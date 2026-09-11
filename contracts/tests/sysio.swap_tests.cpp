@@ -265,11 +265,22 @@ public:
       );
     }
 
-    int64_t balance(name user, int64_t id) {
-        auto _balance = get_balance("sysio.swap"_n, user, "evodexacnts"_n, id, "evodexaccount" );
-        return to_int(fc::json::to_string(_balance["balance"]["quantity"], 
-          fc::time_point(fc::time_point::now() + abi_serializer_max_time) ));
+    // Raw KV read of a composite-keyed row: every key word big-endian, in order
+    // (for a scoped table the scope is the first word). Empty when absent.
+    vector<char> get_kv_row( name code, name table, std::initializer_list<uint64_t> key_words ) {
+        std::string key;
+        for (uint64_t word : key_words)
+            for (int shift = 56; shift >= 0; shift -= 8) key.push_back( char((word >> shift) & 0xff) );
+        const auto& kv_idx = control->db().get_index<chain::kv_index, chain::by_code_key>();
+        const auto itr = kv_idx.find( boost::make_tuple( code, chain::compute_table_id(table.to_uint64_t()),
+                                                         std::string_view(key) ) );
+        if (itr == kv_idx.end()) return {};
+        return vector<char>( itr->value.data(), itr->value.data() + itr->value.size() );
     }
+    // A user's deposit of `sym`, with the token contract resolved as `extend` does:
+    // the evodexacnts row keyed by the extended symbol, scoped by the user.
+    // Declared here, defined after `extend`.
+    int64_t balance( name user, symbol sym );
     int64_t tok_balance(name user, int64_t id){
         auto _balance = get_balance("sysio.swap"_n, user, "accounts"_n, id, "account" );
         return to_int(fc::json::to_string(_balance["balance"], 
@@ -301,18 +312,9 @@ public:
         wide y = wide(w.at(0)) * wide(w.at(1)) * wide(v.at(2)) * wide(v.at(2));
         return x <= y;
     }
-    vector <int64_t> total(){
-        auto EVO_value = symbol::from_string("4,EVO").to_symbol_code().value;
-        auto ETUSD_value = symbol::from_string("3,ETUSD").to_symbol_code().value;
-        int64_t total_eos =  balance("alice"_n, 0) + balance("bob"_n, 0) 
-          + system_balance(EVO_value).at(0) + system_balance(ETUSD_value).at(0);
-        int64_t total_voice = balance("alice"_n, 1) + balance("bob"_n, 1) 
-          + system_balance(EVO_value).at(1);
-        int64_t total_tusd = balance("alice"_n, 2) + balance("bob"_n, 2)
-          + system_balance(ETUSD_value).at(1);
-        vector <int64_t> ans = {total_eos, total_voice, total_tusd};
-        return ans;
-    }
+    // Every unit of EOS, VOICE and TUSD held by the contract for alice, bob and
+    // the two pools. Declared here, defined after the file-scope symbols.
+    vector <int64_t> total();
     void create_tokens_and_issue() {
         BOOST_REQUIRE_EQUAL( success(), create( "sysio.token"_n, "alice"_n, asset::from_string("461168601842738.7903 EOS") ) );
         BOOST_REQUIRE_EQUAL( success(), create( "anothertoken"_n, "bob"_n, asset::from_string("461168601842738.7903 VOICE") ) );
@@ -463,6 +465,27 @@ namespace twap_reference {
    uint256_t price_fp( int64_t numerator, int64_t denominator ) {
       return (uint256_t(numerator) << PriceFractionBits) / denominator;
    }
+}
+
+vector<int64_t> sysio_swap_tester::total() {
+    const int64_t total_eos   = balance("alice"_n, EOS4) + balance("bob"_n, EOS4)
+                              + system_balance(EVO.value).at(0) + system_balance(ETUSD.value).at(0);
+    const int64_t total_voice = balance("alice"_n, VOICE4) + balance("bob"_n, VOICE4)
+                              + system_balance(EVO.value).at(1);
+    const int64_t total_tusd  = balance("alice"_n, TUSD2) + balance("bob"_n, TUSD2)
+                              + system_balance(ETUSD.value).at(1);
+    return { total_eos, total_voice, total_tusd };
+}
+
+int64_t sysio_swap_tester::balance( name user, symbol sym ) {
+    const extended_asset ext = extend( asset(0, sym) );
+    const auto data = get_kv_row( "sysio.swap"_n, "evodexacnts"_n,
+                                  { user.to_uint64_t(), ext.contract.to_uint64_t(), sym.value() } );
+    BOOST_REQUIRE_MESSAGE( !data.empty(), "no deposit row for " << user << " " << sym );
+    const auto row = abi_ser.binary_to_variant( "evodex_account", data,
+                                                abi_serializer::create_yield_function(abi_serializer_max_time) );
+    return to_int( fc::json::to_string( row["balance"]["quantity"],
+                   fc::time_point(fc::time_point::now() + abi_serializer_max_time) ) );
 }
 
 int64_t sysio_swap_tester::settle_swap( name user, symbol_code pair, asset in, symbol out_symbol, int out_leg ) {
@@ -660,8 +683,8 @@ BOOST_FIXTURE_TEST_CASE( exchange_action, sysio_swap_tester ) try {
 
     vector <int64_t> expected_system_balance = {10000073819, 999999185797, 100000328128};
     BOOST_REQUIRE_EQUAL(expected_system_balance == system_balance(EVO.value), true);
-    BOOST_REQUIRE_EQUAL(balance("alice"_n,0), 89999926181);
-    BOOST_REQUIRE_EQUAL(balance("alice"_n,1), 1000000814203);
+    BOOST_REQUIRE_EQUAL(balance("alice"_n, EOS4), 89999926181);
+    BOOST_REQUIRE_EQUAL(balance("alice"_n, VOICE4), 1000000814203);
 
     BOOST_REQUIRE_EQUAL( success(), changefee(EVO, 50) );
 
@@ -670,16 +693,16 @@ BOOST_FIXTURE_TEST_CASE( exchange_action, sysio_swap_tester ) try {
 
     expected_system_balance = {10000123826, 1000004186277, 100000828128};
     BOOST_REQUIRE_EQUAL(expected_system_balance == system_balance(EVO.value), true);
-    BOOST_REQUIRE_EQUAL(balance("alice"_n,0), 89999876174);
-    BOOST_REQUIRE_EQUAL(balance("alice"_n,1), 999995813723);
+    BOOST_REQUIRE_EQUAL(balance("alice"_n, EOS4), 89999876174);
+    BOOST_REQUIRE_EQUAL(balance("alice"_n, VOICE4), 999995813723);
  
     // The retired exact-output form is refused and leaves every balance as it was.
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("ext_asset_in must be positive"),
       exchange( "alice"_n, EVO, extend(asset::from_string("-4.0000 EOS")),
                               asset::from_string("-401.9984 VOICE")) );
     BOOST_REQUIRE_EQUAL(expected_system_balance == system_balance(EVO.value), true);
-    BOOST_REQUIRE_EQUAL(balance("alice"_n,0), 89999876174);
-    BOOST_REQUIRE_EQUAL(balance("alice"_n,1), 999995813723);
+    BOOST_REQUIRE_EQUAL(balance("alice"_n, EOS4), 89999876174);
+    BOOST_REQUIRE_EQUAL(balance("alice"_n, VOICE4), 999995813723);
 
 } FC_LOG_AND_RETHROW()
 
@@ -706,40 +729,40 @@ BOOST_FIXTURE_TEST_CASE( increasing_poolvalue, sysio_swap_tester) try {
 
     auto old_total = total();
     auto old_vec = system_balance(EVO.value);
-    auto old_alice_bal_0 = balance("alice"_n,0);
-    auto old_alice_bal_1 = balance("alice"_n,1);
+    auto old_alice_bal_0 = balance("alice"_n, EOS4);
+    auto old_alice_bal_1 = balance("alice"_n, VOICE4);
 
     BOOST_REQUIRE_EQUAL(success(), 
       exchange( "alice"_n, EVO, extend(asset::from_string("4.0000 EOS")),
       asset::from_string("1.0000 VOICE") ));
     BOOST_REQUIRE_EQUAL(old_total == total(), true);
     BOOST_REQUIRE_EQUAL(is_increasing(old_vec, system_balance(EVO.value)), true);
-    BOOST_REQUIRE_EQUAL(balance("alice"_n,0) - old_alice_bal_0, -40000);
-    BOOST_REQUIRE_EQUAL(balance("alice"_n,1) - old_alice_bal_1, 166570);
+    BOOST_REQUIRE_EQUAL(balance("alice"_n, EOS4) - old_alice_bal_0, -40000);
+    BOOST_REQUIRE_EQUAL(balance("alice"_n, VOICE4) - old_alice_bal_1, 166570);
 
     old_total = total();
     old_vec = system_balance(EVO.value);
-    old_alice_bal_0 = balance("alice"_n, 0);
-    old_alice_bal_1 = balance("alice"_n, 1);
+    old_alice_bal_0 = balance("alice"_n, EOS4);
+    old_alice_bal_1 = balance("alice"_n, VOICE4);
     addliquidity( "alice"_n, asset::from_string("0.0001 EVO"), 
       asset::from_string("10000000.0000 EOS"), asset::from_string("10000000.0000 VOICE") );
     BOOST_REQUIRE_EQUAL(old_total == total(), true);
     BOOST_REQUIRE_EQUAL(is_increasing(old_vec, system_balance(EVO.value)), true);
-    BOOST_REQUIRE_EQUAL(balance("alice"_n,0) - old_alice_bal_0, -2);
-    BOOST_REQUIRE_EQUAL(balance("alice"_n,1) - old_alice_bal_1, -4);
+    BOOST_REQUIRE_EQUAL(balance("alice"_n, EOS4) - old_alice_bal_0, -2);
+    BOOST_REQUIRE_EQUAL(balance("alice"_n, VOICE4) - old_alice_bal_1, -4);
 
     produce_blocks();
 
     old_total = total();
     old_vec = system_balance(EVO.value);
-    old_alice_bal_0 = balance("alice"_n, 0);
-    old_alice_bal_1 = balance("alice"_n, 1);
+    old_alice_bal_0 = balance("alice"_n, EOS4);
+    old_alice_bal_1 = balance("alice"_n, VOICE4);
     remliquidity( "alice"_n, asset::from_string("0.0001 EVO"),
       asset::from_string("0.0000 EOS"), asset::from_string("0.0000 VOICE") );
     BOOST_REQUIRE_EQUAL(old_total == total(), true);
     BOOST_REQUIRE_EQUAL(is_increasing(old_vec, system_balance(EVO.value)), true);
-    BOOST_REQUIRE_EQUAL(balance("alice"_n, 0) - old_alice_bal_0, 0);
-    BOOST_REQUIRE_EQUAL(balance("alice"_n, 1) - old_alice_bal_1, 2);
+    BOOST_REQUIRE_EQUAL(balance("alice"_n, EOS4) - old_alice_bal_0, 0);
+    BOOST_REQUIRE_EQUAL(balance("alice"_n, VOICE4) - old_alice_bal_1, 2);
 
     old_total = total();
     old_vec = system_balance(ETUSD.value);
@@ -1263,11 +1286,18 @@ BOOST_FIXTURE_TEST_CASE( indextable, sysio_swap_tester ) try {
         extend(asset::from_string("1.0000 VOICE")), 
         extend(asset::from_string("1.0000 EOS")), 10, "wevotethefee"_n) );
 
-    auto table = get_balance("sysio.swap"_n, "sysio.swap"_n, "evoindex"_n, EVO.value, "index_struct");
-    // make256key(anothertoken, 4,VOICE, sysio.token, 4,EOS) as little-endian
-    // words; upstream's constant encoded eosio.token in the third word.
-    BOOST_REQUIRE_EQUAL(table["id_256"], "34e996aaf9a4153000004543494f5604c7b0ea033482a60000000000534f4504");
+    // The pair's uniqueness row is keyed by its legs in canonical order, the lower
+    // (contract, symbol) first: anothertoken/VOICE ahead of sysio.token/EOS. The
+    // same two legs in the other order are the same key, so no second row exists.
+    BOOST_REQUIRE( "anothertoken"_n < "sysio.token"_n );
+    const auto data = get_kv_row( "sysio.swap"_n, "evoindex"_n,
+        { "anothertoken"_n.to_uint64_t(), VOICE4.value(), "sysio.token"_n.to_uint64_t(), EOS4.value() } );
+    BOOST_REQUIRE( !data.empty() );
+    const auto table = abi_ser.binary_to_variant( "pair_index", data,
+                                                  abi_serializer::create_yield_function(abi_serializer_max_time) );
     BOOST_REQUIRE_EQUAL(table["evo_symbol"], "4,EVO");
+    BOOST_REQUIRE( get_kv_row( "sysio.swap"_n, "evoindex"_n,
+        { "sysio.token"_n.to_uint64_t(), EOS4.value(), "anothertoken"_n.to_uint64_t(), VOICE4.value() } ).empty() );
 
     BOOST_REQUIRE_EQUAL(wasm_assert_msg("extended_symbol not registered for this user,\
  please run openext action or write exchange details in the memo of your transfer"),
@@ -1336,7 +1366,7 @@ BOOST_FIXTURE_TEST_CASE( compute_rounding_table, sysio_swap_tester ) try {
             // EOS -> VOICE: one unit above the spec quote is refused, the quote itself lands
             auto before = system_balance(EVO.value);
             int64_t out = reference::receive(amount, before[0], before[1], fee);
-            int64_t alice_eos = balance("alice"_n, 0), alice_voice = balance("alice"_n, 1);
+            int64_t alice_eos = balance("alice"_n, EOS4), alice_voice = balance("alice"_n, VOICE4);
             BOOST_REQUIRE_EQUAL( wasm_assert_msg("available is less than expected"),
                 exchange( "alice"_n, EVO, extend(asset(amount, EOS4)), asset(out + 1, VOICE4) ) );
             BOOST_REQUIRE_EQUAL( success(),
@@ -1344,8 +1374,8 @@ BOOST_FIXTURE_TEST_CASE( compute_rounding_table, sysio_swap_tester ) try {
             auto after = system_balance(EVO.value);
             BOOST_REQUIRE_EQUAL( before[0] + amount, after[0] );
             BOOST_REQUIRE_EQUAL( before[1] - out,    after[1] );
-            BOOST_REQUIRE_EQUAL( alice_eos - amount, balance("alice"_n, 0) );
-            BOOST_REQUIRE_EQUAL( alice_voice + out,  balance("alice"_n, 1) );
+            BOOST_REQUIRE_EQUAL( alice_eos - amount, balance("alice"_n, EOS4) );
+            BOOST_REQUIRE_EQUAL( alice_voice + out,  balance("alice"_n, VOICE4) );
 
             // VOICE -> EOS
             before = after;
@@ -1398,11 +1428,10 @@ BOOST_FIXTURE_TEST_CASE( invariants_under_random_sequences, sysio_swap_tester ) 
         symbol      lp;
         symbol      leg1;   // pool1
         symbol      leg2;   // pool2
-        int         leg1_id, leg2_id;   // evodexacnts row ids (openext order: EOS=0, VOICE=1, TUSD=2)
     };
     const std::vector<pool_spec> pools{
-        { EVO,   EVO4,   EOS4, VOICE4, 0, 1 },
-        { ETUSD, ETUSD3, EOS4, TUSD2,  0, 2 },
+        { EVO,   EVO4,   EOS4, VOICE4 },
+        { ETUSD, ETUSD3, EOS4, TUSD2  },
     };
     const std::vector<name> users{ "alice"_n, "bob"_n };
     // Failures the sequence is allowed to produce: every one is a guard the
@@ -1438,8 +1467,8 @@ BOOST_FIXTURE_TEST_CASE( invariants_under_random_sequences, sysio_swap_tester ) 
         const name  user = users[rng() % users.size()];
         const auto  old_total = total();
         const auto  old_vec   = system_balance(pool.code.value);
-        const int64_t user_leg1 = balance(user, pool.leg1_id);
-        const int64_t user_leg2 = balance(user, pool.leg2_id);
+        const int64_t user_leg1 = balance(user, pool.leg1);
+        const int64_t user_leg2 = balance(user, pool.leg2);
         const int   op = rng() % op_count;
 
         action_result r;
@@ -1617,7 +1646,7 @@ BOOST_FIXTURE_TEST_CASE( precision_extremes, sysio_swap_tester ) try {
     // the one-unit minimum fee keeps in the pool: no fee-bearing trade is free.
     {
         const auto before = system_balance(EVO.value);
-        const int64_t amount = balance("alice"_n, 1);
+        const int64_t amount = balance("alice"_n, VOICE4);
         BOOST_REQUIRE_EQUAL( asset::max_amount, before[1] + amount );
         BOOST_REQUIRE_EQUAL( 1, model::gross(amount, before[1], before[0]) );
         const int64_t out = reference::receive(amount, before[1], before[0], 10);
@@ -1625,7 +1654,7 @@ BOOST_FIXTURE_TEST_CASE( precision_extremes, sysio_swap_tester ) try {
         BOOST_REQUIRE_EQUAL( out, settle_swap("alice"_n, EVO, asset(amount, VOICE4), EOS4, 0) );
         const auto after = system_balance(EVO.value);
         BOOST_REQUIRE_EQUAL( asset::max_amount, after[1] );
-        BOOST_REQUIRE_EQUAL( 0, balance("alice"_n, 1) );
+        BOOST_REQUIRE_EQUAL( 0, balance("alice"_n, VOICE4) );
     }
 
     // Whale pool: the smallest trade, then the largest alice can make.
@@ -1640,7 +1669,7 @@ BOOST_FIXTURE_TEST_CASE( precision_extremes, sysio_swap_tester ) try {
         // Every unit of EOS alice still holds: pool_in + amount is the whole
         // supply less the two units parked in the dust pool.
         before = after;
-        const int64_t amount = balance("alice"_n, 0);
+        const int64_t amount = balance("alice"_n, EOS4);
         BOOST_REQUIRE_EQUAL( 2, system_balance(EVO.value)[0] );
         BOOST_REQUIRE_EQUAL( asset::max_amount - 2, before[0] + amount );
         const int64_t out = reference::receive(amount, before[0], before[1], 10);
@@ -1650,15 +1679,15 @@ BOOST_FIXTURE_TEST_CASE( precision_extremes, sysio_swap_tester ) try {
         BOOST_REQUIRE_EQUAL( out, settle_swap("alice"_n, ETUSD, asset(amount, EOS4), TUSD2, 1) );
         after = system_balance(ETUSD.value);
         BOOST_REQUIRE_EQUAL( asset::max_amount - 2, after[0] );
-        BOOST_REQUIRE_EQUAL( 0, balance("alice"_n, 0) );
+        BOOST_REQUIRE_EQUAL( 0, balance("alice"_n, EOS4) );
 
         // And every unit of TUSD the other way.
         before = after;
-        const int64_t tusd = balance("alice"_n, 2);
+        const int64_t tusd = balance("alice"_n, TUSD2);
         const int64_t out2 = reference::receive(tusd, before[1], before[0], 10);
         BOOST_REQUIRE_EQUAL( out2, model::receive(tusd, before[1], before[0], 10) );
         BOOST_REQUIRE_EQUAL( out2, settle_swap("alice"_n, ETUSD, asset(tusd, TUSD2), EOS4, 0) );
-        BOOST_REQUIRE_EQUAL( 0, balance("alice"_n, 2) );
+        BOOST_REQUIRE_EQUAL( 0, balance("alice"_n, TUSD2) );
     }
 } FC_LOG_AND_RETHROW()
 
@@ -1915,7 +1944,10 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     const field_list sync_fields{ {"pair_token", "symbol_code"} };
     const field_list cumulative_price_fields{ {"lo", "uint128"}, {"hi", "uint128"} };
     const field_list price_accumulator_fields{
-        {"pair", "symbol_code"}, {"price1", "cumulative_price"}, {"price2", "cumulative_price"}, {"last_update", "time_point"} };
+        {"price1", "cumulative_price"}, {"price2", "cumulative_price"}, {"last_update", "time_point"} };
+    const field_list account_fields{ {"balance", "asset"} };
+    const field_list evodex_account_fields{ {"balance", "extended_asset"} };
+    const field_list pair_index_fields{ {"evo_symbol", "symbol"} };
     BOOST_REQUIRE( fields("exchange") == exchange_fields );
     BOOST_REQUIRE( fields("changefee") == changefee_fields );
     BOOST_REQUIRE( fields("inittoken") == inittoken_fields );
@@ -1923,12 +1955,32 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     BOOST_REQUIRE( fields("sync") == sync_fields );
     BOOST_REQUIRE( fields("cumulative_price") == cumulative_price_fields );
     BOOST_REQUIRE( fields("price_accumulator") == price_accumulator_fields );
+    BOOST_REQUIRE( fields("account") == account_fields );
+    BOOST_REQUIRE( fields("evodex_account") == evodex_account_fields );
+    BOOST_REQUIRE( fields("pair_index") == pair_index_fields );
+
+    // KV tables: the row type and the key layout an explorer needs to decode
+    // the raw key bytes. A scoped table's first key word is the scope.
+    struct table_shape { std::string type; std::vector<std::string> key_names; std::vector<std::string> key_types; };
+    auto shape = [&](const std::string& table_name) {
+        for (const auto& t : abi.tables)
+            if (t.name == table_name)
+                return table_shape{ t.type, std::vector<std::string>(t.key_names.begin(), t.key_names.end()),
+                                            std::vector<std::string>(t.key_types.begin(), t.key_types.end()) };
+        return table_shape{};
+    };
+    auto same = [](const table_shape& a, const table_shape& b) {
+        return a.type == b.type && a.key_names == b.key_names && a.key_types == b.key_types;
+    };
+    BOOST_REQUIRE( same( shape("accounts"),    { "account",           {"scope", "symbol_code"},                        {"name", "uint64"} } ) );
+    BOOST_REQUIRE( same( shape("evodexacnts"), { "evodex_account",    {"scope", "contract", "symbol"},                 {"name", "name", "uint64"} } ) );
+    BOOST_REQUIRE( same( shape("stat"),        { "currency_stats",    {"symbol_code"},                                 {"uint64"} } ) );
+    BOOST_REQUIRE( same( shape("evoindex"),    { "pair_index",        {"contract1", "symbol1", "contract2", "symbol2"}, {"name", "uint64", "name", "uint64"} } ) );
+    BOOST_REQUIRE( same( shape("priceaccum"),  { "price_accumulator", {"symbol_code"},                                 {"uint64"} } ) );
 
     std::set<std::string> tables;
     for (const auto& t : abi.tables) tables.insert(t.name);
-    const std::set<std::string> expected_tables{
-        "account", "accounts", "currency_stats", "evodexaccount", "evodexacnts", "evoindex", "index_struct",
-        "priceaccum", "stat" };
+    const std::set<std::string> expected_tables{ "accounts", "evodexacnts", "evoindex", "priceaccum", "stat" };
     BOOST_REQUIRE( tables == expected_tables );
 } FC_LOG_AND_RETHROW()
 

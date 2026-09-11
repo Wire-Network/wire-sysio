@@ -1,5 +1,6 @@
 #include <sysio.swap/sysio.swap.hpp>
 #include <sysio.swap/utils.hpp>
+#include <tuple>
 
 namespace sysio {
 
@@ -7,29 +8,24 @@ void swap::openext( const name& user, const name& payer, const extended_symbol& 
     check( is_account( user ), "user account does not exist" );
     require_auth( payer );
     evodexacnts acnts( get_self(), user.value );
-    auto index = acnts.get_index<"extended"_n>();
-    const auto& acnt_balance = index.find( 
-      make128key(ext_symbol.get_contract().value, ext_symbol.get_symbol().raw()) );
-    if( acnt_balance == index.end() ) {
-        acnts.emplace( payer, [&]( auto& a ){
-            a.balance = extended_asset{0, ext_symbol};
-            a.id = acnts.available_primary_key();
-        });
+    const auto key = key_of(ext_symbol);
+    if( !acnts.contains(key) ) {
+        acnts.emplace( payer, key, evodex_account{ extended_asset{0, ext_symbol} } );
     }
 }
 
 void swap::closeext( const name& user, const name& to, const extended_symbol& ext_symbol, string memo) {
     require_auth( user );
     evodexacnts acnts( get_self(), user.value );
-    auto index = acnts.get_index<"extended"_n>();
-    const auto& acnt_balance = index.find( make128key(ext_symbol.get_contract().value, ext_symbol.get_symbol().raw()) );
-    check( acnt_balance != index.end(), "User does not have such token" );
-    auto ext_balance = acnt_balance->balance;
+    const auto key = key_of(ext_symbol);
+    const auto row = acnts.try_get(key);
+    check( row.has_value(), "User does not have such token" );
+    const extended_asset ext_balance = row->balance;
     if (ext_balance.quantity.amount > 0) {
         action(permission_level{ get_self(), "active"_n }, ext_balance.contract, "transfer"_n,
           std::make_tuple( get_self(), to, ext_balance.quantity, memo) ).send();
     }
-    index.erase( acnt_balance );
+    acnts.erase( key );
 }
 
 void swap::ontransfer(name from, name to, asset quantity, string memo) {
@@ -100,9 +96,10 @@ int64_t swap::compute(int64_t x, int64_t y, int64_t z, int fee) {
 void swap::add_signed_liq(name user, asset to_add, bool is_buying,
   asset max_asset1, asset max_asset2){
     check( to_add.is_valid(), "invalid asset");
-    stats statstable( get_self(), to_add.symbol.code().raw() );
-    const auto& token = statstable.find( to_add.symbol.code().raw() );
-    check ( token != statstable.end(), "pair token does not exist" );
+    stats statstable( get_self() );
+    const pair_key key{ to_add.symbol.code().raw() };
+    const auto token = statstable.try_get( key );
+    check ( token.has_value(), "pair token does not exist" );
     auto A = token-> supply.amount;
     auto P1 = token-> pool1.quantity.amount;
     auto P2 = token-> pool2.quantity.amount;
@@ -122,12 +119,12 @@ void swap::add_signed_liq(name user, asset to_add, bool is_buying,
     (to_add.amount > 0)? add_balance(user, to_add, user) : sub_balance(user, -to_add);
     if (token->fee_contract) require_recipient(token->fee_contract);
     update_price_accumulators(*token);
-    statstable.modify( token, same_payer, [&]( auto& a ) {
+    statstable.modify( name{}, key, [&]( auto& a ) {
       a.supply += to_add;
       a.pool1 += to_pay1;
       a.pool2 += to_pay2;
     });
-    check(token->supply.amount != 0, "the pool cannot be left empty");
+    check(token->supply.amount + to_add.amount != 0, "the pool cannot be left empty");
 }
 
 void swap::exchange( name user, symbol_code pair_token, 
@@ -142,9 +139,10 @@ void swap::exchange( name user, symbol_code pair_token,
 
 extended_asset swap::process_exch(symbol_code pair_token,
   extended_asset ext_asset_in, asset min_expected){
-    stats statstable( get_self(), pair_token.raw() );
-    const auto token = statstable.find( pair_token.raw() );
-    check ( token != statstable.end(), "pair token does not exist" );
+    stats statstable( get_self() );
+    const pair_key key{ pair_token.raw() };
+    const auto token = statstable.try_get( key );
+    check ( token.has_value(), "pair token does not exist" );
     bool in_first;
     if ((token->pool1.get_extended_symbol() == ext_asset_in.get_extended_symbol()) && 
         (token->pool2.quantity.symbol == min_expected.symbol)) {
@@ -188,7 +186,7 @@ extended_asset swap::process_exch(symbol_code pair_token,
       ext_asset_out = -ext_asset1;
     }
     update_price_accumulators(*token);
-    statstable.modify( token, same_payer, [&]( auto& a ) {
+    statstable.modify( name{}, key, [&]( auto& a ) {
       a.pool1 += ext_asset1;
       a.pool2 += ext_asset2;
     });
@@ -223,27 +221,24 @@ extended_asset initial_pool2, int initial_fee, name fee_contract)
     auto new_token = asset{int64_t(geometric_mean), new_symbol};
     check( initial_pool1.get_extended_symbol() != initial_pool2.get_extended_symbol(), "extended symbols must be different");
 
-    stats statstable( get_self(), new_symbol.code().raw() );
-    const auto& token = statstable.find( new_symbol.code().raw() );
-    check ( token == statstable.end(), "token symbol already exists" );
+    stats statstable( get_self() );
+    const pair_key key{ new_symbol.code().raw() };
+    check ( !statstable.contains( key ), "token symbol already exists" );
     check( initial_fee == DEFAULT_FEE, "initial_fee must be 10");
     check( fee_contract == "wevotethefee"_n, "fee_contract must be wevotethefee");
 
-    statstable.emplace( user, [&]( auto& a ) {
-        a.supply = new_token;
-        a.max_supply = asset{MAX,new_symbol};
-        a.issuer = get_self();
-        a.pool1 = initial_pool1;
-        a.pool2 = initial_pool2;
-        a.fee = initial_fee;
-        a.fee_contract = fee_contract;
+    statstable.emplace( user, key, currency_stats{
+        .supply       = new_token,
+        .max_supply   = asset{MAX, new_symbol},
+        .issuer       = get_self(),
+        .pool1        = initial_pool1,
+        .pool2        = initial_pool2,
+        .fee          = initial_fee,
+        .fee_contract = fee_contract,
     } );
 
-    priceaccums accums( get_self(), get_self().value );
-    accums.emplace( user, [&]( auto& a ) {
-        a.pair = new_symbol.code();
-        a.last_update = current_time_point();
-    } );
+    priceaccums accums( get_self() );
+    accums.emplace( user, key, price_accumulator{ .last_update = current_time_point() } );
 
     placeindex(user, new_symbol, initial_pool1, initial_pool2 );
     add_balance(user, new_token, user);
@@ -252,38 +247,29 @@ extended_asset initial_pool2, int initial_fee, name fee_contract)
 }
 
 void swap::indexpair(name user, symbol evo_symbol) {
-    stats statstable( get_self(), evo_symbol.code().raw() );
-    const auto& token = statstable.find( evo_symbol.code().raw() );
-    check ( token != statstable.end(), "token symbol does not exist" );
-    auto pool1 = token->pool1;
-    auto pool2 = token->pool2;
-    placeindex(user, evo_symbol, pool1, pool2);
+    stats statstable( get_self() );
+    const auto token = statstable.get( pair_key{ evo_symbol.code().raw() }, "token symbol does not exist" );
+    placeindex(user, evo_symbol, token.pool1, token.pool2);
 }
 
 void swap::placeindex(name user, symbol evo_symbol,
   extended_asset pool1, extended_asset pool2 ) {
-    auto id_256 = make256key(pool1.contract.value, pool1.quantity.symbol.raw(),
-                             pool2.contract.value, pool2.quantity.symbol.raw());
-    evoindexes indextable( get_self(), get_self().value );
-    auto index = indextable.get_index<"extended"_n>();
-    const auto& info = index.find( id_256 );
-    check( info == index.end(), "the pool is already indexed");
-    indextable.emplace( user, [&]( auto& a ){
-        a.evo_symbol = evo_symbol;
-        a.id_256 = id_256;
-    });
+    evoindexes indextable( get_self() );
+    indextable.emplace( user, identity_of(pool1.get_extended_symbol(), pool2.get_extended_symbol()),
+                        pair_index{ evo_symbol }, "the pool is already indexed" );
 }
 
 void swap::update_price_accumulators(const currency_stats& token) {
-    priceaccums accums( get_self(), get_self().value );
-    const auto accum = accums.find( token.supply.symbol.code().raw() );
-    check( accum != accums.end(), "price accumulator does not exist" );
+    priceaccums accums( get_self() );
+    const pair_key key{ token.supply.symbol.code().raw() };
+    const auto accum = accums.try_get( key );
+    check( accum.has_value(), "price accumulator does not exist" );
     const time_point now = current_time_point();
     if (now <= accum->last_update) return;
     const uint64_t elapsed = uint64_t((now - accum->last_update).count());
     const uint64_t P1 = uint64_t(token.pool1.quantity.amount);
     const uint64_t P2 = uint64_t(token.pool2.quantity.amount);
-    accums.modify( accum, same_payer, [&]( auto& a ) {
+    accums.modify( name{}, key, [&]( auto& a ) {
         opp::twap::accumulate( a.price1, opp::twap::price_fp(P2, P1), elapsed );
         opp::twap::accumulate( a.price2, opp::twap::price_fp(P1, P2), elapsed );
         a.last_update = now;
@@ -291,45 +277,45 @@ void swap::update_price_accumulators(const currency_stats& token) {
 }
 
 void swap::sync(symbol_code pair_token) {
-    stats statstable( get_self(), pair_token.raw() );
-    const auto token = statstable.find( pair_token.raw() );
-    check ( token != statstable.end(), "pair token does not exist" );
+    stats statstable( get_self() );
+    const auto token = statstable.try_get( pair_key{ pair_token.raw() } );
+    check ( token.has_value(), "pair token does not exist" );
     update_price_accumulators(*token);
 }
 
 void swap::changefee(symbol_code pair_token, int newfee) {
-    stats statstable( get_self(), pair_token.raw() );
-    const auto& token = statstable.find( pair_token.raw() );
-    check ( token != statstable.end(), "pair token does not exist" );
+    stats statstable( get_self() );
+    const pair_key key{ pair_token.raw() };
+    const auto token = statstable.try_get( key );
+    check ( token.has_value(), "pair token does not exist" );
     require_auth(token->fee_contract);
     check( 0 <= newfee && newfee <= MAX_FEE, "fee out of range" );
-    statstable.modify( token, same_payer, [&]( auto& a ) {
+    statstable.modify( name{}, key, [&]( auto& a ) {
       a.fee = newfee;
     } );
 }
 
-uint128_t swap::make128key(uint64_t a, uint64_t b) {
-    uint128_t aa = a;
-    uint128_t bb = b;
-    return (aa << 64) + bb;
+swap::extended_symbol_key swap::key_of(const extended_symbol& ext_symbol) {
+    return extended_symbol_key{ ext_symbol.get_contract(), ext_symbol.get_symbol().raw() };
 }
 
-checksum256 swap::make256key(uint64_t a, uint64_t b, uint64_t c, uint64_t d) {
-    if (make128key(a,b) < make128key(c,d))
-      return checksum256::make_from_word_sequence<uint64_t>(a,b,c,d);
-    else
-      return checksum256::make_from_word_sequence<uint64_t>(c,d,a,b);
+swap::pair_identity_key swap::identity_of(const extended_symbol& a, const extended_symbol& b) {
+    const extended_symbol_key ka = key_of(a);
+    const extended_symbol_key kb = key_of(b);
+    const bool a_first = std::tie(ka.contract.value, ka.symbol) < std::tie(kb.contract.value, kb.symbol);
+    const extended_symbol_key& first  = a_first ? ka : kb;
+    const extended_symbol_key& second = a_first ? kb : ka;
+    return pair_identity_key{ first.contract, first.symbol, second.contract, second.symbol };
 }
 
 void swap::add_signed_ext_balance( const name& user, const extended_asset& to_add )
 {
     check( to_add.quantity.is_valid(), "invalid asset" );
     evodexacnts acnts( get_self(), user.value );
-    auto index = acnts.get_index<"extended"_n>();
-    const auto& acnt_balance = index.find( make128key(to_add.contract.value, to_add.quantity.symbol.raw() ) );
-    check( acnt_balance != index.end(), "extended_symbol not registered for this user,\
+    const auto key = key_of(to_add.get_extended_symbol());
+    check( acnts.contains(key), "extended_symbol not registered for this user,\
  please run openext action or write exchange details in the memo of your transfer");
-    index.modify( acnt_balance, same_payer, [&]( auto& a ) {
+    acnts.modify( name{}, key, [&]( auto& a ) {
         a.balance += to_add;
         check( a.balance.quantity.amount >= 0, "insufficient funds");
     });

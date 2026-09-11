@@ -14,6 +14,16 @@
             ]
         },
         {
+            "name": "account_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "symbol_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "addliquidity",
             "base": "",
             "fields": [
@@ -134,16 +144,12 @@
             ]
         },
         {
-            "name": "evodexaccount",
+            "name": "evodex_account",
             "base": "",
             "fields": [
                 {
                     "name": "balance",
                     "type": "extended_asset"
-                },
-                {
-                    "name": "id",
-                    "type": "uint64"
                 }
             ]
         },
@@ -184,16 +190,16 @@
             ]
         },
         {
-            "name": "index_struct",
+            "name": "extended_symbol_key",
             "base": "",
             "fields": [
                 {
-                    "name": "evo_symbol",
-                    "type": "symbol"
+                    "name": "contract",
+                    "type": "name"
                 },
                 {
-                    "name": "id_256",
-                    "type": "checksum256"
+                    "name": "symbol",
+                    "type": "uint64"
                 }
             ]
         },
@@ -278,13 +284,51 @@
             ]
         },
         {
-            "name": "price_accumulator",
+            "name": "pair_identity_key",
             "base": "",
             "fields": [
                 {
-                    "name": "pair",
-                    "type": "symbol_code"
+                    "name": "contract1",
+                    "type": "name"
                 },
+                {
+                    "name": "symbol1",
+                    "type": "uint64"
+                },
+                {
+                    "name": "contract2",
+                    "type": "name"
+                },
+                {
+                    "name": "symbol2",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "pair_index",
+            "base": "",
+            "fields": [
+                {
+                    "name": "evo_symbol",
+                    "type": "symbol"
+                }
+            ]
+        },
+        {
+            "name": "pair_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "symbol_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "price_accumulator",
+            "base": "",
+            "fields": [
                 {
                     "name": "price1",
                     "type": "cumulative_price"
@@ -445,89 +489,43 @@
     ],
     "tables": [
         {
-            "name": "account",
-            "type": "account",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 15140
-        },
-        {
             "name": "accounts",
             "type": "account",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
+            "key_names": ["scope","symbol_code"],
             "key_types": ["name","uint64"],
             "table_id": 25660
         },
         {
-            "name": "currency_stats",
-            "type": "currency_stats",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 18569
-        },
-        {
-            "name": "evodexaccount",
-            "type": "evodexaccount",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 29959
-        },
-        {
             "name": "evodexacnts",
-            "type": "evodexaccount",
+            "type": "evodex_account",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
-            "table_id": 63234,
-            "secondary_indexes": [
-                {
-                    "name": "extended",
-                    "key_type": "uint128",
-                    "table_id": 55555
-                }
-            ]
+            "key_names": ["scope","contract","symbol"],
+            "key_types": ["name","name","uint64"],
+            "table_id": 63234
         },
         {
             "name": "evoindex",
-            "type": "index_struct",
+            "type": "pair_index",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
-            "table_id": 41326,
-            "secondary_indexes": [
-                {
-                    "name": "extended",
-                    "key_type": "checksum256",
-                    "table_id": 12143
-                }
-            ]
-        },
-        {
-            "name": "index_struct",
-            "type": "index_struct",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 44724
+            "key_names": ["contract1","symbol1","contract2","symbol2"],
+            "key_types": ["name","uint64","name","uint64"],
+            "table_id": 41326
         },
         {
             "name": "priceaccum",
             "type": "price_accumulator",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["symbol_code"],
+            "key_types": ["uint64"],
             "table_id": 54664
         },
         {
             "name": "stat",
             "type": "currency_stats",
             "index_type": "i64",
-            "key_names": ["scope","primary_key"],
-            "key_types": ["name","uint64"],
+            "key_names": ["symbol_code"],
+            "key_types": ["uint64"],
             "table_id": 4264
         }
     ],

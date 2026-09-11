@@ -8,8 +8,8 @@ void swap::transfer( const name& from, const name& to, const asset& quantity,
     require_auth( from );
     check( is_account( to ), "to account does not exist");
     auto sym = quantity.symbol.code();
-    stats statstable( get_self(), sym.raw() );
-    const auto& st = statstable.get( sym.raw() );
+    stats statstable( get_self() );
+    const auto st = statstable.get( pair_key{ sym.raw() }, "pair token does not exist" );
 
     require_recipient( from );
     require_recipient( to );
@@ -29,11 +29,13 @@ void swap::transfer( const name& from, const name& to, const asset& quantity,
 
 void swap::sub_balance( const name& owner, const asset& value ) {
     accounts from_acnts( get_self(), owner.value );
+    const account_key key{ value.symbol.code().raw() };
 
-    const auto& from = from_acnts.get( value.symbol.code().raw(), "no balance object found" );
-    check( from.balance.amount >= value.amount, "overdrawn balance" );
+    const auto from = from_acnts.try_get( key );
+    check( from.has_value(), "no balance object found" );
+    check( from->balance.amount >= value.amount, "overdrawn balance" );
 
-    from_acnts.modify( from, owner, [&]( auto& a ) {
+    from_acnts.modify( owner, key, [&]( auto& a ) {
             a.balance -= value;
         });
 }
@@ -41,13 +43,11 @@ void swap::sub_balance( const name& owner, const asset& value ) {
 void swap::add_balance( const name& owner, const asset& value, const name& ram_payer )
 {
     accounts to_acnts( get_self(), owner.value );
-    auto to = to_acnts.find( value.symbol.code().raw() );
-    if( to == to_acnts.end() ) {
-        to_acnts.emplace( ram_payer, [&]( auto& a ){
-        a.balance = value;
-        });
+    const account_key key{ value.symbol.code().raw() };
+    if( !to_acnts.contains( key ) ) {
+        to_acnts.emplace( ram_payer, key, account{ value } );
     } else {
-        to_acnts.modify( to, same_payer, [&]( auto& a ) {
+        to_acnts.modify( name{}, key, [&]( auto& a ) {
         a.balance += value;
         });
     }
@@ -60,16 +60,14 @@ void swap::open( const name& owner, const symbol& symbol, const name& ram_payer 
    check( is_account( owner ), "owner account does not exist" );
 
    auto sym_code_raw = symbol.code().raw();
-   stats statstable( get_self(), sym_code_raw );
-   const auto& st = statstable.get( sym_code_raw, "symbol does not exist" );
+   stats statstable( get_self() );
+   const auto st = statstable.get( pair_key{ sym_code_raw }, "symbol does not exist" );
    check( st.supply.symbol == symbol, "symbol precision mismatch" );
 
    accounts acnts( get_self(), owner.value );
-   auto it = acnts.find( sym_code_raw );
-   if( it == acnts.end() ) {
-      acnts.emplace( ram_payer, [&]( auto& a ){
-        a.balance = asset{0, symbol};
-      });
+   const account_key key{ sym_code_raw };
+   if( !acnts.contains( key ) ) {
+      acnts.emplace( ram_payer, key, account{ asset{0, symbol} } );
    }
 }
 
@@ -77,10 +75,11 @@ void swap::close( const name& owner, const symbol& symbol )
 {
    require_auth( owner );
    accounts acnts( get_self(), owner.value );
-   auto it = acnts.find( symbol.code().raw() );
-   check( it != acnts.end(), "Balance row already deleted or never existed. Action won't have any effect." );
-   check( it->balance.amount == 0, "Cannot close because the balance is not zero." );
-   acnts.erase( it );
+   const account_key key{ symbol.code().raw() };
+   const auto row = acnts.try_get( key );
+   check( row.has_value(), "Balance row already deleted or never existed. Action won't have any effect." );
+   check( row->balance.amount == 0, "Cannot close because the balance is not zero." );
+   acnts.erase( key );
 }
 
 } // namespace sysio
