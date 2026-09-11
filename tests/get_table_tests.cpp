@@ -1707,7 +1707,7 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_index_name_test, validating_tester ) try {
 // values straddle zero, which LE sorts above the negatives; and the composite keys need
 // tier compared before owner, which only holds if each field encodes big-endian.
 // ---------------------------------------------------------------------------
-BOOST_FIXTURE_TEST_CASE( get_kv_rows_wide_secondary_keys, validating_tester ) try {
+BOOST_FIXTURE_TEST_CASE( get_kv_rows_wide_secondary_keys_test, validating_tester ) try {
    produce_block();
    create_accounts({"widesec"_n});
    produce_block();
@@ -1722,13 +1722,17 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_wide_secondary_keys, validating_tester ) tr
 
    // Ascending by every index is id 4, 3, 2, 1 -- i.e. `small` 1, 256, 65536, 16777216.
    //
-   // The tiers are byte-rotations for the same reason the `small` values are. Small
-   // consecutive tiers (0, 1, 2) would NOT discriminate: they differ only in the
+   // Every value here is chosen to be ASYMMETRIC under byte reversal, which takes care.
+   // Consecutive tiers (0, 1, 2) would not discriminate: they differ only in the
    // least-significant byte, which little-endian puts first, so a LE encoding orders them
-   // correctly by accident. Ids 1 and 2 share a tier so `owner` is exercised as the
-   // tiebreaker rather than never being reached.
-   additem(1, 0x01000000u,  1, 0x00010000u, "zzz");
-   additem(2, 0x00010000u,  0, 0x00010000u, "aaa");
+   // correctly by accident. The tiers are byte-rotations for that reason.
+   //
+   // The same trap catches `name`. Ids 1 and 2 share a tier so `owner` breaks the tie, but
+   // a pair like "aaa"/"zzz" sorts the same either way -- their low bytes are zero, so LE
+   // reaches the differing high byte with everything before it equal. "aaz" (raw 0x31be..)
+   // and "b" (0x3800..) do not: big-endian puts "aaz" first, little-endian puts it second.
+   additem(1, 0x01000000u,  1, 0x00010000u, "b");
+   additem(2, 0x00010000u,  0, 0x00010000u, "aaz");
    additem(3, 0x00000100u, -1, 0x00000100u, "mmm");
    additem(4, 0x00000001u, -2, 0x00000001u, "bob");
    produce_block();
@@ -1766,6 +1770,12 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_wide_secondary_keys, validating_tester ) tr
 
    const std::vector<uint64_t> ascending{1u, 256u, 65536u, 16777216u};
 
+   // BOOST_CHECK(a == b) on vectors prints nothing useful on failure, and every assertion
+   // here is about a sequence -- which order came back is the whole answer.
+   auto check_seq = [](const std::vector<uint64_t>& got, const std::vector<uint64_t>& want) {
+      BOOST_CHECK_EQUAL_COLLECTIONS(got.begin(), got.end(), want.begin(), want.end());
+   };
+
    // (a) primary query returns everything, so a wrong count later is an index problem
    {
       chain_apis::read_only::get_table_rows_params p;
@@ -1778,36 +1788,36 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_wide_secondary_keys, validating_tester ) tr
 
    // (b) uint32 secondary index, full scan. Under a little-endian encoding this comes back
    //     exactly reversed.
-   BOOST_CHECK(smalls_of(query("bysmall")) == ascending);
+   check_seq(smalls_of(query("bysmall")), ascending);
 
    // (c) int64 secondary index. Under LE the two non-negative scores sort ahead of the
    //     negative ones, giving {65536, 16777216, 1, 256}.
-   BOOST_CHECK(smalls_of(query("byscore")) == ascending);
+   check_seq(smalls_of(query("byscore")), ascending);
 
    // (d) composite {uint32 tier, name owner}. be_key_codec expands the struct field by field
    //     in declaration order and be_key_stream encodes each through the same overloads, so
    //     tier is compared before owner.
-   BOOST_CHECK(smalls_of(query("bycombo")) == ascending);
+   check_seq(smalls_of(query("bycombo")), ascending);
 
    // (e) JSON bound on the uint32 index -- the host encodes 256 big-endian and it has to
    //     match the bytes the contract stored.
    {
       auto got = smalls_of(query("bysmall", R"({"bysmall": 256})"));
-      BOOST_CHECK((got == std::vector<uint64_t>{256u, 65536u, 16777216u}));
+      check_seq(got, {256u, 65536u, 16777216u});
    }
 
    // (f) JSON bound on the signed index, at zero -- the sign-bit flip has to agree on both
    //     sides or this returns the negatives too.
    {
       auto got = smalls_of(query("byscore", R"({"byscore": 0})"));
-      BOOST_CHECK((got == std::vector<uint64_t>{65536u, 16777216u}));
+      check_seq(got, {65536u, 16777216u});
    }
 
    // (g) JSON bound on the composite index, at tier 256. The bound object nests by field
    //     name, which is what encode_shape reads.
    {
       auto got = smalls_of(query("bycombo", R"({"bycombo": {"tier": 256, "owner": "mmm"}})"));
-      BOOST_CHECK((got == std::vector<uint64_t>{256u, 65536u, 16777216u}));
+      check_seq(got, {256u, 65536u, 16777216u});
    }
 
    // (h) composite bounds narrowed to one row: within tier 65536, from "aaa" up to but not
@@ -1815,9 +1825,9 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_wide_secondary_keys, validating_tester ) tr
    //     correctly as well as tier.
    {
       auto got = smalls_of(query("bycombo",
-                                 R"({"bycombo": {"tier": 65536, "owner": "aaa"}})",
-                                 R"({"bycombo": {"tier": 65536, "owner": "zzz"}})"));
-      BOOST_CHECK((got == std::vector<uint64_t>{65536u}));
+                                 R"({"bycombo": {"tier": 65536, "owner": "aaz"}})",
+                                 R"({"bycombo": {"tier": 65536, "owner": "b"}})"));
+      check_seq(got, {65536u});
    }
 
    // (i) reverse walks the same order backwards, which uses a different cursor path than
@@ -1825,14 +1835,17 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_wide_secondary_keys, validating_tester ) tr
    {
       auto got = smalls_of(query("bysmall", {}, {}, true));
       std::vector<uint64_t> descending(ascending.rbegin(), ascending.rend());
-      BOOST_CHECK(got == descending);
+      check_seq(got, descending);
    }
 
-   // (j) a bound below every key returns everything; one above every key returns nothing.
-   //     A wrongly-encoded bound tends to land inside the range instead.
+   // (j) A bound below every key returns everything; one above every key returns nothing.
+   //     The values matter. 0 and 0xFFFFFFFF are fixed points of byte reversal, so a bound
+   //     built from either encodes to the same bytes under both orders and cannot detect a
+   //     byte-order fault at all. 0x02000000 reverses to 0x00000002, which lands below
+   //     every stored key instead of above them; -3 reverses into the middle of the range.
    {
-      BOOST_CHECK(smalls_of(query("bysmall", R"({"bysmall": 0})")) == ascending);
-      BOOST_CHECK_EQUAL(query("bysmall", R"({"bysmall": 4294967295})").rows.size(), 0u);
+      check_seq(smalls_of(query("byscore", R"({"byscore": -3})")), ascending);
+      BOOST_CHECK_EQUAL(query("bysmall", R"({"bysmall": 33554432})").rows.size(), 0u);
    }
 
 } FC_LOG_AND_RETHROW()
