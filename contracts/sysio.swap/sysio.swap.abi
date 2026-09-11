@@ -86,6 +86,20 @@
             ]
         },
         {
+            "name": "cumulative_price",
+            "base": "",
+            "fields": [
+                {
+                    "name": "lo",
+                    "type": "uint128"
+                },
+                {
+                    "name": "hi",
+                    "type": "uint128"
+                }
+            ]
+        },
+        {
             "name": "currency_stats",
             "base": "",
             "fields": [
@@ -264,6 +278,28 @@
             ]
         },
         {
+            "name": "price_accumulator",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pair",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "price1",
+                    "type": "cumulative_price"
+                },
+                {
+                    "name": "price2",
+                    "type": "cumulative_price"
+                },
+                {
+                    "name": "last_update",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
             "name": "remliquidity",
             "base": "",
             "fields": [
@@ -282,6 +318,16 @@
                 {
                     "name": "min_asset2",
                     "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "sync",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pair_token",
+                    "type": "symbol_code"
                 }
             ]
         },
@@ -382,6 +428,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "sync",
+            "type": "sync",
+            "ricardian_contract": ""
+        },
+        {
             "name": "transfer",
             "type": "transfer",
             "ricardian_contract": ""
@@ -462,6 +513,14 @@
             "key_names": [],
             "key_types": [],
             "table_id": 44724
+        },
+        {
+            "name": "priceaccum",
+            "type": "price_accumulator",
+            "index_type": "i64",
+            "key_names": ["scope","primary_key"],
+            "key_types": ["name","uint64"],
+            "table_id": 54664
         },
         {
             "name": "stat",

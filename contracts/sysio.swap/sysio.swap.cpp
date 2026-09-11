@@ -121,6 +121,7 @@ void swap::add_signed_liq(name user, asset to_add, bool is_buying,
     add_signed_ext_balance(user, -to_pay2);
     (to_add.amount > 0)? add_balance(user, to_add, user) : sub_balance(user, -to_add);
     if (token->fee_contract) require_recipient(token->fee_contract);
+    update_price_accumulators(*token);
     statstable.modify( token, same_payer, [&]( auto& a ) {
       a.supply += to_add;
       a.pool1 += to_pay1;
@@ -186,6 +187,7 @@ extended_asset swap::process_exch(symbol_code pair_token,
       ext_asset2 = ext_asset_in;
       ext_asset_out = -ext_asset1;
     }
+    update_price_accumulators(*token);
     statstable.modify( token, same_payer, [&]( auto& a ) {
       a.pool1 += ext_asset1;
       a.pool2 += ext_asset2;
@@ -237,6 +239,12 @@ extended_asset initial_pool2, int initial_fee, name fee_contract)
         a.fee_contract = fee_contract;
     } );
 
+    priceaccums accums( get_self(), get_self().value );
+    accums.emplace( user, [&]( auto& a ) {
+        a.pair = new_symbol.code();
+        a.last_update = current_time_point();
+    } );
+
     placeindex(user, new_symbol, initial_pool1, initial_pool2 );
     add_balance(user, new_token, user);
     add_signed_ext_balance(user, -initial_pool1);
@@ -264,6 +272,29 @@ void swap::placeindex(name user, symbol evo_symbol,
         a.evo_symbol = evo_symbol;
         a.id_256 = id_256;
     });
+}
+
+void swap::update_price_accumulators(const currency_stats& token) {
+    priceaccums accums( get_self(), get_self().value );
+    const auto accum = accums.find( token.supply.symbol.code().raw() );
+    check( accum != accums.end(), "price accumulator does not exist" );
+    const time_point now = current_time_point();
+    if (now <= accum->last_update) return;
+    const uint64_t elapsed = uint64_t((now - accum->last_update).count());
+    const uint64_t P1 = uint64_t(token.pool1.quantity.amount);
+    const uint64_t P2 = uint64_t(token.pool2.quantity.amount);
+    accums.modify( accum, same_payer, [&]( auto& a ) {
+        opp::twap::accumulate( a.price1, opp::twap::price_fp(P2, P1), elapsed );
+        opp::twap::accumulate( a.price2, opp::twap::price_fp(P1, P2), elapsed );
+        a.last_update = now;
+    } );
+}
+
+void swap::sync(symbol_code pair_token) {
+    stats statstable( get_self(), pair_token.raw() );
+    const auto token = statstable.find( pair_token.raw() );
+    check ( token != statstable.end(), "pair token does not exist" );
+    update_price_accumulators(*token);
 }
 
 void swap::changefee(symbol_code pair_token, int newfee) {

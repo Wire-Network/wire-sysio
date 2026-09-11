@@ -5,6 +5,7 @@
 #include <sysio/system.hpp>
 #include <sysio/print.hpp>
 #include <sysio.opp.common/amm_math.hpp>
+#include <sysio.opp.common/twap.hpp>
 #include <algorithm>
 #include <cmath>
 
@@ -47,6 +48,10 @@ namespace sysio {
          [[sysio::action]] void remliquidity(name user, asset to_sell, asset min_asset1, asset min_asset2);
          [[sysio::action]] void exchange( name user, symbol_code pair_token, extended_asset ext_asset_in, asset min_expected );
          [[sysio::action]] void changefee(symbol_code pair_token, int newfee);
+         /// Bring the pair's cumulative-price accumulators up to the current block
+         /// time without trading, so a reader can take an up-to-date snapshot. No
+         /// authorization is required; the caller pays only the CPU.
+         [[sysio::action]] void sync(symbol_code pair_token);
 
          [[sysio::action]] void transfer(const name& from, const name& to, 
            const asset& quantity, const string&  memo );
@@ -87,6 +92,20 @@ namespace sysio {
             checksum256 secondary_key()const { return id_256; }
          };
 
+         /// Cumulative-price accumulators for a pair (sysio.opp.common/twap.hpp).
+         /// `price1` sums the Q64.64 price of one unit of pool1 in units of pool2,
+         /// times elapsed microseconds; `price2` the reverse. Both advance, at the
+         /// spot price that held since `last_update`, immediately before the pools
+         /// change and on `sync`. A reader snapshots the row at t0 and computes
+         /// `twap::average_price(twap::difference(now, snapshot), t - t0)`.
+         struct [[sysio::table("priceaccum")]] price_accumulator {
+            symbol_code                        pair;
+            sysio::opp::twap::cumulative_price price1;
+            sysio::opp::twap::cumulative_price price2;
+            time_point                         last_update;
+            uint64_t primary_key()const { return pair.raw(); }
+         };
+
          typedef sysio::multi_index< "evodexacnts"_n, evodexaccount,
          indexed_by<"extended"_n, const_mem_fun<evodexaccount, uint128_t, 
            &evodexaccount::secondary_key>> > evodexacnts;
@@ -95,6 +114,7 @@ namespace sysio {
          indexed_by<"extended"_n, const_mem_fun<index_struct, checksum256, 
            &index_struct::secondary_key>> > evoindexes;
          typedef sysio::multi_index< "accounts"_n, account > accounts;
+         typedef sysio::multi_index< "priceaccum"_n, price_accumulator > priceaccums;
 
          static uint128_t make128key(uint64_t a, uint64_t b);
          static checksum256 make256key(uint64_t a, uint64_t b, uint64_t c, uint64_t d);
@@ -115,6 +135,10 @@ namespace sysio {
          /// The liquidity fee: `fee`/FEE_DENOMINATOR of `amount`, rounded up so a
          /// non-zero amount never pays a zero fee. `amount` must be nonnegative.
          static int128_t ceil_fee(int128_t amount, int fee);
+         /// Advance the pair's accumulators by `token`'s current spot prices times
+         /// the time since the last update. Must run BEFORE the pools change, so the
+         /// interval is weighted at the price that actually held during it.
+         void update_price_accumulators(const currency_stats& token);
          asset string_to_asset(string input);
          void placeindex(name user, symbol evo_symbol, extended_asset pool1, extended_asset pool2 );
          void add_balance( const name& owner, const asset& value, const name& ram_payer );
