@@ -4,6 +4,8 @@
 #include <sysio/asset.hpp>
 #include <sysio/system.hpp>
 #include <sysio/print.hpp>
+#include <sysio/kv_table.hpp>
+#include <sysio/kv_scoped_table.hpp>
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/twap.hpp>
 #include <algorithm>
@@ -17,7 +19,7 @@ namespace sysio {
    class [[sysio::contract("sysio.swap")]] swap : public contract {
       public:
          const int64_t MAX = sysio::asset::max_amount;
-         const int64_t INIT_MAX = 1000000000000000;  // 10^15 
+         const int64_t INIT_MAX = 1000000000000000;  // 10^15
          const int ADD_LIQUIDITY_FEE = 1;
          const int DEFAULT_FEE = 10;
          /// Fees are expressed in units of 1/FEE_DENOMINATOR of the traded amount.
@@ -37,8 +39,8 @@ namespace sysio {
          static constexpr uint64_t MIN_SWAP_FEE = 1;
 
          using contract::contract;
-         [[sysio::action]] void inittoken(name user, symbol new_symbol, 
-           extended_asset initial_pool1, extended_asset initial_pool2, 
+         [[sysio::action]] void inittoken(name user, symbol new_symbol,
+           extended_asset initial_pool1, extended_asset initial_pool2,
            int initial_fee, name fee_contract);
          [[sysio::on_notify("*::transfer")]] void ontransfer(name from, name to, asset quantity, string memo);
          [[sysio::action]] void openext( const name& user, const name& payer, const extended_symbol& ext_symbol);
@@ -53,7 +55,7 @@ namespace sysio {
          /// authorization is required; the caller pays only the CPU.
          [[sysio::action]] void sync(symbol_code pair_token);
 
-         [[sysio::action]] void transfer(const name& from, const name& to, 
+         [[sysio::action]] void transfer(const name& from, const name& to,
            const asset& quantity, const string&  memo );
          [[sysio::action]] void open( const name& owner, const symbol& symbol, const name& ram_payer );
          [[sysio::action]] void close( const name& owner, const symbol& symbol );
@@ -61,35 +63,64 @@ namespace sysio {
 
       private:
 
-         struct [[sysio::table]] account {
-            asset    balance;
-            uint64_t primary_key()const { return balance.symbol.code().raw(); }
+         // --- Keys ---
+
+         /// A pair's rows in `stat` and `priceaccum`: keyed by the LP token's symbol code.
+         struct pair_key {
+            uint64_t symbol_code;
+            SYSLIB_SERIALIZE(pair_key, (symbol_code))
          };
 
-         struct [[sysio::table]] evodexaccount {
-            extended_asset   balance;
-            uint64_t id;
-            uint64_t primary_key()const { return id; }
-            uint128_t secondary_key()const { return 
-              make128key(balance.contract.value, balance.quantity.symbol.raw() ); }
+         /// An LP-token balance row, scoped by its owner: keyed by the symbol code.
+         struct account_key {
+            uint64_t symbol_code;
+            SYSLIB_SERIALIZE(account_key, (symbol_code))
          };
 
-         struct [[sysio::table]] currency_stats {
-            asset    supply;
-            asset    max_supply;
-            name     issuer;
-            extended_asset    pool1;
-            extended_asset    pool2;
-            int fee;
-            name fee_contract;
-            uint64_t primary_key()const { return supply.symbol.code().raw(); }
+         /// A deposit row, scoped by its owner: keyed by the deposited token's extended
+         /// symbol, so a balance is one primary lookup and needs no surrogate id.
+         struct extended_symbol_key {
+            name     contract;
+            uint64_t symbol;
+            SYSLIB_SERIALIZE(extended_symbol_key, (contract)(symbol))
          };
 
-         struct [[sysio::table]] index_struct{
+         /// A pair's uniqueness row: keyed by its two legs, the lower (contract, symbol)
+         /// first, so the same two tokens in either order resolve to one key.
+         struct pair_identity_key {
+            name     contract1;
+            uint64_t symbol1;
+            name     contract2;
+            uint64_t symbol2;
+            SYSLIB_SERIALIZE(pair_identity_key, (contract1)(symbol1)(contract2)(symbol2))
+         };
+
+         // --- Rows ---
+
+         struct [[sysio::table("accounts")]] account {
+            asset balance;
+            SYSLIB_SERIALIZE(account, (balance))
+         };
+
+         struct [[sysio::table("evodexacnts")]] evodex_account {
+            extended_asset balance;
+            SYSLIB_SERIALIZE(evodex_account, (balance))
+         };
+
+         struct [[sysio::table("stat")]] currency_stats {
+            asset          supply;
+            asset          max_supply;
+            name           issuer;
+            extended_asset pool1;
+            extended_asset pool2;
+            int            fee;
+            name           fee_contract;
+            SYSLIB_SERIALIZE(currency_stats, (supply)(max_supply)(issuer)(pool1)(pool2)(fee)(fee_contract))
+         };
+
+         struct [[sysio::table("evoindex")]] pair_index {
             symbol evo_symbol;
-            checksum256 id_256;
-            uint64_t primary_key()const { return evo_symbol.code().raw(); }
-            checksum256 secondary_key()const { return id_256; }
+            SYSLIB_SERIALIZE(pair_index, (evo_symbol))
          };
 
          /// Cumulative-price accumulators for a pair (sysio.opp.common/twap.hpp).
@@ -99,25 +130,24 @@ namespace sysio {
          /// change and on `sync`. A reader snapshots the row at t0 and computes
          /// `twap::average_price(twap::difference(now, snapshot), t - t0)`.
          struct [[sysio::table("priceaccum")]] price_accumulator {
-            symbol_code                        pair;
             sysio::opp::twap::cumulative_price price1;
             sysio::opp::twap::cumulative_price price2;
             time_point                         last_update;
-            uint64_t primary_key()const { return pair.raw(); }
+            SYSLIB_SERIALIZE(price_accumulator, (price1)(price2)(last_update))
          };
 
-         typedef sysio::multi_index< "evodexacnts"_n, evodexaccount,
-         indexed_by<"extended"_n, const_mem_fun<evodexaccount, uint128_t, 
-           &evodexaccount::secondary_key>> > evodexacnts;
-         typedef sysio::multi_index< "stat"_n, currency_stats > stats;
-         typedef sysio::multi_index< "evoindex"_n, index_struct,
-         indexed_by<"extended"_n, const_mem_fun<index_struct, checksum256, 
-           &index_struct::secondary_key>> > evoindexes;
-         typedef sysio::multi_index< "accounts"_n, account > accounts;
-         typedef sysio::multi_index< "priceaccum"_n, price_accumulator > priceaccums;
+         // --- Tables ---
 
-         static uint128_t make128key(uint64_t a, uint64_t b);
-         static checksum256 make256key(uint64_t a, uint64_t b, uint64_t c, uint64_t d);
+         using accounts    = kv::scoped_table<"accounts"_n,    account_key,         account>;
+         using evodexacnts = kv::scoped_table<"evodexacnts"_n, extended_symbol_key, evodex_account>;
+         using stats       = kv::table<"stat"_n,       pair_key,          currency_stats>;
+         using evoindexes  = kv::table<"evoindex"_n,   pair_identity_key, pair_index>;
+         using priceaccums = kv::table<"priceaccum"_n, pair_key,          price_accumulator>;
+
+         /// The deposit-row key of an extended symbol.
+         static extended_symbol_key key_of(const extended_symbol& ext_symbol);
+         /// The uniqueness-row key of a pair, in canonical leg order.
+         static pair_identity_key identity_of(const extended_symbol& a, const extended_symbol& b);
 
          void add_signed_ext_balance( const name& owner, const extended_asset& value );
          void add_signed_liq(name user, asset to_buy, bool is_buying, asset max_asset1, asset max_asset2);
