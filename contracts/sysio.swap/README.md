@@ -8,12 +8,7 @@ Evolutiondex follows the line initiated by Bancor and Uniswap, but with some des
 
 1- Evotokens. For each registered pair there will be a standard token backed by the assets in the corresponding pool. These new tokens can be freely transferred, facilitating the access and management of the investment position. We can call these tokens "evotokens".
 
-2- Initial fee and fee governance. A fee value is set at initialization of each trading pair. The contract wevotethefee will be able to control the fee value through
-a voting mechanism. The liquidity providers can vote for a value between
-0.1% and 1%, their vote will be weighted according to their stake.
-The fee value will be set to the median of the votes. The voting tables
-are updated each time a liquidity provider modifies its balance.
-A tiny fee of 0.01% is charged when providing liquidity in order
+2- Initial fee and fee governance. A fee value in [0, 99.99%] is set at initialization of each trading pair. Every pair has a fee authority, the account whose signature `changefee` requires: by default the contract-wide one set at deployment with `setconfig` (WIRE governance executes approved proposals as `sysio`, so that is `sysio`), or a specific account named when the pair is created. A tiny fee of 0.01% is charged when providing liquidity in order
 to protect previous liquidity providers from attacks to the fee value.
 The action of removing liquidity is free of charge.
 

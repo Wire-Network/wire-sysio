@@ -117,7 +117,6 @@ void swap::add_signed_liq(name user, asset to_add, bool is_buying,
     add_signed_ext_balance(user, -to_pay1);
     add_signed_ext_balance(user, -to_pay2);
     (to_add.amount > 0)? add_balance(user, to_add, user) : sub_balance(user, -to_add);
-    if (token->fee_contract) require_recipient(token->fee_contract);
     update_price_accumulators(*token);
     statstable.modify( name{}, key, [&]( auto& a ) {
       a.supply += to_add;
@@ -208,8 +207,15 @@ void swap::memoexchange(name user, extended_asset ext_asset_in, string_view deta
       std::make_tuple( get_self(), user, ext_asset_out.quantity, std::string(memo)) ).send();
 }
 
+void swap::setconfig(name fee_authority) {
+    require_auth( get_self() );
+    check( is_account( fee_authority ), "fee authority account does not exist" );
+    swapconfig_t config( get_self() );
+    config.set( swap_config{ fee_authority }, get_self() );
+}
+
 void swap::inittoken(name user, symbol new_symbol, extended_asset initial_pool1,
-extended_asset initial_pool2, int initial_fee, name fee_contract)
+extended_asset initial_pool2, int initial_fee, name fee_authority)
 {
     require_auth( user );
     require_auth( get_self() );
@@ -224,17 +230,22 @@ extended_asset initial_pool2, int initial_fee, name fee_contract)
     stats statstable( get_self() );
     const pair_key key{ new_symbol.code().raw() };
     check ( !statstable.contains( key ), "token symbol already exists" );
-    check( initial_fee == DEFAULT_FEE, "initial_fee must be 10");
-    check( fee_contract == "wevotethefee"_n, "fee_contract must be wevotethefee");
+    check( 0 <= initial_fee && initial_fee <= MAX_FEE, "fee out of range" );
+    if (fee_authority == name{}) {
+        swapconfig_t config( get_self() );
+        fee_authority = config.get( "fee authority not configured" ).fee_authority;
+    } else {
+        check( is_account( fee_authority ), "fee authority account does not exist" );
+    }
 
     statstable.emplace( user, key, currency_stats{
-        .supply       = new_token,
-        .max_supply   = asset{MAX, new_symbol},
-        .issuer       = get_self(),
-        .pool1        = initial_pool1,
-        .pool2        = initial_pool2,
-        .fee          = initial_fee,
-        .fee_contract = fee_contract,
+        .supply        = new_token,
+        .max_supply    = asset{MAX, new_symbol},
+        .issuer        = get_self(),
+        .pool1         = initial_pool1,
+        .pool2         = initial_pool2,
+        .fee           = initial_fee,
+        .fee_authority = fee_authority,
     } );
 
     priceaccums accums( get_self() );
@@ -288,7 +299,7 @@ void swap::changefee(symbol_code pair_token, int newfee) {
     const pair_key key{ pair_token.raw() };
     const auto token = statstable.try_get( key );
     check ( token.has_value(), "pair token does not exist" );
-    require_auth(token->fee_contract);
+    require_auth(token->fee_authority);
     check( 0 <= newfee && newfee <= MAX_FEE, "fee out of range" );
     statstable.modify( name{}, key, [&]( auto& a ) {
       a.fee = newfee;
