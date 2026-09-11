@@ -20,13 +20,14 @@ namespace sysio {
          const int DEFAULT_FEE = 10;
          /// Fees are expressed in units of 1/FEE_DENOMINATOR of the traded amount.
          static constexpr int FEE_DENOMINATOR = 10000;
-         /// Upper bound accepted by changefee. compute() checks its result against the
-         /// int64 range BEFORE adding the fee, so a fee at or above 100% could push the
-         /// final amount past that range; below 100% the sum stays within int64.
+         /// Upper bound accepted by changefee: strictly below 100%, so a positive quote
+         /// always nets at least one unit (amm::split_wire_fee reports net 0 at 100%).
          static constexpr int MAX_FEE = FEE_DENOMINATOR - 1;
          /// Both pool sides carry the same weight: every pair is a plain constant-product
          /// (x*y=k) pool, which is the exact-integer path of amm::out_given_in.
          static constexpr uint64_t CP_WEIGHT_BPS = sysio::opp::amm::WEIGHT_TOTAL_BPS / 2;
+         /// The pair fee stays in the pool; no underwriter takes a share of it.
+         static constexpr uint32_t NO_UNDERWRITER_SHARE_BPS = 0;
 
          using contract::contract;
          [[sysio::action]] void inittoken(name user, symbol new_symbol, 
@@ -97,15 +98,15 @@ namespace sysio {
          void memoexchange(name user, extended_asset ext_asset_in, string_view details);
          /// Settle an exact-input swap of `paying` through the pair `evo_token`: the
          /// output is the constant-product quote (amm::out_given_in at equal weights)
-         /// less the pair's fee, and must reach `min_expected`. Moves the pools and
-         /// returns the extended asset the user receives.
+         /// net of the pair's fee (amm::split_wire_fee), and must reach `min_expected`.
+         /// Moves the pools and returns the extended asset the user receives.
          extended_asset process_exch(symbol_code evo_token, extended_asset paying, asset min_expected);
          /// Liquidity pricing: `x * y / z` rounded the pool's way -- up when `x > 0`
          /// (a leg the user pays), down when `x < 0` (a leg the user receives) -- plus
          /// `fee` (in 1/FEE_DENOMINATOR units) of that amount, rounded up.
          int64_t compute(int64_t x, int64_t y, int64_t z, int fee);
-         /// `fee`/FEE_DENOMINATOR of `amount`, rounded up so a non-zero amount never
-         /// pays a zero fee. `amount` must be nonnegative.
+         /// The liquidity fee: `fee`/FEE_DENOMINATOR of `amount`, rounded up so a
+         /// non-zero amount never pays a zero fee. `amount` must be nonnegative.
          static int128_t ceil_fee(int128_t amount, int fee);
          asset string_to_asset(string input);
          void placeindex(name user, symbol evo_symbol, extended_asset pool1, extended_asset pool2 );

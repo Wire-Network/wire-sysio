@@ -140,10 +140,10 @@ summary: 'Exchange token through a specific pair'
 
 {{user}} agree to substract {{ext_asset_in}} and to add at least {{min_expected}} to their extended balances. {{ext_asset_in}} must be positive and {{min_expected}} nonnegative. The extended symbol of {{ext_asset_in}} must match one of the pools associated to the token {{pair_token}}. The contract of {{min_expected}} is given by the other pool of that pair. These extended assets will be respectively added to and substracted from the corresponding pools.
 
-The extended asset to be added to {{users}}'s extended balance as a result of the exchange operation, is computed as x + y, where
+The extended asset to be added to {{users}}'s extended balance as a result of the exchange operation, is computed as x - y, where
 
 x = pool_out * {{ext_asset_in}} / (pool_in + {{ext_asset_in}}), up to the precision of the symbol of pool_out rounded downward.
-y = x * fee / 10000, up to the same precision as x, again rounded downward.
+y = x * fee / 10000, up to the same precision as x, again rounded downward. The fee y remains in the pools.
 
 The variable pool_in denotes the corresponding extended asset pool1 or pool2 associated to the token {{pair_token}}; namely, the one whose extended symbol matches that of {{ext_asset_in}}. The variable pool_out is the extended asset pool1 or pool2, the one that is not pool_in. The variable fee is the integer fee associated to the token {{pair_token}}.
 The values of these three variables must be taken at the moment of operation.
