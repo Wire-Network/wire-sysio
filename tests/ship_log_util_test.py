@@ -307,7 +307,11 @@ try:
         if f.startswith("chain_state_history-"):
             os.remove(os.path.join(retainedDir, f))
 
-    assert prodNode.relaunch(chainArg="--enable-stale-production"), "Failed to relaunch prodNode"
+    # This test deliberately keeps the finalizing node offline long enough to exceed the default
+    # vote timeout. Keep the producer live so the SHiP recovery below can observe a new block.
+    assert prodNode.relaunch(chainArg="--enable-stale-production",
+                             addSwapFlags={"--production-pause-vote-timeout-ms": "0"}), \
+        "Failed to relaunch prodNode"
     # relaunch(chainArg=...) is sticky: the force-write flag from the previous relaunch is still on
     # the command line, and passing it again would duplicate the switch
     assert shipNode.relaunch(), "SHiP node should start with state-history-force-write"
