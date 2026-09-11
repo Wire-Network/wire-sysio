@@ -356,11 +356,6 @@ namespace reference {
       const int64_t gross = floor_div( wide(amount_in) * pool_out, wide(pool_in) + amount_in );
       return gross - fee_on( gross, fee );
    }
-   // Units of `pool_pay` charged to withdraw exactly `amount_out` units of `pool_out`.
-   int64_t pay( int64_t amount_out, int64_t pool_out, int64_t pool_pay, int fee ) {
-      const int64_t gross = ceil_div( wide(amount_out) * pool_pay, wide(pool_out) - amount_out );
-      return gross + fee_on( gross, fee );
-   }
    // Units of one leg charged for `shares` new LP tokens (ADD_LIQUIDITY_FEE = 1).
    int64_t add_leg( int64_t shares, int64_t pool_leg, int64_t supply ) {
       const int64_t gross = ceil_div( wide(shares) * pool_leg, supply );
@@ -521,26 +516,25 @@ BOOST_FIXTURE_TEST_CASE( exchange_action, sysio_swap_tester ) try {
           ( "ext_asset_in", extend(asset::from_string("1 EOS")) )
           ( "min_expected", asset::from_string("1 VOICE")) )
     );
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg(
-      "ext_asset_in must be nonzero and min_expected must have same sign or be zero"), 
-      exchange( "alice"_n, EVO, extend(asset::from_string("2.0000 VOICE")), 
+    // Inputs are exact-in only: the amount must be positive and the slippage
+    // floor nonnegative. The negative-amount (exact-output) form is retired.
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("min_expected must be nonnegative"),
+      exchange( "alice"_n, EVO, extend(asset::from_string("2.0000 VOICE")),
       asset::from_string("-0.1000 EOS")) );
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg(
-      "ext_asset_in must be nonzero and min_expected must have same sign or be zero"), 
-      exchange( "alice"_n, EVO, extend(asset::from_string("-2.0000 RICE")), 
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("ext_asset_in must be positive"),
+      exchange( "alice"_n, EVO, extend(asset::from_string("-2.0000 RICE")),
       asset::from_string("0.1000 REOS")) );
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg(
-      "ext_asset_in must be nonzero and min_expected must have same sign or be zero"), 
-      exchange( "alice"_n, EVO, extend(asset::from_string("0.0000 EOS")), 
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("ext_asset_in must be positive"),
+      exchange( "alice"_n, EVO, extend(asset::from_string("0.0000 EOS")),
       asset::from_string("-0.1000 VOICE")) );
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg("invalid parameters"), 
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("ext_asset_in must be positive"),
       exchange( "alice"_n, EVO, extend(asset::from_string("-1000004.0000 EOS")),
       asset::from_string("-0.0001 VOICE")) );
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg("invalid parameters"), 
-      exchange( "alice"_n, EVO, extend(asset::from_string("-100000328.6280 VOICE")), 
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("ext_asset_in must be positive"),
+      exchange( "alice"_n, EVO, extend(asset::from_string("-100000328.6280 VOICE")),
       asset::from_string("0.0000 EOS")) );
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair token does not exist"), 
-      exchange( "alice"_n, TUSD, extend(asset::from_string("-8.0000 VOICE")), 
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair token does not exist"),
+      exchange( "alice"_n, TUSD, extend(asset::from_string("8.0000 VOICE")),
       asset::from_string("0.0000 EOS")) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("extended_symbol mismatch"), 
       exchange( "alice"_n, EVO, extend(asset::from_string("4.000 EOS")), 
@@ -574,13 +568,13 @@ BOOST_FIXTURE_TEST_CASE( exchange_action, sysio_swap_tester ) try {
     BOOST_REQUIRE_EQUAL(balance("alice"_n,0), 89999876174);
     BOOST_REQUIRE_EQUAL(balance("alice"_n,1), 999995813721);
  
-    BOOST_REQUIRE_EQUAL( success(),
-      exchange( "alice"_n, EVO, extend(asset::from_string("-4.0000 EOS")), 
+    // The retired exact-output form is refused and leaves every balance as it was.
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("ext_asset_in must be positive"),
+      exchange( "alice"_n, EVO, extend(asset::from_string("-4.0000 EOS")),
                               asset::from_string("-401.9984 VOICE")) );
-    expected_system_balance = {10000083826, 1000008206263, 100000828128};
     BOOST_REQUIRE_EQUAL(expected_system_balance == system_balance(EVO.value), true);
-    BOOST_REQUIRE_EQUAL(balance("alice"_n,0), 89999916174);
-    BOOST_REQUIRE_EQUAL(balance("alice"_n,1), 999991793737);
+    BOOST_REQUIRE_EQUAL(balance("alice"_n,0), 89999876174);
+    BOOST_REQUIRE_EQUAL(balance("alice"_n,1), 999995813721);
 
 } FC_LOG_AND_RETHROW()
 
@@ -678,19 +672,18 @@ BOOST_FIXTURE_TEST_CASE( increasing_poolvalue, sysio_swap_tester) try {
     BOOST_REQUIRE_EQUAL(old_total == total(), true);
     BOOST_REQUIRE_EQUAL(is_increasing(old_vec, system_balance(EVO.value)), true);
     
-    old_total = total(); 
+    // The retired exact-output form is refused and moves nothing.
+    old_total = total();
     old_vec = system_balance(EVO.value);
-    BOOST_REQUIRE_EQUAL( success(), exchange( "alice"_n, EVO, 
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("ext_asset_in must be positive"), exchange( "alice"_n, EVO,
       extend(asset::from_string("-1.0000 EOS")), asset::from_string("-0.1069 VOICE")) );
     BOOST_REQUIRE_EQUAL(old_total == total(), true);
-    BOOST_REQUIRE_EQUAL(is_increasing(old_vec, system_balance(EVO.value)), true);
+    BOOST_REQUIRE_EQUAL(old_vec == system_balance(EVO.value), true);
 
-    old_total = total(); 
-    old_vec = system_balance(EVO.value);
-    BOOST_REQUIRE_EQUAL( success(), exchange( "bob"_n, EVO, 
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("ext_asset_in must be positive"), exchange( "bob"_n, EVO,
       extend(asset::from_string("-12.0001 VOICE")), asset::from_string("-122.0329 EOS")) );
     BOOST_REQUIRE_EQUAL(old_total == total(), true);
-    BOOST_REQUIRE_EQUAL(is_increasing(old_vec, system_balance(EVO.value)), true);
+    BOOST_REQUIRE_EQUAL(old_vec == system_balance(EVO.value), true);
 } FC_LOG_AND_RETHROW()
 
 
@@ -1231,7 +1224,7 @@ BOOST_FIXTURE_TEST_CASE( compute_rounding_table, sysio_swap_tester ) try {
     setup_pools();
     static const std::vector<int64_t> amounts{1, 2, 3, 10, 100, 12345, 1'000'000};
 
-    // Swaps in both directions and exact-output withdrawals, at every fee.
+    // Swaps in both directions, at every fee.
     for (int fee : FeeVector) {
         BOOST_REQUIRE_EQUAL( success(), changefee(EVO, fee) );
         for (int64_t amount : amounts) {
@@ -1259,17 +1252,6 @@ BOOST_FIXTURE_TEST_CASE( compute_rounding_table, sysio_swap_tester ) try {
             after = system_balance(EVO.value);
             BOOST_REQUIRE_EQUAL( before[1] + amount, after[1] );
             BOOST_REQUIRE_EQUAL( before[0] - out,    after[0] );
-
-            // exact-output: withdraw exactly `amount` EOS, paying the spec quote in VOICE
-            before = after;
-            int64_t cost = reference::pay(amount, before[0], before[1], fee);
-            BOOST_REQUIRE_EQUAL( wasm_assert_msg("available is less than expected"),
-                exchange( "alice"_n, EVO, extend(asset(-amount, EOS4)), asset(-(cost - 1), VOICE4) ) );
-            BOOST_REQUIRE_EQUAL( success(),
-                exchange( "alice"_n, EVO, extend(asset(-amount, EOS4)), asset(-cost, VOICE4) ) );
-            after = system_balance(EVO.value);
-            BOOST_REQUIRE_EQUAL( before[0] - amount, after[0] );
-            BOOST_REQUIRE_EQUAL( before[1] + cost,   after[1] );
         }
     }
 
@@ -1342,7 +1324,7 @@ BOOST_FIXTURE_TEST_CASE( invariants_under_random_sequences, sysio_swap_tester ) 
         return std::min<int64_t>(cap, magnitude * (1 + rng() % 9));
     };
 
-    enum op_kind { op_swap_forward, op_swap_backward, op_exact_output, op_add, op_remove, op_fee_change, op_count };
+    enum op_kind { op_swap_forward, op_swap_backward, op_negative_in, op_add, op_remove, op_fee_change, op_count };
     std::vector<int> successes(op_count, 0);
     const int steps = 400;
 
@@ -1360,10 +1342,13 @@ BOOST_FIXTURE_TEST_CASE( invariants_under_random_sequences, sysio_swap_tester ) 
             r = exchange( user, pool.code, extend(asset(draw(user_leg1), pool.leg1)), asset(0, pool.leg2) );
         } else if (op == op_swap_backward) {
             r = exchange( user, pool.code, extend(asset(draw(user_leg2), pool.leg2)), asset(0, pool.leg1) );
-        } else if (op == op_exact_output) {
-            // withdraw exactly `w` of leg1, paying at most the user's whole leg2 balance
+        } else if (op == op_negative_in) {
+            // a negative input (the retired exact-output mode) is refused outright,
+            // whatever the sign of min_expected, and must leave state untouched
             const int64_t w = draw(old_vec[0] / 2);
-            r = exchange( user, pool.code, extend(asset(-w, pool.leg1)), asset(-user_leg2, pool.leg2) );
+            const int64_t limit = (rng() % 2) ? -user_leg2 : user_leg2;
+            r = exchange( user, pool.code, extend(asset(-w, pool.leg1)), asset(limit, pool.leg2) );
+            BOOST_REQUIRE_EQUAL( wasm_assert_msg("ext_asset_in must be positive"), r );
         } else if (op == op_add) {
             r = addliquidity( user, asset(draw(old_vec[2] / 10), pool.lp),
                               asset(user_leg1, pool.leg1), asset(user_leg2, pool.leg2) );
@@ -1376,6 +1361,8 @@ BOOST_FIXTURE_TEST_CASE( invariants_under_random_sequences, sysio_swap_tester ) 
 
         if (r == success()) {
             ++successes[op];
+        } else if (op == op_negative_in) {
+            ++successes[op];   // the rejection IS the expected outcome, asserted above
         } else {
             BOOST_REQUIRE_MESSAGE( std::find(allowed.begin(), allowed.end(), r) != allowed.end(),
                                    "step " << step << " op " << op << ": unexpected failure: " << r );
@@ -1389,7 +1376,7 @@ BOOST_FIXTURE_TEST_CASE( invariants_under_random_sequences, sysio_swap_tester ) 
 
     // The run must actually have exercised every path, not merely survived it.
     BOOST_REQUIRE_GE( successes[op_swap_forward] + successes[op_swap_backward], 60 );
-    BOOST_REQUIRE_GE( successes[op_exact_output], 15 );
+    BOOST_REQUIRE_GE( successes[op_negative_in], 40 );
     BOOST_REQUIRE_GE( successes[op_add], 15 );
     BOOST_REQUIRE_GE( successes[op_remove], 10 );
     BOOST_REQUIRE_GE( successes[op_fee_change], 20 );
