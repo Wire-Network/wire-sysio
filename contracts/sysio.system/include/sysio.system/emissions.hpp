@@ -118,6 +118,11 @@ struct [[sysio::table("emitcfg"), sysio::contract("sysio.system")]] emission_con
 
    // Producer config
    uint32_t  standby_end_rank;       // last standby rank (default 28)
+   // Share of the producer pool reserved for the standby retainer (basis points, <= 10000). The
+   // rest funds the per-block rate active producers are paid at. Each standby POSITION
+   // (22..standby_end_rank) holds a fixed, linearly decaying share of this slice; a vacant
+   // position's share stays in the treasury rather than flowing to the standbys present.
+   uint16_t  standby_bps;
 
    // Audit-log retention. Caps the unbounded `epochlog` table at this many
    // rows; payepoch prunes head-first after each insert. There is one row per
@@ -142,7 +147,7 @@ struct [[sysio::table("emitcfg"), sysio::contract("sysio.system")]] emission_con
       (annual_initial_emission)(annual_max_emission)(annual_min_emission)
       (compute_bps)(capex_bps)(governance_bps)
       (producer_bps)(batch_op_bps)
-      (standby_end_rank)(epoch_log_retention_count)
+      (standby_end_rank)(standby_bps)(epoch_log_retention_count)
       (pay_cadence_epochs))
 };
 
@@ -224,8 +229,9 @@ struct node_claim_result {
 //
 // Rows do not expire: this is earned pay, held until claimed.
 //
-// The recipient set is bounded only CONCURRENTLY (ranks 1..standby_end_rank, plus batch-op group
-// members) — not across this table's lifetime. Producers and batch
+// The recipient set is bounded only CONCURRENTLY (the schedulable rows one payepoch walk reaches,
+// capped at max_rank_walk_rows, plus batch-op group members) — not across this table's lifetime.
+// It is NOT `standby_end_rank`: no-forfeiture pays carried blocks well below the standby band. Producers and batch
 // operators churn, and every departed account that never calls `claimpay` leaves a row billed to
 // the sysio RAM pool forever, so system-funded claim storage grows with historical participants
 // rather than with the live set. That is a known, accepted cost here: expiring earned pay is an
@@ -330,11 +336,27 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
    // visible without breaking the OPP-handler never-throw contract.
    int64_t                capital_shortfall_total = 0;
 
+   /// Block slots the open pay period is entitled to, accumulated as each epoch accrues.
+   ///
+   /// The DIVISOR has to be built the same way the POOL is. `pending_emission_amount` above adds
+   /// each epoch's share at the moment that epoch accrues; computing the slot count at payout
+   /// instead -- current duration times the epoch count -- applies today's duration to epochs that
+   /// ran under a different one. A period spanning a duration change then mis-sizes the divisor: a
+   /// 60s epoch (120 slots) followed by a 120s epoch (240 slots) is 360 slots, but is computed as
+   /// 480, paying 75% of the active pool under full production.
+   ///
+   /// Reset with `pending_emission_amount` at each payout.
+   ///
+   /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE below. The ABI is generated from the
+   /// declarations while the wasm serializes in macro order, so a field inserted anywhere but the
+   /// end makes the two disagree silently.
+   uint64_t               pending_nominal_slots = 0;
+
    SYSLIB_SERIALIZE(t5_state,
       (start_time)(epoch_count)(last_epoch_index)
       (last_epoch_time)(last_epoch_emission)(total_distributed)
       (pending_emission_amount)(period_start_epoch)(batch_group_epochs)
-      (capital_shortfall_total))
+      (capital_shortfall_total)(pending_nominal_slots))
 };
 
 using t5state_t = sysio::kv::global<"t5state"_n, t5_state>;

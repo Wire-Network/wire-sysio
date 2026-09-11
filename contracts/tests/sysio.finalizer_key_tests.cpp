@@ -59,41 +59,6 @@ struct finalizer_key_tester : sysio_system_tester {
       }
    }
 
-   // sysio.system now schedules a producer only if it is an ACTIVE
-   // OPERATOR_TYPE_PRODUCER operator in sysio.opreg. activate_producers() alone no
-   // longer yields a schedulable set, so this deploys sysio.opreg (once) and
-   // registers each activated producer as a bootstrapped producer operator --
-   // ACTIVE-by-fiat, bypassing the collateral requirement -- before returning.
-   std::vector<name> activate_producers_with_operators( uint32_t count = 21 ) {
-      std::vector<name> producer_names = activate_producers(count);
-      if (!opreg_deployed) {
-         create_account("sysio.opreg"_n, config::system_account_name, false, false, false, true);
-         // opreg is not privileged yet (setpriv requires setcode first). Give it
-         // RAM for the ~800KB wasm and NET/CPU to sign regoperator; a sysio.*
-         // account is created with none by default.
-         push_action(config::system_account_name, "setacctram"_n, mvo()
-            ("account", "sysio.opreg"_n)("ram_bytes", int64_t(2'000'000)));
-         push_action(config::system_account_name, "setacctnet"_n, mvo()
-            ("account", "sysio.opreg"_n)("net_weight", int64_t(1'000'000)));
-         push_action(config::system_account_name, "setacctcpu"_n, mvo()
-            ("account", "sysio.opreg"_n)("cpu_weight", int64_t(1'000'000)));
-         produce_block();
-         set_code("sysio.opreg"_n, contracts::opreg_wasm());
-         set_abi ("sysio.opreg"_n, contracts::opreg_abi().data());
-         set_privileged("sysio.opreg"_n);
-         produce_block();
-         opreg_deployed = true;
-      }
-      for (const auto& p : producer_names) {
-         base_tester::push_action("sysio.opreg"_n, "regoperator"_n, "sysio.opreg"_n, mvo()
-            ("account", p)
-            ("type", sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER)
-            ("is_bootstrapped", true));
-      }
-      produce_block();
-      return producer_names;
-   }
-   bool opreg_deployed = false;
 
    // Verify finalizers_table and last_prop_fins_table match
    void verify_last_proposed_finalizers(const std::vector<name>& producer_names) {
@@ -614,10 +579,11 @@ BOOST_FIXTURE_TEST_CASE(update_ranked_producers_finalizers_replaced_test, finali
    auto producerv_info = get_finalizer_info(producerv_name);
    uint64_t producerv_id = producerv_info["active_key_id"].as_uint64();
 
-   // Use setrank to promote defproducerv into top 21
-   // and demote defproducera out
-   BOOST_REQUIRE_EQUAL( success(), setrank("defproducerv"_n, 1) );
-   BOOST_REQUIRE_EQUAL( success(), setrank("defproducera"_n, 22) );
+   // Rank is POSITION in the score-ordered index -- governance no longer assigns it. Removing the
+   // producer holding position 1 shifts every later producer up by one, which promotes
+   // defproducerv from position 22 into the top 21.
+   BOOST_REQUIRE_EQUAL( success(), push_action("defproducera"_n, "unregprod"_n,
+      mvo()("producer", "defproducera"_n)) );
 
    // Wait for update_ranked_producers to pick up new ranking
    produce_block( fc::minutes(2) );
@@ -627,44 +593,6 @@ BOOST_FIXTURE_TEST_CASE(update_ranked_producers_finalizers_replaced_test, finali
    BOOST_REQUIRE_EQUAL( 21, last_finkey_ids_2.size() );
    // Make sure producerv's key is now in the finalizer set
    BOOST_REQUIRE_EQUAL( true, last_finkey_ids_2.contains(producerv_id) );
-}
-FC_LOG_AND_RETHROW()
-
-// Test that setrank correctly assigns individual producer rank
-BOOST_FIXTURE_TEST_CASE(setrank_test, finalizer_key_tester) try {
-   auto producer_names = activate_producers();
-
-   // Check initial ranks are assigned (1..21)
-   auto prod_info = get_producer_info("defproducera");
-   BOOST_REQUIRE_EQUAL( 1, prod_info["rank"].as<uint32_t>() );
-
-   prod_info = get_producer_info("defproduceru");
-   BOOST_REQUIRE_EQUAL( 21, prod_info["rank"].as<uint32_t>() );
-
-   // setrank requires system authority
-   BOOST_REQUIRE_EQUAL( error( "missing authority of sysio" ),
-                        push_action( alice, "setrank"_n, mvo()
-                           ("producer", "defproducera")
-                           ("rank", 5)
-                        ) );
-
-   // setrank with rank=0 should fail
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "rank must be positive" ),
-                        setrank("defproducera"_n, 0) );
-
-   // setrank with nonexistent producer should fail
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "producer not found" ),
-                        setrank("nonexistent1"_n, 1) );
-
-   // Promote defproduceru to rank 1, demote defproducera to rank 22
-   BOOST_REQUIRE_EQUAL( success(), setrank("defproduceru"_n, 1) );
-   BOOST_REQUIRE_EQUAL( success(), setrank("defproducera"_n, 22) );
-
-   prod_info = get_producer_info("defproduceru");
-   BOOST_REQUIRE_EQUAL( 1, prod_info["rank"].as<uint32_t>() );
-
-   prod_info = get_producer_info("defproducera");
-   BOOST_REQUIRE_EQUAL( 22, prod_info["rank"].as<uint32_t>() );
 }
 FC_LOG_AND_RETHROW()
 

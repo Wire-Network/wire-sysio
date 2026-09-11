@@ -128,11 +128,11 @@ namespace sysio {
       static constexpr name UWRIT_ACCOUNT  = "sysio.uwrit"_n;
       static constexpr name RESERV_ACCOUNT = "sysio.reserv"_n;
 
-      /// Bounds on `epoch_duration_sec`. Floor is a typo-guard: well below this
-      /// value, `expected_rounds` in sysio.system::payepoch falls back to 1
-      /// for any non-trivial epoch, masking misconfig. Ceiling bounds the
-      /// `(epoch_duration_sec * 2) / TOTAL_BLOCKS_PER_ROUND` arithmetic and
-      /// prevents governance typo from setting a multi-year epoch.
+      /// Bounds on `epoch_duration_sec`. Floor is a typo-guard: below it a pay
+      /// period holds fewer block slots than one producer rotation, so the
+      /// per-block pay in sysio.system::payepoch degenerates to a handful of
+      /// slots per producer, masking misconfig. Ceiling bounds the slot
+      /// arithmetic and prevents a governance typo from setting a multi-year epoch.
       static constexpr uint32_t MIN_EPOCH_DURATION_SEC = 60;
       static constexpr uint32_t MAX_EPOCH_DURATION_SEC = 30u * 24u * 60u * 60u;
 
