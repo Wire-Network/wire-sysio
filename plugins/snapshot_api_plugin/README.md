@@ -92,10 +92,13 @@ clio push action sysio regproducer \
   '{"producer": "myproducer1", "producer_key": "SYS6...", "url": "", "location": 0}' \
   -p myproducer1@active
 
-# Set producer rank (must be <= 30 to be eligible as a snapshot provider)
-clio push action sysio setrank \
-  '{"producer": "myproducer1", "rank": 1}' \
-  -p sysio@active
+# Register a finalizer key. Snapshot-provider eligibility requires the producer to hold one of
+# the top 30 rank POSITIONS, and rank is position in the score-ordered producer index among
+# schedulable producers -- an ACTIVE OPERATOR_TYPE_PRODUCER operator in sysio.opreg carrying an
+# active finalizer key. There is no action that assigns a rank.
+clio push action sysio regfinkey \
+  '{"finalizer_name": "myproducer1", "finalizer_key": "PUB_BLS...", "proof_of_possession": "SIG_BLS..."}' \
+  -p myproducer1@active
 ```
 
 ### 2. Register a snapshot provider account

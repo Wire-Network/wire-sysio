@@ -177,6 +177,12 @@ namespace sysiosystem {
             ++f.finalizer_key_count;
          });
       }
+      // Whether a producer HAS an active finalizer key is a scoring input: without one it
+      // cannot be scheduled, so it sinks below the tier every rank walk traverses. Every
+      // action that changes that answer has to move the stored key with it, or the producer
+      // sits at a rank its standing no longer matches -- and a stale demoted key at the front
+      // of the index stops the walks before the producers behind it.
+      rescore_producer( finalizer_name );
    }
 
    /*
@@ -212,6 +218,18 @@ namespace sysiosystem {
          f.active_key_id      = new_key_id;
          f.active_key_binary  = new_key_binary;
       });
+
+      // Whether a producer HAS an active finalizer key is a scoring input: without one it cannot be
+      // scheduled, so it sinks below the tier every rank walk traverses. Every action that changes
+      // that answer has to move the stored key with it, or the producer sits at a rank its standing
+      // no longer matches -- and a stale demoted key at the front of the index stops the walks
+      // before the producers behind it.
+      //
+      // ABOVE the early return, not below it. The activation is already committed at this point,
+      // and the Savanna check below decides only whether the ACTIVE POLICY needs republishing --
+      // a question with no bearing on the producer's score. Rescoring after it would skip every
+      // pre-Savanna chain and every fresh chain before its first ranked publish.
+      rescore_producer( finalizer_name );
 
       const auto& last_proposed_finalizers = get_last_proposed_finalizers();
       if( last_proposed_finalizers.empty() ) {
@@ -277,5 +295,11 @@ namespace sysiosystem {
 
       // Remove the key from finalizer_keys table
       idx.erase( std::move(fin_key_itr) );
+      // Whether a producer HAS an active finalizer key is a scoring input: without one it
+      // cannot be scheduled, so it sinks below the tier every rank walk traverses. Every
+      // action that changes that answer has to move the stored key with it, or the producer
+      // sits at a rank its standing no longer matches -- and a stale demoted key at the front
+      // of the index stops the walks before the producers behind it.
+      rescore_producer( finalizer_name );
    }
 } /// namespace sysiosystem

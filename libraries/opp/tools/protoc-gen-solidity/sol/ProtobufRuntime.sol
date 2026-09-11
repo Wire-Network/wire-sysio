@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.8.0 <0.9.0;
+pragma solidity 0.8.25;
 
 // Shared protobuf3 wire format primitives for protoc-gen-solidity.
 // This file is also emitted by the plugin alongside generated codecs.
@@ -28,9 +28,9 @@ library ProtobufRuntime {
 
   function _encode_varint(uint64 value) internal pure returns (bytes memory) {
     if (value < 0x80) {
-      bytes memory buf = new bytes(1);
-      buf[0] = bytes1(uint8(value));
-      return buf;
+      bytes memory singleByteBuf = new bytes(1);
+      singleByteBuf[0] = bytes1(uint8(value));
+      return singleByteBuf;
     }
 
     bytes memory buf = new bytes(10);
