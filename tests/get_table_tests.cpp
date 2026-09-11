@@ -1756,7 +1756,7 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_wide_secondary_keys_test, validating_tester
    };
 
    auto query = [&](const char* index, const std::string& lower = {}, const std::string& upper = {},
-                    bool reverse = false) {
+                    bool reverse = false, uint32_t limit = 0) {
       chain_apis::read_only::get_table_rows_params p;
       p.json  = true;
       p.code  = "widesec"_n;
@@ -1765,6 +1765,7 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_wide_secondary_keys_test, validating_tester
       p.lower_bound = lower;
       p.upper_bound = upper;
       if (reverse) p.reverse = true;
+      if (limit)   p.limit = limit;
       return get_table_rows_kv(plugin, p, fc::time_point::maximum());
    };
 
@@ -1820,9 +1821,14 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_wide_secondary_keys_test, validating_tester
       check_seq(got, {256u, 65536u, 16777216u});
    }
 
-   // (h) composite bounds narrowed to one row: within tier 65536, from "aaa" up to but not
-   //     including "zzz" leaves only id 2. This is the case that needs owner to encode
+   // (h) Composite bounds narrowed to one row: within tier 65536, from "aaz" up to but not
+   //     including "b" leaves only id 2. This is the case that needs owner to encode
    //     correctly as well as tier.
+   //
+   //     "aaz"/"b" rather than the obvious "aaa"/"zzz" because that pair does not
+   //     discriminate -- "aaa" and "zzz" sort the same under both byte orders, and the
+   //     range between them would span BOTH same-tier rows (b < zzz), returning two rows
+   //     rather than one.
    {
       auto got = smalls_of(query("bycombo",
                                  R"({"bycombo": {"tier": 65536, "owner": "aaz"}})",
@@ -1846,6 +1852,72 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_wide_secondary_keys_test, validating_tester
    {
       check_seq(smalls_of(query("byscore", R"({"byscore": -3})")), ascending);
       BOOST_CHECK_EQUAL(query("bysmall", R"({"bysmall": 33554432})").rows.size(), 0u);
+   }
+
+
+   // Everything above drives the codec's ENCODE half: bounds go in through encode_shape,
+   // and the row order proves what the contract stored. None of it reaches decode_key,
+   // which is only used to format `next_key` -- and `next_key` is only emitted when a page
+   // is cut short. Four rows under the default limit of 50 never cut one, so the decoders
+   // below were previously unexercised for these key types. If decode_field(int64) stopped
+   // removing the sign-bit bias, every assertion above would still pass while score 0 came
+   // back as INT64_MIN.
+
+   // (k) Forward pagination on the signed index. `next_key` is the FIRST UNSEEN row, and
+   //     lower_bound is inclusive, so resuming with it continues with no gap and no repeat.
+   {
+      auto page1 = query("byscore", {}, {}, false, 2);
+      BOOST_CHECK_EQUAL(page1.more, true);
+      check_seq(smalls_of(page1), {1u, 256u});
+      BOOST_REQUIRE(!page1.next_key.empty());
+      // Pins the sign-bias removal: id 2's score is 0, stored as 0x8000000000000000.
+      // Without the xor this decodes as INT64_MIN.
+      auto nk = fc::json::from_string(page1.next_key);
+      BOOST_CHECK_EQUAL(nk.get_object()["byscore"].as_int64(), 0);
+
+      auto page2 = query("byscore", page1.next_key, {}, false, 2);
+      check_seq(smalls_of(page2), {65536u, 16777216u});
+      BOOST_CHECK_EQUAL(page2.more, false);
+   }
+
+   // (l) Forward pagination on the composite index -- the same cursor round-trip, but
+   //     through decode_shape's recursive struct walk rather than a single leaf.
+   {
+      auto page1 = query("bycombo", {}, {}, false, 2);
+      BOOST_CHECK_EQUAL(page1.more, true);
+      check_seq(smalls_of(page1), {1u, 256u});
+      BOOST_REQUIRE(!page1.next_key.empty());
+      auto nk = fc::json::from_string(page1.next_key);
+      const auto& combo = nk.get_object()["bycombo"].get_object();
+      BOOST_CHECK_EQUAL(combo["tier"].as_uint64(), 65536u);
+      BOOST_CHECK_EQUAL(combo["owner"].as_string(), "aaz");
+
+      auto page2 = query("bycombo", page1.next_key, {}, false, 2);
+      check_seq(smalls_of(page2), {65536u, 16777216u});
+      BOOST_CHECK_EQUAL(page2.more, false);
+   }
+
+   // (m) Reverse pagination. Same four rows in the opposite order -- the union of the two
+   //     pages below is the union of (k)'s, just reversed, with no row repeated or dropped.
+   //
+   //     What differs is the resume rule, and both directions emit the SAME cursor here,
+   //     `{"byscore":0}` (id 2's score), for opposite reasons. Forward has not yet returned
+   //     id 2 -- it is the first unseen row -- so it resumes on an INCLUSIVE lower_bound and
+   //     id 2 opens its page 2. Reverse has just returned id 2 as its last row, so it
+   //     resumes on an EXCLUSIVE upper_bound and does not repeat it. The two rules are
+   //     opposite so that either direction yields each row exactly once; asserting both
+   //     pages is what pins that.
+   {
+      auto page1 = query("byscore", {}, {}, true, 2);
+      BOOST_CHECK_EQUAL(page1.more, true);
+      check_seq(smalls_of(page1), {16777216u, 65536u});
+      BOOST_REQUIRE(!page1.next_key.empty());
+      auto nk = fc::json::from_string(page1.next_key);
+      BOOST_CHECK_EQUAL(nk.get_object()["byscore"].as_int64(), 0);
+
+      auto page2 = query("byscore", {}, page1.next_key, true, 2);
+      check_seq(smalls_of(page2), {256u, 1u});
+      BOOST_CHECK_EQUAL(page2.more, false);
    }
 
 } FC_LOG_AND_RETHROW()
