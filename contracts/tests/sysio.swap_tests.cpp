@@ -831,8 +831,38 @@ BOOST_FIXTURE_TEST_CASE( memoexchange_test, sysio_swap_tester ) try {
         extend(asset::from_string("23058430092.1369 EOS")),
         extend(asset::from_string("96116860184.2738 VOICE")), 10, name{}) );
 
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg("extended_symbol mismatch"), 
-      transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("4.0000 EOS"), 
+    // The memo's amount is parsed with overflow-checked arithmetic: a digit string
+    // past int64 aborts at the digit that overflows, a scaled integer part past
+    // int64 aborts at the scaling, more than 18 decimals is refused, and a sign
+    // is not a digit.
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("amount too large"),
+      transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("4.0000 EOS"),
+      "exchange: EVO, 99999999999999999999 VOICE") );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("amount too large"),
+      transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("4.0000 EOS"),
+      "exchange: EVO, 9223372036854775808 VOICE") );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("amount too large"),
+      transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("4.0000 EOS"),
+      "exchange: EVO, 922337203685477580.8 VOICE") );
+    // ...and one that fits int64 but not an asset is the asset's own refusal.
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("magnitude of asset amount must be less than 2^62"),
+      transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("4.0000 EOS"),
+      "exchange: EVO, 922337203685477580.7 VOICE") );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("precision should be <= 18"),
+      transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("4.0000 EOS"),
+      "exchange: EVO, 1.0000000000000000000 VOICE") );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("invalid character"),
+      transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("4.0000 EOS"),
+      "exchange: EVO, -1.0000 VOICE") );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("Missing decimal fraction after decimal point"),
+      transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("4.0000 EOS"),
+      "exchange: EVO, 16. VOICE") );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("Asset's amount and symbol should be separated with space"),
+      transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("4.0000 EOS"),
+      "exchange: EVO, 16.6570VOICE") );
+
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("extended_symbol mismatch"),
+      transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("4.0000 EOS"),
       "exchange: EVO, 166536 VOICE") );
 
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("available is less than expected"),
