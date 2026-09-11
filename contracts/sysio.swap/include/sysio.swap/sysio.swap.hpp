@@ -4,6 +4,7 @@
 #include <sysio/asset.hpp>
 #include <sysio/system.hpp>
 #include <sysio/print.hpp>
+#include <sysio.opp.common/amm_math.hpp>
 #include <cmath>
 
 using namespace sysio;
@@ -23,6 +24,9 @@ namespace sysio {
          /// int64 range BEFORE adding the fee, so a fee at or above 100% could push the
          /// final amount past that range; below 100% the sum stays within int64.
          static constexpr int MAX_FEE = FEE_DENOMINATOR - 1;
+         /// Both pool sides carry the same weight: every pair is a plain constant-product
+         /// (x*y=k) pool, which is the exact-integer path of amm::out_given_in.
+         static constexpr uint64_t CP_WEIGHT_BPS = sysio::opp::amm::WEIGHT_TOTAL_BPS / 2;
 
          using contract::contract;
          [[sysio::action]] void inittoken(name user, symbol new_symbol, 
@@ -91,8 +95,18 @@ namespace sysio {
          void add_signed_ext_balance( const name& owner, const extended_asset& value );
          void add_signed_liq(name user, asset to_buy, bool is_buying, asset max_asset1, asset max_asset2);
          void memoexchange(name user, extended_asset ext_asset_in, string_view details);
+         /// Settle an exact-input swap of `paying` through the pair `evo_token`: the
+         /// output is the constant-product quote (amm::out_given_in at equal weights)
+         /// less the pair's fee, and must reach `min_expected`. Moves the pools and
+         /// returns the extended asset the user receives.
          extended_asset process_exch(symbol_code evo_token, extended_asset paying, asset min_expected);
+         /// Liquidity pricing: `x * y / z` rounded the pool's way -- up when `x > 0`
+         /// (a leg the user pays), down when `x < 0` (a leg the user receives) -- plus
+         /// `fee` (in 1/FEE_DENOMINATOR units) of that amount, rounded up.
          int64_t compute(int64_t x, int64_t y, int64_t z, int fee);
+         /// `fee`/FEE_DENOMINATOR of `amount`, rounded up so a non-zero amount never
+         /// pays a zero fee. `amount` must be nonnegative.
+         static int128_t ceil_fee(int128_t amount, int fee);
          asset string_to_asset(string input);
          void placeindex(name user, symbol evo_symbol, extended_asset pool1, extended_asset pool2 );
          void add_balance( const name& owner, const asset& value, const name& ram_payer );

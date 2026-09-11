@@ -77,22 +77,23 @@ void swap::remliquidity(name user, asset to_sell,
     add_signed_liq(user, -to_sell, false, -min_asset1, -min_asset2);
 }
 
-// computes x * y / z plus the fee
+int128_t swap::ceil_fee(int128_t amount, int fee) {
+    return (amount * fee + (FEE_DENOMINATOR - 1)) / FEE_DENOMINATOR;
+}
+
 int64_t swap::compute(int64_t x, int64_t y, int64_t z, int fee) {
     check( (x != 0) && (y > 0) && (z > 0), "invalid parameters");
     int128_t prod = int128_t(x) * int128_t(y);
     int128_t tmp = 0;
-    int128_t tmp_fee = 0;
     if (x > 0) {
         tmp = 1 + (prod - 1) / int128_t(z);
         check( (tmp <= MAX), "computation overflow" );
-        tmp_fee = (tmp * fee + (FEE_DENOMINATOR - 1)) / FEE_DENOMINATOR;
+        tmp += ceil_fee(tmp, fee);
     } else {
         tmp = prod / int128_t(z);
         check( (tmp >= -MAX), "computation underflow" );
-        tmp_fee =  (-tmp * fee + (FEE_DENOMINATOR - 1)) / FEE_DENOMINATOR;
+        tmp += ceil_fee(-tmp, fee);
     }
-    tmp += tmp_fee;
     return int64_t(tmp);
 }
 
@@ -160,16 +161,21 @@ extended_asset swap::process_exch(symbol_code pair_token,
       P_in = token-> pool2.quantity.amount;
       P_out = token-> pool1.quantity.amount;
     }
-    auto A_in = ext_asset_in.quantity.amount;
-    int64_t A_out = compute(-A_in, P_out, P_in + A_in, token->fee);
-    check(min_expected.amount <= -A_out, "available is less than expected");
+    const int64_t A_in = ext_asset_in.quantity.amount;
+    check( (A_in > 0) && (P_in > 0) && (P_out > 0), "invalid parameters");
+    // Constant-product quote, floored, then the pair's fee rounded up against it.
+    const int128_t gross = opp::amm::out_given_in(uint64_t(P_in), CP_WEIGHT_BPS,
+                                                  uint64_t(P_out), CP_WEIGHT_BPS,
+                                                  uint64_t(A_in));
+    const int64_t A_out = int64_t(gross - ceil_fee(gross, token->fee));
+    check(min_expected.amount <= A_out, "available is less than expected");
     extended_asset ext_asset1, ext_asset2, ext_asset_out;
-    if (in_first) { 
+    if (in_first) {
       ext_asset1 = ext_asset_in;
-      ext_asset2 = extended_asset{A_out, token-> pool2.get_extended_symbol()};
+      ext_asset2 = extended_asset{-A_out, token-> pool2.get_extended_symbol()};
       ext_asset_out = -ext_asset2;
     } else {
-      ext_asset1 = extended_asset{A_out, token-> pool1.get_extended_symbol()};
+      ext_asset1 = extended_asset{-A_out, token-> pool1.get_extended_symbol()};
       ext_asset2 = ext_asset_in;
       ext_asset_out = -ext_asset1;
     }

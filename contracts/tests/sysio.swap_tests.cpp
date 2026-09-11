@@ -7,8 +7,10 @@
 #include <boost/multiprecision/cpp_int.hpp>
 
 #include <contracts.hpp>
+#include <sysio.opp.common/amm_math.hpp>
 #include <cmath>
 #include <random>
+#include <set>
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -310,6 +312,10 @@ public:
     // ETUSD = EOS/TUSD, both funded by alice, with abi_ser on the swap ABI.
     // Defined after the file-scope symbols and `extend` it uses.
     void setup_pools();
+    // Push an exact-input swap with a zero slippage floor and return what the
+    // pool paid out, measured from the pool rather than taken from any quote.
+    // `out_leg` is the pool index (0 = pool1, 1 = pool2) of the received token.
+    int64_t settle_swap( name user, symbol_code pair, asset in, symbol out_symbol, int out_leg );
     void prepare_carol_token() {
         create( "carol"_n, "carol"_n, asset::from_string("4.0000 EOS") );
         issue( "carol"_n, "carol"_n, "carol"_n, asset::from_string("4.0000 EOS"), "");
@@ -365,6 +371,33 @@ namespace reference {
    int64_t remove_leg( int64_t shares, int64_t pool_leg, int64_t supply ) {
       return floor_div( wide(shares) * pool_leg, supply );
    }
+}
+
+// The amm_math composition sysio.swap implements, evaluated on the host with
+// the SAME header the contract compiles against: the equal-weight
+// constant-product kernel for the gross output, then the pair fee against it.
+// `reference` is the spec written by hand; `model` is the library. A swap must
+// agree with both.
+namespace model {
+   namespace amm = sysio::opp::amm;
+   constexpr uint64_t CpWeightBps = amm::WEIGHT_TOTAL_BPS / 2;
+
+   int64_t gross( int64_t amount_in, int64_t pool_in, int64_t pool_out ) {
+      return int64_t( amm::out_given_in( uint64_t(pool_in), CpWeightBps,
+                                         uint64_t(pool_out), CpWeightBps,
+                                         uint64_t(amount_in) ) );
+   }
+   int64_t receive( int64_t amount_in, int64_t pool_in, int64_t pool_out, int fee ) {
+      const int64_t g = gross( amount_in, pool_in, pool_out );
+      return g - reference::fee_on( g, fee );
+   }
+}
+
+int64_t sysio_swap_tester::settle_swap( name user, symbol_code pair, asset in, symbol out_symbol, int out_leg ) {
+    const auto before = system_balance(pair.value);
+    BOOST_REQUIRE_EQUAL( success(), exchange( user, pair, extend(in), asset(0, out_symbol) ) );
+    const auto after = system_balance(pair.value);
+    return before[out_leg] - after[out_leg];
 }
 
 void sysio_swap_tester::setup_pools() {
@@ -1380,6 +1413,257 @@ BOOST_FIXTURE_TEST_CASE( invariants_under_random_sequences, sysio_swap_tester ) 
     BOOST_REQUIRE_GE( successes[op_add], 15 );
     BOOST_REQUIRE_GE( successes[op_remove], 10 );
     BOOST_REQUIRE_GE( successes[op_fee_change], 20 );
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// Characterization for the amm_math substitution. Every expectation below is
+// written from the spec (`reference`) or from the host-side amm_math model
+// (`model`), never from the contract's own arithmetic, so the cases survive
+// a change of implementation and fail only on a change of behaviour.
+// ---------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE( swap_matches_amm_math_model, sysio_swap_tester ) try {
+    setup_pools();
+    struct leg { symbol_code pair; symbol in; symbol out; int in_leg; int out_leg; };
+    const std::vector<leg> legs{
+        { EVO,   EOS4,   VOICE4, 0, 1 }, { EVO,   VOICE4, EOS4, 1, 0 },
+        { ETUSD, EOS4,   TUSD2,  0, 1 }, { ETUSD, TUSD2,  EOS4, 1, 0 },
+    };
+    static const std::vector<int64_t> amounts{1, 7, 999, 1'000'000, 1'000'000'000, 10'000'000'000'000};
+    for (int fee : {0, 1, 10, 100, 9999}) {
+        BOOST_REQUIRE_EQUAL( success(), changefee(EVO, fee) );
+        BOOST_REQUIRE_EQUAL( success(), changefee(ETUSD, fee) );
+        for (const auto& l : legs) {
+            for (int64_t amount : amounts) {
+                const auto before = system_balance(l.pair.value);
+                const int64_t expected = model::receive(amount, before[l.in_leg], before[l.out_leg], fee);
+                BOOST_REQUIRE_EQUAL( expected, reference::receive(amount, before[l.in_leg], before[l.out_leg], fee) );
+                BOOST_REQUIRE_EQUAL( expected, settle_swap("alice"_n, l.pair, asset(amount, l.in), l.out, l.out_leg) );
+            }
+        }
+    }
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( fee_zero_is_the_bare_constant_product_curve, sysio_swap_tester ) try {
+    setup_pools();
+    BOOST_REQUIRE_EQUAL( success(), changefee(EVO, 0) );
+    using wide = boost::multiprecision::int256_t;
+    for (int64_t amount : {int64_t(1), int64_t(3), int64_t(12345), int64_t(1'000'000'000), int64_t(123'456'789'012'345)}) {
+        for (int in_leg = 0; in_leg < 2; ++in_leg) {
+            const int out_leg = 1 - in_leg;
+            const symbol in_symbol = in_leg == 0 ? EOS4 : VOICE4;
+            const symbol out_symbol = in_leg == 0 ? VOICE4 : EOS4;
+            const auto before = system_balance(EVO.value);
+            const wide k = wide(before[0]) * wide(before[1]);
+            const int64_t out = settle_swap("alice"_n, EVO, asset(amount, in_symbol), out_symbol, out_leg);
+            const auto after = system_balance(EVO.value);
+            // With no fee the output IS the bare kernel...
+            BOOST_REQUIRE_EQUAL( out, model::gross(amount, before[in_leg], before[out_leg]) );
+            // ...which is the largest integer output that keeps x*y from falling:
+            // one unit more would have broken the invariant.
+            BOOST_REQUIRE( wide(after[0]) * wide(after[1]) >= k );
+            BOOST_REQUIRE( wide(after[in_leg]) * wide(after[out_leg] - 1) < k );
+        }
+    }
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( round_trip_never_profits, sysio_swap_tester ) try {
+    setup_pools();
+    using wide = boost::multiprecision::int256_t;
+    for (int fee : {0, 10, 100, 9999}) {
+        BOOST_REQUIRE_EQUAL( success(), changefee(EVO, fee) );
+        for (int64_t amount : {int64_t(1), int64_t(10), int64_t(12345), int64_t(1'000'000), int64_t(50'000'000'000'000)}) {
+            const auto start  = system_balance(EVO.value);
+            const auto totals = total();
+            const int64_t voice = settle_swap("alice"_n, EVO, asset(amount, EOS4), VOICE4, 1);
+            const int64_t eos = voice > 0 ? settle_swap("alice"_n, EVO, asset(voice, VOICE4), EOS4, 0) : 0;
+            const auto end = system_balance(EVO.value);
+            // Out and back never returns more than went in; with a fee and a
+            // trade big enough for the fee to bite, strictly less.
+            BOOST_REQUIRE_LE( eos, amount );
+            if (fee > 0 && amount >= 1'000'000) BOOST_REQUIRE_LT( eos, amount );
+            BOOST_REQUIRE( wide(end[0]) * wide(end[1]) >= wide(start[0]) * wide(start[1]) );
+            BOOST_REQUIRE_EQUAL( end[2], start[2] );
+            BOOST_REQUIRE( totals == total() );
+        }
+    }
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( precision_extremes, sysio_swap_tester ) try {
+    // Every unit of every token sits in the contract under alice, so pools and
+    // trades can be pushed to the int64 asset ceiling with no external limit.
+    create_tokens_and_issue();
+    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+    many_openext();
+    const asset all_eos   = asset::from_string("461168601842738.7903 EOS");
+    const asset all_voice = asset::from_string("461168601842738.7903 VOICE");
+    const asset all_tusd  = asset::from_string("46116860184273879.03 TUSD");
+    BOOST_REQUIRE_EQUAL( asset::max_amount, all_eos.get_amount() );
+    BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, all_eos, "") );
+    BOOST_REQUIRE_EQUAL( success(), transfer( "anothertoken"_n, "bob"_n, "sysio.swap"_n, all_voice, "deposit to: alice") );
+    BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, all_tusd, "") );
+
+    // A dust pool: one unit of EOS against the largest side inittoken accepts.
+    const int64_t init_max = 1'000'000'000'000'000 - 1;
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, EVO4,
+        extend(asset(1, EOS4)), extend(asset(init_max, VOICE4)), 10, "wevotethefee"_n) );
+    // A whale pool: both sides at the inittoken ceiling, then grown 2500x by
+    // adding liquidity, which has no ceiling of its own.
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, ETUSD3,
+        extend(asset(init_max, EOS4)), extend(asset(init_max, TUSD2)), 10, "wevotethefee"_n) );
+    {
+        const auto before = system_balance(ETUSD.value);
+        const int64_t shares = 2500 * before[2];
+        const int64_t pay1 = reference::add_leg(shares, before[0], before[2]);
+        const int64_t pay2 = reference::add_leg(shares, before[1], before[2]);
+        BOOST_REQUIRE_EQUAL( success(),
+            addliquidity( "alice"_n, asset(shares, ETUSD3), asset(pay1, EOS4), asset(pay2, TUSD2) ) );
+        const auto after = system_balance(ETUSD.value);
+        BOOST_REQUIRE_EQUAL( before[0] + pay1,   after[0] );
+        BOOST_REQUIRE_EQUAL( before[1] + pay2,   after[1] );
+        BOOST_REQUIRE_EQUAL( before[2] + shares, after[2] );
+    }
+
+    // Dust pool: one unit in each direction.
+    {
+        auto before = system_balance(EVO.value);
+        const int64_t out = reference::receive(1, before[0], before[1], 10);
+        BOOST_REQUIRE_EQUAL( out, model::receive(1, before[0], before[1], 10) );
+        BOOST_REQUIRE_EQUAL( wasm_assert_msg("available is less than expected"),
+            exchange( "alice"_n, EVO, extend(asset(1, EOS4)), asset(out + 1, VOICE4) ) );
+        BOOST_REQUIRE_EQUAL( out, settle_swap("alice"_n, EVO, asset(1, EOS4), VOICE4, 1) );
+        // One VOICE unit back into the now lopsided pool buys nothing; the pool keeps it.
+        before = system_balance(EVO.value);
+        BOOST_REQUIRE_EQUAL( 0, reference::receive(1, before[1], before[0], 10) );
+        BOOST_REQUIRE_EQUAL( 0, settle_swap("alice"_n, EVO, asset(1, VOICE4), EOS4, 0) );
+        const auto after = system_balance(EVO.value);
+        BOOST_REQUIRE_EQUAL( before[0],     after[0] );
+        BOOST_REQUIRE_EQUAL( before[1] + 1, after[1] );
+    }
+    // Dust pool: alice's entire VOICE balance in one trade. The pool side lands
+    // exactly on the int64 ceiling, the gross quote is a single unit, and the
+    // fee rounding decides whether that unit reaches her.
+    {
+        const auto before = system_balance(EVO.value);
+        const int64_t amount = balance("alice"_n, 1);
+        BOOST_REQUIRE_EQUAL( asset::max_amount, before[1] + amount );
+        BOOST_REQUIRE_EQUAL( 1, model::gross(amount, before[1], before[0]) );
+        const int64_t out = reference::receive(amount, before[1], before[0], 10);
+        BOOST_REQUIRE_EQUAL( out, settle_swap("alice"_n, EVO, asset(amount, VOICE4), EOS4, 0) );
+        const auto after = system_balance(EVO.value);
+        BOOST_REQUIRE_EQUAL( asset::max_amount, after[1] );
+        BOOST_REQUIRE_EQUAL( 0, balance("alice"_n, 1) );
+    }
+
+    // Whale pool: the smallest trade, then the largest alice can make.
+    {
+        auto before = system_balance(ETUSD.value);
+        BOOST_REQUIRE_EQUAL( 0, reference::receive(1, before[0], before[1], 10) );
+        BOOST_REQUIRE_EQUAL( 0, settle_swap("alice"_n, ETUSD, asset(1, EOS4), TUSD2, 1) );
+        auto after = system_balance(ETUSD.value);
+        BOOST_REQUIRE_EQUAL( before[0] + 1, after[0] );
+        BOOST_REQUIRE_EQUAL( before[1],     after[1] );
+
+        // Every unit of EOS alice still holds: pool_in + amount is the whole
+        // supply less the two units parked in the dust pool.
+        before = after;
+        const int64_t amount = balance("alice"_n, 0);
+        BOOST_REQUIRE_EQUAL( asset::max_amount - 2, before[0] + amount );
+        const int64_t out = reference::receive(amount, before[0], before[1], 10);
+        BOOST_REQUIRE_EQUAL( out, model::receive(amount, before[0], before[1], 10) );
+        BOOST_REQUIRE_EQUAL( wasm_assert_msg("available is less than expected"),
+            exchange( "alice"_n, ETUSD, extend(asset(amount, EOS4)), asset(out + 1, TUSD2) ) );
+        BOOST_REQUIRE_EQUAL( out, settle_swap("alice"_n, ETUSD, asset(amount, EOS4), TUSD2, 1) );
+        after = system_balance(ETUSD.value);
+        BOOST_REQUIRE_EQUAL( asset::max_amount - 2, after[0] );
+        BOOST_REQUIRE_EQUAL( 0, balance("alice"_n, 0) );
+
+        // And every unit of TUSD the other way.
+        before = after;
+        const int64_t tusd = balance("alice"_n, 2);
+        const int64_t out2 = reference::receive(tusd, before[1], before[0], 10);
+        BOOST_REQUIRE_EQUAL( out2, model::receive(tusd, before[1], before[0], 10) );
+        BOOST_REQUIRE_EQUAL( out2, settle_swap("alice"_n, ETUSD, asset(tusd, TUSD2), EOS4, 0) );
+        BOOST_REQUIRE_EQUAL( 0, balance("alice"_n, 2) );
+    }
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( guard_semantics_on_the_memo_path, sysio_swap_tester ) try {
+    // badtoken forwards any transfer notification untouched, including a zero
+    // amount a real token contract refuses, so with it hosting one leg of a
+    // pair the swap path can be driven with inputs sysio.token cannot produce.
+    create_tokens_and_issue();
+    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+    BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, extended_symbol{EOS4, "badtoken"_n}) );
+    BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, extended_symbol{VOICE4, "anothertoken"_n}) );
+    BOOST_REQUIRE_EQUAL( success(), transfer( "badtoken"_n, "alice"_n, "sysio.swap"_n, asset::from_string("2000.0000 EOS"), "") );
+    BOOST_REQUIRE_EQUAL( success(), transfer( "anothertoken"_n, "bob"_n, "sysio.swap"_n, asset::from_string("2000.0000 VOICE"), "deposit to: alice") );
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, EVO4,
+        extended_asset{asset::from_string("1000.0000 EOS"), "badtoken"_n},
+        extend(asset::from_string("1000.0000 VOICE")), 10, "wevotethefee"_n) );
+
+    const auto before = system_balance(EVO.value);
+    // A zero input through the memo path is refused before the pools move...
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("invalid parameters"),
+        transfer( "badtoken"_n, "alice"_n, "sysio.swap"_n, asset::from_string("0.0000 EOS"), "exchange: EVO, 0.0000 VOICE") );
+    // ...and a negative one is refused one layer earlier.
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("quantity must be positive"),
+        transfer( "badtoken"_n, "alice"_n, "sysio.swap"_n, asset::from_string("-1.0000 EOS"), "exchange: EVO, 0.0000 VOICE") );
+    BOOST_REQUIRE( before == system_balance(EVO.value) );
+
+    // The slippage floor is inclusive: the quote itself settles, one unit more is refused.
+    const int64_t out = reference::receive(10000, before[0], before[1], 10);
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("available is less than expected"),
+        transfer( "badtoken"_n, "alice"_n, "sysio.swap"_n, asset::from_string("1.0000 EOS"),
+                  "exchange: EVO, " + asset(out + 1, VOICE4).to_string() ) );
+    BOOST_REQUIRE_EQUAL( success(),
+        transfer( "badtoken"_n, "alice"_n, "sysio.swap"_n, asset::from_string("1.0000 EOS"),
+                  "exchange: EVO, " + asset(out, VOICE4).to_string() ) );
+    const auto after = system_balance(EVO.value);
+    BOOST_REQUIRE_EQUAL( before[0] + 10000, after[0] );
+    BOOST_REQUIRE_EQUAL( before[1] - out,   after[1] );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
+    // The substitution is internal: the action set, the swap and fee
+    // signatures, the pair row, and the table set must not move.
+    const abi_def abi = swap_abi_def();
+
+    std::set<std::string> actions;
+    for (const auto& a : abi.actions) actions.insert(a.name.to_string());
+    const std::set<std::string> expected_actions{
+        "addliquidity", "changefee", "close", "closeext", "exchange", "indexpair",
+        "inittoken", "open", "openext", "remliquidity", "transfer", "withdraw" };
+    BOOST_REQUIRE( actions == expected_actions );
+
+    using field_list = std::vector<std::pair<std::string, std::string>>;
+    auto fields = [&](const std::string& struct_name) {
+        field_list out;
+        for (const auto& s : abi.structs) {
+            if (s.name != struct_name) continue;
+            for (const auto& f : s.fields) out.emplace_back(f.name, f.type);
+        }
+        return out;
+    };
+    const field_list exchange_fields{
+        {"user", "name"}, {"pair_token", "symbol_code"}, {"ext_asset_in", "extended_asset"}, {"min_expected", "asset"} };
+    const field_list changefee_fields{ {"pair_token", "symbol_code"}, {"newfee", "int32"} };
+    const field_list inittoken_fields{
+        {"user", "name"}, {"new_symbol", "symbol"}, {"initial_pool1", "extended_asset"},
+        {"initial_pool2", "extended_asset"}, {"initial_fee", "int32"}, {"fee_contract", "name"} };
+    const field_list currency_stats_fields{
+        {"supply", "asset"}, {"max_supply", "asset"}, {"issuer", "name"}, {"pool1", "extended_asset"},
+        {"pool2", "extended_asset"}, {"fee", "int32"}, {"fee_contract", "name"} };
+    BOOST_REQUIRE( fields("exchange") == exchange_fields );
+    BOOST_REQUIRE( fields("changefee") == changefee_fields );
+    BOOST_REQUIRE( fields("inittoken") == inittoken_fields );
+    BOOST_REQUIRE( fields("currency_stats") == currency_stats_fields );
+
+    std::set<std::string> tables;
+    for (const auto& t : abi.tables) tables.insert(t.name);
+    const std::set<std::string> expected_tables{
+        "account", "accounts", "currency_stats", "evodexaccount", "evodexacnts", "evoindex", "index_struct", "stat" };
+    BOOST_REQUIRE( tables == expected_tables );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()
