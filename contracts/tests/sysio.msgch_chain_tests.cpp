@@ -690,9 +690,11 @@ public:
 
    /// Inspect the actual emitted envelope, after inline buildenv drained queueout.
    /// The final OPERATORS snapshot must match the registry, and any published
-   /// schedule must follow that snapshot and contain only active batch operators.
+   /// active/future schedule must follow that snapshot. A held historical seat
+   /// can intentionally remain as an inactive denominator placeholder.
    void require_fresh_roster(uint64_t chain_code, name account,
-                              opp::types::OperatorStatus expected_status) {
+                              opp::types::OperatorStatus expected_status,
+                              bool expect_schedule_absence = true) {
       const auto row = find_outbound_envelope(chain_code);
       BOOST_REQUIRE(!row.is_null());
       const auto env = decode_envelope(row["raw_envelope"].as<std::vector<char>>());
@@ -731,7 +733,7 @@ public:
          }
       }
       BOOST_REQUIRE(found_operator);
-      if (expected_status != opp::types::OPERATOR_STATUS_ACTIVE) {
+      if (expected_status != opp::types::OPERATOR_STATUS_ACTIVE && expect_schedule_absence) {
          const auto state = read_epoch_state();
          for (const auto& group : state["batch_op_groups"].get_array()) {
             for (const auto& member : group.get_array()) {
@@ -1704,7 +1706,8 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    BOOST_REQUIRE_EQUAL(epoch + kEpochAdvanceCount, current_epoch());
    BOOST_REQUIRE_EQUAL(kExpectedDeliveredLogCount, delivered_dellog_count(BATCHOP));
    for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
-      require_fresh_roster(chain, BATCHOP, opp::types::OPERATOR_STATUS_SLASHED);
+      require_fresh_roster(chain, BATCHOP, opp::types::OPERATOR_STATUS_SLASHED,
+                           /*expect_schedule_absence=*/false);
       // The remaining two members must not be advertised with a reduced quorum.
       BOOST_REQUIRE_EQUAL(0, shipped_batch_operator_groups_count(chain));
    }
@@ -2107,6 +2110,98 @@ BOOST_FIXTURE_TEST_CASE(advance_ships_group_index_zero_for_single_group, sysio_m
    }
 } FC_LOG_AND_RETHROW() }
 
+/// A one-group schedule has no pre-announced successor to rotate into. If one
+/// member loses eligibility at the exact floor, keep the announced vector and
+/// withhold it; once a standby appears, replace that member at the same slot so
+/// every healthy incumbent keeps the chunk position already known to outposts.
+BOOST_FIXTURE_TEST_CASE(advance_repairs_single_group_ineligible_slot_in_place,
+                        sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3);
+   const auto initial = shipped_batch_operator_groups(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(initial.groups_size(), 1);
+   BOOST_REQUIRE_EQUAL(initial.groups(0).operators_size(), 3);
+   BOOST_REQUIRE_EQUAL(initial.groups(0).operators(0).address(), BATCHOP.to_string());
+   BOOST_REQUIRE_EQUAL(initial.groups(0).operators(1).address(), BATCHOP_C.to_string());
+   BOOST_REQUIRE_EQUAL(initial.groups(0).operators(2).address(), BATCHOP_B.to_string());
+
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "terminate"_n,
+      mvo()("account", BATCHOP.to_string())("reason", std::string("starve one group"))));
+   produce_blocks();
+   advance_to_next_epoch();
+
+   BOOST_REQUIRE_EQUAL(0, shipped_batch_operator_groups_count(ETH_OUTPOST_ID));
+   auto held = read_epoch_state()["batch_op_groups"].get_array();
+   BOOST_REQUIRE_EQUAL(held.size(), 1u);
+   BOOST_REQUIRE_EQUAL(held[0].get_array()[0].as_string(), BATCHOP.to_string());
+   BOOST_REQUIRE_EQUAL(held[0].get_array()[1].as_string(), BATCHOP_C.to_string());
+   BOOST_REQUIRE_EQUAL(held[0].get_array()[2].as_string(), BATCHOP_B.to_string());
+
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+      "regoperator"_n, mvo()("account", BATCHOP_D.to_string())
+         ("type", opp::types::OperatorType::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   produce_blocks();
+   advance_to_next_epoch();
+
+   const auto repaired = shipped_batch_operator_groups(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(repaired.groups_size(), 1);
+   BOOST_REQUIRE_EQUAL(repaired.active_group_index(), 0u);
+   BOOST_REQUIRE_EQUAL(repaired.groups(0).operators_size(), 3);
+   BOOST_REQUIRE_EQUAL(repaired.groups(0).operators(0).address(), BATCHOP_D.to_string());
+   BOOST_REQUIRE_EQUAL(repaired.groups(0).operators(1).address(), BATCHOP_C.to_string());
+   BOOST_REQUIRE_EQUAL(repaired.groups(0).operators(2).address(), BATCHOP_B.to_string());
+} FC_LOG_AND_RETHROW() }
+
+/// Depot-state regression for the transition race: the group announced for
+/// the next epoch is immutable while it slides to current duty. If its member
+/// became ineligible, retain that exact seat as a placeholder and repair only
+/// future groups. This one-seat fixture exercises state construction directly;
+/// the three-seat end-to-end flow proves that a healthy majority can deliver
+/// the recovery envelope across both outposts.
+BOOST_FIXTURE_TEST_CASE(advance_preserves_ineligible_announced_successor_position,
+                        sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kGroups = 3;
+   constexpr uint64_t kRotationWindowMs = 12ULL * kGroups * EPOCH_DURATION_SEC * 1000ULL;
+   bootstrap_rotation(kRotationWindowMs);
+
+   const auto initial = shipped_batch_operator_groups(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(initial.groups_size(), 3);
+   BOOST_REQUIRE_EQUAL(initial.groups(1).operators(0).address(), BATCHOP_C.to_string());
+
+   // Remove both the expiring member and its already-announced successor.
+   // The transition must still slide to C without deleting its known seat.
+   for (const auto op : {BATCHOP, BATCHOP_C}) {
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+         "terminate"_n, mvo()("account", op.to_string())
+            ("reason", std::string("starve announced successor"))));
+   }
+   produce_blocks();
+   advance_to_next_epoch();
+   BOOST_REQUIRE_EQUAL(duty_member(), BATCHOP_C);
+   BOOST_REQUIRE_EQUAL(0, shipped_batch_operator_groups_count(ETH_OUTPOST_ID));
+
+   for (const auto op : {BATCHOP_D, BATCHOP_E}) {
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+         "regoperator"_n, mvo()("account", op.to_string())
+            ("type", opp::types::OperatorType::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   }
+   produce_blocks();
+   advance_to_next_epoch();
+
+   const auto repaired = shipped_batch_operator_groups(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(repaired.groups_size(), 3);
+   BOOST_REQUIRE_EQUAL(repaired.active_group_index(), 1u);
+   BOOST_REQUIRE_EQUAL(repaired.groups(0).operators(0).address(), BATCHOP_C.to_string());
+   BOOST_REQUIRE_EQUAL(repaired.groups(1).operators(0).address(), BATCHOP_B.to_string());
+   BOOST_REQUIRE_EQUAL(repaired.groups(2).operators(0).address(), BATCHOP_D.to_string());
+
+   advance_to_next_epoch();
+   BOOST_REQUIRE_EQUAL(duty_member(), BATCHOP_B);
+   const auto resumed = shipped_batch_operator_groups(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(resumed.groups(0).operators(0).address(), BATCHOP_B.to_string());
+   BOOST_REQUIRE_EQUAL(resumed.groups(1).operators(0).address(), BATCHOP_D.to_string());
+   BOOST_REQUIRE_EQUAL(resumed.groups(2).operators(0).address(), BATCHOP_E.to_string());
+} FC_LOG_AND_RETHROW() }
+
 /// The depot must NEVER publish an active index that names an EMPTY group: that index selects
 /// the group an outpost admits against and sizes its quorum from, so an empty one admits nobody,
 /// can never reach consensus, and wedges the outpost permanently — the handler that could replace
@@ -2115,49 +2210,93 @@ BOOST_FIXTURE_TEST_CASE(advance_ships_group_index_zero_for_single_group, sysio_m
 /// The state is reached by starving an EXISTING window, which is the only way it is reachable:
 /// `schbatchgps` refuses to build a starved schedule up front ("not enough available batch
 /// operators for group assignment"), so a pool smaller than the window can only arise AFTER the
-/// schedule exists — operators leaving the ACTIVE set. Here two of the three are administratively
-/// terminated. The slide then finds no ACTIVE operator outside the surviving groups (residency is
-/// what keeps window groups DISJOINT, which Ethereum's `_resolveChunkPosition` depends on, so it
-/// is not relaxed to fill the gap), pushes an empty tail, and the lookahead index — `cursor + 1`
-/// — names it.
+/// schedule exists — operators leaving the ACTIVE set. Here the expiring operator is terminated
+/// at the exact configured minimum. The first slide enters the next, already-announced group and
+/// produces a short tail. Later advances must keep that announced group current until a new ACTIVE
+/// standby fills the tail; otherwise Solana rejects the next duty group before the envelope carrying
+/// its authorizing roster can land.
 ///
-/// Asserted here: the BATCH_OPERATOR_GROUPS attestation is absent, AND the envelope still exists
-/// carrying other attestations. The second half is the regression guard that matters — withholding
-/// is implemented by skipping ONE queueout, and an early `return` from `advance` would also produce
-/// a missing roster while silently dropping the rest of the epoch's emissions.
-BOOST_FIXTURE_TEST_CASE(advance_withholds_batch_operator_groups_when_next_group_is_empty,
+/// Asserted here: the incomplete window is withheld while other attestations continue, duty freezes
+/// on the group outposts already know, a new operator repairs the future vacancy in place, and only
+/// the advance AFTER that repaired lookahead was published resumes rotation.
+BOOST_FIXTURE_TEST_CASE(advance_freezes_and_recovers_withheld_operator_window,
                         sysio_msgch_chain_tester) { try {
    constexpr uint32_t kGroups = 3;
    constexpr uint64_t kRotationWindowMs = 12ULL * kGroups * EPOCH_DURATION_SEC * 1000ULL;
    bootstrap_rotation(kRotationWindowMs);
 
-   // A full window ships its roster every epoch — the baseline the withhold is measured against.
+   // schbatchgps interleaves the sorted roster as [A,C,B]. Epoch 1's envelope
+   // therefore announces C for epoch 2.
    BOOST_REQUIRE_EQUAL(1, shipped_batch_operator_groups_count(ETH_OUTPOST_ID));
+   const auto initial = shipped_batch_operator_groups(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(initial.groups_size(), 3);
+   BOOST_REQUIRE_EQUAL(initial.active_group_index(), 1u);
+   BOOST_REQUIRE_EQUAL(initial.groups(0).operators(0).address(), BATCHOP.to_string());
+   BOOST_REQUIRE_EQUAL(initial.groups(1).operators(0).address(), BATCHOP_C.to_string());
+   BOOST_REQUIRE_EQUAL(initial.groups(2).operators(0).address(), BATCHOP_B.to_string());
 
-   // Starve it: terminate two of the three, leaving one ACTIVE operator for a three-seat window.
-   for (const auto& op : {BATCHOP_B, BATCHOP_C}) {
-      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "terminate"_n,
-         mvo()("account", op.to_string())("reason", std::string("starve the schedule window"))));
-   }
+   // Terminate the expiring group at exactly the three-seat minimum. The next
+   // group C remains healthy and was already announced by epoch 1.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "terminate"_n,
+      mvo()("account", BATCHOP.to_string())("reason", std::string("starve the schedule window"))));
    produce_blocks();
 
-   // Removed operators are pruned from surviving seats immediately. The pool
-   // cannot fill the window, so group attestations remain withheld while epoch
-   // accounting and authoritative operator-status publication continue.
-   bool observed_withhold = false;
-   for (uint32_t round = 0; round < kGroups + 1; ++round) {
-      advance_to_next_epoch();
-      // `advance` skipped at most ONE queueout, never the rest of its work.
-      BOOST_REQUIRE_GT(shipped_attestation_count(ETH_OUTPOST_ID), 0);
-      if (shipped_batch_operator_groups_count(ETH_OUTPOST_ID) == 0) observed_withhold = true;
-      if (observed_withhold) {
-         // Once the lookahead seat is empty it stays empty — the roster is never republished
-         // while starved, and an empty active index is never shipped.
-         BOOST_REQUIRE_EQUAL(0, shipped_batch_operator_groups_count(ETH_OUTPOST_ID));
-      }
+   advance_to_next_epoch();
+   BOOST_REQUIRE_EQUAL(duty_member(), BATCHOP_C);
+   BOOST_REQUIRE_GT(shipped_attestation_count(ETH_OUTPOST_ID), 0);
+   BOOST_REQUIRE_EQUAL(0, shipped_batch_operator_groups_count(ETH_OUTPOST_ID));
+   require_fresh_roster(ETH_OUTPOST_ID, BATCHOP,
+                        opp::types::OPERATOR_STATUS_TERMINATED);
+
+   // A second epoch while starved must retain C. Sliding to B here would make
+   // outposts reject B because the roster authorizing it was withheld above.
+   advance_to_next_epoch();
+   BOOST_REQUIRE_EQUAL(duty_member(), BATCHOP_C);
+   BOOST_REQUIRE_GT(shipped_attestation_count(ETH_OUTPOST_ID), 0);
+   BOOST_REQUIRE_EQUAL(0, shipped_batch_operator_groups_count(ETH_OUTPOST_ID));
+
+   // If C loses eligibility while its previously announced group is held, it
+   // must remain as a positional placeholder long enough for the other current
+   // members to deliver a repaired lookahead. Replacing or deleting C in group
+   // zero would change the duty known to the outposts before they receive it.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+      "terminate"_n, mvo()("account", BATCHOP_C.to_string())
+         ("reason", std::string("remove one held-duty member"))));
+   produce_blocks();
+   advance_to_next_epoch();
+   BOOST_REQUIRE_EQUAL(duty_member(), BATCHOP_C);
+   BOOST_REQUIRE_EQUAL(0, shipped_batch_operator_groups_count(ETH_OUTPOST_ID));
+   require_fresh_roster(ETH_OUTPOST_ID, BATCHOP_C,
+                        opp::types::OPERATOR_STATUS_TERMINATED,
+                        /*expect_schedule_absence=*/false);
+
+   // Two ACTIVE standbys restore the active roster minimum. D fills the held
+   // future vacancy; E remains available to build the next tail after C's
+   // placeholder group has delivered the repaired lookahead and expires.
+   for (const auto op : {BATCHOP_D, BATCHOP_E}) {
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+         "regoperator"_n, mvo()("account", op.to_string())
+            ("type", opp::types::OperatorType::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
    }
-   BOOST_REQUIRE_MESSAGE(observed_withhold,
-      "starved window never withheld BATCH_OPERATOR_GROUPS -- an empty active group was published");
+   produce_blocks();
+   advance_to_next_epoch();
+   BOOST_REQUIRE_EQUAL(duty_member(), BATCHOP_C);
+   const auto repaired = shipped_batch_operator_groups(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(repaired.groups_size(), 3);
+   BOOST_REQUIRE_EQUAL(repaired.active_group_index(), 1u);
+   BOOST_REQUIRE_EQUAL(repaired.groups(0).operators(0).address(), BATCHOP_C.to_string());
+   BOOST_REQUIRE_EQUAL(repaired.groups(1).operators(0).address(), BATCHOP_B.to_string());
+   BOOST_REQUIRE_EQUAL(repaired.groups(2).operators(0).address(), BATCHOP_D.to_string());
+
+   // Only after the repaired lookahead lands may the schedule rotate to B.
+   advance_to_next_epoch();
+   BOOST_REQUIRE_EQUAL(duty_member(), BATCHOP_B);
+   const auto resumed = shipped_batch_operator_groups(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(resumed.groups_size(), 3);
+   BOOST_REQUIRE_EQUAL(resumed.active_group_index(), 1u);
+   BOOST_REQUIRE_EQUAL(resumed.groups(0).operators(0).address(), BATCHOP_B.to_string());
+   BOOST_REQUIRE_EQUAL(resumed.groups(1).operators(0).address(), BATCHOP_D.to_string());
+   BOOST_REQUIRE_EQUAL(resumed.groups(2).operators(0).address(), BATCHOP_E.to_string());
 } FC_LOG_AND_RETHROW() }
 
 // WIRE-385: a removal during this advance must be visible in BOTH emitted
@@ -2176,13 +2315,13 @@ BOOST_FIXTURE_TEST_CASE(advance_roster_excludes_same_epoch_termination,
       const auto groups = shipped_batch_operator_groups(chain);
       BOOST_REQUIRE_EQUAL(groups.groups_size(), 1);
       BOOST_REQUIRE_EQUAL(groups.groups(0).operators_size(), 3);
-      BOOST_REQUIRE_EQUAL(groups.groups(0).operators(0).address(), BATCHOP_B.to_string());
+      BOOST_REQUIRE_EQUAL(groups.groups(0).operators(0).address(), BATCHOP_D.to_string());
       BOOST_REQUIRE_EQUAL(groups.groups(0).operators(1).address(), BATCHOP_C.to_string());
-      BOOST_REQUIRE_EQUAL(groups.groups(0).operators(2).address(), BATCHOP_D.to_string());
+      BOOST_REQUIRE_EQUAL(groups.groups(0).operators(2).address(), BATCHOP_B.to_string());
    }
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(advance_removes_inactive_surviving_group_members,
+BOOST_FIXTURE_TEST_CASE(advance_preserves_announced_successor_and_prunes_later_inactive_members,
                         sysio_msgch_chain_tester) { try {
    constexpr uint32_t GROUP_COUNT = 3;
    constexpr uint64_t WINDOW_MS = 12ULL * GROUP_COUNT * EPOCH_DURATION_SEC * 1000ULL;
@@ -2193,9 +2332,11 @@ BOOST_FIXTURE_TEST_CASE(advance_removes_inactive_surviving_group_members,
    }
    produce_blocks();
    advance_to_next_epoch();
-   for (const auto op : {BATCHOP_B, BATCHOP_C}) {
-      require_fresh_roster(ETH_OUTPOST_ID, op, opp::types::OPERATOR_STATUS_SLASHED);
-   }
+   require_fresh_roster(ETH_OUTPOST_ID, BATCHOP_B,
+                        opp::types::OPERATOR_STATUS_SLASHED);
+   require_fresh_roster(ETH_OUTPOST_ID, BATCHOP_C,
+                        opp::types::OPERATOR_STATUS_SLASHED,
+                        /*expect_schedule_absence=*/false);
    BOOST_REQUIRE_EQUAL(0, shipped_batch_operator_groups_count(ETH_OUTPOST_ID));
 } FC_LOG_AND_RETHROW() }
 
