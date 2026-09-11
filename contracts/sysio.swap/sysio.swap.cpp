@@ -165,12 +165,16 @@ extended_asset swap::process_exch(symbol_code pair_token,
     check( (A_in > 0) && (P_in > 0) && (P_out > 0), "invalid parameters");
     // Constant-product quote, floored, then the pair's fee taken off it with the
     // depot-wide decomposition. The fee has no recipient here -- it stays in the
-    // pool for the liquidity providers -- so only the net is consumed.
+    // pool for the liquidity providers. The decomposition rounds the fee down,
+    // which would let a quote below FEE_DENOMINATOR/fee units trade fee-free;
+    // "units" is precision-relative, so a nonzero fee rate collects at least
+    // MIN_SWAP_FEE on any nonzero quote and every fee-bearing trade grows x*y.
     const uint64_t gross = opp::amm::out_given_in(uint64_t(P_in), CP_WEIGHT_BPS,
                                                   uint64_t(P_out), CP_WEIGHT_BPS,
                                                   uint64_t(A_in));
-    const int64_t A_out = int64_t(opp::amm::split_wire_fee(gross, uint32_t(token->fee),
-                                                           NO_UNDERWRITER_SHARE_BPS).net);
+    uint64_t fee = opp::amm::split_wire_fee(gross, uint32_t(token->fee), NO_UNDERWRITER_SHARE_BPS).fee;
+    if (token->fee > 0 && gross > 0) fee = std::max(fee, MIN_SWAP_FEE);
+    const int64_t A_out = int64_t(gross - fee);
     check(min_expected.amount <= A_out, "available is less than expected");
     extended_asset ext_asset1, ext_asset2, ext_asset_out;
     if (in_first) {

@@ -5,6 +5,7 @@
 #include <sysio/system.hpp>
 #include <sysio/print.hpp>
 #include <sysio.opp.common/amm_math.hpp>
+#include <algorithm>
 #include <cmath>
 
 using namespace sysio;
@@ -28,6 +29,11 @@ namespace sysio {
          static constexpr uint64_t CP_WEIGHT_BPS = sysio::opp::amm::WEIGHT_TOTAL_BPS / 2;
          /// The pair fee stays in the pool; no underwriter takes a share of it.
          static constexpr uint32_t NO_UNDERWRITER_SHARE_BPS = 0;
+         /// Least fee, in units of the output token, a nonzero fee rate collects on a
+         /// nonzero quote. Without it the floored fee is zero on any quote below
+         /// FEE_DENOMINATOR/fee units, a window that is a thousand whole tokens for a
+         /// zero-precision symbol.
+         static constexpr uint64_t MIN_SWAP_FEE = 1;
 
          using contract::contract;
          [[sysio::action]] void inittoken(name user, symbol new_symbol, 
@@ -98,7 +104,8 @@ namespace sysio {
          void memoexchange(name user, extended_asset ext_asset_in, string_view details);
          /// Settle an exact-input swap of `paying` through the pair `evo_token`: the
          /// output is the constant-product quote (amm::out_given_in at equal weights)
-         /// net of the pair's fee (amm::split_wire_fee), and must reach `min_expected`.
+         /// net of the pair's fee (amm::split_wire_fee, at least MIN_SWAP_FEE when the
+         /// rate and the quote are both nonzero), and must reach `min_expected`.
          /// Moves the pools and returns the extended asset the user receives.
          extended_asset process_exch(symbol_code evo_token, extended_asset paying, asset min_expected);
          /// Liquidity pricing: `x * y / z` rounded the pool's way -- up when `x > 0`
