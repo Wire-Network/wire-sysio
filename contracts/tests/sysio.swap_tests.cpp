@@ -1157,19 +1157,12 @@ BOOST_FIXTURE_TEST_CASE( indextable, sysio_swap_tester ) try {
     transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("10000000.0000 EOS"), "");
     transfer( "anothertoken"_n, "alice"_n, "sysio.swap"_n, asset::from_string("200000000.0000 VOICE"), "");
        
-    BOOST_REQUIRE_EQUAL(wasm_assert_msg("token symbol does not exist"), 
-      push_action( "sysio.swap"_n, "alice"_n, "indexpair"_n, 
-            mvo() ( "user", "alice"_n ) ( "evo_symbol", EVO4 ) ) );  
-
     BOOST_REQUIRE_EQUAL(success(), inittoken( "alice"_n, EVO4,
         extend(asset::from_string("1000000.0000 EOS")), 
         extend(asset::from_string("100000000.0000 VOICE")), 10, name{}) );
 
-    BOOST_REQUIRE_EQUAL(wasm_assert_msg("the pool is already indexed"), 
-      push_action( "sysio.swap"_n, "alice"_n, "indexpair"_n, 
-            mvo() ( "user", "alice"_n ) ( "evo_symbol", EVO4 ) ) );  
-
-    BOOST_REQUIRE_EQUAL(wasm_assert_msg("the pool is already indexed"), 
+    // One pool per token pair, whichever way round the legs are given.
+    BOOST_REQUIRE_EQUAL(wasm_assert_msg("the pool is already indexed"),
         inittoken( "alice"_n, EOS4,
         extend(asset::from_string("1.0000 EOS")), 
         extend(asset::from_string("1.0000 VOICE")), 10, name{}) );
@@ -1811,7 +1804,7 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     std::set<std::string> actions;
     for (const auto& a : abi.actions) actions.insert(a.name.to_string());
     const std::set<std::string> expected_actions{
-        "addliquidity", "changefee", "close", "closeext", "exchange", "indexpair",
+        "addliquidity", "changefee", "close", "closeext", "exchange",
         "inittoken", "open", "openext", "remliquidity", "setconfig", "sync", "transfer", "withdraw" };
     BOOST_REQUIRE( actions == expected_actions );
 

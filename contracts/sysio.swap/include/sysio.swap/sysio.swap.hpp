@@ -71,7 +71,6 @@ namespace sysio {
            const asset& quantity, const string&  memo );
          [[sysio::action]] void open( const name& owner, const symbol& symbol, const name& ram_payer );
          [[sysio::action]] void close( const name& owner, const symbol& symbol );
-         [[sysio::action]] void indexpair(name user, symbol evo_symbol); // This action is only temporarily useful
 
       private:
 
