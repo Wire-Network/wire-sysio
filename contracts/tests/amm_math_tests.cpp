@@ -18,6 +18,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <random>
 #include <limits>
 #include <vector>
 
@@ -314,6 +315,49 @@ BOOST_AUTO_TEST_CASE(split_wire_fee_reaches_the_leg_under_valid_configuration) {
       BOOST_CHECK_GT(f.net, 0u);
       BOOST_CHECK_EQUAL(f.net + f.fee, 1'000'000'000ULL);
    }
+}
+
+BOOST_AUTO_TEST_CASE(isqrt_is_the_floored_root) {
+   BOOST_CHECK(isqrt(0) == 0);
+   BOOST_CHECK(isqrt(1) == 1);
+   BOOST_CHECK(isqrt(2) == 1);
+   BOOST_CHECK(isqrt(3) == 1);
+   BOOST_CHECK(isqrt(4) == 2);
+   BOOST_CHECK(isqrt(99) == 9);
+   BOOST_CHECK(isqrt(100) == 10);
+   BOOST_CHECK(isqrt(101) == 10);
+   // Exactness around perfect squares across the whole range, where a floating
+   // sqrt of an int128 product loses low bits.
+   std::mt19937_64 rng(0x4953'5152'5400ULL);
+   for (int i = 0; i < 20000; ++i) {
+      const u128 r  = (i % 2 == 0) ? static_cast<u128>(rng()) : static_cast<u128>(rng() >> (rng() % 60));
+      const u128 sq = r * r;
+      BOOST_REQUIRE(isqrt(sq) == r);
+      if (sq > 0) BOOST_REQUIRE(isqrt(sq - 1) == r - 1);
+      if (sq + 2 * r + 1 > sq) { // no wrap
+         BOOST_REQUIRE(isqrt(sq + 2 * r) == r);
+         BOOST_REQUIRE(isqrt(sq + 2 * r + 1) == r + 1);
+      }
+   }
+   // The largest product two int64 balances can form.
+   const u128 max_i64 = static_cast<u128>(INT64_MAX);
+   const u128 r = isqrt(max_i64 * max_i64);
+   BOOST_CHECK(r == max_i64);
+   BOOST_CHECK(isqrt(~static_cast<u128>(0)) == (static_cast<u128>(1) << 64) - 1);
+}
+
+BOOST_AUTO_TEST_CASE(geometric_mean_seeds_by_sqrt_of_the_product) {
+   BOOST_CHECK(geometric_mean(10'000'000'000ULL, 1'000'000'000'000ULL) == 100'000'000'000ULL);
+   BOOST_CHECK(geometric_mean(1, 999'999'999'999'999ULL) == 31'622'776ULL);
+   BOOST_CHECK(geometric_mean(230'584'300'921'369ULL, 961'168'601'842'738ULL) == 470'776'369'546'600ULL);
+   BOOST_CHECK(geometric_mean(100'000'000'000'000ULL, 991'168'601'842'738ULL) == 314'828'302'705'258ULL);
+   // Scales linearly with a proportional deposit, up to the floor: seeding at 2x
+   // mints 2x or one unit more (2*floor(r) <= floor(2r) <= 2*floor(r) + 1).
+   const uint64_t once = geometric_mean(12345, 67890);
+   const uint64_t twice = geometric_mean(2 * 12345, 2 * 67890);
+   BOOST_CHECK(twice >= 2 * once && twice <= 2 * once + 1);
+   BOOST_CHECK(geometric_mean(2 * 300, 2 * 1200) == 2 * geometric_mean(300, 1200));   // exact roots: 1200 vs 600
+   BOOST_CHECK(geometric_mean(0, 5) == 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -157,9 +157,15 @@ public:
           ( "memo", "" )
         );
     }
-    // An empty `fee_authority` adopts the configured one (sysio in this fixture).
+    // An empty `fee_authority` adopts the configured one (sysio in this fixture);
+    // `locked_shares` is in units of the new symbol, none by default.
     action_result inittoken( name user, symbol new_symbol, extended_asset initial_pool1,
-      extended_asset initial_pool2, int initial_fee, name fee_authority = name{} ){
+      extended_asset initial_pool2, int initial_fee, name fee_authority = name{}, int64_t locked_shares = 0 ){
+        return inittoken( user, new_symbol, initial_pool1, initial_pool2, initial_fee, fee_authority,
+                          asset( locked_shares, new_symbol ) );
+    }
+    action_result inittoken( name user, symbol new_symbol, extended_asset initial_pool1,
+      extended_asset initial_pool2, int initial_fee, name fee_authority, asset locked_shares ){
         // inittoken bills the new rows to `user`, so the action must carry the
         // user's sysio.payer permission in addition to the two active authorities.
         return push_swap_action( "inittoken"_n,
@@ -171,6 +177,7 @@ public:
           ("initial_pool2", initial_pool2)
           ("initial_fee", initial_fee)
           ("fee_authority", fee_authority)
+          ("locked_shares", locked_shares)
         );
     }
     action_result addliquidity(name user, asset to_buy, asset max_asset1, asset max_asset2) {
@@ -495,6 +502,9 @@ void sysio_swap_tester::setup_pools() {
     BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, ETUSD3,
         extend(asset::from_string("10000000000.0000 EOS")),
         extend(asset::from_string("9911686018427.38 TUSD")), 10, name{}) );
+    // Seed supply is the exact integer root of the product (neither is a square).
+    BOOST_REQUIRE_EQUAL( 470776369546600, system_balance(EVO.value).at(2) );
+    BOOST_REQUIRE_EQUAL( 314828302705258, system_balance(ETUSD.value).at(2) );
 }
 
 BOOST_AUTO_TEST_SUITE(sysio_swap_tests)
@@ -941,14 +951,14 @@ BOOST_FIXTURE_TEST_CASE( the_other_actions, sysio_swap_tester ) try {
         ("user", "alice"_n) ("new_symbol", EVO4)
         ("initial_pool1", extend(asset::from_string("1.0000 EOS")))
         ("initial_pool2", extend(asset::from_string("1.0000 ECO")))
-        ("initial_fee", 1) ("fee_authority", "carol"_n) )
+        ("initial_fee", 1) ("fee_authority", "carol"_n) ("locked_shares", asset::from_string("0.0000 EVO")) )
     );
     BOOST_REQUIRE_EQUAL( error("missing authority of alice"), 
       push_action( "sysio.swap"_n, "bob"_n, "inittoken"_n, mvo()
         ("user", "alice"_n) ("new_symbol", EVO4)
         ("initial_pool1", extend(asset::from_string("1.0000 EOS")))
         ("initial_pool2", extend(asset::from_string("1.0000 ECO")))
-        ("initial_fee", 1) ("fee_authority", "carol"_n) )
+        ("initial_fee", 1) ("fee_authority", "carol"_n) ("locked_shares", asset::from_string("0.0000 EVO")) )
     );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("Both assets must be positive"), inittoken( "alice"_n, EVO4, 
       extend(asset::from_string("-0.0001 EOS")),
@@ -1049,6 +1059,55 @@ BOOST_FIXTURE_TEST_CASE( pair_creation_needs_a_configured_fee_authority, sysio_s
     BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, ETUSD3,
         extend(asset::from_string("1.0000 EOS")), extend(asset::from_string("1.00 TUSD")), 10, name{}) );
     BOOST_REQUIRE_EQUAL( success(), changefee(ETUSD, 25) );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( seed_locks_shares, sysio_swap_tester ) try {
+    create_tokens_and_issue();
+    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+    many_openext();
+    many_transfer();
+    const int64_t minted = 100'000'000'000;   // sqrt(1e10 * 1e12)
+    const int64_t locked = 5'000'000;
+    const auto lock_of = [&](int64_t units) { return asset(units, EVO4); };
+
+    // The lock must be in the new symbol, nonnegative, and leave the creator something.
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("locked_shares must be in new_symbol"), inittoken( "alice"_n, EVO4,
+        extend(asset::from_string("1000000.0000 EOS")), extend(asset::from_string("100000000.0000 VOICE")),
+        10, name{}, asset(locked, VOICE4) ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("locked_shares must be nonnegative"), inittoken( "alice"_n, EVO4,
+        extend(asset::from_string("1000000.0000 EOS")), extend(asset::from_string("100000000.0000 VOICE")),
+        10, name{}, lock_of(-1) ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("locked_shares must leave the creator at least one share"), inittoken( "alice"_n, EVO4,
+        extend(asset::from_string("1000000.0000 EOS")), extend(asset::from_string("100000000.0000 VOICE")),
+        10, name{}, lock_of(minted) ) );
+
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, EVO4,
+        extend(asset::from_string("1000000.0000 EOS")), extend(asset::from_string("100000000.0000 VOICE")),
+        10, name{}, lock_of(locked) ) );
+    // The whole geometric mean is supply; the creator holds all of it but the lock.
+    auto pool = system_balance(EVO.value);
+    BOOST_REQUIRE_EQUAL( minted, pool.at(2) );
+    BOOST_REQUIRE_EQUAL( minted - locked, lp_balance("alice"_n, EVO) );
+    BOOST_REQUIRE_EQUAL( lock_of(locked).to_string(), get_balance("sysio.swap"_n, name(EVO.value), "stat"_n, EVO.value,
+        "currency_stats")["locked_shares"].as_string() );
+
+    // Removing every share the creator holds succeeds and leaves the locked
+    // shares' slice of the pools behind: the pair can never be emptied.
+    BOOST_REQUIRE_EQUAL( success(), remliquidity( "alice"_n, lock_of(minted - locked), asset(0, EOS4), asset(0, VOICE4) ) );
+    pool = system_balance(EVO.value);
+    BOOST_REQUIRE_EQUAL( locked, pool.at(2) );
+    BOOST_REQUIRE_EQUAL( reference::remove_leg(locked, 10'000'000'000, minted), pool.at(0) );   // what the lock still backs
+    BOOST_REQUIRE_EQUAL( 0, lp_balance("alice"_n, EVO) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("overdrawn balance"),
+        remliquidity( "alice"_n, lock_of(1), asset(0, EOS4), asset(0, VOICE4) ) );
+
+    // The pool keeps working from the locked floor: pricing uses the full supply.
+    const auto before = system_balance(EVO.value);
+    const int64_t pay1 = reference::add_leg(locked, before[0], before[2]);
+    const int64_t pay2 = reference::add_leg(locked, before[1], before[2]);
+    BOOST_REQUIRE_EQUAL( success(), addliquidity( "alice"_n, lock_of(locked), asset(pay1, EOS4), asset(pay2, VOICE4) ) );
+    BOOST_REQUIRE_EQUAL( 2 * locked, system_balance(EVO.value).at(2) );
+    BOOST_REQUIRE_GE( settle_swap("alice"_n, EVO, asset(1000, EOS4), VOICE4, 1), 0 );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( fee_authority_configuration, sysio_swap_tester ) try {
@@ -1770,10 +1829,11 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     const field_list changefee_fields{ {"pair_token", "symbol_code"}, {"newfee", "int32"} };
     const field_list inittoken_fields{
         {"user", "name"}, {"new_symbol", "symbol"}, {"initial_pool1", "extended_asset"},
-        {"initial_pool2", "extended_asset"}, {"initial_fee", "int32"}, {"fee_authority", "name"} };
+        {"initial_pool2", "extended_asset"}, {"initial_fee", "int32"}, {"fee_authority", "name"},
+        {"locked_shares", "asset"} };
     const field_list currency_stats_fields{
         {"supply", "asset"}, {"max_supply", "asset"}, {"issuer", "name"}, {"pool1", "extended_asset"},
-        {"pool2", "extended_asset"}, {"fee", "int32"}, {"fee_authority", "name"} };
+        {"pool2", "extended_asset"}, {"fee", "int32"}, {"fee_authority", "name"}, {"locked_shares", "asset"} };
     const field_list setconfig_fields{ {"fee_authority", "name"} };
     const field_list swap_config_fields{ {"fee_authority", "name"} };
     const field_list sync_fields{ {"pair_token", "symbol_code"} };

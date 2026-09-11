@@ -123,7 +123,11 @@ void swap::add_signed_liq(name user, asset to_add, bool is_buying,
       a.pool1 += to_pay1;
       a.pool2 += to_pay2;
     });
-    check(token->supply.amount + to_add.amount != 0, "the pool cannot be left empty");
+    // Ownership already bounds a removal by the caller's own shares, so supply can
+    // only reach the locked floor when nothing is locked and the last share goes.
+    const int64_t remaining = token->supply.amount + to_add.amount;
+    check(remaining != 0, "the pool cannot be left empty");
+    check(remaining >= token->locked_shares.amount, "locked shares cannot be removed");
 }
 
 void swap::exchange( name user, symbol_code pair_token, 
@@ -215,7 +219,7 @@ void swap::setconfig(name fee_authority) {
 }
 
 void swap::inittoken(name user, symbol new_symbol, extended_asset initial_pool1,
-extended_asset initial_pool2, int initial_fee, name fee_authority)
+extended_asset initial_pool2, int initial_fee, name fee_authority, asset locked_shares)
 {
     require_auth( user );
     require_auth( get_self() );
@@ -223,8 +227,12 @@ extended_asset initial_pool2, int initial_fee, name fee_authority)
     check((initial_pool1.quantity.amount < INIT_MAX) && (initial_pool2.quantity.amount < INIT_MAX), "Initial amounts must be less than 10^15");
     uint8_t new_precision = ( initial_pool1.quantity.symbol.precision() + initial_pool2.quantity.symbol.precision() ) / 2;
     check( new_symbol.precision() == new_precision, "new_symbol precision must be (precision1 + precision2) / 2" );
-    int128_t geometric_mean = sqrt(int128_t(initial_pool1.quantity.amount) * int128_t(initial_pool2.quantity.amount));
-    auto new_token = asset{int64_t(geometric_mean), new_symbol};
+    const auto new_token = asset{ int64_t(opp::amm::geometric_mean(uint64_t(initial_pool1.quantity.amount),
+                                                                   uint64_t(initial_pool2.quantity.amount))),
+                                  new_symbol };
+    check( locked_shares.symbol == new_symbol, "locked_shares must be in new_symbol" );
+    check( locked_shares.amount >= 0, "locked_shares must be nonnegative" );
+    check( locked_shares.amount < new_token.amount, "locked_shares must leave the creator at least one share" );
     check( initial_pool1.get_extended_symbol() != initial_pool2.get_extended_symbol(), "extended symbols must be different");
 
     stats statstable( get_self() );
@@ -246,13 +254,15 @@ extended_asset initial_pool2, int initial_fee, name fee_authority)
         .pool2         = initial_pool2,
         .fee           = initial_fee,
         .fee_authority = fee_authority,
+        .locked_shares = locked_shares,
     } );
 
     priceaccums accums( get_self() );
     accums.emplace( user, key, price_accumulator{ .last_update = current_time_point() } );
 
     placeindex(user, new_symbol, initial_pool1, initial_pool2 );
-    add_balance(user, new_token, user);
+    // The locked shares count toward supply but are credited to nobody.
+    add_balance(user, new_token - locked_shares, user);
     add_signed_ext_balance(user, -initial_pool1);
     add_signed_ext_balance(user, -initial_pool2);
 }
