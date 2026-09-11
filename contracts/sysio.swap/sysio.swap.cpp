@@ -267,12 +267,6 @@ extended_asset initial_pool2, int initial_fee, name fee_authority, asset locked_
     add_signed_ext_balance(user, -initial_pool2);
 }
 
-void swap::indexpair(name user, symbol evo_symbol) {
-    stats statstable( get_self() );
-    const auto token = statstable.get( pair_key{ evo_symbol.code().raw() }, "token symbol does not exist" );
-    placeindex(user, evo_symbol, token.pool1, token.pool2);
-}
-
 void swap::placeindex(name user, symbol evo_symbol,
   extended_asset pool1, extended_asset pool2 ) {
     evoindexes indextable( get_self() );

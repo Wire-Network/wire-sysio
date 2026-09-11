@@ -208,20 +208,6 @@
             ]
         },
         {
-            "name": "indexpair",
-            "base": "",
-            "fields": [
-                {
-                    "name": "user",
-                    "type": "name"
-                },
-                {
-                    "name": "evo_symbol",
-                    "type": "symbol"
-                }
-            ]
-        },
-        {
             "name": "inittoken",
             "base": "",
             "fields": [
@@ -472,11 +458,6 @@
         {
             "name": "exchange",
             "type": "exchange",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "indexpair",
-            "type": "indexpair",
             "ricardian_contract": ""
         },
         {
