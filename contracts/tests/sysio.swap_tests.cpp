@@ -8,6 +8,7 @@
 
 #include <contracts.hpp>
 #include <sysio.opp.common/amm_math.hpp>
+#include <algorithm>
 #include <cmath>
 #include <random>
 #include <set>
@@ -349,16 +350,20 @@ extended_asset extend(asset to_extend) {
 // copied from the contract. The curve goes the pool's way: what a user pays is
 // rounded up, what a user receives is rounded down. The two fees differ: the
 // swap fee taken off a quote is rounded DOWN (the depot-wide amm_math
-// convention, so a one-unit quote is not eaten by its own fee), while the
-// liquidity fee added on top of what a provider pays is rounded UP (so it is
-// never zero on a non-zero amount).
+// convention) but never below one unit when both the rate and the quote are
+// nonzero (units are precision-relative, so a fee-free window is not dust),
+// while the liquidity fee added on top of what a provider pays is rounded UP.
 namespace reference {
    using wide = boost::multiprecision::int128_t;
    constexpr int64_t FeeDenominator = 10000;
+   constexpr int64_t MinSwapFee = 1;
 
    int64_t ceil_div( wide a, wide b )  { return int64_t( (a + b - 1) / b ); }
    int64_t floor_div( wide a, wide b ) { return int64_t( a / b ); }
-   int64_t swap_fee_on( int64_t amount, int fee )      { return floor_div( wide(amount) * fee, FeeDenominator ); }
+   int64_t swap_fee_on( int64_t amount, int fee ) {
+      const int64_t floored = floor_div( wide(amount) * fee, FeeDenominator );
+      return (amount > 0 && fee > 0) ? std::max( floored, MinSwapFee ) : floored;
+   }
    int64_t liquidity_fee_on( int64_t amount, int fee ) { return ceil_div( wide(amount) * fee, FeeDenominator ); }
 
    // Units of `pool_out` received for `amount_in` units of `pool_in`.
@@ -380,13 +385,14 @@ namespace reference {
 // The amm_math composition sysio.swap implements, evaluated on the host with
 // the SAME header the contract compiles against: the equal-weight
 // constant-product kernel for the gross output, then the depot fee split
-// against it (no underwriter share -- the fee stays in the pool).
-// `reference` is the spec written by hand; `model` is the library. A swap must
-// agree with both.
+// against it (no underwriter share -- the fee stays in the pool), with the
+// contract's one-unit minimum on top. `reference` is the spec written by hand;
+// `model` is the library. A swap must agree with both.
 namespace model {
    namespace amm = sysio::opp::amm;
    constexpr uint64_t CpWeightBps = amm::WEIGHT_TOTAL_BPS / 2;
    constexpr uint32_t NoUnderwriterShareBps = 0;
+   constexpr uint64_t MinSwapFee = 1;
 
    int64_t gross( int64_t amount_in, int64_t pool_in, int64_t pool_out ) {
       return int64_t( amm::out_given_in( uint64_t(pool_in), CpWeightBps,
@@ -394,8 +400,10 @@ namespace model {
                                          uint64_t(amount_in) ) );
    }
    int64_t receive( int64_t amount_in, int64_t pool_in, int64_t pool_out, int fee ) {
-      const int64_t g = gross( amount_in, pool_in, pool_out );
-      return int64_t( amm::split_wire_fee( uint64_t(g), uint32_t(fee), NoUnderwriterShareBps ).net );
+      const uint64_t g = uint64_t( gross( amount_in, pool_in, pool_out ) );
+      uint64_t f = amm::split_wire_fee( g, uint32_t(fee), NoUnderwriterShareBps ).fee;
+      if (fee > 0 && g > 0) f = std::max( f, MinSwapFee );
+      return int64_t( g - f );
    }
 }
 
@@ -592,20 +600,20 @@ BOOST_FIXTURE_TEST_CASE( exchange_action, sysio_swap_tester ) try {
     exchange( "alice"_n, EVO, extend(asset::from_string("0.1000 EOS")), asset::from_string("4.8500 VOICE"));
     exchange( "alice"_n, EVO, extend(asset::from_string("0.0001 EOS")), asset::from_string("0.0009 VOICE"));
 
-    vector <int64_t> expected_system_balance = {10000073819, 999999185796, 100000328128};
+    vector <int64_t> expected_system_balance = {10000073819, 999999185797, 100000328128};
     BOOST_REQUIRE_EQUAL(expected_system_balance == system_balance(EVO.value), true);
     BOOST_REQUIRE_EQUAL(balance("alice"_n,0), 89999926181);
-    BOOST_REQUIRE_EQUAL(balance("alice"_n,1), 1000000814204);
+    BOOST_REQUIRE_EQUAL(balance("alice"_n,1), 1000000814203);
 
     BOOST_REQUIRE_EQUAL( success(), changefee(EVO, 50) );
 
     addliquidity( "alice"_n, asset::from_string("50.0000 EVO"),
       asset::from_string("10000000.0000 EOS"), asset::from_string("10000000.0000 VOICE") );
 
-    expected_system_balance = {10000123826, 1000004186276, 100000828128};
+    expected_system_balance = {10000123826, 1000004186277, 100000828128};
     BOOST_REQUIRE_EQUAL(expected_system_balance == system_balance(EVO.value), true);
     BOOST_REQUIRE_EQUAL(balance("alice"_n,0), 89999876174);
-    BOOST_REQUIRE_EQUAL(balance("alice"_n,1), 999995813724);
+    BOOST_REQUIRE_EQUAL(balance("alice"_n,1), 999995813723);
  
     // The retired exact-output form is refused and leaves every balance as it was.
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("ext_asset_in must be positive"),
@@ -613,7 +621,7 @@ BOOST_FIXTURE_TEST_CASE( exchange_action, sysio_swap_tester ) try {
                               asset::from_string("-401.9984 VOICE")) );
     BOOST_REQUIRE_EQUAL(expected_system_balance == system_balance(EVO.value), true);
     BOOST_REQUIRE_EQUAL(balance("alice"_n,0), 89999876174);
-    BOOST_REQUIRE_EQUAL(balance("alice"_n,1), 999995813724);
+    BOOST_REQUIRE_EQUAL(balance("alice"_n,1), 999995813723);
 
 } FC_LOG_AND_RETHROW()
 
@@ -1548,14 +1556,14 @@ BOOST_FIXTURE_TEST_CASE( precision_extremes, sysio_swap_tester ) try {
     }
     // Dust pool: alice's entire VOICE balance in one trade. The pool side lands
     // exactly on the int64 ceiling and the gross quote is a single unit, which
-    // reaches her because the fee on it rounds down to nothing.
+    // the one-unit minimum fee keeps in the pool: no fee-bearing trade is free.
     {
         const auto before = system_balance(EVO.value);
         const int64_t amount = balance("alice"_n, 1);
         BOOST_REQUIRE_EQUAL( asset::max_amount, before[1] + amount );
         BOOST_REQUIRE_EQUAL( 1, model::gross(amount, before[1], before[0]) );
         const int64_t out = reference::receive(amount, before[1], before[0], 10);
-        BOOST_REQUIRE_EQUAL( 1, out );
+        BOOST_REQUIRE_EQUAL( 0, out );
         BOOST_REQUIRE_EQUAL( out, settle_swap("alice"_n, EVO, asset(amount, VOICE4), EOS4, 0) );
         const auto after = system_balance(EVO.value);
         BOOST_REQUIRE_EQUAL( asset::max_amount, after[1] );
@@ -1572,18 +1580,18 @@ BOOST_FIXTURE_TEST_CASE( precision_extremes, sysio_swap_tester ) try {
         BOOST_REQUIRE_EQUAL( before[1],     after[1] );
 
         // Every unit of EOS alice still holds: pool_in + amount is the whole
-        // supply less the single unit still parked in the dust pool.
+        // supply less the two units parked in the dust pool.
         before = after;
         const int64_t amount = balance("alice"_n, 0);
-        BOOST_REQUIRE_EQUAL( 1, system_balance(EVO.value)[0] );
-        BOOST_REQUIRE_EQUAL( asset::max_amount - 1, before[0] + amount );
+        BOOST_REQUIRE_EQUAL( 2, system_balance(EVO.value)[0] );
+        BOOST_REQUIRE_EQUAL( asset::max_amount - 2, before[0] + amount );
         const int64_t out = reference::receive(amount, before[0], before[1], 10);
         BOOST_REQUIRE_EQUAL( out, model::receive(amount, before[0], before[1], 10) );
         BOOST_REQUIRE_EQUAL( wasm_assert_msg("available is less than expected"),
             exchange( "alice"_n, ETUSD, extend(asset(amount, EOS4)), asset(out + 1, TUSD2) ) );
         BOOST_REQUIRE_EQUAL( out, settle_swap("alice"_n, ETUSD, asset(amount, EOS4), TUSD2, 1) );
         after = system_balance(ETUSD.value);
-        BOOST_REQUIRE_EQUAL( asset::max_amount - 1, after[0] );
+        BOOST_REQUIRE_EQUAL( asset::max_amount - 2, after[0] );
         BOOST_REQUIRE_EQUAL( 0, balance("alice"_n, 0) );
 
         // And every unit of TUSD the other way.
@@ -1593,6 +1601,56 @@ BOOST_FIXTURE_TEST_CASE( precision_extremes, sysio_swap_tester ) try {
         BOOST_REQUIRE_EQUAL( out2, model::receive(tusd, before[1], before[0], 10) );
         BOOST_REQUIRE_EQUAL( out2, settle_swap("alice"_n, ETUSD, asset(tusd, TUSD2), EOS4, 0) );
         BOOST_REQUIRE_EQUAL( 0, balance("alice"_n, 2) );
+    }
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( minimum_fee_closes_the_free_window, sysio_swap_tester ) try {
+    // A small, balanced pool so single-unit inputs produce single-unit quotes:
+    // 1000.0000 EOS against 1000.0000 VOICE, 10 bps.
+    create_tokens_and_issue();
+    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+    many_openext();
+    BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("2000.0000 EOS"), "") );
+    BOOST_REQUIRE_EQUAL( success(), transfer( "anothertoken"_n, "bob"_n, "sysio.swap"_n, asset::from_string("2000.0000 VOICE"), "deposit to: alice") );
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, EVO4,
+        extend(asset::from_string("1000.0000 EOS")), extend(asset::from_string("1000.0000 VOICE")), 10, "wevotethefee"_n) );
+
+    // Below one unit of quote there is nothing to charge: the input is kept, nothing is paid.
+    BOOST_REQUIRE_EQUAL( 0, settle_swap("alice"_n, EVO, asset(1, EOS4), VOICE4, 1) );
+    // A 999-unit quote would round to a zero fee; the minimum makes it one unit.
+    {
+        const auto before = system_balance(EVO.value);
+        BOOST_REQUIRE_EQUAL( 999, model::gross(1000, before[0], before[1]) );
+        BOOST_REQUIRE_EQUAL( 998, reference::receive(1000, before[0], before[1], 10) );
+        BOOST_REQUIRE_EQUAL( 998, settle_swap("alice"_n, EVO, asset(1000, EOS4), VOICE4, 1) );
+    }
+    // Once the floored fee reaches a unit on its own the minimum is inert.
+    {
+        const auto before = system_balance(EVO.value);
+        const int64_t g = model::gross(20000, before[0], before[1]);
+        BOOST_REQUIRE( g * 10 / 10000 >= 1 );
+        BOOST_REQUIRE_EQUAL( g - g * 10 / 10000, settle_swap("alice"_n, EVO, asset(20000, EOS4), VOICE4, 1) );
+    }
+    // At a zero fee rate there is no minimum: the quote is the bare curve.
+    BOOST_REQUIRE_EQUAL( success(), changefee(EVO, 0) );
+    {
+        const auto before = system_balance(EVO.value);
+        const int64_t g = model::gross(1000, before[0], before[1]);
+        BOOST_REQUIRE_EQUAL( g, settle_swap("alice"_n, EVO, asset(1000, EOS4), VOICE4, 1) );
+    }
+    // And back at a nonzero rate, x*y grows on EVERY fee-bearing trade, including
+    // the smallest quotes -- there is no fee-free window to hunt for.
+    BOOST_REQUIRE_EQUAL( success(), changefee(EVO, 10) );
+    using wide = boost::multiprecision::int256_t;
+    for (int64_t amount : {int64_t(1000), int64_t(1001), int64_t(1500), int64_t(2), int64_t(3)}) {
+        const auto before = system_balance(EVO.value);
+        const int64_t g = model::gross(amount, before[0], before[1]);
+        const int64_t out = settle_swap("alice"_n, EVO, asset(amount, EOS4), VOICE4, 1);
+        const auto after = system_balance(EVO.value);
+        if (g > 0) {
+            BOOST_REQUIRE_LT( out, g );
+            BOOST_REQUIRE( wide(after[0]) * wide(after[1]) > wide(before[0]) * wide(before[1]) );
+        }
     }
 } FC_LOG_AND_RETHROW()
 
