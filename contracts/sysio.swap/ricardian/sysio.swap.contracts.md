@@ -138,9 +138,9 @@ title: Exchange
 summary: 'Exchange token through a specific pair'
 ---
 
-{{user}} agree to substract {{ext_asset_in}} and to add at least {{min_expected}} to their extended balances. The extended symbol of {{ext_asset_in}} must match one of the pools associated to the token {{pair_token}}. The contract of {{min_expected}} is given by the other pool of that pair. These (possibly negative) extended assets will be respectively added to and substracted from the corresponding pools.
+{{user}} agree to substract {{ext_asset_in}} and to add at least {{min_expected}} to their extended balances. {{ext_asset_in}} must be positive and {{min_expected}} nonnegative. The extended symbol of {{ext_asset_in}} must match one of the pools associated to the token {{pair_token}}. The contract of {{min_expected}} is given by the other pool of that pair. These extended assets will be respectively added to and substracted from the corresponding pools.
 
-The extended asset (might be negative) to be added to {{users}}'s extended balance as a result of the exchange operation, is computed as x + y, where
+The extended asset to be added to {{users}}'s extended balance as a result of the exchange operation, is computed as x + y, where
 
 x = pool_out * {{ext_asset_in}} / (pool_in + {{ext_asset_in}}), up to the precision of the symbol of pool_out rounded downward.
 y = x * fee / 10000, up to the same precision as x, again rounded downward.
