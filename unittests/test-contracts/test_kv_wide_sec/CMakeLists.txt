@@ -1,0 +1,6 @@
+if( BUILD_TEST_CONTRACTS )
+   add_contract( test_kv_wide_sec test_kv_wide_sec test_kv_wide_sec.cpp )
+else()
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/test_kv_wide_sec.wasm ${CMAKE_CURRENT_BINARY_DIR}/test_kv_wide_sec.wasm COPYONLY )
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/test_kv_wide_sec.abi ${CMAKE_CURRENT_BINARY_DIR}/test_kv_wide_sec.abi COPYONLY )
+endif()

@@ -1,0 +1,112 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "additem",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "small",
+                    "type": "uint32"
+                },
+                {
+                    "name": "score",
+                    "type": "int64"
+                },
+                {
+                    "name": "tier",
+                    "type": "uint32"
+                },
+                {
+                    "name": "owner",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "combo_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "tier",
+                    "type": "uint32"
+                },
+                {
+                    "name": "owner",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "item_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "item_val",
+            "base": "",
+            "fields": [
+                {
+                    "name": "small",
+                    "type": "uint32"
+                },
+                {
+                    "name": "score",
+                    "type": "int64"
+                },
+                {
+                    "name": "combo",
+                    "type": "combo_key"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "additem",
+            "type": "additem",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "items",
+            "type": "item_val",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 37244,
+            "secondary_indexes": [
+                {
+                    "name": "bysmall",
+                    "key_type": "uint32",
+                    "table_id": 32693
+                },
+                {
+                    "name": "byscore",
+                    "key_type": "int64",
+                    "table_id": 23410
+                },
+                {
+                    "name": "bycombo",
+                    "key_type": "combo_key",
+                    "table_id": 49075
+                }
+            ]
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}

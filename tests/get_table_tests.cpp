@@ -1689,6 +1689,240 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_index_name_test, validating_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
+// kv::table secondary indexes on key types outside multi_index's five
+//
+// multi_index is capped at what upstream Antelope supports, because it exists to carry a
+// ported contract over unchanged. kv::table is the Wire-native path and is not: kv::index
+// keys through sysio::kv::be_key_stream, which encodes the narrow integers, the signed
+// ones, name, and composite structs in an order-preserving big-endian form.
+//
+// The chain has to agree, and it agrees through a SEPARATE implementation --
+// get_table_rows resolves index_name against the ABI and builds the caller's bound with
+// be_key_codec. Two implementations, one byte format. Until this test the only kv::index
+// in the suite was on `name`, so uint32, int64 and composite keys were unverified end to
+// end even though be_key_codec claims to handle them.
+//
+// Every row below is laid out so a little-endian encoding would order it differently: the
+// uint32 values are byte-rotations of each other, which LE reverses outright; the int64
+// values straddle zero, which LE sorts above the negatives; and the composite keys need
+// tier compared before owner, which only holds if each field encodes big-endian.
+// ---------------------------------------------------------------------------
+BOOST_FIXTURE_TEST_CASE( get_kv_rows_wide_secondary_keys_test, validating_tester ) try {
+   produce_block();
+   create_accounts({"widesec"_n});
+   produce_block();
+   set_code("widesec"_n, test_contracts::test_kv_wide_sec_wasm());
+   set_abi("widesec"_n, test_contracts::test_kv_wide_sec_abi());
+   produce_block();
+
+   auto additem = [&](uint64_t id, uint32_t small, int64_t score, uint32_t tier, const char* owner) {
+      push_action("widesec"_n, "additem"_n, "widesec"_n, mutable_variant_object()
+                  ("id", id)("small", small)("score", score)("tier", tier)("owner", owner));
+   };
+
+   // Ascending by every index is id 4, 3, 2, 1 -- i.e. `small` 1, 256, 65536, 16777216.
+   //
+   // Every value here is chosen to be ASYMMETRIC under byte reversal, which takes care.
+   // Consecutive tiers (0, 1, 2) would not discriminate: they differ only in the
+   // least-significant byte, which little-endian puts first, so a LE encoding orders them
+   // correctly by accident. The tiers are byte-rotations for that reason.
+   //
+   // The same trap catches `name`. Ids 1 and 2 share a tier so `owner` breaks the tie, but
+   // a pair like "aaa"/"zzz" sorts the same either way -- their low bytes are zero, so LE
+   // reaches the differing high byte with everything before it equal. "aaz" (raw 0x31be..)
+   // and "b" (0x3800..) do not: big-endian puts "aaz" first, little-endian puts it second.
+   additem(1, 0x01000000u,  1, 0x00010000u, "b");
+   additem(2, 0x00010000u,  0, 0x00010000u, "aaz");
+   additem(3, 0x00000100u, -1, 0x00000100u, "mmm");
+   additem(4, 0x00000001u, -2, 0x00000001u, "bob");
+   produce_block();
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes,
+                                fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+
+   // `small` is unique per row, so the sequence of it identifies both the rows returned and
+   // the order they came back in.
+   auto smalls_of = [](const chain_apis::read_only::get_table_rows_result& r) {
+      std::vector<uint64_t> out;
+      for (const auto& row : r.rows) {
+         const auto& obj = row.get_object();
+         BOOST_REQUIRE(obj.contains("value"));
+         const auto& val = obj["value"];
+         BOOST_REQUIRE(val.is_object());
+         out.push_back(val.get_object()["small"].as_uint64());
+      }
+      return out;
+   };
+
+   auto query = [&](const char* index, const std::string& lower = {}, const std::string& upper = {},
+                    bool reverse = false, uint32_t limit = 0) {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json  = true;
+      p.code  = "widesec"_n;
+      p.table = "items";
+      p.index_name  = index;
+      p.lower_bound = lower;
+      p.upper_bound = upper;
+      if (reverse) p.reverse = true;
+      if (limit)   p.limit = limit;
+      return get_table_rows_kv(plugin, p, fc::time_point::maximum());
+   };
+
+   const std::vector<uint64_t> ascending{1u, 256u, 65536u, 16777216u};
+
+   // BOOST_CHECK(a == b) on vectors prints nothing useful on failure, and every assertion
+   // here is about a sequence -- which order came back is the whole answer.
+   auto check_seq = [](const std::vector<uint64_t>& got, const std::vector<uint64_t>& want) {
+      BOOST_CHECK_EQUAL_COLLECTIONS(got.begin(), got.end(), want.begin(), want.end());
+   };
+
+   // (a) primary query returns everything, so a wrong count later is an index problem
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json = true;
+      p.code = "widesec"_n;
+      p.table = "items";
+      auto result = get_table_rows_kv(plugin, p, fc::time_point::maximum());
+      BOOST_CHECK_EQUAL(result.rows.size(), 4u);
+   }
+
+   // (b) uint32 secondary index, full scan. Under a little-endian encoding this comes back
+   //     exactly reversed.
+   check_seq(smalls_of(query("bysmall")), ascending);
+
+   // (c) int64 secondary index. Under LE the two non-negative scores sort ahead of the
+   //     negative ones, giving {65536, 16777216, 1, 256}.
+   check_seq(smalls_of(query("byscore")), ascending);
+
+   // (d) composite {uint32 tier, name owner}. be_key_codec expands the struct field by field
+   //     in declaration order and be_key_stream encodes each through the same overloads, so
+   //     tier is compared before owner.
+   check_seq(smalls_of(query("bycombo")), ascending);
+
+   // (e) JSON bound on the uint32 index -- the host encodes 256 big-endian and it has to
+   //     match the bytes the contract stored.
+   {
+      auto got = smalls_of(query("bysmall", R"({"bysmall": 256})"));
+      check_seq(got, {256u, 65536u, 16777216u});
+   }
+
+   // (f) JSON bound on the signed index, at zero -- the sign-bit flip has to agree on both
+   //     sides or this returns the negatives too.
+   {
+      auto got = smalls_of(query("byscore", R"({"byscore": 0})"));
+      check_seq(got, {65536u, 16777216u});
+   }
+
+   // (g) JSON bound on the composite index, at tier 256. The bound object nests by field
+   //     name, which is what encode_shape reads.
+   {
+      auto got = smalls_of(query("bycombo", R"({"bycombo": {"tier": 256, "owner": "mmm"}})"));
+      check_seq(got, {256u, 65536u, 16777216u});
+   }
+
+   // (h) Composite bounds narrowed to one row: within tier 65536, from "aaz" up to but not
+   //     including "b" leaves only id 2. This is the case that needs owner to encode
+   //     correctly as well as tier.
+   //
+   //     "aaz"/"b" rather than the obvious "aaa"/"zzz" because that pair does not
+   //     discriminate -- "aaa" and "zzz" sort the same under both byte orders, and the
+   //     range between them would span BOTH same-tier rows (b < zzz), returning two rows
+   //     rather than one.
+   {
+      auto got = smalls_of(query("bycombo",
+                                 R"({"bycombo": {"tier": 65536, "owner": "aaz"}})",
+                                 R"({"bycombo": {"tier": 65536, "owner": "b"}})"));
+      check_seq(got, {65536u});
+   }
+
+   // (i) reverse walks the same order backwards, which uses a different cursor path than
+   //     the forward scan.
+   {
+      auto got = smalls_of(query("bysmall", {}, {}, true));
+      std::vector<uint64_t> descending(ascending.rbegin(), ascending.rend());
+      check_seq(got, descending);
+   }
+
+   // (j) A bound below every key returns everything; one above every key returns nothing.
+   //     The values matter. 0 and 0xFFFFFFFF are fixed points of byte reversal, so a bound
+   //     built from either encodes to the same bytes under both orders and cannot detect a
+   //     byte-order fault at all. 0x02000000 reverses to 0x00000002, which lands below
+   //     every stored key instead of above them; -3 reverses into the middle of the range.
+   {
+      check_seq(smalls_of(query("byscore", R"({"byscore": -3})")), ascending);
+      BOOST_CHECK_EQUAL(query("bysmall", R"({"bysmall": 33554432})").rows.size(), 0u);
+   }
+
+
+   // Everything above drives the codec's ENCODE half: bounds go in through encode_shape,
+   // and the row order proves what the contract stored. None of it reaches decode_key,
+   // which is only used to format `next_key` -- and `next_key` is only emitted when a page
+   // is cut short. Four rows under the default limit of 50 never cut one, so the decoders
+   // below were previously unexercised for these key types. If decode_field(int64) stopped
+   // removing the sign-bit bias, every assertion above would still pass while score 0 came
+   // back as INT64_MIN.
+
+   // (k) Forward pagination on the signed index. `next_key` is the FIRST UNSEEN row, and
+   //     lower_bound is inclusive, so resuming with it continues with no gap and no repeat.
+   {
+      auto page1 = query("byscore", {}, {}, false, 2);
+      BOOST_CHECK_EQUAL(page1.more, true);
+      check_seq(smalls_of(page1), {1u, 256u});
+      BOOST_REQUIRE(!page1.next_key.empty());
+      // Pins the sign-bias removal: id 2's score is 0, stored as 0x8000000000000000.
+      // Without the xor this decodes as INT64_MIN.
+      auto nk = fc::json::from_string(page1.next_key);
+      BOOST_CHECK_EQUAL(nk.get_object()["byscore"].as_int64(), 0);
+
+      auto page2 = query("byscore", page1.next_key, {}, false, 2);
+      check_seq(smalls_of(page2), {65536u, 16777216u});
+      BOOST_CHECK_EQUAL(page2.more, false);
+   }
+
+   // (l) Forward pagination on the composite index -- the same cursor round-trip, but
+   //     through decode_shape's recursive struct walk rather than a single leaf.
+   {
+      auto page1 = query("bycombo", {}, {}, false, 2);
+      BOOST_CHECK_EQUAL(page1.more, true);
+      check_seq(smalls_of(page1), {1u, 256u});
+      BOOST_REQUIRE(!page1.next_key.empty());
+      auto nk = fc::json::from_string(page1.next_key);
+      const auto& combo = nk.get_object()["bycombo"].get_object();
+      BOOST_CHECK_EQUAL(combo["tier"].as_uint64(), 65536u);
+      BOOST_CHECK_EQUAL(combo["owner"].as_string(), "aaz");
+
+      auto page2 = query("bycombo", page1.next_key, {}, false, 2);
+      check_seq(smalls_of(page2), {65536u, 16777216u});
+      BOOST_CHECK_EQUAL(page2.more, false);
+   }
+
+   // (m) Reverse pagination. Same four rows in the opposite order -- the union of the two
+   //     pages below is the union of (k)'s, just reversed, with no row repeated or dropped.
+   //
+   //     What differs is the resume rule, and both directions emit the SAME cursor here,
+   //     `{"byscore":0}` (id 2's score), for opposite reasons. Forward has not yet returned
+   //     id 2 -- it is the first unseen row -- so it resumes on an INCLUSIVE lower_bound and
+   //     id 2 opens its page 2. Reverse has just returned id 2 as its last row, so it
+   //     resumes on an EXCLUSIVE upper_bound and does not repeat it. The two rules are
+   //     opposite so that either direction yields each row exactly once; asserting both
+   //     pages is what pins that.
+   {
+      auto page1 = query("byscore", {}, {}, true, 2);
+      BOOST_CHECK_EQUAL(page1.more, true);
+      check_seq(smalls_of(page1), {16777216u, 65536u});
+      BOOST_REQUIRE(!page1.next_key.empty());
+      auto nk = fc::json::from_string(page1.next_key);
+      BOOST_CHECK_EQUAL(nk.get_object()["byscore"].as_int64(), 0);
+
+      auto page2 = query("byscore", {}, page1.next_key, true, 2);
+      check_seq(smalls_of(page2), {256u, 1u});
+      BOOST_CHECK_EQUAL(page2.more, false);
+   }
+
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
 // New unified get_table_rows feature tests
 // ---------------------------------------------------------------------------
 
