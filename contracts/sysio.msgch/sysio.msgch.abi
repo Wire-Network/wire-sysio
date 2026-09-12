@@ -583,14 +583,6 @@
                     "value": 2001
                 },
                 {
-                    "name": "ATTESTATION_TYPE_STAKE",
-                    "value": 3001
-                },
-                {
-                    "name": "ATTESTATION_TYPE_UNSTAKE",
-                    "value": 3002
-                },
-                {
                     "name": "ATTESTATION_TYPE_PRETOKEN_PURCHASE",
                     "value": 3004
                 },

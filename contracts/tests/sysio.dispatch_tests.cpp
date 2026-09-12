@@ -187,18 +187,19 @@ std::vector<char> encode_envelope_with_attestations(
 constexpr size_t MAX_ENVELOPE_BYTES = 32'768;
 
 /// Encode a decodable envelope whose serialised size is EXACTLY `target_bytes`, padded with a
-/// single out-of-scope STAKE attestation (dispatch drops it with no value-bearing effect). Probe
-/// once with `target_bytes` of padding to measure the fixed protobuf overhead, then rebuild with
+/// permanently inert processing-error attestation (dispatch drops it with no value-bearing effect).
+/// Probe once with `target_bytes` of padding to measure the fixed protobuf overhead, then rebuild with
 /// the pad shrunk by that overhead: at sizes near the 32 KiB envelope cap every nested length
 /// prefix and the `data_size` varint sit in the same 3-byte width band (16 KiB .. 2 MiB), so the
 /// second pass lands exactly on target — the final REQUIRE pins it.
 std::vector<char> encode_envelope_padded_to(uint32_t epoch_index, size_t target_bytes) {
    auto probe = encode_envelope_with_one_attestation(
-      epoch_index, sysio::opp::types::ATTESTATION_TYPE_STAKE, std::string(target_bytes, 'x'));
+      epoch_index, sysio::opp::types::ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR,
+      std::string(target_bytes, 'x'));
    BOOST_REQUIRE_GT(probe.size(), target_bytes);
    const size_t overhead = probe.size() - target_bytes;
    auto padded = encode_envelope_with_one_attestation(
-      epoch_index, sysio::opp::types::ATTESTATION_TYPE_STAKE,
+      epoch_index, sysio::opp::types::ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR,
       std::string(target_bytes - overhead, 'x'));
    BOOST_REQUIRE_EQUAL(target_bytes, padded.size());
    return padded;
@@ -1471,7 +1472,7 @@ BOOST_FIXTURE_TEST_CASE(dispatch_silently_drops_out_of_scope_types, sysio_dispat
    const auto eth_code = fc::slug_name{"ETH"}.value;
    auto envelope = encode_envelope_with_one_attestation(
       current_epoch(),
-      sysio::opp::types::ATTESTATION_TYPE_STAKE,
+      sysio::opp::types::ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR,
       std::string{});
 
    BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));
@@ -1872,7 +1873,7 @@ BOOST_FIXTURE_TEST_CASE(deliver_duplicate_from_same_operator_reverts, sysio_disp
    const auto eth_code = fc::slug_name{"ETH"}.value;
    auto envelope = encode_envelope_with_one_attestation(
       current_epoch(),
-      sysio::opp::types::ATTESTATION_TYPE_STAKE,
+      sysio::opp::types::ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR,
       std::string{});
 
    BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));

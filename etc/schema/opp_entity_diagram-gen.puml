@@ -44,11 +44,6 @@ sysio.opp.MessagePayload -- sysio.opp.AttestationEntry
 
 
 
-sysio.opp.attestations.PretokenStakeChange -- sysio.opp.types.ChainAddress
-sysio.opp.attestations.PretokenStakeChange -- sysio.opp.types.TokenAmount
-
-
-
 sysio.opp.types.ChainSignature -- sysio.opp.types.ChainAddress
 sysio.opp.types.ChainSignature -- sysio.opp.types.ChainKeyType
 
@@ -109,13 +104,6 @@ package sysio.opp.attestations {
   index_at_mint: Long
  }
 
- class PretokenStakeChange {
-  actor: sysio.opp.types.ChainAddress
-  amount: sysio.opp.types.TokenAmount
-  index_at_mint: Long
-  index_at_burn: Long
- }
-
  class PretokenYield {
   actor: sysio.opp.types.ChainAddress
   amount: sysio.opp.types.TokenAmount
@@ -156,8 +144,6 @@ package sysio.opp.attestations {
 package sysio.opp.types {
  enum AttestationType {
   ATTESTATION_TYPE_UNSPECIFIED
-  ATTESTATION_TYPE_STAKE
-  ATTESTATION_TYPE_UNSTAKE
   ATTESTATION_TYPE_PRETOKEN_PURCHASE
   ATTESTATION_TYPE_PRETOKEN_YIELD
   ATTESTATION_TYPE_RESERVE_BALANCE_SHEET
