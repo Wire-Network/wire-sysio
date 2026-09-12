@@ -526,3 +526,65 @@ message EmissionsBlocked {
   int64                                 sysio_balance      = 5;
   uint32                                first_blocked_at   = 6; // unix seconds
 }
+
+// ---------------------------------------------------------------------------
+//  liq syndication (simple_swap)
+//
+//  A holder syndicates their liq token (liqSOL on Solana) by handing it to the
+//  outpost; from that moment the tokens are outpost property and the WIRE
+//  depot is the ledger of record for who syndicated what. The outpost keeps no
+//  per-user syndication state and never pays a syndicator on its own
+//  initiative: every de-syndication is depot-originated (DESYNDICATE_LIQ) and
+//  the outpost applies it inline at dispatch, exactly like a remit.
+//
+//  Amounts are base units of the syndicating chain's liq token (liqSOL is
+//  9-decimal, so 1:1 with the depot frame). `sequence` is a per-outpost
+//  strictly-increasing counter carried so the depot can dedupe replays without
+//  retaining per-attestation history.
+// ---------------------------------------------------------------------------
+
+// Outpost -> Depot. A user syndicated `amount` liq tokens to the outpost.
+message SyndicateLiq {
+  // Chain code of the emitting outpost (bound to the proven source chain).
+  uint64                       chain_code = 1;
+  // The syndicating user's native IDENTITY: what the depot parks the
+  // syndication against and later matches an AuthX link on. The encoding
+  // follows the VM family, not the chain. SVM: the 32-byte Ed25519 pubkey
+  // (which is the address). EVM: the 33-byte COMPRESSED secp256k1 point, NOT
+  // the 20-byte address -- sysio.authex indexes links by pubkey only, and the
+  // depot cannot derive an address from a compressed key.
+  sysio.opp.types.ChainAddress user       = 2;
+  // liq tokens syndicated, base units.
+  int64                        amount     = 3;
+  // Per-outpost monotonic sequence shared with LiqYield; dedupe key.
+  uint64                       sequence   = 4;
+}
+
+// Outpost -> Depot. Yield the outpost claimed for the syndicated liq pool since
+// its previous report. Global to the outpost: no user address — the depot
+// splits it across its own syndication ledger.
+message LiqYield {
+  uint64 chain_code = 1;
+  // liq tokens claimed as yield for the syndicated pool, base units.
+  int64  amount     = 2;
+  // Per-outpost monotonic sequence shared with SyndicateLiq; dedupe key.
+  uint64 sequence   = 3;
+  // Outpost-chain epoch at which the report was taken. Informational.
+  uint64 epoch      = 4;
+}
+
+// Depot -> Outpost. Release `amount` liq tokens from the outpost's syndicated
+// pool to `user`. The outpost transfers inline at dispatch; refusals are
+// logged and skipped (never retried locally), the depot ledger is authoritative.
+message DesyndicateLiq {
+  // Chain code of the destination outpost.
+  uint64                       chain_code = 1;
+  // Recipient's transfer DESTINATION on the outpost chain (the opposite
+  // reading from SyndicateLiq.user). SVM: the 32-byte pubkey. EVM: the
+  // 20-byte address.
+  sysio.opp.types.ChainAddress user       = 2;
+  // liq tokens to release, base units.
+  int64                        amount     = 3;
+  // Depot-side request id for correlation in outpost logs.
+  uint64                       request_id = 4;
+}
