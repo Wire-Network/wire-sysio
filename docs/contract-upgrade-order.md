@@ -137,6 +137,16 @@ Independently of inlines, the emissions readiness gate in `sysio.epoch` **reads*
 `sysio.system`'s `emitcfg`, `t5state` and `payclaimtot`, and `sysio.token`'s
 `accounts`.
 
+WIRE-352 adds a separate, deliberately soft inline edge:
+
+| Caller | Callee/action | Required order | Mixed-state behavior |
+|---|---|---|---|
+| `sysio.authex::{createlink,recordlink}` | `sysio.dclaim::linkswept` | Deploy `sysio.dclaim` before the first external-key link. | A missing or non-privileged callee is detected before the inline send, so the link commits and the pre-link reward remains in `unmapped_tokens` for operator remediation rather than aborting dispatch. |
+
+Production deployment through `sysio.roa::setsyscode` privileges `sysio.dclaim`
+as part of the deploy, so there is no separate privilege step. The durable
+precondition is ordering: deploy DClaim before any link action can execute.
+
 ### WIRE-343 pre-launch activation
 
 Activate WIRE-343 in one quiesced maintenance window, with no

@@ -136,6 +136,11 @@ def abi_type_to_schema(abi_type: str, structs_map: dict, type_aliases: dict,
                        enums_map: dict | None = None) -> dict:
     """Map an ABI type to a JSON Schema fragment."""
     abi_type = resolve_type(abi_type, type_aliases)
+    if abi_type.endswith('$'):
+        # ABI binary extensions are encoded exactly like their inner type when
+        # present; the containing field's required/optional status is handled
+        # by generate() below.
+        return abi_type_to_schema(abi_type[:-1], structs_map, type_aliases, enums_map)
     if abi_type.endswith('[]'):
         return {'type': 'array', 'items': abi_type_to_schema(abi_type[:-2], structs_map, type_aliases, enums_map)}
     if abi_type.endswith('?'):
@@ -185,6 +190,8 @@ def abi_type_to_ts(abi_type: str, structs_map: dict, type_aliases: dict,
     spelling without casts (see enums-are-first-class).
     """
     abi_type = resolve_type(abi_type, type_aliases)
+    if abi_type.endswith('$'):
+        return abi_type_to_ts(abi_type[:-1], structs_map, type_aliases, contract_prefix, enums_map)
     if abi_type.endswith('[]'):
         inner = abi_type_to_ts(abi_type[:-2], structs_map, type_aliases, contract_prefix, enums_map)
         # A union inner type must parenthesize: `(A | B)[]`, not `A | B[]`.
@@ -302,7 +309,7 @@ def generate(abi_files: list[str], output_dir: str, style: str) -> None:
                 for member in member_variants(field['name'], style):
                     properties[member] = dict(schema_val)
                     # In 'both' mode all properties are optional
-                    if style != 'both' and not resolved.endswith('?'):
+                    if style != 'both' and not resolved.endswith(('?', '$')):
                         required.append(member)
 
             schema_def: dict = {'type': 'object', 'properties': properties}
@@ -323,7 +330,7 @@ def generate(abi_files: list[str], output_dir: str, style: str) -> None:
                     if style == 'both':
                         optional = '?'
                     else:
-                        optional = '?' if resolved.endswith('?') else ''
+                        optional = '?' if resolved.endswith(('?', '$')) else ''
                     ts_lines.append(f'  {member}{optional}: {ts_type}')
             ts_lines.append('}')
             ts_lines.append('')

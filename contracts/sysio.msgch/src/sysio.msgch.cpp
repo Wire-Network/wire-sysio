@@ -5,6 +5,7 @@
 #include <sysio.chalg/sysio.chalg.hpp>     // dispute trigger + open-dispute gate (disputes table)
 #include <sysio.opreg/sysio.opreg.hpp>     // operator-status delivery gate (operators table)
 #include <sysio.roa.hpp>                    // authoritative Tier-1 electorate preflight
+#include <sysio.opp.common/evm_address.hpp>
 #include <sysio.opp.common/slug_name.hpp>
 #include <sysio.opp.common/safe_ops.hpp>   // to_depot_amount — WSA-028 fail-closed TokenAmount gate
 #include <sysio.opp.common/name_ops.hpp>   // parse_wire_account_name — never-throw account-name parse
@@ -731,24 +732,29 @@ std::optional<sysio::public_key> public_key_from_wire_key(WireKeyType kt, const 
    }
 }
 
-/// Build an EM (secp256k1) public_key from a depositor's Ethereum public key carried as raw bytes:
-/// either the 33-byte compressed point (0x02/0x03 prefix) or the 65-byte uncompressed point (0x04
-/// prefix + X + Y). Returns nullopt on any other shape so the caller soft-drops. authex stores EM as
-/// the 33-byte compressed form, so an uncompressed input is compressed here (prefix carries Y parity).
-std::optional<sysio::public_key> em_pubkey_from_eth_bytes(const std::vector<char>& b) {
-   sysio::ecc_public_key compressed{};  // std::array, 33 bytes
-   if (b.size() == 33 && (static_cast<uint8_t>(b[0]) == 0x02 || static_cast<uint8_t>(b[0]) == 0x03)) {
-      std::copy(b.begin(), b.end(), compressed.begin());
-   } else if (b.size() == 65 && static_cast<uint8_t>(b[0]) == 0x04) {
-      // Compressed prefix = 0x02 if Y is even, 0x03 if odd; Y is bytes [33,65), parity is its LSB.
-      compressed[0] = static_cast<char>(0x02 | (static_cast<uint8_t>(b[64]) & 1));
-      std::copy(b.begin() + 1, b.begin() + 33, compressed.begin() + 1);  // X coordinate
-   } else {
-      return std::nullopt;
-   }
+struct em_identity {
+   sysio::public_key key;
+   std::vector<char> address;
+};
+
+/// Validate the BAR-provided uncompressed secp256k1 key, compress it for authex storage, and derive
+/// its canonical EVM address from the same bytes. `reg.actor.address` is metadata only and is never
+/// trusted as identity input.
+std::optional<em_identity> em_identity_from_uncompressed_key(const std::vector<char>& b) {
+   const auto address = opp::evm_address_from_uncompressed_key(b.data(), b.size());
+   if (!address) return std::nullopt;
+
+   sysio::ecc_public_key compressed{};
+   // Compressed prefix = 0x02 if Y is even, 0x03 if odd; Y is bytes [33,65), parity is its LSB.
+   compressed[0] = static_cast<char>(0x02 | (static_cast<uint8_t>(b[64]) & 1));
+   std::copy(b.begin() + 1, b.begin() + 33, compressed.begin() + 1);  // X coordinate
+
    sysio::public_key pk;
    pk.emplace<3>(compressed);  // variant index 3 = EM
-   return pk;
+   return em_identity{
+      .key = pk,
+      .address = *address,
+   };
 }
 
 /// Decode an inbound NodeOwnerRegistration attestation and drive the NFT node-owner claim: create
@@ -796,8 +802,8 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
    auto wire_pk = public_key_from_wire_key(reg.wire_pub_key.key_type, reg.wire_pub_key.key);
    if (!wire_pk) return;                          // unusable owner/active key; drop
 
-   auto eth_pk = em_pubkey_from_eth_bytes(reg.actor_pub_key);
-   if (!eth_pk) return;                           // unusable depositor ETH key; drop
+   auto eth_identity = em_identity_from_uncompressed_key(reg.actor_pub_key);
+   if (!eth_identity) return;                     // unusable depositor ETH key; drop
 
    // 1) Create the account (idempotent; soft-skips a name that breaks the tier rule).
    action(permission_level{ROA_ACCOUNT, "active"_n}, ROA_ACCOUNT, "newnameduser"_n,
@@ -805,7 +811,7 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
 
    // 2) Register the owner + record the ETH link, with claim-payload soft-fail + audit recording.
    action(permission_level{ROA_ACCOUNT, "active"_n}, ROA_ACCOUNT, "nodeownreg"_n,
-          std::make_tuple(*owner, tier, *eth_pk, *wire_pk)).send();
+          std::make_tuple(*owner, tier, eth_identity->key, *wire_pk, eth_identity->address)).send();
 }
 
 /// Per-attestation dispatch entry. Called from the inbound extraction loop
