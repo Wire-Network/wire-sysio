@@ -710,14 +710,12 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
    // Activate only a window published by the preceding advance. On a hold
    // there is no pending announcement, so both membership and positions stay
    // unchanged. In particular, one-group replacements cannot serve early.
-   std::vector<name> expired;
+   const uint32_t serving_group_index = cfg.batch_op_groups > 1 ? 1 : 0;
    const bool activate_schedule = !state.next_batch_op_groups.empty();
    if (activate_schedule) {
-      if (cfg.batch_op_groups > 1 && state.current_batch_op_group < state.batch_op_groups.size())
-         expired = state.batch_op_groups[state.current_batch_op_group];
       state.batch_op_groups = std::move(state.next_batch_op_groups);
       state.next_batch_op_groups.clear();
-      state.current_batch_op_group = cfg.batch_op_groups > 1 ? 1 : 0;
+      state.current_batch_op_group = serving_group_index;
    }
 
    opreg::operators_t current_ops(OPREG_ACCOUNT);
@@ -733,17 +731,15 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
    // group. Multi-group publication names its successor; a single group names
    // its repaired self. Only the candidate may acquire replacement members.
    std::vector<std::vector<name>> candidate_groups;
-   const uint32_t next_group_index = cfg.batch_op_groups > 1 ? 1 : 0;
    if (state.current_batch_op_group < state.batch_op_groups.size()) {
       candidate_groups.assign(state.batch_op_groups.begin() + state.current_batch_op_group,
                               state.batch_op_groups.end());
-      const size_t retained_groups = candidate_groups.size();
       candidate_groups.resize(cfg.batch_op_groups);
 
       // Keep healthy seats at their existing positions. For multiple groups,
       // candidate group zero is the unchanged delivery group and may contain
       // inactive historical placeholders. Every active/future seat must be live.
-      for (size_t g = next_group_index; g < candidate_groups.size(); ++g) {
+      for (size_t g = serving_group_index; g < candidate_groups.size(); ++g) {
          auto& group = candidate_groups[g];
          group.resize(cfg.operators_per_epoch);
          for (auto& member : group)
@@ -771,19 +767,12 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
          return a.first < b.first;
       });
 
-      for (size_t g = next_group_index; g < candidate_groups.size(); ++g) {
+      for (size_t g = serving_group_index; g < candidate_groups.size(); ++g) {
          for (auto& member : candidate_groups[g]) {
             if (member.value != 0) continue;
-            // On an ordinary advance, repair existing future groups with true
-            // standbys before recycling the expired group into the new tail.
-            // A hold may reuse it sooner to restore a complete disjoint window.
-            const auto replacement = std::find_if(pool.begin(), pool.end(), [&](const auto& candidate) {
-               return g >= retained_groups ||
-                  std::find(expired.begin(), expired.end(), candidate.first) == expired.end();
-            });
-            if (replacement == pool.end()) break;
-            member = replacement->first;
-            pool.erase(replacement);
+            if (pool.empty()) break;
+            member = pool.front().first;
+            pool.erase(pool.begin());
          }
       }
    }
@@ -873,11 +862,14 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
 
    // Publish a complete next window using the unchanged OPP lookahead format.
    // Current duty is kept separately and cannot change until the next advance.
+   // Outposts authorize an envelope against the group they already know. If we
+   // switch duty before publishing its lookahead, the roster that would authorise
+   // the delivery is inside the envelope being refused, so recovery cannot land.
    // Group zero of a rotating candidate is historical when this announcement
    // lands; inactive placeholders there preserve the serving group's positions.
    if (publish_schedule) {
       opp::attestations::BatchOperatorGroups attest;
-      attest.active_group_index = zpp::bits::vuint32_t{next_group_index};
+      attest.active_group_index = zpp::bits::vuint32_t{serving_group_index};
       attest.epoch_index = zpp::bits::vuint32_t{state.current_epoch_index};
       // Propagate the depot's minimum epoch duration so the outpost can
       // evaluate the fallback (path-2) majority consensus after this many

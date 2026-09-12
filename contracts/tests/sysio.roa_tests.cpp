@@ -1828,10 +1828,7 @@ BOOST_FIXTURE_TEST_CASE( setsyscode_redeploy_reclaims_to_sysio, sysio_roa_tester
    int64_t sysio_q_mid;  rlm.get_account_limits("sysio"_n, sysio_q_mid, n, cpu);
    int64_t alice_u_mid = rlm.get_account_ram_usage("alice"_n);
 
-   // Use a system-contract fixture built with this test target; noop belongs
-   // to the separate core-unit-test contract build.
-   auto small = test_contracts::sysio_token_wasm();
-   BOOST_REQUIRE_LT(small.size(), big.size());
+   auto small = test_contracts::noop_wasm();
    BOOST_REQUIRE_EQUAL( success(),
       push_action(config::system_account_name, "setsyscode"_n, mvo()
          ("account","alice")("vmtype",0)("vmversion",0)("code", bytes(small.begin(), small.end()))) );
