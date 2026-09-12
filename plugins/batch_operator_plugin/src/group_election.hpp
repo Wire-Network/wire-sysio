@@ -22,12 +22,10 @@ inline constexpr uint8_t GROUP_NONE = 255;
 /// This operator's standing against one `sysio.epoch::epochstate` reading.
 ///
 /// `current_group` is the group ON DUTY, taken verbatim from
-/// `epochstate.current_batch_op_group`. The sliding window keeps the group on
-/// duty at the FRONT of `batch_op_groups` — `sysio.epoch::advance` pops the
-/// expiring group off — so the on-duty index is NOT a function of the epoch
-/// index. Anything reporting the active group reads it from here; deriving it
-/// (`epoch_index % groups`) is the static-rotation anti-pattern the sliding
-/// window replaced.
+/// `epochstate.current_batch_op_group`. A newly published window activates on
+/// the following advance; while publication is withheld the cursor and serving
+/// window stay fixed. Duty is never derived from the epoch number or from the
+/// separate `next_batch_op_groups` announcement.
 struct group_election {
    uint8_t                  my_group      = GROUP_NONE;
    uint8_t                  current_group = GROUP_NONE;
