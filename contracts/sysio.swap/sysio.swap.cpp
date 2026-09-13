@@ -219,7 +219,8 @@ void swap::setconfig(name fee_authority) {
 }
 
 void swap::inittoken(name user, symbol new_symbol, extended_asset initial_pool1,
-extended_asset initial_pool2, int initial_fee, name fee_authority, asset locked_shares)
+extended_asset initial_pool2, int initial_fee, name fee_authority, asset locked_shares,
+std::optional<extended_symbol> yield_leg)
 {
     require_auth( user );
     require_auth( get_self() );
@@ -234,6 +235,13 @@ extended_asset initial_pool2, int initial_fee, name fee_authority, asset locked_
     check( locked_shares.amount >= 0, "locked_shares must be nonnegative" );
     check( locked_shares.amount < new_token.amount, "locked_shares must leave the creator at least one share" );
     check( initial_pool1.get_extended_symbol() != initial_pool2.get_extended_symbol(), "extended symbols must be different");
+    if (yield_leg) {
+        check( *yield_leg == initial_pool1.get_extended_symbol() || *yield_leg == initial_pool2.get_extended_symbol(),
+               "yield_leg must be one of the pair's legs" );
+        yieldpairs yieldtable( get_self() );
+        yieldtable.emplace( user, key_of(*yield_leg), yield_pair{ new_symbol.code() },
+                            "a yield pool already exists for this symbol" );
+    }
 
     stats statstable( get_self() );
     const pair_key key{ new_symbol.code().raw() };
@@ -255,6 +263,7 @@ extended_asset initial_pool2, int initial_fee, name fee_authority, asset locked_
         .fee           = initial_fee,
         .fee_authority = fee_authority,
         .locked_shares = locked_shares,
+        .yield_leg     = yield_leg,
     } );
 
     priceaccums accums( get_self() );
@@ -296,6 +305,25 @@ void swap::sync(symbol_code pair_token) {
     const auto token = statstable.try_get( pair_key{ pair_token.raw() } );
     check ( token.has_value(), "pair token does not exist" );
     update_price_accumulators(*token);
+}
+
+const extended_symbol& swap::require_yield_leg(const currency_stats& token) {
+    check( token.yield_leg.has_value(), "pair has no yield leg" );
+    return *token.yield_leg;
+}
+
+void swap::setyield(symbol_code pair_token, uint32_t conversion_horizon_sec, uint32_t depth_cap_bps) {
+    stats statstable( get_self() );
+    const pair_key key{ pair_token.raw() };
+    const auto token = statstable.try_get( key );
+    check ( token.has_value(), "pair token does not exist" );
+    require_auth(token->fee_authority);
+    require_yield_leg(*token);
+    check( depth_cap_bps <= opp::amm::BPS_TOTAL, "depth_cap_bps out of range" );
+    statstable.modify( name{}, key, [&]( auto& a ) {
+      a.conversion_horizon_sec = conversion_horizon_sec;
+      a.depth_cap_bps          = depth_cap_bps;
+    } );
 }
 
 void swap::changefee(symbol_code pair_token, int newfee) {

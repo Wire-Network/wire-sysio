@@ -11,6 +11,7 @@
 #include <sysio.opp.common/twap.hpp>
 #include <algorithm>
 #include <cmath>
+#include <optional>
 
 using namespace sysio;
 using namespace std;
@@ -51,9 +52,19 @@ namespace sysio {
          /// keep the pool from ever being emptied and bound how far the value of one
          /// share can be pushed. Seed-time attacks victimise the creator, so the size
          /// of the lock is the creator's call; zero is allowed.
+         /// `yield_leg`, when set, names the pair's shadow token (one of its two legs)
+         /// and makes it a yield pool: the pool absorbs the WIRE yield distributed on
+         /// the shadow it holds, and sells queued yield shadow through itself. At most
+         /// one yield pool may exist per shadow symbol. Empty makes a plain pool.
          [[sysio::action]] void inittoken(name user, symbol new_symbol,
            extended_asset initial_pool1, extended_asset initial_pool2,
-           int initial_fee, name fee_authority, asset locked_shares);
+           int initial_fee, name fee_authority, asset locked_shares,
+           std::optional<extended_symbol> yield_leg);
+         /// Set a yield pool's tick parameters (fee authority): the horizon over which
+         /// its queued yield is meant to sell, and the hard ceiling on one clip as basis
+         /// points of the pool's shadow side. Both must be nonzero before tickyield runs.
+         [[sysio::action]] void setyield(symbol_code pair_token,
+           uint32_t conversion_horizon_sec, uint32_t depth_cap_bps);
          [[sysio::on_notify("*::transfer")]] void ontransfer(name from, name to, asset quantity, string memo);
          [[sysio::action]] void openext( const name& user, const name& payer, const extended_symbol& ext_symbol);
          [[sysio::action]] void closeext ( const name& user, const name& to, const extended_symbol& ext_symbol, string memo);
@@ -133,7 +144,19 @@ namespace sysio {
             int            fee;
             name           fee_authority;   ///< whose signature changefee requires for this pair
             asset          locked_shares;   ///< part of `supply` held by no account, never redeemable
-            SYSLIB_SERIALIZE(currency_stats, (supply)(max_supply)(issuer)(pool1)(pool2)(fee)(fee_authority)(locked_shares))
+            std::optional<extended_symbol> yield_leg;   ///< the shadow leg of a yield pool; empty for a plain pool
+            uint32_t       conversion_horizon_sec = 0;  ///< H: the reservoir is meant to sell over this long
+            uint32_t       depth_cap_bps          = 0;  ///< hard ceiling on one clip, bps of the pool's shadow side
+            time_point     last_tick{};                 ///< elapsed-time base of the clip formula
+            SYSLIB_SERIALIZE(currency_stats, (supply)(max_supply)(issuer)(pool1)(pool2)(fee)(fee_authority)
+                                             (locked_shares)(yield_leg)(conversion_horizon_sec)(depth_cap_bps)(last_tick))
+         };
+
+         /// One yield pool per shadow symbol: keyed by the shadow's extended symbol,
+         /// this is also the lookup from a shadow symbol to its pair.
+         struct [[sysio::table("yieldpairs")]] yield_pair {
+            symbol_code pair;
+            SYSLIB_SERIALIZE(yield_pair, (pair))
          };
 
          struct [[sysio::table("evoindex")]] pair_index {
@@ -162,11 +185,14 @@ namespace sysio {
          using stats       = kv::table<"stat"_n,       pair_key,          currency_stats>;
          using evoindexes  = kv::table<"evoindex"_n,   pair_identity_key, pair_index>;
          using priceaccums = kv::table<"priceaccum"_n, pair_key,          price_accumulator>;
+         using yieldpairs  = kv::table<"yieldpairs"_n, extended_symbol_key, yield_pair>;
 
          /// The deposit-row key of an extended symbol.
          static extended_symbol_key key_of(const extended_symbol& ext_symbol);
          /// The uniqueness-row key of a pair, in canonical leg order.
          static pair_identity_key identity_of(const extended_symbol& a, const extended_symbol& b);
+         /// The pair's shadow leg, or a check failure on a plain pool: every yield path starts here.
+         static const extended_symbol& require_yield_leg(const currency_stats& token);
 
          void add_signed_ext_balance( const name& owner, const extended_asset& value );
          void add_signed_liq(name user, asset to_buy, bool is_buying, asset max_asset1, asset max_asset2);

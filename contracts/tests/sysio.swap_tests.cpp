@@ -158,14 +158,17 @@ public:
         );
     }
     // An empty `fee_authority` adopts the configured one (sysio in this fixture);
-    // `locked_shares` is in units of the new symbol, none by default.
+    // `locked_shares` is in units of the new symbol, none by default; no yield
+    // leg makes a plain pool.
     action_result inittoken( name user, symbol new_symbol, extended_asset initial_pool1,
-      extended_asset initial_pool2, int initial_fee, name fee_authority = name{}, int64_t locked_shares = 0 ){
+      extended_asset initial_pool2, int initial_fee, name fee_authority = name{}, int64_t locked_shares = 0,
+      std::optional<extended_symbol> yield_leg = std::nullopt ){
         return inittoken( user, new_symbol, initial_pool1, initial_pool2, initial_fee, fee_authority,
-                          asset( locked_shares, new_symbol ) );
+                          asset( locked_shares, new_symbol ), yield_leg );
     }
     action_result inittoken( name user, symbol new_symbol, extended_asset initial_pool1,
-      extended_asset initial_pool2, int initial_fee, name fee_authority, asset locked_shares ){
+      extended_asset initial_pool2, int initial_fee, name fee_authority, asset locked_shares,
+      std::optional<extended_symbol> yield_leg = std::nullopt ){
         // inittoken bills the new rows to `user`, so the action must carry the
         // user's sysio.payer permission in addition to the two active authorities.
         return push_swap_action( "inittoken"_n,
@@ -178,7 +181,21 @@ public:
           ("initial_fee", initial_fee)
           ("fee_authority", fee_authority)
           ("locked_shares", locked_shares)
+          ("yield_leg", yield_leg)
         );
+    }
+    // Signed by the pair's fee authority, sysio unless overridden.
+    action_result setyield( symbol_code pair_token, uint32_t conversion_horizon_sec, uint32_t depth_cap_bps,
+                            name authority = config::system_account_name ) {
+        return push_swap_action( "setyield"_n, { {authority, config::active_name} }, mvo()
+          ( "pair_token", pair_token )
+          ( "conversion_horizon_sec", conversion_horizon_sec )
+          ( "depth_cap_bps", depth_cap_bps )
+        );
+    }
+    // The pair's stat row as a variant (abi_ser must hold the swap ABI).
+    fc::variant pair_row( symbol_code pair_token ) {
+        return get_balance( "sysio.swap"_n, name(pair_token.value), "stat"_n, pair_token.value, "currency_stats" );
     }
     action_result addliquidity(name user, asset to_buy, asset max_asset1, asset max_asset2) {
         return push_action( "sysio.swap"_n, user, "addliquidity"_n, mvo()
@@ -981,14 +998,14 @@ BOOST_FIXTURE_TEST_CASE( the_other_actions, sysio_swap_tester ) try {
         ("user", "alice"_n) ("new_symbol", EVO4)
         ("initial_pool1", extend(asset::from_string("1.0000 EOS")))
         ("initial_pool2", extend(asset::from_string("1.0000 ECO")))
-        ("initial_fee", 1) ("fee_authority", "carol"_n) ("locked_shares", asset::from_string("0.0000 EVO")) )
+        ("initial_fee", 1) ("fee_authority", "carol"_n) ("locked_shares", asset::from_string("0.0000 EVO")) ("yield_leg", fc::variant()) )
     );
     BOOST_REQUIRE_EQUAL( error("missing authority of alice"), 
       push_action( "sysio.swap"_n, "bob"_n, "inittoken"_n, mvo()
         ("user", "alice"_n) ("new_symbol", EVO4)
         ("initial_pool1", extend(asset::from_string("1.0000 EOS")))
         ("initial_pool2", extend(asset::from_string("1.0000 ECO")))
-        ("initial_fee", 1) ("fee_authority", "carol"_n) ("locked_shares", asset::from_string("0.0000 EVO")) )
+        ("initial_fee", 1) ("fee_authority", "carol"_n) ("locked_shares", asset::from_string("0.0000 EVO")) ("yield_leg", fc::variant()) )
     );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("Both assets must be positive"), inittoken( "alice"_n, EVO4, 
       extend(asset::from_string("-0.0001 EOS")),
@@ -1138,6 +1155,60 @@ BOOST_FIXTURE_TEST_CASE( seed_locks_shares, sysio_swap_tester ) try {
     BOOST_REQUIRE_EQUAL( success(), addliquidity( "alice"_n, lock_of(locked), asset(pay1, EOS4), asset(pay2, VOICE4) ) );
     BOOST_REQUIRE_EQUAL( 2 * locked, system_balance(EVO.value).at(2) );
     BOOST_REQUIRE_GE( settle_swap("alice"_n, EVO, asset(1000, EOS4), VOICE4, 1), 0 );
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// Yield pools: the optional yield leg and its uniqueness rule.
+// ---------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE( yield_leg_rules, sysio_swap_tester ) try {
+    create_tokens_and_issue();
+    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+    many_openext();
+    many_transfer();
+    const extended_symbol voice{ VOICE4, "anothertoken"_n };
+    const extended_symbol eos{ EOS4, "sysio.token"_n };
+    const extended_symbol tusd{ TUSD2, "sysio.token"_n };
+
+    // The yield leg must be one of the pair's own legs.
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield_leg must be one of the pair's legs"), inittoken( "alice"_n, EVO4,
+        extend(asset::from_string("1.0000 EOS")), extend(asset::from_string("1.0000 VOICE")), 10, name{}, 0, tusd ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield_leg must be one of the pair's legs"), inittoken( "alice"_n, EVO4,
+        extend(asset::from_string("1.0000 EOS")), extend(asset::from_string("1.0000 VOICE")), 10, name{}, 0,
+        extended_symbol{ VOICE4, "sysio.token"_n } ) );
+
+    // EVO is a yield pool on VOICE; ETUSD is a plain pool.
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, EVO4,
+        extend(asset::from_string("1.0000 EOS")), extend(asset::from_string("1.0000 VOICE")), 10, name{}, 0, voice ) );
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, ETUSD3,
+        extend(asset::from_string("1.0000 EOS")), extend(asset::from_string("1.00 TUSD")), 10, name{} ) );
+    auto evo = pair_row(EVO);
+    BOOST_REQUIRE_EQUAL( "4,VOICE", evo["yield_leg"]["sym"].as_string() );
+    BOOST_REQUIRE_EQUAL( "anothertoken", evo["yield_leg"]["contract"].as_string() );
+    BOOST_REQUIRE_EQUAL( 0u, evo["conversion_horizon_sec"].as_uint64() );
+    BOOST_REQUIRE_EQUAL( 0u, evo["depth_cap_bps"].as_uint64() );
+    BOOST_REQUIRE( pair_row(ETUSD)["yield_leg"].is_null() );
+
+    // One yield pool per shadow symbol: VOICE/TUSD may not also yield on VOICE...
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("a yield pool already exists for this symbol"), inittoken( "alice"_n,
+        symbol::from_string("3,BVO"), extend(asset::from_string("1.0000 VOICE")), extend(asset::from_string("1.00 TUSD")),
+        10, name{}, 0, voice ) );
+    // ...but may yield on TUSD, or be plain.
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n,
+        symbol::from_string("3,BVO"), extend(asset::from_string("1.0000 VOICE")), extend(asset::from_string("1.00 TUSD")),
+        10, name{}, 0, tusd ) );
+
+    // setyield: fee authority only, yield pools only, cap within basis points.
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair has no yield leg"), setyield( ETUSD, 86400, 3 ) );
+    BOOST_REQUIRE_EQUAL( error("missing authority of sysio"), setyield( EVO, 86400, 3, "alice"_n ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("depth_cap_bps out of range"), setyield( EVO, 86400, 10001 ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair token does not exist"), setyield( EOS, 86400, 3 ) );
+    BOOST_REQUIRE_EQUAL( success(), setyield( EVO, 86400, 3 ) );
+    evo = pair_row(EVO);
+    BOOST_REQUIRE_EQUAL( 86400u, evo["conversion_horizon_sec"].as_uint64() );
+    BOOST_REQUIRE_EQUAL( 3u, evo["depth_cap_bps"].as_uint64() );
+    // The leg is fixed at creation; setyield does not touch it.
+    BOOST_REQUIRE_EQUAL( "4,VOICE", evo["yield_leg"]["sym"].as_string() );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( fee_authority_configuration, sysio_swap_tester ) try {
@@ -1835,7 +1906,7 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     for (const auto& a : abi.actions) actions.insert(a.name.to_string());
     const std::set<std::string> expected_actions{
         "addliquidity", "changefee", "close", "closeext", "exchange",
-        "inittoken", "open", "openext", "remliquidity", "setconfig", "sync", "transfer", "withdraw" };
+        "inittoken", "open", "openext", "remliquidity", "setconfig", "setyield", "sync", "transfer", "withdraw" };
     BOOST_REQUIRE( actions == expected_actions );
 
     using field_list = std::vector<std::pair<std::string, std::string>>;
@@ -1853,10 +1924,15 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     const field_list inittoken_fields{
         {"user", "name"}, {"new_symbol", "symbol"}, {"initial_pool1", "extended_asset"},
         {"initial_pool2", "extended_asset"}, {"initial_fee", "int32"}, {"fee_authority", "name"},
-        {"locked_shares", "asset"} };
+        {"locked_shares", "asset"}, {"yield_leg", "extended_symbol?"} };
     const field_list currency_stats_fields{
         {"supply", "asset"}, {"max_supply", "asset"}, {"issuer", "name"}, {"pool1", "extended_asset"},
-        {"pool2", "extended_asset"}, {"fee", "int32"}, {"fee_authority", "name"}, {"locked_shares", "asset"} };
+        {"pool2", "extended_asset"}, {"fee", "int32"}, {"fee_authority", "name"}, {"locked_shares", "asset"},
+        {"yield_leg", "extended_symbol?"}, {"conversion_horizon_sec", "uint32"}, {"depth_cap_bps", "uint32"},
+        {"last_tick", "time_point"} };
+    const field_list setyield_fields{
+        {"pair_token", "symbol_code"}, {"conversion_horizon_sec", "uint32"}, {"depth_cap_bps", "uint32"} };
+    const field_list yield_pair_fields{ {"pair", "symbol_code"} };
     const field_list setconfig_fields{ {"fee_authority", "name"} };
     const field_list swap_config_fields{ {"fee_authority", "name"} };
     const field_list sync_fields{ {"pair_token", "symbol_code"} };
@@ -1878,6 +1954,8 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     BOOST_REQUIRE( fields("pair_index") == pair_index_fields );
     BOOST_REQUIRE( fields("setconfig") == setconfig_fields );
     BOOST_REQUIRE( fields("swap_config") == swap_config_fields );
+    BOOST_REQUIRE( fields("setyield") == setyield_fields );
+    BOOST_REQUIRE( fields("yield_pair") == yield_pair_fields );
 
     // KV tables: the row type and the key layout an explorer needs to decode
     // the raw key bytes. A scoped table's first key word is the scope.
@@ -1898,10 +1976,12 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     BOOST_REQUIRE( same( shape("evoindex"),    { "pair_index",        {"contract1", "symbol1", "contract2", "symbol2"}, {"name", "uint64", "name", "uint64"} } ) );
     BOOST_REQUIRE( same( shape("priceaccum"),  { "price_accumulator", {"symbol_code"},                                 {"uint64"} } ) );
     BOOST_REQUIRE( same( shape("swapconfig"),  { "swap_config",       {"name"},                                        {"name"} } ) );
+    BOOST_REQUIRE( same( shape("yieldpairs"),  { "yield_pair",        {"contract", "symbol"},                          {"name", "uint64"} } ) );
 
     std::set<std::string> tables;
     for (const auto& t : abi.tables) tables.insert(t.name);
-    const std::set<std::string> expected_tables{ "accounts", "evodexacnts", "evoindex", "priceaccum", "stat", "swapconfig" };
+    const std::set<std::string> expected_tables{
+        "accounts", "evodexacnts", "evoindex", "priceaccum", "stat", "swapconfig", "yieldpairs" };
     BOOST_REQUIRE( tables == expected_tables );
 } FC_LOG_AND_RETHROW()
 
