@@ -144,6 +144,22 @@
                 {
                     "name": "locked_shares",
                     "type": "asset"
+                },
+                {
+                    "name": "yield_leg",
+                    "type": "extended_symbol?"
+                },
+                {
+                    "name": "conversion_horizon_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "depth_cap_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "last_tick",
+                    "type": "time_point"
                 }
             ]
         },
@@ -238,6 +254,10 @@
                 {
                     "name": "locked_shares",
                     "type": "asset"
+                },
+                {
+                    "name": "yield_leg",
+                    "type": "extended_symbol?"
                 }
             ]
         },
@@ -370,6 +390,24 @@
             ]
         },
         {
+            "name": "setyield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pair_token",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "conversion_horizon_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "depth_cap_bps",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "swap_config",
             "base": "",
             "fields": [
@@ -432,6 +470,16 @@
                     "type": "string"
                 }
             ]
+        },
+        {
+            "name": "yield_pair",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pair",
+                    "type": "symbol_code"
+                }
+            ]
         }
     ],
     "actions": [
@@ -483,6 +531,11 @@
         {
             "name": "setconfig",
             "type": "setconfig",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setyield",
+            "type": "setyield",
             "ricardian_contract": ""
         },
         {
@@ -549,6 +602,14 @@
             "key_names": ["name"],
             "key_types": ["name"],
             "table_id": 40605
+        },
+        {
+            "name": "yieldpairs",
+            "type": "yield_pair",
+            "index_type": "i64",
+            "key_names": ["contract","symbol"],
+            "key_types": ["name","uint64"],
+            "table_id": 19873
         }
     ],
     "ricardian_clauses": [],
