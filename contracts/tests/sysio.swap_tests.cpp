@@ -232,6 +232,56 @@ public:
     vector<char> pending_payout( name contract ) {
         return get_kv_row( "sysio.swap"_n, "yieldpayouts"_n, { contract.to_uint64_t() } );
     }
+    // fundyield is the funder's own call; the fixture adds its payer permission.
+    action_result fundyield( name from, symbol_code pair_token, asset quantity ) {
+        return push_action( "sysio.swap"_n, from, "fundyield"_n, mvo()
+          ( "from", from )( "pair_token", pair_token )( "quantity", quantity )
+        );
+    }
+    // The pending funding announced by `funder`, as a variant; null when none.
+    fc::variant pending_funding( name funder ) {
+        const auto data = get_kv_row( "sysio.swap"_n, "yieldfunds"_n, { funder.to_uint64_t() } );
+        return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "fund_receipt", data,
+                   abi_serializer::create_yield_function(abi_serializer_max_time) );
+    }
+    // Units of shadow queued in `pair`'s reservoir. Requires the row: only yield
+    // pools have one.
+    int64_t reservoir_of( symbol_code pair ) {
+        const auto data = get_kv_row( "sysio.swap"_n, "reservoirs"_n, { pair.value } );
+        BOOST_REQUIRE_MESSAGE( !data.empty(), "no reservoir row for " << pair );
+        const auto row = abi_ser.binary_to_variant( "reservoir", data,
+                             abi_serializer::create_yield_function(abi_serializer_max_time) );
+        return to_int( fc::json::to_string( row["balance"]["quantity"],
+                       fc::time_point(fc::time_point::now() + abi_serializer_max_time) ) );
+    }
+    bool has_reservoir( symbol_code pair ) {
+        return !get_kv_row( "sysio.swap"_n, "reservoirs"_n, { pair.value } ).empty();
+    }
+    // The intended shape of a funding: the announcement and the shadow transfer
+    // in ONE transaction, signed by the funder, as a contract would do it inline.
+    void fund_yield_in_one_transaction( name from, symbol_code pair, asset quantity ) {
+        signed_transaction trx;
+        action announce;
+        announce.account = "sysio.swap"_n;
+        announce.name    = "fundyield"_n;
+        announce.authorization = { {from, config::active_name} };
+        announce.data = abi_ser.variant_to_binary( "fundyield",
+            mvo()( "from", from )( "pair_token", pair )( "quantity", quantity ),
+            abi_serializer::create_yield_function(abi_serializer_max_time) );
+        action deliver;
+        deliver.account = "shadowtoken"_n;
+        deliver.name    = "transfer"_n;
+        deliver.authorization = { {from, config::active_name} };
+        deliver.data = shadow_abi_ser.variant_to_binary( "transfer",
+            mvo()( "from", from )( "to", "sysio.swap"_n )( "quantity", quantity )( "memo", "" ),
+            abi_serializer::create_yield_function(abi_serializer_max_time) );
+        trx.actions.emplace_back( std::move(announce) );
+        trx.actions.emplace_back( std::move(deliver) );
+        set_transaction_headers( trx );
+        trx.sign( get_private_key( from, "active" ), control->get_chain_id() );
+        push_transaction( trx );
+        produce_block();
+    }
 
     // --- The shadow token stand-in (contracts/test_contracts/shadowtoken) ---
 
@@ -644,10 +694,12 @@ void sysio_swap_tester::setup_yield_pool() {
     BOOST_REQUIRE_EQUAL( success(), shadow_transfer( "alice"_n, "sysio.swap"_n, asset( YieldPoolShadow, SHD4 ), "" ) );
     BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, SHEO4, shd( YieldPoolShadow ),
         extend( asset( YieldPoolWire, EOS4 ) ), 10, name{}, 0, SHADOW ) );
-    // The pool holds exactly its seed; the shadow row was stamped at index 0.
+    // The pool holds exactly its seed, its reservoir exists and is empty, and
+    // the shadow row was stamped at index 0.
     const auto pool = system_balance( SHEO.value );
     BOOST_REQUIRE_EQUAL( YieldPoolShadow, pool.at(0) );
     BOOST_REQUIRE_EQUAL( YieldPoolWire,   pool.at(1) );
+    BOOST_REQUIRE_EQUAL( 0, reservoir_of( SHEO ) );
     const auto held = shadow_account( "sysio.swap"_n, SHD );
     BOOST_REQUIRE_EQUAL( YieldPoolShadow, held.balance.get_amount() );
     BOOST_REQUIRE_EQUAL( 0u, held.index_checkpoint );
@@ -1551,6 +1603,77 @@ BOOST_FIXTURE_TEST_CASE( yield_payout_route_is_exact, sysio_swap_tester ) try {
     BOOST_REQUIRE( pending_payout( "shadowtoken"_n ).empty() );
 } FC_LOG_AND_RETHROW()
 
+// ---------------------------------------------------------------------------
+// Yield funding: shadow announced with fundyield lands in the pair's
+// reservoir, not in the funder's deposit.
+// ---------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE( yield_funding_fills_the_reservoir, sysio_swap_tester ) try {
+    setup_yield_pool();
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, ETUSD3,
+        extend(asset::from_string("1.0000 EOS")), extend(asset::from_string("1.00 TUSD")), 10, name{}) );
+    BOOST_REQUIRE( !has_reservoir( ETUSD ) );   // plain pools queue nothing
+
+    // Only a yield pool, in its shadow symbol, a positive amount, by the funder.
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair has no yield leg"), fundyield( "alice"_n, ETUSD, asset( 1'0000, EOS4 ) ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair token does not exist"), fundyield( "alice"_n, EOS, asset( 1'0000, SHD4 ) ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("quantity must be in the pair's shadow symbol"),
+                         fundyield( "alice"_n, SHEO, asset( 1'0000, EOS4 ) ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("quantity must be positive"), fundyield( "alice"_n, SHEO, asset( 0, SHD4 ) ) );
+    BOOST_REQUIRE_EQUAL( error("missing authority of bob"), push_action( "sysio.swap"_n, "alice"_n, "fundyield"_n, mvo()
+        ( "from", "bob"_n )( "pair_token", SHEO )( "quantity", asset( 1'0000, SHD4 ) ) ) );
+    BOOST_REQUIRE( pending_funding( "alice"_n ).is_null() );
+
+    // Announce, then deliver in a later transaction: until the announced amount
+    // arrives every other transfer from the funder is refused, the deposit is
+    // untouched, and the delivery goes to the reservoir.
+    const int64_t first = 100'0000;
+    const int64_t alice_deposit = deposit_of( "alice"_n, SHADOW );
+    BOOST_REQUIRE_EQUAL( success(), fundyield( "alice"_n, SHEO, asset( first, SHD4 ) ) );
+    auto pending = pending_funding( "alice"_n );
+    BOOST_REQUIRE_EQUAL( SHEO4.name(), pending["pair"].as_string() );
+    BOOST_REQUIRE_EQUAL( asset( first, SHD4 ).to_string(), pending["quantity"]["quantity"].as_string() );
+    BOOST_REQUIRE_EQUAL( "shadowtoken", pending["quantity"]["contract"].as_string() );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield funding does not match the pending fundyield"),
+                         shadow_transfer( "alice"_n, "sysio.swap"_n, asset( first / 2, SHD4 ), "" ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield funding does not match the pending fundyield"),
+                         transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset( 1'0000, EOS4 ), "" ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_transfer( "alice"_n, "sysio.swap"_n, asset( first, SHD4 ), "" ) );
+    BOOST_REQUIRE_EQUAL( first, reservoir_of( SHEO ) );
+    BOOST_REQUIRE_EQUAL( alice_deposit, deposit_of( "alice"_n, SHADOW ) );
+    BOOST_REQUIRE( pending_funding( "alice"_n ).is_null() );
+    BOOST_REQUIRE_EQUAL( YieldPoolShadow, system_balance( SHEO.value ).at(0) );   // not in the pool
+    // With nothing pending, a transfer is an ordinary deposit again.
+    BOOST_REQUIRE_EQUAL( success(), shadow_transfer( "alice"_n, "sysio.swap"_n, asset( 1'0000, SHD4 ), "" ) );
+    BOOST_REQUIRE_EQUAL( alice_deposit + 1'0000, deposit_of( "alice"_n, SHADOW ) );
+    BOOST_REQUIRE_EQUAL( first, reservoir_of( SHEO ) );
+
+    // A new announcement replaces a pending one.
+    const int64_t second = 20'0000;
+    BOOST_REQUIRE_EQUAL( success(), fundyield( "alice"_n, SHEO, asset( 30'0000, SHD4 ) ) );
+    BOOST_REQUIRE_EQUAL( success(), fundyield( "alice"_n, SHEO, asset( second, SHD4 ) ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield funding does not match the pending fundyield"),
+                         shadow_transfer( "alice"_n, "sysio.swap"_n, asset( 30'0000, SHD4 ), "" ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_transfer( "alice"_n, "sysio.swap"_n, asset( second, SHD4 ), "" ) );
+    BOOST_REQUIRE_EQUAL( first + second, reservoir_of( SHEO ) );
+
+    // The intended shape: both steps in one transaction.
+    const int64_t third = 7'0000;
+    fund_yield_in_one_transaction( "alice"_n, SHEO, asset( third, SHD4 ) );
+    BOOST_REQUIRE_EQUAL( first + second + third, reservoir_of( SHEO ) );
+    BOOST_REQUIRE( pending_funding( "alice"_n ).is_null() );
+
+    // The reservoir is the contract's shadow too: it earns for the pool.
+    BOOST_REQUIRE_EQUAL( YieldPoolShadow + 1'0000 + first + second + third,
+                         shadow_account( "sysio.swap"_n, SHD ).balance.get_amount() );
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( 100'0000, EOS4 ), SHD ) );
+    const int64_t owed = yield_reference::owed( YieldPoolShadow + 1'0000 + first + second + third,
+                                                shadow_index( SHD ).index, 0 );
+    BOOST_REQUIRE_EQUAL( success(), accrueyield( SHEO ) );
+    BOOST_REQUIRE_EQUAL( YieldPoolWire + owed, system_balance( SHEO.value ).at(1) );
+    BOOST_REQUIRE_EQUAL( first + second + third, reservoir_of( SHEO ) );   // accrual leaves the queue alone
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( fee_authority_configuration, sysio_swap_tester ) try {
     create_tokens_and_issue();
     abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
@@ -2245,7 +2368,7 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     std::set<std::string> actions;
     for (const auto& a : abi.actions) actions.insert(a.name.to_string());
     const std::set<std::string> expected_actions{
-        "accrueyield", "addliquidity", "changefee", "close", "closeext", "exchange",
+        "accrueyield", "addliquidity", "changefee", "close", "closeext", "exchange", "fundyield",
         "inittoken", "open", "openext", "remliquidity", "setconfig", "setyield", "sync", "transfer", "withdraw" };
     BOOST_REQUIRE( actions == expected_actions );
 
@@ -2275,6 +2398,9 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     const field_list yield_pair_fields{ {"pair", "symbol_code"} };
     const field_list accrueyield_fields{ {"pair_token", "symbol_code"} };
     const field_list payout_receipt_fields{ {"pair", "symbol_code"}, {"quantity", "extended_asset"} };
+    const field_list fundyield_fields{ {"from", "name"}, {"pair_token", "symbol_code"}, {"quantity", "asset"} };
+    const field_list fund_receipt_fields{ {"pair", "symbol_code"}, {"quantity", "extended_asset"} };
+    const field_list reservoir_fields{ {"balance", "extended_asset"} };
     const field_list setconfig_fields{ {"fee_authority", "name"} };
     const field_list swap_config_fields{ {"fee_authority", "name"} };
     const field_list sync_fields{ {"pair_token", "symbol_code"} };
@@ -2300,6 +2426,9 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     BOOST_REQUIRE( fields("yield_pair") == yield_pair_fields );
     BOOST_REQUIRE( fields("accrueyield") == accrueyield_fields );
     BOOST_REQUIRE( fields("payout_receipt") == payout_receipt_fields );
+    BOOST_REQUIRE( fields("fundyield") == fundyield_fields );
+    BOOST_REQUIRE( fields("fund_receipt") == fund_receipt_fields );
+    BOOST_REQUIRE( fields("reservoir") == reservoir_fields );
 
     // KV tables: the row type and the key layout an explorer needs to decode
     // the raw key bytes. A scoped table's first key word is the scope.
@@ -2322,12 +2451,15 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     BOOST_REQUIRE( same( shape("swapconfig"),  { "swap_config",       {"name"},                                        {"name"} } ) );
     BOOST_REQUIRE( same( shape("yieldpairs"),  { "yield_pair",        {"contract", "symbol"},                          {"name", "uint64"} } ) );
     BOOST_REQUIRE( same( shape("yieldpayouts"), { "payout_receipt",   {"contract"},                                    {"name"} } ) );
+    BOOST_REQUIRE( same( shape("yieldfunds"),  { "fund_receipt",      {"funder"},                                      {"name"} } ) );
+    BOOST_REQUIRE( same( shape("reservoirs"),  { "reservoir",         {"symbol_code"},                                 {"uint64"} } ) );
 
     // The shadow token's tables are read by this contract but are not its own.
     std::set<std::string> tables;
     for (const auto& t : abi.tables) tables.insert(t.name);
     const std::set<std::string> expected_tables{
-        "accounts", "evodexacnts", "evoindex", "priceaccum", "stat", "swapconfig", "yieldpairs", "yieldpayouts" };
+        "accounts", "evodexacnts", "evoindex", "priceaccum", "reservoirs", "stat", "swapconfig",
+        "yieldfunds", "yieldpairs", "yieldpayouts" };
     BOOST_REQUIRE( tables == expected_tables );
 } FC_LOG_AND_RETHROW()
 

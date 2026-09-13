@@ -72,6 +72,14 @@ namespace sysio {
          /// it). Runs implicitly before every mint and burn; this call lets anyone
          /// settle between them. No authorization is required.
          [[sysio::action]] void accrueyield(symbol_code pair_token);
+         /// Announce that `from` is about to transfer exactly `quantity` of the pair's
+         /// shadow to this contract as queued yield for the pool: the transfer, when it
+         /// lands, fills the pair's reservoir instead of `from`'s deposit. One
+         /// announcement per account is pending at a time; a new one replaces it, and
+         /// while one is pending any other transfer from `from` is refused. Typed and
+         /// memo-free, so a contract can do both steps inline in one transaction.
+         /// Requires `from`'s authority.
+         [[sysio::action]] void fundyield(name from, symbol_code pair_token, asset quantity);
          [[sysio::on_notify("*::transfer")]] void ontransfer(name from, name to, asset quantity, string memo);
          [[sysio::action]] void openext( const name& user, const name& payer, const extended_symbol& ext_symbol);
          [[sysio::action]] void closeext ( const name& user, const name& to, const extended_symbol& ext_symbol, string memo);
@@ -131,6 +139,13 @@ namespace sysio {
             SYSLIB_SERIALIZE(contract_key, (contract))
          };
 
+         /// A pending yield funding: keyed by the account that announced it, which is
+         /// the `from` of the transfer that will fill it.
+         struct funder_key {
+            name funder;
+            SYSLIB_SERIALIZE(funder_key, (funder))
+         };
+
          // --- Rows ---
 
          /// Contract-wide configuration, set on deployment by `setconfig`.
@@ -185,6 +200,24 @@ namespace sysio {
             SYSLIB_SERIALIZE(payout_receipt, (pair)(quantity))
          };
 
+         /// A yield funding announced by `fundyield` and not yet delivered: the
+         /// transfer from the funder that matches `quantity` fills `pair`'s reservoir
+         /// and erases the row.
+         struct [[sysio::table("yieldfunds")]] fund_receipt {
+            symbol_code    pair;
+            extended_asset quantity;
+            SYSLIB_SERIALIZE(fund_receipt, (pair)(quantity))
+         };
+
+         /// A yield pool's reservoir: the shadow queued to be sold through the pool,
+         /// held by the contract but in no pool and no deposit. Its own row rather
+         /// than a deposit row under a synthetic owner, so no account name can ever
+         /// alias it. Exists for yield pools only, from creation.
+         struct [[sysio::table("reservoirs")]] reservoir {
+            extended_asset balance;
+            SYSLIB_SERIALIZE(reservoir, (balance))
+         };
+
          struct [[sysio::table("evoindex")]] pair_index {
             symbol evo_symbol;
             SYSLIB_SERIALIZE(pair_index, (evo_symbol))
@@ -213,6 +246,8 @@ namespace sysio {
          using priceaccums = kv::table<"priceaccum"_n, pair_key,          price_accumulator>;
          using yieldpairs  = kv::table<"yieldpairs"_n, extended_symbol_key, yield_pair>;
          using yieldpayouts = kv::table<"yieldpayouts"_n, contract_key, payout_receipt>;
+         using yieldfunds   = kv::table<"yieldfunds"_n,   funder_key,   fund_receipt>;
+         using reservoirs   = kv::table<"reservoirs"_n,   pair_key,     reservoir>;
          // (The shadow token's own tables are read through aliases local to the
          // implementation file: an alias declared here would make the ABI generator
          // list them as this contract's.)

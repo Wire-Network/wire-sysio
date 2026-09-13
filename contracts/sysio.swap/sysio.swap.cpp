@@ -11,6 +11,15 @@ namespace {
                                                    sysio::opp::shadow::symbol_key, sysio::opp::shadow::account>;
    using shadow_indexes  = sysio::kv::table<sysio::opp::shadow::YIELD_INDEX_TABLE,
                                             sysio::opp::shadow::symbol_key, sysio::opp::shadow::yield_index>;
+
+   /// Whether a delivered extended asset is exactly the expected one: same
+   /// contract, same symbol, same amount. (asset's own == asserts on a symbol
+   /// mismatch, which here must be an ordinary "does not match" failure.)
+   bool delivers(const sysio::extended_asset& delivered, const sysio::extended_asset& expected) {
+      return delivered.contract == expected.contract
+          && delivered.quantity.symbol == expected.quantity.symbol
+          && delivered.quantity.amount == expected.quantity.amount;
+   }
 }
 
 namespace sysio {
@@ -54,8 +63,19 @@ void swap::ontransfer(name from, name to, asset quantity, string memo) {
     yieldpayouts payouts( get_self() );
     const contract_key payer{ from };
     if (const auto receipt = payouts.try_get( payer )) {
-        check( incoming == receipt->quantity, "yield payout does not match the claim" );
+        check( delivers( incoming, receipt->quantity ), "yield payout does not match the claim" );
         payouts.erase( payer );
+        return;
+    }
+    // A funding `from` announced with fundyield: the announced amount fills the
+    // pair's reservoir, anything else from `from` is refused until it does.
+    yieldfunds funds( get_self() );
+    const funder_key funder{ from };
+    if (const auto receipt = funds.try_get( funder )) {
+        check( delivers( incoming, receipt->quantity ), "yield funding does not match the pending fundyield" );
+        reservoirs reservoir_table( get_self() );
+        reservoir_table.modify( name{}, pair_key{ receipt->pair.raw() }, [&]( auto& r ) { r.balance += incoming; } );
+        funds.erase( funder );
         return;
     }
     string_view memosv(memo);
@@ -259,17 +279,18 @@ std::optional<extended_symbol> yield_leg)
     check( locked_shares.amount >= 0, "locked_shares must be nonnegative" );
     check( locked_shares.amount < new_token.amount, "locked_shares must leave the creator at least one share" );
     check( initial_pool1.get_extended_symbol() != initial_pool2.get_extended_symbol(), "extended symbols must be different");
+    stats statstable( get_self() );
+    const pair_key key{ new_symbol.code().raw() };
+    check ( !statstable.contains( key ), "token symbol already exists" );
     if (yield_leg) {
         check( *yield_leg == initial_pool1.get_extended_symbol() || *yield_leg == initial_pool2.get_extended_symbol(),
                "yield_leg must be one of the pair's legs" );
         yieldpairs yieldtable( get_self() );
         yieldtable.emplace( user, key_of(*yield_leg), yield_pair{ new_symbol.code() },
                             "a yield pool already exists for this symbol" );
+        reservoirs reservoir_table( get_self() );
+        reservoir_table.emplace( user, key, reservoir{ extended_asset{ 0, *yield_leg } } );
     }
-
-    stats statstable( get_self() );
-    const pair_key key{ new_symbol.code().raw() };
-    check ( !statstable.contains( key ), "token symbol already exists" );
     check( 0 <= initial_fee && initial_fee <= MAX_FEE, "fee out of range" );
     if (fee_authority == name{}) {
         swapconfig_t config( get_self() );
@@ -375,6 +396,21 @@ swap::currency_stats swap::accrue(const pair_key& key, const currency_stats& tok
     action( permission_level{ get_self(), "active"_n }, shadow.get_contract(), opp::shadow::CLAIM_ACTION,
             std::make_tuple( get_self(), shadow.get_symbol().code() ) ).send();
     return statstable.get( key );
+}
+
+void swap::fundyield(name from, symbol_code pair_token, asset quantity) {
+    require_auth( from );
+    stats statstable( get_self() );
+    const auto token = statstable.try_get( pair_key{ pair_token.raw() } );
+    check ( token.has_value(), "pair token does not exist" );
+    const extended_symbol& shadow = require_yield_leg(*token);
+    check( quantity.symbol == shadow.get_symbol(), "quantity must be in the pair's shadow symbol" );
+    check( quantity.amount > 0, "quantity must be positive" );
+    // The row is transient (the matching transfer erases it) and replaceable by
+    // its own funder, so the contract carries it rather than billing `from`.
+    yieldfunds funds( get_self() );
+    funds.upsert( get_self(), funder_key{ from },
+                  fund_receipt{ pair_token, extended_asset{ quantity, shadow.get_contract() } } );
 }
 
 void swap::accrueyield(symbol_code pair_token) {
