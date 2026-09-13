@@ -9,6 +9,7 @@
 #include <sysio/kv_global.hpp>
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/twap.hpp>
+#include <sysio.opp.common/shadow_yield.hpp>
 #include <algorithm>
 #include <cmath>
 #include <optional>
@@ -65,6 +66,12 @@ namespace sysio {
          /// points of the pool's shadow side. Both must be nonzero before tickyield runs.
          [[sysio::action]] void setyield(symbol_code pair_token,
            uint32_t conversion_horizon_sec, uint32_t depth_cap_bps);
+         /// Settle the WIRE yield a yield pool is owed on the shadow it holds into the
+         /// pool's other leg, minting nothing: the pool is credited now and the token's
+         /// `claim` delivers the same amount in the same transaction (a mismatch fails
+         /// it). Runs implicitly before every mint and burn; this call lets anyone
+         /// settle between them. No authorization is required.
+         [[sysio::action]] void accrueyield(symbol_code pair_token);
          [[sysio::on_notify("*::transfer")]] void ontransfer(name from, name to, asset quantity, string memo);
          [[sysio::action]] void openext( const name& user, const name& payer, const extended_symbol& ext_symbol);
          [[sysio::action]] void closeext ( const name& user, const name& to, const extended_symbol& ext_symbol, string memo);
@@ -117,6 +124,13 @@ namespace sysio {
             SYSLIB_SERIALIZE(pair_identity_key, (contract1)(symbol1)(contract2)(symbol2))
          };
 
+         /// A pending yield payout: keyed by the shadow contract that owes it, which is
+         /// the `from` of the transfer that will settle it.
+         struct contract_key {
+            name contract;
+            SYSLIB_SERIALIZE(contract_key, (contract))
+         };
+
          // --- Rows ---
 
          /// Contract-wide configuration, set on deployment by `setconfig`.
@@ -159,6 +173,18 @@ namespace sysio {
             SYSLIB_SERIALIZE(yield_pair, (pair))
          };
 
+         /// A yield payout the contract has claimed and credited to `pair` but not yet
+         /// received. `quantity` is what the shadow contract's `claim` must deliver,
+         /// computed from the token's public state before the call; the transfer that
+         /// delivers it is matched against this row and the row erased. A row that
+         /// outlives its transaction means the token paid something else, and blocks
+         /// every further accrual through that contract until it is understood.
+         struct [[sysio::table("yieldpayouts")]] payout_receipt {
+            symbol_code    pair;
+            extended_asset quantity;
+            SYSLIB_SERIALIZE(payout_receipt, (pair)(quantity))
+         };
+
          struct [[sysio::table("evoindex")]] pair_index {
             symbol evo_symbol;
             SYSLIB_SERIALIZE(pair_index, (evo_symbol))
@@ -186,6 +212,10 @@ namespace sysio {
          using evoindexes  = kv::table<"evoindex"_n,   pair_identity_key, pair_index>;
          using priceaccums = kv::table<"priceaccum"_n, pair_key,          price_accumulator>;
          using yieldpairs  = kv::table<"yieldpairs"_n, extended_symbol_key, yield_pair>;
+         using yieldpayouts = kv::table<"yieldpayouts"_n, contract_key, payout_receipt>;
+         // (The shadow token's own tables are read through aliases local to the
+         // implementation file: an alias declared here would make the ABI generator
+         // list them as this contract's.)
 
          /// The deposit-row key of an extended symbol.
          static extended_symbol_key key_of(const extended_symbol& ext_symbol);
@@ -193,6 +223,19 @@ namespace sysio {
          static pair_identity_key identity_of(const extended_symbol& a, const extended_symbol& b);
          /// The pair's shadow leg, or a check failure on a plain pool: every yield path starts here.
          static const extended_symbol& require_yield_leg(const currency_stats& token);
+         /// The pool holding the leg that is NOT `leg`; `leg` must be one of the pair's legs.
+         static const extended_asset& other_pool(const currency_stats& token, const extended_symbol& leg);
+         /// The WIRE this contract is owed right now on the shadow it holds, from the
+         /// token's public state: `shadow::owed` over the contract's row and the current
+         /// index. Zero when the token has never distributed (no index row), so a
+         /// plain token in a yield leg reads as owing nothing.
+         uint64_t owed_yield(const extended_symbol& shadow) const;
+         /// Settle the owed yield of a yield pool into its other leg without minting:
+         /// credit the pool, record the receipt keyed by the shadow contract, and call
+         /// the token's `claim` inline; the transfer it sends lands in `ontransfer`
+         /// against the receipt. A plain pool, or nothing owed, changes nothing.
+         /// Returns the pair row as it now stands, for a caller that goes on to price.
+         currency_stats accrue(const pair_key& key, const currency_stats& token);
 
          void add_signed_ext_balance( const name& owner, const extended_asset& value );
          void add_signed_liq(name user, asset to_buy, bool is_buying, asset max_asset1, asset max_asset2);

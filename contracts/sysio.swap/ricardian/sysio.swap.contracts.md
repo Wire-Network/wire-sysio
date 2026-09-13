@@ -81,6 +81,8 @@ The fee authority is the account whose authorization the changefee action requir
 
 The pair token supply minted is the square root of the product of the two initial pool amounts, rounded downward. Of it, {{locked_shares}} are held by no account and can never be redeemed, so the pools always retain the value those shares represent; the remainder is credited to {{user}}. {{locked_shares}} must be less than the amount minted.
 
+If {{yield_leg}} is given it must be one of the two legs, and the pair becomes a yield pool on that shadow token: the yield the contract is owed on the shadow it holds is settled into the other leg without minting, before every addliquidity and remliquidity and on accrueyield. Only one yield pool may exist for a given shadow token. Without {{yield_leg}} the pair is a plain pool.
+
 RAM will be deducted from {{user}}’s resources to create the necessary records.
 Authorization of {{user}} and of the contract is required.
 
@@ -168,6 +170,30 @@ summary: 'Bring the cumulative prices of {{nowrap pair_token}} up to the current
 The cumulative-price accumulators of the token {{pair_token}} are advanced to the current block time: each accumulator grows by the pool price that has held since the previous update, multiplied by the time elapsed. The pools are not modified. No authorization is required.
 
 The accumulators also advance in the same way immediately before any operation that changes the pools of {{pair_token}}. A reader that records the accumulators at two times obtains the time-weighted average price between them as the difference of the accumulators divided by the elapsed time.
+
+
+<h1 class="contract">setyield</h1>
+
+---
+spec_version: "0.2.0"
+title: Set yield parameters
+summary: 'Set the yield tick parameters of {{nowrap pair_token}}'
+---
+
+The fee authority associated to the token {{pair_token}}, which must be a yield pool, authorizes to set the horizon of {{conversion_horizon_sec}} seconds over which the pool's queued yield is meant to sell, and the ceiling of {{depth_cap_bps}} basis points (at most 10000) of the pool's shadow side on one clip. Both must be nonzero before the pool's yield tick can run.
+
+
+<h1 class="contract">accrueyield</h1>
+
+---
+spec_version: "0.2.0"
+title: Accrue yield
+summary: 'Settle the yield owed to the pool of {{nowrap pair_token}}'
+---
+
+The token {{pair_token}} must be a yield pool. The WIRE the contract is owed by the pool's shadow token, computed from that token's public distribution state, is credited to the pool's other leg with no pair tokens minted, and the shadow token's claim action is called to deliver it. The delivery must match the credited amount exactly within the same transaction; otherwise the transaction fails. When nothing is owed the pools are not modified.
+
+The same settlement is performed immediately before every addliquidity and remliquidity on {{pair_token}}. No authorization is required.
 
 
 <h1 class="contract">changefee</h1>

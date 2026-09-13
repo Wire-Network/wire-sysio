@@ -2,6 +2,17 @@
 #include <sysio.swap/utils.hpp>
 #include <tuple>
 
+namespace {
+   // The shadow token's tables, read in place (sysio.opp.common/shadow_yield.hpp):
+   // constructed with the token contract as code, the holder table scoped by the
+   // holder. Declared outside the contract class on purpose: the ABI generator
+   // lists every kv table alias it finds inside the class as the contract's own.
+   using shadow_accounts = sysio::kv::scoped_table<sysio::opp::shadow::ACCOUNTS_TABLE,
+                                                   sysio::opp::shadow::symbol_key, sysio::opp::shadow::account>;
+   using shadow_indexes  = sysio::kv::table<sysio::opp::shadow::YIELD_INDEX_TABLE,
+                                            sysio::opp::shadow::symbol_key, sysio::opp::shadow::yield_index>;
+}
+
 namespace sysio {
 
 void swap::openext( const name& user, const name& payer, const extended_symbol& ext_symbol) {
@@ -37,6 +48,16 @@ void swap::ontransfer(name from, name to, asset quantity, string memo) {
     check(quantity.amount >= 0, "quantity must be positive");
 
     auto incoming = extended_asset{quantity, get_first_receiver()};
+    // A payout this contract claimed from a shadow token and already credited to
+    // the pool: match it against the receipt and retire the receipt. Nothing
+    // else is accepted from a contract with a claim outstanding.
+    yieldpayouts payouts( get_self() );
+    const contract_key payer{ from };
+    if (const auto receipt = payouts.try_get( payer )) {
+        check( incoming == receipt->quantity, "yield payout does not match the claim" );
+        payouts.erase( payer );
+        return;
+    }
     string_view memosv(memo);
     if ( starts_with(memosv, EXCHANGE) ) {
       memoexchange(from, incoming, memosv.substr(EXCHANGE.size()) );
@@ -98,17 +119,20 @@ void swap::add_signed_liq(name user, asset to_add, bool is_buying,
     check( to_add.is_valid(), "invalid asset");
     stats statstable( get_self() );
     const pair_key key{ to_add.symbol.code().raw() };
-    const auto token = statstable.try_get( key );
-    check ( token.has_value(), "pair token does not exist" );
-    auto A = token-> supply.amount;
-    auto P1 = token-> pool1.quantity.amount;
-    auto P2 = token-> pool2.quantity.amount;
+    const auto stored = statstable.try_get( key );
+    check ( stored.has_value(), "pair token does not exist" );
+    // Yield owed to the pool belongs to the shares that exist now: settle it
+    // before any share is priced, minted or burned.
+    const currency_stats token = accrue( key, *stored );
+    auto A = token.supply.amount;
+    auto P1 = token.pool1.quantity.amount;
+    auto P2 = token.pool2.quantity.amount;
 
     int fee = is_buying? ADD_LIQUIDITY_FEE : 0;
     auto to_pay1 = extended_asset{ asset{compute(to_add.amount, P1, A, fee),
-      token->pool1.quantity.symbol}, token->pool1.contract};
+      token.pool1.quantity.symbol}, token.pool1.contract};
     auto to_pay2 = extended_asset{ asset{compute(to_add.amount, P2, A, fee),
-      token->pool2.quantity.symbol}, token->pool2.contract};
+      token.pool2.quantity.symbol}, token.pool2.contract};
     check( (to_pay1.quantity.symbol == max_asset1.symbol) && 
            (to_pay2.quantity.symbol == max_asset2.symbol), "incorrect symbol");
     check( (to_pay1.quantity.amount <= max_asset1.amount) && 
@@ -117,7 +141,7 @@ void swap::add_signed_liq(name user, asset to_add, bool is_buying,
     add_signed_ext_balance(user, -to_pay1);
     add_signed_ext_balance(user, -to_pay2);
     (to_add.amount > 0)? add_balance(user, to_add, user) : sub_balance(user, -to_add);
-    update_price_accumulators(*token);
+    update_price_accumulators(token);
     statstable.modify( name{}, key, [&]( auto& a ) {
       a.supply += to_add;
       a.pool1 += to_pay1;
@@ -125,9 +149,9 @@ void swap::add_signed_liq(name user, asset to_add, bool is_buying,
     });
     // Ownership already bounds a removal by the caller's own shares, so supply can
     // only reach the locked floor when nothing is locked and the last share goes.
-    const int64_t remaining = token->supply.amount + to_add.amount;
+    const int64_t remaining = token.supply.amount + to_add.amount;
     check(remaining != 0, "the pool cannot be left empty");
-    check(remaining >= token->locked_shares.amount, "locked shares cannot be removed");
+    check(remaining >= token.locked_shares.amount, "locked shares cannot be removed");
 }
 
 void swap::exchange( name user, symbol_code pair_token, 
@@ -310,6 +334,56 @@ void swap::sync(symbol_code pair_token) {
 const extended_symbol& swap::require_yield_leg(const currency_stats& token) {
     check( token.yield_leg.has_value(), "pair has no yield leg" );
     return *token.yield_leg;
+}
+
+const extended_asset& swap::other_pool(const currency_stats& token, const extended_symbol& leg) {
+    if (token.pool1.get_extended_symbol() == leg) return token.pool2;
+    check( token.pool2.get_extended_symbol() == leg, "not a leg of this pair" );
+    return token.pool1;
+}
+
+uint64_t swap::owed_yield(const extended_symbol& shadow) const {
+    const opp::shadow::symbol_key key{ shadow.get_symbol().code().raw() };
+    shadow_indexes indexes( shadow.get_contract() );
+    const auto index = indexes.try_get( key );
+    if (!index || index->index == 0) return 0;
+    shadow_accounts holdings( shadow.get_contract(), get_self().value );
+    const auto row = holdings.try_get( key );
+    return row ? opp::shadow::owed( *row, index->index ) : 0;
+}
+
+swap::currency_stats swap::accrue(const pair_key& key, const currency_stats& token) {
+    if (!token.yield_leg) return token;
+    const extended_symbol& shadow = *token.yield_leg;
+    const uint64_t owed = owed_yield( shadow );
+    if (owed == 0) return token;
+    check( owed <= uint64_t(MAX), "yield payout overflows" );
+    const extended_symbol payout_symbol = other_pool( token, shadow ).get_extended_symbol();
+    const extended_asset payout{ asset{ int64_t(owed), payout_symbol.get_symbol() }, payout_symbol.get_contract() };
+
+    yieldpayouts payouts( get_self() );
+    payouts.emplace( get_self(), contract_key{ shadow.get_contract() },
+                     payout_receipt{ token.supply.symbol.code(), payout },
+                     "a yield payout from this contract is still pending" );
+    // The pool changes: close the accumulators' interval at the old price first.
+    update_price_accumulators( token );
+    stats statstable( get_self() );
+    statstable.modify( name{}, key, [&]( auto& a ) {
+        if (a.pool1.get_extended_symbol() == shadow) a.pool2 += payout;
+        else                                         a.pool1 += payout;
+    } );
+    action( permission_level{ get_self(), "active"_n }, shadow.get_contract(), opp::shadow::CLAIM_ACTION,
+            std::make_tuple( get_self(), shadow.get_symbol().code() ) ).send();
+    return statstable.get( key );
+}
+
+void swap::accrueyield(symbol_code pair_token) {
+    stats statstable( get_self() );
+    const pair_key key{ pair_token.raw() };
+    const auto token = statstable.try_get( key );
+    check ( token.has_value(), "pair token does not exist" );
+    require_yield_leg(*token);
+    accrue( key, *token );
 }
 
 void swap::setyield(symbol_code pair_token, uint32_t conversion_horizon_sec, uint32_t depth_cap_bps) {

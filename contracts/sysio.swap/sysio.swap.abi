@@ -24,6 +24,16 @@
             ]
         },
         {
+            "name": "accrueyield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pair_token",
+                    "type": "symbol_code"
+                }
+            ]
+        },
+        {
             "name": "addliquidity",
             "base": "",
             "fields": [
@@ -92,6 +102,16 @@
                 {
                     "name": "memo",
                     "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "contract_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "contract",
+                    "type": "name"
                 }
             ]
         },
@@ -340,6 +360,20 @@
             ]
         },
         {
+            "name": "payout_receipt",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pair",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "quantity",
+                    "type": "extended_asset"
+                }
+            ]
+        },
+        {
             "name": "price_accumulator",
             "base": "",
             "fields": [
@@ -484,6 +518,11 @@
     ],
     "actions": [
         {
+            "name": "accrueyield",
+            "type": "accrueyield",
+            "ricardian_contract": ""
+        },
+        {
             "name": "addliquidity",
             "type": "addliquidity",
             "ricardian_contract": ""
@@ -610,6 +649,14 @@
             "key_names": ["contract","symbol"],
             "key_types": ["name","uint64"],
             "table_id": 19873
+        },
+        {
+            "name": "yieldpayouts",
+            "type": "payout_receipt",
+            "index_type": "i64",
+            "key_names": ["contract"],
+            "key_types": ["name"],
+            "table_id": 50476
         }
     ],
     "ricardian_clauses": [],
