@@ -514,6 +514,16 @@
             ]
         },
         {
+            "name": "tickyield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pair_token",
+                    "type": "symbol_code"
+                }
+            ]
+        },
+        {
             "name": "transfer",
             "base": "",
             "fields": [
@@ -637,6 +647,11 @@
         {
             "name": "sync",
             "type": "sync",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tickyield",
+            "type": "tickyield",
             "ricardian_contract": ""
         },
         {

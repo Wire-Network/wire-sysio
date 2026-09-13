@@ -74,7 +74,12 @@ void swap::ontransfer(name from, name to, asset quantity, string memo) {
     if (const auto receipt = funds.try_get( funder )) {
         check( delivers( incoming, receipt->quantity ), "yield funding does not match the pending fundyield" );
         reservoirs reservoir_table( get_self() );
-        reservoir_table.modify( name{}, pair_key{ receipt->pair.raw() }, [&]( auto& r ) { r.balance += incoming; } );
+        const pair_key pair{ receipt->pair.raw() };
+        // A reservoir that was empty starts selling over a fresh horizon; one that
+        // was not keeps the clock it had.
+        const bool was_empty = reservoir_table.get( pair ).balance.quantity.amount == 0;
+        reservoir_table.modify( name{}, pair, [&]( auto& r ) { r.balance += incoming; } );
+        if (was_empty) restart_tick_clock( pair );
         funds.erase( funder );
         return;
     }
@@ -357,6 +362,12 @@ const extended_symbol& swap::require_yield_leg(const currency_stats& token) {
     return *token.yield_leg;
 }
 
+const extended_asset& swap::pool_of(const currency_stats& token, const extended_symbol& leg) {
+    if (token.pool1.get_extended_symbol() == leg) return token.pool1;
+    check( token.pool2.get_extended_symbol() == leg, "not a leg of this pair" );
+    return token.pool2;
+}
+
 const extended_asset& swap::other_pool(const currency_stats& token, const extended_symbol& leg) {
     if (token.pool1.get_extended_symbol() == leg) return token.pool2;
     check( token.pool2.get_extended_symbol() == leg, "not a leg of this pair" );
@@ -433,7 +444,52 @@ void swap::setyield(symbol_code pair_token, uint32_t conversion_horizon_sec, uin
     statstable.modify( name{}, key, [&]( auto& a ) {
       a.conversion_horizon_sec = conversion_horizon_sec;
       a.depth_cap_bps          = depth_cap_bps;
+      a.last_tick              = current_time_point();   // new parameters, fresh horizon
     } );
+}
+
+void swap::restart_tick_clock(const pair_key& key) {
+    stats statstable( get_self() );
+    statstable.modify( name{}, key, [&]( auto& a ) { a.last_tick = current_time_point(); } );
+}
+
+void swap::tickyield(symbol_code pair_token) {
+    stats statstable( get_self() );
+    const pair_key key{ pair_token.raw() };
+    const auto stored = statstable.try_get( key );
+    check ( stored.has_value(), "pair token does not exist" );
+    const extended_symbol shadow = require_yield_leg(*stored);
+    check( stored->conversion_horizon_sec > 0 && stored->depth_cap_bps > 0, "yield tick parameters not set" );
+    // What the pool is owed belongs to it before it trades.
+    const currency_stats token = accrue( key, *stored );
+
+    reservoirs reservoir_table( get_self() );
+    const int64_t queued = reservoir_table.get( key ).balance.quantity.amount;
+    const time_point now = current_time_point();
+    if (queued <= 0 || now <= token.last_tick) return;
+
+    // The clip: the reservoir's share of the horizon that has elapsed, rounded up
+    // so a nonempty reservoir always drains, capped by depth_cap_bps of the pool's
+    // shadow side and by what is queued. Ticking more often than the horizon
+    // needs only shortens the interval each clip is measured over.
+    const uint128_t elapsed_us = uint128_t( (now - token.last_tick).count() );
+    const uint128_t horizon_us = uint128_t( sysio::seconds( token.conversion_horizon_sec ).count() );
+    const uint128_t cap = uint128_t( pool_of( token, shadow ).quantity.amount ) * token.depth_cap_bps / opp::amm::BPS_TOTAL;
+    uint128_t clip = ( uint128_t(queued) * elapsed_us + horizon_us - 1 ) / horizon_us;
+    clip = std::min( { clip, cap, uint128_t(queued) } );
+    if (clip == 0) return;
+
+    const extended_asset selling{ asset{ int64_t(clip), shadow.get_symbol() }, shadow.get_contract() };
+    const symbol proceeds_symbol = other_pool( token, shadow ).quantity.symbol;
+    const extended_asset proceeds = process_exch( pair_token, selling, asset{ 0, proceeds_symbol } );
+    reservoir_table.modify( name{}, key, [&]( auto& r ) { r.balance -= selling; } );
+    statstable.modify( name{}, key, [&]( auto& a ) { a.last_tick = now; } );
+    // The proceeds reach every holder of the shadow through the token's own
+    // distribution; the pool, a holder, takes its share back on the next accrual.
+    if (proceeds.quantity.amount > 0) {
+        action( permission_level{ get_self(), "active"_n }, shadow.get_contract(), opp::shadow::ADDYIELD_ACTION,
+                std::make_tuple( get_self(), proceeds.quantity, shadow.get_symbol().code() ) ).send();
+    }
 }
 
 void swap::changefee(symbol_code pair_token, int newfee) {

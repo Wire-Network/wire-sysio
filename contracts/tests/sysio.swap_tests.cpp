@@ -316,13 +316,44 @@ public:
         return push_shadow_action( holder, "claim"_n, mvo()( "holder", holder )( "sym", sym ) );
     }
     // Let the shadow token act for `account`: its active keeps its key and gains
-    // shadowtoken@sysio.code, the delegation addyield's inline transfer needs.
-    void grant_shadow_code( name account ) {
+    // shadowtoken@sysio.code, the delegation addyield's inline transfer needs. A
+    // contract account keeps its own sysio.code seat too (`keep_own_code`), which
+    // its own inline actions need; the seats are listed in name order.
+    void grant_shadow_code( name account, bool keep_own_code = false ) {
+        vector<permission_level_weight> seats{ { { "shadowtoken"_n, config::sysio_code_name }, 1 } };
+        if (keep_own_code) seats.push_back( { { account, config::sysio_code_name }, 1 } );
+        std::sort( seats.begin(), seats.end() );
         set_authority( account, config::active_name,
-            authority( 1, { key_weight{ get_public_key( account, "active" ), 1 } },
-                          { permission_level_weight{ { "shadowtoken"_n, config::sysio_code_name }, 1 } } ),
+            authority( 1, { key_weight{ get_public_key( account, "active" ), 1 } }, seats ),
             config::owner_name );
         produce_block();
+    }
+    // tickyield needs no authorization; any account can foot the CPU.
+    action_result tickyield( symbol_code pair_token ) {
+        return push_action( "sysio.swap"_n, "alice"_n, "tickyield"_n, mvo()
+          ( "pair_token", pair_token )
+        );
+    }
+    // Two ticks in ONE transaction, so no block time passes between them.
+    void tick_twice_in_one_transaction( symbol_code pair ) {
+        signed_transaction trx;
+        for (int i = 0; i < 2; ++i) {
+            action act;
+            act.account = "sysio.swap"_n;
+            act.name    = "tickyield"_n;
+            act.authorization = { {"alice"_n, config::active_name} };
+            act.data = abi_ser.variant_to_binary( "tickyield", mvo()( "pair_token", pair ),
+                                                  abi_serializer::create_yield_function(abi_serializer_max_time) );
+            trx.actions.emplace_back( std::move(act) );
+        }
+        set_transaction_headers( trx );
+        trx.sign( get_private_key( "alice"_n, "active" ), control->get_chain_id() );
+        push_transaction( trx );
+        produce_block();
+    }
+    // The pair's tick clock, in microseconds since the epoch.
+    int64_t last_tick_us( symbol_code pair ) {
+        return fc::time_point::from_iso_string( pair_row( pair )["last_tick"].as_string() ).time_since_epoch().count();
     }
     // `holder`'s row for `sym` on the shadow token (scope = holder, key = symbol code).
     shadow_account_row shadow_account( name holder, symbol_code sym ) {
@@ -567,6 +598,11 @@ extended_asset extend(asset to_extend) {
   }
 }
 
+// The constant product of a pair's two pools, as system_balance reports them.
+static boost::multiprecision::int256_t wide_product( const vector<int64_t>& pool ) {
+  return boost::multiprecision::int256_t( pool.at(0) ) * pool.at(1);
+}
+
 // Reference quotes for the rounding tests, written from the SPEC rather than
 // copied from the contract. The curve goes the pool's way: what a user pays is
 // rounded up, what a user receives is rounded down. The two fees differ: the
@@ -653,6 +689,16 @@ namespace yield_reference {
    }
    int64_t owed( int64_t balance, uint64_t index, uint64_t checkpoint, uint64_t banked = 0 ) {
       return int64_t( banked + uint64_t( wide(balance) * (index - checkpoint) / Scale ) );
+   }
+   // One tick's clip: the reservoir's share of the horizon elapsed, rounded up,
+   // capped by `cap_bps` of the pool's shadow side and by what is queued.
+   constexpr int64_t MicrosecondsPerSecond = 1'000'000;
+   constexpr int64_t BpsTotal = 10'000;
+   int64_t clip_size( int64_t queued, int64_t elapsed_us, uint32_t horizon_sec, int64_t pool_shadow, uint32_t cap_bps ) {
+      const wide horizon_us = wide(horizon_sec) * MicrosecondsPerSecond;
+      const wide by_time = ( wide(queued) * elapsed_us + horizon_us - 1 ) / horizon_us;
+      const wide cap     = wide(pool_shadow) * cap_bps / BpsTotal;
+      return int64_t( std::min( { by_time, cap, wide(queued) } ) );
    }
 }
 
@@ -1674,6 +1720,148 @@ BOOST_FIXTURE_TEST_CASE( yield_funding_fills_the_reservoir, sysio_swap_tester ) 
     BOOST_REQUIRE_EQUAL( first + second + third, reservoir_of( SHEO ) );   // accrual leaves the queue alone
 } FC_LOG_AND_RETHROW()
 
+// ---------------------------------------------------------------------------
+// The yield tick: the reservoir sells through the pool in clips paced by the
+// horizon, and the proceeds go back to the shadow's holders.
+// ---------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_swap_tester ) try {
+    setup_yield_pool();
+    // The token moves the proceeds out of the contract under the contract's own
+    // authority: the deployment grants it the shadow token's sysio.code seat.
+    grant_shadow_code( "sysio.swap"_n, true );
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, ETUSD3,
+        extend(asset::from_string("1.0000 EOS")), extend(asset::from_string("1.00 TUSD")), 10, name{}) );
+    const uint32_t horizon_sec = 3600;
+    const uint32_t cap_bps     = 1;
+    const int      fee         = pool_fee( SHEO );
+    const auto shadow_pool_of  = [&]( const vector<int64_t>& pool ) { return pool.at(0); };   // SHD is pool1
+    const auto wire_pool_of    = [&]( const vector<int64_t>& pool ) { return pool.at(1); };
+
+    // Only a yield pool with its parameters set can tick.
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair has no yield leg"), tickyield( ETUSD ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair token does not exist"), tickyield( EOS ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield tick parameters not set"), tickyield( SHEO ) );
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, cap_bps ) );
+    const int64_t set_at = last_tick_us( SHEO );
+    BOOST_REQUIRE_EQUAL( control->head_block_time().time_since_epoch().count(), set_at );   // setyield starts the clock
+
+    // An empty reservoir: the tick is a no-op and the clock is untouched.
+    auto before = system_balance( SHEO.value );
+    BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
+    BOOST_REQUIRE( before == system_balance( SHEO.value ) );
+    BOOST_REQUIRE_EQUAL( set_at, last_tick_us( SHEO ) );
+
+    // Funding an empty reservoir restarts the clock: the queue sells over a
+    // fresh horizon from the moment it is funded.
+    const int64_t queued = 1000'0000;
+    fund_yield_in_one_transaction( "alice"_n, SHEO, asset( queued, SHD4 ) );
+    const int64_t funded_at = last_tick_us( SHEO );
+    BOOST_REQUIRE_LT( set_at, funded_at );
+    BOOST_REQUIRE_EQUAL( queued, reservoir_of( SHEO ) );
+
+    // One tick, one block later: the clip is the queue's share of the elapsed
+    // horizon (rounded up), sold at the pool's curve and fee; the proceeds leave
+    // the contract for the token's pot, which advances the index by the spec.
+    before = system_balance( SHEO.value );
+    auto idx_before = shadow_index( SHD );
+    const int64_t contract_wire_before = token_balance( "sysio.token"_n, "sysio.swap"_n, EOS.value );
+    BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
+    const int64_t ticked_at = last_tick_us( SHEO );
+    int64_t clip = yield_reference::clip_size( queued, ticked_at - funded_at, horizon_sec, shadow_pool_of(before), cap_bps );
+    BOOST_REQUIRE_LT( 0, clip );
+    BOOST_REQUIRE_LT( clip, queued / 1000 );   // a block is a sliver of the horizon
+    int64_t proceeds = reference::receive( clip, shadow_pool_of(before), wire_pool_of(before), fee );
+    auto after = system_balance( SHEO.value );
+    BOOST_REQUIRE_EQUAL( shadow_pool_of(before) + clip,   shadow_pool_of(after) );
+    BOOST_REQUIRE_EQUAL( wire_pool_of(before) - proceeds, wire_pool_of(after) );
+    BOOST_REQUIRE_EQUAL( before.at(2), after.at(2) );
+    BOOST_REQUIRE_EQUAL( queued - clip, reservoir_of( SHEO ) );
+    BOOST_REQUIRE_EQUAL( contract_wire_before - proceeds, token_balance( "sysio.token"_n, "sysio.swap"_n, EOS.value ) );
+    auto distributed = yield_reference::distribute( proceeds, ShadowIssuance, idx_before.carry );
+    auto idx_after = shadow_index( SHD );
+    BOOST_REQUIRE_EQUAL( idx_before.index + distributed.index_delta, idx_after.index );
+    BOOST_REQUIRE_EQUAL( idx_before.pot + uint64_t(proceeds), idx_after.pot );
+    // The pool kept the fee: the product grew.
+    BOOST_REQUIRE( is_increasing( before, after ) );
+    BOOST_REQUIRE_LT( wide_product( before ), wide_product( after ) );
+
+    // The proceeds come back: the contract is a holder, so the next accrual
+    // (explicit here; every later tick performs it too) credits the pool its
+    // share of what the tick distributed.
+    const auto held = shadow_account( "sysio.swap"_n, SHD );
+    const int64_t returned = yield_reference::owed( held.balance.get_amount(), idx_after.index,
+                                                    held.index_checkpoint, held.owed_wire );
+    BOOST_REQUIRE_LT( 0, returned );
+    BOOST_REQUIRE_LT( returned, proceeds );   // alice holds the rest of the shadow
+    before = system_balance( SHEO.value );
+    BOOST_REQUIRE_EQUAL( success(), accrueyield( SHEO ) );
+    BOOST_REQUIRE_EQUAL( wire_pool_of(before) + returned, wire_pool_of( system_balance( SHEO.value ) ) );
+
+    // Pounding the tick does not sell faster: a second tick in the same block
+    // sees no elapsed time and does nothing, and consecutive blocks sell only
+    // the slivers of horizon they span.
+    const int64_t queued_before_pair = reservoir_of( SHEO );
+    before = system_balance( SHEO.value );
+    tick_twice_in_one_transaction( SHEO );
+    const int64_t paired_at = last_tick_us( SHEO );
+    clip = yield_reference::clip_size( queued_before_pair, paired_at - ticked_at, horizon_sec, shadow_pool_of(before), cap_bps );
+    BOOST_REQUIRE_EQUAL( queued_before_pair - clip, reservoir_of( SHEO ) );
+    BOOST_REQUIRE_EQUAL( shadow_pool_of(before) + clip, shadow_pool_of( system_balance( SHEO.value ) ) );
+
+    // After a gap longer than the horizon the time share is the whole queue,
+    // and the depth cap is what bounds the clip.
+    produce_block();
+    produce_block( fc::hours(2) );
+    before = system_balance( SHEO.value );
+    const int64_t queued_before_gap = reservoir_of( SHEO );
+    const int64_t clock_before_gap  = last_tick_us( SHEO );
+    BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
+    clip = yield_reference::clip_size( queued_before_gap, last_tick_us( SHEO ) - clock_before_gap, horizon_sec,
+                                       shadow_pool_of(before), cap_bps );
+    BOOST_REQUIRE_EQUAL( shadow_pool_of(before) * cap_bps / yield_reference::BpsTotal, clip );
+    BOOST_REQUIRE_LT( clip, queued_before_gap );
+    BOOST_REQUIRE_EQUAL( queued_before_gap - clip, reservoir_of( SHEO ) );
+    BOOST_REQUIRE_EQUAL( shadow_pool_of(before) + clip, shadow_pool_of( system_balance( SHEO.value ) ) );
+
+    // With the cap lifted, the same gap drains the queue in one clip, and the
+    // tick after that is a no-op again.
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, uint32_t(yield_reference::BpsTotal) ) );
+    produce_block();
+    produce_block( fc::hours(2) );
+    before = system_balance( SHEO.value );
+    const int64_t remaining = reservoir_of( SHEO );
+    BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
+    BOOST_REQUIRE_EQUAL( 0, reservoir_of( SHEO ) );
+    BOOST_REQUIRE_EQUAL( shadow_pool_of(before) + remaining, shadow_pool_of( system_balance( SHEO.value ) ) );
+    const int64_t drained_at = last_tick_us( SHEO );
+    // (Settle the drain's own proceeds first, so only the tick's trade is in question.)
+    BOOST_REQUIRE_EQUAL( success(), accrueyield( SHEO ) );
+    before = system_balance( SHEO.value );
+    BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
+    BOOST_REQUIRE( before == system_balance( SHEO.value ) );
+    BOOST_REQUIRE_EQUAL( drained_at, last_tick_us( SHEO ) );
+
+    // Accrual comes before the trade: a distribution the pool has not yet
+    // collected is credited first, and the clip is priced against that pool.
+    fund_yield_in_one_transaction( "alice"_n, SHEO, asset( queued, SHD4 ) );
+    const int64_t refunded_at = last_tick_us( SHEO );
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( 100'0000, EOS4 ), SHD ) );
+    const auto held_now = shadow_account( "sysio.swap"_n, SHD );
+    const int64_t owed = yield_reference::owed( held_now.balance.get_amount(), shadow_index( SHD ).index,
+                                                held_now.index_checkpoint, held_now.owed_wire );
+    BOOST_REQUIRE_LT( 0, owed );
+    before = system_balance( SHEO.value );
+    BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
+    clip = yield_reference::clip_size( queued, last_tick_us( SHEO ) - refunded_at, horizon_sec,
+                                       shadow_pool_of(before), uint32_t(yield_reference::BpsTotal) );
+    proceeds = reference::receive( clip, shadow_pool_of(before), wire_pool_of(before) + owed, fee );
+    after = system_balance( SHEO.value );
+    BOOST_REQUIRE_EQUAL( shadow_pool_of(before) + clip,          shadow_pool_of(after) );
+    BOOST_REQUIRE_EQUAL( wire_pool_of(before) + owed - proceeds, wire_pool_of(after) );
+    BOOST_REQUIRE( pending_payout( "shadowtoken"_n ).empty() );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( fee_authority_configuration, sysio_swap_tester ) try {
     create_tokens_and_issue();
     abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
@@ -2368,8 +2556,8 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     std::set<std::string> actions;
     for (const auto& a : abi.actions) actions.insert(a.name.to_string());
     const std::set<std::string> expected_actions{
-        "accrueyield", "addliquidity", "changefee", "close", "closeext", "exchange", "fundyield",
-        "inittoken", "open", "openext", "remliquidity", "setconfig", "setyield", "sync", "transfer", "withdraw" };
+        "accrueyield", "addliquidity", "changefee", "close", "closeext", "exchange", "fundyield", "inittoken",
+        "open", "openext", "remliquidity", "setconfig", "setyield", "sync", "tickyield", "transfer", "withdraw" };
     BOOST_REQUIRE( actions == expected_actions );
 
     using field_list = std::vector<std::pair<std::string, std::string>>;
@@ -2401,6 +2589,7 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     const field_list fundyield_fields{ {"from", "name"}, {"pair_token", "symbol_code"}, {"quantity", "asset"} };
     const field_list fund_receipt_fields{ {"pair", "symbol_code"}, {"quantity", "extended_asset"} };
     const field_list reservoir_fields{ {"balance", "extended_asset"} };
+    const field_list tickyield_fields{ {"pair_token", "symbol_code"} };
     const field_list setconfig_fields{ {"fee_authority", "name"} };
     const field_list swap_config_fields{ {"fee_authority", "name"} };
     const field_list sync_fields{ {"pair_token", "symbol_code"} };
@@ -2429,6 +2618,7 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     BOOST_REQUIRE( fields("fundyield") == fundyield_fields );
     BOOST_REQUIRE( fields("fund_receipt") == fund_receipt_fields );
     BOOST_REQUIRE( fields("reservoir") == reservoir_fields );
+    BOOST_REQUIRE( fields("tickyield") == tickyield_fields );
 
     // KV tables: the row type and the key layout an explorer needs to decode
     // the raw key bytes. A scoped table's first key word is the scope.
