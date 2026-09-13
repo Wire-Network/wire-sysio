@@ -45,6 +45,15 @@ Settle the yield the pool is owed on the shadow it holds into its other leg, min
 
     cleos push action evolutiondex accrueyield '["SHDEOS"]' -p YOUR_ACCOUNT
 
+Queue shadow to be sold through the pool: announce the exact amount, then transfer it. The transfer that matches the announcement fills the pool's reservoir instead of your deposit; while the announcement is pending any other transfer from you is refused, and announcing again replaces it. Both steps fit in one transaction.
+
+    cleos push action evolutiondex fundyield '["YOUR_ACCOUNT", "SHDEOS", "5.0000 SHD"]' -p YOUR_ACCOUNT
+    cleos push action shadowtoken transfer '["YOUR_ACCOUNT", "evolutiondex", "5.0000 SHD", ""]' -p YOUR_ACCOUNT
+
+See what is queued:
+
+    cleos get table evolutiondex evolutiondex reservoirs -L SHDEOS -U SHDEOS
+
 Set the contract-wide fee authority (deployment step, the contract's own authority):
 
     cleos push action evolutiondex setconfig '["sysio"]' -p evolutiondex

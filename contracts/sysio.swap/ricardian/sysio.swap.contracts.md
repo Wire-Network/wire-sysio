@@ -47,6 +47,8 @@ The default response is to deposit {{quantity}} to {{from}}'s extended balance f
 
 If {{memo}} starts with "deposit to:", the account {{from}} will be replaced by the subsequent content of {{memo}} whenever it is possible.
 
+Two typed routes take precedence over the memo, and each accepts exactly one transfer. If {{from}} is a shadow token from which this contract has a yield payout outstanding (see accrueyield), {{quantity}} must be that payout, which was already credited to the pool; the receipt is retired and nothing else is deposited. Otherwise, if {{from}} has a yield funding pending (see fundyield), {{quantity}} must be the announced amount, which fills the announced pair's reservoir. In either case any other transfer from {{from}} fails.
+
 If {{memo}} starts with "exchange:", the subsequent content of the memo is expected
 to have the form "EVOTOKEN,min_expected_asset,optional memo". An exchange operation will be processed with this data, following the same conversion rules as in the exchange action for the input {{from}}, {{EVOTOKEN}}, {{quantity}}, {{min_expected_asset}}. If the output asset is at least equal to {{min_expected_asset}}, it will be transfered from this contract
 to {{user}}, with {{optional memo}} as memo.
@@ -194,6 +196,19 @@ summary: 'Settle the yield owed to the pool of {{nowrap pair_token}}'
 The token {{pair_token}} must be a yield pool. The WIRE the contract is owed by the pool's shadow token, computed from that token's public distribution state, is credited to the pool's other leg with no pair tokens minted, and the shadow token's claim action is called to deliver it. The delivery must match the credited amount exactly within the same transaction; otherwise the transaction fails. When nothing is owed the pools are not modified.
 
 The same settlement is performed immediately before every addliquidity and remliquidity on {{pair_token}}. No authorization is required.
+
+
+<h1 class="contract">fundyield</h1>
+
+---
+spec_version: "0.2.0"
+title: Fund yield
+summary: 'Announce {{nowrap quantity}} of shadow for the reservoir of {{nowrap pair_token}}'
+---
+
+{{from}} announces the transfer of exactly {{quantity}}, in the shadow symbol of the yield pool {{pair_token}}, to this contract. The transfer of {{quantity}} from {{from}} that follows, in this transaction or a later one, is added to the reservoir of {{pair_token}}, the shadow queued to be sold through the pool, and not to {{from}}'s extended balance. While the announcement is pending, any other transfer from {{from}} to this contract is refused. A new announcement by {{from}} replaces the pending one.
+
+Authorization of {{from}} is required.
 
 
 <h1 class="contract">changefee</h1>

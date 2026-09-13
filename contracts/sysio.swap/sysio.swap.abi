@@ -244,6 +244,48 @@
             ]
         },
         {
+            "name": "fund_receipt",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pair",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "quantity",
+                    "type": "extended_asset"
+                }
+            ]
+        },
+        {
+            "name": "funder_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "funder",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "fundyield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "from",
+                    "type": "name"
+                },
+                {
+                    "name": "pair_token",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
             "name": "inittoken",
             "base": "",
             "fields": [
@@ -414,6 +456,16 @@
             ]
         },
         {
+            "name": "reservoir",
+            "base": "",
+            "fields": [
+                {
+                    "name": "balance",
+                    "type": "extended_asset"
+                }
+            ]
+        },
+        {
             "name": "setconfig",
             "base": "",
             "fields": [
@@ -548,6 +600,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "fundyield",
+            "type": "fundyield",
+            "ricardian_contract": ""
+        },
+        {
             "name": "inittoken",
             "type": "inittoken",
             "ricardian_contract": ""
@@ -627,6 +684,14 @@
             "table_id": 54664
         },
         {
+            "name": "reservoirs",
+            "type": "reservoir",
+            "index_type": "i64",
+            "key_names": ["symbol_code"],
+            "key_types": ["uint64"],
+            "table_id": 43956
+        },
+        {
             "name": "stat",
             "type": "currency_stats",
             "index_type": "i64",
@@ -641,6 +706,14 @@
             "key_names": ["name"],
             "key_types": ["name"],
             "table_id": 40605
+        },
+        {
+            "name": "yieldfunds",
+            "type": "fund_receipt",
+            "index_type": "i64",
+            "key_names": ["funder"],
+            "key_types": ["name"],
+            "table_id": 29681
         },
         {
             "name": "yieldpairs",
