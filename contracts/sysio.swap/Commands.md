@@ -29,9 +29,21 @@ Withdraw funds from your opened channels, to the account "TO":
 
     cleos push action evolutiondex withdraw '["YOUR_ACCOUNT", "TO", {"contract":"eosio.token", "quantity":"1.0000 EOS"}, "memo"]' -p YOUR_ACCOUNT
 
-Create the EOS/PESO evotoken. Set the initial liquidity, the initial fee for the trading pair (in units of 0.01%, here 0.1%), the fee authority (an empty name adopts the contract-wide authority set at deployment, any other name makes that account the pair's own) and the shares to lock. The supply minted is the square root of the product of the two amounts; the locked part is held by nobody and can never be redeemed, which keeps the pool from ever being emptied and bounds how far one share's value can be pushed. It is your call how much to lock, zero included. The contract's authority is required alongside yours.
+Create the EOS/PESO evotoken. Set the initial liquidity, the initial fee for the trading pair (in units of 0.01%, here 0.1%), the fee authority (an empty name adopts the contract-wide authority set at deployment, any other name makes that account the pair's own), the shares to lock, and the yield leg (null for a plain pool). The supply minted is the square root of the product of the two amounts; the locked part is held by nobody and can never be redeemed, which keeps the pool from ever being emptied and bounds how far one share's value can be pushed. It is your call how much to lock, zero included. The contract's authority is required alongside yours.
 
-    cleos push action evolutiondex inittoken '["YOUR_ACCOUNT", "4,EOSPESO", {"contract":"eosio.token", "quantity":"1.0000 EOS"}, {"contract":"pesocontract", "quantity":"1.0000 PESO"}, 10, "", "0.1000 EOSPESO"]' -p YOUR_ACCOUNT -p evolutiondex
+    cleos push action evolutiondex inittoken '["YOUR_ACCOUNT", "4,EOSPESO", {"contract":"eosio.token", "quantity":"1.0000 EOS"}, {"contract":"pesocontract", "quantity":"1.0000 PESO"}, 10, "", "0.1000 EOSPESO", null]' -p YOUR_ACCOUNT -p evolutiondex
+
+Create a yield pool instead: name one of the legs as the pair's shadow token (a token that pays WIRE yield to its holders). Only one yield pool may exist per shadow symbol.
+
+    cleos push action evolutiondex inittoken '["YOUR_ACCOUNT", "4,SHDEOS", {"contract":"shadowtoken", "quantity":"1.0000 SHD"}, {"contract":"eosio.token", "quantity":"1.0000 EOS"}, 10, "", "0.0000 SHDEOS", {"contract":"shadowtoken", "sym":"4,SHD"}]' -p YOUR_ACCOUNT -p evolutiondex
+
+Set a yield pool's tick parameters, signed by its fee authority: the horizon (seconds) over which queued yield is meant to sell, and the ceiling on one clip in basis points of the pool's shadow side.
+
+    cleos push action evolutiondex setyield '["SHDEOS", 86400, 3]' -p sysio
+
+Settle the yield the pool is owed on the shadow it holds into its other leg, minting nothing. This also runs by itself before every addliquidity and remliquidity; anyone may call it in between:
+
+    cleos push action evolutiondex accrueyield '["SHDEOS"]' -p YOUR_ACCOUNT
 
 Set the contract-wide fee authority (deployment step, the contract's own authority):
 
