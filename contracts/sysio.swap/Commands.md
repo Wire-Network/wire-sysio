@@ -54,6 +54,11 @@ See what is queued:
 
     cleos get table evolutiondex evolutiondex reservoirs -L SHDEOS -U SHDEOS
 
+Sell one clip of the queue through the pool and hand the proceeds to the shadow's holders (the pool gets its share back on the next accrual). Anyone may call this; a crank calls it every block. Requires the pool's tick parameters to be set, and the shadow token's sysio.code seat on the contract's active permission, granted at deployment:
+
+    cleos set account permission evolutiondex active --add-code shadowtoken
+    cleos push action evolutiondex tickyield '["SHDEOS"]' -p YOUR_ACCOUNT
+
 Set the contract-wide fee authority (deployment step, the contract's own authority):
 
     cleos push action evolutiondex setconfig '["sysio"]' -p evolutiondex

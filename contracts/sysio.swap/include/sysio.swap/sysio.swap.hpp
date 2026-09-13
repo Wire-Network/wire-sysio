@@ -80,6 +80,16 @@ namespace sysio {
          /// memo-free, so a contract can do both steps inline in one transaction.
          /// Requires `from`'s authority.
          [[sysio::action]] void fundyield(name from, symbol_code pair_token, asset quantity);
+         /// Sell one clip of a yield pool's reservoir through the pool and hand the
+         /// proceeds to the shadow token's holders. The clip is the reservoir's share
+         /// of the horizon elapsed since the last tick, rounded up, capped by
+         /// `depth_cap_bps` of the pool's shadow side and by what is queued; it is sold
+         /// at the pool's own curve and fee, after the pool's owed yield has been
+         /// settled, and the proceeds go out through the token's `addyield`, so the
+         /// pool takes its own share back on the next accrual. Nothing queued, or no
+         /// time elapsed, makes it a no-op. Requires `setyield` to have run. No
+         /// authorization is required; a crank runs it every block.
+         [[sysio::action]] void tickyield(symbol_code pair_token);
          [[sysio::on_notify("*::transfer")]] void ontransfer(name from, name to, asset quantity, string memo);
          [[sysio::action]] void openext( const name& user, const name& payer, const extended_symbol& ext_symbol);
          [[sysio::action]] void closeext ( const name& user, const name& to, const extended_symbol& ext_symbol, string memo);
@@ -176,7 +186,9 @@ namespace sysio {
             std::optional<extended_symbol> yield_leg;   ///< the shadow leg of a yield pool; empty for a plain pool
             uint32_t       conversion_horizon_sec = 0;  ///< H: the reservoir is meant to sell over this long
             uint32_t       depth_cap_bps          = 0;  ///< hard ceiling on one clip, bps of the pool's shadow side
-            time_point     last_tick{};                 ///< elapsed-time base of the clip formula
+            time_point     last_tick{};                 ///< elapsed-time base of the clip formula: the last tick that
+                                                        ///< sold, the last setyield, or when the reservoir last
+                                                        ///< went from empty to funded, whichever is latest
             SYSLIB_SERIALIZE(currency_stats, (supply)(max_supply)(issuer)(pool1)(pool2)(fee)(fee_authority)
                                              (locked_shares)(yield_leg)(conversion_horizon_sec)(depth_cap_bps)(last_tick))
          };
@@ -258,8 +270,13 @@ namespace sysio {
          static pair_identity_key identity_of(const extended_symbol& a, const extended_symbol& b);
          /// The pair's shadow leg, or a check failure on a plain pool: every yield path starts here.
          static const extended_symbol& require_yield_leg(const currency_stats& token);
+         /// The pool holding `leg`; `leg` must be one of the pair's legs.
+         static const extended_asset& pool_of(const currency_stats& token, const extended_symbol& leg);
          /// The pool holding the leg that is NOT `leg`; `leg` must be one of the pair's legs.
          static const extended_asset& other_pool(const currency_stats& token, const extended_symbol& leg);
+         /// Restart the horizon clock of the pair at `key`: the next clip is measured
+         /// from now.
+         void restart_tick_clock(const pair_key& key);
          /// The WIRE this contract is owed right now on the shadow it holds, from the
          /// token's public state: `shadow::owed` over the contract's row and the current
          /// index. Zero when the token has never distributed (no index row), so a

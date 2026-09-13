@@ -182,7 +182,7 @@ title: Set yield parameters
 summary: 'Set the yield tick parameters of {{nowrap pair_token}}'
 ---
 
-The fee authority associated to the token {{pair_token}}, which must be a yield pool, authorizes to set the horizon of {{conversion_horizon_sec}} seconds over which the pool's queued yield is meant to sell, and the ceiling of {{depth_cap_bps}} basis points (at most 10000) of the pool's shadow side on one clip. Both must be nonzero before the pool's yield tick can run.
+The fee authority associated to the token {{pair_token}}, which must be a yield pool, authorizes to set the horizon of {{conversion_horizon_sec}} seconds over which the pool's queued yield is meant to sell, and the ceiling of {{depth_cap_bps}} basis points (at most 10000) of the pool's shadow side on one clip. Both must be nonzero before the pool's yield tick can run. The pair's tick clock restarts now.
 
 
 <h1 class="contract">accrueyield</h1>
@@ -206,9 +206,22 @@ title: Fund yield
 summary: 'Announce {{nowrap quantity}} of shadow for the reservoir of {{nowrap pair_token}}'
 ---
 
-{{from}} announces the transfer of exactly {{quantity}}, in the shadow symbol of the yield pool {{pair_token}}, to this contract. The transfer of {{quantity}} from {{from}} that follows, in this transaction or a later one, is added to the reservoir of {{pair_token}}, the shadow queued to be sold through the pool, and not to {{from}}'s extended balance. While the announcement is pending, any other transfer from {{from}} to this contract is refused. A new announcement by {{from}} replaces the pending one.
+{{from}} announces the transfer of exactly {{quantity}}, in the shadow symbol of the yield pool {{pair_token}}, to this contract. The transfer of {{quantity}} from {{from}} that follows, in this transaction or a later one, is added to the reservoir of {{pair_token}}, the shadow queued to be sold through the pool, and not to {{from}}'s extended balance. While the announcement is pending, any other transfer from {{from}} to this contract is refused. A new announcement by {{from}} replaces the pending one. When the delivery fills a reservoir that was empty, the pair's tick clock restarts.
 
 Authorization of {{from}} is required.
+
+
+<h1 class="contract">tickyield</h1>
+
+---
+spec_version: "0.2.0"
+title: Tick yield
+summary: 'Sell one clip of the reservoir of {{nowrap pair_token}} through the pool'
+---
+
+The token {{pair_token}} must be a yield pool whose tick parameters have been set. The yield owed to the pool is settled first, as in accrueyield. Then a clip of the reservoir is exchanged through the pool for the other leg, under the same conversion rules and fee as the exchange action with no minimum: the clip is the reservoir multiplied by the time elapsed since the pair's tick clock last advanced and divided by the conversion horizon, rounded upward, but at most the depth cap (in basis points of the pool's shadow side) and at most the reservoir. The clock then advances to now. The other-leg proceeds are handed to the shadow token's addyield action, which distributes them to every holder of the shadow; this contract, holding the pool's shadow, receives its share on a later accrual.
+
+When the reservoir is empty, or no time has elapsed since the clock last advanced, or the clip rounds to nothing, the pools, the reservoir and the clock are not modified. No authorization is required.
 
 
 <h1 class="contract">changefee</h1>
