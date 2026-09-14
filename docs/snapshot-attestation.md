@@ -135,8 +135,9 @@ A producer calls `regsnapprov` to designate a separate `snap_account` as its sna
 provider. A producer that currently holds no mapping must be registered (via `regproducer`),
 active, and ranked at or below `max_snap_provider_rank` (30). Rank is position in a walk that tests
 `is_schedulable`, so two conditions ride along with it: an ACTIVE `OPERATOR_TYPE_PRODUCER` row in
-sysio.opreg, and an active finalizer key. A producer missing either is absent from the ranked list
-and is refused with the rank error, which names rank for a cause that is not rank.
+sysio.opreg, and an active finalizer key. A producer missing either is absent from the ranked list,
+so the rejection re-tests the two non-rank conditions to report the one that actually applied --
+rank is what remains once both are excluded, not the answer given to all three.
 The gate keys on the ABSENCE OF A CURRENT MAPPING rather than on never having registered: a
 producer whose row was evicted by the capacity prune is gated again when it re-registers, while a
 producer that still holds one replaces it ungated, for the reason below.

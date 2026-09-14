@@ -150,7 +150,8 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     *
     * A producer that currently holds no mapping must be active and hold a rank position <=
     * max_snap_provider_rank. That walk tests `is_schedulable`, so operator-registry status and an
-    * active finalizer key are both consulted through it. When the table is full, stale producer
+    * active finalizer key are both consulted through it, and a rejection names which of the three
+    * conditions failed. When the table is full, stale producer
     * mappings are pruned lazily before enforcing the capacity limit -- a producer evicted that way
     * is gated again when it re-registers.
     *

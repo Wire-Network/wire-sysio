@@ -19,6 +19,8 @@ namespace snapshot_protocol = sysio::protocol::snapshot_attestation;
 constexpr char producer_not_registered_error[] = "producer is not registered";
 constexpr char producer_not_active_error[] = "producer is not active";
 constexpr char producer_rank_too_high_error[] = "producer rank exceeds maximum for snapshot providers";
+constexpr char producer_not_operator_error[] = "producer is not an active PRODUCER operator";
+constexpr char producer_no_finalizer_key_error[] = "producer has no active finalizer key";
 constexpr char provider_not_registered_error[] = "snap_account is not a registered snapshot provider";
 constexpr char provider_already_registered_error[] = "snap_account is already registered as a provider";
 constexpr char provider_capacity_error[] = "maximum registered snapshot providers reached";
@@ -39,8 +41,25 @@ constexpr char log_line_ending[] = "\n";
 enum class snapshot_producer_eligibility {
    eligible,
    inactive,
+   not_active_operator,
+   no_active_finalizer,
    rank_exceeds_maximum,
 };
+
+/// The assert message for a rejecting state, or nullptr when the producer is eligible.
+///
+/// Exhaustive over the enum rather than defaulted, so a state added later is a compiler diagnostic
+/// instead of a silent fall-through to the rank message.
+constexpr const char* snapshot_eligibility_error(snapshot_producer_eligibility eligibility) {
+   switch (eligibility) {
+      case snapshot_producer_eligibility::inactive:             return producer_not_active_error;
+      case snapshot_producer_eligibility::not_active_operator:  return producer_not_operator_error;
+      case snapshot_producer_eligibility::no_active_finalizer:  return producer_no_finalizer_key_error;
+      case snapshot_producer_eligibility::rank_exceeds_maximum: return producer_rank_too_high_error;
+      case snapshot_producer_eligibility::eligible:             break;
+   }
+   return nullptr;
+}
 
 /// The producers holding rank positions 1..max_snap_provider_rank, in rank order.
 ///
@@ -77,16 +96,37 @@ std::vector<name> snapshot_ranked_producers(name self) {
    return ranked;
 }
 
+/// Whether the producer qualifies to hold a mapping, by membership in `ranked` alone.
+///
+/// The PRUNE's predicate: it runs per retained row and only needs the verdict, so it stays free of
+/// the per-producer reads that naming a reason costs.
+bool is_snapshot_producer_eligible(const producer_info& producer, const std::vector<name>& ranked) {
+   return producer.active() && std::find(ranked.begin(), ranked.end(), producer.owner) != ranked.end();
+}
+
 /// Returns the producer-table eligibility required to acquire a mapping the producer lacks.
+///
+/// Absence from `ranked` does not say WHY: `snapshot_ranked_producers` drops a producer for missing
+/// operator standing or a missing finalizer key exactly as readily as for rank. So the two non-rank
+/// causes are re-tested here, through the same predicates the walk used, and rank is what remains
+/// once both are excluded. Those two reads are why this is the REGISTRANT's path only -- it runs
+/// once, for one producer, on a path that is already rejecting.
 snapshot_producer_eligibility get_snapshot_producer_eligibility(const producer_info& producer,
-                                                               const std::vector<name>& ranked) {
+                                                               const std::vector<name>& ranked,
+                                                               finalizers_table& finalizers) {
+   if (is_snapshot_producer_eligible(producer, ranked)) {
+      return snapshot_producer_eligibility::eligible;
+   }
    if (!producer.active()) {
       return snapshot_producer_eligibility::inactive;
    }
-   if (std::find(ranked.begin(), ranked.end(), producer.owner) == ranked.end()) {
-      return snapshot_producer_eligibility::rank_exceeds_maximum;
+   if (!producer_rank::is_eligible_operator(producer)) {
+      return snapshot_producer_eligibility::not_active_operator;
    }
-   return snapshot_producer_eligibility::eligible;
+   if (!producer_rank::active_finalizer(producer.owner, finalizers).has_value()) {
+      return snapshot_producer_eligibility::no_active_finalizer;
+   }
+   return snapshot_producer_eligibility::rank_exceeds_maximum;
 }
 
 /// Requires the producer's current table state to permit acquiring a mapping it lacks.
@@ -95,11 +135,13 @@ snapshot_producer_eligibility get_snapshot_producer_eligibility(const producer_i
 /// `regsnapprov` also needs the list for the capacity prune, and this walk is the expensive part
 /// of that user-signed action.
 void require_snapshot_producer_eligibility(name self, name producer, const std::vector<name>& ranked) {
-   producers_table producers(self);
+   producers_table  producers(self);
+   finalizers_table finalizers(self);
    const auto prod_itr = producers.require_find(producer_key_t{producer.value}, producer_not_registered_error);
-   const auto eligibility = get_snapshot_producer_eligibility(*prod_itr, ranked);
-   check(eligibility != snapshot_producer_eligibility::inactive, producer_not_active_error);
-   check(eligibility != snapshot_producer_eligibility::rank_exceeds_maximum, producer_rank_too_high_error);
+   const auto eligibility = get_snapshot_producer_eligibility(*prod_itr, ranked, finalizers);
+   if (const auto* error = snapshot_eligibility_error(eligibility)) {
+      check(false, error);
+   }
 }
 
 /// Credit every producer whose vote contributed to a quorum-reaching snapshot record.
@@ -147,8 +189,7 @@ void prune_stale_snapshot_providers_if_full(name self, snap_providers_table& pro
    auto              provider_itr = providers.begin();
    while (provider_itr != providers.end()) {
       const auto producer_itr = producers.try_get(producer_key_t{provider_itr->producer.value});
-      if (!producer_itr
-          || get_snapshot_producer_eligibility(*producer_itr, ranked) != snapshot_producer_eligibility::eligible) {
+      if (!producer_itr || !is_snapshot_producer_eligible(*producer_itr, ranked)) {
          const name stale_producer = provider_itr->producer;
          const name stale_snap_account = provider_itr->snap_account;
          provider_itr = providers.erase(std::move(provider_itr));

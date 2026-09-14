@@ -459,16 +459,31 @@ BOOST_FIXTURE_TEST_CASE(regsnapprov_unregistered_producer, snapshot_attest_teste
                         regsnapprov("alice1111111"_n, "snapprov1"_n));
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(regsnapprov_rank_too_high, snapshot_attest_tester) { try {
-   create_account("highrank"_n, config::system_account_name, false, false, true, true);
+/// A registered producer with no operator row holds no rank position, and the rejection says so
+/// rather than blaming rank -- the two are reached through the same absence from the ranked walk.
+BOOST_FIXTURE_TEST_CASE(regsnapprov_rejects_non_operator, snapshot_attest_tester) { try {
+   create_account("nonoperator"_n, config::system_account_name, false, false, true, true);
    produce_blocks();
-   regproducer("highrank"_n);
-   // No opreg operator row and no finalizer key, so it occupies no rank position at all -- which
-   // is exactly the "outside the eligible band" case this rejects.
+   regproducer("nonoperator"_n);
    produce_blocks();
 
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer rank exceeds maximum for snapshot providers"),
-                        regsnapprov("highrank"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer is not an active PRODUCER operator"),
+                        regsnapprov("nonoperator"_n, "snapprov1"_n));
+   BOOST_REQUIRE(get_snap_provider("snapprov1"_n).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// The other half of the same split: operator standing satisfied, finalizer key missing. Both land
+/// outside `ranked`, so before the causes were separated both reported the rank error.
+BOOST_FIXTURE_TEST_CASE(regsnapprov_rejects_producer_without_finalizer_key, snapshot_attest_tester) { try {
+   create_account("nofinkey"_n, config::system_account_name, false, false, true, true);
+   produce_blocks();
+   regproducer("nofinkey"_n);
+   register_producer_operators({"nofinkey"_n});
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer has no active finalizer key"),
+                        regsnapprov("nofinkey"_n, "snapprov1"_n));
+   BOOST_REQUIRE(get_snap_provider("snapprov1"_n).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(regsnapprov_rejects_inactive_producer, snapshot_attest_tester) { try {
