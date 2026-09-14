@@ -307,9 +307,13 @@ namespace sysio {
          /// rate and the quote are both nonzero), and must reach `min_expected`.
          /// Moves the pools and returns the extended asset the user receives.
          extended_asset process_exch(symbol_code evo_token, extended_asset paying, asset min_expected);
-         /// Liquidity pricing: `x * y / z` rounded the pool's way -- up when `x > 0`
-         /// (a leg the user pays), down when `x < 0` (a leg the user receives) -- plus
-         /// `fee` (in 1/FEE_DENOMINATOR units) of that amount, rounded up.
+         /// Liquidity pricing for one leg: what `x` shares are worth of a pool side
+         /// holding `y` against a supply of `z`, signed the way `add_signed_liq` reads
+         /// it -- positive is a leg the user pays, negative one they receive. The
+         /// proportional slice itself is amm::in_given_shares / amm::out_given_shares,
+         /// which round the pool's way; this adds the sign, the bounds that keep the
+         /// result inside an asset, and `fee` (in 1/FEE_DENOMINATOR units) of that
+         /// amount, rounded up.
          int64_t compute(int64_t x, int64_t y, int64_t z, int fee);
          /// The liquidity fee: `fee`/FEE_DENOMINATOR of `amount`, rounded up so a
          /// non-zero amount never pays a zero fee. `amount` must be nonnegative.

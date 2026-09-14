@@ -360,4 +360,72 @@ BOOST_AUTO_TEST_CASE(geometric_mean_seeds_by_sqrt_of_the_product) {
    BOOST_CHECK(geometric_mean(0, 5) == 0);
 }
 
+/// The largest amount an on-chain asset can hold, which is what bounds every
+/// input the pool-share slices are called with. Spelled here because this suite
+/// tests the shared kernel and links no contract.
+static constexpr uint64_t MAX_ASSET = (1ULL << 62) - 1;   // sysio::asset::max_amount
+
+/// Minting rounds up and burning rounds down, so the pool keeps the remainder
+/// in both directions.
+BOOST_AUTO_TEST_CASE(share_slices_round_toward_the_pool) {
+   // Exact division: nothing to round, so the two agree.
+   BOOST_CHECK(in_given_shares(1000, 100, 10)  == 100u);
+   BOOST_CHECK(out_given_shares(1000, 100, 10) == 100u);
+   // A remainder splits them by exactly one unit, each the pool's way.
+   BOOST_CHECK(in_given_shares(1001, 100, 10)  == 101u);   // 100.1
+   BOOST_CHECK(out_given_shares(1001, 100, 10) == 100u);
+   // The whole supply is worth the whole pool, exactly, either way.
+   BOOST_CHECK(in_given_shares(1234567, 8910, 8910)  == 1234567u);
+   BOOST_CHECK(out_given_shares(1234567, 8910, 8910) == 1234567u);
+   // A slice below one unit still costs one to mint and returns nothing to
+   // burn: dust cannot be minted for free, nor extracted.
+   BOOST_CHECK(in_given_shares(5, 1'000'000, 1)  == 1u);
+   BOOST_CHECK(out_given_shares(5, 1'000'000, 1) == 0u);
+}
+
+/// Degenerate inputs return 0 rather than dividing by zero or, for the ceiling,
+/// wrapping on `prod - 1`.
+BOOST_AUTO_TEST_CASE(share_slices_degenerate_inputs) {
+   BOOST_CHECK(in_given_shares(0, 100, 10)  == 0u);    // empty pool side
+   BOOST_CHECK(out_given_shares(0, 100, 10) == 0u);
+   BOOST_CHECK(in_given_shares(1000, 0, 10)  == 0u);   // no supply to divide by
+   BOOST_CHECK(out_given_shares(1000, 0, 10) == 0u);
+   BOOST_CHECK(in_given_shares(1000, 100, 0)  == 0u);  // no shares
+   BOOST_CHECK(out_given_shares(1000, 100, 0) == 0u);
+}
+
+/// The slice genuinely outgrows 64 bits, which is why it is returned as `u128`
+/// and bounding it is the caller's job.
+BOOST_AUTO_TEST_CASE(share_slices_exceed_64_bits) {
+   const u128 whole = static_cast<u128>(MAX_ASSET) * MAX_ASSET;
+   BOOST_CHECK(whole > static_cast<u128>(std::numeric_limits<uint64_t>::max()));
+   BOOST_CHECK(in_given_shares(MAX_ASSET, 1, MAX_ASSET)  == whole);
+   BOOST_CHECK(out_given_shares(MAX_ASSET, 1, MAX_ASSET) == whole);
+   // The ceiling's `+ supply - 1` cannot carry past `u128` even with every
+   // input at its maximum.
+   BOOST_CHECK(in_given_shares(MAX_ASSET, MAX_ASSET, MAX_ASSET) == static_cast<u128>(MAX_ASSET));
+}
+
+/// Across a wide random grid: each side is tight against the true quotient, and
+/// the two differ by one unit exactly when there is a remainder to split.
+BOOST_AUTO_TEST_CASE(share_slices_invariants) {
+   std::mt19937_64 rng(0x5348'4152'4553'0000ULL);
+   // Log-uniform inside the asset range, so dust and maxima are both frequent.
+   auto draw = [&]() -> uint64_t {
+      const uint64_t v = (rng() >> (rng() % 63)) & MAX_ASSET;
+      return v == 0 ? 1 : v;
+   };
+   for (int i = 0; i < 20000; ++i) {
+      const uint64_t pool = draw(), supply = draw(), shares = draw();
+      const u128 up   = in_given_shares(pool, supply, shares);
+      const u128 down = out_given_shares(pool, supply, shares);
+      const u128 prod = static_cast<u128>(shares) * pool;
+      BOOST_REQUIRE(down * supply <= prod);            // the floor never overshoots
+      BOOST_REQUIRE(prod - down * supply < supply);    // ...and is tight
+      BOOST_REQUIRE(up * supply >= prod);              // the ceiling never undershoots
+      if (prod % supply == 0) BOOST_REQUIRE(up == down);
+      else                    BOOST_REQUIRE(up == down + 1);
+   }
+}
+
 BOOST_AUTO_TEST_SUITE_END()
