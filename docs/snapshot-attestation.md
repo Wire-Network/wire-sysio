@@ -134,6 +134,7 @@ A producer calls `regsnapprov` to designate a separate `snap_account` as its sna
 provider. The producer must be registered (via `regproducer`), active, and ranked at or below
 `max_snap_provider_rank` (30) when the mapping is created. This producer-table check is the
 registration trust gate; operator-registry status is deliberately not an additional dependency.
+It gates CREATING a mapping only -- replacing one is not gated, for the reason below.
 Eligibility is not rechecked while voting, so a provider that was valid when registered keeps a
 stable delegation through ordinary producer churn.
 
@@ -148,6 +149,12 @@ the snapshot node -- only the snap_account's key does.
 Calling `regsnapprov` again with the same pair is idempotent. Calling it with a new snap_account
 atomically replaces that producer's old mapping. Votes store producer identities, so rotating the
 signing account neither retracts an accepted vote nor allows the producer to vote twice.
+
+Rotation is not eligibility-gated, because `regsnapprov` is the only action that can replace a
+mapping: a producer that has since gone inactive or fallen outside the rank band must still be able
+to revoke a compromised `snap_account`, and the prune is out of reach below 30 rows. The rotation
+replaces that producer's single row, so it grants nothing a new registration would -- and a new
+mapping from an ineligible producer is still rejected.
 
 ### Voting and quorum
 

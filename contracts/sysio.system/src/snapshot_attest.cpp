@@ -42,18 +42,17 @@ enum class snapshot_producer_eligibility {
    rank_exceeds_maximum,
 };
 
-/// Returns the producer-table eligibility used only when a provider mapping is registered.
+/// The producers holding rank positions 1..max_snap_provider_rank, in rank order.
 ///
 /// `rank` is no longer a stored field -- it is POSITION in the "prodrank" index among schedulable
 /// producers. So the rank gate is a bounded walk of at most `max_snap_provider_rank` schedulable
 /// entries, testing membership, rather than a point read. Counting matches (rather than taking the
 /// first N index entries) is what stops unbonded registrants -- which occupy index slots but can
 /// never be scheduled -- from crowding real producers out of snapshot-provider eligibility.
-/// The producers holding rank positions 1..max_snap_provider_rank, in rank order.
 ///
-/// Computed ONCE per ACTION -- `regsnapprov` walks it here and threads the result through both the
-/// eligibility check and the capacity prune -- then tested for membership rather than re-walked per
-/// producer, which would make the prune's max_snap_providers entries quadratic.
+/// Computed ONCE per ACTION -- `regsnapprov` walks it on the CREATE path and threads the result
+/// through both the eligibility check and the capacity prune -- then tested for membership rather
+/// than re-walked per producer, which would make the prune's max_snap_providers entries quadratic.
 std::vector<name> snapshot_ranked_producers(name self) {
    producers_table  producers(self);
    finalizers_table finalizers(self);
@@ -78,7 +77,7 @@ std::vector<name> snapshot_ranked_producers(name self) {
    return ranked;
 }
 
-/// Returns the producer-table eligibility used only when a provider mapping is registered.
+/// Returns the producer-table eligibility required to CREATE a provider mapping.
 snapshot_producer_eligibility get_snapshot_producer_eligibility(const producer_info& producer,
                                                                const std::vector<name>& ranked) {
    if (!producer.active()) {
@@ -90,10 +89,11 @@ snapshot_producer_eligibility get_snapshot_producer_eligibility(const producer_i
    return snapshot_producer_eligibility::eligible;
 }
 
-/// Requires the producer's current table state to permit snapshot-provider registration.
+/// Requires the producer's current table state to permit CREATING a provider mapping.
 ///
-/// Takes `ranked` rather than walking for it: `regsnapprov` also needs the list for the capacity
-/// prune, and this walk is the expensive part of that user-signed action.
+/// Not applied to a rotation -- see `regsnapprov`. Takes `ranked` rather than walking for it:
+/// `regsnapprov` also needs the list for the capacity prune, and this walk is the expensive part
+/// of that user-signed action.
 void require_snapshot_producer_eligibility(name self, name producer, const std::vector<name>& ranked) {
    producers_table producers(self);
    const auto prod_itr = producers.require_find(producer_key_t{producer.value}, producer_not_registered_error);
@@ -198,11 +198,6 @@ void finalize_snapshot_vote(name self, uint32_t block_num, const checksum256& bl
 void snapshot_attest::regsnapprov(name producer, name snap_account) {
    require_auth(producer);
 
-   // Walked ONCE and shared with the capacity prune below -- the walk is bounded but expensive,
-   // and this is a user-signed action.
-   const auto ranked = snapshot_ranked_producers(get_self());
-   require_snapshot_producer_eligibility(get_self(), producer, ranked);
-
    snap_providers_table providers(get_self());
    const auto provider_itr = providers.find(snap_provider_key_t{snap_account.value});
    if (provider_itr != providers.end()) {
@@ -213,8 +208,17 @@ void snapshot_attest::regsnapprov(name producer, name snap_account) {
    auto by_producer = providers.get_index<snapshot_index::by_producer>();
    auto producer_itr = by_producer.find(producer.value);
    if (producer_itr != by_producer.end()) {
+      // ROTATION is deliberately UN-gated. This action is the only one that can replace a mapping,
+      // so gating it would strand a producer that has since gone inactive or lost its rank position
+      // with a compromised snap_account it cannot revoke -- the prune is out of reach below
+      // max_snap_providers. The erase keeps both the row count and this producer's single vote
+      // unchanged, so an ineligible rotation grants nothing a new registration would.
       by_producer.erase(std::move(producer_itr));
    } else {
+      // CREATE is gated, and gated BEFORE the prune so a rejected registration never erases
+      // another producer's mapping. The walk is bounded but expensive, so the prune shares it.
+      const auto ranked = snapshot_ranked_producers(get_self());
+      require_snapshot_producer_eligibility(get_self(), producer, ranked);
       prune_stale_snapshot_providers_if_full(get_self(), providers, ranked);
    }
    check(count_snapshot_providers(providers) < max_snap_providers, provider_capacity_error);

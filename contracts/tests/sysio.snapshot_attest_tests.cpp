@@ -479,6 +479,37 @@ BOOST_FIXTURE_TEST_CASE(regsnapprov_rejects_inactive_producer, snapshot_attest_t
    BOOST_REQUIRE(get_snap_provider("snapprov1"_n).is_null());
 } FC_LOG_AND_RETHROW() }
 
+/// An ineligible producer keeps the one path that can retire its mapping. The same producer is
+/// refused a NEW mapping by `regsnapprov_rejects_inactive_producer` above -- the gate is on
+/// creation, not on replacement.
+BOOST_FIXTURE_TEST_CASE(regsnapprov_rotates_for_ineligible_producer, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
+
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov2"_n));
+   BOOST_REQUIRE(get_snap_provider("snapprov1"_n).is_null());
+   const auto rotated_provider = get_snap_provider("snapprov2"_n);
+   BOOST_REQUIRE(!rotated_provider.is_null());
+   BOOST_REQUIRE_EQUAL("producer1", rotated_provider["producer"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+/// The un-gated rotation must not become a way to gain weight: it can neither take a mapping the
+/// producer does not own nor leave it holding two.
+BOOST_FIXTURE_TEST_CASE(regsnapprov_ineligible_rotation_grants_no_extra_mapping,
+                        snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
+
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is already registered as a provider"),
+                        regsnapprov("producer1"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL("producer2", get_snap_provider("snapprov2"_n)["producer"].as_string());
+
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov3"_n));
+   BOOST_REQUIRE(get_snap_provider("snapprov1"_n).is_null());
+   BOOST_REQUIRE_EQUAL("producer1", get_snap_provider("snapprov3"_n)["producer"].as_string());
+} FC_LOG_AND_RETHROW() }
+
 // ---------------------------------------------------------------------------
 // setsnpcfg tests
 // ---------------------------------------------------------------------------
@@ -525,6 +556,26 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_preserves_registered_authority_after_produc
    const auto snapshot_hash = make_snap_hash(9);
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
    BOOST_REQUIRE(getsnaphash(block_num).is_null());
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// Revocation reaches the vote: an ineligible producer rotates away from a compromised
+/// snap_account, and that account can no longer cast the vote its mapping used to carry.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_the_rotated_away_snap_account, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
+   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov2"_n));
+
+   const auto block_num = vote_block_num();
+   const auto block_id = make_block_id(block_num);
+   const auto snapshot_hash = make_snap_hash(11);
+
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is not a registered snapshot provider"),
+                        votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
+
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
    BOOST_REQUIRE(!getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
