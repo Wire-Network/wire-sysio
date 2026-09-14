@@ -727,24 +727,43 @@ BOOST_AUTO_TEST_CASE(test_corrupt_permission_parent_in_snapshot_rejected)
          ("sections", std::move(new_sections));
    };
 
-   // Parent cycle: custa's parent rewritten to custb while custb's parent is custa. custa loads
-   // first, custb is not yet present, so the load must fail on the unresolvable parent.
-   fc::variant cyclic = mutate_parent("custa", "custb");
-   BOOST_REQUIRE_EXCEPTION(
-      snapshotted_tester(chain.get_config(), variant_snapshot_suite::get_reader(cyclic), 0),
-      snapshot_exception,
-      [](const snapshot_exception& e) {
-         return e.to_detail_string().find("victim@custa references parent custb") != std::string::npos;
-      });
+   /// Load `mutated`, require it is rejected with a snapshot_exception, and hand back the
+   /// detail string. Returning it lets the caller assert on the message with
+   /// BOOST_REQUIRE_MESSAGE, so a mismatch reports what was actually thrown -- a
+   /// BOOST_REQUIRE_EXCEPTION predicate only echoes its own source, which leaves a
+   /// failure here naming none of the three snapshot_exceptions this path can raise.
+   auto rejected_detail = [&](const fc::variant& mutated, uint32_t ordinal) {
+      try {
+         snapshotted_tester(chain.get_config(), variant_snapshot_suite::get_reader(mutated), ordinal);
+      } catch (const snapshot_exception& e) {
+         return e.to_detail_string();
+      }
+      BOOST_FAIL("corrupt snapshot was accepted; expected a snapshot_exception");
+      return std::string{};
+   };
+
+   // Parent cycle: custa's parent rewritten to custb while custb's parent is custa. The
+   // loader rejects at whichever member it reaches first, and BOTH are correct detections
+   // of the same cycle -- so accept either spelling. Pinning one made this case depend on
+   // the order permission rows happen to occupy in the snapshot.
+   //
+   // Still requires the parent-resolution message specifically: the other two rejections
+   // reachable here (invalid authority, and the "higher id" row-order guard) would mean
+   // something other than the cycle stopped the load, and must not satisfy this case.
+   const std::string cyclic_detail = rejected_detail(mutate_parent("custa", "custb"), 0);
+   BOOST_REQUIRE_MESSAGE(
+      cyclic_detail.find("victim@custa references parent custb") != std::string::npos ||
+      cyclic_detail.find("victim@custb references parent custa") != std::string::npos,
+      "expected a parent-resolution rejection naming one end of the custa/custb cycle, got: "
+         << cyclic_detail);
 
    // Dangling parent: references a permission name that exists nowhere in the snapshot.
-   fc::variant dangling = mutate_parent("custb", "nosuchperm");
-   BOOST_REQUIRE_EXCEPTION(
-      snapshotted_tester(chain.get_config(), variant_snapshot_suite::get_reader(dangling), 1),
-      snapshot_exception,
-      [](const snapshot_exception& e) {
-         return e.to_detail_string().find("victim@custb references parent nosuchperm") != std::string::npos;
-      });
+   // Only custb is rewritten and nosuchperm resolves for no row, so there is no second
+   // candidate -- this one stays pinned.
+   const std::string dangling_detail = rejected_detail(mutate_parent("custb", "nosuchperm"), 1);
+   BOOST_REQUIRE_MESSAGE(
+      dangling_detail.find("victim@custb references parent nosuchperm") != std::string::npos,
+      "expected a dangling-parent rejection naming victim@custb, got: " << dangling_detail);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
