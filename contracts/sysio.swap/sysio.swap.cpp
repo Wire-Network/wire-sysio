@@ -57,6 +57,7 @@ void swap::ontransfer(name from, name to, asset quantity, string memo) {
     check(quantity.amount >= 0, "quantity must be positive");
 
     auto incoming = extended_asset{quantity, get_first_receiver()};
+    require_deposit_token( incoming.get_extended_symbol() );
     // A payout this contract claimed from a shadow token and already credited to
     // the pool: match it against the receipt and retire the receipt. Nothing
     // else is accepted from a contract with a claim outstanding.
@@ -260,11 +261,26 @@ void swap::memoexchange(name user, extended_asset ext_asset_in, string_view deta
       std::make_tuple( get_self(), user, ext_asset_out.quantity, std::string(memo)) ).send();
 }
 
-void swap::setconfig(name fee_authority) {
+void swap::setconfig(name fee_authority, extended_symbol system_token) {
     require_auth( get_self() );
     check( is_account( fee_authority ), "fee authority account does not exist" );
+    check( is_account( system_token.get_contract() ), "system token contract does not exist" );
+    check( system_token.get_symbol().is_valid(), "invalid system token symbol" );
     swapconfig_t config( get_self() );
-    config.set( swap_config{ fee_authority }, get_self() );
+    config.set( swap_config{ fee_authority, system_token }, get_self() );
+}
+
+swap::swap_config swap::configured() const {
+    swapconfig_t config( get_self() );
+    return config.get( "swap not configured" );
+}
+
+void swap::require_deposit_token(const extended_symbol& token) const {
+    const swap_config cfg = configured();
+    if (token == cfg.system_token) return;
+    evoindexes indextable( get_self() );
+    if (indextable.contains( identity_of( token, cfg.system_token ) )) return;
+    check( has_auth( get_self() ), "token is not a leg of any pair" );
 }
 
 void swap::inittoken(name user, symbol new_symbol, extended_asset initial_pool1,
@@ -284,22 +300,21 @@ std::optional<extended_symbol> yield_leg)
     check( locked_shares.amount >= 0, "locked_shares must be nonnegative" );
     check( locked_shares.amount < new_token.amount, "locked_shares must leave the creator at least one share" );
     check( initial_pool1.get_extended_symbol() != initial_pool2.get_extended_symbol(), "extended symbols must be different");
+    const swap_config cfg = configured();
+    check( initial_pool2.get_extended_symbol() == cfg.system_token, "the second leg must be the system token" );
     stats statstable( get_self() );
     const pair_key key{ new_symbol.code().raw() };
     check ( !statstable.contains( key ), "token symbol already exists" );
     if (yield_leg) {
-        check( *yield_leg == initial_pool1.get_extended_symbol() || *yield_leg == initial_pool2.get_extended_symbol(),
-               "yield_leg must be one of the pair's legs" );
-        yieldpairs yieldtable( get_self() );
-        yieldtable.emplace( user, key_of(*yield_leg), yield_pair{ new_symbol.code() },
-                            "a yield pool already exists for this symbol" );
+        // Pairs are unique per first leg, so this is also the only yield pool the
+        // shadow can have.
+        check( *yield_leg == initial_pool1.get_extended_symbol(), "yield_leg must be the pair's first leg" );
         reservoirs reservoir_table( get_self() );
         reservoir_table.emplace( user, key, reservoir{ extended_asset{ 0, *yield_leg } } );
     }
     check( 0 <= initial_fee && initial_fee <= MAX_FEE, "fee out of range" );
     if (fee_authority == name{}) {
-        swapconfig_t config( get_self() );
-        fee_authority = config.get( "fee authority not configured" ).fee_authority;
+        fee_authority = cfg.fee_authority;
     } else {
         check( is_account( fee_authority ), "fee authority account does not exist" );
     }

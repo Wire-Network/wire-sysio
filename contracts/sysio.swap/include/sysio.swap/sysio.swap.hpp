@@ -41,22 +41,30 @@ namespace sysio {
          static constexpr uint64_t MIN_SWAP_FEE = 1;
 
          using contract::contract;
-         /// Set the contract-wide fee authority: the account whose signature `changefee`
-         /// requires for every pair that did not name its own at creation. Governance
-         /// executes approved proposals as `sysio`, so deployment sets it to `sysio`.
-         /// Requires the contract's own authority.
-         [[sysio::action]] void setconfig(name fee_authority);
-         /// Create a pair, minting sqrt(pool1 * pool2) LP shares. `initial_fee` may be
-         /// anything in [0, MAX_FEE]. An empty `fee_authority` adopts the configured one;
-         /// a name overrides it for this pair. `locked_shares` (in the new symbol, below
-         /// the minted amount) are held by no account and can never be redeemed: they
-         /// keep the pool from ever being emptied and bound how far the value of one
-         /// share can be pushed. Seed-time attacks victimise the creator, so the size
-         /// of the lock is the creator's call; zero is allowed.
-         /// `yield_leg`, when set, names the pair's shadow token (one of its two legs)
-         /// and makes it a yield pool: the pool absorbs the WIRE yield distributed on
-         /// the shadow it holds, and sells queued yield shadow through itself. At most
-         /// one yield pool may exist per shadow symbol. Empty makes a plain pool.
+         /// Deployment configuration, required before anything else works. The fee
+         /// authority is the account whose signature `changefee` requires for every
+         /// pair that did not name its own at creation; governance executes approved
+         /// proposals as `sysio`, so deployment sets it to `sysio`. The system token
+         /// (WIRE) is the second leg of every pair, which is what lets a transfer be
+         /// recognised without an index: a token is accepted if it is the system token
+         /// or the first leg of the one pair it can form with it. Requires the
+         /// contract's own authority.
+         [[sysio::action]] void setconfig(name fee_authority, extended_symbol system_token);
+         /// Create a pair, minting sqrt(pool1 * pool2) LP shares. `initial_pool2` must
+         /// be in the system token; `initial_pool1` is the pair's own token, and since
+         /// pairs are unique there is exactly one pair per such token. `initial_fee`
+         /// may be anything in [0, MAX_FEE]. An empty `fee_authority` adopts the
+         /// configured one; a name overrides it for this pair. `locked_shares` (in the
+         /// new symbol, below the minted amount) are held by no account and can never
+         /// be redeemed: they keep the pool from ever being emptied and bound how far
+         /// the value of one share can be pushed. Seed-time attacks victimise the
+         /// creator, so the size of the lock is the creator's call; zero is allowed.
+         /// `yield_leg`, when set, must be the first leg and names it as a shadow
+         /// token, making the pair a yield pool: the pool absorbs the WIRE yield
+         /// distributed on the shadow it holds, and sells queued yield shadow through
+         /// itself. Empty makes a plain pool. The first leg's seed must already be on
+         /// deposit, which a transfer carrying this contract's authority can make
+         /// before the pair exists.
          [[sysio::action]] void inittoken(name user, symbol new_symbol,
            extended_asset initial_pool1, extended_asset initial_pool2,
            int initial_fee, name fee_authority, asset locked_shares,
@@ -160,8 +168,9 @@ namespace sysio {
 
          /// Contract-wide configuration, set on deployment by `setconfig`.
          struct [[sysio::table("swapconfig")]] swap_config {
-            name fee_authority;
-            SYSLIB_SERIALIZE(swap_config, (fee_authority))
+            name            fee_authority;
+            extended_symbol system_token;   ///< the second leg of every pair
+            SYSLIB_SERIALIZE(swap_config, (fee_authority)(system_token))
          };
 
          struct [[sysio::table("accounts")]] account {
@@ -191,13 +200,6 @@ namespace sysio {
                                                         ///< went from empty to funded, whichever is latest
             SYSLIB_SERIALIZE(currency_stats, (supply)(max_supply)(issuer)(pool1)(pool2)(fee)(fee_authority)
                                              (locked_shares)(yield_leg)(conversion_horizon_sec)(depth_cap_bps)(last_tick))
-         };
-
-         /// One yield pool per shadow symbol: keyed by the shadow's extended symbol,
-         /// this is also the lookup from a shadow symbol to its pair.
-         struct [[sysio::table("yieldpairs")]] yield_pair {
-            symbol_code pair;
-            SYSLIB_SERIALIZE(yield_pair, (pair))
          };
 
          /// A yield payout the contract has claimed and credited to `pair` but not yet
@@ -256,7 +258,6 @@ namespace sysio {
          using stats       = kv::table<"stat"_n,       pair_key,          currency_stats>;
          using evoindexes  = kv::table<"evoindex"_n,   pair_identity_key, pair_index>;
          using priceaccums = kv::table<"priceaccum"_n, pair_key,          price_accumulator>;
-         using yieldpairs  = kv::table<"yieldpairs"_n, extended_symbol_key, yield_pair>;
          using yieldpayouts = kv::table<"yieldpayouts"_n, contract_key, payout_receipt>;
          using yieldfunds   = kv::table<"yieldfunds"_n,   funder_key,   fund_receipt>;
          using reservoirs   = kv::table<"reservoirs"_n,   pair_key,     reservoir>;
@@ -264,6 +265,14 @@ namespace sysio {
          // implementation file: an alias declared here would make the ABI generator
          // list them as this contract's.)
 
+         /// The deployment configuration, or a check failure before `setconfig` has run.
+         swap_config configured() const;
+         /// Refuse a transfer of anything this contract does not trade: `token` must be
+         /// the system token or the first leg of the pair it forms with the system
+         /// token (one lookup in the pair index, no table of its own). A first leg's
+         /// seed lands before its pair exists, so a transfer carrying this contract's
+         /// authority, the authority that creates pairs, is accepted regardless.
+         void require_deposit_token(const extended_symbol& token) const;
          /// The deposit-row key of an extended symbol.
          static extended_symbol_key key_of(const extended_symbol& ext_symbol);
          /// The uniqueness-row key of a pair, in canonical leg order.

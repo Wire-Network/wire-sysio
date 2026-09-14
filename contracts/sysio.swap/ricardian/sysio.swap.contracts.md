@@ -43,7 +43,9 @@ summary: 'Deposit or exchange upon a transfer from {{nowrap user}}'
 
 This action is executed as a response to a notification of a transfer action with the input {{from}}, {{to}}, {{quantity}}, {{memo}} in that order. 
 
-The default response is to deposit {{quantity}} to {{from}}'s extended balance for the extended symbol formed by the tranfer's contract and the symbol {{asset_to_symbol quantity}}. This is only possible if such extended balance previously exists.
+The transfer is accepted only if the extended symbol formed by the transfer's contract and the symbol {{asset_to_symbol quantity}} is the system token set by setconfig, or is the first leg of the pair it forms with the system token, or the transfer carries this contract's authority (the authority that creates pairs, so that a pair's first leg can be seeded before the pair exists). Any other transfer fails.
+
+The default response is to deposit {{quantity}} to {{from}}'s extended balance for that extended symbol. This is only possible if such extended balance previously exists.
 
 If {{memo}} starts with "deposit to:", the account {{from}} will be replaced by the subsequent content of {{memo}} whenever it is possible.
 
@@ -77,13 +79,13 @@ title: Initialize token
 summary: 'Initializes an evotoken by setting initial pair of token pools'
 ---
 
-{{user}} agrees to initialize a pair token with symbol {{new_symbol}}, with the following initial parameters: pool1 = {{initial_pool1}}, pool2 = {{initial_pool2}}, fee = {{initial_fee}} (in units of 1/10000, at most 9999), fee_authority = {{fee_authority}}. The extended assets {{initial_pool1}} and {{initial_pool2}} will be deducted from the corresponding extended balances of {{user}}.
+{{user}} agrees to initialize a pair token with symbol {{new_symbol}}, with the following initial parameters: pool1 = {{initial_pool1}}, pool2 = {{initial_pool2}}, fee = {{initial_fee}} (in units of 1/10000, at most 9999), fee_authority = {{fee_authority}}. {{initial_pool2}} must be in the system token set by setconfig; {{initial_pool1}} is the pair's own token, and a token can form only one pair. The extended assets {{initial_pool1}} and {{initial_pool2}} will be deducted from the corresponding extended balances of {{user}}.
 
 The fee authority is the account whose authorization the changefee action requires for this pair. An empty {{fee_authority}} adopts the contract-wide fee authority set by setconfig; any other name makes that account the pair's own.
 
 The pair token supply minted is the square root of the product of the two initial pool amounts, rounded downward. Of it, {{locked_shares}} are held by no account and can never be redeemed, so the pools always retain the value those shares represent; the remainder is credited to {{user}}. {{locked_shares}} must be less than the amount minted.
 
-If {{yield_leg}} is given it must be one of the two legs, and the pair becomes a yield pool on that shadow token: the yield the contract is owed on the shadow it holds is settled into the other leg without minting, before every addliquidity and remliquidity and on accrueyield. Only one yield pool may exist for a given shadow token. Without {{yield_leg}} the pair is a plain pool.
+If {{yield_leg}} is given it must be the first leg, and the pair becomes a yield pool on that shadow token: the yield the contract is owed on the shadow it holds is settled into the second leg without minting, before every addliquidity and remliquidity and on accrueyield. Without {{yield_leg}} the pair is a plain pool.
 
 RAM will be deducted from {{user}}’s resources to create the necessary records.
 Authorization of {{user}} and of the contract is required.
@@ -241,10 +243,10 @@ to change the fee parameter associated to the same token, to the value {{newfee}
 ---
 spec_version: "0.2.0"
 title: Set configuration
-summary: 'Set the contract-wide fee authority to {{nowrap fee_authority}}'
+summary: 'Set the fee authority to {{nowrap fee_authority}} and the system token to {{nowrap system_token}}'
 ---
 
-The contract sets {{fee_authority}} as the account whose authorization the changefee action requires for every pair created afterwards without a fee authority of its own. Pairs already created keep the authority they were created with.
+The contract sets {{fee_authority}} as the account whose authorization the changefee action requires for every pair created afterwards without a fee authority of its own, and {{system_token}} as the system token: the second leg of every pair, and the one token accepted in a transfer without a pair of its own. Pairs already created keep the authority they were created with. Until this action has run, no transfer is accepted and no pair can be created.
 
 The authorization of the contract is required.
 
