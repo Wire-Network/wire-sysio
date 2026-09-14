@@ -62,9 +62,9 @@ namespace sysio {
          /// `yield_leg`, when set, must be the first leg and names it as a shadow
          /// token, making the pair a yield pool: the pool absorbs the WIRE yield
          /// distributed on the shadow it holds, and sells queued yield shadow through
-         /// itself. Empty makes a plain pool. The first leg's seed must already be on
-         /// deposit, which a transfer carrying this contract's authority can make
-         /// before the pair exists.
+         /// itself. Empty makes a plain pool. Both seeds must already be on deposit.
+         /// The system token's always can be; the first leg has no pair yet, so its
+         /// seed transfer must also carry this contract's authority.
          [[sysio::action]] void inittoken(name user, symbol new_symbol,
            extended_asset initial_pool1, extended_asset initial_pool2,
            int initial_fee, name fee_authority, asset locked_shares,
