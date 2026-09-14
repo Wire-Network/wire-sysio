@@ -1,4 +1,4 @@
-/// Pure-logic unit tests for `sysio::depot::opreg_status::compute_is_active`.
+/// Pure-logic unit tests for `sysio::opp::depot::opreg_status::compute_is_active`.
 ///
 /// Exercises the awareness decision table consumed by `batch_operator_plugin`
 /// and `underwriter_plugin` each tick. The actual chain read happens through
@@ -9,9 +9,9 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <sysio/depot/opreg_status.hpp>
+#include <sysio/opp/depot/opreg_status.hpp>
 
-namespace s = sysio::depot::opreg_status;
+namespace s = sysio::opp::depot::opreg_status;
 
 BOOST_AUTO_TEST_SUITE(opreg_status_tests)
 

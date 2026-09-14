@@ -12,11 +12,11 @@
  * pin them in one place and let both plugins consume them via this
  * header — no plugin dependency, no duplicated string literals.
  */
-namespace sysio::depot::opreg_status {
+namespace sysio::opp::depot::opreg_status {
 
 /// Protobuf enum spellings as they surface through the ABI serializer
 /// when the `operators` table row is decoded. Keep in lockstep with
-/// `OperatorStatus` in `libraries/opp/proto/types.proto`.
+/// `OperatorStatus` in `libraries/opp/proto/sysio/opp/types/types.proto`.
 inline constexpr std::string_view active     = "OPERATOR_STATUS_ACTIVE";
 inline constexpr std::string_view slashed    = "OPERATOR_STATUS_SLASHED";
 inline constexpr std::string_view terminated = "OPERATOR_STATUS_TERMINATED";
@@ -41,4 +41,4 @@ inline bool compute_is_active(std::string_view status, bool previous) noexcept {
    return previous;
 }
 
-} // namespace sysio::depot::opreg_status
+} // namespace sysio::opp::depot::opreg_status
