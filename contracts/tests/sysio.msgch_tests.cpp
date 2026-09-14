@@ -323,16 +323,29 @@ public:
       );
    }
 
-   /// Return the first outbound envelope row found in a small id scan.
+   /// Return the NEWEST outbound envelope row in a small id scan -- the per-outpost
+   /// chain tip, which is what `buildenv` chains from. Deliberately not "the first
+   /// row found": `buildenv` retains emits the outpost has not acknowledged, so the
+   /// lowest id can be a retained predecessor rather than the tip.
    fc::variant find_outbound_envelope(uint64_t scan_until = 16) {
+      fc::variant newest;
       for (uint64_t id = 0; id < scan_until; ++id) {
          auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
          if (data.empty()) continue;
-         return msgch_abi.binary_to_variant(
+         newest = msgch_abi.binary_to_variant(
             "outbound_envelope", data,
             abi_serializer::create_yield_function(abi_serializer_max_time));
       }
-      return fc::variant{};
+      return newest;
+   }
+
+   /// Number of live `outenvelopes` rows in the id range `[0, scan_until)`.
+   uint32_t outbound_envelope_count(uint64_t scan_until = 16) {
+      uint32_t n = 0;
+      for (uint64_t id = 0; id < scan_until; ++id) {
+         if (!get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id).empty()) ++n;
+      }
+      return n;
    }
 
    /// Count populated `envlog` rows in the id range `[0, max_id_exclusive)`.
@@ -475,10 +488,18 @@ BOOST_FIXTURE_TEST_CASE(envlog_cap_tracks_outpost_count, sysio_msgch_envlog_test
    BOOST_REQUIRE_EQUAL(7u, alive);
 } FC_LOG_AND_RETHROW() }
 
-/// Existing `outenvelopes` row gets dropped on the next `buildenv` for
-/// the same outpost — one-deep retention (the batch op only ever reads
-/// the most-recent emit).
-BOOST_FIXTURE_TEST_CASE(buildenv_drops_previous_outenvelopes, sysio_msgch_envlog_tester) { try {
+/// WNS-18 / WIRE-348. `buildenv` erases a previous emit only once the destination
+/// outpost has CONSUMED it -- i.e. `outpcons.epoch_index` reaches that row's epoch.
+/// This fixture pushes `buildenv` directly and never drives inbound consensus, so no
+/// `outpcons` row exists (acked = 0) and the earlier emit MUST survive: its
+/// `raw_envelope` is the only remaining copy of an envelope the outpost still needs
+/// (the audit log keeps a checksum, not a payload, and the source attestations are
+/// drained by the same `buildenv`).
+///
+/// The acknowledged half of the contract -- the erase actually firing, and the table
+/// staying one-deep in the healthy path -- needs real consensus and lives in
+/// `sysio.msgch_chain_tests.cpp::buildenv_erases_acknowledged_outenvelope`.
+BOOST_FIXTURE_TEST_CASE(buildenv_retains_unacknowledged_outenvelopes, sysio_msgch_envlog_tester) { try {
    bootstrap_epoch_config(/*retention=*/200);
    register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
    produce_blocks();
@@ -490,16 +511,25 @@ BOOST_FIXTURE_TEST_CASE(buildenv_drops_previous_outenvelopes, sysio_msgch_envlog
    produce_blocks();
    auto first = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, 1);
    BOOST_REQUIRE(!first.empty());
+   BOOST_REQUIRE_EQUAL(1u, outbound_envelope_count());
 
    BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));
    BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
    produce_blocks();
 
-   // First row is now gone (replaced by the second emit).
+   // Both rows live: the outpost acknowledged neither.
    first = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, 1);
-   BOOST_REQUIRE(first.empty());
+   BOOST_REQUIRE(!first.empty());
    auto second = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, 2);
    BOOST_REQUIRE(!second.empty());
+   BOOST_REQUIRE_EQUAL(2u, outbound_envelope_count());
+
+   // With a predecessor retained, the tip must still be the NEWEST row -- the
+   // `byoutepoch` read in `buildenv`, not a `byoutpost` lower_bound (which orders by
+   // ascending primary key and would hand back the retained row 1).
+   auto tip = find_outbound_envelope();
+   BOOST_REQUIRE(!tip.is_null());
+   BOOST_REQUIRE_EQUAL(2u, tip["id"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 /// `attestations` PROCESSED rows for a given outpost are dropped at the
@@ -575,20 +605,12 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
    BOOST_REQUIRE_EQUAL(success(), buildenv(/*chain_code=*/ETH_OUTPOST_ID));
    produce_blocks();
 
-   // The most recent emit lives at one of the early ids; the one-deep
-   // retention sweep means at most one row exists per outpost. Find it.
-   fc::variant emitted_row;
-   uint64_t    emitted_id = std::numeric_limits<uint64_t>::max();
-   for (uint64_t id = 0; id < 16; ++id) {
-      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
-      if (data.empty()) continue;
-      emitted_row = msgch_abi.binary_to_variant(
-         "outbound_envelope", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
-      emitted_id = id;
-      break;
-   }
+   // Take the NEWEST emit. This fixture never drives inbound consensus, so nothing is
+   // acknowledged and `buildenv` retains each predecessor -- the lowest id is not the
+   // row under test.
+   fc::variant emitted_row = find_outbound_envelope();
    BOOST_REQUIRE(!emitted_row.is_null());
+   const uint64_t emitted_id = emitted_row["id"].as_uint64();
 
    // ── Invariant 1: emitted envelope is at or under the cross-chain cap.
    const auto& raw = emitted_row["raw_envelope"].as<std::vector<char>>();
@@ -609,18 +631,11 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
    BOOST_REQUIRE_EQUAL(success(), buildenv(/*chain_code=*/ETH_OUTPOST_ID));
    produce_blocks();
 
-   // Find the new emitted row (one-deep retention dropped the prior one).
-   fc::variant emitted_row_2;
-   for (uint64_t id = 0; id < 16; ++id) {
-      if (id == emitted_id) continue;        // prior row was evicted
-      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
-      if (data.empty()) continue;
-      emitted_row_2 = msgch_abi.binary_to_variant(
-         "outbound_envelope", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
-      break;
-   }
+   // The new tip. emit#1's row is still present (unacknowledged), so select by
+   // recency rather than by "the other row".
+   fc::variant emitted_row_2 = find_outbound_envelope();
    BOOST_REQUIRE(!emitted_row_2.is_null());
+   BOOST_REQUIRE_NE(emitted_id, emitted_row_2["id"].as_uint64());
    const auto& raw2 = emitted_row_2["raw_envelope"].as<std::vector<char>>();
    BOOST_TEST_MESSAGE("emit#2 envelope size = " << raw2.size() << " bytes");
    BOOST_REQUIRE_LE(raw2.size(), MAX_ENV_BYTES);
