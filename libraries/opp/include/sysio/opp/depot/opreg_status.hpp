@@ -25,8 +25,9 @@ inline constexpr std::string_view terminated = "OPERATOR_STATUS_TERMINATED";
  * Map a status string to an `is_active` flag for the relay loop.
  *
  * Callers pass the previous `is_active` so the helper can preserve it
- * for transient / unknown statuses (`OPERATOR_STATUS_STANDBY`,
- * `OPERATOR_STATUS_UNKNOWN`, an empty string from a stale read, etc.).
+ * for the transient statuses (`OPERATOR_STATUS_WARMUP`,
+ * `OPERATOR_STATUS_COOLDOWN`), `OPERATOR_STATUS_UNKNOWN`, and an
+ * unrecognized spelling (an empty string from a stale read, etc.).
  * That avoids spurious flips when the row is momentarily unavailable
  * — only `ACTIVE` and the terminal `SLASHED` / `TERMINATED` states
  * actually toggle the flag.

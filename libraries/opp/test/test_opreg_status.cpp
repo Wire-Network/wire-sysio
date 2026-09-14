@@ -30,17 +30,26 @@ BOOST_AUTO_TEST_CASE(terminated_status_halts_relay_regardless_of_previous) {
    BOOST_REQUIRE_EQUAL(false, s::compute_is_active(s::terminated, /*previous=*/false));
 }
 
-/// STANDBY / PENDING_REGISTRATION / etc. — anything outside the canonical
-/// terminal triple — must NOT toggle the flag. The relay loop relies on
-/// this so a transient row miss or a status the plugin doesn't recognize
+/// The transient states an operator actually passes through. The relay loop
+/// relies on these preserving the flag so a mid-warmup or mid-cooldown tick
 /// doesn't push a still-eligible operator offline.
-BOOST_AUTO_TEST_CASE(unknown_status_preserves_previous_value) {
-   BOOST_REQUIRE_EQUAL(true,  s::compute_is_active("OPERATOR_STATUS_STANDBY",  /*previous=*/true));
-   BOOST_REQUIRE_EQUAL(false, s::compute_is_active("OPERATOR_STATUS_STANDBY",  /*previous=*/false));
+BOOST_AUTO_TEST_CASE(transient_status_preserves_previous_value) {
+   BOOST_REQUIRE_EQUAL(true,  s::compute_is_active("OPERATOR_STATUS_WARMUP",   /*previous=*/true));
+   BOOST_REQUIRE_EQUAL(false, s::compute_is_active("OPERATOR_STATUS_WARMUP",   /*previous=*/false));
+   BOOST_REQUIRE_EQUAL(true,  s::compute_is_active("OPERATOR_STATUS_COOLDOWN", /*previous=*/true));
+   BOOST_REQUIRE_EQUAL(false, s::compute_is_active("OPERATOR_STATUS_COOLDOWN", /*previous=*/false));
    BOOST_REQUIRE_EQUAL(true,  s::compute_is_active("OPERATOR_STATUS_UNKNOWN",  /*previous=*/true));
    BOOST_REQUIRE_EQUAL(false, s::compute_is_active("OPERATOR_STATUS_UNKNOWN",  /*previous=*/false));
-   BOOST_REQUIRE_EQUAL(true,  s::compute_is_active("",                          /*previous=*/true));
-   BOOST_REQUIRE_EQUAL(false, s::compute_is_active("",                          /*previous=*/false));
+}
+
+/// A spelling the enum does not carry — a stale read, or a name from a proto
+/// revision this build doesn't have — must also preserve the flag rather than
+/// read as a terminal state.
+BOOST_AUTO_TEST_CASE(unrecognized_spelling_preserves_previous_value) {
+   BOOST_REQUIRE_EQUAL(true,  s::compute_is_active("",                         /*previous=*/true));
+   BOOST_REQUIRE_EQUAL(false, s::compute_is_active("",                         /*previous=*/false));
+   BOOST_REQUIRE_EQUAL(true,  s::compute_is_active("OPERATOR_STATUS_STANDBY",  /*previous=*/true));
+   BOOST_REQUIRE_EQUAL(false, s::compute_is_active("OPERATOR_STATUS_STANDBY",  /*previous=*/false));
 }
 
 /// Spelling regression guard — the constants must match the protobuf
