@@ -126,14 +126,18 @@ int128_t swap::ceil_fee(int128_t amount, int fee) {
 
 int64_t swap::compute(int64_t x, int64_t y, int64_t z, int fee) {
     check( (x != 0) && (y > 0) && (z > 0), "invalid parameters");
-    int128_t prod = int128_t(x) * int128_t(y);
+    // The shared kernel prices a magnitude and says nothing about direction, so
+    // the sign of `x` picks the rounding there and the sign of the result here.
+    // Its value can exceed an asset, which is what the bounds below are for;
+    // they run before the fee, so the fee is charged on a sane amount.
+    const uint64_t shares = uint64_t( x > 0 ? int128_t(x) : -int128_t(x) );
     int128_t tmp = 0;
     if (x > 0) {
-        tmp = 1 + (prod - 1) / int128_t(z);
+        tmp = int128_t( opp::amm::in_given_shares(uint64_t(y), uint64_t(z), shares) );
         check( (tmp <= MAX), "computation overflow" );
         tmp += ceil_fee(tmp, fee);
     } else {
-        tmp = prod / int128_t(z);
+        tmp = -int128_t( opp::amm::out_given_shares(uint64_t(y), uint64_t(z), shares) );
         check( (tmp >= -MAX), "computation underflow" );
         tmp += ceil_fee(-tmp, fee);
     }
