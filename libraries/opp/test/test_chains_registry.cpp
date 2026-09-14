@@ -9,11 +9,11 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <sysio/depot/chains_registry.hpp>
+#include <sysio/opp/depot/chains_registry.hpp>
 
 #include <string>
 
-namespace c = sysio::depot::chains;
+namespace c = sysio::opp::depot::chains;
 
 BOOST_AUTO_TEST_SUITE(chains_registry_tests)
 
