@@ -2,44 +2,44 @@
 
 #include <string_view>
 
+#include <sysio/opp/types/types.pb.h>
+
 /**
  * @file
- * Depot-side helpers for the `sysio.opreg::operators[].status` field.
+ * Depot-side helper for the `sysio.opreg::operators[].status` field.
  *
- * Both `batch_operator_plugin` and `underwriter_plugin` poll their own
- * status row each tick to decide whether to keep relaying. The string
- * spellings come from the protobuf enum (`OPERATOR_STATUS_*`), so we
- * pin them in one place and let both plugins consume them via this
- * header — no plugin dependency, no duplicated string literals.
+ * Both `batch_operator_plugin` and `underwriter_plugin` poll their own status
+ * row each tick to decide whether to keep relaying. The spelling set IS the
+ * protobuf `OperatorStatus` enum, so the string is parsed through the generated
+ * descriptor rather than compared against copies of its names — a proto rename
+ * reaches this decision through the compiler and the parse, never as a silent
+ * fall-through.
  */
 namespace sysio::opp::depot::opreg_status {
-
-/// Protobuf enum spellings as they surface through the ABI serializer
-/// when the `operators` table row is decoded. Keep in lockstep with
-/// `OperatorStatus` in `libraries/opp/proto/sysio/opp/types/types.proto`.
-inline constexpr std::string_view active     = "OPERATOR_STATUS_ACTIVE";
-inline constexpr std::string_view slashed    = "OPERATOR_STATUS_SLASHED";
-inline constexpr std::string_view terminated = "OPERATOR_STATUS_TERMINATED";
 
 /**
  * Map a status string to an `is_active` flag for the relay loop.
  *
- * Callers pass the previous `is_active` so the helper can preserve it
- * for the transient statuses (`OPERATOR_STATUS_WARMUP`,
- * `OPERATOR_STATUS_COOLDOWN`), `OPERATOR_STATUS_UNKNOWN`, and an
- * unrecognized spelling (an empty string from a stale read, etc.).
- * That avoids spurious flips when the row is momentarily unavailable
- * — only `ACTIVE` and the terminal `SLASHED` / `TERMINATED` states
- * actually toggle the flag.
+ * Callers pass the previous `is_active` so the helper can preserve it for the
+ * transient states (`WARMUP`, `COOLDOWN`), `UNKNOWN`, and any spelling that
+ * fails to parse (an empty string from a stale read). That avoids spurious
+ * flips when the row is momentarily unavailable — only `ACTIVE` and the
+ * terminal `TERMINATED` / `SLASHED` states actually toggle the flag.
  *
- * @param status        status string read from the operators row.
- * @param previous      `is_active` value from the prior tick.
- * @return              true iff the operator should keep relaying.
+ * @param status   status string read from the operators row.
+ * @param previous `is_active` value from the prior tick.
+ * @return         true iff the operator should keep relaying.
  */
-inline bool compute_is_active(std::string_view status, bool previous) noexcept {
-   if (status == active)                            return true;
-   if (status == slashed || status == terminated)   return false;
-   return previous;
+inline bool compute_is_active(std::string_view status, bool previous) {
+   types::OperatorStatus parsed{};
+   if (!types::OperatorStatus_Parse(status, &parsed)) return previous;
+
+   switch (parsed) {
+      case types::OPERATOR_STATUS_ACTIVE:     return true;
+      case types::OPERATOR_STATUS_TERMINATED:
+      case types::OPERATOR_STATUS_SLASHED:    return false;
+      default:                                return previous;  // WARMUP / COOLDOWN / UNKNOWN
+   }
 }
 
 } // namespace sysio::opp::depot::opreg_status
