@@ -1,6 +1,10 @@
-**NOTE: In this example we use the PAIR EOS/PESO, which creates the evotoken EOSPESO. We assume an EOS token located in the eosio.token contract as usual, and a PESO token located in the contract pesocontract. You would need to replace these variables depending on your trading pairs.** 
+**NOTE: In this example we use the PAIR PESO/EOS, which creates the evotoken EOSPESO. We assume an EOS token located in the eosio.token contract as usual, configured as the system token (every pair's second leg), and a PESO token located in the contract pesocontract as the pair's first leg. You would need to replace these variables depending on your trading pairs.** 
 
 First, let us describe the single actions of the smart contract.
+
+Configure the contract (deployment step, the contract's own authority): the contract-wide fee authority and the system token. Nothing else works before this.
+
+    cleos push action evolutiondex setconfig '["sysio", {"contract":"eosio.token", "sym":"4,EOS"}]' -p evolutiondex
 
 Open a channel in the contract. This channel will store your trading tokens. You need to create one channel for each token you plan to trade. The second input below is the ram payer, and the authorizer must be the ram payer.
 
@@ -15,11 +19,11 @@ it returns them to the account "TO".
 
     cleos push action evolutiondex closeext '["YOUR_ACCOUNT", "TO", {"contract":"eosio.token", "sym":"4,EOS"}, "memo"]' -p YOUR_ACCOUNT
 
-Fill your account with the desired tokens:
+Fill your account with the desired tokens. The contract accepts only the system token and the first legs of existing pairs; anything else is refused. A pair's first leg has no pair yet when its seed is deposited, so that one transfer also carries the contract's authority.
 
     cleos push action eosio.token transfer '["YOUR_ACCOUNT", "evolutiondex", "100.0000 EOS", "memo"]' -p YOUR_ACCOUNT
 
-    cleos push action pesocontract transfer '["YOUR_ACCOUNT", "evolutiondex", "100.0000 PESO", "pesitos"]' -p YOUR_ACCOUNT
+    cleos push action pesocontract transfer '["YOUR_ACCOUNT", "evolutiondex", "100.0000 PESO", "pesitos"]' -p YOUR_ACCOUNT -p evolutiondex
 
 Check your open channels and balances:
 
@@ -29,11 +33,11 @@ Withdraw funds from your opened channels, to the account "TO":
 
     cleos push action evolutiondex withdraw '["YOUR_ACCOUNT", "TO", {"contract":"eosio.token", "quantity":"1.0000 EOS"}, "memo"]' -p YOUR_ACCOUNT
 
-Create the EOS/PESO evotoken. Set the initial liquidity, the initial fee for the trading pair (in units of 0.01%, here 0.1%), the fee authority (an empty name adopts the contract-wide authority set at deployment, any other name makes that account the pair's own), the shares to lock, and the yield leg (null for a plain pool). The supply minted is the square root of the product of the two amounts; the locked part is held by nobody and can never be redeemed, which keeps the pool from ever being emptied and bounds how far one share's value can be pushed. It is your call how much to lock, zero included. The contract's authority is required alongside yours.
+Create the PESO/EOS evotoken: the pair's own token first, the system token second. Set the initial liquidity, the initial fee for the trading pair (in units of 0.01%, here 0.1%), the fee authority (an empty name adopts the contract-wide authority set at deployment, any other name makes that account the pair's own), the shares to lock, and the yield leg (null for a plain pool). The supply minted is the square root of the product of the two amounts; the locked part is held by nobody and can never be redeemed, which keeps the pool from ever being emptied and bounds how far one share's value can be pushed. It is your call how much to lock, zero included. The contract's authority is required alongside yours, and a token can form only one pair.
 
-    cleos push action evolutiondex inittoken '["YOUR_ACCOUNT", "4,EOSPESO", {"contract":"eosio.token", "quantity":"1.0000 EOS"}, {"contract":"pesocontract", "quantity":"1.0000 PESO"}, 10, "", "0.1000 EOSPESO", null]' -p YOUR_ACCOUNT -p evolutiondex
+    cleos push action evolutiondex inittoken '["YOUR_ACCOUNT", "4,EOSPESO", {"contract":"pesocontract", "quantity":"1.0000 PESO"}, {"contract":"eosio.token", "quantity":"1.0000 EOS"}, 10, "", "0.1000 EOSPESO", null]' -p YOUR_ACCOUNT -p evolutiondex
 
-Create a yield pool instead: name one of the legs as the pair's shadow token (a token that pays WIRE yield to its holders). Only one yield pool may exist per shadow symbol.
+Create a yield pool instead: name the first leg as a shadow token (a token that pays WIRE yield to its holders).
 
     cleos push action evolutiondex inittoken '["YOUR_ACCOUNT", "4,SHDEOS", {"contract":"shadowtoken", "quantity":"1.0000 SHD"}, {"contract":"eosio.token", "quantity":"1.0000 EOS"}, 10, "", "0.0000 SHDEOS", {"contract":"shadowtoken", "sym":"4,SHD"}]' -p YOUR_ACCOUNT -p evolutiondex
 
@@ -59,10 +63,6 @@ Sell one clip of the queue through the pool and hand the proceeds to the shadow'
     cleos set account permission evolutiondex active --add-code shadowtoken
     cleos push action evolutiondex tickyield '["SHDEOS"]' -p YOUR_ACCOUNT
 
-Set the contract-wide fee authority (deployment step, the contract's own authority):
-
-    cleos push action evolutiondex setconfig '["sysio"]' -p evolutiondex
-
 Change a pair's fee, signed by its fee authority:
 
     cleos push action evolutiondex changefee '["EOSPESO", 30]' -p sysio
@@ -72,10 +72,10 @@ Check your evotokens balance:
     cleos get table evolutiondex YOUR_ACCOUNT accounts
 
 Add more liquidity to a pool. Set the exact amount of evotoken to obtain, in this case 
-1.5000 EOSPESO, and the maximum you are willing to pay of each token of the pair.
+1.5000 EOSPESO, and the maximum you are willing to pay of each token of the pair, first leg first.
 
     cleos push action evolutiondex addliquidity '["YOUR_ACCOUNT", "1.5000 EOSPESO", 
-    "2.0000 EOS", "2.0000 PESO"]' -p YOUR_ACCOUNT
+    "2.0000 PESO", "2.0000 EOS"]' -p YOUR_ACCOUNT
 
 Sell your evotokens and retire liquidity. The amount of evotoken is exact and the other two are minima required.
 
@@ -167,8 +167,8 @@ where the file addliquidity.json contains:
             "data": {
                 "user": "YOUR_ACCOUNT",
                 "to_buy": "1.5000 EOSPESO",
-                "max_asset1": "2.0000 EOS",
-                "max_asset2": "2.0000 PESO",                
+                "max_asset1": "2.0000 PESO",
+                "max_asset2": "2.0000 EOS",                
             }
         },{
             "account": "evolutiondex",
