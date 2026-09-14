@@ -156,12 +156,24 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     * is gated again when it re-registers.
     *
     * Re-registering rotates that producer's snapshot account without retracting votes already
-    * recorded under the producer identity, and is deliberately NOT eligibility-gated: this is the
-    * only action that can replace a mapping, so a producer that has since become ineligible must
-    * still be able to revoke a compromised snapshot account.
+    * recorded under the producer identity, and is deliberately NOT eligibility-gated. `delsnapprov`
+    * does not replace it: leaving is one-way, since re-registering is gated, so an ineligible
+    * producer that rotates keeps a delegation it can still serve from and carry back into
+    * eligibility.
     */
    [[sysio::action]]
    void regsnapprov(name producer, name snap_account);
+
+   /**
+    * Retire the caller's snapshot-provider delegation, freeing its registration slot.
+    *
+    * Not eligibility-gated, for the reason rotation is not: a producer that has become ineligible
+    * is exactly the one that needs to stop, and the capacity prune is out of reach below
+    * max_snap_providers. Votes already accepted are keyed by producer identity and are not
+    * retracted, and the producer keeps the attestation credit it earned in the open pay period.
+    */
+   [[sysio::action]]
+   void delsnapprov(name producer);
 
    /**
     * Submit a snapshot hash vote from a registered provider for a scheduled snapshot height.

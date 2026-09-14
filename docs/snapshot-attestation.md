@@ -114,6 +114,7 @@ Files:
 | Action | Authority | Description |
 |--------|-----------|-------------|
 | `regsnapprov(producer, snap_account)` | `producer` | Create or rotate the producer's snapshot-provider delegation. |
+| `delsnapprov(producer)` | `producer` | Retire the producer's delegation, freeing its registration slot. |
 | `votesnaphash(snap_account, block_id, snapshot_hash)` | `snap_account` | Submit a hash vote for the block named by `block_id`. |
 | `setsnpcfg(min_providers)` | `sysio` | Set the fixed number K of producer votes required to attest. |
 | `getsnaphash(block_num)` | read-only | Return the attested record for a block, if any. |
@@ -156,10 +157,17 @@ Calling `regsnapprov` again with the same pair is idempotent. Calling it with a 
 atomically replaces that producer's old mapping. Votes store producer identities, so rotating the
 signing account neither retracts an accepted vote nor allows the producer to vote twice.
 
-Rotation is not eligibility-gated, because `regsnapprov` is the only action that can replace a
-mapping: a producer that has since gone inactive, lost its operator or finalizer standing, or
-fallen outside the rank band must still be able to revoke a compromised `snap_account`, and the
-prune is out of reach below 30 rows. Rotation erases that producer's `byproducer` row and emplaces
+`delsnapprov` retires a mapping outright, freeing its slot without waiting for the capacity prune.
+It is not eligibility-gated either, and for the same reason rotation is not: the producer that most
+needs to stop is the one that has become ineligible. Votes are keyed by producer identity, so
+leaving retracts nothing already accepted, and the attestation credit earned in the open pay period
+stays until the period boundary rolls it off.
+
+Rotation is not eligibility-gated either, and retiring does not make it redundant: leaving is
+one-way, because re-registering is gated. A producer that has gone inactive, lost its operator or
+finalizer standing, or fallen outside the rank band can therefore rotate to a safe `snap_account`
+and keep a delegation it can carry back into eligibility, where deleting would oblige it to regain
+eligibility first. Rotation erases that producer's `byproducer` row and emplaces
 the replacement under the new `snap_account`, leaving the row count and the producer's single vote
 unchanged -- it grants nothing a gated registration would. A producer holding no `byproducer` row
 is still refused one while ineligible, whether or not it held one before.

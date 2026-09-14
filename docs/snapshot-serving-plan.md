@@ -106,6 +106,7 @@ Actions are implemented as a sub-contract class (`snapshot_attest`) following th
 
 ```
 regsnapprov(producer, snap_account)       // producer auth — register a snapshot provider
+delsnapprov(producer)                     // producer auth — retire a snapshot provider
 votesnaphash(snap_account, block_id, snapshot_hash)  // snap_account auth
 setsnpcfg(min_providers)                  // sysio auth — set fixed K
 getsnaphash(block_num)                    // read-only — returns attested record
@@ -122,7 +123,7 @@ getsnaphash(block_num)                    // read-only — returns attested reco
 
 **Registration:**
 - A producer calls `regsnapprov` to designate a `snap_account` as their snapshot provider. A producer that currently holds no mapping must be registered, active, and ranked at or below 30. Rank is position in a walk that tests `is_schedulable`, so an ACTIVE `OPERATOR_TYPE_PRODUCER` row in sysio.opreg and an active finalizer key are required alongside it; a producer missing either is absent from the ranked list, and the rejection names which condition failed rather than reporting rank for all three.
-- Repeating the same registration is idempotent; registering a new snap_account atomically rotates that producer's mapping without retracting producer-keyed votes. Rotation is deliberately not eligibility-gated: `regsnapprov` is the only action that can replace a mapping, so a producer that has since become ineligible must still be able to revoke a compromised `snap_account`. It replaces that producer's single row, so it grants nothing a gated registration would. The gate keys on the absence of a current mapping, so a producer whose row was evicted by the capacity prune is gated again when it re-registers.
+- Repeating the same registration is idempotent; registering a new snap_account atomically rotates that producer's mapping without retracting producer-keyed votes. Rotation is deliberately not eligibility-gated, and `delsnapprov` does not subsume it: leaving is one-way because re-registering is gated, so an ineligible producer that rotates keeps a delegation it can carry back into eligibility. It replaces that producer's single row, so it grants nothing a gated registration would. The gate keys on the absence of a current mapping, so a producer whose row was evicted by the capacity prune is gated again when it re-registers.
 - The table is capped at 30. Producer lifecycle actions do no attestation work. Only a registration that finds the table full lazily removes mappings whose producers are missing, inactive, or rank-ineligible; pending votes remain monotonic.
 **Voting:**
 - The contract accepts only block heights divisible by 25,000, matching the automatic provider schedule; manual/on-demand heights are rejected.

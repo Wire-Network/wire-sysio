@@ -24,6 +24,7 @@ constexpr char producer_no_finalizer_key_error[] = "producer has no active final
 constexpr char provider_not_registered_error[] = "snap_account is not a registered snapshot provider";
 constexpr char provider_already_registered_error[] = "snap_account is already registered as a provider";
 constexpr char provider_capacity_error[] = "maximum registered snapshot providers reached";
+constexpr char producer_has_no_provider_error[] = "producer has no registered snapshot provider";
 constexpr char vote_equivocation_error[] = "producer already voted a different snapshot tuple for this height";
 constexpr char snapshot_config_unset_error[] = "snapshot attestation configuration has not been set";
 constexpr char invalid_block_id_error[] = "invalid block_id";
@@ -249,11 +250,13 @@ void snapshot_attest::regsnapprov(name producer, name snap_account) {
    auto by_producer = providers.get_index<snapshot_index::by_producer>();
    auto producer_itr = by_producer.find(producer.value);
    if (producer_itr != by_producer.end()) {
-      // ROTATION is deliberately UN-gated. This action is the only one that can replace a mapping,
-      // so gating it would strand a producer that has since gone inactive or lost its rank position
-      // with a compromised snap_account it cannot revoke -- the prune is out of reach below
-      // max_snap_providers. The erase keeps both the row count and this producer's single vote
-      // unchanged, so an ineligible rotation grants nothing a gated registration would.
+      // ROTATION is deliberately UN-gated, and `delsnapprov` does not subsume it: leaving is
+      // one-way, because re-registering IS gated. So an ineligible producer that rotates keeps a
+      // delegation it can still serve from and can carry back into eligibility, where one that
+      // deleted would have to regain eligibility first. Both paths exist so that a compromised
+      // snap_account is revocable either way. The erase keeps both the row count and this
+      // producer's single vote unchanged, so an ineligible rotation grants nothing a gated
+      // registration would.
       by_producer.erase(std::move(producer_itr));
    } else {
       // NO CURRENT ROW -- gated, and gated BEFORE the prune so a rejected registration never
@@ -269,6 +272,21 @@ void snapshot_attest::regsnapprov(name producer, name snap_account) {
       row.snap_account = snap_account;
       row.producer     = producer;
    });
+}
+
+// -------------------------------------------------------------------------------------------------
+void snapshot_attest::delsnapprov(name producer) {
+   require_auth(producer);
+
+   snap_providers_table providers(get_self());
+   auto by_producer = providers.get_index<snapshot_index::by_producer>();
+   auto producer_itr = by_producer.require_find(producer.value, producer_has_no_provider_error);
+   by_producer.erase(std::move(producer_itr));
+
+   // No rescore, unlike every other mutation in this contract: `snapshot_attestations` is a
+   // PRODUCER-row counter on the payepoch cadence, and none of the score's inputs are the mapping.
+   // A producer keeps the credit it already earned this period and the counter rolls off on its own.
+   // Pending votes are keyed by producer, so leaving retracts nothing already accepted.
 }
 
 // -------------------------------------------------------------------------------------------------

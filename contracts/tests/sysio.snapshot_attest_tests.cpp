@@ -192,6 +192,12 @@ public:
          ("snap_account", snap_account));
    }
 
+   /// Retire a producer's snapshot-provider delegation.
+   action_result delsnapprov(name producer) {
+      return push_action(producer, "delsnapprov"_n, mvo()
+         ("producer", producer));
+   }
+
    /// Deactivate a producer while retaining its producer-table row.
    action_result unregproducer(name producer) {
       return push_action(producer, "unregprod"_n, mvo()
@@ -486,6 +492,44 @@ BOOST_FIXTURE_TEST_CASE(regsnapprov_rejects_producer_without_finalizer_key, snap
    BOOST_REQUIRE(get_snap_provider("snapprov1"_n).is_null());
 } FC_LOG_AND_RETHROW() }
 
+/// Voluntary exit: the row goes, and the slot it held is immediately reusable without waiting for
+/// the capacity prune.
+BOOST_FIXTURE_TEST_CASE(delsnapprov_retires_the_mapping_and_frees_the_slot, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE(!get_snap_provider("snapprov1"_n).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), delsnapprov("producer1"_n));
+   BOOST_REQUIRE(get_snap_provider("snapprov1"_n).is_null());
+
+   // The slot is genuinely free, not merely vacated: the same producer can take one again.
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov2"_n));
+   BOOST_REQUIRE(!get_snap_provider("snapprov2"_n).is_null());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(delsnapprov_requires_producer_auth, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+
+   BOOST_REQUIRE_EQUAL(error("missing authority of producer1"),
+                        push_action("snapprov1"_n, "delsnapprov"_n, mvo()("producer", "producer1")));
+   BOOST_REQUIRE(!get_snap_provider("snapprov1"_n).is_null());
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(delsnapprov_rejects_producer_without_mapping, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer has no registered snapshot provider"),
+                        delsnapprov("producer1"_n));
+} FC_LOG_AND_RETHROW() }
+
+/// The case the action exists for, and the reason it is not eligibility-gated: a producer that has
+/// become ineligible is exactly the one that needs to stop, and the prune is out of reach below
+/// max_snap_providers.
+BOOST_FIXTURE_TEST_CASE(delsnapprov_retires_for_ineligible_producer, snapshot_attest_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
+
+   BOOST_REQUIRE_EQUAL(success(), delsnapprov("producer1"_n));
+   BOOST_REQUIRE(get_snap_provider("snapprov1"_n).is_null());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(regsnapprov_rejects_inactive_producer, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
 
@@ -494,9 +538,9 @@ BOOST_FIXTURE_TEST_CASE(regsnapprov_rejects_inactive_producer, snapshot_attest_t
    BOOST_REQUIRE(get_snap_provider("snapprov1"_n).is_null());
 } FC_LOG_AND_RETHROW() }
 
-/// An ineligible producer keeps the one path that can retire its mapping. The same producer is
-/// refused a NEW mapping by `regsnapprov_rejects_inactive_producer` above -- the gate is on
-/// creation, not on replacement.
+/// An ineligible producer keeps the path that can replace its mapping. The same producer is
+/// refused a mapping it does not hold by `regsnapprov_rejects_inactive_producer` above -- the gate
+/// keys on the absence of a current row, not on replacement.
 BOOST_FIXTURE_TEST_CASE(regsnapprov_rotates_for_ineligible_producer, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), unregproducer("producer1"_n));
@@ -571,6 +615,36 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_preserves_registered_authority_after_produc
    const auto snapshot_hash = make_snap_hash(9);
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
    BOOST_REQUIRE(getsnaphash(block_num).is_null());
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// #575's invariant survives voluntary exit: votes are keyed by producer identity, so retiring the
+/// mapping that cast one neither retracts it nor stops the tuple it belongs to from finalizing.
+BOOST_FIXTURE_TEST_CASE(delsnapprov_does_not_retract_an_accepted_vote, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+
+   const auto block_num     = vote_block_num();
+   const auto block_id      = make_block_id(block_num);
+   const auto snapshot_hash = make_snap_hash(11);
+
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
+
+   // producer1 leaves after voting. Its vote is already recorded under the producer identity.
+   BOOST_REQUIRE_EQUAL(success(), delsnapprov("producer1"_n));
+   BOOST_REQUIRE(get_snap_provider("snapprov1"_n).is_null());
+   BOOST_REQUIRE_EQUAL(1u, snapshot_vote_count());
+
+   // The retired account is refused while the tuple is still PENDING. Asserting this after the
+   // tuple finalizes would prove nothing: an exact match against a final record returns before
+   // votesnaphash ever looks the provider up.
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snap_account is not a registered snapshot provider"),
+                        votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+
+   // The retired producer's vote still counts toward K, so producer2 alone completes the quorum.
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
    BOOST_REQUIRE(!getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
