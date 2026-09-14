@@ -90,8 +90,9 @@ This approach was chosen over BLS aggregate signatures because:
 - No requirement for BLS key sharing between producer and snapshot nodes
 - Producers opt in — not all need to run snapshot infrastructure
 - Uses existing transaction/action infrastructure entirely
-- The trust assumption is a quorum of durable provider registrations whose producers satisfied the
-  active/rank eligibility checks when registered
+- The trust assumption is a quorum of durable provider registrations whose producers were
+  schedulable when they entered the provider set; rotation afterwards is ungated, so a live mapping
+  does not imply its producer is schedulable now
 
 ### System Contract Actions (in `sysio.system`)
 
@@ -120,8 +121,8 @@ getsnaphash(block_num)                    // read-only — returns attested reco
 | `snaprecords` | `block_num` | `{ block_num, block_id, snapshot_hash, attested_at_block }` |
 
 **Registration:**
-- A producer calls `regsnapprov` to designate a `snap_account` as their snapshot provider. A producer holding no mapping yet must be registered, active, and ranked at or below 30. Producer-table eligibility is deliberately the only registration gate; operator-registry status is not consulted.
-- Repeating the same registration is idempotent; registering a new snap_account atomically rotates that producer's mapping without retracting producer-keyed votes. Rotation is deliberately not eligibility-gated: `regsnapprov` is the only action that can replace a mapping, so a producer that has since become ineligible must still be able to revoke a compromised `snap_account`. It replaces that producer's single row, so it grants nothing a first-time registration would -- which stays gated.
+- A producer calls `regsnapprov` to designate a `snap_account` as their snapshot provider. A producer that currently holds no mapping must be registered, active, and ranked at or below 30. Rank is position in a walk that tests `is_schedulable`, so an ACTIVE `OPERATOR_TYPE_PRODUCER` row in sysio.opreg and an active finalizer key are required alongside it; a producer missing either is absent from the ranked list and is refused with the rank error.
+- Repeating the same registration is idempotent; registering a new snap_account atomically rotates that producer's mapping without retracting producer-keyed votes. Rotation is deliberately not eligibility-gated: `regsnapprov` is the only action that can replace a mapping, so a producer that has since become ineligible must still be able to revoke a compromised `snap_account`. It replaces that producer's single row, so it grants nothing a gated registration would. The gate keys on the absence of a current mapping, so a producer whose row was evicted by the capacity prune is gated again when it re-registers.
 - The table is capped at 30. Producer lifecycle actions do no attestation work. Only a registration that finds the table full lazily removes mappings whose producers are missing, inactive, or rank-ineligible; pending votes remain monotonic.
 **Voting:**
 - The contract accepts only block heights divisible by 25,000, matching the automatic provider schedule; manual/on-demand heights are rejected.
@@ -170,7 +171,7 @@ Manual `--snapshot` bypasses the ABI, configuration, and post-sync attestation c
 
 ### Exit Criteria
 
-- ✅ Contract actions implemented and tested (35 contract tests, 5 snapshot unit tests)
+- ✅ Contract actions implemented and tested
 - ✅ Multiple snapshot providers register, compute hashes, vote
 - ✅ Attestation record created when quorum reached
 - ✅ Auto-fetching node verifies the snapshot block ID and hash after syncing
@@ -398,7 +399,7 @@ requested explicitly.
 - **Hash algorithm:** BLAKE3 — faster than SHA-256, uses LLVM's bundled implementation
 - **Snapshot format:** Single-file binary with section index at end (not tar.zst — simpler, deterministic, already 10% faster than Spring)
 - **Signing mechanism:** On-chain voting contract in `sysio.system`, not BLS aggregate signatures
-  (no P2P changes; trust rests on durable registrations that were eligible when created)
+  (no P2P changes; trust rests on durable registrations whose producers were schedulable when they entered the provider set)
 - **Snapshot interval:** Every 25,000 blocks, constant (not configurable) — all providers must use the same interval
 - **Attestation threshold:** governance sets a fixed K in `min_providers`; it does not scale with registration count
 - **Contract location:** Actions added to `sysio.system` as a sub-contract class (not a separate `sysio.snapshot` contract) for direct access to the producers table and rank index

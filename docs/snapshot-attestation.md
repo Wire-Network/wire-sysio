@@ -91,7 +91,8 @@ documented in `docs/snapshot-benchmarks.md`.
 
 Attestation is implemented as a small voting contract rather than a BLS aggregate-signature
 and P2P vote-gossip layer. Its trust assumption is a quorum of durable provider registrations
-whose producers satisfied the active/rank eligibility checks when registered. The contract
+whose producers were schedulable when they entered the provider set. Rotation is ungated
+afterwards, so a live mapping does not imply its producer is schedulable now. The contract
 approach:
 
 - adds no new P2P message types or off-chain vote accumulation,
@@ -131,12 +132,15 @@ Storage uses the KV table API (`sysio::kv::table` / `sysio::kv::global`).
 ### Registration
 
 A producer calls `regsnapprov` to designate a separate `snap_account` as its snapshot
-provider. A producer that holds no mapping yet must be registered (via `regproducer`), active, and
-ranked at or below `max_snap_provider_rank` (30). This producer-table check is the registration
-trust gate; operator-registry status is deliberately not an additional dependency. It gates that
-first-time registration only -- a producer that already holds a mapping replaces it ungated, for
-the reason below.
-Eligibility is not rechecked while voting, so a provider that was valid when registered keeps a
+provider. A producer that currently holds no mapping must be registered (via `regproducer`),
+active, and ranked at or below `max_snap_provider_rank` (30). Rank is position in a walk that tests
+`is_schedulable`, so two conditions ride along with it: an ACTIVE `OPERATOR_TYPE_PRODUCER` row in
+sysio.opreg, and an active finalizer key. A producer missing either is absent from the ranked list
+and is refused with the rank error, which names rank for a cause that is not rank.
+The gate keys on the ABSENCE OF A CURRENT MAPPING rather than on never having registered: a
+producer whose row was evicted by the capacity prune is gated again when it re-registers, while a
+producer that still holds one replaces it ungated, for the reason below.
+Eligibility is not rechecked while voting, so a provider that was valid when it registered keeps a
 stable delegation through ordinary producer churn.
 
 The registration table is capped at 30. Normal producer lifecycle actions do no attestation work.
@@ -152,11 +156,12 @@ atomically replaces that producer's old mapping. Votes store producer identities
 signing account neither retracts an accepted vote nor allows the producer to vote twice.
 
 Rotation is not eligibility-gated, because `regsnapprov` is the only action that can replace a
-mapping: a producer that has since gone inactive or fallen outside the rank band must still be able
-to revoke a compromised `snap_account`, and the prune is out of reach below 30 rows. Rotation erases
-that producer's `byproducer` row and emplaces the replacement under the new `snap_account`, leaving
-the row count and the producer's single vote unchanged -- it grants nothing a first-time
-registration would. A producer with no `byproducer` row is still refused one while ineligible.
+mapping: a producer that has since gone inactive, lost its operator or finalizer standing, or
+fallen outside the rank band must still be able to revoke a compromised `snap_account`, and the
+prune is out of reach below 30 rows. Rotation erases that producer's `byproducer` row and emplaces
+the replacement under the new `snap_account`, leaving the row count and the producer's single vote
+unchanged -- it grants nothing a gated registration would. A producer holding no `byproducer` row
+is still refused one while ineligible, whether or not it held one before.
 
 ### Voting and quorum
 
