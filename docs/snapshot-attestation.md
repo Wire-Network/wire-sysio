@@ -131,10 +131,11 @@ Storage uses the KV table API (`sysio::kv::table` / `sysio::kv::global`).
 ### Registration
 
 A producer calls `regsnapprov` to designate a separate `snap_account` as its snapshot
-provider. The producer must be registered (via `regproducer`), active, and ranked at or below
-`max_snap_provider_rank` (30) when the mapping is created. This producer-table check is the
-registration trust gate; operator-registry status is deliberately not an additional dependency.
-It gates CREATING a mapping only -- replacing one is not gated, for the reason below.
+provider. A producer that holds no mapping yet must be registered (via `regproducer`), active, and
+ranked at or below `max_snap_provider_rank` (30). This producer-table check is the registration
+trust gate; operator-registry status is deliberately not an additional dependency. It gates that
+first-time registration only -- a producer that already holds a mapping replaces it ungated, for
+the reason below.
 Eligibility is not rechecked while voting, so a provider that was valid when registered keeps a
 stable delegation through ordinary producer churn.
 
@@ -152,9 +153,10 @@ signing account neither retracts an accepted vote nor allows the producer to vot
 
 Rotation is not eligibility-gated, because `regsnapprov` is the only action that can replace a
 mapping: a producer that has since gone inactive or fallen outside the rank band must still be able
-to revoke a compromised `snap_account`, and the prune is out of reach below 30 rows. The rotation
-replaces that producer's single row, so it grants nothing a new registration would -- and a new
-mapping from an ineligible producer is still rejected.
+to revoke a compromised `snap_account`, and the prune is out of reach below 30 rows. Rotation erases
+that producer's `byproducer` row and emplaces the replacement under the new `snap_account`, leaving
+the row count and the producer's single vote unchanged -- it grants nothing a first-time
+registration would. A producer with no `byproducer` row is still refused one while ineligible.
 
 ### Voting and quorum
 

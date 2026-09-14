@@ -120,8 +120,8 @@ getsnaphash(block_num)                    // read-only — returns attested reco
 | `snaprecords` | `block_num` | `{ block_num, block_id, snapshot_hash, attested_at_block }` |
 
 **Registration:**
-- A producer calls `regsnapprov` to designate a `snap_account` as their snapshot provider. The producer must be registered, active, and ranked at or below 30 at registration time. Producer-table eligibility is deliberately the only registration gate; operator-registry status is not consulted.
-- Repeating the same registration is idempotent; registering a new snap_account atomically rotates that producer's mapping without retracting producer-keyed votes.
+- A producer calls `regsnapprov` to designate a `snap_account` as their snapshot provider. A producer holding no mapping yet must be registered, active, and ranked at or below 30. Producer-table eligibility is deliberately the only registration gate; operator-registry status is not consulted.
+- Repeating the same registration is idempotent; registering a new snap_account atomically rotates that producer's mapping without retracting producer-keyed votes. Rotation is deliberately not eligibility-gated: `regsnapprov` is the only action that can replace a mapping, so a producer that has since become ineligible must still be able to revoke a compromised `snap_account`. It replaces that producer's single row, so it grants nothing a first-time registration would -- which stays gated.
 - The table is capped at 30. Producer lifecycle actions do no attestation work. Only a registration that finds the table full lazily removes mappings whose producers are missing, inactive, or rank-ineligible; pending votes remain monotonic.
 **Voting:**
 - The contract accepts only block heights divisible by 25,000, matching the automatic provider schedule; manual/on-demand heights are rejected.
@@ -339,7 +339,7 @@ For a complete operator setup guide — including producer registration, provide
 ### Implemented Tests
 
 **Contract tests** (`contracts/tests/sysio.snapshot_attest_tests.cpp`):
-- Registration: authority/eligibility checks, idempotent rotation, bounded capacity, side-effect-free conflicts, and traceable lazy stale-row pruning only when full
+- Registration: authority/eligibility checks, idempotent rotation, ungated rotation by a producer that has since become ineligible, bounded capacity, side-effect-free conflicts, and traceable lazy stale-row pruning only when full
 - Configuration: validation, authority, explicit initialization, and current fixed-K enforcement
 - Voting: scheduled/future bounds, idempotency, per-height equivocation rejection, and independent heights
 - Quorum: fixed K independent of registration count, governance changes on pending tuples, and explicit K=1 behavior

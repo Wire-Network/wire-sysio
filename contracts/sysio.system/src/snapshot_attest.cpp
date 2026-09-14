@@ -212,7 +212,7 @@ void snapshot_attest::regsnapprov(name producer, name snap_account) {
       // so gating it would strand a producer that has since gone inactive or lost its rank position
       // with a compromised snap_account it cannot revoke -- the prune is out of reach below
       // max_snap_providers. The erase keeps both the row count and this producer's single vote
-      // unchanged, so an ineligible rotation grants nothing a new registration would.
+      // unchanged, so an ineligible rotation grants nothing a first-time registration would.
       by_producer.erase(std::move(producer_itr));
    } else {
       // CREATE is gated, and gated BEFORE the prune so a rejected registration never erases

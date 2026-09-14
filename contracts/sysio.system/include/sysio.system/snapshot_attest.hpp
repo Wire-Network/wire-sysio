@@ -148,12 +148,15 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
    /**
     * Register a snapshot provider account delegated by a producer.
     *
-    * The producer must be active and hold a rank position <= max_snap_provider_rank at
-    * registration time. That walk tests `is_schedulable`, so operator-registry status and an active
-    * finalizer key are both consulted through it. Re-registering rotates that producer's snapshot
-    * account without
-    * retracting votes already recorded under the producer identity. When the table is full, stale
-    * producer mappings are pruned lazily before enforcing the capacity limit.
+    * A producer holding no mapping yet must be active and hold a rank position <=
+    * max_snap_provider_rank. That walk tests `is_schedulable`, so operator-registry status and an
+    * active finalizer key are both consulted through it. When the table is full, stale producer
+    * mappings are pruned lazily before enforcing the capacity limit.
+    *
+    * Re-registering rotates that producer's snapshot account without retracting votes already
+    * recorded under the producer identity, and is deliberately NOT eligibility-gated: this is the
+    * only action that can replace a mapping, so a producer that has since become ineligible must
+    * still be able to revoke a compromised snapshot account.
     */
    [[sysio::action]]
    void regsnapprov(name producer, name snap_account);
