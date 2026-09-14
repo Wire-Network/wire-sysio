@@ -60,7 +60,7 @@ struct snap_provider_key_t {
 struct [[sysio::table("snapprovs"), sysio::contract("sysio.system")]] snap_provider {
    /// Account authorized to submit snapshot votes.
    name snap_account;
-   /// Active, rank-eligible producer represented by this account.
+   /// Delegating producer. Schedulable when the mapping was acquired, not maintained afterwards.
    name producer;
 
    /** Return the producer secondary-index key. */
@@ -148,15 +148,32 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
    /**
     * Register a snapshot provider account delegated by a producer.
     *
-    * The producer must be active and hold a rank position <= max_snap_provider_rank at
-    * registration time. That walk tests `is_schedulable`, so operator-registry status and an active
-    * finalizer key are both consulted through it. Re-registering rotates that producer's snapshot
-    * account without
-    * retracting votes already recorded under the producer identity. When the table is full, stale
-    * producer mappings are pruned lazily before enforcing the capacity limit.
+    * A producer that currently holds no mapping must be active and hold a rank position <=
+    * max_snap_provider_rank. That walk tests `is_schedulable`, so operator-registry status and an
+    * active finalizer key are both consulted through it, and a rejection names which of the three
+    * conditions failed. When the table is full, stale producer
+    * mappings are pruned lazily before enforcing the capacity limit -- a producer evicted that way
+    * is gated again when it re-registers.
+    *
+    * Re-registering rotates that producer's snapshot account without retracting votes already
+    * recorded under the producer identity, and is deliberately NOT eligibility-gated. `delsnapprov`
+    * does not replace it: leaving is one-way, since re-registering is gated, so an ineligible
+    * producer that rotates keeps a delegation it can still serve from and carry back into
+    * eligibility.
     */
    [[sysio::action]]
    void regsnapprov(name producer, name snap_account);
+
+   /**
+    * Retire the caller's snapshot-provider delegation, freeing its registration slot.
+    *
+    * Not eligibility-gated, for the reason rotation is not: a producer that has become ineligible
+    * is exactly the one that needs to stop, and the capacity prune is out of reach below
+    * max_snap_providers. Votes already accepted are keyed by producer identity and are not
+    * retracted, and the producer keeps the attestation credit it earned in the open pay period.
+    */
+   [[sysio::action]]
+   void delsnapprov(name producer);
 
    /**
     * Submit a snapshot hash vote from a registered provider for a scheduled snapshot height.
