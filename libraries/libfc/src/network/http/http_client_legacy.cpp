@@ -171,18 +171,6 @@ public:
          [active_cancel] { return static_cast<bool>(*active_cancel) && (*active_cancel)(); });
    }
 
-   /** Resolve one endpoint through the same asynchronous core. */
-   void prime_endpoint(const url& target, const request_options& options) {
-      auto async_options = options;
-      use_guard guard(*this, async_options);
-      async_options.cancel_check = {};
-      run_void(
-         [&](asio::cancellation_slot slot) {
-            return async_client.async_warm_up(target, std::move(async_options), slot);
-         },
-         options.cancel_check);
-   }
-
    /** Stream one response through the pull reader and atomic-file helper. */
    void perform_to_file(const request& req, const request_options& options, const std::filesystem::path& output,
                         const std::function<void(const http_file_download_status&)>& status_callback,
@@ -291,10 +279,6 @@ response transport::perform(const request& req, const request_options& options) 
 response transport::perform_then(const request& req, const request_options& options,
                                  const continuation_hook& continue_with) {
    return _impl->perform_then(req, options, continue_with);
-}
-
-void transport::prime_endpoint(const url& target, const request_options& options) {
-   _impl->prime_endpoint(target, options);
 }
 
 void transport::perform_to_file(const request& req, const request_options& options, const std::filesystem::path& output,
@@ -415,10 +399,6 @@ variant http_client::post_sync(const url& dest, const variant& payload, const ti
       FC_THROW("HTTP POST failed with status {}", response.status);
    }
    return result;
-}
-
-void http_client::set_verify_peers(bool enabled) {
-   FC_ASSERT(enabled, "Outbound HTTPS peer and hostname verification cannot be disabled");
 }
 
 void http_client::set_transport_options(http::transport_options options) {

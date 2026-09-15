@@ -17,8 +17,7 @@ namespace fc::network::json_rpc {
 
 // -----------------------------------------------------------------------
 //  HTTP verb — used by send_http and typed REST methods.
-//  Existing JSON-RPC methods (call, notify, call_batch) are unchanged
-//  and always use POST internally.
+//  The JSON-RPC methods (call, call_idempotent) always use POST internally.
 // -----------------------------------------------------------------------
 enum class http_verb { GET, PUT, POST, DELETE_ };
 
@@ -121,16 +120,6 @@ public:
     */
    fc::variant call_then(const std::string& method, const fc::variant& params, call_options first_call_options,
                          const continuation_hook& continue_with);
-
-   /**
-    * Send one non-replaying notification and consume its HTTP response.
-    *
-    * A JSON-RPC notification has no `id`; the response body is ignored.
-    */
-   void notify(const std::string& method, const fc::variant& params = variants{});
-
-   /** Perform one non-replaying JSON-RPC batch request. */
-   variant call_batch(const std::vector<variant>& requests);
 
    // -----------------------------------------------------------------------
    //  Raw HTTP verb support — for REST-style endpoints.

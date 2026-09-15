@@ -342,13 +342,6 @@ public:
                                                        continuation_hook continue_with,
                                                        boost::asio::cancellation_slot cancellation = {});
 
-   /** Resolve and cache one endpoint without opening a connection. */
-   boost::asio::awaitable<void> async_warm_up(const url& target, request_options options,
-                                              boost::asio::cancellation_slot cancellation = {});
-
-   /** Return the executor used by all client state and socket operations. */
-   boost::asio::any_io_executor get_executor() const noexcept;
-
 private:
    friend class transport_impl;
    friend boost::asio::awaitable<void> async_download_atomic(client&, request, request_options, std::filesystem::path,
@@ -394,9 +387,6 @@ public:
     * must not block or re-enter this transport; re-entry fails immediately.
     */
    response perform_then(const request& req, const request_options& options, const continuation_hook& continue_with);
-
-   /** Resolve and cache one endpoint under the same DNS/connect deadline policy. */
-   void prime_endpoint(const url& target, const request_options& options);
 
    /**
     * Execute one bounded request and stream a successful response atomically to @p output.
@@ -472,13 +462,6 @@ public:
 
    variant post_sync(const url& dest, const variant& payload, const time_point& deadline = time_point::maximum());
 
-   template <typename T>
-   variant post_sync(const url& dest, const T& payload, const time_point& deadline = time_point::maximum()) {
-      variant payload_v;
-      to_variant(payload, payload_v);
-      return post_sync(dest, payload_v, deadline);
-   }
-
    /**
     * Download a binary POST response using explicit resource limits.
     *
@@ -495,8 +478,6 @@ public:
     * cancels the active operation so callers can interrupt otherwise unbounded requests.
     */
    void set_cancel_check(std::function<bool()> cancel_check);
-
-   void set_verify_peers(bool enabled);
 
    /**
     * Replace transport configuration while preserving this facade object's identity.

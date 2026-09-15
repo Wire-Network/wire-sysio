@@ -1364,13 +1364,6 @@ BOOST_AUTO_TEST_CASE(tls_failure_diagnostic_omits_url_credentials) {
       });
 }
 
-/// The legacy facade rejects every attempt to disable HTTPS verification.
-BOOST_AUTO_TEST_CASE(peer_verification_cannot_be_disabled) {
-   fc::http_client client;
-   BOOST_CHECK_THROW(client.set_verify_peers(false), fc::exception);
-   BOOST_CHECK_NO_THROW(client.set_verify_peers(true));
-}
-
 /// A peer that never completes TLS negotiation is bounded by the connect-phase deadline.
 BOOST_AUTO_TEST_CASE(tls_handshake_is_bounded) {
    scripted_http_server server(

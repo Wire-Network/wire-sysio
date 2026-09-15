@@ -281,32 +281,6 @@ variant json_rpc_client::extract_call_result(const variant& response, std::int64
    return object["result"];
 }
 
-void json_rpc_client::notify(const std::string& method, const fc::variant& params) {
-   mutable_variant_object obj;
-   obj("jsonrpc", "2.0")("method", method)("params", params);
-   send_json(fc::variant(obj), false, non_replaying_request_options(_options.request));
-}
-
-fc::variant json_rpc_client::call_batch(const std::vector<fc::variant>& requests) {
-   variants payload;
-   payload.reserve(requests.size());
-   for (const auto& request : requests) {
-      if (!request.is_object())
-         throw json_rpc_error("JSON-RPC batch: each element must be an object");
-      fc::mutable_variant_object object(request.get_object());
-      if (!object.contains("jsonrpc"))
-         object("jsonrpc", "2.0");
-      if (!object.contains("method"))
-         throw json_rpc_error("JSON-RPC batch: missing 'method'");
-      payload.emplace_back(std::move(object));
-   }
-
-   variant response = send_json(variant(payload), true, non_replaying_request_options(_options.request));
-   if (!response.is_array())
-      throw json_rpc_error("JSON-RPC batch: server did not return an array");
-   return response;
-}
-
 variant json_rpc_client::send_json(const variant& payload, bool expect_json_body,
                                    fc::http::request_options request_options) {
    const auto body = fc::json::to_string(payload, fc::json::yield_function_t{});

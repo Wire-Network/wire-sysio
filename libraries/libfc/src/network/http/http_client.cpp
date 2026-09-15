@@ -679,12 +679,6 @@ public:
       transition(http_file_download_phase::complete);
    }
 
-   /** Return decoded response bytes retained or written by this sink. */
-   uint64_t received_bytes() const {
-      std::scoped_lock lock(_mutex);
-      return _status == status_value(beast_http::status::ok) ? _downloaded_bytes : _error_body.size();
-   }
-
 private:
    /** Return a path on the destination filesystem suitable for a space query. */
    std::filesystem::path space_query_path() const {
@@ -1837,17 +1831,6 @@ public:
               std::function<void(http_file_download_phase)> on_phase = {}, connection_affinity affinity = {},
               bool retain_connection = false);
 
-   asio::awaitable<void> async_warm_up(url target, request_options policy, std::shared_ptr<request_control> control) {
-      validate_policy(policy);
-      const auto total_deadline = effective_total_deadline(policy);
-      const auto connect_deadline =
-         phase_deadline(policy.timeouts.connect, failure_kind::timeout_connect, total_deadline);
-      const auto normalized = normalize_target(target);
-      if (normalized.scheme == scheme_unix)
-         co_return;
-      (void)co_await resolve(proxy_host.value_or(normalized.host), proxy_service.value_or(normalized.service),
-                             connect_deadline, control);
-   }
 };
 
 /** Parser, connection lease, and policy for one opened response. */
@@ -2293,23 +2276,6 @@ asio::awaitable<response> client::async_request_then(request req, request_option
 
    response_reader next_reader(std::move(next_impl));
    co_return co_await async_buffer_response(next_reader);
-}
-
-asio::awaitable<void> client::async_warm_up(const url& target, request_options options,
-                                            asio::cancellation_slot cancellation) {
-   FC_ASSERT(_impl, "Outbound HTTP client is empty");
-   auto control = request_control::create(cancellation, _impl->strand);
-   try {
-      co_await asio::co_spawn(_impl->strand, _impl->async_warm_up(target, std::move(options), std::move(control)),
-                              asio::use_awaitable);
-   } catch (const transport_failure& failure) {
-      record_failure(failure.kind);
-      throw_public_failure(failure);
-   }
-}
-
-asio::any_io_executor client::get_executor() const noexcept {
-   return _impl ? asio::any_io_executor(_impl->strand) : asio::any_io_executor{};
 }
 
 asio::awaitable<void> async_download_atomic(client& source, request req, request_options policy,

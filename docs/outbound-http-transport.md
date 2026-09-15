@@ -40,7 +40,7 @@ transport already classified as retryable; it cannot broaden replay eligibility 
 requirement. The legacy snapshot retry flag remains source-compatible and maps internally to the same hook.
 
 Side-effecting calls such as `eth_sendTransaction`, `eth_sendRawTransaction`, Solana `sendTransaction`, and
-`requestAirdrop` are always single-attempt. The generic JSON-RPC `call`, notification, batch, and raw HTTP APIs also
+`requestAirdrop` are always single-attempt. The generic JSON-RPC `call` and raw HTTP APIs also
 enforce single-attempt behavior even if a caller supplies permissive base retry options. A caller must select the
 explicit idempotent API to receive the stale-connection retry.
 
