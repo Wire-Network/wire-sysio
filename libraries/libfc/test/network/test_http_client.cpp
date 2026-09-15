@@ -665,69 +665,32 @@ std::string certificate_hash_filename(const std::filesystem::path& certificate) 
 
 BOOST_AUTO_TEST_SUITE(http_authenticated_transport_tests)
 
-/// A continuation observes the first response and sends its follow-up on the same socket.
-BOOST_AUTO_TEST_CASE(connection_affine_continuation_reuses_exact_connection) {
-   std::atomic_uint32_t requests_observed{1};
-   scripted_http_server server([&](tcp::socket& socket, const std::atomic_bool&) {
-      BOOST_REQUIRE(write_bytes(socket, "HTTP/1.1 200 OK\r\n"
-                                        "Content-Length: 5\r\n"
-                                        "Connection: keep-alive\r\n\r\n"
-                                        "first"));
-      if (!read_request_header(socket).empty()) {
-         ++requests_observed;
-         (void)write_bytes(socket, "HTTP/1.1 200 OK\r\n"
-                                   "Content-Length: 6\r\n"
-                                   "Connection: close\r\n\r\n"
-                                   "second");
-      }
-   });
-   fc::http::transport transport;
-   const fc::http::request request{
-      .method = fc::http::request_method::get,
-      .target = server_url(server),
-   };
-   bool hook_called = false;
-
-   const auto response = transport.perform_then(request, tls_request_options(), [&](const fc::http::response& first) {
-      hook_called = true;
-      BOOST_CHECK_EQUAL(first.body, "first");
-      return fc::http::continuation_request{
-         .next_request = request,
-         .options = tls_request_options(),
-      };
-   });
-
-   BOOST_CHECK(hook_called);
-   BOOST_CHECK_EQUAL(response.body, "second");
-   BOOST_CHECK_EQUAL(requests_observed.load(), 2U);
-}
-
-/// A continuation that re-enters its synchronous transport fails instead of deadlocking.
-BOOST_AUTO_TEST_CASE(connection_affine_continuation_reentry_fails_fast) {
+/// A transport callback that re-enters its synchronous transport fails instead of deadlocking.
+BOOST_AUTO_TEST_CASE(synchronous_transport_reentry_fails_fast) {
    scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
-      (void)write_bytes(socket, "HTTP/1.1 200 OK\r\n"
-                                "Content-Length: 5\r\n"
-                                "Connection: keep-alive\r\n\r\n"
-                                "first");
+      write_bytes(socket, fixed_length_header(exact_body_bytes) + std::string(exact_body));
    });
-   fc::http::transport transport;
-   const fc::http::request request{
-      .method = fc::http::request_method::get,
-      .target = server_url(server),
-   };
+   fc::temp_directory temp;
+   const auto output = temp.path() / "reentry.bin";
+   fc::http_client client;
    const auto started = std::chrono::steady_clock::now();
 
-   BOOST_CHECK_EXCEPTION(transport.perform_then(request, tls_request_options(),
-                                                [&](const fc::http::response&) {
-                                                   (void)transport.perform(request, tls_request_options());
-                                                   return fc::http::continuation_request{
-                                                      .next_request = request,
-                                                      .options = tls_request_options(),
-                                                   };
-                                                }),
-                         fc::exception, [](const fc::exception& error) {
-                            return error.to_detail_string().find("cannot be re-entered") != std::string::npos;
-                         });
+   // The download sink swallows status-callback exceptions, so capture the re-entry failure here
+   // rather than letting it propagate out of post_to_file.
+   std::string reentry_error;
+   auto options = download_options(exact_body_bytes);
+   options.status_callback = [&](const fc::http_file_download_status&) {
+      if (!reentry_error.empty())
+         return;
+      try {
+         (void)client.post_sync(server_url(server), fc::variant(fc::mutable_variant_object()));
+      } catch (const fc::exception& error) {
+         reentry_error = error.to_detail_string();
+      }
+   };
+   client.post_to_file(server_url(server), fc::variant(fc::mutable_variant_object()), output, options);
+
+   BOOST_CHECK(reentry_error.find("cannot be re-entered") != std::string::npos);
    BOOST_CHECK_LT(
       std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - started).count(),
       max_test_elapsed_ms);
@@ -824,206 +787,6 @@ BOOST_AUTO_TEST_CASE(expired_idle_connection_is_not_reused) {
    (void)transport.perform(request, tls_request_options());
 
    BOOST_CHECK_EQUAL(connections.load(), 2U);
-}
-
-/// A continuation cannot redirect the retained connection to another endpoint.
-BOOST_AUTO_TEST_CASE(connection_affine_continuation_rejects_different_endpoint) {
-   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
-      (void)write_bytes(socket, "HTTP/1.1 200 OK\r\n"
-                                "Content-Length: 5\r\n"
-                                "Connection: keep-alive\r\n\r\n"
-                                "first");
-   });
-   fc::http::transport transport;
-   const fc::http::request request{
-      .method = fc::http::request_method::get,
-      .target = server_url(server),
-   };
-
-   BOOST_CHECK_EXCEPTION(transport.perform_then(request, tls_request_options(),
-                                                [&](const fc::http::response&) {
-                                                   auto different_endpoint = request;
-                                                   different_endpoint.target = fc::url("http://127.0.0.1:1/download");
-                                                   return fc::http::continuation_request{
-                                                      .next_request = std::move(different_endpoint),
-                                                      .options = tls_request_options(),
-                                                   };
-                                                }),
-                         fc::exception, [](const fc::exception& error) {
-                            return error.to_detail_string().find("does not match the retained endpoint") !=
-                                   std::string::npos;
-                         });
-}
-
-/// A rejecting continuation closes the retained connection before a follow-up is written.
-BOOST_AUTO_TEST_CASE(connection_affine_continuation_rejection_fails_closed) {
-   std::atomic_uint32_t requests_observed{1};
-   scripted_http_server server([&](tcp::socket& socket, const std::atomic_bool&) {
-      BOOST_REQUIRE(write_bytes(socket, "HTTP/1.1 200 OK\r\n"
-                                        "Content-Length: 5\r\n"
-                                        "Connection: keep-alive\r\n\r\n"
-                                        "first"));
-      if (!read_request_header(socket).empty())
-         ++requests_observed;
-   });
-   fc::http::transport transport;
-   const fc::http::request request{
-      .method = fc::http::request_method::get,
-      .target = server_url(server),
-   };
-
-   BOOST_CHECK_THROW(transport.perform_then(request, tls_request_options(),
-                                            [](const fc::http::response&) -> fc::http::continuation_request {
-                                               FC_THROW("continuation rejected");
-                                            }),
-                     fc::exception);
-   BOOST_CHECK_EQUAL(requests_observed.load(), 1U);
-}
-
-/// Cancellation emitted by the hook closes the retained socket before request two is written.
-BOOST_AUTO_TEST_CASE(connection_affine_continuation_honors_slot_cancellation_before_write) {
-   std::atomic_uint32_t requests_observed{1};
-   scripted_http_server server([&](tcp::socket& socket, const std::atomic_bool&) {
-      BOOST_REQUIRE(write_bytes(socket, "HTTP/1.1 200 OK\r\n"
-                                        "Content-Length: 5\r\n"
-                                        "Connection: keep-alive\r\n\r\n"
-                                        "first"));
-      if (!read_request_header(socket).empty())
-         ++requests_observed;
-   });
-   const fc::http::request request{
-      .method = fc::http::request_method::get,
-      .target = server_url(server),
-   };
-   boost::asio::io_context io;
-   fc::http::client client(io.get_executor());
-   boost::asio::cancellation_signal cancellation;
-   std::exception_ptr failure;
-
-   boost::asio::co_spawn(
-      io,
-      [&]() -> boost::asio::awaitable<void> {
-         (void)co_await client.async_request_then(
-            request, tls_request_options(),
-            [&](const fc::http::response&) {
-               cancellation.emit(boost::asio::cancellation_type::terminal);
-               return fc::http::continuation_request{
-                  .next_request = request,
-                  .options = tls_request_options(),
-               };
-            },
-            cancellation.slot());
-      },
-      [&](std::exception_ptr operation_failure) { failure = std::move(operation_failure); });
-   io.run();
-
-   BOOST_REQUIRE(failure);
-   BOOST_CHECK_EXCEPTION(std::rethrow_exception(failure), fc::canceled_exception, [](const fc::exception& error) {
-      return error.to_detail_string().find("cancelled") != std::string::npos;
-   });
-   BOOST_CHECK_EQUAL(requests_observed.load(), 1U);
-}
-
-/// The blocking adapter checks its predicate at the hook boundary, not only on its timer.
-BOOST_AUTO_TEST_CASE(connection_affine_continuation_honors_predicate_cancellation_before_write) {
-   std::atomic_uint32_t requests_observed{1};
-   scripted_http_server server([&](tcp::socket& socket, const std::atomic_bool&) {
-      BOOST_REQUIRE(write_bytes(socket, "HTTP/1.1 200 OK\r\n"
-                                        "Content-Length: 5\r\n"
-                                        "Connection: keep-alive\r\n\r\n"
-                                        "first"));
-      if (!read_request_header(socket).empty())
-         ++requests_observed;
-   });
-   fc::http::transport transport;
-   const fc::http::request request{
-      .method = fc::http::request_method::get,
-      .target = server_url(server),
-   };
-   std::atomic_bool cancelled{false};
-   auto options = tls_request_options();
-   options.cancel_check = [&cancelled] { return cancelled.load(); };
-
-   BOOST_CHECK_EXCEPTION(transport.perform_then(request, options,
-                                                [&](const fc::http::response&) {
-                                                   cancelled = true;
-                                                   auto next_options = tls_request_options();
-                                                   next_options.cancel_check = [] { return false; };
-                                                   return fc::http::continuation_request{
-                                                      .next_request = request,
-                                                      .options = std::move(next_options),
-                                                   };
-                                                }),
-                         fc::canceled_exception, [](const fc::exception& error) {
-                            return error.to_detail_string().find("cancelled") != std::string::npos;
-                         });
-   BOOST_CHECK_EQUAL(requests_observed.load(), 1U);
-}
-
-/// A peer-closed first connection never causes the follow-up to reconnect.
-BOOST_AUTO_TEST_CASE(connection_affine_continuation_does_not_reconnect) {
-   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
-      (void)write_bytes(socket, "HTTP/1.1 200 OK\r\n"
-                                "Content-Length: 5\r\n"
-                                "Connection: close\r\n\r\n"
-                                "first");
-   });
-   fc::http::transport transport;
-   const fc::http::request request{
-      .method = fc::http::request_method::get,
-      .target = server_url(server),
-   };
-
-   BOOST_CHECK_EXCEPTION(transport.perform_then(request, tls_request_options(),
-                                                [&](const fc::http::response&) {
-                                                   return fc::http::continuation_request{
-                                                      .next_request = request,
-                                                      .options = tls_request_options(),
-                                                   };
-                                                }),
-                         fc::exception, [](const fc::exception& error) {
-                            return error.to_detail_string().find("connection-affine") != std::string::npos;
-                         });
-}
-
-/// Each request in a continuation receives an independent total deadline.
-BOOST_AUTO_TEST_CASE(connection_affine_continuation_has_per_request_deadlines) {
-   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool& stop) {
-      BOOST_REQUIRE(write_bytes(socket, "HTTP/1.1 200 OK\r\n"
-                                        "Content-Length: 5\r\n"
-                                        "Connection: keep-alive\r\n\r\n"
-                                        "first"));
-      if (read_request_header(socket).empty())
-         return;
-      const auto respond_at = std::chrono::steady_clock::now() + 150ms;
-      while (!stop.load() && std::chrono::steady_clock::now() < respond_at) {
-         std::this_thread::sleep_for(5ms);
-      }
-      if (!stop.load()) {
-         (void)write_bytes(socket, "HTTP/1.1 200 OK\r\n"
-                                   "Content-Length: 6\r\n"
-                                   "Connection: close\r\n\r\n"
-                                   "second");
-      }
-   });
-   fc::http::transport transport;
-   const fc::http::request request{
-      .method = fc::http::request_method::get,
-      .target = server_url(server),
-   };
-   auto first_options = tls_request_options();
-   first_options.timeouts.total = fc::milliseconds(100);
-
-   const auto response = transport.perform_then(request, first_options, [&](const fc::http::response&) {
-      auto next_options = tls_request_options();
-      next_options.timeouts.total = fc::milliseconds(500);
-      return fc::http::continuation_request{
-         .next_request = request,
-         .options = std::move(next_options),
-      };
-   });
-
-   BOOST_CHECK_EQUAL(response.body, "second");
 }
 
 /// A private CA file augments trust and accepts the matching DNS identity with SNI.
@@ -1857,64 +1620,6 @@ BOOST_AUTO_TEST_CASE(request_upload_can_be_cancelled) {
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE(http_async_client_tests)
-
-/// A continuation hook executes on the client strand rather than the initiating executor.
-BOOST_AUTO_TEST_CASE(continuation_hook_runs_on_client_executor) {
-   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
-      BOOST_REQUIRE(write_bytes(socket, "HTTP/1.1 200 OK\r\n"
-                                        "Content-Length: 5\r\n"
-                                        "Connection: keep-alive\r\n\r\n"
-                                        "first"));
-      if (!read_request_header(socket).empty()) {
-         (void)write_bytes(socket, "HTTP/1.1 200 OK\r\n"
-                                   "Content-Length: 6\r\n"
-                                   "Connection: close\r\n\r\n"
-                                   "second");
-      }
-   });
-
-   boost::asio::io_context client_io;
-   auto client_work = boost::asio::make_work_guard(client_io);
-   std::promise<std::thread::id> client_thread;
-   auto client_thread_future = client_thread.get_future();
-   std::jthread client_worker([&] {
-      client_thread.set_value(std::this_thread::get_id());
-      client_io.run();
-   });
-   const auto expected_thread = client_thread_future.get();
-
-   boost::asio::io_context caller_io;
-   fc::http::client client(client_io.get_executor());
-   const fc::http::request request{
-      .method = fc::http::request_method::get,
-      .target = server_url(server),
-   };
-   std::thread::id hook_thread;
-   std::exception_ptr failure;
-   boost::asio::co_spawn(
-      caller_io,
-      [&]() -> boost::asio::awaitable<void> {
-         const auto response =
-            co_await client.async_request_then(request, tls_request_options(), [&](const fc::http::response& first) {
-               hook_thread = std::this_thread::get_id();
-               BOOST_CHECK_EQUAL(first.body, "first");
-               return fc::http::continuation_request{
-                  .next_request = request,
-                  .options = tls_request_options(),
-               };
-            });
-         BOOST_CHECK_EQUAL(response.body, "second");
-      },
-      [&](std::exception_ptr operation_failure) { failure = std::move(operation_failure); });
-   caller_io.run();
-   client_work.reset();
-   client_worker.join();
-
-   if (failure)
-      std::rethrow_exception(failure);
-   BOOST_CHECK(hook_thread == expected_thread);
-   BOOST_CHECK(hook_thread != std::this_thread::get_id());
-}
 
 /// async_open returns after the response head and the pull reader incrementally consumes the body.
 BOOST_AUTO_TEST_CASE(open_exposes_headers_before_a_delayed_body) {

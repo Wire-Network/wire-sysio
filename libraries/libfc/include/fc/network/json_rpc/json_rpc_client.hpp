@@ -55,26 +55,6 @@ struct call_options {
    std::optional<fc::microseconds> total_timeout_cap;
 };
 
-/** Deadline policy for a connection-affine JSON-RPC follow-up. */
-struct follow_up_options {
-   /// Optional upper bound for the base total timeout.
-   std::optional<fc::microseconds> total_timeout_cap;
-};
-
-/** One JSON-RPC call selected by a completed-call continuation hook. */
-struct continuation_call {
-   std::string method;
-   fc::variant params = variants{};
-   follow_up_options options;
-};
-
-/**
- * Inspect one call result and select a same-connection follow-up call.
- *
- * The hook must not block or re-enter the same client.
- */
-using continuation_hook = std::function<continuation_call(const fc::variant&)>;
-
 // JSON-RPC error type
 struct json_rpc_error : fc::exception {
    int code;
@@ -108,18 +88,6 @@ public:
     * connection proves stale.
     */
    fc::variant call_idempotent(const std::string& method, const fc::variant& params = variants{});
-
-   /**
-    * Perform one bounded call, inspect its result, and send a hook-selected
-    * follow-up over the exact same HTTP/TLS connection.
-    *
-    * The first call follows @p first_call_options. The selected follow-up
-    * is always single-attempt because reconnecting would break connection
-    * affinity. Each call receives an independent total deadline. The hook
-    * must not block or re-enter this client; re-entry fails immediately.
-    */
-   fc::variant call_then(const std::string& method, const fc::variant& params, call_options first_call_options,
-                         const continuation_hook& continue_with);
 
    // -----------------------------------------------------------------------
    //  Raw HTTP verb support — for REST-style endpoints.

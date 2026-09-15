@@ -901,14 +901,6 @@ struct idle_connection {
    idle_clock::time_point idle_since;
 };
 
-/** Opaque in-process lease retained across a connection-affine continuation. */
-struct connection_affinity {
-   std::shared_ptr<connection_state> connection;
-   std::string connection_key;
-
-   explicit operator bool() const noexcept { return static_cast<bool>(connection); }
-};
-
 /**
  * Cancellation ownership for one logical request.
  *
@@ -1828,9 +1820,7 @@ public:
 
    asio::awaitable<std::shared_ptr<response_reader_impl>>
    async_open(request req, request_options policy, std::shared_ptr<request_control> control,
-              std::function<void(http_file_download_phase)> on_phase = {}, connection_affinity affinity = {},
-              bool retain_connection = false);
-
+              std::function<void(http_file_download_phase)> on_phase = {});
 };
 
 /** Parser, connection lease, and policy for one opened response. */
@@ -1839,7 +1829,7 @@ public:
    response_reader_impl(std::shared_ptr<client_impl> client_in, std::shared_ptr<connection_state> connection_in,
                         std::string connection_key_in, request_options policy_in,
                         std::optional<time_point> total_deadline_in, std::shared_ptr<request_control> control_in,
-                        std::shared_ptr<request_metrics_state> metrics_in, bool retain_connection_in)
+                        std::shared_ptr<request_metrics_state> metrics_in)
       : client(std::move(client_in))
       , connection(std::move(connection_in))
       , connection_key(std::move(connection_key_in))
@@ -1848,8 +1838,7 @@ public:
       , policy(std::move(policy_in))
       , total_deadline(total_deadline_in)
       , control(std::move(control_in))
-      , metrics(std::move(metrics_in))
-      , retain_connection(retain_connection_in) {
+      , metrics(std::move(metrics_in)) {
       parser.header_limit(policy.max_response_header_bytes);
       parser.body_limit(policy.max_response_body_bytes);
    }
@@ -1942,25 +1931,9 @@ public:
       }
       if (!parser.get().keep_alive())
          connection->close();
-      else if (!retain_connection)
+      else
          client->release_connection(connection_key, connection);
       metrics->finish_status(value_head.status);
-   }
-
-   /** Return the completed response's retained connection lease. */
-   connection_affinity retained_affinity() const {
-      FC_ASSERT(retain_connection && complete.load(std::memory_order_acquire),
-                "Outbound HTTP response has no completed retained connection");
-      return connection_affinity{
-         .connection = connection,
-         .connection_key = connection_key,
-      };
-   }
-
-   /** Close a retained connection after a continuation hook rejects it. */
-   void close_retained_connection() {
-      FC_ASSERT(retain_connection, "Outbound HTTP response connection was not retained");
-      connection->close();
    }
 
    std::shared_ptr<client_impl> client;
@@ -1977,14 +1950,12 @@ public:
    std::atomic_bool opened{false};
    std::atomic_bool complete{false};
    std::atomic_bool abandoned{false};
-   bool retain_connection = false;
    bool reading = false;
 };
 
 asio::awaitable<std::shared_ptr<response_reader_impl>>
 client_impl::async_open(request req, request_options policy, std::shared_ptr<request_control> control,
-                        std::function<void(http_file_download_phase)> on_phase, connection_affinity affinity,
-                        bool retain_connection) {
+                        std::function<void(http_file_download_phase)> on_phase) {
    validate_policy(policy);
    auto metrics = std::make_shared<request_metrics_state>();
    shared_metrics().requests.fetch_add(1, std::memory_order_relaxed);
@@ -2009,35 +1980,21 @@ client_impl::async_open(request req, request_options policy, std::shared_ptr<req
       throw;
    }
    transport_failure last_failure(failure_kind::io, "request did not start");
-   const auto max_attempts = affinity ? 1U : policy.retry.max_attempts;
-   for (uint32_t attempt = 1; attempt <= max_attempts; ++attempt) {
+   for (uint32_t attempt = 1; attempt <= policy.retry.max_attempts; ++attempt) {
       std::shared_ptr<connection_state> connection;
       bool reused = false;
       bool retry = false;
       try {
          if (on_phase)
             on_phase(http_file_download_phase::connecting);
-         if (affinity) {
-            connection = affinity.connection;
-            reused = true;
-            if (target.connection_key != affinity.connection_key) {
-               throw transport_failure(failure_kind::request_limit,
-                                       "connection-affine follow-up target does not match the retained endpoint");
-            }
-            if (!connection->open()) {
-               throw transport_failure(failure_kind::connect,
-                                       "connection-affine follow-up connection is no longer open");
-            }
-         } else {
-            auto acquired = co_await acquire_connection(target, policy, total_deadline, control, attempt > 1);
-            connection = std::move(acquired.first);
-            reused = acquired.second;
-         }
+         auto acquired = co_await acquire_connection(target, policy, total_deadline, control, attempt > 1);
+         connection = std::move(acquired.first);
+         reused = acquired.second;
 
          auto request_message = build_request(req, target);
          if (on_phase)
             on_phase(http_file_download_phase::sending_request);
-         control->throw_if_cancelled(affinity ? "connection-affine follow-up" : "request send");
+         control->throw_if_cancelled("request send");
          co_await std::visit(
             [&](auto& stream) {
                const auto upload_deadline =
@@ -2054,9 +2011,8 @@ client_impl::async_open(request req, request_options policy, std::shared_ptr<req
             connection->stream);
          shared_metrics().request_bytes.fetch_add(req.body.size(), std::memory_order_relaxed);
 
-         auto reader =
-            std::make_shared<response_reader_impl>(shared_from_this(), connection, target.connection_key, policy,
-                                                   total_deadline, control, metrics, retain_connection);
+         auto reader = std::make_shared<response_reader_impl>(shared_from_this(), connection, target.connection_key,
+                                                              policy, total_deadline, control, metrics);
          if (on_phase)
             on_phase(http_file_download_phase::waiting_for_response);
          co_await std::visit(
@@ -2084,9 +2040,9 @@ client_impl::async_open(request req, request_options policy, std::shared_ptr<req
             }
          }
          last_failure = failure;
-         if (attempt == max_attempts || !failure.retryable) {
+         if (attempt == policy.retry.max_attempts || !failure.retryable) {
             const auto final_failure =
-               max_attempts > 1 && failure.retryable
+               policy.retry.max_attempts > 1 && failure.retryable
                   ? transport_failure(failure_kind::retry_exhausted, "retry attempts exhausted after " +
                                                                         std::to_string(attempt) +
                                                                         " attempts: " + failure.what())
@@ -2177,18 +2133,6 @@ asio::awaitable<response> async_buffer_response(response_reader& reader) {
    co_return result;
 }
 
-/** Invoke one continuation hook on the client executor. */
-asio::awaitable<continuation_request> async_select_continuation(continuation_hook continue_with,
-                                                                response first_response) {
-   co_return continue_with(first_response);
-}
-
-/** Close one retained connection on its owning strand. */
-asio::awaitable<void> async_close_retained_response(std::shared_ptr<response_reader_impl> reader) {
-   reader->close_retained_connection();
-   co_return;
-}
-
 client::client(asio::any_io_executor executor, transport_options options)
    : client(std::move(executor), std::move(options), {}) {}
 
@@ -2216,66 +2160,6 @@ asio::awaitable<response> client::async_request(request req, request_options opt
                                                 asio::cancellation_slot cancellation) {
    auto reader = co_await async_open(std::move(req), std::move(options), cancellation);
    co_return co_await async_buffer_response(reader);
-}
-
-asio::awaitable<response> client::async_request_then(request req, request_options options,
-                                                     continuation_hook continue_with,
-                                                     asio::cancellation_slot cancellation) {
-   FC_ASSERT(_impl, "Outbound HTTP client is empty");
-   FC_ASSERT(static_cast<bool>(continue_with), "Outbound HTTP continuation hook must be configured");
-   auto control = request_control::create(cancellation, _impl->strand);
-
-   std::shared_ptr<response_reader_impl> first_impl;
-   try {
-      first_impl = co_await asio::co_spawn(_impl->strand,
-                                           _impl->async_open(std::move(req), std::move(options), control, {}, {}, true),
-                                           asio::use_awaitable);
-   } catch (const transport_failure& failure) {
-      throw_public_failure(failure);
-   }
-
-   response_reader first_reader(first_impl);
-   auto first_response = co_await async_buffer_response(first_reader);
-   const auto affinity = first_impl->retained_affinity();
-
-   std::optional<continuation_request> continuation;
-   std::exception_ptr continuation_failure;
-   try {
-      continuation.emplace(co_await asio::co_spawn(
-         _impl->strand, async_select_continuation(std::move(continue_with), std::move(first_response)),
-         asio::use_awaitable));
-      FC_ASSERT(continuation->options.retry.max_attempts == 1,
-                "Outbound HTTP connection-affine follow-up cannot retry");
-   } catch (...) {
-      continuation_failure = std::current_exception();
-   }
-   if (continuation_failure) {
-      co_await asio::co_spawn(_impl->strand, async_close_retained_response(first_impl), asio::use_awaitable);
-      std::rethrow_exception(continuation_failure);
-   }
-
-   std::shared_ptr<response_reader_impl> next_impl;
-   std::exception_ptr next_failure;
-   try {
-      next_impl = co_await asio::co_spawn(_impl->strand,
-                                          _impl->async_open(std::move(continuation->next_request),
-                                                            std::move(continuation->options), control, {}, affinity),
-                                          asio::use_awaitable);
-   } catch (...) {
-      next_failure = std::current_exception();
-   }
-   if (next_failure) {
-      co_await asio::co_spawn(_impl->strand, async_close_retained_response(first_impl), asio::use_awaitable);
-      try {
-         std::rethrow_exception(next_failure);
-      } catch (const transport_failure& failure) {
-         throw_public_failure(failure);
-      }
-      std::rethrow_exception(next_failure);
-   }
-
-   response_reader next_reader(std::move(next_impl));
-   co_return co_await async_buffer_response(next_reader);
 }
 
 asio::awaitable<void> async_download_atomic(client& source, request req, request_options policy,

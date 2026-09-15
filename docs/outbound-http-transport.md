@@ -55,29 +55,6 @@ closed before reuse, which keeps the reuse window below common provider keep-ali
 peer-closed sockets retained by the process. A non-blocking socket peek also rejects a cached connection when a
 peer FIN/reset or unexpected unread bytes are already observable.
 
-## Connection-affine continuations
-
-The asynchronous client and blocking compatibility adapter expose a generic one-step continuation hook. The
-transport buffers the first bounded response, keeps that exact HTTP/TLS connection out of the idle pool while the
-hook inspects it, and sends the hook-selected follow-up on the retained connection. The connection is opaque: callers
-cannot manufacture or persist a session identifier.
-
-The first request may apply its ordinary bounded retry policy before the hook runs. Once the hook is entered, a
-validation exception, peer close, endpoint change, cancellation, or follow-up transport failure closes the retained
-connection. The follow-up is single-attempt and never reconnects or falls back to another pooled connection. Each
-request has its own limits and total-deadline budget. This supports generic challenge/response, preflight/action, and
-endpoint-identity/action flows without embedding a caller-specific verification field in `request_options`.
-Continuation hooks execute synchronously on the client executor. They must be non-blocking and must not re-enter the
-same client; synchronous re-entry fails immediately instead of deadlocking.
-
-The JSON-RPC facade exposes the same mechanism through `call_then`. Its hook receives the validated first call's
-`result` and returns a method, parameters, and follow-up deadline policy. Replay policy is explicit:
-`stale_reused_connection_once` permits only the initial call to recover once when an idle cached connection proves
-stale. The follow-up options type has no replay setting because a connection-affine follow-up is unconditionally
-single-attempt. An optional per-call total-timeout cap can shorten the client's configured total timeout but cannot
-lengthen it or replace stricter connect, header, read, or idle limits. The first and follow-up calls each start an
-independent total-timeout budget and remain bounded by an active task deadline.
-
 ## Limits, cancellation, and snapshot downloads
 
 The shared transport bounds request and response headers and bodies. The total deadline covers queueing, DNS,

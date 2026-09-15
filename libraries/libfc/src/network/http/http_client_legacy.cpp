@@ -137,40 +137,6 @@ public:
          options.cancel_check);
    }
 
-   /** Run one hook-selected follow-up on the first response's exact connection. */
-   response perform_then(const request& req, const request_options& options, const continuation_hook& continue_with) {
-      auto async_options = options;
-      use_guard guard(*this, async_options);
-      async_options.cancel_check = {};
-      auto active_cancel = std::make_shared<std::function<bool()>>(options.cancel_check);
-      auto async_continue = [continue_with, active_cancel](const response& first_response) mutable {
-         auto continuation = continue_with(first_response);
-         if (continuation.options.cancel_check) {
-            auto first_cancel = std::move(*active_cancel);
-            auto next_cancel = std::move(continuation.options.cancel_check);
-            *active_cancel = [first_cancel = std::move(first_cancel), next_cancel = std::move(next_cancel)] {
-               return (first_cancel && first_cancel()) || (next_cancel && next_cancel());
-            };
-         }
-         continuation.options.cancel_check = {};
-         bool cancelled = false;
-         try {
-            cancelled = static_cast<bool>(*active_cancel) && (*active_cancel)();
-         } catch (...) {
-            cancelled = true;
-         }
-         if (cancelled) {
-            FC_THROW_EXCEPTION(fc::canceled_exception, "Outbound HTTP connection-affine follow-up cancelled");
-         }
-         return continuation;
-      };
-      return run<response>(
-         [&](asio::cancellation_slot slot) {
-            return async_client.async_request_then(req, std::move(async_options), std::move(async_continue), slot);
-         },
-         [active_cancel] { return static_cast<bool>(*active_cancel) && (*active_cancel)(); });
-   }
-
    /** Stream one response through the pull reader and atomic-file helper. */
    void perform_to_file(const request& req, const request_options& options, const std::filesystem::path& output,
                         const std::function<void(const http_file_download_status&)>& status_callback,
@@ -274,11 +240,6 @@ transport& transport::operator=(transport&&) noexcept = default;
 
 response transport::perform(const request& req, const request_options& options) {
    return _impl->perform(req, options);
-}
-
-response transport::perform_then(const request& req, const request_options& options,
-                                 const continuation_hook& continue_with) {
-   return _impl->perform_then(req, options, continue_with);
 }
 
 void transport::perform_to_file(const request& req, const request_options& options, const std::filesystem::path& output,

@@ -213,26 +213,6 @@ struct response {
    std::string body;
 };
 
-/**
- * One request selected by a connection-affine continuation hook.
- *
- * The request must target the same transport endpoint as the completed
- * request. It is sent on that exact HTTP/TLS connection without pooling,
- * reconnecting, or retrying.
- */
-struct continuation_request {
-   request next_request;
-   request_options options;
-};
-
-/**
- * Inspect one complete response and select a same-connection follow-up.
- *
- * The hook may throw to reject the continuation. It must not block or
- * re-enter the same client.
- */
-using continuation_hook = std::function<continuation_request(const response&)>;
-
 /** Response metadata available before a streamed body is consumed. */
 struct response_head {
    /// Numeric HTTP status.
@@ -328,20 +308,6 @@ public:
    boost::asio::awaitable<response> async_request(request req, request_options options,
                                                   boost::asio::cancellation_slot cancellation = {});
 
-   /**
-    * Buffer one response, invoke @p continue_with, and send its selected
-    * request over the exact same connection.
-    *
-    * The first request retains its final successful connection across the
-    * hook. A hook failure, closed peer, endpoint change, or follow-up
-    * transport failure closes that connection and never falls back to
-    * another connection. The hook runs synchronously on the client executor:
-    * it must not block or re-enter the same client.
-    */
-   boost::asio::awaitable<response> async_request_then(request req, request_options options,
-                                                       continuation_hook continue_with,
-                                                       boost::asio::cancellation_slot cancellation = {});
-
 private:
    friend class transport_impl;
    friend boost::asio::awaitable<void> async_download_atomic(client&, request, request_options, std::filesystem::path,
@@ -377,16 +343,6 @@ public:
 
    /** Execute one bounded request and buffer its bounded response body. */
    response perform(const request& req, const request_options& options);
-
-   /**
-    * Execute one request and a hook-selected follow-up on the exact same
-    * connection.
-    *
-    * Each request has its own limits and deadline budget. The follow-up is
-    * single-attempt and never falls back to another connection. The hook
-    * must not block or re-enter this transport; re-entry fails immediately.
-    */
-   response perform_then(const request& req, const request_options& options, const continuation_hook& continue_with);
 
    /**
     * Execute one bounded request and stream a successful response atomically to @p output.
