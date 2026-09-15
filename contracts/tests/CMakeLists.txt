@@ -85,7 +85,6 @@ function(add_contract_suite SUITE_NAME SOURCE_FILE)
     COMMAND ${_suite_binary}
             --run_test=${SUITE_NAME}
             --report_level=detailed
-            -- --sys-vm
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   )
   set_tests_properties(${_ctest_name} PROPERTIES
