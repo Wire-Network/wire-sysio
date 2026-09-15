@@ -21,6 +21,7 @@ set(CHAIN_PLUGIN_TEST_CASES
         snapshot_attestation_enabled_config_policy
         snapshot_attestation_record_tuple_policy
         snapshot_endpoint_block_identity_policy
+        get_info_consumer_plugin_policy
         chain_plugin_snapshot_endpoint_option_registration
         outbound_http_global_option_registration
         chain_plugin_snapshot_endpoint_option_validation
