@@ -1,0 +1,8 @@
+# Revisions to skip when running git blame: whole-file reformats and other
+# mechanical changes that carry no authorship signal.
+#
+# GitHub honors this file automatically. To use it locally, run once:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# style(libfc): reformat the outbound http transport to the repo's clang-format
+36de611a3caf518e921d619616b472c04e4fc85c

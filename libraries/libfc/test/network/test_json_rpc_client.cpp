@@ -94,10 +94,10 @@ private:
    }
 
    boost::asio::io_context _io;
-   tcp::acceptor           _acceptor;
-   uint16_t                _port;
-   std::atomic_bool        _stop{false};
-   std::thread             _worker;
+   tcp::acceptor _acceptor;
+   uint16_t _port;
+   std::atomic_bool _stop{false};
+   std::thread _worker;
 };
 
 /**
@@ -174,10 +174,10 @@ private:
    }
 
    boost::asio::io_context _io;
-   tcp::acceptor           _acceptor;
-   uint16_t                _port;
-   std::string             _response_body;
-   std::thread             _worker;
+   tcp::acceptor _acceptor;
+   uint16_t _port;
+   std::string _response_body;
+   std::thread _worker;
 };
 
 /**
@@ -227,11 +227,7 @@ private:
       boost::asio::io_context io;
       tcp::socket socket(io);
       boost::system::error_code error;
-      socket.connect(
-         tcp::endpoint(
-            boost::asio::ip::make_address("127.0.0.1"),
-            _port),
-         error);
+      socket.connect(tcp::endpoint(boost::asio::ip::make_address("127.0.0.1"), _port), error);
    }
 
    /** Accept one connection unless shutdown has started. */
@@ -246,36 +242,20 @@ private:
    }
 
    /** Read one complete request and send the matching JSON-RPC response. */
-   bool serve_request(
-      tcp::socket& socket,
-      int64_t response_id,
-      std::string_view result,
-      bool keep_alive) {
+   bool serve_request(tcp::socket& socket, int64_t response_id, std::string_view result, bool keep_alive) {
       boost::beast::flat_buffer request_buffer;
       boost::beast::http::request<boost::beast::http::string_body> request;
       boost::system::error_code error;
-      boost::beast::http::read(
-         socket,
-         request_buffer,
-         request,
-         error);
+      boost::beast::http::read(socket, request_buffer, request, error);
       if (error)
          return false;
       _request_count.fetch_add(1);
 
-      boost::beast::http::response<boost::beast::http::string_body> response{
-         boost::beast::http::status::ok,
-         11};
-      response.set(
-         boost::beast::http::field::content_type,
-         "application/json");
+      boost::beast::http::response<boost::beast::http::string_body> response{boost::beast::http::status::ok, 11};
+      response.set(boost::beast::http::field::content_type, "application/json");
       response.keep_alive(keep_alive);
       response.body() =
-         "{\"jsonrpc\":\"2.0\",\"id\":" +
-         std::to_string(response_id) +
-         ",\"result\":\"" +
-         std::string(result) +
-         "\"}";
+         "{\"jsonrpc\":\"2.0\",\"id\":" + std::to_string(response_id) + ",\"result\":\"" + std::string(result) + "\"}";
       response.prepare_payload();
       boost::beast::http::write(socket, response, error);
       return !error;
@@ -321,18 +301,11 @@ struct continuation_json_rpc_response {
    kind response_kind = kind::result;
    fc::variant payload;
    std::optional<int64_t> response_id;
-   std::chrono::microseconds delay{0};
    bool keep_alive = true;
-   bool reset_after_response = false;
 
    /** Return a successful JSON-RPC result. */
    static continuation_json_rpc_response result(fc::variant value) {
       return {.response_kind = kind::result, .payload = std::move(value)};
-   }
-
-   /** Return a successful result after a deterministic delay. */
-   static continuation_json_rpc_response delayed_result(fc::variant value, std::chrono::microseconds delay) {
-      return {.response_kind = kind::result, .payload = std::move(value), .delay = delay};
    }
 
    /** Return a JSON-RPC error object. */
@@ -471,8 +444,6 @@ private:
                reset_socket(*socket);
                break;
             }
-            if (response.delay.count() > 0)
-               std::this_thread::sleep_for(response.delay);
             if (_stop.load())
                break;
 
@@ -485,10 +456,6 @@ private:
             boost::beast::http::write(*socket, http_response, error);
             if (error)
                break;
-            if (response.reset_after_response) {
-               reset_socket(*socket);
-               break;
-            }
             if (!response.keep_alive) {
                socket->close(error);
                break;
@@ -515,11 +482,6 @@ private:
    std::thread _worker;
 };
 
-/** Return a JSON-RPC error object suitable for a scripted response. */
-fc::variant json_rpc_error_object(int64_t code, std::string message) {
-   return fc::variant(fc::mutable_variant_object()("code", code)("message", std::move(message)));
-}
-
 /**
  * Return true when the exception came from the transport response body limit.
  */
@@ -531,327 +493,39 @@ bool is_response_body_limit_error(const fc::exception& e) {
 
 BOOST_AUTO_TEST_SUITE(json_rpc_client_tests)
 
-/// Legacy JSON-RPC clients retain startup DNS until a connection failure invalidates it.
+/// JSON-RPC clients retain startup DNS until a connection failure invalidates it.
 BOOST_AUTO_TEST_CASE(default_endpoint_refresh_policy_is_preserved) {
    const fc::network::json_rpc::client_options options;
 
    BOOST_CHECK(!options.transport.dns_cache_timeout);
-   BOOST_CHECK(
-      options.transport.refresh_dns_on_connection_failure);
+   BOOST_CHECK(options.transport.refresh_dns_on_connection_failure);
 }
 
 /// Explicitly idempotent calls reuse one healthy connection.
 BOOST_AUTO_TEST_CASE(idempotent_calls_reuse_a_healthy_connection) {
-   reusable_json_rpc_server server(
-      reusable_json_rpc_server::behavior::healthy_keep_alive);
-   fc::network::json_rpc::json_rpc_client client(
-      fc::url(
-         "http://127.0.0.1:" +
-         std::to_string(server.port())));
+   reusable_json_rpc_server server(reusable_json_rpc_server::behavior::healthy_keep_alive);
+   fc::network::json_rpc::json_rpc_client client(fc::url("http://127.0.0.1:" + std::to_string(server.port())));
 
-   BOOST_CHECK_EQUAL(
-      client.call_idempotent("wire_first_probe").as_string(),
-      "first");
-   BOOST_CHECK_EQUAL(
-      client.call_idempotent("wire_second_probe").as_string(),
-      "second");
+   BOOST_CHECK_EQUAL(client.call_idempotent("wire_first_probe").as_string(), "first");
+   BOOST_CHECK_EQUAL(client.call_idempotent("wire_second_probe").as_string(), "second");
    BOOST_CHECK_EQUAL(server.connection_count(), 1U);
    BOOST_CHECK_EQUAL(server.request_count(), 2U);
 }
 
-/// A result-aware JSON-RPC hook selects a follow-up on the exact connection.
-BOOST_AUTO_TEST_CASE(continuation_hook_selects_same_connection_followup) {
-   continuation_json_rpc_server server({
-      continuation_json_rpc_response::result("first"),
-      continuation_json_rpc_response::result("second"),
-   });
-   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
-
-   bool hook_called = false;
-   const auto result = client.call_then("wire_identity_probe", fc::variants{},
-                                        fc::network::json_rpc::call_options{
-                                           .replay = fc::network::json_rpc::replay_policy::stale_reused_connection_once,
-                                           .total_timeout_cap = fc::seconds(1),
-                                        },
-                                        [&](const fc::variant& first_result) {
-                                           hook_called = true;
-                                           BOOST_CHECK_EQUAL(first_result.as_string(), "first");
-                                           return fc::network::json_rpc::continuation_call{
-                                              .method = "wire_protected_operation",
-                                              .options =
-                                                 fc::network::json_rpc::follow_up_options{
-                                                    .total_timeout_cap = fc::seconds(1),
-                                                 },
-                                           };
-                                        });
-
-   BOOST_CHECK(hook_called);
-   BOOST_CHECK_EQUAL(result.as_string(), "second");
-   const auto requests = server.requests();
-   BOOST_REQUIRE_EQUAL(requests.size(), 2U);
-   BOOST_CHECK_EQUAL(requests[0].connection, requests[1].connection);
-}
-
-/// An initial JSON-RPC error rejects the continuation before invoking its hook.
-BOOST_AUTO_TEST_CASE(continuation_initial_json_rpc_error_prevents_hook) {
-   continuation_json_rpc_server server({
-      continuation_json_rpc_response::error(json_rpc_error_object(-32000, "probe failed")),
-   });
-   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
-   bool hook_called = false;
-
-   BOOST_CHECK_THROW(client.call_then("wire_identity_probe", fc::variants{}, {},
-                                      [&](const fc::variant&) {
-                                         hook_called = true;
-                                         return fc::network::json_rpc::continuation_call{.method =
-                                                                                            "wire_protected_operation"};
-                                      }),
-                     fc::network::json_rpc::json_rpc_error);
-   BOOST_CHECK(!hook_called);
-   BOOST_CHECK_EQUAL(server.requests().size(), 1U);
-}
-
-/// A malformed initial envelope rejects the continuation before invoking its hook.
-BOOST_AUTO_TEST_CASE(continuation_malformed_initial_envelope_prevents_hook) {
-   continuation_json_rpc_server server({
-      continuation_json_rpc_response::raw("{\"jsonrpc\":\"1.0\",\"id\":1,\"result\":\"first\"}"),
-   });
-   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
-   bool hook_called = false;
-
-   BOOST_CHECK_THROW(client.call_then("wire_identity_probe", fc::variants{}, {},
-                                      [&](const fc::variant&) {
-                                         hook_called = true;
-                                         return fc::network::json_rpc::continuation_call{.method =
-                                                                                            "wire_protected_operation"};
-                                      }),
-                     fc::exception);
-   BOOST_CHECK(!hook_called);
-   BOOST_CHECK_EQUAL(server.requests().size(), 1U);
-}
-
-/// A mismatched initial response ID rejects the continuation before invoking its hook.
-BOOST_AUTO_TEST_CASE(continuation_wrong_initial_id_prevents_hook) {
-   auto response = continuation_json_rpc_response::result("first");
-   response.response_id = 99;
-   continuation_json_rpc_server server({std::move(response)});
-   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
-   bool hook_called = false;
-
-   BOOST_CHECK_THROW(client.call_then("wire_identity_probe", fc::variants{}, {},
-                                      [&](const fc::variant&) {
-                                         hook_called = true;
-                                         return fc::network::json_rpc::continuation_call{.method =
-                                                                                            "wire_protected_operation"};
-                                      }),
-                     fc::exception);
-   BOOST_CHECK(!hook_called);
-   BOOST_CHECK_EQUAL(server.requests().size(), 1U);
-}
-
-/// A rejecting hook closes the retained connection without sending a follow-up.
-BOOST_AUTO_TEST_CASE(continuation_hook_rejection_prevents_followup) {
-   continuation_json_rpc_server server({
-      continuation_json_rpc_response::result("first"),
-   });
-   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
-
-   BOOST_CHECK_THROW(client.call_then("wire_identity_probe", fc::variants{}, {},
-                                      [](const fc::variant&) -> fc::network::json_rpc::continuation_call {
-                                         FC_THROW("identity rejected");
-                                      }),
-                     fc::exception);
-   BOOST_CHECK_EQUAL(server.requests().size(), 1U);
-}
-
-/// A JSON-RPC error from the follow-up is returned to the caller.
-BOOST_AUTO_TEST_CASE(continuation_followup_json_rpc_error_is_reported) {
-   continuation_json_rpc_server server({
-      continuation_json_rpc_response::result("first"),
-      continuation_json_rpc_response::error(json_rpc_error_object(-32001, "operation failed")),
-   });
-   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
-
-   BOOST_CHECK_THROW(client.call_then("wire_identity_probe", fc::variants{}, {},
-                                      [](const fc::variant&) {
-                                         return fc::network::json_rpc::continuation_call{.method =
-                                                                                            "wire_protected_operation"};
-                                      }),
-                     fc::network::json_rpc::json_rpc_error);
-   BOOST_CHECK_EQUAL(server.requests().size(), 2U);
-}
-
-/// A mismatched follow-up response ID is rejected.
-BOOST_AUTO_TEST_CASE(continuation_wrong_followup_id_is_rejected) {
-   auto wrong_id = continuation_json_rpc_response::result("second");
-   wrong_id.response_id = 99;
-   continuation_json_rpc_server server({
-      continuation_json_rpc_response::result("first"),
-      std::move(wrong_id),
-   });
-   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
-
-   BOOST_CHECK_THROW(client.call_then("wire_identity_probe", fc::variants{}, {},
-                                      [](const fc::variant&) {
-                                         return fc::network::json_rpc::continuation_call{.method =
-                                                                                            "wire_protected_operation"};
-                                      }),
-                     fc::exception);
-   BOOST_CHECK_EQUAL(server.requests().size(), 2U);
-}
-
-/// A stale cached first connection replays only the probe and retains the replacement for the follow-up.
-BOOST_AUTO_TEST_CASE(continuation_replays_stale_initial_connection_once) {
-   auto stale = continuation_json_rpc_response::result("warm");
-   stale.reset_after_response = true;
-   continuation_json_rpc_server server({
-      std::move(stale),
-      continuation_json_rpc_response::result("first"),
-      continuation_json_rpc_response::result("second"),
-   });
-   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
-
-   BOOST_CHECK_EQUAL(client.call_idempotent("wire_warm_connection").as_string(), "warm");
-   const auto result =
-      client.call_then("wire_identity_probe", fc::variants{},
-                       fc::network::json_rpc::call_options{
-                          .replay = fc::network::json_rpc::replay_policy::stale_reused_connection_once,
-                       },
-                       [](const fc::variant&) {
-                          return fc::network::json_rpc::continuation_call{.method = "wire_protected_operation"};
-                       });
-
-   BOOST_CHECK_EQUAL(result.as_string(), "second");
-   BOOST_CHECK_EQUAL(server.connection_count(), 2U);
-   const auto requests = server.requests();
-   BOOST_REQUIRE_EQUAL(requests.size(), 3U);
-   BOOST_CHECK_NE(requests[0].connection, requests[1].connection);
-   BOOST_CHECK_EQUAL(requests[1].connection, requests[2].connection);
-}
-
-/// A non-replaying continuation probe fails instead of replacing a stale cached connection.
-BOOST_AUTO_TEST_CASE(continuation_never_policy_does_not_replay_stale_initial_connection) {
-   auto stale = continuation_json_rpc_response::result("warm");
-   stale.reset_after_response = true;
-   continuation_json_rpc_server server({std::move(stale)});
-   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
-   bool hook_called = false;
-
-   BOOST_CHECK_EQUAL(client.call_idempotent("wire_warm_connection").as_string(), "warm");
-   BOOST_CHECK_THROW(client.call_then("wire_identity_probe", fc::variants{}, {},
-                                      [&](const fc::variant&) {
-                                         hook_called = true;
-                                         return fc::network::json_rpc::continuation_call{.method =
-                                                                                            "wire_protected_operation"};
-                                      }),
-                     fc::exception);
-   BOOST_CHECK(!hook_called);
-   BOOST_CHECK_EQUAL(server.connection_count(), 1U);
-   BOOST_CHECK_EQUAL(server.requests().size(), 1U);
-}
-
-/// A total-timeout cap preserves stricter configured phase deadlines.
-BOOST_AUTO_TEST_CASE(continuation_timeout_cap_preserves_stricter_phase_timeout) {
-   continuation_json_rpc_server server({
-      continuation_json_rpc_response::delayed_result("first", 250ms),
-   });
-   fc::network::json_rpc::client_options options;
-   options.request.timeouts.header = fc::milliseconds(40);
-   options.request.timeouts.total = fc::seconds(2);
-   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()), std::nullopt,
-                                                 fc::network::json_rpc::endpoint_refresh_policy::on_connection_failure,
-                                                 std::move(options));
-   bool hook_called = false;
-
-   const auto start = fc::time_point::now();
-   BOOST_CHECK_THROW(client.call_then("wire_identity_probe", fc::variants{},
-                                      fc::network::json_rpc::call_options{.total_timeout_cap = fc::milliseconds(500)},
-                                      [&](const fc::variant&) {
-                                         hook_called = true;
-                                         return fc::network::json_rpc::continuation_call{.method =
-                                                                                            "wire_protected_operation"};
-                                      }),
-                     fc::timeout_exception);
-   const auto elapsed = fc::time_point::now() - start;
-
-   BOOST_CHECK(!hook_called);
-   BOOST_CHECK_LT(elapsed.count(), fc::milliseconds(200).count());
-}
-
-/// A per-call cap cannot lengthen a stricter base total timeout.
-BOOST_AUTO_TEST_CASE(continuation_timeout_cap_cannot_expand_base_total_timeout) {
-   continuation_json_rpc_server server({
-      continuation_json_rpc_response::delayed_result("first", 250ms),
-   });
-   fc::network::json_rpc::client_options options;
-   options.request.timeouts.header = fc::seconds(1);
-   options.request.timeouts.total = fc::milliseconds(40);
-   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()), std::nullopt,
-                                                 fc::network::json_rpc::endpoint_refresh_policy::on_connection_failure,
-                                                 std::move(options));
-   bool hook_called = false;
-
-   const auto start = fc::time_point::now();
-   BOOST_CHECK_THROW(client.call_then("wire_identity_probe", fc::variants{},
-                                      fc::network::json_rpc::call_options{.total_timeout_cap = fc::milliseconds(500)},
-                                      [&](const fc::variant&) {
-                                         hook_called = true;
-                                         return fc::network::json_rpc::continuation_call{.method =
-                                                                                            "wire_protected_operation"};
-                                      }),
-                     fc::timeout_exception);
-   const auto elapsed = fc::time_point::now() - start;
-
-   BOOST_CHECK(!hook_called);
-   BOOST_CHECK_LT(elapsed.count(), fc::milliseconds(200).count());
-}
-
-/// The follow-up receives a fresh total-timeout budget independent of the probe.
-BOOST_AUTO_TEST_CASE(continuation_followup_has_independent_total_timeout) {
-   continuation_json_rpc_server server({
-      continuation_json_rpc_response::result("first"),
-      continuation_json_rpc_response::delayed_result("second", 150ms),
-   });
-   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
-
-   const auto result = client.call_then("wire_identity_probe", fc::variants{},
-                                        fc::network::json_rpc::call_options{.total_timeout_cap = fc::milliseconds(50)},
-                                        [](const fc::variant&) {
-                                           return fc::network::json_rpc::continuation_call{
-                                              .method = "wire_protected_operation",
-                                              .options =
-                                                 fc::network::json_rpc::follow_up_options{
-                                                    .total_timeout_cap = fc::milliseconds(500),
-                                                 },
-                                           };
-                                        });
-
-   BOOST_CHECK_EQUAL(result.as_string(), "second");
-}
-
 /// An idempotent call retries once when its cached connection has gone stale.
 BOOST_AUTO_TEST_CASE(idempotent_call_recovers_from_a_stale_cached_connection) {
-   reusable_json_rpc_server server(
-      reusable_json_rpc_server::behavior::stale_after_first_response);
-   fc::network::json_rpc::json_rpc_client client(
-      fc::url(
-         "http://127.0.0.1:" +
-         std::to_string(server.port())));
+   reusable_json_rpc_server server(reusable_json_rpc_server::behavior::stale_after_first_response);
+   fc::network::json_rpc::json_rpc_client client(fc::url("http://127.0.0.1:" + std::to_string(server.port())));
 
-   BOOST_CHECK_EQUAL(
-      client.call_idempotent("wire_first_probe").as_string(),
-      "first");
-   BOOST_CHECK_EQUAL(
-      client.call_idempotent("wire_second_probe").as_string(),
-      "second");
+   BOOST_CHECK_EQUAL(client.call_idempotent("wire_first_probe").as_string(), "first");
+   BOOST_CHECK_EQUAL(client.call_idempotent("wire_second_probe").as_string(), "second");
    BOOST_CHECK_EQUAL(server.connection_count(), 2U);
    BOOST_CHECK_EQUAL(server.request_count(), 2U);
 }
 
 /// Caller-supplied retry options cannot make a default call replay.
 BOOST_AUTO_TEST_CASE(default_call_enforces_single_attempt) {
-   auto warm =
-      continuation_json_rpc_response::result("warm");
+   auto warm = continuation_json_rpc_response::result("warm");
    continuation_json_rpc_server server({
       std::move(warm),
       continuation_json_rpc_response::close(),
@@ -861,34 +535,57 @@ BOOST_AUTO_TEST_CASE(default_call_enforces_single_attempt) {
    options.request.retry.max_attempts = 3;
    options.request.retry.initial_backoff = fc::microseconds(0);
    options.request.retry.max_backoff = fc::microseconds(0);
-   options.request.retry.allow_retry =
-      [](const fc::http::retry_context& context) {
-         return context.reused_connection;
-      };
+   options.request.retry.allow_retry = [](const fc::http::retry_context& context) { return context.reused_connection; };
    options.request.idempotent = true;
-   fc::network::json_rpc::json_rpc_client client(
-      fc::url(server.url()),
-      std::nullopt,
-      fc::network::json_rpc::endpoint_refresh_policy::on_connection_failure,
-      std::move(options));
+   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()), std::nullopt,
+                                                 fc::network::json_rpc::endpoint_refresh_policy::on_connection_failure,
+                                                 std::move(options));
 
-   BOOST_CHECK_EQUAL(
-      client.call_idempotent("wire_first_probe").as_string(),
-      "warm");
-   BOOST_CHECK_THROW(
-      client.call("wire_side_effect_probe"),
-      fc::exception);
-   BOOST_CHECK_EQUAL(
-      server.connection_count(),
-      1U);
+   BOOST_CHECK_EQUAL(client.call_idempotent("wire_first_probe").as_string(), "warm");
+   BOOST_CHECK_THROW(client.call("wire_side_effect_probe"), fc::exception);
+   BOOST_CHECK_EQUAL(server.connection_count(), 1U);
    const auto requests = server.requests();
    BOOST_REQUIRE_EQUAL(requests.size(), 2U);
-   BOOST_CHECK_EQUAL(
-      requests.front().method,
-      "wire_first_probe");
-   BOOST_CHECK_EQUAL(
-      requests.back().method,
-      "wire_side_effect_probe");
+   BOOST_CHECK_EQUAL(requests.front().method, "wire_first_probe");
+   BOOST_CHECK_EQUAL(requests.back().method, "wire_side_effect_probe");
+}
+
+/// A response carrying an error member is decoded as a JSON-RPC error rather than a result.
+BOOST_AUTO_TEST_CASE(call_reports_a_json_rpc_error_envelope) {
+   fc::mutable_variant_object failure;
+   failure("code", -32601)("message", "Method not found");
+   continuation_json_rpc_server server({
+      continuation_json_rpc_response::error(fc::variant(std::move(failure))),
+   });
+   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
+
+   BOOST_CHECK_THROW(client.call("wire_missing_probe"), fc::network::json_rpc::json_rpc_error);
+}
+
+/// A response whose id does not match the request is rejected instead of returned.
+BOOST_AUTO_TEST_CASE(call_rejects_a_mismatched_response_id) {
+   auto mismatched = continuation_json_rpc_response::result("wrong-id");
+   mismatched.response_id = 9'001;
+   continuation_json_rpc_server server({std::move(mismatched)});
+   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
+
+   // Match the message, not just the type: a transport failure would also throw fc::exception
+   // and would let this pass without ever reaching the id check.
+   BOOST_CHECK_EXCEPTION(client.call("wire_id_probe"), fc::exception, [](const fc::exception& error) {
+      return error.to_detail_string().find("does not match request") != std::string::npos;
+   });
+}
+
+/// A response that is not a JSON-RPC 2.0 envelope is rejected before its result is read.
+BOOST_AUTO_TEST_CASE(call_rejects_a_non_2_0_envelope) {
+   continuation_json_rpc_server server({
+      continuation_json_rpc_response::raw(R"({"jsonrpc":"1.0","id":1,"result":"first"})"),
+   });
+   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
+
+   BOOST_CHECK_EXCEPTION(client.call("wire_envelope_probe"), fc::exception, [](const fc::exception& error) {
+      return error.to_detail_string().find("'jsonrpc'") != std::string::npos;
+   });
 }
 
 /// URL parsing preserves bracketed IPv6 identity, credentials, path, query, and port.
@@ -903,36 +600,27 @@ BOOST_AUTO_TEST_CASE(url_round_trips_ipv6_authority_and_query) {
    BOOST_CHECK_EQUAL(parsed.path()->generic_string(), "/rpc");
    BOOST_REQUIRE(parsed.query());
    BOOST_CHECK_EQUAL(*parsed.query(), "commitment=finalized");
-   BOOST_CHECK_EQUAL(
-      static_cast<std::string>(parsed),
-      "https://operator:secret@[2001:db8::1]:8443/rpc?commitment=finalized");
+   BOOST_CHECK_EQUAL(static_cast<std::string>(parsed),
+                     "https://operator:secret@[2001:db8::1]:8443/rpc?commitment=finalized");
 }
 
 /// Diagnostic endpoint labels omit URL credentials, paths, and queries.
 BOOST_AUTO_TEST_CASE(endpoint_diagnostics_are_credential_free) {
-   const fc::url endpoint(
-      "https://operator:secret@[2001:db8::1]:8443/"
-      "private/token?authorization=hidden");
+   const fc::url endpoint("https://operator:secret@[2001:db8::1]:8443/"
+                          "private/token?authorization=hidden");
 
-   const auto sanitized =
-      fc::http::sanitized_endpoint(endpoint);
-   BOOST_CHECK_EQUAL(
-      sanitized,
-      "https://[2001:db8::1]:8443");
-   BOOST_CHECK(
-      sanitized.find("operator") == std::string::npos);
-   BOOST_CHECK(
-      sanitized.find("secret") == std::string::npos);
-   BOOST_CHECK(
-      sanitized.find("authorization") == std::string::npos);
+   const auto sanitized = fc::http::sanitized_endpoint(endpoint);
+   BOOST_CHECK_EQUAL(sanitized, "https://[2001:db8::1]:8443");
+   BOOST_CHECK(sanitized.find("operator") == std::string::npos);
+   BOOST_CHECK(sanitized.find("secret") == std::string::npos);
+   BOOST_CHECK(sanitized.find("authorization") == std::string::npos);
 }
 
 /// A peer that accepts the TCP request but withholds the HTTP response must
 /// release the caller within the active RPC deadline.
 BOOST_AUTO_TEST_CASE(call_times_out_when_http_response_hangs) {
    hanging_http_server server;
-   fc::network::json_rpc::json_rpc_client client(
-      fc::url("http://127.0.0.1:" + std::to_string(server.port())));
+   fc::network::json_rpc::json_rpc_client client(fc::url("http://127.0.0.1:" + std::to_string(server.port())));
 
    const auto start = fc::time_point::now();
    BOOST_CHECK_THROW(
@@ -962,25 +650,18 @@ BOOST_AUTO_TEST_CASE(call_rejects_expired_ambient_deadline) {
 /// the transport parser before JSON parsing or outpost envelope decoding.
 BOOST_AUTO_TEST_CASE(call_rejects_oversized_response_body) {
    fixed_response_http_server server(std::string(OVERSIZED_RESPONSE_BODY_BYTES, 'x'));
-   fc::network::json_rpc::json_rpc_client client(
-      fc::url("http://127.0.0.1:" + std::to_string(server.port())));
+   fc::network::json_rpc::json_rpc_client client(fc::url("http://127.0.0.1:" + std::to_string(server.port())));
 
-   BOOST_CHECK_EXCEPTION(
-      client.call("wire_body_limit_probe"),
-      fc::exception,
-      is_response_body_limit_error);
+   BOOST_CHECK_EXCEPTION(client.call("wire_body_limit_probe"), fc::exception, is_response_body_limit_error);
 }
 
 /// The raw HTTP helper shares the same bounded transport path as JSON-RPC calls.
 BOOST_AUTO_TEST_CASE(send_http_rejects_oversized_response_body) {
    fixed_response_http_server server(std::string(OVERSIZED_RESPONSE_BODY_BYTES, 'x'));
-   fc::network::json_rpc::json_rpc_client client(
-      fc::url("http://127.0.0.1:" + std::to_string(server.port())));
+   fc::network::json_rpc::json_rpc_client client(fc::url("http://127.0.0.1:" + std::to_string(server.port())));
 
-   BOOST_CHECK_EXCEPTION(
-      client.send_http(fc::network::json_rpc::http_verb::GET, "/"),
-      fc::exception,
-      is_response_body_limit_error);
+   BOOST_CHECK_EXCEPTION(client.send_http(fc::network::json_rpc::http_verb::GET, "/"), fc::exception,
+                         is_response_body_limit_error);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
