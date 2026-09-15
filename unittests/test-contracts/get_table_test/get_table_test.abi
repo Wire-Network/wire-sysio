@@ -38,6 +38,16 @@
             ]
         },
         {
+            "name": "composite_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "erasenumobj",
             "base": "",
             "fields": [
@@ -106,22 +116,12 @@
             ]
         },
         {
-            "name": "slug_name",
-            "base": "",
-            "fields": [
-                {
-                    "name": "value",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "structobj",
             "base": "",
             "fields": [
                 {
                     "name": "code",
-                    "type": "slug_name"
+                    "type": "composite_key"
                 },
                 {
                     "name": "payload",
@@ -135,7 +135,7 @@
             "fields": [
                 {
                     "name": "code",
-                    "type": "slug_name"
+                    "type": "composite_key"
                 }
             ]
         }
@@ -239,7 +239,7 @@
             "type": "structobj",
             "index_type": "i64",
             "key_names": ["code"],
-            "key_types": ["slug_name"],
+            "key_types": ["composite_key"],
             "table_id": 12649
         }
     ],

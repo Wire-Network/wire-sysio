@@ -145,8 +145,8 @@ public:
    }
 
    static fc::slug_name cn(std::string_view s) { return fc::slug_name{s}; }
-   static fc::mutable_variant_object codename_mvo(std::string_view s) {
-      return mvo()("value", fc::slug_name{s}.value);
+   static std::string codename(std::string_view s) {
+      return std::string{s};
    }
 
    /// Push an action against any deployed contract.
@@ -240,7 +240,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
          "regchain"_n, mvo()
             ("kind",              ChainKind::CHAIN_KIND_SVM)
-            ("code",              codename_mvo("SOL"))
+            ("code",              codename("SOL"))
             ("external_chain_id", 1)
             ("name",              std::string("solana-test"))
             ("description",       std::string{})
@@ -248,7 +248,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
          "regchain"_n, mvo()
             ("kind",              ChainKind::CHAIN_KIND_EVM)
-            ("code",              codename_mvo("ETH"))
+            ("code",              codename("ETH"))
             ("external_chain_id", 31337)
             ("name",              std::string("ethereum-test"))
             ("description",       std::string{})
@@ -299,8 +299,8 @@ public:
                              std::string_view token_code, uint64_t amount) {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
          ("account",              account.to_string())
-         ("chain_code",           codename_mvo(chain_code))
-         ("token_code",           codename_mvo(token_code))
+         ("chain_code",           codename(chain_code))
+         ("token_code",           codename(token_code))
          ("amount",               amount)
          ("actor_chain",          ChainKind::CHAIN_KIND_EVM)
          ("actor_address",        std::vector<char>{})
@@ -311,8 +311,8 @@ public:
                               std::string_view token_code, uint64_t amount) {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "withdrawinle"_n, mvo()
          ("account",     account.to_string())
-         ("chain_code",  codename_mvo(chain_code))
-         ("token_code",  codename_mvo(token_code))
+         ("chain_code",  codename(chain_code))
+         ("token_code",  codename(token_code))
          ("amount",      amount));
    }
 
@@ -346,8 +346,8 @@ public:
       const auto token_v = cn(token_code).value;
       const auto& arr = op["balances"].get_array();
       for (const auto& b : arr) {
-         if (b["chain_code"]["value"].as_uint64() == chain_v &&
-             b["token_code"]["value"].as_uint64() == token_v) {
+         if (b["chain_code"].as<fc::slug_name>().value == chain_v &&
+             b["token_code"].as<fc::slug_name>().value == token_v) {
             return b["balance"].as_uint64();
          }
       }

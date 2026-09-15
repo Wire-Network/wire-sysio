@@ -576,7 +576,7 @@ public:
       deploy_reserv();
 
       auto codename = [](std::string_view value) {
-         return mvo()("value", fc::slug_name{value}.value);
+         return std::string{value};
       };
       BOOST_REQUIRE_EQUAL(success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
          ("chain_code", codename("ETH"))("token_code", codename("ETH"))("reserve_code", codename("PRIMARY"))
@@ -5060,7 +5060,7 @@ BOOST_FIXTURE_TEST_CASE( expired_wire_claims_unblock_a_balance_blocked_epoch, sy
    create_t5_holding_accounts();
    deploy_reserv();
 
-   auto codename = [](std::string_view s) { return mvo()("value", fc::slug_name{s}.value); };
+   auto codename = [](std::string_view s) { return std::string{s}; };
 
    // Move real WIRE into reserv custody so a claim has backing. regreserve is bootstrap-window
    // only, which holds here: current_epoch_index is still 0.
@@ -5970,9 +5970,9 @@ struct producer_score_tester : public producer_eligibility_tester {
    /// The tier packed into a `rank_score`, mirroring `producer_rank::tier_of`.
    static uint64_t tier_of(uint64_t rank_score) { return rank_score >> composite_bits; }
 
-   /// A `slug_name` in the shape the ABI serializes it: a single `value` field.
-   static fc::mutable_variant_object slug_mvo(std::string_view code) {
-      return mvo()("value", fc::slug_name{code}.value);
+   /// A `slug_name` in the shape the ABI serializes it: its decoded string.
+   static std::string slug_mvo(std::string_view code) {
+      return std::string{code};
    }
 
    /// One `(chain, token, min_bond)` entry for opreg's `req_*_collat` vectors. The

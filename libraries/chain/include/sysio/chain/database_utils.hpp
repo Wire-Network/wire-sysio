@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fc/slug_name.hpp>
+
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/abi_def.hpp>
 #include <fc/int128.hpp>
@@ -270,7 +272,7 @@ private:
 enum class key_leaf_kind {
    uint8, int8, uint16, int16, uint32, int32, uint64, int64,
    uint128, int128, checksum256,
-   name, boolean, string,
+   name, slug_name, boolean, string,
    float32, float64, float128,
 };
 
@@ -304,6 +306,7 @@ inline constexpr auto leaf_key_spellings = std::to_array<leaf_key_spelling>({
    {"int128",      key_leaf_kind::int128},
    {"checksum256", key_leaf_kind::checksum256},
    {"name",        key_leaf_kind::name},
+   {"slug_name",   key_leaf_kind::slug_name},
    {"bool",        key_leaf_kind::boolean},
    {"string",      key_leaf_kind::string},
    {"float32",     key_leaf_kind::float32},
@@ -361,6 +364,17 @@ inline fc::variant decode_field(reader& r, key_leaf_kind kind) {
       return v;
    }
    case key_leaf_kind::name:    return fc::variant(name(r.read_be64()).to_string());
+   case key_leaf_kind::slug_name: {
+      // Delegates to fc::slug_name's to_variant, so next_key inherits the same
+      // total, injective carrier: a canonical slug decodes to its string, zero
+      // to "", and a non-canonical value to the raw integer. A string-only
+      // decode would send every sub-2^42 key to "" and re-encode it to 0,
+      // restarting pagination at the top of the table.
+      const fc::slug_name s{ r.read_be64() };
+      fc::variant v;
+      fc::to_variant(s, v);
+      return v;
+   }
    case key_leaf_kind::boolean: return fc::variant(r.read_u8() != 0);
    case key_leaf_kind::string:  return fc::variant(r.read_nul_escaped_string());
    case key_leaf_kind::float32: {
@@ -437,6 +451,16 @@ inline void encode_field(writer& w, key_leaf_kind kind, const fc::variant& val) 
       return;
    }
    case key_leaf_kind::name:    w.write_be64(name(val.as_string()).to_uint64_t()); return;
+   case key_leaf_kind::slug_name: {
+      // Delegates to fc::slug_name's from_variant so the dual carrier (string /
+      // "" / integer, plus the transitional object) is implemented exactly once.
+      // Byte-identical to the struct-node path it replaces: that recursed one
+      // uint64 child to write_be64, and so does this.
+      fc::slug_name s;
+      fc::from_variant(val, s);
+      w.write_be64(s.value);
+      return;
+   }
    case key_leaf_kind::boolean: w.write_u8(val.as_bool() ? 1 : 0); return;
    case key_leaf_kind::string:  w.write_nul_escaped_string(val.as_string()); return;
    case key_leaf_kind::float32: {
@@ -476,11 +500,16 @@ inline void encode_field(writer& w, key_leaf_kind kind, const fc::variant& val) 
 }
 
 // ── ABI-aware key shapes ────────────────────────────────────────────────────
-// kv/multi_index keys are not limited to the builtin leaf types above: CDT's
-// to_key reflects through typedefs and struct key types — e.g. `slug_name`
-// (struct { value: uint64 }) is the primary key of the v6 registry tables
-// (sysio.chains chains, sysio.tokens tokens/chaintokens, sysio.reserv
-// reserves). A key_shape is the resolved encode/decode plan for one key
+// kv/multi_index keys are not limited to the builtin leaf types above: a key
+// may be a struct whose fields encode in declaration order. Note `sysio::kv`
+// does NOT route through CDT's `to_key` — `make_key` writes into a
+// `be_key_stream` whose operator<< set is closed (the integrals, name, the
+// floats, bool, string, vector<char>), so a struct key resolves through
+// SYSLIB_SERIALIZE's generic-DataStream friend template and recurses to
+// write_be64 per member. `slug_name` is the primary key of the v6 registry
+// tables (sysio.chains chains, sysio.tokens tokens/chaintokens, sysio.reserv
+// reserves) and is now a LEAF above, not a struct key; the byte encoding is
+// unchanged either way. A key_shape is the resolved encode/decode plan for one key
 // field: a leaf with a codec-supported type, or a struct node whose children
 // encode in declaration order (matching to_key's reflected-field walk). Leaf
 // types and their kinds are defined above, with the codec (key_leaf_kind /

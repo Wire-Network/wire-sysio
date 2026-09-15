@@ -26,9 +26,9 @@ using mvo = fc::mutable_variant_object;
 
 namespace {
 
-/// A `slug_name` renders in JSON/ABI as `{value: <uint64>}`.
-inline fc::mutable_variant_object codename_mvo(std::string_view s) {
-   return mvo()("value", fc::slug_name{s}.value);
+/// A `slug_name` renders in JSON/ABI as its decoded string spelling.
+inline std::string codename(std::string_view s) {
+   return std::string{s};
 }
 
 // Well-formed sample addresses for the accept paths.
@@ -88,7 +88,7 @@ public:
                           const fc::variant_object& outpost) {
       return push_chains("regchain"_n, mvo()
          ("kind",              kind)
-         ("code",              codename_mvo(code))
+         ("code",              codename(code))
          ("external_chain_id", external_chain_id)
          ("name",              std::string(code))
          ("description",       std::string{})
@@ -97,7 +97,7 @@ public:
 
    action_result setoutpost(std::string_view code, const fc::variant_object& outpost) {
       return push_chains("setoutpost"_n, mvo()
-         ("code",    codename_mvo(code))
+         ("code",    codename(code))
          ("outpost", outpost));
    }
 
@@ -122,6 +122,21 @@ public:
 BOOST_AUTO_TEST_SUITE(sysio_chains_tests)
 
 // ── EVM: all four role addresses are accepted and stored verbatim ──
+// ── The `code` CELL renders as its decoded slug, not a `{value}` wrapper ─────
+// `sysio.chains::chains` is keyed on `code`, so this table is the one whose
+// `next_key` spelling the slug_name ABI builtin changes — and before this case
+// the suite only ever used `code` as a KEY ARGUMENT (get_chain's get_row_by_id),
+// never asserting the rendered cell. A wrong carrier here had no coverage.
+BOOST_FIXTURE_TEST_CASE(regchain_code_cell_renders_as_the_decoded_slug, sysio_chains_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1,
+      evm_outpost_mvo(EVM_OPP, EVM_INBOUND, EVM_OPREG, EVM_DEPOSIT)));
+   auto row = get_chain("ETH");
+   BOOST_REQUIRE(!row.is_null());
+   BOOST_REQUIRE_MESSAGE(row["code"].is_string(),
+                         "a slug_name cell must render as its decoded string, not a wrapper");
+   BOOST_REQUIRE_EQUAL("ETH", row["code"].as_string());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(regchain_evm_addresses_stored, sysio_chains_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1,
       evm_outpost_mvo(EVM_OPP, EVM_INBOUND, EVM_OPREG, EVM_DEPOSIT)));

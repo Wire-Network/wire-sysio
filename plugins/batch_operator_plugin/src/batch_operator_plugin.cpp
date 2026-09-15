@@ -612,16 +612,13 @@ struct batch_operator_plugin::impl {
       outposts.clear();
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
-         // The `code` field on the Chain proto is a `slug_name` struct
-         // wrapping a uint64 (see slug_name.hpp). The JSON view exposes
-         // it as `{value: <uint64>}`. Unpack defensively.
+         // `code` is a `slug_name`. fc::slug_name's own from_variant accepts
+         // every carrier — the decoded slug string, "" for zero, a raw integer,
+         // and the legacy `{value: <uint64>}` object — so the shape does not
+         // have to be probed here.
          uint64_t code_val = 0;
          if (auto code_obj = obj.find(chains::field::code); code_obj != obj.end()) {
-            if (code_obj->value().is_object()) {
-               code_val = code_obj->value().get_object()["value"].as_uint64();
-            } else {
-               code_val = code_obj->value().as_uint64();
-            }
+            code_val = code_obj->value().as<fc::slug_name>().value;
          }
          bool is_depot = obj[chains::field::is_depot].as_bool();
          bool active   = obj[chains::field::active].as_bool();

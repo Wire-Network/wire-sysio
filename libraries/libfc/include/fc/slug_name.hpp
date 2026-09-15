@@ -17,6 +17,8 @@
 
 #include <fc/basic_name.hpp>
 #include <fc/exception/exception.hpp>
+#include <fc/variant.hpp>
+#include <fc/variant_object.hpp>
 
 #include <cstddef>
 #include <string>
@@ -81,5 +83,58 @@ inline constexpr slug_name operator""_s() {
 } // namespace slug_name_literals
 
 using slug_name_literals::operator""_s;
+
+/// JSON carrier for a slug_name — a DUAL carrier, and deliberately so.
+///
+/// A canonical slug renders as its string spelling (`"LIQSOL"`), and the zero
+/// sentinel as the empty string. A value below 2^42 renders as the **raw
+/// integer**, because `to_string()` cannot represent it: `zero_terminates` is
+/// true, so decoding stops at the first zero symbol slot, and every such value
+/// collapses to `""`. Emitting the integer instead keeps this conversion TOTAL
+/// and INJECTIVE over all 2^64 — `""` means exactly zero and nothing else.
+///
+/// The integer arm must not be replaced by a throw. Only `chain_code` is bound
+/// to the proven source outpost, so a non-canonical `token_code` is plantable
+/// from a forgeable attestation payload; a throwing conversion would let one
+/// such row make an entire table unreadable over `get_table_rows`.
+///
+/// A JSON integer cannot collide with a JSON string, which is what makes the
+/// two carriers unambiguous. A numeric *string* would not: the slug alphabet
+/// contains digits, so `"7"` is itself a valid canonical slug.
+inline void to_variant(const slug_name& s, fc::variant& v) {
+   const std::string text = s.to_string();
+   // `pack` is the non-validating encoder, so this is a pure round-trip test:
+   // the string spelling is used only when it recovers the value exactly.
+   if (slug_name::pack(text) == s.value) {
+      v = text;
+      return;
+   }
+   v = s.value;
+}
+
+/// Accepts every carrier `to_variant` can emit, plus — TRANSITIONALLY — the
+/// `{"value": <uint64>}` object that abigen's reflected struct emitted before
+/// `slug_name` became an ABI builtin.
+///
+/// The object arm is what makes the cross-repo landing window survivable: with
+/// no variant conversions, a slug converts through
+/// `FC_REFLECT_TEMPLATE(basic_name<Traits>, (value))` and is therefore
+/// object-only, while a string/integer-only reader rejects that object. There
+/// is no value both spellings accept, so a JSON *writer* cannot straddle the
+/// window the way a reader can. Delete this arm once no writer emits the
+/// object form.
+inline void from_variant(const fc::variant& v, slug_name& s) {
+   if (v.is_string()) {
+      // Validating: the ctor round-trip-checks and rejects a non-canonical or
+      // out-of-alphabet spelling. `""` is the zero sentinel.
+      s = slug_name{ v.get_string() };
+      return;
+   }
+   if (v.is_object()) {
+      s = slug_name{ v.get_object()["value"].as_uint64() };
+      return;
+   }
+   s = slug_name{ v.as_uint64() };
+}
 
 } // namespace fc

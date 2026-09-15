@@ -50,8 +50,8 @@ using mvo = fc::mutable_variant_object;
 
 namespace {
 
-inline fc::mutable_variant_object codename_mvo(std::string_view s) {
-   return mvo()("value", fc::slug_name{s}.value);
+inline std::string codename(std::string_view s) {
+   return std::string{s};
 }
 
 using fc::slug_name_literals::operator""_s;
@@ -420,7 +420,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
          "regchain"_n, mvo()
             ("kind",              kind)
-            ("code",              codename_mvo(code))
+            ("code",              codename(code))
             ("external_chain_id", chain_id)
             ("name",              std::string("outpost-test"))
             ("description",       std::string{})
@@ -798,8 +798,8 @@ public:
    static fc::variant make_chain_min_bond(std::string_view chain_code, std::string_view token_code,
                                           uint64_t min_bond) {
       return fc::variant(mvo()
-         ("chain_code",          codename_mvo(chain_code))
-         ("token_code",          codename_mvo(token_code))
+         ("chain_code",          codename(chain_code))
+         ("token_code",          codename(token_code))
          ("min_bond",            min_bond)
          ("config_timestamp_ms", uint64_t{0}));
    }
@@ -845,8 +845,8 @@ public:
                              opp::types::ChainKind actor_chain = opp::types::ChainKind::CHAIN_KIND_EVM) {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
          ("account",             account.to_string())
-         ("chain_code",          codename_mvo(chain_code))
-         ("token_code",          codename_mvo(token_code))
+         ("chain_code",          codename(chain_code))
+         ("token_code",          codename(token_code))
          ("amount",              amount)
          ("actor_chain",         actor_chain)
          ("actor_address",       std::vector<char>{})

@@ -98,25 +98,29 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
                             > hashobjs;
 
     // Struct-keyed kv::table — drives the ABI-aware BE key codec's struct
-    // expansion on the live get_table_rows path. Mirrors the v6 registry
-    // tables (e.g. sysio.chains `chains`), whose primary key is the reflected
-    // struct `slug_name { value: uint64 }`. abigen emits
-    // `key_types: ["code"->"slug_name"]` for this table, so JSON bounds and
-    // `next_key` pagination must round-trip the nested `{ "code": { "value": N } }`
-    // key shape — coverage a flat scalar key cannot provide.
-    struct slug_name {
+    // expansion on the live get_table_rows path, so JSON bounds and `next_key`
+    // pagination must round-trip the nested `{ "code": { "value": N } }` key
+    // shape — coverage a flat scalar key cannot provide.
+    //
+    // Deliberately NOT named `composite_key`: that spelling is an abi_serializer
+    // builtin and a `leaf_key_spellings` entry, and abigen's builtin match is
+    // on the namespace-stripped bare name — so a member struct called
+    // `composite_key` would be emitted as the builtin, take the leaf branch in
+    // `build_key_shape`, and stop exercising struct expansion at all. The
+    // suite would keep passing while testing nothing it was written for.
+    struct composite_key {
         uint64_t value = 0;
-        SYSLIB_SERIALIZE(slug_name, (value))
+        SYSLIB_SERIALIZE(composite_key, (value))
     };
 
     struct structobj_key {
-        slug_name code;
+        composite_key code;
         uint64_t primary_key() const { return code.value; }
         SYSLIB_SERIALIZE(structobj_key, (code))
     };
 
     struct [[sysio::table("structobjs")]] structobj {
-        slug_name code;
+        composite_key code;
         uint64_t  payload = 0;
         SYSLIB_SERIALIZE(structobj, (code)(payload))
     };
@@ -137,7 +141,7 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
    void addhashobj(std::string hashinput);
 
    /// Insert a row into the struct-keyed kv::table `structobjs`.
-   /// @param code     the slug_name value forming the struct primary key
+   /// @param code     the composite_key value forming the struct primary key
    /// @param payload  arbitrary row payload
    [[sysio::action]]
    void addstruct(uint64_t code, uint64_t payload);
