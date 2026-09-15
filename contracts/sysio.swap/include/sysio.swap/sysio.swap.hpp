@@ -80,8 +80,7 @@ namespace sysio {
          /// below that, MIN_SWAP_FEE is the binding fee and a clip pays far above the
          /// pair's rate (an output of 2 pays half of itself). Erring high costs
          /// nothing, because the clip scales with elapsed time and a higher floor only
-         /// makes sales larger and rarer at the same average rate. Erring low is what
-         /// bleeds the reservoir to the liquidity providers a unit at a time.
+         /// makes sales larger and rarer at the same average rate.
          ///
          /// It must stay under the depth cap, though: a floor above
          /// `pool_shadow * depth_cap_bps / BPS_TOTAL` caps every clip below the floor
@@ -114,9 +113,7 @@ namespace sysio {
          /// has not reached `min(clip_floor, queued)` yet. That last case is what makes
          /// cranking every block harmless: a clip below the floor sells nothing AND
          /// leaves the clock alone, so the next tick measures a longer window and
-         /// offers a proportionally larger clip. Selling below the floor would hand the
-         /// reservoir to the liquidity providers a unit at a time, because integer
-         /// rounding and MIN_SWAP_FEE take the whole of a small enough clip.
+         /// offers a proportionally larger clip.
          ///
          /// Requires `setyield` to have run. No authorization is required.
          [[sysio::action]] void tickyield(symbol_code pair_token);
