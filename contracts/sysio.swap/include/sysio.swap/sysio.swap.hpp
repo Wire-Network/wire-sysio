@@ -82,9 +82,14 @@ namespace sysio {
          /// nothing, because the clip scales with elapsed time and a higher floor only
          /// makes sales larger and rarer at the same average rate.
          ///
-         /// It must stay under the depth cap, though: a floor above
-         /// `pool_shadow * depth_cap_bps / BPS_TOTAL` caps every clip below the floor
-         /// and the pair stops selling entirely.
+         /// It must stay under the depth cap, though: a floor above the cap caps every
+         /// clip below the floor and the pair stops selling entirely.
+         ///
+         /// Keep `depth_cap_bps` below roughly twice the pair's fee. The cap is what
+         /// makes a tick not worth sandwiching: an attacker pays the round-trip fee on
+         /// their own position to capture a share of the clip's price impact, so the
+         /// attack only clears its cost once a clip can move the pool by more than the
+         /// fee costs them.
          [[sysio::action]] void setyield(symbol_code pair_token,
            uint32_t conversion_horizon_sec, uint32_t depth_cap_bps, int64_t clip_floor);
          /// Settle the WIRE yield a yield pool is owed on the shadow it holds into the
@@ -104,7 +109,8 @@ namespace sysio {
          /// Sell one clip of a yield pool's reservoir through the pool and hand the
          /// proceeds to the shadow token's holders. The clip is the reservoir's share
          /// of the horizon elapsed since the last tick, floored, capped by
-         /// `depth_cap_bps` of the pool's shadow side and by what is queued; it is sold
+         /// `depth_cap_bps` of `last_tick_depth` or the current shadow side, whichever
+         /// is smaller, and by what is queued; it is sold
          /// at the pool's own curve and fee, after the pool's owed yield has been
          /// settled, and the proceeds go out through the token's `addyield`, so the
          /// pool takes its own share back on the next accrual.
@@ -215,13 +221,17 @@ namespace sysio {
             uint32_t       conversion_horizon_sec = 0;  ///< H: the reservoir is meant to sell over this long
             uint32_t       depth_cap_bps          = 0;  ///< hard ceiling on one clip, bps of the pool's shadow side
             int64_t        clip_floor             = 0;  ///< least a clip may be, in units of the shadow
+            int64_t        last_tick_depth        = 0;  ///< the shadow side as of the last setyield or selling tick.
+                                                        ///< The depth cap is taken against the SMALLER of this and
+                                                        ///< the current side, so a shadow side inflated inside one
+                                                        ///< transaction cannot widen the cap that bounds it.
             time_point     last_tick{};                 ///< elapsed-time base of the clip formula: the last tick that
                                                         ///< sold, the last setyield, or when the reservoir last
                                                         ///< went from empty to funded, whichever is latest. A tick
                                                         ///< that sells nothing deliberately leaves it alone.
             SYSLIB_SERIALIZE(currency_stats, (supply)(max_supply)(issuer)(pool1)(pool2)(fee)(fee_authority)
                                              (locked_shares)(yield_leg)(conversion_horizon_sec)(depth_cap_bps)
-                                             (clip_floor)(last_tick))
+                                             (clip_floor)(last_tick_depth)(last_tick))
          };
 
          /// A yield payout the contract has claimed and credited to `pair` but not yet

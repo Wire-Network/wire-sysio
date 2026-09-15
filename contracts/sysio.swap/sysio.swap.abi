@@ -182,6 +182,10 @@
                     "type": "int64"
                 },
                 {
+                    "name": "last_tick_depth",
+                    "type": "int64"
+                },
+                {
                     "name": "last_tick",
                     "type": "time_point"
                 }

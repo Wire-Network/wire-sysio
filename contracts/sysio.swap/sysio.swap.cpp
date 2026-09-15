@@ -463,13 +463,15 @@ void swap::setyield(symbol_code pair_token, uint32_t conversion_horizon_sec, uin
     const auto token = statstable.try_get( key );
     check ( token.has_value(), "pair token does not exist" );
     require_auth(token->fee_authority);
-    require_yield_leg(*token);
+    const extended_symbol& shadow = require_yield_leg(*token);
     check( depth_cap_bps <= opp::amm::BPS_TOTAL, "depth_cap_bps out of range" );
     check( clip_floor >= 0 && clip_floor <= MAX, "clip_floor out of range" );
+    const int64_t shadow_depth = pool_of( *token, shadow ).quantity.amount;
     statstable.modify( name{}, key, [&]( auto& a ) {
       a.conversion_horizon_sec = conversion_horizon_sec;
       a.depth_cap_bps          = depth_cap_bps;
       a.clip_floor             = clip_floor;
+      a.last_tick_depth        = shadow_depth;
       a.last_tick              = current_time_point();   // new parameters, fresh horizon
     } );
 }
@@ -501,7 +503,15 @@ void swap::tickyield(symbol_code pair_token) {
     // capped by depth_cap_bps of the pool's shadow side and by what is queued.
     const uint128_t elapsed_us = uint128_t( (now - token.last_tick).count() );
     const uint128_t horizon_us = uint128_t( sysio::seconds( token.conversion_horizon_sec ).count() );
-    const uint128_t cap = uint128_t( pool_of( token, shadow ).quantity.amount ) * token.depth_cap_bps / opp::amm::BPS_TOTAL;
+    // The cap is taken against the SMALLER of the shadow side now and as of the
+    // last setyield or selling tick. Selling shadow into the pool is what widens
+    // the current side, and it is the same move that makes a clip worth
+    // sandwiching, so a cap that followed it would be set by the attacker it is
+    // meant to bound. Taking the smaller also tightens immediately when the pool
+    // genuinely shrinks, and lets genuine growth through one tick later.
+    const uint128_t cap_depth = std::min( uint128_t( pool_of( token, shadow ).quantity.amount ),
+                                          uint128_t( token.last_tick_depth ) );
+    const uint128_t cap = cap_depth * token.depth_cap_bps / opp::amm::BPS_TOTAL;
     uint128_t clip = ( uint128_t(queued) * elapsed_us ) / horizon_us;
     clip = std::min( { clip, cap, uint128_t(queued) } );
     // Below the floor there is nothing worth selling yet, so return WITHOUT
@@ -521,7 +531,10 @@ void swap::tickyield(symbol_code pair_token) {
     const symbol proceeds_symbol = other_pool( token, shadow ).quantity.symbol;
     const extended_asset proceeds = process_exch( pair_token, selling, asset{ 0, proceeds_symbol } );
     reservoir_table.modify( name{}, key, [&]( auto& r ) { r.balance -= selling; } );
-    statstable.modify( name{}, key, [&]( auto& a ) { a.last_tick = now; } );
+    statstable.modify( name{}, key, [&]( auto& a ) {
+      a.last_tick       = now;
+      a.last_tick_depth = pool_of( a, shadow ).quantity.amount;   // a is post-trade
+    } );
     // The proceeds reach every holder of the shadow through the token's own
     // distribution; the pool, a holder, takes its share back on the next accrual.
     if (proceeds.quantity.amount > 0) {

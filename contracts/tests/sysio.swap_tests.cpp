@@ -392,6 +392,10 @@ public:
     int64_t last_tick_us( symbol_code pair ) {
         return fc::time_point::from_iso_string( pair_row( pair )["last_tick"].as_string() ).time_since_epoch().count();
     }
+    // The shadow side the pair recorded at its last setyield or selling tick.
+    int64_t last_tick_depth( symbol_code pair ) {
+        return pair_row( pair )["last_tick_depth"].as_int64();
+    }
     // `holder`'s row for `sym` on the shadow token (scope = holder, key = symbol code).
     shadow_account_row shadow_account( name holder, symbol_code sym ) {
         const auto data = get_kv_row( "shadowtoken"_n, "accounts"_n, { holder.to_uint64_t(), sym.value } );
@@ -1971,6 +1975,46 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_
     BOOST_REQUIRE( pending_payout( "shadowtoken"_n ).empty() );
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( yield_tick_cap_ignores_an_inflated_shadow_side, sysio_swap_tester ) try {
+    setup_yield_pool();
+    grant_shadow_code( "sysio.swap"_n, true );
+    const uint32_t horizon_sec = 3600;
+    const uint32_t cap_bps     = 1;
+    const int64_t  clip_floor  = 1000;
+    const auto shadow_pool_of  = [&]( const vector<int64_t>& pool ) { return pool.at(0); };
+
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, cap_bps, clip_floor ) );
+    const int64_t honest_depth = shadow_pool_of( system_balance( SHEO.value ) );
+    BOOST_REQUIRE_EQUAL( honest_depth, last_tick_depth( SHEO ) );
+
+    // Queue enough that the cap, not the time share, is what binds.
+    const int64_t queued = 1'0000'0000;
+    fund_yield_in_one_transaction( "alice"_n, SHEO, asset( queued, SHD4 ) );
+
+    // Double the shadow side by selling into the pool. That is the same move
+    // that makes a clip worth sandwiching, so a cap following the current side
+    // would be set by the attacker it is meant to bound.
+    const int64_t inflate = honest_depth;
+    BOOST_REQUIRE_EQUAL( success(), shadow_transfer( "alice"_n, "sysio.swap"_n, asset( inflate, SHD4 ), "" ) );
+    BOOST_REQUIRE_EQUAL( success(), exchange( "alice"_n, SHEO, shd(inflate), asset(0, EOS4) ) );
+    const int64_t inflated_depth = shadow_pool_of( system_balance( SHEO.value ) );
+    BOOST_REQUIRE_EQUAL( honest_depth + inflate, inflated_depth );
+    BOOST_REQUIRE_EQUAL( honest_depth, last_tick_depth( SHEO ) );   // the record did not follow
+
+    produce_block();
+    produce_block( fc::hours(2) );
+    const auto before = system_balance( SHEO.value );
+    BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
+    const int64_t sold = shadow_pool_of( system_balance( SHEO.value ) ) - shadow_pool_of( before );
+    BOOST_REQUIRE_EQUAL( honest_depth * cap_bps / yield_reference::BpsTotal, sold );
+    BOOST_REQUIRE_EQUAL( inflated_depth * cap_bps / yield_reference::BpsTotal, 2 * sold );   // what it would have been
+    BOOST_REQUIRE_LT( sold, queued );                                                        // the cap bound it, not the queue
+
+    // The tick records the pool it actually left, so the next one is bounded by
+    // that rather than by the stale figure.
+    BOOST_REQUIRE_EQUAL( shadow_pool_of( system_balance( SHEO.value ) ), last_tick_depth( SHEO ) );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( yield_tick_never_sells_below_the_clip_floor, sysio_swap_tester ) try {
     setup_yield_pool();
     grant_shadow_code( "sysio.swap"_n, true );
@@ -2796,7 +2840,7 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
         {"supply", "asset"}, {"max_supply", "asset"}, {"issuer", "name"}, {"pool1", "extended_asset"},
         {"pool2", "extended_asset"}, {"fee", "int32"}, {"fee_authority", "name"}, {"locked_shares", "asset"},
         {"yield_leg", "extended_symbol?"}, {"conversion_horizon_sec", "uint32"}, {"depth_cap_bps", "uint32"},
-        {"clip_floor", "int64"}, {"last_tick", "time_point"} };
+        {"clip_floor", "int64"}, {"last_tick_depth", "int64"}, {"last_tick", "time_point"} };
     const field_list setyield_fields{
         {"pair_token", "symbol_code"}, {"conversion_horizon_sec", "uint32"}, {"depth_cap_bps", "uint32"},
         {"clip_floor", "int64"} };
