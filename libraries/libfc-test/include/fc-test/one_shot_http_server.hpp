@@ -5,6 +5,7 @@
 #include <boost/beast/http.hpp>
 
 #include <fc/io/json.hpp>
+#include <fc/variant_object.hpp>
 
 #include <cstdint>
 #include <sstream>

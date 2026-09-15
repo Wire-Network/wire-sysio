@@ -3,6 +3,7 @@
 #include <fc/crypto/base64.hpp>
 #include <fc/io/json.hpp>
 #include <fc/log/es_sink.hpp>
+#include <fc/log/es_sink_config.hpp>
 #include <fc/log/json_formatter.hpp>
 #include <fc/log/json_layout.hpp>
 #include <fc/log/logger.hpp>
@@ -20,12 +21,14 @@
 #include <algorithm>
 #include <chrono>
 #include <memory>
-#include <sstream>
 #include <string>
 #include <thread>
 #include <vector>
 
 using namespace std::chrono_literals;
+using fc::test::bulk_partial_failure_body;
+using fc::test::delayed_ok;
+using fc::test::split_bulk_lines;
 
 namespace {
 
@@ -49,17 +52,6 @@ fc::sink::es_sink_config make_cfg(const std::string& url) {
    return cfg;
 }
 
-/// Split an NDJSON bulk body into its lines (the trailing newline yields no entry).
-std::vector<std::string> split_bulk_lines(const std::string& body) {
-   std::vector<std::string> lines;
-   std::stringstream        in{body};
-   std::string              line;
-   while (std::getline(in, line)) {
-      lines.push_back(line);
-   }
-   return lines;
-}
-
 /// Log @p count records through a stack-local spdlog logger wired to @p sink.
 void log_records(const std::shared_ptr<fc::es_sink_mt>& sink, int count, const std::string& payload = "record") {
    spdlog::logger lgr("es_test_logger", {sink});
@@ -67,21 +59,6 @@ void log_records(const std::shared_ptr<fc::es_sink_mt>& sink, int count, const s
    for (int i = 0; i < count; ++i) {
       SPDLOG_LOGGER_INFO(&lgr, "{} {}", payload, i);
    }
-}
-
-/// A successful default-body response whose delivery stalls for @p delay.
-fc::test::capture_http_server::scripted_response delayed_ok(std::chrono::milliseconds delay) {
-   fc::test::capture_http_server::scripted_response response;
-   response.delay = delay;
-   return response;
-}
-
-/// A 2-item bulk response: one indexed, one rejected with a reason.
-std::string partial_failure_body() {
-   return R"({"took":3,"errors":true,"items":[)"
-          R"({"index":{"_index":"test-logs","status":201}},)"
-          R"({"index":{"_index":"test-logs","status":400,"error":{"type":"mapper_parsing_exception","reason":"boom"}}})"
-          R"(]})";
 }
 
 } // anonymous namespace
@@ -269,7 +246,7 @@ BOOST_AUTO_TEST_CASE(no_retry_on_4xx) try {
 // duplicate the indexed documents); per-item failures are accounted.
 BOOST_AUTO_TEST_CASE(errors_true_no_retry_and_counts) try {
    fc::test::capture_http_server server{
-      {fc::test::capture_http_server::scripted_response{200, partial_failure_body(), 0ms}}};
+      {fc::test::capture_http_server::scripted_response{200, bulk_partial_failure_body(test_index), 0ms}}};
    auto cfg       = make_cfg(server.url());
    cfg.batch_size = 2;
    auto sink      = std::make_shared<fc::es_sink_mt>(cfg);
@@ -537,14 +514,14 @@ BOOST_AUTO_TEST_CASE(es_config_defaults_from_json) try {
    BOOST_CHECK(!cfg.username.has_value());
    BOOST_CHECK(!cfg.password.has_value());
    BOOST_CHECK_EQUAL(cfg.batch_size, fc::sink::default_es_batch_size);
-   BOOST_CHECK_EQUAL(cfg.max_batch_bytes, fc::sink::default_es_max_batch_bytes);
-   BOOST_CHECK_EQUAL(cfg.max_doc_bytes, fc::sink::default_es_max_doc_bytes);
+   BOOST_CHECK_EQUAL(cfg.max_batch_bytes, fc::network::es::es_default_max_batch_bytes);
+   BOOST_CHECK_EQUAL(cfg.max_doc_bytes, fc::network::es::es_default_max_doc_bytes);
    BOOST_CHECK_EQUAL(cfg.flush_interval_ms, fc::sink::default_es_flush_interval_ms);
    BOOST_CHECK_EQUAL(cfg.max_pending_batches, fc::sink::default_es_max_pending_batches);
-   BOOST_CHECK_EQUAL(cfg.max_retries, fc::sink::default_es_max_retries);
-   BOOST_CHECK_EQUAL(cfg.retry_backoff_ms, fc::sink::default_es_retry_backoff_ms);
-   BOOST_CHECK_EQUAL(cfg.connect_timeout_ms, fc::sink::default_es_connect_timeout_ms);
-   BOOST_CHECK_EQUAL(cfg.request_timeout_ms, fc::sink::default_es_request_timeout_ms);
+   BOOST_CHECK_EQUAL(cfg.max_retries, fc::network::es::es_default_max_retries);
+   BOOST_CHECK_EQUAL(cfg.retry_backoff_ms, fc::network::es::es_default_retry_backoff_ms);
+   BOOST_CHECK_EQUAL(cfg.connect_timeout_ms, fc::network::es::es_default_connect_timeout_ms);
+   BOOST_CHECK_EQUAL(cfg.request_timeout_ms, fc::network::es::es_default_request_timeout_ms);
    BOOST_CHECK_EQUAL(cfg.shutdown_flush_timeout_ms, fc::sink::default_es_shutdown_flush_timeout_ms);
 } FC_LOG_AND_RETHROW()
 

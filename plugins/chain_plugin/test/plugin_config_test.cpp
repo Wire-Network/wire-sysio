@@ -460,6 +460,18 @@ BOOST_AUTO_TEST_CASE(snapshot_endpoint_block_identity_policy) {
    BOOST_CHECK(!sysio::parse_snapshot_endpoint_block_num(invalid_block_segment));
 }
 
+/** get_info_db refreshes per block only while an in-process get_info consumer is configured. */
+BOOST_AUTO_TEST_CASE(get_info_consumer_plugin_policy) {
+   BOOST_CHECK(!sysio::get_info_consumer_configured({}));
+   BOOST_CHECK(!sysio::get_info_consumer_configured({"sysio::net_plugin", "sysio::producer_plugin"}));
+   BOOST_CHECK(sysio::get_info_consumer_configured({"sysio::chain_api_plugin"}));
+   BOOST_CHECK(sysio::get_info_consumer_configured({"sysio::status_monitor_plugin"}));
+   // appbase lets one `plugin` value carry several names; the match is per name, not per value.
+   BOOST_CHECK(sysio::get_info_consumer_configured({"sysio::net_plugin sysio::status_monitor_plugin"}));
+   // The match is deliberately loose: a longer name that contains a consumer's name matches.
+   BOOST_CHECK(sysio::get_info_consumer_configured({"sysio::chain_api_plugin_extended"}));
+}
+
 /** Auto-fetch a scheduled snapshot, replay its later attestation, and finish verification. */
 BOOST_FIXTURE_TEST_CASE(
    chain_plugin_accepts_attested_auto_fetched_snapshot,

@@ -1483,14 +1483,12 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
       _last_tracked_votes.emplace(*chain);
 
-      bool chain_api_plugin_configured = false;
-      if (options.count("plugin")) {
-         const auto& v = options.at("plugin").as<std::vector<std::string>>();
-         chain_api_plugin_configured = std::ranges::any_of(v, [](const std::string& p) { return p.find("sysio::chain_api_plugin") != std::string::npos; });
-      }
+      bool get_info_consumer = false;
+      if (options.count("plugin"))
+         get_info_consumer = get_info_consumer_configured(options.at("plugin").as<std::vector<std::string>>());
 
-      // only enable _get_info_db if chain_api_plugin enabled.
-      _get_info_db.emplace(*chain, chain_api_plugin_configured);
+      // get_info_db refreshes per block only for an in-process consumer (see get_info_consumer_plugins).
+      _get_info_db.emplace(*chain, get_info_consumer);
 
       // initialize deep mind logging
       if ( options.at( "deep-mind" ).as<bool>() ) {
