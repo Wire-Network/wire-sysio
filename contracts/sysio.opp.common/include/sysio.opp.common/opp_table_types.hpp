@@ -298,16 +298,6 @@ DataStream& operator>>(DataStream& ds, ReserveBalanceSheet& t) {
    return ds >> t.chain_code >> t.reserves;
 }
 
-// PretokenStakeChange (deprecated; pre-launch only)
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const PretokenStakeChange& t) {
-   return ds << t.actor << t.amount << t.index_at_mint << t.index_at_burn;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, PretokenStakeChange& t) {
-   return ds >> t.actor >> t.amount >> t.index_at_mint >> t.index_at_burn;
-}
-
 // PretokenPurchase (deprecated; pre-launch only)
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const PretokenPurchase& t) {
