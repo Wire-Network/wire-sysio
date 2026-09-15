@@ -195,7 +195,13 @@ namespace sysio {
     using bytes = std::vector<char>;
 
     /**
-     * @brief Using the signature and provided parameters, this action will create a link between the WIRE account name and the external chain address. Pub keys / Addresses are 1:1 mapped.
+     * @brief Verify and create a one-to-one link between a WIRE account and an external-chain key.
+     *
+     * A successful link derives its canonical native address and inline-sends
+     * `sysio.dclaim::linkswept` to move matching pre-link rewards. If sysio.dclaim is missing or
+     * non-privileged, the link still commits and the sweep is skipped. Because a second createlink
+     * for the same account and chain is rejected, that skipped sweep is not automatically retryable
+     * through this action; an authorized operator must use recordlink or linkswept for remediation.
      *
      * @param chain_kind The chain identifier from `opp::types::ChainKind`
      *                   (CHAIN_KIND_EVM / CHAIN_KIND_SVM).
@@ -222,8 +228,16 @@ namespace sysio {
      * Record an external-chain public-key link WITHOUT signature verification -- the trusted,
      * depot-only counterpart to createlink. The OPP NodeOwnerRegistration dispatch has already
      * established (via the deposit attestation) that `pub_key` belongs to `account`, so this skips
-     * createlink's signature/nonce checks and just inserts the link. `require_auth(get_self())`;
-     * idempotent and non-throwing so the trust-OPP depot dispatch is never aborted.
+     * createlink's signature/nonce checks and inserts the link.
+     * `require_auth(get_self())`; idempotent and non-throwing so the trust-OPP depot dispatch is
+     * never aborted. Unsupported chain/key pairs are silently ignored. With a correctly sized
+     * `native_address`, a successful or idempotent link also sweeps matching pre-link DClaim
+     * rewards. EVM addresses must be 20 bytes; SVM addresses must equal the raw ED public-key bytes.
+     * A malformed or mismatched address skips only the sweep, not link insertion. A missing or
+     * non-privileged sysio.dclaim deployment likewise skips the sweep. An identical recordlink can
+     * retry before node-owner registration completes; after registration, nodeownreg's duplicate
+     * gate returns before this action, so remediation requires an operator-pushed recordlink or
+     * linkswept action.
      *
      * Unlike createlink, this does NOT enforce a unique `pub_key`: one external wallet may hold
      * several WireNodes NFTs and back several Wire accounts, so one ETH key -> many accounts is
@@ -231,12 +245,14 @@ namespace sysio {
      *
      * @param account    The WIRE account to link.
      * @param chain_kind The external chain identifier (opp::types::ChainKind).
-     * @param pub_key     The external chain's public key, Wire format.
+     * @param pub_key        The external chain's public key, Wire format.
+     * @param native_address Raw external-chain address used to find unmapped DClaim rewards.
      */
     [[sysio::action]] void recordlink(
         const name& account,
         const opp::types::ChainKind chain_kind,
-        const sysio::public_key& pub_key);
+        const sysio::public_key& pub_key,
+        const bytes& native_address);
 
     // ----- Tables (public so sister contracts can read via cross-contract kv::table reads) -----
 

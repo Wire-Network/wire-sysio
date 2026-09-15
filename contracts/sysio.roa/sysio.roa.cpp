@@ -3,6 +3,7 @@
 #include "sysio.system/emissions.hpp"
 
 #include <sysio.authex/sysio.authex.hpp>
+#include <sysio.opp.common/evm_address.hpp>
 #include <sysio.opp.common/safe_ops.hpp>   // add_sat_u64 / add_sat_i64 -- never-throw saturating accumulators
 #include <sysio/permission.hpp>   // get_permission -- read an account's active authority in nodeownreg
 
@@ -673,7 +674,8 @@ namespace sysio {
     };
 
     void roa::nodeownreg(const name& owner, const uint8_t& tier, const public_key& eth_pub_key,
-                         const public_key& wire_pub_key) {
+                         const public_key& wire_pub_key,
+                         const bytes& eth_address) {
         // Dispatched by the OPP depot (sysio.msgch) when it processes an inbound
         // ATTESTATION_TYPE_NODE_OWNER_REG attestation. msgch inline-sends newnameduser (account
         // create) and then this action, both declaring permission_level{sysio.roa, active}; the
@@ -691,6 +693,8 @@ namespace sysio {
         // NFT deposits land on Ethereum, so the recorded link is always an EM (secp256k1) key.
         check(eth_pub_key.index() == fc::crypto::key_type_em,
               "eth_pub_key must be an EM (secp256k1) public key");
+        check(eth_address.size() == opp::evm_address_size,
+              "eth_address must be exactly 20 bytes");
 
         // ROA-active is a hard system invariant (the network cannot function with ROA inactive).
         // Read the state once here so the soft-fail audit rows below scope to the live network_gen
@@ -765,7 +769,8 @@ namespace sysio {
         // on authex; it is idempotent and non-throwing. EVM-only by design (NFT deposits originate
         // on Ethereum); to extend to another ChainKind, promote the kind to an action parameter.
         action(permission_level{AUTHEX_ACCOUNT, "active"_n}, AUTHEX_ACCOUNT, AUTHEX_RECORDLINK,
-               std::make_tuple(owner, opp::types::ChainKind::CHAIN_KIND_EVM, eth_pub_key)).send();
+               std::make_tuple(owner, opp::types::ChainKind::CHAIN_KIND_EVM, eth_pub_key,
+                               eth_address)).send();
 
         regnodeowner(owner, tier);
         record_nodereg(owner, tier, CONFIRMED, NONE, gen);
