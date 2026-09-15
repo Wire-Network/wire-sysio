@@ -1,9 +1,11 @@
 #include "http_transport_internal.hpp"
 
-#include <algorithm>
-#include <boost/asio/ip/address.hpp>
-#include <cctype>
 #include <fc/task/deadline.hpp>
+
+#include <boost/asio/ip/address.hpp>
+
+#include <algorithm>
+#include <cctype>
 #include <limits>
 #include <string>
 #include <string_view>
@@ -96,8 +98,9 @@ std::optional<operation_deadline> phase_deadline(const std::optional<microsecond
    return operation_deadline{phase_end, phase_failure};
 }
 
-/** Reject control characters in caller-controlled HTTP header material. */
 namespace {
+
+/** Reject control characters in caller-controlled HTTP header material. */
 void validate_header_component(std::string_view value, std::string_view label) {
    const auto invalid = std::find_if(value.begin(), value.end(), [](unsigned char character) {
       return (character < 0x20 && character != '\t') || character == 0x7f;

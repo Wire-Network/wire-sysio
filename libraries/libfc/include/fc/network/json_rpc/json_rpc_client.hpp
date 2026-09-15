@@ -1,12 +1,13 @@
 #pragma once
 
-#include <cstdint>
 #include <fc/io/json.hpp>
 #include <fc/network/http/http_client.hpp>
 #include <fc/network/url.hpp>
 #include <fc/time.hpp>
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
+
+#include <cstdint>
 #include <functional>
 #include <optional>
 #include <string>

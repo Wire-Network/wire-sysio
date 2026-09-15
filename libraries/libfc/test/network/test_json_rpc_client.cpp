@@ -3,14 +3,16 @@
  * @brief Regression tests for deadline-bound JSON-RPC transport calls.
  */
 
-#include <atomic>
+#include <fc/network/json_rpc/json_rpc_client.hpp>
+#include <fc/task/deadline.hpp>
+
 #include <boost/asio.hpp>
 #include <boost/beast/core/flat_buffer.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/test/unit_test.hpp>
+
+#include <atomic>
 #include <chrono>
-#include <fc/network/json_rpc/json_rpc_client.hpp>
-#include <fc/task/deadline.hpp>
 #include <optional>
 #include <sstream>
 #include <string>
@@ -492,11 +494,6 @@ private:
    std::vector<request_record> _requests;
    std::thread _worker;
 };
-
-/** Return a JSON-RPC error object suitable for a scripted response. */
-fc::variant json_rpc_error_object(int64_t code, std::string message) {
-   return fc::variant(fc::mutable_variant_object()("code", code)("message", std::move(message)));
-}
 
 /**
  * Return true when the exception came from the transport response body limit.

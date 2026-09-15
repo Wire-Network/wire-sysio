@@ -1,13 +1,15 @@
 #include "http_transport_internal.hpp"
 
-#include <algorithm>
-#include <array>
 #include <boost/asio/executor_work_guard.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/posix/stream_descriptor.hpp>
-#include <fcntl.h>
+
+#include <algorithm>
+#include <array>
 #include <thread>
+
+#include <fcntl.h>
 #include <unistd.h>
 
 namespace fc {

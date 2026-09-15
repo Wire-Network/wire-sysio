@@ -4,22 +4,25 @@
  */
 #pragma once
 
-#include <array>
-#include <boost/asio/any_io_executor.hpp>
-#include <boost/asio/awaitable.hpp>
-#include <boost/asio/buffer.hpp>
-#include <boost/asio/cancellation_signal.hpp>
-#include <cstddef>
-#include <cstdint>
 #include <fc/crypto/blake3.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/network/url.hpp>
 #include <fc/static_variant.hpp>
 #include <fc/time.hpp>
 #include <fc/variant.hpp>
+
+#include <boost/asio/any_io_executor.hpp>
+#include <boost/asio/awaitable.hpp>
+#include <boost/asio/buffer.hpp>
+#include <boost/asio/cancellation_signal.hpp>
+
+#include <magic_enum/magic_enum.hpp>
+
+#include <array>
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
 #include <functional>
-#include <magic_enum/magic_enum.hpp>
 #include <memory>
 #include <optional>
 #include <string>

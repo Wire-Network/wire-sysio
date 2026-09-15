@@ -3,19 +3,26 @@
  * @brief Regression tests for bounded streamed HTTP file downloads.
  */
 
-#include <algorithm>
-#include <array>
-#include <atomic>
+#include <fc/filesystem.hpp>
+#include <fc/network/http/http_client.hpp>
+#include <fc/task/deadline.hpp>
+
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 #include <boost/beast/http/status.hpp>
 #include <boost/test/unit_test.hpp>
+
+#include <openssl/pem.h>
+#include <openssl/rsa.h>
+#include <openssl/ssl.h>
+#include <openssl/x509v3.h>
+
+#include <algorithm>
+#include <array>
+#include <atomic>
 #include <cerrno>
 #include <chrono>
 #include <cstdio>
-#include <fc/filesystem.hpp>
-#include <fc/network/http/http_client.hpp>
-#include <fc/task/deadline.hpp>
 #include <filesystem>
 #include <fstream>
 #include <functional>
@@ -24,10 +31,6 @@
 #include <iterator>
 #include <memory>
 #include <mutex>
-#include <openssl/pem.h>
-#include <openssl/rsa.h>
-#include <openssl/ssl.h>
-#include <openssl/x509v3.h>
 #include <sstream>
 #include <string>
 #include <string_view>

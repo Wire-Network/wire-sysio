@@ -7,8 +7,8 @@
  * to one process-global counter block.
  */
 
-#include <array>
-#include <atomic>
+#include <fc/network/http/http_client.hpp>
+
 #include <boost/asio/any_io_executor.hpp>
 #include <boost/asio/awaitable.hpp>
 #include <boost/asio/buffer.hpp>
@@ -27,11 +27,13 @@
 #include <boost/beast/core/tcp_stream.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/system/error_code.hpp>
+
+#include <array>
+#include <atomic>
 #include <cerrno>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
-#include <fc/network/http/http_client.hpp>
 #include <functional>
 #include <map>
 #include <memory>
@@ -40,10 +42,11 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
-#include <sys/socket.h>
 #include <utility>
 #include <variant>
 #include <vector>
+
+#include <sys/socket.h>
 
 namespace fc {
 namespace http {

@@ -1,10 +1,13 @@
 // Implementation file for JSON-RPC client
-#include <algorithm>
+#include <fc/network/json_rpc/json_rpc_client.hpp>
+
 #include <boost/beast/http/status.hpp>
 #include <boost/beast/version.hpp>
-#include <cctype>
-#include <fc/network/json_rpc/json_rpc_client.hpp>
+
 #include <magic_enum/magic_enum.hpp>
+
+#include <algorithm>
+#include <cctype>
 #include <string_view>
 
 namespace fc::network::json_rpc {
