@@ -301,18 +301,11 @@ struct continuation_json_rpc_response {
    kind response_kind = kind::result;
    fc::variant payload;
    std::optional<int64_t> response_id;
-   std::chrono::microseconds delay{0};
    bool keep_alive = true;
-   bool reset_after_response = false;
 
    /** Return a successful JSON-RPC result. */
    static continuation_json_rpc_response result(fc::variant value) {
       return {.response_kind = kind::result, .payload = std::move(value)};
-   }
-
-   /** Return a successful result after a deterministic delay. */
-   static continuation_json_rpc_response delayed_result(fc::variant value, std::chrono::microseconds delay) {
-      return {.response_kind = kind::result, .payload = std::move(value), .delay = delay};
    }
 
    /** Return a JSON-RPC error object. */
@@ -451,8 +444,6 @@ private:
                reset_socket(*socket);
                break;
             }
-            if (response.delay.count() > 0)
-               std::this_thread::sleep_for(response.delay);
             if (_stop.load())
                break;
 
@@ -465,10 +456,6 @@ private:
             boost::beast::http::write(*socket, http_response, error);
             if (error)
                break;
-            if (response.reset_after_response) {
-               reset_socket(*socket);
-               break;
-            }
             if (!response.keep_alive) {
                socket->close(error);
                break;
@@ -561,6 +548,44 @@ BOOST_AUTO_TEST_CASE(default_call_enforces_single_attempt) {
    BOOST_REQUIRE_EQUAL(requests.size(), 2U);
    BOOST_CHECK_EQUAL(requests.front().method, "wire_first_probe");
    BOOST_CHECK_EQUAL(requests.back().method, "wire_side_effect_probe");
+}
+
+/// A response carrying an error member is decoded as a JSON-RPC error rather than a result.
+BOOST_AUTO_TEST_CASE(call_reports_a_json_rpc_error_envelope) {
+   fc::mutable_variant_object failure;
+   failure("code", -32601)("message", "Method not found");
+   continuation_json_rpc_server server({
+      continuation_json_rpc_response::error(fc::variant(std::move(failure))),
+   });
+   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
+
+   BOOST_CHECK_THROW(client.call("wire_missing_probe"), fc::network::json_rpc::json_rpc_error);
+}
+
+/// A response whose id does not match the request is rejected instead of returned.
+BOOST_AUTO_TEST_CASE(call_rejects_a_mismatched_response_id) {
+   auto mismatched = continuation_json_rpc_response::result("wrong-id");
+   mismatched.response_id = 9'001;
+   continuation_json_rpc_server server({std::move(mismatched)});
+   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
+
+   // Match the message, not just the type: a transport failure would also throw fc::exception
+   // and would let this pass without ever reaching the id check.
+   BOOST_CHECK_EXCEPTION(client.call("wire_id_probe"), fc::exception, [](const fc::exception& error) {
+      return error.to_detail_string().find("does not match request") != std::string::npos;
+   });
+}
+
+/// A response that is not a JSON-RPC 2.0 envelope is rejected before its result is read.
+BOOST_AUTO_TEST_CASE(call_rejects_a_non_2_0_envelope) {
+   continuation_json_rpc_server server({
+      continuation_json_rpc_response::raw(R"({"jsonrpc":"1.0","id":1,"result":"first"})"),
+   });
+   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
+
+   BOOST_CHECK_EXCEPTION(client.call("wire_envelope_probe"), fc::exception, [](const fc::exception& error) {
+      return error.to_detail_string().find("'jsonrpc'") != std::string::npos;
+   });
 }
 
 /// URL parsing preserves bracketed IPv6 identity, credentials, path, query, and port.

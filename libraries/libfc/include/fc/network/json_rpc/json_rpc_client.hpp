@@ -48,12 +48,10 @@ enum class replay_policy {
    stale_reused_connection_once,
 };
 
-/** Explicit replay and total-deadline policy for one JSON-RPC call. */
+/** Explicit replay policy for one JSON-RPC call. */
 struct call_options {
    /// Explicit replay behavior for this call.
    replay_policy replay = replay_policy::never;
-   /// Optional upper bound for the base total timeout.
-   std::optional<fc::microseconds> total_timeout_cap;
 };
 
 // JSON-RPC error type

@@ -39,7 +39,7 @@ fc::http::request_options stale_connection_retry_options(fc::http::request_optio
    return options;
 }
 
-/** Apply a per-call replay policy and optional total-timeout cap. */
+/** Apply a per-call replay policy. */
 fc::http::request_options request_options_for(fc::http::request_options options, const call_options& call) {
    switch (call.replay) {
    case replay_policy::never:
@@ -48,12 +48,6 @@ fc::http::request_options request_options_for(fc::http::request_options options,
    case replay_policy::stale_reused_connection_once:
       options = stale_connection_retry_options(std::move(options));
       break;
-   }
-
-   if (call.total_timeout_cap) {
-      FC_ASSERT(call.total_timeout_cap->count() > 0, "JSON-RPC total timeout cap must be positive");
-      options.timeouts.total =
-         options.timeouts.total ? std::min(*options.timeouts.total, *call.total_timeout_cap) : call.total_timeout_cap;
    }
    return options;
 }
