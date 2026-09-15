@@ -503,9 +503,6 @@ void swap::tickyield(symbol_code pair_token) {
     // longer window, offering a proportionally larger clip. That is what makes
     // cranking every block harmless, and it costs no throughput -- waiting N
     // times as long sells N times as much, so the average rate is unchanged.
-    // Selling anyway is what bled the reservoir to the liquidity providers: a
-    // clip small enough is taken entirely by integer rounding on the curve and
-    // by MIN_SWAP_FEE, settling a zero output while the shadow still moves.
     //
     // The floor gives way to `queued` so a remainder smaller than it is not
     // stranded: that leaves as one sale once the time share reaches the whole
