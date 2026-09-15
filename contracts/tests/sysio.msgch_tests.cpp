@@ -21,8 +21,8 @@ namespace {
 
 /// Build a slug_name mvo: `{"value": <uint64>}` matches the ABI surface for
 /// `sysio::slug_name` fields.
-inline fc::mutable_variant_object codename_mvo(std::string_view s) {
-   return mvo()("value", fc::slug_name{s}.value);
+inline std::string codename(std::string_view s) {
+   return std::string{s};
 }
 
 } // anonymous namespace
@@ -98,7 +98,7 @@ public:
                           uint32_t chain_id) {
       base_tester::push_action(CHAINS_ACCOUNT, "regchain"_n, CHAINS_ACCOUNT, mvo()
          ("kind",              kind)
-         ("code",              codename_mvo(code))
+         ("code",              codename(code))
          ("external_chain_id", chain_id)
          ("name",              std::string("outpost"))
          ("description",       std::string{})
@@ -268,7 +268,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(),
          push_action(CHAINS_ACCOUNT, CHAINS_ACCOUNT, "regchain"_n, mvo()
             ("kind",              kind)
-            ("code",              codename_mvo(code))
+            ("code",              codename(code))
             ("external_chain_id", chain_id)
             ("name",              std::string("outpost"))
             ("description",       std::string{})

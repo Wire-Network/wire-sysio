@@ -59,8 +59,8 @@ public:
       }
    }
 
-   static fc::mutable_variant_object codename(std::string_view s) {
-      return mvo()("value", fc::slug_name{s}.value);
+   static std::string codename(std::string_view s) {
+      return std::string{s};
    }
 
    /// `sysio.tokens::regtoken` for a chain-native token; the metadata strings are the
@@ -98,8 +98,8 @@ public:
             auto row = abi_ser.binary_to_variant(
                "chain_token_row", raw,
                abi_serializer::create_yield_function(abi_serializer_max_time));
-            if (row["chain_code"]["value"].as_uint64() == target_chain &&
-                row["token_code"]["value"].as_uint64() == target_token) {
+            if (row["chain_code"].as<fc::slug_name>().value == target_chain &&
+                row["token_code"].as<fc::slug_name>().value == target_token) {
                return row;
             }
          } catch (...) {

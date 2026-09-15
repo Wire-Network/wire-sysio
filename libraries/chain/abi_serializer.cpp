@@ -1,4 +1,5 @@
 #include <sysio/chain/abi_serializer.hpp>
+#include <fc/slug_name.hpp>
 #include <sysio/chain/asset.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <fc/io/raw.hpp>
@@ -135,6 +136,7 @@ namespace sysio::chain {
 
       built_in_types.emplace("symbol",                    pack_unpack<symbol>());
       built_in_types.emplace("symbol_code",               pack_unpack<symbol_code>());
+      built_in_types.emplace("slug_name",                 pack_unpack<fc::slug_name>());
       built_in_types.emplace("asset",                     pack_unpack<asset>());
       built_in_types.emplace("extended_asset",            pack_unpack<extended_asset>());
       built_in_types.emplace("bitset",                    pack_unpack<fc::bitset>());

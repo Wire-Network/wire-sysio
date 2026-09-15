@@ -251,10 +251,10 @@ public:
 
    static fc::slug_name cn(std::string_view s) { return fc::slug_name{s}; }
 
-   /// Build a slug_name mvo suitable for an action argument:
-   /// `{"value": <uint64>}` matches the ABI surface for slug_name fields.
-   static fc::mutable_variant_object codename_mvo(std::string_view s) {
-      return mvo()("value", fc::slug_name{s}.value);
+   /// A slug_name action argument: the ABI builtin takes the decoded string
+   /// spelling, so the codename is passed through as-is.
+   static std::string codename(std::string_view s) {
+      return std::string{s};
    }
 
    // ── Action helpers ──
@@ -297,8 +297,8 @@ public:
                                           std::string_view token_code,
                                           uint64_t min_bond) {
       return fc::variant(mvo()
-         ("chain_code",           codename_mvo(chain_code))
-         ("token_code",           codename_mvo(token_code))
+         ("chain_code",           codename(chain_code))
+         ("token_code",           codename(token_code))
          ("min_bond",             min_bond)
          ("config_timestamp_ms",  uint64_t{0}));
    }
@@ -406,8 +406,8 @@ public:
                              const std::string& original_message_id_hex = std::string(64, '0')) {
       return push_opreg_action(OPREG_ACCOUNT, "depositinle"_n, mvo()
          ("account",              account)
-         ("chain_code",           codename_mvo(chain_code))
-         ("token_code",           codename_mvo(token_code))
+         ("chain_code",           codename(chain_code))
+         ("token_code",           codename(token_code))
          ("amount",               amount)
          ("actor_chain",          actor_chain)
          ("actor_address",        actor_address)
@@ -420,8 +420,8 @@ public:
                               uint64_t amount) {
       return push_opreg_action(OPREG_ACCOUNT, "withdrawinle"_n, mvo()
          ("account",     account)
-         ("chain_code",  codename_mvo(chain_code))
-         ("token_code",  codename_mvo(token_code))
+         ("chain_code",  codename(chain_code))
+         ("token_code",  codename(token_code))
          ("amount",      amount));
    }
 
@@ -471,8 +471,8 @@ public:
                              uint64_t amount) {
       return push_opreg_action(signer, "releaselock"_n, mvo()
          ("account",     account)
-         ("chain_code",  codename_mvo(chain_code))
-         ("token_code",  codename_mvo(token_code))
+         ("chain_code",  codename(chain_code))
+         ("token_code",  codename(token_code))
          ("amount",      amount));
    }
 
@@ -941,8 +941,8 @@ BOOST_FIXTURE_TEST_CASE(deposit_credits_balance_row, sysio_opreg_tester) { try {
    auto op = get_operator("uwrit.alice"_n);
    auto balances = op["balances"].get_array();
    BOOST_REQUIRE_EQUAL(1, balances.size());
-   BOOST_REQUIRE_EQUAL(cn("ETH").value, balances[0]["chain_code"]["value"].as_uint64());
-   BOOST_REQUIRE_EQUAL(cn("ETH").value, balances[0]["token_code"]["value"].as_uint64());
+   BOOST_REQUIRE_EQUAL(cn("ETH").value, balances[0]["chain_code"].as<fc::slug_name>().value);
+   BOOST_REQUIRE_EQUAL(cn("ETH").value, balances[0]["token_code"].as<fc::slug_name>().value);
    BOOST_REQUIRE_EQUAL(1'000'000,       balances[0]["balance"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
@@ -1035,8 +1035,8 @@ BOOST_FIXTURE_TEST_CASE(deposit_custodies_and_credits_wire_units, sysio_opreg_te
    auto op = get_operator(OPERATOR);
    auto balances = op["balances"].get_array();
    BOOST_REQUIRE_EQUAL(1u, balances.size());
-   BOOST_REQUIRE_EQUAL(cn(kWireCodename).value, balances[0]["chain_code"]["value"].as_uint64());
-   BOOST_REQUIRE_EQUAL(cn(kWireCodename).value, balances[0]["token_code"]["value"].as_uint64());
+   BOOST_REQUIRE_EQUAL(cn(kWireCodename).value, balances[0]["chain_code"].as<fc::slug_name>().value);
+   BOOST_REQUIRE_EQUAL(cn(kWireCodename).value, balances[0]["token_code"].as<fc::slug_name>().value);
    BOOST_REQUIRE_EQUAL(DEPOSIT, balances[0]["balance"].as_uint64());
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
 } FC_LOG_AND_RETHROW() }

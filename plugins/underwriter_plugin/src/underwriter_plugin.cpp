@@ -1208,9 +1208,11 @@ struct underwriter_plugin::impl {
       depot_chain_code.reset();
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
-         // `code` is a `slug_name` — serialised as `{"value": <uint64>}`.
-         const auto& code_obj = obj["code"].get_object();
-         uint64_t chain_code = code_obj["value"].as_uint64();
+         // `code` is a `slug_name`. Read it through fc::slug_name's own
+         // from_variant, which accepts every carrier the depot emits — the
+         // decoded slug string, "" for the zero sentinel, and a raw integer for
+         // a non-canonical value — plus the legacy `{"value": <uint64>}` object.
+         uint64_t chain_code = obj["code"].as<fc::slug_name>().value;
          if (obj.contains("is_depot") && obj["is_depot"].as_bool()) {
             // Record the depot's own code for exact per-leg depot
             // detection (to/from-WIRE swaps), then skip caching it as an
@@ -1366,7 +1368,7 @@ struct underwriter_plugin::impl {
       credit_lines.clear();
 
       // v6 schema: balance / lock / withdraw rows carry `chain_code`
-      // and `token_code` slug_names (serialised as `{"value": <u64>}`)
+      // and `token_code` slug_names (read via fc::slug_name's from_variant)
       // — not the v5 `chain` (ChainKind enum) / `token_kind` (TokenKind
       // enum). Translation:
       //   chain_code → ChainKind  via `outpost_chain_kinds` map
@@ -1385,7 +1387,7 @@ struct underwriter_plugin::impl {
          auto tk_rows = read_all("sysio.tokens", "sysio.tokens", "tokens");
          for (auto& row : tk_rows.rows) {
             auto obj  = row.get_object();
-            uint64_t code = obj["code"].get_object()["value"].as_uint64();
+            uint64_t code = obj["code"].as<fc::slug_name>().value;
             token_kind_by_code[code] = obj["kind"].as<TokenKind>();
          }
       }
@@ -1400,8 +1402,8 @@ struct underwriter_plugin::impl {
          if (!obj.contains("chain_code") || !obj.contains("token_code")) {
             return std::nullopt;
          }
-         uint64_t chain_code = obj["chain_code"].get_object()["value"].as_uint64();
-         uint64_t token_code = obj["token_code"].get_object()["value"].as_uint64();
+         uint64_t chain_code = obj["chain_code"].as<fc::slug_name>().value;
+         uint64_t token_code = obj["token_code"].as<fc::slug_name>().value;
          if (!outpost_chain_kinds.contains(chain_code)
              || !token_kind_by_code.contains(token_code)) {
             return std::nullopt;
@@ -1544,9 +1546,9 @@ struct underwriter_plugin::impl {
          // v6 data-model schema: src/dst identity lives on the uwreq row as
          // `(chain_code, token_code, reserve_code)` slug_name triples plus a
          // `*_amount`. Populated by `sysio.uwrit::createuwreq` from the
-         // originating SwapRequest. The ABI surfaces slug_name as
-         // `{value: uint64}`; we lift the inner uint64 directly into
-         // `fc::slug_name` to mirror the host-side packing.
+         // originating SwapRequest. Each is read through fc::slug_name's own
+         // from_variant, so every carrier the depot emits is accepted without
+         // this plugin knowing which one it is.
          if (!obj.contains(uwrit::request_field::source_chain_code) ||
              !obj.contains(uwrit::request_field::source_amount) ||
              !obj.contains(uwrit::request_field::destination_chain_code) ||
@@ -1557,7 +1559,7 @@ struct underwriter_plugin::impl {
             continue;
          }
          auto read_codename = [&](const char* key) -> fc::slug_name {
-            return fc::slug_name{obj[key]["value"].as_uint64()};
+            return obj[key].as<fc::slug_name>();
          };
          req.src_chain_code = read_codename(
             uwrit::request_field::source_chain_code);

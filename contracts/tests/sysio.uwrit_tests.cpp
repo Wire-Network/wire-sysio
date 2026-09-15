@@ -21,8 +21,8 @@ using mvo = fc::mutable_variant_object;
 namespace {
 
 /// SlugName mvo helper for v6 action arguments.
-inline fc::mutable_variant_object codename_mvo(std::string_view s) {
-   return mvo()("value", fc::slug_name{s}.value);
+inline std::string codename(std::string_view s) {
+   return std::string{s};
 }
 
 } // anonymous namespace
@@ -351,9 +351,9 @@ BOOST_FIXTURE_TEST_CASE(swapfromwire_rejects_zero_wire_amount, sysio_uwrit_teste
       push_uwrit_action("uwrit.a"_n, "swapfromwire"_n, mvo()
          ("user",                 "uwrit.a")
          ("wire_amount",          0)
-         ("dst_chain_code",       codename_mvo("SOLANA"))
-         ("dst_token_code",       codename_mvo("SOL"))
-         ("dst_reserve_code",     codename_mvo("PRIMARY"))
+         ("dst_chain_code",       codename("SOLANA"))
+         ("dst_token_code",       codename("SOL"))
+         ("dst_reserve_code",     codename("PRIMARY"))
          ("target_amount",        100)
          ("target_tolerance_bps", 50)
          ("recipient_kind",       sysio::opp::types::ChainKind::CHAIN_KIND_SVM)
@@ -370,9 +370,9 @@ BOOST_FIXTURE_TEST_CASE(swapfromwire_rejects_below_minimum, sysio_uwrit_tester) 
       push_uwrit_action("uwrit.a"_n, "swapfromwire"_n, mvo()
          ("user",                 "uwrit.a")
          ("wire_amount",          4'999'999'999ull)
-         ("dst_chain_code",       codename_mvo("SOLANA"))
-         ("dst_token_code",       codename_mvo("SOL"))
-         ("dst_reserve_code",     codename_mvo("PRIMARY"))
+         ("dst_chain_code",       codename("SOLANA"))
+         ("dst_token_code",       codename("SOL"))
+         ("dst_reserve_code",     codename("PRIMARY"))
          ("target_amount",        100)
          ("target_tolerance_bps", 50)
          ("recipient_kind",       sysio::opp::types::ChainKind::CHAIN_KIND_SVM)
@@ -391,9 +391,9 @@ BOOST_FIXTURE_TEST_CASE(swapfromwire_rejects_unregistered_target_chain, sysio_uw
       push_uwrit_action("uwrit.a"_n, "swapfromwire"_n, mvo()
          ("user",                 "uwrit.a")
          ("wire_amount",          5'000'000'000ull)
-         ("dst_chain_code",       codename_mvo("SOLANA"))
-         ("dst_token_code",       codename_mvo("SOL"))
-         ("dst_reserve_code",     codename_mvo("PRIMARY"))
+         ("dst_chain_code",       codename("SOLANA"))
+         ("dst_token_code",       codename("SOL"))
+         ("dst_reserve_code",     codename("PRIMARY"))
          ("target_amount",        100)
          ("target_tolerance_bps", 50)
          ("recipient_kind",       sysio::opp::types::ChainKind::CHAIN_KIND_SVM)
@@ -412,9 +412,9 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_requires_msgch_auth, sysio_uwrit_tester) { tr
       ("uwreq_id",         1)
       ("underwriter",      "uwrit.a")
       ("chain_code",       1)
-      ("from_chain_code",  codename_mvo("ETH"))
-      ("from_token_code",  codename_mvo("ETH"))
-      ("reserve_code",     codename_mvo("PRIMARY"))
+      ("from_chain_code",  codename("ETH"))
+      ("from_token_code",  codename("ETH"))
+      ("reserve_code",     codename("PRIMARY"))
       ("uic_bytes",        std::vector<char>{})
    ).find("missing authority of sysio.msgch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
@@ -429,9 +429,9 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_rejects_unknown_uwreq, sysio_uwrit_tester) { 
          ("uwreq_id",         42)
          ("underwriter",      "uwrit.a")
          ("chain_code",       1)
-         ("from_chain_code",  codename_mvo("ETH"))
-         ("from_token_code",  codename_mvo("ETH"))
-         ("reserve_code",     codename_mvo("PRIMARY"))
+         ("from_chain_code",  codename("ETH"))
+         ("from_token_code",  codename("ETH"))
+         ("reserve_code",     codename("PRIMARY"))
          ("uic_bytes",        std::vector<char>{})
       )
    );
@@ -444,8 +444,8 @@ BOOST_FIXTURE_TEST_CASE(sumlocks_zero_for_unbonded_underwriter, sysio_uwrit_test
    BOOST_REQUIRE_EQUAL(success(),
       push_uwrit_action("uwrit.a"_n, "sumlocks"_n, mvo()
          ("underwriter", "uwrit.a")
-         ("chain_code",  codename_mvo("ETH"))
-         ("token_code",  codename_mvo("ETH"))
+         ("chain_code",  codename("ETH"))
+         ("token_code",  codename("ETH"))
       )
    );
 } FC_LOG_AND_RETHROW() }
@@ -466,9 +466,9 @@ BOOST_FIXTURE_TEST_CASE(rcrdcommit_same_chain_swap_auth, sysio_uwrit_tester) { t
       ("uwreq_id",         7)
       ("underwriter",      "uwrit.a")
       ("chain_code",       1)
-      ("from_chain_code",  codename_mvo("ETH"))      // src == dst chain
-      ("from_token_code",  codename_mvo("USDC"))     // distinguishes legs
-      ("reserve_code",     codename_mvo("PRIMARY"))
+      ("from_chain_code",  codename("ETH"))      // src == dst chain
+      ("from_token_code",  codename("USDC"))     // distinguishes legs
+      ("reserve_code",     codename("PRIMARY"))
       ("uic_bytes",        std::vector<char>{})
    ).find("missing authority of sysio.msgch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }

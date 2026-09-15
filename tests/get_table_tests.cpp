@@ -452,7 +452,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
    push_action("test"_n, "addhashobj"_n, "test"_n, mutable_variant_object()("hashinput", "firstinput"));
    push_action("test"_n, "addhashobj"_n, "test"_n, mutable_variant_object()("hashinput", "secondinput"));
    push_action("test"_n, "addhashobj"_n, "test"_n, mutable_variant_object()("hashinput", "thirdinput"));
-   // structobjs: kv::table keyed by the reflected struct slug_name{value} — the
+   // structobjs: kv::table keyed by the reflected struct composite_key{value} — the
    // sysio.chains `chains` key shape. Drives the struct-key path in (sec-10).
    push_action("test"_n, "addstruct"_n, "test"_n, mutable_variant_object()("code", 10)("payload", 100));
    push_action("test"_n, "addstruct"_n, "test"_n, mutable_variant_object()("code", 20)("payload", 200));
@@ -747,15 +747,18 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
    }
 
    // (sec-10) structobjs primary key — kv::table keyed by the reflected struct
-   //          `slug_name { value: uint64 }`, the exact key shape of the v6
-   //          registry tables (sysio.chains `chains`, key_types ["slug_name"]).
+   //          `composite_key { value: uint64 }` — the struct key shape the v6
+   //          registry tables used before `slug_name` became an ABI builtin.
+   //          Deliberately not named `slug_name`: that spelling now resolves as
+   //          a codec LEAF, which would bypass struct expansion entirely and
+   //          leave this case passing while testing nothing.
    //          Exercises the ABI-aware BE key codec's struct-key expansion on the
    //          live get_table_rows path: a JSON bound of the documented nested
    //          `{ "code": { "value": N } }` form (encode_key), and a `next_key`
    //          pagination cursor that round-trips that same nested shape
    //          (decode_key -> next_key -> encode_key). Before the codec became
    //          ABI-aware, any JSON bound here asserted
-   //          "Unsupported BE key type: slug_name".
+   //          "Unsupported BE key type: composite_key".
    {
       // (a) JSON bound of the documented nested struct shape filters inclusively.
       chain_apis::read_only::get_table_rows_params p;

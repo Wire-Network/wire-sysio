@@ -4,6 +4,8 @@
 #include <fc/basic_name.hpp>
 #include <fc/slug_name.hpp>
 #include <fc/io/raw.hpp>
+#include <fc/variant.hpp>
+#include <fc/variant_object.hpp>
 
 #include <string>
 #include <string_view>
@@ -342,6 +344,105 @@ BOOST_AUTO_TEST_CASE(non_zero_terminator_trait_accepts_alphabet_zero) {
    static_assert(name_like::is_valid_literal(std::string_view{".alpha", 6}),
                  "leading '.' (the pad symbol) must validate when "
                  "zero_terminates is false");
+}
+
+// ── variant carrier ────────────────────────────────────────────────────────
+// to_variant is a DUAL carrier: a canonical slug renders as its string, zero as
+// "", and a value with no string spelling as the raw integer. It must be TOTAL
+// and INJECTIVE over all 2^64 — a non-canonical code is plantable from a
+// forgeable attestation payload (only chain_code is bound to the proven source
+// outpost), so a throwing conversion would let one row make a whole table
+// unreadable over get_table_rows.
+
+BOOST_AUTO_TEST_CASE(variant_canonical_slug_is_a_string) {
+   fc::variant v;
+   fc::to_variant(slug_name{"LIQSOL"}, v);
+   BOOST_REQUIRE(v.is_string());
+   BOOST_CHECK_EQUAL(v.as_string(), "LIQSOL");
+
+   slug_name back;
+   fc::from_variant(v, back);
+   BOOST_CHECK(back == slug_name{"LIQSOL"});
+}
+
+BOOST_AUTO_TEST_CASE(variant_zero_is_the_empty_string_both_ways) {
+   fc::variant v;
+   fc::to_variant(slug_name{uint64_t{0}}, v);
+   BOOST_REQUIRE(v.is_string());
+   BOOST_CHECK_EQUAL(v.as_string(), "");
+
+   slug_name back{uint64_t{12345}};
+   fc::from_variant(fc::variant(std::string{}), back);
+   BOOST_CHECK_EQUAL(back.value, 0u);
+}
+
+BOOST_AUTO_TEST_CASE(variant_non_canonical_uses_the_integer_carrier) {
+   // Every value below 1<<42 has a zero in the char[0] slot, so to_string()
+   // truncates it to "" and the string spelling cannot recover it. The carrier
+   // must therefore be the integer, or the conversion stops being injective.
+   for (uint64_t raw : {uint64_t{1}, uint64_t{7}, uint64_t{42},
+                        uint64_t{(uint64_t{1} << 42) - 1}}) {
+      fc::variant v;
+      fc::to_variant(slug_name{raw}, v);
+      BOOST_REQUIRE_MESSAGE(v.is_integer(), "raw=" << raw << " must use the integer carrier");
+      slug_name back;
+      fc::from_variant(v, back);
+      BOOST_CHECK_EQUAL(back.value, raw);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(variant_never_throws_on_any_value) {
+   // The anti-DoS property. If this is ever "tidied" into a throw, one planted
+   // row makes get_table_rows fail for an entire table.
+   for (uint64_t raw : {uint64_t{0}, uint64_t{1}, uint64_t{9}, uint64_t{1} << 41,
+                        uint64_t{1} << 42, ~uint64_t{0}}) {
+      fc::variant v;
+      BOOST_CHECK_NO_THROW(fc::to_variant(slug_name{raw}, v));
+   }
+}
+
+BOOST_AUTO_TEST_CASE(variant_every_carrier_round_trips_exactly) {
+   // Totality + injectivity across the boundary, including the canonical floor.
+   for (uint64_t raw : {uint64_t{0}, uint64_t{1}, uint64_t{(uint64_t{1} << 42) - 1},
+                        uint64_t{1} << 42, fc::slug_name{"A"}.value,
+                        fc::slug_name{"LIQSOL"}.value, fc::slug_name{"12345678"}.value}) {
+      fc::variant v;
+      fc::to_variant(slug_name{raw}, v);
+      slug_name back;
+      fc::from_variant(v, back);
+      BOOST_CHECK_EQUAL(back.value, raw);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(variant_an_all_digit_slug_is_a_string_not_its_own_decimal) {
+   // The slug alphabet contains digits, so "7" is itself a valid canonical slug
+   // — which is exactly why the non-canonical carrier must be a JSON integer
+   // and not a numeric string. A numeric string would be ambiguous.
+   fc::variant v;
+   fc::to_variant(slug_name{"7"}, v);
+   BOOST_REQUIRE(v.is_string());
+   BOOST_CHECK_EQUAL(v.as_string(), "7");
+   BOOST_CHECK_NE(slug_name{"7"}.value, 7u);
+}
+
+BOOST_AUTO_TEST_CASE(variant_accepts_the_transitional_object_carrier) {
+   // TRANSITIONAL: the shape abigen's reflected struct emitted before slug_name
+   // became an ABI builtin. Deleted once no writer emits it.
+   slug_name back;
+   fc::from_variant(fc::variant(fc::mutable_variant_object("value", uint64_t{7})), back);
+   BOOST_CHECK_EQUAL(back.value, 7u);
+
+   fc::from_variant(
+      fc::variant(fc::mutable_variant_object("value", fc::slug_name{"LIQSOL"}.value)), back);
+   BOOST_CHECK(back == slug_name{"LIQSOL"});
+}
+
+BOOST_AUTO_TEST_CASE(variant_rejects_a_non_canonical_string_spelling) {
+   // The string arm validates: an out-of-alphabet or non-canonical spelling is
+   // a hard error, not a silent zero.
+   slug_name back;
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(std::string{"liqsol"}), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(std::string{"TOOOLONGXX"}), back), fc::exception);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

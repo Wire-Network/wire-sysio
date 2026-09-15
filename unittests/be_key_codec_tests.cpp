@@ -1,3 +1,4 @@
+#include <fc/slug_name.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <sysio/chain/database_utils.hpp>
@@ -11,7 +12,7 @@ namespace codec = sysio::chain::be_key_codec;
 
 /**
  * Direct coverage for the ABI-aware BE key codec: typedef resolution, struct
- * key expansion (the `slug_name` shape keying the v6 registry tables),
+ * key expansion (a single-uint64 struct key, the pre-builtin `slug_name` shape),
  * abigen template-spelling canonicalization, the float128 leaf, and the
  * shape builder's rejection paths. End-to-end bound/pagination behaviour is
  * covered in tests/get_table_tests.cpp; these pin the codec layer itself.
@@ -19,16 +20,22 @@ namespace codec = sysio::chain::be_key_codec;
 
 namespace {
 
-/// ABI fixture: a slug_name-style struct key, a two-hop typedef chain onto
-/// it, a nested struct key, and a based struct (rejected by design).
+/// ABI fixture: a single-uint64 struct key, a two-hop typedef chain onto it, a
+/// nested struct key, and a based struct (rejected by design).
+///
+/// Deliberately NOT named `slug_name`: that spelling is an abi_serializer
+/// builtin and a `leaf_key_spellings` entry, so a fixture using it would take
+/// the leaf branch in `build_key_shape` and stop exercising the struct-key and
+/// typedef-chain paths — while still passing. This is the repo's only coverage
+/// of those paths.
 abi_def make_test_abi() {
    abi_def abi;
    abi.types.emplace_back(type_def{"chain_code_t", "code_alias"});
-   abi.types.emplace_back(type_def{"code_alias", "slug_name"});
-   abi.structs.emplace_back(struct_def{"slug_name", "", {field_def{"value", "uint64"}}});
+   abi.types.emplace_back(type_def{"code_alias", "composite_key"});
+   abi.structs.emplace_back(struct_def{"composite_key", "", {field_def{"value", "uint64"}}});
    abi.structs.emplace_back(
-      struct_def{"pair_key", "", {field_def{"code", "slug_name"}, field_def{"idx", "uint32"}}});
-   abi.structs.emplace_back(struct_def{"based_key", "slug_name", {field_def{"extra", "uint64"}}});
+      struct_def{"pair_key", "", {field_def{"code", "composite_key"}, field_def{"idx", "uint32"}}});
+   abi.structs.emplace_back(struct_def{"based_key", "composite_key", {field_def{"extra", "uint64"}}});
    return abi;
 }
 
@@ -51,9 +58,9 @@ bool key_less(const std::vector<char>& a, const std::vector<char>& b) {
 
 BOOST_AUTO_TEST_SUITE(be_key_codec_tests)
 
-BOOST_AUTO_TEST_CASE(slug_name_struct_roundtrip) {
+BOOST_AUTO_TEST_CASE(composite_key_struct_roundtrip) {
    auto abi    = make_test_abi();
-   auto shapes = codec::build_key_shapes(abi, {"code"}, {"slug_name"});
+   auto shapes = codec::build_key_shapes(abi, {"code"}, {"composite_key"});
 
    auto bytes = codec::encode_key(fc::variant(fc::mutable_variant_object("code", slug(42))), shapes);
    BOOST_REQUIRE_EQUAL(bytes.size(), 8u); // single uint64 field, BE
@@ -63,17 +70,88 @@ BOOST_AUTO_TEST_CASE(slug_name_struct_roundtrip) {
       decoded.get_object()["code"].get_object()["value"].as_uint64(), 42u);
 }
 
-BOOST_AUTO_TEST_CASE(slug_name_byte_order_matches_value_order) {
+// ── slug_name as a codec LEAF ───────────────────────────────────────────────
+// `slug_name` is an abi_serializer builtin and a leaf_key_spellings entry, so
+// it needs no abi.structs entry here — build_key_shapes resolves it through
+// leaf_kind_of. These pin the leaf's carrier and the two properties the v6
+// registry tables depend on: byte compatibility with the struct-key encoding it
+// replaced, and prefix grouping.
+
+BOOST_AUTO_TEST_CASE(slug_name_leaf_bytes_match_the_struct_node_it_replaced) {
+   // The no-migration guarantee: the struct-node path recursed one uint64 child
+   // to write_be64, and the leaf path IS write_be64. `composite_key` still
+   // exercises the struct path, so it is the reference encoding.
    auto abi = make_test_abi();
-   auto lo  = encode_single(abi, "slug_name", slug(2));
-   auto hi  = encode_single(abi, "slug_name", slug(7));
+   const uint64_t packed = fc::slug_name{"LIQSOL"}.value;
+   BOOST_CHECK(encode_single(abi, "slug_name", fc::variant("LIQSOL"))
+               == encode_single(abi, "composite_key", slug(packed)));
+}
+
+BOOST_AUTO_TEST_CASE(slug_name_leaf_roundtrips_a_canonical_slug_as_a_string) {
+   auto abi    = make_test_abi();
+   auto shapes = codec::build_key_shapes(abi, {"code"}, {"slug_name"});
+   auto bytes  = codec::encode_key(
+      fc::variant(fc::mutable_variant_object("code", "LIQSOL")), shapes);
+   BOOST_REQUIRE_EQUAL(bytes.size(), 8u);
+   auto decoded = codec::decode_key(bytes.data(), bytes.size(), shapes);
+   BOOST_CHECK_EQUAL(decoded.get_object()["code"].as_string(), "LIQSOL");
+}
+
+BOOST_AUTO_TEST_CASE(slug_name_leaf_roundtrips_the_zero_sentinel_as_empty) {
+   auto abi = make_test_abi();
+   auto shapes = codec::build_key_shapes(abi, {"code"}, {"slug_name"});
+   auto bytes  = codec::encode_key(
+      fc::variant(fc::mutable_variant_object("code", "")), shapes);
+   auto decoded = codec::decode_key(bytes.data(), bytes.size(), shapes);
+   BOOST_CHECK_EQUAL(decoded.get_object()["code"].as_string(), "");
+   BOOST_CHECK(bytes == encode_single(abi, "composite_key", slug(0)));
+}
+
+BOOST_AUTO_TEST_CASE(slug_name_leaf_roundtrips_a_non_canonical_value_as_an_integer) {
+   // A value below 2^42 has no string spelling (to_string truncates at the first
+   // zero symbol slot), so the carrier is the raw integer. Without this, decode
+   // would emit "" and re-encode to 0 — restarting pagination at the top of the
+   // table for any row holding a plantable non-canonical code.
+   auto abi    = make_test_abi();
+   auto shapes = codec::build_key_shapes(abi, {"code"}, {"slug_name"});
+   auto bytes  = codec::encode_key(
+      fc::variant(fc::mutable_variant_object("code", 7u)), shapes);
+   auto decoded = codec::decode_key(bytes.data(), bytes.size(), shapes);
+   BOOST_CHECK(decoded.get_object()["code"].is_integer());
+   BOOST_CHECK_EQUAL(decoded.get_object()["code"].as_uint64(), 7u);
+   // And it re-encodes to the same key — the round trip pagination relies on.
+   BOOST_CHECK(bytes == codec::encode_key(decoded, shapes));
+}
+
+BOOST_AUTO_TEST_CASE(slug_name_leaf_groups_shared_prefixes) {
+   // The property slug_name was designed for: MSB-first 6-bit packing puts
+   // char[0] at bits [42..47], so a shared textual prefix is a shared leading
+   // BYTE prefix of the key — k symbols share 2 + floor(6k/8) bytes, the 2 from
+   // the unused top 16 bits. Grouping is byte-exact only at k = 4 and k = 8.
+   auto abi = make_test_abi();
+   auto shared_bytes = [&](const char* a, const char* b) {
+      auto ka = encode_single(abi, "slug_name", fc::variant(a));
+      auto kb = encode_single(abi, "slug_name", fc::variant(b));
+      size_t n = 0;
+      while (n < ka.size() && n < kb.size() && ka[n] == kb[n]) ++n;
+      return n;
+   };
+   BOOST_CHECK_EQUAL(shared_bytes("LIQSOL", "LIQETH"), 4u);  // k=3 -> 2 + 2
+   BOOST_CHECK_EQUAL(shared_bytes("WIRE", "WIREUSD"), 5u);   // k=4 -> 2 + 3, aligned
+   BOOST_CHECK_EQUAL(shared_bytes("USDC", "USDT"), 4u);      // k=3 -> 2 + 2
+}
+
+BOOST_AUTO_TEST_CASE(composite_key_byte_order_matches_value_order) {
+   auto abi = make_test_abi();
+   auto lo  = encode_single(abi, "composite_key", slug(2));
+   auto hi  = encode_single(abi, "composite_key", slug(7));
    BOOST_CHECK(key_less(lo, hi));
 }
 
 BOOST_AUTO_TEST_CASE(typedef_chain_resolves_to_struct) {
    auto abi = make_test_abi();
-   // chain_code_t -> code_alias -> slug_name: same encoding as the struct itself.
-   auto direct  = encode_single(abi, "slug_name", slug(99));
+   // chain_code_t -> code_alias -> composite_key: same encoding as the struct itself.
+   auto direct  = encode_single(abi, "composite_key", slug(99));
    auto aliased = encode_single(abi, "chain_code_t", slug(99));
    BOOST_CHECK(direct == aliased);
 }
@@ -147,7 +225,7 @@ BOOST_AUTO_TEST_CASE(rejections) {
    BOOST_CHECK_THROW(codec::build_key_shapes(abi, {"k"}, {"based_key"}), fc::exception);
 
    // Bound object missing a struct field.
-   auto shapes = codec::build_key_shapes(abi, {"code"}, {"slug_name"});
+   auto shapes = codec::build_key_shapes(abi, {"code"}, {"composite_key"});
    fc::variant missing(fc::mutable_variant_object(
       "code", fc::mutable_variant_object("wrong_field", 1)));
    BOOST_CHECK_THROW(codec::encode_key(missing, shapes), fc::exception);
@@ -265,22 +343,22 @@ BOOST_AUTO_TEST_CASE(typedef_cycle_is_rejected) {
    BOOST_CHECK_EXCEPTION(codec::build_key_shapes(self, {"k"}, {"s"}), fc::exception, has_cycle_msg);
 }
 
-// Scoped table whose within-scope primary key is a struct (slug_name). The real
+// Scoped table whose within-scope primary key is a struct (composite_key). The real
 // v6 registry tables are unscoped, but chain_plugin supports scoped tables by
 // stripping the leading scope field's shape from the bound shapes and encoding
 // only the within-scope portion (see get_table_rows' scope_key_count erase).
 // This pins that slice-then-encode path for a struct-typed within-scope key:
-// build the full [scope=name, code=slug_name] shapes, drop the scope shape as
+// build the full [scope=name, code=composite_key] shapes, drop the scope shape as
 // the plugin does for a scoped JSON bound, and round-trip the struct remainder.
 BOOST_AUTO_TEST_CASE(scoped_struct_key_within_scope_roundtrip) {
    auto abi = make_test_abi();
 
    // Full key list: a leading "scope" leaf (name) followed by a struct "code"
-   // (slug_name) — the shape of a scoped kv table keyed by a struct per scope.
-   auto full = codec::build_key_shapes(abi, {"scope", "code"}, {"name", "slug_name"});
+   // (composite_key) — the shape of a scoped kv table keyed by a struct per scope.
+   auto full = codec::build_key_shapes(abi, {"scope", "code"}, {"name", "composite_key"});
    BOOST_REQUIRE_EQUAL(full.size(), 2u);
    BOOST_CHECK(full[0].is_leaf);   // scope resolves to the name leaf
-   BOOST_CHECK(!full[1].is_leaf);  // code is the slug_name struct node
+   BOOST_CHECK(!full[1].is_leaf);  // code is the composite_key struct node
 
    // chain_plugin strips the leading scope shape for a scoped bound; the
    // remaining shapes encode/decode the within-scope key only.
@@ -294,7 +372,7 @@ BOOST_AUTO_TEST_CASE(scoped_struct_key_within_scope_roundtrip) {
 
    // The leading scope is a pure prefix: the within-scope struct bytes are
    // identical to that struct keyed on its own.
-   BOOST_CHECK(bytes == encode_single(abi, "slug_name", slug(42)));
+   BOOST_CHECK(bytes == encode_single(abi, "composite_key", slug(42)));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
