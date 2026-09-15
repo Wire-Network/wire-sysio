@@ -1732,7 +1732,11 @@ void opreg::recorddel(name account, uint32_t epoch, bool delivered) {
    sysio::epoch::epochstate_t epoch_tbl(EPOCH_ACCOUNT);
    if (epoch_tbl.exists()) {
       const auto state = epoch_tbl.get();
-      if (state.current_epoch_index == epoch && state.next_batch_op_groups.empty()) {
+      // `advance` writes the incremented state before queued `recorddel`
+      // actions execute, while `finishadv` has not changed the publication yet.
+      if (state.current_epoch_index > 0 &&
+          state.current_epoch_index - 1 == epoch &&
+          state.next_batch_op_groups.empty()) {
          heldepochs_t held(get_self());
          const held_epoch_key key{epoch};
          if (!held.contains(key)) {

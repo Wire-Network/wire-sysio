@@ -2325,6 +2325,7 @@ BOOST_FIXTURE_TEST_CASE(held_duty_misses_are_audited_without_accelerating_termin
    const auto normal = encode_delivery(current_epoch(), "normal-duty hit");
    for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID})
       BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, chain, normal));
+   produce_blocks(); // commit pending actions before jumping to the next epoch
    advance_to_next_epoch();
    BOOST_REQUIRE(read_epoch_state()[epoch_fields::NEXT_BATCH_OP_GROUPS].get_array().empty());
    BOOST_REQUIRE_EQUAL(get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>(),
@@ -2356,11 +2357,13 @@ BOOST_FIXTURE_TEST_CASE(held_duty_misses_are_audited_without_accelerating_termin
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
       "regoperator"_n, mvo()("account", BATCHOP_D.to_string())
          ("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   produce_blocks();
    advance_to_next_epoch(); // publishes the repaired candidate while duty is still held
    BOOST_REQUIRE(!read_epoch_state()[epoch_fields::NEXT_BATCH_OP_GROUPS].get_array().empty());
    const auto resumed = encode_delivery(current_epoch(), "resumed-duty hit");
    for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID})
       BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, chain, resumed));
+   produce_blocks();
    advance_to_next_epoch();
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, EPOCH_ACCOUNT,
       "termcheck"_n, mvo()("account", BATCHOP.to_string())));
