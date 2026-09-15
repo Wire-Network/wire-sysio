@@ -35,10 +35,6 @@ function(contract_binary_for_source SOURCE_FILE OUTPUT_TARGET)
       ${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE_FILE}
       ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     )
-    if(SOURCE_FILE STREQUAL "emissions_tests.cpp" OR
-       SOURCE_FILE STREQUAL "sysio.finalizer_key_tests.cpp")
-      list(APPEND _binary_sources ${CMAKE_CURRENT_SOURCE_DIR}/finalizer_test_keys.cpp)
-    endif()
     unittest_target(${_binary_target} SOURCE_FILES ${_binary_sources})
     target_link_libraries(${_binary_target} PRIVATE fc-lite opp)
     target_include_directories(${_binary_target} PRIVATE
