@@ -341,6 +341,7 @@ namespace sysiosystem {
 
       public:
          static constexpr sysio::name active_permission{"active"_n};
+         static constexpr sysio::name auth_ext_permission{"auth.ext"_n};
          static constexpr sysio::name token_account{"sysio.token"_n};
          static constexpr sysio::name null_account{"sysio.null"_n};
 
@@ -619,7 +620,15 @@ namespace sysiosystem {
          void limitauthchg( const name& account, const std::vector<name>& allow_perms, const std::vector<name>& disallow_perms );
 
          /**
-          * On Link Auth notify to catch auth.ext stuff for sig-em
+          * Install or rotate the reserved auth.ext child permission from an auth.msg notification.
+          *
+          * The notification payload is untrusted input. Only the protocol-reserved auth.ext permission
+          * may be changed through this privileged path; owner, active, and arbitrary permission names
+          * are rejected.
+          *
+          * @param user - account whose auth.ext permission is installed or rotated.
+          * @param permission - must be exactly auth.ext.
+          * @param pub_key - sole key for the auth.ext authority.
           */
          [[sysio::on_notify("auth.msg::onlinkauth")]]
          void onlinkauth(const name &user, const name &permission, const sysio::public_key &pub_key);
