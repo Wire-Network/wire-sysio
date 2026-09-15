@@ -634,6 +634,17 @@ void prune_dellog(uint64_t window_open_ms, uint32_t max_rows) {
       it = log.erase(std::move(it));
       ++removed;
    }
+
+   // Held-epoch markers are retained for the same window as their audit
+   // observations. Epoch order is timestamp order, so this is oldest-first
+   // and bounded by the same per-write/per-crank cap.
+   opreg::heldepochs_t held(name{"sysio.opreg"_n});
+   removed = 0;
+   for (auto it = held.begin();
+        it != held.end() && removed < max_rows && it->ts_ms < window_open_ms; ) {
+      it = held.erase(std::move(it));
+      ++removed;
+   }
 }
 
 /// Get the current epoch index from sysio.epoch's epochstate singleton.
@@ -1714,6 +1725,22 @@ void opreg::recorddel(name account, uint32_t epoch, bool delivered) {
    const auto cfg = cfg_tbl.get_or_default(op_config{});
    prune_dellog(termination_window_open_ms(now_ms, cfg), MAX_DELLOG_PRUNE_PER_WRITE);
 
+   // A withheld schedule keeps the same group on duty every epoch instead of
+   // rotating it through the configured number of groups. Retain real misses
+   // in dellog, but mark this epoch once so termcheck cannot interpret those
+   // accelerated observations as ordinary rotating-duty misses later.
+   sysio::epoch::epochstate_t epoch_tbl(EPOCH_ACCOUNT);
+   if (epoch_tbl.exists()) {
+      const auto state = epoch_tbl.get();
+      if (state.current_epoch_index == epoch && state.next_batch_op_groups.empty()) {
+         heldepochs_t held(get_self());
+         const held_epoch_key key{epoch};
+         if (!held.contains(key)) {
+            held.emplace(ram_payer, key, held_epoch_entry{.epoch = epoch, .ts_ms = now_ms});
+         }
+      }
+   }
+
    dellog_t log(get_self());
    uint64_t id = next_dellog_id();
    log.emplace(ram_payer, delivery_key{id}, delivery_log_entry{
@@ -1766,6 +1793,7 @@ void opreg::termcheck(name account) {
    uint64_t window_open = termination_window_open_ms(now_ms, cfg);
 
    dellog_t log(get_self());
+   heldepochs_t held(get_self());
    auto idx = log.get_index<"byaccountts"_n>();
    uint128_t lower_key = (static_cast<uint128_t>(account.value) << 64) | window_open;
    uint128_t upper_key = (static_cast<uint128_t>(account.value) << 64) | std::numeric_limits<uint64_t>::max();
@@ -1776,6 +1804,10 @@ void opreg::termcheck(name account) {
    uint32_t total_in_window    = 0;
    for (auto it = idx.lower_bound(lower_key); it != idx.end() && it->by_account_ts() <= upper_key; ++it) {
       if (it->account != account) break;
+      if (held.contains(held_epoch_key{it->epoch})) {
+         consecutive_misses = 0;
+         continue;
+      }
       total_in_window++;
       if (!it->delivered) total_misses++;
 

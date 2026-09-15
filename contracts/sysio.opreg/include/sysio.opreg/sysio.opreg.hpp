@@ -536,6 +536,24 @@ namespace sysio {
             sysio::const_mem_fun<delivery_log_entry, uint128_t, &delivery_log_entry::by_account_ts>>
       >;
 
+      /// Epochs whose announced duty remained held. The delivery rows stay in
+      /// dellog for audit, but neither termination rail counts those rows.
+      /// Keeping the marker separate leaves the existing dellog row format
+      /// and its account/timestamp index unchanged.
+      struct held_epoch_key {
+         uint64_t epoch;
+         uint64_t primary_key() const { return epoch; }
+         SYSLIB_SERIALIZE(held_epoch_key, (epoch))
+      };
+
+      struct [[sysio::table("heldepochs")]] held_epoch_entry {
+         uint64_t epoch = 0;
+         uint64_t ts_ms = 0;
+         SYSLIB_SERIALIZE(held_epoch_entry, (epoch)(ts_ms))
+      };
+
+      using heldepochs_t = sysio::kv::table<"heldepochs"_n, held_epoch_key, held_epoch_entry>;
+
       /// Claimable WIRE collateral owed to an operator by a WIRE-chain remit: a withdraw
       /// flush (`flushwtdw`), a deferred lock release on a TERMINATED operator, or the
       /// termination payout itself.

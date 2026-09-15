@@ -613,9 +613,11 @@ void epoch::advance() {
          ).send();
       }
 
-      // Preserve the delivery history after slashing. A non-canonical operator is already
-      // SLASHED here, so opreg::termcheck returns without converting the punitive outcome into a
-      // termination/remit. Other group members retain their normal delivery accounting.
+      // Preserve the delivery history after slashing and while duty is held.
+      // opreg marks held-epoch observations as audit-only so a later rotating
+      // epoch cannot retroactively count the accelerated held-duty misses.
+      // A non-canonical operator is already SLASHED here, so termcheck safely
+      // skips that operator without converting the punitive outcome into a remit.
       for (const auto& observation : observations) {
          action(
             permission_level{get_self(), "owner"_n},
@@ -623,12 +625,14 @@ void epoch::advance() {
             opreg_actions::RECORD_DELIVERY,
             std::make_tuple(observation.member, state.current_epoch_index, observation.did_deliver)
          ).send();
-         action(
-            permission_level{get_self(), "owner"_n},
-            OPREG_ACCOUNT,
-            opreg_actions::TERMINATION_CHECK,
-            std::make_tuple(observation.member)
-         ).send();
+         if (!state.next_batch_op_groups.empty()) {
+            action(
+               permission_level{get_self(), "owner"_n},
+               OPREG_ACCOUNT,
+               opreg_actions::TERMINATION_CHECK,
+               std::make_tuple(observation.member)
+            ).send();
+         }
       }
 
       // NOTE: we intentionally do NOT erase the per-batch-op envelope
