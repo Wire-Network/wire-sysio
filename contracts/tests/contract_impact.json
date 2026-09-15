@@ -24,7 +24,7 @@
     "contracts/tests/*.hpp",
     "contracts/tests/contracts.hpp.in",
     "contracts/tests/contract_suites.json",
-    "contracts/tests/verify_contract_suites.py",
+    "contracts/tests/contract_case_inventory.py",
     "contracts/sysio.opp.common/**",
     "contracts/sysio.system/**",
     "contracts/**/*.hpp"
