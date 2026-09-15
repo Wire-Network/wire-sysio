@@ -148,9 +148,10 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
    /**
     * Register a snapshot provider account delegated by a producer.
     *
-    * The producer must be active and have rank <= max_snap_provider_rank at registration time.
-    * Operator-registry status is deliberately not consulted: producer-table eligibility is the
-    * attestation trust root. Re-registering rotates that producer's snapshot account without
+    * The producer must be active and hold a rank position <= max_snap_provider_rank at
+    * registration time. That walk tests `is_schedulable`, so operator-registry status and an active
+    * finalizer key are both consulted through it. Re-registering rotates that producer's snapshot
+    * account without
     * retracting votes already recorded under the producer identity. When the table is full, stale
     * producer mappings are pruned lazily before enforcing the capacity limit.
     */

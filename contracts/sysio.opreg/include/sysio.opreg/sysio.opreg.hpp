@@ -61,23 +61,18 @@ namespace sysio {
       // minimum is demoted before the funds physically leave.
       static constexpr uint32_t WITHDRAW_WAIT_EPOCHS = 2;
 
-      /// Safety rails on the collateral withdraw queue (SEC-78 / WSA-166).
-      /// `withdraw` / `withdrawinle` are operator-driven and bounded only by
-      /// available collateral, so without a row cap an operator could split
-      /// collateral into an unbounded number of system-paid `wtdwqueue` rows and
-      /// force `flushwtdw` to process them all inside one `sysio.epoch::advance`
-      /// transaction. That transaction's CPU budget (~150 ms) is a hard,
-      /// uncatchable deadline, so an oversized queue would abort every advance
-      /// and stall epoch progress chain-wide.
-      ///
+      /// Per-(operator, chain, token) cap on pending collateral withdrawals
+      /// (WIRE-376 / WNS-41). The cap covers both request entry points. A
+      /// cancellation or flush erases the row and permits the next request for
+      /// that collateral bucket.
+      static constexpr uint32_t MAX_OUTSTANDING_WITHDRAWS_PER_COLLATERAL_BUCKET = 1;
+
+      /// Safety rail on collateral-withdraw flush work (SEC-78 / WSA-166).
       /// MAX_WTDW_FLUSH_PER_EPOCH bounds the matured rows flushed per advance;
       /// undrained rows stay queued (collateral stays in the operator's balance
-      /// until flushed) and flush a later epoch. Ingress is already bounded
-      /// economically -- withdraw rows can never exceed the operator's real
-      /// deposited collateral, and direct `withdraw` bills the operator CPU/NET
-      /// per call -- so the flush bound alone is the liveness rail; there is no
-      /// per-account row cap. Conservatively sized to stay well under the
-      /// transaction CPU ceiling shared with the rest of advance's fan-out.
+      /// until flushed) and flush a later epoch. Conservatively sized to stay
+      /// well under the transaction CPU ceiling shared with the rest of
+      /// advance's fan-out.
       static constexpr uint32_t MAX_WTDW_FLUSH_PER_EPOCH = 32;
 
       /// Rolling delivery-buffer thresholds for batch-op termination. Per the
@@ -502,7 +497,9 @@ namespace sysio {
       // the row as `by_account_ck()` for cross-contract comparisons but is
       // NOT a table-managed secondary index. Callers scan `byaccount`
       // (uint64) and filter (chain_code, token_code) in memory — cheap
-      // because pending-withdraw counts per account are O(1)-ish.
+      // because pending-withdraw counts per account are bounded by the number
+      // of its collateral buckets times
+      // MAX_OUTSTANDING_WITHDRAWS_PER_COLLATERAL_BUCKET.
       using wtdwqueue_t = sysio::kv::table<"wtdwqueue"_n, withdraw_key, withdraw_request,
          sysio::kv::index<"byeligible"_n,
             sysio::const_mem_fun<withdraw_request, uint64_t, &withdraw_request::by_eligible>>,

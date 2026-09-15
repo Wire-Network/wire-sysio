@@ -58,6 +58,20 @@
       ]
     },
     {
+      "suite": "sysio_producer_score_tests",
+      "source": "emissions_tests.cpp",
+      "accounts": [
+        "sysio.dclaim",
+        "sysio.epoch",
+        "sysio.msig",
+        "sysio.opreg",
+        "sysio.reserv",
+        "sysio.system",
+        "sysio.token",
+        "sysio.uwrit"
+      ]
+    },
+    {
       "suite": "getpeerkeys_tests",
       "source": "getpeerkeys_tests.cpp",
       "accounts": [

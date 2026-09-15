@@ -139,6 +139,9 @@ add_contract_suite(t5_emissions_tests emissions_tests.cpp ACCOUNTS
 add_contract_suite(sysio_producer_eligibility_tests emissions_tests.cpp ACCOUNTS
   sysio.dclaim sysio.epoch sysio.msig sysio.opreg
   sysio.reserv sysio.system sysio.token sysio.uwrit)
+add_contract_suite(sysio_producer_score_tests emissions_tests.cpp ACCOUNTS
+  sysio.dclaim sysio.epoch sysio.msig sysio.opreg
+  sysio.reserv sysio.system sysio.token sysio.uwrit)
 add_contract_suite(getpeerkeys_tests getpeerkeys_tests.cpp ACCOUNTS
   sysio.msig sysio.system sysio.token)
 add_contract_suite(safe_ops_tests safe_ops_tests.cpp ACCOUNTS sysio.opp.common)

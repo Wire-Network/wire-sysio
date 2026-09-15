@@ -32,8 +32,8 @@
 #include <sysio/underwriter_plugin/uic_signature_detail.hpp>
 #include <sysio/underwriter_plugin/uic_construction_detail.hpp>
 #include <sysio/underwriter_plugin/variant_enum_detail.hpp>
-#include <sysio/depot/chains_registry.hpp>
-#include <sysio/depot/opreg_status.hpp>
+#include <sysio/opp/depot/chains_registry.hpp>
+#include <sysio/opp/depot/opreg_status.hpp>
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/types/types.pb.h>
 #include <sysio/opp/attestations/attestations.pb.h>
@@ -57,7 +57,7 @@ namespace eth = fc::network::ethereum;
 namespace opp_att = sysio::opp::attestations;
 /// Field spellings for the `sysio.chains::chains` rows this plugin reads,
 /// shared with batch_operator_plugin so the two daemons cannot drift apart.
-namespace depot_chains = sysio::depot::chains;
+namespace depot_chains = sysio::opp::depot::chains;
 
 // SEC-13/WSA-027: exact-(chain_code, token_code, reserve_code) routing /
 // accounting keys, lifted to a testable detail header. These replace the
@@ -1473,7 +1473,7 @@ struct underwriter_plugin::impl {
    /**
     * Refresh `is_active` from `sysio.opreg::operators[underwriter_account].status`.
     * Mirror of the awareness poll on batch_operator_plugin — both share
-    * the `sysio::depot::opreg_status::compute_is_active` helper so the
+    * the `sysio::opp::depot::opreg_status::compute_is_active` helper so the
     * status spellings + decision table live in one place. Logs once per
     * transition.
     */
@@ -1483,7 +1483,7 @@ struct underwriter_plugin::impl {
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
          if (chain::name(obj["account"].as_string()) != underwriter_account) continue;
-         is_active = sysio::depot::opreg_status::compute_is_active(
+         is_active = sysio::opp::depot::opreg_status::compute_is_active(
             obj["status"].as_string(), was_active);
          break;
       }

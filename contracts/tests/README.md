@@ -15,13 +15,13 @@ The target name strips `.cpp` and replaces dots with underscores: for example,
 startup is linked into each target. The finalizer key fixture used by both
 emissions and finalizer tests lives in `finalizer_test_keys.cpp`.
 
-The manifest has 33 suites in 30 owning test sources and currently lists 725
-Boost cases. `emissions_tests.cpp` owns three suites and
+The manifest has 34 suites in 30 owning test sources and currently lists 761
+Boost cases. `emissions_tests.cpp` owns four suites and
 `sysio.msgch_tests.cpp` owns two. A test-only edit selects every suite in its
 owning source file. A contract edit selects suites that deploy or otherwise
 exercise that account, plus explicit runtime consumer edges and mapped OPP
-flows. `sysio.reserv` source currently selects nine suites and seven flows:
-reserve, dispatch, three emissions suites, epoch, underwriting, and the two
+flows. `sysio.reserv` source currently selects ten suites and seven flows:
+reserve, dispatch, four emissions suites, epoch, underwriting, and the two
 message-channel suites. The four explicit runtime edges cite the caller source
 files in `contract_impact.json`.
 
@@ -37,7 +37,7 @@ The contract build gate explicitly builds `contracts_project`,
 `noop.wasm` for ROA. Tracked WASM/ABI synchronization and complete generated
 artifact parity precede either selected or full contract behavior. On a broad
 platform path, the parallel and NP/LR CTest groups exclude the `contract`
-label; `contracts-all` runs the 33 suites once after parity with CTest `-j`.
+label; `contracts-all` runs the 34 suites once after parity with CTest `-j`.
 
 Headers, protocol inputs, shared contract code, target or packaging CMake
 changes, ambiguous paths, and unbounded ownership escalate to all contract

@@ -15,7 +15,7 @@
  * Keep in lockstep with `chain_row` in
  * `contracts/sysio.chains/include/sysio.chains/sysio.chains.hpp`.
  */
-namespace sysio::depot::chains {
+namespace sysio::opp::depot::chains {
 
 /// Account and table the registry lives on.
 inline constexpr auto account      = "sysio.chains";
@@ -67,4 +67,4 @@ inline std::string resolve_role_addr(std::string_view role_addr,
    return single_program ? std::string{opp_addr} : std::string{role_addr};
 }
 
-} // namespace sysio::depot::chains
+} // namespace sysio::opp::depot::chains
