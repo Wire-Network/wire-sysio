@@ -452,7 +452,8 @@ void swap::accrueyield(symbol_code pair_token) {
     accrue( key, *token );
 }
 
-void swap::setyield(symbol_code pair_token, uint32_t conversion_horizon_sec, uint32_t depth_cap_bps) {
+void swap::setyield(symbol_code pair_token, uint32_t conversion_horizon_sec, uint32_t depth_cap_bps,
+  int64_t clip_floor) {
     stats statstable( get_self() );
     const pair_key key{ pair_token.raw() };
     const auto token = statstable.try_get( key );
@@ -460,9 +461,11 @@ void swap::setyield(symbol_code pair_token, uint32_t conversion_horizon_sec, uin
     require_auth(token->fee_authority);
     require_yield_leg(*token);
     check( depth_cap_bps <= opp::amm::BPS_TOTAL, "depth_cap_bps out of range" );
+    check( clip_floor >= 0 && clip_floor <= MAX, "clip_floor out of range" );
     statstable.modify( name{}, key, [&]( auto& a ) {
       a.conversion_horizon_sec = conversion_horizon_sec;
       a.depth_cap_bps          = depth_cap_bps;
+      a.clip_floor             = clip_floor;
       a.last_tick              = current_time_point();   // new parameters, fresh horizon
     } );
 }
@@ -478,7 +481,8 @@ void swap::tickyield(symbol_code pair_token) {
     const auto stored = statstable.try_get( key );
     check ( stored.has_value(), "pair token does not exist" );
     const extended_symbol shadow = require_yield_leg(*stored);
-    check( stored->conversion_horizon_sec > 0 && stored->depth_cap_bps > 0, "yield tick parameters not set" );
+    check( stored->conversion_horizon_sec > 0 && stored->depth_cap_bps > 0 && stored->clip_floor > 0,
+           "yield tick parameters not set" );
     // What the pool is owed belongs to it before it trades.
     const currency_stats token = accrue( key, *stored );
 
@@ -487,16 +491,28 @@ void swap::tickyield(symbol_code pair_token) {
     const time_point now = current_time_point();
     if (queued <= 0 || now <= token.last_tick) return;
 
-    // The clip: the reservoir's share of the horizon that has elapsed, rounded up
-    // so a nonempty reservoir always drains, capped by depth_cap_bps of the pool's
-    // shadow side and by what is queued. Ticking more often than the horizon
-    // needs only shortens the interval each clip is measured over.
+    // The clip: the reservoir's share of the horizon that has elapsed, FLOORED,
+    // capped by depth_cap_bps of the pool's shadow side and by what is queued.
     const uint128_t elapsed_us = uint128_t( (now - token.last_tick).count() );
     const uint128_t horizon_us = uint128_t( sysio::seconds( token.conversion_horizon_sec ).count() );
     const uint128_t cap = uint128_t( pool_of( token, shadow ).quantity.amount ) * token.depth_cap_bps / opp::amm::BPS_TOTAL;
-    uint128_t clip = ( uint128_t(queued) * elapsed_us + horizon_us - 1 ) / horizon_us;
+    uint128_t clip = ( uint128_t(queued) * elapsed_us ) / horizon_us;
     clip = std::min( { clip, cap, uint128_t(queued) } );
-    if (clip == 0) return;
+    // Below the floor there is nothing worth selling yet, so return WITHOUT
+    // touching last_tick: the clock keeps running and the next tick measures a
+    // longer window, offering a proportionally larger clip. That is what makes
+    // cranking every block harmless, and it costs no throughput -- waiting N
+    // times as long sells N times as much, so the average rate is unchanged.
+    // Selling anyway is what bled the reservoir to the liquidity providers: a
+    // clip small enough is taken entirely by integer rounding on the curve and
+    // by MIN_SWAP_FEE, settling a zero output while the shadow still moves.
+    //
+    // The floor gives way to `queued` so a remainder smaller than it is not
+    // stranded: that leaves as one sale once the time share reaches the whole
+    // queue, which takes exactly one horizon. A depth cap below the floor is
+    // the one combination with no way out -- every clip is capped under the
+    // floor and the pair stops selling until setyield widens one of them.
+    if (clip < std::min( uint128_t(token.clip_floor), uint128_t(queued) )) return;
 
     const extended_asset selling{ asset{ int64_t(clip), shadow.get_symbol() }, shadow.get_contract() };
     const symbol proceeds_symbol = other_pool( token, shadow ).quantity.symbol;
