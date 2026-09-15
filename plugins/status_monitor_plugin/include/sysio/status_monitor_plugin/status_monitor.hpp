@@ -190,14 +190,20 @@ struct pipeline_stats {
 /// The two-stage worker pipeline: render (worker_task_queue<status_snapshot>, one thread) then delivery
 /// (batch_task_queue<std::string>, one thread, up to max_items_per_task documents per bulk request). The
 /// sender is injected: the plugin passes fc::network::es::es_client::bulk, tests pass a recorder. Workers
-/// touch only their items, the counters, the last-failure detail, and the sender; they never log.
+/// touch only their items, the counters, the last-failure detail, the sender, and the failure reporter; the
+/// reporter is the one place a worker reaches back to the caller for anything but delivery.
 class pipeline {
 public:
    /// Delivers one assembled body; must not throw (es_client::bulk never does).
    using sender = std::function<fc::network::es::es_bulk_result(std::string body, uint32_t doc_count)>;
+   /// Reports one bulk request whose outcome was not `indexed`, with the batch's result and the documents it
+   /// carried. Called on the delivery worker, once per failed batch, before the next one is sent; must not
+   /// throw (the plugin's reporter only logs).
+   using failure_reporter = std::function<void(const fc::network::es::es_bulk_result& result, uint32_t doc_count)>;
 
-   /// Starts both worker threads. @p action_line is the es client's; @p send delivers one assembled body.
-   pipeline(const config& cfg, std::string action_line, sender send);
+   /// Starts both worker threads. @p action_line is the es client's; @p send delivers one assembled body;
+   /// @p report_failure, when set, is invoked once per failed batch.
+   pipeline(const config& cfg, std::string action_line, sender send, failure_reporter report_failure = {});
    /// shutdown().
    ~pipeline();
 
@@ -243,6 +249,7 @@ private:
    uint32_t _body_byte_cap; ///< cfg.delivery.max_batch_bytes
    uint32_t _doc_byte_cap;  ///< cfg.delivery.max_doc_bytes
    sender _send;
+   failure_reporter _report_failure; ///< empty when the caller wants no per-batch report
    counters _counters;
    mutable std::mutex _failure_mtx;
    std::string _last_failure; ///< guarded by _failure_mtx

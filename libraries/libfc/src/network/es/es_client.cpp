@@ -30,6 +30,10 @@ namespace {
 constexpr std::string_view es_action_line_prefix = R"({"index":{"_index":)";
 constexpr std::string_view es_action_line_suffix = "}}\n";
 constexpr std::string_view es_bulk_path = "/_bulk";
+/// What probe() requests: the base URL's root, the one path every OpenSearch/Elasticsearch endpoint answers.
+constexpr std::string_view es_probe_path = "/";
+/// The reason probe() reports when a failure carries no message of its own.
+constexpr std::string_view es_unknown_failure = "unknown failure";
 constexpr std::string_view es_content_type = "application/x-ndjson";
 constexpr std::string_view es_user_agent = "wire-es-client";
 /// OS and fc name of the client's io thread.
@@ -50,6 +54,10 @@ constexpr uint32_t es_max_backoff_exponent = 16;
 constexpr uint64_t es_max_response_body_bytes = 4ULL * 1024ULL * 1024ULL;
 constexpr uint32_t es_http_status_ok_min = 200;
 constexpr uint32_t es_http_status_ok_max = 299;
+/// Authenticated but not authorized. probe() counts it as reachable: its GET of the root is the cluster-info
+/// path, which OpenSearch fine-grained access control gates behind the cluster `monitor/main` permission, so a
+/// least-privilege credential scoped to writing _bulk is answered with a 403 while _bulk itself works.
+constexpr uint32_t es_http_status_forbidden = 403;
 constexpr uint32_t es_http_status_too_many_requests = 429;
 constexpr uint32_t es_http_status_server_error_min = 500;
 
@@ -85,6 +93,7 @@ es_client::es_client(es_client_options options)
                   fc::json::to_string(fc::variant{_options.index}, fc::time_point::maximum()) +
                   std::string{es_action_line_suffix})
    , _bulk_url(_options.url + std::string{es_bulk_path})
+   , _root_url(_options.url + std::string{es_probe_path})
    , _endpoint(http::sanitized_endpoint(_bulk_url))
    , _auth_header(auth_header_for(_options))
    , _work(boost::asio::make_work_guard(_io))
@@ -139,7 +148,8 @@ boost::asio::awaitable<es_bulk_result> es_client::async_bulk(std::string body, u
    FC_ASSERT(_io.get_executor().running_in_this_thread(), "es_client: async_bulk() must run on get_executor()");
    // The cancellation signal holds one slot: a second request would displace the first one's cancel handler.
    // When this fires the flag was already set, so it is left set -- the request that owns it still clears it.
-   FC_ASSERT(!_in_flight.exchange(true), "es_client: one bulk request at a time -- async_bulk() is not reentrant");
+   FC_ASSERT(!_in_flight.exchange(true),
+             "es_client: one request at a time -- async_bulk() must not overlap another request");
    auto in_flight_guard = fc::make_scoped_exit([this] { _in_flight.store(false); });
 
    http::request req;
@@ -249,6 +259,71 @@ es_bulk_result es_client::bulk(std::string body, uint32_t doc_count) {
       result.detail = "delivery could not run";
       return result;
    }
+}
+
+void es_client::probe() {
+   // Same affinity rule as bulk(): this blocks the calling thread on the coroutine's result, so the io thread
+   // calling it would wait on the one thread that has to run the coroutine.
+   FC_ASSERT(!_io.get_executor().running_in_this_thread(),
+             "es_client: probe() must not be called from the client's io thread");
+   // Same guard bulk() applies to the canceled client, as an assert rather than a value: cancel() is permanent,
+   // so a probe after it would never send a request, and a connectivity check that cannot check is a
+   // programming error rather than a result to report.
+   FC_ASSERT(!_cancel_requested.load(std::memory_order_relaxed), "es_client: probe() after cancel()");
+   // Unlike bulk(), every failure is an exception: the future rethrows whatever async_probe() threw, and a
+   // failure to run the coroutine at all is just as fatal to the caller's initialization.
+   boost::asio::co_spawn(_io, async_probe(), boost::asio::use_future).get();
+}
+
+boost::asio::awaitable<void> es_client::async_probe() {
+   FC_ASSERT(_io.get_executor().running_in_this_thread(), "es_client: async_probe() must run on get_executor()");
+   // The same single cancellation slot async_bulk() guards, for the same reason: a concurrent request would
+   // displace the other one's cancel handler.
+   FC_ASSERT(!_in_flight.exchange(true), "es_client: one request at a time -- probe() must not overlap a bulk request");
+   auto in_flight_guard = fc::make_scoped_exit([this] { _in_flight.store(false); });
+
+   http::request req;
+   req.method = http::request_method::get;
+   req.target = _root_url;
+   req.user_agent = std::string{es_user_agent};
+   if (_auth_header)
+      req.headers.emplace_back("Authorization", *_auth_header);
+
+   http::request_options opt;
+   opt.max_response_body_bytes = es_max_response_body_bytes;
+   opt.timeouts.connect = fc::milliseconds(_options.connect_timeout_ms);
+   opt.timeouts.header = opt.timeouts.read = opt.timeouts.idle = opt.timeouts.total =
+      fc::milliseconds(_options.request_timeout_ms);
+   // The check runs on the client's own thread: an ambient fc task deadline must not bound it.
+   opt.timeouts.inherit_task_deadline = false;
+   // One attempt: request_options::retry stays at its single-attempt default and this function has no loop.
+
+   std::string reason;
+   bool canceled = false;
+   try {
+      const auto resp = co_await _http.async_request(req, opt, _cancellation.slot());
+      // A 403 answers the only question this check asks: the endpoint is up and it accepted the credential.
+      // Reading the cluster info is a separate permission a write-only credential is not required to hold.
+      if ((resp.status >= es_http_status_ok_min && resp.status <= es_http_status_ok_max) ||
+          resp.status == es_http_status_forbidden)
+         co_return;
+      reason = fmt::format("HTTP {}", resp.status);
+   } catch (const fc::canceled_exception& e) {
+      // cancel() aborted the check; the endpoint was never judged, so it must not be called unreachable.
+      canceled = true;
+      reason = e.top_message();
+   } catch (const fc::exception& e) {
+      // connect / DNS / TLS / timeout / io failures -- all carry their own message.
+      reason = e.top_message();
+   } catch (const std::exception& e) {
+      reason = e.what();
+   } catch (...) {
+      reason = std::string{es_unknown_failure};
+   }
+   // Thrown outside the handlers above so the exception does not nest inside one.
+   if (canceled)
+      FC_THROW("es_client: probe of endpoint {}{} was canceled: {}", _endpoint, es_probe_path, reason);
+   FC_THROW("es_client: endpoint {}{} is not reachable: {}", _endpoint, es_probe_path, reason);
 }
 
 es_bulk_result es_client::account_response(const std::string& body, uint32_t doc_count, uint32_t attempts) const {

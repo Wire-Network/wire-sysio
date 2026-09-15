@@ -13,8 +13,9 @@ namespace fc::network::es {
 inline constexpr uint32_t es_default_max_batch_bytes = 1024 * 1024;
 /// Single-document cap, in bytes; a producer drops and counts a larger document.
 inline constexpr uint32_t es_default_max_doc_bytes = 256 * 1024;
-/// ADDITIONAL delivery attempts after the first (total attempts = max_retries + 1).
-inline constexpr uint32_t es_default_max_retries = 2;
+/// ADDITIONAL delivery attempts after the first (total attempts = max_retries + 1, so four per batch at this
+/// default). Each attempt is bounded by es_default_request_timeout_ms, with the capped backoff in between.
+inline constexpr uint32_t es_default_max_retries = 3;
 /// Initial retry backoff; doubles per attempt, capped at es_max_retry_backoff_ms.
 inline constexpr uint32_t es_default_retry_backoff_ms = 250;
 /// Connection-establishment budget for one delivery attempt, in milliseconds.
