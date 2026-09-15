@@ -105,7 +105,13 @@ namespace sysio {
          /// while one is pending any other transfer from `from` is refused. Typed and
          /// memo-free, so a contract can do both steps inline in one transaction.
          /// Requires `from`'s authority.
+         /// Requires `from`'s authority, and bills `from` for the row, so the
+         /// announcement carries `{from, sysio.payer}` alongside its active permission.
          [[sysio::action]] void fundyield(name from, symbol_code pair_token, asset quantity);
+         /// Drop `from`'s pending announcement and refund its row. Their transfers go
+         /// back to being ordinary deposits. Announcing again replaces a pending row,
+         /// so this is for leaving none at all. Requires `from`'s authority.
+         [[sysio::action]] void cancelyield(name from);
          /// Sell one clip of a yield pool's reservoir through the pool and hand the
          /// proceeds to the shadow token's holders. The clip is the reservoir's share
          /// of the horizon elapsed since the last tick, floored, capped by
