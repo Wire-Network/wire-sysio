@@ -199,6 +199,23 @@ BOOST_FIXTURE_TEST_CASE(onreward_unlinked_parks_unmapped_then_linkswept, sysio_d
    BOOST_REQUIRE_EQUAL(pending_of("bob"_n)["balance"].as<asset>().get_amount(), 5000);
 } FC_LOG_AND_RETHROW() }
 
+BOOST_FIXTURE_TEST_CASE(linkswept_forfeits_expired_unmapped_balance, sysio_dclaim_tester) { try {
+   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n,
+      mvo()("window_sec", uint32_t{1})), success());
+   BOOST_REQUIRE_EQUAL(onreward(MSGCH_ACCOUNT, 1, "", ChainKind::CHAIN_KIND_EVM,
+      addr20, 5000, 7, 100), success());
+   BOOST_REQUIRE(!unmapped_row(1).is_null());
+   produce_blocks(10);
+   produce_block(fc::seconds(5));
+
+   BOOST_REQUIRE_EQUAL(push_dclaim(AUTHEX_ACCOUNT, "linkswept"_n, mvo()
+      ("wire_account", "bob")
+      ("chain", ChainKind::CHAIN_KIND_EVM)
+      ("native_pubkey", addr20)), success());
+   BOOST_REQUIRE(unmapped_row(1).is_null());
+   BOOST_REQUIRE(pending_of("bob"_n).is_null());
+} FC_LOG_AND_RETHROW() }
+
 // -- dedupe cursor --
 
 BOOST_FIXTURE_TEST_CASE(onreward_dedupes_stale_external_ref, sysio_dclaim_tester) { try {

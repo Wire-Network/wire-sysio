@@ -202,6 +202,8 @@ namespace sysio {
      * non-privileged, the link still commits and the sweep is skipped. Because a second createlink
      * for the same account and chain is rejected, that skipped sweep is not automatically retryable
      * through this action; an authorized operator must use recordlink or linkswept for remediation.
+     * EVM links require an EM key and EM signature so recovery applies EIP-191 domain separation;
+     * SVM links require an ED key. Duplicate-key detection uses the verified recovered key.
      *
      * @param chain_kind The chain identifier from `opp::types::ChainKind`
      *                   (CHAIN_KIND_EVM / CHAIN_KIND_SVM).

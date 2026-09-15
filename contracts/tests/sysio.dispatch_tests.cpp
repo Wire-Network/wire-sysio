@@ -2329,12 +2329,13 @@ BOOST_FIXTURE_TEST_CASE(swap_missing_dst_authex_recovers_after_exact_uic_replay,
 
    const auto solana_link_key = fc::crypto::private_key::generate(
       fc::crypto::private_key::key_type::ed).get_public_key();
+   const auto solana_link_raw = solana_link_key.get<fc::crypto::ed::public_key_shim>().serialize();
    BOOST_REQUIRE_EQUAL(success(), push(
       AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
          ("account", UWRIT_OP)
          ("chain_kind", ChainKind::CHAIN_KIND_SVM)
          ("pub_key", solana_link_key)
-         ("native_address", std::vector<char>(32, '\x0b'))));
+         ("native_address", std::vector<char>(solana_link_raw.begin(), solana_link_raw.end()))));
    produce_block();
 
    BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
@@ -3880,12 +3881,13 @@ BOOST_FIXTURE_TEST_CASE(swap_forged_claim_cannot_overwrite_honest_candidate,
          ("outpost", sysio_system::test_support::no_outpost_mvo())));
    const auto solana_link_key = fc::crypto::private_key::generate(
       fc::crypto::private_key::key_type::ed).get_public_key();
+   const auto solana_link_raw = solana_link_key.get<fc::crypto::ed::public_key_shim>().serialize();
    BOOST_REQUIRE_EQUAL(success(), push(
       AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
          ("account", UWRIT_OP)
          ("chain_kind", ChainKind::CHAIN_KIND_SVM)
          ("pub_key", solana_link_key)
-         ("native_address", std::vector<char>(32, '\x0b'))));
+         ("native_address", std::vector<char>(solana_link_raw.begin(), solana_link_raw.end()))));
    setup_wire_token_and_reserves();
 
    const uint64_t eth       = fc::slug_name{"ETH"}.value;

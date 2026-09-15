@@ -25,7 +25,7 @@ using ed_raw_key_t = std::array<uint8_t, 32>;
  * Sweep rewards deposited before this external-chain identity was linked.
  *
  * A missing or non-privileged DClaim deployment cannot safely bill new rows to sysio. Treat either
- * rollout state as "sweep unavailable": the link remains recordable and a later identical
+ * bootstrap state as "sweep unavailable": the link remains recordable and a later identical
  * recordlink call can retry once bootstrap has completed.
  */
 void sweep_linked_rewards(const name self, const name account,
@@ -56,16 +56,15 @@ namespace sysio {
    check(chain_kind == ChainKind::CHAIN_KIND_EVM
          || chain_kind == ChainKind::CHAIN_KIND_SVM,
          "Invalid chain_kind. Supported: CHAIN_KIND_EVM(2), CHAIN_KIND_SVM(3).");
+   check((chain_kind == ChainKind::CHAIN_KIND_EVM && pub_key.index() == fc::crypto::key_type_em)
+         || (chain_kind == ChainKind::CHAIN_KIND_SVM && pub_key.index() == fc::crypto::key_type_ed),
+         "chain_kind and pub_key must pair as EVM/EM or SVM/ED");
 
    // ——— Table & indices ———
    links_t links(get_self());
    auto by_namechain = links.get_index<"bynamechain"_n>();
    uint128_t name_chain = to_namechain_key(account, chain_kind);
    check(by_namechain.find(name_chain) == by_namechain.end(), "Account already has a link for this chain.");
-
-   auto by_pubkey = links.get_index<"bypubkey"_n>();
-   auto pub_hash = pubkey_to_checksum256(pub_key);
-   check(by_pubkey.find(pub_hash) == by_pubkey.end(), "Public key already linked to a different account.");
 
    // ——— Nonce freshness ———
    constexpr uint64_t TEN_MIN_MS = 10 * 60 * 1000;
@@ -92,6 +91,8 @@ namespace sysio {
 
    // ——— Curve-specific signing & address derivation ———
    if (chain_kind == ChainKind::CHAIN_KIND_EVM) {
+      // EIP-191 domain separation is applied only by the EM recovery path.
+      check(sig.index() == fc::crypto::key_type_em, "EM link requires an EM signature");
       // 1) keccak(msg) — use the pubkey string as the contract sees it
       //    (fc/CDT may normalize the compression prefix byte)
       auto eth_hash = sysio::keccak(msg.c_str(), msg.size());
@@ -137,6 +138,12 @@ namespace sysio {
       native_address = pubkey_to_bytes(verified_pub_key);
    }
 
+   // EM recovery fixes the supplied compressed key's parity. Probe the same canonical key that
+   // the row will store, or an opposite-parity spelling can evade the duplicate-key guard.
+   auto by_pubkey = links.get_index<"bypubkey"_n>();
+   auto pub_hash = pubkey_to_checksum256(verified_pub_key);
+   check(by_pubkey.find(pub_hash) == by_pubkey.end(), "Public key already linked to a different account.");
+
    // CREATE LINK RECORD — use verified_pub_key which has the real y-parity
    // prefix from recovery (for EM) rather than the potentially ambiguous input.
    uint64_t next_key = 0;
@@ -179,7 +186,7 @@ namespace sysio {
 // verification. The OPP NodeOwnerRegistration attestation is the proof; the chain accepts this
 // inline send because sysio.authex.active trusts the caller (sysio.roa@sysio.code). Unsupported
 // chain/key pairs are soft-dropped. Idempotent and non-throwing so the trust-OPP dispatch never
-// aborts, including during a staged rollout where sysio.dclaim is absent or not yet privileged.
+// aborts when sysio.dclaim is absent or not yet privileged at bootstrap.
 [[sysio::action]] void authex::recordlink(const name& account, const opp::types::ChainKind chain_kind,
                                           const public_key& pub_key,
                                           const bytes& native_address) {
@@ -209,6 +216,8 @@ namespace sysio {
    auto existing = by_namechain.find(to_namechain_key(account, chain_kind));
    if (existing != by_namechain.end()) {
       if (existing->pub_key == pub_key && can_sweep) {
+         // This is the last available inline depth on the OPP node-owner path:
+         // deliver -> evalcons -> nodeownreg -> recordlink -> linkswept.
          sweep_linked_rewards(get_self(), account, chain_kind, native_address);
       }
       return;
@@ -227,6 +236,7 @@ namespace sysio {
    });
 
    if (can_sweep) {
+      // The OPP node-owner path spends its final inline depth on linkswept.
       sweep_linked_rewards(get_self(), account, chain_kind, native_address);
    }
 }

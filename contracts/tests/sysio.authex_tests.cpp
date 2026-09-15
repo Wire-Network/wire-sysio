@@ -247,6 +247,31 @@ BOOST_FIXTURE_TEST_CASE( createlink_invalid_chain, sysio_authex_tester ) try {
    );
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( createlink_rejects_mismatched_chain_and_key, sysio_authex_tester ) try {
+   auto link = make_eth_link("alice", now_ms());
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("chain_kind and pub_key must pair as EVM/EM or SVM/ED"),
+      createlink("alice"_n, ChainKind::CHAIN_KIND_SVM, "alice", link.sig, link.pub, link.nonce)
+   );
+   BOOST_REQUIRE(get_link(0).is_null());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( createlink_rejects_k1_signature_for_em_key, sysio_authex_tester ) try {
+   auto link = make_eth_link("alice", now_ms());
+   // Use the same secp256k1 secret to produce an otherwise-valid raw-digest K1 signature.
+   // Without the type gate, recovery would accept this signature without EIP-191 wrapping.
+   auto k1_priv = fc::crypto::private_key::regenerate<fc::ecc::private_key_shim>(
+      link.priv.get<fc::em::private_key_shim>().serialize());
+   const auto msg = build_link_message(link.pub, "alice", ChainKind::CHAIN_KIND_EVM, link.nonce);
+   const auto hash = fc::crypto::keccak256::hash(msg);
+   const auto k1_sig = k1_priv.sign(fc::sha256(reinterpret_cast<const char*>(hash.data()), 32));
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("EM link requires an EM signature"),
+      createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", k1_sig, link.pub, link.nonce)
+   );
+   BOOST_REQUIRE(get_link(0).is_null());
+} FC_LOG_AND_RETHROW()
+
 // ——— createlink: stale nonce ———
 
 BOOST_FIXTURE_TEST_CASE( createlink_stale_nonce, sysio_authex_tester ) try {
@@ -295,6 +320,30 @@ BOOST_FIXTURE_TEST_CASE( createlink_eth_sweeps_prelink_dclaim_rewards, sysio_aut
    auto pending = get_dclaim_row("pclaims"_n, "pending_claim", "alice"_n.to_uint64_t());
    BOOST_REQUIRE(!pending.is_null());
    BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 5000);
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( createlink_forfeits_expired_prelink_dclaim_rewards,
+                         sysio_authex_tester ) try {
+   deploy_dclaim();
+   BOOST_REQUIRE_EQUAL(success(),
+      sysio_system::test_support::push_contract_action_and_produce_block(
+         *this, DCLAIM, dclaim_abi_ser, DCLAIM, "setclmwindow"_n,
+         mvo()("window_sec", uint32_t{1})));
+   auto link = make_eth_link("alice", now_ms());
+   const auto address_bytes = fc::crypto::ethereum::address_to_bytes(link.pub);
+   const std::vector<char> native_address(address_bytes.begin(), address_bytes.end());
+   BOOST_REQUIRE_EQUAL(success(), onreward(native_address, 5000));
+   BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   produce_blocks(10);
+   produce_block(fc::seconds(5));
+
+   BOOST_REQUIRE_EQUAL(success(), createlink(
+      "alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce));
+   produce_blocks();
+
+   BOOST_REQUIRE(!get_link(0).is_null());
+   BOOST_REQUIRE(get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   BOOST_REQUIRE(get_dclaim_row("pclaims"_n, "pending_claim", "alice"_n.to_uint64_t()).is_null());
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( recordlink_records_link_when_dclaim_is_missing, sysio_authex_tester ) try {
@@ -466,6 +515,29 @@ BOOST_FIXTURE_TEST_CASE( createlink_duplicate_pubkey, sysio_authex_tester ) try 
       wasm_assert_msg("Public key already linked to a different account."),
       createlink("bob"_n, ChainKind::CHAIN_KIND_EVM, "bob", sig2, link1.pub, nonce2)
    );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( createlink_opposite_parity_cannot_duplicate_verified_key,
+                         sysio_authex_tester ) try {
+   auto link = make_eth_link("alice", now_ms());
+   BOOST_REQUIRE_EQUAL(success(), createlink(
+      "alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce));
+   produce_blocks();
+
+   auto opposite_bytes = link.pub.get<fc::em::public_key_shim>().serialize();
+   opposite_bytes[0] = opposite_bytes[0] == char{0x02} ? char{0x03} : char{0x02};
+   const auto opposite_pub = fc::crypto::public_key{
+      fc::crypto::public_key::storage_type{fc::em::public_key_shim{opposite_bytes}}};
+   const uint64_t nonce = now_ms();
+   const auto msg = build_link_message(opposite_pub, "bob", ChainKind::CHAIN_KIND_EVM, nonce);
+   const auto hash = fc::crypto::keccak256::hash(msg);
+   const auto sig = link.priv.sign(fc::sha256(reinterpret_cast<const char*>(hash.data()), 32));
+
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("Public key already linked to a different account."),
+      createlink("bob"_n, ChainKind::CHAIN_KIND_EVM, "bob", sig, opposite_pub, nonce)
+   );
+   BOOST_REQUIRE(get_link(1).is_null());
 } FC_LOG_AND_RETHROW()
 
 // ——— createlink: duplicate chain for same user ———

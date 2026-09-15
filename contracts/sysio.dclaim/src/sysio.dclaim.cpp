@@ -223,6 +223,12 @@ void dclaim::linkswept(name wire_account, ChainKind chain, std::vector<char> nat
                            return r.chain_kind == chain && r.native_pubkey == native_pubkey;
                         });
    if (uit != uidx.end()) {
+      // Linking must not give an already-expired parked balance a fresh claim window. Erase it
+      // exactly as flushexpired would: its WIRE remains in the DClaim capital fund.
+      if (uit->expires_at_sec != 0 && now_sec() >= uit->expires_at_sec) {
+         unmapped.erase(unmapped_key{uit->id});
+         return;
+      }
       const asset    bal    = uit->balance;
       const uint64_t row_id = uit->id;
       unmapped.erase(unmapped_key{row_id});
