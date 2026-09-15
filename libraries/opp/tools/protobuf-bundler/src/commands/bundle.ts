@@ -442,21 +442,56 @@ function publishCargoCrate(dir: string): void {
   }
 }
 
+/**
+ * Publish every publishable target, then fail if any publish failed.
+ *
+ * The registries are independent: the cargo crate publishes to CodeArtifact
+ * over the OIDC-minted registry token, the npm packages publish to npmjs.org
+ * with NPM_TOKEN. One registry's credential failing must not withhold the
+ * bundles the other registry would have accepted — every consumer of the
+ * generated types is blocked until its OWN registry carries the new version,
+ * and a re-run heals the registry that failed without re-publishing the one
+ * that succeeded (`publishCargoCrate` treats a duplicate version as success).
+ * So each publish runs to completion and the failures are reported together.
+ */
 async function handlePublish(
   args: BundleArgs,
   baseOutputDir: string
 ): Promise<void> {
-  args.targets
-    .filter(t => PUBLISHABLE_TARGETS.includes(t))
-    .forEach(target => {
-      publishPackage(Path.join(baseOutputDir, target))
-    })
+  const failures: Error[] = []
+  const attempt = (label: string, publish: () => void): void => {
+    try {
+      publish()
+    } catch (err: any) {
+      log.error("Publish failed for %s: %s", label, err.message)
+      failures.push(err)
+    }
+  }
 
   args.targets
     .filter(t => CARGO_PUBLISHABLE_TARGETS.includes(t))
     .forEach(target => {
-      publishCargoCrate(Path.join(baseOutputDir, target))
+      attempt(`${target} (cargo)`, () =>
+        publishCargoCrate(Path.join(baseOutputDir, target))
+      )
     })
+
+  args.targets
+    .filter(t => PUBLISHABLE_TARGETS.includes(t))
+    .forEach(target => {
+      attempt(`${target} (npm)`, () =>
+        publishPackage(Path.join(baseOutputDir, target))
+      )
+    })
+
+  if (failures.length > 0) {
+    throw new Error(
+      `${failures.length} of the publish steps failed: ${failures
+        .map(failure => failure.message)
+        .join("; ")}`,
+      { cause: failures }
+    )
+  }
 }
 
 function copyDirExcluding(
