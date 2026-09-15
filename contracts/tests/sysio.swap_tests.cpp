@@ -1679,6 +1679,51 @@ BOOST_FIXTURE_TEST_CASE( yield_is_credited_before_shares_are_priced, sysio_swap_
     BOOST_REQUIRE( after == system_balance( SHEO.value ) );
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( yield_accrues_before_a_swap_is_priced, sysio_swap_tester ) try {
+    setup_yield_pool();
+    const auto shadow_pool_of = [&]( const vector<int64_t>& pool ) { return pool.at(0); };
+    const auto wire_pool_of   = [&]( const vector<int64_t>& pool ) { return pool.at(1); };
+    const int     fee = pool_fee( SHEO );
+    const int64_t pay = 1000'0000;
+
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( 100'0000, EOS4 ), SHD ) );
+    auto before = system_balance( SHEO.value );
+    const auto held = shadow_account( "sysio.swap"_n, SHD );
+    const int64_t owed = yield_reference::owed( held.balance.get_amount(), shadow_index( SHD ).index,
+                                                held.index_checkpoint, held.owed_wire );
+    BOOST_REQUIRE_LT( 0, owed );
+
+    // Buying shadow prices against the pool WITH the owed yield in it, which is
+    // strictly worse for the buyer than the stale quote: the WIRE side is larger,
+    // so a given payment buys less.
+    const int64_t accrued_out = reference::receive( pay, wire_pool_of(before) + owed, shadow_pool_of(before), fee );
+    const int64_t stale_out   = reference::receive( pay, wire_pool_of(before),        shadow_pool_of(before), fee );
+    BOOST_REQUIRE_LT( accrued_out, stale_out );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("available is less than expected"),
+        exchange( "alice"_n, SHEO, extend(asset(pay, EOS4)), asset(stale_out, SHD4) ) );
+    BOOST_REQUIRE_EQUAL( success(),
+        exchange( "alice"_n, SHEO, extend(asset(pay, EOS4)), asset(accrued_out, SHD4) ) );
+    auto after = system_balance( SHEO.value );
+    BOOST_REQUIRE_EQUAL( wire_pool_of(before) + owed + pay,   wire_pool_of(after) );
+    BOOST_REQUIRE_EQUAL( shadow_pool_of(before) - accrued_out, shadow_pool_of(after) );
+    BOOST_REQUIRE_EQUAL( before.at(2), after.at(2) );          // no shares minted
+    BOOST_REQUIRE( pending_payout( "shadowtoken"_n ).empty() );
+
+    // Buy, settle, sell back. With the yield already in the pool before the buy
+    // is priced there is nothing left to get in front of, so the round trip only
+    // pays the fee twice and alice ends with less WIRE than she started.
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( 100'0000, EOS4 ), SHD ) );
+    const int64_t wire_start   = deposit_of( "alice"_n, WIRE );
+    const int64_t shadow_start = deposit_of( "alice"_n, SHADOW );
+    BOOST_REQUIRE_EQUAL( success(), exchange( "alice"_n, SHEO, extend(asset(pay, EOS4)), asset(0, SHD4) ) );
+    const int64_t bought = deposit_of( "alice"_n, SHADOW ) - shadow_start;
+    BOOST_REQUIRE_LT( 0, bought );
+    BOOST_REQUIRE_EQUAL( success(), accrueyield( SHEO ) );     // nothing left pending
+    BOOST_REQUIRE_EQUAL( success(), exchange( "alice"_n, SHEO, shd(bought), asset(0, EOS4) ) );
+    BOOST_REQUIRE_EQUAL( shadow_start, deposit_of( "alice"_n, SHADOW ) );
+    BOOST_REQUIRE_LT( deposit_of( "alice"_n, WIRE ), wire_start );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( yield_payout_route_is_exact, sysio_swap_tester ) try {
     setup_yield_pool();
     // A transfer from a shadow contract with no claim outstanding is an ordinary

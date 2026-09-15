@@ -198,24 +198,28 @@ extended_asset swap::process_exch(symbol_code pair_token,
   extended_asset ext_asset_in, asset min_expected){
     stats statstable( get_self() );
     const pair_key key{ pair_token.raw() };
-    const auto token = statstable.try_get( key );
-    check ( token.has_value(), "pair token does not exist" );
+    const auto stored = statstable.try_get( key );
+    check ( stored.has_value(), "pair token does not exist" );
+    // Yield owed to the pool is part of the pool, so it is settled before anyone
+    // prices a trade against it. Without this an atomic buy, accrueyield, sell
+    // takes a share of the pending yield off the liquidity providers.
+    const currency_stats token = accrue( key, *stored );
     bool in_first;
-    if ((token->pool1.get_extended_symbol() == ext_asset_in.get_extended_symbol()) && 
-        (token->pool2.quantity.symbol == min_expected.symbol)) {
+    if ((token.pool1.get_extended_symbol() == ext_asset_in.get_extended_symbol()) &&
+        (token.pool2.quantity.symbol == min_expected.symbol)) {
         in_first = true;
-    } else if ((token->pool1.quantity.symbol == min_expected.symbol) &&
-               (token->pool2.get_extended_symbol() == ext_asset_in.get_extended_symbol())) {
+    } else if ((token.pool1.quantity.symbol == min_expected.symbol) &&
+               (token.pool2.get_extended_symbol() == ext_asset_in.get_extended_symbol())) {
         in_first = false;
     }
     else check(false, "extended_symbol mismatch");
     int64_t P_in, P_out;
-    if (in_first) { 
-      P_in = token-> pool1.quantity.amount;
-      P_out = token-> pool2.quantity.amount;
+    if (in_first) {
+      P_in = token.pool1.quantity.amount;
+      P_out = token.pool2.quantity.amount;
     } else {
-      P_in = token-> pool2.quantity.amount;
-      P_out = token-> pool1.quantity.amount;
+      P_in = token.pool2.quantity.amount;
+      P_out = token.pool1.quantity.amount;
     }
     const int64_t A_in = ext_asset_in.quantity.amount;
     check( (A_in > 0) && (P_in > 0) && (P_out > 0), "invalid parameters");
@@ -228,21 +232,21 @@ extended_asset swap::process_exch(symbol_code pair_token,
     const uint64_t gross = opp::amm::out_given_in(uint64_t(P_in), CP_WEIGHT_BPS,
                                                   uint64_t(P_out), CP_WEIGHT_BPS,
                                                   uint64_t(A_in));
-    uint64_t fee = opp::amm::split_wire_fee(gross, uint32_t(token->fee), NO_UNDERWRITER_SHARE_BPS).fee;
-    if (token->fee > 0 && gross > 0) fee = std::max(fee, MIN_SWAP_FEE);
+    uint64_t fee = opp::amm::split_wire_fee(gross, uint32_t(token.fee), NO_UNDERWRITER_SHARE_BPS).fee;
+    if (token.fee > 0 && gross > 0) fee = std::max(fee, MIN_SWAP_FEE);
     const int64_t A_out = int64_t(gross - fee);
     check(min_expected.amount <= A_out, "available is less than expected");
     extended_asset ext_asset1, ext_asset2, ext_asset_out;
     if (in_first) {
       ext_asset1 = ext_asset_in;
-      ext_asset2 = extended_asset{-A_out, token-> pool2.get_extended_symbol()};
+      ext_asset2 = extended_asset{-A_out, token.pool2.get_extended_symbol()};
       ext_asset_out = -ext_asset2;
     } else {
-      ext_asset1 = extended_asset{-A_out, token-> pool1.get_extended_symbol()};
+      ext_asset1 = extended_asset{-A_out, token.pool1.get_extended_symbol()};
       ext_asset2 = ext_asset_in;
       ext_asset_out = -ext_asset1;
     }
-    update_price_accumulators(*token);
+    update_price_accumulators(token);
     statstable.modify( name{}, key, [&]( auto& a ) {
       a.pool1 += ext_asset1;
       a.pool2 += ext_asset2;
@@ -483,8 +487,10 @@ void swap::tickyield(symbol_code pair_token) {
     const extended_symbol shadow = require_yield_leg(*stored);
     check( stored->conversion_horizon_sec > 0 && stored->depth_cap_bps > 0 && stored->clip_floor > 0,
            "yield tick parameters not set" );
-    // What the pool is owed belongs to it before it trades.
-    const currency_stats token = accrue( key, *stored );
+    // process_exch settles what the pool is owed before it prices the clip, so
+    // this does not accrue itself. Nothing read below moves when it does: accrual
+    // credits the other leg, and the clip is measured against the shadow side.
+    const currency_stats& token = *stored;
 
     reservoirs reservoir_table( get_self() );
     const int64_t queued = reservoir_table.get( key ).balance.quantity.amount;

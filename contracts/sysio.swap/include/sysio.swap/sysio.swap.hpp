@@ -318,6 +318,10 @@ namespace sysio {
          /// the token's `claim` inline; the transfer it sends lands in `ontransfer`
          /// against the receipt. A plain pool, or nothing owed, changes nothing.
          /// Returns the pair row as it now stands, for a caller that goes on to price.
+         ///
+         /// At most ONCE per action. The inline `claim` settles the token's row only
+         /// after this returns, so a second call inside the same action reads the same
+         /// owed amount and collides with the receipt the first one left.
          currency_stats accrue(const pair_key& key, const currency_stats& token);
 
          void add_signed_ext_balance( const name& owner, const extended_asset& value );
