@@ -184,7 +184,7 @@ title: Set yield parameters
 summary: 'Set the yield tick parameters of {{nowrap pair_token}}'
 ---
 
-The fee authority associated to the token {{pair_token}}, which must be a yield pool, authorizes to set the horizon of {{conversion_horizon_sec}} seconds over which the pool's queued yield is meant to sell, and the ceiling of {{depth_cap_bps}} basis points (at most 10000) of the pool's shadow side on one clip. Both must be nonzero before the pool's yield tick can run. The pair's tick clock restarts now.
+The fee authority associated to the token {{pair_token}}, which must be a yield pool, authorizes to set the horizon of {{conversion_horizon_sec}} seconds over which the pool's queued yield is meant to sell, the ceiling of {{depth_cap_bps}} basis points (at most 10000) of the pool's shadow side on one clip, and the least a clip may be, {{clip_floor}}, in units of the shadow token. All three must be nonzero before the pool's yield tick can run. The pair's tick clock restarts now.
 
 
 <h1 class="contract">accrueyield</h1>
@@ -221,9 +221,9 @@ title: Tick yield
 summary: 'Sell one clip of the reservoir of {{nowrap pair_token}} through the pool'
 ---
 
-The token {{pair_token}} must be a yield pool whose tick parameters have been set. The yield owed to the pool is settled first, as in accrueyield. Then a clip of the reservoir is exchanged through the pool for the other leg, under the same conversion rules and fee as the exchange action with no minimum: the clip is the reservoir multiplied by the time elapsed since the pair's tick clock last advanced and divided by the conversion horizon, rounded upward, but at most the depth cap (in basis points of the pool's shadow side) and at most the reservoir. The clock then advances to now. The other-leg proceeds are handed to the shadow token's addyield action, which distributes them to every holder of the shadow; this contract, holding the pool's shadow, receives its share on a later accrual.
+The token {{pair_token}} must be a yield pool whose tick parameters have been set. The yield owed to the pool is settled first, as in accrueyield. Then a clip of the reservoir is exchanged through the pool for the other leg, under the same conversion rules and fee as the exchange action with no minimum: the clip is the reservoir multiplied by the time elapsed since the pair's tick clock last advanced and divided by the conversion horizon, rounded downward, but at most the depth cap (in basis points of the pool's shadow side) and at most the reservoir. The clock then advances to now. The other-leg proceeds are handed to the shadow token's addyield action, which distributes them to every holder of the shadow; this contract, holding the pool's shadow, receives its share on a later accrual.
 
-When the reservoir is empty, or no time has elapsed since the clock last advanced, or the clip rounds to nothing, the pools, the reservoir and the clock are not modified. No authorization is required.
+The exchange happens only if the clip has reached the pair's clip floor, or the whole of the reservoir if that is smaller. When it has not, and when the reservoir is empty or no time has elapsed, the pools, the reservoir and the clock are all left unmodified; in particular the clock is not advanced, so the elapsed time counts toward the next clip instead of being discarded. No authorization is required.
 
 
 <h1 class="contract">changefee</h1>

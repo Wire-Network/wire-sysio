@@ -41,9 +41,9 @@ Create a yield pool instead: name the first leg as a shadow token (a token that 
 
     cleos push action evolutiondex inittoken '["YOUR_ACCOUNT", "4,SHDEOS", {"contract":"shadowtoken", "quantity":"1.0000 SHD"}, {"contract":"eosio.token", "quantity":"1.0000 EOS"}, 10, "", "0.0000 SHDEOS", {"contract":"shadowtoken", "sym":"4,SHD"}]' -p YOUR_ACCOUNT -p evolutiondex
 
-Set a yield pool's tick parameters, signed by its fee authority: the horizon (seconds) over which queued yield is meant to sell, and the ceiling on one clip in basis points of the pool's shadow side.
+Set a yield pool's tick parameters, signed by its fee authority: the horizon (seconds) over which queued yield is meant to sell, the ceiling on one clip in basis points of the pool's shadow side, and the least a clip may be, in units of the shadow. Size the floor so the pair's fee on a clip's output reaches a whole unit on its own, which at a 0.1% fee is an output of 1000 units; below that the one-unit minimum swap fee is what a clip actually pays, and a small enough clip is consumed entirely. Erring high only makes sales larger and rarer at the same average rate, but a floor above the depth cap stops the pair selling altogether.
 
-    cleos push action evolutiondex setyield '["SHDEOS", 86400, 3]' -p sysio
+    cleos push action evolutiondex setyield '["SHDEOS", 86400, 3, 1000]' -p sysio
 
 Settle the yield the pool is owed on the shadow it holds into its other leg, minting nothing. This also runs by itself before every addliquidity and remliquidity; anyone may call it in between:
 

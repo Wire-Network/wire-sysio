@@ -247,11 +247,12 @@ public:
     }
     // Signed by the pair's fee authority, sysio unless overridden.
     action_result setyield( symbol_code pair_token, uint32_t conversion_horizon_sec, uint32_t depth_cap_bps,
-                            name authority = config::system_account_name ) {
+                            int64_t clip_floor, name authority = config::system_account_name ) {
         return push_swap_action( "setyield"_n, { {authority, config::active_name} }, mvo()
           ( "pair_token", pair_token )
           ( "conversion_horizon_sec", conversion_horizon_sec )
           ( "depth_cap_bps", depth_cap_bps )
+          ( "clip_floor", clip_floor )
         );
     }
     // The pair's stat row as a variant (abi_ser must hold the swap ABI).
@@ -710,15 +711,19 @@ namespace yield_reference {
    int64_t owed( int64_t balance, uint64_t index, uint64_t checkpoint, uint64_t banked = 0 ) {
       return int64_t( banked + uint64_t( wide(balance) * (index - checkpoint) / Scale ) );
    }
-   // One tick's clip: the reservoir's share of the horizon elapsed, rounded up,
-   // capped by `cap_bps` of the pool's shadow side and by what is queued.
+   // One tick's clip: the reservoir's share of the horizon elapsed, FLOORED,
+   // capped by `cap_bps` of the pool's shadow side and by what is queued. A
+   // clip short of min(clip_floor, queued) is not sold at all, which this
+   // reports as 0 -- the tick moves nothing and leaves its clock alone.
    constexpr int64_t MicrosecondsPerSecond = 1'000'000;
    constexpr int64_t BpsTotal = 10'000;
-   int64_t clip_size( int64_t queued, int64_t elapsed_us, uint32_t horizon_sec, int64_t pool_shadow, uint32_t cap_bps ) {
+   int64_t clip_size( int64_t queued, int64_t elapsed_us, uint32_t horizon_sec, int64_t pool_shadow,
+                      uint32_t cap_bps, int64_t clip_floor ) {
       const wide horizon_us = wide(horizon_sec) * MicrosecondsPerSecond;
-      const wide by_time = ( wide(queued) * elapsed_us + horizon_us - 1 ) / horizon_us;
+      const wide by_time = ( wide(queued) * elapsed_us ) / horizon_us;
       const wide cap     = wide(pool_shadow) * cap_bps / BpsTotal;
-      return int64_t( std::min( { by_time, cap, wide(queued) } ) );
+      const wide clip    = std::min( { by_time, cap, wide(queued) } );
+      return clip < std::min( wide(clip_floor), wide(queued) ) ? 0 : int64_t( clip );
    }
 }
 
@@ -1497,15 +1502,18 @@ BOOST_FIXTURE_TEST_CASE( yield_leg_rules, sysio_swap_tester ) try {
         symbol::from_string("4,BVO"), extend(asset::from_string("1.0000 VOICE")), extend(asset::from_string("1.0000 EOS")),
         10, name{} ) );
 
-    // setyield: fee authority only, yield pools only, cap within basis points.
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair has no yield leg"), setyield( ETUSD, 86400, 3 ) );
-    BOOST_REQUIRE_EQUAL( error("missing authority of sysio"), setyield( EVO, 86400, 3, "alice"_n ) );
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg("depth_cap_bps out of range"), setyield( EVO, 86400, 10001 ) );
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair token does not exist"), setyield( EOS, 86400, 3 ) );
-    BOOST_REQUIRE_EQUAL( success(), setyield( EVO, 86400, 3 ) );
+    // setyield: fee authority only, yield pools only, cap within basis points,
+    // clip floor within an asset.
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair has no yield leg"), setyield( ETUSD, 86400, 3, 1000 ) );
+    BOOST_REQUIRE_EQUAL( error("missing authority of sysio"), setyield( EVO, 86400, 3, 1000, "alice"_n ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("depth_cap_bps out of range"), setyield( EVO, 86400, 10001, 1000 ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("clip_floor out of range"), setyield( EVO, 86400, 3, -1 ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair token does not exist"), setyield( EOS, 86400, 3, 1000 ) );
+    BOOST_REQUIRE_EQUAL( success(), setyield( EVO, 86400, 3, 1000 ) );
     evo = pair_row(EVO);
     BOOST_REQUIRE_EQUAL( 86400u, evo["conversion_horizon_sec"].as_uint64() );
     BOOST_REQUIRE_EQUAL( 3u, evo["depth_cap_bps"].as_uint64() );
+    BOOST_REQUIRE_EQUAL( 1000, evo["clip_floor"].as_int64() );
     // The leg is fixed at creation; setyield does not touch it.
     BOOST_REQUIRE_EQUAL( "4,VOICE", evo["yield_leg"]["sym"].as_string() );
 
@@ -1781,6 +1789,10 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_
         extend(asset::from_string("1.00 TUSD")), extend(asset::from_string("1.0000 EOS")), 10, name{}) );
     const uint32_t horizon_sec = 3600;
     const uint32_t cap_bps     = 1;
+    // Sized the way setyield's docs prescribe: at a 0.1% pair fee the proportional
+    // fee reaches a whole unit at an output of 1000, which is where MIN_SWAP_FEE
+    // stops being the binding fee.
+    const int64_t  clip_floor  = 1000;
     const int      fee         = pool_fee( SHEO );
     const auto shadow_pool_of  = [&]( const vector<int64_t>& pool ) { return pool.at(0); };   // SHD is pool1
     const auto wire_pool_of    = [&]( const vector<int64_t>& pool ) { return pool.at(1); };
@@ -1789,7 +1801,10 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair has no yield leg"), tickyield( ETUSD ) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair token does not exist"), tickyield( EOS ) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield tick parameters not set"), tickyield( SHEO ) );
-    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, cap_bps ) );
+    // A floor of zero is as unset as a horizon of zero: the tick refuses it.
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, cap_bps, 0 ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield tick parameters not set"), tickyield( SHEO ) );
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, cap_bps, clip_floor ) );
     const int64_t set_at = last_tick_us( SHEO );
     BOOST_REQUIRE_EQUAL( control->head_block_time().time_since_epoch().count(), set_at );   // setyield starts the clock
 
@@ -1815,8 +1830,9 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_
     const int64_t contract_wire_before = token_balance( "sysio.token"_n, "sysio.swap"_n, EOS.value );
     BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
     const int64_t ticked_at = last_tick_us( SHEO );
-    int64_t clip = yield_reference::clip_size( queued, ticked_at - funded_at, horizon_sec, shadow_pool_of(before), cap_bps );
-    BOOST_REQUIRE_LT( 0, clip );
+    int64_t clip = yield_reference::clip_size( queued, ticked_at - funded_at, horizon_sec,
+                                               shadow_pool_of(before), cap_bps, clip_floor );
+    BOOST_REQUIRE_LT( clip_floor, clip );      // over the floor, so it sells
     BOOST_REQUIRE_LT( clip, queued / 1000 );   // a block is a sliver of the horizon
     int64_t proceeds = reference::receive( clip, shadow_pool_of(before), wire_pool_of(before), fee );
     auto after = system_balance( SHEO.value );
@@ -1852,7 +1868,8 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_
     before = system_balance( SHEO.value );
     tick_twice_in_one_transaction( SHEO );
     const int64_t paired_at = last_tick_us( SHEO );
-    clip = yield_reference::clip_size( queued_before_pair, paired_at - ticked_at, horizon_sec, shadow_pool_of(before), cap_bps );
+    clip = yield_reference::clip_size( queued_before_pair, paired_at - ticked_at, horizon_sec,
+                                       shadow_pool_of(before), cap_bps, clip_floor );
     BOOST_REQUIRE_EQUAL( queued_before_pair - clip, reservoir_of( SHEO ) );
     BOOST_REQUIRE_EQUAL( shadow_pool_of(before) + clip, shadow_pool_of( system_balance( SHEO.value ) ) );
 
@@ -1865,7 +1882,7 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_
     const int64_t clock_before_gap  = last_tick_us( SHEO );
     BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
     clip = yield_reference::clip_size( queued_before_gap, last_tick_us( SHEO ) - clock_before_gap, horizon_sec,
-                                       shadow_pool_of(before), cap_bps );
+                                       shadow_pool_of(before), cap_bps, clip_floor );
     BOOST_REQUIRE_EQUAL( shadow_pool_of(before) * cap_bps / yield_reference::BpsTotal, clip );
     BOOST_REQUIRE_LT( clip, queued_before_gap );
     BOOST_REQUIRE_EQUAL( queued_before_gap - clip, reservoir_of( SHEO ) );
@@ -1873,7 +1890,7 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_
 
     // With the cap lifted, the same gap drains the queue in one clip, and the
     // tick after that is a no-op again.
-    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, uint32_t(yield_reference::BpsTotal) ) );
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, uint32_t(yield_reference::BpsTotal), clip_floor ) );
     produce_block();
     produce_block( fc::hours(2) );
     before = system_balance( SHEO.value );
@@ -1901,12 +1918,103 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_
     before = system_balance( SHEO.value );
     BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
     clip = yield_reference::clip_size( queued, last_tick_us( SHEO ) - refunded_at, horizon_sec,
-                                       shadow_pool_of(before), uint32_t(yield_reference::BpsTotal) );
+                                       shadow_pool_of(before), uint32_t(yield_reference::BpsTotal), clip_floor );
     proceeds = reference::receive( clip, shadow_pool_of(before), wire_pool_of(before) + owed, fee );
     after = system_balance( SHEO.value );
     BOOST_REQUIRE_EQUAL( shadow_pool_of(before) + clip,          shadow_pool_of(after) );
     BOOST_REQUIRE_EQUAL( wire_pool_of(before) + owed - proceeds, wire_pool_of(after) );
     BOOST_REQUIRE( pending_payout( "shadowtoken"_n ).empty() );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( yield_tick_never_sells_below_the_clip_floor, sysio_swap_tester ) try {
+    setup_yield_pool();
+    grant_shadow_code( "sysio.swap"_n, true );
+    const uint32_t horizon_sec = 3600;
+    const uint32_t cap_bps     = 1;            // cap = 1e6 against the 1e10 shadow side
+    const int      fee         = pool_fee( SHEO );
+    const auto shadow_pool_of  = [&]( const vector<int64_t>& pool ) { return pool.at(0); };
+    const auto wire_pool_of    = [&]( const vector<int64_t>& pool ) { return pool.at(1); };
+    const int64_t  queued      = 1000'0000;
+
+    // A floor far above one block's share: the clip is short, so the tick sells
+    // nothing AND leaves its clock alone. That is the whole point -- the unsold
+    // time is not lost, it accumulates into the next clip.
+    const int64_t high_floor = 100'000;
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, cap_bps, high_floor ) );
+    fund_yield_in_one_transaction( "alice"_n, SHEO, asset( queued, SHD4 ) );
+    const int64_t funded_at = last_tick_us( SHEO );
+    auto before = system_balance( SHEO.value );
+    const int64_t block_share = yield_reference::clip_size( queued, 500'000, horizon_sec,
+                                                           shadow_pool_of(before), cap_bps, 0 );
+    BOOST_REQUIRE_LT( 0, block_share );            // a block's share is real...
+    BOOST_REQUIRE_LT( block_share, high_floor );   // ...but under the floor
+
+    // Ten blocks of cranking: every one a no-op, nothing sold, clock untouched.
+    for (int i = 0; i < 10; ++i) {
+        BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
+        BOOST_REQUIRE_EQUAL( queued, reservoir_of( SHEO ) );
+        BOOST_REQUIRE( before == system_balance( SHEO.value ) );
+        BOOST_REQUIRE_EQUAL( funded_at, last_tick_us( SHEO ) );
+    }
+
+    // Once enough time has accrued the clip clears the floor and sells in one
+    // piece, measured from the ORIGINAL clock: the skipped blocks were banked,
+    // so throughput is unchanged and only the granularity is coarser.
+    produce_block();
+    produce_block( fc::seconds(40) );
+    BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
+    const int64_t sold_at = last_tick_us( SHEO );
+    const int64_t clip = yield_reference::clip_size( queued, sold_at - funded_at, horizon_sec,
+                                                     shadow_pool_of(before), cap_bps, high_floor );
+    BOOST_REQUIRE_LE( high_floor, clip );
+    const int64_t proceeds = reference::receive( clip, shadow_pool_of(before), wire_pool_of(before), fee );
+    BOOST_REQUIRE_LT( 0, proceeds );               // and it actually pays, unlike a 1-unit clip
+    BOOST_REQUIRE_EQUAL( queued - clip, reservoir_of( SHEO ) );
+    BOOST_REQUIRE_EQUAL( shadow_pool_of(before) + clip, shadow_pool_of( system_balance( SHEO.value ) ) );
+
+    // A remainder smaller than the floor is not stranded: the floor gives way to
+    // what is queued, so it leaves as one sale once the time share reaches the
+    // whole queue, which takes exactly one horizon.
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, uint32_t(yield_reference::BpsTotal), high_floor ) );
+    produce_block();
+    produce_block( fc::hours(2) );
+    BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );   // drain whatever is left
+    BOOST_REQUIRE_EQUAL( 0, reservoir_of( SHEO ) );
+    BOOST_REQUIRE_EQUAL( success(), accrueyield( SHEO ) );
+
+    const int64_t dust = 500;                                  // well under high_floor
+    fund_yield_in_one_transaction( "alice"_n, SHEO, asset( dust, SHD4 ) );
+    const int64_t dust_at = last_tick_us( SHEO );
+    before = system_balance( SHEO.value );
+    produce_block();
+    produce_block( fc::minutes(30) );                          // half a horizon: not yet
+    BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
+    BOOST_REQUIRE_EQUAL( dust, reservoir_of( SHEO ) );
+    BOOST_REQUIRE_EQUAL( dust_at, last_tick_us( SHEO ) );
+    produce_block();
+    produce_block( fc::minutes(31) );                          // past one horizon: clears
+    BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
+    BOOST_REQUIRE_EQUAL( 0, reservoir_of( SHEO ) );
+    BOOST_REQUIRE_EQUAL( shadow_pool_of(before) + dust, shadow_pool_of( system_balance( SHEO.value ) ) );
+
+    // A depth cap below the floor is the one combination with no way out: every
+    // clip is capped under the floor, so the pair stops selling however long it
+    // waits, until setyield widens one of them.
+    BOOST_REQUIRE_EQUAL( success(), accrueyield( SHEO ) );
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, cap_bps, 2'000'000 ) );   // cap is 1e6
+    fund_yield_in_one_transaction( "alice"_n, SHEO, asset( queued, SHD4 ) );
+    before = system_balance( SHEO.value );
+    produce_block();
+    produce_block( fc::hours(6) );
+    BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
+    BOOST_REQUIRE_EQUAL( queued, reservoir_of( SHEO ) );
+    BOOST_REQUIRE( before == system_balance( SHEO.value ) );
+    // Lowering the floor under the cap starts it again.
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, cap_bps, 1000 ) );
+    produce_block();
+    produce_block( fc::hours(6) );
+    BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
+    BOOST_REQUIRE_LT( reservoir_of( SHEO ), queued );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( fee_authority_configuration, sysio_swap_tester ) try {
@@ -2643,9 +2751,10 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
         {"supply", "asset"}, {"max_supply", "asset"}, {"issuer", "name"}, {"pool1", "extended_asset"},
         {"pool2", "extended_asset"}, {"fee", "int32"}, {"fee_authority", "name"}, {"locked_shares", "asset"},
         {"yield_leg", "extended_symbol?"}, {"conversion_horizon_sec", "uint32"}, {"depth_cap_bps", "uint32"},
-        {"last_tick", "time_point"} };
+        {"clip_floor", "int64"}, {"last_tick", "time_point"} };
     const field_list setyield_fields{
-        {"pair_token", "symbol_code"}, {"conversion_horizon_sec", "uint32"}, {"depth_cap_bps", "uint32"} };
+        {"pair_token", "symbol_code"}, {"conversion_horizon_sec", "uint32"}, {"depth_cap_bps", "uint32"},
+        {"clip_floor", "int64"} };
     const field_list accrueyield_fields{ {"pair_token", "symbol_code"} };
     const field_list payout_receipt_fields{ {"pair", "symbol_code"}, {"quantity", "extended_asset"} };
     const field_list fundyield_fields{ {"from", "name"}, {"pair_token", "symbol_code"}, {"quantity", "asset"} };

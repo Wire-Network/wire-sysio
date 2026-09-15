@@ -70,10 +70,24 @@ namespace sysio {
            int initial_fee, name fee_authority, asset locked_shares,
            std::optional<extended_symbol> yield_leg);
          /// Set a yield pool's tick parameters (fee authority): the horizon over which
-         /// its queued yield is meant to sell, and the hard ceiling on one clip as basis
-         /// points of the pool's shadow side. Both must be nonzero before tickyield runs.
+         /// its queued yield is meant to sell, the hard ceiling on one clip as basis
+         /// points of the pool's shadow side, and the least a clip may be. All three
+         /// must be nonzero before tickyield runs.
+         ///
+         /// `clip_floor` is in units of the shadow, so it is precision-relative and has
+         /// no sensible default. Size it so the pair's fee on a clip's output reaches a
+         /// whole unit on its own, which is an output of FEE_DENOMINATOR/fee units:
+         /// below that, MIN_SWAP_FEE is the binding fee and a clip pays far above the
+         /// pair's rate (an output of 2 pays half of itself). Erring high costs
+         /// nothing, because the clip scales with elapsed time and a higher floor only
+         /// makes sales larger and rarer at the same average rate. Erring low is what
+         /// bleeds the reservoir to the liquidity providers a unit at a time.
+         ///
+         /// It must stay under the depth cap, though: a floor above
+         /// `pool_shadow * depth_cap_bps / BPS_TOTAL` caps every clip below the floor
+         /// and the pair stops selling entirely.
          [[sysio::action]] void setyield(symbol_code pair_token,
-           uint32_t conversion_horizon_sec, uint32_t depth_cap_bps);
+           uint32_t conversion_horizon_sec, uint32_t depth_cap_bps, int64_t clip_floor);
          /// Settle the WIRE yield a yield pool is owed on the shadow it holds into the
          /// pool's other leg, minting nothing: the pool is credited now and the token's
          /// `claim` delivers the same amount in the same transaction (a mismatch fails
@@ -90,13 +104,21 @@ namespace sysio {
          [[sysio::action]] void fundyield(name from, symbol_code pair_token, asset quantity);
          /// Sell one clip of a yield pool's reservoir through the pool and hand the
          /// proceeds to the shadow token's holders. The clip is the reservoir's share
-         /// of the horizon elapsed since the last tick, rounded up, capped by
+         /// of the horizon elapsed since the last tick, floored, capped by
          /// `depth_cap_bps` of the pool's shadow side and by what is queued; it is sold
          /// at the pool's own curve and fee, after the pool's owed yield has been
          /// settled, and the proceeds go out through the token's `addyield`, so the
-         /// pool takes its own share back on the next accrual. Nothing queued, or no
-         /// time elapsed, makes it a no-op. Requires `setyield` to have run. No
-         /// authorization is required; a crank runs it every block.
+         /// pool takes its own share back on the next accrual.
+         ///
+         /// A no-op when nothing is queued, when no time has elapsed, or when the clip
+         /// has not reached `min(clip_floor, queued)` yet. That last case is what makes
+         /// cranking every block harmless: a clip below the floor sells nothing AND
+         /// leaves the clock alone, so the next tick measures a longer window and
+         /// offers a proportionally larger clip. Selling below the floor would hand the
+         /// reservoir to the liquidity providers a unit at a time, because integer
+         /// rounding and MIN_SWAP_FEE take the whole of a small enough clip.
+         ///
+         /// Requires `setyield` to have run. No authorization is required.
          [[sysio::action]] void tickyield(symbol_code pair_token);
          [[sysio::on_notify("*::transfer")]] void ontransfer(name from, name to, asset quantity, string memo);
          [[sysio::action]] void openext( const name& user, const name& payer, const extended_symbol& ext_symbol);
@@ -195,11 +217,14 @@ namespace sysio {
             std::optional<extended_symbol> yield_leg;   ///< the shadow leg of a yield pool; empty for a plain pool
             uint32_t       conversion_horizon_sec = 0;  ///< H: the reservoir is meant to sell over this long
             uint32_t       depth_cap_bps          = 0;  ///< hard ceiling on one clip, bps of the pool's shadow side
+            int64_t        clip_floor             = 0;  ///< least a clip may be, in units of the shadow
             time_point     last_tick{};                 ///< elapsed-time base of the clip formula: the last tick that
                                                         ///< sold, the last setyield, or when the reservoir last
-                                                        ///< went from empty to funded, whichever is latest
+                                                        ///< went from empty to funded, whichever is latest. A tick
+                                                        ///< that sells nothing deliberately leaves it alone.
             SYSLIB_SERIALIZE(currency_stats, (supply)(max_supply)(issuer)(pool1)(pool2)(fee)(fee_authority)
-                                             (locked_shares)(yield_leg)(conversion_horizon_sec)(depth_cap_bps)(last_tick))
+                                             (locked_shares)(yield_leg)(conversion_horizon_sec)(depth_cap_bps)
+                                             (clip_floor)(last_tick))
          };
 
          /// A yield payout the contract has claimed and credited to `pair` but not yet

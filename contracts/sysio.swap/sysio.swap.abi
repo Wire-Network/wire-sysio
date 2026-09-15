@@ -178,6 +178,10 @@
                     "type": "uint32"
                 },
                 {
+                    "name": "clip_floor",
+                    "type": "int64"
+                },
+                {
                     "name": "last_tick",
                     "type": "time_point"
                 }
@@ -494,6 +498,10 @@
                 {
                     "name": "depth_cap_bps",
                     "type": "uint32"
+                },
+                {
+                    "name": "clip_floor",
+                    "type": "int64"
                 }
             ]
         },
