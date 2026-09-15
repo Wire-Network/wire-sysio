@@ -1,4 +1,5 @@
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/resource_limits.hpp>
 #include <sysio/testing/tester.hpp>
 
 
@@ -269,11 +270,19 @@ public:
     vector<char> pending_payout( name contract ) {
         return get_kv_row( "sysio.swap"_n, "yieldpayouts"_n, { contract.to_uint64_t() } );
     }
-    // fundyield is the funder's own call; the fixture adds its payer permission.
+    // fundyield is the funder's own call; the fixture adds its payer permission,
+    // which the row is billed to.
     action_result fundyield( name from, symbol_code pair_token, asset quantity ) {
         return push_action( "sysio.swap"_n, from, "fundyield"_n, mvo()
           ( "from", from )( "pair_token", pair_token )( "quantity", quantity )
         );
+    }
+    action_result cancelyield( name from, name signer ) {
+        return push_swap_action( "cancelyield"_n, { {signer, config::active_name} }, mvo()( "from", from ) );
+    }
+    action_result cancelyield( name from ) { return cancelyield( from, from ); }
+    int64_t ram_usage( name account ) const {
+        return control->get_resource_limits_manager().get_account_ram_usage( account );
     }
     // The pending funding announced by `funder`, as a variant; null when none.
     fc::variant pending_funding( name funder ) {
@@ -301,7 +310,9 @@ public:
         action announce;
         announce.account = "sysio.swap"_n;
         announce.name    = "fundyield"_n;
-        announce.authorization = { {from, config::active_name} };
+        // The announcement's row is billed to the funder, so it carries the payer
+        // permission as well as the active one.
+        announce.authorization = { {from, config::sysio_payer_name}, {from, config::active_name} };
         announce.data = abi_ser.variant_to_binary( "fundyield",
             mvo()( "from", from )( "pair_token", pair )( "quantity", quantity ),
             abi_serializer::create_yield_function(abi_serializer_max_time) );
@@ -1813,6 +1824,29 @@ BOOST_FIXTURE_TEST_CASE( yield_funding_fills_the_reservoir, sysio_swap_tester ) 
     BOOST_REQUIRE_EQUAL( first + second + third, reservoir_of( SHEO ) );
     BOOST_REQUIRE( pending_funding( "alice"_n ).is_null() );
 
+    // The announcement's row is the funder's, not the contract's, and cancelling
+    // gives it back. Otherwise one abandoned announcement per account that ever
+    // called fundyield would sit on the contract's RAM with no way to reclaim it.
+    {
+        const int64_t swap_ram = ram_usage( "sysio.swap"_n );
+        const int64_t bob_ram  = ram_usage( "bob"_n );
+        BOOST_REQUIRE_EQUAL( success(), fundyield( "bob"_n, SHEO, asset( 5'0000, SHD4 ) ) );
+        BOOST_REQUIRE_LT( bob_ram, ram_usage( "bob"_n ) );
+        BOOST_REQUIRE_EQUAL( swap_ram, ram_usage( "sysio.swap"_n ) );
+        // While it is pending bob cannot deposit anything else...
+        BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield funding does not match the pending fundyield"),
+                             transfer( "sysio.token"_n, "bob"_n, "sysio.swap"_n, asset( 1'0000, EOS4 ), "" ) );
+        // ...and cancelling is his own call, not anyone else's.
+        BOOST_REQUIRE_EQUAL( error("missing authority of bob"), cancelyield( "bob"_n, "alice"_n ) );
+        BOOST_REQUIRE_EQUAL( success(), cancelyield( "bob"_n ) );
+        BOOST_REQUIRE( pending_funding( "bob"_n ).is_null() );
+        BOOST_REQUIRE_EQUAL( bob_ram, ram_usage( "bob"_n ) );
+        BOOST_REQUIRE_EQUAL( wasm_assert_msg("no pending fundyield"), cancelyield( "bob"_n ) );
+        // Ordinary deposits work again.
+        BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "bob"_n, "sysio.swap"_n, asset( 1'0000, EOS4 ), "" ) );
+        BOOST_REQUIRE_EQUAL( first + second + third, reservoir_of( SHEO ) );
+    }
+
     // The reservoir is the contract's shadow too: it earns for the pool.
     BOOST_REQUIRE_EQUAL( YieldPoolShadow + 1'0000 + first + second + third,
                          shadow_account( "sysio.swap"_n, SHD ).balance.get_amount() );
@@ -2816,8 +2850,9 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     std::set<std::string> actions;
     for (const auto& a : abi.actions) actions.insert(a.name.to_string());
     const std::set<std::string> expected_actions{
-        "accrueyield", "addliquidity", "changefee", "close", "closeext", "exchange", "fundyield", "inittoken",
-        "open", "openext", "remliquidity", "setconfig", "setyield", "sync", "tickyield", "transfer", "withdraw" };
+        "accrueyield", "addliquidity", "cancelyield", "changefee", "close", "closeext", "exchange", "fundyield",
+        "inittoken", "open", "openext", "remliquidity", "setconfig", "setyield", "sync", "tickyield", "transfer",
+        "withdraw" };
     BOOST_REQUIRE( actions == expected_actions );
 
     using field_list = std::vector<std::pair<std::string, std::string>>;
@@ -2847,6 +2882,7 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     const field_list accrueyield_fields{ {"pair_token", "symbol_code"} };
     const field_list payout_receipt_fields{ {"pair", "symbol_code"}, {"quantity", "extended_asset"} };
     const field_list fundyield_fields{ {"from", "name"}, {"pair_token", "symbol_code"}, {"quantity", "asset"} };
+    const field_list cancelyield_fields{ {"from", "name"} };
     const field_list fund_receipt_fields{ {"pair", "symbol_code"}, {"quantity", "extended_asset"} };
     const field_list reservoir_fields{ {"balance", "extended_asset"} };
     const field_list tickyield_fields{ {"pair_token", "symbol_code"} };
@@ -2875,6 +2911,7 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
     BOOST_REQUIRE( fields("accrueyield") == accrueyield_fields );
     BOOST_REQUIRE( fields("payout_receipt") == payout_receipt_fields );
     BOOST_REQUIRE( fields("fundyield") == fundyield_fields );
+    BOOST_REQUIRE( fields("cancelyield") == cancelyield_fields );
     BOOST_REQUIRE( fields("fund_receipt") == fund_receipt_fields );
     BOOST_REQUIRE( fields("reservoir") == reservoir_fields );
     BOOST_REQUIRE( fields("tickyield") == tickyield_fields );

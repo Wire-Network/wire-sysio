@@ -51,8 +51,12 @@ Settle the yield the pool is owed on the shadow it holds into its other leg, min
 
 Queue shadow to be sold through the pool: announce the exact amount, then transfer it. The transfer that matches the announcement fills the pool's reservoir instead of your deposit; while the announcement is pending any other transfer from you is refused, and announcing again replaces it. Both steps fit in one transaction.
 
-    cleos push action evolutiondex fundyield '["YOUR_ACCOUNT", "SHDEOS", "5.0000 SHD"]' -p YOUR_ACCOUNT
+    cleos push action evolutiondex fundyield '["YOUR_ACCOUNT", "SHDEOS", "5.0000 SHD"]' -p YOUR_ACCOUNT -p YOUR_ACCOUNT@sysio.payer
     cleos push action shadowtoken transfer '["YOUR_ACCOUNT", "evolutiondex", "5.0000 SHD", ""]' -p YOUR_ACCOUNT
+
+The announcement's row is billed to you, which is why it needs the payer permission. Drop one you are not going to deliver, which refunds the row and lets you deposit normally again:
+
+    cleos push action evolutiondex cancelyield '["YOUR_ACCOUNT"]' -p YOUR_ACCOUNT
 
 See what is queued:
 

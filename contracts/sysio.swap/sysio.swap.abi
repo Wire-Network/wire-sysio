@@ -56,6 +56,16 @@
             ]
         },
         {
+            "name": "cancelyield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "from",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "changefee",
             "base": "",
             "fields": [
@@ -597,6 +607,11 @@
         {
             "name": "addliquidity",
             "type": "addliquidity",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "cancelyield",
+            "type": "cancelyield",
             "ricardian_contract": ""
         },
         {

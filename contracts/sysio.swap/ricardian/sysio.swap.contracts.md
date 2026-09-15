@@ -210,6 +210,21 @@ summary: 'Announce {{nowrap quantity}} of shadow for the reservoir of {{nowrap p
 
 {{from}} announces the transfer of exactly {{quantity}}, in the shadow symbol of the yield pool {{pair_token}}, to this contract. The transfer of {{quantity}} from {{from}} that follows, in this transaction or a later one, is added to the reservoir of {{pair_token}}, the shadow queued to be sold through the pool, and not to {{from}}'s extended balance. While the announcement is pending, any other transfer from {{from}} to this contract is refused. A new announcement by {{from}} replaces the pending one. When the delivery fills a reservoir that was empty, the pair's tick clock restarts.
 
+RAM for the record of the announcement will be deducted from {{from}}'s resources, and returned by cancelyield or by the delivery.
+
+Authorization of {{from}} is required.
+
+
+<h1 class="contract">cancelyield</h1>
+
+---
+spec_version: "0.2.0"
+title: Cancel yield funding
+summary: 'Drop the pending funding announcement of {{nowrap from}}'
+---
+
+{{from}} agrees to withdraw their pending fundyield announcement. The record is erased and its RAM returned to {{from}}, and transfers from {{from}} to this contract are treated as ordinary deposits again. The action fails if {{from}} has no pending announcement.
+
 Authorization of {{from}} is required.
 
 

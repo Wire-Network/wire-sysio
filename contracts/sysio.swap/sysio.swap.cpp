@@ -440,11 +440,20 @@ void swap::fundyield(name from, symbol_code pair_token, asset quantity) {
     const extended_symbol& shadow = require_yield_leg(*token);
     check( quantity.symbol == shadow.get_symbol(), "quantity must be in the pair's shadow symbol" );
     check( quantity.amount > 0, "quantity must be positive" );
-    // The row is transient (the matching transfer erases it) and replaceable by
-    // its own funder, so the contract carries it rather than billing `from`.
+    // Billed to `from`: only the matching transfer erases the row, so an
+    // announcement nobody delivers would otherwise sit on the contract's RAM,
+    // one per account that ever called this. cancelyield refunds it.
     yieldfunds funds( get_self() );
-    funds.upsert( get_self(), funder_key{ from },
+    funds.upsert( from, funder_key{ from },
                   fund_receipt{ pair_token, extended_asset{ quantity, shadow.get_contract() } } );
+}
+
+void swap::cancelyield(name from) {
+    require_auth( from );
+    yieldfunds funds( get_self() );
+    const funder_key funder{ from };
+    check( funds.contains( funder ), "no pending fundyield" );
+    funds.erase( funder );
 }
 
 void swap::accrueyield(symbol_code pair_token) {
