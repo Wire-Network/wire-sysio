@@ -414,7 +414,7 @@ Split by binary per CLAUDE.md; the seed math is deliberately isolated for cheap 
 ## 13. Validation and artifacts
 
 The contract is built only through the repository's `contracts_project` target with Wire CDT.
-`council_math_tests` and `sysio_councl_tests` run in separate contract suite binaries. The generated
+Both `council_math_tests` and `sysio_councl_tests` belong to `contracts_unit_test`. The generated
 ABI and WASM are copied back beside the source, and their hashes are compared with a clean rebuild
 before release. Ricardian contracts are sourced from `ricardian/sysio.councl.contracts.md`; every
 action parameter placeholder must match the ABI.

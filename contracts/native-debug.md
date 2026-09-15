@@ -34,14 +34,14 @@ The native-module runtime lets you debug smart contracts with standard C/C++ deb
 
 3. **Build** the test executables and native contracts:
    ```bash
-   # Build native contracts, chain tests, and split contract suite binaries
-   ninja -C cmake-build-debug unit_test contract_suite_binaries \
+   # Build all native contracts + both test executables
+   ninja -C cmake-build-debug unit_test contracts_unit_test \
      sysio.bios_native sysio.token_native sysio.msig_native \
      sysio.wrap_native sysio.system_native sysio.roa_native
    ```
    This produces:
    - `cmake-build-debug/unittests/unit_test` — chain/WASM unit tests (exports intrinsic symbols)
-   - `cmake-build-debug/contracts/tests/contract_<source>` — contract suite binaries (system, token, msig, roa, etc.)
+   - `cmake-build-debug/contracts/tests/contracts_unit_test` — contract-specific tests (system, token, msig, roa, etc.)
    - `cmake-build-debug/contracts/<name>/<name>_native.so` — native contract shared libraries
 
 ## LLDB Setup (required)
@@ -139,25 +139,24 @@ The export list should contain underscore-prefixed symbols such as `_require_aut
 
 ## Running Tests
 
-Chain tests and contract tests use separate executables; contract suites are split by owning source:
+There are two test executables, each covering different contracts:
 
 | Executable | Location |
 |------------|----------|
 | `unit_test` | `cmake-build-debug/unittests/unit_test` |
-| `contract_<source>` | `cmake-build-debug/contracts/tests/contract_<source>` |
+| `contracts_unit_test` | `cmake-build-debug/contracts/tests/contracts_unit_test` |
 
-Run an individual binary with `--native-module` to use native contracts. The
-registered CTest suites use the configured system VM:
+Run with `--native-module` to use native contracts:
 
 ```bash
 # Chain-level tests
 ./cmake-build-debug/unittests/unit_test --run_test=currency_tests -- --native-module
 
 # Contract-level tests (system, roa, etc.)
-./cmake-build-debug/contracts/tests/contract_sysio_roa_tests --run_test=sysio_roa_tests -- --native-module
+./cmake-build-debug/contracts/tests/contracts_unit_test --run_test=sysio_roa_tests -- --native-module
 
-# Run all contract suites under the configured CTest VM
-ctest --test-dir cmake-build-debug -L '^contract$' -j6 --output-on-failure
+# Run all contract tests natively
+./cmake-build-debug/contracts/tests/contracts_unit_test -- --native-module
 ```
 
 ## Debugging in CLion
@@ -165,12 +164,12 @@ ctest --test-dir cmake-build-debug -L '^contract$' -j6 --output-on-failure
 ### 1. Create a Run/Debug Configuration
 
 - **Run > Edit Configurations > + > Custom Build Application**
-- **Executable**: select `cmake-build-debug/unittests/unit_test` or the contract binary for the owning source (for example `cmake-build-debug/contracts/tests/contract_sysio_roa_tests`)
+- **Executable**: select `cmake-build-debug/unittests/unit_test` or `cmake-build-debug/contracts/tests/contracts_unit_test`
 - **Program arguments**: `--run_test=sysio_roa_tests -- --native-module`
 - **Working directory**: the project root
 
 If using CLion's built-in CMake integration, you can instead:
-- Select the `unit_test` or owning `contract_<source>` target from the CMake tool window
+- Select the `unit_test` or `contracts_unit_test` target from the CMake tool window
 - Edit its run configuration to add program arguments: `--run_test=sysio_roa_tests -- --native-module`
 
 ### 2. Set Breakpoints

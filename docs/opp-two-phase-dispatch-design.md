@@ -265,7 +265,7 @@ references describe the deleted guard and must be corrected or a future reader
 will conclude msgch is the backstop: `sysio.reserv.cpp:93-95`,
 `sysio.msgch_tests.cpp:164-170`, `sysio.reserv_tests.cpp:411-414`.
 
-Any change under `contracts/**` runs the contract CTest suites before the
+Any change under `contracts/**` runs `contracts_unit_test -- --sys-vm` before the
 commit lands, and follows the rebuild + WASM/ABI copy sequence
 (`post-contract-refactor-rebuild.md`, `test-wire-sysio-contracts-before-committing.md`).
 
@@ -307,7 +307,7 @@ Order:
 - Plugin: drive the packing loop through a seam — multi-round drain, resume from a
   nonzero cursor, stall break, round exhaustion alarming, and the terminal-shape
   packet-limit measurement.
-- Contracts: `ctest --test-dir build -L '^contract$' -j6 --output-on-failure` for the `queueout` change.
+- Contracts: `contracts_unit_test -- --sys-vm` for the `queueout` change.
 - Flow: a SOL swap-remit flow whose envelope needs ≥ 2 dispatch rounds, asserting
   the epoch does not advance until the cursor drains. Run via the canonical pair
   (`run-flow.mjs` + `flow-heartbeat-monitor.mjs`) per
