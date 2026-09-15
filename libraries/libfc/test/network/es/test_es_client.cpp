@@ -44,6 +44,12 @@ constexpr uint32_t slow_timeout_ms = 10'000;
 constexpr uint32_t dead_timeout_ms = 500;
 /// A 2xx body that is not JSON at all: the full parse behind the success probe must fail.
 constexpr std::string_view html_2xx_body = "<html>";
+/// The path probe() requests: the base URL's root.
+constexpr std::string_view probe_target = "/";
+/// Comfortably inside make_options()'s request timeout, so a probe that returns within it cannot have made a
+/// second attempt: that attempt could only end at the 2000 ms request timeout against an endpoint that
+/// answers no attempt but the first.
+constexpr auto probe_attempt_budget = 1500ms;
 
 /// Client options with fast test timings against @p url.
 fc::network::es::es_client_options make_options(const std::string& url) {
@@ -310,6 +316,139 @@ BOOST_AUTO_TEST_CASE(cancel_interrupts_the_backoff_wait) try {
    // Once canceled, the client stays canceled: a later bulk() returns immediately.
    BOOST_CHECK(client.bulk(one_document_body(client), 1).outcome == es_bulk_result::status::canceled);
    BOOST_CHECK_EQUAL(server.request_count(), 1u);
+}
+FC_LOG_AND_RETHROW()
+
+// probe() is the producer's one connectivity check at initialization: a single GET of the base URL's root,
+// carrying the same credentials and User-Agent a bulk request would.
+BOOST_AUTO_TEST_CASE(probe_succeeds_on_2xx) try {
+   fc::test::capture_http_server server;
+   auto options = make_options(server.url());
+   options.username = "u";
+   options.password = "p";
+   es_client client{options};
+   BOOST_CHECK_NO_THROW(client.probe());
+
+   BOOST_REQUIRE_EQUAL(server.request_count(), 1u);
+   const auto req = server.request(0);
+   BOOST_CHECK_EQUAL(req.method, "GET");
+   BOOST_CHECK_EQUAL(req.target, std::string{probe_target});
+   BOOST_CHECK_EQUAL(req.header("user-agent"), "wire-es-client");
+   BOOST_CHECK_EQUAL(req.header("authorization"), "Basic " + fc::base64_encode(std::string{"u:p"}));
+   BOOST_CHECK(req.body.empty());
+   // The guard the probe shares with a bulk request is released again: delivery still works afterwards.
+   BOOST_CHECK(client.bulk(one_document_body(client), 1).outcome == es_bulk_result::status::indexed);
+   BOOST_CHECK_EQUAL(server.request_count(), 2u);
+}
+FC_LOG_AND_RETHROW()
+
+// An endpoint that answers something other than a 2xx is a configuration failure the producer must not start
+// past -- and it is not retried, however many retries the delivery options allow.
+BOOST_AUTO_TEST_CASE(probe_throws_on_non_2xx) try {
+   fc::test::capture_http_server server{{reply(503)}};
+   es_client client{make_options(server.url())};
+   BOOST_CHECK_THROW(client.probe(), fc::exception);
+   BOOST_CHECK_EQUAL(server.request_count(), 1u);
+}
+FC_LOG_AND_RETHROW()
+
+// The exception to the rule above: the probed root is the cluster-info path, which OpenSearch fine-grained
+// access control gates behind the cluster `monitor/main` permission. A credential scoped to writing _bulk is
+// answered with a 403 there while delivery works, so the endpoint answering at all -- and accepting the
+// credential -- is what the check is after.
+BOOST_AUTO_TEST_CASE(probe_accepts_403_as_reachable) try {
+   fc::test::capture_http_server server{{reply(403)}};
+   es_client client{make_options(server.url())};
+   BOOST_CHECK_NO_THROW(client.probe());
+   BOOST_CHECK_EQUAL(server.request_count(), 1u);
+}
+FC_LOG_AND_RETHROW()
+
+// A 401 is the credential itself being rejected, not a missing cluster-info permission: delivery would be
+// rejected the same way, so startup must not continue past it.
+BOOST_AUTO_TEST_CASE(probe_throws_on_401) try {
+   fc::test::capture_http_server server{{reply(401)}};
+   es_client client{make_options(server.url())};
+   BOOST_CHECK_THROW(client.probe(), fc::exception);
+   BOOST_CHECK_EQUAL(server.request_count(), 1u);
+}
+FC_LOG_AND_RETHROW()
+
+// The fixture owns its port until the client connects, so no other process can race the test onto a working
+// endpoint; it answers that one connection with a reset and leaves any later one unanswered in its backlog.
+BOOST_AUTO_TEST_CASE(probe_throws_when_unreachable) try {
+   fc::test::connection_closing_http_server closing_server;
+   es_client client{make_options(closing_server.url())};
+   const auto started = std::chrono::steady_clock::now();
+   BOOST_CHECK_THROW(client.probe(), fc::exception);
+   // A second attempt could only end at the request timeout, so returning well inside it is the single attempt.
+   BOOST_CHECK(std::chrono::steady_clock::now() - started < probe_attempt_budget);
+}
+FC_LOG_AND_RETHROW()
+
+// cancel() is permanent, so a probe after it could never send a request: a connectivity check that cannot
+// check is a programming error rather than an outcome to report.
+BOOST_AUTO_TEST_CASE(probe_after_cancel_is_rejected) try {
+   fc::test::capture_http_server server;
+   es_client client{make_options(server.url())};
+   client.cancel();
+   BOOST_CHECK_THROW(client.probe(), fc::assert_exception);
+   BOOST_CHECK_EQUAL(server.request_count(), 0u);
+}
+FC_LOG_AND_RETHROW()
+
+// A probe cancel() aborts never judged the endpoint, so it must report the cancellation rather than call the
+// endpoint unreachable.
+BOOST_AUTO_TEST_CASE(cancel_during_probe_reports_canceled) try {
+   fc::test::capture_http_server server{{delayed_ok(overlap_delay)}};
+   auto options = make_options(server.url());
+   options.request_timeout_ms = slow_timeout_ms; // the held request must outlive overlap_delay
+   es_client client{options};
+
+   std::string message;
+   std::thread prober{[&] {
+      try {
+         client.probe();
+      } catch (const fc::exception& e) {
+         message = e.top_message();
+      } catch (const std::exception& e) {
+         message = e.what(); // a failure to run the coroutine surfaces as a std::exception
+      } catch (...) {
+         message = "<unknown exception>";
+      }
+   }};
+   // The recorded request is the synchronization point: the probe is past the guard and awaiting a response
+   // the stub is still holding back.
+   BOOST_REQUIRE(server.wait_for_requests(1, delivery_wait));
+   client.cancel();
+   prober.join();
+   BOOST_CHECK(message.find("was canceled") != std::string::npos);
+   BOOST_CHECK(message.find("not reachable") == std::string::npos);
+}
+FC_LOG_AND_RETHROW()
+
+// The single cancellation slot admits one request at a time whichever entry point asks for it: a probe while a
+// bulk request is in flight is an FC_ASSERT, and the request in flight is untouched by it.
+BOOST_AUTO_TEST_CASE(probe_overlapping_a_bulk_is_rejected) try {
+   fc::test::capture_http_server server{{delayed_ok(overlap_delay)}};
+   auto options = make_options(server.url());
+   options.request_timeout_ms = slow_timeout_ms; // the held request must outlive overlap_delay
+   es_client client{options};
+
+   auto first = boost::asio::co_spawn(client.get_executor(), client.async_bulk(one_document_body(client), 1),
+                                      boost::asio::use_future);
+   // The recorded request is the synchronization point: the first coroutine is past the guard and awaiting a
+   // response the stub is still holding back.
+   BOOST_REQUIRE(server.wait_for_requests(1, delivery_wait));
+   BOOST_CHECK_THROW(client.probe(), fc::assert_exception);
+
+   const auto result = first.get();
+   BOOST_CHECK(result.outcome == es_bulk_result::status::indexed);
+   BOOST_CHECK_EQUAL(result.attempts, 1u);
+   BOOST_CHECK_EQUAL(result.indexed_docs, 1u);
+   // The rejected probe left the flag to its owner, which cleared it on completion: the next request is admitted.
+   BOOST_CHECK(client.bulk(one_document_body(client), 1).outcome == es_bulk_result::status::indexed);
+   BOOST_CHECK_EQUAL(server.request_count(), 2u);
 }
 FC_LOG_AND_RETHROW()
 

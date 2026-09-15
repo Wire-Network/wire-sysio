@@ -71,7 +71,7 @@ status-monitor-max-items-per-task = 100
 status-monitor-max-pending-documents = 256
 status-monitor-connect-timeout-ms = 5000
 status-monitor-request-timeout-ms = 10000
-status-monitor-max-retries = 2
+status-monitor-max-retries = 3
 status-monitor-retry-backoff-ms = 250
 ```
 
@@ -102,7 +102,7 @@ placeholder names the plugin supplies.
 | `status-monitor-max-pending-documents` | 256 (1 to 65536) | Rendered documents allowed to wait behind the active request; the newest is dropped when full. |
 | `status-monitor-connect-timeout-ms` | 5000 | Connect timeout per request. |
 | `status-monitor-request-timeout-ms` | 10000 | Header, read, idle, and total timeout per request. |
-| `status-monitor-max-retries` | 2 (0 to 10) | Additional attempts after the first for a 5xx, 429, timeout, or connection failure. |
+| `status-monitor-max-retries` | 3 (0 to 10) | Additional attempts after the first for a 5xx, 429, timeout, or connection failure, so four attempts per batch at the default. |
 | `status-monitor-retry-backoff-ms` | 250 (greater than 0) | Initial backoff between attempts; doubles per attempt, capped at 2000 ms. |
 
 An invalid active configuration (bad URL scheme, empty index, missing or unparseable template, a template
@@ -176,13 +176,23 @@ uses `${epoch_millis}`, or keep `${timestamp}` for an ISO 8601 string.
 
 ## Delivery semantics
 
+- At startup the plugin checks the endpoint once: a single `GET` of the target URL's root, carrying the same
+  credentials and timeouts a bulk request would, and no retry. A 2xx passes, and so does a `403`: the root is
+  the cluster-info path, which OpenSearch fine-grained access control gates behind the cluster `monitor/main`
+  permission, so a least-privilege credential that may only write to `_bulk` is answered with a `403` there
+  while delivery works -- the endpoint answered and accepted the credential, which is what the check asks.
+  Everything else -- a `401` (the credential itself rejected), a `404`, another status, a connection failure,
+  or a timeout -- fails `nodeop` startup with the probed URL and the reason. An endpoint that cannot be
+  reached would otherwise drop every document for as long as the node runs.
 - Each document is one NDJSON line, paired with an `{"index":{"_index":"<index>"}}` action line; a request
   body holds up to `max-items-per-task` pairs and stays under the 1 MiB batch cap. A single document larger
   than 256 KiB is dropped and counted rather than sent.
 - A 5xx, a 429, a timeout, or a connection failure is retried up to `max-retries` more times with doubling
-  backoff (capped at 2 s). Any other 4xx is terminal for that batch. A 2xx is never retried: a partial bulk
-  response (`"errors":true`) credits the acknowledged documents and counts the rejected ones, and a 2xx that
-  is not a bulk response is counted as a failed batch.
+  backoff (capped at 2 s), each attempt bounded by `request-timeout-ms`. Any other 4xx is terminal for that
+  batch. A 2xx is never retried: a partial bulk response (`"errors":true`) credits the acknowledged documents
+  and counts the rejected ones, and a 2xx that is not a bulk response is counted as a failed batch.
+- Once the batch is given up on its documents are dropped -- nothing is re-queued -- and the drop is
+  logged (see Diagnostics).
 - A batch's documents are consumed as they are sent; nothing is re-rendered.
 - Basic auth is sent as an `Authorization: Basic` header when configured. TLS uses the system trust store;
   there is no per-plugin CA file option.
@@ -200,16 +210,22 @@ and counted. Every drop and failure is visible in the counters below.
 All diagnostics go through the `status_monitor` logger (configure it like any other logger in
 `logging.json`; `SIGHUP` re-binds it, but never re-reads the plugin options). Nothing is logged per block.
 
-- Startup: one line naming the endpoint (credentials stripped), the index, the template's tokens, and the
-  batching limits; or `no --status-monitor-target-url provided, disabled`.
+- Startup: one line reporting the endpoint (credentials stripped) reachable and naming the index, the
+  template's tokens, and the batching limits; or `no --status-monitor-target-url provided, disabled`. An
+  unreachable endpoint logs one error naming the probed URL and the reason, and fails startup. A `403` from
+  the root is not a failure (see Delivery semantics): startup continues and logs the reachable line.
 - Liveness: one warning when documents pause because the irreversible block is behind wall-clock time, at
   most once a minute while paused, and one line when they resume; one error, at most once a minute, while
   the get_info snapshot does not describe the signaled block, and one line when it does again.
-- Delivery: when a bulk request fails or something is dropped, one warning carrying every counter and the
-  last failure detail (for example `HTTP 503 from https://opensearch.example.com/_bulk`); when delivery
-  succeeds again, one recovery line. The failure line and the recovery line share one rate limit of at most
-  one line per minute between them, so an endpoint that alternates between failing and succeeding cannot
-  log a line per block.
+- Delivery, per failed batch: one warning for every bulk request that did not fully index, naming the
+  attempts it took, the failure detail (for example `HTTP 503 from https://opensearch.example.com`),
+  and what became of its documents -- `N document(s) dropped` once the batch is given up on, `N of M
+  document(s) rejected` for a partial bulk response, `N document(s) canceled` at shutdown. This line fires
+  only on failure, so the per-block data path stays log-free.
+- Delivery, summarized: when a bulk request fails or something is dropped, one warning carrying every counter
+  and the last failure detail; when delivery succeeds again, one recovery line. These two share one rate
+  limit of at most one line per minute between them, so an endpoint that alternates between failing and
+  succeeding cannot log a line per block.
 - Shutdown: one line with the final `documents_indexed`, `documents_failed`, `batches_indexed`,
   `batches_failed`, `snapshots_dropped_queue_full`, and `documents_dropped_queue_full` counters.
 

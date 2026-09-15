@@ -3,6 +3,7 @@
 #include <fc/crypto/base64.hpp>
 #include <fc/io/json.hpp>
 #include <fc/log/es_sink.hpp>
+#include <fc/log/es_sink_config.hpp>
 #include <fc/log/json_formatter.hpp>
 #include <fc/log/json_layout.hpp>
 #include <fc/log/logger.hpp>

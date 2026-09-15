@@ -3,7 +3,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <cstdint>
-#include <fc/log/logger_config.hpp>
+#include <fc/log/es_sink_config.hpp>
 #include <fc/network/es/es_client.hpp>
 #include <fc/parallel/worker_task_queue.hpp>
 #include <fc/spdlog.hpp>

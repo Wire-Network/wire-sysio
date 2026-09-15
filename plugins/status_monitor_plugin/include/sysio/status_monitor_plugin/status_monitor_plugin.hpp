@@ -19,10 +19,15 @@ namespace sysio {
 /// that ahead of the chain (the pause is warned about once a minute and the resumption logged once). The
 /// block-application thread only copies the snapshot and queues it; a render worker builds the document and
 /// a delivery worker batches up to --status-monitor-max-items-per-task documents per bulk request, which the
-/// es client sends from its own io thread (three threads in all). Delivery problems are counted on the workers
-/// and reported from the application thread, where the failure line and the recovery line share one rate limit
+/// es client sends from its own io thread (three threads in all). The endpoint is checked once at startup
+/// (es_client::probe(), one request, no retry): an endpoint that cannot be reached fails startup rather than
+/// dropping every document for the life of the node. Afterwards every bulk request that does not fully index
+/// is logged on the delivery worker, one warning per failed batch naming the attempts, the failure detail, and
+/// what became of the batch's documents -- the only per-batch line, and never emitted for an acknowledged
+/// batch, so the per-block data path stays log-free. Delivery problems are also counted on the workers and
+/// summarized from the application thread, where the failure line and the recovery line share one rate limit
 /// of at most one line a minute between them -- so an endpoint alternating between failed and acknowledged
-/// batches cannot log a line per block. Steady-state rate: one document per irreversible block, about
+/// batches cannot log a summary per block. Steady-state rate: one document per irreversible block, about
 /// two per second at the 500 ms block interval.
 ///
 /// config.ini excerpt:
@@ -45,8 +50,9 @@ public:
    /// chain::plugin_config_exception -- and binds the diagnostic logger. An absent target URL leaves the
    /// plugin disabled.
    void plugin_initialize(const variables_map& options);
-   /// When enabled: acquires chain_plugin's read-only API, starts the es client and the two workers, and
-   /// connects the irreversible_block slot.
+   /// When enabled: acquires chain_plugin's read-only API, starts the es client, checks the endpoint once
+   /// (an unreachable one is logged and rethrown, failing startup), then starts the two workers and connects
+   /// the irreversible_block slot.
    void plugin_startup();
    /// Disconnects the slot, cancels an in-flight request, stops the workers, and reports the final counters.
    void plugin_shutdown();

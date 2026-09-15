@@ -203,6 +203,31 @@ struct recording_sender {
    }
 };
 
+/// Records every call the pipeline's failure reporter makes, as the plugin's logging reporter would be called.
+struct recording_failure_reporter {
+   /// One reported batch: the client's result and the documents that batch carried.
+   struct call {
+      fc::network::es::es_bulk_result result;
+      uint32_t doc_count = 0;
+   };
+
+   std::mutex mtx;
+   std::vector<call> calls; ///< guarded by mtx
+
+   /// A copy of what has been recorded so far.
+   std::vector<call> recorded() {
+      std::lock_guard<std::mutex> lk(mtx);
+      return calls;
+   }
+
+   status_monitor::pipeline::failure_reporter as_reporter() {
+      return [this](const fc::network::es::es_bulk_result& result, uint32_t doc_count) {
+         std::lock_guard<std::mutex> lk(mtx);
+         calls.push_back({result, doc_count});
+      };
+   }
+};
+
 /// Poll @p pipeline until @p done(stats) or drain_wait elapses; returns the final stats.
 template <typename Predicate>
 status_monitor::pipeline_stats wait_for(const status_monitor::pipeline& pipeline, Predicate done) {
@@ -557,6 +582,46 @@ BOOST_AUTO_TEST_CASE(pipeline_counts_failures_and_keeps_the_last_detail) try {
    BOOST_CHECK(done.batches_failed >= 1u);
    BOOST_CHECK_EQUAL(pipeline.last_failure(), std::string{unavailable_detail});
    pipeline.shutdown(); // idempotent
+}
+FC_LOG_AND_RETHROW()
+
+// The reporter is how a failed batch reaches the log: the plugin's is a warning line, so it must fire exactly
+// once per failed batch, carrying that batch's own documents and detail -- and never for an acknowledged one.
+BOOST_AUTO_TEST_CASE(the_failure_reporter_sees_every_failed_batch_and_no_indexed_batch) try {
+   recording_failure_reporter reporter; // declared before the pipeline: it must outlive the destructor's join
+   recording_sender sender;
+   sender.fail = true;
+   {
+      status_monitor::pipeline pipeline{pipeline_config(small_batch), std::string{action_line}, sender.as_sender(),
+                                        reporter.as_reporter()};
+      for (uint64_t i = 0; i < failing_count; ++i)
+         BOOST_REQUIRE(pipeline.submit(sample_snapshot(static_cast<uint32_t>(i))));
+      wait_for(pipeline, [](const auto& s) { return s.documents_failed == failing_count; });
+      pipeline.shutdown(); // joins both workers: every report the run will make has been made
+      const auto done = pipeline.stats();
+      const auto reported = reporter.recorded();
+      BOOST_CHECK_EQUAL(reported.size(), done.batches_failed);
+      uint64_t reported_documents = 0;
+      for (const auto& call : reported) {
+         BOOST_CHECK(call.result.outcome == fc::network::es::es_bulk_result::status::unavailable);
+         BOOST_CHECK_EQUAL(call.result.detail, std::string{unavailable_detail});
+         BOOST_CHECK(call.doc_count >= 1u);
+         reported_documents += call.doc_count;
+      }
+      // Every document the failing pipeline swallowed was named in a report.
+      BOOST_CHECK_EQUAL(reported_documents, failing_count);
+   }
+
+   recording_failure_reporter quiet_reporter;
+   recording_sender indexing_sender;
+   status_monitor::pipeline indexing_pipeline{pipeline_config(small_batch), std::string{action_line},
+                                              indexing_sender.as_sender(), quiet_reporter.as_reporter()};
+   for (uint64_t i = 0; i < failing_count; ++i)
+      BOOST_REQUIRE(indexing_pipeline.submit(sample_snapshot(static_cast<uint32_t>(i))));
+   wait_for(indexing_pipeline, [](const auto& s) { return s.documents_indexed == failing_count; });
+   indexing_pipeline.shutdown();
+   BOOST_CHECK_EQUAL(indexing_pipeline.stats().documents_indexed, failing_count);
+   BOOST_CHECK(quiet_reporter.recorded().empty());
 }
 FC_LOG_AND_RETHROW()
 

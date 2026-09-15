@@ -1,12 +1,15 @@
 #include <boost/signals2/connection.hpp>
 #include <cassert>
+#include <cstdint>
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/network/es/es_client.hpp>
+#include <fmt/format.h>
 #include <fmt/ranges.h> // fmt::join
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <sysio/chain/controller.hpp>
 #include <sysio/status_monitor_plugin/status_monitor.hpp>
 #include <sysio/status_monitor_plugin/status_monitor_plugin.hpp>
@@ -30,6 +33,28 @@ constexpr fc::microseconds pause_report_interval = fc::seconds(60);
 /// the next line of either kind waits this long, so an endpoint alternating between failed and acknowledged
 /// batches cannot log a line per irreversible block.
 constexpr fc::microseconds failure_report_interval = fc::seconds(60);
+/// The line logged for every bulk request that did not fully index: the attempts the client spent, its
+/// endpoint-sanitized detail, and what became of the batch's documents (see delivery_outcome_clause).
+constexpr std::string_view failed_batch_format = "bulk request failed after {} attempt(s): {} -- {}";
+
+/// What became of one failed batch's documents: a partial batch had only its rejected documents refused (the
+/// rest did index), a canceled batch was abandoned at shutdown, and every other outcome loses the whole batch
+/// once the client's retries are exhausted.
+std::string delivery_outcome_clause(const fc::network::es::es_bulk_result& result, uint32_t doc_count) {
+   using status = fc::network::es::es_bulk_result::status;
+   switch (result.outcome) {
+   case status::partial:
+      return fmt::format("{} of {} document(s) rejected", result.failed_docs, doc_count);
+   case status::canceled:
+      return fmt::format("{} document(s) canceled", doc_count);
+   // `indexed` never reaches the reporter; `rejected` and `unavailable` lose the batch outright.
+   case status::indexed:
+   case status::rejected:
+   case status::unavailable:
+      break;
+   }
+   return fmt::format("{} document(s) dropped", doc_count);
+}
 } // anonymous namespace
 
 /// Every member is touched only on the application thread: plugin_initialize/startup/shutdown run there,
@@ -43,7 +68,9 @@ constexpr fc::microseconds failure_report_interval = fc::seconds(60);
 /// connection, then pipeline, then client, then the read-only handle -- which is the only safe order, since
 /// nothing can be queued once the connection is gone, the workers are joined before the client whose bulk()
 /// they call, and the client's io thread stops after both. plugin_shutdown() only stops them; it destroys
-/// nothing.
+/// nothing. `log` is declared FIRST for the same reason from the other end: it outlives the pipeline, whose
+/// delivery worker logs through it (via report_failed_batch(), the failure reporter) right up until the join
+/// inside ~pipeline() completes.
 struct status_monitor_plugin::impl {
    fc::logger log;                            ///< the `status_monitor` logger
    std::optional<status_monitor::config> cfg; ///< empty: disabled
@@ -71,6 +98,13 @@ struct status_monitor_plugin::impl {
    void on_irreversible_block(const chain::block_signal_params& params);
    /** Compare the pipeline's counters with the last comparison and log a failing streak or a recovery. */
    void report_progress(fc::time_point now);
+   /**
+    * Log one line for a bulk request that did not fully index, so no batch is lost silently. Unlike every
+    * other member function this runs on the pipeline's delivery worker and touches only the logger, which
+    * handle_sighup() re-binds on the application thread -- the same arrangement every plugin that logs off
+    * the application thread uses. It only logs, so it does not throw, as pipeline::failure_reporter requires.
+    */
+   void report_failed_batch(const fc::network::es::es_bulk_result& result, uint32_t doc_count);
 };
 
 status_monitor_plugin::impl::~impl() {
@@ -174,6 +208,13 @@ void status_monitor_plugin::impl::report_progress(fc::time_point now) {
    last_stats = current;
 }
 
+void status_monitor_plugin::impl::report_failed_batch(const fc::network::es::es_bulk_result& result,
+                                                      uint32_t doc_count) {
+   // The one line this plugin logs per batch, and only for a batch that failed: the per-block data path stays
+   // log-free. The rate-limited summary in report_progress() still carries the counters and the last detail.
+   fc_wlog(log, failed_batch_format, result.attempts, result.detail, delivery_outcome_clause(result, doc_count));
+}
+
 status_monitor_plugin::status_monitor_plugin()
    : _impl(std::make_unique<impl>()) {}
 
@@ -196,21 +237,39 @@ void status_monitor_plugin::plugin_startup() {
       fc_ilog(_impl->log, "no --{} provided, disabled", status_monitor::option::target_url);
       return;
    }
-   auto& chain_plug = app().get_plugin<chain_plugin>();
-   _impl->read_only_api.emplace(chain_plug.get_read_only_api(read_only_api_response_budget));
-   _impl->client = std::make_unique<fc::network::es::es_client>(_impl->cfg->delivery);
-   _impl->pipeline = std::make_unique<status_monitor::pipeline>(
-      *_impl->cfg, _impl->client->action_line(), [client = _impl->client.get()](std::string body, uint32_t doc_count) {
-         return client->bulk(std::move(body), doc_count);
-      });
-   _impl->irreversible_block_connection.emplace(chain_plug.chain().irreversible_block().connect(
-      [impl = _impl.get()](const chain::block_signal_params& params) { impl->on_irreversible_block(params); }));
-   fc_ilog(_impl->log,
-           "writing one get_info document per irreversible block to {} index '{}' "
-           "(template tokens: {}; max_items_per_task={}, max_pending_documents={})",
-           _impl->client->endpoint(), _impl->cfg->delivery.index,
-           fmt::join(_impl->cfg->document_template.tokens(), status_monitor::token_list_separator),
-           _impl->cfg->max_items_per_task, _impl->cfg->max_pending_documents);
+   try {
+      auto& chain_plug = app().get_plugin<chain_plugin>();
+      _impl->read_only_api.emplace(chain_plug.get_read_only_api(read_only_api_response_budget));
+      _impl->client = std::make_unique<fc::network::es::es_client>(_impl->cfg->delivery);
+      // Before anything is started: an endpoint that cannot be reached now would silently drop every document,
+      // so it fails startup instead. One attempt, no retry -- the retry budget is for a running node.
+      try {
+         _impl->client->probe();
+      } catch (const fc::exception& e) {
+         // The client's own message already names the probed endpoint and why it is not reachable; wrapping it
+         // in a second sentence of the same shape only says it twice. The outer FC_LOG_AND_RETHROW still logs
+         // the exception's detail.
+         fc_elog(_impl->log, "{}", e.top_message());
+         throw;
+      }
+      _impl->pipeline = std::make_unique<status_monitor::pipeline>(
+         *_impl->cfg, _impl->client->action_line(),
+         [client = _impl->client.get()](std::string body, uint32_t doc_count) {
+            return client->bulk(std::move(body), doc_count);
+         },
+         [impl = _impl.get()](const fc::network::es::es_bulk_result& result, uint32_t doc_count) {
+            impl->report_failed_batch(result, doc_count);
+         });
+      _impl->irreversible_block_connection.emplace(chain_plug.chain().irreversible_block().connect(
+         [impl = _impl.get()](const chain::block_signal_params& params) { impl->on_irreversible_block(params); }));
+      fc_ilog(_impl->log,
+              "endpoint {} reachable; writing one get_info document per irreversible block to index '{}' "
+              "(template tokens: {}; max_items_per_task={}, max_pending_documents={})",
+              _impl->client->endpoint(), _impl->cfg->delivery.index,
+              fmt::join(_impl->cfg->document_template.tokens(), status_monitor::token_list_separator),
+              _impl->cfg->max_items_per_task, _impl->cfg->max_pending_documents);
+   }
+   FC_LOG_AND_RETHROW()
 }
 
 void status_monitor_plugin::plugin_shutdown() {

@@ -215,12 +215,13 @@ bool snapshot_is_for(const chain_apis::get_info_db::get_info_results& info, cons
    return info.last_irreversible_block_id == lib_id;
 }
 
-pipeline::pipeline(const config& cfg, std::string action_line, sender send)
+pipeline::pipeline(const config& cfg, std::string action_line, sender send, failure_reporter report_failure)
    : _document_template(cfg.document_template)
    , _action_line(std::move(action_line))
    , _body_byte_cap(cfg.delivery.max_batch_bytes)
    , _doc_byte_cap(cfg.delivery.max_doc_bytes)
-   , _send(std::move(send)) {
+   , _send(std::move(send))
+   , _report_failure(std::move(report_failure)) {
    _delivery = fc::parallel::batch_task_queue<std::string>::create(
       {.max_items_per_task = cfg.max_items_per_task, .max_pending_items = cfg.max_pending_documents},
       [this](std::span<std::string> documents) { delivery_stage(documents); });
@@ -307,12 +308,19 @@ void pipeline::delivery_stage(std::span<std::string> documents) {
       for (auto& body : assemble_bulk_bodies(documents, _action_line, _body_byte_cap)) {
          const uint32_t doc_count = body.doc_count;
          const auto result = _send(std::move(body.body), doc_count);
-         accounted += doc_count;
          const bool indexed = result.outcome == fc::network::es::es_bulk_result::status::indexed;
          // Published before the counters that advertise it, so a reader that observes documents_failed or
          // batches_failed advance and then calls last_failure() never sees a stale or empty detail.
-         if (!indexed)
+         if (!indexed) {
             note_failure(result.detail);
+            // One report per failed batch, so nothing a batch carried is dropped silently. Neither the
+            // reporter nor note_failure throws; if either ever did, this batch is still unaccounted for, so
+            // the catch below counts its documents as the loss they are.
+            if (_report_failure)
+               _report_failure(result, doc_count);
+         }
+         // Counted as handled only past every step that could throw before the counters below are reached.
+         accounted += doc_count;
          _counters.documents_indexed.fetch_add(result.indexed_docs, std::memory_order_relaxed);
          _counters.documents_failed.fetch_add(result.failed_docs, std::memory_order_relaxed);
          if (indexed) {
