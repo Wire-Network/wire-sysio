@@ -155,7 +155,7 @@ try:
         cluster.getNode(nodeId).waitForBlock(blockNum)
 
     # return the peer names (defproducera) of the connected peers in the v1/net/connections JSON
-    def connectedPeers(nodeId, connectionsJson):
+    def connectedPeers(nodeId, connectionsJson, bpOnly=True):
         peers = []
         for conn in connectionsJson["payload"]:
             if conn["is_socket_open"] is False:
@@ -168,7 +168,7 @@ try:
                 if not peer_addr:
                     continue
             if peer_names[peer_addr] != "bios" and peer_addr != getHostName(nodeId):
-                if conn["is_bp_peer"]:
+                if not bpOnly or conn["is_bp_peer"]:
                     peers.append(peer_names[peer_addr])
         return peers
 
@@ -239,13 +239,13 @@ try:
         "Timed out waiting for new schedule gossip connections"
 
     Print("Verify manual connection still connected and stale gossip peer disconnected")
-    # After schedule change, defproducerh may still have an incoming gossip connection to
-    # node_19 from the old schedule. Multiple connection-cleanup-period cycles (5s each) may
-    # be needed before the stale gossip peer is fully pruned.
     def checkNode19Connections():
         connections = cluster.nodes[19].processUrllibRequest("net", "connections")
         if Utils.Debug: Utils.Print(f"v1/net/connections: {connections}")
-        found = connectedPeers(19, connections)
+        # Not filtered on is_bp_peer: defproducere is out of the schedule, so getpeerkeys no
+        # longer returns its peer key and a gossip message can no longer mark the connection.
+        # The manual connection is still held open as a supplied peer.
+        found = connectedPeers(19, connections, bpOnly=False)
         Print(f"Found connections of Node_19: {found}")
         return "defproducere" in found and "defproducerh" not in found
     assert Utils.waitForBool(checkNode19Connections, timeout=60), \

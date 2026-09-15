@@ -19,8 +19,8 @@
 #include <sysio/batch_operator_plugin/depot_ops.hpp>
 #include <sysio/batch_operator_plugin/outpost_epoch_lookup.hpp>
 #include <sysio/batch_operator_plugin/outpost_opp_job.hpp>
-#include <sysio/depot/chains_registry.hpp>
-#include <sysio/depot/opreg_status.hpp>
+#include <sysio/opp/depot/chains_registry.hpp>
+#include <sysio/opp/depot/opreg_status.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/plugin_interface.hpp>
 #include <sysio/chain/transaction.hpp>
@@ -85,7 +85,7 @@ namespace {
          constexpr auto status = "status";
       }
       // `OperatorStatus` enum spellings + the `is_active` decision live
-      // in `sysio/depot/opreg_status.hpp` so underwriter_plugin can pull
+      // in `sysio/opp/depot/opreg_status.hpp` so underwriter_plugin can pull
       // the same source of truth without a cross-plugin dependency.
    }
 
@@ -119,7 +119,7 @@ namespace {
    /// `sysio.chains` contract. The `outposts` table was replaced by the
    /// `chains` KV table, keyed by slug_name (uint64 packed). Field spellings
    /// are shared with underwriter_plugin, which reads the same rows.
-   namespace chains = sysio::depot::chains;
+   namespace chains = sysio::opp::depot::chains;
 }
 
 // ---------------------------------------------------------------------------
@@ -478,7 +478,7 @@ struct batch_operator_plugin::impl {
       auto status = obj[opreg::field::status].as_string();
 
       bool was_active = is_active;
-      is_active = sysio::depot::opreg_status::compute_is_active(status, was_active);
+      is_active = sysio::opp::depot::opreg_status::compute_is_active(status, was_active);
 
       if (was_active && !is_active) {
          elog("batch_operator: own status flipped to {} — halting relay loop", status);
