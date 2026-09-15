@@ -509,7 +509,7 @@ bool is_response_body_limit_error(const fc::exception& e) {
 
 BOOST_AUTO_TEST_SUITE(json_rpc_client_tests)
 
-/// Legacy JSON-RPC clients retain startup DNS until a connection failure invalidates it.
+/// JSON-RPC clients retain startup DNS until a connection failure invalidates it.
 BOOST_AUTO_TEST_CASE(default_endpoint_refresh_policy_is_preserved) {
    const fc::network::json_rpc::client_options options;
 

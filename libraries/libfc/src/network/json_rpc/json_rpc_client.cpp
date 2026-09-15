@@ -55,7 +55,7 @@ fc::http::request_options request_options_for(fc::http::request_options options,
    return options;
 }
 
-/** Return transport options adjusted for the legacy endpoint-refresh contract. */
+/** Return transport options adjusted for the caller's endpoint-refresh contract. */
 client_options normalize_options(endpoint_refresh_policy refresh_policy, client_options options) {
    options.transport.refresh_dns_on_connection_failure =
       refresh_policy == endpoint_refresh_policy::on_connection_failure;

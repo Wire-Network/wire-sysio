@@ -404,7 +404,7 @@ struct http_file_download_options {
 };
 
 /**
- * Backwards-compatible JSON POST facade over the shared bounded authenticated transport.
+ * JSON POST facade over the shared bounded transport.
  *
  * New coroutine call sites should use `fc::http::client` directly. This facade remains for
  * KIOD and snapshot call sites while preserving their existing serialization API.

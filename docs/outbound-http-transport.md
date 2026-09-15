@@ -37,7 +37,7 @@ Ethereum and Solana reads use a narrowly bounded stale-connection policy: a read
 and only when its first attempt used a cached HTTP/1.1 connection that proved stale. Healthy connections are reused.
 The shared request policy expresses this through a retry-filter hook. The hook can only reject a failure that the
 transport already classified as retryable; it cannot broaden replay eligibility or bypass the explicit idempotence
-requirement. The legacy snapshot retry flag remains source-compatible and maps internally to the same hook.
+requirement. The snapshot retry flag maps internally to the same hook.
 
 Side-effecting calls such as `eth_sendTransaction`, `eth_sendRawTransaction`, Solana `sendTransaction`, and
 `requestAirdrop` are always single-attempt. The generic JSON-RPC `call` and raw HTTP APIs also

@@ -826,7 +826,7 @@ private:
 } // namespace
 namespace {
 
-/** One plain, authenticated TLS, or Unix-domain HTTP/1.1 connection. */
+/** One plain, TLS, or Unix-domain HTTP/1.1 connection. */
 struct connection_state {
    using tcp_stream = beast::tcp_stream;
    using tls_stream = asio::ssl::stream<tcp_stream>;
@@ -1638,7 +1638,7 @@ public:
       }
    }
 
-   /** Connect one new plain, authenticated TLS, or Unix-domain connection. */
+   /** Connect one new plain, TLS, or Unix-domain connection. */
    asio::awaitable<std::shared_ptr<connection_state>>
    create_connection(const target_info& target, const request_options& policy,
                      const std::optional<time_point>& total_deadline, const std::shared_ptr<request_control>& control) {

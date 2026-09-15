@@ -28,7 +28,7 @@ thread_local const void* active_transport = nullptr;
 } // namespace
 
 /**
- * Synchronous event-loop ownership retained only for legacy call sites.
+ * Synchronous event-loop ownership for callers that cannot await.
  *
  * All resolver, connection, parser, retry, and download behavior lives in the asynchronous
  * client. This adapter owns only blocking execution and predicate-to-slot cancellation.
@@ -127,7 +127,7 @@ public:
       const void* _previous;
    };
 
-   /** Buffer one asynchronous request while polling a legacy cancellation predicate. */
+   /** Buffer one asynchronous request while polling the caller's cancellation predicate. */
    response perform(const request& req, const request_options& options) {
       auto async_options = options;
       use_guard guard(*this, async_options);
@@ -157,7 +157,7 @@ public:
    }
 
 private:
-   /** Arm the only legacy-specific behavior: predicate-to-slot cancellation. */
+   /** Arm the only behavior this adapter adds: predicate-to-slot cancellation. */
    void arm_cancel_poll(const std::function<bool()>& cancel_check, asio::cancellation_signal& cancellation,
                         bool& complete) {
       if (!cancel_check)
@@ -252,11 +252,11 @@ void transport::perform_to_file(const request& req, const request_options& optio
 
 namespace {
 
-constexpr uint64_t legacy_max_request_body_bytes = 1ULL * 1024ULL * 1024ULL;
-constexpr uint64_t legacy_max_response_body_bytes = 1ULL * 1024ULL * 1024ULL;
+constexpr uint64_t facade_max_request_body_bytes = 1ULL * 1024ULL * 1024ULL;
+constexpr uint64_t facade_max_response_body_bytes = 1ULL * 1024ULL * 1024ULL;
 
-/** Return phase timeouts honoring the legacy absolute-deadline argument. */
-http::timeout_options legacy_timeouts(time_point deadline) {
+/** Return phase timeouts honoring the facade's absolute-deadline argument. */
+http::timeout_options facade_timeouts(time_point deadline) {
    http::timeout_options result;
    if (deadline < time_point::maximum()) {
       const auto now = time_point::now();
@@ -286,7 +286,7 @@ void http_client::post_to_file(const url& dest, const variant& payload, const st
       .user_agent = "wire-libfc-http",
    };
    http::request_options policy{
-      .max_request_body_bytes = legacy_max_request_body_bytes,
+      .max_request_body_bytes = facade_max_request_body_bytes,
       .max_response_body_bytes = options.max_response_body_bytes,
       .timeouts = options.timeouts,
       .retry =
@@ -314,7 +314,7 @@ void http_client::set_space_available_provider_for_testing(
 }
 
 variant http_client::post_sync(const url& dest, const variant& payload, const time_point& deadline) {
-   const auto timeouts = legacy_timeouts(deadline);
+   const auto timeouts = facade_timeouts(deadline);
    const auto serialization_deadline =
       deadline < time_point::maximum() ? deadline : time_point::now().safe_add(*timeouts.total);
    http::request req{
@@ -325,8 +325,8 @@ variant http_client::post_sync(const url& dest, const variant& payload, const ti
       .user_agent = "wire-libfc-http",
    };
    http::request_options policy{
-      .max_request_body_bytes = legacy_max_request_body_bytes,
-      .max_response_body_bytes = legacy_max_response_body_bytes,
+      .max_request_body_bytes = facade_max_request_body_bytes,
+      .max_response_body_bytes = facade_max_response_body_bytes,
       .timeouts = timeouts,
       .cancel_check = _cancel_check,
    };

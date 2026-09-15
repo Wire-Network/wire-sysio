@@ -663,7 +663,7 @@ std::string certificate_hash_filename(const std::filesystem::path& certificate) 
 
 } // namespace
 
-BOOST_AUTO_TEST_SUITE(http_authenticated_transport_tests)
+BOOST_AUTO_TEST_SUITE(http_transport_tests)
 
 /// A transport callback that re-enters its synchronous transport fails instead of deadlocking.
 BOOST_AUTO_TEST_CASE(synchronous_transport_reentry_fails_fast) {
@@ -2042,7 +2042,7 @@ BOOST_AUTO_TEST_CASE(stale_metadata_reconnect_failure_cleans_up_safely) {
    check_download_files_removed(output);
 }
 
-/// The legacy stale-connection flag does not retry a failure on the first fresh connection.
+/// The stale-connection flag does not retry a failure on the first fresh connection.
 BOOST_AUTO_TEST_CASE(fresh_download_connection_failure_is_not_retried) {
    boost::asio::io_context io;
    tcp::acceptor closed_listener(io, tcp::endpoint(boost::asio::ip::address_v4::loopback(), 0));
