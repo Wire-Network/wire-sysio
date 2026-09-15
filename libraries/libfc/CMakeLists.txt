@@ -67,6 +67,10 @@ set(fc_sources
         src/network/ethereum/ethereum_rlp_encoder.cpp
         src/network/ethereum/ethereum_transaction_policy.cpp
         src/network/http/http_client.cpp
+        src/network/http/http_connection.cpp
+        src/network/http/http_download.cpp
+        src/network/http/http_resolver.cpp
+        src/network/http/http_transport_common.cpp
         src/network/http/http_transport_sync.cpp
         src/network/json_rpc/json_rpc_client.cpp
         src/network/solana/solana_types.cpp
