@@ -1099,18 +1099,18 @@ public:
       tls_context.set_verify_mode(asio::ssl::verify_peer);
       error_code error;
       tls_context.set_default_verify_paths(error);
-      FC_ASSERT(!error, "Outbound HTTPS tls_ca failure loading system trust roots: {}", error.message());
+      FC_ASSERT(!error, "Outbound HTTPS failed to load the system trust roots: {}", error.message());
 
       const auto ca_file = options.additional_ca_file ? options.additional_ca_file->c_str() : nullptr;
       const auto ca_path = options.additional_ca_path ? options.additional_ca_path->c_str() : nullptr;
       if (options.additional_ca_path) {
          FC_ASSERT(contains_hashed_ca_certificate(*options.additional_ca_path),
-                   "Outbound HTTPS tls_ca directory is empty, malformed, or unreadable");
+                   "Outbound HTTPS additional CA directory is empty, malformed, or unreadable");
       }
       if (ca_file || ca_path) {
          ERR_clear_error();
          FC_ASSERT(SSL_CTX_load_verify_locations(tls_context.native_handle(), ca_file, ca_path) == 1,
-                   "Outbound HTTPS tls_ca configuration is malformed or unreadable");
+                   "Outbound HTTPS additional CA configuration is malformed or unreadable");
          ERR_clear_error();
       }
 

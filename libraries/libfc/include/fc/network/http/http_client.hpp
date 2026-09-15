@@ -72,7 +72,6 @@ enum class failure_kind {
    cancelled,
    dns,
    connect,
-   tls_ca,
    tls_handshake,
    tls_verification,
    tls_hostname,
