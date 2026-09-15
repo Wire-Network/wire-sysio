@@ -25,17 +25,12 @@ reserve, dispatch, three emissions suites, epoch, underwriting, and the two
 message-channel suites. The four explicit runtime edges cite the caller source
 files in `contract_impact.json`.
 
-The case inventory inspects each built binary's `--list_content` and exact
-CTest registration. CMake and the impact planner already check source suite
+The Wire validation skill's case inventory inspects each built binary's
+`--list_content` and exact CTest registration. CMake and the impact planner
+already check source suite
 declarations and account metadata. Inventory rejects missing or stale binaries,
-empty selectors, mismatched labels, or an aggregate CTest entry. Run it
-after an ON/ON build:
-
-```sh
-python3 contracts/tests/contract_case_inventory.py \
-  --manifest contracts/tests/contract_suites.json \
-  --build-dir build
-```
+empty selectors, mismatched labels, or an aggregate CTest entry. The skill
+profile runs it after an ON/ON build and before contract CTest.
 
 The contract build gate explicitly builds `contracts_project`,
 `test_contracts_project`, and `contract_suite_binaries`. The second project supplies
