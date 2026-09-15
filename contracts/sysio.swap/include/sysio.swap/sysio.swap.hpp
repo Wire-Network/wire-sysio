@@ -364,7 +364,6 @@ namespace sysio {
          /// the time since the last update. Must run BEFORE the pools change, so the
          /// interval is weighted at the price that actually held during it.
          void update_price_accumulators(const currency_stats& token);
-         asset string_to_asset(string input);
          void placeindex(name user, symbol evo_symbol, extended_asset pool1, extended_asset pool2 );
          void add_balance( const name& owner, const asset& value, const name& ram_payer );
          void sub_balance( const name& owner, const asset& value );
