@@ -94,6 +94,22 @@ public:
    bool retryable;
 };
 
+/**
+ * Internal signal that every platform resolver worker is currently occupied.
+ *
+ * External linkage for the same reason transport_failure has it: this is thrown and caught in
+ * separate scopes, and an internal-linkage copy per translation unit would make the catch stop
+ * matching without any diagnostic, silently turning DNS backpressure into an immediate failure.
+ */
+class resolver_capacity_unavailable : public std::runtime_error {
+public:
+   resolver_capacity_unavailable()
+      : std::runtime_error("platform resolver worker is busy") {}
+
+   /** Out-of-line to pin one vtable and typeinfo. */
+   ~resolver_capacity_unavailable() override;
+};
+
 /** Process-global metrics storage with only fixed enum-indexed cardinality. */
 struct atomic_metrics {
    std::atomic<uint64_t> requests{0};

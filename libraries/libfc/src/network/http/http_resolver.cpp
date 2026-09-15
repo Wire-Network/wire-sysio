@@ -113,13 +113,6 @@ struct platform_resolver_runtime {
    }
 };
 
-/** Internal signal that every platform resolver worker is currently occupied. */
-class resolver_capacity_unavailable : public std::runtime_error {
-public:
-   resolver_capacity_unavailable()
-      : std::runtime_error("platform resolver worker is busy") {}
-};
-
 /**
  * Executor-independent writer for one pipe notification.
  *
@@ -295,6 +288,8 @@ struct async_resolution_state {
 } // namespace
 
 inline namespace transport_internal {
+
+resolver_capacity_unavailable::~resolver_capacity_unavailable() = default;
 
 detail::resolver_cancel_fn start_platform_resolution(const std::string& host, const std::string& service,
                                                      time_point deadline, detail::resolver_complete_fn complete) {

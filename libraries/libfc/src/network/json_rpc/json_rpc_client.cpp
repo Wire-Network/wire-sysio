@@ -101,9 +101,6 @@ variant make_call_payload(std::string method, variant params, int64_t id) {
 
 } // namespace
 
-json_rpc_error::json_rpc_error(const std::string& message)
-   : json_rpc_error(0, message, {}) {}
-
 json_rpc_error::json_rpc_error(int code_in, const std::string& message, const variant& data_in)
    : fc::exception(code_in, "json_rpc_error", message)
    , code(code_in)
@@ -146,8 +143,7 @@ variant json_rpc_client::call_idempotent(const std::string& method, const fc::va
 
 variant json_rpc_client::call_with_policy(const std::string& method, const fc::variant& params, call_options options) {
    const auto id = _next_id++;
-   variant response =
-      send_json(make_call_payload(method, params, id), true, request_options_for(_options.request, options));
+   variant response = send_json(make_call_payload(method, params, id), request_options_for(_options.request, options));
    return extract_call_result(response, id);
 }
 
@@ -197,8 +193,7 @@ variant json_rpc_client::extract_call_result(const variant& response, std::int64
    return object["result"];
 }
 
-variant json_rpc_client::send_json(const variant& payload, bool expect_json_body,
-                                   fc::http::request_options request_options) {
+variant json_rpc_client::send_json(const variant& payload, fc::http::request_options request_options) {
    const auto body = fc::json::to_string(payload, fc::json::yield_function_t{});
    fc::http::request request{
       .method = fc::http::request_method::post,
@@ -210,8 +205,6 @@ variant json_rpc_client::send_json(const variant& payload, bool expect_json_body
    const auto response = _transport.perform(request, std::move(request_options));
    require_ok(response, "JSON-RPC request");
 
-   if (!expect_json_body)
-      return variant();
    if (response.body.empty())
       FC_THROW("Empty HTTP body, expected JSON-RPC response");
    return fc::json::from_string(response.body);

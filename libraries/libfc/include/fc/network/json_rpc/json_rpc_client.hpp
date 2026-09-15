@@ -3,16 +3,13 @@
 #include <fc/io/json.hpp>
 #include <fc/network/http/http_client.hpp>
 #include <fc/network/url.hpp>
-#include <fc/time.hpp>
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
 
 #include <cstdint>
-#include <functional>
 #include <optional>
 #include <string>
 #include <variant>
-#include <vector>
 
 namespace fc::network::json_rpc {
 
@@ -58,7 +55,6 @@ struct call_options {
 struct json_rpc_error : fc::exception {
    int code;
    variant data;
-   explicit json_rpc_error(const std::string& message);
    json_rpc_error(int code_in, const std::string& message, const variant& data_in = {});
 };
 
@@ -110,7 +106,7 @@ private:
    variant call_with_policy(const std::string& method, const fc::variant& params, call_options options);
 
    /** Perform HTTP POST with JSON payload and an explicit replay policy. */
-   variant send_json(const variant& payload, bool expect_json_body, fc::http::request_options request_options);
+   variant send_json(const variant& payload, fc::http::request_options request_options);
 
    /// Validate a JSON-RPC response envelope and return its `result`.
    static variant extract_call_result(const variant& response, std::int64_t expected_id);
