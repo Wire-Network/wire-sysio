@@ -54,7 +54,7 @@ Example cmake options for building the contracts with CDT:
 
 ### Running tests
 ```shell
-./contracts/tests/contracts_unit_test
+ctest --test-dir build -L '^contract$' -j6 --output-on-failure
 ```
 ---
 

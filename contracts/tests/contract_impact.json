@@ -1,0 +1,1013 @@
+{
+  "version": 1,
+  "contracts": {
+    "sysio.authex": "contracts/sysio.authex/**",
+    "sysio.bios": "contracts/sysio.bios/**",
+    "sysio.chains": "contracts/sysio.chains/**",
+    "sysio.chalg": "contracts/sysio.chalg/**",
+    "sysio.councl": "contracts/sysio.councl/**",
+    "sysio.dclaim": "contracts/sysio.dclaim/**",
+    "sysio.epoch": "contracts/sysio.epoch/**",
+    "sysio.msgch": "contracts/sysio.msgch/**",
+    "sysio.msig": "contracts/sysio.msig/**",
+    "sysio.opp.common": "contracts/sysio.opp.common/**",
+    "sysio.opreg": "contracts/sysio.opreg/**",
+    "sysio.reserv": "contracts/sysio.reserv/**",
+    "sysio.roa": "contracts/sysio.roa/**",
+    "sysio.system": "contracts/sysio.system/**",
+    "sysio.token": "contracts/sysio.token/**",
+    "sysio.tokens": "contracts/sysio.tokens/**",
+    "sysio.uwrit": "contracts/sysio.uwrit/**",
+    "sysio.wrap": "contracts/sysio.wrap/**"
+  },
+  "full_contract_paths": [
+    "contracts/tests/*.hpp",
+    "contracts/tests/contracts.hpp.in",
+    "contracts/tests/contract_suites.json",
+    "contracts/tests/verify_contract_suites.py",
+    "contracts/sysio.opp.common/**",
+    "contracts/sysio.system/**",
+    "contracts/**/*.hpp"
+  ],
+  "full_platform_paths": [
+    "contracts/**/CMakeLists.txt",
+    "contracts/**/*.proto",
+    "contracts/CMakeLists.txt"
+  ],
+  "runtime_consumer_edges": {
+    "sysio.reserv": [
+      {
+        "suite": "sysio_epoch_tests",
+        "caller": "sysio.epoch",
+        "source": "contracts/sysio.epoch/src/sysio.epoch.cpp",
+        "reason": "advance conditionally inlines reserve sweepclaims"
+      },
+      {
+        "suite": "sysio_uwrit_tests",
+        "caller": "sysio.uwrit",
+        "source": "contracts/sysio.uwrit/src/sysio.uwrit.cpp",
+        "reason": "underwriting settlement inlines reserve refundwire, paywire, applyfromwire, and applyswap"
+      },
+      {
+        "suite": "sysio_msgch_tests",
+        "caller": "sysio.msgch",
+        "source": "contracts/sysio.msgch/src/sysio.msgch.cpp",
+        "reason": "message dispatch inlines reserve-create and cancellation actions"
+      },
+      {
+        "suite": "sysio_msgch_envlog_tests",
+        "caller": "sysio.msgch",
+        "source": "contracts/sysio.msgch/src/sysio.msgch.cpp",
+        "reason": "message envelope handling shares the reserve dispatch source"
+      }
+    ]
+  },
+  "flow_catalog": [
+    "flow-batch-operator-slashing",
+    "flow-batch-operator-termination",
+    "flow-emissions-soak",
+    "flow-node-owner-nft",
+    "flow-operator-collateral-deposit",
+    "flow-reserve-lifecycle",
+    "flow-swap-from-wire",
+    "flow-swap-non-native-tokens",
+    "flow-swap-private-reserves",
+    "flow-swap-to-wire",
+    "flow-swap-variance-revert",
+    "flow-swap-with-underwriting",
+    "flow-underwriter-slashing",
+    "flow-yield-distribution"
+  ],
+  "flow_edges": {
+    "sysio.authex": [
+      {
+        "flow": "flow-emissions-soak",
+        "reason": "Canonical flow-emissions-soak package references sysio.authex"
+      },
+      {
+        "flow": "flow-node-owner-nft",
+        "reason": "Canonical flow-node-owner-nft package references sysio.authex"
+      },
+      {
+        "flow": "flow-reserve-lifecycle",
+        "reason": "Canonical flow-reserve-lifecycle package references sysio.authex"
+      },
+      {
+        "flow": "flow-swap-private-reserves",
+        "reason": "Canonical flow-swap-private-reserves package references sysio.authex"
+      },
+      {
+        "flow": "flow-yield-distribution",
+        "reason": "Canonical flow-yield-distribution package references sysio.authex"
+      },
+      {
+        "flow": "flow-batch-operator-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-batch-operator-termination",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-operator-collateral-deposit",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-from-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-non-native-tokens",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-to-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-variance-revert",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-with-underwriting",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-underwriter-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      }
+    ],
+    "sysio.bios": [
+      {
+        "flow": "flow-batch-operator-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-batch-operator-termination",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-emissions-soak",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-node-owner-nft",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-operator-collateral-deposit",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-reserve-lifecycle",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-from-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-non-native-tokens",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-private-reserves",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-to-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-variance-revert",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-with-underwriting",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-underwriter-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-yield-distribution",
+        "reason": "Conservative cross-contract flow fallback"
+      }
+    ],
+    "sysio.chains": [
+      {
+        "flow": "flow-operator-collateral-deposit",
+        "reason": "Canonical flow-operator-collateral-deposit package references sysio.chains"
+      },
+      {
+        "flow": "flow-batch-operator-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-batch-operator-termination",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-emissions-soak",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-node-owner-nft",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-reserve-lifecycle",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-from-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-non-native-tokens",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-private-reserves",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-to-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-variance-revert",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-with-underwriting",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-underwriter-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-yield-distribution",
+        "reason": "Conservative cross-contract flow fallback"
+      }
+    ],
+    "sysio.chalg": [
+      {
+        "flow": "flow-batch-operator-slashing",
+        "reason": "Canonical flow-batch-operator-slashing package references sysio.chalg"
+      },
+      {
+        "flow": "flow-underwriter-slashing",
+        "reason": "Canonical flow-underwriter-slashing package references sysio.chalg"
+      },
+      {
+        "flow": "flow-batch-operator-termination",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-emissions-soak",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-node-owner-nft",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-operator-collateral-deposit",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-reserve-lifecycle",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-from-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-non-native-tokens",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-private-reserves",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-to-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-variance-revert",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-with-underwriting",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-yield-distribution",
+        "reason": "Conservative cross-contract flow fallback"
+      }
+    ],
+    "sysio.councl": [
+      {
+        "flow": "flow-batch-operator-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-batch-operator-termination",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-emissions-soak",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-node-owner-nft",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-operator-collateral-deposit",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-reserve-lifecycle",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-from-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-non-native-tokens",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-private-reserves",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-to-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-variance-revert",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-with-underwriting",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-underwriter-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-yield-distribution",
+        "reason": "Conservative cross-contract flow fallback"
+      }
+    ],
+    "sysio.dclaim": [
+      {
+        "flow": "flow-emissions-soak",
+        "reason": "Canonical flow-emissions-soak package references sysio.dclaim"
+      },
+      {
+        "flow": "flow-yield-distribution",
+        "reason": "Canonical flow-yield-distribution package references sysio.dclaim"
+      },
+      {
+        "flow": "flow-batch-operator-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-batch-operator-termination",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-node-owner-nft",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-operator-collateral-deposit",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-reserve-lifecycle",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-from-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-non-native-tokens",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-private-reserves",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-to-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-variance-revert",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-with-underwriting",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-underwriter-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      }
+    ],
+    "sysio.epoch": [
+      {
+        "flow": "flow-batch-operator-slashing",
+        "reason": "Canonical flow-batch-operator-slashing package references sysio.epoch"
+      },
+      {
+        "flow": "flow-batch-operator-termination",
+        "reason": "Canonical flow-batch-operator-termination package references sysio.epoch"
+      },
+      {
+        "flow": "flow-emissions-soak",
+        "reason": "Canonical flow-emissions-soak package references sysio.epoch"
+      },
+      {
+        "flow": "flow-node-owner-nft",
+        "reason": "Canonical flow-node-owner-nft package references sysio.epoch"
+      },
+      {
+        "flow": "flow-operator-collateral-deposit",
+        "reason": "Canonical flow-operator-collateral-deposit package references sysio.epoch"
+      },
+      {
+        "flow": "flow-reserve-lifecycle",
+        "reason": "Canonical flow-reserve-lifecycle package references sysio.epoch"
+      },
+      {
+        "flow": "flow-swap-from-wire",
+        "reason": "Canonical flow-swap-from-wire package references sysio.epoch"
+      },
+      {
+        "flow": "flow-swap-private-reserves",
+        "reason": "Canonical flow-swap-private-reserves package references sysio.epoch"
+      },
+      {
+        "flow": "flow-swap-to-wire",
+        "reason": "Canonical flow-swap-to-wire package references sysio.epoch"
+      },
+      {
+        "flow": "flow-swap-variance-revert",
+        "reason": "Canonical flow-swap-variance-revert package references sysio.epoch"
+      },
+      {
+        "flow": "flow-swap-with-underwriting",
+        "reason": "Canonical flow-swap-with-underwriting package references sysio.epoch"
+      },
+      {
+        "flow": "flow-underwriter-slashing",
+        "reason": "Canonical flow-underwriter-slashing package references sysio.epoch"
+      },
+      {
+        "flow": "flow-yield-distribution",
+        "reason": "Canonical flow-yield-distribution package references sysio.epoch"
+      },
+      {
+        "flow": "flow-swap-non-native-tokens",
+        "reason": "Conservative cross-contract flow fallback"
+      }
+    ],
+    "sysio.msgch": [
+      {
+        "flow": "flow-batch-operator-slashing",
+        "reason": "Canonical flow-batch-operator-slashing package references sysio.msgch"
+      },
+      {
+        "flow": "flow-node-owner-nft",
+        "reason": "Canonical flow-node-owner-nft package references sysio.msgch"
+      },
+      {
+        "flow": "flow-operator-collateral-deposit",
+        "reason": "Canonical flow-operator-collateral-deposit package references sysio.msgch"
+      },
+      {
+        "flow": "flow-swap-to-wire",
+        "reason": "Canonical flow-swap-to-wire package references sysio.msgch"
+      },
+      {
+        "flow": "flow-batch-operator-termination",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-emissions-soak",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-reserve-lifecycle",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-from-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-non-native-tokens",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-private-reserves",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-variance-revert",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-with-underwriting",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-underwriter-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-yield-distribution",
+        "reason": "Conservative cross-contract flow fallback"
+      }
+    ],
+    "sysio.msig": [
+      {
+        "flow": "flow-batch-operator-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-batch-operator-termination",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-emissions-soak",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-node-owner-nft",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-operator-collateral-deposit",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-reserve-lifecycle",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-from-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-non-native-tokens",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-private-reserves",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-to-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-variance-revert",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-with-underwriting",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-underwriter-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-yield-distribution",
+        "reason": "Conservative cross-contract flow fallback"
+      }
+    ],
+    "sysio.opreg": [
+      {
+        "flow": "flow-batch-operator-slashing",
+        "reason": "Canonical flow-batch-operator-slashing package references sysio.opreg"
+      },
+      {
+        "flow": "flow-batch-operator-termination",
+        "reason": "Canonical flow-batch-operator-termination package references sysio.opreg"
+      },
+      {
+        "flow": "flow-operator-collateral-deposit",
+        "reason": "Canonical flow-operator-collateral-deposit package references sysio.opreg"
+      },
+      {
+        "flow": "flow-swap-from-wire",
+        "reason": "Canonical flow-swap-from-wire package references sysio.opreg"
+      },
+      {
+        "flow": "flow-swap-non-native-tokens",
+        "reason": "Canonical flow-swap-non-native-tokens package references sysio.opreg"
+      },
+      {
+        "flow": "flow-swap-to-wire",
+        "reason": "Canonical flow-swap-to-wire package references sysio.opreg"
+      },
+      {
+        "flow": "flow-swap-with-underwriting",
+        "reason": "Canonical flow-swap-with-underwriting package references sysio.opreg"
+      },
+      {
+        "flow": "flow-underwriter-slashing",
+        "reason": "Canonical flow-underwriter-slashing package references sysio.opreg"
+      },
+      {
+        "flow": "flow-emissions-soak",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-node-owner-nft",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-reserve-lifecycle",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-private-reserves",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-variance-revert",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-yield-distribution",
+        "reason": "Conservative cross-contract flow fallback"
+      }
+    ],
+    "sysio.reserv": [
+      {
+        "flow": "flow-reserve-lifecycle",
+        "reason": "Canonical flow-reserve-lifecycle package references sysio.reserv"
+      },
+      {
+        "flow": "flow-swap-from-wire",
+        "reason": "Canonical flow-swap-from-wire package references sysio.reserv"
+      },
+      {
+        "flow": "flow-swap-non-native-tokens",
+        "reason": "Canonical flow-swap-non-native-tokens package references sysio.reserv"
+      },
+      {
+        "flow": "flow-swap-private-reserves",
+        "reason": "Canonical flow-swap-private-reserves package references sysio.reserv"
+      },
+      {
+        "flow": "flow-swap-to-wire",
+        "reason": "Canonical flow-swap-to-wire package references sysio.reserv"
+      },
+      {
+        "flow": "flow-swap-variance-revert",
+        "reason": "Canonical flow-swap-variance-revert package references sysio.reserv"
+      },
+      {
+        "flow": "flow-swap-with-underwriting",
+        "reason": "Canonical flow-swap-with-underwriting package references sysio.reserv"
+      }
+    ],
+    "sysio.roa": [
+      {
+        "flow": "flow-batch-operator-slashing",
+        "reason": "Canonical flow-batch-operator-slashing package references sysio.roa"
+      },
+      {
+        "flow": "flow-batch-operator-termination",
+        "reason": "Canonical flow-batch-operator-termination package references sysio.roa"
+      },
+      {
+        "flow": "flow-node-owner-nft",
+        "reason": "Canonical flow-node-owner-nft package references sysio.roa"
+      },
+      {
+        "flow": "flow-underwriter-slashing",
+        "reason": "Canonical flow-underwriter-slashing package references sysio.roa"
+      },
+      {
+        "flow": "flow-emissions-soak",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-operator-collateral-deposit",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-reserve-lifecycle",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-from-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-non-native-tokens",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-private-reserves",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-to-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-variance-revert",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-with-underwriting",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-yield-distribution",
+        "reason": "Conservative cross-contract flow fallback"
+      }
+    ],
+    "sysio.system": [
+      {
+        "flow": "flow-emissions-soak",
+        "reason": "Canonical flow-emissions-soak package references sysio.system"
+      },
+      {
+        "flow": "flow-yield-distribution",
+        "reason": "Canonical flow-yield-distribution package references sysio.system"
+      },
+      {
+        "flow": "flow-batch-operator-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-batch-operator-termination",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-node-owner-nft",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-operator-collateral-deposit",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-reserve-lifecycle",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-from-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-non-native-tokens",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-private-reserves",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-to-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-variance-revert",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-with-underwriting",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-underwriter-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      }
+    ],
+    "sysio.token": [
+      {
+        "flow": "flow-emissions-soak",
+        "reason": "Canonical flow-emissions-soak package references sysio.token"
+      },
+      {
+        "flow": "flow-swap-to-wire",
+        "reason": "Canonical flow-swap-to-wire package references sysio.token"
+      },
+      {
+        "flow": "flow-underwriter-slashing",
+        "reason": "Canonical flow-underwriter-slashing package references sysio.token"
+      },
+      {
+        "flow": "flow-yield-distribution",
+        "reason": "Canonical flow-yield-distribution package references sysio.token"
+      },
+      {
+        "flow": "flow-batch-operator-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-batch-operator-termination",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-node-owner-nft",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-operator-collateral-deposit",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-reserve-lifecycle",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-from-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-non-native-tokens",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-private-reserves",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-variance-revert",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-with-underwriting",
+        "reason": "Conservative cross-contract flow fallback"
+      }
+    ],
+    "sysio.tokens": [
+      {
+        "flow": "flow-batch-operator-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-batch-operator-termination",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-emissions-soak",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-node-owner-nft",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-operator-collateral-deposit",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-reserve-lifecycle",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-from-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-non-native-tokens",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-private-reserves",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-to-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-variance-revert",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-with-underwriting",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-underwriter-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-yield-distribution",
+        "reason": "Conservative cross-contract flow fallback"
+      }
+    ],
+    "sysio.uwrit": [
+      {
+        "flow": "flow-reserve-lifecycle",
+        "reason": "Canonical flow-reserve-lifecycle package references sysio.uwrit"
+      },
+      {
+        "flow": "flow-swap-from-wire",
+        "reason": "Canonical flow-swap-from-wire package references sysio.uwrit"
+      },
+      {
+        "flow": "flow-swap-non-native-tokens",
+        "reason": "Canonical flow-swap-non-native-tokens package references sysio.uwrit"
+      },
+      {
+        "flow": "flow-swap-to-wire",
+        "reason": "Canonical flow-swap-to-wire package references sysio.uwrit"
+      },
+      {
+        "flow": "flow-swap-variance-revert",
+        "reason": "Canonical flow-swap-variance-revert package references sysio.uwrit"
+      },
+      {
+        "flow": "flow-swap-with-underwriting",
+        "reason": "Canonical flow-swap-with-underwriting package references sysio.uwrit"
+      },
+      {
+        "flow": "flow-underwriter-slashing",
+        "reason": "Canonical flow-underwriter-slashing package references sysio.uwrit"
+      }
+    ],
+    "sysio.wrap": [
+      {
+        "flow": "flow-batch-operator-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-batch-operator-termination",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-emissions-soak",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-node-owner-nft",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-operator-collateral-deposit",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-reserve-lifecycle",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-from-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-non-native-tokens",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-private-reserves",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-to-wire",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-variance-revert",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-swap-with-underwriting",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-underwriter-slashing",
+        "reason": "Conservative cross-contract flow fallback"
+      },
+      {
+        "flow": "flow-yield-distribution",
+        "reason": "Conservative cross-contract flow fallback"
+      }
+    ]
+  }
+}

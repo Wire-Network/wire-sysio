@@ -1,0 +1,333 @@
+{
+  "version": 1,
+  "suites": [
+    {
+      "suite": "amm_math_tests",
+      "source": "amm_math_tests.cpp",
+      "accounts": [
+        "sysio.opp.common"
+      ]
+    },
+    {
+      "suite": "council_math_tests",
+      "source": "council_math_tests.cpp",
+      "accounts": [
+        "sysio.councl"
+      ]
+    },
+    {
+      "suite": "sysio_emissions_tests",
+      "source": "emissions_tests.cpp",
+      "accounts": [
+        "sysio.dclaim",
+        "sysio.epoch",
+        "sysio.msig",
+        "sysio.opreg",
+        "sysio.reserv",
+        "sysio.system",
+        "sysio.token",
+        "sysio.uwrit"
+      ]
+    },
+    {
+      "suite": "t5_emissions_tests",
+      "source": "emissions_tests.cpp",
+      "accounts": [
+        "sysio.dclaim",
+        "sysio.epoch",
+        "sysio.msig",
+        "sysio.opreg",
+        "sysio.reserv",
+        "sysio.system",
+        "sysio.token",
+        "sysio.uwrit"
+      ]
+    },
+    {
+      "suite": "sysio_producer_eligibility_tests",
+      "source": "emissions_tests.cpp",
+      "accounts": [
+        "sysio.dclaim",
+        "sysio.epoch",
+        "sysio.msig",
+        "sysio.opreg",
+        "sysio.reserv",
+        "sysio.system",
+        "sysio.token",
+        "sysio.uwrit"
+      ]
+    },
+    {
+      "suite": "getpeerkeys_tests",
+      "source": "getpeerkeys_tests.cpp",
+      "accounts": [
+        "sysio.msig",
+        "sysio.system",
+        "sysio.token"
+      ]
+    },
+    {
+      "suite": "safe_ops_tests",
+      "source": "safe_ops_tests.cpp",
+      "accounts": [
+        "sysio.opp.common"
+      ]
+    },
+    {
+      "suite": "sysio_authex_tests",
+      "source": "sysio.authex_tests.cpp",
+      "accounts": [
+        "sysio.authex"
+      ]
+    },
+    {
+      "suite": "sysio_bios_if_tests",
+      "source": "sysio.bios_inst_fin_tests.cpp",
+      "accounts": [
+        "sysio.bios"
+      ]
+    },
+    {
+      "suite": "sysio_chains_tests",
+      "source": "sysio.chains_tests.cpp",
+      "accounts": [
+        "sysio.chains"
+      ]
+    },
+    {
+      "suite": "sysio_councl_tests",
+      "source": "sysio.councl_tests.cpp",
+      "accounts": [
+        "sysio.councl",
+        "sysio.msig",
+        "sysio.system",
+        "sysio.token"
+      ]
+    },
+    {
+      "suite": "sysio_dclaim_tests",
+      "source": "sysio.dclaim_tests.cpp",
+      "accounts": [
+        "sysio.dclaim"
+      ]
+    },
+    {
+      "suite": "sysio_dispatch_tests",
+      "source": "sysio.dispatch_tests.cpp",
+      "accounts": [
+        "sysio.authex",
+        "sysio.chains",
+        "sysio.chalg",
+        "sysio.epoch",
+        "sysio.msgch",
+        "sysio.opreg",
+        "sysio.opp.common",
+        "sysio.reserv",
+        "sysio.system",
+        "sysio.token",
+        "sysio.uwrit"
+      ]
+    },
+    {
+      "suite": "sysio_dispute_tests",
+      "source": "sysio.dispute_tests.cpp",
+      "accounts": [
+        "sysio.chains",
+        "sysio.chalg",
+        "sysio.epoch",
+        "sysio.msgch",
+        "sysio.msig",
+        "sysio.opreg",
+        "sysio.roa",
+        "sysio.system",
+        "sysio.token",
+        "sysio.uwrit"
+      ]
+    },
+    {
+      "suite": "sysio_epoch_flushwtdw_tests",
+      "source": "sysio.epoch_flushwtdw_tests.cpp",
+      "accounts": [
+        "sysio.chains",
+        "sysio.epoch",
+        "sysio.msgch",
+        "sysio.opreg",
+        "sysio.system",
+        "sysio.token",
+        "sysio.uwrit"
+      ]
+    },
+    {
+      "suite": "sysio_epoch_tests",
+      "source": "sysio.epoch_tests.cpp",
+      "accounts": [
+        "sysio.chains",
+        "sysio.epoch"
+      ]
+    },
+    {
+      "suite": "sysio_system_finalizer_key_tests",
+      "source": "sysio.finalizer_key_tests.cpp",
+      "accounts": [
+        "sysio.msig",
+        "sysio.opreg",
+        "sysio.system",
+        "sysio.token"
+      ]
+    },
+    {
+      "suite": "sysio_inline_auth_tests",
+      "source": "sysio.inline_auth_tests.cpp",
+      "accounts": [
+        "sysio.system",
+        "test.sendinline"
+      ]
+    },
+    {
+      "suite": "sysio_system_limitauth_tests",
+      "source": "sysio.limitauth_tests.cpp",
+      "accounts": [
+        "sysio.msig",
+        "sysio.system",
+        "sysio.token"
+      ]
+    },
+    {
+      "suite": "sysio_msgch_chain_tests",
+      "source": "sysio.msgch_chain_tests.cpp",
+      "accounts": [
+        "sysio.chains",
+        "sysio.chalg",
+        "sysio.epoch",
+        "sysio.msgch",
+        "sysio.opreg",
+        "sysio.roa",
+        "sysio.system",
+        "sysio.token",
+        "sysio.uwrit"
+      ]
+    },
+    {
+      "suite": "sysio_msgch_tests",
+      "source": "sysio.msgch_tests.cpp",
+      "accounts": [
+        "sysio.chains",
+        "sysio.epoch",
+        "sysio.msgch"
+      ]
+    },
+    {
+      "suite": "sysio_msgch_envlog_tests",
+      "source": "sysio.msgch_tests.cpp",
+      "accounts": [
+        "sysio.chains",
+        "sysio.epoch",
+        "sysio.msgch"
+      ]
+    },
+    {
+      "suite": "sysio_msig_tests",
+      "source": "sysio.msig_tests.cpp",
+      "accounts": [
+        "sysio.msig",
+        "sysio.system",
+        "sysio.token",
+        "test.sendinline"
+      ]
+    },
+    {
+      "suite": "sysio_opreg_tests",
+      "source": "sysio.opreg_tests.cpp",
+      "accounts": [
+        "sysio.epoch",
+        "sysio.opreg",
+        "sysio.token"
+      ]
+    },
+    {
+      "suite": "sysio_reserve_tests",
+      "source": "sysio.reserv_tests.cpp",
+      "accounts": [
+        "sysio.authex",
+        "sysio.chains",
+        "sysio.msgch",
+        "sysio.opp.common",
+        "sysio.reserv",
+        "sysio.token"
+      ]
+    },
+    {
+      "suite": "sysio_roa_tests",
+      "source": "sysio.roa_tests.cpp",
+      "accounts": [
+        "sysio.authex",
+        "sysio.msig",
+        "sysio.roa",
+        "sysio.system",
+        "sysio.token",
+        "test.noop",
+        "test.sendinline"
+      ]
+    },
+    {
+      "suite": "sysio_snapshot_attest_tests",
+      "source": "sysio.snapshot_attest_tests.cpp",
+      "accounts": [
+        "sysio.msig",
+        "sysio.system",
+        "sysio.token"
+      ]
+    },
+    {
+      "suite": "sysio_system_blockinfo_tests",
+      "source": "sysio.system_blockinfo_tests.cpp",
+      "accounts": [
+        "sysio.msig",
+        "sysio.system",
+        "sysio.token",
+        "test.blockinfo_tester"
+      ]
+    },
+    {
+      "suite": "sysio_system_tests",
+      "source": "sysio.system_tests.cpp",
+      "accounts": [
+        "sysio.bios",
+        "sysio.msig",
+        "sysio.system",
+        "sysio.token"
+      ]
+    },
+    {
+      "suite": "sysio_token_tests",
+      "source": "sysio.token_tests.cpp",
+      "accounts": [
+        "sysio.msig",
+        "sysio.system",
+        "sysio.token"
+      ]
+    },
+    {
+      "suite": "sysio_tokens_tests",
+      "source": "sysio.tokens_tests.cpp",
+      "accounts": [
+        "sysio.tokens"
+      ]
+    },
+    {
+      "suite": "sysio_uwrit_tests",
+      "source": "sysio.uwrit_tests.cpp",
+      "accounts": [
+        "sysio.uwrit"
+      ]
+    },
+    {
+      "suite": "sysio_wrap_tests",
+      "source": "sysio.wrap_tests.cpp",
+      "accounts": [
+        "sysio.msig",
+        "sysio.wrap"
+      ]
+    }
+  ]
+}

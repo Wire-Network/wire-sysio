@@ -220,7 +220,7 @@ Tests are split across **multiple binaries** depending on which CMake target own
 |--------|-----------------|---------|
 | `$BUILD_DIR/unittests/unit_test` | `unittests/*.cpp` | Core chain/library unit tests |
 | `$BUILD_DIR/tests/plugin_test` | `tests/get_table_tests.cpp`, `tests/test_*.cpp` | chain_plugin / plugin-level integration tests (e.g. `get_table_tests`, `get_kv_rows_*`, `account_query_db`, `trx_finality_status`, `trx_retry_db`) |
-| `$BUILD_DIR/contracts/tests/contracts_unit_test` | `contracts/tests/*.cpp` | System contract Boost tests (sysio.system, sysio.token, sysio.msig, sysio.roa, sysio.authex, sysio.bios) |
+| `$BUILD_DIR/contracts/tests/contract_<source>` | `contracts/tests/<source>.cpp` | System contract Boost suites, one binary per owning source |
 | `$BUILD_DIR/libraries/libfc/test/test_fc` | `libraries/libfc/test/*.cpp` | libfc unit tests (crypto, serialization, clients) |
 
 **Boost.Test naming — common pitfall:**
@@ -229,14 +229,14 @@ Tests are split across **multiple binaries** depending on which CMake target own
 - Suite-name != test-binary: `test_fc` is the binary that contains many suites; a single suite lives in one `.cpp` file but the filename and suite name can diverge.
 - Full path for a single case: `--run_test=<suite>/<case>` (e.g. `--run_test=json_test_suite/parse_escape_unicode_errors`).
 - Output convention: a green `*** No errors detected` line means all filtered cases passed; red `*** N failures are detected` means N failed and test-case lines above identify which.
-- If `unit_test --run_test=foo` reports `no test cases matching filter`, the test almost certainly lives in a different binary — try `plugin_test` first, then `contracts_unit_test`.
+- If `unit_test --run_test=foo` reports `no test cases matching filter`, check `plugin_test` and the contract suite manifest for the owning binary.
 
-**Standard pre-PR test sweep** — both `unit_test` AND `plugin_test` (and ideally `contracts_unit_test` and `test_fc`) should be built and run before creating a PR:
+**Standard pre-PR test sweep** — build and run the core, plugin, contract, and libfc tests before creating a PR:
 ```bash
-ninja -C $BUILD_DIR -j6 unit_test plugin_test contracts_unit_test test_fc
+ninja -C $BUILD_DIR -j6 unit_test plugin_test contract_suite_binaries test_fc
 ./$BUILD_DIR/unittests/unit_test -- --sys-vm
 ./$BUILD_DIR/tests/plugin_test
-./$BUILD_DIR/contracts/tests/contracts_unit_test -- --sys-vm
+ctest --test-dir $BUILD_DIR -L '^contract$' -j6 --output-on-failure
 ./$BUILD_DIR/libraries/libfc/test/test_fc
 ```
 ### Test Categories
