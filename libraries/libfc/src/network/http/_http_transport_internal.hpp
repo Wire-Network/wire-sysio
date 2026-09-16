@@ -152,6 +152,9 @@ std::optional<operation_deadline> phase_deadline(const std::optional<microsecond
 /** Return a bounded printable HTTP reason phrase. */
 std::string sanitize_reason(boost::beast::string_view reason);
 
+/** Return @p host wrapped in brackets when it is an IPv6 literal, as an HTTP authority requires. */
+std::string authority_host(std::string_view host);
+
 /** Return whether an Asio error can represent a stale or failed peer connection. */
 bool is_retryable_connection_error(const boost::system::error_code& error);
 
@@ -373,6 +376,22 @@ void arm_operation_deadline(Stream& stream, const std::optional<operation_deadli
    beast::get_lowest_layer(stream).expires_after(std::chrono::microseconds(remaining.count()));
 }
 
+/**
+ * Arm this phase's deadline and route request cancellation at @p connection, for the duration of
+ * the returned guard.
+ *
+ * Every asynchronous operation in the transport needs both, in that order, so pairing them here
+ * keeps them from drifting apart. The guard is deliberately neither copyable nor movable; it is
+ * returned as a prvalue and constructed directly in the caller's storage.
+ */
+template <typename Stream>
+[[nodiscard]] active_cancel_guard begin_operation(const std::shared_ptr<connection_state>& connection, Stream& stream,
+                                                  const std::optional<operation_deadline>& deadline,
+                                                  const std::shared_ptr<request_control>& control) {
+   arm_operation_deadline(stream, deadline);
+   return active_cancel_guard(control, [connection] { connection->cancel(); });
+}
+
 /** Convert a Beast/Asio timeout into the selected phase category. */
 void throw_if_operation_failed(const error_code& error, const std::optional<operation_deadline>& deadline,
                                const std::shared_ptr<request_control>& control);
@@ -383,8 +402,7 @@ asio::awaitable<void> write_request(const std::shared_ptr<connection_state>& con
                                     beast_http::request<Body>& request_message,
                                     std::optional<operation_deadline> deadline,
                                     const std::shared_ptr<request_control>& control) {
-   arm_operation_deadline(stream, deadline);
-   active_cancel_guard cancel_guard(control, [connection] { connection->cancel(); });
+   auto cancel_guard = begin_operation(connection, stream, deadline, control);
    error_code error;
    (void)co_await beast_http::async_write(stream, request_message, asio::redirect_error(asio::use_awaitable, error));
    throw_if_operation_failed(error, deadline, control);
@@ -400,8 +418,7 @@ asio::awaitable<void> read_header(const std::shared_ptr<connection_state>& conne
                                   beast::flat_buffer& buffer, Parser& parser, const request_options& policy,
                                   std::optional<operation_deadline> deadline,
                                   const std::shared_ptr<request_control>& control) {
-   arm_operation_deadline(stream, deadline);
-   active_cancel_guard cancel_guard(control, [connection] { connection->cancel(); });
+   auto cancel_guard = begin_operation(connection, stream, deadline, control);
    error_code error;
    (void)co_await beast_http::async_read_header(stream, buffer, parser,
                                                 asio::redirect_error(asio::use_awaitable, error));
@@ -432,8 +449,7 @@ asio::awaitable<size_t> read_body(const std::shared_ptr<connection_state>& conne
    auto deadline = phase_deadline(policy.timeouts.idle, failure_kind::timeout_idle, total_deadline);
    if (read_deadline && (!deadline || read_deadline->when < deadline->when))
       deadline = *read_deadline;
-   arm_operation_deadline(stream, deadline);
-   active_cancel_guard cancel_guard(control, [connection] { connection->cancel(); });
+   auto cancel_guard = begin_operation(connection, stream, deadline, control);
    error_code error;
    (void)co_await beast_http::async_read_some(stream, buffer, parser, asio::redirect_error(asio::use_awaitable, error));
    throw_if_operation_failed(error, deadline, control);

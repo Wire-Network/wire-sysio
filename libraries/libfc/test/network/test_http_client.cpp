@@ -2390,14 +2390,10 @@ BOOST_AUTO_TEST_CASE(oversized_chunk_extension_is_bounded_and_removed) {
    });
    fc::temp_directory temp;
    const auto output = temp.path() / "oversized-chunk-extension.bin";
-   auto options = download_options(exact_body_bytes);
-   options.timeouts.idle = fc::milliseconds(200);
-
-   const auto start = std::chrono::steady_clock::now();
-   BOOST_CHECK_THROW(download(server, output, options), fc::exception);
-   const auto elapsed = std::chrono::steady_clock::now() - start;
-
-   BOOST_CHECK_LT(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count(), max_test_elapsed_ms);
+   // No idle deadline is set: the parser rejects the oversized extension immediately, so a
+   // deadline here would never be reached and would only suggest this test covered one.
+   // stalled_response_body_times_out_on_the_idle_deadline covers the idle deadline itself.
+   BOOST_CHECK_THROW(download(server, output, download_options(exact_body_bytes)), fc::exception);
    check_download_files_removed(output);
 }
 
