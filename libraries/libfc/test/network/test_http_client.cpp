@@ -766,6 +766,83 @@ BOOST_AUTO_TEST_CASE(idle_connection_pool_cap_can_disable_reuse) {
    BOOST_CHECK_EQUAL(connections.load(), 2U);
 }
 
+/// An interim 1xx response is consumed, and the final response reaches the caller.
+BOOST_AUTO_TEST_CASE(interim_response_is_not_delivered_as_final) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
+      (void)write_bytes(socket, "HTTP/1.1 103 Early Hints\r\n"
+                                "Link: </s.css>; rel=preload\r\n\r\n");
+      (void)write_bytes(socket, "HTTP/1.1 200 OK\r\n"
+                                "Content-Length: 5\r\n"
+                                "Connection: close\r\n\r\nfinal");
+   });
+   fc::http::transport transport;
+
+   const auto response = transport.perform(
+      fc::http::request{
+         .method = fc::http::request_method::get,
+         .target = server_url(server),
+      },
+      tls_request_options());
+
+   BOOST_CHECK_EQUAL(response.status, 200U);
+   BOOST_CHECK_EQUAL(response.body, "final");
+}
+
+/// An interim response must not return the connection to the idle pool mid-exchange.
+///
+/// Pooling after the interim header would hand the next request a connection with the first
+/// request's real response still queued on it, so the second caller reads the first one's body.
+BOOST_AUTO_TEST_CASE(interim_response_does_not_poison_the_idle_pool) {
+   scripted_http_server server(
+      [](tcp::socket& socket, const std::atomic_bool&) {
+         (void)write_bytes(socket, "HTTP/1.1 103 Early Hints\r\n\r\n");
+         (void)write_bytes(socket, "HTTP/1.1 200 OK\r\n"
+                                   "Content-Length: 5\r\n"
+                                   "Connection: keep-alive\r\n\r\nfirst");
+         // Wait for the second request before answering it. Writing both responses up front
+         // would leave unsolicited bytes on the idle connection, which the transport correctly
+         // rejects on reuse, so the pooling this test is about would never be exercised.
+         boost::system::error_code error;
+         boost::asio::streambuf next_request;
+         boost::asio::read_until(socket, next_request, "\r\n\r\n", error);
+         if (error)
+            return;
+         (void)write_bytes(socket, "HTTP/1.1 200 OK\r\n"
+                                   "Content-Length: 6\r\n"
+                                   "Connection: close\r\n\r\nsecond");
+      },
+      true, 1);
+   fc::http::transport transport;
+   const fc::http::request request{
+      .method = fc::http::request_method::get,
+      .target = server_url(server),
+   };
+
+   BOOST_CHECK_EQUAL(transport.perform(request, tls_request_options()).body, "first");
+   BOOST_CHECK_EQUAL(transport.perform(request, tls_request_options()).body, "second");
+}
+
+/// A peer that only ever sends interim responses is cut off rather than read forever.
+BOOST_AUTO_TEST_CASE(unbounded_interim_responses_are_rejected) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool& stop) {
+      while (!stop.load()) {
+         if (!write_bytes(socket, "HTTP/1.1 103 Early Hints\r\n\r\n"))
+            return;
+      }
+   });
+   fc::http::transport transport;
+
+   BOOST_CHECK_EXCEPTION(transport.perform(
+                            fc::http::request{
+                               .method = fc::http::request_method::get,
+                               .target = server_url(server),
+                            },
+                            tls_request_options()),
+                         fc::exception, [](const fc::exception& error) {
+                            return error.to_detail_string().find("interim responses") != std::string::npos;
+                         });
+}
+
 /// Connections older than the configured idle age are closed before reuse.
 BOOST_AUTO_TEST_CASE(expired_idle_connection_is_not_reused) {
    std::atomic_uint32_t connections{0};

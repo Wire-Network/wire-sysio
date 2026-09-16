@@ -70,6 +70,10 @@ inline constexpr auto download_status_interval = std::chrono::seconds(5);
 inline constexpr size_t platform_resolver_workers = 4;
 inline constexpr size_t max_resolver_capacity_waiters = 256;
 inline constexpr unsigned http_version_1_1 = 11;
+/// Lowest status that ends a response exchange; anything below it is an interim 1xx.
+inline constexpr unsigned first_final_status = 200;
+/// Interim responses consumed before a peer is treated as abusive.
+inline constexpr uint32_t max_interim_responses = 8;
 inline constexpr uint16_t default_http_port = 80;
 inline constexpr uint16_t default_https_port = 443;
 inline constexpr std::string_view default_http_service = "80";

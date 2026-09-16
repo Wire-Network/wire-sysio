@@ -96,9 +96,24 @@ public:
       , total_deadline(total_deadline_in)
       , control(std::move(control_in))
       , metrics(std::move(metrics_in)) {
-      parser.header_limit(policy.max_response_header_bytes);
-      parser.body_limit(policy.max_response_body_bytes);
+      start_response();
    }
+
+   /**
+    * Begin parsing one response message.
+    *
+    * Called again for each interim 1xx response: Beast's parser is neither copyable nor
+    * movable, so a fresh one is emplaced rather than reset. The read buffer is deliberately
+    * retained, because bytes of the following response may already have been read into it.
+    */
+   void start_response() {
+      parser.emplace();
+      parser->header_limit(policy.max_response_header_bytes);
+      parser->body_limit(policy.max_response_body_bytes);
+   }
+
+   /** Return whether the parsed response is an interim 1xx rather than the final one. */
+   bool is_interim_response() const { return parser->get().result_int() < first_final_status; }
 
    ~response_reader_impl() {
       if (complete.load(std::memory_order_acquire))
@@ -114,9 +129,9 @@ public:
 
    /** Initialize public metadata and the aggregate body-read deadline. */
    void header_complete() {
-      value_head.status = parser.get().result_int();
-      value_head.reason = sanitize_reason(parser.get().reason());
-      if (const auto length = parser.content_length())
+      value_head.status = parser->get().result_int();
+      value_head.reason = sanitize_reason(parser->get().reason());
+      if (const auto length = parser->content_length())
          value_head.content_length = *length;
       if (policy.timeouts.read) {
          read_deadline = phase_deadline(policy.timeouts.read, failure_kind::timeout_read, total_deadline);
@@ -143,7 +158,7 @@ public:
       try {
          const auto bytes = co_await std::visit(
             [&](auto& stream) {
-               return read_body(connection, *stream, buffer, parser, output, policy, total_deadline, read_deadline,
+               return read_body(connection, *stream, buffer, *parser, output, policy, total_deadline, read_deadline,
                                 control);
             },
             connection->stream);
@@ -183,10 +198,10 @@ public:
 
    /** Return the leased connection only after Beast confirms end-of-message. */
    void finish_if_complete() {
-      if (!parser.is_done() || complete.exchange(true, std::memory_order_acq_rel)) {
+      if (!parser->is_done() || complete.exchange(true, std::memory_order_acq_rel)) {
          return;
       }
-      if (!parser.get().keep_alive())
+      if (!parser->get().keep_alive())
          connection->close();
       else
          client->release_connection(connection_key, connection);
@@ -197,7 +212,7 @@ public:
    std::shared_ptr<connection_state> connection;
    std::string connection_key;
    beast::flat_buffer buffer;
-   beast_http::response_parser<beast_http::buffer_body> parser;
+   std::optional<beast_http::response_parser<beast_http::buffer_body>> parser;
    request_options policy;
    std::optional<time_point> total_deadline;
    std::optional<operation_deadline> read_deadline;
@@ -272,13 +287,33 @@ client_impl::async_open(request req, request_options policy, std::shared_ptr<req
                                                               policy, total_deadline, control, metrics);
          if (on_phase)
             on_phase(http_file_download_phase::waiting_for_response);
-         co_await std::visit(
-            [&](auto& stream) {
-               return read_header(connection, *stream, reader->buffer, reader->parser, policy,
-                                  phase_deadline(policy.timeouts.header, failure_kind::timeout_header, total_deadline),
-                                  control);
-            },
-            connection->stream);
+         // One budget covers every header read below, interim responses included, so a peer
+         // cannot extend the header phase by trickling 1xx responses.
+         const auto header_deadline =
+            phase_deadline(policy.timeouts.header, failure_kind::timeout_header, total_deadline);
+         const auto read_response_header = [&] {
+            return std::visit(
+               [&](auto& stream) {
+                  return read_header(connection, *stream, reader->buffer, *reader->parser, policy, header_deadline,
+                                     control);
+               },
+               connection->stream);
+         };
+
+         co_await read_response_header();
+         // A 1xx is interim: Beast reports the message complete after its header, but the final
+         // response still follows on this connection. Consuming it here keeps the interim status
+         // from reaching the caller and, more importantly, stops the connection being returned to
+         // the idle pool mid-exchange, where the next request would read this response's body.
+         for (uint32_t interim = 0; reader->is_interim_response(); ++interim) {
+            if (interim == max_interim_responses) {
+               throw transport_failure(failure_kind::response_limit, "peer sent more than " +
+                                                                        std::to_string(max_interim_responses) +
+                                                                        " interim responses");
+            }
+            reader->start_response();
+            co_await read_response_header();
+         }
          reader->header_complete();
          co_return reader;
       } catch (transport_failure& failure) {
