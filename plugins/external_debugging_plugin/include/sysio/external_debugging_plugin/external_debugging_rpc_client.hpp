@@ -32,6 +32,17 @@ using namespace sysio::opp;
 using namespace sysio::opp::debugging;
 namespace rpc = fc::network::json_rpc;
 
+/// Serialize a protobuf request to the JSON sent as JSON-RPC params, with enums as their integer values.
+inline std::string to_request_json(const google::protobuf::Message& request) {
+   std::string req_json;
+   google::protobuf::json::PrintOptions json_options;
+   json_options.always_print_enums_as_ints = true;
+   auto status = google::protobuf::util::MessageToJsonString(request, &req_json, json_options);
+   FC_ASSERT(status.ok(), "protobuf MessageToJsonString failed: {}",
+             std::string(status.message()));
+   return req_json;
+}
+
 /// Send a typed protobuf request via JSON-RPC 2.0 and deserialize the response.
 /// Uses protobuf's built-in JSON serialization (MessageToJsonString / JsonStringToMessage).
 /// The JSON-RPC method is the API path; params is the protobuf request as a JSON object.
@@ -43,12 +54,7 @@ Res execute(rpc::json_rpc_client& client, const std::string& method, const Req& 
                  "Res must be a protobuf Message");
 
    // Serialize request protobuf to JSON, then parse as fc::variant for json_rpc_client
-   std::string req_json;
-   google::protobuf::json::PrintOptions json_options;
-   json_options.always_print_enums_as_ints = true;
-   auto status = google::protobuf::util::MessageToJsonString(request, &req_json);
-   FC_ASSERT(status.ok(), "protobuf MessageToJsonString failed: {}",
-             std::string(status.message()));
+   const std::string req_json = to_request_json(request);
 
    ilog("rpc_client::execute: method={} request={}", method, req_json);
    fc::variant params = fc::json::from_string(req_json);
@@ -62,7 +68,7 @@ Res execute(rpc::json_rpc_client& client, const std::string& method, const Req& 
    ilog("rpc_client::execute: method={},req={},res={}", method, req_json, result_json);
 
    Res resp_message;
-   status = google::protobuf::util::JsonStringToMessage(result_json, &resp_message);
+   auto status = google::protobuf::util::JsonStringToMessage(result_json, &resp_message);
    FC_ASSERT(status.ok(), "protobuf JsonStringToMessage failed: {}",
              std::string(status.message()));
    ilog("rpc_client::execute: method={},req={},res={}", method, req_json, resp_message.DebugString());
