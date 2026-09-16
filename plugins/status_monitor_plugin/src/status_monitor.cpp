@@ -236,12 +236,9 @@ pipeline::~pipeline() {
 }
 
 bool pipeline::submit(status_snapshot snapshot) {
-   if (!_render->try_push(std::move(snapshot))) {
-      _counters.snapshots_dropped_queue_full.fetch_add(1, std::memory_order_relaxed);
-      return false;
-   }
-   _counters.snapshots_submitted.fetch_add(1, std::memory_order_relaxed);
-   return true;
+   const bool admitted = _render->try_push(std::move(snapshot));
+   count(admitted ? &pipeline_stats::snapshots_submitted : &pipeline_stats::snapshots_dropped_queue_full);
+   return admitted;
 }
 
 void pipeline::shutdown() {
@@ -252,28 +249,18 @@ void pipeline::shutdown() {
 }
 
 pipeline_stats pipeline::stats() const {
-   pipeline_stats stats;
-   stats.snapshots_submitted = _counters.snapshots_submitted.load(std::memory_order_relaxed);
-   stats.snapshots_dropped_queue_full = _counters.snapshots_dropped_queue_full.load(std::memory_order_relaxed);
-   stats.documents_queued = _counters.documents_queued.load(std::memory_order_relaxed);
-   stats.documents_dropped_oversize = _counters.documents_dropped_oversize.load(std::memory_order_relaxed);
-   stats.documents_dropped_queue_full = _counters.documents_dropped_queue_full.load(std::memory_order_relaxed);
-   stats.render_failures = _counters.render_failures.load(std::memory_order_relaxed);
-   stats.batches_indexed = _counters.batches_indexed.load(std::memory_order_relaxed);
-   stats.batches_failed = _counters.batches_failed.load(std::memory_order_relaxed);
-   stats.documents_indexed = _counters.documents_indexed.load(std::memory_order_relaxed);
-   stats.documents_failed = _counters.documents_failed.load(std::memory_order_relaxed);
-   return stats;
+   std::lock_guard<std::mutex> lk(_stats_mtx);
+   return _stats;
 }
 
 std::string pipeline::last_failure() const {
-   std::lock_guard<std::mutex> lk(_failure_mtx);
+   std::lock_guard<std::mutex> lk(_stats_mtx);
    return _last_failure;
 }
 
-void pipeline::note_failure(std::string detail) {
-   std::lock_guard<std::mutex> lk(_failure_mtx);
-   _last_failure = std::move(detail);
+void pipeline::count(uint64_t pipeline_stats::*counter, uint64_t n) {
+   std::lock_guard<std::mutex> lk(_stats_mtx);
+   _stats.*counter += n;
 }
 
 void pipeline::render_stage(status_snapshot& snapshot) {
@@ -283,16 +270,13 @@ void pipeline::render_stage(status_snapshot& snapshot) {
    try {
       std::string document = render_document(snapshot, _document_template);
       if (document.size() > _doc_byte_cap) {
-         _counters.documents_dropped_oversize.fetch_add(1, std::memory_order_relaxed);
+         count(&pipeline_stats::documents_dropped_oversize);
          return;
       }
-      if (!_delivery->try_push(std::move(document))) {
-         _counters.documents_dropped_queue_full.fetch_add(1, std::memory_order_relaxed);
-         return;
-      }
-      _counters.documents_queued.fetch_add(1, std::memory_order_relaxed);
+      const bool admitted = _delivery->try_push(std::move(document));
+      count(admitted ? &pipeline_stats::documents_queued : &pipeline_stats::documents_dropped_queue_full);
    } catch (...) {
-      _counters.render_failures.fetch_add(1, std::memory_order_relaxed);
+      count(&pipeline_stats::render_failures);
    }
 }
 
@@ -303,31 +287,30 @@ void pipeline::delivery_stage(std::span<std::string> documents) {
          const uint32_t doc_count = body.doc_count;
          const auto result = _send(std::move(body.body), doc_count);
          const bool indexed = result.outcome == fc::network::es::es_bulk_result::status::indexed;
-         // Published before the counters that advertise it, so a reader that observes documents_failed or
-         // batches_failed advance and then calls last_failure() never sees a stale or empty detail.
-         if (!indexed) {
-            note_failure(result.detail);
-            // One report per failed batch, so nothing a batch carried is dropped silently. Neither the
-            // reporter nor note_failure throws; if either ever did, this batch is still unaccounted for, so
-            // the catch below counts its documents as the loss they are.
-            if (_report_failure)
-               _report_failure(result, doc_count);
-         }
+         // One report per failed batch, so nothing a batch carried is dropped silently. The reporter does not
+         // throw; if it ever did, this batch is still unaccounted for, so the catch below counts its documents as
+         // the loss they are.
+         if (!indexed && _report_failure)
+            _report_failure(result, doc_count);
          // Counted as handled only past every step that could throw before the counters below are reached.
          accounted += doc_count;
-         _counters.documents_indexed.fetch_add(result.indexed_docs, std::memory_order_relaxed);
-         _counters.documents_failed.fetch_add(result.failed_docs, std::memory_order_relaxed);
+         // One critical section per batch, so stats() and last_failure() see its counters and detail together.
+         std::lock_guard<std::mutex> lk(_stats_mtx);
+         _stats.documents_indexed += result.indexed_docs;
+         _stats.documents_failed += result.failed_docs;
          if (indexed) {
-            _counters.batches_indexed.fetch_add(1, std::memory_order_relaxed);
+            ++_stats.batches_indexed;
          } else {
-            _counters.batches_failed.fetch_add(1, std::memory_order_relaxed);
+            ++_stats.batches_failed;
+            _last_failure = result.detail;
          }
       }
    } catch (...) {
       // assemble_bulk_bodies or the sender threw (es_client::bulk never does): whatever was not yet accounted
       // for is lost.
-      _counters.batches_failed.fetch_add(1, std::memory_order_relaxed);
-      _counters.documents_failed.fetch_add(documents.size() - accounted, std::memory_order_relaxed);
+      std::lock_guard<std::mutex> lk(_stats_mtx);
+      ++_stats.batches_failed;
+      _stats.documents_failed += documents.size() - accounted;
    }
 }
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <array>
-#include <atomic>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
 #include <cstddef>
@@ -210,7 +209,7 @@ public:
    /// that order (nothing can enter the delivery queue after the render worker is joined). A bulk request in
    /// flight completes, or returns `canceled` when the sender's client was canceled first. Idempotent.
    void shutdown();
-   /// The counters (each read atomically; the set is not one transaction).
+   /// A copy of the counters, taken under the stats lock; each batch's counters and failure detail change together.
    pipeline_stats stats() const;
    /// Detail of the most recent failed bulk request; empty when none failed yet.
    std::string last_failure() const;
@@ -220,22 +219,8 @@ private:
    void render_stage(status_snapshot& snapshot);
    /// Delivery-worker callback: a drained span of documents -> one or more bulk requests.
    void delivery_stage(std::span<std::string> documents);
-   /// Keep @p detail as the last failure (delivery worker; read by last_failure()).
-   void note_failure(std::string detail);
-
-   /// The atomic mirror of pipeline_stats the workers write; see pipeline_stats for each counter's meaning.
-   struct counters {
-      std::atomic<uint64_t> snapshots_submitted{0};
-      std::atomic<uint64_t> snapshots_dropped_queue_full{0};
-      std::atomic<uint64_t> documents_queued{0};
-      std::atomic<uint64_t> documents_dropped_oversize{0};
-      std::atomic<uint64_t> documents_dropped_queue_full{0};
-      std::atomic<uint64_t> render_failures{0};
-      std::atomic<uint64_t> batches_indexed{0};
-      std::atomic<uint64_t> batches_failed{0};
-      std::atomic<uint64_t> documents_indexed{0};
-      std::atomic<uint64_t> documents_failed{0};
-   };
+   /// Add @p n to one counter under the stats lock.
+   void count(uint64_t pipeline_stats::*counter, uint64_t n = 1);
 
    fc::json_template _document_template;
    std::string _action_line;
@@ -243,9 +228,9 @@ private:
    uint32_t _doc_byte_cap;  ///< cfg.delivery.max_doc_bytes
    sender _send;
    failure_reporter _report_failure; ///< empty when the caller wants no per-batch report
-   counters _counters;
-   mutable std::mutex _failure_mtx;
-   std::string _last_failure; ///< guarded by _failure_mtx
+   mutable std::mutex _stats_mtx; ///< guards _stats and _last_failure
+   pipeline_stats _stats;
+   std::string _last_failure;
    std::shared_ptr<fc::parallel::batch_task_queue<std::string>> _delivery;
    std::shared_ptr<fc::parallel::worker_task_queue<status_snapshot>> _render;
 };

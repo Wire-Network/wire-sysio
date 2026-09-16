@@ -580,8 +580,7 @@ BOOST_AUTO_TEST_CASE(pipeline_counts_failures_and_keeps_the_last_detail) try {
    status_monitor::pipeline pipeline{pipeline_config(small_batch), std::string{action_line}, sender.as_sender()};
    for (uint64_t i = 0; i < failing_count; ++i)
       BOOST_REQUIRE(pipeline.submit(sample_snapshot(static_cast<uint32_t>(i))));
-   // batches_failed is incremented after documents_failed, so a snapshot taken between the two would see the
-   // documents without their batch: the counters are read after shutdown()'s join, once both workers are done.
+   // Read after shutdown()'s join, once both workers are done.
    wait_for(pipeline, [](const auto& s) { return s.documents_failed == failing_count; });
    pipeline.shutdown();
    const auto done = pipeline.stats();
