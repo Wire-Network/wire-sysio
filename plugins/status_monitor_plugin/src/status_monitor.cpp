@@ -167,8 +167,8 @@ std::optional<config> parse_config(const bpo::variables_map& options) {
 std::string render_document(const status_snapshot& snapshot, const fc::json_template& document_template) {
    using entry = std::pair<std::string, fc::variant_object>;
    using token = fc::json_template_default_token;
-   // The snapshot's variant is the same encoding the HTTP API serializes for /v1/chain/get_info, so the nested
-   // object renders byte-identically to that response body.
+   // The snapshot's variant is the one the HTTP API serializes for /v1/chain/get_info, so the nested object has the
+   // same fields as that response body, with integers as JSON numbers.
    const fc::variant_object data = fc::to_data(entry{std::string{record_key}, fc::variant{snapshot.info}.get_object()});
    fc::json_template_values values;
    values.set_time(snapshot.observed)

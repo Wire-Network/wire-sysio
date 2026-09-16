@@ -32,8 +32,8 @@ Three threads do the work; the application thread only copies a snapshot and enq
 get_info snapshot comes from `chain_plugin`'s per-block cache, which `chain_plugin` refreshes on every
 accepted and irreversible block whenever `sysio::status_monitor_plugin` is named in the `plugin` option
 (the same mechanism `chain_api_plugin` uses). Because the snapshot is the same `fc::variant` the HTTP API
-serializes, the nested `status_monitor` object in each document is byte-identical to a `/v1/chain/get_info`
-response body.
+serializes, the nested `status_monitor` object in each document has the same fields as a `/v1/chain/get_info`
+response body, with every integer as a JSON number (the HTTP API quotes those above 0xffffffff).
 
 Two checks keep the stream meaningful:
 

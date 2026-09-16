@@ -145,10 +145,10 @@ fc::variant_object to_data(const Pairs&... pairs) {
 /// has no comment syntax, so a "_comment" member would land in every document).
 ///
 /// Rendering emits one line of JSON text, looking each placeholder up by name in the json_template_values. A
-/// string value that is exactly one placeholder renders the entry's typed value: an integer as bare digits (never
-/// through fc::json, which quotes integers above 0xffffffff for the HTTP API), a string as a JSON string, and an
-/// object, array, bool, null, or double exactly as fc::json emits it. A string that mixes placeholders with other
-/// text is assembled (a string entry contributes its text, an integer its digits, anything else its JSON) and then
+/// string value that is exactly one placeholder renders the entry's typed value: a string as a JSON string, and
+/// anything else as fc::json emits it except that every 64-bit integer, at any depth, is bare digits (fc::json
+/// quotes integers above 0xffffffff for the HTTP API). A string that mixes placeholders with other text is
+/// assembled (a string entry contributes its text, anything else its JSON by the same rule) and then
 /// encoded as a JSON string. Every string in the document -- literal or assembled -- goes through fc::json's
 /// encoder, so control characters and invalid UTF-8 are handled identically everywhere (never through the
 /// logging layout's lighter escaper). In a string value `$${` is a literal `${`, whether or not the value also
@@ -194,7 +194,7 @@ private:
    struct node {
       enum class kind : uint8_t { verbatim, templated_string, object, array };
       kind type = kind::verbatim;
-      std::string verbatim;                 ///< kind::verbatim: the value pre-serialized by fc::json
+      std::string verbatim;                 ///< kind::verbatim: the value's JSON, pre-serialized at compile
       std::vector<part> parts;              ///< kind::templated_string
       std::vector<std::string> member_keys; ///< kind::object: pre-serialized key text, in template order
       std::vector<node> member_values;      ///< kind::object: one per key
@@ -205,11 +205,10 @@ private:
    void render_node(const node& n, const json_template_values& values, std::string& dest) const;
    /// The entry @p p reads; FC_ASSERTs when @p values has none.
    static const fc::variant& lookup(const part& p, const json_template_values& values);
-   /// The text a placeholder contributes inside a mixed string: a string entry's text (recased for level), an
-   /// integer's digits, anything else's JSON.
+   /// The text a placeholder contributes inside a mixed string: a string entry's text (recased for level), anything
+   /// else's JSON with every 64-bit integer as bare digits.
    static std::string token_text(const part& p, const fc::variant& value);
-   /// The JSON a lone placeholder renders: bare digits for an integer, a JSON string for a string (recased for
-   /// level), fc::json's text for anything else.
+   /// The JSON a lone placeholder renders: a JSON string for a string (recased for level), token_text() otherwise.
    static std::string token_json(const part& p, const fc::variant& value);
 
    node root_;

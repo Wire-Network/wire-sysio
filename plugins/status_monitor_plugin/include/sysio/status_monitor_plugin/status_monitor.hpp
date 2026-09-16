@@ -148,7 +148,7 @@ struct status_snapshot {
 };
 
 /// Render one document: @p document_template over the supplied_tokens -- `data` set to
-/// `{ "status_monitor": <snapshot> }` (the snapshot exactly as /v1/chain/get_info would return it), the three
+/// `{ "status_monitor": <snapshot> }` (the get_info fields, with integers as JSON numbers), the three
 /// timestamp entries from @p snapshot.observed, `level`/`message`/`logger`/`thread` from the constants above, and
 /// `file`/`line`/`func` from this renderer's location. Returns one newline-terminated line.
 std::string render_document(const status_snapshot& snapshot, const fc::json_template& document_template);
