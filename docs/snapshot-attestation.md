@@ -142,14 +142,16 @@ rank is what remains once both are excluded, not the answer given to all three.
 The gate keys on the ABSENCE OF A CURRENT MAPPING rather than on never having registered: a
 producer whose row was evicted by the capacity prune is gated again when it re-registers, while a
 producer that still holds one replaces it ungated, for the reason below.
-Eligibility is not rechecked while voting, so a provider that was valid when it registered keeps a
-stable delegation through ordinary producer churn.
+Eligibility is not rechecked while voting, so a producer that was eligible when it entered the
+provider set keeps a stable delegation through ordinary producer churn.
 
 The registration table is capped at 30. Normal producer lifecycle actions do no attestation work.
-Only when a new registration encounters a full table does `regsnapprov` lazily remove mappings whose
-producer is missing, inactive, or ranked above 30, print each eviction, then reapply the cap. All
-uniqueness checks run before pruning, so a doomed registration cannot mutate unrelated mappings.
-Pending votes are never retracted by this cleanup.
+Only when a gated registration encounters a full table does `regsnapprov` lazily remove every
+mapping whose producer would now fail that gate, print each eviction, then reapply the cap. Rank is
+only one way to fail it: a producer that has gone inactive, lost its ACTIVE `OPERATOR_TYPE_PRODUCER`
+row in sysio.opreg, or lost its active finalizer key is evicted the same as one ranked outside the
+top 30. All uniqueness checks run before pruning, so a doomed registration cannot mutate unrelated
+mappings. Pending votes are never retracted by this cleanup.
 Delegating to a separate account decouples authority: the producer's keys never have to live on
 the snapshot node -- only the snap_account's key does.
 
@@ -323,8 +325,9 @@ clio push action sysio votesnaphash \
 ## Trust and security model
 
 - Trust reduces to: a quorum of durable provider registrations honestly computed the snapshot
-  hash. Each registration's producer must be active and ranked at or below 30 when the mapping
-  is created; that eligibility is not continuously revalidated afterward.
+  hash. Each producer was schedulable and within the top 30 rank positions when it entered the
+  provider set. That is checked on admission, not on each mapping row: rotation replaces the
+  `snap_account` ungated, and eligibility is not continuously revalidated afterward.
 - Determinism is what makes a quorum meaningful: if honest providers could compute different
   hashes for the same block, votes would never converge. The fixed snapshot format and
   canonical section ordering remove that ambiguity.
