@@ -7,15 +7,21 @@
 #include <sysio/chain/transaction_metadata.hpp>
 #include <sysio/chain/trace.hpp>
 
+#include <tuple>
+
 namespace sysio::chain::plugin_interface {
    using namespace sysio::chain;
    using namespace appbase;
    struct chain_plugin_interface;
 
    namespace channels {
-      using accepted_block_header  = channel_decl<struct accepted_block_header_tag, block_signal_params>;
-      using accepted_block         = channel_decl<struct accepted_block_tag,        block_signal_params>;
-      using irreversible_block     = channel_decl<struct irreversible_block_tag,    block_signal_params>;
+      /// Payload of the block channels. A delivery is posted to the executor and runs after the controller signal
+      /// returns, so it owns its values; controller::block_signal_params only references them for the signal call.
+      using block_params = std::tuple<signed_block_ptr, block_id_type>;
+
+      using accepted_block_header  = channel_decl<struct accepted_block_header_tag, block_params>;
+      using accepted_block         = channel_decl<struct accepted_block_tag,        block_params>;
+      using irreversible_block     = channel_decl<struct irreversible_block_tag,    block_params>;
       using applied_transaction    = channel_decl<struct applied_transaction_tag,   transaction_trace_ptr>;
    }
 
