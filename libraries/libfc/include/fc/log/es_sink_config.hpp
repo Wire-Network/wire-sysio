@@ -50,9 +50,9 @@ struct es_sink_config {
    uint32_t flush_interval_ms = default_es_flush_interval_ms;
    uint32_t max_pending_batches = default_es_max_pending_batches;
    uint32_t max_retries = network::es::es_default_max_retries;
-   uint32_t retry_backoff_ms = network::es::es_default_retry_backoff_ms;
-   uint32_t connect_timeout_ms = network::es::es_default_connect_timeout_ms;
-   uint32_t request_timeout_ms = network::es::es_default_request_timeout_ms;
+   uint32_t retry_backoff_ms = network::es::to_config_ms(network::es::es_default_retry_backoff);
+   uint32_t connect_timeout_ms = network::es::to_config_ms(network::es::es_default_connect_timeout);
+   uint32_t request_timeout_ms = network::es::to_config_ms(network::es::es_default_request_timeout);
    uint32_t shutdown_flush_timeout_ms = default_es_shutdown_flush_timeout_ms;
 };
 } // namespace sink

@@ -20,6 +20,7 @@
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
 #include <fmt/format.h>
+#include <limits>
 #include <string_view>
 
 namespace fc::network::es {
@@ -45,11 +46,13 @@ constexpr std::string_view es_scheme_https = "https";
 /// whitespace) falls through to a full parse.
 constexpr std::size_t es_errors_probe_bytes = 256;
 constexpr std::string_view es_errors_false_token = R"("errors":false)";
-constexpr std::chrono::milliseconds es_max_backoff{es_max_retry_backoff_ms};
 /// Clamp for the backoff doubling exponent: `1u << attempt` is UB once `attempt` reaches the width of
-/// unsigned (max_retries is operator-controlled and may exceed 32). es_max_backoff already caps the RESULT
+/// unsigned (max_retries is operator-controlled and may exceed 32). es_max_retry_backoff already caps the RESULT
 /// after ~4 doublings, so clamping the exponent changes no observable behavior.
 constexpr uint32_t es_max_backoff_exponent = 16;
+/// The widest timeout the request arithmetic takes: what a uint32 millisecond config field holds. A longer one set
+/// directly on es_client_options is clamped to it, so the conversion to fc::microseconds cannot overflow.
+constexpr std::chrono::milliseconds es_max_request_timeout{std::numeric_limits<uint32_t>::max()};
 /// Bulk responses carry one item per document; cap them well above realistic sizes.
 constexpr uint64_t es_max_response_body_bytes = 4ULL * 1024ULL * 1024ULL;
 constexpr uint32_t es_http_status_ok_min = 200;
@@ -60,6 +63,11 @@ constexpr uint32_t es_http_status_ok_max = 299;
 constexpr uint32_t es_http_status_forbidden = 403;
 constexpr uint32_t es_http_status_too_many_requests = 429;
 constexpr uint32_t es_http_status_server_error_min = 500;
+
+/// @p timeout clamped to [0, es_max_request_timeout], as the fc::microseconds an http request takes.
+fc::microseconds to_request_timeout(std::chrono::milliseconds timeout) {
+   return fc::milliseconds(std::clamp(timeout, std::chrono::milliseconds::zero(), es_max_request_timeout).count());
+}
 
 } // anonymous namespace
 
@@ -166,9 +174,9 @@ boost::asio::awaitable<es_bulk_result> es_client::async_bulk(std::string body, u
    // NEXT pair would overflow it), so the client's cap allows exactly that much more.
    opt.max_request_body_bytes = uint64_t{_options.max_batch_bytes} + _options.max_doc_bytes + _action_line.size();
    opt.max_response_body_bytes = es_max_response_body_bytes;
-   opt.timeouts.connect = fc::milliseconds(_options.connect_timeout_ms);
+   opt.timeouts.connect = to_request_timeout(_options.connect_timeout);
    opt.timeouts.header = opt.timeouts.read = opt.timeouts.idle = opt.timeouts.total =
-      fc::milliseconds(_options.request_timeout_ms);
+      to_request_timeout(_options.request_timeout);
    // Delivery runs on the client's own thread: an ambient fc task deadline must not bound it.
    opt.timeouts.inherit_task_deadline = false;
    // The http client's retry stays at one attempt (a _bulk POST is not idempotent); this loop owns retries.
@@ -220,10 +228,12 @@ boost::asio::awaitable<es_bulk_result> es_client::async_bulk(std::string body, u
          co_return result;
       }
       // Capped exponential backoff as a timer on this executor, interruptible by cancel() through the same
-      // slot; an aborted wait (or a flag raised while nothing was connected to the slot) means canceled.
-      const auto backoff = std::min<std::chrono::milliseconds>(std::chrono::milliseconds(_options.retry_backoff_ms) *
-                                                                  (1u << std::min(attempt, es_max_backoff_exponent)),
-                                                               es_max_backoff);
+      // slot; an aborted wait (or a flag raised while nothing was connected to the slot) means canceled. The base
+      // is clamped to the cap before doubling, so no retry_backoff can overflow the multiplication.
+      const auto backoff = std::min<std::chrono::milliseconds>(
+         std::clamp(_options.retry_backoff, std::chrono::milliseconds::zero(), es_max_retry_backoff) *
+            (1u << std::min(attempt, es_max_backoff_exponent)),
+         es_max_retry_backoff);
       boost::asio::steady_timer timer(co_await boost::asio::this_coro::executor);
       timer.expires_after(backoff);
       boost::system::error_code wait_error;
@@ -291,9 +301,9 @@ boost::asio::awaitable<void> es_client::async_probe() {
 
    http::request_options opt;
    opt.max_response_body_bytes = es_max_response_body_bytes;
-   opt.timeouts.connect = fc::milliseconds(_options.connect_timeout_ms);
+   opt.timeouts.connect = to_request_timeout(_options.connect_timeout);
    opt.timeouts.header = opt.timeouts.read = opt.timeouts.idle = opt.timeouts.total =
-      fc::milliseconds(_options.request_timeout_ms);
+      to_request_timeout(_options.request_timeout);
    // The check runs on the client's own thread: an ambient fc task deadline must not bound it.
    opt.timeouts.inherit_task_deadline = false;
    // One attempt: request_options::retry stays at its single-attempt default and this function has no loop.

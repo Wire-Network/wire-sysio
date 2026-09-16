@@ -519,9 +519,12 @@ BOOST_AUTO_TEST_CASE(es_config_defaults_from_json) try {
    BOOST_CHECK_EQUAL(cfg.flush_interval_ms, fc::sink::default_es_flush_interval_ms);
    BOOST_CHECK_EQUAL(cfg.max_pending_batches, fc::sink::default_es_max_pending_batches);
    BOOST_CHECK_EQUAL(cfg.max_retries, fc::network::es::es_default_max_retries);
-   BOOST_CHECK_EQUAL(cfg.retry_backoff_ms, fc::network::es::es_default_retry_backoff_ms);
-   BOOST_CHECK_EQUAL(cfg.connect_timeout_ms, fc::network::es::es_default_connect_timeout_ms);
-   BOOST_CHECK_EQUAL(cfg.request_timeout_ms, fc::network::es::es_default_request_timeout_ms);
+   BOOST_CHECK_EQUAL(cfg.retry_backoff_ms,
+                     fc::network::es::to_config_ms(fc::network::es::es_default_retry_backoff));
+   BOOST_CHECK_EQUAL(cfg.connect_timeout_ms,
+                     fc::network::es::to_config_ms(fc::network::es::es_default_connect_timeout));
+   BOOST_CHECK_EQUAL(cfg.request_timeout_ms,
+                     fc::network::es::to_config_ms(fc::network::es::es_default_request_timeout));
    BOOST_CHECK_EQUAL(cfg.shutdown_flush_timeout_ms, fc::sink::default_es_shutdown_flush_timeout_ms);
 } FC_LOG_AND_RETHROW()
 

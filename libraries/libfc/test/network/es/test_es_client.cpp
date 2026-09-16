@@ -23,25 +23,25 @@ namespace {
 constexpr std::string_view test_index = "test-status";
 constexpr std::string_view sample_document = R"({"@timestamp":1700000000123,"message":"sample"})"
                                              "\n";
-constexpr uint32_t fast_backoff_ms = 10;
+constexpr auto fast_backoff = 10ms;
 constexpr uint32_t two_retries = 2;
 constexpr auto delivery_wait = 5s;
 /// A backoff long enough that only cancel() can end the wait inside the test's budget.
-constexpr uint32_t long_backoff_ms = 60'000;
+constexpr auto long_backoff = 60s;
 constexpr auto cancel_budget = 2s;
 constexpr uint32_t no_retries = 0;
 constexpr uint32_t one_retry = 1;
-/// A scripted service delay many times short_timeout_ms: delivery times out on the header.
+/// A scripted service delay many times short_timeout: delivery times out on the header.
 constexpr auto timeout_delay = 3s;
 /// The timeout case's own request timeout: 6x inside timeout_delay, so the deadline is reached with a wide
 /// margin on a loaded host without lengthening the scripted delay.
-constexpr uint32_t short_timeout_ms = 500;
+constexpr auto short_timeout = 500ms;
 /// A scripted service delay that holds one request in flight while a second is attempted, with a request
 /// timeout generous enough that the held request still succeeds once the delay elapses.
 constexpr auto overlap_delay = 1s;
-constexpr uint32_t slow_timeout_ms = 10'000;
+constexpr auto slow_timeout = 10s;
 /// Bounds the attempt that connects into a closed server's backlog and is never answered.
-constexpr uint32_t dead_timeout_ms = 500;
+constexpr auto dead_timeout = 500ms;
 /// A 2xx body that is not JSON at all: the full parse behind the success probe must fail.
 constexpr std::string_view html_2xx_body = "<html>";
 /// The path probe() requests: the base URL's root.
@@ -58,9 +58,9 @@ fc::network::es::es_client_options make_options(const std::string& url) {
    fc::network::es::es_client_options options;
    options.url = url;
    options.index = std::string{test_index};
-   options.retry_backoff_ms = fast_backoff_ms;
-   options.connect_timeout_ms = 1000;
-   options.request_timeout_ms = 2000;
+   options.retry_backoff = fast_backoff;
+   options.connect_timeout = 1000ms;
+   options.request_timeout = 2000ms;
    return options;
 }
 
@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE(request_timeout_reports_unavailable) try {
    fc::test::capture_http_server server{{delayed_ok(timeout_delay)}};
    auto options = make_options(server.url());
    options.max_retries = no_retries;
-   options.request_timeout_ms = short_timeout_ms; // 6x inside timeout_delay -- the deadline always wins
+   options.request_timeout = short_timeout; // 6x inside timeout_delay -- the deadline always wins
    es_client client{options};
    const auto result = client.bulk(one_document_body(client), 1);
    BOOST_CHECK(result.outcome == es_bulk_result::status::unavailable);
@@ -209,7 +209,7 @@ BOOST_AUTO_TEST_CASE(unreachable_endpoint_reports_unavailable_after_retries) try
    fc::test::connection_closing_http_server closing_server;
    auto options = make_options(closing_server.url());
    options.max_retries = one_retry;
-   options.request_timeout_ms = dead_timeout_ms; // bounds an attempt the dead endpoint never answers
+   options.request_timeout = dead_timeout; // bounds an attempt the dead endpoint never answers
    es_client client{options};
    const auto result = client.bulk(one_document_body(client), 1);
    BOOST_CHECK(result.outcome == es_bulk_result::status::unavailable);
@@ -276,7 +276,7 @@ FC_LOG_AND_RETHROW()
 BOOST_AUTO_TEST_CASE(overlapping_requests_are_rejected) try {
    fc::test::capture_http_server server{{delayed_ok(overlap_delay)}};
    auto options = make_options(server.url());
-   options.request_timeout_ms = slow_timeout_ms; // the held request must outlive overlap_delay
+   options.request_timeout = slow_timeout; // the held request must outlive overlap_delay
    es_client client{options};
 
    auto first = boost::asio::co_spawn(client.get_executor(), client.async_bulk(one_document_body(client), 1),
@@ -303,7 +303,7 @@ FC_LOG_AND_RETHROW()
 BOOST_AUTO_TEST_CASE(cancel_interrupts_the_backoff_wait) try {
    fc::test::capture_http_server server{{reply(503)}};
    auto options = make_options(server.url());
-   options.retry_backoff_ms = long_backoff_ms;
+   options.retry_backoff = long_backoff;
    es_client client{options};
    std::optional<es_bulk_result> result;
    std::thread sender{[&] { result = client.bulk(one_document_body(client), 1); }};
@@ -404,7 +404,7 @@ FC_LOG_AND_RETHROW()
 BOOST_AUTO_TEST_CASE(cancel_during_probe_reports_canceled) try {
    fc::test::capture_http_server server{{delayed_ok(overlap_delay)}};
    auto options = make_options(server.url());
-   options.request_timeout_ms = slow_timeout_ms; // the held request must outlive overlap_delay
+   options.request_timeout = slow_timeout; // the held request must outlive overlap_delay
    es_client client{options};
 
    std::string message;
@@ -434,7 +434,7 @@ FC_LOG_AND_RETHROW()
 BOOST_AUTO_TEST_CASE(probe_overlapping_a_bulk_is_rejected) try {
    fc::test::capture_http_server server{{delayed_ok(overlap_delay)}};
    auto options = make_options(server.url());
-   options.request_timeout_ms = slow_timeout_ms; // the held request must outlive overlap_delay
+   options.request_timeout = slow_timeout; // the held request must outlive overlap_delay
    es_client client{options};
 
    auto first = boost::asio::co_spawn(client.get_executor(), client.async_bulk(one_document_body(client), 1),
@@ -464,6 +464,18 @@ BOOST_AUTO_TEST_CASE(bulk_is_sent_through_the_configured_proxy) try {
    BOOST_CHECK(client.bulk(one_document_body(client), 1).outcome == es_bulk_result::status::indexed);
    BOOST_REQUIRE(proxy.wait_for_requests(1, delivery_wait));
    BOOST_CHECK_EQUAL(proxy.request(0).target, std::string{unresolvable_origin} + "/_bulk");
+}
+FC_LOG_AND_RETHROW()
+
+// A timeout set directly beyond what a uint32 millisecond field holds is clamped, not overflowed: a request with
+// the largest representable timeouts still completes.
+BOOST_AUTO_TEST_CASE(extreme_timeouts_are_clamped) try {
+   fc::test::capture_http_server server;
+   auto options = make_options(server.url());
+   options.connect_timeout = std::chrono::milliseconds::max();
+   options.request_timeout = std::chrono::milliseconds::max();
+   es_client client{options};
+   BOOST_CHECK(client.bulk(one_document_body(client), 1).outcome == es_bulk_result::status::indexed);
 }
 FC_LOG_AND_RETHROW()
 

@@ -303,9 +303,9 @@ BOOST_AUTO_TEST_CASE(defaults_apply_when_target_index_and_template_are_given) tr
    BOOST_CHECK_EQUAL(cfg->delivery.max_batch_bytes, status_monitor::max_batch_bytes);
    BOOST_CHECK_EQUAL(cfg->delivery.max_doc_bytes, status_monitor::max_doc_bytes);
    BOOST_CHECK_EQUAL(cfg->delivery.max_retries, fc::network::es::es_default_max_retries);
-   BOOST_CHECK_EQUAL(cfg->delivery.retry_backoff_ms, fc::network::es::es_default_retry_backoff_ms);
-   BOOST_CHECK_EQUAL(cfg->delivery.connect_timeout_ms, fc::network::es::es_default_connect_timeout_ms);
-   BOOST_CHECK_EQUAL(cfg->delivery.request_timeout_ms, fc::network::es::es_default_request_timeout_ms);
+   BOOST_CHECK_EQUAL(cfg->delivery.retry_backoff.count(), fc::network::es::es_default_retry_backoff.count());
+   BOOST_CHECK_EQUAL(cfg->delivery.connect_timeout.count(), fc::network::es::es_default_connect_timeout.count());
+   BOOST_CHECK_EQUAL(cfg->delivery.request_timeout.count(), fc::network::es::es_default_request_timeout.count());
    BOOST_CHECK(cfg->document_template.contains(fc::json_template_default_token::data));
    BOOST_CHECK_EQUAL(cfg->max_items_per_task, status_monitor::default_max_items_per_task);
    BOOST_CHECK_EQUAL(cfg->max_pending_documents, status_monitor::default_max_pending_documents);
@@ -324,10 +324,10 @@ BOOST_AUTO_TEST_CASE(explicit_values_override_the_defaults) try {
    BOOST_CHECK_EQUAL(cfg->delivery.password.value_or(""), "p");
    BOOST_CHECK_EQUAL(cfg->max_items_per_task, 7u);
    BOOST_CHECK_EQUAL(cfg->max_pending_documents, 9u);
-   BOOST_CHECK_EQUAL(cfg->delivery.connect_timeout_ms, 11u);
-   BOOST_CHECK_EQUAL(cfg->delivery.request_timeout_ms, 13u);
+   BOOST_CHECK_EQUAL(cfg->delivery.connect_timeout.count(), 11);
+   BOOST_CHECK_EQUAL(cfg->delivery.request_timeout.count(), 13);
    BOOST_CHECK_EQUAL(cfg->delivery.max_retries, 0u);
-   BOOST_CHECK_EQUAL(cfg->delivery.retry_backoff_ms, 17u);
+   BOOST_CHECK_EQUAL(cfg->delivery.retry_backoff.count(), 17);
 }
 FC_LOG_AND_RETHROW()
 

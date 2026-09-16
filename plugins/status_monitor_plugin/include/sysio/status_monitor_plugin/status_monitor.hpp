@@ -78,7 +78,7 @@ inline constexpr auto request_timeout_ms = "status-monitor-request-timeout-ms";
 /// Delivery attempts after the first for a retryable failure; 0 to max_retries_ceiling.
 inline constexpr auto max_retries = "status-monitor-max-retries";
 /// Initial retry backoff, in milliseconds; greater than 0, doubled per attempt up to
-/// fc::network::es::es_max_retry_backoff_ms.
+/// fc::network::es::es_max_retry_backoff.
 inline constexpr auto retry_backoff_ms = "status-monitor-retry-backoff-ms";
 /// PEM CA bundle added to system trust for the endpoint's requests; overrides outbound-http-additional-ca-file.
 inline constexpr auto additional_ca_file = "status-monitor-additional-ca-file";
@@ -105,7 +105,7 @@ inline constexpr uint32_t default_max_pending_documents = 256;
 inline constexpr uint32_t max_items_per_task_ceiling = 10'000;
 /// Upper bound on --status-monitor-max-pending-documents, the delivery queue's depth (see above).
 inline constexpr uint32_t max_pending_documents_ceiling = 65'536;
-/// Upper bound on --status-monitor-max-retries: with fc::network::es::es_max_retry_backoff_ms as the backoff
+/// Upper bound on --status-monitor-max-retries: with fc::network::es::es_max_retry_backoff as the backoff
 /// cap, ten retries already hold the delivery worker for about 20 s of backoff plus eleven request timeouts on
 /// a dead endpoint.
 inline constexpr uint32_t max_retries_ceiling = 10;
