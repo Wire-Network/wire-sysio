@@ -4,6 +4,7 @@
  */
 
 #include <fc/filesystem.hpp>
+#include <fc/io/json.hpp>
 #include <fc/network/http/http_client.hpp>
 #include <fc/task/deadline.hpp>
 
@@ -32,6 +33,7 @@
 #include <memory>
 #include <mutex>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -80,6 +82,11 @@ constexpr size_t disk_space_budget_bytes = 64 * 1024 * 1024;
 constexpr size_t large_body_chunk_bytes = 1024 * 1024;
 constexpr size_t oversized_chunk_extension_bytes = 128 * 1024;
 constexpr std::string_view exact_body = "12345678";
+constexpr int64_t remote_error_code = 3'010'001;
+constexpr std::string_view remote_error_name = "wallet_locked_exception";
+constexpr std::string_view remote_error_what = "Wallet is locked";
+constexpr std::string_view remote_error_detail = "unlock the wallet before signing";
+constexpr std::string_view remote_error_page = "<html><body>Internal Server Error</body></html>";
 
 /** Return finite policy used by deterministic shared-transport tests. */
 fc::http::request_options tls_request_options();
@@ -385,6 +392,18 @@ std::string keep_alive_metadata_response() {
           "Content-Type: application/json\r\n"
           "Content-Length: 2\r\n"
           "Connection: keep-alive\r\n\r\n{}";
+}
+
+/** Return the JSON error envelope a remote node emits alongside an HTTP 500 response. */
+std::string remote_error_response_body() {
+   fc::mutable_variant_object detail;
+   detail("message", std::string(remote_error_detail));
+   fc::mutable_variant_object remote_error;
+   remote_error("code", remote_error_code)("name", std::string(remote_error_name))(
+      "what", std::string(remote_error_what))("details", fc::variants{fc::variant(std::move(detail))});
+   fc::mutable_variant_object envelope;
+   envelope("error", fc::variant(std::move(remote_error)));
+   return fc::json::to_string(fc::variant(std::move(envelope)), fc::time_point::maximum());
 }
 
 /** Write @p body_bytes bytes in bounded blocks. */
@@ -1526,6 +1545,28 @@ BOOST_AUTO_TEST_CASE(idempotent_retry_exhaustion_is_bounded) {
                          });
 }
 
+/// A retry hook that breaks its must-not-throw contract fails the request instead of escaping.
+BOOST_AUTO_TEST_CASE(throwing_retry_decision_hook_is_contained) {
+   fc::http::transport transport;
+   auto options = tls_request_options();
+   options.retry.max_attempts = 2;
+   options.retry.initial_backoff = fc::microseconds(0);
+   options.retry.max_backoff = fc::microseconds(0);
+   options.retry.allow_retry = [](const fc::http::retry_context&) -> bool {
+      throw std::runtime_error("retry policy is unavailable");
+   };
+
+   BOOST_CHECK_EXCEPTION(transport.perform(
+                            fc::http::request{
+                               .method = fc::http::request_method::get,
+                               .target = fc::url("http://127.0.0.1:1/"),
+                            },
+                            options),
+                         fc::exception, [](const fc::exception& error) {
+                            return error.to_detail_string().find("retry decision hook threw") != std::string::npos;
+                         });
+}
+
 /// Caller-provided request headers are bounded before any connection attempt.
 BOOST_AUTO_TEST_CASE(oversized_request_headers_are_rejected_before_send) {
    fc::http::transport transport;
@@ -1663,6 +1704,34 @@ BOOST_AUTO_TEST_CASE(slow_progressing_response_body_times_out) {
                             options),
                          fc::timeout_exception, [](const fc::exception& error) {
                             return error.to_detail_string().find("timeout_read") != std::string::npos;
+                         });
+   const auto elapsed = std::chrono::steady_clock::now() - start;
+   BOOST_CHECK_LT(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count(), max_test_elapsed_ms);
+}
+
+/// A body that stops making progress is cut off by the idle deadline alone.
+BOOST_AUTO_TEST_CASE(stalled_response_body_times_out_on_the_idle_deadline) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool& stop) {
+      if (!write_bytes(socket, fixed_length_header(1'000) + std::string(16, 'x')))
+         return;
+      while (!stop.load())
+         std::this_thread::sleep_for(10ms);
+   });
+   fc::http::transport transport;
+   auto options = tls_request_options();
+   options.timeouts.idle = fc::milliseconds(200);
+   options.timeouts.read = std::nullopt;
+   options.timeouts.total = std::nullopt;
+   const auto start = std::chrono::steady_clock::now();
+
+   BOOST_CHECK_EXCEPTION(transport.perform(
+                            fc::http::request{
+                               .method = fc::http::request_method::get,
+                               .target = fc::url("http://127.0.0.1:" + std::to_string(server.port()) + "/"),
+                            },
+                            options),
+                         fc::timeout_exception, [](const fc::exception& error) {
+                            return error.to_detail_string().find("timeout_idle") != std::string::npos;
                          });
    const auto elapsed = std::chrono::steady_clock::now() - start;
    BOOST_CHECK_LT(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count(), max_test_elapsed_ms);
@@ -2030,6 +2099,52 @@ BOOST_AUTO_TEST_CASE(post_sync_can_be_cancelled) {
    const auto elapsed = std::chrono::steady_clock::now() - start;
 
    BOOST_CHECK_LT(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count(), max_test_elapsed_ms);
+}
+
+/// A 500 error envelope is rebuilt locally with the remote code, name, message, and nested details.
+BOOST_AUTO_TEST_CASE(post_sync_rethrows_a_remote_error_envelope) {
+   const std::string body = remote_error_response_body();
+   scripted_http_server server([&](tcp::socket& socket, const std::atomic_bool&) {
+      write_bytes(socket, fixed_length_header(body.size(), "500 Internal Server Error") + body);
+   });
+   fc::http_client client;
+
+   BOOST_CHECK_EXCEPTION(client.post_sync(server_url(server), fc::variant(fc::mutable_variant_object())), fc::exception,
+                         [](const fc::exception& error) {
+                            const auto detail = error.to_detail_string();
+                            return error.code() == remote_error_code &&
+                                   std::string_view(error.name()) == remote_error_name &&
+                                   detail.find(remote_error_what) != std::string::npos &&
+                                   detail.find(remote_error_detail) != std::string::npos;
+                         });
+}
+
+/// A 500 whose body is not JSON is reported as unparseable rather than as a decoded remote error.
+BOOST_AUTO_TEST_CASE(post_sync_reports_an_unparseable_error_response) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
+      write_bytes(socket, fixed_length_header(remote_error_page.size(), "500 Internal Server Error") +
+                             std::string(remote_error_page));
+   });
+   fc::http_client client;
+
+   BOOST_CHECK_EXCEPTION(client.post_sync(server_url(server), fc::variant(fc::mutable_variant_object())), fc::exception,
+                         [](const fc::exception& error) {
+                            return error.to_detail_string().find(
+                                      "Request failed with 500 response, but response was not parseable") !=
+                                   std::string::npos;
+                         });
+}
+
+/// A 404 metadata response names the missing URL instead of falling through to the generic status error.
+BOOST_AUTO_TEST_CASE(post_sync_reports_a_missing_url) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
+      write_bytes(socket, fixed_length_header(0, "404 Not Found"));
+   });
+   fc::http_client client;
+
+   BOOST_CHECK_EXCEPTION(
+      client.post_sync(server_url(server), fc::variant(fc::mutable_variant_object())), fc::exception,
+      [](const fc::exception& error) { return error.to_detail_string().find("URL not found") != std::string::npos; });
 }
 
 /// An unbounded download clears an expired metadata deadline before reusing the connection.
