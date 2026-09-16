@@ -279,14 +279,8 @@ sysio::provider_spec_result create_ssm_provider_with_fetcher(fc::crypto::chain_k
    try {
       privkey = from_native_string_to_private_key(key_type, std::string{value});
    } catch (const fc::exception& e) {
-      // Deliberately do NOT embed the parser's message or detail: low-level
-      // parse errors can echo their input, and the input here is the secret
-      // parameter value. The exception name alone is safe and still tells the
-      // operator which parser stage rejected it.
-      FC_THROW_EXCEPTION(chain::plugin_config_exception,
-                         "SSM parameter \"{}\" does not contain a valid {} private key "
-                         "(parse failed with {}; the value is not shown because it is a secret)",
-                         ref.name, chain_key_type_reflector::to_fc_string(key_type), e.name());
+      // libfc's parse error never contains the value, which is the secret; add the parameter that held it.
+      FC_THROW_EXCEPTION(chain::plugin_config_exception, "SSM parameter \"{}\": {}", ref.name, e.top_message());
    }
 
    // The plugin core verifies pinned-pubkey-vs-derived only for `KEY:`;

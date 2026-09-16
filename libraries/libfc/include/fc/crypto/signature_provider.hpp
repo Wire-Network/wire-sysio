@@ -84,7 +84,8 @@ using signature_provider_ptr = std::shared_ptr<signature_provider_t>;
  * @throws fc::unsupported_exception for chain key types without an implemented native form
  *         (e.g. `chain_key_type_sui`); callers owning a richer error taxonomy (such as the
  *         signature-provider plugin's config exceptions) should pre-check the type
- * @throws fc exceptions from the underlying parser on malformed input
+ * @throws fc::parse_error_exception on malformed input; the message names the key type and the
+ *         parser's exception but never the input, which is a secret
  * @return the parsed private key
  */
 private_key from_native_string_to_private_key(chain_key_type_t key_type, const std::string& private_key_str);
