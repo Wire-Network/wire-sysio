@@ -184,6 +184,9 @@ BOOST_AUTO_TEST_CASE(literal_values_pass_through_verbatim_and_no_field_is_requir
    BOOST_CHECK_EQUAL(list[1].as_int64(), sample_line);
    BOOST_CHECK_EQUAL(list[2].get_object()["q"].as_string(), "x");
    BOOST_CHECK_EQUAL(json_template::parse(R"({"only":"literal"})").render(sample_values()), R"({"only":"literal"})");
+   // A wide integer literal stays bare, though fc::json would quote it.
+   const std::string wide_literal = R"({"wide":)" + std::to_string(wide_value) + "}";
+   BOOST_CHECK_EQUAL(json_template::parse(wide_literal).render(sample_values()), wide_literal);
    // Keys are never tokenized -- neither a placeholder nor the escape means anything in a key.
    BOOST_CHECK_EQUAL(json_template::parse(R"({"${message}":"v","$${k}":"w"})").render(sample_values()),
                      R"({"${message}":"v","$${k}":"w"})");
@@ -191,18 +194,25 @@ BOOST_AUTO_TEST_CASE(literal_values_pass_through_verbatim_and_no_field_is_requir
 FC_LOG_AND_RETHROW()
 
 // Names beyond the defaults are supplied by string and render by the same type rules -- including a wide integer
-// as bare digits where fc::json would quote it.
+// as bare digits where fc::json would quote it, at any depth and inside a mixed string.
 BOOST_AUTO_TEST_CASE(additional_names_render_like_the_defaults) try {
-   const auto tpl = json_template::parse(R"({"x":"${custom}","y":"${wide}","z":"${obj}","w":"${wide} wide"})");
+   const auto tpl = json_template::parse(R"({"x":"${custom}","y":"${wide}","z":"${obj}","w":"${wide} wide",)"
+                                         R"("v":"obj ${obj}"})");
    auto values = sample_values();
-   values.set("custom", "v").set("wide", wide_value).set("obj", fc::variant{fc::mutable_variant_object{}("k", 1)});
+   const fc::variant_object obj =
+      fc::mutable_variant_object{}("k", 1)("n", wide_value)("list", fc::variants{fc::variant{wide_value}});
+   values.set("custom", "v").set("wide", wide_value).set("obj", fc::variant{obj});
    const std::string line = tpl.render(values);
-   BOOST_CHECK(line.find(R"("y":)" + std::to_string(wide_value) + ",") != std::string::npos);
+   const std::string wide_digits = std::to_string(wide_value);
+   BOOST_CHECK(line.find(R"("y":)" + wide_digits + ",") != std::string::npos);
+   BOOST_CHECK(line.find(R"("n":)" + wide_digits + ",") != std::string::npos);
+   BOOST_CHECK(line.find(R"("list":[)" + wide_digits + "]") != std::string::npos);
    const auto doc = parse_object(line);
    BOOST_CHECK_EQUAL(doc["x"].as_string(), "v");
    BOOST_CHECK_EQUAL(doc["y"].as_uint64(), wide_value);
    BOOST_CHECK_EQUAL(doc["z"].get_object()["k"].as_int64(), 1);
    BOOST_CHECK_EQUAL(doc["w"].as_string(), std::to_string(wide_value) + " wide");
+   BOOST_CHECK(doc["v"].as_string().find(R"("n":)" + wide_digits + ",") != std::string::npos);
 }
 FC_LOG_AND_RETHROW()
 

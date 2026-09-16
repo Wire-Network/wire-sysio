@@ -52,7 +52,7 @@ constexpr auto expected_get_info_fields = std::to_array<std::string_view>(
     "block_cpu_limit", "block_net_limit", "fork_db_head_block_num", "total_cpu_weight"});
 /// A 64-hex block id for the sample snapshot's LIB (block 41).
 constexpr std::string_view sample_lib_block_id = "0000002900000000000000000000000000000000000000000000000000000000";
-/// Above 0xffffffff, so fc renders it as a JSON string -- the same rule the HTTP body follows.
+/// Above 0xffffffff, which the HTTP body quotes; a status document carries it as a JSON number.
 constexpr uint64_t wide_weight = uint64_t{1} << 40;
 constexpr uint32_t sample_head_block_num = 42;
 /// A fixed wall-clock reference; the render tests pin its epoch-millis rendering.
@@ -431,7 +431,8 @@ BOOST_AUTO_TEST_CASE(render_document_replaces_every_token_of_the_shipped_sample)
    BOOST_CHECK_EQUAL(status["last_irreversible_block_num"].as_uint64(), sample_head_block_num - 1);
    BOOST_CHECK_EQUAL(status["server_version"].as_string(), "0badf00d");
    BOOST_CHECK_EQUAL(status["head_block_producer"].as_string(), "sysio");
-   BOOST_CHECK(status["total_cpu_weight"].is_string());
+   BOOST_CHECK(status["total_cpu_weight"].is_uint64());
+   BOOST_CHECK_EQUAL(status["total_cpu_weight"].as_uint64(), wide_weight);
    BOOST_CHECK_MESSAGE(status.size() == expected_get_info_fields.size(),
                        "get_info_results gained or lost a reflected field (fc omits unset optionals): update "
                        "expected_get_info_fields");
@@ -461,12 +462,17 @@ BOOST_AUTO_TEST_CASE(every_supplied_token_renders) try {
 }
 FC_LOG_AND_RETHROW()
 
-// Byte parity with /v1/chain/get_info: the snapshot is embedded verbatim -- the text the HTTP layer sends for
-// the same struct (beast_http_session: fc::json::to_string(fc::variant(result), fc::time_point::maximum())) --
-// and the document is exactly what the template says, nothing added.
-BOOST_AUTO_TEST_CASE(render_document_embeds_the_http_body_verbatim_and_adds_nothing) try {
+// Byte parity with /v1/chain/get_info: the snapshot is embedded as the text the HTTP layer sends for the same
+// struct (beast_http_session: fc::json::to_string(fc::variant(result), fc::time_point::maximum())), except that an
+// integer the HTTP body quotes is a bare number -- and the document is exactly what the template says, nothing added.
+BOOST_AUTO_TEST_CASE(render_document_embeds_the_http_body_and_adds_nothing) try {
    const auto snapshot = sample_snapshot();
-   const std::string http_body = fc::json::to_string(fc::variant{snapshot.info}, fc::time_point::maximum());
+   std::string http_body = fc::json::to_string(fc::variant{snapshot.info}, fc::time_point::maximum());
+   const std::string wide_digits = std::to_string(wide_weight);
+   const std::string quoted_wide = '"' + wide_digits + '"';
+   const auto quoted_at = http_body.find(quoted_wide);
+   BOOST_REQUIRE(quoted_at != std::string::npos);
+   http_body.replace(quoted_at, quoted_wide.size(), wide_digits);
    const auto data_only = fc::json_template::parse(data_only_template);
    const std::string line = status_monitor::render_document(snapshot, data_only);
    BOOST_CHECK_EQUAL(line, R"({"data":{")" + std::string{status_monitor::record_key} + R"(":)" + http_body + "}}\n");

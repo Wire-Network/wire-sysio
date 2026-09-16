@@ -16,11 +16,45 @@ constexpr std::string_view token_escape = "$${";
 constexpr char token_close = '}';
 constexpr char modifier_separator = ':';
 
-/// Serialize a value exactly as fc::json emits it -- the one encoder every value in a rendered document goes
-/// through: literal values and member keys at compile time, assembled strings and non-integer entries at render
-/// time (the same encoder as the HTTP API's response bodies).
+/// Serialize a value exactly as fc::json emits it -- the one encoder every non-integer value in a rendered document
+/// goes through: literals and member keys at compile time, assembled strings and entries at render time (the same
+/// encoder as the HTTP API's response bodies).
 std::string serialize(const fc::variant& value) {
    return fc::json::to_string(value, fc::time_point::maximum());
+}
+
+/// Append @p value as JSON with every 64-bit integer as bare digits, at any depth. fc::json quotes integers above
+/// 0xffffffff for the HTTP API, and a document index maps a quoted number as text.
+void append_json(const fc::variant& value, std::string& dest) {
+   if (value.is_int64()) {
+      fmt::format_to(std::back_inserter(dest), "{}", value.as_int64());
+   } else if (value.is_uint64()) {
+      fmt::format_to(std::back_inserter(dest), "{}", value.as_uint64());
+   } else if (value.is_object()) {
+      dest += '{';
+      bool first = true;
+      for (const auto& entry : value.get_object()) {
+         if (!first)
+            dest += ',';
+         first = false;
+         dest += serialize(fc::variant{entry.key()});
+         dest += ':';
+         append_json(entry.value(), dest);
+      }
+      dest += '}';
+   } else if (value.is_array()) {
+      dest += '[';
+      bool first = true;
+      for (const auto& element : value.get_array()) {
+         if (!first)
+            dest += ',';
+         first = false;
+         append_json(element, dest);
+      }
+      dest += ']';
+   } else {
+      dest += serialize(value); // string, bool, null, double, 128/256-bit: exactly as fc::json emits them
+   }
 }
 
 } // anonymous namespace
@@ -118,7 +152,7 @@ json_template::node json_template::compile_node(const fc::variant& value) {
       return n;
    }
    if (!value.is_string()) {
-      n.verbatim = serialize(value);
+      append_json(value, n.verbatim);
       return n;
    }
    std::vector<part> parts;
@@ -178,28 +212,22 @@ const fc::variant& json_template::lookup(const part& p, const json_template_valu
 }
 
 std::string json_template::token_text(const part& p, const fc::variant& value) {
+   std::string text;
    if (value.is_string()) {
       // level_case is preserve for every name but level, so this is the identity everywhere else.
-      std::string text;
       format_level_name_to(std::back_inserter(text), value.get_string(), p.level_case);
-      return text;
+   } else {
+      append_json(value, text);
    }
-   if (value.is_int64())
-      return fmt::format("{}", value.as_int64());
-   if (value.is_uint64())
-      return fmt::format("{}", value.as_uint64());
-   return serialize(value); // bool, null, double, object, array: exactly as fc::json emits them
+   return text;
 }
 
 std::string json_template::token_json(const part& p, const fc::variant& value) {
-   // An integer renders bare digits: fc::json quotes integers above 0xffffffff for the HTTP API, a rule a
-   // date-mapped epoch_millis must not inherit. A string is recased (level) and encoded; anything else is
-   // fc::json's own text.
-   if (value.is_int64() || value.is_uint64())
-      return token_text(p, value);
+   // A string is recased (level) and encoded; anything else already is JSON, integers bare (a date-mapped
+   // epoch_millis included).
    if (value.is_string())
       return serialize(fc::variant{token_text(p, value)});
-   return serialize(value);
+   return token_text(p, value);
 }
 
 void json_template::render_node(const node& n, const json_template_values& values, std::string& dest) const {
