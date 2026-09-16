@@ -17,7 +17,7 @@ using namespace sysio::opp::types;
 using mvo = fc::mutable_variant_object;
 
 /// Test fixture for sysio.dclaim. Deploys sysio.dclaim and creates sysio.msgch /
-/// sysio.authex as the authorized inbound callers. The v6 staking-reward path
+/// sysio.authex as the authorized inbound callers. The staking-reward path
 /// credits a WIRE-denominated amount directly (native -> WIRE conversion is
 /// outpost-side), so no sysio.reserv deployment is needed.
 class sysio_dclaim_tester : public tester {

@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(composite_key_struct_roundtrip) {
 // ── slug_name as a codec LEAF ───────────────────────────────────────────────
 // `slug_name` is an abi_serializer builtin and a leaf_key_spellings entry, so
 // it needs no abi.structs entry here — build_key_shapes resolves it through
-// leaf_kind_of. These pin the leaf's carrier and the two properties the v6
+// leaf_kind_of. These pin the leaf's carrier and the two properties the registry
 // registry tables depend on: byte compatibility with the struct-key encoding it
 // replaced, and prefix grouping.
 
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(slug_name_leaf_roundtrips_a_non_canonical_value_as_an_integ
 }
 
 BOOST_AUTO_TEST_CASE(slug_name_multi_leaf_keys_preserve_field_order_and_offsets) {
-   // THREE of the five v6 registry tables key on more than one slug:
+   // THREE of the five registry tables key on more than one slug:
    //   sysio.tokens::chaintokens ["slug_name","slug_name"]
    //   sysio.reserv::reserves    ["slug_name","slug_name","slug_name"]
    //   sysio.uwrit::locksums     ["name","slug_name","slug_name"]
@@ -412,7 +412,7 @@ BOOST_AUTO_TEST_CASE(typedef_cycle_is_rejected) {
 }
 
 // Scoped table whose within-scope primary key is a struct (composite_key). The real
-// v6 registry tables are unscoped, but chain_plugin supports scoped tables by
+// registry tables are unscoped, but chain_plugin supports scoped tables by
 // stripping the leading scope field's shape from the bound shapes and encoding
 // only the within-scope portion (see get_table_rows' scope_key_count erase).
 // This pins that slice-then-encode path for a struct-typed within-scope key:

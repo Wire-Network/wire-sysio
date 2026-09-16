@@ -1,7 +1,7 @@
 /// Cross-contract tests for the `sysio.epoch::advance` ↔ `sysio.opreg::
 /// flushwtdw` integration (Task 9 of the operator-collateral plan).
 ///
-/// v6 data-model: identity is now slug_name-keyed across opreg / chains.
+/// Data model: identity is now slug_name-keyed across opreg / chains.
 /// The fixture deploys `sysio.chains` so the chain-of-record exists and
 /// uses `regchain` (replacing the v5 `regoutpost`).
 
@@ -289,7 +289,7 @@ public:
    }
 
    /// Direct opreg::depositinle, signed as opreg itself.
-   /// v6 signature: codenames for chain and token, plus the actor identity.
+   /// Signature: codenames for chain and token, plus the actor identity.
    action_result depositinle(name account, std::string_view chain_code,
                              std::string_view token_code, uint64_t amount) {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
@@ -485,7 +485,7 @@ BOOST_FIXTURE_TEST_CASE(slashed_operator_withdraw_drops_silently,
 /// emitted by `sysio.opreg::emit_*` parse as a standard protobuf
 /// `OperatorAction` message. They were originally written against the v5
 /// OperatorAction proto (with a `chain` ChainKind field and a
-/// `TokenAmount.kind` TokenKind field). The v6 proto carries
+/// `TokenAmount.kind` TokenKind field). The proto carries
 /// `chain_code` (uint64) and `amount.token_code` (uint64) instead — same
 /// shape, different field semantics — so the parse + field-1-tag-byte
 /// invariant still holds.

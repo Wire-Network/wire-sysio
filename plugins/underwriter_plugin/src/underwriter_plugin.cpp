@@ -144,7 +144,7 @@ struct uw_request {
    /// `SwapDeposit` correlation hash, so it is the value the source-deposit
    /// verifier must reproduce.
    uint64_t                target_amount;
-   /// Per-leg slug_name triples (v6 data-model). These are the authoritative
+   /// Per-leg slug_name triples (data-model). These are the authoritative
    /// identifiers for the depot's `rcrdcommit` routing and the
    /// `UnderwriteIntentCommit` (`chain_code` / `token_code` / `reserve_code`)
    /// payload populated in `create_signed_uic_bytes`. The `ChainKind` /
@@ -196,7 +196,7 @@ struct uw_request {
 //  Credit line — per-(chain_code, token_code) bond from sysio.opreg::operators
 //
 //  Reads the `balances` field (one aggregate balance per EXACT
-//  (chain_code, token_code) — SEC-13/WSA-027: keyed by the v6 slug codes, NOT
+//  (chain_code, token_code) — SEC-13/WSA-027: keyed by the slug codes, NOT
 //  the coarse (ChainKind, TokenKind) family, so two same-family chains hold
 //  independent collateral). `read_credit_lines` starts from this raw balance
 //  and subtracts active locks plus pending withdrawals to mirror the depot's
@@ -378,7 +378,7 @@ struct underwriter_plugin::impl {
    /// The `commit_addr` each entry of `outpost_by_chain` was built against, so
    /// a `sysio.chains::setoutpost` redeploy is noticed and the handle rebuilt.
    std::map<uint64_t, std::string>               wired_commit_addrs;
-   /// v6 cross-walk: token slug_name → TokenKind enum. Refreshed each
+   /// cross-walk: token slug_name → TokenKind enum. Refreshed each
    /// scan cycle by `read_credit_lines` (which reads `sysio.tokens::tokens`
    /// for the lookup); used by `scan_pending_requests` to translate the
    /// uwreq row's `src/dst_token_code` slug into the `TokenKind` the
@@ -388,7 +388,7 @@ struct underwriter_plugin::impl {
    // ── Outstanding commit tracking (one entry per CONFIRMED leg) ───────
    // Per `feedback`: an underwriter that confirmed a commit tx for a leg
    // should NOT resubmit on the next scan cycle. The de-dup key is the EXACT
-   // v6 leg identity `(uwreq_id, chain_code, token_code, reserve_code)`
+   // leg identity `(uwreq_id, chain_code, token_code, reserve_code)`
    // (`underwriter_detail::commit_key`) — NOT the coarse (ChainKind,
    // TokenKind), so two legs differing only by chain or reserve are tracked
    // independently (SEC-13/WSA-027). The set is pruned at the end of each scan
@@ -1191,7 +1191,7 @@ struct underwriter_plugin::impl {
       outpost_chain_kinds.clear();
       outpost_external_chain_ids.clear();
       outpost_endpoints.clear();
-      // v6 refactor: chain rows moved from `sysio.epoch::outposts` to
+      // refactor: chain rows moved from `sysio.epoch::outposts` to
       // `sysio.chains::chains`. Each row is a `Chain` with fields:
       //   `code`              — slug_name (the universal chain identifier; the
       //                          v5 `outpost_id` was just this slug's uint64).
@@ -1367,7 +1367,7 @@ struct underwriter_plugin::impl {
    void read_credit_lines() {
       credit_lines.clear();
 
-      // v6 schema: balance / lock / withdraw rows carry `chain_code`
+      // schema: balance / lock / withdraw rows carry `chain_code`
       // and `token_code` slug_names (read via fc::slug_name's from_variant)
       // — not the v5 `chain` (ChainKind enum) / `token_kind` (TokenKind
       // enum). Translation:
@@ -1392,7 +1392,7 @@ struct underwriter_plugin::impl {
          }
       }
 
-      // Local helper: read `chain_code`/`token_code` slug fields (v6 shape
+      // Local helper: read `chain_code`/`token_code` slug fields (shape
       // `{"value": <u64>}`) as their EXACT packed slug values. Returns nullopt
       // (row skipped) when the chain isn't a registered non-depot outpost or
       // the token is unknown — neither can back a leg. SEC-13/WSA-027: key by
@@ -1503,10 +1503,10 @@ struct underwriter_plugin::impl {
    std::vector<uw_request> scan_pending_requests() {
       std::vector<uw_request> requests;
 
-      // v6: `sysio.uwrit::uwreqs` is now a KV table. The legacy
+      // `sysio.uwrit::uwreqs` is now a KV table. The legacy
       // multi_index-style `{"bystatus": <n>}` lower_bound format
       // doesn't traverse the KV secondary index — it returns 0 rows.
-      // Until a v6 KV-index query path lands here, scan by primary
+      // Until a KV-index query path lands here, scan by primary
       // key and filter PENDING in C++. uwreqs is small (one row per
       // in-flight swap; race-resolved rows transition to other
       // statuses within an epoch), so this is cheap.
@@ -1543,7 +1543,7 @@ struct underwriter_plugin::impl {
              AttestationType::ATTESTATION_TYPE_SWAP_REQUEST) continue;
          req.attestation_type = *attestation_type;
 
-         // v6 data-model schema: src/dst identity lives on the uwreq row as
+         // Data-model schema: src/dst identity lives on the uwreq row as
          // `(chain_code, token_code, reserve_code)` slug_name triples plus a
          // `*_amount`. Populated by `sysio.uwrit::createuwreq` from the
          // originating SwapRequest. Each is read through fc::slug_name's own
@@ -1855,7 +1855,7 @@ struct underwriter_plugin::impl {
    /// provider, serialize failure, etc.).
    ///
    /// The slug_name triple `(chain_code, token_code, reserve_code)` is the
-   /// v6 routing scalar set the depot's `rcrdcommit` uses to disambiguate
+   /// routing scalar set the depot's `rcrdcommit` uses to disambiguate
    /// src vs dst legs — same-chain swaps with multiple reserves on a single
    /// `(chain, token)` pair are still resolvable because `reserve_code`
    /// breaks the tie. `chain_code` carries the chain identity at the OPP
@@ -1875,7 +1875,7 @@ struct underwriter_plugin::impl {
       opp_att::UnderwriteIntentCommit uic;
       uic.mutable_uw_account()->set_name(underwriter_account.to_string());
       uic.set_uw_request_id(uwreq_id);
-      // v6 data-model: leg identity is the slug_name triple. The wire format
+      // Data model: leg identity is the slug_name triple. The wire format
       // for each field is the packed uint64 slug_name value (alphabet
       // `[A-Z0-9_]+`, ≤8 chars). The depot decodes these back to
       // `sysio::slug_name` via `sysio::slug_name{uic.chain_code}` etc. in
@@ -2621,7 +2621,7 @@ struct underwriter_plugin::impl {
            req.dst_token_code.to_string(),
            req.dst_reserve_code.to_string());
 
-      // Per-leg dispatch keyed on the v6 slug_name triple
+      // Per-leg dispatch keyed on the slug_name triple
       // `(chain_code, token_code, reserve_code)`. Same-chain swaps (e.g.
       // ERC20 → native on one outpost) share `chain_code` between the two
       // legs but differ on `token_code`/`reserve_code`; the UIC payload

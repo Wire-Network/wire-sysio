@@ -33,7 +33,7 @@ std::vector<char> em_pubkey_bytes(const fc::crypto::public_key& pk) {
 
 } // anonymous namespace
 
-/// v6 data-model: reserves are keyed by the triple `(chain_code, token_code,
+/// Data model: reserves are keyed by the triple `(chain_code, token_code,
 /// reserve_code)` (each a `sysio::slug_name` packed uint64). The legacy
 /// `setreserve` action is gone; `regreserve` is the bootstrap-window
 /// equivalent (it works only while `current_epoch_index == 0`, which is the
@@ -185,11 +185,11 @@ public:
       return fc::raw::unpack<uint64_t>(trace->action_traces[0].return_value);
    }
 
-   // ── SlugName helpers (v6) ──
+   // ── SlugName helpers ──
 
    static fc::slug_name cn(std::string_view s) { return fc::slug_name{s}; }
 
-   /// `regreserve` is the v6 bootstrap-window action for inserting a reserve
+   /// `regreserve` is the bootstrap-window action for inserting a reserve
    /// row with `status=ACTIVE` and REAL WIRE backing drained from the
    /// treasury. Triple-slug_name PK is `(chain_code, token_code,
    /// reserve_code)`; `is_private`/`owner` seed privately-owned reserves.
@@ -358,7 +358,7 @@ public:
 
 BOOST_AUTO_TEST_SUITE(sysio_reserve_tests)
 
-// ── regreserve (v6 bootstrap-window action; real-WIRE treasury drain) ──
+// ── regreserve (bootstrap-window action; real-WIRE treasury drain) ──
 
 BOOST_FIXTURE_TEST_CASE(regreserve_creates_reserve_row, sysio_reserve_tester) { try {
    const int64_t treasury_before = wire_balance(SYSIO_ACCOUNT);

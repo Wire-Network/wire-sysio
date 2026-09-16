@@ -102,12 +102,10 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
     // pagination must round-trip the nested `{ "code": { "value": N } }` key
     // shape — coverage a flat scalar key cannot provide.
     //
-    // Deliberately NOT named `slug_name`: that spelling is an abi_serializer
-    // builtin and a `leaf_key_spellings` entry, and abigen's builtin match is
-    // on the namespace-stripped bare name — so a member struct called
-    // `slug_name` would be emitted as the builtin, take the leaf branch in
-    // `build_key_shape`, and stop exercising struct expansion at all. The
-    // suite would keep passing while testing nothing it was written for.
+    // The name must not collide with an ABI builtin. abigen matches builtins on
+    // the namespace-stripped bare name, so a key struct named after one is
+    // emitted AS that builtin, takes the leaf branch in `build_key_shape`, and
+    // stops exercising struct expansion — while the suite keeps passing.
     struct composite_key {
         uint64_t value = 0;
         SYSLIB_SERIALIZE(composite_key, (value))

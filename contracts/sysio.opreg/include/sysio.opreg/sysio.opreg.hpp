@@ -161,7 +161,7 @@ namespace sysio {
 
       /// Per-(chain, token) minimum-bond row stored in `opconfig`'s
       /// per-role requirement vectors and accepted as `setconfig` input.
-      /// Per the v6 data-model refactor: `chain` / `token` identifiers are
+      /// Per the data-model refactor: `chain` / `token` identifiers are
       /// `sysio::slug_name` (uint64-packed) instead of the old enums.
       struct chain_min_bond {
          sysio::slug_name  chain_code;

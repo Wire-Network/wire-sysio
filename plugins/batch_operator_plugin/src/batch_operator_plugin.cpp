@@ -115,7 +115,7 @@ namespace {
       }
    }
 
-   /// v6: chain registry was split out of `sysio.epoch` onto its own
+   /// Chain registry was split out of `sysio.epoch` onto its own
    /// `sysio.chains` contract. The `outposts` table was replaced by the
    /// `chains` KV table, keyed by slug_name (uint64 packed). Field spellings
    /// are shared with underwriter_plugin, which reads the same rows.
@@ -445,7 +445,7 @@ struct batch_operator_plugin::impl {
     * in the batch-op log without grep'ing every poll.
     */
    void poll_own_status() {
-      // v6: `sysio.opreg::operators` is a KV table whose PK is a struct
+      // `sysio.opreg::operators` is a KV table whose PK is a struct
       // `{account: name}`; the chain_plugin's `lower_bound` / `upper_bound`
       // expects JSON-shaped key bounds for KV tables, not the bare name
       // string the v5 multi_index path accepted. Easiest robust fix: scan
@@ -573,7 +573,7 @@ struct batch_operator_plugin::impl {
    // -----------------------------------------------------------------------
 
    void refresh_outposts() {
-      // v6: chain registry lives on `sysio.chains::chains` (replaces the
+      // Chain registry lives on `sysio.chains::chains` (replaces the
       // removed `sysio.epoch::outposts` table). Each row carries the
       // chain's slug_name + kind + external_chain_id + is_depot + active.
       // Outposts are the non-depot, active rows; the single is_depot=true
@@ -640,7 +640,7 @@ struct batch_operator_plugin::impl {
          }
          outposts.push_back(std::move(od));
       }
-      ilog("batch_operator: loaded {} outposts (v6 sysio.chains)", outposts.size());
+      ilog("batch_operator: loaded {} outposts (sysio.chains)", outposts.size());
       prune_stale_opp_jobs();
       build_opp_jobs();
       schedule_opp_jobs();

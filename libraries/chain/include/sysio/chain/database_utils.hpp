@@ -500,20 +500,18 @@ inline void encode_field(writer& w, key_leaf_kind kind, const fc::variant& val) 
 }
 
 // ── ABI-aware key shapes ────────────────────────────────────────────────────
-// kv/multi_index keys are not limited to the builtin leaf types above: a key
-// may be a struct whose fields encode in declaration order. Note `sysio::kv`
-// does NOT route through CDT's `to_key` — `make_key` writes into a
-// `be_key_stream` whose operator<< set is closed (the integrals, name, the
-// floats, bool, string, vector<char>), so a struct key resolves through
-// SYSLIB_SERIALIZE's generic-DataStream friend template and recurses to
-// write_be64 per member. `slug_name` is the primary key of the v6 registry
-// tables (sysio.chains chains, sysio.tokens tokens/chaintokens, sysio.reserv
-// reserves) and is now a LEAF above, not a struct key; the byte encoding is
-// unchanged either way. A key_shape is the resolved encode/decode plan for one key
-// field: a leaf with a codec-supported type, or a struct node whose children
-// encode in declaration order (matching to_key's reflected-field walk). Leaf
-// types and their kinds are defined above, with the codec (key_leaf_kind /
-// leaf_key_spellings / leaf_kind_of).
+// A key_shape is the resolved encode/decode plan for one key field: either a
+// leaf of a codec-supported type (key_leaf_kind / leaf_key_spellings /
+// leaf_kind_of, above), or a struct node whose children encode in declaration
+// order — matching to_key's reflected-field walk.
+//
+// Struct nodes exist because a kv/multi_index key may itself be a struct, and
+// they encode the same bytes a leaf does: `sysio::kv` never routes through
+// CDT's `to_key`. `make_key` writes into a `be_key_stream` whose operator<<
+// set is closed, so a struct key resolves through SYSLIB_SERIALIZE's generic
+// friend template and recurses to write_be64 per member. That is why promoting
+// `slug_name` from a struct key to a leaf leaves every stored key
+// byte-identical.
 
 /// Canonicalize abigen template spellings and chase ABI typedefs to a fixpoint.
 /// A visited set of resolved typedef names makes an alias cycle (a -> b -> ...

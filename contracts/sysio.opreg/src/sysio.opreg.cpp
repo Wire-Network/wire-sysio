@@ -87,7 +87,7 @@ checksum256 make_account_chain_token_key(name account,
 /// for handling that case — typically by skipping the queueout for chains
 /// without an outpost, e.g. WIRE-direct flows).
 ///
-/// Post v6 cross-contract realignment: chain rows live in
+/// After the cross-contract realignment: chain rows live in
 /// `sysio.chains::chains` keyed by `code` (slug_name); the legacy
 /// `sysio.epoch::outposts` table is gone. The "outpost id" returned here is
 /// the chain's `code.value` (uint64) — callers that still expect a small
@@ -333,7 +333,7 @@ void opreg::regoperator(name account,
    // Verify authex links exist for all active outpost chains.
    // Skip when: bootstrapped OR privileged caller (sysio.opreg registering on behalf)
    //
-   // Post v6 refactor: the outpost set lives in `sysio.chains::chains` keyed
+   // After the refactor: the outpost set lives in `sysio.chains::chains` keyed
    // by slug_name. The depot self-row (`is_depot == true`) is skipped; only
    // active outpost chains require an authex link. `authex::links.bynamechain`
    // is still keyed by ChainKind (uint128 of (account, ChainKind)), so we
@@ -411,7 +411,7 @@ uint64_t sum_locks_inline(name account, sysio::slug_name chain_code, sysio::slug
 /// (op, chain, token). Subtracted by `available()` so a queued withdraw
 /// effectively reserves the funds for its 2-epoch wait.
 ///
-/// Per v6 plan §B.2 (split-index design): `wtdwqueue_t` exposes only uint64
+/// Per the split-index design: `wtdwqueue_t` exposes only uint64
 /// secondary indexes. `byaccount` keys on `account.value`; rows are filtered
 /// on `(chain_code, token_code)` in memory. Per-account pending-withdraw
 /// counts are bounded by the operator's collateral-bucket count.
@@ -659,7 +659,7 @@ namespace {
 /// fails gracefully (the depot's `dispatch_operator_action` rejects empty
 /// `op_address.address`).
 ///
-/// Post v6: `authex::links.bynamechain` is still keyed by `(name, ChainKind)`
+/// After the refactor: `authex::links.bynamechain` is still keyed by `(name, ChainKind)`
 /// and `ChainAddress.kind` is still `ChainKind`. opreg now stores chains by
 /// slug_name; resolve via `chain_kind_for_code` first.
 opp::types::ChainAddress operator_chain_address(name account, sysio::slug_name chain_code) {
@@ -1214,7 +1214,7 @@ void opreg::deposit(name account, uint64_t amount) {
 // `actor_chain` is retained as `opp::types::ChainKind` per the
 // ChainAddress flattening pattern — the depositor's source-chain
 // `ChainAddress.kind` field is still ChainKind on the wire and is not
-// part of the v6 slug_name refactor.
+// part of the slug_name refactor.
 void opreg::depositinle(name account,
                         sysio::slug_name chain_code,
                         sysio::slug_name token_code,

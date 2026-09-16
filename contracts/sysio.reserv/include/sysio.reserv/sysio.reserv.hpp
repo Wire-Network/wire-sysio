@@ -22,7 +22,7 @@ namespace sysio {
    /**
     * @brief sysio.reserv — reserve registry with create→match→ready handshake.
     *
-    * Per the v6 data-model refactor:
+    * Per the data-model refactor:
     *
     * - Reserve primary key is the triple `(chain_code, token_code, code)`
     *   (all codenames). Composite stored as `checksum256(chain || token || code)`.
@@ -297,7 +297,7 @@ namespace sysio {
       // depot-initiated REMIT is paid by the destination outpost (no rejection,
       // so no reserve-ledger reconciliation is needed).
 
-      // onreward was removed: the v6 STAKING_REWARD path credits the per-staker
+      // onreward was removed: the STAKING_REWARD path credits the per-staker
       // reward to sysio.dclaim directly (already WIRE-denominated), so there is
       // no reserve leg and no reserve-side reward crediting.
 

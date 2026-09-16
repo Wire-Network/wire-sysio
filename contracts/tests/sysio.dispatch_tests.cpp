@@ -1,7 +1,7 @@
 /// Cross-contract dispatch tests for sysio.msgch's per-attestation-type
 /// routing (Task 4 of the operator-collateral plan).
 ///
-/// v6 data-model: identity moved to slug_name-keyed registries. The dispatch
+/// Data model: identity moved to slug_name-keyed registries. The dispatch
 /// surface still routes `OPERATOR_ACTION` payloads into opreg, but the
 /// payload schema now carries `chain_code` (slug_name uint64) instead of a
 /// `ChainKind chain` field, and `TokenAmount.token_code` (slug_name uint64)
@@ -228,7 +228,7 @@ std::vector<char> em_pubkey_bytes(const fc::crypto::public_key& pk) {
    return std::vector<char>(compressed.begin(), compressed.end());
 }
 
-/// Encode an OperatorAction attestation payload (v6 schema).
+/// Encode an OperatorAction attestation payload (schema).
 /// `chain_code` and `amount.token_code` are slug_name-packed uint64 values.
 std::string encode_operator_action(
    sysio::opp::attestations::OperatorAction_ActionType action_type,
@@ -527,7 +527,7 @@ public:
 
       create_uwrit_op_eth_authex_link();
 
-      // v6: chains are first-class registry rows.
+      // Chains are first-class registry rows.
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
          "regchain"_n, mvo()
             ("kind",              outpost_kind)

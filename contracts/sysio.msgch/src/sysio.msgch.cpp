@@ -447,7 +447,7 @@ std::optional<checksum256> to_checksum256_exact(const std::vector<char>& bytes) 
 /// Decode an OperatorAction sub-message and dispatch to the appropriate
 /// sysio.opreg action. Called from the inbound dispatch loop in `evalcons`.
 ///
-/// Sub-type routing (post v6 data-model refactor — codenames everywhere):
+/// Sub-type routing (post data-model refactor — codenames everywhere):
 ///   * DEPOSIT_REQUEST     → opreg::depositinle(account, chain_code, token_code,
 ///                                              amount, actor_chain, actor_addr,
 ///                                              msg_id)
@@ -561,7 +561,7 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
 /// covering this leg); the authoritative copy for verification is the
 /// bytes themselves, stored on `commit_entry.{source,dest}_uic_bytes`.
 ///
-/// Post v6: identity scalars on UIC are codenames (uint64). `chain_code` is the proven source
+/// After the refactor: identity scalars on UIC are codenames (uint64). `chain_code` is the proven source
 /// outpost from `deliver`; `uic.chain_code` is the leg this commit covers. WSA-005 requires the two
 /// to be identical — each leg's underwrite commit is emitted on, and relayed by, that leg's own
 /// outpost (a source-leg UIC rides the source outpost's envelope, a dest-leg UIC the dest outpost's;
@@ -856,10 +856,10 @@ void dispatch_attestation(name self, uint64_t attestation_id,
       // longer exists; any stray inbound falls through to the default drop below.
 
       case AttestationType::ATTESTATION_TYPE_STAKING_REWARD:
-         // Per-staker staking reward -> sysio.dclaim claim ledger. The v6
+         // Per-staker staking reward -> sysio.dclaim claim ledger. The
          // staking-reward path does not deposit back to a reserve (the
          // external-pool credit and native -> WIRE conversion are
-         // outpost-side), so the pre-v6 reserv::onreward leg is dropped and
+         // outpost-side), so the pre-refactor reserv::onreward leg is dropped and
          // reward_amount.amount is forwarded as the WIRE-denominated credit.
          {
             opp::attestations::StakingReward sr;
@@ -1331,7 +1331,7 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
 
    // Verify outpost exists on the new `sysio.chains::chains` table.
    // `chain_code` is the originating chain's slug_name value (uint64) per
-   // the v6 data-model refactor — the chain row's PK is `code.value`.
+   // the data-model refactor — the chain row's PK is `code.value`.
    // Reject deliveries from the depot self-row (`is_depot==true`) and
    // from inactive chains; both are protocol invariants.
    sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
@@ -1577,7 +1577,7 @@ void msgch::chkcons() {
 
    // Check all active outposts have consensus for the current epoch.
    // Outpost set is sourced from `sysio.chains::chains` filtered to
-   // active && !is_depot per the v6 data-model refactor; outpost ids
+   // active && !is_depot per the data-model refactor; outpost ids
    // in `outpcons` are slug_name values (chain_row::code.value).
    outpost_consensus_t opcons(get_self());
    sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);

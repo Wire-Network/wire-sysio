@@ -200,7 +200,7 @@ namespace sysio {
      * @param chain_kind The chain identifier from `opp::types::ChainKind`
      *                   (CHAIN_KIND_EVM / CHAIN_KIND_SVM).
      *                   Wire-side legacy `fc::crypto::chain_kind_t` is host-only.
-     *                   TODO @jglanz: SUI variant removed in v6; revisit when
+     *                   TODO @jglanz: SUI variant removed in the data-model refactor; revisit when
      *                   SUI outpost is added.
      * @param account   The WIRE account name of the user which the address is being linked to.
      * @param sig        A valid signature for the target chain converted to Wire's standard.

@@ -123,7 +123,7 @@ uint32_t get_current_epoch() {
 }
 
 /// Sum the underwriter's pending withdraws on opreg for the given
-/// `(chain_code, token_code)`. Per v6 plan §B.2 (split-index design):
+/// `(chain_code, token_code)`. Per the split-index design:
 /// `opreg::wtdwqueue_t` exposes only uint64 secondary indexes. The `byaccount`
 /// index keys on `account.value`; rows are filtered on `(chain_code,
 /// token_code)` in memory. Per-account pending-withdraw counts are O(1)-ish
@@ -467,7 +467,7 @@ std::optional<ChainKind> chain_kind_for_code(sysio::slug_name chain_code) {
 /// `feedback_no_zero_sentinels` — outpost id 0 is a real id, so 0 must not
 /// double as "missing").
 ///
-/// Post v6 cross-contract realignment: chain rows live in
+/// After the cross-contract realignment: chain rows live in
 /// `sysio.chains::chains` keyed by `code` (slug_name); the legacy
 /// `sysio.epoch::outposts` table is gone. The "outpost id" returned here is
 /// the chain's `code.value` (uint64). The depot-self row is filtered out so

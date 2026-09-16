@@ -191,7 +191,7 @@ constexpr uint32_t kDellogPrunePerCrank = 64;
 
 } // namespace
 
-/// v6 data-model: per-chain identity has moved from `ChainKind` enums to
+/// Data model: per-chain identity has moved from `ChainKind` enums to
 /// `sysio::slug_name`-keyed registries (`sysio.chains`, `sysio.tokens`,
 /// `sysio.reserv`). The test fixture treats the codenames as opaque uint64
 /// values; per-chain spelling ("ETH", "SOL", "WIRE", "LIQETH", ...) maps to
@@ -243,7 +243,7 @@ public:
       epoch_abi_ser.set_abi(std::move(epoch_abi), abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-   // ── SlugName helpers (v6) ──
+   // ── SlugName helpers ──
    //
    // Codenames are 8-byte packed identifiers (`fc::slug_name`). The contract's
    // `sysio::slug_name` and the host-side `fc::slug_name` use the same packing
@@ -285,7 +285,7 @@ public:
    }
 
    /// Build a single `chain_min_bond` entry as an fc::variant suitable for
-   /// `setconfig`'s `req_*_collat` vector arguments. v6: identity is by
+   /// `setconfig`'s `req_*_collat` vector arguments. identity is by
    /// (chain_code, token_code) codenames rather than the old enums.
    static fc::variant make_chain_min_bond(std::string_view chain_code,
                                           std::string_view token_code,
@@ -386,10 +386,10 @@ public:
       BOOST_REQUIRE_EQUAL(0, op["is_bootstrapped"].as_uint64());
    }
 
-   // ── Collateral-action helpers (msgch-dispatched paths, v6 codenames) ──
+   // ── Collateral-action helpers (msgch-dispatched paths, codenames) ──
 
    /// `depositinle`: dispatched from sysio.msgch.
-   /// v6 signature: `(account, chain_code, token_code, amount,
+   /// Signature: `(account, chain_code, token_code, amount,
    ///                actor_chain ChainKind, actor_address bytes,
    ///                original_message_id checksum256)`.
    action_result depositinle(name account,
