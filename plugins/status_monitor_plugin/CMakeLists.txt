@@ -3,4 +3,5 @@ plugin_target(
         LIBRARIES
         appbase
         chain_plugin
+        http_client_plugin
 )

@@ -251,7 +251,7 @@ void status_monitor_plugin::plugin_startup() {
       auto& chain_plug = app().get_plugin<chain_plugin>();
       _impl->chain_plug = &chain_plug;
       _impl->read_only_api.emplace(chain_plug.get_read_only_api(read_only_api_response_budget));
-      _impl->client = std::make_unique<fc::network::es::es_client>(_impl->cfg->delivery);
+      _impl->client = std::make_unique<fc::network::es::es_client>(_impl->cfg->delivery, _impl->cfg->transport);
       // Before anything is started: an endpoint that cannot be reached now would silently drop every document,
       // so it fails startup instead. One attempt, no retry -- the retry budget is for a running node.
       try {

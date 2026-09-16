@@ -86,7 +86,7 @@ std::optional<std::string> es_client::auth_header_for(const es_client_options& o
    return "Basic " + fc::base64_encode(*options.username + ":" + *options.password);
 }
 
-es_client::es_client(es_client_options options)
+es_client::es_client(es_client_options options, http::transport_options transport)
    : _options(validate(std::move(options)))
    // The index is encoded by fc::json -- the one JSON encoder every producer's documents go through as well.
    , _action_line(std::string{es_action_line_prefix} +
@@ -97,7 +97,7 @@ es_client::es_client(es_client_options options)
    , _endpoint(http::sanitized_endpoint(_bulk_url))
    , _auth_header(auth_header_for(_options))
    , _work(boost::asio::make_work_guard(_io))
-   , _http(_io.get_executor())
+   , _http(_io.get_executor(), std::move(transport))
    , _io_thread([this] {
       // An exception leaving a thread function terminates the process, so every statement here is guarded --
       // including the thread-name allocation, whose failure would otherwise take the node down.

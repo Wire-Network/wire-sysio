@@ -679,6 +679,7 @@ BOOST_AUTO_TEST_CASE(outbound_http_global_option_registration) {
    bpo::options_description debugging;
    bpo::options_description signing;
    bpo::options_description snapshot;
+   bpo::options_description status_monitor;
    bpo::options_description options;
 
    sysio::outbound_http::add_global_transport_program_options(global);
@@ -702,7 +703,11 @@ BOOST_AUTO_TEST_CASE(outbound_http_global_option_registration) {
       snapshot,
       {"snapshot-endpoint-additional-ca-file", "snapshot-endpoint-additional-ca-path", "snapshot-endpoint-proxy"},
       "snapshot endpoint");
-   options.add(global).add(ethereum).add(solana).add(debugging).add(signing).add(snapshot);
+   sysio::outbound_http::add_transport_program_options(
+      status_monitor,
+      {"status-monitor-additional-ca-file", "status-monitor-additional-ca-path", "status-monitor-proxy"},
+      "status monitor");
+   options.add(global).add(ethereum).add(solana).add(debugging).add(signing).add(snapshot).add(status_monitor);
 
    std::array arguments{
       chain_plugin_test_program_name,

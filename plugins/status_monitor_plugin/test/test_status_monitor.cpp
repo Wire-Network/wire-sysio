@@ -80,7 +80,15 @@ constexpr auto every_status_monitor_option = std::to_array<std::string_view>(
     status_monitor::option::target_template_file, status_monitor::option::username, status_monitor::option::password,
     status_monitor::option::max_items_per_task, status_monitor::option::max_pending_documents,
     status_monitor::option::connect_timeout_ms, status_monitor::option::request_timeout_ms,
-    status_monitor::option::max_retries, status_monitor::option::retry_backoff_ms});
+    status_monitor::option::max_retries, status_monitor::option::retry_backoff_ms,
+    status_monitor::option::additional_ca_file, status_monitor::option::additional_ca_path,
+    status_monitor::option::proxy});
+/// Transport arguments: a node-wide proxy and CA file, and the plugin's own proxy.
+constexpr std::string_view global_proxy_argument = "--outbound-http-proxy=http://global-proxy:3128";
+constexpr std::string_view global_ca_file_argument = "--outbound-http-additional-ca-file=/tmp/global-ca.pem";
+constexpr std::string_view status_monitor_proxy_argument = "--status-monitor-proxy=http://status-proxy:3128";
+constexpr std::string_view status_monitor_proxy = "http://status-proxy:3128";
+constexpr std::string_view global_ca_file = "/tmp/global-ca.pem";
 
 /// A temporary directory holding a template file written from @p text; the path is an option argument.
 struct template_file {
@@ -94,10 +102,12 @@ struct template_file {
    std::string argument() const { return std::string{template_option} + path.string(); }
 };
 
-/// Parse status-monitor arguments through the component's option surface (no application, no plugin class).
+/// Parse status-monitor arguments through the component's option surface (no application, no plugin class), plus
+/// the node-wide outbound HTTP options http_client_plugin registers in nodeop.
 bpo::variables_map parse_options(const std::vector<std::string>& arguments) {
    bpo::options_description cfg;
    status_monitor::add_options(cfg);
+   sysio::outbound_http::add_global_transport_program_options(cfg);
    bpo::variables_map options;
    bpo::store(bpo::command_line_parser(arguments).options(cfg).run(), options);
    bpo::notify(options);
@@ -318,6 +328,26 @@ BOOST_AUTO_TEST_CASE(explicit_values_override_the_defaults) try {
    BOOST_CHECK_EQUAL(cfg->delivery.request_timeout_ms, 13u);
    BOOST_CHECK_EQUAL(cfg->delivery.max_retries, 0u);
    BOOST_CHECK_EQUAL(cfg->delivery.retry_backoff_ms, 17u);
+}
+FC_LOG_AND_RETHROW()
+
+// Each status-monitor-* transport option overrides its outbound-http-* counterpart, which applies when the
+// plugin's own option is absent; with neither, the transport stays at its defaults.
+BOOST_AUTO_TEST_CASE(transport_options_overlay_the_node_wide_values) try {
+   const template_file tpl{data_only_template};
+   const auto cfg = active_config(tpl, {std::string{global_proxy_argument}, std::string{global_ca_file_argument},
+                                        std::string{status_monitor_proxy_argument}});
+   BOOST_REQUIRE(cfg.has_value());
+   BOOST_REQUIRE(cfg->transport.proxy.has_value());
+   BOOST_CHECK_EQUAL(*cfg->transport.proxy, status_monitor_proxy);
+   BOOST_REQUIRE(cfg->transport.additional_ca_file.has_value());
+   BOOST_CHECK_EQUAL(cfg->transport.additional_ca_file->string(), global_ca_file);
+   BOOST_CHECK(!cfg->transport.additional_ca_path.has_value());
+
+   const auto defaults = active_config(tpl);
+   BOOST_REQUIRE(defaults.has_value());
+   BOOST_CHECK(!defaults->transport.proxy.has_value());
+   BOOST_CHECK(!defaults->transport.additional_ca_file.has_value());
 }
 FC_LOG_AND_RETHROW()
 
