@@ -59,10 +59,6 @@ public:
       }
    }
 
-   static std::string codename(std::string_view s) {
-      return std::string{s};
-   }
-
    /// `sysio.tokens::regtoken` for a chain-native token; the metadata strings are the
    /// parameters under test, everything else is a fixed valid value.
    action_result regtoken(std::string_view code,
@@ -70,7 +66,7 @@ public:
                           const std::string& description) {
       return push_action(TOKENS_ACCOUNT, "regtoken"_n, mvo()
          ("kind",        TokenKind::TOKEN_KIND_NATIVE)
-         ("code",        codename(code))
+         ("code",        code)
          ("symbol_name", symbol_name)
          ("description", description)
          ("precision",   9)
@@ -122,8 +118,8 @@ BOOST_AUTO_TEST_SUITE(sysio_tokens_tests)
 BOOST_FIXTURE_TEST_CASE(regctok_records_binding, sysio_tokens_tester) { try {
    // Native binding.
    BOOST_REQUIRE_EQUAL(success(), push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
-      ("chain_code",    codename("ETH"))
-      ("token_code",    codename("WIRE"))
+      ("chain_code",    "ETH")
+      ("token_code",    "WIRE")
       ("contract_addr", "")
       ("is_native",     true)));
 
@@ -134,8 +130,8 @@ BOOST_FIXTURE_TEST_CASE(regctok_records_binding, sysio_tokens_tester) { try {
 
    // Non-native ERC-20 binding with a contract address.
    BOOST_REQUIRE_EQUAL(success(), push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
-      ("chain_code",    codename("ETH"))
-      ("token_code",    codename("USDC"))
+      ("chain_code",    "ETH")
+      ("token_code",    "USDC")
       ("contract_addr", "01")
       ("is_native",     false)));
 

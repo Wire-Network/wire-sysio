@@ -104,10 +104,9 @@ public:
                           uint32_t external_chain_id,
                           const std::string& name_str = "test outpost",
                           const std::string& description = "") {
-      auto code_v = fc::slug_name{code_str};
       return push_chains_action(CHAINS_ACCOUNT, "regchain"_n, mvo()
          ("kind", kind)
-         ("code", mvo()("value", code_v.value))
+         ("code", code_str)
          ("external_chain_id", external_chain_id)
          ("name", name_str)
          ("description", description)

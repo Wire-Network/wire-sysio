@@ -682,6 +682,57 @@ BOOST_AUTO_TEST_CASE(optional_vector)
 
 
 
+BOOST_AUTO_TEST_CASE(slug_name_builtin_type)
+{ try {
+   // Guards the `slug_name` entry in configure_built_in_types(). Without it the
+   // spelling resolves as neither builtin nor struct and set_abi's validate()
+   // throws invalid_type_inside_abi; with a same-named ABI struct present it
+   // would instead serialize as {"value":N}. The converted table-read sweep in
+   // contracts/tests cannot catch either case, because fc::slug_name's
+   // from_variant accepts the string, the integer AND the object form, so those
+   // reads pass identically whether or not this registration exists.
+   const char* test_abi = R"=====(
+   {
+       "version": "sysio::abi/1.0",
+       "types": [],
+       "structs": [{
+           "name": "regrow",
+           "base": "",
+           "fields": [{
+               "name": "code",
+               "type": "slug_name"
+           }]
+       }],
+       "actions": [],
+       "tables": [],
+       "ricardian_clauses": []
+   }
+   )=====";
+
+   auto abi = fc::json::from_string(test_abi).as<abi_def>();
+   abi_serializer abis(sysio_contract_abi(abi), yield_fn());
+
+   // A canonical slug is carried as its STRING spelling, in 8 bytes.
+   auto bytes = abis.variant_to_binary(
+      "regrow", fc::json::from_string(R"({"code":"ETH"})"), yield_fn());
+   BOOST_REQUIRE_EQUAL(bytes.size(), 8u);
+   auto back = abis.binary_to_variant("regrow", bytes, yield_fn());
+   BOOST_REQUIRE(back.get_object()["code"].is_string());
+   BOOST_CHECK_EQUAL(back.get_object()["code"].as_string(), "ETH");
+
+   // A planted non-canonical value must render — as a JSON INTEGER, not a
+   // string, and WITHOUT throwing. A throwing conversion would make one such
+   // row able to brick get_table_rows for a whole table.
+   auto planted = abis.variant_to_binary(
+      "regrow", fc::json::from_string(R"({"code":7})"), yield_fn());
+   BOOST_REQUIRE_EQUAL(planted.size(), 8u);
+   fc::variant rendered;
+   BOOST_REQUIRE_NO_THROW(rendered = abis.binary_to_variant("regrow", planted, yield_fn()));
+   BOOST_REQUIRE(rendered.get_object()["code"].is_integer());
+   BOOST_CHECK_EQUAL(rendered.get_object()["code"].as_uint64(), 7u);
+
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_CASE(uint_types)
 { try {
 

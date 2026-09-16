@@ -123,6 +123,74 @@ BOOST_AUTO_TEST_CASE(slug_name_leaf_roundtrips_a_non_canonical_value_as_an_integ
    BOOST_CHECK(bytes == codec::encode_key(decoded, shapes));
 }
 
+BOOST_AUTO_TEST_CASE(slug_name_multi_leaf_keys_preserve_field_order_and_offsets) {
+   // THREE of the five v6 registry tables key on more than one slug:
+   //   sysio.tokens::chaintokens ["slug_name","slug_name"]
+   //   sysio.reserv::reserves    ["slug_name","slug_name","slug_name"]
+   //   sysio.uwrit::locksums     ["name","slug_name","slug_name"]
+   // Every other slug case here builds a SINGLE leaf, and a single leaf cannot
+   // observe a field-ordering or offset error because there is only one field to
+   // misplace. decode_key walks the shapes in order consuming a fixed width each,
+   // and encode_key must reproduce that ordering from the decoded object.
+   auto abi = make_test_abi();
+
+   // 2-leaf, mirroring chaintokens.
+   {
+      auto shapes = codec::build_key_shapes(abi, {"chain_code", "token_code"},
+                                            {"slug_name", "slug_name"});
+      auto bytes  = codec::encode_key(
+         fc::variant(fc::mutable_variant_object("chain_code", "ETH")("token_code", "USDC")),
+         shapes);
+      BOOST_REQUIRE_EQUAL(bytes.size(), 16u);
+      // Ordering is observable: each leaf must occupy its own 8-byte window, in
+      // declaration order. Swapping the two would keep the size and fail here.
+      BOOST_CHECK(std::vector<char>(bytes.begin(), bytes.begin() + 8)
+                  == encode_single(abi, "slug_name", fc::variant("ETH")));
+      BOOST_CHECK(std::vector<char>(bytes.begin() + 8, bytes.end())
+                  == encode_single(abi, "slug_name", fc::variant("USDC")));
+      auto decoded = codec::decode_key(bytes.data(), bytes.size(), shapes);
+      BOOST_CHECK_EQUAL(decoded.get_object()["chain_code"].as_string(), "ETH");
+      BOOST_CHECK_EQUAL(decoded.get_object()["token_code"].as_string(), "USDC");
+      BOOST_CHECK(bytes == codec::encode_key(decoded, shapes));
+   }
+
+   // 3-leaf, mirroring reserves — and with a non-canonical middle leaf, so the
+   // mixed-carrier case (string, integer, string) is covered at its own offset.
+   {
+      auto shapes = codec::build_key_shapes(abi, {"chain_code", "token_code", "reserve_code"},
+                                            {"slug_name", "slug_name", "slug_name"});
+      auto bytes  = codec::encode_key(
+         fc::variant(fc::mutable_variant_object("chain_code", "ETH")
+                                               ("token_code", 7u)
+                                               ("reserve_code", "PRIMARY")),
+         shapes);
+      BOOST_REQUIRE_EQUAL(bytes.size(), 24u);
+      auto decoded = codec::decode_key(bytes.data(), bytes.size(), shapes);
+      BOOST_CHECK_EQUAL(decoded.get_object()["chain_code"].as_string(), "ETH");
+      BOOST_CHECK(decoded.get_object()["token_code"].is_integer());
+      BOOST_CHECK_EQUAL(decoded.get_object()["token_code"].as_uint64(), 7u);
+      BOOST_CHECK_EQUAL(decoded.get_object()["reserve_code"].as_string(), "PRIMARY");
+      BOOST_CHECK(bytes == codec::encode_key(decoded, shapes));
+   }
+
+   // name + 2 slugs, mirroring locksums — a mixed-KIND composite.
+   {
+      auto shapes = codec::build_key_shapes(abi, {"underwriter", "chain_code", "token_code"},
+                                            {"name", "slug_name", "slug_name"});
+      auto bytes  = codec::encode_key(
+         fc::variant(fc::mutable_variant_object("underwriter", "uw.a")
+                                               ("chain_code", "SOLANA")
+                                               ("token_code", "SOL")),
+         shapes);
+      BOOST_REQUIRE_EQUAL(bytes.size(), 24u);
+      auto decoded = codec::decode_key(bytes.data(), bytes.size(), shapes);
+      BOOST_CHECK_EQUAL(decoded.get_object()["underwriter"].as_string(), "uw.a");
+      BOOST_CHECK_EQUAL(decoded.get_object()["chain_code"].as_string(), "SOLANA");
+      BOOST_CHECK_EQUAL(decoded.get_object()["token_code"].as_string(), "SOL");
+      BOOST_CHECK(bytes == codec::encode_key(decoded, shapes));
+   }
+}
+
 BOOST_AUTO_TEST_CASE(slug_name_leaf_groups_shared_prefixes) {
    // The property slug_name was designed for: MSB-first 6-bit packing puts
    // char[0] at bits [42..47], so a shared textual prefix is a shared leading

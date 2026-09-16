@@ -130,7 +130,6 @@ public:
                       abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-
    void deploy(name account, std::vector<uint8_t> wasm, std::vector<char> abi,
                abi_serializer& out_ser) {
       set_code(account, wasm);
@@ -145,9 +144,6 @@ public:
    }
 
    static fc::slug_name cn(std::string_view s) { return fc::slug_name{s}; }
-   static std::string codename(std::string_view s) {
-      return std::string{s};
-   }
 
    /// Push an action against any deployed contract.
    action_result push(name contract, abi_serializer& ser, name signer,
@@ -213,7 +209,6 @@ public:
          "initt5"_n, mvo()
             ("start_time", fc::time_point_sec(control->head().block_time()))));
 
-
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
          "setconfig"_n, mvo()
             ("max_available_producers",          21)
@@ -240,7 +235,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
          "regchain"_n, mvo()
             ("kind",              ChainKind::CHAIN_KIND_SVM)
-            ("code",              codename("SOL"))
+            ("code",              "SOL")
             ("external_chain_id", 1)
             ("name",              std::string("solana-test"))
             ("description",       std::string{})
@@ -248,7 +243,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
          "regchain"_n, mvo()
             ("kind",              ChainKind::CHAIN_KIND_EVM)
-            ("code",              codename("ETH"))
+            ("code",              "ETH")
             ("external_chain_id", 31337)
             ("name",              std::string("ethereum-test"))
             ("description",       std::string{})
@@ -299,8 +294,8 @@ public:
                              std::string_view token_code, uint64_t amount) {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
          ("account",              account.to_string())
-         ("chain_code",           codename(chain_code))
-         ("token_code",           codename(token_code))
+         ("chain_code",           chain_code)
+         ("token_code",           token_code)
          ("amount",               amount)
          ("actor_chain",          ChainKind::CHAIN_KIND_EVM)
          ("actor_address",        std::vector<char>{})
@@ -311,8 +306,8 @@ public:
                               std::string_view token_code, uint64_t amount) {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "withdrawinle"_n, mvo()
          ("account",     account.to_string())
-         ("chain_code",  codename(chain_code))
-         ("token_code",  codename(token_code))
+         ("chain_code",  chain_code)
+         ("token_code",  token_code)
          ("amount",      amount));
    }
 

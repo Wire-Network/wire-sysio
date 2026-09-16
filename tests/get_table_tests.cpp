@@ -453,7 +453,8 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
    push_action("test"_n, "addhashobj"_n, "test"_n, mutable_variant_object()("hashinput", "secondinput"));
    push_action("test"_n, "addhashobj"_n, "test"_n, mutable_variant_object()("hashinput", "thirdinput"));
    // structobjs: kv::table keyed by the reflected struct composite_key{value} — the
-   // sysio.chains `chains` key shape. Drives the struct-key path in (sec-10).
+   // key shape the v6 registry tables used BEFORE `slug_name` became an ABI builtin
+   // (they now key on a slug_name LEAF). Drives the struct-key path in (sec-10).
    push_action("test"_n, "addstruct"_n, "test"_n, mutable_variant_object()("code", 10)("payload", 100));
    push_action("test"_n, "addstruct"_n, "test"_n, mutable_variant_object()("code", 20)("payload", 200));
    push_action("test"_n, "addstruct"_n, "test"_n, mutable_variant_object()("code", 30)("payload", 300));

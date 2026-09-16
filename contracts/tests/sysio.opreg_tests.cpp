@@ -251,12 +251,6 @@ public:
 
    static fc::slug_name cn(std::string_view s) { return fc::slug_name{s}; }
 
-   /// A slug_name action argument: the ABI builtin takes the decoded string
-   /// spelling, so the codename is passed through as-is.
-   static std::string codename(std::string_view s) {
-      return std::string{s};
-   }
-
    // ── Action helpers ──
 
    action_result push_opreg_action(name signer, name action_name, const variant_object& data) {
@@ -297,8 +291,8 @@ public:
                                           std::string_view token_code,
                                           uint64_t min_bond) {
       return fc::variant(mvo()
-         ("chain_code",           codename(chain_code))
-         ("token_code",           codename(token_code))
+         ("chain_code",           chain_code)
+         ("token_code",           token_code)
          ("min_bond",             min_bond)
          ("config_timestamp_ms",  uint64_t{0}));
    }
@@ -406,8 +400,8 @@ public:
                              const std::string& original_message_id_hex = std::string(64, '0')) {
       return push_opreg_action(OPREG_ACCOUNT, "depositinle"_n, mvo()
          ("account",              account)
-         ("chain_code",           codename(chain_code))
-         ("token_code",           codename(token_code))
+         ("chain_code",           chain_code)
+         ("token_code",           token_code)
          ("amount",               amount)
          ("actor_chain",          actor_chain)
          ("actor_address",        actor_address)
@@ -420,8 +414,8 @@ public:
                               uint64_t amount) {
       return push_opreg_action(OPREG_ACCOUNT, "withdrawinle"_n, mvo()
          ("account",     account)
-         ("chain_code",  codename(chain_code))
-         ("token_code",  codename(token_code))
+         ("chain_code",  chain_code)
+         ("token_code",  token_code)
          ("amount",      amount));
    }
 
@@ -471,8 +465,8 @@ public:
                              uint64_t amount) {
       return push_opreg_action(signer, "releaselock"_n, mvo()
          ("account",     account)
-         ("chain_code",  codename(chain_code))
-         ("token_code",  codename(token_code))
+         ("chain_code",  chain_code)
+         ("token_code",  token_code)
          ("amount",      amount));
    }
 

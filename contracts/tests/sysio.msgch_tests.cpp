@@ -19,12 +19,6 @@ using mvo = fc::mutable_variant_object;
 
 namespace {
 
-/// Build a slug_name mvo: `{"value": <uint64>}` matches the ABI surface for
-/// `sysio::slug_name` fields.
-inline std::string codename(std::string_view s) {
-   return std::string{s};
-}
-
 } // anonymous namespace
 
 class sysio_msgch_tester : public tester {
@@ -98,7 +92,7 @@ public:
                           uint32_t chain_id) {
       base_tester::push_action(CHAINS_ACCOUNT, "regchain"_n, CHAINS_ACCOUNT, mvo()
          ("kind",              kind)
-         ("code",              codename(code))
+         ("code",              code)
          ("external_chain_id", chain_id)
          ("name",              std::string("outpost"))
          ("description",       std::string{})
@@ -268,7 +262,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(),
          push_action(CHAINS_ACCOUNT, CHAINS_ACCOUNT, "regchain"_n, mvo()
             ("kind",              kind)
-            ("code",              codename(code))
+            ("code",              code)
             ("external_chain_id", chain_id)
             ("name",              std::string("outpost"))
             ("description",       std::string{})
@@ -364,7 +358,6 @@ constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
 
 constexpr auto EVM_TEST_ATTESTATION_TYPE       = opp::types::ATTESTATION_TYPE_OPERATORS;
 constexpr auto SWAP_REMIT_ATTESTATION_TYPE    = opp::types::ATTESTATION_TYPE_SWAP_REMIT;
-
 
 } // anonymous namespace
 

@@ -98,9 +98,14 @@ using slug_name_literals::operator""_s;
 /// from a forgeable attestation payload; a throwing conversion would let one
 /// such row make an entire table unreadable over `get_table_rows`.
 ///
-/// A JSON integer cannot collide with a JSON string, which is what makes the
-/// two carriers unambiguous. A numeric *string* would not: the slug alphabet
-/// contains digits, so `"7"` is itself a valid canonical slug.
+/// The two carriers are distinguished by JSON *type* here, and by string
+/// LENGTH after a round trip through JSON text — `fc::json` quotes a uint64
+/// above 0xffffffff, so the integer arm comes back as a decimal string that
+/// `from_variant` re-routes on length (see there). What is never ambiguous is
+/// the spelling: a canonical slug is at most max_len symbols and a stringified
+/// uint64 past 0xffffffff is at least 10 digits. The carrier could NOT have
+/// been a numeric string chosen freely — the slug alphabet contains digits, so
+/// `"7"` is itself a valid canonical slug.
 inline void to_variant(const slug_name& s, fc::variant& v) {
    const std::string text = s.to_string();
    // `pack` is the non-validating encoder, so this is a pure round-trip test:
@@ -125,9 +130,22 @@ inline void to_variant(const slug_name& s, fc::variant& v) {
 /// object form.
 inline void from_variant(const fc::variant& v, slug_name& s) {
    if (v.is_string()) {
+      const std::string_view text = v.get_string();
+      // The integer carrier arrives here as a STRING whenever it crossed JSON
+      // TEXT: fc::json quotes a uint64 above 0xffffffff (fc/io/json.cpp), and
+      // `next_key` is json text that a paginating caller feeds back as a bound.
+      // Length disambiguates exactly — a canonical slug is at most max_len
+      // symbols, while a stringified uint64 past 0xffffffff is at least 10
+      // digits — so no valid spelling is diverted. In particular the 8-digit
+      // "12345678" stays a slug, keeping the rule that `"7"` is the slug 7 and
+      // not the integer 7.
+      if (text.size() > static_cast<std::size_t>(slug_name_traits::max_len)) {
+         s = slug_name{ v.as_uint64() };
+         return;
+      }
       // Validating: the ctor round-trip-checks and rejects a non-canonical or
       // out-of-alphabet spelling. `""` is the zero sentinel.
-      s = slug_name{ v.get_string() };
+      s = slug_name{ text };
       return;
    }
    if (v.is_object()) {

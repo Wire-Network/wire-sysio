@@ -3,6 +3,7 @@
 
 #include <fc/basic_name.hpp>
 #include <fc/slug_name.hpp>
+#include <fc/io/json.hpp>
 #include <fc/io/raw.hpp>
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
@@ -443,6 +444,89 @@ BOOST_AUTO_TEST_CASE(variant_rejects_a_non_canonical_string_spelling) {
    slug_name back;
    BOOST_CHECK_THROW(fc::from_variant(fc::variant(std::string{"liqsol"}), back), fc::exception);
    BOOST_CHECK_THROW(fc::from_variant(fc::variant(std::string{"TOOOLONGXX"}), back), fc::exception);
+}
+
+BOOST_AUTO_TEST_CASE(variant_every_carrier_round_trips_through_json_TEXT) {
+   // The variant-layer round trip above is NOT sufficient: `next_key` is json
+   // TEXT (chain_plugin renders it with fc::json::to_string) and a paginating
+   // caller feeds it straight back as a `lower_bound`, which is re-parsed with
+   // fc::json::from_string. fc::json QUOTES a uint64 above 0xffffffff, so the
+   // integer carrier crosses that boundary as a decimal STRING — which the
+   // validating string arm rejected as "too long" until from_variant learned to
+   // re-route on length. Values are chosen to straddle every threshold that
+   // matters: the 0xffffffff quoting cutoff, the 2^42 canonical floor, and 2^48.
+   const uint64_t values[] = {
+      0u,                       // the zero sentinel -> ""
+      7u,                       // non-canonical, below the quoting cutoff
+      0xffffffffu,              // last value fc::json emits unquoted
+      0x100000000u,             // first value fc::json QUOTES
+      (uint64_t{1} << 42) - 1,  // last non-canonical
+      uint64_t{1} << 42,        // first canonical ("A")
+      slug_name{"ETH"}.value,
+      slug_name{"12345678"}.value,
+      (uint64_t{1} << 48) - 1,  // symbols past the alphabet -> integer carrier
+      ~uint64_t{0},
+   };
+   for (const uint64_t raw : values) {
+      fc::variant v;
+      fc::to_variant(slug_name{raw}, v);
+      const std::string text =
+         fc::json::to_string(fc::variant(fc::mutable_variant_object("code", v)),
+                             fc::time_point::maximum());
+      slug_name back;
+      BOOST_REQUIRE_NO_THROW(
+         fc::from_variant(fc::json::from_string(text).get_object()["code"], back));
+      BOOST_CHECK_MESSAGE(back.value == raw,
+                          "json text round trip lost " << raw << " via " << text);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(mvo_accepts_every_spelling_a_caller_can_write) {
+   // Pins the whole INPUT surface a test or caller may write for a slug_name
+   // field. mutable_variant_object's templated operator() forwards to
+   // fc::variant's constructor set (variant_object.hpp:206-211), so every
+   // spelling below resolves through a different ctor and must still land on
+   // the same value:
+   //
+   //   const char*      -> variant(const char*)          -> string
+   //   std::string      -> variant(std::string)          -> string
+   //   std::string_view -> variant(std::string_view)     -> string
+   //   fc::slug_name    -> explicit variant(const T&)    -> to_variant -> string
+   //   uint64_t         -> variant(uint64_t)             -> the integer escape
+   //
+   // This is why no `codename()`-style wrapper is needed at a call site: the
+   // raw literal and the `_s` literal both already work, and a wrapper
+   // returning std::string is just identity.
+   const slug_name expected{"LIQSOL"};
+
+   const char* const      as_c_str  = "LIQSOL";
+   const std::string      as_string = "LIQSOL";
+   const std::string_view as_view   = "LIQSOL";
+
+   const fc::variant obj{ fc::mutable_variant_object()
+      ("c_str",   as_c_str)
+      ("string",  as_string)
+      ("view",    as_view)
+      ("literal", "LIQSOL"_s)      // the _s literal — validated at compile time
+      ("slug",    expected) };     // an fc::slug_name value
+
+   for (const char* key : {"c_str", "string", "view", "literal", "slug"}) {
+      const fc::variant& cell = obj.get_object()[key];
+      BOOST_REQUIRE_MESSAGE(cell.is_string(), std::string{"not a string: "} + key);
+      BOOST_CHECK_EQUAL(cell.as_string(), "LIQSOL");
+      slug_name back;
+      fc::from_variant(cell, back);
+      BOOST_CHECK_MESSAGE(back == expected, std::string{"round trip failed: "} + key);
+   }
+
+   // The integer escape is the one writable spelling that is NOT a string, and
+   // it is the only way to write a non-canonical value.
+   const fc::variant esc{ fc::mutable_variant_object()("code", uint64_t{7}) };
+   const fc::variant& cell = esc.get_object()["code"];
+   BOOST_CHECK(cell.is_integer());
+   slug_name back;
+   fc::from_variant(cell, back);
+   BOOST_CHECK_EQUAL(back.value, 7u);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
