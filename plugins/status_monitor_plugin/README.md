@@ -1,6 +1,6 @@
 # status_monitor_plugin
 
-`status_monitor_plugin` writes one `/v1/chain/get_info` snapshot per irreversible block straight to an
+`status_monitor_plugin` writes one `/v1/chain/get_info` snapshot per LIB advance straight to an
 OpenSearch or Elasticsearch `_bulk` endpoint. Each snapshot is rendered through an operator-supplied JSON
 document template, so the shape of the document is entirely under the operator's control, and the delivery
 path never touches the logging framework: dashboards get a steady, low-volume stream of chain-status
@@ -13,10 +13,10 @@ The plugin is opt-in (`plugin = sysio::status_monitor_plugin`) and stays disable
 ## How it works
 
 ```
-controller::irreversible_block  (block-application thread)
+channels::irreversible_block  (application thread, after the block commits)
         |
-        |  1. is the block current?  (irreversible block time within 5 s of wall-clock time)
-        |  2. does chain_plugin's get_info cache describe this block?
+        |  1. is the node synced?  (controller::is_synced(): LIB time within 5 s of wall-clock time)
+        |  2. has LIB advanced since the last document?
         |  3. copy the get_info snapshot + wall-clock time, queue it   (cheap; never blocks)
         v
 render worker  (one thread)      -> renders the JSON template into one NDJSON line
@@ -28,25 +28,25 @@ delivery worker  (one thread)    -> assembles up to --status-monitor-max-items-p
 es client io thread               -> POST <target-url>/_bulk with retries and backoff
 ```
 
-Three threads do the work; the block-application thread only copies a snapshot and enqueues it. The
+Three threads do the work; the application thread only copies a snapshot and enqueues it. The
 get_info snapshot comes from `chain_plugin`'s per-block cache, which `chain_plugin` refreshes on every
 accepted and irreversible block whenever `sysio::status_monitor_plugin` is named in the `plugin` option
 (the same mechanism `chain_api_plugin` uses). Because the snapshot is the same `fc::variant` the HTTP API
 serializes, the nested `status_monitor` object in each document is byte-identical to a `/v1/chain/get_info`
 response body.
 
-Two gates keep the stream meaningful:
+Two checks keep the stream meaningful:
 
-- **Liveness.** A document is emitted only when the irreversible block's time is within
-  `max_current_block_age` (ten block intervals, 5 s) of wall-clock time. While the node syncs or replays,
-  nothing is sent; the pause is warned about at most once a minute and the resumption is logged once. A host
-  whose clock runs more than that ahead of the chain also pauses the stream.
-- **Snapshot identity.** The get_info snapshot must name the same last-irreversible block the signal carried.
-  If it does not (the cache was refreshed on a different path), the document is suppressed; the error is
-  logged at most once a minute while the mismatch persists, and the resumption is logged once.
+- **Liveness.** A document is emitted only while `controller::is_synced()` holds: the last irreversible
+  block's time is within 5 s of wall-clock time. While the node syncs, while finality lags, or on a host whose
+  clock runs more than that ahead of the chain, nothing is sent; the pause is warned about at most once a
+  minute and the resumption is logged once. Both checks run as LIB advances, so a halted LIB sends and logs
+  nothing.
+- **One document per LIB.** A delivery that finds the last irreversible block unchanged since the last
+  document sends nothing, so several blocks becoming irreversible at once yield one document for the newest.
 
-Steady-state volume is one document per irreversible block, about two per second at the 500 ms block
-interval.
+Steady-state volume is one document per LIB advance, normally one per block: about two per second at the
+500 ms block interval.
 
 ## Enabling the plugin
 
@@ -196,8 +196,8 @@ uses `${epoch_millis}`, or keep `${timestamp}` for an ISO 8601 string.
 - A batch's documents are consumed as they are sent; nothing is re-rendered.
 - Basic auth is sent as an `Authorization: Basic` header when configured. TLS uses the system trust store;
   there is no per-plugin CA file option.
-- Shutdown disconnects from the block signal, cancels an in-flight request, joins both workers, and logs the
-  final counters. Documents still waiting are discarded, not flushed.
+- Shutdown unsubscribes from the irreversible_block channel, cancels an in-flight request, joins both
+  workers, and logs the final counters. Documents still waiting are discarded, not flushed.
 
 ## Backpressure
 
@@ -215,8 +215,7 @@ All diagnostics go through the `status_monitor` logger (configure it like any ot
   unreachable endpoint logs one error naming the probed URL and the reason, and fails startup. A `403` from
   the root is not a failure (see Delivery semantics): startup continues and logs the reachable line.
 - Liveness: one warning when documents pause because the irreversible block is behind wall-clock time, at
-  most once a minute while paused, and one line when they resume; one error, at most once a minute, while
-  the get_info snapshot does not describe the signaled block, and one line when it does again.
+  most once a minute while paused, and one line when they resume.
 - Delivery, per failed batch: one warning for every bulk request that did not fully index, naming the
   attempts it took, the failure detail (for example `HTTP 503 from https://opensearch.example.com`),
   and what became of its documents -- `N document(s) dropped` once the batch is given up on, `N of M
@@ -255,6 +254,6 @@ ninja -C build/debug test_status_monitor_plugin
 ```
 
 The suite covers option registration and validation, rendering of the shipped sample template and of every
-supplied token, bulk-body assembly and splitting, the liveness gates, the two-stage pipeline with an injected
+supplied token, bulk-body assembly and splitting, the two-stage pipeline with an injected
 sender, drop and failure accounting, progress classification, and the plugin lifecycle without a running
 node. No test dials a real endpoint.

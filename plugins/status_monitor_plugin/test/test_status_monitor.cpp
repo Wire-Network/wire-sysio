@@ -55,12 +55,10 @@ constexpr std::string_view sample_lib_block_id = "000000290000000000000000000000
 /// Above 0xffffffff, so fc renders it as a JSON string -- the same rule the HTTP body follows.
 constexpr uint64_t wide_weight = uint64_t{1} << 40;
 constexpr uint32_t sample_head_block_num = 42;
-/// A fixed wall-clock reference; the render tests pin its epoch-millis rendering, the gate tests use it as "now".
+/// A fixed wall-clock reference; the render tests pin its epoch-millis rendering.
 const fc::time_point reference_now = fc::time_point::from_iso_string("2026-01-02T03:04:05.123");
 constexpr int64_t reference_now_sub_second_millis = 123;
 constexpr int64_t millis_per_second = 1000;
-constexpr fc::microseconds two_blocks{2 * chain::config::block_interval_us};
-constexpr fc::microseconds one_microsecond{1};
 constexpr std::string_view action_line = R"({"index":{"_index":"test-status"}})"
                                          "\n";
 constexpr uint32_t small_batch = 4;
@@ -496,25 +494,6 @@ BOOST_AUTO_TEST_CASE(assemble_bulk_bodies_splits_at_the_body_byte_cap) try {
 }
 FC_LOG_AND_RETHROW()
 
-// --- gates -----------------------------------------------------------------------------------------------
-
-BOOST_AUTO_TEST_CASE(is_current_accepts_live_blocks_and_rejects_catch_up) try {
-   BOOST_CHECK(status_monitor::is_current(reference_now, reference_now));
-   BOOST_CHECK(status_monitor::is_current(reference_now - two_blocks, reference_now));
-   BOOST_CHECK(status_monitor::is_current(reference_now - status_monitor::max_current_block_age, reference_now));
-   BOOST_CHECK(status_monitor::is_current(reference_now + two_blocks, reference_now)); // clock skew: still live
-   BOOST_CHECK(!status_monitor::is_current(reference_now - status_monitor::max_current_block_age - one_microsecond,
-                                           reference_now));
-}
-FC_LOG_AND_RETHROW()
-
-BOOST_AUTO_TEST_CASE(snapshot_is_for_matches_only_the_signals_lib) try {
-   const auto info = sample_info();
-   BOOST_CHECK(status_monitor::snapshot_is_for(info, info.last_irreversible_block_id));
-   BOOST_CHECK(!status_monitor::snapshot_is_for(info, info.head_block_id));
-}
-FC_LOG_AND_RETHROW()
-
 // --- pipeline --------------------------------------------------------------------------------------------
 
 // The first send is held while the remaining documents render and queue behind it; once released, the delivery
@@ -746,7 +725,7 @@ FC_LOG_AND_RETHROW()
 
 // appbase calls plugin_shutdown() on every running plugin however far plugin_startup() got, so it may not
 // require anything from it (plugins/usage_pattern.md). Neither a plugin that was never initialized nor one that
-// was initialized and never started has a connection, a client, a pipeline, or a read-only handle, and shutting
+// was initialized and never started has a subscription, a client, a pipeline, or a read-only handle, and shutting
 // either down must be a no-op rather than a throw.
 BOOST_AUTO_TEST_CASE(plugin_shutdown_tolerates_never_initialized_and_never_started) try {
    status_monitor_plugin never_initialized;

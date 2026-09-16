@@ -6,7 +6,7 @@
 
 namespace sysio {
 
-/// Writes one /v1/chain/get_info snapshot per irreversible block straight to an OpenSearch/Elasticsearch
+/// Writes one /v1/chain/get_info snapshot per LIB advance straight to an OpenSearch/Elasticsearch
 /// `_bulk` endpoint, rendered through the operator's JSON document template (the snapshot is the
 /// `status_monitor` member of the object the template's `${data}` token renders), feeding dashboards
 /// without involving the logging framework. Opt-in (`plugin = sysio::status_monitor_plugin`) and disabled
@@ -14,10 +14,10 @@ namespace sysio {
 /// the command line, fixed at startup (SIGHUP refreshes only the diagnostic logger). The template file is a
 /// JSON object whose string values carry `${token}` placeholders; every other member is emitted as written
 /// (a JSON file has no comment syntax, so a "_comment" member would land in every document), and no field
-/// is required. Emits only for irreversible blocks within status_monitor::max_current_block_age of
-/// wall-clock time -- nothing while syncing or replaying, and nothing on a host whose clock runs more than
-/// that ahead of the chain (the pause is warned about once a minute and the resumption logged once). The
-/// block-application thread only copies the snapshot and queues it; a render worker builds the document and
+/// is required. Emits one document per LIB advance while controller::is_synced() holds -- nothing while syncing,
+/// replaying, or while finality lags, and nothing on a host whose clock runs ahead of the chain by more than the
+/// sync window (a pause is warned about once a minute and a resumption logged once; a halted LIB logs nothing). An
+/// irreversible_block channel delivery only copies the snapshot and queues it; a render worker builds the document and
 /// a delivery worker batches up to --status-monitor-max-items-per-task documents per bulk request, which the
 /// es client sends from its own io thread (three threads in all). The endpoint is checked once at startup
 /// (es_client::probe(), one request, no retry): an endpoint that cannot be reached fails startup rather than
@@ -27,7 +27,7 @@ namespace sysio {
 /// batch, so the per-block data path stays log-free. Delivery problems are also counted on the workers and
 /// summarized from the application thread, where the failure line and the recovery line share one rate limit
 /// of at most one line a minute between them -- so an endpoint alternating between failed and acknowledged
-/// batches cannot log a summary per block. Steady-state rate: one document per irreversible block, about
+/// batches cannot log a summary per block. Steady-state rate: one document per LIB advance, about
 /// two per second at the 500 ms block interval.
 ///
 /// config.ini excerpt:
@@ -51,10 +51,10 @@ public:
    /// plugin disabled.
    void plugin_initialize(const variables_map& options);
    /// When enabled: acquires chain_plugin's read-only API, starts the es client, checks the endpoint once
-   /// (an unreachable one is logged and rethrown, failing startup), then starts the two workers and connects
-   /// the irreversible_block slot.
+   /// (an unreachable one is logged and rethrown, failing startup), then starts the two workers and subscribes
+   /// to the irreversible_block channel.
    void plugin_startup();
-   /// Disconnects the slot, cancels an in-flight request, stops the workers, and reports the final counters.
+   /// Unsubscribes, cancels an in-flight request, stops the workers, and reports the final counters.
    void plugin_shutdown();
    /// Refreshes the diagnostic logger from the reloaded logging config; options are never re-read.
    void handle_sighup() override;
