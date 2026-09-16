@@ -19,7 +19,6 @@
 #include <span>
 #include <string>
 #include <string_view>
-#include <sysio/chain/config.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/chain_plugin/get_info_db.hpp>
 #include <vector>
@@ -106,15 +105,6 @@ inline constexpr std::size_t max_pending_snapshots = 32;
 inline constexpr uint32_t max_batch_bytes = fc::network::es::es_default_max_batch_bytes;
 /// Single-document cap: a rendered document larger than this is dropped and counted, never sent.
 inline constexpr uint32_t max_doc_bytes = fc::network::es::es_default_max_doc_bytes;
-/// Block intervals of tolerance before an irreversible block counts as catch-up work rather than a live LIB
-/// advance. Steady-state LIB lags head by a few blocks, well inside this window.
-inline constexpr uint32_t max_current_block_intervals = 10;
-/// An irreversible block older than this, relative to wall-clock time, belongs to a catch-up: while syncing,
-/// controller::log_irreversible() fires the signal once per block of the newly-final branch, and during replay
-/// the controller emits it explicitly per applied block -- a synchronous burst either way, and emitting a
-/// document per firing would flood the delivery queue and the endpoint. The host clock must therefore stay
-/// within this window of the chain's block times for documents to flow at all.
-inline constexpr fc::microseconds max_current_block_age{max_current_block_intervals * chain::config::block_interval_us};
 
 /// Everything the plugin needs, parsed once from its options.
 struct config {
@@ -137,7 +127,7 @@ void add_options(boost::program_options::options_description& cfg);
 /// a template that does not compile, or a template that references a name outside supplied_tokens.
 std::optional<config> parse_config(const boost::program_options::variables_map& options);
 
-/// One queued unit from the block-application thread: the get_info snapshot and when it was taken.
+/// One queued unit from the application thread: the get_info snapshot and when it was taken.
 struct status_snapshot {
    chain_apis::get_info_db::get_info_results info; ///< the get_info snapshot /v1/chain/get_info would return
    fc::time_point observed;                        ///< wall-clock time of the snapshot -> the timestamp tokens
@@ -160,18 +150,6 @@ struct bulk_body {
 /// once appended, so the caller's buffer and the bodies never hold every document twice.
 std::vector<bulk_body> assemble_bulk_bodies(std::span<std::string> documents, std::string_view action_line,
                                             std::size_t body_byte_cap);
-
-/// True when an irreversible block timestamped @p block_time is a live LIB advance rather than catch-up work,
-/// i.e. it is at most max_current_block_age behind @p now (a block ahead of the clock is current).
-bool is_current(fc::time_point block_time, fc::time_point now);
-
-/// True when @p info is the get_info_db snapshot stored for the irreversible block @p lib_id. chain_plugin's
-/// own slot on the same signal (connected in its plugin_initialize, so before this plugin's plugin_startup
-/// slot; that order is not pinned by any test, only relied on) stores the LIB from that signal. A mismatch
-/// means either that order changed, or get_info_db's lazy refresh ran instead: when its cache lacks full data
-/// it re-stores from controller::fork_db_root(), which has not advanced yet during a multi-block
-/// log_irreversible() burst. Either way the document would carry a stale LIB, so it is suppressed.
-bool snapshot_is_for(const chain_apis::get_info_db::get_info_results& info, const chain::block_id_type& lib_id);
 
 /// Counters the workers maintain; read from the application thread.
 struct pipeline_stats {

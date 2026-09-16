@@ -1,4 +1,3 @@
-#include <boost/signals2/connection.hpp>
 #include <cassert>
 #include <cstdint>
 #include <fc/exception/exception.hpp>
@@ -11,23 +10,21 @@
 #include <string>
 #include <string_view>
 #include <sysio/chain/controller.hpp>
+#include <sysio/chain/plugin_interface.hpp>
 #include <sysio/status_monitor_plugin/status_monitor.hpp>
 #include <sysio/status_monitor_plugin/status_monitor_plugin.hpp>
 #include <thread>
-#include <tuple>
 #include <utility>
 
 namespace sysio {
-
-using boost::signals2::scoped_connection;
 
 namespace {
 /// Budget handed to chain_plugin::get_read_only_api. get_info() answers from get_info_db's cache and ignores
 /// its deadline; the value only shapes deadlines of HTTP-style calls this plugin never makes.
 constexpr fc::microseconds read_only_api_response_budget = fc::seconds(1);
-/// While the catch-up gate or the snapshot check keeps pausing documents, the pause is re-announced at most this
-/// often, so a host clock running ahead of the chain or a persistent snapshot mismatch (either pauses documents
-/// indefinitely) stays visible in the log.
+/// While the sync gate keeps pausing documents, the pause is re-announced at most this often, so lagging finality or
+/// a host clock running ahead of the chain (either can pause documents indefinitely) stays visible in the log. A
+/// halted LIB publishes no irreversible_block, so it is not logged here.
 constexpr fc::microseconds pause_report_interval = fc::seconds(60);
 /// The delivery failure line and the delivery recovery line share this interval: whichever one is reported,
 /// the next line of either kind waits this long, so an endpoint alternating between failed and acknowledged
@@ -58,15 +55,15 @@ std::string delivery_outcome_clause(const fc::network::es::es_bulk_result& resul
 } // anonymous namespace
 
 /// Every member is touched only on the application thread: plugin_initialize/startup/shutdown run there,
-/// SIGHUP handlers are dispatched through the executor's read_write queue, and irreversible_block is emitted
-/// from block application. The workers see only the pipeline's own state (its atomics, its last-failure
+/// SIGHUP handlers are dispatched through the executor's read_write queue, and irreversible_block channel
+/// deliveries are posted to it. The workers see only the pipeline's own state (its atomics, its last-failure
 /// string under its mutex) and the es client, whose bulk() runs on the delivery worker and whose cancel() is
 /// safe from any thread. No lock is needed here; assert_application_thread() documents and (in debug)
 /// checks it.
 ///
 /// The declaration order of the last four members is load-bearing: they are destroyed in reverse --
-/// connection, then pipeline, then client, then the read-only handle -- which is the only safe order, since
-/// nothing can be queued once the connection is gone, the workers are joined before the client whose bulk()
+/// subscription, then pipeline, then client, then the read-only handle -- which is the only safe order, since
+/// nothing can be queued once the subscription is gone, the workers are joined before the client whose bulk()
 /// they call, and the client's io thread stops after both. plugin_shutdown() only stops them; it destroys
 /// nothing. `log` is declared FIRST for the same reason from the other end: it outlives the pipeline, whose
 /// delivery worker logs through it (via report_failed_batch(), the failure reporter) right up until the join
@@ -74,10 +71,11 @@ std::string delivery_outcome_clause(const fc::network::es::es_bulk_result& resul
 struct status_monitor_plugin::impl {
    fc::logger log;                            ///< the `status_monitor` logger
    std::optional<status_monitor::config> cfg; ///< empty: disabled
+   chain_plugin* chain_plug = nullptr;        ///< set at startup; outlives this plugin's shutdown
    bool catching_up = false;                  ///< the gate is pausing documents
    fc::time_point last_pause_report;          ///< when the pause was last announced
-   bool stale_snapshot_reported = false;      ///< a snapshot-mismatch streak is open
-   fc::time_point last_stale_report;          ///< when the mismatch was last announced
+   /// LIB of the last submitted snapshot; a delivery that finds no newer LIB submits nothing
+   chain::block_num_type last_submitted_lib = 0;
    bool failing = false;                      ///< a delivery-failure streak is open
    fc::time_point last_failure_report;        ///< when a failure or a recovery was last reported
    status_monitor::pipeline_stats last_stats; ///< counters as last compared
@@ -87,15 +85,16 @@ struct status_monitor_plugin::impl {
    std::optional<chain_apis::read_only> read_only_api;
    std::unique_ptr<fc::network::es::es_client> client; ///< created before the pipeline; canceled before it stops
    std::unique_ptr<status_monitor::pipeline> pipeline; ///< the two workers
-   std::optional<scoped_connection> irreversible_block_connection;
+   /// Declared last, so it is released first (see above).
+   chain::plugin_interface::channels::irreversible_block::channel_type::handle irreversible_block_subscription;
 
    /** Cancels the client first, so ~pipeline()'s joins stay bounded however the plugin is destroyed. */
    ~impl();
 
    /** Debug check of the single-thread invariant stated on this struct. */
    void assert_application_thread() const;
-   /** Slot body: report counter changes, then queue the get_info snapshot for the newly irreversible block. */
-   void on_irreversible_block(const chain::block_signal_params& params);
+   /** Channel delivery: report counter changes, then queue a get_info snapshot if LIB advanced since the last. */
+   void on_irreversible_block();
    /** Compare the pipeline's counters with the last comparison and log a failing streak or a recovery. */
    void report_progress(fc::time_point now);
    /**
@@ -121,51 +120,40 @@ void status_monitor_plugin::impl::assert_application_thread() const {
    assert(std::this_thread::get_id() == appbase::app().executor().get_main_thread_id());
 }
 
-void status_monitor_plugin::impl::on_irreversible_block(const chain::block_signal_params& params) {
+void status_monitor_plugin::impl::on_irreversible_block() {
    assert_application_thread();
-   const auto& block = std::get<0>(params);
-   const auto& lib_id = std::get<1>(params);
    try {
-      const fc::time_point block_time = block->timestamp;
       const fc::time_point now = fc::time_point::now();
-      // Before the gates, so failures and drops accumulated while paused or suppressed are still reported at
-      // block cadence; this block's own submit outcome is reported on the next call.
+      // Before the gate, so failures and drops accumulated while paused are still reported at LIB cadence; this
+      // delivery's own submit outcome is reported on the next one.
       report_progress(now);
-      if (!status_monitor::is_current(block_time, now)) {
-         // Catching up (sync or replay), or a host clock running ahead of the chain -- the latter pauses
-         // documents for as long as it lasts, so the pause is re-announced every pause_report_interval.
+      const auto& chain = chain_plug->chain();
+      if (!chain.is_synced()) {
+         // Syncing, finality lagging, or a host clock running ahead of the chain; the last two can last
+         // indefinitely, so the pause is re-announced every pause_report_interval.
          if (!catching_up || now - last_pause_report >= pause_report_interval) {
             catching_up = true;
             last_pause_report = now;
-            fc_wlog(log,
-                    "irreversible block {} is {} s behind wall clock; status documents "
-                    "paused (node catching up, or the host clock is ahead of the chain; see max_current_block_age)",
-                    lib_id.str(), (now - block_time).to_seconds());
+            if (chain.fork_db_has_root()) {
+               const auto lib = chain.fork_db_root();
+               fc_wlog(log,
+                       "irreversible block {} is {} s behind wall clock; status documents paused "
+                       "(node syncing, finality lagging, or the host clock is ahead of the chain)",
+                       lib.block_num(), (now - lib.block_time()).to_seconds());
+            }
          }
          return;
       }
       if (catching_up) {
          catching_up = false;
-         fc_ilog(log, "caught up; resuming status documents");
+         fc_ilog(log, "irreversible block is current; resuming status documents");
       }
       auto info = read_only_api->get_info({}, fc::time_point::maximum());
-      if (!status_monitor::snapshot_is_for(info, lib_id)) {
-         // chain_plugin's slot on this signal (connected first) refreshes get_info_db for this LIB before this
-         // slot runs; a mismatch means that ordering changed or get_info_db's lazy refresh ran instead (see
-         // snapshot_is_for), and the document would carry a stale LIB. A persistent mismatch is an outage, so
-         // it is re-announced every pause_report_interval like the catch-up pause.
-         if (!stale_snapshot_reported || now - last_stale_report >= pause_report_interval) {
-            stale_snapshot_reported = true;
-            last_stale_report = now;
-            fc_elog(log, "get_info snapshot is not for irreversible block {}; status documents suppressed until it is",
-                    lib_id.str());
-         }
+      // Deliveries queued behind a multi-block LIB advance all find get_info at the newest LIB; only the first
+      // submits, so the burst yields one document.
+      if (info.last_irreversible_block_num <= last_submitted_lib)
          return;
-      }
-      if (stale_snapshot_reported) {
-         stale_snapshot_reported = false;
-         fc_ilog(log, "get_info snapshot matches the irreversible block again; resuming status documents");
-      }
+      last_submitted_lib = info.last_irreversible_block_num;
       // A full render queue is counted by the pipeline and surfaces through the next report_progress().
       pipeline->submit(status_monitor::status_snapshot{std::move(info), now});
    }
@@ -239,6 +227,7 @@ void status_monitor_plugin::plugin_startup() {
    }
    try {
       auto& chain_plug = app().get_plugin<chain_plugin>();
+      _impl->chain_plug = &chain_plug;
       _impl->read_only_api.emplace(chain_plug.get_read_only_api(read_only_api_response_budget));
       _impl->client = std::make_unique<fc::network::es::es_client>(_impl->cfg->delivery);
       // Before anything is started: an endpoint that cannot be reached now would silently drop every document,
@@ -260,10 +249,15 @@ void status_monitor_plugin::plugin_startup() {
          [impl = _impl.get()](const fc::network::es::es_bulk_result& result, uint32_t doc_count) {
             impl->report_failed_batch(result, doc_count);
          });
-      _impl->irreversible_block_connection.emplace(chain_plug.chain().irreversible_block().connect(
-         [impl = _impl.get()](const chain::block_signal_params& params) { impl->on_irreversible_block(params); }));
+      // A channel delivery runs on the application thread after the block commits. The payload is unused: the
+      // document comes from get_info(), which already holds the newest LIB when the delivery runs.
+      _impl->irreversible_block_subscription =
+         app().get_channel<chain::plugin_interface::channels::irreversible_block>().subscribe(
+            [impl = _impl.get()](const chain::plugin_interface::channels::block_params&) {
+               impl->on_irreversible_block();
+            });
       fc_ilog(_impl->log,
-              "endpoint {} reachable; writing one get_info document per irreversible block to index '{}' "
+              "endpoint {} reachable; writing one get_info document per LIB advance to index '{}' "
               "(template tokens: {}; max_items_per_task={}, max_pending_documents={})",
               _impl->client->endpoint(), _impl->cfg->delivery.index,
               fmt::join(_impl->cfg->document_template.tokens(), status_monitor::token_list_separator),
@@ -273,10 +267,10 @@ void status_monitor_plugin::plugin_startup() {
 }
 
 void status_monitor_plugin::plugin_shutdown() {
-   // Disconnect first so nothing new is queued; cancel the client so an in-flight request or backoff returns
-   // at once (the join below is then bounded); stop the workers. Nothing is destroyed here: the pipeline and
-   // the client go when impl does, in the reverse declaration order this sequence follows.
-   _impl->irreversible_block_connection.reset();
+   // Unsubscribe first so no delivery, even one already queued, submits again; cancel the client so an in-flight
+   // request or backoff returns at once (the join below is then bounded); stop the workers. Nothing is destroyed
+   // here: the pipeline and the client go when impl does, in the reverse declaration order this sequence follows.
+   _impl->irreversible_block_subscription.unsubscribe();
    if (_impl->client)
       _impl->client->cancel();
    if (_impl->pipeline) {

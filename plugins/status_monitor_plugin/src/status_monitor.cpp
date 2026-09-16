@@ -69,8 +69,8 @@ void add_options(bpo::options_description& cfg) {
 
    auto opts = cfg.add_options();
    opts(option::target_url, bpo::value<std::string>(),
-        "Base URL of the OpenSearch/Elasticsearch endpoint that receives one status document per irreversible "
-        "block (e.g. https://opensearch.example.com). If not provided, the plugin is disabled.");
+        "Base URL of the OpenSearch/Elasticsearch endpoint that receives one status document per LIB advance "
+        "(e.g. https://opensearch.example.com). If not provided, the plugin is disabled.");
    opts(option::target_index, bpo::value<std::string>(), target_index_description.c_str());
    opts(option::target_template_file, bpo::value<std::filesystem::path>(), template_file_description.c_str());
    opts(option::username, bpo::value<std::string>(), username_description.c_str());
@@ -205,14 +205,6 @@ std::vector<bulk_body> assemble_bulk_bodies(std::span<std::string> documents, st
    if (current.doc_count > 0)
       bodies.push_back(std::move(current));
    return bodies;
-}
-
-bool is_current(fc::time_point block_time, fc::time_point now) {
-   return now - block_time <= max_current_block_age;
-}
-
-bool snapshot_is_for(const chain_apis::get_info_db::get_info_results& info, const chain::block_id_type& lib_id) {
-   return info.last_irreversible_block_id == lib_id;
 }
 
 pipeline::pipeline(const config& cfg, std::string action_line, sender send, failure_reporter report_failure)
