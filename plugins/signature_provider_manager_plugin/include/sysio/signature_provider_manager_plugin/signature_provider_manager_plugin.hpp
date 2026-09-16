@@ -52,24 +52,27 @@ using spec_handler = std::function<provider_spec_result(
 /**
  * Redact any inline private key from a signature-provider spec so it can be safely logged.
  *
- * A spec has the form `<name>,<chain-kind>,<key-type>,<public-key>,<provider>`, where the final comma-separated field
- * is the provider. Only a `KEY:<private-key>` provider embeds secret key material; `KIOD:`/other providers reference
- * external material and malformed specs carry no inline secret, so both are returned unchanged. When the provider field
- * is `KEY:...`, everything after the `KEY:` marker is replaced with `<redacted>`. Only the final field is inspected, so
- * a `KEY:`-prefixed name never triggers redaction.
+ * A spec has the form `<name>,<chain-kind>,<key-type>,<public-key>,<provider>`. Only a `KEY:<private-key>` provider
+ * embeds secret key material; `KIOD:`/other providers reference external material and are returned unchanged.
+ * Everything after the first `KEY:` that follows the first comma is replaced with `<redacted>`, so a malformed spec
+ * whose key keeps its `KEY:` marker -- in the wrong field, after a space, in the `<public-key>=KEY:<private-key>` form
+ * -- is still masked. A spec with no comma (a bare provider) is masked from its first `KEY:`. A key without the `KEY:`
+ * marker cannot be recognized and is not masked. The first field is the name, so a `KEY:`-prefixed name never
+ * triggers redaction.
  *
  * @param spec the signature-provider spec, exactly as supplied to `--signature-provider`.
  * @return a copy of @p spec with any inline private key masked.
  */
 inline std::string redact_signature_provider_spec(const std::string& spec) {
    constexpr std::string_view key_provider_prefix = "KEY:";
-   const std::string::size_type last_comma = spec.rfind(',');
-   const std::string::size_type provider_start = (last_comma == std::string::npos) ? 0 : last_comma + 1;
-   const std::string_view provider{spec.data() + provider_start, spec.size() - provider_start};
-   if (provider.substr(0, key_provider_prefix.size()) == key_provider_prefix) {
-      return spec.substr(0, provider_start + key_provider_prefix.size()) + "<redacted>";
+   constexpr std::string_view redacted            = "<redacted>";
+
+   const auto first_comma = spec.find(',');
+   const auto key_start   = spec.find(key_provider_prefix, first_comma == std::string::npos ? 0 : first_comma + 1);
+   if (key_start == std::string::npos) {
+      return spec;
    }
-   return spec;
+   return spec.substr(0, key_start + key_provider_prefix.size()) + std::string{redacted};
 }
 
 /**
@@ -244,6 +247,15 @@ public:
       });
    }
 
+   /**
+    * Ensure a signature provider exists for each of @p key_types, falling back to a default key.
+    *
+    * A key type that already has a provider is left alone. Otherwise the default saved for that type in
+    * `<config-dir>/default_signature_providers.json` becomes its provider, or a new key is generated and saved there.
+    * Only the requested key types are registered: a saved default for any other type stays in the file unused.
+    *
+    * @param key_types the key types that need a provider; `wire` and `wire_bls` are supported
+    */
    void register_default_signature_providers(
       const std::vector<fc::crypto::chain_key_type_t>& key_types);
 

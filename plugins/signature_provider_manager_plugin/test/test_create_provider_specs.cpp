@@ -4,12 +4,14 @@
 #include <fc/crypto/elliptic_em.hpp>
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
 #include <fc/crypto/hex.hpp>
+#include <fc/filesystem.hpp>
 #include <fc/io/fstream.hpp>
 #include <fc/io/json.hpp>
 #include <filesystem>
 #include <format>
 #include <fstream>
 #include <memory>
+#include <optional>
 #include <sodium.h>
 #include <string>
 #include <type_traits>
@@ -576,7 +578,7 @@ BOOST_AUTO_TEST_CASE(startup_probe_not_retained_for_rejected_duplicate_provider)
 }
 
 // A signature-provider spec must never be logged with its inline private key intact; `redact_signature_provider_spec`
-// masks only the final `KEY:<private-key>` field while leaving name/chain/type/public-key and non-KEY providers
+// masks everything after a `KEY:` provider marker while leaving name/chain/type/public-key and non-KEY providers
 // (which reference external key material) untouched.
 BOOST_AUTO_TEST_CASE(redact_signature_provider_spec_masks_inline_private_key) {
    using sysio::redact_signature_provider_spec;
@@ -599,10 +601,78 @@ BOOST_AUTO_TEST_CASE(redact_signature_provider_spec_masks_inline_private_key) {
       redact_signature_provider_spec("wire-1,wire,wire,PUB_WA_pub,KIOD:http://127.0.0.1:8888"),
       "wire-1,wire,wire,PUB_WA_pub,KIOD:http://127.0.0.1:8888");
 
-   // Only the final field is inspected: a KEY:-prefixed *name* must not trigger false redaction.
+   // A KEY:-prefixed *name* must not trigger false redaction.
    BOOST_CHECK_EQUAL(
       redact_signature_provider_spec("KEY:weird-name,wire,wire,PUB_WA_pub,KIOD:url"),
       "KEY:weird-name,wire,wire,PUB_WA_pub,KIOD:url");
+
+   // Malformed specs still mask the key: the `<public-key>=KEY:<private-key>` form with and without other fields, a
+   // space after a comma, a trailing extra field after the key, and a key supplied in the public-key field.
+   BOOST_CHECK_EQUAL(redact_signature_provider_spec("PUB_WA_pub=KEY:PVT_WA_secretkey"), "PUB_WA_pub=KEY:<redacted>");
+   BOOST_CHECK_EQUAL(
+      redact_signature_provider_spec("wire,wire,PUB_WA_pub=KEY:PVT_WA_secretkey"),
+      "wire,wire,PUB_WA_pub=KEY:<redacted>");
+   BOOST_CHECK_EQUAL(
+      redact_signature_provider_spec("wire-1, wire, wire, PUB_WA_pub, KEY:PVT_WA_secretkey"),
+      "wire-1, wire, wire, PUB_WA_pub, KEY:<redacted>");
+   BOOST_CHECK_EQUAL(
+      redact_signature_provider_spec("wire-1,wire,wire,PUB_WA_pub,KEY:PVT_WA_secretkey,extra"),
+      "wire-1,wire,wire,PUB_WA_pub,KEY:<redacted>");
+   BOOST_CHECK_EQUAL(
+      redact_signature_provider_spec("wire-1,wire,wire,KEY:PVT_WA_secretkey,PUB_WA_pub"),
+      "wire-1,wire,wire,KEY:<redacted>");
+}
+
+// Provider creation errors never carry the private key: not from a KEY: key the parser rejects, not from a key missing
+// its KEY: prefix, not from a key in the public-key field, and not from the `<public-key>=KEY:<private-key>` form.
+BOOST_AUTO_TEST_CASE(create_provider_errors_never_echo_private_key) {
+   using namespace fc::crypto;
+
+   auto clean_app = gsl_lite::finally([]() {
+      appbase::application::reset_app_singleton();
+   });
+
+   const auto priv             = private_key::generate();
+   const auto public_key_text  = priv.get_public_key().to_string({});
+   const auto private_key_text = priv.to_string({});
+   // '0' is outside the base58 alphabet, so the native parser rejects this key.
+   const auto malformed_private_key_text = private_key_text.substr(0, private_key_text.size() - 1) + "0";
+
+   auto  tester = create_app();
+   auto& mgr    = tester->plugin();
+
+   // Checks for the key material after its `PVT_<type>_` prefix: that is what a parser echoes (base58 decode errors
+   // quote only the body), so searching for the whole string would miss a leak.
+   const auto never_echoes = [](const std::string& key_text) {
+      const auto body = key_text.substr(key_text.rfind('_') + 1);
+      return [body](const fc::exception& e) { return e.to_detail_string().find(body) == std::string::npos; };
+   };
+
+   BOOST_CHECK_EXCEPTION(
+      mgr.create_provider(to_signature_provider_spec("wire-malformed", chain_kind_wire, chain_key_type_wire,
+                                                     public_key_text, to_private_key_spec(malformed_private_key_text))),
+      sysio::chain::plugin_config_exception, never_echoes(malformed_private_key_text));
+
+   BOOST_CHECK_EXCEPTION(
+      mgr.create_provider(to_signature_provider_spec("wire-bare", chain_kind_wire, chain_key_type_wire,
+                                                     public_key_text, private_key_text)),
+      fc::exception, never_echoes(private_key_text));
+
+   BOOST_CHECK_EXCEPTION(
+      mgr.create_provider(to_signature_provider_spec("wire-swapped", chain_kind_wire, chain_key_type_wire,
+                                                     to_private_key_spec(private_key_text), public_key_text)),
+      sysio::chain::plugin_config_exception, never_echoes(private_key_text));
+
+   BOOST_CHECK_EXCEPTION(
+      mgr.create_provider(to_signature_provider_spec("wire-swapped-bare", chain_kind_wire, chain_key_type_wire,
+                                                     private_key_text, to_private_key_spec(private_key_text))),
+      sysio::chain::plugin_config_exception, never_echoes(private_key_text));
+
+   BOOST_CHECK_EXCEPTION(mgr.create_provider(public_key_text + "=" + to_private_key_spec(private_key_text)),
+                         fc::exception, never_echoes(private_key_text));
+   BOOST_CHECK_EXCEPTION(
+      mgr.create_provider("wire,wire," + public_key_text + "=" + to_private_key_spec(private_key_text)),
+      fc::exception, never_echoes(private_key_text));
 }
 
 // The auto-generated default signature-provider file holds private keys and must be written owner-only (0600),
@@ -711,6 +781,39 @@ BOOST_AUTO_TEST_CASE(invalid_spec_error_redacts_inline_private_key) {
                             return detail.find(priv_str) == std::string::npos &&
                                    detail.find("KEY:<redacted>") != std::string::npos;
                          });
+}
+
+// Stored defaults become providers only for the key types a caller requests: a node that asks for the wire default
+// must not also pick up the BLS finalizer default an earlier run as a producer saved to the same config dir.
+BOOST_AUTO_TEST_CASE(stored_defaults_register_only_requested_key_types) {
+   using namespace fc::crypto;
+
+   const fc::temp_directory       config_dir;
+   const std::vector<std::string> args = {"--config-dir", config_dir.path().string()};
+
+   // A producer run generates and saves both defaults.
+   std::optional<public_key> saved_bls_key;
+   {
+      auto tester = create_app(args);
+      tester->plugin().register_default_signature_providers({chain_key_type_wire, chain_key_type_wire_bls});
+      const auto bls = tester->plugin().query_providers(std::nullopt, std::nullopt, chain_key_type_wire_bls);
+      BOOST_REQUIRE_EQUAL(bls.size(), 1u);
+      saved_bls_key = bls.front()->public_key;
+   }
+
+   auto tester = create_app(args);
+   auto& mgr   = tester->plugin();
+
+   // A later run that requests only the wire default gets no BLS provider.
+   mgr.register_default_signature_providers({chain_key_type_wire});
+   BOOST_CHECK_EQUAL(mgr.query_providers(std::nullopt, std::nullopt, chain_key_type_wire).size(), 1u);
+   BOOST_CHECK(mgr.query_providers(std::nullopt, std::nullopt, chain_key_type_wire_bls).empty());
+
+   // Requesting the BLS default reuses the saved key instead of generating a new one.
+   mgr.register_default_signature_providers({chain_key_type_wire_bls});
+   const auto bls = mgr.query_providers(std::nullopt, std::nullopt, chain_key_type_wire_bls);
+   BOOST_REQUIRE_EQUAL(bls.size(), 1u);
+   BOOST_CHECK(bls.front()->public_key == *saved_bls_key);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -172,7 +172,10 @@ public:
       using namespace fc::crypto;
       constexpr std::size_t max_split = 2;
       auto spec_parts = fc::split(spec, ':', max_split);
-      FC_ASSERT(spec_parts.size() == max_split, "Provider spec '{}' is malformed. Format: '<spec type>:<spec data>'", spec);
+      // Not echoed: a spec missing its `KEY:` prefix is a bare private key.
+      FC_ASSERT(spec_parts.size() == max_split,
+                "Provider spec for {} is malformed. Format: '<spec type>:<spec data>'",
+                fc::json::to_log_string(public_key));
 
       auto spec_type_str = spec_parts[0];
       auto spec_data = spec_parts[1];
@@ -189,7 +192,13 @@ public:
             // Runtime dispatch over the per-type native parsers lives in libfc (fc/crypto/signature_provider.cpp) so
             // extension handlers that also construct local-key providers (e.g. the ssm sub-library) share it. The sui /
             // unknown arms stay here: libfc cannot throw the chain-level config exceptions this plugin's contract uses.
-            privkey = from_native_string_to_private_key(key_type, spec_data);
+            try {
+               privkey = from_native_string_to_private_key(key_type, spec_data);
+            } catch (const fc::exception& e) {
+               // libfc keeps the key out of the message; name the provider so the operator can find the spec.
+               FC_THROW_EXCEPTION(sysio::chain::plugin_config_exception, "KEY: provider spec for {}: {}",
+                                  fc::json::to_log_string(public_key), e.top_message());
+            }
             break;
          }
          case chain_key_type_sui: {
@@ -376,19 +385,16 @@ public:
       fc::read_file_contents(def_sig_prov_file.string(), json_data);
       auto vo = fc::json::from_string(json_data, fc::json::parse_type::relaxed_parser).as<fc::variant_object>();
 
-      // Record every parsed spec before creating any provider, so a creation failure part-way through never leaves the
-      // specs map missing entries that were present on disk (the guard above proves the member is empty on entry, so
-      // these inserts are the whole map).
+      // Record every parsed spec so a later save keeps entries that were present on disk (the guard above proves the
+      // member is empty on entry, so these inserts are the whole map). Providers are created only for the key types a
+      // caller requests (register_default_signature_providers): a node must not pick up a default it did not ask for,
+      // such as a BLS finalizer key saved by an earlier run as a producer.
       for (const auto& item : vo) {
          auto spec = item.value().as_string();
          auto key_type = fc::crypto::chain_key_type_reflector::from_string(item.key().c_str());
          auto [it, inserted] = _default_signature_provider_specs.try_emplace(key_type, spec);
          FC_ASSERT(inserted, "corrupt {}: duplicate default for key type \"{}\"", def_sig_prov_file.string(),
                    fc::crypto::chain_key_type_reflector::to_string(key_type));
-      }
-
-      for (const auto& [key_type, spec] : _default_signature_provider_specs) {
-         create_provider(spec);
       }
    }
 
@@ -403,11 +409,16 @@ public:
       for (const auto& key_type : key_types) {
          FC_ASSERT(fc::contains(supported_key_types, key_type),
                    "Unsupported key type: {}", key_type);
-         // A stored default spec was already created by load_default_signature_provider_specs, and a configured
-         // provider of this key type makes a default redundant.
-         if (_default_signature_provider_specs.contains(key_type) ||
-             query_providers(std::nullopt, std::nullopt, key_type).size())
+         // A configured (or already created) provider of this key type makes a default redundant.
+         if (query_providers(std::nullopt, std::nullopt, key_type).size())
             continue;
+
+         // Reuse the stored default for this key type.
+         if (auto stored = _default_signature_provider_specs.find(key_type);
+             stored != _default_signature_provider_specs.end()) {
+            create_provider(stored->second);
+            continue;
+         }
 
          // create anonymous key
          auto key_name = std::format("{}-default", fc::crypto::chain_key_type_reflector::to_string(key_type));
@@ -531,7 +542,15 @@ public:
       case chain_key_type_solana: {
          // Runtime dispatch lives in libfc (fc/crypto/signature_provider.cpp); the sui / unknown arms stay here for the
          // chain-level exception taxonomy, same as the KEY: private-key parse.
-         pubkey = from_native_string_to_public_key(key_type, public_key_text);
+         try {
+            pubkey = from_native_string_to_public_key(key_type, public_key_text);
+         } catch (const fc::exception& e) {
+            // The parser echoes its input, and a private key typed into this field must not reach the error.
+            FC_THROW_EXCEPTION(sysio::chain::plugin_config_exception,
+                               "Signature provider {} has an invalid {} public key (parse failed with {}; the text is "
+                               "not shown in case it is a private key)",
+                               key_name, chain_key_type_reflector::to_fc_string(key_type), e.name());
+         }
          break;
       }
       case chain_key_type_sui: {
@@ -749,7 +768,7 @@ void signature_provider_manager_plugin::plugin_initialize(const variables_map& o
    if (options.contains(option_name_provider)) {
       auto specs = options.at(option_name_provider).as<std::vector<std::string>>();
       for (const auto& spec : specs) {
-         dlog("Registering signature provider from spec: {}", redact_signature_provider_spec(spec));
+         // The spec itself is not logged: a malformed one can carry a private key that redaction cannot recognize.
          auto provider = my->create_configured_provider(spec);
          dlog("Registered signature provider ({}): {}",
               provider->key_name, provider->public_key.to_string({}));
