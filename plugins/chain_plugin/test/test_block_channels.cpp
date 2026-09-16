@@ -56,6 +56,12 @@ struct delivery {
    block_id_type    id;
 };
 
+/// The objects a test emits a signal through, as the controller emits through its block states.
+struct signal_binding {
+   signed_block_ptr block;
+   block_id_type    id;
+};
+
 /// A packed block with no transactions whose id is made distinct by @p slot.
 signed_block_ptr make_block(uint32_t slot) {
    signed_block_header header;
@@ -113,11 +119,13 @@ public:
    block_channel_recorder(const block_channel_recorder&) = delete;
    block_channel_recorder& operator=(const block_channel_recorder&) = delete;
 
-   /// Run @p emit on the application thread, where the controller emits its signals. Deliveries it causes run
-   /// only after @p emit returns.
-   void on_app_thread(std::function<void(controller&)> emit) {
+   /// Run @p emit on the application thread, where the controller emits its signals; the deliveries it causes run
+   /// after it returns. @p emit must capture by value, since a failed wait unwinds the test's locals before this
+   /// recorder stops that thread. Emit through the binding: the recorder owns it and joins the thread before
+   /// destroying it.
+   void on_app_thread(std::function<void(controller&, signal_binding&)> emit) {
       _app->executor().post(appbase::priority::high, appbase::exec_queue::read_write,
-                            [this, emit = std::move(emit)]() { emit(_chain_plug->chain()); });
+                            [this, emit = std::move(emit)]() { emit(_chain_plug->chain(), _binding); });
    }
 
    /// Wait for one delivery per block channel; false on timeout.
@@ -150,6 +158,7 @@ private:
    appbase::scoped_app     _app;
    std::thread             _app_thread;
    chain_plugin*           _chain_plug = nullptr;
+   signal_binding          _binding; ///< application thread only
    mutable std::mutex      _mtx;
    std::condition_variable _delivered;
    std::vector<delivery>   _deliveries; ///< guarded by _mtx
@@ -172,19 +181,15 @@ BOOST_AUTO_TEST_CASE(deliveries_carry_the_emitted_block) {
    const block_id_type    emitted_id = emitted->calculate_id();
    const signed_block_ptr replacement = make_block(second_block_slot);
 
-   signed_block_ptr binding_block;
-   block_id_type    binding_id;
-   recorder.on_app_thread([&](controller& chain) {
+   recorder.on_app_thread([emitted, emitted_id, replacement](controller& chain, signal_binding& binding) {
       const auto emit = [&](auto& signal) {
-         binding_block = emitted;
-         binding_id = emitted_id;
-         signal(std::tie(binding_block, binding_id));
+         binding = {emitted, emitted_id};
+         signal(std::tie(binding.block, binding.id));
       };
       emit(chain.accepted_block_header());
       emit(chain.accepted_block());
       emit(chain.irreversible_block());
-      binding_block = replacement;
-      binding_id = replacement->calculate_id();
+      binding = {replacement, replacement->calculate_id()};
    });
 
    BOOST_REQUIRE(recorder.wait_for_one_delivery_per_channel());
@@ -207,10 +212,12 @@ BOOST_AUTO_TEST_CASE(deliveries_keep_emission_order) {
    const signed_block_ptr final_block = make_block(first_block_slot);
    const block_id_type    final_id = final_block->calculate_id();
 
-   recorder.on_app_thread([&](controller& chain) {
-      chain.accepted_block_header()(std::tie(head, head_id));
-      chain.accepted_block()(std::tie(head, head_id));
-      chain.irreversible_block()(std::tie(final_block, final_id));
+   recorder.on_app_thread([head, head_id, final_block, final_id](controller& chain, signal_binding& binding) {
+      binding = {head, head_id};
+      chain.accepted_block_header()(std::tie(binding.block, binding.id));
+      chain.accepted_block()(std::tie(binding.block, binding.id));
+      binding = {final_block, final_id};
+      chain.irreversible_block()(std::tie(binding.block, binding.id));
    });
 
    BOOST_REQUIRE(recorder.wait_for_one_delivery_per_channel());
