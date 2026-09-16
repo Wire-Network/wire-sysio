@@ -21,13 +21,13 @@ namespace sysio {
 /// a delivery worker batches up to --status-monitor-max-items-per-task documents per bulk request, which the
 /// es client sends from its own io thread (three threads in all). The endpoint is checked once at startup
 /// (es_client::probe(), one request, no retry): an endpoint that cannot be reached fails startup rather than
-/// dropping every document for the life of the node. Afterwards every bulk request that does not fully index
-/// is logged on the delivery worker, one warning per failed batch naming the attempts, the failure detail, and
-/// what became of the batch's documents -- the only per-batch line, and never emitted for an acknowledged
-/// batch, so the per-block data path stays log-free. Delivery problems are also counted on the workers and
-/// summarized from the application thread, where the failure line and the recovery line share one rate limit
-/// of at most one line a minute between them -- so an endpoint alternating between failed and acknowledged
-/// batches cannot log a summary per block. Steady-state rate: one document per LIB advance, about
+/// dropping every document for the life of the node. Afterwards a bulk request that does not fully index is
+/// logged on the delivery worker -- the first one, then at most one a minute counting the failed batches in
+/// between -- naming the attempts, the failure detail, and what became of the batch's documents; an acknowledged
+/// batch is never logged, so the per-block data path stays log-free. Delivery problems are also counted on the
+/// workers and summarized from the application thread, where the failure line and the recovery line share one
+/// rate limit of at most one line a minute between them -- so an endpoint alternating between failed and
+/// acknowledged batches cannot log a summary per block. Steady-state rate: one document per LIB advance, about
 /// two per second at the 500 ms block interval.
 ///
 /// config.ini excerpt:
