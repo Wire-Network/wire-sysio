@@ -301,6 +301,8 @@ struct continuation_json_rpc_response {
    kind response_kind = kind::result;
    fc::variant payload;
    std::optional<int64_t> response_id;
+   /// Emit a literal null id, as JSON-RPC 2.0 requires when the request id could not be read.
+   bool null_response_id = false;
    bool keep_alive = true;
 
    /** Return a successful JSON-RPC result. */
@@ -390,7 +392,9 @@ private:
          return response.payload.as_string();
 
       fc::mutable_variant_object envelope;
-      envelope("jsonrpc", "2.0")("id", response.response_id ? fc::variant(*response.response_id) : request["id"]);
+      envelope("jsonrpc", "2.0")("id", response.null_response_id ? fc::variant()
+                                       : response.response_id    ? fc::variant(*response.response_id)
+                                                                 : request["id"]);
       if (response.response_kind == continuation_json_rpc_response::kind::result)
          envelope("result", response.payload);
       else
@@ -560,6 +564,23 @@ BOOST_AUTO_TEST_CASE(call_reports_a_json_rpc_error_envelope) {
    fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
 
    BOOST_CHECK_THROW(client.call("wire_missing_probe"), fc::network::json_rpc::json_rpc_error);
+}
+
+/// A spec-compliant error response with a null id still decodes as a JSON-RPC error.
+///
+/// JSON-RPC 2.0 requires id to be null when the server could not determine the request's id,
+/// as on a parse error. Rejecting that on the id check first would throw a plain fc::exception
+/// and bypass every `catch (const json_rpc_error&)` the outpost clients rely on.
+BOOST_AUTO_TEST_CASE(call_reports_an_error_envelope_carrying_a_null_id) {
+   fc::mutable_variant_object failure;
+   failure("code", -32700)("message", "Parse error");
+   auto response = continuation_json_rpc_response::error(fc::variant(std::move(failure)));
+   response.response_id = std::nullopt;
+   response.null_response_id = true;
+   continuation_json_rpc_server server({std::move(response)});
+   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
+
+   BOOST_CHECK_THROW(client.call("wire_parse_error_probe"), fc::network::json_rpc::json_rpc_error);
 }
 
 /// A response whose id does not match the request is rejected instead of returned.
