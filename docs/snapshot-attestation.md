@@ -148,10 +148,10 @@ provider set keeps a stable delegation through ordinary producer churn.
 The registration table is capped at 30. Normal producer lifecycle actions do no attestation work.
 Only when a gated registration encounters a full table does `regsnapprov` lazily remove every
 mapping whose producer would now fail that gate, print each eviction, then reapply the cap. Rank is
-only one way to fail it: a producer that has gone inactive, lost its ACTIVE `OPERATOR_TYPE_PRODUCER`
-row in sysio.opreg, or lost its active finalizer key is evicted the same as one ranked outside the
-top 30. All uniqueness checks run before pruning, so a doomed registration cannot mutate unrelated
-mappings. Pending votes are never retracted by this cleanup.
+only one way to fail it: a producer that has no `producers` row, has gone inactive, lost its ACTIVE
+`OPERATOR_TYPE_PRODUCER` row in sysio.opreg, or lost its active finalizer key is evicted the same as
+one ranked outside the top 30. All uniqueness checks run before pruning, so a doomed registration
+cannot mutate unrelated mappings. Pending votes are never retracted by this cleanup.
 Delegating to a separate account decouples authority: the producer's keys never have to live on
 the snapshot node -- only the snap_account's key does.
 
@@ -340,10 +340,11 @@ clio push action sysio votesnaphash \
 
 ## Testing
 
-- Contract tests (`contracts/tests/sysio.snapshot_attest_tests.cpp`) cover registration and
-  rotation, side-effect-free uniqueness failures, traceable lazy full-table pruning, fixed-K
-  configuration, scheduled-height rejection, monotonic votes across churn and heights,
-  equivocation/disagreement rejection, finalization purging, and the `getsnaphash` query.
+- Contract tests (`contracts/tests/sysio.snapshot_attest_tests.cpp`) cover registration, rotation
+  and `delsnapprov` retirement, rejections that name the failed eligibility condition,
+  side-effect-free uniqueness failures, traceable lazy full-table pruning, fixed-K configuration,
+  scheduled-height rejection, monotonic votes across churn and heights, equivocation/disagreement
+  rejection, finalization purging, and the `getsnaphash` query.
 - Unit tests (`unittests/snapshot_attest_tests.cpp`) cover snapshot round-trip hash
   stability, a full chain whose snapshot hash matches its on-chain record, mismatch
   detection, the no-attestation case, and survival of attestation state across a snapshot

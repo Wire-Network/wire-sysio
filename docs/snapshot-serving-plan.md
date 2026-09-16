@@ -124,7 +124,7 @@ getsnaphash(block_num)                    // read-only — returns attested reco
 **Registration:**
 - A producer calls `regsnapprov` to designate a `snap_account` as their snapshot provider. A producer that currently holds no mapping must be registered, active, and ranked at or below 30. Rank is position in a walk that tests `is_schedulable`, so an ACTIVE `OPERATOR_TYPE_PRODUCER` row in sysio.opreg and an active finalizer key are required alongside it; a producer missing either is absent from the ranked list, and the rejection names which condition failed rather than reporting rank for all three.
 - Repeating the same registration is idempotent; registering a new snap_account atomically rotates that producer's mapping without retracting producer-keyed votes. Rotation is deliberately not eligibility-gated, and `delsnapprov` does not subsume it: leaving is one-way because re-registering is gated, so an ineligible producer that rotates keeps a delegation it can carry back into eligibility. It replaces that producer's single row, so it grants nothing a gated registration would. The gate keys on the absence of a current mapping, so a producer whose row was evicted by the capacity prune is gated again when it re-registers.
-- The table is capped at 30. Producer lifecycle actions do no attestation work. Only a gated registration that finds the table full lazily removes mappings, evicting every producer that would now fail the gate: one that has gone inactive, lost its ACTIVE `OPERATOR_TYPE_PRODUCER` row in sysio.opreg or its active finalizer key, or ranks outside the top 30. Pending votes remain monotonic.
+- The table is capped at 30. Producer lifecycle actions do no attestation work. Only a gated registration that finds the table full lazily removes mappings, evicting every producer that would now fail the gate: one that has no `producers` row, has gone inactive, lost its ACTIVE `OPERATOR_TYPE_PRODUCER` row in sysio.opreg or its active finalizer key, or ranks outside the top 30. Pending votes remain monotonic.
 **Voting:**
 - The contract accepts only block heights divisible by 25,000, matching the automatic provider schedule; manual/on-demand heights are rejected.
 - Votes accumulate per `(block_num, block_id, snapshot_hash)` tuple. A producer can vote at multiple scheduled heights but cannot equivocate at one height, and exact retries are idempotent.
@@ -341,7 +341,7 @@ For a complete operator setup guide — including producer registration, provide
 ### Implemented Tests
 
 **Contract tests** (`contracts/tests/sysio.snapshot_attest_tests.cpp`):
-- Registration: authority/eligibility checks, idempotent rotation, ungated rotation by a producer that has since become ineligible, bounded capacity, side-effect-free conflicts, and traceable lazy stale-row pruning only when full
+- Registration: authority/eligibility checks and rejections that name the failed condition, idempotent rotation, `delsnapprov` retirement, ungated rotation and retirement by a producer that has since become ineligible, bounded capacity, side-effect-free conflicts, and traceable lazy stale-row pruning only when full
 - Configuration: validation, authority, explicit initialization, and current fixed-K enforcement
 - Voting: scheduled/future bounds, idempotency, per-height equivocation rejection, and independent heights
 - Quorum: fixed K independent of registration count, governance changes on pending tuples, and explicit K=1 behavior
