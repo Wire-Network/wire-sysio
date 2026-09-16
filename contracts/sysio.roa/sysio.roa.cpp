@@ -13,6 +13,9 @@ namespace sysio {
         // literals -- a contract rename is one change here, not scattered across call sites).
         constexpr name AUTHEX_ACCOUNT    = "sysio.authex"_n;
         constexpr name AUTHEX_RECORDLINK = "recordlink"_n;
+
+        /// Maximum number of generated account names checked before newuser gives up.
+        constexpr uint8_t MAX_ACCOUNT_NAME_ATTEMPTS = 100;
     } // anonymous namespace
 
     static bool is_sysio_account(const name& account) {
@@ -1032,7 +1035,7 @@ namespace sysio {
         check(prefix_len + 2 <= NAME_LENGTH, "Creator name is too long to generate a sub-account under it");
         size_t gen_len = NAME_LENGTH - prefix_len - 1; // chars after "<prefix>."
 
-        // Try up to 3 times to generate a unique username
+        // Try a bounded number of times to generate a unique username.
         name new_username;
         bool created = false;
         uint32_t block_num = current_block_number();
@@ -1060,7 +1063,7 @@ namespace sysio {
             return z ^ (z >> 31);
         };
 
-        for (uint8_t attempt = 0; attempt < 3; ++attempt) {
+        for (uint8_t attempt = 0; attempt < MAX_ACCOUNT_NAME_ATTEMPTS; ++attempt) {
             uint64_t x = nonce.value ^ (static_cast<uint64_t>(block_num) << 32)
                          ^ (static_cast<uint64_t>(attempt) * 0x9E3779B97F4A7C15ULL);
 
@@ -1078,7 +1081,7 @@ namespace sysio {
                 break;
             }
         }
-        check(created, "Failed to generate a unique account name after 3 attempts");
+        check(created, "Failed to generate a unique account name after 100 attempts");
 
         auto owner_auth = sysiosystem::authority{1, {{pubkey, 1}}, {}};
         auto active_auth = sysiosystem::authority{1, {{pubkey, 1}}, {}};

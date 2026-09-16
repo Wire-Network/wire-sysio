@@ -13,6 +13,8 @@
 #include <fc/crypto/elliptic_em.hpp>
 #include <fc/crypto/private_key.hpp>
 #include <boost/test/unit_test.hpp>
+#include <algorithm>
+#include <memory>
 #include <string>
 #include <type_traits>
 
@@ -348,6 +350,34 @@ BOOST_FIXTURE_TEST_CASE( newuser_twice_test, sysio_roa_tester ) try {
    auto new_name2 = fc::raw::unpack<name>(newuser_action_trace2.return_value);
    BOOST_REQUIRE_NE(new_name, new_name2);
 
+} FC_LOG_AND_RETHROW()
+
+/// Verifies newuser continues past the former three-attempt limit when generated names collide.
+/// Each isolated tester starts from the same chain state and block number. Names returned by the
+/// earlier testers are pre-created in the next tester, deterministically forcing one additional
+/// collision without duplicating the contract's name-generation algorithm in test code.
+BOOST_AUTO_TEST_CASE( newuser_retries_after_three_name_collisions ) try {
+   std::vector<account_name> occupied_names;
+
+   for (size_t collision_count = 0; collision_count <= 3; ++collision_count) {
+      auto chain = std::make_unique<sysio_roa_tester>();
+      BOOST_REQUIRE_EQUAL(chain->success(), chain->regnodeowner("alice"_n, 1));
+      chain->produce_blocks(1);
+
+      for (const auto occupied_name : occupied_names)
+         chain->create_account(occupied_name, config::system_account_name, false, false, false, false);
+
+      auto result = chain->newuser("alice"_n, "retrynonce"_n,
+                                   chain->get_public_key("alice"_n, "active"));
+      BOOST_REQUIRE(result && !result->action_traces.empty());
+
+      const auto generated_name = fc::raw::unpack<name>(result->action_traces[0].return_value);
+      BOOST_REQUIRE(std::find(occupied_names.begin(), occupied_names.end(), generated_name)
+                    == occupied_names.end());
+      occupied_names.push_back(generated_name);
+   }
+
+   BOOST_REQUIRE_EQUAL(occupied_names.size(), 4u);
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( newuser_creator_permission_test, sysio_roa_tester ) try {
