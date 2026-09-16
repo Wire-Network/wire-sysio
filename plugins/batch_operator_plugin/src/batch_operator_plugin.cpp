@@ -612,10 +612,9 @@ struct batch_operator_plugin::impl {
       outposts.clear();
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
-         // `code` is a `slug_name`. fc::slug_name's own from_variant accepts
-         // every carrier — the decoded slug string, "" for zero, a raw integer,
-         // and the legacy `{value: <uint64>}` object — so the shape does not
-         // have to be probed here.
+         // `code` is a `slug_name`. fc::slug_name's own from_variant reads the
+         // decoded slug string ("" for zero) and the transitional
+         // `{value: <uint64>}` object, so the shape is not probed here.
          uint64_t code_val = 0;
          if (auto code_obj = obj.find(chains::field::code); code_obj != obj.end()) {
             code_val = code_obj->value().as<fc::slug_name>().value;

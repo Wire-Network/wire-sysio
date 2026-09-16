@@ -348,12 +348,10 @@ BOOST_AUTO_TEST_CASE(non_zero_terminator_trait_accepts_alphabet_zero) {
 }
 
 // ── variant carrier ────────────────────────────────────────────────────────
-// to_variant is a DUAL carrier: a canonical slug renders as its string, zero as
-// "", and a value with no string spelling as the raw integer. It must be TOTAL
-// and INJECTIVE over all 2^64 — a non-canonical code is plantable from a
-// forgeable attestation payload (only chain_code is bound to the proven source
-// outpost), so a throwing conversion would let one row make a whole table
-// unreadable over get_table_rows.
+// ONE carrier: the canonical string spelling. A slug renders as its text, zero
+// as "", and a value with no spelling throws. The cases below pin that single
+// shape from both directions — every writable spelling lands on a string, and
+// every non-string is refused rather than coerced.
 
 BOOST_AUTO_TEST_CASE(variant_canonical_slug_is_a_string) {
    fc::variant v;
@@ -377,38 +375,30 @@ BOOST_AUTO_TEST_CASE(variant_zero_is_the_empty_string_both_ways) {
    BOOST_CHECK_EQUAL(back.value, 0u);
 }
 
-BOOST_AUTO_TEST_CASE(variant_non_canonical_uses_the_integer_carrier) {
+BOOST_AUTO_TEST_CASE(variant_non_canonical_has_no_spelling_and_throws) {
    // Every value below 1<<42 has a zero in the char[0] slot, so to_string()
-   // truncates it to "" and the string spelling cannot recover it. The carrier
-   // must therefore be the integer, or the conversion stops being injective.
+   // truncates it to "" and no string recovers it. Rather than grow a second
+   // carrier for those, the conversion refuses them — which is what keeps ""
+   // meaning exactly zero. The throw is contained: get_table_rows catches per
+   // row and renders that cell as hex.
    for (uint64_t raw : {uint64_t{1}, uint64_t{7}, uint64_t{42},
-                        uint64_t{(uint64_t{1} << 42) - 1}}) {
+                        uint64_t{(uint64_t{1} << 42) - 1},
+                        (uint64_t{1} << 48) - 1,  // symbols past the alphabet
+                        ~uint64_t{0}}) {
       fc::variant v;
-      fc::to_variant(slug_name{raw}, v);
-      BOOST_REQUIRE_MESSAGE(v.is_integer(), "raw=" << raw << " must use the integer carrier");
-      slug_name back;
-      fc::from_variant(v, back);
-      BOOST_CHECK_EQUAL(back.value, raw);
+      BOOST_CHECK_THROW(fc::to_variant(slug_name{raw}, v), fc::exception);
    }
 }
 
-BOOST_AUTO_TEST_CASE(variant_never_throws_on_any_value) {
-   // The anti-DoS property. If this is ever "tidied" into a throw, one planted
-   // row makes get_table_rows fail for an entire table.
-   for (uint64_t raw : {uint64_t{0}, uint64_t{1}, uint64_t{9}, uint64_t{1} << 41,
-                        uint64_t{1} << 42, ~uint64_t{0}}) {
+BOOST_AUTO_TEST_CASE(variant_every_canonical_value_round_trips_exactly) {
+   // Injectivity across the boundary for the whole canonical range, including
+   // its floor (1<<42 is "A") and the zero sentinel.
+   for (uint64_t raw : {uint64_t{0}, uint64_t{1} << 42, fc::slug_name{"A"}.value,
+                        fc::slug_name{"LIQSOL"}.value, fc::slug_name{"12345678"}.value,
+                        fc::slug_name{"________"}.value}) {
       fc::variant v;
-      BOOST_CHECK_NO_THROW(fc::to_variant(slug_name{raw}, v));
-   }
-}
-
-BOOST_AUTO_TEST_CASE(variant_every_carrier_round_trips_exactly) {
-   // Totality + injectivity across the boundary, including the canonical floor.
-   for (uint64_t raw : {uint64_t{0}, uint64_t{1}, uint64_t{(uint64_t{1} << 42) - 1},
-                        uint64_t{1} << 42, fc::slug_name{"A"}.value,
-                        fc::slug_name{"LIQSOL"}.value, fc::slug_name{"12345678"}.value}) {
-      fc::variant v;
-      fc::to_variant(slug_name{raw}, v);
+      BOOST_REQUIRE_NO_THROW(fc::to_variant(slug_name{raw}, v));
+      BOOST_REQUIRE(v.is_string());
       slug_name back;
       fc::from_variant(v, back);
       BOOST_CHECK_EQUAL(back.value, raw);
@@ -416,14 +406,17 @@ BOOST_AUTO_TEST_CASE(variant_every_carrier_round_trips_exactly) {
 }
 
 BOOST_AUTO_TEST_CASE(variant_an_all_digit_slug_is_a_string_not_its_own_decimal) {
-   // The slug alphabet contains digits, so "7" is itself a valid canonical slug
-   // — which is exactly why the non-canonical carrier must be a JSON integer
-   // and not a numeric string. A numeric string would be ambiguous.
+   // The slug alphabet contains digits, so "7" is itself a canonical slug whose
+   // packed value is nothing like 7. That ambiguity is why a JSON number is
+   // rejected outright rather than read as either one.
    fc::variant v;
    fc::to_variant(slug_name{"7"}, v);
    BOOST_REQUIRE(v.is_string());
    BOOST_CHECK_EQUAL(v.as_string(), "7");
    BOOST_CHECK_NE(slug_name{"7"}.value, 7u);
+
+   slug_name back;
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(uint64_t{7}), back), fc::exception);
 }
 
 BOOST_AUTO_TEST_CASE(variant_accepts_the_transitional_object_carrier) {
@@ -446,26 +439,20 @@ BOOST_AUTO_TEST_CASE(variant_rejects_a_non_canonical_string_spelling) {
    BOOST_CHECK_THROW(fc::from_variant(fc::variant(std::string{"TOOOLONGXX"}), back), fc::exception);
 }
 
-BOOST_AUTO_TEST_CASE(variant_every_carrier_round_trips_through_json_TEXT) {
-   // The variant-layer round trip above is NOT sufficient: `next_key` is json
-   // TEXT (chain_plugin renders it with fc::json::to_string) and a paginating
-   // caller feeds it straight back as a `lower_bound`, which is re-parsed with
-   // fc::json::from_string. fc::json QUOTES a uint64 above 0xffffffff, so the
-   // integer carrier crosses that boundary as a decimal STRING — which the
-   // validating string arm rejected as "too long" until from_variant learned to
-   // re-route on length. Values are chosen to straddle every threshold that
-   // matters: the 0xffffffff quoting cutoff, the 2^42 canonical floor, and 2^48.
+BOOST_AUTO_TEST_CASE(variant_carrier_round_trips_through_json_TEXT) {
+   // The variant-layer round trip above is NOT sufficient on its own: `next_key`
+   // is json TEXT (chain_plugin renders it with fc::json::to_string) and a
+   // paginating caller feeds it straight back as a `lower_bound`, re-parsed with
+   // fc::json::from_string. A single string carrier is what makes that crossing
+   // uneventful — fc::json quotes a uint64 above 0xffffffff, so a numeric
+   // carrier would change JSON TYPE mid-flight and land on the string arm as a
+   // decimal nobody asked for.
    const uint64_t values[] = {
-      0u,                       // the zero sentinel -> ""
-      7u,                       // non-canonical, below the quoting cutoff
-      0xffffffffu,              // last value fc::json emits unquoted
-      0x100000000u,             // first value fc::json QUOTES
-      (uint64_t{1} << 42) - 1,  // last non-canonical
-      uint64_t{1} << 42,        // first canonical ("A")
+      0u,                        // the zero sentinel -> ""
+      uint64_t{1} << 42,         // the canonical floor ("A")
       slug_name{"ETH"}.value,
-      slug_name{"12345678"}.value,
-      (uint64_t{1} << 48) - 1,  // symbols past the alphabet -> integer carrier
-      ~uint64_t{0},
+      slug_name{"12345678"}.value,  // all digits, and still a string
+      slug_name{"________"}.value,
    };
    for (const uint64_t raw : values) {
       fc::variant v;
@@ -492,11 +479,11 @@ BOOST_AUTO_TEST_CASE(mvo_accepts_every_spelling_a_caller_can_write) {
    //   std::string      -> variant(std::string)          -> string
    //   std::string_view -> variant(std::string_view)     -> string
    //   fc::slug_name    -> explicit variant(const T&)    -> to_variant -> string
-   //   uint64_t         -> variant(uint64_t)             -> the integer escape
    //
-   // This is why no `codename()`-style wrapper is needed at a call site: the
-   // raw literal and the `_s` literal both already work, and a wrapper
-   // returning std::string is just identity.
+   // Every one lands on a string, because the string IS the carrier. This is
+   // why no `codename()`-style wrapper is needed at a call site: the raw
+   // literal and the `_s` literal both already work, and a wrapper returning
+   // std::string is just identity.
    const slug_name expected{"LIQSOL"};
 
    const char* const      as_c_str  = "LIQSOL";
@@ -518,53 +505,37 @@ BOOST_AUTO_TEST_CASE(mvo_accepts_every_spelling_a_caller_can_write) {
       fc::from_variant(cell, back);
       BOOST_CHECK_MESSAGE(back == expected, std::string{"round trip failed: "} + key);
    }
-
-   // The integer escape is the one writable spelling that is NOT a string, and
-   // it is the only way to write a non-canonical value.
-   const fc::variant esc{ fc::mutable_variant_object()("code", uint64_t{7}) };
-   const fc::variant& cell = esc.get_object()["code"];
-   BOOST_CHECK(cell.is_integer());
-   slug_name back;
-   fc::from_variant(cell, back);
-   BOOST_CHECK_EQUAL(back.value, 7u);
 }
 
-BOOST_AUTO_TEST_CASE(variant_numeric_string_arm_rejects_a_signed_spelling) {
-   // The over-long string arm routes to as_uint64() for the integer carrier that
-   // crossed JSON text. as_uint64 goes through boost::lexical_cast, which does
-   // NOT reject a sign for an unsigned target — it WRAPS. Without the all-digits
-   // guard, "-12345678" (9 chars, so over max_len) was admitted as
-   // 18446744073697205938 instead of being rejected.
+BOOST_AUTO_TEST_CASE(variant_rejects_every_non_string_carrier) {
+   // Nothing but a string (and the transitional object) is read. Each value
+   // below would otherwise be COERCED by fc::variant::as_uint64 — which is the
+   // failure mode a single carrier removes, because none of these coercions is
+   // the value the writer meant:
+   //
+   //   7          -> the slug "7" is 0x1F0000000000, not 7
+   //   -1         -> lexical_cast does not reject a sign for an unsigned
+   //                 target, it WRAPS; a bound of -1 would page from the far
+   //                 end of the table
+   //   null/false -> 0, the absent sentinel, silently
+   //   true       -> 1, a value with no spelling at all
    slug_name back;
-   for (const char* spelling : {"-12345678", "-123456789", "+123456789", "-1"}) {
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(uint64_t{7}), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(uint64_t{1} << 42), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(int64_t{-1}), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(int64_t{-12345678}), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(false), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(true), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(1.5), back), fc::exception);
+
+   // A numeric STRING is not an escape either: it is parsed as a slug like any
+   // other spelling, so a signed or over-long decimal is simply invalid text.
+   for (const char* spelling : {"-1", "-12345678", "+123456789", "4294967296",
+                                "000000000000000042"}) {
       BOOST_CHECK_THROW(fc::from_variant(fc::variant(std::string{spelling}), back),
                         fc::exception);
    }
-
-   // A plain decimal over max_len is still the integer carrier, which is the
-   // whole point of the arm.
-   fc::from_variant(fc::variant(std::string{"4294967296"}), back);
-   BOOST_CHECK_EQUAL(back.value, 4294967296u);
-
-   // Zero-padded is all-digits, so it is accepted and means what it says.
-   fc::from_variant(fc::variant(std::string{"000000000000000042"}), back);
-   BOOST_CHECK_EQUAL(back.value, 42u);
-
-   // The NUMBER spelling must agree with the string spelling. `as_uint64`
-   // wraps a negative rather than rejecting it, so without a guard a JSON
-   // bound of `-1` would silently page from the far end of the table while
-   // `"-1"` threw — the two arms disagreeing is worse than either choice.
-   BOOST_CHECK_THROW(fc::from_variant(fc::variant(int64_t{-1}), back), fc::exception);
-   BOOST_CHECK_THROW(fc::from_variant(fc::variant(int64_t{-12345678}), back), fc::exception);
-
-   // NOT changed, and documented so the next reader knows it is deliberate:
-   // null / false / true coerce through fc::variant::as_uint64 exactly as they
-   // do for every other uint64 key leaf. Making slug_name alone strict here
-   // would diverge from the rest of the ABI for no gain — `0` is a legitimate
-   // slug value (the absent sentinel).
-   fc::from_variant(fc::variant(), back);      BOOST_CHECK_EQUAL(back.value, 0u);
-   fc::from_variant(fc::variant(false), back); BOOST_CHECK_EQUAL(back.value, 0u);
-   fc::from_variant(fc::variant(true), back);  BOOST_CHECK_EQUAL(back.value, 1u);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

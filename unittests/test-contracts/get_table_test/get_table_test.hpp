@@ -125,6 +125,37 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
 
     typedef sysio::kv::table< "structobjs"_n, structobj_key, structobj > structobjs;
 
+    // Slug-keyed kv::table — the shape every registry table ships
+    // (sysio.chains::chains, sysio.tokens::tokens, sysio.reserv::reserves).
+    //
+    // This one is named after a builtin ON PURPOSE, the exact hazard
+    // `composite_key` above exists to avoid: abigen matches builtins on the
+    // namespace-stripped bare name, so the field reaches the ABI as the bare
+    // `slug_name` and `build_key_shape` takes the LEAF branch. That is what puts
+    // the slug carrier on the live get_table_rows path — a bound and a
+    // `next_key` are the canonical STRING, never a nested object.
+    //
+    // Declared here rather than included from the contract library so the
+    // fixture stays self-contained: the layout is all the ABI sees.
+    struct slug_name {
+        uint64_t value = 0;
+        SYSLIB_SERIALIZE(slug_name, (value))
+    };
+
+    struct slugobj_key {
+        slug_name code;
+        uint64_t primary_key() const { return code.value; }
+        SYSLIB_SERIALIZE(slugobj_key, (code))
+    };
+
+    struct [[sysio::table("slugobjs")]] slugobj {
+        slug_name code;
+        uint64_t  payload = 0;
+        SYSLIB_SERIALIZE(slugobj, (code)(payload))
+    };
+
+    typedef sysio::kv::table< "slugobjs"_n, slugobj_key, slugobj > slugobjs;
+
    [[sysio::action]]
    void addnumobj(uint64_t input);
 
@@ -143,6 +174,13 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
    /// @param payload  arbitrary row payload
    [[sysio::action]]
    void addstruct(uint64_t code, uint64_t payload);
+
+   /// Insert a row into the slug-keyed kv::table `slugobjs`.
+   /// @param code     the slug forming the primary key — written as its
+   ///                 canonical string, since `slug_name` is an ABI builtin
+   /// @param payload  arbitrary row payload
+   [[sysio::action]]
+   void addslug(slug_name code, uint64_t payload);
 
 
 };

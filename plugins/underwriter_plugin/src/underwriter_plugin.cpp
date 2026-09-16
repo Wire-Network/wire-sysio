@@ -1209,9 +1209,8 @@ struct underwriter_plugin::impl {
       for (auto& row : rows.rows) {
          auto obj = row.get_object();
          // `code` is a `slug_name`. Read it through fc::slug_name's own
-         // from_variant, which accepts every carrier the depot emits — the
-         // decoded slug string, "" for the zero sentinel, and a raw integer for
-         // a non-canonical value — plus the legacy `{"value": <uint64>}` object.
+         // from_variant, which takes the decoded slug string ("" for the zero
+         // sentinel) plus the transitional `{"value": <uint64>}` object.
          uint64_t chain_code = obj["code"].as<fc::slug_name>().value;
          if (obj.contains("is_depot") && obj["is_depot"].as_bool()) {
             // Record the depot's own code for exact per-leg depot
@@ -1547,8 +1546,7 @@ struct underwriter_plugin::impl {
          // `(chain_code, token_code, reserve_code)` slug_name triples plus a
          // `*_amount`. Populated by `sysio.uwrit::createuwreq` from the
          // originating SwapRequest. Each is read through fc::slug_name's own
-         // from_variant, so every carrier the depot emits is accepted without
-         // this plugin knowing which one it is.
+         // from_variant, so the carrier is decoded in exactly one place.
          if (!obj.contains(uwrit::request_field::source_chain_code) ||
              !obj.contains(uwrit::request_field::source_amount) ||
              !obj.contains(uwrit::request_field::destination_chain_code) ||

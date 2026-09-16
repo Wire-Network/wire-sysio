@@ -457,6 +457,12 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
    push_action("test"_n, "addstruct"_n, "test"_n, mutable_variant_object()("code", 10)("payload", 100));
    push_action("test"_n, "addstruct"_n, "test"_n, mutable_variant_object()("code", 20)("payload", 200));
    push_action("test"_n, "addstruct"_n, "test"_n, mutable_variant_object()("code", 30)("payload", 300));
+   // slugobjs: kv::table keyed on `slug_name`, the shape every registry table
+   // ships. The code is written as its canonical string — `slug_name` is an ABI
+   // builtin, so that string IS the action's wire form. Drives (sec-11).
+   push_action("test"_n, "addslug"_n, "test"_n, mutable_variant_object()("code", "ETH")("payload", 100));
+   push_action("test"_n, "addslug"_n, "test"_n, mutable_variant_object()("code", "SOL")("payload", 200));
+   push_action("test"_n, "addslug"_n, "test"_n, mutable_variant_object()("code", "WIRE")("payload", 300));
    produce_block();
 
    // The result of the init will populate
@@ -794,6 +800,65 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       BOOST_REQUIRE_EQUAL(page2.rows.size(), 1u);
       BOOST_REQUIRE_EQUAL(page2.more, false);
       BOOST_CHECK_EQUAL(page2.rows[0].get_object()["value"].get_object()["code"].get_object()["value"].as_uint64(), 30u);
+      BOOST_CHECK_EQUAL(page2.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 300u);
+   }
+
+   // (sec-11) slugobjs primary key — kv::table keyed on `slug_name`, the shape
+   //          every registry table ships. `slug_name` is an ABI builtin, so
+   //          build_key_shape takes the LEAF branch and the carrier is the
+   //          canonical STRING at every boundary: the decoded key, the row
+   //          value, a JSON bound, and the `next_key` cursor. (sec-10) covers
+   //          the struct-node path; the leaf resolves through a different lookup
+   //          (leaf_kind_of, before the struct table) and needs its own
+   //          end-to-end pin.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json  = true;
+      p.code  = "test"_n;
+      // slugobjs is unscoped, exactly like structobjs above — no `scope` is set.
+      p.table = "slugobjs";
+
+      // (a) Both the decoded key and the row value render the canonical string.
+      //     A hex `key` here means the per-row decode threw and fell back.
+      auto all = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(all.rows.size(), 3u);
+      BOOST_REQUIRE(all.rows[0].get_object()["key"].get_object()["code"].is_string());
+      BOOST_CHECK_EQUAL(all.rows[0].get_object()["key"].get_object()["code"].as_string(), "ETH");
+      BOOST_CHECK_EQUAL(all.rows[0].get_object()["value"].get_object()["code"].as_string(), "ETH");
+      BOOST_CHECK_EQUAL(all.rows[1].get_object()["value"].get_object()["code"].as_string(), "SOL");
+      BOOST_CHECK_EQUAL(all.rows[2].get_object()["value"].get_object()["code"].as_string(), "WIRE");
+
+      // (b) A bare-string JSON bound filters inclusively — no nested object, no
+      //     packed integer. MSB-first packing makes key order follow the
+      //     alphabet, so ETH < SOL < WIRE holds in the stored bytes too.
+      p.lower_bound = R"({"code":"SOL"})";
+      auto bounded = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(bounded.rows.size(), 2u); // SOL, WIRE
+      BOOST_CHECK_EQUAL(bounded.rows[0].get_object()["value"].get_object()["code"].as_string(), "SOL");
+      BOOST_CHECK_EQUAL(bounded.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 200u);
+
+      // (c) Pagination: `next_key` carries the same string spelling and is fed
+      //     back verbatim as the next bound.
+      p.lower_bound.clear();
+      p.limit = 2;
+      auto page1 = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(page1.rows.size(), 2u);
+      BOOST_REQUIRE_EQUAL(page1.more, true);
+      BOOST_REQUIRE(!page1.next_key.empty());
+      BOOST_CHECK_EQUAL(page1.rows[0].get_object()["value"].get_object()["code"].as_string(), "ETH");
+      BOOST_CHECK_EQUAL(page1.rows[1].get_object()["value"].get_object()["code"].as_string(), "SOL");
+
+      auto nk = fc::json::from_string(page1.next_key);
+      BOOST_REQUIRE(nk.is_object());
+      BOOST_REQUIRE(nk.get_object()["code"].is_string());
+      BOOST_CHECK_EQUAL(nk.get_object()["code"].as_string(), "WIRE");
+
+      p.lower_bound = page1.next_key;
+      p.limit       = 50;
+      auto page2 = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(page2.rows.size(), 1u);
+      BOOST_REQUIRE_EQUAL(page2.more, false);
+      BOOST_CHECK_EQUAL(page2.rows[0].get_object()["value"].get_object()["code"].as_string(), "WIRE");
       BOOST_CHECK_EQUAL(page2.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 300u);
    }
 

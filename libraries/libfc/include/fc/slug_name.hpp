@@ -20,8 +20,6 @@
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
 
-#include <algorithm>
-#include <cstddef>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -85,89 +83,52 @@ inline constexpr slug_name operator""_s() {
 
 using slug_name_literals::operator""_s;
 
-/// JSON carrier for a slug_name — a DUAL carrier, and deliberately so.
+/// JSON carrier for a slug_name: the canonical string spelling, and nothing
+/// else. A slug renders as its text (`"LIQSOL"`), the zero sentinel as `""`.
 ///
-/// A canonical slug renders as its string spelling (`"LIQSOL"`), and the zero
-/// sentinel as the empty string. A value below 2^42 renders as the **raw
-/// integer**, because `to_string()` cannot represent it: `zero_terminates` is
-/// true, so decoding stops at the first zero symbol slot, and every such value
-/// collapses to `""`. Emitting the integer instead keeps this conversion TOTAL
-/// and INJECTIVE over all 2^64 — `""` means exactly zero and nothing else.
+/// A value below 2^42 has no spelling — `zero_terminates` is true, so decoding
+/// stops at the first zero symbol slot and every such value collapses to `""`.
+/// Those THROW rather than acquire a second, numeric carrier. One type, one
+/// JSON shape: a caller writes a slug field exactly one way, and a reader never
+/// branches on the JSON type.
 ///
-/// The integer arm must not be replaced by a throw. Only `chain_code` is bound
-/// to the proven source outpost, so a non-canonical `token_code` is plantable
-/// from a forgeable attestation payload; a throwing conversion would let one
-/// such row make an entire table unreadable over `get_table_rows`.
-///
-/// The two carriers are distinguished by JSON *type* here, and by string
-/// LENGTH after a round trip through JSON text — `fc::json` quotes a uint64
-/// above 0xffffffff, so the integer arm comes back as a decimal string that
-/// `from_variant` re-routes on length (see there). What is never ambiguous is
-/// the spelling: a canonical slug is at most max_len symbols and a stringified
-/// uint64 past 0xffffffff is at least 10 digits. The carrier could NOT have
-/// been a numeric string chosen freely — the slug alphabet contains digits, so
-/// `"7"` is itself a valid canonical slug.
+/// The throw is contained by construction: `get_table_rows` wraps each row's
+/// key decode and each row's value render in its own try/catch and falls back
+/// to hex (`plugins/chain_plugin/src/chain_plugin.cpp`), so a row holding a
+/// non-canonical code degrades that one cell instead of failing the table.
 inline void to_variant(const slug_name& s, fc::variant& v) {
    const std::string text = s.to_string();
    // `pack` is the non-validating encoder, so this is a pure round-trip test:
-   // the string spelling is used only when it recovers the value exactly.
-   if (slug_name::pack(text) == s.value) {
-      v = text;
-      return;
-   }
-   v = s.value;
+   // the value is canonical exactly when its own spelling recovers it.
+   FC_ASSERT(slug_name::pack(text) == s.value,
+             "slug_name {} is not canonical and has no string spelling", s.value);
+   v = text;
 }
 
-/// Accepts every carrier `to_variant` can emit, plus — TRANSITIONALLY — the
+/// Accepts the string carrier `to_variant` emits, plus — TRANSITIONALLY — the
 /// `{"value": <uint64>}` object that abigen's reflected struct emitted before
 /// `slug_name` became an ABI builtin.
 ///
 /// The object arm is what makes the cross-repo landing window survivable: with
 /// no variant conversions, a slug converts through
 /// `FC_REFLECT_TEMPLATE(basic_name<Traits>, (value))` and is therefore
-/// object-only, while a string/integer-only reader rejects that object. There
-/// is no value both spellings accept, so a JSON *writer* cannot straddle the
-/// window the way a reader can. Delete this arm once no writer emits the
-/// object form.
+/// object-only, while a string-only reader rejects that object. There is no
+/// value both spellings accept, so a JSON *writer* cannot straddle the window
+/// the way a reader can. Delete this arm once no writer emits the object form.
 inline void from_variant(const fc::variant& v, slug_name& s) {
-   if (v.is_string()) {
-      const std::string_view text = v.get_string();
-      // The integer carrier arrives here as a STRING whenever it crossed JSON
-      // TEXT: fc::json quotes a uint64 above 0xffffffff (fc/io/json.cpp), and
-      // `next_key` is json text that a paginating caller feeds back as a bound.
-      // Length disambiguates exactly — a canonical slug is at most max_len
-      // symbols, while a stringified uint64 past 0xffffffff is at least 10
-      // digits — so no valid spelling is diverted. In particular the 8-digit
-      // "12345678" stays a slug, keeping the rule that `"7"` is the slug 7 and
-      // not the integer 7.
-      // The all-digits guard is load-bearing: `as_uint64` goes through
-      // boost::lexical_cast, which does NOT reject a sign for an unsigned
-      // target — it WRAPS, so "-12345678" would be admitted as
-      // 18446744073697205938. Anything over-long that is not a plain decimal
-      // falls through to the validating parse below, which rejects it.
-      if (text.size() > static_cast<std::size_t>(slug_name_traits::max_len)
-          && std::all_of(text.begin(), text.end(),
-                         [](char c) { return c >= '0' && c <= '9'; })) {
-         s = slug_name{ v.as_uint64() };
-         return;
-      }
-      // Validating: the ctor round-trip-checks and rejects a non-canonical or
-      // out-of-alphabet spelling. `""` is the zero sentinel.
-      s = slug_name{ text };
-      return;
-   }
    if (v.is_object()) {
       s = slug_name{ v.get_object()["value"].as_uint64() };
       return;
    }
-   // A negative number is never a slug, and `as_uint64` would WRAP it rather
-   // than reject it (boost::lexical_cast does not reject a sign for an unsigned
-   // target), so a JSON bound of `-1` would silently page from the far end of
-   // the table. Rejecting it here also keeps the two arms consistent: the string
-   // arm above already rejects "-12345678".
-   if (v.is_int64() && v.as_int64() < 0)
-      slug_name_traits::throw_invalid(std::to_string(v.as_int64()), "negative");
-   s = slug_name{ v.as_uint64() };
+   // A number is REJECTED, never coerced. The slug alphabet contains digits, so
+   // `"123"` is itself a canonical slug whose packed value is nothing like 123
+   // — reading the JSON number 123 as either one would be a silent mis-decode.
+   // Same for null/bool, which `as_uint64` would quietly turn into 0/1.
+   FC_ASSERT(v.is_string(), "slug_name must be a string, got {}",
+             fc::reflector<fc::variant::type_id>::to_string(v.get_type()));
+   // Validating: the ctor round-trip-checks and rejects a non-canonical or
+   // out-of-alphabet spelling. `""` is the zero sentinel.
+   s = slug_name{ std::string_view{ v.get_string() } };
 }
 
 } // namespace fc

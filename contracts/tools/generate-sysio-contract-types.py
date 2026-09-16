@@ -110,6 +110,12 @@ PRIMITIVE_SCHEMA = {
     'int128': {'type': 'string'}, 'uint128': {'type': 'string'},
     'float32': {'type': 'number'}, 'float64': {'type': 'number'}, 'float128': {'type': 'string'},
     'name': {'type': 'string', 'pattern': '^[a-z1-5.]{1,13}$'},
+    # slug_name is an abi_serializer builtin whose JSON carrier is its canonical
+    # spelling — up to 8 symbols over [A-Z0-9_], with "" the zero sentinel. The
+    # entry must precede the structs lookup: every registry ABI still ships a
+    # `slug_name` struct_def, and without this the field would resolve to that
+    # `{value: uint64}` shape (or, once abigen stops emitting it, to `unknown`).
+    'slug_name': {'type': 'string', 'pattern': '^[A-Z0-9_]{0,8}$'},
     'string': {'type': 'string'},
     'bytes': {'type': 'string', 'description': 'hex-encoded bytes'},
     'checksum256': {'type': 'string', 'pattern': '^[a-f0-9]{64}$'},
@@ -163,7 +169,7 @@ PRIMITIVE_TS = {
     'int64': 'number | string', 'uint64': 'number | string',
     'int128': 'string', 'uint128': 'string',
     'float32': 'number', 'float64': 'number', 'float128': 'string',
-    'name': 'string', 'string': 'string', 'bytes': 'string',
+    'name': 'string', 'slug_name': 'string', 'string': 'string', 'bytes': 'string',
     'checksum256': 'string', 'checksum160': 'string', 'checksum512': 'string',
     'public_key': 'string', 'signature': 'string',
     'symbol': 'string', 'symbol_code': 'string',

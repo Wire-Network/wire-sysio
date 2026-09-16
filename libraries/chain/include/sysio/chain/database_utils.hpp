@@ -365,11 +365,10 @@ inline fc::variant decode_field(reader& r, key_leaf_kind kind) {
    }
    case key_leaf_kind::name:    return fc::variant(name(r.read_be64()).to_string());
    case key_leaf_kind::slug_name: {
-      // Delegates to fc::slug_name's to_variant, so next_key inherits the same
-      // total, injective carrier: a canonical slug decodes to its string, zero
-      // to "", and a non-canonical value to the raw integer. A string-only
-      // decode would send every sub-2^42 key to "" and re-encode it to 0,
-      // restarting pagination at the top of the table.
+      // Delegates to fc::slug_name's to_variant, so next_key carries the same
+      // canonical string the row's key field does, and feeding it back as a
+      // bound re-encodes the identical bytes. A stored key with no spelling
+      // throws; get_table_rows catches per row and falls back to hex.
       const fc::slug_name s{ r.read_be64() };
       fc::variant v;
       fc::to_variant(s, v);
@@ -452,10 +451,10 @@ inline void encode_field(writer& w, key_leaf_kind kind, const fc::variant& val) 
    }
    case key_leaf_kind::name:    w.write_be64(name(val.as_string()).to_uint64_t()); return;
    case key_leaf_kind::slug_name: {
-      // Delegates to fc::slug_name's from_variant so the dual carrier (string /
-      // "" / integer, plus the transitional object) is implemented exactly once.
-      // Byte-identical to the struct-node path it replaces: that recursed one
-      // uint64 child to write_be64, and so does this.
+      // Delegates to fc::slug_name's from_variant so the carrier — the
+      // canonical string, plus the transitional object — is implemented exactly
+      // once. Byte-identical to the struct-node path it replaces: that recursed
+      // one uint64 child to write_be64, and so does this.
       fc::slug_name s;
       fc::from_variant(val, s);
       w.write_be64(s.value);

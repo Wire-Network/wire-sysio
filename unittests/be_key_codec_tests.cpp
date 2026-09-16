@@ -107,20 +107,28 @@ BOOST_AUTO_TEST_CASE(slug_name_leaf_roundtrips_the_zero_sentinel_as_empty) {
    BOOST_CHECK(bytes == encode_single(abi, "composite_key", slug(0)));
 }
 
-BOOST_AUTO_TEST_CASE(slug_name_leaf_roundtrips_a_non_canonical_value_as_an_integer) {
+BOOST_AUTO_TEST_CASE(slug_name_leaf_refuses_a_non_canonical_value_both_ways) {
    // A value below 2^42 has no string spelling (to_string truncates at the first
-   // zero symbol slot), so the carrier is the raw integer. Without this, decode
-   // would emit "" and re-encode to 0 — restarting pagination at the top of the
-   // table for any row holding a plantable non-canonical code.
+   // zero symbol slot), so it is not writable as a bound and not renderable as a
+   // key. Both directions throw rather than silently collapsing to "" — which
+   // would re-encode to 0 and restart pagination at the top of the table.
+   // get_table_rows catches per row and falls back to hex, so a stored key like
+   // this costs that one cell, not the query.
    auto abi    = make_test_abi();
    auto shapes = codec::build_key_shapes(abi, {"code"}, {"slug_name"});
-   auto bytes  = codec::encode_key(
-      fc::variant(fc::mutable_variant_object("code", 7u)), shapes);
-   auto decoded = codec::decode_key(bytes.data(), bytes.size(), shapes);
-   BOOST_CHECK(decoded.get_object()["code"].is_integer());
-   BOOST_CHECK_EQUAL(decoded.get_object()["code"].as_uint64(), 7u);
-   // And it re-encodes to the same key — the round trip pagination relies on.
-   BOOST_CHECK(bytes == codec::encode_key(decoded, shapes));
+
+   // No bound can name it: the integer is refused, and there is no spelling.
+   BOOST_CHECK_THROW(
+      codec::encode_key(fc::variant(fc::mutable_variant_object("code", 7u)), shapes),
+      fc::exception);
+
+   // And a key already holding one does not decode. Reach past the carrier to
+   // build those bytes — the transitional object arm is the only writer left
+   // that can express a raw value.
+   auto bytes = codec::encode_key(
+      fc::variant(fc::mutable_variant_object("code", slug(7))), shapes);
+   BOOST_REQUIRE_EQUAL(bytes.size(), 8u);
+   BOOST_CHECK_THROW(codec::decode_key(bytes.data(), bytes.size(), shapes), fc::exception);
 }
 
 BOOST_AUTO_TEST_CASE(slug_name_leaf_wins_over_a_shadowing_struct_def) {
@@ -188,21 +196,23 @@ BOOST_AUTO_TEST_CASE(slug_name_multi_leaf_keys_preserve_field_order_and_offsets)
       BOOST_CHECK(bytes == codec::encode_key(decoded, shapes));
    }
 
-   // 3-leaf, mirroring reserves — and with a non-canonical middle leaf, so the
-   // mixed-carrier case (string, integer, string) is covered at its own offset.
+   // 3-leaf, mirroring reserves. The middle leaf is a DIFFERENT length from its
+   // neighbours, so a decoder that mis-tracked its offset would land inside an
+   // adjacent slug and still produce a string.
    {
       auto shapes = codec::build_key_shapes(abi, {"chain_code", "token_code", "reserve_code"},
                                             {"slug_name", "slug_name", "slug_name"});
       auto bytes  = codec::encode_key(
          fc::variant(fc::mutable_variant_object("chain_code", "ETH")
-                                               ("token_code", 7u)
+                                               ("token_code", "USDC")
                                                ("reserve_code", "PRIMARY")),
          shapes);
       BOOST_REQUIRE_EQUAL(bytes.size(), 24u);
+      BOOST_CHECK(std::vector<char>(bytes.begin() + 8, bytes.begin() + 16)
+                  == encode_single(abi, "slug_name", fc::variant("USDC")));
       auto decoded = codec::decode_key(bytes.data(), bytes.size(), shapes);
       BOOST_CHECK_EQUAL(decoded.get_object()["chain_code"].as_string(), "ETH");
-      BOOST_CHECK(decoded.get_object()["token_code"].is_integer());
-      BOOST_CHECK_EQUAL(decoded.get_object()["token_code"].as_uint64(), 7u);
+      BOOST_CHECK_EQUAL(decoded.get_object()["token_code"].as_string(), "USDC");
       BOOST_CHECK_EQUAL(decoded.get_object()["reserve_code"].as_string(), "PRIMARY");
       BOOST_CHECK(bytes == codec::encode_key(decoded, shapes));
    }
@@ -356,6 +366,7 @@ BOOST_AUTO_TEST_CASE(leaf_support_list_roundtrips) {
    auto sample = [](std::string_view t) -> fc::variant {
       if (t == "checksum256") return fc::variant(fc::sha256::hash(std::string("x")).str());
       if (t == "name")        return fc::variant(std::string("alice"));
+      if (t == "slug_name")   return fc::variant(std::string("LIQSOL"));
       if (t == "bool")        return fc::variant(true);
       if (t == "string")      return fc::variant(std::string("hi"));
       if (t == "float128" || t == "long double") {

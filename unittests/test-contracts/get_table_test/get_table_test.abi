@@ -24,6 +24,20 @@
             ]
         },
         {
+            "name": "addslug",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "payload",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "addstruct",
             "base": "",
             "fields": [
@@ -116,6 +130,40 @@
             ]
         },
         {
+            "name": "slug_name",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "slugobj",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "payload",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "slugobj_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
             "name": "structobj",
             "base": "",
             "fields": [
@@ -149,6 +197,11 @@
         {
             "name": "addnumobj",
             "type": "addnumobj",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "addslug",
+            "type": "addslug",
             "ricardian_contract": ""
         },
         {
@@ -233,6 +286,14 @@
                     "table_id": 51630
                 }
             ]
+        },
+        {
+            "name": "slugobjs",
+            "type": "slugobj",
+            "index_type": "i64",
+            "key_names": ["code"],
+            "key_types": ["slug_name"],
+            "table_id": 41308
         },
         {
             "name": "structobjs",

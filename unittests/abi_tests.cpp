@@ -746,16 +746,20 @@ BOOST_AUTO_TEST_CASE(slug_name_builtin_type)
    BOOST_REQUIRE(back.get_object()["code"].is_string());
    BOOST_CHECK_EQUAL(back.get_object()["code"].as_string(), "ETH");
 
-   // A planted non-canonical value must render — as a JSON INTEGER, not a
-   // string, and WITHOUT throwing. A throwing conversion would make one such
-   // row able to brick get_table_rows for a whole table.
-   auto planted = abis.variant_to_binary(
-      "regrow", fc::json::from_string(R"({"code":7})"), yield_fn());
-   BOOST_REQUIRE_EQUAL(planted.size(), 8u);
-   fc::variant rendered;
-   BOOST_REQUIRE_NO_THROW(rendered = abis.binary_to_variant("regrow", planted, yield_fn()));
-   BOOST_REQUIRE(rendered.get_object()["code"].is_integer());
-   BOOST_CHECK_EQUAL(rendered.get_object()["code"].as_uint64(), 7u);
+   // The string is the ONLY carrier, in both directions. A JSON number is not a
+   // second spelling of a slug — `"7"` is itself a canonical slug whose packed
+   // value is nothing like 7 — so it is refused rather than read as either one.
+   BOOST_CHECK_THROW(
+      abis.variant_to_binary("regrow", fc::json::from_string(R"({"code":7})"), yield_fn()),
+      fc::exception);
+
+   // And a value with no spelling does not render. Every value below 2^42 has a
+   // zero in the leading symbol slot, so `to_string` truncates it to "" and no
+   // string recovers it. get_table_rows wraps each row's render in its own
+   // try/catch and falls back to hex, so a planted row costs that one cell
+   // rather than the query (plugins/chain_plugin/src/chain_plugin.cpp).
+   const std::vector<char> planted{ 7, 0, 0, 0, 0, 0, 0, 0 };  // packed LE uint64 7
+   BOOST_CHECK_THROW(abis.binary_to_variant("regrow", planted, yield_fn()), fc::exception);
 
 } FC_LOG_AND_RETHROW() }
 
