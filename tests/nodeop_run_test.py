@@ -864,6 +864,18 @@ try:
     abiTrans=node.setCodeOrAbi(notUtlAccount, "abi", abiFile, returnTrans=True)
     node.waitForTransactionInBlock(abiTrans["transaction_id"])
 
+    # Producer rows now require prior admission by sysio.opreg. Keep this fixture's registry write
+    # outside the root-tracking transactions below so their expected per-block root counts remain exact.
+    operatorData=json.dumps({
+        "account": notUtlAccount.name,
+        "type": "OPERATOR_TYPE_PRODUCER",
+        "is_bootstrapped": True,
+    })
+    operatorTrans=node.pushMessage(
+        "sysio.opreg", "regoperator", operatorData, "--permission sysio.opreg@active")
+    assert(operatorTrans[0])
+    node.waitForTransactionInBlock(operatorTrans[1]["transaction_id"])
+
 
     def sendAction(contract, action, data, opts, transArr, ids):
         trans=node.pushMessage(contract, action, data, opts)
