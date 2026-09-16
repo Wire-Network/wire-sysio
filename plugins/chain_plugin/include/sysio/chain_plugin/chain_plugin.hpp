@@ -614,7 +614,7 @@ public:
 
    struct get_producers_result {
       fc::variants        rows; ///< one row per item, either encoded as hex string or JSON object
-      double              total_producer_vote_weight;
+      double              total_producer_vote_weight = 0; ///< always 0: producers come from the schedule
       string              more; ///< fill lower_bound with this value to fetch more rows
    };
 
