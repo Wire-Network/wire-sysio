@@ -20,6 +20,7 @@
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
 
+#include <algorithm>
 #include <cstddef>
 #include <string>
 #include <string_view>
@@ -139,7 +140,14 @@ inline void from_variant(const fc::variant& v, slug_name& s) {
       // digits — so no valid spelling is diverted. In particular the 8-digit
       // "12345678" stays a slug, keeping the rule that `"7"` is the slug 7 and
       // not the integer 7.
-      if (text.size() > static_cast<std::size_t>(slug_name_traits::max_len)) {
+      // The all-digits guard is load-bearing: `as_uint64` goes through
+      // boost::lexical_cast, which does NOT reject a sign for an unsigned
+      // target — it WRAPS, so "-12345678" would be admitted as
+      // 18446744073697205938. Anything over-long that is not a plain decimal
+      // falls through to the validating parse below, which rejects it.
+      if (text.size() > static_cast<std::size_t>(slug_name_traits::max_len)
+          && std::all_of(text.begin(), text.end(),
+                         [](char c) { return c >= '0' && c <= '9'; })) {
          s = slug_name{ v.as_uint64() };
          return;
       }
@@ -152,6 +160,13 @@ inline void from_variant(const fc::variant& v, slug_name& s) {
       s = slug_name{ v.get_object()["value"].as_uint64() };
       return;
    }
+   // A negative number is never a slug, and `as_uint64` would WRAP it rather
+   // than reject it (boost::lexical_cast does not reject a sign for an unsigned
+   // target), so a JSON bound of `-1` would silently page from the far end of
+   // the table. Rejecting it here also keeps the two arms consistent: the string
+   // arm above already rejects "-12345678".
+   if (v.is_int64() && v.as_int64() < 0)
+      slug_name_traits::throw_invalid(std::to_string(v.as_int64()), "negative");
    s = slug_name{ v.as_uint64() };
 }
 

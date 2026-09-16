@@ -123,6 +123,40 @@ BOOST_AUTO_TEST_CASE(slug_name_leaf_roundtrips_a_non_canonical_value_as_an_integ
    BOOST_CHECK(bytes == codec::encode_key(decoded, shapes));
 }
 
+BOOST_AUTO_TEST_CASE(slug_name_leaf_wins_over_a_shadowing_struct_def) {
+   // The collision spans TWO independent resolution sites. abi_tests covers the
+   // action/row data path (built_in_types at abi_serializer.cpp:706 before
+   // structs at :778); the key codec is its own lookup (leaf_kind_of at
+   // database_utils.hpp:558 before the struct table), and it needs its own pin.
+   //
+   // Every shipped registry ABI carries a `slug_name` struct_def alongside the
+   // field, and `slug_name` is the ONLY builtin name so shadowed. `set_abi` has
+   // no collision check, so the ABI is genuinely ambiguous and resolved only by
+   // lookup order. If the struct won here, `encode_key` would demand the nested
+   // `{"code":{"value":N}}` form and `decode_key` would emit it — so `is_leaf`
+   // is the exact discriminator for the bounds and `next_key` path.
+   //
+   // Deliberately NOT built on make_test_abi(): that fixture avoids the name
+   // `slug_name` on purpose, and its avoidance is load-bearing for the
+   // struct-expansion and typedef-chain cases.
+   abi_def abi;
+   abi.structs.emplace_back(struct_def{"slug_name", "", {field_def{"value", "uint64"}}});
+
+   auto shapes = codec::build_key_shapes(abi, {"code"}, {"slug_name"});
+   BOOST_REQUIRE_EQUAL(shapes.size(), 1u);
+   BOOST_REQUIRE(shapes[0].is_leaf);
+   BOOST_CHECK(shapes[0].kind == codec::key_leaf_kind::slug_name);
+   BOOST_CHECK(shapes[0].children.empty());
+
+   // And it round-trips as the leaf carrier, not as a nested object.
+   auto bytes = codec::encode_key(
+      fc::variant(fc::mutable_variant_object("code", "LIQSOL")), shapes);
+   BOOST_REQUIRE_EQUAL(bytes.size(), 8u);
+   auto decoded = codec::decode_key(bytes.data(), bytes.size(), shapes);
+   BOOST_CHECK(decoded.get_object()["code"].is_string());
+   BOOST_CHECK_EQUAL(decoded.get_object()["code"].as_string(), "LIQSOL");
+}
+
 BOOST_AUTO_TEST_CASE(slug_name_multi_leaf_keys_preserve_field_order_and_offsets) {
    // THREE of the five registry tables key on more than one slug:
    //   sysio.tokens::chaintokens ["slug_name","slug_name"]

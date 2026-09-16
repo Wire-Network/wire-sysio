@@ -529,4 +529,42 @@ BOOST_AUTO_TEST_CASE(mvo_accepts_every_spelling_a_caller_can_write) {
    BOOST_CHECK_EQUAL(back.value, 7u);
 }
 
+BOOST_AUTO_TEST_CASE(variant_numeric_string_arm_rejects_a_signed_spelling) {
+   // The over-long string arm routes to as_uint64() for the integer carrier that
+   // crossed JSON text. as_uint64 goes through boost::lexical_cast, which does
+   // NOT reject a sign for an unsigned target — it WRAPS. Without the all-digits
+   // guard, "-12345678" (9 chars, so over max_len) was admitted as
+   // 18446744073697205938 instead of being rejected.
+   slug_name back;
+   for (const char* spelling : {"-12345678", "-123456789", "+123456789", "-1"}) {
+      BOOST_CHECK_THROW(fc::from_variant(fc::variant(std::string{spelling}), back),
+                        fc::exception);
+   }
+
+   // A plain decimal over max_len is still the integer carrier, which is the
+   // whole point of the arm.
+   fc::from_variant(fc::variant(std::string{"4294967296"}), back);
+   BOOST_CHECK_EQUAL(back.value, 4294967296u);
+
+   // Zero-padded is all-digits, so it is accepted and means what it says.
+   fc::from_variant(fc::variant(std::string{"000000000000000042"}), back);
+   BOOST_CHECK_EQUAL(back.value, 42u);
+
+   // The NUMBER spelling must agree with the string spelling. `as_uint64`
+   // wraps a negative rather than rejecting it, so without a guard a JSON
+   // bound of `-1` would silently page from the far end of the table while
+   // `"-1"` threw — the two arms disagreeing is worse than either choice.
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(int64_t{-1}), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(int64_t{-12345678}), back), fc::exception);
+
+   // NOT changed, and documented so the next reader knows it is deliberate:
+   // null / false / true coerce through fc::variant::as_uint64 exactly as they
+   // do for every other uint64 key leaf. Making slug_name alone strict here
+   // would diverge from the rest of the ABI for no gain — `0` is a legitimate
+   // slug value (the absent sentinel).
+   fc::from_variant(fc::variant(), back);      BOOST_CHECK_EQUAL(back.value, 0u);
+   fc::from_variant(fc::variant(false), back); BOOST_CHECK_EQUAL(back.value, 0u);
+   fc::from_variant(fc::variant(true), back);  BOOST_CHECK_EQUAL(back.value, 1u);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

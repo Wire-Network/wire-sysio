@@ -691,11 +691,27 @@ BOOST_AUTO_TEST_CASE(slug_name_builtin_type)
    // contracts/tests cannot catch either case, because fc::slug_name's
    // from_variant accepts the string, the integer AND the object form, so those
    // reads pass identically whether or not this registration exists.
+   // The `slug_name` struct_def below is NOT filler: every one of the five
+   // registry ABIs shipped today carries exactly this shadowed definition, and
+   // `slug_name` is the ONLY builtin name so shadowed (`symbol`, `name`,
+   // `asset` appear in no `structs[]`). `set_abi` has no collision check, so
+   // the ABI is genuinely ambiguous and is resolved only by LOOKUP ORDER —
+   // `built_in_types` at abi_serializer.cpp:706 before `structs` at :778. If
+   // the struct ever won, the field would still encode to 8 bytes but
+   // `binary_to_variant` would yield `{"value":N}`, so the `is_string()`
+   // assertions below are what pin the precedence.
    const char* test_abi = R"=====(
    {
        "version": "sysio::abi/1.0",
        "types": [],
        "structs": [{
+           "name": "slug_name",
+           "base": "",
+           "fields": [{
+               "name": "value",
+               "type": "uint64"
+           }]
+       },{
            "name": "regrow",
            "base": "",
            "fields": [{
@@ -711,6 +727,16 @@ BOOST_AUTO_TEST_CASE(slug_name_builtin_type)
 
    auto abi = fc::json::from_string(test_abi).as<abi_def>();
    abi_serializer abis(sysio_contract_abi(abi), yield_fn());
+
+   // Both lookups resolve, and the BUILTIN is the one that wins. Asserting the
+   // serializer's own post-`set_abi` view is stronger than inspecting the input
+   // `abi_def`: it proves `set_abi` KEPT the struct_def rather than dropping or
+   // rejecting it, which is what makes the ambiguity real. Note that if the
+   // struct won instead, the inputs below would not merely render differently —
+   // they would not encode at all, because the struct branch throws
+   // `pack_exception` for a non-object/array input (abi_serializer.cpp:831).
+   BOOST_REQUIRE( abis.is_builtin_type("slug_name") );
+   BOOST_REQUIRE( abis.is_struct("slug_name") );
 
    // A canonical slug is carried as its STRING spelling, in 8 bytes.
    auto bytes = abis.variant_to_binary(

@@ -269,7 +269,7 @@ enum AttestationType {
   // always pay; there is no post-underwriting rejection path.
 
   // ---------------------------------------------------------------------------
-  //  Reserve-flow attestations (v6 data-model refactor, 2026-05-19)
+  //  Reserve-flow attestations (data-model refactor, 2026-05-19)
   //  Outpost-initiated reserve creation with depot-side matching handshake.
   // ---------------------------------------------------------------------------
   ATTESTATION_TYPE_RESERVE_CREATE           = 60958; // 0xEE1E  outpost → depot
