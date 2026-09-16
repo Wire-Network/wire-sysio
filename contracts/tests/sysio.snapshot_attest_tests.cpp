@@ -465,16 +465,15 @@ BOOST_FIXTURE_TEST_CASE(regsnapprov_unregistered_producer, snapshot_attest_teste
                         regsnapprov("alice1111111"_n, "snapprov1"_n));
 } FC_LOG_AND_RETHROW() }
 
-/// A registered producer with no operator row holds no rank position, and the rejection says so
-/// rather than blaming rank -- the two are reached through the same absence from the ranked walk.
+/// A producer whose operator is no longer ACTIVE holds no rank position, and the rejection says so rather than
+/// blaming rank; both are reached through the same absence from the ranked walk. Terminating producer5's operator
+/// leaves its producer row active and its finalizer key registered, so operator standing is the only condition that
+/// fails.
 BOOST_FIXTURE_TEST_CASE(regsnapprov_rejects_non_operator, snapshot_attest_tester) { try {
-   create_account("nonoperator"_n, config::system_account_name, false, false, true, true);
-   produce_blocks();
-   regproducer("nonoperator"_n);
-   produce_blocks();
+   terminate_operator("producer5"_n);
 
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer is not an active PRODUCER operator"),
-                        regsnapprov("nonoperator"_n, "snapprov1"_n));
+                        regsnapprov("producer5"_n, "snapprov1"_n));
    BOOST_REQUIRE(get_snap_provider("snapprov1"_n).is_null());
 } FC_LOG_AND_RETHROW() }
 
@@ -483,8 +482,8 @@ BOOST_FIXTURE_TEST_CASE(regsnapprov_rejects_non_operator, snapshot_attest_tester
 BOOST_FIXTURE_TEST_CASE(regsnapprov_rejects_producer_without_finalizer_key, snapshot_attest_tester) { try {
    create_account("nofinkey"_n, config::system_account_name, false, false, true, true);
    produce_blocks();
-   regproducer("nofinkey"_n);
    register_producer_operators({"nofinkey"_n});
+   regproducer("nofinkey"_n);
    produce_blocks();
 
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer has no active finalizer key"),
