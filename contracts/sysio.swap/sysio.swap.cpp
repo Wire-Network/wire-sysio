@@ -194,6 +194,26 @@ void swap::exchange( name user, symbol_code pair_token,
     add_signed_ext_balance(user, ext_asset_out);
 }
 
+int64_t swap::quote_out(int64_t pool_in, int64_t pool_out, int64_t amount_in, int fee) {
+    if (pool_in <= 0 || pool_out <= 0 || amount_in <= 0) return 0;
+    // Constant-product quote, floored, then the pair's fee taken off it with the
+    // depot-wide decomposition. The fee has no recipient here -- it stays in the
+    // pool for the liquidity providers. The decomposition rounds the fee down,
+    // which would let a quote below FEE_DENOMINATOR/fee units trade fee-free;
+    // "units" is precision-relative, so a nonzero fee rate collects at least
+    // MIN_SWAP_FEE on any nonzero quote and every fee-bearing trade grows x*y.
+    const uint64_t gross = opp::amm::out_given_in(uint64_t(pool_in),  CP_WEIGHT_BPS,
+                                                  uint64_t(pool_out), CP_WEIGHT_BPS,
+                                                  uint64_t(amount_in));
+    uint64_t taken = opp::amm::split_wire_fee(gross, uint32_t(fee), NO_UNDERWRITER_SHARE_BPS).fee;
+    if (fee > 0 && gross > 0) taken = std::max(taken, MIN_SWAP_FEE);
+    return int64_t(gross - taken);
+}
+
+int64_t swap::min_fee_bearing_output(int fee) {
+    return fee > 0 ? FEE_DENOMINATOR / fee : 1;
+}
+
 extended_asset swap::process_exch(symbol_code pair_token,
   extended_asset ext_asset_in, asset min_expected){
     stats statstable( get_self() );
@@ -223,18 +243,7 @@ extended_asset swap::process_exch(symbol_code pair_token,
     }
     const int64_t A_in = ext_asset_in.quantity.amount;
     check( (A_in > 0) && (P_in > 0) && (P_out > 0), "invalid parameters");
-    // Constant-product quote, floored, then the pair's fee taken off it with the
-    // depot-wide decomposition. The fee has no recipient here -- it stays in the
-    // pool for the liquidity providers. The decomposition rounds the fee down,
-    // which would let a quote below FEE_DENOMINATOR/fee units trade fee-free;
-    // "units" is precision-relative, so a nonzero fee rate collects at least
-    // MIN_SWAP_FEE on any nonzero quote and every fee-bearing trade grows x*y.
-    const uint64_t gross = opp::amm::out_given_in(uint64_t(P_in), CP_WEIGHT_BPS,
-                                                  uint64_t(P_out), CP_WEIGHT_BPS,
-                                                  uint64_t(A_in));
-    uint64_t fee = opp::amm::split_wire_fee(gross, uint32_t(token.fee), NO_UNDERWRITER_SHARE_BPS).fee;
-    if (token.fee > 0 && gross > 0) fee = std::max(fee, MIN_SWAP_FEE);
-    const int64_t A_out = int64_t(gross - fee);
+    const int64_t A_out = quote_out(P_in, P_out, A_in, token.fee);
     check(min_expected.amount <= A_out, "available is less than expected");
     extended_asset ext_asset1, ext_asset2, ext_asset_out;
     if (in_first) {
@@ -535,6 +544,25 @@ void swap::tickyield(symbol_code pair_token) {
     // the one combination with no way out -- every clip is capped under the
     // floor and the pair stops selling until setyield widens one of them.
     if (clip < std::min( uint128_t(token.clip_floor), uint128_t(queued) )) return;
+    // The clip clears its own floor; the OUTPUT has to clear one too. `clip_floor`
+    // is a proxy, in shadow units, for the condition that actually matters -- an
+    // output of at least FEE_DENOMINATOR/fee, below which MIN_SWAP_FEE binds and
+    // the clip pays far above the pair's rate, out of the holders' distribution.
+    // The conversion between the two is the pool price times the precision gap,
+    // which moves after setyield has run, so the proxy alone cannot hold it.
+    //
+    // Quoted against the pool BEFORE accrual, which only ever raises the other
+    // leg, so this is a lower bound: a clip that clears it here clears it on the
+    // sale. Returning banks the time exactly as the floor above does, which is
+    // what keeps a crank that finds nothing to do from paying for the attempt.
+    //
+    // The remainder drain is exempt. When the whole queue is under the floor it
+    // is dust by construction, and stranding it forever is worse than selling it
+    // at a poor rate -- that escape is why the floor gives way to `queued`.
+    if (uint128_t(queued) >= uint128_t(token.clip_floor)
+        && quote_out( pool_of( token, shadow ).quantity.amount,
+                      other_pool( token, shadow ).quantity.amount,
+                      int64_t(clip), token.fee ) < min_fee_bearing_output( token.fee )) return;
 
     const extended_asset selling{ asset{ int64_t(clip), shadow.get_symbol() }, shadow.get_contract() };
     const symbol proceeds_symbol = other_pool( token, shadow ).quantity.symbol;

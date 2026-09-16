@@ -74,13 +74,16 @@ namespace sysio {
          /// points of the pool's shadow side, and the least a clip may be. All three
          /// must be nonzero before tickyield runs.
          ///
-         /// `clip_floor` is in units of the shadow, so it is precision-relative and has
-         /// no sensible default. Size it so the pair's fee on a clip's output reaches a
-         /// whole unit on its own, which is an output of FEE_DENOMINATOR/fee units:
-         /// below that, MIN_SWAP_FEE is the binding fee and a clip pays far above the
-         /// pair's rate (an output of 2 pays half of itself). Erring high costs
+         /// `clip_floor` is the sale GRANULARITY, in units of the shadow: how large a
+         /// clip has to get before it is worth selling at all. Erring high costs
          /// nothing, because the clip scales with elapsed time and a higher floor only
-         /// makes sales larger and rarer at the same average rate.
+         /// makes sales larger and rarer at the same average rate. It is not what
+         /// guarantees a clip pays the pair's rate rather than MIN_SWAP_FEE -- that is
+         /// `min_fee_bearing_output`, which `tickyield` enforces on the OUTPUT, where
+         /// the condition does not move with the price. Sizing this one against that
+         /// condition is still worth doing, since a floor below it just means ticks
+         /// that quote and decline; at a 0.1% fee and a shadow near parity with the
+         /// system token that is around 1000 units.
          ///
          /// It must stay under the depth cap, though: a floor above the cap caps every
          /// clip below the floor and the pair stops selling entirely.
@@ -121,11 +124,17 @@ namespace sysio {
          /// settled, and the proceeds go out through the token's `addyield`, so the
          /// pool takes its own share back on the next accrual.
          ///
-         /// A no-op when nothing is queued, when no time has elapsed, or when the clip
-         /// has not reached `min(clip_floor, queued)` yet. That last case is what makes
-         /// cranking every block harmless: a clip below the floor sells nothing AND
-         /// leaves the clock alone, so the next tick measures a longer window and
-         /// offers a proportionally larger clip.
+         /// A no-op when nothing is queued, when no time has elapsed, when the clip has
+         /// not reached `min(clip_floor, queued)` yet, or when what the clip would
+         /// fetch is under `min_fee_bearing_output`. Those last two are what make
+         /// cranking every block harmless: a clip that does not clear them sells
+         /// nothing AND leaves the clock alone, so the next tick measures a longer
+         /// window and offers a proportionally larger clip. They no-op rather than
+         /// fail on purpose -- a tick that asserted every block would accrue
+         /// subjective CPU against the crank until the node stopped accepting the
+         /// ticks that DO clear. A pair that has stopped selling is visible as a
+         /// non-empty reservoir whose `last_tick` is not advancing, which is the same
+         /// signal a depth cap under the clip floor gives.
          ///
          /// Requires `setyield` to have run. No authorization is required.
          [[sysio::action]] void tickyield(symbol_code pair_token);
@@ -343,6 +352,18 @@ namespace sysio {
          void add_signed_ext_balance( const name& owner, const extended_asset& value );
          void add_signed_liq(name user, asset to_buy, bool is_buying, asset max_asset1, asset max_asset2);
          void memoexchange(name user, extended_asset ext_asset_in, string_view details);
+         /// What paying `amount_in` into a pool holding `pool_in` of the paid leg and
+         /// `pool_out` of the other fetches, at `fee` in 1/FEE_DENOMINATOR units: the
+         /// constant-product quote floored (amm::out_given_in at equal weights), less
+         /// the pair's fee. Pure and side-effect free, so `tickyield` can ask what a
+         /// clip would fetch without moving anything. Returns 0 on degenerate input.
+         static int64_t quote_out(int64_t pool_in, int64_t pool_out, int64_t amount_in, int fee);
+         /// Least output at which the pair's own rate is the fee a trade pays. The fee
+         /// decomposition floors, so below FEE_DENOMINATOR/fee units the proportional
+         /// fee is zero and MIN_SWAP_FEE binds instead: an output of 2 pays half of
+         /// itself. Stated in output units, which is the only place the condition is
+         /// price-independent.
+         static int64_t min_fee_bearing_output(int fee);
          /// Settle an exact-input swap of `paying` through the pair `evo_token`: the
          /// output is the constant-product quote (amm::out_given_in at equal weights)
          /// net of the pair's fee (amm::split_wire_fee, at least MIN_SWAP_FEE when the

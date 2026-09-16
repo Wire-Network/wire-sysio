@@ -658,6 +658,13 @@ namespace reference {
       return (amount > 0 && fee > 0) ? std::max( floored, MinSwapFee ) : floored;
    }
    int64_t liquidity_fee_on( int64_t amount, int fee ) { return ceil_div( wide(amount) * fee, FeeDenominator ); }
+   // The proportional fee BEFORE the one-unit minimum is applied. Zero is what
+   // makes MinSwapFee bind, and a clip whose output gets there pays far above
+   // the pair's rate.
+   int64_t proportional_fee_on( int64_t amount, int fee ) { return floor_div( wide(amount) * fee, FeeDenominator ); }
+   // Least output at which the pair's own rate is the fee a trade pays: the
+   // smallest amount whose proportional fee reaches a whole unit.
+   int64_t min_fee_bearing_output( int fee ) { return fee > 0 ? FeeDenominator / fee : 1; }
 
    // Units of `pool_out` received for `amount_in` units of `pool_in`.
    int64_t receive( int64_t amount_in, int64_t pool_in, int64_t pool_out, int fee ) {
@@ -2138,6 +2145,72 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_never_sells_below_the_clip_floor, sysio_swap
     produce_block( fc::hours(6) );
     BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
     BOOST_REQUIRE_LT( reservoir_of( SHEO ), queued );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( yield_tick_never_sells_below_a_fee_bearing_output, sysio_swap_tester ) try {
+    setup_yield_pool();
+    grant_shadow_code( "sysio.swap"_n, true );
+    const uint32_t horizon_sec = 3600;
+    const uint32_t cap_bps     = uint32_t(yield_reference::BpsTotal);   // the cap is not what binds here
+    const int64_t  clip_floor  = 1000;
+    const auto shadow_pool_of  = [&]( const vector<int64_t>& pool ) { return pool.at(0); };
+    const auto wire_pool_of    = [&]( const vector<int64_t>& pool ) { return pool.at(1); };
+
+    // A 0.01% fee puts the fee-bearing output at 10000, an order of magnitude
+    // above the clip floor, which is what separates the two gates: the floor is
+    // a granularity in SHADOW units, and what the pair's rate actually depends
+    // on is the OUTPUT. A floor sized for one fee is wrong for another, and
+    // changefee can move the fee under a floor that setyield already set.
+    const int fee = 1;
+    BOOST_REQUIRE_EQUAL( success(), changefee( SHEO, fee ) );
+    BOOST_REQUIRE_EQUAL( fee, pool_fee( SHEO ) );
+    const int64_t fee_bearing = reference::min_fee_bearing_output( fee );
+    BOOST_REQUIRE_EQUAL( 10000, fee_bearing );
+    BOOST_REQUIRE_LT( clip_floor, fee_bearing );
+
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, cap_bps, clip_floor ) );
+    const int64_t queued = 1000'0000;
+    fund_yield_in_one_transaction( "alice"_n, SHEO, asset( queued, SHD4 ) );
+    const int64_t funded_at = last_tick_us( SHEO );
+    const auto before = system_balance( SHEO.value );
+
+    // One block on, the clip clears the CLIP floor, so that gate alone would
+    // have sold it -- but its output does not reach a whole unit of fee, so the
+    // clip would pay the one-unit minimum instead of the pair's rate, out of the
+    // holders' distribution. The tick declines, and leaves the clock alone.
+    const int64_t short_clip = yield_reference::clip_size( queued, 500'000, horizon_sec,
+                                                           shadow_pool_of(before), cap_bps, clip_floor );
+    BOOST_REQUIRE_LT( 0, short_clip );                              // clears the clip floor
+    const int64_t short_out = reference::receive( short_clip, shadow_pool_of(before), wire_pool_of(before), fee );
+    BOOST_REQUIRE_LT( short_out, fee_bearing );                     // but not the output floor
+    BOOST_REQUIRE_EQUAL( 0, reference::proportional_fee_on( short_out, fee ) );   // MinSwapFee is what it would pay
+    for (int i = 0; i < 5; ++i) {
+        BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
+        BOOST_REQUIRE_EQUAL( queued, reservoir_of( SHEO ) );
+        BOOST_REQUIRE( before == system_balance( SHEO.value ) );
+        BOOST_REQUIRE_EQUAL( funded_at, last_tick_us( SHEO ) );
+    }
+
+    // The banked time grows the clip until its output does clear, and then it
+    // sells in one piece measured from the original clock: declining costs
+    // throughput nothing, exactly as the clip floor's own skips do.
+    produce_block();
+    produce_block( fc::seconds(10) );
+    BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
+    const int64_t clip = yield_reference::clip_size( queued, last_tick_us( SHEO ) - funded_at, horizon_sec,
+                                                     shadow_pool_of(before), cap_bps, clip_floor );
+    const int64_t proceeds = reference::receive( clip, shadow_pool_of(before), wire_pool_of(before), fee );
+    BOOST_REQUIRE_LE( fee_bearing, proceeds );
+    BOOST_REQUIRE_LE( 1, reference::proportional_fee_on( proceeds, fee ) );   // the pair's own rate, not the minimum
+    BOOST_REQUIRE_EQUAL( queued - clip, reservoir_of( SHEO ) );
+    BOOST_REQUIRE_EQUAL( shadow_pool_of(before) + clip,      shadow_pool_of( system_balance( SHEO.value ) ) );
+    BOOST_REQUIRE_EQUAL( wire_pool_of(before) - proceeds,    wire_pool_of( system_balance( SHEO.value ) ) );
+    BOOST_REQUIRE( pending_payout( "shadowtoken"_n ).empty() );
+
+    // (The remainder drain is exempt from this gate, so dust is not stranded by
+    // it either. yield_tick_never_sells_below_the_clip_floor pins that: at its
+    // 0.1% fee the 500-unit remainder it drains is itself under the 1000-unit
+    // fee-bearing output, and it still leaves.)
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( fee_authority_configuration, sysio_swap_tester ) try {
