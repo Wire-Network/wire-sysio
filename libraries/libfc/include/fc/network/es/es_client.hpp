@@ -61,7 +61,7 @@ public:
    /// The endpoint host with credentials stripped, as used in diagnostics.
    const std::string& endpoint() const noexcept { return _endpoint; }
    /// The executor every request runs on -- what a coroutine caller co_spawns async_bulk() onto.
-   boost::asio::any_io_executor get_executor() const noexcept { return _http.get_executor(); }
+   boost::asio::any_io_executor get_executor() noexcept { return _io.get_executor(); }
 
    /// POST @p body -- action/document line pairs, each line newline-terminated, @p doc_count documents in
    /// total -- to <url>/_bulk. Retries a 5xx, a 429, a timeout, or a connection failure up to max_retries

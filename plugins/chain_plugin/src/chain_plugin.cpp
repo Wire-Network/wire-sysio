@@ -68,6 +68,10 @@ constexpr sysio::outbound_http::transport_option_names
 
 namespace snapshot_attest = sysio::protocol::snapshot_attestation;
 
+/// Priority of every block channel delivery. One priority keeps deliveries in emission order for a subscriber of
+/// several channels; medium is process_incoming_block's, so deliveries run between block-apply batches.
+constexpr int block_channel_priority = appbase::priority::medium;
+
 /// Finalized-block grace window past the snapshot height during which a missing snaprecords row keeps
 /// snapshot-attestation verification pending even after this node has caught up to the live chain tip.
 /// A node bootstrapping from a recently-taken snapshot reaches the tip before the providers'
@@ -1539,7 +1543,8 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       // relay signals to channels
       accepted_block_header_connection = chain->accepted_block_header().connect(
             [this]( const block_signal_params& t ) {
-               accepted_block_header_channel.publish( priority::medium, t );
+               const auto& [ block, id ] = t;
+               accepted_block_header_channel.publish( block_channel_priority, channels::block_params{ block, id } );
             } );
 
       accepted_block_connection = chain->accepted_block().connect( [this]( const block_signal_params& t ) {
@@ -1564,7 +1569,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             _get_info_db->on_accepted_block();
          }
 
-         accepted_block_channel.publish( priority::high, t );
+         accepted_block_channel.publish( block_channel_priority, channels::block_params{ block, id } );
       } );
 
       irreversible_block_connection = chain->irreversible_block().connect( [this]( const block_signal_params& t ) {
@@ -1588,7 +1593,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             verify_snapshot_attestation(block);
          }
 
-         irreversible_block_channel.publish( priority::low, t );
+         irreversible_block_channel.publish( block_channel_priority, channels::block_params{ block, id } );
       } );
 
       applied_transaction_connection = chain->applied_transaction().connect(
