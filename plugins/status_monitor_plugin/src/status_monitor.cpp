@@ -27,6 +27,8 @@ constexpr char document_line_terminator = '\n';
 /// irreversible.
 constexpr uint64_t render_threads = 1;
 
+using fc::network::es::to_config_ms;
+
 /// Copy an optional string option into @p target when present.
 void read_optional(const bpo::variables_map& options, const char* name, std::optional<std::string>& target) {
    if (options.contains(name))
@@ -65,7 +67,7 @@ void add_options(bpo::options_description& cfg) {
                   max_retries_ceiling);
    const std::string retry_backoff_ms_description =
       fmt::format("Initial retry backoff in milliseconds (greater than 0); doubles per attempt, capped at {} ms",
-                  fc::network::es::es_max_retry_backoff_ms);
+                  fc::network::es::es_max_retry_backoff.count());
 
    auto opts = cfg.add_options();
    opts(option::target_url, bpo::value<std::string>(),
@@ -80,14 +82,15 @@ void add_options(bpo::options_description& cfg) {
    opts(option::max_pending_documents, bpo::value<uint32_t>()->default_value(default_max_pending_documents),
         max_pending_documents_description.c_str());
    opts(option::connect_timeout_ms,
-        bpo::value<uint32_t>()->default_value(fc::network::es::es_default_connect_timeout_ms),
+        bpo::value<uint32_t>()->default_value(to_config_ms(fc::network::es::es_default_connect_timeout)),
         "Connect timeout in milliseconds for each _bulk request");
    opts(option::request_timeout_ms,
-        bpo::value<uint32_t>()->default_value(fc::network::es::es_default_request_timeout_ms),
+        bpo::value<uint32_t>()->default_value(to_config_ms(fc::network::es::es_default_request_timeout)),
         "Header, read, idle, and total timeout in milliseconds for each _bulk request");
    opts(option::max_retries, bpo::value<uint32_t>()->default_value(fc::network::es::es_default_max_retries),
         max_retries_description.c_str());
-   opts(option::retry_backoff_ms, bpo::value<uint32_t>()->default_value(fc::network::es::es_default_retry_backoff_ms),
+   opts(option::retry_backoff_ms,
+        bpo::value<uint32_t>()->default_value(to_config_ms(fc::network::es::es_default_retry_backoff)),
         retry_backoff_ms_description.c_str());
    sysio::outbound_http::add_transport_program_options(cfg, option::transport_option_names, "status monitor");
 }
@@ -125,10 +128,10 @@ std::optional<config> parse_config(const bpo::variables_map& options) {
 
    read_optional(options, option::username, cfg.delivery.username);
    read_optional(options, option::password, cfg.delivery.password);
-   cfg.delivery.connect_timeout_ms = options[option::connect_timeout_ms].as<uint32_t>();
-   cfg.delivery.request_timeout_ms = options[option::request_timeout_ms].as<uint32_t>();
+   cfg.delivery.connect_timeout = std::chrono::milliseconds{options[option::connect_timeout_ms].as<uint32_t>()};
+   cfg.delivery.request_timeout = std::chrono::milliseconds{options[option::request_timeout_ms].as<uint32_t>()};
    cfg.delivery.max_retries = options[option::max_retries].as<uint32_t>();
-   cfg.delivery.retry_backoff_ms = options[option::retry_backoff_ms].as<uint32_t>();
+   cfg.delivery.retry_backoff = std::chrono::milliseconds{options[option::retry_backoff_ms].as<uint32_t>()};
    cfg.delivery.max_batch_bytes = max_batch_bytes;
    cfg.delivery.max_doc_bytes = max_doc_bytes;
    cfg.max_items_per_task = options[option::max_items_per_task].as<uint32_t>();
@@ -143,12 +146,12 @@ std::optional<config> parse_config(const bpo::variables_map& options) {
    SYS_ASSERT(cfg.max_pending_documents > 0 && cfg.max_pending_documents <= max_pending_documents_ceiling,
               chain::plugin_config_exception, "--{} must be between 1 and {}", option::max_pending_documents,
               max_pending_documents_ceiling);
-   SYS_ASSERT(cfg.delivery.connect_timeout_ms > 0, chain::plugin_config_exception, "--{} must be greater than 0",
-              option::connect_timeout_ms);
-   SYS_ASSERT(cfg.delivery.request_timeout_ms > 0, chain::plugin_config_exception, "--{} must be greater than 0",
-              option::request_timeout_ms);
-   SYS_ASSERT(cfg.delivery.retry_backoff_ms > 0, chain::plugin_config_exception, "--{} must be greater than 0",
-              option::retry_backoff_ms);
+   SYS_ASSERT(cfg.delivery.connect_timeout > std::chrono::milliseconds::zero(), chain::plugin_config_exception,
+              "--{} must be greater than 0", option::connect_timeout_ms);
+   SYS_ASSERT(cfg.delivery.request_timeout > std::chrono::milliseconds::zero(), chain::plugin_config_exception,
+              "--{} must be greater than 0", option::request_timeout_ms);
+   SYS_ASSERT(cfg.delivery.retry_backoff > std::chrono::milliseconds::zero(), chain::plugin_config_exception,
+              "--{} must be greater than 0", option::retry_backoff_ms);
    SYS_ASSERT(cfg.delivery.max_retries <= max_retries_ceiling, chain::plugin_config_exception,
               "--{} must be between 0 and {}", option::max_retries, max_retries_ceiling);
    // Everything the client checks beyond the above is the endpoint itself (scheme, parseability), so its

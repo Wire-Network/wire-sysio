@@ -34,9 +34,9 @@ fc::network::es::es_client_options to_es_client_options(const fc::sink::es_sink_
    delivery.max_batch_bytes = cfg.max_batch_bytes;
    delivery.max_doc_bytes = cfg.max_doc_bytes;
    delivery.max_retries = cfg.max_retries;
-   delivery.retry_backoff_ms = cfg.retry_backoff_ms;
-   delivery.connect_timeout_ms = cfg.connect_timeout_ms;
-   delivery.request_timeout_ms = cfg.request_timeout_ms;
+   delivery.retry_backoff = std::chrono::milliseconds{cfg.retry_backoff_ms};
+   delivery.connect_timeout = std::chrono::milliseconds{cfg.connect_timeout_ms};
+   delivery.request_timeout = std::chrono::milliseconds{cfg.request_timeout_ms};
    return delivery;
 }
 
