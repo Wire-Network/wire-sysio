@@ -4,6 +4,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
+#include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/address_v6.hpp>
 
 #include <set>
@@ -46,16 +47,19 @@ namespace detail {
       if( limit > 0.0 ) {
          std::string units;
          in >> units;
-         std::regex units_regex{"([KMGT]?[i]?)B/s"};
-         std::smatch units_match;
-         std::regex_match(units, units_match, units_regex);
+         // A number alone is bytes per second.
+         size_t multiplier = 1;
          if( units.length() > 0 ) {
+            std::regex units_regex{"([KMGT]?[i]?)B/s"};
+            std::smatch units_match;
+            std::regex_match(units, units_match, units_regex);
             SYS_ASSERT(units_match.size() == 2, chain::plugin_config_exception, "invalid block sync rate limit specification: {}", units);
-            try {
-               block_sync_rate_limit = boost::numeric_cast<size_t>(limit * prefix_multipliers.at(units_match[1].str()));
-            } catch (boost::numeric::bad_numeric_cast&) {
-               SYS_THROW(chain::plugin_config_exception, "block sync rate limit specification overflowed: {}", limit_str);
-            }
+            multiplier = prefix_multipliers.at(units_match[1].str());
+         }
+         try {
+            block_sync_rate_limit = boost::numeric_cast<size_t>(limit * multiplier);
+         } catch (boost::numeric::bad_numeric_cast&) {
+            SYS_THROW(chain::plugin_config_exception, "block sync rate limit specification overflowed: {}", limit_str);
          }
       }
       return block_sync_rate_limit;
@@ -134,6 +138,18 @@ namespace detail {
       bool operator==(const endpoint& lhs) const = default;
       auto operator<=>(const endpoint& lhs) const = default;
    };
+
+   /**
+    * Whether a listen host binds every interface: empty, or an unspecified IP address such as `0.0.0.0` or `::`.
+    * Takes the host as returned by `split_host_port_type`, which strips IPv6 brackets.
+    */
+   inline bool is_unspecified_host(const std::string& host) {
+      if (host.empty())
+         return true;
+      boost::system::error_code ec;
+      const auto address = boost::asio::ip::make_address(host, ec);
+      return !ec && address.is_unspecified();
+   }
 
    /// @return host, port, type. returns empty on invalid endpoint, does not throw
    inline std::tuple<std::string, std::string, std::string> split_host_port_type(const std::string& endpoint) {
