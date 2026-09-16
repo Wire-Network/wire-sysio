@@ -13,49 +13,27 @@ include_directories(${CMAKE_SOURCE_DIR}/contracts/sysio.councl/include)
 include(CTest) # eliminates DartConfiguration.tcl errors at test runtime
 enable_testing()
 
-# Each owning source links with the shared Boost.Test entry point into its own
-# executable. CTest may then schedule suites from different binaries together.
+# build unit test executable
+file(GLOB UNIT_TESTS CONFIGURE_DEPENDS "*.cpp" "*.hpp") # find all unit test suites
+set(CONTRACT_UNIT_TEST_EXE contracts_unit_test)
 set(CONTRACT_UNIT_TEST_TIMEOUT_SECONDS 2700)
+unittest_target(
+        ${CONTRACT_UNIT_TEST_EXE}
+        SOURCE_FILES
+        ${UNIT_TESTS}
+) # build unit tests as one executable
 
-function(contract_binary_for_source SOURCE_FILE OUTPUT_TARGET)
-  if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE_FILE}")
-    message(FATAL_ERROR "Contract suite source is missing: ${SOURCE_FILE}")
-  endif()
-  get_filename_component(_binary_id "${SOURCE_FILE}" NAME)
-  string(REGEX REPLACE "\\.cpp$" "" _binary_id "${_binary_id}")
-  string(REPLACE "." "_" _binary_id "${_binary_id}")
-  set(_binary_target "contract_${_binary_id}")
-  get_property(_binary_source GLOBAL PROPERTY "CONTRACT_BINARY_SOURCE_${_binary_target}")
-  if(_binary_source AND NOT _binary_source STREQUAL SOURCE_FILE)
-    message(FATAL_ERROR "Two contract sources map to ${_binary_target}: ${_binary_source} and ${SOURCE_FILE}")
-  endif()
-  if(NOT TARGET ${_binary_target})
-    set_property(GLOBAL PROPERTY "CONTRACT_BINARY_SOURCE_${_binary_target}" "${SOURCE_FILE}")
-    set(_binary_sources
-      ${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE_FILE}
-      ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-    )
-    unittest_target(${_binary_target} SOURCE_FILES ${_binary_sources})
-    target_link_libraries(${_binary_target} PRIVATE fc-lite opp)
-    target_include_directories(${_binary_target} PRIVATE
-      ${CMAKE_SOURCE_DIR}/libraries/opp/test/include)
-    # Target builds provide generated WASMs; CTest still does not build or sync.
-    if(BUILD_SYSTEM_CONTRACTS)
-      if(NOT TARGET contracts_project)
-        message(FATAL_ERROR "ON/ON contract project is missing")
-      endif()
-      add_dependencies(${_binary_target} contracts_project)
-    endif()
-    if(BUILD_TEST_CONTRACTS)
-      if(NOT TARGET test_contracts_project)
-        message(FATAL_ERROR "ON/ON test fixture project is missing")
-      endif()
-      add_dependencies(${_binary_target} test_contracts_project)
-    endif()
-  endif()
-  set(${OUTPUT_TARGET} "${_binary_target}" PARENT_SCOPE)
-endfunction()
+target_link_libraries(${CONTRACT_UNIT_TEST_EXE}
+        PRIVATE
+        fc-lite
+        opp
+)
+target_include_directories(${CONTRACT_UNIT_TEST_EXE} PRIVATE
+        ${CMAKE_SOURCE_DIR}/libraries/opp/test/include)
 
+# Register every top-level Boost suite as a separate CTest process. The
+# processes share this executable but remain independently selectable and may
+# run concurrently under ctest -j.
 function(add_contract_suite SUITE_NAME SOURCE_FILE)
   cmake_parse_arguments(SUITE "" "" "ACCOUNTS" ${ARGN})
   if(SUITE_UNPARSED_ARGUMENTS)
@@ -74,15 +52,10 @@ function(add_contract_suite SUITE_NAME SOURCE_FILE)
     message(FATAL_ERROR "Contract suite ${SUITE_NAME} is registered twice")
   endif()
   set_property(GLOBAL APPEND PROPERTY CONTRACT_REGISTERED_SUITES ${SUITE_NAME})
-  contract_binary_for_source(${SOURCE_FILE} _suite_binary)
-  get_property(_binary_targets GLOBAL PROPERTY CONTRACT_BINARY_TARGETS)
-  if(NOT _suite_binary IN_LIST _binary_targets)
-    set_property(GLOBAL APPEND PROPERTY CONTRACT_BINARY_TARGETS ${_suite_binary})
-  endif()
   set(_ctest_name "contract.${SUITE_NAME}")
   add_test(
     NAME ${_ctest_name}
-    COMMAND ${_suite_binary}
+    COMMAND ${CONTRACT_UNIT_TEST_EXE}
             --run_test=${SUITE_NAME}
             --report_level=detailed
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -93,8 +66,7 @@ function(add_contract_suite SUITE_NAME SOURCE_FILE)
   )
 endfunction()
 
-# Each owning source builds a separate executable. Every runnable top-level
-# suite is visible here; multiple suites may intentionally share one source.
+# Every runnable top-level suite is visible here with its owning source.
 add_contract_suite(amm_math_tests amm_math_tests.cpp ACCOUNTS sysio.opp.common)
 add_contract_suite(council_math_tests council_math_tests.cpp ACCOUNTS sysio.councl)
 add_contract_suite(sysio_emissions_tests emissions_tests.cpp ACCOUNTS
@@ -165,8 +137,6 @@ add_contract_suite(sysio_tokens_tests sysio.tokens_tests.cpp ACCOUNTS sysio.toke
 add_contract_suite(sysio_uwrit_tests sysio.uwrit_tests.cpp ACCOUNTS sysio.uwrit)
 add_contract_suite(sysio_wrap_tests sysio.wrap_tests.cpp ACCOUNTS sysio.msig sysio.wrap)
 get_property(_registered_suites GLOBAL PROPERTY CONTRACT_REGISTERED_SUITES)
-get_property(_contract_binary_targets GLOBAL PROPERTY CONTRACT_BINARY_TARGETS)
-add_custom_target(contract_suite_binaries DEPENDS ${_contract_binary_targets})
 
 # Fail at configure time when a source introduces a suite without declaring it.
 set(_source_suites)
