@@ -22,4 +22,27 @@ ContinuationIndentWidth: 3
 MaxEmptyLinesToKeep: 3
 SortIncludes: true
 IncludeBlocks: Regroup
+# Regroup discards hand-written blank-line grouping, so the grouping has to be stated here or
+# every include block collapses into one alphabetical list. Nearest first, farthest last;
+# alphabetical within a group. First matching regex wins, so the specific ones come first.
+IncludeCategories:
+  # Project-local, quoted.
+  - Regex: '^"'
+    Priority: 1
+  # Our own headers.
+  - Regex: '^<(fc|sysio)/'
+    Priority: 2
+  - Regex: '^<boost/'
+    Priority: 3
+  # C system headers, before the third-party rule so <sys/socket.h> is not read as a library.
+  - Regex: '^<sys/'
+    Priority: 6
+  - Regex: '^<[^/>]*\.h>'
+    Priority: 6
+  # Remaining third-party libraries: openssl, magic_enum, and friends.
+  - Regex: '^<[^/>]+/'
+    Priority: 4
+  # C++ standard library.
+  - Regex: '^<'
+    Priority: 5
 IndentPPDirectives: BeforeHash
