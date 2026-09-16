@@ -21,6 +21,7 @@
 #include <string_view>
 #include <sysio/chain/types.hpp>
 #include <sysio/chain_plugin/get_info_db.hpp>
+#include <sysio/http_client_plugin/http_client_options.hpp>
 #include <vector>
 
 namespace sysio::status_monitor {
@@ -80,6 +81,18 @@ inline constexpr auto max_retries = "status-monitor-max-retries";
 /// Initial retry backoff, in milliseconds; greater than 0, doubled per attempt up to
 /// fc::network::es::es_max_retry_backoff_ms.
 inline constexpr auto retry_backoff_ms = "status-monitor-retry-backoff-ms";
+/// PEM CA bundle added to system trust for the endpoint's requests; overrides outbound-http-additional-ca-file.
+inline constexpr auto additional_ca_file = "status-monitor-additional-ca-file";
+/// Hashed CA directory added to system trust for the endpoint's requests; overrides outbound-http-additional-ca-path.
+inline constexpr auto additional_ca_path = "status-monitor-additional-ca-path";
+/// Explicit proxy URL for the endpoint's requests; overrides outbound-http-proxy.
+inline constexpr auto proxy = "status-monitor-proxy";
+/// The three transport options above, in the shape sysio::outbound_http registers and reads.
+inline constexpr sysio::outbound_http::transport_option_names transport_option_names{
+   .additional_ca_file = additional_ca_file,
+   .additional_ca_path = additional_ca_path,
+   .proxy = proxy,
+};
 } // namespace option
 
 /// Documents per _bulk request at most; the delivery worker sends whatever is queued, up to this many.
@@ -110,6 +123,8 @@ inline constexpr uint32_t max_doc_bytes = fc::network::es::es_default_max_doc_by
 struct config {
    /// Endpoint and request-level settings of the _bulk target, as es_client::validate() normalized them.
    fc::network::es::es_client_options delivery;
+   /// Proxy and extra CA trust of the endpoint's requests: the status-monitor-* values over the outbound-http-* ones.
+   fc::http::transport_options transport;
    /// The operator's compiled document template; rendered once per snapshot.
    fc::json_template document_template;
    /// Documents per _bulk request at most (--status-monitor-max-items-per-task).

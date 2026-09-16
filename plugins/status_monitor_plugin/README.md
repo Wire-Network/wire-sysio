@@ -104,6 +104,9 @@ placeholder names the plugin supplies.
 | `status-monitor-request-timeout-ms` | 10000 | Header, read, idle, and total timeout per request. |
 | `status-monitor-max-retries` | 3 (0 to 10) | Additional attempts after the first for a 5xx, 429, timeout, or connection failure, so four attempts per batch at the default. |
 | `status-monitor-retry-backoff-ms` | 250 (greater than 0) | Initial backoff between attempts; doubles per attempt, capped at 2000 ms. |
+| `status-monitor-additional-ca-file` | unset (`outbound-http-additional-ca-file` applies) | PEM CA bundle added to the system trust store for requests to the endpoint, the startup check included. |
+| `status-monitor-additional-ca-path` | unset (`outbound-http-additional-ca-path` applies) | Hashed CA directory added to the system trust store for requests to the endpoint, the startup check included. |
+| `status-monitor-proxy` | unset (`outbound-http-proxy` applies) | Explicit proxy URL for requests to the endpoint, the startup check included. |
 
 An invalid active configuration (bad URL scheme, empty index, missing or unparseable template, a template
 that references a token the plugin does not supply, a value outside its range, auth with only one half set)
@@ -194,8 +197,9 @@ uses `${epoch_millis}`, or keep `${timestamp}` for an ISO 8601 string.
 - Once the batch is given up on its documents are dropped -- nothing is re-queued -- and the drop is
   logged (see Diagnostics).
 - A batch's documents are consumed as they are sent; nothing is re-rendered.
-- Basic auth is sent as an `Authorization: Basic` header when configured. TLS uses the system trust store;
-  there is no per-plugin CA file option.
+- Basic auth is sent as an `Authorization: Basic` header when configured. TLS uses the system trust store
+  plus any additional CA file or path, and requests go through the proxy when one is set; each
+  `status-monitor-*` transport option falls back to its node-wide `outbound-http-*` counterpart.
 - Shutdown unsubscribes from the irreversible_block channel, cancels an in-flight request, joins both
   workers, and logs the final counters. Documents still waiting are discarded, not flushed.
 

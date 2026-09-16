@@ -89,6 +89,7 @@ void add_options(bpo::options_description& cfg) {
         max_retries_description.c_str());
    opts(option::retry_backoff_ms, bpo::value<uint32_t>()->default_value(fc::network::es::es_default_retry_backoff_ms),
         retry_backoff_ms_description.c_str());
+   sysio::outbound_http::add_transport_program_options(cfg, option::transport_option_names, "status monitor");
 }
 
 std::optional<config> parse_config(const bpo::variables_map& options) {
@@ -132,6 +133,7 @@ std::optional<config> parse_config(const bpo::variables_map& options) {
    cfg.delivery.max_doc_bytes = max_doc_bytes;
    cfg.max_items_per_task = options[option::max_items_per_task].as<uint32_t>();
    cfg.max_pending_documents = options[option::max_pending_documents].as<uint32_t>();
+   cfg.transport = sysio::outbound_http::read_transport_options(options, option::transport_option_names);
 
    SYS_ASSERT(cfg.delivery.username.has_value() == cfg.delivery.password.has_value(), chain::plugin_config_exception,
               "--{} and --{} must be provided together", option::username, option::password);

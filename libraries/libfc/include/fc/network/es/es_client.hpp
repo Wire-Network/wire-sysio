@@ -40,8 +40,8 @@ struct es_bulk_result {
 /// async_bulk() is the coroutine form for callers on any executor; bulk() is the blocking convenience a
 /// producer's delivery worker calls -- it waits for the coroutine's result while the io thread does the I/O.
 /// bulk() is used from ONE thread at a time (the producer's delivery worker); cancel() may be called from any
-/// thread. Opens no connection until the first request or probe(). HTTPS uses the platform trust store with
-/// peer and hostname verification (the client cannot disable it).
+/// thread. Opens no connection until the first request or probe(). HTTPS uses the platform trust store plus any
+/// additional CA in the transport options, with peer and hostname verification (the client cannot disable it).
 class es_client {
 public:
    /// Strip a trailing '/' from url and FC_ASSERT the endpoint (http/https scheme, non-empty index),
@@ -49,7 +49,8 @@ public:
    static es_client_options validate(es_client_options options);
 
    /// Validates @p options again (cheap and idempotent, so a caller may pass raw options) and starts the io thread.
-   explicit es_client(es_client_options options);
+   /// @p transport is the proxy and extra CA trust every request uses (see sysio::outbound_http).
+   explicit es_client(es_client_options options, http::transport_options transport = {});
    /// cancel(), then joins the io thread. A producer stops the thread that calls bulk() first.
    ~es_client();
 

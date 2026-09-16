@@ -50,6 +50,8 @@ constexpr std::string_view probe_target = "/";
 /// second attempt: that attempt could only end at the 2000 ms request timeout against an endpoint that
 /// answers no attempt but the first.
 constexpr auto probe_attempt_budget = 1500ms;
+/// An origin that never resolves: only a proxy can deliver a request addressed to it.
+constexpr std::string_view unresolvable_origin = "http://origin.invalid:9200";
 
 /// Client options with fast test timings against @p url.
 fc::network::es::es_client_options make_options(const std::string& url) {
@@ -449,6 +451,19 @@ BOOST_AUTO_TEST_CASE(probe_overlapping_a_bulk_is_rejected) try {
    // The rejected probe left the flag to its owner, which cleared it on completion: the next request is admitted.
    BOOST_CHECK(client.bulk(one_document_body(client), 1).outcome == es_bulk_result::status::indexed);
    BOOST_CHECK_EQUAL(server.request_count(), 2u);
+}
+FC_LOG_AND_RETHROW()
+
+// The transport options reach the HTTP client: with a proxy set, the bulk request goes to the proxy with the
+// endpoint's absolute URL as its target.
+BOOST_AUTO_TEST_CASE(bulk_is_sent_through_the_configured_proxy) try {
+   fc::test::capture_http_server proxy;
+   fc::http::transport_options transport;
+   transport.proxy = proxy.url();
+   es_client client{make_options(std::string{unresolvable_origin}), std::move(transport)};
+   BOOST_CHECK(client.bulk(one_document_body(client), 1).outcome == es_bulk_result::status::indexed);
+   BOOST_REQUIRE(proxy.wait_for_requests(1, delivery_wait));
+   BOOST_CHECK_EQUAL(proxy.request(0).target, std::string{unresolvable_origin} + "/_bulk");
 }
 FC_LOG_AND_RETHROW()
 

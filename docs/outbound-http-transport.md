@@ -27,6 +27,7 @@ overrides its process-wide fallback.
 | External debugging | `--ext-debugging-additional-ca-file` | `--ext-debugging-additional-ca-path` | `--ext-debugging-proxy` |
 | KIOD/signing | `--http-client-additional-ca-file` | `--http-client-additional-ca-path` | `--http-client-proxy` |
 | Snapshot bootstrap | `--snapshot-endpoint-additional-ca-file` | `--snapshot-endpoint-additional-ca-path` | `--snapshot-endpoint-proxy` |
+| Status monitor | `--status-monitor-additional-ca-file` | `--status-monitor-additional-ca-path` | `--status-monitor-proxy` |
 
 Missing, empty, malformed, or unreadable custom trust configuration fails during plugin initialization.
 Plain `http://` remains available for explicitly configured trusted networks but is not authenticated.
