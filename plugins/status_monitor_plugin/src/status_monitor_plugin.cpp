@@ -59,8 +59,8 @@ std::string delivery_outcome_clause(const fc::network::es::es_bulk_result& resul
 
 /// Every member is touched only on the application thread: plugin_initialize/startup/shutdown run there,
 /// SIGHUP handlers are dispatched through the executor's read_write queue, and irreversible_block channel
-/// deliveries are posted to it. The workers see only the pipeline's own state (its atomics, its last-failure
-/// string under its mutex) and the es client, whose bulk() runs on the delivery worker and whose cancel() is
+/// deliveries are posted to it. The workers see only the pipeline's own state (its counters and last-failure
+/// detail, under its mutex) and the es client, whose bulk() runs on the delivery worker and whose cancel() is
 /// safe from any thread. No lock is needed here; assert_application_thread() documents and (in debug)
 /// checks it. The exception is report_failed_batch()'s two throttle members, which only the delivery worker
 /// touches.
