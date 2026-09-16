@@ -27,6 +27,23 @@ BOOST_FIXTURE_TEST_CASE( producer_register_unregister, sysio_system_tester ) try
 
    //fc::variant params = producer_parameters_example(1);
    auto key =  fc::crypto::public_key::from_string("SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"); // cspell:disable-line
+   auto registration = [&] {
+      return push_action("alice1111111"_n, "regproducer"_n, mvo()
+                         ("producer",  "alice1111111")
+                         ("producer_key", key )
+                         ("url", "http://wire.network")
+                         ("location", 1));
+   };
+
+   // A self-signed direct registration cannot allocate a system-owned producer row until opreg
+   // has admitted the account as an ACTIVE producer.
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("producer must be an active collateral-backed operator"), registration());
+   BOOST_REQUIRE(get_row_by_account(config::system_account_name, config::system_account_name,
+                                    "producers"_n, "alice1111111"_n).empty());
+
+   deploy_opreg_once();
+   register_producer_operators({"alice1111111"_n});
    BOOST_REQUIRE_EQUAL( success(), push_action("alice1111111"_n, "regproducer"_n, mvo()
                                                ("producer",  "alice1111111")
                                                ("producer_key", key )
@@ -96,6 +113,8 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig, sysio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( control->active_producers().version, 0u );
 
    issue_and_transfer( "alice1111111"_n, core_sym::from_string("200000000.0000"),  config::system_account_name );
+   deploy_opreg_once();
+   register_producer_operators({"alice1111111"_n});
    block_signing_authority_v0 alice_signing_authority;
    alice_signing_authority.threshold = 1;
    alice_signing_authority.keys.push_back( {.key = get_public_key( "alice1111111"_n, "bs1"), .weight = 1} );

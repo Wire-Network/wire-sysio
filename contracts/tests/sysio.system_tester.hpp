@@ -357,23 +357,14 @@ public:
       msig_abi_ser.set_abi(msig_abi, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-   /// activate_producers(), plus the sysio.opreg operator rows `producer_rank::is_schedulable`
-   /// requires.
-   ///
-   /// sysio.system schedules -- and getpeerkeys / snapshot-provider eligibility rank -- only
-   /// producers that are ACTIVE OPERATOR_TYPE_PRODUCER operators in sysio.opreg AND carry an
-   /// active finalizer key. `activate_producers()` yields neither, so this deploys sysio.opreg
-   /// (once) and registers each producer as a bootstrapped producer operator -- ACTIVE-by-fiat,
-   /// bypassing collateral.
+   /// Compatibility spelling for activate_producers(). Producer registration itself now requires
+   /// the ACTIVE OPERATOR_TYPE_PRODUCER rows that activate_producers installs first.
    ///
    /// Finalizer keys are deliberately left to the caller. Which keys a test registers decides
    /// whether this node can vote for the policy update_ranked_producers proposes, and some tests
    /// depend on it NOT being able to (so the policy stays pending at the controller).
    vector<name> activate_producers_with_operators( uint32_t count = 21 ) {
-      std::vector<name> producer_names = activate_producers(count);
-      deploy_opreg_once();
-      register_producer_operators(producer_names);
-      return producer_names;
+      return activate_producers(count);
    }
 
    /// Deploy sysio.opreg into the test chain, once. `sysio_system_tester` does not ship it, but
@@ -429,6 +420,10 @@ public:
             producer_names.emplace_back(root + std::string(1, static_cast<char>('a' + i)));
          }
          setup_producer_accounts(producer_names);
+         // regproducer is admitted only after sysio.opreg has made the account an ACTIVE producer.
+         // These legacy fixture producers model the genesis set, so install bootstrapped rows.
+         deploy_opreg_once();
+         register_producer_operators(producer_names);
          // Only the first 21 go into the initial schedule
          uint32_t sched_count = std::min(count, uint32_t(21));
          std::vector<legacy::producer_key> schedule;

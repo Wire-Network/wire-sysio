@@ -71,11 +71,11 @@ namespace sysiosystem {
    /// Ceiling on rows a rank walk may EXAMINE before giving up on finding more.
    ///
    /// The demoted tier already bounds these walks: a row that cannot be scheduled scores into it
-   /// and sorts last. This is the belt to that pair of braces -- `regproducer` is permissionless
-   /// and the table unbounded, so a walk that runs inline in `onblock` or in the epoch payout
-   /// should never depend for its CPU cost on a predicate holding. Generous enough that it binds
-   /// only when something has already gone wrong: the schedule needs `max_producers` matches and
-   /// the payout `standby_end_rank`, both far below it.
+   /// and sorts last. This is the belt to that pair of braces -- producer admission is collateral
+   /// gated, but historical rows remain, so a walk that runs inline in `onblock` or in the epoch
+   /// payout should never depend for its CPU cost on a predicate holding. Generous enough that it
+   /// binds only when something has already gone wrong: the schedule needs `max_producers` matches
+   /// and the payout `standby_end_rank`, both far below it.
    ///
    /// Stopping early is SAFE for pay because of the no-forfeiture rule: a row the walk never
    /// reaches is neither paid nor reset, exactly like an unpayable one, so its blocks carry to the
@@ -114,9 +114,9 @@ namespace sysiosystem {
       name                 last_producer;
 
       /// Rescore cursor. A weight change (`setscorecfg`) or a `req_prod_collat` change
-      /// invalidates every stored `rank_score`, and the producers table is unbounded because
-      /// `regproducer` is permissionless. Rather than a mass rewrite, `rescore_pending` is set
-      /// and `onblock` drains `rescore_cursor` a bounded number of rows per schedule-rebuild tick.
+      /// invalidates every stored `rank_score`, and the producers table can retain a large number
+      /// of historical rows. Rather than a mass rewrite, `rescore_pending` is set and `onblock`
+      /// drains `rescore_cursor` a bounded number of rows per schedule-rebuild tick.
       /// The cursor walks PRIMARY-key order: rescoring mutates the secondary key, so walking
       /// `prodrank` would revisit or skip rows.
       uint64_t             rescore_cursor = 0;
@@ -451,12 +451,14 @@ namespace sysiosystem {
           * @param url - the url of the block producer, normally the url of the block producer presentation website,
           * @param location - is the country code as defined in the ISO 3166, https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
           *
-          * @note Registration alone does not schedule the producer. To be placed
-          *       in the active schedule the account must also be an ACTIVE
-          *       OPERATOR_TYPE_PRODUCER operator in sysio.opreg (i.e. have posted
-          *       the required slashable collateral). Eligibility is enforced when
-          *       the schedule is built, so withdrawing that collateral -- or
-          *       being slashed or terminated -- drops the producer.
+          * @note Registration requires the account to already be an ACTIVE
+          *       OPERATOR_TYPE_PRODUCER operator in sysio.opreg. For ordinary
+          *       operators, collateral credited in sysio.opreg must satisfy every
+          *       configured producer minimum; external-chain collateral is delivered
+          *       through OPP. Bootstrapped genesis operators are the explicit exception.
+          *       Eligibility is checked again when the schedule is built,
+          *       so withdrawing collateral -- or being slashed or terminated --
+          *       drops the producer.
           *
           * @pre Producer to register is an account
           * @pre Authority of producer to register
@@ -474,12 +476,14 @@ namespace sysiosystem {
           * @param url - the url of the block producer, normally the url of the block producer presentation website,
           * @param location - is the country code as defined in the ISO 3166, https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
           *
-          * @note Registration alone does not schedule the producer. To be placed
-          *       in the active schedule the account must also be an ACTIVE
-          *       OPERATOR_TYPE_PRODUCER operator in sysio.opreg (i.e. have posted
-          *       the required slashable collateral). Eligibility is enforced when
-          *       the schedule is built, so withdrawing that collateral -- or
-          *       being slashed or terminated -- drops the producer.
+          * @note Registration requires the account to already be an ACTIVE
+          *       OPERATOR_TYPE_PRODUCER operator in sysio.opreg. For ordinary
+          *       operators, collateral credited in sysio.opreg must satisfy every
+          *       configured producer minimum; external-chain collateral is delivered
+          *       through OPP. Bootstrapped genesis operators are the explicit exception.
+          *       Eligibility is checked again when the schedule is built,
+          *       so withdrawing collateral -- or being slashed or terminated --
+          *       drops the producer.
           *
           * @pre Producer to register is an account
           * @pre Authority of producer to register

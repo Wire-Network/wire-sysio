@@ -99,6 +99,31 @@ namespace sysiosystem {
       }
 
       /**
+       * Whether sysio.opreg currently admits an account to create or reactivate a producer row.
+       *
+       * ACTIVE and the PRODUCER role are mandatory. Non-bootstrapped operators must also satisfy
+       * every producer minimum in the live configuration. The latter closes the setconfig window
+       * where status can still say ACTIVE under an older, lower minimum; bootstrapped genesis
+       * operators remain the explicit collateral-free exception.
+       */
+      inline bool is_admitted_producer(const sysio::name& producer) {
+         sysio::opreg::operators_t ops(opreg_refs::account);
+         const auto op_key = sysio::opreg::operator_key{producer.value};
+         if (!ops.contains(op_key)) return false;
+
+         const auto op = ops.get(op_key);
+         if (op.status != sysio::opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE
+             || op.type != sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER) {
+            return false;
+         }
+         if (op.is_bootstrapped) return true;
+
+         sysio::opreg::opconfig_t cfg_tbl(opreg_refs::account);
+         const auto cfg = cfg_tbl.get_or_default(sysio::opreg::op_config{});
+         return collateral_factor(op, cfg) >= score_scale;
+      }
+
+      /**
        * Snapshot-service factor: how much of the configured attestation target the producer met in
        * the current pay period.
        *
@@ -224,12 +249,11 @@ namespace sysiosystem {
                               const score_inputs& inputs,
                               const producer_score_config& weights) {
          // A producer that is not a live, collateral-backed PRODUCER operator -- parked by
-         // `unregprod`, unbonded, slashed, terminated -- scores into the demoted tier. That is
-         // correct on its own terms (an unbonded registrant must never outrank a bonded one) and it
-         // is also what BOUNDS the rank walk: `regproducer` is permissionless, so without this
-         // every consumer would scan an unbounded table. With it, the healthy and bootstrapped
-         // tiers hold only producers that were live at their LAST rescore, and a consumer stops at
-         // the first demoted entry. Every event that can end a producer's standing rescores it --
+         // `unregprod`, slashed, terminated, or below a newly raised minimum -- scores into the
+         // demoted tier. New admission is collateral-gated, but historical rows remain, so this
+         // still bounds every rank walk: the healthy and bootstrapped tiers hold only producers
+         // that were live at their LAST rescore, and a consumer stops at the first demoted entry.
+         // Every event that can end a producer's standing rescores it --
          // `unregprod` directly, and sysio.opreg through its `processprod` notification, which it
          // dispatches on every balance change AND on slash and termination. The one row a rescore
          // cannot reach is one `prune` erased, and the termination before it already sank the
@@ -237,10 +261,10 @@ namespace sysiosystem {
          if (!inputs.is_active) return unscored();
 
          // No active finalizer key, no schedule position -- so no place above the demoted tier
-         // either. This is what BOUNDS every rank walk. Registration is permissionless and the
-         // table is unbounded, so if bonded-but-keyless rows stayed in the healthy tier a walk
-         // looking for 21 schedulable producers could skip an arbitrary number of rows that can
-         // never qualify, on `onblock`'s schedule rebuild and inline in the epoch payout.
+         // either. A collateral-backed roster may still contain arbitrarily many keyless or
+         // historical rows; if they stayed in the healthy tier, a walk looking for 21 schedulable
+         // producers could skip too many rows on `onblock`'s schedule rebuild and inline in the
+         // epoch payout.
          //
          // Peer discovery is deliberately unaffected: it seeds from the ACTIVE SCHEDULE before it
          // ranks anything, so a producer scheduled through `setprods` without a finalizer key is

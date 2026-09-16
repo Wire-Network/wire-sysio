@@ -25,6 +25,14 @@ namespace sysiosystem {
    void system_contract::register_producer( const name& producer, const sysio::block_signing_authority& producer_authority, const std::string& url, uint16_t location ) {
       const auto ct = current_time_point();
 
+      // Producer registration creates or reactivates a persistent system-table row. Require the
+      // operator registry to have already admitted the account as an ACTIVE producer. For ordinary
+      // operators this means collateral credited by sysio.opreg satisfies every configured producer
+      // minimum; external-chain collateral reaches that ledger through OPP. Bootstrapped operators
+      // are the explicit genesis exception maintained by sysio.opreg.
+      check( producer_rank::is_admitted_producer( producer ),
+             "producer must be an active collateral-backed operator" );
+
       sysio::public_key producer_key{};
 
       std::visit( [&](auto&& auth ) {
@@ -174,12 +182,12 @@ namespace sysiosystem {
       // weights would not give it -- and that is accepted: ranking is allowed to converge rather
       // than switch atomically, and it self-corrects within a few ticks as the cursor advances.
       //
-      // Deferring instead is what is NOT safe. The sweep's length scales with the table, the table
-      // is unbounded, and `regproducer` is permissionless with its RAM billed to this contract --
-      // so waiting for the sweep would let anyone hold BOTH the producer schedule and the finalizer
-      // policy frozen for as long as they kept registering, during which a slashed, terminated or
-      // demoted producer would keep its slot and its finality weight. A briefly mixed ordering is a
-      // far smaller harm than a schedule that cannot be rebuilt at all.
+      // Deferring instead is what is NOT safe. The sweep's length scales with the table, which can
+      // retain historical producer rows even though new admission is collateral-gated. Waiting for
+      // the sweep could hold BOTH the producer schedule and the finalizer policy frozen while a
+      // large roster is rescored, during which a slashed, terminated or demoted producer would keep
+      // its slot and its finality weight. A briefly mixed ordering is a far smaller harm than a
+      // schedule that cannot be rebuilt at all.
       _global.modify( get_self(), [&]( auto& g ) { g.last_producer_schedule_update = block_time; });
 
       auto idx = _producers.get_index<"prodrank"_n>();
@@ -196,9 +204,9 @@ namespace sysiosystem {
       // a slot vacated by an ineligible producer is filled by the next schedulable entry for free,
       // with no explicit backfill.
       //
-      // The walk is bounded by the demoted tier. `regproducer` is permissionless, so the table is
-      // unbounded -- but producer_rank::compute sinks every non-ACTIVE producer operator into the
-      // demoted tier, which sorts last, so the scan stops before the spam tail.
+      // The walk is bounded by the demoted tier. The table can retain historical rows, but
+      // producer_rank::compute sinks every non-ACTIVE producer operator into the demoted tier,
+      // which sorts last, so the scan stops before that tail.
       uint32_t examined = 0;
       for( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < max_producers; ++it ) {
          if( producer_rank::tier_of( it->rank_score ) == producer_tier::demoted ) break;

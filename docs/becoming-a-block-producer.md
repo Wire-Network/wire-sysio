@@ -73,6 +73,14 @@ Use `regproducer2` instead if you want a multi-key block-signing authority rathe
 key. The `url` is where you publish information about your operation, and `location` is an
 advisory number used for peer topology.
 
+This action succeeds only after `sysio.opreg` reports your account as an `ACTIVE` producer. For a
+non-bootstrapped producer, that means the registry has credited enough collateral for every
+configured pair. External-chain collateral is delivered through OPP; a configured native WIRE pair
+can instead be funded through the registry direct-deposit action. Calling `regproducer` or
+`regproducer2` before admission cannot create a producer row. Genesis producers are the explicit
+exception because `sysio.opreg` creates their bootstrapped operator records as `ACTIVE` during chain
+setup.
+
 ## Step 5 — Register a finalizer key
 
 ```

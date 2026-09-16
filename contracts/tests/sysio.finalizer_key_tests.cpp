@@ -10,6 +10,13 @@ using namespace sysio_test;
 
 struct finalizer_key_tester : sysio_system_tester {
 
+   finalizer_key_tester() {
+      // Finalizer tests use Alice and Bob as producers directly. Producer registration now
+      // requires an ACTIVE producer operator, so model them as genesis fixtures up front.
+      deploy_opreg_once();
+      register_producer_operators({"alice1111111"_n, "bob111111111"_n});
+   }
+
    fc::variant get_finalizer_key_info( uint64_t id ) {
       vector<char> data = get_row_by_id( config::system_account_name, config::system_account_name, "finkeys"_n, id );
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "finalizer_key_info", data, abi_serializer::create_yield_function(abi_serializer_max_time) );

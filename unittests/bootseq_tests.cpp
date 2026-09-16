@@ -109,6 +109,34 @@ public:
        return r;
     }
 
+    void deploy_opreg() {
+       create_account("sysio.opreg"_n, config::system_account_name, false, false, false, true);
+       base_tester::push_action(config::system_account_name, "setacctram"_n,
+          config::system_account_name,
+          mvo()("account", "sysio.opreg")("ram_bytes", int64_t(2'000'000)));
+       base_tester::push_action(config::system_account_name, "setacctnet"_n,
+          config::system_account_name,
+          mvo()("account", "sysio.opreg")("net_weight", int64_t(1'000'000)));
+       base_tester::push_action(config::system_account_name, "setacctcpu"_n,
+          config::system_account_name,
+          mvo()("account", "sysio.opreg")("cpu_weight", int64_t(1'000'000)));
+       produce_block();
+       set_code("sysio.opreg"_n, test_contracts::sysio_opreg_wasm());
+       set_abi("sysio.opreg"_n, test_contracts::sysio_opreg_abi());
+       set_privileged("sysio.opreg"_n);
+       produce_block();
+    }
+
+    void register_genesis_producer_operators(const std::vector<name>& producers) {
+       for (const auto producer : producers) {
+          base_tester::push_action("sysio.opreg"_n, "regoperator"_n, "sysio.opreg"_n, mvo()
+             ("account", producer)
+             ("type", "OPERATOR_TYPE_PRODUCER")
+             ("is_bootstrapped", true));
+       }
+       produce_block();
+    }
+
     asset get_balance( const account_name& act ) {
          return get_currency_balance("sysio.token"_n, symbol(CORE_SYMBOL), act);
     }
@@ -186,14 +214,17 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
 
         deploy_contract();
 
-        auto producer_candidates = {
+        std::vector<name> producer_candidates = {
                 "proda"_n, "prodb"_n, "prodc"_n, "prodd"_n, "prode"_n, "prodf"_n, "prodg"_n,
                 "prodh"_n, "prodi"_n, "prodj"_n, "prodk"_n, "prodl"_n, "prodm"_n, "prodn"_n,
                 "prodo"_n, "prodp"_n, "prodq"_n, "prodr"_n, "prods"_n, "prodt"_n, "produ"_n,
                 "runnerup1"_n, "runnerup2"_n, "runnerup3"_n
         };
 
-        // Register producers
+        // Genesis producers are the explicit collateral-free exception. sysio.opreg installs
+        // their ACTIVE producer rows before sysio.system accepts their signing-key registration.
+        deploy_opreg();
+        register_genesis_producer_operators(producer_candidates);
         for( auto pro : producer_candidates ) {
            register_producer(pro);
         }
