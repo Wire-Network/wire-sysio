@@ -175,8 +175,8 @@ void status_monitor_plugin::impl::report_progress(fc::time_point now) {
    // Both report kinds are gated on the one timestamp, so an endpoint alternating between failed and
    // acknowledged batches -- every irreversible block opening a fresh streak -- cannot log a line per block:
    // whichever line is emitted silences both for failure_report_interval. last_failure_report starts at the
-   // epoch, so the first report after a quiet period is always due. The streak flag follows the pipeline's
-   // state unconditionally; only the log line is rate-limited.
+   // epoch, so the first report after a quiet period is always due. A streak ends only when its recovery line
+   // is logged, so a recovery inside the interval is reported on the first acknowledged batch after the interval.
    const bool report_due = now - last_failure_report >= failure_report_interval;
    switch (status_monitor::classify_progress(last_stats, current, failing)) {
    case status_monitor::progress::failing:
@@ -193,8 +193,8 @@ void status_monitor_plugin::impl::report_progress(fc::time_point now) {
       }
       break;
    case status_monitor::progress::recovered:
-      failing = false;
       if (report_due) {
+         failing = false;
          last_failure_report = now;
          fc_ilog(log, "delivery recovered (documents_indexed={} batches_failed={})", current.documents_indexed,
                  current.batches_failed);
