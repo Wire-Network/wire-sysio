@@ -216,11 +216,12 @@ All diagnostics go through the `status_monitor` logger (configure it like any ot
   the root is not a failure (see Delivery semantics): startup continues and logs the reachable line.
 - Liveness: one warning when documents pause because the irreversible block is behind wall-clock time, at
   most once a minute while paused, and one line when they resume.
-- Delivery, per failed batch: one warning for every bulk request that did not fully index, naming the
-  attempts it took, the failure detail (for example `HTTP 503 from https://opensearch.example.com`),
-  and what became of its documents -- `N document(s) dropped` once the batch is given up on, `N of M
-  document(s) rejected` for a partial bulk response, `N document(s) canceled` at shutdown. This line fires
-  only on failure, so the per-block data path stays log-free.
+- Delivery, per failed batch: one warning for the first bulk request that did not fully index, then at most
+  one a minute counting the failed batches in between, naming the attempts it took, the failure detail (for
+  example `HTTP 503 from https://opensearch.example.com`), and what became of its documents -- `N document(s)
+  dropped` once the batch is given up on, `N of M document(s) rejected` for a partial bulk response, `N
+  document(s) canceled` at shutdown. This line fires only on failure, so the per-block data path stays
+  log-free.
 - Delivery, summarized: when a bulk request fails or something is dropped, one warning carrying every counter
   and the last failure detail; when delivery succeeds again, one recovery line. These two share one rate
   limit of at most one line per minute between them, so an endpoint that alternates between failing and

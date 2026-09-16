@@ -176,7 +176,7 @@ public:
    using sender = std::function<fc::network::es::es_bulk_result(std::string body, uint32_t doc_count)>;
    /// Reports one bulk request whose outcome was not `indexed`, with the batch's result and the documents it
    /// carried. Called on the delivery worker, once per failed batch, before the next one is sent; must not
-   /// throw (the plugin's reporter only logs).
+   /// throw (the plugin's reporter only logs, at a limited rate).
    using failure_reporter = std::function<void(const fc::network::es::es_bulk_result& result, uint32_t doc_count)>;
 
    /// Starts both worker threads. @p action_line is the es client's; @p send delivers one assembled body;

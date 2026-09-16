@@ -28,11 +28,14 @@ constexpr fc::microseconds read_only_api_response_budget = fc::seconds(1);
 constexpr fc::microseconds pause_report_interval = fc::seconds(60);
 /// The delivery failure line and the delivery recovery line share this interval: whichever one is reported,
 /// the next line of either kind waits this long, so an endpoint alternating between failed and acknowledged
-/// batches cannot log a line per irreversible block.
+/// batches cannot log a line per irreversible block. The per-batch failure line uses it on its own clock.
 constexpr fc::microseconds failure_report_interval = fc::seconds(60);
-/// The line logged for every bulk request that did not fully index: the attempts the client spent, its
+/// The line logged for a bulk request that did not fully index: the attempts the client spent, its
 /// endpoint-sanitized detail, and what became of the batch's documents (see delivery_outcome_clause).
 constexpr std::string_view failed_batch_format = "bulk request failed after {} attempt(s): {} -- {}";
+/// failed_batch_format plus the number of failed batches not logged since the previous line.
+constexpr std::string_view failed_batch_with_unlogged_format =
+   "bulk request failed after {} attempt(s): {} -- {} ({} more failed batch(es) since the last line)";
 
 /// What became of one failed batch's documents: a partial batch had only its rejected documents refused (the
 /// rest did index), a canceled batch was abandoned at shutdown, and every other outcome loses the whole batch
@@ -59,7 +62,8 @@ std::string delivery_outcome_clause(const fc::network::es::es_bulk_result& resul
 /// deliveries are posted to it. The workers see only the pipeline's own state (its atomics, its last-failure
 /// string under its mutex) and the es client, whose bulk() runs on the delivery worker and whose cancel() is
 /// safe from any thread. No lock is needed here; assert_application_thread() documents and (in debug)
-/// checks it.
+/// checks it. The exception is report_failed_batch()'s two throttle members, which only the delivery worker
+/// touches.
 ///
 /// The declaration order of the last four members is load-bearing: they are destroyed in reverse --
 /// subscription, then pipeline, then client, then the read-only handle -- which is the only safe order, since
@@ -79,6 +83,11 @@ struct status_monitor_plugin::impl {
    bool failing = false;                      ///< a delivery-failure streak is open
    fc::time_point last_failure_report;        ///< when a failure or a recovery was last reported
    status_monitor::pipeline_stats last_stats; ///< counters as last compared
+   /// When a failed batch was last logged. Delivery worker only, like report_failed_batch(); declared before the
+   /// pipeline so it outlives the worker.
+   fc::time_point last_failed_batch_report;
+   /// Failed batches not logged since last_failed_batch_report. Delivery worker only.
+   uint64_t unlogged_failed_batches = 0;
    /// chain_plugin's read-only API (get_info). It references chain_plugin's internals, which outlive it only
    /// because appbase shuts plugins down in reverse startup order: this plugin depends on chain_plugin, so
    /// plugin_shutdown resets the handle before chain_plugin's own shutdown runs.
@@ -98,10 +107,11 @@ struct status_monitor_plugin::impl {
    /** Compare the pipeline's counters with the last comparison and log a failing streak or a recovery. */
    void report_progress(fc::time_point now);
    /**
-    * Log one line for a bulk request that did not fully index, so no batch is lost silently. Unlike every
-    * other member function this runs on the pipeline's delivery worker and touches only the logger, which
-    * handle_sighup() re-binds on the application thread -- the same arrangement every plugin that logs off
-    * the application thread uses. It only logs, so it does not throw, as pipeline::failure_reporter requires.
+    * Log a bulk request that did not fully index: the first one, then at most one per failure_report_interval
+    * carrying the count of failed batches in between. Unlike every other member function this runs on the
+    * pipeline's delivery worker and touches only the logger, which handle_sighup() re-binds on the application
+    * thread -- the same arrangement every plugin that logs off the application thread uses -- and its own two
+    * throttle members. It only logs and counts, so it does not throw, as pipeline::failure_reporter requires.
     */
    void report_failed_batch(const fc::network::es::es_bulk_result& result, uint32_t doc_count);
 };
@@ -198,9 +208,21 @@ void status_monitor_plugin::impl::report_progress(fc::time_point now) {
 
 void status_monitor_plugin::impl::report_failed_batch(const fc::network::es::es_bulk_result& result,
                                                       uint32_t doc_count) {
-   // The one line this plugin logs per batch, and only for a batch that failed: the per-block data path stays
-   // log-free. The rate-limited summary in report_progress() still carries the counters and the last detail.
-   fc_wlog(log, failed_batch_format, result.attempts, result.detail, delivery_outcome_clause(result, doc_count));
+   // Throttled so an endpoint that fails every batch cannot log a line per block; the summary in
+   // report_progress() still carries the counters and the last detail.
+   const fc::time_point now = fc::time_point::now();
+   if (now - last_failed_batch_report < failure_report_interval) {
+      ++unlogged_failed_batches;
+      return;
+   }
+   last_failed_batch_report = now;
+   const uint64_t unlogged = std::exchange(unlogged_failed_batches, 0);
+   if (unlogged == 0) {
+      fc_wlog(log, failed_batch_format, result.attempts, result.detail, delivery_outcome_clause(result, doc_count));
+   } else {
+      fc_wlog(log, failed_batch_with_unlogged_format, result.attempts, result.detail,
+              delivery_outcome_clause(result, doc_count), unlogged);
+   }
 }
 
 status_monitor_plugin::status_monitor_plugin()
