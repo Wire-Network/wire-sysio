@@ -5819,7 +5819,15 @@ BOOST_FIXTURE_TEST_CASE( noncollateralized_account_cannot_register_then_can_join
          ("producer", names[4])("producer_key", get_public_key(names[4], "active"))("url", "")("location", 0)) );
    BOOST_REQUIRE(get_producer_info(names[4]).is_null());
 
-   register_finalizer_keys(names, 4);
+   // Configure every key the node will need before it starts voting. Replacing the node key set
+   // after finality has written its safety file is not a supported runtime operation. The fifth
+   // private key is harmless until its public key is registered and enters the proposed policy.
+   for (uint32_t i = 0; i < 4; ++i) {
+      auto [privkey, pubkey, pop, sig_provider] = sysio::testing::get_bls_key(names[i]);
+      BOOST_REQUIRE_EQUAL(success(),
+         register_finalizer_key(names[i], pubkey.to_string(), pop.to_string()));
+   }
+   set_node_finalizers(names);
    produce_blocks(1);
    trigger_reschedule();
 
@@ -5834,7 +5842,6 @@ BOOST_FIXTURE_TEST_CASE( noncollateralized_account_cannot_register_then_can_join
       BOOST_REQUIRE_EQUAL(success(),
          register_finalizer_key(names[4], pubkey.to_string(), pop.to_string()));
    }
-   set_node_finalizers(names);
    trigger_reschedule();
 
    BOOST_REQUIRE( is_scheduled(names[4]) );
