@@ -6,6 +6,7 @@
 
 #include <magic_enum/magic_enum.hpp>
 
+#include <fc/crypto/keccak256.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/io/json.hpp>
@@ -29,9 +30,17 @@ constexpr std::string_view OP_DELIVER_OUTBOUND = "deliver_outbound_envelope";
 constexpr std::string_view OP_READ_INBOUND     = "read_inbound_envelope";
 constexpr std::string_view OP_UW_COMMIT        = "uw_commit";
 
-/// EIP-1474 code for a call the node executed and that reverted, as distinct from a protocol
-/// error such as a parse failure, where the node never ran the call at all.
+/// Execution APIs code for a call the node executed and that reverted, as distinct from a
+/// protocol error such as a parse failure, where the node never ran the call at all. Not an
+/// EIP-1474 code — that spec only defines the negative range; 3 is geth's convention, which
+/// `ethereum/execution-apis` standardised.
 constexpr int ethereum_execution_reverted_code = 3;
+
+/// Solidity signature of the revert `discardEnvelopeChunks()` raises when it has nothing of
+/// ours to clear. Hashed rather than written out as its selector so a reader can check this
+/// against the ABI directly; `chunk_buffer_missing_selector_is_pinned` holds the hash to the
+/// four bytes the contract actually emits.
+constexpr auto chunk_buffer_missing_signature = "OPP_ChunkBufferMissing(address)";
 
 /// ABI entry names and decoded-output field keys of the outpost contracts this
 /// client drives. Grouped per contract so a Solidity rename is one edit here
@@ -58,6 +67,8 @@ constexpr auto stored_bytes    = "storedBytes";
 } // namespace opp_inbound_abi
 
 constexpr size_t EVM_ABI_WORD_BYTES            = 32;
+constexpr size_t EVM_ADDRESS_BYTES             = 20;
+constexpr size_t EVM_SELECTOR_BYTES            = 4;
 constexpr size_t HEX_PREFIX_CHARS              = 2;
 constexpr size_t HEX_CHARS_PER_BYTE            = 2;
 constexpr size_t MAX_ENVELOPE_HEX_CHARS =
@@ -67,6 +78,24 @@ constexpr size_t MAX_LATEST_OUTBOUND_RPC_BYTES =
    ((OPP_MAX_ENVELOPE_BYTES + EVM_ABI_WORD_BYTES - 1) / EVM_ABI_WORD_BYTES) * EVM_ABI_WORD_BYTES;
 constexpr size_t MAX_LATEST_OUTBOUND_RPC_HEX_CHARS =
    HEX_PREFIX_CHARS + MAX_LATEST_OUTBOUND_RPC_BYTES * HEX_CHARS_PER_BYTE;
+
+/// Drop a leading `0x` / `0X` if present. Hex is not self-delimiting, so every
+/// comparison below works on the prefix-free form.
+std::string_view strip_hex_prefix(std::string_view value) {
+   if (value.size() >= HEX_PREFIX_CHARS && value[0] == '0' &&
+       (value[1] == 'x' || value[1] == 'X')) {
+      value.remove_prefix(HEX_PREFIX_CHARS);
+   }
+   return value;
+}
+
+/// Equal-length hex comparison, insensitive to case (EIP-55 checksum casing).
+bool same_hex(std::string_view lhs, std::string_view rhs) {
+   return lhs.size() == rhs.size() && std::ranges::equal(lhs, rhs, [](char a, char b) {
+      return std::tolower(static_cast<unsigned char>(a)) ==
+             std::tolower(static_cast<unsigned char>(b));
+   });
+}
 
 /// Interpret one decoded ABI output word as an unsigned integer.
 ///
@@ -93,20 +122,30 @@ std::optional<uint64_t> abi_uint_output(const fc::variant& value) {
 namespace outpost_ethereum_client_detail {
 
 bool same_evm_address(std::string_view lhs, std::string_view rhs) {
-   const auto strip_prefix = [](std::string_view value) {
-      if (value.size() >= HEX_PREFIX_CHARS && value[0] == '0' &&
-          (value[1] == 'x' || value[1] == 'X')) {
-         value.remove_prefix(HEX_PREFIX_CHARS);
-      }
-      return value;
-   };
-   const auto left  = strip_prefix(lhs);
-   const auto right = strip_prefix(rhs);
-   if (left.empty() || left.size() != right.size()) return false;
-   return std::ranges::equal(left, right, [](char a, char b) {
-      return std::tolower(static_cast<unsigned char>(a)) ==
-             std::tolower(static_cast<unsigned char>(b));
-   });
+   const auto left = strip_hex_prefix(lhs);
+   if (left.empty()) return false;
+   return same_hex(left, strip_hex_prefix(rhs));
+}
+
+bool is_chunk_buffer_missing_revert(std::string_view revert_data, std::string_view owner_address) {
+   constexpr size_t selector_chars = EVM_SELECTOR_BYTES * HEX_CHARS_PER_BYTE;
+   constexpr size_t word_chars     = EVM_ABI_WORD_BYTES * HEX_CHARS_PER_BYTE;
+   constexpr size_t address_chars  = EVM_ADDRESS_BYTES * HEX_CHARS_PER_BYTE;
+
+   const auto data = strip_hex_prefix(revert_data);
+   // Selector plus exactly one address word. Requiring the exact length is no more brittle
+   // than the selector test: an error taking different arguments hashes differently.
+   if (data.size() != selector_chars + word_chars) return false;
+
+   const auto expected = fc::crypto::keccak256::hash(std::string(chunk_buffer_missing_signature)).str();
+   if (!same_hex(data.substr(0, selector_chars), std::string_view(expected).substr(0, selector_chars)))
+      return false;
+
+   // The error's sole argument is the contract's `msg.sender`, so the word must be this
+   // relay's own signer, left-padded into 32 bytes.
+   const auto word = data.substr(selector_chars);
+   if (word.find_first_not_of('0') < word_chars - address_chars) return false;
+   return same_evm_address(word.substr(word_chars - address_chars), owner_address);
 }
 
 chunk_resume_decision decide_chunk_resume(const envelope_chunk_state& staged,
@@ -316,17 +355,19 @@ std::optional<uint16_t> outpost_ethereum_client::resume_chunk_index(
               to_string(), epoch_index, staged.total_chunks, staged.total_bytes,
               result.as_string());
       } catch (const fc::network::json_rpc::json_rpc_error& e) {
-         // Only an execution revert means the header is already clear. A protocol-level
-         // JSON-RPC error carries a different code and says the node never ran the call, so
-         // the discard may not have happened; tolerating it would upload against a staging
-         // header that is still stale. Those propagate and abandon the tick, like the
-         // failures described below.
-         if (e.code != ethereum_execution_reverted_code)
+         // Only one revert means the header is already clear, and it has to be identified by
+         // what the node returned, not by the exception's type or its code alone. A
+         // protocol-level JSON-RPC error says the node never ran the call at all; a code-3
+         // revert carrying anything else — a wrong implementation behind the proxy, a
+         // reentrancy guard, an unrecognised selector — says it ran and failed for a reason
+         // this path cannot interpret. Either way the discard may not have happened, and
+         // tolerating it would upload against a staging header that is still stale.
+         if (e.code != ethereum_execution_reverted_code ||
+             !detail::is_chunk_buffer_missing_revert(e.data.is_string() ? e.data.as_string() : std::string{},
+                                                     _signer_address_hex))
             throw;
-         // A revert the node catches during `eth_estimateGas` arrives as a
-         // JSON-RPC error, and for this call it means `OPP_ChunkBufferMissing`
-         // — the header is already clear, which is exactly the state we wanted.
-         // Tolerate it and upload from chunk 0.
+         // `OPP_ChunkBufferMissing(self)` from `eth_estimateGas` means the header is already
+         // clear, which is exactly the state we wanted. Tolerate it and upload from chunk 0.
          //
          // Deliberately NOT widened: a revert first observed at RECEIPT time
          // (status=0) is raised by `wait_for_confirmation` as a generic
