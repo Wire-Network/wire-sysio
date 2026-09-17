@@ -42,12 +42,21 @@ plugin_shutdown
 
 ### Windows
 
-When `read-only-threads` is above 0 the node alternates two windows: a **write window** of
+When `read-only-threads` is above 0 the node runs two windows: a **write window** of
 `read-only-write-window-time-us`, during which blocks and normal transactions are applied, and a **read
 window** of `read-only-read-window-time-us`, during which the read-only pool executes read-only transactions
-in parallel. The read window must be longer than the 10,000 µs minimum. The maximum read-only transaction time
-is clamped at startup to fit inside the effective read window minus that minimum, and both the clamp and the
-resulting value are logged.
+in parallel.
+
+They do not strictly alternate. When the write window's timer expires the node only switches if read-only
+work is actually queued; with both read queues empty it restarts the write window and stays in it, so an idle
+node never enters a read window at all. `read-only-read-window-time-us` is likewise a maximum rather than a
+fixed length: each read-only worker stops early once the queue drains or once a block arrives for the pending
+block number, and when the last worker finishes the node switches back to the write window immediately
+instead of waiting out the remaining time.
+
+The read window must be longer than the 10,000 µs minimum. The maximum read-only transaction time is clamped
+at startup to fit inside the effective read window minus that minimum, and both the clamp and the resulting
+value are logged.
 
 ### Production, pausing, and the vote timeout
 
@@ -75,6 +84,16 @@ attestation from the configured account each time a scheduled snapshot finalizes
 persisted to `snapshot-schedule.json` in the snapshots directory and reused across restarts rather than
 re-created.
 
+Provider mode needs a signing key of its own. The attestation is signed in-process from the `wire` signature
+providers that carry a local private key, and at least one of them must satisfy the configured account's
+`active` authority. Without one, every attestation is skipped with `Snapshot provider: no signing key
+available for <account>@active votesnaphash transaction` — snapshots are still written, but nothing is
+attested.
+
+A rejected attestation is not always survivable. If `votesnaphash` fails with error code 9001 — this node's
+snapshot hash disagrees with the record already attested on chain — the plugin logs `FATAL: Snapshot hash
+disagreement detected` and shuts the node down. Any other failure is logged and the node keeps running.
+
 ### Transactions
 
 The plugin registers the `incoming::methods::transaction_async` provider, so every transaction arriving from
@@ -94,7 +113,7 @@ and `disable-subjective-account-billing` excludes named accounts.
 
 ```ini
 producer-name = <your-account>
-signature-provider = <your-public-key>=KEY:<your-private-key>
+signature-provider = <key-name>,wire,wire,<your-public-key>,KEY:<your-private-key>
 
 # Production timing.
 produce-block-offset-ms = 450
@@ -108,7 +127,9 @@ subjective-account-max-failures = 3
 subjective-account-cpu-allowed-us = 300000
 ```
 
-`signature-provider` is registered by `signature_provider_manager_plugin`, not by this plugin.
+`signature-provider` is registered by `signature_provider_manager_plugin`, not by this plugin. Its spec takes
+four or five comma-separated fields — `[<key-name>,]<chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>`
+— and anything else is rejected at startup with `Invalid key spec`.
 
 A non-producing node that serves read-only transactions and takes snapshots:
 
@@ -119,10 +140,12 @@ read-only-read-window-time-us = 60000
 snapshots-dir = snapshots
 ```
 
-A snapshot provider — note that provider mode and `producer-name` are mutually exclusive:
+A snapshot provider — note that provider mode and `producer-name` are mutually exclusive, and that the
+account's `active` authority has to be satisfied by one of the configured `wire` keys:
 
 ```ini
 snapshot-provider-account = <your-account>
+signature-provider = <key-name>,wire,wire,<your-public-key>,KEY:<your-private-key>
 snapshots-dir = snapshots
 ```
 
@@ -130,11 +153,14 @@ The equivalent command lines:
 
 ```bash
 nodeop --producer-name <your-account> \
+       --signature-provider <key-name>,wire,wire,<your-public-key>,KEY:<your-private-key> \
        --produce-block-offset-ms 450 \
        --max-transaction-time 499 \
        --production-pause-vote-timeout-ms 6000
 
-nodeop --snapshot-provider-account <your-account> --snapshots-dir snapshots
+nodeop --snapshot-provider-account <your-account> \
+       --signature-provider <key-name>,wire,wire,<your-public-key>,KEY:<your-private-key> \
+       --snapshots-dir snapshots
 
 nodeop --pause-on-startup   # -x; start with production paused
 ```
@@ -181,7 +207,7 @@ for `enable-stale-production`, and `-x` for `pause-on-startup`.
 
 | Option | Default | Meaning |
 |---|---|---|
-| `read-only-threads` | 0 on a node with `producer-name`, otherwise 3 | Worker threads in the read-only execution pool. Maximum 128. |
+| `read-only-threads` | 3 only on a node that has no `producer-name` and lists `sysio::chain_api_plugin` in its `plugin` options; 0 otherwise | Worker threads in the read-only execution pool. Maximum 128. Must be 0 on a node with `producer-name`: a nonzero value there fails startup with `read-only-threads not allowed on producer node`. |
 | `read-only-write-window-time-us` | `200000` | Microseconds the write window lasts. |
 | `read-only-read-window-time-us` | `60000` | Microseconds the read window lasts. Must be greater than the 10,000 µs minimum. |
 
@@ -189,7 +215,7 @@ for `enable-stale-production`, and `-x` for `pause-on-startup`.
 
 | Option | Default | Meaning |
 |---|---|---|
-| `snapshots-dir` | `snapshots` | Location of the snapshots directory (absolute, or relative to the data dir). |
+| `snapshots-dir` | `snapshots` | Location of the snapshots directory. A relative path resolves against the data dir and is created if it does not exist; an absolute path must already exist, or startup fails with `No such directory '<path>'`. |
 | `snapshot-provider-account` | empty | Account used to sign and submit `votesnaphash` transactions. Setting it enables snapshot provider mode. Cannot be used alongside `producer-name`. |
 
 ## HTTP API
@@ -229,6 +255,8 @@ Lines an operator should recognize:
 - `Exception in read-only thread pool, exiting` and `Exception in producer timer thread, exiting` — either
   quits the node.
 - `Exception during snapshot execution: ...` — quits the node.
+- `FATAL: Snapshot hash disagreement detected (error code 9001)! ...` — the `votesnaphash` attestation was
+  rejected because this node's snapshot differs from the attested record; quits the node.
 - Startup assertion failures name the conflicting option directly: a node cannot have `producer-name`
   configured with `validation-mode` other than `full`, with neither API nor P2P transactions accepted, or with
   `read-mode = irreversible`; finalizers cannot be configured in `read-mode = irreversible`; and
@@ -242,9 +270,10 @@ ninja -C build/debug test_producer_plugin
 ./build/debug/plugins/producer_plugin/test/test_producer_plugin
 ```
 
-The suite covers the implicit production-pause vote tracker, full transaction handling, option parsing and
-validation, block timing calculations, rejection of delayed transactions, and the mockable timers the
-production loop is built on.
+The suite covers the implicit production-pause vote tracker, full transaction handling, block timing
+calculations, rejection of delayed transactions, and the mockable timers the production loop is built on. It
+does not cover this plugin's option parsing or validation: `test_options.cpp` holds one case, and what it
+checks is that `chain_plugin`'s `--state-dir` is honored.
 
 ## Related plugins
 

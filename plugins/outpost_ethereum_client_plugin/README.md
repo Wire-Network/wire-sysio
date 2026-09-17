@@ -35,8 +35,12 @@ outpost_ethereum_client  -- deliver_outbound_envelope / read_inbound_envelope / 
 
 ### Endpoints, signers, and chain ids
 
-Clients come from exactly one of two sources, and configuring both is rejected with
-`Configure exactly one of --outpost-ethereum-client-config-file or --outpost-ethereum-client`.
+Clients come from exactly one of two sources. The check is an exclusive-or, so configuring both **and**
+configuring neither are rejected with the same message, `Configure exactly one of
+--outpost-ethereum-client-config-file or --outpost-ethereum-client`. Because `batch_operator_plugin` and
+`underwriter_plugin` name this plugin in `APPBASE_PLUGIN_REQUIRES`, a node that loads either of them must
+configure an Ethereum client source or it will not start, even if it only intends to serve a Solana
+outpost.
 
 A **command-line spec** is `<client-id>,<signature-provider-id>,<rpc-url>[,<chain-id>]`. With three fields
 the chain id is resolved from the endpoint's `eth_chainId` at startup. With four fields the supplied value —
@@ -46,11 +50,14 @@ it does not. A CLI-configured client carries no local expenditure limits: it is 
 policy.
 
 A **configuration file** is versioned protobuf-JSON validated strictly — unknown fields are rejected, the
-document is capped at 1 MiB, and `schema_version` must be `1`. Every client needs a `connection` with a
-non-empty `client_id`, `signature_provider_id`, and `rpc_url`, plus a non-zero `chain_id`; client ids and
-chain ids must each be unique within the file. A `transaction_policy` is optional, but when present all four
-fields must be set and `max_priority_fee_per_gas_wei` must not exceed `max_fee_per_gas_wei`. File-configured
-chain ids are always verified against `eth_chainId`.
+document is capped at 1 MiB, and `schema_version` must be `1`. The file must declare at least one client.
+Every client needs a `connection` with a `client_id`, a non-empty `signature_provider_id`, and an `rpc_url`,
+plus a non-zero `chain_id`; client ids and chain ids must each be unique within the file. A `client_id` is 1
+to 64 characters drawn from `[A-Za-z0-9._-]`. An `rpc_url` must parse as `http` or `https`, must resolve to a
+host the outbound HTTP layer considers safe, and must carry no `#` fragment. A `transaction_policy` is
+optional, but when present all four fields must be set, each amount must be a canonical decimal string
+(digits only, non-zero, no leading zero), and `max_priority_fee_per_gas_wei` must not exceed
+`max_fee_per_gas_wei`. File-configured chain ids are always verified against `eth_chainId`.
 
 Chain-id resolution is retried before it gives up: initial backoff 200 ms, doubling to a 1 s ceiling, under a
 5 s total budget. Failure raises `plugin_config_exception` naming the client, the sanitized endpoint, and a
@@ -223,9 +230,9 @@ Startup and configuration:
 - `Added Ethereum client (id=...,endpoint=...,chain_id=...)` per successfully constructed client.
 - `Starting outpost Ethereum client plugin` / `Shutdown outpost Ethereum client plugin`.
 - `Rejected Ethereum client configuration (reason_code=...,field=...,observed=...,allowed=...)` at error
-  level when the configuration file fails validation, and
-  `Rejected Ethereum client policy (reason_code=...,field=...,observed=...,allowed=...)` when a transaction
-  policy value is refused. Both rethrow, so the node does not start.
+  level when client configuration fails validation, then rethrown so the node does not start. Policy-value
+  failures reach this line too: the configuration loader converts them into the configuration vocabulary
+  before they escape, with `reason_code=policy_value_invalid`.
 
 Per-client runtime lines are prefixed with the SPI label `outpost_ethereum_client[{chain_code}:{ChainKind}:{chain_id}]`:
 
@@ -263,8 +270,15 @@ ninja -C build/debug outpost_ethereum_client_tool
 ./build/debug/bin/outpost_ethereum_client_tool --signature-provider ... --outpost-ethereum-client ... --ethereum-abi-file ...
 ```
 
-It initializes `signature_provider_manager_plugin`, `outpost_client_plugin`, and this plugin, then exercises
-the first configured client's RPC surface directly. It takes the same options this README documents.
+It is a fixed demonstration against a local anvil chain, not a general RPC probe. It initializes
+`signature_provider_manager_plugin`, `outpost_client_plugin`, and this plugin, then drives the **first**
+configured client through a hard-coded script: it requires at least two `--ethereum-abi-file` entries and
+uses the second for an `OPPEnvelope` event read against a fixed contract address, then uses the first to read
+a counter contract at another fixed address and **sign and broadcast a `setNumber` transaction** that
+increments it. Both addresses are compiled in and match a local anvil deployment; it takes the same options
+this README documents, but there is no option that redirects those addresses. Do not point it at a real
+network: it will spend gas from the configured signer and write to whatever contract happens to sit at that
+counter address.
 
 ## Related plugins
 

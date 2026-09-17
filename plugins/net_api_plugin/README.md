@@ -91,6 +91,13 @@ All five endpoints take a JSON body by POST, run on an HTTP worker thread, and a
 | `/v1/net/connect` | `net_rw` | `"host:port"` | 201 | Add the endpoint as a supplied peer and start connecting to it. Returns the resulting status string. |
 | `/v1/net/disconnect` | `net_rw` | `"host:port"` | 201 | Drop the connection to the endpoint and remove it from the supplied peer set. Returns the resulting status string. |
 
+`status` looks the peer up by an **exact string match** on the address `net_plugin` stored for the connection,
+which is the configured peer address including any `:trx` or `:blk` suffix -- `p2p.example.com:9876:blk` is
+found only by that full string, not by `p2p.example.com:9876`. Inbound connections have no stored address, so
+they cannot be looked up at all and only appear in `connections`. A peer that is not found is not an error: the
+call still answers 201, with the body being the plain string `"connection not found: <host>"` instead of a
+connection record.
+
 ## Diagnostics
 
 The plugin has no logger of its own; its lines go to the default logger, and per-request diagnostics come from
@@ -119,8 +126,12 @@ The plugin has no logger of its own; its lines go to the default logger, and per
 
 ## Tests
 
-The plugin has no `test/` directory. Its registration surface is exercised by `plugin_test`; the peer
-management it forwards to is covered by `test_net_plugin`.
+The plugin has no `test/` directory, and no C++ test binary links it -- `plugin_test` does not, and
+`test_net_plugin` covers `net_plugin` internals rather than the calls registered here (its BP-peering case runs
+against a mock connection manager). The endpoints are covered by the Python integration tests:
+`test_NetApi` in `tests/plugin_http_api_test.py` drives `connect`, `disconnect`, `status`, and `connections`
+over HTTP, and `tests/auto_bp_gossip_peering_test.py` is the only test that exercises `bp_gossip_peers`, on a
+running cluster.
 
 ## Related plugins
 

@@ -17,11 +17,13 @@ stops it. A running service owns two things:
 - **One `boost::asio::thread_pool`** of `--cron-threads` workers, which is where job functions actually run.
 
 Each job carries a schedule, a `std::function<void()>`, and optional metadata. A schedule has six fields, and an
-**empty field is a wildcard** matching every value in its range:
+**empty field is a wildcard** matching every value in its range -- with one exception: an empty `milliseconds`
+expands to `{0}` rather than to all 60 000 values. A schedule whose fields are all empty therefore fires once a
+minute, at millisecond 0.
 
 | Field | Range |
 |---|---|
-| `milliseconds` | 0..59999 (milliseconds within the minute) |
+| `milliseconds` | 0..59999 (milliseconds within the minute); empty means `{0}`, not the whole range |
 | `minutes` | 0..59 |
 | `hours` | 0..23 |
 | `day_of_month` | 1..31 |
@@ -31,6 +33,10 @@ Each job carries a schedule, a `std::function<void()>`, and optional metadata. A
 Each field is a set of three value kinds, mirroring crontab syntax: `exact_value` (a single value, crontab
 `30`), `step_value` (every N, crontab `*/15`), and `range_value` (crontab `1-5`). Values outside the field's
 range are discarded during expansion, and a `step_value` of 0 contributes nothing.
+
+Two things differ from crontab. Schedules are evaluated in **UTC**, not local time -- the candidate time is
+decomposed straight from `system_clock` with no timezone applied. And when both `day_of_month` and
+`day_of_week` are constrained, a day has to match **both**; crontab matches either.
 
 Rather than re-deriving the next fire time on every wake, each job keeps up to **8** pre-computed upcoming
 trigger times (`cron_service::schedule_trigger_count`). The scheduler loop is:
@@ -133,8 +139,8 @@ ninja -C build/debug test_cron_plugin
 
 The `cron_service` suite covers the service end to end without a running node: construction with options and
 basic `add`, millisecond-field triggers firing within the same second, `cancel_all` across multiple jobs, the
-destructor stopping the service cleanly, independent jobs progressing in parallel, `list` filtering by id and
-tag, `expand_field` for exact/step/range/wildcard, step and range schedules, the `next_fire_time` algorithm,
+destructor stopping the service cleanly, independent jobs progressing in parallel, `list` filtering by job id,
+`expand_field` for exact/step/range/wildcard, step and range schedules, the `next_fire_time` algorithm,
 trigger pre-computation, the scheduler waking when a new job is added, and day-of-week schedules.
 
 ## Related plugins

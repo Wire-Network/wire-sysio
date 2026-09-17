@@ -10,10 +10,15 @@ loaded by a bare `nodeop` run, because `nodeop` initializes only `resource_monit
 
 ## How it works
 
-`nodeop` calls `http_plugin::set_defaults` before initialization, fixing three per-executable values: the
+`nodeop` calls `http_plugin::set_defaults` before initialization, fixing the per-executable values: the
 default unix socket path (empty, so unix socket support is off unless `unix-socket-path` is set), the default
-HTTP port (`8888`, which makes the `http-server-address` default `127.0.0.1:8888`), and the `Server` response
-header (`<executable name>/<version string>`).
+HTTP port (`8888`, which makes the `http-server-address` default `127.0.0.1:8888`), the `Server` response
+header (`<executable name>/<version string>`), and whether API categories are supported at all.
+
+Those are `nodeop`'s values, and this document describes `nodeop`. `kiod` runs the same plugin with a
+different set: `unix-socket-path` defaults to `kiod.sock`, the default HTTP port is `0`, so `http-server-address`
+is registered with no default and the server listens only if one is configured, and category support is off, so
+`http-category-address` is not a registered option there at all.
 
 ```
 plugin_initialize                       plugin_startup (posted to the app thread, high priority)
@@ -32,15 +37,18 @@ Handlers reach the plugin through three registration paths, and the path decides
 
 | Registration | Thread | Used for |
 |---|---|---|
-| `add_handler` / `add_api(api, queue, priority)` | posted to the appbase executor, runs on the main application thread in the given `exec_queue` at the given priority | calls that must read chain state under the executor's read window |
+| `add_handler` / `add_api(api, queue, priority)` | posted to the appbase executor, to run in the given `exec_queue` at the given priority. A `read_write` handler runs on the main application thread; a `read_only` handler runs on the main thread too, but also on the read-only thread pool when `--read-only-threads` is greater than 0 | calls that must read chain state under the executor's read window |
 | `add_async_handler` / `add_async_api` | runs inline on an HTTP worker thread | calls that do not touch the controller, or that do their own posting |
 | `add_raw_handler` | inline on an HTTP worker thread, handler owns the connection | binary and file responses (`snapshot_api_plugin` downloads) |
 
-Admission control runs before any work is queued. A request is rejected with a 503 "Busy" response when it
-would push the in-flight byte total past `http-max-bytes-in-flight-mb` or the in-flight request count past
-`http-max-in-flight-requests`. For app-thread handlers the request body is additionally reserved against the
-in-flight byte budget for as long as it sits in the executor queue, and released exactly once when the posted
-work runs, throws, returns early on shutdown, or is discarded.
+Admission control happens in two places. When a connection is accepted, the number of open connections is
+checked against `http-max-in-flight-requests` and a 503 "Busy" response is returned if it is over. For a
+handler posted to the app thread the request body is then checked against `http-max-bytes-in-flight-mb` before
+anything is queued -- a 503 if it would push the in-flight byte total over -- and reserved against that budget
+for as long as it sits in the executor queue, released exactly once when the posted work runs, throws, returns
+early on shutdown, or is discarded. Handlers that run inline on an HTTP worker thread get no request-body
+check. The byte budget is checked once more when the response is sent, so a 503 can come back after the call
+has already executed.
 
 `/v1/node/get_supported_apis` is answered by the HTTP connection handler itself rather than by a registered
 handler: it returns the paths of every handler whose category is enabled on the listener that received the
@@ -48,7 +56,8 @@ request, so it is reachable on every listener and its answer differs per listene
 answered with `{}` plus the configured CORS headers; any other method reaches the handler, and the API
 plugins' calls take a JSON body by POST.
 
-Exceptions thrown by handlers are converted to a JSON `error_results` body by a single shared mapping:
+A handler that catches its own exceptions and calls `http_plugin::handle_exception` -- what the API plugins
+do -- gets them converted to a JSON `error_results` body by a single shared mapping:
 
 | Thrown | Status | `message` |
 |---|---|---|
@@ -62,6 +71,11 @@ Exceptions thrown by handlers are converted to a JSON `error_results` body by a 
 
 `verbose-http-errors` controls how much of the exception log is appended to the body: one detail entry when
 off, up to ten when on.
+
+An exception that escapes a handler never reaches that mapping. It is caught by the connection instead, logged
+at error level, answered with a 500 `Internal Service Error` body, and the connection is closed --
+`keep_alive` is cleared and the socket is shut down immediately after the error response is queued, without
+waiting for the write to complete.
 
 `plugin_shutdown` stops the HTTP thread pool. `SIGHUP` re-reads the `http_plugin` logger configuration.
 
@@ -79,7 +93,7 @@ be named in a `plugin` option, or startup fails with `plugin_config_exception`.
 | `db_size` | `sysio::db_size_api_plugin` |
 | `trace_api` | `sysio::trace_api_plugin` |
 | `prometheus` | `sysio::prometheus_plugin` |
-| `test_control` | `sysio::test_control_plugin` |
+| `test_control` | `sysio::test_control_api_plugin` |
 | `underwriter` | `sysio::underwriter_plugin` |
 
 `node` is the category of endpoints served on every listener; it is what `http-server-address` and
@@ -146,9 +160,9 @@ All of `http_plugin`'s options are config-file options, so each is equally valid
 
 | Option | Default | Meaning |
 |---|---|---|
-| `http-server-address` | `127.0.0.1:8888` | Local IP and port to listen on for incoming HTTP connections. Set to the literal `http-category-address` to enable the `http-category-address` option; leave blank to disable. |
-| `unix-socket-path` | unset | Filename, relative to the data dir, of a unix socket for HTTP RPC; blank disables it. Must not be set when `http-category-address` is used. |
-| `http-category-address` | unset | `category,address` pair binding one API category to one listen address; may be repeated. The address is `<hostname>:port`, `<ipaddress>:port`, or a unix socket path starting with `/`, `./`, or `../`. Valid categories are `chain_ro`, `chain_rw`, `db_size`, `net_ro`, `net_rw`, `producer_ro`, `producer_rw`, `snapshot`, `trace_api`, `prometheus`, `test_control`, `snapshot_ro`, and `underwriter`. |
+| `http-server-address` | `127.0.0.1:8888` | Local IP and port to listen on for incoming HTTP connections. Set to the literal `http-category-address` to enable the `http-category-address` option; leave blank to disable. Under `kiod` the option is registered with no default. |
+| `unix-socket-path` | unset | Filename, relative to the data dir, of a unix socket for HTTP RPC; blank disables it. Must not be set when `http-category-address` is used. Under `kiod` it defaults to `kiod.sock`. |
+| `http-category-address` | unset | `category,address` pair binding one API category to one listen address; may be repeated. The address is `<hostname>:port`, `<ipaddress>:port`, or a unix socket path starting with `/`, `./`, or `../`. Valid categories are `chain_ro`, `chain_rw`, `db_size`, `net_ro`, `net_rw`, `producer_ro`, `producer_rw`, `snapshot`, `trace_api`, `prometheus`, `test_control`, `snapshot_ro`, and `underwriter`. `kiod` does not register this option. |
 
 ### Limits and threads
 
@@ -156,8 +170,8 @@ All of `http_plugin`'s options are config-file options, so each is equally valid
 |---|---|---|
 | `http-threads` | `2` | Number of worker threads in the HTTP thread pool. Must be greater than 0. |
 | `max-body-size` | `2097152` | Maximum body size in bytes accepted for an incoming RPC request. |
-| `http-max-bytes-in-flight-mb` | `500` | Maximum megabytes `http_plugin` uses for in-flight request processing; `-1` for unlimited. A 503 is returned when exceeded. |
-| `http-max-in-flight-requests` | `-1` | Maximum number of concurrently processed requests; `-1` for unlimited. A 503 is returned when exceeded. |
+| `http-max-bytes-in-flight-mb` | `500` | Maximum megabytes `http_plugin` uses for in-flight request processing; `-1` for unlimited. Checked when an app-thread handler is queued and again when the response is sent; a 503 is returned when exceeded. |
+| `http-max-in-flight-requests` | `-1` | Maximum number of concurrently open HTTP connections; `-1` for unlimited. The counter goes up when a session is created and down when it is destroyed, so idle keep-alive connections count against it, and it is checked only when a connection is accepted. A 503 is returned when exceeded. |
 | `http-max-response-time-ms` | `15` | Maximum time on the main thread for processing a request; `-1` for unlimited. API plugins read this value as their per-call deadline. |
 | `http-keep-alive` | `true` | When false, connections are not kept alive even if the client requests it. |
 

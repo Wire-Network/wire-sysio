@@ -17,8 +17,15 @@ A `--signature-provider` option carries one spec:
 
 The four-field form omits `<name>` and the plugin assigns a process-local `key-<n>` instead. `<chain-kind>`
 is one of `wire`, `ethereum`, `solana`, `sui`; `<key-type>` is one of `wire`, `wire_bls`, `ethereum`,
-`solana`, `sui`. `sui` is not implemented and fails with `pending_impl_exception`; an unrecognised value
-fails with `config_parse_error`. `<public-key>` is parsed in the native form of `<key-type>`.
+`solana`, `sui`. Both are read by their `FC_REFLECT_ENUM_WITH_STRIP` reflector, which also accepts the
+unstripped enumerator spelling (`chain_kind_wire`, `chain_key_type_wire_bls`, ...) and `unknown`. A value that
+matches no name is not rejected outright: `from_string` falls back to `lexical_cast<int64_t>`, so a numeric
+spelling of the enumerator is accepted too. Both failure modes throw `fc::bad_cast_exception` — a non-numeric
+unknown name as `invalid name '<value>' in enum 'fc::crypto::chain_kind_t'`, a number outside the enum as
+`invalid index '<n>' in enum 'fc::crypto::chain_kind_t'`. Only `<key-type>` is acted on after the parse:
+`sui` fails with `pending_impl_exception` and `unknown` with `config_parse_error`. `<chain-kind>` is not
+checked again — it is stored on the provider record and used only for lookups. `<public-key>` is parsed in the
+native form of `<key-type>`.
 
 The last field is `<provider-type>:<spec data>`, split on the first colon:
 
@@ -58,15 +65,20 @@ lookups from producer, batch-operator, underwriter, and outpost threads need no 
 
 `chain_plugin` asks the manager for a default `wire` provider when no `wire` provider is configured, and a
 default `wire_bls` provider when `producer-name` is set and no `wire_bls` provider is configured. A
-generated provider is named `<key-type>-default`, and its `KEY:` spec is persisted to
-`<config-dir>/default_signature_providers.json` so the same key survives a restart. That file holds private
-keys: it is written through the secure-file helper (owner-only temporary file, fsync, atomic rename), and a
-pre-existing copy that is group- or world-readable is brought down to owner-only when it is loaded.
+generated provider is named `<key-type>-default` using the reflector's `to_string`, which keeps the enum
+prefix — so the names are `chain_key_type_wire-default` and `chain_key_type_wire_bls-default`. Its `KEY:` spec
+is persisted to `<config-dir>/default_signature_providers.json` so the same key survives a restart. That file
+holds private keys: it is written through the secure-file helper (owner-only temporary file, fsync, atomic
+rename), and a pre-existing copy that is group- or world-readable is brought down to owner-only when it is
+loaded.
 
-Specs are redacted before they reach a log line or an error message: everything after `KEY:` in the final
-field is replaced with `<redacted>`. Only the final field is inspected, so a provider named `KEY:something`
-never triggers redaction, and `KIOD:` / `SSM:` / `KMS:` specs pass through unchanged because they carry no
-inline secret.
+Specs are redacted before they reach an error message: everything after the first `KEY:` that follows the
+first comma is replaced with `<redacted>`, so a key still carrying its `KEY:` marker is masked wherever it sits
+in the spec, not only in the final field. A spec with no comma at all is masked from its first `KEY:`. The
+first field is the name, so a provider named `KEY:something` never triggers redaction, and `KIOD:` / `SSM:` /
+`KMS:` specs pass through unchanged because they carry no inline secret. A private key written without the
+`KEY:` marker cannot be recognised and is therefore not masked — which is why the spec text itself is kept out
+of the initialize logging and out of the private-key and public-key parse errors.
 
 ## Enabling / configuration
 
@@ -111,7 +123,7 @@ current defaults, and the `signature-provider` help text enumerates every provid
 | Option | Default | Meaning |
 |---|---|---|
 | `signature-provider` | unset | One signing provider, as `<name>,<chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>`. Repeatable; the four-field form drops `<name>` and receives a process-local `key-<n>`. |
-| `signature-provider-kiod-timeout` | `5` | Maximum time in milliseconds allowed for a request to a `KIOD:` provider. A negative value means no deadline. |
+| `signature-provider-kiod-timeout` | `5` | Maximum time in milliseconds allowed for a request to a `KIOD:` provider. A negative value passes `time_point::maximum()` instead of a deadline, which leaves the HTTP client's own defaults in force — 30 s total, 10 s connect — rather than removing the bound. |
 
 Both options are accepted in `config.ini` and on the command line. The plugin registers no other options.
 
@@ -120,9 +132,10 @@ Both options are accepted in `config.ini` and on the command line. The plugin re
 The plugin declares no logger of its own, so its output goes to fc's default logger — the one `logging.json`
 names `default`.
 
-- **Initialize**, at debug level: `Registering signature provider from spec: <spec>` (redacted) followed by
-  `Registered signature provider (<name>): <public-key>` for each spec, and
-  `Registering default signature provider spec (type=<key-type>)` when a default is generated.
+- **Initialize**, at debug level: `Registered signature provider (<name>): <public-key>` for each spec — the
+  only per-spec line — and `Registering default signature provider spec (type=<key-type>)` when a default is
+  generated. The spec itself is never logged: a malformed one can carry a private key that redaction cannot
+  recognise.
 - **Startup**, at info level: `Running signature-provider startup probes for <n> signing key(s)`, then
   either `Signature-provider startup probes passed` or
   `Signature-provider startup probes passed; <n> key(s) hit a transient error and will be re-checked on the first sign`.

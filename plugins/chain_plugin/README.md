@@ -2,18 +2,25 @@
 
 `chain_plugin` owns the blockchain itself. It constructs and configures the `controller` — block log, chain
 state database, fork database, WASM runtime, protocol features, whitelists and blacklists — brings it up from
-genesis, a snapshot, or existing state, and relays the controller's signals onto the appbase channels that
-every other plugin subscribes to. `nodeop` initializes it on every run alongside `resource_monitor_plugin`,
-`net_plugin`, and `producer_plugin`, so there is no `plugin =` line to add; it pulls in
-`signature_provider_manager_plugin` through `APPBASE_PLUGIN_REQUIRES`, which in turn pulls in
-`http_client_plugin`. It registers no HTTP endpoints of its own — `chain_api_plugin` publishes the
+genesis, a snapshot, or existing state, and relays the controller's signals onto the appbase channels
+declared in `chain_interface`. Those channels have few subscribers: `batch_operator_plugin` and
+`underwriter_plugin` take `irreversible_block` as their sync gate, and nothing else subscribes to any of
+them — `net_plugin` connects to the controller's signals directly instead. `nodeop` initializes it on every
+run alongside `resource_monitor_plugin`, `net_plugin`, and `producer_plugin`, so there is no `plugin =` line
+to add; it pulls in `signature_provider_manager_plugin` through `APPBASE_PLUGIN_REQUIRES`, which in turn
+pulls in `http_client_plugin`. It registers no HTTP endpoints of its own — `chain_api_plugin` publishes the
 `chain_apis::read_only` and `chain_apis::read_write` objects this plugin hands out.
 
 ## How it works
 
 ```
 plugin_initialize
+  |  register default signature providers: with no `wire` provider configured, a key is generated and
+  |     saved to <config-dir>/default_signature_providers.json; the same happens for a `wire_bls` key
+  |     when producer-name is set
   |  read every option into controller::config (dirs, limits, runtime, read/validation mode, lists)
+  |  --snapshot-endpoint: download + hash-check the snapshot, to be loaded like --snapshot
+  |  resolve the chain id and, with no state, the genesis to start from
   |  construct the controller and its chain id
   |  construct the optional side databases:
   |     trx_finality_status_processing   transaction-finality-status-max-storage-size-gb > 0
@@ -25,7 +32,6 @@ plugin_initialize
   |  add chain indices
   |
 plugin_startup
-  |  --snapshot-endpoint: download + hash-check, then load like --snapshot
   |  controller::startup( from snapshot | from genesis | from existing state )
   |  account_query_db constructed here (enable-account-queries)
   |
@@ -53,23 +59,34 @@ runtime
 `chain_plugin` starts no thread of its own; it sizes the controller's pools:
 
 - `chain-threads` — the controller thread pool, used for signature recovery and other parallel chain work.
-- `vote-threads` — the vote processor pool. Setting it to 0 disables voting, and votes are then not propagated
-  on the P2P network. When `producer-name` is configured and `vote-threads` is not given, it is set to 4 and
-  the choice is logged.
+- `vote-threads` — the vote processor pool. On a node with `producer-name`, voting cannot be turned off: both
+  an unset `vote-threads` and an explicit `vote-threads = 0` are replaced by 4, and the choice is logged.
+  Without `producer-name`, an unset `vote-threads` leaves the pool at 0, and a node with no vote threads
+  accepts no votes — `net_plugin` drops every vote a peer sends and propagates none. Give such a node an
+  explicit `vote-threads` above 0 to have it carry votes.
 - `sys-vm-oc-compile-threads` — tier-up compilation threads, on builds with the SYS VM OC runtime.
 
 ### Startup sources
 
-The node comes up from exactly one of three sources, and the CLI options select which:
+The CLI options select where the node comes up from:
 
 - **Existing state** — the default.
+- **Genesis** — what a node with no chain state falls back to. The genesis state comes from `blocks.log` when
+  it holds one, otherwise from `--genesis-json` (optionally retimed with `--genesis-timestamp`), otherwise
+  from the built-in default genesis. The default genesis is built from this node's own keys, so on a node
+  with `producer-name` it needs a `wire_bls` finalizer key and startup fails when none is configured.
 - **A snapshot file** — `--snapshot <path>`. Operator-trusted; no attestation is verified.
 - **A snapshot endpoint** — `--snapshot-endpoint <url>`, which downloads and hash-checks a snapshot from a
-  serving node and then loads it. This path is not trusted the same way: the snapshot must contain readable,
-  enabled on-chain attestation state, and after the node syncs past the snapshot's height the loaded block id
-  and root hash are verified against the on-chain attestation record on each finalized block. A failure to
-  verify within the grace window stops the node rather than continue on an unverified snapshot. The option
-  requires an empty database; use `--delete-all-blocks` to clear existing data.
+  serving node and then loads it. This path is not trusted the same way, and it carries hard constraints. The
+  endpoint must serve a snapshot taken at a block number that is a multiple of 25000, because only those
+  heights are attested on chain, and the snapshot must contain readable, enabled on-chain attestation state.
+  After the node syncs past the snapshot's height, the loaded block id and root hash are checked against the
+  on-chain attestation record on each finalized block: a record that does not match the loaded snapshot stops
+  the node immediately, with no grace, while a record that has not appeared yet keeps verification pending.
+  Verification only concludes once the node has caught up to the live tip: until then every finalized block
+  simply retries, with no limit. Past that point a missing record is tolerated for a grace window of 12,500
+  finalized blocks beyond the snapshot height before the node is stopped. The option requires an empty
+  database; use `--delete-all-blocks` to clear existing data.
 
 Both snapshot paths share the chain-state size setting as their download and state ceiling
 (`--chain-state-db-size-mb`), and the endpoint path accepts per-caller HTTPS transport overrides
@@ -90,7 +107,7 @@ flag is fixed when `chain_plugin` initializes, because appbase runs that before 
 | Feature | Enabled by | Effect |
 |---|---|---|
 | Account queries | `enable-account-queries = true` | Builds `account_query_db` at startup and lets `chain_api_plugin` register `/v1/chain/get_accounts_by_authorizers`. A failure to build it is logged and the feature is left off; the node still starts. |
-| Transaction retry | `transaction-retry-max-storage-size-gb` above 0 | Re-sends an incoming transaction to the network if it is not seen in a block; backs `send_transaction2`'s `retry_trx`. |
+| Transaction retry | `transaction-retry-max-storage-size-gb` above 0 | Re-sends a transaction to the network if it is not seen in a block. Only transactions submitted through `send_transaction2` with `retry_trx: true` are tracked, not every incoming transaction. Setting the option on a node with `producer-name` fails startup. |
 | Transaction finality status | `transaction-finality-status-max-storage-size-gb` above 0 | Tracks where a transaction stands relative to head and LIB, and lets `chain_api_plugin` register `/v1/chain/get_transaction_status`. |
 | Deep mind logging | `deep-mind = true` | Emits the deep-mind trace stream on unbuffered `stdout`. Requires both `api-accept-transactions = false` and `p2p-accept-transactions = false`. |
 
@@ -152,15 +169,15 @@ them change how the node starts or make it print something and exit.
 | `finalizers-dir` | `finalizers` | Location of the finalizer safety data directory (absolute, or relative to the data dir). |
 | `protocol-features-dir` | `protocol_features` | Location of the protocol features directory (absolute, or relative to the config dir). |
 | `blocks-retained-dir` | unset | Location of the retained blocks directory (absolute, or relative to `blocks-dir`). Empty means the blocks dir itself. |
-| `blocks-archive-dir` | unset | Location of the blocks archive directory (absolute, or relative to `blocks-dir`). Empty means blocks past the retained limit are deleted. Files here are entirely under the operator's control and are not accessed by `nodeop` again. |
+| `blocks-archive-dir` | `archive`, once any split option is set | Location of the blocks archive directory (absolute, or relative to `blocks-dir`). Leaving it unset does not mean deletion: as soon as any of `blocks-retained-dir`, `blocks-log-stride`, or `max-retained-block-files` is set, the archive dir defaults to `archive` and files past the retained limit are moved there. Only an explicitly empty value makes them be deleted instead. Files here are entirely under the operator's control and are not accessed by `nodeop` again. |
 
 ### Block log retention
 
 | Option | Default | Meaning |
 |---|---|---|
 | `blocks-log-stride` | unset | Split the block log when the head block number is a multiple of the stride. The current log and index are renamed `<blocks-retained-dir>/blocks-<start>-<end>.log/index` and a new current pair is created. |
-| `max-retained-block-files` | unset | Maximum number of block files to retain so their blocks remain queryable. Past the limit the oldest file is moved to the archive dir, or deleted when no archive dir is set. Retained files must not be manipulated by hand. |
-| `block-log-retain-blocks` | unset | When greater than 0, periodically prune the block log to the configured number of most recent blocks. When 0, no blocks are written to the block log and the file is removed after startup. |
+| `max-retained-block-files` | unset | Maximum number of block files to retain so their blocks remain queryable. Past the limit the oldest file is moved to the archive dir, which defaults to `archive`; it is deleted only when `blocks-archive-dir` is set to an explicitly empty value. Retained files must not be manipulated by hand. |
+| `block-log-retain-blocks` | unset | When greater than 0, periodically prune the block log to the configured number of most recent blocks; a value above 0 requires a file system that supports hole punching, and startup fails when it does not. When 0, no blocks are written to the block log and the file is removed after startup. Cannot be combined with `blocks-retained-dir`, `blocks-archive-dir`, `blocks-log-stride`, or `max-retained-block-files` — startup fails when it is. |
 
 ### Sizing and threads
 
@@ -169,7 +186,7 @@ them change how the node starts or make it print something and exit.
 | `chain-state-db-size-mb` | `1024` | Maximum size in MiB of the chain state database. Also the maximum accepted snapshot download size. |
 | `chain-state-db-guard-size-mb` | `128` | Shut the node down safely when free space in the chain state database drops below this size in MiB. |
 | `chain-threads` | `4` | Number of worker threads in the controller thread pool. Must be greater than 0. |
-| `vote-threads` | unset | Number of worker threads in the vote processor pool. 0 disables voting and stops vote propagation on P2P. Defaults to 4 on nodes with `producer-name` configured. |
+| `vote-threads` | unset | Number of worker threads in the vote processor pool. On a node with `producer-name` both an unset value and an explicit 0 are replaced by 4, so voting cannot be disabled there. Elsewhere, unset leaves the pool at 0 and the node neither accepts nor propagates votes on P2P. |
 | `abi-serializer-max-time-ms` | `15` | Maximum ABI serialization time allowed, in milliseconds. |
 | `signature-cpu-billable-pct` | `50` | Percentage of actual signature-recovery CPU to bill, as a whole number. |
 | `maximum-variable-signature-length` | `16384` | Subjective limit, in bytes, on the variable components of a variable-length signature. |
@@ -184,7 +201,7 @@ them change how the node starts or make it print something and exit.
 | `native-contract` | unset | `account:/path/to/contract_native.so` — route a contract's execution through a native shared object for debugger support; may be repeated. State data is copied into `.native-debug/` directories to protect the originals. Registered only on builds with the native module runtime. |
 | `sys-vm-oc-cache-size-mb` | `1024` | Maximum size in MiB of the SYS VM OC code cache. Registered only on builds with the OC runtime. |
 | `sys-vm-oc-compile-threads` | `1` | Threads used for SYS VM OC tier-up. Must be non-zero. Registered only on builds with the OC runtime. |
-| `sys-vm-oc-enable` | `auto` | SYS VM OC tier-up: `auto` enables it for `sysio.*` accounts, read-only transactions, and everywhere except producers applying blocks; `all` enables it for all contract execution; `none` disables it. Registered only on builds with the OC runtime. |
+| `sys-vm-oc-enable` | `auto` | SYS VM OC tier-up: `auto` always uses OC for `sysio.*` accounts and for the `sys-vm-oc-whitelist` suffixes; every other account gets OC only when a non-producing node applies a block, or inside a read-only transaction. Speculative execution, `compute_transaction`, and block building stay on the baseline runtime for those accounts. `all` enables it for all contract execution; `none` disables it. Registered only on builds with the OC runtime. |
 | `sys-vm-oc-whitelist` | `wire` | Account suffixes tiered up under `sys-vm-oc-enable = auto`; may be repeated. Registered only on builds with the OC runtime. |
 
 ### Read, validation, and transaction acceptance
@@ -217,7 +234,7 @@ them change how the node starts or make it print something and exit.
 | Option | Default | Meaning |
 |---|---|---|
 | `enable-account-queries` | `false` | Enable queries that find accounts by various metadata, backing `/v1/chain/get_accounts_by_authorizers`. |
-| `transaction-retry-max-storage-size-gb` | unset | Maximum size in GiB allocated to transaction retry. Any value above 0 enables the feature. |
+| `transaction-retry-max-storage-size-gb` | unset | Maximum size in GiB allocated to transaction retry. Any value above 0 enables the feature, and only transactions sent through `send_transaction2` with `retry_trx: true` are tracked. Setting the option at all on a node with `producer-name` fails startup. |
 | `transaction-retry-interval-sec` | `20` | How often, in seconds, to resend an incoming transaction that has not been seen in a block. Must be at least twice `p2p-dedup-cache-expire-time-sec`. |
 | `transaction-retry-max-expiration-sec` | `120` | Maximum transaction expiration eligible for retry. Must be larger than `transaction-retry-interval-sec`. |
 | `transaction-finality-status-max-storage-size-gb` | unset | Maximum size in GiB allocated to transaction finality status. Any value above 0 enables the feature. |
@@ -255,7 +272,7 @@ process-wide `outbound-http-*` fallback that `http_client_plugin` registers.
 | `truncate-at-block` | `0` | Stop hard replay or block-log recovery at this block number when non-zero. Combined with `terminate-at-block`, prunes received blocks from the fork database on exit. |
 | `terminate-at-block` | `0` | Stop the node after reaching this block number when non-zero. To pause at a block instead, use `/v1/producer/pause_at_block`. |
 | `snapshot` | unset | File to read the snapshot state from. |
-| `snapshot-endpoint` | unset | Fetch a snapshot from a URL and bootstrap. `http(s)://host:port` fetches the latest snapshot; `http(s)://host:port/50000` fetches the snapshot at block 50000. Requires an empty database. |
+| `snapshot-endpoint` | unset | Fetch a snapshot from a URL and bootstrap. `http(s)://host:port` fetches the latest snapshot; `http(s)://host:port/50000` fetches the snapshot at block 50000. The served snapshot's block number must be a multiple of 25000, since only those heights are attested on chain. Requires an empty database. |
 
 ## HTTP API
 
@@ -277,11 +294,14 @@ Lines an operator should recognize:
 - Startup: `starting chain in read/write mode`, then `Blockchain started; head block is #<n>` — with
   `genesis timestamp is <t>` appended when the node started from genesis.
 - Snapshot load: one line naming the loaded block number, and for `--snapshot-endpoint` its root hash.
-- Snapshot attestation: `FATAL: Could not read the on-chain snapshot attestation for block #<n> after syncing
-  <k> blocks past it.` — the node has been stopped rather than continue with an unverified snapshot. A
-  configuration-check failure instead tells the operator to delete chain state before restarting without
-  `--snapshot-endpoint`.
-- `Setting vote-threads to 4 on producing node`, when `producer-name` is set and `vote-threads` was not given.
+- Snapshot attestation, on success: `Snapshot attestation verified successfully for block #<n>`. The same
+  check has four ways to stop the node instead, each logged at FATAL: `Could not read the on-chain snapshot
+  attestation for block #<n> after syncing <k> blocks past it.`, `No attested snapshot record found for
+  block #<n> after syncing <k> blocks past it.`, `Snapshot attestation mismatch for block #<n>!`, and `Error
+  verifying snapshot attestation for block #<n>`. Each says the node has been stopped rather than continue
+  with an unverified snapshot. A configuration-check failure instead tells the operator to delete chain state
+  before restarting without `--snapshot-endpoint`.
+- `Setting vote-threads to 4 on producing node`, when `producer-name` is set and `vote-threads` is unset or 0.
 - `Unable to enable account queries` — logged and dropped; the node starts with the feature off.
 - Native contract debugging, when configured: `Native debug: <account> (code_hash=...) -> <path>` per contract
   and a count at the end.
@@ -315,8 +335,9 @@ VM OC whitelist on builds that have it, and the three side databases: `account_q
   `/v1/chain/*`.
 - [`producer_plugin`](../producer_plugin/README.md) — produces and applies blocks against this controller, and
   owns snapshot creation and scheduling.
-- [`net_plugin`](../net_plugin/README.md) — propagates the blocks, transactions, and votes this plugin
-  publishes on its channels.
+- [`net_plugin`](../net_plugin/README.md) — propagates blocks, transactions, and votes. It connects to this
+  plugin's controller signals directly rather than through the appbase channels, and subscribes only to
+  `transaction_ack`.
 - `signature_provider_manager_plugin` — required dependency; supplies signing providers, and brings in
   `http_client_plugin`, which registers the process-wide `outbound-http-*` options.
 - [`snapshot_api_plugin`](../snapshot_api_plugin/README.md) — serves the snapshots that `--snapshot-endpoint`

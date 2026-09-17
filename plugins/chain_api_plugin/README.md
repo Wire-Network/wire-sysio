@@ -27,13 +27,15 @@ chain_api_plugin::plugin_startup
 Three things are decided at registration time and visible to operators:
 
 - **Which thread runs a call.** Most endpoints are registered with `add_api(..., exec_queue::read_only)`, so
-  the call is posted onto the main application thread's read-only queue and runs inside the controller's read
-  window. `get_info`, `get_accounts_by_authorizers`, `send_read_only_transaction`, `get_raw_block`, and
+  the call goes on the read-only queue, whose tasks run in parallel on the read-only thread pool as well as on
+  the main application thread, for as long as nothing from the read-write queue is executing.
+  `get_info`, `get_accounts_by_authorizers`, `send_read_only_transaction`, `get_raw_block`, and
   `get_block_header` are registered with `add_async_api` and run on an `http_plugin` worker thread.
   `get_block`, `get_account`, and `get_table_rows` run on the app thread but return a function that is posted
   back onto the HTTP thread pool to do the final serialization, keeping ABI conversion off the app thread.
   Transaction calls run asynchronously: keys are recovered in parallel, then the work is posted to the
-  read-write queue (or, for `send_read_only_transaction`, the read-exclusive queue).
+  `trx_read_write` queue — a separate app-thread queue that runs only when no `read_write` task is pending —
+  or, for `send_read_only_transaction`, to the read-exclusive queue.
 - **Which category a call belongs to.** `/v1/chain/get_info` is registered under the `node` category, so it is
   reachable on every listener, exactly like `/v1/node/get_supported_apis`. Read calls are `chain_ro`; the four
   transaction-submission calls are `chain_rw`. With `--http-category-address` this is what lets a node publish
@@ -57,6 +59,14 @@ so `tracked_votes` can skip work on a node that serves no chain reads.
 `chain_api_plugin` registers no options of its own. Everything that shapes its behavior comes from
 `chain_plugin` (which calls are available, deadlines, ABI serialization time) and `http_plugin` (addresses,
 threads, limits).
+
+Two further settings decide whether a registered call works rather than whether it exists:
+
+- `send_read_only_transaction` fails with `read-only transactions execution not enabled on API node` unless
+  `read-only-threads` is greater than 0. A producing node cannot set that option, so the call is unavailable
+  there.
+- Every `chain_rw` call is refused with `Not allowed, node has api-accept-transactions = false` when
+  `api-accept-transactions = false`: each handler validates that flag before it computes its deadline.
 
 ```ini
 plugin = sysio::chain_api_plugin
@@ -119,24 +129,27 @@ Every endpoint takes a JSON body by POST. "Params" below names the fields of the
 | `/v1/chain/get_raw_block` | `block_num_or_id` | 200 | The same block without ABI decoding. Runs on an HTTP thread. |
 | `/v1/chain/get_block_info` | `block_num` | 200 | Block header summary for one block number. |
 | `/v1/chain/get_block_header` | `block_num_or_id`, `include_extensions` | 200 | Block id and signed header; extensions are read off disk only when requested. Runs on an HTTP thread. |
-| `/v1/chain/get_block_header_state` | `block_num_or_id` | 200 | Fork-database header state for a reversible block. |
+| `/v1/chain/get_block_header_state` | `block_num_or_id` | 200 | Block identity and header, taken from the fork database (the best branch when looked up by number, any branch when looked up by id) and otherwise from the block log, so the block need not be reversible. The response carries `block_num`, `id`, and `header` only. |
 | `/v1/chain/get_table_rows` | `code`, `table`, `scope`, `json`, `find`, `index_name`, `lower_bound`, `upper_bound`, `limit`, `reverse`, `show_payer`, `values_only`, `time_limit_ms` | 200 | Paged contract table scan. The result carries `more` and `next_key` for pagination; the page is also bounded by the call deadline. |
 | `/v1/chain/get_table_by_scope` | `code`, `table`, `lower_bound`, `upper_bound`, `limit`, `reverse`, `time_limit_ms` | 200 | Enumerate the scopes a contract's tables occupy. |
 | `/v1/chain/get_currency_balance` | `code`, `account`, `symbol` (optional) | 200 | Token balances held by an account in a token contract. |
 | `/v1/chain/get_currency_stats` | `code`, `symbol` | 200 | Supply, max supply, and issuer for one token symbol. |
-| `/v1/chain/get_producers` | `json`, `lower_bound`, `limit`, `time_limit_ms` | 200 | Paged producer rows plus total producer vote weight. |
+| `/v1/chain/get_producers` | `json`, `lower_bound`, `limit`, `time_limit_ms` (all ignored) | 200 | One row per producer in the active schedule, always in a single response: none of the four params is read, `more` is never set, and `total_producer_vote_weight` is always 0 because the rows come from the schedule rather than from a vote tally. |
 | `/v1/chain/get_producer_schedule` | none | 200 | Active and pending producer schedules. |
 | `/v1/chain/get_finalizer_info` | none | 200 | Active and pending finalizer policies, plus the last tracked vote for each finalizer in them. |
-| `/v1/chain/get_activated_protocol_features` | `lower_bound`, `upper_bound`, `search_by_block_num`, `reverse` (all optional) | 200 | Protocol features activated on this chain, paged via `more`. |
+| `/v1/chain/get_activated_protocol_features` | `lower_bound`, `upper_bound`, `search_by_block_num`, `reverse` (all optional) | 200 | Every protocol feature activated on this chain within the requested bounds, in one response. It is not paged: `limit` and `time_limit_ms` are ignored and `more` is never set. |
 | `/v1/chain/get_consensus_parameters` | none | 200 | Current chain configuration and WASM configuration. |
 | `/v1/chain/get_required_keys` | `transaction`, `available_keys` | 200 | Subset of the supplied keys that is required to authorize the transaction. |
 | `/v1/chain/get_transaction_id` | a transaction object | 200 | Transaction id computed from the supplied transaction. Action `data` must be un-exploded hex. |
 | `/v1/chain/compute_transaction` | `transaction` | 200 | Execute a transaction speculatively and return its trace without submitting it. |
-| `/v1/chain/send_read_only_transaction` | `transaction` | 200 | Execute a read-only transaction. The handler runs on an HTTP thread and posts the execution onto the read-exclusive queue. |
+| `/v1/chain/send_read_only_transaction` | `transaction` | 200 | Execute a read-only transaction. The handler runs on an HTTP thread and posts the execution onto the read-exclusive queue. **Fails unless `read-only-threads` is greater than 0**, which a producing node cannot configure. |
 | `/v1/chain/get_accounts_by_authorizers` | `accounts`, `keys` | 200 | Accounts whose permissions are authorized by the supplied accounts or keys. **Registered only when `enable-account-queries = true`.** |
 | `/v1/chain/get_transaction_status` | `id` | 200 | Where a transaction stands relative to head and LIB, with the earliest block still tracked. **Registered only when the transaction finality status feature is enabled.** |
 
 ### Read-write (`chain_rw`)
+
+All four calls are refused with `Not allowed, node has api-accept-transactions = false` when
+`api-accept-transactions = false`.
 
 | URL | Params | Code | Purpose |
 |---|---|---|---|
@@ -160,8 +173,11 @@ from `http_plugin`'s `http_plugin` logger.
 
 ## Tests
 
-The plugin has no `test/` directory. Its registration surface is exercised by `plugin_test` and by the chain
-API tests under `unittests`; the API implementations it forwards to are covered by `test_chain_plugin`.
+The plugin has no `test/` directory, and no C++ test target exercises it: `plugin_test` does not link it and
+nothing under `unittests` references it. Its endpoints are covered end to end by
+`tests/plugin_http_api_test.py` (`test_ChainApi`), which drives a running node over HTTP. The API
+implementations it forwards to are covered by `plugin_test` (`tests/get_table_tests.cpp`,
+`tests/get_producers_tests.cpp`, and their siblings).
 
 ## Related plugins
 

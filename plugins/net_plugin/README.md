@@ -49,7 +49,11 @@ violation is a hard failure rather than silent corruption.
   `producer_plugin` publishes. `p2p-dedup-cache-expire-time-sec` bounds how long a transaction is remembered
   for duplicate suppression — `chain_plugin`'s transaction retry interval must be at least twice this value.
 - **Votes.** Finalizer votes are broadcast from the controller's `aggregated_vote` and `voted_block` signals.
-  Vote propagation is gated by `chain_plugin`'s `vote-threads`: at 0, votes are not propagated.
+  Vote handling is gated by `chain_plugin`'s `vote-threads`, read once at startup: at 0 an incoming vote is
+  dropped and nothing is relayed. `vote-threads` has no option default — the pool size is resolved only when
+  `producer-name` or `vote-threads` is present. On a node with `producer-name`, an unset value and an explicit
+  0 are both replaced by 4; without `producer-name`, unset leaves the pool at 0, so a plain relay drops
+  incoming votes unless `vote-threads` is set explicitly.
 
 ### Listen endpoints
 
@@ -64,26 +68,46 @@ Duplicate listen endpoints are removed and the removal is logged. `p2p-server-ad
 externally reachable address advertised in handshakes and is paired **positionally** with
 `p2p-listen-endpoint`, so order matters and it may not be given more times than there are listen endpoints.
 When a listen host is a wildcard (`0.0.0.0` or `[::]`) and no server address is given, the host's own name is
-advertised instead.
+advertised instead. Which of the paired addresses a handshake carries depends on the direction: an outbound
+connection advertises the first address, while an inbound connection advertises the address paired with the
+listen endpoint it arrived on.
 
 ### Peer discovery and authentication
 
-Three mechanisms add peers beyond the static `p2p-peer-address` list:
+Two mechanisms add peers beyond the static `p2p-peer-address` list:
 
 - **`p2p-auto-bp-peer`** — `bp_account,host:port[:trx|:blk]`. The node connects to that producer's endpoint
   automatically whenever the account is in the producer schedule. These entries are not gossiped.
 - **`p2p-bp-gossip-endpoint`** — `bp_account,inbound_endpoint,outbound_ip_address`. The producer's peer key is
-  read from the on-chain `peerkeys` table, registered there with the `regpeerkey` action; the private half
-  must be available as a `signature-provider`, and startup fails with `signature-provider of associated key
-  required for p2p-bp-gossip-endpoint` when it is not. The inbound endpoint is normally this node's listen
-  endpoint, and the outbound IP address is what peers use to allow this node through a firewall.
-- **`allowed-connection` plus `peer-key` / `peer-private-key`** — the connection allow-list. Values combine:
-  `any` accepts anyone, `producers` accepts nodes presenting a producer key, `specified` accepts only the
-  listed `peer-key` values, and `none` accepts none. `specified` requires at least one `peer-key`, or startup
-  fails.
+  read from the on-chain `peerkeys` table, registered there with the `regpeerkey` action, and the private half
+  must be available as a `signature-provider` so this node can sign the gossip message it publishes. The
+  startup check only asserts that some `wire` signature provider is registered, and `chain_plugin` registers a
+  default `wire` provider when none is configured, so it does not catch a missing gossip key. That failure
+  appears at runtime instead. The gossip key has to be reachable through `producer_plugin`'s signature-provider
+  set, which is populated only when `producer-name` is configured; when it is missing there, signing the gossip
+  message throws `producer_priv_key_not_found` — `Local producer has no private key in config.ini corresponding
+  to public key "<key>"` — which surfaces as `Unable to update bp producer peers, error: ...` on `p2p_log`, and
+  the endpoints are never advertised. The inbound endpoint is normally this node's listen endpoint, and the
+  outbound IP address is what peers use to allow this node through a firewall.
 
-`p2p-max-nodes-per-host` caps how many client nodes may connect from a single /24 (IPv4) or /48 (IPv6) subnet;
-`max-clients` caps accepted inbound connections overall, with 0 meaning no limit.
+Which peers may connect is a separate question, answered by the connection allow-list: `allowed-connection`
+plus `peer-key` / `peer-private-key`. Repeated values are combined; `none` resets the policy to accept nobody,
+but only what precedes it, so a value listed after `none` is still combined in. `any` on its own accepts every
+peer without authentication. `producers` and `specified` both turn authentication on — including when either
+is combined with `any` — and they share one authorization check, which accepts a key that is listed in
+`peer-key`, is the public half of a `peer-private-key` pair, or
+is one of this node's own producer signing keys. Those producer keys are loaded only when `producer-name` is
+configured, so on a non-producing node `producers` admits nothing by itself. `specified` additionally requires
+at least one `peer-key`, or startup fails.
+
+`p2p-max-nodes-per-host` caps how many client nodes may connect from a single /24 (IPv4) or /48 (IPv6) subnet,
+and a connection over that cap is closed outright. `max-clients` caps accepted inbound connections overall,
+with 0 meaning no limit. Reaching that limit does not simply refuse the new peer: the node looks for the
+lowest-scoring inbound non-BP connection that is below the eviction threshold, and if it finds one it closes
+that peer and accepts the new connection, logging `Evicting low-score peer <id> (score <n>)`. Only when no
+peer is evictable is the new socket closed, with `max_client_count <n> exceeded, no evictable peer, closing`.
+With BP peering enabled the accept-time check is skipped and the limit is enforced after the first handshake
+instead — a peer's BP status is not known before then — and it counts only inbound non-BP connections.
 
 ## Enabling / configuration
 
@@ -111,11 +135,13 @@ p2p-accept-transactions = false
 max-clients = 200
 ```
 
-A producer connecting automatically to its peers, and gossiping its own endpoint:
+A producer connecting automatically to its peers, and gossiping its own endpoint. `p2p-auto-bp-peer` names
+another producer's account and endpoint — naming this node's own account and host makes it dial itself, and
+the handshake closes the connection as a self-connection:
 
 ```ini
 p2p-listen-endpoint = 0.0.0.0:9876
-p2p-auto-bp-peer = <your-account>,p2p.<your-host>:9876
+p2p-auto-bp-peer = <peer-account>,p2p.<peer-host>:9876
 p2p-bp-gossip-endpoint = <your-account>,<your-host>:9876,198.51.100.1
 ```
 
@@ -149,7 +175,7 @@ as a `nodeop --<name>` argument.
 | Option | Default | Meaning |
 |---|---|---|
 | `p2p-listen-endpoint` | `0.0.0.0:9876:0` | `host:port[:trx\|:blk][:<rate-cap>]` to listen on for incoming p2p connections; may be repeated. An empty value disables listening. `trx` / `blk` tells peers to send only transactions or only blocks. The rate cap limits per-connection block-sync bandwidth; a bare number is bytes per second, and `B/s`, `KB/s`, `MB/s`, `GB/s`, `TB/s`, `KiB/s`, `MiB/s`, `GiB/s`, `TiB/s` suffixes are accepted. |
-| `p2p-server-address` | derived from `p2p-listen-endpoint` | Externally accessible `host:port` identifying this node. May be given as many times as `p2p-listen-endpoint` and is paired with it positionally; the first address is used in handshakes. |
+| `p2p-server-address` | derived from `p2p-listen-endpoint` | Externally accessible `host:port` identifying this node. May be given as many times as `p2p-listen-endpoint` and is paired with it positionally. An outbound connection advertises the first address; an inbound connection advertises the address paired with the listen endpoint it arrived on. |
 | `agent-name` | `Wire Agent` | Name supplied to identify this node to peers. |
 | `max-clients` | `25` | Maximum number of clients whose connections are accepted; 0 for no limit. |
 | `p2p-max-nodes-per-host` | `1` | Maximum number of client nodes from any single /24 (IPv4) or /48 (IPv6) subnet. |
@@ -169,7 +195,7 @@ as a `nodeop --<name>` argument.
 
 | Option | Default | Meaning |
 |---|---|---|
-| `allowed-connection` | `any` | `any`, `producers`, `specified`, or `none`. `producers` and `specified` may be combined. `specified` requires at least one `peer-key`; `producers` does not. |
+| `allowed-connection` | `any` | `any`, `producers`, `specified`, or `none`; may be repeated, and the values are combined. `any` alone accepts every peer without authentication; combining it with `producers` or `specified` still requires authentication. `producers` and `specified` share one check that accepts `peer-key` values, `peer-private-key` public halves, and this node's own producer signing keys (present only with `producer-name`). `specified` requires at least one `peer-key`; `producers` does not. `none` resets the accumulated policy to accept nobody, but only what precedes it — a value listed after `none` is still combined in. |
 | `peer-key` | unset | Public key of a peer allowed to connect; may be repeated. |
 | `peer-private-key` | unset | `[PublicKey, WIF private key]` tuple; may be repeated. |
 
@@ -188,7 +214,7 @@ as a `nodeop --<name>` argument.
 
 | Option | Default | Meaning |
 |---|---|---|
-| `peer-log-format` | `["${_peer} - ${_sid}" - ${_cid} ${_ip}:${_port}] ` | Format string prefixed to messages about a peer. Variables: `_peer` endpoint name, `_name` self-reported name, `_cid` assigned connection id, `_id` self-reported 64-hex-character id, `_sid` first 8 characters of `_id`, `_ip` and `_port` of the peer, `_lip` and `_lport` of the local side, `_agent` first 15 characters of the peer's agent name, `_nver` p2p protocol version. |
+| `peer-log-format` | `["${_peer} - ${_sid}" - ${_cid} ${_ip}:${_port}] ` | Format string prefixed to messages about a peer. Variables: `_peer` endpoint name, `_name` self-reported name, `_cid` assigned connection id, `_id` self-reported 64-hex-character id, `_sid` its short id — 16 hex characters read from byte 4 of `_id`, i.e. characters 9-24, `_ip` and `_port` of the peer, `_lip` and `_lport` of the local side, `_agent` first 15 characters of the peer's agent name, `_nver` p2p protocol version. |
 
 ## HTTP API
 
@@ -197,9 +223,11 @@ as a `nodeop --<name>` argument.
 
 ## Diagnostics
 
-Six named loggers, all re-read on `SIGHUP`. `net_plugin_impl` is the parent: the five `p2p_*` loggers inherit
-its configuration unless configured individually, which is what makes it practical to raise one traffic class
-to debug without drowning in the rest.
+Six `net_plugin` loggers plus the chain library's `vote` logger, all re-read on `SIGHUP`. `net_plugin_impl`
+is the parent of the `net_plugin` set: the five `p2p_*` loggers inherit its configuration unless configured
+individually, which is what makes it practical to raise one traffic class to debug without drowning in the
+rest. `vote` is declared in the chain library and inherits nothing from `net_plugin_impl`, so raising the
+`p2p_*` levels does not surface vote traffic.
 
 | Logger | Carries |
 |---|---|
@@ -209,6 +237,7 @@ to debug without drowning in the rest.
 | `p2p_block` | Block propagation, notices, and nacks. |
 | `p2p_trx` | Transaction propagation. |
 | `p2p_message` | Individual protocol messages. |
+| `vote` | Finalizer vote traffic: votes received and sent, duplicate and ID-mismatch drops, rebroadcast decisions, and the disconnect taken on an invalid vote. Declared by the chain library, shared with the vote processor. |
 
 Every per-peer line is prefixed with `peer-log-format` rendered for that connection, so a connection id and
 remote address are attached to the message.
@@ -233,8 +262,14 @@ Lines an operator should recognize:
 - Startup configuration failures name the option: an over-long or malformed `p2p-listen-endpoint`,
   `p2p-server-address`, or `p2p-peer-address` (`syntax host:port:[trx|blk]`), more `p2p-server-address` values
   than listen endpoints, `net-threads` or the keepalive interval not greater than 0, an over-long
-  `agent-name`, `At least one peer-key must accompany 'allowed-connection=specified'`, and the missing
-  gossip signature provider.
+  `agent-name`, and `At least one peer-key must accompany 'allowed-connection=specified'`.
+- `Unable to update bp producer peers, error: ...` on `p2p_log` — a configured `p2p-bp-gossip-endpoint` could
+  not be published because signing its gossip message failed. The gossip key must be reachable through
+  `producer_plugin`'s signature-provider set, which is populated only when `producer-name` is configured;
+  otherwise signing throws `producer_priv_key_not_found` — `Local producer has no private key in config.ini
+  corresponding to public key "<key>"`. A configured BP with no `peerkeys` row is a separate, non-throwing
+  case: it logs `On-chain peer-key not found for configured BP <account>` and stops connecting to gossip
+  peers, so it never reaches this line.
 - Shutdown: `shutdown..` and `exit shutdown` at debug level on `p2p_log`.
 
 ## Tests
@@ -255,4 +290,6 @@ wire encoding, peer authentication, the queued send buffer, and /24 and /48 subn
   plugin relays, and the `vote-threads` setting that gates vote propagation.
 - [`producer_plugin`](../producer_plugin/README.md) — required dependency; publishes the `transaction_ack`
   channel this plugin subscribes to, and answers the producer-key check used by peer authentication.
-- `signature_provider_manager_plugin` — required dependency; supplies the key used for BP gossip endpoints.
+- `signature_provider_manager_plugin` — required dependency; holds the `wire` key used to sign BP gossip
+  messages. `chain_plugin` registers a default `wire` provider when none is configured, so the presence check
+  at startup does not prove the configured gossip key is available.
