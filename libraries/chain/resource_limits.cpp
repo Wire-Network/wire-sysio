@@ -147,7 +147,7 @@ int64_t resource_limits_manager::initialize_account(const account_name& account,
       dm_logger->on_newaccount_resource_limits(usage);
    }
 
-   return config::billable_size<resource_object>::value + config::billable_size<resource_pending_object>::value;
+   return config::billable_size_v<resource_object> + config::billable_size_v<resource_pending_object>;
 }
 
 void resource_limits_manager::set_block_parameters(const elastic_limit_parameters& cpu_limit_parameters, const elastic_limit_parameters& net_limit_parameters ) {

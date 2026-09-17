@@ -54,6 +54,28 @@ Note:
 def main():
     result = subprocess.run(["../../../bin/nodeop", "--help"], stdout=subprocess.PIPE, universal_newlines=True)
 
+    def parseArity(helpText: str) -> dict:
+        """Map each --option to whether nodeop consumes a value for it.
+
+        boost::program_options puts the value placeholder one space after the option name and starts
+        the description column after two or more spaces. The placeholder is "arg" only when the
+        option did not set a value_name -- "--wasm-runtime runtime (=sys-vm-jit)" is a value option
+        too -- so its presence, not its spelling, is the signal. This must run before whitespace is
+        collapsed below, which erases the distinction.
+
+        Anchored to the two-space option column so that wrapped description lines, which are
+        indented far further and may themselves mention an option, cannot overwrite a real entry.
+        The optional group covers the short-form spelling, "-e [ --enable-stale-production ]".
+        """
+        arity = {}
+        for line in helpText.splitlines():
+            match = re.match("  (?:-\\w \\[ )?(--[\\w\\-]+)(?: \\])?(.*)", line)
+            if match is not None:
+                arity[match.group(1)] = re.match(" \\S", match.group(2)) is not None
+        return arity
+
+    argTakesValue = parseArity(result.stdout)
+
     myStr = result.stdout
     myStr = myStr.rstrip("\n")
     myStr = re.sub(":\n\\s+-",':@@@\n  -', string=myStr)
@@ -122,51 +144,30 @@ def main():
                 newKey="".join([x.capitalize() for x in key.split('-')]).replace('--','')
                 newKey="".join([newKey[0].lower(), newKey[1:]])
                 value = chainPluginArgs[newKey]
+                # Arity comes from nodeop's own output, not from the option's name or default.
+                # Unknown options are assumed to take a value: rendering "--switch value" fails
+                # loudly, while a bare flag on a value option silently eats the next argument.
+                takesValue = argTakesValue.get(key, True)
                 match = re.search("\\(=.*?\\)", value)
-                if match is not None:
-                    value = match.group(0)[2:-1]
+                if not takesValue:
+                    fieldType, defaultVal = "bool", "False"
+                elif match is not None:
+                    defaultStr = match.group(0)[2:-1]
                     try:
-                        numVal = int(value)
-                        dataclassFile.write(f"    {newKey}: int=None\n")
-                        dataclassFile.write(f"    _{newKey}NodeopDefault: int={numVal}\n")
-                        dataclassFile.write(f"    _{newKey}NodeopArg: str=\"{key}\"\n")
+                        fieldType, defaultVal = "int", str(int(defaultStr))
                     except ValueError:
-                        strValue = str(value)
-                        quote = "\'" if re.search("\"", strValue) else "\""
-                        dataclassFile.write(f"    {newKey}: str=None\n")
-                        dataclassFile.write(f"    _{newKey}NodeopDefault: str={quote}{strValue}{quote}\n")
-                        dataclassFile.write(f"    _{newKey}NodeopArg: str=\"{key}\"\n")
+                        quote = "\'" if re.search("\"", defaultStr) else "\""
+                        fieldType, defaultVal = "str", f"{quote}{defaultStr}{quote}"
+                elif re.search("sizegb|maxage|retainblocks", newKey, re.IGNORECASE):
+                    # Value options nodeop prints without a default. The annotation is documentation
+                    # for harness users; takesValue above is what decides how they are rendered.
+                    fieldType, defaultVal = "int", "None"
                 else:
-                    if re.search("deepmind", newKey, re.IGNORECASE) or \
-                       re.search("tracehistory", newKey, re.IGNORECASE) or \
-                       re.search("tracenoabis", newKey, re.IGNORECASE) or \
-                       re.search("chainstatehistory", newKey, re.IGNORECASE) or \
-                       re.search("console", newKey, re.IGNORECASE) or \
-                       re.search("print", newKey, re.IGNORECASE) or \
-                       re.search("verbose", newKey, re.IGNORECASE) or \
-                       re.search("debug", newKey, re.IGNORECASE) or \
-                       re.search("force", newKey, re.IGNORECASE) or \
-                       re.search("onthreshold", newKey, re.IGNORECASE) or \
-                       re.search("allowcredentials", newKey, re.IGNORECASE) or \
-                       re.search("delete", newKey, re.IGNORECASE) or \
-                       re.search("replay", newKey, re.IGNORECASE) or \
-                       re.search("onstart", newKey, re.IGNORECASE) or \
-                       re.search("onstop", newKey, re.IGNORECASE) or \
-                       re.search("enable", newKey, re.IGNORECASE) or \
-                       re.search("disable", newKey, re.IGNORECASE):
-                        dataclassFile.write(f"    {newKey}: bool=None\n")
-                        dataclassFile.write(f"    _{newKey}NodeopDefault: bool=False\n")
-                        dataclassFile.write(f"    _{newKey}NodeopArg: str=\"{key}\"\n")
-                    elif re.search("sizegb", newKey, re.IGNORECASE) or \
-                         re.search("maxage", newKey, re.IGNORECASE) or \
-                         re.search("retainblocks", newKey, re.IGNORECASE):
-                        dataclassFile.write(f"    {newKey}: int=None\n")
-                        dataclassFile.write(f"    _{newKey}NodeopDefault: int=None\n")
-                        dataclassFile.write(f"    _{newKey}NodeopArg: str=\"{key}\"\n")
-                    else:
-                        dataclassFile.write(f"    {newKey}: str=None\n")
-                        dataclassFile.write(f"    _{newKey}NodeopDefault: str=None\n")
-                        dataclassFile.write(f"    _{newKey}NodeopArg: str=\"{key}\"\n")
+                    fieldType, defaultVal = "str", "None"
+                dataclassFile.write(f"    {newKey}: {fieldType}=None\n")
+                dataclassFile.write(f"    _{newKey}NodeopDefault: {fieldType}={defaultVal}\n")
+                dataclassFile.write(f"    _{newKey}NodeopArg: str=\"{key}\"\n")
+                dataclassFile.write(f"    _{newKey}NodeopArgTakesValue: bool={takesValue}\n")
 
             def writeMainFxn(pluginName: str) -> str:
                 return f"""\

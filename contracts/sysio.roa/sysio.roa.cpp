@@ -843,13 +843,30 @@ namespace sysio {
         // Get the total SYS allocation for this tier
         asset total_sys_allocation = get_allocation_for_tier(tier);
 
+        // Only a tier-1 owner is provisioned a personal allocation here. Tier 1 is the sole tier
+        // that can call newuser, and newuser's `sponsors` / `sponsorcount` rows are the only writes
+        // in this contract billed to a node owner rather than to sysio.roa -- so a tier-1 owner
+        // needs RAM headroom before its first sponsorship. No other node-owner capability draws on
+        // the owner's own resources: addpolicy / expandpolicy / extendpolicy / reducepolicy are
+        // actions on sysio.roa, so unless the caller names an explicit sysio.payer, action::payer()
+        // resolves to sysio.roa (unlimited CPU/NET), and every row those actions write is emplaced
+        // with get_self() as the RAM payer. A tier-2 or tier-3 owner can therefore issue policies --
+        // including to itself -- while holding nothing but what native::newaccount granted it,
+        // drawing on the tier budget the nodeowners row records.
+        //
+        // Granting it anyway was disproportionate: the personal weights are a flat constant while the
+        // tier budgets are a fraction of supply, so the same grant lands very differently -- tier 1
+        // draws 4% of supply against tier 3's 0.003%, making an identical deduction roughly three
+        // orders of magnitude more significant for a tier-3 owner.
+        const bool provision_personal = (tier == 1);
+
         // We will track how much is allocated to bandwidth (CPU/NET) and RAM separately
         asset allocated_sys(0, state.total_sys.symbol);
         asset allocated_bw(0, state.total_sys.symbol);
         asset allocated_ram(0, state.total_sys.symbol);
 
-        // Personal RAM allocation: For example 0.0080 SYS
-        asset personal_ram_weight(80, state.total_sys.symbol); // 0.0080 SYS if precision=4
+        // Personal RAM allocation: 0.0080 SYS for a tier-1 owner, nothing for tiers 2 and 3.
+        asset personal_ram_weight(provision_personal ? 80 : 0, state.total_sys.symbol);
         uint64_t personal_ram_bytes = personal_ram_weight.amount * state.bytes_per_unit;
         allocated_sys += personal_ram_weight;
         allocated_ram += personal_ram_weight; // RAM allocation
@@ -860,8 +877,10 @@ namespace sysio {
         allocated_sys += sysio_allocation;
         allocated_ram += sysio_allocation; // Also RAM allocation since it's for sysio policy
 
-        // Minimal default net/cpu: 0.0500 SYS each for NET and CPU (0.1000 SYS total)
-        asset net_cpu_weight(500, state.total_sys.symbol); // 0.0500 SYS
+        // Minimal default net/cpu for a tier-1 owner: 0.0500 SYS each. Zero for tiers 2 and 3.
+        // Adding a zero asset below is a no-op, so the nodeowners totals stay correct for every
+        // tier without branching the accounting.
+        asset net_cpu_weight(provision_personal ? 500 : 0, state.total_sys.symbol);
         allocated_sys += (net_cpu_weight + net_cpu_weight);
         allocated_bw += (net_cpu_weight + net_cpu_weight); // CPU/NET allocation
 
@@ -869,9 +888,12 @@ namespace sysio {
         auto pol_key = policy_key{owner.value};
 
         name sysio_account = "sysio"_n;
+        auto sysio_pol_key = policy_key{sysio_account.value};
         asset zero_asset(0, state.total_sys.symbol);
 
-        if (!policies.contains(pol_key)) {
+        // Guard the two policies independently: the sysio RAM grant is created for every tier, so
+        // it must not sit behind the presence of the tier-1-only personal policy.
+        if (provision_personal && !policies.contains(pol_key)) {
             // Create personal policy
             policies.emplace(get_self(), pol_key, roa::policies{
                 .owner = owner,
@@ -882,9 +904,12 @@ namespace sysio {
                 .bytes_per_unit = state.bytes_per_unit,
                 .time_block = 1,
             });
+        }
 
-            // Create sysio policy for RAM
-            policies.emplace(get_self(), policy_key{sysio_account.value}, roa::policies{
+        if (!policies.contains(sysio_pol_key)) {
+            // Create sysio policy for RAM. Every tier contributes 10% of its allocation to the
+            // network RAM pool that funds newaccount_ram, so this is not tier-gated.
+            policies.emplace(get_self(), sysio_pol_key, roa::policies{
                 .owner = sysio_account,
                 .issuer = owner,
                 .net_weight = zero_asset,
@@ -907,6 +932,10 @@ namespace sysio {
         //   the create path stays conservation-exact; the reconcile path adds only the node-owner delta.
         //   forcereg over a pre-existing row now reconciles too (previously threw in set_reslimit) --
         //   acceptable for the governance/bootstrap path.
+        //   Tiers 2 and 3 pass zero weights, so this still CREATES the reslimit row -- keeping it a
+        //   complete registry of node owners and preserving the row == quota invariant -- but grants
+        //   nothing beyond the newaccount_ram the account already holds, making the set_resource_limits
+        //   below a no-op against what native::newaccount set.
         roa::resources_t owner_res = increase_reslimit(owner, net_cpu_weight, net_cpu_weight,
                                                        (int64_t)personal_ram_bytes, /*require_to_exist=*/false);
         set_resource_limits(owner, (int64_t)owner_res.ram_bytes, owner_res.net.amount, owner_res.cpu.amount);

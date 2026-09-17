@@ -76,4 +76,45 @@ typename Tester::action_result push_contract_action_and_produce_block(
    }
 }
 
+// ---------------------------------------------------------------------------
+//  sysio.chains::outpost_addrs builders
+//
+//  `regchain` and `setoutpost` both take the remote outpost contract identities
+//  as one nested struct. These build its variant form so a test states only the
+//  addresses it cares about; the contract validates the set against the row's
+//  ChainKind (see validate_outpost_addrs in sysio.chains.cpp).
+// ---------------------------------------------------------------------------
+
+/// Every field empty — a chain registered before its remote contracts exist.
+/// Valid for any kind; both operator daemons fail closed and skip such a row.
+inline fc::mutable_variant_object no_outpost_mvo() {
+   return fc::mutable_variant_object()
+      ("opp_addr",               std::string{})
+      ("opp_inbound_addr",       std::string{})
+      ("operator_registry_addr", std::string{})
+      ("source_deposit_addr",    std::string{});
+}
+
+/// EVM form: each role is a distinct 0x-prefixed 20-byte hex contract address.
+inline fc::mutable_variant_object evm_outpost_mvo(std::string_view opp,
+                                                  std::string_view opp_inbound,
+                                                  std::string_view operator_registry,
+                                                  std::string_view source_deposit) {
+   return fc::mutable_variant_object()
+      ("opp_addr",               std::string{opp})
+      ("opp_inbound_addr",       std::string{opp_inbound})
+      ("operator_registry_addr", std::string{operator_registry})
+      ("source_deposit_addr",    std::string{source_deposit});
+}
+
+/// SVM form: one base58 program id serves every role, so the other three fields
+/// must stay empty — the contract rejects a set that fills them in.
+inline fc::mutable_variant_object svm_outpost_mvo(std::string_view program_id) {
+   return fc::mutable_variant_object()
+      ("opp_addr",               std::string{program_id})
+      ("opp_inbound_addr",       std::string{})
+      ("operator_registry_addr", std::string{})
+      ("source_deposit_addr",    std::string{});
+}
+
 } // namespace sysio_system::test_support

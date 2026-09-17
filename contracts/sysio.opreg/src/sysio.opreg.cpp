@@ -23,7 +23,12 @@ using opp::attestations::DepositRevert;
 
 namespace {
 
-using namespace sysio::slug_name_literals;
+/// Forward declaration -- defined with the other eligibility helpers further down. `regoperator`
+/// needs it so registering a PRODUCER notifies sysio.system to score the new operator row.
+void reevaluate_eligibility(opreg::operators_t& ops,
+                            const opreg::operator_key& op_pk,
+                            name self,
+                            name account);
 
 // System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
 // model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
@@ -52,14 +57,6 @@ void credit_remit_claim(name self, name account, uint64_t amount) {
                                  opreg::remit_claim{.account = account}, amount,
                                  now_sec + opreg::REMIT_CLAIM_WINDOW_SEC);
 }
-
-/// Well-known chain code for the WIRE depot itself. Comparisons of the form
-/// `chain == ChainKind::CHAIN_KIND_WIRE` are now `chain_code == kWireChainCode`.
-constexpr sysio::slug_name kWireChainCode = "WIRE"_s;
-
-/// Well-known token code for the WIRE-native token. Replaces the historical
-/// `TokenKind::TOKEN_KIND_WIRE` discriminant in (chain, token) tuples.
-constexpr sysio::slug_name kWireTokenCode = "WIRE"_s;
 
 uint64_t current_time_ms() {
    return static_cast<uint64_t>(current_time_point().sec_since_epoch()) * 1000;
@@ -275,6 +272,11 @@ void opreg::setconfig(uint32_t max_available_producers,
    cfg.req_batchop_collat               = std::move(req_batchop_collat);
    cfg.req_uw_collat                    = std::move(req_uw_collat);
    cfg_tbl.set(cfg, ram_payer);
+
+   // sysio.system scores producer rank on the ratio of posted collateral to these minimums, so
+   // every stored score is stale the moment they move. Tell it on the same channel processprod
+   // uses; it opens a bounded rescore sweep on the notification.
+   require_recipient(opreg::SYSTEM_ACCOUNT);
 }
 
 // ---------------------------------------------------------------------------
@@ -362,6 +364,12 @@ void opreg::regoperator(name account,
       .registered_at   = now,
       .available_at    = is_bootstrapped ? now : 0,
    });
+
+   // Producer rank is scored from the operator row, so registering one -- which is what decides its
+   // tier -- must bring sysio.system's stored score in step. reevaluate_eligibility dispatches
+   // processprod for producers regardless of transition, which is the notification that does it.
+   // Declared below; see the forward declaration above regoperator.
+   reevaluate_eligibility(ops, op_pk, get_self(), account);
 }
 
 // ---------------------------------------------------------------------------
@@ -406,7 +414,7 @@ uint64_t sum_locks_inline(name account, sysio::slug_name chain_code, sysio::slug
 /// Per v6 plan §B.2 (split-index design): `wtdwqueue_t` exposes only uint64
 /// secondary indexes. `byaccount` keys on `account.value`; rows are filtered
 /// on `(chain_code, token_code)` in memory. Per-account pending-withdraw
-/// counts are O(1)-ish so the scan is cheap.
+/// counts are bounded by the operator's collateral-bucket count.
 uint64_t sum_pending_withdraws(name account, sysio::slug_name chain_code, sysio::slug_name token_code) {
    // The queue is scoped to opreg itself; reference the well-known account.
    opreg::wtdwqueue_t real_queue(name{"sysio.opreg"_n});
@@ -435,13 +443,19 @@ find_balance(const opreg::operator_entry& op,
    return nullptr;
 }
 
+/// Return true when the operator has entered a permanent punishment or
+/// removal state that collateral changes must never reverse.
+bool has_terminal_status(OperatorStatus status) {
+   return status == OperatorStatus::OPERATOR_STATUS_SLASHED ||
+          status == OperatorStatus::OPERATOR_STATUS_TERMINATED;
+}
+
 /// Compute available balance for a given (op, chain, token). The single
 /// rollup formula: balance - sum(active locks) - sum(pending withdraws),
 /// gated by status. Slashed / terminated operators read as zero.
 uint64_t available_inline(const opreg::operator_entry& op,
                           sysio::slug_name chain_code, sysio::slug_name token_code) {
-   if (op.status == OperatorStatus::OPERATOR_STATUS_SLASHED ||
-       op.status == OperatorStatus::OPERATOR_STATUS_TERMINATED) {
+   if (has_terminal_status(op.status)) {
       return 0;
    }
    const auto* bal = find_balance(op, chain_code, token_code);
@@ -520,7 +534,7 @@ namespace {
 
 /// Maximum collateral a single `(chain_code, token_code)` balance row may hold:
 /// the Antelope `asset` magnitude limit (`2^62 - 1`). A stored balance above
-/// this cannot be carried by the WIRE-frame `asset()` that the withdraw /
+/// this cannot be carried by the `asset()` that the withdraw /
 /// terminate remit path constructs — `asset()` `check()`-aborts past
 /// `asset::max_amount` — so every credit is gated to keep the running sum within
 /// range. The WSA-028 ingress gate (`sysio.msgch`) already bounds a *single*
@@ -700,7 +714,7 @@ OperatorAction build_slash_action(name account,
 /// the WIRE chain) or has no registered outpost.
 void emit_slash_attestation(name self, const OperatorAction& slash_action) {
    const sysio::slug_name chain_code{slash_action.chain_code};
-   if (chain_code == kWireChainCode) return;
+   if (chain_code == opp::wire::chain_code) return;
    auto resolved = find_outpost_id_for_chain(chain_code);
    if (!resolved) return;   // no outpost on this chain — nothing to slash through
 
@@ -838,6 +852,13 @@ void emit_withdraw_remit(name self,
 
 namespace {
 
+/// Re-evaluate whether an operator's available collateral still satisfies the
+/// configured minimums after a balance or reservation change.
+void reevaluate_eligibility(opreg::operators_t& ops,
+                            const opreg::operator_key& op_pk,
+                            name self,
+                            name account);
+
 /// Result of `try_enqueue_withdraw` — non-throwing variant for the
 /// msgch-dispatched `withdrawinle` path so failures get logged on the
 /// operator's row instead of reverting the inbound dispatch tx.
@@ -875,10 +896,27 @@ enqueue_result try_enqueue_withdraw(name account,
       return { false, 0, "insufficient available balance for withdraw" };
    }
 
+   opreg::wtdwqueue_t queue(name{"sysio.opreg"_n});
+   auto by_account = queue.get_index<"byaccount"_n>();
+   auto it  = by_account.lower_bound(account.value);
+   auto end = by_account.upper_bound(account.value);
+   uint32_t outstanding = 0;
+   for (; it != end &&
+          outstanding < opreg::MAX_OUTSTANDING_WITHDRAWS_PER_COLLATERAL_BUCKET;
+        ++it) {
+      if (it->account != account) break;
+      if (it->chain_code != chain_code || it->token_code != token_code) continue;
+      ++outstanding;
+   }
+   if (outstanding >= opreg::MAX_OUTSTANDING_WITHDRAWS_PER_COLLATERAL_BUCKET) {
+      return {
+         false, 0, "operator already has an outstanding withdraw request for this collateral bucket"
+      };
+   }
+
    uint32_t now_ep = get_current_epoch();
    uint64_t request_id = next_withdraw_id();
 
-   opreg::wtdwqueue_t queue(name{"sysio.opreg"_n});
    queue.emplace(ram_payer, opreg::withdraw_key{request_id}, opreg::withdraw_request{
       .request_id          = request_id,
       .account             = account,
@@ -970,10 +1008,13 @@ void opreg::withdraw(name account, uint64_t amount) {
    operators_t ops(get_self());
    auto op_pk = operator_key{account.value};
 
-   auto result = try_enqueue_withdraw(account, kWireChainCode, kWireTokenCode, amount);
-   auto action = build_withdraw_request_action(account, kWireChainCode, kWireTokenCode, amount,
+   auto result = try_enqueue_withdraw(account, opp::wire::chain_code, opp::wire::token_code, amount);
+   auto action = build_withdraw_request_action(account, opp::wire::chain_code, opp::wire::token_code, amount,
                                                result.request_id);
    append_action_log(ops, op_pk, action, result.success, std::move(result.error_message));
+   if (result.success) {
+      reevaluate_eligibility(ops, op_pk, get_self(), account);
+   }
 }
 
 // ---------------------------------------------------------------------------
@@ -1000,6 +1041,9 @@ void opreg::withdrawinle(name account,
    auto action = build_withdraw_request_action(account, chain_code, token_code, amount,
                                                result.request_id);
    append_action_log(ops, op_pk, action, result.success, std::move(result.error_message));
+   if (result.success) {
+      reevaluate_eligibility(ops, op_pk, get_self(), account);
+   }
 }
 
 // ---------------------------------------------------------------------------
@@ -1012,28 +1056,39 @@ void opreg::cancelwtdw(name account, uint64_t request_id) {
    auto row = queue.get(wkey, "withdraw request not found");
    check(row.account == account, "not your withdraw request");
    queue.erase(wkey);
+
+   operators_t ops(get_self());
+   auto op_pk = operator_key{account.value};
+   if (ops.contains(op_pk)) {
+      reevaluate_eligibility(ops, op_pk, get_self(), account);
+   }
 }
 
 // ---------------------------------------------------------------------------
-//  Eligibility re-check helper — invoked at the end of deposit/depositinle
+//  Eligibility re-check helper — invoked after collateral availability changes
 // ---------------------------------------------------------------------------
 namespace {
 
-/// After a balance change, re-evaluate whether the operator now meets the
-/// minimum-collateral threshold for their type. If the eligibility flipped
-/// vs the prior status, fan out to the per-type processor (`processprod` /
-/// `processbatch` / `processuw`) which owns the active/standby transition.
+/// After a balance or reservation change, re-evaluate whether the operator now
+/// meets the minimum-collateral threshold for their type. Terminal punishment
+/// and removal states are never reevaluated. If eligibility flipped versus the
+/// prior status, fan out to the per-type processor
+/// (`processprod` / `processbatch` / `processuw`) which owns the active/standby
+/// transition.
 void reevaluate_eligibility(opreg::operators_t& ops,
                             const opreg::operator_key& op_pk,
                             name self,
                             name account) {
+   // An absent config must not silently skip evaluation: `meets_role_min` already treats a default
+   // (empty) requirement vector as "no operator of this role can activate", and a bootstrapped
+   // operator bypasses it either way. Returning early here also suppressed the producer rescore
+   // notification on chains that had not yet installed opconfig.
    opreg::opconfig_t cfg_tbl(self);
-   if (!cfg_tbl.exists()) return;
-   auto cfg = cfg_tbl.get();
+   auto cfg = cfg_tbl.get_or_default(opreg::op_config{});
    auto refreshed = ops.get(op_pk);
+   if (has_terminal_status(refreshed.status)) return;
    bool was_eligible = (refreshed.status == OperatorStatus::OPERATOR_STATUS_ACTIVE);
    bool is_eligible  = meets_role_min(refreshed, cfg);
-   if (was_eligible == is_eligible) return;
 
    name handler;
    switch (refreshed.type) {
@@ -1042,10 +1097,35 @@ void reevaluate_eligibility(opreg::operators_t& ops,
       case OperatorType::OPERATOR_TYPE_UNDERWRITER: handler = "processuw"_n;    break;
       default:                                       return;
    }
+
+   // Producers dispatch on EVERY balance change, not only on an eligibility transition, because
+   // sysio.system scores producer rank on the collateral actually posted: a top-up while already
+   // ACTIVE must raise that score, and a partial withdraw must lower it. `processprod` is a no-op
+   // on the status when was == is; its notification is the point. Batch operators and underwriters
+   // have no such score, so they keep the transition-only dispatch.
+   if (was_eligible == is_eligible && refreshed.type != OperatorType::OPERATOR_TYPE_PRODUCER) {
+      return;
+   }
    action(
       permission_level{self, "active"_n},
       self, handler,
       std::make_tuple(account, was_eligible, is_eligible)
+   ).send();
+}
+
+/// Tell sysio.system that a producer's standing ended through a path
+/// `reevaluate_eligibility` does not cover -- a terminal transition (slash,
+/// termination). Same `processprod` channel, no eligibility transition
+/// (was == is), so the notification is the whole effect: sysio.system rescores
+/// the producer from its live status and sinks its rank key at once, instead of
+/// leaving a slashed or terminated producer in the healthy tier until some
+/// unrelated event rescored it.
+void notify_producer_standing(name self, const opreg::operator_entry& op) {
+   if (op.type != OperatorType::OPERATOR_TYPE_PRODUCER) return;
+   action(
+      permission_level{self, "active"_n},
+      self, "processprod"_n,
+      std::make_tuple(op.account, false, false)
    ).send();
 }
 
@@ -1072,6 +1152,12 @@ void opreg::deposit(name account, uint64_t amount) {
    check(op.status != OperatorStatus::OPERATOR_STATUS_SLASHED &&
          op.status != OperatorStatus::OPERATOR_STATUS_TERMINATED,
          "operator not in a deposit-eligible state");
+   // Bootstrapped operators are ACTIVE by fiat and bypass `meets_role_min` entirely, so collateral
+   // credited to one can never affect its eligibility -- the deposit would be accepted into a
+   // balance that does nothing. `depositinle` already rejects them; this closes the WIRE-direct
+   // path. There is deliberately no way to collateralise a bootstrap: an operator who wants a
+   // collateralised producer registers a new account.
+   check(!op.is_bootstrapped, "bootstrapped operators cannot deposit collateral");
 
    // Credit collateral BEFORE the outbound WIRE transfer, with the cap check
    // performed ATOMICALLY inside the same `modify` as the credit — reading the
@@ -1081,7 +1167,7 @@ void opreg::deposit(name account, uint64_t amount) {
    // `deposit`. A separate pre-read-then-check-then-credit could let two credits
    // pass against the same stale balance and push the WIRE row past
    // `asset::max_amount` — recreating the withdraw/terminate remit abort
-   // (`asset(balance, CORE_SYM)` aborts above the limit). Checking inside the
+   // (`asset(balance, WIRE_SYM)` aborts above the limit). Checking inside the
    // modify makes check+credit indivisible, and crediting before the transfer
    // means any re-entry observes the committed balance. A direct user deposit may
    // legitimately `check()`-throw here (unlike the never-throw OPP `depositinle`);
@@ -1089,9 +1175,9 @@ void opreg::deposit(name account, uint64_t amount) {
    // transaction — including this credit — rolls back. (SEC-103; PR #449 review.)
    ops.modify(same_payer, op_pk, [&](auto& o) {
       check(amount <= MAX_COLLATERAL_AMOUNT &&
-               balance_of(o, kWireChainCode, kWireTokenCode) <= MAX_COLLATERAL_AMOUNT - amount,
+               balance_of(o, opp::wire::chain_code, opp::wire::token_code) <= MAX_COLLATERAL_AMOUNT - amount,
             "deposit would exceed max collateral");
-      add_balance(o, kWireChainCode, kWireTokenCode, amount);
+      add_balance(o, opp::wire::chain_code, opp::wire::token_code, amount);
    });
 
    // Direct WIRE token transfer from operator -> opreg, sent after the credit so
@@ -1100,13 +1186,13 @@ void opreg::deposit(name account, uint64_t amount) {
       permission_level{account, "active"_n},
       TOKEN_ACCOUNT, "transfer"_n,
       std::make_tuple(account, get_self(),
-         asset(static_cast<int64_t>(amount), CORE_SYM),
+         asset(static_cast<int64_t>(amount), WIRE_SYM),
          std::string("opreg::deposit"))
    ).send();
 
    auto deposit_action = build_deposit_action(
-      operator_chain_address(account, kWireChainCode),
-      kWireChainCode, kWireTokenCode, amount);
+      operator_chain_address(account, opp::wire::chain_code),
+      opp::wire::chain_code, opp::wire::token_code, amount);
    append_action_log(ops, op_pk, deposit_action, /*success*/ true, "");
 
    reevaluate_eligibility(ops, op_pk, get_self(), account);
@@ -1187,7 +1273,7 @@ void opreg::depositinle(name account,
    }
    // SEC-103 (WSA-028 follow-up): the credited collateral must stay within the
    // asset magnitude range so the WIRE-direct remit path's `asset(balance,
-   // CORE_SYM)` can never abort — an abort on this OPP-inbound path would stall
+   // WIRE_SYM)` can never abort — an abort on this OPP-inbound path would stall
    // consensus. The msgch ingress gate already bounds a single `amount` to
    // `asset::max_amount`; this additionally bounds the running sum. Fail closed
    // by refunding via DEPOSIT_REVERT — never `check()`.
@@ -1279,6 +1365,7 @@ void opreg::flushwtdw(uint32_t current_epoch) {
          append_action_log(ops, op_pk, remit_action, false,
                            "insufficient balance at flush (rollup mismatch)");
          queue.erase(wkey);
+         reevaluate_eligibility(ops, op_pk, get_self(), row.account);
          continue;
       }
 
@@ -1292,7 +1379,7 @@ void opreg::flushwtdw(uint32_t current_epoch) {
       // `sysio.epoch::advance`, where a pushed transfer would let the operator's notify handler
       // abort epoch advancement chain-wide. For outpost chains: queue an
       // OPERATOR_ACTION(WITHDRAW_REMIT) to the outpost so it can release the escrow on its end.
-      if (row.chain_code == kWireChainCode) {
+      if (row.chain_code == opp::wire::chain_code) {
          credit_remit_claim(get_self(), row.account, row.amount);
       } else {
          emit_withdraw_remit(get_self(), row.account, op.type,
@@ -1300,11 +1387,14 @@ void opreg::flushwtdw(uint32_t current_epoch) {
       }
       append_action_log(ops, op_pk, remit_action, true, "");
 
+      // Remove the matured reservation before eligibility is recomputed. The
+      // balance debit already accounts for this withdrawal; leaving the queue
+      // row visible would make available_inline subtract the same amount twice.
+      queue.erase(wkey);
+
       // Re-check eligibility — this withdraw may have dropped the operator
       // below the role minimum.
       reevaluate_eligibility(ops, op_pk, get_self(), row.account);
-
-      queue.erase(wkey);
    }
 }
 
@@ -1323,19 +1413,34 @@ void process_eligibility_change(name self, name account,
    auto op_pk = opreg::operator_key{account.value};
    check(ops.contains(op_pk), "operator not found");
 
+   // Eligibility callbacks are inline today, but the terminal-state invariant
+   // belongs at the transition sink as well as at each caller. A stale or
+   // newly introduced callback must never reactivate an operator after slash
+   // or termination merely because its collateral predicate says eligible.
+   // The notification below is NOT gated on it: a producer's terminal
+   // transition is exactly what sysio.system must hear about, and slash and
+   // termination dispatch through here (`notify_producer_standing`) to say so.
+   const bool terminal = has_terminal_status(ops.get(op_pk).status);
+
    auto now = current_time_ms();
-   if (!was_eligible && is_eligible) {
+   if (!terminal && !was_eligible && is_eligible) {
       ops.modify(same_payer, op_pk, [&](auto& o) {
          o.status       = OperatorStatus::OPERATOR_STATUS_ACTIVE;
          o.available_at = now;
       });
-      if (notify_system) {
-         require_recipient(opreg::SYSTEM_ACCOUNT);
-      }
-   } else if (was_eligible && !is_eligible) {
+   } else if (!terminal && was_eligible && !is_eligible) {
       ops.modify(same_payer, op_pk, [&](auto& o) {
          o.status = OperatorStatus::OPERATOR_STATUS_UNKNOWN;
       });
+   }
+
+   // Notify OUTSIDE the transition branches. sysio.system rescores the producer's rank from its
+   // live standing, so it must hear about a top-up that changed no status, about a drop out of
+   // ACTIVE, and about a slash or termination -- not only about a promotion. A stale score is not
+   // merely cosmetic: it leaves a de-collateralized, slashed or terminated producer holding an
+   // index slot ahead of bonded ones.
+   if (notify_system) {
+      require_recipient(opreg::SYSTEM_ACCOUNT);
    }
 }
 
@@ -1406,6 +1511,8 @@ void opreg::slash(name account, std::string reason) {
       emit_slash_attestation(get_self(), slash_action);
       append_action_log(ops, op_pk, slash_action, /*success*/ true, "");
    }
+
+   notify_producer_standing(get_self(), op);
 }
 
 // ---------------------------------------------------------------------------
@@ -1475,7 +1582,7 @@ void opreg::releaselock(name account,
       // and leaving the lock unreleased on every retry. (Aborting the termination itself is the
       // `terminate_inline` case below.) Otherwise queue WITHDRAW_REMIT so the outpost can transfer
       // to the authex destination. request_id == 0 (this remit isn't queued in wtdwqueue).
-      if (chain_code == kWireChainCode) {
+      if (chain_code == opp::wire::chain_code) {
          credit_remit_claim(get_self(), account, settle_amount);
       } else {
          emit_withdraw_remit(get_self(), op.account, op.type,
@@ -1539,7 +1646,7 @@ void terminate_inline(name self, name account, const std::string& reason) {
    // a normal queued withdraw, only resolvable by querying msgch internals
    // (which are transient — the rows drain on the next `buildenv`).
    for (const auto& rp : to_remit) {
-      if (rp.chain_code == kWireChainCode) {
+      if (rp.chain_code == opp::wire::chain_code) {
          credit_remit_claim(self, account, rp.amount);
       } else {
          emit_withdraw_remit(self, account, op.type,
@@ -1550,6 +1657,8 @@ void terminate_inline(name self, name account, const std::string& reason) {
       append_action_log(ops, op_pk, remit_action, /*success*/ true,
                         std::string("terminate-remit"));
    }
+
+   notify_producer_standing(self, op);
 }
 
 } // anonymous namespace
@@ -1575,12 +1684,27 @@ void opreg::claimremit(name account) {
    remitclaims_t claims(get_self());
    sysio::opp::claimable::pay_out(
       claims, remitclaim_key{account.value}, get_self(), TOKEN_ACCOUNT,
-      account, CORE_SYM, std::string("opreg::claimremit collateral payout"),
+      account, WIRE_SYM, std::string("opreg::claimremit collateral payout"),
       "no claimable remit for this account");
 }
 
 void opreg::recorddel(name account, uint32_t epoch, bool delivered) {
    require_auth(EPOCH_ACCOUNT);
+
+   // A temporarily ineligible operator cannot submit deliveries because
+   // sysio.msgch requires ACTIVE status. Do not turn that expected downtime
+   // into termination misses after collateral is restored. Terminal-state
+   // observations remain durable audit records; termcheck already excludes
+   // those operators permanently.
+   operators_t ops(get_self());
+   auto op_pk = operator_key{account.value};
+   if (ops.contains(op_pk)) {
+      auto status = ops.get(op_pk).status;
+      if (status != OperatorStatus::OPERATOR_STATUS_ACTIVE &&
+          !has_terminal_status(status)) {
+         return;
+      }
+   }
 
    uint64_t now_ms = current_time_ms();
 
@@ -1618,9 +1742,19 @@ void opreg::termcheck(name account) {
    // `batch_operator_minimum_active` with no remaining ACTIVE operators
    // to advance consensus and no recovery path.
    if (op.is_bootstrapped) return;
-   // Termination on rolling-buffer underperformance is, for now, scoped to
-   // batch operators. Producer schedule misses + underwriter offline-too-long
-   // are open questions per the plan §1; revisit when those decisions land.
+   // Termination on rolling-buffer underperformance is scoped to batch operators, and for
+   // producers that is now a DECISION rather than an open question.
+   //
+   // A producer that misses `max_consecutive_missed_rounds` consecutive scheduled rounds is
+   // DEMOTED by sysio.system -- moved to a categorical tier no score can climb out of, so it
+   // leaves the schedule and draws no pay. Demotion is deliberately recoverable: the producer
+   // re-registers via `regproducer` when it is ready again. Termination is not recoverable, and
+   // it also returns the bond, so applying it to an offline-but-bonded producer would convert a
+   // reversible outage into a permanent exit and hand back the collateral that makes the operator
+   // accountable. An indefinitely-demoted producer therefore stays demoted -- holding its row and
+   // its bond -- until it either re-registers or withdraws of its own accord.
+   //
+   // Underwriter offline-too-long remains open; they have no committee and no schedule to miss.
    if (op.type != OperatorType::OPERATOR_TYPE_BATCH) return;
 
    // Thresholds come from opconfig — tests can dial them down so the
@@ -1643,8 +1777,17 @@ void opreg::termcheck(name account) {
    for (auto it = idx.lower_bound(lower_key); it != idx.end() && it->by_account_ts() <= upper_key; ++it) {
       if (it->account != account) break;
       total_in_window++;
+      if (!it->delivered) total_misses++;
+
+      // A transition back to ACTIVE starts a new duty interval. Earlier rows
+      // remain part of the rolling miss-rate sample, but must not join a
+      // consecutive run across time when the operator could not deliver.
+      if (it->ts_ms < op.available_at) {
+         consecutive_misses = 0;
+         continue;
+      }
+
       if (!it->delivered) {
-         total_misses++;
          consecutive_misses++;
          if (consecutive_misses > worst_consecutive) worst_consecutive = consecutive_misses;
       } else {

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+"""Exercise snapshot serving APIs and reject unattestable endpoint bootstraps."""
+
 import json
 import os
 import signal
@@ -8,7 +10,7 @@ import urllib.request
 import urllib.error
 import urllib.parse
 
-from TestHarness import Account, Cluster, TestHelper, Utils, WalletMgr
+from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 from TestHarness.testUtils import ReturnType
 from TestHarness.TestHelper import AppArgs
 
@@ -19,15 +21,14 @@ from TestHarness.TestHelper import AppArgs
 #  from a snapshot endpoint (--snapshot-endpoint CLI option).
 #
 #  API endpoints tests:
-#   - /v1/snapshot/latest    — metadata of highest block snapshot
+#   - /v1/snapshot/latest    — metadata of newest scheduled snapshot
 #   - /v1/snapshot/by_block  — metadata for specific block
 #   - /v1/snapshot/download  — binary file download
 #   - Range header support for partial downloads
 #
 #  bootstrap tests:
-#   - Bootstrap node from snapshot endpoint
-#   - Bootstrap with specific block number in URL
-#   - Attestation verification after bootstrap
+#   - Exclude manual snapshots from latest endpoint discovery
+#   - Reject a specific manual snapshot before endpoint download
 #
 #  Cluster layout:
 #    Node 0: producer with snapshot_api_plugin enabled
@@ -38,26 +39,6 @@ from TestHarness.TestHelper import AppArgs
 
 Print=Utils.Print
 errorExit=Utils.errorExit
-
-def waitForAttestationRecord(node, blockNum, timeout=90):
-    """Poll a node's sysio.snaprecords table until the attestation for ``blockNum`` appears.
-
-    A snapshot is created first and attested afterwards, so the votesnaphash transaction
-    lands in a block *after* the snapshot height. A node that bootstraps from that snapshot
-    therefore does not have the attestation in its loaded state -- it must sync forward past
-    the attestation block before the record becomes visible.
-
-    A single ``waitForLibToAdvance`` only guarantees one finality round (a few blocks), which
-    can fall far short of the attestation block when bootstrapping from an older snapshot
-    while the chain head is already many blocks ahead. Poll for the record itself instead so
-    the wait tracks the actual condition under test rather than a proxy that races it.
-
-    Returns True once the record is found, False on timeout.
-    """
-    def recordPresent():
-        records = node.getTableRows("sysio", "sysio", "snaprecords")
-        return records is not None and any(r["value"]["block_num"] == blockNum for r in records)
-    return Utils.waitForBool(recordPresent, timeout=timeout, sleepTime=1)
 
 appArgs = AppArgs()
 args=TestHelper.parse_args({"--dump-error-details","--keep-logs","-v","--leave-running","--unshared"},
@@ -93,87 +74,16 @@ try:
         errorExit("Failed to stand up cluster.")
 
     node0 = cluster.getNode(0)
-    node1 = cluster.getNode(1)
     bootstrapNode = cluster.getNode(2)
-
-    # ---------------------------------------------------------------
-    # Setup: Register producers, snapshot providers, attestation config
-    # ---------------------------------------------------------------
-    Print("Create wallet and import keys")
-    wallet = walletMgr.create('snapwallet')
-    cluster.populateWallet(2, wallet)
-
-    Print("Create test accounts for snapshot providers")
-    cluster.createAccounts(cluster.sysioAccount, stakedDeposit=0)
-
-    snapProv1 = cluster.accounts[0]
-    Print(f"Snapshot provider account: {snapProv1.name}")
-
-    assert node0.waitForLibToAdvance(timeout=30), "LIB did not advance after account creation"
-
-    producerA = "defproducera"
-
-    ignWallet = walletMgr.create("ignition")
-    account = cluster.defProducerAccounts[producerA]
-    walletMgr.importKey(account, ignWallet, ignoreDupKeyWarning=True)
-
-    success, trans = node0.pushMessage("sysio", "regproducer",
-        json.dumps({
-            "producer": producerA,
-            "producer_key": account.activePublicKey,
-            "url": "",
-            "location": 0
-        }),
-        f"--permission {producerA}@active")
-    assert success, f"Failed to register producer {producerA}: {trans}"
-    regProducerTransId = node0.getTransId(trans)
-
-    # Wait for regproducer to be in a block before setrank reads the on-chain
-    # producers table. waitForHeadToAdvance() does not guarantee this specific
-    # transaction was applied -- with multiple producers a transaction pushed to
-    # node0 can be forwarded into a peer's block -- which would make setrank fail
-    # with "producer not found".
-    assert node0.waitForTransactionInBlock(regProducerTransId, timeout=60), \
-        "regproducer transaction did not make it into a block before setrank"
-
-    success, trans = node0.pushMessage("sysio", "setrank",
-        json.dumps({"producer": producerA, "rank": 1}),
-        "--permission sysio@active")
-    assert success, f"Failed to set rank for {producerA}: {trans}"
-    setRankTransId = node0.getTransId(trans)
-
-    # regsnapprov reads producer ranks from the on-chain producers table. A
-    # generic head advance can race the exact setrank transaction under
-    # multi-producer scheduling, so wait for that transaction specifically.
-    assert node0.waitForTransactionInBlock(setRankTransId, timeout=60), \
-        "setrank transaction did not make it into a block before regsnapprov"
-
-    success, trans = node0.pushMessage("sysio", "regsnapprov",
-        json.dumps({"producer": producerA, "snap_account": snapProv1.name}),
-        f"--permission {producerA}@active")
-    assert success, f"Failed to register snapshot provider: {trans}"
-    regSnapProvTransId = node0.getTransId(trans)
-
-    # Set attestation config: min_providers=1, threshold_pct=50 (single vote = quorum)
-    success, trans = node0.pushMessage("sysio", "setsnpcfg",
-        json.dumps({"min_providers": 1, "threshold_pct": 50}),
-        "--permission sysio@active")
-    assert success, f"Failed to set snapshot config: {trans}"
-    setCfgTransId = node0.getTransId(trans)
-
-    # Ensure provider registration and config are applied in a block before the
-    # snapshot/attestation flow below depends on them.
-    assert node0.waitForTransactionsInBlock([regSnapProvTransId, setCfgTransId], timeout=60), \
-        "regsnapprov/setsnpcfg transactions did not make it into a block"
 
     # ===================================================================
     # Snapshot API endpoint tests
     # ===================================================================
 
     # ---------------------------------------------------------------
-    # Test 1: /v1/snapshot/latest returns 404 when no snapshots exist
+    # Test 1: /v1/snapshot/latest returns 404 when no scheduled snapshots exist
     # ---------------------------------------------------------------
-    Print("=== Test 1: /v1/snapshot/latest returns 404 with no snapshots ===")
+    Print("=== Test 1: /v1/snapshot/latest returns 404 with no scheduled snapshots ===")
 
     try:
         result = node0.processUrllibRequest("snapshot", "latest", silentErrors=True)
@@ -190,9 +100,9 @@ try:
     Print("Test 1 PASSED")
 
     # ---------------------------------------------------------------
-    # Test 2: Create snapshot and query /v1/snapshot/latest
+    # Test 2: Manual snapshots remain explicit-only
     # ---------------------------------------------------------------
-    Print("=== Test 2: Create snapshot and query /v1/snapshot/latest ===")
+    Print("=== Test 2: Manual snapshots remain explicit-only ===")
 
     assert node0.waitForHeadToAdvance(blocksToAdvance=3), "Head did not advance"
 
@@ -201,22 +111,12 @@ try:
     assert ret is not None, "Snapshot creation failed"
     snapInfo = ret["payload"]
     snapBlockNum = snapInfo["head_block_num"]
-    snapBlockId = snapInfo["head_block_id"]
     snapRootHash = snapInfo["root_hash"]
     Print(f"Created snapshot: block_num={snapBlockNum}, root_hash={snapRootHash}")
 
-    Print("Query /v1/snapshot/latest")
-    result = node0.processUrllibRequest("snapshot", "latest")
-    assert result is not None and result.get("code") == 200, \
-        f"latest endpoint failed: {result}"
-    meta = result["payload"]
-
-    assert meta["block_num"] == snapBlockNum, \
-        f"block_num mismatch: expected {snapBlockNum}, got {meta['block_num']}"
-    assert meta["block_id"] == snapBlockId, \
-        f"block_id mismatch: expected {snapBlockId}, got {meta['block_id']}"
-    assert meta["root_hash"] == snapRootHash, \
-        f"root_hash mismatch: expected {snapRootHash}, got {meta['root_hash']}"
+    Print("Verify /v1/snapshot/latest excludes the manual snapshot")
+    result = node0.processUrllibRequest("snapshot", "latest", silentErrors=True)
+    assert result is None, f"Expected no scheduled latest snapshot, got: {result}"
 
     Print("Test 2 PASSED")
 
@@ -380,9 +280,9 @@ try:
     Print("Test 6 PASSED")
 
     # ---------------------------------------------------------------
-    # Test 7: Second snapshot updates catalog
+    # Test 7: Additional manual snapshots remain explicit-only
     # ---------------------------------------------------------------
-    Print("=== Test 7: Second snapshot updates catalog ===")
+    Print("=== Test 7: Additional manual snapshots remain explicit-only ===")
 
     assert node0.waitForHeadToAdvance(blocksToAdvance=3), "Head did not advance"
 
@@ -390,13 +290,16 @@ try:
     assert ret2 is not None, "Second snapshot creation failed"
     snap2Info = ret2["payload"]
     snap2BlockNum = snap2Info["head_block_num"]
-    snap2RootHash = snap2Info["root_hash"]
     assert snap2BlockNum > snapBlockNum
 
-    result = node0.processUrllibRequest("snapshot", "latest")
+    result = node0.processUrllibRequest("snapshot", "latest", silentErrors=True)
+    assert result is None, f"Expected no scheduled latest snapshot, got: {result}"
+
+    # Both manual snapshots remain explicitly accessible.
+    result = node0.processUrllibRequest("snapshot", "by_block",
+                                         payload={"block_num": snap2BlockNum})
     assert result is not None and result["payload"]["block_num"] == snap2BlockNum
 
-    # First snapshot still accessible
     result = node0.processUrllibRequest("snapshot", "by_block",
                                          payload={"block_num": snapBlockNum})
     assert result is not None and result["payload"]["block_num"] == snapBlockNum
@@ -404,46 +307,18 @@ try:
     Print("Test 7 PASSED")
 
     # ===================================================================
-    # Bootstrap from snapshot endpoint
+    # Snapshot endpoint cadence enforcement
     # ===================================================================
-    #
-    # Real-world flow: snapshot is taken first, then attested afterwards.
-    # The attestation transaction lands in a block AFTER the snapshot.
-    # The bootstrap node loads from the snapshot, syncs forward, and
-    # eventually reaches the block containing the attestation. The
-    # verify_snapshot_attestation check retries on each irreversible block
-    # until it finds the record; for auto-fetched snapshots a record still
-    # missing after a grace window past the snapshot height is fatal, while
-    # manual --snapshot downgrades to a warning at the chain tip.
+    # These API-created snapshots are manual and therefore intentionally outside the
+    # 25,000-block attestation cadence. Base-URL discovery must ignore them, while an
+    # explicit block request must still reject an unscheduled height before download;
+    # scheduled-attestation verification is covered by C++ tests that can construct
+    # cadence heights without hours of wall-clock block production.
 
     # ---------------------------------------------------------------
-    # Test 8: Bootstrap from snapshot endpoint (latest)
+    # Test 8: Base-URL bootstrap ignores manual snapshots
     # ---------------------------------------------------------------
-    Print("=== Test 8: Bootstrap from snapshot endpoint ===")
-
-    # Use snap2 (the second snapshot from test 7) — attest it now.
-    # The attestation lands in a block after snap2BlockNum.
-    snap2BlockId = snap2Info["head_block_id"]
-    Print(f"Submit votesnaphash for snapshot at block {snap2BlockNum}")
-    success, trans = node0.pushMessage("sysio", "votesnaphash",
-        json.dumps({
-            "snap_account": snapProv1.name,
-            "block_id": snap2BlockId,
-            "snapshot_hash": snap2RootHash
-        }),
-        f"--permission {snapProv1.name}@active")
-    assert success, f"Failed to submit snapshot vote: {trans}"
-
-    assert node0.waitForHeadToAdvance(), "Head did not advance after vote"
-
-    # KV table rows are returned as {"key": {...}, "value": {...}}
-    records = node0.getTableRows("sysio", "sysio", "snaprecords")
-    found = any(r["value"]["block_num"] == snap2BlockNum for r in records)
-    assert found, f"Attestation record not created for block {snap2BlockNum}"
-
-    # Wait for attestation to become irreversible so the bootstrap node
-    # will see it when syncing
-    assert node0.waitForLibToAdvance(timeout=30), "LIB did not advance after attestation"
+    Print("=== Test 8: Base-URL bootstrap ignores manual snapshots ===")
 
     # Kill and wipe bootstrap node
     Print("Kill and wipe bootstrap node (node 2)")
@@ -451,61 +326,42 @@ try:
     bootstrapNode.removeDataDir(rmBlocks=True)
 
     endpointUrl = node0.endpointHttp
-    Print(f"Restart bootstrap node with --snapshot-endpoint {endpointUrl}")
+    Print(f"Attempt bootstrap with --snapshot-endpoint {endpointUrl}")
 
-    # Fetches latest snapshot (snap2). The attestation is NOT in the snapshot —
-    # it's in blocks after snap2BlockNum. The bootstrap node syncs forward and
-    # finds the attestation record once it reaches those blocks.
+    # No scheduled snapshot exists, so discovery must fail before any manual snapshot download.
     isRelaunchSuccess = bootstrapNode.relaunch(
-        chainArg=f"--delete-all-blocks --snapshot-endpoint {endpointUrl}")
-    assert isRelaunchSuccess, "Failed to relaunch bootstrap node from snapshot endpoint"
-
-    # The attestation is in blocks after the snapshot height, so wait for the bootstrap
-    # node to sync forward until the record is visible (not just one LIB advance).
-    Print("Wait for bootstrap node to sync past the attestation block")
-    assert waitForAttestationRecord(bootstrapNode, snap2BlockNum), \
-        f"Attestation for block {snap2BlockNum} not found on bootstrap node"
+        chainArg=f"--delete-all-blocks --snapshot-endpoint {endpointUrl}", timeout=10)
+    assert not isRelaunchSuccess, \
+        "Bootstrap should reject an endpoint without a scheduled snapshot"
+    assert bootstrapNode.findInLog(r"URL not found") is not None, \
+        "Missing no-scheduled-snapshot endpoint diagnostic"
+    assert not list(bootstrapNode.data_dir.glob("snapshots/snapshot-bootstrap-*.bin")), \
+        "Manual endpoint snapshot was downloaded before discovery rejection"
 
     Print("Test 8 PASSED")
 
     # ---------------------------------------------------------------
-    # Test 9: Bootstrap with specific block number in URL
+    # Test 9: Reject specific manual snapshot endpoint
     # ---------------------------------------------------------------
-    Print("=== Test 9: Bootstrap with specific block number ===")
+    Print("=== Test 9: Reject specific manual snapshot endpoint ===")
 
-    # Also attest the first snapshot so we can bootstrap from it
-    Print(f"Submit votesnaphash for first snapshot at block {snapBlockNum}")
-    success, trans = node0.pushMessage("sysio", "votesnaphash",
-        json.dumps({
-            "snap_account": snapProv1.name,
-            "block_id": snapBlockId,
-            "snapshot_hash": snapRootHash
-        }),
-        f"--permission {snapProv1.name}@active")
-    assert success, f"Failed to attest first snapshot: {trans}"
+    # launchCmd saves the attempted command before readiness is checked, including for an expected
+    # startup failure. Reuse its --delete-all-blocks option and replace the endpoint instead of
+    # appending duplicate options that would fail before endpoint validation.
 
-    assert node0.waitForLibToAdvance(timeout=30), "LIB did not advance"
-
-    # Kill and wipe bootstrap node again
-    bootstrapNode.kill(signal.SIGTERM)
-    bootstrapNode.removeDataDir(rmBlocks=True)
-
-    # Bootstrap requesting the FIRST snapshot by block number in URL.
-    # Use addSwapFlags to replace --snapshot-endpoint value (avoid duplicate flags
-    # from the previous relaunch which stored the modified cmd).
+    # Request the first manual snapshot by block number in the URL.
     endpointUrlWithBlock = f"{endpointUrl}/{snapBlockNum}"
     Print(f"Restart with --snapshot-endpoint {endpointUrlWithBlock}")
 
     isRelaunchSuccess = bootstrapNode.relaunch(
-        addSwapFlags={"--snapshot-endpoint": endpointUrlWithBlock})
-    assert isRelaunchSuccess, "Failed to relaunch with specific block number"
-
-    # Bootstrapped from the FIRST (older) snapshot, so the attestation block is many
-    # blocks ahead of the loaded state -- a single LIB advance is not enough. Poll for
-    # the record until the node syncs forward to it.
-    Print("Wait for bootstrap node to sync past the attestation block")
-    assert waitForAttestationRecord(bootstrapNode, snapBlockNum), \
-        "First snapshot attestation not found after specific-block bootstrap"
+        addSwapFlags={"--snapshot-endpoint": endpointUrlWithBlock}, timeout=10)
+    assert not isRelaunchSuccess, \
+        "Bootstrap should reject an unattestable specific manual snapshot"
+    assert bootstrapNode.findInLog(
+        rf"Snapshot endpoint returned unscheduled block #{snapBlockNum}") is not None, \
+        "Missing specific-block snapshot endpoint diagnostic"
+    assert not list(bootstrapNode.data_dir.glob("snapshots/snapshot-bootstrap-*.bin")), \
+        "Specific unscheduled endpoint snapshot was downloaded before rejection"
 
     Print("Test 9 PASSED")
 

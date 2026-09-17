@@ -11,12 +11,15 @@ add_executable( test_fc
         crypto/test_webauthn.cpp
         io/test_cfile.cpp
         io/test_json.cpp
+        io/test_json_template.cpp
         io/test_secure_file.cpp
         log/test_json_formatter.cpp
+        log/test_es_sink.cpp
         io/test_json_variant.cpp
         io/test_random_access_file.cpp
         io/test_raw.cpp
         io/test_tracked_storage.cpp
+        network/es/test_es_client.cpp
         network/ethereum/test_ethereum_client_and_rlp.cpp
         network/ethereum/test_ethereum_transaction_policy.cpp
         network/test_http_client.cpp
@@ -42,9 +45,9 @@ add_executable( test_fc
         test_bls.cpp
         test_bitset.cpp
         test_ordered_diff.cpp
-        test_opreg_status.cpp
         test_system_timer.cpp
         parallel/test_worker_task_queue.cpp
+        parallel/test_batch_task_queue.cpp
         task/test_retry.cpp
         main.cpp
         )

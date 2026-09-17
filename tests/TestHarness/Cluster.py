@@ -68,6 +68,9 @@ class Cluster(object):
     __finalizerCatchupStableRounds=3
     __finalizerCatchupReportInterval=5
     __setFinalizerCpuRetryAttempts=30
+    __systemContractName="sysio.system"
+    __systemContractInitVersion=0
+    __coreSymbolPrecision=4
 
     # pylint: disable=too-many-arguments
     def __init__(self, localCluster=True, host="localhost", port=None, walletHost="localhost", walletPort=None
@@ -1172,6 +1175,40 @@ class Cluster(object):
         transId = Node.getTransId(trans[1])
         return transId
 
+    def deploySystemContract(self, node, sysioAccount):
+        """Deploy the current system contract and wait for the deployment transaction."""
+        contract=self.__systemContractName
+        contractDir=str(self.contractsPath / contract)
+        wasmFile=f"{contract}.wasm"
+        abiFile=f"{contract}.abi"
+        Utils.Print(f"Publish {contract} contract")
+        trans=node.publishContract(sysioAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print(f"ERROR: Failed to publish contract {contract}.")
+            return False
+
+        Node.validateTransaction(trans)
+        return True
+
+    def initializeSystemContract(self, node, sysioAccount):
+        """Initialize the deployed system contract and wait for the action transaction."""
+        action="init"
+        data=(f'{{"version":{self.__systemContractInitVersion},'
+              f'"core":"{self.__coreSymbolPrecision},{CORE_SYMBOL}"}}')
+        opts=f"--permission {sysioAccount.name}@active"
+        trans=node.pushMessage(sysioAccount.name, action, data, opts)
+        if trans is None or not trans[0]:
+            Utils.Print(f"ERROR: Failed to initialize contract {self.__systemContractName}.")
+            return False
+
+        transId=Node.getTransId(trans[1])
+        Utils.Print("Wait for system init transaction to be in a block.")
+        if not node.waitForTransactionInBlock(transId):
+            Utils.Print(f"ERROR: Failed to validate transaction {transId} in block on server port {node.port}")
+            return False
+
+        return True
+
     def bootstrap(self, launcher,  biosNode, totalNodes, prodCount, totalProducers, pfSetupPolicy, onlyBios=False, onlySetProds=False, loadSystemContract=True, activateIF=False, biosFinalizer=True, signatureProviderForNonProducer=False):
         """Create 'prodCount' init accounts and deposits 10000000000 SYS in each. If prodCount is -1 will initialize all possible producers.
         Ensure nodes are inter-connected prior to this call. One way to validate this will be to check if every node has block 1."""
@@ -1301,17 +1338,8 @@ class Cluster(object):
             return None
 
         if loadSystemContract:
-            contract="sysio.system"
-            contractDir=str(self.contractsPath / contract)
-            wasmFile="%s.wasm" % (contract)
-            abiFile="%s.abi" % (contract)
-            Utils.Print("Publish %s contract" % (contract))
-            trans=biosNode.publishContract(sysioAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
-            if trans is None:
-                Utils.Print("ERROR: Failed to publish contract %s." % (contract))
+            if not self.deploySystemContract(biosNode, sysioAccount):
                 return None
-
-            Node.validateTransaction(trans)
 
         # verify node is synced before setting prods
         headBlockNum=biosNode.getHeadBlockNum()
@@ -1537,7 +1565,7 @@ class Cluster(object):
         if loadSystemContract:
             Utils.Print("Set default emission config")
             action="setemitcfg"
-            data='{"cfg":{"t1_allocation":"7500000000000000","t2_allocation":"1000000000000000","t3_allocation":"100000000000000","t1_duration":31104000,"t2_duration":62208000,"t3_duration":93312000,"min_claimable":"10000000000","t5_distributable":"375000000000000000","t5_floor":"125000000000000000","target_annual_decay_bps":6940,"annual_initial_emission":"205549750000000000","annual_max_emission":"1095000000000000000","annual_min_emission":"36500000000000000","compute_bps":4000,"capex_bps":2000,"governance_bps":1000,"producer_bps":7000,"batch_op_bps":3000,"standby_end_rank":28,"epoch_log_retention_count":8640,"pay_cadence_epochs":2}}'
+            data='{"cfg":{"t1_allocation":"7500000000000000","t2_allocation":"1000000000000000","t3_allocation":"100000000000000","t1_duration":31104000,"t2_duration":62208000,"t3_duration":93312000,"min_claimable":"10000000000","t5_distributable":"375000000000000000","t5_floor":"125000000000000000","target_annual_decay_bps":6940,"annual_initial_emission":"205549750000000000","annual_max_emission":"1095000000000000000","annual_min_emission":"36500000000000000","compute_bps":4000,"capex_bps":2000,"governance_bps":1000,"producer_bps":7000,"batch_op_bps":3000,"standby_end_rank":28,"standby_bps":800,"epoch_log_retention_count":8640,"pay_cadence_epochs":2}}'
             opts="--permission %s@active" % (sysioAccount.name)
             trans=biosNode.pushMessage(sysioAccount.name, action, data, opts)
             transId=Node.getTransId(trans[1])
@@ -1568,14 +1596,7 @@ class Cluster(object):
 
         # Only call init if the system contract is loaded
         if loadSystemContract:
-            action="init"
-            data="{\"version\":0,\"core\":\"4,%s\"}" % (CORE_SYMBOL)
-            opts="--permission %s@active" % (sysioAccount.name)
-            trans=biosNode.pushMessage(sysioAccount.name, action, data, opts)
-            transId=Node.getTransId(trans[1])
-            Utils.Print("Wait for system init transaction to be in a block.")
-            if not biosNode.waitForTransactionInBlock(transId):
-                Utils.Print("ERROR: Failed to validate transaction %s in block on server port %d." % (transId, biosNode.port))
+            if not self.initializeSystemContract(biosNode, sysioAccount):
                 return None
 
         Utils.Print("Cluster bootstrap done.")

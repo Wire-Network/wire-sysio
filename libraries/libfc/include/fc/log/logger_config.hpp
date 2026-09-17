@@ -31,6 +31,13 @@ namespace fc {
          // (string/number/bool/null) coerced to string at load time. Nested
          // objects or arrays throw fc::bad_cast_exception on configure_logging.
          fc::variant_object extra_fields;
+         // layout is a fc::log::json_layout token template controlling the document
+         // shape (see fc/log/json_layout.hpp). Empty/absent renders the historical
+         // fc JSONL shape (fc::log::default_layout); fc::log::es_default_layout is
+         // the shipped Elasticsearch/OpenSearch document template. A malformed
+         // template (unknown token/modifier, unterminated placeholder) fails
+         // configure_logging.
+         std::string layout;
       };
    } // namespace format
 
@@ -133,7 +140,7 @@ namespace fc {
 FC_REFLECT( fc::sink_config, (name)(type)(args)(format)(enabled) )
 FC_REFLECT( fc::format_config, (type)(args) )
 FC_REFLECT( fc::format::pattern_config, (pattern) )
-FC_REFLECT( fc::format::json_config, (extra_fields) )
+FC_REFLECT( fc::format::json_config, (extra_fields)(layout) )
 FC_REFLECT( fc::sink::level_color, (level)(color) )
 FC_REFLECT_ENUM( fc::sink::output_t, (stderr)(stdout) )
 FC_REFLECT( fc::sink::console_sink_config, (color)(level_colors)(output_type) )

@@ -9,6 +9,7 @@
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opp.common/slug_name.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
+#include <sysio.opp.common/wire_asset.hpp>
 #include <magic_enum/magic_enum.hpp>
 
 namespace sysio {
@@ -52,31 +53,26 @@ namespace sysio {
       static constexpr name TOKEN_ACCOUNT  = "sysio.token"_n;
       static constexpr name SYSTEM_ACCOUNT = "sysio"_n;
 
-      // Core token symbol — currently SYS, may change to WIRE
-      static constexpr symbol CORE_SYM = symbol("SYS", 4);
+      /// WIRE collateral asset held by the depot-side operator registry.
+      static constexpr symbol WIRE_SYM = opp::wire::asset_symbol;
 
       // 2-epoch wait between `queue_withdraw` and `flushwithdraws` releasing
       // funds. Long enough that an operator who would drop below the role
       // minimum is demoted before the funds physically leave.
       static constexpr uint32_t WITHDRAW_WAIT_EPOCHS = 2;
 
-      /// Safety rails on the collateral withdraw queue (SEC-78 / WSA-166).
-      /// `withdraw` / `withdrawinle` are operator-driven and bounded only by
-      /// available collateral, so without a row cap an operator could split
-      /// collateral into an unbounded number of system-paid `wtdwqueue` rows and
-      /// force `flushwtdw` to process them all inside one `sysio.epoch::advance`
-      /// transaction. That transaction's CPU budget (~150 ms) is a hard,
-      /// uncatchable deadline, so an oversized queue would abort every advance
-      /// and stall epoch progress chain-wide.
-      ///
+      /// Per-(operator, chain, token) cap on pending collateral withdrawals
+      /// (WIRE-376 / WNS-41). The cap covers both request entry points. A
+      /// cancellation or flush erases the row and permits the next request for
+      /// that collateral bucket.
+      static constexpr uint32_t MAX_OUTSTANDING_WITHDRAWS_PER_COLLATERAL_BUCKET = 1;
+
+      /// Safety rail on collateral-withdraw flush work (SEC-78 / WSA-166).
       /// MAX_WTDW_FLUSH_PER_EPOCH bounds the matured rows flushed per advance;
       /// undrained rows stay queued (collateral stays in the operator's balance
-      /// until flushed) and flush a later epoch. Ingress is already bounded
-      /// economically -- withdraw rows can never exceed the operator's real
-      /// deposited collateral, and direct `withdraw` bills the operator CPU/NET
-      /// per call -- so the flush bound alone is the liveness rail; there is no
-      /// per-account row cap. Conservatively sized to stay well under the
-      /// transaction CPU ceiling shared with the rest of advance's fan-out.
+      /// until flushed) and flush a later epoch. Conservatively sized to stay
+      /// well under the transaction CPU ceiling shared with the rest of
+      /// advance's fan-out.
       static constexpr uint32_t MAX_WTDW_FLUSH_PER_EPOCH = 32;
 
       /// Rolling delivery-buffer thresholds for batch-op termination. Per the
@@ -219,9 +215,10 @@ namespace sysio {
                        opp::types::OperatorType type,
                        bool is_bootstrapped);
 
-      /// Operator-callable: lock CORE_SYM tokens directly as the operator's
+      /// Operator-callable: lock WIRE tokens directly as the operator's
       /// WIRE-side collateral. The tokens transfer in the same transaction;
-      /// the corresponding (operator, WIRE, WIRE_TOKEN) balance row is
+      /// the corresponding (operator, opp::wire::chain_code,
+      /// opp::wire::token_code) balance row is
       /// credited. Reverts on validation failure (no escrow exists yet —
       /// failure surfaces in the operator's signing tx so they can retry).
       [[sysio::action]]
@@ -345,7 +342,7 @@ namespace sysio {
       [[sysio::action]]
       void terminate(name account, std::string reason);
 
-      /// Auth = the claiming operator. Pull CORE_SYM collateral credited by a WIRE-chain remit
+      /// Auth = the claiming operator. Pull WIRE collateral credited by a WIRE-chain remit
       /// (withdraw flush, deferred lock release, or termination payout) in a single transfer.
       ///
       /// The remit paths credit rather than transfer because they are reachable from
@@ -500,7 +497,9 @@ namespace sysio {
       // the row as `by_account_ck()` for cross-contract comparisons but is
       // NOT a table-managed secondary index. Callers scan `byaccount`
       // (uint64) and filter (chain_code, token_code) in memory — cheap
-      // because pending-withdraw counts per account are O(1)-ish.
+      // because pending-withdraw counts per account are bounded by the number
+      // of its collateral buckets times
+      // MAX_OUTSTANDING_WITHDRAWS_PER_COLLATERAL_BUCKET.
       using wtdwqueue_t = sysio::kv::table<"wtdwqueue"_n, withdraw_key, withdraw_request,
          sysio::kv::index<"byeligible"_n,
             sysio::const_mem_fun<withdraw_request, uint64_t, &withdraw_request::by_eligible>>,
@@ -537,7 +536,7 @@ namespace sysio {
             sysio::const_mem_fun<delivery_log_entry, uint128_t, &delivery_log_entry::by_account_ts>>
       >;
 
-      /// Claimable CORE_SYM collateral owed to an operator by a WIRE-chain remit: a withdraw
+      /// Claimable WIRE collateral owed to an operator by a WIRE-chain remit: a withdraw
       /// flush (`flushwtdw`), a deferred lock release on a TERMINATED operator, or the
       /// termination payout itself.
       ///
@@ -579,7 +578,7 @@ namespace sysio {
 
       struct [[sysio::table("remitclaims")]] remit_claim {
          sysio::name account;
-         uint64_t    balance        = 0;   // atomic CORE_SYM units owed, not yet claimed
+         uint64_t    balance        = 0;   ///< Atomic WIRE units owed, not yet claimed.
          uint32_t    expires_at_sec = 0;   // recorded by `credit`; read by nothing yet (WIRE-339)
 
          /// Expiry-major composite so the secondary index orders by expiry and a future retention

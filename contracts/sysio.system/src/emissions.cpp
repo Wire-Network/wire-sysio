@@ -1,10 +1,12 @@
 #include <sysio.system/sysio.system.hpp>
 #include <sysio.system/emissions.hpp>
 #include <sysio.system/opreg_status.hpp>
+#include <sysio.system/producer_score.hpp>
 
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 #include <sysio.opp.common/claimable.hpp>
+#include <sysio.opp.common/wire_asset.hpp>
 
 // Canonical contract headers used for cross-contract reads. The
 // [[sysio::contract("sysio.<name>")]] attribute on each table struct pins
@@ -37,13 +39,13 @@ namespace {
 // Compile-time constants (not user-configurable)
 // ---------------------------------------------------------------------------
 
-constexpr sysio::symbol WIRE_SYMBOL{"WIRE", 9};
-
-constexpr uint32_t ACTIVE_PRODUCER_COUNT  = 21;
 constexpr uint32_t STANDBY_START_RANK     = 22;
-constexpr uint32_t MAX_STANDBY_END_RANK   = 100; // safety cap: bounds inline-action count in payepoch
-constexpr uint32_t TOTAL_BLOCKS_PER_ROUND = ACTIVE_PRODUCER_COUNT * blocks_per_round; // 252
-constexpr uint32_t ACTIVE_PRODUCER_WEIGHT = 15; // > any standby weight (1..cfg.standby_end_rank-21)
+constexpr uint32_t MAX_STANDBY_END_RANK   = 100; // safety cap: bounds how many STANDBY retainers one
+                                                 // payepoch can credit. It does NOT bound the pay walk --
+                                                 // no-forfeiture means a producer far below the standby
+                                                 // band still has carried blocks to collect, so the walk
+                                                 // runs past this and is bounded by max_rank_walk_rows.
+constexpr int64_t  MS_PER_SECOND          = 1000;
 
 // Basis-point denominator for all category / sub-split ratios.
 constexpr int64_t  BPS_DENOMINATOR        = 10000;
@@ -135,7 +137,7 @@ node_claim_result compute_node_claim(const emission_state& emission,
 // accounts table because the upstream types are private.
 int64_t get_wire_balance(name account) {
    sysio::token::token::accounts acct_tbl(TOKEN_CONTRACT, account.value);
-   sysio::token::token::acct_key key{WIRE_SYMBOL.code().raw()};
+   sysio::token::token::acct_key key{sysio::opp::wire::asset_symbol.code().raw()};
    if (!acct_tbl.contains(key)) return 0;
    return acct_tbl.get(key).balance.amount;
 }
@@ -204,7 +206,7 @@ void send_wire_transfer(name self, name to, int64_t amount, std::string_view mem
       {self, "active"_n},
       TOKEN_CONTRACT,
       "transfer"_n,
-      std::make_tuple(self, to, asset{amount, WIRE_SYMBOL}, std::string{memo_str})
+      std::make_tuple(self, to, asset{amount, sysio::opp::wire::asset_symbol}, std::string{memo_str})
    ).send();
 }
 
@@ -259,12 +261,18 @@ emission_config get_emit_cfg(name self) {
 }
 
 // Canonical epoch duration lives on sysio.epoch::epochcfg. Both payepoch
-// (producer expected_rounds) and viewepoch (seconds_until_next) read it
+// (the producer pay period's slot count) and viewepoch (seconds_until_next) read it
 // here cross-contract so the value cannot drift from what advance() uses.
 uint32_t get_epoch_duration_sec() {
    sysio::epoch::epochcfg_t cfg_tbl(epoch_refs::account);
    sysio::check(cfg_tbl.exists(), "sysio.epoch config not initialized");
    return cfg_tbl.get().epoch_duration_sec;
+}
+
+// Same value for callers that may not throw -- see accrueepoch.
+uint32_t epoch_duration_sec_or_zero() {
+   sysio::epoch::epochcfg_t cfg_tbl(epoch_refs::account);
+   return cfg_tbl.exists() ? cfg_tbl.get().epoch_duration_sec : 0;
 }
 
 } // anonymous namespace
@@ -317,23 +325,31 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
                  "standby_end_rank must be >= standby_start_rank (22)");
    sysio::check(cfg.standby_end_rank <= MAX_STANDBY_END_RANK,
                  "standby_end_rank exceeds safety cap");
+   sysio::check(cfg.standby_bps <= BPS_DENOMINATOR,
+                 "standby_bps must be <= 10000");
 
    // Audit-log retention
    sysio::check(cfg.epoch_log_retention_count > 0,
                  "epoch_log_retention_count must be positive");
 
    // Pay cadence (number of epochs accumulated per payepoch firing). Zero
-   // would divide-by-zero in the period share-by-rounds math; no upper
-   // bound is enforced (operator's call).
+   // would divide-by-zero in the period share-by-rounds math. This upper bound
+   // caps retained history; the joint check after epochcfg is loaded separately
+   // caps expensive per-recipient payout work.
    sysio::check(cfg.pay_cadence_epochs > 0,
                  "pay_cadence_epochs must be positive");
+   sysio::check(cfg.pay_cadence_epochs <= emissions::MAX_PAY_CADENCE_EPOCHS,
+                 "pay_cadence_epochs exceeds batch roster history safety cap");
 
    // Single read of sysio.epoch::epochcfg shared by the round-to-zero guards
    // (which need epoch_secs to scale annual values) and the post-init guard
    // (which compares per-epoch floor against remaining distributable).
    sysio::epoch::epochcfg_t epoch_cfg_tbl(epoch_refs::account);
    const bool epoch_configured = epoch_cfg_tbl.exists();
-   const uint32_t epoch_secs   = epoch_configured ? epoch_cfg_tbl.get().epoch_duration_sec : 0;
+   const auto epoch_cfg = epoch_configured
+      ? epoch_cfg_tbl.get()
+      : sysio::epoch::epoch_config{};
+   const uint32_t epoch_secs = epoch_cfg.epoch_duration_sec;
 
    // Single read of t5_state shared by the period-accrual bound (which needs
    // the already-accrued pending amount) and the post-init brick guards below.
@@ -348,6 +364,11 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
    // and emissions silently disable. Skipped pre-bootstrap (sysio.epoch not
    // yet configured); the same check fires on the next setemitcfg call.
    if (epoch_configured) {
+      sysio::check(
+         emissions::batch_payout_work_fits(cfg.pay_cadence_epochs,
+                                            epoch_cfg.operators_per_epoch),
+         "pay_cadence_epochs x operators_per_epoch exceeds the batch payout credit safety cap (100)");
+
       if (cfg.annual_initial_emission > 0) {
          sysio::check(emissions::scale_annual_to_epoch(cfg.annual_initial_emission, epoch_secs) > 0,
                        "annual_initial_emission per-epoch share rounds to 0 at current epoch_duration_sec");
@@ -466,8 +487,8 @@ void system_contract::addnodeowner(const sysio::name& account_name, uint8_t tier
 
    nodedist.emplace(get_self(), pk, node_owner_distribution{
       .account_name     = account_name,
-      .total_allocation = asset{total_allocation_amount, WIRE_SYMBOL},
-      .claimed          = asset{0, WIRE_SYMBOL},
+      .total_allocation = asset{total_allocation_amount, sysio::opp::wire::asset_symbol},
+      .claimed          = asset{0, sysio::opp::wire::asset_symbol},
       .total_duration   = duration_seconds,
    });
 }
@@ -544,7 +565,7 @@ void system_contract::claimpay(const sysio::name& account_name) {
    payclaims_t claims(get_self());
    const uint64_t paid = sysio::opp::claimable::pay_out(
       claims, payclaim_key{account_name.value}, get_self(), TOKEN_CONTRACT,
-      account_name, WIRE_SYMBOL, std::string{memo::epoch_pay_claim}, NOTHING_TO_CLAIM_MSG);
+      account_name, sysio::opp::wire::asset_symbol, std::string{memo::epoch_pay_claim}, NOTHING_TO_CLAIM_MSG);
 
    payclaimtot_t tot_tbl(get_self());
    auto tot = tot_tbl.get_or_default(pay_claim_total{});
@@ -638,6 +659,16 @@ void system_contract::accrueepoch(uint32_t epoch_index,
    state.pending_emission_amount =
       saturating_accrue(state.pending_emission_amount, per_epoch_emission);
 
+   // The divisor accrues with the pool, at the duration in force for THIS epoch. Computing it at
+   // payout from the current duration would apply today's value to epochs that ran under a
+   // different one, mis-sizing the divisor for any period spanning a duration change.
+   // Read WITHOUT asserting the epoch config exists: this action is inline from
+   // sysio.epoch::advance and must not throw. A 0 duration accrues no slots and payout falls
+   // through to the produced-block divisor.
+   state.pending_nominal_slots += static_cast<uint64_t>(epoch_duration_sec_or_zero())
+      * static_cast<uint64_t>(MS_PER_SECOND)
+      / static_cast<uint64_t>(sysio::block_timestamp::block_interval_ms);
+
    // Lazy-grow batch_group_epochs to fit batch_group_index. Pre-pay-cadence
    // chains see length 0 and grow on first epoch under the new schema.
    if (batch_group_index >= state.batch_group_epochs.size()) {
@@ -651,6 +682,44 @@ void system_contract::accrueepoch(uint32_t epoch_index,
    state.last_epoch_emission = per_epoch_emission;
 
    t5s.set(state, get_self());
+}
+
+// rcrdbatch - retain the exact roster that accrued this epoch. The schedule
+// mutates before advance queues its inline actions, so a current position is
+// not a stable identity for an earlier epoch.
+void system_contract::rcrdbatch(uint32_t epoch_index, std::vector<sysio::name> members) {
+   require_auth(epoch_refs::account);
+
+   t5state_t t5s(get_self());
+   sysio::check(t5s.exists(), "t5 state not initialized");
+   const auto state = t5s.get();
+   sysio::check(epoch_index == state.last_epoch_index,
+                "rcrdbatch must run after accrueepoch for the same epoch_index");
+
+   // The scheduler supplies canonical order today. Sorting here keeps the
+   // table identity stable even if a future scheduler changes that detail.
+   std::sort(members.begin(), members.end());
+
+   batchepochs_t history(get_self());
+   const batch_epoch_key key{epoch_index};
+   sysio::check(!history.contains(key), "batch roster already recorded for epoch");
+
+   // Never let an old stored cadence make this mandatory inline action throw.
+   // Normal advances pay at most every MAX_PAY_CADENCE_EPOCHS, but the exact
+   // oldest key probe also heals a pre-bound configuration without
+   // deserializing every historical roster on each advance.
+   if (epoch_index > emissions::MAX_PAY_CADENCE_EPOCHS) {
+      const batch_epoch_key oldest_retained{
+         static_cast<uint32_t>(epoch_index - emissions::MAX_PAY_CADENCE_EPOCHS)};
+      if (history.contains(oldest_retained)) {
+         history.erase(oldest_retained);
+      }
+   }
+
+   history.emplace(get_self(), key, batch_epoch{
+      .sysio_epoch_index = epoch_index,
+      .members           = members,
+   });
 }
 
 // payepoch - pay the compute, capex, and governance shares of accumulated
@@ -668,18 +737,19 @@ void system_contract::accrueepoch(uint32_t epoch_index,
 // dclaim has funds the moment a claim is credited rather than at the next
 // pay-epoch.
 //
-// Swap-fee rewards: the batch-operator share of collected swap fees
+// Swap-fee rewards: when immutable roster history is complete and contains at
+// least one non-empty roster, the batch-operator share of collected swap fees
 // (sysio.reserv's rewards_bucket) is swept here via an inline drainrewards and
 // allocated EXCLUSIVELY to the batch-operator distribution, on top of their
-// emission share and weighted by the same per-group active-epoch count.
+// emission share and weighted by the same historical-roster active-epoch count.
+// Incomplete or all-empty history leaves the bucket in sysio.reserv for a later
+// payable period.
 // Producers are NOT paid out of swap fees, so producer_bps / batch_op_bps govern
 // the emission split only -- see the fold-in comment at the drain. Allocated is
-// not paid: only ELIGIBLE shares go out, and whatever is skipped stays in this
-// treasury, exactly as undistributed emission does. What is actually skipped is
-// listed at the batch-op loop below -- note a zero-epoch group is NOT one of
-// them, since its weighted allocation is zero to begin with.
-// Fees are funded by the sweep
-// (not the treasury) and so are excluded from total_distributed.
+// not paid: only ELIGIBLE shares go out, and any skipped amount from a completed
+// sweep stays in this treasury. The audit row records retained batch emission,
+// retained swept fees, and whether roster history was complete. Fees are funded
+// by the sweep (not the treasury) and so are excluded from total_distributed.
 //
 // Single-trx semantics guarantee gate conditions hold through this call;
 // payepoch trusts the gate-computed period_emission and does not recompute.
@@ -689,7 +759,7 @@ void system_contract::accrueepoch(uint32_t epoch_index,
 // Slashed / terminated batch-op group members are skipped via opreg filter;
 // their slice remains in the treasury.
 void system_contract::payepoch(uint32_t epoch_index,
-                               std::vector<std::vector<sysio::name>> batch_op_groups,
+                               std::vector<std::vector<sysio::name>>,
                                int64_t period_emission) {
    require_auth(epoch_refs::account);
 
@@ -734,7 +804,7 @@ void system_contract::payepoch(uint32_t epoch_index,
    // normalizations correct whatever the config did mid-period.
    //
    // Sum in int64: each counter is a uint32 epoch tally and the vector is sized
-   // from batch_op_groups, so the total cannot approach the int64 range. Zero is
+   // from a scheduler-bounded group list, so the total cannot approach the int64 range. Zero is
    // impossible in practice (payepoch asserts accrueepoch ran for this same
    // epoch_index, and accrueepoch always increments a slot) but is guarded at
    // each use, because a zero divisor would abort the whole advance chain.
@@ -742,6 +812,71 @@ void system_contract::payepoch(uint32_t epoch_index,
    for (const uint32_t group_epoch_count : state.batch_group_epochs) {
       accrued_epochs += group_epoch_count;
    }
+
+   // Preserve roster identity separately from the legacy positional counters.
+   // advance() slides its schedule before queueing this action, so a counter at
+   // position g cannot identify the roster that was active in a prior epoch.
+   struct recorded_batch_group {
+      std::vector<sysio::name> members;
+      uint32_t                 active_epochs = 0;
+   };
+
+   batchepochs_t batch_history(get_self());
+   std::vector<recorded_batch_group> recorded_batch_groups;
+   bool batch_history_complete = accrued_epochs > 0;
+   bool has_nonempty_batch_roster = false;
+   int64_t recorded_epochs = 0;
+   uint32_t batch_payout_credits = 0;
+   uint64_t expected_epoch_index = state.period_start_epoch;
+
+   for (auto it = batch_history.begin(); it != batch_history.end(); ++it) {
+      // A stale/corrupted table must not make the mandatory payepoch inline
+      // action abort. Bound deserialization to the configured safety window,
+      // retain the batch slice, and clear the table below so the next period
+      // starts from a fresh immutable roster history.
+      if (recorded_epochs == emissions::MAX_PAY_CADENCE_EPOCHS) {
+         batch_history_complete = false;
+         break;
+      }
+      ++recorded_epochs;
+
+      // A clean activation may initialize T5 after sysio.epoch has already
+      // advanced. In that first period, the earliest recorded roster defines
+      // the start rather than an obsolete literal epoch-one assumption.
+      if (expected_epoch_index == 0) {
+         expected_epoch_index = it->sysio_epoch_index;
+      }
+      if (static_cast<uint64_t>(it->sysio_epoch_index) != expected_epoch_index) {
+         batch_history_complete = false;
+      }
+      ++expected_epoch_index;
+
+      auto group_it = std::find_if(
+         recorded_batch_groups.begin(), recorded_batch_groups.end(),
+         [&](const auto& group) { return group.members == it->members; });
+      if (group_it == recorded_batch_groups.end()) {
+         const uint64_t credits_with_group =
+            static_cast<uint64_t>(batch_payout_credits) + it->members.size();
+         if (credits_with_group > emissions::MAX_BATCH_PAYOUT_CREDITS) {
+            batch_history_complete = false;
+         } else {
+            batch_payout_credits = static_cast<uint32_t>(credits_with_group);
+            has_nonempty_batch_roster =
+               has_nonempty_batch_roster || !it->members.empty();
+            recorded_batch_groups.push_back(recorded_batch_group{
+               .members       = it->members,
+               .active_epochs = 1,
+            });
+         }
+      } else {
+         group_it->active_epochs += 1;
+      }
+   }
+
+   batch_history_complete =
+      batch_history_complete
+      && recorded_epochs == accrued_epochs
+      && expected_epoch_index == static_cast<uint64_t>(epoch_index) + 1;
 
    // ----- Swap-fee rewards fold-in -----
    // The BATCH-OPERATOR half of collected swap fees accrues in sysio.reserv's
@@ -761,223 +896,281 @@ void system_contract::payepoch(uint32_t epoch_index,
    // `compute_amount` split only, and the entire drained fee pool goes to the
    // batch-op distribution below.
    //
-   // The fee WIRE lives in sysio.reserv's custody, so it must be swept here
-   // before the payouts below can spend it. drainrewards is queued FIRST (ahead
-   // of every payout transfer): inline actions execute depth-first, so the drain
-   // -- and the reserv->sysio transfer it queues -- run to completion before any
-   // sibling payout queued after it, landing the WIRE in this account's balance
+   // The fee WIRE lives in sysio.reserv's custody. Sweep it only when immutable
+   // roster history is complete and at least one roster can receive a share;
+   // otherwise leave the bucket in reserv so a later payable period can
+   // distribute it. When swept, drainrewards is queued FIRST
+   // (ahead of every payout transfer): inline actions execute depth-first, so the
+   // drain -- and the reserv->sysio transfer it queues -- run to completion before
+   // any sibling payout queued after it, landing the WIRE in this account's balance
    // first. MUST remain ahead of the first send_wire_transfer below.
    //
    // Fees are funded by that transfer, NOT the T5 treasury, so fee payouts are
    // tracked in `fee_paid` and excluded from total_distributed (which governs
-   // the emission curve). Any fee not distributed stays in this treasury, exactly
-   // as undistributed emission does — see the batch-op loop for what is actually
-   // retained (an EMPTY group holding positive epochs, non-ACTIVE members, the
-   // two integer divisions' remainders, or no groups at all). A group active in
-   // zero epochs retains NOTHING: its weighted allocation is already zero.
-   const int64_t fee_total = get_reserv_rewards_balance();
-   if (fee_total > 0) {
-      sysio::action(
-         {get_self(), "active"_n},
-         RESERV_CONTRACT,
-         "drainrewards"_n,
-         std::make_tuple(fee_total)
-      ).send();
+   // the emission curve). After a sweep, any amount skipped for an empty roster
+   // alongside a non-empty one, non-ACTIVE members, or integer-division
+   // remainders stays in this treasury. Incomplete or all-empty history leaves
+   // the entire bucket in reserv.
+   int64_t fee_batch_pool = 0;
+   if (batch_history_complete && has_nonempty_batch_roster) {
+      fee_batch_pool = get_reserv_rewards_balance();
+      if (fee_batch_pool > 0) {
+         sysio::action(
+            {get_self(), "active"_n},
+            RESERV_CONTRACT,
+            "drainrewards"_n,
+            std::make_tuple(fee_batch_pool)
+         ).send();
+      }
    }
-   const int64_t fee_batch_pool = fee_total;
 
    // "paid" here means DISTRIBUTED -- credited to `payclaims` for producers / standbys /
    // batch operators, transferred for the category buckets. Both leave the treasury's
    // spendable position, which is what these counters feed.
    int64_t actual_paid = 0; // emission actually distributed (counts toward total_distributed)
+   int64_t batch_emission_paid = 0;
    int64_t fee_paid    = 0; // swap-fee rewards actually distributed (does NOT count toward treasury)
 
    // =======================================================================
-   // Producer + standby pay. Active producers (rank 1..21) are paid in
-   // proportion to their eligible_rounds across the pay period; standbys
-   // (rank 22..cfg.standby_end_rank) are paid by the existing rank-
-   // decreasing weight without an eligible_rounds requirement. Producer
-   // counters accumulate across non-pay epochs (no reset by accrueepoch)
-   // and are zeroed at the end of this action. Recipients are filtered
-   // by opreg status so slashed / terminated operators are skipped.
+   // Producer + standby pay.
+   //
+   // Producers are paid PER BLOCK. The active slice of the producer pool is spread over the block
+   // slots the period held, and every schedulable producer is credited that rate for each block
+   // it made. A missed block is never counted, so its pay stays in the treasury: it does not flow
+   // to the producers that did show up, because the rate does not depend on who did. The divisor
+   // is the period's nominal slot count, raised to the blocks actually produced when a period runs
+   // long (an epoch can extend while a batch operator delivers), so the slice is never exceeded.
+   //
+   // Standbys (positions 22..cfg.standby_end_rank) draw a retainer from the standby slice
+   // (cfg.standby_bps of the pool). Each POSITION holds a fixed share, decaying linearly from
+   // position 22, over the constant sum of every position's weight -- a vacant position's share
+   // stays in the treasury. Block pay is not gated on position, so a producer that slid from 21
+   // to 22 mid-period is still paid for the blocks it made before the schedule caught up.
+   //
+   // Counters accumulate across non-pay epochs (no reset by accrueepoch) and are zeroed at the
+   // end of this action for every producer PAID by it. A producer that is not schedulable when the
+   // walk reaches it -- keyless, or one whose standing ended since its last rescore -- is neither
+   // paid nor reset: its block count waits for the first payepoch where it is schedulable again
+   // (a re-keyed producer's return; a terminated operator's, should it settle and re-register;
+   // never, for a slashed one, whose row is never pruned and which `regoperator` refuses). A
+   // producer BELOW the walk (demoted, parked, unbonded, slashed, terminated -- each rescored at
+   // the event) is not visited at all, with the same effect. Every block a producer makes is paid
+   // exactly once, at the first payepoch where it is payable.
    // =======================================================================
    {
       auto prod_by_rank = _producers.get_index<"prodrank"_n>();
 
-      // expected_rounds is derived from the configured epoch duration on
-      // sysio.epoch (canonical source of truth) scaled by the period's ACTUAL
-      // accrued epoch count, because elig_rounds accumulates across exactly those
-      // epochs. It must NOT scale by cfg.pay_cadence_epochs: a mid-period cadence
-      // change makes the two disagree (see accrued_epochs above), and the
-      // mismatch silently distorts every producer's pay share -- too small a
-      // denominator lets everyone hit the clamp and collect their full share, too
-      // large a one forfeits pay that was earned. Unlike the batch-op pool this
-      // cannot overpay past producer_pool (the clamp bounds each share by
-      // emis_share), so it skews proportions rather than the total.
-      const uint32_t epoch_duration_sec = get_epoch_duration_sec();
-      // Compute in uint64: epoch_duration_sec (<= 30 days) * the accrued epoch
-      // count * 2 overflows uint32 at the extremes, and a wrapped
-      // denominator would silently distort every producer's pay share. uint64
-      // holds the full product with room to spare; the result is a small round
-      // count that fits back into uint64 for the divide below.
-      uint64_t expected_rounds =
-         (static_cast<uint64_t>(epoch_duration_sec)
-          * static_cast<uint64_t>(accrued_epochs > 0 ? accrued_epochs : 1) * 2) / TOTAL_BLOCKS_PER_ROUND;
-      // Below ~126s of effective period duration (one full 21-producer round
-      // at 0.5s/block), expected_rounds truncates to zero. Falling back to 1
-      // keeps the pay formula well-defined -- producer pay collapses to
-      // "elig_rounds clamped to 1, pay = full_share" at the floor. This
-      // coarse-grained pay is the price of allowing sub-rotation period
-      // durations; documented at MIN_EPOCH_DURATION_SEC.
-      if (expected_rounds == 0) expected_rounds = 1;
+      const int64_t standby_pool = split_bps(producer_pool, cfg.standby_bps);
+      const int64_t active_pool  = producer_pool - standby_pool;
 
-      struct prod_entry {
+      // Nominal block slots in the period: the configured epoch duration (canonical on
+      // sysio.epoch) times the epochs the period ACTUALLY accrued -- never
+      // cfg.pay_cadence_epochs, which a mid-period change makes disagree with the accrual --
+      // at one slot per block interval. uint64: a 30-day epoch times a large cadence overflows
+      // uint32.
+      // Accumulated by `accrueepoch` at each epoch's OWN duration -- every epoch of the period
+      // including this one, exactly as `pending_emission_amount` is (the equality check above
+      // pins that). The fallback is the zero-accrual case, not a compatibility path.
+      const uint64_t this_epoch_slots =
+         static_cast<uint64_t>(get_epoch_duration_sec())
+         * static_cast<uint64_t>(MS_PER_SECOND)
+         / static_cast<uint64_t>(sysio::block_timestamp::block_interval_ms);
+      const uint64_t nominal_slots = state.pending_nominal_slots > 0
+         ? state.pending_nominal_slots
+         : this_epoch_slots * static_cast<uint64_t>(accrued_epochs > 0 ? accrued_epochs : 1);
+
+      // Standby position weights run N at position 22 down to 1 at standby_end_rank; their sum
+      // is the divisor, so a position's share is the same whether or not it is filled.
+      const uint64_t standby_positions  = cfg.standby_end_rank + 1 - STANDBY_START_RANK;
+      const uint64_t standby_weight_sum = standby_positions * (standby_positions + 1) / 2;
+
+      struct pay_entry {
          name     owner;
-         uint32_t weight;
-         uint32_t elig_rounds;
-         bool     is_standby;
+         uint32_t blocks;
+         uint64_t standby_weight;
       };
-      std::vector<prod_entry> eligible;
-      std::vector<name>       to_reset; // snapshot before modify: avoids
-                                         // iterating while mutating secondary idx
-      uint32_t total_weight = 0;
+      struct reset_entry {
+         name owner;
+         bool snapshot; // this payout consumed the row's attestation credit
+      };
+      std::vector<pay_entry>   entries;
+      std::vector<reset_entry> to_reset; // snapshot before modify: avoids
+                                          // iterating while mutating secondary idx
+      uint64_t produced_blocks = 0;
 
-      // Single pass over the rank-ordered producers: builds both the pay list
-      // (eligible) and the counter-reset list (to_reset). The lists differ --
-      // to_reset includes slashed / terminated producers with stale counters,
-      // eligible does not.
+      // Single pass over the rank-ordered producers: builds both the pay list (entries) and the
+      // counter-reset list (to_reset). `position` is POSITION in this index among SCHEDULABLE
+      // producers, counted while walking -- not a stored ordinal. The demoted tier sorts last and
+      // is never schedulable, so it bounds the walk over what is a permissionless, unbounded
+      // table; every row above it was a live, bonded producer operator at its last rescore, and
+      // every event that ends that standing rescores the row (see producer_rank::compute).
+      //
+      // The divisor counts exactly the blocks this payepoch pays for. A count that waits on an
+      // unpayable row is neither paid nor counted now; when its producer is payable again the
+      // carried blocks are paid at THAT period's rate and counted in THAT period's divisor.
+      uint32_t position = 0;
+      uint32_t examined = 0;
       for (auto it = prod_by_rank.begin(); it != prod_by_rank.end(); ++it) {
-         if (it->rank > cfg.standby_end_rank) break;
+         if (producer_rank::tier_of(it->rank_score) == producer_tier::demoted) break;
+         // Hard ceiling on rows examined. This walk runs INLINE in an epoch advance, where an
+         // overrun stalls the chain, so its cost may not depend on the demoted tier actually
+         // bounding it. A row past the ceiling is neither paid nor reset -- the same treatment an
+         // unpayable row gets -- so its blocks carry rather than vanish.
+         //
+         // Its snapshot counter is not reset either, and nothing rescores it, so a SCHEDULABLE row
+         // past this ceiling keeps a stored rank_score carrying last period's snapshot term until
+         // some unrelated event rescores it -- `compute` would drop the credit as stale, but the
+         // stored key is not recomputed. Accepted rather than swept: reaching it takes 500+ ranked
+         // schedulable producers, and the rows short of that are unaffected. A demoted row's stale
+         // term is inert (every walk breaks at that tier, so nothing reads the order within it),
+         // and an inactive one is `unscored()` and carries no term at all.
+         if (++examined > max_rank_walk_rows) break;
 
-         // Reset list: every rank-ranged producer with stale counters gets
-         // reset, regardless of is_active / opreg status. Slashed producers
-         // still need their counters cleared for the next epoch.
-         if (it->unpaid_blocks > 0 || it->eligible_rounds > 0 || it->current_round_blocks > 0) {
-            to_reset.push_back(it->owner);
+         // is_schedulable requires an active row, ACTIVE opreg status, and an active finalizer
+         // key: a producer missing any of them can never be scheduled, so it draws neither block
+         // pay nor a standby retainer -- and keeps its block count for when it can. The snapshot
+         // counter is per period regardless.
+         if (!producer_rank::is_schedulable(*it, _finalizers)) {
+            if (it->snapshot_attestations > 0) to_reset.push_back({it->owner, true});
+            continue;
          }
 
-         if (!it->is_active) continue;
-         // opreg filter: skip slashed / terminated / unknown
-         if (!is_op_active(it->owner, OperatorType::OPERATOR_TYPE_PRODUCER)) continue;
-
-         uint32_t w      = 0;
-         bool     standby = false;
-         uint32_t rounds  = 0;
-
-         if (it->rank >= 1 && it->rank <= ACTIVE_PRODUCER_COUNT) {
-            rounds = it->eligible_rounds;
-            if (it->current_round_blocks >= min_blocks_per_round_for_pay) rounds++;
-            if (rounds == 0) continue;
-            w = ACTIVE_PRODUCER_WEIGHT;
-         } else if (it->rank >= STANDBY_START_RANK && it->rank <= cfg.standby_end_rank) {
-            w       = cfg.standby_end_rank + 1 - it->rank;
-            standby = true;
+         produced_blocks += it->unpaid_blocks;
+         if (it->unpaid_blocks > 0 || it->snapshot_attestations > 0) {
+            to_reset.push_back({it->owner, it->snapshot_attestations > 0});
          }
 
-         if (w > 0) {
-            eligible.push_back({it->owner, w, rounds, standby});
-            total_weight += w;
+         ++position;
+         const bool standby = position >= STANDBY_START_RANK && position <= cfg.standby_end_rank;
+         const uint64_t standby_weight = standby ? cfg.standby_end_rank + 1 - position : 0;
+         if (it->unpaid_blocks > 0 || standby_weight > 0) {
+            entries.push_back({it->owner, it->unpaid_blocks, standby_weight});
          }
       }
 
+      // `nominal_slots` is the period's entitlement; `produced_blocks` raises it when a period ran
+      // long, so no producer's rate exceeds its slice.
+      //
+      // Carried blocks are NOT subtracted back out. A row whose pay rounds to zero keeps its blocks
+      // (that promise is what makes the model forfeiture-free) and they are counted again in the
+      // period that settles them -- a hair of dilution, and only when the per-block rate is under
+      // one subunit. Correcting it took a second pass that could overdraw the pool.
+      const uint64_t slot_divisor = std::max<uint64_t>(std::max(nominal_slots, produced_blocks), 1);
+
       // Producers are paid the emission share only — swap fees go to the
       // underwriter + batch operators (see the fold-in comment above).
+      //
+      // A row's blocks are cleared ONLY when the block portion actually credited something. The
+      // division is integer, so a small pool over a large divisor can round a real block count to
+      // zero pay; clearing the count then would destroy work the producer did, which is the one
+      // thing this model promises never to do. An uncredited count carries to the next payout
+      // exactly as an unpayable row's does, and the rate it eventually settles at is the settling
+      // period's -- so the blocks are worth something the moment the pool can represent them.
       int64_t distributed_to_producers = 0;
-      if (total_weight > 0) {
-         for (const auto& pe : eligible) {
-            const int64_t emis_share = static_cast<int64_t>(
-               static_cast<__int128>(producer_pool) * pe.weight / total_weight);
-            int64_t pay;
-            if (pe.is_standby) {
-               pay = emis_share;
-            } else {
-               uint64_t r = (pe.elig_rounds > expected_rounds) ? expected_rounds : pe.elig_rounds;
-               pay = static_cast<int64_t>(
-                  static_cast<__int128>(emis_share) * r / expected_rounds);
-            }
-            if (pay > 0) {
-               credit_pay(get_self(), pe.owner, pay, memo::producer_reward);
-               distributed_to_producers += pay;
-            }
+      std::vector<name> block_paid;
+      block_paid.reserve(entries.size());
+      for (const auto& entry : entries) {
+         const int64_t block_pay = static_cast<int64_t>(
+            static_cast<__int128>(active_pool) * entry.blocks / slot_divisor);
+         int64_t pay = block_pay;
+         if (entry.standby_weight > 0) {
+            pay += static_cast<int64_t>(
+               static_cast<__int128>(standby_pool) * entry.standby_weight / standby_weight_sum);
          }
+         if (pay > 0) {
+            credit_pay(get_self(), entry.owner, pay, memo::producer_reward);
+            distributed_to_producers += pay;
+         }
+         // The BLOCK portion specifically -- a standby whose retainer paid but whose block pay
+         // rounded to zero keeps its blocks too.
+         if (block_pay > 0) block_paid.push_back(entry.owner);
       }
 
       actual_paid += distributed_to_producers;
 
-      // Reset round-tracking after distribution (iteration-safe: uses PK snapshot).
-      // The reclaimed count is accumulated across the loop and applied to the global in one
-      // modify, so the whole reset costs a single deferred KV write rather than one per producer.
-      uint32_t reclaimed_unpaid_blocks = 0;
-      for (const auto& owner : to_reset) {
-         auto key = producer_key_t{owner.value};
+      // Sorted so the join below is a binary search. This action runs INLINE in the epoch advance,
+      // where an overrun stalls the chain, and both vectors are bounded by `max_rank_walk_rows` --
+      // a linear scan per reset entry is quadratic in a number an unbounded, permissionless table
+      // controls.
+      std::sort(block_paid.begin(), block_paid.end());
+
+      // Reset the period's counters after distribution (iteration-safe: uses PK snapshot).
+      for (const auto& entry : to_reset) {
+         const bool clear_blocks =
+            std::binary_search(block_paid.begin(), block_paid.end(), entry.owner);
+         if (!clear_blocks && !entry.snapshot) continue;
+         auto key = producer_key_t{entry.owner.value};
          _producers.modify(same_payer, key, [&](auto& p) {
-            reclaimed_unpaid_blocks += p.unpaid_blocks;
-            p.unpaid_blocks        = 0;
-            p.eligible_rounds      = 0;
-            p.current_round_blocks = 0;
-            p.last_block_num       = no_prev_block;
+            if (clear_blocks)   p.unpaid_blocks          = 0;
+            if (entry.snapshot) p.snapshot_attestations  = 0;
          });
-      }
-      if (reclaimed_unpaid_blocks > 0) {
-         _global.modify(get_self(), [&](auto& g) { g.total_unpaid_blocks -= reclaimed_unpaid_blocks; });
+         // Zeroing snapshot_attestations moved the snapshot factor; keep the sort key in step.
+         if (entry.snapshot) rescore_producer(entry.owner);
       }
    }
 
    // =======================================================================
-   // Batch-op pay. With pay_cadence_epochs > 1 the active group can rotate
-   // multiple times across a period, so each group's slice is weighted by
-   // its active-epoch count (state.batch_group_epochs[g]) over the period.
-   //
-   // The divisor is the ACTUAL accrued epoch count -- the sum of those counters
-   // -- NOT cfg.pay_cadence_epochs. The two can disagree: accrueepoch increments
-   // one slot per epoch unconditionally, while setemitcfg may change
-   // pay_cadence_epochs at any time, taking effect on the next advance. Lowering
-   // cadence 3->1 after one accrual leaves the counters summing to 2 against a
-   // divisor of 1, which pays 2x batch_pool AND 2x fee_batch_pool -- the surplus
-   // fee drawn from this treasury even though only one fee pool was swept from
-   // sysio.reserv, and invisible to total_distributed because fee payouts are
-   // excluded from it. A shortened genesis period underpays by the inverse.
-   // Summing the counters makes the per-group weights partition the pool by
-   // construction, whatever the config did mid-period.
-   //
-   // A group active in zero epochs is skipped, but that retains NOTHING: its
-   // weighted allocation is `pool * 0 / accrued_epochs` == 0, and since the
-   // counters sum to that divisor the remaining groups already absorb the whole
-   // pool. What ACTUALLY leaves WIRE behind in the treasury is:
-   //   * no groups at all (the enclosing `if` fails) — the entire pool;
-   //   * an EMPTY group that owns POSITIVE epochs — skipped by the `group.empty()`
-   //     test BEFORE the epoch check, so its weighted slice is never paid;
-   //   * a member not registered ACTIVE in sysio.opreg (slashed / terminated /
-   //     unknown) — that member's per-member slice;
-   //   * the remainders of the two integer divisions below (per-group weighting
-   //     and the even per-member split).
+   // Batch-op pay. Each historical roster receives a slice weighted by its
+   // actual active epochs over the period. The legacy counters still supply the
+   // actual period length, rather than cfg.pay_cadence_epochs: configuration can
+   // change between accruals. Complete immutable history is required for a
+   // batch payout. History is bounded by MAX_PAY_CADENCE_EPOCHS and recipient
+   // credits by MAX_BATCH_PAYOUT_CREDITS. Incomplete or over-budget history
+   // takes the non-halting retention path below, so it cannot abort advance.
    // =======================================================================
-   if (accrued_epochs > 0 && !batch_op_groups.empty()) {
-      for (size_t g = 0; g < batch_op_groups.size(); ++g) {
-         const auto& group = batch_op_groups[g];
-         if (group.empty()) continue;
-         const uint32_t group_epochs =
-            (g < state.batch_group_epochs.size()) ? state.batch_group_epochs[g] : 0;
-         if (group_epochs == 0) continue;
+   auto pay_batch_group = [&](const std::vector<sysio::name>& group,
+                              uint32_t active_epochs) {
+      if (group.empty() || active_epochs == 0) return;
 
-         // Period-weighted slices for this group, divided evenly among members.
-         // Emission and fee are weighted identically (by the group's active-epoch
-         // count over the period) so a member's fee tracks its emission reward.
-         const int64_t members = static_cast<int64_t>(group.size());
-         const int64_t group_pool = static_cast<int64_t>(
-            static_cast<__int128>(batch_pool) * group_epochs / accrued_epochs);
-         const int64_t fee_group_pool = static_cast<int64_t>(
-            static_cast<__int128>(fee_batch_pool) * group_epochs / accrued_epochs);
-         const int64_t per_member     = group_pool / members;
-         const int64_t fee_per_member = fee_group_pool / members;
+      // Period-weighted slices for this group, divided evenly among members.
+      // Emission and fee are weighted identically by active-epoch count.
+      const int64_t members = static_cast<int64_t>(group.size());
+      const int64_t group_pool = static_cast<int64_t>(
+         static_cast<__int128>(batch_pool) * active_epochs / accrued_epochs);
+      const int64_t fee_group_pool = static_cast<int64_t>(
+         static_cast<__int128>(fee_batch_pool) * active_epochs / accrued_epochs);
+      const int64_t per_member     = group_pool / members;
+      const int64_t fee_per_member = fee_group_pool / members;
 
-         for (const auto& m : group) {
-            if (!is_op_active(m, OperatorType::OPERATOR_TYPE_BATCH)) continue;
-            // One credit carries both the emission and the fee share.
-            credit_pay(get_self(), m, per_member + fee_per_member, memo::batch_op_reward);
-            actual_paid += per_member;
-            fee_paid    += fee_per_member;
-         }
+      for (const auto& m : group) {
+         if (!is_op_active(m, OperatorType::OPERATOR_TYPE_BATCH)) continue;
+         // One credit carries both the emission and the fee share.
+         credit_pay(get_self(), m, per_member + fee_per_member, memo::batch_op_reward);
+         actual_paid += per_member;
+         batch_emission_paid += per_member;
+         fee_paid    += fee_per_member;
+      }
+   };
+
+   if (batch_history_complete) {
+      for (const auto& group : recorded_batch_groups) {
+         pay_batch_group(group.members, group.active_epochs);
+      }
+   } else if (accrued_epochs > 0) {
+      // Do not guess a roster during a mixed-version upgrade or an incomplete
+      // first period: retain its batch emission in the treasury, leave swap fees
+      // in sysio.reserv, and let the next period establish complete history.
+      sysio::print("batch roster history incomplete; retaining batch emission and deferring swap fees\n");
+   }
+
+   const int64_t batch_emission_retained = batch_pool - batch_emission_paid;
+   const int64_t batch_fee_retained = fee_batch_pool - fee_paid;
+
+   // A pay period is the history lifetime. Clear only after an actual accrued
+   // period: on the defensive zero-accrual path the history is preserved rather
+   // than silently discarding roster identity without a batch payout. Keep the
+   // cleanup bounded so an overlong legacy/corrupt table cannot exhaust the
+   // mandatory epoch-advance transaction. Since normal operation adds at most
+   // MAX_PAY_CADENCE_EPOCHS rows per period and this removes twice that many,
+   // stale history drains monotonically while rewards remain on the audited
+   // incomplete-history recovery path.
+   if (accrued_epochs > 0) {
+      uint32_t cleaned = 0;
+      for (auto it = batch_history.begin();
+           it != batch_history.end()
+              && cleaned < emissions::MAX_BATCH_HISTORY_CLEANUP_ROWS;
+           ++cleaned) {
+         it = batch_history.erase(it);
       }
    }
 
@@ -1023,6 +1216,7 @@ void system_contract::payepoch(uint32_t epoch_index,
 
    // Drain accumulator + advance period boundary.
    state.pending_emission_amount = 0;
+   state.pending_nominal_slots   = 0;
    std::fill(state.batch_group_epochs.begin(), state.batch_group_epochs.end(), 0);
    state.period_start_epoch = epoch_index + 1;
 
@@ -1046,11 +1240,15 @@ void system_contract::payepoch(uint32_t epoch_index,
       .capex_amount      = capex_amount,
       .governance_amount = governance_amount,
       .fee_distributed   = fee_paid,
+      .batch_history_complete  = batch_history_complete,
+      .batch_emission_retained = batch_emission_retained,
+      .batch_fee_retained      = batch_fee_retained,
    });
 
    // Head-first prune of the audit log past its retention cap. Rows are added
-   // monotonically (one per successful payepoch) so live_count is computed in
-   // O(1) from id arithmetic. Drop up to two oldest rows per call: only one
+   // monotonically (one per successful payepoch), and epoch_count is the
+   // contiguous payment-row sequence even when pay cadence is greater than
+   // one. Drop up to two oldest rows per call: only one
    // is needed in steady state, but a recent retention-cap shrink (governance
    // lowering epoch_log_retention_count from N to a smaller M) leaves the
    // table over cap by N - M; pruning two per call drains it twice as fast
@@ -1058,9 +1256,8 @@ void system_contract::payepoch(uint32_t epoch_index,
    for (int i = 0; i < 2; ++i) {
       auto first_it = epoch_table.begin();
       if (first_it == epoch_table.end()) break;
-      const uint64_t oldest_index = first_it.key().sysio_epoch_index;
       const uint64_t live_count =
-         (static_cast<uint64_t>(epoch_index) + 1) - oldest_index;
+         state.epoch_count - first_it->epoch_count + 1;
       if (live_count <= cfg.epoch_log_retention_count) break;
       epoch_table.erase(first_it);
    }

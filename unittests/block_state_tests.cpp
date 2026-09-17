@@ -978,6 +978,109 @@ BOOST_AUTO_TEST_CASE(verify_qc_dual_finalizers) try {
 
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(verify_qc_dual_finalizers_pending_bitset_size) try {
+   // prepare digests
+   digest_type strong_digest(fc::sha256("0000000000000000000000000000002"));
+   auto weak_digest(create_weak_digest(strong_digest));
+
+   // initialize a set of private keys
+   std::vector<bls_private_key> active_private_keys {
+      bls_private_key("PVT_BLS_tNAkC5MnI-fjHWSX7la1CPC2GIYgzW5TBfuKFPagmwVVsOeW"),
+      bls_private_key("PVT_BLS_FWK1sk_DJnoxNvUNhwvJAYJFcQAFtt_mCtdQCUPQ4jN1K7eT"),
+      bls_private_key("PVT_BLS_foNjZTu0k6qM5ftIrqC5G_sim1Rg7wq3cRUaJGvNtm2rM89K"),
+   };
+   auto num_active_finalizers = active_private_keys.size();
+
+   // construct active finalizers, with weight 1, 2, 9 respectively
+   std::vector<bls_public_key> active_public_keys(num_active_finalizers);
+   std::vector<finalizer_authority> active_finalizers(num_active_finalizers);
+   for (size_t i = 0; i < num_active_finalizers; ++i) {
+      active_public_keys[i] = active_private_keys[i].get_public_key();
+      uint64_t weight = (i < num_active_finalizers - 1) ? i + 1 : 9; // last one meets quorum on its own
+      active_finalizers[i] = finalizer_authority{ "test", weight, active_public_keys[i] };
+   }
+
+   // The pending policy holds one more finalizer than the active policy, so a bitset sized for the
+   // active policy is not a valid size for the pending one. create a dual finalizer by using the same
+   // key PVT_BLS_tNAkC5MnI-fjHWSX7la1CPC2GIYgzW5TBfuKFPagmwVVsOeW. This makes active finalizer 0 and
+   // pending finalizer 1 dual finalizers
+   std::vector<bls_private_key> pending_private_keys {
+      bls_private_key("PVT_BLS_0d8dsux83r42Qg8CHgAqIuSsn9AV-QdCzx3tPj0K8yOJA_qb"),
+      bls_private_key("PVT_BLS_tNAkC5MnI-fjHWSX7la1CPC2GIYgzW5TBfuKFPagmwVVsOeW"), // dual finalizer
+      bls_private_key("PVT_BLS_Wfs3KzfTI2P5F85PnoHXLnmYgSbp-XpebIdS6BUCHXOKmKXK"),
+      bls_private_key("PVT_BLS_74crPc__6BlpoQGvWjkHmUdzcDKh8QaiN_GtU4SD0QAi4BHY"),
+   };
+   auto num_pending_finalizers = pending_private_keys.size();
+   BOOST_REQUIRE_NE( num_active_finalizers, num_pending_finalizers );
+
+   // construct pending finalizers, with weight 1, 2, 3, 9 respectively
+   std::vector<bls_public_key> pending_public_keys(num_pending_finalizers);
+   std::vector<finalizer_authority> pending_finalizers(num_pending_finalizers);
+   for (size_t i = 0; i < num_pending_finalizers; ++i) {
+      pending_public_keys[i] = pending_private_keys[i].get_public_key();
+      uint64_t weight = (i < num_pending_finalizers - 1) ? i + 1 : 9; // last one meets quorum on its own
+      pending_finalizers[i] = finalizer_authority{ "test", weight, pending_public_keys[i] };
+   }
+
+   // construct a test bsp
+   block_state_ptr bsp = std::make_shared<block_state>();
+   constexpr uint32_t generation = 1;
+   constexpr uint64_t active_threshold = 8;   // 2/3 of total active weights of 12
+   constexpr uint64_t pending_threshold = 10; // 2/3 of total pending weights of 15
+   bsp->active_finalizer_policy = std::make_shared<finalizer_policy>( generation, active_threshold, active_finalizers );
+   bsp->pending_finalizer_policy = { bsp->block_num(), std::make_shared<finalizer_policy>( generation+1, pending_threshold, pending_finalizers ) };
+   bsp->strong_digest = strong_digest;
+   bsp->weak_digest = weak_digest;
+
+   // verify_qc_test_with_pending gives the active and pending signatures the same malformed bitset,
+   // so the active policy check rejects it and the pending bitset size is never reached. Here the
+   // active signature is well formed and meets quorum, leaving the pending bitset size as the only
+   // thing under test, and the shared key makes the dual finalizer comparison applicable to this
+   // policy pair.
+   auto pending_bitset_size_test = [&](std::optional<size_t> pending_strong_size,
+                                       std::optional<size_t> pending_weak_size)
+   {
+      vote_bitset_t active_strong_votes(num_active_finalizers);
+      active_strong_votes.set(2); // active finalizer 2 votes with weight 9, meeting the active threshold
+
+      bls_aggregate_signature active_agg_sig;
+      active_agg_sig.aggregate(active_private_keys[2].sign_sha256(strong_digest));
+
+      std::optional<vote_bitset_t> pending_strong_votes;
+      std::optional<vote_bitset_t> pending_weak_votes;
+      if (pending_strong_size)
+         pending_strong_votes = vote_bitset_t(*pending_strong_size);
+      if (pending_weak_size)
+         pending_weak_votes = vote_bitset_t(*pending_weak_size);
+
+      // verify_basic rejects the pending vote format before any signature is verified, so the
+      // pending aggregate signature is left empty.
+      qc_sig_t active_qc_sig{active_strong_votes, {}, active_agg_sig};
+      qc_sig_t pending_qc_sig{pending_strong_votes, pending_weak_votes, bls_aggregate_signature{}};
+      qc_t qc{bsp->block_num(), active_qc_sig, pending_qc_sig};
+
+      BOOST_CHECK_EXCEPTION( bsp->verify_qc(qc), invalid_qc, sysio::testing::fc_exception_message_starts_with("vote bitset size is not the same as the number of finalizers") );
+   };
+
+   // empty pending vote bitsets
+   pending_bitset_size_test(0, {});
+   pending_bitset_size_test({}, 0);
+
+   // pending vote bitsets sized for the active policy rather than the pending one, which are accepted
+   // only if the pending signature is checked against the active policy
+   pending_bitset_size_test(num_active_finalizers, {});
+   pending_bitset_size_test({}, num_active_finalizers);
+
+   // pending vote bitsets larger than the pending policy's finalizer count
+   pending_bitset_size_test(num_pending_finalizers + 1, {});
+   pending_bitset_size_test({}, num_pending_finalizers + 1);
+
+   // well formed pending strong bitset paired with a mis-sized pending weak bitset
+   pending_bitset_size_test(num_pending_finalizers, 0);
+   pending_bitset_size_test(num_pending_finalizers, num_active_finalizers);
+
+} FC_LOG_AND_RETHROW();
+
 // Verify that aggregate_vote adds dual finalizer votes to both
 // active and pending policies, and get_best_qc returns consistent state.
 BOOST_AUTO_TEST_CASE(get_best_qc_dual_finalizer_consistency) try {

@@ -625,14 +625,7 @@
             "index_type": "i64",
             "key_names": ["scope","nonce"],
             "key_types": ["name","uint64"],
-            "table_id": 25433,
-            "secondary_indexes": [
-                {
-                    "name": "byusername",
-                    "key_type": "uint64",
-                    "table_id": 35688
-                }
-            ]
+            "table_id": 25433
         }
     ],
     "ricardian_clauses": [],

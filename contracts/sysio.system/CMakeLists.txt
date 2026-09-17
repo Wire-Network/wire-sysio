@@ -21,7 +21,8 @@ set(SYSIO_SYSTEM_HEADERS
 
 set(SYSIO_SYSTEM_INCLUDE_DIRS
    ${CMAKE_CURRENT_SOURCE_DIR}/include
-   ${CMAKE_CURRENT_SOURCE_DIR}/../sysio.token/include)
+   ${CMAKE_CURRENT_SOURCE_DIR}/../sysio.token/include
+   ${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/protocol/include)
 
 # OPP integration: emissions reads opreg/epoch state via generated protobuf types + shared DataStream operators.
 # generated-cdt is reached via CMAKE_CURRENT_BINARY_DIR since contracts_project is a nested ExternalProject.

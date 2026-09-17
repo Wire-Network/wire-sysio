@@ -119,6 +119,30 @@
             ]
         },
         {
+            "name": "batch_epoch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sysio_epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "members",
+                    "type": "name[]"
+                }
+            ]
+        },
+        {
+            "name": "batch_epoch_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sysio_epoch_index",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "block_header",
             "base": "",
             "fields": [
@@ -337,7 +361,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "account",
+                    "name": "producer",
                     "type": "name"
                 }
             ]
@@ -421,6 +445,10 @@
                 {
                     "name": "standby_end_rank",
                     "type": "uint32"
+                },
+                {
+                    "name": "standby_bps",
+                    "type": "uint16"
                 },
                 {
                     "name": "epoch_log_retention_count",
@@ -514,6 +542,18 @@
                 },
                 {
                     "name": "fee_distributed",
+                    "type": "int64"
+                },
+                {
+                    "name": "batch_history_complete",
+                    "type": "bool"
+                },
+                {
+                    "name": "batch_emission_retained",
+                    "type": "int64"
+                },
+                {
+                    "name": "batch_fee_retained",
                     "type": "int64"
                 }
             ]
@@ -841,6 +881,16 @@
             ]
         },
         {
+            "name": "observed_schedule",
+            "base": "",
+            "fields": [
+                {
+                    "name": "producers",
+                    "type": "name[]"
+                }
+            ]
+        },
+        {
             "name": "onblock",
             "base": "",
             "fields": [
@@ -961,8 +1011,8 @@
                     "type": "public_key"
                 },
                 {
-                    "name": "rank",
-                    "type": "uint32"
+                    "name": "rank_score",
+                    "type": "uint64"
                 },
                 {
                     "name": "is_active",
@@ -989,15 +1039,19 @@
                     "type": "block_signing_authority"
                 },
                 {
-                    "name": "last_block_num",
+                    "name": "consecutive_missed_rounds",
                     "type": "uint32"
                 },
                 {
-                    "name": "current_round_blocks",
-                    "type": "uint16"
+                    "name": "is_demoted",
+                    "type": "bool"
                 },
                 {
-                    "name": "eligible_rounds",
+                    "name": "snapshot_attestations",
+                    "type": "uint32"
+                },
+                {
+                    "name": "snapshot_period",
                     "type": "uint32"
                 }
             ]
@@ -1037,6 +1091,62 @@
                 {
                     "name": "producers",
                     "type": "producer_key[]"
+                }
+            ]
+        },
+        {
+            "name": "producer_score_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "collateral_weight",
+                    "type": "uint32"
+                },
+                {
+                    "name": "participation_weight",
+                    "type": "uint32"
+                },
+                {
+                    "name": "snapshot_weight",
+                    "type": "uint32"
+                },
+                {
+                    "name": "relay_weight",
+                    "type": "uint32"
+                },
+                {
+                    "name": "api_weight",
+                    "type": "uint32"
+                },
+                {
+                    "name": "benchmark_weight",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_consecutive_missed_rounds",
+                    "type": "uint32"
+                },
+                {
+                    "name": "snapshot_target_attestations",
+                    "type": "uint32"
+                },
+                {
+                    "name": "min_blocks_per_round",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "rcrdbatch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "members",
+                    "type": "name[]"
                 }
             ]
         },
@@ -1309,16 +1419,12 @@
             ]
         },
         {
-            "name": "setrank",
+            "name": "setscorecfg",
             "base": "",
             "fields": [
                 {
-                    "name": "producer",
-                    "type": "name"
-                },
-                {
-                    "name": "rank",
-                    "type": "uint32"
+                    "name": "weights",
+                    "type": "producer_score_config"
                 }
             ]
         },
@@ -1329,10 +1435,6 @@
                 {
                     "name": "min_providers",
                     "type": "uint32"
-                },
-                {
-                    "name": "threshold_pct",
-                    "type": "uint32"
                 }
             ]
         },
@@ -1342,10 +1444,6 @@
             "fields": [
                 {
                     "name": "min_providers",
-                    "type": "uint32"
-                },
-                {
-                    "name": "threshold_pct",
                     "type": "uint32"
                 }
             ]
@@ -1463,12 +1561,24 @@
                     "type": "time_point"
                 },
                 {
-                    "name": "total_unpaid_blocks",
-                    "type": "uint32"
-                },
-                {
                     "name": "last_producer_schedule_size",
                     "type": "uint16"
+                },
+                {
+                    "name": "last_producer",
+                    "type": "name"
+                },
+                {
+                    "name": "rescore_cursor",
+                    "type": "uint64"
+                },
+                {
+                    "name": "rescore_pending",
+                    "type": "bool"
+                },
+                {
+                    "name": "round_start_block",
+                    "type": "uint32"
                 }
             ]
         },
@@ -1515,6 +1625,10 @@
                 {
                     "name": "capital_shortfall_total",
                     "type": "int64"
+                },
+                {
+                    "name": "pending_nominal_slots",
+                    "type": "uint64"
                 }
             ]
         },
@@ -1904,6 +2018,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "rcrdbatch",
+            "type": "rcrdbatch",
+            "ricardian_contract": ""
+        },
+        {
             "name": "regfinkey",
             "type": "regfinkey",
             "ricardian_contract": ""
@@ -1994,8 +2113,8 @@
             "ricardian_contract": ""
         },
         {
-            "name": "setrank",
-            "type": "setrank",
+            "name": "setscorecfg",
+            "type": "setscorecfg",
             "ricardian_contract": ""
         },
         {
@@ -2077,6 +2196,14 @@
             "key_names": ["owner"],
             "key_types": ["uint64"],
             "table_id": 49446
+        },
+        {
+            "name": "batchepochs",
+            "type": "batch_epoch",
+            "index_type": "i64",
+            "key_names": ["sysio_epoch_index"],
+            "key_types": ["uint32"],
+            "table_id": 22503
         },
         {
             "name": "blockinfo",
@@ -2200,6 +2327,22 @@
             "key_names": ["name"],
             "key_types": ["name"],
             "table_id": 16636
+        },
+        {
+            "name": "prodsched",
+            "type": "observed_schedule",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 35433
+        },
+        {
+            "name": "prodscorecfg",
+            "type": "producer_score_config",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 26071
         },
         {
             "name": "producers",

@@ -29,8 +29,9 @@ using namespace sysio::chain;
 constexpr std::chrono::milliseconds real_time_patience{200};
 
 /// How long to wait, in real time, for the plugin to react to virtual time moving. Generous, since
-/// this bounds a failure rather than the happy path: the reaction is normally within a few ms.
-constexpr std::chrono::seconds reaction_timeout{10};
+/// this bounds a failure rather than the happy path: the reaction is normally within a few ms, but a loaded CI runner
+/// has stalled the app thread for ten seconds.
+constexpr std::chrono::seconds reaction_timeout{60};
 
 /// How long to leave the timer thread alone with a moved clock. Under mock time the timer polls the
 /// virtual clock rather than sleeping out its delay, so this is many poll intervals; it is used
@@ -53,6 +54,12 @@ constexpr chain::account_name own_producer = config::system_account_name;
 /// How long to give the node to do something with a slot the clock has just moved into, before
 /// concluding it did nothing with it. Bounds a per-slot poll, so it is short.
 constexpr std::chrono::milliseconds slot_settle_budget{200};
+
+/// How many slots advance_until_head_moves moves the clock through before concluding the head is not going to move.
+constexpr uint32_t head_move_slot_allowance = 3;
+
+/// How long advance_until_head_moves waits, in real time, for the head to move before moving the clock another slot.
+constexpr std::chrono::seconds head_move_slot_patience{2};
 
 /// Spin until pred() holds or reaction_timeout elapses. Returns whether pred() held.
 /// Spin until pred() holds or the given budget elapses. Returns whether pred() held.
@@ -270,6 +277,11 @@ public:
       return fut.get();
    }
 
+   /// Wait for the app thread to finish what it is running, before moving the clock. The head is published from inside
+   /// the handler that produced the block, and only later does that handler arm the timer for the next block, reading
+   /// the clock as it stands then: every slot the clock moves first pushes that block a slot later.
+   void sync_with_app_thread() { on_main_thread([]() { return true; }); }
+
    /// Advance the virtual clock by an arbitrary amount, for waits that are not a whole slot.
    void advance(fc::microseconds by) {
       _now += by;
@@ -281,11 +293,13 @@ public:
    template<typename Pred>
    bool advance_slots_until(uint32_t max_slots, Pred pred) {
       for (uint32_t slot = 0; slot < max_slots; ++slot) {
+         sync_with_app_thread();
          if (pred())
             return true;
          advance(fc::milliseconds(config::block_interval_ms));
          wait_up_to(slot_settle_budget, pred);
       }
+      sync_with_app_thread();
       return pred();
    }
 
@@ -303,23 +317,22 @@ public:
 
    /// Advance the clock a slot at a time until the head moves, and report whether it did.
    ///
-   /// Counting blocks against slots elapsed is not a safe invariant here. A block ships at its cpu
-   /// effort deadline rather than at its slot, and those deadlines sit closer together than slots
-   /// do, so the node runs progressively further ahead across a round and then waits out a gap of
-   /// nearly two slots at the round boundary. How far ahead it is at any moment follows from where
-   /// in that round it started, which is startup timing rather than anything under test. What does
-   /// hold, and what a starved timer breaks, is that production keeps moving while the clock does.
+   /// Syncing with the app thread before each move means the node armed its timer against the clock its last block was
+   /// produced at, so the first slot already makes the next block due. A slow machine is absorbed by the real-time
+   /// waits, not by further slots; those only let a deadline armed up to two slots late go unnoticed.
    bool advance_until_head_moves() {
       const uint32_t before = head_block_num();
-      // Three slots covers the round boundary gap, the longest legitimate pause in shipping.
-      for (uint32_t slot = 0; slot < 3; ++slot) {
-         _now += fc::milliseconds(config::block_interval_ms);
-         fc::mock_time_traits::set_now(_now);
-         if (wait_up_to(std::chrono::seconds(2), [&]() { return head_block_num() > before; }))
+      const auto     moved  = [&]() { return head_block_num() > before; };
+      for (uint32_t slot = 0; slot < head_move_slot_allowance; ++slot) {
+         sync_with_app_thread();
+         if (moved())
+            return true;
+         advance(fc::milliseconds(config::block_interval_ms));
+         if (wait_up_to(head_move_slot_patience, moved))
             return true;
       }
       // One last generous wait, so a merely loaded machine is not mistaken for a stalled one.
-      return wait_for([&]() { return head_block_num() > before; });
+      return wait_for(moved);
    }
 
 private:
@@ -451,19 +464,14 @@ BOOST_AUTO_TEST_SUITE(mockable_timers)
  * no sleeping and no tolerance for a loaded machine: the head advances only when the test moves the
  * clock, and it must keep advancing for as long as the test keeps moving it.
  *
- * What that establishes is BOUNDED LIVENESS, not a per-slot guarantee, and the difference is
- * deliberate rather than a shortcut. Blocks ship at their cpu-effort deadline -- 462.5ms at the
- * default offset -- rather than at the 500ms slot boundary, so a node runs progressively further
- * ahead across a round and then waits out a gap of roughly two slots. Requiring a block from every
- * slot would therefore fail on correct behaviour, at a step that moves with startup timing. This
- * case asserts instead that the head never stalls longer than that legitimate gap, twelve times
- * running, and that twelve advances yield at least twelve blocks.
+ * What that establishes is BOUNDED LIVENESS, not a per-slot guarantee. Each step lets the app thread finish before
+ * the clock moves, so one slot makes the next block due, but a step allows head_move_slot_allowance slots. This case
+ * asserts that the head never takes longer than that, twelve times running, and that twelve steps yield at least
+ * twelve blocks.
  *
- * It follows that a regression losing a single deadline is NOT caught here: the head still moves
- * within the allowance, just later. Detecting that needs a slot budget over the whole round, and a
- * fixed budget is brittle for the same reason a per-slot assertion is -- how much drift has
- * accumulated depends on where in the round the node started. What this case does catch is a timer
- * that stops re-arming, which is the failure the seam under test can actually introduce.
+ * It follows that a regression delaying a deadline by up to two slots is NOT caught here: the head still moves within
+ * the allowance, just later. What this case does catch is a timer that stops re-arming, which is the failure the seam
+ * under test can actually introduce.
  */
 BOOST_AUTO_TEST_CASE(production_follows_the_virtual_clock) {
    running_node   node;
@@ -474,18 +482,17 @@ BOOST_AUTO_TEST_CASE(production_follows_the_virtual_clock) {
    std::this_thread::sleep_for(real_time_patience);
    BOOST_CHECK_EQUAL(node.blocks_produced(), settled);
 
-   // 2. The head must keep advancing for as long as the clock does, and each advance must arrive
-   //    inside the longest legitimate pause -- the round-boundary gap advance_until_head_moves
-   //    allows for. A timer that stops re-arming fails here on the step where it stopped.
+   // 2. The head must keep advancing for as long as the clock does, each step within the slots
+   //    advance_until_head_moves allows. A timer that stops re-arming fails here on the step where it stopped.
    for (uint32_t step = 1; step <= slots_to_step; ++step) {
       BOOST_REQUIRE_MESSAGE(node.advance_until_head_moves(),
                             "production stopped at step " << step << " of " << slots_to_step
-                                                          << ": the head did not move across three slots of "
-                                                             "virtual time");
+                                                          << ": the head did not move across "
+                                                          << head_move_slot_allowance << " slots of virtual time");
    }
 
    // Each of those steps required the head to move at least once, and this node is the only
-   // producer, so every advance is a block it produced.
+   // producer, so every step is a block it produced.
    BOOST_CHECK_GE(node.blocks_produced(), settled + slots_to_step);
 
    // 3. Stopping the clock must stop production, confirming that step 2 measured the clock driving

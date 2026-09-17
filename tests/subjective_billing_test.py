@@ -60,8 +60,11 @@ try:
                     "3": "--subjective-account-decay-time-minutes=1" }
 
     Print("Stand up cluster")
+    # Deliberately does NOT pass --disable-subjective-api-billing: subjective billing is on by
+    # default, so leaving it unset exercises the shipped configuration. If the default is ever
+    # flipped back, this test fails rather than silently covering nothing.
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay, activateIF=True,
-                      extraNodeopArgs=" --http-max-response-time-ms 990000 --disable-subjective-api-billing false ",
+                      extraNodeopArgs=" --http-max-response-time-ms 990000 ",
                       specificExtraNodeopArgs=specificArgs ) is False:
        errorExit("Failed to stand up sys cluster.")
 

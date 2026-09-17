@@ -9,8 +9,8 @@
 
 /// SEC-103 deposit-reentrancy regression helper.
 ///
-/// Deployed onto an `sysio.opreg` operator account. `opreg::deposit` moves the
-/// operator's SYS collateral to `sysio.opreg` via `sysio.token::transfer`, which
+/// Deployed onto a `sysio.opreg` operator account. `opreg::deposit` moves the
+/// operator's WIRE collateral to `sysio.opreg` via `sysio.token::transfer`, which
 /// notifies the `from` account — this contract. The handler re-enters
 /// `opreg::deposit` once, modelling a malicious operator that tries to land a
 /// second credit against the same pre-credit balance and push its collateral row
@@ -24,7 +24,7 @@ class [[sysio::contract]] reenter_deposit : public sysio::contract {
 public:
    using contract::contract;
 
-   /// On the deposit's outgoing SYS transfer, re-enter `opreg::deposit` with a
+   /// On the deposit's outgoing WIRE transfer, re-enter `opreg::deposit` with a
    /// `+1` credit. Guards: only react to OUR OWN outgoing transfer
    /// (`from == get_self()`), and only when the moved quantity exceeds the `+1`
    /// re-deposit, so the re-entrant deposit's own transfer cannot recurse.

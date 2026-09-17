@@ -27,7 +27,6 @@ namespace sysio {
    namespace underwriter_defaults {
       constexpr uint32_t scan_interval_ms    = 5000;
       constexpr uint32_t action_timeout_ms   = 15000;
-      constexpr bool     enabled             = false;
       // The sync-recency window moved to `controller::default_sync_recency_ms`
       // — the sync predicate is `controller::is_synced()`, shared by every
       // operator-daemon plugin.

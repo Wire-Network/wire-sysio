@@ -45,6 +45,9 @@ class transaction_metadata {
       fc::microseconds                                           elapsed;                // not thread safe
       accounts_billing_t                                         prev_accounts_billing;  // not thread safe
       bool                                                       prev_succeeded = false; // not thread safe
+      /// Signatures satisfied the declared authorizations. Until this is set, the authorization
+      /// list is attacker-chosen and must not be used to attribute blame for a failure.
+      bool                                                       auth_verified = false;  // not thread safe
 
    private:
       struct private_type{};

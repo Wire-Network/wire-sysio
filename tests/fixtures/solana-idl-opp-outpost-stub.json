@@ -518,6 +518,10 @@
             "type": "u8"
           },
           {
+            "name": "custody_token_program",
+            "type": "pubkey"
+          },
+          {
             "name": "name_len",
             "type": "u8"
           },

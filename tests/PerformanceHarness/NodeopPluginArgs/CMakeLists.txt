@@ -1,5 +1,6 @@
 configure_file(__init__.py . COPYONLY)
 configure_file(BasePluginArgs.py . COPYONLY)
+configure_file(plugin_args_emission_test.py . COPYONLY)
 
 set(GEN_FILES
         ChainPluginArgs.py
@@ -19,3 +20,6 @@ add_custom_command(COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/gene
 add_custom_target(GenNodeopPluginArgs ALL
                   DEPENDS ${GEN_FILES}
                   COMMENT "Generating NodeopPluginArgs files")
+
+add_p_test(NAME plugin_args_emission_test
+           COMMAND tests/PerformanceHarness/NodeopPluginArgs/plugin_args_emission_test.py)

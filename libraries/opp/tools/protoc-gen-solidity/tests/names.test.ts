@@ -188,8 +188,8 @@ describe("relativeImportPath", () => {
 })
 
 describe("constants", () => {
-  it("SOL_PRAGMA is correct", () => {
-    expect(SOL_PRAGMA).toBe(">=0.8.0 <0.9.0")
+  it("pins SOL_PRAGMA to the configured compiler", () => {
+    expect(SOL_PRAGMA).toBe("0.8.25")
   })
 
   it("SPDX_LICENSE is MIT", () => {

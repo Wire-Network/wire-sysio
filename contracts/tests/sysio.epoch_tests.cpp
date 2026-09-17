@@ -6,6 +6,7 @@
 #include <fc/slug_name.hpp>
 
 #include "contracts.hpp"
+#include "contract_test_support.hpp"
 #include <sysio/opp/opp.hpp>
 
 using namespace sysio::testing;
@@ -110,6 +111,7 @@ public:
          ("external_chain_id", external_chain_id)
          ("name", name_str)
          ("description", description)
+         ("outpost", sysio_system::test_support::no_outpost_mvo())
       );
    }
 

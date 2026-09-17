@@ -36,6 +36,8 @@ public:
    static constexpr auto UWRIT_ACCOUNT  = "sysio.uwrit"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
    static constexpr auto UWRIT_OP       = "uwrit.alice"_n;
+   static constexpr auto UWRIT_OP_B     = "uwrit.bob"_n;
+   static constexpr auto UWRIT_OP_C     = "uwrit.carl"_n;
 
    /// Must be >= the contract's MIN_EPOCH_DURATION_SEC (60) typo-guard floor.
    /// Each advance_one_epoch() crosses the boundary by producing
@@ -62,6 +64,7 @@ public:
       create_accounts({
          TOKEN_ACCOUNT, EPOCH_ACCOUNT, OPREG_ACCOUNT, MSGCH_ACCOUNT,
          CHALG_ACCOUNT, CHAINS_ACCOUNT, UWRIT_ACCOUNT, BATCHOP, UWRIT_OP,
+         UWRIT_OP_B, UWRIT_OP_C,
          "sysio.dclaim"_n, "sysio.gov"_n, "sysio.ops"_n
       });
       produce_blocks(2);
@@ -183,7 +186,7 @@ public:
             ("governance_bps",         uint16_t(1000))
             ("producer_bps",           uint16_t(7000))
             ("batch_op_bps",           uint16_t(3000))
-            ("standby_end_rank",       uint32_t(28))
+            ("standby_end_rank",       uint32_t(28))("standby_bps", uint16_t(800))
             ("epoch_log_retention_count", uint32_t(8640))
             ("pay_cadence_epochs",     uint16_t(1))));
    }
@@ -230,11 +233,7 @@ public:
             ("type",             OperatorType::OPERATOR_TYPE_BATCH)
             ("is_bootstrapped",  true)));
 
-      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
-         "regoperator"_n, mvo()
-            ("account",          UWRIT_OP.to_string())
-            ("type",             OperatorType::OPERATOR_TYPE_UNDERWRITER)
-            ("is_bootstrapped",  false)));
+      BOOST_REQUIRE_EQUAL(success(), regunderwriter(UWRIT_OP));
 
       // Register a SOLANA-class chain first to soak up the first slot, then
       // an Ethereum chain to host the deposits the rest of the test exercises.
@@ -244,14 +243,16 @@ public:
             ("code",              codename_mvo("SOL"))
             ("external_chain_id", 1)
             ("name",              std::string("solana-test"))
-            ("description",       std::string{})));
+            ("description",       std::string{})
+            ("outpost", sysio_system::test_support::no_outpost_mvo())));
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
          "regchain"_n, mvo()
             ("kind",              ChainKind::CHAIN_KIND_EVM)
             ("code",              codename_mvo("ETH"))
             ("external_chain_id", 31337)
             ("name",              std::string("ethereum-test"))
-            ("description",       std::string{})));
+            ("description",       std::string{})
+            ("outpost", sysio_system::test_support::no_outpost_mvo())));
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "schbatchgps"_n, mvo()));
@@ -282,6 +283,14 @@ public:
       auto v = epoch_abi.binary_to_variant("epoch_state", data,
          abi_serializer::create_yield_function(abi_serializer_max_time));
       return v["current_epoch_index"].as<uint32_t>();
+   }
+
+   /// Register a non-bootstrapped underwriter through opreg's privileged path.
+   action_result regunderwriter(name account) {
+      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
+         ("account",          account.to_string())
+         ("type",             OperatorType::OPERATOR_TYPE_UNDERWRITER)
+         ("is_bootstrapped",  false));
    }
 
    /// Direct opreg::depositinle, signed as opreg itself.
@@ -528,13 +537,16 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_multiple_attestations_all_clean_protobuf,
 
    constexpr uint64_t INITIAL_DEPOSIT  = 1'000'000;
 
+   const std::array<name, 3> operators{ UWRIT_OP, UWRIT_OP_B, UWRIT_OP_C };
    const std::array<uint64_t, 3> withdraws{ 100'000, 200'000, 300'000 };
 
-   BOOST_REQUIRE_EQUAL(success(),
-      depositinle(UWRIT_OP, "ETH", "ETH", INITIAL_DEPOSIT));
-   for (auto amount : withdraws) {
+   BOOST_REQUIRE_EQUAL(success(), regunderwriter(UWRIT_OP_B));
+   BOOST_REQUIRE_EQUAL(success(), regunderwriter(UWRIT_OP_C));
+   for (size_t i = 0; i < operators.size(); ++i) {
       BOOST_REQUIRE_EQUAL(success(),
-         withdrawinle(UWRIT_OP, "ETH", "ETH", amount));
+         depositinle(operators[i], "ETH", "ETH", INITIAL_DEPOSIT));
+      BOOST_REQUIRE_EQUAL(success(),
+         withdrawinle(operators[i], "ETH", "ETH", withdraws[i]));
    }
 
    constexpr uint32_t FUTURE_EPOCH = 100;

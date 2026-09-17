@@ -6,7 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is blockchain infrastructure code. **Prefer the best solution over the simplest one.** Correctness, robustness, and consensus safety always take priority over brevity or speed of implementation.
 
-- **Consensus determinism**: All code that executes on-chain must produce identical results across all nodes. No floating point, no uninitialized memory reads, no undefined behavior, no platform-dependent behavior.
+- **Consensus determinism**: All code that executes on-chain must produce identical results across all nodes. No uninitialized memory reads, no undefined behavior, no platform-dependent behavior.
+  - **No floating point in host / consensus-path code** — `nodeop`, `libraries/chain`, `libfc`, plugins.
+  - **Floating point in contract code is permitted.** Contract WASM executes through softfloat (`libraries/chain/webassembly/softfloat.cpp`), which is deterministic across nodes by construction. Prefer an integer path in a contract where one is natural, for cost — but that is a performance consideration, not a correctness one, and it does not gate a review.
 - **Thoroughness over shortcuts**: Take the time to understand the full problem. Read all relevant code before proposing changes. Do not suggest partial or "quick fix" solutions when a complete, well-designed solution is achievable.
 - **Complete test coverage**: Every change should include tests that cover normal paths, edge cases, and error conditions. Tests should verify behavior, not just that code compiles.
 - **Robustness**: Handle error conditions properly. Validate inputs at system boundaries. Prefer compile-time checks over runtime checks where possible.
@@ -484,7 +486,12 @@ $BUILD_DIR/programs/sys-util/sys-util snapshot info /tmp/snap_v1.bin
 
 ### When to Regenerate
 
-Regenerate all reference data whenever:
-- Any production contract is recompiled (changes action merkle roots)
+Regenerate only the reference data whose fixture can actually change:
+- The snapshot compatibility fixture deploys a contract whose WASM changed (currently
+  `sysio.bios`, `sysio.roa`, or `snapshot_test`)
 - Chain-level serialization changes (block format, snapshot format)
 - Genesis intrinsics change (different genesis state)
+
+Do not regenerate `unittests/snapshots/` merely because an unrelated production contract such as
+`sysio.system` is rebuilt: the compatibility fixture never deploys it, so replacing the historical
+snapshot would remove rather than add compatibility coverage.

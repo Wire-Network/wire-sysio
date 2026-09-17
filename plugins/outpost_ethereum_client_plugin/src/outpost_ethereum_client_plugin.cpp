@@ -435,18 +435,10 @@ public:
       return std::views::values(_clients) | std::ranges::to<std::vector>();
    }
 
-   /** Return the published client identified by @p id. */
-   ethereum_client_entry_ptr get_client(const std::string& id) { return _clients.at(id); }
-
-   /** Return the unique client for @p chain_id, or null when the id is ambiguous. */
-   ethereum_client_entry_ptr get_client_by_chain_id(uint32_t chain_id) {
-      ethereum_client_entry_ptr match;
-      for (const auto& entry : std::views::values(_clients)) {
-         if (entry->chain_id != chain_id) continue;
-         if (match) return nullptr;
-         match = entry;
-      }
-      return match;
+   /** Return the published client identified by @p id, or null when there is none. */
+   ethereum_client_entry_ptr get_client(const std::string& id) {
+      auto it = _clients.find(id);
+      return it == _clients.end() ? nullptr : it->second;
    }
 
    /** Return all loaded ABI files and their parsed contracts. */
@@ -514,7 +506,9 @@ void outpost_ethereum_client_plugin::set_program_options(options_description& cl
        boost::program_options::value<std::vector<std::string>>()->multitoken(),
        "CLI outpost Ethereum client spec: "
        "<client-id>,<signature-provider-id>,<rpc-url>[,<chain-id>]. A three-field spec resolves "
-       "eth_chainId during startup; a four-field chain id controls signing and is verified against the endpoint.")
+       "eth_chainId during startup; a four-field chain id controls signing and is verified against the endpoint. "
+       "For a client serving an OPP outpost the client-id MUST be that chain's sysio.chains code "
+       "(e.g. ETHEREUM): the operator daemons look their RPC client up under the chain code.")
       (option_name_client_config_file,
        boost::program_options::value<std::filesystem::path>(),
        "Versioned protobuf-JSON outpost Ethereum client configuration file. Cannot be combined "
@@ -535,10 +529,6 @@ std::vector<ethereum_client_entry_ptr> outpost_ethereum_client_plugin::get_clien
 
 ethereum_client_entry_ptr outpost_ethereum_client_plugin::get_client(const std::string& id) {
    return my->get_client(id);
-}
-
-ethereum_client_entry_ptr outpost_ethereum_client_plugin::get_client_by_chain_id(uint32_t chain_id) {
-   return my->get_client_by_chain_id(chain_id);
 }
 
 const std::vector<std::pair<std::filesystem::path,

@@ -304,7 +304,10 @@ class Transactions(NodeopQueries):
                 if retries > 0 and "tx_cpu_usage_exceeded" in output:
                     Utils.Print(f"Retrying {cmd} due to: tx_cpu_usage_exceeded")
                     continue # try again
-                return (False, msg)
+                # JSON-mode clio writes an executed transaction's contract exception to stdout
+                # and may leave stderr empty. Preserve that diagnostic for callers asserting the
+                # expected rejection while retaining stderr as the preferred error channel.
+                return (False, msg or output)
             except subprocess.TimeoutExpired as ex:
                 msg=str(ex)
                 output=Utils.decodeProcessOutput(ex.output)

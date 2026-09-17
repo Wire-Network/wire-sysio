@@ -92,9 +92,14 @@ namespace sysio { namespace chain {
 
    namespace config {
       template<>
-      struct billable_size<permission_object> { // Also counts memory usage of the associated permission_usage_object
-         static const uint64_t  overhead = 5 * overhead_per_row_per_index_ram_bytes; ///< 5 indices 2x internal ID, parent, owner, name
-         static const uint64_t  value = (config::billable_size_v<shared_authority> + 64) + overhead;  ///< fixed field size + overhead
+      struct billable_size<permission_object> {
+         /// One entry per index declared by permission_index: by_id, by_parent, by_owner, by_name.
+         static const uint64_t  overhead = 4 * overhead_per_row_per_index_ram_bytes;
+         /// 40 is what permission_object holds outside its authority member: id, parent, owner,
+         /// name and last_updated. It was 64 upstream -- 48 fixed bytes including a usage_id, plus
+         /// a 16-byte permission_usage_object -- and both of those went away with
+         /// get_permission_last_used, so billing them here charged for state that no longer exists.
+         static const uint64_t  value = (config::billable_size_v<shared_authority> + 40) + overhead;  ///< fixed field size + overhead
          static_assert(sizeof(permission_object) <= value, "billable_size<permission_object> must be >= sizeof(permission_object)");
       };
    }
