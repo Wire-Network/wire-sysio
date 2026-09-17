@@ -96,11 +96,8 @@ public:
       , total_deadline(total_deadline_in)
       , control(std::move(control_in))
       , metrics(std::move(metrics_in)) {
-      start_response();
+      restart_response_parser(parser, policy);
    }
-
-   /** Begin parsing one response message. */
-   void start_response() { restart_response_parser(parser, policy); }
 
    ~response_reader_impl() {
       if (complete.load(std::memory_order_acquire))
@@ -278,16 +275,12 @@ client_impl::async_open(request req, request_options policy, std::shared_ptr<req
          // cannot extend the header phase by trickling 1xx responses.
          const auto header_deadline =
             phase_deadline(policy.timeouts.header, failure_kind::timeout_header, total_deadline);
-         const auto read_response_header = [&] {
-            return std::visit(
-               [&](auto& stream) {
-                  return read_final_header(connection, *stream, reader->buffer, reader->parser, policy, header_deadline,
-                                           control);
-               },
-               connection->stream);
-         };
-
-         co_await read_response_header();
+         co_await std::visit(
+            [&](auto& stream) {
+               return read_final_header(connection, *stream, reader->buffer, reader->parser, policy, header_deadline,
+                                        control);
+            },
+            connection->stream);
          reader->header_complete();
          co_return reader;
       } catch (transport_failure& failure) {

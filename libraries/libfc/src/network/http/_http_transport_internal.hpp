@@ -70,8 +70,6 @@ inline constexpr auto download_status_interval = std::chrono::seconds(5);
 inline constexpr size_t platform_resolver_workers = 4;
 inline constexpr size_t max_resolver_capacity_waiters = 256;
 inline constexpr unsigned http_version_1_1 = 11;
-/// Lowest status that ends a response exchange; anything below it is an interim 1xx.
-inline constexpr unsigned first_final_status = 200;
 /// The one 1xx that is terminal: bytes after it belong to the upgraded protocol, not to HTTP.
 inline constexpr unsigned switching_protocols_status = 101;
 /// Interim responses consumed before a peer is treated as abusive.
@@ -473,7 +471,7 @@ read_final_header(const std::shared_ptr<connection_state>& connection, Stream& s
          throw transport_failure(failure_kind::http_status,
                                  "peer switched protocols on a request that offered no upgrade");
       }
-      if (status >= first_final_status)
+      if (beast_http::to_status_class(status) != beast_http::status_class::informational)
          co_return;
       if (interim == max_interim_responses) {
          throw transport_failure(failure_kind::response_limit,

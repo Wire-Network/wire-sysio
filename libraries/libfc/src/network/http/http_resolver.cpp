@@ -17,16 +17,11 @@ namespace http {
 
 namespace {
 
-/**
- * Return the positive standard-library duration remaining before @p deadline.
- *
- * Throws @p expired_kind when the deadline has already passed, so a caller that only needs the
- * guard can discard the value.
- */
-std::chrono::microseconds resolver_time_remaining(time_point deadline, failure_kind expired_kind) {
+/** Return the positive standard-library duration remaining before @p deadline. */
+std::chrono::microseconds resolver_time_remaining(time_point deadline) {
    const auto now = time_point::now();
    if (deadline <= now) {
-      throw transport_failure(expired_kind, "DNS resolution deadline expired");
+      throw transport_failure(failure_kind::timeout_connect, "DNS resolution deadline expired");
    }
    return std::chrono::microseconds((deadline - now).count());
 }
@@ -300,7 +295,7 @@ detail::resolver_cancel_fn start_platform_resolution(const std::string& host, co
                                                      time_point deadline, detail::resolver_complete_fn complete) {
    auto& runtime = resolver_runtime();
    auto permit = std::make_shared<platform_resolver_permit>(runtime);
-   (void)resolver_time_remaining(deadline, failure_kind::timeout_connect);
+   (void)resolver_time_remaining(deadline);
 
    auto resolver = std::make_shared<tcp::resolver>(permit->executor());
    resolver->async_resolve(host, service,
@@ -391,7 +386,11 @@ asio::awaitable<std::vector<tcp::endpoint>> client_impl::resolve(const std::stri
          auto timeout = std::make_shared<asio::steady_timer>(strand);
          auto timed_out = std::make_shared<std::atomic_bool>(false);
          if (deadline) {
-            timeout->expires_after(resolver_time_remaining(deadline->when, deadline->timeout_kind));
+            const auto remaining = deadline->when - time_point::now();
+            if (remaining.count() <= 0) {
+               throw transport_failure(deadline->timeout_kind, "DNS resolution deadline expired");
+            }
+            timeout->expires_after(std::chrono::microseconds(remaining.count()));
             timeout->async_wait([waiter, timed_out](const error_code& error) {
                if (error)
                   return;
@@ -423,8 +422,6 @@ asio::awaitable<std::vector<tcp::endpoint>> client_impl::resolve(const std::stri
 
    state->cancel = std::move(cancel_resolution);
    if (deadline) {
-      // Not resolver_time_remaining: an already-started lookup has to be cancelled before this
-      // throws, which the shared helper cannot do.
       const auto remaining = deadline->when - time_point::now();
       if (remaining.count() <= 0) {
          if (state->cancel)
