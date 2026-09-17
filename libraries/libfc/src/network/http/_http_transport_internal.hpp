@@ -70,8 +70,6 @@ inline constexpr auto download_status_interval = std::chrono::seconds(5);
 inline constexpr size_t platform_resolver_workers = 4;
 inline constexpr size_t max_resolver_capacity_waiters = 256;
 inline constexpr unsigned http_version_1_1 = 11;
-/// The one 1xx that is terminal: bytes after it belong to the upgraded protocol, not to HTTP.
-inline constexpr unsigned switching_protocols_status = 101;
 /// Interim responses consumed before a peer is treated as abusive.
 inline constexpr uint32_t max_interim_responses = 8;
 inline constexpr uint16_t default_http_port = 80;
@@ -452,7 +450,8 @@ void restart_response_parser(std::optional<beast_http::response_parser<Body>>& p
  * response carries no body. Treating that as the end of the exchange would hand the interim
  * response to the caller and, worse, release the connection while the real response is still in
  * flight. Every read shares @p deadline, so a peer cannot extend the header phase by trickling
- * interim responses, and their number is bounded separately.
+ * interim responses. The count is bounded separately because the file-download policy disables
+ * every timeout, and there the count is the only thing stopping a peer that streams 1xx forever.
  *
  * 101 is deliberately not consumed. It is not followed by a final HTTP response at all: the bytes
  * after its header belong to the negotiated protocol. This transport never offers an upgrade, so a
@@ -466,12 +465,13 @@ read_final_header(const std::shared_ptr<connection_state>& connection, Stream& s
                   const std::optional<operation_deadline>& deadline, const std::shared_ptr<request_control>& control) {
    for (uint32_t interim = 0;; ++interim) {
       co_await read_header(connection, stream, buffer, *parser, policy, deadline, control);
-      const auto status = parser->get().result_int();
-      if (status == switching_protocols_status) {
+      if (parser->get().result() == beast_http::status::switching_protocols) {
          throw transport_failure(failure_kind::http_status,
                                  "peer switched protocols on a request that offered no upgrade");
       }
-      if (beast_http::to_status_class(status) != beast_http::status_class::informational)
+      // Classified from the raw code, not result(): Beast maps an unrecognised status to
+      // status::unknown, which would take an unusual 1xx out of the informational class.
+      if (beast_http::to_status_class(parser->get().result_int()) != beast_http::status_class::informational)
          co_return;
       if (interim == max_interim_responses) {
          throw transport_failure(failure_kind::response_limit,

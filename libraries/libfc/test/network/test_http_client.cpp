@@ -807,6 +807,31 @@ BOOST_AUTO_TEST_CASE(interim_response_is_not_delivered_as_final) {
    BOOST_CHECK_EQUAL(response.body, "final");
 }
 
+/// A 1xx status Beast does not recognize is still interim, and is consumed like any other.
+///
+/// The status class has to be taken from the raw code: `result()` maps an unregistered status to
+/// `status::unknown`, which falls outside the informational class and would hand this response to
+/// the caller as if it were final.
+BOOST_AUTO_TEST_CASE(unregistered_interim_status_is_consumed) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
+      (void)write_bytes(socket, "HTTP/1.1 199 Unassigned\r\n\r\n");
+      (void)write_bytes(socket, "HTTP/1.1 200 OK\r\n"
+                                "Content-Length: 5\r\n"
+                                "Connection: close\r\n\r\nfinal");
+   });
+   fc::http::transport transport;
+
+   const auto response = transport.perform(
+      fc::http::request{
+         .method = fc::http::request_method::get,
+         .target = server_url(server),
+      },
+      tls_request_options());
+
+   BOOST_CHECK_EQUAL(response.status, 200U);
+   BOOST_CHECK_EQUAL(response.body, "final");
+}
+
 /// An interim response must not return the connection to the idle pool mid-exchange.
 ///
 /// Pooling after the interim header would hand the next request a connection with the first
