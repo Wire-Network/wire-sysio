@@ -3214,8 +3214,7 @@ void producer_plugin_impl::produce_block() {
 
    producer_authority::for_each_key(auth, [&](const public_key_type& key) {
       const auto& iter = _signature_providers.find(key);
-      if (iter->second->key_type == crypto::chain_key_type_wire && iter != _signature_providers.end()) {
-
+      if (iter != _signature_providers.end() && iter->second->key_type == crypto::chain_key_type_wire) {
          relevant_providers.emplace_back(iter->second);
       }
    });

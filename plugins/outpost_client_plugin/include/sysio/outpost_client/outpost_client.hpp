@@ -49,7 +49,7 @@ public:
    /// diagnostics and for selecting the correct debug endpoint enum value.
    virtual sysio::opp::types::ChainKind chain_kind() const = 0;
 
-   /// Outpost id assigned by `sysio.epoch::regoutpost`.
+   /// Slug-packed chain code of this chain's `sysio.chains` row, registered with `sysio.chains::regchain`.
    virtual uint64_t chain_code() const = 0;
 
    /// Numeric chain id on the target chain. Anvil = 31337, ETH mainnet = 1,
@@ -75,7 +75,9 @@ public:
 
    /// Human-readable identifier safe to embed in log lines and metrics.
    /// Canonical format: `{chain_code}:{ChainKind_Name}:{chain_id}`
-   /// e.g. `"0:CHAIN_KIND_EVM:31337"` or `"1:CHAIN_KIND_SVM:0"`.
+   /// `chain_code()` prints as the raw packed `slug_name` integer, so the row
+   /// registered as `ETH` against a local chain renders
+   /// `"23373212024832:CHAIN_KIND_EVM:31337"`.
    ///
    /// The default implementation derives the string from the other three
    /// getters — concretes only override when they want a chain-specific

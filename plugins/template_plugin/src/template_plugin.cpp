@@ -1,4 +1,5 @@
 #include <sysio/template_plugin/template_plugin.hpp>
+#include <fc/exception/exception.hpp>
 
 namespace sysio {
 
