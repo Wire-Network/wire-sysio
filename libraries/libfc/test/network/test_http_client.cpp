@@ -841,6 +841,33 @@ BOOST_AUTO_TEST_CASE(interim_response_does_not_poison_the_idle_pool) {
    BOOST_CHECK_EQUAL(transport.perform(request, tls_request_options()).body, "second");
 }
 
+/// 101 is rejected rather than consumed: no final response follows it, so waiting would hang.
+///
+/// The snapshot download path disables every deadline, so treating 101 as interim would block
+/// forever there rather than failing.
+BOOST_AUTO_TEST_CASE(switching_protocols_is_rejected_not_awaited) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool& stop) {
+      (void)write_bytes(socket, "HTTP/1.1 101 Switching Protocols\r\n"
+                                "Upgrade: websocket\r\n"
+                                "Connection: Upgrade\r\n\r\n");
+      // Whatever follows a 101 belongs to the negotiated protocol. Hold the socket open so the
+      // test fails by hanging if the client ever waits for an HTTP response that cannot arrive.
+      while (!stop.load())
+         std::this_thread::sleep_for(10ms);
+   });
+   fc::http::transport transport;
+
+   BOOST_CHECK_EXCEPTION(transport.perform(
+                            fc::http::request{
+                               .method = fc::http::request_method::get,
+                               .target = server_url(server),
+                            },
+                            tls_request_options()),
+                         fc::exception, [](const fc::exception& error) {
+                            return error.to_detail_string().find("switched protocols") != std::string::npos;
+                         });
+}
+
 /// A peer that only ever sends interim responses is cut off rather than read forever.
 BOOST_AUTO_TEST_CASE(unbounded_interim_responses_are_rejected) {
    scripted_http_server server([](tcp::socket& socket, const std::atomic_bool& stop) {
@@ -1547,7 +1574,15 @@ BOOST_AUTO_TEST_CASE(idempotent_retry_exhaustion_is_bounded) {
 
 /// A retry hook that breaks its must-not-throw contract fails the request instead of escaping.
 BOOST_AUTO_TEST_CASE(throwing_retry_decision_hook_is_contained) {
-   fc::http::transport transport;
+   // A failing injected resolver gives a deterministic retryable failure, so the hook is reached
+   // without depending on some port being closed on the machine running the test.
+   auto transport = fc::http::transport_test_access::create(
+      {},
+      [](const std::string&, const std::string&, fc::time_point,
+         fc::http::detail::resolver_complete_fn complete) -> fc::http::detail::resolver_cancel_fn {
+         complete(std::string("injected resolver failure"), {});
+         return [] {};
+      });
    auto options = tls_request_options();
    options.retry.max_attempts = 2;
    options.retry.initial_backoff = fc::microseconds(0);
@@ -1559,7 +1594,7 @@ BOOST_AUTO_TEST_CASE(throwing_retry_decision_hook_is_contained) {
    BOOST_CHECK_EXCEPTION(transport.perform(
                             fc::http::request{
                                .method = fc::http::request_method::get,
-                               .target = fc::url("http://127.0.0.1:1/"),
+                               .target = fc::url("http://retry-hook.invalid/"),
                             },
                             options),
                          fc::exception, [](const fc::exception& error) {
@@ -2390,10 +2425,19 @@ BOOST_AUTO_TEST_CASE(oversized_chunk_extension_is_bounded_and_removed) {
    });
    fc::temp_directory temp;
    const auto output = temp.path() / "oversized-chunk-extension.bin";
-   // No idle deadline is set: the parser rejects the oversized extension immediately, so a
-   // deadline here would never be reached and would only suggest this test covered one.
-   // stalled_response_body_times_out_on_the_idle_deadline covers the idle deadline itself.
-   BOOST_CHECK_THROW(download(server, output, download_options(exact_body_bytes)), fc::exception);
+   // The idle deadline is a watchdog, not the behaviour under test: the server handler returns
+   // while its socket stays open until the server is destroyed, which cannot happen while the
+   // download is blocked, so a regression that stopped rejecting the extension would hang here
+   // forever. The predicate matches the parser diagnostic specifically, so a watchdog timeout
+   // ends the test as a failure instead of satisfying a bare fc::exception assertion.
+   auto options = download_options(exact_body_bytes);
+   options.timeouts.idle = fc::milliseconds(200);
+
+   BOOST_CHECK_EXCEPTION(download(server, output, options), fc::exception, [](const fc::exception& error) {
+      // Beast refuses to buffer the unterminated extension; a watchdog timeout would instead
+      // report timeout_idle, so this cannot be satisfied by the test simply running long.
+      return error.to_detail_string().find("buffer overflow") != std::string::npos;
+   });
    check_download_files_removed(output);
 }
 
