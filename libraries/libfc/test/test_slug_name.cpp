@@ -62,15 +62,12 @@ BOOST_AUTO_TEST_CASE(roundtrip_simple_strings) {
 BOOST_AUTO_TEST_CASE(roundtrip_with_underscores) {
    BOOST_CHECK_EQUAL(slug_name{"A_B"}.to_string(),     "A_B");
    BOOST_CHECK_EQUAL(slug_name{"X_Y_Z"}.to_string(),   "X_Y_Z");
-   BOOST_CHECK_EQUAL(slug_name{"_LEAD"}.to_string(),   "_LEAD");
    BOOST_CHECK_EQUAL(slug_name{"TRAIL_"}.to_string(),  "TRAIL_");
 }
 
 BOOST_AUTO_TEST_CASE(roundtrip_with_digits) {
    BOOST_CHECK_EQUAL(slug_name{"V1"}.to_string(),       "V1");
-   BOOST_CHECK_EQUAL(slug_name{"0"}.to_string(),        "0");
    BOOST_CHECK_EQUAL(slug_name{"X12345"}.to_string(),   "X12345");
-   BOOST_CHECK_EQUAL(slug_name{"01234567"}.to_string(), "01234567");  // 8 digits
 }
 
 BOOST_AUTO_TEST_CASE(empty_codename) {
@@ -115,12 +112,12 @@ BOOST_AUTO_TEST_CASE(values_under_js_safe_integer_limit) {
 
    BOOST_CHECK_LT("ETHEREUM"_s.value, JS_SAFE_LIMIT);
    BOOST_CHECK_LT("ZZZZZZZZ"_s.value, JS_SAFE_LIMIT);
-   BOOST_CHECK_LT("12345678"_s.value, JS_SAFE_LIMIT);
-   BOOST_CHECK_LT("________"_s.value, JS_SAFE_LIMIT);
+   BOOST_CHECK_LT("Z1234567"_s.value, JS_SAFE_LIMIT);
+   BOOST_CHECK_LT("Z_______"_s.value, JS_SAFE_LIMIT);
 
-   // The theoretical maximum: all slots = 37 (the `_` char).
-   // Value = 37 * (1 + 2^6 + 2^12 + ... + 2^42) = 37 * ((2^48 - 1) / 63).
-   const uint64_t max_codename = "________"_s.value;
+   // The largest legal code: 'Z' (26) leading, then '_' (37) in every slot the
+   // leading rule leaves free.
+   const uint64_t max_codename = "Z_______"_s.value;
    BOOST_CHECK_LT(max_codename, JS_SAFE_LIMIT);
    BOOST_CHECK_LT(max_codename, (1ULL << 48));
 }
@@ -159,13 +156,32 @@ BOOST_AUTO_TEST_CASE(accepts_full_alphabet) {
 //  Alphabet
 // ---------------------------------------------------------------------------
 
-BOOST_AUTO_TEST_CASE(every_alphabet_char_roundtrips) {
-   // every non-pad symbol of the alphabet round-trips as a single-char slug
+BOOST_AUTO_TEST_CASE(every_alphabet_char_roundtrips_after_the_first_slot) {
+   // Every non-pad symbol round-trips — but only a letter may LEAD, so the
+   // sweep puts each symbol in the SECOND slot behind a fixed letter.
    const std::string_view alphabet = fc::slug_name_traits::alphabet;
    for (std::size_t s = 1; s < alphabet.size(); ++s) {
-      const std::string one(1, alphabet[s]);
-      BOOST_CHECK_EQUAL(slug_name{one}.to_string(), one);
+      const std::string two = std::string("A") + alphabet[s];
+      BOOST_CHECK_EQUAL(slug_name{two}.to_string(), two);
    }
+}
+
+BOOST_AUTO_TEST_CASE(a_code_must_start_with_a_letter) {
+   // The rule that makes the string carrier unambiguous: no legal code can be
+   // spelled like a number, so a bare JSON string is never a decimal.
+   for (const char* bad : {"0", "7", "101", "1E3", "0X10", "12345678",
+                           "_LEAD", "________", "01234567"}) {
+      BOOST_CHECK_THROW(slug_name{bad}, fc::exception);
+      BOOST_CHECK_MESSAGE(!slug_name::is_valid_literal(bad),
+                          std::string{"must be rejected as a literal: "} + bad);
+   }
+   // Digits and '_' stay legal everywhere after the first symbol.
+   for (const char* good : {"V1", "X12345", "AZ09_", "TRAIL_", "A_B", "Z_______"}) {
+      BOOST_CHECK_EQUAL(slug_name{good}.to_string(), good);
+      BOOST_CHECK(slug_name::is_valid_literal(good));
+   }
+   // The zero sentinel is not a spelling and is unaffected.
+   BOOST_CHECK_EQUAL(slug_name{""}.value, 0u);
 }
 
 BOOST_AUTO_TEST_CASE(symbol_zero_is_the_nul_pad) {
@@ -394,8 +410,8 @@ BOOST_AUTO_TEST_CASE(variant_every_canonical_value_round_trips_exactly) {
    // Injectivity across the boundary for the whole canonical range, including
    // its floor (1<<42 is "A") and the zero sentinel.
    for (uint64_t raw : {uint64_t{0}, uint64_t{1} << 42, fc::slug_name{"A"}.value,
-                        fc::slug_name{"LIQSOL"}.value, fc::slug_name{"12345678"}.value,
-                        fc::slug_name{"________"}.value}) {
+                        fc::slug_name{"LIQSOL"}.value, fc::slug_name{"Z1234567"}.value,
+                        fc::slug_name{"Z_______"}.value}) {
       fc::variant v;
       BOOST_REQUIRE_NO_THROW(fc::to_variant(slug_name{raw}, v));
       BOOST_REQUIRE(v.is_string());
@@ -403,20 +419,6 @@ BOOST_AUTO_TEST_CASE(variant_every_canonical_value_round_trips_exactly) {
       fc::from_variant(v, back);
       BOOST_CHECK_EQUAL(back.value, raw);
    }
-}
-
-BOOST_AUTO_TEST_CASE(variant_an_all_digit_slug_is_a_string_not_its_own_decimal) {
-   // The slug alphabet contains digits, so "7" is itself a canonical slug whose
-   // packed value is nothing like 7. That ambiguity is why a JSON number is
-   // rejected outright rather than read as either one.
-   fc::variant v;
-   fc::to_variant(slug_name{"7"}, v);
-   BOOST_REQUIRE(v.is_string());
-   BOOST_CHECK_EQUAL(v.as_string(), "7");
-   BOOST_CHECK_NE(slug_name{"7"}.value, 7u);
-
-   slug_name back;
-   BOOST_CHECK_THROW(fc::from_variant(fc::variant(uint64_t{7}), back), fc::exception);
 }
 
 BOOST_AUTO_TEST_CASE(variant_accepts_the_transitional_object_carrier) {
@@ -451,8 +453,8 @@ BOOST_AUTO_TEST_CASE(variant_carrier_round_trips_through_json_TEXT) {
       0u,                        // the zero sentinel -> ""
       uint64_t{1} << 42,         // the canonical floor ("A")
       slug_name{"ETH"}.value,
-      slug_name{"12345678"}.value,  // all digits, and still a string
-      slug_name{"________"}.value,
+      slug_name{"Z1234567"}.value,  // digits after the leading letter
+      slug_name{"Z_______"}.value,
    };
    for (const uint64_t raw : values) {
       fc::variant v;
@@ -513,7 +515,7 @@ BOOST_AUTO_TEST_CASE(variant_rejects_every_non_string_carrier) {
    // failure mode a single carrier removes, because none of these coercions is
    // the value the writer meant:
    //
-   //   7          -> the slug "7" is 0x1F0000000000, not 7
+   //   7          -> not a code at all now; a code must start with a letter
    //   -1         -> lexical_cast does not reject a sign for an unsigned
    //                 target, it WRAPS; a bound of -1 would page from the far
    //                 end of the table

@@ -42,6 +42,16 @@ struct slug_name_traits {
    static constexpr std::string_view alphabet{ alphabet_storage,
                                                sizeof(alphabet_storage) - 1 };
 
+   // A code must START with a letter. This is what makes the string carrier
+   // unambiguous: no legal code can be spelled like a number, so a bare JSON
+   // string is always a code and never a decimal. Without it the alphabet's
+   // digits make "7" both a valid code (packed 149533581377536) and a valid
+   // decimal, and "1E3" / "0X10" additionally collide with JS numeric syntax —
+   // an ambiguity no reader can resolve from the value alone. Digits and '_'
+   // remain legal in every position after the first ("V1", "USDC", "TRAIL_").
+   // The empty string is unaffected: it is the zero sentinel, not a spelling.
+   static constexpr std::string_view leading_alphabet{ "ABCDEFGHIJKLMNOPQRSTUVWXYZ" };
+
    // A symbol-0 ('\0') slot terminates the string — to_string() stops there, so
    // a raw value with an interior zero decodes identically to the contract-side
    // sysio::slug_name, which also stops at the first zero.
@@ -87,22 +97,29 @@ using slug_name_literals::operator""_s;
 /// JSON carrier for a slug_name: the canonical string spelling, and nothing
 /// else. A slug renders as its text (`"LIQSOL"`), the zero sentinel as `""`.
 ///
-/// A value below 2^42 has no spelling — `zero_terminates` is true, so decoding
-/// stops at the first zero symbol slot and every such value collapses to `""`.
-/// Those THROW rather than acquire a second, numeric carrier. One type, one
-/// JSON shape: a caller writes a slug field exactly one way, and a reader never
-/// branches on the JSON type.
+/// The string is unambiguous because `leading_alphabet` forbids a code from
+/// starting with a digit: no legal spelling can be read as a number, so a bare
+/// JSON string is always a code. That is what removes the need for a second,
+/// type-disjoint carrier — and why the carrier could not have been a numeric
+/// string before the rule existed.
 ///
-/// The throw is contained by construction: `get_table_rows` wraps each row's
-/// key decode and each row's value render in its own try/catch and falls back
-/// to hex (`plugins/chain_plugin/src/chain_plugin.cpp`), so a row holding a
-/// non-canonical code degrades that one cell instead of failing the table.
+/// A packed value whose leading symbol slot is 0 or a digit is not a code and
+/// has no spelling; rendering one THROWS. That is an invariant assertion, not a
+/// carrier decision: such a value must never be persisted in the first place,
+/// which is the job of the validation at the proto boundary where a raw
+/// `uint64` becomes a slug (`sysio.msgch`'s dispatch path and the opreg/uwrit
+/// /reserv writers). Until that lands, a stored one is a defect that surfaces
+/// here rather than being silently rendered as something it is not.
 inline void to_variant(const slug_name& s, fc::variant& v) {
    const std::string text = s.to_string();
-   // `pack` is the non-validating encoder, so this is a pure round-trip test:
-   // the value is canonical exactly when its own spelling recovers it.
-   FC_ASSERT(slug_name::pack(text) == s.value,
-             "slug_name {} is not canonical and has no string spelling", s.value);
+   // Two checks, because a round trip alone is not enough. `is_valid_literal`
+   // is the static spelling predicate (length, alphabet, pad, leading letter);
+   // `pack` is the NON-validating encoder, so comparing it to `value` is the
+   // canonicality test. A value packed from an illegal spelling — say
+   // `pack("0")` — round-trips through `pack`/`to_string` yet is not a code, so
+   // emitting it would produce a string `from_variant` then refuses.
+   FC_ASSERT(slug_name::is_valid_literal(text) && slug_name::pack(text) == s.value,
+             "slug_name {} is not a code and has no string spelling", s.value);
    v = text;
 }
 
