@@ -1449,8 +1449,13 @@ BOOST_AUTO_TEST_CASE(multi_chunk_delivery_abandons_on_a_protocol_error_during_di
       1,
       static_cast<uint32_t>(envelope.size()) - 1,
       sysio::ETHEREUM_MAX_CHUNK_BYTES);
-   fixture->discard_failure =
-      fc::network::json_rpc::json_rpc_error(json_rpc_parse_error_code, "Parse error", fc::variant{});
+   // The payload is a well-formed OPP_ChunkBufferMissing naming this signer, so only the code
+   // distinguishes it. A JSON-RPC error object may carry `data`, and with an empty one here the
+   // selector check would reject it first and the code guard would never be exercised.
+   fixture->discard_failure = fc::network::json_rpc::json_rpc_error(
+      json_rpc_parse_error_code, "Parse error",
+      fc::variant{encode_address_revert(chunk_buffer_missing_selector,
+                                        fixture->outpost->signer_address_hex())});
 
    BOOST_CHECK_THROW(
       fixture->outpost->deliver_outbound_envelope(test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
