@@ -57,16 +57,18 @@ Deposit on the outpost chains themselves, signed by the wallets you linked in st
 
 - **Ethereum** — `OperatorRegistry.deposit(...)`
 - **Solana** — the outpost program's `deposit` instruction
-- **WIRE** — `sysio.opreg::deposit(account, amount)` for the configured native WIRE pair
-
-The direct `sysio.opreg::deposit` action requires an existing non-bootstrapped operator row and
-credits only the WIRE-chain pair. It is not an alternative way to satisfy Ethereum or Solana
-requirements; it completes admission only when WIRE is the last unmet configured pair.
 
 Each deposit travels to WIRE over the cross-chain protocol and credits your balance in
-`sysio.opreg`. When every required chain is at or above its minimum, your operator status flips to
-`ACTIVE` on its own. No producer rank exists yet: the first score is written only after the
-producer row and active finalizer key are created in steps 4 and 5.
+`sysio.opreg`.
+
+If the configured requirements include the native WIRE pair, separately call
+`sysio.opreg::deposit(account, amount)` on WIRE, signed by your WIRE account. This native action
+requires an existing non-bootstrapped operator row, transfers WIRE inline, and credits only the
+WIRE-chain pair; it does not replace the Ethereum or Solana outpost deposits.
+
+When every required chain is at or above its minimum, your operator status flips to `ACTIVE` on
+its own. No producer rank exists yet: the first score is written only after the producer row and
+active finalizer key are created in steps 4 and 5.
 
 You can top up at any time. Once your producer row exists, every balance change rescores it, so
 additional collateral raises your rank as soon as it lands.

@@ -45,7 +45,7 @@ find_active_operator( const sysio::name& account,
    const auto key = sysio::opreg::operator_key{ account.value };
    if( !ops.contains( key ) )
       return std::nullopt;
-   const auto op = ops.get( key );
+   auto op = ops.get( key );
    if( op.status != sysio::opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE
        || op.type != expected_type ) {
       return std::nullopt;

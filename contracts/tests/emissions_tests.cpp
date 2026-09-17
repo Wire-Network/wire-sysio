@@ -5860,25 +5860,22 @@ BOOST_FIXTURE_TEST_CASE( noncollateralized_account_cannot_register_then_can_join
    BOOST_REQUIRE( is_scheduled(names[4]) );
 } FC_LOG_AND_RETHROW()
 
-// ACTIVE is role-specific at schedule time too. Keep the historical producer/finalizer rows,
-// replace the settled operator registration with BATCH, and make the live walk reject that row.
-BOOST_FIXTURE_TEST_CASE( active_batch_operator_is_not_schedulable_as_producer, producer_eligibility_tester ) try {
-   auto names = setup_ranked_producers(5);
-   trigger_reschedule();
-   BOOST_REQUIRE(is_scheduled(names[4]));
-
-   BOOST_REQUIRE_EQUAL(success(), terminate_operator(names[4]));
+// ACTIVE is role-specific at admission: collateral for another operator role cannot allocate a
+// producer row.
+BOOST_FIXTURE_TEST_CASE( active_batch_operator_cannot_register_as_producer,
+                         producer_eligibility_tester ) try {
+   const auto producer = producer_names(1).front();
+   create_producer_accounts({producer});
    BOOST_REQUIRE_EQUAL(
-      success(), register_operator(names[4], OperatorType::OPERATOR_TYPE_BATCH, true));
-   trigger_reschedule();
-
-   const auto producer = get_producer_info(names[4]);
-   constexpr unsigned composite_bits = 62;
-   constexpr uint64_t demoted_tier = 2;
-   BOOST_REQUIRE(!producer.is_null());
-   BOOST_REQUIRE_EQUAL(demoted_tier, producer["rank_score"].as<uint64_t>() >> composite_bits);
-   BOOST_REQUIRE(  is_scheduled(names[0]) );
-   BOOST_REQUIRE( !is_scheduled(names[4]) );
+      success(), register_operator(producer, OperatorType::OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("producer operator is not eligible for admission"),
+      push_system_action(producer, "regproducer"_n, mvo()
+         ("producer", producer)
+         ("producer_key", get_public_key(producer, "active"))
+         ("url", "")
+         ("location", 0)));
+   BOOST_REQUIRE(get_producer_info(producer).is_null());
 } FC_LOG_AND_RETHROW()
 
 // When an active-rank producer becomes ineligible and a standby is available,
@@ -6225,6 +6222,28 @@ struct producer_score_tester : public producer_eligibility_tester {
 };
 
 BOOST_AUTO_TEST_SUITE(sysio_producer_score_tests)
+
+// ACTIVE is role-specific at schedule time too. Force a full rescore after replacing a settled
+// producer operator with an ACTIVE BATCH row; without the role match, its bootstrap flag would put
+// the historical producer/finalizer row back into the schedulable tier.
+BOOST_FIXTURE_TEST_CASE( active_batch_operator_is_not_schedulable_as_producer,
+                         producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);
+   trigger_reschedule();
+   BOOST_REQUIRE(is_scheduled(names[4]));
+
+   BOOST_REQUIRE_EQUAL(success(), terminate_operator(names[4]));
+   BOOST_REQUIRE_EQUAL(
+      success(), register_operator(names[4], OperatorType::OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), set_score_config(/*collateral_weight=*/9'999));
+   BOOST_REQUIRE(rescore_pending());
+   trigger_reschedule();
+
+   BOOST_REQUIRE(!rescore_pending());
+   BOOST_REQUIRE_EQUAL(tier_demoted, tier_of(rank_score_of(names[4])));
+   BOOST_REQUIRE(  is_scheduled(names[0]) );
+   BOOST_REQUIRE( !is_scheduled(names[4]) );
+} FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
 // Composite score
@@ -6803,7 +6822,7 @@ BOOST_FIXTURE_TEST_CASE( pruned_operator_row_stays_demoted_through_rescore_sweep
    BOOST_REQUIRE_EQUAL(success(), set_producer_collateral(
       fc::variants{min_bond_mvo(collateral_chain, collateral_token, base_min_bond)},
       /*prune_delay_ms=*/1));
-   produce_blocks(1);
+   produce_blocks(2);
    BOOST_REQUIRE_EQUAL(success(), prune_operators());
    BOOST_REQUIRE(get_opreg_operator(target).is_null());
 

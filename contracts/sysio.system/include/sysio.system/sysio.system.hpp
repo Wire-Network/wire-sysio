@@ -454,14 +454,13 @@ namespace sysiosystem {
           * @param url - the url of the block producer, normally the url of the block producer presentation website,
           * @param location - is the country code as defined in the ISO 3166, https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
           *
-          * @note Registration requires the account to already be an ACTIVE
-          *       OPERATOR_TYPE_PRODUCER operator in sysio.opreg. For ordinary
-          *       operators, collateral credited in sysio.opreg must satisfy every
-          *       configured producer minimum; external-chain collateral is delivered
-          *       through OPP. Bootstrapped genesis operators are the explicit exception.
-          *       Eligibility is checked again when the schedule is built,
-          *       so withdrawing collateral -- or being slashed or terminated --
-          *       drops the producer.
+          * @note Creating a producer row, or reactivating one parked by `unregprod`, requires an
+          *       ACTIVE OPERATOR_TYPE_PRODUCER operator in sysio.opreg. For ordinary operators,
+          *       collateral credited in sysio.opreg must satisfy every configured producer
+          *       minimum; bootstrapped genesis operators are the explicit exception. An existing
+          *       active row may update its key or metadata without allocating new storage, but
+          *       live eligibility is checked again when the schedule is built. Producer keys must
+          *       be valid K1/R1 keys; `regproducer2` accepts at most five authority keys.
           *
           * @pre Producer to register is an account
           * @pre Authority of producer to register
@@ -479,14 +478,13 @@ namespace sysiosystem {
           * @param url - the url of the block producer, normally the url of the block producer presentation website,
           * @param location - is the country code as defined in the ISO 3166, https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
           *
-          * @note Registration requires the account to already be an ACTIVE
-          *       OPERATOR_TYPE_PRODUCER operator in sysio.opreg. For ordinary
-          *       operators, collateral credited in sysio.opreg must satisfy every
-          *       configured producer minimum; external-chain collateral is delivered
-          *       through OPP. Bootstrapped genesis operators are the explicit exception.
-          *       Eligibility is checked again when the schedule is built,
-          *       so withdrawing collateral -- or being slashed or terminated --
-          *       drops the producer.
+          * @note Creating a producer row, or reactivating one parked by `unregprod`, requires an
+          *       ACTIVE OPERATOR_TYPE_PRODUCER operator in sysio.opreg. For ordinary operators,
+          *       collateral credited in sysio.opreg must satisfy every configured producer
+          *       minimum; bootstrapped genesis operators are the explicit exception. An existing
+          *       active row may update its authority or metadata without allocating new storage,
+          *       but live eligibility is checked again when the schedule is built. Every authority
+          *       key must be a valid K1/R1 key, and at most five keys may be supplied.
           *
           * @pre Producer to register is an account
           * @pre Authority of producer to register
@@ -524,7 +522,8 @@ namespace sysiosystem {
           * by other block producers, the registration will fail.
           * If this is the first registered finalizer key of the producer,
           * it will also implicitly be marked active.
-          * A registered producer can have multiple registered finalizer keys.
+          * A registered producer can retain at most five finalizer keys. The bounded finalizer
+          * and key rows are billed to the system contract rather than to the producer.
           *
           * @param finalizer_name - account registering `finalizer_key`,
           * @param finalizer_key - key to be registered. The key is in base64url format.

@@ -55,6 +55,13 @@ namespace sysiosystem {
          }
          for (const auto& kw : auth.keys) {
             check( kw.key.index() < 2, "Only K1 & R1 keys allowed" );
+            const auto& key_bytes = kw.key.index() == 0
+               ? std::get<0>(kw.key)
+               : std::get<1>(kw.key);
+            check( std::any_of(key_bytes.begin(), key_bytes.end(), [](uint8_t byte) {
+                      return byte != 0;
+                   }),
+                   "producer authority contains an invalid key" );
          }
       }, producer_authority );
 

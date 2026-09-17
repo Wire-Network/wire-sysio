@@ -185,13 +185,27 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig, sysio_system_tester ) try {
                         )
    );
 
-   // Bound per-block signature verification work even for an otherwise valid M-of-N authority.
+   // The contract and chain policy both accept the five-key boundary.
    alice_signing_authority.keys.clear();
-   for (uint32_t i = 0; i < 6; ++i) {
+   for (uint32_t i = 0; i < 5; ++i) {
       alice_signing_authority.keys.push_back(
          {.key = get_public_key("alice1111111"_n, "many" + std::to_string(i)), .weight = 1});
    }
    alice_signing_authority.threshold = 1;
+   alice_producer_authority.authority = alice_signing_authority;
+   BOOST_REQUIRE_EQUAL(
+      success(),
+      push_action( "alice1111111"_n, "regproducer2"_n, mvo()
+                   ("producer",  "alice1111111")
+                   ("producer_authority", alice_producer_authority.get_abi_variant()["authority"])
+                   ("url", "http://wire.network")
+                   ("location", 0 )
+      )
+   );
+
+   // A sixth key would add unbounded per-block signature verification work.
+   alice_signing_authority.keys.push_back(
+      {.key = get_public_key("alice1111111"_n, "many5"), .weight = 1});
    alice_producer_authority.authority = alice_signing_authority;
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: producer authority cannot contain more than 5 keys"),
@@ -203,19 +217,20 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig, sysio_system_tester ) try {
       )
    );
 
-   // However, an authority with an invalid key is okay.
+   // Invalid keys would make schedule publication fail from onblock, so reject them at the write.
    alice_signing_authority.keys = {
       {.key = get_public_key("alice1111111"_n, "bs1"), .weight = 1},
       {}
    };
    alice_producer_authority.authority = alice_signing_authority;
-   BOOST_REQUIRE_EQUAL( success(),
-                        push_action( "alice1111111"_n, "regproducer2"_n, mvo()
-                                       ("producer",  "alice1111111")
-                                       ("producer_authority", alice_producer_authority.get_abi_variant()["authority"])
-                                       ("url", "http://wire.network")
-                                       ("location", 0 )
-                        )
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: producer authority contains an invalid key"),
+      push_action( "alice1111111"_n, "regproducer2"_n, mvo()
+                   ("producer",  "alice1111111")
+                   ("producer_authority", alice_producer_authority.get_abi_variant()["authority"])
+                   ("url", "http://wire.network")
+                   ("location", 0 )
+      )
    );
 
 } FC_LOG_AND_RETHROW()
