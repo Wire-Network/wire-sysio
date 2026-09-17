@@ -1151,6 +1151,48 @@ BOOST_AUTO_TEST_CASE(explicit_proxy_connect_uses_ipv6_authority_and_port) {
    BOOST_CHECK(observed_request.starts_with("CONNECT [2001:db8::1]:443 HTTP/1.1\r\n"));
 }
 
+/// A proxy may send an interim response before 200 Connection Established, and CONNECT consumes
+/// it exactly as the request path does.
+///
+/// Both headers go out in a single write so the 200 is already sitting in the read buffer when
+/// the parser restarts: a loop that discarded the buffer along with the parser would lose it.
+///
+/// The assertion is on the wire rather than on an error string. A client that accepted the tunnel
+/// starts its TLS handshake, so a ClientHello arrives; one that stopped at the interim status
+/// closes without sending anything.
+BOOST_AUTO_TEST_CASE(proxy_connect_consumes_an_interim_response) {
+   constexpr uint8_t tls_handshake_record_type = 0x16;
+   std::atomic_bool  client_hello_observed{false};
+   scripted_http_server proxy(
+      [&](tcp::socket& socket, const std::atomic_bool&) {
+         if (read_request_header(socket).empty())
+            return;
+         write_bytes(socket, "HTTP/1.1 103 Early Hints\r\n"
+                             "Link: </s.css>; rel=preload\r\n\r\n"
+                             "HTTP/1.1 200 Connection Established\r\n\r\n");
+         std::array<uint8_t, 1> first_byte{};
+         boost::system::error_code error;
+         if (boost::asio::read(socket, boost::asio::buffer(first_byte), error) == first_byte.size())
+            client_hello_observed = first_byte[0] == tls_handshake_record_type;
+      },
+      false);
+   fc::http::transport transport(fc::http::transport_options{
+      .proxy = "http://127.0.0.1:" + std::to_string(proxy.port()),
+   });
+
+   // The tunnel leads nowhere, so the request still fails — but past CONNECT, in TLS.
+   BOOST_CHECK_EXCEPTION(transport.perform(
+                            fc::http::request{
+                               .method = fc::http::request_method::get,
+                               .target = fc::url("https://127.0.0.1/"),
+                            },
+                            tls_request_options()),
+                         fc::exception, [](const fc::exception& error) {
+                            return error.to_detail_string().find("proxy tunnel failed") == std::string::npos;
+                         });
+   BOOST_CHECK(client_hello_observed.load());
+}
+
 /// Proxy credentials are rejected because this transport has no implicit authentication policy.
 BOOST_AUTO_TEST_CASE(explicit_proxy_credentials_are_rejected) {
    BOOST_CHECK_THROW(fc::http::transport(fc::http::transport_options{
