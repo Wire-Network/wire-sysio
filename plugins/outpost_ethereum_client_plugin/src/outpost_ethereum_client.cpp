@@ -29,6 +29,10 @@ constexpr std::string_view OP_DELIVER_OUTBOUND = "deliver_outbound_envelope";
 constexpr std::string_view OP_READ_INBOUND     = "read_inbound_envelope";
 constexpr std::string_view OP_UW_COMMIT        = "uw_commit";
 
+/// EIP-1474 code for a call the node executed and that reverted, as distinct from a protocol
+/// error such as a parse failure, where the node never ran the call at all.
+constexpr int ethereum_execution_reverted_code = 3;
+
 /// ABI entry names and decoded-output field keys of the outpost contracts this
 /// client drives. Grouped per contract so a Solidity rename is one edit here
 /// rather than a scatter of string literals.
@@ -312,6 +316,13 @@ std::optional<uint16_t> outpost_ethereum_client::resume_chunk_index(
               to_string(), epoch_index, staged.total_chunks, staged.total_bytes,
               result.as_string());
       } catch (const fc::network::json_rpc::json_rpc_error& e) {
+         // Only an execution revert means the header is already clear. A protocol-level
+         // JSON-RPC error carries a different code and says the node never ran the call, so
+         // the discard may not have happened; tolerating it would upload against a staging
+         // header that is still stale. Those propagate and abandon the tick, like the
+         // failures described below.
+         if (e.code != ethereum_execution_reverted_code)
+            throw;
          // A revert the node catches during `eth_estimateGas` arrives as a
          // JSON-RPC error, and for this call it means `OPP_ChunkBufferMissing`
          // — the header is already clear, which is exactly the state we wanted.

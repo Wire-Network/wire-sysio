@@ -224,6 +224,9 @@ constexpr uint64_t over_cap_gas_estimate = 14'000'000;
 /// JSON-RPC error code anvil/geth report for a reverted call.
 constexpr int contract_revert_rpc_code = 3;
 
+/// JSON-RPC parse error: the node never executed the call, so nothing on chain changed.
+constexpr int json_rpc_parse_error_code = -32700;
+
 /** Build a one-shot JSON-RPC endpoint reporting Anvil's chain id (31337). */
 fc::test::one_shot_http_server chain_id_rpc_server(std::string result_json = "\"0x7a69\"") {
    return fc::test::one_shot_http_server{
@@ -1330,6 +1333,35 @@ BOOST_AUTO_TEST_CASE(multi_chunk_delivery_treats_a_reverting_discard_as_already_
 
    BOOST_CHECK_EQUAL(fixture->discard_calls, 1u);
    check_chunk_call_sequence(fixture->chunk_calls, envelope, test_wire_epoch, 0);
+} FC_LOG_AND_RETHROW();
+
+/// A JSON-RPC protocol error is NOT a revert, and must abandon the tick rather than be tolerated.
+///
+/// A parse error means the node never executed the call, so the staging header may still hold
+/// the superseded envelope. Treating it as "already clear" would upload chunk 0 against that
+/// stale header. Such a response is required by the JSON-RPC specification to carry a null id,
+/// which the transport now decodes as json_rpc_error rather than a bare fc::exception, so this
+/// catch discriminates on the code instead of on the exception type.
+BOOST_AUTO_TEST_CASE(multi_chunk_delivery_abandons_on_a_protocol_error_during_discard) try {
+   auto fixture  = create_chunked_delivery_fixture();
+   auto envelope = make_chunked_envelope(three_chunk_envelope_bytes);
+
+   fixture->chunk_state_response = encode_envelope_chunk_state_result(
+      test_wire_epoch,
+      fixture->outpost->signer_address_hex(),
+      sysio::outpost_ethereum_client_detail::chunk_count_for(envelope.size()),
+      1,
+      static_cast<uint32_t>(envelope.size()) - 1,
+      sysio::ETHEREUM_MAX_CHUNK_BYTES);
+   fixture->discard_failure =
+      fc::network::json_rpc::json_rpc_error(json_rpc_parse_error_code, "Parse error", fc::variant{});
+
+   BOOST_CHECK_THROW(
+      fixture->outpost->deliver_outbound_envelope(test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
+      fc::exception);
+
+   BOOST_CHECK_EQUAL(fixture->discard_calls, 1u);
+   BOOST_CHECK(fixture->chunk_calls.empty());
 } FC_LOG_AND_RETHROW();
 
 /// A stale OWN header on a consensus retry is the signature of an epoch that
