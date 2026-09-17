@@ -9,6 +9,9 @@
 #include <fc/utility.hpp>
 #include <fc/variant.hpp>
 
+#include <algorithm>
+#include <variant>
+
 using namespace fc::crypto;
 using namespace fc;
 
@@ -140,6 +143,35 @@ BOOST_AUTO_TEST_CASE(test_r1_recyle) try {
    auto recycled_pub = public_key::from_string(pub_str);
 
    BOOST_CHECK_EQUAL(pub.to_string({}), recycled_pub.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_public_key_valid_never_throws) try {
+   // valid() is a predicate, and callers use it as one -- the legacy producer schedule format
+   // asserts on it. R1 answers by decoding the point, and the r1::public_key constructor RAISES
+   // when the point does not decode, so the shim has to absorb that rather than propagate it.
+   r1::public_key_data undecodable{};
+   undecodable[0] = 0x02;                                          // compressed point prefix
+   std::fill(undecodable.begin() + 1, undecodable.end(), '\xff');  // x above the field prime
+
+   public_key bad_r1{public_key::storage_type{std::in_place_index<1>, r1::public_key_shim{undecodable}}};
+   BOOST_CHECK_NO_THROW(bad_r1.valid());
+   BOOST_CHECK(!bad_r1.valid());
+
+   // All-zero is rejected on both curves. This is the shape a producer that registered without
+   // setting a signing key ends up holding.
+   BOOST_CHECK(!public_key{}.valid()); // default storage is a zero K1 key
+   public_key zero_r1{public_key::storage_type{std::in_place_index<1>, r1::public_key_shim{}}};
+   BOOST_CHECK(!zero_r1.valid());
+
+   // Real keys of both types are valid.
+   BOOST_CHECK(private_key::generate().get_public_key().valid());
+   BOOST_CHECK(private_key::generate(private_key::key_type::r1).get_public_key().valid());
+
+   // K1 validity is ONLY an all-zero test: ecc::public_key's public_key_data constructor copies
+   // without decoding, so the same bytes R1 rejects pass here. Asserted so the asymmetry is
+   // recorded rather than rediscovered as a bug.
+   public_key bad_k1{public_key::storage_type{std::in_place_index<0>, ecc::public_key_shim{undecodable}}};
+   BOOST_CHECK(bad_k1.valid());
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_em) try {

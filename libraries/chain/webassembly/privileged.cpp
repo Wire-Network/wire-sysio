@@ -58,23 +58,20 @@ namespace sysio { namespace chain { namespace webassembly {
          SYS_THROW(wasm_execution_error, "set_proposed_producers: {}", e.top_message());
       }
 
-      // Remaining checks that don't belong in proposer_policy::validate():
-      //   - account existence (requires apply_context)
-      //   - K1/R1 key type enforcement (uses unactivated_key_type to convey
-      //     that non-K1/R1 keys need a protocol feature to be activated — a
-      //     distinct category from structural validation errors)
-      //   - key.valid() semantics
-      using key_type = fc::crypto::public_key::key_type;
+      // Account existence is the only remaining per-producer check; it needs the apply_context, so
+      // it cannot live on proposer_policy::validate(). A schedule naming an account that does not
+      // exist is malformed, not merely unusable.
+      //
+      // Key type and key validity are deliberately NOT checked, on either packing format. Both are
+      // per-producer capability facts already enforced where they decide something:
+      // block_state::verify_signee rejects any key recovered from a block signature that is not K1
+      // or R1, and a key that decodes to no curve point is recovered from no signature at all, so
+      // it never matches in keys_satisfy_and_relevant. Checking them here adds no safety and one
+      // failure mode: the system contract assembles a schedule from its own tables inside onblock,
+      // where a throw rolls the rebuild timestamp back with it and re-fires on every block after.
       for (const auto& p : candidate.proposer_schedule.producers) {
          SYS_ASSERT(context.is_account(p.producer_name), wasm_execution_error,
                     "producer schedule includes a nonexisting account");
-         std::visit([](const auto& a) {
-            for (const auto& kw : a.keys) {
-               SYS_ASSERT(kw.key.contains_type(key_type::k1, key_type::r1), unactivated_key_type,
-                          "Unactivated key type used in proposed producer schedule");
-               SYS_ASSERT(kw.key.valid(), wasm_execution_error, "producer schedule includes an invalid key");
-            }
-         }, p.authority);
       }
 
       return context.control.set_proposed_producers( context.trx_context,
