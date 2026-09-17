@@ -33,20 +33,6 @@ public:
       return push_action(proposer, "regpeerkey"_n, mvo()("proposer_finalizer_name", proposer)("key", key));
    }
 
-   // Push the getpeerkeys action and decode its action return value -- the value the
-   // net_plugin auto-bp-peering path consumes. Exercising the decoded return here guards
-   // against a dropped action return value (a CDT codegen hazard that otherwise surfaces only
-   // in the auto_bp_gossip_peering integration test).
-   /// Terminate an operator so it stops being an ELIGIBLE operator, without touching the
-   /// schedule the chain is currently producing under. Pushed as sysio.opreg, which is what
-   /// `opreg::terminate` requires -- the same actor `register_producer_operators` uses.
-   void terminate_operator( const name& account ) {
-      base_tester::push_action("sysio.opreg"_n, "terminate"_n, "sysio.opreg"_n, mvo()
-         ("account", account)
-         ("reason", std::string("peer-discovery test")));
-      produce_block();
-   }
-
    /// Register an active finalizer key for each name.
    ///
    /// Required to reach the RANK WALK at all: `producer_rank::compute` sinks a keyless producer
@@ -73,6 +59,10 @@ public:
       return names;
    }
 
+   // Push the getpeerkeys action and decode its action return value -- the value the
+   // net_plugin auto-bp-peering path consumes. Exercising the decoded return here guards
+   // against a dropped action return value (a CDT codegen hazard that otherwise surfaces only
+   // in the auto_bp_gossip_peering integration test).
    std::vector<gpk_peerkeys_t> get_peer_keys() {
       auto trace = TESTER::push_action( config::system_account_name, "getpeerkeys"_n,
                                         config::system_account_name, mvo() );
