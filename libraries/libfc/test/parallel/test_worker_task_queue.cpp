@@ -1,14 +1,15 @@
-#include <boost/test/unit_test.hpp>
-
-#include <fc/parallel/worker_task_queue.hpp>
-
 #include <atomic>
+#include <boost/test/unit_test.hpp>
 #include <chrono>
+#include <fc-test/wait_until.hpp>
+#include <fc/exception/exception.hpp>
+#include <fc/parallel/worker_task_queue.hpp>
 #include <latch>
 #include <thread>
 #include <vector>
 
 using namespace fc::parallel;
+using fc::test::wait_until;
 
 BOOST_AUTO_TEST_SUITE(worker_task_queue_tests)
 
@@ -74,6 +75,22 @@ BOOST_AUTO_TEST_CASE(push_after_stop_is_noop) {
    BOOST_TEST(!q->try_push(3));
    BOOST_TEST(processed.load() == 0);
    BOOST_TEST(q->size() == 0u);
+}
+
+/// A stopped queue stays stopped: start() afterwards neither runs a worker nor admits items.
+BOOST_AUTO_TEST_CASE(start_after_stop_is_a_no_op) {
+   std::atomic<int> processed{0};
+   auto q = worker_task_queue<int>::create({.max_threads = 1}, [&](int&) { ++processed; });
+
+   q->push(1);
+   BOOST_REQUIRE(wait_until([&] { return processed.load() >= 1; }));
+
+   q->stop();
+   q->start();
+   BOOST_TEST(!q->running());
+   BOOST_TEST(!q->try_push(2));
+   BOOST_TEST(q->size() == 0u);
+   BOOST_TEST(processed.load() == 1);
 }
 
 /// Appending capacity to the public aggregate preserves the meaning of legacy
@@ -211,6 +228,12 @@ BOOST_AUTO_TEST_CASE(concurrent_producers) {
 
    q->stop();
    BOOST_TEST(processed.load() == per_producer * num_producers);
+}
+
+/// A pool of zero threads is accepted by boost::asio and runs nothing, so create() rejects the count rather
+/// than hand back a queue that reports itself running while it delivers no item.
+BOOST_AUTO_TEST_CASE(zero_max_threads_is_rejected) {
+   BOOST_CHECK_THROW(worker_task_queue<int>::create({.max_threads = 0}, [](int&) {}), fc::exception);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
