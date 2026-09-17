@@ -11,6 +11,7 @@ set(fc_sources
         src/utf8.cpp
         src/io/datastream.cpp
         src/io/json.cpp
+        src/io/json_template.cpp
         src/io/varint.cpp
         src/io/fstream.cpp
         src/io/secure_file.cpp
@@ -62,6 +63,7 @@ set(fc_sources
         src/crypto/blake2.cpp
         src/crypto/k1_recover.cpp
         src/network/url.cpp
+        src/network/es/es_client.cpp
         src/network/ethereum/ethereum_abi.cpp
         src/network/ethereum/ethereum_client.cpp
         src/network/ethereum/ethereum_rlp_encoder.cpp

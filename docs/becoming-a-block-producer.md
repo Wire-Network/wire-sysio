@@ -167,7 +167,8 @@ They stay at zero until the chain can observe them; a self-declared factor would
 of free points.
 
 Snapshot service is optional. If you want it, register a snapshot provider account with
-`regsnapprov` and vote snapshot hashes with `votesnaphash`. Only votes that reach quorum are
+`regsnapprov` and vote snapshot hashes with `votesnaphash`; `delsnapprov` retires the delegation
+again and frees the registration slot it held. Only votes that reach quorum are
 credited, so registering alone earns nothing. The credit is a rating of the CURRENT pay period and
 is stamped with it, so it expires at the period boundary rather than being consumed when you leave:
 attestations you earned this period still count if you park and come back inside it, and none of
