@@ -13,9 +13,12 @@
 #include <fc/io/secure_file.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <filesystem>
 #include <set>
+#include <string>
+#include <string_view>
 
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/exceptions.hpp>
@@ -35,6 +38,86 @@ constexpr std::string_view option_name_plugin = "plugin";
 /// never registrable).
 constexpr std::string_view scheme_key  = "KEY";
 constexpr std::string_view scheme_kiod = "KIOD";
+
+/// Field counts of a `--signature-provider` spec, `[<name>,]<chain-kind>,<key-type>,<public-key>,<provider>`.
+constexpr std::size_t spec_field_count_with_name = 5;
+constexpr std::size_t spec_field_count_anonymous = 4;
+
+/// Separates the accepted spellings listed by `reflected_enum_names`.
+constexpr std::string_view enum_name_separator = ", ";
+
+/**
+ * List the spellings a reflected enum accepts, in declaration order.
+ *
+ * Used by diagnostics that cannot show the value they rejected. The stripped spelling is the one a spec carries
+ * (`to_signature_provider_spec` writes `wire`, not `chain_kind_wire`), and `from_string` accepts either.
+ *
+ * @return the accepted spellings, separated by `enum_name_separator`.
+ */
+template<typename Enum>
+std::string reflected_enum_names() {
+   struct name_collector {
+      std::string names;
+      void        operator()(const char*, int64_t value) {
+         if (!names.empty()) {
+            names.append(enum_name_separator);
+         }
+         names.append(fc::reflector<Enum>::to_fc_string(value));
+      }
+   } collector;
+   fc::reflector<Enum>::visit(collector);
+   return collector.names;
+}
+
+/**
+ * Parse one enum-valued field of a signature-provider spec without echoing it.
+ *
+ * `fc::reflector<Enum>::from_string` reports the text it rejected (`invalid name '<text>' in enum ...`). A spec whose
+ * fields are shifted can leave a private key in the chain-kind or key-type field, so the field's position and the
+ * spellings it accepts take the place of the text itself.
+ *
+ * @param field the field text, exactly as supplied.
+ * @param field_idx the field's zero-based position in the spec, so the operator can find it.
+ * @param field_label what the field holds, for the message.
+ * @return the parsed enum value.
+ */
+template<typename Enum>
+Enum parse_spec_enum_field(const std::string& field, std::size_t field_idx, std::string_view field_label) {
+   try {
+      return fc::reflector<Enum>::from_string(field);
+   } catch (const fc::exception&) {
+      FC_THROW_EXCEPTION(chain::plugin_config_exception,
+                         "Invalid key spec: field {} is not a {}; expected one of {}. The field itself is not shown, "
+                         "because a misplaced field can hold an unmarked private key.",
+                         field_idx, field_label, reflected_enum_names<Enum>());
+   }
+}
+
+/// Longest key name reproduced verbatim by `abbreviate_key_name`. Covers the generated `<key-type>-default` names (31
+/// characters) and typical operator labels, while the shortest private key this plugin accepts -- a bare 64-character
+/// Ethereum hex key -- is always cut, leaving at least half of it, 128 bits, unrecoverable.
+constexpr std::size_t max_logged_key_name_len = 32;
+
+/// Marks a key name that `abbreviate_key_name` had to cut.
+constexpr std::string_view key_name_elision = "...";
+
+/**
+ * Shorten an operator-supplied signing-key name for a diagnostic or log line.
+ *
+ * The name is the optional first field of a `--signature-provider` spec and is never validated, so a spec whose fields
+ * are shifted can leave a private key there. Nothing can recognize it: a key in the name carries no `KEY:` marker, and
+ * no grammar separates a key from a name -- an Ethereum key is bare hex, a Solana key bare base58. A bounded prefix
+ * still tells the operator which spec a message is about while leaving any key material in it unusable.
+ *
+ * @param key_name the name exactly as supplied.
+ * @return @p key_name, cut to `max_logged_key_name_len` characters and marked when it was longer.
+ */
+std::string abbreviate_key_name(std::string_view key_name) {
+   if (key_name.size() <= max_logged_key_name_len) {
+      return std::string{key_name};
+   }
+   return std::string{key_name.substr(0, max_logged_key_name_len)}.append(key_name_elision);
+}
 
 std::filesystem::path default_signature_provider_spec_file() {
    return app().config_dir() / "default_signature_providers.json";
@@ -179,7 +262,10 @@ public:
 
       auto spec_type_str = spec_parts[0];
       auto spec_data = spec_parts[1];
-      FC_ASSERT(!spec_data.empty(), "Provider spec '{}' is malformed. Format: '<spec type>:<spec data>' has empty <spec data>", spec);
+      // Not echoed either, for the same reason as the check above.
+      FC_ASSERT(!spec_data.empty(),
+                "Provider spec for {} is malformed. Format: '<spec type>:<spec data>' has empty <spec data>",
+                fc::json::to_log_string(public_key));
 
       if (spec_type_str == scheme_key) {
          chain::private_key_type privkey;
@@ -264,7 +350,7 @@ public:
                  !_signing_providers_by_name.contains(provider->key_name),
                  chain::plugin_config_exception,
                  "A signature provider with key_name \"{}\" or public_key \"{}\" already exists",
-                 provider->key_name, fc::json::to_log_string(provider->public_key));
+                 abbreviate_key_name(provider->key_name), fc::json::to_log_string(provider->public_key));
 
       _signing_providers_by_pubkey.insert_or_assign(provider->public_key, provider);
 
@@ -470,20 +556,27 @@ public:
    parsed_provider_spec parse_provider_spec(const string& spec) const {
       using namespace fc::crypto;
       //<name>,<chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>
-      auto spec_parts = fc::split(spec, ',', 5);
+      auto spec_parts = fc::split(spec, ',', spec_field_count_with_name);
       auto num_parts = spec_parts.size();
-      SYS_ASSERT(num_parts == 5 || num_parts == 4, chain::plugin_config_exception, "Invalid key spec: {}",
-                 redact_signature_provider_spec(spec));
+      // The spec is not echoed. A field-count mismatch means a field is missing or extra, which can leave a private key
+      // in any position, with no `KEY:` marker to recognize it by.
+      SYS_ASSERT(num_parts == spec_field_count_with_name || num_parts == spec_field_count_anonymous,
+                 chain::plugin_config_exception,
+                 "Invalid key spec: expected {} comma-separated fields, or {} without the leading <name>, but got {}. "
+                 "Format: [<name>,]<chain-kind>,<key-type>,<public-key>,<provider>. The spec itself is not shown, "
+                 "because a missing or extra field can leave an unmarked private key anywhere in it.",
+                 spec_field_count_with_name, spec_field_count_anonymous, num_parts);
       std::string key_name;
       std::size_t target_chain_idx = 1;
-      if (num_parts == 4) {
+      if (num_parts == spec_field_count_anonymous) {
          target_chain_idx = 0;
       } else {
          key_name = spec_parts[0];
       }
 
-      auto kind = chain_kind_reflector::from_string(spec_parts[target_chain_idx].c_str());
-      auto key_type = chain_key_type_reflector::from_string(spec_parts[target_chain_idx + 1].c_str());
+      auto kind = parse_spec_enum_field<chain_kind_t>(spec_parts[target_chain_idx], target_chain_idx, "chain kind");
+      auto key_type = parse_spec_enum_field<chain_key_type_t>(spec_parts[target_chain_idx + 1],
+                                                              target_chain_idx + 1, "key type");
       auto public_key_text = spec_parts[target_chain_idx + 2];
       auto private_key_provider_spec = spec_parts[target_chain_idx + 3];
 
@@ -493,7 +586,7 @@ public:
          .key_type = key_type,
          .public_key_text = std::move(public_key_text),
          .private_key_provider_spec = std::move(private_key_provider_spec),
-         .has_explicit_name = num_parts == 5 && !key_name.empty(),
+         .has_explicit_name = num_parts == spec_field_count_with_name && !key_name.empty(),
       };
    }
 
@@ -545,11 +638,13 @@ public:
          try {
             pubkey = from_native_string_to_public_key(key_type, public_key_text);
          } catch (const fc::exception& e) {
-            // The parser echoes its input, and a private key typed into this field must not reach the error.
+            // The parser echoes its input, and a private key typed into this field must not reach the error. The name
+            // is abbreviated for the same reason: it is operator text that a shifted spec can leave a key in.
             FC_THROW_EXCEPTION(sysio::chain::plugin_config_exception,
                                "Signature provider {} has an invalid {} public key (parse failed with {}; the text is "
                                "not shown in case it is a private key)",
-                               key_name, chain_key_type_reflector::to_fc_string(key_type), e.name());
+                               abbreviate_key_name(key_name), chain_key_type_reflector::to_fc_string(key_type),
+                               e.name());
          }
          break;
       }
@@ -768,10 +863,10 @@ void signature_provider_manager_plugin::plugin_initialize(const variables_map& o
    if (options.contains(option_name_provider)) {
       auto specs = options.at(option_name_provider).as<std::vector<std::string>>();
       for (const auto& spec : specs) {
-         // The spec itself is not logged: a malformed one can carry a private key that redaction cannot recognize.
+         // The spec itself is not logged: a malformed one can carry a private key with no `KEY:` marker to find it by.
          auto provider = my->create_configured_provider(spec);
          dlog("Registered signature provider ({}): {}",
-              provider->key_name, provider->public_key.to_string({}));
+              abbreviate_key_name(provider->key_name), provider->public_key.to_string({}));
       }
    }
 }
