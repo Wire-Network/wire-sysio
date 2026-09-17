@@ -51,6 +51,13 @@ constexpr uint32_t produce_block_offset_ms = 450;
 /// The one producer running_node holds a key for, so the one whose windows it can commit in.
 constexpr chain::account_name own_producer = config::system_account_name;
 
+/// The role a producer's signing key is derived under. tester signs a seeded chain's blocks with this key, and a
+/// seeded node holds own_producer's key under it and no other.
+constexpr const char* signing_key_role = "active";
+
+/// A role no node is given a key under, for an authority key the producing node has to do without.
+constexpr const char* unheld_key_role = "unheld";
+
 /// How long to give the node to do something with a slot the clock has just moved into, before
 /// concluding it did nothing with it. Bounds a per-slot poll, so it is short.
 constexpr std::chrono::milliseconds slot_settle_budget{200};
@@ -382,16 +389,15 @@ private:
 
 constexpr uint32_t slots_to_step = 12;   // one full production round
 
-/// Build a chain in `dir` whose active schedule holds more producers than the node under test will
-/// own, so that node has to speculate through the other windows rather than producing every slot.
-/// Returns the head block time, which is where the mock clock has to stand when the node opens it.
+/// Build a chain in `dir` whose active schedule is `schedule`, creating every producer account it names beyond
+/// own_producer. Returns the head block time, which is where the mock clock has to stand when the node opens it.
 ///
 /// The schedule is installed with a tester rather than by pushing transactions into the running
 /// plugin, because setting producers goes through sysio.bios and needs protocol features and a
 /// finalizer policy in place first; the tester already knows how to do all of that. The tester is
 /// destroyed before the node starts, so only one controller ever has the directory open.
-fc::time_point seed_chain_with_other_producers(const fc::temp_directory&              dir,
-                                               const std::vector<chain::account_name>& others) {
+fc::time_point seed_chain_with_schedule(const fc::temp_directory&              dir,
+                                        const std::vector<producer_authority>& schedule) {
    using namespace sysio::testing;
 
    tester t(dir, true);
@@ -403,47 +409,61 @@ fc::time_point seed_chain_with_other_producers(const fc::temp_directory&        
    finalizer_keys fin_keys(t, 1u, 1u);
    fin_keys.activate_savanna(0u);
 
-   t.create_accounts(others);
-   std::vector<chain::account_name> schedule{config::system_account_name};
-   schedule.insert(schedule.end(), others.begin(), others.end());
-   t.set_producers(schedule);
+   for (const auto& producer : schedule) {
+      if (producer.producer_name != own_producer)
+         t.create_account(producer.producer_name);
+   }
+   t.set_producer_schedule(schedule);
 
    // A proposer policy takes effect a round after it is proposed, so run out two rounds of the new
    // schedule to be certain the node opens a chain that is already using it.
    t.produce_blocks(2 * schedule.size() * config::producer_repetitions);
 
-   BOOST_REQUIRE_EQUAL(t.control->head_active_producers().producers.size(), schedule.size());
+   BOOST_REQUIRE(t.control->head_active_producers().producers == schedule);
    return t.control->head().block_time();
 }
 
-/// A node whose schedule holds producers it has no key for, so it must speculate through their
-/// windows rather than producing every slot. That is the only state in which the delayed production
-/// loop is armed, so both of the cases that care about it start here.
+/// A schedule of own_producer followed by `others`, each signing with its own key. The node holds only own_producer's,
+/// so it must speculate through the other windows rather than producing every slot. That is the only state in which
+/// the delayed production loop is armed, so both of the cases that care about it start here.
+std::vector<producer_authority> schedule_with_other_producers(const std::vector<chain::account_name>& others) {
+   std::vector<chain::account_name> names{own_producer};
+   names.insert(names.end(), others.begin(), others.end());
+
+   std::vector<producer_authority> schedule;
+   schedule.reserve(names.size());
+   for (const auto& name : names) {
+      const auto key = sysio::testing::base_tester::get_public_key(name, signing_key_role);
+      schedule.push_back(producer_authority{name, block_signing_authority_v0{1, {{key, 1}}}});
+   }
+   return schedule;
+}
+
+/// A node on a chain seeded with `schedule`, holding own_producer's signing key and no other.
 ///
 /// The seeded directory and the signature provider string are held alongside the node because it
 /// borrows both: the directory for as long as it runs, the string while it is starting up.
-class speculating_node {
+class seeded_node {
 public:
-   explicit speculating_node(const std::vector<chain::account_name>& others)
-      : _others(others)
-      , _head_time(seed_chain_with_other_producers(_seeded, _others))
-      // <chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>. Only sysio's key, so the
-      // node produces its own window and speculates through the rest.
+   explicit seeded_node(const std::vector<producer_authority>& schedule)
+      : _rotation(schedule.size() * config::producer_repetitions)
+      , _head_time(seed_chain_with_schedule(_seeded, schedule))
+      // <chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>
       , _provider("wire,wire,"
-                  + sysio::testing::base_tester::get_public_key(config::system_account_name, "active").to_string({})
+                  + sysio::testing::base_tester::get_public_key(own_producer, signing_key_role).to_string({})
                   + ",KEY:"
-                  + sysio::testing::base_tester::get_private_key(config::system_account_name, "active").to_string({}))
+                  + sysio::testing::base_tester::get_private_key(own_producer, signing_key_role).to_string({}))
       , node({"--signature-provider", _provider.c_str(), "--production-pause-vote-timeout-ms", "0"},
              _seeded.path().string(), _head_time) {}
 
    /// Slots in one turn of the whole schedule, which bounds every walk over it.
-   uint32_t rotation() const { return (_others.size() + 1) * config::producer_repetitions; }
+   uint32_t rotation() const { return _rotation; }
 
 private:
-   const std::vector<chain::account_name> _others;
-   fc::temp_directory                     _seeded;
-   const fc::time_point                   _head_time;
-   const std::string                      _provider;
+   const uint32_t       _rotation;
+   fc::temp_directory   _seeded;
+   const fc::time_point _head_time;
+   const std::string    _provider;
 
 public:
    /// Declared last so it is constructed last, after everything it borrows above exists.
@@ -526,8 +546,8 @@ BOOST_AUTO_TEST_CASE(production_follows_the_virtual_clock) {
  * for any of it, since that is the only state in which the delayed loop is the armed timer.
  */
 BOOST_AUTO_TEST_CASE(production_survives_a_competing_reschedule) {
-   speculating_node seeded{{"defproducera"_n, "defproducerb"_n}};
-   running_node&    node = seeded.node;
+   seeded_node   seeded{schedule_with_other_producers({"defproducera"_n, "defproducerb"_n})};
+   running_node& node = seeded.node;
 
    // The wake up is only armed while the node is speculating, so get there first.
    BOOST_REQUIRE_MESSAGE(node.advance_slots_until(2 * seeded.rotation(), [&]() { return node.speculating(); }),
@@ -647,8 +667,8 @@ BOOST_AUTO_TEST_CASE(a_block_ships_at_its_deadline_not_at_its_slot) {
  * speculating is the only thing that brings it back.
  */
 BOOST_AUTO_TEST_CASE(production_resumes_after_speculating_through_other_windows) {
-   speculating_node seeded{{"defproducera"_n, "defproducerb"_n}};
-   running_node&    node = seeded.node;
+   seeded_node   seeded{schedule_with_other_producers({"defproducera"_n, "defproducerb"_n})};
+   running_node& node = seeded.node;
 
    // Walk a whole rotation. The node must speculate through the windows it has no key for, and it
    // must produce again in its own, which is what the delayed wake up exists to do.
@@ -681,6 +701,32 @@ BOOST_AUTO_TEST_CASE(production_resumes_after_speculating_through_other_windows)
    BOOST_CHECK_MESSAGE(resumed,
                        "the node speculated through another producer's window and never produced "
                        "again: the wake up armed while speculating did not bring it back");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(multi_key_block_signing)
+
+/**
+ * An authority can need fewer signatures than it has keys, so a producer may hold only some of them. produce_block
+ * looks up a signer for every key and has to skip the ones this node lacks. Here the node is the only producer and
+ * holds one of its authority's two keys, so every block it produces looks up a key it does not hold.
+ */
+BOOST_AUTO_TEST_CASE(production_with_only_some_of_the_signing_keys) {
+   const auto held   = sysio::testing::base_tester::get_public_key(own_producer, signing_key_role);
+   const auto unheld = sysio::testing::base_tester::get_public_key(own_producer, unheld_key_role);
+   seeded_node   seeded{{producer_authority{own_producer, block_signing_authority_v0{1, {{held, 1}, {unheld, 1}}}}}};
+   running_node& node = seeded.node;
+
+   const uint32_t settled = node.blocks_produced();
+   for (uint32_t step = 1; step <= slots_to_step; ++step) {
+      BOOST_REQUIRE_MESSAGE(node.advance_until_head_moves(),
+                            "production stopped at step " << step << " of " << slots_to_step
+                                                          << " while holding one of two signing keys");
+   }
+
+   // The node is the only producer, so every step that moved the head is a block it signed.
+   BOOST_CHECK_GE(node.blocks_produced(), settled + slots_to_step);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
