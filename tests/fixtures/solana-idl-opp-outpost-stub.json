@@ -184,8 +184,7 @@
           "name": "config"
         },
         {
-          "name": "operator_registry",
-          "writable": true
+          "name": "operator_registry"
         },
         {
           "name": "outbound_message_buffer",
@@ -193,6 +192,10 @@
         },
         {
           "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "collateral_position",
           "writable": true
         },
         {
