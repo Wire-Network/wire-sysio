@@ -1008,14 +1008,7 @@ public:
 
       // Every producer needs an active finalizer key: rank is position among SCHEDULABLE producers,
       // and a producer without one holds no position -- so it is neither scheduled nor paid.
-      // regfinkey stores a row on the producer, which needs RAM this fixture does not otherwise
-      // grant (it does not activate the ROA / RAM market).
-      for (auto& pname : prod_names) {
-         BOOST_REQUIRE_EQUAL(success(), push_system_action(config::system_account_name, "setacctram"_n,
-            mvo()("account", pname)("ram_bytes", int64_t(1'000'000))));
-      }
-      produce_blocks(1);
-
+      // sysio.system pays for these bounded rows; producers need no RAM allocation of their own.
       register_finalizer_keys(prod_names, count);
       produce_blocks(1);
 
@@ -4886,7 +4879,7 @@ BOOST_FIXTURE_TEST_CASE( opreg_unregistered_account_cannot_become_producer, sysi
    produce_blocks(1);
 
    BOOST_REQUIRE_EQUAL(
-      wasm_assert_msg("producer must be an active collateral-backed operator"),
+      wasm_assert_msg("producer operator is not eligible for admission"),
       push_system_action(producer, "regproducer"_n, mvo()
          ("producer", producer)
          ("producer_key", get_public_key(producer, "active"))
@@ -5699,16 +5692,10 @@ struct producer_eligibility_tester : public sysio_emissions_tester {
       return names;
    }
 
-   /// Create producer accounts with enough RAM to store a finalizer key. Uses the
-   /// system setacctram action (a direct native limit set) rather than the ROA /
-   /// RAM market, which this fixture does not activate.
+   /// Create producer accounts. Producer and finalizer rows are billed to sysio.system, so these
+   /// accounts deliberately receive no extra RAM allocation.
    void create_producer_accounts(const std::vector<account_name>& names) {
       create_accounts(names, false, false, false, true);
-      produce_blocks(1);
-      for (const auto& p : names) {
-         BOOST_REQUIRE_EQUAL(success(), push_system_action(config::system_account_name, "setacctram"_n,
-            mvo()("account", p)("ram_bytes", int64_t(1'000'000))));
-      }
       produce_blocks(1);
    }
 
@@ -5803,6 +5790,30 @@ BOOST_FIXTURE_TEST_CASE( terminated_producer_removed, producer_eligibility_teste
    BOOST_REQUIRE(  is_scheduled(names[0]) );
 } FC_LOG_AND_RETHROW()
 
+// Parking a producer row makes the next regproducer a reactivation, so even a bootstrapped
+// operator must still have ACTIVE standing. Bootstrap bypasses collateral, never status.
+BOOST_FIXTURE_TEST_CASE( parked_producer_cannot_reactivate_after_slash_or_termination,
+                         producer_eligibility_tester ) try {
+   auto names = setup_ranked_producers(2);
+   for (const auto& producer : names) {
+      BOOST_REQUIRE_EQUAL(success(), push_system_action(
+         producer, "unregprod"_n, mvo()("producer", producer)));
+   }
+
+   BOOST_REQUIRE_EQUAL(success(), slash_operator(names[0]));
+   BOOST_REQUIRE_EQUAL(success(), terminate_operator(names[1]));
+   for (const auto& producer : names) {
+      BOOST_REQUIRE_EQUAL(
+         wasm_assert_msg("producer operator is not eligible for admission"),
+         push_system_action(producer, "regproducer"_n, mvo()
+            ("producer", producer)
+            ("producer_key", get_public_key(producer, "active"))
+            ("url", "")
+            ("location", 0)));
+      BOOST_REQUIRE(!get_producer_info(producer)["is_active"].as<bool>());
+   }
+} FC_LOG_AND_RETHROW()
+
 // An account without an ACTIVE producer operator cannot create the persistent producer row. Once
 // opreg admits it, registration succeeds and ordinary schedule eligibility takes over.
 BOOST_FIXTURE_TEST_CASE( noncollateralized_account_cannot_register_then_can_join, producer_eligibility_tester ) try {
@@ -5814,14 +5825,16 @@ BOOST_FIXTURE_TEST_CASE( noncollateralized_account_cannot_register_then_can_join
          ("producer", names[i])("producer_key", get_public_key(names[i], "active"))("url", "")("location", 0)) );
    }
    BOOST_REQUIRE_EQUAL(
-      wasm_assert_msg("producer must be an active collateral-backed operator"),
+      wasm_assert_msg("producer operator is not eligible for admission"),
       push_system_action(names[4], "regproducer"_n, mvo()
          ("producer", names[4])("producer_key", get_public_key(names[4], "active"))("url", "")("location", 0)) );
    BOOST_REQUIRE(get_producer_info(names[4]).is_null());
 
-   // Configure every key the node will need before it starts voting. Replacing the node key set
-   // after finality has written its safety file is not a supported runtime operation. The fifth
-   // private key is harmless until its public key is registered and enters the proposed policy.
+   // Configure every key the node will need before it starts voting. The tester's
+   // `my_finalizers_t::set_keys` helper does not reset `inactive_safety_info_written_pos` and
+   // `inactive_crc32` when re-keying, so replacing its key set after the safety file is written
+   // trips the tester's bad-magic guard. The fifth private key is harmless until its public key
+   // is registered and enters the proposed policy.
    for (uint32_t i = 0; i < 4; ++i) {
       auto [privkey, pubkey, pop, sig_provider] = sysio::testing::get_bls_key(names[i]);
       BOOST_REQUIRE_EQUAL(success(),
@@ -5847,25 +5860,23 @@ BOOST_FIXTURE_TEST_CASE( noncollateralized_account_cannot_register_then_can_join
    BOOST_REQUIRE( is_scheduled(names[4]) );
 } FC_LOG_AND_RETHROW()
 
-// ACTIVE is role-specific: a BATCH operator cannot use its status to allocate a producer row.
-BOOST_FIXTURE_TEST_CASE( active_batch_operator_cannot_register_as_producer, producer_eligibility_tester ) try {
-   auto names = producer_names(5);
-   create_producer_accounts(names);
-   for (uint32_t i = 0; i < 4; ++i) {
-      BOOST_REQUIRE_EQUAL( success(), register_operator(names[i], OperatorType::OPERATOR_TYPE_PRODUCER, true) );
-      BOOST_REQUIRE_EQUAL( success(), push_system_action(names[i], "regproducer"_n, mvo()
-         ("producer", names[i])("producer_key", get_public_key(names[i], "active"))("url", "")("location", 0)) );
-   }
-   BOOST_REQUIRE_EQUAL( success(), register_operator(names[4], OperatorType::OPERATOR_TYPE_BATCH, true) );
+// ACTIVE is role-specific at schedule time too. Keep the historical producer/finalizer rows,
+// replace the settled operator registration with BATCH, and make the live walk reject that row.
+BOOST_FIXTURE_TEST_CASE( active_batch_operator_is_not_schedulable_as_producer, producer_eligibility_tester ) try {
+   auto names = setup_ranked_producers(5);
+   trigger_reschedule();
+   BOOST_REQUIRE(is_scheduled(names[4]));
+
+   BOOST_REQUIRE_EQUAL(success(), terminate_operator(names[4]));
    BOOST_REQUIRE_EQUAL(
-      wasm_assert_msg("producer must be an active collateral-backed operator"),
-      push_system_action(names[4], "regproducer"_n, mvo()
-         ("producer", names[4])("producer_key", get_public_key(names[4], "active"))("url", "")("location", 0)) );
-   BOOST_REQUIRE(get_producer_info(names[4]).is_null());
-   register_finalizer_keys(names, 4);
-   produce_blocks(1);
+      success(), register_operator(names[4], OperatorType::OPERATOR_TYPE_BATCH, true));
    trigger_reschedule();
 
+   const auto producer = get_producer_info(names[4]);
+   constexpr unsigned composite_bits = 62;
+   constexpr uint64_t demoted_tier = 2;
+   BOOST_REQUIRE(!producer.is_null());
+   BOOST_REQUIRE_EQUAL(demoted_tier, producer["rank_score"].as<uint64_t>() >> composite_bits);
    BOOST_REQUIRE(  is_scheduled(names[0]) );
    BOOST_REQUIRE( !is_scheduled(names[4]) );
 } FC_LOG_AND_RETHROW()
@@ -5982,12 +5993,13 @@ struct producer_score_tester : public producer_eligibility_tester {
    ///
    /// @param req_prod_collat producer collateral requirement, built from `min_bond_mvo`.
    /// @return the action result.
-   action_result set_producer_collateral(const fc::variants& req_prod_collat) {
+   action_result set_producer_collateral(const fc::variants& req_prod_collat,
+                                         uint64_t prune_delay_ms = 600'000) {
       return push_opreg_action(OPREG, "setconfig"_n, mvo()
          ("max_available_producers",          uint32_t{21})
          ("max_available_batch_ops",          uint32_t{63})
          ("max_available_underwriters",       uint32_t{21})
-         ("terminate_prune_delay_ms",         uint64_t{600'000})
+         ("terminate_prune_delay_ms",         prune_delay_ms)
          ("terminate_max_consecutive_misses", uint32_t{5})
          ("terminate_max_pct_misses_24h",     uint32_t{5})
          ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
@@ -6000,6 +6012,10 @@ struct producer_score_tester : public producer_eligibility_tester {
    action_result set_single_pair_collateral(uint64_t min_bond = base_min_bond) {
       return set_producer_collateral(fc::variants{
          min_bond_mvo(collateral_chain, collateral_token, min_bond)});
+   }
+
+   action_result prune_operators() {
+      return push_opreg_action(OPREG, "prune"_n, mvo());
    }
 
    /// Credit an outpost-side collateral row the way `sysio.msgch` does when it dispatches an
@@ -6572,6 +6588,21 @@ BOOST_FIXTURE_TEST_CASE( raising_the_collateral_minimum_sinks_producers_now_belo
       BOOST_REQUIRE_EQUAL( tier_healthy, tier_of(rank_score_of(names[i])) );
    }
 
+   // Updating an existing active producer row allocates nothing new, so key and metadata rotation
+   // remains available. It cannot restore schedule standing: the live-minimum rescore keeps the
+   // producer in the demoted tier until its bond clears the new bar.
+   const auto rotated_key = get_public_key(target, "rotated");
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(target, "regproducer"_n, mvo()
+      ("producer", target)
+      ("producer_key", rotated_key)
+      ("url", "https://rotated.example")
+      ("location", 7)) );
+   BOOST_REQUIRE_EQUAL(
+      rotated_key,
+      fc::crypto::public_key::from_string(get_producer_info(target)["producer_key"].as_string()));
+   BOOST_REQUIRE_EQUAL(tier_demoted, tier_of(rank_score_of(target)));
+   BOOST_REQUIRE(!is_scheduled(target));
+
    // Topping back up over the new bar restores it -- the deposit re-evaluates status in opreg and
    // the score follows.
    BOOST_REQUIRE_EQUAL( success(), credit_collateral(target, base_min_bond * 3) );
@@ -6760,6 +6791,33 @@ BOOST_FIXTURE_TEST_CASE( slash_and_termination_sink_the_key_at_once, producer_sc
    BOOST_REQUIRE_EQUAL( 5u, producer_rank_position(names[4]) );
 } FC_LOG_AND_RETHROW()
 
+// A producer row can outlive its opreg row after a settled termination is pruned. A later sweep
+// must treat that missing cross-contract row as ineligible and complete rather than trapping the
+// cursor on a lookup failure.
+BOOST_FIXTURE_TEST_CASE( pruned_operator_row_stays_demoted_through_rescore_sweep,
+                         producer_score_tester ) try {
+   auto names = setup_collateralized_producers(5);
+   const auto target = names[4];
+
+   BOOST_REQUIRE_EQUAL(success(), terminate_operator(target));
+   BOOST_REQUIRE_EQUAL(success(), set_producer_collateral(
+      fc::variants{min_bond_mvo(collateral_chain, collateral_token, base_min_bond)},
+      /*prune_delay_ms=*/1));
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL(success(), prune_operators());
+   BOOST_REQUIRE(get_opreg_operator(target).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), set_score_config(
+      /*collateral_weight=*/9'999, /*participation_weight=*/10'000,
+      /*snapshot_weight=*/10'000));
+   BOOST_REQUIRE(rescore_pending());
+   trigger_reschedule();
+
+   BOOST_REQUIRE(!rescore_pending());
+   BOOST_REQUIRE_EQUAL(tier_demoted, tier_of(rank_score_of(target)));
+   BOOST_REQUIRE(!is_scheduled(target));
+} FC_LOG_AND_RETHROW()
+
 // ---------------------------------------------------------------------------
 // Position versus index slot
 // ---------------------------------------------------------------------------
@@ -6812,7 +6870,7 @@ BOOST_FIXTURE_TEST_CASE( unbonded_account_cannot_allocate_a_producer_row, produc
    BOOST_REQUIRE_EQUAL(
       "OPERATOR_STATUS_UNKNOWN", get_opreg_operator(squatter)["status"].as_string());
    BOOST_REQUIRE_EQUAL(
-      wasm_assert_msg("producer must be an active collateral-backed operator"),
+      wasm_assert_msg("producer operator is not eligible for admission"),
       push_system_action(squatter, "regproducer"_n, mvo()
          ("producer", squatter)("producer_key", get_public_key(squatter, "active"))("url", "")("location", 0)) );
    produce_blocks(1);
@@ -6841,12 +6899,13 @@ BOOST_FIXTURE_TEST_CASE( stale_active_status_cannot_bypass_raised_collateral_min
       "OPERATOR_STATUS_ACTIVE", get_opreg_operator(producer)["status"].as_string());
 
    BOOST_REQUIRE_EQUAL(
-      wasm_assert_msg("producer must be an active collateral-backed operator"),
+      wasm_assert_msg("producer operator is not eligible for admission"),
       push_system_action(producer, "regproducer"_n, mvo()
          ("producer", producer)
          ("producer_key", get_public_key(producer, "active"))
          ("url", "")
          ("location", 0)) );
+   BOOST_REQUIRE(!get_producer_info(producer)["is_active"].as<bool>());
 
    BOOST_REQUIRE_EQUAL(success(), credit_collateral(producer, base_min_bond));
    BOOST_REQUIRE_EQUAL(success(), push_system_action(producer, "regproducer"_n, mvo()
@@ -6854,6 +6913,7 @@ BOOST_FIXTURE_TEST_CASE( stale_active_status_cannot_bypass_raised_collateral_min
       ("producer_key", get_public_key(producer, "active"))
       ("url", "")
       ("location", 0)) );
+   BOOST_REQUIRE(get_producer_info(producer)["is_active"].as<bool>());
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------

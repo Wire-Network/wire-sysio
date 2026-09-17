@@ -228,6 +228,24 @@ BOOST_AUTO_TEST_CASE(validate_rejects_too_many_producers) try {
       fc_exception_message_contains("exceeds max"));
 } FC_LOG_AND_RETHROW()
 
+// One block may carry a signature for every key named by its producer authority. Bound that
+// per-producer work at the policy layer so snapshots and every proposal path enforce the same cap.
+BOOST_AUTO_TEST_CASE(validate_rejects_too_many_authority_keys) try {
+   proposer_policy pol;
+   block_signing_authority_v0 authority;
+   authority.threshold = 1;
+   for (size_t i = 0; i <= proposer_policy::max_authority_keys; ++i) {
+      authority.keys.push_back({get_public_key("alice"_n, "bs" + std::to_string(i)), 1});
+   }
+   pol.proposer_schedule.version = 1;
+   pol.proposer_schedule.producers = {
+      producer_authority{"alice"_n, std::move(authority)}
+   };
+
+   BOOST_CHECK_EXCEPTION(pol.validate(), producer_schedule_exception,
+      fc_exception_message_contains("authority key count (6) exceeds max (5)"));
+} FC_LOG_AND_RETHROW()
+
 // proposer_policy::validate() rejects a per-authority threshold of zero.
 BOOST_AUTO_TEST_CASE(authority_threshold_zero_test) try {
    savanna_tester chain;

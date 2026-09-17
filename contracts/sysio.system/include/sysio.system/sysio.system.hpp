@@ -247,6 +247,9 @@ namespace sysiosystem {
       SYSLIB_SERIALIZE(finalizer_key_t, (finalizer_name))
    };
 
+   /// Maximum BLS keys one producer may retain for finalizer-key rotation.
+   constexpr uint32_t max_finalizer_keys = 5;
+
    // finalizer_info stores information about a finalizer.
    struct [[sysio::table("finalizers"), sysio::contract("sysio.system")]] finalizer_info {
       name              finalizer_name;           // finalizer's name

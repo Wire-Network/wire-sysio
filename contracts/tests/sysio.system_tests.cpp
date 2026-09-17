@@ -38,7 +38,7 @@ BOOST_FIXTURE_TEST_CASE( producer_register_unregister, sysio_system_tester ) try
    // A self-signed direct registration cannot allocate a system-owned producer row until opreg
    // has admitted the account as an ACTIVE producer.
    BOOST_REQUIRE_EQUAL(
-      wasm_assert_msg("producer must be an active collateral-backed operator"), registration());
+      wasm_assert_msg("producer operator is not eligible for admission"), registration());
    BOOST_REQUIRE(get_row_by_account(config::system_account_name, config::system_account_name,
                                     "producers"_n, "alice1111111"_n).empty());
 
@@ -113,13 +113,25 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig, sysio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( control->active_producers().version, 0u );
 
    issue_and_transfer( "alice1111111"_n, core_sym::from_string("200000000.0000"),  config::system_account_name );
-   deploy_opreg_once();
-   register_producer_operators({"alice1111111"_n});
    block_signing_authority_v0 alice_signing_authority;
    alice_signing_authority.threshold = 1;
    alice_signing_authority.keys.push_back( {.key = get_public_key( "alice1111111"_n, "bs1"), .weight = 1} );
    alice_signing_authority.keys.push_back( {.key = get_public_key( "alice1111111"_n, "bs2"), .weight = 1} );
    producer_authority alice_producer_authority = {.producer_name = "alice1111111"_n, .authority = alice_signing_authority};
+
+   // regproducer2 is subject to the same admission gate as the single-key action.
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("producer operator is not eligible for admission"),
+      push_action( "alice1111111"_n, "regproducer2"_n, mvo()
+                   ("producer",  "alice1111111")
+                   ("producer_authority", alice_producer_authority.get_abi_variant()["authority"])
+                   ("url", "http://wire.network")
+                   ("location", 0 )
+      )
+   );
+
+   deploy_opreg_once();
+   register_producer_operators({"alice1111111"_n});
    BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproducer2"_n, mvo()
                                                ("producer",  "alice1111111")
                                                ("producer_authority", alice_producer_authority.get_abi_variant()["authority"])
@@ -173,8 +185,29 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig, sysio_system_tester ) try {
                         )
    );
 
+   // Bound per-block signature verification work even for an otherwise valid M-of-N authority.
+   alice_signing_authority.keys.clear();
+   for (uint32_t i = 0; i < 6; ++i) {
+      alice_signing_authority.keys.push_back(
+         {.key = get_public_key("alice1111111"_n, "many" + std::to_string(i)), .weight = 1});
+   }
+   alice_signing_authority.threshold = 1;
+   alice_producer_authority.authority = alice_signing_authority;
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: producer authority cannot contain more than 5 keys"),
+      push_action( "alice1111111"_n, "regproducer2"_n, mvo()
+                   ("producer",  "alice1111111")
+                   ("producer_authority", alice_producer_authority.get_abi_variant()["authority"])
+                   ("url", "http://wire.network")
+                   ("location", 0 )
+      )
+   );
+
    // However, an authority with an invalid key is okay.
-   alice_signing_authority.keys[1] = {};
+   alice_signing_authority.keys = {
+      {.key = get_public_key("alice1111111"_n, "bs1"), .weight = 1},
+      {}
+   };
    alice_producer_authority.authority = alice_signing_authority;
    BOOST_REQUIRE_EQUAL( success(),
                         push_action( "alice1111111"_n, "regproducer2"_n, mvo()

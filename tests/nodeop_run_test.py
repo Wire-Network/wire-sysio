@@ -864,8 +864,8 @@ try:
     abiTrans=node.setCodeOrAbi(notUtlAccount, "abi", abiFile, returnTrans=True)
     node.waitForTransactionInBlock(abiTrans["transaction_id"])
 
-    # Producer rows now require prior admission by sysio.opreg. Keep this fixture's registry write
-    # outside the root-tracking transactions below so their expected per-block root counts remain exact.
+    # Producer rows now require a matching operator row before regproducer. This setup transaction
+    # is not part of the root-tracking cases below; only those explicit contract actions are counted.
     operatorData=json.dumps({
         "account": notUtlAccount.name,
         "type": "OPERATOR_TYPE_PRODUCER",
@@ -896,7 +896,7 @@ try:
 
     sendAction(testUtlAccount.name, "batchw", "{\"batch\": 1, \"withdrawals\": [] }", "--permission test.utl@active", testTrans, testIds)
     sendAction(funUtlAccount.name, "batchw", "{\"batch\": 1, \"withdrawals\": [] }", "--permission fun.utl@active", funTrans, funIds)
-    regTrans=node.regproducer(notUtlAccount, url="", location=0)
+    regTrans=node.regproducer(notUtlAccount, url="", location=0, exitOnError=True)
     sendAction(notUtlAccount.name, "batchw", "{\"batch\": 1, \"withdrawals\": [] }", "--permission notutl@active", notTrans, notIds)
     sendAction(testUtlAccount.name, "snoop", "{ }", "--permission test.utl@active", testTrans, testIds)
     sendAction(testUtlAccount.name, "cancelbatch", "{\"batch\": 1 }", "--permission test.utl@active", testTrans, testIds)

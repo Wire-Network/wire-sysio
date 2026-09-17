@@ -4,6 +4,8 @@
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opreg/sysio.opreg.hpp>
 
+#include <optional>
+
 // Shared opreg-status predicate for sysio.system. Kept in its own header --
 // rather than as a system_contract member or in emissions.hpp -- because it
 // depends on the OPP protobuf types (types.pb.hpp). emissions.hpp is
@@ -22,14 +24,12 @@ namespace opreg_refs {
    constexpr sysio::name account = "sysio.opreg"_n;
 }
 
-/// Returns true iff `account` is registered in sysio.opreg as an operator of
-/// `expected_type` whose status is OPERATOR_STATUS_ACTIVE.
+/// Return `account`'s operator row when it has the requested role and ACTIVE status.
 ///
 /// Any other status (WARMUP / COOLDOWN / UNKNOWN / SLASHED / TERMINATED), a
-/// type mismatch, or a missing operator row all return false. This is the
-/// single source of truth for the "live, collateral-backed operator" predicate:
-/// it gates reward distribution (a de-collateralized operator is not paid) and
-/// block-producer scheduling (a de-collateralized producer is not scheduled).
+/// type mismatch, or a missing operator row returns nullopt. This is the
+/// single lookup for live role standing; callers that need more than a boolean
+/// reuse the returned row instead of reading sysio.opreg again.
 /// Requiring the exact `expected_type` prevents an account collateralized for
 /// one role (e.g. a batch operator, backed by req_batchop_collat) from
 /// satisfying the gate for a different role (e.g. producer, backed by
@@ -37,16 +37,30 @@ namespace opreg_refs {
 ///
 /// @param account       operator account to check.
 /// @param expected_type operator role the caller requires.
-/// @return true iff a matching, ACTIVE operator row exists in sysio.opreg.
-inline bool is_op_active( const sysio::name& account,
-                          sysio::opp::types::OperatorType expected_type ) {
+/// @return the matching ACTIVE operator row, or nullopt.
+inline std::optional<sysio::opreg::operator_entry>
+find_active_operator( const sysio::name& account,
+                      sysio::opp::types::OperatorType expected_type ) {
    sysio::opreg::operators_t ops( opreg_refs::account );
    const auto key = sysio::opreg::operator_key{ account.value };
    if( !ops.contains( key ) )
-      return false;
+      return std::nullopt;
    const auto op = ops.get( key );
-   return op.status == sysio::opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE
-       && op.type   == expected_type;
+   if( op.status != sysio::opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE
+       || op.type != expected_type ) {
+      return std::nullopt;
+   }
+   return op;
+}
+
+/// Return whether `account` has the requested role and ACTIVE status.
+///
+/// @param account       operator account to check.
+/// @param expected_type operator role the caller requires.
+/// @return true iff {@link find_active_operator} returns a row.
+inline bool is_op_active( const sysio::name& account,
+                          sysio::opp::types::OperatorType expected_type ) {
+   return find_active_operator( account, expected_type ).has_value();
 }
 
 } // namespace sysiosystem

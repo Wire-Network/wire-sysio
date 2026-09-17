@@ -86,6 +86,10 @@ A snapshot provider generates snapshots, attests to them on-chain, and serves th
 
 The node operator must be a registered producer with a rank of 30 or below:
 
+Before the commands below, complete [steps 1–3 of the block-producer guide](../../docs/becoming-a-block-producer.md):
+link the outpost identities, create the PRODUCER operator row, and post every required collateral
+pair. `regproducer` is admitted only after that operator becomes ACTIVE.
+
 ```bash
 # Register as a block producer
 clio push action sysio regproducer \

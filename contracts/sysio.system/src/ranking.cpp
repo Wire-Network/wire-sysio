@@ -18,6 +18,10 @@
 
 namespace sysiosystem {
 
+   namespace {
+      constexpr size_t max_producer_authority_keys = 5;
+   }
+
    using sysio::const_mem_fun;
    using sysio::current_time_point;
    using sysio::microseconds;
@@ -25,17 +29,26 @@ namespace sysiosystem {
    void system_contract::register_producer( const name& producer, const sysio::block_signing_authority& producer_authority, const std::string& url, uint16_t location ) {
       const auto ct = current_time_point();
 
-      // Producer registration creates or reactivates a persistent system-table row. Require the
-      // operator registry to have already admitted the account as an ACTIVE producer. For ordinary
-      // operators this means collateral credited by sysio.opreg satisfies every configured producer
-      // minimum; external-chain collateral reaches that ledger through OPP. Bootstrapped operators
-      // are the explicit genesis exception maintained by sysio.opreg.
-      check( producer_rank::is_admitted_producer( producer ),
-             "producer must be an active collateral-backed operator" );
+      const auto key = producer_key_t{producer.value};
+      const bool needs_admission = !_producers.contains(key) || !_producers.get(key).active();
+      if (needs_admission) {
+         const auto op = find_active_operator(
+            producer, sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER);
+         bool admitted = false;
+         if (op) {
+            sysio::opreg::opconfig_t cfg_tbl(opreg_refs::account);
+            const auto cfg = cfg_tbl.get_or_default(sysio::opreg::op_config{});
+            const auto collateral_ratio = producer_rank::collateral_factor(*op, cfg);
+            admitted = producer_rank::meets_live_producer_minimum(*op, collateral_ratio);
+         }
+         check( admitted, "producer operator is not eligible for admission" );
+      }
 
       sysio::public_key producer_key{};
 
       std::visit( [&](auto&& auth ) {
+         check( auth.keys.size() <= max_producer_authority_keys,
+                "producer authority cannot contain more than 5 keys" );
          if( auth.keys.size() == 1 ) {
             // if the producer_authority consists of a single key, use that key in the legacy producer_key field
             producer_key = auth.keys[0].key;
@@ -50,7 +63,6 @@ namespace sysiosystem {
       const bool scheduled = std::find( active_schedule.begin(), active_schedule.end(), producer )
                              != active_schedule.end();
 
-      auto key = producer_key_t{producer.value};
       _producers.upsert( get_self(), key,
          producer_info{
             .owner              = producer,

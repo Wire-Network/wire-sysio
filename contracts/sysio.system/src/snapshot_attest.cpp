@@ -66,9 +66,9 @@ constexpr const char* snapshot_eligibility_error(snapshot_producer_eligibility e
 ///
 /// `rank` is no longer a stored field -- it is POSITION in the "prodrank" index among schedulable
 /// producers. So the rank gate is a bounded walk of at most `max_snap_provider_rank` schedulable
-/// entries, testing membership, rather than a point read. Counting matches (rather than taking the
-/// first N index entries) is what stops unbonded registrants -- which occupy index slots but can
-/// never be scheduled -- from crowding real producers out of snapshot-provider eligibility.
+/// entries, testing membership, rather than a point read. Counting matches (rather than taking
+/// the first N index entries) stops historical rows whose live standing has lapsed from crowding
+/// eligible producers out while their cached rank keys converge.
 ///
 /// Computed ONCE per ACTION -- `regsnapprov` walks it on the gated path and threads the result
 /// through both the eligibility check and the capacity prune -- then tested for membership rather

@@ -99,28 +99,19 @@ namespace sysiosystem {
       }
 
       /**
-       * Whether sysio.opreg currently admits an account to create or reactivate a producer row.
+       * Whether an ACTIVE producer operator meets the live producer collateral minimum.
        *
-       * ACTIVE and the PRODUCER role are mandatory. Non-bootstrapped operators must also satisfy
-       * every producer minimum in the live configuration. The latter closes the setconfig window
-       * where status can still say ACTIVE under an older, lower minimum; bootstrapped genesis
-       * operators remain the explicit collateral-free exception.
+       * Bootstrapped genesis operators are the explicit collateral-free exception. Ordinary
+       * operators are measured against the current config rather than trusting a status earned
+       * under an older minimum.
+       *
+       * @param op               an ACTIVE OPERATOR_TYPE_PRODUCER row returned by `find_active_operator`.
+       * @param collateral_ratio the row's collateral factor under the live sysio.opreg config.
+       * @return true iff the operator is bootstrapped or clears every live producer minimum.
        */
-      inline bool is_admitted_producer(const sysio::name& producer) {
-         sysio::opreg::operators_t ops(opreg_refs::account);
-         const auto op_key = sysio::opreg::operator_key{producer.value};
-         if (!ops.contains(op_key)) return false;
-
-         const auto op = ops.get(op_key);
-         if (op.status != sysio::opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE
-             || op.type != sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER) {
-            return false;
-         }
-         if (op.is_bootstrapped) return true;
-
-         sysio::opreg::opconfig_t cfg_tbl(opreg_refs::account);
-         const auto cfg = cfg_tbl.get_or_default(sysio::opreg::op_config{});
-         return collateral_factor(op, cfg) >= score_scale;
+      inline bool meets_live_producer_minimum(const sysio::opreg::operator_entry& op,
+                                              uint64_t collateral_ratio) {
+         return op.is_bootstrapped || collateral_ratio >= score_scale;
       }
 
       /**
@@ -163,25 +154,6 @@ namespace sysiosystem {
       }
 
       /**
-       * The ONE schedulable predicate ranking, pay and snapshot eligibility walk:
-       * `is_eligible_operator` plus an active finalizer key.
-       *
-       * `rank` is position among the producers this returns true for -- so every consumer must
-       * COUNT matches while walking the index, never take the first N index entries. An unbonded
-       * non-bootstrapped registrant is UNKNOWN in opreg and occupies an index slot ahead of the
-       * bootstrap tier; taking the first N would let a handful of them crowd real producers out of
-       * peer discovery and snapshot-provider eligibility.
-       *
-       * Before this existed the consumers disagreed -- update_ranked_producers checked all three
-       * conditions, emissions only the first two, peer_keys and snapshot_attest none. Making
-       * emissions honour the finalizer-key check is a behavioural fix, not a regression: a producer
-       * with no active finalizer key can never be scheduled, so it should not draw top-21 pay.
-       *
-       * @param producer   the producer row under consideration.
-       * @param finalizers the sysio.system finalizers table.
-       * @return true iff the producer is eligible to occupy a rank position.
-       */
-      /**
        * The producer's finalizer row if it holds an active key, else nullopt.
        *
        * One table read. Callers that need the ROW (the schedule rebuild, which proposes it as a
@@ -198,6 +170,13 @@ namespace sysiosystem {
          return row;
       }
 
+      /**
+       * The ONE schedulable predicate ranking, pay and snapshot eligibility walk.
+       *
+       * @param producer   the producer row under consideration.
+       * @param finalizers the sysio.system finalizers table.
+       * @return true iff the producer has live operator standing and an active finalizer key.
+       */
       inline bool is_schedulable(const producer_info& producer, finalizers_table& finalizers) {
          return is_eligible_operator(producer) && active_finalizer(producer.owner, finalizers).has_value();
       }
@@ -276,14 +255,9 @@ namespace sysiosystem {
             return unscored();
          }
 
-         sysio::opreg::operators_t ops(opreg_refs::account);
-         const auto op_key = sysio::opreg::operator_key{producer.value};
-         if (!ops.contains(op_key)) return unscored();
-         const auto op = ops.get(op_key);
-         if (op.status != sysio::opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE
-             || op.type != sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER) {
-            return unscored();
-         }
+         const auto op = find_active_operator(
+            producer, sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER);
+         if (!op) return unscored();
 
          sysio::opreg::opconfig_t opreg_cfg_tbl(opreg_refs::account);
          const auto opreg_cfg = opreg_cfg_tbl.get_or_default(sysio::opreg::op_config{});
@@ -318,8 +292,8 @@ namespace sysiosystem {
          //
          // Bootstrapped producers are exempt, exactly as they are in `meets_role_min`: they are
          // ACTIVE by fiat and hold no bond to measure.
-         const uint64_t collateral_ratio = collateral_factor(op, opreg_cfg);
-         if (!op.is_bootstrapped && collateral_ratio < score_scale) return unscored();
+         const uint64_t collateral_ratio = collateral_factor(*op, opreg_cfg);
+         if (!meets_live_producer_minimum(*op, collateral_ratio)) return unscored();
 
          // Every term saturates: the collateral factor is uncapped by design, so factor * weight
          // must not be allowed to wrap.
@@ -334,7 +308,7 @@ namespace sysiosystem {
                     weights.snapshot_weight);
 
          const uint64_t composite = add_sat(add_sat(collateral, participation), snapshot);
-         return pack(tier_for(inputs.is_demoted, op.is_bootstrapped), composite);
+         return pack(tier_for(inputs.is_demoted, op->is_bootstrapped), composite);
       }
 
       /**
