@@ -13,7 +13,11 @@
 #include <fc/crypto/elliptic_em.hpp>
 #include <fc/crypto/private_key.hpp>
 #include <boost/test/unit_test.hpp>
+#include <algorithm>
+#include <memory>
+#include <optional>
 #include <string>
+#include <string_view>
 #include <type_traits>
 
 using namespace sysio::testing;
@@ -30,6 +34,21 @@ using sysio::chain::compute_table_id;
 
 constexpr account_name ROA = "sysio.roa"_n;
 constexpr uint64_t NETWORK_GEN = 0;
+
+/// Generated sub-account names newuser checks before giving up.
+constexpr size_t NEWUSER_MAX_NAME_ATTEMPTS = 100;
+/// newuser's abort when the nonce was already used by the same creator.
+constexpr auto NEWUSER_DUPLICATE_NONCE = "Sponsor entry for this nonce already exists";
+/// Every character newuser can place in a generated sub-account name: the name alphabet without '.'.
+constexpr std::string_view GENERATED_NAME_CHARS = "12345abcdefghijklmnopqrstuvwxyz";
+/// Longest account name supported by the contract.
+constexpr size_t MAX_ACCOUNT_NAME_LENGTH = 12;
+
+/// Returns newuser's error after its bounded generated-name search is exhausted.
+static std::string newuser_names_exhausted_message() {
+   return "Failed to generate a unique account name after " +
+          std::to_string(NEWUSER_MAX_NAME_ATTEMPTS) + " attempts";
+}
 
 class sysio_roa_tester : public tester {
 public:
@@ -257,6 +276,53 @@ public:
       return new_name;
    }
 
+   /// Runs newuser with every account in `occupied` created first, committing nothing.
+   /// A second call with the same nonce aborts the transaction after the first call returns its
+   /// generated name, so every probe observes identical state in the same pending block.
+   transaction_trace_ptr push_newuser_probe( account_name creator, name nonce,
+                                             const vector<account_name>& occupied )
+   {
+      signed_transaction trx;
+      for (const auto& account : occupied) {
+         trx.actions.emplace_back( vector<permission_level>{{config::system_account_name,
+                                                             config::active_name}},
+                                   newaccount{
+                                      .creator = config::system_account_name,
+                                      .name    = account,
+                                      .owner   = authority( get_public_key( account, "owner" ) ),
+                                      .active  = authority( get_public_key( account, "active" ) ),
+                                   });
+      }
+      const auto call = get_action( ROA, "newuser"_n,
+                                    vector<permission_level>{{creator, config::sysio_payer_name},
+                                                             {creator, config::active_name}},
+                                    mvo()("creator", creator)("nonce", nonce)
+                                         ("pubkey", get_public_key(creator, "active")) );
+      trx.actions.push_back( call );
+      trx.actions.push_back( call );
+      set_transaction_headers( trx );
+      if (!occupied.empty())
+         trx.sign( get_private_key( config::system_account_name, "active" ), control->get_chain_id() );
+      trx.sign( get_private_key( creator, "active" ), control->get_chain_id() );
+      return push_transaction( trx, fc::time_point::maximum(), DEFAULT_BILLED_CPU_TIME_US,
+                               true /* no_throw */ );
+   }
+
+   /// Returns the first newuser call's generated name from a rolled-back probe transaction.
+   static account_name newuser_probe_name( const transaction_trace& trace )
+   {
+      BOOST_REQUIRE( trace.except_ptr );
+      BOOST_REQUIRE_EXCEPTION( std::rethrow_exception( trace.except_ptr ),
+                               sysio_assert_message_exception,
+                               sysio_assert_message_is( NEWUSER_DUPLICATE_NONCE ) );
+      const auto it = std::find_if( trace.action_traces.begin(), trace.action_traces.end(),
+                                    []( const auto& at ) {
+                                       return at.receiver == ROA && at.act.name == "newuser"_n;
+                                    });
+      BOOST_REQUIRE( it != trace.action_traces.end() );
+      return fc::raw::unpack<name>( it->return_value );
+   }
+
    action_result regnodeowner( account_name owner, uint8_t tier )
    {
       return push_action(ROA, "forcereg"_n, mvo()
@@ -348,6 +414,119 @@ BOOST_FIXTURE_TEST_CASE( newuser_twice_test, sysio_roa_tester ) try {
    auto new_name2 = fc::raw::unpack<name>(newuser_action_trace2.return_value);
    BOOST_REQUIRE_NE(new_name, new_name2);
 
+} FC_LOG_AND_RETHROW()
+
+/// Verifies newuser continues past the former three-attempt limit when generated names collide.
+/// Each isolated tester starts from the same chain state and block number. Names returned by the
+/// earlier testers are pre-created in the next tester, deterministically forcing one additional
+/// collision without duplicating the contract's name-generation algorithm in test code.
+BOOST_AUTO_TEST_CASE( newuser_retries_after_three_name_collisions ) try {
+   std::vector<account_name> occupied_names;
+   std::optional<uint32_t> newuser_block_num;
+
+   for (size_t collision_count = 0; collision_count <= 3; ++collision_count) {
+      auto chain = std::make_unique<sysio_roa_tester>();
+      BOOST_REQUIRE_EQUAL(chain->success(), chain->regnodeowner("alice"_n, 1));
+      chain->produce_blocks(1);
+
+      for (const auto occupied_name : occupied_names)
+         chain->create_account(occupied_name, config::system_account_name, false, false, false, false);
+
+      auto result = chain->newuser("alice"_n, "retrynonce"_n,
+                                   chain->get_public_key("alice"_n, "active"));
+      BOOST_REQUIRE(result && !result->action_traces.empty());
+
+      // A different block draws an unrelated sequence, so pin the generator input that makes the
+      // accounts collected from earlier fixtures collide in later fixtures.
+      if (!newuser_block_num)
+         newuser_block_num = result->block_num;
+      BOOST_REQUIRE_EQUAL(*newuser_block_num, result->block_num);
+
+      const auto generated_name = fc::raw::unpack<name>(result->action_traces[0].return_value);
+      BOOST_REQUIRE(std::find(occupied_names.begin(), occupied_names.end(), generated_name)
+                    == occupied_names.end());
+      occupied_names.push_back(generated_name);
+   }
+
+   BOOST_REQUIRE_EQUAL(occupied_names.size(), 4u);
+} FC_LOG_AND_RETHROW()
+
+/// Verifies mixing the block number prevents related name nonces in different blocks from aliasing.
+BOOST_AUTO_TEST_CASE( newuser_mixes_block_number_before_combining_nonce ) try {
+   // In Antelope name encoding, user1 ^ user2 equals this block delta shifted left 32 bits.
+   // The former linear seed therefore gave both calls the same candidate sequence.
+   constexpr uint32_t aliasing_block_distance = 384;
+   auto first = std::make_unique<sysio_roa_tester>();
+   auto second = std::make_unique<sysio_roa_tester>();
+   BOOST_REQUIRE_EQUAL(first->success(), first->regnodeowner("alice"_n, 1));
+   BOOST_REQUIRE_EQUAL(second->success(), second->regnodeowner("alice"_n, 1));
+   first->produce_blocks(1);
+   second->produce_blocks(1 + aliasing_block_distance);
+
+   const auto first_result = first->newuser("alice"_n, "user1"_n,
+                                            first->get_public_key("alice"_n, "active"));
+   const auto second_result = second->newuser("alice"_n, "user2"_n,
+                                              second->get_public_key("alice"_n, "active"));
+   BOOST_REQUIRE_EQUAL(first_result->block_num + aliasing_block_distance, second_result->block_num);
+
+   const auto first_name = fc::raw::unpack<name>(first_result->action_traces[0].return_value);
+   const auto second_name = fc::raw::unpack<name>(second_result->action_traces[0].return_value);
+   BOOST_REQUIRE_NE(first_name, second_name);
+} FC_LOG_AND_RETHROW()
+
+/// Pins newuser's generated-name search at exactly NEWUSER_MAX_NAME_ATTEMPTS attempts.
+/// Probes roll back in one pending block. Occupying each returned candidate moves the next probe
+/// one step farther through the deterministic sequence without duplicating the generator in test code.
+BOOST_FIXTURE_TEST_CASE( newuser_tries_exactly_max_name_attempts, sysio_roa_tester ) try {
+   constexpr account_name creator = "alice"_n;
+   constexpr name nonce = "boundnonce"_n;
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner(creator, 1));
+   produce_blocks(1);
+
+   std::vector<account_name> occupied;
+   std::optional<uint32_t> probe_block_num;
+   for (size_t attempt = 0; attempt < NEWUSER_MAX_NAME_ATTEMPTS; ++attempt) {
+      BOOST_TEST_CONTEXT("probe " << attempt) {
+         const auto trace = push_newuser_probe(creator, nonce, occupied);
+         if (!probe_block_num)
+            probe_block_num = trace->block_num;
+         BOOST_REQUIRE_EQUAL(*probe_block_num, trace->block_num);
+
+         const auto generated = newuser_probe_name(*trace);
+         BOOST_REQUIRE(std::find(occupied.begin(), occupied.end(), generated) == occupied.end());
+         occupied.push_back(generated);
+      }
+   }
+
+   const auto trace = push_newuser_probe(creator, nonce, occupied);
+   BOOST_REQUIRE_EQUAL(*probe_block_num, trace->block_num);
+   BOOST_REQUIRE(trace->except_ptr);
+   BOOST_REQUIRE_EXCEPTION(std::rethrow_exception(trace->except_ptr),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is(newuser_names_exhausted_message()));
+   BOOST_REQUIRE(get_sponsorship(creator, nonce).is_null());
+   BOOST_REQUIRE_EQUAL(0, get_sponsor_count(creator));
+} FC_LOG_AND_RETHROW()
+
+/// Verifies newuser records no sponsorship when the creator's entire generated namespace is occupied.
+BOOST_FIXTURE_TEST_CASE( newuser_fails_when_generated_names_exhausted, sysio_roa_tester ) try {
+   constexpr account_name creator = "nodeowner1"_n;
+   constexpr name nonce = "fullspace"_n;
+   const std::string prefix = creator.to_string() + '.';
+   BOOST_REQUIRE_EQUAL(prefix.size() + 1, MAX_ACCOUNT_NAME_LENGTH);
+
+   create_account(creator, config::system_account_name, false, false, false, false);
+   BOOST_REQUIRE_EQUAL(success(), regnodeowner(creator, 1));
+
+   for (const char c : GENERATED_NAME_CHARS)
+      create_account(name(prefix + c), config::system_account_name, false, false, false, false);
+   produce_blocks(1);
+
+   BOOST_REQUIRE_EXCEPTION(newuser(creator, nonce, get_public_key(creator, "active")),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is(newuser_names_exhausted_message()));
+   BOOST_REQUIRE(get_sponsorship(creator, nonce).is_null());
+   BOOST_REQUIRE_EQUAL(0, get_sponsor_count(creator));
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( newuser_creator_permission_test, sysio_roa_tester ) try {

@@ -13,6 +13,28 @@ namespace sysio {
         // literals -- a contract rename is one change here, not scattered across call sites).
         constexpr name AUTHEX_ACCOUNT    = "sysio.authex"_n;
         constexpr name AUTHEX_RECORDLINK = "recordlink"_n;
+
+        /// Maximum number of generated account names checked before newuser gives up.
+        constexpr uint32_t MAX_ACCOUNT_NAME_ATTEMPTS{100};
+
+        /// SplitMix64's Weyl-sequence increment, used to decorrelate account-name generator inputs.
+        constexpr uint64_t ACCOUNT_NAME_MIX_INCREMENT{0x9E3779B97F4A7C15ULL};
+        /// First SplitMix64 avalanche multiplier.
+        constexpr uint64_t ACCOUNT_NAME_MIX_MULTIPLIER_1{0xBF58476D1CE4E5B9ULL};
+        /// Second SplitMix64 avalanche multiplier.
+        constexpr uint64_t ACCOUNT_NAME_MIX_MULTIPLIER_2{0x94D049BB133111EBULL};
+        /// SplitMix64's three avalanche shifts, in application order.
+        constexpr uint32_t ACCOUNT_NAME_MIX_SHIFT_1{30};
+        constexpr uint32_t ACCOUNT_NAME_MIX_SHIFT_2{27};
+        constexpr uint32_t ACCOUNT_NAME_MIX_SHIFT_3{31};
+
+        /// Applies the SplitMix64 finalizer to one account-name generator input.
+        uint64_t mix_account_name_seed(uint64_t value) {
+            value += ACCOUNT_NAME_MIX_INCREMENT;
+            value = (value ^ (value >> ACCOUNT_NAME_MIX_SHIFT_1)) * ACCOUNT_NAME_MIX_MULTIPLIER_1;
+            value = (value ^ (value >> ACCOUNT_NAME_MIX_SHIFT_2)) * ACCOUNT_NAME_MIX_MULTIPLIER_2;
+            return value ^ (value >> ACCOUNT_NAME_MIX_SHIFT_3);
+        }
     } // anonymous namespace
 
     static bool is_sysio_account(const name& account) {
@@ -1032,7 +1054,7 @@ namespace sysio {
         check(prefix_len + 2 <= NAME_LENGTH, "Creator name is too long to generate a sub-account under it");
         size_t gen_len = NAME_LENGTH - prefix_len - 1; // chars after "<prefix>."
 
-        // Try up to 3 times to generate a unique username
+        // Try a bounded number of times to generate a unique username.
         name new_username;
         bool created = false;
         uint32_t block_num = current_block_number();
@@ -1050,23 +1072,17 @@ namespace sysio {
            'p','q','r','s','t','u','v','w','x','y','z'};
         constexpr size_t charmap_len = sizeof(charmap) / sizeof(charmap[0]);
 
-        // Cheap pseudo-random generator: a splitmix64 finalizer over nonce/attempt/block_num. No
-        // crypto is needed here — uniqueness is enforced by the is_account retry below; we only
-        // need variation — so this avoids a sha256 intrinsic call per attempt.
-        auto mix = [](uint64_t z) {
-            z += 0x9E3779B97F4A7C15ULL;
-            z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9ULL;
-            z = (z ^ (z >> 27)) * 0x94D049BB133111EBULL;
-            return z ^ (z >> 31);
-        };
+        // Mix the block number before combining it with the nonce. A linear shifted combination
+        // lets related name-valued nonces in different blocks produce the same candidate sequence.
+        // No cryptographic strength is needed: is_account enforces uniqueness below.
+        const uint64_t seed = nonce.value ^ mix_account_name_seed(static_cast<uint64_t>(block_num));
 
-        for (uint8_t attempt = 0; attempt < 3; ++attempt) {
-            uint64_t x = nonce.value ^ (static_cast<uint64_t>(block_num) << 32)
-                         ^ (static_cast<uint64_t>(attempt) * 0x9E3779B97F4A7C15ULL);
+        for (uint32_t attempt = 0; attempt < MAX_ACCOUNT_NAME_ATTEMPTS; ++attempt) {
+            uint64_t x = seed ^ (static_cast<uint64_t>(attempt) * ACCOUNT_NAME_MIX_INCREMENT);
 
             // Fill the generated portion after "<prefix>."
             for (size_t i = 0; i < gen_len; ++i) {
-                x = mix(x);
+                x = mix_account_name_seed(x);
                 uname_str[prefix_len + 1 + i] = charmap[x % charmap_len];
             }
 
@@ -1078,7 +1094,10 @@ namespace sysio {
                 break;
             }
         }
-        check(created, "Failed to generate a unique account name after 3 attempts");
+        check(created, [] {
+            return "Failed to generate a unique account name after " +
+                   std::to_string(MAX_ACCOUNT_NAME_ATTEMPTS) + " attempts";
+        });
 
         auto owner_auth = sysiosystem::authority{1, {{pubkey, 1}}, {}};
         auto active_auth = sysiosystem::authority{1, {{pubkey, 1}}, {}};
