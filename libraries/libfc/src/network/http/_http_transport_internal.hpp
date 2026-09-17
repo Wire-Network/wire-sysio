@@ -72,6 +72,8 @@ inline constexpr size_t max_resolver_capacity_waiters = 256;
 inline constexpr unsigned http_version_1_1 = 11;
 /// Lowest status that ends a response exchange; anything below it is an interim 1xx.
 inline constexpr unsigned first_final_status = 200;
+/// The one 1xx that is terminal: bytes after it belong to the upgraded protocol, not to HTTP.
+inline constexpr unsigned switching_protocols_status = 101;
 /// Interim responses consumed before a peer is treated as abusive.
 inline constexpr uint32_t max_interim_responses = 8;
 inline constexpr uint16_t default_http_port = 80;
@@ -434,6 +436,50 @@ asio::awaitable<void> read_header(const std::shared_ptr<connection_state>& conne
    if (error) {
       throw transport_failure(failure_kind::io, "response header read failed: " + error.message(),
                               is_retryable_connection_error(error));
+   }
+}
+
+/** Emplace a fresh response parser carrying this request's byte ceilings. */
+template <typename Body>
+void restart_response_parser(std::optional<beast_http::response_parser<Body>>& parser, const request_options& policy) {
+   parser.emplace();
+   parser->header_limit(policy.max_response_header_bytes);
+   parser->body_limit(policy.max_response_body_bytes);
+}
+
+/**
+ * Read response heads until a final status arrives, consuming any interim ones.
+ *
+ * Beast reports a message complete once it has parsed the header of a 1xx, because an interim
+ * response carries no body. Treating that as the end of the exchange would hand the interim
+ * response to the caller and, worse, release the connection while the real response is still in
+ * flight. Every read shares @p deadline, so a peer cannot extend the header phase by trickling
+ * interim responses, and their number is bounded separately.
+ *
+ * 101 is deliberately not consumed. It is not followed by a final HTTP response at all: the bytes
+ * after its header belong to the negotiated protocol. This transport never offers an upgrade, so a
+ * 101 is a peer protocol violation, and waiting for a final response that cannot arrive would hang
+ * until the header deadline — forever on the snapshot path, which disables all of them.
+ */
+template <typename Stream, typename Body>
+asio::awaitable<void>
+read_final_header(const std::shared_ptr<connection_state>& connection, Stream& stream, beast::flat_buffer& buffer,
+                  std::optional<beast_http::response_parser<Body>>& parser, const request_options& policy,
+                  const std::optional<operation_deadline>& deadline, const std::shared_ptr<request_control>& control) {
+   for (uint32_t interim = 0;; ++interim) {
+      co_await read_header(connection, stream, buffer, *parser, policy, deadline, control);
+      const auto status = parser->get().result_int();
+      if (status == switching_protocols_status) {
+         throw transport_failure(failure_kind::http_status,
+                                 "peer switched protocols on a request that offered no upgrade");
+      }
+      if (status >= first_final_status)
+         co_return;
+      if (interim == max_interim_responses) {
+         throw transport_failure(failure_kind::response_limit,
+                                 "peer sent more than " + std::to_string(max_interim_responses) + " interim responses");
+      }
+      restart_response_parser(parser, policy);
    }
 }
 

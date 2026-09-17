@@ -194,12 +194,15 @@ asio::awaitable<void> client_impl::establish_proxy_tunnel(const std::shared_ptr<
    co_await write_request(connection, stream, connect_request, connect_deadline, control);
 
    beast::flat_buffer buffer(policy.max_response_header_bytes);
-   beast_http::response_parser<beast_http::empty_body> parser;
-   parser.header_limit(policy.max_response_header_bytes);
-   co_await read_header(connection, stream, buffer, parser, policy, connect_deadline, control);
-   if (parser.get().result() != beast_http::status::ok) {
+   // A proxy may send an interim response before 200 Connection Established, so this shares the
+   // request path's skip loop rather than treating the first header as the tunnel's answer. The
+   // buffer is retained across parser restarts because the following head may already be in it.
+   std::optional<beast_http::response_parser<beast_http::empty_body>> parser;
+   restart_response_parser(parser, policy);
+   co_await read_final_header(connection, stream, buffer, parser, policy, connect_deadline, control);
+   if (parser->get().result() != beast_http::status::ok) {
       throw transport_failure(failure_kind::connect,
-                              "proxy tunnel failed with HTTP status " + std::to_string(parser.get().result_int()));
+                              "proxy tunnel failed with HTTP status " + std::to_string(parser->get().result_int()));
    }
 }
 

@@ -99,21 +99,8 @@ public:
       start_response();
    }
 
-   /**
-    * Begin parsing one response message.
-    *
-    * Called again for each interim 1xx response: Beast's parser is neither copyable nor
-    * movable, so a fresh one is emplaced rather than reset. The read buffer is deliberately
-    * retained, because bytes of the following response may already have been read into it.
-    */
-   void start_response() {
-      parser.emplace();
-      parser->header_limit(policy.max_response_header_bytes);
-      parser->body_limit(policy.max_response_body_bytes);
-   }
-
-   /** Return whether the parsed response is an interim 1xx rather than the final one. */
-   bool is_interim_response() const { return parser->get().result_int() < first_final_status; }
+   /** Begin parsing one response message. */
+   void start_response() { restart_response_parser(parser, policy); }
 
    ~response_reader_impl() {
       if (complete.load(std::memory_order_acquire))
@@ -294,26 +281,13 @@ client_impl::async_open(request req, request_options policy, std::shared_ptr<req
          const auto read_response_header = [&] {
             return std::visit(
                [&](auto& stream) {
-                  return read_header(connection, *stream, reader->buffer, *reader->parser, policy, header_deadline,
-                                     control);
+                  return read_final_header(connection, *stream, reader->buffer, reader->parser, policy, header_deadline,
+                                           control);
                },
                connection->stream);
          };
 
          co_await read_response_header();
-         // A 1xx is interim: Beast reports the message complete after its header, but the final
-         // response still follows on this connection. Consuming it here keeps the interim status
-         // from reaching the caller and, more importantly, stops the connection being returned to
-         // the idle pool mid-exchange, where the next request would read this response's body.
-         for (uint32_t interim = 0; reader->is_interim_response(); ++interim) {
-            if (interim == max_interim_responses) {
-               throw transport_failure(failure_kind::response_limit, "peer sent more than " +
-                                                                        std::to_string(max_interim_responses) +
-                                                                        " interim responses");
-            }
-            reader->start_response();
-            co_await read_response_header();
-         }
          reader->header_complete();
          co_return reader;
       } catch (transport_failure& failure) {
