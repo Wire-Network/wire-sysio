@@ -10,16 +10,22 @@ whether or not any `plugin =` line names it -- and it has no dependencies of its
 
 ## How it works
 
-Directories are not discovered; they are *registered* by the plugins that own them. Each caller looks the monitor
-up with `app().find_plugin<resource_monitor_plugin>()` during its own `plugin_initialize`, so registration is
+Directories are not discovered; they are *registered* by their owners. A plugin registrant looks the monitor up
+with `app().find_plugin<resource_monitor_plugin>()` during its own `plugin_initialize`, so registration is
 optional and silently skipped if the monitor is absent:
 
-| Registering plugin | Directory |
+| Registrant | Directory |
 |---|---|
+| `chain::application::init` | the data dir (`--data-dir`) |
 | `chain_plugin` | `blocks_dir` and `state_dir` |
 | `producer_plugin` | the snapshots directory |
 | `trace_api_plugin` | the trace directory |
 | `state_history_plugin` | the state-history directory |
+
+The first row is not a plugin: `chain::application::init` registers the plugin itself (when
+`application_config::enable_resource_monitor` is true, as it is for `nodeop`), calls its `initialize()`, and then
+calls `monitor_directory(app_->data_dir())`. The data dir is therefore always monitored, on top of whatever the
+plugins below register. `kiod` and the cranker example set `enable_resource_monitor = false` and get neither.
 
 At `plugin_startup` the handler walks the registered list and, for each path, adds the path itself **plus each of
 its immediate subdirectories** -- a directory such as `data` can have subdirectories mounted on different file

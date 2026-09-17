@@ -72,8 +72,11 @@ rather than the first signature:
 1. Parse the spec body into `(region, name)`.
 2. Reject a chain key type with no `KEY:`-style native form (`sui` is not implemented; an unrecognised value
    is a config parse error).
-3. Issue `GetParameter` with `WithDecryption=true` on the shared regional client — the one network
-   round-trip, bounded by the SDK's connect and request timeouts and its default retry strategy.
+3. Issue `GetParameter` with `WithDecryption=true` on the shared regional client, bounded by the SDK's connect
+   and request timeouts and its default retry strategy. For a spec that names its region this is the only
+   network round-trip; a region-less spec may make one more first, because resolving the default region falls
+   back to the EC2 instance-metadata service when neither `AWS_DEFAULT_REGION` / `AWS_REGION` nor the
+   shared-config profile supplies one (and `AWS_EC2_METADATA_DISABLED` is not `true`).
 4. Require the parameter's type to be `SecureString`. A `String` or `StringList` is refused outright, with
    the `put-parameter --type SecureString` remediation in the message.
 5. Trim surrounding ASCII whitespace — a trailing newline from `put-parameter --value "$(cat key.txt)"`
@@ -141,9 +144,9 @@ option, and through the standard AWS environment (`AWS_DEFAULT_REGION`, `AWS_REG
 ## Diagnostics
 
 Neither the plugin nor the provider emits a log line: the plugin's lifecycle hooks are empty and the fetch
-path reports through exceptions. Everything an operator sees comes from the manager (its debug-level
-`Registering signature provider from spec: ...` line names the spec, which is passed through unredacted
-because an `SSM:` spec carries no inline secret) or from a boot-time failure.
+path reports through exceptions. Everything an operator sees comes from the manager — its debug-level
+`Registered signature provider (<name>): <public-key>`, the only per-spec line it writes — or from a
+boot-time failure.
 
 Failures split two ways, matching the AWS SDK's own retryability classification:
 

@@ -17,9 +17,11 @@ of its own.
 
 `wallet-dir` names the directory; a relative value resolves against the application data directory (for
 `kiod`, `~/.config/wire/kiod/data` unless `--data-dir` says otherwise), and the directory is created if it
-does not exist. Each wallet is one file, `<name>.wallet`, holding a JSON object with a `version` and a
-`cipher_keys` byte array. A wallet name must be a single path component made only of alphanumerics, `.`,
-`_`, and `-`; anything else is rejected, so a name can never escape the directory.
+does not exist. Each wallet is one file, `<name>.wallet`, holding a JSON object with a single member:
+`cipher_keys`, the encrypted key blob written as a hex string. `wallet_data` also carries a `version` field,
+but it is left out of the struct's `FC_REFLECT`, so it is never serialized and never appears in the file. A
+wallet name must be a single path component made only of alphanumerics, `.`, `_`, and `-`; anything else is
+rejected, so a name can never escape the directory.
 
 Setting the directory also takes an exclusive lock on it. The manager creates `wallet.lock` inside the
 directory and holds an interprocess file lock on it; if the lock cannot be taken, startup fails with
@@ -57,9 +59,10 @@ new pair inside an unlocked wallet; the key type is upper-cased before dispatch 
 | `EM` | ethereum secp256k1 |
 | `ED` | ed25519 |
 
-Anything else raises `unsupported_key_type_exception`. Importing a key, generating one, and removing one each
-write the wallet file immediately. The `set_key_name` operations update only the in-memory index, so a rename
-reaches disk with the next operation that writes the file.
+Anything else raises `unsupported_key_type_exception`. Every mutating operation writes the wallet file
+immediately: importing a key, generating one, removing a key or a name, and each of the three `set_key_name`
+renames. A rename to a name already in the index is refused with `key_exist_exception` before anything is
+written.
 
 Signing walks the unlocked wallets. `sign_transaction` takes a transaction, the set of public keys that must
 sign it, and a chain id, and appends one signature per key — failing if any key is not in an unlocked
@@ -107,16 +110,18 @@ The plugin declares no logger of its own, so its output goes to fc's default log
 names `default`.
 
 - `initializing wallet plugin` at info level, once, at the start of `plugin_initialize`.
-- `saving wallet to file <path>` at warning level, every time a wallet file is written — which is after every
-  create, import, key removal, rename, and password change, not only on shutdown.
+- `saving wallet to file <path>` at warning level, every time a wallet file is written — that is, on wallet
+  creation and after every import, key removal, name removal, and rename. Nothing is written at shutdown: the
+  manager's destructor only removes `wallet.lock`. A wallet's password is set once, when `create` generates
+  it; no operation changes the password of an existing wallet.
 - `Unable to open file: <path>` at error level when a wallet file cannot be written, immediately before the
   matching exception.
 
 Everything else surfaces as a thrown exception with a message naming the wallet: a wallet that already
 exists, a wallet file that cannot be opened, a locked wallet, an already-unlocked wallet, a bad password, a
-missing public key when signing, an unsupported key type, a name containing a path separator, a
-non-positive `unlock-timeout`, and the directory-lock failure described above. `kiod` reports these to the
-caller through `wallet_api_plugin`'s HTTP error responses.
+missing public key when signing, a rename onto a name already in use, an unsupported key type, a name
+containing a path separator, a non-positive `unlock-timeout`, and the directory-lock failure described above.
+`kiod` reports these to the caller through `wallet_api_plugin`'s HTTP error responses.
 
 ## Tests
 

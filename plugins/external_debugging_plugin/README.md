@@ -138,11 +138,15 @@ The plugin uses the default logger and declares no logger category of its own.
 | `opp_tracking: server validation failed at <endpoint>: <detail>` | error | The startup ping failed; immediately followed by the `External debugging server not reachable at <endpoint>` assertion that aborts startup. |
 | `external_debugging_plugin: send_envelope: delivered epoch=E endpoints=D batch_op=B (N bytes) -> key=K existed=X` | info | One envelope was accepted by the server. One line per delivered envelope. |
 | `external_debugging_plugin: failed to parse envelope data for event from batch_op=B, skipping` | error | The event's bytes were not a decodable `opp::Envelope`; nothing is sent. |
-| `external_debugging_plugin: error sending envelope to <endpoint> (epoch=E, batch_op=B)` | error | The RPC threw; the exception detail is appended and the event is dropped. |
+| `external_debugging_plugin: error sending envelope to <endpoint> (epoch=E, batch_op=B)` | warn | The RPC threw. The handler is `FC_LOG_AND_DROP`, which logs through `wlog` with the exception detail appended, and the event is dropped. |
 | `external_debugging_plugin: event not admitted; dropping epoch=E endpoints=D batch_op=B pending=P capacity=C total_dropped=T` | warn | The bounded queue was full. `total_dropped` is the running count. |
 | `external_debugging_plugin: discarding N pending envelopes during shutdown; total_dropped=T` | warn | Shutdown dropped queued work. |
 | `external_debugging_plugin: shutdown complete` | info | End of `plugin_shutdown`. |
-| `rpc_client::execute: method=... request=... res=...` | info | Emitted by the shared typed-RPC helper around each call; these are verbose and carry the full request and response JSON. |
+| `rpc_client::execute: method=<method> request=<request json>` | info | Emitted by the shared typed-RPC helper before each call. |
+| `rpc_client::execute: method=<method>,req=<request json>,res=<result json>` | info | Emitted twice per call by the same helper: once with the raw result JSON, then once with the decoded response message. |
+
+The three `rpc_client::execute` lines are verbose -- they carry the full request and response payloads for every
+call.
 
 A `total_dropped` that keeps climbing means the debugging server cannot keep up with envelope production; raise
 `--ext-debugging-max-pending-envelopes`, lower `--ext-debugging-request-timeout-ms` so failing requests clear

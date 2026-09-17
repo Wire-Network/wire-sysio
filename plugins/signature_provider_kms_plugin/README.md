@@ -22,8 +22,12 @@ the plugin starts no threads of its own.
 
 The manager creates every configured `KMS:` provider during **its** `plugin_initialize`, but only when this
 plugin is enabled; a config carrying a `KMS:` spec without the `plugin =` line fails the boot with an error
-naming the exact line to add. Creation is offline — the spec is parsed, the key type and public-key variant
-are checked, and a client is fetched from the shared per-region cache, all without touching AWS.
+naming the exact line to add. For a spec that names its region, creation is offline — the spec is parsed, the
+key type and public-key variant are checked, and a client is fetched from the shared per-region cache, all
+without touching AWS. A region-less spec is the one exception: resolving its region consults
+`AWS_DEFAULT_REGION`, `AWS_REGION`, and the shared-config profile, and if none of those supplies one it queries
+the EC2 instance-metadata service (unless `AWS_EC2_METADATA_DISABLED=true`), so that lookup happens during
+creation.
 
 Each created provider attaches a **startup probe**, which the manager runs from its `plugin_startup`: a
 single `GetPublicKey` call that resolves credentials, warms the client, and verifies the KMS key's public
@@ -149,14 +153,21 @@ Failures split two ways, matching the AWS SDK's own retryability classification:
 
 | Class | Thrown as | Typical cause |
 |---|---|---|
-| Permanent | `plugin_config_exception` | Access denied, key not found, disabled key, invalid key state, bad parameters, a malformed spec, a non-ethereum key type, a public key that does not match the KMS key, an unresolvable region. |
+| Permanent | `plugin_config_exception` | Access denied, key not found, disabled key, invalid key state, bad parameters, a malformed spec, a public key that does not match the KMS key, an unresolvable region. |
 | Transient | `signing_transient_exception` | Throttling, `KMSInternal`, dependency or network timeouts, service-unavailable. |
 
-The two types are siblings rather than parent and child, so a handler catching only the permanent type
-cannot silently swallow a retryable error. Every message names the service, the operation (`Sign` or
-`GetPublicKey`), the key, the AWS error type and HTTP status, the exception name, and whether the failure
-was classified transient or permanent. At startup a permanent failure aborts the boot; a transient one is
-deferred. At runtime a transient failure is safe to retry with backoff, and a permanent one means the
+One configuration error sits outside both rows: a spec whose key type is not `ethereum` — that is, `wire`,
+`wire_bls`, or `solana` — is rejected at provider creation with `pending_impl_exception`, since KMS signing
+here is secp256k1/Ethereum-only. The other two key types never reach this plugin:
+`signature_provider_manager_plugin` rejects `sui` with `pending_impl_exception` and `unknown` with
+`config_parse_error` before any provider scheme runs. The rejection still aborts the boot; it just carries the
+not-yet-implemented type rather than the misconfiguration one, and the unit tests assert that.
+
+The permanent and transient types are siblings rather than parent and child, so a handler catching only the
+permanent type cannot silently swallow a retryable error. Every message names the service, the operation
+(`Sign` or `GetPublicKey`), the key, the AWS error type and HTTP status, the exception name, and whether the
+failure was classified transient or permanent. At startup a permanent failure aborts the boot; a transient one
+is deferred. At runtime a transient failure is safe to retry with backoff, and a permanent one means the
 configuration must be fixed.
 
 ### Credentials and IAM

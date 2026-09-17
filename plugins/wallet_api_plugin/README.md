@@ -44,14 +44,20 @@ http-server-address = 127.0.0.1:8900
 ### Command line
 
 ```bash
-kiod --unix-socket-path kiod.sock \
+kiod --data-dir /var/lib/wire \
+     --unix-socket-path kiod.sock \
      --wallet-dir /var/lib/wire/wallets \
      --unlock-timeout 900
 ```
 
-Point a client at it with `clio --wallet-url unix:///var/lib/wire/kiod.sock ...`, or with the `WALLET_URL`
-environment variable. `clio`'s built-in default is
-`unix://$HOME/.config/wire/kiod/data/kiod.sock`.
+`--data-dir` is what moves the socket. A relative `--unix-socket-path` is resolved against the data dir by
+`http_plugin`, and `--wallet-dir` has no bearing on it — so without the `--data-dir` line above the socket
+would still be created at `~/.config/wire/kiod/data/kiod.sock`. Passing an absolute
+`--unix-socket-path /var/lib/wire/kiod.sock` has the same effect without relocating the rest of the data dir.
+
+Point a client at whichever path the socket actually lives on: `clio --wallet-url
+unix:///var/lib/wire/kiod.sock ...` matches the invocation above, and `WALLET_URL` sets the same thing.
+`clio`'s built-in default is `unix://$HOME/.config/wire/kiod/data/kiod.sock`.
 
 ## Options
 

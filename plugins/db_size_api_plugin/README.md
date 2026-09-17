@@ -23,7 +23,10 @@ straight off the chainbase segment manager plus the per-index row-count multiset
 | `indices` | `db.row_count_per_index()`, one `{index, row_count}` entry per chainbase index |
 
 `size` is the segment size the node was started with, so it tracks `chain_plugin`'s `--chain-state-db-size-mb`
-option. Because the read runs on the read-only queue it does not block block application.
+option. The `read_only` queue is not a guarantee that the read stays off the main thread: it runs on a
+read-only thread only when `--read-only-threads` is greater than 0, and during the write window the main
+application thread executes `read_only` tasks alongside `read_write` work -- with `read-only-threads = 0` the
+main thread is the only place they run at all.
 
 ## Enabling / configuration
 
@@ -31,12 +34,17 @@ option. Because the read runs on the read-only queue it does not block block app
 
 ```ini
 plugin = sysio::db_size_api_plugin
+plugin = sysio::chain_api_plugin
 
 # db_size is an administrative category -- keep it on loopback.
 http-server-address = http-category-address
 http-category-address = db_size,127.0.0.1:8888
 http-category-address = chain_ro,127.0.0.1:8888
 ```
+
+Every category bound with `http-category-address` needs the plugin that owns it named in a `plugin` option, so
+the `chain_ro` line above requires `plugin = sysio::chain_api_plugin`; without it startup fails with
+`--plugin=sysio::chain_api_plugin is required for --http-category-address=chain_ro,127.0.0.1:8888`.
 
 Command line:
 
@@ -90,8 +98,10 @@ logging with `db_size`/`get` in the message.
 
 ## Tests
 
-The plugin has no `test/` directory and therefore no dedicated target. It is exercised indirectly through the
-chain and http plugin suites (`unit_test`, `plugin_test`, `test_chain_plugin`, `test_http_plugin`).
+The plugin has no `test/` directory and therefore no dedicated target. Its coverage is `test_DbSizeApi` in
+`tests/plugin_http_api_test.py`, which drives `/v1/db_size/get` against a running node on the `db_size`
+listener: an empty request and an empty-content request must both return a payload carrying `free_bytes`,
+`used_bytes`, `size`, and `indices`, and a request with a parameter must return `400`.
 
 ## Related plugins
 

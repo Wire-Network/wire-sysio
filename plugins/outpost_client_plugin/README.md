@@ -27,10 +27,10 @@ an EVM address, a Solana public key, a PDA, or a signature-provider format.
 | Member | Purpose |
 |---|---|
 | `chain_kind()` | `sysio::opp::types::ChainKind` of the target chain — diagnostics and debug-endpoint selection |
-| `chain_code()` | Outpost id assigned by `sysio.epoch::regoutpost` |
+| `chain_code()` | Slug-packed code of this chain's `sysio.chains` row — a `slug_name` over `[A-Z0-9_]`, at most 8 symbols, carried as the packed `uint64`. Rows are registered with `sysio.chains::regchain` |
 | `chain_id()` | Numeric chain id on the target chain; Solana has none and reports `0` |
 | `authenticated_caller_address()` | Raw chain-native address that authenticates this client's writes — 20 bytes on Ethereum, 32 on Solana |
-| `to_string()` | `{chain_code}:{ChainKind_Name}:{chain_id}`, e.g. `0:CHAIN_KIND_EVM:31337`. Virtual, with a default derived from the three getters |
+| `to_string()` | `{chain_code}:{ChainKind_Name}:{chain_id}`. The default prints `chain_code()` as the raw packed integer, so the row registered as `ETH` against a local chain renders `23373212024832:CHAIN_KIND_EVM:31337`. Virtual, with a default derived from the three getters |
 | `deliver_outbound_envelope(epoch_index, envelope_bytes, deadline)` | OPP outbound — submit one envelope to the remote chain; returns the chain-native transaction id |
 | `read_inbound_envelope(epoch_index, deadline)` | OPP inbound — return the envelope the remote chain produced for this epoch, or an empty vector when the latest slot does not match |
 | `uw_commit(uw_request_id, uic_bytes, deadline)` | Underwriter commit — relay a signed `UnderwriteIntentCommit` through the outpost; returns only after on-chain confirmation |
@@ -113,7 +113,7 @@ Two lines, both through fc's `default` logger:
 
 Everything else an operator sees about an outpost connection is emitted by the chain-specific plugin or by
 the concrete client, which prefixes its lines with the SPI's `to_string()` label
-(`outpost_ethereum_client[0:CHAIN_KIND_EVM:31337]: ...`).
+(`outpost_ethereum_client[23373212024832:CHAIN_KIND_EVM:31337]: ...`).
 
 ## Tests
 
@@ -122,11 +122,13 @@ ninja -C build/debug test_outpost_client_plugin
 ./build/debug/plugins/outpost_client_plugin/test_outpost_client_plugin
 ```
 
-The suite covers plugin construction and the SPI's format and getter semantics through a minimal subclass —
-that `to_string()` renders `{chain_code}:{ChainKind_Name}:{chain_id}` for an EVM outpost on a local chain id,
-for an EVM outpost on mainnet, and for an SVM outpost whose numeric chain id is `0`. Higher-fidelity mocks
-live in `batch_operator_plugin/test`, where they are consumed by the `outpost_opp_job` tests. No test dials a
-chain.
+The binary holds two suites. `outpost_client_plugin` has a single case, `init_plugin`, which asserts a
+constant and therefore only proves the plugin header compiles and links. `outpost_client_interface_tests`
+exercises the SPI's getter and format semantics through a minimal subclass, over an EVM outpost on a local
+chain id, an EVM outpost on mainnet, and an SVM outpost whose numeric chain id is `0`; it passes synthetic
+small chain codes rather than packed slugs, and it overrides `to_string()` with its own copy of the format,
+so the base class's default implementation is not under test. Higher-fidelity mocks live in
+`batch_operator_plugin/test`, where they are consumed by the `outpost_opp_job` tests. No test dials a chain.
 
 ## Related plugins
 

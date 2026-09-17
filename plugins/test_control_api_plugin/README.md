@@ -16,16 +16,27 @@ read-write API handle from `test_control_plugin` via `get_read_write_api()` and 
 `appbase::exec_queue::read_write` queue.
 
 Each handler parses the request body into the matching parameter struct, calls the one API method, and
-answers with the serialized result. The parameters are required: an empty body, an empty JSON object, or a
-body that does not match the parameter struct is rejected by `http_plugin` with HTTP 400 and the
-`invalid_http_request` chain error (`3200006`) before the API method is reached. Any exception raised inside
-the handler is converted by `http_plugin::handle_exception`. The result type of all three calls is the empty
-struct, so a successful response body is `{}` with status **202 Accepted** — the status says the behavior was
-armed, not that it has fired.
+answers with the serialized result. All three are registered `params_required`, which rejects exactly three
+kinds of body with HTTP 400 and the `invalid_http_request` chain error (`3200006`) before the API method is
+reached: an absent or space-only body, a body that is an empty JSON object (`is_empty_content` counts `{}`
+and `{   }` as empty), and a body that is not parseable JSON. The emptiness test trims only the space
+character, so a body made of tabs or newlines is not treated as empty — it falls through to the JSON parse and
+is rejected by the unparseable arm instead, with the same status and error code.
+
+Field checking stops there. `fc::from_variant` walks the struct's reflected members and looks each one up by
+name, leaving it at its default when the key is absent, so a well-formed object whose fields are missing or
+misspelled is accepted and the behavior is armed with default values rather than the caller's intent —
+`plugin_http_api_test.py`'s own "valid parameter" payload sends `name` instead of `producer` and gets `{}`
+back. Any exception raised inside the handler is converted by `http_plugin::handle_exception`. The result type
+of all three calls is the empty struct, so a successful response body is `{}` with status **202 Accepted** —
+the status says the behavior was armed, not that it has fired.
 
 Because the endpoints live in their own `test_control` API category, they can be bound to a separate listener
-with `--http-category-address test_control,<address>` while the rest of the node's APIs stay elsewhere.
-`nodeop` maps that category name back to `sysio::test_control_plugin` when it reports which plugin serves it.
+with `--http-category-address test_control,<address>` while the rest of the node's APIs stay elsewhere. That
+binding is checked at startup, not merely reported: `http_plugin` maps the category to
+`sysio::test_control_api_plugin` and asserts that plugin is named in a `plugin` option, aborting with
+`--plugin=sysio::test_control_api_plugin is required for --http-category-address=test_control,<address>` when
+it is not.
 
 ## Enabling / configuration
 
@@ -53,7 +64,8 @@ nodeop --plugin sysio::test_control_api_plugin \
 
 ## HTTP API
 
-All three endpoints are POST with a JSON body, require their parameters, and answer `202` with `{}`.
+All three endpoints are POST with a JSON body, require a non-empty one, and answer `202` with `{}`. A field the
+body omits or misspells is not an error; it takes the parameter struct's default.
 
 | Endpoint | Params | Purpose |
 |---|---|---|
@@ -71,11 +83,12 @@ on: ...`, `Swapped action ... to ...`, `shutting down`, and the rest).
 
 The directory has no `test/` subdirectory, so the build produces no per-plugin test target. The endpoints are
 covered by the Python integration tests under `tests/`: `plugin_http_api_test.py` exercises
-`kill_node_on_producer` for the empty, empty-object, invalid, and valid parameter cases and asserts the
-`400`/`3200006` and `{}` responses, and lists `test_control` among the API categories the node reports;
-`nodeop_signal_throw_test.py` drives `throw_on` across every signal; `interrupt_trx_test.py` drives
-`swap_action`; and the `TestHarness` `Node` helper calls `kill_node_on_producer` for the fork, snapshot, and
-LIB-advance tests.
+`kill_node_on_producer` with an empty body, `{}`, unparseable JSON, and a populated body, asserting
+`400`/`3200006` for the first three and `{}` for the last — note the last payload's first key is `name`, not
+`producer`, so what it actually pins down is that an unrecognised field is ignored. It also lists
+`test_control` among the API categories the node reports; `nodeop_signal_throw_test.py` drives `throw_on`
+across every signal; `interrupt_trx_test.py` drives `swap_action`; and the `TestHarness` `Node` helper calls
+`kill_node_on_producer` for the fork, snapshot, and LIB-advance tests.
 
 ## Related plugins
 

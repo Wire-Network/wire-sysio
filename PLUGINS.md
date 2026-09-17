@@ -1,9 +1,12 @@
 # nodeop plugins
 
-`nodeop` is assembled from appbase plugins. A plugin is enabled with `plugin = sysio::<name>` in `config.ini`
-or `--plugin sysio::<name>` on the command line; a plugin named in `APPBASE_PLUGIN_REQUIRES` by another
-enabled plugin is loaded automatically. Every plugin's options are `nodeop --help` output, and each plugin's
-README below documents what it does, how it works, and how to configure it. The plugin lifecycle
+`nodeop` is assembled from appbase plugins. It always initializes `resource_monitor_plugin`, `chain_plugin`,
+`net_plugin`, and `producer_plugin`, so those four need no `plugin =` line. Every other plugin is enabled with
+`plugin = sysio::<name>` in `config.ini` or `--plugin sysio::<name>` on the command line; a plugin named in
+`APPBASE_PLUGIN_REQUIRES` by another enabled plugin is loaded automatically. The options of the plugins
+`nodeop` links are `nodeop --help` output, with two exceptions: `wallet_plugin` and `wallet_api_plugin` are
+linked and initialized only by `kiod`, so their options are `kiod --help` output. Each plugin's README below
+documents what it does, how it works, and how to configure it. The plugin lifecycle
 (registration, initialize, startup, shutdown) is described in [plugins/usage_pattern.md](plugins/usage_pattern.md);
 [plugins/template_plugin](plugins/template_plugin/README.md) is the scaffold a new plugin starts from.
 
@@ -11,7 +14,7 @@ README below documents what it does, how it works, and how to configure it. The 
 |---|---|---|
 | `batch_operator_plugin` | Cranks depot and outpost contracts, ferrying OPP message chains between the WIRE chain and the external blockchains (Ethereum, Solana) on the epoch schedule | [README](plugins/batch_operator_plugin/README.md) |
 | `chain_api_plugin` | Publishes chain_plugin's read and write APIs as the `/v1/chain/*` HTTP endpoints | [README](plugins/chain_api_plugin/README.md) |
-| `chain_plugin` | Owns the controller (block log, chain state, fork database, WASM runtime) and relays its signals onto the appbase channels every other plugin consumes | [README](plugins/chain_plugin/README.md) |
+| `chain_plugin` | Owns the controller (block log, chain state, fork database, WASM runtime) and relays its signals onto the appbase channels declared in `chain_interface` | [README](plugins/chain_plugin/README.md) |
 | `cron_plugin` | Provides an in-process cron scheduler that other plugins use to run functions on cron-style schedules | [README](plugins/cron_plugin/README.md) |
 | `db_size_api_plugin` | Serves one read-only endpoint reporting chain-state segment usage and per-index row counts | [README](plugins/db_size_api_plugin/README.md) |
 | `external_debugging_plugin` | Forwards every OPP envelope the batch operator computes to an external debugging server over JSON-RPC 2.0 | [README](plugins/external_debugging_plugin/README.md) |
@@ -36,8 +39,8 @@ README below documents what it does, how it works, and how to configure it. The 
 | `test_control_plugin` | Test-only plugin that arms deliberate node misbehavior: shut down inside a named producer's round, throw from a controller signal handler, or republish the next block with one action swapped | [README](plugins/test_control_plugin/README.md) |
 | `trace_api_plugin` | Full-history action trace store with HTTP endpoints for querying traces, transactions, actions, and token transfers | [trace_api_plugin.md](plugins/trace_api_plugin/trace_api_plugin.md) |
 | `underwriter_plugin` | Autonomous underwriter daemon that polls pending swaps and submits signed underwrite-intent commits for the outpost legs that still lack one | [README](plugins/underwriter_plugin/README.md) |
-| `wallet_api_plugin` | Publishes the `kiod` key store as the `/v1/wallet/*` HTTP endpoints that `clio` and a `KIOD:` signature provider call | [README](plugins/wallet_api_plugin/README.md) |
-| `wallet_plugin` | The `kiod` key store: a locked directory of AES-encrypted wallet files with inactivity auto-lock and transaction and digest signing | [README](plugins/wallet_plugin/README.md) |
+| `wallet_api_plugin` | Publishes the `kiod` key store as the `/v1/wallet/*` HTTP endpoints that `clio` and a `KIOD:` signature provider call. Linked and initialized by `kiod`, not `nodeop` | [README](plugins/wallet_api_plugin/README.md) |
+| `wallet_plugin` | The `kiod` key store: a locked directory of AES-encrypted wallet files with inactivity auto-lock and transaction and digest signing. Linked and initialized by `kiod`, not `nodeop` | [README](plugins/wallet_plugin/README.md) |
 
 ## Support code under `plugins/`
 

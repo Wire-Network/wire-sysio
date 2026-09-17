@@ -25,8 +25,10 @@ In `plugin_initialize` the plugin registers its update handlers with each depend
 asynchronous handler to `http_plugin` via `add_async_api(..., http_content_type::plaintext)` in the `prometheus`
 API category. Every callback except the two thread-safe `Counter::Increment` hooks (failed p2p connections and
 dropped transactions) posts its work onto a single `boost::asio::io_context::strand`, so the registry is only
-ever mutated from one thread. The plugin also caches `http_plugin::get_max_response_time()` at initialization;
-its handler's `start()` derives a per-request deadline from it.
+ever mutated from one thread. The plugin caches `http_plugin::get_max_response_time()` at initialization and its
+handler's `start()` computes a deadline from it, but the registration macro (`CALL_ASYNC_WITH_400`) calls
+`start()` for its side effect and discards the returned value, and `metrics()` takes no deadline parameter, so
+nothing bounds how long a scrape may run.
 
 `plugin_startup` starts the one-thread `prom` pool that backs the strand and then publishes the static `nodeop`
 info series (server version, chain id, version strings, earliest available block). `plugin_shutdown` stops the
@@ -50,20 +52,26 @@ outbound-HTTP failure family likewise has one series per `fc::http::failure_kind
 
 ```ini
 plugin = sysio::prometheus_plugin
+plugin = sysio::chain_api_plugin
 
-# Keep the scrape endpoint on a private interface; give it its own listener
-# so the chain APIs stay on loopback.
+# Keep the chain APIs on loopback and put the scrape endpoint on its own
+# listener, bound to the interface the Prometheus server reaches.
 http-server-address = http-category-address
 http-category-address = chain_ro,127.0.0.1:8888
-http-category-address = prometheus,127.0.0.1:9101
+http-category-address = prometheus,10.0.0.7:9101
 ```
+
+Every category named in `--http-category-address` must have its owning plugin named in a `plugin` option;
+`http_plugin` asserts this during `plugin_initialize` and aborts startup with
+`--plugin=sysio::chain_api_plugin is required for --http-category-address=chain_ro,127.0.0.1:8888` otherwise.
+The `prometheus` category maps to this plugin.
 
 Command line:
 
 ```bash
 nodeop --plugin sysio::prometheus_plugin \
        --http-server-address http-category-address \
-       --http-category-address prometheus,127.0.0.1:9101
+       --http-category-address prometheus,10.0.0.7:9101
 ```
 
 With the plain `--http-server-address <ip>:<port>` form (default `127.0.0.1:8888`), the metrics endpoint is
@@ -76,14 +84,21 @@ scrape_configs:
   - job_name: nodeop
     metrics_path: /v1/prometheus/metrics
     static_configs:
-      - targets: ["<your-host>:9101"]
+      - targets: ["10.0.0.7:9101"]
 ```
+
+The target address has to be one the node actually listens on -- a `127.0.0.1` binding is unreachable from
+another host. If the target is written as a host name rather than an IP, add `--http-alias <that-host-name>`:
+`--http-validate-host` defaults to `true`, and a `Host` header that does not parse as an IP address is only
+accepted when it is in the alias set.
 
 ## Options
 
 The plugin registers no program options -- its `set_program_options` body is empty. Everything that governs the
 endpoint comes from `http_plugin`: `--http-server-address` / `--http-category-address` for where it is served,
-and `--http-max-response-time-ms` (default `15`), whose value the plugin caches as its response-deadline base.
+`--http-validate-host` / `--http-alias` for which `Host` headers are accepted, and the thread-pool and body-size
+limits that apply to every endpoint. `--http-max-response-time-ms` does not apply: the deadline this plugin
+computes from it is discarded by the async registration macro and never reaches `metrics()`.
 
 ## HTTP API
 
@@ -118,7 +133,6 @@ A Prometheus scraper's plain `GET` works: `http_plugin` dispatches on the URL pa
 | `nodeop_trxs_produced_total` / `nodeop_trxs_incoming_total` | Counter | -- | Transactions produced / incoming |
 | `nodeop_unapplied_transactions_total` | Counter | -- | Unapplied transactions from produced blocks |
 | `nodeop_subjective_bill_account_size_total` | Counter | -- | Subjective bill account size from produced blocks |
-| `nodeop_scheduled_trxs_total` | Counter | -- | Scheduled transactions from produced blocks |
 | `nodeop_produced_elapsed_us_total` / `nodeop_produced_us_total` | Counter | -- | Total produced-block elapsed time / total time |
 | `nodeop_incoming_elapsed_us_total` / `nodeop_incoming_us_total` | Counter | -- | Total incoming-block elapsed time / total time |
 | `nodeop_incoming_us_block_latency` | Counter | -- | Total incoming-block latency |
@@ -160,8 +174,8 @@ removed, and the outbound-HTTP failure family has fixed label cardinality.
 
 ## Related plugins
 
-- [`http_plugin`](../http_plugin) -- serves the endpoint, owns the `prometheus` category binding and the
-  response-time limit, and feeds `nodeop_http_requests_total`.
+- [`http_plugin`](../http_plugin) -- serves the endpoint, owns the `prometheus` category binding and its
+  startup check, and feeds `nodeop_http_requests_total`.
 - [`net_plugin`](../net_plugin) -- source of every `nodeop_p2p_*` series.
 - [`producer_plugin`](../producer_plugin) -- source of the speculative-block metrics.
 - [`chain_plugin`](../chain_plugin) -- its controller is the source of the produced- and incoming-block metrics

@@ -53,10 +53,12 @@ the chain has a non-zero head block and the chain-state log is empty, the initia
 bracketed by two log lines, and this can take a considerable amount of time.
 
 Two listeners are possible and both may be active at once: a TCP listener on `--state-history-endpoint` and a
-unix-domain listener on `--state-history-unix-socket-path`. Both run on the `ship` pool's executor, so stopping
-the pool at shutdown also stops accepting. Each accepted socket is handed to the main application thread, which
-constructs a `session` and stores it in the connection set; the set is only ever touched by the main thread
-because `on_accepted_block` iterates it.
+unix-domain listener on `--state-history-unix-socket-path`. Each is created only when its option is non-empty,
+so setting `state-history-endpoint =` to the empty string disables the TCP listener -- the way to run
+unix-socket-only. Both run on the `ship` pool's executor, so stopping the pool at shutdown also stops
+accepting. Each accepted socket is handed to the main application thread, which constructs a `session` and
+stores it in the connection set; the set is only ever touched by the main thread because `on_accepted_block`
+iterates it.
 
 A session runs two coroutines on its own strand -- a read loop and a write loop. Each dispatches the parts that
 touch controller state onto the main application thread and then resumes on the strand, so per-connection
@@ -215,7 +217,7 @@ the command line -- except `delete-state-history`, which is registered on the co
 | `trace-history` | `false` | Enable trace history. |
 | `chain-state-history` | `false` | Enable chain state history. |
 | `finality-data-history` | `false` | Enable finality data history. |
-| `state-history-endpoint` | `127.0.0.1:8080` | The endpoint upon which to listen for incoming connections. Caution: only expose this port to your internal network. |
+| `state-history-endpoint` | `127.0.0.1:8080` | The endpoint upon which to listen for incoming connections. An empty value creates no TCP listener at all. Caution: only expose this port to your internal network. |
 | `state-history-unix-socket-path` | unset | Path (relative to data-dir) at which to create a unix socket to listen for incoming connections. |
 | `trace-history-debug-mode` | `false` | Enable debug mode for trace history. |
 | `state-history-log-retain-blocks` | unset | If set, periodically prune the state history files to store only this many most recent blocks. Must be at least 1000, and cannot be used together with `state-history-retained-dir`, `state-history-archive-dir`, `state-history-stride`, or `max-retained-history-files`. |

@@ -52,9 +52,13 @@ transaction according to the result.
 | `methods::get_head_block_id` | `block_id_type()` | `chain_plugin` |
 | `incoming::methods::transaction_async` | `void(const packed_transaction_ptr&, bool, transaction_metadata::trx_type, bool, next_function<transaction_trace_ptr>)`, `first_provider_policy` | `producer_plugin` |
 
-`transaction_async` is the inbound transaction path: `chain_plugin` calls it for transactions arriving over
-the HTTP API and `producer_plugin` registers the provider that schedules them, replying through the
-`next_function` continuation.
+`transaction_async` is the inbound transaction path for every source, not only the HTTP API.
+`chain_plugin` calls it for transactions arriving over the API, and again — through
+`chain_plugin::accept_transaction` — for every transaction `net_plugin` accepts from a peer (it drops peer
+transactions outright when `p2p-accept-transactions` is false or while it is syncing);
+`producer_plugin` calls it directly to submit its own `votesnaphash` transactions. `producer_plugin`
+registers the single provider that schedules all of them, replying through the `next_function`
+continuation.
 
 ## Enabling / configuration
 
@@ -107,7 +111,8 @@ to the ack channel. Both run under their own plugin's test target.
 - `chain_plugin` — publishes all four block and transaction channels and provides both block-lookup methods.
 - `producer_plugin` — provides `transaction_async`, publishes `transaction_ack`, and is the target that makes
   this include path public to the rest of the tree.
-- `net_plugin` — subscribes to `transaction_ack`.
+- `net_plugin` — subscribes to `transaction_ack`, and feeds every transaction it accepts from a peer into
+  `transaction_async` via `chain_plugin::accept_transaction`.
 - `batch_operator_plugin`, `underwriter_plugin` — subscribe to `irreversible_block` as their sync gate.
 - [`plugins/usage_pattern.md`](../usage_pattern.md) — when to connect, register, and release these handles
   across the appbase lifecycle.
