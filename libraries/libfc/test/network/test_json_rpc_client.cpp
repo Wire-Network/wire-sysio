@@ -586,6 +586,38 @@ BOOST_AUTO_TEST_CASE(call_reports_an_error_envelope_carrying_a_null_id) {
    BOOST_CHECK_THROW(client.call("wire_parse_error_probe"), fc::network::json_rpc::json_rpc_error);
 }
 
+/// A null id is tolerated only alongside an error, never on a result.
+///
+/// The spec allows a null id precisely because the server could not work out which request it
+/// was answering — which it can only fail to do while reporting an error. A result carries no
+/// such excuse, and accepting one would correlate an answer to a request nobody can identify.
+BOOST_AUTO_TEST_CASE(call_rejects_a_null_id_on_a_result) {
+   continuation_json_rpc_server server({
+      continuation_json_rpc_response::raw(R"({"jsonrpc":"2.0","id":null,"result":"unattributable"})"),
+   });
+   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
+
+   BOOST_CHECK_EXCEPTION(client.call("wire_null_id_result_probe"), fc::exception, [](const fc::exception& error) {
+      return error.to_detail_string().find("invalid 'id' type") != std::string::npos;
+   });
+}
+
+/// An error response still has to be correlated when it carries an id at all.
+///
+/// Only a null id skips the match. An error naming some other request is a reply to that
+/// request, and reporting it as this call's failure would attribute it to the wrong caller.
+BOOST_AUTO_TEST_CASE(call_rejects_a_mismatched_response_id_on_an_error) {
+   continuation_json_rpc_server server({
+      continuation_json_rpc_response::raw(
+         R"({"jsonrpc":"2.0","id":9001,"error":{"code":-32000,"message":"someone else's failure"}})"),
+   });
+   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
+
+   BOOST_CHECK_EXCEPTION(client.call("wire_error_id_probe"), fc::exception, [](const fc::exception& error) {
+      return error.to_detail_string().find("does not match request") != std::string::npos;
+   });
+}
+
 /// A response whose id does not match the request is rejected instead of returned.
 BOOST_AUTO_TEST_CASE(call_rejects_a_mismatched_response_id) {
    auto mismatched = continuation_json_rpc_response::result("wrong-id");
