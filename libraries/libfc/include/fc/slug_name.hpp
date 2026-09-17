@@ -20,6 +20,7 @@
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
 
+#include <algorithm>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -105,6 +106,52 @@ inline void to_variant(const slug_name& s, fc::variant& v) {
    v = text;
 }
 
+namespace detail {
+
+/// Checked unsigned decode for the transitional object arm's `value`.
+///
+/// `fc::variant::as_uint64` COERCES where this needs to validate: it wraps a
+/// negative `int64` to `UINT64_MAX`, truncates a `double`, turns null/bool into
+/// 0/1, and its string path goes through a `lexical_cast` that does not reject a
+/// sign (`variant.cpp`, `as_uint64`). `from_variant` feeds `encode_field`, so a
+/// bound of `{"value": -1}` would otherwise encode `be64(UINT64_MAX)` and page
+/// from the far end of the table. Every shape that is not an exact non-negative
+/// integer is rejected here instead.
+///
+/// Canonicality is deliberately NOT required: a packed value with no spelling is
+/// the one thing the string carrier cannot express, so this arm is the only way
+/// to name such a key as a bound.
+inline uint64_t checked_packed_value(const fc::variant& v) {
+   if (v.is_uint64())
+      return v.as_uint64();
+   if (v.is_int64()) {
+      const int64_t i = v.as_int64();
+      FC_ASSERT(i >= 0, "slug_name value must not be negative, got {}", i);
+      return static_cast<uint64_t>(i);
+   }
+   if (v.is_string()) {
+      const std::string_view text = v.get_string();
+      // All-digits only: no sign, no decimal point, no exponent. `as_uint64`
+      // then throws on overflow rather than wrapping.
+      //
+      // The predicate is bound to a local on purpose: FC_ASSERT stringizes its
+      // condition INTO the fmt format string (`#TEST ": " FORMAT`), so a lambda
+      // inline here would feed fmt's compile-time checker the lambda's own
+      // braces as malformed replacement fields.
+      const bool all_digits =
+         !text.empty() && std::all_of(text.begin(), text.end(),
+                                      [](char c) { return c >= '0' && c <= '9'; });
+      FC_ASSERT(all_digits, "slug_name value must be an unsigned decimal, got '{}'",
+                std::string(text));
+      return v.as_uint64();
+   }
+   FC_ASSERT(false, "slug_name value must be an unsigned integer, got {}",
+             fc::reflector<fc::variant::type_id>::to_string(v.get_type()));
+   __builtin_unreachable();
+}
+
+} // namespace detail
+
 /// Accepts the string carrier `to_variant` emits, plus — TRANSITIONALLY — the
 /// `{"value": <uint64>}` object that abigen's reflected struct emitted before
 /// `slug_name` became an ABI builtin.
@@ -117,7 +164,7 @@ inline void to_variant(const slug_name& s, fc::variant& v) {
 /// the way a reader can. Delete this arm once no writer emits the object form.
 inline void from_variant(const fc::variant& v, slug_name& s) {
    if (v.is_object()) {
-      s = slug_name{ v.get_object()["value"].as_uint64() };
+      s = slug_name{ detail::checked_packed_value(v.get_object()["value"]) };
       return;
    }
    // A number is REJECTED, never coerced. The slug alphabet contains digits, so

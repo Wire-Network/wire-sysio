@@ -538,4 +538,44 @@ BOOST_AUTO_TEST_CASE(variant_rejects_every_non_string_carrier) {
    }
 }
 
+BOOST_AUTO_TEST_CASE(variant_object_arm_rejects_every_coercible_value_shape) {
+   // The transitional object arm reaches a RAW uint64, so it is the one place a
+   // malformed number can still land on a key. `fc::variant::as_uint64` coerces
+   // rather than validates — it wraps a negative int64 to UINT64_MAX, truncates
+   // a double, and turns null/bool into 0/1 — and since from_variant feeds
+   // encode_field, `{"value": -1}` would encode be64(UINT64_MAX) and page from
+   // the far end of the table. Each shape below must be refused, not coerced.
+   slug_name back;
+   const auto obj = [](const fc::variant& value) {
+      return fc::variant(fc::mutable_variant_object("value", value));
+   };
+
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(int64_t{-1})), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(int64_t{-12345678})), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(std::string{"-1"})), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(std::string{"+1"})), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(1.5)), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(-1.0)), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(std::string{"1.5"})), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(std::string{"1E3"})), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant()), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(true)), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(std::string{})), back), fc::exception);
+   // Out of range: all digits, but past 2^64. boost::lexical_cast throws rather
+   // than saturating, so the parse error surfaces instead of a wrong value.
+   BOOST_CHECK_THROW(
+      fc::from_variant(obj(fc::variant(std::string{"1234567890123456789012345"})), back),
+      fc::exception);
+
+   // And the shapes a real pre-builtin writer emits still work. Canonicality is
+   // NOT required here: a value with no spelling is exactly what the string
+   // carrier cannot express, so this arm is the only way to name such a bound.
+   fc::from_variant(obj(fc::variant(uint64_t{7})), back);
+   BOOST_CHECK_EQUAL(back.value, 7u);
+   fc::from_variant(obj(fc::variant(std::string{"7"})), back);
+   BOOST_CHECK_EQUAL(back.value, 7u);
+   fc::from_variant(obj(fc::variant(slug_name{"LIQSOL"}.value)), back);
+   BOOST_CHECK(back == slug_name{"LIQSOL"});
+}
+
 BOOST_AUTO_TEST_SUITE_END()
