@@ -11,7 +11,6 @@
 #include <set>
 #include <string>
 #include <string_view>
-#include <sstream>
 #include <regex>
 #include <vector>
 
@@ -42,18 +41,21 @@ namespace detail {
    inline size_t parse_connection_rate_limit( const std::string& limit_str) {
       // The number is taken with strtod rather than `istringstream >> double`. libc++ pulls a trailing hex digit into
       // its float scan and then fails the whole extraction, so `640B/s` yields 0 there while `640KB/s` yields 640 --
-      // and a failed extraction writes 0, which is indistinguishable from "no limit configured".
+      // and a failed extraction writes 0, which is indistinguishable from "no limit configured". `std::from_chars`
+      // would be the locale-independent choice, but libc++ still defines its floating-point overload as deleted.
       const char* const number_begin = limit_str.c_str();
       char*             number_end   = nullptr;
       const double      limit        = std::strtod(number_begin, &number_end);
       SYS_ASSERT(limit >= 0.0, chain::plugin_config_exception, "block sync rate limit must not be negative: {}", limit_str);
       size_t block_sync_rate_limit = 0;
       if( limit > 0.0 ) {
-         // One whitespace-delimited token from whatever follows the number, so prose after the unit
-         // (`640KB/s - additional info`) is ignored as it was before.
-         std::istringstream in{std::string{number_end}};
-         std::string units;
-         in >> units;
+         // One whitespace-delimited token from the text after the number -- `operator>>` semantics without the stream --
+         // so prose following the unit (`640KB/s - additional info`) is ignored.
+         constexpr std::string_view whitespace = " \t\n\v\f\r";
+         std::string_view rest{number_end};
+         const auto       unit_begin = rest.find_first_not_of(whitespace);
+         rest = unit_begin == std::string_view::npos ? std::string_view{} : rest.substr(unit_begin);
+         const std::string units{rest.substr(0, rest.find_first_of(whitespace))};
          // A number alone is bytes per second.
          size_t multiplier = 1;
          if( units.length() > 0 ) {
