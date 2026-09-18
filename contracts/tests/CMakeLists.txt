@@ -34,6 +34,8 @@ target_include_directories(${CONTRACT_UNIT_TEST_EXE} PRIVATE
 # Register every top-level Boost suite as a separate CTest process. The
 # processes share this executable but remain independently selectable and may
 # run concurrently under ctest -j.
+set(CONTRACT_SUITE_MACRO_PATTERN
+  "BOOST_(AUTO|FIXTURE|DATA)_TEST_SUITE[ \t\r\n]*\\([ \t\r\n]*([A-Za-z_][A-Za-z_0-9]*)[ \t\r\n]*[,)]")
 function(add_contract_suite SUITE_NAME SOURCE_FILE)
   cmake_parse_arguments(SUITE "" "" "ACCOUNTS" ${ARGN})
   if(SUITE_UNPARSED_ARGUMENTS)
@@ -43,8 +45,11 @@ function(add_contract_suite SUITE_NAME SOURCE_FILE)
     message(FATAL_ERROR "Contract suite source is missing: ${SOURCE_FILE}")
   endif()
   file(READ "${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE_FILE}" _suite_source_text)
-  string(FIND "${_suite_source_text}" "BOOST_AUTO_TEST_SUITE(${SUITE_NAME})" _suite_declaration)
-  if(_suite_declaration EQUAL -1)
+  string(REGEX MATCH
+    "BOOST_(AUTO|FIXTURE|DATA)_TEST_SUITE[ \t\r\n]*\\([ \t\r\n]*${SUITE_NAME}[ \t\r\n]*[,)]"
+    _suite_declaration
+    "${_suite_source_text}")
+  if(NOT _suite_declaration)
     message(FATAL_ERROR "Contract suite ${SUITE_NAME} is not declared in ${SOURCE_FILE}")
   endif()
   get_property(_registered_suites GLOBAL PROPERTY CONTRACT_REGISTERED_SUITES)
@@ -138,19 +143,28 @@ add_contract_suite(sysio_uwrit_tests sysio.uwrit_tests.cpp ACCOUNTS sysio.uwrit)
 add_contract_suite(sysio_wrap_tests sysio.wrap_tests.cpp ACCOUNTS sysio.msig sysio.wrap)
 get_property(_registered_suites GLOBAL PROPERTY CONTRACT_REGISTERED_SUITES)
 
-# Fail at configure time when a source introduces a suite without declaring it.
+# Fail at configure time when a source introduces a suite without registering it.
+# Contract tests must live in a named suite: file-scope test cases cannot be
+# discovered by this inventory and therefore cannot be registered separately.
 set(_source_suites)
 file(GLOB _contract_suite_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 foreach(_source IN LISTS _contract_suite_sources)
   file(READ "${_source}" _source_text)
-  string(REGEX MATCHALL "BOOST_AUTO_TEST_SUITE\\([A-Za-z_][A-Za-z_0-9]*\\)" _suite_macros "${_source_text}")
+  string(REGEX MATCHALL "${CONTRACT_SUITE_MACRO_PATTERN}" _suite_macros "${_source_text}")
   foreach(_macro IN LISTS _suite_macros)
-    string(REGEX REPLACE "^BOOST_AUTO_TEST_SUITE\\(([A-Za-z_][A-Za-z_0-9]*)\\)$" "\\1" _declared_suite "${_macro}")
+    string(REGEX REPLACE "^${CONTRACT_SUITE_MACRO_PATTERN}$" "\\2" _declared_suite "${_macro}")
     list(APPEND _source_suites ${_declared_suite})
   endforeach()
 endforeach()
+list(REMOVE_DUPLICATES _source_suites)
 list(SORT _source_suites)
 list(SORT _registered_suites)
-if(NOT "${_source_suites}" STREQUAL "${_registered_suites}")
-  message(FATAL_ERROR "Direct contract suite registrations do not match source declarations")
+set(_missing_suites ${_source_suites})
+list(REMOVE_ITEM _missing_suites ${_registered_suites})
+set(_extra_suites ${_registered_suites})
+list(REMOVE_ITEM _extra_suites ${_source_suites})
+if(_missing_suites OR _extra_suites)
+  message(FATAL_ERROR
+    "Contract suites declared but not registered: ${_missing_suites}; "
+    "registered but not declared: ${_extra_suites}")
 endif()
