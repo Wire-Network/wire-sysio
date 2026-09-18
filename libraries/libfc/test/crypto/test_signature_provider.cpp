@@ -73,8 +73,23 @@ BOOST_AUTO_TEST_CASE(runtime_dispatch_rejects_types_without_a_native_form) {
 }
 
 BOOST_AUTO_TEST_CASE(runtime_dispatch_propagates_parse_failures) {
-   BOOST_CHECK_THROW(from_native_string_to_private_key(chain_key_type_wire, "not-a-key"), fc::exception);
-   BOOST_CHECK_THROW(from_native_string_to_private_key(chain_key_type_wire, ""), fc::exception);
+   BOOST_CHECK_THROW(from_native_string_to_private_key(chain_key_type_wire, "not-a-key"), fc::parse_error_exception);
+   BOOST_CHECK_THROW(from_native_string_to_private_key(chain_key_type_wire, ""), fc::parse_error_exception);
+}
+
+BOOST_AUTO_TEST_CASE(runtime_dispatch_parse_failures_never_echo_the_key) {
+   // Tail length checked for in the error: long enough that an echoed key cannot match by accident.
+   constexpr std::size_t secret_tail_length = 16;
+   for (const auto& [chain_key_type, shim_type] : supported_types) {
+      // '!' is outside every native alphabet (base58, hex, base64), so the parser rejects the key.
+      auto corrupted = private_key::generate(shim_type).to_string({});
+      corrupted.back() = '!';
+      const auto secret_tail = corrupted.substr(corrupted.size() - secret_tail_length);
+      BOOST_CHECK_EXCEPTION(from_native_string_to_private_key(chain_key_type, corrupted), fc::parse_error_exception,
+                            [&](const fc::parse_error_exception& e) {
+                               return e.to_detail_string().find(secret_tail) == std::string::npos;
+                            });
+   }
 }
 
 BOOST_AUTO_TEST_CASE(make_local_sign_fn_signs_with_the_captured_key) {

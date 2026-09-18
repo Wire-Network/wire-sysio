@@ -105,6 +105,8 @@ public:
       SYS_ASSERT(!is_locked(), wallet_locked_exception, "Unable to set key name on a locked wallet");
       SYS_ASSERT(_key_by_name.contains(current_key_name), key_nonexistent_exception,
                  "Key name provided does not exist: {}", current_key_name);
+      SYS_ASSERT(!_key_by_name.contains(new_key_name), key_exist_exception,
+                 "Key name provided already exists (keyName={})", new_key_name);
       _key_by_name[new_key_name] = _key_by_name[current_key_name];
       _key_by_name.erase(current_key_name);
    }
@@ -441,14 +443,17 @@ void soft_wallet::encrypt_keys() {
 
 void soft_wallet::set_key_name(string current_key_name, string new_key_name) {
    my->set_key_name(current_key_name, new_key_name);
+   save_wallet_file();
 }
 
 void soft_wallet::set_key_name(private_key_type private_key, string key_name) {
    my->set_key_name(private_key, key_name);
+   save_wallet_file();
 }
 
 void soft_wallet::set_key_name(public_key_type public_key, string key_name) {
    my->set_key_name(public_key, key_name);
+   save_wallet_file();
 }
 
 string soft_wallet::generate_key_name(string prefix, string suffix) {

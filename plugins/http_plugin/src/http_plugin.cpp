@@ -108,7 +108,7 @@ namespace sysio {
       if (category == api_category::prometheus)
          return "sysio::prometheus_plugin";
       if (category == api_category::test_control)
-         return "sysio::test_control_plugin";
+         return "sysio::test_control_api_plugin";
       if (api_category_set({api_category::chain_ro, api_category::chain_rw}).contains(category))
          return "sysio::chain_api_plugin";
       if (api_category_set({api_category::net_ro, api_category::net_rw}).contains(category))
