@@ -41,10 +41,13 @@ constexpr std::string_view scheme_kiod = "KIOD";
 
 /// Field counts of a `--signature-provider` spec, `[<name>,]<chain-kind>,<key-type>,<public-key>,<provider>`.
 ///
-/// No diagnostic below reproduces a spec or any field of one, not even in part. Any field can hold a private key if the
-/// operator mistypes the line, and a key that lost its `KEY:` marker leaves nothing to recognize it by -- an Ethereum
-/// key is bare hex and a Solana key bare base58. Providers are identified by their public key instead, which is not
-/// secret and, unlike a name, cannot be a mistyped key.
+/// No diagnostic in this file reproduces a spec or any field of one, not even in part. Any field can hold a private key
+/// if the operator mistypes the line, and a key that lost its `KEY:` marker leaves nothing to recognize it by -- an
+/// Ethereum key is bare hex and a Solana key bare base58. Providers are identified by their public key instead, which
+/// is not secret and, unlike a name, cannot be a mistyped key.
+///
+/// The guarantee stops at handler dispatch: an extension scheme receives its own `spec_data` and owns what it reports,
+/// and the SSM and KMS handlers still echo theirs.
 constexpr std::size_t spec_field_count_with_name = 5;
 constexpr std::size_t spec_field_count_anonymous = 4;
 
