@@ -14,6 +14,19 @@ constexpr name linkswept_action = "linkswept"_n;
 
 using ed_raw_key_t = std::array<uint8_t, 32>;
 
+/**
+ * Return whether an external-chain kind is paired with its supported public-key curve.
+ *
+ * EVM links use EM keys and SVM links use ED keys. Callers decide whether an invalid pair should
+ * abort a user-authorized action or be soft-dropped on the trusted inbound path.
+ */
+[[nodiscard]] bool is_supported_chain_key_pair(const opp::types::ChainKind chain_kind,
+                                               const sysio::public_key& pub_key) {
+   using ChainKind = opp::types::ChainKind;
+   return (chain_kind == ChainKind::CHAIN_KIND_EVM && pub_key.index() == fc::crypto::key_type_em) ||
+          (chain_kind == ChainKind::CHAIN_KIND_SVM && pub_key.index() == fc::crypto::key_type_ed);
+}
+
 [[maybe_unused]] ed_raw_key_t get_ed_raw_key(const sysio::public_key& pub_key) {
    const auto& arr = std::get<4>(pub_key);
    ed_raw_key_t raw_key;
@@ -53,12 +66,9 @@ namespace sysio {
 
    // ——— Chain kind validation ———
    // TODO @jglanz: SUI removed in v6; restore when SUI outpost is added.
-   check(chain_kind == ChainKind::CHAIN_KIND_EVM
-         || chain_kind == ChainKind::CHAIN_KIND_SVM,
+   check(chain_kind == ChainKind::CHAIN_KIND_EVM || chain_kind == ChainKind::CHAIN_KIND_SVM,
          "Invalid chain_kind. Supported: CHAIN_KIND_EVM(2), CHAIN_KIND_SVM(3).");
-   check((chain_kind == ChainKind::CHAIN_KIND_EVM && pub_key.index() == fc::crypto::key_type_em)
-         || (chain_kind == ChainKind::CHAIN_KIND_SVM && pub_key.index() == fc::crypto::key_type_ed),
-         "chain_kind and pub_key must pair as EVM/EM or SVM/ED");
+   check(is_supported_chain_key_pair(chain_kind, pub_key), "chain_kind and pub_key must pair as EVM/EM or SVM/ED");
 
    // ——— Table & indices ———
    links_t links(get_self());
@@ -188,18 +198,14 @@ namespace sysio {
 // chain/key pairs are soft-dropped. Idempotent and non-throwing so the trust-OPP dispatch never
 // aborts when sysio.dclaim is absent or not yet privileged at bootstrap.
 [[sysio::action]] void authex::recordlink(const name& account, const opp::types::ChainKind chain_kind,
-                                          const public_key& pub_key,
-                                          const bytes& native_address) {
+                                          const public_key& pub_key, const bytes& native_address) {
    require_auth(get_self());
 
-   const bool valid_evm = chain_kind == opp::types::ChainKind::CHAIN_KIND_EVM
-                       && pub_key.index() == fc::crypto::key_type_em;
-   const bool valid_svm = chain_kind == opp::types::ChainKind::CHAIN_KIND_SVM
-                       && pub_key.index() == fc::crypto::key_type_ed;
-   if (!valid_evm && !valid_svm) return;
-   const bool can_sweep = valid_evm
-      ? native_address.size() == opp::evm_address_size
-      : native_address == pubkey_to_bytes(pub_key);
+   if (!is_supported_chain_key_pair(chain_kind, pub_key))
+      return;
+   const bool can_sweep = chain_kind == opp::types::ChainKind::CHAIN_KIND_EVM
+                             ? native_address.size() == opp::evm_address_size
+                             : native_address == pubkey_to_bytes(pub_key);
 
    links_t links(get_self());
    auto by_namechain = links.get_index<"bynamechain"_n>();

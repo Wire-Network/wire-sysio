@@ -71,7 +71,7 @@ inline void add_wire_capped(asset& balance, const asset& amt) {
 /// Credit `amt` WIRE to the staker. Linked (`wacct` set) -> `pending_claims`;
 /// otherwise parked in `unmapped_tokens` keyed by (chain, addr). Either way
 /// the row's expiry is refreshed to now + window. Shared by `onreward`,
-/// `retryconvert`, `linkswept`, and `importseed` so the upsert + expiry logic
+/// `linkswept`, and `importseed` so the upsert + expiry logic
 /// lives in exactly one place.
 void credit_wire(name self, name wacct, ChainKind chain,
                  const std::vector<char>& addr, const asset& amt, uint32_t window) {
