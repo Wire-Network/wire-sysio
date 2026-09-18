@@ -39,9 +39,9 @@ namespace sysio {
             value += ACCOUNT_NAME_MIX_INCREMENT;
             value = (value ^ (value >> ACCOUNT_NAME_MIX_SHIFT_1)) * ACCOUNT_NAME_MIX_MULTIPLIER_1;
             value = (value ^ (value >> ACCOUNT_NAME_MIX_SHIFT_2)) * ACCOUNT_NAME_MIX_MULTIPLIER_2;
-             return value ^ (value >> ACCOUNT_NAME_MIX_SHIFT_3);
-         }
-     } // anonymous namespace
+            return value ^ (value >> ACCOUNT_NAME_MIX_SHIFT_3);
+        }
+    } // anonymous namespace
 
     static bool is_sysio_account(const name& account) {
         return account.prefix() == "sysio"_n;
