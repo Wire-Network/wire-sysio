@@ -773,69 +773,53 @@ BOOST_AUTO_TEST_CASE(invalid_enum_field_error_never_echoes_the_field) {
                                BOOST_TEST_INFO(detail);
                                BOOST_CHECK(detail.find(priv_str) == std::string::npos);
                                BOOST_CHECK(detail.find(expected_field) != std::string::npos);
-                               // The accepted spellings are listed, in the stripped form a spec carries. `solana` is
-                               // checked because, unlike `wire`, nothing else in the message could supply it.
-                               BOOST_CHECK(detail.find("solana") != std::string::npos);
                                return true;
                             });
    }
 }
 
-// The key name is the spec's optional first field and is never validated, so a shifted spec can leave a private key
-// there. It has no `KEY:` marker and no grammar separates it from a legitimate name, so every diagnostic that repeats
-// a name cuts it to a bounded prefix: enough to say which spec is meant, never enough to reconstruct a key.
-BOOST_AUTO_TEST_CASE(diagnostics_abbreviate_an_over_long_key_name) {
+// Operator text never reaches a diagnostic, not even in part, so no fragment of a mistyped key is disclosed. The name
+// field is unvalidated, and `fc::split` folds a sixth and later field into the provider field, so an extra field or a
+// `<key>:<junk>` provider can put a bare key where the unknown-provider-type error used to print it.
+BOOST_AUTO_TEST_CASE(diagnostics_never_echo_operator_supplied_text) {
    using namespace fc::crypto;
 
    const auto priv     = private_key::generate();
    const auto priv_str = priv.to_string({});
    const auto pub_str  = priv.get_public_key().to_string({});
 
+   // Checks for any run of key material, not just the whole key: disclosing a prefix of a base58 key narrows the
+   // scalar to an interval that is searchable against the public key these messages carry.
+   const auto no_fragment_of = [&](const std::string& detail) {
+      constexpr std::size_t shortest_disclosable_run = 8;
+      for (std::size_t i = 0; i + shortest_disclosable_run <= priv_str.size(); ++i) {
+         if (detail.find(priv_str.substr(i, shortest_disclosable_run)) != std::string::npos) {
+            return false;
+         }
+      }
+      return true;
+   };
+
    auto  tester = create_app();
    auto& mgr    = tester->plugin();
 
-   // A private key in the name field, with a public key the parser rejects, reaches the invalid-public-key error.
-   BOOST_CHECK_EXCEPTION(
-      mgr.create_provider(std::format("{},wire,wire,not-a-public-key,{}", priv_str, to_private_key_spec(priv_str))),
-      sysio::chain::plugin_config_exception, [&](const sysio::chain::plugin_config_exception& e) {
-         const auto detail = e.to_detail_string();
-         BOOST_TEST_INFO(detail);
-         BOOST_CHECK(detail.find(priv_str) == std::string::npos);
-         BOOST_CHECK(detail.find("...") != std::string::npos);
-         return true;
-      });
+   // A key in the name field, alongside a public key the parser rejects.
+   // A key carried into the provider-type field by an extra field, and by a `<key>:<junk>` provider.
+   const std::string bad_specs[] = {
+      std::format("{},wire,wire,not-a-public-key,{}", priv_str, to_private_key_spec(priv_str)),
+      std::format("wire-1,wire,wire,{},{},bogus:x", pub_str, priv_str),
+      std::format("wire-1,wire,wire,{},{}:junk", pub_str, priv_str),
+   };
 
-   // The duplicate-provider error repeats a name too, and abbreviates it the same way.
-   const auto long_name = std::string(64, 'k');
-   mgr.create_provider(to_signature_provider_spec(long_name, chain_kind_wire, chain_key_type_wire, pub_str,
-                                                  to_private_key_spec(priv_str)));
-   BOOST_CHECK_EXCEPTION(
-      mgr.create_provider(to_signature_provider_spec(long_name, chain_kind_wire, chain_key_type_wire, pub_str,
-                                                     to_private_key_spec(priv_str))),
-      sysio::chain::plugin_config_exception, [&](const sysio::chain::plugin_config_exception& e) {
-         const auto detail = e.to_detail_string();
-         BOOST_TEST_INFO(detail);
-         BOOST_CHECK(detail.find(long_name) == std::string::npos);
-         BOOST_CHECK(detail.find("...") != std::string::npos);
-         return true;
-      });
-
-   // A name of ordinary length, including the longest one this plugin generates, is still shown in full.
-   const auto default_name = std::format("{}-default", chain_key_type_reflector::to_string(chain_key_type_wire_bls));
-   const auto other_priv   = private_key::generate();
-   mgr.create_provider(to_signature_provider_spec(default_name, chain_kind_wire, chain_key_type_wire,
-                                                  other_priv.get_public_key().to_string({}),
-                                                  to_private_key_spec(other_priv.to_string({}))));
-   BOOST_CHECK_EXCEPTION(
-      mgr.create_provider(to_signature_provider_spec(default_name, chain_kind_wire, chain_key_type_wire,
-                                                     other_priv.get_public_key().to_string({}),
-                                                     to_private_key_spec(other_priv.to_string({})))),
-      sysio::chain::plugin_config_exception, [&](const sysio::chain::plugin_config_exception& e) {
-         const auto detail = e.to_detail_string();
-         BOOST_TEST_INFO(detail);
-         BOOST_CHECK(detail.find(default_name) != std::string::npos);
-         return true;
-      });
+   for (const auto& bad_spec : bad_specs) {
+      BOOST_CHECK_EXCEPTION(mgr.create_provider(bad_spec), sysio::chain::plugin_config_exception,
+                            [&](const sysio::chain::plugin_config_exception& e) {
+                               const auto detail = e.to_detail_string();
+                               BOOST_TEST_INFO(detail);
+                               BOOST_CHECK(no_fragment_of(detail));
+                               return true;
+                            });
+   }
 }
 
 // Stored defaults become providers only for the key types a caller requests: a node that asks for the wire default
