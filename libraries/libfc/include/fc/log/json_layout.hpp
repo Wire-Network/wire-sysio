@@ -1,7 +1,8 @@
 #pragma once
-#include <fc/spdlog.hpp>
-
 #include <cstdint>
+#include <fc/io/json_template.hpp>
+#include <fc/spdlog.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -25,11 +26,20 @@ enum class json_layout_token : uint8_t {
    extra_flat    ///< renders `,"k":"v",...` (leading comma per entry) -- or NOTHING when empty
 };
 
-/// ${timestamp} rendering choices.
-enum class json_layout_timestamp_format : uint8_t { iso8601, epoch_millis };
-
-/// ${level} case choices. `preserve` keeps spdlog's spelling (trace/debug/info/warn/error/crit).
-enum class json_layout_level_case : uint8_t { preserve, upper, lower };
+/// Every layout token that denotes a VALUE is a json_template default token under the same name, so a layout author's
+/// vocabulary carries over to JSON-file templates unchanged. extra_flat is the one exception: it splices `,"k":"v"`
+/// text into a layout, which a JSON template expresses by writing the members literally.
+consteval bool layout_tokens_have_template_defaults() {
+   for (const auto name : magic_enum::enum_names<json_layout_token>()) {
+      if (name == magic_enum::enum_name(json_layout_token::extra_flat))
+         continue;
+      if (!magic_enum::enum_cast<json_template_default_token>(name).has_value())
+         return false;
+   }
+   return true;
+}
+static_assert(layout_tokens_have_template_defaults(),
+              "every json_layout_token except extra_flat must be a json_template_default_token");
 
 /// A compiled json_formatter layout template.
 ///
@@ -59,11 +69,16 @@ public:
 private:
    /// One compiled template piece: literal text, or a token with its modifiers.
    struct segment {
-      std::string                  literal;                                                  ///< used when !is_token
-      bool                         is_token = false;                                         ///< literal vs token discriminator
-      json_layout_token            token = json_layout_token::message;                       ///< valid when is_token
-      json_layout_timestamp_format timestamp_format = json_layout_timestamp_format::iso8601; ///< timestamp token only
-      json_layout_level_case       level_case = json_layout_level_case::preserve;            ///< level token only
+      /// used when !is_token
+      std::string literal;
+      /// literal vs token discriminator
+      bool is_token = false;
+      /// valid when is_token
+      json_layout_token token = json_layout_token::message;
+      /// timestamp token only
+      json_template_timestamp_format timestamp_format = json_template_timestamp_format::iso8601;
+      /// level token only
+      json_template_level_case level_case = json_template_level_case::preserve;
    };
 
    std::vector<segment> segments_;

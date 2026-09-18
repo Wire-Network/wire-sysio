@@ -1,45 +1,15 @@
-#include <fc/log/es_sink.hpp>
-#include <fc/log/json_escape.hpp>
-#include <fc/log/json_formatter.hpp>
-
-#include <fc/crypto/base64.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/io/json.hpp>
-#include <fc/variant_object.hpp>
-
-#include <algorithm>
+#include <fc/log/es_sink.hpp>
+#include <fc/log/json_formatter.hpp>
 #include <iostream>
 
 namespace fc {
 
 namespace {
 
-using log::detail::json_escape_into;
-
-constexpr std::string_view es_bulk_path     = "/_bulk";
-constexpr std::string_view es_content_type  = "application/x-ndjson";
-constexpr std::string_view es_user_agent    = "wire-es-sink";
-constexpr std::string_view es_scheme_http   = "http";
-constexpr std::string_view es_scheme_https  = "https";
-/// The top-level "errors" flag precedes "items" in a bulk response, so probing the
-/// head of the body for the success token is authoritative; every other outcome
-/// (item errors, non-bulk 2xx, unexpected whitespace) falls through to a full parse.
-constexpr std::size_t      es_errors_probe_bytes = 256;
-constexpr std::string_view es_errors_false_token = R"("errors":false)";
 constexpr auto es_warn_interval = std::chrono::seconds(5);
-constexpr auto es_drain_poll    = std::chrono::milliseconds(25);
-constexpr auto es_max_backoff   = std::chrono::milliseconds(2000);
-/// Clamp for the backoff doubling exponent: `1u << attempt` is UB once `attempt`
-/// reaches the width of unsigned (max_retries is operator-controlled and may exceed
-/// 32). es_max_backoff already caps the RESULT after ~4 doublings, so clamping the
-/// exponent changes no observable behavior.
-constexpr uint32_t es_max_backoff_exponent = 16;
-/// Bulk responses carry one item per document; cap them well above realistic sizes.
-constexpr uint64_t es_max_response_body_bytes = 4ULL * 1024ULL * 1024ULL;
-constexpr uint32_t http_status_ok_min            = 200;
-constexpr uint32_t http_status_ok_max            = 299;
-constexpr uint32_t http_status_too_many_requests = 429;
-constexpr uint32_t http_status_server_error_min  = 500;
+constexpr auto es_drain_poll = std::chrono::milliseconds(25);
 
 /// Fields used to sample-render the formatter for configure-time validation.
 constexpr std::string_view sample_source_file = "es_sink";
@@ -54,25 +24,31 @@ struct delivery_completed_guard {
    std::atomic<uint64_t>& _counter;
 };
 
+/// The delivery half of an es_sink_config, as the shared client consumes it.
+fc::network::es::es_client_options to_es_client_options(const fc::sink::es_sink_config& cfg) {
+   fc::network::es::es_client_options delivery;
+   delivery.url = cfg.url;
+   delivery.index = cfg.index;
+   delivery.username = cfg.username;
+   delivery.password = cfg.password;
+   delivery.max_batch_bytes = cfg.max_batch_bytes;
+   delivery.max_doc_bytes = cfg.max_doc_bytes;
+   delivery.max_retries = cfg.max_retries;
+   delivery.retry_backoff = std::chrono::milliseconds{cfg.retry_backoff_ms};
+   delivery.connect_timeout = std::chrono::milliseconds{cfg.connect_timeout_ms};
+   delivery.request_timeout = std::chrono::milliseconds{cfg.request_timeout_ms};
+   return delivery;
+}
+
 } // anonymous namespace
 
 fc::sink::es_sink_config es_sink_mt::validate(fc::sink::es_sink_config cfg) {
-   while (!cfg.url.empty() && cfg.url.back() == '/')
-      cfg.url.pop_back();
-   FC_ASSERT(!cfg.url.empty(), "es_sink: url is required");
-   const fc::url parsed{cfg.url};
-   FC_ASSERT(parsed.proto() == es_scheme_http || parsed.proto() == es_scheme_https,
-             "es_sink: url scheme must be http or https, got '{}'", parsed.proto());
-   FC_ASSERT(!cfg.index.empty(), "es_sink: index is required");
+   // Endpoint, byte-cap, and auth invariants are the client's; the sink adds its batching invariants and
+   // keeps the client's normalized url.
+   cfg.url = fc::network::es::es_client::validate(to_es_client_options(cfg)).url;
    FC_ASSERT(cfg.batch_size > 0, "es_sink: batch_size must be greater than zero");
-   FC_ASSERT(cfg.max_batch_bytes > 0 && cfg.max_batch_bytes <= fc::sink::es_max_batch_bytes_ceiling,
-             "es_sink: max_batch_bytes must be in (0, {}]", fc::sink::es_max_batch_bytes_ceiling);
-   FC_ASSERT(cfg.max_doc_bytes > 0 && cfg.max_doc_bytes <= cfg.max_batch_bytes,
-             "es_sink: max_doc_bytes must be in (0, max_batch_bytes]");
    FC_ASSERT(cfg.flush_interval_ms > 0, "es_sink: flush_interval_ms must be greater than zero");
    FC_ASSERT(cfg.max_pending_batches > 0, "es_sink: max_pending_batches must be greater than zero");
-   FC_ASSERT(cfg.username.has_value() == cfg.password.has_value(),
-             "es_sink: username and password must be provided together");
    return cfg;
 }
 
@@ -80,27 +56,18 @@ es_sink_mt::es_sink_mt(fc::sink::es_sink_config cfg)
    : spdlog::sinks::base_sink<std::mutex>(std::make_unique<fc::log::json_formatter>(
         std::map<std::string, std::string>{}, std::string{fc::log::es_default_layout}))
    , _cfg(validate(std::move(cfg))) {
-   spdlog::memory_buf_t action;
-   log::detail::append_sv(action, R"({"index":{"_index":")");
-   json_escape_into(action, _cfg.index);
-   log::detail::append_sv(action, "\"}}\n");
-   _action_line.assign(action.data(), action.size());
+   _client = std::make_unique<fc::network::es::es_client>(to_es_client_options(_cfg));
 
-   _bulk_url = fc::url{_cfg.url + std::string{es_bulk_path}};
-   if (_cfg.username)
-      _auth_header = "Basic " + fc::base64_encode(*_cfg.username + ":" + *_cfg.password);
-   _transport = std::make_unique<http::transport>();
-
-   // Thread-bearing members are created LAST, inside a guard: a throw after the queue
-   // exists (e.g. std::system_error from std::thread) would otherwise skip the
-   // destructor while the queue's worker still holds a raw `this`.
+   // The es client starts its own io thread, but its destructor cancels and joins it during unwinding. The
+   // queue and the timer thread need the guard: their workers hold a raw `this`, and a throw after the queue
+   // exists (e.g. std::system_error from std::thread) would otherwise skip the destructor.
    try {
       _queue = parallel::worker_task_queue<batch>::create(
          {.max_threads = 1, .max_pending_items = _cfg.max_pending_batches},
          [this](batch& delivery) { deliver(delivery); });
       _timer_thread = std::thread([this] { timer_loop(); });
    } catch (...) {
-      _cancel_requested.store(true, std::memory_order_relaxed);
+      _client->cancel();
       if (_queue) {
          _queue->discard_pending();
          _queue->stop();
@@ -139,19 +106,18 @@ es_sink_mt::~es_sink_mt() {
       std::this_thread::sleep_for(es_drain_poll);
    }
 
-   // 4. Hard-stop anything still in flight: the cancel_check poll aborts an active
-   //    perform(); the backoff wait's predicate aborts a retry sleep.
-   _cancel_requested.store(true, std::memory_order_relaxed);
-   _timer_cv.notify_all();
+   // 4. Hard-stop anything still in flight: the client's cancellation signal aborts an active request and
+   //    its backoff wait on the client's io thread; the timer is already stopped, so nothing else needs waking.
+   _client->cancel();
 
    // 5. Account then discard whatever the drain window did not deliver (stop()
    //    discards silently), then join the worker.
    _dropped_batches.fetch_add(_queue->discard_pending(), std::memory_order_relaxed);
    _queue->stop();
 
-   // 6. Final report + transport teardown.
+   // 6. Final report + client teardown.
    emit_pending_warnings();
-   _transport.reset();
+   _client.reset();
 }
 
 void es_sink_mt::sink_it_(const spdlog::details::log_msg& msg) {
@@ -163,12 +129,12 @@ void es_sink_mt::sink_it_(const spdlog::details::log_msg& msg) {
       _warn_events.fetch_add(1, std::memory_order_relaxed);
       return;
    }
-   const std::size_t incoming = _action_line.size() + formatted.size();
+   const std::size_t incoming = _client->action_line().size() + formatted.size();
    // Ship the current batch first when appending would exceed the byte cap, so every
    // request body stays <= max_batch_bytes (+ at most one max_doc_bytes document).
    if (_pending.doc_count > 0 && _pending.body.size() + incoming > _cfg.max_batch_bytes)
       enqueue_pending_locked();
-   _pending.body.append(_action_line);
+   _pending.body.append(_client->action_line());
    _pending.body.append(formatted.data(), formatted.size());
    ++_pending.doc_count;
    if (_pending.doc_count >= _cfg.batch_size || _pending.body.size() >= _cfg.max_batch_bytes)
@@ -209,128 +175,15 @@ void es_sink_mt::timer_loop() {
 
 void es_sink_mt::deliver(batch& delivery) {
    const delivery_completed_guard completion{_batches_completed};
-   const uint32_t                 doc_count = delivery.doc_count;
-
-   http::request req;
-   req.method       = http::request_method::post;
-   req.target       = _bulk_url;
-   req.body         = std::move(delivery.body);
-   req.content_type = std::string{es_content_type};
-   req.user_agent   = std::string{es_user_agent};
-   if (_auth_header)
-      req.headers.emplace_back("Authorization", *_auth_header);
-
-   http::request_options opt;
-   opt.max_request_body_bytes  = uint64_t{_cfg.max_batch_bytes} + _cfg.max_doc_bytes;
-   opt.max_response_body_bytes = es_max_response_body_bytes;
-   opt.timeouts.connect        = fc::milliseconds(_cfg.connect_timeout_ms);
-   opt.timeouts.header = opt.timeouts.read = opt.timeouts.idle = opt.timeouts.total =
-      fc::milliseconds(_cfg.request_timeout_ms);
-   // Background worker: an ambient fc task deadline must not bound a log flush.
-   opt.timeouts.inherit_task_deadline = false;
-   opt.cancel_check = [this] { return _cancel_requested.load(std::memory_order_relaxed); };
-   // Transport retry stays at one attempt (a _bulk POST is not idempotent); the sink
-   // owns its retry loop below.
-
-   for (uint32_t attempt = 0;; ++attempt) {
-      if (_cancel_requested.load(std::memory_order_relaxed)) {
-         _failed_batches.fetch_add(1, std::memory_order_relaxed);
-         return;
-      }
-      bool retryable = false;
-      try {
-         const auto resp = _transport->perform(req, opt);
-         if (resp.status >= http_status_ok_min && resp.status <= http_status_ok_max) {
-            handle_bulk_response_body(resp.body, doc_count);
-            return;
-         }
-         // 429 is endpoint back-pressure -- the one 4xx worth retrying; other 4xx are
-         // terminal (retrying a rejected request only repeats the rejection).
-         retryable = resp.status >= http_status_server_error_min || resp.status == http_status_too_many_requests;
-         if (!retryable) {
-            _failed_batches.fetch_add(1, std::memory_order_relaxed);
-            note_warning(fmt::format("HTTP {} from {}", resp.status, http::sanitized_endpoint(_bulk_url)));
-            return;
-         }
-         note_warning(fmt::format("HTTP {} from {} (attempt {})", resp.status,
-                                  http::sanitized_endpoint(_bulk_url), attempt + 1));
-      } catch (const fc::canceled_exception&) {
-         // Shutdown abort via cancel_check.
-         _failed_batches.fetch_add(1, std::memory_order_relaxed);
-         return;
-      } catch (const fc::timeout_exception& e) {
-         retryable = true;
-         note_warning(fmt::format("timeout delivering to {}: {}", http::sanitized_endpoint(_bulk_url),
-                                  e.top_message()));
-      } catch (const fc::exception& e) {
-         // connect / DNS / TLS / io failures -- message-classified only at this layer.
-         retryable = true;
-         note_warning(fmt::format("delivery to {} failed: {}", http::sanitized_endpoint(_bulk_url),
-                                  e.top_message()));
-      }
-      if (!retryable || attempt >= _cfg.max_retries) {
-         _failed_batches.fetch_add(1, std::memory_order_relaxed);
-         return;
-      }
-      // Capped exponential backoff, interruptible by shutdown's cancel request. The
-      // predicate deliberately keys on _cancel_requested (set at drain-timeout), NOT
-      // _shutting_down (set at teardown start) -- otherwise retries would spin at zero
-      // backoff for the whole graceful-drain window.
-      const auto backoff = std::min<std::chrono::milliseconds>(
-         std::chrono::milliseconds(_cfg.retry_backoff_ms) * (1u << std::min(attempt, es_max_backoff_exponent)),
-         es_max_backoff);
-      std::unique_lock<std::mutex> lk(_timer_mtx);
-      if (_timer_cv.wait_for(lk, backoff, [this] { return _cancel_requested.load(std::memory_order_relaxed); })) {
-         _failed_batches.fetch_add(1, std::memory_order_relaxed);
-         return;
-      }
-   }
-}
-
-void es_sink_mt::handle_bulk_response_body(const std::string& body, uint32_t doc_count) {
-   const std::string_view probe = std::string_view{body}.substr(0, es_errors_probe_bytes);
-   if (probe.find(es_errors_false_token) != std::string_view::npos) {
-      _indexed_docs.fetch_add(doc_count, std::memory_order_relaxed);
+   const auto result = _client->bulk(std::move(delivery.body), delivery.doc_count);
+   _indexed_docs.fetch_add(result.indexed_docs, std::memory_order_relaxed);
+   if (result.outcome == fc::network::es::es_bulk_result::status::indexed)
       return;
-   }
-   // "errors":true, or neither token in the probe window (a proxy landing page, a
-   // response with unexpected whitespace, ...) -- parse to find out. Never retry after
-   // a 2xx: a partial success replayed duplicates the documents that DID index.
-   try {
-      const auto parsed = fc::json::from_string(body).get_object();
-      if (!parsed.contains("errors")) {
-         _failed_batches.fetch_add(1, std::memory_order_relaxed);
-         note_warning(fmt::format("2xx from {} is not a bulk response", http::sanitized_endpoint(_bulk_url)));
-         return;
-      }
-      if (!parsed["errors"].as_bool()) {
-         _indexed_docs.fetch_add(doc_count, std::memory_order_relaxed);
-         return;
-      }
-      uint64_t    failed_docs = 0;
-      std::string first_reason;
-      if (parsed.contains("items")) {
-         for (const auto& item : parsed["items"].get_array()) {
-            const auto& item_obj = item.get_object();
-            for (const auto& entry : item_obj) {
-               const auto& result = entry.value().get_object();
-               if (!result.contains("error"))
-                  continue;
-               ++failed_docs;
-               if (first_reason.empty())
-                  first_reason = fc::json::to_string(result["error"], fc::time_point::maximum());
-            }
-         }
-      }
-      failed_docs = std::min<uint64_t>(failed_docs, doc_count);
-      _indexed_docs.fetch_add(doc_count - failed_docs, std::memory_order_relaxed);
-      _failed_batches.fetch_add(1, std::memory_order_relaxed);
-      note_warning(fmt::format("{} of {} documents rejected by {}; first error: {}", failed_docs, doc_count,
-                               http::sanitized_endpoint(_bulk_url), first_reason));
-   } catch (const fc::exception&) {
-      _failed_batches.fetch_add(1, std::memory_order_relaxed);
-      note_warning(fmt::format("unparseable 2xx response from {}", http::sanitized_endpoint(_bulk_url)));
-   }
+   // partial, rejected, unavailable: the batch counts as failed (partial also credited the indexed subset
+   // above); canceled is shutdown's doing and warrants no warning.
+   _failed_batches.fetch_add(1, std::memory_order_relaxed);
+   if (result.outcome != fc::network::es::es_bulk_result::status::canceled)
+      note_warning(result.detail);
 }
 
 void es_sink_mt::note_warning(std::string detail) {

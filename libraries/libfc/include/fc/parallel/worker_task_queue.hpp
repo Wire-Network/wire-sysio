@@ -1,15 +1,13 @@
 #pragma once
 
-#include <boost/asio/post.hpp>
-#include <boost/asio/thread_pool.hpp>
-#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
+#include <fc/parallel/detail/task_queue_base.hpp>
 #include <functional>
 #include <memory>
-#include <mutex>
 #include <optional>
 #include <queue>
+#include <string_view>
 #include <utility>
 
 namespace fc::parallel {
@@ -24,7 +22,13 @@ struct worker_task_queue_config {
    std::optional<std::size_t> max_pending_items;
 };
 
+/// Name this queue reports in the configuration assert of its create().
+inline constexpr std::string_view worker_task_queue_name = "worker_task_queue";
+
 /// Thread-pool-backed work queue that delivers items of type T to a callback.
+///
+/// The queue storage, admission and the start/stop lifecycle contract live in
+/// fc::parallel::detail::task_queue_base; this class adds the single-item callback and its worker loop.
 ///
 /// Managed exclusively via shared_ptr — use the static create() factory.
 /// Non-copyable, non-movable.
@@ -36,136 +40,49 @@ struct worker_task_queue_config {
 ///   q->push(event);
 ///   q->stop();
 template <typename T>
-class worker_task_queue : public std::enable_shared_from_this<worker_task_queue<T>> {
+class worker_task_queue : public detail::task_queue_base<T, worker_task_queue<T>, worker_task_queue_config> {
+   using base_t = detail::task_queue_base<T, worker_task_queue<T>, worker_task_queue_config>;
+   /// The base posts one worker_loop() call per pool thread.
+   friend base_t;
+
 public:
+   /// The one-item callback type: the item is delivered by reference, outside the queue mutex.
    using callback_t = std::function<void(T&)>;
 
    /// Factory — the only way to obtain an instance.
+   /// @throw fc::assert_exception when max_threads is zero.
    static std::shared_ptr<worker_task_queue> create(worker_task_queue_config config, callback_t cb) {
-      auto ptr = std::shared_ptr<worker_task_queue>(new worker_task_queue(std::move(config), std::move(cb)));
-      if (!ptr->_config.skip_autostart)
-         ptr->start();
-      return ptr;
-   }
-
-   worker_task_queue(const worker_task_queue&)            = delete;
-   worker_task_queue& operator=(const worker_task_queue&) = delete;
-   worker_task_queue(worker_task_queue&&)                 = delete;
-   worker_task_queue& operator=(worker_task_queue&&)      = delete;
-
-   ~worker_task_queue() { stop(); }
-
-   /// Enqueue an item. No-op if the queue has been stopped or is at capacity.
-   void push(const T& item) { (void)try_push(item); }
-
-   /// Enqueue an item (move). No-op if the queue has been stopped or is at capacity.
-   void push(T&& item) { (void)try_push(std::move(item)); }
-
-   /// Attempt to enqueue a copied item.
-   /// @return True when admitted; false when stopped or at the pending-item limit.
-   bool try_push(const T& item) { return try_push_impl(item); }
-
-   /// Attempt to enqueue a moved item.
-   /// @return True when admitted; false when stopped or at the pending-item limit.
-   bool try_push(T&& item) { return try_push_impl(std::move(item)); }
-
-   /// Start the thread pool and worker loops.
-   /// Called automatically by create() unless skip_autostart is set.
-   void start() {
-      {
-         std::lock_guard<std::mutex> lock(_mtx);
-         if (_running)
-            return;
-         _running = true;
-      }
-      _pool.emplace(static_cast<std::size_t>(_config.max_threads));
-      for (uint64_t i = 0; i < _config.max_threads; ++i) {
-         boost::asio::post(*_pool, [self = this->shared_from_this()]() { self->worker_loop(); });
-      }
-   }
-
-   /// Mark the queue as stopped and join all worker threads.
-   void stop() {
-      {
-         std::lock_guard<std::mutex> lock(_mtx);
-         _stopped = true;
-         if (!_running)
-            return;
-         _running = false;
-      }
-      _cv.notify_all();
-      if (_pool) {
-         _pool->join();
-         _pool.reset();
-      }
+      return base_t::start_if_configured(
+         std::shared_ptr<worker_task_queue>(new worker_task_queue(std::move(config), std::move(cb))),
+         worker_task_queue_name);
    }
 
    /// Alias for stop().
-   void destroy() { stop(); }
-
-   bool running() const {
-      std::lock_guard<std::mutex> lock(_mtx);
-      return _running;
-   }
-
-   std::size_t size() const {
-      std::lock_guard<std::mutex> lock(_mtx);
-      return _queue.size();
-   }
-
-   /// Remove and return the number of pending items without affecting an active callback.
-   std::size_t discard_pending() {
-      std::queue<T> discarded;
-      {
-         std::lock_guard<std::mutex> lock(_mtx);
-         _queue.swap(discarded);
-      }
-      const auto count = discarded.size();
-      return count;
-   }
+   void destroy() { this->stop(); }
 
 private:
    worker_task_queue(worker_task_queue_config config, callback_t cb)
-      : _config(std::move(config))
+      : base_t(std::move(config))
       , _callback(std::move(cb)) {}
 
-   /// Admit an item while holding the capacity check and queue mutation under the same lock.
-   template <typename U>
-   bool try_push_impl(U&& item) {
-      {
-         std::lock_guard<std::mutex> lock(_mtx);
-         if (_stopped || (_config.max_pending_items && _queue.size() >= *_config.max_pending_items)) {
-            return false;
-         }
-         _queue.push(std::forward<U>(item));
-      }
-      _cv.notify_one();
-      return true;
-   }
-
+   /// Deliver one item per callback invocation until stop() clears the running flag. The item is taken
+   /// under the queue mutex and the callback runs after it is released, so a slow callback blocks only the
+   /// worker running it.
    void worker_loop() {
       while (true) {
          std::optional<T> item;
-         {
-            std::unique_lock<std::mutex> lock(_mtx);
-            _cv.wait(lock, [this] { return !_queue.empty() || !_running; });
-            if (!_running)
-               return;
-            item.emplace(std::move(_queue.front()));
-            _queue.pop();
-         }
+         const bool taken = this->wait_and_drain([&item](std::queue<T>& queue) {
+            item.emplace(std::move(queue.front()));
+            queue.pop();
+         });
+         if (!taken)
+            return;
          _callback(*item);
       }
    }
 
-   worker_task_queue_config                  _config;
-   callback_t                                _callback;
-   mutable std::mutex                        _mtx;
-   std::condition_variable                   _cv;
-   std::queue<T>                             _queue;
-   bool                                      _running = false;
-   bool                                      _stopped = false;
-   std::optional<boost::asio::thread_pool>   _pool;
+   /// Receives each dequeued item; runs on a pool thread and must not throw.
+   callback_t _callback;
 };
 
 } // namespace fc::parallel

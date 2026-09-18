@@ -102,7 +102,6 @@ class netUtil:
             'nodeop_trxs_incoming_total': 'Total Incoming Trxs:',
             'nodeop_blocks_produced_total': 'Blocks Produced:',
             'nodeop_trxs_produced_total': 'Trxs Produced:',
-            'nodeop_scheduled_trxs_total': 'Scheduled Trxs:',
             'nodeop_unapplied_transactions_total': 'Unapplied Trxs:',
             'nodeop_p2p_dropped_trxs_total': 'Dropped Trxs:',
             'nodeop_p2p_failed_connections_total': 'Failed P2P Connections:',
@@ -122,7 +121,6 @@ class netUtil:
             'Failed P2P Connections:',
             'Total Incoming Blocks:',
             'Blocks Produced:',
-            'Scheduled Trxs:',
             'Unapplied Trxs:',
             'HTTP Requests:',
         ]

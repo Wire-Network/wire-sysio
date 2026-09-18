@@ -4,12 +4,13 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
+#include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/address_v6.hpp>
 
+#include <cstdlib>
 #include <set>
 #include <string>
 #include <string_view>
-#include <sstream>
 #include <regex>
 #include <vector>
 
@@ -38,24 +39,36 @@ namespace detail {
    };
 
    inline size_t parse_connection_rate_limit( const std::string& limit_str) {
-      std::istringstream in(limit_str);
-      double limit{0};
-      in >> limit;
+      // The number is taken with strtod rather than `istringstream >> double`. libc++ pulls a trailing hex digit into
+      // its float scan and then fails the whole extraction, so `640B/s` yields 0 there while `640KB/s` yields 640 --
+      // and a failed extraction writes 0, which is indistinguishable from "no limit configured". `std::from_chars`
+      // would be the locale-independent choice, but libc++ still defines its floating-point overload as deleted.
+      const char* const number_begin = limit_str.c_str();
+      char*             number_end   = nullptr;
+      const double      limit        = std::strtod(number_begin, &number_end);
       SYS_ASSERT(limit >= 0.0, chain::plugin_config_exception, "block sync rate limit must not be negative: {}", limit_str);
       size_t block_sync_rate_limit = 0;
       if( limit > 0.0 ) {
-         std::string units;
-         in >> units;
-         std::regex units_regex{"([KMGT]?[i]?)B/s"};
-         std::smatch units_match;
-         std::regex_match(units, units_match, units_regex);
+         // One whitespace-delimited token from the text after the number -- `operator>>` semantics without the stream --
+         // so prose following the unit (`640KB/s - additional info`) is ignored.
+         constexpr std::string_view whitespace = " \t\n\v\f\r";
+         std::string_view rest{number_end};
+         const auto       unit_begin = rest.find_first_not_of(whitespace);
+         rest = unit_begin == std::string_view::npos ? std::string_view{} : rest.substr(unit_begin);
+         const std::string units{rest.substr(0, rest.find_first_of(whitespace))};
+         // A number alone is bytes per second.
+         size_t multiplier = 1;
          if( units.length() > 0 ) {
+            std::regex units_regex{"([KMGT]?[i]?)B/s"};
+            std::smatch units_match;
+            std::regex_match(units, units_match, units_regex);
             SYS_ASSERT(units_match.size() == 2, chain::plugin_config_exception, "invalid block sync rate limit specification: {}", units);
-            try {
-               block_sync_rate_limit = boost::numeric_cast<size_t>(limit * prefix_multipliers.at(units_match[1].str()));
-            } catch (boost::numeric::bad_numeric_cast&) {
-               SYS_THROW(chain::plugin_config_exception, "block sync rate limit specification overflowed: {}", limit_str);
-            }
+            multiplier = prefix_multipliers.at(units_match[1].str());
+         }
+         try {
+            block_sync_rate_limit = boost::numeric_cast<size_t>(limit * multiplier);
+         } catch (boost::numeric::bad_numeric_cast&) {
+            SYS_THROW(chain::plugin_config_exception, "block sync rate limit specification overflowed: {}", limit_str);
          }
       }
       return block_sync_rate_limit;
@@ -110,10 +123,12 @@ namespace detail {
       string port = endpoint.substr( colon + 1, colon2 == string::npos ? string::npos : colon2 - (colon + 1));
       string remainder;
       if (colon2 == string::npos) {
+         // One colon means no `:trx|:blk` and no `:<rate>` section, so whatever trails the port digits is prose --
+         // net_plugin appends ` - <peer id>` when it logs an address. It is dropped rather than returned as the
+         // remainder, so neither the connection type nor the rate limit can be read out of it.
          auto port_end = port.find_first_not_of("0123456789");
          if (port_end != string::npos) {
             port = port.substr(0, port_end);
-            remainder = port.substr( port_end );
          }
       } else {
          remainder = endpoint.substr( colon2 + 1 );
@@ -134,6 +149,18 @@ namespace detail {
       bool operator==(const endpoint& lhs) const = default;
       auto operator<=>(const endpoint& lhs) const = default;
    };
+
+   /**
+    * Whether a listen host binds every interface: empty, or an unspecified IP address such as `0.0.0.0` or `::`.
+    * Takes the host as returned by `split_host_port_type`, which strips IPv6 brackets.
+    */
+   inline bool is_unspecified_host(const std::string& host) {
+      if (host.empty())
+         return true;
+      boost::system::error_code ec;
+      const auto address = boost::asio::ip::make_address(host, ec);
+      return !ec && address.is_unspecified();
+   }
 
    /// @return host, port, type. returns empty on invalid endpoint, does not throw
    inline std::tuple<std::string, std::string, std::string> split_host_port_type(const std::string& endpoint) {

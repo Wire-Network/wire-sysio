@@ -23,7 +23,8 @@ systemAccounts = [
     'sysio.saving',
     'sysio.token',
     'sysio.vpay',
-    'sysio.acct'
+    'sysio.acct',
+    'sysio.opreg'
 ]
 
 def jsonArg(a):
@@ -169,8 +170,29 @@ def createAccounts(b, e):
             (a['name'], a['pub']))
 
 def regProducers(b, e):
+    opregConfig = {
+        'max_available_producers': 21,
+        'max_available_batch_ops': 63,
+        'max_available_underwriters': 21,
+        'terminate_prune_delay_ms': 600000,
+        'terminate_max_consecutive_misses': 5,
+        'terminate_max_pct_misses_24h': 5,
+        'terminate_window_ms': 86400000,
+        'req_prod_collat': [],
+        'req_batchop_collat': [],
+        'req_uw_collat': []
+    }
+    run(args.clio + 'push action sysio.opreg setconfig' + jsonArg(opregConfig) +
+        '-p sysio.opreg@active')
     for i in range(b, e):
         a = accounts[i]
+        operator = {
+            'account': a['name'],
+            'type': 'OPERATOR_TYPE_PRODUCER',
+            'is_bootstrapped': True
+        }
+        run(args.clio + 'push action sysio.opreg regoperator' + jsonArg(operator) +
+            '-p sysio.opreg@active')
         retry(args.clio + 'system regproducer ' + a['name'] + ' ' + a['pub'] + ' https://' + a['name'] + '.com' + '/' + a['pub'])
 
 #dfe regFinKeys(b, e): for i in range(b,e): a = account[i] reg fin key all point 8000
@@ -253,6 +275,7 @@ def stepStartBoot():
 def stepInstallSystemContracts():
     run(args.clio + 'set contract sysio.token ' + args.contracts_dir + '/sysio.token/')
     run(args.clio + 'set contract sysio.msig ' + args.contracts_dir + '/sysio.msig/')
+    run(args.clio + 'set contract sysio.opreg ' + args.contracts_dir + '/sysio.opreg/')
 def stepCreateTokens():
     run(args.clio + 'push action sysio setpriv' + jsonArg(['sysio.token', 1]) + '-p sysio@active')
     run(args.clio + 'push action sysio.token create \'["sysio", "10000000000.0000 %s"]\' -p sysio.token' % (args.symbol))
@@ -286,6 +309,7 @@ def stepSetSystemContract():
     retry(args.clio + 'set contract sysio ' + args.contracts_dir + '/sysio.system/')
     # setpriv is only available after sysio.system is installed
     run(args.clio + 'push action sysio setpriv' + jsonArg(['sysio.msig', 1]) + '-p sysio@active')
+    run(args.clio + 'push action sysio setpriv' + jsonArg(['sysio.opreg', 1]) + '-p sysio@active')
     sleep(3)
 
 def stepInitSystemContract():

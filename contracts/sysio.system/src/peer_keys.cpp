@@ -89,10 +89,8 @@ peer_keys::getpeerkeys_res_t peer_keys::getpeerkeys() {
    auto idx = producers.get_index<"prodrank"_n>();
 
    // `rank` is POSITION among ELIGIBLE producers, so this counts matches rather than taking the
-   // first `max_rank` index entries. Taking the first N would let unbonded registrants -- which
-   // occupy index slots but can never be scheduled -- crowd real producers out of peer discovery.
-   // The demoted tier sorts last and is never eligible, so it also bounds the walk over what is
-   // a permissionless, unbounded table.
+   // first `max_rank` index entries. The demoted tier sorts last and is never eligible, which keeps
+   // historical, parked and keyless rows from crowding current producers out of peer discovery.
    //
    // Peer discovery walks `is_eligible_operator`, NOT `is_schedulable`: it must not require a
    // finalizer key. A producer scheduled through `setprods` -- the bootstrap window, and every

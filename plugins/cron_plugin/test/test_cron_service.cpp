@@ -465,4 +465,23 @@ BOOST_AUTO_TEST_SUITE(cron_service)
     BOOST_CHECK_EQUAL(wd.c_encoding(), 3u); // Wednesday
   } FC_LOG_AND_RETHROW();
 
+  BOOST_AUTO_TEST_CASE(test_empty_milliseconds_fires_at_minute_start) try {
+    using namespace std::chrono;
+
+    // An empty milliseconds field matches only the start of the minute.
+    const svc::job_schedule every_minute{};
+    const auto base = sys_days{year{2025} / month{6} / day{15}} + hours{10} + minutes{5};
+
+    BOOST_CHECK(svc::next_fire_time(every_minute, base) == base + minutes{1});
+    BOOST_CHECK(svc::next_fire_time(every_minute, base + seconds{30}) == base + minutes{1});
+
+    // A schedule pinned to a minute fires once in that minute, not once per second of it.
+    svc::job_schedule half_past{};
+    half_past.minutes.insert(svc::job_schedule::exact_value{30});
+    const auto triggers = svc::compute_next_n_triggers(half_past, base, 2);
+    BOOST_REQUIRE_EQUAL(triggers.size(), 2u);
+    BOOST_CHECK(triggers[0] == base + minutes{25});
+    BOOST_CHECK(triggers[1] == base + minutes{25} + hours{1});
+  } FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_SUITE_END()

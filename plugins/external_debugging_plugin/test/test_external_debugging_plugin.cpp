@@ -3,13 +3,16 @@
 #include <boost/program_options/variables_map.hpp>
 #include <boost/test/unit_test.hpp>
 #include <cstdint>
+#include <fc/io/json.hpp>
 #include <latch>
 #include <memory>
 #include <set>
 #include <string>
 #include <sysio/chain/exceptions.hpp>
+#include <sysio/opp/debugging/debugging.pb.h>
 #include <sysio/external_debugging_plugin/debug_envelope_event_sink.hpp>
 #include <sysio/external_debugging_plugin/external_debugging_plugin.hpp>
+#include <sysio/external_debugging_plugin/external_debugging_rpc_client.hpp>
 #include <thread>
 #include <vector>
 
@@ -134,6 +137,17 @@ BOOST_AUTO_TEST_CASE(event_slot_retains_stopped_sink_through_owner_release) {
    retained_sink.reset();
    slot = {};
    BOOST_TEST(weak_sink.expired());
+}
+
+/// Requests reach the debugging server with enums as their integer values, not their names.
+BOOST_AUTO_TEST_CASE(request_json_prints_enums_as_ints) {
+   sysio::opp::debugging::PutEnvelopeRequest request;
+   request.set_endpoints_type(sysio::opp::debugging::DEBUG_OUTPOST_ENDPOINTS_TYPE_DEPOT_OUTPOST_ETHEREUM);
+
+   const auto params = fc::json::from_string(sysio::debugging::rpc_client::to_request_json(request));
+   const auto& endpoints_type = params["endpointsType"];
+   BOOST_REQUIRE(endpoints_type.is_integer());
+   BOOST_TEST(endpoints_type.as_int64() == request.endpoints_type());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
