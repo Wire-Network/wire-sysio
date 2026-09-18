@@ -31,6 +31,30 @@ public_key_type undecodable_r1_key() {
 /// and what the chain's own K1 validity test rejects.
 public_key_type zero_k1_key() { return public_key_type{}; }
 
+/// A BLS key whose payload is absent. fc reflects the shim's shared_ptr behind a presence flag,
+/// so clearing that flag unpacks to a null pointer. Built by packing a real key and dropping the
+/// payload, rather than by hand, so it stays correct if the encoding changes.
+std::vector<char> strip_bls_payload( const std::vector<char>& packed ) {
+   const auto bls_index = static_cast<char>( fc::crypto::public_key::key_type::bls );
+   for( size_t i = 0; i + 1 < packed.size(); ++i ) {
+      if( packed[i] == bls_index && packed[i + 1] == 1 ) {
+         std::vector<char> stripped( packed.begin(), packed.begin() + i + 1 );
+         stripped.push_back( 0 );                                      // payload absent
+         const auto rest = i + 2 + fc::crypto::bls::public_key_data_size;
+         stripped.insert( stripped.end(), packed.begin() + rest, packed.end() );
+         return stripped;
+      }
+   }
+   BOOST_FAIL( "no BLS payload found in packed schedule" );
+   return {};
+}
+
+/// A real BLS public key, used only as a carrier for the payload-stripping above.
+public_key_type bls_key() {
+   return public_key_type::from_string(
+      "PUB_BLS_sGOyYNtpmmjfsNbQaiGJrPxeSg9sdx0nRtfhI_KnWoACXLL53FIf1HjpcN8wX0cYQyOE60NLSI9iPY8mIlT4GkiFMT3ez7j2IbBBzR0D1MthC0B_fYlgYWwjcbqCOowSaH48KA" );
+}
+
 /// A WebAuthn key: well-formed, and of a type the chain rejects when it recovers a key from a
 /// block signature, so a producer holding one could never sign.
 public_key_type webauthn_key() {
@@ -405,6 +429,37 @@ BOOST_AUTO_TEST_CASE(legacy_format_admits_unsignable_keys) try {
       BOOST_REQUIRE( !trace->except );
       BOOST_REQUIRE( trace->receipt );
    }
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE(absent_bls_payload_is_rejected_on_both_formats) try {
+   // The schedule path no longer screens key types, so a BLS key reaches it. Its shim holds the
+   // payload behind a shared_ptr that fc lets deserialize as absent, and every accessor -- the
+   // to_string a node performs when it logs a schedule, among them -- would dereference null.
+   // A one-key authority slips past proposer_policy::validate untouched, because the first
+   // insertion into the uniqueness set compares nothing. Deserialization has to reject it.
+
+   // Authority format, as set_proposed_producers_ex(1) unpacks it.
+   vector<producer_authority> authority_schedule = {
+      producer_authority{ "alice"_n, block_signing_authority_v0{ 1, {{ bls_key(), 1 }} } }
+   };
+   const auto unpack_bytes = []( const std::vector<char>& bytes, auto& out ) {
+      fc::datastream<const char*> ds( bytes.data(), bytes.size() );
+      fc::raw::unpack( ds, out );
+   };
+
+   auto authority_bytes = strip_bls_payload( fc::raw::pack( authority_schedule ) );
+   vector<producer_authority> unpacked_authority;
+   BOOST_CHECK_THROW( unpack_bytes( authority_bytes, unpacked_authority ), fc::exception );
+
+   // Legacy format, as set_proposed_producers unpacks it.
+   vector<legacy::producer_key> legacy_schedule = {{ "alice"_n, bls_key() }};
+   auto legacy_bytes = strip_bls_payload( fc::raw::pack( legacy_schedule ) );
+   vector<legacy::producer_key> unpacked_legacy;
+   BOOST_CHECK_THROW( unpack_bytes( legacy_bytes, unpacked_legacy ), fc::exception );
+
+   // The unmodified bytes still round-trip, so the guard rejects only the absent payload.
+   BOOST_CHECK_NO_THROW( unpack_bytes( fc::raw::pack( authority_schedule ), unpacked_authority ) );
+   BOOST_CHECK_NO_THROW( unpack_bytes( fc::raw::pack( legacy_schedule ), unpacked_legacy ) );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE(unsignable_key_never_satisfies_authority) try {

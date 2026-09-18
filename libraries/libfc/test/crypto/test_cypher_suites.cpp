@@ -9,6 +9,9 @@
 #include <fc/utility.hpp>
 #include <fc/variant.hpp>
 
+#include <fc/io/datastream.hpp>
+#include <fc/io/raw.hpp>
+
 #include <algorithm>
 #include <variant>
 
@@ -468,6 +471,33 @@ BOOST_AUTO_TEST_CASE(test_bls_sig_str) try {
 } FC_LOG_AND_RETHROW();
 
 // --- sign_eth (shim-level): recovery round-trip with multiple messages ---
+BOOST_AUTO_TEST_CASE(test_bls_absent_payload_is_rejected) try {
+   // The BLS shims reflect their shared_ptr, and fc packs a presence flag ahead of it, so a false
+   // flag unpacks to a null pointer that valid(), to_string() and serialize() all dereference.
+   // Deserialization has to reject it: these bytes reach the node from any peer-supplied
+   // signature, and a null dereference terminates the process rather than raising.
+   const auto unpack_absent = [](uint8_t variant_index, auto& out) {
+      const std::vector<char> bytes{static_cast<char>(variant_index), 0}; // alternative, presence = false
+      fc::datastream<const char*> ds(bytes.data(), bytes.size());
+      fc::raw::unpack(ds, out);
+   };
+
+   public_key key;
+   BOOST_CHECK_THROW(unpack_absent(static_cast<uint8_t>(public_key::key_type::bls), key), fc::exception);
+
+   signature sig;
+   BOOST_CHECK_THROW(unpack_absent(static_cast<uint8_t>(signature::sig_type::bls), sig), fc::exception);
+
+   // A present payload still round-trips, so the guard does not reject real BLS material.
+   const auto real = public_key::from_string(
+      "PUB_BLS_sGOyYNtpmmjfsNbQaiGJrPxeSg9sdx0nRtfhI_KnWoACXLL53FIf1HjpcN8wX0cYQyOE60NLSI9iPY8mIlT4GkiFMT3ez7j2IbBBzR0D1MthC0B_fYlgYWwjcbqCOowSaH48KA");
+   const auto packed = fc::raw::pack(real);
+   fc::datastream<const char*> ds(packed.data(), packed.size());
+   public_key round_tripped;
+   BOOST_CHECK_NO_THROW(fc::raw::unpack(ds, round_tripped));
+   BOOST_CHECK_EQUAL(real.to_string({}), round_tripped.to_string({}));
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(test_sign_eth_recovery_roundtrip) try {
    auto key = fc::crypto::private_key::generate(private_key::key_type::em);
    auto pub = key.get_public_key();
