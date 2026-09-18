@@ -443,6 +443,26 @@ fc::http_file_download_options download_options(uint64_t max_body_bytes) {
    };
 }
 
+/**
+ * A loopback port that refuses connections.
+ *
+ * Bound briefly so the kernel hands out a port nothing else holds, never listened on, then
+ * released. The socket must never listen: a port that has listened keeps accepting for a short
+ * window after it closes on hosts whose listener teardown is asynchronous -- WSL2 mirrored
+ * networking among them -- and the connection is then reset, which the transport correctly
+ * reports as an io failure rather than a connect failure. Holding the socket open instead of
+ * closing it does not work either: a bound-but-unlistening socket does not produce a connect
+ * failure on macOS.
+ */
+uint16_t unconnectable_loopback_port() {
+   boost::asio::io_context io;
+   tcp::socket probe(io, tcp::endpoint(boost::asio::ip::address_v4::loopback(), 0));
+   const auto port = probe.local_endpoint().port();
+   boost::system::error_code ec;
+   probe.close(ec);
+   return port;
+}
+
 /** Return the URL for @p server. */
 fc::url server_url(const scripted_http_server& server) {
    return fc::url("http://127.0.0.1:" + std::to_string(server.port()) + "/download");
@@ -1519,11 +1539,7 @@ BOOST_AUTO_TEST_CASE(dns_resolver_start_failure_is_classified) {
 
 /// A successful injected DNS result is used for the bounded connection attempt.
 BOOST_AUTO_TEST_CASE(dns_resolution_accepts_completed_lookup) {
-   boost::asio::io_context io;
-   tcp::acceptor closed_listener(io, tcp::endpoint(boost::asio::ip::address_v4::loopback(), 0));
-   const auto closed_port = closed_listener.local_endpoint().port();
-   boost::system::error_code close_error;
-   closed_listener.close(close_error);
+   const auto refused_port = unconnectable_loopback_port();
    std::atomic_uint32_t resolve_count{0};
    auto resolver = [&](const std::string&, const std::string&, fc::time_point,
                        fc::http::detail::resolver_complete_fn complete) {
@@ -1531,7 +1547,7 @@ BOOST_AUTO_TEST_CASE(dns_resolution_accepts_completed_lookup) {
       complete(std::nullopt, {
                                 {
                                  .address = "127.0.0.1",
-                                 .port = closed_port,
+                                 .port = refused_port,
                                  }
       });
       return [] {};
@@ -1552,11 +1568,7 @@ BOOST_AUTO_TEST_CASE(dns_resolution_accepts_completed_lookup) {
 
 /// DNS TTL and connection-failure refresh are independent cache policies.
 BOOST_AUTO_TEST_CASE(dns_cache_refresh_policy_is_preserved) {
-   boost::asio::io_context io;
-   tcp::acceptor closed_listener(io, tcp::endpoint(boost::asio::ip::address_v4::loopback(), 0));
-   const auto closed_port = closed_listener.local_endpoint().port();
-   boost::system::error_code close_error;
-   closed_listener.close(close_error);
+   const auto refused_port = unconnectable_loopback_port();
 
    const auto exercise = [&](std::optional<fc::microseconds> cache_timeout, bool refresh_on_connection_failure) {
       std::atomic_uint32_t resolve_count{0};
@@ -1570,7 +1582,7 @@ BOOST_AUTO_TEST_CASE(dns_cache_refresh_policy_is_preserved) {
             complete(std::nullopt, {
                                       {
                                        .address = "127.0.0.1",
-                                       .port = closed_port,
+                                       .port = refused_port,
                                        }
             });
             return [] {};
@@ -1616,11 +1628,7 @@ BOOST_AUTO_TEST_CASE(retries_require_explicit_idempotency) {
 
 /// Exhausted retries produce a stable category without replaying more than the configured attempts.
 BOOST_AUTO_TEST_CASE(idempotent_retry_exhaustion_is_bounded) {
-   boost::asio::io_context io;
-   tcp::acceptor closed_listener(io, tcp::endpoint(boost::asio::ip::address_v4::loopback(), 0));
-   const auto closed_port = closed_listener.local_endpoint().port();
-   boost::system::error_code close_error;
-   closed_listener.close(close_error);
+   const auto refused_port = unconnectable_loopback_port();
 
    fc::http::transport transport;
    auto options = tls_request_options();
@@ -1631,7 +1639,7 @@ BOOST_AUTO_TEST_CASE(idempotent_retry_exhaustion_is_bounded) {
    BOOST_CHECK_EXCEPTION(transport.perform(
                             fc::http::request{
                                .method = fc::http::request_method::get,
-                               .target = fc::url("http://127.0.0.1:" + std::to_string(closed_port) + "/"),
+                               .target = fc::url("http://127.0.0.1:" + std::to_string(refused_port) + "/"),
                             },
                             options),
                          fc::exception, [](const fc::exception& error) {
@@ -2341,18 +2349,14 @@ BOOST_AUTO_TEST_CASE(stale_metadata_reconnect_failure_cleans_up_safely) {
 
 /// The stale-connection flag does not retry a failure on the first fresh connection.
 BOOST_AUTO_TEST_CASE(fresh_download_connection_failure_is_not_retried) {
-   boost::asio::io_context io;
-   tcp::acceptor closed_listener(io, tcp::endpoint(boost::asio::ip::address_v4::loopback(), 0));
-   const auto closed_port = closed_listener.local_endpoint().port();
-   boost::system::error_code close_error;
-   closed_listener.close(close_error);
+   const auto refused_port = unconnectable_loopback_port();
    fc::temp_directory temp;
    const auto output = temp.path() / "fresh-connect-failure.bin";
    fc::http_client client;
    auto options = download_options(exact_body_bytes);
    options.retry_failed_reused_connection = true;
 
-   BOOST_CHECK_EXCEPTION(client.post_to_file(fc::url("http://127.0.0.1:" + std::to_string(closed_port) + "/download"),
+   BOOST_CHECK_EXCEPTION(client.post_to_file(fc::url("http://127.0.0.1:" + std::to_string(refused_port) + "/download"),
                                              fc::variant(fc::mutable_variant_object()), output, options),
                          fc::exception, [](const fc::exception& error) {
                             const auto detail = error.to_detail_string();
