@@ -22,6 +22,9 @@ struct proposer_policy_diff {
 };
 
 struct proposer_policy {
+   /// Maximum signing keys carried by one producer authority in a block policy.
+   static constexpr size_t max_authority_keys = 5;
+
    // Useful for light clients, not necessary for nodeos
    block_timestamp_type        proposal_time; // block when schedule was proposed
    producer_authority_schedule proposer_schedule;
@@ -63,6 +66,9 @@ struct proposer_policy {
          SYS_ASSERT(unique_producers.insert(p.producer_name).second, producer_schedule_exception,
                     "duplicate producer name {}", p.producer_name);
          std::visit([&](const auto& a) {
+            SYS_ASSERT(a.keys.size() <= max_authority_keys, producer_schedule_exception,
+                       "producer {} authority key count ({}) exceeds max ({})",
+                       p.producer_name, a.keys.size(), max_authority_keys);
             SYS_ASSERT(a.threshold > 0, producer_schedule_exception,
                        "producer {} authority threshold must be positive", p.producer_name);
             boost::container::flat_set<public_key_type> unique_keys;

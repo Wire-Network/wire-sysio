@@ -45,7 +45,9 @@ sysio.opreg::regoperator(account, OPERATOR_TYPE_PRODUCER, is_bootstrapped = fals
 ```
 
 Signed by your own account. `is_bootstrapped` must be `false`; setting it `true` requires the
-registry contract's own authority and is reserved for genesis producers.
+registry contract's own authority and is reserved for genesis producers. During chain bootstrap,
+the bootstrap process explicitly pushes those privileged `regoperator` actions as
+`sysio.opreg@active`; the registry does not create genesis rows by itself.
 
 You are now registered but not yet eligible. Your status stays `UNKNOWN` until the bond arrives.
 
@@ -57,11 +59,19 @@ Deposit on the outpost chains themselves, signed by the wallets you linked in st
 - **Solana** — the outpost program's `deposit` instruction
 
 Each deposit travels to WIRE over the cross-chain protocol and credits your balance in
-`sysio.opreg`. When every required chain is at or above its minimum, your operator status flips to
-`ACTIVE` on its own and your rank score is computed from the bond you posted.
+`sysio.opreg`.
 
-You can top up at any time. Every balance change rescores you, so additional collateral raises your
-rank as soon as it lands.
+If the configured requirements include the native WIRE pair, separately call
+`sysio.opreg::deposit(account, amount)` on WIRE, signed by your WIRE account. This native action
+requires an existing non-bootstrapped operator row, transfers WIRE inline, and credits only the
+WIRE-chain pair; it does not replace the Ethereum or Solana outpost deposits.
+
+When every required chain is at or above its minimum, your operator status flips to `ACTIVE` on
+its own. No producer rank exists yet: the first score is written only after the producer row and
+active finalizer key are created in steps 4 and 5.
+
+You can top up at any time. Once your producer row exists, every balance change rescores it, so
+additional collateral raises your rank as soon as it lands.
 
 ## Step 4 — Register your block-signing key
 
@@ -72,6 +82,18 @@ sysio.system::regproducer(producer, producer_key, url, location)
 Use `regproducer2` instead if you want a multi-key block-signing authority rather than a single
 key. The `url` is where you publish information about your operation, and `location` is an
 advisory number used for peer topology.
+
+Creating a producer row, or reactivating one parked with `unregprod`, succeeds only after
+`sysio.opreg` reports your account as an `ACTIVE` producer that meets the live minimums. Calling
+`regproducer` or `regproducer2` before admission cannot create or reactivate the row. Genesis
+producers are the explicit collateral exception because the bootstrap process registers their
+operator rows as bootstrapped and `ACTIVE`.
+
+An already-active producer row may still update its URL, location, or signing authority if a later
+minimum increase puts its bond below the new bar. That update allocates no new producer row and
+does not restore schedule eligibility: the live collateral check still keeps its rank demoted until
+the bond is topped up. A multi-key authority is limited to five keys so one block cannot force
+unbounded signature verification.
 
 ## Step 5 — Register a finalizer key
 
@@ -88,7 +110,9 @@ sys-util bls create key --to-console
 Two rules matter here. The key must be **globally unique**, so you cannot reuse another producer's
 key or share one across accounts you control. And the first key you register is activated
 automatically; if you later register additional keys, `actfinkey` chooses which one is active and
-`delfinkey` removes one.
+`delfinkey` removes one. At most five keys may be retained at once; deleting an inactive key frees
+a slot for the next rotation. These bounded rows are billed to `sysio`, so the producer account
+does not need RAM merely to register or rotate finalizer keys.
 
 A producer without an active finalizer key can never be scheduled, because it could not take part
 in finality.
@@ -179,7 +203,8 @@ separate slice of the pool, decaying linearly with position, so the network keep
 Blocks you have produced are not forfeited. If you are not payable when a payout runs — parked,
 demoted, or temporarily under-collateralized — your block count is held rather than cleared, and it
 is paid at the first payout after you are payable again. Unregistering right after producing and
-re-registering before your next round costs you nothing.
+re-registering before your next round costs you nothing provided you still meet the admission
+requirements; if governance raised a collateral minimum while you were parked, top up first.
 
 The one bound worth stating: a payout walks the ranking from the top and stops after a fixed number
 of rows, far below which no producer is paid anything anyway. Settling held blocks therefore
@@ -214,7 +239,9 @@ There are two ways back, and which one applies depends on whether you still hold
 2. **Call `regproducer` again.** This is the way back *once the schedule has actually dropped you*,
    and it is refused as a pardon while you are still in it. Off the schedule there are no rounds
    left to serve, so this clears the streak along with the demotion; re-supplying your signing key
-   is what makes it a statement of readiness. There is no cooldown and no waiting period.
+   is what makes it a statement of readiness. There is no cooldown and no waiting period. If the
+   producer row was parked, reactivation also rechecks operator status and the live collateral
+   minimum, so top up before calling it when the bar has moved.
 
 The schedule check is what keeps the second door honest. `regproducer` costs nothing but a
 signature and can be repeated, so if a scheduled producer could call it to erase a demotion, an
@@ -235,7 +262,8 @@ under it. It is not applied only to rounds missed from that point on.
 
 - **Park** with `unregprod`. Your bond is untouched and your operator status stays `ACTIVE`; you
   simply hold no schedule position. `regproducer` brings you back at the position your collateral
-  earns.
+  earns after rechecking current admission; a minimum raised while you were parked requires a
+  top-up first.
 - **Withdraw** from the chain that holds the bond. An outpost bond is released through that
   outpost's own withdrawal entry point, the counterpart of the deposit you made in step 3, which
   travels to WIRE and settles against your registry balance. `sysio.opreg::withdraw` is **not**

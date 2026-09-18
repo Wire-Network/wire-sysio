@@ -28,6 +28,7 @@ namespace {
 using tcp = boost::asio::ip::tcp;
 
 constexpr size_t OVERSIZED_RESPONSE_BODY_BYTES = 2 * 1024 * 1024;
+constexpr std::string_view SERVICE_UNAVAILABLE_STATUS_LINE = "503 Service Unavailable";
 
 /**
  * HTTP endpoint that reads one request and deliberately withholds the response.
@@ -108,10 +109,11 @@ public:
    /**
     * Start listening on a loopback port and launch the response worker.
     */
-   explicit fixed_response_http_server(std::string response_body)
+   explicit fixed_response_http_server(std::string response_body, std::string status_line = "200 OK")
       : _acceptor(_io, tcp::endpoint(boost::asio::ip::make_address("127.0.0.1"), 0))
       , _port(_acceptor.local_endpoint().port())
       , _response_body(std::move(response_body))
+      , _status_line(std::move(status_line))
       , _worker([this] { serve(); }) {}
 
    fixed_response_http_server(const fixed_response_http_server&) = delete;
@@ -163,7 +165,7 @@ private:
       }
 
       std::ostringstream response;
-      response << "HTTP/1.1 200 OK\r\n"
+      response << "HTTP/1.1 " << _status_line << "\r\n"
                << "Content-Type: application/json\r\n"
                << "Content-Length: " << _response_body.size() << "\r\n"
                << "Connection: close\r\n\r\n"
@@ -177,6 +179,7 @@ private:
    tcp::acceptor _acceptor;
    uint16_t _port;
    std::string _response_body;
+   std::string _status_line;
    std::thread _worker;
 };
 
@@ -301,6 +304,8 @@ struct continuation_json_rpc_response {
    kind response_kind = kind::result;
    fc::variant payload;
    std::optional<int64_t> response_id;
+   /// Emit a literal null id, as JSON-RPC 2.0 requires when the request id could not be read.
+   bool null_response_id = false;
    bool keep_alive = true;
 
    /** Return a successful JSON-RPC result. */
@@ -390,7 +395,9 @@ private:
          return response.payload.as_string();
 
       fc::mutable_variant_object envelope;
-      envelope("jsonrpc", "2.0")("id", response.response_id ? fc::variant(*response.response_id) : request["id"]);
+      envelope("jsonrpc", "2.0")("id", response.null_response_id ? fc::variant()
+                                       : response.response_id    ? fc::variant(*response.response_id)
+                                                                 : request["id"]);
       if (response.response_kind == continuation_json_rpc_response::kind::result)
          envelope("result", response.payload);
       else
@@ -562,6 +569,55 @@ BOOST_AUTO_TEST_CASE(call_reports_a_json_rpc_error_envelope) {
    BOOST_CHECK_THROW(client.call("wire_missing_probe"), fc::network::json_rpc::json_rpc_error);
 }
 
+/// A spec-compliant error response with a null id still decodes as a JSON-RPC error.
+///
+/// JSON-RPC 2.0 requires id to be null when the server could not determine the request's id,
+/// as on a parse error. Rejecting that on the id check first would throw a plain fc::exception
+/// and bypass every `catch (const json_rpc_error&)` the outpost clients rely on.
+BOOST_AUTO_TEST_CASE(call_reports_an_error_envelope_carrying_a_null_id) {
+   fc::mutable_variant_object failure;
+   failure("code", -32700)("message", "Parse error");
+   auto response = continuation_json_rpc_response::error(fc::variant(std::move(failure)));
+   response.response_id = std::nullopt;
+   response.null_response_id = true;
+   continuation_json_rpc_server server({std::move(response)});
+   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
+
+   BOOST_CHECK_THROW(client.call("wire_parse_error_probe"), fc::network::json_rpc::json_rpc_error);
+}
+
+/// A null id is tolerated only alongside an error, never on a result.
+///
+/// The spec allows a null id precisely because the server could not work out which request it
+/// was answering — which it can only fail to do while reporting an error. A result carries no
+/// such excuse, and accepting one would correlate an answer to a request nobody can identify.
+BOOST_AUTO_TEST_CASE(call_rejects_a_null_id_on_a_result) {
+   continuation_json_rpc_server server({
+      continuation_json_rpc_response::raw(R"({"jsonrpc":"2.0","id":null,"result":"unattributable"})"),
+   });
+   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
+
+   BOOST_CHECK_EXCEPTION(client.call("wire_null_id_result_probe"), fc::exception, [](const fc::exception& error) {
+      return error.to_detail_string().find("invalid 'id' type") != std::string::npos;
+   });
+}
+
+/// An error response still has to be correlated when it carries an id at all.
+///
+/// Only a null id skips the match. An error naming some other request is a reply to that
+/// request, and reporting it as this call's failure would attribute it to the wrong caller.
+BOOST_AUTO_TEST_CASE(call_rejects_a_mismatched_response_id_on_an_error) {
+   continuation_json_rpc_server server({
+      continuation_json_rpc_response::raw(
+         R"({"jsonrpc":"2.0","id":9001,"error":{"code":-32000,"message":"someone else's failure"}})"),
+   });
+   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
+
+   BOOST_CHECK_EXCEPTION(client.call("wire_error_id_probe"), fc::exception, [](const fc::exception& error) {
+      return error.to_detail_string().find("does not match request") != std::string::npos;
+   });
+}
+
 /// A response whose id does not match the request is rejected instead of returned.
 BOOST_AUTO_TEST_CASE(call_rejects_a_mismatched_response_id) {
    auto mismatched = continuation_json_rpc_response::result("wrong-id");
@@ -586,6 +642,86 @@ BOOST_AUTO_TEST_CASE(call_rejects_a_non_2_0_envelope) {
    BOOST_CHECK_EXCEPTION(client.call("wire_envelope_probe"), fc::exception, [](const fc::exception& error) {
       return error.to_detail_string().find("'jsonrpc'") != std::string::npos;
    });
+}
+
+/// A batch-style array reply is rejected before any of its members is read as this call's result.
+BOOST_AUTO_TEST_CASE(call_rejects_a_non_object_response) {
+   continuation_json_rpc_server server({
+      continuation_json_rpc_response::raw(R"([{"jsonrpc":"2.0","id":1,"result":"batched"}])"),
+   });
+   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
+
+   BOOST_CHECK_EXCEPTION(client.call("wire_batch_probe"), fc::exception, [](const fc::exception& error) {
+      return error.to_detail_string().find("response must be an object") != std::string::npos;
+   });
+}
+
+/// A reply with no id is rejected rather than matched to the only outstanding request.
+BOOST_AUTO_TEST_CASE(call_rejects_a_response_without_an_id) {
+   continuation_json_rpc_server server({
+      continuation_json_rpc_response::raw(R"({"jsonrpc":"2.0","result":"unaddressed"})"),
+   });
+   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
+
+   BOOST_CHECK_EXCEPTION(client.call("wire_missing_id_probe"), fc::exception, [](const fc::exception& error) {
+      return error.to_detail_string().find("missing 'id'") != std::string::npos;
+   });
+}
+
+/// A non-integer id is rejected rather than coerced, so a stringly-typed id cannot pass the match.
+BOOST_AUTO_TEST_CASE(call_rejects_a_non_integer_response_id) {
+   continuation_json_rpc_server server({
+      continuation_json_rpc_response::raw(R"({"jsonrpc":"2.0","id":"1","result":"stringly-typed"})"),
+   });
+   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
+
+   BOOST_CHECK_EXCEPTION(client.call("wire_id_type_probe"), fc::exception, [](const fc::exception& error) {
+      return error.to_detail_string().find("invalid 'id' type") != std::string::npos;
+   });
+}
+
+/// A reply carrying neither result nor error is rejected instead of returning a null result.
+BOOST_AUTO_TEST_CASE(call_rejects_a_response_without_result_or_error) {
+   continuation_json_rpc_server server({
+      continuation_json_rpc_response::raw(R"({"jsonrpc":"2.0","id":1})"),
+   });
+   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
+
+   BOOST_CHECK_EXCEPTION(client.call("wire_empty_envelope_probe"), fc::exception, [](const fc::exception& error) {
+      return error.to_detail_string().find("missing 'result'") != std::string::npos;
+   });
+}
+
+/// A 200 response with no body is rejected before JSON parsing turns it into a parse diagnostic.
+BOOST_AUTO_TEST_CASE(call_rejects_an_empty_http_body) {
+   continuation_json_rpc_server server({continuation_json_rpc_response::raw("")});
+   fc::network::json_rpc::json_rpc_client client(fc::url(server.url()));
+
+   BOOST_CHECK_EXCEPTION(client.call("wire_empty_body_probe"), fc::exception, [](const fc::exception& error) {
+      return error.to_detail_string().find("Empty HTTP body") != std::string::npos;
+   });
+}
+
+/// A non-200 reply fails on its HTTP status even when its body is a well-formed result envelope.
+BOOST_AUTO_TEST_CASE(call_rejects_a_non_ok_http_status) {
+   fixed_response_http_server server(R"({"jsonrpc":"2.0","id":1,"result":"served-anyway"})",
+                                     std::string(SERVICE_UNAVAILABLE_STATUS_LINE));
+   fc::network::json_rpc::json_rpc_client client(fc::url("http://127.0.0.1:" + std::to_string(server.port())));
+
+   BOOST_CHECK_EXCEPTION(client.call("wire_status_probe"), fc::exception, [](const fc::exception& error) {
+      return error.to_detail_string().find("JSON-RPC request failed with HTTP status 503") != std::string::npos;
+   });
+}
+
+/// The raw HTTP helper enforces the same 200-only contract as a JSON-RPC call.
+BOOST_AUTO_TEST_CASE(send_http_rejects_a_non_ok_http_status) {
+   fixed_response_http_server server("service unavailable", std::string(SERVICE_UNAVAILABLE_STATUS_LINE));
+   fc::network::json_rpc::json_rpc_client client(fc::url("http://127.0.0.1:" + std::to_string(server.port())));
+
+   BOOST_CHECK_EXCEPTION(
+      client.send_http(fc::network::json_rpc::http_verb::GET, "/"), fc::exception, [](const fc::exception& error) {
+         return error.to_detail_string().find("HTTP request failed with HTTP status 503") != std::string::npos;
+      });
 }
 
 /// URL parsing preserves bracketed IPv6 identity, credentials, path, query, and port.

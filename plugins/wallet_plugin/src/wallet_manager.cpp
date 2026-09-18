@@ -4,6 +4,7 @@
 #include <sysio/chain/exceptions.hpp>
 #include <boost/algorithm/string.hpp>
 #include <fc/io/json.hpp>
+#include <fc/log/logger.hpp>
 
 namespace sysio {
 namespace wallet {
@@ -342,11 +343,13 @@ void wallet_manager::start_lock_watch(std::shared_ptr<boost::asio::steady_timer>
    {
       std::error_code ec;
       auto rc = std::filesystem::status(lock_path, ec);
-      if(!ec) {
-         if(rc.type() == std::filesystem::file_type::not_found) {
-            appbase::app().quit();
-            SYS_THROW(wallet_exception, "Lock file removed while kiod still running.  Terminating.");
-         }
+      // status() reports a missing file through ec as well as through the not_found type.
+      if(ec && rc.type() == std::filesystem::file_type::not_found) {
+         // Quit through the normal shutdown path; throwing out of this handler would skip plugin shutdown. The watch is
+         // not re-armed.
+         elog("Lock file {} removed while kiod still running. Terminating.", lock_path.string());
+         appbase::app().quit();
+         return;
       }
       t->expires_after(std::chrono::seconds(1));
       start_lock_watch(t);

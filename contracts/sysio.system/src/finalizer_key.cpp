@@ -160,6 +160,11 @@ namespace sysiosystem {
       auto prod_key = producer_key_t{finalizer_name.value};
       check( _producers.contains(prod_key), "finalizer " + finalizer_name.to_string() + " is not a registered producer");
 
+      const auto fin_key = finalizer_key_t{finalizer_name.value};
+      const auto finalizer = _finalizers.try_get(fin_key);
+      check( !finalizer || finalizer->finalizer_key_count < max_finalizer_keys,
+             "finalizer cannot register more than 5 keys" );
+
       // Basic signature format check
       check(proof_of_possession.compare(0, 7, "SIG_BLS") == 0, "proof of possession signature does not start with SIG_BLS: " + proof_of_possession);
 
@@ -187,7 +192,7 @@ namespace sysiosystem {
       // Insert the finalizer key into finalizer_keys table
       auto new_key_id = get_next_finalizer_key_id();
       std::vector<char> key_binary{ fin_key_g1.begin(), fin_key_g1.end() };
-      _finalizer_keys.emplace( finalizer_name, finkey_key_t{new_key_id}, finalizer_key_info{
+      _finalizer_keys.emplace( get_self(), finkey_key_t{new_key_id}, finalizer_key_info{
          .id                   = new_key_id,
          .finalizer_name       = finalizer_name,
          .finalizer_key        = finalizer_key,
@@ -195,11 +200,10 @@ namespace sysiosystem {
       });
 
       // Update finalizers table
-      auto fin_key = finalizer_key_t{finalizer_name.value};
       if( !_finalizers.contains(fin_key) ) {
          // This is the first time the finalizer registering a finalizer key,
          // mark the key active
-         _finalizers.emplace( finalizer_name, fin_key, finalizer_info{
+         _finalizers.emplace( get_self(), fin_key, finalizer_info{
             .finalizer_name       = finalizer_name,
             .active_key_id        = new_key_id,
             .active_key_binary    = key_binary,

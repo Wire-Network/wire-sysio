@@ -32,6 +32,9 @@ BOOST_AUTO_TEST_CASE(test_parse_rate_limit) {
       , "0.0.0.0"
       , "0.0.0.0:"
       , "0.0.0.0::"
+      , "0.0.0.0:9877:640"
+      , "0.0.0.0:9877:trx:640"
+      , "0.0.0.0:9877:640B/s"
    };
    size_t which = 0;
    auto [listen_addr, block_sync_rate_limit] = sysio::net_utils::parse_listen_address(p2p_addresses.at(which++));
@@ -121,6 +124,16 @@ BOOST_AUTO_TEST_CASE(test_parse_rate_limit) {
    BOOST_CHECK_EXCEPTION(sysio::net_utils::parse_listen_address(p2p_addresses.at(which++)), sysio::chain::plugin_config_exception,
                          [](const sysio::chain::plugin_config_exception& e)
                          {return std::strstr(e.top_message().c_str(), "host or port missing");});
+   // A rate cap without a unit is bytes per second, the same as `B/s`.
+   std::tie(listen_addr, block_sync_rate_limit) = sysio::net_utils::parse_listen_address(p2p_addresses.at(which++));
+   BOOST_CHECK_EQUAL(listen_addr, "0.0.0.0:9877");
+   BOOST_CHECK_EQUAL(block_sync_rate_limit, 640u);
+   std::tie(listen_addr, block_sync_rate_limit) = sysio::net_utils::parse_listen_address(p2p_addresses.at(which++));
+   BOOST_CHECK_EQUAL(listen_addr, "0.0.0.0:9877");
+   BOOST_CHECK_EQUAL(block_sync_rate_limit, 640u);
+   std::tie(listen_addr, block_sync_rate_limit) = sysio::net_utils::parse_listen_address(p2p_addresses.at(which++));
+   BOOST_CHECK_EQUAL(listen_addr, "0.0.0.0:9877");
+   BOOST_CHECK_EQUAL(block_sync_rate_limit, 640u);
 }
 
 BOOST_AUTO_TEST_CASE(test_split_host_port_type) {
@@ -271,5 +284,38 @@ BOOST_AUTO_TEST_CASE(test_split_host_port_type) {
    std::tie(host, port, type) = sysio::net_utils::split_host_port_type(p2p_addresses.at(which++));
    BOOST_CHECK_EQUAL(host, "");
    BOOST_CHECK_EQUAL(port, "");
+   BOOST_CHECK_EQUAL(type, "");
+}
+
+BOOST_AUTO_TEST_CASE(test_is_unspecified_host) {
+   BOOST_CHECK(sysio::net_utils::is_unspecified_host(""));
+   BOOST_CHECK(sysio::net_utils::is_unspecified_host("0.0.0.0"));
+   BOOST_CHECK(sysio::net_utils::is_unspecified_host("::"));
+   BOOST_CHECK(sysio::net_utils::is_unspecified_host("0:0:0:0:0:0:0:0"));
+   BOOST_CHECK(!sysio::net_utils::is_unspecified_host("127.0.0.1"));
+   BOOST_CHECK(!sysio::net_utils::is_unspecified_host("::1"));
+   BOOST_CHECK(!sysio::net_utils::is_unspecified_host("localhost"));
+   BOOST_CHECK(!sysio::net_utils::is_unspecified_host("192.168.0.1"));
+
+   // A bracketed IPv6 listen address reaches the check with its brackets already stripped.
+   const auto [host, port, type] = sysio::net_utils::split_host_port_type("[::]:9876:trx");
+   BOOST_CHECK_EQUAL(host, "::");
+   BOOST_CHECK(sysio::net_utils::is_unspecified_host(host));
+}
+
+// A single-colon address carries no `:trx|:blk` or `:<rate>` section, so everything after the port digits is trailing
+// prose (net_plugin appends ` - <peer id>` when it logs an address) and must not be read as either.
+BOOST_AUTO_TEST_CASE(test_single_colon_trailing_text) {
+   auto [host, port, type] = sysio::net_utils::split_host_port_type("0.0.0.0:9876 - 84c470d");
+   BOOST_CHECK_EQUAL(host, "0.0.0.0");
+   BOOST_CHECK_EQUAL(port, "9876");
+   BOOST_CHECK_EQUAL(type, "");
+
+   auto [addr, rate] = sysio::net_utils::parse_listen_address("0.0.0.0:9876 - 84c470d");
+   BOOST_CHECK_EQUAL(addr, "0.0.0.0:9876");
+   BOOST_CHECK_EQUAL(rate, 0u);
+
+   // A type glued to the port without its colon is not the documented syntax.
+   std::tie(host, port, type) = sysio::net_utils::split_host_port_type("0.0.0.0:9876trx");
    BOOST_CHECK_EQUAL(type, "");
 }
