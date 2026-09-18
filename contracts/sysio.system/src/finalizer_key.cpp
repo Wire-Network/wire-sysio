@@ -46,6 +46,30 @@ namespace sysiosystem {
          return sysio::bls_g1_add( key, sysio::bls_g1{}, sum ) == 0;
       }
 
+      constexpr auto subgroup_key_error = "finalizer key is not in the r-order subgroup";
+
+      /// Order of the G1 subgroup, little-endian, as bls_g1_weighted_sum reads its scalars.
+      constexpr sysio::bls_scalar g1_subgroup_order = {
+         '\x01', '\x00', '\x00', '\x00', '\xff', '\xff', '\xff', '\xff',
+         '\xfe', '\x5b', '\xfe', '\xff', '\x02', '\xa4', '\xbd', '\x53',
+         '\x05', '\xd8', '\xa1', '\x09', '\x08', '\xd8', '\x39', '\x33',
+         '\x48', '\x7d', '\x9d', '\x29', '\x53', '\xa7', '\xed', '\x73'
+      };
+
+      // Whether `key` lies in the r-order subgroup, tested as [r]P == identity.
+      //
+      // Being on the curve is not enough. A small-order point such as affine (0, 2) -- on the
+      // curve, canonical, and not the identity -- pairs to one against any G2 point, because its
+      // order is coprime to r. bls_pop_verify therefore accepts it with an identity proof, and it
+      // would carry finality weight that anyone could cast, exactly as the identity key would.
+      bool is_in_g1_subgroup( const sysio::bls_g1& key ) {
+         const sysio::bls_g1     points[1]  = { key };
+         const sysio::bls_scalar scalars[1] = { g1_subgroup_order };
+         sysio::bls_g1 product{};
+         if( sysio::bls_g1_weighted_sum( points, scalars, 1, product ) != 0 ) return false;
+         return product == sysio::bls_g1{};
+      }
+
    } // namespace
 
    // Returns hash of finalizer_key in binary format
@@ -180,6 +204,7 @@ namespace sysiosystem {
       // check can still be removed.
       check( !is_identity_g1(fin_key_g1), identity_key_error );
       check( is_valid_g1(fin_key_g1), invalid_key_error );
+      check( is_in_g1_subgroup(fin_key_g1), subgroup_key_error );
 
       // Duplication check across all registered keys
       const auto idx = _finalizer_keys.get_index<"byfinkey"_n>();

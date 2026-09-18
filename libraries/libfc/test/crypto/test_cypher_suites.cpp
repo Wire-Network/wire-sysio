@@ -498,6 +498,21 @@ BOOST_AUTO_TEST_CASE(test_bls_absent_payload_is_rejected) try {
    BOOST_CHECK_EQUAL(real.to_string({}), round_tripped.to_string({}));
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(test_bls_small_order_point_is_rejected) try {
+   // Affine (0, 2): y^2 = 4 = x^3 + 4, so it is canonical and on the curve, and it is not the
+   // identity. Its order is 3 -- the tangent at (0, y) has slope 3x^2/2y = 0, so 2P = -P and
+   // 3P = O -- and 3 is coprime to r, so e(P, Q) = 1 for every G2 point Q. A proof of possession
+   // therefore cannot reject it, and it would carry finality weight anyone could cast. Only a
+   // subgroup test catches it.
+   fc::crypto::bls::public_key_data small_order{};
+   small_order[48] = 2;   // x = 0, y = 2, affine little-endian
+
+   BOOST_CHECK_EXCEPTION(fc::crypto::bls::public_key{small_order}, fc::exception,
+                         [](const fc::exception& e) {
+                            return e.top_message().find("r-order subgroup") != std::string::npos;
+                         });
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(test_sign_eth_recovery_roundtrip) try {
    auto key = fc::crypto::private_key::generate(private_key::key_type::em);
    auto pub = key.get_public_key();

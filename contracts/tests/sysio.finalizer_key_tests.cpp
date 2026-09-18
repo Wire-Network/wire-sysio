@@ -741,6 +741,15 @@ BOOST_FIXTURE_TEST_CASE(reject_identity_finalizer_key, finalizer_key_tester) try
    BOOST_REQUIRE_EQUAL( wasm_assert_msg("finalizer key is not a valid G1 point"),
                         register_finalizer_key(alice, fc::crypto::bls::public_key::to_string(off_curve), identity_pop) );
 
+   // Affine (0, 2) is canonical, on the curve, and not the identity, but its order is 3. That is
+   // coprime to r, so it pairs to one against any G2 point and the proof of possession above
+   // accepts it -- only a subgroup test rejects it.
+   fc::crypto::bls::public_key_data small_order{};
+   small_order[48] = 2;
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("finalizer key is not in the r-order subgroup"),
+                        register_finalizer_key(alice, fc::crypto::bls::public_key::to_string(small_order),
+                                               identity_pop) );
+
    // An honest key is unaffected.
    BOOST_REQUIRE_EQUAL( success(), register_finalizer_key(alice, key_pairs[0].pub_key, key_pairs[0].pop) );
 } FC_LOG_AND_RETHROW()
