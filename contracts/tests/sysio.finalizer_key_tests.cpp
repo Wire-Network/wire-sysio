@@ -2,6 +2,8 @@
 #include "finalizer_test_keys.hpp"
 
 #include <sysio/chain/kv_table_objects.hpp>
+#include <fc/crypto/bls_public_key.hpp>
+#include <fc/crypto/bls_signature.hpp>
 #include <sysio/opp/opp.hpp>
 #include <boost/test/unit_test.hpp>
 
@@ -669,5 +671,29 @@ BOOST_FIXTURE_TEST_CASE(verify_controller_schedule_and_policy_test, finalizer_ke
    }
 }
 FC_LOG_AND_RETHROW()
+
+
+// A finalizer key that no proof of possession can screen out: the pairing bls_pop_verify computes
+// is e(-g1, sig) * e(pk, H(pk)), and both terms are 1 when the points are the identity.
+BOOST_FIXTURE_TEST_CASE(reject_identity_finalizer_key, finalizer_key_tester) try {
+   add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+   BOOST_REQUIRE_EQUAL( success(), regproducer(alice) );
+
+   const std::string identity_key = fc::crypto::bls::public_key::to_string(fc::crypto::bls::public_key_data{});
+   const std::string identity_pop = fc::crypto::bls::signature::to_string(fc::crypto::bls::signature_data{});
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("finalizer key must not be the identity point"),
+                        register_finalizer_key(alice, identity_key, identity_pop) );
+
+   // Bytes with a valid encoding that are not a point on the curve. set_finalizers raises while
+   // deserializing one, before the policy is even validated.
+   fc::crypto::bls::public_key_data off_curve;
+   off_curve.fill(0xff);
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("finalizer key is not a valid G1 point"),
+                        register_finalizer_key(alice, fc::crypto::bls::public_key::to_string(off_curve), identity_pop) );
+
+   // An honest key is unaffected.
+   BOOST_REQUIRE_EQUAL( success(), register_finalizer_key(alice, key_pairs[0].pub_key, key_pairs[0].pop) );
+} FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()
