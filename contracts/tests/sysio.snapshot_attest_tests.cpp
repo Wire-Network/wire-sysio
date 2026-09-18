@@ -72,20 +72,18 @@ public:
 
       produce_blocks();
 
-      // Register producers
+      // Snapshot-provider eligibility is POSITION among schedulable producers, not a stored rank
+      // governance hands out. A producer is schedulable only as an ACTIVE PRODUCER operator in
+      // sysio.opreg carrying an active finalizer key. The ACTIVE operator row must now exist before
+      // regproducer is admitted, so install the bootstrapped fixture operators first.
+      deploy_opreg_once();
+      register_producer_operators(std::vector<name>(producers.begin(), producers.end()));
       for (const auto& p : producers) {
          regproducer(p);
       }
       produce_blocks();
-
-      // Snapshot-provider eligibility is POSITION among schedulable producers, not a stored rank
-      // governance hands out. A producer is schedulable only as an ACTIVE PRODUCER operator in
-      // sysio.opreg carrying an active finalizer key, so the fixture must supply both. With equal
-      // scores the index orders by account name, so producer1..producer5 take positions 1..5 --
-      // all inside max_snap_provider_rank.
-      deploy_opreg_once();
-      register_producer_operators(std::vector<name>(producers.begin(), producers.end()));
-      produce_blocks();
+      // With equal scores the index orders by account name, so producer1..producer5 take positions
+      // 1..5 -- all inside max_snap_provider_rank.
       // Reach the attestation cadence BEFORE registering finalizer keys, i.e. while no producer
       // is schedulable yet. Ordering is the whole point: once they are, `update_ranked_producers`
       // publishes a policy of ALL of them, and the node then signs and verifies one vote per

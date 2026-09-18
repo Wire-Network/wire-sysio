@@ -18,6 +18,10 @@
 
 namespace sysiosystem {
 
+   namespace {
+      constexpr size_t max_producer_authority_keys = 5;
+   }
+
    using sysio::const_mem_fun;
    using sysio::current_time_point;
    using sysio::microseconds;
@@ -25,15 +29,39 @@ namespace sysiosystem {
    void system_contract::register_producer( const name& producer, const sysio::block_signing_authority& producer_authority, const std::string& url, uint16_t location ) {
       const auto ct = current_time_point();
 
+      const auto key = producer_key_t{producer.value};
+      const bool needs_admission = !_producers.contains(key) || !_producers.get(key).active();
+      if (needs_admission) {
+         const auto op = find_active_operator(
+            producer, sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER);
+         bool admitted = false;
+         if (op) {
+            sysio::opreg::opconfig_t cfg_tbl(opreg_refs::account);
+            const auto cfg = cfg_tbl.get_or_default(sysio::opreg::op_config{});
+            const auto collateral_ratio = producer_rank::collateral_factor(*op, cfg);
+            admitted = producer_rank::meets_live_producer_minimum(*op, collateral_ratio);
+         }
+         check( admitted, "producer operator is not eligible for admission" );
+      }
+
       sysio::public_key producer_key{};
 
       std::visit( [&](auto&& auth ) {
+         check( auth.keys.size() <= max_producer_authority_keys,
+                "producer authority cannot contain more than 5 keys" );
          if( auth.keys.size() == 1 ) {
             // if the producer_authority consists of a single key, use that key in the legacy producer_key field
             producer_key = auth.keys[0].key;
          }
          for (const auto& kw : auth.keys) {
             check( kw.key.index() < 2, "Only K1 & R1 keys allowed" );
+            const auto& key_bytes = kw.key.index() == 0
+               ? std::get<0>(kw.key)
+               : std::get<1>(kw.key);
+            check( std::any_of(key_bytes.begin(), key_bytes.end(), [](uint8_t byte) {
+                      return byte != 0;
+                   }),
+                   "producer authority contains an invalid key" );
          }
       }, producer_authority );
 
@@ -42,7 +70,6 @@ namespace sysiosystem {
       const bool scheduled = std::find( active_schedule.begin(), active_schedule.end(), producer )
                              != active_schedule.end();
 
-      auto key = producer_key_t{producer.value};
       _producers.upsert( get_self(), key,
          producer_info{
             .owner              = producer,
@@ -174,12 +201,12 @@ namespace sysiosystem {
       // weights would not give it -- and that is accepted: ranking is allowed to converge rather
       // than switch atomically, and it self-corrects within a few ticks as the cursor advances.
       //
-      // Deferring instead is what is NOT safe. The sweep's length scales with the table, the table
-      // is unbounded, and `regproducer` is permissionless with its RAM billed to this contract --
-      // so waiting for the sweep would let anyone hold BOTH the producer schedule and the finalizer
-      // policy frozen for as long as they kept registering, during which a slashed, terminated or
-      // demoted producer would keep its slot and its finality weight. A briefly mixed ordering is a
-      // far smaller harm than a schedule that cannot be rebuilt at all.
+      // Deferring instead is what is NOT safe. The sweep's length scales with the table, which can
+      // retain historical producer rows even though new admission is collateral-gated. Waiting for
+      // the sweep could hold BOTH the producer schedule and the finalizer policy frozen while a
+      // large roster is rescored, during which a slashed, terminated or demoted producer would keep
+      // its slot and its finality weight. A briefly mixed ordering is a far smaller harm than a
+      // schedule that cannot be rebuilt at all.
       _global.modify( get_self(), [&]( auto& g ) { g.last_producer_schedule_update = block_time; });
 
       auto idx = _producers.get_index<"prodrank"_n>();
@@ -196,9 +223,9 @@ namespace sysiosystem {
       // a slot vacated by an ineligible producer is filled by the next schedulable entry for free,
       // with no explicit backfill.
       //
-      // The walk is bounded by the demoted tier. `regproducer` is permissionless, so the table is
-      // unbounded -- but producer_rank::compute sinks every non-ACTIVE producer operator into the
-      // demoted tier, which sorts last, so the scan stops before the spam tail.
+      // The walk is bounded by the demoted tier. The table can retain historical rows, but
+      // producer_rank::compute sinks every non-ACTIVE producer operator into the demoted tier,
+      // which sorts last, so the scan stops before that tail.
       uint32_t examined = 0;
       for( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < max_producers; ++it ) {
          if( producer_rank::tier_of( it->rank_score ) == producer_tier::demoted ) break;
