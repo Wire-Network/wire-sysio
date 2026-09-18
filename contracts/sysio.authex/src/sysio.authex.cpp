@@ -1,20 +1,53 @@
 #include <cstdint>
 #include <sysio.authex/sysio.authex.hpp>
+#include <sysio.opp.common/evm_address.hpp>
 #include <sysio/print.hpp>
+#include <sysio/privileged.hpp>
 
 namespace {
 using namespace sysio;
 
 // sysio funds the RAM for every link row (system-paid) -- createlink and recordlink alike.
 constexpr name link_row_payer = "sysio"_n;
+constexpr name dclaim_account = "sysio.dclaim"_n;
+constexpr name linkswept_action = "linkswept"_n;
 
 using ed_raw_key_t = std::array<uint8_t, 32>;
+
+/**
+ * Return whether an external-chain kind is paired with its supported public-key curve.
+ *
+ * EVM links use EM keys and SVM links use ED keys. Callers decide whether an invalid pair should
+ * abort a user-authorized action or be soft-dropped on the trusted inbound path.
+ */
+[[nodiscard]] bool is_supported_chain_key_pair(const opp::types::ChainKind chain_kind,
+                                               const sysio::public_key& pub_key) {
+   using ChainKind = opp::types::ChainKind;
+   return (chain_kind == ChainKind::CHAIN_KIND_EVM && pub_key.index() == fc::crypto::key_type_em) ||
+          (chain_kind == ChainKind::CHAIN_KIND_SVM && pub_key.index() == fc::crypto::key_type_ed);
+}
 
 [[maybe_unused]] ed_raw_key_t get_ed_raw_key(const sysio::public_key& pub_key) {
    const auto& arr = std::get<4>(pub_key);
    ed_raw_key_t raw_key;
    std::copy(arr.begin(), arr.end(), raw_key.data());
    return raw_key;
+}
+
+/**
+ * Sweep rewards deposited before this external-chain identity was linked.
+ *
+ * A missing or non-privileged DClaim deployment cannot safely bill new rows to sysio. Treat either
+ * bootstrap state as "sweep unavailable": the link remains recordable and a later identical
+ * recordlink call can retry once bootstrap has completed.
+ */
+void sweep_linked_rewards(const name self, const name account,
+                          const opp::types::ChainKind chain_kind,
+                          const std::vector<char>& native_address) {
+   if (!is_account(dclaim_account) || !is_privileged(dclaim_account)) return;
+
+   action(permission_level{self, "active"_n}, dclaim_account, linkswept_action,
+          std::make_tuple(account, chain_kind, native_address)).send();
 }
 
 
@@ -33,19 +66,15 @@ namespace sysio {
 
    // ——— Chain kind validation ———
    // TODO @jglanz: SUI removed in v6; restore when SUI outpost is added.
-   check(chain_kind == ChainKind::CHAIN_KIND_EVM
-         || chain_kind == ChainKind::CHAIN_KIND_SVM,
+   check(chain_kind == ChainKind::CHAIN_KIND_EVM || chain_kind == ChainKind::CHAIN_KIND_SVM,
          "Invalid chain_kind. Supported: CHAIN_KIND_EVM(2), CHAIN_KIND_SVM(3).");
+   check(is_supported_chain_key_pair(chain_kind, pub_key), "chain_kind and pub_key must pair as EVM/EM or SVM/ED");
 
    // ——— Table & indices ———
    links_t links(get_self());
    auto by_namechain = links.get_index<"bynamechain"_n>();
    uint128_t name_chain = to_namechain_key(account, chain_kind);
    check(by_namechain.find(name_chain) == by_namechain.end(), "Account already has a link for this chain.");
-
-   auto by_pubkey = links.get_index<"bypubkey"_n>();
-   auto pub_hash = pubkey_to_checksum256(pub_key);
-   check(by_pubkey.find(pub_hash) == by_pubkey.end(), "Public key already linked to a different account.");
 
    // ——— Nonce freshness ———
    constexpr uint64_t TEN_MIN_MS = 10 * 60 * 1000;
@@ -68,9 +97,12 @@ namespace sysio {
    // Store it so downstream consumers (advance → OPERATORS attestation)
    // get the correct compressed key for ETH address derivation.
    public_key verified_pub_key = pub_key;
+   std::vector<char> native_address;
 
    // ——— Curve-specific signing & address derivation ———
    if (chain_kind == ChainKind::CHAIN_KIND_EVM) {
+      // EIP-191 domain separation is applied only by the EM recovery path.
+      check(sig.index() == fc::crypto::key_type_em, "EM link requires an EM signature");
       // 1) keccak(msg) — use the pubkey string as the contract sees it
       //    (fc/CDT may normalize the compression prefix byte)
       auto eth_hash = sysio::keccak(msg.c_str(), msg.size());
@@ -81,15 +113,22 @@ namespace sysio {
       //    x-coordinate is sufficient to verify key ownership.
       //    The recovered key (with correct prefix from libsecp256k1) is stored
       //    in the link table so downstream consumers get the real y-parity.
-      auto recovered = recover_key(eth_hash, sig);
       auto expected_raw = std::get<3>(pub_key);
-      auto recovered_raw = std::get<3>(recovered);
+      auto recovered_uncompressed = k1_recover_uncompressed(sig, eth_hash);
+      std::array<uint8_t, 33> recovered_raw{};
+      recovered_raw[0] = (static_cast<uint8_t>(recovered_uncompressed[64]) & 1) == 0 ? 0x02 : 0x03;
+      std::copy(recovered_uncompressed.begin() + 1, recovered_uncompressed.begin() + 33,
+                recovered_raw.begin() + 1);
 
       check(std::equal(expected_raw.begin() + 1, expected_raw.end(),
                        recovered_raw.begin() + 1),
             "EM key recovery failed: x-coordinate mismatch");
 
-      verified_pub_key = recovered;
+      verified_pub_key = public_key{std::in_place_index<3>, recovered_raw};
+      const auto recovered_address = opp::evm_address_from_uncompressed_key(
+         recovered_uncompressed.data(), recovered_uncompressed.size());
+      check(recovered_address.has_value(), "Recovered EVM public key must be uncompressed");
+      native_address = *recovered_address;
 
    } else if (chain_kind == ChainKind::CHAIN_KIND_SVM) {
       checksum256 hash256;
@@ -106,7 +145,14 @@ namespace sysio {
       // 3) pack into checksum256
       std::memcpy(hash256.data(), mapped, 32);
       assert_recover_key(hash256, sig, pub_key);
+      native_address = pubkey_to_bytes(verified_pub_key);
    }
+
+   // EM recovery fixes the supplied compressed key's parity. Probe the same canonical key that
+   // the row will store, or an opposite-parity spelling can evade the duplicate-key guard.
+   auto by_pubkey = links.get_index<"bypubkey"_n>();
+   auto pub_hash = pubkey_to_checksum256(verified_pub_key);
+   check(by_pubkey.find(pub_hash) == by_pubkey.end(), "Public key already linked to a different account.");
 
    // CREATE LINK RECORD — use verified_pub_key which has the real y-parity
    // prefix from recovery (for EM) rather than the potentially ambiguous input.
@@ -121,6 +167,8 @@ namespace sysio {
       .chain_kind = chain_kind,
       .pub_key = verified_pub_key,
    });
+
+   sweep_linked_rewards(get_self(), account, chain_kind, native_address);
 
    // The verified key is recorded in the links table only; it is NOT added to the
    // account's `active` (or any) permission, so the link grants no Wire signing
@@ -146,11 +194,18 @@ namespace sysio {
 
 // Trusted depot-only link insert -- the counterpart to createlink that skips signature/nonce
 // verification. The OPP NodeOwnerRegistration attestation is the proof; the chain accepts this
-// inline send because sysio.authex.active trusts the caller (sysio.roa@sysio.code). Idempotent and
-// non-throwing so the trust-OPP dispatch never aborts.
+// inline send because sysio.authex.active trusts the caller (sysio.roa@sysio.code). Unsupported
+// chain/key pairs are soft-dropped. Idempotent and non-throwing so the trust-OPP dispatch never
+// aborts when sysio.dclaim is absent or not yet privileged at bootstrap.
 [[sysio::action]] void authex::recordlink(const name& account, const opp::types::ChainKind chain_kind,
-                                          const public_key& pub_key) {
+                                          const public_key& pub_key, const bytes& native_address) {
    require_auth(get_self());
+
+   if (!is_supported_chain_key_pair(chain_kind, pub_key))
+      return;
+   const bool can_sweep = chain_kind == opp::types::ChainKind::CHAIN_KIND_EVM
+                             ? native_address.size() == opp::evm_address_size
+                             : native_address == pubkey_to_bytes(pub_key);
 
    links_t links(get_self());
    auto by_namechain = links.get_index<"bynamechain"_n>();
@@ -164,7 +219,15 @@ namespace sysio {
    // lowest-primary-key row for that key; sysio.msgch's resolve_account_from_op_address does a single
    // `bypubkey.find()` (lowest-primary-key match), so it still lands on the operator's account rather
    // than a later node-owner duplicate.
-   if (by_namechain.find(to_namechain_key(account, chain_kind)) != by_namechain.end()) return;
+   auto existing = by_namechain.find(to_namechain_key(account, chain_kind));
+   if (existing != by_namechain.end()) {
+      if (existing->pub_key == pub_key && can_sweep) {
+         // This is the last available inline depth on the OPP node-owner path:
+         // deliver -> evalcons -> nodeownreg -> recordlink -> linkswept.
+         sweep_linked_rewards(get_self(), account, chain_kind, native_address);
+      }
+      return;
+   }
 
    uint64_t next_key = 0;
    if (links.cbegin() != links.cend()) {
@@ -177,6 +240,11 @@ namespace sysio {
       .chain_kind = chain_kind,
       .pub_key = pub_key,
    });
+
+   if (can_sweep) {
+      // The OPP node-owner path spends its final inline depth on linkswept.
+      sweep_linked_rewards(get_self(), account, chain_kind, native_address);
+   }
 }
 
 

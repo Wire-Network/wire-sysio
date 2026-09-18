@@ -100,7 +100,9 @@ namespace sysio {
 
       /// Internal: sweep an `unmapped_tokens` entry into `pending_claims` when
       /// the staker / purchaser completes AuthX linking. Called inline by
-      /// `sysio.authex` after a successful link. No-op if nothing matches.
+      /// `sysio.authex` after a successful link. An already-expired unmapped
+      /// row is forfeited instead of being re-stamped with a fresh window;
+      /// its WIRE stays in the DClaim capital fund. No-op if nothing matches.
       /// Auth=sysio.authex.
       [[sysio::action]]
       void linkswept(name wire_account,
