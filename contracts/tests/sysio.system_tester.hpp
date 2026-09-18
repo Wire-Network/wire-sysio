@@ -414,6 +414,16 @@ public:
       }
       produce_block();
    }
+
+   /// Terminate an operator in sysio.opreg. Its producers row and finalizer key are untouched, so only the operator
+   /// standing `producer_rank::is_eligible_operator` requires is withdrawn. Pushed as sysio.opreg, the actor
+   /// `opreg::terminate` requires and the one `register_producer_operators` uses.
+   void terminate_operator(const name& account) {
+      base_tester::push_action("sysio.opreg"_n, "terminate"_n, "sysio.opreg"_n, mvo()
+         ("account", account)
+         ("reason", std::string("test termination")));
+      produce_block();
+   }
    bool opreg_deployed = false;
 
    vector<name> activate_producers( uint32_t count = 21 ) {

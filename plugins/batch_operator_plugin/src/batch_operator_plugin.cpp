@@ -1129,7 +1129,7 @@ void batch_operator_plugin::plugin_startup() {
            : "n/a");
    _impl->sync_gate_subscription =
       app().get_channel<chain::plugin_interface::channels::irreversible_block>().subscribe(
-         [impl = _impl.get()](const chain::block_signal_params&) {
+         [impl = _impl.get()](const chain::plugin_interface::channels::block_params&) {
             if (impl->shutting_down || !impl->chain_plug->chain().is_synced()) {
                return;
             }

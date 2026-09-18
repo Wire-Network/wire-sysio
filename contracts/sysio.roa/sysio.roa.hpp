@@ -163,7 +163,9 @@ namespace sysio {
              * - The action will create a new account utilizing a new randomly generated username with the provided `pubkey` as its authority.
              * - The registration count for the `creator` will be incremented.
              * - The sponsor mapping (creator, nonce -> username) will be recorded in the sponsors table.
-             * - The action will fail if the `creator` is not a tier-1 node owner or if the account already exists.
+             * - The action fails if ROA is inactive, the `creator` is not a tier-1 node owner, the
+             *   creator name cannot fit a generated suffix, the nonce was already used by that creator,
+             *   or no unused generated name is found within the bounded candidate search.
              *
              * ### Rights Granted
              * - The new user account is granted access to the network with the specified public key.

@@ -1,0 +1,12 @@
+{
+  "@timestamp": "${epoch_millis}",
+  "level": "${level:upper}",
+  "message": "${message}",
+  "category": "${logger}",
+  "sourceLocation": "${file}:${line} ${func}",
+  "data": "${data}",
+  "env": "local",
+  "app": "nodeop",
+  "principal": "node-a",
+  "logStream": "nodeop/node-a"
+}

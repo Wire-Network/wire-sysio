@@ -357,6 +357,16 @@
             ]
         },
         {
+            "name": "delsnapprov",
+            "base": "",
+            "fields": [
+                {
+                    "name": "producer",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "emission_config",
             "base": "",
             "fields": [
@@ -1955,6 +1965,11 @@
         {
             "name": "delfinkey",
             "type": "delfinkey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "delsnapprov",
+            "type": "delsnapprov",
             "ricardian_contract": ""
         },
         {
