@@ -7,6 +7,7 @@
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/address_v6.hpp>
 
+#include <cstdlib>
 #include <set>
 #include <string>
 #include <string_view>
@@ -39,12 +40,18 @@ namespace detail {
    };
 
    inline size_t parse_connection_rate_limit( const std::string& limit_str) {
-      std::istringstream in(limit_str);
-      double limit{0};
-      in >> limit;
+      // The number is taken with strtod rather than `istringstream >> double`. libc++ pulls a trailing hex digit into
+      // its float scan and then fails the whole extraction, so `640B/s` yields 0 there while `640KB/s` yields 640 --
+      // and a failed extraction writes 0, which is indistinguishable from "no limit configured".
+      const char* const number_begin = limit_str.c_str();
+      char*             number_end   = nullptr;
+      const double      limit        = std::strtod(number_begin, &number_end);
       SYS_ASSERT(limit >= 0.0, chain::plugin_config_exception, "block sync rate limit must not be negative: {}", limit_str);
       size_t block_sync_rate_limit = 0;
       if( limit > 0.0 ) {
+         // One whitespace-delimited token from whatever follows the number, so prose after the unit
+         // (`640KB/s - additional info`) is ignored as it was before.
+         std::istringstream in{std::string{number_end}};
          std::string units;
          in >> units;
          // A number alone is bytes per second.
@@ -114,10 +121,12 @@ namespace detail {
       string port = endpoint.substr( colon + 1, colon2 == string::npos ? string::npos : colon2 - (colon + 1));
       string remainder;
       if (colon2 == string::npos) {
+         // One colon means no `:trx|:blk` and no `:<rate>` section, so whatever trails the port digits is prose --
+         // net_plugin appends ` - <peer id>` when it logs an address. It is dropped rather than returned as the
+         // remainder, so neither the connection type nor the rate limit can be read out of it.
          auto port_end = port.find_first_not_of("0123456789");
          if (port_end != string::npos) {
             port = port.substr(0, port_end);
-            remainder = port.substr( port_end );
          }
       } else {
          remainder = endpoint.substr( colon2 + 1 );

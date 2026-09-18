@@ -302,3 +302,20 @@ BOOST_AUTO_TEST_CASE(test_is_unspecified_host) {
    BOOST_CHECK_EQUAL(host, "::");
    BOOST_CHECK(sysio::net_utils::is_unspecified_host(host));
 }
+
+// A single-colon address carries no `:trx|:blk` or `:<rate>` section, so everything after the port digits is trailing
+// prose (net_plugin appends ` - <peer id>` when it logs an address) and must not be read as either.
+BOOST_AUTO_TEST_CASE(test_single_colon_trailing_text) {
+   auto [host, port, type] = sysio::net_utils::split_host_port_type("0.0.0.0:9876 - 84c470d");
+   BOOST_CHECK_EQUAL(host, "0.0.0.0");
+   BOOST_CHECK_EQUAL(port, "9876");
+   BOOST_CHECK_EQUAL(type, "");
+
+   auto [addr, rate] = sysio::net_utils::parse_listen_address("0.0.0.0:9876 - 84c470d");
+   BOOST_CHECK_EQUAL(addr, "0.0.0.0:9876");
+   BOOST_CHECK_EQUAL(rate, 0u);
+
+   // A type glued to the port without its colon is not the documented syntax.
+   std::tie(host, port, type) = sysio::net_utils::split_host_port_type("0.0.0.0:9876trx");
+   BOOST_CHECK_EQUAL(type, "");
+}
