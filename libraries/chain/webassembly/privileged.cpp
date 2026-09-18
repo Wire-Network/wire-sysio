@@ -175,10 +175,17 @@ namespace sysio { namespace chain { namespace webassembly {
       finpol.finalizers.reserve(abi_finpol.finalizers.size());
       for (auto& f: abi_finpol.finalizers) {
          SYS_ASSERT(f.public_key.size() == 96, wasm_execution_error, "Invalid bls public key length");
-         fc::crypto::bls::public_key pk(std::span<const uint8_t,96>(f.public_key.data(), 96));
-         finpol.finalizers.push_back(chain::finalizer_authority{.description = std::move(f.description),
-                                                                .weight = f.weight,
-                                                                .public_key{pk}});
+         // bls::public_key validates the point in its constructor and raises a bare fc::exception
+         // when the bytes are not on the curve -- which lands outside the catch below. Report it
+         // the way every other input error on this path is reported.
+         try {
+            finpol.finalizers.push_back(chain::finalizer_authority{.description = std::move(f.description),
+                                                                   .weight = f.weight,
+                                                                   .public_key{fc::crypto::bls::public_key(
+                                                                      std::span<const uint8_t,96>(f.public_key.data(), 96))}});
+         } catch (const fc::exception& e) {
+            SYS_THROW(wasm_execution_error, "set_finalizers: invalid bls public key: {}", e.top_message());
+         }
       }
 
       // Structural validation is factored into finalizer_policy::validate() so the
