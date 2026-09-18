@@ -20,7 +20,6 @@
 //   - setup_producers(N) now auto-registers each producer as an opreg operator so existing
 //     producer-pay tests pass through the opreg filter without test-level churn.
 
-
 #include "contracts.hpp"
 
 // fp_math.hpp is dependency-free __int128 fixed-point math; reused here so
@@ -575,24 +574,21 @@ public:
       const account_name UWRIT = "sysio.uwrit"_n;
       deploy_reserv();
 
-      auto codename = [](std::string_view value) {
-         return mvo()("value", fc::slug_name{value}.value);
-      };
       BOOST_REQUIRE_EQUAL(success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
-         ("chain_code", codename("ETH"))("token_code", codename("ETH"))("reserve_code", codename("PRIMARY"))
+         ("chain_code", "ETH")("token_code", "ETH")("reserve_code", "PRIMARY")
          ("name", "eth")("description", "")
          ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
          ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{})));
       BOOST_REQUIRE_EQUAL(success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
-         ("chain_code", codename("SOLANA"))("token_code", codename("SOL"))("reserve_code", codename("PRIMARY"))
+         ("chain_code", "SOLANA")("token_code", "SOL")("reserve_code", "PRIMARY")
          ("name", "sol")("description", "")
          ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
          ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{})));
       BOOST_REQUIRE_EQUAL(success(), push_reserv_action(UWRIT, "applyswap"_n, mvo()
-         ("src_chain_code", codename("ETH"))("src_token_code", codename("ETH"))("src_reserve_code", codename("PRIMARY"))
+         ("src_chain_code", "ETH")("src_token_code", "ETH")("src_reserve_code", "PRIMARY")
          ("src_amount", 1'000'000'000ULL)
-         ("dst_chain_code", codename("SOLANA"))("dst_token_code", codename("SOL"))
-         ("dst_reserve_code", codename("PRIMARY"))
+         ("dst_chain_code", "SOLANA")("dst_token_code", "SOL")
+         ("dst_reserve_code", "PRIMARY")
          ("dst_amount", 100'000'000ULL)("underwriter", name{})));
 
       const int64_t balance = reserv_reward_balance();
@@ -5060,13 +5056,11 @@ BOOST_FIXTURE_TEST_CASE( expired_wire_claims_unblock_a_balance_blocked_epoch, sy
    create_t5_holding_accounts();
    deploy_reserv();
 
-   auto codename = [](std::string_view s) { return mvo()("value", fc::slug_name{s}.value); };
-
    // Move real WIRE into reserv custody so a claim has backing. regreserve is bootstrap-window
    // only, which holds here: current_epoch_index is still 0.
    constexpr uint64_t RESERVE_SEED = 1'000'000'000'000ULL;
    BOOST_REQUIRE_EQUAL( success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
-      ("chain_code", codename("ETH"))("token_code", codename("ETH"))("reserve_code", codename("PRIMARY"))
+      ("chain_code", "ETH")("token_code", "ETH")("reserve_code", "PRIMARY")
       ("name", "eth")("description", "")
       ("initial_chain_amount", RESERVE_SEED)("initial_wire_amount", RESERVE_SEED)
       ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{}) ) );
@@ -5970,18 +5964,13 @@ struct producer_score_tester : public producer_eligibility_tester {
    /// The tier packed into a `rank_score`, mirroring `producer_rank::tier_of`.
    static uint64_t tier_of(uint64_t rank_score) { return rank_score >> composite_bits; }
 
-   /// A `slug_name` in the shape the ABI serializes it: a single `value` field.
-   static fc::mutable_variant_object slug_mvo(std::string_view code) {
-      return mvo()("value", fc::slug_name{code}.value);
-   }
-
    /// One `(chain, token, min_bond)` entry for opreg's `req_*_collat` vectors. The
    /// `config_timestamp_ms` supplied here is ignored -- `setconfig` overwrites it with on-chain
    /// time so consumers never trust the caller's clock.
    static fc::variant min_bond_mvo(std::string_view chain, std::string_view token, uint64_t min_bond) {
       return fc::variant(mvo()
-         ("chain_code",          slug_mvo(chain))
-         ("token_code",          slug_mvo(token))
+         ("chain_code",          chain)
+         ("token_code",          token)
          ("min_bond",            min_bond)
          ("config_timestamp_ms", uint64_t{0}));
    }
@@ -6022,8 +6011,8 @@ struct producer_score_tester : public producer_eligibility_tester {
                                    std::string_view token = collateral_token) {
       return push_opreg_action(OPREG, "depositinle"_n, mvo()
          ("account",             account)
-         ("chain_code",          slug_mvo(chain))
-         ("token_code",          slug_mvo(token))
+         ("chain_code",          chain)
+         ("token_code",          token)
          ("amount",              amount)
          ("actor_chain",         ChainKind::CHAIN_KIND_EVM)
          ("actor_address",       std::vector<char>(20, '\x06'))

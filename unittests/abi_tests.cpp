@@ -682,6 +682,87 @@ BOOST_AUTO_TEST_CASE(optional_vector)
 
 
 
+BOOST_AUTO_TEST_CASE(slug_name_builtin_type)
+{ try {
+   // Guards the `slug_name` entry in configure_built_in_types(). Without it the
+   // spelling resolves as neither builtin nor struct and set_abi's validate()
+   // throws invalid_type_inside_abi; with a same-named ABI struct present it
+   // would instead serialize as {"value":N}. The converted table-read sweep in
+   // contracts/tests cannot catch either case, because fc::slug_name's
+   // from_variant accepts the string, the integer AND the object form, so those
+   // reads pass identically whether or not this registration exists.
+   // The `slug_name` struct_def below is NOT filler: every one of the five
+   // registry ABIs shipped today carries exactly this shadowed definition, and
+   // `slug_name` is the ONLY builtin name so shadowed (`symbol`, `name`,
+   // `asset` appear in no `structs[]`). `set_abi` has no collision check, so
+   // the ABI is genuinely ambiguous and is resolved only by LOOKUP ORDER —
+   // `built_in_types` at abi_serializer.cpp:706 before `structs` at :778. If
+   // the struct ever won, the field would still encode to 8 bytes but
+   // `binary_to_variant` would yield `{"value":N}`, so the `is_string()`
+   // assertions below are what pin the precedence.
+   const char* test_abi = R"=====(
+   {
+       "version": "sysio::abi/1.0",
+       "types": [],
+       "structs": [{
+           "name": "slug_name",
+           "base": "",
+           "fields": [{
+               "name": "value",
+               "type": "uint64"
+           }]
+       },{
+           "name": "regrow",
+           "base": "",
+           "fields": [{
+               "name": "code",
+               "type": "slug_name"
+           }]
+       }],
+       "actions": [],
+       "tables": [],
+       "ricardian_clauses": []
+   }
+   )=====";
+
+   auto abi = fc::json::from_string(test_abi).as<abi_def>();
+   abi_serializer abis(sysio_contract_abi(abi), yield_fn());
+
+   // Both lookups resolve, and the BUILTIN is the one that wins. Asserting the
+   // serializer's own post-`set_abi` view is stronger than inspecting the input
+   // `abi_def`: it proves `set_abi` KEPT the struct_def rather than dropping or
+   // rejecting it, which is what makes the ambiguity real. Note that if the
+   // struct won instead, the inputs below would not merely render differently —
+   // they would not encode at all, because the struct branch throws
+   // `pack_exception` for a non-object/array input (abi_serializer.cpp:831).
+   BOOST_REQUIRE( abis.is_builtin_type("slug_name") );
+   BOOST_REQUIRE( abis.is_struct("slug_name") );
+
+   // A canonical slug is carried as its STRING spelling, in 8 bytes.
+   auto bytes = abis.variant_to_binary(
+      "regrow", fc::json::from_string(R"({"code":"ETH"})"), yield_fn());
+   BOOST_REQUIRE_EQUAL(bytes.size(), 8u);
+   auto back = abis.binary_to_variant("regrow", bytes, yield_fn());
+   BOOST_REQUIRE(back.get_object()["code"].is_string());
+   BOOST_CHECK_EQUAL(back.get_object()["code"].as_string(), "ETH");
+
+   // The string is the ONLY carrier, in both directions. A JSON number is not a
+   // second spelling of a slug — `"7"` is itself a canonical slug whose packed
+   // value is nothing like 7 — so it is refused rather than read as either one.
+   BOOST_CHECK_THROW(
+      abis.variant_to_binary("regrow", fc::json::from_string(R"({"code":7})"), yield_fn()),
+      fc::exception);
+
+   // And a value with no spelling does not render. Every value below 2^42 has a
+   // zero in the leading symbol slot, so `to_string` truncates it to "" and no
+   // string recovers it. get_table_rows wraps each row's render in its own
+   // try/catch and falls back to hex, so a planted row costs that one cell
+   // rather than the query (plugins/chain_plugin/src/chain_plugin.cpp).
+   const std::vector<char> planted{ 7, 0, 0, 0, 0, 0, 0, 0 };  // packed LE uint64 7
+   BOOST_CHECK_THROW(abis.binary_to_variant("regrow", planted, yield_fn()), fc::exception);
+
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_CASE(uint_types)
 { try {
 

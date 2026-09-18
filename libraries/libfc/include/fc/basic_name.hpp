@@ -64,6 +64,15 @@ concept basic_name_traits =
    && Traits::max_len > 0
    && std::string_view{ Traits::alphabet }.size() > 0;
 
+/// OPTIONAL traits member: the symbols a spelling may START with. Traits that
+/// omit it accept any alphabet character in the leading position, which is what
+/// `sysio::name` wants. `slug_name` supplies it so that no legal code can be
+/// confused with a decimal number — see `slug_name_traits::leading_alphabet`.
+template <typename Traits>
+concept basic_name_has_leading_alphabet = requires {
+   { Traits::leading_alphabet } -> std::convertible_to<std::string_view>;
+};
+
 template <basic_name_traits Traits>
 struct basic_name {
    uint64_t value = 0;
@@ -102,6 +111,12 @@ struct basic_name {
    static constexpr bool is_valid_literal(std::string_view str) {
       if (str.size() > static_cast<std::size_t>(Traits::max_len))
          return false;
+      if constexpr (basic_name_has_leading_alphabet<Traits>) {
+         if (!str.empty()
+             && std::string_view{ Traits::leading_alphabet }.find(str[0])
+                   == std::string_view::npos)
+            return false;
+      }
       for (char c : str) {
          if (Traits::alphabet.find(c) == std::string_view::npos)
             return false;
@@ -199,6 +214,12 @@ private:
    static uint64_t encode(std::string_view str) {
       if (static_cast<int>(str.size()) > Traits::max_len)
          Traits::throw_invalid(str, "too long");
+      if constexpr (basic_name_has_leading_alphabet<Traits>) {
+         if (!str.empty()
+             && std::string_view{ Traits::leading_alphabet }.find(str[0])
+                   == std::string_view::npos)
+            Traits::throw_invalid(str, "first character is not allowed to lead");
+      }
       const basic_name packed{ pack(str) };
       if (packed.to_string() != str)
          Traits::throw_invalid(str, "not properly normalized");

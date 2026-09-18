@@ -191,7 +191,7 @@ constexpr uint32_t kDellogPrunePerCrank = 64;
 
 } // namespace
 
-/// v6 data-model: per-chain identity has moved from `ChainKind` enums to
+/// Data model: per-chain identity has moved from `ChainKind` enums to
 /// `sysio::slug_name`-keyed registries (`sysio.chains`, `sysio.tokens`,
 /// `sysio.reserv`). The test fixture treats the codenames as opaque uint64
 /// values; per-chain spelling ("ETH", "SOL", "WIRE", "LIQETH", ...) maps to
@@ -243,19 +243,13 @@ public:
       epoch_abi_ser.set_abi(std::move(epoch_abi), abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-   // ── SlugName helpers (v6) ──
+   // ── SlugName helpers ──
    //
    // Codenames are 8-byte packed identifiers (`fc::slug_name`). The contract's
    // `sysio::slug_name` and the host-side `fc::slug_name` use the same packing
    // algorithm so values are byte-identical across the boundary.
 
    static fc::slug_name cn(std::string_view s) { return fc::slug_name{s}; }
-
-   /// Build a slug_name mvo suitable for an action argument:
-   /// `{"value": <uint64>}` matches the ABI surface for slug_name fields.
-   static fc::mutable_variant_object codename_mvo(std::string_view s) {
-      return mvo()("value", fc::slug_name{s}.value);
-   }
 
    // ── Action helpers ──
 
@@ -291,14 +285,14 @@ public:
    }
 
    /// Build a single `chain_min_bond` entry as an fc::variant suitable for
-   /// `setconfig`'s `req_*_collat` vector arguments. v6: identity is by
+   /// `setconfig`'s `req_*_collat` vector arguments. identity is by
    /// (chain_code, token_code) codenames rather than the old enums.
    static fc::variant make_chain_min_bond(std::string_view chain_code,
                                           std::string_view token_code,
                                           uint64_t min_bond) {
       return fc::variant(mvo()
-         ("chain_code",           codename_mvo(chain_code))
-         ("token_code",           codename_mvo(token_code))
+         ("chain_code",           chain_code)
+         ("token_code",           token_code)
          ("min_bond",             min_bond)
          ("config_timestamp_ms",  uint64_t{0}));
    }
@@ -392,10 +386,10 @@ public:
       BOOST_REQUIRE_EQUAL(0, op["is_bootstrapped"].as_uint64());
    }
 
-   // ── Collateral-action helpers (msgch-dispatched paths, v6 codenames) ──
+   // ── Collateral-action helpers (msgch-dispatched paths, codenames) ──
 
    /// `depositinle`: dispatched from sysio.msgch.
-   /// v6 signature: `(account, chain_code, token_code, amount,
+   /// Signature: `(account, chain_code, token_code, amount,
    ///                actor_chain ChainKind, actor_address bytes,
    ///                original_message_id checksum256)`.
    action_result depositinle(name account,
@@ -406,8 +400,8 @@ public:
                              const std::string& original_message_id_hex = std::string(64, '0')) {
       return push_opreg_action(OPREG_ACCOUNT, "depositinle"_n, mvo()
          ("account",              account)
-         ("chain_code",           codename_mvo(chain_code))
-         ("token_code",           codename_mvo(token_code))
+         ("chain_code",           chain_code)
+         ("token_code",           token_code)
          ("amount",               amount)
          ("actor_chain",          actor_chain)
          ("actor_address",        actor_address)
@@ -420,8 +414,8 @@ public:
                               uint64_t amount) {
       return push_opreg_action(OPREG_ACCOUNT, "withdrawinle"_n, mvo()
          ("account",     account)
-         ("chain_code",  codename_mvo(chain_code))
-         ("token_code",  codename_mvo(token_code))
+         ("chain_code",  chain_code)
+         ("token_code",  token_code)
          ("amount",      amount));
    }
 
@@ -471,8 +465,8 @@ public:
                              uint64_t amount) {
       return push_opreg_action(signer, "releaselock"_n, mvo()
          ("account",     account)
-         ("chain_code",  codename_mvo(chain_code))
-         ("token_code",  codename_mvo(token_code))
+         ("chain_code",  chain_code)
+         ("token_code",  token_code)
          ("amount",      amount));
    }
 
@@ -941,8 +935,8 @@ BOOST_FIXTURE_TEST_CASE(deposit_credits_balance_row, sysio_opreg_tester) { try {
    auto op = get_operator("uwrit.alice"_n);
    auto balances = op["balances"].get_array();
    BOOST_REQUIRE_EQUAL(1, balances.size());
-   BOOST_REQUIRE_EQUAL(cn("ETH").value, balances[0]["chain_code"]["value"].as_uint64());
-   BOOST_REQUIRE_EQUAL(cn("ETH").value, balances[0]["token_code"]["value"].as_uint64());
+   BOOST_REQUIRE_EQUAL(cn("ETH").value, balances[0]["chain_code"].as<fc::slug_name>().value);
+   BOOST_REQUIRE_EQUAL(cn("ETH").value, balances[0]["token_code"].as<fc::slug_name>().value);
    BOOST_REQUIRE_EQUAL(1'000'000,       balances[0]["balance"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
@@ -1035,8 +1029,8 @@ BOOST_FIXTURE_TEST_CASE(deposit_custodies_and_credits_wire_units, sysio_opreg_te
    auto op = get_operator(OPERATOR);
    auto balances = op["balances"].get_array();
    BOOST_REQUIRE_EQUAL(1u, balances.size());
-   BOOST_REQUIRE_EQUAL(cn(kWireCodename).value, balances[0]["chain_code"]["value"].as_uint64());
-   BOOST_REQUIRE_EQUAL(cn(kWireCodename).value, balances[0]["token_code"]["value"].as_uint64());
+   BOOST_REQUIRE_EQUAL(cn(kWireCodename).value, balances[0]["chain_code"].as<fc::slug_name>().value);
+   BOOST_REQUIRE_EQUAL(cn(kWireCodename).value, balances[0]["token_code"].as<fc::slug_name>().value);
    BOOST_REQUIRE_EQUAL(DEPOSIT, balances[0]["balance"].as_uint64());
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
 } FC_LOG_AND_RETHROW() }

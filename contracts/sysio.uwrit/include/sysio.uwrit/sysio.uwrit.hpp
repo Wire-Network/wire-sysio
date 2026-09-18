@@ -16,7 +16,7 @@ namespace sysio {
    /**
     * @brief sysio.uwrit — underwriter race resolver + flat lock vector.
     *
-    * Per the v6 data-model refactor (`load-context-and-follow-smooth-flame.md`
+    * Per the data-model refactor (`load-context-and-follow-smooth-flame.md`
     * §3.13, §4.5, §4.6):
     *
     * - opreg owns the bond ledger (per-(operator, chain_code, token_code) aggregate
@@ -771,7 +771,7 @@ namespace sysio {
       /// src/dst pairs, the underwriter race, and the eventual settlement.
       ///
       /// Each side of the swap carries a full `(chain_code, token_code,
-      /// reserve_code)` triple per the v6 data-model refactor: identity
+      /// reserve_code)` triple per the data-model refactor: identity
       /// is slug_name-keyed throughout, and `reserve_code` lets a same-
       /// `(chain, token)` swap target a specific reserve when multiple
       /// reserves exist for that pair.

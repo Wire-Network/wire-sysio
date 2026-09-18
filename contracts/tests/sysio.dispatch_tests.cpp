@@ -1,7 +1,7 @@
 /// Cross-contract dispatch tests for sysio.msgch's per-attestation-type
 /// routing (Task 4 of the operator-collateral plan).
 ///
-/// v6 data-model: identity moved to slug_name-keyed registries. The dispatch
+/// Data model: identity moved to slug_name-keyed registries. The dispatch
 /// surface still routes `OPERATOR_ACTION` payloads into opreg, but the
 /// payload schema now carries `chain_code` (slug_name uint64) instead of a
 /// `ChainKind chain` field, and `TokenAmount.token_code` (slug_name uint64)
@@ -59,11 +59,6 @@ constexpr uint32_t PROTOBUF_VARINT_PAYLOAD_BITS = 7u;
 constexpr uint8_t  PROTOBUF_VARINT_CONTINUATION_BIT = 0x80u;
 constexpr uint32_t PROTOBUF_FIELD_TAG_SHIFT = 3u;
 
-/// SlugName mvo helper for v6 action arguments.
-inline fc::mutable_variant_object codename_mvo(std::string_view s) {
-   return mvo()("value", fc::slug_name{s}.value);
-}
-
 /** Append one unsigned protobuf varint to a hostile-wire-format fixture. */
 void append_proto_varint(std::vector<char>& out, uint64_t value) {
    do {
@@ -101,8 +96,8 @@ inline fc::variant chain_min_bond_mvo(std::string_view chain_code,
                                       std::string_view token_code,
                                       uint64_t min_bond) {
    return fc::variant(mvo()
-      ("chain_code",          codename_mvo(chain_code))
-      ("token_code",          codename_mvo(token_code))
+      ("chain_code",          chain_code)
+      ("token_code",          token_code)
       ("min_bond",            min_bond)
       ("config_timestamp_ms", uint64_t{0}));
 }
@@ -233,7 +228,7 @@ std::vector<char> em_pubkey_bytes(const fc::crypto::public_key& pk) {
    return std::vector<char>(compressed.begin(), compressed.end());
 }
 
-/// Encode an OperatorAction attestation payload (v6 schema).
+/// Encode an OperatorAction attestation payload (schema).
 /// `chain_code` and `amount.token_code` are slug_name-packed uint64 values.
 std::string encode_operator_action(
    sysio::opp::attestations::OperatorAction_ActionType action_type,
@@ -532,11 +527,11 @@ public:
 
       create_uwrit_op_eth_authex_link();
 
-      // v6: chains are first-class registry rows.
+      // Chains are first-class registry rows.
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
          "regchain"_n, mvo()
             ("kind",              outpost_kind)
-            ("code",              codename_mvo(outpost_code))
+            ("code",              outpost_code)
             ("external_chain_id", 31337)
             ("name",              std::string("outpost-test"))
             ("description",       std::string{})
@@ -621,8 +616,8 @@ public:
       const auto token_v = fc::slug_name{token_code}.value;
       const auto& arr = op["balances"].get_array();
       for (const auto& b : arr) {
-         if (b["chain_code"]["value"].as_uint64() == chain_v &&
-             b["token_code"]["value"].as_uint64() == token_v) {
+         if (b["chain_code"].as<fc::slug_name>().value == chain_v &&
+             b["token_code"].as<fc::slug_name>().value == token_v) {
             return b;
          }
       }
@@ -666,8 +661,8 @@ public:
       // depositinle does require_auth(get_self()); sign as opreg for a direct call.
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
          ("account",             account.to_string())
-         ("chain_code",          codename_mvo(chain_code))
-         ("token_code",          codename_mvo(token_code))
+         ("chain_code",          chain_code)
+         ("token_code",          token_code)
          ("amount",              amount)
          ("actor_chain",         ChainKind::CHAIN_KIND_EVM)
          ("actor_address",       std::vector<char>(20, '\x06'))
@@ -692,9 +687,9 @@ public:
          ("uwreq_id",        uwreq_id)
          ("underwriter",     underwriter.to_string())
          ("chain_code",      outpost_chain_code)
-         ("from_chain_code", codename_mvo(from_chain))
-         ("from_token_code", codename_mvo(from_token))
-         ("reserve_code",    codename_mvo(reserve))
+         ("from_chain_code", from_chain)
+         ("from_token_code", from_token)
+         ("reserve_code",    reserve)
          ("uic_bytes",       uic_bytes));
    }
 
@@ -707,9 +702,9 @@ public:
          ("uwreq_id",        uwreq_id)
          ("underwriter",     underwriter.to_string())
          ("chain_code",      outpost_chain_code)
-         ("from_chain_code", codename_mvo(from_chain))
-         ("from_token_code", codename_mvo(from_token))
-         ("reserve_code",    codename_mvo(reserve))
+         ("from_chain_code", from_chain)
+         ("from_token_code", from_token)
+         ("reserve_code",    reserve)
          ("uic_bytes",       uic_bytes));
    }
 
@@ -1062,8 +1057,8 @@ public:
             auto row = uwrit_abi.binary_to_variant("lock_sum", raw,
                abi_serializer::create_yield_function(abi_serializer_max_time));
             if (row["underwriter"].as_string()             == underwriter.to_string() &&
-                row["chain_code"]["value"].as_uint64()     == target_chain &&
-                row["token_code"]["value"].as_uint64()      == target_token) {
+                row["chain_code"].as<fc::slug_name>().value     == target_chain &&
+                row["token_code"].as<fc::slug_name>().value      == target_token) {
                return row["amount"].as_uint64();
             }
          } catch (...) {
@@ -1094,8 +1089,8 @@ public:
             auto row = uwrit_abi.binary_to_variant("lock_entry", raw,
                abi_serializer::create_yield_function(abi_serializer_max_time));
             if (row["underwriter"].as_string()         == underwriter.to_string() &&
-                row["chain_code"]["value"].as_uint64() == target_chain &&
-                row["token_code"]["value"].as_uint64() == target_token) {
+                row["chain_code"].as<fc::slug_name>().value == target_chain &&
+                row["token_code"].as<fc::slug_name>().value == target_token) {
                total += row["amount"].as_uint64();
             }
          } catch (...) {
@@ -1121,8 +1116,8 @@ public:
                                     std::string_view token_code, uint64_t amount) {
       return push(OPREG_ACCOUNT, opreg_abi, UWRIT_ACCOUNT, "releaselock"_n, mvo()
          ("account",    account.to_string())
-         ("chain_code", codename_mvo(chain_code))
-         ("token_code", codename_mvo(token_code))
+         ("chain_code", chain_code)
+         ("token_code", token_code)
          ("amount",     amount));
    }
 
@@ -1162,9 +1157,9 @@ public:
          try {
             auto row = reserv_abi.binary_to_variant("reserve_row", raw,
                abi_serializer::create_yield_function(abi_serializer_max_time));
-            if (row["chain_code"]["value"].as_uint64()   == target_chain &&
-                row["token_code"]["value"].as_uint64()   == target_token &&
-                row["reserve_code"]["value"].as_uint64() == target_reserve) {
+            if (row["chain_code"].as<fc::slug_name>().value   == target_chain &&
+                row["token_code"].as<fc::slug_name>().value   == target_token &&
+                row["reserve_code"].as<fc::slug_name>().value == target_reserve) {
                return row;
             }
          } catch (...) {
@@ -1214,9 +1209,9 @@ public:
                                            std::string_view r,
                                            uint64_t chain_amount, uint64_t wire_amount) {
       return push(RESERV_ACCOUNT, reserv_abi, RESERV_ACCOUNT, "regreserve"_n, mvo()
-         ("chain_code",             codename_mvo(c))
-         ("token_code",             codename_mvo(t))
-         ("reserve_code",           codename_mvo(r))
+         ("chain_code",             c)
+         ("token_code",             t)
+         ("reserve_code",           r)
          ("name",                   std::string(c))
          ("description",            std::string{})
          ("initial_chain_amount",   chain_amount)
@@ -1233,9 +1228,9 @@ public:
    action_result debit_reserve_chain(std::string_view c, std::string_view t,
                                      std::string_view r, uint64_t amount) {
       return push(RESERV_ACCOUNT, reserv_abi, UWRIT_ACCOUNT, "debit"_n, mvo()
-         ("chain_code",   codename_mvo(c))
-         ("token_code",   codename_mvo(t))
-         ("reserve_code", codename_mvo(r))
+         ("chain_code",   c)
+         ("token_code",   t)
+         ("reserve_code", r)
          ("amount",       amount));
    }
 
@@ -1262,7 +1257,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
          "regchain"_n, mvo()
             ("kind",              ChainKind::CHAIN_KIND_WIRE)
-            ("code",              codename_mvo("WIRE"))
+            ("code",              "WIRE")
             ("external_chain_id", 0)
             ("name",              std::string("wire-depot"))
             ("description",       std::string{})
@@ -1276,7 +1271,7 @@ public:
    /// must have been called first.
    void setup_eth_to_sol_uwreq(uint64_t att_id) {
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
-         ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
+         ("kind", ChainKind::CHAIN_KIND_SVM)("code", "SOLANA")
          ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})
          ("outpost", sysio_system::test_support::no_outpost_mvo())));
       setup_wire_token_and_reserves();
@@ -1461,8 +1456,8 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_withdraw_request_to_opreg, sysio_dispatc
    BOOST_REQUIRE_EQUAL(UWRIT_OP.to_string(),  row["account"].as_string());
    BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(WITHDRAW_AMOUNT),
                        row["amount"].as_uint64());
-   BOOST_REQUIRE_EQUAL(eth_code, row["chain_code"]["value"].as_uint64());
-   BOOST_REQUIRE_EQUAL(eth_code, row["token_code"]["value"].as_uint64());
+   BOOST_REQUIRE_EQUAL(eth_code, row["chain_code"].as<fc::slug_name>().value);
+   BOOST_REQUIRE_EQUAL(eth_code, row["token_code"].as<fc::slug_name>().value);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(dispatch_silently_drops_out_of_scope_types, sysio_dispatch_tester) { try {
@@ -1506,7 +1501,7 @@ BOOST_FIXTURE_TEST_CASE(operator_action_mismatched_source_chain_is_dropped,
    // SOLANA is a real, active outpost, so the ONLY thing wrong with the payloads below is that they
    // were proven-delivered from ETH rather than SOLANA — the exact WSA-005 forgery.
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
-      ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
+      ("kind", ChainKind::CHAIN_KIND_SVM)("code", "SOLANA")
       ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})
       ("outpost", sysio_system::test_support::no_outpost_mvo())));
 
@@ -1539,7 +1534,7 @@ BOOST_FIXTURE_TEST_CASE(swap_request_mismatched_source_chain_is_refunded,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();   // ETH source outpost
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
-      ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
+      ("kind", ChainKind::CHAIN_KIND_SVM)("code", "SOLANA")
       ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})
       ("outpost", sysio_system::test_support::no_outpost_mvo())));
    setup_wire_token_and_reserves();   // ACTIVE ETH/ETH/PRIMARY + SOLANA/SOL/PRIMARY reserves
@@ -1576,7 +1571,7 @@ BOOST_FIXTURE_TEST_CASE(swap_request_identical_reserve_identity_is_refunded,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
-      ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
+      ("kind", ChainKind::CHAIN_KIND_SVM)("code", "SOLANA")
       ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})
       ("outpost", sysio_system::test_support::no_outpost_mvo())));
    setup_wire_token_and_reserves();
@@ -1610,7 +1605,7 @@ BOOST_FIXTURE_TEST_CASE(underwrite_commit_mismatched_source_chain_is_dropped,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
-      ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
+      ("kind", ChainKind::CHAIN_KIND_SVM)("code", "SOLANA")
       ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})
       ("outpost", sysio_system::test_support::no_outpost_mvo())));
    setup_wire_token_and_reserves();
@@ -1669,13 +1664,13 @@ BOOST_FIXTURE_TEST_CASE(underwrite_commit_two_evm_chains_route_per_chain,
    bootstrap_for_dispatch();   // ETH (EVM) source outpost
    // A SECOND active EVM chain — same VM family, distinct chain_code.
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
-      ("kind", ChainKind::CHAIN_KIND_EVM)("code", codename_mvo("POLYGON"))
+      ("kind", ChainKind::CHAIN_KIND_EVM)("code", "POLYGON")
       ("external_chain_id", 137)("name", std::string("polygon-test"))("description", std::string{})
       ("outpost", sysio_system::test_support::no_outpost_mvo())));
    // SOLANA is registered only because the shared reserve-setup helper seeds a
    // SOLANA/SOL reserve; it is otherwise unused by this two-EVM scenario.
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
-      ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
+      ("kind", ChainKind::CHAIN_KIND_SVM)("code", "SOLANA")
       ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})
       ("outpost", sysio_system::test_support::no_outpost_mvo())));
    setup_wire_token_and_reserves();
@@ -1965,7 +1960,7 @@ BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_other_evm_outpost_is_dropped, sysio_
    bootstrap_for_dispatch();   // registers "ETH" — an EVM outpost, but NOT the node-owner source
    // Register the real node-owner source too, so the ONLY thing wrong below is the delivering outpost.
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
-      ("kind", ChainKind::CHAIN_KIND_EVM)("code", codename_mvo("ETHEREUM"))
+      ("kind", ChainKind::CHAIN_KIND_EVM)("code", "ETHEREUM")
       ("external_chain_id", 1)("name", std::string("ethereum-mainnet"))("description", std::string{})
       ("outpost", sysio_system::test_support::no_outpost_mvo())));
    const auto other_evm = fc::slug_name{"ETH"}.value;   // active EVM outpost, but not "ETHEREUM"
@@ -2215,7 +2210,7 @@ BOOST_FIXTURE_TEST_CASE(swap_missing_dst_authex_recovers_after_exact_uic_replay,
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
       "regchain"_n, mvo()
          ("kind",              ChainKind::CHAIN_KIND_SVM)
-         ("code",              codename_mvo("SOLANA"))
+         ("code",              "SOLANA")
          ("external_chain_id", 900)
          ("name",              std::string("solana-test"))
          ("description",       std::string{})
@@ -2299,7 +2294,7 @@ BOOST_FIXTURE_TEST_CASE(swap_zero_quote_from_active_reserve_fails_closed,
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
       "regchain"_n, mvo()
          ("kind",              ChainKind::CHAIN_KIND_SVM)
-         ("code",              codename_mvo("SOLANA"))
+         ("code",              "SOLANA")
          ("external_chain_id", 900)
          ("name",              std::string("solana-test"))
          ("description",       std::string{})
@@ -2538,9 +2533,9 @@ BOOST_FIXTURE_TEST_CASE(swap_slippage_bound_does_not_compound_across_checkpoints
    // Move the destination reserve so the price walks a second step down: debit
    // 7% of its token side (UWRIT-authorized, the same primitive settlement uses).
    BOOST_REQUIRE_EQUAL(success(), push(RESERV_ACCOUNT, reserv_abi, UWRIT_ACCOUNT, "debit"_n, mvo()
-      ("chain_code",   codename_mvo("ETH"))
-      ("token_code",   codename_mvo("ETH"))
-      ("reserve_code", codename_mvo("SECOND"))
+      ("chain_code",   "ETH")
+      ("token_code",   "ETH")
+      ("reserve_code", "SECOND")
       ("amount",       uint64_t{70'000'000'000})));
 
    // Pin the scenario: the drift is inside tolerance of the PREVIOUS quote (so
@@ -2607,9 +2602,9 @@ BOOST_FIXTURE_TEST_CASE(swap_underbonded_candidate_cannot_terminally_reject,
    // Drift the price far outside the tolerance — the request IS terminally
    // doomed, but this candidate must not be the one to close it.
    BOOST_REQUIRE_EQUAL(success(), push(RESERV_ACCOUNT, reserv_abi, UWRIT_ACCOUNT, "debit"_n, mvo()
-      ("chain_code",   codename_mvo("ETH"))
-      ("token_code",   codename_mvo("ETH"))
-      ("reserve_code", codename_mvo("SECOND"))
+      ("chain_code",   "ETH")
+      ("token_code",   "ETH")
+      ("reserve_code", "SECOND")
       ("amount",       uint64_t{500'000'000'000})));
 
    const auto src_uic = create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, primary);
@@ -3688,7 +3683,7 @@ BOOST_FIXTURE_TEST_CASE(swap_malformed_destination_signature_preserves_valid_sou
    BOOST_REQUIRE_EQUAL(success(), push(
       CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
          ("kind", ChainKind::CHAIN_KIND_SVM)
-         ("code", codename_mvo("SOLANA"))
+         ("code", "SOLANA")
          ("external_chain_id", 900)
          ("name", std::string("solana-test"))
          ("description", std::string{})
@@ -3809,7 +3804,7 @@ BOOST_FIXTURE_TEST_CASE(swap_forged_claim_cannot_overwrite_honest_candidate,
    BOOST_REQUIRE_EQUAL(success(), push(
       CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
          ("kind", ChainKind::CHAIN_KIND_SVM)
-         ("code", codename_mvo("SOLANA"))
+         ("code", "SOLANA")
          ("external_chain_id", 900)
          ("name", std::string("solana-test"))
          ("description", std::string{})
@@ -4060,7 +4055,7 @@ BOOST_FIXTURE_TEST_CASE(swap_request_malformed_bytes_do_not_abort_consensus_deli
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();   // ETH source outpost
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
-      ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
+      ("kind", ChainKind::CHAIN_KIND_SVM)("code", "SOLANA")
       ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})
       ("outpost", sysio_system::test_support::no_outpost_mvo())));
    setup_wire_token_and_reserves();
@@ -4105,7 +4100,7 @@ BOOST_FIXTURE_TEST_CASE(swap_request_malformed_bytes_do_not_abort_consensus_deli
    const auto req = get_uwreq(first_att_id + 3);
    BOOST_REQUIRE(!req.is_null());
    BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_PENDING", req["status"].as_string());
-   BOOST_REQUIRE_EQUAL(eth, req["src_chain_code"]["value"].as_uint64());
+   BOOST_REQUIRE_EQUAL(eth, req["src_chain_code"].as<fc::slug_name>().value);
    BOOST_REQUIRE_EQUAL(100u, req["src_amount"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
@@ -4117,7 +4112,7 @@ BOOST_FIXTURE_TEST_CASE(createuwreq_duplicate_attestation_id_is_idempotent,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
-      ("kind", ChainKind::CHAIN_KIND_SVM)("code", codename_mvo("SOLANA"))
+      ("kind", ChainKind::CHAIN_KIND_SVM)("code", "SOLANA")
       ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})
       ("outpost", sysio_system::test_support::no_outpost_mvo())));
    setup_wire_token_and_reserves();
@@ -4243,7 +4238,7 @@ BOOST_FIXTURE_TEST_CASE(swap_request_negative_source_is_reverted,
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
       "regchain"_n, mvo()
          ("kind",              ChainKind::CHAIN_KIND_SVM)
-         ("code",              codename_mvo("SOLANA"))
+         ("code",              "SOLANA")
          ("external_chain_id", 900)
          ("name",              std::string("solana-test"))
          ("description",       std::string{})
@@ -4363,7 +4358,7 @@ BOOST_FIXTURE_TEST_CASE(swap_race_time_reserve_drain_rejects_request,
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
       "regchain"_n, mvo()
          ("kind",              ChainKind::CHAIN_KIND_SVM)
-         ("code",              codename_mvo("SOLANA"))
+         ("code",              "SOLANA")
          ("external_chain_id", 900)
          ("name",              std::string("solana-test"))
          ("description",       std::string{})
@@ -4437,7 +4432,7 @@ BOOST_FIXTURE_TEST_CASE(swap_replayed_uic_variance_drift_rejects_request,
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
       "regchain"_n, mvo()
          ("kind",              ChainKind::CHAIN_KIND_SVM)
-         ("code",              codename_mvo("SOLANA"))
+         ("code",              "SOLANA")
          ("external_chain_id", 900)
          ("name",              std::string("solana-test"))
          ("description",       std::string{})
@@ -4608,10 +4603,10 @@ BOOST_FIXTURE_TEST_CASE(swap_same_token_legs_exact_balance_wins,
    const auto l2 = get_lock(2);
    BOOST_REQUIRE(!l1.is_null());
    BOOST_REQUIRE(!l2.is_null());
-   BOOST_REQUIRE_EQUAL(eth, l1["chain_code"]["value"].as_uint64());
-   BOOST_REQUIRE_EQUAL(eth, l1["token_code"]["value"].as_uint64());
-   BOOST_REQUIRE_EQUAL(eth, l2["chain_code"]["value"].as_uint64());
-   BOOST_REQUIRE_EQUAL(eth, l2["token_code"]["value"].as_uint64());
+   BOOST_REQUIRE_EQUAL(eth, l1["chain_code"].as<fc::slug_name>().value);
+   BOOST_REQUIRE_EQUAL(eth, l1["token_code"].as<fc::slug_name>().value);
+   BOOST_REQUIRE_EQUAL(eth, l2["chain_code"].as<fc::slug_name>().value);
+   BOOST_REQUIRE_EQUAL(eth, l2["token_code"].as<fc::slug_name>().value);
    BOOST_REQUIRE_EQUAL(100u,   l1["amount"].as_uint64());
    BOOST_REQUIRE_EQUAL(quote,  l2["amount"].as_uint64());
    BOOST_REQUIRE_EQUAL(100u + quote, l1["amount"].as_uint64() + l2["amount"].as_uint64());
@@ -4778,9 +4773,9 @@ BOOST_FIXTURE_TEST_CASE(drainfwq_bounds_rows_per_epoch, sysio_dispatch_tester) {
          push(UWRIT_ACCOUNT, uwrit_abi, "swapuser"_n, "swapfromwire"_n, mvo()
             ("user",                 "swapuser")
             ("wire_amount",          uint64_t{1'000'000} + i)
-            ("dst_chain_code",       codename_mvo("ETH"))
-            ("dst_token_code",       codename_mvo("ETH"))
-            ("dst_reserve_code",     codename_mvo("PRIMARY"))
+            ("dst_chain_code",       "ETH")
+            ("dst_token_code",       "ETH")
+            ("dst_reserve_code",     "PRIMARY")
             ("target_amount",        uint64_t{1'000'000})
             ("target_tolerance_bps", uint32_t{10000})
             ("recipient_kind",       sysio::opp::types::ChainKind::CHAIN_KIND_EVM)
@@ -4836,9 +4831,9 @@ BOOST_FIXTURE_TEST_CASE(swapfromwire_enforces_min_amount, sysio_dispatch_tester)
       return push(UWRIT_ACCOUNT, uwrit_abi, "swapuser"_n, "swapfromwire"_n, mvo()
          ("user",                 "swapuser")
          ("wire_amount",          wire_amount)
-         ("dst_chain_code",       codename_mvo("ETH"))
-         ("dst_token_code",       codename_mvo("ETH"))
-         ("dst_reserve_code",     codename_mvo("PRIMARY"))
+         ("dst_chain_code",       "ETH")
+         ("dst_token_code",       "ETH")
+         ("dst_reserve_code",     "PRIMARY")
          ("target_amount",        uint64_t{1'000'000})
          ("target_tolerance_bps", uint32_t{10000})
          ("recipient_kind",       sysio::opp::types::ChainKind::CHAIN_KIND_EVM)
@@ -4907,9 +4902,9 @@ BOOST_FIXTURE_TEST_CASE(drainfwq_charges_revert_fee_on_caller_fault, sysio_dispa
       push(UWRIT_ACCOUNT, uwrit_abi, "swapuser"_n, "swapfromwire"_n, mvo()
          ("user",                 "swapuser")
          ("wire_amount",          ESCROW)
-         ("dst_chain_code",       codename_mvo("ETH"))
-         ("dst_token_code",       codename_mvo("ETH"))
-         ("dst_reserve_code",     codename_mvo("PRIMARY"))
+         ("dst_chain_code",       "ETH")
+         ("dst_token_code",       "ETH")
+         ("dst_reserve_code",     "PRIMARY")
          ("target_amount",        uint64_t{1})
          ("target_tolerance_bps", uint32_t{0})
          ("recipient_kind",       sysio::opp::types::ChainKind::CHAIN_KIND_EVM)
@@ -4967,9 +4962,9 @@ BOOST_FIXTURE_TEST_CASE(drainfwq_full_refund_on_system_caused_revert, sysio_disp
       push(UWRIT_ACCOUNT, uwrit_abi, "swapuser"_n, "swapfromwire"_n, mvo()
          ("user",                 "swapuser")
          ("wire_amount",          ESCROW)
-         ("dst_chain_code",       codename_mvo("ETH"))
-         ("dst_token_code",       codename_mvo("ETH"))
-         ("dst_reserve_code",     codename_mvo("PRIMARY"))
+         ("dst_chain_code",       "ETH")
+         ("dst_token_code",       "ETH")
+         ("dst_reserve_code",     "PRIMARY")
          ("target_amount",        uint64_t{1'000'000})
          ("target_tolerance_bps", uint32_t{10000})
          ("recipient_kind",       sysio::opp::types::ChainKind::CHAIN_KIND_EVM)
@@ -5027,9 +5022,9 @@ BOOST_FIXTURE_TEST_CASE(blocking_refund_recipient_cannot_stall_drainfwq, sysio_d
       push(UWRIT_ACCOUNT, uwrit_abi, "swapuser"_n, "swapfromwire"_n, mvo()
          ("user",                 "swapuser")
          ("wire_amount",          ESCROW)
-         ("dst_chain_code",       codename_mvo("ETH"))
-         ("dst_token_code",       codename_mvo("ETH"))
-         ("dst_reserve_code",     codename_mvo("PRIMARY"))
+         ("dst_chain_code",       "ETH")
+         ("dst_token_code",       "ETH")
+         ("dst_reserve_code",     "PRIMARY")
          ("target_amount",        uint64_t{1'000'000})
          ("target_tolerance_bps", uint32_t{10000})
          ("recipient_kind",       sysio::opp::types::ChainKind::CHAIN_KIND_EVM)
@@ -5168,9 +5163,9 @@ BOOST_FIXTURE_TEST_CASE(uwreq_from_wire_pending_timeout_refunds_escrow,
       "swapfromwire"_n, mvo()
          ("user",                 "swapuser")
          ("wire_amount",          ESCROW)
-         ("dst_chain_code",       codename_mvo("ETH"))
-         ("dst_token_code",       codename_mvo("ETH"))
-         ("dst_reserve_code",     codename_mvo("PRIMARY"))
+         ("dst_chain_code",       "ETH")
+         ("dst_token_code",       "ETH")
+         ("dst_reserve_code",     "PRIMARY")
          ("target_amount",        uint64_t{1'000'000})
          ("target_tolerance_bps", uint32_t{10000})
          ("recipient_kind",       ChainKind::CHAIN_KIND_EVM)
@@ -5562,9 +5557,9 @@ public:
          try {
             auto row = reserv_abi.binary_to_variant(
                "reserve_row", raw, abi_serializer::create_yield_function(abi_serializer_max_time));
-            if (row["chain_code"]["value"].as_uint64()   == target_chain &&
-                row["token_code"]["value"].as_uint64()   == target_token &&
-                row["reserve_code"]["value"].as_uint64() == target_reserve) {
+            if (row["chain_code"].as<fc::slug_name>().value   == target_chain &&
+                row["token_code"].as<fc::slug_name>().value   == target_token &&
+                row["reserve_code"].as<fc::slug_name>().value == target_reserve) {
                return row;
             }
          } catch (...) {
@@ -5587,8 +5582,8 @@ public:
       for (const auto& bal : op["balances"].get_array()) {
          const uint64_t amount = bal["balance"].as_uint64();
          if (amount == 0) continue;
-         const auto chain = bal["chain_code"]["value"].as_uint64(),
-                    token = bal["token_code"]["value"].as_uint64();
+         const auto chain = bal["chain_code"].as<fc::slug_name>().value,
+                    token = bal["token_code"].as<fc::slug_name>().value;
          const uint64_t wire = fc::slug_name{"WIRE"}.value;
          if (chain == wire && token == wire) {
             total += amount;   // already WIRE — no curve
@@ -5623,8 +5618,8 @@ public:
          try {
             auto row = reserv_abi.binary_to_variant("reserve_row", raw,
                abi_serializer::create_yield_function(abi_serializer_max_time));
-            if (row["chain_code"]["value"].as_uint64() == target_chain &&
-                row["token_code"]["value"].as_uint64() == target_token &&
+            if (row["chain_code"].as<fc::slug_name>().value == target_chain &&
+                row["token_code"].as<fc::slug_name>().value == target_token &&
                 row["status"].as_string() == "RESERVE_STATUS_ACTIVE") {
                return row;
             }

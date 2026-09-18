@@ -98,30 +98,63 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
                             > hashobjs;
 
     // Struct-keyed kv::table — drives the ABI-aware BE key codec's struct
-    // expansion on the live get_table_rows path. Mirrors the v6 registry
-    // tables (e.g. sysio.chains `chains`), whose primary key is the reflected
-    // struct `slug_name { value: uint64 }`. abigen emits
-    // `key_types: ["code"->"slug_name"]` for this table, so JSON bounds and
-    // `next_key` pagination must round-trip the nested `{ "code": { "value": N } }`
-    // key shape — coverage a flat scalar key cannot provide.
-    struct slug_name {
+    // expansion on the live get_table_rows path, so JSON bounds and `next_key`
+    // pagination must round-trip the nested `{ "code": { "value": N } }` key
+    // shape — coverage a flat scalar key cannot provide.
+    //
+    // The name must not collide with an ABI builtin. abigen matches builtins on
+    // the namespace-stripped bare name, so a key struct named after one is
+    // emitted AS that builtin, takes the leaf branch in `build_key_shape`, and
+    // stops exercising struct expansion — while the suite keeps passing.
+    struct composite_key {
         uint64_t value = 0;
-        SYSLIB_SERIALIZE(slug_name, (value))
+        SYSLIB_SERIALIZE(composite_key, (value))
     };
 
     struct structobj_key {
-        slug_name code;
+        composite_key code;
         uint64_t primary_key() const { return code.value; }
         SYSLIB_SERIALIZE(structobj_key, (code))
     };
 
     struct [[sysio::table("structobjs")]] structobj {
-        slug_name code;
+        composite_key code;
         uint64_t  payload = 0;
         SYSLIB_SERIALIZE(structobj, (code)(payload))
     };
 
     typedef sysio::kv::table< "structobjs"_n, structobj_key, structobj > structobjs;
+
+    // Slug-keyed kv::table — the shape every registry table ships
+    // (sysio.chains::chains, sysio.tokens::tokens, sysio.reserv::reserves).
+    //
+    // This one is named after a builtin ON PURPOSE, the exact hazard
+    // `composite_key` above exists to avoid: abigen matches builtins on the
+    // namespace-stripped bare name, so the field reaches the ABI as the bare
+    // `slug_name` and `build_key_shape` takes the LEAF branch. That is what puts
+    // the slug carrier on the live get_table_rows path — a bound and a
+    // `next_key` are the canonical STRING, never a nested object.
+    //
+    // Declared here rather than included from the contract library so the
+    // fixture stays self-contained: the layout is all the ABI sees.
+    struct slug_name {
+        uint64_t value = 0;
+        SYSLIB_SERIALIZE(slug_name, (value))
+    };
+
+    struct slugobj_key {
+        slug_name code;
+        uint64_t primary_key() const { return code.value; }
+        SYSLIB_SERIALIZE(slugobj_key, (code))
+    };
+
+    struct [[sysio::table("slugobjs")]] slugobj {
+        slug_name code;
+        uint64_t  payload = 0;
+        SYSLIB_SERIALIZE(slugobj, (code)(payload))
+    };
+
+    typedef sysio::kv::table< "slugobjs"_n, slugobj_key, slugobj > slugobjs;
 
    [[sysio::action]]
    void addnumobj(uint64_t input);
@@ -137,10 +170,17 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
    void addhashobj(std::string hashinput);
 
    /// Insert a row into the struct-keyed kv::table `structobjs`.
-   /// @param code     the slug_name value forming the struct primary key
+   /// @param code     the composite_key value forming the struct primary key
    /// @param payload  arbitrary row payload
    [[sysio::action]]
    void addstruct(uint64_t code, uint64_t payload);
+
+   /// Insert a row into the slug-keyed kv::table `slugobjs`.
+   /// @param code     the slug forming the primary key — written as its
+   ///                 canonical string, since `slug_name` is an ABI builtin
+   /// @param payload  arbitrary row payload
+   [[sysio::action]]
+   void addslug(slug_name code, uint64_t payload);
 
 
 };

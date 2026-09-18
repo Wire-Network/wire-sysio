@@ -24,6 +24,20 @@
             ]
         },
         {
+            "name": "addslug",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "payload",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "addstruct",
             "base": "",
             "fields": [
@@ -33,6 +47,16 @@
                 },
                 {
                     "name": "payload",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "composite_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
                     "type": "uint64"
                 }
             ]
@@ -116,7 +140,7 @@
             ]
         },
         {
-            "name": "structobj",
+            "name": "slugobj",
             "base": "",
             "fields": [
                 {
@@ -130,12 +154,36 @@
             ]
         },
         {
-            "name": "structobj_key",
+            "name": "slugobj_key",
             "base": "",
             "fields": [
                 {
                     "name": "code",
                     "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "structobj",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "composite_key"
+                },
+                {
+                    "name": "payload",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "structobj_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "composite_key"
                 }
             ]
         }
@@ -149,6 +197,11 @@
         {
             "name": "addnumobj",
             "type": "addnumobj",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "addslug",
+            "type": "addslug",
             "ricardian_contract": ""
         },
         {
@@ -235,11 +288,19 @@
             ]
         },
         {
+            "name": "slugobjs",
+            "type": "slugobj",
+            "index_type": "i64",
+            "key_names": ["code"],
+            "key_types": ["slug_name"],
+            "table_id": 41308
+        },
+        {
             "name": "structobjs",
             "type": "structobj",
             "index_type": "i64",
             "key_names": ["code"],
-            "key_types": ["slug_name"],
+            "key_types": ["composite_key"],
             "table_id": 12649
         }
     ],

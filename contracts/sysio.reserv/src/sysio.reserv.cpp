@@ -183,7 +183,7 @@ std::optional<sysio::public_key> pubkey_from_raw(opp::types::ChainKind   kind,
 ///     (the default `zpp::bits::data_out` form prepends a 4-byte LE length
 ///     prefix that corrupts the first field tag on the receiving side).
 ///   * The destination `chain_code` is the reserve's `chain_code.value`
-///     itself (per the v6 convention recorded in `sysio.msgch.hpp`:
+///     itself (per the convention recorded in `sysio.msgch.hpp`:
 ///     "the outpost id IS the chain's slug_name value").
 template <typename ProtoMessage>
 void queue_attestation_out(name self,
@@ -669,7 +669,7 @@ void reserve::matchreserve(sysio::slug_name chain_code,
    // Reserve is now ACTIVE on the depot. Notify the owning outpost so its
    // local reserve record can flip to ACTIVE and become usable for swap
    // routing. The destination `chain_code` is the reserve's `chain_code`
-   // (per the v6 `sysio.msgch::queueout` convention — the outpost id is
+   // (per the `sysio.msgch::queueout` convention — the outpost id is
    // the chain slug_name's packed uint64 value).
    opp::attestations::ReserveReady ready;
    ready.chain_code   = chain_code.value;
@@ -839,7 +839,7 @@ void reserve::debit(sysio::slug_name chain_code,
 // onreject was removed — no SwapRejected attestation exists (every depot-initiated
 // REMIT is paid by the destination outpost; reserves need no rejection reconciliation).
 
-// onreward was removed: the v6 STAKING_REWARD path credits the per-staker reward to
+// onreward was removed: the STAKING_REWARD path credits the per-staker reward to
 // sysio.dclaim directly (already WIRE-denominated), so there is no reserve leg.
 
 // ---------------------------------------------------------------------------

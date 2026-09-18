@@ -50,11 +50,6 @@ using mvo = fc::mutable_variant_object;
 
 namespace {
 
-/// SlugName mvo helper for v6 chain-registry action arguments.
-inline fc::mutable_variant_object codename_mvo(std::string_view s) {
-   return mvo()("value", fc::slug_name{s}.value);
-}
-
 /// Build an `authority` whose active permission is the account's own active key plus a list of
 /// `{actor, sysio.code}` co-signers — lets the listed contracts authorize inline actions as `account`.
 authority active_with_code_authors(name account, const std::vector<name>& code_authors) {
@@ -213,7 +208,7 @@ public:
          ("is_bootstrapped", true)));
 
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
-         ("kind", ChainKind::CHAIN_KIND_EVM)("code", codename_mvo("ETH"))
+         ("kind", ChainKind::CHAIN_KIND_EVM)("code", "ETH")
          ("external_chain_id", 31337)("name", std::string("ethereum-test"))("description", std::string{})
          ("outpost", sysio_system::test_support::no_outpost_mvo())));
 
@@ -369,15 +364,15 @@ public:
    static fc::variant make_chain_min_bond(std::string_view chain_code,
                                           std::string_view token_code, uint64_t min_bond) {
       return fc::variant(mvo()
-         ("chain_code", codename_mvo(chain_code))("token_code", codename_mvo(token_code))
+         ("chain_code", chain_code)("token_code", token_code)
          ("min_bond", min_bond)("config_timestamp_ms", uint64_t{0}));
    }
 
    action_result depositinle(name account, std::string_view chain_code,
                              std::string_view token_code, uint64_t amount) {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
-         ("account", account.to_string())("chain_code", codename_mvo(chain_code))
-         ("token_code", codename_mvo(token_code))("amount", amount)
+         ("account", account.to_string())("chain_code", chain_code)
+         ("token_code", token_code)("amount", amount)
          ("actor_chain", ChainKind::CHAIN_KIND_EVM)("actor_address", std::vector<char>{})
          ("original_message_id", std::string(64, '0')));
    }
@@ -385,8 +380,8 @@ public:
    action_result withdrawinle(name account, std::string_view chain_code,
                               std::string_view token_code, uint64_t amount) {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "withdrawinle"_n, mvo()
-         ("account", account.to_string())("chain_code", codename_mvo(chain_code))
-         ("token_code", codename_mvo(token_code))("amount", amount));
+         ("account", account.to_string())("chain_code", chain_code)
+         ("token_code", token_code)("amount", amount));
    }
 
    action_result flushwtdw(uint32_t up_to_epoch) {
@@ -903,7 +898,7 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_after_last_open_dispute, sysio_
    // A second EVM outpost (distinct external_chain_id) so a second (outpost, epoch) dispute can
    // exist concurrently with the ETH one.
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
-      ("kind", ChainKind::CHAIN_KIND_EVM)("code", codename_mvo("BASE"))
+      ("kind", ChainKind::CHAIN_KIND_EVM)("code", "BASE")
       ("external_chain_id", 8453)("name", std::string("base-test"))("description", std::string{})
       ("outpost", sysio_system::test_support::no_outpost_mvo())));
    const uint64_t base_code = fc::slug_name{"BASE"}.value;

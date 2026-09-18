@@ -26,11 +26,6 @@ using mvo = fc::mutable_variant_object;
 
 namespace {
 
-/// A `slug_name` renders in JSON/ABI as `{value: <uint64>}`.
-inline fc::mutable_variant_object codename_mvo(std::string_view s) {
-   return mvo()("value", fc::slug_name{s}.value);
-}
-
 // Well-formed sample addresses for the accept paths.
 constexpr auto EVM_OPP      = "0x5FbDB2315678afecb367f032d93F642f64180aa3";  // OPP.sol
 constexpr auto EVM_INBOUND  = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";  // OPPInbound.sol
@@ -88,7 +83,7 @@ public:
                           const fc::variant_object& outpost) {
       return push_chains("regchain"_n, mvo()
          ("kind",              kind)
-         ("code",              codename_mvo(code))
+         ("code",              code)
          ("external_chain_id", external_chain_id)
          ("name",              std::string(code))
          ("description",       std::string{})
@@ -97,7 +92,7 @@ public:
 
    action_result setoutpost(std::string_view code, const fc::variant_object& outpost) {
       return push_chains("setoutpost"_n, mvo()
-         ("code",    codename_mvo(code))
+         ("code",    code)
          ("outpost", outpost));
    }
 

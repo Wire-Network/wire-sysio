@@ -68,7 +68,7 @@ FC_REFLECT_ENUM(sysio::opp::types::TokenKind,
    (TOKEN_KIND_SPL_NFT)
    (TOKEN_KIND_LIQ))
 
-// v6 — Reserve lifecycle
+// Reserve lifecycle
 FC_REFLECT_ENUM(sysio::opp::types::ReserveStatus,
    (RESERVE_STATUS_UNKNOWN)
    (RESERVE_STATUS_PENDING)
@@ -129,7 +129,7 @@ FC_REFLECT_ENUM(sysio::opp::attestations::OperatorAction_ActionType,
    (OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REMIT)
    (OperatorAction_ActionType_ACTION_TYPE_SLASH))
 
-// ReserveTarget_Kind removed in v6 — the carrier (renamed `ReserveAmount`)
+// ReserveTarget_Kind removed in the data-model refactor — the carrier (renamed `ReserveAmount`)
 // is now (chain_code, reserve_code, TokenAmount) in the depot 9-dec frame.
 
 FC_REFLECT_ENUM(sysio::opp::types::AttestationStatus,

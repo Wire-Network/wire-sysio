@@ -1,7 +1,7 @@
 /// Cross-contract tests for the `sysio.epoch::advance` ↔ `sysio.opreg::
 /// flushwtdw` integration (Task 9 of the operator-collateral plan).
 ///
-/// v6 data-model: identity is now slug_name-keyed across opreg / chains.
+/// Data model: identity is now slug_name-keyed across opreg / chains.
 /// The fixture deploys `sysio.chains` so the chain-of-record exists and
 /// uses `regchain` (replacing the v5 `regoutpost`).
 
@@ -130,7 +130,6 @@ public:
                       abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-
    void deploy(name account, std::vector<uint8_t> wasm, std::vector<char> abi,
                abi_serializer& out_ser) {
       set_code(account, wasm);
@@ -145,9 +144,6 @@ public:
    }
 
    static fc::slug_name cn(std::string_view s) { return fc::slug_name{s}; }
-   static fc::mutable_variant_object codename_mvo(std::string_view s) {
-      return mvo()("value", fc::slug_name{s}.value);
-   }
 
    /// Push an action against any deployed contract.
    action_result push(name contract, abi_serializer& ser, name signer,
@@ -213,7 +209,6 @@ public:
          "initt5"_n, mvo()
             ("start_time", fc::time_point_sec(control->head().block_time()))));
 
-
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
          "setconfig"_n, mvo()
             ("max_available_producers",          21)
@@ -240,7 +235,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
          "regchain"_n, mvo()
             ("kind",              ChainKind::CHAIN_KIND_SVM)
-            ("code",              codename_mvo("SOL"))
+            ("code",              "SOL")
             ("external_chain_id", 1)
             ("name",              std::string("solana-test"))
             ("description",       std::string{})
@@ -248,7 +243,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
          "regchain"_n, mvo()
             ("kind",              ChainKind::CHAIN_KIND_EVM)
-            ("code",              codename_mvo("ETH"))
+            ("code",              "ETH")
             ("external_chain_id", 31337)
             ("name",              std::string("ethereum-test"))
             ("description",       std::string{})
@@ -294,13 +289,13 @@ public:
    }
 
    /// Direct opreg::depositinle, signed as opreg itself.
-   /// v6 signature: codenames for chain and token, plus the actor identity.
+   /// Signature: codenames for chain and token, plus the actor identity.
    action_result depositinle(name account, std::string_view chain_code,
                              std::string_view token_code, uint64_t amount) {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
          ("account",              account.to_string())
-         ("chain_code",           codename_mvo(chain_code))
-         ("token_code",           codename_mvo(token_code))
+         ("chain_code",           chain_code)
+         ("token_code",           token_code)
          ("amount",               amount)
          ("actor_chain",          ChainKind::CHAIN_KIND_EVM)
          ("actor_address",        std::vector<char>{})
@@ -311,8 +306,8 @@ public:
                               std::string_view token_code, uint64_t amount) {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "withdrawinle"_n, mvo()
          ("account",     account.to_string())
-         ("chain_code",  codename_mvo(chain_code))
-         ("token_code",  codename_mvo(token_code))
+         ("chain_code",  chain_code)
+         ("token_code",  token_code)
          ("amount",      amount));
    }
 
@@ -346,8 +341,8 @@ public:
       const auto token_v = cn(token_code).value;
       const auto& arr = op["balances"].get_array();
       for (const auto& b : arr) {
-         if (b["chain_code"]["value"].as_uint64() == chain_v &&
-             b["token_code"]["value"].as_uint64() == token_v) {
+         if (b["chain_code"].as<fc::slug_name>().value == chain_v &&
+             b["token_code"].as<fc::slug_name>().value == token_v) {
             return b["balance"].as_uint64();
          }
       }
@@ -490,7 +485,7 @@ BOOST_FIXTURE_TEST_CASE(slashed_operator_withdraw_drops_silently,
 /// emitted by `sysio.opreg::emit_*` parse as a standard protobuf
 /// `OperatorAction` message. They were originally written against the v5
 /// OperatorAction proto (with a `chain` ChainKind field and a
-/// `TokenAmount.kind` TokenKind field). The v6 proto carries
+/// `TokenAmount.kind` TokenKind field). The proto carries
 /// `chain_code` (uint64) and `amount.token_code` (uint64) instead — same
 /// shape, different field semantics — so the parse + field-1-tag-byte
 /// invariant still holds.

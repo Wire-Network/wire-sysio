@@ -72,7 +72,7 @@ namespace sysio {
       ///   * `sysio.reserv::oncnclrsv` — `RESERVE_CREATE_CANCELLED` to
       ///     the reserve's owning outpost on race-win cancel.
       ///   * `sysio.opreg::*` — `OPERATOR_ACTION` family (WITHDRAW_REMIT,
-      ///     SLASH) — once the v6 reserve-flow lands the same pattern
+      ///     SLASH) — once the reserve-flow work lands the same pattern
       ///     reaches every depot-authorised outbound.
       ///
       /// Gated to the depot's own system contracts (sysio.epoch / .opreg /

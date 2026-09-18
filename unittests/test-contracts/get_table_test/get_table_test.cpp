@@ -42,5 +42,10 @@ void get_table_test::addhashobj(std::string hashinput) {
 
 void get_table_test::addstruct(uint64_t code, uint64_t payload) {
    structobjs structobjs_table( get_self() );
-   structobjs_table.emplace( get_self(), { slug_name{code} }, { slug_name{code}, payload } );
+   structobjs_table.emplace( get_self(), { composite_key{code} }, { composite_key{code}, payload } );
+}
+
+void get_table_test::addslug(slug_name code, uint64_t payload) {
+   slugobjs slugobjs_table( get_self() );
+   slugobjs_table.emplace( get_self(), { code }, { code, payload } );
 }
