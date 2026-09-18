@@ -435,6 +435,12 @@ BOOST_AUTO_TEST_CASE(schedule_admits_unsignable_keys) try {
    auto trace = chain.set_producer_schedule( sch );
    BOOST_REQUIRE( !trace->except );
    BOOST_REQUIRE( trace->receipt );
+
+   // Accepting the action is not the claim. The policy is assembled, logged and diffed when the
+   // block is finalized, which is where an unusable key would be dereferenced or rejected, so the
+   // block has to be produced and the proposal observed.
+   auto block = chain.produce_block();
+   BOOST_REQUIRE( block->new_proposer_policy_diff );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE(legacy_format_admits_unsignable_keys) try {
@@ -451,6 +457,10 @@ BOOST_AUTO_TEST_CASE(legacy_format_admits_unsignable_keys) try {
                                       config::system_account_name, mvo()("schedule", sched) );
       BOOST_REQUIRE( !trace->except );
       BOOST_REQUIRE( trace->receipt );
+
+      // As above: the proposal is only assembled when the block is finalized.
+      auto block = chain.produce_block();
+      BOOST_REQUIRE( block->new_proposer_policy_diff );
    }
 } FC_LOG_AND_RETHROW()
 

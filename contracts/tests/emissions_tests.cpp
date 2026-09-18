@@ -5764,6 +5764,53 @@ BOOST_FIXTURE_TEST_CASE( active_producers_scheduled, producer_eligibility_tester
 
 // A slashed producer (status SLASHED) is dropped from the schedule; the others
 // remain (4 eligible >= min_schedule_size).
+// The rank walk runs inside onblock, so a schedule it cannot publish stops every future schedule
+// update rather than just this one: update_ranked_producers writes last_producer_schedule_update
+// before proposing, and a throw rolls that write back with the rest of the transaction. A producer
+// holding a key nothing can sign with is the case that used to do it -- regproducer accepts the
+// key, the walk proposes it, and set_proposed_producers rejected the whole schedule.
+BOOST_FIXTURE_TEST_CASE( unsignable_producer_key_does_not_stall_rebuild, producer_eligibility_tester ) try {
+   auto names = setup_ranked_producers(5);
+   trigger_reschedule();
+   for (const auto& p : names) {
+      BOOST_REQUIRE_MESSAGE(is_scheduled(p), "expected " << p.to_string() << " scheduled");
+   }
+
+   // One producer re-registers with a key no signature can ever yield: a well-formed compressed
+   // R1 point prefix over an x coordinate above the field prime. Registration admits it -- it is
+   // an R1 key and it is not all zero, which is as far as the contract can check without curve
+   // arithmetic -- so this is the case the contract guard cannot close.
+   fc::crypto::r1::public_key_data undecodable{};
+   undecodable[0] = 0x02;
+   std::fill(undecodable.begin() + 1, undecodable.end(), '\xff');
+   const fc::crypto::public_key unsignable_key{
+      fc::crypto::public_key::storage_type{std::in_place_index<1>,
+                                           fc::crypto::r1::public_key_shim{undecodable}}};
+
+   const auto bad = names.back();
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(bad, "regproducer"_n, mvo()
+      ("producer", bad)("producer_key", unsignable_key)("url", "")("location", 0)));
+
+   // A block carries a proposer policy diff only when set_proposed_producers accepted the
+   // schedule, so that diff is the rebuild succeeding. Advance one block at a time and stop as
+   // soon as it appears: continuing past it would activate a policy this producer cannot sign
+   // for, and the harness signs every block itself.
+   bool proposed = false;
+   size_t blocks = 0;
+   for (; blocks < 200 && !proposed; ++blocks) {
+      proposed = produce_block()->new_proposer_policy_diff.has_value();
+   }
+   BOOST_REQUIRE_MESSAGE(proposed,
+                         "the rank walk never published a schedule with an unsignable key registered");
+   BOOST_TEST_MESSAGE("proposal landed after " << blocks << " blocks");
+
+   // One landing is proof enough: the stall was per block and permanent, so the row could not have
+   // moved at all unless onblock completed. Recovery beyond this point is not observable here --
+   // the harness holds no private half for an unsignable key and cannot sign that producer's slot
+   // once the policy activates, which is the intended consequence of admitting the key rather than
+   // a chain failure.
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( slashed_producer_removed, producer_eligibility_tester ) try {
    auto names = setup_ranked_producers(5);
    trigger_reschedule();
