@@ -19,7 +19,12 @@ namespace fc::crypto::bls {
       std::span<const uint8_t, public_key_data_size> affine_non_montgomery_le_span = affine_non_montgomery_le;
       std::optional<bls12_381::g1> g1 =
          bls12_381::g1::fromAffineBytesLE(affine_non_montgomery_le_span, {.check_valid = true, .to_mont = true});
-      FC_ASSERT(g1);
+      FC_ASSERT(g1, "BLS public key is not a canonical point on the curve");
+      // check_valid establishes only that the point is canonical and on the curve. A small-order
+      // point such as affine (0, 2) satisfies both and still pairs to one against any G2 subgroup
+      // point, so a proof of possession cannot tell it from a real key -- it would carry finality
+      // weight that anyone could cast. Subgroup membership is a separate test.
+      FC_ASSERT(g1->inCorrectSubgroup(), "BLS public key is not in the r-order subgroup");
       return *g1;
    }
    public_key::public_key(const public_key_data& affine_non_montgomery_le)
