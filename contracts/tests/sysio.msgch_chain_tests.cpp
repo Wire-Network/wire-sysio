@@ -162,6 +162,7 @@ namespace epoch_fields {
 constexpr const char* BATCH_OP_GROUPS       = "batch_op_groups";
 constexpr const char* NEXT_BATCH_OP_GROUPS  = "next_batch_op_groups";
 constexpr const char* CURRENT_BATCH_OP_GROUP = "current_batch_op_group";
+constexpr const char* CURRENT_EPOCH_INDEX    = "current_epoch_index";
 constexpr const char* IS_PAUSED              = "is_paused";
 } // namespace epoch_fields
 
@@ -691,8 +692,9 @@ public:
 
    /// Inspect the actual emitted envelope, after inline buildenv drained queueout.
    /// The final OPERATORS snapshot must match the registry, and any published
-   /// active/future schedule must follow that snapshot. A held historical seat
-   /// can intentionally remain as an inactive denominator placeholder.
+   /// active/future schedule must follow that snapshot. A one-group held-duty
+   /// lease may intentionally retain an inactive incumbent as a denominator
+   /// placeholder.
    void require_fresh_roster(uint64_t chain_code, name account,
                               opp::types::OperatorStatus expected_status,
                               bool expect_schedule_absence = true) {
@@ -721,14 +723,19 @@ public:
             BOOST_REQUIRE(have_operators);
             opp::attestations::BatchOperatorGroups groups;
             BOOST_REQUIRE(groups.ParseFromString(att.data()));
+            const auto state = read_epoch_state();
+            const auto held = state[epoch_fields::NEXT_BATCH_OP_GROUPS].get_array().empty() &&
+               groups.groups_size() == 1 && groups.active_group_index() == 0;
             std::set<std::string> members;
             for (const auto& group : groups.groups()) {
                for (const auto& address : group.operators()) {
                   BOOST_REQUIRE(members.insert(address.address()).second);
                   const auto registered = get_operator(name{address.address()});
                   BOOST_REQUIRE(!registered.is_null());
-                  BOOST_REQUIRE_EQUAL(opp::types::OPERATOR_STATUS_ACTIVE,
-                     registered["status"].as<opp::types::OperatorStatus>());
+                  if (!held) {
+                     BOOST_REQUIRE_EQUAL(opp::types::OPERATOR_STATUS_ACTIVE,
+                        registered["status"].as<opp::types::OperatorStatus>());
+                  }
                }
             }
          }
@@ -744,22 +751,23 @@ public:
       }
    }
 
-   /// How many BATCH_OPERATOR_GROUPS attestations the most recent `advance` shipped to
-   /// `chain_code` -- 0 when the depot WITHHELD it. Distinct from
-   /// `shipped_batch_operator_groups`, which fails the test on absence: the withhold path
-   /// needs to assert absence while still proving the envelope itself was built (i.e. that
-   /// `advance` skipped only this queueout and went on to emit the epoch's other
-   /// attestations, rather than returning early).
-   int shipped_batch_operator_groups_count(uint64_t chain_code) {
-      auto row = find_outbound_envelope(chain_code);
-      BOOST_REQUIRE(!row.is_null());
-      auto env = decode_envelope(row["raw_envelope"].as<std::vector<char>>());
-      BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
-      int count = 0;
-      for (const auto& att : env.messages(0).payload().attestations()) {
-         if (att.type() == sysio::opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS) ++count;
-      }
-      return count;
+   /// Require the incomplete-candidate path to re-anchor exactly the group the
+   /// depot keeps in duty. The lease is intentionally one group wide: it says
+   /// nothing about an incomplete future window.
+   sysio::opp::attestations::BatchOperatorGroups require_held_group_announcement(
+      uint64_t chain_code) {
+      const auto state = read_epoch_state();
+      const auto current_index = state[epoch_fields::CURRENT_BATCH_OP_GROUP].as_uint64();
+      const auto current = state[epoch_fields::BATCH_OP_GROUPS].get_array()[current_index].get_array();
+      const auto groups = shipped_batch_operator_groups(chain_code);
+      BOOST_REQUIRE_EQUAL(groups.groups_size(), 1);
+      BOOST_REQUIRE_EQUAL(groups.active_group_index(), 0u);
+      BOOST_REQUIRE_EQUAL(groups.epoch_index(), state[epoch_fields::CURRENT_EPOCH_INDEX].as_uint64());
+      BOOST_REQUIRE_EQUAL(groups.groups(0).operators_size(), current.size());
+      for (size_t i = 0; i < current.size(); ++i)
+         BOOST_REQUIRE_EQUAL(groups.groups(0).operators(static_cast<int>(i)).address(),
+                             current[i].as_string());
+      return groups;
    }
 
    /// Total attestations in the most recent outbound envelope for `chain_code`.
@@ -1710,7 +1718,7 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
       require_fresh_roster(chain, BATCHOP, opp::types::OPERATOR_STATUS_SLASHED,
                            /*expect_schedule_absence=*/false);
       // The remaining two members must not be advertised with a reduced quorum.
-      BOOST_REQUIRE_EQUAL(0, shipped_batch_operator_groups_count(chain));
+      require_held_group_announcement(chain);
    }
 } FC_LOG_AND_RETHROW() }
 
@@ -2130,7 +2138,7 @@ BOOST_FIXTURE_TEST_CASE(advance_repairs_single_group_ineligible_slot_in_place,
    produce_blocks();
    advance_to_next_epoch();
 
-   BOOST_REQUIRE_EQUAL(0, shipped_batch_operator_groups_count(ETH_OUTPOST_ID));
+   require_held_group_announcement(ETH_OUTPOST_ID);
    auto held = read_epoch_state()["batch_op_groups"].get_array();
    BOOST_REQUIRE_EQUAL(held.size(), 1u);
    BOOST_REQUIRE_EQUAL(held[0].get_array()[0].as_string(), BATCHOP.to_string());
@@ -2181,7 +2189,7 @@ BOOST_FIXTURE_TEST_CASE(advance_discards_partial_candidate_and_activates_complet
       BOOST_REQUIRE_EQUAL(group[0].as_string(), BATCHOP.to_string());
       BOOST_REQUIRE_EQUAL(group[1].as_string(), BATCHOP_C.to_string());
       BOOST_REQUIRE_EQUAL(group[2].as_string(), BATCHOP_B.to_string());
-      BOOST_REQUIRE_EQUAL(shipped_batch_operator_groups_count(ETH_OUTPOST_ID), 0);
+      require_held_group_announcement(ETH_OUTPOST_ID);
    }
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n,
       mvo()("account", BATCHOP_E.to_string())
@@ -2213,7 +2221,7 @@ BOOST_FIXTURE_TEST_CASE(chkcons_cannot_recover_without_a_live_held_group_signer,
    advance_via_consensus();
    BOOST_REQUIRE_EQUAL(current_epoch(), anchor_epoch + 1);
    BOOST_REQUIRE_EQUAL(duty_member(), BATCHOP_C);
-   BOOST_REQUIRE_EQUAL(shipped_batch_operator_groups_count(ETH_OUTPOST_ID), 0);
+   require_held_group_announcement(ETH_OUTPOST_ID);
 
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
       "terminate"_n, mvo()("account", BATCHOP_C.to_string())("reason", "lose every held signer")));
@@ -2242,7 +2250,7 @@ BOOST_FIXTURE_TEST_CASE(chkcons_cannot_recover_without_a_live_held_group_signer,
       BOOST_REQUIRE_EQUAL(duty_member(), BATCHOP_C);
       BOOST_REQUIRE(read_epoch_state()[epoch_fields::NEXT_BATCH_OP_GROUPS].get_array().empty());
       BOOST_REQUIRE_EQUAL(get_outpcons(ETH_OUTPOST_ID)["epoch_index"].as_uint64(), anchor_epoch);
-      BOOST_REQUIRE_EQUAL(shipped_batch_operator_groups_count(ETH_OUTPOST_ID), 0);
+      require_held_group_announcement(ETH_OUTPOST_ID);
    }
 } FC_LOG_AND_RETHROW() }
 
@@ -2286,7 +2294,7 @@ BOOST_FIXTURE_TEST_CASE(advance_freezes_and_recovers_withheld_operator_window,
       BOOST_REQUIRE_EQUAL(duty_member(), BATCHOP_C);
       BOOST_REQUIRE(read_epoch_state()[epoch_fields::NEXT_BATCH_OP_GROUPS].get_array().empty());
       BOOST_REQUIRE_GT(shipped_attestation_count(ETH_OUTPOST_ID), 0);
-      BOOST_REQUIRE_EQUAL(shipped_batch_operator_groups_count(ETH_OUTPOST_ID), 0);
+      require_held_group_announcement(ETH_OUTPOST_ID);
       require_fresh_roster(ETH_OUTPOST_ID, BATCHOP_B, opp::types::OPERATOR_STATUS_TERMINATED);
       deliver_and_advance(BATCHOP_C);
    }
@@ -2409,7 +2417,7 @@ BOOST_FIXTURE_TEST_CASE(advance_preserves_announced_successor_and_withholds_inac
    require_fresh_roster(ETH_OUTPOST_ID, BATCHOP_C,
                         opp::types::OPERATOR_STATUS_SLASHED,
                         /*expect_schedule_absence=*/false);
-   BOOST_REQUIRE_EQUAL(0, shipped_batch_operator_groups_count(ETH_OUTPOST_ID));
+   require_held_group_announcement(ETH_OUTPOST_ID);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(advance_repairs_future_group_before_it_becomes_current,

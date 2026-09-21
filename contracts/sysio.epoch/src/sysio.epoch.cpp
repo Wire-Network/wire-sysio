@@ -781,8 +781,8 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
       }
    }
 
-   // Failed candidates never become persistent schedule state. Empty pending
-   // state explicitly means no new publication and therefore no next activation.
+   // Failed candidates never become persistent successor state. Empty pending
+   // state explicitly means no new activation on the following advance.
    const bool publish_schedule = candidate_groups.size() == cfg.batch_op_groups &&
       std::all_of(candidate_groups.begin(), candidate_groups.end(), [&](const auto& group) {
          return group.size() == cfg.operators_per_epoch &&
@@ -792,7 +792,7 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
       state.next_batch_op_groups = std::move(candidate_groups);
    } else {
       sysio::print("sysio.epoch::finishadv: incomplete schedule candidate at epoch ", epoch_index,
-                   "; withholding BatchOperatorGroups and retaining the announced duty\n");
+                   "; withholding the successor and re-announcing the held duty\n");
    }
    state_tbl.set(state, ram_payer);
 
@@ -871,16 +871,30 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
    // the delivery is inside the envelope being refused, so recovery cannot land.
    // Group zero of a rotating candidate is historical when this announcement
    // lands; inactive placeholders there preserve the serving group's positions.
+   //
+   // When the candidate is incomplete, publish a one-group lease containing
+   // only the duty that just delivered this envelope. Re-anchoring that exact
+   // group on every held epoch is required by epoch-indexed outposts: merely
+   // omitting BATCH_OPERATOR_GROUPS would make them advance through the old
+   // resident window while the depot intentionally keeps this group in duty.
+   std::vector<std::vector<name>> announced_groups;
+   uint32_t announced_active_group = 0;
    if (publish_schedule) {
+      announced_groups = state.next_batch_op_groups;
+      announced_active_group = serving_group_index;
+   } else if (state.current_batch_op_group < state.batch_op_groups.size()) {
+      announced_groups.push_back(state.batch_op_groups[state.current_batch_op_group]);
+   }
+   if (!announced_groups.empty()) {
       opp::attestations::BatchOperatorGroups attest;
-      attest.active_group_index = zpp::bits::vuint32_t{serving_group_index};
+      attest.active_group_index = zpp::bits::vuint32_t{announced_active_group};
       attest.epoch_index = zpp::bits::vuint32_t{state.current_epoch_index};
       // Propagate the depot's minimum epoch duration so the outpost can
       // evaluate the fallback (path-2) majority consensus after this many
       // seconds since the current epoch started — see
       // .claude/rules/opp-consensus.md.
       attest.epoch_duration_sec = zpp::bits::vuint32_t{cfg.epoch_duration_sec};
-      for (const auto& group : state.next_batch_op_groups) {
+      for (const auto& group : announced_groups) {
          opp::attestations::BatchOperatorGroup grp;
          for (auto& op_name : group) {
             opp::types::ChainAddress addr;
