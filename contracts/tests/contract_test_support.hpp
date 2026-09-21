@@ -117,4 +117,15 @@ inline fc::mutable_variant_object svm_outpost_mvo(std::string_view program_id) {
       ("source_deposit_addr",    std::string{});
 }
 
+/// Mirrors of sysio.roa's `nodeownerreg` audit values (`reg_status` / `reject_reason` in sysio.roa.hpp).
+namespace nodeownerreg {
+inline constexpr uint64_t status_confirmed            = 0;
+inline constexpr uint64_t status_rejected             = 1;
+inline constexpr uint64_t reason_name_invalid         = 1;
+inline constexpr uint64_t reason_owner_not_account    = 2;
+inline constexpr uint64_t reason_account_key_mismatch = 3;
+inline constexpr uint64_t reason_duplicate            = 4;
+inline constexpr uint64_t reason_link_key_mismatch    = 5;
+} // namespace nodeownerreg
+
 } // namespace sysio_system::test_support
