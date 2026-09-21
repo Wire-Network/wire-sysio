@@ -198,10 +198,9 @@ namespace sysio {
      * @brief Verify and create a one-to-one link between a WIRE account and an external-chain key.
      *
      * A successful link derives its canonical native address and inline-sends
-     * `sysio.dclaim::linkswept` to move matching pre-link rewards. If sysio.dclaim is missing or
-     * non-privileged, the link still commits and the sweep is skipped. Because a second createlink
-     * for the same account and chain is rejected, that skipped sweep is not automatically retryable
-     * through this action; an authorized operator must use recordlink or linkswept for remediation.
+     * `sysio.dclaim::linkswept` to move matching pre-link rewards. The user link is atomic with that
+     * sweep: if sysio.dclaim is missing, non-privileged, or rejects the inline action, the link is
+     * rolled back so the user can submit a fresh retry after bootstrap.
      * EVM links require an EM key and EM signature so recovery applies EIP-191 domain separation;
      * SVM links require an ED key. Duplicate-key detection uses the verified recovered key.
      *

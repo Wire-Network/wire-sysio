@@ -68,29 +68,47 @@ inline void add_wire_capped(asset& balance, const asset& amt) {
    balance.amount += (amt.amount <= room ? amt.amount : room);
 }
 
+/**
+ * Credit a pending account balance with an explicit absolute expiry.
+ *
+ * Normal rewards replace the aggregate expiry so a new reward refreshes the
+ * account-level claim window. Link migration instead retains the later
+ * effective deadline: folding an older parked reward into an account must not
+ * make newer rewards expire early. A zero deadline means no expiry and is
+ * therefore later than every finite deadline.
+ */
+void credit_pending(name self, name wacct, const asset& amt, uint32_t expires_at_sec,
+                    bool retain_later_expiry = false) {
+   dclaim::pclaims_t pclaims(self);
+   auto it = pclaims.find(dclaim::pclaim_key{wacct.value});
+   if (it == pclaims.end()) {
+      pclaims.emplace(ram_payer, dclaim::pclaim_key{wacct.value},
+         dclaim::pending_claim{ .wire_account = wacct,
+                               .balance = amt,
+                               .expires_at_sec = expires_at_sec });
+   } else {
+      pclaims.modify(same_payer, dclaim::pclaim_key{wacct.value}, [&](auto& r) {
+         add_wire_capped(r.balance, amt);
+         if (!retain_later_expiry) {
+            r.expires_at_sec = expires_at_sec;
+         } else if (r.expires_at_sec != 0 &&
+                    (expires_at_sec == 0 || expires_at_sec > r.expires_at_sec)) {
+            r.expires_at_sec = expires_at_sec;
+         }
+      });
+   }
+}
+
 /// Credit `amt` WIRE to the staker. Linked (`wacct` set) -> `pending_claims`;
-/// otherwise parked in `unmapped_tokens` keyed by (chain, addr). Either way
-/// the row's expiry is refreshed to now + window. Shared by `onreward`,
-/// `linkswept`, and `importseed` so the upsert + expiry logic
-/// lives in exactly one place.
+/// otherwise parked in `unmapped_tokens` keyed by (chain, addr). A new reward
+/// refreshes the destination row to now + window. Link migration bypasses this
+/// helper so it can retain the parked row's original absolute expiry.
 void credit_wire(name self, name wacct, ChainKind chain,
                  const std::vector<char>& addr, const asset& amt, uint32_t window) {
    const uint32_t exp = now_sec() + window;
 
    if (wacct.value != 0) {
-      dclaim::pclaims_t pclaims(self);
-      auto it = pclaims.find(dclaim::pclaim_key{wacct.value});
-      if (it == pclaims.end()) {
-         pclaims.emplace(ram_payer, dclaim::pclaim_key{wacct.value},
-            dclaim::pending_claim{ .wire_account = wacct,
-                                .balance      = amt,
-                                .expires_at_sec = exp });
-      } else {
-         pclaims.modify(same_payer, dclaim::pclaim_key{wacct.value}, [&](auto& r) {
-            add_wire_capped(r.balance, amt);
-            r.expires_at_sec  = exp;
-         });
-      }
+      credit_pending(self, wacct, amt, exp);
       return;
    }
 
@@ -212,8 +230,6 @@ void dclaim::claim(name wire_account) {
 void dclaim::linkswept(name wire_account, ChainKind chain, std::vector<char> native_pubkey) {
    require_auth(AUTHEX_ACCOUNT);
 
-   const uint32_t window = config_window(get_self());
-
    // Sweep an unmapped balance into the staker's pending_claims row.
    unmapped_t unmapped(get_self());
    auto uidx = unmapped.template get_index<"bychainad"_n>();
@@ -229,11 +245,13 @@ void dclaim::linkswept(name wire_account, ChainKind chain, std::vector<char> nat
          unmapped.erase(unmapped_key{uit->id});
          return;
       }
-      const asset    bal    = uit->balance;
+      const asset bal = uit->balance;
+      const uint32_t expires_at_sec = uit->expires_at_sec;
       const uint64_t row_id = uit->id;
       unmapped.erase(unmapped_key{row_id});
-      // wire_account is set -> routed to pending_claims, expiry refreshed.
-      credit_wire(get_self(), wire_account, chain, native_pubkey, bal, window);
+      // Preserve the parked row's deadline when it creates the account aggregate. If an aggregate
+      // already exists, its later effective deadline governs so newer rewards cannot expire early.
+      credit_pending(get_self(), wire_account, bal, expires_at_sec, true);
    }
 }
 

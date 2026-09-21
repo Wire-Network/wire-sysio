@@ -137,11 +137,12 @@ Independently of inlines, the emissions readiness gate in `sysio.epoch` **reads*
 `sysio.system`'s `emitcfg`, `t5state` and `payclaimtot`, and `sysio.token`'s
 `accounts`.
 
-WIRE-352 adds a separate, deliberately soft inline edge:
+WIRE-352 adds a separate inline edge whose failure behavior depends on the caller:
 
 | Caller | Callee/action | Required order | Mixed-state behavior |
 |---|---|---|---|
-| `sysio.authex::{createlink,recordlink}` | `sysio.dclaim::linkswept` | Deploy `sysio.dclaim` before the first external-key link. | A missing or non-privileged callee is detected before the inline send, so the link commits and the pre-link reward remains in `unmapped_tokens` for operator remediation rather than aborting dispatch. |
+| `sysio.authex::createlink` | `sysio.dclaim::linkswept` | Deploy `sysio.dclaim` before the first user-created external-key link. | A missing or non-privileged callee aborts before link insertion. Any inline failure rolls the transaction back, so the user can submit a fresh retry. |
+| `sysio.authex::recordlink` | `sysio.dclaim::linkswept` | Prefer deploying `sysio.dclaim` before trusted node-owner dispatch begins. | A missing or non-privileged callee skips the sweep but preserves the trusted link; an identical operator-authorized `recordlink` can retry it after bootstrap. |
 
 Production deployment through `sysio.roa::setsyscode` privileges `sysio.dclaim`
 as part of the deploy, so there is no separate privilege step. The durable

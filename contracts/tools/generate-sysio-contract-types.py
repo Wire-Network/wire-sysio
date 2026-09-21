@@ -400,7 +400,7 @@ def generate(abi_files: list[str], output_dir: str, style: str) -> None:
     # Write TypeScript
     ts_path = os.path.join(output_dir, 'typescript', 'SysioContractTypes.ts')
     with open(ts_path, 'w') as f:
-        f.write('\n'.join(ts_lines) + '\n')
+        f.write('\n'.join(ts_lines).rstrip('\n') + '\n')
     iface_count = sum(1 for line in ts_lines if line.startswith('export interface'))
     click.echo(f'Written: {ts_path} ({iface_count} interfaces)')
 

@@ -287,6 +287,7 @@ BOOST_FIXTURE_TEST_CASE( createlink_stale_nonce, sysio_authex_tester ) try {
 // ——— createlink: successful ethereum link ———
 
 BOOST_FIXTURE_TEST_CASE( createlink_eth_success, sysio_authex_tester ) try {
+   deploy_dclaim();
    auto link = make_eth_link("alice", now_ms());
 
    BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce) );
@@ -301,6 +302,38 @@ BOOST_FIXTURE_TEST_CASE( createlink_eth_success, sysio_authex_tester ) try {
    for (const auto& kw : auth.keys)
       BOOST_CHECK_MESSAGE( kw.key != link.pub, "EM key must not be added to active" );
    BOOST_REQUIRE( auth_mgr.find_permission({"alice"_n, "ex.eth"_n}) == nullptr );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( createlink_rolls_back_until_dclaim_is_ready,
+                         sysio_authex_tester ) try {
+   auto link = make_eth_link("alice", now_ms());
+
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("sysio.dclaim must be deployed and privileged before creating a link"),
+      createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce));
+   BOOST_REQUIRE(get_link(0).is_null());
+
+   deploy_dclaim();
+   BOOST_REQUIRE_EQUAL(success(), createlink(
+      "alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce));
+   BOOST_REQUIRE(!get_link(0).is_null());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( createlink_rolls_back_until_dclaim_is_privileged,
+                         sysio_authex_tester ) try {
+   deploy_dclaim();
+   set_dclaim_privileged(false);
+   auto link = make_eth_link("alice", now_ms());
+
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("sysio.dclaim must be deployed and privileged before creating a link"),
+      createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce));
+   BOOST_REQUIRE(get_link(0).is_null());
+
+   set_dclaim_privileged(true);
+   BOOST_REQUIRE_EQUAL(success(), createlink(
+      "alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce));
+   BOOST_REQUIRE(!get_link(0).is_null());
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( createlink_eth_sweeps_prelink_dclaim_rewards, sysio_authex_tester ) try {
@@ -480,6 +513,7 @@ BOOST_FIXTURE_TEST_CASE( recordlink_identical_retry_resweeps_dclaim_rewards, sys
 // --- createlink: account bears no RAM cost (link row is sysio-paid) ---
 
 BOOST_FIXTURE_TEST_CASE( createlink_no_account_ram_cost, sysio_authex_tester ) try {
+   deploy_dclaim();
    auto& rlm = control->get_resource_limits_manager();
    int64_t q0, net, cpu;
    rlm.get_account_limits("alice"_n, q0, net, cpu);
@@ -500,6 +534,7 @@ BOOST_FIXTURE_TEST_CASE( createlink_no_account_ram_cost, sysio_authex_tester ) t
 // ——— createlink: duplicate pubkey ———
 
 BOOST_FIXTURE_TEST_CASE( createlink_duplicate_pubkey, sysio_authex_tester ) try {
+   deploy_dclaim();
    auto link1 = make_eth_link("alice", now_ms());
 
    BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link1.sig, link1.pub, link1.nonce) );
@@ -519,6 +554,7 @@ BOOST_FIXTURE_TEST_CASE( createlink_duplicate_pubkey, sysio_authex_tester ) try 
 
 BOOST_FIXTURE_TEST_CASE( createlink_opposite_parity_cannot_duplicate_verified_key,
                          sysio_authex_tester ) try {
+   deploy_dclaim();
    auto link = make_eth_link("alice", now_ms());
    BOOST_REQUIRE_EQUAL(success(), createlink(
       "alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce));
@@ -543,6 +579,7 @@ BOOST_FIXTURE_TEST_CASE( createlink_opposite_parity_cannot_duplicate_verified_ke
 // ——— createlink: duplicate chain for same user ———
 
 BOOST_FIXTURE_TEST_CASE( createlink_duplicate_chain_for_user, sysio_authex_tester ) try {
+   deploy_dclaim();
    auto link1 = make_eth_link("alice", now_ms());
 
    BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link1.sig, link1.pub, link1.nonce) );
@@ -559,6 +596,7 @@ BOOST_FIXTURE_TEST_CASE( createlink_duplicate_chain_for_user, sysio_authex_teste
 // ——— clearlinks + re-create ———
 
 BOOST_FIXTURE_TEST_CASE( clearlinks_then_recreate, sysio_authex_tester ) try {
+   deploy_dclaim();
    auto link1 = make_eth_link("alice", now_ms());
    BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link1.sig, link1.pub, link1.nonce) );
    produce_blocks();

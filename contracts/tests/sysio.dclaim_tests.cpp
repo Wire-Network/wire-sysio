@@ -199,6 +199,87 @@ BOOST_FIXTURE_TEST_CASE(onreward_unlinked_parks_unmapped_then_linkswept, sysio_d
    BOOST_REQUIRE_EQUAL(pending_of("bob"_n)["balance"].as<asset>().get_amount(), 5000);
 } FC_LOG_AND_RETHROW() }
 
+BOOST_FIXTURE_TEST_CASE(linkswept_preserves_original_unmapped_expiry, sysio_dclaim_tester) { try {
+   constexpr uint32_t original_window_sec = 120;
+   constexpr uint32_t replacement_window_sec = 3600;
+   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n,
+      mvo()("window_sec", original_window_sec)), success());
+   BOOST_REQUIRE_EQUAL(onreward(MSGCH_ACCOUNT, 1, "", ChainKind::CHAIN_KIND_EVM,
+      addr20, 5000, 7, 100), success());
+   const auto original_expiry = unmapped_row(1)["expires_at_sec"].as<uint32_t>();
+
+   produce_block(fc::seconds(5));
+   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n,
+      mvo()("window_sec", replacement_window_sec)), success());
+   BOOST_REQUIRE_EQUAL(push_dclaim(AUTHEX_ACCOUNT, "linkswept"_n, mvo()
+      ("wire_account", "bob")
+      ("chain", ChainKind::CHAIN_KIND_EVM)
+      ("native_pubkey", addr20)), success());
+
+   const auto pending = pending_of("bob"_n);
+   BOOST_REQUIRE(!pending.is_null());
+   BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 5000);
+   BOOST_REQUIRE_EQUAL(pending["expires_at_sec"].as<uint32_t>(), original_expiry);
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(linkswept_does_not_shorten_newer_aggregate_expiry, sysio_dclaim_tester) { try {
+   constexpr uint32_t older_window_sec = 120;
+   constexpr uint32_t newer_window_sec = 3600;
+   const std::vector<char> newer_addr(20, char(0xB2));
+
+   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n,
+      mvo()("window_sec", older_window_sec)), success());
+   BOOST_REQUIRE_EQUAL(onreward(MSGCH_ACCOUNT, 1, "", ChainKind::CHAIN_KIND_EVM,
+      addr20, 5000, 7, 100), success());
+   const auto older_expiry = unmapped_row(1)["expires_at_sec"].as<uint32_t>();
+
+   produce_block(fc::seconds(5));
+   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n,
+      mvo()("window_sec", newer_window_sec)), success());
+   BOOST_REQUIRE_EQUAL(onreward(MSGCH_ACCOUNT, 1, "bob", ChainKind::CHAIN_KIND_EVM,
+      newer_addr, 2000, 8, 101), success());
+   const auto newer_expiry = pending_of("bob"_n)["expires_at_sec"].as<uint32_t>();
+   BOOST_REQUIRE_GT(newer_expiry, older_expiry);
+
+   BOOST_REQUIRE_EQUAL(push_dclaim(AUTHEX_ACCOUNT, "linkswept"_n, mvo()
+      ("wire_account", "bob")
+      ("chain", ChainKind::CHAIN_KIND_EVM)
+      ("native_pubkey", addr20)), success());
+
+   const auto pending = pending_of("bob"_n);
+   BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 7000);
+   BOOST_REQUIRE_EQUAL(pending["expires_at_sec"].as<uint32_t>(), newer_expiry);
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(linkswept_adopts_newer_migrated_expiry, sysio_dclaim_tester) { try {
+   constexpr uint32_t older_window_sec = 120;
+   constexpr uint32_t newer_window_sec = 3600;
+   const std::vector<char> newer_addr(20, char(0xB2));
+
+   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n,
+      mvo()("window_sec", older_window_sec)), success());
+   BOOST_REQUIRE_EQUAL(onreward(MSGCH_ACCOUNT, 1, "bob", ChainKind::CHAIN_KIND_EVM,
+      addr20, 2000, 7, 100), success());
+   const auto older_expiry = pending_of("bob"_n)["expires_at_sec"].as<uint32_t>();
+
+   produce_block(fc::seconds(5));
+   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n,
+      mvo()("window_sec", newer_window_sec)), success());
+   BOOST_REQUIRE_EQUAL(onreward(MSGCH_ACCOUNT, 1, "", ChainKind::CHAIN_KIND_EVM,
+      newer_addr, 5000, 8, 101), success());
+   const auto newer_expiry = unmapped_row(1)["expires_at_sec"].as<uint32_t>();
+   BOOST_REQUIRE_GT(newer_expiry, older_expiry);
+
+   BOOST_REQUIRE_EQUAL(push_dclaim(AUTHEX_ACCOUNT, "linkswept"_n, mvo()
+      ("wire_account", "bob")
+      ("chain", ChainKind::CHAIN_KIND_EVM)
+      ("native_pubkey", newer_addr)), success());
+
+   const auto pending = pending_of("bob"_n);
+   BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 7000);
+   BOOST_REQUIRE_EQUAL(pending["expires_at_sec"].as<uint32_t>(), newer_expiry);
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(linkswept_forfeits_expired_unmapped_balance, sysio_dclaim_tester) { try {
    BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n,
       mvo()("window_sec", uint32_t{1})), success());

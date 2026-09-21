@@ -11,6 +11,8 @@ using namespace sysio;
 constexpr name link_row_payer = "sysio"_n;
 constexpr name dclaim_account = "sysio.dclaim"_n;
 constexpr name linkswept_action = "linkswept"_n;
+constexpr auto dclaim_not_ready_message =
+   "sysio.dclaim must be deployed and privileged before creating a link";
 
 using ed_raw_key_t = std::array<uint8_t, 32>;
 
@@ -34,22 +36,35 @@ using ed_raw_key_t = std::array<uint8_t, 32>;
    return raw_key;
 }
 
-/**
- * Sweep rewards deposited before this external-chain identity was linked.
- *
- * A missing or non-privileged DClaim deployment cannot safely bill new rows to sysio. Treat either
- * bootstrap state as "sweep unavailable": the link remains recordable and a later identical
- * recordlink call can retry once bootstrap has completed.
- */
-void sweep_linked_rewards(const name self, const name account,
-                          const opp::types::ChainKind chain_kind,
-                          const std::vector<char>& native_address) {
-   if (!is_account(dclaim_account) || !is_privileged(dclaim_account)) return;
+/** Return whether DClaim can receive a system-paid link sweep. */
+[[nodiscard]] bool dclaim_ready() {
+   return is_account(dclaim_account) && is_privileged(dclaim_account);
+}
 
+/** Abort a user link before insertion unless its required DClaim sweep is available. */
+void assert_dclaim_ready() {
+   check(dclaim_ready(), dclaim_not_ready_message);
+}
+
+/** Send the DClaim sweep that completes an external-chain link. */
+void send_linked_rewards_sweep(const name self, const name account,
+                               const opp::types::ChainKind chain_kind,
+                               const std::vector<char>& native_address) {
    action(permission_level{self, "active"_n}, dclaim_account, linkswept_action,
           std::make_tuple(account, chain_kind, native_address)).send();
 }
 
+/**
+ * Best-effort sweep for the trusted inbound path.
+ *
+ * A missing or non-privileged DClaim deployment cannot safely bill new rows to sysio. Preserve the
+ * recorded link so an identical operator-authorized recordlink can retry after bootstrap.
+ */
+void try_send_linked_rewards_sweep(const name self, const name account,
+                                   const opp::types::ChainKind chain_kind,
+                                   const std::vector<char>& native_address) {
+   if (dclaim_ready()) send_linked_rewards_sweep(self, account, chain_kind, native_address);
+}
 
 } // anonymous namespace
 
@@ -154,6 +169,10 @@ namespace sysio {
    auto pub_hash = pubkey_to_checksum256(verified_pub_key);
    check(by_pubkey.find(pub_hash) == by_pubkey.end(), "Public key already linked to a different account.");
 
+   // User-created links are atomic with their DClaim sweep. A missing or non-privileged deployment
+   // must fail before insertion so the user can submit a fresh retry after bootstrap.
+   assert_dclaim_ready();
+
    // CREATE LINK RECORD — use verified_pub_key which has the real y-parity
    // prefix from recovery (for EM) rather than the potentially ambiguous input.
    uint64_t next_key = 0;
@@ -168,7 +187,7 @@ namespace sysio {
       .pub_key = verified_pub_key,
    });
 
-   sweep_linked_rewards(get_self(), account, chain_kind, native_address);
+   send_linked_rewards_sweep(get_self(), account, chain_kind, native_address);
 
    // The verified key is recorded in the links table only; it is NOT added to the
    // account's `active` (or any) permission, so the link grants no Wire signing
@@ -224,7 +243,7 @@ namespace sysio {
       if (existing->pub_key == pub_key && can_sweep) {
          // This is the last available inline depth on the OPP node-owner path:
          // deliver -> evalcons -> nodeownreg -> recordlink -> linkswept.
-         sweep_linked_rewards(get_self(), account, chain_kind, native_address);
+         try_send_linked_rewards_sweep(get_self(), account, chain_kind, native_address);
       }
       return;
    }
@@ -243,7 +262,7 @@ namespace sysio {
 
    if (can_sweep) {
       // The OPP node-owner path spends its final inline depth on linkswept.
-      sweep_linked_rewards(get_self(), account, chain_kind, native_address);
+      try_send_linked_rewards_sweep(get_self(), account, chain_kind, native_address);
    }
 }
 
