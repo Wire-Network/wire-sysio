@@ -13,7 +13,7 @@
                 },
                 {
                     "name": "index_checkpoint",
-                    "type": "uint64"
+                    "type": "uint128"
                 },
                 {
                     "name": "owed_wire",
@@ -157,7 +157,7 @@
             "fields": [
                 {
                     "name": "index",
-                    "type": "uint64"
+                    "type": "uint128"
                 },
                 {
                     "name": "pot",

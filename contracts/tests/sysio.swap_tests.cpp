@@ -3,6 +3,7 @@
 #include <sysio/testing/tester.hpp>
 
 
+#include <fc/int128.hpp>
 #include <fc/variant_object.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
@@ -13,6 +14,7 @@
 #include "twap_wide.hpp"
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <random>
 #include <set>
 
@@ -30,17 +32,25 @@ using mvo = fc::mutable_variant_object;
 // spelled again here so the test reads them without that (CDT-only) header:
 // this is the host-side pin of the layout the swap contract compiles against.
 struct shadow_account_row {
-    asset    balance;
-    uint64_t index_checkpoint;
-    uint64_t owed_wire;
+    asset         balance;
+    fc::uint128_t index_checkpoint;
+    uint64_t      owed_wire;
 };
 FC_REFLECT( shadow_account_row, (balance)(index_checkpoint)(owed_wire) )
 struct shadow_index_row {
-    uint64_t index;
-    uint64_t pot;
-    uint64_t carry;
+    fc::uint128_t index;
+    uint64_t      pot;
+    uint64_t      carry;
 };
 FC_REFLECT( shadow_index_row, (index)(pot)(carry) )
+
+// Boost.Test prints both operands of a failed assertion; the 128-bit index
+// fields have no stream operator of their own.
+namespace boost::test_tools::tt_detail {
+   template<> struct print_log_value<fc::uint128_t> {
+      void operator()( std::ostream& os, const fc::uint128_t& v ) { os << fc::to_string( v ); }
+   };
+}
 
 static symbol EVO4 = symbol::from_string("4,EVO");
 static symbol ETUSD3 = symbol::from_string("3,ETUSD");
@@ -725,13 +735,14 @@ namespace twap_reference {
 namespace yield_reference {
    using wide = boost::multiprecision::uint128_t;
    constexpr uint64_t Scale = 1'000'000'000'000;
-   struct distribution { uint64_t index_delta; uint64_t carry; };
+   // The index and the checkpoints are 128-bit, like the rows they are read from.
+   struct distribution { wide index_delta; uint64_t carry; };
    distribution distribute( int64_t wire, int64_t supply, uint64_t carry_in ) {
       const wide total = wide(wire) * Scale + carry_in;
-      return { uint64_t( total / supply ), uint64_t( total % supply ) };
+      return { wide( total / supply ), uint64_t( total % supply ) };
    }
-   int64_t owed( int64_t balance, uint64_t index, uint64_t checkpoint, uint64_t banked = 0 ) {
-      return int64_t( banked + uint64_t( wide(balance) * (index - checkpoint) / Scale ) );
+   int64_t owed( int64_t balance, fc::uint128_t index, fc::uint128_t checkpoint, uint64_t banked = 0 ) {
+      return int64_t( banked + uint64_t( wide(balance) * (wide(index) - wide(checkpoint)) / Scale ) );
    }
    // One tick's clip: the reservoir's share of the horizon elapsed, FLOORED,
    // capped by `cap_bps` of the pool's shadow side and by what is queued. A
@@ -1571,7 +1582,7 @@ BOOST_FIXTURE_TEST_CASE( yield_accrues_into_the_pool_without_minting, sysio_swap
     BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( first_donation, EOS4 ), SHD ) );
     const auto first = yield_reference::distribute( first_donation, ShadowIssuance, 0 );
     auto idx = shadow_index( SHD );
-    BOOST_REQUIRE_EQUAL( first.index_delta, idx.index );
+    BOOST_REQUIRE_EQUAL( first.index_delta, yield_reference::wide( idx.index ) );
     BOOST_REQUIRE_EQUAL( first.carry, idx.carry );
     BOOST_REQUIRE_EQUAL( uint64_t(first_donation), idx.pot );
     BOOST_REQUIRE_LT( 0u, idx.carry );   // the chosen supply does not divide evenly
@@ -1606,9 +1617,9 @@ BOOST_FIXTURE_TEST_CASE( yield_accrues_into_the_pool_without_minting, sysio_swap
     BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( third_donation, EOS4 ), SHD ) );
     const auto second = yield_reference::distribute( second_donation, ShadowIssuance, first.carry );
     const auto third  = yield_reference::distribute( third_donation,  ShadowIssuance, second.carry );
-    const uint64_t index_after_three = first.index_delta + second.index_delta + third.index_delta;
+    const yield_reference::wide index_after_three = first.index_delta + second.index_delta + third.index_delta;
     idx = shadow_index( SHD );
-    BOOST_REQUIRE_EQUAL( index_after_three, idx.index );
+    BOOST_REQUIRE_EQUAL( index_after_three, yield_reference::wide( idx.index ) );
     BOOST_REQUIRE_EQUAL( third.carry, idx.carry );
     const int64_t owed2 = yield_reference::owed( YieldPoolShadow, idx.index, held.index_checkpoint );
     BOOST_REQUIRE_EQUAL( success(), accrueyield( SHEO ) );
@@ -1627,6 +1638,44 @@ BOOST_FIXTURE_TEST_CASE( yield_accrues_into_the_pool_without_minting, sysio_swap
     const int64_t donated = first_donation + second_donation + third_donation;
     BOOST_REQUIRE_EQUAL( uint64_t(donated - owed1 - owed2 - owed_alice), shadow_index( SHD ).pot );
     BOOST_REQUIRE_LT( shadow_index( SHD ).pot, 3u );   // at most one unit of dust per holder
+} FC_LOG_AND_RETHROW()
+
+// The index is 128-bit: one add to a thinly held symbol moves it past 2^64 (a
+// single subunit of supply and 2e7 subunits of yield give 2e19), and the holder
+// is still paid every subunit, through that add and the next one.
+BOOST_FIXTURE_TEST_CASE( yield_index_grows_past_64_bits, sysio_swap_tester ) try {
+    create_tokens_and_issue();
+    BOOST_REQUIRE_EQUAL( success(), shadow_create( "alice"_n, asset( ShadowIssuance, SHD4 ), WIRE ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_issue( "alice"_n, "alice"_n, asset( 1, SHD4 ) ) );
+    BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "bob"_n, asset( BobDonationBudget, EOS4 ), "" ) );
+    grant_shadow_code( "bob"_n );
+
+    const int64_t supply   = 1;
+    const int64_t donation = 2000'0000;   // 2e7 subunits: the index moves by 2e7 * 1e12 / 1
+    const auto first = yield_reference::distribute( donation, supply, 0 );
+    BOOST_REQUIRE_LT( yield_reference::wide( std::numeric_limits<uint64_t>::max() ), first.index_delta );
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( donation, EOS4 ), SHD ) );
+    BOOST_REQUIRE_EQUAL( first.index_delta, yield_reference::wide( shadow_index( SHD ).index ) );
+
+    // The sole holder is owed the whole donation, and claiming pays exactly that.
+    BOOST_REQUIRE_EQUAL( donation, yield_reference::owed( supply, shadow_index( SHD ).index, 0 ) );
+    int64_t alice_before = token_balance( "sysio.token"_n, "alice"_n, EOS.value );
+    BOOST_REQUIRE_EQUAL( success(), shadow_claim( "alice"_n, SHD ) );
+    BOOST_REQUIRE_EQUAL( alice_before + donation, token_balance( "sysio.token"_n, "alice"_n, EOS.value ) );
+    const auto held = shadow_account( "alice"_n, SHD );
+    BOOST_REQUIRE_EQUAL( shadow_index( SHD ).index, held.index_checkpoint );
+    BOOST_REQUIRE_EQUAL( 0u, held.owed_wire );
+    BOOST_REQUIRE_EQUAL( 0u, shadow_index( SHD ).pot );
+
+    // A second add accrues from a checkpoint that is itself past 2^64.
+    const auto second = yield_reference::distribute( donation, supply, first.carry );
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( donation, EOS4 ), SHD ) );
+    BOOST_REQUIRE_EQUAL( first.index_delta + second.index_delta, yield_reference::wide( shadow_index( SHD ).index ) );
+    BOOST_REQUIRE_EQUAL( donation, yield_reference::owed( supply, shadow_index( SHD ).index, held.index_checkpoint ) );
+    alice_before = token_balance( "sysio.token"_n, "alice"_n, EOS.value );
+    BOOST_REQUIRE_EQUAL( success(), shadow_claim( "alice"_n, SHD ) );
+    BOOST_REQUIRE_EQUAL( alice_before + donation, token_balance( "sysio.token"_n, "alice"_n, EOS.value ) );
+    BOOST_REQUIRE_EQUAL( 0u, shadow_index( SHD ).pot );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( yield_is_credited_before_shares_are_priced, sysio_swap_tester ) try {
@@ -1933,7 +1982,8 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_
     BOOST_REQUIRE_EQUAL( contract_wire_before - proceeds, token_balance( "sysio.token"_n, "sysio.swap"_n, EOS.value ) );
     auto distributed = yield_reference::distribute( proceeds, ShadowIssuance, idx_before.carry );
     auto idx_after = shadow_index( SHD );
-    BOOST_REQUIRE_EQUAL( idx_before.index + distributed.index_delta, idx_after.index );
+    BOOST_REQUIRE_EQUAL( yield_reference::wide( idx_before.index ) + distributed.index_delta,
+                         yield_reference::wide( idx_after.index ) );
     BOOST_REQUIRE_EQUAL( idx_before.pot + uint64_t(proceeds), idx_after.pot );
     // The pool kept the fee: the product grew.
     BOOST_REQUIRE( is_increasing( before, after ) );

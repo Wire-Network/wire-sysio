@@ -55,7 +55,7 @@ private:
    using accounts  = kv::scoped_table<"accounts"_n, opp::shadow::symbol_key, opp::shadow::account>;
    using yieldidxs = kv::table<"yieldidx"_n, opp::shadow::symbol_key, opp::shadow::yield_index>;
 
-   uint64_t current_index(symbol_code sym) const;
+   opp::shadow::u128 current_index(symbol_code sym) const;
    /// Settle `owner`'s row at the current index, then apply `delta` to its
    /// balance. A holder without a row is stamped at the current index, so no
    /// history is credited to it.

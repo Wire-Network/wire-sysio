@@ -53,7 +53,7 @@ void shadowtoken::addyield(name from, asset quantity, symbol_code target) {
    yieldidxs indexes( get_self() );
    opp::shadow::yield_index idx = indexes.try_get( key ).value_or( opp::shadow::yield_index{} );
    const u128 total = static_cast<u128>(quantity.amount) * opp::shadow::YIELD_INDEX_SCALE + idx.carry;
-   idx.index += static_cast<uint64_t>( total / static_cast<u128>(st.supply.amount) );
+   idx.index += total / static_cast<u128>(st.supply.amount);
    idx.carry  = static_cast<uint64_t>( total % static_cast<u128>(st.supply.amount) );
    idx.pot   += quantity.amount;
    indexes.upsert( get_self(), key, idx );
@@ -68,7 +68,7 @@ void shadowtoken::claim(name holder, symbol_code sym) {
    const opp::shadow::symbol_key key{ sym.raw() };
    const auto row = holdings.try_get( key );
    check( row.has_value(), "no balance object found" );
-   const uint64_t index = current_index( sym );
+   const u128     index = current_index( sym );
    const uint64_t owed  = opp::shadow::owed( *row, index );
    holdings.modify( name{}, key, [&]( auto& a ) {
       a.index_checkpoint = index;
@@ -87,7 +87,7 @@ void shadowtoken::claim(name holder, symbol_code sym) {
            std::make_tuple( get_self(), holder, asset{ int64_t(owed), st.wire_symbol }, string("") ) ).send();
 }
 
-uint64_t shadowtoken::current_index(symbol_code sym) const {
+u128 shadowtoken::current_index(symbol_code sym) const {
    yieldidxs indexes( get_self() );
    const auto idx = indexes.try_get( opp::shadow::symbol_key{ sym.raw() } );
    return idx ? idx->index : 0;
@@ -96,7 +96,7 @@ uint64_t shadowtoken::current_index(symbol_code sym) const {
 void shadowtoken::settle_and_adjust(name owner, const asset& delta) {
    accounts holdings( get_self(), owner.value );
    const opp::shadow::symbol_key key{ delta.symbol.code().raw() };
-   const uint64_t index = current_index( delta.symbol.code() );
+   const u128 index = current_index( delta.symbol.code() );
    const auto row = holdings.try_get( key );
    if (!row) {
       check( delta.amount >= 0, "no balance object found" );
