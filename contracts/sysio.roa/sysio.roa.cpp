@@ -6,6 +6,8 @@
 #include <sysio.opp.common/safe_ops.hpp>   // add_sat_u64 / add_sat_i64 -- never-throw saturating accumulators
 #include <sysio/permission.hpp>   // get_permission -- read an account's active authority in nodeownreg
 
+#include <string_view>
+
 namespace sysio {
 
     namespace {
@@ -13,6 +15,10 @@ namespace sysio {
         // literals -- a contract rename is one change here, not scattered across call sites).
         constexpr name AUTHEX_ACCOUNT    = "sysio.authex"_n;
         constexpr name AUTHEX_RECORDLINK = "recordlink"_n;
+
+        /// Names under this prefix belong to system accounts. The chain refuses them only to non-privileged
+        /// creators, and sysio.roa is privileged, so node-owner claims must refuse them here.
+        constexpr std::string_view RESERVED_SYSTEM_NAME_PREFIX = "sysio.";
 
         /// Maximum number of generated account names checked before newuser gives up.
         constexpr uint32_t MAX_ACCOUNT_NAME_ATTEMPTS{100};
@@ -817,6 +823,7 @@ namespace sysio {
     }
 
     bool roa::valid_name_for_tier(const name& account, uint8_t tier) {
+        if (account.to_string().rfind(RESERVED_SYSTEM_NAME_PREFIX, 0) == 0) return false;
         const size_t len = account.length();
         // Tier-1 owners take a short 2-6 char prefix (sub-accounts become <prefix>.<random>);
         // tier 2/3 take a 1-12 char vanity name.

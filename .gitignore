@@ -73,7 +73,6 @@ scripts/tn_init.sh
 
 tests/plugin_test
 unittests/unit_test
-tutorials/sig-em-tutorial/contracts
 
 doxygen
 wire.doxygen
