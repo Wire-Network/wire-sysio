@@ -57,7 +57,6 @@ uint64_t next_id(name self, Pick pick) {
 /// Non-throwing validation of a string destined for `name(std::string_view)`. Shared with every
 /// other OPP inbound handler via `sysio.opp.common/safe_ops.hpp` so the never-throw name domain is
 /// defined and audited in exactly one place.
-using sysio::opp::safe::is_valid_name_string;
 
 /// Saturating WIRE credit. `asset::operator+=` aborts on overflow past `asset::max_amount`
 /// (2^62-1); credit_wire runs inside the never-throw OPP inbound path (via onreward), so cap at
@@ -259,10 +258,11 @@ void dclaim::onreward(uint64_t              chain_code,
    }
 
    name wacct;   // value 0 == not yet AuthX-linked
-   // Validate the cross-chain-supplied account string before constructing name(): an invalid or
-   // oversized string is treated as unlinked (credit parked by native address) rather than
-   // aborting the inbound dispatch via name()'s internal check(). See is_valid_name_string.
-   if (!staker_wire_account.empty() && is_valid_name_string(staker_wire_account)) {
+   // Validate the cross-chain-supplied account string before constructing name(): an invalid
+   // string is treated as unlinked (credit parked by native address) rather than aborting the
+   // inbound dispatch via name()'s internal check(). `is_valid_literal` is name's OWN predicate --
+   // the one its constructor uses -- so it cannot drift from what the constructor accepts.
+   if (!staker_wire_account.empty() && sysio::name::is_valid_literal(staker_wire_account)) {
       wacct = name(staker_wire_account);
    }
 

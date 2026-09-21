@@ -134,16 +134,6 @@
                     "type": "outpost_addrs"
                 }
             ]
-        },
-        {
-            "name": "slug_name",
-            "base": "",
-            "fields": [
-                {
-                    "name": "value",
-                    "type": "uint64"
-                }
-            ]
         }
     ],
     "actions": [

@@ -6,7 +6,7 @@
 #include <sysio/crypto.hpp>
 #include <sysio/system.hpp>
 #include <sysio/opp/types/types.pb.hpp>
-#include <sysio.opp.common/slug_name.hpp>
+#include <sysio/slug_name.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 #include <sysio.opp.common/opp_keys.hpp>
 

@@ -61,6 +61,19 @@ struct slug_name_traits {
    // [0..5]. Byte-identical with the contract-side sysio::slug_name.
    static constexpr basic_name_endianness packing = basic_name_endianness::MSB;
 
+   // The rejection messages. Identical to the contract-side
+   // sysio::slug_name_traits so a failure reads the same on both sides of the
+   // wire; the host additionally names the offending input via throw_invalid.
+   static constexpr const char* bad_char_message =
+      "character is not in allowed character set for slug_names ([A-Z0-9_])";
+   static constexpr const char* too_long_message = "string is too long to be a valid slug_name";
+   static constexpr const char* bad_leading_char_message =
+      "slug_name must start with a letter ([A-Z])";
+   static constexpr const char* bad_final_symbol_message =
+      "final character in slug_name does not fit its packed slot";
+   static constexpr const char* not_normalized_message =
+      "slug_name is not properly normalized";
+
    [[noreturn]] static void throw_invalid( std::string_view in, const char* why ) {
       FC_ASSERT( false, "invalid slug_name '{}': {}", std::string(in), why );
       __builtin_unreachable();
@@ -111,16 +124,14 @@ using slug_name_literals::operator""_s;
 /// /reserv writers). Until that lands, a stored one is a defect that surfaces
 /// here rather than being silently rendered as something it is not.
 inline void to_variant(const slug_name& s, fc::variant& v) {
-   const std::string text = s.to_string();
-   // Two checks, because a round trip alone is not enough. `is_valid_literal`
-   // is the static spelling predicate (length, alphabet, pad, leading letter);
-   // `pack` is the NON-validating encoder, so comparing it to `value` is the
-   // canonicality test. A value packed from an illegal spelling — say
-   // `pack("0")` — round-trips through `pack`/`to_string` yet is not a code, so
-   // emitting it would produce a string `from_variant` then refuses.
-   FC_ASSERT(slug_name::is_valid_literal(text) && slug_name::pack(text) == s.value,
+   // is_canonical() is the shared predicate: the spelling must be a valid
+   // literal AND pack back to this exact value. A round trip alone is not
+   // enough — a value packed from an illegal spelling (say pack("0")) round-
+   // trips yet is not a code, so emitting it would produce a string
+   // from_variant then refuses.
+   FC_ASSERT(s.is_canonical(),
              "slug_name {} is not a code and has no string spelling", s.value);
-   v = text;
+   v = s.to_string();
 }
 
 namespace detail {

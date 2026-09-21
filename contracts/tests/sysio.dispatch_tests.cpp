@@ -1421,6 +1421,49 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_deposit_to_opreg, sysio_dispatch_tester)
                        bal["balance"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
+// A payload `token_code` with no canonical spelling is DROPPED, never stored.
+//
+// `chain_code` is proven -- source_chain_binding_ok binds it to the delivering
+// outpost -- but `token_code` rides the FORGEABLE payload and reaches slug_name
+// through the non-validating raw constructor. Persisting one would make every
+// later render of that balance row throw; under `values_only` the underwriter's
+// unconditional `row.get_object()` then drops the ENTIRE scan cycle rather than
+// one cell. So the dispatcher drops the attestation -- a check() here would halt
+// evalcons and stall consensus (feedback_opp_handlers_never_throw).
+BOOST_FIXTURE_TEST_CASE(dispatch_drops_uncanonical_token_code, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+
+   const auto eth_code = fc::slug_name{"ETH"}.value;
+   // Any value below the leading symbol's floor decodes to "" and packs back to
+   // 0, so it is not a code and has no spelling.
+   constexpr uint64_t uncanonical_token = 7;
+   BOOST_REQUIRE(!fc::slug_name{uncanonical_token}.is_canonical());
+
+   const auto   before          = get_operator(UWRIT_OP);
+   const size_t balances_before = before.is_null() ? 0 : before["balances"].get_array().size();
+
+   auto payload = encode_operator_action(
+      sysio::opp::attestations::OperatorAction::ACTION_TYPE_DEPOSIT_REQUEST,
+      sysio::opp::types::CHAIN_KIND_EVM,
+      uwrit_op_eth_pubkey,
+      /*chain_code_v=*/ eth_code,
+      /*token_code_v=*/ uncanonical_token,
+      1'000'000);
+
+   auto envelope = encode_envelope_with_one_attestation(
+      current_epoch(),
+      sysio::opp::types::ATTESTATION_TYPE_OPERATOR_ACTION,
+      payload);
+
+   // The delivery SUCCEEDS -- the attestation is dropped inside dispatch, not reverted.
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));
+
+   // ...and nothing was persisted, so no stored row can later fail to render.
+   const auto   after          = get_operator(UWRIT_OP);
+   const size_t balances_after = after.is_null() ? 0 : after["balances"].get_array().size();
+   BOOST_CHECK_EQUAL(balances_before, balances_after);
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(dispatch_routes_withdraw_request_to_opreg, sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
 

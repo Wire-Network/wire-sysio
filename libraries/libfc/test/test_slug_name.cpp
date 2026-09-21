@@ -30,6 +30,13 @@ struct slug_name_lsb_traits {
    static constexpr bool zero_terminates = true;
    static constexpr fc::basic_name_endianness packing = fc::basic_name_endianness::LSB;
 
+   static constexpr const char* bad_char_message =
+      "character is not in allowed character set for slug_names ([A-Z0-9_])";
+   static constexpr const char* too_long_message = "string is too long to be a valid slug_name";
+   static constexpr const char* bad_final_symbol_message =
+      "final character in slug_name does not fit its packed slot";
+   static constexpr const char* not_normalized_message = "slug_name is not properly normalized";
+
    [[noreturn]] static void throw_invalid( std::string_view in, const char* why ) {
       FC_ASSERT( false, "invalid slug_name_lsb '{}': {}", std::string(in), why );
       __builtin_unreachable();
@@ -341,6 +348,12 @@ struct name_like_traits {
    static constexpr std::string_view alphabet = ".12345abcdefghijklmnopqrstuvwxyz";
    static constexpr bool             zero_terminates = false;
    static constexpr fc::basic_name_endianness packing = fc::basic_name_endianness::MSB;
+   static constexpr const char* bad_char_message =
+      "character is not in allowed character set for names ([.1-5a-z])";
+   static constexpr const char* too_long_message = "string is too long to be a valid name";
+   static constexpr const char* bad_final_symbol_message =
+      "thirteenth character in name cannot be a letter that comes after j";
+   static constexpr const char* not_normalized_message = "name is not properly normalized";
    [[noreturn]] static void throw_invalid( std::string_view in, const char* why ) {
       FC_ASSERT( false, "invalid name '{}': {}", std::string(in), why );
       __builtin_unreachable();

@@ -4,7 +4,7 @@
 #include <sysio.reserv/sysio.reserv.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.chains/sysio.chains.hpp>
-#include <sysio.opp.common/slug_name.hpp>
+#include <sysio/slug_name.hpp>
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio.opp.common/name_ops.hpp>

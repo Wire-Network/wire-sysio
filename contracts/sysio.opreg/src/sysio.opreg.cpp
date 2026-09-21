@@ -3,7 +3,7 @@
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.uwrit/sysio.uwrit.hpp>
-#include <sysio.opp.common/slug_name.hpp>
+#include <sysio/slug_name.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio.opp.common/claimable.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>

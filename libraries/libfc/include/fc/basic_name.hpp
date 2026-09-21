@@ -60,6 +60,10 @@ concept basic_name_traits =
       { Traits::zero_terminates }        -> std::convertible_to<bool>;
       { Traits::packing }                -> std::convertible_to<basic_name_endianness>;
       { Traits::throw_invalid(in, why) } -> std::same_as<void>;
+      { Traits::bad_char_message }         -> std::convertible_to<const char*>;
+      { Traits::too_long_message }         -> std::convertible_to<const char*>;
+      { Traits::bad_final_symbol_message } -> std::convertible_to<const char*>;
+      { Traits::not_normalized_message }   -> std::convertible_to<const char*>;
    }
    && Traits::max_len > 0
    && std::string_view{ Traits::alphabet }.size() > 0;
@@ -70,7 +74,8 @@ concept basic_name_traits =
 /// confused with a decimal number — see `slug_name_traits::leading_alphabet`.
 template <typename Traits>
 concept basic_name_has_leading_alphabet = requires {
-   { Traits::leading_alphabet } -> std::convertible_to<std::string_view>;
+   { Traits::leading_alphabet }         -> std::convertible_to<std::string_view>;
+   { Traits::bad_leading_char_message } -> std::convertible_to<const char*>;
 };
 
 template <basic_name_traits Traits>
@@ -80,15 +85,20 @@ struct basic_name {
    constexpr basic_name() = default;
    constexpr explicit basic_name(uint64_t v) : value(v) {}
 
-   /// Construct from a string: checks length, then requires the input to be the
-   /// canonical spelling of its own encoding (round-trip check). Throws via
-   /// Traits::throw_invalid on bad or non-canonical input.
-   explicit basic_name(std::string_view str) : value(encode(str)) {}
-
-   constexpr uint64_t to_uint64_t() const { return value; }
-   constexpr bool     empty()      const { return value == 0; }
-   constexpr bool     good()       const { return value != 0; }
-   constexpr explicit operator bool() const { return value != 0; }
+   /// Construct from a string. Rejects via Traits::throw_invalid unless the
+   /// input is the canonical spelling of its own encoding — see
+   /// validity_error(), which is the SINGLE validation algorithm this type
+   /// has, shared with is_valid_literal() and byte-for-byte the same rules as
+   /// the contract-side sysio::basic_name.
+   ///
+   /// constexpr: Traits::throw_invalid is not constexpr, so it is reached only
+   /// on the failure path. A valid literal therefore constant-evaluates, and an
+   /// invalid one is a compile error rather than a silent mis-encoding.
+   constexpr explicit basic_name(std::string_view str) : value(0) {
+      if (const char* why = validity_error(str))
+         Traits::throw_invalid(str, why);
+      value = pack(str);
+   }
 
    /// Non-validating encode — the constexpr path used by literals and by
    /// string_to_name. Characters outside the alphabet pack as symbol 0.
@@ -100,31 +110,86 @@ struct basic_name {
       return v;
    }
 
-   /// Compile-time literal check: length within bounds and every character in
-   /// the alphabet. For zero_terminates traits the pad symbol (alphabet[0]) is
-   /// additionally rejected; accepting it would let a literal like "A\0B"_s
-   /// compile to the same packed value as "A"_s, while the runtime constructor
-   /// fed the same bytes would throw on the canonical round-trip check. The
-   /// literal path bypasses that constructor, so the check has to live here.
-   /// Canonicality (trailing pads, an over-wide final symbol) is still left to
-   /// the validating constructor's round-trip check.
+   /// Is `str` a valid, canonical spelling? The literal path's gate — and the
+   /// predicate a caller uses to ask whether a raw packed value has a spelling
+   /// at all. Delegates to validity_error so the literal path and the throwing
+   /// constructor can never disagree.
    static constexpr bool is_valid_literal(std::string_view str) {
+      return validity_error(str) == nullptr;
+   }
+
+   /// THE validation algorithm. Returns nullptr when `str` is a valid, canonical
+   /// spelling; otherwise the traits' message for the FIRST rule it breaks.
+   /// Identical, rule for rule and in the same order, to the contract-side
+   /// sysio::basic_name — the two are meant to be diffable.
+   ///
+   /// Rules 4-6 make pack() lossless, which is what lets the constructor drop
+   /// the old `to_string() != str` round-trip: given 1-6, to_string(pack(str))
+   /// IS str, so the round trip can be a test assertion instead of a runtime
+   /// one. Rules 5 and 6 were previously enforced ONLY by that round-trip and
+   /// were absent from is_valid_literal, so the literal path accepted spellings
+   /// the constructor rejected — `"abcdefghijklm"_n` compiled and packed as
+   /// `abcdefghijkl2` while `name{"abcdefghijklm"}` threw.
+   static constexpr const char* validity_error(std::string_view str) {
+      // 1. length
       if (str.size() > static_cast<std::size_t>(Traits::max_len))
-         return false;
+         return Traits::too_long_message;
+
+      // 2. leading symbol, for traits that restrict it
       if constexpr (basic_name_has_leading_alphabet<Traits>) {
          if (!str.empty()
              && std::string_view{ Traits::leading_alphabet }.find(str[0])
                    == std::string_view::npos)
-            return false;
+            return Traits::bad_leading_char_message;
       }
-      for (char c : str) {
-         if (Traits::alphabet.find(c) == std::string_view::npos)
-            return false;
+
+      for (std::size_t i = 0; i < str.size(); ++i) {
+         const std::size_t sym = Traits::alphabet.find(str[i]);
+
+         // 3. in the alphabet
+         if (sym == std::string_view::npos)
+            return Traits::bad_char_message;
+
+         // 4. a zero-terminated alphabet has no INTERIOR pad: to_string() stops
+         //    at the first symbol-0 slot, so such a spelling cannot round-trip.
          if constexpr (Traits::zero_terminates) {
-            if (c == Traits::alphabet[0]) return false;
+            if (sym == 0)
+               return Traits::bad_char_message;
          }
+
+         // 5. the final slot may be narrower than `bits` (13 x 5 > 64 for name,
+         //    leaving 4 bits), and pack() would silently truncate a symbol too
+         //    wide for it.
+         if (static_cast<uint64_t>(sym) > width_mask(static_cast<int>(i)))
+            return Traits::bad_final_symbol_message;
       }
-      return true;
+
+      // 6. a non-zero-terminated alphabet strips TRAILING pads in to_string(),
+      //    so a trailing pad cannot round-trip either.
+      if constexpr (!Traits::zero_terminates) {
+         if (!str.empty() && str.back() == Traits::alphabet[0])
+            return Traits::not_normalized_message;
+      }
+
+      return nullptr;
+   }
+
+   constexpr uint64_t to_uint64_t() const { return value; }
+   constexpr bool     empty()      const { return value == 0; }
+   constexpr bool     good()       const { return value != 0; }
+   constexpr explicit operator bool() const { return value != 0; }
+
+
+   /// Does this value have a canonical spelling? A basic_name built from a RAW
+   /// uint64 bypasses the validating constructor, so it can hold a value no
+   /// spelling produces — for zero_terminates traits, anything whose leading
+   /// symbol slot is empty. Such a value cannot round-trip: to_string() yields a
+   /// text that packs to something else. Persisting one makes every later render
+   /// of that row throw, so writers that accept a raw uint64 off the wire gate on
+   /// this before storing it.
+   bool is_canonical() const {
+      const std::string text = to_string();
+      return is_valid_literal(text) && pack(text) == value;
    }
 
    std::string to_string() const {
@@ -209,22 +274,6 @@ private:
       return (static_cast<uint64_t>(1) << w) - 1;
    }
 
-   /// Validating encode — mirrors sysio::chain::name::set(): length check, then
-   /// require the string to round-trip (rejects non-canonical input).
-   static uint64_t encode(std::string_view str) {
-      if (static_cast<int>(str.size()) > Traits::max_len)
-         Traits::throw_invalid(str, "too long");
-      if constexpr (basic_name_has_leading_alphabet<Traits>) {
-         if (!str.empty()
-             && std::string_view{ Traits::leading_alphabet }.find(str[0])
-                   == std::string_view::npos)
-            Traits::throw_invalid(str, "first character is not allowed to lead");
-      }
-      const basic_name packed{ pack(str) };
-      if (packed.to_string() != str)
-         Traits::throw_invalid(str, "not properly normalized");
-      return packed.value;
-   }
 };
 
 /// fmtlib hook — `format_as` is found by ADL for basic_name and its derivations.

@@ -115,7 +115,11 @@ PRIMITIVE_SCHEMA = {
     # entry must precede the structs lookup: every registry ABI still ships a
     # `slug_name` struct_def, and without this the field would resolve to that
     # `{value: uint64}` shape (or, once abigen stops emitting it, to `unknown`).
-    'slug_name': {'type': 'string', 'pattern': '^[A-Z0-9_]{0,8}$'},
+    # A code must START with a letter, so the pattern is NOT [A-Z0-9_]{0,8}: that
+    # would accept "7" and "_LEAD", which fc::slug_name now rejects, leaving the
+    # generated schema disagreeing with the ABI serializer. The outer group is
+    # optional so the empty string — the zero sentinel — still validates.
+    'slug_name': {'type': 'string', 'pattern': '^(?:[A-Z][A-Z0-9_]{0,7})?$'},
     'string': {'type': 'string'},
     'bytes': {'type': 'string', 'description': 'hex-encoded bytes'},
     'checksum256': {'type': 'string', 'pattern': '^[a-f0-9]{64}$'},

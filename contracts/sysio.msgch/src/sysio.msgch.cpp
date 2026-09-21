@@ -5,7 +5,7 @@
 #include <sysio.chalg/sysio.chalg.hpp>     // dispute trigger + open-dispute gate (disputes table)
 #include <sysio.opreg/sysio.opreg.hpp>     // operator-status delivery gate (operators table)
 #include <sysio.roa.hpp>                    // authoritative Tier-1 electorate preflight
-#include <sysio.opp.common/slug_name.hpp>
+#include <sysio/slug_name.hpp>
 #include <sysio.opp.common/safe_ops.hpp>   // to_depot_amount — WSA-028 fail-closed TokenAmount gate
 #include <sysio.opp.common/name_ops.hpp>   // parse_wire_account_name — never-throw account-name parse
 #include <sysio.opp.common/opp_canonical_codec.hpp> // canonical envelope encoding + keccak epoch digest
@@ -49,7 +49,7 @@ constexpr name     ram_payer       = "sysio"_n;
 /// always WIRE.
 constexpr uint32_t WIRE_CHAIN_ID  = 1;
 
-using sysio::slug_name_literals::operator""_s;
+// `operator""_s` is declared at global scope by <sysio/slug_name.hpp>.
 
 /// Codename of the Ethereum outpost — the sole source of node-owner NFT (ERC1155) deposits, which
 /// occur on Ethereum mainnet only. This is the `ChainSpec.code` the launch and dev bootstrap configs
@@ -332,6 +332,33 @@ name resolve_account_from_op_address(const opp::types::ChainAddress& op_address)
    return false;
 }
 
+/// Are a payload's FORGEABLE code fields canonical slug_names?
+///
+/// `chain_code` is proven — `source_chain_binding_ok` binds it to the delivering
+/// outpost. `token_code` / `reserve_code` are NOT: they arrive as raw protobuf
+/// uint64s and reach a slug_name through the non-validating raw constructor, so a
+/// forged payload can carry a value no spelling produces. Such a value can never
+/// have been registered, and persisting it makes every later render of that row
+/// throw — in a `values_only` scan the underwriter's unconditional
+/// `row.get_object()` then drops the WHOLE cycle, not one cell.
+///
+/// Drop the attestation instead; never check(), per
+/// feedback_opp_handlers_never_throw — a check() here halts evalcons and stalls
+/// consensus.
+///
+/// `path` labels the dispatch path in the diagnostic. True iff every code is canonical.
+[[nodiscard]] bool payload_codes_canonical(std::initializer_list<sysio::slug_name> codes,
+                                           const char* path) {
+   for (const sysio::slug_name code : codes) {
+      if (!code.is_canonical()) {
+         sysio::print("msgch::", path, ": DROP attestation -- payload code ", code.value,
+                      " has no canonical slug_name spelling\n");
+         return false;
+      }
+   }
+   return true;
+}
+
 /// Reinterpret an exactly-32-byte protobuf `bytes` field as a checksum256. Returns std::nullopt
 /// for any other length; chain and header verification treat a malformed hash as a mismatch,
 /// never as a match or a wildcard.
@@ -504,6 +531,7 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
    // no-proto-messages-in-actions rule.
    const sysio::slug_name chain_code_slug{chain_code};
    const sysio::slug_name token_code{oa.amount.token_code};
+   if (!payload_codes_canonical({token_code}, "dispatch_operator_action")) return;
    // WSA-028: TokenAmount.amount is signed on the wire. Gate it through the
    // shared fail-closed parser before any unsigned use — a negative or
    // out-of-range amount is dropped here, never wrapped into a huge collateral
@@ -595,6 +623,11 @@ void dispatch_underwrite_commit(name self, const std::vector<char>& data, uint64
    // commit is recorded against a swap leg.
    if (!source_chain_binding_ok(chain_code, uic.chain_code, "dispatch_underwrite_commit")) return;
 
+   const sysio::slug_name uic_token_code{uic.token_code};
+   const sysio::slug_name uic_reserve_code{uic.reserve_code};
+   if (!payload_codes_canonical({uic_token_code, uic_reserve_code},
+                                "dispatch_underwrite_commit")) return;
+
    // Route with the proven `chain_code` (equal to `uic.chain_code`, enforced above) so the leg slot
    // is keyed off provenance, not the payload's self-asserted chain.
    action(
@@ -602,8 +635,8 @@ void dispatch_underwrite_commit(name self, const std::vector<char>& data, uint64
       UWRIT_ACCOUNT, "rcrdcommit"_n,
       std::make_tuple(uic.uw_request_id, *underwriter, chain_code,
                       sysio::slug_name{chain_code},
-                      sysio::slug_name{uic.token_code},
-                      sysio::slug_name{uic.reserve_code},
+                      uic_token_code,
+                      uic_reserve_code,
                       data)
    ).send();
 }
@@ -636,6 +669,11 @@ void dispatch_reserve_create(name self, const std::vector<char>& data, uint64_t 
    // reserve whose external custody is claimed against a different chain B.
    if (!source_chain_binding_ok(chain_code, ext.chain_code, "dispatch_reserve_create")) return;
 
+   const sysio::slug_name ext_token_code{ext.amount.token_code};
+   const sysio::slug_name ext_reserve_code{ext.reserve_code};
+   if (!payload_codes_canonical({ext_token_code, ext_reserve_code},
+                                "dispatch_reserve_create")) return;
+
    const uint64_t ext_amount =
       sysio::opp::safe::to_depot_amount(static_cast<int64_t>(ext.amount.amount)).value_or(0);
 
@@ -643,8 +681,8 @@ void dispatch_reserve_create(name self, const std::vector<char>& data, uint64_t 
       permission_level{self, "active"_n},
       RESERV_ACCOUNT, "oncrtreserve"_n,
       std::make_tuple(sysio::slug_name{ext.chain_code},
-                      sysio::slug_name{ext.amount.token_code},
-                      sysio::slug_name{ext.reserve_code},
+                      ext_token_code,
+                      ext_reserve_code,
                       rc.name,
                       rc.description,
                       ext_amount,
@@ -675,12 +713,17 @@ void dispatch_reserve_create_cancel(name self, const std::vector<char>& data, ui
    // delivering outpost so an envelope proven from outpost A cannot cancel a reserve on chain B.
    if (!source_chain_binding_ok(chain_code, cancel.chain_code, "dispatch_reserve_create_cancel")) return;
 
+   const sysio::slug_name cancel_token_code{cancel.token_code};
+   const sysio::slug_name cancel_reserve_code{cancel.reserve_code};
+   if (!payload_codes_canonical({cancel_token_code, cancel_reserve_code},
+                                "dispatch_reserve_create_cancel")) return;
+
    action(
       permission_level{self, "active"_n},
       RESERV_ACCOUNT, "oncnclrsv"_n,
       std::make_tuple(sysio::slug_name{cancel.chain_code},
-                      sysio::slug_name{cancel.token_code},
-                      sysio::slug_name{cancel.reserve_code},
+                      cancel_token_code,
+                      cancel_reserve_code,
                       cancel.creator_addr.kind,
                       cancel.creator_addr.address)
    ).send();
