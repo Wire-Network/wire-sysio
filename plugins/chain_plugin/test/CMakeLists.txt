@@ -1,5 +1,6 @@
 add_executable( test_chain_plugin
         test_account_query_db.cpp
+        test_block_channels.cpp
         test_trx_retry_db.cpp
         test_trx_finality_status_processing.cpp
         plugin_config_test.cpp
@@ -21,10 +22,12 @@ set(CHAIN_PLUGIN_TEST_CASES
         snapshot_attestation_enabled_config_policy
         snapshot_attestation_record_tuple_policy
         snapshot_endpoint_block_identity_policy
+        get_info_consumer_plugin_policy
         chain_plugin_snapshot_endpoint_option_registration
         outbound_http_global_option_registration
         chain_plugin_snapshot_endpoint_option_validation
         account_query_db_tests
+        block_channel_tests
         trx_finality_status_processing_test
         trx_retry_db_test
         )

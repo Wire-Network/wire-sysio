@@ -94,6 +94,19 @@ struct chunk_resume_decision {
 /// and EIP-55 checksum casing on either side.
 bool same_evm_address(std::string_view lhs, std::string_view rhs);
 
+/// True when `revert_data` is exactly `OPP_ChunkBufferMissing(owner_address)`.
+///
+/// `discardEnvelopeChunks()` raises that error, and only that error, when it
+/// finds nothing of ours to clear — the one revert meaning the staging header
+/// is already in the state the caller wanted. Every other revert (a wrong
+/// implementation behind the proxy, a reentrancy guard, an unrecognised
+/// selector) must not be mistaken for it.
+///
+/// @param revert_data    `json_rpc_error::data`, the node's revert bytes as
+///                       `0x`-hex; empty or truncated data returns false.
+/// @param owner_address  the signer this relay expects the contract to name.
+bool is_chunk_buffer_missing_revert(std::string_view revert_data, std::string_view owner_address);
+
 /// Decide how to resume (or abandon) a chunked delivery given the on-chain
 /// staging header.
 ///

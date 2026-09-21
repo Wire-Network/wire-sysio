@@ -70,6 +70,9 @@ struct abstract_conn {
    virtual void send_busy_response(std::string&& what) = 0;
    virtual void handle_exception() = 0;
 
+   /// Set the Content-Type header of the response to be sent, replacing the type of the handler that serves it.
+   virtual void set_content_type_header(http_content_type content_type) = 0;
+
    virtual void send_response(std::string&& json_body, unsigned int code) = 0;
 
    /// Send a file as the HTTP response body using zero-copy I/O.
@@ -188,8 +191,16 @@ inline auto make_http_response_handler(http_plugin_state& plugin_state, detail::
                            }
 
                            try {
+                              // A plaintext handler's string body is sent as-is; anything else it produces (an error
+                              // object, or no value) is sent as JSON.
+                              const bool plaintext_body = content_type == http_content_type::plaintext &&
+                                                          response.has_value() && response->is_string();
+                              if (content_type == http_content_type::plaintext && !plaintext_body)
+                                 session_ptr->set_content_type_header(http_content_type::json);
                               if (response.has_value()) {
-                                 std::string json = (content_type == http_content_type::plaintext) ? response->as_string() : fc::json::to_string(*response, fc::time_point::maximum());
+                                 std::string json = plaintext_body
+                                                       ? response->as_string()
+                                                       : fc::json::to_string(*response, fc::time_point::maximum());
                                  if (auto error_str = session_ptr->verify_max_bytes_in_flight(json.size()); error_str.empty())
                                     session_ptr->send_response(std::move(json), code);
                                  else

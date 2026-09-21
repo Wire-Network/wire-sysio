@@ -10,6 +10,13 @@ using namespace sysio_test;
 
 struct finalizer_key_tester : sysio_system_tester {
 
+   finalizer_key_tester() {
+      // Finalizer tests use Alice and Bob as producers directly. Producer registration now
+      // requires an ACTIVE producer operator, so model them as genesis fixtures up front.
+      deploy_opreg_once();
+      register_producer_operators({"alice1111111"_n, "bob111111111"_n});
+   }
+
    fc::variant get_finalizer_key_info( uint64_t id ) {
       vector<char> data = get_row_by_id( config::system_account_name, config::system_account_name, "finkeys"_n, id );
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "finalizer_key_info", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
@@ -199,6 +206,48 @@ BOOST_FIXTURE_TEST_CASE(register_finalizer_key_by_same_finalizer_tests, finalize
    BOOST_REQUIRE_EQUAL( active_key_id, alice_info["active_key_id"].as_uint64() ); // active key should not change
 }
 FC_LOG_AND_RETHROW() // register_finalizer_key_by_same_finalizer_tests
+
+BOOST_FIXTURE_TEST_CASE(register_finalizer_key_bills_system_ram, finalizer_key_tester) try {
+   BOOST_REQUIRE_EQUAL( success(), regproducer(alice) );
+
+   auto& resource_limits = control->get_mutable_resource_limits_manager();
+   const int64_t alice_before = resource_limits.get_account_ram_usage(alice);
+   const int64_t sysio_before = resource_limits.get_account_ram_usage(config::system_account_name);
+   resource_limits.set_account_limits(alice, alice_before, -1, -1, false);
+
+   BOOST_REQUIRE_EQUAL( success(), register_finalizer_key(alice, finalizer_key_1, pop_1) );
+
+   BOOST_REQUIRE_EQUAL(alice_before, resource_limits.get_account_ram_usage(alice));
+   BOOST_REQUIRE_GT(resource_limits.get_account_ram_usage(config::system_account_name), sysio_before);
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE(register_finalizer_key_caps_retained_keys, finalizer_key_tester) try {
+   constexpr uint32_t max_retained_finalizer_keys = 5;
+   BOOST_REQUIRE_EQUAL( success(), regproducer(alice) );
+   BOOST_REQUIRE_GE(key_pairs.size(), max_retained_finalizer_keys + 1);
+
+   for (uint32_t i = 0; i < max_retained_finalizer_keys; ++i) {
+      BOOST_REQUIRE_EQUAL(
+         success(), register_finalizer_key(alice, key_pairs[i].pub_key, key_pairs[i].pop));
+   }
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("finalizer cannot register more than 5 keys"),
+      register_finalizer_key(
+         alice, key_pairs[max_retained_finalizer_keys].pub_key,
+         key_pairs[max_retained_finalizer_keys].pop));
+
+   // Rotation needs only two keys; deleting an inactive key immediately frees one bounded slot.
+   BOOST_REQUIRE_EQUAL(
+      success(), delete_finalizer_key(
+         alice, key_pairs[max_retained_finalizer_keys - 1].pub_key));
+   BOOST_REQUIRE_EQUAL(
+      success(), register_finalizer_key(
+         alice, key_pairs[max_retained_finalizer_keys].pub_key,
+         key_pairs[max_retained_finalizer_keys].pop));
+   BOOST_REQUIRE_EQUAL(
+      max_retained_finalizer_keys,
+      get_finalizer_info(alice)["finalizer_key_count"].as_uint64());
+} FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE(register_finalizer_key_duplicate_key_tests, finalizer_key_tester) try {
    add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);

@@ -330,7 +330,7 @@ public:
     * @param sig_provider `signature_provider` shared pointer
     * @param url_source The URL of the Ethereum node (e.g., Infura, local node).
     * @param transaction_policy Required local expenditure policy and authoritative chain id
-    * @param rpc_options authenticated transport and bounded request policy
+    * @param rpc_options transport trust settings and bounded request policy
     */
    ethereum_client(const signature_provider_ptr& sig_provider, const std::variant<std::string, fc::url>& url_source,
                    ethereum_transaction_policy transaction_policy,

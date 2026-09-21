@@ -4809,7 +4809,7 @@ namespace sysio {
          }
 
          const auto& [host, port, type] = net_utils::split_host_port_type(p2p_address);
-         if( host.empty() || host == "0.0.0.0" || host == "[::]") {
+         if( net_utils::is_unspecified_host(host) ) {
             boost::system::error_code ec;
             auto hostname = host_name( ec );
             if( ec.value() != boost::system::errc::success ) {

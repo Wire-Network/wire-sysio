@@ -1,0 +1,73 @@
+# Local development: authentication and TLS are disabled on both services.
+# https://docs.opensearch.org/latest/install-and-configure/install-opensearch/docker/
+name: aws-opensearch
+
+services:
+  opensearch:
+    image: ${OPENSEARCH_IMAGE:-opensearchproject/opensearch:${OPENSEARCH_VERSION:-3.8.0}}
+    container_name: aws-opensearch
+    environment:
+      discovery.type: single-node
+      cluster.name: local-opensearch
+      node.name: aws-opensearch
+      network.host: 0.0.0.0
+      bootstrap.memory_lock: "true"
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+      DISABLE_SECURITY_PLUGIN: "true"
+      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "9200:9200" # HTTP API
+      - "9300:9300" # Node transport
+      - "9600:9600" # Performance Analyzer
+      - "9650:9650" # Root cause analysis
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          curl --fail --silent --max-time 8
+          'http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=5s'
+          >/dev/null || exit 1
+      interval: 10s
+      timeout: 10s
+      start_period: 40s
+      retries: 12
+    stop_grace_period: 30s
+
+  dashboards:
+    image: ${OPENSEARCH_DASHBOARDS_IMAGE:-opensearchproject/opensearch-dashboards:${OPENSEARCH_VERSION:-3.8.0}}
+    container_name: aws-opensearch-dashboards
+    environment:
+      OPENSEARCH_HOSTS: '["http://opensearch:9200"]'
+      DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
+      SERVER_HOST: 0.0.0.0
+      SERVER_SSL_ENABLED: "false"
+    ports:
+      - "5601:5601" # Dashboards UI and its API
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - curl --fail --silent --max-time 8 http://127.0.0.1:5601/api/status >/dev/null || exit 1
+      interval: 10s
+      timeout: 10s
+      start_period: 60s
+      retries: 12
+    stop_grace_period: 30s
+
+volumes:
+  opensearch-data:
+    name: aws-opensearch-data
+    # Reuse the existing data; even `compose down --volumes` cannot remove it.
+    # The launcher creates this volume on first use if needed.
+    external: true
