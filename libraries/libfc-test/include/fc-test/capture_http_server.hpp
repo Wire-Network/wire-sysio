@@ -178,4 +178,33 @@ private:
    std::thread                    _worker;
 };
 
+/// A successful default-body reply whose delivery stalls for @p delay -- lets a test hold a request in
+/// flight while it observes the client's behavior.
+inline capture_http_server::scripted_response delayed_ok(std::chrono::milliseconds delay) {
+   capture_http_server::scripted_response response;
+   response.delay = delay;
+   return response;
+}
+
+/// Split an NDJSON bulk body into its lines (the trailing newline yields no entry).
+inline std::vector<std::string> split_bulk_lines(const std::string& body) {
+   std::vector<std::string> lines;
+   std::stringstream in{body};
+   std::string line;
+   while (std::getline(in, line)) {
+      lines.push_back(line);
+   }
+   return lines;
+}
+
+/// A `_bulk` response body with one indexed item and one rejected item under @p index, for the
+/// partial-failure cases.
+inline std::string bulk_partial_failure_body(std::string_view index) {
+   std::ostringstream body;
+   body << R"({"took":3,"errors":true,"items":[{"index":{"_index":")" << index << R"(","status":201}},)"
+        << R"({"index":{"_index":")" << index
+        << R"(","status":400,"error":{"type":"mapper_parsing_exception","reason":"boom"}}}]})";
+   return body.str();
+}
+
 } // namespace fc::test

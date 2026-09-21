@@ -526,3 +526,75 @@ message EmissionsBlocked {
   int64                                 sysio_balance      = 5;
   uint32                                first_blocked_at   = 6; // unix seconds
 }
+
+// ---------------------------------------------------------------------------
+//  liq syndication (simple_swap)
+//
+//  A holder syndicates their liq token (liqSOL on Solana) by handing it to the
+//  outpost; from that moment the tokens are outpost property and the WIRE
+//  depot is the ledger of record for who syndicated what. The outpost keeps no
+//  per-user syndication state and never pays a syndicator on its own
+//  initiative: every de-syndication is depot-originated (DESYNDICATE_LIQ) and
+//  the outpost applies it inline at dispatch, exactly like a remit.
+//
+//  Every `amount` is a `TokenAmount`: `token_code` is the chain's liq token as
+//  registered on the depot (a packed slug_name, e.g. LIQSOL), `amount` is in
+//  that token's base units (liqSOL is 9-decimal, so 1:1 with the depot frame).
+//  `sequence` is a per-outpost strictly-increasing counter carried so the depot
+//  can dedupe replays without retaining per-attestation history.
+// ---------------------------------------------------------------------------
+
+// Outpost -> Depot. A user syndicated `amount` liq tokens to the outpost.
+message SyndicateLIQ {
+  // Chain code of the emitting outpost (bound to the proven source chain).
+  uint64                       chain_code = 1;
+  // The syndicating user's native PUBKEY -- the one identity the depot
+  // parks the syndication against and later matches an AuthX link on.
+  // Always the public key, never a derived address, so the same bytes
+  // round-trip unchanged through DesyndicateLIQ.user. Encoding follows the
+  // VM family: SVM the 32-byte Ed25519 pubkey (which is the address); EVM
+  // the 33-byte COMPRESSED secp256k1 point, NOT the 20-byte address --
+  // sysio.authex indexes links by pubkey only, and the depot cannot derive
+  // an address from a compressed key.
+  sysio.opp.types.ChainAddress user       = 2;
+  // The liq tokens syndicated: `token_code` names the outpost's liq token as
+  // the depot registered it, `amount` is base units of that token.
+  sysio.opp.types.TokenAmount  amount     = 3;
+  // Per-outpost monotonic sequence shared with LIQYield; dedupe key.
+  uint64                       sequence   = 4;
+}
+
+// Outpost -> Depot. Yield the outpost claimed for the syndicated liq pool since
+// its previous report. Global to the outpost: no user address — the depot
+// splits it across its own syndication ledger.
+message LIQYield {
+  uint64                      chain_code = 1;
+  // The liq tokens claimed as yield for the syndicated pool: `token_code`
+  // names the outpost's liq token, `amount` is base units of that token.
+  sysio.opp.types.TokenAmount amount     = 2;
+  // Per-outpost monotonic sequence shared with SyndicateLIQ; dedupe key.
+  uint64                      sequence   = 3;
+  // Outpost-chain epoch at which the report was taken. Informational.
+  uint64                      epoch      = 4;
+}
+
+// Depot -> Outpost. Release `amount` liq tokens from the outpost's syndicated
+// pool to `user`. The outpost transfers inline at dispatch; refusals are
+// logged and skipped (never retried locally), the depot ledger is authoritative.
+message DesyndicateLIQ {
+  // Chain code of the destination outpost.
+  uint64                       chain_code = 1;
+  // The recipient's native PUBKEY, byte-identical to the SyndicateLIQ.user
+  // the depot recorded: a de-syndication pays only the AuthX-linked holder of
+  // the syndicated position, never an arbitrary destination, so the depot
+  // hands back the same identity it holds. The OUTPOST derives the transfer
+  // destination: SVM the pubkey is the address; EVM
+  // Secp256k1.addressFromCompressedPubkey (the derivation OPPInboundLib
+  // already applies to inbound remits).
+  sysio.opp.types.ChainAddress user       = 2;
+  // The liq tokens to release: `token_code` must name this outpost's liq
+  // token (the outpost refuses any other), `amount` is base units of it.
+  sysio.opp.types.TokenAmount  amount     = 3;
+  // Depot-side request id for correlation in outpost logs.
+  uint64                       request_id = 4;
+}

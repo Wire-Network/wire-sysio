@@ -95,7 +95,7 @@ const abi::contract& ethereum_contract_client::get_abi(const std::string& contra
  * @param sig_provider Signature provider for signing transactions
  * @param url_source URL of the Ethereum node (string or fc::url)
  * @param transaction_policy Required expenditure limits and authoritative chain ID
- * @param rpc_options Authenticated transport and bounded request policy
+ * @param rpc_options Transport trust settings and bounded request policy
  */
 ethereum_client::ethereum_client(const signature_provider_ptr& sig_provider,
                                  const std::variant<std::string, fc::url>& url_source,

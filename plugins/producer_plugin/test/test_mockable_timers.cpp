@@ -29,8 +29,9 @@ using namespace sysio::chain;
 constexpr std::chrono::milliseconds real_time_patience{200};
 
 /// How long to wait, in real time, for the plugin to react to virtual time moving. Generous, since
-/// this bounds a failure rather than the happy path: the reaction is normally within a few ms.
-constexpr std::chrono::seconds reaction_timeout{10};
+/// this bounds a failure rather than the happy path: the reaction is normally within a few ms, but a loaded CI runner
+/// has stalled the app thread for ten seconds.
+constexpr std::chrono::seconds reaction_timeout{60};
 
 /// How long to leave the timer thread alone with a moved clock. Under mock time the timer polls the
 /// virtual clock rather than sleeping out its delay, so this is many poll intervals; it is used
@@ -50,9 +51,22 @@ constexpr uint32_t produce_block_offset_ms = 450;
 /// The one producer running_node holds a key for, so the one whose windows it can commit in.
 constexpr chain::account_name own_producer = config::system_account_name;
 
+/// The role a producer's signing key is derived under. tester signs a seeded chain's blocks with this key, and a
+/// seeded node holds own_producer's key under it and no other.
+constexpr const char* signing_key_role = "active";
+
+/// A role no node is given a key under, for an authority key the producing node has to do without.
+constexpr const char* unheld_key_role = "unheld";
+
 /// How long to give the node to do something with a slot the clock has just moved into, before
 /// concluding it did nothing with it. Bounds a per-slot poll, so it is short.
 constexpr std::chrono::milliseconds slot_settle_budget{200};
+
+/// How many slots advance_until_head_moves moves the clock through before concluding the head is not going to move.
+constexpr uint32_t head_move_slot_allowance = 3;
+
+/// How long advance_until_head_moves waits, in real time, for the head to move before moving the clock another slot.
+constexpr std::chrono::seconds head_move_slot_patience{2};
 
 /// Spin until pred() holds or reaction_timeout elapses. Returns whether pred() held.
 /// Spin until pred() holds or the given budget elapses. Returns whether pred() held.
@@ -270,6 +284,11 @@ public:
       return fut.get();
    }
 
+   /// Wait for the app thread to finish what it is running, before moving the clock. The head is published from inside
+   /// the handler that produced the block, and only later does that handler arm the timer for the next block, reading
+   /// the clock as it stands then: every slot the clock moves first pushes that block a slot later.
+   void sync_with_app_thread() { on_main_thread([]() { return true; }); }
+
    /// Advance the virtual clock by an arbitrary amount, for waits that are not a whole slot.
    void advance(fc::microseconds by) {
       _now += by;
@@ -281,11 +300,13 @@ public:
    template<typename Pred>
    bool advance_slots_until(uint32_t max_slots, Pred pred) {
       for (uint32_t slot = 0; slot < max_slots; ++slot) {
+         sync_with_app_thread();
          if (pred())
             return true;
          advance(fc::milliseconds(config::block_interval_ms));
          wait_up_to(slot_settle_budget, pred);
       }
+      sync_with_app_thread();
       return pred();
    }
 
@@ -303,23 +324,22 @@ public:
 
    /// Advance the clock a slot at a time until the head moves, and report whether it did.
    ///
-   /// Counting blocks against slots elapsed is not a safe invariant here. A block ships at its cpu
-   /// effort deadline rather than at its slot, and those deadlines sit closer together than slots
-   /// do, so the node runs progressively further ahead across a round and then waits out a gap of
-   /// nearly two slots at the round boundary. How far ahead it is at any moment follows from where
-   /// in that round it started, which is startup timing rather than anything under test. What does
-   /// hold, and what a starved timer breaks, is that production keeps moving while the clock does.
+   /// Syncing with the app thread before each move means the node armed its timer against the clock its last block was
+   /// produced at, so the first slot already makes the next block due. A slow machine is absorbed by the real-time
+   /// waits, not by further slots; those only let a deadline armed up to two slots late go unnoticed.
    bool advance_until_head_moves() {
       const uint32_t before = head_block_num();
-      // Three slots covers the round boundary gap, the longest legitimate pause in shipping.
-      for (uint32_t slot = 0; slot < 3; ++slot) {
-         _now += fc::milliseconds(config::block_interval_ms);
-         fc::mock_time_traits::set_now(_now);
-         if (wait_up_to(std::chrono::seconds(2), [&]() { return head_block_num() > before; }))
+      const auto     moved  = [&]() { return head_block_num() > before; };
+      for (uint32_t slot = 0; slot < head_move_slot_allowance; ++slot) {
+         sync_with_app_thread();
+         if (moved())
+            return true;
+         advance(fc::milliseconds(config::block_interval_ms));
+         if (wait_up_to(head_move_slot_patience, moved))
             return true;
       }
       // One last generous wait, so a merely loaded machine is not mistaken for a stalled one.
-      return wait_for([&]() { return head_block_num() > before; });
+      return wait_for(moved);
    }
 
 private:
@@ -369,16 +389,15 @@ private:
 
 constexpr uint32_t slots_to_step = 12;   // one full production round
 
-/// Build a chain in `dir` whose active schedule holds more producers than the node under test will
-/// own, so that node has to speculate through the other windows rather than producing every slot.
-/// Returns the head block time, which is where the mock clock has to stand when the node opens it.
+/// Build a chain in `dir` whose active schedule is `schedule`, creating every producer account it names beyond
+/// own_producer. Returns the head block time, which is where the mock clock has to stand when the node opens it.
 ///
 /// The schedule is installed with a tester rather than by pushing transactions into the running
 /// plugin, because setting producers goes through sysio.bios and needs protocol features and a
 /// finalizer policy in place first; the tester already knows how to do all of that. The tester is
 /// destroyed before the node starts, so only one controller ever has the directory open.
-fc::time_point seed_chain_with_other_producers(const fc::temp_directory&              dir,
-                                               const std::vector<chain::account_name>& others) {
+fc::time_point seed_chain_with_schedule(const fc::temp_directory&              dir,
+                                        const std::vector<producer_authority>& schedule) {
    using namespace sysio::testing;
 
    tester t(dir, true);
@@ -390,47 +409,61 @@ fc::time_point seed_chain_with_other_producers(const fc::temp_directory&        
    finalizer_keys fin_keys(t, 1u, 1u);
    fin_keys.activate_savanna(0u);
 
-   t.create_accounts(others);
-   std::vector<chain::account_name> schedule{config::system_account_name};
-   schedule.insert(schedule.end(), others.begin(), others.end());
-   t.set_producers(schedule);
+   for (const auto& producer : schedule) {
+      if (producer.producer_name != own_producer)
+         t.create_account(producer.producer_name);
+   }
+   t.set_producer_schedule(schedule);
 
    // A proposer policy takes effect a round after it is proposed, so run out two rounds of the new
    // schedule to be certain the node opens a chain that is already using it.
    t.produce_blocks(2 * schedule.size() * config::producer_repetitions);
 
-   BOOST_REQUIRE_EQUAL(t.control->head_active_producers().producers.size(), schedule.size());
+   BOOST_REQUIRE(t.control->head_active_producers().producers == schedule);
    return t.control->head().block_time();
 }
 
-/// A node whose schedule holds producers it has no key for, so it must speculate through their
-/// windows rather than producing every slot. That is the only state in which the delayed production
-/// loop is armed, so both of the cases that care about it start here.
+/// A schedule of own_producer followed by `others`, each signing with its own key. The node holds only own_producer's,
+/// so it must speculate through the other windows rather than producing every slot. That is the only state in which
+/// the delayed production loop is armed, so both of the cases that care about it start here.
+std::vector<producer_authority> schedule_with_other_producers(const std::vector<chain::account_name>& others) {
+   std::vector<chain::account_name> names{own_producer};
+   names.insert(names.end(), others.begin(), others.end());
+
+   std::vector<producer_authority> schedule;
+   schedule.reserve(names.size());
+   for (const auto& name : names) {
+      const auto key = sysio::testing::base_tester::get_public_key(name, signing_key_role);
+      schedule.push_back(producer_authority{name, block_signing_authority_v0{1, {{key, 1}}}});
+   }
+   return schedule;
+}
+
+/// A node on a chain seeded with `schedule`, holding own_producer's signing key and no other.
 ///
 /// The seeded directory and the signature provider string are held alongside the node because it
 /// borrows both: the directory for as long as it runs, the string while it is starting up.
-class speculating_node {
+class seeded_node {
 public:
-   explicit speculating_node(const std::vector<chain::account_name>& others)
-      : _others(others)
-      , _head_time(seed_chain_with_other_producers(_seeded, _others))
-      // <chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>. Only sysio's key, so the
-      // node produces its own window and speculates through the rest.
+   explicit seeded_node(const std::vector<producer_authority>& schedule)
+      : _rotation(schedule.size() * config::producer_repetitions)
+      , _head_time(seed_chain_with_schedule(_seeded, schedule))
+      // <chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>
       , _provider("wire,wire,"
-                  + sysio::testing::base_tester::get_public_key(config::system_account_name, "active").to_string({})
+                  + sysio::testing::base_tester::get_public_key(own_producer, signing_key_role).to_string({})
                   + ",KEY:"
-                  + sysio::testing::base_tester::get_private_key(config::system_account_name, "active").to_string({}))
+                  + sysio::testing::base_tester::get_private_key(own_producer, signing_key_role).to_string({}))
       , node({"--signature-provider", _provider.c_str(), "--production-pause-vote-timeout-ms", "0"},
              _seeded.path().string(), _head_time) {}
 
    /// Slots in one turn of the whole schedule, which bounds every walk over it.
-   uint32_t rotation() const { return (_others.size() + 1) * config::producer_repetitions; }
+   uint32_t rotation() const { return _rotation; }
 
 private:
-   const std::vector<chain::account_name> _others;
-   fc::temp_directory                     _seeded;
-   const fc::time_point                   _head_time;
-   const std::string                      _provider;
+   const uint32_t       _rotation;
+   fc::temp_directory   _seeded;
+   const fc::time_point _head_time;
+   const std::string    _provider;
 
 public:
    /// Declared last so it is constructed last, after everything it borrows above exists.
@@ -451,19 +484,14 @@ BOOST_AUTO_TEST_SUITE(mockable_timers)
  * no sleeping and no tolerance for a loaded machine: the head advances only when the test moves the
  * clock, and it must keep advancing for as long as the test keeps moving it.
  *
- * What that establishes is BOUNDED LIVENESS, not a per-slot guarantee, and the difference is
- * deliberate rather than a shortcut. Blocks ship at their cpu-effort deadline -- 462.5ms at the
- * default offset -- rather than at the 500ms slot boundary, so a node runs progressively further
- * ahead across a round and then waits out a gap of roughly two slots. Requiring a block from every
- * slot would therefore fail on correct behaviour, at a step that moves with startup timing. This
- * case asserts instead that the head never stalls longer than that legitimate gap, twelve times
- * running, and that twelve advances yield at least twelve blocks.
+ * What that establishes is BOUNDED LIVENESS, not a per-slot guarantee. Each step lets the app thread finish before
+ * the clock moves, so one slot makes the next block due, but a step allows head_move_slot_allowance slots. This case
+ * asserts that the head never takes longer than that, twelve times running, and that twelve steps yield at least
+ * twelve blocks.
  *
- * It follows that a regression losing a single deadline is NOT caught here: the head still moves
- * within the allowance, just later. Detecting that needs a slot budget over the whole round, and a
- * fixed budget is brittle for the same reason a per-slot assertion is -- how much drift has
- * accumulated depends on where in the round the node started. What this case does catch is a timer
- * that stops re-arming, which is the failure the seam under test can actually introduce.
+ * It follows that a regression delaying a deadline by up to two slots is NOT caught here: the head still moves within
+ * the allowance, just later. What this case does catch is a timer that stops re-arming, which is the failure the seam
+ * under test can actually introduce.
  */
 BOOST_AUTO_TEST_CASE(production_follows_the_virtual_clock) {
    running_node   node;
@@ -474,18 +502,17 @@ BOOST_AUTO_TEST_CASE(production_follows_the_virtual_clock) {
    std::this_thread::sleep_for(real_time_patience);
    BOOST_CHECK_EQUAL(node.blocks_produced(), settled);
 
-   // 2. The head must keep advancing for as long as the clock does, and each advance must arrive
-   //    inside the longest legitimate pause -- the round-boundary gap advance_until_head_moves
-   //    allows for. A timer that stops re-arming fails here on the step where it stopped.
+   // 2. The head must keep advancing for as long as the clock does, each step within the slots
+   //    advance_until_head_moves allows. A timer that stops re-arming fails here on the step where it stopped.
    for (uint32_t step = 1; step <= slots_to_step; ++step) {
       BOOST_REQUIRE_MESSAGE(node.advance_until_head_moves(),
                             "production stopped at step " << step << " of " << slots_to_step
-                                                          << ": the head did not move across three slots of "
-                                                             "virtual time");
+                                                          << ": the head did not move across "
+                                                          << head_move_slot_allowance << " slots of virtual time");
    }
 
    // Each of those steps required the head to move at least once, and this node is the only
-   // producer, so every advance is a block it produced.
+   // producer, so every step is a block it produced.
    BOOST_CHECK_GE(node.blocks_produced(), settled + slots_to_step);
 
    // 3. Stopping the clock must stop production, confirming that step 2 measured the clock driving
@@ -519,8 +546,8 @@ BOOST_AUTO_TEST_CASE(production_follows_the_virtual_clock) {
  * for any of it, since that is the only state in which the delayed loop is the armed timer.
  */
 BOOST_AUTO_TEST_CASE(production_survives_a_competing_reschedule) {
-   speculating_node seeded{{"defproducera"_n, "defproducerb"_n}};
-   running_node&    node = seeded.node;
+   seeded_node   seeded{schedule_with_other_producers({"defproducera"_n, "defproducerb"_n})};
+   running_node& node = seeded.node;
 
    // The wake up is only armed while the node is speculating, so get there first.
    BOOST_REQUIRE_MESSAGE(node.advance_slots_until(2 * seeded.rotation(), [&]() { return node.speculating(); }),
@@ -640,8 +667,8 @@ BOOST_AUTO_TEST_CASE(a_block_ships_at_its_deadline_not_at_its_slot) {
  * speculating is the only thing that brings it back.
  */
 BOOST_AUTO_TEST_CASE(production_resumes_after_speculating_through_other_windows) {
-   speculating_node seeded{{"defproducera"_n, "defproducerb"_n}};
-   running_node&    node = seeded.node;
+   seeded_node   seeded{schedule_with_other_producers({"defproducera"_n, "defproducerb"_n})};
+   running_node& node = seeded.node;
 
    // Walk a whole rotation. The node must speculate through the windows it has no key for, and it
    // must produce again in its own, which is what the delayed wake up exists to do.
@@ -674,6 +701,32 @@ BOOST_AUTO_TEST_CASE(production_resumes_after_speculating_through_other_windows)
    BOOST_CHECK_MESSAGE(resumed,
                        "the node speculated through another producer's window and never produced "
                        "again: the wake up armed while speculating did not bring it back");
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(multi_key_block_signing)
+
+/**
+ * An authority can need fewer signatures than it has keys, so a producer may hold only some of them. produce_block
+ * looks up a signer for every key and has to skip the ones this node lacks. Here the node is the only producer and
+ * holds one of its authority's two keys, so every block it produces looks up a key it does not hold.
+ */
+BOOST_AUTO_TEST_CASE(production_with_only_some_of_the_signing_keys) {
+   const auto held   = sysio::testing::base_tester::get_public_key(own_producer, signing_key_role);
+   const auto unheld = sysio::testing::base_tester::get_public_key(own_producer, unheld_key_role);
+   seeded_node   seeded{{producer_authority{own_producer, block_signing_authority_v0{1, {{held, 1}, {unheld, 1}}}}}};
+   running_node& node = seeded.node;
+
+   const uint32_t settled = node.blocks_produced();
+   for (uint32_t step = 1; step <= slots_to_step; ++step) {
+      BOOST_REQUIRE_MESSAGE(node.advance_until_head_moves(),
+                            "production stopped at step " << step << " of " << slots_to_step
+                                                          << " while holding one of two signing keys");
+   }
+
+   // The node is the only producer, so every step that moved the head is a block it signed.
+   BOOST_CHECK_GE(node.blocks_produced(), settled + slots_to_step);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

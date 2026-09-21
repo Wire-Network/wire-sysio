@@ -1,24 +1,21 @@
 #pragma once
 
-#include <cstdint>
 #include <fc/io/json.hpp>
 #include <fc/network/http/http_client.hpp>
 #include <fc/network/url.hpp>
-#include <fc/time.hpp>
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
-#include <functional>
+
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <variant>
-#include <vector>
 
 namespace fc::network::json_rpc {
 
 // -----------------------------------------------------------------------
 //  HTTP verb — used by send_http and typed REST methods.
-//  Existing JSON-RPC methods (call, notify, call_batch) are unchanged
-//  and always use POST internally.
+//  The JSON-RPC methods (call, call_idempotent) always use POST internally.
 // -----------------------------------------------------------------------
 enum class http_verb { GET, PUT, POST, DELETE_ };
 
@@ -48,39 +45,16 @@ enum class replay_policy {
    stale_reused_connection_once,
 };
 
-/** Explicit replay and total-deadline policy for one JSON-RPC call. */
+/** Explicit replay policy for one JSON-RPC call. */
 struct call_options {
    /// Explicit replay behavior for this call.
    replay_policy replay = replay_policy::never;
-   /// Optional upper bound for the base total timeout.
-   std::optional<fc::microseconds> total_timeout_cap;
 };
-
-/** Deadline policy for a connection-affine JSON-RPC follow-up. */
-struct follow_up_options {
-   /// Optional upper bound for the base total timeout.
-   std::optional<fc::microseconds> total_timeout_cap;
-};
-
-/** One JSON-RPC call selected by a completed-call continuation hook. */
-struct continuation_call {
-   std::string method;
-   fc::variant params = variants{};
-   follow_up_options options;
-};
-
-/**
- * Inspect one call result and select a same-connection follow-up call.
- *
- * The hook must not block or re-enter the same client.
- */
-using continuation_hook = std::function<continuation_call(const fc::variant&)>;
 
 // JSON-RPC error type
 struct json_rpc_error : fc::exception {
    int code;
    variant data;
-   explicit json_rpc_error(const std::string& message);
    json_rpc_error(int code_in, const std::string& message, const variant& data_in = {});
 };
 
@@ -110,28 +84,6 @@ public:
     */
    fc::variant call_idempotent(const std::string& method, const fc::variant& params = variants{});
 
-   /**
-    * Perform one bounded call, inspect its result, and send a hook-selected
-    * follow-up over the exact same HTTP/TLS connection.
-    *
-    * The first call follows @p first_call_options. The selected follow-up
-    * is always single-attempt because reconnecting would break connection
-    * affinity. Each call receives an independent total deadline. The hook
-    * must not block or re-enter this client; re-entry fails immediately.
-    */
-   fc::variant call_then(const std::string& method, const fc::variant& params, call_options first_call_options,
-                         const continuation_hook& continue_with);
-
-   /**
-    * Send one non-replaying notification and consume its HTTP response.
-    *
-    * A JSON-RPC notification has no `id`; the response body is ignored.
-    */
-   void notify(const std::string& method, const fc::variant& params = variants{});
-
-   /** Perform one non-replaying JSON-RPC batch request. */
-   variant call_batch(const std::vector<variant>& requests);
-
    // -----------------------------------------------------------------------
    //  Raw HTTP verb support — for REST-style endpoints.
    //  Does NOT wrap in JSON-RPC envelope.
@@ -154,7 +106,7 @@ private:
    variant call_with_policy(const std::string& method, const fc::variant& params, call_options options);
 
    /** Perform HTTP POST with JSON payload and an explicit replay policy. */
-   variant send_json(const variant& payload, bool expect_json_body, fc::http::request_options request_options);
+   variant send_json(const variant& payload, fc::http::request_options request_options);
 
    /// Validate a JSON-RPC response envelope and return its `result`.
    static variant extract_call_result(const variant& response, std::int64_t expected_id);

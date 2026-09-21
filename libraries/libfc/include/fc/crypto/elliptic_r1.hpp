@@ -4,6 +4,7 @@
 #include <fc/crypto/sha256.hpp>
 #include <fc/crypto/sha512.hpp>
 #include <fc/crypto/openssl.hpp>
+#include <fc/exception/exception.hpp>
 #include <fc/fwd.hpp>
 #include <fc/io/raw_fwd.hpp>
 
@@ -106,8 +107,18 @@ namespace fc {
      struct public_key_shim : public crypto::shim<public_key_data> {
         using crypto::shim<public_key_data>::shim;
 
+        /// Whether the stored bytes decode to a point on the curve.
+        ///
+        /// Never throws: the r1::public_key constructor raises when o2i_ECPublicKey rejects the
+        /// point, and every caller of this uses it as a predicate. Note the asymmetry with the K1
+        /// shim of the same name, whose underlying constructor only copies -- there valid() is an
+        /// all-zero test and says nothing about the point.
         bool valid()const {
-           return public_key(_data).valid();
+           try {
+              return public_key(_data).valid();
+           } catch (const fc::exception&) {
+              return false;
+           }
         }
      };
 

@@ -37,7 +37,10 @@ public:
 
    /**
     * Represents a cron-like schedule.  Empty set for any field means wildcard
-    * (match all valid values for that field).
+    * (match all valid values for that field), except `milliseconds`: an empty
+    * `milliseconds` field matches only 0, the start of the minute, so a schedule
+    * fires once per matching minute (like crontab's implicit second 0).  For
+    * example, `minutes = {exact_value{30}}` alone fires once an hour, at hh:30:00.000.
     *
     * Field ranges:
     *   milliseconds : 0..59999     (milliseconds within the minute)

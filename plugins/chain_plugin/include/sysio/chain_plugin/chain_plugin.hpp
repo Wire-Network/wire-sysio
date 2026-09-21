@@ -1,38 +1,36 @@
 #pragma once
 
-#include <sysio/chain_plugin/account_query_db.hpp>
-#include <sysio/chain_plugin/trx_retry_db.hpp>
-#include <sysio/chain_plugin/trx_finality_status_processing.hpp>
-#include <sysio/chain_plugin/tracked_votes.hpp>
-#include <sysio/chain_plugin/get_info_db.hpp>
-
-#include <sysio/chain/application.hpp>
-#include <sysio/chain/asset.hpp>
-#include <sysio/chain/authority.hpp>
-#include <sysio/chain/account_object.hpp>
-#include <sysio/chain/block.hpp>
-#include <sysio/chain/config.hpp>
-#include <sysio/chain/controller.hpp>
-#include <sysio/chain/kv_table_objects.hpp>
-#include <sysio/chain/resource_limits.hpp>
-#include <sysio/chain/transaction.hpp>
-#include <sysio/chain/abi_serializer.hpp>
-#include <sysio/chain/plugin_interface.hpp>
-#include <sysio/chain/types.hpp>
-#include <sysio/chain/fixed_bytes.hpp>
-#include <sysio/protocol/snapshot_attestation.hpp>
-
+#include <algorithm>
+#include <array>
+#include <atomic>
 #include <boost/container/flat_set.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
-
 #include <fc/time.hpp>
-
-#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
-
-#include <atomic>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/account_object.hpp>
+#include <sysio/chain/application.hpp>
+#include <sysio/chain/asset.hpp>
+#include <sysio/chain/authority.hpp>
+#include <sysio/chain/block.hpp>
+#include <sysio/chain/config.hpp>
+#include <sysio/chain/controller.hpp>
+#include <sysio/chain/fixed_bytes.hpp>
+#include <sysio/chain/kv_table_objects.hpp>
+#include <sysio/chain/plugin_interface.hpp>
+#include <sysio/chain/resource_limits.hpp>
+#include <sysio/chain/transaction.hpp>
+#include <sysio/chain/types.hpp>
+#include <sysio/chain_plugin/account_query_db.hpp>
+#include <sysio/chain_plugin/get_info_db.hpp>
+#include <sysio/chain_plugin/tracked_votes.hpp>
+#include <sysio/chain_plugin/trx_finality_status_processing.hpp>
+#include <sysio/chain_plugin/trx_retry_db.hpp>
+#include <sysio/protocol/snapshot_attestation.hpp>
+#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
+#include <vector>
 
 namespace fc { class variant; }
 
@@ -166,6 +164,26 @@ namespace sysio {
       const fc::crypto::blake3& loaded_snapshot_hash,
       const chain::block_id_type& attested_block_id,
       std::string_view attested_snapshot_hash);
+
+   /// Plugins that read get_info in-process. get_info_db refreshes its cache on every irreversible block, and
+   /// on every accepted block outside db_read_mode::IRREVERSIBLE, only while one of these is configured;
+   /// otherwise get_info() fills the cache lazily and it is not refreshed thereafter. The list lives here
+   /// rather than being registered by each consumer at runtime because get_info_db's refresh flag is fixed
+   /// when chain_plugin's plugin_initialize constructs it, and appbase runs that before any dependent plugin
+   /// initializes.
+   inline constexpr auto get_info_consumer_plugins =
+      std::to_array<std::string_view>({"sysio::chain_api_plugin", "sysio::status_monitor_plugin"});
+
+   /// True when any `plugin` option value names a get_info consumer. Substring match, because appbase lets
+   /// one option value carry several plugin names; the option is a free-form list, so the match is
+   /// deliberately loose and a longer name that contains a consumer's name matches as well.
+   inline bool get_info_consumer_configured(const std::vector<std::string>& plugin_option_values) {
+      return std::ranges::any_of(plugin_option_values, [](const std::string& value) {
+         return std::ranges::any_of(get_info_consumer_plugins, [&value](std::string_view consumer) {
+            return value.find(consumer) != std::string::npos;
+         });
+      });
+   }
 
    inline auto make_resolver(const controller& control, fc::microseconds abi_serializer_max_time, throw_on_yield yield_throw ) {
       return [&control, abi_serializer_max_time, yield_throw](const account_name& name) -> std::optional<abi_serializer> {
@@ -614,7 +632,7 @@ public:
 
    struct get_producers_result {
       fc::variants        rows; ///< one row per item, either encoded as hex string or JSON object
-      double              total_producer_vote_weight;
+      double              total_producer_vote_weight = 0; ///< always 0: producers come from the schedule
       string              more; ///< fill lower_bound with this value to fetch more rows
    };
 

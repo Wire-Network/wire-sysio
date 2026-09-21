@@ -91,7 +91,8 @@ documented in `docs/snapshot-benchmarks.md`.
 
 Attestation is implemented as a small voting contract rather than a BLS aggregate-signature
 and P2P vote-gossip layer. Its trust assumption is a quorum of durable provider registrations
-whose producers satisfied the active/rank eligibility checks when registered. The contract
+whose producers were schedulable when they entered the provider set. Rotation is ungated
+afterwards, so a live mapping does not imply its producer is schedulable now. The contract
 approach:
 
 - adds no new P2P message types or off-chain vote accumulation,
@@ -113,6 +114,7 @@ Files:
 | Action | Authority | Description |
 |--------|-----------|-------------|
 | `regsnapprov(producer, snap_account)` | `producer` | Create or rotate the producer's snapshot-provider delegation. |
+| `delsnapprov(producer)` | `producer` | Retire the producer's delegation, freeing its registration slot. |
 | `votesnaphash(snap_account, block_id, snapshot_hash)` | `snap_account` | Submit a hash vote for the block named by `block_id`. |
 | `setsnpcfg(min_providers)` | `sysio` | Set the fixed number K of producer votes required to attest. |
 | `getsnaphash(block_num)` | read-only | Return the attested record for a block, if any. |
@@ -131,23 +133,46 @@ Storage uses the KV table API (`sysio::kv::table` / `sysio::kv::global`).
 ### Registration
 
 A producer calls `regsnapprov` to designate a separate `snap_account` as its snapshot
-provider. The producer must be registered (via `regproducer`), active, and ranked at or below
-`max_snap_provider_rank` (30) when the mapping is created. This producer-table check is the
-registration trust gate; operator-registry status is deliberately not an additional dependency.
-Eligibility is not rechecked while voting, so a provider that was valid when registered keeps a
-stable delegation through ordinary producer churn.
+provider. A producer that currently holds no mapping must be registered (via `regproducer`),
+active, and ranked at or below `max_snap_provider_rank` (30). Rank is position in a walk that tests
+`is_schedulable`, so two conditions ride along with it: an ACTIVE `OPERATOR_TYPE_PRODUCER` row in
+sysio.opreg, and an active finalizer key. A producer missing either is absent from the ranked list,
+so the rejection re-tests the two non-rank conditions to report the one that actually applied --
+rank is what remains once both are excluded, not the answer given to all three.
+The gate keys on the ABSENCE OF A CURRENT MAPPING rather than on never having registered: a
+producer whose row was evicted by the capacity prune is gated again when it re-registers, while a
+producer that still holds one replaces it ungated, for the reason below.
+Eligibility is not rechecked while voting, so a producer that was eligible when it entered the
+provider set keeps a stable delegation through ordinary producer churn.
 
 The registration table is capped at 30. Normal producer lifecycle actions do no attestation work.
-Only when a new registration encounters a full table does `regsnapprov` lazily remove mappings whose
-producer is missing, inactive, or ranked above 30, print each eviction, then reapply the cap. All
-uniqueness checks run before pruning, so a doomed registration cannot mutate unrelated mappings.
-Pending votes are never retracted by this cleanup.
+Only when a gated registration encounters a full table does `regsnapprov` lazily remove every
+mapping whose producer would now fail that gate, print each eviction, then reapply the cap. Rank is
+only one way to fail it: a producer that has no `producers` row, has gone inactive, lost its ACTIVE
+`OPERATOR_TYPE_PRODUCER` row in sysio.opreg, or lost its active finalizer key is evicted the same as
+one ranked outside the top 30. All uniqueness checks run before pruning, so a doomed registration
+cannot mutate unrelated mappings. Pending votes are never retracted by this cleanup.
 Delegating to a separate account decouples authority: the producer's keys never have to live on
 the snapshot node -- only the snap_account's key does.
 
 Calling `regsnapprov` again with the same pair is idempotent. Calling it with a new snap_account
 atomically replaces that producer's old mapping. Votes store producer identities, so rotating the
 signing account neither retracts an accepted vote nor allows the producer to vote twice.
+
+`delsnapprov` retires a mapping outright, freeing its slot without waiting for the capacity prune.
+It is not eligibility-gated either, and for the same reason rotation is not: the producer that most
+needs to stop is the one that has become ineligible. Votes are keyed by producer identity, so
+leaving retracts nothing already accepted, and the attestation credit earned in the open pay period
+stays until the period boundary rolls it off.
+
+Rotation is not eligibility-gated either, and retiring does not make it redundant: leaving is
+one-way, because re-registering is gated. A producer that has gone inactive, lost its operator or
+finalizer standing, or fallen outside the rank band can therefore rotate to a safe `snap_account`
+and keep a delegation it can carry back into eligibility, where deleting would oblige it to regain
+eligibility first. Rotation erases that producer's `byproducer` row and emplaces
+the replacement under the new `snap_account`, leaving the row count and the producer's single vote
+unchanged -- it grants nothing a gated registration would. A producer holding no `byproducer` row
+is still refused one while ineligible, whether or not it held one before.
 
 ### Voting and quorum
 
@@ -300,8 +325,9 @@ clio push action sysio votesnaphash \
 ## Trust and security model
 
 - Trust reduces to: a quorum of durable provider registrations honestly computed the snapshot
-  hash. Each registration's producer must be active and ranked at or below 30 when the mapping
-  is created; that eligibility is not continuously revalidated afterward.
+  hash. Each producer was schedulable and within the top 30 rank positions when it entered the
+  provider set. That is checked on admission, not on each mapping row: rotation replaces the
+  `snap_account` ungated, and eligibility is not continuously revalidated afterward.
 - Determinism is what makes a quorum meaningful: if honest providers could compute different
   hashes for the same block, votes would never converge. The fixed snapshot format and
   canonical section ordering remove that ambiguity.
@@ -314,10 +340,11 @@ clio push action sysio votesnaphash \
 
 ## Testing
 
-- Contract tests (`contracts/tests/sysio.snapshot_attest_tests.cpp`) cover registration and
-  rotation, side-effect-free uniqueness failures, traceable lazy full-table pruning, fixed-K
-  configuration, scheduled-height rejection, monotonic votes across churn and heights,
-  equivocation/disagreement rejection, finalization purging, and the `getsnaphash` query.
+- Contract tests (`contracts/tests/sysio.snapshot_attest_tests.cpp`) cover registration, rotation
+  and `delsnapprov` retirement, rejections that name the failed eligibility condition,
+  side-effect-free uniqueness failures, traceable lazy full-table pruning, fixed-K configuration,
+  scheduled-height rejection, monotonic votes across churn and heights, equivocation/disagreement
+  rejection, finalization purging, and the `getsnaphash` query.
 - Unit tests (`unittests/snapshot_attest_tests.cpp`) cover snapshot round-trip hash
   stability, a full chain whose snapshot hash matches its on-chain record, mismatch
   detection, the no-attestation case, and survival of attestation state across a snapshot

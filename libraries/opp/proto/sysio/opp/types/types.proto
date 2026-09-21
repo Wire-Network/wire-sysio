@@ -280,6 +280,17 @@ enum AttestationType {
   // gate state is depot-local (sysio.epoch::blocklog); no outpost consumes
   // a cross-chain notification of it. Slot retained; do not reuse.
   ATTESTATION_TYPE_EMISSIONS_BLOCKED        = 60962; // 0xEE22
+
+  // ---------------------------------------------------------------------------
+  //  liq syndication attestations (simple_swap, 2026-09-12)
+  //  Syndicated liq tokens (liqSOL today, liqEth at parity) become outpost
+  //  property; the depot owns the syndication ledger and originates every
+  //  de-syndication. Per-user yield reporting for the syndicated pool is
+  //  replaced by one global LIQ_YIELD report.
+  // ---------------------------------------------------------------------------
+  ATTESTATION_TYPE_SYNDICATE_LIQ            = 60963; // 0xEE23  outpost → depot
+  ATTESTATION_TYPE_LIQ_YIELD                = 60964; // 0xEE24  outpost → depot
+  ATTESTATION_TYPE_DESYNDICATE_LIQ          = 60965; // 0xEE25  depot   → outpost
 }
 
 // Reason codes recorded by sysio.epoch::advance's emissions readiness gate

@@ -14,6 +14,7 @@
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/permission_object.hpp>
+#include <sysio/chain/wast_to_wasm.hpp>
 #include <sysio/chain/kv_table_objects.hpp>   // kv_index / by_code_key for reading sysio.roa kv tables
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/opp.pb.h>
@@ -38,9 +39,12 @@
 #include <algorithm>
 #include <array>
 #include <iterator>
+#include <map>
+#include <sstream>
 
 #include "contracts.hpp"
 #include "contract_test_support.hpp"
+#include "test_symbol.hpp"
 // Canonical-encoding + header-derivation oracle: inbound envelopes must carry
 // spec-derived semantic headers or apply_consensus drops them before dispatch.
 #include "opp_envelope_oracle.hpp"
@@ -324,6 +328,14 @@ std::string encode_swap_request(
 }
 
 } // anonymous namespace
+
+/// Wire layout of an `auth.msg::onlinkauth` action, the payload sysio.system once acted on.
+struct onlinkauth_notification {
+   name            user;
+   name            permission;
+   public_key_type pub_key;
+};
+FC_REFLECT(onlinkauth_notification, (user)(permission)(pub_key))
 
 class sysio_dispatch_tester : public tester {
 public:
@@ -1989,7 +2001,7 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    BOOST_REQUIRE_EQUAL(reg["tier"].as<uint32_t>(), 2u);
    auto audit = get_nodeownerreg(CLAIM_ACCOUNT);
    BOOST_REQUIRE(!audit.is_null());
-   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), 0u);  // CONFIRMED
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), sysio_system::test_support::nodeownerreg::status_confirmed);
 } FC_LOG_AND_RETHROW() }
 
 // WSA-005: node-owner registration is bound to the EXACT Ethereum source outpost (NODE_OWNER_SRC_CHAIN
@@ -2051,6 +2063,161 @@ BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_non_evm_outpost_is_dropped, sysio_di
    // Nothing was sent to sysio.roa: no node-owner registration and no audit row.
    BOOST_REQUIRE(get_nodeowner(CLAIM_ACCOUNT).is_null());
    BOOST_REQUIRE(get_nodeownerreg(CLAIM_ACCOUNT).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// Node-owner claims on a chain running sysio.system. A tier-2/3 claim lets the NFT holder pick any valid 1-12 char
+/// name and control the account created for it; these cases pin what that control must not reach.
+class node_owner_claim_tester : public sysio_dispatch_tester {
+public:
+   static constexpr auto     NODE_OWNER_SOURCE_CHAIN = "ETHEREUM";
+   static constexpr uint32_t CLAIM_TIER              = 2;
+   static constexpr auto     AUTH_MSG_ACCOUNT        = "auth.msg"_n;
+   static constexpr auto     ONLINKAUTH_ACTION       = "onlinkauth"_n;
+   static constexpr auto     AUTH_EXT_PERMISSION     = "auth.ext"_n;
+   static constexpr auto     OTHER_PERMISSION        = "session"_n;
+   static constexpr auto     RESERVED_SYSTEM_NAME    = "sysio.pwn"_n;
+   static constexpr auto     PAYER_ACCOUNT           = "payer"_n;
+   /// Never created; only names the key a notification offers.
+   static constexpr auto     REPLACEMENT_KEY_NAME    = "replacement"_n;
+   static constexpr auto     SYSTEM_INIT_ACTION      = "init"_n;
+   static constexpr auto     ADDPOLICY_ACTION        = "addpolicy"_n;
+   static constexpr auto     SELF_POLICY_WEIGHT      = "0.1000 SYS";
+
+   /// Parent and authority of each of an account's permissions, keyed by permission name.
+   using permission_set = std::map<name, std::pair<name, authority>>;
+
+   /// Deploy and initialize sysio.system; the base dispatch fixture runs without it.
+   void deploy_system_contract() {
+      set_code(config::system_account_name, contracts::system_wasm());
+      set_abi(config::system_account_name, contracts::system_abi().data());
+      produce_block();
+      base_tester::push_action(config::system_account_name, SYSTEM_INIT_ACTION, config::system_account_name,
+                               mvo()("version", 0)("core", CORE_SYM_STR));
+      produce_block();
+   }
+
+   /// Deliver a NodeOwnerRegistration for `account` through the Ethereum outpost, as BAR.commitNode emits it.
+   void claim_node_owner(name account, const public_key_type& wire_key) {
+      const auto eth_key  = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
+      const auto payload  = encode_node_owner_registration(account.to_string(), CLAIM_TIER,
+                                                           sysio::opp::types::WIRE_KEY_TYPE_K1,
+                                                           k1_pubkey_bytes(wire_key), em_pubkey_bytes(eth_key));
+      const auto envelope = encode_envelope_with_one_attestation(
+         current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
+      BOOST_REQUIRE_EQUAL(success(), deliver(fc::slug_name{NODE_OWNER_SOURCE_CHAIN}.value, envelope));
+      produce_blocks(2);
+   }
+
+   /// The claimant issues a policy to itself from its tier budget; PAYER_ACCOUNT pays for the transaction.
+   void issue_own_policy(name owner) {
+      signed_transaction trx;
+      trx.actions.emplace_back(get_action(config::roa_account_name, ADDPOLICY_ACTION,
+         vector<permission_level>{{PAYER_ACCOUNT, config::sysio_payer_name}, {PAYER_ACCOUNT, config::active_name},
+                                  {owner, config::active_name}},
+         mvo()("owner", owner)("issuer", owner)("net_weight", SELF_POLICY_WEIGHT)("cpu_weight", SELF_POLICY_WEIGHT)
+              ("ram_weight", SELF_POLICY_WEIGHT)("time_block", 0)("network_gen", ROA_NETWORK_GEN)));
+      set_transaction_headers(trx);
+      trx.sign(get_private_key(PAYER_ACCOUNT, "active"), control->get_chain_id());
+      trx.sign(get_private_key(owner, "active"), control->get_chain_id());
+      push_transaction(trx);
+      produce_block();
+   }
+
+   /// Code a claimant can deploy on its account: it forwards every action it receives to sysio as a notification.
+   static std::vector<uint8_t> notify_system_account_wasm() {
+      std::ostringstream wast;
+      wast << R"((module
+         (import "env" "require_recipient" (func $require_recipient (param i64)))
+         (func (export "apply") (param i64 i64 i64)
+            (call $require_recipient (i64.const 0x)"
+           << std::hex << config::system_account_name.to_uint64_t() << R"())
+         )
+      ))";
+      return wast_to_wasm(wast.str());
+   }
+
+   /// Push auth.msg::onlinkauth as auth.msg; true when the transaction committed and the notification reached sysio.
+   bool notify_onlinkauth(name user, name permission, const public_key_type& key) {
+      signed_transaction trx;
+      trx.actions.emplace_back(vector<permission_level>{{AUTH_MSG_ACCOUNT, config::active_name}}, AUTH_MSG_ACCOUNT,
+                               ONLINKAUTH_ACTION, fc::raw::pack(onlinkauth_notification{user, permission, key}));
+      set_transaction_headers(trx);
+      trx.sign(get_private_key(AUTH_MSG_ACCOUNT, "active"), control->get_chain_id());
+      bool delivered = false;
+      try {
+         const auto trace = push_transaction(trx);
+         delivered = std::ranges::any_of(trace->action_traces, [](const action_trace& at) {
+            return at.receiver == config::system_account_name && at.act.name == ONLINKAUTH_ACTION;
+         });
+      } catch (const fc::exception&) {
+         delivered = false;
+      }
+      produce_block();
+      return delivered;
+   }
+
+   /// Native newaccount creates only the account_object; metadata appears once code, abi or privilege is set.
+   bool account_exists(name account) const {
+      return control->db().find<account_object, by_name>(account) != nullptr;
+   }
+
+   /// Every permission of `account`, for before/after comparison.
+   permission_set permissions_of(name account) const {
+      permission_set out;
+      const auto& db  = control->db();
+      const auto& idx = db.get_index<permission_index, by_owner>();
+      for (auto it = idx.lower_bound(boost::make_tuple(account)); it != idx.end() && it->owner == account; ++it) {
+         const name parent = it->parent._id == 0 ? name{} : db.get<permission_object, by_id>(it->parent).name;
+         out.emplace(it->name, std::make_pair(parent, it->auth.to_authority()));
+      }
+      return out;
+   }
+};
+
+// A tier-2/3 claim can take the name auth.msg and deploy code there, so an auth.msg::onlinkauth notification is
+// attacker-controlled. It must reach sysio as an ordinary notification and change nothing: not sysio's owner, active,
+// auth.ext or any other permission, and not a user's.
+BOOST_FIXTURE_TEST_CASE(claimed_auth_msg_notification_changes_no_permission, node_owner_claim_tester) { try {
+   bootstrap_for_dispatch(NODE_OWNER_SOURCE_CHAIN);
+   create_account(PAYER_ACCOUNT);
+   deploy_system_contract();
+
+   claim_node_owner(AUTH_MSG_ACCOUNT, get_public_key(AUTH_MSG_ACCOUNT, "active"));
+   const auto audit = get_nodeownerreg(AUTH_MSG_ACCOUNT);
+   BOOST_REQUIRE(!audit.is_null());
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), sysio_system::test_support::nodeownerreg::status_confirmed);
+   issue_own_policy(AUTH_MSG_ACCOUNT);
+   set_code(AUTH_MSG_ACCOUNT, notify_system_account_wasm());
+   produce_block();
+
+   const auto replacement_key = get_public_key(REPLACEMENT_KEY_NAME, "active");
+   const auto sysio_before    = permissions_of(config::system_account_name);
+   const auto user_before     = permissions_of(CLAIM_ACCOUNT);
+   for (const auto target : {config::system_account_name, CLAIM_ACCOUNT}) {
+      for (const auto permission : {config::owner_name, config::active_name, AUTH_EXT_PERMISSION, OTHER_PERMISSION}) {
+         BOOST_CHECK_MESSAGE(notify_onlinkauth(target, permission, replacement_key),
+                             "onlinkauth for " << target.to_string() << "@" << permission.to_string()
+                                               << " did not commit as a plain notification");
+      }
+   }
+   BOOST_CHECK_MESSAGE(permissions_of(config::system_account_name) == sysio_before, "sysio permissions changed");
+   BOOST_CHECK_MESSAGE(permissions_of(CLAIM_ACCOUNT) == user_before, "claimacct permissions changed");
+} FC_LOG_AND_RETHROW() }
+
+// No node owner may claim a name under the reserved sysio. prefix: the depot's claim is rejected as NAME_INVALID and
+// no account is created.
+BOOST_FIXTURE_TEST_CASE(node_owner_claim_rejects_reserved_system_name, node_owner_claim_tester) { try {
+   bootstrap_for_dispatch(NODE_OWNER_SOURCE_CHAIN);
+   deploy_system_contract();
+
+   claim_node_owner(RESERVED_SYSTEM_NAME, get_public_key(RESERVED_SYSTEM_NAME, "active"));
+
+   const auto audit = get_nodeownerreg(RESERVED_SYSTEM_NAME);
+   BOOST_REQUIRE(!audit.is_null());
+   BOOST_CHECK_EQUAL(audit["status"].as<uint64_t>(), sysio_system::test_support::nodeownerreg::status_rejected);
+   BOOST_CHECK_EQUAL(audit["reason"].as<uint64_t>(), sysio_system::test_support::nodeownerreg::reason_name_invalid);
+   BOOST_CHECK(get_nodeowner(RESERVED_SYSTEM_NAME).is_null());
+   BOOST_CHECK(!account_exists(RESERVED_SYSTEM_NAME));
 } FC_LOG_AND_RETHROW() }
 
 /// Regression: a non-advancing advance() must not permanently strand the epoch.

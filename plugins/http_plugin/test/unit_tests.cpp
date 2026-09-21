@@ -10,6 +10,8 @@
 #include <boost/asio/basic_stream_socket.hpp>
 #include <boost/asio/local/stream_protocol.hpp>
 #include <fc/crypto/rand.hpp>
+#include <fc/io/json.hpp>
+#include <fc/variant_object.hpp>
 
 #define BOOST_TEST_MODULE http_plugin unit tests
 #include <boost/test/included/unit_test.hpp>
@@ -41,6 +43,7 @@ constexpr uint32_t bytes_in_flight_index = 3;
 constexpr uint32_t requests_in_flight_index = 4;
 constexpr uint32_t request_body_bytes_in_flight_index = 5;
 constexpr uint32_t category_uw_index = 6;
+constexpr uint32_t plaintext_response_index = 7;
 // Keeps unsharded IPv6 probe coverage on the historical port 9999.
 constexpr uint32_t ipv6_probe_index = 2;
 
@@ -449,6 +452,12 @@ BOOST_AUTO_TEST_CASE(invalid_category_addresses) {
    BOOST_TEST(app_log({test_name, "--plugin=sysio::chain_api_plugin", "--http-server-address",
                                  "http-category-address", "--http-category-address", underwriter_localhost.c_str()})
                   .contains("--plugin=sysio::underwriter_plugin is required"));
+
+   // The test_control endpoints are registered by test_control_api_plugin, so that is the plugin the category needs.
+   const std::string test_control_localhost = "test_control," + localhost_rw;
+   BOOST_TEST(app_log({test_name, "--plugin=sysio::chain_api_plugin", "--http-server-address",
+                                 "http-category-address", "--http-category-address", test_control_localhost.c_str()})
+                  .contains("--plugin=sysio::test_control_api_plugin is required"));
 
    BOOST_TEST(app_log({test_name, "--plugin=sysio::chain_api_plugin", "--http-category-address", chain_ro_localhost.c_str()})
                   .contains("http-server-address must be set as `http-category-address`"));
@@ -914,6 +923,52 @@ BOOST_FIXTURE_TEST_CASE(requests_in_flight, http_plugin_test_fixture) {
    BOOST_REQUIRE_EQUAL(r[boost::beast::http::status::ok], 8u);
    connections.clear();
    wait_for_no_requests_in_flight();
+}
+
+// A plaintext handler's string response is sent as-is; an error object it reports is sent as JSON with its own status,
+// not failed as a 500 on a closed connection.
+BOOST_FIXTURE_TEST_CASE(plaintext_responses, http_plugin_test_fixture) {
+   const std::string endpoint       = test_http_endpoint("127.0.0.1", plaintext_response_index);
+   const std::string server_address = "--http-server-address=" + endpoint;
+   const std::string plaintext_body = "metric 1\n";
+
+   http_plugin* http_plugin = init({bu::framework::current_test_case().p_name->c_str(), server_address.c_str(),
+                                    "--http-validate-host", "false"});
+   BOOST_REQUIRE(http_plugin);
+
+   http_plugin->add_async_api({{std::string("/v1/node/plaintext_ok"), api_category::node,
+                                [plaintext_body](string&&, string&&, url_response_callback&& cb) {
+                                   cb(200, fc::variant(plaintext_body));
+                                }},
+                               {std::string("/v1/node/plaintext_error"), api_category::node,
+                                [](string&&, string&&, url_response_callback&& cb) {
+                                   const auto error =
+                                      fc::mutable_variant_object()("code", 400)("message", "Bad Request");
+                                   cb(400, fc::variant(error));
+                                }},
+                               {std::string("/v1/node/plaintext_empty"), api_category::node,
+                                [](string&&, string&&, url_response_callback&& cb) { cb(200, std::nullopt); }}},
+                              http_content_type::plaintext);
+
+   {
+      http_response_for resp(endpoint.c_str(), "/v1/node/plaintext_ok");
+      BOOST_CHECK_EQUAL(resp.status(), http::status::ok);
+      BOOST_CHECK_EQUAL(std::string(resp.response[http::field::content_type]), "text/plain");
+      BOOST_CHECK_EQUAL(resp.body(), plaintext_body);
+   }
+   {
+      http_response_for resp(endpoint.c_str(), "/v1/node/plaintext_error");
+      BOOST_CHECK_EQUAL(resp.status(), http::status::bad_request);
+      BOOST_CHECK_EQUAL(std::string(resp.response[http::field::content_type]), "application/json");
+      const auto body = fc::json::from_string(resp.body());
+      BOOST_CHECK_EQUAL(body["code"].as_int64(), 400);
+   }
+   {
+      http_response_for resp(endpoint.c_str(), "/v1/node/plaintext_empty");
+      BOOST_CHECK_EQUAL(resp.status(), http::status::ok);
+      BOOST_CHECK_EQUAL(std::string(resp.response[http::field::content_type]), "application/json");
+      BOOST_CHECK_EQUAL(resp.body(), "{}");
+   }
 }
 
 //A warning for future tests: destruction of http_plugin_test_fixture sometimes does not destroy http_plugin's listeners. Tests

@@ -1,6 +1,11 @@
+#include <sysio/chain/application.hpp>
 #include <sysio/chain/genesis_state.hpp>
 #include <sysio/wallet_plugin/wallet.hpp>
 #include <sysio/wallet_plugin/wallet_manager.hpp>
+
+#include <fc/filesystem.hpp>
+
+#include <chrono>
 
 #include <boost/test/unit_test.hpp>
 #include <sysio/chain/authority.hpp>
@@ -129,21 +134,53 @@ BOOST_AUTO_TEST_CASE(wallet_manager_test)
    BOOST_CHECK(std::find(keys.cbegin(), keys.cend(), pub_pri_pair(key1)) != keys.cend());
    keys_by_name = wm.list_keys_by_name("test", pw);
    BOOST_TEST(keys_by_name.size() == 2);
+
+   // Key names as saved in test.wallet, read back through a second manager.
+   auto saved_key_names = [&pw]() {
+      wallet_manager saved;
+      saved.open("test");
+      saved.unlock("test", pw);
+      return saved.list_keys_by_name("test", pw);
+   };
+
    wm.set_key_name_with_public_key("test", pw, "key2", pub_pri_pair(key2).first.to_string({}, true));
    keys_by_name = wm.list_keys_by_name("test", pw);
    BOOST_TEST(keys_by_name.size() == 2);
    BOOST_CHECK(keys_by_name.contains("key2"));
+   BOOST_CHECK(saved_key_names().contains("key2"));
    wm.set_key_name_with_private_key("test", pw, "key_two", pub_pri_pair(key2).second.to_string({}, true));
    keys_by_name = wm.list_keys_by_name("test", pw);
    BOOST_TEST(keys_by_name.size() == 2);
    BOOST_CHECK(keys_by_name.contains("key_two"));
    BOOST_CHECK(!keys_by_name.contains("key2"));
+   BOOST_CHECK(saved_key_names().contains("key_two"));
    wm.set_key_name("test", pw, "key_2", "key_two");
    keys_by_name = wm.list_keys_by_name("test", pw);
    BOOST_TEST(keys_by_name.size() == 2);
    BOOST_CHECK(!keys_by_name.contains("key_two"));
    BOOST_CHECK(!keys_by_name.contains("key2"));
    BOOST_CHECK(keys_by_name.contains("key_2"));
+   {
+      const auto saved = saved_key_names();
+      BOOST_CHECK(saved.contains("key_2"));
+      BOOST_CHECK(!saved.contains("key_two"));
+   }
+   {
+      // Renaming onto a name already in use, including a key's own name, is refused and leaves every name in place.
+      const auto names_of = [](const std::map<std::string, wallet_key_entry>& entries) {
+         std::map<std::string, public_key_type> names;
+         for (const auto& [name, entry] : entries)
+            names.emplace(name, entry.public_key);
+         return names;
+      };
+      const auto names_before = names_of(wm.list_keys_by_name("test", pw));
+      const auto other_name = std::find_if(names_before.begin(), names_before.end(),
+                                           [](const auto& entry) { return entry.first != "key_2"; })->first;
+      BOOST_CHECK_THROW(wm.set_key_name("test", pw, "key_2", other_name), key_exist_exception);
+      BOOST_CHECK_THROW(wm.set_key_name("test", pw, "key_2", "key_2"), key_exist_exception);
+      BOOST_CHECK(names_of(wm.list_keys_by_name("test", pw)) == names_before);
+      BOOST_CHECK(names_of(saved_key_names()) == names_before);
+   }
    BOOST_CHECK_THROW(wm.remove_key("test", pw, pub_pri_pair(key3).first.to_string({})), fc::exception);
    BOOST_CHECK_EQUAL(2u, wm.get_public_keys().size());
    BOOST_CHECK_THROW(wm.remove_key("test", "PWnogood", pub_pri_pair(key2).first.to_string({})), wallet_invalid_password_exception);
@@ -288,6 +325,29 @@ BOOST_AUTO_TEST_CASE(wallet_manager_create_test) {
 
    } FC_LOG_AND_RETHROW()
 }
+
+/// Removing wallet.lock while the manager holds the wallet directory stops the application.
+BOOST_AUTO_TEST_CASE(wallet_manager_lock_file_removed_test) { try {
+   using namespace sysio::wallet;
+
+   fc::temp_directory temp_dir;
+   appbase::scoped_app app;
+   wallet_manager wm;
+   wm.set_dir(temp_dir.path());
+
+   const auto lock_file = temp_dir.path() / "wallet.lock";
+   BOOST_REQUIRE(std::filesystem::exists(lock_file));
+
+   // The watch runs every second and keeps re-arming while the lock file exists.
+   auto& ioc = app->get_io_context();
+   BOOST_CHECK_NO_THROW(ioc.run_for(std::chrono::milliseconds(1500)));
+   BOOST_CHECK(!app->is_quiting());
+
+   // The next watch quits the application through the normal shutdown path instead of re-arming.
+   std::filesystem::remove(lock_file);
+   BOOST_CHECK_NO_THROW(ioc.run_for(std::chrono::seconds(3)));
+   BOOST_CHECK(app->is_quiting());
+} FC_LOG_AND_RETHROW() }
 
 
 BOOST_AUTO_TEST_SUITE_END()

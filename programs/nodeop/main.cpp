@@ -1,3 +1,4 @@
+#include <string>
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/chain/app.hpp>
 #include <sysio/chain_api_plugin/chain_api_plugin.hpp>
@@ -14,12 +15,11 @@
 #include <sysio/signature_provider_ssm_plugin/signature_provider_ssm_plugin.hpp>
 #include <sysio/snapshot_api_plugin/snapshot_api_plugin.hpp>
 #include <sysio/state_history_plugin/state_history_plugin.hpp>
+#include <sysio/status_monitor_plugin/status_monitor_plugin.hpp>
 #include <sysio/test_control_api_plugin/test_control_api_plugin.hpp>
 #include <sysio/test_control_plugin/test_control_plugin.hpp>
 #include <sysio/trace_api/trace_api_plugin.hpp>
 #include <sysio/underwriter_plugin/underwriter_plugin.hpp>
-
-#include <string>
 
 using namespace appbase;
 using namespace sysio;
@@ -37,6 +37,7 @@ int main(int argc, char** argv)
    application_base::register_plugin<test_control_plugin>();
    application_base::register_plugin<test_control_api_plugin>();
    application_base::register_plugin<state_history_plugin>();
+   application_base::register_plugin<status_monitor_plugin>();
    application_base::register_plugin<prometheus_plugin>();
    application_base::register_plugin<chain_api_plugin>();
    application_base::register_plugin<signature_provider_manager_plugin>();

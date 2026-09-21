@@ -52,14 +52,13 @@ public:
       create_accounts({producer_account, snapshot_provider_account});
       produce_blocks();
 
-      regproducer(producer_account);
-      produce_blocks();
-
       // Snapshot-provider eligibility is POSITION in the score-ordered producer index, not a rank
       // governance assigns. A producer holds a position only as an ACTIVE PRODUCER operator in
-      // sysio.opreg carrying an active finalizer key, so the fixture must supply both.
+      // sysio.opreg carrying an active finalizer key. The ACTIVE operator row must exist before
+      // regproducer is admitted, so install the bootstrapped fixture operator first.
       deploy_opreg_once();
       register_producer_operators({producer_account});
+      regproducer(producer_account);
       push_action(config::system_account_name, "setacctram"_n,
                   mvo()("account", producer_account)("ram_bytes", int64_t(1'000'000)));
       produce_blocks();

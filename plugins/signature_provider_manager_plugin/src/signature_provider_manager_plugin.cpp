@@ -13,9 +13,12 @@
 #include <fc/io/secure_file.hpp>
 
 #include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <filesystem>
 #include <set>
+#include <string>
+#include <string_view>
 
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/exceptions.hpp>
@@ -35,6 +38,39 @@ constexpr std::string_view option_name_plugin = "plugin";
 /// never registrable).
 constexpr std::string_view scheme_key  = "KEY";
 constexpr std::string_view scheme_kiod = "KIOD";
+
+/// Field counts of a `--signature-provider` spec, `[<name>,]<chain-kind>,<key-type>,<public-key>,<provider>`.
+///
+/// No diagnostic in this file reproduces a spec or any field of one, not even in part. Any field can hold a private key
+/// if the operator mistypes the line, and a key that lost its `KEY:` marker leaves nothing to recognize it by -- an
+/// Ethereum key is bare hex and a Solana key bare base58. Providers are identified by their public key instead, which
+/// is not secret and, unlike a name, cannot be a mistyped key.
+///
+/// The guarantee stops at handler dispatch: an extension scheme receives its own `spec_data` and owns what it reports,
+/// and the SSM and KMS handlers still echo theirs.
+constexpr std::size_t spec_field_count_with_name = 5;
+constexpr std::size_t spec_field_count_anonymous = 4;
+
+/**
+ * Parse one enum-valued field of a signature-provider spec without echoing it.
+ *
+ * `fc::reflector<Enum>::from_string` reports the text it rejected (`invalid name '<text>' in enum ...`), which a
+ * mistyped spec can make a private key.
+ *
+ * @param field the field text, exactly as supplied.
+ * @param field_idx the field's zero-based position in the spec, so the operator can find it.
+ * @param field_label what the field holds, for the message.
+ * @return the parsed enum value.
+ */
+template<typename Enum>
+Enum parse_spec_enum_field(const std::string& field, std::size_t field_idx, std::string_view field_label) {
+   try {
+      return fc::reflector<Enum>::from_string(field);
+   } catch (const fc::exception&) {
+      FC_THROW_EXCEPTION(chain::plugin_config_exception, "Invalid key spec: field {} is not a valid {}", field_idx,
+                         field_label);
+   }
+}
 
 std::filesystem::path default_signature_provider_spec_file() {
    return app().config_dir() / "default_signature_providers.json";
@@ -172,11 +208,16 @@ public:
       using namespace fc::crypto;
       constexpr std::size_t max_split = 2;
       auto spec_parts = fc::split(spec, ':', max_split);
-      FC_ASSERT(spec_parts.size() == max_split, "Provider spec '{}' is malformed. Format: '<spec type>:<spec data>'", spec);
+      // Not echoed: a spec missing its `KEY:` prefix is a bare private key.
+      FC_ASSERT(spec_parts.size() == max_split,
+                "Provider spec for {} is malformed. Format: '<spec type>:<spec data>'",
+                fc::json::to_log_string(public_key));
 
       auto spec_type_str = spec_parts[0];
       auto spec_data = spec_parts[1];
-      FC_ASSERT(!spec_data.empty(), "Provider spec '{}' is malformed. Format: '<spec type>:<spec data>' has empty <spec data>", spec);
+      FC_ASSERT(!spec_data.empty(),
+                "Provider spec for {} is malformed. Format: '<spec type>:<spec data>' has empty <spec data>",
+                fc::json::to_log_string(public_key));
 
       if (spec_type_str == scheme_key) {
          chain::private_key_type privkey;
@@ -189,7 +230,13 @@ public:
             // Runtime dispatch over the per-type native parsers lives in libfc (fc/crypto/signature_provider.cpp) so
             // extension handlers that also construct local-key providers (e.g. the ssm sub-library) share it. The sui /
             // unknown arms stay here: libfc cannot throw the chain-level config exceptions this plugin's contract uses.
-            privkey = from_native_string_to_private_key(key_type, spec_data);
+            try {
+               privkey = from_native_string_to_private_key(key_type, spec_data);
+            } catch (const fc::exception& e) {
+               // libfc keeps the key out of the message; name the provider so the operator can find the spec.
+               FC_THROW_EXCEPTION(sysio::chain::plugin_config_exception, "KEY: provider spec for {}: {}",
+                                  fc::json::to_log_string(public_key), e.top_message());
+            }
             break;
          }
          case chain_key_type_sui: {
@@ -231,11 +278,13 @@ public:
          return entry->handler(key_type, public_key, spec_data);
       }
 
+      // The type is not echoed: `fc::split` folds a sixth and later comma-separated field into the provider field, so
+      // an extra field can carry a bare private key into this position, as can a `<key>:<junk>` provider field.
       SYS_THROW(chain::plugin_config_exception,
-                "Unknown provider type \"{}\". Built-in types are KEY and KIOD; additional types "
+                "Unknown provider type for {}. Built-in types are KEY and KIOD; additional types "
                 "(e.g. KMS, SSM) are provided by optional signature-provider plugins (enable with "
-                "`plugin = ...`) -- no plugin in this binary provides \"{}\".",
-                spec_type_str, spec_type_str);
+                "`plugin = ...`) -- no plugin in this binary provides the type in this spec.",
+                fc::json::to_log_string(public_key));
    }
 
    /**
@@ -254,8 +303,8 @@ public:
       SYS_ASSERT(!_signing_providers_by_pubkey.contains(provider->public_key) &&
                  !_signing_providers_by_name.contains(provider->key_name),
                  chain::plugin_config_exception,
-                 "A signature provider with key_name \"{}\" or public_key \"{}\" already exists",
-                 provider->key_name, fc::json::to_log_string(provider->public_key));
+                 "A signature provider with this key name, or with public_key \"{}\", already exists",
+                 fc::json::to_log_string(provider->public_key));
 
       _signing_providers_by_pubkey.insert_or_assign(provider->public_key, provider);
 
@@ -376,19 +425,16 @@ public:
       fc::read_file_contents(def_sig_prov_file.string(), json_data);
       auto vo = fc::json::from_string(json_data, fc::json::parse_type::relaxed_parser).as<fc::variant_object>();
 
-      // Record every parsed spec before creating any provider, so a creation failure part-way through never leaves the
-      // specs map missing entries that were present on disk (the guard above proves the member is empty on entry, so
-      // these inserts are the whole map).
+      // Record every parsed spec so a later save keeps entries that were present on disk (the guard above proves the
+      // member is empty on entry, so these inserts are the whole map). Providers are created only for the key types a
+      // caller requests (register_default_signature_providers): a node must not pick up a default it did not ask for,
+      // such as a BLS finalizer key saved by an earlier run as a producer.
       for (const auto& item : vo) {
          auto spec = item.value().as_string();
          auto key_type = fc::crypto::chain_key_type_reflector::from_string(item.key().c_str());
          auto [it, inserted] = _default_signature_provider_specs.try_emplace(key_type, spec);
          FC_ASSERT(inserted, "corrupt {}: duplicate default for key type \"{}\"", def_sig_prov_file.string(),
                    fc::crypto::chain_key_type_reflector::to_string(key_type));
-      }
-
-      for (const auto& [key_type, spec] : _default_signature_provider_specs) {
-         create_provider(spec);
       }
    }
 
@@ -403,11 +449,16 @@ public:
       for (const auto& key_type : key_types) {
          FC_ASSERT(fc::contains(supported_key_types, key_type),
                    "Unsupported key type: {}", key_type);
-         // A stored default spec was already created by load_default_signature_provider_specs, and a configured
-         // provider of this key type makes a default redundant.
-         if (_default_signature_provider_specs.contains(key_type) ||
-             query_providers(std::nullopt, std::nullopt, key_type).size())
+         // A configured (or already created) provider of this key type makes a default redundant.
+         if (query_providers(std::nullopt, std::nullopt, key_type).size())
             continue;
+
+         // Reuse the stored default for this key type.
+         if (auto stored = _default_signature_provider_specs.find(key_type);
+             stored != _default_signature_provider_specs.end()) {
+            create_provider(stored->second);
+            continue;
+         }
 
          // create anonymous key
          auto key_name = std::format("{}-default", fc::crypto::chain_key_type_reflector::to_string(key_type));
@@ -459,20 +510,24 @@ public:
    parsed_provider_spec parse_provider_spec(const string& spec) const {
       using namespace fc::crypto;
       //<name>,<chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>
-      auto spec_parts = fc::split(spec, ',', 5);
+      auto spec_parts = fc::split(spec, ',', spec_field_count_with_name);
       auto num_parts = spec_parts.size();
-      SYS_ASSERT(num_parts == 5 || num_parts == 4, chain::plugin_config_exception, "Invalid key spec: {}",
-                 redact_signature_provider_spec(spec));
+      SYS_ASSERT(num_parts == spec_field_count_with_name || num_parts == spec_field_count_anonymous,
+                 chain::plugin_config_exception,
+                 "Invalid key spec: expected {} comma-separated fields, or {} without the leading <name>, but got {}. "
+                 "Format: [<name>,]<chain-kind>,<key-type>,<public-key>,<provider>",
+                 spec_field_count_with_name, spec_field_count_anonymous, num_parts);
       std::string key_name;
       std::size_t target_chain_idx = 1;
-      if (num_parts == 4) {
+      if (num_parts == spec_field_count_anonymous) {
          target_chain_idx = 0;
       } else {
          key_name = spec_parts[0];
       }
 
-      auto kind = chain_kind_reflector::from_string(spec_parts[target_chain_idx].c_str());
-      auto key_type = chain_key_type_reflector::from_string(spec_parts[target_chain_idx + 1].c_str());
+      auto kind = parse_spec_enum_field<chain_kind_t>(spec_parts[target_chain_idx], target_chain_idx, "chain kind");
+      auto key_type = parse_spec_enum_field<chain_key_type_t>(spec_parts[target_chain_idx + 1],
+                                                              target_chain_idx + 1, "key type");
       auto public_key_text = spec_parts[target_chain_idx + 2];
       auto private_key_provider_spec = spec_parts[target_chain_idx + 3];
 
@@ -482,7 +537,7 @@ public:
          .key_type = key_type,
          .public_key_text = std::move(public_key_text),
          .private_key_provider_spec = std::move(private_key_provider_spec),
-         .has_explicit_name = num_parts == 5 && !key_name.empty(),
+         .has_explicit_name = num_parts == spec_field_count_with_name && !key_name.empty(),
       };
    }
 
@@ -531,7 +586,15 @@ public:
       case chain_key_type_solana: {
          // Runtime dispatch lives in libfc (fc/crypto/signature_provider.cpp); the sui / unknown arms stay here for the
          // chain-level exception taxonomy, same as the KEY: private-key parse.
-         pubkey = from_native_string_to_public_key(key_type, public_key_text);
+         try {
+            pubkey = from_native_string_to_public_key(key_type, public_key_text);
+         } catch (const fc::exception& e) {
+            // Neither the field nor the provider's name reaches the error: the parser echoes its input, and both are
+            // operator text that a mistyped spec can leave a private key in.
+            FC_THROW_EXCEPTION(sysio::chain::plugin_config_exception,
+                               "Signature provider has an invalid {} public key (parse failed with {})",
+                               chain_key_type_reflector::to_fc_string(key_type), e.name());
+         }
          break;
       }
       case chain_key_type_sui: {
@@ -749,10 +812,9 @@ void signature_provider_manager_plugin::plugin_initialize(const variables_map& o
    if (options.contains(option_name_provider)) {
       auto specs = options.at(option_name_provider).as<std::vector<std::string>>();
       for (const auto& spec : specs) {
-         dlog("Registering signature provider from spec: {}", redact_signature_provider_spec(spec));
+         // Neither the spec nor the provider's name is logged: both are operator text that can carry a private key.
          auto provider = my->create_configured_provider(spec);
-         dlog("Registered signature provider ({}): {}",
-              provider->key_name, provider->public_key.to_string({}));
+         dlog("Registered signature provider: {}", provider->public_key.to_string({}));
       }
    }
 }
