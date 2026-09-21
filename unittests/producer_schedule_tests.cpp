@@ -5,11 +5,64 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <algorithm>
+#include <variant>
+
 #include "fork_test_utilities.hpp"
 
 using namespace sysio::testing;
 using namespace sysio::chain;
 using mvo = fc::mutable_variant_object;
+
+namespace {
+
+/// A key no block signature can ever produce: a well-formed compressed-point prefix over an x
+/// coordinate above the R1 field prime. o2i_ECPublicKey rejects it, so R1 key validity answers
+/// false for it -- and, until the shim absorbed the decode failure, threw instead.
+public_key_type undecodable_r1_key() {
+   fc::crypto::r1::public_key_data data{};
+   data[0] = 0x02;
+   std::fill( data.begin() + 1, data.end(), '\xff' );
+   return public_key_type{ fc::crypto::public_key::storage_type{ std::in_place_index<1>,
+                                                                 fc::crypto::r1::public_key_shim{ data } } };
+}
+
+/// The all-zero K1 key -- what a producer that registered without setting a signing key holds,
+/// and what the chain's own K1 validity test rejects.
+public_key_type zero_k1_key() { return public_key_type{}; }
+
+/// A BLS key whose payload is absent. fc reflects the shim's shared_ptr behind a presence flag,
+/// so clearing that flag unpacks to a null pointer. Built by packing a real key and dropping the
+/// payload, rather than by hand, so it stays correct if the encoding changes.
+std::vector<char> strip_bls_payload( const std::vector<char>& packed ) {
+   const auto bls_index = static_cast<char>( fc::crypto::public_key::key_type::bls );
+   for( size_t i = 0; i + 1 < packed.size(); ++i ) {
+      if( packed[i] == bls_index && packed[i + 1] == 1 ) {
+         std::vector<char> stripped( packed.begin(), packed.begin() + i + 1 );
+         stripped.push_back( 0 );                                      // payload absent
+         const auto rest = i + 2 + fc::crypto::bls::public_key_data_size;
+         stripped.insert( stripped.end(), packed.begin() + rest, packed.end() );
+         return stripped;
+      }
+   }
+   BOOST_FAIL( "no BLS payload found in packed schedule" );
+   return {};
+}
+
+/// A real BLS public key, used only as a carrier for the payload-stripping above.
+public_key_type bls_key() {
+   return public_key_type::from_string(
+      "PUB_BLS_sGOyYNtpmmjfsNbQaiGJrPxeSg9sdx0nRtfhI_KnWoACXLL53FIf1HjpcN8wX0cYQyOE60NLSI9iPY8mIlT4GkiFMT3ez7j2IbBBzR0D1MthC0B_fYlgYWwjcbqCOowSaH48KA" );
+}
+
+/// A WebAuthn key: well-formed, and of a type the chain rejects when it recovers a key from a
+/// block signature, so a producer holding one could never sign.
+public_key_type webauthn_key() {
+   return public_key_type::from_string(
+      "PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC" );
+}
+
+} // namespace
 
 BOOST_AUTO_TEST_SUITE(producer_schedule_tests)
 
@@ -360,6 +413,143 @@ BOOST_AUTO_TEST_CASE( extra_signatures_test ) try {
    // Push block with extra signature to the main chain.
    auto sb = signed_block::create_signed_block(std::move(b));
    BOOST_REQUIRE_EXCEPTION( main.push_block(sb), wrong_signing_key, fc_exception_message_starts_with("number of block signatures") );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE(schedule_admits_unsignable_keys) try {
+   savanna_tester chain;
+   chain.create_accounts( {"alice"_n, "bobby"_n, "carol"_n} );
+   chain.produce_block();
+
+   // None of these keys can be produced by recovering a key from a block signature, so none of
+   // these producers can sign. The schedule must still publish: the system contract rebuilds one
+   // from its own producer table inside onblock, and a rejection there rolls back the rebuild
+   // timestamp along with it, so the rebuild re-fires -- and fails again -- on every block that
+   // follows, permanently.
+   vector<producer_authority> sch = {
+      producer_authority{ "alice"_n, block_signing_authority_v0{ 1, {{ undecodable_r1_key(), 1 }} } },
+      producer_authority{ "bobby"_n, block_signing_authority_v0{ 1, {{ zero_k1_key(), 1 }} } },
+      producer_authority{ "carol"_n, block_signing_authority_v0{ 1, {{ webauthn_key(), 1 }} } }
+   };
+
+   auto trace = chain.set_producer_schedule( sch );
+   BOOST_REQUIRE( !trace->except );
+   BOOST_REQUIRE( trace->receipt );
+
+   // Accepting the action is not the claim. The policy is assembled, logged and diffed when the
+   // block is finalized, which is where an unusable key would be dereferenced or rejected, so the
+   // block has to be produced and the proposal observed.
+   auto block = chain.produce_block();
+   BOOST_REQUIRE( block->new_proposer_policy_diff );
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE(legacy_format_admits_unsignable_keys) try {
+   savanna_tester chain;
+   chain.create_accounts( {"alice"_n} );
+   chain.produce_block();
+
+   // The legacy producer_key format is lenient on the same terms. Upstream kept a key check here
+   // only to avoid a consensus change on an already-live intrinsic; it never established that a
+   // key could sign, since a curve point whose private key nobody holds passes it just the same.
+   for( const auto& key : { zero_k1_key(), undecodable_r1_key(), webauthn_key() } ) {
+      vector<legacy::producer_key> sched = {{ "alice"_n, key }};
+      auto trace = chain.push_action( config::system_account_name, "setprodkeys"_n,
+                                      config::system_account_name, mvo()("schedule", sched) );
+      BOOST_REQUIRE( !trace->except );
+      BOOST_REQUIRE( trace->receipt );
+
+      // As above: the proposal is only assembled when the block is finalized.
+      auto block = chain.produce_block();
+      BOOST_REQUIRE( block->new_proposer_policy_diff );
+   }
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE(absent_bls_payload_is_rejected_on_both_formats) try {
+   // The schedule path no longer screens key types, so a BLS key reaches it. Its shim holds the
+   // payload behind a shared_ptr that fc lets deserialize as absent, and every accessor -- the
+   // to_string a node performs when it logs a schedule, among them -- would dereference null.
+   // A one-key authority slips past proposer_policy::validate untouched, because the first
+   // insertion into the uniqueness set compares nothing. Deserialization has to reject it.
+
+   // Authority format, as set_proposed_producers_ex(1) unpacks it.
+   vector<producer_authority> authority_schedule = {
+      producer_authority{ "alice"_n, block_signing_authority_v0{ 1, {{ bls_key(), 1 }} } }
+   };
+   const auto unpack_bytes = []( const std::vector<char>& bytes, auto& out ) {
+      fc::datastream<const char*> ds( bytes.data(), bytes.size() );
+      fc::raw::unpack( ds, out );
+   };
+
+   auto authority_bytes = strip_bls_payload( fc::raw::pack( authority_schedule ) );
+   vector<producer_authority> unpacked_authority;
+   BOOST_CHECK_THROW( unpack_bytes( authority_bytes, unpacked_authority ), fc::exception );
+
+   // Legacy format, as set_proposed_producers unpacks it.
+   vector<legacy::producer_key> legacy_schedule = {{ "alice"_n, bls_key() }};
+   auto legacy_bytes = strip_bls_payload( fc::raw::pack( legacy_schedule ) );
+   vector<legacy::producer_key> unpacked_legacy;
+   BOOST_CHECK_THROW( unpack_bytes( legacy_bytes, unpacked_legacy ), fc::exception );
+
+   // The unmodified bytes still round-trip, so the guard rejects only the absent payload.
+   BOOST_CHECK_NO_THROW( unpack_bytes( fc::raw::pack( authority_schedule ), unpacked_authority ) );
+   BOOST_CHECK_NO_THROW( unpack_bytes( fc::raw::pack( legacy_schedule ), unpacked_legacy ) );
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE(unsignable_key_never_satisfies_authority) try {
+   // Why admitting those keys costs nothing: the presented set is built by recovering keys from
+   // the block's signatures, so a key that no signature yields is never in it, and the authority
+   // is never satisfied. The producer burns its rounds; the chain keeps updating schedules.
+   block_signing_authority_v0 auth{ 1, {{ undecodable_r1_key(), 1 }, { zero_k1_key(), 1 }} };
+
+   std::set<public_key_type> presented = { get_public_key("alice"_n, "bs1"),
+                                           get_public_key("bobby"_n, "bs1") };
+
+   auto [satisfied, relevant] = auth.keys_satisfy_and_relevant( presented );
+   BOOST_CHECK( !satisfied );
+   BOOST_CHECK_EQUAL( relevant, 0u );
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE( block_signed_with_non_k1_r1_key_test ) try {
+   savanna_tester main;
+
+   main.create_accounts( {"alice"_n} );
+   main.produce_block();
+
+   vector<producer_authority> sch1 = {
+      producer_authority{"alice"_n, block_signing_authority_v0{1, {{get_public_key("alice"_n, "bs1"), 1}}}}
+   };
+   main.set_producer_schedule( sch1 );
+   main.block_signing_private_keys.emplace(get_public_key("alice"_n, "bs1"), get_private_key("alice"_n, "bs1"));
+
+   BOOST_REQUIRE( main.control->pending_block_producer() == "sysio"_n );
+   main.produce_blocks(24);
+   BOOST_REQUIRE( main.control->pending_block_producer() == "alice"_n );
+
+   mutable_block_ptr b;
+
+   // Generate a valid block, then re-sign it with a key of a type no producer may sign with.
+   {
+      tester remote(setup_policy::none);
+      push_blocks(main, remote);
+
+      remote.block_signing_private_keys.emplace(get_public_key("alice"_n, "bs1"), get_private_key("alice"_n, "bs1"));
+
+      auto valid_block = remote.produce_block();
+      BOOST_REQUIRE( valid_block->producer == "alice"_n );
+
+      b = valid_block->clone();
+
+      // The block id excludes producer_signatures, so replacing them does not move it.
+      b->producer_signatures.clear();
+      b->producer_signatures.emplace_back(
+         fc::crypto::private_key::generate( fc::crypto::private_key::key_type::em ).sign( b->calculate_id() ) );
+   }
+
+   // This is where the K1/R1 rule decides something, and the reason a proposed schedule does not
+   // need to repeat it: the key type is screened on every key recovered from a block signature.
+   auto sb = signed_block::create_signed_block(std::move(b));
+   BOOST_REQUIRE_EXCEPTION( main.push_block(sb), unactivated_key_type,
+                            fc_exception_message_contains("Block signed with invalid key type") );
 
 } FC_LOG_AND_RETHROW()
 

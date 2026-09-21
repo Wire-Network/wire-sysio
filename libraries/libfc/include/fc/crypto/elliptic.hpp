@@ -116,6 +116,11 @@ namespace fc {
       struct public_key_shim : public crypto::shim<public_key_data> {
          using crypto::shim<public_key_data>::shim;
 
+         /// Whether the stored bytes are anything other than all zero.
+         ///
+         /// The ecc::public_key constructor taking public_key_data copies without decoding, so this
+         /// does NOT establish that the bytes name a point on the curve -- unlike the R1 shim's
+         /// valid(), which does decode.
          bool valid()const {
             return public_key(_data).valid();
          }
