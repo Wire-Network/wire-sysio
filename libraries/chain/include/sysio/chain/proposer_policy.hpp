@@ -22,6 +22,9 @@ struct proposer_policy_diff {
 };
 
 struct proposer_policy {
+   /// Maximum signing keys carried by one producer authority in a block policy.
+   static constexpr size_t max_authority_keys = 5;
+
    // Useful for light clients, not necessary for nodeos
    block_timestamp_type        proposal_time; // block when schedule was proposed
    producer_authority_schedule proposer_schedule;
@@ -46,11 +49,9 @@ struct proposer_policy {
 
    // Validates structural well-formedness of the policy. Single source of truth
    // reused by the set_proposed_producers host function and snapshot loading.
-   // Two things are intentionally NOT checked here and stay at the intrinsic
-   // call site instead:
-   //  - account existence (requires apply_context)
-   //  - K1/R1 key type enforcement (uses unactivated_key_type to signal that
-   //    non-K1/R1 keys need a protocol feature; distinct from structural errors)
+   // Account existence is NOT checked here and stays at the intrinsic call site,
+   // which has the apply_context needed for it. Key type and key validity are not
+   // checked anywhere on this path by design -- see set_proposed_producers_common.
    // Throws producer_schedule_exception on violation.
    void validate() const {
       const auto& producers = proposer_schedule.producers;
@@ -65,6 +66,9 @@ struct proposer_policy {
          SYS_ASSERT(unique_producers.insert(p.producer_name).second, producer_schedule_exception,
                     "duplicate producer name {}", p.producer_name);
          std::visit([&](const auto& a) {
+            SYS_ASSERT(a.keys.size() <= max_authority_keys, producer_schedule_exception,
+                       "producer {} authority key count ({}) exceeds max ({})",
+                       p.producer_name, a.keys.size(), max_authority_keys);
             SYS_ASSERT(a.threshold > 0, producer_schedule_exception,
                        "producer {} authority threshold must be positive", p.producer_name);
             boost::container::flat_set<public_key_type> unique_keys;

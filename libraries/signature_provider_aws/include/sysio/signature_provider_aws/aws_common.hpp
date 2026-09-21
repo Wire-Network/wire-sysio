@@ -85,6 +85,30 @@ void ensure_aws_sdk_initialized();
 std::string resolve_default_region();
 
 /**
+ * @brief Build a client configuration for an already-resolved region without network I/O.
+ *
+ * The SDK's default `ClientConfiguration` constructor queries IMDS for a region whenever neither the environment nor
+ * the shared config supplies one -- before a caller can set the region. The region here is always explicit (the spec,
+ * or `resolve_default_region()`), so construction runs with IMDS disabled and IMDS is re-enabled afterwards: the
+ * credential provider chain still needs it to resolve instance-role credentials on the first API call.
+ *
+ * @param region the resolved AWS region; applied to both the client and its credential provider configuration
+ * @return the client configuration
+ */
+inline Aws::Client::ClientConfiguration make_client_configuration(const std::string& region) {
+   // The configuration constructor reads the SDK's shared config, which requires the SDK lifecycle.
+   ensure_aws_sdk_initialized();
+   Aws::Client::ClientConfigurationInitValues init_values;
+   init_values.shouldDisableIMDS = true;
+   Aws::Client::ClientConfiguration cfg{init_values};
+   cfg.disableIMDS                                     = false;
+   cfg.credentialProviderConfig.imdsConfig.disableImds = false;
+   cfg.region                                          = Aws::String{region};
+   cfg.credentialProviderConfig.region                 = cfg.region;
+   return cfg;
+}
+
+/**
  * @brief Process-wide, per-region cache of AWS service clients.
  *
  * One instance per service client type, held as a function-local static by the owning provider (see `get_kms_client` /
@@ -96,8 +120,9 @@ std::string resolve_default_region();
  * the AWS client itself: the SDK's HTTP pool is thread-safe, so multiple closures sharing a client may submit
  * requests concurrently.
  *
- * Construction of a client is offline: no credential resolution, no network. Credentials are looked up via the standard
- * AWS provider chain on the first API call, not here. The client configuration carries the region and nothing else. An
+ * Construction of a client is offline: no credential resolution, no network (see `make_client_configuration`).
+ * Credentials are looked up via the standard AWS provider chain on the first API call, not here. The client
+ * configuration carries the region and nothing else. An
  * explicit region comes from the provider spec; a spec that omitted its region resolves one through
  * `resolve_default_region()` -- whose IMDS step is the one exception to "no network" on this path -- and the client is
  * then cached under the *resolved* region, so an explicit `us-east-1` spec and a region-less spec resolving to
@@ -124,9 +149,7 @@ public:
       const std::lock_guard<std::mutex> lock{_mutex};
       auto& slot = _by_region[effective];
       if (!slot) {
-         Aws::Client::ClientConfiguration cfg;
-         cfg.region = Aws::String{effective};
-         slot = std::make_shared<Client>(cfg);
+         slot = std::make_shared<Client>(make_client_configuration(effective));
       }
       return slot;
    }

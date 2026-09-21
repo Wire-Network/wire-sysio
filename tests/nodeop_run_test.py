@@ -864,6 +864,18 @@ try:
     abiTrans=node.setCodeOrAbi(notUtlAccount, "abi", abiFile, returnTrans=True)
     node.waitForTransactionInBlock(abiTrans["transaction_id"])
 
+    # Producer rows now require a matching operator row before regproducer. This setup transaction
+    # is not part of the root-tracking cases below; only those explicit contract actions are counted.
+    operatorData=json.dumps({
+        "account": notUtlAccount.name,
+        "type": "OPERATOR_TYPE_PRODUCER",
+        "is_bootstrapped": True,
+    })
+    operatorTrans=node.pushMessage(
+        "sysio.opreg", "regoperator", operatorData, "--permission sysio.opreg@active")
+    assert(operatorTrans[0])
+    node.waitForTransactionInBlock(operatorTrans[1]["transaction_id"])
+
 
     def sendAction(contract, action, data, opts, transArr, ids):
         trans=node.pushMessage(contract, action, data, opts)
@@ -884,7 +896,8 @@ try:
 
     sendAction(testUtlAccount.name, "batchw", "{\"batch\": 1, \"withdrawals\": [] }", "--permission test.utl@active", testTrans, testIds)
     sendAction(funUtlAccount.name, "batchw", "{\"batch\": 1, \"withdrawals\": [] }", "--permission fun.utl@active", funTrans, funIds)
-    regTrans=node.regproducer(notUtlAccount, url="", location=0)
+    regTrans=node.regproducer(
+        notUtlAccount, url="", location=0, silentErrors=False, exitOnError=True)
     sendAction(notUtlAccount.name, "batchw", "{\"batch\": 1, \"withdrawals\": [] }", "--permission notutl@active", notTrans, notIds)
     sendAction(testUtlAccount.name, "snoop", "{ }", "--permission test.utl@active", testTrans, testIds)
     sendAction(testUtlAccount.name, "cancelbatch", "{\"batch\": 1 }", "--permission test.utl@active", testTrans, testIds)

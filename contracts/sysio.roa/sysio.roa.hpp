@@ -377,7 +377,7 @@ namespace sysio {
             // to migrate.)
             enum reject_reason : uint8_t {
                 NONE                 = 0,  // not rejected
-                NAME_INVALID         = 1,  // chosen account name violates the tier's length rule
+                NAME_INVALID         = 1,  // chosen name violates the tier's length rule or is a reserved sysio. name
                 OWNER_NOT_ACCOUNT    = 2,  // account does not exist (creation did not occur)
                 ACCOUNT_KEY_MISMATCH = 3,  // existing account's active authority != the single claimed wire key
                 DUPLICATE            = 4,  // owner is already a registered node owner
@@ -492,14 +492,15 @@ namespace sysio {
                                 uint8_t network_gen);
 
             /**
-             * @brief Whether `account`'s name satisfies the node-owner name-length rule for `tier`.
+             * @brief Whether `account`'s name satisfies the node-owner naming rules for `tier`.
              *        Tier-1 owners take a short 2-6 char prefix (sub-accounts become <prefix>.<random>);
-             *        tier 2/3 take a 1-12 char vanity name. Shared by newnameduser (gates creation) and
-             *        nodeownreg (records NAME_INVALID) so the rule lives in one place.
+             *        tier 2/3 take a 1-12 char vanity name, and no tier may take a name under the reserved
+             *        `sysio.` prefix. Shared by newnameduser (gates creation) and nodeownreg (records
+             *        NAME_INVALID) so the rule lives in one place.
              *
              * @param account The chosen account name.
              * @param tier    Node-owner tier (must already be validated to 1-3).
-             * @return true if the name length is valid for the tier.
+             * @return true if the name is valid for the tier.
              */
             static bool valid_name_for_tier(const name& account, uint8_t tier);
 

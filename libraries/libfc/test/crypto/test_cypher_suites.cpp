@@ -9,6 +9,12 @@
 #include <fc/utility.hpp>
 #include <fc/variant.hpp>
 
+#include <fc/io/datastream.hpp>
+#include <fc/io/raw.hpp>
+
+#include <algorithm>
+#include <variant>
+
 using namespace fc::crypto;
 using namespace fc;
 
@@ -140,6 +146,35 @@ BOOST_AUTO_TEST_CASE(test_r1_recyle) try {
    auto recycled_pub = public_key::from_string(pub_str);
 
    BOOST_CHECK_EQUAL(pub.to_string({}), recycled_pub.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_public_key_valid_never_throws) try {
+   // valid() is a predicate, and callers use it as one -- the legacy producer schedule format
+   // asserts on it. R1 answers by decoding the point, and the r1::public_key constructor RAISES
+   // when the point does not decode, so the shim has to absorb that rather than propagate it.
+   r1::public_key_data undecodable{};
+   undecodable[0] = 0x02;                                          // compressed point prefix
+   std::fill(undecodable.begin() + 1, undecodable.end(), '\xff');  // x above the field prime
+
+   public_key bad_r1{public_key::storage_type{std::in_place_index<1>, r1::public_key_shim{undecodable}}};
+   BOOST_CHECK_NO_THROW(bad_r1.valid());
+   BOOST_CHECK(!bad_r1.valid());
+
+   // All-zero is rejected on both curves. This is the shape a producer that registered without
+   // setting a signing key ends up holding.
+   BOOST_CHECK(!public_key{}.valid()); // default storage is a zero K1 key
+   public_key zero_r1{public_key::storage_type{std::in_place_index<1>, r1::public_key_shim{}}};
+   BOOST_CHECK(!zero_r1.valid());
+
+   // Real keys of both types are valid.
+   BOOST_CHECK(private_key::generate().get_public_key().valid());
+   BOOST_CHECK(private_key::generate(private_key::key_type::r1).get_public_key().valid());
+
+   // K1 validity is ONLY an all-zero test: ecc::public_key's public_key_data constructor copies
+   // without decoding, so the same bytes R1 rejects pass here. Asserted so the asymmetry is
+   // recorded rather than rediscovered as a bug.
+   public_key bad_k1{public_key::storage_type{std::in_place_index<0>, ecc::public_key_shim{undecodable}}};
+   BOOST_CHECK(bad_k1.valid());
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_em) try {
@@ -436,6 +471,48 @@ BOOST_AUTO_TEST_CASE(test_bls_sig_str) try {
 } FC_LOG_AND_RETHROW();
 
 // --- sign_eth (shim-level): recovery round-trip with multiple messages ---
+BOOST_AUTO_TEST_CASE(test_bls_absent_payload_is_rejected) try {
+   // The BLS shims reflect their shared_ptr, and fc packs a presence flag ahead of it, so a false
+   // flag unpacks to a null pointer that valid(), to_string() and serialize() all dereference.
+   // Deserialization has to reject it: these bytes reach the node from any peer-supplied
+   // signature, and a null dereference terminates the process rather than raising.
+   const auto unpack_absent = [](uint8_t variant_index, auto& out) {
+      const std::vector<char> bytes{static_cast<char>(variant_index), 0}; // alternative, presence = false
+      fc::datastream<const char*> ds(bytes.data(), bytes.size());
+      fc::raw::unpack(ds, out);
+   };
+
+   public_key key;
+   BOOST_CHECK_THROW(unpack_absent(static_cast<uint8_t>(public_key::key_type::bls), key), fc::exception);
+
+   signature sig;
+   BOOST_CHECK_THROW(unpack_absent(static_cast<uint8_t>(signature::sig_type::bls), sig), fc::exception);
+
+   // A present payload still round-trips, so the guard does not reject real BLS material.
+   const auto real = public_key::from_string(
+      "PUB_BLS_sGOyYNtpmmjfsNbQaiGJrPxeSg9sdx0nRtfhI_KnWoACXLL53FIf1HjpcN8wX0cYQyOE60NLSI9iPY8mIlT4GkiFMT3ez7j2IbBBzR0D1MthC0B_fYlgYWwjcbqCOowSaH48KA");
+   const auto packed = fc::raw::pack(real);
+   fc::datastream<const char*> ds(packed.data(), packed.size());
+   public_key round_tripped;
+   BOOST_CHECK_NO_THROW(fc::raw::unpack(ds, round_tripped));
+   BOOST_CHECK_EQUAL(real.to_string({}), round_tripped.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_bls_small_order_point_is_rejected) try {
+   // Affine (0, 2): y^2 = 4 = x^3 + 4, so it is canonical and on the curve, and it is not the
+   // identity. Its order is 3 -- the tangent at (0, y) has slope 3x^2/2y = 0, so 2P = -P and
+   // 3P = O -- and 3 is coprime to r, so e(P, Q) = 1 for every G2 point Q. A proof of possession
+   // therefore cannot reject it, and it would carry finality weight anyone could cast. Only a
+   // subgroup test catches it.
+   fc::crypto::bls::public_key_data small_order{};
+   small_order[48] = 2;   // x = 0, y = 2, affine little-endian
+
+   BOOST_CHECK_EXCEPTION(fc::crypto::bls::public_key{small_order}, fc::exception,
+                         [](const fc::exception& e) {
+                            return e.top_message().find("r-order subgroup") != std::string::npos;
+                         });
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(test_sign_eth_recovery_roundtrip) try {
    auto key = fc::crypto::private_key::generate(private_key::key_type::em);
    auto pub = key.get_public_key();

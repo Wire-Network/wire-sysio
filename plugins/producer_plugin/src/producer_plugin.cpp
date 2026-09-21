@@ -1488,7 +1488,11 @@ void producer_plugin::set_program_options(
          ("snapshot-provider-account", bpo::value<std::string>()->default_value(""),
           "Account name used to sign and submit votesnaphash transactions. When set, enables snapshot provider mode. Cannot be used alongside producer-name.")
          ("read-only-threads", bpo::value<uint32_t>(),
-         ("Number of worker threads in read-only execution thread pool. Defaults to 0 if configured as producer, otherwise defaults to "s + std::to_string(producer_plugin_impl::_ro_default_threads_nonproducer) + ". Max "s + std::to_string(producer_plugin_impl::_ro_max_threads_allowed) + "."s).c_str())
+         ("Number of worker threads in read-only execution thread pool. Defaults to "s +
+          std::to_string(producer_plugin_impl::_ro_default_threads_nonproducer) +
+          " on a node that is not configured as a producer and enables chain_api_plugin, otherwise 0. "
+          "Must be 0 on a producer. Max "s +
+          std::to_string(producer_plugin_impl::_ro_max_threads_allowed) + "."s).c_str())
          ("read-only-write-window-time-us", bpo::value<uint32_t>()->default_value(my->_ro_write_window_time_us.count()),
           "Time in microseconds the write window lasts.")
          ("read-only-read-window-time-us", bpo::value<uint32_t>()->default_value(my->_ro_read_window_time_us.count()),

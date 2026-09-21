@@ -6,6 +6,7 @@
 #include <sysio/chain/permission_object.hpp>
 #include <sysio/chain/subjective_billing.hpp>
 #include "sysio.system_tester.hpp"
+#include "contract_test_support.hpp"
 #include <contracts.hpp>
 #include <sysio/opp/opp.hpp>
 #include <fc/variant_object.hpp>
@@ -2121,6 +2122,9 @@ BOOST_FIXTURE_TEST_CASE( newnameduser_tier_name_rules, sysio_roa_tester ) try {
 // sysio.authex.active <- sysio.roa@sysio.code delegation that authorizes the inline recordlink.
 // ---------------------------------------------------------------------------
 
+/// Shared mirrors of sysio.roa's node-owner registration audit values.
+namespace nodeownerreg_audit = sysio_system::test_support::nodeownerreg;
+
 class sysio_roa_nodeownreg_tester : public sysio_roa_tester {
 public:
    static constexpr auto AUTHEX = "sysio.authex"_n;
@@ -2196,10 +2200,14 @@ public:
       return fc::crypto::private_key::generate(fc::crypto::private_key::key_type::k1).get_public_key();
    }
 
-   // nodeownerreg reg_status + reject_reason values (mirror sysio.roa.hpp).
-   static constexpr uint64_t CONFIRMED = 0, REJECTED = 1;
-   static constexpr uint64_t R_NAME_INVALID = 1, R_OWNER_NOT_ACCOUNT = 2,
-                             R_ACCOUNT_KEY_MISMATCH = 3, R_DUPLICATE = 4, R_LINK_KEY_MISMATCH = 5;
+   // nodeownerreg reg_status + reject_reason values, shared with the depot dispatch tests.
+   static constexpr uint64_t CONFIRMED              = nodeownerreg_audit::status_confirmed;
+   static constexpr uint64_t REJECTED               = nodeownerreg_audit::status_rejected;
+   static constexpr uint64_t R_NAME_INVALID         = nodeownerreg_audit::reason_name_invalid;
+   static constexpr uint64_t R_OWNER_NOT_ACCOUNT    = nodeownerreg_audit::reason_owner_not_account;
+   static constexpr uint64_t R_ACCOUNT_KEY_MISMATCH = nodeownerreg_audit::reason_account_key_mismatch;
+   static constexpr uint64_t R_DUPLICATE            = nodeownerreg_audit::reason_duplicate;
+   static constexpr uint64_t R_LINK_KEY_MISMATCH    = nodeownerreg_audit::reason_link_key_mismatch;
 
    abi_serializer authex_abi_ser;
 };
@@ -2499,6 +2507,33 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_name_invalid, sysio_roa_nodeownreg_tester ) 
    auto audit = get_nodeownerreg(owner);
    BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
    BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_NAME_INVALID);
+} FC_LOG_AND_RETHROW()
+
+// No tier may claim a name under the reserved sysio. prefix, however deep: newnameduser creates nothing (sysio's RAM
+// pool is untouched) and nodeownreg records REJECTED/NAME_INVALID.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_rejects_reserved_system_names, sysio_roa_nodeownreg_tester ) try {
+   constexpr auto    tier2_name  = "sysio.pwn"_n;
+   constexpr auto    nested_name = "sysio.a.b"_n;   // prefix() is "sysio.a": the rule must match the leading segment
+   constexpr uint8_t tier2 = 2, tier3 = 3;
+   auto& rlm = control->get_resource_limits_manager();
+   const auto wire_pub = gen_k1_key();
+
+   for (const auto& [owner, tier] : {std::pair{tier2_name, tier2}, std::pair{nested_name, tier3}}) {
+      int64_t net = 0, cpu = 0, pool_before = 0, pool_after = 0;
+      rlm.get_account_limits(config::system_account_name, pool_before, net, cpu);
+      BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, tier));
+      produce_blocks();
+      rlm.get_account_limits(config::system_account_name, pool_after, net, cpu);
+      BOOST_CHECK_EQUAL(pool_before, pool_after);
+
+      BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, tier, gen_em_key(), wire_pub));
+      produce_blocks();
+      BOOST_CHECK(get_nodeowner(owner).is_null());
+      const auto audit = get_nodeownerreg(owner);
+      BOOST_REQUIRE(!audit.is_null());
+      BOOST_CHECK_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
+      BOOST_CHECK_EQUAL(audit["reason"].as<uint64_t>(), R_NAME_INVALID);
+   }
 } FC_LOG_AND_RETHROW()
 
 // Valid-for-tier name that is not an account -> REJECTED/OWNER_NOT_ACCOUNT.

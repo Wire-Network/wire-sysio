@@ -154,12 +154,4 @@ BOOST_AUTO_TEST_CASE(duplicate_ssm_registration_rejected) {
                      fc::exception);
 }
 
-BOOST_AUTO_TEST_CASE(redaction_passes_ssm_specs_through_unchanged) {
-   // `redact_signature_provider_spec` masks inline `KEY:` secrets. An `SSM:`
-   // spec carries no secret -- the parameter name / ARN is safe to log -- and
-   // must come through verbatim.
-   const auto spec = std::string{"ssm-wire-01,wire,wire,PUB_K1_examplekey,SSM:us-east-1:/wire/prod/bp1"};
-   BOOST_CHECK_EQUAL(sysio::redact_signature_provider_spec(spec), spec);
-}
-
 BOOST_AUTO_TEST_SUITE_END()

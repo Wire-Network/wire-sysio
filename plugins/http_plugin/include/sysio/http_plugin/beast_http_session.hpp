@@ -98,18 +98,6 @@ class beast_http_session : public detail::abstract_conn,
    // whether response should be sent back to client when an exception occurs
    bool is_send_exception_response_ = true;
 
-   void set_content_type_header(http_content_type content_type) {
-      switch (content_type) {
-         case http_content_type::plaintext:
-            res_->set(http::field::content_type, "text/plain");
-            break;
-
-         case http_content_type::json:
-         default:
-            res_->set(http::field::content_type, "application/json");
-      }
-   }
-
    enum class continue_state_t { none, read_body, reject };
    continue_state_t continue_state_ { continue_state_t::none };
 
@@ -223,12 +211,26 @@ private:
 
 public:
 
+   /// @copydoc detail::abstract_conn::set_content_type_header
+   virtual void set_content_type_header(http_content_type content_type) final {
+      switch (content_type) {
+         case http_content_type::plaintext:
+            res_->set(http::field::content_type, "text/plain");
+            break;
+
+         case http_content_type::json:
+         default:
+            res_->set(http::field::content_type, "application/json");
+      }
+   }
+
    virtual void send_busy_response(std::string&& what) final {
       error_results::error_info ei;
       ei.code = static_cast<int64_t>(http::status::service_unavailable);
       ei.name = "Busy";
       ei.what = std::move(what);
       error_results results{static_cast<uint16_t>(http::status::service_unavailable), "Busy", ei};
+      set_content_type_header(http_content_type::json);
       send_response(fc::json::to_string(results, fc::time_point::maximum()),
                     static_cast<unsigned int>(http::status::service_unavailable) );
    }
