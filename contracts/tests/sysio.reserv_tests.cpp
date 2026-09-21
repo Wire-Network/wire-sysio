@@ -383,6 +383,46 @@ BOOST_FIXTURE_TEST_CASE(regreserve_creates_reserve_row, sysio_reserve_tester) { 
    BOOST_REQUIRE_EQUAL(treasury_before - 2'000'000, wire_balance(SYSIO_ACCOUNT));
 } FC_LOG_AND_RETHROW() }
 
+// A `slug_name` reaches action JSON either as its canonical STRING or through the
+// transitional object form `{"value": N}`, and only the string arm validates. A reserve
+// row is keyed on all three codes and there is no erase action, so an unspellable code
+// would make the row permanently unrenderable — `to_variant` throws on every later read.
+// `regreserve` is a privileged bootstrap-window action and refuses.
+BOOST_FIXTURE_TEST_CASE(regreserve_uncanonical_code_rejected, sysio_reserve_tester) { try {
+   // Below the leading symbol's floor: decodes to "" and packs back to 0, so it is not a
+   // code and has no spelling.
+   constexpr uint64_t uncanonical = 7;
+   BOOST_REQUIRE(!fc::slug_name{uncanonical}.is_canonical());
+
+   // Any of the three key columns is enough to refuse the row.
+   for (const auto& which : {std::string("chain_code"),
+                             std::string("token_code"),
+                             std::string("reserve_code")}) {
+      auto data = mvo()
+         ("chain_code",             which == "chain_code"   ? fc::variant(mvo()("value", uncanonical))
+                                                            : fc::variant(std::string("ETH")))
+         ("token_code",             which == "token_code"   ? fc::variant(mvo()("value", uncanonical))
+                                                            : fc::variant(std::string("ETH")))
+         ("reserve_code",           which == "reserve_code" ? fc::variant(mvo()("value", uncanonical))
+                                                            : fc::variant(std::string("PRIMARY")))
+         ("name",                   std::string("bad reserve"))
+         ("description",            std::string{})
+         ("initial_chain_amount",   uint64_t{1'000'000})
+         ("initial_wire_amount",    uint64_t{2'000'000})
+         ("source_token_precision", 9u)
+         ("connector_weight_bps",   5000u)
+         ("is_private",             false)
+         ("owner",                  name{});
+      BOOST_REQUIRE(push_action(RESERVE_ACCOUNT, "regreserve"_n, data)
+         .find("has no canonical slug_name spelling") != std::string::npos);
+   }
+
+   // Control: spellable codes on the same shape still register.
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY",
+                 /*chain_amount*/ 1'000'000, /*wire_amount*/ 2'000'000));
+} FC_LOG_AND_RETHROW() }
+
 // A token whose depot-frame precision is below 9 (e.g. a 6-decimal stablecoin)
 // is recorded as-is on the reserve: precision is carried, never assumed to be 9.
 BOOST_FIXTURE_TEST_CASE(regreserve_records_non_default_precision, sysio_reserve_tester) { try {

@@ -1,5 +1,6 @@
 #include <sysio.tokens/sysio.tokens.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
+#include <sysio.opp.common/registry_codes.hpp>
 #include <sysio.opp.common/registry_metadata.hpp>
 
 namespace sysio {
@@ -51,6 +52,9 @@ void tokens::regtoken(opp::types::TokenKind    kind,
                 "sysio.tokens: token kind must not be UNKNOWN");
    sysio::check(precision <= MAX_TOKEN_PRECISION,
                 "sysio.tokens: precision exceeds the depot frame maximum (9)");
+   // The code is this row's PRIMARY KEY and is rendered as a string by every reader --
+   // refuse one with no spelling before it becomes a permanent, unrenderable row.
+   opp::registry::check_codes({code}, "sysio.tokens");
    // Both strings persist into a `sysio`-billed row -- bound them before emplace.
    opp::registry::check_metadata(symbol_name, description, "sysio.tokens");
 
@@ -95,6 +99,10 @@ void tokens::regctok(sysio::slug_name   chain_code,
                       std::vector<char> contract_addr,
                       bool              is_native) {
    require_priv_caller();
+
+   // Both codes form this row's COMPOSITE PRIMARY KEY and are rendered as strings by
+   // every reader -- refuse either with no spelling before the row becomes permanent.
+   opp::registry::check_codes({chain_code, token_code}, "sysio.tokens");
 
    chaintokens_t tbl(get_self());
    chain_token_key pk{chain_code, token_code};

@@ -1059,6 +1059,31 @@ void uwrit::createuwreq(uint64_t attestation_id,
       return;
    }
 
+   // The four payload-controlled codes must have a canonical string spelling, because a
+   // uwreq row IS created from them below on a path that no registry lookup gates: the
+   // zero-quote guard fails closed only when `required_reserves_active` holds, so a
+   // MISSING reserve (the unprovisioned-LP case) falls through to `reqs.emplace` with
+   // these codes stored verbatim. A stored code with no spelling makes the row
+   // unrenderable — `get_table_rows` degrades it to hex, and the underwriter plugin's
+   // scan reaches an unconditional `get_object()` and drops its whole cycle, stalling
+   // every commit. Refund rather than drop: the user's deposit is escrowed on the source
+   // outpost, so a silent skip would strand it. Never `check()` — we are inside the
+   // evalcons dispatch chain (`feedback_opp_handlers_never_throw`).
+   //
+   // The two CHAIN codes are deliberately absent: `src_chain_code` was just proven equal
+   // to the delivering outpost's `chain_code`, and `dst_chain_code` must pass
+   // `chain_registered_active` below. Both therefore name a `sysio.chains` row, and
+   // `sysio.chains::regchain` refuses a code with no spelling — so the registry itself
+   // carries that guarantee.
+   if (!src_token_code.is_canonical() || !src_reserve_code.is_canonical() ||
+       !dst_token_code.is_canonical() || !dst_reserve_code.is_canonical()) {
+      emit_swap_revert(get_self(), chain_code, attestation_id, sr,
+                       src_chain_code, src_reserve_code,
+                       "SwapRequest rejected: a token or reserve code has no canonical "
+                       "slug_name spelling");
+      return;
+   }
+
    // An exact source/destination reserve identity has only one outpost leg.
    // Admitting it would leave the ordinary two-leg request waiting forever
    // for a second distinct commitment. Refund on the proven source outpost

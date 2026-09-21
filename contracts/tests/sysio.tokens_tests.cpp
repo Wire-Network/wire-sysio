@@ -140,6 +140,50 @@ BOOST_FIXTURE_TEST_CASE(regctok_records_binding, sysio_tokens_tester) { try {
    BOOST_REQUIRE_EQUAL(false, erc20["is_native"].as<bool>());
 } FC_LOG_AND_RETHROW() }
 
+// A `slug_name` reaches action JSON either as its canonical STRING or through the
+// transitional object form `{"value": N}`, and only the string arm validates. Neither
+// registry has an erase action, so a code with no spelling would become a permanently
+// unrenderable row — `to_variant` throws on every later read. Both writers are
+// privileged top-level actions and refuse.
+BOOST_FIXTURE_TEST_CASE(regtoken_regctok_uncanonical_code_rejected, sysio_tokens_tester) { try {
+   // Below the leading symbol's floor: decodes to "" and packs back to 0, so it is not a
+   // code and has no spelling.
+   constexpr uint64_t uncanonical = 7;
+   BOOST_REQUIRE(!fc::slug_name{uncanonical}.is_canonical());
+
+   BOOST_REQUIRE(push_action(TOKENS_ACCOUNT, "regtoken"_n, mvo()
+      ("kind",        TokenKind::TOKEN_KIND_NATIVE)
+      ("code",        mvo()("value", uncanonical))
+      ("symbol_name", std::string("bad"))
+      ("description", std::string{})
+      ("precision",   9)
+      ("address",     mvo()("kind", ChainKind::CHAIN_KIND_UNKNOWN)("address", "")))
+      .find("has no canonical slug_name spelling") != std::string::npos);
+
+   // Either half of regctok's composite key is enough to refuse the binding.
+   BOOST_REQUIRE(push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
+      ("chain_code",    mvo()("value", uncanonical))
+      ("token_code",    "WIRE")
+      ("contract_addr", "")
+      ("is_native",     true))
+      .find("has no canonical slug_name spelling") != std::string::npos);
+
+   BOOST_REQUIRE(push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
+      ("chain_code",    "ETH")
+      ("token_code",    mvo()("value", uncanonical))
+      ("contract_addr", "")
+      ("is_native",     true))
+      .find("has no canonical slug_name spelling") != std::string::npos);
+
+   // Control: spellable codes on the same shapes still register.
+   BOOST_REQUIRE_EQUAL(success(), regtoken("WIRE", "Wire", "ok"));
+   BOOST_REQUIRE_EQUAL(success(), push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
+      ("chain_code",    "ETH")
+      ("token_code",    "WIRE")
+      ("contract_addr", "")
+      ("is_native",     true)));
+} FC_LOG_AND_RETHROW() }
+
 // `symbol_name` and `description` are moved into a persisted `token_row` billed to
 // `ram_payer = sysio` — the shared system pool — so an unbounded string lets each unique
 // `code` consume up to the KV/action ceiling of system-owned state. regtoken validated

@@ -1,5 +1,6 @@
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
+#include <sysio.opp.common/registry_codes.hpp>
 #include <sysio.opp.common/registry_metadata.hpp>
 #include <sysio.opp.common/wire_asset.hpp>
 
@@ -142,6 +143,9 @@ void chains::regchain(opp::types::ChainKind kind,
 
    sysio::check(kind != opp::types::CHAIN_KIND_UNKNOWN,
                 "sysio.chains: kind must not be UNKNOWN");
+   // The code is this row's PRIMARY KEY and is rendered as a string by every reader --
+   // refuse one with no spelling before it becomes a permanent, unrenderable row.
+   opp::registry::check_codes({code}, "sysio.chains");
    // Both strings persist into a `sysio`-billed row -- bound them before emplace.
    opp::registry::check_metadata(name, description, "sysio.chains");
    validate_outpost_addrs(kind, outpost);

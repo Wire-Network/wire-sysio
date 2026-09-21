@@ -622,6 +622,38 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_min_bond, sysio_opreg_tester) { t
    );
 } FC_LOG_AND_RETHROW() }
 
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_uncanonical_collateral_code, sysio_opreg_tester) { try {
+   // A `slug_name` reaches action JSON either as its canonical STRING or through the
+   // transitional object form `{"value": N}`, and only the string arm validates. These
+   // entries persist on the config row, so an unspellable code makes the whole row
+   // unrenderable — `to_variant` throws on every later read of it. `setconfig` is a
+   // privileged top-level action and refuses.
+   constexpr uint64_t uncanonical = 7;   // decodes to "", packs back to 0 — not a code
+   BOOST_REQUIRE(!fc::slug_name{uncanonical}.is_canonical());
+
+   const auto bad_chain = fc::variant(mvo()
+      ("chain_code",          mvo()("value", uncanonical))
+      ("token_code",          "ETH")
+      ("min_bond",            kTestMinBond)
+      ("config_timestamp_ms", uint64_t{0}));
+
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: req_uw_collat: code 7 has no canonical "
+            "slug_name spelling"),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
+                {}, {}, { bad_chain })
+   );
+
+   // The identical shape with a spellable code is accepted.
+   BOOST_REQUIRE_EQUAL(
+      success(),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
+                {}, {}, { make_chain_min_bond("ETH", "ETH", kTestMinBond) })
+   );
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_window_narrower_than_consecutive_run, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kWindowBoundEpochDurationSec));
    produce_blocks();

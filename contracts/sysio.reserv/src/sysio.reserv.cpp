@@ -8,6 +8,7 @@
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio.opp.common/claimable.hpp>
+#include <sysio.opp.common/registry_codes.hpp>
 #include <sysio.opp.common/registry_metadata.hpp>
 #include <sysio.opp.common/wire_asset.hpp>
 
@@ -384,6 +385,9 @@ void reserve::regreserve(sysio::slug_name chain_code,
                 "bootstrap reserve must seed both chain_amount and wire_amount > 0");
    sysio::check(!is_private || owner != sysio::name{},
                 "a private bootstrap reserve must name an owner");
+   // The three codes form this row's COMPOSITE PRIMARY KEY and are rendered as strings by
+   // every reader -- refuse any with no spelling before the row becomes permanent.
+   opp::registry::check_codes({chain_code, token_code, reserve_code}, "sysio.reserv");
    // Both strings persist into a `sysio`-billed row -- bound them before emplace.
    opp::registry::check_metadata(name, description, "sysio.reserv");
 

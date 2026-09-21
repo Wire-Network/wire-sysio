@@ -1617,6 +1617,66 @@ BOOST_FIXTURE_TEST_CASE(swap_request_mismatched_source_chain_is_refunded,
    BOOST_REQUIRE(!get_uwreq(9002).is_null());
 } FC_LOG_AND_RETHROW() }
 
+// A SwapRequest's token/reserve codes are payload-controlled and reach `slug_name`
+// through the non-validating raw constructor. Nothing downstream gates them: the
+// zero-quote guard fails closed only when `required_reserves_active` holds, so a code
+// naming NO reserve leaves the quote at zero, skips that guard, and reaches
+// `reqs.emplace` — persisting a uwreq row no reader can render. `get_table_rows`
+// degrades such a row to hex; the underwriter plugin's scan hits an unconditional
+// `get_object()` and drops its whole cycle, stalling every commit. The request must be
+// REFUNDED rather than dropped: the user's deposit is escrowed on the source outpost.
+BOOST_FIXTURE_TEST_CASE(swap_request_uncanonical_code_is_refunded,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();   // ETH source outpost
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
+      ("kind", ChainKind::CHAIN_KIND_SVM)("code", "SOLANA")
+      ("external_chain_id", 900)("name", std::string("solana-test"))("description", std::string{})
+      ("outpost", sysio_system::test_support::no_outpost_mvo())));
+   setup_wire_token_and_reserves();
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH",    "ETH", 1'000'000'000));
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "SOLANA", "SOL", 1'000'000'000));
+
+   const auto eth       = fc::slug_name{"ETH"}.value;
+   const auto sol_chain = fc::slug_name{"SOLANA"}.value;
+   const auto sol_token = fc::slug_name{"SOL"}.value;
+   const auto primary   = fc::slug_name{"PRIMARY"}.value;
+
+   // Below the leading symbol's floor: decodes to "" and packs back to 0, so it is not a
+   // code and has no spelling. The TARGET CHAIN stays valid — the point is that a
+   // registered chain does not imply a renderable token/reserve code.
+   constexpr uint64_t uncanonical = 7;
+   BOOST_REQUIRE(!fc::slug_name{uncanonical}.is_canonical());
+
+   const auto bad_target_token = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, /*src_amount*/ 100,
+      sol_chain, uncanonical, primary, /*target*/ 100,
+      5000, ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
+
+   // Delivery SUCCEEDS (refund path, never a throw) and NO row is persisted.
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(/*att_id*/ 9101, /*proven=*/ eth, bad_target_token));
+   BOOST_REQUIRE(get_uwreq(9101).is_null());
+
+   // Same for an unspellable RESERVE code on the source leg.
+   const auto bad_source_reserve = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, uncanonical, /*src_amount*/ 100,
+      sol_chain, sol_token, primary, /*target*/ 100,
+      5000, ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(/*att_id*/ 9102, /*proven=*/ eth, bad_source_reserve));
+   BOOST_REQUIRE(get_uwreq(9102).is_null());
+
+   // Control: every code spellable -> the uwreq is created, so the guard rejects the
+   // unspellable code rather than the shape of the request.
+   const auto good = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, primary, /*src_amount*/ 100,
+      sol_chain, sol_token, primary, /*target*/ 100,
+      5000, ChainKind::CHAIN_KIND_SVM, std::vector<char>(32, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(/*att_id*/ 9103, /*proven=*/ eth, good));
+   BOOST_REQUIRE(!get_uwreq(9103).is_null());
+} FC_LOG_AND_RETHROW() }
+
 // An exact `(chain, token, reserve)` self-route has only one outpost leg and
 // can never produce the two distinct commitments an ordinary external-token
 // swap requires. Depot ingestion must therefore refund it without creating a

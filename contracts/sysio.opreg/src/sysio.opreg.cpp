@@ -6,6 +6,7 @@
 #include <sysio/slug_name.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio.opp.common/claimable.hpp>
+#include <sysio.opp.common/registry_codes.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <magic_enum/magic_enum.hpp>
 #include <zpp_bits.h>
@@ -148,6 +149,18 @@ void require_positive_min_bond(const std::vector<opreg::chain_min_bond>& v,
    }
 }
 
+/// Reject a collateral-requirement entry whose codes have no canonical string
+/// spelling. These entries persist on the config row and are rendered by every
+/// reader of it, so an unspellable code makes the whole row unreadable — see
+/// `registry_codes.hpp`. `setconfig` is a privileged top-level action, so it
+/// refuses rather than absorbing the value the way a dispatch handler must.
+void require_canonical_codes(const std::vector<opreg::chain_min_bond>& v,
+                             const char* role_label) {
+   for (const auto& entry : v) {
+      opp::registry::check_codes({entry.chain_code, entry.token_code}, role_label);
+   }
+}
+
 /// True iff `sysio.uwrit::locks` still holds ANY row for `account`, on any
 /// `(chain_code, token_code)` pair. Existence-only, so it stops at the first row
 /// instead of summing like `sum_locks_inline` — the settlement gate needs to know
@@ -237,6 +250,10 @@ void opreg::setconfig(uint32_t max_available_producers,
                "terminate_window_ms must span at least terminate_max_consecutive_misses + 1 duty rotations");
       }
    }
+
+   require_canonical_codes(req_prod_collat,    "req_prod_collat");
+   require_canonical_codes(req_batchop_collat, "req_batchop_collat");
+   require_canonical_codes(req_uw_collat,      "req_uw_collat");
 
    require_no_duplicate_chain_token(req_prod_collat,    "req_prod_collat");
    require_no_duplicate_chain_token(req_batchop_collat, "req_batchop_collat");
