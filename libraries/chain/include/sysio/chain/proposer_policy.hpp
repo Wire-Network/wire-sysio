@@ -49,11 +49,9 @@ struct proposer_policy {
 
    // Validates structural well-formedness of the policy. Single source of truth
    // reused by the set_proposed_producers host function and snapshot loading.
-   // Two things are intentionally NOT checked here and stay at the intrinsic
-   // call site instead:
-   //  - account existence (requires apply_context)
-   //  - K1/R1 key type enforcement (uses unactivated_key_type to signal that
-   //    non-K1/R1 keys need a protocol feature; distinct from structural errors)
+   // Account existence is NOT checked here and stays at the intrinsic call site,
+   // which has the apply_context needed for it. Key type and key validity are not
+   // checked anywhere on this path by design -- see set_proposed_producers_common.
    // Throws producer_schedule_exception on violation.
    void validate() const {
       const auto& producers = proposer_schedule.producers;

@@ -17,11 +17,60 @@ namespace sysiosystem {
       return !get_last_proposed_finalizers().empty();
    }
 
-   // Validates finalizer_key in text form and returns a binary form
+   // Validates finalizer_key in text form and returns a binary form.
+   // This checks the prefix and the base64url encoding only -- it says nothing about the point.
    sysio::bls_g1 to_binary(const std::string& finalizer_key) {
       check(finalizer_key.compare(0, 7, "PUB_BLS") == 0, "finalizer key does not start with PUB_BLS: " + finalizer_key);
       return sysio::decode_bls_public_key_to_g1(finalizer_key);
    }
+
+   namespace {
+
+      constexpr auto identity_key_error = "finalizer key must not be the identity point";
+      constexpr auto invalid_key_error  = "finalizer key is not a valid G1 point";
+
+      // The all-zero G1 encoding is the point at infinity, and a proof of possession cannot screen
+      // it out: the pairing bls_pop_verify computes is satisfied by it for free. It must never
+      // become a finalizer key -- aggregating it into a quorum certificate is a no-op on the
+      // aggregate public key while its weight still counts toward the threshold, so its votes
+      // could be cast by anyone.
+      bool is_identity_g1( const sysio::bls_g1& key ) {
+         return key == sysio::bls_g1{};
+      }
+
+      // Whether the bytes are a point on the curve. The host G1 primitives deserialize with
+      // validity checking and report failure, so adding the identity to the key answers this in
+      // one host call. A key that fails here makes set_finalizers throw while deserializing it.
+      bool is_valid_g1( const sysio::bls_g1& key ) {
+         sysio::bls_g1 sum{};
+         return sysio::bls_g1_add( key, sysio::bls_g1{}, sum ) == 0;
+      }
+
+      constexpr auto subgroup_key_error = "finalizer key is not in the r-order subgroup";
+
+      /// Order of the G1 subgroup, little-endian, as bls_g1_weighted_sum reads its scalars.
+      constexpr sysio::bls_scalar g1_subgroup_order = {
+         '\x01', '\x00', '\x00', '\x00', '\xff', '\xff', '\xff', '\xff',
+         '\xfe', '\x5b', '\xfe', '\xff', '\x02', '\xa4', '\xbd', '\x53',
+         '\x05', '\xd8', '\xa1', '\x09', '\x08', '\xd8', '\x39', '\x33',
+         '\x48', '\x7d', '\x9d', '\x29', '\x53', '\xa7', '\xed', '\x73'
+      };
+
+      // Whether `key` lies in the r-order subgroup, tested as [r]P == identity.
+      //
+      // Being on the curve is not enough. A small-order point such as affine (0, 2) -- on the
+      // curve, canonical, and not the identity -- pairs to one against any G2 point, because its
+      // order is coprime to r. bls_pop_verify therefore accepts it with an identity proof, and it
+      // would carry finality weight that anyone could cast, exactly as the identity key would.
+      bool is_in_g1_subgroup( const sysio::bls_g1& key ) {
+         const sysio::bls_g1     points[1]  = { key };
+         const sysio::bls_scalar scalars[1] = { g1_subgroup_order };
+         sysio::bls_g1 product{};
+         if( sysio::bls_g1_weighted_sum( points, scalars, 1, product ) != 0 ) return false;
+         return product == sysio::bls_g1{};
+      }
+
+   } // namespace
 
    // Returns hash of finalizer_key in binary format
    static sysio::checksum256 get_finalizer_key_hash(const sysio::bls_g1& finalizer_key_binary) {
@@ -143,9 +192,19 @@ namespace sysiosystem {
       // Basic signature format check
       check(proof_of_possession.compare(0, 7, "SIG_BLS") == 0, "proof of possession signature does not start with SIG_BLS: " + proof_of_possession);
 
-      // Convert to binary form. The validity will be checked during conversion.
+      // Convert to binary form.
       const auto fin_key_g1 = to_binary(finalizer_key);
       const auto pop_g2 = sysio::decode_bls_signature_to_g2(proof_of_possession);
+
+      // A key set_finalizers would reject must not enter the table. The schedule rebuild proposes
+      // every active finalizer key from inside onblock, and a throw there rolls back the rebuild
+      // timestamp with it, so the gate re-fires and fails again on every block that follows.
+      // Registration is the only action that admits new key material, which makes it the one place
+      // this can be caught; delfinkey is deliberately left lenient so a key that predates this
+      // check can still be removed.
+      check( !is_identity_g1(fin_key_g1), identity_key_error );
+      check( is_valid_g1(fin_key_g1), invalid_key_error );
+      check( is_in_g1_subgroup(fin_key_g1), subgroup_key_error );
 
       // Duplication check across all registered keys
       const auto idx = _finalizer_keys.get_index<"byfinkey"_n>();
