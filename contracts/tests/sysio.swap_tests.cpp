@@ -11,6 +11,9 @@
 #include <contracts.hpp>
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/twap.hpp>
+#include <sysio/opp/opp.hpp>
+#include <sysio/opp/types/types.pb.h>
+#include "contract_test_support.hpp"
 #include "shadow_yield_reference.hpp"
 #include "twap_wide.hpp"
 #include <algorithm>
@@ -57,25 +60,43 @@ static symbol_code EOS = EOS4.to_symbol_code();
 static symbol_code VOICE = VOICE4.to_symbol_code();
 static symbol_code TUSD = TUSD2.to_symbol_code();
 
-// The system token (the tests' stand-in for WIRE): the second leg of every
-// pair. The shadow token and its yield pool trade against it.
-static const extended_symbol WIRE{ EOS4, "sysio.token"_n };
+// The system token every pair's second leg is in. The AMM tests run on
+// upstream's fixture, where EOS on sysio.token stands in for WIRE; the yield
+// tests run on WIRE itself (sysio_swap_yield_tester below), because the real
+// sysio.liq takes its yield in WIRE and pays claims in WIRE.
+static const extended_symbol SYSTEM_TOKEN{ EOS4, "sysio.token"_n };
+static symbol WIRE9 = symbol::from_string("9,WIRE");
+static symbol_code WIRE = WIRE9.to_symbol_code();
+// Upstream's fixture issues 461168601842738.7903 of its system token and
+// deposits 461000000000000.0000 of it for alice -- kept in units, so the yield
+// fixture's WIRE gets the same amounts at its own precision.
+static const int64_t SystemTokenIssuance = 4'611'686'018'427'387'903;
+static const int64_t SystemTokenDeposit  = 4'610'000'000'000'000'000;
+// The shadow token -- the real sysio.liq, opened on a 4-decimal liq token so
+// the precision-gap cases below hold -- and its yield pool against WIRE, at the
+// precision inittoken derives for the pair: (4 + 9) / 2.
 static symbol SHD4 = symbol::from_string("4,SHD");
-static symbol SHEO4 = symbol::from_string("4,SHEO");
+static symbol SHEO6 = symbol::from_string("6,SHEO");
 static symbol_code SHD = SHD4.to_symbol_code();
-static symbol_code SHEO = SHEO4.to_symbol_code();
-static const extended_symbol SHADOW{ SHD4, "shadowtoken"_n };
+static symbol_code SHEO = SHEO6.to_symbol_code();
+static const extended_symbol SHADOW{ SHD4, "sysio.liq"_n };
+// TUSD's plain pool against WIRE, the yield tests' "no yield leg" case: (2 + 9) / 2.
+static symbol ETUSD5 = symbol::from_string("5,ETUSD");
 
 class sysio_swap_tester : public tester {
 public:
+    // The system token every pair's second leg is in: SYSTEM_TOKEN unless a
+    // fixture configures another (sysio_swap_yield_tester configures WIRE).
+    const extended_symbol system_token;
 
     // `configure` = false leaves the fee authority unset, for the test that pins
     // what pair creation does before deployment has run setconfig.
-    explicit sysio_swap_tester( bool configure = true ) {
+    explicit sysio_swap_tester( bool configure = true, extended_symbol system_token = SYSTEM_TOKEN )
+    : system_token( system_token ) {
         produce_blocks( 2 );
 
         create_accounts( { "alice"_n, "bob"_n, "carol"_n, "sysio.token"_n, "sysio.swap"_n,
-          "badtoken"_n, "anothertoken"_n, "shadowtoken"_n } );
+          "badtoken"_n, "anothertoken"_n, "sysio.chains"_n, "sysio.tokens"_n, "sysio.liq"_n, "sysio.msgch"_n } );
         produce_blocks( 2 );
 
         // sysio.token bills every row to the system account (ram_payer = "sysio"),
@@ -98,25 +119,36 @@ public:
         set_code( "badtoken"_n, contracts::util::badtoken_wasm() );
         set_abi( "badtoken"_n, contracts::util::badtoken_abi().data() );
 
-        // The shadow token stand-in bills its rows to itself; no privilege needed.
-        set_code( "shadowtoken"_n, contracts::util::shadowtoken_wasm() );
-        set_abi( "shadowtoken"_n, contracts::util::shadowtoken_abi().data() );
+        // The shadow token is the real sysio.liq: privileged like the deployment
+        // makes it, bound through the chain and token registries, and minted into
+        // only by sysio.msgch's inbound dispatch.
+        set_code( "sysio.chains"_n, contracts::chains_wasm() );
+        set_abi( "sysio.chains"_n, contracts::chains_abi().data() );
+        set_privileged( "sysio.chains"_n );
+        set_code( "sysio.tokens"_n, contracts::tokens_wasm() );
+        set_abi( "sysio.tokens"_n, contracts::tokens_abi().data() );
+        set_privileged( "sysio.tokens"_n );
+        set_code( "sysio.liq"_n, contracts::liq_wasm() );
+        set_abi( "sysio.liq"_n, contracts::liq_abi().data() );
+        set_privileged( "sysio.liq"_n );
 
         produce_blocks();
 
-        // Deployment's configuration step: governance executes as sysio, and EOS
-        // on sysio.token stands in for WIRE as the system token.
-        if (configure) BOOST_REQUIRE_EQUAL( success(), setconfig( config::system_account_name ) );
+        // Deployment's configuration step: governance executes as sysio, and the
+        // fixture's system token is the second leg of every pair.
+        if (configure) BOOST_REQUIRE_EQUAL( success(), setconfig( config::system_account_name, system_token ) );
 
         const auto* accnt1 = control->find_account_metadata( "sysio.token"_n );
         abi_def abi1;
         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt1->abi, abi1), true);
         abi_ser.set_abi(abi1, abi_serializer::create_yield_function(abi_serializer_max_time));
 
-        const auto* shadow_accnt = control->find_account_metadata( "shadowtoken"_n );
+        const auto* shadow_accnt = control->find_account_metadata( "sysio.liq"_n );
         abi_def shadow_abi;
         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(shadow_accnt->abi, shadow_abi), true);
         shadow_abi_ser.set_abi(shadow_abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+
+        register_shadow_token();
     }
 
     // Push `act` on sysio.swap under exactly the given authorities, resolving the
@@ -132,7 +164,7 @@ public:
         produce_block();
         return success();
     }
-    action_result setconfig( name fee_authority, extended_symbol system_token = WIRE, name signer = "sysio.swap"_n ) {
+    action_result setconfig( name fee_authority, extended_symbol system_token = SYSTEM_TOKEN, name signer = "sysio.swap"_n ) {
         return push_swap_action( "setconfig"_n, { {signer, config::active_name} }, mvo()
           ( "fee_authority", fee_authority )
           ( "system_token", system_token )
@@ -320,7 +352,7 @@ public:
             mvo()( "from", from )( "pair_token", pair )( "quantity", quantity ),
             abi_serializer::create_yield_function(abi_serializer_max_time) );
         action deliver;
-        deliver.account = "shadowtoken"_n;
+        deliver.account = "sysio.liq"_n;
         deliver.name    = "transfer"_n;
         deliver.authorization = { {from, config::active_name} };
         deliver.data = shadow_abi_ser.variant_to_binary( "transfer",
@@ -334,50 +366,79 @@ public:
         produce_block();
     }
 
-    // --- The shadow token stand-in (contracts/test_contracts/shadowtoken) ---
+    // --- The shadow token (contracts/sysio.liq) ---
+
+    // The registry rows the shadow is bound to: one SVM chain and one liq token
+    // declared at the shadow's own precision.
+    static constexpr std::string_view ShadowChainCodename  = "SOLANA";
+    static constexpr std::string_view ShadowTokenCodename  = "SHD";
+    static constexpr uint32_t         ShadowExternalChainId = 2;
 
     action_result push_shadow_action( name signer, action_name act, const variant_object& data ) {
         action a;
-        a.account = "shadowtoken"_n;
+        a.account = "sysio.liq"_n;
         a.name    = act;
         a.data    = shadow_abi_ser.variant_to_binary( shadow_abi_ser.get_action_type(act), data,
                                                       abi_serializer::create_yield_function(abi_serializer_max_time) );
         return base_tester::push_action( std::move(a), signer.to_uint64_t() );
     }
-    action_result shadow_create( name issuer, asset maximum_supply, extended_symbol wire ) {
-        return push_shadow_action( "shadowtoken"_n, "create"_n, mvo()
-          ( "issuer", issuer )( "maximum_supply", maximum_supply )
-          ( "wire_contract", wire.contract )( "wire_symbol", wire.sym ) );
+    // Push a registry action on `code` (sysio.chains / sysio.tokens), signed by
+    // that contract, resolving the action's type from ITS deployed ABI -- the
+    // fixture's plain push_action reads the swap's serializer.
+    action_result push_registry_action( name code, action_name act, const variant_object& data ) {
+        try {
+            base_tester::push_action( code, act, code, data );
+        } catch (const fc::exception& ex) {
+            return error(ex.top_message());
+        }
+        produce_block();
+        return success();
     }
-    action_result shadow_issue( name issuer, name to, asset quantity ) {
-        return push_shadow_action( issuer, "issue"_n, mvo()( "to", to )( "quantity", quantity )( "memo", "" ) );
+    // Register the chain and the liq token, then open the shadow symbol on
+    // sysio.liq -- the order its README gives a deployment.
+    void register_shadow_token() {
+        using sysio::opp::types::ChainKind;
+        using sysio::opp::types::TokenKind;
+        using sysio_system::test_support::codename_mvo;
+        const std::vector<char> address( 32, char(0x5a) );   // an SVM-width placeholder
+        BOOST_REQUIRE_EQUAL( success(), push_registry_action( "sysio.chains"_n, "regchain"_n, mvo()
+          ( "kind", ChainKind::CHAIN_KIND_SVM )( "code", codename_mvo( ShadowChainCodename ) )
+          ( "external_chain_id", ShadowExternalChainId )( "name", std::string( "outpost" ) )
+          ( "description", std::string{} )( "outpost", sysio_system::test_support::no_outpost_mvo() ) ) );
+        BOOST_REQUIRE_EQUAL( success(), push_registry_action( "sysio.tokens"_n, "regtoken"_n, mvo()
+          ( "kind", TokenKind::TOKEN_KIND_LIQ )( "code", codename_mvo( ShadowTokenCodename ) )
+          ( "symbol_name", std::string( ShadowTokenCodename ) )( "description", std::string{} )
+          ( "precision", SHD4.decimals() )
+          ( "address", mvo()( "kind", ChainKind::CHAIN_KIND_SVM )( "address", address ) ) ) );
+        BOOST_REQUIRE_EQUAL( success(), push_registry_action( "sysio.tokens"_n, "regctok"_n, mvo()
+          ( "chain_code", codename_mvo( ShadowChainCodename ) )( "token_code", codename_mvo( ShadowTokenCodename ) )
+          ( "contract_addr", address )( "is_native", false ) ) );
+        BOOST_REQUIRE_EQUAL( success(), push_shadow_action( "sysio.liq"_n, "create"_n, mvo()
+          ( "sym", SHD4 )( "chain_code", codename_mvo( ShadowChainCodename ) )
+          ( "token_code", codename_mvo( ShadowTokenCodename ) ) ) );
+    }
+    // Shadow enters supply the way the depot mints it: sysio.msgch credits a
+    // syndication the outpost reported, one sequence per credit.
+    uint64_t liq_sequence = 0;
+    action_result shadow_mint( name to, asset quantity ) {
+        using sysio_system::test_support::codename_mvo;
+        return push_shadow_action( "sysio.msgch"_n, "mintsynd"_n, mvo()
+          ( "chain_code", codename_mvo( ShadowChainCodename ) )( "sequence", ++liq_sequence )
+          ( "account", to )( "token_code", codename_mvo( ShadowTokenCodename ) )( "amount", quantity.get_amount() ) );
     }
     action_result shadow_transfer( name from, name to, asset quantity, string memo ) {
         return push_shadow_action( from, "transfer"_n, mvo()
           ( "from", from )( "to", to )( "quantity", quantity )( "memo", memo ) );
     }
     // `from` donates `quantity` WIRE to `target`'s holders. The token moves the
-    // WIRE by an inline transfer under `from`'s authority, so `from`'s active
-    // must carry shadowtoken@sysio.code (see grant_shadow_code).
+    // WIRE by an inline transfer under `from`'s authority; being privileged, it
+    // needs no sysio.code seat on `from` for that.
     action_result shadow_addyield( name from, asset quantity, symbol_code target ) {
         return push_shadow_action( from, "addyield"_n, mvo()
           ( "from", from )( "quantity", quantity )( "target", target ) );
     }
     action_result shadow_claim( name holder, symbol_code sym ) {
         return push_shadow_action( holder, "claim"_n, mvo()( "holder", holder )( "sym", sym ) );
-    }
-    // Let the shadow token act for `account`: its active keeps its key and gains
-    // shadowtoken@sysio.code, the delegation addyield's inline transfer needs. A
-    // contract account keeps its own sysio.code seat too (`keep_own_code`), which
-    // its own inline actions need; the seats are listed in name order.
-    void grant_shadow_code( name account, bool keep_own_code = false ) {
-        vector<permission_level_weight> seats{ { { "shadowtoken"_n, config::sysio_code_name }, 1 } };
-        if (keep_own_code) seats.push_back( { { account, config::sysio_code_name }, 1 } );
-        std::sort( seats.begin(), seats.end() );
-        set_authority( account, config::active_name,
-            authority( 1, { key_weight{ get_public_key( account, "active" ), 1 } }, seats ),
-            config::owner_name );
-        produce_block();
     }
     // tickyield needs no authorization; any account can foot the CPU.
     action_result tickyield( symbol_code pair_token ) {
@@ -412,13 +473,13 @@ public:
     }
     // `holder`'s row for `sym` on the shadow token (scope = holder, key = symbol code).
     shadow_account_row shadow_account( name holder, symbol_code sym ) {
-        const auto data = get_kv_row( "shadowtoken"_n, "accounts"_n, { holder.to_uint64_t(), sym.value } );
+        const auto data = get_kv_row( "sysio.liq"_n, "accounts"_n, { holder.to_uint64_t(), sym.value } );
         BOOST_REQUIRE_MESSAGE( !data.empty(), "no shadow row for " << holder << " " << sym );
         return fc::raw::unpack<shadow_account_row>( data );
     }
     // The distribution state of `sym`; all zero before the first addyield.
     shadow_index_row shadow_index( symbol_code sym ) {
-        const auto data = get_kv_row( "shadowtoken"_n, "yieldidx"_n, { sym.value } );
+        const auto data = get_kv_row( "sysio.liq"_n, "yieldidx"_n, { sym.value } );
         return data.empty() ? shadow_index_row{ 0, 0, 0 } : fc::raw::unpack<shadow_index_row>( data );
     }
     // A user's deposit of any extended symbol, resolved without `extend`.
@@ -553,26 +614,26 @@ public:
     // the two pools. Declared here, defined after the file-scope symbols.
     vector <int64_t> total();
     void create_tokens_and_issue() {
-        BOOST_REQUIRE_EQUAL( success(), create( "sysio.token"_n, "alice"_n, asset::from_string("461168601842738.7903 EOS") ) );
+        BOOST_REQUIRE_EQUAL( success(), create( system_token.contract, "alice"_n, asset( SystemTokenIssuance, system_token.sym ) ) );
         BOOST_REQUIRE_EQUAL( success(), create( "anothertoken"_n, "bob"_n, asset::from_string("461168601842738.7903 VOICE") ) );
         BOOST_REQUIRE_EQUAL( success(), create( "sysio.token"_n, "alice"_n, asset::from_string("46116860184273879.03 TUSD") ) );
-        BOOST_REQUIRE_EQUAL( success(), issue( "sysio.token"_n, "alice"_n, "alice"_n, asset::from_string("461168601842738.7903 EOS"), "") );
+        BOOST_REQUIRE_EQUAL( success(), issue( system_token.contract, "alice"_n, "alice"_n, asset( SystemTokenIssuance, system_token.sym ), "") );
         BOOST_REQUIRE_EQUAL( success(), issue( "anothertoken"_n, "bob"_n, "bob"_n, asset::from_string("461168601842738.7903 VOICE"), "") );
         BOOST_REQUIRE_EQUAL( success(), issue( "sysio.token"_n, "alice"_n, "alice"_n, asset::from_string("46116860184273879.03 TUSD"), "") );
     }
     void many_openext() {
-        BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, extended_symbol{symbol::from_string("4,EOS"), "sysio.token"_n}) );
+        BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, system_token ) );
         BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, extended_symbol{symbol::from_string("4,VOICE"), "anothertoken"_n}) );
         BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, extended_symbol{symbol::from_string("2,TUSD"), "sysio.token"_n}) );
-        BOOST_REQUIRE_EQUAL( success(), openext( "bob"_n, "alice"_n, extended_symbol{symbol::from_string("4,EOS"), "sysio.token"_n}) );
+        BOOST_REQUIRE_EQUAL( success(), openext( "bob"_n, "alice"_n, system_token ) );
         BOOST_REQUIRE_EQUAL( success(), openext( "bob"_n, "alice"_n, extended_symbol{symbol::from_string("4,VOICE"), "anothertoken"_n}) );
         BOOST_REQUIRE_EQUAL( success(), openext( "bob"_n, "alice"_n, extended_symbol{symbol::from_string("2,TUSD"), "sysio.token"_n}) );
     }
-    // The deposits the pools are seeded from. EOS is the system token and is
-    // always accepted; VOICE and TUSD have no pair yet, so their deposits carry
-    // the contract's authority.
+    // The deposits the pools are seeded from. The system token is always
+    // accepted; VOICE and TUSD have no pair yet, so their deposits carry the
+    // contract's authority.
     void many_transfer() {
-        BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("461000000000000.0000 EOS"), "") );
+        BOOST_REQUIRE_EQUAL( success(), transfer( system_token.contract, "alice"_n, "sysio.swap"_n, asset( SystemTokenDeposit, system_token.sym ), "") );
         BOOST_REQUIRE_EQUAL( success(), seed_transfer( "anothertoken"_n, "bob"_n, asset::from_string("461168601842738.7000 VOICE"), "deposit to: alice") );
         // 0.0902, not bob's full 0.0903 remainder: memoexchange_test first sends
         // 0.0001 VOICE bob -> alice, so 0.0903 overdraws there (upstream ignored
@@ -612,16 +673,11 @@ public:
         create( "carol"_n, "carol"_n, asset::from_string("1.0000 VOICE") );
         issue( "carol"_n, "carol"_n, "carol"_n, asset::from_string("1.0000 VOICE"), "");
     }
-    // The yield-pool state the accrual tests start from: SHD (the shadow, paying
-    // its yield in EOS) issued to alice, bob holding EOS to donate and able to
-    // route it through the shadow token, and SHEO = SHD/EOS created by alice as
-    // a yield pool on SHD. Defined after the file-scope symbols it uses.
-    void setup_yield_pool();
     abi_serializer abi_ser;
     abi_serializer shadow_abi_ser;
 };
 
-static extended_asset shd( int64_t units ) { return extended_asset{ asset( units, SHD4 ), "shadowtoken"_n }; }
+static extended_asset shd( int64_t units ) { return extended_asset{ asset( units, SHD4 ), "sysio.liq"_n }; }
 // Seed of the yield pool and the shadow's total issuance: the pool holds a third
 // of the supply, so every distribution splits 1:2 between the pool and alice.
 static const int64_t YieldPoolShadow   = 1'000'000'0000;
@@ -766,30 +822,40 @@ int64_t sysio_swap_tester::balance( name user, symbol sym ) {
     return deposit_of( user, extended_symbol{ sym, ext.contract } );
 }
 
-void sysio_swap_tester::setup_yield_pool() {
-    create_tokens_and_issue();
-    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
-    many_openext();
-    many_transfer();
-    BOOST_REQUIRE_EQUAL( success(), shadow_create( "alice"_n, asset( 100 * ShadowIssuance, SHD4 ), WIRE ) );
-    BOOST_REQUIRE_EQUAL( success(), shadow_issue( "alice"_n, "alice"_n, asset( ShadowIssuance, SHD4 ) ) );
-    BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "bob"_n, asset( BobDonationBudget, EOS4 ), "" ) );
-    grant_shadow_code( "bob"_n );
-    BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, SHADOW ) );
-    BOOST_REQUIRE_EQUAL( success(), seed_transfer( "shadowtoken"_n, "alice"_n, asset( YieldPoolShadow, SHD4 ), "" ) );
-    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, SHEO4, shd( YieldPoolShadow ),
-        extend( asset( YieldPoolWire, EOS4 ) ), 10, name{}, 0, SHADOW ) );
-    // The pool holds exactly its seed, its reservoir exists and is empty, and
-    // the shadow row was stamped at index 0.
-    const auto pool = system_balance( SHEO.value );
-    BOOST_REQUIRE_EQUAL( YieldPoolShadow, pool.at(0) );
-    BOOST_REQUIRE_EQUAL( YieldPoolWire,   pool.at(1) );
-    BOOST_REQUIRE_EQUAL( 0, reservoir_of( SHEO ) );
-    const auto held = shadow_account( "sysio.swap"_n, SHD );
-    BOOST_REQUIRE_EQUAL( YieldPoolShadow, held.balance.get_amount() );
-    BOOST_REQUIRE_EQUAL( 0u, held.index_checkpoint );
-    BOOST_REQUIRE_EQUAL( 0u, held.owed_wire );
-}
+// The yield tests trade against the real sysio.liq, which takes its yield in
+// WIRE and pays claims in WIRE, and a pair's second leg is the swap's system
+// token: this fixture configures WIRE itself where the AMM tests stand EOS in
+// for it.
+struct sysio_swap_yield_tester : public sysio_swap_tester {
+    sysio_swap_yield_tester() : sysio_swap_tester( true, extended_symbol{ WIRE9, "sysio.token"_n } ) {}
+
+    // The yield-pool state the accrual tests start from: SHD (the shadow, paying
+    // its yield in WIRE) issued to alice, bob holding WIRE to donate and able to
+    // route it through the shadow token, and SHEO = SHD/WIRE created by alice as
+    // a yield pool on SHD.
+    void setup_yield_pool() {
+        create_tokens_and_issue();
+        abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+        many_openext();
+        many_transfer();
+        BOOST_REQUIRE_EQUAL( success(), shadow_mint( "alice"_n, asset( ShadowIssuance, SHD4 ) ) );
+        BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "bob"_n, asset( BobDonationBudget, WIRE9 ), "" ) );
+        BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, SHADOW ) );
+        BOOST_REQUIRE_EQUAL( success(), seed_transfer( "sysio.liq"_n, "alice"_n, asset( YieldPoolShadow, SHD4 ), "" ) );
+        BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, SHEO6, shd( YieldPoolShadow ),
+            extend( asset( YieldPoolWire, WIRE9 ) ), 10, name{}, 0, SHADOW ) );
+        // The pool holds exactly its seed, its reservoir exists and is empty, and
+        // the shadow row was stamped at index 0.
+        const auto pool = system_balance( SHEO.value );
+        BOOST_REQUIRE_EQUAL( YieldPoolShadow, pool.at(0) );
+        BOOST_REQUIRE_EQUAL( YieldPoolWire,   pool.at(1) );
+        BOOST_REQUIRE_EQUAL( 0, reservoir_of( SHEO ) );
+        const auto held = shadow_account( "sysio.swap"_n, SHD );
+        BOOST_REQUIRE_EQUAL( YieldPoolShadow, held.balance.get_amount() );
+        BOOST_REQUIRE_EQUAL( 0u, held.index_checkpoint );
+        BOOST_REQUIRE_EQUAL( 0u, held.owed_wire );
+    }
+};
 
 int64_t sysio_swap_tester::settle_swap( name user, symbol_code pair, asset in, symbol out_symbol, int out_leg ) {
     const auto before = system_balance(pair.value);
@@ -1404,7 +1470,7 @@ BOOST_FIXTURE_TEST_CASE( nothing_works_before_setconfig, sysio_swap_unconfigured
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("swap not configured"), inittoken( "alice"_n, EVO4,
         extend(asset::from_string("1.0000 VOICE")), extend(asset::from_string("1.0000 EOS")), 10, "alice"_n) );
     // setconfig is the contract's own call, and checks what it is given.
-    BOOST_REQUIRE_EQUAL( error("missing authority of sysio.swap"), setconfig( "alice"_n, WIRE, "alice"_n ) );
+    BOOST_REQUIRE_EQUAL( error("missing authority of sysio.swap"), setconfig( "alice"_n, SYSTEM_TOKEN, "alice"_n ) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("fee authority account does not exist"), setconfig( "natalia"_n ) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("system token contract does not exist"),
         setconfig( config::system_account_name, extended_symbol{ EOS4, "natalia"_n } ) );
@@ -1489,7 +1555,7 @@ BOOST_FIXTURE_TEST_CASE( yield_leg_rules, sysio_swap_tester ) try {
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield_leg must be the pair's first leg"), inittoken( "alice"_n, EVO4,
         extend(asset::from_string("1.0000 VOICE")), extend(asset::from_string("1.0000 EOS")), 10, name{}, 0, tusd ) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield_leg must be the pair's first leg"), inittoken( "alice"_n, EVO4,
-        extend(asset::from_string("1.0000 VOICE")), extend(asset::from_string("1.0000 EOS")), 10, name{}, 0, WIRE ) );
+        extend(asset::from_string("1.0000 VOICE")), extend(asset::from_string("1.0000 EOS")), 10, name{}, 0, SYSTEM_TOKEN ) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield_leg must be the pair's first leg"), inittoken( "alice"_n, EVO4,
         extend(asset::from_string("1.0000 VOICE")), extend(asset::from_string("1.0000 EOS")), 10, name{}, 0,
         extended_symbol{ VOICE4, "sysio.token"_n } ) );
@@ -1546,20 +1612,20 @@ BOOST_FIXTURE_TEST_CASE( yield_leg_rules, sysio_swap_tester ) try {
 // other leg, computed from the token's public state and asserted on receipt.
 // ---------------------------------------------------------------------------
 
-BOOST_FIXTURE_TEST_CASE( yield_accrues_into_the_pool_without_minting, sysio_swap_tester ) try {
+BOOST_FIXTURE_TEST_CASE( yield_accrues_into_the_pool_without_minting, sysio_swap_yield_tester ) try {
     setup_yield_pool();
-    const auto pool_wire_at_token = [&]() { return token_balance( "sysio.token"_n, "sysio.swap"_n, EOS.value ); };
+    const auto pool_wire_at_token = [&]() { return token_balance( "sysio.token"_n, "sysio.swap"_n, WIRE.value ); };
     const int64_t supply = system_balance( SHEO.value ).at(2);
 
     // Nothing distributed yet: accrual is a no-op and leaves no trace.
     BOOST_REQUIRE_EQUAL( success(), accrueyield( SHEO ) );
     BOOST_REQUIRE_EQUAL( YieldPoolWire, system_balance( SHEO.value ).at(1) );
-    BOOST_REQUIRE( pending_payout( "shadowtoken"_n ).empty() );
+    BOOST_REQUIRE( pending_payout( "sysio.liq"_n ).empty() );
 
-    // bob donates 100 EOS to SHD holders: the index advances by the spec, the
+    // bob donates 1e6 units of WIRE to SHD holders: the index advances by the spec, the
     // truncation remainder is carried, and the pot holds the whole donation.
     const int64_t first_donation = 100'0000;
-    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( first_donation, EOS4 ), SHD ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( first_donation, WIRE9 ), SHD ) );
     const auto first = yield_reference::distribute( first_donation, ShadowIssuance, 0 );
     auto idx = shadow_index( SHD );
     BOOST_REQUIRE_EQUAL( first.index_delta, yield_reference::wide( idx.index ) );
@@ -1568,8 +1634,8 @@ BOOST_FIXTURE_TEST_CASE( yield_accrues_into_the_pool_without_minting, sysio_swap
     BOOST_REQUIRE_LT( 0u, idx.carry );   // the chosen supply does not divide evenly
 
     // The pool is owed its share, floored; accruing credits exactly that to the
-    // EOS side, mints nothing, and the token delivers the same amount in the
-    // same transaction: the receipt is retired and the contract's EOS grew by it.
+    // WIRE side, mints nothing, and the token delivers the same amount in the
+    // same transaction: the receipt is retired and the contract's WIRE grew by it.
     const int64_t owed1 = yield_reference::owed( YieldPoolShadow, idx.index, 0 );
     BOOST_REQUIRE_EQUAL( 333333, owed1 );   // 1e6 units * 1/3, floored
     const int64_t wire_before = pool_wire_at_token();
@@ -1579,7 +1645,7 @@ BOOST_FIXTURE_TEST_CASE( yield_accrues_into_the_pool_without_minting, sysio_swap
     BOOST_REQUIRE_EQUAL( YieldPoolWire + owed1,  pool.at(1) );
     BOOST_REQUIRE_EQUAL( supply,                 pool.at(2) );
     BOOST_REQUIRE_EQUAL( wire_before + owed1, pool_wire_at_token() );
-    BOOST_REQUIRE( pending_payout( "shadowtoken"_n ).empty() );
+    BOOST_REQUIRE( pending_payout( "sysio.liq"_n ).empty() );
     auto held = shadow_account( "sysio.swap"_n, SHD );
     BOOST_REQUIRE_EQUAL( idx.index, held.index_checkpoint );
     BOOST_REQUIRE_EQUAL( 0u, held.owed_wire );
@@ -1593,8 +1659,8 @@ BOOST_FIXTURE_TEST_CASE( yield_accrues_into_the_pool_without_minting, sysio_swap
     // Two more distributions before the next accrual: the carry chains through
     // them, and one accrual collects the pool's share of both.
     const int64_t second_donation = 7'0001, third_donation = 50'0000;
-    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( second_donation, EOS4 ), SHD ) );
-    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( third_donation, EOS4 ), SHD ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( second_donation, WIRE9 ), SHD ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( third_donation, WIRE9 ), SHD ) );
     const auto second = yield_reference::distribute( second_donation, ShadowIssuance, first.carry );
     const auto third  = yield_reference::distribute( third_donation,  ShadowIssuance, second.carry );
     const yield_reference::wide index_after_three = first.index_delta + second.index_delta + third.index_delta;
@@ -1612,9 +1678,9 @@ BOOST_FIXTURE_TEST_CASE( yield_accrues_into_the_pool_without_minting, sysio_swap
     // alice, holding the other two thirds directly, is owed by the same formula,
     // and the pot ends holding only what flooring left behind.
     const int64_t owed_alice = yield_reference::owed( ShadowIssuance - YieldPoolShadow, idx.index, 0 );
-    const int64_t alice_before = token_balance( "sysio.token"_n, "alice"_n, EOS.value );
+    const int64_t alice_before = token_balance( "sysio.token"_n, "alice"_n, WIRE.value );
     BOOST_REQUIRE_EQUAL( success(), shadow_claim( "alice"_n, SHD ) );
-    BOOST_REQUIRE_EQUAL( alice_before + owed_alice, token_balance( "sysio.token"_n, "alice"_n, EOS.value ) );
+    BOOST_REQUIRE_EQUAL( alice_before + owed_alice, token_balance( "sysio.token"_n, "alice"_n, WIRE.value ) );
     const int64_t donated = first_donation + second_donation + third_donation;
     BOOST_REQUIRE_EQUAL( uint64_t(donated - owed1 - owed2 - owed_alice), shadow_index( SHD ).pot );
     BOOST_REQUIRE_LT( shadow_index( SHD ).pot, 3u );   // at most one unit of dust per holder
@@ -1623,25 +1689,23 @@ BOOST_FIXTURE_TEST_CASE( yield_accrues_into_the_pool_without_minting, sysio_swap
 // The index is 128-bit: one add to a thinly held symbol moves it past 2^64 (a
 // single subunit of supply and 2e7 subunits of yield give 2e19), and the holder
 // is still paid every subunit, through that add and the next one.
-BOOST_FIXTURE_TEST_CASE( yield_index_grows_past_64_bits, sysio_swap_tester ) try {
+BOOST_FIXTURE_TEST_CASE( yield_index_grows_past_64_bits, sysio_swap_yield_tester ) try {
     create_tokens_and_issue();
-    BOOST_REQUIRE_EQUAL( success(), shadow_create( "alice"_n, asset( ShadowIssuance, SHD4 ), WIRE ) );
-    BOOST_REQUIRE_EQUAL( success(), shadow_issue( "alice"_n, "alice"_n, asset( 1, SHD4 ) ) );
-    BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "bob"_n, asset( BobDonationBudget, EOS4 ), "" ) );
-    grant_shadow_code( "bob"_n );
+    BOOST_REQUIRE_EQUAL( success(), shadow_mint( "alice"_n, asset( 1, SHD4 ) ) );
+    BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "bob"_n, asset( BobDonationBudget, WIRE9 ), "" ) );
 
     const int64_t supply   = 1;
     const int64_t donation = 2000'0000;   // 2e7 subunits: the index moves by 2e7 * 1e12 / 1
     const auto first = yield_reference::distribute( donation, supply, 0 );
     BOOST_REQUIRE_LT( yield_reference::wide( std::numeric_limits<uint64_t>::max() ), first.index_delta );
-    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( donation, EOS4 ), SHD ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( donation, WIRE9 ), SHD ) );
     BOOST_REQUIRE_EQUAL( first.index_delta, yield_reference::wide( shadow_index( SHD ).index ) );
 
     // The sole holder is owed the whole donation, and claiming pays exactly that.
     BOOST_REQUIRE_EQUAL( donation, yield_reference::owed( supply, shadow_index( SHD ).index, 0 ) );
-    int64_t alice_before = token_balance( "sysio.token"_n, "alice"_n, EOS.value );
+    int64_t alice_before = token_balance( "sysio.token"_n, "alice"_n, WIRE.value );
     BOOST_REQUIRE_EQUAL( success(), shadow_claim( "alice"_n, SHD ) );
-    BOOST_REQUIRE_EQUAL( alice_before + donation, token_balance( "sysio.token"_n, "alice"_n, EOS.value ) );
+    BOOST_REQUIRE_EQUAL( alice_before + donation, token_balance( "sysio.token"_n, "alice"_n, WIRE.value ) );
     const auto held = shadow_account( "alice"_n, SHD );
     BOOST_REQUIRE_EQUAL( shadow_index( SHD ).index, held.index_checkpoint );
     BOOST_REQUIRE_EQUAL( 0u, held.owed_wire );
@@ -1649,16 +1713,16 @@ BOOST_FIXTURE_TEST_CASE( yield_index_grows_past_64_bits, sysio_swap_tester ) try
 
     // A second add accrues from a checkpoint that is itself past 2^64.
     const auto second = yield_reference::distribute( donation, supply, first.carry );
-    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( donation, EOS4 ), SHD ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( donation, WIRE9 ), SHD ) );
     BOOST_REQUIRE_EQUAL( first.index_delta + second.index_delta, yield_reference::wide( shadow_index( SHD ).index ) );
     BOOST_REQUIRE_EQUAL( donation, yield_reference::owed( supply, shadow_index( SHD ).index, held.index_checkpoint ) );
-    alice_before = token_balance( "sysio.token"_n, "alice"_n, EOS.value );
+    alice_before = token_balance( "sysio.token"_n, "alice"_n, WIRE.value );
     BOOST_REQUIRE_EQUAL( success(), shadow_claim( "alice"_n, SHD ) );
-    BOOST_REQUIRE_EQUAL( alice_before + donation, token_balance( "sysio.token"_n, "alice"_n, EOS.value ) );
+    BOOST_REQUIRE_EQUAL( alice_before + donation, token_balance( "sysio.token"_n, "alice"_n, WIRE.value ) );
     BOOST_REQUIRE_EQUAL( 0u, shadow_index( SHD ).pot );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( yield_is_credited_before_shares_are_priced, sysio_swap_tester ) try {
+BOOST_FIXTURE_TEST_CASE( yield_is_credited_before_shares_are_priced, sysio_swap_yield_tester ) try {
     setup_yield_pool();
     const int64_t donation = 300'0000;
     // alice deposits more shadow to mint with. The contract now holds shadow that
@@ -1677,7 +1741,7 @@ BOOST_FIXTURE_TEST_CASE( yield_is_credited_before_shares_are_priced, sysio_swap_
 
     // A mint after a distribution prices against the accrued pool: the yield
     // belongs to the shares that existed, so the new shares pay for their cut.
-    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( donation, EOS4 ), SHD ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( donation, WIRE9 ), SHD ) );
     auto before = system_balance( SHEO.value );
     int64_t owed = owed_now();
     BOOST_REQUIRE_LT( yield_reference::owed( before.at(0), shadow_index( SHD ).index, 0 ), owed );
@@ -1685,40 +1749,40 @@ BOOST_FIXTURE_TEST_CASE( yield_is_credited_before_shares_are_priced, sysio_swap_
     const int64_t pay_shadow = reference::add_leg( shares, before.at(0), before.at(2) );
     const int64_t pay_wire   = reference::add_leg( shares, before.at(1) + owed, before.at(2) );
     const int64_t alice_shadow = deposit_of( "alice"_n, SHADOW );
-    const int64_t alice_wire   = deposit_of( "alice"_n, WIRE );
-    BOOST_REQUIRE_EQUAL( success(), addliquidity( "alice"_n, asset( shares, SHEO4 ),
-                                                  asset( pay_shadow, SHD4 ), asset( pay_wire, EOS4 ) ) );
+    const int64_t alice_wire   = balance( "alice"_n, WIRE9 );
+    BOOST_REQUIRE_EQUAL( success(), addliquidity( "alice"_n, asset( shares, SHEO6 ),
+                                                  asset( pay_shadow, SHD4 ), asset( pay_wire, WIRE9 ) ) );
     auto after = system_balance( SHEO.value );
     BOOST_REQUIRE_EQUAL( before.at(0) + pay_shadow,        after.at(0) );
     BOOST_REQUIRE_EQUAL( before.at(1) + owed + pay_wire,   after.at(1) );
     BOOST_REQUIRE_EQUAL( before.at(2) + shares,            after.at(2) );
     BOOST_REQUIRE_EQUAL( alice_shadow - pay_shadow, deposit_of( "alice"_n, SHADOW ) );
-    BOOST_REQUIRE_EQUAL( alice_wire - pay_wire,     deposit_of( "alice"_n, WIRE ) );
-    BOOST_REQUIRE( pending_payout( "shadowtoken"_n ).empty() );
+    BOOST_REQUIRE_EQUAL( alice_wire - pay_wire,     balance( "alice"_n, WIRE9 ) );
+    BOOST_REQUIRE( pending_payout( "sysio.liq"_n ).empty() );
     // Paying one unit less than the accrued price is refused: the quote is the
     // accrued one, not the stale one a caller might compute from the row.
-    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( donation, EOS4 ), SHD ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( donation, WIRE9 ), SHD ) );
     before = after;
     owed = owed_now();
     BOOST_REQUIRE_LT( 0, owed );
     const int64_t stale_wire = reference::add_leg( shares, before.at(1), before.at(2) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("available is less than expected"),
-        addliquidity( "alice"_n, asset( shares, SHEO4 ), asset( pay_shadow, SHD4 ), asset( stale_wire, EOS4 ) ) );
+        addliquidity( "alice"_n, asset( shares, SHEO6 ), asset( pay_shadow, SHD4 ), asset( stale_wire, WIRE9 ) ) );
     // The refused action left nothing behind: no credit, no receipt.
     BOOST_REQUIRE( before == system_balance( SHEO.value ) );
-    BOOST_REQUIRE( pending_payout( "shadowtoken"_n ).empty() );
+    BOOST_REQUIRE( pending_payout( "sysio.liq"_n ).empty() );
 
     // A burn after a distribution pays out of the accrued pool too.
     const int64_t get_shadow = reference::remove_leg( shares, before.at(0), before.at(2) );
     const int64_t get_wire   = reference::remove_leg( shares, before.at(1) + owed, before.at(2) );
-    const int64_t alice_wire_before = deposit_of( "alice"_n, WIRE );
-    BOOST_REQUIRE_EQUAL( success(), remliquidity( "alice"_n, asset( shares, SHEO4 ),
-                                                  asset( get_shadow, SHD4 ), asset( get_wire, EOS4 ) ) );
+    const int64_t alice_wire_before = balance( "alice"_n, WIRE9 );
+    BOOST_REQUIRE_EQUAL( success(), remliquidity( "alice"_n, asset( shares, SHEO6 ),
+                                                  asset( get_shadow, SHD4 ), asset( get_wire, WIRE9 ) ) );
     after = system_balance( SHEO.value );
     BOOST_REQUIRE_EQUAL( before.at(0) - get_shadow,        after.at(0) );
     BOOST_REQUIRE_EQUAL( before.at(1) + owed - get_wire,   after.at(1) );
     BOOST_REQUIRE_EQUAL( before.at(2) - shares,            after.at(2) );
-    BOOST_REQUIRE_EQUAL( alice_wire_before + get_wire, deposit_of( "alice"_n, WIRE ) );
+    BOOST_REQUIRE_EQUAL( alice_wire_before + get_wire, balance( "alice"_n, WIRE9 ) );
     // Mint and burn move shadow between deposits and the pool, never out of the
     // contract, and its row is settled at the current index: nothing is owed
     // until the next distribution.
@@ -1730,14 +1794,14 @@ BOOST_FIXTURE_TEST_CASE( yield_is_credited_before_shares_are_priced, sysio_swap_
     BOOST_REQUIRE( after == system_balance( SHEO.value ) );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( yield_accrues_before_a_swap_is_priced, sysio_swap_tester ) try {
+BOOST_FIXTURE_TEST_CASE( yield_accrues_before_a_swap_is_priced, sysio_swap_yield_tester ) try {
     setup_yield_pool();
     const auto shadow_pool_of = [&]( const vector<int64_t>& pool ) { return pool.at(0); };
     const auto wire_pool_of   = [&]( const vector<int64_t>& pool ) { return pool.at(1); };
     const int     fee = pool_fee( SHEO );
     const int64_t pay = 1000'0000;
 
-    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( 100'0000, EOS4 ), SHD ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( 100'0000, WIRE9 ), SHD ) );
     auto before = system_balance( SHEO.value );
     const auto held = shadow_account( "sysio.swap"_n, SHD );
     const int64_t owed = yield_reference::owed( held.balance.get_amount(), shadow_index( SHD ).index,
@@ -1751,53 +1815,53 @@ BOOST_FIXTURE_TEST_CASE( yield_accrues_before_a_swap_is_priced, sysio_swap_teste
     const int64_t stale_out   = reference::receive( pay, wire_pool_of(before),        shadow_pool_of(before), fee );
     BOOST_REQUIRE_LT( accrued_out, stale_out );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("available is less than expected"),
-        exchange( "alice"_n, SHEO, extend(asset(pay, EOS4)), asset(stale_out, SHD4) ) );
+        exchange( "alice"_n, SHEO, extend(asset(pay, WIRE9)), asset(stale_out, SHD4) ) );
     BOOST_REQUIRE_EQUAL( success(),
-        exchange( "alice"_n, SHEO, extend(asset(pay, EOS4)), asset(accrued_out, SHD4) ) );
+        exchange( "alice"_n, SHEO, extend(asset(pay, WIRE9)), asset(accrued_out, SHD4) ) );
     auto after = system_balance( SHEO.value );
     BOOST_REQUIRE_EQUAL( wire_pool_of(before) + owed + pay,   wire_pool_of(after) );
     BOOST_REQUIRE_EQUAL( shadow_pool_of(before) - accrued_out, shadow_pool_of(after) );
     BOOST_REQUIRE_EQUAL( before.at(2), after.at(2) );          // no shares minted
-    BOOST_REQUIRE( pending_payout( "shadowtoken"_n ).empty() );
+    BOOST_REQUIRE( pending_payout( "sysio.liq"_n ).empty() );
 
     // Buy, settle, sell back. With the yield already in the pool before the buy
     // is priced there is nothing left to get in front of, so the round trip only
     // pays the fee twice and alice ends with less WIRE than she started.
-    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( 100'0000, EOS4 ), SHD ) );
-    const int64_t wire_start   = deposit_of( "alice"_n, WIRE );
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( 100'0000, WIRE9 ), SHD ) );
+    const int64_t wire_start   = balance( "alice"_n, WIRE9 );
     const int64_t shadow_start = deposit_of( "alice"_n, SHADOW );
-    BOOST_REQUIRE_EQUAL( success(), exchange( "alice"_n, SHEO, extend(asset(pay, EOS4)), asset(0, SHD4) ) );
+    BOOST_REQUIRE_EQUAL( success(), exchange( "alice"_n, SHEO, extend(asset(pay, WIRE9)), asset(0, SHD4) ) );
     const int64_t bought = deposit_of( "alice"_n, SHADOW ) - shadow_start;
     BOOST_REQUIRE_LT( 0, bought );
     BOOST_REQUIRE_EQUAL( success(), accrueyield( SHEO ) );     // nothing left pending
-    BOOST_REQUIRE_EQUAL( success(), exchange( "alice"_n, SHEO, shd(bought), asset(0, EOS4) ) );
+    BOOST_REQUIRE_EQUAL( success(), exchange( "alice"_n, SHEO, shd(bought), asset(0, WIRE9) ) );
     BOOST_REQUIRE_EQUAL( shadow_start, deposit_of( "alice"_n, SHADOW ) );
-    BOOST_REQUIRE_LT( deposit_of( "alice"_n, WIRE ), wire_start );
+    BOOST_REQUIRE_LT( balance( "alice"_n, WIRE9 ), wire_start );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( yield_payout_route_is_exact, sysio_swap_tester ) try {
+BOOST_FIXTURE_TEST_CASE( yield_payout_route_is_exact, sysio_swap_yield_tester ) try {
     setup_yield_pool();
     // A transfer from a shadow contract with no claim outstanding is an ordinary
     // deposit, and needs the ordinary deposit row: the payout route only exists
     // while a receipt does.
-    BOOST_REQUIRE_EQUAL( success(), shadow_issue( "alice"_n, "shadowtoken"_n, asset( 1'0000, SHD4 ) ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_mint( "sysio.liq"_n, asset( 1'0000, SHD4 ) ) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("extended_symbol not registered for this user,"
                                          " please run openext action or write exchange details in the memo of your transfer"),
-        shadow_transfer( "shadowtoken"_n, "sysio.swap"_n, asset( 1'0000, SHD4 ), "" ) );
-    BOOST_REQUIRE_EQUAL( success(), openext( "shadowtoken"_n, "alice"_n, SHADOW ) );
-    BOOST_REQUIRE_EQUAL( success(), shadow_transfer( "shadowtoken"_n, "sysio.swap"_n, asset( 1'0000, SHD4 ), "" ) );
-    BOOST_REQUIRE_EQUAL( 1'0000, deposit_of( "shadowtoken"_n, SHADOW ) );
+        shadow_transfer( "sysio.liq"_n, "sysio.swap"_n, asset( 1'0000, SHD4 ), "" ) );
+    BOOST_REQUIRE_EQUAL( success(), openext( "sysio.liq"_n, "alice"_n, SHADOW ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_transfer( "sysio.liq"_n, "sysio.swap"_n, asset( 1'0000, SHD4 ), "" ) );
+    BOOST_REQUIRE_EQUAL( 1'0000, deposit_of( "sysio.liq"_n, SHADOW ) );
     BOOST_REQUIRE_EQUAL( YieldPoolWire, system_balance( SHEO.value ).at(1) );
 
     // The shadow's own holding (issued above) makes it a holder too; a
     // distribution and an accrual still settle the contract's share exactly,
     // on everything it holds (the pool plus that one deposited unit).
     const int64_t donation = 10'0000;
-    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( donation, EOS4 ), SHD ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( donation, WIRE9 ), SHD ) );
     const int64_t owed = yield_reference::owed( YieldPoolShadow + 1'0000, shadow_index( SHD ).index, 0 );
     BOOST_REQUIRE_EQUAL( success(), accrueyield( SHEO ) );
     BOOST_REQUIRE_EQUAL( YieldPoolWire + owed, system_balance( SHEO.value ).at(1) );
-    BOOST_REQUIRE( pending_payout( "shadowtoken"_n ).empty() );
+    BOOST_REQUIRE( pending_payout( "sysio.liq"_n ).empty() );
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
@@ -1805,17 +1869,17 @@ BOOST_FIXTURE_TEST_CASE( yield_payout_route_is_exact, sysio_swap_tester ) try {
 // reservoir, not in the funder's deposit.
 // ---------------------------------------------------------------------------
 
-BOOST_FIXTURE_TEST_CASE( yield_funding_fills_the_reservoir, sysio_swap_tester ) try {
+BOOST_FIXTURE_TEST_CASE( yield_funding_fills_the_reservoir, sysio_swap_yield_tester ) try {
     setup_yield_pool();
-    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, ETUSD3,
-        extend(asset::from_string("1.00 TUSD")), extend(asset::from_string("1.0000 EOS")), 10, name{}) );
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, ETUSD5,
+        extend(asset::from_string("1.00 TUSD")), extend( asset( 1'0000, WIRE9 ) ), 10, name{}) );
     BOOST_REQUIRE( !has_reservoir( ETUSD ) );   // plain pools queue nothing
 
     // Only a yield pool, in its shadow symbol, a positive amount, by the funder.
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair has no yield leg"), fundyield( "alice"_n, ETUSD, asset( 1'0000, EOS4 ) ) );
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair token does not exist"), fundyield( "alice"_n, EOS, asset( 1'0000, SHD4 ) ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair has no yield leg"), fundyield( "alice"_n, ETUSD, asset( 1'0000, WIRE9 ) ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair token does not exist"), fundyield( "alice"_n, WIRE, asset( 1'0000, SHD4 ) ) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("quantity must be in the pair's shadow symbol"),
-                         fundyield( "alice"_n, SHEO, asset( 1'0000, EOS4 ) ) );
+                         fundyield( "alice"_n, SHEO, asset( 1'0000, WIRE9 ) ) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("quantity must be positive"), fundyield( "alice"_n, SHEO, asset( 0, SHD4 ) ) );
     BOOST_REQUIRE_EQUAL( error("missing authority of bob"), push_action( "sysio.swap"_n, "alice"_n, "fundyield"_n, mvo()
         ( "from", "bob"_n )( "pair_token", SHEO )( "quantity", asset( 1'0000, SHD4 ) ) ) );
@@ -1828,13 +1892,13 @@ BOOST_FIXTURE_TEST_CASE( yield_funding_fills_the_reservoir, sysio_swap_tester ) 
     const int64_t alice_deposit = deposit_of( "alice"_n, SHADOW );
     BOOST_REQUIRE_EQUAL( success(), fundyield( "alice"_n, SHEO, asset( first, SHD4 ) ) );
     auto pending = pending_funding( "alice"_n );
-    BOOST_REQUIRE_EQUAL( SHEO4.name(), pending["pair"].as_string() );
+    BOOST_REQUIRE_EQUAL( SHEO6.name(), pending["pair"].as_string() );
     BOOST_REQUIRE_EQUAL( asset( first, SHD4 ).to_string(), pending["quantity"]["quantity"].as_string() );
-    BOOST_REQUIRE_EQUAL( "shadowtoken", pending["quantity"]["contract"].as_string() );
+    BOOST_REQUIRE_EQUAL( "sysio.liq", pending["quantity"]["contract"].as_string() );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield funding does not match the pending fundyield"),
                          shadow_transfer( "alice"_n, "sysio.swap"_n, asset( first / 2, SHD4 ), "" ) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield funding does not match the pending fundyield"),
-                         transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset( 1'0000, EOS4 ), "" ) );
+                         transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset( 1'0000, WIRE9 ), "" ) );
     BOOST_REQUIRE_EQUAL( success(), shadow_transfer( "alice"_n, "sysio.swap"_n, asset( first, SHD4 ), "" ) );
     BOOST_REQUIRE_EQUAL( first, reservoir_of( SHEO ) );
     BOOST_REQUIRE_EQUAL( alice_deposit, deposit_of( "alice"_n, SHADOW ) );
@@ -1871,7 +1935,7 @@ BOOST_FIXTURE_TEST_CASE( yield_funding_fills_the_reservoir, sysio_swap_tester ) 
         BOOST_REQUIRE_EQUAL( swap_ram, ram_usage( "sysio.swap"_n ) );
         // While it is pending bob cannot deposit anything else...
         BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield funding does not match the pending fundyield"),
-                             transfer( "sysio.token"_n, "bob"_n, "sysio.swap"_n, asset( 1'0000, EOS4 ), "" ) );
+                             transfer( "sysio.token"_n, "bob"_n, "sysio.swap"_n, asset( 1'0000, WIRE9 ), "" ) );
         // ...and cancelling is his own call, not anyone else's.
         BOOST_REQUIRE_EQUAL( error("missing authority of bob"), cancelyield( "bob"_n, "alice"_n ) );
         BOOST_REQUIRE_EQUAL( success(), cancelyield( "bob"_n ) );
@@ -1879,14 +1943,14 @@ BOOST_FIXTURE_TEST_CASE( yield_funding_fills_the_reservoir, sysio_swap_tester ) 
         BOOST_REQUIRE_EQUAL( bob_ram, ram_usage( "bob"_n ) );
         BOOST_REQUIRE_EQUAL( wasm_assert_msg("no pending fundyield"), cancelyield( "bob"_n ) );
         // Ordinary deposits work again.
-        BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "bob"_n, "sysio.swap"_n, asset( 1'0000, EOS4 ), "" ) );
+        BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "bob"_n, "sysio.swap"_n, asset( 1'0000, WIRE9 ), "" ) );
         BOOST_REQUIRE_EQUAL( first + second + third, reservoir_of( SHEO ) );
     }
 
     // The reservoir is the contract's shadow too: it earns for the pool.
     BOOST_REQUIRE_EQUAL( YieldPoolShadow + 1'0000 + first + second + third,
                          shadow_account( "sysio.swap"_n, SHD ).balance.get_amount() );
-    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( 100'0000, EOS4 ), SHD ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( 100'0000, WIRE9 ), SHD ) );
     const int64_t owed = yield_reference::owed( YieldPoolShadow + 1'0000 + first + second + third,
                                                 shadow_index( SHD ).index, 0 );
     BOOST_REQUIRE_EQUAL( success(), accrueyield( SHEO ) );
@@ -1899,13 +1963,10 @@ BOOST_FIXTURE_TEST_CASE( yield_funding_fills_the_reservoir, sysio_swap_tester ) 
 // horizon, and the proceeds go back to the shadow's holders.
 // ---------------------------------------------------------------------------
 
-BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_swap_tester ) try {
+BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_swap_yield_tester ) try {
     setup_yield_pool();
-    // The token moves the proceeds out of the contract under the contract's own
-    // authority: the deployment grants it the shadow token's sysio.code seat.
-    grant_shadow_code( "sysio.swap"_n, true );
-    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, ETUSD3,
-        extend(asset::from_string("1.00 TUSD")), extend(asset::from_string("1.0000 EOS")), 10, name{}) );
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, ETUSD5,
+        extend(asset::from_string("1.00 TUSD")), extend( asset( 1'0000, WIRE9 ) ), 10, name{}) );
     const uint32_t horizon_sec = 3600;
     const uint32_t cap_bps     = 1;
     // Sized the way setyield's docs prescribe: at a 0.1% pair fee the proportional
@@ -1918,7 +1979,7 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_
 
     // Only a yield pool with its parameters set can tick.
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair has no yield leg"), tickyield( ETUSD ) );
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair token does not exist"), tickyield( EOS ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair token does not exist"), tickyield( WIRE ) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield tick parameters not set"), tickyield( SHEO ) );
     // A floor of zero is as unset as a horizon of zero: the tick refuses it.
     BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, cap_bps, 0 ) );
@@ -1946,7 +2007,7 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_
     // the contract for the token's pot, which advances the index by the spec.
     before = system_balance( SHEO.value );
     auto idx_before = shadow_index( SHD );
-    const int64_t contract_wire_before = token_balance( "sysio.token"_n, "sysio.swap"_n, EOS.value );
+    const int64_t contract_wire_before = token_balance( "sysio.token"_n, "sysio.swap"_n, WIRE.value );
     BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
     const int64_t ticked_at = last_tick_us( SHEO );
     int64_t clip = yield_reference::clip_size( queued, ticked_at - funded_at, horizon_sec,
@@ -1959,7 +2020,7 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_
     BOOST_REQUIRE_EQUAL( wire_pool_of(before) - proceeds, wire_pool_of(after) );
     BOOST_REQUIRE_EQUAL( before.at(2), after.at(2) );
     BOOST_REQUIRE_EQUAL( queued - clip, reservoir_of( SHEO ) );
-    BOOST_REQUIRE_EQUAL( contract_wire_before - proceeds, token_balance( "sysio.token"_n, "sysio.swap"_n, EOS.value ) );
+    BOOST_REQUIRE_EQUAL( contract_wire_before - proceeds, token_balance( "sysio.token"_n, "sysio.swap"_n, WIRE.value ) );
     auto distributed = yield_reference::distribute( proceeds, ShadowIssuance, idx_before.carry );
     auto idx_after = shadow_index( SHD );
     BOOST_REQUIRE_EQUAL( yield_reference::wide( idx_before.index ) + distributed.index_delta,
@@ -2030,7 +2091,7 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_
     // collected is credited first, and the clip is priced against that pool.
     fund_yield_in_one_transaction( "alice"_n, SHEO, asset( queued, SHD4 ) );
     const int64_t refunded_at = last_tick_us( SHEO );
-    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( 100'0000, EOS4 ), SHD ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( 100'0000, WIRE9 ), SHD ) );
     const auto held_now = shadow_account( "sysio.swap"_n, SHD );
     const int64_t owed = yield_reference::owed( held_now.balance.get_amount(), shadow_index( SHD ).index,
                                                 held_now.index_checkpoint, held_now.owed_wire );
@@ -2043,12 +2104,11 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_
     after = system_balance( SHEO.value );
     BOOST_REQUIRE_EQUAL( shadow_pool_of(before) + clip,          shadow_pool_of(after) );
     BOOST_REQUIRE_EQUAL( wire_pool_of(before) + owed - proceeds, wire_pool_of(after) );
-    BOOST_REQUIRE( pending_payout( "shadowtoken"_n ).empty() );
+    BOOST_REQUIRE( pending_payout( "sysio.liq"_n ).empty() );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( yield_tick_cap_ignores_an_inflated_shadow_side, sysio_swap_tester ) try {
+BOOST_FIXTURE_TEST_CASE( yield_tick_cap_ignores_an_inflated_shadow_side, sysio_swap_yield_tester ) try {
     setup_yield_pool();
-    grant_shadow_code( "sysio.swap"_n, true );
     const uint32_t horizon_sec = 3600;
     const uint32_t cap_bps     = 1;
     const int64_t  clip_floor  = 1000;
@@ -2067,7 +2127,7 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_cap_ignores_an_inflated_shadow_side, sysio_s
     // would be set by the attacker it is meant to bound.
     const int64_t inflate = honest_depth;
     BOOST_REQUIRE_EQUAL( success(), shadow_transfer( "alice"_n, "sysio.swap"_n, asset( inflate, SHD4 ), "" ) );
-    BOOST_REQUIRE_EQUAL( success(), exchange( "alice"_n, SHEO, shd(inflate), asset(0, EOS4) ) );
+    BOOST_REQUIRE_EQUAL( success(), exchange( "alice"_n, SHEO, shd(inflate), asset(0, WIRE9) ) );
     const int64_t inflated_depth = shadow_pool_of( system_balance( SHEO.value ) );
     BOOST_REQUIRE_EQUAL( honest_depth + inflate, inflated_depth );
     BOOST_REQUIRE_EQUAL( honest_depth, last_tick_depth( SHEO ) );   // the record did not follow
@@ -2086,9 +2146,8 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_cap_ignores_an_inflated_shadow_side, sysio_s
     BOOST_REQUIRE_EQUAL( shadow_pool_of( system_balance( SHEO.value ) ), last_tick_depth( SHEO ) );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( yield_tick_never_sells_below_the_clip_floor, sysio_swap_tester ) try {
+BOOST_FIXTURE_TEST_CASE( yield_tick_never_sells_below_the_clip_floor, sysio_swap_yield_tester ) try {
     setup_yield_pool();
-    grant_shadow_code( "sysio.swap"_n, true );
     const uint32_t horizon_sec = 3600;
     const uint32_t cap_bps     = 1;            // cap = 1e6 against the 1e10 shadow side
     const int      fee         = pool_fee( SHEO );
@@ -2177,9 +2236,8 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_never_sells_below_the_clip_floor, sysio_swap
     BOOST_REQUIRE_LT( reservoir_of( SHEO ), queued );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( yield_tick_never_sells_below_a_fee_bearing_output, sysio_swap_tester ) try {
+BOOST_FIXTURE_TEST_CASE( yield_tick_never_sells_below_a_fee_bearing_output, sysio_swap_yield_tester ) try {
     setup_yield_pool();
-    grant_shadow_code( "sysio.swap"_n, true );
     const uint32_t horizon_sec = 3600;
     const uint32_t cap_bps     = uint32_t(yield_reference::BpsTotal);   // the cap is not what binds here
     const int64_t  clip_floor  = 1000;
@@ -2235,7 +2293,7 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_never_sells_below_a_fee_bearing_output, sysi
     BOOST_REQUIRE_EQUAL( queued - clip, reservoir_of( SHEO ) );
     BOOST_REQUIRE_EQUAL( shadow_pool_of(before) + clip,      shadow_pool_of( system_balance( SHEO.value ) ) );
     BOOST_REQUIRE_EQUAL( wire_pool_of(before) - proceeds,    wire_pool_of( system_balance( SHEO.value ) ) );
-    BOOST_REQUIRE( pending_payout( "shadowtoken"_n ).empty() );
+    BOOST_REQUIRE( pending_payout( "sysio.liq"_n ).empty() );
 
     // (The remainder drain is exempt from this gate, so dust is not stranded by
     // it either. yield_tick_never_sells_below_the_clip_floor pins that: at its
@@ -2777,7 +2835,7 @@ BOOST_FIXTURE_TEST_CASE( guard_semantics_on_the_memo_path, sysio_swap_tester ) t
     // badtoken's EOS is a different token from the system token's EOS: it is the
     // pair's first leg, seeded with the contract's authority.
     BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, extended_symbol{EOS4, "badtoken"_n}) );
-    BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, WIRE) );
+    BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, SYSTEM_TOKEN) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("token is not a leg of any pair"),
         transfer( "badtoken"_n, "alice"_n, "sysio.swap"_n, asset::from_string("2000.0000 EOS"), "") );
     BOOST_REQUIRE_EQUAL( success(), seed_transfer( "badtoken"_n, "alice"_n, asset::from_string("2000.0000 EOS"), "") );

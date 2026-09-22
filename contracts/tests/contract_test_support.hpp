@@ -4,6 +4,7 @@
 #include <sysio/testing/tester.hpp>
 
 #include <fc/exception/exception.hpp>
+#include <fc/slug_name.hpp>
 #include <fc/variant_object.hpp>
 
 namespace sysio_system::test_support {
@@ -96,6 +97,12 @@ typename Tester::action_result push_contract_action_and_produce_block(
 //  addresses it cares about; the contract validates the set against the row's
 //  ChainKind (see validate_outpost_addrs in sysio.chains.cpp).
 // ---------------------------------------------------------------------------
+
+/// The variant form of a `slug_name` action argument (`chain_code`, `token_code`,
+/// `code`, ...): the packed value under the struct's one field.
+inline fc::mutable_variant_object codename_mvo(std::string_view s) {
+   return fc::mutable_variant_object()("value", fc::slug_name{ s }.value);
+}
 
 /// Every field empty — a chain registered before its remote contracts exist.
 /// Valid for any kind; both operator daemons fail closed and skip such a row.

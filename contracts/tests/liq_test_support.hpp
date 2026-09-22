@@ -5,6 +5,8 @@
 #include <sysio/chain/name.hpp>
 #include <sysio/chain/symbol.hpp>
 #include <sysio/opp/types/types.pb.h>
+#include <fc/crypto/elliptic_ed.hpp>
+#include <fc/crypto/public_key.hpp>
 
 #include <magic_enum/magic_enum.hpp>
 
@@ -40,6 +42,13 @@ inline std::vector<char> parked_row_bytes(const sysio::chain::controller& contro
       liq_account, sysio::chain::compute_table_id(sysio::chain::name{ "parked" }.to_uint64_t()), std::string_view(key)));
    if (itr == kv_idx.end()) return {};
    return std::vector<char>(itr->value.data(), itr->value.data() + itr->value.size());
+}
+
+/// The chain-native address `sysio.authex::recordlink` carries beside a linked key. On SVM
+/// that is the ED key's own 32 bytes -- the form `sysio.liq` parks against and sweeps by.
+inline std::vector<char> native_address_of(const fc::crypto::public_key& pub_key) {
+   const auto raw = pub_key.get<fc::crypto::ed::public_key_shim>().serialize();
+   return std::vector<char>(raw.begin(), raw.end());
 }
 
 } // namespace sysio_liq::test_support

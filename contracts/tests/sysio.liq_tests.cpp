@@ -32,6 +32,7 @@ using namespace sysio::opp::types;
 using namespace fc;
 
 using mvo = fc::mutable_variant_object;
+using sysio_system::test_support::codename_mvo;
 
 namespace {
 
@@ -139,7 +140,6 @@ public:
 
    // --- slugs and keys ---
 
-   static mvo slug(std::string_view s) { return mvo()("value", fc::slug_name{ s }.value); }
    static uint64_t slug_value(std::string_view s) { return fc::slug_name{ s }.value; }
 
    static fc::crypto::public_key ed_key() {
@@ -155,7 +155,7 @@ public:
    // Registrations inside the epoch-0 bootstrap window land ACTIVE, as the launch bootstrap's do.
    action_result regchain(ChainKind kind, std::string_view code, uint32_t external_chain_id) {
       return push(CHAINS_ACCOUNT, chains_abi_ser, CHAINS_ACCOUNT, "regchain"_n, mvo()
-         ("kind", kind)("code", slug(code))("external_chain_id", external_chain_id)
+         ("kind", kind)("code", codename_mvo(code))("external_chain_id", external_chain_id)
          ("name", std::string("outpost"))("description", std::string{})
          ("outpost", sysio_system::test_support::no_outpost_mvo()));
    }
@@ -163,11 +163,11 @@ public:
    action_result regtoken(TokenKind kind, std::string_view code, uint32_t precision, ChainKind chain_kind,
                           std::string_view chain_code, const std::vector<char>& address) {
       auto r = push(TOKENS_ACCOUNT, tokens_abi_ser, TOKENS_ACCOUNT, "regtoken"_n, mvo()
-         ("kind", kind)("code", slug(code))("symbol_name", std::string(code))("description", std::string{})
+         ("kind", kind)("code", codename_mvo(code))("symbol_name", std::string(code))("description", std::string{})
          ("precision", precision)("address", mvo()("kind", chain_kind)("address", address)));
       if (r != success()) return r;
       return push(TOKENS_ACCOUNT, tokens_abi_ser, TOKENS_ACCOUNT, "regctok"_n, mvo()
-         ("chain_code", slug(chain_code))("token_code", slug(code))("contract_addr", address)("is_native", false));
+         ("chain_code", codename_mvo(chain_code))("token_code", codename_mvo(code))("contract_addr", address)("is_native", false));
    }
    /// A 9-decimal token at a placeholder address of the chain family's width.
    action_result regtoken(TokenKind kind, std::string_view code, ChainKind chain_kind, std::string_view chain_code) {
@@ -185,29 +185,32 @@ public:
    }
    /// A link recorded the depot's way, signed as sysio.authex.
    action_result recordlink(name account, ChainKind kind, const fc::crypto::public_key& pub_key) {
+      // The trusted path carries the chain-native address alongside the key; for the ED keys
+      // these tests link on SVM that is the key's own 32 bytes.
       return push(AUTHEX_ACCOUNT, authex_abi_ser, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
-         ("account", account)("chain_kind", kind)("pub_key", pub_key));
+         ("account", account)("chain_kind", kind)("pub_key", pub_key)
+         ("native_address", sysio_liq::test_support::native_address_of(pub_key)));
    }
 
    // --- sysio.liq actions ---
 
    action_result create(symbol sym, std::string_view chain_code, std::string_view token_code, name signer = LIQ_ACCOUNT) {
-      return push_liq(signer, "create"_n, mvo()("sym", sym)("chain_code", slug(chain_code))("token_code", slug(token_code)));
+      return push_liq(signer, "create"_n, mvo()("sym", sym)("chain_code", codename_mvo(chain_code))("token_code", codename_mvo(token_code)));
    }
    action_result mintsynd(std::string_view chain_code, uint64_t sequence, name account, std::string_view token_code,
                           uint64_t amount, name signer = MSGCH_ACCOUNT) {
-      return push_liq(signer, "mintsynd"_n, mvo()("chain_code", slug(chain_code))("sequence", sequence)
-         ("account", account)("token_code", slug(token_code))("amount", amount));
+      return push_liq(signer, "mintsynd"_n, mvo()("chain_code", codename_mvo(chain_code))("sequence", sequence)
+         ("account", account)("token_code", codename_mvo(token_code))("amount", amount));
    }
    action_result park(std::string_view chain_code, uint64_t sequence, ChainKind kind, const std::vector<char>& pubkey,
                       std::string_view token_code, uint64_t amount, name signer = MSGCH_ACCOUNT) {
-      return push_liq(signer, "park"_n, mvo()("chain_code", slug(chain_code))("sequence", sequence)
-         ("chain_kind", kind)("pubkey", pubkey)("token_code", slug(token_code))("amount", amount));
+      return push_liq(signer, "park"_n, mvo()("chain_code", codename_mvo(chain_code))("sequence", sequence)
+         ("chain_kind", kind)("pubkey", pubkey)("token_code", codename_mvo(token_code))("amount", amount));
    }
    action_result mintyield(std::string_view chain_code, uint64_t sequence, uint64_t epoch, std::string_view token_code,
                            uint64_t amount, name signer = MSGCH_ACCOUNT) {
-      return push_liq(signer, "mintyield"_n, mvo()("chain_code", slug(chain_code))("sequence", sequence)
-         ("epoch", epoch)("token_code", slug(token_code))("amount", amount));
+      return push_liq(signer, "mintyield"_n, mvo()("chain_code", codename_mvo(chain_code))("sequence", sequence)
+         ("epoch", epoch)("token_code", codename_mvo(token_code))("amount", amount));
    }
    action_result queueyield(symbol sym, name signer = "alice"_n) {
       return push_liq(signer, "queueyield"_n, mvo()("sym", sym.to_symbol_code()));
@@ -251,7 +254,7 @@ public:
                             uint64_t initial_chain_amount, uint64_t initial_wire_amount, int32_t fee = 30,
                             int64_t locked_shares = 0, uint32_t horizon_sec = 86400, uint32_t depth_cap_bps = 300,
                             int64_t clip_floor = 1000, name signer = LIQ_ACCOUNT) {
-      return push_liq(signer, "regliqpool"_n, mvo()("chain_code", slug(chain_code))("token_code", slug(token_code))
+      return push_liq(signer, "regliqpool"_n, mvo()("chain_code", codename_mvo(chain_code))("token_code", codename_mvo(token_code))
          ("pair_symbol", pair_symbol)("initial_chain_amount", initial_chain_amount)
          ("initial_wire_amount", initial_wire_amount)("fee", fee)("locked_shares", locked_shares)
          ("conversion_horizon_sec", horizon_sec)("depth_cap_bps", depth_cap_bps)("clip_floor", clip_floor));
@@ -261,7 +264,7 @@ public:
    }
    action_result importsynd(std::string_view chain_code, std::string_view token_code, const fc::variants& credits,
                             name signer = LIQ_ACCOUNT) {
-      return push_liq(signer, "importsynd"_n, mvo()("chain_code", slug(chain_code))("token_code", slug(token_code))
+      return push_liq(signer, "importsynd"_n, mvo()("chain_code", codename_mvo(chain_code))("token_code", codename_mvo(token_code))
          ("credits", credits));
    }
    action_result importdone(name signer = LIQ_ACCOUNT) {

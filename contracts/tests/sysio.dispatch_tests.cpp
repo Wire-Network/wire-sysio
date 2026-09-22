@@ -58,6 +58,7 @@ using namespace sysio::chain;
 using namespace sysio::opp::types;
 
 using mvo = fc::mutable_variant_object;
+using sysio_system::test_support::codename_mvo;
 
 namespace {
 
@@ -65,11 +66,6 @@ constexpr uint64_t PROTOBUF_VARINT_PAYLOAD_MASK = 0x7fu;
 constexpr uint32_t PROTOBUF_VARINT_PAYLOAD_BITS = 7u;
 constexpr uint8_t  PROTOBUF_VARINT_CONTINUATION_BIT = 0x80u;
 constexpr uint32_t PROTOBUF_FIELD_TAG_SHIFT = 3u;
-
-/// SlugName mvo helper for v6 action arguments.
-inline fc::mutable_variant_object codename_mvo(std::string_view s) {
-   return mvo()("value", fc::slug_name{s}.value);
-}
 
 /** Append one unsigned protobuf varint to a hostile-wire-format fixture. */
 void append_proto_varint(std::vector<char>& out, uint64_t value) {
@@ -503,10 +499,14 @@ public:
    }
 
    std::vector<char> create_eth_authex_link(name account) {
+      return create_eth_authex_link(account, fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em));
+   }
+
+   /// Link `account` to the EM key behind `priv` through a user-created `createlink`.
+   std::vector<char> create_eth_authex_link(name account, const fc::crypto::private_key& priv) {
       using namespace fc::crypto;
       using namespace sysio::opp::types;
 
-      auto priv = private_key::generate(private_key::key_type::em);
       auto pub  = priv.get_public_key();
       const uint64_t nonce = control->head().block_time().time_since_epoch().count() / 1000;
 
@@ -1457,6 +1457,95 @@ public:
       produce_blocks(124);
       BOOST_REQUIRE_EQUAL(success(),
          push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n, mvo()));
+   }
+
+   // ── sysio.liq inbound routing (SYNDICATE_LIQ / LIQ_YIELD) ─────────────────
+
+   static constexpr auto TOKENS_ACCOUNT = "sysio.tokens"_n;
+   static constexpr auto LIQ_ACCOUNT    = "sysio.liq"_n;
+   static inline const symbol LIQETH_SYM = symbol::from_string("9,LIQETH");
+   /// One whole liq token in the depot's 9-decimal frame.
+   static constexpr int64_t LIQ_UNIT = 1'000'000'000;
+
+   /// Register `code` on sysio.tokens as `kind` at the depot's 9-decimal precision and bind
+   /// it to `chain_code` (EVM address bytes; the registries only check the length).
+   action_result regtoken(TokenKind kind, std::string_view code, std::string_view chain_code) {
+      const std::vector<char> addr(20, '\x5a');
+      auto r = push(TOKENS_ACCOUNT, tokens_abi, TOKENS_ACCOUNT, "regtoken"_n, mvo()
+         ("kind", kind)("code", codename_mvo(code))("symbol_name", std::string(code))
+         ("description", std::string{})("precision", 9)
+         ("address", mvo()("kind", ChainKind::CHAIN_KIND_EVM)("address", addr)));
+      if (r != success()) return r;
+      return push(TOKENS_ACCOUNT, tokens_abi, TOKENS_ACCOUNT, "regctok"_n, mvo()
+         ("chain_code", codename_mvo(chain_code))("token_code", codename_mvo(code))
+         ("contract_addr", addr)("is_native", false));
+   }
+
+   /// Deploy sysio.tokens + sysio.liq and register the bootstrapped outpost's liq token
+   /// ("LIQETH" on ETH) with its shadow, plus two tokens the shadow ledger must refuse: a
+   /// plain ERC20 ("USDCETH") and a liq token nobody opened a shadow for ("LIQTWO").
+   /// `bootstrap_for_dispatch` must have run first — registrations inside the epoch-0
+   /// bootstrap window land ACTIVE.
+   void setup_liq_for_dispatch() {
+      create_accounts({TOKENS_ACCOUNT, LIQ_ACCOUNT});
+      produce_blocks();
+      deploy(TOKENS_ACCOUNT, contracts::tokens_wasm(), contracts::tokens_abi(), tokens_abi);
+      deploy(LIQ_ACCOUNT,    contracts::liq_wasm(),    contracts::liq_abi(),    liq_abi);
+      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_LIQ,   "LIQETH",  "ETH"));
+      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_LIQ,   "LIQTWO",  "ETH"));
+      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_ERC20, "USDCETH", "ETH"));
+      BOOST_REQUIRE_EQUAL(success(), push(LIQ_ACCOUNT, liq_abi, LIQ_ACCOUNT, "create"_n, mvo()
+         ("sym", LIQETH_SYM)("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("LIQETH"))));
+      produce_blocks();
+   }
+
+   fc::variant liq_row(name table, const char* type, name scope, uint64_t id) {
+      auto data = get_row_by_id(LIQ_ACCOUNT, scope, table, id);
+      return data.empty() ? fc::variant() : liq_abi.binary_to_variant(
+         type, data, abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// `holder`'s LIQETH shadow balance; 0 without a row.
+   int64_t liq_balance(name holder) {
+      const auto row = liq_row("accounts"_n, "account", holder, LIQETH_SYM.to_symbol_code().value);
+      return row.is_null() ? 0 : row["balance"].as<asset>().get_amount();
+   }
+
+   /// The LIQETH shadow supply; 0 without a stat row.
+   int64_t liq_supply() {
+      const auto row = liq_row("stat"_n, "currency_stats", LIQ_ACCOUNT, LIQETH_SYM.to_symbol_code().value);
+      return row.is_null() ? 0 : row["supply"].as<asset>().get_amount();
+   }
+
+   /// LIQETH yield reported by the outpost and not yet queued to the swap; 0 without a row.
+   int64_t liq_pending() {
+      const auto row = liq_row("liqpending"_n, "pending_yield", LIQ_ACCOUNT, LIQETH_SYM.to_symbol_code().value);
+      return row.is_null() ? 0 : row["quantity"].as<asset>().get_amount();
+   }
+
+   /// The per-outpost inbound cursor (`last_sequence`, `last_epoch`); null before any credit lands.
+   fc::variant liq_cursor(std::string_view chain_code) {
+      return liq_row("liqcursors"_n, "liq_cursor", LIQ_ACCOUNT, fc::slug_name{chain_code}.value);
+   }
+
+   /// The LIQETH balance parked against an unlinked `pubkey` of `kind`; 0 without a row.
+   int64_t liq_parked(ChainKind kind, const std::vector<char>& pubkey) {
+      using namespace sysio_liq::test_support;
+      const auto data = parked_row_bytes(*control, LIQ_ACCOUNT, parked_key(LIQETH_SYM.to_symbol_code(), kind, pubkey));
+      if (data.empty()) return 0;
+      const auto row = liq_abi.binary_to_variant(
+         "parked_row", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+      return row["holding"]["balance"].as<asset>().get_amount();
+   }
+
+   /// Every action's console in `trace`, inline actions included: msgch's own drops print on
+   /// `deliver`, a downstream contract's on the inline action msgch sent it.
+   static std::string all_console(const transaction_trace_ptr& trace) {
+      std::string console;
+      for (const auto& action_trace : trace->action_traces) {
+         console += action_trace.console;
+      }
+      return console;
    }
 
    abi_serializer msgch_abi, opreg_abi, uwrit_abi, epoch_abi, reserv_abi, authex_abi, dclaim_abi,
@@ -6656,9 +6745,9 @@ BOOST_FIXTURE_TEST_CASE(syndicate_liq_credits_a_linked_user_and_parks_an_unlinke
 
    const auto eth    = fc::slug_name{"ETH"}.value;
    const auto liqeth = fc::slug_name{"LIQETH"}.value;
-   // An EVM key nobody links.
-   const auto stranger = em_pubkey_bytes(
-      fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key());
+   // An EVM key nobody has linked yet.
+   const auto stranger_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
+   const auto stranger     = em_pubkey_bytes(stranger_key.get_public_key());
    constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
 
    const auto env = encode_envelope_with_mixed_attestations(current_epoch(), {
@@ -6687,6 +6776,15 @@ BOOST_FIXTURE_TEST_CASE(syndicate_liq_credits_a_linked_user_and_parks_an_unlinke
    BOOST_CHECK_EQUAL(9u, cursor["last_sequence"].as<uint64_t>());
    BOOST_CHECK_EQUAL(0u, cursor["last_epoch"].as<uint64_t>());
    BOOST_CHECK_NE(std::string::npos, console.find("sysio.liq::mintsynd: DROP -- replayed sequence"));
+
+   // The stranger links the key later: createlink sweeps the parked shadow into the new
+   // account inline, so nothing is left parked and no permissionless sweep is needed.
+   create_accounts({"stranger"_n});
+   produce_blocks();
+   create_eth_authex_link("stranger"_n, stranger_key);
+   BOOST_CHECK_EQUAL(3 * LIQ_UNIT, liq_balance("stranger"_n));
+   BOOST_CHECK_EQUAL(0, liq_parked(EVM, stranger));
+   BOOST_CHECK_EQUAL(9 * LIQ_UNIT, liq_supply());
 } FC_LOG_AND_RETHROW() }
 
 // LIQ_YIELD lands in sysio.liq's pending balance (no per-user routing) and stamps the report's
