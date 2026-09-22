@@ -17,9 +17,6 @@ import re
 import sys
 from pathlib import Path
 
-import click
-
-
 # ---------------------------------------------------------------------------
 # Naming helpers
 # ---------------------------------------------------------------------------
@@ -395,59 +392,71 @@ def generate(abi_files: list[str], output_dir: str, style: str) -> None:
     schema_path = os.path.join(output_dir, 'schema', 'system-contracts.schema.json')
     with open(schema_path, 'w') as f:
         json.dump(schema, f, indent=2)
-    click.echo(f'Written: {schema_path} ({len(all_definitions)} definitions)')
+    print(f'Written: {schema_path} ({len(all_definitions)} definitions)')
 
     # Write TypeScript
     ts_path = os.path.join(output_dir, 'typescript', 'SysioContractTypes.ts')
     with open(ts_path, 'w') as f:
         f.write('\n'.join(ts_lines).rstrip('\n') + '\n')
     iface_count = sum(1 for line in ts_lines if line.startswith('export interface'))
-    click.echo(f'Written: {ts_path} ({iface_count} interfaces)')
+    print(f'Written: {ts_path} ({iface_count} interfaces)')
 
 
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
-@click.command()
-@click.option('-B', '--build-dir', required=True, type=click.Path(exists=True, file_okay=False),
-              help='Path to wire-sysio build directory.')
-@click.option('-O', '--output-dir', required=True, type=click.Path(),
-              help='Output directory for generated types.')
-@click.option('-P', '--style', type=click.Choice(['snake', 'camel', 'both'], case_sensitive=False),
-              default='snake', show_default=True,
-              help='Property naming style for type members. "both" emits snake + camel (all optional).')
-@click.option('-f', '--force', is_flag=True, default=False,
-              help='Overwrite if output directory is not empty.')
-def main(build_dir: str, output_dir: str, style: str, force: bool) -> None:
-    """Generate JSON Schema and TypeScript types from Wire system contract ABIs."""
-    # Check output dir
-    if os.path.isdir(output_dir) and os.listdir(output_dir) and not force:
-        raise click.ClickException(
-            f'Output directory is not empty: {output_dir} (use --force to overwrite)')
+def run_cli() -> None:
+    """Load the optional Click dependency only when the CLI is executed.
 
-    # Gather ABIs
-    contracts_dir = os.path.join(build_dir, 'contracts')
-    abi_files = sorted(
-        str(p) for p in Path(contracts_dir).glob('sysio.*/sysio.*.abi')
-        if '.bad.' not in p.name  # skip known bad ABIs like sysio.token.bad.abi
-    )
+    The generator's core is imported by CTest unit tests and other Python
+    callers that do not need command-line parsing. Keeping Click behind this
+    boundary lets those callers run in the repository's minimal Python test
+    environments while preserving the existing CLI surface.
+    """
+    import click
 
-    if not abi_files:
-        raise click.ClickException(f'No sysio.*.abi files found in {contracts_dir}/')
+    @click.command()
+    @click.option('-B', '--build-dir', required=True, type=click.Path(exists=True, file_okay=False),
+                  help='Path to wire-sysio build directory.')
+    @click.option('-O', '--output-dir', required=True, type=click.Path(),
+                  help='Output directory for generated types.')
+    @click.option('-P', '--style', type=click.Choice(['snake', 'camel', 'both'], case_sensitive=False),
+                  default='snake', show_default=True,
+                  help='Property naming style for type members. "both" emits snake + camel (all optional).')
+    @click.option('-f', '--force', is_flag=True, default=False,
+                  help='Overwrite if output directory is not empty.')
+    def main(build_dir: str, output_dir: str, style: str, force: bool) -> None:
+        """Generate JSON Schema and TypeScript types from Wire system contract ABIs."""
+        # Check output dir
+        if os.path.isdir(output_dir) and os.listdir(output_dir) and not force:
+            raise click.ClickException(
+                f'Output directory is not empty: {output_dir} (use --force to overwrite)')
 
-    click.echo(f'Found {len(abi_files)} ABI files:')
-    for f in abi_files:
-        click.echo(f'  {f}')
+        # Gather ABIs
+        contracts_dir = os.path.join(build_dir, 'contracts')
+        abi_files = sorted(
+            str(p) for p in Path(contracts_dir).glob('sysio.*/sysio.*.abi')
+            if '.bad.' not in p.name  # skip known bad ABIs like sysio.token.bad.abi
+        )
 
-    generate(abi_files, output_dir, style)
+        if not abi_files:
+            raise click.ClickException(f'No sysio.*.abi files found in {contracts_dir}/')
 
-    click.echo()
-    click.echo('Generation complete:')
-    click.echo(f'  Schema:     {output_dir}/schema/system-contracts.schema.json')
-    click.echo(f'  TypeScript: {output_dir}/typescript/SysioContractTypes.ts')
-    click.echo(f'  Style:      {style}')
+        click.echo(f'Found {len(abi_files)} ABI files:')
+        for abi_file in abi_files:
+            click.echo(f'  {abi_file}')
+
+        generate(abi_files, output_dir, style)
+
+        click.echo()
+        click.echo('Generation complete:')
+        click.echo(f'  Schema:     {output_dir}/schema/system-contracts.schema.json')
+        click.echo(f'  TypeScript: {output_dir}/typescript/SysioContractTypes.ts')
+        click.echo(f'  Style:      {style}')
+
+    main()
 
 
 if __name__ == '__main__':
-    main()
+    run_cli()

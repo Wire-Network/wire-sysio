@@ -112,24 +112,6 @@ inline fc::variant chain_min_bond_mvo(std::string_view chain_code,
       ("config_timestamp_ms", uint64_t{0}));
 }
 
-/// Build an `authority` whose active permission is the account's own
-/// active key + a list of `{actor, sysio.code}` co-signers.
-authority active_with_code_authors(name account, const std::vector<name>& code_authors) {
-   authority a(base_tester::get_public_key(account, "active"));
-   a.accounts.push_back(permission_level_weight{
-      {account, config::sysio_code_name}, 1});
-   for (const auto& actor : code_authors) {
-      a.accounts.push_back(permission_level_weight{
-         {actor, config::sysio_code_name}, 1});
-   }
-   std::sort(a.accounts.begin(), a.accounts.end(),
-      [](const permission_level_weight& l, const permission_level_weight& r) {
-         return std::tie(l.permission.actor, l.permission.permission)
-              < std::tie(r.permission.actor, r.permission.permission);
-      });
-   return a;
-}
-
 /// Encode an Envelope wrapping a single attestation.
 std::vector<char> encode_envelope_with_one_attestation(
    uint32_t epoch_index,
@@ -423,11 +405,10 @@ public:
                          abi_serializer::create_yield_function(abi_serializer_max_time));
       }
 
-      grant_code_authors(OPREG_ACCOUNT, {MSGCH_ACCOUNT});
-      // NodeOwnerRegistration delegations (the production analogue is wired in ClusterManager):
-      // msgch -> sysio.roa (newnameduser/nodeownreg), and sysio.roa -> sysio.authex (recordlink).
-      grant_code_authors(ROA_ACCOUNT,    {MSGCH_ACCOUNT});
-      grant_code_authors(AUTHEX_ACCOUNT, {ROA_ACCOUNT});
+      // Production uses privileged system contracts and installs no cross-contract active grants.
+      // deploy() already marked msgch privileged; explicitly preserve the genesis ROA privilege so
+      // both msgch -> roa and roa -> authex exercise that exact authorization path.
+      set_privileged(ROA_ACCOUNT);
 
       produce_blocks();
    }
@@ -443,12 +424,6 @@ public:
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, parsed_abi), true);
       out_ser.set_abi(std::move(parsed_abi),
                       abi_serializer::create_yield_function(abi_serializer_max_time));
-   }
-
-   void grant_code_authors(name account, const std::vector<name>& code_authors) {
-      set_authority(account, config::active_name,
-                    active_with_code_authors(account, code_authors),
-                    config::owner_name);
    }
 
    action_result push(name contract, abi_serializer& ser, name signer,

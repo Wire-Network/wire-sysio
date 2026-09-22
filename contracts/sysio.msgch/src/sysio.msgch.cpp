@@ -520,11 +520,9 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
       case AT::ACTION_TYPE_DEPOSIT_REQUEST: {
          // opreg::depositinle checks require_auth(get_self()=opreg). msgch
          // must therefore declare opreg's own permission on the inline action.
-         // For the chain's inline-send auth check to accept this declaration,
-         // opreg.active must trust msgch@sysio.code — wired at cluster
-         // bootstrap via `updateauth` (see wire-tools-ts ClusterManager
-         // alongside the analogous sysio↔authex grant). The test fixture
-         // sets up the same delegation in `sysio.dispatch_tests.cpp`.
+         // Privileged sysio.msgch may declare the target contract's active
+         // permission on an inline action without a cross-contract active
+         // grant. Deployment must preserve msgch's privileged status.
          action(
             permission_level{OPREG_ACCOUNT, "active"_n},
             OPREG_ACCOUNT, "depositinle"_n,
@@ -535,8 +533,8 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
          break;
       }
       case AT::ACTION_TYPE_WITHDRAW_REQUEST: {
-         // Same delegation requirement as DEPOSIT_REQUEST — opreg.active must
-         // trust msgch@sysio.code at the cluster level.
+         // Same privileged-system-contract boundary as DEPOSIT_REQUEST: no
+         // msgch@sysio.code grant on opreg.active is required.
          action(
             permission_level{OPREG_ACCOUNT, "active"_n},
             OPREG_ACCOUNT, "withdrawinle"_n,
@@ -760,8 +758,9 @@ std::optional<em_identity> em_identity_from_uncompressed_key(const std::vector<c
 /// Decode an inbound NodeOwnerRegistration attestation and drive the NFT node-owner claim: create
 /// the vanity-named Wire account from the claim's wire_pub_key, then register the owner and record
 /// the depositor's ETH link. Both steps are inline-sent to sysio.roa declaring {sysio.roa, active}
-/// (accepted via the msgch@sysio.code delegation on sysio.roa.active), newnameduser first so its
-/// newaccount runs depth-first and the account exists before nodeownreg executes.
+/// (permitted because sysio.msgch is privileged; no cross-contract active grant is required),
+/// newnameduser first so its newaccount runs depth-first and the account exists before nodeownreg
+/// executes.
 ///
 /// Trust-OPP: a malformed envelope (undecodable proto, unparseable name, unusable key bytes,
 /// out-of-range tier) is silently dropped here -- nothing is sent. A well-formed envelope whose

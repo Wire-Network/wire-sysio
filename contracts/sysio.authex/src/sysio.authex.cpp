@@ -212,10 +212,11 @@ namespace sysio {
 
 
 // Trusted depot-only link insert -- the counterpart to createlink that skips signature/nonce
-// verification. The OPP NodeOwnerRegistration attestation is the proof; the chain accepts this
-// inline send because sysio.authex.active trusts the caller (sysio.roa@sysio.code). Unsupported
-// chain/key pairs are soft-dropped. Idempotent and non-throwing so the trust-OPP dispatch never
-// aborts when sysio.dclaim is absent or not yet privileged at bootstrap.
+// verification. The OPP NodeOwnerRegistration attestation is the proof; privileged sysio.roa
+// declares sysio.authex.active on the inline action, so no cross-contract active-permission
+// delegation is required. Unsupported chain/key pairs are soft-dropped. Idempotent and
+// non-throwing so the trust-OPP dispatch never aborts when sysio.dclaim is absent or not yet
+// privileged at bootstrap.
 [[sysio::action]] void authex::recordlink(const name& account, const opp::types::ChainKind chain_kind,
                                           const public_key& pub_key, const bytes& native_address) {
    require_auth(get_self());

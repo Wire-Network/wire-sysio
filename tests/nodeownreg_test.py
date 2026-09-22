@@ -10,8 +10,8 @@ pushing the two inline actions directly as sysio.roa:
                                                   -- register + inline-record the ETH link
 
 Verifies the nodeowners + nodeownerreg tables, plus the soft-fail (audit row) and hard-fail paths.
-The sysio.authex.active <- sysio.roa@sysio.code delegation that the inline recordlink needs is wired
-by the bios bootstrap (Cluster.py).
+The bios bootstrap marks sysio.roa privileged, so its inline recordlink may declare
+sysio.authex.active without a cross-contract permission delegation.
 """
 
 import json
@@ -101,7 +101,7 @@ testSuccessful = False
 try:
     TestHelper.printSystemInfo("BEGIN")
 
-    # Bootstraps sysio.roa (active) + sysio.authex + the authex.active <- sysio.roa@sysio.code grant.
+    # Bootstraps privileged sysio.roa + sysio.authex without cross-contract active grants.
     assert cluster.launch(
         pnodes=1,
         prodCount=1,

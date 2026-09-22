@@ -2118,8 +2118,8 @@ BOOST_FIXTURE_TEST_CASE( newnameduser_tier_name_rules, sysio_roa_tester ) try {
 // Under the create-in-flow model the depot (sysio.msgch) inline-sends newnameduser (creates the
 // account with the claimed wire key) then nodeownreg (registers + records the depositor's ETH key
 // via an inline sysio.authex::recordlink). These unit tests drive the two sysio.roa actions
-// directly, signed by ROA, the same way the depot would. The fixture wires the
-// sysio.authex.active <- sysio.roa@sysio.code delegation that authorizes the inline recordlink.
+// directly, signed by privileged ROA, the same way the depot would. No cross-contract active
+// permission is installed: privilege authorizes the declared sysio.authex.active permission.
 // ---------------------------------------------------------------------------
 
 /// Shared mirrors of sysio.roa's node-owner registration audit values.
@@ -2145,12 +2145,10 @@ public:
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
       authex_abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
 
-      // Delegate sysio.authex.active to sysio.roa@sysio.code so nodeownreg's inline recordlink
-      // (declared {sysio.authex, active}) is authorized -- the same code-permission grant the
-      // production bootstrap wires. Without it the inline send fails auth and aborts the claim.
-      authority a( get_public_key( AUTHEX, "active" ) );
-      a.accounts.push_back( permission_level_weight{ { ROA, config::sysio_code_name }, 1 } );
-      set_authority( AUTHEX, config::active_name, a, config::owner_name );
+      // Production marks sysio.roa privileged and deliberately installs no cross-contract
+      // active-permission delegation. Privilege lets nodeownreg declare sysio.authex.active on its
+      // inline recordlink; keeping the fixture identical guards that authorization boundary.
+      set_privileged( ROA );
       produce_blocks();
    }
 
@@ -2163,12 +2161,28 @@ public:
          const auto address_bytes = fc::crypto::ethereum::address_to_bytes(eth_pub_key);
          eth_address.assign(address_bytes.begin(), address_bytes.end());
       }
+      return nodeownreg_with_address(owner, tier, eth_pub_key, wire_pub_key, eth_address);
+   }
+
+   // Push nodeownreg with an explicit address to exercise its hard system-envelope boundary.
+   action_result nodeownreg_with_address(const name& owner, uint8_t tier,
+                                         const fc::crypto::public_key& eth_pub_key,
+                                         const fc::crypto::public_key& wire_pub_key,
+                                         const std::vector<char>& eth_address) {
       return push_action(ROA, "nodeownreg"_n, mvo()
          ("owner", owner)
          ("tier", tier)
          ("eth_pub_key", eth_pub_key)
          ("wire_pub_key", wire_pub_key)
          ("eth_address", eth_address));
+   }
+
+   // Read an authex link by row id so hard-rejection tests can prove no inline link was recorded.
+   fc::variant get_authex_link(uint64_t id) {
+      auto data = get_row_by_id(AUTHEX, AUTHEX, "links"_n, id);
+      return data.empty() ? fc::variant()
+         : authex_abi_ser.binary_to_variant(
+              "links_s", data, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
    // Create the claim account in-flow (depot path) with `wire_pub_key` as owner/active.
@@ -2237,6 +2251,28 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_happy_path, sysio_roa_nodeownreg_tester ) tr
    // nodeownreg returning success implies the inline recordlink ({sysio.authex, active}) was
    // authorized and ran -- an unauthorized inline send would have aborted the whole transaction.
    // recordlink's own table effects are covered by the sysio.authex unit tests.
+} FC_LOG_AND_RETHROW()
+
+// The depot envelope carries a raw EVM address. Anything other than exactly 20 bytes is a hard
+// system invariant failure and must leave registration, audit, and authex state untouched.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_rejects_malformed_eth_address_lengths,
+                         sysio_roa_nodeownreg_tester ) try {
+   const auto owner    = "claimacct"_n;
+   const auto wire_pub = gen_k1_key();
+   const auto eth_pub  = gen_em_key();
+
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, 2));
+   produce_blocks();
+
+   for (const auto size : {size_t{19}, size_t{21}}) {
+      const std::vector<char> malformed_address(size, char{0x01});
+      BOOST_REQUIRE_EQUAL(
+         wasm_assert_msg("eth_address must be exactly 20 bytes"),
+         nodeownreg_with_address(owner, 2, eth_pub, wire_pub, malformed_address));
+      BOOST_REQUIRE(get_nodeowner(owner).is_null());
+      BOOST_REQUIRE(get_nodeownerreg(owner).is_null());
+      BOOST_REQUIRE(get_authex_link(0).is_null());
+   }
 } FC_LOG_AND_RETHROW()
 
 // Existing account controlled by a different key than the claim -> REJECTED/ACCOUNT_KEY_MISMATCH.

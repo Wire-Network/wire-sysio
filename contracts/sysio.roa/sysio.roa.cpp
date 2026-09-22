@@ -706,12 +706,11 @@ namespace sysio {
                          const bytes& eth_address) {
         // Dispatched by the OPP depot (sysio.msgch) when it processes an inbound
         // ATTESTATION_TYPE_NODE_OWNER_REG attestation. msgch inline-sends newnameduser (account
-        // create) and then this action, both declaring permission_level{sysio.roa, active}; the
-        // chain accepts that declaration because sysio.roa.active trusts msgch@sysio.code via a
-        // code-permission delegation wired at bootstrap (same shape as the sysio.opreg grant). So
-        // require_auth(get_self()) is the correct gate: only the delegated depot dispatch satisfies
-        // it. Inline actions run depth-first, so newnameduser's newaccount has already executed and
-        // `owner` exists by the time this runs.
+        // create) and then this action, both declaring permission_level{sysio.roa, active}.
+        // Privileged sysio.msgch may declare that target permission without a cross-contract active
+        // grant, so deployment must preserve msgch's privileged status. Inline actions run
+        // depth-first, so newnameduser's newaccount has already executed and `owner` exists by the
+        // time this runs.
         require_auth(get_self());
 
         // ---- Envelope / system invariants (depot misuse) ----
@@ -793,9 +792,10 @@ namespace sysio {
         // stolen and the claim reaches CONFIRMED. (SEC-087)
 
         // Record the depositor's ETH key as a sysio.authex link via the trusted depot-only path.
-        // recordlink requires sysio.authex.active, satisfied by the sysio.roa@sysio.code delegation
-        // on authex; it is idempotent and non-throwing. EVM-only by design (NFT deposits originate
-        // on Ethereum); to extend to another ChainKind, promote the kind to an action parameter.
+        // recordlink requires sysio.authex.active; privileged sysio.roa may declare that permission
+        // on this inline action without a cross-contract active-permission delegation. The action is
+        // idempotent and non-throwing. EVM-only by design (NFT deposits originate on Ethereum); to
+        // extend to another ChainKind, promote the kind to an action parameter.
         action(permission_level{AUTHEX_ACCOUNT, "active"_n}, AUTHEX_ACCOUNT, AUTHEX_RECORDLINK,
                std::make_tuple(owner, opp::types::ChainKind::CHAIN_KIND_EVM, eth_pub_key,
                                eth_address)).send();
@@ -1159,8 +1159,8 @@ namespace sysio {
 
     void roa::newnameduser(const name& account, const public_key& pubkey, uint8_t tier) {
         // Dispatched by the OPP depot (sysio.msgch) in the NFT node-owner claim flow, the same way
-        // as nodeownreg: msgch sends this inline declaring {sysio.roa, active}, accepted via the
-        // msgch@sysio.code delegation on sysio.roa.active wired at bootstrap.
+        // as nodeownreg: privileged sysio.msgch sends this inline declaring {sysio.roa, active},
+        // without requiring a cross-contract active grant.
         require_auth(get_self());
 
         roastate_t roastate(get_self());

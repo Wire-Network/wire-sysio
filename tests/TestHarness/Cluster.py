@@ -1527,19 +1527,6 @@ class Cluster(object):
             Utils.Print("ERROR: Failed to set sysio.dclaim as privileged")
             return None
 
-        # Delegate sysio.authex.active to sysio.roa@sysio.code so sysio.roa::nodeownreg's inline
-        # sysio.authex::recordlink is authorized (mirrors the production ClusterManager grant).
-        Utils.Print("Delegate sysio.authex.active to sysio.roa@sysio.code")
-        authexAuth=('{"account":"sysio.authex","permission":"active","parent":"owner","auth":'
-                    '{"threshold":1,"keys":[{"key":"%s","weight":1}],'
-                    '"accounts":[{"permission":{"actor":"sysio.roa","permission":"sysio.code"},"weight":1}],'
-                    '"waits":[]}}' % sysioAuthexAccount.activePublicKey)
-        trans=biosNode.pushMessage('sysio', 'updateauth', authexAuth, '--permission sysio.authex@owner')
-        transId=Node.getTransId(trans[1])
-        if not biosNode.waitForTransactionInBlock(transId):
-            Utils.Print("ERROR: Failed to delegate sysio.authex.active to sysio.roa@sysio.code (tx %s)" % transId)
-            return None
-
         # Deploy sysio.opreg and register the cluster producers as ACTIVE producer
         # operators. sysio.system::update_ranked_producers schedules a producer only
         # if it is an ACTIVE OPERATOR_TYPE_PRODUCER operator in sysio.opreg (producers

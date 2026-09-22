@@ -184,9 +184,9 @@ namespace sysio {
              * create step of the OPP NFT claim flow (newnameduser -> nodeownreg, whose inline
              * recordlink records the external-chain link and sweeps pre-link rewards).
              *
-             * Dispatched by the OPP depot (sysio.msgch) as {sysio.roa, active} via delegation, like
-             * nodeownreg. Idempotent: a no-op if the account already exists. Tier-based name rules:
-             * tier-1 = 2-6 char prefix; tier 2/3 = up to 12 chars.
+             * Dispatched by privileged sysio.msgch as {sysio.roa, active}, without a cross-contract
+             * active grant, like nodeownreg. Idempotent: a no-op if the account already exists.
+             * Tier-based name rules: tier-1 = 2-6 char prefix; tier 2/3 = up to 12 chars.
              *
              * @param account The user-chosen account name.
              * @param pubkey  The holder's K1 public key (becomes owner and active).
