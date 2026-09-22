@@ -123,14 +123,20 @@ using slug_name_literals::operator""_s;
 /// `uint64` becomes a slug (`sysio.msgch`'s dispatch path and the opreg/uwrit
 /// /reserv writers). Until that lands, a stored one is a defect that surfaces
 /// here rather than being silently rendered as something it is not.
+/// Render a slug as its spelling. TOTAL, exactly like sysio::chain::name — a
+/// renderer is a READ path, and a throwing one turns one bad row into a failure
+/// of everything that scans it (an unspellable code would stall every
+/// underwriter_plugin commit, not just that cell). Validation lives on the WRITE
+/// path: from_variant's string arm goes through the validating constructor, so a
+/// non-canonical spelling is refused at construction.
+///
+/// A value with no canonical spelling renders as whatever it decodes to, and is
+/// lossy in the same two ways name is: one with a non-empty char[0] renders a
+/// string from_variant then rejects (loud), while one below the 1<<42 floor has
+/// an empty char[0] and renders "" — indistinguishable from zero (silent). Both
+/// are name's behaviour; neither can be prevented here, because a prepacked
+/// binary action sets the reflected `value` directly for either type.
 inline void to_variant(const slug_name& s, fc::variant& v) {
-   // is_canonical() is the shared predicate: the spelling must be a valid
-   // literal AND pack back to this exact value. A round trip alone is not
-   // enough — a value packed from an illegal spelling (say pack("0")) round-
-   // trips yet is not a code, so emitting it would produce a string
-   // from_variant then refuses.
-   FC_ASSERT(s.is_canonical(),
-             "slug_name {} is not a code and has no string spelling", s.value);
    v = s.to_string();
 }
 

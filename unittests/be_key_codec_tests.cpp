@@ -107,28 +107,30 @@ BOOST_AUTO_TEST_CASE(slug_name_leaf_roundtrips_the_zero_sentinel_as_empty) {
    BOOST_CHECK(bytes == encode_single(abi, "composite_key", slug(0)));
 }
 
-BOOST_AUTO_TEST_CASE(slug_name_leaf_refuses_a_non_canonical_value_both_ways) {
+BOOST_AUTO_TEST_CASE(slug_name_leaf_decodes_a_non_canonical_value_lossily) {
    // A value below 2^42 has no string spelling (to_string truncates at the first
-   // zero symbol slot), so it is not writable as a bound and not renderable as a
-   // key. Both directions throw rather than silently collapsing to "" — which
-   // would re-encode to 0 and restart pagination at the top of the table.
-   // get_table_rows catches per row and falls back to hex, so a stored key like
-   // this costs that one cell, not the query.
+   // zero symbol slot). The leaf converts it anyway — you get what you get,
+   // identical to the `name` leaf (`name(raw).to_string()`). It neither throws
+   // nor falls back to hex: a read path that throws costs the whole scan, and a
+   // raw uint64 that spells nothing is self-inflicted, since nothing validates
+   // the raw ctor for either type.
    auto abi    = make_test_abi();
    auto shapes = codec::build_key_shapes(abi, {"code"}, {"slug_name"});
 
-   // No bound can name it: the integer is refused, and there is no spelling.
+   // A bound is still named by its SPELLING, so a bare integer is not one.
    BOOST_CHECK_THROW(
       codec::encode_key(fc::variant(fc::mutable_variant_object("code", 7u)), shapes),
       fc::exception);
 
-   // And a key already holding one does not decode. Reach past the carrier to
-   // build those bytes — the transitional object arm is the only writer left
-   // that can express a raw value.
+   // A key already holding one decodes to "" — the same text zero renders, so
+   // feeding it back re-encodes to 0. That is the price of a total conversion.
+   // Reach past the carrier to build those bytes: the transitional object arm
+   // is the only writer left that can express a raw value.
    auto bytes = codec::encode_key(
       fc::variant(fc::mutable_variant_object("code", slug(7))), shapes);
    BOOST_REQUIRE_EQUAL(bytes.size(), 8u);
-   BOOST_CHECK_THROW(codec::decode_key(bytes.data(), bytes.size(), shapes), fc::exception);
+   auto decoded = codec::decode_key(bytes.data(), bytes.size(), shapes);
+   BOOST_CHECK_EQUAL(decoded.get_object()["code"].as_string(), "");
 }
 
 BOOST_AUTO_TEST_CASE(slug_name_leaf_wins_over_a_shadowing_struct_def) {
@@ -329,7 +331,8 @@ BOOST_AUTO_TEST_CASE(rejections) {
 
    // 256-bit integers have no codec leaf and no CDT producer. build_key_shapes
    // must reject them — this is exactly what drives chain_plugin to leave
-   // key_shapes unset and fall back to hex bounds (the defensive nullopt path).
+   // key_shapes unset, so json=true rejects and hex bounds are the only form
+   // (the defensive nullopt path).
    BOOST_CHECK_THROW(codec::build_key_shapes(abi, {"k"}, {"uint256"}), fc::exception);
    BOOST_CHECK_THROW(codec::build_key_shapes(abi, {"k"}, {"int256"}), fc::exception);
 

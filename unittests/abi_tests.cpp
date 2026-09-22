@@ -753,13 +753,15 @@ BOOST_AUTO_TEST_CASE(slug_name_builtin_type)
       abis.variant_to_binary("regrow", fc::json::from_string(R"({"code":7})"), yield_fn()),
       fc::exception);
 
-   // And a value with no spelling does not render. Every value below 2^42 has a
-   // zero in the leading symbol slot, so `to_string` truncates it to "" and no
-   // string recovers it. get_table_rows wraps each row's render in its own
-   // try/catch and falls back to hex, so a planted row costs that one cell
-   // rather than the query (plugins/chain_plugin/src/chain_plugin.cpp).
+   // A value with no spelling renders anyway — you get what you get. Every value
+   // below 2^42 has a zero in the leading symbol slot, so `to_string` truncates
+   // it to "", the same text zero renders. The conversion is TOTAL, exactly like
+   // `name` (`database_utils.hpp`: `name(raw).to_string()`): a read path that
+   // throws costs the whole scan, and a raw uint64 that spells nothing is
+   // self-inflicted — nothing validates the raw ctor for either type.
    const std::vector<char> planted{ 7, 0, 0, 0, 0, 0, 0, 0 };  // packed LE uint64 7
-   BOOST_CHECK_THROW(abis.binary_to_variant("regrow", planted, yield_fn()), fc::exception);
+   auto rendered = abis.binary_to_variant("regrow", planted, yield_fn());
+   BOOST_CHECK_EQUAL(rendered.get_object()["code"].as_string(), "");
 
 } FC_LOG_AND_RETHROW() }
 

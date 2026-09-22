@@ -366,9 +366,10 @@ inline fc::variant decode_field(reader& r, key_leaf_kind kind) {
    case key_leaf_kind::name:    return fc::variant(name(r.read_be64()).to_string());
    case key_leaf_kind::slug_name: {
       // Delegates to fc::slug_name's to_variant, so next_key carries the same
-      // canonical string the row's key field does, and feeding it back as a
-      // bound re-encodes the identical bytes. A stored key with no spelling
-      // throws; get_table_rows catches per row and falls back to hex.
+      // string the row's key field does, and feeding a canonical one back as a
+      // bound re-encodes the identical bytes. The renderer is TOTAL (parity with
+      // the `name` arm above), so a stored key with no canonical spelling renders
+      // rather than throwing — lossily, exactly as `name` does.
       const fc::slug_name s{ r.read_be64() };
       fc::variant v;
       fc::to_variant(s, v);

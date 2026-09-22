@@ -449,19 +449,44 @@ BOOST_AUTO_TEST_CASE(variant_zero_is_the_empty_string_both_ways) {
    BOOST_CHECK_EQUAL(back.value, 0u);
 }
 
-BOOST_AUTO_TEST_CASE(variant_non_canonical_has_no_spelling_and_throws) {
-   // Every value below 1<<42 has a zero in the char[0] slot, so to_string()
-   // truncates it to "" and no string recovers it. Rather than grow a second
-   // carrier for those, the conversion refuses them — which is what keeps ""
-   // meaning exactly zero. The throw is contained: get_table_rows catches per
-   // row and renders that cell as hex.
+BOOST_AUTO_TEST_CASE(variant_render_is_total_like_name) {
+   // The renderer never throws — parity with sysio::chain::name, whose key leaf
+   // is `name(raw).to_string()`. A read path that throws converts one bad row
+   // into a failure of every scan over it; validation belongs on the write path.
+   // A prepacked binary action can set the reflected `value` directly for either
+   // type, so neither can guarantee it only ever holds a canonical value.
    for (uint64_t raw : {uint64_t{1}, uint64_t{7}, uint64_t{42},
                         uint64_t{(uint64_t{1} << 42) - 1},
                         (uint64_t{1} << 48) - 1,  // symbols past the alphabet
                         ~uint64_t{0}}) {
       fc::variant v;
-      BOOST_CHECK_THROW(fc::to_variant(slug_name{raw}, v), fc::exception);
+      BOOST_REQUIRE_NO_THROW(fc::to_variant(slug_name{raw}, v));
+      BOOST_CHECK(v.is_string());
    }
+}
+
+BOOST_AUTO_TEST_CASE(variant_non_canonical_render_is_lossy_the_same_two_ways_name_is) {
+   // Losing information is the price of a total renderer, and it takes exactly
+   // two shapes. Pinned so a future change to to_string() cannot move them
+   // silently.
+   fc::variant v;
+
+   // 1. char[0] non-empty -> a spelling exists but is not a legal code, so
+   //    feeding it back fails LOUDLY at construction.
+   // '7' is symbol 34 in the alphabet, and char[0] occupies bits [42..47].
+   constexpr uint64_t packed_seven = uint64_t{34} << 42;
+   BOOST_REQUIRE(!fc::slug_name{packed_seven}.is_canonical());
+   fc::to_variant(slug_name{packed_seven}, v);
+   BOOST_CHECK_EQUAL(v.as_string(), "7");
+   slug_name back;
+   BOOST_CHECK_THROW(fc::from_variant(v, back), fc::exception);
+
+   // 2. Below the 1<<42 floor -> char[0] is empty, so it renders "" and is
+   //    indistinguishable from zero. This one is SILENT; name has the same hole.
+   fc::to_variant(slug_name{uint64_t{7}}, v);
+   BOOST_CHECK_EQUAL(v.as_string(), "");
+   fc::from_variant(v, back);
+   BOOST_CHECK_EQUAL(back.value, 0u);
 }
 
 BOOST_AUTO_TEST_CASE(variant_every_canonical_value_round_trips_exactly) {
