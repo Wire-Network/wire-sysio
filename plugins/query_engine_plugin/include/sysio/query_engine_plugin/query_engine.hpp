@@ -7,7 +7,7 @@
 
 #include <array>
 
-namespace sysio::query_engine_plugin {
+namespace sysio::query_engine {
 /// Observable stages used for deterministic scheduling and lifecycle tests.
 enum class query_stage { parse, describe, plan, capture, evaluate };
 
@@ -52,4 +52,4 @@ private:
    struct impl;
    std::shared_ptr<impl> state;
 };
-} // namespace sysio::query_engine_plugin
+} // namespace sysio::query_engine

@@ -49,5 +49,5 @@ its only worker is blocked in execute. The application tests also execute querie
 with HTTP registered but disabled, and with HTTP enabled without a listener, using zero/two read
 threads. The plugin's only required dependency is chain_plugin.
 
-Every implementation/parser namespace is `sysio::query_engine_plugin`; the appbase plugin name is
-`sysio::query_engine_plugin::query_engine_plugin`.
+Every implementation/parser namespace is `sysio::query_engine`; the appbase plugin name is
+`sysio::query_engine_plugin`.

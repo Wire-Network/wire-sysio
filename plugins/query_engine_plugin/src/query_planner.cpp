@@ -4,7 +4,7 @@
 #include <map>
 #include <set>
 
-namespace sysio::query_engine_plugin {
+namespace sysio::query_engine {
 namespace {
 constexpr uint32_t byte_bits = 8;
 constexpr auto path_separator = ".";
@@ -258,7 +258,7 @@ private:
 
    /// Only a conjunction of field/literal comparisons proves a range; residual evaluation always remains.
    static bool collect_comparisons(const predicate& predicate,
-                                   std::vector<const ::sysio::query_engine_plugin::predicate*>& comparisons) {
+                                   std::vector<const ::sysio::query_engine::predicate*>& comparisons) {
       if (predicate.kind == predicate_kind::logical_and) {
          for (const auto& child : predicate.children)
             if (!collect_comparisons(child, comparisons))
@@ -455,4 +455,4 @@ typed_plan create_plan(ast_query ast, std::vector<table_schema> schemas, query_b
    }
    return planner(std::move(ast), std::move(owned), budget).create();
 }
-} // namespace sysio::query_engine_plugin
+} // namespace sysio::query_engine

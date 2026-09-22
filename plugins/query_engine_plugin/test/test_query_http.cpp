@@ -14,8 +14,8 @@
 #include <fstream>
 
 using namespace sysio;
-using namespace sysio::query_engine_plugin;
-using namespace sysio::query_engine_plugin::test;
+using namespace sysio::query_engine;
+using namespace sysio::query_engine::test;
 namespace http = boost::beast::http;
 namespace {
 constexpr auto socket_name = "query.sock";
@@ -49,7 +49,7 @@ struct http_application {
                                           const std::vector<std::string>& extra = {},
                                           const std::string& read_mode = "head", bool listener = true,
                                           bool enable_http = true) {
-      appbase::application_base::register_plugin<sysio::query_engine_plugin::query_engine_plugin>();
+      appbase::application_base::register_plugin<sysio::query_engine_plugin>();
       appbase::application_base::register_plugin<http_plugin>();
       appbase::application_base::register_plugin<chain_api_plugin>();
       http_enabled = enable_http;
@@ -78,7 +78,7 @@ struct http_application {
                                     "--sys-vm-oc-enable",
                                     "none"};
       if (enabled)
-         args.insert(args.end(), {"--plugin", "sysio::query_engine_plugin::query_engine_plugin"});
+         args.insert(args.end(), {"--plugin", "sysio::query_engine_plugin"});
       if (enable_http)
          args.insert(args.end(), {"--plugin", "sysio::chain_api_plugin", "--plugin", "sysio::http_plugin"});
       args.insert(args.end(), extra.begin(), extra.end());
@@ -313,7 +313,7 @@ BOOST_AUTO_TEST_CASE(query_service_without_http) {
          http_application server;
          BOOST_REQUIRE(server.initialize(true, read_threads, {}, "head", false, http_enabled) ==
                        chain::exit_code::SUCCESS);
-         auto& plugin = app().get_plugin<sysio::query_engine_plugin::query_engine_plugin>();
+         auto& plugin = app().get_plugin<sysio::query_engine_plugin>();
          BOOST_CHECK(!plugin.get_query_service());
          if (!http_enabled) {
             BOOST_CHECK(app().get_plugin<http_plugin>().get_state() == appbase::abstract_plugin::registered);
@@ -339,7 +339,7 @@ BOOST_AUTO_TEST_CASE(query_service_without_http) {
          BOOST_CHECK_EQUAL(result.state["block_id"].as_string(), fixture.control->head().id().str());
          BOOST_CHECK_EQUAL(server.query_requests.load(), 0);
          server.stop();
-         BOOST_CHECK(!app().find_plugin<sysio::query_engine_plugin::query_engine_plugin>());
+         BOOST_CHECK(!app().find_plugin<sysio::query_engine_plugin>());
          BOOST_CHECK_EXCEPTION(service->execute(selected_sql), query_error,
                                [](const auto& error) { return error.kind == error_kind::QUERY_CANCELLED; });
       }

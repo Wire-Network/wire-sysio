@@ -3,8 +3,8 @@
 #include <limits>
 #include <type_traits>
 
-using namespace sysio::query_engine_plugin;
-using namespace sysio::query_engine_plugin::test;
+using namespace sysio::query_engine;
+using namespace sysio::query_engine::test;
 
 namespace {
 constexpr auto ordered_sql = "SELECT key.id AS id, amount FROM sample.positions ORDER BY amount DESC";

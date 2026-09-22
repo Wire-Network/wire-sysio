@@ -3,7 +3,7 @@
 #include <mutex>
 #include <shared_mutex>
 
-namespace sysio::query_engine_plugin {
+namespace sysio::query_engine {
 namespace {
 constexpr auto read_wait_interval = std::chrono::milliseconds(10);
 }
@@ -73,4 +73,4 @@ void query_read_api::stop() {
    std::unique_lock lock(state->mutex);
    state->source.reset();
 }
-} // namespace sysio::query_engine_plugin
+} // namespace sysio::query_engine

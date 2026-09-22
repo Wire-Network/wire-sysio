@@ -5,7 +5,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-using namespace sysio::query_engine_plugin;
+using namespace sysio::query_engine;
 
 namespace {
 /// Keep number-token ID tests independent of any JSON serializer's coercion rules.

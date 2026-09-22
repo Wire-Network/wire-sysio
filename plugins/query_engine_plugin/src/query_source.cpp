@@ -9,7 +9,7 @@
 #include <algorithm>
 #include <cctype>
 
-namespace sysio::query_engine_plugin {
+namespace sysio::query_engine {
 namespace {
 constexpr uint64_t abi_allocation_factor = 8;
 constexpr uint64_t row_allocation_factor = 2;
@@ -126,4 +126,4 @@ captured_input local_table_source::capture(const typed_plan& plan, query_budget&
    result.capture_us = std::chrono::duration_cast<std::chrono::microseconds>(budget.now() - started).count();
    return result;
 }
-} // namespace sysio::query_engine_plugin
+} // namespace sysio::query_engine

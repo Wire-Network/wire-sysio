@@ -17,7 +17,7 @@ version_output="$("$java" -jar "$jar")"
 output_dir="$(mktemp -d)"
 trap 'rm -rf -- "$output_dir"' EXIT
 cd "$plugin_dir/grammar"
-"$java" -jar "$jar" -Dlanguage=Cpp -package sysio::query_engine_plugin -visitor -no-listener -Xexact-output-dir -o "$output_dir" WireQuery.g4
+"$java" -jar "$jar" -Dlanguage=Cpp -package sysio::query_engine -visitor -no-listener -Xexact-output-dir -o "$output_dir" WireQuery.g4
 mkdir -p "$plugin_dir/generated"
 for component in Lexer Parser Visitor BaseVisitor; do
    for suffix in h cpp; do

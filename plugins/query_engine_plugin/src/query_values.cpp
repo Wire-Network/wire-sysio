@@ -14,7 +14,7 @@
 #include <set>
 #include <tuple>
 
-namespace sysio::query_engine_plugin {
+namespace sysio::query_engine {
 namespace {
 constexpr auto abi_boolean = "bool";
 constexpr auto fixed_checksum = "fixed_bytes<32>";
@@ -865,4 +865,4 @@ std::vector<value> decode_fields(const typed_plan& plan, const chain_apis::owned
       throw query_error(error_kind::ROW_DECODE_ERROR, "Invalid ABI row or key encoding");
    }
 }
-} // namespace sysio::query_engine_plugin
+} // namespace sysio::query_engine

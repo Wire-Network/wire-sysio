@@ -4,7 +4,7 @@
 
 #include <thread>
 
-namespace sysio::query_engine_plugin {
+namespace sysio::query_engine {
 /// Synchronous worker-facing reads. Synchronization with block application stays inside this API;
 /// callbacks copy owned ABI/row data and never execute SQL or wait for query workers.
 class query_read_api {
@@ -25,4 +25,4 @@ private:
    struct impl;
    std::shared_ptr<impl> state;
 };
-} // namespace sysio::query_engine_plugin
+} // namespace sysio::query_engine

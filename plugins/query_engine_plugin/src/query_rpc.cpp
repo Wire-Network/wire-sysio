@@ -9,7 +9,7 @@
 #include <charconv>
 #include <set>
 
-namespace sysio::query_engine_plugin {
+namespace sysio::query_engine {
 namespace {
 constexpr uint64_t maximum_json_escape_bytes = 6;
 constexpr uint64_t envelope_allowance = 4096;
@@ -245,4 +245,4 @@ fc::variant create_error(const query_request* request, const query_error& error)
       fc::mutable_variant_object()(response_field::code, error_code(error.kind))(
          response_field::message, std::string(error.what()))(response_field::data, std::move(data)));
 }
-} // namespace sysio::query_engine_plugin
+} // namespace sysio::query_engine

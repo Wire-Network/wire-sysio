@@ -9,7 +9,7 @@
 #include <mutex>
 #include <thread>
 
-namespace sysio::query_engine_plugin {
+namespace sysio::query_engine {
 namespace {
 constexpr auto deadline_poll_interval = std::chrono::milliseconds(10);
 constexpr uint64_t json_escape_bound = 6;
@@ -242,4 +242,4 @@ api_description query_http_handler::create_api() {
        }}
    };
 }
-} // namespace sysio::query_engine_plugin
+} // namespace sysio::query_engine

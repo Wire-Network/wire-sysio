@@ -14,7 +14,7 @@
 #include <mutex>
 #include <test_contracts.hpp>
 
-namespace sysio::query_engine_plugin::test {
+namespace sysio::query_engine::test {
 using namespace sysio::chain::literals;
 inline constexpr auto account = "sample"_n;
 inline constexpr auto other_account = "other"_n;
@@ -144,4 +144,4 @@ inline query_result execute(query_engine& engine, read_queue& reads, const std::
    }
    return future.get();
 }
-} // namespace sysio::query_engine_plugin::test
+} // namespace sysio::query_engine::test

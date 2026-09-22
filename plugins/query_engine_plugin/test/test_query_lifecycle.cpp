@@ -3,8 +3,8 @@
 #include <atomic>
 #include <thread>
 
-using namespace sysio::query_engine_plugin;
-using namespace sysio::query_engine_plugin::test;
+using namespace sysio::query_engine;
+using namespace sysio::query_engine::test;
 
 namespace {
 constexpr auto count_query = "SELECT COUNT(*) AS n FROM sample.wide";

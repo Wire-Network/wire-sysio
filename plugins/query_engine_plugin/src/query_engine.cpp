@@ -4,7 +4,7 @@
 #include <map>
 #include <mutex>
 
-namespace sysio::query_engine_plugin {
+namespace sysio::query_engine {
 namespace {
 constexpr auto completion_wait_interval = std::chrono::milliseconds(10);
 constexpr auto failure_log_interval = std::chrono::seconds(60);
@@ -261,4 +261,4 @@ service_stats query_engine::stats() const {
    std::lock_guard lock(state->mutex);
    return state->counters;
 }
-} // namespace sysio::query_engine_plugin
+} // namespace sysio::query_engine

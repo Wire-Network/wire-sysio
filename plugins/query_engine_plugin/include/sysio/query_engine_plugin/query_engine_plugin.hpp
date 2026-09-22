@@ -6,7 +6,7 @@
 
 #include <memory>
 
-namespace sysio::query_engine_plugin {
+namespace sysio {
 /// Opt-in current-state SQL queries over this node's controller, with bounded off-chain evaluation.
 class query_engine_plugin : public appbase::plugin<query_engine_plugin> {
 public:
@@ -22,7 +22,7 @@ public:
    /// Start the query service; register a route only if HTTP and its chain_ro category are enabled.
    void plugin_startup();
    /// Return the shared C++ API, or nullptr before startup/after shutdown. Retained services reject calls after stop.
-   std::shared_ptr<query_service> get_query_service() const;
+   std::shared_ptr<query_engine::query_service> get_query_service() const;
    /// Cancel pending work and release controller access before dependency shutdown.
    void plugin_shutdown();
    /// Rebind only the diagnostic logger.
@@ -32,4 +32,4 @@ private:
    struct impl;
    std::unique_ptr<impl> _impl;
 };
-} // namespace sysio::query_engine_plugin
+} // namespace sysio

@@ -3,7 +3,7 @@
 #include <charconv>
 #include <limits>
 
-namespace sysio::query_engine_plugin {
+namespace sysio::query_engine {
 
 namespace {
 /// Parse decimal option text without accepting a leading minus through unsigned wraparound.
@@ -170,4 +170,4 @@ uint64_t query_budget::elapsed_us() const {
    return std::chrono::duration_cast<std::chrono::microseconds>(now() - started).count();
 }
 
-} // namespace sysio::query_engine_plugin
+} // namespace sysio::query_engine
