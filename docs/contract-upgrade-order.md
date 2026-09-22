@@ -137,6 +137,36 @@ Independently of inlines, the emissions readiness gate in `sysio.epoch` **reads*
 `sysio.system`'s `emitcfg`, `t5state` and `payclaimtot`, and `sysio.token`'s
 `accounts`.
 
+WIRE-352 adds separate inline edges whose failure behavior depends on the caller:
+
+| Caller | Callee/action | Required order | Mixed-state behavior |
+|---|---|---|---|
+| `sysio.msgch` node-owner dispatch | `sysio.roa::nodeownreg` | Deploy `sysio.msgch` and `sysio.roa` as one compatibility-coupled set. | WIRE-352 adds the required `eth_address` field. An old caller underflows the new action decoder; the inverse pairing is also unsupported. Node-owner delivery can abort. |
+| `sysio.roa::nodeownreg` | `sysio.authex::recordlink` | Deploy `sysio.roa` and `sysio.authex` as the same compatibility-coupled set. | WIRE-352 adds the required `native_address` field. An old caller underflows the new action decoder; the inverse pairing is also unsupported. Node-owner delivery can abort. |
+| `sysio.authex::createlink` | `sysio.dclaim::linkswept` | Deploy `sysio.dclaim` before the first user-created external-key link. | A missing or non-privileged callee aborts before link insertion. Any inline failure rolls the transaction back, so the user can submit a fresh retry. |
+| `sysio.authex::recordlink` | `sysio.dclaim::linkswept` | Prefer deploying `sysio.dclaim` before trusted node-owner dispatch begins. | A missing or non-privileged callee skips the sweep but preserves the trusted link; an identical operator-authorized `recordlink` can retry it after bootstrap. |
+
+Production deployment through `sysio.roa::setsyscode` privileges `sysio.dclaim`
+as part of the deploy, so there is no separate privilege step. The durable
+precondition is ordering: deploy DClaim before any link action can execute.
+
+The two added address fields are intentionally not a staged compatibility
+protocol. Activate WIRE-352 in a quiesced maintenance window:
+
+1. Stop user `createlink` submissions and pause inbound node-owner delivery.
+2. Deploy `sysio.dclaim`, then verify that it is privileged and dispatches
+   `linkswept`.
+3. In one `sysio.msig` transaction, deploy the code and ABIs for
+   `sysio.msgch`, `sysio.roa`, and `sysio.authex`. Preflight the actual packed
+   proposal size as described above; do not split this trio across externally
+   visible transactions.
+4. Smoke-test one node-owner registration and one user-created EVM link, then
+   resume operator delivery and user traffic.
+
+This sequence keeps DClaim ready before either link path and prevents every
+old/new pairing of the two changed inline payloads from becoming externally
+observable.
+
 ### WIRE-343 pre-launch activation
 
 Activate WIRE-343 in one quiesced maintenance window, with no
