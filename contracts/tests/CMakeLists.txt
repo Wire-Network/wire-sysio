@@ -12,6 +12,12 @@ include_directories(${CMAKE_SOURCE_DIR}/contracts/sysio.councl/include)
 # UNIT TESTING ###
 include(CTest) # eliminates DartConfiguration.tcl errors at test runtime
 enable_testing()
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+add_test(NAME contract_type_generator_test
+        COMMAND ${Python3_EXECUTABLE} -m unittest discover
+                -s ${CMAKE_SOURCE_DIR}/contracts/tools/tests
+                -p test_generate_sysio_contract_types.py)
 
 # build unit test executable
 file(GLOB UNIT_TESTS CONFIGURE_DEPENDS "*.cpp" "*.hpp") # find all unit test suites

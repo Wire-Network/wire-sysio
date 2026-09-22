@@ -168,6 +168,9 @@ expected by the regenerated abi, breaking the table decodes of every contract th
 established. The depot creates the account from `wire_pub_key`, registers the owner, and
 records the depositor's external key in `sysio.authex::links` (keyed by account+chain via
 the `bynamechain` index), which is separate from the account's own owner/active authority.
+For this attestation, BAR supplies `actor_pub_key` in the 65-byte uncompressed EVM form. The
+depot validates that shape and derives the canonical 20-byte address from the key; the redundant
+`actor.address` field is not trusted as identity input.
 
 ## Using an existing Ethereum keypair as a Wire K1 key
 

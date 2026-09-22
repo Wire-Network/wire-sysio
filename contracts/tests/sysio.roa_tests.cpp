@@ -13,12 +13,14 @@
 #include <fc/crypto/keccak256.hpp>
 #include <fc/crypto/elliptic_em.hpp>
 #include <fc/crypto/private_key.hpp>
+#include <fc/crypto/ethereum/ethereum_types.hpp>
 #include <boost/test/unit_test.hpp>
 #include <algorithm>
 #include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <type_traits>
 
 using namespace sysio::testing;
@@ -2116,8 +2118,8 @@ BOOST_FIXTURE_TEST_CASE( newnameduser_tier_name_rules, sysio_roa_tester ) try {
 // Under the create-in-flow model the depot (sysio.msgch) inline-sends newnameduser (creates the
 // account with the claimed wire key) then nodeownreg (registers + records the depositor's ETH key
 // via an inline sysio.authex::recordlink). These unit tests drive the two sysio.roa actions
-// directly, signed by ROA, the same way the depot would. The fixture wires the
-// sysio.authex.active <- sysio.roa@sysio.code delegation that authorizes the inline recordlink.
+// directly, signed by privileged ROA, the same way the depot would. No cross-contract active
+// permission is installed: privilege authorizes the declared sysio.authex.active permission.
 // ---------------------------------------------------------------------------
 
 /// Shared mirrors of sysio.roa's node-owner registration audit values.
@@ -2126,8 +2128,11 @@ namespace nodeownerreg_audit = sysio_system::test_support::nodeownerreg;
 class sysio_roa_nodeownreg_tester : public sysio_roa_tester {
 public:
    static constexpr auto AUTHEX = "sysio.authex"_n;
+   static constexpr auto DCLAIM = "sysio.dclaim"_n;
 
    sysio_roa_nodeownreg_tester() {
+      create_accounts({DCLAIM});
+
       // Deploy authex -- the node-owner flow inline-records the depositor's ETH link there.
       set_code( AUTHEX, contracts::authex_wasm() );
       set_abi( AUTHEX, contracts::authex_abi().data() );
@@ -2140,13 +2145,10 @@ public:
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
       authex_abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
 
-      // Delegate sysio.authex.active to sysio.roa@sysio.code so nodeownreg's inline recordlink
-      // (declared {sysio.authex, active}) is authorized -- the same code-permission grant the
-      // production bootstrap wires. Without it the inline send fails auth and aborts the claim.
-      // A single co-signer is trivially sorted, so no accounts re-sort is needed.
-      authority a( get_public_key( AUTHEX, "active" ) );
-      a.accounts.push_back( permission_level_weight{ { ROA, config::sysio_code_name }, 1 } );
-      set_authority( AUTHEX, config::active_name, a, config::owner_name );
+      // Production marks sysio.roa privileged and deliberately installs no cross-contract
+      // active-permission delegation. Privilege lets nodeownreg declare sysio.authex.active on its
+      // inline recordlink; keeping the fixture identical guards that authorization boundary.
+      set_privileged( ROA );
       produce_blocks();
    }
 
@@ -2154,11 +2156,33 @@ public:
    action_result nodeownreg(const name& owner, uint8_t tier,
                             const fc::crypto::public_key& eth_pub_key,
                             const fc::crypto::public_key& wire_pub_key) {
+      std::vector<char> eth_address(20, '\0');
+      if (eth_pub_key.contains<fc::em::public_key_shim>()) {
+         const auto address_bytes = fc::crypto::ethereum::address_to_bytes(eth_pub_key);
+         eth_address.assign(address_bytes.begin(), address_bytes.end());
+      }
+      return nodeownreg_with_address(owner, tier, eth_pub_key, wire_pub_key, eth_address);
+   }
+
+   // Push nodeownreg with an explicit address to exercise its hard system-envelope boundary.
+   action_result nodeownreg_with_address(const name& owner, uint8_t tier,
+                                         const fc::crypto::public_key& eth_pub_key,
+                                         const fc::crypto::public_key& wire_pub_key,
+                                         const std::vector<char>& eth_address) {
       return push_action(ROA, "nodeownreg"_n, mvo()
          ("owner", owner)
          ("tier", tier)
          ("eth_pub_key", eth_pub_key)
-         ("wire_pub_key", wire_pub_key));
+         ("wire_pub_key", wire_pub_key)
+         ("eth_address", eth_address));
+   }
+
+   // Read an authex link by row id so hard-rejection tests can prove no inline link was recorded.
+   fc::variant get_authex_link(uint64_t id) {
+      auto data = get_row_by_id(AUTHEX, AUTHEX, "links"_n, id);
+      return data.empty() ? fc::variant()
+         : authex_abi_ser.binary_to_variant(
+              "links_s", data, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
    // Create the claim account in-flow (depot path) with `wire_pub_key` as owner/active.
@@ -2170,12 +2194,15 @@ public:
    // Seed an EVM link directly via the depot-only recordlink, signed as sysio.authex. Used to set up
    // a pre-existing link with a chosen key before a (mismatched) claim.
    action_result recordlink(const fc::crypto::public_key& pub_key, const name& account) {
+      const auto address_bytes = fc::crypto::ethereum::address_to_bytes(pub_key);
+      const std::vector<char> native_address(address_bytes.begin(), address_bytes.end());
       action act;
       act.account       = AUTHEX;
       act.name          = "recordlink"_n;
       act.authorization = {{AUTHEX, config::active_name}};
       act.data          = authex_abi_ser.variant_to_binary("recordlink",
-         mvo()("account", account)("chain_kind", opp::types::ChainKind::CHAIN_KIND_EVM)("pub_key", pub_key),
+         mvo()("account", account)("chain_kind", opp::types::ChainKind::CHAIN_KIND_EVM)
+              ("pub_key", pub_key)("native_address", native_address),
          abi_serializer::create_yield_function(abi_serializer_max_time));
       return base_tester::push_action(std::move(act), AUTHEX.to_uint64_t());
    }
@@ -2224,6 +2251,28 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_happy_path, sysio_roa_nodeownreg_tester ) tr
    // nodeownreg returning success implies the inline recordlink ({sysio.authex, active}) was
    // authorized and ran -- an unauthorized inline send would have aborted the whole transaction.
    // recordlink's own table effects are covered by the sysio.authex unit tests.
+} FC_LOG_AND_RETHROW()
+
+// The depot envelope carries a raw EVM address. Anything other than exactly 20 bytes is a hard
+// system invariant failure and must leave registration, audit, and authex state untouched.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_rejects_malformed_eth_address_lengths,
+                         sysio_roa_nodeownreg_tester ) try {
+   const auto owner    = "claimacct"_n;
+   const auto wire_pub = gen_k1_key();
+   const auto eth_pub  = gen_em_key();
+
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, 2));
+   produce_blocks();
+
+   for (const auto size : {size_t{19}, size_t{21}}) {
+      const std::vector<char> malformed_address(size, char{0x01});
+      BOOST_REQUIRE_EQUAL(
+         wasm_assert_msg("eth_address must be exactly 20 bytes"),
+         nodeownreg_with_address(owner, 2, eth_pub, wire_pub, malformed_address));
+      BOOST_REQUIRE(get_nodeowner(owner).is_null());
+      BOOST_REQUIRE(get_nodeownerreg(owner).is_null());
+      BOOST_REQUIRE(get_authex_link(0).is_null());
+   }
 } FC_LOG_AND_RETHROW()
 
 // Existing account controlled by a different key than the claim -> REJECTED/ACCOUNT_KEY_MISMATCH.
