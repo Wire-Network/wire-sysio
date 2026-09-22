@@ -2317,66 +2317,51 @@ BOOST_FIXTURE_TEST_CASE(advance_freezes_and_recovers_withheld_operator_window,
    BOOST_REQUIRE_EQUAL(duty_member(), BATCHOP_D);
 } FC_LOG_AND_RETHROW() }
 
-/// A held group can accrue a real audit miss on every epoch without rotating
-/// through the configured schedule. Neither a check during the hold nor a
-/// later check after publication resumes may count those accelerated rows.
-BOOST_FIXTURE_TEST_CASE(held_duty_misses_are_audited_without_accelerating_termination,
+/// Held-duty delivery observations retain the ordinary consecutive-miss and
+/// rolling-percentage termination rules. This isolates accounting with the
+/// privileged advance fixture; quorum-loss recovery is tested separately.
+BOOST_FIXTURE_TEST_CASE(held_duty_misses_follow_ordinary_termination_rules,
                         sysio_msgch_chain_tester) { try {
-   bootstrap(/*n_batch_ops=*/3, /*batchop_is_bootstrapped=*/false);
-   set_termination_thresholds(/*max_consecutive_misses=*/1,
-                              /*max_percent_misses=*/49);
+   struct termination_limits {
+      uint32_t consecutive;
+      uint32_t percent;
+   };
+   for (const auto limits : {termination_limits{1, 99}, termination_limits{5, 49}}) {
+      sysio_msgch_chain_tester tester;
+      tester.bootstrap(/*n_batch_ops=*/3, /*batchop_is_bootstrapped=*/false);
+      tester.set_termination_thresholds(limits.consecutive, limits.percent);
 
-   // Keep A's normal-duty history clean before the window is withheld.
-   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, CHALG_ACCOUNT,
-      "slash"_n, mvo()("account", BATCHOP_B.to_string())
-                       ("reason", "hold the one-group window")));
-   const auto normal = encode_delivery(current_epoch(), "normal-duty hit");
-   for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID})
-      BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, chain, normal));
-   produce_blocks(); // commit pending actions before jumping to the next epoch
-   advance_to_next_epoch();
-   BOOST_REQUIRE(read_epoch_state()[epoch_fields::NEXT_BATCH_OP_GROUPS].get_array().empty());
-   BOOST_REQUIRE_EQUAL(get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>(),
-                       opp::types::OPERATOR_STATUS_ACTIVE);
-
-   const auto first_held_epoch = current_epoch();
-   for (uint32_t held = 0; held < 2; ++held) {
-      const auto expiring_epoch = current_epoch();
-      advance_to_next_epoch(); // accounting-policy test; no quorum is simulated here
-      BOOST_REQUIRE_EQUAL(get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>(),
+      BOOST_REQUIRE_EQUAL(success(), tester.push(OPREG_ACCOUNT, tester.opreg_abi, CHALG_ACCOUNT,
+         "slash"_n, mvo()("account", BATCHOP_B.to_string())
+                          ("reason", "hold the one-group window")));
+      const auto normal = tester.encode_delivery(tester.current_epoch(), "normal-duty hit");
+      for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID})
+         BOOST_REQUIRE_EQUAL(success(), tester.deliver_as(BATCHOP, chain, normal));
+      tester.produce_blocks();
+      tester.advance_to_next_epoch();
+      BOOST_REQUIRE(tester.read_epoch_state()[epoch_fields::NEXT_BATCH_OP_GROUPS].get_array().empty());
+      BOOST_REQUIRE_EQUAL(tester.get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>(),
                           opp::types::OPERATOR_STATUS_ACTIVE);
-      BOOST_REQUIRE(!get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT,
-         "heldepochs"_n, name{expiring_epoch}).empty());
-      BOOST_REQUIRE(read_epoch_state()[epoch_fields::NEXT_BATCH_OP_GROUPS].get_array().empty());
-   }
 
-   uint32_t held_audit_misses = 0;
-   for (uint64_t id = 0; id < TABLE_SCAN_LIMIT; ++id) {
-      const auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "dellog"_n, name{id});
-      if (data.empty()) continue;
-      const auto row = opreg_abi.binary_to_variant("delivery_log_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
-      if (row["account"].as_string() == BATCHOP.to_string() &&
-          row["epoch"].as_uint64() >= first_held_epoch &&
-          !row["delivered"].as_bool()) ++held_audit_misses;
-   }
-   BOOST_REQUIRE_EQUAL(held_audit_misses, 4u); // two held epochs x two outposts
+      const auto held_epoch = tester.current_epoch();
+      tester.advance_to_next_epoch();
+      BOOST_REQUIRE_EQUAL(tester.get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>(),
+                          opp::types::OPERATOR_STATUS_TERMINATED);
 
-   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
-      "regoperator"_n, mvo()("account", BATCHOP_D.to_string())
-         ("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
-   produce_blocks();
-   advance_to_next_epoch(); // publishes the repaired candidate while duty is still held
-   BOOST_REQUIRE(!read_epoch_state()[epoch_fields::NEXT_BATCH_OP_GROUPS].get_array().empty());
-   const auto resumed = encode_delivery(current_epoch(), "resumed-duty hit");
-   for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID})
-      BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, chain, resumed));
-   produce_blocks();
-   advance_to_next_epoch();
-   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, EPOCH_ACCOUNT,
-      "termcheck"_n, mvo()("account", BATCHOP.to_string())));
-   BOOST_REQUIRE_EQUAL(get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>(),
-                       opp::types::OPERATOR_STATUS_ACTIVE);
+      uint32_t held_misses = 0;
+      for (uint64_t id = 0; id < TABLE_SCAN_LIMIT; ++id) {
+         const auto data = tester.get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "dellog"_n, name{id});
+         if (data.empty()) continue;
+         const auto row = tester.opreg_abi.binary_to_variant("delivery_log_entry", data,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+         if (row["account"].as_string() == BATCHOP.to_string() &&
+             row["epoch"].as_uint64() == held_epoch && !row["delivered"].as_bool()) ++held_misses;
+      }
+      BOOST_REQUIRE_EQUAL(held_misses, 2u); // one held epoch, two required outposts
+      for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID})
+         tester.require_fresh_roster(chain, BATCHOP, opp::types::OPERATOR_STATUS_TERMINATED,
+                                    /*expect_schedule_absence=*/false);
+   }
 } FC_LOG_AND_RETHROW() }
 
 // WIRE-385: a removal during this advance must be visible in BOTH emitted

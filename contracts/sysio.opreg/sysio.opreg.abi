@@ -285,30 +285,6 @@
             ]
         },
         {
-            "name": "held_epoch_entry",
-            "base": "",
-            "fields": [
-                {
-                    "name": "epoch",
-                    "type": "uint64"
-                },
-                {
-                    "name": "ts_ms",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "held_epoch_key",
-            "base": "",
-            "fields": [
-                {
-                    "name": "epoch",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "op_config",
             "base": "",
             "fields": [
@@ -880,14 +856,6 @@
                     "table_id": 30319
                 }
             ]
-        },
-        {
-            "name": "heldepochs",
-            "type": "held_epoch_entry",
-            "index_type": "i64",
-            "key_names": ["epoch"],
-            "key_types": ["uint64"],
-            "table_id": 10706
         },
         {
             "name": "opconfig",
