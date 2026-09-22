@@ -124,9 +124,11 @@ public:
       sysio_system::test_support::load_account_abi(*this, account, ser);
    }
 
-   action_result push(name code, abi_serializer& ser, name signer, name action_name, const variant_object& data) {
+   action_result push(name code, abi_serializer& ser, name signer, name action_name, const variant_object& data,
+                      std::vector<permission_level> authorization = {}) {
       return sysio_system::test_support::push_contract_action_and_produce_block(*this, code, ser, signer,
-                                                                                action_name, data);
+                                                                                action_name, data,
+                                                                                std::move(authorization));
    }
    action_result push_liq(name signer, name action_name, const variant_object& data) {
       return push(LIQ_ACCOUNT, liq_abi_ser, signer, action_name, data);
@@ -274,6 +276,26 @@ public:
    }
    action_result tickyield(symbol pair = POOL_SYM, name signer = "alice"_n) {
       return push(SWAP_ACCOUNT, swap_abi_ser, signer, "tickyield"_n, mvo()("pair_token", pair.to_symbol_code()));
+   }
+   // The swap is unprivileged and bills a user's rows to the user, so these carry the
+   // user's `sysio.payer` beside `active`, as the swap suite's own pushes do.
+   /// A user's deposit row on the swap for one token, RAM billed to `payer`.
+   action_result openext(name user, name payer, const extended_symbol& ext_symbol) {
+      return push(SWAP_ACCOUNT, swap_abi_ser, payer, "openext"_n, mvo()
+         ("user", user)("payer", payer)("ext_symbol", ext_symbol),
+         sysio_system::test_support::payer_authorization(payer));
+   }
+   /// Sell `ext_asset_in` from the user's deposit into `pair` for at least `min_expected`.
+   action_result exchange(name user, symbol pair, const extended_asset& ext_asset_in, const asset& min_expected) {
+      return push(SWAP_ACCOUNT, swap_abi_ser, user, "exchange"_n, mvo()
+         ("user", user)("pair_token", pair.to_symbol_code())("ext_asset_in", ext_asset_in)("min_expected", min_expected),
+         sysio_system::test_support::payer_authorization(user));
+   }
+   /// Move `to_withdraw` from the user's deposit on the swap to `to`'s wallet.
+   action_result withdraw(name user, name to, const extended_asset& to_withdraw) {
+      return push(SWAP_ACCOUNT, swap_abi_ser, user, "withdraw"_n, mvo()
+         ("user", user)("to", to)("to_withdraw", to_withdraw)("memo", ""),
+         sysio_system::test_support::payer_authorization(user));
    }
 
    // --- rows ---
@@ -727,6 +749,46 @@ BOOST_FIXTURE_TEST_CASE(queued_yield_sells_through_the_pool_and_pays_holders, sy
    BOOST_REQUIRE_LT(0, alice_owed);
    BOOST_REQUIRE_EQUAL(success(), claim("alice"_n));
    BOOST_REQUIRE_EQUAL(alice_before + alice_owed, wire_balance("alice"_n));
+} FC_LOG_AND_RETHROW()
+
+// The other exit: a holder sells shadow into the yield pool for WIRE on the depot, no
+// outpost round trip. The pool is an ordinary pair, so alice opens her two deposit rows,
+// deposits shadow by transfer, exchanges it for WIRE and withdraws the WIRE to her wallet.
+// Both legs conserve exactly: the pool gains what she sold and she receives what the pool
+// lost; the shadow supply is untouched, since it moved and nothing burned; the fee and the
+// price impact keep her proceeds below par.
+BOOST_FIXTURE_TEST_CASE(a_holder_can_sell_shadow_into_the_yield_pool_for_wire, sysio_liq_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), mintsynd(SOLANA, 1, "alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), regliqpool(SOLANA, LIQSOL, POOL_SYM, 1000 * UNIT, 1000 * UNIT));
+
+   const extended_symbol shadow_ext{ LIQSOL_SYM, LIQ_ACCOUNT };
+   const extended_symbol wire_ext{ WIRE_SYM, TOKEN_ACCOUNT };
+   BOOST_REQUIRE_EQUAL(success(), openext("alice"_n, "alice"_n, shadow_ext));
+   BOOST_REQUIRE_EQUAL(success(), openext("alice"_n, "alice"_n, wire_ext));
+
+   constexpr int64_t sold = 50 * UNIT;
+   BOOST_REQUIRE_EQUAL(success(), transfer_shadow("alice"_n, SWAP_ACCOUNT, sold));
+   BOOST_REQUIRE_EQUAL(50 * UNIT, shadow_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(1050 * UNIT, shadow_balance(SWAP_ACCOUNT));   // the pool's 1000 plus her deposit
+
+   const auto    before             = swap_pool_row(POOL_SYM);
+   const int64_t pool_shadow_before = before["pool1"]["quantity"].as<asset>().get_amount();
+   const int64_t pool_wire_before   = before["pool2"]["quantity"].as<asset>().get_amount();
+   BOOST_REQUIRE_EQUAL(success(), exchange("alice"_n, POOL_SYM, extended_asset{ asset(sold, LIQSOL_SYM), LIQ_ACCOUNT },
+                                           asset(1, WIRE_SYM)));
+   const auto    after    = swap_pool_row(POOL_SYM);
+   const int64_t received = pool_wire_before - after["pool2"]["quantity"].as<asset>().get_amount();
+   BOOST_REQUIRE_EQUAL(pool_shadow_before + sold, after["pool1"]["quantity"].as<asset>().get_amount());
+   BOOST_REQUIRE_LT(0, received);
+   BOOST_REQUIRE_LT(received, sold);
+   BOOST_REQUIRE_EQUAL(1100 * UNIT, supply());
+
+   const int64_t wallet_before = wire_balance("alice"_n);
+   BOOST_REQUIRE_EQUAL(success(), withdraw("alice"_n, "alice"_n, extended_asset{ asset(received, WIRE_SYM), TOKEN_ACCOUNT }));
+   BOOST_REQUIRE_EQUAL(wallet_before + received, wire_balance("alice"_n));
+   // The deposit held exactly the proceeds: nothing is left to withdraw.
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("insufficient funds"),
+                       withdraw("alice"_n, "alice"_n, extended_asset{ asset(1, WIRE_SYM), TOKEN_ACCOUNT }));
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE(regliqpool_refusals, sysio_liq_tester) try {

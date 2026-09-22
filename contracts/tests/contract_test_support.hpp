@@ -20,18 +20,28 @@ void load_account_abi(Tester& tester, name account, abi_serializer& out_ser) {
    out_ser.set_abi(std::move(parsed), abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
 }
 
-/// Build and sign one ABI-encoded contract-action transaction.
+/// The authorization an action needs when an unprivileged contract bills RAM to `signer`
+/// (a deposit row emplaced for a user, say): the signer's `sysio.payer` beside `active`.
+/// The active key satisfies both.
+inline std::vector<permission_level> payer_authorization(name signer) {
+   return {{signer, config::sysio_payer_name}, {signer, config::active_name}};
+}
+
+/// Build and sign one ABI-encoded contract-action transaction. `authorization` defaults to
+/// the signer's `active`; pass `payer_authorization(signer)` when the action bills RAM.
 template <typename Tester>
 signed_transaction create_contract_action_transaction(Tester& tester, name contract, abi_serializer& serializer,
                                                        name signer, name action_name,
-                                                       const fc::variant_object& data) {
+                                                       const fc::variant_object& data,
+                                                       std::vector<permission_level> authorization = {}) {
    action act;
    act.account = contract;
    act.name = action_name;
    act.data = serializer.variant_to_binary(
       serializer.get_action_type(action_name), data,
       abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
-   act.authorization = std::vector<permission_level>{{signer, config::active_name}};
+   act.authorization = authorization.empty() ? std::vector<permission_level>{{signer, config::active_name}}
+                                             : std::move(authorization);
 
    signed_transaction trx;
    trx.actions.emplace_back(std::move(act));
@@ -44,8 +54,10 @@ signed_transaction create_contract_action_transaction(Tester& tester, name contr
 template <typename Tester>
 transaction_trace_ptr push_contract_action_trace(Tester& tester, name contract, abi_serializer& serializer,
                                                  name signer, name action_name,
-                                                 const fc::variant_object& data) {
-   auto trx = create_contract_action_transaction(tester, contract, serializer, signer, action_name, data);
+                                                 const fc::variant_object& data,
+                                                 std::vector<permission_level> authorization = {}) {
+   auto trx = create_contract_action_transaction(tester, contract, serializer, signer, action_name, data,
+                                                 std::move(authorization));
    return tester.push_transaction(trx);
 }
 
@@ -66,9 +78,9 @@ typename Tester::action_result push_contract_action(Tester& tester, name contrac
 template <typename Tester>
 typename Tester::action_result push_contract_action_and_produce_block(
    Tester& tester, name contract, abi_serializer& serializer, name signer, name action_name,
-   const fc::variant_object& data) {
+   const fc::variant_object& data, std::vector<permission_level> authorization = {}) {
    try {
-      push_contract_action_trace(tester, contract, serializer, signer, action_name, data);
+      push_contract_action_trace(tester, contract, serializer, signer, action_name, data, std::move(authorization));
       tester.produce_block();
       return Tester::success();
    } catch (const fc::exception& ex) {
