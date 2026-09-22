@@ -9,7 +9,7 @@
 #include <numeric>
 #include <tuple>
 
-namespace sysio::query_engine_plugin {
+namespace sysio::query_engine {
 namespace {
 constexpr uint64_t allocation_factor = 2;
 constexpr uint64_t map_node_overhead = 128;
@@ -317,4 +317,4 @@ query_result evaluate(const typed_plan& plan, captured_input input, query_budget
       throw query_error(error_kind::VALUE_ERROR, "Aggregate overflow");
    }
 }
-} // namespace sysio::query_engine_plugin
+} // namespace sysio::query_engine

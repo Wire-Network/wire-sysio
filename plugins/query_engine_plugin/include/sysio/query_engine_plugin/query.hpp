@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-namespace sysio::query_engine_plugin {
+namespace sysio::query_engine {
 
 /// Protocol/parser constants shared by the service, parser and schema tests.
 namespace constants {
@@ -460,6 +460,6 @@ fc::variant create_error(const query_request*, const query_error&);
 /// Validate the single-request profile, retaining valid notification status on invocation errors.
 query_request parse_request(std::string_view, query_budget&);
 
-} // namespace sysio::query_engine_plugin
+} // namespace sysio::query_engine
 
-FC_REFLECT(sysio::query_engine_plugin::query_result, (schema_version)(complete)(source)(state)(columns)(rows)(stats))
+FC_REFLECT(sysio::query_engine::query_result, (schema_version)(complete)(source)(state)(columns)(rows)(stats))

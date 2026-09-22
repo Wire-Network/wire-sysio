@@ -39,8 +39,7 @@ int main(int argc, char** argv)
    application_base::register_plugin<test_control_api_plugin>();
    application_base::register_plugin<state_history_plugin>();
    application_base::register_plugin<status_monitor_plugin>();
-   /// Register the query engine for explicit --plugin activation.
-   application_base::register_plugin<sysio::query_engine_plugin::query_engine_plugin>();
+   application_base::register_plugin<query_engine_plugin>();
    application_base::register_plugin<prometheus_plugin>();
    application_base::register_plugin<chain_api_plugin>();
    application_base::register_plugin<signature_provider_manager_plugin>();

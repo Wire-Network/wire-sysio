@@ -9,7 +9,7 @@
 #include <WireQueryLexer.h>
 #include <WireQueryParser.h>
 
-namespace sysio::query_engine_plugin {
+namespace sysio::query_engine {
 namespace {
 /// A throwing listener prevents ANTLR recovery from silently changing the query.
 class error_listener final : public antlr4::BaseErrorListener {
@@ -289,4 +289,4 @@ ast_query parse_query(std::string_view sql, query_budget& budget) {
    return ast_builder(budget).create(tree);
 }
 
-} // namespace sysio::query_engine_plugin
+} // namespace sysio::query_engine

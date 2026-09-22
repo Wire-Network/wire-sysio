@@ -1,7 +1,7 @@
 # Query engine plugin
 
-`sysio::query_engine_plugin::query_engine_plugin` exposes a shared C++ query service and, when HTTP is enabled,
-`POST /v1/query/execute`. All plugin types, including the generated parser, live in `sysio::query_engine_plugin`. All ABI and table access is in process. HTTP carries client requests and
+`sysio::query_engine_plugin` exposes a shared C++ query service and, when HTTP is enabled,
+`POST /v1/query/execute`. The plugin class lives in `sysio`; every other plugin type, including the generated parser, lives in `sysio::query_engine`. All ABI and table access is in process. HTTP carries client requests and
 responses; no table HTTP client, external database, historical snapshots or retained cursors are used.
 
 ## Enablement
@@ -9,7 +9,7 @@ responses; no table HTTP client, external database, historical snapshots or reta
 The plugin is linked into `nodeop` and is **opt-in**. Add to the query node's existing `config.ini`:
 
 ```ini
-plugin = sysio::query_engine_plugin::query_engine_plugin
+plugin = sysio::query_engine_plugin
 read-mode = head
 ```
 
@@ -26,8 +26,8 @@ without being configured to produce blocks. P2P synchronization remains the node
 Retrieve the service after plugin startup and call it from a worker thread:
 
 ```cpp
-using namespace sysio::query_engine_plugin;
-auto service = appbase::app().get_plugin<sysio::query_engine_plugin::query_engine_plugin>().get_query_service();
+using namespace sysio::query_engine;
+auto service = appbase::app().get_plugin<sysio::query_engine_plugin>().get_query_service();
 query_result result = service->execute(
    "SELECT beneficiary, SUM(amount) AS total FROM sample.positions GROUP BY beneficiary ORDER BY total DESC",
    query_options{.timeout_ms = -1, .limit = 20, .offset = 0});

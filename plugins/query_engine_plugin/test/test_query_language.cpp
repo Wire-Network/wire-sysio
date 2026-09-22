@@ -2,7 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-using namespace sysio::query_engine_plugin;
+using namespace sysio::query_engine;
 BOOST_AUTO_TEST_SUITE(query_language)
 
 BOOST_AUTO_TEST_CASE(case_quotes_and_owned_ast) {

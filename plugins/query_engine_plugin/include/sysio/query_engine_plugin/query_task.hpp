@@ -3,7 +3,7 @@
 
 #include <future>
 
-namespace sysio::query_engine_plugin {
+namespace sysio::query_engine {
 /// One queued execution. Read callbacks retain this task after timeout so admission outlives all raw reads.
 struct query_task {
    std::string query;
@@ -20,4 +20,4 @@ struct query_task {
          retire(*this);
    }
 };
-} // namespace sysio::query_engine_plugin
+} // namespace sysio::query_engine

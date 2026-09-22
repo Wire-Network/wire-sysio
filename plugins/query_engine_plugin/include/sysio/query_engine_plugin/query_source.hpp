@@ -1,7 +1,7 @@
 #pragma once
 #include <sysio/query_engine_plugin/query.hpp>
 
-namespace sysio::query_engine_plugin {
+namespace sysio::query_engine {
 /// Direct local-controller adapter. Both methods must run in the chain executor's read-only queue.
 /// The synchronized read API owns its lifetime; no controller-owned reference escapes either method.
 class local_table_source {
@@ -16,4 +16,4 @@ public:
 private:
    const chain::controller& controller;
 };
-} // namespace sysio::query_engine_plugin
+} // namespace sysio::query_engine

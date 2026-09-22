@@ -12,7 +12,7 @@
 #include <regex>
 #include <set>
 
-namespace sysio::query_engine_plugin::test {
+namespace sysio::query_engine::test {
 /// Read a checked-in schema/example independently of the test's working directory.
 inline std::string read_document(const std::string& relative) {
    std::ifstream input(std::string(QUERY_PLUGIN_SOURCE_DIR) + "/" + relative);
@@ -91,4 +91,4 @@ inline void validate_response(const std::string& body) {
    for (size_t i = 0; i < owners.size(); ++i)
       BOOST_CHECK_EQUAL(owners[i].as_string(), abis[i]["owner"].as_string());
 }
-} // namespace sysio::query_engine_plugin::test
+} // namespace sysio::query_engine::test

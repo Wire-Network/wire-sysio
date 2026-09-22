@@ -3,8 +3,8 @@
 #include <fc/io/raw.hpp>
 #include <sysio/chain/account_object.hpp>
 
-using namespace sysio::query_engine_plugin;
-using namespace sysio::query_engine_plugin::test;
+using namespace sysio::query_engine;
+using namespace sysio::query_engine::test;
 using namespace sysio::chain::literals;
 
 BOOST_FIXTURE_TEST_SUITE(query_integration, chain_fixture)

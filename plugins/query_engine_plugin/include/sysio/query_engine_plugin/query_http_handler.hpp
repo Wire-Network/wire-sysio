@@ -2,7 +2,7 @@
 #include <sysio/http_plugin/http_plugin.hpp>
 #include <sysio/query_engine_plugin/query_engine.hpp>
 
-namespace sysio::query_engine_plugin {
+namespace sysio::query_engine {
 /// JSON-RPC/HTTP adapter. The engine owns execution; this class owns envelopes, IDs, byte caps and notifications.
 class query_http_handler : public std::enable_shared_from_this<query_http_handler> {
 public:
@@ -21,4 +21,4 @@ private:
    struct impl;
    std::unique_ptr<impl> state;
 };
-} // namespace sysio::query_engine_plugin
+} // namespace sysio::query_engine
