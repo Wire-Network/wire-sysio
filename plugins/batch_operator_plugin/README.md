@@ -20,6 +20,22 @@ All 21 batch operators run this plugin in perpetuity. The epoch scheduler (`sysi
 3. Deliver its raw protobuf bytes to Depot (`sysio.msgch::deliver`)
 4. Depot evaluates consensus across all 7 deliveries
 
+## Depot cranks
+
+Every epoch poll (`--batch-epoch-poll-ms`) also pushes the depot actions nothing on
+chain schedules. `sysio.msgch::chkcons` comes only from the elected operator; the
+rest come from every ACTIVE operator, because the elected one may be the operator
+that is offline, and each is a cheap no-op once its work is done:
+
+| Action | When | Why nothing else drives it |
+|--------|------|----------------------------|
+| `sysio.chalg::chkdispute(dispute_id)` | every OPEN envelope dispute | a dispute pauses `sysio.epoch::advance`, so no inline poke can reach it |
+| `sysio.swap::tickyield(pair_token)` | every yield pool whose reservoir has a queued balance, at most once per `--batch-yield-tick-interval-ms` per pool from this operator | the reservoir is sold into the pool as time passes; only a tick moves the clock |
+| `sysio.liq::queueyield(sym)` | every shadow with yield pending from an outpost `LIQ_YIELD` report | the report lands in `sysio.liq`'s pending balance; queuing it into the swap is a separate, permissionless step |
+
+The two yield cranks stay idle, without logging a read failure per poll, until both
+`sysio.swap` and `sysio.liq` are deployed on the depot.
+
 ## Configuration
 
 | Option | Default | Description |
@@ -27,6 +43,7 @@ All 21 batch operators run this plugin in perpetuity. The epoch scheduler (`sysi
 | `--batch-operator-account` | — | WIRE account name for this operator. Configuring it enables the relay |
 | `--batch-epoch-poll-ms` | 15000 | How often to check epoch state (ms) |
 | `--batch-delivery-timeout-ms` | 15000 | Max time to wait for chain delivery confirmation (ms) |
+| `--batch-yield-tick-interval-ms` | 60000 | Minimum spacing between this operator's `sysio.swap::tickyield` pushes per yield pool (ms) |
 
 There is no separate enable flag: the relay runs when `--batch-operator-account`
 is configured, the way `producer_plugin` keys off `--producer-name`. The plugin

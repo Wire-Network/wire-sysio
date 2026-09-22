@@ -14,6 +14,7 @@
 
 #include "async_action_completion.hpp"
 #include "group_election.hpp"
+#include "yield_cranks.hpp"
 
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 #include <sysio/batch_operator_plugin/depot_ops.hpp>
@@ -41,6 +42,9 @@ namespace {
    constexpr auto DELIVERY_TIMEOUT_MS  = 15000;
    constexpr auto EPOCH_POLL_MS        = 15000;
    constexpr auto EPOCH_EDGE_BUFFER_MS = 2500;
+   /// Minimum spacing between this operator's `sysio.swap::tickyield` pushes per
+   /// yield pool (`--batch-yield-tick-interval-ms`).
+   constexpr auto YIELD_TICK_INTERVAL_MS = 60000;
 
    /// Minimum private cron-service thread count even when 0 outposts are
    /// discovered at startup — keeps `epoch_tick` viable so a cold-sync node
@@ -148,6 +152,16 @@ struct batch_operator_plugin::impl {
    bool         enabled             = false;
    uint32_t     epoch_poll_ms       = EPOCH_POLL_MS;
    uint32_t     delivery_timeout_ms = DELIVERY_TIMEOUT_MS;
+   uint32_t     yield_tick_interval_ms = YIELD_TICK_INTERVAL_MS;
+
+   // Yield cranks -- see `crank_yield`.
+   /// Whether `sysio.swap` and `sysio.liq` run code, refreshed off the read-only
+   /// executor queue every poll (a chainbase read belongs in a read window). The
+   /// cranks act on the last reading rather than wait for a fresh one: one poll
+   /// of lag is nothing against a yield horizon, and it keeps the cron thread
+   /// off chainbase.
+   std::atomic<bool>                    yield_contracts_deployed{false};
+   batch_operator_detail::crank_spacing yield_tick_spacing;
 
    // Epoch state tracked across polls
    uint32_t                 current_epoch = 0;
@@ -371,6 +385,15 @@ struct batch_operator_plugin::impl {
       try {
          crank_open_disputes();
       } FC_LOG_AND_DROP();
+
+      // Sell queued yield and queue reported yield. Not gated on `is_elected`
+      // either — see crank_yield. Idle until both contracts are deployed.
+      refresh_yield_contract_presence();
+      if (yield_contracts_deployed) {
+         try {
+            crank_yield();
+         } FC_LOG_AND_DROP();
+      }
    }
 
    /**
@@ -427,6 +450,130 @@ struct batch_operator_plugin::impl {
             // Expected-transient: the dispute resolved between the scan and the push, or
             // another operator's crank won the race.
             dlog("batch_operator: chkdispute({}): {}", dispute_id, e.to_string());
+         }
+      }
+   }
+
+   /**
+    * Refresh `yield_contracts_deployed` from a read window. `sysio.swap` and
+    * `sysio.liq` are the two contracts the yield cranks read, and a depot whose
+    * bootstrap has not deployed them (or never will) must not pay a failed table
+    * read -- an `elog` per poll -- for tables that legitimately do not exist.
+    */
+   void refresh_yield_contract_presence() {
+      // `this` outlives every queued task: appbase drains the executor before it
+      // destroys plugins (the same guarantee chain_plugin::read_table_rows_checked
+      // relies on for its own posted scans).
+      app().executor().post(appbase::priority::low, appbase::exec_queue::read_only, [this] {
+         using namespace batch_operator_detail;
+         if (shutting_down) return;
+         const auto& controller = chain_plug->chain();
+         auto runs_code = [&](const char* account) {
+            const auto* meta = controller.find_account_metadata(chain::name(account));
+            return meta != nullptr && meta->code_hash != chain::digest_type();
+         };
+         const bool deployed = runs_code(swap::account) && runs_code(liq::account);
+         if (yield_contracts_deployed.exchange(deployed) != deployed) {
+            ilog("batch_operator: yield cranks {}: {} and {} {}",
+                 deployed ? "active" : "idle", swap::account, liq::account,
+                 deployed ? "are deployed" : "are not both deployed");
+         }
+      });
+   }
+
+   /**
+    * Crank the two permissionless yield actions nothing on chain schedules:
+    * `sysio.swap::tickyield` for every yield pool whose reservoir has a queued
+    * balance, and `sysio.liq::queueyield` for every shadow with yield pending from
+    * an outpost `LIQ_YIELD` report. Like `crank_open_disputes`, NOT gated on
+    * `is_elected`: the elected operator may be the one that is offline, and every
+    * push is a cheap no-op once its work is done (`tickyield` returns when nothing
+    * is queued or the clip is below its floor; `queueyield` when nothing is
+    * pending). `yield_tick_spacing` bounds this operator to one tick per pool per
+    * `batch-yield-tick-interval-ms`: a reservoir drains over a horizon of hours
+    * while every ACTIVE operator polls every few seconds.
+    */
+   void crank_yield() {
+      crank_yield_ticks();
+      crank_pending_yield();
+   }
+
+   /// `tickyield` for every tickable pool whose reservoir has something queued.
+   void crank_yield_ticks() {
+      using namespace batch_operator_detail;
+      // The pools: only a yield pool with its tick parameters set survives the
+      // action's own checks; the pool's symbol code is the row's kv key, so the
+      // rows are read with their keys.
+      sysio::chain_apis::read_only::get_table_rows_params pools;
+      pools.code     = chain::name(swap::account);
+      pools.scope    = swap::account;
+      pools.table    = swap::table_stat;
+      pools.all_rows = true;
+      pools.filter   = [](const fc::variant& row) {
+         const auto value = row_value(row.get_object());
+         return value && is_tickable_pool(*value);
+      };
+      auto pool_rows = read_table(std::move(pools));
+      if (pool_rows.rows.empty()) return;
+
+      // The reservoirs: what is queued to sell, keyed by the same symbol code.
+      sysio::chain_apis::read_only::get_table_rows_params reservoirs;
+      reservoirs.code     = chain::name(swap::account);
+      reservoirs.scope    = swap::account;
+      reservoirs.table    = swap::table_reservoirs;
+      reservoirs.all_rows = true;
+      std::map<uint64_t, int64_t> queued_by_pool;
+      for (const auto& r : read_table(std::move(reservoirs)).rows) {
+         const auto& row   = r.get_object();
+         const auto  code  = row_symbol_code(row);
+         const auto  value = row_value(row);
+         if (!code || !value) continue;
+         auto balance = value->find(swap::field::balance);
+         if (balance == value->end() || !balance->value().is_object()) continue;
+         queued_by_pool[code->value] = asset_amount(balance->value().get_object(), swap::field::quantity);
+      }
+
+      const auto now      = fc::time_point::now();
+      const auto interval = fc::milliseconds(yield_tick_interval_ms);
+      for (const auto& r : pool_rows.rows) {
+         const auto code = row_symbol_code(r.get_object());
+         if (!code) continue;
+         const auto queued = queued_by_pool.find(code->value);
+         if (queued == queued_by_pool.end() || queued->second <= 0) continue;
+         const auto pool = symbol_code_name(*code);
+         if (!yield_tick_spacing.due(pool, now, interval)) continue;
+         try {
+            push_action(swap::account, swap::action_tickyield, operator_account,
+                        fc::mutable_variant_object()(swap::field::pair_token, *code));
+            yield_tick_spacing.mark(pool, now);
+         } catch (const fc::exception& e) {
+            // Expected-transient: another operator's tick sold the clip first, or the
+            // pool's parameters changed between the scan and the push.
+            dlog("batch_operator: tickyield({}): {}", pool, e.to_string());
+         }
+      }
+   }
+
+   /// `queueyield` for every shadow with yield pending from an outpost report.
+   void crank_pending_yield() {
+      using namespace batch_operator_detail;
+      sysio::chain_apis::read_only::get_table_rows_params pending;
+      pending.code     = chain::name(liq::account);
+      pending.scope    = liq::account;
+      pending.table    = liq::table_liqpending;
+      pending.all_rows = true;
+      for (const auto& r : read_table(std::move(pending)).rows) {
+         const auto& row   = r.get_object();
+         const auto  code  = row_symbol_code(row);
+         const auto  value = row_value(row);
+         if (!code || !value || asset_amount(*value, liq::field::quantity) <= 0) continue;
+         try {
+            push_action(liq::account, liq::action_queueyield, operator_account,
+                        fc::mutable_variant_object()(liq::field::sym, *code));
+         } catch (const fc::exception& e) {
+            // Expected-transient: another operator queued it first. Persistent while
+            // the shadow has no yield pool yet (`regliqpool` still to come).
+            dlog("batch_operator: queueyield({}): {}", symbol_code_name(*code), e.to_string());
          }
       }
    }
@@ -1066,6 +1213,8 @@ void batch_operator_plugin::set_program_options(options_description& cli,
    // splits nodeop --help output on that token).
    opts("batch-delivery-timeout-ms", bpo::value<uint32_t>()->default_value(DELIVERY_TIMEOUT_MS),
         "Max time to wait for chain delivery confirmation (ms)");
+   opts("batch-yield-tick-interval-ms", bpo::value<uint32_t>()->default_value(YIELD_TICK_INTERVAL_MS),
+        "Minimum spacing between this operator's sysio.swap::tickyield pushes per yield pool (ms)");
 }
 
 void batch_operator_plugin::plugin_initialize(const variables_map& options) {
@@ -1073,6 +1222,7 @@ void batch_operator_plugin::plugin_initialize(const variables_map& options) {
       _impl->operator_account = chain::name(options["batch-operator-account"].as<std::string>());
    _impl->epoch_poll_ms       = options["batch-epoch-poll-ms"].as<uint32_t>();
    _impl->delivery_timeout_ms = options["batch-delivery-timeout-ms"].as<uint32_t>();
+   _impl->yield_tick_interval_ms = options["batch-yield-tick-interval-ms"].as<uint32_t>();
    _impl->enabled             = _impl->operator_account.good();
    _impl->chain_plug = &app().get_plugin<chain_plugin>();
    _impl->cron_plug  = &app().get_plugin<cron_plugin>();

@@ -147,6 +147,22 @@ void outpost_opp_job::run_outbound() {
       wlog("outpost_opp_job[{}]: outbound delivery failed: {}",
            _client->to_string(), e.what());
    }
+
+   // The outpost's per-epoch cranks ride the first successful delivery of an
+   // epoch -- never its consensus retry, never a failed delivery. Best-effort
+   // and separate from the delivery result: the envelope landed regardless, and
+   // a failed crank is retried by the next epoch's delivery.
+   if (!retry_pending && _last_outbound_epoch == epoch) {
+      try {
+         _client->crank_outpost(epoch, _outpost_deadline);
+      } catch (const fc::exception& e) {
+         wlog("outpost_opp_job[{}]: outpost crank failed for epoch {}: {}",
+              _client->to_string(), epoch, e.to_detail_string());
+      } catch (const std::exception& e) {
+         wlog("outpost_opp_job[{}]: outpost crank failed for epoch {}: {}",
+              _client->to_string(), epoch, e.what());
+      }
+   }
 }
 
 void outpost_opp_job::run_inbound() {
