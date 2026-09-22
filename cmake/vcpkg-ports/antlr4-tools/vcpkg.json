@@ -1,0 +1,8 @@
+{
+  "name": "antlr4-tools",
+  "version": "4.13.2",
+  "description": "Pinned ANTLR generator JAR for native host code generation; uses a system JVM.",
+  "homepage": "https://www.antlr.org",
+  "license": "BSD-3-Clause",
+  "supports": "native"
+}

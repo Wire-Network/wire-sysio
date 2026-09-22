@@ -1,0 +1,15 @@
+{
+  "jsonrpc": "2.0",
+  "id": "balances-by-beneficiary",
+  "error": {
+    "code": -32012,
+    "message": "Query scan row limit exceeded",
+    "data": {
+      "kind": "QUERY_LIMIT",
+      "retryable": false,
+      "line": null,
+      "column": null,
+      "limit": "query-max-scan-rows"
+    }
+  }
+}
