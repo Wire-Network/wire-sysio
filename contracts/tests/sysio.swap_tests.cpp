@@ -11,6 +11,7 @@
 #include <contracts.hpp>
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/twap.hpp>
+#include "shadow_yield_reference.hpp"
 #include "twap_wide.hpp"
 #include <algorithm>
 #include <cmath>
@@ -43,14 +44,6 @@ struct shadow_index_row {
     uint64_t      carry;
 };
 FC_REFLECT( shadow_index_row, (index)(pot)(carry) )
-
-// Boost.Test prints both operands of a failed assertion; the 128-bit index
-// fields have no stream operator of their own.
-namespace boost::test_tools::tt_detail {
-   template<> struct print_log_value<fc::uint128_t> {
-      void operator()( std::ostream& os, const fc::uint128_t& v ) { os << fc::to_string( v ); }
-   };
-}
 
 static symbol EVO4 = symbol::from_string("4,EVO");
 static symbol ETUSD3 = symbol::from_string("3,ETUSD");
@@ -728,22 +721,9 @@ namespace twap_reference {
    }
 }
 
-// The shadow yield spec (sysio.opp.common/shadow_yield.hpp), written by hand:
-// a distribution advances the index by WIRE * SCALE / supply with the
-// remainder carried into the next one, and a holder is owed its banked WIRE
-// plus balance * (index - checkpoint) / SCALE, floored.
+// The shadow yield spec is shared with the sysio.liq suite (shadow_yield_reference.hpp);
+// the tick's clip formula is the swap's own.
 namespace yield_reference {
-   using wide = boost::multiprecision::uint128_t;
-   constexpr uint64_t Scale = 1'000'000'000'000;
-   // The index and the checkpoints are 128-bit, like the rows they are read from.
-   struct distribution { wide index_delta; uint64_t carry; };
-   distribution distribute( int64_t wire, int64_t supply, uint64_t carry_in ) {
-      const wide total = wide(wire) * Scale + carry_in;
-      return { wide( total / supply ), uint64_t( total % supply ) };
-   }
-   int64_t owed( int64_t balance, fc::uint128_t index, fc::uint128_t checkpoint, uint64_t banked = 0 ) {
-      return int64_t( banked + uint64_t( wide(balance) * (wide(index) - wide(checkpoint)) / Scale ) );
-   }
    // One tick's clip: the reservoir's share of the horizon elapsed, FLOORED,
    // capped by `cap_bps` of the pool's shadow side and by what is queued. A
    // clip short of min(clip_floor, queued) is not sold at all, which this

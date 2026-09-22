@@ -40,6 +40,10 @@ struct contracts {
    static std::vector<char>    tokens_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.tokens/sysio.tokens.abi"); }
    static std::vector<uint8_t> swap_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.swap/sysio.swap.wasm"); }
    static std::vector<char>    swap_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.swap/sysio.swap.abi"); }
+   static std::vector<uint8_t> liq_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.liq/sysio.liq.wasm"); }
+   static std::vector<char>    liq_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.liq/sysio.liq.abi"); }
+   /// The checked-in bootstrap configs (`dex-config.*.json`) the launch-ingestion tests replay.
+   static std::string          dex_config_dir() { return "${CMAKE_SOURCE_DIR}/etc/config/dex"; }
 
    struct util {
       static std::vector<uint8_t> badtoken_wasm()     { return read_wasm("${CMAKE_BINARY_DIR}/contracts/test_contracts/badtoken/badtoken.wasm"); }

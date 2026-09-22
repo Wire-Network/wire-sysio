@@ -681,6 +681,18 @@
                 {
                     "name": "ATTESTATION_TYPE_EMISSIONS_BLOCKED",
                     "value": 60962
+                },
+                {
+                    "name": "ATTESTATION_TYPE_SYNDICATE_LIQ",
+                    "value": 60963
+                },
+                {
+                    "name": "ATTESTATION_TYPE_LIQ_YIELD",
+                    "value": 60964
+                },
+                {
+                    "name": "ATTESTATION_TYPE_DESYNDICATE_LIQ",
+                    "value": 60965
                 }
             ]
         },

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <stdlib.h>
+#include <algorithm>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -187,6 +189,55 @@ namespace sysio {
         default:
            return {};
      }
+  }
+
+  /// The key width each chain family carries in a `ChainAddress.address`.
+  inline constexpr size_t EVM_PUBKEY_BYTES = 33;   // compressed secp256k1
+  inline constexpr size_t SVM_PUBKEY_BYTES = 32;   // Ed25519
+
+  /**
+   * @brief Build the `sysio::public_key` variant a `links` row stores from a chain
+   * family and the raw key bytes an outpost carries in a `ChainAddress.address`.
+   * Inverse of `pubkey_to_bytes`, shared by every contract that resolves an inbound
+   * pubkey through the `links` `bypubkey` index.
+   *
+   * Only the two families authex links carry are representable: EM (33 bytes) for
+   * EVM and ED (32 bytes) for SVM. Anything else -- another chain kind, or bytes of
+   * the wrong width -- yields nullopt, and the caller treats that as "no link".
+   * That is the whole never-throw contract: `pubkey_to_checksum256` aborts on any
+   * other variant, so a resolver must never hash a key this function did not build.
+   *
+   * @param chain The chain family the bytes belong to.
+   * @param bytes The raw key: 33 bytes for EM, 32 for ED.
+   * @return The variant, or nullopt when no link could hold these bytes.
+   */
+  inline std::optional<sysio::public_key> public_key_from_op_address(opp::types::ChainKind chain,
+                                                                     const std::vector<char>& bytes) {
+     sysio::public_key pk;
+     switch (chain) {
+        case opp::types::ChainKind::CHAIN_KIND_EVM: {    // EM — variant index 3
+           if (bytes.size() != EVM_PUBKEY_BYTES) return std::nullopt;
+           sysio::ecc_public_key arr;
+           std::copy(bytes.begin(), bytes.end(), arr.begin());
+           pk.emplace<3>(arr);
+           return pk;
+        }
+        case opp::types::ChainKind::CHAIN_KIND_SVM: {    // ED — variant index 4
+           if (bytes.size() != SVM_PUBKEY_BYTES) return std::nullopt;
+           sysio::ed_public_key arr;
+           std::copy(bytes.begin(), bytes.end(), reinterpret_cast<char*>(arr.data()));
+           pk.emplace<4>(arr);
+           return pk;
+        }
+        default:
+           return std::nullopt;
+     }
+  }
+
+  /// True iff `bytes` has the width of a key `chain` links can carry — the exact set
+  /// `public_key_from_op_address` accepts.
+  inline bool pubkey_fits(opp::types::ChainKind chain, const std::vector<char>& bytes) {
+     return public_key_from_op_address(chain, bytes).has_value();
   }
 
   class [[sysio::contract("sysio.authex")]] authex : public contract {

@@ -282,7 +282,7 @@ void dclaim::onreward(uint64_t              chain_code,
       permission_level{ get_self(), "active"_n },
       SYSTEM_ACCOUNT,
       "fundclaim"_n,
-      std::make_tuple(static_cast<int64_t>(reward_amount))
+      std::make_tuple(get_self(), static_cast<int64_t>(reward_amount))
    ).send();
 }
 

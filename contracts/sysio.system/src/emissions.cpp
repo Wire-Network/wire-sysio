@@ -51,6 +51,8 @@ constexpr int64_t  MS_PER_SECOND          = 1000;
 constexpr int64_t  BPS_DENOMINATOR        = 10000;
 
 constexpr sysio::name CAPITAL_ACCOUNT            = "sysio.dclaim"_n;
+// The shadow-liq token draws the yield kicker through fundclaim beside sysio.dclaim.
+constexpr sysio::name LIQ_ACCOUNT                = "sysio.liq"_n;
 constexpr sysio::name GOVERNANCE_ACCOUNT         = "sysio.gov"_n;
 // Capex ("capital expenditure") bucket lives on sysio.ops -- operational spend.
 constexpr sysio::name CAPEX_OPERATIONS_ACCOUNT   = "sysio.ops"_n;
@@ -184,10 +186,10 @@ int64_t get_reserv_rewards_balance() {
 // THREE call sites remain, and every one targets a PROTOCOL-CONTROLLED account. What makes each
 // safe differs, and the difference is the thing to preserve:
 //
-//   * `fundclaim`             -> `sysio.dclaim`  — a DEPLOYED contract, not a bare account. Safe
-//                                                  because it is protocol-controlled and its code
-//                                                  has no failing `sysio.token::transfer` notify
-//                                                  path; that invariant must hold as dclaim evolves.
+//   * `fundclaim`             -> `sysio.dclaim`  — DEPLOYED contracts, not bare accounts. Safe
+//                                `sysio.liq`       because both are protocol-controlled and neither
+//                                                  has a failing `sysio.token::transfer` notify
+//                                                  path; that invariant must hold as they evolve.
 //   * `payepoch` (capex)      -> `sysio.ops`     — no code deployed
 //   * `payepoch` (governance) -> `sysio.gov`     — no code deployed
 //
@@ -1264,15 +1266,18 @@ void system_contract::payepoch(uint32_t epoch_index,
 }
 
 // fundclaim - transfer up to `amount` WIRE from sysio's drainable pool to
-// sysio.dclaim. Called inline by sysio.dclaim::onreward as each
-// STAKING_REWARD attestation lands, so dclaim is funded against the credit
-// it just took on before the staker can attempt to claim.
+// `recipient`, one of the two capital drains: sysio.dclaim, inline from
+// sysio.dclaim::onreward as each STAKING_REWARD attestation lands, and
+// sysio.liq, inline from sysio.liq::addyield for the kicker on each yield
+// intake. Either way the recipient is funded against the credit it just took
+// on before anyone can attempt to claim it.
 //
-// Never throws. STAKING_REWARD dispatch from sysio.msgch must not be
-// aborted on emissions-side conditions (the never-throw contract for OPP
-// inbound handlers), so a pool-too-small case caps the transfer at what's
-// available and accrues the unfunded delta to t5state.capital_shortfall_total
-// for operator visibility.
+// Never throws for those two callers. STAKING_REWARD dispatch from sysio.msgch
+// must not be aborted on emissions-side conditions (the never-throw contract
+// for OPP inbound handlers), so a pool-too-small case caps the transfer at
+// what's available and accrues the unfunded delta to
+// t5state.capital_shortfall_total for operator visibility. A recipient that is
+// not a drain is refused, which reaches only the stranger who asked.
 //
 // The transfer cap is the minimum of three caps that all must hold:
 //   * `amount`                                                -- requested
@@ -1297,8 +1302,10 @@ void system_contract::payepoch(uint32_t epoch_index,
 // actually transferred counts toward total_distributed -- the curve sees
 // less remaining headroom on its next per-epoch computation and emissions
 // auto-throttle to match real claim load.
-void system_contract::fundclaim(int64_t amount) {
-   require_auth(CAPITAL_ACCOUNT);
+void system_contract::fundclaim(name recipient, int64_t amount) {
+   require_auth(recipient);
+   check(recipient == CAPITAL_ACCOUNT || recipient == LIQ_ACCOUNT,
+         "fundclaim: recipient is not a capital drain");
 
    if (amount <= 0) return;
 
@@ -1322,7 +1329,7 @@ void system_contract::fundclaim(int64_t amount) {
    const int64_t shortfall   = amount - to_transfer;
 
    if (to_transfer > 0) {
-      send_wire_transfer(get_self(), CAPITAL_ACCOUNT, to_transfer, memo::capital);
+      send_wire_transfer(get_self(), recipient, to_transfer, memo::capital);
       state.total_distributed += to_transfer;
    }
 

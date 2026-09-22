@@ -780,22 +780,25 @@ namespace sysiosystem {
          void rcrdbatch(uint32_t epoch_index, std::vector<sysio::name> members);
 
          /**
-          * Fund a sysio.dclaim capital draw against the T5 drainable pool.
-          * Called inline by sysio.dclaim::onreward as each STAKING_REWARD
-          * lands, so dclaim is funded the moment the claim ledger row is
-          * written and the staker can claim immediately. Auth: dclaim.
+          * Fund a capital draw against the T5 drainable pool for `recipient`,
+          * one of the two drains: sysio.dclaim, inline from its `onreward` as
+          * each STAKING_REWARD lands, and sysio.liq, inline from its `addyield`
+          * for the kicker on each yield intake. The recipient is funded the
+          * moment its ledger row is written, so a claim can follow at once.
+          * Auth: the recipient.
           *
-          * Never throws (OPP-handler never-throw contract): if the pool
-          * cannot cover `amount`, the transfer caps at what's available
-          * and the unfunded delta is accrued to t5state.capital_shortfall_total
-          * for operator visibility.
+          * Never throws for those two callers (OPP-handler never-throw
+          * contract): if the pool cannot cover `amount`, the transfer caps at
+          * what's available and the unfunded delta is accrued to
+          * t5state.capital_shortfall_total for operator visibility. Any other
+          * recipient is refused.
           *
           * Amounts actually transferred count toward t5state.total_distributed
           * so the emission curve auto-throttles via its remaining-headroom
           * clamp.
           */
          [[sysio::action]]
-         void fundclaim(int64_t amount);
+         void fundclaim(sysio::name recipient, int64_t amount);
 
          /**
           * Read-only: current T5 treasury emission state.
