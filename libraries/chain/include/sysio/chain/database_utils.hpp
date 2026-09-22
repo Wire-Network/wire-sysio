@@ -365,12 +365,24 @@ inline fc::variant decode_field(reader& r, key_leaf_kind kind) {
    }
    case key_leaf_kind::name:    return fc::variant(name(r.read_be64()).to_string());
    case key_leaf_kind::slug_name: {
-      // Delegates to fc::slug_name's to_variant, so next_key carries the same
-      // string the row's key field does, and feeding a canonical one back as a
-      // bound re-encodes the identical bytes. The renderer is TOTAL (parity with
-      // the `name` arm above), so a stored key with no canonical spelling renders
-      // rather than throwing — lossily, exactly as `name` does.
+      // A canonical value renders as its spelling, and feeding that back as a
+      // bound re-encodes the identical bytes.
+      //
+      // One with NO canonical spelling cannot be named. Unlike the `name` arm
+      // above, to_string is not injective over raw uint64s here: 38 of the 64
+      // symbol values are used, symbol 0 terminates, and bits 48-63 are never
+      // read — so a rendered string would re-encode to a DIFFERENT key, and a
+      // cursor built from it would resume in the wrong place. `name`'s alphabet
+      // is exactly 2^5 with no gaps and consumes all 64 bits, so its trim-and-
+      // repack IS lossless; the two are not symmetric.
+      //
+      // Fail instead, and the caller emits hex of the raw key bytes — the same
+      // thing every other undecodable ABI value does, and exact by construction.
+      // fc::slug_name::to_variant stays TOTAL: a display cell may be lossy, a
+      // resume token may not.
       const fc::slug_name s{ r.read_be64() };
+      FC_ASSERT(s.is_canonical(),
+                "slug_name {} has no canonical spelling; key renders as hex", s.value);
       fc::variant v;
       fc::to_variant(s, v);
       return v;

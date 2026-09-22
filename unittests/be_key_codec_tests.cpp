@@ -107,30 +107,52 @@ BOOST_AUTO_TEST_CASE(slug_name_leaf_roundtrips_the_zero_sentinel_as_empty) {
    BOOST_CHECK(bytes == encode_single(abi, "composite_key", slug(0)));
 }
 
-BOOST_AUTO_TEST_CASE(slug_name_leaf_decodes_a_non_canonical_value_lossily) {
-   // A value below 2^42 has no string spelling (to_string truncates at the first
-   // zero symbol slot). The leaf converts it anyway — you get what you get,
-   // identical to the `name` leaf (`name(raw).to_string()`). It neither throws
-   // nor falls back to hex: a read path that throws costs the whole scan, and a
-   // raw uint64 that spells nothing is self-inflicted, since nothing validates
-   // the raw ctor for either type.
+BOOST_AUTO_TEST_CASE(slug_name_leaf_round_trips_every_canonical_key) {
+   // THE property pagination depends on: encode(decode(key)) == key. A cursor is
+   // a resume token, so a key that renders must re-encode to the same bytes.
    auto abi    = make_test_abi();
    auto shapes = codec::build_key_shapes(abi, {"code"}, {"slug_name"});
 
-   // A bound is still named by its SPELLING, so a bare integer is not one.
+   for (const char* spelling : {"A", "ETH", "WIRE", "LIQSOL", "Z1234567", "Z_______"}) {
+      auto bytes = codec::encode_key(
+         fc::variant(fc::mutable_variant_object("code", spelling)), shapes);
+      auto decoded = codec::decode_key(bytes.data(), bytes.size(), shapes);
+      BOOST_CHECK_EQUAL(decoded.get_object()["code"].as_string(), spelling);
+      BOOST_CHECK(codec::encode_key(decoded, shapes) == bytes);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(slug_name_leaf_refuses_to_name_a_non_canonical_key) {
+   // to_string is NOT injective over raw uint64s here — 38 of 64 symbol values
+   // are used, symbol 0 terminates, and bits 48-63 are never read — so naming
+   // such a key would produce a string that re-encodes to a DIFFERENT one, and a
+   // cursor built from it would resume in the wrong place. (`name` is not
+   // comparable: its alphabet is exactly 2^5 with no gaps and it consumes all 64
+   // bits, so its trim-and-repack IS lossless.)
+   //
+   // The leaf therefore refuses, and get_table_rows renders the key as bare hex —
+   // the same escape every other undecodable ABI value uses, and exact by
+   // construction. fc::slug_name::to_variant stays TOTAL: a display cell may be
+   // lossy, a resume token may not.
+   auto abi    = make_test_abi();
+   auto shapes = codec::build_key_shapes(abi, {"code"}, {"slug_name"});
+
+   // A bound is named by its SPELLING, so a bare integer is not one.
    BOOST_CHECK_THROW(
       codec::encode_key(fc::variant(fc::mutable_variant_object("code", 7u)), shapes),
       fc::exception);
 
-   // A key already holding one decodes to "" — the same text zero renders, so
-   // feeding it back re-encodes to 0. That is the price of a total conversion.
-   // Reach past the carrier to build those bytes: the transitional object arm
-   // is the only writer left that can express a raw value.
-   auto bytes = codec::encode_key(
-      fc::variant(fc::mutable_variant_object("code", slug(7))), shapes);
-   BOOST_REQUIRE_EQUAL(bytes.size(), 8u);
-   auto decoded = codec::decode_key(bytes.data(), bytes.size(), shapes);
-   BOOST_CHECK_EQUAL(decoded.get_object()["code"].as_string(), "");
+   // Both shapes of non-canonical value are refused. Reach past the carrier to
+   // build the bytes: the transitional object arm is the only writer left that
+   // can express a raw value.
+   //   7          -> below the 1<<42 floor; char[0] empty, would render ""
+   //   34 << 42   -> the packed former spelling "7"; leads with a digit
+   for (uint64_t raw : {uint64_t{7}, uint64_t{34} << 42}) {
+      auto bytes = codec::encode_key(
+         fc::variant(fc::mutable_variant_object("code", slug(raw))), shapes);
+      BOOST_REQUIRE_EQUAL(bytes.size(), 8u);
+      BOOST_CHECK_THROW(codec::decode_key(bytes.data(), bytes.size(), shapes), fc::exception);
+   }
 }
 
 BOOST_AUTO_TEST_CASE(slug_name_leaf_wins_over_a_shadowing_struct_def) {

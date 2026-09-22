@@ -860,6 +860,58 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       BOOST_REQUIRE_EQUAL(page2.more, false);
       BOOST_CHECK_EQUAL(page2.rows[0].get_object()["value"].get_object()["code"].as_string(), "WIRE");
       BOOST_CHECK_EQUAL(page2.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 300u);
+
+      // (d) A key with NO canonical spelling renders as bare hex, and that hex is
+      //     accepted straight back as a json=true bound — so a cursor landing on
+      //     one still resumes exactly. This is the property pagination needs
+      //     (encode(decode(key)) == key), and naming such a key could not provide
+      //     it: slug_name's to_string is not injective over raw uint64s.
+      //
+      //     Stored through the transitional object carrier, the only writer left
+      //     that can express a raw value. 34<<42 is the packed former spelling
+      //     "7", which the leading-letter rule now rejects; char[0] = 34 sorts it
+      //     after 'W', so it lands last.
+      push_action("test"_n, "addslug"_n, "test"_n, mutable_variant_object()
+         ("code", mutable_variant_object()("value", uint64_t{34} << 42))("payload", 400));
+
+      p.lower_bound.clear();
+      p.limit = 3;
+      auto pageA = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(pageA.rows.size(), 3u);
+      BOOST_REQUIRE_EQUAL(pageA.more, true);
+      BOOST_REQUIRE(!pageA.next_key.empty());
+      // Bare hex, not a JSON key object -- the leaf refused to name it.
+      BOOST_CHECK(pageA.next_key.front() != '{');
+
+      p.lower_bound = pageA.next_key;
+      p.limit       = 50;
+      auto pageB = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(pageB.rows.size(), 1u);
+      BOOST_CHECK_EQUAL(pageB.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 400u);
+      // Its own `key` is hex for the same reason...
+      BOOST_CHECK(pageB.rows[0].get_object()["key"].is_string());
+      // ...while the row VALUE still renders, lossily, through the TOTAL
+      //    fc::slug_name::to_variant. A display cell may be lossy; a resume
+      //    token may not, and that asymmetry is deliberate.
+      BOOST_CHECK_EQUAL(pageB.rows[0].get_object()["value"].get_object()["code"].as_string(), "7");
+
+      // Reverse pagination over the same boundary resumes exactly too.
+      p.lower_bound.clear();
+      p.reverse = true;
+      p.limit   = 1;
+      auto revA = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(revA.rows.size(), 1u);
+      BOOST_REQUIRE_EQUAL(revA.more, true);
+      BOOST_CHECK(revA.next_key.front() != '{');
+      BOOST_CHECK_EQUAL(revA.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 400u);
+
+      p.upper_bound = revA.next_key;
+      p.limit       = 50;
+      auto revB = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(revB.rows.size(), 3u); // WIRE, SOL, ETH
+      BOOST_CHECK_EQUAL(revB.rows[0].get_object()["value"].get_object()["code"].as_string(), "WIRE");
+      p.reverse = false;
+      p.upper_bound.clear();
    }
 
    // (sec-5) Invalid index name on multi_index — should throw, not silently
