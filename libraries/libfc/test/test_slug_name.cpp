@@ -362,7 +362,52 @@ struct name_like_traits {
 
 using name_like = fc::basic_name<name_like_traits>;
 
+// An alphabet member that is only CONVERTIBLE to std::string_view: it has no
+// find(), no size(), no operator[] of its own. basic_name_traits asks for
+// exactly this much, so basic_name must bind a view before using it -- a direct
+// member call on the traits' alphabet would not compile against this policy.
+struct convertible_alphabet {
+   static constexpr char storage[] = ".12345abcdefghijklmnopqrstuvwxyz";
+   constexpr operator std::string_view() const {
+      return { storage, sizeof(storage) - 1 };
+   }
+};
+
+// Name-style (zero_terminates = false) so ONE instantiation reaches all three
+// sites: the alphabet scan in validity_error, rule 6's trailing-pad test (which
+// indexes alphabet[0]), and the symbol-width derivation (which takes size()).
+struct convertible_alphabet_traits {
+   static constexpr int                   max_len         = 13;
+   static constexpr convertible_alphabet  alphabet{};
+   static constexpr bool                  zero_terminates = false;
+   static constexpr fc::basic_name_endianness packing = fc::basic_name_endianness::MSB;
+   static constexpr const char* bad_char_message         = "conv: character is not in the alphabet";
+   static constexpr const char* too_long_message         = "conv: string is too long";
+   static constexpr const char* bad_final_symbol_message = "conv: final symbol does not fit its slot";
+   static constexpr const char* not_normalized_message   = "conv: spelling is not properly normalized";
+   [[noreturn]] static void throw_invalid( std::string_view in, const char* why ) {
+      FC_ASSERT( false, "invalid conv '{}': {}", std::string(in), why );
+      __builtin_unreachable();
+   }
+};
+
+using conv_name = fc::basic_name<convertible_alphabet_traits>;
+
 } // anonymous namespace
+
+// A policy whose alphabet is only CONVERTIBLE to string_view is usable. The
+// concept promises no more than that, so the implementation must not demand
+// more; this whole case is a compile-time assertion as much as a runtime one.
+BOOST_AUTO_TEST_CASE(convertible_alphabet_traits_are_usable) {
+   static_assert(fc::basic_name_traits<convertible_alphabet_traits>);
+   // Round trip: the alphabet scan and the symbol-width derivation both ran.
+   BOOST_CHECK_EQUAL(conv_name{"sysio"}.to_string(), "sysio");
+   BOOST_CHECK_EQUAL(conv_name{"a.b"}.to_string(), "a.b");
+   // Rule 6 (!zero_terminates): a trailing pad is not normalized. This is the
+   // check that indexes alphabet[0].
+   BOOST_CHECK_THROW(conv_name{std::string_view{"a."}}, fc::exception);
+   BOOST_CHECK_THROW(conv_name{std::string_view{"A"}}, fc::exception);
+}
 
 BOOST_AUTO_TEST_CASE(non_zero_terminator_trait_accepts_alphabet_zero) {
    // For name-style traits the pad symbol is '.', and '.' is ALSO an ordinary

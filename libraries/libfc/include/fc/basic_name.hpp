@@ -144,7 +144,7 @@ struct basic_name {
       }
 
       for (std::size_t i = 0; i < str.size(); ++i) {
-         const std::size_t sym = Traits::alphabet.find(str[i]);
+         const std::size_t sym = alphabet.find(str[i]);
 
          // 3. in the alphabet
          if (sym == std::string_view::npos)
@@ -167,7 +167,7 @@ struct basic_name {
       // 6. a non-zero-terminated alphabet strips TRAILING pads in to_string(),
       //    so a trailing pad cannot round-trip either.
       if constexpr (!Traits::zero_terminates) {
-         if (!str.empty() && str.back() == Traits::alphabet[0])
+         if (!str.empty() && str.back() == alphabet[0])
             return Traits::not_normalized_message;
       }
 
@@ -227,13 +227,19 @@ struct basic_name {
    }
 
 private:
+   /// `Traits::alphabet` as a view. The traits concept requires only that the
+   /// member be CONVERTIBLE to string_view, so every use binds here rather than
+   /// calling find/size/operator[] on the traits member and silently demanding
+   /// more of a policy than the concept declares. Mirrors sysio::basic_name.
+   static constexpr std::string_view alphabet = Traits::alphabet;
+
    // --- symbol width: minimal bits to index the alphabet ---
    static constexpr int symbol_bits(std::size_t alphabet_size) {
       int b = 0;
       while ((std::size_t{1} << b) < alphabet_size) ++b;
       return b;
    }
-   static constexpr int bits       = symbol_bits(Traits::alphabet.size());
+   static constexpr int bits       = symbol_bits(alphabet.size());
    static constexpr int total_bits = Traits::max_len * bits < 64
                                    ? Traits::max_len * bits : 64;
    static_assert((Traits::max_len - 1) * bits < 64,
@@ -243,14 +249,12 @@ private:
    /// symbol value -> character. Out-of-range symbols decode as the pad
    /// character (alphabet[0]).
    static constexpr char char_of(uint64_t s) {
-      const std::string_view a = Traits::alphabet;
-      return s < a.size() ? a[s] : a[0];
+      return s < alphabet.size() ? alphabet[s] : alphabet[0];
    }
    /// character -> symbol value. Any character not in the alphabet maps to 0.
    static constexpr uint64_t sym_of(char c) {
-      const std::string_view a = Traits::alphabet;
-      for (std::size_t s = 0; s < a.size(); ++s)
-         if (a[s] == c) return static_cast<uint64_t>(s);
+      for (std::size_t s = 0; s < alphabet.size(); ++s)
+         if (alphabet[s] == c) return static_cast<uint64_t>(s);
       return 0;
    }
 
