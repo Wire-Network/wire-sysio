@@ -2,6 +2,11 @@
   "name": "wire-sysio",
   "version": "5.2.0-rc1",
   "dependencies": [
+    "antlr4",
+    {
+      "name": "antlr4-tools",
+      "host": true
+    },
     "blake3",
     "bzip2",
     "liblzma",
