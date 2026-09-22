@@ -6,6 +6,7 @@
 #include <fc/log/dmlog_sink.hpp>
 #include <fc/log/dmlog_formatter.hpp>
 #include <fc/log/es_sink.hpp>
+#include <fc/log/es_sink_config.hpp>
 #include <fc/log/json_formatter.hpp>
 #include <fc/log/pattern_formatter.hpp>
 #include <spdlog/sinks/stdout_sinks.h>

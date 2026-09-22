@@ -1003,9 +1003,9 @@ void system_contract::payepoch(uint32_t epoch_index,
       // Single pass over the rank-ordered producers: builds both the pay list (entries) and the
       // counter-reset list (to_reset). `position` is POSITION in this index among SCHEDULABLE
       // producers, counted while walking -- not a stored ordinal. The demoted tier sorts last and
-      // is never schedulable, so it bounds the walk over what is a permissionless, unbounded
-      // table; every row above it was a live, bonded producer operator at its last rescore, and
-      // every event that ends that standing rescores the row (see producer_rank::compute).
+      // is never schedulable, so it bounds the walk over retained historical, parked and keyless
+      // rows; every row above it was a live, bonded producer operator at its last rescore, and every
+      // event that ends that standing rescores the row (see producer_rank::compute).
       //
       // The divisor counts exactly the blocks this payepoch pays for. A count that waits on an
       // unpayable row is neither paid nor counted now; when its producer is payable again the
@@ -1092,8 +1092,7 @@ void system_contract::payepoch(uint32_t epoch_index,
 
       // Sorted so the join below is a binary search. This action runs INLINE in the epoch advance,
       // where an overrun stalls the chain, and both vectors are bounded by `max_rank_walk_rows` --
-      // a linear scan per reset entry is quadratic in a number an unbounded, permissionless table
-      // controls.
+      // a linear scan per reset entry would otherwise be quadratic in a potentially large roster.
       std::sort(block_paid.begin(), block_paid.end());
 
       // Reset the period's counters after distribution (iteration-safe: uses PK snapshot).

@@ -99,6 +99,22 @@ namespace sysiosystem {
       }
 
       /**
+       * Whether an ACTIVE producer operator meets the live producer collateral minimum.
+       *
+       * Bootstrapped genesis operators are the explicit collateral-free exception. Ordinary
+       * operators are measured against the current config rather than trusting a status earned
+       * under an older minimum.
+       *
+       * @param op               an ACTIVE OPERATOR_TYPE_PRODUCER row returned by `find_active_operator`.
+       * @param collateral_ratio the row's collateral factor under the live sysio.opreg config.
+       * @return true iff the operator is bootstrapped or clears every live producer minimum.
+       */
+      inline bool meets_live_producer_minimum(const sysio::opreg::operator_entry& op,
+                                              uint64_t collateral_ratio) {
+         return op.is_bootstrapped || collateral_ratio >= score_scale;
+      }
+
+      /**
        * Snapshot-service factor: how much of the configured attestation target the producer met in
        * the current pay period.
        *
@@ -138,25 +154,6 @@ namespace sysiosystem {
       }
 
       /**
-       * The ONE schedulable predicate ranking, pay and snapshot eligibility walk:
-       * `is_eligible_operator` plus an active finalizer key.
-       *
-       * `rank` is position among the producers this returns true for -- so every consumer must
-       * COUNT matches while walking the index, never take the first N index entries. An unbonded
-       * non-bootstrapped registrant is UNKNOWN in opreg and occupies an index slot ahead of the
-       * bootstrap tier; taking the first N would let a handful of them crowd real producers out of
-       * peer discovery and snapshot-provider eligibility.
-       *
-       * Before this existed the consumers disagreed -- update_ranked_producers checked all three
-       * conditions, emissions only the first two, peer_keys and snapshot_attest none. Making
-       * emissions honour the finalizer-key check is a behavioural fix, not a regression: a producer
-       * with no active finalizer key can never be scheduled, so it should not draw top-21 pay.
-       *
-       * @param producer   the producer row under consideration.
-       * @param finalizers the sysio.system finalizers table.
-       * @return true iff the producer is eligible to occupy a rank position.
-       */
-      /**
        * The producer's finalizer row if it holds an active key, else nullopt.
        *
        * One table read. Callers that need the ROW (the schedule rebuild, which proposes it as a
@@ -173,6 +170,13 @@ namespace sysiosystem {
          return row;
       }
 
+      /**
+       * The ONE schedulable predicate ranking, pay and snapshot eligibility walk.
+       *
+       * @param producer   the producer row under consideration.
+       * @param finalizers the sysio.system finalizers table.
+       * @return true iff the producer has live operator standing and an active finalizer key.
+       */
       inline bool is_schedulable(const producer_info& producer, finalizers_table& finalizers) {
          return is_eligible_operator(producer) && active_finalizer(producer.owner, finalizers).has_value();
       }
@@ -224,12 +228,11 @@ namespace sysiosystem {
                               const score_inputs& inputs,
                               const producer_score_config& weights) {
          // A producer that is not a live, collateral-backed PRODUCER operator -- parked by
-         // `unregprod`, unbonded, slashed, terminated -- scores into the demoted tier. That is
-         // correct on its own terms (an unbonded registrant must never outrank a bonded one) and it
-         // is also what BOUNDS the rank walk: `regproducer` is permissionless, so without this
-         // every consumer would scan an unbounded table. With it, the healthy and bootstrapped
-         // tiers hold only producers that were live at their LAST rescore, and a consumer stops at
-         // the first demoted entry. Every event that can end a producer's standing rescores it --
+         // `unregprod`, slashed, terminated, or below a newly raised minimum -- scores into the
+         // demoted tier. New admission is collateral-gated, but historical rows remain, so this
+         // still bounds every rank walk: the healthy and bootstrapped tiers hold only producers
+         // that were live at their LAST rescore, and a consumer stops at the first demoted entry.
+         // Every event that can end a producer's standing rescores it --
          // `unregprod` directly, and sysio.opreg through its `processprod` notification, which it
          // dispatches on every balance change AND on slash and termination. The one row a rescore
          // cannot reach is one `prune` erased, and the termination before it already sank the
@@ -237,10 +240,10 @@ namespace sysiosystem {
          if (!inputs.is_active) return unscored();
 
          // No active finalizer key, no schedule position -- so no place above the demoted tier
-         // either. This is what BOUNDS every rank walk. Registration is permissionless and the
-         // table is unbounded, so if bonded-but-keyless rows stayed in the healthy tier a walk
-         // looking for 21 schedulable producers could skip an arbitrary number of rows that can
-         // never qualify, on `onblock`'s schedule rebuild and inline in the epoch payout.
+         // either. A collateral-backed roster may still contain arbitrarily many keyless or
+         // historical rows; if they stayed in the healthy tier, a walk looking for 21 schedulable
+         // producers could skip too many rows on `onblock`'s schedule rebuild and inline in the
+         // epoch payout.
          //
          // Peer discovery is deliberately unaffected: it seeds from the ACTIVE SCHEDULE before it
          // ranks anything, so a producer scheduled through `setprods` without a finalizer key is
@@ -252,14 +255,9 @@ namespace sysiosystem {
             return unscored();
          }
 
-         sysio::opreg::operators_t ops(opreg_refs::account);
-         const auto op_key = sysio::opreg::operator_key{producer.value};
-         if (!ops.contains(op_key)) return unscored();
-         const auto op = ops.get(op_key);
-         if (op.status != sysio::opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE
-             || op.type != sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER) {
-            return unscored();
-         }
+         const auto op = find_active_operator(
+            producer, sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER);
+         if (!op) return unscored();
 
          sysio::opreg::opconfig_t opreg_cfg_tbl(opreg_refs::account);
          const auto opreg_cfg = opreg_cfg_tbl.get_or_default(sysio::opreg::op_config{});
@@ -294,8 +292,8 @@ namespace sysiosystem {
          //
          // Bootstrapped producers are exempt, exactly as they are in `meets_role_min`: they are
          // ACTIVE by fiat and hold no bond to measure.
-         const uint64_t collateral_ratio = collateral_factor(op, opreg_cfg);
-         if (!op.is_bootstrapped && collateral_ratio < score_scale) return unscored();
+         const uint64_t collateral_ratio = collateral_factor(*op, opreg_cfg);
+         if (!meets_live_producer_minimum(*op, collateral_ratio)) return unscored();
 
          // Every term saturates: the collateral factor is uncapped by design, so factor * weight
          // must not be allowed to wrap.
@@ -310,7 +308,7 @@ namespace sysiosystem {
                     weights.snapshot_weight);
 
          const uint64_t composite = add_sat(add_sat(collateral, participation), snapshot);
-         return pack(tier_for(inputs.is_demoted, op.is_bootstrapped), composite);
+         return pack(tier_for(inputs.is_demoted, op->is_bootstrapped), composite);
       }
 
       /**

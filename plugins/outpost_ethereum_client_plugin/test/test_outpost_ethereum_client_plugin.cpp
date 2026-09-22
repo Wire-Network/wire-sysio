@@ -224,6 +224,25 @@ constexpr uint64_t over_cap_gas_estimate = 14'000'000;
 /// JSON-RPC error code anvil/geth report for a reverted call.
 constexpr int contract_revert_rpc_code = 3;
 
+/// JSON-RPC parse error: the node never executed the call, so nothing on chain changed.
+constexpr int json_rpc_parse_error_code = -32700;
+
+/// `keccak256("OPP_ChunkBufferMissing(address)")[0..4]`, written out rather than recomputed so
+/// these tests pin the client's own hashing of that signature instead of restating it.
+constexpr std::string_view chunk_buffer_missing_selector = "dca69e67";
+/// A selector the client must not accept. `OPP_NoChunkSlot(address)` is a real neighbouring
+/// error of the same shape, so a length or padding check alone would let it through.
+constexpr std::string_view no_chunk_slot_selector = "9ecbc704";
+/// Any address that is not this relay's signer, for the revert naming a different operator.
+constexpr std::string_view test_other_operator_address = "0x00000000000000000000000000000000deadbeef";
+
+/** ABI-encode a one-address custom error the way a node returns it in `error.data`. */
+std::string encode_address_revert(std::string_view selector, std::string_view address_hex) {
+   std::string_view address = address_hex;
+   if (address.starts_with("0x") || address.starts_with("0X")) address.remove_prefix(2);
+   return "0x" + std::string(selector) + std::string(64 - address.size(), '0') + std::string(address);
+}
+
 /** Build a one-shot JSON-RPC endpoint reporting Anvil's chain id (31337). */
 fc::test::one_shot_http_server chain_id_rpc_server(std::string result_json = "\"0x7a69\"") {
    return fc::test::one_shot_http_server{
@@ -1065,6 +1084,36 @@ BOOST_AUTO_TEST_CASE(envelope_chunk_count_math) try {
    // observed `epochIn` calls against `chunk_count_for`.
 } FC_LOG_AND_RETHROW();
 
+/// The client hashes `OPP_ChunkBufferMissing(address)` to recognise the one tolerable discard
+/// revert. This pins that hash against the four bytes the deployed contract actually emits, so
+/// a wrong signature string cannot quietly make every revert unrecognisable — which would look
+/// like nothing more than a few extra abandoned ticks.
+BOOST_AUTO_TEST_CASE(chunk_buffer_missing_selector_is_pinned) try {
+   namespace chunking = sysio::outpost_ethereum_client_detail;
+   const std::string self{"0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"};
+
+   BOOST_CHECK(chunking::is_chunk_buffer_missing_revert(
+      encode_address_revert(chunk_buffer_missing_selector, self), self));
+   // The node lower-cases what it returns; the configured signer may be checksummed.
+   BOOST_CHECK(chunking::is_chunk_buffer_missing_revert(
+      encode_address_revert(chunk_buffer_missing_selector, self), fc::to_lower(self)));
+
+   // Right selector, wrong operator.
+   BOOST_CHECK(!chunking::is_chunk_buffer_missing_revert(
+      encode_address_revert(chunk_buffer_missing_selector, foreign_operator_address), self));
+   // Right shape, different error.
+   BOOST_CHECK(!chunking::is_chunk_buffer_missing_revert(
+      encode_address_revert(no_chunk_slot_selector, self), self));
+   // Nothing to identify it by.
+   BOOST_CHECK(!chunking::is_chunk_buffer_missing_revert("", self));
+   BOOST_CHECK(!chunking::is_chunk_buffer_missing_revert("0x", self));
+
+   // A non-zero byte in the padding is not our address however it decodes.
+   auto corrupt_padding = encode_address_revert(chunk_buffer_missing_selector, self);
+   corrupt_padding[hex_prefix.size() + chunk_buffer_missing_selector.size()] = '1';
+   BOOST_CHECK(!chunking::is_chunk_buffer_missing_revert(corrupt_padding, self));
+} FC_LOG_AND_RETHROW();
+
 /// The resume decision table, exercised without an EVM node.
 BOOST_AUTO_TEST_CASE(chunk_resume_decision_table) try {
    namespace chunking = sysio::outpost_ethereum_client_detail;
@@ -1323,13 +1372,97 @@ BOOST_AUTO_TEST_CASE(multi_chunk_delivery_treats_a_reverting_discard_as_already_
       static_cast<uint32_t>(envelope.size()) - 1,
       sysio::ETHEREUM_MAX_CHUNK_BYTES);
    fixture->discard_failure = fc::network::json_rpc::json_rpc_error(
-      contract_revert_rpc_code, "execution reverted: OPP_ChunkBufferMissing", fc::variant{});
+      contract_revert_rpc_code, "execution reverted",
+      fc::variant{encode_address_revert(chunk_buffer_missing_selector,
+                                        fixture->outpost->signer_address_hex())});
 
    fixture->outpost->deliver_outbound_envelope(
       test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
 
    BOOST_CHECK_EQUAL(fixture->discard_calls, 1u);
    check_chunk_call_sequence(fixture->chunk_calls, envelope, test_wire_epoch, 0);
+} FC_LOG_AND_RETHROW();
+
+/// A revert the client cannot identify is NOT proof the staging header is clear.
+///
+/// Code 3 says only that the EVM executed and reverted. A node whose proxy points at a
+/// mismatched implementation, or that returns no revert bytes at all, produces the same code
+/// for a completely different reason — and the superseded header may still be staged. Each of
+/// these must abandon the tick rather than upload chunk 0 against it.
+///
+/// Abandoning is self-healing rather than terminal: this path is only reached when a header
+/// WAS read, so the next cron tick re-reads it and either resumes or starts fresh.
+BOOST_AUTO_TEST_CASE(multi_chunk_delivery_abandons_on_an_unrecognized_discard_revert) try {
+   auto envelope = make_chunked_envelope(three_chunk_envelope_bytes);
+   // Built against a throwaway fixture so the cases can name this relay's real signer.
+   const auto signer = create_chunked_delivery_fixture()->outpost->signer_address_hex();
+
+   const std::vector<std::pair<std::string, std::string>> unrecognized{
+      {"no revert bytes at all", ""},
+      {"an empty revert payload", "0x"},
+      {"a neighbouring error of identical shape",
+       encode_address_revert(no_chunk_slot_selector, signer)},
+      {"our error naming a different operator",
+       encode_address_revert(chunk_buffer_missing_selector, test_other_operator_address)},
+      {"our selector with the argument truncated away",
+       "0x" + std::string(chunk_buffer_missing_selector)},
+   };
+
+   for (const auto& [description, revert_data] : unrecognized) {
+      BOOST_TEST_CONTEXT(description) {
+         auto fixture = create_chunked_delivery_fixture();
+         fixture->chunk_state_response = encode_envelope_chunk_state_result(
+            test_wire_epoch,
+            fixture->outpost->signer_address_hex(),
+            sysio::outpost_ethereum_client_detail::chunk_count_for(envelope.size()),
+            1,
+            static_cast<uint32_t>(envelope.size()) - 1,
+            sysio::ETHEREUM_MAX_CHUNK_BYTES);
+         fixture->discard_failure = fc::network::json_rpc::json_rpc_error(
+            contract_revert_rpc_code, "execution reverted", fc::variant{revert_data});
+
+         BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
+                              test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
+                           fc::exception);
+
+         BOOST_CHECK_EQUAL(fixture->discard_calls, 1u);
+         BOOST_CHECK(fixture->chunk_calls.empty());
+      }
+   }
+} FC_LOG_AND_RETHROW();
+
+/// A JSON-RPC protocol error is NOT a revert, and must abandon the tick rather than be tolerated.
+///
+/// A parse error means the node never executed the call, so the staging header may still hold
+/// the superseded envelope. Treating it as "already clear" would upload chunk 0 against that
+/// stale header. Such a response is required by the JSON-RPC specification to carry a null id,
+/// which the transport now decodes as json_rpc_error rather than a bare fc::exception, so this
+/// catch discriminates on the code instead of on the exception type.
+BOOST_AUTO_TEST_CASE(multi_chunk_delivery_abandons_on_a_protocol_error_during_discard) try {
+   auto fixture  = create_chunked_delivery_fixture();
+   auto envelope = make_chunked_envelope(three_chunk_envelope_bytes);
+
+   fixture->chunk_state_response = encode_envelope_chunk_state_result(
+      test_wire_epoch,
+      fixture->outpost->signer_address_hex(),
+      sysio::outpost_ethereum_client_detail::chunk_count_for(envelope.size()),
+      1,
+      static_cast<uint32_t>(envelope.size()) - 1,
+      sysio::ETHEREUM_MAX_CHUNK_BYTES);
+   // The payload is a well-formed OPP_ChunkBufferMissing naming this signer, so only the code
+   // distinguishes it. A JSON-RPC error object may carry `data`, and with an empty one here the
+   // selector check would reject it first and the code guard would never be exercised.
+   fixture->discard_failure = fc::network::json_rpc::json_rpc_error(
+      json_rpc_parse_error_code, "Parse error",
+      fc::variant{encode_address_revert(chunk_buffer_missing_selector,
+                                        fixture->outpost->signer_address_hex())});
+
+   BOOST_CHECK_THROW(
+      fixture->outpost->deliver_outbound_envelope(test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
+      fc::exception);
+
+   BOOST_CHECK_EQUAL(fixture->discard_calls, 1u);
+   BOOST_CHECK(fixture->chunk_calls.empty());
 } FC_LOG_AND_RETHROW();
 
 /// A stale OWN header on a consensus retry is the signature of an epoch that

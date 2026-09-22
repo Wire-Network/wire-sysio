@@ -10,6 +10,8 @@ pluginName=$1
 
 echo Copying template...
 cp -R template_plugin $pluginName
+# The template's README documents the template itself, not the new plugin.
+rm -f $pluginName/README.md
 
 echo Renaming files/directories...
 mv $pluginName/include/sysio/template_plugin $pluginName/include/sysio/$pluginName

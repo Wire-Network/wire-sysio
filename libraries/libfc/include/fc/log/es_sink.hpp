@@ -1,19 +1,15 @@
 #pragma once
-#include <fc/spdlog.hpp>
-#include <spdlog/sinks/base_sink.h>
-
-#include <fc/log/logger_config.hpp>
-#include <fc/network/http/http_client.hpp>
-#include <fc/network/url.hpp>
-#include <fc/parallel/worker_task_queue.hpp>
-
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <cstdint>
+#include <fc/log/es_sink_config.hpp>
+#include <fc/network/es/es_client.hpp>
+#include <fc/parallel/worker_task_queue.hpp>
+#include <fc/spdlog.hpp>
 #include <memory>
 #include <mutex>
-#include <optional>
+#include <spdlog/sinks/base_sink.h>
 #include <string>
 #include <thread>
 
@@ -30,14 +26,19 @@ namespace fc {
 /// not overwrite it with the default pattern); an explicit json "format" block
 /// overrides it, which is the supported way to stamp identity extra_fields or reshape
 /// documents. Each formatter output line is used verbatim as one bulk document source
-/// line; the sink owns the action line built from its `index` argument.
+/// line; the es client owns the action line, built once from the configured `index`.
+///
+/// The es client adds an io thread of its own, which performs every request and retry backoff; the worker
+/// only waits for each batch's result.
 ///
 /// Lock order: _timer_mtx -> base_sink::mutex_ -> worker_task_queue internals.
 ///  - logging threads: mutex_ -> queue (try_push); never _timer_mtx
 ///  - timer thread:    _timer_mtx, then mutex_ -> queue on each tick
-///  - worker thread:   queue alone (pop) or _timer_mtx alone (backoff / warn detail);
-///                     NEVER mutex_, so a slow endpoint can never stall logging
+///  - worker thread:   queue alone (pop) or _timer_mtx alone (warn detail); delivery blocks on the es
+///                     client's result with NO sink lock held, so a slow endpoint can never stall logging
 ///  - destructor:      each lock briefly; no lock held across a join
+///  - the es client takes no sink lock and offers none: cancel() posts to its io thread, and the sink calls
+///                     it (from the constructor guard and the destructor) with no lock held
 ///
 /// Failure diagnostics NEVER go through fc loggers (this sink may be attached to the
 /// "default" logger -- an fc log call from sink internals would recurse into
@@ -58,7 +59,8 @@ public:
    /// Single documents whose formatted size exceeded max_doc_bytes.
    uint64_t dropped_docs() const noexcept { return _dropped_docs.load(std::memory_order_relaxed); }
    /// Batches that exhausted retries, got a terminal 4xx, or a non-bulk 2xx response;
-   /// also counted (alongside partial indexed_docs credit) on 2xx-with-item-errors.
+   /// also counted (alongside partial indexed_docs credit) on 2xx-with-item-errors;
+   /// a batch canceled by shutdown is also counted (it was never delivered).
    uint64_t failed_batches() const noexcept { return _failed_batches.load(std::memory_order_relaxed); }
    /// Documents positively acknowledged by the endpoint ("errors":false, or the
    /// non-erroring subset of a partial-failure response).
@@ -98,34 +100,27 @@ private:
    /// Move the pending batch onto the delivery queue. Requires mutex_ held. Counters
    /// only on the drop path -- no I/O, no stream writes.
    void enqueue_pending_locked();
-   /// Deliver one batch (worker thread only; never takes mutex_).
+   /// Deliver one batch through the es client and account its result (worker thread only; never takes mutex_).
    void deliver(batch& delivery);
    /// Interval flush + rate-limited warning reporter (dedicated timer thread).
    void timer_loop();
-   /// Account a 2xx bulk response: positive-signal probe for "errors":false /
-   /// "errors":true, full parse on the uncertain paths (worker thread only).
-   void handle_bulk_response_body(const std::string& body, uint32_t doc_count);
    /// Record a warning event with detail text for the timer thread's next report.
    void note_warning(std::string detail);
    /// Emit at most one std::cerr summary per warn interval (timer thread + dtor only).
    void emit_pending_warnings();
 
-   const fc::sink::es_sink_config _cfg;         ///< validated configuration
-   std::string                _action_line; ///< {"index":{"_index":"<escaped>"}}\n, built once
-   fc::url                    _bulk_url;    ///< <url>/_bulk
-   std::optional<std::string> _auth_header; ///< "Basic <base64(user:pass)>" when configured
+   const fc::sink::es_sink_config _cfg; ///< validated configuration
 
    batch _pending; ///< guarded by base_sink::mutex_
 
    std::shared_ptr<parallel::worker_task_queue<batch>> _queue;
-   std::unique_ptr<http::transport>                    _transport; ///< worker thread only
+   std::unique_ptr<fc::network::es::es_client> _client; ///< bulk() on the worker thread; cancel() from the destructor
 
    std::thread             _timer_thread;
    std::mutex              _timer_mtx;
    std::condition_variable _timer_cv;
    bool                    _shutting_down = false; ///< guarded by _timer_mtx; stops the TIMER only
-   std::string             _warn_detail;           ///< guarded by _timer_mtx; latest warning detail
-   std::atomic<bool>       _cancel_requested{false}; ///< aborts in-flight HTTP + retry backoff
+   std::string _warn_detail;                       ///< guarded by _timer_mtx; latest warning detail
    std::atomic<uint64_t>   _batches_enqueued{0};     ///< successful try_push count (gap-free vs completed)
    std::atomic<uint64_t>   _batches_completed{0};    ///< deliver() exits (any outcome)
 

@@ -2,9 +2,8 @@
  * Offline unit tests for the shared AWS glue (`sysio::sigprov::aws`): the region-shape classifier, the
  * environment-driven default-region resolution chain, and the per-region client cache's region-less
  * normalization. No AWS credentials or network anywhere: every case pins the environment it needs (see
- * `env_fixtures.hpp`), and IMDS is explicitly disabled wherever the chain -- or the SDK's own
- * `ClientConfiguration` default constructor -- could otherwise stall probing the metadata endpoint on a
- * non-AWS test host.
+ * `env_fixtures.hpp`), and IMDS is explicitly disabled wherever the region resolution chain could otherwise
+ * stall probing the metadata endpoint on a non-AWS test host.
  */
 
 #include <boost/test/unit_test.hpp>
@@ -15,8 +14,19 @@
 
 #include <fc/filesystem.hpp>
 
+#include <aws/core/internal/AWSHttpResourceClient.h>
+#include <aws/core/utils/logging/AWSLogging.h>
+#include <aws/core/utils/logging/LogMacros.h>
+#include <aws/core/utils/logging/LogSystemInterface.h>
+
+#include <algorithm>
+#include <cstdarg>
 #include <fstream>
+#include <memory>
+#include <mutex>
 #include <string>
+#include <string_view>
+#include <vector>
 
 using namespace sysio::sigprov::aws;
 using namespace sysio::sigprov::aws::test;
@@ -119,25 +129,91 @@ BOOST_AUTO_TEST_SUITE(aws_region_client_cache)
 namespace {
 
 /// Minimal stand-in for an AWS service client: constructible from a ClientConfiguration, recording the
-/// region it was configured with -- lets the cache's normalization be asserted offline, with no service SDK
-/// and no pointer-identity guesswork.
+/// region and IMDS settings it was configured with -- lets the cache's normalization be asserted offline, with
+/// no service SDK and no pointer-identity guesswork.
 struct fake_client {
    explicit fake_client(const Aws::Client::ClientConfiguration& cfg)
-      : region(cfg.region.c_str(), cfg.region.size()) {}
+      : region(cfg.region.c_str(), cfg.region.size())
+      , credential_region(cfg.credentialProviderConfig.region.c_str(), cfg.credentialProviderConfig.region.size())
+      , imds_disabled(cfg.disableIMDS)
+      , credential_imds_disabled(cfg.credentialProviderConfig.imdsConfig.disableImds) {}
    std::string region;
+   std::string credential_region;
+   bool        imds_disabled;
+   bool        credential_imds_disabled;
 };
+
+/// Records every AWS SDK log message, down to trace level, while in scope; the prior log system is restored after.
+class scoped_aws_log_capture {
+public:
+   scoped_aws_log_capture() { Aws::Utils::Logging::PushLogger(_log); }
+   ~scoped_aws_log_capture() { Aws::Utils::Logging::PopLogger(); }
+
+   scoped_aws_log_capture(const scoped_aws_log_capture&)            = delete;
+   scoped_aws_log_capture& operator=(const scoped_aws_log_capture&) = delete;
+
+   /// Whether any captured message contains @p text.
+   bool contains(std::string_view text) const { return _log->contains(text); }
+
+private:
+   struct recording_log_system : Aws::Utils::Logging::LogSystemInterface {
+      Aws::Utils::Logging::LogLevel GetLogLevel() const override { return Aws::Utils::Logging::LogLevel::Trace; }
+      void Log(Aws::Utils::Logging::LogLevel, const char*, const char* format, ...) override { record(format); }
+      void vaLog(Aws::Utils::Logging::LogLevel, const char*, const char* format, va_list) override { record(format); }
+      void LogStream(Aws::Utils::Logging::LogLevel, const char*, const Aws::OStringStream& message) override {
+         record(message.str());
+      }
+      void Flush() override {}
+
+      void record(std::string_view message) {
+         const std::lock_guard<std::mutex> lock{mutex};
+         messages.emplace_back(message);
+      }
+      bool contains(std::string_view text) const {
+         const std::lock_guard<std::mutex> lock{mutex};
+         return std::ranges::any_of(messages, [&](const std::string& m) { return m.find(text) != std::string::npos; });
+      }
+
+      mutable std::mutex       mutex;
+      std::vector<std::string> messages;
+   };
+
+   std::shared_ptr<recording_log_system> _log = std::make_shared<recording_log_system>();
+};
+
+/// The trace message the SDK's EC2 metadata client logs before it queries IMDS for the instance region.
+constexpr std::string_view imds_region_lookup_trace = "Getting current region for ec2 instance";
 
 } // namespace
 
 BOOST_AUTO_TEST_CASE(explicit_region_reaches_the_client_config) {
-   // IMDS disabled so the ClientConfiguration default constructor cannot stall probing the metadata
-   // endpoint on non-AWS test hosts (the spec region overwrites whatever it resolves anyway).
-   const scoped_env_var imds{env_ec2_metadata_disabled, metadata_disabled_true};
    region_client_cache<fake_client> cache;
    const auto client = cache.get("eu-west-2");
    BOOST_REQUIRE(client);
    BOOST_CHECK_EQUAL(client->region, "eu-west-2");
+   BOOST_CHECK_EQUAL(client->credential_region, "eu-west-2");
+   // IMDS is only skipped while the configuration is built; credentials can still resolve through it.
+   BOOST_CHECK(!client->imds_disabled);
+   BOOST_CHECK(!client->credential_imds_disabled);
    BOOST_CHECK_EQUAL(client.get(), cache.get("eu-west-2").get());
+}
+
+BOOST_AUTO_TEST_CASE(client_configuration_skips_the_imds_region_lookup) {
+   // No region from the environment or shared config, and IMDS enabled: exactly the state in which the SDK's default
+   // ClientConfiguration constructor queries IMDS for a region.
+   const scoped_env_var              default_region{env_default_region, nullptr};
+   const scoped_env_var              region{env_region, nullptr};
+   const scoped_env_var              imds{env_ec2_metadata_disabled, nullptr};
+   const scoped_config_file_redirect config{scoped_unresolvable_region_env::nonexistent_config_path};
+   BOOST_REQUIRE(Aws::Internal::GetEC2MetadataClient());
+
+   const scoped_aws_log_capture log;
+   AWS_LOGSTREAM_TRACE("test_aws_common", "log capture sentinel");
+   BOOST_REQUIRE(log.contains("log capture sentinel"));
+
+   const auto cfg = make_client_configuration("eu-west-2");
+   BOOST_CHECK(!log.contains(imds_region_lookup_trace));
+   BOOST_CHECK_EQUAL(std::string(cfg.region.c_str(), cfg.region.size()), "eu-west-2");
 }
 
 BOOST_AUTO_TEST_CASE(empty_region_resolves_and_shares_the_resolved_slot) {

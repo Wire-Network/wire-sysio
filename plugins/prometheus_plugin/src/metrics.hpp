@@ -108,7 +108,6 @@ struct catalog_type {
    // produced blocks
    Counter& unapplied_transactions_total;
    Counter& subjective_bill_account_size_total;
-   Counter& scheduled_trxs_total;
    Counter& trxs_produced_total;
    Counter& cpu_usage_us_produced_block;
    Counter& total_elapsed_time_us_produced_block;
@@ -183,8 +182,6 @@ struct catalog_type {
                                                      "total number of unapplied transactions from produced blocks"))
        , subjective_bill_account_size_total(build<Counter>(
              "nodeop_subjective_bill_account_size_total", "total number of subjective bill account size from produced blocks"))
-       , scheduled_trxs_total(
-             build<Counter>("nodeop_scheduled_trxs_total", "total number of scheduled transactions from produced blocks"))
        , trxs_produced_total(build<Counter>("nodeop_trxs_produced_total", "number of transactions produced"))
        , cpu_usage_us_produced_block(cpu_usage_us.Add({{"block_type", "produced"}}))
        , total_elapsed_time_us_produced_block(build<Counter>("nodeop_produced_elapsed_us_total", "total produced blocks elapsed time"))

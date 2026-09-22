@@ -145,8 +145,8 @@ cron_service::next_fire_time(const job_schedule& sched, time_point after) {
    auto months_set  = field_values(sched.month, 1, 12);
    auto hours_set   = field_values(sched.hours, 0, 23);
    auto minutes_set = field_values(sched.minutes, 0, 59);
-   // Wildcard milliseconds defaults to {0} (once per second) rather than
-   // materializing all 60 000 values.
+   // An empty milliseconds field matches only 0, the start of the minute, so a
+   // schedule fires once per matching minute rather than every millisecond of it.
    auto ms_set = cron_service::job_schedule::expand_field(sched.milliseconds, 0, 59999);
    if (ms_set.empty())
       ms_set.insert(0);

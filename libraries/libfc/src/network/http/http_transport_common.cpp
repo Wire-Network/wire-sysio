@@ -112,6 +112,13 @@ void validate_header_component(std::string_view value, std::string_view label) {
 }
 } // namespace
 
+std::string authority_host(std::string_view host) {
+   // A colon can only be an IPv6 literal here; is_safe_network_host rejects a colon in any
+   // registered name, and the port is carried separately.
+   const bool ipv6 = host.find(':') != std::string_view::npos;
+   return ipv6 ? "[" + std::string(host) + "]" : std::string(host);
+}
+
 std::string sanitize_reason(boost::beast::string_view reason) {
    constexpr size_t max_reason_bytes = 128;
    std::string result;
@@ -233,8 +240,7 @@ std::string sanitized_endpoint(const url& target) {
    std::string result = target.proto() + "://";
    if (!target.host() || target.host()->empty())
       return result + "<missing-host>";
-   const bool ipv6 = target.host()->find(':') != std::string::npos;
-   result += ipv6 ? "[" + *target.host() + "]" : *target.host();
+   result += authority_host(*target.host());
    if (target.port())
       result += ":" + std::to_string(*target.port());
    return result;
