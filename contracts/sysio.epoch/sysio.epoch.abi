@@ -112,10 +112,6 @@
                     "type": "B_vector_name_E[]"
                 },
                 {
-                    "name": "next_batch_op_groups",
-                    "type": "B_vector_name_E[]"
-                },
-                {
                     "name": "last_consensus_hash",
                     "type": "checksum256"
                 },
