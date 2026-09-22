@@ -353,9 +353,36 @@ public:
       set_abi(MSGCH_ACCOUNT, contracts::msgch_abi().data());
       set_privileged(MSGCH_ACCOUNT);
       produce_blocks();
+      const auto* msgch_acct = control->find_account_metadata(MSGCH_ACCOUNT);
+      BOOST_REQUIRE(msgch_acct != nullptr);
+      abi_def msgch_def;
+      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(msgch_acct->abi, msgch_def), true);
+      msgch_abi_ser.set_abi(std::move(msgch_def),
+                            abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// The first queued outbound attestation of `attest_type`, or a null variant.
+   /// `queueout` mints sequential ids, so a bounded forward scan finds any a test
+   /// queued. Requires deploy_msgch().
+   fc::variant find_queued_attestation(const char* type_name, uint32_t type_value,
+                                       uint64_t scan_until = 32) {
+      for (uint64_t id = 0; id <= scan_until; ++id) {
+         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "attestations"_n, id);
+         if (data.empty()) continue;
+         auto row = msgch_abi_ser.binary_to_variant(
+            "attestation_entry", data,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+         // `type` is an AttestationType; accept either rendering so the helper
+         // survives a change in how the enum reflects.
+         const auto& t = row["type"];
+         if ((t.is_string()  && t.as_string() == type_name) ||
+             (t.is_integer() && t.as_uint64() == type_value)) return row;
+      }
+      return fc::variant();
    }
 
    abi_serializer abi_ser;
+   abi_serializer msgch_abi_ser;
    abi_serializer token_abi_ser;
    abi_serializer authex_abi_ser;
    abi_serializer chains_abi_ser;
@@ -561,6 +588,43 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_unregistered_chain_soft_skips_before_queueo
       ("creator_pub_key",       std::vector<char>(33, '\x02'))));
 
    BOOST_REQUIRE(find_reserve("NOCHAIN", "ETH", "USERRES").is_null());
+} FC_LOG_AND_RETHROW() }
+
+// A reserve_code is chosen by the CALLER on the outpost -- ETH `create_reserve` and SOL
+// `create_reserve_handler` validate only that it is non-zero -- and the creator's escrow is
+// taken BEFORE the RESERVE_CREATE goes out. A code with no canonical spelling must therefore
+// be REFUNDED, never dropped: a drop strands the funds in the outpost's PENDING record with
+// no cancel path, since the outpost cannot release escrow on its own authority.
+BOOST_FIXTURE_TEST_CASE(oncrtreserve_uncanonical_code_is_cancelled, sysio_reserve_tester) { try {
+   deploy_msgch();
+
+   // Below the leading symbol's floor: decodes to "" and packs back to 0, so it is
+   // not a code and has no spelling.
+   constexpr uint64_t uncanonical = 7;
+   BOOST_REQUIRE(!fc::slug_name{uncanonical}.is_canonical());
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
+      ("chain_code",            "ETH")
+      ("token_code",            "ETH")
+      ("reserve_code",          mvo()("value", uncanonical))
+      ("name",                  "user reserve")
+      ("description",           "")
+      ("external_token_amount", 1000)
+      ("requested_wire_amount", 1000)
+      ("source_token_precision", 9u)
+      ("connector_weight_bps",  5000)
+      ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
+      ("creator_chain_addr",    std::vector<char>(20, '\x01'))
+      ("is_private",            false)
+      ("creator_pub_key",       std::vector<char>(33, '\x02'))
+   ));
+
+   // The refund is what matters: observe the OUTBOUND cancellation, not merely the
+   // absence of a depot row (the row's key IS the unspellable triple, so it could
+   // not be looked up by spelling anyway).
+   BOOST_REQUIRE(!find_queued_attestation(
+      "ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED",
+      sysio::opp::types::ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(oncrtreserve_unlinked_creator_is_cancelled, sysio_reserve_tester) { try {

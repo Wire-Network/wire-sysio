@@ -610,6 +610,26 @@ public:
          abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
+   /// The first queued outbound attestation of `attest_type`, or a null variant.
+   /// `queueout` mints sequential ids, so a bounded forward scan finds any a test
+   /// queued.
+   fc::variant find_queued_attestation(const char* type_name, uint32_t type_value,
+                                       uint64_t scan_until = 32) {
+      for (uint64_t id = 0; id <= scan_until; ++id) {
+         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "attestations"_n, id);
+         if (data.empty()) continue;
+         auto row = msgch_abi.binary_to_variant(
+            "attestation_entry", data,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+         // `type` is an AttestationType; accept either rendering so the helper
+         // survives a change in how the enum reflects.
+         const auto& t = row["type"];
+         if ((t.is_string()  && t.as_string() == type_name) ||
+             (t.is_integer() && t.as_uint64() == type_value)) return row;
+      }
+      return fc::variant();
+   }
+
    /// Find an operator's balance entry for a (chain_code, token_code) pair.
    fc::variant find_balance(const fc::variant& op,
                             std::string_view chain_code,
@@ -1439,7 +1459,11 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_deposit_to_opreg, sysio_dispatch_tester)
 // unconditional `row.get_object()` then drops the ENTIRE scan cycle rather than
 // one cell. So the dispatcher drops the attestation -- a check() here would halt
 // evalcons and stall consensus (feedback_opp_handlers_never_throw).
-BOOST_FIXTURE_TEST_CASE(dispatch_drops_uncanonical_token_code, sysio_dispatch_tester) { try {
+// A DEPOSIT_REQUEST arrives only after the outpost has taken custody, so an
+// unspellable token code must be REFUNDED rather than dropped: a drop leaves the
+// depositor with no credit on the depot and no DEPOSIT_REVERT to release the escrow.
+// The balance map is keyed by the code, so the credit itself must still not persist.
+BOOST_FIXTURE_TEST_CASE(dispatch_refunds_uncanonical_deposit_token_code, sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
 
    const auto eth_code = fc::slug_name{"ETH"}.value;
@@ -1464,13 +1488,20 @@ BOOST_FIXTURE_TEST_CASE(dispatch_drops_uncanonical_token_code, sysio_dispatch_te
       sysio::opp::types::ATTESTATION_TYPE_OPERATOR_ACTION,
       payload);
 
-   // The delivery SUCCEEDS -- the attestation is dropped inside dispatch, not reverted.
+   // The delivery SUCCEEDS -- the rejection happens inside dispatch, never as a revert
+   // of the envelope (a throw here would halt evalcons and stall consensus).
    BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));
 
-   // ...and nothing was persisted, so no stored row can later fail to render.
+   // Nothing was persisted, so no stored row can later fail to render...
    const auto   after          = get_operator(UWRIT_OP);
    const size_t balances_after = after.is_null() ? 0 : after["balances"].get_array().size();
    BOOST_CHECK_EQUAL(balances_before, balances_after);
+
+   // ...and the escrow is released: observe the OUTBOUND revert, not merely the
+   // absent credit. Without it the depositor's funds sit in outpost custody forever.
+   BOOST_REQUIRE(!find_queued_attestation(
+      "ATTESTATION_TYPE_DEPOSIT_REVERT",
+      sysio::opp::types::ATTESTATION_TYPE_DEPOSIT_REVERT).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(dispatch_routes_withdraw_request_to_opreg, sysio_dispatch_tester) { try {

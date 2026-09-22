@@ -532,7 +532,12 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
    // no-proto-messages-in-actions rule.
    const sysio::slug_name chain_code_slug{chain_code};
    const sysio::slug_name token_code{oa.amount.token_code};
-   if (!payload_codes_canonical({token_code}, "dispatch_operator_action")) return;
+   // A DEPOSIT_REQUEST carries outpost custody, so an unspellable token code must be
+   // REFUNDED, not dropped: opreg::depositinle rejects it with DEPOSIT_REVERT before
+   // touching the balance map. Every other action type is a state transition with no
+   // escrow to return, so dropping stays correct there.
+   if (oa.action_type != AT::ACTION_TYPE_DEPOSIT_REQUEST &&
+       !payload_codes_canonical({token_code}, "dispatch_operator_action")) return;
    // WSA-028: TokenAmount.amount is signed on the wire. Gate it through the
    // shared fail-closed parser before any unsigned use — a negative or
    // out-of-range amount is dropped here, never wrapped into a huge collateral
@@ -668,10 +673,11 @@ void dispatch_reserve_create(name self, const std::vector<char>& data, uint64_t 
    // reserve whose external custody is claimed against a different chain B.
    if (!source_chain_binding_ok(chain_code, ext.chain_code, "dispatch_reserve_create")) return;
 
+   // No canonicality drop here: the creator's escrow is already in outpost custody, so
+   // an unspellable token/reserve code must be REFUNDED. reserv::oncrtreserve rejects it
+   // with RESERVE_CREATE_CANCELLED before persisting anything.
    const sysio::slug_name ext_token_code{ext.amount.token_code};
    const sysio::slug_name ext_reserve_code{ext.reserve_code};
-   if (!payload_codes_canonical({ext_token_code, ext_reserve_code},
-                                "dispatch_reserve_create")) return;
 
    const uint64_t ext_amount =
       sysio::opp::safe::to_depot_amount(static_cast<int64_t>(ext.amount.amount)).value_or(0);

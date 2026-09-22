@@ -449,6 +449,24 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
       registered_chain_kind_or_skip(chain_code, "oncrtreserve");
    if (!expected_chain_kind.has_value()) return;
 
+   // The reserve row is keyed by (chain, token, reserve) codes, so an unspellable one
+   // cannot be persisted. The creator's escrow is already in outpost custody, so refund
+   // rather than drop. No CANCELLED tombstone (unlike the rejections below): the row's
+   // key IS the unspellable triple, and a code with no spelling can be neither squatted
+   // nor reclaimed, so the tombstone has nothing to protect.
+   if (!token_code.is_canonical() || !reserve_code.is_canonical()) {
+      sysio::print("oncrtreserve: rejecting with RESERVE_CREATE_CANCELLED "
+                   "(token or reserve code has no canonical slug_name spelling)\n");
+      opp::attestations::ReserveCreateCancelled cancelled;
+      cancelled.chain_code   = chain_code.value;
+      cancelled.token_code   = token_code.value;
+      cancelled.reserve_code = reserve_code.value;
+      queue_attestation_out(get_self(), chain_code,
+                            opp::types::AttestationType::ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED,
+                            cancelled);
+      return;
+   }
+
    // Soft-validate; silent skip per feedback_opp_handlers_never_throw.
    if (connector_weight_bps == 0 || connector_weight_bps > MAX_CONNECTOR_WEIGHT_BPS) {
       sysio::print("oncrtreserve: bad connector_weight_bps; skipping\n");

@@ -1253,6 +1253,17 @@ void opreg::depositinle(name account,
 
    auto deposit_action = build_deposit_action(actor, chain_code, token_code, amount);
 
+   // The balance map is keyed by (chain_code, token_code), so an unspellable token
+   // code cannot be persisted — every later render of that row would throw, and the
+   // underwriter's values_only scan drops the whole cycle rather than one cell. The
+   // outpost has already taken custody, so refund rather than drop.
+   if (!token_code.is_canonical()) {
+      const std::string err = "token code has no canonical slug_name spelling";
+      emit_deposit_revert(get_self(), chain_code, actor, token_code, amount,
+                          original_message_id, err);
+      append_action_log(ops, op_pk, deposit_action, false, err);
+      return;
+   }
    if (amount == 0) {
       const std::string err = "amount must be positive";
       emit_deposit_revert(get_self(), chain_code, actor, token_code, amount,
