@@ -2663,6 +2663,22 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       out.absolute          = p.json && hex.size() != body.size();
       const auto v          = fc::from_hex(hex);
       out.bytes.assign(v.begin(), v.end());
+      // The tag identifies the CARRIER; it does not prove these caller-supplied bytes
+      // belong to the scope this request named. Skipping the prefix on an unchecked
+      // absolute bound is a scope bypass: `scope=B` with a bound naming scope A seeks
+      // into A while the default upper bound is still the end of B, so the scan walks
+      // every scope in between; a bare `0x` decodes to nothing and starts at the front
+      // of the table. `find` shares this path, so it escapes its own scope the same way.
+      //
+      // Rejected rather than clamped — a bound naming another scope is a caller error,
+      // and quietly returning a different range is how that stays invisible.
+      if (out.absolute && !scope_prefix_bytes.empty()) {
+         SYS_ASSERT(out.bytes.size() >= scope_prefix_bytes.size()
+                       && std::equal(scope_prefix_bytes.begin(), scope_prefix_bytes.end(),
+                                     out.bytes.begin()),
+                    chain::contract_table_query_exception,
+                    "Table {} bound '{}' is outside scope {}", p.table, bound, p.scope);
+      }
       return out;
    };
 

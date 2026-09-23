@@ -176,14 +176,21 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
     struct [[sysio::table("sslugobjs")]] sslugobj {
         slug_name code;
         uint64_t  payload = 0;
+        // A SLUG-typed secondary. `bypayload` is a uint64 and always decodes, so it
+        // can never reach the secondary cursor's raw fallback; only a secondary whose
+        // key can fail to be NAMED exercises that path.
+        slug_name alt;
         uint64_t  by_payload() const { return payload; }
-        SYSLIB_SERIALIZE(sslugobj, (code)(payload))
+        slug_name by_alt() const { return alt; }
+        SYSLIB_SERIALIZE(sslugobj, (code)(payload)(alt))
     };
 
     typedef sysio::kv::scoped_table<
         "sslugobjs"_n, sslugobj_key, sslugobj,
         sysio::kv::index<"bypayload"_n,
-                         sysio::const_mem_fun<sslugobj, uint64_t, &sslugobj::by_payload>>> sslugobjs;
+                         sysio::const_mem_fun<sslugobj, uint64_t, &sslugobj::by_payload>>,
+        sysio::kv::index<"byalt"_n,
+                         sysio::const_mem_fun<sslugobj, slug_name, &sslugobj::by_alt>>> sslugobjs;
 
    [[sysio::action]]
    void addnumobj(uint64_t input);
@@ -215,8 +222,11 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
    /// @param scope    the table scope
    /// @param code     the slug forming the primary key
    /// @param payload  arbitrary row payload; also the `bypayload` secondary
+   /// @param alt      a second slug, indexed by `byalt` -- a SLUG-typed secondary,
+   ///                 so a non-canonical value here cannot be named and drives the
+   ///                 secondary cursor's raw fallback
    [[sysio::action]]
-   void addsslug(uint64_t scope, slug_name code, uint64_t payload);
+   void addsslug(uint64_t scope, slug_name code, uint64_t payload, slug_name alt);
 
 
 };

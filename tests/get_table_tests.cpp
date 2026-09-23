@@ -922,17 +922,20 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
    //           to double or drop.
    {
       const uint64_t sc = chain::name("sc1").to_uint64_t();
+      // `alt` is the SLUG-typed secondary (`byalt`). It mirrors `code`'s canonicality
+      // so the same boundary row is un-nameable on both the primary and the secondary
+      // cursor; `bypayload` is a uint64 and always decodes, so it cannot reach either.
       push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
-         ("scope", sc)("code", "ETH")("payload", 10));
+         ("scope", sc)("code", "ETH")("payload", 10)("alt", "AAA"));
       push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
-         ("scope", sc)("code", "SOL")("payload", 20));
+         ("scope", sc)("code", "SOL")("payload", 20)("alt", "BBB"));
       push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
-         ("scope", sc)("code", "WIRE")("payload", 30));
+         ("scope", sc)("code", "WIRE")("payload", 30)("alt", "CCC"));
       // The un-nameable one, stored through the transitional object carrier.
       // 34<<42 is the packed former spelling "7"; char[0] = 34 sorts it last.
       push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
          ("scope", sc)("code", mutable_variant_object()("value", uint64_t{34} << 42))
-         ("payload", 40));
+         ("payload", 40)("alt", mutable_variant_object()("value", uint64_t{34} << 42)));
 
       chain_apis::read_only::get_table_rows_params p;
       p.json  = true;
@@ -1007,6 +1010,94 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
          get_table_rows_full(plugin, p, fc::time_point::maximum()),
          chain::contract_table_query_exception
       );
+      p.lower_bound.clear();
+
+      // (sec-11h) The SECONDARY cursor's raw fallback. `bypayload` is a uint64 and
+      //           always decodes, so only a SLUG-typed secondary can reach the
+      //           emitter's catch at all — `byalt` exists for that.
+      p.index_name = "byalt";
+      p.limit      = 3;
+      auto secA = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(secA.rows.size(), 3u);
+      BOOST_REQUIRE_EQUAL(secA.more, true);
+      // Absolute and tagged, exactly like the primary: "0x" + scope + the packed alt.
+      BOOST_CHECK_EQUAL(secA.next_key, "0xc2020000000000000000880000000000");
+
+      p.lower_bound = secA.next_key;
+      p.limit       = 50;
+      auto secB = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(secB.rows.size(), 1u);
+      BOOST_CHECK_EQUAL(secB.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 40u);
+      p.lower_bound.clear();
+
+      //           REVERSE on the same index. The reverse branch has its own emitter
+      //           call and names the LAST RETURNED row rather than the first unseen
+      //           one, so a forward-only test leaves exactly the half where the
+      //           earlier relative/absolute cursor defects lived.
+      p.reverse = true;
+      p.limit   = 1;
+      auto secRevA = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(secRevA.rows.size(), 1u);
+      BOOST_REQUIRE_EQUAL(secRevA.more, true);
+      BOOST_CHECK_EQUAL(secRevA.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 40u);
+      BOOST_CHECK_EQUAL(secRevA.next_key, "0xc2020000000000000000880000000000");
+
+      p.upper_bound = secRevA.next_key;
+      p.limit       = 50;
+      auto secRevB = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(secRevB.rows.size(), 3u);   // CCC, BBB, AAA
+      BOOST_CHECK_EQUAL(secRevB.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 30u);
+      p.upper_bound.clear();
+      p.reverse = false;
+      p.index_name.clear();
+
+      // (sec-11i) A raw cursor is a CARRIER tag, not proof of provenance. An absolute
+      //           bound naming a different scope must be refused, not silently
+      //           honoured -- seeking into scope A while the default upper bound is
+      //           still the end of B returns every scope in between. Same for a bound
+      //           too short to carry a scope at all, and for `find`, which feeds both
+      //           bounds from one value.
+      const std::string other_scope_cursor = "0xc302000000000000" "0000154200000000";
+      for (const std::string& bad : { other_scope_cursor,   // names another scope
+                                      std::string("0x"),    // no bytes at all
+                                      std::string("0xc2020000") }) {   // truncated prefix
+         p.lower_bound = bad;
+         BOOST_CHECK_THROW(
+            get_table_rows_full(plugin, p, fc::time_point::maximum()),
+            chain::contract_table_query_exception
+         );
+         p.lower_bound.clear();
+
+         p.upper_bound = bad;
+         BOOST_CHECK_THROW(
+            get_table_rows_full(plugin, p, fc::time_point::maximum()),
+            chain::contract_table_query_exception
+         );
+         p.upper_bound.clear();
+
+         p.find = bad;
+         BOOST_CHECK_THROW(
+            get_table_rows_full(plugin, p, fc::time_point::maximum()),
+            chain::contract_table_query_exception
+         );
+         p.find.clear();
+
+         // ...and the same three on the secondary path.
+         p.index_name  = "byalt";
+         p.lower_bound = bad;
+         BOOST_CHECK_THROW(
+            get_table_rows_full(plugin, p, fc::time_point::maximum()),
+            chain::contract_table_query_exception
+         );
+         p.lower_bound.clear();
+         p.index_name.clear();
+      }
+
+      // The in-scope cursor still works, so the guard rejects provenance and not
+      // every absolute bound.
+      p.lower_bound = "0xc2020000000000000000880000000000";
+      auto stillOk = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_CHECK_EQUAL(stillOk.rows.size(), 1u);
       p.lower_bound.clear();
    }
 

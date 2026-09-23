@@ -52,6 +52,10 @@
                 {
                     "name": "payload",
                     "type": "uint64"
+                },
+                {
+                    "name": "alt",
+                    "type": "slug_name"
                 }
             ]
         },
@@ -182,6 +186,10 @@
                 {
                     "name": "payload",
                     "type": "uint64"
+                },
+                {
+                    "name": "alt",
+                    "type": "slug_name"
                 }
             ]
         },
@@ -328,6 +336,11 @@
                     "name": "bypayload",
                     "key_type": "uint64",
                     "table_id": 64287
+                },
+                {
+                    "name": "byalt",
+                    "key_type": "slug_name",
+                    "table_id": 52539
                 }
             ]
         },

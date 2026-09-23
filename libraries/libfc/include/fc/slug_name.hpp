@@ -139,26 +139,29 @@ using slug_name_literals::operator""_s;
 /// type-disjoint carrier — and why the carrier could not have been a numeric
 /// string before the rule existed.
 ///
-/// A packed value whose leading symbol slot is 0 or a digit is not a code and
-/// has no spelling; rendering one THROWS. That is an invariant assertion, not a
-/// carrier decision: such a value must never be persisted in the first place,
-/// which is the job of the validation at the proto boundary where a raw
-/// `uint64` becomes a slug (`sysio.msgch`'s dispatch path and the opreg/uwrit
-/// /reserv writers). Until that lands, a stored one is a defect that surfaces
-/// here rather than being silently rendered as something it is not.
-/// Render a slug as its spelling. TOTAL, exactly like sysio::chain::name — a
-/// renderer is a READ path, and a throwing one turns one bad row into a failure
-/// of everything that scans it (an unspellable code would stall every
-/// underwriter_plugin commit, not just that cell). Validation lives on the WRITE
-/// path: from_variant's string arm goes through the validating constructor, so a
-/// non-canonical spelling is refused at construction.
+/// Render a slug as its spelling. TOTAL, like sysio::chain::name — a renderer is
+/// a READ path, and a throwing one turns one bad row into a failure of everything
+/// that scans it (an unspellable code would stall every underwriter_plugin commit,
+/// not just that cell). Validation lives on the WRITE path: from_variant's string
+/// arm goes through the validating constructor, so a non-canonical spelling is
+/// refused at construction.
 ///
-/// A value with no canonical spelling renders as whatever it decodes to, and is
-/// lossy in the same two ways name is: one with a non-empty char[0] renders a
-/// string from_variant then rejects (loud), while one below the 1<<42 floor has
-/// an empty char[0] and renders "" — indistinguishable from zero (silent). Both
-/// are name's behaviour; neither can be prevented here, because a prepacked
-/// binary action sets the reflected `value` directly for either type.
+/// TOTAL is where the resemblance to `name` ends, and the difference is the whole
+/// reason is_canonical() exists here and would be meaningless there. `name`'s
+/// alphabet is exactly 2^5 with no gaps and its 13 symbols consume all 64 bits, so
+/// every raw uint64 IS a canonical name and its render is total AND injective —
+/// nothing is ever lost. slug_name's decode is injective only over its canonical
+/// range, so a value outside that range renders as whatever it decodes to, lossily,
+/// in two ways with no counterpart in `name`:
+///
+///   - a non-empty leading symbol renders a string from_variant then REJECTS (loud);
+///   - a value below 1<<42 has an empty leading slot and renders "" —
+///     indistinguishable from the zero sentinel (silent).
+///
+/// Neither can be prevented in a renderer: a prepacked binary action sets the
+/// reflected `value` directly, so such a value is already stored by the time
+/// anything reads it. Keeping it out is the job of validation at the proto
+/// boundary, where a raw uint64 becomes a slug.
 inline void to_variant(const slug_name& s, fc::variant& v) {
    v = s.to_string();
 }

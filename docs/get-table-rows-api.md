@@ -18,7 +18,7 @@ POST /v1/chain/get_table_rows
 | `scope` | string | `""` | Scope for scoped tables. Empty = unscoped (all rows). Parsed using ABI type. |
 | `find` | string | `""` | Exact key lookup (JSON key object or hex). Cannot be combined with bounds. |
 | `index_name` | string | `""` | Secondary index name (e.g. `"byowner"`) or position (e.g. `"2"`). Empty = primary key. |
-| `lower_bound` | string | `""` | Lower bound (inclusive). JSON key object when `json=true`, hex when `json=false`. |
+| `lower_bound` | string | `""` | Lower bound (inclusive). When `json=true`: a JSON key object, or a `0x`-prefixed raw cursor as returned by `next_key`. When `json=false`: hex. |
 | `upper_bound` | string | `""` | Upper bound (exclusive). Same format as `lower_bound`. |
 | `limit` | uint32 | `50` | Max rows to return |
 | `reverse` | bool | `false` | Iterate in reverse order |
@@ -39,7 +39,7 @@ POST /v1/chain/get_table_rows
 
 - `rows` — array of `{key, value}` objects. When `show_payer=true`, includes `payer` field.
 - `more` — `true` if there are more rows beyond `limit`.
-- `next_key` — use as `lower_bound` for the next page. Scope is stripped (pass same `scope` param).
+- `next_key` — use as `lower_bound` for the next page. Usually a JSON key object with the scope stripped (pass the same `scope` param); for a key the ABI cannot name it is a `0x` raw cursor instead — an opaque, complete key. Feed either back verbatim.
 
 ## Scoped Queries
 
@@ -96,7 +96,9 @@ Where `1397703940` is `symbol_code("SYS").raw()`. Returns alice's SYS balance.
 
 ### Bounded range
 
-Bounds are JSON objects with field names matching the table's `key_names` from the ABI. For scoped tables with `scope` set, bounds represent the within-scope key (scope is prepended automatically).
+Bounds are JSON objects with field names matching the table's `key_names` from the ABI. For scoped tables with `scope` set, a key object represents the within-scope key and the scope is prepended automatically.
+
+A `0x` raw cursor is the exception: it is already the complete stored key, so it is used verbatim and nothing is prepended. It must lie inside the `scope` the request names — a cursor from another scope is rejected rather than silently returning that other scope's rows.
 
 ```json
 {
@@ -174,7 +176,7 @@ When `more` is `true`, use `next_key` as `lower_bound` for the next request. Kee
 }
 ```
 
-`next_key` is scope-stripped — the scope prefix is not included. Just pass it back as `lower_bound` with the same `scope`.
+A `next_key` key object is scope-stripped — the scope prefix is not included, so pass it back as `lower_bound` with the same `scope`. A `0x` raw cursor already carries the scope; pass it back with the same `scope` too, and it is used as-is.
 
 ## RAM Payer
 
