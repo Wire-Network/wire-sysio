@@ -44,6 +44,11 @@ sysio.opp.MessagePayload -- sysio.opp.AttestationEntry
 
 
 
+sysio.opp.attestations.PretokenStakeChange -- sysio.opp.types.ChainAddress
+sysio.opp.attestations.PretokenStakeChange -- sysio.opp.types.TokenAmount
+
+
+
 sysio.opp.types.ChainSignature -- sysio.opp.types.ChainAddress
 sysio.opp.types.ChainSignature -- sysio.opp.types.ChainKeyType
 
@@ -102,6 +107,13 @@ package sysio.opp.attestations {
   amount: sysio.opp.types.TokenAmount
   pretoken_count: Long
   index_at_mint: Long
+ }
+
+ class PretokenStakeChange {
+  actor: sysio.opp.types.ChainAddress
+  amount: sysio.opp.types.TokenAmount
+  index_at_mint: Long
+  index_at_burn: Long
  }
 
  class PretokenYield {
