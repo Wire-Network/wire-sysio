@@ -237,6 +237,22 @@ inline void from_variant(const fc::variant& v, slug_name& s) {
 
 } // namespace fc
 
+namespace std {
+   /// slug_name is DERIVED, so `std::hash<fc::basic_name<Traits>>` no longer
+   /// covers it: a partial specialization is matched by deducing the exact
+   /// type, which never considers a derived-to-base conversion. Without this,
+   /// `std::hash<fc::slug_name>` resolves to the disabled primary template and
+   /// every unordered container over a slug fails to compile. sysio::chain::name
+   /// carries its own for the same reason, and hashes the same way.
+   template <>
+   struct hash<fc::slug_name> {
+      size_t operator()(const fc::slug_name& s) const noexcept {
+         static_assert(sizeof(size_t) == sizeof(uint64_t));
+         return __builtin_bswap64(s.value);
+      }
+   };
+} // namespace std
+
 /// slug_name is DERIVED, so it needs its own reflection — the base's
 /// FC_REFLECT_TEMPLATE does not cover it, and a plain FC_REFLECT cannot take an
 /// INHERITED member (the pointer is to the base). Same form sysio::chain::name

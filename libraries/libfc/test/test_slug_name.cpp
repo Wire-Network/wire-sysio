@@ -10,6 +10,7 @@
 
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <unordered_set>
 
 using fc::slug_name;
@@ -661,6 +662,37 @@ BOOST_AUTO_TEST_CASE(variant_object_arm_rejects_every_coercible_value_shape) {
    BOOST_CHECK_EQUAL(back.value, 7u);
    fc::from_variant(obj(fc::variant(slug_name{"LIQSOL"}.value)), back);
    BOOST_CHECK(back == slug_name{"LIQSOL"});
+}
+
+/// slug_name is DERIVED, so it needs its own std::hash — and this is primarily a
+/// COMPILE-time guard. A partial specialization over fc::basic_name<Traits> is
+/// matched by deducing the exact type and never considers a derived-to-base
+/// conversion, so without fc::slug_name's own specialization the lookup falls to
+/// the disabled primary template and none of the lines below compile.
+///
+/// `lsb_hash_distinguishes_distinct_values` above cannot catch that: its type IS a
+/// basic_name, so the partial specialization covers it either way. Equality is not
+/// at risk for the same reason it is not for chain::name — basic_name's `==` is a
+/// hidden friend, and ADL finds it through the base.
+BOOST_AUTO_TEST_CASE(derived_slug_name_is_usable_in_unordered_containers) {
+   const slug_name eth{"ETH"};
+   const slug_name sol{"SOL"};
+
+   std::unordered_set<slug_name> codes{eth, sol};
+   BOOST_CHECK_EQUAL(codes.size(), 2u);
+   BOOST_CHECK(codes.contains(eth));
+   BOOST_CHECK(codes.contains(sol));
+   BOOST_CHECK(!codes.contains(slug_name{"WIRE"}));
+   BOOST_CHECK(!codes.insert(eth).second);   // equal value, same bucket
+
+   std::unordered_map<slug_name, uint64_t> payload{{eth, 10}, {sol, 20}};
+   BOOST_CHECK_EQUAL(payload.at(eth), 10u);
+   BOOST_CHECK_EQUAL(payload.at(sol), 20u);
+
+   // Same hash the base would have produced: the specialization restores
+   // reachability, it does not change the value.
+   BOOST_CHECK_EQUAL(std::hash<slug_name>{}(eth),
+                     std::hash<fc::basic_name<fc::slug_name_traits>>{}(eth));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
