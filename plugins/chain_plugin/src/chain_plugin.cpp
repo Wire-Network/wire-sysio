@@ -2456,13 +2456,14 @@ std::string to_raw_cursor(std::string_view key) {
 /// stops at the table_id boundary on its own, so the caller wants no upper bound.
 bool scope_exclusive_upper(const std::vector<char>& prefix, std::vector<char>& out) {
    out = prefix;
-   for (int i = static_cast<int>(out.size()) - 1; i >= 0; --i) {
-      const auto b = static_cast<uint8_t>(out[i]);
-      if (b < 0xFF) {
-         out[i] = static_cast<char>(b + 1);
+   for (auto it = out.rbegin(); it != out.rend(); ++it) {
+      // Unsigned on purpose: `char` is signed here, so incrementing 0x7F in place
+      // would be signed overflow. The wrap to zero IS the carry into the next byte,
+      // so no separate carry flag is needed.
+      const unsigned char carried = static_cast<unsigned char>(*it) + 1;
+      *it = static_cast<char>(carried);
+      if (carried != 0)
          return true;
-      }
-      out[i] = '\0';
    }
    return false;
 }
@@ -2639,7 +2640,9 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    // json=false is hex only and unchanged — the complete stored key, untagged.
    struct parsed_bound {
       std::vector<char> bytes;
-      bool              absolute = false; ///< raw cursor: never scope-prefixed again
+      /// The bytes are already a COMPLETE stored key, scope prefix included, so they
+      /// are never prefixed again -- and must be checked to lie inside the scope.
+      bool              complete = false;
    };
    auto parse_bound = [&](const std::string& bound) {
       parsed_bound out;
@@ -2660,23 +2663,25 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          out.bytes = chain::be_key_codec::encode_key(fc::json::from_string(body), *bound_key_shapes);
          return out;
       }
-      // fc::from_hex trims the tag itself; this only has to NOTICE it — and only under
-      // json=true, because a json=false bound has always been the complete key whether
-      // or not it carries the prefix, and that meaning must not change here.
+      // Which bounds are already COMPLETE keys:
+      //   json=true  + "0x"  -> a raw cursor (fc::from_hex trims the tag itself; this
+      //                        only has to NOTICE it)
+      //   json=true  + hex   -> within-scope, like the key object
+      //   json=false         -> always complete, by the contract this PR restores
       const std::string hex = fc::trim_hex_prefix(body);
-      out.absolute          = p.json && hex.size() != body.size();
+      out.complete          = !p.json || hex.size() != body.size();
       const auto v          = fc::from_hex(hex);
       out.bytes.assign(v.begin(), v.end());
-      // The tag identifies the CARRIER; it does not prove these caller-supplied bytes
-      // belong to the scope this request named. Skipping the prefix on an unchecked
-      // absolute bound is a scope bypass: `scope=B` with a bound naming scope A seeks
-      // into A while the default upper bound is still the end of B, so the scan walks
-      // every scope in between; a bare `0x` decodes to nothing and starts at the front
-      // of the table. `find` shares this path, so it escapes its own scope the same way.
+      // A complete bound carries its own scope, so nothing prefixes it — which makes it
+      // the caller's word for where to start. Unchecked, that is a scope bypass:
+      // `scope=B` with a bound naming scope A seeks into A while the default upper
+      // bound is still the end of B, so the scan walks every scope in between; a bare
+      // `0x` decodes to nothing and starts at the front of the table. `find` shares
+      // this path, so it escapes its own scope the same way.
       //
       // Rejected rather than clamped — a bound naming another scope is a caller error,
       // and quietly returning a different range is how that stays invisible.
-      if (out.absolute && !scope_prefix_bytes.empty()) {
+      if (out.complete && !scope_prefix_bytes.empty()) {
          SYS_ASSERT(out.bytes.size() >= scope_prefix_bytes.size()
                        && std::equal(scope_prefix_bytes.begin(), scope_prefix_bytes.end(),
                                      out.bytes.begin()),
@@ -2687,19 +2692,19 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    };
 
    std::vector<char> lb_bytes;
-   bool              lb_absolute = false;
+   bool              lb_complete = false;
    if (!effective_lower.empty()) {
       auto parsed = parse_bound(effective_lower);
       lb_bytes    = std::move(parsed.bytes);
-      lb_absolute = parsed.absolute;
+      lb_complete = parsed.complete;
    }
    std::vector<char> ub_bytes;
-   bool              ub_absolute = false;
+   bool              ub_complete = false;
    bool has_upper = !effective_upper.empty();
    if (has_upper) {
       auto parsed = parse_bound(effective_upper);
       ub_bytes    = std::move(parsed.bytes);
-      ub_absolute = parsed.absolute;
+      ub_complete = parsed.complete;
    }
 
    // For find: upper bound must be exclusive, so increment the encoded bytes
@@ -2738,11 +2743,11 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
 
       if (effective_lower.empty())
          lb_bytes = scope_prefix_bytes;
-      else if (p.json && !lb_absolute)
+      else if (!lb_complete)
          lb_bytes = prepend_scope(lb_bytes);
 
       if (has_upper) {
-         if (p.json && !ub_absolute)
+         if (!ub_complete)
             ub_bytes = prepend_scope(ub_bytes);
       } else if (scope_exclusive_upper(scope_prefix_bytes, ub_bytes)) {
          has_upper = true;

@@ -3107,13 +3107,13 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_scoped_bounds_test, validating_tester ) try
    const uint64_t scb = chain::name("scb").to_uint64_t();
    for (uint64_t scope : {sca, scb}) {
       push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
-         ("scope", scope)("code", "ETH")("payload", 10));
+         ("scope", scope)("code", "ETH")("payload", 10)("alt", "AAA"));
       push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
-         ("scope", scope)("code", "SOL")("payload", 20));
+         ("scope", scope)("code", "SOL")("payload", 20)("alt", "BBB"));
       push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
-         ("scope", scope)("code", "USDC")("payload", 30));
+         ("scope", scope)("code", "USDC")("payload", 30)("alt", "CCC"));
       push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
-         ("scope", scope)("code", "WIRE")("payload", 40));
+         ("scope", scope)("code", "WIRE")("payload", 40)("alt", "DDD"));
    }
    produce_block();
 
@@ -3188,6 +3188,56 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_scoped_bounds_test, validating_tester ) try
 
       auto rows = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_CHECK_EQUAL(rows.rows.size(), 4u);
+   }
+
+   // (d) A json=false bound is a COMPLETE stored key, so this PR stops prefixing it --
+   //     which makes it the caller's word for where the scan starts. Unchecked, that
+   //     is the same scope bypass the `0x` cursor had: master clamped these by always
+   //     prefixing them, and that clamp is exactly what (a) removes. So the complete-
+   //     bound scope check has to cover json=false too, not just the tagged cursor.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json  = false;
+      p.code  = "test"_n;
+      p.scope = "sca";
+      p.table = "sslugobjs";
+
+      char wrong_scope[chain::kv_scoped_key_size];
+      chain::kv_encode_be64(wrong_scope, scb);                                 // the OTHER scope
+      chain::kv_encode_be64(wrong_scope + chain::kv_scope_prefix_size, 0);     // any in-scope key
+      const std::string bad = fc::to_hex(wrong_scope, chain::kv_scoped_key_size);
+
+      p.lower_bound = bad;
+      BOOST_CHECK_THROW(
+         get_table_rows_full(plugin, p, fc::time_point::maximum()),
+         chain::contract_table_query_exception
+      );
+      p.lower_bound.clear();
+
+      p.upper_bound = bad;
+      BOOST_CHECK_THROW(
+         get_table_rows_full(plugin, p, fc::time_point::maximum()),
+         chain::contract_table_query_exception
+      );
+      p.upper_bound.clear();
+
+      // Too short to carry a scope at all.
+      p.lower_bound = "c202";
+      BOOST_CHECK_THROW(
+         get_table_rows_full(plugin, p, fc::time_point::maximum()),
+         chain::contract_table_query_exception
+      );
+      p.lower_bound.clear();
+
+      // The in-scope equivalent still works, so the guard rejects provenance rather
+      // than every json=false bound -- which would break the sec-8 contract.
+      char in_scope[chain::kv_scoped_key_size];
+      chain::kv_encode_be64(in_scope, sca);
+      chain::kv_encode_be64(in_scope + chain::kv_scope_prefix_size, 0);
+      p.lower_bound = fc::to_hex(in_scope, chain::kv_scoped_key_size);
+      auto ok = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_CHECK_EQUAL(ok.rows.size(), 4u);
+      p.lower_bound.clear();
    }
 
 } FC_LOG_AND_RETHROW() /// get_kv_rows_scoped_bounds_test
