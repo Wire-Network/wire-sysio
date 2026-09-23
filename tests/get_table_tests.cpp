@@ -3092,4 +3092,104 @@ BOOST_FIXTURE_TEST_CASE(primary_capture_budget_and_compatibility, validating_tes
    BOOST_CHECK(filtered.more); // Filtering is intentionally after the public API's page boundary.
 } FC_LOG_AND_RETHROW()
 
+/// Scoped kv pagination bounds. Nothing here involves `slug_name`; `sslugobjs` is
+/// used only because it is the one scoped kv table in the fixture that also carries
+/// a secondary index, so both paths are reachable from one set of rows.
+///
+/// Two rows sets in two scopes, so a query that leaks across scopes is visible.
+BOOST_FIXTURE_TEST_CASE( get_kv_rows_scoped_bounds_test, validating_tester ) try {
+   create_account("test"_n);
+   set_code( "test"_n, test_contracts::get_table_test_wasm() );
+   set_abi( "test"_n, test_contracts::get_table_test_abi() );
+   produce_block();
+
+   const uint64_t sca = chain::name("sca").to_uint64_t();
+   const uint64_t scb = chain::name("scb").to_uint64_t();
+   for (uint64_t scope : {sca, scb}) {
+      push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
+         ("scope", scope)("code", "ETH")("payload", 10));
+      push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
+         ("scope", scope)("code", "SOL")("payload", 20));
+      push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
+         ("scope", scope)("code", "USDC")("payload", 30));
+      push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
+         ("scope", scope)("code", "WIRE")("payload", 40));
+   }
+   produce_block();
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes,
+                                fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+
+   // (a) json=false scoped pagination must RESUME. `next_key` is the complete stored
+   //     key, scope prefix included, so the bound path must not prepend the prefix to
+   //     it a second time -- doing so seeks to <scope><scope>, past every row in the
+   //     scope, and the caller silently receives an empty final page.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json  = false;
+      p.code  = "test"_n;
+      p.scope = "sca";
+      p.table = "sslugobjs";
+
+      p.limit = 3;
+      auto pageA = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(pageA.rows.size(), 3u);
+      BOOST_REQUIRE_EQUAL(pageA.more, true);
+      BOOST_REQUIRE(!pageA.next_key.empty());
+
+      p.lower_bound = pageA.next_key;
+      p.limit       = 50;
+      auto pageB = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_CHECK_EQUAL(pageB.rows.size(), 1u);
+      BOOST_CHECK_EQUAL(pageB.more, false);
+      p.lower_bound.clear();
+
+      // Reverse resumes on the same contract.
+      p.reverse = true;
+      p.limit   = 3;
+      auto revA = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(revA.rows.size(), 3u);
+      BOOST_REQUIRE_EQUAL(revA.more, true);
+      p.upper_bound = revA.next_key;
+      p.limit       = 50;
+      auto revB = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_CHECK_GE(revB.rows.size(), 1u);
+      p.upper_bound.clear();
+      p.reverse = false;
+   }
+
+   // (b) A scoped SECONDARY query with NO bounds must stay inside its scope. The
+   //     prefix was only applied when a bound had been supplied, so an unbounded
+   //     scan started at the front of the table_id partition and walked every scope.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json       = true;
+      p.code       = "test"_n;
+      p.scope      = "sca";
+      p.table      = "sslugobjs";
+      p.index_name = "bypayload";
+      p.limit      = 50;
+
+      auto rows = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_CHECK_EQUAL(rows.rows.size(), 4u);   // sca only -- never scb's four
+   }
+
+   // (c) ...and the same query on the OTHER scope returns that scope's rows, so (b)
+   //     is not passing merely because the scan found nothing.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json       = true;
+      p.code       = "test"_n;
+      p.scope      = "scb";
+      p.table      = "sslugobjs";
+      p.index_name = "bypayload";
+      p.limit      = 50;
+
+      auto rows = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_CHECK_EQUAL(rows.rows.size(), 4u);
+   }
+
+} FC_LOG_AND_RETHROW() /// get_kv_rows_scoped_bounds_test
+
 BOOST_AUTO_TEST_SUITE_END()

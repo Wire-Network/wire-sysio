@@ -2449,6 +2449,24 @@ std::string to_raw_cursor(std::string_view key) {
    return fc::to_hex(key.data(), static_cast<uint32_t>(key.size()), /*add_prefix=*/true);
 }
 
+/// Exclusive upper bound for a scope's key range: \p prefix with its last byte
+/// incremented, carrying left. Writes it to \p out and returns true.
+///
+/// Returns false when every byte is 0xFF and no successor exists — iteration then
+/// stops at the table_id boundary on its own, so the caller wants no upper bound.
+bool scope_exclusive_upper(const std::vector<char>& prefix, std::vector<char>& out) {
+   out = prefix;
+   for (int i = static_cast<int>(out.size()) - 1; i >= 0; --i) {
+      const auto b = static_cast<uint8_t>(out[i]);
+      if (b < 0xFF) {
+         out[i] = static_cast<char>(b + 1);
+         return true;
+      }
+      out[i] = '\0';
+   }
+   return false;
+}
+
 read_only::get_table_rows_return_t
 read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
    abi_def abi = sysio::chain_apis::get_abi( db, p.code );
@@ -2690,60 +2708,44 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       ub_bytes.push_back('\0');
    }
 
-   // When scope is set on a primary query, prepend scope prefix to bounds.
-   if (!resolved_index_name.empty() && !scope_prefix_bytes.empty()) {
-      // Secondary index keys on scoped tables (multi_index / kv_multi_index)
-      // are stored as [scope:8B BE][sec_value:N]. For json=false the caller
-      // supplies the full [scope][value] bytes via hex, but for json=true
-      // `encode_key` produced only the sec_value portion (since bound_key_names
-      // is just the index name). Prepend the scope prefix so the bound
-      // compares byte-for-byte against the stored sec_key.
-      if (p.json) {
-         auto prepend_scope_sec = [&](const std::vector<char>& bound) -> std::vector<char> {
-            std::vector<char> scoped;
-            scoped.reserve(scope_prefix_bytes.size() + bound.size());
-            scoped.insert(scoped.end(), scope_prefix_bytes.begin(), scope_prefix_bytes.end());
-            scoped.insert(scoped.end(), bound.begin(), bound.end());
-            return scoped;
-         };
-         // Keyed on whether a bound was SUPPLIED, not on its decoded byte length: a
-         // supplied bound that decodes to zero bytes still needs the prefix, or the
-         // scan starts at the front of the table instead of this scope. A raw cursor
-         // is exempt — it already carries the scope.
-         if (!effective_lower.empty() && !lb_absolute) lb_bytes = prepend_scope_sec(lb_bytes);
-         if (has_upper && !ub_absolute)                ub_bytes = prepend_scope_sec(ub_bytes);
-      }
-   } else if (!resolved_index_name.empty()) {
-      // Secondary index on an unscoped kv::table: nothing to prepend.
-   } else if (!scope_prefix_bytes.empty()) {
+   // Scope handling for bounds. Two INDEPENDENT jobs, and conflating them is what
+   // produced the two defects this replaces.
+   //
+   //   CONFINEMENT — an ABSENT bound on a scoped table defaults to that scope's own
+   //   range. Without it the scan walks the entire table_id partition, across every
+   //   scope. This has nothing to do with how a supplied bound is encoded, and it
+   //   applies to a secondary index exactly as it does to the primary; the secondary
+   //   branch previously skipped it, so an unbounded scoped secondary query returned
+   //   other scopes' rows.
+   //
+   //   PREFIXING — a SUPPLIED json=true bound names only the within-scope fields, so
+   //   it needs the prefix. A json=false bound is the COMPLETE stored key by contract:
+   //   it is what next_key emits, and what a caller assembles by hand (see the scoped
+   //   secondary bounds in get_kv_rows_index_name_test). A raw `0x` cursor is complete
+   //   as well. Neither is prefixed — the primary branch previously prefixed both,
+   //   which pushed a json=false resume past the end of its own scope.
+   //
+   // Secondary keys are [scope:8B BE][sec_value:N] and primary keys [scope:8B BE][key],
+   // so one prefix range bounds either.
+   if (!scope_prefix_bytes.empty()) {
       auto prepend_scope = [&](const std::vector<char>& bound) -> std::vector<char> {
-         std::vector<char> scoped(scope_prefix_bytes.size() + bound.size());
-         if (!scope_prefix_bytes.empty())
-            memcpy(scoped.data(), scope_prefix_bytes.data(), scope_prefix_bytes.size());
-         if (!bound.empty())
-            memcpy(scoped.data() + scope_prefix_bytes.size(), bound.data(), bound.size());
+         std::vector<char> scoped;
+         scoped.reserve(scope_prefix_bytes.size() + bound.size());
+         scoped.insert(scoped.end(), scope_prefix_bytes.begin(), scope_prefix_bytes.end());
+         scoped.insert(scoped.end(), bound.begin(), bound.end());
          return scoped;
       };
-      // A raw cursor is exempt from both: it is already the complete stored key.
-      if (!lb_absolute)
-         lb_bytes = effective_lower.empty() ? scope_prefix_bytes : prepend_scope(lb_bytes);
+
+      if (effective_lower.empty())
+         lb_bytes = scope_prefix_bytes;
+      else if (p.json && !lb_absolute)
+         lb_bytes = prepend_scope(lb_bytes);
+
       if (has_upper) {
-         if (!ub_absolute)
+         if (p.json && !ub_absolute)
             ub_bytes = prepend_scope(ub_bytes);
-      } else {
-         // No upper bound: iterate the full scope prefix range.
-         // Create an exclusive upper bound by incrementing the scope prefix.
-         ub_bytes = scope_prefix_bytes;
-         // Increment the last byte; on overflow, carry.
-         bool carried = true;
-         for (int i = static_cast<int>(ub_bytes.size()) - 1; i >= 0 && carried; --i) {
-            uint8_t b = static_cast<uint8_t>(ub_bytes[i]);
-            if (b < 0xFF) { ub_bytes[i] = static_cast<char>(b + 1); carried = false; }
-            else { ub_bytes[i] = '\0'; }
-         }
-         if (!carried) has_upper = true;
-         // If carried all the way (scope = all 0xFF), no upper bound needed —
-         // iteration will naturally stop at the table_id boundary.
+      } else if (scope_exclusive_upper(scope_prefix_bytes, ub_bytes)) {
+         has_upper = true;
       }
    }
 
