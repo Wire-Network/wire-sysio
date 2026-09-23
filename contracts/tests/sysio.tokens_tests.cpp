@@ -142,9 +142,10 @@ BOOST_FIXTURE_TEST_CASE(regctok_records_binding, sysio_tokens_tester) { try {
 
 // A `slug_name` reaches action JSON either as its canonical STRING or through the
 // transitional object form `{"value": N}`, and only the string arm validates. Neither
-// registry has an erase action, so a code with no spelling would become a permanently
-// unrenderable row — `to_variant` throws on every later read. Both writers are
-// privileged top-level actions and refuse.
+// registry has an erase action, so an uncanonical code would become a permanent row.
+// Rendering is TOTAL and will not complain — the value can decode to "" or to a valid
+// spelling that re-parses as a DIFFERENT code. Both writers are privileged top-level
+// actions and refuse.
 BOOST_FIXTURE_TEST_CASE(regtoken_regctok_uncanonical_code_rejected, sysio_tokens_tester) { try {
    // Below the leading symbol's floor: decodes to "" and packs back to 0, so it is not a
    // code and has no spelling.

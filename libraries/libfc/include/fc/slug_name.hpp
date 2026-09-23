@@ -151,17 +151,16 @@ using slug_name_literals::operator""_s;
 /// alphabet is exactly 2^5 with no gaps and its 13 symbols consume all 64 bits, so
 /// every raw uint64 IS a canonical name and its render is total AND injective —
 /// nothing is ever lost. slug_name's decode is injective only over its canonical
-/// range, so a value outside that range renders as whatever it decodes to, lossily,
-/// in two ways with no counterpart in `name`:
+/// range. Outside it the render either REJECTS on the way back or silently
+/// NORMALIZES, and the leading symbol does not tell you which:
 ///
-///   - a non-empty leading symbol renders a string from_variant then REJECTS (loud);
-///   - a value below 1<<42 has an empty leading slot and renders "" —
-///     indistinguishable from the zero sentinel (silent).
+///   - a digit-leading symbol spells something from_variant refuses (loud);
+///   - a value below 1<<42 renders "" — indistinguishable from the zero sentinel;
+///   - to_string() reads only bits 0-47 and stops at the first zero symbol, so
+///     `pack("ETH") | 1<<63` renders "ETH" and re-parses to a DIFFERENT value.
 ///
-/// Neither can be prevented in a renderer: a prepacked binary action sets the
-/// reflected `value` directly, so such a value is already stored by the time
-/// anything reads it. Keeping it out is the job of validation at the proto
-/// boundary, where a raw uint64 becomes a slug.
+/// The last one means two distinct raw values can share a spelling. is_canonical()
+/// is what separates them; a successful render is not.
 inline void to_variant(const slug_name& s, fc::variant& v) {
    v = s.to_string();
 }

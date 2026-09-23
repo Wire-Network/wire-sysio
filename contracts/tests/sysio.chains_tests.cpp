@@ -150,7 +150,8 @@ BOOST_FIXTURE_TEST_CASE(regchain_evm_bad_hex_rejected, sysio_chains_tester) { tr
 // `slug_name`'s canonical carrier is the STRING, but the transitional object form
 // `{"value": N}` packs a raw uint64 with no spelling check — that is how an unspellable
 // code reaches action JSON at all. The registry has no erase action, so such a row would
-// be permanently unrenderable (and `to_variant` throws on every later read of it).
+// be permanent — and rendering is TOTAL, so nothing downstream reports it: the value can
+// decode to "" or to a valid spelling that re-parses as a DIFFERENT chain code.
 // `regchain` is a privileged top-level action, so unlike an OPP dispatch handler it can
 // simply refuse.
 BOOST_FIXTURE_TEST_CASE(regchain_uncanonical_code_rejected, sysio_chains_tester) { try {

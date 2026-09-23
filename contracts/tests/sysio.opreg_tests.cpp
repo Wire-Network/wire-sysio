@@ -625,9 +625,9 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_min_bond, sysio_opreg_tester) { t
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_uncanonical_collateral_code, sysio_opreg_tester) { try {
    // A `slug_name` reaches action JSON either as its canonical STRING or through the
    // transitional object form `{"value": N}`, and only the string arm validates. These
-   // entries persist on the config row, so an unspellable code makes the whole row
-   // unrenderable — `to_variant` throws on every later read of it. `setconfig` is a
-   // privileged top-level action and refuses.
+   // entries persist on the config row, and rendering is TOTAL so an uncanonical code
+   // never announces itself — it can decode to "" or to a valid spelling that re-parses
+   // as a DIFFERENT code. `setconfig` is a privileged top-level action and refuses.
    constexpr uint64_t uncanonical = 7;   // decodes to "", packs back to 0 — not a code
    BOOST_REQUIRE(!fc::slug_name{uncanonical}.is_canonical());
 

@@ -454,8 +454,9 @@ BOOST_AUTO_TEST_CASE(variant_render_is_total_like_name) {
    // The renderer never throws — parity with sysio::chain::name, whose key leaf
    // is `name(raw).to_string()`. A read path that throws converts one bad row
    // into a failure of every scan over it; validation belongs on the write path.
-   // A prepacked binary action can set the reflected `value` directly for either
-   // type, so neither can guarantee it only ever holds a canonical value.
+   // A prepacked binary action sets the reflected `value` directly, so slug_name
+   // cannot guarantee it only ever holds a canonical value. (`name` needs no such
+   // guarantee: every uint64 is a canonical name — see the case below.)
    for (uint64_t raw : {uint64_t{1}, uint64_t{7}, uint64_t{42},
                         uint64_t{(uint64_t{1} << 42) - 1},
                         (uint64_t{1} << 48) - 1,  // symbols past the alphabet
@@ -466,28 +467,33 @@ BOOST_AUTO_TEST_CASE(variant_render_is_total_like_name) {
    }
 }
 
-BOOST_AUTO_TEST_CASE(variant_non_canonical_render_is_lossy_the_same_two_ways_name_is) {
-   // Losing information is the price of a total renderer, and it takes exactly
-   // two shapes. Pinned so a future change to to_string() cannot move them
-   // silently.
+BOOST_AUTO_TEST_CASE(variant_non_canonical_render_rejects_or_silently_normalizes) {
+   // A total renderer loses information in THREE ways, and the leading symbol does
+   // not tell you which: to_string() reads only bits 0-47 and stops at the first
+   // zero symbol.
    fc::variant v;
+   slug_name   back;
 
-   // 1. char[0] non-empty -> a spelling exists but is not a legal code, so
-   //    feeding it back fails LOUDLY at construction.
-   // '7' is symbol 34 in the alphabet, and char[0] occupies bits [42..47].
-   constexpr uint64_t packed_seven = uint64_t{34} << 42;
-   BOOST_REQUIRE(!fc::slug_name{packed_seven}.is_canonical());
-   fc::to_variant(slug_name{packed_seven}, v);
+   // LOUD — a digit-leading symbol spells something from_variant refuses.
+   fc::to_variant(slug_name{uint64_t{34} << 42}, v);       // 34 is '7'
    BOOST_CHECK_EQUAL(v.as_string(), "7");
-   slug_name back;
    BOOST_CHECK_THROW(fc::from_variant(v, back), fc::exception);
 
-   // 2. Below the 1<<42 floor -> char[0] is empty, so it renders "" and is
-   //    indistinguishable from zero. This one is SILENT; name has the same hole.
+   // SILENT — below the 1<<42 floor renders "", aliasing the zero sentinel.
    fc::to_variant(slug_name{uint64_t{7}}, v);
    BOOST_CHECK_EQUAL(v.as_string(), "");
    fc::from_variant(v, back);
    BOOST_CHECK_EQUAL(back.value, 0u);
+
+   // SILENT — unread bits render a VALID spelling that re-parses to a different
+   // value, so two distinct raws can share one spelling.
+   for (uint64_t raw : { slug_name{"ETH"}.value | (uint64_t{1} << 63),   // bits 48-63
+                         slug_name{"A"}.value | uint64_t{1} }) {         // past the terminator
+      BOOST_REQUIRE(!slug_name{raw}.is_canonical());
+      fc::to_variant(slug_name{raw}, v);
+      BOOST_REQUIRE_NO_THROW(fc::from_variant(v, back));
+      BOOST_CHECK_NE(back.value, raw);
+   }
 }
 
 BOOST_AUTO_TEST_CASE(variant_every_canonical_value_round_trips_exactly) {

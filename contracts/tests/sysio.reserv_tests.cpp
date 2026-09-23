@@ -417,9 +417,11 @@ BOOST_FIXTURE_TEST_CASE(regreserve_creates_reserve_row, sysio_reserve_tester) { 
 
 // A `slug_name` reaches action JSON either as its canonical STRING or through the
 // transitional object form `{"value": N}`, and only the string arm validates. A reserve
-// row is keyed on all three codes and there is no erase action, so an unspellable code
-// would make the row permanently unrenderable — `to_variant` throws on every later read.
-// `regreserve` is a privileged bootstrap-window action and refuses.
+// row is keyed on all three codes and there is no erase action, so an uncanonical code
+// would be permanent. Rendering is TOTAL and will not complain: the value can decode to
+// "" or to a valid spelling that re-parses as a DIFFERENT code, aliasing this reserve
+// onto another's identity. `regreserve` is a privileged bootstrap-window action and
+// refuses.
 BOOST_FIXTURE_TEST_CASE(regreserve_uncanonical_code_rejected, sysio_reserve_tester) { try {
    // Below the leading symbol's floor: decodes to "" and packs back to 0, so it is not a
    // code and has no spelling.
