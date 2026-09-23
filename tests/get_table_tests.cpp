@@ -861,11 +861,12 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       BOOST_CHECK_EQUAL(page2.rows[0].get_object()["value"].get_object()["code"].as_string(), "WIRE");
       BOOST_CHECK_EQUAL(page2.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 300u);
 
-      // (d) A key with NO canonical spelling renders as bare hex, and that hex is
-      //     accepted straight back as a json=true bound — so a cursor landing on
-      //     one still resumes exactly. This is the property pagination needs
-      //     (encode(decode(key)) == key), and naming such a key could not provide
-      //     it: slug_name's to_string is not injective over raw uint64s.
+      // (d) A key with NO canonical spelling renders as a RAW CURSOR — the `0x` tag
+      //     plus the hex of the whole stored key — and that is accepted straight
+      //     back as a json=true bound, so a cursor landing on one still resumes
+      //     exactly. This is the property pagination needs (encode(decode(key)) ==
+      //     key), and naming such a key could not provide it: slug_name's to_string
+      //     is not injective over raw uint64s.
       //
       //     Stored through the transitional object carrier, the only writer left
       //     that can express a raw value. 34<<42 is the packed former spelling
@@ -879,9 +880,9 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       auto pageA = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(pageA.rows.size(), 3u);
       BOOST_REQUIRE_EQUAL(pageA.more, true);
-      BOOST_REQUIRE(!pageA.next_key.empty());
-      // Bare hex, not a JSON key object -- the leaf refused to name it.
-      BOOST_CHECK(pageA.next_key.front() != '{');
+      // A tagged raw cursor, not a JSON key object -- the leaf refused to name it.
+      // Unscoped, so the whole key IS the 8-byte slug: 34<<42 = 0000880000000000.
+      BOOST_CHECK_EQUAL(pageA.next_key, "0x0000880000000000");
 
       p.lower_bound = pageA.next_key;
       p.limit       = 50;
@@ -902,7 +903,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       auto revA = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(revA.rows.size(), 1u);
       BOOST_REQUIRE_EQUAL(revA.more, true);
-      BOOST_CHECK(revA.next_key.front() != '{');
+      BOOST_CHECK_EQUAL(revA.next_key, "0x0000880000000000");
       BOOST_CHECK_EQUAL(revA.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 400u);
 
       p.upper_bound = revA.next_key;
@@ -914,11 +915,11 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       p.upper_bound.clear();
    }
 
-   // (sec-11e) SCOPED slug-keyed table. A json=true cursor must be scope-RELATIVE:
-   //           get_table_rows prepends the scope prefix to whatever bound comes
-   //           back, so an absolute hex cursor is scoped TWICE and the query skips
-   //           the rest of the range. Unscoped (sec-11d) cannot catch that — there
-   //           is no prefix to double.
+   // (sec-11e) SCOPED slug-keyed table. A raw cursor carries the COMPLETE stored
+   //           key and the bound parser feeds it back verbatim, so the scope prefix
+   //           is neither stripped on the way out nor re-added on the way in.
+   //           Unscoped (sec-11d) cannot catch a mistake here — there is no prefix
+   //           to double or drop.
    {
       const uint64_t sc = chain::name("sc1").to_uint64_t();
       push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
@@ -944,14 +945,15 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       auto pageA = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(pageA.rows.size(), 3u);
       BOOST_REQUIRE_EQUAL(pageA.more, true);
-      BOOST_REQUIRE(!pageA.next_key.empty());
-      BOOST_CHECK(pageA.next_key.front() != '{');   // hex fallback, not a JSON key
+      // The tagged ABSOLUTE key: "0x" + scope name("sc1") + slug 34<<42. A cursor
+      // carrying only the within-scope remainder would be "0x0000880000000000",
+      // and the parser — which no longer re-prefixes a tagged bound — would seek
+      // into the wrong scope entirely.
+      BOOST_CHECK_EQUAL(pageA.next_key, "0xc2020000000000000000880000000000");
 
       p.lower_bound = pageA.next_key;
       p.limit       = 50;
       auto pageB = get_table_rows_full(plugin, p, fc::time_point::maximum());
-      // With a scope-ABSOLUTE cursor this returns 0 rows: the bound parser
-      // prepends the scope a second time and the seek lands past the range.
       BOOST_REQUIRE_EQUAL(pageB.rows.size(), 1u);
       BOOST_CHECK_EQUAL(pageB.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 40u);
 
@@ -962,7 +964,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       auto revA = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(revA.rows.size(), 1u);
       BOOST_REQUIRE_EQUAL(revA.more, true);
-      BOOST_CHECK(revA.next_key.front() != '{');
+      BOOST_CHECK_EQUAL(revA.next_key, "0xc2020000000000000000880000000000");
       BOOST_CHECK_EQUAL(revA.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 40u);
 
       p.upper_bound = revA.next_key;
@@ -971,6 +973,41 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       BOOST_REQUIRE_EQUAL(revB.rows.size(), 3u);   // WIRE, SOL, ETH
       BOOST_CHECK_EQUAL(revB.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 30u);
       p.reverse = false;
+      p.upper_bound.clear();
+
+      // (sec-11f) A raw cursor is usable at its SHORTEST: bytes that are nothing
+      //           but the scope prefix. Nothing writes such a key through
+      //           kv::scoped_table, but kv_set only requires the COMPLETE key to be
+      //           nonempty, so a raw write can store one — and if a cursor ever
+      //           names it, the within-scope remainder is empty. An empty next_key
+      //           reads as "no bound" and restarts the page forever; the tag is
+      //           what keeps even this cursor nonempty and exact.
+      //
+      //           Re-prefixing it would seek to <scope><scope>, past every row.
+      p.lower_bound = "0xc202000000000000";
+      p.limit       = 50;
+      auto scopeStart = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_CHECK_EQUAL(scopeStart.rows.size(), 4u);
+      p.lower_bound.clear();
+
+      // (sec-11g) A JSON bound with leading whitespace still parses as JSON.
+      //           `fc::json::from_string` has always accepted it, so dispatching on
+      //           the first character rather than the first NON-WHITESPACE one sent
+      //           a valid bound to the hex reader, which throws on the brace.
+      p.lower_bound = "  {\"code\":\"SOL\"}";
+      auto padded = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(padded.rows.size(), 3u);   // SOL, WIRE, 7
+      BOOST_CHECK_EQUAL(padded.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 20u);
+
+      //           A bound that is ONLY whitespace is refused, not trimmed away —
+      //           turning one into zero bytes would read as "no bound" downstream
+      //           and silently restart the page.
+      p.lower_bound = "   ";
+      BOOST_CHECK_THROW(
+         get_table_rows_full(plugin, p, fc::time_point::maximum()),
+         chain::contract_table_query_exception
+      );
+      p.lower_bound.clear();
    }
 
    // (sec-5) Invalid index name on multi_index — should throw, not silently

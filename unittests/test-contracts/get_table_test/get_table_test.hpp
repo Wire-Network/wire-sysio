@@ -160,12 +160,13 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
     // The same registry shape, but SCOPED — stored as [scope:8B BE][key], with a
     // secondary index so both cursor paths are reachable.
     //
-    // A json=true cursor must be scope-RELATIVE, because get_table_rows prepends
-    // the scope prefix to whatever bound comes back. That holds trivially for a
-    // decoded JSON key object; it is the HEX fallback (a key the codec cannot
-    // name) that can get it wrong, and an absolute cursor is then scoped twice
-    // and skips the rest of the range. Unscoped `slugobjs` above cannot catch
-    // that — there is no prefix to double.
+    // Two json=true cursor shapes meet here and only the scoped table can tell
+    // them apart. A decoded JSON key object names the fields WITHIN the scope, so
+    // get_table_rows prepends the scope prefix to it; the RAW cursor a key the
+    // codec cannot name falls back to carries the COMPLETE key and is fed back
+    // verbatim. Getting either one's prefix handling wrong seeks into the wrong
+    // scope — and unscoped `slugobjs` above cannot catch it, since there is no
+    // prefix to double or drop.
     struct sslugobj_key {
         slug_name code;
         uint64_t primary_key() const { return code.value; }
