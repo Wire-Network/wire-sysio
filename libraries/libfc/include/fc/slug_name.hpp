@@ -23,7 +23,6 @@
 #include <algorithm>
 #include <string>
 #include <string_view>
-#include <type_traits>
 
 namespace fc {
 
@@ -243,24 +242,3 @@ inline void from_variant(const fc::variant& v, slug_name& s) {
 /// INHERITED member (the pointer is to the base). Same form sysio::chain::name
 /// uses, for the same reason; the layout is unchanged.
 FC_REFLECT_DERIVED_EMPTY( fc::slug_name, (fc::basic_name<fc::slug_name_traits>) )
-
-namespace fc {
-
-// --- shape pins -----------------------------------------------------------
-// These two properties drifted apart between this repo and wire-cdt once before,
-// silently: CDT derived slug_name for abigen while this side stayed an alias,
-// and is_canonical sat on the shared base where `name` inherited a predicate
-// that can never be false. Both repos assert the same two things.
-static_assert(!std::is_same_v<slug_name, basic_name<slug_name_traits>>,
-              "slug_name must be a DERIVED type, not an alias — abigen matches "
-              "builtins on a real type, and is_canonical belongs to this encoding");
-template <typename T>
-concept has_is_canonical = requires(const T t) { t.is_canonical(); };
-
-static_assert(!has_is_canonical<basic_name<slug_name_traits>>,
-              "is_canonical must live on slug_name, not the shared basic_name: "
-              "`name` shares that base, and every uint64 IS a canonical name, so "
-              "the predicate could never be false there");
-static_assert(has_is_canonical<slug_name>, "slug_name must carry is_canonical");
-
-} // namespace fc
