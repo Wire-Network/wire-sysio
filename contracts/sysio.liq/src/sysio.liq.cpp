@@ -143,7 +143,7 @@ std::optional<liq::currency_stats> liq::resolve_inbound(const char* path, sysio:
       drop(path, "amount out of range");
       return std::nullopt;
    }
-   if (amount > static_cast<uint64_t>(asset::max_amount - st->supply.amount)) {
+   if (amount > headroom(*st)) {
       drop(path, "supply exceeds the asset range");
       return std::nullopt;
    }
@@ -186,11 +186,10 @@ void liq::mintyield(sysio::slug_name chain_code, uint64_t sequence, uint64_t epo
    const symbol_key key{ st->supply.symbol.code().raw() };
    liqpendings pendings(get_self());
    const pending_yield fresh{ asset{ static_cast<int64_t>(amount), st->supply.symbol } };
+   // resolve_inbound bounded the amount by the headroom net of what is already pending,
+   // so supply plus pending stays within the asset range and queueyield always fits.
    pendings.upsert(ram_payer, key, fresh, [&](pending_yield& p) {
-      // Saturate rather than abort: a pending balance this large is not reachable,
-      // and the never-throw contract holds either way.
-      const int64_t room = asset::max_amount - p.quantity.amount;
-      p.quantity.amount += std::min<int64_t>(room, static_cast<int64_t>(amount));
+      p.quantity.amount += static_cast<int64_t>(amount);
    });
 }
 
@@ -207,6 +206,8 @@ void liq::queueyield(symbol_code sym) {
    const currency_stats st = stat_of(sym);
    check(st.pair_symbol != symbol_code{}, "no yield pool registered for this shadow");
    const asset quantity = pending->quantity;
+   // Erased before the mint: the headroom mint measures is net of what is pending, and
+   // this is the pending being minted. Every intake reserved it, so the mint cannot fail.
    pendings.erase(key);
 
    // Minted to this contract and handed on in the same transaction, so its row is
@@ -533,11 +534,19 @@ void liq::adjust_parked(const parked_key& key, ChainKind chain_kind, const std::
    parked.modify(ram_payer, key, [&](parked_row& p) { p = updated; });
 }
 
+uint64_t liq::headroom(const currency_stats& st) const {
+   liqpendings pendings(get_self());
+   const auto    pending  = pendings.try_get(symbol_key{ st.supply.symbol.code().raw() });
+   const int64_t reserved = pending ? pending->quantity.amount : 0;
+   const int64_t room     = asset::max_amount - st.supply.amount - reserved;
+   return room > 0 ? static_cast<uint64_t>(room) : 0;
+}
+
 bool liq::mint(symbol_code sym, uint64_t quantity) {
    stats statstable(get_self());
    const symbol_key key{ sym.raw() };
    const currency_stats st = statstable.get(key, "shadow symbol does not exist");
-   if (quantity > static_cast<uint64_t>(asset::max_amount - st.supply.amount)) return false;
+   if (quantity > headroom(st)) return false;
    statstable.modify(ram_payer, key, [&](currency_stats& s) { s.supply.amount += static_cast<int64_t>(quantity); });
    return true;
 }

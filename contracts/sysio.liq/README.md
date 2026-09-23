@@ -21,7 +21,10 @@ unknown token, a token of another chain or an out-of-range amount is dropped wit
 a diagnostic.
 
 **Yield (LIQ_YIELD, inbound).** `mintyield` holds the reported yield in the
-symbol's pending balance, outside supply. The permissionless `queueyield` mints it
+symbol's pending balance, outside supply but reserved against the asset range
+beside it: every supply-growing path measures its headroom net of what is pending,
+a report past that headroom is dropped before its sequence is consumed, and
+queueing always fits. The permissionless `queueyield` mints it
 to this contract, announces it to `sysio.swap` with `fundyield` and transfers it,
 in one transaction, so it lands in the pool's reservoir and never accrues to this
 contract. The swap sells it in clips through the pool and pays the proceeds in
@@ -58,7 +61,7 @@ import.
 | `accounts` | holder / symbol code | `balance`, `index_checkpoint` (uint128), `owed_wire` |
 | `yieldidx` | symbol code | `index` (uint128), `pot`, `carry` |
 | `parked` | symbol code, chain kind, pubkey | `chain_kind`, `pubkey`, `holding` (an account row) |
-| `liqpending` | symbol code | `quantity` minted by LIQ_YIELD and not yet queued |
+| `liqpending` | symbol code | `quantity` minted by LIQ_YIELD and not yet queued; counts against the asset range beside supply |
 | `liqcursors` | chain code | `last_sequence`, `last_epoch` |
 | `liqconfig` | singleton | `kicker_bps`, `import_complete` |
 | `liqcounters` | singleton | `next_request_id` |

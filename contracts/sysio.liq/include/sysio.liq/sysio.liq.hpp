@@ -236,7 +236,8 @@ namespace sysio {
       using parkeds = kv::table<"parked"_n, parked_key, parked_row>;
 
       /// Yield minted by LIQ_YIELD and not yet queued. Outside supply, so it
-      /// earns nothing while it waits and nothing is stranded when it leaves.
+      /// earns nothing while it waits and nothing is stranded when it leaves;
+      /// reserved against the asset range beside supply, so queueing always fits.
       struct [[sysio::table("liqpending")]] pending_yield {
          asset quantity;
          SYSLIB_SERIALIZE(pending_yield, (quantity))
@@ -282,6 +283,9 @@ namespace sysio {
       currency_stats stat_of(symbol_code sym) const;
       /// The stat row bound to `token_code`, if any.
       std::optional<currency_stats> stat_by_token(sysio::slug_name token_code) const;
+      /// Base units `st`'s supply can still grow by: the asset range net of the supply
+      /// and of the yield parked in `liqpending`, which mints when queued.
+      uint64_t headroom(const currency_stats& st) const;
       /// The chain family of the registered outpost `chain_code`, or a check failure.
       ChainKind kind_of_chain(sysio::slug_name chain_code) const;
       /// `sym`'s index now; zero before the first distribution.
@@ -298,7 +302,7 @@ namespace sysio {
       /// The same for a parked row.
       void adjust_parked(const parked_key& key, ChainKind chain_kind, const std::vector<char>& pubkey,
                          const asset& delta);
-      /// Grow `sym`'s supply by `quantity`; false (and no change) past the asset range.
+      /// Grow `sym`'s supply by `quantity`; false (and no change) past its headroom.
       bool mint(symbol_code sym, uint64_t quantity);
       /// Advance `sym`'s index by `quantity` WIRE over its supply, carrying the
       /// remainder, and grow its pot by the same.

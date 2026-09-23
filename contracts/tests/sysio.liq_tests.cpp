@@ -765,6 +765,49 @@ BOOST_FIXTURE_TEST_CASE(queued_yield_sells_through_the_pool_and_pays_holders, sy
    BOOST_REQUIRE_EQUAL(alice_before + alice_owed, wire_balance("alice"_n));
 } FC_LOG_AND_RETHROW()
 
+// Supply plus pending yield never exceeds the asset range: every supply-growing path
+// measures its headroom net of what is parked in liqpending, so queueyield can always
+// mint it. A report past that headroom is dropped before its sequence is consumed, so
+// no value is clipped behind an acknowledged sequence.
+BOOST_FIXTURE_TEST_CASE(pending_yield_is_reserved_against_the_asset_range, sysio_liq_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), setkicker(SYSIO_ACCOUNT, 0));
+   // The pool first, while the range is open: regliqpool mints the LCO seed. Then one
+   // syndication takes supply to 100 base units under the range.
+   BOOST_REQUIRE_EQUAL(success(), regliqpool(SOLANA, LIQSOL, POOL_SYM, 1000 * UNIT, 1000 * UNIT));
+   const uint64_t range = static_cast<uint64_t>(asset::max_amount);
+   BOOST_REQUIRE_EQUAL(success(), mintsynd(SOLANA, 1, "alice"_n, LIQSOL, range - 100 - 1000 * UNIT));
+   BOOST_REQUIRE_EQUAL(asset::max_amount - 100, supply());
+
+   // 60 fits and parks. A second 60 exceeds the 40 left and is dropped, its sequence
+   // unconsumed; 40 under the same sequence then fills the range exactly.
+   BOOST_REQUIRE_EQUAL(success(), mintyield(SOLANA, 2, 7, LIQSOL, 60));
+   BOOST_REQUIRE_EQUAL(60, pending_row()["quantity"].as<asset>().get_amount());
+   BOOST_REQUIRE_EQUAL(success(), mintyield(SOLANA, 3, 8, LIQSOL, 60));
+   BOOST_REQUIRE_EQUAL(60, pending_row()["quantity"].as<asset>().get_amount());
+   BOOST_REQUIRE_EQUAL(2u, cursor_row(SOLANA)["last_sequence"].as_uint64());
+   BOOST_REQUIRE_EQUAL(success(), mintyield(SOLANA, 3, 8, LIQSOL, 40));
+   BOOST_REQUIRE_EQUAL(100, pending_row()["quantity"].as<asset>().get_amount());
+   BOOST_REQUIRE_EQUAL(3u, cursor_row(SOLANA)["last_sequence"].as_uint64());
+   BOOST_REQUIRE_EQUAL(asset::max_amount - 100, supply());   // pending stays outside supply
+
+   // The reservation binds every other supply-growing path: a credit of one base unit
+   // is dropped, and the governance mint is refused.
+   BOOST_REQUIRE_EQUAL(success(), mintsynd(SOLANA, 4, "bob"_n, LIQSOL, 1));
+   BOOST_REQUIRE_EQUAL(0, shadow_balance("bob"_n));
+   BOOST_REQUIRE_EQUAL(3u, cursor_row(SOLANA)["last_sequence"].as_uint64());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("supply exceeds the asset range"), recredit("alice"_n, 1));
+
+   // Queueing always fits: the pending yield mints to exactly the range.
+   BOOST_REQUIRE_EQUAL(success(), queueyield(LIQSOL_SYM));
+   BOOST_REQUIRE(pending_row().is_null());
+   BOOST_REQUIRE_EQUAL(asset::max_amount, supply());
+   BOOST_REQUIRE_EQUAL(100, reservoir());
+   // Nothing can grow the supply now, and a report says why before it is dropped.
+   BOOST_REQUIRE_EQUAL(success(), mintyield(SOLANA, 5, 9, LIQSOL, 1));
+   BOOST_REQUIRE(pending_row().is_null());
+   BOOST_REQUIRE_EQUAL(3u, cursor_row(SOLANA)["last_sequence"].as_uint64());
+} FC_LOG_AND_RETHROW()
+
 // The other exit: a holder sells shadow into the yield pool for WIRE on the depot, no
 // outpost round trip. The pool is an ordinary pair, so alice opens her two deposit rows,
 // deposits shadow by transfer, exchanges it for WIRE and withdraws the WIRE to her wallet.
