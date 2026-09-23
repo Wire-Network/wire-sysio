@@ -1,6 +1,5 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg-configuration.schema.json",
-  "overlay-ports": ["cmake/vcpkg-ports"],
   "default-registry": {
     "kind": "git",
     "baseline": "74e6536215718009aae747d86d84b78376bf9e09",
@@ -11,8 +10,8 @@
     {
       "kind": "git",
       "repository": "https://github.com/wire-network/wire-vcpkg-registry",
-      "baseline": "6aace41ed50413fe5e9b50891b0c90f46ff85165",
-      "reference": "6aace41ed50413fe5e9b50891b0c90f46ff85165",
+      "baseline": "2806c1bc39dda520c100b5ea75aef8aa2693a85f",
+      "reference": "2806c1bc39dda520c100b5ea75aef8aa2693a85f",
       "packages": [
         "boost",
         "softfloat",
@@ -28,7 +27,8 @@
         "wire-sys-vm",
         "aws-sdk-cpp",
         "aws-c-cal",
-        "s2n"
+        "s2n",
+        "antlr4-tools"
       ]
     }
   ]
