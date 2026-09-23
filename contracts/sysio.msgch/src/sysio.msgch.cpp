@@ -338,10 +338,10 @@ name resolve_account_from_op_address(const opp::types::ChainAddress& op_address)
 /// `chain_code` is proven — `source_chain_binding_ok` binds it to the delivering
 /// outpost. `token_code` / `reserve_code` are NOT: they arrive as raw protobuf
 /// uint64s and reach a slug_name through the non-validating raw constructor, so a
-/// forged payload can carry a value no spelling produces. Such a value can never
-/// have been registered, and persisting it makes every later render of that row
-/// throw — in a `values_only` scan the underwriter's unconditional
-/// `row.get_object()` then drops the WHOLE cycle, not one cell.
+/// forged payload can carry a value that does not round-trip through its spelling.
+/// Such a value can never have been registered, and rendering is total so it will
+/// not announce itself: it renders a string that packs back to something else, which
+/// can be the spelling of a DIFFERENT, real code.
 ///
 /// Drop the attestation instead; never check(), per
 /// feedback_opp_handlers_never_throw — a check() here halts evalcons and stalls

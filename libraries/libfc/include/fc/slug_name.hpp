@@ -177,7 +177,7 @@ namespace detail {
 /// from the far end of the table. Every shape that is not an exact non-negative
 /// integer is rejected here instead.
 ///
-/// Canonicality is deliberately NOT required: a packed value with no spelling is
+/// Canonicality is deliberately NOT required: a packed value with no canonical spelling is
 /// the one thing the string carrier cannot express, so this arm is the only way
 /// to name such a key as a bound.
 inline uint64_t checked_packed_value(const fc::variant& v) {

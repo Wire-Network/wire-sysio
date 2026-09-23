@@ -143,8 +143,10 @@ void chains::regchain(opp::types::ChainKind kind,
 
    sysio::check(kind != opp::types::CHAIN_KIND_UNKNOWN,
                 "sysio.chains: kind must not be UNKNOWN");
-   // The code is this row's PRIMARY KEY and is rendered as a string by every reader --
-   // refuse one with no spelling before it becomes a permanent, unrenderable row.
+   // The code is this row's PRIMARY KEY and is rendered as a string by every reader.
+   // Rendering is total, so an uncanonical one does not fail -- it renders something
+   // that does not pack back, possibly the spelling of a DIFFERENT chain. Refuse it
+   // before it becomes a permanent row.
    opp::registry::check_codes({code}, "sysio.chains");
    // Both strings persist into a `sysio`-billed row -- bound them before emplace.
    opp::registry::check_metadata(name, description, "sysio.chains");

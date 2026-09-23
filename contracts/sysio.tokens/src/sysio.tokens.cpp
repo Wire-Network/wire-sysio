@@ -52,8 +52,10 @@ void tokens::regtoken(opp::types::TokenKind    kind,
                 "sysio.tokens: token kind must not be UNKNOWN");
    sysio::check(precision <= MAX_TOKEN_PRECISION,
                 "sysio.tokens: precision exceeds the depot frame maximum (9)");
-   // The code is this row's PRIMARY KEY and is rendered as a string by every reader --
-   // refuse one with no spelling before it becomes a permanent, unrenderable row.
+   // The code is this row's PRIMARY KEY and is rendered as a string by every reader.
+   // Rendering is total, so an uncanonical one does not fail -- it renders something
+   // that does not pack back, possibly the spelling of a DIFFERENT token. Refuse it
+   // before it becomes a permanent row.
    opp::registry::check_codes({code}, "sysio.tokens");
    // Both strings persist into a `sysio`-billed row -- bound them before emplace.
    opp::registry::check_metadata(symbol_name, description, "sysio.tokens");
@@ -101,7 +103,7 @@ void tokens::regctok(sysio::slug_name   chain_code,
    require_priv_caller();
 
    // Both codes form this row's COMPOSITE PRIMARY KEY and are rendered as strings by
-   // every reader -- refuse either with no spelling before the row becomes permanent.
+   // every reader -- refuse either that does not round-trip before the row becomes permanent.
    opp::registry::check_codes({chain_code, token_code}, "sysio.tokens");
 
    chaintokens_t tbl(get_self());

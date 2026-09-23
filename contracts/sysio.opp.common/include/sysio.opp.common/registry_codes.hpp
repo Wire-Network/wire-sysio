@@ -41,9 +41,9 @@ namespace sysio::opp::registry {
  * Call before the row is emplaced/modified, alongside `check_metadata`.
  *
  * The zero code passes deliberately: it spells as `""`, which is a valid literal that
- * packs back to zero, so it renders and round-trips like any other code. Whether an
- * EMPTY code belongs in a given registry row is that registry's own question -- this
- * guard is only about values that cannot be rendered at all.
+ * packs back to zero, so it round-trips like any other code. Whether an EMPTY code
+ * belongs in a given registry row is that registry's own question -- this guard is only
+ * about values that do not survive the round trip.
  *
  * @param codes   The row's `slug_name` columns.
  * @param context Contract-scoped message prefix, e.g. `"sysio.tokens"`.

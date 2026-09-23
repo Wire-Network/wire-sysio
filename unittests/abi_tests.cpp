@@ -753,7 +753,7 @@ BOOST_AUTO_TEST_CASE(slug_name_builtin_type)
       abis.variant_to_binary("regrow", fc::json::from_string(R"({"code":7})"), yield_fn()),
       fc::exception);
 
-   // A value with no spelling renders anyway — you get what you get. Every value
+   // A value with no canonical spelling renders anyway — you get what you get. Every value
    // below 2^42 has a zero in the leading symbol slot, so `to_string` truncates
    // it to "", the same text zero renders. The conversion is TOTAL, exactly like
    // `name` (`database_utils.hpp`: `name(raw).to_string()`): a read path that

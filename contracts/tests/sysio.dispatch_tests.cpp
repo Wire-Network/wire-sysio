@@ -1454,10 +1454,10 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_deposit_to_opreg, sysio_dispatch_tester)
 //
 // `chain_code` is proven -- source_chain_binding_ok binds it to the delivering
 // outpost -- but `token_code` rides the FORGEABLE payload and reaches slug_name
-// through the non-validating raw constructor. Persisting one would make every
-// later render of that balance row throw; under `values_only` the underwriter's
-// unconditional `row.get_object()` then drops the ENTIRE scan cycle rather than
-// one cell. So the dispatcher drops the attestation -- a check() here would halt
+// through the non-validating raw constructor. Rendering is total, so persisting one
+// would not fail loudly -- the balance row would render a spelling that packs back to
+// a DIFFERENT code, silently aliasing one operator's balance onto another's key.
+// So the dispatcher drops the attestation -- a check() here would halt
 // evalcons and stall consensus (feedback_opp_handlers_never_throw).
 // A DEPOSIT_REQUEST arrives only after the outpost has taken custody, so an
 // unspellable token code must be REFUNDED rather than dropped: a drop leaves the
@@ -1649,9 +1649,9 @@ BOOST_FIXTURE_TEST_CASE(swap_request_mismatched_source_chain_is_refunded,
 // through the non-validating raw constructor. Nothing downstream gates them: the
 // zero-quote guard fails closed only when `required_reserves_active` holds, so a code
 // naming NO reserve leaves the quote at zero, skips that guard, and reaches
-// `reqs.emplace` — persisting a uwreq row no reader can render. `get_table_rows`
-// degrades such a row to hex; the underwriter plugin's scan hits an unconditional
-// `get_object()` and drops its whole cycle, stalling every commit. The request must be
+// `reqs.emplace`. Rendering is total, so the row is not unreadable — it is WRONG: it
+// renders a spelling that packs back to a different value, so the uwreq can name a
+// reserve other than the one it was created from. The request must be
 // REFUNDED rather than dropped: the user's deposit is escrowed on the source outpost.
 BOOST_FIXTURE_TEST_CASE(swap_request_uncanonical_code_is_refunded,
                         sysio_dispatch_tester) { try {

@@ -423,10 +423,11 @@ BOOST_AUTO_TEST_CASE(non_zero_terminator_trait_accepts_alphabet_zero) {
 }
 
 // ── variant carrier ────────────────────────────────────────────────────────
-// ONE carrier: the canonical string spelling. A slug renders as its text, zero
-// as "", and a value with no spelling throws. The cases below pin that single
-// shape from both directions — every writable spelling lands on a string, and
-// every non-string is refused rather than coerced.
+// ONE emitted carrier: the canonical string spelling. A slug renders as its text
+// and zero as "", and the render is TOTAL — an uncanonical value still produces a
+// string (see the reject-or-normalize case below). Input additionally accepts the
+// transitional `{"value": N}` object, which is the only non-string form taken and
+// the only way to name a value the string carrier cannot express.
 
 BOOST_AUTO_TEST_CASE(variant_canonical_slug_is_a_string) {
    fc::variant v;
@@ -610,7 +611,7 @@ BOOST_AUTO_TEST_CASE(variant_rejects_every_non_string_carrier) {
    //                 target, it WRAPS; a bound of -1 would page from the far
    //                 end of the table
    //   null/false -> 0, the absent sentinel, silently
-   //   true       -> 1, a value with no spelling at all
+   //   true       -> 1, a value with no canonical spelling at all
    slug_name back;
    BOOST_CHECK_THROW(fc::from_variant(fc::variant(uint64_t{7}), back), fc::exception);
    BOOST_CHECK_THROW(fc::from_variant(fc::variant(uint64_t{1} << 42), back), fc::exception);
@@ -660,7 +661,7 @@ BOOST_AUTO_TEST_CASE(variant_object_arm_rejects_every_coercible_value_shape) {
       fc::exception);
 
    // And the shapes a real pre-builtin writer emits still work. Canonicality is
-   // NOT required here: a value with no spelling is exactly what the string
+   // NOT required here: a value with no canonical spelling is exactly what the string
    // carrier cannot express, so this arm is the only way to name such a bound.
    fc::from_variant(obj(fc::variant(uint64_t{7})), back);
    BOOST_CHECK_EQUAL(back.value, 7u);

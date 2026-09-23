@@ -386,7 +386,7 @@ void reserve::regreserve(sysio::slug_name chain_code,
    sysio::check(!is_private || owner != sysio::name{},
                 "a private bootstrap reserve must name an owner");
    // The three codes form this row's COMPOSITE PRIMARY KEY and are rendered as strings by
-   // every reader -- refuse any with no spelling before the row becomes permanent.
+   // every reader -- refuse any that does not round-trip before the row becomes permanent.
    opp::registry::check_codes({chain_code, token_code, reserve_code}, "sysio.reserv");
    // Both strings persist into a `sysio`-billed row -- bound them before emplace.
    opp::registry::check_metadata(name, description, "sysio.reserv");
@@ -452,7 +452,7 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
    // The reserve row is keyed by (chain, token, reserve) codes, so an unspellable one
    // cannot be persisted. The creator's escrow is already in outpost custody, so refund
    // rather than drop. No CANCELLED tombstone (unlike the rejections below): the row's
-   // key IS the unspellable triple, and a code with no spelling can be neither squatted
+   // key IS the unspellable triple, and a code with no canonical spelling can be neither squatted
    // nor reclaimed, so the tombstone has nothing to protect.
    if (!token_code.is_canonical() || !reserve_code.is_canonical()) {
       sysio::print("oncrtreserve: rejecting with RESERVE_CREATE_CANCELLED "
