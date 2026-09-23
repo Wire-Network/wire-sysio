@@ -178,7 +178,10 @@ public:
     *
     * The default cranks nothing. The Solana relay overrides it with the liqSOL
     * pool's `report_liq_yield` (PostLaunch only; a no-op on chain when nothing
-    * new was claimed since the previous report).
+    * new was claimed since the previous report); the Ethereum relay with the
+    * syndication pool's `realizeYield`, on the pool the outpost registers as its
+    * `DESYNDICATE_LIQ` handler (idle until one is, and quiet when the pool has
+    * nothing to report).
     *
     * @param epoch_index  The WIRE epoch whose delivery just landed.
     * @param deadline     Upper bound on the total time spent talking to the
