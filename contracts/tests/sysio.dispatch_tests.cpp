@@ -6787,6 +6787,55 @@ BOOST_FIXTURE_TEST_CASE(syndicate_liq_credits_a_linked_user_and_parks_an_unlinke
    BOOST_CHECK_EQUAL(9 * LIQ_UNIT, liq_supply());
 } FC_LOG_AND_RETHROW() }
 
+// The user's key family must be the proven outpost's own. A Solana-family key inside an
+// Ethereum envelope is dropped by msgch before the AuthX lookup, whether an account has linked
+// it (mintsynd receives no family and would have credited that account) or not (park would
+// have refused it); the EVM credit beside them still lands and is the only sequence consumed.
+BOOST_FIXTURE_TEST_CASE(syndicate_liq_refuses_a_key_of_another_chain_family,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   setup_liq_for_dispatch();
+
+   const auto eth    = fc::slug_name{"ETH"}.value;
+   const auto liqeth = fc::slug_name{"LIQETH"}.value;
+   constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
+   constexpr auto SVM = ChainKind::CHAIN_KIND_SVM;
+   // A Solana key the underwriter has linked, and one nobody has.
+   const auto linked_sol_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::ed).get_public_key();
+   const auto linked_sol_raw = linked_sol_key.get<fc::crypto::ed::public_key_shim>().serialize();
+   const std::vector<char> linked_sol(linked_sol_raw.begin(), linked_sol_raw.end());
+   BOOST_REQUIRE_EQUAL(success(), push(
+      AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
+         ("account", UWRIT_OP)("chain_kind", SVM)("pub_key", linked_sol_key)("native_address", linked_sol)));
+   produce_block();
+   const auto stranger_sol_raw = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::ed)
+                                    .get_public_key().get<fc::crypto::ed::public_key_shim>().serialize();
+   const std::vector<char> stranger_sol(stranger_sol_raw.begin(), stranger_sol_raw.end());
+
+   const auto env = encode_envelope_with_mixed_attestations(current_epoch(), {
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, SVM, linked_sol,          liqeth, 5 * LIQ_UNIT, 1)},
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, SVM, stranger_sol,        liqeth, 3 * LIQ_UNIT, 2)},
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 2 * LIQ_UNIT, 3)},
+   });
+   const auto trace = deliver_trace(/*proven=*/ eth, env);
+   BOOST_REQUIRE(trace != nullptr);
+   BOOST_REQUIRE(!trace->except);
+   const auto console = all_console(trace);
+
+   BOOST_CHECK_EQUAL(2 * LIQ_UNIT, liq_balance(UWRIT_OP));
+   BOOST_CHECK_EQUAL(0, liq_parked(SVM, linked_sol));
+   BOOST_CHECK_EQUAL(0, liq_parked(SVM, stranger_sol));
+   BOOST_CHECK_EQUAL(2 * LIQ_UNIT, liq_supply());
+   const auto cursor = liq_cursor("ETH");
+   BOOST_REQUIRE(!cursor.is_null());
+   BOOST_CHECK_EQUAL(3u, cursor["last_sequence"].as<uint64_t>());
+   const std::string dropped = "msgch::dispatch_syndicate_liq: DROP attestation -- user kind CHAIN_KIND_SVM";
+   const auto first = console.find(dropped);
+   BOOST_REQUIRE_NE(std::string::npos, first);
+   BOOST_CHECK_NE(std::string::npos, console.find(dropped, first + dropped.size()));
+   BOOST_CHECK_EQUAL(std::string::npos, console.find("sysio.liq::park"));
+} FC_LOG_AND_RETHROW() }
+
 // LIQ_YIELD lands in sysio.liq's pending balance (no per-user routing) and stamps the report's
 // epoch on the outpost cursor. Every refusal is dropped at the boundary without aborting the
 // envelope: a payload claiming another chain, a token that is not an active liq token (a plain

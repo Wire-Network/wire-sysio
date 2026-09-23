@@ -302,6 +302,20 @@ name resolve_account_from_op_address(const opp::types::ChainAddress& op_address)
    return false;
 }
 
+/// The syndicating user's key family must be the proven outpost's own: an outpost of family F
+/// verifies and emits F-family keys only, so a key of another family is a forgery whatever it
+/// resolves to. `sysio.liq::park` refuses the other family for an unlinked key; this refuses it
+/// for every key, before the AuthX lookup could credit a linked one. Print + false, never a
+/// throw, for the reason `source_chain_binding_ok` gives.
+[[nodiscard]] bool user_kind_matches_chain(uint64_t proven_chain_code, ChainKind user_kind, const char* path) {
+   sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+   const auto row = chains_tbl.try_get(sysio::chains::chain_key{sysio::slug_name{proven_chain_code}});
+   if (row && row->kind == user_kind) return true;
+   sysio::print("msgch::", path, ": DROP attestation -- user kind ", std::string(magic_enum::enum_name(user_kind)),
+                " is not the proven source outpost's chain family\n");
+   return false;
+}
+
 /// Reinterpret an exactly-32-byte protobuf `bytes` field as a checksum256. Returns std::nullopt
 /// for any other length; chain and header verification treat a malformed hash as a mismatch,
 /// never as a match or a wildcard.
@@ -598,6 +612,7 @@ void dispatch_syndicate_liq(name self, const std::vector<char>& data, uint64_t c
       if (in(synd) != zpp::bits::errc{}) return;
    }
    if (!source_chain_binding_ok(chain_code, synd.chain_code, "dispatch_syndicate_liq")) return;
+   if (!user_kind_matches_chain(chain_code, synd.user.kind, "dispatch_syndicate_liq")) return;
    const std::optional<uint64_t> amount =
       sysio::opp::safe::to_depot_amount(static_cast<int64_t>(synd.amount.amount));
    if (!amount) return;

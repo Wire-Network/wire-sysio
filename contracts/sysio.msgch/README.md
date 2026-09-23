@@ -38,6 +38,7 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
 - Routes attestations to `sysio.epoch`, `sysio.uwrit`, `sysio.chalg`
 - Routes `SYNDICATE_LIQ` and `LIQ_YIELD` to `sysio.liq` (`mintsynd` for an AuthX-linked
   user, `park` for an unlinked pubkey, `mintyield` for a yield report) once the payload's
-  token is an active `TOKEN_KIND_LIQ` row on `sysio.tokens` bound to the proven outpost.
+  token is an active `TOKEN_KIND_LIQ` row on `sysio.tokens` bound to the proven outpost
+  and, for a syndication, the user's key family is the outpost's own.
   Every refusal is a logged drop, never an abort. `DESYNDICATE_LIQ` is outbound only:
   `sysio.liq::desyndicate` queues it through `queueout`.
