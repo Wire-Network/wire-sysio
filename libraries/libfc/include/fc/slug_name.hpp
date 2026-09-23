@@ -81,8 +81,32 @@ struct slug_name_traits {
 };
 
 /// 8-byte packed identifier — alphabet [A-Z0-9_], <= 8 chars, MSB-first.
-/// Byte-identical with the contract-side sysio::slug_name.
-using slug_name = basic_name<slug_name_traits>;
+///
+/// DERIVED, not an alias, and byte-identical with the contract-side
+/// sysio::slug_name, which is derived for the same reason. Two things need it:
+/// abigen only matches a builtin on a real type (CDT side), and is_canonical()
+/// below belongs to this encoding rather than to every basic_name.
+struct slug_name : basic_name<slug_name_traits> {
+   using base = basic_name<slug_name_traits>;
+   using base::base;
+   constexpr slug_name() = default;
+
+   /// Does this value have a canonical spelling? A slug_name built from a RAW
+   /// uint64 bypasses the validating constructor — and nothing validates on
+   /// deserialization either, since the reflected member is written directly —
+   /// so it can hold a value no spelling produces: anything whose leading symbol
+   /// slot is empty, or that uses one of the 26 unused symbol values, or that
+   /// sets any of bits 48-63. Such a value cannot round-trip.
+   ///
+   /// This lives on slug_name and NOT on basic_name because it is meaningless
+   /// for `name`: that alphabet is exactly 2^5 with no gaps and its 13 symbols
+   /// consume all 64 bits, so every uint64 IS a canonical name and the predicate
+   /// could never be false.
+   bool is_canonical() const {
+      const std::string text = to_string();
+      return is_valid_literal(text) && pack(text) == value;
+   }
+};
 
 namespace slug_name_literals {
 
@@ -211,5 +235,32 @@ inline void from_variant(const fc::variant& v, slug_name& s) {
    // out-of-alphabet spelling. `""` is the zero sentinel.
    s = slug_name{ std::string_view{ v.get_string() } };
 }
+
+} // namespace fc
+
+/// slug_name is DERIVED, so it needs its own reflection — the base's
+/// FC_REFLECT_TEMPLATE does not cover it, and a plain FC_REFLECT cannot take an
+/// INHERITED member (the pointer is to the base). Same form sysio::chain::name
+/// uses, for the same reason; the layout is unchanged.
+FC_REFLECT_DERIVED_EMPTY( fc::slug_name, (fc::basic_name<fc::slug_name_traits>) )
+
+namespace fc {
+
+// --- shape pins -----------------------------------------------------------
+// These two properties drifted apart between this repo and wire-cdt once before,
+// silently: CDT derived slug_name for abigen while this side stayed an alias,
+// and is_canonical sat on the shared base where `name` inherited a predicate
+// that can never be false. Both repos assert the same two things.
+static_assert(!std::is_same_v<slug_name, basic_name<slug_name_traits>>,
+              "slug_name must be a DERIVED type, not an alias — abigen matches "
+              "builtins on a real type, and is_canonical belongs to this encoding");
+template <typename T>
+concept has_is_canonical = requires(const T t) { t.is_canonical(); };
+
+static_assert(!has_is_canonical<basic_name<slug_name_traits>>,
+              "is_canonical must live on slug_name, not the shared basic_name: "
+              "`name` shares that base, and every uint64 IS a canonical name, so "
+              "the predicate could never be false there");
+static_assert(has_is_canonical<slug_name>, "slug_name must carry is_canonical");
 
 } // namespace fc

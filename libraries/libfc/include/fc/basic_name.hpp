@@ -180,18 +180,6 @@ struct basic_name {
    constexpr explicit operator bool() const { return value != 0; }
 
 
-   /// Does this value have a canonical spelling? A basic_name built from a RAW
-   /// uint64 bypasses the validating constructor, so it can hold a value no
-   /// spelling produces — for zero_terminates traits, anything whose leading
-   /// symbol slot is empty. Such a value cannot round-trip: to_string() yields a
-   /// text that packs to something else. Persisting one makes every later render
-   /// of that row throw, so writers that accept a raw uint64 off the wire gate on
-   /// this before storing it.
-   bool is_canonical() const {
-      const std::string text = to_string();
-      return is_valid_literal(text) && pack(text) == value;
-   }
-
    std::string to_string() const {
       std::string s;
       for (int i = 0; i < Traits::max_len; ++i) {
