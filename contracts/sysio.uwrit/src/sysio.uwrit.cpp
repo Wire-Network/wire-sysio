@@ -1064,8 +1064,8 @@ void uwrit::createuwreq(uint64_t attestation_id,
    // zero-quote guard fails closed only when `required_reserves_active` holds, so a
    // MISSING reserve (the unprovisioned-LP case) falls through to `reqs.emplace` with
    // these codes stored verbatim. Rendering is total, so an uncanonical code does not
-   // make the row unreadable — it makes it WRONG: the row renders a spelling that packs
-   // back to a different value, so a uwreq can name a reserve that is not the one it was
+   // make the row unreadable — it makes it WRONG: the rendered text either fails
+   // validation on the way back, or re-parses as a DIFFERENT reserve than the uwreq was
    // created from. Refund rather than drop: the user's deposit is escrowed on the source
    // outpost, so a silent skip would strand it. Never `check()` — we are inside the
    // evalcons dispatch chain (`feedback_opp_handlers_never_throw`).

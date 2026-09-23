@@ -339,9 +339,9 @@ name resolve_account_from_op_address(const opp::types::ChainAddress& op_address)
 /// outpost. `token_code` / `reserve_code` are NOT: they arrive as raw protobuf
 /// uint64s and reach a slug_name through the non-validating raw constructor, so a
 /// forged payload can carry a value that does not round-trip through its spelling.
-/// Such a value can never have been registered, and rendering is total so it will
-/// not announce itself: it renders a string that packs back to something else, which
-/// can be the spelling of a DIFFERENT, real code.
+/// Such a value can never have been registered, and rendering is total, so it still
+/// produces text: text that either FAILS validation on the way back, or silently
+/// re-parses as a DIFFERENT, real code.
 ///
 /// Drop the attestation instead; never check(), per
 /// feedback_opp_handlers_never_throw — a check() here halts evalcons and stalls

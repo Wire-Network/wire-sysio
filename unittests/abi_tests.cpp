@@ -746,9 +746,9 @@ BOOST_AUTO_TEST_CASE(slug_name_builtin_type)
    BOOST_REQUIRE(back.get_object()["code"].is_string());
    BOOST_CHECK_EQUAL(back.get_object()["code"].as_string(), "ETH");
 
-   // The string is the ONLY carrier, in both directions. A JSON number is not a
-   // second spelling of a slug — `"7"` is itself a canonical slug whose packed
-   // value is nothing like 7 — so it is refused rather than read as either one.
+   // A JSON number is never a slug carrier: the field carries a SPELLING, so a number
+   // is refused rather than read as a packed value. (`from_variant` also takes the
+   // transitional `{"value": N}` object; a bare number is not that.)
    BOOST_CHECK_THROW(
       abis.variant_to_binary("regrow", fc::json::from_string(R"({"code":7})"), yield_fn()),
       fc::exception);

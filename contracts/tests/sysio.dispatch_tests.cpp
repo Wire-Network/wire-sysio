@@ -1455,8 +1455,9 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_deposit_to_opreg, sysio_dispatch_tester)
 // `chain_code` is proven -- source_chain_binding_ok binds it to the delivering
 // outpost -- but `token_code` rides the FORGEABLE payload and reaches slug_name
 // through the non-validating raw constructor. Rendering is total, so persisting one
-// would not fail loudly -- the balance row would render a spelling that packs back to
-// a DIFFERENT code, silently aliasing one operator's balance onto another's key.
+// leaves a balance row whose rendered code either fails validation on the way back, or
+// silently re-parses as a DIFFERENT code -- aliasing one operator's balance onto
+// another's key.
 // So the dispatcher drops the attestation -- a check() here would halt
 // evalcons and stall consensus (feedback_opp_handlers_never_throw).
 // A DEPOSIT_REQUEST arrives only after the outpost has taken custody, so an
@@ -1492,7 +1493,7 @@ BOOST_FIXTURE_TEST_CASE(dispatch_refunds_uncanonical_deposit_token_code, sysio_d
    // of the envelope (a throw here would halt evalcons and stall consensus).
    BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));
 
-   // Nothing was persisted, so no stored row can later fail to render...
+   // Nothing was persisted, so no stored row can later render as the wrong code...
    const auto   after          = get_operator(UWRIT_OP);
    const size_t balances_after = after.is_null() ? 0 : after["balances"].get_array().size();
    BOOST_CHECK_EQUAL(balances_before, balances_after);
@@ -1649,9 +1650,9 @@ BOOST_FIXTURE_TEST_CASE(swap_request_mismatched_source_chain_is_refunded,
 // through the non-validating raw constructor. Nothing downstream gates them: the
 // zero-quote guard fails closed only when `required_reserves_active` holds, so a code
 // naming NO reserve leaves the quote at zero, skips that guard, and reaches
-// `reqs.emplace`. Rendering is total, so the row is not unreadable — it is WRONG: it
-// renders a spelling that packs back to a different value, so the uwreq can name a
-// reserve other than the one it was created from. The request must be
+// `reqs.emplace`. Rendering is total, so the row is not unreadable — it is WRONG: its
+// rendered code either fails validation on the way back, or re-parses as a DIFFERENT
+// reserve than the one it was created from. The request must be
 // REFUNDED rather than dropped: the user's deposit is escrowed on the source outpost.
 BOOST_FIXTURE_TEST_CASE(swap_request_uncanonical_code_is_refunded,
                         sysio_dispatch_tester) { try {
@@ -1670,8 +1671,8 @@ BOOST_FIXTURE_TEST_CASE(swap_request_uncanonical_code_is_refunded,
    const auto primary   = fc::slug_name{"PRIMARY"}.value;
 
    // Below the leading symbol's floor: decodes to "" and packs back to 0, so it is not a
-   // code and has no spelling. The TARGET CHAIN stays valid — the point is that a
-   // registered chain does not imply a renderable token/reserve code.
+   // code and does not round-trip. The TARGET CHAIN stays valid — the point is that a
+   // registered chain does not imply a canonical token/reserve code.
    constexpr uint64_t uncanonical = 7;
    BOOST_REQUIRE(!fc::slug_name{uncanonical}.is_canonical());
 

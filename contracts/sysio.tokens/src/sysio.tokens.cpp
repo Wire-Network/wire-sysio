@@ -53,9 +53,9 @@ void tokens::regtoken(opp::types::TokenKind    kind,
    sysio::check(precision <= MAX_TOKEN_PRECISION,
                 "sysio.tokens: precision exceeds the depot frame maximum (9)");
    // The code is this row's PRIMARY KEY and is rendered as a string by every reader.
-   // Rendering is total, so an uncanonical one does not fail -- it renders something
-   // that does not pack back, possibly the spelling of a DIFFERENT token. Refuse it
-   // before it becomes a permanent row.
+   // Rendering is total, so an uncanonical one still produces text -- text that either
+   // fails validation on the way back, or silently re-parses as a DIFFERENT token.
+   // Refuse it before it becomes a permanent row.
    opp::registry::check_codes({code}, "sysio.tokens");
    // Both strings persist into a `sysio`-billed row -- bound them before emplace.
    opp::registry::check_metadata(symbol_name, description, "sysio.tokens");

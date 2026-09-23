@@ -130,14 +130,17 @@ inline constexpr slug_name operator""_s() {
 
 using slug_name_literals::operator""_s;
 
-/// JSON carrier for a slug_name: the canonical string spelling, and nothing
-/// else. A slug renders as its text (`"LIQSOL"`), the zero sentinel as `""`.
+/// JSON carrier for a slug_name. `to_variant` ALWAYS emits a string: the canonical
+/// spelling for a canonical value (`"LIQSOL"`), `""` for zero, and whatever
+/// `to_string()` yields for anything else. `from_variant` takes that string,
+/// validating, plus the transitional `{"value": N}` object below.
 ///
-/// The string is unambiguous because `leading_alphabet` forbids a code from
-/// starting with a digit: no legal spelling can be read as a number, so a bare
-/// JSON string is always a code. That is what removes the need for a second,
-/// type-disjoint carrier — and why the carrier could not have been a numeric
-/// string before the rule existed.
+/// A JSON NUMBER is never a slug carrier in either direction. `leading_alphabet`
+/// forbids a code from starting with a digit, so no legal spelling can be read as a
+/// decimal and the string form is unambiguous on its own — a numeric carrier would
+/// only add a second way to say the same thing. (Before that rule the string could
+/// not have carried it alone, which is why this is stated as a consequence of the
+/// rule rather than a free choice.)
 ///
 /// Render a slug as its spelling. TOTAL, like sysio::chain::name — a renderer is
 /// a READ path, and a throwing one turns one bad row into a failure of everything
@@ -226,10 +229,10 @@ inline void from_variant(const fc::variant& v, slug_name& s) {
       s = slug_name{ detail::checked_packed_value(v.get_object()["value"]) };
       return;
    }
-   // A number is REJECTED, never coerced. The slug alphabet contains digits, so
-   // `"123"` is itself a canonical slug whose packed value is nothing like 123
-   // — reading the JSON number 123 as either one would be a silent mis-decode.
-   // Same for null/bool, which `as_uint64` would quietly turn into 0/1.
+   // A number is REJECTED, never coerced: a slug field carries a SPELLING, so a bare
+   // number would be a second carrier for the same value with nothing to say which was
+   // meant. Same for null/bool, which `as_uint64` would quietly turn into 0/1. The
+   // object arm above is the one exception, and it is transitional.
    FC_ASSERT(v.is_string(), "slug_name must be a string, got {}",
              fc::reflector<fc::variant::type_id>::to_string(v.get_type()));
    // Validating: the ctor round-trip-checks and rejects a non-canonical or
