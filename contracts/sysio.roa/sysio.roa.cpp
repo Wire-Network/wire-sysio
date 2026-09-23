@@ -3,8 +3,11 @@
 #include "sysio.system/emissions.hpp"
 
 #include <sysio.authex/sysio.authex.hpp>
+#include <sysio.opp.common/evm_address.hpp>
 #include <sysio.opp.common/safe_ops.hpp>   // add_sat_u64 / add_sat_i64 -- never-throw saturating accumulators
 #include <sysio/permission.hpp>   // get_permission -- read an account's active authority in nodeownreg
+
+#include <string_view>
 
 namespace sysio {
 
@@ -13,6 +16,32 @@ namespace sysio {
         // literals -- a contract rename is one change here, not scattered across call sites).
         constexpr name AUTHEX_ACCOUNT    = "sysio.authex"_n;
         constexpr name AUTHEX_RECORDLINK = "recordlink"_n;
+
+        /// Names under this prefix belong to system accounts. The chain refuses them only to non-privileged
+        /// creators, and sysio.roa is privileged, so node-owner claims must refuse them here.
+        constexpr std::string_view RESERVED_SYSTEM_NAME_PREFIX = "sysio.";
+
+        /// Maximum number of generated account names checked before newuser gives up.
+        constexpr uint32_t MAX_ACCOUNT_NAME_ATTEMPTS{100};
+
+        /// SplitMix64's Weyl-sequence increment, used to decorrelate account-name generator inputs.
+        constexpr uint64_t ACCOUNT_NAME_MIX_INCREMENT{0x9E3779B97F4A7C15ULL};
+        /// First SplitMix64 avalanche multiplier.
+        constexpr uint64_t ACCOUNT_NAME_MIX_MULTIPLIER_1{0xBF58476D1CE4E5B9ULL};
+        /// Second SplitMix64 avalanche multiplier.
+        constexpr uint64_t ACCOUNT_NAME_MIX_MULTIPLIER_2{0x94D049BB133111EBULL};
+        /// SplitMix64's three avalanche shifts, in application order.
+        constexpr uint32_t ACCOUNT_NAME_MIX_SHIFT_1{30};
+        constexpr uint32_t ACCOUNT_NAME_MIX_SHIFT_2{27};
+        constexpr uint32_t ACCOUNT_NAME_MIX_SHIFT_3{31};
+
+        /// Applies the SplitMix64 finalizer to one account-name generator input.
+        uint64_t mix_account_name_seed(uint64_t value) {
+            value += ACCOUNT_NAME_MIX_INCREMENT;
+            value = (value ^ (value >> ACCOUNT_NAME_MIX_SHIFT_1)) * ACCOUNT_NAME_MIX_MULTIPLIER_1;
+            value = (value ^ (value >> ACCOUNT_NAME_MIX_SHIFT_2)) * ACCOUNT_NAME_MIX_MULTIPLIER_2;
+            return value ^ (value >> ACCOUNT_NAME_MIX_SHIFT_3);
+        }
     } // anonymous namespace
 
     static bool is_sysio_account(const name& account) {
@@ -673,15 +702,15 @@ namespace sysio {
     };
 
     void roa::nodeownreg(const name& owner, const uint8_t& tier, const public_key& eth_pub_key,
-                         const public_key& wire_pub_key) {
+                         const public_key& wire_pub_key,
+                         const bytes& eth_address) {
         // Dispatched by the OPP depot (sysio.msgch) when it processes an inbound
         // ATTESTATION_TYPE_NODE_OWNER_REG attestation. msgch inline-sends newnameduser (account
-        // create) and then this action, both declaring permission_level{sysio.roa, active}; the
-        // chain accepts that declaration because sysio.roa.active trusts msgch@sysio.code via a
-        // code-permission delegation wired at bootstrap (same shape as the sysio.opreg grant). So
-        // require_auth(get_self()) is the correct gate: only the delegated depot dispatch satisfies
-        // it. Inline actions run depth-first, so newnameduser's newaccount has already executed and
-        // `owner` exists by the time this runs.
+        // create) and then this action, both declaring permission_level{sysio.roa, active}.
+        // Privileged sysio.msgch may declare that target permission without a cross-contract active
+        // grant, so deployment must preserve msgch's privileged status. Inline actions run
+        // depth-first, so newnameduser's newaccount has already executed and `owner` exists by the
+        // time this runs.
         require_auth(get_self());
 
         // ---- Envelope / system invariants (depot misuse) ----
@@ -691,6 +720,8 @@ namespace sysio {
         // NFT deposits land on Ethereum, so the recorded link is always an EM (secp256k1) key.
         check(eth_pub_key.index() == fc::crypto::key_type_em,
               "eth_pub_key must be an EM (secp256k1) public key");
+        check(eth_address.size() == opp::evm_address_size,
+              "eth_address must be exactly 20 bytes");
 
         // ROA-active is a hard system invariant (the network cannot function with ROA inactive).
         // Read the state once here so the soft-fail audit rows below scope to the live network_gen
@@ -761,11 +792,13 @@ namespace sysio {
         // stolen and the claim reaches CONFIRMED. (SEC-087)
 
         // Record the depositor's ETH key as a sysio.authex link via the trusted depot-only path.
-        // recordlink requires sysio.authex.active, satisfied by the sysio.roa@sysio.code delegation
-        // on authex; it is idempotent and non-throwing. EVM-only by design (NFT deposits originate
-        // on Ethereum); to extend to another ChainKind, promote the kind to an action parameter.
+        // recordlink requires sysio.authex.active; privileged sysio.roa may declare that permission
+        // on this inline action without a cross-contract active-permission delegation. The action is
+        // idempotent and non-throwing. EVM-only by design (NFT deposits originate on Ethereum); to
+        // extend to another ChainKind, promote the kind to an action parameter.
         action(permission_level{AUTHEX_ACCOUNT, "active"_n}, AUTHEX_ACCOUNT, AUTHEX_RECORDLINK,
-               std::make_tuple(owner, opp::types::ChainKind::CHAIN_KIND_EVM, eth_pub_key)).send();
+               std::make_tuple(owner, opp::types::ChainKind::CHAIN_KIND_EVM, eth_pub_key,
+                               eth_address)).send();
 
         regnodeowner(owner, tier);
         record_nodereg(owner, tier, CONFIRMED, NONE, gen);
@@ -795,6 +828,7 @@ namespace sysio {
     }
 
     bool roa::valid_name_for_tier(const name& account, uint8_t tier) {
+        if (account.to_string().rfind(RESERVED_SYSTEM_NAME_PREFIX, 0) == 0) return false;
         const size_t len = account.length();
         // Tier-1 owners take a short 2-6 char prefix (sub-accounts become <prefix>.<random>);
         // tier 2/3 take a 1-12 char vanity name.
@@ -1032,7 +1066,7 @@ namespace sysio {
         check(prefix_len + 2 <= NAME_LENGTH, "Creator name is too long to generate a sub-account under it");
         size_t gen_len = NAME_LENGTH - prefix_len - 1; // chars after "<prefix>."
 
-        // Try up to 3 times to generate a unique username
+        // Try a bounded number of times to generate a unique username.
         name new_username;
         bool created = false;
         uint32_t block_num = current_block_number();
@@ -1050,23 +1084,17 @@ namespace sysio {
            'p','q','r','s','t','u','v','w','x','y','z'};
         constexpr size_t charmap_len = sizeof(charmap) / sizeof(charmap[0]);
 
-        // Cheap pseudo-random generator: a splitmix64 finalizer over nonce/attempt/block_num. No
-        // crypto is needed here — uniqueness is enforced by the is_account retry below; we only
-        // need variation — so this avoids a sha256 intrinsic call per attempt.
-        auto mix = [](uint64_t z) {
-            z += 0x9E3779B97F4A7C15ULL;
-            z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9ULL;
-            z = (z ^ (z >> 27)) * 0x94D049BB133111EBULL;
-            return z ^ (z >> 31);
-        };
+        // Mix the block number before combining it with the nonce. A linear shifted combination
+        // lets related name-valued nonces in different blocks produce the same candidate sequence.
+        // No cryptographic strength is needed: is_account enforces uniqueness below.
+        const uint64_t seed = nonce.value ^ mix_account_name_seed(static_cast<uint64_t>(block_num));
 
-        for (uint8_t attempt = 0; attempt < 3; ++attempt) {
-            uint64_t x = nonce.value ^ (static_cast<uint64_t>(block_num) << 32)
-                         ^ (static_cast<uint64_t>(attempt) * 0x9E3779B97F4A7C15ULL);
+        for (uint32_t attempt = 0; attempt < MAX_ACCOUNT_NAME_ATTEMPTS; ++attempt) {
+            uint64_t x = seed ^ (static_cast<uint64_t>(attempt) * ACCOUNT_NAME_MIX_INCREMENT);
 
             // Fill the generated portion after "<prefix>."
             for (size_t i = 0; i < gen_len; ++i) {
-                x = mix(x);
+                x = mix_account_name_seed(x);
                 uname_str[prefix_len + 1 + i] = charmap[x % charmap_len];
             }
 
@@ -1078,7 +1106,10 @@ namespace sysio {
                 break;
             }
         }
-        check(created, "Failed to generate a unique account name after 3 attempts");
+        check(created, [] {
+            return "Failed to generate a unique account name after " +
+                   std::to_string(MAX_ACCOUNT_NAME_ATTEMPTS) + " attempts";
+        });
 
         auto owner_auth = sysiosystem::authority{1, {{pubkey, 1}}, {}};
         auto active_auth = sysiosystem::authority{1, {{pubkey, 1}}, {}};
@@ -1128,8 +1159,8 @@ namespace sysio {
 
     void roa::newnameduser(const name& account, const public_key& pubkey, uint8_t tier) {
         // Dispatched by the OPP depot (sysio.msgch) in the NFT node-owner claim flow, the same way
-        // as nodeownreg: msgch sends this inline declaring {sysio.roa, active}, accepted via the
-        // msgch@sysio.code delegation on sysio.roa.active wired at bootstrap.
+        // as nodeownreg: privileged sysio.msgch sends this inline declaring {sysio.roa, active},
+        // without requiring a cross-contract active grant.
         require_auth(get_self());
 
         roastate_t roastate(get_self());

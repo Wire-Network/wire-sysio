@@ -96,8 +96,7 @@ public:
       , total_deadline(total_deadline_in)
       , control(std::move(control_in))
       , metrics(std::move(metrics_in)) {
-      parser.header_limit(policy.max_response_header_bytes);
-      parser.body_limit(policy.max_response_body_bytes);
+      restart_response_parser(parser, policy);
    }
 
    ~response_reader_impl() {
@@ -114,9 +113,9 @@ public:
 
    /** Initialize public metadata and the aggregate body-read deadline. */
    void header_complete() {
-      value_head.status = parser.get().result_int();
-      value_head.reason = sanitize_reason(parser.get().reason());
-      if (const auto length = parser.content_length())
+      value_head.status = parser->get().result_int();
+      value_head.reason = sanitize_reason(parser->get().reason());
+      if (const auto length = parser->content_length())
          value_head.content_length = *length;
       if (policy.timeouts.read) {
          read_deadline = phase_deadline(policy.timeouts.read, failure_kind::timeout_read, total_deadline);
@@ -143,7 +142,7 @@ public:
       try {
          const auto bytes = co_await std::visit(
             [&](auto& stream) {
-               return read_body(connection, *stream, buffer, parser, output, policy, total_deadline, read_deadline,
+               return read_body(connection, *stream, buffer, *parser, output, policy, total_deadline, read_deadline,
                                 control);
             },
             connection->stream);
@@ -183,10 +182,10 @@ public:
 
    /** Return the leased connection only after Beast confirms end-of-message. */
    void finish_if_complete() {
-      if (!parser.is_done() || complete.exchange(true, std::memory_order_acq_rel)) {
+      if (!parser->is_done() || complete.exchange(true, std::memory_order_acq_rel)) {
          return;
       }
-      if (!parser.get().keep_alive())
+      if (!parser->get().keep_alive())
          connection->close();
       else
          client->release_connection(connection_key, connection);
@@ -197,7 +196,7 @@ public:
    std::shared_ptr<connection_state> connection;
    std::string connection_key;
    beast::flat_buffer buffer;
-   beast_http::response_parser<beast_http::buffer_body> parser;
+   std::optional<beast_http::response_parser<beast_http::buffer_body>> parser;
    request_options policy;
    std::optional<time_point> total_deadline;
    std::optional<operation_deadline> read_deadline;
@@ -272,11 +271,14 @@ client_impl::async_open(request req, request_options policy, std::shared_ptr<req
                                                               policy, total_deadline, control, metrics);
          if (on_phase)
             on_phase(http_file_download_phase::waiting_for_response);
+         // One budget covers every header read below, interim responses included, so a peer
+         // cannot extend the header phase by trickling 1xx responses.
+         const auto header_deadline =
+            phase_deadline(policy.timeouts.header, failure_kind::timeout_header, total_deadline);
          co_await std::visit(
             [&](auto& stream) {
-               return read_header(connection, *stream, reader->buffer, reader->parser, policy,
-                                  phase_deadline(policy.timeouts.header, failure_kind::timeout_header, total_deadline),
-                                  control);
+               return read_final_header(connection, *stream, reader->buffer, reader->parser, policy, header_deadline,
+                                        control);
             },
             connection->stream);
          reader->header_complete();

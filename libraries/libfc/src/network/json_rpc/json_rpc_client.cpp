@@ -155,18 +155,24 @@ variant json_rpc_client::extract_call_result(const variant& response, std::int64
       FC_THROW("JSON-RPC: missing 'id' in response");
 
    const auto& response_id = object["id"];
-   int64_t got_id = 0;
-   if (response_id.is_int64())
-      got_id = response_id.as_int64();
-   else if (response_id.is_uint64())
-      got_id = static_cast<int64_t>(response_id.as_uint64());
-   else
-      FC_THROW("JSON-RPC: invalid 'id' type in response");
+   const bool carries_error = object.contains("error");
+   // JSON-RPC 2.0 requires a null id when the server could not determine the request's id, which
+   // it can only fail to do while reporting an error. Accept null there and nowhere else, so the
+   // error still decodes as json_rpc_error while a mismatched id on a result is still caught.
+   if (!(carries_error && response_id.is_null())) {
+      int64_t got_id = 0;
+      if (response_id.is_int64())
+         got_id = response_id.as_int64();
+      else if (response_id.is_uint64())
+         got_id = static_cast<int64_t>(response_id.as_uint64());
+      else
+         FC_THROW("JSON-RPC: invalid 'id' type in response");
 
-   if (got_id != expected_id)
-      FC_THROW("JSON-RPC: response 'id' does not match request 'id'");
+      if (got_id != expected_id)
+         FC_THROW("JSON-RPC: response 'id' does not match request 'id'");
+   }
 
-   if (object.contains("error")) {
+   if (carries_error) {
       const auto& error = object["error"];
       int code = 0;
       std::string message = "JSON-RPC error";

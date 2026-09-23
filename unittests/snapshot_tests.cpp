@@ -727,24 +727,31 @@ BOOST_AUTO_TEST_CASE(test_corrupt_permission_parent_in_snapshot_rejected)
          ("sections", std::move(new_sections));
    };
 
-   // Parent cycle: custa's parent rewritten to custb while custb's parent is custa. custa loads
-   // first, custb is not yet present, so the load must fail on the unresolvable parent.
-   fc::variant cyclic = mutate_parent("custa", "custb");
-   BOOST_REQUIRE_EXCEPTION(
-      snapshotted_tester(chain.get_config(), variant_snapshot_suite::get_reader(cyclic), 0),
-      snapshot_exception,
-      [](const snapshot_exception& e) {
-         return e.to_detail_string().find("victim@custa references parent custb") != std::string::npos;
-      });
+   /// Load `mutated`, require that it throws snapshot_exception, and return the exception's detail string. The caller
+   /// matches it with BOOST_REQUIRE_MESSAGE so a mismatch prints what was thrown; BOOST_REQUIRE_EXCEPTION prints only
+   /// its predicate's source.
+   auto rejected_detail = [&](const fc::variant& mutated, uint32_t ordinal) {
+      try {
+         snapshotted_tester(chain.get_config(), variant_snapshot_suite::get_reader(mutated), ordinal);
+      } catch (const snapshot_exception& e) {
+         return e.to_detail_string();
+      }
+      BOOST_FAIL("corrupt snapshot was accepted; expected a snapshot_exception");
+      return std::string{};
+   };
+
+   // Parent cycle: custa's parent rewritten to custb while custb's parent is custa. custa was created first and rows
+   // load in id order, so the load must fail at custa; a rejection naming custb would mean rows left creation order.
+   const std::string cyclic_detail = rejected_detail(mutate_parent("custa", "custb"), 0);
+   BOOST_REQUIRE_MESSAGE(
+      cyclic_detail.find("victim@custa references parent custb") != std::string::npos,
+      "expected the cycle to be rejected at victim@custa, got: " << cyclic_detail);
 
    // Dangling parent: references a permission name that exists nowhere in the snapshot.
-   fc::variant dangling = mutate_parent("custb", "nosuchperm");
-   BOOST_REQUIRE_EXCEPTION(
-      snapshotted_tester(chain.get_config(), variant_snapshot_suite::get_reader(dangling), 1),
-      snapshot_exception,
-      [](const snapshot_exception& e) {
-         return e.to_detail_string().find("victim@custb references parent nosuchperm") != std::string::npos;
-      });
+   const std::string dangling_detail = rejected_detail(mutate_parent("custb", "nosuchperm"), 1);
+   BOOST_REQUIRE_MESSAGE(
+      dangling_detail.find("victim@custb references parent nosuchperm") != std::string::npos,
+      "expected a dangling-parent rejection naming victim@custb, got: " << dangling_detail);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

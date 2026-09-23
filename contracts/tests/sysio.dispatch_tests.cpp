@@ -14,6 +14,7 @@
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/permission_object.hpp>
+#include <sysio/chain/wast_to_wasm.hpp>
 #include <sysio/chain/kv_table_objects.hpp>   // kv_index / by_code_key for reading sysio.roa kv tables
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/opp.pb.h>
@@ -33,14 +34,18 @@
 #include <fc/crypto/private_key.hpp>
 #include <fc/crypto/public_key.hpp>
 #include <fc/crypto/signature.hpp>
+#include <fc/crypto/ethereum/ethereum_types.hpp>
 #include <magic_enum/magic_enum.hpp>
 
 #include <algorithm>
 #include <array>
 #include <iterator>
+#include <map>
+#include <sstream>
 
 #include "contracts.hpp"
 #include "contract_test_support.hpp"
+#include "test_symbol.hpp"
 // Canonical-encoding + header-derivation oracle: inbound envelopes must carry
 // spec-derived semantic headers or apply_consensus drops them before dispatch.
 #include "opp_envelope_oracle.hpp"
@@ -105,24 +110,6 @@ inline fc::variant chain_min_bond_mvo(std::string_view chain_code,
       ("token_code",          codename_mvo(token_code))
       ("min_bond",            min_bond)
       ("config_timestamp_ms", uint64_t{0}));
-}
-
-/// Build an `authority` whose active permission is the account's own
-/// active key + a list of `{actor, sysio.code}` co-signers.
-authority active_with_code_authors(name account, const std::vector<name>& code_authors) {
-   authority a(base_tester::get_public_key(account, "active"));
-   a.accounts.push_back(permission_level_weight{
-      {account, config::sysio_code_name}, 1});
-   for (const auto& actor : code_authors) {
-      a.accounts.push_back(permission_level_weight{
-         {actor, config::sysio_code_name}, 1});
-   }
-   std::sort(a.accounts.begin(), a.accounts.end(),
-      [](const permission_level_weight& l, const permission_level_weight& r) {
-         return std::tie(l.permission.actor, l.permission.permission)
-              < std::tie(r.permission.actor, r.permission.permission);
-      });
-   return a;
 }
 
 /// Encode an Envelope wrapping a single attestation.
@@ -234,6 +221,13 @@ std::vector<char> em_pubkey_bytes(const fc::crypto::public_key& pk) {
    return std::vector<char>(compressed.begin(), compressed.end());
 }
 
+/// Extract the 65-byte uncompressed EVM key emitted by BAR for NodeOwnerRegistration.
+std::vector<char> em_uncompressed_pubkey_bytes(const fc::crypto::public_key& pk) {
+   const auto& shim = pk.get<fc::em::public_key_shim>();
+   auto uncompressed = shim.unwrapped().serialize_uncompressed();
+   return std::vector<char>(uncompressed.begin(), uncompressed.end());
+}
+
 /// Encode an OperatorAction attestation payload (v6 schema).
 /// `chain_code` and `amount.token_code` are slug_name-packed uint64 values.
 std::string encode_operator_action(
@@ -273,17 +267,22 @@ std::vector<char> k1_pubkey_bytes(const fc::crypto::public_key& pk) {
 
 /// Encode a NodeOwnerRegistration attestation payload: the Wire account name + tier, the new
 /// account's owner/active key as a `WireKey` (key_type + raw bytes), and the depositor's ETH key.
+/// Leaves `actor.kind` unset because the exact source-outpost binding proves the chain and actor is
+/// metadata only; `actor.address` remains populated so tests can prove it is not trusted as identity.
 std::string encode_node_owner_registration(
    const std::string& account,
    uint32_t tier,
    sysio::opp::types::WireKeyType wire_key_type,
    const std::vector<char>& wire_key_bytes,
-   const std::vector<char>& eth_pubkey_bytes)
+   const std::vector<char>& eth_pubkey_bytes,
+   const std::vector<uint8_t>& eth_address)
 {
    sysio::opp::attestations::NodeOwnerRegistration reg;
    reg.mutable_account()->set_name(account);
    reg.set_tier(tier);
    reg.set_actor_pub_key(eth_pubkey_bytes.data(), eth_pubkey_bytes.size());
+   auto* actor = reg.mutable_actor();
+   actor->set_address(eth_address.data(), eth_address.size());
    auto* wk = reg.mutable_wire_pub_key();
    wk->set_key_type(wire_key_type);
    wk->set_key(wire_key_bytes.data(), wire_key_bytes.size());
@@ -331,6 +330,14 @@ std::string encode_swap_request(
 
 } // anonymous namespace
 
+/// Wire layout of an `auth.msg::onlinkauth` action, the payload sysio.system once acted on.
+struct onlinkauth_notification {
+   name            user;
+   name            permission;
+   public_key_type pub_key;
+};
+FC_REFLECT(onlinkauth_notification, (user)(permission)(pub_key))
+
 class sysio_dispatch_tester : public tester {
 public:
    static constexpr auto MSGCH_ACCOUNT  = "sysio.msgch"_n;
@@ -351,6 +358,7 @@ public:
    static constexpr uint32_t kMaxLockReleasePerEpoch = 32;
    static constexpr auto TOKEN_ACCOUNT  = "sysio.token"_n;
    static constexpr auto AUTHEX_ACCOUNT = "sysio.authex"_n;
+   static constexpr auto DCLAIM_ACCOUNT = "sysio.dclaim"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
    static constexpr auto ROA_ACCOUNT    = "sysio.roa"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
@@ -367,7 +375,7 @@ public:
       create_accounts({
          MSGCH_ACCOUNT, OPREG_ACCOUNT, UWRIT_ACCOUNT, EPOCH_ACCOUNT,
          RESERV_ACCOUNT, CHALG_ACCOUNT, TOKEN_ACCOUNT, CHAINS_ACCOUNT,
-         BATCHOP, UWRIT_OP
+         DCLAIM_ACCOUNT, BATCHOP, UWRIT_OP
       });
       // CLAIM_ACCOUNT with NO roa policy (include_roa_policy=false) so regnodeowner exercises the
       // fresh create-branch of increase_reslimit. (A pre-existing reslimit row would now be reconciled,
@@ -384,6 +392,7 @@ public:
       deploy(EPOCH_ACCOUNT,  contracts::epoch_wasm(),   contracts::epoch_abi(),   epoch_abi);
       deploy(RESERV_ACCOUNT, contracts::reserve_wasm(), contracts::reserve_abi(), reserv_abi);
       deploy(AUTHEX_ACCOUNT, contracts::authex_wasm(),  contracts::authex_abi(),  authex_abi);
+      deploy(DCLAIM_ACCOUNT, contracts::dclaim_wasm(),  contracts::dclaim_abi(),  dclaim_abi);
       deploy(CHAINS_ACCOUNT, contracts::chains_wasm(),  contracts::chains_abi(),  chains_abi);
       // sysio.roa is a genesis system account already running this build's code (active, with the
       // sysio.acct policy), so re-deploying it would fail set_exact_code. Just load its on-chain abi
@@ -397,11 +406,10 @@ public:
                          abi_serializer::create_yield_function(abi_serializer_max_time));
       }
 
-      grant_code_authors(OPREG_ACCOUNT, {MSGCH_ACCOUNT});
-      // NodeOwnerRegistration delegations (the production analogue is wired in ClusterManager):
-      // msgch -> sysio.roa (newnameduser/nodeownreg), and sysio.roa -> sysio.authex (recordlink).
-      grant_code_authors(ROA_ACCOUNT,    {MSGCH_ACCOUNT});
-      grant_code_authors(AUTHEX_ACCOUNT, {ROA_ACCOUNT});
+      // Production uses privileged system contracts and installs no cross-contract active grants.
+      // deploy() already marked msgch privileged; explicitly preserve the genesis ROA privilege so
+      // both msgch -> roa and roa -> authex exercise that exact authorization path.
+      set_privileged(ROA_ACCOUNT);
 
       produce_blocks();
    }
@@ -417,12 +425,6 @@ public:
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, parsed_abi), true);
       out_ser.set_abi(std::move(parsed_abi),
                       abi_serializer::create_yield_function(abi_serializer_max_time));
-   }
-
-   void grant_code_authors(name account, const std::vector<name>& code_authors) {
-      set_authority(account, config::active_name,
-                    active_with_code_authors(account, code_authors),
-                    config::owner_name);
    }
 
    action_result push(name contract, abi_serializer& ser, name signer,
@@ -658,6 +660,13 @@ public:
             abi_serializer::create_yield_function(abi_serializer_max_time));
       }
       return fc::variant();
+   }
+
+   fc::variant get_dclaim_row(name table, const char* type, uint64_t id) {
+      auto data = get_row_by_id(DCLAIM_ACCOUNT, DCLAIM_ACCOUNT, table, id);
+      return data.empty() ? fc::variant()
+         : dclaim_abi.binary_to_variant(
+              type, data, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
    // ── uwrit swap-race helpers (direct msgch-auth action calls) ──
@@ -1388,8 +1397,8 @@ public:
          push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n, mvo()));
    }
 
-   abi_serializer msgch_abi, opreg_abi, uwrit_abi, epoch_abi, reserv_abi, authex_abi, chains_abi, roa_abi,
-                  token_abi;
+   abi_serializer msgch_abi, opreg_abi, uwrit_abi, epoch_abi, reserv_abi, authex_abi, dclaim_abi,
+                  chains_abi, roa_abi, token_abi;
 
    std::vector<char> uwrit_op_eth_pubkey;
 };
@@ -1934,13 +1943,25 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    const auto eth_code = fc::slug_name{"ETHEREUM"}.value;
    // The claim must carry CLAIM_ACCOUNT's own active key so nodeownreg's active_key_matches passes.
    auto wire_key = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
-   // Depositor's ETH key (EM, 33-byte compressed).
+   // BAR supplies the depositor's ETH key as an uncompressed 65-byte point.
    auto eth_pub = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
-   auto eth_bytes = em_pubkey_bytes(eth_pub);
+   auto eth_bytes = em_uncompressed_pubkey_bytes(eth_pub);
+   auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_pub);
+
+   // Seed a pre-link reward at the key-derived address, then deliberately put a conflicting address
+   // in the redundant actor field. Dispatch must derive from actor_pub_key and sweep the real row.
+   const std::vector<char> native_address(eth_address.begin(), eth_address.end());
+   BOOST_REQUIRE_EQUAL(success(), push(DCLAIM_ACCOUNT, dclaim_abi, MSGCH_ACCOUNT, "onreward"_n, mvo()
+      ("chain_code", eth_code)("staker_wire_account", std::string{})
+      ("reward_chain", ChainKind::CHAIN_KIND_EVM)("staker_native_addr", native_address)
+      ("reward_amount", uint64_t{4321})("reward_epoch_index", uint32_t{7})
+      ("external_epoch_ref", uint64_t{100})("share_bps", uint32_t{10000})));
+   BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   std::fill(eth_address.begin(), eth_address.end(), uint8_t{0xA5});
 
    auto payload = encode_node_owner_registration(
       CLAIM_ACCOUNT.to_string(), /*tier=*/2,
-      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes);
+      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes, eth_address);
    auto envelope = encode_envelope_with_one_attestation(
       current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
 
@@ -1952,7 +1973,35 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    BOOST_REQUIRE_EQUAL(reg["tier"].as<uint32_t>(), 2u);
    auto audit = get_nodeownerreg(CLAIM_ACCOUNT);
    BOOST_REQUIRE(!audit.is_null());
-   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), 0u);  // CONFIRMED
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(),
+                       sysio_system::test_support::nodeownerreg::status_confirmed);
+   BOOST_REQUIRE(get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   auto pending = get_dclaim_row("pclaims"_n, "pending_claim", CLAIM_ACCOUNT.to_uint64_t());
+   BOOST_REQUIRE(!pending.is_null());
+   BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 4321);
+} FC_LOG_AND_RETHROW() }
+
+// BAR's NodeOwnerRegistration contract emits a 65-byte uncompressed SEC1 key. A compressed EM key
+// is well-formed protobuf but unusable identity input: dispatch must soft-drop it while committing
+// the consensus envelope, with no sysio.roa registration or audit side effect.
+BOOST_FIXTURE_TEST_CASE(node_owner_reg_with_compressed_actor_key_is_dropped, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch("ETHEREUM");
+   const auto eth_code = fc::slug_name{"ETHEREUM"}.value;
+   auto wire_key = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
+   auto eth_pub = fc::crypto::private_key::generate(
+      fc::crypto::private_key::key_type::em).get_public_key();
+   auto compressed_eth_key = em_pubkey_bytes(eth_pub);
+   auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_pub);
+   auto payload = encode_node_owner_registration(
+      CLAIM_ACCOUNT.to_string(), /*tier=*/2,
+      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, compressed_eth_key, eth_address);
+   auto envelope = encode_envelope_with_one_attestation(
+      current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
+
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));
+   BOOST_REQUIRE(!get_envelope(1).is_null());
+   BOOST_REQUIRE(get_nodeowner(CLAIM_ACCOUNT).is_null());
+   BOOST_REQUIRE(get_nodeownerreg(CLAIM_ACCOUNT).is_null());
 } FC_LOG_AND_RETHROW() }
 
 // WSA-005: node-owner registration is bound to the EXACT Ethereum source outpost (NODE_OWNER_SRC_CHAIN
@@ -1973,10 +2022,11 @@ BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_other_evm_outpost_is_dropped, sysio_
 
    auto wire_key  = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
    auto eth_pub   = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
-   auto eth_bytes = em_pubkey_bytes(eth_pub);
+   auto eth_bytes = em_uncompressed_pubkey_bytes(eth_pub);
+   auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_pub);
    auto payload   = encode_node_owner_registration(
       CLAIM_ACCOUNT.to_string(), /*tier=*/2,
-      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes);
+      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes, eth_address);
    auto envelope  = encode_envelope_with_one_attestation(
       current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
 
@@ -2000,10 +2050,11 @@ BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_non_evm_outpost_is_dropped, sysio_di
 
    auto wire_key  = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
    auto eth_pub   = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
-   auto eth_bytes = em_pubkey_bytes(eth_pub);
+   auto eth_bytes = em_uncompressed_pubkey_bytes(eth_pub);
+   auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_pub);
    auto payload   = encode_node_owner_registration(
       CLAIM_ACCOUNT.to_string(), /*tier=*/2,
-      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes);
+      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes, eth_address);
    auto envelope  = encode_envelope_with_one_attestation(
       current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
 
@@ -2014,6 +2065,163 @@ BOOST_FIXTURE_TEST_CASE(node_owner_reg_from_non_evm_outpost_is_dropped, sysio_di
    // Nothing was sent to sysio.roa: no node-owner registration and no audit row.
    BOOST_REQUIRE(get_nodeowner(CLAIM_ACCOUNT).is_null());
    BOOST_REQUIRE(get_nodeownerreg(CLAIM_ACCOUNT).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// Node-owner claims on a chain running sysio.system. A tier-2/3 claim lets the NFT holder pick any valid 1-12 char
+/// name and control the account created for it; these cases pin what that control must not reach.
+class node_owner_claim_tester : public sysio_dispatch_tester {
+public:
+   static constexpr auto     NODE_OWNER_SOURCE_CHAIN = "ETHEREUM";
+   static constexpr uint32_t CLAIM_TIER              = 2;
+   static constexpr auto     AUTH_MSG_ACCOUNT        = "auth.msg"_n;
+   static constexpr auto     ONLINKAUTH_ACTION       = "onlinkauth"_n;
+   static constexpr auto     AUTH_EXT_PERMISSION     = "auth.ext"_n;
+   static constexpr auto     OTHER_PERMISSION        = "session"_n;
+   static constexpr auto     RESERVED_SYSTEM_NAME    = "sysio.pwn"_n;
+   static constexpr auto     PAYER_ACCOUNT           = "payer"_n;
+   /// Never created; only names the key a notification offers.
+   static constexpr auto     REPLACEMENT_KEY_NAME    = "replacement"_n;
+   static constexpr auto     SYSTEM_INIT_ACTION      = "init"_n;
+   static constexpr auto     ADDPOLICY_ACTION        = "addpolicy"_n;
+   static constexpr auto     SELF_POLICY_WEIGHT      = "0.1000 SYS";
+
+   /// Parent and authority of each of an account's permissions, keyed by permission name.
+   using permission_set = std::map<name, std::pair<name, authority>>;
+
+   /// Deploy and initialize sysio.system; the base dispatch fixture runs without it.
+   void deploy_system_contract() {
+      set_code(config::system_account_name, contracts::system_wasm());
+      set_abi(config::system_account_name, contracts::system_abi().data());
+      produce_block();
+      base_tester::push_action(config::system_account_name, SYSTEM_INIT_ACTION, config::system_account_name,
+                               mvo()("version", 0)("core", CORE_SYM_STR));
+      produce_block();
+   }
+
+   /// Deliver a NodeOwnerRegistration for `account` through the Ethereum outpost, as BAR.commitNode emits it.
+   void claim_node_owner(name account, const public_key_type& wire_key) {
+      const auto eth_key = fc::crypto::private_key::generate(
+         fc::crypto::private_key::key_type::em).get_public_key();
+      const auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_key);
+      const auto payload = encode_node_owner_registration(
+         account.to_string(), CLAIM_TIER, sysio::opp::types::WIRE_KEY_TYPE_K1,
+         k1_pubkey_bytes(wire_key), em_uncompressed_pubkey_bytes(eth_key), eth_address);
+      const auto envelope = encode_envelope_with_one_attestation(
+         current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, payload);
+      BOOST_REQUIRE_EQUAL(success(), deliver(fc::slug_name{NODE_OWNER_SOURCE_CHAIN}.value, envelope));
+      produce_blocks(2);
+   }
+
+   /// The claimant issues a policy to itself from its tier budget; PAYER_ACCOUNT pays for the transaction.
+   void issue_own_policy(name owner) {
+      signed_transaction trx;
+      trx.actions.emplace_back(get_action(config::roa_account_name, ADDPOLICY_ACTION,
+         vector<permission_level>{{PAYER_ACCOUNT, config::sysio_payer_name}, {PAYER_ACCOUNT, config::active_name},
+                                  {owner, config::active_name}},
+         mvo()("owner", owner)("issuer", owner)("net_weight", SELF_POLICY_WEIGHT)("cpu_weight", SELF_POLICY_WEIGHT)
+              ("ram_weight", SELF_POLICY_WEIGHT)("time_block", 0)("network_gen", ROA_NETWORK_GEN)));
+      set_transaction_headers(trx);
+      trx.sign(get_private_key(PAYER_ACCOUNT, "active"), control->get_chain_id());
+      trx.sign(get_private_key(owner, "active"), control->get_chain_id());
+      push_transaction(trx);
+      produce_block();
+   }
+
+   /// Code a claimant can deploy on its account: it forwards every action it receives to sysio as a notification.
+   static std::vector<uint8_t> notify_system_account_wasm() {
+      std::ostringstream wast;
+      wast << R"((module
+         (import "env" "require_recipient" (func $require_recipient (param i64)))
+         (func (export "apply") (param i64 i64 i64)
+            (call $require_recipient (i64.const 0x)"
+           << std::hex << config::system_account_name.to_uint64_t() << R"())
+         )
+      ))";
+      return wast_to_wasm(wast.str());
+   }
+
+   /// Push auth.msg::onlinkauth as auth.msg; true when the transaction committed and the notification reached sysio.
+   bool notify_onlinkauth(name user, name permission, const public_key_type& key) {
+      signed_transaction trx;
+      trx.actions.emplace_back(vector<permission_level>{{AUTH_MSG_ACCOUNT, config::active_name}}, AUTH_MSG_ACCOUNT,
+                               ONLINKAUTH_ACTION, fc::raw::pack(onlinkauth_notification{user, permission, key}));
+      set_transaction_headers(trx);
+      trx.sign(get_private_key(AUTH_MSG_ACCOUNT, "active"), control->get_chain_id());
+      bool delivered = false;
+      try {
+         const auto trace = push_transaction(trx);
+         delivered = std::ranges::any_of(trace->action_traces, [](const action_trace& at) {
+            return at.receiver == config::system_account_name && at.act.name == ONLINKAUTH_ACTION;
+         });
+      } catch (const fc::exception&) {
+         delivered = false;
+      }
+      produce_block();
+      return delivered;
+   }
+
+   /// Native newaccount creates only the account_object; metadata appears once code, abi or privilege is set.
+   bool account_exists(name account) const {
+      return control->db().find<account_object, by_name>(account) != nullptr;
+   }
+
+   /// Every permission of `account`, for before/after comparison.
+   permission_set permissions_of(name account) const {
+      permission_set out;
+      const auto& db  = control->db();
+      const auto& idx = db.get_index<permission_index, by_owner>();
+      for (auto it = idx.lower_bound(boost::make_tuple(account)); it != idx.end() && it->owner == account; ++it) {
+         const name parent = it->parent._id == 0 ? name{} : db.get<permission_object, by_id>(it->parent).name;
+         out.emplace(it->name, std::make_pair(parent, it->auth.to_authority()));
+      }
+      return out;
+   }
+};
+
+// A tier-2/3 claim can take the name auth.msg and deploy code there, so an auth.msg::onlinkauth notification is
+// attacker-controlled. It must reach sysio as an ordinary notification and change nothing: not sysio's owner, active,
+// auth.ext or any other permission, and not a user's.
+BOOST_FIXTURE_TEST_CASE(claimed_auth_msg_notification_changes_no_permission, node_owner_claim_tester) { try {
+   bootstrap_for_dispatch(NODE_OWNER_SOURCE_CHAIN);
+   create_account(PAYER_ACCOUNT);
+   deploy_system_contract();
+
+   claim_node_owner(AUTH_MSG_ACCOUNT, get_public_key(AUTH_MSG_ACCOUNT, "active"));
+   const auto audit = get_nodeownerreg(AUTH_MSG_ACCOUNT);
+   BOOST_REQUIRE(!audit.is_null());
+   BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), sysio_system::test_support::nodeownerreg::status_confirmed);
+   issue_own_policy(AUTH_MSG_ACCOUNT);
+   set_code(AUTH_MSG_ACCOUNT, notify_system_account_wasm());
+   produce_block();
+
+   const auto replacement_key = get_public_key(REPLACEMENT_KEY_NAME, "active");
+   const auto sysio_before    = permissions_of(config::system_account_name);
+   const auto user_before     = permissions_of(CLAIM_ACCOUNT);
+   for (const auto target : {config::system_account_name, CLAIM_ACCOUNT}) {
+      for (const auto permission : {config::owner_name, config::active_name, AUTH_EXT_PERMISSION, OTHER_PERMISSION}) {
+         BOOST_CHECK_MESSAGE(notify_onlinkauth(target, permission, replacement_key),
+                             "onlinkauth for " << target.to_string() << "@" << permission.to_string()
+                                               << " did not commit as a plain notification");
+      }
+   }
+   BOOST_CHECK_MESSAGE(permissions_of(config::system_account_name) == sysio_before, "sysio permissions changed");
+   BOOST_CHECK_MESSAGE(permissions_of(CLAIM_ACCOUNT) == user_before, "claimacct permissions changed");
+} FC_LOG_AND_RETHROW() }
+
+// No node owner may claim a name under the reserved sysio. prefix: the depot's claim is rejected as NAME_INVALID and
+// no account is created.
+BOOST_FIXTURE_TEST_CASE(node_owner_claim_rejects_reserved_system_name, node_owner_claim_tester) { try {
+   bootstrap_for_dispatch(NODE_OWNER_SOURCE_CHAIN);
+   deploy_system_contract();
+
+   claim_node_owner(RESERVED_SYSTEM_NAME, get_public_key(RESERVED_SYSTEM_NAME, "active"));
+
+   const auto audit = get_nodeownerreg(RESERVED_SYSTEM_NAME);
+   BOOST_REQUIRE(!audit.is_null());
+   BOOST_CHECK_EQUAL(audit["status"].as<uint64_t>(), sysio_system::test_support::nodeownerreg::status_rejected);
+   BOOST_CHECK_EQUAL(audit["reason"].as<uint64_t>(), sysio_system::test_support::nodeownerreg::reason_name_invalid);
+   BOOST_CHECK(get_nodeowner(RESERVED_SYSTEM_NAME).is_null());
+   BOOST_CHECK(!account_exists(RESERVED_SYSTEM_NAME));
 } FC_LOG_AND_RETHROW() }
 
 /// Regression: a non-advancing advance() must not permanently strand the epoch.
@@ -2267,11 +2475,13 @@ BOOST_FIXTURE_TEST_CASE(swap_missing_dst_authex_recovers_after_exact_uic_replay,
 
    const auto solana_link_key = fc::crypto::private_key::generate(
       fc::crypto::private_key::key_type::ed).get_public_key();
+   const auto solana_link_raw = solana_link_key.get<fc::crypto::ed::public_key_shim>().serialize();
    BOOST_REQUIRE_EQUAL(success(), push(
       AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
          ("account", UWRIT_OP)
          ("chain_kind", ChainKind::CHAIN_KIND_SVM)
-         ("pub_key", solana_link_key)));
+         ("pub_key", solana_link_key)
+         ("native_address", std::vector<char>(solana_link_raw.begin(), solana_link_raw.end()))));
    produce_block();
 
    BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
@@ -3817,11 +4027,13 @@ BOOST_FIXTURE_TEST_CASE(swap_forged_claim_cannot_overwrite_honest_candidate,
          ("outpost", sysio_system::test_support::no_outpost_mvo())));
    const auto solana_link_key = fc::crypto::private_key::generate(
       fc::crypto::private_key::key_type::ed).get_public_key();
+   const auto solana_link_raw = solana_link_key.get<fc::crypto::ed::public_key_shim>().serialize();
    BOOST_REQUIRE_EQUAL(success(), push(
       AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
          ("account", UWRIT_OP)
          ("chain_kind", ChainKind::CHAIN_KIND_SVM)
-         ("pub_key", solana_link_key)));
+         ("pub_key", solana_link_key)
+         ("native_address", std::vector<char>(solana_link_raw.begin(), solana_link_raw.end()))));
    setup_wire_token_and_reserves();
 
    const uint64_t eth       = fc::slug_name{"ETH"}.value;
@@ -4375,7 +4587,8 @@ BOOST_FIXTURE_TEST_CASE(swap_race_time_reserve_drain_rejects_request,
       AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
          ("account", UWRIT_OP)
          ("chain_kind", ChainKind::CHAIN_KIND_SVM)
-         ("pub_key", solana_link_key)));
+         ("pub_key", solana_link_key)
+         ("native_address", std::vector<char>(32, '\x0b'))));
    setup_wire_token_and_reserves();
 
    const uint64_t eth       = fc::slug_name{"ETH"}.value;
@@ -4485,7 +4698,8 @@ BOOST_FIXTURE_TEST_CASE(swap_replayed_uic_variance_drift_rejects_request,
       AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
          ("account", UWRIT_OP)
          ("chain_kind", ChainKind::CHAIN_KIND_SVM)
-         ("pub_key", solana_link_key)));
+         ("pub_key", solana_link_key)
+         ("native_address", std::vector<char>(32, '\x0b'))));
    produce_block();
 
    BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(

@@ -2,6 +2,8 @@
 #include "finalizer_test_keys.hpp"
 
 #include <sysio/chain/kv_table_objects.hpp>
+#include <fc/crypto/bls_public_key.hpp>
+#include <fc/crypto/bls_signature.hpp>
 #include <sysio/opp/opp.hpp>
 #include <boost/test/unit_test.hpp>
 
@@ -9,6 +11,13 @@ using namespace sysio_system;
 using namespace sysio_test;
 
 struct finalizer_key_tester : sysio_system_tester {
+
+   finalizer_key_tester() {
+      // Finalizer tests use Alice and Bob as producers directly. Producer registration now
+      // requires an ACTIVE producer operator, so model them as genesis fixtures up front.
+      deploy_opreg_once();
+      register_producer_operators({"alice1111111"_n, "bob111111111"_n});
+   }
 
    fc::variant get_finalizer_key_info( uint64_t id ) {
       vector<char> data = get_row_by_id( config::system_account_name, config::system_account_name, "finkeys"_n, id );
@@ -199,6 +208,48 @@ BOOST_FIXTURE_TEST_CASE(register_finalizer_key_by_same_finalizer_tests, finalize
    BOOST_REQUIRE_EQUAL( active_key_id, alice_info["active_key_id"].as_uint64() ); // active key should not change
 }
 FC_LOG_AND_RETHROW() // register_finalizer_key_by_same_finalizer_tests
+
+BOOST_FIXTURE_TEST_CASE(register_finalizer_key_bills_system_ram, finalizer_key_tester) try {
+   BOOST_REQUIRE_EQUAL( success(), regproducer(alice) );
+
+   auto& resource_limits = control->get_mutable_resource_limits_manager();
+   const int64_t alice_before = resource_limits.get_account_ram_usage(alice);
+   const int64_t sysio_before = resource_limits.get_account_ram_usage(config::system_account_name);
+   resource_limits.set_account_limits(alice, alice_before, -1, -1, false);
+
+   BOOST_REQUIRE_EQUAL( success(), register_finalizer_key(alice, finalizer_key_1, pop_1) );
+
+   BOOST_REQUIRE_EQUAL(alice_before, resource_limits.get_account_ram_usage(alice));
+   BOOST_REQUIRE_GT(resource_limits.get_account_ram_usage(config::system_account_name), sysio_before);
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE(register_finalizer_key_caps_retained_keys, finalizer_key_tester) try {
+   constexpr uint32_t max_retained_finalizer_keys = 5;
+   BOOST_REQUIRE_EQUAL( success(), regproducer(alice) );
+   BOOST_REQUIRE_GE(key_pairs.size(), max_retained_finalizer_keys + 1);
+
+   for (uint32_t i = 0; i < max_retained_finalizer_keys; ++i) {
+      BOOST_REQUIRE_EQUAL(
+         success(), register_finalizer_key(alice, key_pairs[i].pub_key, key_pairs[i].pop));
+   }
+   BOOST_REQUIRE_EQUAL(
+      wasm_assert_msg("finalizer cannot register more than 5 keys"),
+      register_finalizer_key(
+         alice, key_pairs[max_retained_finalizer_keys].pub_key,
+         key_pairs[max_retained_finalizer_keys].pop));
+
+   // Rotation needs only two keys; deleting an inactive key immediately frees one bounded slot.
+   BOOST_REQUIRE_EQUAL(
+      success(), delete_finalizer_key(
+         alice, key_pairs[max_retained_finalizer_keys - 1].pub_key));
+   BOOST_REQUIRE_EQUAL(
+      success(), register_finalizer_key(
+         alice, key_pairs[max_retained_finalizer_keys].pub_key,
+         key_pairs[max_retained_finalizer_keys].pop));
+   BOOST_REQUIRE_EQUAL(
+      max_retained_finalizer_keys,
+      get_finalizer_info(alice)["finalizer_key_count"].as_uint64());
+} FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE(register_finalizer_key_duplicate_key_tests, finalizer_key_tester) try {
    add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
@@ -669,5 +720,38 @@ BOOST_FIXTURE_TEST_CASE(verify_controller_schedule_and_policy_test, finalizer_ke
    }
 }
 FC_LOG_AND_RETHROW()
+
+
+// A finalizer key that no proof of possession can screen out: the pairing bls_pop_verify computes
+// is e(-g1, sig) * e(pk, H(pk)), and both terms are 1 when the points are the identity.
+BOOST_FIXTURE_TEST_CASE(reject_identity_finalizer_key, finalizer_key_tester) try {
+   add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+   BOOST_REQUIRE_EQUAL( success(), regproducer(alice) );
+
+   const std::string identity_key = fc::crypto::bls::public_key::to_string(fc::crypto::bls::public_key_data{});
+   const std::string identity_pop = fc::crypto::bls::signature::to_string(fc::crypto::bls::signature_data{});
+
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("finalizer key must not be the identity point"),
+                        register_finalizer_key(alice, identity_key, identity_pop) );
+
+   // Bytes with a valid encoding that are not a point on the curve. set_finalizers raises while
+   // deserializing one, before the policy is even validated.
+   fc::crypto::bls::public_key_data off_curve;
+   off_curve.fill(0xff);
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("finalizer key is not a valid G1 point"),
+                        register_finalizer_key(alice, fc::crypto::bls::public_key::to_string(off_curve), identity_pop) );
+
+   // Affine (0, 2) is canonical, on the curve, and not the identity, but its order is 3. That is
+   // coprime to r, so it pairs to one against any G2 point and the proof of possession above
+   // accepts it -- only a subgroup test rejects it.
+   fc::crypto::bls::public_key_data small_order{};
+   small_order[48] = 2;
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg("finalizer key is not in the r-order subgroup"),
+                        register_finalizer_key(alice, fc::crypto::bls::public_key::to_string(small_order),
+                                               identity_pop) );
+
+   // An honest key is unaffected.
+   BOOST_REQUIRE_EQUAL( success(), register_finalizer_key(alice, key_pairs[0].pub_key, key_pairs[0].pop) );
+} FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

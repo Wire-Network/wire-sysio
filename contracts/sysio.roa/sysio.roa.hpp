@@ -143,10 +143,13 @@ namespace sysio {
              * @param eth_pub_key  The depositor's ETH public key (Wire PUB_EM format); recorded as the link.
              * @param wire_pub_key The Wire account owner/active key the claim specified; an existing
              *                     account must be controlled by exactly this key or the claim is rejected.
+             * @param eth_address  Depositor 20-byte ETH address used to sweep DClaim rewards
+             *                     deposited before the link existed.
              */
             [[sysio::action]]
             void nodeownreg(const name& owner, const uint8_t& tier, const public_key& eth_pub_key,
-                            const public_key& wire_pub_key);
+                            const public_key& wire_pub_key,
+                            const bytes& eth_address);
 
             /**
              * @brief Creates a new user account on the network and records the sponsor mapping.
@@ -160,7 +163,9 @@ namespace sysio {
              * - The action will create a new account utilizing a new randomly generated username with the provided `pubkey` as its authority.
              * - The registration count for the `creator` will be incremented.
              * - The sponsor mapping (creator, nonce -> username) will be recorded in the sponsors table.
-             * - The action will fail if the `creator` is not a tier-1 node owner or if the account already exists.
+             * - The action fails if ROA is inactive, the `creator` is not a tier-1 node owner, the
+             *   creator name cannot fit a generated suffix, the nonce was already used by that creator,
+             *   or no unused generated name is found within the bounded candidate search.
              *
              * ### Rights Granted
              * - The new user account is granted access to the network with the specified public key.
@@ -176,11 +181,12 @@ namespace sysio {
             /**
              * @brief Create a node-owner account with a user-chosen (vanity) name and the holder's
              * K1 key as owner/active, funded with the fixed newaccount_ram from sysio's pool. The
-             * create step of the OPP NFT claim flow (create -> createlink -> nodeownreg).
+             * create step of the OPP NFT claim flow (newnameduser -> nodeownreg, whose inline
+             * recordlink records the external-chain link and sweeps pre-link rewards).
              *
-             * Dispatched by the OPP depot (sysio.msgch) as {sysio.roa, active} via delegation, like
-             * nodeownreg. Idempotent: a no-op if the account already exists. Tier-based name rules:
-             * tier-1 = 2-6 char prefix; tier 2/3 = up to 12 chars.
+             * Dispatched by privileged sysio.msgch as {sysio.roa, active}, without a cross-contract
+             * active grant, like nodeownreg. Idempotent: a no-op if the account already exists.
+             * Tier-based name rules: tier-1 = 2-6 char prefix; tier 2/3 = up to 12 chars.
              *
              * @param account The user-chosen account name.
              * @param pubkey  The holder's K1 public key (becomes owner and active).
@@ -371,7 +377,7 @@ namespace sysio {
             // to migrate.)
             enum reject_reason : uint8_t {
                 NONE                 = 0,  // not rejected
-                NAME_INVALID         = 1,  // chosen account name violates the tier's length rule
+                NAME_INVALID         = 1,  // chosen name violates the tier's length rule or is a reserved sysio. name
                 OWNER_NOT_ACCOUNT    = 2,  // account does not exist (creation did not occur)
                 ACCOUNT_KEY_MISMATCH = 3,  // existing account's active authority != the single claimed wire key
                 DUPLICATE            = 4,  // owner is already a registered node owner
@@ -486,14 +492,15 @@ namespace sysio {
                                 uint8_t network_gen);
 
             /**
-             * @brief Whether `account`'s name satisfies the node-owner name-length rule for `tier`.
+             * @brief Whether `account`'s name satisfies the node-owner naming rules for `tier`.
              *        Tier-1 owners take a short 2-6 char prefix (sub-accounts become <prefix>.<random>);
-             *        tier 2/3 take a 1-12 char vanity name. Shared by newnameduser (gates creation) and
-             *        nodeownreg (records NAME_INVALID) so the rule lives in one place.
+             *        tier 2/3 take a 1-12 char vanity name, and no tier may take a name under the reserved
+             *        `sysio.` prefix. Shared by newnameduser (gates creation) and nodeownreg (records
+             *        NAME_INVALID) so the rule lives in one place.
              *
              * @param account The chosen account name.
              * @param tier    Node-owner tier (must already be validated to 1-3).
-             * @return true if the name length is valid for the tier.
+             * @return true if the name is valid for the tier.
              */
             static bool valid_name_for_tier(const name& account, uint8_t tier);
 

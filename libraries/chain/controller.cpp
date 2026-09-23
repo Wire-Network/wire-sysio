@@ -2469,7 +2469,6 @@ struct controller_impl {
          if (_update_produced_block_metrics) {
             produced_block_metrics metrics;
             metrics.subjective_bill_account_size_total = subjective_bill.get_account_cache_size();
-            metrics.scheduled_trxs_total = 0;
             metrics.trxs_produced_total = new_b->transactions.size();
             metrics.cpu_usage_us = br.total_cpu_usage_us;
             metrics.total_elapsed_time_us = br.total_elapsed_time.count();

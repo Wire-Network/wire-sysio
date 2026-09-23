@@ -100,8 +100,13 @@ namespace sysio {
 
       /// Internal: sweep an `unmapped_tokens` entry into `pending_claims` when
       /// the staker / purchaser completes AuthX linking. Called inline by
-      /// `sysio.authex` after a successful link. No-op if nothing matches.
-      /// Auth=sysio.authex.
+      /// `sysio.authex` after a successful link. An already-expired unmapped
+      /// row is forfeited instead of being re-stamped with a fresh window. A
+      /// live row retains its absolute expiry when it creates a pending row;
+      /// when it joins an existing account aggregate, the later effective
+      /// deadline governs the aggregate so newer rewards cannot expire early.
+      /// Its WIRE stays in the DClaim capital fund if expired. No-op if nothing
+      /// matches. Auth=sysio.authex.
       [[sysio::action]]
       void linkswept(name wire_account,
                      opp::types::ChainKind chain,

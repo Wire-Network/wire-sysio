@@ -150,8 +150,7 @@ client_impl::target_info client_impl::normalize_target(const url& target) {
       result.tls = result.scheme == scheme_https;
       result.service = target.port() ? std::to_string(*target.port())
                                      : std::string(result.tls ? default_https_service : default_http_service);
-      const bool ipv6 = result.host.find(':') != std::string::npos;
-      result.host_header = ipv6 ? "[" + result.host + "]" : result.host;
+      result.host_header = authority_host(result.host);
       const bool default_port = !target.port() || (result.tls && *target.port() == default_https_port) ||
                                 (!result.tls && *target.port() == default_http_port);
       if (!default_port)
@@ -171,8 +170,7 @@ asio::awaitable<void> client_impl::connect_tcp(const std::shared_ptr<connection_
                                                const std::vector<tcp::endpoint>& endpoints, const std::string& host,
                                                const std::string& service, std::optional<operation_deadline> deadline,
                                                const std::shared_ptr<request_control>& control) {
-   arm_operation_deadline(stream, deadline);
-   active_cancel_guard cancel_guard(control, [connection] { connection->cancel(); });
+   auto cancel_guard = begin_operation(connection, stream, deadline, control);
    error_code error;
    (void)co_await stream.async_connect(endpoints, asio::redirect_error(asio::use_awaitable, error));
    throw_if_operation_failed(error, deadline, control);
@@ -188,8 +186,7 @@ asio::awaitable<void> client_impl::establish_proxy_tunnel(const std::shared_ptr<
                                                           const target_info& target, const request_options& policy,
                                                           std::optional<operation_deadline> connect_deadline,
                                                           const std::shared_ptr<request_control>& control) {
-   const bool ipv6 = target.host.find(':') != std::string::npos;
-   const auto connect_authority = (ipv6 ? "[" + target.host + "]" : target.host) + ":" + target.service;
+   const auto connect_authority = authority_host(target.host) + ":" + target.service;
    beast_http::request<beast_http::empty_body> connect_request{beast_http::verb::connect, connect_authority,
                                                                http_version_1_1};
    connect_request.set(beast_http::field::host, connect_authority);
@@ -197,12 +194,15 @@ asio::awaitable<void> client_impl::establish_proxy_tunnel(const std::shared_ptr<
    co_await write_request(connection, stream, connect_request, connect_deadline, control);
 
    beast::flat_buffer buffer(policy.max_response_header_bytes);
-   beast_http::response_parser<beast_http::empty_body> parser;
-   parser.header_limit(policy.max_response_header_bytes);
-   co_await read_header(connection, stream, buffer, parser, policy, connect_deadline, control);
-   if (parser.get().result() != beast_http::status::ok) {
+   // A proxy may send an interim response before 200 Connection Established, so this shares the
+   // request path's skip loop rather than treating the first header as the tunnel's answer. The
+   // buffer is retained across parser restarts because the following head may already be in it.
+   std::optional<beast_http::response_parser<beast_http::empty_body>> parser;
+   restart_response_parser(parser, policy);
+   co_await read_final_header(connection, stream, buffer, parser, policy, connect_deadline, control);
+   if (parser->get().result() != beast_http::status::ok) {
       throw transport_failure(failure_kind::connect,
-                              "proxy tunnel failed with HTTP status " + std::to_string(parser.get().result_int()));
+                              "proxy tunnel failed with HTTP status " + std::to_string(parser->get().result_int()));
    }
 }
 
@@ -215,8 +215,7 @@ client_impl::create_connection(const target_info& target, const request_options&
       auto connection = std::make_shared<connection_state>(
          connection_state::stream_variant{std::make_unique<connection_state::unix_stream>(strand)});
       auto& stream = *std::get<std::unique_ptr<connection_state::unix_stream>>(connection->stream);
-      arm_operation_deadline(stream, connect_deadline);
-      active_cancel_guard cancel_guard(control, [connection] { connection->cancel(); });
+      auto cancel_guard = begin_operation(connection, stream, connect_deadline, control);
       error_code error;
       co_await stream.async_connect(local::stream_protocol::endpoint(*target.unix_socket_path),
                                     asio::redirect_error(asio::use_awaitable, error));
@@ -277,8 +276,7 @@ client_impl::create_connection(const target_info& target, const request_options&
       return verified;
    });
 
-   arm_operation_deadline(stream, connect_deadline);
-   active_cancel_guard cancel_guard(control, [connection] { connection->cancel(); });
+   auto cancel_guard = begin_operation(connection, stream, connect_deadline, control);
    error_code error;
    co_await stream.async_handshake(asio::ssl::stream_base::client, asio::redirect_error(asio::use_awaitable, error));
    throw_if_operation_failed(error, connect_deadline, control);

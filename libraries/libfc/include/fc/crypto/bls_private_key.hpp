@@ -67,7 +67,7 @@ private:
 /**
  * @brief Shim class for BLS public key operations
  */
-struct public_key_shim {
+struct public_key_shim : fc::reflect_init {
    using data_type = public_key_data;
 
    /** @brief Checks if the public key is valid */
@@ -97,13 +97,24 @@ struct public_key_shim {
       return *this;
    }
 
+   /**
+    * Reject a deserialized shim whose payload is absent.
+    *
+    * The reflected member is the shared_ptr itself and fc packs a presence flag ahead of it, so a
+    * false flag unpacks to a null pointer that valid(), to_string(), serialize() and unwrapped()
+    * would all dereference. Both constructors allocate, so deserialization is the only way to
+    * reach that state; fc calls this after unpacking a reflected type, which turns it into a
+    * controlled exception where the bytes are read.
+    */
+   void reflector_init() { FC_ASSERT(shim_ptr, "BLS public key has no payload"); }
+
    std::shared_ptr<shim<data_type>> shim_ptr;
 };
 
 /**
  * @brief Shim class for BLS signature operations
  */
-struct signature_shim {
+struct signature_shim : fc::reflect_init {
    using data_type = compact_signature;
 
    /** @brief Indicates if signature is recoverable */
@@ -125,6 +136,9 @@ struct signature_shim {
       shim_ptr->_data = other;
       return *this;
    }
+
+   /** Reject a deserialized shim whose payload is absent -- see public_key_shim::reflector_init. */
+   void reflector_init() { FC_ASSERT(shim_ptr, "BLS signature has no payload"); }
 
    /**
     * Not supported, throws.

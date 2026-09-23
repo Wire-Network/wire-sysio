@@ -54,8 +54,8 @@ namespace sysiosystem {
          // Drain any pending rescore BEFORE rebuilding, so the rebuild sees the freshest scores it
          // can. A sweep spans many ticks and the rebuild does NOT wait for it: ranking is allowed
          // to converge, and the alternative -- holding the schedule until the sweep finishes --
-         // would put both the schedule and the finalizer policy behind an unbounded, permissionless
-         // table. See `update_ranked_producers`.
+         // would put both the schedule and the finalizer policy behind a roster that may retain a
+         // large number of historical rows. See `update_ranked_producers`.
          drain_rescore_cursor();
          update_ranked_producers( timestamp );
       }

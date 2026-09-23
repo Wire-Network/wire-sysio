@@ -4,6 +4,7 @@
  */
 
 #include <fc/filesystem.hpp>
+#include <fc/io/json.hpp>
 #include <fc/network/http/http_client.hpp>
 #include <fc/task/deadline.hpp>
 
@@ -32,6 +33,7 @@
 #include <memory>
 #include <mutex>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -80,6 +82,11 @@ constexpr size_t disk_space_budget_bytes = 64 * 1024 * 1024;
 constexpr size_t large_body_chunk_bytes = 1024 * 1024;
 constexpr size_t oversized_chunk_extension_bytes = 128 * 1024;
 constexpr std::string_view exact_body = "12345678";
+constexpr int64_t remote_error_code = 3'010'001;
+constexpr std::string_view remote_error_name = "wallet_locked_exception";
+constexpr std::string_view remote_error_what = "Wallet is locked";
+constexpr std::string_view remote_error_detail = "unlock the wallet before signing";
+constexpr std::string_view remote_error_page = "<html><body>Internal Server Error</body></html>";
 
 /** Return finite policy used by deterministic shared-transport tests. */
 fc::http::request_options tls_request_options();
@@ -387,6 +394,18 @@ std::string keep_alive_metadata_response() {
           "Connection: keep-alive\r\n\r\n{}";
 }
 
+/** Return the JSON error envelope a remote node emits alongside an HTTP 500 response. */
+std::string remote_error_response_body() {
+   fc::mutable_variant_object detail;
+   detail("message", std::string(remote_error_detail));
+   fc::mutable_variant_object remote_error;
+   remote_error("code", remote_error_code)("name", std::string(remote_error_name))(
+      "what", std::string(remote_error_what))("details", fc::variants{fc::variant(std::move(detail))});
+   fc::mutable_variant_object envelope;
+   envelope("error", fc::variant(std::move(remote_error)));
+   return fc::json::to_string(fc::variant(std::move(envelope)), fc::time_point::maximum());
+}
+
 /** Write @p body_bytes bytes in bounded blocks. */
 bool write_repeated_body(tcp::socket& socket, uint64_t body_bytes) {
    const std::string block(large_body_chunk_bytes, 'x');
@@ -422,6 +441,26 @@ fc::http_file_download_options download_options(uint64_t max_body_bytes) {
       .max_response_body_bytes = max_body_bytes,
       .retry_failed_reused_connection = false,
    };
+}
+
+/**
+ * A loopback port that refuses connections.
+ *
+ * Bound briefly so the kernel hands out a port nothing else holds, never listened on, then
+ * released. The socket must never listen: a port that has listened keeps accepting for a short
+ * window after it closes on hosts whose listener teardown is asynchronous -- WSL2 mirrored
+ * networking among them -- and the connection is then reset, which the transport correctly
+ * reports as an io failure rather than a connect failure. Holding the socket open instead of
+ * closing it does not work either: a bound-but-unlistening socket does not produce a connect
+ * failure on macOS.
+ */
+uint16_t unconnectable_loopback_port() {
+   boost::asio::io_context io;
+   tcp::socket probe(io, tcp::endpoint(boost::asio::ip::address_v4::loopback(), 0));
+   const auto port = probe.local_endpoint().port();
+   boost::system::error_code ec;
+   probe.close(ec);
+   return port;
 }
 
 /** Return the URL for @p server. */
@@ -766,6 +805,135 @@ BOOST_AUTO_TEST_CASE(idle_connection_pool_cap_can_disable_reuse) {
    BOOST_CHECK_EQUAL(connections.load(), 2U);
 }
 
+/// An interim 1xx response is consumed, and the final response reaches the caller.
+BOOST_AUTO_TEST_CASE(interim_response_is_not_delivered_as_final) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
+      (void)write_bytes(socket, "HTTP/1.1 103 Early Hints\r\n"
+                                "Link: </s.css>; rel=preload\r\n\r\n");
+      (void)write_bytes(socket, "HTTP/1.1 200 OK\r\n"
+                                "Content-Length: 5\r\n"
+                                "Connection: close\r\n\r\nfinal");
+   });
+   fc::http::transport transport;
+
+   const auto response = transport.perform(
+      fc::http::request{
+         .method = fc::http::request_method::get,
+         .target = server_url(server),
+      },
+      tls_request_options());
+
+   BOOST_CHECK_EQUAL(response.status, 200U);
+   BOOST_CHECK_EQUAL(response.body, "final");
+}
+
+/// A 1xx status Beast does not recognize is still interim, and is consumed like any other.
+///
+/// The status class has to be taken from the raw code: `result()` maps an unregistered status to
+/// `status::unknown`, which falls outside the informational class and would hand this response to
+/// the caller as if it were final.
+BOOST_AUTO_TEST_CASE(unregistered_interim_status_is_consumed) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
+      (void)write_bytes(socket, "HTTP/1.1 199 Unassigned\r\n\r\n");
+      (void)write_bytes(socket, "HTTP/1.1 200 OK\r\n"
+                                "Content-Length: 5\r\n"
+                                "Connection: close\r\n\r\nfinal");
+   });
+   fc::http::transport transport;
+
+   const auto response = transport.perform(
+      fc::http::request{
+         .method = fc::http::request_method::get,
+         .target = server_url(server),
+      },
+      tls_request_options());
+
+   BOOST_CHECK_EQUAL(response.status, 200U);
+   BOOST_CHECK_EQUAL(response.body, "final");
+}
+
+/// An interim response must not return the connection to the idle pool mid-exchange.
+///
+/// Pooling after the interim header would hand the next request a connection with the first
+/// request's real response still queued on it, so the second caller reads the first one's body.
+BOOST_AUTO_TEST_CASE(interim_response_does_not_poison_the_idle_pool) {
+   scripted_http_server server(
+      [](tcp::socket& socket, const std::atomic_bool&) {
+         (void)write_bytes(socket, "HTTP/1.1 103 Early Hints\r\n\r\n");
+         (void)write_bytes(socket, "HTTP/1.1 200 OK\r\n"
+                                   "Content-Length: 5\r\n"
+                                   "Connection: keep-alive\r\n\r\nfirst");
+         // Wait for the second request before answering it. Writing both responses up front
+         // would leave unsolicited bytes on the idle connection, which the transport correctly
+         // rejects on reuse, so the pooling this test is about would never be exercised.
+         boost::system::error_code error;
+         boost::asio::streambuf next_request;
+         boost::asio::read_until(socket, next_request, "\r\n\r\n", error);
+         if (error)
+            return;
+         (void)write_bytes(socket, "HTTP/1.1 200 OK\r\n"
+                                   "Content-Length: 6\r\n"
+                                   "Connection: close\r\n\r\nsecond");
+      },
+      true, 1);
+   fc::http::transport transport;
+   const fc::http::request request{
+      .method = fc::http::request_method::get,
+      .target = server_url(server),
+   };
+
+   BOOST_CHECK_EQUAL(transport.perform(request, tls_request_options()).body, "first");
+   BOOST_CHECK_EQUAL(transport.perform(request, tls_request_options()).body, "second");
+}
+
+/// 101 is rejected rather than consumed: no final response follows it, so waiting would hang.
+///
+/// The snapshot download path disables every deadline, so treating 101 as interim would block
+/// forever there rather than failing.
+BOOST_AUTO_TEST_CASE(switching_protocols_is_rejected_not_awaited) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool& stop) {
+      (void)write_bytes(socket, "HTTP/1.1 101 Switching Protocols\r\n"
+                                "Upgrade: websocket\r\n"
+                                "Connection: Upgrade\r\n\r\n");
+      // Whatever follows a 101 belongs to the negotiated protocol. Hold the socket open so the
+      // test fails by hanging if the client ever waits for an HTTP response that cannot arrive.
+      while (!stop.load())
+         std::this_thread::sleep_for(10ms);
+   });
+   fc::http::transport transport;
+
+   BOOST_CHECK_EXCEPTION(transport.perform(
+                            fc::http::request{
+                               .method = fc::http::request_method::get,
+                               .target = server_url(server),
+                            },
+                            tls_request_options()),
+                         fc::exception, [](const fc::exception& error) {
+                            return error.to_detail_string().find("switched protocols") != std::string::npos;
+                         });
+}
+
+/// A peer that only ever sends interim responses is cut off rather than read forever.
+BOOST_AUTO_TEST_CASE(unbounded_interim_responses_are_rejected) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool& stop) {
+      while (!stop.load()) {
+         if (!write_bytes(socket, "HTTP/1.1 103 Early Hints\r\n\r\n"))
+            return;
+      }
+   });
+   fc::http::transport transport;
+
+   BOOST_CHECK_EXCEPTION(transport.perform(
+                            fc::http::request{
+                               .method = fc::http::request_method::get,
+                               .target = server_url(server),
+                            },
+                            tls_request_options()),
+                         fc::exception, [](const fc::exception& error) {
+                            return error.to_detail_string().find("interim responses") != std::string::npos;
+                         });
+}
+
 /// Connections older than the configured idle age are closed before reuse.
 BOOST_AUTO_TEST_CASE(expired_idle_connection_is_not_reused) {
    std::atomic_uint32_t connections{0};
@@ -1026,6 +1194,48 @@ BOOST_AUTO_TEST_CASE(explicit_proxy_connect_uses_ipv6_authority_and_port) {
                          });
    std::scoped_lock lock(observed_mutex);
    BOOST_CHECK(observed_request.starts_with("CONNECT [2001:db8::1]:443 HTTP/1.1\r\n"));
+}
+
+/// A proxy may send an interim response before 200 Connection Established, and CONNECT consumes
+/// it exactly as the request path does.
+///
+/// Both headers go out in a single write so the 200 is already sitting in the read buffer when
+/// the parser restarts: a loop that discarded the buffer along with the parser would lose it.
+///
+/// The assertion is on the wire rather than on an error string. A client that accepted the tunnel
+/// starts its TLS handshake, so a ClientHello arrives; one that stopped at the interim status
+/// closes without sending anything.
+BOOST_AUTO_TEST_CASE(proxy_connect_consumes_an_interim_response) {
+   constexpr uint8_t tls_handshake_record_type = 0x16;
+   std::atomic_bool  client_hello_observed{false};
+   scripted_http_server proxy(
+      [&](tcp::socket& socket, const std::atomic_bool&) {
+         if (read_request_header(socket).empty())
+            return;
+         write_bytes(socket, "HTTP/1.1 103 Early Hints\r\n"
+                             "Link: </s.css>; rel=preload\r\n\r\n"
+                             "HTTP/1.1 200 Connection Established\r\n\r\n");
+         std::array<uint8_t, 1> first_byte{};
+         boost::system::error_code error;
+         if (boost::asio::read(socket, boost::asio::buffer(first_byte), error) == first_byte.size())
+            client_hello_observed = first_byte[0] == tls_handshake_record_type;
+      },
+      false);
+   fc::http::transport transport(fc::http::transport_options{
+      .proxy = "http://127.0.0.1:" + std::to_string(proxy.port()),
+   });
+
+   // The tunnel leads nowhere, so the request still fails — but past CONNECT, in TLS.
+   BOOST_CHECK_EXCEPTION(transport.perform(
+                            fc::http::request{
+                               .method = fc::http::request_method::get,
+                               .target = fc::url("https://127.0.0.1/"),
+                            },
+                            tls_request_options()),
+                         fc::exception, [](const fc::exception& error) {
+                            return error.to_detail_string().find("proxy tunnel failed") == std::string::npos;
+                         });
+   BOOST_CHECK(client_hello_observed.load());
 }
 
 /// Proxy credentials are rejected because this transport has no implicit authentication policy.
@@ -1329,11 +1539,7 @@ BOOST_AUTO_TEST_CASE(dns_resolver_start_failure_is_classified) {
 
 /// A successful injected DNS result is used for the bounded connection attempt.
 BOOST_AUTO_TEST_CASE(dns_resolution_accepts_completed_lookup) {
-   boost::asio::io_context io;
-   tcp::acceptor closed_listener(io, tcp::endpoint(boost::asio::ip::address_v4::loopback(), 0));
-   const auto closed_port = closed_listener.local_endpoint().port();
-   boost::system::error_code close_error;
-   closed_listener.close(close_error);
+   const auto refused_port = unconnectable_loopback_port();
    std::atomic_uint32_t resolve_count{0};
    auto resolver = [&](const std::string&, const std::string&, fc::time_point,
                        fc::http::detail::resolver_complete_fn complete) {
@@ -1341,7 +1547,7 @@ BOOST_AUTO_TEST_CASE(dns_resolution_accepts_completed_lookup) {
       complete(std::nullopt, {
                                 {
                                  .address = "127.0.0.1",
-                                 .port = closed_port,
+                                 .port = refused_port,
                                  }
       });
       return [] {};
@@ -1362,11 +1568,7 @@ BOOST_AUTO_TEST_CASE(dns_resolution_accepts_completed_lookup) {
 
 /// DNS TTL and connection-failure refresh are independent cache policies.
 BOOST_AUTO_TEST_CASE(dns_cache_refresh_policy_is_preserved) {
-   boost::asio::io_context io;
-   tcp::acceptor closed_listener(io, tcp::endpoint(boost::asio::ip::address_v4::loopback(), 0));
-   const auto closed_port = closed_listener.local_endpoint().port();
-   boost::system::error_code close_error;
-   closed_listener.close(close_error);
+   const auto refused_port = unconnectable_loopback_port();
 
    const auto exercise = [&](std::optional<fc::microseconds> cache_timeout, bool refresh_on_connection_failure) {
       std::atomic_uint32_t resolve_count{0};
@@ -1380,7 +1582,7 @@ BOOST_AUTO_TEST_CASE(dns_cache_refresh_policy_is_preserved) {
             complete(std::nullopt, {
                                       {
                                        .address = "127.0.0.1",
-                                       .port = closed_port,
+                                       .port = refused_port,
                                        }
             });
             return [] {};
@@ -1426,11 +1628,7 @@ BOOST_AUTO_TEST_CASE(retries_require_explicit_idempotency) {
 
 /// Exhausted retries produce a stable category without replaying more than the configured attempts.
 BOOST_AUTO_TEST_CASE(idempotent_retry_exhaustion_is_bounded) {
-   boost::asio::io_context io;
-   tcp::acceptor closed_listener(io, tcp::endpoint(boost::asio::ip::address_v4::loopback(), 0));
-   const auto closed_port = closed_listener.local_endpoint().port();
-   boost::system::error_code close_error;
-   closed_listener.close(close_error);
+   const auto refused_port = unconnectable_loopback_port();
 
    fc::http::transport transport;
    auto options = tls_request_options();
@@ -1441,11 +1639,41 @@ BOOST_AUTO_TEST_CASE(idempotent_retry_exhaustion_is_bounded) {
    BOOST_CHECK_EXCEPTION(transport.perform(
                             fc::http::request{
                                .method = fc::http::request_method::get,
-                               .target = fc::url("http://127.0.0.1:" + std::to_string(closed_port) + "/"),
+                               .target = fc::url("http://127.0.0.1:" + std::to_string(refused_port) + "/"),
                             },
                             options),
                          fc::exception, [](const fc::exception& error) {
                             return error.to_detail_string().find("retry_exhausted") != std::string::npos;
+                         });
+}
+
+/// A retry hook that breaks its must-not-throw contract fails the request instead of escaping.
+BOOST_AUTO_TEST_CASE(throwing_retry_decision_hook_is_contained) {
+   // A failing injected resolver gives a deterministic retryable failure, so the hook is reached
+   // without depending on some port being closed on the machine running the test.
+   auto transport = fc::http::transport_test_access::create(
+      {},
+      [](const std::string&, const std::string&, fc::time_point,
+         fc::http::detail::resolver_complete_fn complete) -> fc::http::detail::resolver_cancel_fn {
+         complete(std::string("injected resolver failure"), {});
+         return [] {};
+      });
+   auto options = tls_request_options();
+   options.retry.max_attempts = 2;
+   options.retry.initial_backoff = fc::microseconds(0);
+   options.retry.max_backoff = fc::microseconds(0);
+   options.retry.allow_retry = [](const fc::http::retry_context&) -> bool {
+      throw std::runtime_error("retry policy is unavailable");
+   };
+
+   BOOST_CHECK_EXCEPTION(transport.perform(
+                            fc::http::request{
+                               .method = fc::http::request_method::get,
+                               .target = fc::url("http://retry-hook.invalid/"),
+                            },
+                            options),
+                         fc::exception, [](const fc::exception& error) {
+                            return error.to_detail_string().find("retry decision hook threw") != std::string::npos;
                          });
 }
 
@@ -1586,6 +1814,34 @@ BOOST_AUTO_TEST_CASE(slow_progressing_response_body_times_out) {
                             options),
                          fc::timeout_exception, [](const fc::exception& error) {
                             return error.to_detail_string().find("timeout_read") != std::string::npos;
+                         });
+   const auto elapsed = std::chrono::steady_clock::now() - start;
+   BOOST_CHECK_LT(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count(), max_test_elapsed_ms);
+}
+
+/// A body that stops making progress is cut off by the idle deadline alone.
+BOOST_AUTO_TEST_CASE(stalled_response_body_times_out_on_the_idle_deadline) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool& stop) {
+      if (!write_bytes(socket, fixed_length_header(1'000) + std::string(16, 'x')))
+         return;
+      while (!stop.load())
+         std::this_thread::sleep_for(10ms);
+   });
+   fc::http::transport transport;
+   auto options = tls_request_options();
+   options.timeouts.idle = fc::milliseconds(200);
+   options.timeouts.read = std::nullopt;
+   options.timeouts.total = std::nullopt;
+   const auto start = std::chrono::steady_clock::now();
+
+   BOOST_CHECK_EXCEPTION(transport.perform(
+                            fc::http::request{
+                               .method = fc::http::request_method::get,
+                               .target = fc::url("http://127.0.0.1:" + std::to_string(server.port()) + "/"),
+                            },
+                            options),
+                         fc::timeout_exception, [](const fc::exception& error) {
+                            return error.to_detail_string().find("timeout_idle") != std::string::npos;
                          });
    const auto elapsed = std::chrono::steady_clock::now() - start;
    BOOST_CHECK_LT(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count(), max_test_elapsed_ms);
@@ -1955,6 +2211,52 @@ BOOST_AUTO_TEST_CASE(post_sync_can_be_cancelled) {
    BOOST_CHECK_LT(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count(), max_test_elapsed_ms);
 }
 
+/// A 500 error envelope is rebuilt locally with the remote code, name, message, and nested details.
+BOOST_AUTO_TEST_CASE(post_sync_rethrows_a_remote_error_envelope) {
+   const std::string body = remote_error_response_body();
+   scripted_http_server server([&](tcp::socket& socket, const std::atomic_bool&) {
+      write_bytes(socket, fixed_length_header(body.size(), "500 Internal Server Error") + body);
+   });
+   fc::http_client client;
+
+   BOOST_CHECK_EXCEPTION(client.post_sync(server_url(server), fc::variant(fc::mutable_variant_object())), fc::exception,
+                         [](const fc::exception& error) {
+                            const auto detail = error.to_detail_string();
+                            return error.code() == remote_error_code &&
+                                   std::string_view(error.name()) == remote_error_name &&
+                                   detail.find(remote_error_what) != std::string::npos &&
+                                   detail.find(remote_error_detail) != std::string::npos;
+                         });
+}
+
+/// A 500 whose body is not JSON is reported as unparseable rather than as a decoded remote error.
+BOOST_AUTO_TEST_CASE(post_sync_reports_an_unparseable_error_response) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
+      write_bytes(socket, fixed_length_header(remote_error_page.size(), "500 Internal Server Error") +
+                             std::string(remote_error_page));
+   });
+   fc::http_client client;
+
+   BOOST_CHECK_EXCEPTION(client.post_sync(server_url(server), fc::variant(fc::mutable_variant_object())), fc::exception,
+                         [](const fc::exception& error) {
+                            return error.to_detail_string().find(
+                                      "Request failed with 500 response, but response was not parseable") !=
+                                   std::string::npos;
+                         });
+}
+
+/// A 404 metadata response names the missing URL instead of falling through to the generic status error.
+BOOST_AUTO_TEST_CASE(post_sync_reports_a_missing_url) {
+   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
+      write_bytes(socket, fixed_length_header(0, "404 Not Found"));
+   });
+   fc::http_client client;
+
+   BOOST_CHECK_EXCEPTION(
+      client.post_sync(server_url(server), fc::variant(fc::mutable_variant_object())), fc::exception,
+      [](const fc::exception& error) { return error.to_detail_string().find("URL not found") != std::string::npos; });
+}
+
 /// An unbounded download clears an expired metadata deadline before reusing the connection.
 BOOST_AUTO_TEST_CASE(healthy_metadata_connection_is_reused_for_download) {
    scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
@@ -2047,18 +2349,14 @@ BOOST_AUTO_TEST_CASE(stale_metadata_reconnect_failure_cleans_up_safely) {
 
 /// The stale-connection flag does not retry a failure on the first fresh connection.
 BOOST_AUTO_TEST_CASE(fresh_download_connection_failure_is_not_retried) {
-   boost::asio::io_context io;
-   tcp::acceptor closed_listener(io, tcp::endpoint(boost::asio::ip::address_v4::loopback(), 0));
-   const auto closed_port = closed_listener.local_endpoint().port();
-   boost::system::error_code close_error;
-   closed_listener.close(close_error);
+   const auto refused_port = unconnectable_loopback_port();
    fc::temp_directory temp;
    const auto output = temp.path() / "fresh-connect-failure.bin";
    fc::http_client client;
    auto options = download_options(exact_body_bytes);
    options.retry_failed_reused_connection = true;
 
-   BOOST_CHECK_EXCEPTION(client.post_to_file(fc::url("http://127.0.0.1:" + std::to_string(closed_port) + "/download"),
+   BOOST_CHECK_EXCEPTION(client.post_to_file(fc::url("http://127.0.0.1:" + std::to_string(refused_port) + "/download"),
                                              fc::variant(fc::mutable_variant_object()), output, options),
                          fc::exception, [](const fc::exception& error) {
                             const auto detail = error.to_detail_string();
@@ -2198,14 +2496,19 @@ BOOST_AUTO_TEST_CASE(oversized_chunk_extension_is_bounded_and_removed) {
    });
    fc::temp_directory temp;
    const auto output = temp.path() / "oversized-chunk-extension.bin";
+   // The idle deadline is a watchdog, not the behaviour under test: the server handler returns
+   // while its socket stays open until the server is destroyed, which cannot happen while the
+   // download is blocked, so a regression that stopped rejecting the extension would hang here
+   // forever. The predicate matches the parser diagnostic specifically, so a watchdog timeout
+   // ends the test as a failure instead of satisfying a bare fc::exception assertion.
    auto options = download_options(exact_body_bytes);
    options.timeouts.idle = fc::milliseconds(200);
 
-   const auto start = std::chrono::steady_clock::now();
-   BOOST_CHECK_THROW(download(server, output, options), fc::exception);
-   const auto elapsed = std::chrono::steady_clock::now() - start;
-
-   BOOST_CHECK_LT(std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count(), max_test_elapsed_ms);
+   BOOST_CHECK_EXCEPTION(download(server, output, options), fc::exception, [](const fc::exception& error) {
+      // Beast refuses to buffer the unterminated extension; a watchdog timeout would instead
+      // report timeout_idle, so this cannot be satisfied by the test simply running long.
+      return error.to_detail_string().find("buffer overflow") != std::string::npos;
+   });
    check_download_files_removed(output);
 }
 
