@@ -138,8 +138,9 @@ namespace sysio {
       /// Holder's authority; sends nothing when nothing is owed.
       [[sysio::action]] void claim(name holder, symbol_code sym);
       /// Distribute `quantity` WIRE to `target`'s holders: the index advances by
-      /// quantity / supply with the remainder carried, the WIRE is pulled from
-      /// `from` by inline transfer, and the kicker is requested from T5.
+      /// quantity / supply with the remainder carried and the WIRE is pulled from
+      /// `from` by inline transfer. The kicker is requested from T5 only when
+      /// `from` is the swap; any other donation distributes itself alone.
       [[sysio::action]] void addyield(name from, asset quantity, symbol_code target);
       /// Fold the kicker `fundclaim` delivered into `sym`'s index: what this
       /// contract's WIRE balance now exceeds `base_balance` by, at most

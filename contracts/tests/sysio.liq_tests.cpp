@@ -634,37 +634,48 @@ BOOST_FIXTURE_TEST_CASE(addyield_requests_the_kicker_from_t5, sysio_liq_tester) 
    BOOST_REQUIRE_EQUAL(success(), mintsynd(SOLANA, 1, "alice"_n, LIQSOL, 100 * UNIT));
    BOOST_REQUIRE_EQUAL(uint32_t(200), config_row().is_null() ? 200u : config_row()["kicker_bps"].as<uint32_t>());
 
-   // The intake's trace carries a fundclaim for this contract at 2%, then the
-   // fold. sysio runs no emissions here, so the request lands nothing and the
-   // fold is a no-op: holders get the base yield and nothing else.
-   auto trace = base_tester::push_action(LIQ_ACCOUNT, "addyield"_n, "carol"_n, mvo()
-      ("from", "carol"_n)("quantity", asset(100 * UNIT, WIRE_SYM))("target", LIQSOL_SYM.to_symbol_code()));
-   produce_block();
-   bool requested = false, folded = false;
-   for (const auto& at : trace->action_traces) {
-      if (at.act.account == SYSIO_ACCOUNT && at.act.name == "fundclaim"_n) {
-         const auto args = fc::raw::unpack<fundclaim_args>(at.act.data);
-         BOOST_REQUIRE_EQUAL(LIQ_ACCOUNT, args.recipient);
-         BOOST_REQUIRE_EQUAL(2 * UNIT, args.amount);
-         requested = true;
+   // The swap's intake is the one that is yield, so it is the one that earns the
+   // kicker. Stand in for the pool's proceeds: WIRE deposited on the swap.
+   BOOST_REQUIRE_EQUAL(success(), openext("alice"_n, "alice"_n, extended_symbol{ WIRE_SYM, TOKEN_ACCOUNT }));
+   BOOST_REQUIRE_EQUAL(success(), transfer_wire("alice"_n, SWAP_ACCOUNT, 300 * UNIT));
+   // 100 WIRE in from `from`; whether the trace carries the 2% fundclaim for
+   // this contract and the fold that follows it.
+   const auto intake = [&](name from) {
+      auto trace = base_tester::push_action(LIQ_ACCOUNT, "addyield"_n, from, mvo()
+         ("from", from)("quantity", asset(100 * UNIT, WIRE_SYM))("target", LIQSOL_SYM.to_symbol_code()));
+      produce_block();
+      bool requested = false, folded = false;
+      for (const auto& at : trace->action_traces) {
+         if (at.act.account == SYSIO_ACCOUNT && at.act.name == "fundclaim"_n) {
+            const auto args = fc::raw::unpack<fundclaim_args>(at.act.data);
+            BOOST_REQUIRE_EQUAL(LIQ_ACCOUNT, args.recipient);
+            BOOST_REQUIRE_EQUAL(2 * UNIT, args.amount);
+            requested = true;
+         }
+         if (at.act.account == LIQ_ACCOUNT && at.act.name == "addkicker"_n) folded = true;
       }
-      if (at.act.account == LIQ_ACCOUNT && at.act.name == "addkicker"_n) folded = true;
-   }
-   BOOST_REQUIRE(requested);
-   BOOST_REQUIRE(folded);
+      return std::make_pair(requested, folded);
+   };
+
+   // sysio runs no emissions here, so the request lands nothing and the fold is
+   // a no-op: holders get the base yield and nothing else.
+   BOOST_REQUIRE(intake(SWAP_ACCOUNT) == std::make_pair(true, true));
    BOOST_REQUIRE_EQUAL(100 * UNIT, owed("alice"_n));
    BOOST_REQUIRE_EQUAL(uint64_t(100 * UNIT), pot());
 
-   // With the kicker off, no request is made at all.
+   // A donation from anyone else distributes only itself: no request, no fold.
+   // Otherwise a near-sole holder could donate, claim it back with the kicker on
+   // top, and repeat against the treasury.
+   BOOST_REQUIRE(intake("carol"_n) == std::make_pair(false, false));
+   BOOST_REQUIRE_EQUAL(200 * UNIT, owed("alice"_n));
+   BOOST_REQUIRE_EQUAL(uint64_t(200 * UNIT), pot());
+
+   // With the kicker off, the swap's intake makes no request either.
    BOOST_REQUIRE(mentions(setkicker("alice"_n, 0), "missing authority of sysio"));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("kicker_bps out of range"), setkicker(SYSIO_ACCOUNT, 10'001));
    BOOST_REQUIRE_EQUAL(success(), setkicker(SYSIO_ACCOUNT, 0));
    BOOST_REQUIRE_EQUAL(0u, config_row()["kicker_bps"].as<uint32_t>());
-   trace = base_tester::push_action(LIQ_ACCOUNT, "addyield"_n, "carol"_n, mvo()
-      ("from", "carol"_n)("quantity", asset(100 * UNIT, WIRE_SYM))("target", LIQSOL_SYM.to_symbol_code()));
-   produce_block();
-   for (const auto& at : trace->action_traces)
-      BOOST_REQUIRE(!(at.act.account == SYSIO_ACCOUNT && at.act.name == "fundclaim"_n));
+   BOOST_REQUIRE(intake(SWAP_ACCOUNT) == std::make_pair(false, false));
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE(addkicker_folds_only_what_landed, sysio_liq_tester) try {

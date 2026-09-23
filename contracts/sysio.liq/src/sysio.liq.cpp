@@ -306,9 +306,13 @@ void liq::addyield(name from, asset quantity, symbol_code target) {
    action(active_of(from), TOKEN_ACCOUNT, "transfer"_n,
           std::make_tuple(from, get_self(), quantity, std::string{ YIELD_MEMO })).send();
 
-   // The kicker: `kicker_bps` of the intake, requested from T5. fundclaim caps the
-   // draw and never throws, so what actually lands is folded in afterwards by
-   // addkicker, measured against the balance the pull above will have left.
+   // The kicker: `kicker_bps` of the intake, requested from T5 -- only on the
+   // swap's intake, the one that is yield (tickyield's proceeds). A donation
+   // draws nothing: a near-sole holder could otherwise donate, claim it back
+   // with the kicker on top, and repeat against the treasury. fundclaim caps
+   // the draw and never throws, so what actually lands is folded in afterwards
+   // by addkicker, measured against the balance the pull above will have left.
+   if (from != SWAP_ACCOUNT) return;
    liqconfig_t config(get_self());
    const uint32_t kicker_bps = config.get_or_default(liq_config{}).kicker_bps;
    const uint64_t kicker = static_cast<uint64_t>(

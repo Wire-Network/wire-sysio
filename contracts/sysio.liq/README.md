@@ -28,11 +28,14 @@ contract. The swap sells it in clips through the pool and pays the proceeds in
 through `addyield`, which advances the index by `quantity / supply`, carries the
 remainder and pulls the WIRE by inline transfer.
 
-**The kicker.** On every intake `addyield` requests `kicker_bps` (default 200) of
-the intake from T5 through `sysio.system::fundclaim(sysio.liq, amount)`, then
-folds what actually landed into the same index with `addkicker`, measured against
-the balance the pull left. A short T5 reduces the kicker only. `setkicker`
-(auth `sysio`, the account council proposals execute as) changes the next intake.
+**The kicker.** On the swap's intake, the one that is yield, `addyield` requests
+`kicker_bps` (default 200) of the intake from T5 through
+`sysio.system::fundclaim(sysio.liq, amount)`, then folds what actually landed into
+the same index with `addkicker`, measured against the balance the pull left. A
+donation from any other account distributes only itself: the treasury never tops
+up what is not yield, or a near-sole holder could donate, claim it back with the
+kicker on top, and repeat. A short T5 reduces the kicker only. `setkicker` (auth
+`sysio`, the account council proposals execute as) changes the next intake.
 
 **De-syndication (DESYNDICATE_LIQ, outbound).** `desyndicate` requires the holder
 to be AuthX-linked for the token's chain, settles and burns the shadow, and queues

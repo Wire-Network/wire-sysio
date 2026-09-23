@@ -185,8 +185,9 @@ payepoch; it stays in sysio's balance and drains lazily:
    accumulated balance out (memo `sysio.dclaim claim`).
 
 `sysio.liq` draws through the same action: its `addyield` requests the yield
-kicker (`kicker_bps` of each intake) from the pool, so `fundclaim` names its
-recipient, which must be one of those two contracts.
+kicker (`kicker_bps` of each intake from the swap, the intake that is yield) from
+the pool, so `fundclaim` names its recipient, which must be one of those two
+contracts.
 
 Unclaimed rows expire after `cap_config.claim_window_sec` and revert to the
 dclaim pool via `flushexpired`. `fundclaim` and the whole OPP inbound path are
