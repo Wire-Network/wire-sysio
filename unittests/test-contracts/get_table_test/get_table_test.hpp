@@ -6,6 +6,7 @@
 
 #include <sysio/sysio.hpp>
 #include <sysio/crypto.hpp>
+#include <sysio/kv_scoped_table.hpp>
 #include <sysio/kv_table.hpp>
 
 
@@ -156,6 +157,33 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
 
     typedef sysio::kv::table< "slugobjs"_n, slugobj_key, slugobj > slugobjs;
 
+    // The same registry shape, but SCOPED — stored as [scope:8B BE][key], with a
+    // secondary index so both cursor paths are reachable.
+    //
+    // A json=true cursor must be scope-RELATIVE, because get_table_rows prepends
+    // the scope prefix to whatever bound comes back. That holds trivially for a
+    // decoded JSON key object; it is the HEX fallback (a key the codec cannot
+    // name) that can get it wrong, and an absolute cursor is then scoped twice
+    // and skips the rest of the range. Unscoped `slugobjs` above cannot catch
+    // that — there is no prefix to double.
+    struct sslugobj_key {
+        slug_name code;
+        uint64_t primary_key() const { return code.value; }
+        SYSLIB_SERIALIZE(sslugobj_key, (code))
+    };
+
+    struct [[sysio::table("sslugobjs")]] sslugobj {
+        slug_name code;
+        uint64_t  payload = 0;
+        uint64_t  by_payload() const { return payload; }
+        SYSLIB_SERIALIZE(sslugobj, (code)(payload))
+    };
+
+    typedef sysio::kv::scoped_table<
+        "sslugobjs"_n, sslugobj_key, sslugobj,
+        sysio::kv::index<"bypayload"_n,
+                         sysio::const_mem_fun<sslugobj, uint64_t, &sslugobj::by_payload>>> sslugobjs;
+
    [[sysio::action]]
    void addnumobj(uint64_t input);
 
@@ -181,6 +209,13 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
    /// @param payload  arbitrary row payload
    [[sysio::action]]
    void addslug(slug_name code, uint64_t payload);
+
+   /// Insert a row into the SCOPED slug-keyed table `sslugobjs`.
+   /// @param scope    the table scope
+   /// @param code     the slug forming the primary key
+   /// @param payload  arbitrary row payload; also the `bypayload` secondary
+   [[sysio::action]]
+   void addsslug(uint64_t scope, slug_name code, uint64_t payload);
 
 
 };

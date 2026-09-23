@@ -2760,19 +2760,24 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       // bound parser accepts back verbatim — so next_key is always feedable.
       auto emit_secondary_next_key = [&](std::string_view sk) {
          if (p.json) {
+            // Scope-RELATIVE for BOTH shapes: the bound parser prepends
+            // scope_prefix_bytes whichever one comes back, so hexing the
+            // absolute key would scope it twice.
+            std::string_view sv = sk;
+            if (!scope_prefix_bytes.empty() && sv.size() >= scope_prefix_bytes.size()) {
+               sv.remove_prefix(scope_prefix_bytes.size());
+            }
             try {
-               std::string_view sv = sk;
-               if (!scope_prefix_bytes.empty() && sv.size() >= scope_prefix_bytes.size()) {
-                  sv.remove_prefix(scope_prefix_bytes.size());
-               }
                FC_ASSERT(bound_key_shapes, "be_key_codec: key shape unresolved");
                auto key_var = chain::be_key_codec::decode_key(sv.data(), sv.size(), *bound_key_shapes);
                hp.next_key = fc::json::to_string(key_var, fc::time_point::maximum());
                return;
             } catch (...) {
-               // fall through to hex
+               hp.next_key = fc::to_hex(sv.data(), sv.size());
+               return;
             }
          }
+         // json=false takes the stored key verbatim on the way back in.
          hp.next_key = fc::to_hex(sk.data(), sk.size());
       };
 
@@ -2853,6 +2858,7 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       return [p = std::move(hp), abi = std::move(abi), table_name = p.table,
               key_shapes = std::move(key_shapes),
               scope_key_count,
+              scope_prefix_size = scope_prefix_bytes.size(),
               abi_serializer_max_time = abi_serializer_max_time,
               shorten_abi_errors = shorten_abi_errors,
               all_rows    = p.all_rows,
@@ -2881,7 +2887,10 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
                      row.key.data(), row.key.size(), *key_shapes);
                   obj["key"] = strip_scope_fields(std::move(full_key), scope_key_count);
                } catch (...) {
-                  obj["key"] = fc::to_hex(row.key.data(), row.key.size());
+                  // strip_scope_fields drops the scope on the JSON path; keep the
+                  // hex form scope-relative so the two describe the same key.
+                  obj["key"] = fc::to_hex(row.key.data() + scope_prefix_size,
+                                          row.key.size() - scope_prefix_size);
                }
             } else {
                obj["key"] = fc::to_hex(row.key.data(), row.key.size());
@@ -2932,9 +2941,14 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
             auto stripped = strip_scope_fields(std::move(full_key), scope_key_count);
             hp.next_key = fc::json::to_string(stripped, fc::time_point::maximum());
          } catch (...) {
-            hp.next_key = fc::to_hex(kv.data(), static_cast<uint32_t>(kv.size()));
+            // Scope-RELATIVE, exactly like the JSON key object it replaces: the
+            // bound parser prepends scope_prefix_bytes for either shape, so an
+            // absolute cursor would be scoped twice and skip the range.
+            hp.next_key = fc::to_hex(kv.data() + scope_prefix_bytes.size(),
+                                     static_cast<uint32_t>(kv.size() - scope_prefix_bytes.size()));
          }
       } else {
+         // json=false takes the stored key verbatim on the way back in.
          hp.next_key = fc::to_hex(kv.data(), static_cast<uint32_t>(kv.size()));
       }
    };
@@ -3034,6 +3048,7 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    return [hp = std::move(hp), abi = std::move(abi), tbl_name = p.table,
            key_shapes = std::move(key_shapes),
            scope_key_count,
+           scope_prefix_size = scope_prefix_bytes.size(),
            abi_serializer_max_time = abi_serializer_max_time,
            shorten_abi_errors = shorten_abi_errors,
            all_rows    = p.all_rows,
@@ -3058,7 +3073,9 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
                   row.key.data(), row.key.size(), *key_shapes);
                obj("key", strip_scope_fields(std::move(full_key), scope_key_count));
             } catch (...) {
-               obj("key", fc::to_hex(row.key.data(), static_cast<uint32_t>(row.key.size())));
+               // Scope-relative, matching strip_scope_fields on the JSON path.
+               obj("key", fc::to_hex(row.key.data() + scope_prefix_size,
+                                     static_cast<uint32_t>(row.key.size() - scope_prefix_size)));
             }
          } else {
             obj("key", fc::to_hex(row.key.data(), static_cast<uint32_t>(row.key.size())));

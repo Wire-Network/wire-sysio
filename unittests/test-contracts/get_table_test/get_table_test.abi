@@ -38,6 +38,24 @@
             ]
         },
         {
+            "name": "addsslug",
+            "base": "",
+            "fields": [
+                {
+                    "name": "scope",
+                    "type": "uint64"
+                },
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "payload",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "addstruct",
             "base": "",
             "fields": [
@@ -130,16 +148,6 @@
             ]
         },
         {
-            "name": "slug_name",
-            "base": "",
-            "fields": [
-                {
-                    "name": "value",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "slugobj",
             "base": "",
             "fields": [
@@ -155,6 +163,30 @@
         },
         {
             "name": "slugobj_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "sslugobj",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "payload",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "sslugobj_key",
             "base": "",
             "fields": [
                 {
@@ -205,6 +237,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "addsslug",
+            "type": "addsslug",
+            "ricardian_contract": ""
+        },
+        {
             "name": "addstruct",
             "type": "addstruct",
             "ricardian_contract": ""
@@ -221,14 +258,6 @@
         }
     ],
     "tables": [
-        {
-            "name": "hashobj",
-            "type": "hashobj",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 37781
-        },
         {
             "name": "hashobjs",
             "type": "hashobj",
@@ -248,14 +277,6 @@
                     "table_id": 6575
                 }
             ]
-        },
-        {
-            "name": "numobj",
-            "type": "numobj",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 30247
         },
         {
             "name": "numobjs",
@@ -294,6 +315,21 @@
             "key_names": ["code"],
             "key_types": ["slug_name"],
             "table_id": 41308
+        },
+        {
+            "name": "sslugobjs",
+            "type": "sslugobj",
+            "index_type": "i64",
+            "key_names": ["scope","code"],
+            "key_types": ["name","slug_name"],
+            "table_id": 32371,
+            "secondary_indexes": [
+                {
+                    "name": "bypayload",
+                    "key_type": "uint64",
+                    "table_id": 64287
+                }
+            ]
         },
         {
             "name": "structobjs",

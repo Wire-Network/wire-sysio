@@ -914,6 +914,65 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       p.upper_bound.clear();
    }
 
+   // (sec-11e) SCOPED slug-keyed table. A json=true cursor must be scope-RELATIVE:
+   //           get_table_rows prepends the scope prefix to whatever bound comes
+   //           back, so an absolute hex cursor is scoped TWICE and the query skips
+   //           the rest of the range. Unscoped (sec-11d) cannot catch that — there
+   //           is no prefix to double.
+   {
+      const uint64_t sc = chain::name("sc1").to_uint64_t();
+      push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
+         ("scope", sc)("code", "ETH")("payload", 10));
+      push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
+         ("scope", sc)("code", "SOL")("payload", 20));
+      push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
+         ("scope", sc)("code", "WIRE")("payload", 30));
+      // The un-nameable one, stored through the transitional object carrier.
+      // 34<<42 is the packed former spelling "7"; char[0] = 34 sorts it last.
+      push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
+         ("scope", sc)("code", mutable_variant_object()("value", uint64_t{34} << 42))
+         ("payload", 40));
+
+      chain_apis::read_only::get_table_rows_params p;
+      p.json  = true;
+      p.code  = "test"_n;
+      p.scope = "sc1";
+      p.table = "sslugobjs";
+
+      // Forward: page across the boundary onto the un-nameable key.
+      p.limit = 3;
+      auto pageA = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(pageA.rows.size(), 3u);
+      BOOST_REQUIRE_EQUAL(pageA.more, true);
+      BOOST_REQUIRE(!pageA.next_key.empty());
+      BOOST_CHECK(pageA.next_key.front() != '{');   // hex fallback, not a JSON key
+
+      p.lower_bound = pageA.next_key;
+      p.limit       = 50;
+      auto pageB = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      // With a scope-ABSOLUTE cursor this returns 0 rows: the bound parser
+      // prepends the scope a second time and the seek lands past the range.
+      BOOST_REQUIRE_EQUAL(pageB.rows.size(), 1u);
+      BOOST_CHECK_EQUAL(pageB.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 40u);
+
+      // Reverse over the same boundary.
+      p.lower_bound.clear();
+      p.reverse = true;
+      p.limit   = 1;
+      auto revA = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(revA.rows.size(), 1u);
+      BOOST_REQUIRE_EQUAL(revA.more, true);
+      BOOST_CHECK(revA.next_key.front() != '{');
+      BOOST_CHECK_EQUAL(revA.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 40u);
+
+      p.upper_bound = revA.next_key;
+      p.limit       = 50;
+      auto revB = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(revB.rows.size(), 3u);   // WIRE, SOL, ETH
+      BOOST_CHECK_EQUAL(revB.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 30u);
+      p.reverse = false;
+   }
+
    // (sec-5) Invalid index name on multi_index — should throw, not silently
    //         return primary rows.
    {

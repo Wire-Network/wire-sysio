@@ -49,3 +49,8 @@ void get_table_test::addslug(slug_name code, uint64_t payload) {
    slugobjs slugobjs_table( get_self() );
    slugobjs_table.emplace( get_self(), { code }, { code, payload } );
 }
+
+void get_table_test::addsslug(uint64_t scope, slug_name code, uint64_t payload) {
+   sslugobjs sslugobjs_table( get_self(), scope );
+   sslugobjs_table.emplace( get_self(), { code }, { code, payload } );
+}
