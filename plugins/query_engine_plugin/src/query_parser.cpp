@@ -164,9 +164,9 @@ private:
       result.literal.null = literal->NULL_LITERAL() != nullptr;
       if (literal->STRING()) {
          result.literal.text = unquote(literal->getText());
-      } else if (literal->TRUE() || literal->FALSE()) {
+      } else if (literal->TRUE_LITERAL() || literal->FALSE_LITERAL()) {
          result.literal.type = logical_type::boolean;
-         result.literal.numerator = literal->TRUE() ? 1 : 0;
+         result.literal.numerator = literal->TRUE_LITERAL() ? 1 : 0;
       } else if (!literal->NULL_LITERAL()) {
          result.literal = parse_number(literal->getText());
       }
