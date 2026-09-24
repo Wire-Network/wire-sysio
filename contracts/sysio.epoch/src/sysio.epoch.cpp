@@ -791,7 +791,7 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
       // below). Short-but-non-empty is pre-existing behaviour and is not made
       // safe here -- it is reported so the roster can be repaired off-chain.
       if (new_tail.size() < cfg.operators_per_epoch) {
-         sysio::print("sysio.epoch::advance: only ", new_tail.size(), " of ",
+         sysio::print("sysio.epoch::finishadv: only ", new_tail.size(), " of ",
                       cfg.operators_per_epoch,
                       " eligible batch operators for the new tail group at epoch ",
                       state.current_epoch_index + cfg.batch_op_groups - 1,
@@ -905,14 +905,14 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
    //
    // Only the ATTESTATION looks ahead. The depot's own schedule state is
    // untouched -- `current_batch_op_group` still names the group on duty NOW,
-   // and `advance` still slides the window so the front is the current epoch.
+   // and `finishadv` still slides the window so the front is the current epoch.
    // Nothing that reads `epoch_state` changes meaning.
    //
    // `epoch_index` stays the epoch this envelope IS for; it identifies the
    // envelope, not the roster, and no outpost reads it.
    {
       opp::attestations::BatchOperatorGroups attest;
-      // The window SLIDES; it does not rotate. `advance` erases the front and
+      // The window SLIDES; it does not rotate. `finishadv` erases the front and
       // pushes a new tail, and every write to the cursor pins it to 0 (here,
       // and `schbatchgps`) -- so the group on duty NEXT is simply the one
       // after the cursor.
@@ -926,7 +926,7 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
       // The bound check is also what keeps an EMPTY schedule off a division.
       // `group_count == 0` is reachable here: the slide above is guarded by
       // `!empty()`, but nothing requires a seated schedule before this block,
-      // and `% 0` is an `i32.rem_u` trap that would abort `advance` and halt
+      // and `% 0` is an `i32.rem_u` trap that would abort `finishadv` and halt
       // epoch advancement chain-wide.
       //
       // Falling back to the cursor covers the single-group case: the same
@@ -970,12 +970,12 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
       // carrying an empty group regardless -- so it buys nothing here.
       //
       // Withheld by SKIPPING THE QUEUEOUT ONLY -- never by returning from
-      // `advance`, which still has the epoch's remaining attestations and
+      // `finishadv`, which still has the epoch's remaining attestations and
       // actions to issue after this block.
       const bool have_next_group =
          next_group_index < group_count && !state.batch_op_groups[next_group_index].empty();
       if (!have_next_group) {
-         sysio::print("sysio.epoch::advance: no non-empty next group to publish at epoch ",
+         sysio::print("sysio.epoch::finishadv: no non-empty next group to publish at epoch ",
                       state.current_epoch_index,
                       " (groups=", group_count, ", next_index=", next_group_index,
                       "); withholding BatchOperatorGroups -- outposts retain their "
@@ -1004,7 +1004,7 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
       auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
       (void)out(attest);
 
-      // `have_next_group` gates the QUEUEOUT, not `advance` -- see above.
+      // `have_next_group` gates the QUEUEOUT, not `finishadv` -- see above.
       if (have_next_group) {
          sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
          for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
@@ -1088,7 +1088,7 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
 //  them into N groups (`cfg.batch_op_groups`). The resulting window is
 //  [epoch_1_group, epoch_2_group, ..., epoch_N_group].
 //
-//  After this, every per-epoch `advance` pops the front group and pushes
+//  After this, every per-epoch `finishadv` pops the front group and pushes
 //  a new tail group, where the tail's members are drawn from the ACTIVE
 //  pool MINUS anyone still resident in the N-1 surviving groups. The
 //  window itself encodes "scheduled in the last N-1 epochs"; no separate

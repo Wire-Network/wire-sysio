@@ -2094,7 +2094,7 @@ BOOST_FIXTURE_TEST_CASE(advance_ships_group_index_zero_for_single_group, sysio_m
 ///
 /// Asserted here: the BATCH_OPERATOR_GROUPS attestation is absent, AND the envelope still exists
 /// carrying other attestations. The second half is the regression guard that matters — withholding
-/// is implemented by skipping ONE queueout, and an early `return` from `advance` would also produce
+/// is implemented by skipping ONE queueout, and an early `return` from `finishadv` would also produce
 /// a missing roster while silently dropping the rest of the epoch's emissions.
 BOOST_FIXTURE_TEST_CASE(advance_withholds_batch_operator_groups_when_next_group_is_empty,
                         sysio_msgch_chain_tester) { try {
