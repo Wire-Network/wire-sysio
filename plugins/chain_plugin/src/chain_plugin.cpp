@@ -1,3 +1,4 @@
+#include <sysio/chain_plugin/table_read.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/chain_plugin/trx_retry_db.hpp>
 #include <sysio/chain_plugin/tracked_votes.hpp>
@@ -2405,16 +2406,6 @@ double convert_to_type(const string& str, const string& desc) {
    return val;
 }
 
-abi_def get_abi( const controller& db, const name& account ) {
-   const auto* accnt = db.find_account(account);
-   SYS_ASSERT(accnt != nullptr, chain::account_query_exception, "Fail to retrieve account for {}", account );
-   const account_metadata_object* code_accnt = db.find_account_metadata(account);
-   abi_def abi;
-   if (code_accnt)
-      abi_serializer::to_abi(code_accnt->abi, abi);
-   return abi;
-}
-
 string get_table_type( const abi_def& abi, const string& table_name ) {
    for( const auto& t : abi.tables ) {
       if( t.name == table_name ){
@@ -2554,11 +2545,7 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
 
    // Phase 1: Collect raw rows on the main thread.
    // Phase 2 (the returned lambda): ABI-decode on the http thread pool.
-   struct raw_row {
-      std::vector<char> key;
-      std::vector<char> value;
-      name              payer;
-   };
+   using raw_row = owned_table_row;
    struct http_params_t {
       bool json;
       bool show_payer;
@@ -2571,7 +2558,6 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    http_params_t hp{ p.json, show_payer, false, {}, {} };
 
    const auto& d = db.db();
-   const auto& kv_idx = d.get_index<chain::kv_index, chain::by_code_key>();
 
    // --- Resolve index_name ---
    // Supports: empty (primary), named secondary ("byowner"), or numeric position ("2" = first secondary)
@@ -3003,113 +2989,30 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       };
    }
 
-   // --- Primary key query path ---
-   auto collect_next_key = [&](const chain::kv_object& obj) {
-      auto kv = obj.key_view();
+   // The primary collector is shared with in-process query consumers. Compatibility
+   // mode retains this API's post-row deadline and reverse exclusive-upper cursor.
+   primary_scan_request request{p.code, table_id, std::move(lb_bytes),
+      has_upper ? std::optional<std::vector<char>>(std::move(ub_bytes)) : std::nullopt,
+      reverse ? scan_direction::reverse : scan_direction::forward, limit};
+   table_read_budget budget;
+   budget.deadline = params_deadline;
+   auto page = capture_primary_page(db, request, budget);
+   hp.rows = std::move(page.rows);
+   hp.more = page.more;
+   if (page.more) {
+      const auto& key = page.resume;
       if (p.json) {
          try {
             FC_ASSERT(key_shapes, "be_key_codec: key shape unresolved");
-            auto full_key = chain::be_key_codec::decode_key(kv.data(), kv.size(), *key_shapes);
-            auto stripped = strip_scope_fields(std::move(full_key), scope_key_count);
-            hp.next_key = fc::json::to_string(stripped, fc::time_point::maximum());
+            auto full_key = chain::be_key_codec::decode_key(key.data(), key.size(), *key_shapes);
+            hp.next_key = fc::json::to_string(strip_scope_fields(std::move(full_key), scope_key_count),
+                                             fc::time_point::maximum());
          } catch (...) {
-            hp.next_key = to_raw_cursor(kv);
+            hp.next_key = to_raw_cursor(std::string_view(key.data(), key.size()));
          }
       } else {
          // json=false takes the stored key verbatim on the way back in.
-         hp.next_key = fc::to_hex(kv.data(), static_cast<uint32_t>(kv.size()));
-      }
-   };
-
-   if (!reverse) {
-      auto itr = kv_idx.lower_bound(boost::make_tuple(p.code, table_id, lb_sv));
-      uint32_t count = 0;
-      while (itr != kv_idx.end() && itr->code == p.code &&
-             itr->table_id == table_id) {
-         auto kv = itr->key_view();
-         if (has_upper && kv >= ub_sv) break;
-
-         if (count >= limit) {
-            hp.more = true;
-            collect_next_key(*itr);
-            break;
-         }
-
-         raw_row row;
-         row.key.assign(kv.data(), kv.data() + kv.size());
-         row.value.assign(itr->value.data(), itr->value.data() + itr->value.size());
-         row.payer = itr->payer;
-         hp.rows.emplace_back(std::move(row));
-
-         ++count;
-         ++itr;
-         if (fc::time_point::now() >= params_deadline) {
-            if (itr != kv_idx.end() && itr->code == p.code &&
-                itr->table_id == table_id) {
-               auto next_kv = itr->key_view();
-               if (!has_upper || next_kv < ub_sv) {
-                  hp.more = true;
-                  collect_next_key(*itr);
-               }
-            }
-            break;
-         }
-      }
-   } else {
-      // Reverse iteration
-      decltype(kv_idx.end()) itr;
-      if (has_upper) {
-         itr = kv_idx.lower_bound(boost::make_tuple(p.code, table_id, ub_sv));
-      } else {
-         // Seek past the end of this table_id partition
-         itr = kv_idx.lower_bound(
-            boost::make_tuple(p.code, static_cast<uint16_t>(table_id + 1), std::string_view()));
-      }
-
-      auto begin = kv_idx.lower_bound(
-         boost::make_tuple(p.code, table_id, std::string_view()));
-
-      if (itr != begin) {
-         uint32_t count = 0;
-         // Resume cursor is the LAST RETURNED row, not the first unseen. See
-         // the secondary-index reverse branch above for the full rationale.
-         auto last_added_itr = kv_idx.end();
-         do {
-            --itr;
-            if (itr->code != p.code || itr->table_id != table_id)
-               break;
-
-            auto kv = itr->key_view();
-            if (!lb_bytes.empty() && kv < lb_sv)
-               break;
-
-            if (count >= limit) {
-               if (last_added_itr != kv_idx.end()) {
-                  hp.more = true;
-                  collect_next_key(*last_added_itr);
-               }
-               break;
-            }
-
-            raw_row row;
-            row.key.assign(kv.data(), kv.data() + kv.size());
-            row.value.assign(itr->value.data(), itr->value.data() + itr->value.size());
-            row.payer = itr->payer;
-            hp.rows.emplace_back(std::move(row));
-            last_added_itr = itr;
-
-            ++count;
-            if (itr == begin) {
-               // No more entries before this one
-               break;
-            }
-
-            if (fc::time_point::now() >= params_deadline) {
-               hp.more = true;
-               collect_next_key(*last_added_itr);
-               break;
-            }
-         } while (true);
+         hp.next_key = fc::to_hex(key.data(), static_cast<uint32_t>(key.size()));
       }
    }
 

@@ -8,6 +8,7 @@
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/wast_to_wasm.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
+#include <sysio/chain_plugin/table_read.hpp>
 
 #include <contracts.hpp>
 #include <test_contracts.hpp>
@@ -3020,5 +3021,75 @@ BOOST_FIXTURE_TEST_CASE( get_table_missing_contract_test, validating_tester ) tr
    }
 
 } FC_LOG_AND_RETHROW() /// get_table_missing_contract_test
+
+/// Pin the extracted collector's strict accounting and the public API's soft limits.
+BOOST_FIXTURE_TEST_CASE(primary_capture_budget_and_compatibility, validating_tester) try {
+   constexpr auto account = "rawcapture"_n;
+   constexpr auto table_name = "users";
+   constexpr uint32_t page_size = 2;
+   setup_kvrev_primary(*this, account);
+   const auto abi = chain_apis::get_abi(*control, account);
+   const auto table = std::find_if(abi.tables.begin(), abi.tables.end(), [](const auto& item) { return item.name == table_name; });
+   BOOST_REQUIRE(table != abi.tables.end());
+   chain_apis::primary_scan_request scan;
+   scan.code = account;
+   scan.table_id = table->table_id;
+   scan.page_rows = page_size;
+   chain_apis::table_read_budget budget;
+   uint64_t charged_rows = 0, charged_bytes = 0;
+   budget.check = [] {};
+   budget.before_copy = [&](uint64_t rows, uint64_t bytes) { charged_rows += rows; charged_bytes += bytes; };
+   std::vector<chain_apis::owned_table_row> rows;
+   for (;;) {
+      auto page = chain_apis::capture_primary_page(*control, scan, budget);
+      rows.insert(rows.end(), page.rows.begin(), page.rows.end());
+      if (!page.more) break;
+      scan.lower = std::move(page.resume);
+   }
+   BOOST_REQUIRE_EQUAL(rows.size(), 5);
+   BOOST_CHECK_EQUAL(charged_rows, rows.size());
+   BOOST_CHECK_EQUAL(charged_bytes, budget.bytes);
+   scan.lower = rows[1].key;
+   scan.upper = rows[4].key;
+   scan.page_rows = 5;
+   auto bounded = chain_apis::capture_primary_page(*control, scan, budget);
+   BOOST_REQUIRE_EQUAL(bounded.rows.size(), 3);
+   BOOST_CHECK(bounded.rows.front().key == rows[1].key);
+   BOOST_CHECK(!bounded.more);
+   scan.direction = chain_apis::scan_direction::reverse;
+   auto reverse = chain_apis::capture_primary_page(*control, scan, budget);
+   BOOST_REQUIRE_EQUAL(reverse.rows.size(), 3);
+   BOOST_CHECK(reverse.rows.front().key == rows[3].key);
+   BOOST_CHECK(!reverse.more);
+   chain_apis::table_read_budget rejected;
+   rejected.check = [] {};
+   rejected.before_copy = [](uint64_t, uint64_t) { throw std::length_error("copy budget"); };
+   BOOST_CHECK_THROW(chain_apis::capture_primary_page(*control, scan, rejected), std::length_error);
+   BOOST_CHECK_EQUAL(rejected.rows, 0);
+   BOOST_CHECK_EQUAL(rejected.bytes, 0);
+   BOOST_CHECK(!chain_apis::primary_prefix_upper({char(0xff), char(0xff)}));
+   BOOST_CHECK(chain_apis::primary_prefix_upper({char(0x12), char(0xff)}).value() == std::vector<char>{char(0x13)});
+
+   std::optional<chain_apis::tracked_votes> votes;
+   chain_apis::read_only api(*control, {}, {}, votes, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+   chain_apis::read_only::get_table_rows_params params;
+   params.code = account;
+   params.table = table_name;
+   params.limit = 5;
+   auto expired = get_table_rows_full(api, params, fc::time_point{});
+   BOOST_CHECK_EQUAL(expired.rows.size(), 1);
+   BOOST_CHECK(expired.more);
+   params.all_rows = true;
+   params.limit = 1;
+   auto all = get_table_rows_full(api, params, fc::time_point{});
+   BOOST_CHECK_EQUAL(all.rows.size(), 5);
+   BOOST_CHECK(!all.more);
+   params.all_rows = false;
+   params.limit = page_size;
+   params.filter = [](const fc::variant& row) { return row["key"]["id"].as_uint64() > 2; };
+   auto filtered = get_table_rows_full(api, params, fc::time_point::maximum());
+   BOOST_CHECK(filtered.rows.empty());
+   BOOST_CHECK(filtered.more); // Filtering is intentionally after the public API's page boundary.
+} FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()
