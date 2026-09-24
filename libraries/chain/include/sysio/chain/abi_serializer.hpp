@@ -59,8 +59,6 @@ struct abi_serializer {
    bool      is_type( const std::string_view& type, const yield_function_t& yield )const;
    bool      is_type(const std::string_view& type, const fc::microseconds& max_serialization_time)const;
    bool      is_builtin_type(const std::string_view& type)const;
-   bool      is_integer(const std::string_view& type) const;
-   int       get_integer_size(const std::string_view& type) const;
    bool      is_struct(const std::string_view& type)const;
    bool      is_enum(const std::string_view& type)const;
 
