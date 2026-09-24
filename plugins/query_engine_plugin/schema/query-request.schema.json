@@ -1,0 +1,47 @@
+{
+  "type": "object",
+  "required": [
+    "jsonrpc",
+    "method",
+    "params"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "jsonrpc": {
+      "enum": [
+        "2.0"
+      ]
+    },
+    "id": {
+      "type": [
+        "string",
+        "integer",
+        "null"
+      ],
+      "maxLength": 128,
+      "minimum": -4294967295,
+      "maximum": 4294967295
+    },
+    "method": {
+      "enum": [
+        "query.execute"
+      ]
+    },
+    "params": {
+      "type": "object",
+      "required": [
+        "query"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "type": "string",
+          "minLength": 1,
+          "description": "UTF-8 SQL; runtime enforces the configured byte limit (default 16384)."
+        }
+      }
+    }
+  },
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "WIRE query.execute single-request profile v1"
+}

@@ -12,6 +12,30 @@
 
 namespace sysio::chain {
 
+   const enum_value_def* abi_serializer::find_enum_member_by_value( const enum_def& definition, int64_t value ) {
+      for( const auto& member : definition.values )
+         if( member.value == value )
+            return &member;
+      return nullptr;
+   }
+
+   const enum_value_def* abi_serializer::find_enum_member_by_name( const enum_def& definition, std::string_view name ) {
+      for( const auto& member : definition.values )
+         if( member.name == name )
+            return &member;
+      constexpr char separator = '_';
+      const enum_value_def* match = nullptr;
+      for( const auto& member : definition.values ) {
+         const auto position = member.name.rfind( separator );
+         if( position == std::string::npos || std::string_view( member.name ).substr( position + 1 ) != name )
+            continue;
+         if( match )
+            return nullptr; // ambiguous: two members end the same way
+         match = &member;
+      }
+      return match;
+   }
+
    const size_t abi_serializer::max_recursion_depth;
 
    using std::string;
@@ -614,12 +638,8 @@ namespace sysio::chain {
          SYS_ASSERT( btype != built_in_types.end(), invalid_type_inside_abi,
                      "Enum '{}' has unknown underlying type '{}'", impl::limit_size(rtype), impl::limit_size(e_itr->second.type) );
          auto int_var = btype->second.first(stream, false, false, ctx.get_yield_function());
-         auto int_val = int_var.as_int64();
-         for( const auto& ev : e_itr->second.values ) {
-            if( ev.value == int_val ) {
-               return fc::variant(ev.name);
-            }
-         }
+         if( const auto* member = find_enum_member_by_value( e_itr->second, int_var.as_int64() ) )
+            return fc::variant(member->name);
          return int_var; // Unknown value — return as integer
       } else {
          auto v_itr = variants.find(rtype);
@@ -720,40 +740,19 @@ namespace sysio::chain {
             _variant_to_binary(fundamental_type(rtype), var, ds, ctx);
          }
       } else if( auto e_itr = enums.find(rtype); e_itr != enums.end() ) {
-         // Enum type: accept string member name or integer value.
-         // For string matching, tries exact match first, then prefix-stripped match
-         // (e.g., "ethereum" matches "chain_kind_ethereum" by stripping the "chain_kind_" prefix).
+         // Enum type: accept a member name (exact, else a unique prefix-stripped match through
+         // find_enum_member_by_name) or an integer value.
          auto btype = built_in_types.find(e_itr->second.type);
          SYS_ASSERT( btype != built_in_types.end(), invalid_type_inside_abi,
                      "Enum '{}' has unknown underlying type '{}'", ctx.maybe_shorten(rtype), ctx.maybe_shorten(e_itr->second.type) );
          fc::variant val_to_pack;
          if( var.is_string() ) {
-            auto name_str = var.get_string();
-            bool found = false;
-            // Pass 1: exact match
-            for( const auto& ev : e_itr->second.values ) {
-               if( ev.name == name_str ) {
-                  val_to_pack = fc::variant(ev.value);
-                  found = true;
-                  break;
-               }
-            }
-            // Pass 2: prefix-stripped match — enum members often have a common prefix
-            // derived from the type name (e.g., "chain_kind_" for type "chain_kind_t").
-            // Try matching "name_str" as a suffix of each member name after a '_' separator.
-            if( !found ) {
-               for( const auto& ev : e_itr->second.values ) {
-                  auto pos = ev.name.rfind('_');
-                  if( pos != std::string::npos && ev.name.substr(pos + 1) == name_str ) {
-                     val_to_pack = fc::variant(ev.value);
-                     found = true;
-                     break;
-                  }
-               }
-            }
-            SYS_ASSERT( found, pack_exception,
-                        "Unknown enum value '{}' for enum '{}' while processing '{}'",
+            const auto& name_str = var.get_string();
+            const auto* member = find_enum_member_by_name( e_itr->second, name_str );
+            SYS_ASSERT( member, pack_exception,
+                        "Unknown or ambiguous enum value '{}' for enum '{}' while processing '{}'",
                         ctx.maybe_shorten(name_str), ctx.maybe_shorten(rtype), ctx.get_path_string() );
+            val_to_pack = fc::variant(member->value);
          } else {
             val_to_pack = var;
          }

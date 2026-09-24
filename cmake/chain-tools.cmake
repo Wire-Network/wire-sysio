@@ -24,6 +24,7 @@ macro(chain_target TARGET)
             resource_monitor_plugin
             state_history_plugin
             status_monitor_plugin
+            query_engine_plugin
             signature_provider_manager_plugin
             outpost_client_plugin
             outpost_ethereum_client_plugin
