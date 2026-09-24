@@ -1,6 +1,7 @@
 #include "query_fixture.hpp"
 
 #include <fc/io/raw.hpp>
+#include <fc/slug_name.hpp>
 #include <sysio/chain/account_object.hpp>
 
 #include <algorithm>
@@ -377,6 +378,43 @@ BOOST_AUTO_TEST_CASE(checksum_alias_compiles_for_several_fields) {
    const auto row = fc::variant(evaluate(plan, std::move(input), budget))["rows"][size_t{0}];
    BOOST_CHECK_EQUAL(row["first"].as_string(), std::string(2 * digest_bytes, '1'));
    BOOST_CHECK_EQUAL(row["second"].as_string(), std::string(2 * digest_bytes, '2'));
+}
+
+/// `slug_name` is an ABI builtin with no struct definition. A table carrying one compiles for any
+/// query, including COUNT(*), and the field decodes, filters and renders as its canonical string.
+BOOST_AUTO_TEST_CASE(builtin_slug_name_fields_compile_filter_and_render) {
+   local_table_source source(*validating_node);
+   const auto plan_with_slug = [&](const char* sql, query_budget& budget) {
+      const auto ast = parse_query(sql, budget);
+      auto schemas = source.describe(ast, budget);
+      for (auto& structure : schemas.front().abi.structs)
+         if (structure.name == schemas.front().table.type)
+            structure.fields = {
+               {"code",  "slug_name"},
+               {"units", "uint64"   }
+            };
+      return create_plan(ast, std::move(schemas), budget);
+   };
+   const auto slug_row = [](std::string_view code, uint64_t units) {
+      auto bytes = fc::raw::pack(fc::slug_name(code).value);
+      const auto packed_units = fc::raw::pack(units);
+      bytes.insert(bytes.end(), packed_units.begin(), packed_units.end());
+      return bytes;
+   };
+
+   query_budget counting(relaxed_config());
+   BOOST_CHECK_NO_THROW(plan_with_slug("SELECT COUNT(*) AS records FROM sample.positions", counting));
+
+   query_budget budget(relaxed_config());
+   const auto plan = plan_with_slug("SELECT code, units FROM sample.positions WHERE code = 'SOL'", budget);
+   auto input = source.capture(plan, budget);
+   input.rows.resize(2);
+   input.rows[0].row.value = slug_row("ETH", 1);
+   input.rows[1].row.value = slug_row("SOL", 2);
+   const auto rows = fc::variant(evaluate(plan, std::move(input), budget))["rows"];
+   BOOST_REQUIRE_EQUAL(rows.get_array().size(), 1u);
+   BOOST_CHECK_EQUAL(rows[size_t{0}]["code"].as_string(), "SOL");
+   BOOST_CHECK_EQUAL(rows[size_t{0}]["units"].as_string(), "2");
 }
 
 /// The table name `fasp` hashes to the highest table id, 0xFFFF. A forward query reads it like any
