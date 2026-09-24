@@ -126,6 +126,20 @@
             ]
         },
         {
+            "name": "putfasp",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "row",
+                    "type": "position"
+                }
+            ]
+        },
+        {
             "name": "putwide",
             "base": "",
             "fields": [
@@ -213,6 +227,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "putfasp",
+            "type": "putfasp",
+            "ricardian_contract": ""
+        },
+        {
             "name": "putwide",
             "type": "putwide",
             "ricardian_contract": ""
@@ -231,6 +250,14 @@
             "key_names": ["beneficiary","sequence"],
             "key_types": ["name","uint64"],
             "table_id": 22163
+        },
+        {
+            "name": "fasp",
+            "type": "position",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 65535
         },
         {
             "name": "positions",

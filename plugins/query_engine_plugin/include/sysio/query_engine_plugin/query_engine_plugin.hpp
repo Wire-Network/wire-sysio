@@ -5,6 +5,7 @@
 #include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/query_engine_plugin/query_service.hpp>
 
+#include <chrono>
 #include <memory>
 
 namespace sysio {
@@ -29,6 +30,9 @@ public:
    void plugin_shutdown();
    /// Rebind only the diagnostic logger.
    void handle_sighup() override;
+   /// Time left in the current read-only window, from producer_plugin's window deadline: the bound
+   /// the read API places on every chain read. Meaningful on a read-only thread inside a read window.
+   static std::chrono::microseconds read_window_remaining(const producer_plugin&);
 
 private:
    struct impl;

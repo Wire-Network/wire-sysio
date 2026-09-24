@@ -31,7 +31,9 @@ bool same_abi(const chain::account_metadata_object& metadata, const table_schema
 } // namespace
 
 std::vector<table_schema> local_table_source::capture_abis(const ast_query& ast, query_budget& budget) const {
-   budget.check();
+   // Bounded like a data capture: the bytes copied here hold the read window too.
+   const auto started = budget.now();
+   budget.check_capture(started);
    assert_state(controller);
    budget.charge_memory(ast.owners.size() * sizeof(table_schema));
    std::vector<table_schema> schemas;
@@ -54,7 +56,7 @@ std::vector<table_schema> local_table_source::capture_abis(const ast_query& ast,
       result.owner = account;
       result.abi_sequence = metadata->abi_sequence;
       result.abi_bytes.assign(metadata->abi.data(), metadata->abi.data() + metadata->abi.size());
-      budget.check();
+      budget.check_capture(started);
       schemas.emplace_back(std::move(result));
    }
    return schemas;
@@ -71,15 +73,14 @@ captured_input local_table_source::capture(const typed_plan& plan, query_budget&
    const auto started = budget.now();
    budget.check_capture(started);
    assert_state(controller);
-   const auto assert_abis = [&](error_kind failure) {
-      for (const auto& schema : plan.schemas) {
-         budget.check_capture(started);
-         const auto* metadata = controller.find_account_metadata(schema->owner);
-         if (!metadata || !same_abi(*metadata, *schema))
-            throw query_error(failure, "Selected owner's ABI changed");
-      }
-   };
-   assert_abis(error_kind::SCHEMA_CHANGED);
+   // Nothing can rewrite an ABI while this callback holds the read window, so one comparison at the
+   // start covers the whole capture.
+   for (const auto& schema : plan.schemas) {
+      budget.check_capture(started);
+      const auto* metadata = controller.find_account_metadata(schema->owner);
+      if (!metadata || !same_abi(*metadata, *schema))
+         throw query_error(error_kind::SCHEMA_CHANGED, "Selected owner's ABI changed");
+   }
    const auto head = controller.head();
    const auto identity = head.id();
    const auto mode = controller.get_read_mode();
@@ -121,9 +122,6 @@ captured_input local_table_source::capture(const typed_plan& plan, query_budget&
       }
    }
    budget.check_capture(started);
-   assert_abis(error_kind::STATE_UNAVAILABLE);
-   if (controller.head().id() != identity || controller.get_read_mode() != mode)
-      throw query_error(error_kind::STATE_UNAVAILABLE, "Chain state changed inside read callback");
    result.capture_us = std::chrono::duration_cast<std::chrono::microseconds>(budget.now() - started).count();
    return result;
 }

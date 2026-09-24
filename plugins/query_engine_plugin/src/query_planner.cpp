@@ -427,11 +427,17 @@ bool compatible_type(const type_descriptor& left, const type_descriptor& right, 
    if (left.kind != right.kind || left.logical != right.logical || left.primitive != right.primitive ||
        left.abi_type != right.abi_type || left.fields.size() != right.fields.size() ||
        left.alternatives.size() != right.alternatives.size() || bool(left.element) != bool(right.element) ||
-       left.members.size() != right.members.size())
+       bool(left.enumeration) != bool(right.enumeration))
       return false;
-   for (size_t i = 0; i < left.members.size(); ++i)
-      if (left.members[i].name != right.members[i].name || left.members[i].value != right.members[i].value)
+   if (left.enumeration) {
+      const auto& members = left.enumeration->values;
+      const auto& others = right.enumeration->values;
+      if (left.enumeration->type != right.enumeration->type || members.size() != others.size())
          return false;
+      for (size_t i = 0; i < members.size(); ++i)
+         if (members[i].name != others[i].name || members[i].value != others[i].value)
+            return false;
+   }
    if (left.element && !compatible_type(*left.element, *right.element, budget))
       return false;
    for (size_t i = 0; i < left.fields.size(); ++i)

@@ -7,6 +7,7 @@
 #include <magic_enum/magic_enum.hpp>
 
 #include <algorithm>
+#include <chrono>
 #include <mutex>
 
 namespace sysio {
@@ -62,20 +63,20 @@ void query_engine_plugin::plugin_startup() {
    // read would never execute. producer_plugin sizes that pool from read-only-threads.
    SYS_ASSERT(app().executor().get_read_threads() > 0, chain::plugin_config_exception,
               "Query engine requires read-only-threads > 0: its chain reads run on the read-exclusive queue");
+   auto& producer = app().get_plugin<producer_plugin>();
    // One capture callback may hold a read window for at most the budget producer_plugin enforces on a
    // read-only transaction, so it cannot delay the next write window. An explicit query-max-capture-ms
    // may only tighten that bound.
-   const uint64_t read_budget_us = app().get_plugin<producer_plugin>().get_read_only_max_transaction_time().count();
-   SYS_ASSERT(read_budget_us > 0, chain::plugin_config_exception,
+   const std::chrono::microseconds read_budget(producer.get_read_only_max_transaction_time().count());
+   SYS_ASSERT(read_budget > std::chrono::microseconds::zero(), chain::plugin_config_exception,
               "Query engine requires a positive read-only transaction time from producer_plugin");
    if (_impl->capture_configured)
-      SYS_ASSERT(_impl->config.max_capture_us <= read_budget_us, chain::plugin_config_exception,
-                 "{} ({} ms) exceeds producer_plugin's read-only transaction time of {} us",
-                 query_engine::option::max_capture_ms,
-                 _impl->config.max_capture_us / query_engine::constants::microseconds_per_millisecond, read_budget_us);
+      SYS_ASSERT(_impl->config.max_capture <= read_budget, chain::plugin_config_exception,
+                 "{} ({} us) exceeds producer_plugin's read-only transaction time of {} us",
+                 query_engine::option::max_capture_ms, _impl->config.max_capture.count(), read_budget.count());
    else
-      _impl->config.max_capture_us = std::min(read_budget_us, uint64_t(_impl->config.timeout_ms) *
-                                                                 query_engine::constants::microseconds_per_millisecond);
+      _impl->config.max_capture =
+         std::min(read_budget, std::chrono::duration_cast<std::chrono::microseconds>(_impl->config.timeout));
    try {
       _impl->config.validate();
    } catch (const query_engine::query_error& error) {
@@ -87,7 +88,10 @@ void query_engine_plugin::plugin_startup() {
          app().executor().post(priority::medium_low, exec_queue::read_exclusive, std::move(callback));
       },
       // Startup runs on the application loop thread before its executor refreshes the thread ID.
-      std::this_thread::get_id());
+      std::this_thread::get_id(),
+      // A read-exclusive task runs inside a read window; the window's end bounds the capture like the
+      // deadline producer_plugin passes to a read-only transaction.
+      [&producer] { return read_window_remaining(producer); });
    auto engine = std::make_shared<query_engine::query_engine>(_impl->config, std::move(reads));
    engine->set_logger(_impl->log);
    _impl->exchange_engine(engine);
@@ -104,7 +108,7 @@ void query_engine_plugin::plugin_startup() {
            "Query service enabled; read_mode={}, workers={}, max_in_flight={}, max_capture_us={}, "
            "admitted_memory_bytes={}",
            magic_enum::enum_name(controller.get_read_mode()), _impl->config.worker_threads, _impl->config.max_in_flight,
-           _impl->config.max_capture_us, _impl->config.max_memory_bytes * _impl->config.max_in_flight);
+           _impl->config.max_capture.count(), _impl->config.max_memory_bytes * _impl->config.max_in_flight);
 }
 void query_engine_plugin::plugin_shutdown() {
    if (auto engine = _impl->exchange_engine(nullptr)) {
@@ -117,6 +121,9 @@ void query_engine_plugin::plugin_shutdown() {
 }
 std::shared_ptr<query_engine::query_service> query_engine_plugin::get_query_service() const {
    return _impl->current_engine();
+}
+std::chrono::microseconds query_engine_plugin::read_window_remaining(const producer_plugin& producer) {
+   return std::chrono::microseconds((producer.get_read_only_window_deadline() - fc::time_point::now()).count());
 }
 void query_engine_plugin::handle_sighup() {
    fc::logger::update(query_engine::constants::logger, _impl->log);

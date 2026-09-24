@@ -7,6 +7,7 @@
 #include <cstring>
 #include <map>
 #include <numeric>
+#include <optional>
 #include <tuple>
 
 namespace sysio::query_engine {
@@ -14,11 +15,17 @@ namespace {
 constexpr uint64_t allocation_factor = 2;
 constexpr uint64_t map_node_overhead = 128;
 
-/// Charge value storage and owned strings before a copy or a vector growth.
+/// Bytes a retained value owns beyond its slot: text, units, and a container cell's whole tree.
+uint64_t value_bytes(const value& value) {
+   return value.text.size() + value.symbol.size() + value.contract.size() +
+          (value.type == logical_type::json ? value.container.estimated_size() * allocation_factor : 0);
+}
+
+/// Charge value storage and owned strings/containers before a copy or a vector growth.
 void charge_values(const std::vector<value>& values, query_budget& budget) {
    budget.charge_memory(values.size() * sizeof(value) * allocation_factor);
    for (const auto& value : values)
-      budget.charge_memory(value.text.size() + value.symbol.size() + value.contract.size());
+      budget.charge_memory(value_bytes(value));
 }
 
 /// Get a bound expression from source fields or finalized aggregate slots.
@@ -66,26 +73,27 @@ truth evaluate_predicate(const predicate& predicate, const std::vector<value>& f
       const auto& right = expression_value(predicate.right, fields, aggregates);
       if (left.null || right.null)
          return truth::unknown;
-      const auto comparison = compare_values(left, right);
+      // Equality never needs an order, so assets of different denominations are unequal rather than
+      // incomparable; the ordered operators still reject them.
       bool result = false;
       switch (predicate.operation) {
       case comparison_operator::equal:
-         result = comparison == 0;
+         result = equal_values(left, right);
          break;
       case comparison_operator::not_equal:
-         result = comparison != 0;
+         result = !equal_values(left, right);
          break;
       case comparison_operator::less:
-         result = comparison < 0;
+         result = compare_values(left, right) < 0;
          break;
       case comparison_operator::less_equal:
-         result = comparison <= 0;
+         result = compare_values(left, right) <= 0;
          break;
       case comparison_operator::greater:
-         result = comparison > 0;
+         result = compare_values(left, right) > 0;
          break;
       case comparison_operator::greater_equal:
-         result = comparison >= 0;
+         result = compare_values(left, right) >= 0;
          break;
       }
       return result ? truth::true_value : truth::false_value;
@@ -150,13 +158,18 @@ void accumulate(group_state& group, const typed_plan& plan, const std::vector<va
          continue;
       if (slot.function == aggregate_function::SUM || slot.function == aggregate_function::AVG)
          add_value(accumulator.accumulated, *source);
-      else if (accumulator.accumulated.null)
+      else if (accumulator.accumulated.null) {
+         budget.charge_memory(value_bytes(*source));
          accumulator.accumulated = *source;
-      else {
+      } else {
          const auto comparison = compare_values(*source, accumulator.accumulated);
          if ((slot.function == aggregate_function::MIN && comparison < 0) ||
-             (slot.function == aggregate_function::MAX && comparison > 0))
+             (slot.function == aggregate_function::MAX && comparison > 0)) {
+            // A retained extreme owns its text; the one it replaces is released.
+            budget.charge_memory(value_bytes(*source));
+            budget.release_memory(value_bytes(accumulator.accumulated));
             accumulator.accumulated = *source;
+         }
       }
    }
 }
@@ -183,16 +196,24 @@ std::vector<value> finalize(const group_state& group, const typed_plan& plan, qu
    return result;
 }
 
-/// Releases one row's decode charges when the decoded values go out of scope: the retained copies
-/// (projected cells, group keys and states) were charged separately, so the accounting tracks live
-/// memory instead of the sum of every row ever decoded.
+/// Releases one row's transient charges when its decoded values go out of scope. Everything charged
+/// between construction and settle() is transient (the decoded fields, a GROUP BY key); retained
+/// copies (projected cells, group keys and states) are charged after settle(), so the accounting
+/// tracks live memory instead of the sum of every row ever decoded. A scope that is never settled
+/// explicitly, because its row left early, settles at destruction.
 struct transient_charge {
    query_budget& budget;
    uint64_t start;
-   uint64_t bytes = 0;
-   /// Fix the amount once decoding finished, before retained copies are charged.
-   void settle() { bytes = budget.accounted_bytes - start; }
-   ~transient_charge() { budget.release_memory(bytes); }
+   std::optional<uint64_t> bytes;
+   /// Fix the transient amount, before retained copies are charged.
+   void settle() {
+      if (!bytes)
+         bytes = budget.accounted_bytes >= start ? budget.accounted_bytes - start : 0;
+   }
+   ~transient_charge() {
+      settle();
+      budget.release_memory(*bytes);
+   }
 };
 
 /// Projection retains exact values until sort and final JSON normalization.
@@ -204,7 +225,7 @@ projected_row project(const typed_plan& plan, const std::vector<value>& fields, 
    result.cells.reserve(plan.columns.size());
    for (const auto& item : plan.ast.select) {
       const auto& value = expression_value(item.source, fields, aggregates);
-      budget.charge_memory(value.text.size() + value.symbol.size() + value.contract.size());
+      budget.charge_memory(value_bytes(value));
       result.cells.push_back(value);
    }
    return result;
@@ -232,22 +253,26 @@ query_result evaluate(const typed_plan& plan, captured_input input, query_budget
          budget.check();
          transient_charge decode_charge{budget, budget.accounted_bytes};
          auto fields = decoder.decode(row.row, budget);
-         decode_charge.settle();
          if (plan.ast.where && evaluate_predicate(*plan.ast.where, fields, no_aggregates, budget) != truth::true_value)
             continue;
          ++matched;
          if (!plan.aggregate) {
+            decode_charge.settle();
             auto projected = project(plan, fields, no_aggregates, budget);
             projected.primary_key = std::move(row.row.key);
             projected.owner = row.owner;
             output.push_back(std::move(projected));
             continue;
          }
-         budget.charge_memory(plan.groups.size() * sizeof(value) * allocation_factor);
+         // The key is transient as well: a row joining an existing group frees it with the decoded
+         // fields, and a new group charges its retained copy below.
          std::vector<value> key;
          key.reserve(plan.groups.size());
-         for (auto slot : plan.groups)
+         for (auto slot : plan.groups) {
+            budget.charge_memory(sizeof(value) * allocation_factor + value_bytes(fields[slot]));
             key.push_back(fields[slot]);
+         }
+         decode_charge.settle();
          auto found = groups.find(key);
          if (found == groups.end()) {
             budget.assert_limit(groups.size() + 1, budget.config.max_groups, option::max_groups);
@@ -262,10 +287,13 @@ query_result evaluate(const typed_plan& plan, captured_input input, query_budget
       }
       uint64_t ordinal = 0;
       for (const auto& [key, group] : groups) {
+         // Finalized aggregates are transient: project() charges the copies it retains.
+         transient_charge finalize_charge{budget, budget.accounted_bytes};
          auto aggregates = finalize(group, plan, budget);
          if (plan.ast.having &&
              evaluate_predicate(*plan.ast.having, group.fields, aggregates, budget) != truth::true_value)
             continue;
+         finalize_charge.settle();
          auto projected = project(plan, group.fields, aggregates, budget);
          projected.group_ordinal = ordinal++;
          output.push_back(std::move(projected));

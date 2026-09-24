@@ -3,7 +3,7 @@
   "id": "balances-by-beneficiary",
   "error": {
     "code": -32012,
-    "message": "Query scan row limit exceeded",
+    "message": "Query resource limit exceeded",
     "data": {
       "kind": "QUERY_LIMIT",
       "retryable": false,

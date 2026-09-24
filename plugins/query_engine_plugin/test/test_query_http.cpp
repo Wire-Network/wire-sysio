@@ -10,7 +10,10 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 
+#include <algorithm>
 #include <atomic>
+#include <chrono>
+#include <cstdlib>
 #include <fstream>
 
 using namespace sysio;
@@ -26,6 +29,10 @@ constexpr auto selected_sql = "SELECT * FROM sample.positions WHERE key.id = 1";
 constexpr auto table_route = "/v1/chain/get_table_rows";
 constexpr int http_version = 11;
 constexpr uint32_t default_read_threads = 2;
+constexpr auto write_window_option = "read-only-write-window-time-us";
+/// Real-clock request deadlines include read-window waits; a generous default keeps runs on a loaded
+/// host deterministic unless a test pins its own timeout.
+constexpr auto default_query_timeout = std::chrono::seconds(10);
 
 /// Actual application and dependency closure, with an explicitly disabled TCP listener.
 struct http_application {
@@ -83,6 +90,10 @@ struct http_application {
       if (enable_http)
          args.insert(args.end(), {"--plugin", "sysio::chain_api_plugin", "--plugin", "sysio::http_plugin"});
       args.insert(args.end(), extra.begin(), extra.end());
+      const auto timeout_flag = flag(option::timeout_ms);
+      if (std::find(extra.begin(), extra.end(), timeout_flag) == extra.end())
+         args.insert(args.end(),
+                     {timeout_flag, std::to_string(std::chrono::milliseconds(default_query_timeout).count())});
       std::vector<char*> argv;
       for (auto& argument : args)
          argv.push_back(argument.data());
@@ -273,6 +284,15 @@ BOOST_AUTO_TEST_CASE(query_http_plugin_route) {
       BOOST_REQUIRE(error.result() == http::status::ok);
       BOOST_CHECK(fc::json::from_string(error.body()).get_object().contains("error"));
    }
+   // The error contract on the wire: numeric code, retryability, 1-based position and the echoed ID.
+   const auto syntax =
+      fc::json::from_string(server.request(request_body("SELECT * FROM sample.positions JOIN other.positions")).body());
+   BOOST_CHECK_EQUAL(syntax["id"].as_string(), "test");
+   BOOST_CHECK_EQUAL(syntax["error"]["code"].as_int64(), error_code(error_kind::QUERY_SYNTAX));
+   BOOST_CHECK_EQUAL(syntax["error"]["data"]["kind"].as_string(), "QUERY_SYNTAX");
+   BOOST_CHECK(!syntax["error"]["data"]["retryable"].as_bool());
+   BOOST_CHECK_EQUAL(syntax["error"]["data"]["line"].as_uint64(), 1);
+   BOOST_CHECK_EQUAL(syntax["error"]["data"]["column"].as_uint64(), 32);
    for (const auto& body :
         {R"({"jsonrpc":"2.0","method":"query.execute","params":{"query":"SELECT * FROM sample.positions"}})",
          R"({"jsonrpc":"2.0","method":"query.execute","params":{"query":"bad sql"}})",
@@ -300,11 +320,19 @@ BOOST_AUTO_TEST_CASE(query_http_plugin_disabled) {
    BOOST_CHECK(server.request(request_body(selected_sql)).result() == http::status::not_found);
 }
 
-/// Reject a configured producer during initialization, before workers or routes exist.
+/// Reject a configured producer during initialization, before workers or routes exist. Zero read
+/// threads keep producer_plugin's own producer/read-thread check out of the way, so the rejection is
+/// the query plugin's.
 BOOST_AUTO_TEST_CASE(query_http_rejects_producer) {
+   constexpr uint32_t no_read_threads = 0;
+   const std::vector<std::string> producer = {"--producer-name", "sysio"};
+   {
+      // Control: the same node without the query plugin initializes, so the rejection below is ours.
+      http_application control;
+      BOOST_REQUIRE(control.initialize(false, no_read_threads, producer) == chain::exit_code::SUCCESS);
+   }
    http_application server;
-   BOOST_CHECK(server.initialize(true, default_read_threads, {"--producer-name", "sysio"}) !=
-               chain::exit_code::SUCCESS);
+   BOOST_CHECK(server.initialize(true, no_read_threads, producer) != chain::exit_code::SUCCESS);
 }
 
 /// Startup rejects speculative chain state independently of HTTP enablement.
@@ -326,18 +354,86 @@ BOOST_AUTO_TEST_CASE(query_http_requires_read_only_threads) {
 BOOST_AUTO_TEST_CASE(query_http_capture_bound_cannot_exceed_read_only_budget) {
    {
       http_application server;
-      BOOST_REQUIRE(server.initialize(true, default_read_threads, {"--query-max-capture-ms", "500"}) ==
+      BOOST_REQUIRE(server.initialize(true, default_read_threads, {flag(option::max_capture_ms), "500"}) ==
                     chain::exit_code::SUCCESS);
       BOOST_CHECK(server.run_until_startup_fails() != chain::exit_code::SUCCESS);
    }
    chain_fixture fixture;
    http_application server;
-   BOOST_REQUIRE(server.initialize(true, default_read_threads, {"--query-max-capture-ms", "5"}) ==
+   BOOST_REQUIRE(server.initialize(true, default_read_threads, {flag(option::max_capture_ms), "5"}) ==
                  chain::exit_code::SUCCESS);
    server.start();
    server.sync(fixture);
    BOOST_CHECK(
       fc::json::from_string(server.request(request_body(selected_sql)).body()).get_object().contains("result"));
+}
+
+/// The capture bound is producer_plugin's read-only transaction budget: the smaller of
+/// max-transaction-time and the read window less the minimum producer_plugin keeps free of new work.
+/// Inside a read window, the deadline producer_plugin reports lies ahead by at most the window.
+BOOST_AUTO_TEST_CASE(query_http_capture_bound_follows_the_read_window) {
+   constexpr auto read_window = std::chrono::milliseconds(30);
+   // The floor producer_plugin keeps free of new work in every read window, per its option help.
+   constexpr auto read_window_minimum = std::chrono::milliseconds(10);
+   chain_fixture fixture;
+   http_application server;
+   BOOST_REQUIRE(
+      server.initialize(true, default_read_threads,
+                        {flag(bound::read_window), std::to_string(std::chrono::microseconds(read_window).count())}) ==
+      chain::exit_code::SUCCESS);
+   server.start();
+   server.sync(fixture);
+   const auto engine = std::dynamic_pointer_cast<sysio::query_engine::query_engine>(
+      app().get_plugin<sysio::query_engine_plugin>().get_query_service());
+   BOOST_REQUIRE(engine);
+   BOOST_CHECK(engine->config().max_capture == read_window - read_window_minimum);
+   BOOST_CHECK_EQUAL(engine->config().max_capture.count(),
+                     app().get_plugin<producer_plugin>().get_read_only_max_transaction_time().count());
+   // The window time the plugin binds on every read agrees with producer_plugin's deadline.
+   std::promise<std::pair<fc::microseconds, std::chrono::microseconds>> remaining_completion;
+   auto remaining = remaining_completion.get_future();
+   server.post_read([&] {
+      const auto& producer = app().get_plugin<producer_plugin>();
+      remaining_completion.set_value({producer.get_read_only_window_deadline() - fc::time_point::now(),
+                                      sysio::query_engine_plugin::read_window_remaining(producer)});
+   });
+   BOOST_REQUIRE(remaining.wait_for(test_wait) == std::future_status::ready);
+   const auto [direct, plugin_remaining] = remaining.get();
+   // The task was popped while the window was open; a preempted thread may measure a hair past its end.
+   constexpr auto scheduling_margin = std::chrono::milliseconds(5);
+   BOOST_CHECK_GT(direct.count(), -std::chrono::microseconds(scheduling_margin).count());
+   BOOST_CHECK_LE(direct.count(), std::chrono::microseconds(read_window).count());
+   BOOST_CHECK_LE(std::abs(plugin_remaining.count() - direct.count()),
+                  std::chrono::microseconds(scheduling_margin).count());
+   BOOST_CHECK(
+      fc::json::from_string(server.request(request_body(selected_sql)).body()).get_object().contains("result"));
+   // The plugin binds that window on every read: a budget the engine ran carries the capture deadline
+   // the read API set, no later than one window after the read.
+   const auto budget = engine->create_budget();
+   BOOST_CHECK_EQUAL(engine->execute(selected_sql, budget).rows.size(), 1);
+   BOOST_REQUIRE(budget->capture_deadline);
+   BOOST_CHECK(*budget->capture_deadline <= query_budget::clock::now() + read_window);
+   BOOST_CHECK(*budget->capture_deadline > budget->started);
+}
+
+/// Chain reads run on the read-exclusive queue, which the application thread never drains: with a
+/// write window longer than the request deadline, a query cannot complete on the main thread the way
+/// a read_only task would, and times out waiting for a read window.
+BOOST_AUTO_TEST_CASE(query_http_reads_wait_for_a_read_window) {
+   chain_fixture fixture;
+   http_application server;
+   constexpr auto long_write_window = std::chrono::seconds(30);
+   constexpr auto short_timeout = std::chrono::milliseconds(500);
+   BOOST_REQUIRE(server.initialize(
+                    true, default_read_threads,
+                    {flag(write_window_option), std::to_string(std::chrono::microseconds(long_write_window).count()),
+                     flag(option::timeout_ms), std::to_string(short_timeout.count())}) == chain::exit_code::SUCCESS);
+   server.start();
+   server.sync(fixture);
+   const auto response = fc::json::from_string(server.request(request_body(selected_sql)).body());
+   BOOST_REQUIRE_MESSAGE(response.get_object().contains("error"),
+                         fc::json::to_string(response, fc::time_point::maximum()));
+   BOOST_CHECK_EQUAL(response["error"]["data"]["kind"].as_string(), "QUERY_TIMEOUT");
 }
 
 /// Registering HTTP never makes it a required dependency; execute remains usable without listeners.
@@ -402,7 +498,7 @@ BOOST_AUTO_TEST_CASE(query_http_irreversible_read_mode) {
 BOOST_AUTO_TEST_CASE(query_http_admission_while_chain_queue_is_blocked) {
    chain_fixture fixture;
    http_application server;
-   BOOST_REQUIRE(server.initialize(true, default_read_threads, {"--query-max-in-flight", "1"}) ==
+   BOOST_REQUIRE(server.initialize(true, default_read_threads, {flag(option::max_in_flight), "1"}) ==
                  chain::exit_code::SUCCESS);
    server.start();
    server.sync(fixture);
@@ -521,8 +617,9 @@ BOOST_AUTO_TEST_CASE(query_application_coherent_pages_and_capture_timeout) {
       server.post_read([&] {
          query_budget* active = nullptr;
          query_budget timeout({}, [&] {
-            return started + std::chrono::microseconds(
-                                active && active->scanned_rows >= constants::page_rows ? defaults::max_capture_us : 0);
+            return started + (active && active->scanned_rows >= constants::page_rows
+                                 ? defaults::max_capture
+                                 : std::chrono::microseconds::zero());
          });
          active = &timeout;
          try {
@@ -556,7 +653,7 @@ BOOST_AUTO_TEST_CASE(query_application_representative_workload) {
    server.sync(fixture);
    const auto before = fixture.control->head().block_num();
    const auto sql = "SELECT beneficiary, SUM(amount) AS total FROM sample.positions GROUP BY beneficiary";
-   query_budget budget({});
+   query_budget budget(relaxed_config());
    const auto ast = parse_query(sql, budget);
    const auto plan = create_plan(ast, server.describe(ast, budget), budget);
    std::promise<void> baseline_completion;

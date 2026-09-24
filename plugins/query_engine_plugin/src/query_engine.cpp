@@ -56,9 +56,10 @@ struct query_engine::impl : std::enable_shared_from_this<impl> {
       std::lock_guard lock(mutex);
       counters.scanned_rows += task.succeeded ? task.scanned_rows : task.budget->scanned_rows;
       counters.capture_bytes += task.succeeded ? task.raw_bytes : task.budget->raw_bytes;
-      counters.peak_accounted_bytes =
-         std::max(counters.peak_accounted_bytes, task.succeeded ? task.accounted_bytes : task.budget->accounted_bytes);
+      counters.peak_accounted_bytes = std::max(
+         counters.peak_accounted_bytes, task.succeeded ? task.peak_accounted_bytes : task.budget->peak_accounted_bytes);
       counters.returned_rows += task.returned_rows;
+      counters.read_window_cuts += task.budget->read_window_cuts.load(std::memory_order_relaxed);
       requests.erase(&task);
       counters.in_flight = requests.size();
    }
@@ -85,7 +86,7 @@ struct query_engine::impl : std::enable_shared_from_this<impl> {
       task->returned_rows = result.rows.size();
       task->scanned_rows = task->budget->scanned_rows;
       task->raw_bytes = task->budget->raw_bytes;
-      task->accounted_bytes = task->budget->accounted_bytes;
+      task->peak_accounted_bytes = task->budget->peak_accounted_bytes;
       {
          std::lock_guard lock(mutex);
          ++counters.completed;
@@ -221,9 +222,10 @@ struct query_engine::impl : std::enable_shared_from_this<impl> {
       std::lock_guard lock(mutex);
       fc_ilog(log,
               "Query shutdown: accepted={}, completed={}, busy={}, timed_out={}, cancelled={}, scanned_rows={}, "
-              "returned_rows={}, capture_bytes={}, peak_accounted_bytes={}",
+              "returned_rows={}, capture_bytes={}, peak_accounted_bytes={}, read_window_cuts={}",
               counters.accepted, counters.completed, counters.rejected_busy, counters.timed_out, counters.cancelled,
-              counters.scanned_rows, counters.returned_rows, counters.capture_bytes, counters.peak_accounted_bytes);
+              counters.scanned_rows, counters.returned_rows, counters.capture_bytes, counters.peak_accounted_bytes,
+              counters.read_window_cuts);
    }
 };
 
@@ -239,6 +241,10 @@ query_result query_engine::execute(const std::string& sql, const std::optional<q
    return execute(sql, create_budget(options));
 }
 query_result query_engine::execute(const std::string& sql, std::shared_ptr<query_budget> budget) {
+   if (!budget)
+      throw query_error(error_kind::INVALID_PARAMS, "Query budget is required");
+   if (budget->claimed.exchange(true))
+      throw query_error(error_kind::INVALID_PARAMS, "Query budget was already used");
    return state->execute(sql, std::move(budget));
 }
 std::shared_ptr<query_budget> query_engine::create_budget(const std::optional<query_options>& options) const {

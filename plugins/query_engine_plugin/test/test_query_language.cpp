@@ -44,6 +44,33 @@ BOOST_AUTO_TEST_CASE(unsupported_syntax_and_parser_limits) {
    BOOST_CHECK_THROW(parse_query(tokens, token_budget), query_error);
 }
 
+/// The token pre-scan stops a long stream before the parser allocates a tree: ORDER BY items cost
+/// three tokens but one AST node, so this query exceeds the token bound well under the node bound.
+BOOST_AUTO_TEST_CASE(token_bound_precedes_node_bound) {
+   constexpr uint32_t tokens_per_item = 3;
+   std::string ordered = "SELECT x FROM a.b ORDER BY x";
+   for (uint32_t i = 0; i < constants::max_tokens / tokens_per_item; ++i)
+      ordered += ", x DESC";
+   query_budget budget({});
+   BOOST_CHECK_EXCEPTION(parse_query(ordered, budget), query_error, [](const auto& error) {
+      return error.kind == error_kind::QUERY_LIMIT && error.limit == bound::tokens;
+   });
+}
+
+/// A keyword becomes an identifier in double quotes: as a field, a table and an output name alike.
+BOOST_AUTO_TEST_CASE(quoted_keywords_are_identifiers) {
+   query_budget budget({});
+   const auto query = parse_query(
+      "SELECT \"count\", \"limit\" AS \"order\" FROM \"select\" OWNER 'sysio.roa' ORDER BY \"order\"", budget);
+   BOOST_CHECK_EQUAL(query.table, "select");
+   BOOST_REQUIRE_EQUAL(query.select.size(), 2);
+   BOOST_CHECK_EQUAL(query.select.front().source.path.front(), "count");
+   BOOST_CHECK_EQUAL(*query.select.back().alias, "order");
+   BOOST_CHECK_EQUAL(query.order_by.front().name, "order");
+   query_budget unquoted({});
+   BOOST_CHECK_THROW(parse_query("SELECT count FROM sponsorcount OWNER 'sysio.roa'", unquoted), query_error);
+}
+
 /// Owner selection is explicit and supports both qualified tables and a SQL owner list.
 BOOST_AUTO_TEST_CASE(owner_clause_and_qualified_sources) {
    query_budget budget({});

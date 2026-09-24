@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(default_timeout_is_configured_and_no_deadline_is_explicit) 
          [&] { return query_budget::clock::time_point{} + std::chrono::milliseconds(elapsed_ms.load()); },
          [&](query_stage stage) {
             if (stage == query_stage::parse)
-               elapsed_ms = config.timeout_ms + 1;
+               elapsed_ms = config.timeout.count() + 1;
          });
       if (options && options->timeout == constants::no_deadline)
          BOOST_CHECK_EQUAL(execute(engine, reads, ordered_sql, options).rows.size(), 3);
@@ -107,6 +107,27 @@ BOOST_AUTO_TEST_CASE(option_errors_and_resource_limits) {
    engine.stop();
    BOOST_CHECK_EXCEPTION(engine.execute(ordered_sql), query_error,
                          [](const auto& error) { return error.kind == error_kind::QUERY_CANCELLED; });
+}
+
+/// A caller-owned budget is required and serves exactly one call; it may be inspected afterwards.
+BOOST_AUTO_TEST_CASE(caller_owned_budgets_serve_one_call) {
+   read_queue reads;
+   query_engine engine({}, reads.create_api(*validating_node));
+   BOOST_CHECK_EXCEPTION(engine.execute(ordered_sql, std::shared_ptr<query_budget>{}), query_error,
+                         [](const auto& error) { return error.kind == error_kind::INVALID_PARAMS; });
+   const auto budget = engine.create_budget();
+   auto first = std::async(std::launch::async, [&] { return engine.execute(ordered_sql, budget); });
+   const auto deadline = query_budget::clock::now() + test_wait;
+   while (first.wait_for(std::chrono::milliseconds(0)) != std::future_status::ready) {
+      BOOST_REQUIRE(query_budget::clock::now() < deadline);
+      reads.run_one();
+   }
+   BOOST_CHECK_EQUAL(first.get().rows.size(), 3);
+   BOOST_CHECK_GT(budget->peak_accounted_bytes, 0);
+   BOOST_CHECK_EQUAL(budget->scanned_rows, 3);
+   BOOST_CHECK_EXCEPTION(engine.execute(ordered_sql, budget), query_error,
+                         [](const auto& error) { return error.kind == error_kind::INVALID_PARAMS; });
+   engine.stop();
 }
 
 /// Reject accidental application-thread waits before creating a query or scheduling a read.

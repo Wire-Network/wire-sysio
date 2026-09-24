@@ -8,6 +8,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <chrono>
 #include <condition_variable>
 #include <deque>
 #include <future>
@@ -23,10 +24,21 @@ inline constexpr auto seed_action = "seed"_n;
 inline constexpr auto erase_action = "erase"_n;
 inline constexpr auto composite_action = "putcomp"_n;
 inline constexpr auto wide_action = "putwide"_n;
+inline constexpr auto fasp_action = "putfasp"_n;
 inline constexpr auto status_open = "POSITION_STATUS_OPEN";
 inline constexpr auto status_closed = "POSITION_STATUS_CLOSED";
 inline constexpr auto status_archived = "POSITION_STATUS_ARCHIVED";
 inline constexpr auto test_wait = std::chrono::seconds(10);
+/// Deadlines for direct evaluation on a real clock: generous, since these tests assert on results and
+/// accounting, never on wall-clock behavior, and sanitizer builds are slow.
+inline constexpr auto relaxed_deadline = std::chrono::seconds(60);
+
+/// A config whose request and capture deadlines cannot expire during a test; other limits as given.
+inline query_config relaxed_config(query_config config = {}) {
+   config.timeout = relaxed_deadline;
+   config.max_capture = relaxed_deadline;
+   return config;
+}
 
 /// Real signed fixture actions, replicated into the validating controller used by queries.
 struct chain_fixture : testing::validating_tester {
@@ -98,16 +110,24 @@ struct read_queue {
       callback();
       return true;
    }
-   /// Synchronization remains inside the production read API; the test thread supplies its executor.
-   std::shared_ptr<query_read_api> create_api(const chain::controller& controller) {
-      return std::make_shared<query_read_api>(std::make_shared<local_table_source>(controller),
-                                              [this](auto callback) { post(std::move(callback)); });
+   /// Synchronization remains inside the production read API; the test thread supplies its executor
+   /// and, when a test models chain read windows, the time left in the current one.
+   std::shared_ptr<query_read_api> create_api(const chain::controller& controller,
+                                              query_read_api::read_window_remaining window = {}) {
+      return std::make_shared<query_read_api>(
+         std::make_shared<local_table_source>(controller), [this](auto callback) { post(std::move(callback)); },
+         std::thread::id{}, std::move(window));
    }
    size_t size() {
       std::lock_guard lock(mutex);
       return callbacks.size();
    }
 };
+
+/// The command-line spelling of an option name.
+inline std::string flag(const char* option) {
+   return std::string("--") + option;
+}
 
 /// Production JSON-RPC envelope without a second route implementation.
 inline std::string request_body(const std::string& sql) {
@@ -120,8 +140,9 @@ inline std::string request_body(const std::string& sql) {
 inline fc::variant submit(query_http_handler& handler, read_queue& reads, const std::string& sql) {
    std::promise<fc::variant> completion;
    auto future = completion.get_future();
-   handler.submit(request_body(sql), [&](int status, std::optional<fc::variant> result) {
-      BOOST_CHECK_EQUAL(status, 200);
+   std::atomic<int> status{0}; // asserted on the test thread; the callback runs on an HTTP worker
+   handler.submit(request_body(sql), [&](int code, std::optional<fc::variant> result) {
+      status = code;
       completion.set_value(result.value());
    });
    const auto deadline = query_budget::clock::now() + test_wait;
@@ -130,6 +151,7 @@ inline fc::variant submit(query_http_handler& handler, read_queue& reads, const 
       reads.run_one();
    }
    auto response = future.get();
+   BOOST_CHECK_EQUAL(status.load(), 200);
    validate_response(fc::json::to_string(response, fc::time_point::maximum()));
    return response;
 }

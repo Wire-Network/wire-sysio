@@ -111,7 +111,7 @@ struct query_http_handler::impl {
          }
          for (const auto& task : expired) {
             task->budget->cancelled = true;
-            finish(task, query_error(error_kind::QUERY_TIMEOUT, "Query deadline exceeded"));
+            finish(task, task->budget->deadline_error());
          }
       }
    }
@@ -151,8 +151,7 @@ struct query_http_handler::impl {
 
    /// Bound ingress independently of engine admission, including queued HTTP bodies and response buffers.
    void submit(std::string body, url_response_callback callback) {
-      auto budget =
-         engine->create_budget(query_options{.timeout = std::chrono::milliseconds(engine->config().timeout_ms)});
+      auto budget = engine->create_budget(query_options{.timeout = engine->config().timeout});
       query_request parsed;
       try {
          parsed = parse_request(body, *budget);

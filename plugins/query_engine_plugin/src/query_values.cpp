@@ -33,7 +33,6 @@ constexpr uint32_t scalar_allocation_bytes = 512;
 constexpr uint32_t node_allocation_factor = 2;
 constexpr uint64_t abi_decode_allocation_factor = 8;
 constexpr uint8_t sign_bit = 0x80;
-constexpr char enum_member_separator = '_';
 constexpr size_t timestamp_fraction_digits = 6;
 constexpr size_t minimum_year_digits = 4;
 constexpr size_t maximum_year_digits = 7; // int64 microseconds span years within +-292277
@@ -185,9 +184,11 @@ logical_type primitive_logical(primitive_type type) {
 /// The ABI member name of an enum's underlying value, or its decimal spelling for an unlisted value
 /// (the abi_serializer's fallback).
 std::string enum_member_name(const type_descriptor& type, const integer& underlying) {
-   for (const auto& member : type.members)
-      if (integer(member.value) == underlying)
-         return member.name;
+   if (type.enumeration && underlying >= std::numeric_limits<int64_t>::min() &&
+       underlying <= std::numeric_limits<int64_t>::max())
+      if (const auto* member =
+             abi_serializer::find_enum_member_by_value(*type.enumeration, underlying.convert_to<int64_t>()))
+         return member->name;
    return underlying.convert_to<std::string>();
 }
 
@@ -216,34 +217,31 @@ std::string canonical_crypto_text(const std::string& text) {
    return rendered.as_string();
 }
 
-/// Bind an enum literal: exact member name, then the abi_serializer's prefix-stripped match, then the
-/// underlying integer spelling. The stored text is always the canonical member name.
+/// Bind an enum literal. An integer spelling binds that underlying value directly, so an unlisted
+/// value rendered as its decimal never re-binds to a member by suffix; other text resolves through
+/// abi_serializer's member lookup (exact name, then a unique `_` suffix). The stored text is the
+/// canonical member name, or the decimal spelling of an unlisted value.
 value coerce_enumeration(value source, const type_descriptor& expected) {
-   for (const auto& member : expected.members) {
-      if (member.name != source.text)
-         continue;
-      source.numerator = member.value;
-      source.type = logical_type::enumeration;
-      return source;
-   }
-   for (const auto& member : expected.members) {
-      const auto separator = member.name.rfind(enum_member_separator);
-      if (separator == std::string::npos || member.name.substr(separator + 1) != source.text)
-         continue;
-      source.numerator = member.value;
-      source.text = member.name;
-      source.type = logical_type::enumeration;
-      return source;
-   }
-   value number;
+   if (!expected.enumeration)
+      throw query_error(error_kind::INTERNAL_ERROR, "Enumeration descriptor without a definition");
+   std::optional<value> number;
    try {
       number = parse_number(source.text);
    } catch (const query_error&) {
-      throw query_error(error_kind::VALUE_ERROR, "Unknown enum member");
+      // Not an integer spelling: resolve it as a member name below.
    }
-   if (number.type != logical_type::integer)
-      throw query_error(error_kind::VALUE_ERROR, "Unknown enum member");
-   source.numerator = number.numerator;
+   if (number) {
+      // A member whose name itself spells an integer can only be reached by that integer; ABI member
+      // names are identifiers, so none does.
+      if (number->type != logical_type::integer)
+         throw query_error(error_kind::VALUE_ERROR, "Unknown enum member");
+      source.numerator = number->numerator;
+   } else {
+      const auto* member = abi_serializer::find_enum_member_by_name(*expected.enumeration, source.text);
+      if (!member)
+         throw query_error(error_kind::VALUE_ERROR, "Unknown or ambiguous enum member");
+      source.numerator = member->value;
+   }
    source.text = enum_member_name(expected, source.numerator);
    source.type = logical_type::enumeration;
    return source;
@@ -258,14 +256,16 @@ public:
 
    std::shared_ptr<const type_descriptor> create(std::string name, uint32_t depth = 0) {
       budget.check();
-      budget.assert_limit(depth, constants::max_depth, "abi-depth");
-      budget.assert_limit(++nodes, constants::max_ast_nodes, "abi-nodes");
+      budget.assert_limit(depth, constants::max_depth, bound::abi_depth);
+      budget.assert_limit(++nodes, constants::max_ast_nodes, bound::abi_nodes);
       budget.charge_memory(sizeof(type_descriptor) * node_allocation_factor + name.size() * node_allocation_factor);
       if (!active.insert(name).second)
          throw query_error(error_kind::QUERY_SEMANTICS, "Recursive ABI types are unsupported");
+      // The guard keeps its own copy: `name` is rewritten below for the checksum alias, and the
+      // entry erased must be the one inserted.
       struct active_guard {
          std::set<std::string>& active;
-         const std::string& name;
+         std::string name;
          ~active_guard() { active.erase(name); }
       } guard{active, name};
       auto result = std::make_shared<type_descriptor>();
@@ -342,7 +342,7 @@ public:
          budget.charge_memory(enumeration.values.size() * sizeof(enum_value_def) * node_allocation_factor);
          result->abi_type = name;
          result->logical = logical_type::enumeration;
-         result->members = enumeration.values;
+         result->enumeration = enumeration;
          return result;
       }
       throw query_error(error_kind::QUERY_SEMANTICS, "Unsupported ABI type");
@@ -694,27 +694,10 @@ void skip_primitive(const type_descriptor& type, stream& input, query_budget& bu
    throw query_error(error_kind::ROW_DECODE_ERROR, "Invalid ABI descriptor");
 }
 
-/// Whether a node can occupy zero bytes, so a length prefix cannot be bounded by the remaining input.
-bool zero_sized(const type_descriptor& type) {
-   switch (type.kind) {
-   case type_kind::extension:
-      return true;
-   case type_kind::structure:
-      return std::all_of(type.fields.begin(), type.fields.end(),
-                         [](const auto& field) { return zero_sized(*field.type); });
-   case type_kind::primitive:
-   case type_kind::optional:
-   case type_kind::array:
-   case type_kind::variant:
-      return false;
-   }
-   return false;
-}
-
 /// Advance past one unreferenced node of any kind, validating only the structure needed to find its end.
 void skip_node(const type_descriptor& type, stream& input, query_budget& budget, uint32_t depth) {
    budget.check();
-   budget.assert_limit(depth, constants::max_depth, "abi-depth");
+   budget.assert_limit(depth, constants::max_depth, bound::abi_depth);
    switch (type.kind) {
    case type_kind::primitive:
       skip_primitive(type, input, budget);
@@ -737,12 +720,15 @@ void skip_node(const type_descriptor& type, stream& input, query_budget& budget,
       return;
    case type_kind::array: {
       const auto size = unpack<fc::unsigned_int>(input).value;
-      if (zero_sized(*type.element))
-         return;
-      if (size > input.remaining())
-         throw query_error(error_kind::ROW_DECODE_ERROR, "Invalid array length");
-      for (uint32_t i = 0; i < size; ++i)
+      // An element may occupy no bytes (a struct of binary extensions past the end of the row), so
+      // the count cannot be checked against the remaining input. The loop instead ends once an
+      // element consumes nothing: from there the decoder reads nothing either.
+      for (uint32_t i = 0; i < size; ++i) {
+         const auto before = input.remaining();
          skip_node(*type.element, input, budget, depth + 1);
+         if (input.remaining() == before)
+            break;
+      }
       return;
    }
    case type_kind::variant: {
@@ -759,7 +745,7 @@ void skip_node(const type_descriptor& type, stream& input, query_budget& budget,
 /// Normalize a complete node recursively using precompiled, acyclic descriptors.
 fc::variant decode_node(const type_descriptor& type, stream& input, query_budget& budget, uint32_t depth = 0) {
    budget.check();
-   budget.assert_limit(depth, constants::max_depth, "abi-depth");
+   budget.assert_limit(depth, constants::max_depth, bound::abi_depth);
    budget.charge_memory(sizeof(fc::variant) * node_allocation_factor);
    switch (type.kind) {
    case type_kind::primitive:
@@ -931,7 +917,7 @@ void assign_cell(const typed_plan& plan, const fc::variant& cell, const row_deco
 void decode_bound(const typed_plan& plan, const type_descriptor& type, const row_decoder::interest& interest,
                   stream& input, query_budget& budget, std::vector<value>& slots, uint32_t depth) {
    budget.check();
-   budget.assert_limit(depth, constants::max_depth, "abi-depth");
+   budget.assert_limit(depth, constants::max_depth, bound::abi_depth);
    switch (type.kind) {
    case type_kind::optional: {
       const auto present = unpack<uint8_t>(input);
@@ -1231,6 +1217,14 @@ int compare_values(const value& left, const value& right) {
    const comparison_integer a = comparison_integer(left.numerator) * right.denominator;
    const comparison_integer b = comparison_integer(right.numerator) * left.denominator;
    return a < b ? -1 : a > b ? 1 : 0;
+}
+
+bool equal_values(const value& left, const value& right) {
+   // Different denominations are unequal rather than incomparable: equality needs no order.
+   if ((left.type == logical_type::asset || left.type == logical_type::extended_asset) && left.type == right.type &&
+       (left.symbol != right.symbol || left.precision != right.precision || left.contract != right.contract))
+      return false;
+   return compare_values(left, right) == 0;
 }
 
 void add_value(value& destination, const value& source) {

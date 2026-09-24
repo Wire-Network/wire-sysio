@@ -14,10 +14,12 @@ read-mode = head
 ```
 
 The required plugins are `chain_plugin` and `producer_plugin`. HTTP is optional: enable
-`sysio::http_plugin` separately to expose the route on its existing `chain_ro` listener.
-`chain_api_plugin` is not required. If HTTP is absent, registered but not initialized, or has no
-enabled `chain_ro` listener, the C++ service still starts. The query plugin adds no listener or port
-option.
+`sysio::http_plugin` separately to expose the route on its existing `chain_ro` listener. A plain
+`http-server-address` serves every category, so the route needs no `chain_api_plugin`; a node that
+routes categories with `http-category-address chain_ro,...` must also load `chain_api_plugin`,
+because `http_plugin` accepts a category address only for a configured plugin. If HTTP is absent,
+registered but not initialized, or has no enabled `chain_ro` listener, the C++ service still starts.
+The query plugin adds no listener or port option.
 
 Every chain read runs on the executor's **read-exclusive** queue, which only `producer_plugin`'s
 read-only threads drain, inside a read window the application thread never enters. Startup
@@ -84,7 +86,9 @@ can instead be supplied as `FROM sample.positions`. Combining a qualified table 
 error. Owners belong in SQL, not JSON-RPC parameters. This syntax does not perform a JOIN.
 
 Keywords are case insensitive. Identifiers preserve case; double quotes permit dots in names
-(`FROM "sample.one".positions`). Strings use single quotes with doubled quote escaping. There are
+(`FROM "sample.one".positions`) and are how a field or table whose name is a keyword is written
+(`SELECT "count" FROM sponsorcount OWNER 'sysio.roa'`; the output column is still `count`). Strings
+use single quotes with doubled quote escaping. There are
 no comments or multiple statements. Fields resolve against row values; `value.nested.score` is
 explicit value access and `key.id` selects the primary key. `SELECT *` projects the value fields and
 must stand alone.
@@ -133,7 +137,8 @@ All numeric cells, including nested numbers and asset precision, are decimal **s
 through 128 bits are exact; aggregation uses checked 256-bit integers and checked 512-bit comparison
 temporaries. AVG is an exact rational during predicates/ordering, rendered to 18 decimal places with
 round-half-even and trailing zeros removed. Assets return `{amount, symbol, precision}`; extended
-assets also return `contract`. Asset aggregation/comparison requires matching denomination.
+assets also return `contract`. Asset aggregation and ordering require matching denomination; `=` and
+`!=` between different denominations are simply unequal.
 
 Booleans remain JSON booleans. Optional fields and absent binary extensions are null. Comparisons
 with null are UNKNOWN; WHERE/HAVING retain only TRUE. COUNT(field) ignores null; other aggregates
@@ -143,12 +148,17 @@ COUNT zero; a grouped empty query produces no groups.
 Structs, arrays and variants support lossless projection, with scalar paths through structs. Whole
 containers cannot be compared, grouped or ordered. ABI floats are projected as `0x` plus their raw
 little-endian IEEE bytes; they cannot participate in predicates, ordering or aggregates. No host
-floating-point arithmetic is used. Malformed raw data fails with ROW_DECODE_ERROR.
+floating-point arithmetic is used. Malformed bytes in a referenced field, or a row whose length
+disagrees with its ABI layout, fail with ROW_DECODE_ERROR for a query that references any value
+field; the bytes of fields a query never references are skipped by structure, not validated, and
+`COUNT(*)` or a key-only query reads no value bytes at all.
 
 ABI enums have logical type `enumeration`: cells carry the member name (the decimal value for an
 unlisted value), like `get_table_rows`, while comparisons, GROUP BY, ORDER BY, MIN and MAX use the
-underlying integer. A string literal binds by exact member name, then by the name after its last
-`_` (`'READY'` for `MESSAGE_STATUS_READY`), then as an integer; an unknown name fails with
+underlying integer. A string literal that spells an integer binds that value; any other string binds
+by exact member name, then by the unique member whose name ends in `_` plus the literal (`'READY'`
+for `MESSAGE_STATUS_READY`), the member-name rules `abi_serializer` applies to action data (where,
+unlike here, a numeric string is not an integer); an unknown or ambiguous name fails with
 VALUE_ERROR. Integer literals compare directly. SUM and AVG reject enums.
 
 Timestamps render as UTC ISO 8601 with microsecond precision, omitting a zero fraction, for every
@@ -173,7 +183,7 @@ All options are immutable, positive integers available through CLI or config.ini
 | query-max-in-flight | 4 | Engine admissions including retained reads; also the independent HTTP ingress cap |
 | query-max-query-bytes | 16384 | SQL bytes before ANTLR |
 | query-timeout-ms | 1000 | Request deadline, including ingress/queue time; C++ callers may opt out per call |
-| query-max-capture-ms | producer_plugin's read-only transaction time | One coherent data-capture callback; unset, the smaller of that time and `query-timeout-ms`; a configured value may not exceed it |
+| query-max-capture-ms | producer_plugin's read-only transaction time | Each chain read callback (the ABI copy and the coherent data capture); unset, the smaller of that time and `query-timeout-ms`; a configured value may not exceed it |
 | query-max-abi-bytes | 1048576 | ABI blob size per selected owner, checked before copy |
 | query-max-scan-rows | 100000 | Total candidate rows across owners |
 | query-max-raw-bytes | 67108864 | Copied ABI, raw rows, continuation and capture overhead |
@@ -182,12 +192,21 @@ All options are immutable, positive integers available through CLI or config.ini
 | query-max-result-rows | 10000 | Output rows after offset and SQL/per-call limit |
 | query-max-response-bytes | 8388608 | Encoded success envelope bytes |
 
-Additional bounds are 4096 tokens, depth 64, 2048 AST/ABI descriptor nodes and 512 rows per internal
-page. Pages do not yield to another chain state. The capture bound is producer_plugin's read-only
-transaction time — the smaller of `max-transaction-time` and the effective read-only read window
-less its minimum — so a capture can never run past the read window and delay the next write
-window; a configured `query-max-capture-ms` may only tighten it and cannot exceed the request
-timeout. Raw memory cannot exceed total memory; aggregate admitted-memory multiplication is checked.
+Additional bounds are 4096 tokens, depth 64, 2048 AST/ABI descriptor nodes, 64 owners and 512 rows
+per internal page; `error.data.limit` names them `sql-tokens`, `sql-depth`, `sql-nodes`,
+`sql-owners`, `abi-depth` and `abi-nodes`, distinct from the option names. Pages do not yield to
+another chain state. The capture bound is producer_plugin's read-only transaction time — the
+smaller of `max-transaction-time` and the effective read-only read window less its minimum — and
+every check inside a read callback also honors the current read window's own end, so a capture that
+starts late in a window stops at the window's end instead of running its full budget past it and
+delaying the next write window; the read is then queued again for the next window, with the cut
+attempt's rows and bytes uncharged, while the request deadline allows. Only that deadline fails it,
+and a `QUERY_TIMEOUT` raised while a read the window cut short is waiting for, or running in, the
+next window names `read-only-read-window-time-us` as its limit; the `query` logger's shutdown
+counters include how many reads were cut. A configured
+`query-max-capture-ms` may only tighten the budget and cannot exceed the request timeout; unset, the
+built-in default is clamped to the request timeout. Raw memory cannot exceed total memory; aggregate
+admitted-memory multiplication is checked.
 Default engine admission permits 512 MiB of accounted execution memory. When HTTP is enabled,
 its independent ingress/response admission can retain another 512 MiB; each HTTP request shares
 one budget across ingress, execution and serialization. C++ callers own their returned results
@@ -235,7 +254,8 @@ semantic, value and limit failures are not.
 
 ## Build and validation
 
-`vcpkg.json` supplies ANTLR 4.13.2 and the `antlr4-tools` host dependency. The latter is a
+`vcpkg.json` pins the `antlr4` runtime to 4.13.2 in its overrides and adds the `antlr4-tools` host
+dependency. The latter is a
 `wire-vcpkg-registry` port that installs the checksum-pinned official generator JAR under
 `tools/antlr4`; the upstream runtime port supplies no JAR. CMake locates it through vcpkg's host
 tool paths and passes it to the runtime port's `antlr4-generator` module, which generates the
@@ -245,9 +265,10 @@ both match the pinned version.
 
 Generation needs a Java runtime, which is a build requirement: on Ubuntu 24.04 install
 `openjdk-21-jre-headless` from the default repositories; on macOS `brew install openjdk` and put
-`$(brew --prefix openjdk)/bin` on `PATH` (Homebrew keeps it keg-only). The Docker build image, the
-devcontainer image and CI install it the same way. A configure without Java fails in the generator
-module.
+`$(brew --prefix openjdk)/bin` on `PATH` (Homebrew keeps it keg-only). The Docker build image and
+CI install it the same way; the devcontainer image does not include a JRE yet, and a matching
+`wire-devcontainer` change adds `openjdk-21-jre-headless`. CMake checks for a Java 11 runtime before
+the generator module runs and names the package to install when it is missing.
 
 Build the default all target in the configured build directory. See [test/README.md](test/README.md)
 for real-controller, HTTP, scheduling, workload and shared-reader regression tests. Schema, examples
