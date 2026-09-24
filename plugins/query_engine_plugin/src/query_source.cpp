@@ -1,5 +1,4 @@
 #include <fc/variant_object.hpp>
-#include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/account_object.hpp>
 #include <sysio/chain/controller.hpp>
 #include <sysio/query_engine_plugin/query_source.hpp>
@@ -8,10 +7,11 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstring>
 
 namespace sysio::query_engine {
 namespace {
-constexpr uint64_t abi_allocation_factor = 8;
+constexpr uint64_t abi_copy_allocation_factor = 2;
 constexpr uint64_t row_allocation_factor = 2;
 constexpr auto utc_suffix = "Z";
 
@@ -21,13 +21,16 @@ void assert_state(const chain::controller& controller) {
       throw query_error(error_kind::STATE_UNAVAILABLE, "No usable applied chain state");
 }
 
-/// Hash the original ABI bytes without allocating or exposing the controller blob.
-fc::sha256 abi_hash(const chain::account_metadata_object& metadata) {
-   return fc::sha256::hash(metadata.abi.data(), metadata.abi.size());
+/// Whether the account's ABI bytes still equal the copy a schema was resolved from. A byte comparison
+/// keeps the read callback O(bytes) without hashing inside the chain's read window.
+bool same_abi(const chain::account_metadata_object& metadata, const table_schema& schema) {
+   return metadata.abi_sequence == schema.abi_sequence && metadata.abi.size() == schema.abi_bytes.size() &&
+          (schema.abi_bytes.empty() ||
+           std::memcmp(metadata.abi.data(), schema.abi_bytes.data(), schema.abi_bytes.size()) == 0);
 }
 } // namespace
 
-std::vector<table_schema> local_table_source::describe(const ast_query& ast, query_budget& budget) const {
+std::vector<table_schema> local_table_source::capture_abis(const ast_query& ast, query_budget& budget) const {
    budget.check();
    assert_state(controller);
    budget.charge_memory(ast.owners.size() * sizeof(table_schema));
@@ -45,24 +48,22 @@ std::vector<table_schema> local_table_source::describe(const ast_query& ast, que
          throw query_error(error_kind::QUERY_SEMANTICS, "Unknown account");
       budget.assert_limit(metadata->abi.size(), budget.config.max_abi_bytes, option::max_abi_bytes);
       budget.charge_raw(0, metadata->abi.size());
-      budget.charge_memory(uint64_t(metadata->abi.size()) * abi_allocation_factor + sizeof(table_schema));
+      budget.charge_memory(uint64_t(metadata->abi.size()) * abi_copy_allocation_factor + sizeof(table_schema));
+      // Only the bytes leave the callback: hashing, decoding and table selection run on a worker.
       table_schema result;
       result.owner = account;
-      result.abi_hash = abi_hash(*metadata);
       result.abi_sequence = metadata->abi_sequence;
-      try {
-         result.abi = chain_apis::get_abi(controller, account);
-      } catch (const fc::exception&) {
-         throw query_error(error_kind::QUERY_SEMANTICS, "Invalid account ABI");
-      }
-      const auto table = std::find_if(result.abi.tables.begin(), result.abi.tables.end(),
-                                      [&](const auto& table) { return table.name == ast.table; });
-      if (table == result.abi.tables.end())
-         throw query_error(error_kind::QUERY_SEMANTICS, "Unknown ABI table");
-      result.table = *table;
+      result.abi_bytes.assign(metadata->abi.data(), metadata->abi.data() + metadata->abi.size());
       budget.check();
       schemas.emplace_back(std::move(result));
    }
+   return schemas;
+}
+
+std::vector<table_schema> local_table_source::describe(const ast_query& ast, query_budget& budget) const {
+   auto schemas = capture_abis(ast, budget);
+   for (auto& schema : schemas)
+      resolve_schema(schema, ast.table, budget);
    return schemas;
 }
 
@@ -74,7 +75,7 @@ captured_input local_table_source::capture(const typed_plan& plan, query_budget&
       for (const auto& schema : plan.schemas) {
          budget.check_capture(started);
          const auto* metadata = controller.find_account_metadata(schema->owner);
-         if (!metadata || metadata->abi_sequence != schema->abi_sequence || abi_hash(*metadata) != schema->abi_hash)
+         if (!metadata || !same_abi(*metadata, *schema))
             throw query_error(failure, "Selected owner's ABI changed");
       }
    };

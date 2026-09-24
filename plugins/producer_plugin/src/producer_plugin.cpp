@@ -1972,6 +1972,10 @@ producer_plugin::runtime_options producer_plugin::get_runtime_options() const {
    return my->get_runtime_options();
 }
 
+fc::microseconds producer_plugin::get_read_only_max_transaction_time() const {
+   return my->_ro_max_trx_time_us;
+}
+
 void producer_plugin::add_greylist_accounts(const greylist_params& params) {
    my->add_greylist_accounts(params);
 }

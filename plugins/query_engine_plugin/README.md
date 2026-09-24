@@ -13,13 +13,18 @@ plugin = sysio::query_engine_plugin
 read-mode = head
 ```
 
-The only required plugin is `chain_plugin`. HTTP is optional: enable `sysio::http_plugin` separately
-to expose the route on its existing `chain_ro` listener. `chain_api_plugin` is not required.
-If HTTP is absent, registered but not initialized, or has no enabled `chain_ro` listener, the C++ service
-still starts. The query plugin adds no listener or port option.
+The required plugins are `chain_plugin` and `producer_plugin`. HTTP is optional: enable
+`sysio::http_plugin` separately to expose the route on its existing `chain_ro` listener.
+`chain_api_plugin` is not required. If HTTP is absent, registered but not initialized, or has no
+enabled `chain_ro` listener, the C++ service still starts. The query plugin adds no listener or port
+option.
+
+Every chain read runs on the executor's **read-exclusive** queue, which only `producer_plugin`'s
+read-only threads drain, inside a read window the application thread never enters. Startup
+therefore requires `read-only-threads` to be greater than zero: `producer_plugin` defaults it to 3
+only when `chain_api_plugin` is configured, so a node without `chain_api_plugin` sets it explicitly.
 It rejects configured `producer-name` values and speculative read mode. `irreversible` read mode is
-also supported. The normal producer plugin may be present for block application/read scheduling
-without being configured to produce blocks. P2P synchronization remains the node's responsibility.
+also supported. P2P synchronization remains the node's responsibility.
 
 ## C++ service
 
@@ -30,7 +35,7 @@ using namespace sysio::query_engine;
 auto service = appbase::app().get_plugin<sysio::query_engine_plugin>().get_query_service();
 query_result result = service->execute(
    "SELECT beneficiary, SUM(amount) AS total FROM sample.positions GROUP BY beneficiary ORDER BY total DESC",
-   query_options{.timeout_ms = -1, .limit = 20, .offset = 0});
+   query_options{.timeout = constants::no_deadline, .limit = 20, .offset = 0});
 for (const fc::variant_object& row : result.rows) {
    // Consume owned row values.
 }
@@ -41,16 +46,19 @@ const std::optional<query_options>& options = std::nullopt)`. `query_result` car
 `complete`, `source`, `state`, `columns`, `stats`, and `std::vector<fc::variant_object> rows`.
 Failures throw `query_error`; C++ execution does not create an RPC envelope.
 
-`query_options.timeout_ms` defaults to **-1 (no end-to-end timeout)**; zero expires immediately and
-other negative values are invalid. `limit` is optional and `offset` defaults to zero. Offset skips
+`query_options.timeout` is an optional `std::chrono::milliseconds`. Unset, it applies the configured
+`query-timeout-ms`, because `execute` blocks its caller; `constants::no_deadline` is the explicit
+opt-out; zero expires immediately and negative values are invalid. `limit` is optional and `offset`
+defaults to zero. Offset skips
 completed, ordered output rows; the smaller of an explicit SQL LIMIT and the per-call limit then
 applies. Pagination never reduces the input used for aggregation. Configured scan, memory, group,
 capture-duration and result-row caps still apply. SQL OWNER specifies accounts.
 
 `execute` enqueues a `query_task` on `fc::parallel::worker_task_queue` and blocks its caller. The
 query worker parses, plans and evaluates, calling `query_read_api` for internally synchronized reads.
-The read API schedules only ABI/row capture through the controller's read executor and waits for
-owned copies. Do not call blocking `execute` from a chain executor callback; application-thread
+The read API schedules only raw ABI/row capture through the controller's read-exclusive queue and
+waits for owned copies; ABI hashing and decoding, descriptor compilation and row decoding all run
+on the query worker. Do not call blocking `execute` from a chain executor callback; application-thread
 calls are rejected before admission. HTTP has its own bounded `worker_task_queue`, whose workers
 invoke `execute`, so HTTP waiters cannot occupy the query workers they depend on.
 
@@ -137,6 +145,22 @@ containers cannot be compared, grouped or ordered. ABI floats are projected as `
 little-endian IEEE bytes; they cannot participate in predicates, ordering or aggregates. No host
 floating-point arithmetic is used. Malformed raw data fails with ROW_DECODE_ERROR.
 
+ABI enums have logical type `enumeration`: cells carry the member name (the decimal value for an
+unlisted value), like `get_table_rows`, while comparisons, GROUP BY, ORDER BY, MIN and MAX use the
+underlying integer. A string literal binds by exact member name, then by the name after its last
+`_` (`'READY'` for `MESSAGE_STATUS_READY`), then as an integer; an unknown name fails with
+VALUE_ERROR. Integer literals compare directly. SUM and AVG reject enums.
+
+Timestamps render as UTC ISO 8601 with microsecond precision, omitting a zero fraction, for every
+stored value: years outside 0000..9999 use the expanded form with an explicit sign
+(`+10000-01-01T00:00:00`), so no stored instant makes a table unqueryable. Timestamp literals accept
+the same form. Checksum and `bytes` literals must be hex of the exact width and are lowercased;
+`public_key` and `signature` literals are re-rendered through the chain codec, so a range bound
+and the residual predicate always agree with the decoded text.
+
+Only the fields a query references are decoded; every other ABI node is skipped, so `COUNT(*)`
+reads no row bytes and a projected scan is charged for one decoded row at a time.
+
 See [schema/README.md](schema/README.md), the normative schemas, and [examples/request.json](examples/request.json).
 
 ## Resource limits
@@ -148,19 +172,22 @@ All options are immutable, positive integers available through CLI or config.ini
 | query-worker-threads | 2 | Query workers; the optional HTTP adapter has the same number of separate workers |
 | query-max-in-flight | 4 | Engine admissions including retained reads; also the independent HTTP ingress cap |
 | query-max-query-bytes | 16384 | SQL bytes before ANTLR |
-| query-timeout-ms | 1000 | HTTP request deadline, including ingress/queue time; C++ defaults to no timeout |
-| query-max-capture-ms | 50 | One coherent data-capture callback |
+| query-timeout-ms | 1000 | Request deadline, including ingress/queue time; C++ callers may opt out per call |
+| query-max-capture-ms | producer_plugin's read-only transaction time | One coherent data-capture callback; unset, the smaller of that time and `query-timeout-ms`; a configured value may not exceed it |
 | query-max-abi-bytes | 1048576 | ABI blob size per selected owner, checked before copy |
 | query-max-scan-rows | 100000 | Total candidate rows across owners |
 | query-max-raw-bytes | 67108864 | Copied ABI, raw rows, continuation and capture overhead |
-| query-max-memory-bytes | 134217728 | Cumulative conservative allocation charges per request |
+| query-max-memory-bytes | 134217728 | Conservative allocation charges per request; a decoded row's charges are released once it is folded in |
 | query-max-groups | 10000 | Aggregate groups |
 | query-max-result-rows | 10000 | Output rows after offset and SQL/per-call limit |
 | query-max-response-bytes | 8388608 | Encoded success envelope bytes |
 
 Additional bounds are 4096 tokens, depth 64, 2048 AST/ABI descriptor nodes and 512 rows per internal
-page. Pages do not yield to another chain state. Capture timeout cannot exceed request timeout;
-raw memory cannot exceed total memory; aggregate admitted-memory multiplication is checked.
+page. Pages do not yield to another chain state. The capture bound is producer_plugin's read-only
+transaction time — the smaller of `max-transaction-time` and the effective read-only read window
+less its minimum — so a capture can never run past the read window and delay the next write
+window; a configured `query-max-capture-ms` may only tighten it and cannot exceed the request
+timeout. Raw memory cannot exceed total memory; aggregate admitted-memory multiplication is checked.
 Default engine admission permits 512 MiB of accounted execution memory. When HTTP is enabled,
 its independent ingress/response admission can retain another 512 MiB; each HTTP request shares
 one budget across ingress, execution and serialization. C++ callers own their returned results
@@ -168,8 +195,10 @@ and are responsible for how many completed results they retain. This is not a pr
 HTTP buffers, bounded ANTLR allocations and allocator overhead are separate. Lower or narrower
 limits fail explicitly with no partial response; expensive queries need narrower criteria.
 
-The read API synchronizes two captures internally (ABI description, then all data pages). Workers
-decode and evaluate owned copies after capture. ABI changes before capture fail with SCHEMA_CHANGED.
+The read API synchronizes two captures internally (raw ABI bytes, then all data pages); both
+callbacks copy bytes and nothing else, so each holds the read window for time proportional to the
+bytes copied. Workers hash and decode the ABI, compile descriptors, and decode and evaluate owned
+row copies after capture. ABI changes before capture fail with SCHEMA_CHANGED.
 Workers never hold database iterators. Deadline/shutdown cancellation completes once; cancelled
 callbacks retain their admission token until drained. Shutdown joins workers without waiting on
 future app-thread work. Client disconnect does not provide immediate cancellation through the
@@ -206,22 +235,19 @@ semantic, value and limit failures are not.
 
 ## Build and validation
 
-`vcpkg.json` supplies ANTLR 4.13.2 and the `antlr4-tools` host dependency. The latter is a local
-vcpkg overlay port that installs the checksum-pinned official generator JAR under `tools/antlr4`;
-the upstream runtime port supplies no JAR. CMake locates it through vcpkg's host tool paths.
+`vcpkg.json` supplies ANTLR 4.13.2 and the `antlr4-tools` host dependency. The latter is a
+`wire-vcpkg-registry` port that installs the checksum-pinned official generator JAR under
+`tools/antlr4`; the upstream runtime port supplies no JAR. CMake locates it through vcpkg's host
+tool paths and passes it to the runtime port's `antlr4-generator` module, which generates the
+parser into the build tree (`<build>/plugins/query_engine_plugin/generated/WireQuery`) whenever
+`grammar/WireQuery.g4` changes. Nothing generated is committed, and the generator and runtime must
+both match the pinned version.
 
-If `generated/` is absent, empty, or missing any nonempty generated header/source, CMake invokes
-`tools/generate-parser.sh generate` during configure and populates all eight files. Complete
-generated sources require no JVM to configure/build. Generation uses a system JVM; on Ubuntu 24.04
-install `openjdk-21-jre-headless` from the default Ubuntu repositories, with no third-party PPA.
-The generator and runtime must both match the pinned version. To check regeneration:
-
-```sh
-cmake --build build/release --target check_query_parser
-```
-
-The CMake target supplies the installed JAR and discovered JVM automatically. Direct script use
-also accepts `ANTLR_JAR` and optional `ANTLR_JAVA` paths.
+Generation needs a Java runtime, which is a build requirement: on Ubuntu 24.04 install
+`openjdk-21-jre-headless` from the default repositories; on macOS `brew install openjdk` and put
+`$(brew --prefix openjdk)/bin` on `PATH` (Homebrew keeps it keg-only). The Docker build image, the
+devcontainer image and CI install it the same way. A configure without Java fails in the generator
+module.
 
 Build the default all target in the configured build directory. See [test/README.md](test/README.md)
 for real-controller, HTTP, scheduling, workload and shared-reader regression tests. Schema, examples

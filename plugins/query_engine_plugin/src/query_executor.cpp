@@ -183,6 +183,18 @@ std::vector<value> finalize(const group_state& group, const typed_plan& plan, qu
    return result;
 }
 
+/// Releases one row's decode charges when the decoded values go out of scope: the retained copies
+/// (projected cells, group keys and states) were charged separately, so the accounting tracks live
+/// memory instead of the sum of every row ever decoded.
+struct transient_charge {
+   query_budget& budget;
+   uint64_t start;
+   uint64_t bytes = 0;
+   /// Fix the amount once decoding finished, before retained copies are charged.
+   void settle() { bytes = budget.accounted_bytes - start; }
+   ~transient_charge() { budget.release_memory(bytes); }
+};
+
 /// Projection retains exact values until sort and final JSON normalization.
 projected_row project(const typed_plan& plan, const std::vector<value>& fields, const std::vector<value>& aggregates,
                       query_budget& budget) {
@@ -215,9 +227,12 @@ query_result evaluate(const typed_plan& plan, captured_input input, query_budget
          groups.emplace(std::vector<value>{}, group_state{{}, std::vector<accumulator>(plan.aggregates.size())});
       }
       uint64_t matched = 0;
+      const row_decoder decoder(plan);
       for (auto& row : input.rows) {
          budget.check();
-         auto fields = decode_fields(plan, row.row, budget);
+         transient_charge decode_charge{budget, budget.accounted_bytes};
+         auto fields = decoder.decode(row.row, budget);
+         decode_charge.settle();
          if (plan.ast.where && evaluate_predicate(*plan.ast.where, fields, no_aggregates, budget) != truth::true_value)
             continue;
          ++matched;

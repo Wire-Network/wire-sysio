@@ -70,7 +70,10 @@ BOOST_AUTO_TEST_CASE(startup_rejects_invalid_unsigned_options) {
       BOOST_CHECK_THROW(parse_config(variables), query_error);
    }
    query_config config;
-   config.max_capture_ms = config.timeout_ms + 1;
+   config.max_capture_us = uint64_t(config.timeout_ms) * constants::microseconds_per_millisecond + 1;
+   BOOST_CHECK_THROW(config.validate(), query_error);
+   config = {};
+   config.max_capture_us = 0;
    BOOST_CHECK_THROW(config.validate(), query_error);
    config = {};
    config.max_memory_bytes = std::numeric_limits<uint64_t>::max();

@@ -54,8 +54,12 @@ query_read_api::query_read_api(std::shared_ptr<local_table_source> source, read_
 std::vector<table_schema> query_read_api::describe(std::shared_ptr<const ast_query> ast,
                                                    std::shared_ptr<query_task> task) const {
    assert_can_wait();
-   return state->read<std::vector<table_schema>>(
-      std::move(task), [ast = std::move(ast)](auto& source, auto& budget) { return source.describe(*ast, budget); });
+   // The read callback only copies bytes; hashing and decoding each ABI happens here, on the worker.
+   auto schemas = state->read<std::vector<table_schema>>(
+      task, [ast](auto& source, auto& budget) { return source.capture_abis(*ast, budget); });
+   for (auto& schema : schemas)
+      resolve_schema(schema, ast->table, *task->budget);
+   return schemas;
 }
 
 captured_input query_read_api::capture(std::shared_ptr<const typed_plan> plan, std::shared_ptr<query_task> task) const {

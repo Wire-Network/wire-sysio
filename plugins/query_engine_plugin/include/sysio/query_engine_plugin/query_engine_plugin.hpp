@@ -2,15 +2,17 @@
 
 #include <sysio/chain/application.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
+#include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/query_engine_plugin/query_service.hpp>
 
 #include <memory>
 
 namespace sysio {
 /// Opt-in current-state SQL queries over this node's controller, with bounded off-chain evaluation.
+/// producer_plugin is required for its read-only thread pool and read-only transaction time budget.
 class query_engine_plugin : public appbase::plugin<query_engine_plugin> {
 public:
-   APPBASE_PLUGIN_REQUIRES((chain_plugin))
+   APPBASE_PLUGIN_REQUIRES((chain_plugin)(producer_plugin))
    /// Construct private lifecycle state without accessing the controller.
    query_engine_plugin();
    /// Stop owned workers before destroying private state.

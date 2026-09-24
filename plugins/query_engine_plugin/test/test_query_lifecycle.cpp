@@ -76,8 +76,9 @@ BOOST_AUTO_TEST_CASE(queued_deadline_retains_admission_until_callback_drains) {
    query_engine engine(config, reads.create_api(*validating_node), [&] {
       return query_budget::clock::time_point{} + std::chrono::milliseconds(elapsed_ms.load());
    });
-   auto first = std::async(std::launch::async,
-                           [&] { return engine.execute(count_query, query_options{.timeout_ms = config.timeout_ms}); });
+   auto first = std::async(std::launch::async, [&] {
+      return engine.execute(count_query, query_options{.timeout = std::chrono::milliseconds(config.timeout_ms)});
+   });
    await([&] { return reads.size() == 1; });
    BOOST_CHECK_EXCEPTION(engine.execute(count_query), query_error,
                          [](const auto& error) { return error.kind == error_kind::QUERY_BUSY; });

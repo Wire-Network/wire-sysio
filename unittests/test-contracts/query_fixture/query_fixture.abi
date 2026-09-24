@@ -76,6 +76,10 @@
                 {
                     "name": "enabled",
                     "type": "bool"
+                },
+                {
+                    "name": "status",
+                    "type": "position_status"
                 }
             ]
         },
@@ -178,6 +182,10 @@
                     "type": "float128"
                 },
                 {
+                    "name": "digest",
+                    "type": "checksum256"
+                },
+                {
                     "name": "choice",
                     "type": "variant_uint64_string"
                 },
@@ -248,5 +256,25 @@
             "types": ["uint64","string"]
         }
     ],
-    "action_results": []
+    "action_results": [],
+    "enums": [
+        {
+            "name": "position_status",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "POSITION_STATUS_OPEN",
+                    "value": 0
+                },
+                {
+                    "name": "POSITION_STATUS_CLOSED",
+                    "value": 1
+                },
+                {
+                    "name": "POSITION_STATUS_ARCHIVED",
+                    "value": 5
+                }
+            ]
+        }
+    ]
 }
