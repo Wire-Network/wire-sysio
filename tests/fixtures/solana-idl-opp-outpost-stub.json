@@ -323,6 +323,86 @@
           "type": "u32"
         }
       ]
+    },
+    {
+      "name": "report_liq_yield",
+      "discriminator": [
+        79,
+        18,
+        82,
+        254,
+        185,
+        29,
+        211,
+        140
+      ],
+      "accounts": [
+        {
+          "name": "cranker",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "liqsol_mint",
+          "writable": true
+        },
+        {
+          "name": "global_state",
+          "writable": true
+        },
+        {
+          "name": "distribution_state",
+          "writable": true
+        },
+        {
+          "name": "pool_authority"
+        },
+        {
+          "name": "bucket_authority"
+        },
+        {
+          "name": "bucket_token_account",
+          "writable": true
+        },
+        {
+          "name": "bucket_user_record",
+          "writable": true
+        },
+        {
+          "name": "liqsol_pool_ata",
+          "writable": true
+        },
+        {
+          "name": "pool_user_record",
+          "writable": true
+        },
+        {
+          "name": "extra_account_meta_list"
+        },
+        {
+          "name": "liqsol_core_program"
+        },
+        {
+          "name": "transfer_hook_program"
+        },
+        {
+          "name": "config"
+        },
+        {
+          "name": "outbound_message_buffer",
+          "writable": true
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program"
+        },
+        {
+          "name": "system_program"
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -376,6 +456,32 @@
         189,
         174,
         190
+      ]
+    },
+    {
+      "name": "GlobalState",
+      "discriminator": [
+        163,
+        46,
+        74,
+        168,
+        216,
+        123,
+        133,
+        98
+      ]
+    },
+    {
+      "name": "DistributionState",
+      "discriminator": [
+        7,
+        25,
+        94,
+        15,
+        208,
+        170,
+        4,
+        103
       ]
     }
   ],
@@ -662,6 +768,78 @@
           {
             "name": "decimals",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GlobalState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "paused",
+            "type": "bool"
+          },
+          {
+            "name": "yield_accumulated_liqsol",
+            "type": "u64"
+          },
+          {
+            "name": "wire_state",
+            "type": {
+              "defined": {
+                "name": "WireState"
+              }
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "liq_sequence",
+            "type": "u64"
+          },
+          {
+            "name": "liq_yield_reported",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DistributionState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "liqsol_mint",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WireState",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "PreLaunch"
+          },
+          {
+            "name": "PostLaunch"
+          },
+          {
+            "name": "Refund"
+          },
+          {
+            "name": "Launching"
           }
         ]
       }

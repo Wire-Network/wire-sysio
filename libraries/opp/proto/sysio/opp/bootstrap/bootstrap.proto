@@ -143,6 +143,76 @@ message ReserveSpec {
   string owner      = 10;
 }
 
+// A shadow-liq yield pool to seed via
+// `sysio.liq::regliqpool(chain_code, token_code, pair_symbol,
+//  initial_chain_amount, initial_wire_amount, fee, locked_shares,
+//  conversion_horizon_sec, depth_cap_bps, clip_floor)`.
+//
+// TEN arguments, one per field below. The action mints `initial_chain_amount`
+// of the token's shadow to `sysio` (the LCO liq, protocol-owned and already in
+// outpost custody), deposits it with `initial_wire_amount` WIRE from the
+// `sysio` treasury into `sysio.swap`, creates the pair with `sysio` as its fee
+// authority and the shadow as its yield leg, and sets the tick parameters. The
+// WIRE side is the `t5_dex_allocation` earmark being drained; the shadow symbol
+// must already exist (`sysio.liq::create`). Exactly one pool per shadow.
+message LiqPoolSpec {
+  // Outpost chain the liq token lives on — references a declared non-WIRE
+  // `ChainSpec.code`.
+  string chain_code             = 1;
+  // The liq token — must reference a `TokenSpec` of kind TOKEN_KIND_LIQ bound
+  // to `chain_code`.
+  string token_code             = 2;
+  // The swap's pair (LP) token symbol CODE, 1..7 characters [A-Z]; the tool
+  // passes it at precision 9, the depot frame, which is what `inittoken`
+  // requires of a 9-decimal shadow against 9-decimal WIRE.
+  string pair_symbol            = 3;
+  // Human-readable display name.
+  string name                   = 4;
+  // Free-form description / provenance note.
+  string description            = 5;
+  // Shadow-side seed: the LCO liq, in the token's subunits (quote in JSON).
+  uint64 initial_chain_amount   = 6;
+  // WIRE-side seed, in WIRE subunits, drained from `t5_dex_allocation`
+  // (quote in JSON).
+  uint64 initial_wire_amount    = 7;
+  // The pair's swap fee in 1/10000 of the traded amount: 0..9999.
+  uint32 fee                    = 8;
+  // LP shares locked forever, in the pair symbol's subunits (quote in JSON);
+  // below the minted sqrt(initial_chain_amount * initial_wire_amount).
+  uint64 locked_shares          = 9;
+  // Horizon over which queued yield is meant to sell, in seconds (> 0).
+  uint32 conversion_horizon_sec = 10;
+  // Hard ceiling on one clip, in basis points of the pool's shadow side:
+  // 1..10000, and best kept below roughly twice `fee`.
+  uint32 depth_cap_bps          = 11;
+  // Least clip worth selling, in the shadow's subunits (> 0; quote in JSON).
+  uint64 clip_floor             = 12;
+  // Optional cross-check: the liq the outpost holds in custody at the snapshot,
+  // in the token's subunits (quote in JSON). When non-zero it must equal
+  // `initial_chain_amount` plus the sum of the `syndications` for this token,
+  // since the depot mints shadow against exactly that custody. 0 skips it.
+  uint64 custody_total          = 13;
+}
+
+// A pre-launch syndicated position to replay via
+// `sysio.liq::importsynd(chain_code, token_code, credits[] {pubkey, amount})`
+// (batched by the tool; `importdone` closes the import). Filled from the same
+// launch export that produces the WPT credits.
+message SyndicationSpec {
+  // Outpost chain — references a declared non-WIRE `ChainSpec.code`.
+  string chain_code = 1;
+  // The liq token — a TOKEN_KIND_LIQ `TokenSpec` bound to `chain_code`.
+  string token_code = 2;
+  // The holder's native PUBKEY in display form, the identity
+  // `SyndicateLIQ.user` carries: base58 of the 32-byte Ed25519 key on SVM,
+  // 0x-hex of the 33-byte COMPRESSED secp256k1 point on EVM (never the
+  // 20-byte address).
+  string pubkey     = 3;
+  // The position, in the token's subunits (quote in JSON), with the LCO yield
+  // already folded in.
+  uint64 amount     = 4;
+}
+
 // Global swap settings applied once via `sysio.uwrit::setconfig`, which takes
 // SIX arguments: `(fee_bps, collateral_lock_duration_ms, min_fromwire_amount,
 // fromwire_revert_fee_bps, uwreq_pending_timeout_epochs,
@@ -206,14 +276,13 @@ message BootstrapPlatformConfig {
   // Invariant: sum(reserves[].initial_wire_amount) <= t5_reserve_allocation.
   uint64 t5_reserve_allocation = 3;
 
-  // WIRE subunits earmarked from the T5 allotment for launch DEX integration —
-  // at least one DEX is seeded at launch (more added later by council vote).
-  // Like `t5_reserve_allocation`, this sits OUTSIDE `t5_distributable`, so the
-  // total T5 carve-out is `t5_reserve_allocation + t5_dex_allocation`. The total
-  // is set per-deployment (Kyle / Ken own the launch figure). RESERVED: the
-  // on-chain DEX-seeding mechanism is not finalized, so this field is carried
-  // for forward compatibility and is not yet drained by the bootstrap tool;
-  // default 0 disables the earmark.
+  // WIRE subunits earmarked from the T5 allotment to back the WIRE side of the
+  // launch shadow-liq yield pools (`liq_pools`), drained by
+  // `sysio.liq::regliqpool`. Like `t5_reserve_allocation`, this sits OUTSIDE
+  // `t5_distributable`, so the total T5 carve-out is
+  // `t5_reserve_allocation + t5_dex_allocation`; the figure is set
+  // per-deployment (Kyle / Ken own the launch number).
+  // Invariant: sum(liq_pools[].initial_wire_amount) <= t5_dex_allocation.
   uint64 t5_dex_allocation = 8;
 
   // Chains to register (one must be the CHAIN_KIND_WIRE depot).
@@ -224,4 +293,9 @@ message BootstrapPlatformConfig {
   repeated ReserveSpec reserves = 6;
   // Global swap / underwriting settings.
   UwritConfig          uwrit    = 7;
+  // Shadow-liq yield pools to seed, one per liq token (WIRE side drained from
+  // `t5_dex_allocation`).
+  repeated LiqPoolSpec     liq_pools    = 9;
+  // Pre-launch syndicated positions to replay into the shadow-liq ledger.
+  repeated SyndicationSpec syndications = 10;
 }

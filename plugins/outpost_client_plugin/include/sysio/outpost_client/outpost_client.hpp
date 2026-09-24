@@ -166,6 +166,33 @@ public:
                                  const std::vector<char>& uic_bytes,
                                  fc::microseconds         deadline) = 0;
 
+   /**
+    * @brief OUTPOST CRANKS — drive the outpost's permissionless per-epoch
+    *        instructions that nothing on the outpost schedules.
+    *
+    * Called by the outbound relay job once per epoch, right after this
+    * operator's envelope delivery for that epoch lands, so the cranks ride the
+    * same cadence and the same operator key as the delivery. Best-effort: a
+    * failure is logged by the job and retried at the next epoch, and it never
+    * travels back into the delivery result.
+    *
+    * The default cranks nothing. The Solana relay overrides it with the liqSOL
+    * pool's `report_liq_yield` (PostLaunch only; a no-op on chain when nothing
+    * new was claimed since the previous report); the Ethereum relay with the
+    * syndication pool's `realizeYield`, on the pool the outpost registers as its
+    * `DESYNDICATE_LIQ` handler (idle until one is, and quiet when the pool has
+    * nothing to report).
+    *
+    * @param epoch_index  The WIRE epoch whose delivery just landed.
+    * @param deadline     Upper bound on the total time spent talking to the
+    *                     remote chain for this call.
+    * @throws fc::exception on RPC failure, tx revert, or deadline expiry.
+    */
+   virtual void crank_outpost(uint32_t epoch_index, fc::microseconds deadline) {
+      (void)epoch_index;
+      (void)deadline;
+   }
+
 protected:
    /// Throw `fc::timeout_exception` if the wall-clock has crossed `deadline_abs`.
    /// Called by concretes before each blocking RPC to bound how long a hung

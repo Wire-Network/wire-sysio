@@ -169,6 +169,59 @@ inline uint64_t wire_to_token(uint64_t reserve_wire_amount,
                        amount_wire);
 }
 
+/// `floor(sqrt(n))` by Newton's method on integers: consensus-safe where the
+/// floating `sqrt` is not (its rounding is platform-dependent). Converges from
+/// an overestimate, so the loop ends the first time it stops decreasing.
+inline u128 isqrt(u128 n) {
+   if (n < 2) return n;
+   // Initial estimate 2^ceil(bits/2) >= sqrt(n).
+   int bits = 0;
+   for (u128 t = n; t != 0; t >>= 1) ++bits;
+   u128 x = static_cast<u128>(1) << ((bits + 1) / 2);
+   for (;;) {
+      const u128 y = (x + n / x) >> 1;
+      if (y >= x) return x;
+      x = y;
+   }
+}
+
+/// Shares minted to seed a two-sided pool: the geometric mean `floor(sqrt(x*y))`
+/// of the two deposits. It scales linearly with a proportional deposit, so the
+/// first depositor cannot price the unit by seeding lopsided.
+inline uint64_t geometric_mean(uint64_t x, uint64_t y) {
+   return static_cast<uint64_t>(isqrt(static_cast<u128>(x) * y));
+}
+
+/// What a number of pool shares is worth on one side of a pool, once the pool
+/// already has a supply: `shares * pool_balance / supply`, the proportional
+/// slice. The two forms below differ ONLY in rounding, and both round the
+/// pool's way, exactly as `out_given_in` floors its output for the same reason.
+///
+/// A pool share is priced against every side, so a caller mints or burns by
+/// calling these once per side with the same `shares` and `supply`.
+///
+/// **The result is `u128` because it genuinely does not fit 64 bits**: the
+/// product of two 62-bit balances over a supply of 1 reaches ~2^124. Bounding it
+/// against whatever the caller's own amount type allows is the CALLER's job, and
+/// must happen before any fee is added on top. Degenerate input returns 0.
+
+/// Amount of one pool side a provider must put IN to mint `shares`: the
+/// proportional slice rounded UP, so minting never shorts the pool.
+inline u128 in_given_shares(uint64_t pool_balance, uint64_t supply, uint64_t shares) {
+   if (pool_balance == 0 || supply == 0) return 0;
+   const u128 prod = static_cast<u128>(shares) * pool_balance;
+   return (prod + supply - 1) / supply;   // ceil; prod peaks ~2^124, no carry
+}
+
+/// Amount of one pool side a provider takes OUT by burning `shares`: the same
+/// proportional slice rounded DOWN, so burning never over-pays. The remainder
+/// stays with the pool, which is what makes a mint-then-burn round trip unable
+/// to profit.
+inline u128 out_given_shares(uint64_t pool_balance, uint64_t supply, uint64_t shares) {
+   if (pool_balance == 0 || supply == 0) return 0;
+   return (static_cast<u128>(shares) * pool_balance) / supply;   // floor
+}
+
 /// Basis-points denominator (10000 = 100%).
 inline constexpr uint32_t BPS_TOTAL = 10000;
 

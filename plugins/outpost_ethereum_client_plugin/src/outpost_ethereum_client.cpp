@@ -29,6 +29,7 @@ namespace detail = outpost_ethereum_client_detail;
 constexpr std::string_view OP_DELIVER_OUTBOUND = "deliver_outbound_envelope";
 constexpr std::string_view OP_READ_INBOUND     = "read_inbound_envelope";
 constexpr std::string_view OP_UW_COMMIT        = "uw_commit";
+constexpr std::string_view OP_REALIZE_YIELD    = "crank_outpost:realizeYield";
 
 /// Execution APIs code for a call the node executed and that reverted, as distinct from a
 /// protocol error such as a parse failure, where the node never ran the call at all. Not an
@@ -42,6 +43,18 @@ constexpr int ethereum_execution_reverted_code = 3;
 /// four bytes the contract actually emits.
 constexpr auto chunk_buffer_missing_signature = "OPP_ChunkBufferMissing(address)";
 
+/// The three refusals `SyndicationPool.realizeYield()` raises for its own reasons
+/// (Wire-Network/wire-ethereum#207), hashed the same way;
+/// `realize_yield_refusal_selectors_are_pinned` holds each to the bytes the contract emits.
+constexpr auto no_yield_signature             = "WIRE_NoYield()";
+constexpr auto yield_below_deadband_signature = "WIRE_YieldBelowDeadband(uint64,uint64)";
+constexpr auto pool_underbacked_signature     = "WIRE_PoolUnderbacked(uint64,uint64)";
+
+/// `ATTESTATION_BLACKHOLE` in wire-ethereum's `OPPCommon.sol`: the handler governance
+/// registers to drop an attestation type on purpose. Mirror duty, like
+/// `ETHEREUM_MAX_CHUNK_BYTES`.
+constexpr auto attestation_blackhole_address = "0x000000000000000000000000000000000000dead";
+
 /// ABI entry names and decoded-output field keys of the outpost contracts this
 /// client drives. Grouped per contract so a Solidity rename is one edit here
 /// rather than a scatter of string literals.
@@ -53,9 +66,14 @@ constexpr auto data  = "data_";
 }
 } // namespace opp_abi
 
+namespace syndication_pool_abi {
+constexpr auto tx_realize_yield = "realizeYield";
+} // namespace syndication_pool_abi
+
 namespace opp_inbound_abi {
 constexpr auto view_envelope_chunk_state = "envelopeChunkState";
 constexpr auto view_next_epoch_index     = "nextEpochIndex";
+constexpr auto view_attestation_handlers = "attestationHandlers";
 namespace field {
 constexpr auto epoch_index     = "epochIndex";
 constexpr auto owner           = "owner";
@@ -117,6 +135,20 @@ std::optional<uint64_t> abi_uint_output(const fc::variant& value) {
    return std::nullopt;
 }
 
+/// The four-byte selector of a Solidity function or error `signature`, as hex.
+std::string selector_hex(const char* signature) {
+   return fc::crypto::keccak256::hash(std::string(signature))
+      .str()
+      .substr(0, EVM_SELECTOR_BYTES * HEX_CHARS_PER_BYTE);
+}
+
+/// True when `abis` declares a function named `name`.
+bool has_function_abi(const std::vector<eth::abi::contract>& abis, std::string_view name) {
+   return std::ranges::any_of(abis, [&](const eth::abi::contract& contract) {
+      return contract.type == eth::abi::invoke_target_type::function && contract.name == name;
+   });
+}
+
 } // namespace
 
 namespace outpost_ethereum_client_detail {
@@ -137,8 +169,7 @@ bool is_chunk_buffer_missing_revert(std::string_view revert_data, std::string_vi
    // than the selector test: an error taking different arguments hashes differently.
    if (data.size() != selector_chars + word_chars) return false;
 
-   const auto expected = fc::crypto::keccak256::hash(std::string(chunk_buffer_missing_signature)).str();
-   if (!same_hex(data.substr(0, selector_chars), std::string_view(expected).substr(0, selector_chars)))
+   if (!same_hex(data.substr(0, selector_chars), selector_hex(chunk_buffer_missing_signature)))
       return false;
 
    // The error's sole argument is the contract's `msg.sender`, so the word must be this
@@ -189,6 +220,43 @@ chunk_resume_decision decide_chunk_resume(const envelope_chunk_state& staged,
    return {chunk_resume_action::resume, staged.received_chunks};
 }
 
+std::optional<realize_yield_refusal> classify_realize_yield_revert(std::string_view revert_data) {
+   constexpr size_t selector_chars = EVM_SELECTOR_BYTES * HEX_CHARS_PER_BYTE;
+   constexpr size_t word_chars     = EVM_ABI_WORD_BYTES * HEX_CHARS_PER_BYTE;
+
+   const auto data = strip_hex_prefix(revert_data);
+   if (data.size() < selector_chars) return std::nullopt;
+   const auto selector       = data.substr(0, selector_chars);
+   const auto argument_chars = data.size() - selector_chars;
+   // Exact shape, as for `OPP_ChunkBufferMissing`: an error with other arguments hashes
+   // differently, and a payload that does not fit the error is not that error.
+   const auto is = [&](const char* signature, size_t words) {
+      return argument_chars == words * word_chars && same_hex(selector, selector_hex(signature));
+   };
+   if (is(no_yield_signature, 0)) return realize_yield_refusal::no_yield;
+   if (is(yield_below_deadband_signature, 2)) return realize_yield_refusal::below_deadband;
+   if (is(pool_underbacked_signature, 2)) return realize_yield_refusal::underbacked;
+   return std::nullopt;
+}
+
+std::optional<std::string> address_from_word(std::string_view raw_hex) {
+   constexpr size_t word_chars    = EVM_ABI_WORD_BYTES * HEX_CHARS_PER_BYTE;
+   constexpr size_t address_chars = EVM_ADDRESS_BYTES * HEX_CHARS_PER_BYTE;
+
+   const auto word = strip_hex_prefix(raw_hex);
+   if (word.size() != word_chars) return std::nullopt;
+   if (!std::ranges::all_of(word, [](unsigned char c) { return std::isxdigit(c) != 0; })) return std::nullopt;
+   // An address word is left-padded with zeros; anything else in the pad is not an address.
+   if (word.find_first_not_of('0') < word_chars - address_chars) return std::nullopt;
+   return "0x" + std::string(word.substr(word_chars - address_chars));
+}
+
+bool is_routable_handler(std::string_view handler_address) {
+   const auto address = strip_hex_prefix(handler_address);
+   if (address.empty() || address.find_first_not_of('0') == std::string_view::npos) return false;
+   return !same_evm_address(handler_address, attestation_blackhole_address);
+}
+
 } // namespace outpost_ethereum_client_detail
 
 outpost_ethereum_client::outpost_ethereum_client(
@@ -203,6 +271,7 @@ outpost_ethereum_client::outpost_ethereum_client(
    , _opp_addr(std::move(opp_addr))
    , _opp_inbound_addr(std::move(opp_inbound_addr))
    , _operator_registry_addr(std::move(operator_registry_addr))
+   , _abis(std::move(abis))
    , _outpost_id(chain_code)
    , _chain_id(chain_id) {
    FC_ASSERT(_entry && _entry->client, "ethereum_client_entry must carry a client");
@@ -213,17 +282,19 @@ outpost_ethereum_client::outpost_ethereum_client(
    // pass empty strings for the addresses it doesn't use; the methods
    // covering an unprovisioned wrapper assert on entry with a clear
    // diagnostic. Per `outpost-client-spi.md`: address configuration is
-   // a per-caller concern; the SPI shape stays uniform.
+   // a per-caller concern; the SPI shape stays uniform. The syndication
+   // pool's wrapper is the exception: the outpost names the pool, so the
+   // crank binds it when it discovers the address.
    if (!_opp_addr.empty()) {
-      _opp_client = _entry->client->get_contract<opp_contract_client>(_opp_addr, abis);
+      _opp_client = _entry->client->get_contract<opp_contract_client>(_opp_addr, _abis);
    }
    if (!_opp_inbound_addr.empty()) {
       _opp_inbound_client =
-         _entry->client->get_contract<opp_inbound_contract_client>(_opp_inbound_addr, abis);
+         _entry->client->get_contract<opp_inbound_contract_client>(_opp_inbound_addr, _abis);
    }
    if (!_operator_registry_addr.empty()) {
       _operator_registry_client =
-         _entry->client->get_contract<operator_registry_contract_client>(_operator_registry_addr, abis);
+         _entry->client->get_contract<operator_registry_contract_client>(_operator_registry_addr, _abis);
    }
 
    // Every OPPInbound staging header is bound to the delivering signer, so the
@@ -649,6 +720,90 @@ std::string outpost_ethereum_client::uw_commit(
    ilog("outpost_ethereum_client[{}]: uw_commit confirmed uwreq={} tx_hash={} bytes={}",
         to_string(), uw_request_id, tx_hash, uic_bytes.size());
    return tx_hash;
+}
+
+void outpost_ethereum_client::bind_syndication_pool(
+   std::string address, std::shared_ptr<syndication_pool_contract_client> client) {
+   FC_ASSERT(client, "outpost_ethereum_client[{}]: bind_syndication_pool needs a wrapper", to_string());
+   _syndication_pool_addr   = std::move(address);
+   _syndication_pool_client = std::move(client);
+}
+
+std::optional<std::string> outpost_ethereum_client::discover_syndication_pool() {
+   // The routing table is configuration, not delivered content, so `latest` is right for the
+   // same reason it is for the staging-header read.
+   uint16_t attestation_type = static_cast<uint16_t>(
+      magic_enum::enum_integer(sysio::opp::types::ATTESTATION_TYPE_DESYNDICATE_LIQ));
+   const auto raw = _opp_inbound_client->attestation_handlers(eth::block_tag_t::latest, attestation_type);
+   if (!raw.is_string()) {
+      wlog("outpost_ethereum_client[{}]: attestationHandlers returned non-string variant", to_string());
+      return std::nullopt;
+   }
+   const auto handler = detail::address_from_word(raw.as_string());
+   if (!handler) {
+      wlog("outpost_ethereum_client[{}]: attestationHandlers returned an unparsable word: {}",
+           to_string(), raw.as_string());
+      return std::nullopt;
+   }
+   if (!detail::is_routable_handler(*handler)) {
+      dlog("outpost_ethereum_client[{}]: no DESYNDICATE_LIQ handler is registered -- no syndication "
+           "pool to crank",
+           to_string());
+      return std::nullopt;
+   }
+   return handler;
+}
+
+void outpost_ethereum_client::crank_outpost(uint32_t epoch_index, fc::microseconds deadline) {
+   // The pool's ABI ships with wire-ethereum #207; an ABI set without `realizeYield` is an
+   // outpost deployment that predates the pool, and there is nothing to crank on it. Without
+   // the OPPInbound wrapper there is no routing table to discover the pool from.
+   if (!_opp_inbound_client || !has_function_abi(_abis, syndication_pool_abi::tx_realize_yield)) {
+      dlog("outpost_ethereum_client[{}]: no syndication pool ABI -- nothing to crank", to_string());
+      return;
+   }
+
+   const auto deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
+   throw_if_past_deadline(deadline_abs, OP_REALIZE_YIELD);
+
+   const auto pool = discover_syndication_pool();
+   if (!pool) return;
+   if (!_syndication_pool_client || !detail::same_evm_address(_syndication_pool_addr, *pool)) {
+      ilog("outpost_ethereum_client[{}]: syndication pool {} is the outpost's DESYNDICATE_LIQ handler",
+           to_string(), *pool);
+      bind_syndication_pool(*pool,
+                            _entry->client->get_contract<syndication_pool_contract_client>(*pool, _abis));
+   }
+
+   throw_if_past_deadline(deadline_abs, OP_REALIZE_YIELD);
+   try {
+      const auto result = _syndication_pool_client->realize_yield();
+      ilog("outpost_ethereum_client[{}]: realizeYield sent for epoch {} tx={}",
+           to_string(), epoch_index, result.as_string());
+   } catch (const fc::network::json_rpc::json_rpc_error& e) {
+      // A revert at estimate time costs no gas. Only the pool's own three refusals are
+      // outcomes of the crank rather than failures of it; anything else -- a signer without
+      // the `yield_operator` role, a paused endpoint, a foreign implementation -- is the job's
+      // to log as a failed crank, exactly like a transport failure.
+      const auto refusal =
+         e.code == ethereum_execution_reverted_code
+            ? detail::classify_realize_yield_revert(e.data.is_string() ? e.data.as_string() : std::string{})
+            : std::nullopt;
+      if (!refusal) throw;
+      switch (*refusal) {
+      case detail::realize_yield_refusal::no_yield:
+      case detail::realize_yield_refusal::below_deadband:
+         dlog("outpost_ethereum_client[{}]: realizeYield has nothing to report for epoch {} ({})",
+              to_string(), epoch_index, magic_enum::enum_name(*refusal));
+         return;
+      case detail::realize_yield_refusal::underbacked:
+         wlog("outpost_ethereum_client[{}]: syndication pool {} is below its principal; realizeYield "
+              "refused for epoch {} (the loss path is not in that contract)",
+              to_string(), _syndication_pool_addr, epoch_index);
+         return;
+      }
+   }
 }
 
 } // namespace sysio
