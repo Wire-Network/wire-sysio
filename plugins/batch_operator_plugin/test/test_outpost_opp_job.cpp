@@ -159,6 +159,105 @@ BOOST_AUTO_TEST_CASE(run_outbound_only_delivers_once_per_epoch) {
    BOOST_CHECK_EQUAL(client->outbound_calls[1].epoch_index, 6u);
 }
 
+// The outpost's per-epoch cranks ride the first successful delivery of an epoch:
+// once per epoch, after the envelope landed, with the delivery's own deadline.
+BOOST_AUTO_TEST_CASE(run_outbound_cranks_the_outpost_once_per_epoch_after_delivery) {
+   auto client = make_client(CHAIN_KIND_SVM, 1, 0);
+   mock_depot_ops depot;
+   depot.epoch = 5;
+
+   outbound_envelope_record rec;
+   rec.raw_envelope = {'x'};
+   depot.pending_response = [rec](uint64_t, uint32_t) -> std::optional<outbound_envelope_record> {
+      return rec;
+   };
+
+   outpost_opp_job job(client, depot, kDeadline);
+   job.run_outbound();
+   BOOST_REQUIRE_EQUAL(client->outbound_calls.size(), 1u);
+   BOOST_REQUIRE_EQUAL(client->crank_calls.size(), 1u);
+   BOOST_CHECK_EQUAL(client->crank_calls[0].epoch_index, 5u);
+   BOOST_CHECK(client->crank_calls[0].deadline == kDeadline);
+
+   job.run_outbound(); // Same epoch: neither a delivery nor a crank.
+   BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
+
+   depot.epoch = 6;
+   job.run_outbound();
+   BOOST_CHECK_EQUAL(client->crank_calls.size(), 2u);
+   BOOST_CHECK_EQUAL(client->crank_calls[1].epoch_index, 6u);
+}
+
+// The path-2 consensus re-delivery of an already-delivered epoch is not a new
+// delivery: it cranks nothing a second time.
+BOOST_AUTO_TEST_CASE(run_outbound_consensus_retry_does_not_crank_again) {
+   auto client = make_client(CHAIN_KIND_SVM, 1, 0);
+   mock_depot_ops depot;
+   depot.epoch = 5;
+
+   outbound_envelope_record rec;
+   rec.raw_envelope = {'x'};
+   depot.pending_response = [rec](uint64_t, uint32_t) -> std::optional<outbound_envelope_record> {
+      return rec;
+   };
+
+   outpost_opp_job job(client, depot, kDeadline);
+   job.run_outbound();
+   BOOST_REQUIRE_EQUAL(client->crank_calls.size(), 1u);
+
+   depot.epoch_boundary_past = true;
+   job.run_outbound(); // The consensus retry re-delivers the same epoch...
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 2u);
+   BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u); // ...without cranking again.
+}
+
+// A failed delivery cranks nothing: the crank belongs to a landed envelope.
+BOOST_AUTO_TEST_CASE(run_outbound_does_not_crank_when_delivery_fails) {
+   auto client = make_client(CHAIN_KIND_SVM, 1, 0);
+   mock_depot_ops depot;
+   depot.epoch = 5;
+
+   outbound_envelope_record rec;
+   rec.raw_envelope = {'x'};
+   depot.pending_response = [rec](uint64_t, uint32_t) -> std::optional<outbound_envelope_record> {
+      return rec;
+   };
+   client->deliver_response = [](const auto&) -> std::string { FC_THROW("rpc down"); };
+
+   outpost_opp_job job(client, depot, kDeadline);
+   job.run_outbound();
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
+   BOOST_CHECK(client->crank_calls.empty());
+}
+
+// A failed crank is logged and retried by the next epoch's delivery; it never
+// un-marks the delivery that already landed.
+BOOST_AUTO_TEST_CASE(run_outbound_crank_failure_leaves_the_delivery_marked) {
+   auto client = make_client(CHAIN_KIND_SVM, 1, 0);
+   mock_depot_ops depot;
+   depot.epoch = 5;
+
+   outbound_envelope_record rec;
+   rec.raw_envelope = {'x'};
+   depot.pending_response = [rec](uint64_t, uint32_t) -> std::optional<outbound_envelope_record> {
+      return rec;
+   };
+   client->crank_response = [](const auto&) { FC_THROW("crank refused"); };
+
+   outpost_opp_job job(client, depot, kDeadline);
+   job.run_outbound();
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
+   BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
+
+   job.run_outbound(); // The epoch is delivered: no re-delivery, no second crank.
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
+   BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
+
+   depot.epoch = 6;
+   job.run_outbound();
+   BOOST_CHECK_EQUAL(client->crank_calls.size(), 2u);
+}
+
 BOOST_AUTO_TEST_CASE(run_outbound_swallows_exceptions_and_does_not_mark_epoch) {
    auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;

@@ -77,6 +77,14 @@ struct opp_inbound_contract_client : ethereum_contract_client {
    /// against this ABI entry (the same shape `read_inbound_envelope` uses for
    /// `getLatestOutboundEnvelope`).
    ethereum_contract_call_fn<fc::variant, std::string> envelope_chunk_state;
+   /// `attestationHandlers(uint16 attestationType)` view — the outpost's own
+   /// inbound routing table: the `IOPPReceiver` registered for one attestation
+   /// type, `address(0)` when none is and `ATTESTATION_BLACKHOLE` when governance
+   /// dropped the type. The relay discovers the liq syndication pool through it,
+   /// since the pool registers itself for `DESYNDICATE_LIQ`, so neither a depot
+   /// row nor operator config has to name the pool. Returns the raw `eth_call`
+   /// hex, one left-padded address word.
+   ethereum_contract_call_fn<fc::variant, uint16_t> attestation_handlers;
 
    opp_inbound_contract_client(const ethereum_client_ptr& client,
                                const address_compat_type& contract_address,
@@ -87,7 +95,31 @@ struct opp_inbound_contract_client : ethereum_contract_client {
       , discard_envelope_chunks(
            create_tx_and_confirm<fc::variant>(get_abi("discardEnvelopeChunks")))
       , next_epoch_index(create_call<fc::variant>(get_abi("nextEpochIndex")))
-      , envelope_chunk_state(create_call<fc::variant, std::string>(get_abi("envelopeChunkState"))) {}
+      , envelope_chunk_state(create_call<fc::variant, std::string>(get_abi("envelopeChunkState")))
+      , attestation_handlers(create_call<fc::variant, uint16_t>(get_abi("attestationHandlers"))) {}
+};
+
+/// Typed contract client for wire-ethereum's `SyndicationPool.sol`, the liq
+/// syndication surface (Wire-Network/wire-ethereum#207). The relay reaches it for
+/// one crank, `realizeYield()`: the pool folds the liqETH yield it accrued since
+/// its last report into its principal and reports the delta as one `LIQ_YIELD`
+/// attestation, the Ethereum counterpart of liqsol-core's `report_liq_yield`.
+/// The call is access-restricted on chain (`yield_operator`), so the relay's
+/// signer must hold that role on the outpost's AccessManager.
+struct syndication_pool_contract_client : ethereum_contract_client {
+   /// `realizeYield()` — confirmed like every other OPP write. The pool refuses
+   /// at estimate time, before any gas is spent, with `WIRE_NoYield()` or
+   /// `WIRE_YieldBelowDeadband(uint64,uint64)` when there is nothing to report
+   /// and with `WIRE_PoolUnderbacked(uint64,uint64)` when its balance fell below
+   /// the principal; the relay reads those as outcomes of the crank
+   /// (`classify_realize_yield_revert`), not as failures of it.
+   ethereum_contract_tx_fn<fc::variant> realize_yield;
+
+   syndication_pool_contract_client(const ethereum_client_ptr& client,
+                                    const address_compat_type& contract_address,
+                                    const std::vector<fc::network::ethereum::abi::contract>& contracts)
+      : ethereum_contract_client(client, contract_address, contracts)
+      , realize_yield(create_tx_and_confirm<fc::variant>(get_abi("realizeYield"))) {}
 };
 
 /// Typed contract client for OperatorRegistry.sol. Carries the actions

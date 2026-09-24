@@ -6,6 +6,8 @@ The `outpost_solana_client_plugin` provides Solana JSON-RPC client integration f
 
 - [Plugin Configuration](#plugin-configuration)
 - [Class Diagrams](#class-diagrams)
+- [Inbound Dispatch Manifests](#inbound-dispatch-manifests)
+- [Outpost Cranks](#outpost-cranks)
 - [Client Architecture](#client-architecture)
 - [solana_client (RPC Client)](#solana_client-rpc-client)
 - [solana_program_data_client (Raw/Vanilla Programs)](#solana_program_data_client-rawvanilla-programs)
@@ -440,6 +442,46 @@ ProgramClient --> Main : decoded data (variant or struct)
 
 @enduml
 ```
+
+---
+
+## Inbound Dispatch Manifests
+
+Settlement of a consensus envelope is a separate instruction (`dispatch_attestations`)
+driven from the on-chain cursor, and every effect account a handler resolves out of
+`remaining_accounts` must be derived by this relay. `extract_inbound_effects` walks the
+envelope once, in dispatch order, and `build_dispatch_manifests` derives one manifest per
+attestation. The shapes and what each derives:
+
+| `effect_shape` | Attestation | Accounts derived |
+|---|---|---|
+| `withdraw_remit`, `slash`, `deposit_revert` | `OPERATOR_ACTION` | the operator / depositor, their `CollateralPosition` PDA, and under SPL custody the collateral vault, the destination ATA and the token program |
+| `swap_remit`, `swap_revert` | `SWAP_REMIT`, `SWAP_REVERT` | the `Reserve` PDA, and under SPL custody the reserve vault, the recipient's ATA, the custody mint, its token program and any transfer-hook metas |
+| `reserve_ready`, `reserve_create_cancelled` | `RESERVE_READY`, `RESERVE_CREATE_CANCELLED` | the `Reserve` PDA, plus the creator's refund accounts for the cancel |
+| `desyndicate_liq` | `DESYNDICATE_LIQ` | the liqSOL pool's `GlobalState` and `DistributionState` singletons, the pool authority, the pool and user Token-2022 ATAs with their `UserRecord`s, the bucket ATA, the liqSOL mint, Token-2022, the bucket authority, the mint's transfer-hook program and extra-metas PDA, and liqsol-core itself |
+
+Custody is read from the account the on-chain handler branches on (`Reserve`,
+`CollateralPosition`, `DistributionState`), never from the mutable `OutpostConfig` token
+map. An absent account degrades to the accounts the handler needs to log-and-skip; a
+present but unreadable one throws, because a guessed manifest is one the program is
+guaranteed to abort on. Each shape's account list is in lock-step with the program's
+`require_remaining_account` calls in wire-solana `inbound.rs`: a program-side change to
+what a handler requires and the matching shape here must move together. The relay
+boot-checks the declarations it decodes (`Reserve`, `CollateralPosition`,
+`EpochDeliveries`, `LatestOutboundEnvelope`, and `DistributionState` on a program that
+declares it) so a drifted IDL fails at startup rather than on the first drain.
+
+## Outpost Cranks
+
+Once per epoch, right after this operator's envelope delivery lands, the outbound relay
+job calls `crank_outpost`. On Solana that is liqsol-core's permissionless
+`report_liq_yield`: it claims the syndicated pool's pending rewards and reports the delta
+since the previous report as one `LIQ_YIELD` attestation (a no-op on chain when nothing
+new was claimed). The relay reads `GlobalState.wire_state` first and submits only
+PostLaunch, derives every account of the instruction (`report_liq_yield_overrides`),
+signs with the operator's Solana key, and skips on a program that does not declare the
+instruction. A failed crank is logged by the job and retried with the next epoch's
+delivery.
 
 ---
 
