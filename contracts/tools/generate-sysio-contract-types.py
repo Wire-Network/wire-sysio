@@ -109,9 +109,10 @@ PRIMITIVE_SCHEMA = {
     'name': {'type': 'string', 'pattern': '^[a-z1-5.]{1,13}$'},
     # slug_name is an abi_serializer builtin whose JSON carrier is its canonical
     # spelling — up to 8 symbols over [A-Z0-9_], with "" the zero sentinel. The
-    # entry must precede the structs lookup: every registry ABI still ships a
+    # entry must precede the structs lookup: a legacy or deployed ABI can still ship a
     # `slug_name` struct_def, and without this the field would resolve to that
-    # `{value: uint64}` shape (or, once abigen stops emitting it, to `unknown`).
+    # `{value: uint64}` shape. Current ABIs emit no such struct, so it would be
+    # `unknown` instead -- wrong either way.
     # A code must START with a letter, so the pattern is NOT [A-Z0-9_]{0,8}: that
     # would accept "7" and "_LEAD", which fc::slug_name now rejects, leaving the
     # generated schema disagreeing with the ABI serializer. The outer group is

@@ -18,7 +18,7 @@ POST /v1/chain/get_table_rows
 | `scope` | string | `""` | Scope for scoped tables. Empty = unscoped (all rows). Parsed using ABI type. |
 | `find` | string | `""` | Exact key lookup (JSON key object or hex). Cannot be combined with bounds. |
 | `index_name` | string | `""` | Secondary index name (e.g. `"byowner"`) or position (e.g. `"2"`). Empty = primary key. |
-| `lower_bound` | string | `""` | Lower bound (inclusive). When `json=true`: a JSON key object, or a `0x`-prefixed raw cursor as returned by `next_key`. When `json=false`: hex. |
+| `lower_bound` | string | `""` | Lower bound (inclusive). Forward pagination feeds `next_key` here. When `json=true` one of three forms: a JSON key object, untagged hex (both within-scope), or a `0x` raw cursor (a complete key, used verbatim). When `json=false`: hex of the complete key. |
 | `upper_bound` | string | `""` | Upper bound (exclusive). Same format as `lower_bound`. |
 | `limit` | uint32 | `50` | Max rows to return |
 | `reverse` | bool | `false` | Iterate in reverse order |
@@ -39,7 +39,7 @@ POST /v1/chain/get_table_rows
 
 - `rows` — array of `{key, value}` objects. When `show_payer=true`, includes `payer` field.
 - `more` — `true` if there are more rows beyond `limit`.
-- `next_key` — use as `lower_bound` for the next page. Usually a JSON key object with the scope stripped (pass the same `scope` param); for a key the ABI cannot name it is a `0x` raw cursor instead — an opaque, complete key. Feed either back verbatim.
+- `next_key` — the cursor for the next page. **Forward scans feed it to `lower_bound`; reverse scans feed it to `upper_bound`** (reverse `next_key` is the last key RETURNED, so the exclusive upper bound must advance below it). Usually a JSON key object with the scope stripped (pass the same `scope` param); for a key the ABI cannot name it is a `0x` raw cursor instead — an opaque, complete key. Feed either back verbatim.
 
 ## Scoped Queries
 
@@ -164,7 +164,7 @@ Position 1 = primary, 2 = first secondary, 3 = second secondary, etc.
 
 ## Pagination
 
-When `more` is `true`, use `next_key` as `lower_bound` for the next request. Keep the same `scope` parameter:
+When `more` is `true`, feed `next_key` back for the next request — to **`lower_bound` going forward, `upper_bound` going in reverse**. Keep the same `scope` parameter:
 
 ```json
 {
@@ -176,7 +176,20 @@ When `more` is `true`, use `next_key` as `lower_bound` for the next request. Kee
 }
 ```
 
-A `next_key` key object is scope-stripped — the scope prefix is not included, so pass it back as `lower_bound` with the same `scope`. A `0x` raw cursor already carries the scope; pass it back with the same `scope` too, and it is used as-is.
+The direction matters: a forward `next_key` is the first key NOT returned, so it belongs in `lower_bound`. A reverse `next_key` is the last key that WAS returned, so it belongs in `upper_bound` — the exclusive bound then advances below it. Putting a reverse cursor in `lower_bound` re-reads the same top row.
+
+```json
+{
+   "code": "mycontract",
+   "table": "mytable",
+   "scope": "myscope",
+   "reverse": true,
+   "upper_bound": "...(next_key from previous response)...",
+   "limit": 50
+}
+```
+
+A `next_key` key object is scope-stripped — the scope prefix is not included, so pass it back with the same `scope`. A `0x` raw cursor already carries the scope; pass it back with the same `scope` too, and it is used as-is. A `0x` cursor must lie inside the `scope` the request names — one from another scope is rejected rather than silently returning that scope's rows.
 
 ## RAM Payer
 

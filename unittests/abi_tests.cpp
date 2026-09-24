@@ -691,8 +691,10 @@ BOOST_AUTO_TEST_CASE(slug_name_builtin_type)
    // contracts/tests cannot catch either case, because fc::slug_name's
    // from_variant accepts the string, the integer AND the object form, so those
    // reads pass identically whether or not this registration exists.
-   // The `slug_name` struct_def below is NOT filler: every one of the five
-   // registry ABIs shipped today carries exactly this shadowed definition, and
+   // The `slug_name` struct_def below is NOT filler. The five registry ABIs on this
+   // branch no longer emit it -- abigen stopped once slug_name became a real builtin --
+   // so this fixture now stands in for a DEPLOYED or legacy ABI that still carries the
+   // shadowed definition, which set_abi must keep resolving the same way. And
    // `slug_name` is the ONLY builtin name so shadowed (`symbol`, `name`,
    // `asset` appear in no `structs[]`). `set_abi` has no collision check, so
    // the ABI is genuinely ambiguous and is resolved only by LOOKUP ORDER —

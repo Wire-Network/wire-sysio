@@ -161,8 +161,9 @@ BOOST_AUTO_TEST_CASE(slug_name_leaf_wins_over_a_shadowing_struct_def) {
    // structs at :778); the key codec is its own lookup (leaf_kind_of at
    // database_utils.hpp:558 before the struct table), and it needs its own pin.
    //
-   // Every shipped registry ABI carries a `slug_name` struct_def alongside the
-   // field, and `slug_name` is the ONLY builtin name so shadowed. `set_abi` has
+   // A legacy or deployed registry ABI carries a `slug_name` struct_def alongside the
+   // field (this branch's own ABIs no longer emit one), and `slug_name` is the ONLY
+   // builtin name so shadowed. `set_abi` has
    // no collision check, so the ABI is genuinely ambiguous and resolved only by
    // lookup order. If the struct won here, `encode_key` would demand the nested
    // `{"code":{"value":N}}` form and `decode_key` would emit it — so `is_leaf`

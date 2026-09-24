@@ -21,7 +21,8 @@ option cc_enable_arenas = true;
 //  addresses, and lifecycle fields that are outputs, not inputs:
 //
 //    * codes are STRINGS ("ETHEREUM", "USDC", "PRIMARY"); the tool packs them
-//      via slug_name (alphabet [A-Z0-9_], <= 8 chars). Packed uint64s are
+//      via slug_name ([A-Z][A-Z0-9_]{0,7} -- must start with a letter, <= 8
+//      chars). Packed uint64s are
 //      write-only for humans and render as opaque digit strings in JSON.
 //    * addresses are STRINGS in chain-native display form (0x-hex for EVM,
 //      base58 for SVM) so each one is eyeball-verifiable against a block
@@ -48,7 +49,7 @@ option cc_enable_arenas = true;
 message ChainSpec {
   // VM family. CHAIN_KIND_WIRE marks the singleton depot chain.
   sysio.opp.types.ChainKind kind              = 1;
-  // Chain codename slug, e.g. "ETHEREUM" (<= 8 chars, [A-Z0-9_]).
+  // Chain codename slug, e.g. "ETHEREUM" ([A-Z][A-Z0-9_]{0,7}: must start with a letter).
   string                    code              = 2;
   // External chain id: 1 = Ethereum mainnet; 0 = WIRE depot / Solana.
   uint32                    external_chain_id = 3;
@@ -68,7 +69,7 @@ message ChainSpec {
 message TokenSpec {
   // Token standard. NATIVE marks the chain's own gas asset.
   sysio.opp.types.TokenKind kind             = 1;
-  // Token codename slug, e.g. "USDCSOL" (<= 8 chars, [A-Z0-9_]).
+  // Token codename slug, e.g. "USDCSOL" ([A-Z][A-Z0-9_]{0,7}: must start with a letter).
   string                    code             = 2;
   // Display symbol / name, e.g. "USD Coin".
   string                    symbol_name      = 3;

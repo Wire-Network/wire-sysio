@@ -368,11 +368,11 @@ inline fc::variant decode_field(reader& r, key_leaf_kind kind) {
       // A canonical value renders as its spelling, and feeding that back as a
       // bound re-encodes the identical bytes.
       //
-      // One with NO canonical spelling cannot be named. Unlike the `name` arm
+      // One with NO canonical spelling cannot be NAMED. Unlike the `name` arm
       // above, to_string is not injective over raw uint64s here: 38 of the 64
       // symbol values are used, symbol 0 terminates, and bits 48-63 are never
-      // read — so a rendered string would re-encode to a DIFFERENT key, and a
-      // cursor built from it would resume in the wrong place. `name`'s alphabet
+      // read — so a rendered string either fails validation on the way back, or
+      // re-encodes to a DIFFERENT key and resumes in the wrong place. `name`'s alphabet
       // is exactly 2^5 with no gaps and consumes all 64 bits, so its trim-and-
       // repack IS lossless; the two are not symmetric.
       //

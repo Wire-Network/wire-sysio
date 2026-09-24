@@ -2950,16 +2950,19 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
                      row.key.data(), row.key.size(), *key_shapes);
                   obj["key"] = strip_scope_fields(std::move(full_key), scope_key_count);
                } catch (...) {
-                  // strip_scope_fields drops the scope on the JSON path; keep the
-                  // hex form scope-relative so the two describe the same key.
+                  // strip_scope_fields drops the scope on the JSON path, so the hex
+                  // form is scope-relative too and the two describe the same key.
+                  // Untagged hex still means "within the scope", so it remains
+                  // feedable as a bound.
                   //
-                  // Deliberately NOT a raw cursor: this is a row's key as DISPLAYED,
-                  // and it has to line up with the stripped object form above.
-                  // next_key is the resume token and is absolute for its own reasons
-                  // (see to_raw_cursor) — both remain feedable as bounds, because
-                  // untagged hex still means "within the scope".
-                  obj["key"] = fc::to_hex(row.key.data() + scope_prefix_size,
-                                          row.key.size() - scope_prefix_size);
+                  // Except when the remainder is EMPTY — a row whose whole key is the
+                  // scope prefix. "" reads as no bound at all, so the displayed key
+                  // would not be replayable; emit the tagged complete key instead,
+                  // which is (see to_raw_cursor).
+                  obj["key"] = row.key.size() == scope_prefix_size
+                                  ? to_raw_cursor(std::string_view(row.key.data(), row.key.size()))
+                                  : fc::to_hex(row.key.data() + scope_prefix_size,
+                                               row.key.size() - scope_prefix_size);
                }
             } else {
                obj["key"] = fc::to_hex(row.key.data(), row.key.size());
@@ -3138,9 +3141,13 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
                   row.key.data(), row.key.size(), *key_shapes);
                obj("key", strip_scope_fields(std::move(full_key), scope_key_count));
             } catch (...) {
-               // Scope-relative, matching strip_scope_fields on the JSON path.
-               obj("key", fc::to_hex(row.key.data() + scope_prefix_size,
-                                     static_cast<uint32_t>(row.key.size() - scope_prefix_size)));
+               // Scope-relative, matching strip_scope_fields on the JSON path -- except
+               // when the remainder is EMPTY, where "" would read as no bound and the
+               // displayed key would not be replayable. See the secondary path above.
+               obj("key", row.key.size() == scope_prefix_size
+                             ? to_raw_cursor(std::string_view(row.key.data(), row.key.size()))
+                             : fc::to_hex(row.key.data() + scope_prefix_size,
+                                          static_cast<uint32_t>(row.key.size() - scope_prefix_size)));
             }
          } else {
             obj("key", fc::to_hex(row.key.data(), static_cast<uint32_t>(row.key.size())));

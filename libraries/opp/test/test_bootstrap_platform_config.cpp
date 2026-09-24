@@ -59,8 +59,9 @@ bool parse_strict(const std::string& json, BootstrapPlatformConfig& out, std::st
    return true;
 }
 
-/// True iff `s` is a valid slug_name (alphabet [A-Z0-9_], 1..8 chars). Uses the
-/// real `fc::slug_name`, which throws on an out-of-alphabet or over-length code.
+/// True iff `s` is a valid slug_name: `[A-Z][A-Z0-9_]{0,7}` -- a code must START with
+/// a letter, and is at most 8 characters. Uses the real `fc::slug_name`, which throws
+/// on a digit- or underscore-leading, out-of-alphabet, or over-length code.
 bool slug_ok(const std::string& s) {
    if (s.empty()) return false;
    try {
@@ -233,6 +234,24 @@ BOOST_AUTO_TEST_CASE(dev_config_parses_and_validates) {
 }
 
 /// A typo'd / unknown JSON key must fail the strict parse, not be dropped.
+// V2's grammar is `[A-Z][A-Z0-9_]{0,7}`, and the LEADING rule is what makes a bare JSON
+// string unambiguous -- no legal code can be read as a decimal. The public authoring docs
+// advertise that grammar, so it is pinned here rather than left to the constructor.
+BOOST_AUTO_TEST_CASE(v2_slug_grammar_requires_a_leading_letter) {
+   for (const char* ok : {"ETHEREUM", "WIRE", "USDC", "V1", "TRAIL_", "Z_______", "A"})
+      BOOST_CHECK_MESSAGE(slug_ok(ok), std::string("should accept ") + ok);
+
+   for (const char* bad : {"7",          // digit-leading
+                           "1ETH",       // digit-leading
+                           "0X10",       // digit-leading, JS-numeric shaped
+                           "_LEAD",      // underscore-leading
+                           "________",   // underscore-leading
+                           "eth",        // lowercase
+                           "ETH-MAIN",   // out of alphabet
+                           "TOOLONG12"}) // over length
+      BOOST_CHECK_MESSAGE(!slug_ok(bad), std::string("should reject ") + bad);
+}
+
 BOOST_AUTO_TEST_CASE(strict_parse_rejects_unknown_field) {
    BootstrapPlatformConfig cfg;
    std::string err;

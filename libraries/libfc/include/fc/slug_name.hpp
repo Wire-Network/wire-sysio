@@ -93,9 +93,10 @@ struct slug_name : basic_name<slug_name_traits> {
    /// Does this value have a canonical spelling? A slug_name built from a RAW
    /// uint64 bypasses the validating constructor — and nothing validates on
    /// deserialization either, since the reflected member is written directly —
-   /// so it can hold a value no spelling produces: anything whose leading symbol
-   /// slot is empty, or that uses one of the 26 unused symbol values, or that
-   /// sets any of bits 48-63. Such a value cannot round-trip.
+   /// so it can hold a value that does not round-trip: a NON-ZERO value whose leading
+   /// symbol slot is empty, one that uses any of the 26 unused symbol values, or one
+   /// that sets any of bits 48-63. Raw zero is not among them — `""` is its canonical
+   /// spelling and packs straight back.
    ///
    /// This lives on slug_name and NOT on basic_name because it is meaningless
    /// for `name`: that alphabet is exactly 2^5 with no gaps and its 13 symbols

@@ -110,10 +110,11 @@ struct basic_name {
       return v;
    }
 
-   /// Is `str` a valid, canonical spelling? The literal path's gate — and the
-   /// predicate a caller uses to ask whether a raw packed value has a spelling
-   /// at all. Delegates to validity_error so the literal path and the throwing
-   /// constructor can never disagree.
+   /// Is `str` a valid, canonical spelling? The literal path's gate. Takes the
+   /// SPELLING, not a packed value — asking whether a raw uint64 round-trips is
+   /// `is_canonical()`, which calls this on its own `to_string()`. Delegates to
+   /// validity_error so the literal path and the throwing constructor can never
+   /// disagree.
    static constexpr bool is_valid_literal(std::string_view str) {
       return validity_error(str) == nullptr;
    }
