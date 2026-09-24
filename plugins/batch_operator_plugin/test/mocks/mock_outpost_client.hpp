@@ -100,9 +100,27 @@ public:
       return commit_response(call);
    }
 
+   struct crank_call {
+      uint32_t         epoch_index = 0;
+      fc::microseconds deadline;
+   };
+
+   /// crank_outpost response — scripted per call; the default cranks nothing.
+   std::function<void(const crank_call&)> crank_response = [](const crank_call&) {};
+
+   void crank_outpost(uint32_t epoch_index, fc::microseconds deadline) override {
+      crank_call call{epoch_index, deadline};
+      {
+         std::lock_guard<std::mutex> lock(_mx);
+         crank_calls.push_back(call);
+      }
+      crank_response(call);
+   }
+
    std::vector<outbound_call> outbound_calls;
    std::vector<inbound_call>  inbound_calls;
    std::vector<commit_call>   commit_calls;
+   std::vector<crank_call>    crank_calls;
    std::vector<uint8_t>       caller_address;
 
 private:

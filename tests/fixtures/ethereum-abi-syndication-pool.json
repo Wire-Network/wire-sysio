@@ -1,0 +1,67 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "_source": "The members of SyndicationPool.sol (Wire-Network/wire-ethereum#207) that outpost_ethereum_client touches.",
+  "contractName": "SyndicationPool",
+  "sourceName": "contracts/outpost/SyndicationPool.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "WIRE_NoYield",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint64", "name": "balanceDepot", "type": "uint64" },
+        { "internalType": "uint64", "name": "principal", "type": "uint64" }
+      ],
+      "name": "WIRE_PoolUnderbacked",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint64", "name": "delta", "type": "uint64" },
+        { "internalType": "uint64", "name": "deadband", "type": "uint64" }
+      ],
+      "name": "WIRE_YieldBelowDeadband",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": false, "internalType": "uint64", "name": "depotAmount", "type": "uint64" },
+        { "indexed": false, "internalType": "uint64", "name": "principal", "type": "uint64" },
+        { "indexed": false, "internalType": "uint64", "name": "sequence", "type": "uint64" }
+      ],
+      "name": "YieldRealized",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "poolBalanceDepot",
+      "outputs": [{ "internalType": "uint64", "name": "", "type": "uint64" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "realizeYield",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "syndicatedPrincipal",
+      "outputs": [{ "internalType": "uint64", "name": "", "type": "uint64" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "yieldDeadband",
+      "outputs": [{ "internalType": "uint64", "name": "", "type": "uint64" }],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ]
+}

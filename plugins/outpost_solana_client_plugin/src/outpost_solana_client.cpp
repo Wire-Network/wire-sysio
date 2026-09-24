@@ -28,6 +28,10 @@ namespace {
 
 // ── Op labels used for deadline-exceeded error messages ──────────────────
 constexpr std::string_view OP_EPOCH_IN    = "deliver_outbound_envelope:epoch_in";
+constexpr std::string_view OP_REPORT_LIQ_YIELD = "crank_outpost:report_liq_yield";
+/// liqsol-core's permissionless yield-report instruction; only the integrated
+/// program declares it.
+constexpr auto REPORT_LIQ_YIELD_INSTRUCTION = "report_liq_yield";
 constexpr std::string_view OP_DISPATCH_ATTESTATIONS =
    "deliver_outbound_envelope:dispatch_attestations";
 constexpr std::string_view OP_READ_LATEST = "read_inbound_envelope:get_account_info";
@@ -48,6 +52,13 @@ constexpr std::string_view ENVELOPE_CHUNKS_SEED  = "envelope_chunks";
 /// runtime as `EffectAccountMissing`, holding the dispatch cursor.
 constexpr std::string_view COLLATERAL_POSITION_SEED = "collateral_position";
 constexpr std::string_view COLLATERAL_VAULT_SEED    = "collateral_vault";
+/// The liqSOL pool's seeds (wire-solana `liqsol-core`: `inbound.rs` and the
+/// `report_liq_yield` / `synd` account declarations), same lock-step caveat.
+constexpr std::string_view LIQSOL_GLOBAL_STATE_SEED       = "outpost_global_state";
+constexpr std::string_view LIQSOL_DISTRIBUTION_STATE_SEED = "distribution_state";
+constexpr std::string_view LIQSOL_POOL_SEED               = "liqsol_pool";
+constexpr std::string_view LIQSOL_BUCKET_SEED             = "liqsol_bucket";
+constexpr std::string_view LIQSOL_USER_RECORD_SEED        = "user_record";
 
 /// The 4-byte little-endian seed encoding of a WIRE epoch index -- the exact
 /// bytes the program's `epoch_index.to_le_bytes()` seed component uses.
@@ -145,6 +156,13 @@ namespace collateral_position {
    constexpr auto field_custody_mint = "custody_mint";
    constexpr auto field_amount       = "amount";
 } // namespace collateral_position
+
+/// `DistributionState` -- the liqSOL pool singleton `handle_desyndicate_liq`
+/// binds the pool's mint from. The relay decodes only `liqsol_mint`.
+namespace distribution_state {
+   constexpr auto account_name      = "DistributionState";
+   constexpr auto field_liqsol_mint = "liqsol_mint";
+} // namespace distribution_state
 
 } // anonymous namespace
 
@@ -635,6 +653,139 @@ fc::network::solana::solana_public_key derive_collateral_position_pda(
       program_id).first;
 }
 
+namespace {
+
+/// A single-literal-seed PDA of `program_id`.
+fc::network::solana::solana_public_key literal_seed_pda(
+   const fc::network::solana::solana_public_key& program_id, std::string_view seed) {
+   return fc::network::solana::system::find_program_address(
+      {std::vector<uint8_t>(seed.begin(), seed.end())}, program_id).first;
+}
+
+} // anonymous namespace
+
+// The liqSOL pool's fixed PDAs. Full contract on the header declarations.
+fc::network::solana::solana_public_key derive_liqsol_global_state_pda(
+   const fc::network::solana::solana_public_key& program_id) {
+   return literal_seed_pda(program_id, LIQSOL_GLOBAL_STATE_SEED);
+}
+
+fc::network::solana::solana_public_key derive_liqsol_distribution_state_pda(
+   const fc::network::solana::solana_public_key& program_id) {
+   return literal_seed_pda(program_id, LIQSOL_DISTRIBUTION_STATE_SEED);
+}
+
+fc::network::solana::solana_public_key derive_liqsol_pool_authority_pda(
+   const fc::network::solana::solana_public_key& program_id) {
+   return literal_seed_pda(program_id, LIQSOL_POOL_SEED);
+}
+
+fc::network::solana::solana_public_key derive_liqsol_bucket_authority_pda(
+   const fc::network::solana::solana_public_key& program_id) {
+   return literal_seed_pda(program_id, LIQSOL_BUCKET_SEED);
+}
+
+/// The `UserRecord` PDA of one liqSOL token account. Full contract on the
+/// header declaration.
+fc::network::solana::solana_public_key derive_liqsol_user_record_pda(
+   const fc::network::solana::solana_public_key& program_id,
+   const fc::network::solana::solana_public_key& token_account) {
+   return fc::network::solana::system::find_program_address(
+      {std::vector<uint8_t>(LIQSOL_USER_RECORD_SEED.begin(), LIQSOL_USER_RECORD_SEED.end()),
+       pubkey_seed(token_account)},
+      program_id).first;
+}
+
+/// Assert the loaded IDL declares `DistributionState` with the pubkey
+/// `liqsol_mint` the DESYNDICATE_LIQ manifest reads. Full contract on the
+/// header declaration.
+void assert_distribution_state_shape(const fc::network::solana::idl::program& program) {
+   namespace idl = fc::network::solana::idl;
+   const auto& fields = declared_account_fields(program, distribution_state::account_name);
+   for (const auto& field : fields) {
+      if (field.name != distribution_state::field_liqsol_mint) continue;
+      FC_ASSERT(field.type.is_primitive() && field.type.primitive == idl::primitive_type::pubkey,
+                "DistributionState '{}' must be declared pubkey, got '{}'",
+                distribution_state::field_liqsol_mint, describe_idl_type(field.type));
+      return;
+   }
+   FC_ASSERT(false,
+             "DistributionState IDL missing '{}'; a DESYNDICATE_LIQ manifest resolves the pool's "
+             "mint from it and cannot be built without it",
+             distribution_state::field_liqsol_mint);
+}
+
+/// Assert the loaded IDL declares `GlobalState.wire_state` as an enum carrying
+/// `PostLaunch`. Full contract on the header declaration.
+void assert_global_state_shape(const fc::network::solana::idl::program& program) {
+   namespace idl = fc::network::solana::idl;
+   const auto& fields = declared_account_fields(program, global_state::account_name);
+   for (const auto& field : fields) {
+      if (field.name != global_state::field_wire_state) continue;
+      FC_ASSERT(field.type.is_defined(),
+                "GlobalState '{}' must be declared as an enum type, got '{}'",
+                global_state::field_wire_state, describe_idl_type(field.type));
+      const idl::type_def* def = program.find_type(field.type.get_defined_name());
+      FC_ASSERT(def && def->is_enum(),
+                "GlobalState '{}' type '{}' is not an enum in the IDL",
+                global_state::field_wire_state, field.type.get_defined_name());
+      const bool has_post_launch =
+         std::any_of(def->enum_variants->begin(), def->enum_variants->end(),
+                     [](const idl::enum_variant& v) { return v.name == global_state::post_launch; });
+      FC_ASSERT(has_post_launch,
+                "GlobalState '{}' enum '{}' has no '{}' variant; the yield crank gates on it",
+                global_state::field_wire_state, field.type.get_defined_name(),
+                global_state::post_launch);
+      return;
+   }
+   FC_ASSERT(false, "GlobalState IDL missing '{}'; the yield crank gates on it",
+             global_state::field_wire_state);
+}
+
+bool liq_yield_report_due(const fc::variant_object& global_state_row) {
+   auto state = global_state_row.find(global_state::field_wire_state);
+   if (state == global_state_row.end() || !state->value().is_object()) return false;
+   const auto& state_obj = state->value().get_object();
+   auto variant = state_obj.find(IDL_ENUM_VARIANT_KEY);
+   return variant != state_obj.end() && variant->value().is_string() &&
+          variant->value().as_string() == global_state::post_launch;
+}
+
+fc::network::solana::account_overrides_t report_liq_yield_overrides(
+   const fc::network::solana::solana_public_key& program_id,
+   const fc::network::solana::solana_public_key& liqsol_mint,
+   const fc::network::solana::solana_public_key& hook_program,
+   const fc::network::solana::solana_public_key& config_pda,
+   const fc::network::solana::solana_public_key& outbound_message_buffer_pda) {
+   namespace accounts = report_liq_yield_accounts;
+   const auto& token_2022       = fc::network::solana::system::program_ids::TOKEN_2022_PROGRAM;
+   const auto  pool_authority   = derive_liqsol_pool_authority_pda(program_id);
+   const auto  bucket_authority = derive_liqsol_bucket_authority_pda(program_id);
+   const auto  pool_ata         = fc::network::solana::system::get_associated_token_address(
+      pool_authority, liqsol_mint, token_2022);
+   const auto  bucket_ata       = fc::network::solana::system::get_associated_token_address(
+      bucket_authority, liqsol_mint, token_2022);
+   return {
+      {accounts::liqsol_mint,              liqsol_mint},
+      {accounts::global_state,             derive_liqsol_global_state_pda(program_id)},
+      {accounts::distribution_state,       derive_liqsol_distribution_state_pda(program_id)},
+      {accounts::pool_authority,           pool_authority},
+      {accounts::bucket_authority,         bucket_authority},
+      {accounts::bucket_token_account,     bucket_ata},
+      {accounts::bucket_user_record,       derive_liqsol_user_record_pda(program_id, bucket_ata)},
+      {accounts::liqsol_pool_ata,          pool_ata},
+      {accounts::pool_user_record,         derive_liqsol_user_record_pda(program_id, pool_ata)},
+      {accounts::extra_account_meta_list,  derive_extra_account_metas_pda(hook_program, liqsol_mint)},
+      {accounts::liqsol_core_program,      program_id},
+      {accounts::transfer_hook_program,    hook_program},
+      {accounts::config,                   config_pda},
+      {accounts::outbound_message_buffer,  outbound_message_buffer_pda},
+      {accounts::token_program,            token_2022},
+      {accounts::associated_token_program, fc::network::solana::system::program_ids::ASSOCIATED_TOKEN_PROGRAM},
+      {accounts::system_program,           fc::network::solana::system::program_ids::SYSTEM_PROGRAM},
+   };
+}
+
 
 // ── Token-2022 transfer-hook resolution (SOL-396 lock-step) ─────────────────
 //
@@ -1006,6 +1157,19 @@ extract_inbound_effects(const std::vector<char>& envelope_bytes) {
                   reserve_pda_seeds{rcc.token_code(), rcc.reserve_code()}});
                break;
             }
+            // The depot releasing a user's syndicated liqSOL. The user's pubkey is
+            // the only payload fact the manifest needs -- the pool's mint comes from
+            // `DistributionState`, and the handler's own token_code check precedes
+            // every account it requires, so a wrong token is a logged skip on chain.
+            case sysio::opp::types::ATTESTATION_TYPE_DESYNDICATE_LIQ: {
+               sysio::opp::attestations::DesyndicateLIQ dl;
+               if (!dl.ParseFromString(entry.data())) continue;
+               if (auto pk = sol_pubkey_from_chain_address(dl.user())) {
+                  effects.push_back(inbound_effect{
+                     at, effect_shape::desyndicate_liq, *pk, std::nullopt, std::nullopt});
+               }
+               break;
+            }
             default:
                break;
          }
@@ -1056,6 +1220,7 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
    const reserve_info_reader&                    read_reserve_info,
    const collateral_custody_reader&              read_collateral_custody,
    const transfer_hook_reader&                   read_transfer_hook,
+   const liq_pool_reader&                        read_liq_pool,
    const fc::network::solana::solana_public_key& reserve_aggregate,
    const std::string&                            log_label) {
    const auto& token_program_id = fc::network::solana::system::program_ids::TOKEN_PROGRAM;
@@ -1113,6 +1278,15 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
       return collateral_custody_cache
          .emplace(cache_key, read_collateral_custody(operator_key, token_code))
          .first->second;
+   };
+
+   // One DistributionState read for the whole build -- the pool singleton is
+   // the same for every DESYNDICATE_LIQ in the envelope -- memoised like the
+   // caches above, an absent read included.
+   std::optional<std::optional<liq_pool_info>> liq_pool_cache;
+   auto liq_pool = [&]() -> const std::optional<liq_pool_info>& {
+      if (!liq_pool_cache.has_value()) liq_pool_cache = read_liq_pool();
+      return *liq_pool_cache;
    };
 
    std::vector<std::vector<fc::network::solana::account_meta>> per_attestation(total_attestations);
@@ -1178,6 +1352,72 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
                 settlement_owner, custody.mint),
              true);
          add(token_program_id, false);
+         continue;
+      }
+
+      // DESYNDICATE_LIQ: the depot releases a user's syndicated liqSOL. Everything
+      // derives from the user's pubkey, the program's fixed pool PDAs and the mint
+      // pinned on `DistributionState` -- the account the handler itself binds the
+      // mint from.
+      //
+      // LOCK-STEP: `handle_desyndicate_liq`'s `require_remaining_account` list
+      // (wire-solana `inbound.rs`) IS this manifest. The two state singletons come
+      // first because the handler loads them before anything else and turns an
+      // uninitialized pool into a logged skip; every later account aborts the
+      // window when missing, which is the caller-fixable retry the program wants.
+      if (effect.shape == effect_shape::desyndicate_liq) {
+         if (!effect.recipient) continue;
+         add(derive_liqsol_global_state_pda(program_id), true);
+         add(derive_liqsol_distribution_state_pda(program_id), true);
+
+         const auto& pool_opt = liq_pool();
+         if (!pool_opt.has_value()) {
+            wlog("outpost_solana_client[{}]: DistributionState absent or empty while building the "
+                 "terminal manifest for attestation {}; passing the state singletons only -- the "
+                 "handler will log-and-skip an uninitialized pool",
+                 log_label, effect.attestation_index);
+            continue;
+         }
+         const auto& mint             = pool_opt->liqsol_mint;
+         const auto  pool_authority   = derive_liqsol_pool_authority_pda(program_id);
+         const auto  bucket_authority = derive_liqsol_bucket_authority_pda(program_id);
+         const auto  pool_ata         = fc::network::solana::system::get_associated_token_address(
+            pool_authority, mint, token_2022_program_id);
+         const auto  user_ata         = fc::network::solana::system::get_associated_token_address(
+            *effect.recipient, mint, token_2022_program_id);
+         const auto  bucket_ata       = fc::network::solana::system::get_associated_token_address(
+            bucket_authority, mint, token_2022_program_id);
+
+         // The pool-authority-signed transfer and the share move it settles.
+         add(pool_authority, false);
+         add(pool_ata, true);
+         add(user_ata, true);
+         add(derive_liqsol_user_record_pda(program_id, pool_ata), true);
+         add(derive_liqsol_user_record_pda(program_id, user_ata), true);
+         add(bucket_ata, false);
+         add(mint, false);
+         add(token_2022_program_id, false);
+         // The liqSOL transfer hook's accounts: `invoke_transfer_checked` resolves
+         // the hook program, the mint's extra-metas PDA and the metas that PDA
+         // declares out of `remaining_accounts`, and the handler requires the
+         // bucket authority and liqsol-core itself on top.
+         add(bucket_authority, false);
+         add(program_id, false);
+         const auto& hook = transfer_hook(mint);
+         if (!hook.has_value()) {
+            wlog("outpost_solana_client[{}]: liqSOL mint {} carries no transfer hook; the "
+                 "DESYNDICATE_LIQ manifest for attestation {} omits the hook accounts the handler "
+                 "requires, so its dispatch window aborts until the mint is fixed",
+                 log_label, mint.to_string(fc::yield_function_t{}), effect.attestation_index);
+            continue;
+         }
+         const auto validation_pda = derive_extra_account_metas_pda(hook->program, mint);
+         add(hook->program, false);
+         add(validation_pda, false);
+         for (const auto& meta : resolve_hook_metas(hook->declared, hook->program, pool_ata, mint,
+                                                    user_ata, pool_authority, validation_pda)) {
+            add(meta.key, meta.is_writable);
+         }
          continue;
       }
 
@@ -1487,6 +1727,33 @@ outpost_solana_client::outpost_solana_client(
       // window on the same unadvanced cursor.
       outpost_solana_client_detail::assert_collateral_position_shape(
          *_program_client->get_program());
+      // `DistributionState` is read only for DESYNDICATE_LIQ manifests, and only
+      // the integrated liqsol-core program declares it -- a standalone outpost
+      // IDL has no syndicated pool to release from, and its DistributionState
+      // PDA never exists on chain. Where it IS declared, a drifted `liqsol_mint`
+      // would wedge every desyndication window the way a drifted Reserve would.
+      if (_program_client->get_program()->find_account(distribution_state::account_name)) {
+         outpost_solana_client_detail::assert_distribution_state_shape(
+            *_program_client->get_program());
+      } else {
+         ilog("outpost_solana_client[{}]: IDL declares no DistributionState; DESYNDICATE_LIQ "
+              "manifests are not derivable on this outpost program",
+              to_string());
+      }
+      // The yield-report crank exists only where the program declares it. There,
+      // it gates on `GlobalState.wire_state` and derives its accounts from
+      // `DistributionState`, so both declarations are boot-checked with it.
+      if (_program_client->has_idl(REPORT_LIQ_YIELD_INSTRUCTION)) {
+         FC_ASSERT(_program_client->get_program()->find_account(distribution_state::account_name),
+                   "outpost program IDL declares `{}` but no DistributionState; the crank "
+                   "derives the pool accounts from it",
+                   REPORT_LIQ_YIELD_INSTRUCTION);
+         outpost_solana_client_detail::assert_global_state_shape(*_program_client->get_program());
+      } else {
+         ilog("outpost_solana_client[{}]: IDL declares no `{}`; the yield-report crank is idle on "
+              "this outpost program",
+              to_string(), REPORT_LIQ_YIELD_INSTRUCTION);
+      }
    }
 }
 
@@ -1706,6 +1973,7 @@ std::string outpost_solana_client::drain_dispatch(
       [&](const fc::network::solana::solana_public_key& custody_mint) {
          return mint_transfer_hook_for(custody_mint);
       },
+      [&] { return syndicated_liq_pool(); },
       _program_client->reserve_pda,
       to_string());
 
@@ -1809,6 +2077,93 @@ outpost_solana_client::collateral_position_custody(
            account_info->data.size(), e.to_detail_string());
       throw;
    }
+}
+
+std::optional<outpost_solana_client_detail::liq_pool_info>
+outpost_solana_client::syndicated_liq_pool() {
+   const auto state_pda =
+      outpost_solana_client_detail::derive_liqsol_distribution_state_pda(_program_id);
+   const auto pda_label = state_pda.to_string(fc::yield_function_t{});
+
+   // An RPC/deadline exception is not evidence that the pool is absent, so the
+   // read deliberately sits outside the decode-only try/catch.
+   const auto account_info = _entry->client->get_account_info(state_pda);
+   if (!account_info.has_value() || account_info->data.empty()) {
+      wlog("outpost_solana_client[{}]: DistributionState absent or empty at {}; DESYNDICATE_LIQ "
+           "manifests carry the state singletons only -- the handler log-and-skips an "
+           "uninitialized pool",
+           to_string(), pda_label);
+      return std::nullopt;
+   }
+
+   try {
+      const auto state_v = _program_client->decode_account_info_data(
+         distribution_state::account_name, account_info->data);
+      const auto& state = state_v.get_object();
+      FC_ASSERT(state.contains(distribution_state::field_liqsol_mint),
+                "DistributionState account missing '{}' field",
+                distribution_state::field_liqsol_mint);
+      return outpost_solana_client_detail::liq_pool_info{
+         fc::network::solana::solana_public_key::from_base58_string(
+            state[distribution_state::field_liqsol_mint].as_string())};
+   } catch (const fc::exception& e) {
+      elog("outpost_solana_client[{}]: DistributionState at {} EXISTS ({} bytes) but this relay "
+           "cannot read its liqSOL mint; refusing to build a manifest the program is guaranteed to "
+           "abort on. The dispatch cursor is left untouched and this epoch cannot settle until the "
+           "cause is fixed -- check the loaded IDL against the deployed program: {}",
+           to_string(), pda_label, account_info->data.size(), e.to_detail_string());
+      throw;
+   }
+}
+
+void outpost_solana_client::crank_outpost(uint32_t epoch_index, fc::microseconds deadline) {
+   // A standalone outpost program has no syndicated pool to report on.
+   if (!_program_client->has_idl(REPORT_LIQ_YIELD_INSTRUCTION)) return;
+
+   const auto deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
+   throw_if_past_deadline(deadline_abs, OP_REPORT_LIQ_YIELD);
+
+   // PostLaunch only: before the flip the pool's yield belongs to the pretoken
+   // accounting and the program refuses the crank, so the state is read first
+   // and nothing is paid for a refused tx.
+   const auto global_state_pda =
+      outpost_solana_client_detail::derive_liqsol_global_state_pda(_program_id);
+   const auto global_info = _entry->client->get_account_info(global_state_pda);
+   if (!global_info.has_value() || global_info->data.empty()) {
+      dlog("outpost_solana_client[{}]: no GlobalState at {} -- no liq yield to report",
+           to_string(), global_state_pda.to_string(fc::yield_function_t{}));
+      return;
+   }
+   const auto global_v = _program_client->decode_account_info_data(
+      outpost_solana_client_detail::global_state::account_name, global_info->data);
+   if (!outpost_solana_client_detail::liq_yield_report_due(global_v.get_object())) {
+      dlog("outpost_solana_client[{}]: outpost is not PostLaunch -- no liq yield to report",
+           to_string());
+      return;
+   }
+
+   const auto pool = syndicated_liq_pool();
+   if (!pool.has_value()) return;   // already logged: no pool, nothing to report
+   const auto hook = mint_transfer_hook_for(pool->liqsol_mint);
+   if (!hook.has_value()) {
+      wlog("outpost_solana_client[{}]: liqSOL mint {} carries no transfer hook; report_liq_yield "
+           "needs the hook's accounts and is skipped until the mint is fixed",
+           to_string(), pool->liqsol_mint.to_string(fc::yield_function_t{}));
+      return;
+   }
+
+   throw_if_past_deadline(deadline_abs, OP_REPORT_LIQ_YIELD);
+   const auto overrides = outpost_solana_client_detail::report_liq_yield_overrides(
+      _program_id, pool->liqsol_mint, hook->program, _program_client->config_pda,
+      _program_client->outbound_message_buffer_pda);
+   const auto& instr = _program_client->get_idl(REPORT_LIQ_YIELD_INSTRUCTION);
+   // The instruction takes no arguments; the cranker is this operator's own key.
+   const fc::network::solana::program_invoke_data_items params;
+   const auto accounts = _program_client->resolve_accounts(instr, params, overrides);
+   const auto sig      = _program_client->execute_tx_and_confirm(instr, accounts, params);
+   ilog("outpost_solana_client[{}]: report_liq_yield sent for epoch {} sig={}",
+        to_string(), epoch_index, sig);
 }
 
 std::string outpost_solana_client::deliver_outbound_envelope(

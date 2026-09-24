@@ -89,15 +89,17 @@ endpoint cannot occupy a cron worker past its budget.
 
 Three typed wrappers are built over the shared connection, each only when its address was supplied to
 `create_outpost_client`; passing an empty string for the others is normal, and calling an SPI method whose
-wrapper was not provisioned asserts with a message naming the missing address. State-changing calls go
-through `create_tx_and_confirm`, which returns only after on-chain inclusion plus confirmations — OPP writes
-are consensus-critical and must not silently drop.
+wrapper was not provisioned asserts with a message naming the missing address. A fourth, the syndication
+pool's, is bound by the crank once the outpost names the pool (see [Outpost cranks](#outpost-cranks)).
+State-changing calls go through `create_tx_and_confirm`, which returns only after on-chain inclusion plus
+confirmations — OPP writes are consensus-critical and must not silently drop.
 
 | Wrapper | Contract | Members |
 |---|---|---|
 | `opp_contract_client` | `OPP.sol` | `emitOutboundEnvelope(uint32)` (recovery-only write; no in-tree steady-state caller), `getLatestOutboundEnvelope()` view |
-| `opp_inbound_contract_client` | `OPPInbound.sol` | `epochIn(uint32,uint16,uint16,uint32,bytes)`, `discardEnvelopeChunks()`, `nextEpochIndex()` view, `envelopeChunkState(address)` view |
+| `opp_inbound_contract_client` | `OPPInbound.sol` | `epochIn(uint32,uint16,uint16,uint32,bytes)`, `discardEnvelopeChunks()`, `nextEpochIndex()` view, `envelopeChunkState(address)` view, `attestationHandlers(uint16)` view |
 | `operator_registry_contract_client` | `OperatorRegistry.sol` | `commit(bytes)` |
+| `syndication_pool_contract_client` | `SyndicationPool.sol` (Wire-Network/wire-ethereum#207) | `realizeYield()` |
 
 ### Outbound delivery and chunking
 
@@ -137,6 +139,26 @@ preceding epoch is normal until the consensus-reaching delivery overwrites the s
 returning the transaction hash only after confirmation. The outpost binds the signed EVM caller and the
 claimed ACTIVE roster identity before queuing the unchanged bytes; the WIRE depot remains authoritative for
 the embedded permission signature and bond.
+
+### Outpost cranks
+
+Once per epoch, right after this operator's envelope delivery lands, the outbound relay job calls
+`crank_outpost`. On Ethereum that is the liq syndication pool's `realizeYield()`
+(Wire-Network/wire-ethereum#207): the pool folds the liqETH yield it accrued since its last report into its
+principal and reports the delta as one `LIQ_YIELD` attestation — the counterpart of the Solana relay's
+`report_liq_yield`. Nothing has to tell the relay the pool's address: it reads
+`OPPInbound.attestationHandlers(DESYNDICATE_LIQ)` at `latest`, because the pool registers itself as that
+handler when its OPP endpoint is configured, binds a `syndication_pool_contract_client` to the address that
+comes back, and re-binds if it changes. `address(0)` and `ATTESTATION_BLACKHOLE` mean no pool, and an ABI set
+without `realizeYield` means an outpost deployment that predates the pool; both leave the crank idle at debug
+level.
+
+`realizeYield()` refuses at estimate time, before any gas is spent, and the relay reads the pool's own three
+refusals as outcomes rather than failures: `WIRE_NoYield()` and `WIRE_YieldBelowDeadband(uint64,uint64)` are
+the quiet steady state (debug), `WIRE_PoolUnderbacked(uint64,uint64)` is a warning (the loss path is not in
+that contract). Any other revert — a signer without the pool's `yield_operator` role, a paused endpoint, a
+foreign implementation — and any transport failure propagate to the job, which logs the failed crank and
+retries with the next epoch's delivery.
 
 ## Enabling / configuration
 
@@ -257,7 +279,9 @@ resolution and verification (explicit, RPC-resolved, mismatched, malformed, out-
 transport failure), signature-provider rejection cases, contract-client construction and ABI encoding, the
 chunk-count and chunk-resume decision tables, and every delivery path — single-chunk, multi-chunk in order,
 resume from a staged high-water mark, peer-owned header, superseded header, reverting discard, epoch
-advanced, deadline abandonment, and the empty and over-cap rejections.
+advanced, deadline abandonment, and the empty and over-cap rejections — and the outpost crank: idle without
+the pool ABI or a registered handler, binding the registered pool and re-binding on a change, the pool's own
+three refusals, unrecognised reverts and protocol errors, and deadline abandonment.
 `outpost_ethereum_transaction_policy_tests` covers the expenditure-policy boundary: that a rejection happens
 before signing or broadcasting, that exact caps pass through once, that two clients enforce their own
 policies, that file and CLI configuration produce the expected policies, and that a partial client map is

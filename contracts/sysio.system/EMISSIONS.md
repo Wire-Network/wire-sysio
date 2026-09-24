@@ -184,6 +184,11 @@ payepoch; it stays in sysio's balance and drains lazily:
 3. The staker calls `dclaim::claim` (auth = their own account) to transfer the
    accumulated balance out (memo `sysio.dclaim claim`).
 
+`sysio.liq` draws through the same action: its `addyield` requests the yield
+kicker (`kicker_bps` of each intake from the swap, the intake that is yield) from
+the pool, so `fundclaim` names its recipient, which must be one of those two
+contracts.
+
 Unclaimed rows expire after `cap_config.claim_window_sec` and revert to the
 dclaim pool via `flushexpired`. `fundclaim` and the whole OPP inbound path are
 never-throw (transfers are capped / soft-dropped so a bad row cannot abort the
@@ -204,7 +209,7 @@ period_emission
   |                       '-- batch_op_bps --> batch operators       (claimpay)
   |-- capex_bps ------> sysio.ops                                    (pushed)
   |-- governance_bps -> sysio.gov                                    (pushed)
-  '-- remainder ------> capital reserve -> sysio.dclaim (fundclaim)  (claim)
+  '-- remainder ------> capital reserve -> sysio.dclaim / sysio.liq (fundclaim)  (claim)
 ```
 
 ## Emission actions
@@ -220,7 +225,7 @@ period_emission
 | `accrueepoch` | `sysio.epoch` | Accrue this epoch's curve share |
 | `rcrdbatch` | `sysio.epoch` | Record the batch-operator roster for this accrued epoch |
 | `payepoch` | `sysio.epoch` | Distribute the period's compute / capex / governance (credits `payclaims`; pushes only the category buckets) |
-| `fundclaim` | `sysio.dclaim` | Lazy capital drain into dclaim (never-throw) |
+| `fundclaim` | the recipient: `sysio.dclaim` or `sysio.liq` | Lazy capital drain into the recipient (never-throw) |
 | `viewnodedist` | read-only | Preview a node owner's claimable amount |
 | `viewepoch` | read-only | Current treasury / next-emission estimate |
 | `viewemitcfg` | read-only | Current emission config |
@@ -245,4 +250,4 @@ period_emission
 - Reads producer eligibility and operator status from `sysio.opreg`.
 - Reads the canonical epoch duration from `sysio.epoch::epochcfg`.
 - Folds swap-fee rewards from `sysio.reserv` (`drainrewards`).
-- Funds `sysio.dclaim` on demand via `fundclaim` for the capital / staking-reward path.
+- Funds `sysio.dclaim` (staking rewards) and `sysio.liq` (the yield kicker) on demand via `fundclaim`.

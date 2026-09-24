@@ -27,6 +27,7 @@
 #include <fc/network/ethereum/ethereum_transaction_policy.hpp>
 #include <fc/network/http/http_client.hpp>
 #include <fc/network/json_rpc/json_rpc_client.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 #include <sysio/chain/types.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
@@ -480,11 +481,21 @@ std::vector<char> serialize_envelope(uint32_t epoch) {
 /// whose OPPInbound wrapper has every typed callable replaced by a recording
 /// stub. The caller owns the returned fixture; the stubs capture it by
 /// reference, so it must not be moved after this returns.
-std::unique_ptr<chunked_delivery_fixture> create_chunked_delivery_fixture() {
-   auto fixture = std::make_unique<chunked_delivery_fixture>();
-   fixture->tester = create_app();
+/// The app, signer, chain connection and client entry every relay fixture
+/// stands on. The connection points at a port nothing listens on, so a wrapper
+/// a case forgot to stub fails loudly instead of dialing anything.
+struct relay_test_stack {
+   std::unique_ptr<sig_provider_tester>             tester;
+   fc::crypto::signature_provider_ptr               sig_provider;
+   ethereum_client_ptr                              eth_client;
+   std::shared_ptr<sysio::ethereum_client_entry_t>  entry;
+};
 
-   auto sig_provider = fixture->tester->plugin().create_provider(
+relay_test_stack create_relay_test_stack() {
+   relay_test_stack stack;
+   stack.tester = create_app();
+
+   stack.sig_provider = stack.tester->plugin().create_provider(
       std::string(latest_slot_test_entry_id),
       chain_kind_ethereum,
       chain_key_type_ethereum,
@@ -499,10 +510,24 @@ std::unique_ptr<chunked_delivery_fixture> create_chunked_delivery_fixture() {
       .max_gas_limit = maximum_ethereum_transaction_policy_value(),
       .max_total_native_cost = maximum_ethereum_transaction_policy_value(),
    };
-   auto eth_client = std::make_shared<ethereum_client>(
-      sig_provider,
+   stack.eth_client = std::make_shared<ethereum_client>(
+      stack.sig_provider,
       std::variant<std::string, fc::url>{std::string(latest_slot_test_rpc_url)},
       std::move(transaction_policy));
+
+   stack.entry = std::make_shared<sysio::ethereum_client_entry_t>();
+   stack.entry->id = latest_slot_test_entry_id;
+   stack.entry->signature_provider = stack.sig_provider;
+   stack.entry->client = stack.eth_client;
+   stack.entry->chain_id = test_evm_chain_id;
+   return stack;
+}
+
+std::unique_ptr<chunked_delivery_fixture> create_chunked_delivery_fixture() {
+   auto fixture = std::make_unique<chunked_delivery_fixture>();
+   auto stack = create_relay_test_stack();
+   fixture->tester = std::move(stack.tester);
+   auto eth_client = stack.eth_client;
 
    auto              abis = load_abi_fixture(opp_inbound_abi_fixture);
    const std::string inbound_address{test_opp_inbound_address};
@@ -546,14 +571,8 @@ std::unique_ptr<chunked_delivery_fixture> create_chunked_delivery_fixture() {
       return fc::variant(raw->next_epoch_index_response);
    };
 
-   auto entry = std::make_shared<sysio::ethereum_client_entry_t>();
-   entry->id = latest_slot_test_entry_id;
-   entry->signature_provider = sig_provider;
-   entry->client = eth_client;
-   entry->chain_id = test_evm_chain_id;
-
    fixture->outpost = std::make_unique<sysio::outpost_ethereum_client>(
-      entry,
+      stack.entry,
       /*opp_addr=*/std::string{},
       inbound_address,
       /*operator_registry_addr=*/std::string{},
@@ -590,6 +609,115 @@ void check_chunk_call_sequence(const std::vector<observed_chunk_call>& calls,
       BOOST_CHECK_EQUAL(call.chunk_hex,
                         fc::to_hex(envelope.data() + offset, static_cast<uint32_t>(length)));
    }
+}
+
+// ── `crank_outpost` fixtures ─────────────────────────────────────────────
+constexpr std::string_view syndication_pool_abi_fixture = "ethereum-abi-syndication-pool.json";
+constexpr std::string_view zero_evm_address = "0x0000000000000000000000000000000000000000";
+/// `ATTESTATION_BLACKHOLE` in wire-ethereum's `OPPCommon.sol`.
+constexpr std::string_view attestation_blackhole_address = "0x000000000000000000000000000000000000dead";
+constexpr std::string_view test_syndication_pool_address = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";
+constexpr std::string_view test_moved_syndication_pool_address = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9";
+/// `keccak256("WIRE_NoYield()")[0..4]` and the pool's other two refusals, written out so these
+/// tests pin the client's own hashing of the signatures (as `chunk_buffer_missing_selector` does).
+constexpr std::string_view no_yield_selector             = "053716d1";
+constexpr std::string_view yield_below_deadband_selector = "45441430";
+constexpr std::string_view pool_underbacked_selector     = "358cc7e9";
+/// `AccessManagedUnauthorized(address)`: what a signer without the `yield_operator` role gets.
+constexpr std::string_view access_managed_unauthorized_selector = "068ca9d8";
+constexpr uint64_t test_yield_delta    = 5;
+constexpr uint64_t test_yield_deadband = 10;
+
+/// ABI-encode one address as the single word an `address` getter returns.
+std::string encode_address_word(std::string_view address_hex) {
+   std::string_view address = address_hex;
+   if (address.starts_with("0x") || address.starts_with("0X")) address.remove_prefix(2);
+   return std::string(hex_prefix) + std::string(evm_abi_word_hex_chars - address.size(), '0') +
+          std::string(address);
+}
+
+/// ABI-encode a two-`uint64` custom error the way a node returns it in `error.data`.
+std::string encode_two_word_revert(std::string_view selector, uint64_t first, uint64_t second) {
+   return std::string(hex_prefix) + std::string(selector) + abi_word(first) + abi_word(second);
+}
+
+/// A `crank_outpost` stand: a real `outpost_ethereum_client` over the OPPInbound ABI (plus the
+/// pool's, unless the case leaves it out), its `attestationHandlers` view stubbed, and a pool
+/// wrapper bound through `bind_stub_pool` whose `realizeYield` records the call or throws what
+/// the case scripts.
+struct crank_fixture {
+   ~crank_fixture() {
+      pool.reset();
+      outpost.reset();
+      inbound.reset();
+      tester.reset();
+      appbase::application::reset_app_singleton();
+   }
+
+   std::unique_ptr<sig_provider_tester>                     tester;
+   ethereum_client_ptr                                      eth_client;
+   std::vector<fc::network::ethereum::abi::contract>        abis;
+   std::shared_ptr<sysio::opp_inbound_contract_client>      inbound;
+   std::shared_ptr<sysio::syndication_pool_contract_client> pool;
+   std::unique_ptr<sysio::outpost_ethereum_client>          outpost;
+
+   /// Every attestation type the stubbed `attestationHandlers` view was asked for.
+   std::vector<uint16_t> handler_reads;
+   /// Response the stubbed view returns; the default is `address(0)`, nothing registered.
+   std::string handler_response = encode_address_word(zero_evm_address);
+   size_t      realize_calls = 0;
+   /// When set, the stubbed `realizeYield` write throws it.
+   std::optional<fc::network::json_rpc::json_rpc_error> realize_failure;
+
+   /// Bind a pool wrapper at `address` whose `realizeYield` is this fixture's recording stub.
+   void bind_stub_pool(std::string_view address) {
+      const std::string pool_address{address};
+      pool = eth_client->get_contract<sysio::syndication_pool_contract_client>(pool_address, abis);
+      BOOST_REQUIRE(pool);
+      pool->realize_yield = [this]() -> fc::variant {
+         ++realize_calls;
+         if (realize_failure) throw *realize_failure;
+         return fc::variant(std::string(hex_prefix) + abi_word(realize_calls));
+      };
+      outpost->bind_syndication_pool(pool_address, pool);
+   }
+};
+
+std::unique_ptr<crank_fixture> create_crank_fixture(bool with_pool_abi = true) {
+   auto fixture = std::make_unique<crank_fixture>();
+   auto stack = create_relay_test_stack();
+   fixture->tester     = std::move(stack.tester);
+   fixture->eth_client = stack.eth_client;
+
+   fixture->abis = load_abi_fixture(opp_inbound_abi_fixture);
+   if (with_pool_abi) {
+      const auto pool_abis = load_abi_fixture(syndication_pool_abi_fixture);
+      fixture->abis.insert(fixture->abis.end(), pool_abis.begin(), pool_abis.end());
+   }
+   const std::string inbound_address{test_opp_inbound_address};
+   fixture->inbound =
+      fixture->eth_client->get_contract<sysio::opp_inbound_contract_client>(inbound_address, fixture->abis);
+   BOOST_REQUIRE(fixture->inbound);
+
+   auto* raw = fixture.get();
+   raw->inbound->attestation_handlers =
+      [raw](const block_number_or_tag_t& block, uint16_t& attestation_type) -> fc::variant {
+         // The routing table is configuration, not delivered content: read at `latest`.
+         BOOST_CHECK(std::holds_alternative<block_tag_t>(block));
+         BOOST_CHECK(std::get<block_tag_t>(block) == block_tag_t::latest);
+         raw->handler_reads.push_back(attestation_type);
+         return fc::variant(raw->handler_response);
+      };
+
+   fixture->outpost = std::make_unique<sysio::outpost_ethereum_client>(
+      stack.entry,
+      /*opp_addr=*/std::string{},
+      inbound_address,
+      /*operator_registry_addr=*/std::string{},
+      fixture->abis,
+      test_outpost_chain_code,
+      test_evm_chain_id);
+   return fixture;
 }
 
 } // anonymous namespace
@@ -1513,6 +1641,200 @@ BOOST_AUTO_TEST_CASE(multi_chunk_delivery_proceeds_when_the_outpost_epoch_has_no
 
    BOOST_CHECK_EQUAL(fixture->next_epoch_reads, 1u);
    check_chunk_call_sequence(fixture->chunk_calls, envelope, test_wire_epoch, 0);
+} FC_LOG_AND_RETHROW();
+
+// ── `crank_outpost` ──────────────────────────────────────────────────────
+
+/// The pool's three refusals are identified by selector AND shape, exactly as
+/// `OPP_ChunkBufferMissing` is: a neighbouring error, a role error, a refusal with the wrong
+/// argument count, and no bytes at all are none of them.
+BOOST_AUTO_TEST_CASE(realize_yield_refusal_selectors_are_pinned) try {
+   namespace crank = sysio::outpost_ethereum_client_detail;
+   using refusal   = crank::realize_yield_refusal;
+
+   BOOST_CHECK(crank::classify_realize_yield_revert(std::string(hex_prefix) + std::string(no_yield_selector)) ==
+               refusal::no_yield);
+   BOOST_CHECK(crank::classify_realize_yield_revert(encode_two_word_revert(
+                  yield_below_deadband_selector, test_yield_delta, test_yield_deadband)) ==
+               refusal::below_deadband);
+   BOOST_CHECK(crank::classify_realize_yield_revert(encode_two_word_revert(
+                  pool_underbacked_selector, test_yield_delta, test_yield_deadband)) ==
+               refusal::underbacked);
+
+   BOOST_CHECK(!crank::classify_realize_yield_revert(
+      std::string(hex_prefix) + std::string(no_yield_selector) + abi_word(1)));
+   BOOST_CHECK(!crank::classify_realize_yield_revert(
+      std::string(hex_prefix) + std::string(pool_underbacked_selector) + abi_word(1)));
+   BOOST_CHECK(!crank::classify_realize_yield_revert(
+      encode_address_revert(access_managed_unauthorized_selector, test_other_operator_address)));
+   BOOST_CHECK(!crank::classify_realize_yield_revert(
+      encode_address_revert(chunk_buffer_missing_selector, test_other_operator_address)));
+   BOOST_CHECK(!crank::classify_realize_yield_revert(""));
+   BOOST_CHECK(!crank::classify_realize_yield_revert("0x"));
+} FC_LOG_AND_RETHROW();
+
+/// The handler word decodes to the registered address, and only a real one is routable:
+/// `address(0)` and the blackhole are "no pool", and a malformed word is nothing at all.
+BOOST_AUTO_TEST_CASE(handler_word_decoding_and_routability) try {
+   namespace crank = sysio::outpost_ethereum_client_detail;
+   const std::string pool{test_syndication_pool_address};
+
+   const auto decoded = crank::address_from_word(encode_address_word(pool));
+   BOOST_REQUIRE(decoded.has_value());
+   BOOST_CHECK(crank::same_evm_address(*decoded, pool));
+   BOOST_CHECK(crank::is_routable_handler(*decoded));
+
+   const auto zero = crank::address_from_word(encode_address_word(zero_evm_address));
+   BOOST_REQUIRE(zero.has_value());
+   BOOST_CHECK(!crank::is_routable_handler(*zero));
+   const auto blackhole = crank::address_from_word(encode_address_word(attestation_blackhole_address));
+   BOOST_REQUIRE(blackhole.has_value());
+   BOOST_CHECK(!crank::is_routable_handler(*blackhole));
+   BOOST_CHECK(!crank::is_routable_handler(""));
+
+   BOOST_CHECK(!crank::address_from_word(""));
+   BOOST_CHECK(!crank::address_from_word("0x"));
+   // A bare address is not a word.
+   BOOST_CHECK(!crank::address_from_word(pool));
+   auto dirty_pad = encode_address_word(pool);
+   dirty_pad[hex_prefix.size()] = '1';
+   BOOST_CHECK(!crank::address_from_word(dirty_pad));
+   auto not_hex = encode_address_word(pool);
+   not_hex.back() = 'g';
+   BOOST_CHECK(!crank::address_from_word(not_hex));
+} FC_LOG_AND_RETHROW();
+
+/// An ABI set without `realizeYield` is an outpost deployment that predates the pool: the crank
+/// asks the outpost nothing.
+BOOST_AUTO_TEST_CASE(crank_outpost_is_idle_without_the_pool_abi) try {
+   auto fixture = create_crank_fixture(/*with_pool_abi=*/false);
+   fixture->handler_response = encode_address_word(test_syndication_pool_address);
+
+   fixture->outpost->crank_outpost(test_wire_epoch, fc::seconds(test_rpc_deadline_seconds));
+
+   BOOST_CHECK(fixture->handler_reads.empty());
+   BOOST_CHECK(fixture->outpost->syndication_pool_address().empty());
+} FC_LOG_AND_RETHROW();
+
+/// Until the outpost routes `DESYNDICATE_LIQ` somewhere real there is no pool: `address(0)` and
+/// the blackhole both leave the crank idle, with nothing bound and nothing sent.
+BOOST_AUTO_TEST_CASE(crank_outpost_is_idle_until_the_outpost_registers_a_pool) try {
+   const auto desyndicate_liq = static_cast<uint16_t>(
+      magic_enum::enum_integer(sysio::opp::types::ATTESTATION_TYPE_DESYNDICATE_LIQ));
+   for (const auto unregistered : {zero_evm_address, attestation_blackhole_address}) {
+      BOOST_TEST_CONTEXT(unregistered) {
+         auto fixture = create_crank_fixture();
+         fixture->handler_response = encode_address_word(unregistered);
+
+         fixture->outpost->crank_outpost(test_wire_epoch, fc::seconds(test_rpc_deadline_seconds));
+
+         BOOST_REQUIRE_EQUAL(fixture->handler_reads.size(), 1u);
+         BOOST_CHECK_EQUAL(fixture->handler_reads.front(), desyndicate_liq);
+         BOOST_CHECK(fixture->outpost->syndication_pool_address().empty());
+      }
+   }
+} FC_LOG_AND_RETHROW();
+
+/// The pool the outpost names is the pool that is cranked, once per epoch, and it stays bound.
+BOOST_AUTO_TEST_CASE(crank_outpost_realizes_yield_on_the_registered_pool) try {
+   auto fixture = create_crank_fixture();
+   fixture->handler_response = encode_address_word(test_syndication_pool_address);
+   fixture->bind_stub_pool(test_syndication_pool_address);
+
+   fixture->outpost->crank_outpost(test_wire_epoch, fc::seconds(test_rpc_deadline_seconds));
+   fixture->outpost->crank_outpost(test_wire_epoch + 1, fc::seconds(test_rpc_deadline_seconds));
+
+   BOOST_CHECK_EQUAL(fixture->handler_reads.size(), 2u);
+   BOOST_CHECK_EQUAL(fixture->realize_calls, 2u);
+   BOOST_CHECK(sysio::outpost_ethereum_client_detail::same_evm_address(
+      fixture->outpost->syndication_pool_address(), test_syndication_pool_address));
+} FC_LOG_AND_RETHROW();
+
+/// When the outpost re-routes `DESYNDICATE_LIQ` (an upgrade to a new proxy) the crank follows:
+/// it binds a wrapper to the new address before sending, and the stale stub is never called.
+/// The fresh wrapper dials the fixture's dead endpoint, so the send fails -- the evidence that
+/// the moved address, not the stub, was driven.
+BOOST_AUTO_TEST_CASE(crank_outpost_rebinds_when_the_registered_pool_moves) try {
+   auto fixture = create_crank_fixture();
+   fixture->bind_stub_pool(test_syndication_pool_address);
+   fixture->handler_response = encode_address_word(test_moved_syndication_pool_address);
+
+   BOOST_CHECK_THROW(fixture->outpost->crank_outpost(test_wire_epoch, fc::seconds(test_rpc_deadline_seconds)),
+                     std::exception);
+
+   BOOST_CHECK_EQUAL(fixture->realize_calls, 0u);
+   BOOST_CHECK(sysio::outpost_ethereum_client_detail::same_evm_address(
+      fixture->outpost->syndication_pool_address(), test_moved_syndication_pool_address));
+} FC_LOG_AND_RETHROW();
+
+/// The pool's own three refusals are outcomes of the crank, not failures: nothing to report is
+/// debug-quiet, an underbacked pool is a warning, and none of them propagate.
+BOOST_AUTO_TEST_CASE(crank_outpost_reads_the_pools_own_refusals_as_outcomes) try {
+   const std::vector<std::pair<std::string, std::string>> refusals{
+      {"WIRE_NoYield()", std::string(hex_prefix) + std::string(no_yield_selector)},
+      {"WIRE_YieldBelowDeadband(uint64,uint64)",
+       encode_two_word_revert(yield_below_deadband_selector, test_yield_delta, test_yield_deadband)},
+      {"WIRE_PoolUnderbacked(uint64,uint64)",
+       encode_two_word_revert(pool_underbacked_selector, test_yield_delta, test_yield_deadband)},
+   };
+   for (const auto& [description, revert_data] : refusals) {
+      BOOST_TEST_CONTEXT(description) {
+         auto fixture = create_crank_fixture();
+         fixture->handler_response = encode_address_word(test_syndication_pool_address);
+         fixture->bind_stub_pool(test_syndication_pool_address);
+         fixture->realize_failure = fc::network::json_rpc::json_rpc_error(
+            contract_revert_rpc_code, "execution reverted", fc::variant{revert_data});
+
+         fixture->outpost->crank_outpost(test_wire_epoch, fc::seconds(test_rpc_deadline_seconds));
+
+         BOOST_CHECK_EQUAL(fixture->realize_calls, 1u);
+      }
+   }
+} FC_LOG_AND_RETHROW();
+
+/// Everything else the send comes back with is the job's to log as a failed crank: a role error,
+/// a refusal of the wrong shape, no revert bytes, and a protocol error that never ran the call.
+BOOST_AUTO_TEST_CASE(crank_outpost_propagates_every_other_failure) try {
+   const std::vector<std::pair<std::string, fc::network::json_rpc::json_rpc_error>> failures{
+      {"a signer without the yield_operator role",
+       fc::network::json_rpc::json_rpc_error(
+          contract_revert_rpc_code, "execution reverted",
+          fc::variant{encode_address_revert(access_managed_unauthorized_selector, test_other_operator_address)})},
+      {"WIRE_NoYield() with a stray argument",
+       fc::network::json_rpc::json_rpc_error(
+          contract_revert_rpc_code, "execution reverted",
+          fc::variant{std::string(hex_prefix) + std::string(no_yield_selector) + abi_word(1)})},
+      {"no revert bytes at all",
+       fc::network::json_rpc::json_rpc_error(contract_revert_rpc_code, "execution reverted",
+                                             fc::variant{std::string{}})},
+      {"a protocol error",
+       fc::network::json_rpc::json_rpc_error(json_rpc_parse_error_code, "parse error", fc::variant{})},
+   };
+   for (const auto& [description, failure] : failures) {
+      BOOST_TEST_CONTEXT(description) {
+         auto fixture = create_crank_fixture();
+         fixture->handler_response = encode_address_word(test_syndication_pool_address);
+         fixture->bind_stub_pool(test_syndication_pool_address);
+         fixture->realize_failure = failure;
+
+         BOOST_CHECK_THROW(
+            fixture->outpost->crank_outpost(test_wire_epoch, fc::seconds(test_rpc_deadline_seconds)),
+            fc::exception);
+         BOOST_CHECK_EQUAL(fixture->realize_calls, 1u);
+      }
+   }
+} FC_LOG_AND_RETHROW();
+
+/// A spent deadline abandons the crank before it asks the outpost anything.
+BOOST_AUTO_TEST_CASE(crank_outpost_abandons_on_an_expired_deadline) try {
+   auto fixture = create_crank_fixture();
+   fixture->handler_response = encode_address_word(test_syndication_pool_address);
+   fixture->bind_stub_pool(test_syndication_pool_address);
+
+   BOOST_CHECK_THROW(fixture->outpost->crank_outpost(test_wire_epoch, fc::microseconds(0)), fc::exception);
+
+   BOOST_CHECK(fixture->handler_reads.empty());
+   BOOST_CHECK_EQUAL(fixture->realize_calls, 0u);
 } FC_LOG_AND_RETHROW();
 
 /// An EVM client policy must bound `max_gas_limit` at EIP-7825's per-transaction

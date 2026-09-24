@@ -40,11 +40,13 @@
 #include <algorithm>
 #include <array>
 #include <iterator>
+#include <limits>
 #include <map>
 #include <sstream>
 
 #include "contracts.hpp"
 #include "contract_test_support.hpp"
+#include "liq_test_support.hpp"
 #include "test_symbol.hpp"
 // Canonical-encoding + header-derivation oracle: inbound envelopes must carry
 // spec-derived semantic headers or apply_consensus drops them before dispatch.
@@ -56,6 +58,7 @@ using namespace sysio::chain;
 using namespace sysio::opp::types;
 
 using mvo = fc::mutable_variant_object;
+using sysio_system::test_support::codename_mvo;
 
 namespace {
 
@@ -63,11 +66,6 @@ constexpr uint64_t PROTOBUF_VARINT_PAYLOAD_MASK = 0x7fu;
 constexpr uint32_t PROTOBUF_VARINT_PAYLOAD_BITS = 7u;
 constexpr uint8_t  PROTOBUF_VARINT_CONTINUATION_BIT = 0x80u;
 constexpr uint32_t PROTOBUF_FIELD_TAG_SHIFT = 3u;
-
-/// SlugName mvo helper for v6 action arguments.
-inline fc::mutable_variant_object codename_mvo(std::string_view s) {
-   return mvo()("value", fc::slug_name{s}.value);
-}
 
 /** Append one unsigned protobuf varint to a hostile-wire-format fixture. */
 void append_proto_varint(std::vector<char>& out, uint64_t value) {
@@ -112,11 +110,17 @@ inline fc::variant chain_min_bond_mvo(std::string_view chain_code,
       ("config_timestamp_ms", uint64_t{0}));
 }
 
-/// Encode an Envelope wrapping a single attestation.
-std::vector<char> encode_envelope_with_one_attestation(
+/// One attestation of an envelope under construction: its type and its encoded payload.
+using typed_attestation = std::pair<sysio::opp::types::AttestationType, std::string>;
+
+/// Encode an Envelope wrapping `attestations` in order, each with its own type — the
+/// general form the single-type encoders below delegate to. Used to fit several
+/// attestations into a single delivery, since the depot deduplicates
+/// per-(batch_op, outpost, epoch) — a second `deliver` from the same batch op in the
+/// same epoch reverts as a duplicate.
+std::vector<char> encode_envelope_with_mixed_attestations(
    uint32_t epoch_index,
-   sysio::opp::types::AttestationType att_type,
-   const std::string& att_data)
+   const std::vector<typed_attestation>& attestations)
 {
    sysio::opp::Envelope env;
    env.set_epoch_index(epoch_index);
@@ -125,10 +129,12 @@ std::vector<char> encode_envelope_with_one_attestation(
 
    auto* msg     = env.add_messages();
    auto* payload = msg->mutable_payload();
-   auto* att     = payload->add_attestations();
-   att->set_type(att_type);
-   att->set_data(att_data);
-   att->set_data_size(static_cast<uint32_t>(att_data.size()));
+   for (const auto& [att_type, att_data] : attestations) {
+      auto* att = payload->add_attestations();
+      att->set_type(att_type);
+      att->set_data(att_data);
+      att->set_data_size(static_cast<uint32_t>(att_data.size()));
+   }
 
    oracle::finalize_header(*env.mutable_messages(0), {}, 1'775'612'516'983ULL);
 
@@ -137,34 +143,25 @@ std::vector<char> encode_envelope_with_one_attestation(
    return out;
 }
 
-/// Encode an Envelope wrapping N attestations of the same type. Used to fit
-/// multiple OPERATOR_ACTIONs into a single delivery, since the depot
-/// deduplicates per-(batch_op, outpost, epoch) — a second `deliver` from
-/// the same batch op in the same epoch reverts as a duplicate.
+/// Encode an Envelope wrapping N attestations of the same type.
 std::vector<char> encode_envelope_with_attestations(
    uint32_t epoch_index,
    sysio::opp::types::AttestationType att_type,
    const std::vector<std::string>& att_datas)
 {
-   sysio::opp::Envelope env;
-   env.set_epoch_index(epoch_index);
-   env.set_epoch_envelope_index(1);
-   env.set_epoch_timestamp(1'775'612'516'983ULL);
+   std::vector<typed_attestation> attestations;
+   attestations.reserve(att_datas.size());
+   for (const auto& d : att_datas) attestations.emplace_back(att_type, d);
+   return encode_envelope_with_mixed_attestations(epoch_index, attestations);
+}
 
-   auto* msg     = env.add_messages();
-   auto* payload = msg->mutable_payload();
-   for (const auto& d : att_datas) {
-      auto* att = payload->add_attestations();
-      att->set_type(att_type);
-      att->set_data(d);
-      att->set_data_size(static_cast<uint32_t>(d.size()));
-   }
-
-   oracle::finalize_header(*env.mutable_messages(0), {}, 1'775'612'516'983ULL);
-
-   std::vector<char> out(env.ByteSizeLong());
-   env.SerializeToArray(out.data(), static_cast<int>(out.size()));
-   return out;
+/// Encode an Envelope wrapping a single attestation.
+std::vector<char> encode_envelope_with_one_attestation(
+   uint32_t epoch_index,
+   sysio::opp::types::AttestationType att_type,
+   const std::string& att_data)
+{
+   return encode_envelope_with_attestations(epoch_index, att_type, {att_data});
 }
 
 /// Mirrors the contract-internal `MAX_ENVELOPE_BYTES` protocol cap (32 KiB, shared with the
@@ -328,6 +325,68 @@ std::string encode_swap_request(
    return out;
 }
 
+/// Encode a SyndicateLIQ attestation payload: the emitting outpost, the syndicating user's
+/// native pubkey (kind + bytes), the liq TokenAmount, and the per-outpost sequence.
+std::string encode_syndicate_liq(uint64_t chain_code_v,
+                                 sysio::opp::types::ChainKind user_kind,
+                                 const std::vector<char>& user_pubkey,
+                                 uint64_t token_code_v, int64_t amount, uint64_t sequence)
+{
+   sysio::opp::attestations::SyndicateLIQ synd;
+   synd.set_chain_code(chain_code_v);
+   auto* user = synd.mutable_user();
+   user->set_kind(user_kind);
+   user->set_address(user_pubkey.data(), user_pubkey.size());
+   auto* amt = synd.mutable_amount();
+   amt->set_token_code(token_code_v);
+   amt->set_amount(amount);
+   synd.set_sequence(sequence);
+
+   std::string out;
+   synd.SerializeToString(&out);
+   return out;
+}
+
+/// Encode a LIQYield attestation payload: the outpost's claimed yield in its liq token,
+/// the per-outpost sequence it shares with SyndicateLIQ, and the outpost epoch of the report.
+std::string encode_liq_yield(uint64_t chain_code_v, uint64_t token_code_v, int64_t amount,
+                             uint64_t sequence, uint64_t epoch)
+{
+   sysio::opp::attestations::LIQYield report;
+   report.set_chain_code(chain_code_v);
+   auto* amt = report.mutable_amount();
+   amt->set_token_code(token_code_v);
+   amt->set_amount(amount);
+   report.set_sequence(sequence);
+   report.set_epoch(epoch);
+
+   std::string out;
+   report.SerializeToString(&out);
+   return out;
+}
+
+/// Encode a DesyndicateLIQ attestation payload — a depot -> outpost type; the tests echo one
+/// inbound to prove the depot drops it.
+std::string encode_desyndicate_liq(uint64_t chain_code_v,
+                                   sysio::opp::types::ChainKind user_kind,
+                                   const std::vector<char>& user_pubkey,
+                                   uint64_t token_code_v, int64_t amount, uint64_t request_id)
+{
+   sysio::opp::attestations::DesyndicateLIQ desynd;
+   desynd.set_chain_code(chain_code_v);
+   auto* user = desynd.mutable_user();
+   user->set_kind(user_kind);
+   user->set_address(user_pubkey.data(), user_pubkey.size());
+   auto* amt = desynd.mutable_amount();
+   amt->set_token_code(token_code_v);
+   amt->set_amount(amount);
+   desynd.set_request_id(request_id);
+
+   std::string out;
+   desynd.SerializeToString(&out);
+   return out;
+}
+
 } // anonymous namespace
 
 /// Wire layout of an `auth.msg::onlinkauth` action, the payload sysio.system once acted on.
@@ -441,10 +500,14 @@ public:
    }
 
    std::vector<char> create_eth_authex_link(name account) {
+      return create_eth_authex_link(account, fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em));
+   }
+
+   /// Link `account` to the EM key behind `priv` through a user-created `createlink`.
+   std::vector<char> create_eth_authex_link(name account, const fc::crypto::private_key& priv) {
       using namespace fc::crypto;
       using namespace sysio::opp::types;
 
-      auto priv = private_key::generate(private_key::key_type::em);
       auto pub  = priv.get_public_key();
       const uint64_t nonce = control->head().block_time().time_since_epoch().count() / 1000;
 
@@ -1397,8 +1460,97 @@ public:
          push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n, mvo()));
    }
 
+   // ── sysio.liq inbound routing (SYNDICATE_LIQ / LIQ_YIELD) ─────────────────
+
+   static constexpr auto TOKENS_ACCOUNT = "sysio.tokens"_n;
+   static constexpr auto LIQ_ACCOUNT    = "sysio.liq"_n;
+   static inline const symbol LIQETH_SYM = symbol::from_string("9,LIQETH");
+   /// One whole liq token in the depot's 9-decimal frame.
+   static constexpr int64_t LIQ_UNIT = 1'000'000'000;
+
+   /// Register `code` on sysio.tokens as `kind` at the depot's 9-decimal precision and bind
+   /// it to `chain_code` (EVM address bytes; the registries only check the length).
+   action_result regtoken(TokenKind kind, std::string_view code, std::string_view chain_code) {
+      const std::vector<char> addr(20, '\x5a');
+      auto r = push(TOKENS_ACCOUNT, tokens_abi, TOKENS_ACCOUNT, "regtoken"_n, mvo()
+         ("kind", kind)("code", codename_mvo(code))("symbol_name", std::string(code))
+         ("description", std::string{})("precision", 9)
+         ("address", mvo()("kind", ChainKind::CHAIN_KIND_EVM)("address", addr)));
+      if (r != success()) return r;
+      return push(TOKENS_ACCOUNT, tokens_abi, TOKENS_ACCOUNT, "regctok"_n, mvo()
+         ("chain_code", codename_mvo(chain_code))("token_code", codename_mvo(code))
+         ("contract_addr", addr)("is_native", false));
+   }
+
+   /// Deploy sysio.tokens + sysio.liq and register the bootstrapped outpost's liq token
+   /// ("LIQETH" on ETH) with its shadow, plus two tokens the shadow ledger must refuse: a
+   /// plain ERC20 ("USDCETH") and a liq token nobody opened a shadow for ("LIQTWO").
+   /// `bootstrap_for_dispatch` must have run first — registrations inside the epoch-0
+   /// bootstrap window land ACTIVE.
+   void setup_liq_for_dispatch() {
+      create_accounts({TOKENS_ACCOUNT, LIQ_ACCOUNT});
+      produce_blocks();
+      deploy(TOKENS_ACCOUNT, contracts::tokens_wasm(), contracts::tokens_abi(), tokens_abi);
+      deploy(LIQ_ACCOUNT,    contracts::liq_wasm(),    contracts::liq_abi(),    liq_abi);
+      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_LIQ,   "LIQETH",  "ETH"));
+      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_LIQ,   "LIQTWO",  "ETH"));
+      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_ERC20, "USDCETH", "ETH"));
+      BOOST_REQUIRE_EQUAL(success(), push(LIQ_ACCOUNT, liq_abi, LIQ_ACCOUNT, "create"_n, mvo()
+         ("sym", LIQETH_SYM)("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("LIQETH"))));
+      produce_blocks();
+   }
+
+   fc::variant liq_row(name table, const char* type, name scope, uint64_t id) {
+      auto data = get_row_by_id(LIQ_ACCOUNT, scope, table, id);
+      return data.empty() ? fc::variant() : liq_abi.binary_to_variant(
+         type, data, abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// `holder`'s LIQETH shadow balance; 0 without a row.
+   int64_t liq_balance(name holder) {
+      const auto row = liq_row("accounts"_n, "account", holder, LIQETH_SYM.to_symbol_code().value);
+      return row.is_null() ? 0 : row["balance"].as<asset>().get_amount();
+   }
+
+   /// The LIQETH shadow supply; 0 without a stat row.
+   int64_t liq_supply() {
+      const auto row = liq_row("stat"_n, "currency_stats", LIQ_ACCOUNT, LIQETH_SYM.to_symbol_code().value);
+      return row.is_null() ? 0 : row["supply"].as<asset>().get_amount();
+   }
+
+   /// LIQETH yield reported by the outpost and not yet queued to the swap; 0 without a row.
+   int64_t liq_pending() {
+      const auto row = liq_row("liqpending"_n, "pending_yield", LIQ_ACCOUNT, LIQETH_SYM.to_symbol_code().value);
+      return row.is_null() ? 0 : row["quantity"].as<asset>().get_amount();
+   }
+
+   /// The per-outpost inbound cursor (`last_sequence`, `last_epoch`); null before any credit lands.
+   fc::variant liq_cursor(std::string_view chain_code) {
+      return liq_row("liqcursors"_n, "liq_cursor", LIQ_ACCOUNT, fc::slug_name{chain_code}.value);
+   }
+
+   /// The LIQETH balance parked against an unlinked `pubkey` of `kind`; 0 without a row.
+   int64_t liq_parked(ChainKind kind, const std::vector<char>& pubkey) {
+      using namespace sysio_liq::test_support;
+      const auto data = parked_row_bytes(*control, LIQ_ACCOUNT, parked_key(LIQETH_SYM.to_symbol_code(), kind, pubkey));
+      if (data.empty()) return 0;
+      const auto row = liq_abi.binary_to_variant(
+         "parked_row", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+      return row["holding"]["balance"].as<asset>().get_amount();
+   }
+
+   /// Every action's console in `trace`, inline actions included: msgch's own drops print on
+   /// `deliver`, a downstream contract's on the inline action msgch sent it.
+   static std::string all_console(const transaction_trace_ptr& trace) {
+      std::string console;
+      for (const auto& action_trace : trace->action_traces) {
+         console += action_trace.console;
+      }
+      return console;
+   }
+
    abi_serializer msgch_abi, opreg_abi, uwrit_abi, epoch_abi, reserv_abi, authex_abi, dclaim_abi,
-                  chains_abi, roa_abi, token_abi;
+                  chains_abi, roa_abi, token_abi, tokens_abi, liq_abi;
 
    std::vector<char> uwrit_op_eth_pubkey;
 };
@@ -1764,10 +1916,7 @@ BOOST_FIXTURE_TEST_CASE(underwrite_commit_early_rejections_log_and_continue,
    const auto trace = deliver_trace(/*proven=*/ sol_chain, env);
    BOOST_REQUIRE(trace != nullptr);
    BOOST_REQUIRE(!trace->except);
-   std::string console;
-   for (const auto& action_trace : trace->action_traces) {
-      console += action_trace.console;
-   }
+   const auto console = all_console(trace);
    BOOST_CHECK_NE(std::string::npos,
                   console.find("UIC_DISPATCH_REJECTED: chain_code="));
    BOOST_CHECK_NE(std::string::npos, console.find("reason=malformed_uic"));
@@ -6563,6 +6712,218 @@ BOOST_FIXTURE_TEST_CASE(lock_hold_actions_require_chalg_auth, sysio_uwchal_teste
    BOOST_REQUIRE(push(UWRIT_ACCOUNT, uwrit_abi, UWRIT_ACCOUNT, "sweeplocks"_n, mvo()
       ("uwreq_id", ATT_ID)("underwriter", UWRIT_OP.to_string()))
          .find("missing authority of sysio.chalg") != std::string::npos);
+} FC_LOG_AND_RETHROW() }
+
+// An OPERATOR_ACTION whose `op_address` is not a key the chain family can link — here 20
+// address bytes where the EVM link holds the 33-byte pubkey — resolves to no account and is
+// dropped; it must never abort the envelope (a link lookup only ever hashes EM / ED keys).
+BOOST_FIXTURE_TEST_CASE(operator_action_with_a_malformed_address_is_dropped,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   const auto eth = fc::slug_name{"ETH"}.value;
+   const std::vector<char> evm_address(20, '\x0c');
+   const auto envelope = encode_envelope_with_one_attestation(
+      current_epoch(), sysio::opp::types::ATTESTATION_TYPE_OPERATOR_ACTION,
+      encode_operator_action(sysio::opp::attestations::OperatorAction::ACTION_TYPE_DEPOSIT_REQUEST,
+                             ChainKind::CHAIN_KIND_EVM, evm_address, eth, eth, 1'000'000));
+   BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/ eth, envelope));
+   const auto op = get_operator(UWRIT_OP);
+   BOOST_REQUIRE(!op.is_null());
+   BOOST_CHECK_EQUAL(0u, op["balances"].get_array().size());
+} FC_LOG_AND_RETHROW() }
+
+// ── SYNDICATE_LIQ / LIQ_YIELD -> sysio.liq ──────────────────────────────────
+
+// SYNDICATE_LIQ routes on the AuthX link: a linked user's syndication credits their shadow
+// balance through sysio.liq::mintsynd, an unlinked user's is parked against the pubkey through
+// sysio.liq::park, and the per-outpost sequence is consumed only by a credit that lands — a
+// replay is dropped, a gap is admitted. A malformed payload and an echoed DESYNDICATE_LIQ are
+// dropped too, and nothing aborts the envelope.
+BOOST_FIXTURE_TEST_CASE(syndicate_liq_credits_a_linked_user_and_parks_an_unlinked_one,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   setup_liq_for_dispatch();
+
+   const auto eth    = fc::slug_name{"ETH"}.value;
+   const auto liqeth = fc::slug_name{"LIQETH"}.value;
+   // An EVM key nobody has linked yet.
+   const auto stranger_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
+   const auto stranger     = em_pubkey_bytes(stranger_key.get_public_key());
+   constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
+
+   const auto env = encode_envelope_with_mixed_attestations(current_epoch(), {
+      {ATTESTATION_TYPE_SYNDICATE_LIQ,   encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 5 * LIQ_UNIT, 1)},
+      {ATTESTATION_TYPE_SYNDICATE_LIQ,   encode_syndicate_liq(eth, EVM, stranger,            liqeth, 3 * LIQ_UNIT, 2)},
+      // sequence 2 again: a replay, dropped by sysio.liq
+      {ATTESTATION_TYPE_SYNDICATE_LIQ,   encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 4 * LIQ_UNIT, 2)},
+      // not a SyndicateLIQ at all
+      {ATTESTATION_TYPE_SYNDICATE_LIQ,   std::string(1, '\x0a')},
+      // a depot -> outpost type echoed back inbound
+      {ATTESTATION_TYPE_DESYNDICATE_LIQ, encode_desyndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 1 * LIQ_UNIT, 77)},
+      // a gap after the last admitted sequence is fine
+      {ATTESTATION_TYPE_SYNDICATE_LIQ,   encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 1 * LIQ_UNIT, 9)},
+   });
+   const auto trace = deliver_trace(/*proven=*/ eth, env);
+   BOOST_REQUIRE(trace != nullptr);
+   BOOST_REQUIRE(!trace->except);
+   const auto console = all_console(trace);
+
+   BOOST_CHECK_EQUAL(6 * LIQ_UNIT, liq_balance(UWRIT_OP));
+   BOOST_CHECK_EQUAL(3 * LIQ_UNIT, liq_parked(EVM, stranger));
+   BOOST_CHECK_EQUAL(9 * LIQ_UNIT, liq_supply());
+   BOOST_CHECK_EQUAL(0, liq_pending());
+   const auto cursor = liq_cursor("ETH");
+   BOOST_REQUIRE(!cursor.is_null());
+   BOOST_CHECK_EQUAL(9u, cursor["last_sequence"].as<uint64_t>());
+   BOOST_CHECK_EQUAL(0u, cursor["last_epoch"].as<uint64_t>());
+   BOOST_CHECK_NE(std::string::npos, console.find("sysio.liq::mintsynd: DROP -- replayed sequence"));
+
+   // The stranger links the key later: createlink sweeps the parked shadow into the new
+   // account inline, so nothing is left parked and no permissionless sweep is needed.
+   create_accounts({"stranger"_n});
+   produce_blocks();
+   create_eth_authex_link("stranger"_n, stranger_key);
+   BOOST_CHECK_EQUAL(3 * LIQ_UNIT, liq_balance("stranger"_n));
+   BOOST_CHECK_EQUAL(0, liq_parked(EVM, stranger));
+   BOOST_CHECK_EQUAL(9 * LIQ_UNIT, liq_supply());
+} FC_LOG_AND_RETHROW() }
+
+// The user's key family must be the proven outpost's own. A Solana-family key inside an
+// Ethereum envelope is dropped by msgch before the AuthX lookup, whether an account has linked
+// it (mintsynd receives no family and would have credited that account) or not (park would
+// have refused it); the EVM credit beside them still lands and is the only sequence consumed.
+BOOST_FIXTURE_TEST_CASE(syndicate_liq_refuses_a_key_of_another_chain_family,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   setup_liq_for_dispatch();
+
+   const auto eth    = fc::slug_name{"ETH"}.value;
+   const auto liqeth = fc::slug_name{"LIQETH"}.value;
+   constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
+   constexpr auto SVM = ChainKind::CHAIN_KIND_SVM;
+   // A Solana key the underwriter has linked, and one nobody has.
+   const auto linked_sol_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::ed).get_public_key();
+   const auto linked_sol_raw = linked_sol_key.get<fc::crypto::ed::public_key_shim>().serialize();
+   const std::vector<char> linked_sol(linked_sol_raw.begin(), linked_sol_raw.end());
+   BOOST_REQUIRE_EQUAL(success(), push(
+      AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
+         ("account", UWRIT_OP)("chain_kind", SVM)("pub_key", linked_sol_key)("native_address", linked_sol)));
+   produce_block();
+   const auto stranger_sol_raw = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::ed)
+                                    .get_public_key().get<fc::crypto::ed::public_key_shim>().serialize();
+   const std::vector<char> stranger_sol(stranger_sol_raw.begin(), stranger_sol_raw.end());
+
+   const auto env = encode_envelope_with_mixed_attestations(current_epoch(), {
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, SVM, linked_sol,          liqeth, 5 * LIQ_UNIT, 1)},
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, SVM, stranger_sol,        liqeth, 3 * LIQ_UNIT, 2)},
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 2 * LIQ_UNIT, 3)},
+   });
+   const auto trace = deliver_trace(/*proven=*/ eth, env);
+   BOOST_REQUIRE(trace != nullptr);
+   BOOST_REQUIRE(!trace->except);
+   const auto console = all_console(trace);
+
+   BOOST_CHECK_EQUAL(2 * LIQ_UNIT, liq_balance(UWRIT_OP));
+   BOOST_CHECK_EQUAL(0, liq_parked(SVM, linked_sol));
+   BOOST_CHECK_EQUAL(0, liq_parked(SVM, stranger_sol));
+   BOOST_CHECK_EQUAL(2 * LIQ_UNIT, liq_supply());
+   const auto cursor = liq_cursor("ETH");
+   BOOST_REQUIRE(!cursor.is_null());
+   BOOST_CHECK_EQUAL(3u, cursor["last_sequence"].as<uint64_t>());
+   const std::string dropped = "msgch::dispatch_syndicate_liq: DROP attestation -- user kind CHAIN_KIND_SVM";
+   const auto first = console.find(dropped);
+   BOOST_REQUIRE_NE(std::string::npos, first);
+   BOOST_CHECK_NE(std::string::npos, console.find(dropped, first + dropped.size()));
+   BOOST_CHECK_EQUAL(std::string::npos, console.find("sysio.liq::park"));
+} FC_LOG_AND_RETHROW() }
+
+// LIQ_YIELD lands in sysio.liq's pending balance (no per-user routing) and stamps the report's
+// epoch on the outpost cursor. Every refusal is dropped at the boundary without aborting the
+// envelope: a payload claiming another chain, a token that is not an active liq token (a plain
+// ERC20, an unregistered code), a liq token with no shadow, a non-positive or oversized amount,
+// an unlinked pubkey of the wrong shape, a replayed sequence, and a malformed payload.
+BOOST_FIXTURE_TEST_CASE(liq_yield_lands_in_pending_and_refusals_are_dropped,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   setup_liq_for_dispatch();
+
+   const auto eth     = fc::slug_name{"ETH"}.value;
+   const auto solana  = fc::slug_name{"SOLANA"}.value;
+   const auto liqeth  = fc::slug_name{"LIQETH"}.value;
+   const auto liqtwo  = fc::slug_name{"LIQTWO"}.value;
+   const auto usdceth = fc::slug_name{"USDCETH"}.value;
+   const auto liqnone = fc::slug_name{"LIQNONE"}.value;
+   constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
+   constexpr int64_t oversized = std::numeric_limits<int64_t>::max();
+   const std::vector<char> evm_address(20, '\x0c');   // an address, not the 33-byte pubkey the link holds
+
+   const auto env = encode_envelope_with_mixed_attestations(current_epoch(), {
+      {ATTESTATION_TYPE_LIQ_YIELD,     encode_liq_yield(eth, liqeth, 7 * LIQ_UNIT, 1, 42)},
+      // claims another chain than the proven outpost
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(solana, EVM, uwrit_op_eth_pubkey, liqeth, 1 * LIQ_UNIT, 2)},
+      // an ERC20, an unregistered code, a liq token without a shadow
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, usdceth, 1 * LIQ_UNIT, 3)},
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqnone, 1 * LIQ_UNIT, 4)},
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqtwo,  1 * LIQ_UNIT, 5)},
+      // amounts the fail-closed gate refuses
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, -1,        6)},
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, oversized, 7)},
+      // unlinked, and not a pubkey the chain family could ever link
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, EVM, evm_address, liqeth, 1 * LIQ_UNIT, 8)},
+      // yield refusals: another chain, not a liq token, a replayed sequence, malformed
+      {ATTESTATION_TYPE_LIQ_YIELD,     encode_liq_yield(solana, liqeth,  1 * LIQ_UNIT, 9,  43)},
+      {ATTESTATION_TYPE_LIQ_YIELD,     encode_liq_yield(eth,    usdceth, 1 * LIQ_UNIT, 10, 43)},
+      {ATTESTATION_TYPE_LIQ_YIELD,     encode_liq_yield(eth,    liqeth,  1 * LIQ_UNIT, 1,  44)},
+      {ATTESTATION_TYPE_LIQ_YIELD,     std::string(1, '\x0a')},
+   });
+   const auto trace = deliver_trace(/*proven=*/ eth, env);
+   BOOST_REQUIRE(trace != nullptr);
+   BOOST_REQUIRE(!trace->except);
+   const auto console = all_console(trace);
+
+   BOOST_CHECK_EQUAL(7 * LIQ_UNIT, liq_pending());
+   BOOST_CHECK_EQUAL(0, liq_supply());
+   BOOST_CHECK_EQUAL(0, liq_balance(UWRIT_OP));
+   BOOST_CHECK_EQUAL(0, liq_parked(EVM, evm_address));
+   const auto cursor = liq_cursor("ETH");
+   BOOST_REQUIRE(!cursor.is_null());
+   BOOST_CHECK_EQUAL(1u,  cursor["last_sequence"].as<uint64_t>());
+   BOOST_CHECK_EQUAL(42u, cursor["last_epoch"].as<uint64_t>());
+
+   BOOST_CHECK_NE(std::string::npos, console.find(
+      "msgch::dispatch_syndicate_liq: DROP attestation -- payload chain_code="));
+   BOOST_CHECK_NE(std::string::npos, console.find(
+      "msgch::dispatch_syndicate_liq: DROP attestation -- token is not an active liq token"));
+   BOOST_CHECK_NE(std::string::npos, console.find("sysio.liq::mintsynd: DROP -- token_code has no shadow symbol"));
+   BOOST_CHECK_NE(std::string::npos, console.find("sysio.liq::park: DROP -- pubkey does not fit the chain family"));
+   BOOST_CHECK_NE(std::string::npos, console.find(
+      "msgch::dispatch_liq_yield: DROP attestation -- payload chain_code="));
+   BOOST_CHECK_NE(std::string::npos, console.find(
+      "msgch::dispatch_liq_yield: DROP attestation -- token is not an active liq token"));
+   BOOST_CHECK_NE(std::string::npos, console.find("sysio.liq::mintyield: DROP -- replayed sequence"));
+} FC_LOG_AND_RETHROW() }
+
+// Without a token registry there is no active liq token, so the envelope is delivered and the
+// attestations dropped before msgch would send anything to a sysio.liq that does not exist.
+BOOST_FIXTURE_TEST_CASE(liq_attestations_are_dropped_without_a_token_registry,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+
+   const auto eth    = fc::slug_name{"ETH"}.value;
+   const auto liqeth = fc::slug_name{"LIQETH"}.value;
+   const auto env = encode_envelope_with_mixed_attestations(current_epoch(), {
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, ChainKind::CHAIN_KIND_EVM, uwrit_op_eth_pubkey,
+                                                            liqeth, 1 * LIQ_UNIT, 1)},
+      {ATTESTATION_TYPE_LIQ_YIELD,     encode_liq_yield(eth, liqeth, 1 * LIQ_UNIT, 2, 1)},
+   });
+   const auto trace = deliver_trace(/*proven=*/ eth, env);
+   BOOST_REQUIRE(trace != nullptr);
+   BOOST_REQUIRE(!trace->except);
+   const auto console = all_console(trace);
+   BOOST_CHECK_NE(std::string::npos, console.find(
+      "msgch::dispatch_syndicate_liq: DROP attestation -- token is not an active liq token"));
+   BOOST_CHECK_NE(std::string::npos, console.find(
+      "msgch::dispatch_liq_yield: DROP attestation -- token is not an active liq token"));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

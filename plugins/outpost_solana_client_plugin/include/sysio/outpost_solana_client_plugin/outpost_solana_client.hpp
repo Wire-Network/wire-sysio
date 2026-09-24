@@ -224,6 +224,13 @@ void assert_collateral_position_shape(const fc::network::solana::idl::program& p
 ///         or a field has a type the manifest builder cannot interpret.
 void assert_reserve_shape(const fc::network::solana::idl::program& program);
 
+/// Assert the loaded IDL declares `DistributionState` with the one field a
+/// DESYNDICATE_LIQ manifest resolves from it: `liqsol_mint` (pubkey). Only the
+/// integrated liqsol-core program declares the account, so the boot check runs
+/// only when the IDL carries it; a drifted declaration would make a LIVE pool
+/// unreadable and wedge every desyndication window on the same cursor.
+void assert_distribution_state_shape(const fc::network::solana::idl::program& program);
+
 /// Terminal-finalization facts for one per-`(token_code, reserve_code)`
 /// Reserve PDA, read from the `Reserve` ACCOUNT itself.
 ///
@@ -455,6 +462,80 @@ using collateral_custody_reader =
    std::function<std::optional<token_custody_info>(
       const fc::network::solana::solana_public_key& operator_key, uint64_t token_code)>;
 
+/// The syndicated liqSOL pool's facts a DESYNDICATE_LIQ manifest is derived
+/// from, read off the program's `DistributionState` singleton: the pool's
+/// liqSOL mint (Token-2022). The handler binds the mint from the same account,
+/// never from the mutable `OutpostConfig` token map.
+struct liq_pool_info {
+   fc::network::solana::solana_public_key liqsol_mint;
+};
+
+/// Reads the `DistributionState` singleton. `nullopt` means the account is
+/// absent or empty -- the program has no syndicated pool, and the handler
+/// log-and-skips -- while a present but unreadable account throws so the relay
+/// never submits a manifest that is guaranteed to abort.
+using liq_pool_reader = std::function<std::optional<liq_pool_info>()>;
+
+/// `GlobalState` -- the liqSOL outpost singleton the yield-report crank gates on.
+namespace global_state {
+   constexpr auto account_name     = "GlobalState";
+   constexpr auto field_wire_state = "wire_state";
+   /// The `WireState` variant in which the syndicated pool is outpost property
+   /// and `report_liq_yield` is accepted.
+   constexpr auto post_launch      = "PostLaunch";
+} // namespace global_state
+
+/// The key libfc's IDL decoder renders an enum field's variant name under.
+constexpr auto IDL_ENUM_VARIANT_KEY = "variant";
+
+/// The instruction-account names of liqsol-core's `report_liq_yield`, exactly
+/// as its `#[derive(Accounts)]` declares them (wire-solana
+/// `report_liq_yield.rs`). The relay overrides every one by name: the ATAs and
+/// the `UserRecord`s seeded on them are account-based derivations the IDL
+/// resolver does not perform, and `token_program` is an Interface the
+/// well-known table would resolve to legacy SPL Token instead of Token-2022.
+namespace report_liq_yield_accounts {
+   constexpr auto liqsol_mint              = "liqsol_mint";
+   constexpr auto global_state             = "global_state";
+   constexpr auto distribution_state       = "distribution_state";
+   constexpr auto pool_authority           = "pool_authority";
+   constexpr auto bucket_authority         = "bucket_authority";
+   constexpr auto bucket_token_account     = "bucket_token_account";
+   constexpr auto bucket_user_record       = "bucket_user_record";
+   constexpr auto liqsol_pool_ata          = "liqsol_pool_ata";
+   constexpr auto pool_user_record         = "pool_user_record";
+   constexpr auto extra_account_meta_list  = "extra_account_meta_list";
+   constexpr auto liqsol_core_program      = "liqsol_core_program";
+   constexpr auto transfer_hook_program    = "transfer_hook_program";
+   constexpr auto config                   = "config";
+   constexpr auto outbound_message_buffer  = "outbound_message_buffer";
+   constexpr auto token_program            = "token_program";
+   constexpr auto associated_token_program = "associated_token_program";
+   constexpr auto system_program           = "system_program";
+} // namespace report_liq_yield_accounts
+
+/// True iff a decoded `GlobalState` says the outpost is PostLaunch -- the one
+/// state `report_liq_yield` accepts. Anything else (another state, a missing or
+/// misshaped field) reads as "not due", so the crank never pays for a refused tx.
+bool liq_yield_report_due(const fc::variant_object& global_state);
+
+/// The `report_liq_yield` account overrides: every named account of the
+/// instruction except the signer, derived from the program id, the pool's
+/// liqSOL mint, the mint's transfer-hook program and the relay's own config /
+/// outbound-buffer PDAs. Exported so the plugin's tests can hold it against the
+/// instruction's declaration.
+fc::network::solana::account_overrides_t report_liq_yield_overrides(
+   const fc::network::solana::solana_public_key& program_id,
+   const fc::network::solana::solana_public_key& liqsol_mint,
+   const fc::network::solana::solana_public_key& hook_program,
+   const fc::network::solana::solana_public_key& config_pda,
+   const fc::network::solana::solana_public_key& outbound_message_buffer_pda);
+
+/// Assert the loaded IDL declares `GlobalState` with a `wire_state` whose enum
+/// type carries the `PostLaunch` variant the yield crank gates on. Boot-checked
+/// only on a program that declares `report_liq_yield`.
+void assert_global_state_shape(const fc::network::solana::idl::program& program);
+
 } // namespace outpost_solana_client_detail
 
 /**
@@ -588,6 +669,20 @@ private:
    std::optional<outpost_solana_client_detail::mint_transfer_hook>
    mint_transfer_hook_for(const fc::network::solana::solana_public_key& custody_mint);
 
+   /// Read the syndicated liqSOL pool's facts off `DistributionState` -- the
+   /// account `handle_desyndicate_liq` binds the pool's mint from. Absent or
+   /// empty degrades (the handler log-and-skips an uninitialized pool); present
+   /// but unreadable THROWS, as `reserve_info_for_codes` does, because a guessed
+   /// mint would name accounts the program never asks for.
+   std::optional<outpost_solana_client_detail::liq_pool_info> syndicated_liq_pool();
+
+   /// The outpost's per-epoch crank: liqsol-core's permissionless
+   /// `report_liq_yield`, submitted once per epoch from the outbound relay job
+   /// after this operator's delivery lands. PostLaunch only (read off
+   /// `GlobalState` first, so a refused tx is never paid for); a program without
+   /// the instruction has no syndicated pool and cranks nothing.
+   void crank_outpost(uint32_t epoch_index, fc::microseconds deadline) override;
+
    solana_client_entry_ptr                       _entry;
    fc::network::solana::solana_public_key        _program_id;
    std::shared_ptr<opp_solana_outpost_client>    _program_client;
@@ -664,6 +759,27 @@ fc::network::solana::solana_public_key
 derive_collateral_vault_pda(const fc::network::solana::solana_public_key& program_id,
                             uint64_t token_code);
 
+/// The liqSOL pool's fixed PDAs (wire-solana `liqsol-core`), byte-exact mirrors
+/// of the program's seed declarations: `GlobalState`
+/// (`["outpost_global_state"]`), `DistributionState` (`["distribution_state"]`),
+/// the pool authority (`["liqsol_pool"]`) and the bucket authority
+/// (`["liqsol_bucket"]`). Exported so the manifest builder and its tests derive
+/// through ONE implementation.
+fc::network::solana::solana_public_key
+derive_liqsol_global_state_pda(const fc::network::solana::solana_public_key& program_id);
+fc::network::solana::solana_public_key
+derive_liqsol_distribution_state_pda(const fc::network::solana::solana_public_key& program_id);
+fc::network::solana::solana_public_key
+derive_liqsol_pool_authority_pda(const fc::network::solana::solana_public_key& program_id);
+fc::network::solana::solana_public_key
+derive_liqsol_bucket_authority_pda(const fc::network::solana::solana_public_key& program_id);
+
+/// The `UserRecord` PDA of one liqSOL token account: seeds
+/// `["user_record", token_account.as_ref()]`.
+fc::network::solana::solana_public_key
+derive_liqsol_user_record_pda(const fc::network::solana::solana_public_key& program_id,
+                              const fc::network::solana::solana_public_key& token_account);
+
 /// Which family of effect accounts one inbound attestation needs. The relay
 /// derives the concrete metas per shape; the on-chain handler resolves them
 /// out of `remaining_accounts` by pubkey.
@@ -700,6 +816,13 @@ enum class effect_shape {
    reserve_ready,
    /// RESERVE_CREATE_CANCELLED: refunds the reserve's creator.
    reserve_create_cancelled,
+   /// DESYNDICATE_LIQ: the depot releases a user's syndicated liqSOL. The
+   /// handler resolves the pool's two state singletons, the pool-authority-signed
+   /// Token-2022 transfer's accounts (the pool and user ATAs with their
+   /// `UserRecord`s, the bucket ATA, the mint, Token-2022) and the liqSOL
+   /// transfer hook's accounts (the bucket authority, the mint's extra-metas PDA,
+   /// the hook program, liqsol-core itself) out of `remaining_accounts`.
+   desyndicate_liq,
 };
 
 /// One inbound attestation's effect-account requirement, keyed by its FLAT
@@ -715,9 +838,10 @@ struct inbound_effect {
    size_t                                                attestation_index;
    effect_shape                                          shape;
    /// WITHDRAW_REMIT operator / DEPOSIT_REVERT depositor / SWAP_REMIT
-   /// recipient / SWAP_REVERT depositor. For `slash` it is the SLASHED
-   /// operator — it keys the `CollateralPosition` PDA and the destination
-   /// ATA owner lookup but is never itself paid.
+   /// recipient / SWAP_REVERT depositor / DESYNDICATE_LIQ user (paid into
+   /// their liqSOL ATA). For `slash` it is the SLASHED operator — it keys the
+   /// `CollateralPosition` PDA and the destination ATA owner lookup but is
+   /// never itself paid.
    std::optional<fc::network::solana::solana_public_key> recipient;
    /// Set for every reserve-backed shape.
    std::optional<reserve_pda_seeds>                      reserve;
@@ -786,6 +910,12 @@ uint32_t count_inbound_attestations(const std::vector<char>& envelope_bytes);
 ///     recipient are still declared, matching the program's log-and-skip /
 ///     abort-and-retry gates.
 ///
+///   * `desyndicate_liq` derives everything from the user, the program's fixed
+///     pool PDAs and the mint on `DistributionState`, read through
+///     `read_liq_pool` at most ONCE per build. A degraded (empty) read costs
+///     the attestation everything but the two state singletons, which is what
+///     lets the handler log-and-skip an uninitialized pool instead of aborting.
+///
 /// @param program_id            outpost program id, for PDA derivation.
 /// @param effects               account-needing attestations, in dispatch order.
 /// @param total_attestations    the envelope's attestation total (the cursor's
@@ -795,6 +925,9 @@ uint32_t count_inbound_attestations(const std::vector<char>& envelope_bytes);
 /// @param read_collateral_custody  reads one `(operator, token_code)`
 ///                              position's pinned custody (may degrade only
 ///                              when the position is absent or empty).
+/// @param read_liq_pool         reads the liqSOL pool's `DistributionState`
+///                              (may degrade only when the account is absent
+///                              or empty).
 /// @param reserve_aggregate     the named `reserve_aggregate` account — the
 ///                              destination whose ATA receives an SPL slash
 ///                              seizure.
@@ -808,6 +941,7 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
    const reserve_info_reader&                    read_reserve_info,
    const collateral_custody_reader&              read_collateral_custody,
    const transfer_hook_reader&                   read_transfer_hook,
+   const liq_pool_reader&                        read_liq_pool,
    const fc::network::solana::solana_public_key& reserve_aggregate,
    const std::string&                            log_label);
 

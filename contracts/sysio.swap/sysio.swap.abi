@@ -1,0 +1,770 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "account",
+            "base": "",
+            "fields": [
+                {
+                    "name": "balance",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "account_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "symbol_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "accrueyield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pair_token",
+                    "type": "symbol_code"
+                }
+            ]
+        },
+        {
+            "name": "addliquidity",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "to_buy",
+                    "type": "asset"
+                },
+                {
+                    "name": "max_asset1",
+                    "type": "asset"
+                },
+                {
+                    "name": "max_asset2",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "cancelyield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "from",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "changefee",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pair_token",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "newfee",
+                    "type": "int32"
+                }
+            ]
+        },
+        {
+            "name": "close",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "symbol",
+                    "type": "symbol"
+                }
+            ]
+        },
+        {
+            "name": "closeext",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "ext_symbol",
+                    "type": "extended_symbol"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "contract_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "contract",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "cumulative_price",
+            "base": "",
+            "fields": [
+                {
+                    "name": "lo",
+                    "type": "uint128"
+                },
+                {
+                    "name": "hi",
+                    "type": "uint128"
+                }
+            ]
+        },
+        {
+            "name": "currency_stats",
+            "base": "",
+            "fields": [
+                {
+                    "name": "supply",
+                    "type": "asset"
+                },
+                {
+                    "name": "max_supply",
+                    "type": "asset"
+                },
+                {
+                    "name": "issuer",
+                    "type": "name"
+                },
+                {
+                    "name": "pool1",
+                    "type": "extended_asset"
+                },
+                {
+                    "name": "pool2",
+                    "type": "extended_asset"
+                },
+                {
+                    "name": "fee",
+                    "type": "int32"
+                },
+                {
+                    "name": "fee_authority",
+                    "type": "name"
+                },
+                {
+                    "name": "locked_shares",
+                    "type": "asset"
+                },
+                {
+                    "name": "yield_leg",
+                    "type": "extended_symbol?"
+                },
+                {
+                    "name": "conversion_horizon_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "depth_cap_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "clip_floor",
+                    "type": "int64"
+                },
+                {
+                    "name": "last_tick_depth",
+                    "type": "int64"
+                },
+                {
+                    "name": "last_tick",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "evodex_account",
+            "base": "",
+            "fields": [
+                {
+                    "name": "balance",
+                    "type": "extended_asset"
+                }
+            ]
+        },
+        {
+            "name": "exchange",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "pair_token",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "ext_asset_in",
+                    "type": "extended_asset"
+                },
+                {
+                    "name": "min_expected",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "extended_symbol",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sym",
+                    "type": "symbol"
+                },
+                {
+                    "name": "contract",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "extended_symbol_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "contract",
+                    "type": "name"
+                },
+                {
+                    "name": "symbol",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "fund_receipt",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pair",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "quantity",
+                    "type": "extended_asset"
+                }
+            ]
+        },
+        {
+            "name": "funder_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "funder",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "fundyield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "from",
+                    "type": "name"
+                },
+                {
+                    "name": "pair_token",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "inittoken",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "new_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "initial_pool1",
+                    "type": "extended_asset"
+                },
+                {
+                    "name": "initial_pool2",
+                    "type": "extended_asset"
+                },
+                {
+                    "name": "initial_fee",
+                    "type": "int32"
+                },
+                {
+                    "name": "fee_authority",
+                    "type": "name"
+                },
+                {
+                    "name": "locked_shares",
+                    "type": "asset"
+                },
+                {
+                    "name": "yield_leg",
+                    "type": "extended_symbol?"
+                }
+            ]
+        },
+        {
+            "name": "open",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "ram_payer",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "openext",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "payer",
+                    "type": "name"
+                },
+                {
+                    "name": "ext_symbol",
+                    "type": "extended_symbol"
+                }
+            ]
+        },
+        {
+            "name": "pair_identity_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "contract1",
+                    "type": "name"
+                },
+                {
+                    "name": "symbol1",
+                    "type": "uint64"
+                },
+                {
+                    "name": "contract2",
+                    "type": "name"
+                },
+                {
+                    "name": "symbol2",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "pair_index",
+            "base": "",
+            "fields": [
+                {
+                    "name": "evo_symbol",
+                    "type": "symbol"
+                }
+            ]
+        },
+        {
+            "name": "pair_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "symbol_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "payout_receipt",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pair",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "quantity",
+                    "type": "extended_asset"
+                }
+            ]
+        },
+        {
+            "name": "price_accumulator",
+            "base": "",
+            "fields": [
+                {
+                    "name": "price1",
+                    "type": "cumulative_price"
+                },
+                {
+                    "name": "price2",
+                    "type": "cumulative_price"
+                },
+                {
+                    "name": "last_update",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "remliquidity",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "to_sell",
+                    "type": "asset"
+                },
+                {
+                    "name": "min_asset1",
+                    "type": "asset"
+                },
+                {
+                    "name": "min_asset2",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "reservoir",
+            "base": "",
+            "fields": [
+                {
+                    "name": "balance",
+                    "type": "extended_asset"
+                }
+            ]
+        },
+        {
+            "name": "setconfig",
+            "base": "",
+            "fields": [
+                {
+                    "name": "fee_authority",
+                    "type": "name"
+                },
+                {
+                    "name": "system_token",
+                    "type": "extended_symbol"
+                }
+            ]
+        },
+        {
+            "name": "setyield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pair_token",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "conversion_horizon_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "depth_cap_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "clip_floor",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "swap_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "fee_authority",
+                    "type": "name"
+                },
+                {
+                    "name": "system_token",
+                    "type": "extended_symbol"
+                }
+            ]
+        },
+        {
+            "name": "sync",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pair_token",
+                    "type": "symbol_code"
+                }
+            ]
+        },
+        {
+            "name": "tickyield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pair_token",
+                    "type": "symbol_code"
+                }
+            ]
+        },
+        {
+            "name": "transfer",
+            "base": "",
+            "fields": [
+                {
+                    "name": "from",
+                    "type": "name"
+                },
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "withdraw",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "to_withdraw",
+                    "type": "extended_asset"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "accrueyield",
+            "type": "accrueyield",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "addliquidity",
+            "type": "addliquidity",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "cancelyield",
+            "type": "cancelyield",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "changefee",
+            "type": "changefee",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "close",
+            "type": "close",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "closeext",
+            "type": "closeext",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "exchange",
+            "type": "exchange",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "fundyield",
+            "type": "fundyield",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "inittoken",
+            "type": "inittoken",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "open",
+            "type": "open",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "openext",
+            "type": "openext",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "remliquidity",
+            "type": "remliquidity",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setconfig",
+            "type": "setconfig",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setyield",
+            "type": "setyield",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sync",
+            "type": "sync",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tickyield",
+            "type": "tickyield",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "transfer",
+            "type": "transfer",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "withdraw",
+            "type": "withdraw",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "accounts",
+            "type": "account",
+            "index_type": "i64",
+            "key_names": ["scope","symbol_code"],
+            "key_types": ["name","uint64"],
+            "table_id": 25660
+        },
+        {
+            "name": "evodexacnts",
+            "type": "evodex_account",
+            "index_type": "i64",
+            "key_names": ["scope","contract","symbol"],
+            "key_types": ["name","name","uint64"],
+            "table_id": 63234
+        },
+        {
+            "name": "evoindex",
+            "type": "pair_index",
+            "index_type": "i64",
+            "key_names": ["contract1","symbol1","contract2","symbol2"],
+            "key_types": ["name","uint64","name","uint64"],
+            "table_id": 41326
+        },
+        {
+            "name": "priceaccum",
+            "type": "price_accumulator",
+            "index_type": "i64",
+            "key_names": ["symbol_code"],
+            "key_types": ["uint64"],
+            "table_id": 54664
+        },
+        {
+            "name": "reservoirs",
+            "type": "reservoir",
+            "index_type": "i64",
+            "key_names": ["symbol_code"],
+            "key_types": ["uint64"],
+            "table_id": 43956
+        },
+        {
+            "name": "stat",
+            "type": "currency_stats",
+            "index_type": "i64",
+            "key_names": ["symbol_code"],
+            "key_types": ["uint64"],
+            "table_id": 4264
+        },
+        {
+            "name": "swapconfig",
+            "type": "swap_config",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 40605
+        },
+        {
+            "name": "yieldfunds",
+            "type": "fund_receipt",
+            "index_type": "i64",
+            "key_names": ["funder"],
+            "key_types": ["name"],
+            "table_id": 29681
+        },
+        {
+            "name": "yieldpayouts",
+            "type": "payout_receipt",
+            "index_type": "i64",
+            "key_names": ["contract"],
+            "key_types": ["name"],
+            "table_id": 50476
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}

@@ -145,6 +145,7 @@ WIRE-352 adds separate inline edges whose failure behavior depends on the caller
 | `sysio.roa::nodeownreg` | `sysio.authex::recordlink` | Deploy `sysio.roa` and `sysio.authex` as the same compatibility-coupled set. | WIRE-352 adds the required `native_address` field. An old caller underflows the new action decoder; the inverse pairing is also unsupported. Node-owner delivery can abort. |
 | `sysio.authex::createlink` | `sysio.dclaim::linkswept` | Deploy `sysio.dclaim` before the first user-created external-key link. | A missing or non-privileged callee aborts before link insertion. Any inline failure rolls the transaction back, so the user can submit a fresh retry. |
 | `sysio.authex::recordlink` | `sysio.dclaim::linkswept` | Prefer deploying `sysio.dclaim` before trusted node-owner dispatch begins. | A missing or non-privileged callee skips the sweep but preserves the trusted link; an identical operator-authorized `recordlink` can retry it after bootstrap. |
+| `sysio.authex::createlink` | `sysio.liq::linkswept` | None. Nothing is parked before `sysio.liq` is deployed, and it deploys privileged through `setsyscode`. | A missing or non-privileged callee skips the sweep and keeps the link; the permissionless `sysio.liq::sweep` delivers the parked shadow later. |
 
 Production deployment through `sysio.roa::setsyscode` privileges `sysio.dclaim`
 as part of the deploy, so there is no separate privilege step. The durable
