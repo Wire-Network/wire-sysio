@@ -22,6 +22,7 @@
 #include <fc/slug_name.hpp>
 #include <fc/crypto/base58.hpp>
 
+#include <algorithm>
 #include <cctype>
 #include <fstream>
 #include <map>
@@ -186,6 +187,7 @@ std::vector<std::string> validate(const BootstrapPlatformConfig& c) {
    std::set<std::tuple<std::string, std::string, std::string>> triples;
    unsigned __int128 sum_wire = 0;
    for (const auto& r : c.reserves()) {
+      if (!slug_ok(r.code())) e.push_back("V2 reserve code: " + r.code());
       const auto key = std::make_tuple(r.chain_code(), r.token_code(), r.code());
       if (!triples.insert(key).second)
          e.push_back("V6 duplicate reserve: " + r.chain_code() + "/" + r.token_code() + "/" + r.code());
@@ -345,6 +347,15 @@ BOOST_AUTO_TEST_CASE(validator_rejects_mutations) {
 
    { auto c = base; c.mutable_chains(1)->set_code("TOOLONG99");         // 9 chars > 8
      BOOST_CHECK(!validate(c).empty()); }                               // V2 over-length slug
+   // Reserve codes get the same V2 grammar as chain and token codes; regreserve
+   // refuses the digit- and underscore-leading ones outright.
+   for (const char* bad : {"1BAD", "_BAD", ""}) {
+      auto c = base; c.mutable_reserves(0)->set_code(bad);
+      const auto errs = validate(c);
+      BOOST_CHECK_MESSAGE(std::any_of(errs.begin(), errs.end(),
+                                      [](const std::string& s) { return s.starts_with("V2 reserve code"); }),
+                          std::string("reserve code should be rejected: '") + bad + "'");
+   }
    { auto c = base; c.mutable_chains(2)->set_kind(ChainKind::CHAIN_KIND_WIRE);
      BOOST_CHECK(!validate(c).empty()); }                               // V3 two depots
    { auto c = base;                                                     // V5 second native on ETHEREUM
