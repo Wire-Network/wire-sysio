@@ -41,11 +41,10 @@ namespace sysio {
     *   duplicates (`external_epoch_ref <= last`) are rejected at ingest, so no
     *   per-reward history is retained (roll-up + data-leak safe).
     *
-    * Claimable lifespan: every credited / staged balance carries an
-    * `expires_at_sec`. `flushexpired` prunes anything past it; the WIRE stays
-    * in the `sysio.dclaim` account balance — i.e. it reverts into the staking
-    * capital fund for redistribution. The window is configurable
-    * (`setclmwindow`), defaulting to 180 days.
+    * Credited and imported balances never expire, including balances waiting
+    * for AuthX linking. They remain owed until claimed; there is no expiry
+    * cleanup or forfeiture to the capital fund. Unclaimed rows retain RAM
+    * indefinitely under this policy.
     *
     * No cooldown/withdrawal machinery for v1 (no withdrawal flow in this
     * wave). When withdrawals come online post-launch, the cooldown-queue +
@@ -66,31 +65,13 @@ namespace sysio {
       /// WIRE token symbol with the system-wide nine-decimal precision.
       static constexpr symbol WIRE_SYM = opp::wire::asset_symbol;
 
-      // Default claimable-reward lifespan: 180 days, in seconds. Configurable
-      // per deployment via `setclmwindow`.
-      static constexpr uint32_t DEFAULT_CLAIM_WINDOW_SEC = 180u * 24u * 60u * 60u;
-
-      // Upper bound on the configurable claim window. Expiry is computed as the
-      // uint32 sum `now_sec() + claim_window_sec`; an unbounded window overflows
-      // uint32 and wraps the expiry into the past, so freshly credited claims are
-      // pruned by `flushexpired` the moment they are written. 10 years is far past
-      // any intended reward lifespan while keeping `now + window` clear of the
-      // uint32 range for decades.
-      static constexpr uint32_t MAX_CLAIM_WINDOW_SEC = 10u * 365u * 24u * 60u * 60u;
-
       // -----------------------------------------------------------------------
       //  Actions
       // -----------------------------------------------------------------------
 
-      /// Initialize the config singleton (idempotent). The claimable-reward
-      /// window defaults to `DEFAULT_CLAIM_WINDOW_SEC`.
+      /// Initialize the bootstrap import config singleton (idempotent).
       [[sysio::action]]
       void setconfig();
-
-      /// Set the claimable-reward window (seconds). Unclaimed balances older
-      /// than this revert to the capital fund on `flushexpired`. Auth=self.
-      [[sysio::action]]
-      void setclmwindow(uint32_t window_sec);
 
       /// User-callable: drain the caller's `pending_claims` row via an inline
       /// transfer of WIRE from `sysio.dclaim` to `wire_account`. Erases the row.
@@ -100,13 +81,9 @@ namespace sysio {
 
       /// Internal: sweep an `unmapped_tokens` entry into `pending_claims` when
       /// the staker / purchaser completes AuthX linking. Called inline by
-      /// `sysio.authex` after a successful link. An already-expired unmapped
-      /// row is forfeited instead of being re-stamped with a fresh window. A
-      /// live row retains its absolute expiry when it creates a pending row;
-      /// when it joins an existing account aggregate, the later effective
-      /// deadline governs the aggregate so newer rewards cannot expire early.
-      /// Its WIRE stays in the DClaim capital fund if expired. No-op if nothing
-      /// matches. Auth=sysio.authex.
+      /// `sysio.authex` after a successful link. The parked balance joins the
+      /// account's pending balance regardless of age. No-op if nothing matches.
+      /// Auth=sysio.authex.
       [[sysio::action]]
       void linkswept(name wire_account,
                      opp::types::ChainKind chain,
@@ -142,13 +119,6 @@ namespace sysio {
                     uint32_t              reward_epoch_index,
                     uint64_t              external_epoch_ref,
                     uint32_t              share_bps);
-
-      /// Permissionless crank: prune up to `max_rows` expired ledger rows
-      /// (`pending_claims`, `unmapped_tokens`). Erasing a credited row leaves
-      /// its WIRE in the `sysio.dclaim` balance — it reverts into the staking
-      /// capital fund for redistribution. Bounded.
-      [[sysio::action]]
-      void flushexpired(uint32_t max_rows);
 
       /// One row of an import batch: a pre-launch holder's WIRE credit on
       /// `chain`. `native_address` is the raw on-chain key (20 B for ETH,
@@ -189,13 +159,10 @@ namespace sysio {
       struct [[sysio::table("pclaims")]] pending_claim {
          name     wire_account;
          asset    balance        = asset{0, WIRE_SYM};
-         /// Seconds since epoch after which `flushexpired` reverts this
-         /// balance to the capital fund. Refreshed on every credit.
-         uint32_t expires_at_sec = 0;
 
          uint64_t primary_key() const { return wire_account.value; }
 
-         SYSLIB_SERIALIZE(pending_claim, (wire_account)(balance)(expires_at_sec))
+         SYSLIB_SERIALIZE(pending_claim, (wire_account)(balance))
       };
 
       using pclaims_t = sysio::kv::table<"pclaims"_n, pclaim_key, pending_claim>;
@@ -213,7 +180,6 @@ namespace sysio {
          opp::types::ChainKind     chain_kind      = opp::types::ChainKind::CHAIN_KIND_UNKNOWN;
          std::vector<char>         native_pubkey;
          asset                     balance         = asset{0, WIRE_SYM};
-         uint32_t                  expires_at_sec  = 0;
 
          uint64_t primary_key() const { return id; }
 
@@ -221,7 +187,7 @@ namespace sysio {
             return chain_addr_key(chain_kind, native_pubkey);
          }
 
-         SYSLIB_SERIALIZE(unmapped_token, (id)(chain_kind)(native_pubkey)(balance)(expires_at_sec))
+         SYSLIB_SERIALIZE(unmapped_token, (id)(chain_kind)(native_pubkey)(balance))
       };
 
       using unmapped_t = sysio::kv::table<"unmapped"_n, unmapped_key, unmapped_token,
@@ -263,10 +229,7 @@ namespace sysio {
       struct [[sysio::table("capcfg")]] cap_config {
          /// One-way flag protecting the bootstrap `importseed` action.
          bool     imported_complete = false;
-         /// Claimable-reward window in seconds (configurable; default 180d).
-         uint32_t claim_window_sec  = DEFAULT_CLAIM_WINDOW_SEC;
-
-         SYSLIB_SERIALIZE(cap_config, (imported_complete)(claim_window_sec))
+         SYSLIB_SERIALIZE(cap_config, (imported_complete))
       };
 
       using capcfg_t = sysio::kv::global<"capcfg"_n, cap_config>;

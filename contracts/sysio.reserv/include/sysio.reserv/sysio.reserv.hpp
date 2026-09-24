@@ -125,8 +125,8 @@ namespace sysio {
       // its balance returns to the emissions treasury.
       //
       // One year is deliberately far longer than any plausible claim latency: forfeiture is a RAM
-      // backstop, not an economic lever. (Contrast `sysio.dclaim::claim_window_sec`, which is
-      // governance-tunable because staker windows ARE policy.) Promote this to config if that ever
+      // backstop, not an economic lever. DClaim staking rewards, operator pay, and returned
+      // operator collateral have a separate no-expiry policy. Promote this to config if that ever
       // changes; a constant keeps the swap-settlement surface unchanged in the meantime.
       static constexpr uint32_t WIRE_CLAIM_WINDOW_SEC = 365 * 24 * 60 * 60;
 
