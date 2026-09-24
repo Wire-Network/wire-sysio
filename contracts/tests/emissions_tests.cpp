@@ -3612,6 +3612,37 @@ BOOST_FIXTURE_TEST_CASE( blocking_producer_cannot_stall_payepoch, sysio_emission
    BOOST_REQUIRE_EQUAL( 0, get_wire_balance("producerb"_n).get_amount() );
 } FC_LOG_AND_RETHROW()
 
+/// Earned pay remains reserved and claimable after years without a new credit.
+BOOST_FIXTURE_TEST_CASE( payclaims_never_expire, sysio_emissions_tester ) try {
+   create_t5_holding_accounts();
+   setup_producers(3);
+   wait_for_producer_schedule();
+   produce_complete_cycles(3, 2);
+
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+
+   const auto producer = "producera"_n;
+   const int64_t owed = pay_claimable(producer);
+   const int64_t outstanding = pay_outstanding_total();
+   const int64_t balance_before_claim = get_wire_balance(producer).get_amount();
+   BOOST_REQUIRE_GT( owed, 0 );
+
+   constexpr uint32_t INACTIVE_DAYS = 3 * 365;
+   produce_block();
+   produce_block(fc::days(INACTIVE_DAYS));
+   produce_blocks(2);
+   BOOST_REQUIRE_EQUAL( owed, pay_claimable(producer) );
+   BOOST_REQUIRE_EQUAL( outstanding, pay_outstanding_total() );
+
+   BOOST_REQUIRE_EQUAL( success(),
+      push_system_action(producer, "claimpay"_n, mvo()("account_name", producer)) );
+   BOOST_REQUIRE_EQUAL( balance_before_claim + owed, get_wire_balance(producer).get_amount() );
+   BOOST_REQUIRE_EQUAL( 0, pay_claimable(producer) );
+   BOOST_REQUIRE_EQUAL( outstanding - owed, pay_outstanding_total() );
+} FC_LOG_AND_RETHROW()
+
 // ---------------------------------------------------------------------------
 // Holding account stub transfers
 // ---------------------------------------------------------------------------

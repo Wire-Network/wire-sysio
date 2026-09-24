@@ -59,10 +59,8 @@ namespace sysio::opp::claimable {
 /// Compile-time detection of the optional `expires_at_sec` member on a claimable row.
 ///
 /// A row that omits the field opts out of expiry entirely: nothing stamps it and `sweep_expired`
-/// cannot select it. Every row in this tree currently CARRIES the field -- `payclaims`,
-/// `wireclaims` and `remitclaims` alike -- so the false branch is the shape a future bounded-set
-/// contract may choose, not a description of any table today. Whether a stamped row is ever acted
-/// on is a separate, per-contract decision (only `wireclaims` is swept; see WIRE-339).
+/// cannot select it. `payclaims` and `remitclaims` omit the field because earned pay and returned
+/// collateral remain claimable indefinitely. `wireclaims` retains expiry and its retention sweep.
 template<class Row, class = void>
 struct has_expiry : std::false_type {};
 

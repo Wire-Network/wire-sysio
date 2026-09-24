@@ -1465,10 +1465,8 @@ BOOST_FIXTURE_TEST_CASE(terminate_survives_operator_blocking_its_own_remit, sysi
    BOOST_REQUIRE_EQUAL(DEPOSIT, get_remitclaim(OPERATOR)["balance"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
-// Positive control: a cooperative operator pulls its terminated collateral normally, and
-// the claim row is consumed. Pairs with the test above -- together they pin that the claimable
-// path pays everyone except the account that refuses payment.
-BOOST_FIXTURE_TEST_CASE(claimremit_pays_terminated_operator_and_clears_row, sysio_opreg_tester) { try {
+/// Returned collateral remains claimable after years of inactivity and operator pruning.
+BOOST_FIXTURE_TEST_CASE(claimremit_never_expires_and_clears_row_after_payment, sysio_opreg_tester) { try {
    const auto OPERATOR    = "batchop.a"_n;
    const uint64_t DEPOSIT = 5000;
 
@@ -1479,6 +1477,13 @@ BOOST_FIXTURE_TEST_CASE(claimremit_pays_terminated_operator_and_clears_row, sysi
    BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, DEPOSIT));
    BOOST_REQUIRE_EQUAL(success(), terminate(OPERATOR, "rolling-24h miss"));
 
+   BOOST_REQUIRE_EQUAL(DEPOSIT, get_remitclaim(OPERATOR)["balance"].as_uint64());
+   constexpr uint32_t INACTIVE_DAYS = 3 * 365;
+   produce_block();
+   produce_block(fc::days(INACTIVE_DAYS));
+   produce_blocks(2);
+   BOOST_REQUIRE_EQUAL(success(), prune());
+   BOOST_REQUIRE(get_operator(OPERATOR).is_null());
    BOOST_REQUIRE_EQUAL(DEPOSIT, get_remitclaim(OPERATOR)["balance"].as_uint64());
    const int64_t balance_before_claim = wire_balance(OPERATOR);
    BOOST_REQUIRE_EQUAL(success(), claimremit(OPERATOR));

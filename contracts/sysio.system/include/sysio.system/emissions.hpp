@@ -238,46 +238,23 @@ struct node_claim_result {
 // economic decision, not a RAM one, and the alternative (`sysio.reserv::wireclaims`, whose
 // recipient set is unbounded AND caller-influenced) buys its sweep by forfeiting balances.
 //
-// The row therefore carries `expires_at_sec` and an expiry-ordered index NOW, even though nothing
-// reads them yet. Landing the schema is free before launch and expensive after it; wiring the
-// sweep is the part that needs a decision, so the two are deliberately separated. `credit`
-// maintains the stamp, so by the time WIRE-339 picks the question up there is real age data to
-// reason about instead of a table that starts counting from the day the field is added.
-//
-// NOTHING EXPIRES TODAY: no `claimable::sweep_expired` call is wired against this table, so the
-// stamp is recorded and ignored. `PAY_CLAIM_WINDOW_SEC` is the provisional window that stamp is
-// computed from, not a commitment — whether earned pay should be forfeited at all, and over what
-// window, is the open economic decision in WIRE-339.
+/// WIRE-339 policy: earned pay never expires, including after a recipient stops participating.
+/// Rows deliberately omit expiry metadata and indexes; balances remain reserved until claimed.
 
 struct payclaim_key {
    uint64_t account_name;
    SYSLIB_SERIALIZE(payclaim_key, (account_name))
 };
 
-// Provisional retention window used only to compute `pay_claim::expires_at_sec`. Mirrors
-// `sysio.reserv::WIRE_CLAIM_WINDOW_SEC` so the two claimable tables age on the same scale; the
-// value is revisited when (and if) a sweep is wired.
-inline constexpr uint32_t PAY_CLAIM_WINDOW_SEC = 365 * 24 * 60 * 60;
-
+/// Earned WIRE held indefinitely for the recipient to claim.
 struct [[sysio::table("payclaims"), sysio::contract("sysio.system")]] pay_claim {
    sysio::name account_name;
-   uint64_t    balance        = 0;   // atomic WIRE units owed, not yet claimed
-   uint32_t    expires_at_sec = 0;   // recorded by `credit`; read by nothing yet (WIRE-339)
+   uint64_t    balance = 0;   ///< Atomic WIRE units owed, not yet claimed.
 
-   /// Expiry-major composite so the secondary index orders by expiry and a future retention sweep
-   /// can stop at the first live row. The account tail only breaks ties, keeping the key unique
-   /// when many rows share an expiry second. (Same shape as `sysio.reserv::wire_claim`.)
-   uint128_t by_expiry() const {
-      return (static_cast<uint128_t>(expires_at_sec) << 64) | account_name.value;
-   }
-
-   SYSLIB_SERIALIZE(pay_claim, (account_name)(balance)(expires_at_sec))
+   SYSLIB_SERIALIZE(pay_claim, (account_name)(balance))
 };
 
-using payclaims_t = sysio::kv::table<"payclaims"_n, payclaim_key, pay_claim,
-   sysio::kv::index<"byexpiry"_n,
-      sysio::const_mem_fun<pay_claim, uint128_t, &pay_claim::by_expiry>>
->;
+using payclaims_t = sysio::kv::table<"payclaims"_n, payclaim_key, pay_claim>;
 
 // Running total of every outstanding `payclaims` balance.
 //
