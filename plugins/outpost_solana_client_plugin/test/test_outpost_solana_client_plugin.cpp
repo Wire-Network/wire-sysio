@@ -1157,6 +1157,59 @@ BOOST_AUTO_TEST_CASE(extract_effects_slash_carries_collateral_position_key) try 
    BOOST_CHECK(effects[1].shape == detail::effect_shape::withdraw_remit);
 } FC_LOG_AND_RETHROW();
 
+namespace {
+
+/// Build a `DESYNDICATE_LIQ` entry releasing `token_code` to `user`. The decoder
+/// reads only `user` -- the pool mint comes from `DistributionState`, not the
+/// payload -- so the other fields stay neutral.
+sysio::opp::AttestationEntry desyndicate_liq_entry(uint64_t                               token_code,
+                                                   const sysio::opp::types::ChainAddress& user) {
+   sysio::opp::attestations::DesyndicateLIQ dl;
+   dl.set_chain_code(900);
+   *dl.mutable_user() = user;
+   dl.mutable_amount()->set_token_code(token_code);
+   dl.mutable_amount()->set_amount(777);
+   dl.set_request_id(1);
+   std::string body;
+   dl.SerializeToString(&body);
+
+   sysio::opp::AttestationEntry entry;
+   entry.set_type(sysio::opp::types::ATTESTATION_TYPE_DESYNDICATE_LIQ);
+   entry.set_data(std::move(body));
+   return entry;
+}
+
+} // namespace
+
+BOOST_AUTO_TEST_CASE(extract_effects_desyndicate_liq_carries_the_user) try {
+   namespace detail = sysio::outpost_solana_client_detail;
+   // DESYNDICATE_LIQ MUST be surfaced: the handler resolves the pool's state
+   // singletons, the transfer's accounts and the hook's accounts out of
+   // remaining_accounts, and a manifest that omits them aborts the dispatch
+   // call and pins the cursor on this attestation for every retry.
+   auto user     = filled_pubkey(0xAB);
+   auto envelope = envelope_with_entries({
+      desyndicate_liq_entry(700, make_sol_addr(user)),
+      // Not an SVM pubkey: dropped here and logged-and-skipped on chain, while
+      // the flat index still advances past it.
+      desyndicate_liq_entry(700, make_eth_addr_32(user)),
+      remit_entry(504, make_sol_addr(filled_pubkey(0xEE))),
+   });
+
+   const auto effects = detail::extract_inbound_effects(envelope);
+   BOOST_REQUIRE_EQUAL(effects.size(), 2u);
+
+   BOOST_CHECK_EQUAL(effects[0].attestation_index, 0u);
+   BOOST_CHECK(effects[0].shape == detail::effect_shape::desyndicate_liq);
+   BOOST_REQUIRE(effects[0].recipient.has_value());
+   BOOST_CHECK(effects[0].recipient->serialize() == user);
+   BOOST_CHECK(!effects[0].reserve.has_value());
+   BOOST_CHECK(!effects[0].collateral_token_code.has_value());
+
+   BOOST_CHECK_EQUAL(effects[1].attestation_index, 2u);
+   BOOST_CHECK(effects[1].shape == detail::effect_shape::withdraw_remit);
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(extract_effects_keeps_distinct_collateral_token_codes) try {
    namespace detail = sysio::outpost_solana_client_detail;
    // One operator withdrawing two different token_codes resolves TWO
@@ -1448,13 +1501,32 @@ struct manifest_build_harness {
       };
    }
 
+   /// The syndicated liqSOL pool, as `DistributionState` would render it.
+   /// Empty by default: a build with no DESYNDICATE_LIQ never reads it, and a
+   /// case that needs one seeds the pool's mint via `put_liq_pool`.
+   std::optional<manifest_detail::liq_pool_info> liq_pool;
+   /// Counts reader invocations so a case can assert the singleton is read once
+   /// per build, however many desyndications the envelope carries.
+   mutable size_t liq_pool_reads = 0;
+
+   void put_liq_pool(const solana_public_key& liqsol_mint) {
+      liq_pool = manifest_detail::liq_pool_info{liqsol_mint};
+   }
+
+   manifest_detail::liq_pool_reader liq_pool_reader() {
+      return [this]() -> std::optional<manifest_detail::liq_pool_info> {
+         ++liq_pool_reads;
+         return liq_pool;
+      };
+   }
+
    std::vector<std::vector<account_meta>> build(
       const std::vector<manifest_detail::inbound_effect>& effects,
       uint32_t                                            total_attestations,
       const std::function<void()>&                        deadline_probe = [] {}) {
       return manifest_detail::build_dispatch_manifests(
          program_id, effects, total_attestations, deadline_probe, reader(),
-         collateral_reader(), hook_reader(), reserve_aggregate, "test-relay");
+         collateral_reader(), hook_reader(), liq_pool_reader(), reserve_aggregate, "test-relay");
    }
 };
 
@@ -1575,6 +1647,96 @@ BOOST_AUTO_TEST_CASE(build_manifests_follows_reserve_custody_per_reserve) try {
    BOOST_CHECK(!manifest_has(native, manifest_detail::derive_reserve_vault_pda(
                                         harness.program_id, token_code, 201)));
    BOOST_CHECK(!manifest_has(native, system::program_ids::TOKEN_PROGRAM));
+} FC_LOG_AND_RETHROW();
+
+namespace {
+
+/// One DESYNDICATE_LIQ effect at `index` releasing syndicated liqSOL to `user`.
+manifest_detail::inbound_effect desyndicate_liq_effect(size_t index, const solana_public_key& user) {
+   return manifest_detail::inbound_effect{
+      index, manifest_detail::effect_shape::desyndicate_liq, user, std::nullopt, std::nullopt};
+}
+
+/// Whether `key` rides `metas` as WRITABLE.
+bool manifest_writes(const std::vector<account_meta>& metas, const solana_public_key& key) {
+   auto it = std::find_if(metas.begin(), metas.end(),
+                          [&](const account_meta& meta) { return meta.key == key; });
+   return it != metas.end() && it->is_writable;
+}
+
+} // namespace
+
+// The DESYNDICATE_LIQ manifest is `handle_desyndicate_liq`'s
+// `require_remaining_account` list, derived from the user's pubkey, the
+// program's fixed pool PDAs and the mint on `DistributionState`: the two state
+// singletons (writable), the pool authority, the pool and user Token-2022 ATAs
+// with their `UserRecord`s (all writable), the bucket ATA, the mint, Token-2022,
+// and the hook's accounts -- the bucket authority, the mint's extra-metas PDA,
+// the hook program and liqsol-core. One DistributionState read serves every
+// desyndication in the envelope.
+BOOST_AUTO_TEST_CASE(build_manifests_desyndicate_liq_derives_the_pool_accounts) try {
+   const auto liqsol_mint  = measurement_pubkey(90);
+   const auto hook_program = measurement_pubkey(91);
+   const auto user_a       = measurement_pubkey(92);
+   const auto user_b       = measurement_pubkey(93);
+
+   manifest_build_harness harness;
+   harness.put_liq_pool(liqsol_mint);
+   harness.put_hook(liqsol_mint, hook_program, {});
+
+   const auto manifests = harness.build(
+      {desyndicate_liq_effect(0, user_a), desyndicate_liq_effect(1, user_b)}, 2);
+   BOOST_REQUIRE_EQUAL(manifests.size(), 2u);
+   BOOST_CHECK_EQUAL(harness.liq_pool_reads, 1u);
+
+   const auto& program_id       = harness.program_id;
+   const auto  global_state     = manifest_detail::derive_liqsol_global_state_pda(program_id);
+   const auto  distribution     = manifest_detail::derive_liqsol_distribution_state_pda(program_id);
+   const auto  pool_authority   = manifest_detail::derive_liqsol_pool_authority_pda(program_id);
+   const auto  bucket_authority = manifest_detail::derive_liqsol_bucket_authority_pda(program_id);
+   const auto& token_2022       = system::program_ids::TOKEN_2022_PROGRAM;
+   const auto  pool_ata   = system::get_associated_token_address(pool_authority, liqsol_mint, token_2022);
+   const auto  bucket_ata = system::get_associated_token_address(bucket_authority, liqsol_mint, token_2022);
+
+   for (size_t i = 0; i < 2; ++i) {
+      const auto& m        = manifests[i];
+      const auto& user     = i == 0 ? user_a : user_b;
+      const auto  user_ata = system::get_associated_token_address(user, liqsol_mint, token_2022);
+      BOOST_TEST_CONTEXT("attestation " << i) {
+         BOOST_CHECK_EQUAL(m.size(), 14u);
+         BOOST_CHECK(manifest_writes(m, global_state));
+         BOOST_CHECK(manifest_writes(m, distribution));
+         BOOST_CHECK(manifest_has(m, pool_authority) && !manifest_writes(m, pool_authority));
+         BOOST_CHECK(manifest_writes(m, pool_ata));
+         BOOST_CHECK(manifest_writes(m, user_ata));
+         BOOST_CHECK(manifest_writes(m, manifest_detail::derive_liqsol_user_record_pda(program_id, pool_ata)));
+         BOOST_CHECK(manifest_writes(m, manifest_detail::derive_liqsol_user_record_pda(program_id, user_ata)));
+         BOOST_CHECK(manifest_has(m, bucket_ata) && !manifest_writes(m, bucket_ata));
+         BOOST_CHECK(manifest_has(m, liqsol_mint) && !manifest_writes(m, liqsol_mint));
+         BOOST_CHECK(manifest_has(m, token_2022));
+         BOOST_CHECK(manifest_has(m, bucket_authority) && !manifest_writes(m, bucket_authority));
+         BOOST_CHECK(manifest_has(m, program_id));
+         BOOST_CHECK(manifest_has(m, hook_program));
+         BOOST_CHECK(manifest_has(m, manifest_detail::derive_extra_account_metas_pda(hook_program, liqsol_mint)));
+         // The bare user wallet is never an account of this shape: the payout
+         // lands in their ATA.
+         BOOST_CHECK(!manifest_has(m, user));
+      }
+   }
+} FC_LOG_AND_RETHROW();
+
+// Without a readable `DistributionState` the manifest carries the two state
+// singletons only: the handler loads them first and turns an uninitialized
+// pool into a logged skip, so nothing behind them is derivable or required.
+BOOST_AUTO_TEST_CASE(build_manifests_desyndicate_liq_degrades_to_the_state_singletons) try {
+   manifest_build_harness harness;   // no pool seeded
+   const auto manifests = harness.build({desyndicate_liq_effect(0, measurement_pubkey(94))}, 1);
+   BOOST_REQUIRE_EQUAL(manifests.size(), 1u);
+   const auto& m = manifests[0];
+   BOOST_CHECK_EQUAL(m.size(), 2u);
+   BOOST_CHECK(manifest_writes(m, manifest_detail::derive_liqsol_global_state_pda(harness.program_id)));
+   BOOST_CHECK(manifest_writes(m, manifest_detail::derive_liqsol_distribution_state_pda(harness.program_id)));
+   BOOST_CHECK_EQUAL(harness.hook_reads, 0u);
 } FC_LOG_AND_RETHROW();
 
 namespace {
@@ -2297,7 +2459,7 @@ BOOST_AUTO_TEST_CASE(build_manifests_propagate_an_unreadable_reserve) try {
          harness.program_id,
          {swap_remit_effect(0, 10, 20, recipient), swap_remit_effect(1, 11, 21, later)},
          2, [] {}, throwing_reader, harness.collateral_reader(), harness.hook_reader(),
-         harness.reserve_aggregate, "test-relay"),
+         harness.liq_pool_reader(), harness.reserve_aggregate, "test-relay"),
       fc::exception,
       [](const fc::exception& e) {
          return e.to_detail_string().find("undecodable") != std::string::npos;
@@ -2927,6 +3089,144 @@ BOOST_AUTO_TEST_CASE(reserve_shape_accepts_the_deployed_declaration) try {
    // It is what guarantees the manifest builder can always resolve custody and
    // the cancel-refund creator from a reserve the program can read.
    BOOST_CHECK_NO_THROW(assert_reserve_shape(load_idl_fixture(opp_outpost_idl_fixture)));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(distribution_state_shape_accepts_a_pubkey_mint_and_rejects_drift) try {
+   using sysio::outpost_solana_client_detail::assert_distribution_state_shape;
+
+   // The stub fixture carries the integrated program's `DistributionState`, so
+   // this is the boot check running against the declaration a batch operator
+   // meets. A standalone outpost program declares none at all; the boot check
+   // skips the assert (and logs it) there, and the assert itself refuses it.
+   BOOST_CHECK_NO_THROW(assert_distribution_state_shape(load_idl_fixture(opp_outpost_idl_fixture)));
+   BOOST_CHECK_THROW(assert_distribution_state_shape(idl::program{}), fc::assert_exception);
+
+   for (bool in_types : {false, true}) {
+      BOOST_TEST_CONTEXT("fields in types section: " << in_types) {
+         BOOST_CHECK_NO_THROW(assert_distribution_state_shape(named_account_program(
+            "DistributionState",
+            {{"bump", prim(idl::primitive_type::u8)}, {"liqsol_mint", prim(idl::primitive_type::pubkey)}},
+            in_types)));
+         // The mint declared as anything but a pubkey, or not declared at all.
+         BOOST_CHECK_THROW(assert_distribution_state_shape(named_account_program(
+                              "DistributionState", {{"liqsol_mint", prim(idl::primitive_type::u64)}}, in_types)),
+                           fc::assert_exception);
+         BOOST_CHECK_THROW(assert_distribution_state_shape(named_account_program(
+                              "DistributionState", {{"bump", prim(idl::primitive_type::u8)}}, in_types)),
+                           fc::assert_exception);
+      }
+   }
+} FC_LOG_AND_RETHROW();
+
+namespace {
+
+/// A synthetic program declaring `GlobalState` with `wire_state` of enum type
+/// `WireState` carrying `variants`.
+idl::program global_state_program(std::vector<std::string> variants, bool fields_in_types_section) {
+   auto prog = named_account_program(
+      "GlobalState", {{"wire_state", idl::idl_type::make_defined("WireState")}}, fields_in_types_section);
+   idl::type_def wire_state;
+   wire_state.name          = "WireState";
+   wire_state.enum_variants = std::vector<idl::enum_variant>{};
+   for (auto& name : variants) {
+      idl::enum_variant variant;
+      variant.name = std::move(name);
+      wire_state.enum_variants->push_back(std::move(variant));
+   }
+   prog.types.push_back(std::move(wire_state));
+   return prog;
+}
+
+} // namespace
+
+BOOST_AUTO_TEST_CASE(global_state_shape_requires_a_post_launch_variant) try {
+   using sysio::outpost_solana_client_detail::assert_global_state_shape;
+
+   // The stub fixture carries the integrated program's `GlobalState`.
+   BOOST_CHECK_NO_THROW(assert_global_state_shape(load_idl_fixture(opp_outpost_idl_fixture)));
+   BOOST_CHECK_THROW(assert_global_state_shape(idl::program{}), fc::assert_exception);
+
+   for (bool in_types : {false, true}) {
+      BOOST_TEST_CONTEXT("fields in types section: " << in_types) {
+         BOOST_CHECK_NO_THROW(assert_global_state_shape(
+            global_state_program({"PreLaunch", "PostLaunch", "Refund", "Launching"}, in_types)));
+         // The variant the crank gates on renamed away, or the field not an enum.
+         BOOST_CHECK_THROW(assert_global_state_shape(global_state_program({"PreLaunch", "Live"}, in_types)),
+                           fc::assert_exception);
+         BOOST_CHECK_THROW(assert_global_state_shape(named_account_program(
+                              "GlobalState", {{"wire_state", prim(idl::primitive_type::u8)}}, in_types)),
+                           fc::assert_exception);
+      }
+   }
+} FC_LOG_AND_RETHROW();
+
+// The crank gates on the decoder's rendering of `GlobalState.wire_state` -- an
+// enum comes back as `{"variant": <name>}` -- and only PostLaunch is due.
+BOOST_AUTO_TEST_CASE(liq_yield_report_is_due_only_post_launch) try {
+   using sysio::outpost_solana_client_detail::liq_yield_report_due;
+   auto state = [](const char* variant) {
+      return fc::mutable_variant_object()("wire_state", fc::mutable_variant_object()("variant", variant));
+   };
+   BOOST_CHECK(liq_yield_report_due(state("PostLaunch")));
+   BOOST_CHECK(!liq_yield_report_due(state("PreLaunch")));
+   BOOST_CHECK(!liq_yield_report_due(state("Launching")));
+   BOOST_CHECK(!liq_yield_report_due(fc::mutable_variant_object()("paused", false)));
+   // A bare string is not the decoder's shape: never due rather than guessed.
+   BOOST_CHECK(!liq_yield_report_due(fc::mutable_variant_object()("wire_state", "PostLaunch")));
+} FC_LOG_AND_RETHROW();
+
+// The overrides cover every non-signer account `report_liq_yield` declares, and
+// derive each the way the program's `#[derive(Accounts)]` constraints do: the
+// Token-2022 ATAs of the pool and bucket authorities, the `UserRecord`s seeded
+// on those ATAs, the hook's extra-metas PDA, and Token-2022 itself as the token
+// program (the well-known table would have resolved legacy SPL Token).
+BOOST_AUTO_TEST_CASE(report_liq_yield_overrides_resolve_every_declared_account) try {
+   namespace accounts = manifest_detail::report_liq_yield_accounts;
+   auto prog = load_idl_fixture(opp_outpost_idl_fixture);
+   const idl::instruction* instr = prog.find_instruction("report_liq_yield");
+   BOOST_REQUIRE(instr != nullptr);
+
+   const auto program_id = measurement_pubkey(42);
+   const auto mint       = measurement_pubkey(90);
+   const auto hook       = measurement_pubkey(91);
+   const auto config     = measurement_pubkey(95);
+   const auto buffer     = measurement_pubkey(96);
+   const auto overrides  = manifest_detail::report_liq_yield_overrides(program_id, mint, hook, config, buffer);
+
+   size_t signers = 0;
+   for (const auto& acct : instr->accounts) {
+      if (acct.is_signer) { ++signers; continue; }   // the cranker is the client's own key
+      BOOST_CHECK_MESSAGE(overrides.contains(acct.name), "no override for '" << acct.name << "'");
+   }
+   BOOST_CHECK_EQUAL(signers, 1u);
+   BOOST_CHECK_EQUAL(overrides.size(), instr->accounts.size() - signers);
+
+   const auto& token_2022       = system::program_ids::TOKEN_2022_PROGRAM;
+   const auto  pool_authority   = manifest_detail::derive_liqsol_pool_authority_pda(program_id);
+   const auto  bucket_authority = manifest_detail::derive_liqsol_bucket_authority_pda(program_id);
+   const auto  pool_ata         = system::get_associated_token_address(pool_authority, mint, token_2022);
+   const auto  bucket_ata       = system::get_associated_token_address(bucket_authority, mint, token_2022);
+   BOOST_CHECK(overrides.at(accounts::liqsol_mint) == mint);
+   BOOST_CHECK(overrides.at(accounts::global_state) == manifest_detail::derive_liqsol_global_state_pda(program_id));
+   BOOST_CHECK(overrides.at(accounts::distribution_state) ==
+               manifest_detail::derive_liqsol_distribution_state_pda(program_id));
+   BOOST_CHECK(overrides.at(accounts::pool_authority) == pool_authority);
+   BOOST_CHECK(overrides.at(accounts::bucket_authority) == bucket_authority);
+   BOOST_CHECK(overrides.at(accounts::liqsol_pool_ata) == pool_ata);
+   BOOST_CHECK(overrides.at(accounts::bucket_token_account) == bucket_ata);
+   BOOST_CHECK(overrides.at(accounts::pool_user_record) ==
+               manifest_detail::derive_liqsol_user_record_pda(program_id, pool_ata));
+   BOOST_CHECK(overrides.at(accounts::bucket_user_record) ==
+               manifest_detail::derive_liqsol_user_record_pda(program_id, bucket_ata));
+   BOOST_CHECK(overrides.at(accounts::extra_account_meta_list) ==
+               manifest_detail::derive_extra_account_metas_pda(hook, mint));
+   BOOST_CHECK(overrides.at(accounts::liqsol_core_program) == program_id);
+   BOOST_CHECK(overrides.at(accounts::transfer_hook_program) == hook);
+   BOOST_CHECK(overrides.at(accounts::config) == config);
+   BOOST_CHECK(overrides.at(accounts::outbound_message_buffer) == buffer);
+   BOOST_CHECK(overrides.at(accounts::token_program) == token_2022);
+   BOOST_CHECK(overrides.at(accounts::associated_token_program) == system::program_ids::ASSOCIATED_TOKEN_PROGRAM);
+   BOOST_CHECK(overrides.at(accounts::system_program) == system::program_ids::SYSTEM_PROGRAM);
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(reserve_shape_rejects_drifted_declarations) try {

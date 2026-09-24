@@ -1,0 +1,737 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "account",
+            "base": "",
+            "fields": [
+                {
+                    "name": "balance",
+                    "type": "asset"
+                },
+                {
+                    "name": "index_checkpoint",
+                    "type": "uint128"
+                },
+                {
+                    "name": "owed_wire",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "addkicker",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sym",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "base_balance",
+                    "type": "int64"
+                },
+                {
+                    "name": "requested",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "addyield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "from",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                },
+                {
+                    "name": "target",
+                    "type": "symbol_code"
+                }
+            ]
+        },
+        {
+            "name": "claim",
+            "base": "",
+            "fields": [
+                {
+                    "name": "holder",
+                    "type": "name"
+                },
+                {
+                    "name": "sym",
+                    "type": "symbol_code"
+                }
+            ]
+        },
+        {
+            "name": "close",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "symbol",
+                    "type": "symbol"
+                }
+            ]
+        },
+        {
+            "name": "create",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sym",
+                    "type": "symbol"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "currency_stats",
+            "base": "",
+            "fields": [
+                {
+                    "name": "supply",
+                    "type": "asset"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "pair_symbol",
+                    "type": "symbol_code"
+                }
+            ]
+        },
+        {
+            "name": "cursor_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "desyndicate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "holder",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "import_credit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pubkey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "importdone",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "importsynd",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "credits",
+                    "type": "import_credit[]"
+                }
+            ]
+        },
+        {
+            "name": "linkswept",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "pubkey",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "liq_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "kicker_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "import_complete",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "liq_counters",
+            "base": "",
+            "fields": [
+                {
+                    "name": "next_request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "liq_cursor",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "last_sequence",
+                    "type": "uint64"
+                },
+                {
+                    "name": "last_epoch",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "mintsynd",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "sequence",
+                    "type": "uint64"
+                },
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "mintyield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "sequence",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "open",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "ram_payer",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "park",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "sequence",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "pubkey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "parked_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "symbol_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "uint64"
+                },
+                {
+                    "name": "pubkey",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "parked_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "pubkey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "holding",
+                    "type": "account"
+                }
+            ]
+        },
+        {
+            "name": "pending_yield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "queueyield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sym",
+                    "type": "symbol_code"
+                }
+            ]
+        },
+        {
+            "name": "recredit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "holder",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "regliqpool",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "pair_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "initial_chain_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "initial_wire_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "fee",
+                    "type": "int32"
+                },
+                {
+                    "name": "locked_shares",
+                    "type": "int64"
+                },
+                {
+                    "name": "conversion_horizon_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "depth_cap_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "clip_floor",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "setkicker",
+            "base": "",
+            "fields": [
+                {
+                    "name": "bps",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "sweep",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                }
+            ]
+        },
+        {
+            "name": "symbol_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "symbol_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "transfer",
+            "base": "",
+            "fields": [
+                {
+                    "name": "from",
+                    "type": "name"
+                },
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "yield_index",
+            "base": "",
+            "fields": [
+                {
+                    "name": "index",
+                    "type": "uint128"
+                },
+                {
+                    "name": "pot",
+                    "type": "uint64"
+                },
+                {
+                    "name": "carry",
+                    "type": "uint64"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "addkicker",
+            "type": "addkicker",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "addyield",
+            "type": "addyield",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "claim",
+            "type": "claim",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "close",
+            "type": "close",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "create",
+            "type": "create",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "desyndicate",
+            "type": "desyndicate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "importdone",
+            "type": "importdone",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "importsynd",
+            "type": "importsynd",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "linkswept",
+            "type": "linkswept",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "mintsynd",
+            "type": "mintsynd",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "mintyield",
+            "type": "mintyield",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "open",
+            "type": "open",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "park",
+            "type": "park",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "queueyield",
+            "type": "queueyield",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "recredit",
+            "type": "recredit",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "regliqpool",
+            "type": "regliqpool",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setkicker",
+            "type": "setkicker",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sweep",
+            "type": "sweep",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "transfer",
+            "type": "transfer",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "accounts",
+            "type": "account",
+            "index_type": "i64",
+            "key_names": ["scope","symbol_code"],
+            "key_types": ["name","uint64"],
+            "table_id": 25660
+        },
+        {
+            "name": "liqconfig",
+            "type": "liq_config",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 57729
+        },
+        {
+            "name": "liqcounters",
+            "type": "liq_counters",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 41070
+        },
+        {
+            "name": "liqcursors",
+            "type": "liq_cursor",
+            "index_type": "i64",
+            "key_names": ["chain_code"],
+            "key_types": ["uint64"],
+            "table_id": 19002
+        },
+        {
+            "name": "liqpending",
+            "type": "pending_yield",
+            "index_type": "i64",
+            "key_names": ["symbol_code"],
+            "key_types": ["uint64"],
+            "table_id": 38824
+        },
+        {
+            "name": "parked",
+            "type": "parked_row",
+            "index_type": "i64",
+            "key_names": ["symbol_code","chain_kind","pubkey"],
+            "key_types": ["uint64","uint64","bytes"],
+            "table_id": 38854
+        },
+        {
+            "name": "stat",
+            "type": "currency_stats",
+            "index_type": "i64",
+            "key_names": ["symbol_code"],
+            "key_types": ["uint64"],
+            "table_id": 4264,
+            "secondary_indexes": [
+                {
+                    "name": "bytoken",
+                    "key_type": "uint64",
+                    "table_id": 11724
+                }
+            ]
+        },
+        {
+            "name": "yieldidx",
+            "type": "yield_index",
+            "index_type": "i64",
+            "key_names": ["symbol_code"],
+            "key_types": ["uint64"],
+            "table_id": 3287
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": [],
+    "enums": [
+        {
+            "name": "ChainKind",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "CHAIN_KIND_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "CHAIN_KIND_WIRE",
+                    "value": 1
+                },
+                {
+                    "name": "CHAIN_KIND_EVM",
+                    "value": 2
+                },
+                {
+                    "name": "CHAIN_KIND_SVM",
+                    "value": 3
+                }
+            ]
+        }
+    ]
+}

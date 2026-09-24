@@ -679,6 +679,10 @@
             "base": "",
             "fields": [
                 {
+                    "name": "recipient",
+                    "type": "name"
+                },
+                {
                     "name": "amount",
                     "type": "int64"
                 }

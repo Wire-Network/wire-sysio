@@ -160,6 +160,16 @@ ethabi::contract address_argument_function(std::string name) {
    };
 }
 
+/** Build a function ABI with one uint16 argument. */
+ethabi::contract uint16_argument_function(std::string name) {
+   return ethabi::contract{
+      .name = std::move(name),
+      .type = ethabi::invoke_target_type::function,
+      .inputs = {ethabi::component_type{"attestationType", ethabi::data_type::uint16}},
+      .outputs = {},
+   };
+}
+
 /** Build a function ABI with one uint32 argument. */
 ethabi::contract uint32_argument_function(std::string name) {
    return ethabi::contract{
@@ -483,7 +493,8 @@ BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
       std::string(contract_address),
       {chunked_epoch_in_function("epochIn"), no_argument_function("nextEpochIndex"),
        no_argument_function("discardEnvelopeChunks"),
-       address_argument_function("envelopeChunkState")},
+       address_argument_function("envelopeChunkState"),
+       uint16_argument_function("attestationHandlers")},
    };
    // Both OPPInbound write wrappers — the per-chunk delivery and the staged
    // recovery — must be rejected by the policy before signing.
@@ -511,6 +522,13 @@ BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
    };
    uint32_t epoch = 1;
    expect_policy_rejection([&] { opp.emit_outbound_envelope(epoch); });
+
+   sysio::syndication_pool_contract_client pool{
+      client,
+      std::string(contract_address),
+      {no_argument_function("realizeYield")},
+   };
+   expect_policy_rejection([&] { pool.realize_yield(); });
 
    BOOST_CHECK_EQUAL(sign_count.load(), 0u);
    BOOST_CHECK_EQUAL(client->broadcast_count, 0u);

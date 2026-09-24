@@ -28,7 +28,7 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
 | `deliver` | operator | Batch operator delivers a chain with hash + messages |
 | `evalcons` | `sysio.msgch` | Evaluate consensus on a chain request |
 | `processmsg` | `sysio.msgch` | Process a READY message (unpack, route attestations) |
-| `queueout` | `sysio.msgch` | Queue an outbound message to an outpost |
+| `queueout` | `sysio.epoch`, `sysio.opreg`, `sysio.uwrit`, `sysio.reserv`, `sysio.liq`, or `sysio.msgch` | Queue an outbound message to an outpost |
 | `buildenv` | `sysio.msgch` | Build outbound envelope from queued messages |
 
 ## Dependencies
@@ -36,3 +36,9 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
 - Reads epoch state from `sysio.epoch`
 - Notifies `sysio.chalg` on consensus failure
 - Routes attestations to `sysio.epoch`, `sysio.uwrit`, `sysio.chalg`
+- Routes `SYNDICATE_LIQ` and `LIQ_YIELD` to `sysio.liq` (`mintsynd` for an AuthX-linked
+  user, `park` for an unlinked pubkey, `mintyield` for a yield report) once the payload's
+  token is an active `TOKEN_KIND_LIQ` row on `sysio.tokens` bound to the proven outpost
+  and, for a syndication, the user's key family is the outpost's own.
+  Every refusal is a logged drop, never an abort. `DESYNDICATE_LIQ` is outbound only:
+  `sysio.liq::desyndicate` queues it through `queueout`.

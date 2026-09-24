@@ -526,6 +526,27 @@ public:
       produce_blocks(1);
    }
 
+   /// The same for sysio.liq, the other capital drain: deployed and privileged
+   /// so a test can sign fundclaim as it.
+   void deploy_liq_for_signing() {
+      const account_name LIQ = "sysio.liq"_n;
+      if (!control->db().find<account_object, by_name>(LIQ)) {
+         create_accounts({ LIQ }, false, false, false, true);
+         produce_blocks(1);
+      }
+      if (get_roa_policy(LIQ, "nodedaddy"_n).is_null()) {
+         auto tr = addpolicy_ram_only("nodedaddy"_n, LIQ,
+            asset::from_string("500.0000 SYS"));
+         BOOST_REQUIRE( tr );
+         BOOST_REQUIRE( !tr->except );
+         produce_blocks(1);
+      }
+      set_code( LIQ, contracts::liq_wasm() );
+      set_abi ( LIQ, contracts::liq_abi().data() );
+      set_privileged( LIQ );
+      produce_blocks(1);
+   }
+
    /// Deploy the real sysio.reserv contract (privileged) so the swap-fee
    /// fold-in test can seed its rewards bucket via a swap. Mirrors
    /// deploy_dclaim_for_signing's account + ROA-policy + code pattern.
@@ -722,11 +743,11 @@ public:
       );
    }
 
-   action_result fundclaim( account_name signer, int64_t amount ) {
+   action_result fundclaim( account_name signer, account_name recipient, int64_t amount ) {
       return push_system_action(
          signer,
          "fundclaim"_n,
-         mvo()("amount", amount)
+         mvo()("recipient", recipient)("amount", amount)
       );
    }
 
@@ -5531,7 +5552,7 @@ BOOST_FIXTURE_TEST_CASE( pay_cadence_change_via_setemitcfg_takes_effect, sysio_e
 // fundclaim: per-onreward immediate funding for sysio.dclaim
 // ---------------------------------------------------------------------------
 
-BOOST_FIXTURE_TEST_CASE( fundclaim_requires_dclaim_auth, sysio_emissions_tester ) try {
+BOOST_FIXTURE_TEST_CASE( fundclaim_requires_the_recipients_auth, sysio_emissions_tester ) try {
    create_t5_holding_accounts();
    deploy_dclaim_for_signing();
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
@@ -5539,9 +5560,21 @@ BOOST_FIXTURE_TEST_CASE( fundclaim_requires_dclaim_auth, sysio_emissions_tester 
 
    // alice has no claim to sysio.dclaim's authority.
    create_user_accounts({ "alice"_n });
-   auto r = fundclaim( "alice"_n, int64_t(1'000'000) );
+   auto r = fundclaim( "alice"_n, "sysio.dclaim"_n, int64_t(1'000'000) );
    BOOST_REQUIRE( r != success() );
    require_substr( r, "missing authority of sysio.dclaim" );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( fundclaim_refuses_a_recipient_that_is_not_a_drain, sysio_emissions_tester ) try {
+   create_t5_holding_accounts();
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   // alice signs for herself; only the two drains may be funded.
+   create_user_accounts({ "alice"_n });
+   auto r = fundclaim( "alice"_n, "alice"_n, int64_t(1'000'000) );
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "recipient is not a capital drain" );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( fundclaim_transfers_and_tracks_distributed, sysio_emissions_tester ) try {
@@ -5555,7 +5588,7 @@ BOOST_FIXTURE_TEST_CASE( fundclaim_transfers_and_tracks_distributed, sysio_emiss
    const int64_t distributed_before = get_t5_state()["total_distributed"].as<int64_t>();
 
    const int64_t amt = int64_t(50'000'000'000);   // 50 WIRE
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, amt ) );
+   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, "sysio.dclaim"_n, amt ) );
 
    const asset sysio_after  = get_wire_balance_paid( config::system_account_name );
    const asset dclaim_after = get_wire_balance_paid( "sysio.dclaim"_n );
@@ -5576,8 +5609,8 @@ BOOST_FIXTURE_TEST_CASE( fundclaim_no_op_for_zero_or_negative, sysio_emissions_t
    const asset dclaim_before = get_wire_balance_paid( "sysio.dclaim"_n );
    const int64_t distributed_before = get_t5_state()["total_distributed"].as<int64_t>();
 
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, int64_t(0) ) );
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, int64_t(-100) ) );
+   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, "sysio.dclaim"_n, int64_t(0) ) );
+   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, "sysio.dclaim"_n, int64_t(-100) ) );
 
    BOOST_REQUIRE_EQUAL( get_wire_balance_paid( "sysio.dclaim"_n ).get_amount(),
                         dclaim_before.get_amount() );
@@ -5626,7 +5659,7 @@ BOOST_FIXTURE_TEST_CASE( fundclaim_caps_to_remaining_pool_and_records_shortfall,
    // Request 3x the headroom; expect partial transfer of `headroom`, shortfall = 2x.
    const int64_t request   = headroom * 3;
    const int64_t shortfall = request - headroom;
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, request ) );
+   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, "sysio.dclaim"_n, request ) );
 
    const asset dclaim_after = get_wire_balance_paid( "sysio.dclaim"_n );
    const auto state = get_t5_state();
@@ -5635,7 +5668,7 @@ BOOST_FIXTURE_TEST_CASE( fundclaim_caps_to_remaining_pool_and_records_shortfall,
    BOOST_REQUIRE_EQUAL( state["capital_shortfall_total"].as<int64_t>(), shortfall );
 
    // A further request after pool is exhausted is a full shortfall.
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, int64_t(500) ) );
+   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, "sysio.dclaim"_n, int64_t(500) ) );
    const auto state2 = get_t5_state();
    BOOST_REQUIRE_EQUAL( get_wire_balance_paid( "sysio.dclaim"_n ).get_amount(),
                         dclaim_after.get_amount() );
@@ -5650,10 +5683,28 @@ BOOST_FIXTURE_TEST_CASE( fundclaim_silent_when_t5state_missing, sysio_emissions_
    deploy_dclaim_for_signing();
    const asset dclaim_before = get_wire_balance_paid( "sysio.dclaim"_n );
 
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, int64_t(1'000'000) ) );
+   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, "sysio.dclaim"_n, int64_t(1'000'000) ) );
 
    BOOST_REQUIRE_EQUAL( get_wire_balance_paid( "sysio.dclaim"_n ).get_amount(),
                         dclaim_before.get_amount() );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( fundclaim_funds_the_liq_kicker_drain, sysio_emissions_tester ) try {
+   // sysio.liq draws the yield kicker through the same drain as sysio.dclaim.
+   create_t5_holding_accounts();
+   deploy_liq_for_signing();
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   const asset   liq_before         = get_wire_balance( "sysio.liq"_n );
+   const int64_t distributed_before = get_t5_state()["total_distributed"].as<int64_t>();
+
+   const int64_t amt = int64_t(2'000'000'000);   // 2 WIRE
+   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.liq"_n, "sysio.liq"_n, amt ) );
+
+   BOOST_REQUIRE_EQUAL( get_wire_balance( "sysio.liq"_n ).get_amount() - liq_before.get_amount(), amt );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["total_distributed"].as<int64_t>(), distributed_before + amt );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["capital_shortfall_total"].as<int64_t>(), 0 );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END() // t5_emissions_tests

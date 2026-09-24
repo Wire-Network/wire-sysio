@@ -124,6 +124,35 @@ chunk_resume_decision decide_chunk_resume(const envelope_chunk_state& staged,
                                           uint16_t                    total_chunks,
                                           uint32_t                    total_bytes);
 
+/// Why `SyndicationPool.realizeYield()` refused, read from the node's revert bytes.
+enum class realize_yield_refusal {
+   /// `WIRE_NoYield()`: the pool balance equals the principal.
+   no_yield,
+   /// `WIRE_YieldBelowDeadband(uint64 delta, uint64 deadband)`: accrued, but under
+   /// the contract's reporting floor.
+   below_deadband,
+   /// `WIRE_PoolUnderbacked(uint64 balanceDepot, uint64 principal)`: the balance
+   /// fell below the principal, a loss the `LIQYield` carrier cannot express.
+   underbacked
+};
+
+/// Classify `realizeYield()`'s revert bytes. `std::nullopt` for anything that is
+/// not one of the pool's own three refusals, exactly shaped (the selector alone,
+/// or the selector plus two words): a role error, a paused endpoint or a foreign
+/// implementation must not pass as a quiet no-op.
+///
+/// @param revert_data  `json_rpc_error::data`, the node's revert bytes as `0x`-hex.
+std::optional<realize_yield_refusal> classify_realize_yield_revert(std::string_view revert_data);
+
+/// The address in one raw `eth_call` word, as `0x`-hex, or `std::nullopt` when
+/// the hex is not exactly one word of hex digits with a zero 12-byte pad.
+std::optional<std::string> address_from_word(std::string_view raw_hex);
+
+/// True when `handler_address` names a contract the outpost routes to: neither
+/// `address(0)` (nothing registered) nor `ATTESTATION_BLACKHOLE` (governance
+/// dropped the type).
+bool is_routable_handler(std::string_view handler_address);
+
 } // namespace outpost_ethereum_client_detail
 
 /**
@@ -165,6 +194,13 @@ public:
                          const std::vector<char>& uic_bytes,
                          fc::microseconds         deadline) override;
 
+   /// The Ethereum crank: `SyndicationPool.realizeYield()` on the pool the
+   /// outpost registers as its `DESYNDICATE_LIQ` handler. Idle, at debug level,
+   /// while the ABI set carries no `realizeYield` (a deployment that predates
+   /// the pool) or no handler is registered; quiet when the pool has nothing to
+   /// report. Any other revert and any transport failure propagate.
+   void crank_outpost(uint32_t epoch_index, fc::microseconds deadline) override;
+
    // Expose for inspection / tests
    const ethereum_client_entry_ptr& entry()                       const { return _entry; }
    const std::string&               opp_address()                 const { return _opp_addr; }
@@ -175,8 +211,23 @@ public:
    /// compares it against `envelopeChunkState`'s `owner` on every multi-chunk
    /// delivery, so it is cached rather than re-derived per tick.
    const std::string&               signer_address_hex()          const { return _signer_address_hex; }
+   /// The liq syndication pool the crank drives, `0x`-hex, or empty until the
+   /// outpost's `DESYNDICATE_LIQ` handler has been discovered.
+   const std::string&               syndication_pool_address()    const { return _syndication_pool_addr; }
+   /// Bind the pool wrapper the crank drives to `address`, replacing whatever was
+   /// bound. Discovery goes through this; tests bind a wrapper whose
+   /// `realize_yield` is a stub.
+   void bind_syndication_pool(std::string address, std::shared_ptr<syndication_pool_contract_client> client);
 
 private:
+   /// The `DESYNDICATE_LIQ` handler the outpost routes to, read from
+   /// `OPPInbound.attestationHandlers` at `latest` (the routing table is
+   /// configuration, not delivered content), or `std::nullopt` when none is
+   /// registered or the word did not decode.
+   ///
+   /// @throws fc::exception on transport failure.
+   std::optional<std::string> discover_syndication_pool();
+
    /// Read `OPPInbound.envelopeChunkState(self)` at `latest` and decode it.
    ///
    /// `latest` is correct here (unlike `read_inbound_envelope`, which reads at
@@ -211,6 +262,11 @@ private:
    std::shared_ptr<opp_contract_client>                   _opp_client;
    std::shared_ptr<opp_inbound_contract_client>           _opp_inbound_client;
    std::shared_ptr<operator_registry_contract_client>     _operator_registry_client;  // nullable
+   /// The plugin's loaded ABI set, kept for the wrapper bound after construction.
+   std::vector<fc::network::ethereum::abi::contract>      _abis;
+   /// See `syndication_pool_address()` / `bind_syndication_pool`.
+   std::string                                            _syndication_pool_addr;
+   std::shared_ptr<syndication_pool_contract_client>      _syndication_pool_client;  // nullable
    /// Cached `0x`-hex signer address — see `signer_address_hex()`.
    std::string                                            _signer_address_hex;
    uint64_t                                               _outpost_id;

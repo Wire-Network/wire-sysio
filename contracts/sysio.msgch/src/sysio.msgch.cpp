@@ -2,6 +2,7 @@
 #include <sysio.epoch/sysio.epoch.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.chains/sysio.chains.hpp>
+#include <sysio.tokens/sysio.tokens.hpp>   // active-liq-token gate on the SYNDICATE_LIQ / LIQ_YIELD paths
 #include <sysio.chalg/sysio.chalg.hpp>     // dispute trigger + open-dispute gate (disputes table)
 #include <sysio.opreg/sysio.opreg.hpp>     // operator-status delivery gate (operators table)
 #include <sysio.roa.hpp>                    // authoritative Tier-1 electorate preflight
@@ -38,8 +39,10 @@ constexpr auto     UWRIT_ACCOUNT   = "sysio.uwrit"_n;
 constexpr auto     CHALG_ACCOUNT   = "sysio.chalg"_n;
 constexpr auto     AUTHEX_ACCOUNT  = "sysio.authex"_n;
 constexpr auto     CHAINS_ACCOUNT  = "sysio.chains"_n;
+constexpr auto     TOKENS_ACCOUNT  = "sysio.tokens"_n;
 constexpr auto     RESERV_ACCOUNT  = "sysio.reserv"_n;
 constexpr auto     ROA_ACCOUNT     = "sysio.roa"_n;
+constexpr auto     LIQ_ACCOUNT     = "sysio.liq"_n;
 
 // System-owned rows bill to the sysio RAM pool, not this contract account (privileged-contract
 // model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
@@ -246,50 +249,16 @@ void write_envelope_log(name self,
    }
 }
 
-/// Build a `sysio::public_key` variant from the raw bytes carried in
-/// `op_address.address` plus the originating chain. Inverse of
-/// opreg.cpp's `pubkey_to_bytes`. Returns an empty (default-constructed
-/// K1) variant for malformed input or unsupported chain kinds — the
-/// downstream `bypubkey` lookup then misses and the dispatch drops.
-sysio::public_key public_key_from_op_address(ChainKind chain,
-                                             const std::vector<char>& bytes) {
-   sysio::public_key pk;
-   switch (chain) {
-      case ChainKind::CHAIN_KIND_WIRE: {       // K1 — variant index 0
-         if (bytes.size() != 33) return pk;
-         sysio::ecc_public_key arr;
-         std::copy(bytes.begin(), bytes.end(), arr.begin());
-         pk.emplace<0>(arr);
-         return pk;
-      }
-      case ChainKind::CHAIN_KIND_EVM: {        // EM — variant index 3
-         if (bytes.size() != 33) return pk;
-         sysio::ecc_public_key arr;
-         std::copy(bytes.begin(), bytes.end(), arr.begin());
-         pk.emplace<3>(arr);
-         return pk;
-      }
-      case ChainKind::CHAIN_KIND_SVM: {        // ED — variant index 4
-         if (bytes.size() != 32) return pk;
-         sysio::ed_public_key arr;
-         std::copy(bytes.begin(), bytes.end(),
-                   reinterpret_cast<char*>(arr.data()));
-         pk.emplace<4>(arr);
-         return pk;
-      }
-      default:
-         return pk;
-   }
-}
-
 /// Resolve `op_address` (chain-kind + raw pubkey bytes) to the operator's
 /// WIRE account name via `sysio.authex::links`'s `bypubkey` index. Returns
 /// `name{}` (zero) on miss — caller treats that as "operator not linked,
 /// drop the attestation".
 name resolve_account_from_op_address(const opp::types::ChainAddress& op_address) {
-   sysio::public_key pk = public_key_from_op_address(op_address.kind,
-                                                     op_address.address);
-   auto digest = sysio::pubkey_to_checksum256(pk);
+   // No key a link could hold (unsupported kind, wrong width) is a miss, never a hash:
+   // `pubkey_to_checksum256` aborts on anything but an EM / ED variant.
+   const auto pk = public_key_from_op_address(op_address.kind, op_address.address);
+   if (!pk) return name{};
+   auto digest = sysio::pubkey_to_checksum256(*pk);
    sysio::authex::links_t links(AUTHEX_ACCOUNT);
    auto by_pubkey = links.get_index<"bypubkey"_n>();
    auto it = by_pubkey.find(digest);
@@ -358,6 +327,20 @@ name resolve_account_from_op_address(const opp::types::ChainAddress& op_address)
       }
    }
    return true;
+}
+
+/// The syndicating user's key family must be the proven outpost's own: an outpost of family F
+/// verifies and emits F-family keys only, so a key of another family is a forgery whatever it
+/// resolves to. `sysio.liq::park` refuses the other family for an unlinked key; this refuses it
+/// for every key, before the AuthX lookup could credit a linked one. Print + false, never a
+/// throw, for the reason `source_chain_binding_ok` gives.
+[[nodiscard]] bool user_kind_matches_chain(uint64_t proven_chain_code, ChainKind user_kind, const char* path) {
+   sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+   const auto row = chains_tbl.try_get(sysio::chains::chain_key{sysio::slug_name{proven_chain_code}});
+   if (row && row->kind == user_kind) return true;
+   sysio::print("msgch::", path, ": DROP attestation -- user kind ", std::string(magic_enum::enum_name(user_kind)),
+                " is not the proven source outpost's chain family\n");
+   return false;
 }
 
 /// Reinterpret an exactly-32-byte protobuf `bytes` field as a checksum256. Returns std::nullopt
@@ -643,6 +626,74 @@ void dispatch_underwrite_commit(name self, const std::vector<char>& data, uint64
                       uic_reserve_code,
                       data)
    ).send();
+}
+
+/// True iff `(chain_code, token_code)` is an active TOKEN_KIND_LIQ registry row bound to an
+/// active chaintokens row: the only tokens the shadow ledger mints against.
+bool is_active_liq_token(sysio::slug_name chain_code, sysio::slug_name token_code) {
+   sysio::tokens::tokens_t tokens(TOKENS_ACCOUNT);
+   const auto token = tokens.try_get(sysio::tokens::token_key{ token_code });
+   if (!token || !token->active || token->kind != opp::types::TOKEN_KIND_LIQ) return false;
+   sysio::tokens::chaintokens_t bindings(TOKENS_ACCOUNT);
+   const auto binding = bindings.try_get(sysio::tokens::chain_token_key{ chain_code, token_code });
+   return binding && binding->active;
+}
+
+/// SYNDICATE_LIQ: a user syndicated liq on the outpost. The pubkey resolves through authex; a
+/// linked user is credited by `sysio.liq::mintsynd`, an unlinked one parked by `sysio.liq::park`
+/// until the link exists. sysio.liq re-checks the token, the amount and the sequence and drops
+/// (never aborts) what it cannot credit. Never-throw: every refusal here is a print + return.
+void dispatch_syndicate_liq(name self, const std::vector<char>& data, uint64_t chain_code) {
+   opp::attestations::SyndicateLIQ synd;
+   {
+      auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
+      if (in(synd) != zpp::bits::errc{}) return;
+   }
+   if (!source_chain_binding_ok(chain_code, synd.chain_code, "dispatch_syndicate_liq")) return;
+   if (!user_kind_matches_chain(chain_code, synd.user.kind, "dispatch_syndicate_liq")) return;
+   const std::optional<uint64_t> amount =
+      sysio::opp::safe::to_depot_amount(static_cast<int64_t>(synd.amount.amount));
+   if (!amount) return;
+   const sysio::slug_name chain_code_slug{chain_code};
+   const sysio::slug_name token_code{synd.amount.token_code};
+   if (!is_active_liq_token(chain_code_slug, token_code)) {
+      sysio::print("msgch::dispatch_syndicate_liq: DROP attestation -- token is not an active liq token\n");
+      return;
+   }
+   const uint64_t sequence = synd.sequence;
+   const name account = resolve_account_from_op_address(synd.user);
+   if (account != name{}) {
+      action(permission_level{self, "active"_n}, LIQ_ACCOUNT, "mintsynd"_n,
+             std::make_tuple(chain_code_slug, sequence, account, token_code, *amount)).send();
+   } else {
+      action(permission_level{self, "active"_n}, LIQ_ACCOUNT, "park"_n,
+             std::make_tuple(chain_code_slug, sequence, synd.user.kind, synd.user.address, token_code, *amount)).send();
+   }
+}
+
+/// LIQ_YIELD: the outpost claimed yield for its syndicated pool since its last report. It lands
+/// in sysio.liq's pending balance (`mintyield`); the permissionless `queueyield` hands it to the
+/// swap later, so nothing that can throw sits on this path.
+void dispatch_liq_yield(name self, const std::vector<char>& data, uint64_t chain_code) {
+   opp::attestations::LIQYield report;
+   {
+      auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
+      if (in(report) != zpp::bits::errc{}) return;
+   }
+   if (!source_chain_binding_ok(chain_code, report.chain_code, "dispatch_liq_yield")) return;
+   const std::optional<uint64_t> amount =
+      sysio::opp::safe::to_depot_amount(static_cast<int64_t>(report.amount.amount));
+   if (!amount) return;
+   const sysio::slug_name chain_code_slug{chain_code};
+   const sysio::slug_name token_code{report.amount.token_code};
+   if (!is_active_liq_token(chain_code_slug, token_code)) {
+      sysio::print("msgch::dispatch_liq_yield: DROP attestation -- token is not an active liq token\n");
+      return;
+   }
+   const uint64_t sequence = report.sequence;
+   const uint64_t epoch    = report.epoch;
+   action(permission_level{self, "active"_n}, LIQ_ACCOUNT, "mintyield"_n,
+          std::make_tuple(chain_code_slug, sequence, epoch, token_code, *amount)).send();
 }
 
 /// Dispatch a RESERVE_CREATE attestation to sysio.reserv::oncrtreserve.
@@ -950,6 +1001,19 @@ void dispatch_attestation(name self, uint64_t attestation_id,
                                sr.share_bps)
             ).send();
          }
+         break;
+
+      case AttestationType::ATTESTATION_TYPE_SYNDICATE_LIQ:
+         dispatch_syndicate_liq(self, data, chain_code);
+         break;
+
+      case AttestationType::ATTESTATION_TYPE_LIQ_YIELD:
+         dispatch_liq_yield(self, data, chain_code);
+         break;
+
+      case AttestationType::ATTESTATION_TYPE_DESYNDICATE_LIQ:
+         // Depot -> outpost outbound-only (sysio.liq::desyndicate queues it). An
+         // outpost echoing one inbound is a benign no-op.
          break;
 
       case AttestationType::ATTESTATION_TYPE_RESERVE_CREATE:
@@ -1768,10 +1832,10 @@ void msgch::queueout(uint64_t chain_code,
    // call it directly and inject a forged attestation that buildenv() then packs into the
    // depot's group-signed outbound envelope — a forged SWAP_REMIT / WITHDRAW_REMIT / SLASH that
    // the outpost authenticates by the group signature and executes. The intended callers
-   // (sysio.epoch / .opreg / .uwrit / .reserv) each send under their own {self, active} authority;
-   // get_self() permits msgch's own inline use and governance.
+   // (sysio.epoch / .opreg / .uwrit / .reserv / .liq) each send under their own {self, active}
+   // authority; get_self() permits msgch's own inline use and governance.
    check(has_auth(EPOCH_ACCOUNT) || has_auth(OPREG_ACCOUNT) || has_auth(UWRIT_ACCOUNT) ||
-         has_auth(RESERV_ACCOUNT) || has_auth(get_self()),
+         has_auth(RESERV_ACCOUNT) || has_auth(LIQ_ACCOUNT) || has_auth(get_self()),
          "queueout: caller not authorized to queue outbound attestations");
 
    // The chains registry is the ONLY authority on which chain codes exist.
