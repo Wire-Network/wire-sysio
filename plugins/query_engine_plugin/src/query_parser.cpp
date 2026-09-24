@@ -55,7 +55,7 @@ public:
          result.owners.push_back(identifier(root->owner));
       }
       for (auto* owner : root->ownerName()) {
-         budget.assert_limit(result.owners.size() + 1, constants::max_owners, "query-max-owners");
+         budget.assert_limit(result.owners.size() + 1, constants::max_owners, bound::owners);
          node();
          result.owners.push_back(owner->STRING() ? unquote(owner->STRING()->getText())
                                                  : identifier(owner->identifier()));
@@ -117,7 +117,7 @@ private:
 
    /// Charge a conservative full node including vector growth and temporary copies.
    void node() {
-      budget.assert_limit(++nodes, constants::max_ast_nodes, "query-max-ast-nodes");
+      budget.assert_limit(++nodes, constants::max_ast_nodes, bound::nodes);
       budget.charge_memory(2 * sizeof(predicate));
    }
    /// Obtain the start location without retaining a token pointer.
@@ -259,14 +259,14 @@ ast_query parse_query(std::string_view sql, query_budget& budget) {
    std::vector<uint32_t> parentheses;
    parentheses.reserve(constants::max_depth);
    for (uint32_t count = 0;; ++count) {
-      budget.assert_limit(count, constants::max_tokens, "query-max-tokens");
+      budget.assert_limit(count, constants::max_tokens, bound::tokens);
       const auto type = tokens.LT(1)->getType();
       if (type == antlr4::Token::EOF)
          break;
       if (type == WireQueryLexer::NOT) {
          ++unary;
       } else if (type == WireQueryLexer::LPAREN) {
-         budget.assert_limit(nesting + unary + 1, constants::max_depth, "query-max-depth");
+         budget.assert_limit(nesting + unary + 1, constants::max_depth, bound::depth);
          parentheses.push_back(unary + 1);
          nesting += unary + 1;
          unary = 0;
@@ -277,7 +277,7 @@ ast_query parse_query(std::string_view sql, query_budget& budget) {
          }
          unary = 0;
       }
-      budget.assert_limit(nesting + unary, constants::max_depth, "query-max-depth");
+      budget.assert_limit(nesting + unary, constants::max_depth, bound::depth);
       tokens.consume();
    }
    tokens.seek(0);

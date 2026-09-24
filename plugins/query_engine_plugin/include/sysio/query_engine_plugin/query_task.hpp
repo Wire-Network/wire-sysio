@@ -12,7 +12,7 @@ struct query_task {
    std::atomic<bool> completed{false};
    bool succeeded = false;
    uint64_t returned_rows = 0;
-   uint64_t scanned_rows = 0, raw_bytes = 0, accounted_bytes = 0;
+   uint64_t scanned_rows = 0, raw_bytes = 0, peak_accounted_bytes = 0;
    std::function<void(const query_task&)> retire;
    /// The engine installs retirement only after admission; no controller ownership escapes this lifetime.
    ~query_task() {

@@ -86,6 +86,10 @@ public:
    /// effective read-only read window less its minimum, fixed during initialization. Zero when no
    /// read-only threads are configured.
    fc::microseconds get_read_only_max_transaction_time() const;
+   /// End of the current read-only window. Meaningful on a read-only thread inside that window, where
+   /// it is the deadline push_read_only_transaction applies to a read-only transaction; exposed so other
+   /// read-exclusive work stops at the window's end as well.
+   fc::time_point get_read_only_window_deadline() const;
 
    void add_greylist_accounts(const greylist_params& params);
    void remove_greylist_accounts(const greylist_params& params);

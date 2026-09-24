@@ -52,7 +52,22 @@ The application tests also execute queries with HTTP registered but disabled, an
 without a listener, using one/two read threads. The plugin requires chain_plugin and
 producer_plugin. Integration tests cover ABI enum names in results and literals, columns named
 `key`/`value`, decode accounting over a 16k-row scan at the default limits, timestamps outside the
-four-digit-year range, and case-insensitive checksum literals.
+four-digit-year range, case-insensitive checksum literals, every primary-key range predicate against
+a forced full scan, which limit each budget case reports, arrays of extension-only structs skipped
+element by element, several `fixed_bytes<32>` fields in one row type, retained memory that does not
+scale with scanned rows, and the `fasp` table whose id 0xFFFF sits at the partition boundary
+(forward query and reverse page). `query_rpc` pins the error envelope (code, retryability, position,
+limit name, echoed ID) and the capture-bound clamp for a short timeout; `query_language` pins the
+token bound below the node bound and quoted keywords as identifiers; lifecycle tests stop the HTTP
+handler with requests in flight and re-queue a read the window cut short, restoring the cut attempt's
+charges (rows and bytes against an uncut reference run, every counter at unit level), naming the
+window in a later deadline failure over both the C++ and the HTTP path until a retry succeeds, and
+never retrying a capture that overran its own budget; `query_execute` pins the caller-owned budget
+contract (required, single use). Integration tests also pin that a text extreme,
+finalized aggregates and the engine's peak statistic track live state. The application tests pin the
+read-exclusive queue (a write window longer than the deadline times a query out), the capture budget
+derived from the read window, and that the plugin binds the window on every read (the capture
+deadline a budget carries after an engine run, and the plugin's window function on a read thread).
 
 Every implementation/parser namespace is `sysio::query_engine`; the appbase plugin name is
 `sysio::query_engine_plugin`.

@@ -145,6 +145,13 @@ struct abi_serializer {
       };
    }
 
+   /// The member of an ABI enum carrying the given underlying value, or nullptr for an unlisted value.
+   static const enum_value_def* find_enum_member_by_value( const enum_def& definition, int64_t value );
+   /// The member of an ABI enum spelled by `name`: the exact member name, else the single member whose
+   /// name ends in '_' followed by `name` (members commonly share a prefix derived from the type name,
+   /// so "ethereum" binds "chain_kind_ethereum"). Nullptr when nothing matches or the suffix is ambiguous.
+   static const enum_value_def* find_enum_member_by_name( const enum_def& definition, std::string_view name );
+
 private:
 
    map<type_name, type_name, std::less<>>     typedefs;

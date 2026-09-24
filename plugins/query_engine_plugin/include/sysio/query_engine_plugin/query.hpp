@@ -34,7 +34,6 @@ inline constexpr uint32_t decimal_places = 18;
 inline constexpr uint32_t page_rows = 512;
 /// Explicit opt-out of the end-to-end deadline. Unset options use the configured `query-timeout-ms`.
 inline constexpr std::chrono::milliseconds no_deadline = std::chrono::milliseconds::max();
-inline constexpr uint64_t microseconds_per_millisecond = 1000;
 inline constexpr uint32_t accumulator_bits = 256;
 inline constexpr uint32_t comparison_bits = 512;
 inline constexpr uint32_t decimal_base = 10;
@@ -42,6 +41,19 @@ inline constexpr auto value_namespace = "value";
 inline constexpr auto key_namespace = "key";
 inline constexpr size_t max_owners = 64;
 } // namespace constants
+
+/// Names reported in `error.data.limit` for the fixed parser/ABI bounds and for the chain's read
+/// window. None is a query-plugin option, so none carries the `query-` prefix the options use.
+namespace bound {
+inline constexpr auto tokens = "sql-tokens";
+inline constexpr auto depth = "sql-depth";
+inline constexpr auto nodes = "sql-nodes";
+inline constexpr auto owners = "sql-owners";
+inline constexpr auto abi_depth = "abi-depth";
+inline constexpr auto abi_nodes = "abi-nodes";
+/// producer_plugin's read window option: a capture stops at the window's end even inside its own budget.
+inline constexpr auto read_window = "read-only-read-window-time-us";
+} // namespace bound
 
 /// Stable response member names, shared by capture, evaluation and RPC serialization.
 namespace response_field {
@@ -107,10 +119,10 @@ namespace defaults {
 inline constexpr uint32_t worker_threads = 2;
 inline constexpr uint32_t max_in_flight = 4;
 inline constexpr uint32_t max_query_bytes = 16384;
-inline constexpr uint32_t timeout_ms = 1000;
+inline constexpr std::chrono::milliseconds timeout{1000};
 /// Capture budget of a directly constructed engine. The plugin replaces it with producer_plugin's
 /// read-only transaction budget unless `query-max-capture-ms` is set explicitly.
-inline constexpr uint64_t max_capture_us = 50000;
+inline constexpr std::chrono::microseconds max_capture{50000};
 inline constexpr uint32_t max_abi_bytes = 1048576;
 inline constexpr uint64_t max_scan_rows = 100000;
 inline constexpr uint64_t max_raw_bytes = 67108864;
@@ -125,9 +137,10 @@ struct query_config {
    uint32_t worker_threads = defaults::worker_threads;
    uint32_t max_in_flight = defaults::max_in_flight;
    uint32_t max_query_bytes = defaults::max_query_bytes;
-   uint32_t timeout_ms = defaults::timeout_ms;
+   /// Request deadline including queue time; the default of every per-call deadline.
+   std::chrono::milliseconds timeout = defaults::timeout;
    /// One coherent capture callback may hold the chain's read window for at most this long.
-   uint64_t max_capture_us = defaults::max_capture_us;
+   std::chrono::microseconds max_capture = defaults::max_capture;
    uint32_t max_abi_bytes = defaults::max_abi_bytes;
    uint64_t max_scan_rows = defaults::max_scan_rows;
    uint64_t max_raw_bytes = defaults::max_raw_bytes;
@@ -183,27 +196,43 @@ struct query_error : std::runtime_error {
 };
 
 /// Budget is owned for the request's full lifetime. Cancellation is cross-thread;
-/// counters are touched only by the one running stage. Allocation charges are conservative;
-/// only the transient charges of one decoded row are released, once that row has been folded
-/// into retained state and its decoded values are gone.
+/// counters are touched only by the one running stage. Allocation charges are conservative:
+/// transient charges (a decoded row, a finalized group, a read attempt the window cut short) are
+/// released once the values they covered are gone, while retained state stays charged.
 class query_budget {
 public:
    using clock = std::chrono::steady_clock;
    using now_function = std::function<clock::time_point()>;
+   /// The counters one read callback charges. A read the window cut short restores them before its
+   /// retry, so only the attempt that completed is accounted; the peak keeps its high-water mark.
+   struct charges {
+      uint64_t scanned_rows = 0;
+      uint64_t raw_bytes = 0;
+      uint64_t accounted_bytes = 0;
+   };
+   /// The counters as they stand, taken before a read attempt.
+   charges checkpoint() const noexcept;
+   /// Return the counters to a checkpoint; peak_accounted_bytes keeps its high-water mark.
+   void restore(const charges& saved) noexcept;
    explicit query_budget(query_config, now_function now = clock::now,
                          const std::optional<query_options>& options = std::nullopt);
-   /// Check cancellation and the absolute admission deadline.
+   /// Check cancellation and the absolute admission deadline; a deadline failure is deadline_error().
    void check() const;
-   /// Check the tighter coherent capture deadline in addition to the request deadline.
-   void check_capture(clock::time_point capture_start) const;
+   /// The request-deadline failure: QUERY_TIMEOUT, naming the read window while a read it cut short
+   /// is waiting for or running in the next window.
+   query_error deadline_error() const;
+   /// Check the tighter coherent capture deadline in addition to the request deadline: the capture
+   /// budget measured from its start, and the read window's own end when `capture_deadline` is set,
+   /// which counts the cut in read_window_cuts.
+   void check_capture(clock::time_point capture_start);
    /// Charge before allocation. Arithmetic checks precede counter mutation.
    void charge_memory(uint64_t bytes);
    /// Return charges of values that no longer exist; never releases more than is accounted.
    void release_memory(uint64_t bytes) noexcept;
    /// Charge source rows and raw bytes, also charging the total memory budget.
    void charge_raw(uint64_t rows, uint64_t bytes);
-   /// Fail with QUERY_LIMIT if value exceeds maximum, naming the violated option.
-   void assert_limit(uint64_t value, uint64_t maximum, const char* option) const;
+   /// Fail with QUERY_LIMIT if value exceeds maximum, naming the violated option or bound.
+   void assert_limit(uint64_t value, uint64_t maximum, const char* limit) const;
    /// Monotonic elapsed time used for result stats and deterministic tests.
    uint64_t elapsed_us() const;
    query_config config;
@@ -211,10 +240,21 @@ public:
    now_function now;
    clock::time_point started;
    clock::time_point deadline;
+   /// End of the chain read window a capture runs in, set by the read API before each read.
+   std::optional<clock::time_point> capture_deadline;
+   /// Set when the read window cuts an attempt short, cleared once an attempt succeeds; a deadline
+   /// failure in between names the window.
+   std::atomic<bool> cut_by_read_window{false};
+   /// Set by the engine that runs this budget: a budget serves exactly one call.
+   std::atomic<bool> claimed{false};
+   /// Read attempts the window's own end cut short, counted by check_capture().
+   std::atomic<uint64_t> read_window_cuts{0};
    std::atomic<bool> cancelled{false};
    uint64_t scanned_rows = 0;
    uint64_t raw_bytes = 0;
    uint64_t accounted_bytes = 0;
+   /// Highest accounted_bytes reached, unaffected by releases.
+   uint64_t peak_accounted_bytes = 0;
 };
 
 /// Exact, checked integer arithmetic; no host floating-point conversion is permitted.
@@ -356,8 +396,8 @@ struct type_descriptor {
    std::vector<field_descriptor> fields;
    std::shared_ptr<const type_descriptor> element;
    std::vector<std::shared_ptr<const type_descriptor>> alternatives;
-   /// ABI enum members; the primitive is the enum's underlying integer type.
-   std::vector<chain::enum_value_def> members;
+   /// ABI enum definition; the primitive is the enum's underlying integer type.
+   std::optional<chain::enum_def> enumeration;
 };
 
 /// Table metadata. Only the owner, ABI sequence and raw ABI bytes are read inside a chain read
@@ -461,7 +501,7 @@ private:
 ast_query parse_query(std::string_view, query_budget&);
 /// Hash and decode the copied ABI bytes and select the queried table. Worker only, never in a read callback.
 void resolve_schema(table_schema&, const std::string& table, query_budget&);
-/// Compile copied ABI, bind the query, and select a provably safe primary range.
+/// Compile resolved ABI, bind the query, and select a provably safe primary range.
 typed_plan create_plan(ast_query, std::vector<table_schema>, query_budget&);
 /// Evaluate all captured input with exact types before applying LIMIT.
 query_result evaluate(const typed_plan&, captured_input, query_budget&);
@@ -475,16 +515,20 @@ std::string format_time(int64_t microseconds);
 /// Parse the format_time() representation (optional sign, at least four year digits, optional
 /// fraction of at most six digits, optional Z) into microseconds, rejecting out-of-range instants.
 int64_t parse_time(std::string_view);
-/// Compare compatible non-null scalars exactly; containers/opaque floats are rejected.
+/// Compare compatible non-null scalars exactly; containers/opaque floats are rejected, as are
+/// assets of different denominations (see equal_values for `=`/`!=`).
 int compare_values(const value&, const value&);
+/// Equality of compatible non-null scalars, where assets of different denominations are unequal
+/// rather than an error.
+bool equal_values(const value&, const value&);
 /// Whether two scalar logical types may be compared: identical, or both numeric-like
 /// (integer, decimal, enumeration).
 bool comparable(logical_type, logical_type);
 /// Normalize a value into the public, recursively number-free cell encoding.
 fc::variant to_cell(const value&, query_budget&);
 /// Convert a string literal using a known scalar ABI type; no implicit general coercion. Checksum
-/// and byte literals are canonicalized to exact-length lowercase hex; enum literals resolve member
-/// names (exact, then the abi_serializer's prefix-stripped match) or the underlying integer.
+/// and byte literals are canonicalized to exact-length lowercase hex; enum literals resolve an
+/// integer spelling, else a member name through abi_serializer's rules (exact, then unique suffix).
 value coerce_literal(value, const type_descriptor&);
 /// Resolve aliases, inheritance and bounded container descriptors in copied ABI metadata.
 void compile_schema(table_schema&, query_budget&);

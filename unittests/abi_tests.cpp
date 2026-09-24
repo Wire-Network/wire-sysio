@@ -3528,6 +3528,19 @@ BOOST_AUTO_TEST_CASE(enum_types)
       ],
    })";
 
+   // Members sharing a type-derived prefix: the part after the last '_' binds only when unique.
+   auto enum_abi_prefixed = R"({
+      "version": "sysio::abi/1.1",
+      "structs": [],
+      "enums": [
+         {"name": "tier", "type": "uint8", "values": [
+            {"name": "TIER_A", "value": 1},
+            {"name": "LEVEL_A", "value": 2},
+            {"name": "TIER_B", "value": 3}
+         ]}
+      ],
+   })";
+
    auto duplicate_enum_abi = R"({
       "version": "sysio::abi/1.1",
       "enums": [
@@ -3626,8 +3639,9 @@ BOOST_AUTO_TEST_CASE(enum_types)
       BOOST_CHECK_EQUAL(fc::to_hex(bytes4), "02");
 
       // Test variant -> binary (invalid enum name)
+      const auto invalid_message = "Unknown or ambiguous enum value 'INVALID' for enum 'my_status'";
       BOOST_CHECK_EXCEPTION( abis.variant_to_binary("my_status", fc::json::from_string(R"("INVALID")"), yield_fn()),
-                             pack_exception, fc_exception_message_starts_with("Unknown enum value 'INVALID' for enum 'my_status'") );
+                             pack_exception, fc_exception_message_starts_with(invalid_message) );
 
       // Test enum in struct context (round trip)
       auto struct_json = R"({"status":"ACTIVE","user":"alice"})";
@@ -3645,6 +3659,27 @@ BOOST_AUTO_TEST_CASE(enum_types)
 
       auto var_c = abis16.binary_to_variant("my_enum16", bytes_c, yield_fn());
       BOOST_CHECK_EQUAL(var_c.as_string(), "C");
+
+      // Suffix binding through the shared resolver: exact names win, a unique suffix binds, an
+      // ambiguous suffix is rejected instead of silently taking the first member.
+      const auto prefixed_def = fc::json::from_string(enum_abi_prefixed).as<abi_def>();
+      abi_serializer prefixed(prefixed_def, yield_fn());
+      const auto tier_bytes = [&](const char* json) {
+         return fc::to_hex(prefixed.variant_to_binary("tier", fc::json::from_string(json), yield_fn()));
+      };
+      BOOST_CHECK_EQUAL(tier_bytes(R"("LEVEL_A")"), "02");
+      BOOST_CHECK_EQUAL(tier_bytes(R"("B")"), "03");
+      BOOST_CHECK_EXCEPTION( tier_bytes(R"("A")"), pack_exception,
+                             fc_exception_message_starts_with("Unknown or ambiguous enum value 'A' for enum 'tier'") );
+      const auto& tier = prefixed_def.enums.value.front();
+      BOOST_REQUIRE(abi_serializer::find_enum_member_by_name(tier, "TIER_B"));
+      BOOST_CHECK_EQUAL(abi_serializer::find_enum_member_by_name(tier, "TIER_B")->value, 3);
+      BOOST_CHECK_EQUAL(abi_serializer::find_enum_member_by_name(tier, "B")->value, 3);
+      BOOST_CHECK(!abi_serializer::find_enum_member_by_name(tier, "A"));
+      BOOST_CHECK(!abi_serializer::find_enum_member_by_name(tier, "TIER"));
+      BOOST_REQUIRE(abi_serializer::find_enum_member_by_value(tier, 2));
+      BOOST_CHECK_EQUAL(abi_serializer::find_enum_member_by_value(tier, 2)->name, "LEVEL_A");
+      BOOST_CHECK(!abi_serializer::find_enum_member_by_value(tier, 9));
 
       // is_enum check
       BOOST_CHECK(abis.is_enum("my_status"));

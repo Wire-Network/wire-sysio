@@ -2,6 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <chrono>
 #include <limits>
 
 using namespace sysio::query_engine;
@@ -128,10 +129,10 @@ BOOST_AUTO_TEST_CASE(enum_literals_bind_member_names_and_values) {
    status.abi_type = "position_status";
    status.logical = logical_type::enumeration;
    status.primitive = primitive_type::uint8;
-   status.members = {
-      {"POSITION_STATUS_OPEN",     0},
-      {"POSITION_STATUS_CLOSED",   1},
-      {"POSITION_STATUS_ARCHIVED", 5}
+   status.enumeration = sysio::chain::enum_def{
+      "position_status",
+      "uint8",
+      {{"POSITION_STATUS_OPEN", 0}, {"POSITION_STATUS_CLOSED", 1}, {"POSITION_STATUS_ARCHIVED", 5}}
    };
    value literal;
    literal.null = false;
@@ -158,5 +159,105 @@ BOOST_AUTO_TEST_CASE(enum_literals_bind_member_names_and_values) {
    BOOST_CHECK(!comparable(logical_type::enumeration, logical_type::text));
    query_budget budget({});
    BOOST_CHECK_EQUAL(to_cell(closed, budget).as_string(), "POSITION_STATUS_CLOSED");
+}
+
+/// An integer spelling binds its value before any member suffix, and an ambiguous suffix is an error.
+BOOST_AUTO_TEST_CASE(enum_literals_prefer_integers_and_reject_ambiguous_suffixes) {
+   type_descriptor tier;
+   tier.abi_type = "tier";
+   tier.logical = logical_type::enumeration;
+   tier.primitive = primitive_type::uint8;
+   tier.enumeration = sysio::chain::enum_def{
+      "tier", "uint8", {{"TIER_0", 1}, {"TIER_A", 2}, {"LEVEL_A", 3}, {"TIER_B", 4}}
+   };
+   value literal;
+   literal.null = false;
+   // An unlisted value keeps its decimal rendering; it never re-binds to TIER_0 by suffix.
+   literal.text = "0";
+   const auto zero = coerce_literal(literal, tier);
+   BOOST_CHECK_EQUAL(zero.numerator.convert_to<std::string>(), "0");
+   BOOST_CHECK_EQUAL(zero.text, "0");
+   literal.text = "1";
+   BOOST_CHECK_EQUAL(coerce_literal(literal, tier).text, "TIER_0");
+   literal.text = "B";
+   BOOST_CHECK_EQUAL(coerce_literal(literal, tier).text, "TIER_B");
+   literal.text = "LEVEL_A";
+   BOOST_CHECK_EQUAL(coerce_literal(literal, tier).numerator.convert_to<std::string>(), "3");
+   literal.text = "A";
+   BOOST_CHECK_EXCEPTION(coerce_literal(literal, tier), query_error,
+                         [](const auto& error) { return error.kind == error_kind::VALUE_ERROR; });
+}
+
+/// Assets of different denominations are unequal under `=`; ordering them remains an error.
+BOOST_AUTO_TEST_CASE(mixed_denominations_are_unequal_but_unordered) {
+   type_descriptor asset;
+   asset.primitive = primitive_type::asset;
+   asset.logical = logical_type::asset;
+   value sys;
+   sys.null = false;
+   sys.text = "1.0000 SYS";
+   sys = coerce_literal(sys, asset);
+   value usd = sys;
+   usd.symbol = "USD";
+   BOOST_CHECK(!equal_values(sys, usd));
+   BOOST_CHECK(equal_values(sys, sys));
+   BOOST_CHECK_THROW(compare_values(sys, usd), query_error);
+   value coarse = sys;
+   coarse.precision = 2;
+   BOOST_CHECK(!equal_values(sys, coarse));
+}
+
+/// The budget records its high-water mark independently of releases, and a capture stops at the
+/// read window's end even inside its own budget.
+BOOST_AUTO_TEST_CASE(peak_accounting_and_read_window_deadline) {
+   query_budget budget({});
+   budget.charge_memory(100);
+   budget.release_memory(60);
+   budget.charge_memory(10);
+   BOOST_CHECK_EQUAL(budget.accounted_bytes, 50);
+   BOOST_CHECK_EQUAL(budget.peak_accounted_bytes, 100);
+   std::chrono::microseconds elapsed{0};
+   query_budget windowed({}, [&] { return query_budget::clock::time_point{} + elapsed; });
+   const auto started = windowed.now();
+   constexpr auto window = std::chrono::milliseconds(5);
+   windowed.capture_deadline = started + window;
+   elapsed = window - std::chrono::microseconds(1);
+   BOOST_CHECK_NO_THROW(windowed.check_capture(started));
+   elapsed = window;
+   BOOST_CHECK_EXCEPTION(windowed.check_capture(started), query_error, [](const auto& error) {
+      return error.kind == error_kind::QUERY_TIMEOUT && error.limit == bound::read_window;
+   });
+   BOOST_CHECK_EQUAL(windowed.read_window_cuts.load(), 1);
+   // The cut sets the flag, so the request-deadline failure names the window until an attempt succeeds.
+   BOOST_CHECK(windowed.deadline_error().limit == bound::read_window);
+   BOOST_CHECK(windowed.deadline_error().kind == error_kind::QUERY_TIMEOUT);
+   windowed.cut_by_read_window = false;
+   BOOST_CHECK(!windowed.deadline_error().limit);
+   // The capture budget itself neither counts as a cut nor labels the deadline.
+   query_budget budgeted({}, [&] { return query_budget::clock::time_point{} + elapsed; });
+   BOOST_CHECK(!budgeted.deadline_error().limit);
+   elapsed = defaults::max_capture;
+   BOOST_CHECK_EXCEPTION(budgeted.check_capture(started), query_error, [](const auto& error) {
+      return error.kind == error_kind::QUERY_TIMEOUT && error.limit == option::max_capture_ms;
+   });
+   BOOST_CHECK_EQUAL(budgeted.read_window_cuts.load(), 0);
+   BOOST_CHECK(!budgeted.deadline_error().limit);
+}
+
+/// A checkpoint restores every counter a read charged, while the peak keeps its high-water mark.
+BOOST_AUTO_TEST_CASE(checkpoint_restores_read_charges_but_not_the_peak) {
+   query_budget budget({});
+   budget.charge_raw(2, 20);
+   budget.charge_memory(30);
+   const auto saved = budget.checkpoint();
+   budget.charge_raw(3, 300);
+   budget.charge_memory(1000);
+   BOOST_CHECK_EQUAL(budget.scanned_rows, 5);
+   BOOST_CHECK_EQUAL(budget.peak_accounted_bytes, 1350);
+   budget.restore(saved);
+   BOOST_CHECK_EQUAL(budget.scanned_rows, 2);
+   BOOST_CHECK_EQUAL(budget.raw_bytes, 20);
+   BOOST_CHECK_EQUAL(budget.accounted_bytes, 50);
+   BOOST_CHECK_EQUAL(budget.peak_accounted_bytes, 1350);
 }
 BOOST_AUTO_TEST_SUITE_END()

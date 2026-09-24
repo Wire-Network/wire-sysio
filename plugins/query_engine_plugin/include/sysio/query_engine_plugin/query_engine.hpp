@@ -11,10 +11,13 @@ namespace sysio::query_engine {
 /// Observable stages used for deterministic scheduling and lifecycle tests.
 enum class query_stage { parse, describe, plan, capture, evaluate };
 
-/// Cumulative engine counters, copied under its mutex. Returned rows count completed execution results.
+/// Cumulative engine counters, copied under its mutex. Returned rows count completed execution results;
+/// read_window_cuts counts chain reads the read window ended early, retried in the next window while
+/// the request deadline allows.
 struct service_stats {
    uint64_t accepted = 0, completed = 0, rejected_busy = 0, timed_out = 0, cancelled = 0;
    uint64_t scanned_rows = 0, returned_rows = 0, capture_bytes = 0, peak_accounted_bytes = 0;
+   uint64_t read_window_cuts = 0;
    uint64_t in_flight = 0;
    std::array<uint64_t, magic_enum::enum_count<error_kind>()> failed{};
 };
@@ -34,6 +37,10 @@ public:
    query_result execute(const std::string& query, const std::optional<query_options>& options = std::nullopt) override;
    /// Create a request budget using this engine's immutable caps and monotonic clock.
    std::shared_ptr<query_budget> create_budget(const std::optional<query_options>& options = std::nullopt) const;
+   /// Execute against a caller-owned budget from this engine's create_budget(), used for exactly one
+   /// call; its non-atomic members may be read once the call returned successfully. HTTP keeps
+   /// ingress, queue time, execution and serialization in the same budget this way.
+   query_result execute(const std::string& query, std::shared_ptr<query_budget>);
    /// Read startup caps; HTTP uses the configured timeout for its own per-call options.
    const query_config& config() const;
    /// Cancel, drain/join workers, and invalidate the source before controller shutdown.
@@ -45,8 +52,6 @@ public:
 
 private:
    friend class query_http_handler;
-   /// HTTP keeps ingress, queue time, execution and serialization in the same budget.
-   query_result execute(const std::string& query, std::shared_ptr<query_budget>);
    /// Share throttled diagnostics and SIGHUP logger rebinding with the optional HTTP adapter.
    void report_internal(const std::string& detail);
    struct impl;
