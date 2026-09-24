@@ -2449,25 +2449,6 @@ std::string to_raw_cursor(std::string_view key) {
    return fc::to_hex(key.data(), static_cast<uint32_t>(key.size()), /*add_prefix=*/true);
 }
 
-/// Exclusive upper bound for a scope's key range: \p prefix with its last byte
-/// incremented, carrying left. Writes it to \p out and returns true.
-///
-/// Returns false when every byte is 0xFF and no successor exists — iteration then
-/// stops at the table_id boundary on its own, so the caller wants no upper bound.
-bool scope_exclusive_upper(const std::vector<char>& prefix, std::vector<char>& out) {
-   out = prefix;
-   for (auto it = out.rbegin(); it != out.rend(); ++it) {
-      // Unsigned on purpose: `char` is signed here, so incrementing 0x7F in place
-      // would be signed overflow. The wrap to zero IS the carry into the next byte,
-      // so no separate carry flag is needed.
-      const unsigned char carried = static_cast<unsigned char>(*it) + 1;
-      *it = static_cast<char>(carried);
-      if (carried != 0)
-         return true;
-   }
-   return false;
-}
-
 read_only::get_table_rows_return_t
 read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
    abi_def abi = sysio::chain_apis::get_abi( db, p.code );
@@ -2749,7 +2730,9 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       if (has_upper) {
          if (!ub_complete)
             ub_bytes = prepend_scope(ub_bytes);
-      } else if (scope_exclusive_upper(scope_prefix_bytes, ub_bytes)) {
+      } else if (auto scope_upper = primary_prefix_upper(scope_prefix_bytes)) {
+         // No successor (an all-0xFF prefix) leaves the scan to stop at the table_id boundary.
+         ub_bytes  = std::move(*scope_upper);
          has_upper = true;
       }
    }
