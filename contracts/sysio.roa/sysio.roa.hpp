@@ -19,6 +19,9 @@ namespace sysio {
             /**
              * @brief Initializes sysio.roa, should be called as last step in Bios Boot Sequence, activating the ROA resource management system.
              *
+             * Reserves every node-owner tier slot and carves 1/10 of each tier-1 slot's allocation out to
+             * `sysio` up front as the account-creation RAM pool; node owners later register against the rest.
+             *
              * @param total_sys The total starting SYS of the network.
              * @param bytes_per_unit The amount of bytes .0001 SYS is worth, set in roastate table. If SYS precision is different, same concept applies, the single smallest unit of the core token.
              */
@@ -273,7 +276,7 @@ namespace sysio {
             struct [[sysio::table("nodeowners")]] nodeowners {
                 name owner;          // Node Owners account name.
                 uint8_t tier;        // Represents what tier they hold: 1, 2, or 3
-                asset total_sys;     // Total SYS alloted based on tier.
+                asset total_sys;     // SYS alloted based on tier, net of sysio's tier-1 carve-out.
                 asset allocated_sys; // Total SYS allocated via policies they issued.
                 asset allocated_bw;  // Total SYS allocated to CPU / NET.
                 asset allocated_ram; // Total SYS allocated to RAM.
@@ -452,11 +455,10 @@ namespace sysio {
 
             /**
              * @brief Registers 'owner' as a Node Owner scoped by network_gen, granting the tier's SYS
-             *        allotment and contributing 10% of it to the network RAM pool.
+             *        allotment (net of sysio's tier-1 share, which activateroa already carved out).
              *
              * Every tier gets a `nodeowners` row (the budget and the membership that gates policy
-             * issuance), a reslimit row, and a policy granting 10% of the tier allocation to `sysio`
-             * for the account-creation RAM pool.
+             * issuance) and a reslimit row.
              *
              * Only tier 1 additionally gets a personal self-issued policy. It is the only tier that can
              * call `newuser`, whose `sponsors` / `sponsorcount` rows are the sole writes in this
@@ -519,9 +521,10 @@ namespace sysio {
 
 
             /**
-             * @brief A simple getter for totall allotted SYS based on tier number: 1, 2, 3. Matches rounding and logic used in activation.
+             * @brief A node owner's SYS budget for tier 1, 2, or 3: the tier allocation, net of sysio's
+             *        carve-out for tier 1. Matches the rounding activateroa uses to size the reserve.
              *
-             * @return An asset containing the amount of SYS this tier gets
+             * @return An asset containing the amount of SYS a node owner of this tier may issue
              */
             asset get_allocation_for_tier(uint8_t tier);
 
