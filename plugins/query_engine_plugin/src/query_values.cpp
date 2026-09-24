@@ -1,16 +1,18 @@
 #include <fc/crypto/hex.hpp>
 #include <fc/io/raw.hpp>
 #include <fc/slug_name.hpp>
+#include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/asset.hpp>
 #include <sysio/chain/block_timestamp.hpp>
 #include <sysio/query_engine_plugin/query.hpp>
 
-#include <boost/date_time/posix_time/posix_time.hpp>
-
+#include <fmt/format.h>
 #include <magic_enum/magic_enum.hpp>
 
 #include <algorithm>
 #include <array>
+#include <limits>
+#include <map>
 #include <set>
 #include <tuple>
 
@@ -29,30 +31,87 @@ constexpr uint32_t float64_bytes = 8;
 constexpr uint32_t float128_bytes = 16;
 constexpr uint32_t scalar_allocation_bytes = 512;
 constexpr uint32_t node_allocation_factor = 2;
+constexpr uint64_t abi_decode_allocation_factor = 8;
 constexpr uint8_t sign_bit = 0x80;
-constexpr auto epoch_date = "1970-01-01";
-constexpr size_t timestamp_seconds_length = 19;
+constexpr char enum_member_separator = '_';
 constexpr size_t timestamp_fraction_digits = 6;
+constexpr size_t minimum_year_digits = 4;
+constexpr size_t maximum_year_digits = 7; // int64 microseconds span years within +-292277
+constexpr int64_t maximum_plain_year = 9999;
+constexpr char date_separator = '-';
+constexpr char time_separator = 'T';
+constexpr char clock_separator = ':';
+constexpr char fraction_separator = '.';
+constexpr char utc_designator = 'Z';
+constexpr char positive_sign = '+';
+constexpr int64_t microseconds_per_second = 1000000;
+constexpr int64_t seconds_per_minute = 60;
+constexpr int64_t minutes_per_hour = 60;
+constexpr int64_t hours_per_day = 24;
+constexpr int64_t seconds_per_day = hours_per_day * minutes_per_hour * seconds_per_minute;
+constexpr int64_t microseconds_per_day = seconds_per_day * microseconds_per_second;
+// Proleptic Gregorian calendar arithmetic (Howard Hinnant's days_from_civil / civil_from_days):
+// eras of 400 years starting on March 1st, so leap days fall at the end of each shifted year.
+constexpr int64_t civil_epoch_shift = 719468; // days from 0000-03-01 to 1970-01-01
+constexpr int64_t years_per_era = 400;
+constexpr int64_t days_per_era = 146097;
+constexpr int64_t days_per_year = 365;
+constexpr int64_t days_per_leap_cycle = 1460;
+constexpr int64_t days_per_century = 36524;
+constexpr int64_t last_day_of_era = days_per_era - 1;
+constexpr int64_t days_per_five_months = 153;
+constexpr int64_t month_shift_offset = 2;
+constexpr int64_t months_before_march = 2;
+constexpr int64_t months_after_february = 9;
+constexpr int64_t months_from_march = 10;
+constexpr int64_t years_per_leap = 4;
+constexpr int64_t years_per_century = 100;
+constexpr unsigned months_per_year = 12;
+constexpr unsigned february = 2;
+constexpr unsigned days_per_month[months_per_year] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 using stream = fc::datastream<const char*>;
 using namespace chain;
 
-/// Use the chain's date codec with microsecond precision; fc::time_point's JSON codec truncates to milliseconds.
-std::string format_time(int64_t microseconds) {
-   const boost::posix_time::ptime epoch(boost::gregorian::from_simple_string(epoch_date));
-   return boost::posix_time::to_iso_extended_string(epoch + boost::posix_time::microseconds(microseconds));
+/// A calendar date in the proleptic Gregorian calendar; year 0 and negative years are valid.
+struct civil_date {
+   int64_t year = 0;
+   unsigned month = 1;
+   unsigned day = 1;
+};
+
+/// Calendar date of a day count relative to 1970-01-01, exact for the whole int64 microsecond range.
+civil_date civil_from_days(int64_t days) {
+   days += civil_epoch_shift;
+   const int64_t era = (days >= 0 ? days : days - last_day_of_era) / days_per_era;
+   const int64_t day_of_era = days - era * days_per_era;
+   const int64_t year_of_era =
+      (day_of_era - day_of_era / days_per_leap_cycle + day_of_era / days_per_century - day_of_era / last_day_of_era) /
+      days_per_year;
+   const int64_t day_of_year =
+      day_of_era - (days_per_year * year_of_era + year_of_era / years_per_leap - year_of_era / years_per_century);
+   const int64_t shifted_month = (5 * day_of_year + month_shift_offset) / days_per_five_months;
+   const auto day =
+      static_cast<unsigned>(day_of_year - (days_per_five_months * shifted_month + month_shift_offset) / 5 + 1);
+   const auto month = static_cast<unsigned>(shifted_month < months_from_march ? shifted_month + months_before_march + 1
+                                                                              : shifted_month - months_after_february);
+   return {year_of_era + era * years_per_era + (month <= months_before_march), month, day};
 }
 
-/// Parse UTC timestamps exactly, rejecting fractions that would be silently truncated by the date codec.
-int64_t parse_time(std::string text) {
-   if (text.ends_with('Z'))
-      text.pop_back();
-   if (text.size() < timestamp_seconds_length ||
-       (text.size() > timestamp_seconds_length &&
-        (text[timestamp_seconds_length] != '.' || text.size() == timestamp_seconds_length + 1 ||
-         text.size() > timestamp_seconds_length + 1 + timestamp_fraction_digits)))
-      throw query_error(error_kind::VALUE_ERROR, "Invalid timestamp literal");
-   const boost::posix_time::ptime epoch(boost::gregorian::from_simple_string(epoch_date));
-   return (boost::posix_time::from_iso_extended_string(text) - epoch).total_microseconds();
+/// Day count relative to 1970-01-01 of a proleptic Gregorian date.
+int64_t days_from_civil(int64_t year, unsigned month, unsigned day) {
+   year -= month <= months_before_march;
+   const int64_t era = (year >= 0 ? year : year - (years_per_era - 1)) / years_per_era;
+   const int64_t year_of_era = year - era * years_per_era;
+   const int64_t shifted_month =
+      month > months_before_march ? month - months_before_march - 1 : month + months_after_february;
+   const int64_t day_of_year = (days_per_five_months * shifted_month + month_shift_offset) / 5 + day - 1;
+   const int64_t day_of_era =
+      year_of_era * days_per_year + year_of_era / years_per_leap - year_of_era / years_per_century + day_of_year;
+   return era * days_per_era + day_of_era - civil_epoch_shift;
+}
+
+bool is_leap_year(int64_t year) {
+   return (year % years_per_leap == 0 && year % years_per_century != 0) || year % years_per_era == 0;
 }
 
 /// Reduce positive-denominator rationals before narrowing to the accumulator width.
@@ -121,6 +180,73 @@ logical_type primitive_logical(primitive_type type) {
    default:
       return logical_type::text;
    }
+}
+
+/// The ABI member name of an enum's underlying value, or its decimal spelling for an unlisted value
+/// (the abi_serializer's fallback).
+std::string enum_member_name(const type_descriptor& type, const integer& underlying) {
+   for (const auto& member : type.members)
+      if (integer(member.value) == underlying)
+         return member.name;
+   return underlying.convert_to<std::string>();
+}
+
+/// Lowercase hex of exactly `bytes` octets, or of any whole number of octets when unspecified.
+std::string canonical_hex(std::string text, std::optional<size_t> bytes) {
+   if ((bytes && text.size() != *bytes * 2) || text.size() % 2 != 0)
+      throw query_error(error_kind::VALUE_ERROR, "Invalid hex literal length");
+   for (auto& character : text) {
+      if ((character >= '0' && character <= '9') || (character >= 'a' && character <= 'f'))
+         continue;
+      if (character >= 'A' && character <= 'F') {
+         character = static_cast<char>(character - 'A' + 'a');
+         continue;
+      }
+      throw query_error(error_kind::VALUE_ERROR, "Invalid hex literal");
+   }
+   return text;
+}
+
+/// Re-render a cryptographic literal through the same variant codec the decoder uses, so any accepted
+/// spelling (legacy prefix or typed prefix) binds in the decoder's canonical form.
+template <typename T>
+std::string canonical_crypto_text(const std::string& text) {
+   fc::variant rendered;
+   fc::to_variant(fc::variant(text).as<T>(), rendered);
+   return rendered.as_string();
+}
+
+/// Bind an enum literal: exact member name, then the abi_serializer's prefix-stripped match, then the
+/// underlying integer spelling. The stored text is always the canonical member name.
+value coerce_enumeration(value source, const type_descriptor& expected) {
+   for (const auto& member : expected.members) {
+      if (member.name != source.text)
+         continue;
+      source.numerator = member.value;
+      source.type = logical_type::enumeration;
+      return source;
+   }
+   for (const auto& member : expected.members) {
+      const auto separator = member.name.rfind(enum_member_separator);
+      if (separator == std::string::npos || member.name.substr(separator + 1) != source.text)
+         continue;
+      source.numerator = member.value;
+      source.text = member.name;
+      source.type = logical_type::enumeration;
+      return source;
+   }
+   value number;
+   try {
+      number = parse_number(source.text);
+   } catch (const query_error&) {
+      throw query_error(error_kind::VALUE_ERROR, "Unknown enum member");
+   }
+   if (number.type != logical_type::integer)
+      throw query_error(error_kind::VALUE_ERROR, "Unknown enum member");
+   source.numerator = number.numerator;
+   source.text = enum_member_name(expected, source.numerator);
+   source.type = logical_type::enumeration;
+   return source;
 }
 
 /// Bounded descriptor compiler; recursive ABI graphs cannot reach the decoder.
@@ -209,8 +335,14 @@ public:
       for (const auto& enumeration : abi.enums.value) {
          if (enumeration.name != name)
             continue;
+         // An enum decodes as its underlying integer and renders as its member name, like get_table_rows.
          *result = *create(enumeration.type, depth + 1);
+         if (result->kind != type_kind::primitive || result->logical != logical_type::integer)
+            throw query_error(error_kind::QUERY_SEMANTICS, "ABI enum requires an integer underlying type");
+         budget.charge_memory(enumeration.values.size() * sizeof(enum_value_def) * node_allocation_factor);
          result->abi_type = name;
+         result->logical = logical_type::enumeration;
+         result->members = enumeration.values;
          return result;
       }
       throw query_error(error_kind::QUERY_SEMANTICS, "Unsupported ABI type");
@@ -393,13 +525,13 @@ value decode_primitive(const type_descriptor& type, stream& input, query_budget&
    case primitive_type::time_point_sec: {
       const auto time = unpack<fc::time_point_sec>(input);
       result.numerator = time.to_time_point().time_since_epoch().count();
-      result.text = time.to_iso_string();
+      result.text = format_time(time.to_time_point().time_since_epoch().count());
       break;
    }
    case primitive_type::block_timestamp_type: {
       const auto time = unpack<chain::block_timestamp_type>(input).to_time_point();
       result.numerator = time.time_since_epoch().count();
-      result.text = time.to_iso_string();
+      result.text = format_time(time.time_since_epoch().count());
       break;
    }
    case primitive_type::asset:
@@ -459,10 +591,172 @@ value decode_primitive(const type_descriptor& type, stream& input, query_budget&
       break;
    }
    }
+   if (type.logical == logical_type::enumeration)
+      result.text = enum_member_name(type, result.numerator);
    return result;
 }
 
-/// Normalize a complete row recursively using precompiled, acyclic descriptors.
+/// Advance past one unreferenced primitive without materializing it.
+void skip_bytes(stream& input, size_t bytes) {
+   if (bytes > input.remaining())
+      throw query_error(error_kind::ROW_DECODE_ERROR, "Truncated scalar");
+   input.skip(bytes);
+}
+
+/// Skip one primitive. Fixed-width families skip by size; length-prefixed ones read their prefix;
+/// the variable cryptographic and bitset codecs reuse the bounded decoder and discard its value.
+void skip_primitive(const type_descriptor& type, stream& input, query_budget& budget) {
+   switch (type.primitive) {
+   case primitive_type::boolean:
+   case primitive_type::int8:
+   case primitive_type::uint8:
+      skip_bytes(input, sizeof(uint8_t));
+      return;
+   case primitive_type::int16:
+   case primitive_type::uint16:
+      skip_bytes(input, sizeof(uint16_t));
+      return;
+   case primitive_type::int32:
+   case primitive_type::uint32:
+      skip_bytes(input, sizeof(uint32_t));
+      return;
+   case primitive_type::int64:
+   case primitive_type::uint64:
+   case primitive_type::varint_int64:
+   case primitive_type::varint_uint64:
+      skip_bytes(input, sizeof(uint64_t));
+      return;
+   case primitive_type::int128:
+   case primitive_type::uint128:
+      skip_bytes(input, sizeof(fc::uint128));
+      return;
+   case primitive_type::varint32:
+      unpack<fc::signed_int>(input);
+      return;
+   case primitive_type::varuint32:
+      unpack<fc::unsigned_int>(input);
+      return;
+   case primitive_type::float32:
+      skip_bytes(input, float32_bytes);
+      return;
+   case primitive_type::float64:
+      skip_bytes(input, float64_bytes);
+      return;
+   case primitive_type::float128:
+      skip_bytes(input, float128_bytes);
+      return;
+   case primitive_type::name:
+      skip_bytes(input, sizeof(chain::name));
+      return;
+   case primitive_type::slug_name:
+      skip_bytes(input, sizeof(uint64_t));
+      return;
+   case primitive_type::time_point:
+      skip_bytes(input, sizeof(fc::time_point));
+      return;
+   case primitive_type::time_point_sec:
+      skip_bytes(input, sizeof(fc::time_point_sec));
+      return;
+   case primitive_type::block_timestamp_type:
+      skip_bytes(input, sizeof(chain::block_timestamp_type));
+      return;
+   case primitive_type::asset:
+      skip_bytes(input, sizeof(asset));
+      return;
+   case primitive_type::extended_asset:
+      skip_bytes(input, sizeof(extended_asset));
+      return;
+   case primitive_type::string:
+   case primitive_type::bytes:
+      skip_bytes(input, unpack<fc::unsigned_int>(input).value);
+      return;
+   case primitive_type::checksum160:
+      skip_bytes(input, sizeof(checksum160_type));
+      return;
+   case primitive_type::checksum256:
+      skip_bytes(input, sizeof(checksum256_type));
+      return;
+   case primitive_type::checksum512:
+      skip_bytes(input, sizeof(checksum512_type));
+      return;
+   case primitive_type::symbol:
+      skip_bytes(input, sizeof(symbol));
+      return;
+   case primitive_type::symbol_code:
+      skip_bytes(input, sizeof(symbol_code));
+      return;
+   case primitive_type::public_key:
+   case primitive_type::signature:
+   case primitive_type::bitset:
+      decode_primitive(type, input, budget);
+      return;
+   }
+   throw query_error(error_kind::ROW_DECODE_ERROR, "Invalid ABI descriptor");
+}
+
+/// Whether a node can occupy zero bytes, so a length prefix cannot be bounded by the remaining input.
+bool zero_sized(const type_descriptor& type) {
+   switch (type.kind) {
+   case type_kind::extension:
+      return true;
+   case type_kind::structure:
+      return std::all_of(type.fields.begin(), type.fields.end(),
+                         [](const auto& field) { return zero_sized(*field.type); });
+   case type_kind::primitive:
+   case type_kind::optional:
+   case type_kind::array:
+   case type_kind::variant:
+      return false;
+   }
+   return false;
+}
+
+/// Advance past one unreferenced node of any kind, validating only the structure needed to find its end.
+void skip_node(const type_descriptor& type, stream& input, query_budget& budget, uint32_t depth) {
+   budget.check();
+   budget.assert_limit(depth, constants::max_depth, "abi-depth");
+   switch (type.kind) {
+   case type_kind::primitive:
+      skip_primitive(type, input, budget);
+      return;
+   case type_kind::optional: {
+      const auto present = unpack<uint8_t>(input);
+      if (present > 1)
+         throw query_error(error_kind::ROW_DECODE_ERROR, "Invalid optional tag");
+      if (present)
+         skip_node(*type.element, input, budget, depth + 1);
+      return;
+   }
+   case type_kind::extension:
+      if (input.remaining())
+         skip_node(*type.element, input, budget, depth + 1);
+      return;
+   case type_kind::structure:
+      for (const auto& field : type.fields)
+         skip_node(*field.type, input, budget, depth + 1);
+      return;
+   case type_kind::array: {
+      const auto size = unpack<fc::unsigned_int>(input).value;
+      if (zero_sized(*type.element))
+         return;
+      if (size > input.remaining())
+         throw query_error(error_kind::ROW_DECODE_ERROR, "Invalid array length");
+      for (uint32_t i = 0; i < size; ++i)
+         skip_node(*type.element, input, budget, depth + 1);
+      return;
+   }
+   case type_kind::variant: {
+      const auto index = unpack<fc::unsigned_int>(input).value;
+      if (index >= type.alternatives.size())
+         throw query_error(error_kind::ROW_DECODE_ERROR, "Invalid variant tag");
+      skip_node(*type.alternatives[index], input, budget, depth + 1);
+      return;
+   }
+   }
+   throw query_error(error_kind::ROW_DECODE_ERROR, "Invalid ABI descriptor");
+}
+
+/// Normalize a complete node recursively using precompiled, acyclic descriptors.
 fc::variant decode_node(const type_descriptor& type, stream& input, query_budget& budget, uint32_t depth = 0) {
    budget.check();
    budget.assert_limit(depth, constants::max_depth, "abi-depth");
@@ -535,12 +829,14 @@ value from_cell(const fc::variant& cell, const type_descriptor& type) {
       result.precision = asset[field_precision].as_uint64();
       if (type.logical == logical_type::extended_asset)
          result.contract = asset[field_contract].as_string();
-   } else {
+   } else if (type.logical == logical_type::ieee_hex)
       result.text = cell.as_string();
-      if (type.logical == logical_type::time)
-         result.type = logical_type::text;
-      if (type.logical != logical_type::ieee_hex)
-         result = coerce_literal(std::move(result), type);
+   else {
+      // Text-family cells (text, time, enumeration) re-enter through literal coercion, which
+      // restores their exact binary form from the rendered spelling.
+      result.text = cell.as_string();
+      result.type = logical_type::text;
+      result = coerce_literal(std::move(result), type);
    }
    result.primitive = type.primitive;
    return result;
@@ -585,22 +881,152 @@ fc::variant decode_key_node(be_key_codec::reader& input, const be_key_codec::key
    }
    budget.charge_memory(input.remaining() * node_allocation_factor);
    const auto raw = be_key_codec::decode_field(input, shape.kind);
-   if (type.logical == logical_type::integer) {
-      if (raw.is_int64())
-         return std::to_string(raw.as_int64());
-      if (raw.is_uint64())
-         return std::to_string(raw.as_uint64());
-      return raw.as_string();
+   if (type.logical == logical_type::integer || type.logical == logical_type::enumeration) {
+      const auto digits = raw.is_int64()    ? std::to_string(raw.as_int64())
+                          : raw.is_uint64() ? std::to_string(raw.as_uint64())
+                                            : raw.as_string();
+      return type.logical == logical_type::enumeration ? enum_member_name(type, integer(digits)) : digits;
    }
    return raw;
 }
 } // namespace
+
+/// Which bound slots a decoded node feeds: the node itself, and deeper paths by ABI field name.
+struct row_decoder::interest {
+   std::vector<size_t> slots;
+   std::map<std::string, interest> children;
+   bool empty() const { return slots.empty() && children.empty(); }
+};
+
+namespace {
+/// Group the plan's bound fields of one namespace by their ABI path.
+std::unique_ptr<const row_decoder::interest> create_interest(const typed_plan& plan, bool key) {
+   auto root = std::make_unique<row_decoder::interest>();
+   for (size_t slot = 0; slot < plan.fields.size(); ++slot) {
+      const auto& field = plan.fields[slot];
+      if (field.key != key)
+         continue;
+      auto* node = root.get();
+      for (const auto& component : field.path)
+         node = &node->children[component];
+      node->slots.push_back(slot);
+   }
+   return root;
+}
+
+/// Fill every slot beneath a materialized cell by walking the interest tree along the cell's members.
+void assign_cell(const typed_plan& plan, const fc::variant& cell, const row_decoder::interest& interest,
+                 std::vector<value>& slots) {
+   for (const auto slot : interest.slots)
+      slots[slot] = from_cell(cell, *plan.fields[slot].type);
+   if (cell.is_null())
+      return; // every deeper slot stays null
+   for (const auto& [name, child] : interest.children)
+      assign_cell(plan, cell.get_object()[name], child, slots);
+}
+
+/// Decode the referenced parts of one node: a bound primitive decodes directly, a bound container
+/// is materialized once and its deeper slots are read from the cell, and an unbound struct member is
+/// skipped without allocation. An absent optional/extension leaves its slots null.
+void decode_bound(const typed_plan& plan, const type_descriptor& type, const row_decoder::interest& interest,
+                  stream& input, query_budget& budget, std::vector<value>& slots, uint32_t depth) {
+   budget.check();
+   budget.assert_limit(depth, constants::max_depth, "abi-depth");
+   switch (type.kind) {
+   case type_kind::optional: {
+      const auto present = unpack<uint8_t>(input);
+      if (present > 1)
+         throw query_error(error_kind::ROW_DECODE_ERROR, "Invalid optional tag");
+      if (present)
+         decode_bound(plan, *type.element, interest, input, budget, slots, depth + 1);
+      return;
+   }
+   case type_kind::extension:
+      if (input.remaining())
+         decode_bound(plan, *type.element, interest, input, budget, slots, depth + 1);
+      return;
+   case type_kind::primitive: {
+      if (!interest.children.empty())
+         throw query_error(error_kind::ROW_DECODE_ERROR, "Field path must traverse structs");
+      const auto decoded = decode_primitive(type, input, budget);
+      for (const auto slot : interest.slots)
+         slots[slot] = decoded;
+      return;
+   }
+   case type_kind::structure:
+   case type_kind::array:
+   case type_kind::variant:
+      if (!interest.slots.empty()) {
+         assign_cell(plan, decode_node(type, input, budget, depth), interest, slots);
+         return;
+      }
+      if (type.kind != type_kind::structure)
+         throw query_error(error_kind::ROW_DECODE_ERROR, "Field path must traverse structs");
+      for (const auto& field : type.fields) {
+         const auto child = interest.children.find(field.name);
+         if (child == interest.children.end())
+            skip_node(*field.type, input, budget, depth + 1);
+         else
+            decode_bound(plan, *field.type, child->second, input, budget, slots, depth + 1);
+      }
+      return;
+   }
+   throw query_error(error_kind::ROW_DECODE_ERROR, "Invalid ABI descriptor");
+}
+} // namespace
+
+row_decoder::row_decoder(const typed_plan& plan)
+   : plan(plan)
+   , value_interest(create_interest(plan, false))
+   , key_interest(create_interest(plan, true)) {}
+
+row_decoder::~row_decoder() = default;
+
+std::vector<value> row_decoder::decode(const chain_apis::owned_table_row& row, query_budget& budget) const {
+   try {
+      budget.charge_memory(plan.fields.size() * sizeof(value) * node_allocation_factor);
+      std::vector<value> slots(plan.fields.size());
+      for (size_t slot = 0; slot < plan.fields.size(); ++slot) {
+         slots[slot].type = plan.fields[slot].type->logical;
+         slots[slot].primitive = plan.fields[slot].type->primitive;
+      }
+      const auto& schema = *plan.schemas.front();
+      // A query that references no value field (COUNT(*)) never touches the row bytes.
+      if (!value_interest->empty()) {
+         stream input(row.value.data(), row.value.size());
+         decode_bound(plan, *schema.row_type, *value_interest, input, budget, slots, 0);
+         if (input.remaining())
+            throw query_error(error_kind::ROW_DECODE_ERROR, "Trailing row bytes");
+      }
+      if (!key_interest->empty()) {
+         be_key_codec::reader key_input(row.key.data(), row.key.size());
+         fc::mutable_variant_object key;
+         for (size_t i = 0; i < schema.key_shapes.size(); ++i)
+            key(schema.key_shapes[i].name,
+                decode_key_node(key_input, schema.key_shapes[i], *schema.key_type->fields[i].type, budget));
+         if (key_input.remaining())
+            throw query_error(error_kind::ROW_DECODE_ERROR, "Trailing key bytes");
+         assign_cell(plan, fc::variant(std::move(key)), *key_interest, slots);
+      }
+      return slots;
+   } catch (const query_error&) {
+      throw;
+   } catch (const fc::exception&) {
+      throw query_error(error_kind::ROW_DECODE_ERROR, "Invalid ABI row or key encoding");
+   } catch (const std::exception&) {
+      throw query_error(error_kind::ROW_DECODE_ERROR, "Invalid ABI row or key encoding");
+   }
+}
 
 bool is_numeric(logical_type type) {
    return type == logical_type::integer || type == logical_type::decimal;
 }
 bool is_ordered(logical_type type) {
    return type != logical_type::json && type != logical_type::ieee_hex;
+}
+bool comparable(logical_type left, logical_type right) {
+   const auto numeric_like = [](logical_type type) { return is_numeric(type) || type == logical_type::enumeration; };
+   return left == right || (numeric_like(left) && numeric_like(right));
 }
 
 encoding value_encoding(logical_type type) {
@@ -620,6 +1046,102 @@ encoding value_encoding(logical_type type) {
    default:
       return encoding::text;
    }
+}
+
+std::string format_time(int64_t microseconds) {
+   // Floor division keeps instants before the epoch on their calendar day.
+   int64_t days = microseconds / microseconds_per_day;
+   int64_t remainder = microseconds % microseconds_per_day;
+   if (remainder < 0) {
+      remainder += microseconds_per_day;
+      --days;
+   }
+   const auto date = civil_from_days(days);
+   const auto second_of_day = remainder / microseconds_per_second;
+   const auto fraction = remainder % microseconds_per_second;
+   std::string result;
+   if (date.year < 0 || date.year > maximum_plain_year)
+      result.push_back(date.year < 0 ? date_separator : positive_sign);
+   result += fmt::format("{:04}{}{:02}{}{:02}{}{:02}{}{:02}{}{:02}", date.year < 0 ? -date.year : date.year,
+                         date_separator, date.month, date_separator, date.day, time_separator,
+                         second_of_day / (minutes_per_hour * seconds_per_minute), clock_separator,
+                         second_of_day / seconds_per_minute % minutes_per_hour, clock_separator,
+                         second_of_day % seconds_per_minute);
+   if (fraction != 0)
+      result += fmt::format("{}{:06}", fraction_separator, fraction);
+   return result;
+}
+
+int64_t parse_time(std::string_view text) {
+   const auto invalid = [] { throw query_error(error_kind::VALUE_ERROR, "Invalid timestamp literal"); };
+   if (text.ends_with(utc_designator))
+      text.remove_suffix(1);
+   bool negative = false;
+   if (!text.empty() && (text.front() == positive_sign || text.front() == date_separator)) {
+      negative = text.front() == date_separator;
+      text.remove_prefix(1);
+   }
+   size_t position = 0;
+   const auto digits = [&](size_t count) {
+      if (position + count > text.size())
+         invalid();
+      int64_t result = 0;
+      for (size_t i = 0; i < count; ++i) {
+         const char character = text[position + i];
+         if (character < '0' || character > '9')
+            invalid();
+         result = result * constants::decimal_base + (character - '0');
+      }
+      position += count;
+      return result;
+   };
+   const auto expect = [&](char separator) {
+      if (position >= text.size() || text[position] != separator)
+         invalid();
+      ++position;
+   };
+   const auto year_digits = text.find(date_separator);
+   if (year_digits == std::string_view::npos || year_digits < minimum_year_digits || year_digits > maximum_year_digits)
+      invalid();
+   const auto year = digits(year_digits);
+   expect(date_separator);
+   const auto month = digits(2);
+   expect(date_separator);
+   const auto day = digits(2);
+   expect(time_separator);
+   const auto hour = digits(2);
+   expect(clock_separator);
+   const auto minute = digits(2);
+   expect(clock_separator);
+   const auto second = digits(2);
+   int64_t fraction = 0;
+   if (position < text.size()) {
+      expect(fraction_separator);
+      const auto fraction_digits = text.size() - position;
+      if (fraction_digits == 0 || fraction_digits > timestamp_fraction_digits)
+         invalid();
+      fraction = digits(fraction_digits);
+      for (auto padding = fraction_digits; padding < timestamp_fraction_digits; ++padding)
+         fraction *= constants::decimal_base;
+   }
+   if (position != text.size())
+      invalid();
+   const int64_t signed_year = negative ? -year : year;
+   if (month < 1 || month > months_per_year)
+      invalid();
+   const auto month_days = days_per_month[month - 1] + (month == february && is_leap_year(signed_year) ? 1 : 0);
+   if (day < 1 || day > month_days || hour >= hours_per_day || minute >= minutes_per_hour ||
+       second >= seconds_per_minute)
+      invalid();
+   const auto day_count = days_from_civil(signed_year, static_cast<unsigned>(month), static_cast<unsigned>(day));
+   const auto microsecond_of_day =
+      ((hour * minutes_per_hour + minute) * seconds_per_minute + second) * microseconds_per_second + fraction;
+   // The day product alone may pass below int64's minimum for the earliest representable instants;
+   // only the sum has to fit.
+   const __int128 total = static_cast<__int128>(day_count) * microseconds_per_day + microsecond_of_day;
+   if (total < std::numeric_limits<int64_t>::min() || total > std::numeric_limits<int64_t>::max())
+      throw query_error(error_kind::VALUE_ERROR, "Timestamp out of range");
+   return static_cast<int64_t>(total);
 }
 
 value parse_number(std::string_view text) {
@@ -700,7 +1222,7 @@ int compare_values(const value& left, const value& right) {
       throw query_error(error_kind::QUERY_SEMANTICS, "Container and IEEE values are projection-only");
    if (left.type == logical_type::asset || left.type == logical_type::extended_asset)
       assert_units(left, right);
-   else if (!(is_numeric(left.type) && is_numeric(right.type)) && left.type != right.type)
+   else if (!comparable(left.type, right.type))
       throw query_error(error_kind::QUERY_SEMANTICS, "Incompatible scalar types");
    if (left.type == logical_type::text && !is_name(left.primitive) && !is_name(right.primitive))
       return left.text.compare(right.text);
@@ -770,6 +1292,8 @@ value coerce_literal(value source, const type_descriptor& expected) {
       return source;
    try {
       source.primitive = expected.primitive;
+      if (expected.logical == logical_type::enumeration)
+         return coerce_enumeration(std::move(source), expected);
       switch (expected.primitive) {
       case primitive_type::name: {
          const auto name = chain::name(source.text);
@@ -798,15 +1322,59 @@ value coerce_literal(value source, const type_descriptor& expected) {
       case primitive_type::symbol:
          source.text = symbol::from_string(source.text).to_string();
          break;
+      // Hex families are canonicalized to the exact form the decoder renders, so a range bound built
+      // from the literal and the residual text comparison agree on every row.
+      case primitive_type::checksum160:
+         source.text = canonical_hex(std::move(source.text), sizeof(checksum160_type));
+         break;
+      case primitive_type::checksum256:
+         source.text = canonical_hex(std::move(source.text), sizeof(checksum256_type));
+         break;
+      case primitive_type::checksum512:
+         source.text = canonical_hex(std::move(source.text), sizeof(checksum512_type));
+         break;
+      case primitive_type::bytes:
+         source.text = canonical_hex(std::move(source.text), std::nullopt);
+         break;
+      case primitive_type::public_key:
+         source.text = canonical_crypto_text<public_key_type>(source.text);
+         break;
+      case primitive_type::signature:
+         source.text = canonical_crypto_text<signature_type>(source.text);
+         break;
       default:
          break;
       }
+   } catch (const query_error&) {
+      throw;
    } catch (const fc::exception&) {
       throw query_error(error_kind::VALUE_ERROR, "Invalid typed literal");
    } catch (const std::exception&) {
       throw query_error(error_kind::VALUE_ERROR, "Invalid typed literal");
    }
    return source;
+}
+
+void resolve_schema(table_schema& schema, const std::string& table, query_budget& budget) {
+   budget.check();
+   schema.abi_hash = fc::sha256::hash(schema.abi_bytes.data(), schema.abi_bytes.size());
+   budget.charge_memory(schema.abi_bytes.size() * abi_decode_allocation_factor);
+   try {
+      if (!abi_serializer::to_abi(schema.abi_bytes, schema.abi))
+         throw query_error(error_kind::QUERY_SEMANTICS, "Account has no ABI");
+   } catch (const query_error&) {
+      throw;
+   } catch (const fc::exception&) {
+      throw query_error(error_kind::QUERY_SEMANTICS, "Invalid account ABI");
+   } catch (const std::exception&) {
+      throw query_error(error_kind::QUERY_SEMANTICS, "Invalid account ABI");
+   }
+   const auto found = std::find_if(schema.abi.tables.begin(), schema.abi.tables.end(),
+                                   [&](const auto& candidate) { return candidate.name == table; });
+   if (found == schema.abi.tables.end())
+      throw query_error(error_kind::QUERY_SEMANTICS, "Unknown ABI table");
+   schema.table = *found;
+   budget.check();
 }
 
 void compile_schema(table_schema& schema, query_budget& budget) {
@@ -826,43 +1394,6 @@ void compile_schema(table_schema& schema, query_budget& budget) {
       schema.key_shapes = be_key_codec::build_key_shapes(schema.abi, schema.table.key_names, schema.table.key_types);
    } catch (const fc::exception&) {
       throw query_error(error_kind::QUERY_SEMANTICS, "Unsupported ABI key shape");
-   }
-}
-
-std::vector<value> decode_fields(const typed_plan& plan, const chain_apis::owned_table_row& row, query_budget& budget) {
-   try {
-      stream input(row.value.data(), row.value.size());
-      const auto decoded = decode_node(*plan.schemas.front()->row_type, input, budget);
-      if (input.remaining())
-         throw query_error(error_kind::ROW_DECODE_ERROR, "Trailing row bytes");
-      be_key_codec::reader key_input(row.key.data(), row.key.size());
-      fc::mutable_variant_object key;
-      for (size_t i = 0; i < plan.schemas.front()->key_shapes.size(); ++i)
-         key(plan.schemas.front()->key_shapes[i].name,
-             decode_key_node(key_input, plan.schemas.front()->key_shapes[i],
-                             *plan.schemas.front()->key_type->fields[i].type, budget));
-      if (key_input.remaining())
-         throw query_error(error_kind::ROW_DECODE_ERROR, "Trailing key bytes");
-      const fc::variant decoded_key(std::move(key));
-      budget.charge_memory(plan.fields.size() * sizeof(value) * node_allocation_factor);
-      std::vector<value> result;
-      result.reserve(plan.fields.size());
-      for (const auto& field : plan.fields) {
-         const fc::variant* cell = field.key ? &decoded_key : &decoded;
-         for (const auto& component : field.path) {
-            if (cell->is_null())
-               break;
-            cell = &cell->get_object()[component];
-         }
-         result.push_back(from_cell(*cell, *field.type));
-      }
-      return result;
-   } catch (const query_error&) {
-      throw;
-   } catch (const fc::exception&) {
-      throw query_error(error_kind::ROW_DECODE_ERROR, "Invalid ABI row or key encoding");
-   } catch (const std::exception&) {
-      throw query_error(error_kind::ROW_DECODE_ERROR, "Invalid ABI row or key encoding");
    }
 }
 } // namespace sysio::query_engine

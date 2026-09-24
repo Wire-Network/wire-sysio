@@ -209,7 +209,8 @@
             "asset",
             "extended_asset",
             "json",
-            "ieee_hex"
+            "ieee_hex",
+            "enumeration"
           ]
         },
         "abi_type": {

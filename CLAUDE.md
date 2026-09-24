@@ -99,9 +99,11 @@ Wire Sysio is a C++ implementation of the AntelopeIO protocol (a fork of Spring)
 
 ### Prerequisites (one-time setup)
 ```bash
-# Install system packages (Ubuntu 24.04+)
+# Install system packages (Ubuntu 24.04+). openjdk-21-jre-headless runs the ANTLR parser
+# generator of the query engine plugin at build time.
 sudo apt-get install -y build-essential binutils ccache cmake curl git ninja-build \
-    libcurl4-openssl-dev libgmp-dev zlib1g-dev python3 python3-pip clang-18 libclang-18-dev
+    libcurl4-openssl-dev libgmp-dev zlib1g-dev python3 python3-pip clang-18 libclang-18-dev \
+    openjdk-21-jre-headless
 
 # Initialize required submodules
 git submodule update --init --recursive vcpkg libraries/appbase
@@ -116,7 +118,10 @@ Apple Silicon developer builds use vcpkg's `arm64-osx` triplet and the interpret
 rebuilds through CDT, `sys-vm-jit`, `sys-vm-oc`, and `native-module` are out of scope for the phase-one macOS path.
 
 ```bash
-brew install cmake ninja ccache pkgconf autoconf automake libtool
+# openjdk runs the ANTLR parser generator of the query engine plugin at build time; Homebrew keeps
+# it keg-only, so its bin directory has to be on PATH for CMake's find_package(Java) to see it.
+brew install cmake ninja ccache pkgconf autoconf automake libtool openjdk
+export PATH="$(brew --prefix openjdk)/bin:$PATH"
 git submodule update --init --recursive vcpkg libraries/appbase
 ./vcpkg/bootstrap-vcpkg.sh
 

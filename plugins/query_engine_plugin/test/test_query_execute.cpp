@@ -63,9 +63,10 @@ BOOST_AUTO_TEST_CASE(limit_offset_and_aggregate_semantics) {
       execute(engine, reads, ordered_sql, query_options{.limit = std::numeric_limits<uint64_t>::max()}).rows.size(), 3);
 }
 
-/// Absent options and default-constructed options both disable the end-to-end deadline.
-BOOST_AUTO_TEST_CASE(default_timeout_is_unlimited) {
-   for (const auto& options : {std::optional<query_options>{}, std::optional<query_options>{query_options{}}}) {
+/// Absent and default-constructed options apply the configured deadline; only no_deadline opts out.
+BOOST_AUTO_TEST_CASE(default_timeout_is_configured_and_no_deadline_is_explicit) {
+   for (const auto& options : {std::optional<query_options>{}, std::optional<query_options>{query_options{}},
+                               std::optional<query_options>{query_options{.timeout = constants::no_deadline}}}) {
       read_queue reads;
       query_config config;
       std::atomic<int64_t> elapsed_ms{0};
@@ -76,7 +77,11 @@ BOOST_AUTO_TEST_CASE(default_timeout_is_unlimited) {
             if (stage == query_stage::parse)
                elapsed_ms = config.timeout_ms + 1;
          });
-      BOOST_CHECK_EQUAL(execute(engine, reads, ordered_sql, options).rows.size(), 3);
+      if (options && options->timeout == constants::no_deadline)
+         BOOST_CHECK_EQUAL(execute(engine, reads, ordered_sql, options).rows.size(), 3);
+      else
+         BOOST_CHECK_EXCEPTION(execute(engine, reads, ordered_sql, options), query_error,
+                               [](const auto& error) { return error.kind == error_kind::QUERY_TIMEOUT; });
    }
 }
 
@@ -86,11 +91,11 @@ BOOST_AUTO_TEST_CASE(option_errors_and_resource_limits) {
    query_config config;
    config.max_result_rows = 1;
    query_engine engine(config, reads.create_api(*validating_node));
-   for (const auto timeout : {int64_t{-2}, std::numeric_limits<int64_t>::max()})
-      BOOST_CHECK_EXCEPTION(execute(engine, reads, ordered_sql, query_options{.timeout_ms = timeout}), query_error,
+   for (const auto timeout : {std::chrono::milliseconds(-2), constants::no_deadline - std::chrono::milliseconds(1)})
+      BOOST_CHECK_EXCEPTION(execute(engine, reads, ordered_sql, query_options{.timeout = timeout}), query_error,
                             [](const auto& error) { return error.kind == error_kind::INVALID_PARAMS; });
-   BOOST_CHECK_EXCEPTION(execute(engine, reads, ordered_sql, query_options{.timeout_ms = 0}), query_error,
-                         [](const auto& error) { return error.kind == error_kind::QUERY_TIMEOUT; });
+   BOOST_CHECK_EXCEPTION(execute(engine, reads, ordered_sql, query_options{.timeout = std::chrono::milliseconds(0)}),
+                         query_error, [](const auto& error) { return error.kind == error_kind::QUERY_TIMEOUT; });
    BOOST_CHECK_EXCEPTION(execute(engine, reads, ordered_sql), query_error, [](const auto& error) {
       return error.kind == error_kind::QUERY_LIMIT && error.limit == option::max_result_rows;
    });

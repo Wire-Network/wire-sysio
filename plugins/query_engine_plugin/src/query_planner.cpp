@@ -73,10 +73,11 @@ public:
       for (auto& item : plan.ast.select) {
          budget.check();
          bind_expression(item.source, false, true);
+         // Output names only feed ORDER BY and HAVING, which take single identifiers; the `key.` and
+         // `value.` namespaces need two components, so a column named `key` or `value` is unambiguous.
          const auto name = item.alias.value_or(output_name(item.source.path));
-         if (name.empty() || name == constants::key_namespace || name == constants::value_namespace ||
-             !names.insert(name).second)
-            throw query_error(error_kind::QUERY_SEMANTICS, "Duplicate or reserved output name", item.source.span);
+         if (name.empty() || !names.insert(name).second)
+            throw query_error(error_kind::QUERY_SEMANTICS, "Duplicate or empty output name", item.source.span);
          output_column column;
          column.name = name;
          column.type = expression_type(item.source);
@@ -248,7 +249,7 @@ private:
       if ((predicate.left.kind == expression_kind::literal && predicate.left.literal.null) ||
           (predicate.right.kind == expression_kind::literal && predicate.right.literal.null))
          return;
-      if (left != right && !(is_numeric(left) && is_numeric(right)))
+      if (!comparable(left, right))
          throw query_error(error_kind::QUERY_SEMANTICS, "Incompatible comparison types", predicate.left.span);
       const auto* left_type = expected_type(predicate.left);
       const auto* right_type = expected_type(predicate.right);
@@ -425,8 +426,12 @@ bool compatible_type(const type_descriptor& left, const type_descriptor& right, 
    budget.check();
    if (left.kind != right.kind || left.logical != right.logical || left.primitive != right.primitive ||
        left.abi_type != right.abi_type || left.fields.size() != right.fields.size() ||
-       left.alternatives.size() != right.alternatives.size() || bool(left.element) != bool(right.element))
+       left.alternatives.size() != right.alternatives.size() || bool(left.element) != bool(right.element) ||
+       left.members.size() != right.members.size())
       return false;
+   for (size_t i = 0; i < left.members.size(); ++i)
+      if (left.members[i].name != right.members[i].name || left.members[i].value != right.members[i].value)
+         return false;
    if (left.element && !compatible_type(*left.element, *right.element, budget))
       return false;
    for (size_t i = 0; i < left.fields.size(); ++i)

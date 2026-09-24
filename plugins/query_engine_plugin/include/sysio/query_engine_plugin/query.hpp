@@ -32,7 +32,9 @@ inline constexpr uint32_t max_depth = 64;
 inline constexpr uint32_t max_ast_nodes = 2048;
 inline constexpr uint32_t decimal_places = 18;
 inline constexpr uint32_t page_rows = 512;
-inline constexpr int64_t no_timeout = -1;
+/// Explicit opt-out of the end-to-end deadline. Unset options use the configured `query-timeout-ms`.
+inline constexpr std::chrono::milliseconds no_deadline = std::chrono::milliseconds::max();
+inline constexpr uint64_t microseconds_per_millisecond = 1000;
 inline constexpr uint32_t accumulator_bits = 256;
 inline constexpr uint32_t comparison_bits = 512;
 inline constexpr uint32_t decimal_base = 10;
@@ -106,7 +108,9 @@ inline constexpr uint32_t worker_threads = 2;
 inline constexpr uint32_t max_in_flight = 4;
 inline constexpr uint32_t max_query_bytes = 16384;
 inline constexpr uint32_t timeout_ms = 1000;
-inline constexpr uint32_t max_capture_ms = 50;
+/// Capture budget of a directly constructed engine. The plugin replaces it with producer_plugin's
+/// read-only transaction budget unless `query-max-capture-ms` is set explicitly.
+inline constexpr uint64_t max_capture_us = 50000;
 inline constexpr uint32_t max_abi_bytes = 1048576;
 inline constexpr uint64_t max_scan_rows = 100000;
 inline constexpr uint64_t max_raw_bytes = 67108864;
@@ -122,7 +126,8 @@ struct query_config {
    uint32_t max_in_flight = defaults::max_in_flight;
    uint32_t max_query_bytes = defaults::max_query_bytes;
    uint32_t timeout_ms = defaults::timeout_ms;
-   uint32_t max_capture_ms = defaults::max_capture_ms;
+   /// One coherent capture callback may hold the chain's read window for at most this long.
+   uint64_t max_capture_us = defaults::max_capture_us;
    uint32_t max_abi_bytes = defaults::max_abi_bytes;
    uint64_t max_scan_rows = defaults::max_scan_rows;
    uint64_t max_raw_bytes = defaults::max_raw_bytes;
@@ -136,9 +141,11 @@ struct query_config {
 
 /// Per-call execution controls. Pagination follows complete evaluation; LIMIT in SQL is also respected.
 struct query_options {
-   int64_t timeout_ms = constants::no_timeout; ///< -1 disables the end-to-end deadline; zero expires immediately.
-   std::optional<uint64_t> limit;              ///< Maximum returned rows, still subject to the configured row cap.
-   uint64_t offset = 0;                        ///< Rows skipped after sorting and before applying the limit.
+   /// End-to-end deadline. Unset applies the configured `query-timeout-ms`; `constants::no_deadline`
+   /// disables the deadline explicitly; zero expires immediately.
+   std::optional<std::chrono::milliseconds> timeout;
+   std::optional<uint64_t> limit; ///< Maximum returned rows, still subject to the configured row cap.
+   uint64_t offset = 0;           ///< Rows skipped after sorting and before applying the limit.
 };
 
 /// Stable error kinds; wire codes are described by error_code(), independently of enum layout.
@@ -176,8 +183,9 @@ struct query_error : std::runtime_error {
 };
 
 /// Budget is owned for the request's full lifetime. Cancellation is cross-thread;
-/// counters are touched only by the one running stage. Allocation charges are conservative
-/// and never recycled, so released intermediates cannot cause under-accounting.
+/// counters are touched only by the one running stage. Allocation charges are conservative;
+/// only the transient charges of one decoded row are released, once that row has been folded
+/// into retained state and its decoded values are gone.
 class query_budget {
 public:
    using clock = std::chrono::steady_clock;
@@ -190,6 +198,8 @@ public:
    void check_capture(clock::time_point capture_start) const;
    /// Charge before allocation. Arithmetic checks precede counter mutation.
    void charge_memory(uint64_t bytes);
+   /// Return charges of values that no longer exist; never releases more than is accounted.
+   void release_memory(uint64_t bytes) noexcept;
    /// Charge source rows and raw bytes, also charging the total memory budget.
    void charge_raw(uint64_t rows, uint64_t bytes);
    /// Fail with QUERY_LIMIT if value exceeds maximum, naming the violated option.
@@ -216,7 +226,8 @@ using comparison_integer = boost::multiprecision::number<boost::multiprecision::
    boost::multiprecision::checked, void>>;
 
 /// Public logical types and serialization encodings; names are their wire spellings.
-enum class logical_type { integer, decimal, boolean, text, time, asset, extended_asset, json, ieee_hex };
+/// An enumeration renders its ABI member name and compares by its underlying integer.
+enum class logical_type { integer, decimal, boolean, text, time, asset, extended_asset, json, ieee_hex, enumeration };
 enum class encoding { decimal_string, boolean, text, asset_object, json, ieee_hex };
 enum class truth { false_value, true_value, unknown };
 
@@ -260,6 +271,7 @@ enum class primitive_type {
 };
 
 /// Exact scalar or already-normalized container. AVG remains numerator/denominator until rendering.
+/// An enumeration keeps its underlying integer in `numerator` and its member name in `text`.
 struct value {
    logical_type type = logical_type::text;
    primitive_type primitive = primitive_type::string;
@@ -344,15 +356,19 @@ struct type_descriptor {
    std::vector<field_descriptor> fields;
    std::shared_ptr<const type_descriptor> element;
    std::vector<std::shared_ptr<const type_descriptor>> alternatives;
+   /// ABI enum members; the primitive is the enum's underlying integer type.
+   std::vector<chain::enum_value_def> members;
 };
 
-/// Metadata copied under the read queue; descriptor compilation never touches the controller.
+/// Table metadata. Only the owner, ABI sequence and raw ABI bytes are read inside a chain read
+/// callback; hashing, decoding, table selection and descriptor compilation happen on a worker.
 struct table_schema {
    chain::name owner;
+   uint64_t abi_sequence = 0;
+   std::vector<char> abi_bytes;
+   fc::sha256 abi_hash;
    chain::abi_def abi;
    chain::table_def table;
-   fc::sha256 abi_hash;
-   uint64_t abi_sequence = 0;
    std::shared_ptr<const type_descriptor> row_type;
    std::shared_ptr<const type_descriptor> key_type;
    std::vector<chain::be_key_codec::key_shape> key_shapes;
@@ -422,8 +438,29 @@ struct query_request {
    std::optional<query_error> invocation_error;
 };
 
+/// Decodes only the source fields a plan binds, skipping every other ABI node without allocating.
+/// COUNT(*) therefore decodes nothing, and a row's charges cover only what the query references.
+class row_decoder {
+public:
+   /// Which bound slots one ABI node feeds; defined with the decoder implementation.
+   struct interest;
+   explicit row_decoder(const typed_plan&);
+   ~row_decoder();
+   row_decoder(const row_decoder&) = delete;
+   row_decoder& operator=(const row_decoder&) = delete;
+   /// Decode and bind one raw row to the plan's source field slots.
+   std::vector<value> decode(const chain_apis::owned_table_row&, query_budget&) const;
+
+private:
+   const typed_plan& plan;
+   std::unique_ptr<const interest> value_interest;
+   std::unique_ptr<const interest> key_interest;
+};
+
 /// Parse the bounded SQL subset, throwing position-bearing QUERY_SYNTAX errors.
 ast_query parse_query(std::string_view, query_budget&);
+/// Hash and decode the copied ABI bytes and select the queried table. Worker only, never in a read callback.
+void resolve_schema(table_schema&, const std::string& table, query_budget&);
 /// Compile copied ABI, bind the query, and select a provably safe primary range.
 typed_plan create_plan(ast_query, std::vector<table_schema>, query_budget&);
 /// Evaluate all captured input with exact types before applying LIMIT.
@@ -432,13 +469,22 @@ query_result evaluate(const typed_plan&, captured_input, query_budget&);
 value parse_number(std::string_view);
 /// Render exact numbers to at most 18 decimal places with round-half-even.
 std::string render_number(const value&);
+/// Render microseconds since the Unix epoch as UTC ISO 8601, for every int64 value. Years outside
+/// 0000..9999 use the expanded form with an explicit sign; a zero fraction is omitted.
+std::string format_time(int64_t microseconds);
+/// Parse the format_time() representation (optional sign, at least four year digits, optional
+/// fraction of at most six digits, optional Z) into microseconds, rejecting out-of-range instants.
+int64_t parse_time(std::string_view);
 /// Compare compatible non-null scalars exactly; containers/opaque floats are rejected.
 int compare_values(const value&, const value&);
+/// Whether two scalar logical types may be compared: identical, or both numeric-like
+/// (integer, decimal, enumeration).
+bool comparable(logical_type, logical_type);
 /// Normalize a value into the public, recursively number-free cell encoding.
 fc::variant to_cell(const value&, query_budget&);
-/// Decode and bind one raw row to the plan's source field slots.
-std::vector<value> decode_fields(const typed_plan&, const chain_apis::owned_table_row&, query_budget&);
-/// Convert a string literal using a known scalar ABI type; no implicit general coercion.
+/// Convert a string literal using a known scalar ABI type; no implicit general coercion. Checksum
+/// and byte literals are canonicalized to exact-length lowercase hex; enum literals resolve member
+/// names (exact, then the abi_serializer's prefix-stripped match) or the underlying integer.
 value coerce_literal(value, const type_descriptor&);
 /// Resolve aliases, inheritance and bounded container descriptors in copied ABI metadata.
 void compile_schema(table_schema&, query_budget&);

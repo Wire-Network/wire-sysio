@@ -37,11 +37,12 @@ void add_options(boost::program_options::options_description& options) {
    options.add_options()(
       option::timeout_ms,
       boost::program_options::value<std::string>()->default_value(std::to_string(defaults::timeout_ms)),
-      "HTTP query deadline in milliseconds, including queue time; C++ execute defaults to no timeout");
-   options.add_options()(
-      option::max_capture_ms,
-      boost::program_options::value<std::string>()->default_value(std::to_string(defaults::max_capture_ms)),
-      "Maximum milliseconds in one coherent chain capture");
+      "Query deadline in milliseconds, including queue time; C++ callers may opt out per call");
+   // No default: producer_plugin's read-only transaction budget governs unless an operator sets a
+   // tighter capture bound, and a configured value may never exceed that budget.
+   options.add_options()(option::max_capture_ms, boost::program_options::value<std::string>(),
+                         "Maximum milliseconds in one coherent chain capture; defaults to producer_plugin's "
+                         "read-only transaction time and may not exceed it");
    options.add_options()(
       option::max_abi_bytes,
       boost::program_options::value<std::string>()->default_value(std::to_string(defaults::max_abi_bytes)),
@@ -78,7 +79,9 @@ query_config parse_config(const boost::program_options::variables_map& options) 
    config.max_in_flight = option_value(options, option::max_in_flight, defaults::max_in_flight);
    config.max_query_bytes = option_value(options, option::max_query_bytes, defaults::max_query_bytes);
    config.timeout_ms = option_value(options, option::timeout_ms, defaults::timeout_ms);
-   config.max_capture_ms = option_value(options, option::max_capture_ms, defaults::max_capture_ms);
+   if (options.count(option::max_capture_ms))
+      config.max_capture_us =
+         uint64_t(option_value<uint32_t>(options, option::max_capture_ms, 0)) * constants::microseconds_per_millisecond;
    config.max_abi_bytes = option_value(options, option::max_abi_bytes, defaults::max_abi_bytes);
    config.max_scan_rows = option_value(options, option::max_scan_rows, defaults::max_scan_rows);
    config.max_raw_bytes = option_value(options, option::max_raw_bytes, defaults::max_raw_bytes);
@@ -99,38 +102,39 @@ query_error::query_error(error_kind kind, std::string message, std::optional<sou
 
 void query_config::validate() const {
    const uint64_t positive[] = {worker_threads,   max_in_flight, max_query_bytes, timeout_ms,
-                                max_capture_ms,   max_abi_bytes, max_scan_rows,   max_raw_bytes,
+                                max_capture_us,   max_abi_bytes, max_scan_rows,   max_raw_bytes,
                                 max_memory_bytes, max_groups,    max_result_rows, max_response_bytes};
    for (auto limit : positive)
       if (!limit)
          throw query_error(error_kind::INVALID_PARAMS, "Every query option must be positive");
-   if (max_capture_ms > timeout_ms || max_raw_bytes > max_memory_bytes ||
-       max_memory_bytes > std::numeric_limits<uint64_t>::max() / max_in_flight)
+   if (max_capture_us > uint64_t(timeout_ms) * constants::microseconds_per_millisecond ||
+       max_raw_bytes > max_memory_bytes || max_memory_bytes > std::numeric_limits<uint64_t>::max() / max_in_flight)
       throw query_error(error_kind::INVALID_PARAMS, "Incompatible query limits or admitted memory overflow");
 }
 
 query_budget::query_budget(query_config config, now_function now, const std::optional<query_options>& options)
    : config(config)
-   , options(options.value_or(query_options{.timeout_ms = config.timeout_ms}))
+   , options(options.value_or(query_options{}))
    , now(std::move(now))
    , started(this->now())
    , deadline(clock::time_point::max()) {
    config.validate();
-   if (this->options.timeout_ms < constants::no_timeout)
-      throw query_error(error_kind::INVALID_PARAMS, "Timeout must be -1 or a nonnegative millisecond count",
-                        std::nullopt, option::timeout_ms);
-   if (this->options.timeout_ms != constants::no_timeout) {
-      const auto maximum = std::chrono::duration_cast<std::chrono::milliseconds>(clock::duration::max()).count();
-      if (this->options.timeout_ms > maximum)
-         throw query_error(error_kind::INVALID_PARAMS, "Timeout exceeds the monotonic clock range", std::nullopt,
-                           option::timeout_ms);
-      const auto duration =
-         std::chrono::duration_cast<clock::duration>(std::chrono::milliseconds(this->options.timeout_ms));
-      if (started > deadline - duration)
-         throw query_error(error_kind::INVALID_PARAMS, "Timeout exceeds the monotonic clock range", std::nullopt,
-                           option::timeout_ms);
-      deadline = started + duration;
-   }
+   // An unset per-call timeout applies the configured deadline; only constants::no_deadline opts out.
+   const auto timeout = this->options.timeout.value_or(std::chrono::milliseconds(config.timeout_ms));
+   if (timeout < std::chrono::milliseconds::zero())
+      throw query_error(error_kind::INVALID_PARAMS, "Timeout must be a nonnegative millisecond count", std::nullopt,
+                        option::timeout_ms);
+   if (timeout == constants::no_deadline)
+      return;
+   const auto maximum = std::chrono::duration_cast<std::chrono::milliseconds>(clock::duration::max());
+   if (timeout > maximum)
+      throw query_error(error_kind::INVALID_PARAMS, "Timeout exceeds the monotonic clock range", std::nullopt,
+                        option::timeout_ms);
+   const auto duration = std::chrono::duration_cast<clock::duration>(timeout);
+   if (started > deadline - duration)
+      throw query_error(error_kind::INVALID_PARAMS, "Timeout exceeds the monotonic clock range", std::nullopt,
+                        option::timeout_ms);
+   deadline = started + duration;
 }
 
 void query_budget::check() const {
@@ -142,7 +146,7 @@ void query_budget::check() const {
 
 void query_budget::check_capture(clock::time_point capture_start) const {
    check();
-   if (now() - capture_start >= std::chrono::milliseconds(config.max_capture_ms))
+   if (now() - capture_start >= std::chrono::microseconds(config.max_capture_us))
       throw query_error(error_kind::QUERY_TIMEOUT, "Query capture deadline exceeded", std::nullopt,
                         option::max_capture_ms);
 }
@@ -156,6 +160,10 @@ void query_budget::assert_limit(uint64_t value, uint64_t maximum, const char* op
 void query_budget::charge_memory(uint64_t bytes) {
    assert_limit(bytes, config.max_memory_bytes - accounted_bytes, option::max_memory_bytes);
    accounted_bytes += bytes;
+}
+
+void query_budget::release_memory(uint64_t bytes) noexcept {
+   accounted_bytes -= std::min(bytes, accounted_bytes);
 }
 
 void query_budget::charge_raw(uint64_t rows, uint64_t bytes) {

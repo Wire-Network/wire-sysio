@@ -42,9 +42,11 @@ RUN apt-get update && \
         wget \
         software-properties-common
 
-# Build toolchain and development libraries (binutils intentionally omitted)
+# Build toolchain and development libraries (binutils intentionally omitted). The Java runtime
+# drives the ANTLR parser generator of the query engine plugin at build time.
 RUN apt-get install -y \
         build-essential \
+        openjdk-21-jre-headless \
         binutils \
         ccache \
         cmake \

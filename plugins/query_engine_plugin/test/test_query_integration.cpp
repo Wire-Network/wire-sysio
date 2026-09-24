@@ -3,6 +3,11 @@
 #include <fc/io/raw.hpp>
 #include <sysio/chain/account_object.hpp>
 
+#include <algorithm>
+#include <cctype>
+#include <cstring>
+#include <limits>
+
 using namespace sysio::query_engine;
 using namespace sysio::query_engine::test;
 using namespace sysio::chain::literals;
@@ -240,11 +245,12 @@ BOOST_AUTO_TEST_CASE(composite_prefix_and_nonleading_fallback) {
    BOOST_CHECK_EQUAL(nonleading.scanned_rows, 6);
 }
 
-/// The owned ABI remains valid after an update; malformed copies never become binary fallback rows.
+/// The owned ABI remains valid after an update; malformed copies of referenced value or key bytes
+/// never become binary fallback rows.
 BOOST_AUTO_TEST_CASE(owned_abi_and_malformed_rows) {
    local_table_source source(*validating_node);
    query_budget budget({});
-   const auto ast = parse_query("SELECT created, amount FROM sample.positions", budget);
+   const auto ast = parse_query("SELECT key.id AS id, created, amount FROM sample.positions", budget);
    const auto plan = create_plan(ast, source.describe(ast, budget), budget);
    auto captured = source.capture(plan, budget);
    auto bad_value = captured;
@@ -388,6 +394,170 @@ BOOST_AUTO_TEST_CASE(incompatible_owner_schemas_fail_before_capture) {
    BOOST_CHECK_EXCEPTION(evaluate_query("SELECT amount FROM positions OWNER 'sample', 'other'", budget), query_error,
                          [](const auto& error) { return error.kind == error_kind::QUERY_SEMANTICS; });
    BOOST_CHECK_EQUAL(budget.scanned_rows, 0);
+}
+
+/// ABI enums render their member names, group and order by underlying value, and bind name literals.
+BOOST_AUTO_TEST_CASE(enum_members_render_names_and_bind_literals) {
+   put(2, position(90, {}, "1.2500 SYS", status_closed));
+   put(3, position(20, {}, "1.2500 SYS", status_archived));
+   query_budget budget({});
+   const auto grouped = evaluate_query("SELECT status, COUNT(*) AS n FROM sample.positions GROUP BY status "
+                                       "ORDER BY status DESC",
+                                       budget);
+   const auto& rows = grouped["rows"].get_array();
+   BOOST_REQUIRE_EQUAL(rows.size(), 3);
+   BOOST_CHECK_EQUAL(rows[0]["status"].as_string(), status_archived);
+   BOOST_CHECK_EQUAL(rows[1]["status"].as_string(), status_closed);
+   BOOST_CHECK_EQUAL(rows[2]["status"].as_string(), status_open);
+   const auto& column = grouped["columns"][size_t{0}];
+   BOOST_CHECK_EQUAL(column["logical_type"].as_string(), "enumeration");
+   BOOST_CHECK_EQUAL(column["encoding"].as_string(), "text");
+   BOOST_CHECK_EQUAL(column["abi_type"].as_string(), "position_status");
+   for (const auto* predicate : {"status = 'POSITION_STATUS_CLOSED'", "status = 'CLOSED'", "status = 1",
+                                 "status > 'POSITION_STATUS_OPEN' AND status < 'ARCHIVED'"}) {
+      query_budget bound({});
+      const auto result =
+         evaluate_query(std::string("SELECT key.id AS id FROM sample.positions WHERE ") + predicate, bound);
+      BOOST_REQUIRE_EQUAL(result["rows"].get_array().size(), 1);
+      BOOST_CHECK_EQUAL(result["rows"][size_t{0}]["id"].as_string(), "2");
+   }
+   query_budget extremes({});
+   const auto aggregated =
+      evaluate_query("SELECT MIN(status) AS low, MAX(status) AS high FROM sample.positions", extremes);
+   BOOST_CHECK_EQUAL(aggregated["rows"][size_t{0}]["low"].as_string(), status_open);
+   BOOST_CHECK_EQUAL(aggregated["rows"][size_t{0}]["high"].as_string(), status_archived);
+   for (const auto* sql : {"SELECT key.id AS id FROM sample.positions WHERE status = 'MISSING'",
+                           "SELECT key.id AS id FROM sample.positions WHERE status = 'a'",
+                           "SELECT SUM(status) AS total FROM sample.positions"}) {
+      query_budget invalid({});
+      BOOST_CHECK_THROW(evaluate_query(sql, invalid), query_error);
+   }
+   query_budget star({});
+   BOOST_CHECK_EQUAL(
+      evaluate_query("SELECT * FROM sample.positions WHERE key.id = 3", star)["rows"][size_t{0}]["status"].as_string(),
+      status_archived);
+}
+
+/// Column names are only consumed by ORDER BY and HAVING, so a field named `key` or `value` projects normally.
+BOOST_AUTO_TEST_CASE(fields_named_key_and_value_project_through_select_star) {
+   auto abi = sysio::chain_apis::get_abi(*validating_node, other_account);
+   for (auto& structure : abi.structs)
+      for (auto& field : structure.fields) {
+         if (structure.name == "position" && field.name == "memo")
+            field.name = "key";
+         if (structure.name == "position" && field.name == "enabled")
+            field.name = "value";
+      }
+   set_abi(other_account, fc::json::to_string(abi, fc::time_point::maximum()).c_str());
+   seed(other_account, 1, 2, "alice"_n, 5);
+   produce_block();
+   query_budget budget({});
+   const auto result = evaluate_query("SELECT * FROM other.positions ORDER BY key", budget);
+   BOOST_REQUIRE_EQUAL(result["rows"].get_array().size(), 2);
+   BOOST_CHECK_EQUAL(result["rows"][size_t{0}]["key"].as_string(), "fixture");
+   BOOST_CHECK(result["rows"][size_t{0}]["value"].as_bool());
+   query_budget filtered({});
+   const auto matched = evaluate_query(
+      "SELECT key, COUNT(*) AS n FROM other.positions WHERE key = 'fixture' AND value = TRUE GROUP BY key "
+      "HAVING key = 'fixture'",
+      filtered);
+   BOOST_REQUIRE_EQUAL(matched["rows"].get_array().size(), 1);
+   BOOST_CHECK_EQUAL(matched["rows"][size_t{0}]["n"].as_string(), "2");
+   BOOST_CHECK_EQUAL(
+      evaluate_query("SELECT key.id AS id FROM other.positions WHERE key.id = 2", filtered)["rows"].get_array().size(),
+      1);
+}
+
+/// Decoding only referenced fields and releasing per-row charges keeps large scans within the default
+/// memory budget: COUNT(*) reads no row bytes, and a projected scan charges each row once.
+BOOST_AUTO_TEST_CASE(decode_charges_do_not_accumulate_across_a_scan) {
+   constexpr uint32_t batch_rows = 1024;
+   constexpr uint32_t batches = 16;
+   for (uint32_t batch = 0; batch < batches; ++batch) {
+      seed(account, 4 + uint64_t(batch) * batch_rows, batch_rows, "alice"_n, 1);
+      produce_block();
+   }
+   const auto expected_rows = std::to_string(batch_rows * batches + 3);
+   query_budget counting({});
+   BOOST_CHECK_EQUAL(
+      evaluate_query("SELECT COUNT(*) AS n FROM sample.positions", counting)["rows"][size_t{0}]["n"].as_string(),
+      expected_rows);
+   BOOST_CHECK_LT(counting.accounted_bytes, defaults::max_memory_bytes / 4);
+   query_budget projecting({});
+   const auto page = evaluate_query("SELECT * FROM sample.positions LIMIT 10", projecting);
+   BOOST_CHECK_EQUAL(page["rows"].get_array().size(), 10);
+   BOOST_CHECK_EQUAL(page["stats"]["scanned_rows"].as_string(), expected_rows);
+   query_budget filtering({});
+   BOOST_CHECK_EQUAL(
+      evaluate_query("SELECT COUNT(*) AS n FROM sample.positions WHERE amount = 1", filtering)["rows"][size_t{0}]["n"]
+         .as_string(),
+      std::to_string(batch_rows * batches));
+   BOOST_CHECK_LT(filtering.accounted_bytes, defaults::max_memory_bytes / 4);
+}
+
+/// Timestamps beyond the four-digit-year range render deterministically instead of failing every row.
+BOOST_AUTO_TEST_CASE(time_values_outside_the_iso_range_remain_queryable) {
+   local_table_source source(*validating_node);
+   query_budget budget({});
+   const auto ast = parse_query("SELECT key.id AS id, created FROM sample.positions ORDER BY created DESC", budget);
+   const auto plan = create_plan(ast, source.describe(ast, budget), budget);
+   auto captured = source.capture(plan, budget);
+   // Seeded rows carry a null optional, so `created` starts at a fixed offset of the value bytes; the
+   // capture lists the three seeded rows in primary-key order (ids 1, 2, 3).
+   constexpr size_t created_offset = sizeof(uint64_t) + sizeof(int64_t) + sizeof(uint8_t) + sizeof(sysio::chain::asset);
+   const int64_t extremes[] = {std::numeric_limits<int64_t>::max(), std::numeric_limits<int64_t>::min(),
+                               int64_t{253402300800000000}};
+   BOOST_REQUIRE_EQUAL(captured.rows.size(), 3);
+   for (size_t i = 0; i < captured.rows.size(); ++i) {
+      auto& bytes = captured.rows[i].row.value;
+      BOOST_REQUIRE_GE(bytes.size(), created_offset + sizeof(int64_t));
+      std::memcpy(bytes.data() + created_offset, &extremes[i], sizeof(int64_t));
+   }
+   const auto result = fc::variant(evaluate(plan, std::move(captured), budget));
+   const auto& rows = result["rows"].get_array();
+   BOOST_REQUIRE_EQUAL(rows.size(), 3);
+   BOOST_CHECK_EQUAL(rows[0]["created"].as_string(), "+294247-01-10T04:00:54.775807");
+   BOOST_CHECK_EQUAL(rows[1]["created"].as_string(), "+10000-01-01T00:00:00");
+   BOOST_CHECK_EQUAL(rows[2]["created"].as_string(), "-290308-12-21T19:59:05.224192");
+   BOOST_CHECK_EQUAL(rows[2]["id"].as_string(), "2");
+   query_budget filtering({});
+   const auto later_ast = parse_query("SELECT COUNT(*) AS n FROM sample.positions WHERE created > "
+                                      "'9999-12-31T23:59:59.999999' AND created <= '+294247-01-10T04:00:54.775807'",
+                                      filtering);
+   const auto later_plan = create_plan(later_ast, source.describe(later_ast, filtering), filtering);
+   auto patched = source.capture(later_plan, filtering);
+   for (auto& row : patched.rows) {
+      const int64_t microseconds = 253402300800000000;
+      std::memcpy(row.row.value.data() + created_offset, &microseconds, sizeof(microseconds));
+   }
+   BOOST_CHECK_EQUAL(
+      fc::variant(evaluate(later_plan, std::move(patched), filtering))["rows"][size_t{0}]["n"].as_string(), "3");
+}
+
+/// Checksum literals bind case-insensitively at their exact width; the decoder's lowercase form is canonical.
+BOOST_AUTO_TEST_CASE(checksum_literals_match_rows_in_any_case) {
+   push_action(account, wide_action, account, fc::mutable_variant_object()("id", 1));
+   produce_block();
+   query_budget budget({});
+   const auto digest =
+      evaluate_query("SELECT digest FROM sample.wide", budget)["rows"][size_t{0}]["digest"].as_string();
+   BOOST_CHECK_EQUAL(digest, fc::sha256::hash(std::string("fixture")).str());
+   std::string uppercase = digest;
+   std::transform(uppercase.begin(), uppercase.end(), uppercase.begin(),
+                  [](unsigned char c) { return std::toupper(c); });
+   for (const auto& literal : {digest, uppercase}) {
+      query_budget bound({});
+      BOOST_CHECK_EQUAL(evaluate_query("SELECT COUNT(*) AS n FROM sample.wide WHERE digest = '" + literal + "'",
+                                       bound)["rows"][size_t{0}]["n"]
+                           .as_string(),
+                        "1");
+   }
+   for (const auto* literal : {"'ab'", "'zz'"}) {
+      query_budget invalid({});
+      BOOST_CHECK_THROW(
+         evaluate_query(std::string("SELECT COUNT(*) AS n FROM sample.wide WHERE digest = ") + literal, invalid),
+         query_error);
+   }
 }
 
 /// A row larger than the remaining raw-byte budget is rejected before its storage is copied.

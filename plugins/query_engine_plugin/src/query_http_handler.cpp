@@ -151,7 +151,8 @@ struct query_http_handler::impl {
 
    /// Bound ingress independently of engine admission, including queued HTTP bodies and response buffers.
    void submit(std::string body, url_response_callback callback) {
-      auto budget = engine->create_budget(query_options{.timeout_ms = engine->config().timeout_ms});
+      auto budget =
+         engine->create_budget(query_options{.timeout = std::chrono::milliseconds(engine->config().timeout_ms)});
       query_request parsed;
       try {
          parsed = parse_request(body, *budget);

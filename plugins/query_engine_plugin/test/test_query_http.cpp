@@ -25,6 +25,7 @@ constexpr auto all_rows_sql = "SELECT beneficiary, COUNT(*) AS records, SUM(amou
 constexpr auto selected_sql = "SELECT * FROM sample.positions WHERE key.id = 1";
 constexpr auto table_route = "/v1/chain/get_table_rows";
 constexpr int http_version = 11;
+constexpr uint32_t default_read_threads = 2;
 
 /// Actual application and dependency closure, with an explicitly disabled TCP listener.
 struct http_application {
@@ -45,7 +46,7 @@ struct http_application {
    std::atomic<uint64_t> query_requests{0}, denied_table_requests{0};
 
    /// Enablement is supplied via the public --plugin option, never a test route.
-   chain::exit_code::exit_code initialize(bool enabled, uint32_t read_threads = 0,
+   chain::exit_code::exit_code initialize(bool enabled, uint32_t read_threads = default_read_threads,
                                           const std::vector<std::string>& extra = {},
                                           const std::string& read_mode = "head", bool listener = true,
                                           bool enable_http = true) {
@@ -113,6 +114,17 @@ struct http_application {
       write([] {}); // Also wait for startup of plugins ordered after the HTTP listener.
    }
 
+   /// Run the application until its startup guards reject the configuration, and return the exit code.
+   chain::exit_code::exit_code run_until_startup_fails() {
+      BOOST_REQUIRE(initialized);
+      loop = std::thread([this] { exit.set_value(application.exec()); });
+      const auto finished = exited.wait_for(test_wait);
+      if (finished != std::future_status::ready)
+         app().quit();
+      BOOST_REQUIRE(finished == std::future_status::ready);
+      return exited.get();
+   }
+
    /// Queue actual state mutations on the same read/write executor used by nodeop.
    std::future<void> post_write(std::function<void()> function) {
       auto completion = std::make_shared<std::promise<void>>();
@@ -133,28 +145,29 @@ struct http_application {
       result.get();
    }
 
-   /// Pool-specific captures use the real read-exclusive queue so the app thread cannot drain
-   /// them in a write window before producer_plugin starts its read workers.
-   void post_read(std::function<void()> function, bool require_read_window = false) {
-      app().executor().post(priority::medium_low,
-                            require_read_window ? exec_queue::read_exclusive : exec_queue::read_only,
-                            std::move(function));
+   /// Captures use the real read-exclusive queue, exactly as the plugin schedules them: only the
+   /// producer's read workers drain it, inside a read window the app thread cannot enter.
+   void post_read(std::function<void()> function) {
+      app().executor().post(priority::medium_low, exec_queue::read_exclusive, std::move(function));
    }
 
-   /// Copy ABI descriptions on the read executor; callers compile plans outside its callbacks.
+   /// Copy ABI bytes on the read executor; the description is resolved outside its callbacks.
    std::vector<table_schema> describe(const ast_query& ast, query_budget& budget) {
       auto completion = std::make_shared<std::promise<std::vector<table_schema>>>();
       auto result = completion->get_future();
       post_read([&ast, &budget, completion] {
          try {
             local_table_source source(app().get_plugin<chain_plugin>().chain());
-            completion->set_value(source.describe(ast, budget));
+            completion->set_value(source.capture_abis(ast, budget));
          } catch (...) {
             completion->set_exception(std::current_exception());
          }
       });
       BOOST_REQUIRE(result.wait_for(test_wait) == std::future_status::ready);
-      return result.get();
+      auto schemas = result.get();
+      for (auto& schema : schemas)
+         resolve_schema(schema, ast.table, budget);
+      return schemas;
    }
 
    /// Copy signed blocks from the real WASM fixture and apply them as scheduled writes.
@@ -290,24 +303,46 @@ BOOST_AUTO_TEST_CASE(query_http_plugin_disabled) {
 /// Reject a configured producer during initialization, before workers or routes exist.
 BOOST_AUTO_TEST_CASE(query_http_rejects_producer) {
    http_application server;
-   BOOST_CHECK(server.initialize(true, 0, {"--producer-name", "sysio"}) != chain::exit_code::SUCCESS);
+   BOOST_CHECK(server.initialize(true, default_read_threads, {"--producer-name", "sysio"}) !=
+               chain::exit_code::SUCCESS);
 }
 
 /// Startup rejects speculative chain state independently of HTTP enablement.
 BOOST_AUTO_TEST_CASE(query_http_startup_guards) {
    http_application server;
-   BOOST_REQUIRE(server.initialize(true, 0, {}, "speculative") == chain::exit_code::SUCCESS);
-   server.loop = std::thread([&] { server.exit.set_value(server.application.exec()); });
-   const auto finished = server.exited.wait_for(test_wait);
-   if (finished != std::future_status::ready)
-      app().quit();
-   BOOST_REQUIRE(finished == std::future_status::ready);
-   BOOST_CHECK(server.exited.get() != chain::exit_code::SUCCESS);
+   BOOST_REQUIRE(server.initialize(true, default_read_threads, {}, "speculative") == chain::exit_code::SUCCESS);
+   BOOST_CHECK(server.run_until_startup_fails() != chain::exit_code::SUCCESS);
+}
+
+/// Reads run on the read-exclusive queue, which only read-only threads drain: startup rejects a node without them.
+BOOST_AUTO_TEST_CASE(query_http_requires_read_only_threads) {
+   http_application server;
+   BOOST_REQUIRE(server.initialize(true, 0) == chain::exit_code::SUCCESS);
+   BOOST_CHECK(server.run_until_startup_fails() != chain::exit_code::SUCCESS);
+}
+
+/// A configured capture bound may only tighten producer_plugin's read-only transaction budget: a value
+/// within the request timeout still fails at startup once it exceeds that budget.
+BOOST_AUTO_TEST_CASE(query_http_capture_bound_cannot_exceed_read_only_budget) {
+   {
+      http_application server;
+      BOOST_REQUIRE(server.initialize(true, default_read_threads, {"--query-max-capture-ms", "500"}) ==
+                    chain::exit_code::SUCCESS);
+      BOOST_CHECK(server.run_until_startup_fails() != chain::exit_code::SUCCESS);
+   }
+   chain_fixture fixture;
+   http_application server;
+   BOOST_REQUIRE(server.initialize(true, default_read_threads, {"--query-max-capture-ms", "5"}) ==
+                 chain::exit_code::SUCCESS);
+   server.start();
+   server.sync(fixture);
+   BOOST_CHECK(
+      fc::json::from_string(server.request(request_body(selected_sql)).body()).get_object().contains("result"));
 }
 
 /// Registering HTTP never makes it a required dependency; execute remains usable without listeners.
 BOOST_AUTO_TEST_CASE(query_service_without_http) {
-   for (const uint32_t read_threads : {0, 2}) {
+   for (const uint32_t read_threads : {1, 2}) {
       for (const bool http_enabled : {false, true}) {
          chain_fixture fixture;
          http_application server;
@@ -326,7 +361,7 @@ BOOST_AUTO_TEST_CASE(query_service_without_http) {
          std::optional<error_kind> application_error;
          server.write([&] {
             try {
-               service->execute(selected_sql, query_options{.timeout_ms = 0});
+               service->execute(selected_sql, query_options{.timeout = std::chrono::milliseconds(0)});
             } catch (const query_error& error) {
                application_error = error.kind;
             }
@@ -351,7 +386,7 @@ BOOST_AUTO_TEST_CASE(query_http_irreversible_read_mode) {
    chain_fixture fixture;
    fixture.produce_blocks(3);
    http_application server;
-   BOOST_REQUIRE(server.initialize(true, 0, {}, "irreversible") == chain::exit_code::SUCCESS);
+   BOOST_REQUIRE(server.initialize(true, default_read_threads, {}, "irreversible") == chain::exit_code::SUCCESS);
    server.start();
    server.sync(fixture);
    const auto response = fc::json::from_string(server.request(request_body(all_rows_sql)).body());
@@ -367,7 +402,8 @@ BOOST_AUTO_TEST_CASE(query_http_irreversible_read_mode) {
 BOOST_AUTO_TEST_CASE(query_http_admission_while_chain_queue_is_blocked) {
    chain_fixture fixture;
    http_application server;
-   BOOST_REQUIRE(server.initialize(true, 0, {"--query-max-in-flight", "1"}) == chain::exit_code::SUCCESS);
+   BOOST_REQUIRE(server.initialize(true, default_read_threads, {"--query-max-in-flight", "1"}) ==
+                 chain::exit_code::SUCCESS);
    server.start();
    server.sync(fixture);
    auto entered = std::make_shared<std::promise<void>>();
@@ -408,9 +444,9 @@ BOOST_AUTO_TEST_CASE(query_http_admission_while_chain_queue_is_blocked) {
    }
 }
 
-/// A real executor excludes block application between pages, in both read-thread configurations.
+/// A real executor excludes block application between pages, for one and for several read threads.
 BOOST_AUTO_TEST_CASE(query_application_coherent_pages_and_capture_timeout) {
-   for (const uint32_t read_threads : {0U, 2U}) {
+   for (const uint32_t read_threads : {1U, 2U}) {
       chain_fixture fixture;
       constexpr uint32_t extra_rows = 600;
       fixture.seed(account, 4, extra_rows, "alice"_n, 1);
@@ -443,21 +479,19 @@ BOOST_AUTO_TEST_CASE(query_application_coherent_pages_and_capture_timeout) {
       const auto plan = create_plan(ast, server.describe(ast, budget), budget);
       std::promise<captured_input> completion;
       auto captured = completion.get_future();
-      server.post_read(
-         [&] {
-            try {
-               auto& controller = app().get_plugin<chain_plugin>().chain();
-               used_read_window = !controller.is_write_window();
-               local_table_source source(controller);
-               capturing = true;
-               auto input = source.capture(plan, budget);
-               capturing = false;
-               completion.set_value(std::move(input));
-            } catch (...) {
-               completion.set_exception(std::current_exception());
-            }
-         },
-         read_threads != 0);
+      server.post_read([&] {
+         try {
+            auto& controller = app().get_plugin<chain_plugin>().chain();
+            used_read_window = !controller.is_write_window();
+            local_table_source source(controller);
+            capturing = true;
+            auto input = source.capture(plan, budget);
+            capturing = false;
+            completion.set_value(std::move(input));
+         } catch (...) {
+            completion.set_exception(std::current_exception());
+         }
+      });
       const auto barrier_status = reached.wait_for(test_wait);
       if (barrier_status != std::future_status::ready)
          resume.set_value();
@@ -468,7 +502,7 @@ BOOST_AUTO_TEST_CASE(query_application_coherent_pages_and_capture_timeout) {
       BOOST_CHECK(update_while_reading == std::future_status::timeout);
       BOOST_REQUIRE(captured.wait_for(test_wait) == std::future_status::ready);
       auto input = captured.get();
-      BOOST_CHECK_EQUAL(used_read_window, read_threads != 0);
+      BOOST_CHECK(used_read_window);
       BOOST_CHECK_EQUAL(input.native_pages, 2);
       BOOST_CHECK_EQUAL(input.state["block_id"].as_string(), original_head);
       BOOST_REQUIRE(update.wait_for(test_wait) == std::future_status::ready);
@@ -484,11 +518,11 @@ BOOST_AUTO_TEST_CASE(query_application_coherent_pages_and_capture_timeout) {
       // Expire only the capture budget after one page, then prove later block work runs.
       std::promise<error_kind> timeout_completion;
       auto timed_out = timeout_completion.get_future();
-      app().executor().post(priority::medium_low, exec_queue::read_only, [&] {
+      server.post_read([&] {
          query_budget* active = nullptr;
          query_budget timeout({}, [&] {
-            return started + std::chrono::milliseconds(
-                                active && active->scanned_rows >= constants::page_rows ? defaults::max_capture_ms : 0);
+            return started + std::chrono::microseconds(
+                                active && active->scanned_rows >= constants::page_rows ? defaults::max_capture_us : 0);
          });
          active = &timeout;
          try {
@@ -528,7 +562,7 @@ BOOST_AUTO_TEST_CASE(query_application_representative_workload) {
    std::promise<void> baseline_completion;
    auto baseline = baseline_completion.get_future();
    uint64_t capture_us = 0, raw_bytes = 0, memory_bytes = 0;
-   app().executor().post(priority::medium_low, exec_queue::read_only, [&] {
+   server.post_read([&] {
       try {
          local_table_source source(app().get_plugin<chain_plugin>().chain());
          const auto input = source.capture(plan, budget);

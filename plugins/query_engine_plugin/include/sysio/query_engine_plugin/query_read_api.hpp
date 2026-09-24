@@ -12,7 +12,7 @@ public:
    using read_scheduler = std::function<void(std::function<void()>)>;
    /// A nonempty application_thread rejects callers whose blocking wait would prevent read dispatch.
    query_read_api(std::shared_ptr<local_table_source>, read_scheduler, std::thread::id application_thread = {});
-   /// Read ABI metadata through the internally scheduled read boundary.
+   /// Copy raw ABI bytes through the internally scheduled read boundary, then resolve them on the caller's worker.
    std::vector<table_schema> describe(std::shared_ptr<const ast_query>, std::shared_ptr<query_task>) const;
    /// Copy every primary page in one synchronized read, preserving coherent state across owners.
    captured_input capture(std::shared_ptr<const typed_plan>, std::shared_ptr<query_task>) const;

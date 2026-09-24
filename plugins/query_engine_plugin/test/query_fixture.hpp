@@ -23,6 +23,9 @@ inline constexpr auto seed_action = "seed"_n;
 inline constexpr auto erase_action = "erase"_n;
 inline constexpr auto composite_action = "putcomp"_n;
 inline constexpr auto wide_action = "putwide"_n;
+inline constexpr auto status_open = "POSITION_STATUS_OPEN";
+inline constexpr auto status_closed = "POSITION_STATUS_CLOSED";
+inline constexpr auto status_archived = "POSITION_STATUS_ARCHIVED";
 inline constexpr auto test_wait = std::chrono::seconds(10);
 
 /// Real signed fixture actions, replicated into the validating controller used by queries.
@@ -45,12 +48,14 @@ struct chain_fixture : testing::validating_tester {
          code, seed_action, code,
          fc::mutable_variant_object()("first", first)("count", count)("beneficiary", beneficiary)("amount", amount));
    }
-   /// Shared action input uses the fixture ABI, preserving nested and optional values.
-   static fc::variant position(int64_t amount, fc::variant nullable = {}, const std::string& quantity = "1.2500 SYS") {
+   /// Shared action input uses the fixture ABI, preserving nested, optional and enum values.
+   static fc::variant position(int64_t amount, fc::variant nullable = {}, const std::string& quantity = "1.2500 SYS",
+                               const std::string& status = status_open) {
       return fc::mutable_variant_object()("beneficiary", "alice")("amount", amount)("nullable", std::move(nullable))(
          "quantity", quantity)("created", "2023-11-14T22:13:20.123")("memo", "a'b")(
          "nested", fc::mutable_variant_object()("score", -7)(
-                      "numbers", fc::variants{fc::variant(uint64_t{9007199254740993ULL})}))("enabled", true);
+                      "numbers", fc::variants{fc::variant(uint64_t{9007199254740993ULL})}))("enabled", true)("status",
+                                                                                                             status);
    }
    /// Replace one row with an ABI-encoded action.
    void put(uint64_t id, fc::variant row) {

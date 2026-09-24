@@ -25,29 +25,34 @@ is validated against the shipped schema plus dynamic column/cell invariants.
 
 Lifecycle tests use deterministic stage barriers and injected clocks to exercise queue deadlines,
 admission, cancellation and exactly-once completion. Executor tests pause after the first 512-row
-page and queue a signed block update, with both zero and two read-only threads. The update must
-remain excluded through capture; worker evaluation of owned bytes then returns the old state and
-the next query returns the new state. A deterministic capture timeout must leave subsequent block
-application live.
+page and queue a signed block update, with one and with two read-only threads, on the
+read-exclusive queue the plugin schedules its reads on. The update must remain excluded through
+capture; worker evaluation of owned bytes then returns the old state and the next query returns the
+new state. A deterministic capture timeout must leave subsequent block application live. Startup
+guards reject zero read-only threads and a `query-max-capture-ms` above producer_plugin's read-only
+transaction time.
 
 `query_application_representative_workload` reports native capture microseconds, copied bytes,
 accounted capture memory, configured admitted memory, total concurrent HTTP latency, scanned rows
 and continued block progress for a bounded 1027-row/four-request workload. This is workload-specific
 evidence, not a universal throughput guarantee. Use `--log_level=message` to retain the measurements.
 
-Generated grammar sources must match the `check_query_parser` CMake target using the vcpkg-installed
-pinned ANTLR JAR and system JVM. Configure must repopulate absent, empty or incomplete generated
-sources, fail clearly without a JVM when generation is needed, and accept complete sources without Java.
+The parser is generated into the build tree from `grammar/WireQuery.g4` by the vcpkg-installed
+pinned ANTLR JAR and the system Java runtime on every build that changes the grammar; nothing
+generated is committed, and a configure without Java fails at the generator module.
 Build fixtures through CMake/CDT and copy the generated ABI/WASM into the source fixture directory.
 Do not regenerate unrelated chain snapshot/reference fixtures.
 
 `query_execute` covers owned typed results/metadata, the public virtual execute interface, worker
-execution, default unlimited timeout, timeout validation, per-call limit/offset, aggregate pagination,
-SQL LIMIT composition, configured caps and stopped services. Lifecycle tests exercise the blocking
-API with deterministic queued reads and stage barriers, plus HTTP queue saturation/deadlines while
-its only worker is blocked in execute. The application tests also execute queries
-with HTTP registered but disabled, and with HTTP enabled without a listener, using zero/two read
-threads. The plugin's only required dependency is chain_plugin.
+execution, the configured default deadline and the explicit no-deadline opt-out, timeout
+validation, per-call limit/offset, aggregate pagination, SQL LIMIT composition, configured caps and
+stopped services. Lifecycle tests exercise the blocking API with deterministic queued reads and
+stage barriers, plus HTTP queue saturation/deadlines while its only worker is blocked in execute.
+The application tests also execute queries with HTTP registered but disabled, and with HTTP enabled
+without a listener, using one/two read threads. The plugin requires chain_plugin and
+producer_plugin. Integration tests cover ABI enum names in results and literals, columns named
+`key`/`value`, decode accounting over a 16k-row scan at the default limits, timestamps outside the
+four-digit-year range, and case-insensitive checksum literals.
 
 Every implementation/parser namespace is `sysio::query_engine`; the appbase plugin name is
 `sysio::query_engine_plugin`.
