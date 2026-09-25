@@ -14,6 +14,7 @@ RUN apt-get update
 
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y build-essential      \
+    openjdk-21-jre-headless \
     cmake                \
     git                  \
     jq                   \

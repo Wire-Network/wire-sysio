@@ -50,9 +50,11 @@ On Ubuntu 24.04 and 25.x, install the following dependencies.
 # Update package lists
 sudo apt update
 
-# Install base build tools and libraries (binutils included on 24.04)
+# Install base build tools and libraries (binutils included on 24.04). The Java runtime drives the
+# ANTLR parser generator of the query engine plugin at build time.
 sudo apt-get install -y \
         build-essential \
+        openjdk-21-jre-headless \
         binutils \
         ccache \
         cmake \
