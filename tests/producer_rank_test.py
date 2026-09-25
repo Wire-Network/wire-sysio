@@ -258,7 +258,7 @@ try:
     def producerRow(name):
         """The producer's `sysio.system::producers` row, or None if it has none.
 
-        v6 promotes the table to KV, so each row arrives as {"key": ..., "value": ...} and the
+        The table is a KV table, so each row arrives as {"key": ..., "value": ...} and the
         fields live under `value`; the fallback keeps this working if that ever flattens.
         """
         resp = node0.processUrllibRequest("chain", "get_table_rows", {

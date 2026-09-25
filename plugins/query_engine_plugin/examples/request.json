@@ -1,0 +1,8 @@
+{
+  "jsonrpc": "2.0",
+  "id": "balances-by-beneficiary",
+  "method": "query.execute",
+  "params": {
+    "query": "SELECT beneficiary, COUNT(*) AS records, SUM(amount) AS total FROM positions OWNER 'sample' WHERE amount >= 10 GROUP BY beneficiary HAVING SUM(amount) > 100 ORDER BY total DESC LIMIT 20"
+  }
+}

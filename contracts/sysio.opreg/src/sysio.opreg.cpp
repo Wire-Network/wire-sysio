@@ -3,9 +3,10 @@
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.uwrit/sysio.uwrit.hpp>
-#include <sysio.opp.common/slug_name.hpp>
+#include <sysio/slug_name.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio.opp.common/claimable.hpp>
+#include <sysio.opp.common/registry_codes.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <magic_enum/magic_enum.hpp>
 #include <zpp_bits.h>
@@ -87,7 +88,7 @@ checksum256 make_account_chain_token_key(name account,
 /// for handling that case — typically by skipping the queueout for chains
 /// without an outpost, e.g. WIRE-direct flows).
 ///
-/// Post v6 cross-contract realignment: chain rows live in
+/// After the cross-contract realignment: chain rows live in
 /// `sysio.chains::chains` keyed by `code` (slug_name); the legacy
 /// `sysio.epoch::outposts` table is gone. The "outpost id" returned here is
 /// the chain's `code.value` (uint64) — callers that still expect a small
@@ -145,6 +146,19 @@ void require_positive_min_bond(const std::vector<opreg::chain_min_bond>& v,
       check(entry.min_bond > 0,
             std::string(role_label) +
                ": min_bond must be positive (an empty requirement set imposes no bond)");
+   }
+}
+
+/// Reject a collateral-requirement entry whose codes have no canonical string
+/// spelling. These entries persist on the config row and are rendered by every
+/// reader of it — and an uncanonical code does not announce itself: it can render
+/// a valid spelling that re-parses to a different value, aliasing onto another
+/// code. See `registry_codes.hpp`. `setconfig` is a privileged top-level action,
+/// so it refuses rather than absorbing the value the way a dispatch handler must.
+void require_canonical_codes(const std::vector<opreg::chain_min_bond>& v,
+                             const char* role_label) {
+   for (const auto& entry : v) {
+      opp::registry::check_codes({entry.chain_code, entry.token_code}, role_label);
    }
 }
 
@@ -237,6 +251,10 @@ void opreg::setconfig(uint32_t max_available_producers,
                "terminate_window_ms must span at least terminate_max_consecutive_misses + 1 duty rotations");
       }
    }
+
+   require_canonical_codes(req_prod_collat,    "req_prod_collat");
+   require_canonical_codes(req_batchop_collat, "req_batchop_collat");
+   require_canonical_codes(req_uw_collat,      "req_uw_collat");
 
    require_no_duplicate_chain_token(req_prod_collat,    "req_prod_collat");
    require_no_duplicate_chain_token(req_batchop_collat, "req_batchop_collat");
@@ -333,7 +351,7 @@ void opreg::regoperator(name account,
    // Verify authex links exist for all active outpost chains.
    // Skip when: bootstrapped OR privileged caller (sysio.opreg registering on behalf)
    //
-   // Post v6 refactor: the outpost set lives in `sysio.chains::chains` keyed
+   // After the refactor: the outpost set lives in `sysio.chains::chains` keyed
    // by slug_name. The depot self-row (`is_depot == true`) is skipped; only
    // active outpost chains require an authex link. `authex::links.bynamechain`
    // is still keyed by ChainKind (uint128 of (account, ChainKind)), so we
@@ -411,7 +429,7 @@ uint64_t sum_locks_inline(name account, sysio::slug_name chain_code, sysio::slug
 /// (op, chain, token). Subtracted by `available()` so a queued withdraw
 /// effectively reserves the funds for its 2-epoch wait.
 ///
-/// Per v6 plan §B.2 (split-index design): `wtdwqueue_t` exposes only uint64
+/// Per the split-index design: `wtdwqueue_t` exposes only uint64
 /// secondary indexes. `byaccount` keys on `account.value`; rows are filtered
 /// on `(chain_code, token_code)` in memory. Per-account pending-withdraw
 /// counts are bounded by the operator's collateral-bucket count.
@@ -659,7 +677,7 @@ namespace {
 /// fails gracefully (the depot's `dispatch_operator_action` rejects empty
 /// `op_address.address`).
 ///
-/// Post v6: `authex::links.bynamechain` is still keyed by `(name, ChainKind)`
+/// After the refactor: `authex::links.bynamechain` is still keyed by `(name, ChainKind)`
 /// and `ChainAddress.kind` is still `ChainKind`. opreg now stores chains by
 /// slug_name; resolve via `chain_kind_for_code` first.
 opp::types::ChainAddress operator_chain_address(name account, sysio::slug_name chain_code) {
@@ -1214,7 +1232,7 @@ void opreg::deposit(name account, uint64_t amount) {
 // `actor_chain` is retained as `opp::types::ChainKind` per the
 // ChainAddress flattening pattern — the depositor's source-chain
 // `ChainAddress.kind` field is still ChainKind on the wire and is not
-// part of the v6 slug_name refactor.
+// part of the slug_name refactor.
 void opreg::depositinle(name account,
                         sysio::slug_name chain_code,
                         sysio::slug_name token_code,
@@ -1236,6 +1254,18 @@ void opreg::depositinle(name account,
 
    auto deposit_action = build_deposit_action(actor, chain_code, token_code, amount);
 
+   // The balance map is keyed by (chain_code, token_code), so an uncanonical token
+   // code must not be persisted: rendering is total and will not complain, but the
+   // code can render a valid spelling that re-parses as a DIFFERENT code, aliasing
+   // one operator's balance onto another's key. The outpost has already taken
+   // custody, so refund rather than drop.
+   if (!token_code.is_canonical()) {
+      const std::string err = "token code has no canonical slug_name spelling";
+      emit_deposit_revert(get_self(), chain_code, actor, token_code, amount,
+                          original_message_id, err);
+      append_action_log(ops, op_pk, deposit_action, false, err);
+      return;
+   }
    if (amount == 0) {
       const std::string err = "amount must be positive";
       emit_deposit_revert(get_self(), chain_code, actor, token_code, amount,

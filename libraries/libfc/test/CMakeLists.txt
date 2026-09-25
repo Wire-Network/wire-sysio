@@ -15,6 +15,7 @@ add_executable( test_fc
         io/test_secure_file.cpp
         log/test_json_formatter.cpp
         log/test_es_sink.cpp
+        log/test_logger.cpp
         io/test_json_variant.cpp
         io/test_random_access_file.cpp
         io/test_raw.cpp

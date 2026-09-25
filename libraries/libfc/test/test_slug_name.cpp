@@ -3,10 +3,14 @@
 
 #include <fc/basic_name.hpp>
 #include <fc/slug_name.hpp>
+#include <fc/io/json.hpp>
 #include <fc/io/raw.hpp>
+#include <fc/variant.hpp>
+#include <fc/variant_object.hpp>
 
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <unordered_set>
 
 using fc::slug_name;
@@ -26,6 +30,13 @@ struct slug_name_lsb_traits {
                                                sizeof(alphabet_storage) - 1 };
    static constexpr bool zero_terminates = true;
    static constexpr fc::basic_name_endianness packing = fc::basic_name_endianness::LSB;
+
+   static constexpr const char* bad_char_message =
+      "character is not in allowed character set for slug_names ([A-Z0-9_])";
+   static constexpr const char* too_long_message = "string is too long to be a valid slug_name";
+   static constexpr const char* bad_final_symbol_message =
+      "final character in slug_name does not fit its packed slot";
+   static constexpr const char* not_normalized_message = "slug_name is not properly normalized";
 
    [[noreturn]] static void throw_invalid( std::string_view in, const char* why ) {
       FC_ASSERT( false, "invalid slug_name_lsb '{}': {}", std::string(in), why );
@@ -59,15 +70,12 @@ BOOST_AUTO_TEST_CASE(roundtrip_simple_strings) {
 BOOST_AUTO_TEST_CASE(roundtrip_with_underscores) {
    BOOST_CHECK_EQUAL(slug_name{"A_B"}.to_string(),     "A_B");
    BOOST_CHECK_EQUAL(slug_name{"X_Y_Z"}.to_string(),   "X_Y_Z");
-   BOOST_CHECK_EQUAL(slug_name{"_LEAD"}.to_string(),   "_LEAD");
    BOOST_CHECK_EQUAL(slug_name{"TRAIL_"}.to_string(),  "TRAIL_");
 }
 
 BOOST_AUTO_TEST_CASE(roundtrip_with_digits) {
    BOOST_CHECK_EQUAL(slug_name{"V1"}.to_string(),       "V1");
-   BOOST_CHECK_EQUAL(slug_name{"0"}.to_string(),        "0");
    BOOST_CHECK_EQUAL(slug_name{"X12345"}.to_string(),   "X12345");
-   BOOST_CHECK_EQUAL(slug_name{"01234567"}.to_string(), "01234567");  // 8 digits
 }
 
 BOOST_AUTO_TEST_CASE(empty_codename) {
@@ -112,12 +120,12 @@ BOOST_AUTO_TEST_CASE(values_under_js_safe_integer_limit) {
 
    BOOST_CHECK_LT("ETHEREUM"_s.value, JS_SAFE_LIMIT);
    BOOST_CHECK_LT("ZZZZZZZZ"_s.value, JS_SAFE_LIMIT);
-   BOOST_CHECK_LT("12345678"_s.value, JS_SAFE_LIMIT);
-   BOOST_CHECK_LT("________"_s.value, JS_SAFE_LIMIT);
+   BOOST_CHECK_LT("Z1234567"_s.value, JS_SAFE_LIMIT);
+   BOOST_CHECK_LT("Z_______"_s.value, JS_SAFE_LIMIT);
 
-   // The theoretical maximum: all slots = 37 (the `_` char).
-   // Value = 37 * (1 + 2^6 + 2^12 + ... + 2^42) = 37 * ((2^48 - 1) / 63).
-   const uint64_t max_codename = "________"_s.value;
+   // The largest legal code: 'Z' (26) leading, then '_' (37) in every slot the
+   // leading rule leaves free.
+   const uint64_t max_codename = "Z_______"_s.value;
    BOOST_CHECK_LT(max_codename, JS_SAFE_LIMIT);
    BOOST_CHECK_LT(max_codename, (1ULL << 48));
 }
@@ -156,13 +164,32 @@ BOOST_AUTO_TEST_CASE(accepts_full_alphabet) {
 //  Alphabet
 // ---------------------------------------------------------------------------
 
-BOOST_AUTO_TEST_CASE(every_alphabet_char_roundtrips) {
-   // every non-pad symbol of the alphabet round-trips as a single-char slug
+BOOST_AUTO_TEST_CASE(every_alphabet_char_roundtrips_after_the_first_slot) {
+   // Every non-pad symbol round-trips — but only a letter may LEAD, so the
+   // sweep puts each symbol in the SECOND slot behind a fixed letter.
    const std::string_view alphabet = fc::slug_name_traits::alphabet;
    for (std::size_t s = 1; s < alphabet.size(); ++s) {
-      const std::string one(1, alphabet[s]);
-      BOOST_CHECK_EQUAL(slug_name{one}.to_string(), one);
+      const std::string two = std::string("A") + alphabet[s];
+      BOOST_CHECK_EQUAL(slug_name{two}.to_string(), two);
    }
+}
+
+BOOST_AUTO_TEST_CASE(a_code_must_start_with_a_letter) {
+   // The rule that makes the string carrier unambiguous: no legal code can be
+   // spelled like a number, so a bare JSON string is never a decimal.
+   for (const char* bad : {"0", "7", "101", "1E3", "0X10", "12345678",
+                           "_LEAD", "________", "01234567"}) {
+      BOOST_CHECK_THROW(slug_name{bad}, fc::exception);
+      BOOST_CHECK_MESSAGE(!slug_name::is_valid_literal(bad),
+                          std::string{"must be rejected as a literal: "} + bad);
+   }
+   // Digits and '_' stay legal everywhere after the first symbol.
+   for (const char* good : {"V1", "X12345", "AZ09_", "TRAIL_", "A_B", "Z_______"}) {
+      BOOST_CHECK_EQUAL(slug_name{good}.to_string(), good);
+      BOOST_CHECK(slug_name::is_valid_literal(good));
+   }
+   // The zero sentinel is not a spelling and is unaffected.
+   BOOST_CHECK_EQUAL(slug_name{""}.value, 0u);
 }
 
 BOOST_AUTO_TEST_CASE(symbol_zero_is_the_nul_pad) {
@@ -322,6 +349,12 @@ struct name_like_traits {
    static constexpr std::string_view alphabet = ".12345abcdefghijklmnopqrstuvwxyz";
    static constexpr bool             zero_terminates = false;
    static constexpr fc::basic_name_endianness packing = fc::basic_name_endianness::MSB;
+   static constexpr const char* bad_char_message =
+      "character is not in allowed character set for names ([.1-5a-z])";
+   static constexpr const char* too_long_message = "string is too long to be a valid name";
+   static constexpr const char* bad_final_symbol_message =
+      "thirteenth character in name cannot be a letter that comes after j";
+   static constexpr const char* not_normalized_message = "name is not properly normalized";
    [[noreturn]] static void throw_invalid( std::string_view in, const char* why ) {
       FC_ASSERT( false, "invalid name '{}': {}", std::string(in), why );
       __builtin_unreachable();
@@ -330,7 +363,52 @@ struct name_like_traits {
 
 using name_like = fc::basic_name<name_like_traits>;
 
+// An alphabet member that is only CONVERTIBLE to std::string_view: it has no
+// find(), no size(), no operator[] of its own. basic_name_traits asks for
+// exactly this much, so basic_name must bind a view before using it -- a direct
+// member call on the traits' alphabet would not compile against this policy.
+struct convertible_alphabet {
+   static constexpr char storage[] = ".12345abcdefghijklmnopqrstuvwxyz";
+   constexpr operator std::string_view() const {
+      return { storage, sizeof(storage) - 1 };
+   }
+};
+
+// Name-style (zero_terminates = false) so ONE instantiation reaches all three
+// sites: the alphabet scan in validity_error, rule 6's trailing-pad test (which
+// indexes alphabet[0]), and the symbol-width derivation (which takes size()).
+struct convertible_alphabet_traits {
+   static constexpr int                   max_len         = 13;
+   static constexpr convertible_alphabet  alphabet{};
+   static constexpr bool                  zero_terminates = false;
+   static constexpr fc::basic_name_endianness packing = fc::basic_name_endianness::MSB;
+   static constexpr const char* bad_char_message         = "conv: character is not in the alphabet";
+   static constexpr const char* too_long_message         = "conv: string is too long";
+   static constexpr const char* bad_final_symbol_message = "conv: final symbol does not fit its slot";
+   static constexpr const char* not_normalized_message   = "conv: spelling is not properly normalized";
+   [[noreturn]] static void throw_invalid( std::string_view in, const char* why ) {
+      FC_ASSERT( false, "invalid conv '{}': {}", std::string(in), why );
+      __builtin_unreachable();
+   }
+};
+
+using conv_name = fc::basic_name<convertible_alphabet_traits>;
+
 } // anonymous namespace
+
+// A policy whose alphabet is only CONVERTIBLE to string_view is usable. The
+// concept promises no more than that, so the implementation must not demand
+// more; this whole case is a compile-time assertion as much as a runtime one.
+BOOST_AUTO_TEST_CASE(convertible_alphabet_traits_are_usable) {
+   static_assert(fc::basic_name_traits<convertible_alphabet_traits>);
+   // Round trip: the alphabet scan and the symbol-width derivation both ran.
+   BOOST_CHECK_EQUAL(conv_name{"sysio"}.to_string(), "sysio");
+   BOOST_CHECK_EQUAL(conv_name{"a.b"}.to_string(), "a.b");
+   // Rule 6 (!zero_terminates): a trailing pad is not normalized. This is the
+   // check that indexes alphabet[0].
+   BOOST_CHECK_THROW(conv_name{std::string_view{"a."}}, fc::exception);
+   BOOST_CHECK_THROW(conv_name{std::string_view{"A"}}, fc::exception);
+}
 
 BOOST_AUTO_TEST_CASE(non_zero_terminator_trait_accepts_alphabet_zero) {
    // For name-style traits the pad symbol is '.', and '.' is ALSO an ordinary
@@ -342,6 +420,286 @@ BOOST_AUTO_TEST_CASE(non_zero_terminator_trait_accepts_alphabet_zero) {
    static_assert(name_like::is_valid_literal(std::string_view{".alpha", 6}),
                  "leading '.' (the pad symbol) must validate when "
                  "zero_terminates is false");
+}
+
+// ── variant carrier ────────────────────────────────────────────────────────
+// ONE emitted carrier: the canonical string spelling. A slug renders as its text
+// and zero as "", and the render is TOTAL — an uncanonical value still produces a
+// string (see the reject-or-normalize case below). Input additionally accepts the
+// transitional `{"value": N}` object, which is the only non-string form taken and
+// the only way to name a value the string carrier cannot express.
+
+BOOST_AUTO_TEST_CASE(variant_canonical_slug_is_a_string) {
+   fc::variant v;
+   fc::to_variant(slug_name{"LIQSOL"}, v);
+   BOOST_REQUIRE(v.is_string());
+   BOOST_CHECK_EQUAL(v.as_string(), "LIQSOL");
+
+   slug_name back;
+   fc::from_variant(v, back);
+   BOOST_CHECK(back == slug_name{"LIQSOL"});
+}
+
+BOOST_AUTO_TEST_CASE(variant_zero_is_the_empty_string_both_ways) {
+   fc::variant v;
+   fc::to_variant(slug_name{uint64_t{0}}, v);
+   BOOST_REQUIRE(v.is_string());
+   BOOST_CHECK_EQUAL(v.as_string(), "");
+
+   slug_name back{uint64_t{12345}};
+   fc::from_variant(fc::variant(std::string{}), back);
+   BOOST_CHECK_EQUAL(back.value, 0u);
+}
+
+BOOST_AUTO_TEST_CASE(variant_render_is_total_like_name) {
+   // The renderer never throws — parity with sysio::chain::name, whose key leaf
+   // is `name(raw).to_string()`. A read path that throws converts one bad row
+   // into a failure of every scan over it; validation belongs on the write path.
+   // A prepacked binary action sets the reflected `value` directly, so slug_name
+   // cannot guarantee it only ever holds a canonical value. (`name` needs no such
+   // guarantee: every uint64 is a canonical name — see the case below.)
+   for (uint64_t raw : {uint64_t{1}, uint64_t{7}, uint64_t{42},
+                        uint64_t{(uint64_t{1} << 42) - 1},
+                        (uint64_t{1} << 48) - 1,  // symbols past the alphabet
+                        ~uint64_t{0}}) {
+      fc::variant v;
+      BOOST_REQUIRE_NO_THROW(fc::to_variant(slug_name{raw}, v));
+      BOOST_CHECK(v.is_string());
+   }
+}
+
+BOOST_AUTO_TEST_CASE(variant_non_canonical_render_rejects_or_silently_normalizes) {
+   // A total renderer loses information in THREE ways, and the leading symbol does
+   // not tell you which: to_string() reads only bits 0-47 and stops at the first
+   // zero symbol.
+   fc::variant v;
+   slug_name   back;
+
+   // LOUD — a digit-leading symbol spells something from_variant refuses.
+   fc::to_variant(slug_name{uint64_t{34} << 42}, v);       // 34 is '7'
+   BOOST_CHECK_EQUAL(v.as_string(), "7");
+   BOOST_CHECK_THROW(fc::from_variant(v, back), fc::exception);
+
+   // SILENT — below the 1<<42 floor renders "", aliasing the zero sentinel.
+   fc::to_variant(slug_name{uint64_t{7}}, v);
+   BOOST_CHECK_EQUAL(v.as_string(), "");
+   fc::from_variant(v, back);
+   BOOST_CHECK_EQUAL(back.value, 0u);
+
+   // SILENT — unread bits render a VALID spelling that re-parses to a different
+   // value, so two distinct raws can share one spelling.
+   for (uint64_t raw : { slug_name{"ETH"}.value | (uint64_t{1} << 63),   // bits 48-63
+                         slug_name{"A"}.value | uint64_t{1} }) {         // past the terminator
+      BOOST_REQUIRE(!slug_name{raw}.is_canonical());
+      fc::to_variant(slug_name{raw}, v);
+      BOOST_REQUIRE_NO_THROW(fc::from_variant(v, back));
+      BOOST_CHECK_NE(back.value, raw);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(variant_every_canonical_value_round_trips_exactly) {
+   // Injectivity across the boundary for the whole canonical range, including
+   // its floor (1<<42 is "A") and the zero sentinel.
+   for (uint64_t raw : {uint64_t{0}, uint64_t{1} << 42, fc::slug_name{"A"}.value,
+                        fc::slug_name{"LIQSOL"}.value, fc::slug_name{"Z1234567"}.value,
+                        fc::slug_name{"Z_______"}.value}) {
+      fc::variant v;
+      BOOST_REQUIRE_NO_THROW(fc::to_variant(slug_name{raw}, v));
+      BOOST_REQUIRE(v.is_string());
+      slug_name back;
+      fc::from_variant(v, back);
+      BOOST_CHECK_EQUAL(back.value, raw);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(variant_accepts_the_transitional_object_carrier) {
+   // TRANSITIONAL: the shape abigen's reflected struct emitted before slug_name
+   // became an ABI builtin. Deleted once no writer emits it.
+   slug_name back;
+   fc::from_variant(fc::variant(fc::mutable_variant_object("value", uint64_t{7})), back);
+   BOOST_CHECK_EQUAL(back.value, 7u);
+
+   fc::from_variant(
+      fc::variant(fc::mutable_variant_object("value", fc::slug_name{"LIQSOL"}.value)), back);
+   BOOST_CHECK(back == slug_name{"LIQSOL"});
+}
+
+BOOST_AUTO_TEST_CASE(variant_rejects_a_non_canonical_string_spelling) {
+   // The string arm validates: an out-of-alphabet or non-canonical spelling is
+   // a hard error, not a silent zero.
+   slug_name back;
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(std::string{"liqsol"}), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(std::string{"TOOOLONGXX"}), back), fc::exception);
+}
+
+BOOST_AUTO_TEST_CASE(variant_carrier_round_trips_through_json_TEXT) {
+   // The variant-layer round trip above is NOT sufficient on its own: `next_key`
+   // is json TEXT (chain_plugin renders it with fc::json::to_string) and a
+   // paginating caller feeds it straight back as a `lower_bound`, re-parsed with
+   // fc::json::from_string. A single string carrier is what makes that crossing
+   // uneventful — fc::json quotes a uint64 above 0xffffffff, so a numeric
+   // carrier would change JSON TYPE mid-flight and land on the string arm as a
+   // decimal nobody asked for.
+   const uint64_t values[] = {
+      0u,                        // the zero sentinel -> ""
+      uint64_t{1} << 42,         // the canonical floor ("A")
+      slug_name{"ETH"}.value,
+      slug_name{"Z1234567"}.value,  // digits after the leading letter
+      slug_name{"Z_______"}.value,
+   };
+   for (const uint64_t raw : values) {
+      fc::variant v;
+      fc::to_variant(slug_name{raw}, v);
+      const std::string text =
+         fc::json::to_string(fc::variant(fc::mutable_variant_object("code", v)),
+                             fc::time_point::maximum());
+      slug_name back;
+      BOOST_REQUIRE_NO_THROW(
+         fc::from_variant(fc::json::from_string(text).get_object()["code"], back));
+      BOOST_CHECK_MESSAGE(back.value == raw,
+                          "json text round trip lost " << raw << " via " << text);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(mvo_accepts_every_spelling_a_caller_can_write) {
+   // Pins the whole INPUT surface a test or caller may write for a slug_name
+   // field. mutable_variant_object's templated operator() forwards to
+   // fc::variant's constructor set (variant_object.hpp:206-211), so every
+   // spelling below resolves through a different ctor and must still land on
+   // the same value:
+   //
+   //   const char*      -> variant(const char*)          -> string
+   //   std::string      -> variant(std::string)          -> string
+   //   std::string_view -> variant(std::string_view)     -> string
+   //   fc::slug_name    -> explicit variant(const T&)    -> to_variant -> string
+   //
+   // Every one lands on a string, because the string IS the carrier. This is
+   // why no `codename()`-style wrapper is needed at a call site: the raw
+   // literal and the `_s` literal both already work, and a wrapper returning
+   // std::string is just identity.
+   const slug_name expected{"LIQSOL"};
+
+   const char* const      as_c_str  = "LIQSOL";
+   const std::string      as_string = "LIQSOL";
+   const std::string_view as_view   = "LIQSOL";
+
+   const fc::variant obj{ fc::mutable_variant_object()
+      ("c_str",   as_c_str)
+      ("string",  as_string)
+      ("view",    as_view)
+      ("literal", "LIQSOL"_s)      // the _s literal — validated at compile time
+      ("slug",    expected) };     // an fc::slug_name value
+
+   for (const char* key : {"c_str", "string", "view", "literal", "slug"}) {
+      const fc::variant& cell = obj.get_object()[key];
+      BOOST_REQUIRE_MESSAGE(cell.is_string(), std::string{"not a string: "} + key);
+      BOOST_CHECK_EQUAL(cell.as_string(), "LIQSOL");
+      slug_name back;
+      fc::from_variant(cell, back);
+      BOOST_CHECK_MESSAGE(back == expected, std::string{"round trip failed: "} + key);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(variant_rejects_every_non_string_carrier) {
+   // Nothing but a string (and the transitional object) is read. Each value
+   // below would otherwise be COERCED by fc::variant::as_uint64 — which is the
+   // failure mode a single carrier removes, because none of these coercions is
+   // the value the writer meant:
+   //
+   //   7          -> not a code at all now; a code must start with a letter
+   //   -1         -> lexical_cast does not reject a sign for an unsigned
+   //                 target, it WRAPS; a bound of -1 would page from the far
+   //                 end of the table
+   //   null/false -> 0, the absent sentinel, silently
+   //   true       -> 1, a value with no canonical spelling at all
+   slug_name back;
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(uint64_t{7}), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(uint64_t{1} << 42), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(int64_t{-1}), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(int64_t{-12345678}), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(false), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(true), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(fc::variant(1.5), back), fc::exception);
+
+   // A numeric STRING is not an escape either: it is parsed as a slug like any
+   // other spelling, so a signed or over-long decimal is simply invalid text.
+   for (const char* spelling : {"-1", "-12345678", "+123456789", "4294967296",
+                                "000000000000000042"}) {
+      BOOST_CHECK_THROW(fc::from_variant(fc::variant(std::string{spelling}), back),
+                        fc::exception);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(variant_object_arm_rejects_every_coercible_value_shape) {
+   // The transitional object arm reaches a RAW uint64, so it is the one place a
+   // malformed number can still land on a key. `fc::variant::as_uint64` coerces
+   // rather than validates — it wraps a negative int64 to UINT64_MAX, truncates
+   // a double, and turns null/bool into 0/1 — and since from_variant feeds
+   // encode_field, `{"value": -1}` would encode be64(UINT64_MAX) and page from
+   // the far end of the table. Each shape below must be refused, not coerced.
+   slug_name back;
+   const auto obj = [](const fc::variant& value) {
+      return fc::variant(fc::mutable_variant_object("value", value));
+   };
+
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(int64_t{-1})), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(int64_t{-12345678})), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(std::string{"-1"})), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(std::string{"+1"})), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(1.5)), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(-1.0)), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(std::string{"1.5"})), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(std::string{"1E3"})), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant()), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(true)), back), fc::exception);
+   BOOST_CHECK_THROW(fc::from_variant(obj(fc::variant(std::string{})), back), fc::exception);
+   // Out of range: all digits, but past 2^64. boost::lexical_cast throws rather
+   // than saturating, so the parse error surfaces instead of a wrong value.
+   BOOST_CHECK_THROW(
+      fc::from_variant(obj(fc::variant(std::string{"1234567890123456789012345"})), back),
+      fc::exception);
+
+   // And the shapes a real pre-builtin writer emits still work. Canonicality is
+   // NOT required here: a value with no canonical spelling is exactly what the string
+   // carrier cannot express, so this arm is the only way to name such a bound.
+   fc::from_variant(obj(fc::variant(uint64_t{7})), back);
+   BOOST_CHECK_EQUAL(back.value, 7u);
+   fc::from_variant(obj(fc::variant(std::string{"7"})), back);
+   BOOST_CHECK_EQUAL(back.value, 7u);
+   fc::from_variant(obj(fc::variant(slug_name{"LIQSOL"}.value)), back);
+   BOOST_CHECK(back == slug_name{"LIQSOL"});
+}
+
+/// slug_name is DERIVED, so it needs its own std::hash — and this is primarily a
+/// COMPILE-time guard. A partial specialization over fc::basic_name<Traits> is
+/// matched by deducing the exact type and never considers a derived-to-base
+/// conversion, so without fc::slug_name's own specialization the lookup falls to
+/// the disabled primary template and none of the lines below compile.
+///
+/// `lsb_hash_distinguishes_distinct_values` above cannot catch that: its type IS a
+/// basic_name, so the partial specialization covers it either way. Equality is not
+/// at risk for the same reason it is not for chain::name — basic_name's `==` is a
+/// hidden friend, and ADL finds it through the base.
+BOOST_AUTO_TEST_CASE(derived_slug_name_is_usable_in_unordered_containers) {
+   const slug_name eth{"ETH"};
+   const slug_name sol{"SOL"};
+
+   std::unordered_set<slug_name> codes{eth, sol};
+   BOOST_CHECK_EQUAL(codes.size(), 2u);
+   BOOST_CHECK(codes.contains(eth));
+   BOOST_CHECK(codes.contains(sol));
+   BOOST_CHECK(!codes.contains(slug_name{"WIRE"}));
+   BOOST_CHECK(!codes.insert(eth).second);   // equal value, same bucket
+
+   std::unordered_map<slug_name, uint64_t> payload{{eth, 10}, {sol, 20}};
+   BOOST_CHECK_EQUAL(payload.at(eth), 10u);
+   BOOST_CHECK_EQUAL(payload.at(sol), 20u);
+
+   // Same hash the base would have produced: the specialization restores
+   // reachability, it does not change the value.
+   BOOST_CHECK_EQUAL(std::hash<slug_name>{}(eth),
+                     std::hash<fc::basic_name<fc::slug_name_traits>>{}(eth));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

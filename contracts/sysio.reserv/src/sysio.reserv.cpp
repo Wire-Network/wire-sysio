@@ -8,6 +8,7 @@
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio.opp.common/claimable.hpp>
+#include <sysio.opp.common/registry_codes.hpp>
 #include <sysio.opp.common/registry_metadata.hpp>
 #include <sysio.opp.common/wire_asset.hpp>
 
@@ -183,7 +184,7 @@ std::optional<sysio::public_key> pubkey_from_raw(opp::types::ChainKind   kind,
 ///     (the default `zpp::bits::data_out` form prepends a 4-byte LE length
 ///     prefix that corrupts the first field tag on the receiving side).
 ///   * The destination `chain_code` is the reserve's `chain_code.value`
-///     itself (per the v6 convention recorded in `sysio.msgch.hpp`:
+///     itself (per the convention recorded in `sysio.msgch.hpp`:
 ///     "the outpost id IS the chain's slug_name value").
 template <typename ProtoMessage>
 void queue_attestation_out(name self,
@@ -384,6 +385,9 @@ void reserve::regreserve(sysio::slug_name chain_code,
                 "bootstrap reserve must seed both chain_amount and wire_amount > 0");
    sysio::check(!is_private || owner != sysio::name{},
                 "a private bootstrap reserve must name an owner");
+   // The three codes form this row's COMPOSITE PRIMARY KEY and are rendered as strings by
+   // every reader -- refuse any that does not round-trip before the row becomes permanent.
+   opp::registry::check_codes({chain_code, token_code, reserve_code}, "sysio.reserv");
    // Both strings persist into a `sysio`-billed row -- bound them before emplace.
    opp::registry::check_metadata(name, description, "sysio.reserv");
 
@@ -444,6 +448,24 @@ void reserve::oncrtreserve(sysio::slug_name       chain_code,
    const auto expected_chain_kind =
       registered_chain_kind_or_skip(chain_code, "oncrtreserve");
    if (!expected_chain_kind.has_value()) return;
+
+   // The reserve row is keyed by (chain, token, reserve) codes, so an unspellable one
+   // cannot be persisted. The creator's escrow is already in outpost custody, so refund
+   // rather than drop. No CANCELLED tombstone (unlike the rejections below): the row's
+   // key IS the unspellable triple, and a code with no canonical spelling can be neither squatted
+   // nor reclaimed, so the tombstone has nothing to protect.
+   if (!token_code.is_canonical() || !reserve_code.is_canonical()) {
+      sysio::print("oncrtreserve: rejecting with RESERVE_CREATE_CANCELLED "
+                   "(token or reserve code has no canonical slug_name spelling)\n");
+      opp::attestations::ReserveCreateCancelled cancelled;
+      cancelled.chain_code   = chain_code.value;
+      cancelled.token_code   = token_code.value;
+      cancelled.reserve_code = reserve_code.value;
+      queue_attestation_out(get_self(), chain_code,
+                            opp::types::AttestationType::ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED,
+                            cancelled);
+      return;
+   }
 
    // Soft-validate; silent skip per feedback_opp_handlers_never_throw.
    if (connector_weight_bps == 0 || connector_weight_bps > MAX_CONNECTOR_WEIGHT_BPS) {
@@ -669,7 +691,7 @@ void reserve::matchreserve(sysio::slug_name chain_code,
    // Reserve is now ACTIVE on the depot. Notify the owning outpost so its
    // local reserve record can flip to ACTIVE and become usable for swap
    // routing. The destination `chain_code` is the reserve's `chain_code`
-   // (per the v6 `sysio.msgch::queueout` convention — the outpost id is
+   // (per the `sysio.msgch::queueout` convention — the outpost id is
    // the chain slug_name's packed uint64 value).
    opp::attestations::ReserveReady ready;
    ready.chain_code   = chain_code.value;
@@ -839,7 +861,7 @@ void reserve::debit(sysio::slug_name chain_code,
 // onreject was removed — no SwapRejected attestation exists (every depot-initiated
 // REMIT is paid by the destination outpost; reserves need no rejection reconciliation).
 
-// onreward was removed: the v6 STAKING_REWARD path credits the per-staker reward to
+// onreward was removed: the STAKING_REWARD path credits the per-staker reward to
 // sysio.dclaim directly (already WIRE-denominated), so there is no reserve leg.
 
 // ---------------------------------------------------------------------------

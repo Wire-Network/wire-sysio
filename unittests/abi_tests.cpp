@@ -682,6 +682,91 @@ BOOST_AUTO_TEST_CASE(optional_vector)
 
 
 
+BOOST_AUTO_TEST_CASE(slug_name_builtin_type)
+{ try {
+   // Guards the `slug_name` entry in configure_built_in_types(). Without it the
+   // spelling resolves as neither builtin nor struct and set_abi's validate()
+   // throws invalid_type_inside_abi; with a same-named ABI struct present it
+   // would instead serialize as {"value":N}. The converted table-read sweep in
+   // contracts/tests cannot catch either case, because fc::slug_name's
+   // from_variant accepts the string, the integer AND the object form, so those
+   // reads pass identically whether or not this registration exists.
+   // The `slug_name` struct_def below is NOT filler. The five registry ABIs on this
+   // branch no longer emit it -- abigen stopped once slug_name became a real builtin --
+   // so this fixture now stands in for a DEPLOYED or legacy ABI that still carries the
+   // shadowed definition, which set_abi must keep resolving the same way. And
+   // `slug_name` is the ONLY builtin name so shadowed (`symbol`, `name`,
+   // `asset` appear in no `structs[]`). `set_abi` has no collision check, so
+   // the ABI is genuinely ambiguous and is resolved only by LOOKUP ORDER —
+   // `built_in_types` at abi_serializer.cpp:706 before `structs` at :778. If
+   // the struct ever won, the field would still encode to 8 bytes but
+   // `binary_to_variant` would yield `{"value":N}`, so the `is_string()`
+   // assertions below are what pin the precedence.
+   const char* test_abi = R"=====(
+   {
+       "version": "sysio::abi/1.0",
+       "types": [],
+       "structs": [{
+           "name": "slug_name",
+           "base": "",
+           "fields": [{
+               "name": "value",
+               "type": "uint64"
+           }]
+       },{
+           "name": "regrow",
+           "base": "",
+           "fields": [{
+               "name": "code",
+               "type": "slug_name"
+           }]
+       }],
+       "actions": [],
+       "tables": [],
+       "ricardian_clauses": []
+   }
+   )=====";
+
+   auto abi = fc::json::from_string(test_abi).as<abi_def>();
+   abi_serializer abis(sysio_contract_abi(abi), yield_fn());
+
+   // Both lookups resolve, and the BUILTIN is the one that wins. Asserting the
+   // serializer's own post-`set_abi` view is stronger than inspecting the input
+   // `abi_def`: it proves `set_abi` KEPT the struct_def rather than dropping or
+   // rejecting it, which is what makes the ambiguity real. Note that if the
+   // struct won instead, the inputs below would not merely render differently —
+   // they would not encode at all, because the struct branch throws
+   // `pack_exception` for a non-object/array input (abi_serializer.cpp:831).
+   BOOST_REQUIRE( abis.is_builtin_type("slug_name") );
+   BOOST_REQUIRE( abis.is_struct("slug_name") );
+
+   // A canonical slug is carried as its STRING spelling, in 8 bytes.
+   auto bytes = abis.variant_to_binary(
+      "regrow", fc::json::from_string(R"({"code":"ETH"})"), yield_fn());
+   BOOST_REQUIRE_EQUAL(bytes.size(), 8u);
+   auto back = abis.binary_to_variant("regrow", bytes, yield_fn());
+   BOOST_REQUIRE(back.get_object()["code"].is_string());
+   BOOST_CHECK_EQUAL(back.get_object()["code"].as_string(), "ETH");
+
+   // A JSON number is never a slug carrier: the field carries a SPELLING, so a number
+   // is refused rather than read as a packed value. (`from_variant` also takes the
+   // transitional `{"value": N}` object; a bare number is not that.)
+   BOOST_CHECK_THROW(
+      abis.variant_to_binary("regrow", fc::json::from_string(R"({"code":7})"), yield_fn()),
+      fc::exception);
+
+   // A value with no canonical spelling renders anyway — you get what you get. Every value
+   // below 2^42 has a zero in the leading symbol slot, so `to_string` truncates
+   // it to "", the same text zero renders. The conversion is TOTAL, exactly like
+   // `name` (`database_utils.hpp`: `name(raw).to_string()`): a read path that
+   // throws costs the whole scan, and a raw uint64 that spells nothing is
+   // self-inflicted — nothing validates the raw ctor for either type.
+   const std::vector<char> planted{ 7, 0, 0, 0, 0, 0, 0, 0 };  // packed LE uint64 7
+   auto rendered = abis.binary_to_variant("regrow", planted, yield_fn());
+   BOOST_CHECK_EQUAL(rendered.get_object()["code"].as_string(), "");
+
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_CASE(uint_types)
 { try {
 
@@ -3528,6 +3613,19 @@ BOOST_AUTO_TEST_CASE(enum_types)
       ],
    })";
 
+   // Members sharing a type-derived prefix: the part after the last '_' binds only when unique.
+   auto enum_abi_prefixed = R"({
+      "version": "sysio::abi/1.1",
+      "structs": [],
+      "enums": [
+         {"name": "tier", "type": "uint8", "values": [
+            {"name": "TIER_A", "value": 1},
+            {"name": "LEVEL_A", "value": 2},
+            {"name": "TIER_B", "value": 3}
+         ]}
+      ],
+   })";
+
    auto duplicate_enum_abi = R"({
       "version": "sysio::abi/1.1",
       "enums": [
@@ -3626,8 +3724,9 @@ BOOST_AUTO_TEST_CASE(enum_types)
       BOOST_CHECK_EQUAL(fc::to_hex(bytes4), "02");
 
       // Test variant -> binary (invalid enum name)
+      const auto invalid_message = "Unknown or ambiguous enum value 'INVALID' for enum 'my_status'";
       BOOST_CHECK_EXCEPTION( abis.variant_to_binary("my_status", fc::json::from_string(R"("INVALID")"), yield_fn()),
-                             pack_exception, fc_exception_message_starts_with("Unknown enum value 'INVALID' for enum 'my_status'") );
+                             pack_exception, fc_exception_message_starts_with(invalid_message) );
 
       // Test enum in struct context (round trip)
       auto struct_json = R"({"status":"ACTIVE","user":"alice"})";
@@ -3645,6 +3744,27 @@ BOOST_AUTO_TEST_CASE(enum_types)
 
       auto var_c = abis16.binary_to_variant("my_enum16", bytes_c, yield_fn());
       BOOST_CHECK_EQUAL(var_c.as_string(), "C");
+
+      // Suffix binding through the shared resolver: exact names win, a unique suffix binds, an
+      // ambiguous suffix is rejected instead of silently taking the first member.
+      const auto prefixed_def = fc::json::from_string(enum_abi_prefixed).as<abi_def>();
+      abi_serializer prefixed(prefixed_def, yield_fn());
+      const auto tier_bytes = [&](const char* json) {
+         return fc::to_hex(prefixed.variant_to_binary("tier", fc::json::from_string(json), yield_fn()));
+      };
+      BOOST_CHECK_EQUAL(tier_bytes(R"("LEVEL_A")"), "02");
+      BOOST_CHECK_EQUAL(tier_bytes(R"("B")"), "03");
+      BOOST_CHECK_EXCEPTION( tier_bytes(R"("A")"), pack_exception,
+                             fc_exception_message_starts_with("Unknown or ambiguous enum value 'A' for enum 'tier'") );
+      const auto& tier = prefixed_def.enums.value.front();
+      BOOST_REQUIRE(abi_serializer::find_enum_member_by_name(tier, "TIER_B"));
+      BOOST_CHECK_EQUAL(abi_serializer::find_enum_member_by_name(tier, "TIER_B")->value, 3);
+      BOOST_CHECK_EQUAL(abi_serializer::find_enum_member_by_name(tier, "B")->value, 3);
+      BOOST_CHECK(!abi_serializer::find_enum_member_by_name(tier, "A"));
+      BOOST_CHECK(!abi_serializer::find_enum_member_by_name(tier, "TIER"));
+      BOOST_REQUIRE(abi_serializer::find_enum_member_by_value(tier, 2));
+      BOOST_CHECK_EQUAL(abi_serializer::find_enum_member_by_value(tier, 2)->name, "LEVEL_A");
+      BOOST_CHECK(!abi_serializer::find_enum_member_by_value(tier, 9));
 
       // is_enum check
       BOOST_CHECK(abis.is_enum("my_status"));

@@ -34,7 +34,7 @@ std::vector<char> em_pubkey_bytes(const fc::crypto::public_key& pk) {
 
 } // anonymous namespace
 
-/// v6 data-model: reserves are keyed by the triple `(chain_code, token_code,
+/// Data model: reserves are keyed by the triple `(chain_code, token_code,
 /// reserve_code)` (each a `sysio::slug_name` packed uint64). The legacy
 /// `setreserve` action is gone; `regreserve` is the bootstrap-window
 /// equivalent (it works only while `current_epoch_index == 0`, which is the
@@ -137,7 +137,7 @@ public:
                           uint32_t external_chain_id) {
       return push_to(CHAINS_ACCOUNT, chains_abi_ser, CHAINS_ACCOUNT, "regchain"_n, mvo()
          ("kind",              kind)
-         ("code",              codename_mvo(code))
+         ("code",              code)
          ("external_chain_id", external_chain_id)
          ("name",              std::string("outpost"))
          ("description",       std::string{})
@@ -176,25 +176,22 @@ public:
                             std::string_view to_chain, std::string_view to_token,
                             std::string_view to_reserve) {
       auto trace = tester::push_action(RESERVE_ACCOUNT, "swapquote"_n, RESERVE_ACCOUNT, mvo()
-         ("from_chain_code",   codename_mvo(from_chain))
-         ("from_token_code",   codename_mvo(from_token))
-         ("from_reserve_code", codename_mvo(from_reserve))
+         ("from_chain_code",   from_chain)
+         ("from_token_code",   from_token)
+         ("from_reserve_code", from_reserve)
          ("from_amount",       from_amount)
-         ("to_chain_code",     codename_mvo(to_chain))
-         ("to_token_code",     codename_mvo(to_token))
-         ("to_reserve_code",   codename_mvo(to_reserve)));
+         ("to_chain_code",     to_chain)
+         ("to_token_code",     to_token)
+         ("to_reserve_code",   to_reserve));
       BOOST_REQUIRE(trace && !trace->action_traces.empty());
       return fc::raw::unpack<uint64_t>(trace->action_traces[0].return_value);
    }
 
-   // ── SlugName helpers (v6) ──
+   // ── SlugName helpers ──
 
    static fc::slug_name cn(std::string_view s) { return fc::slug_name{s}; }
-   static fc::mutable_variant_object codename_mvo(std::string_view s) {
-      return mvo()("value", fc::slug_name{s}.value);
-   }
 
-   /// `regreserve` is the v6 bootstrap-window action for inserting a reserve
+   /// `regreserve` is the bootstrap-window action for inserting a reserve
    /// row with `status=ACTIVE` and REAL WIRE backing drained from the
    /// treasury. Triple-slug_name PK is `(chain_code, token_code,
    /// reserve_code)`; `is_private`/`owner` seed privately-owned reserves.
@@ -210,9 +207,9 @@ public:
                             const std::string& description = "",
                             uint32_t source_token_precision = 9) {
       return push_action(RESERVE_ACCOUNT, "regreserve"_n, mvo()
-         ("chain_code",            codename_mvo(chain_code))
-         ("token_code",            codename_mvo(token_code))
-         ("reserve_code",          codename_mvo(reserve_code))
+         ("chain_code",            chain_code)
+         ("token_code",            token_code)
+         ("reserve_code",          reserve_code)
          ("name",                  name_str)
          ("description",           description)
          ("initial_chain_amount",  initial_chain_amount)
@@ -300,9 +297,9 @@ public:
             auto row = abi_ser.binary_to_variant(
                "reserve_row", raw,
                abi_serializer::create_yield_function(abi_serializer_max_time));
-            if (row["chain_code"]["value"].as_uint64()   == target_chain &&
-                row["token_code"]["value"].as_uint64()   == target_token &&
-                row["reserve_code"]["value"].as_uint64() == target_reserve) {
+            if (row["chain_code"].as<fc::slug_name>().value   == target_chain &&
+                row["token_code"].as<fc::slug_name>().value   == target_token &&
+                row["reserve_code"].as<fc::slug_name>().value == target_reserve) {
                return row;
             }
          } catch (...) {
@@ -356,9 +353,36 @@ public:
       set_abi(MSGCH_ACCOUNT, contracts::msgch_abi().data());
       set_privileged(MSGCH_ACCOUNT);
       produce_blocks();
+      const auto* msgch_acct = control->find_account_metadata(MSGCH_ACCOUNT);
+      BOOST_REQUIRE(msgch_acct != nullptr);
+      abi_def msgch_def;
+      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(msgch_acct->abi, msgch_def), true);
+      msgch_abi_ser.set_abi(std::move(msgch_def),
+                            abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// The first queued outbound attestation of `attest_type`, or a null variant.
+   /// `queueout` mints sequential ids, so a bounded forward scan finds any a test
+   /// queued. Requires deploy_msgch().
+   fc::variant find_queued_attestation(const char* type_name, uint32_t type_value,
+                                       uint64_t scan_until = 32) {
+      for (uint64_t id = 0; id <= scan_until; ++id) {
+         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "attestations"_n, id);
+         if (data.empty()) continue;
+         auto row = msgch_abi_ser.binary_to_variant(
+            "attestation_entry", data,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+         // `type` is an AttestationType; accept either rendering so the helper
+         // survives a change in how the enum reflects.
+         const auto& t = row["type"];
+         if ((t.is_string()  && t.as_string() == type_name) ||
+             (t.is_integer() && t.as_uint64() == type_value)) return row;
+      }
+      return fc::variant();
    }
 
    abi_serializer abi_ser;
+   abi_serializer msgch_abi_ser;
    abi_serializer token_abi_ser;
    abi_serializer authex_abi_ser;
    abi_serializer chains_abi_ser;
@@ -366,7 +390,7 @@ public:
 
 BOOST_AUTO_TEST_SUITE(sysio_reserve_tests)
 
-// ── regreserve (v6 bootstrap-window action; real-WIRE treasury drain) ──
+// ── regreserve (bootstrap-window action; real-WIRE treasury drain) ──
 
 BOOST_FIXTURE_TEST_CASE(regreserve_creates_reserve_row, sysio_reserve_tester) { try {
    const int64_t treasury_before = wire_balance(SYSIO_ACCOUNT);
@@ -389,6 +413,48 @@ BOOST_FIXTURE_TEST_CASE(regreserve_creates_reserve_row, sysio_reserve_tester) { 
    // treasury into sysio.reserv's token balance.
    BOOST_REQUIRE_EQUAL(2'000'000, wire_balance(RESERVE_ACCOUNT));
    BOOST_REQUIRE_EQUAL(treasury_before - 2'000'000, wire_balance(SYSIO_ACCOUNT));
+} FC_LOG_AND_RETHROW() }
+
+// A `slug_name` reaches action JSON either as its canonical STRING or through the
+// transitional object form `{"value": N}`, and only the string arm validates. A reserve
+// row is keyed on all three codes and there is no erase action, so an uncanonical code
+// would be permanent. Rendering is TOTAL and will not complain: the value can decode to
+// "" or to a valid spelling that re-parses as a DIFFERENT code, aliasing this reserve
+// onto another's identity. `regreserve` is a privileged bootstrap-window action and
+// refuses.
+BOOST_FIXTURE_TEST_CASE(regreserve_uncanonical_code_rejected, sysio_reserve_tester) { try {
+   // Below the leading symbol's floor: decodes to "" and packs back to 0, so it is not a
+   // code and has no spelling.
+   constexpr uint64_t uncanonical = 7;
+   BOOST_REQUIRE(!fc::slug_name{uncanonical}.is_canonical());
+
+   // Any of the three key columns is enough to refuse the row.
+   for (const auto& which : {std::string("chain_code"),
+                             std::string("token_code"),
+                             std::string("reserve_code")}) {
+      auto data = mvo()
+         ("chain_code",             which == "chain_code"   ? fc::variant(mvo()("value", uncanonical))
+                                                            : fc::variant(std::string("ETH")))
+         ("token_code",             which == "token_code"   ? fc::variant(mvo()("value", uncanonical))
+                                                            : fc::variant(std::string("ETH")))
+         ("reserve_code",           which == "reserve_code" ? fc::variant(mvo()("value", uncanonical))
+                                                            : fc::variant(std::string("PRIMARY")))
+         ("name",                   std::string("bad reserve"))
+         ("description",            std::string{})
+         ("initial_chain_amount",   uint64_t{1'000'000})
+         ("initial_wire_amount",    uint64_t{2'000'000})
+         ("source_token_precision", 9u)
+         ("connector_weight_bps",   5000u)
+         ("is_private",             false)
+         ("owner",                  name{});
+      BOOST_REQUIRE(push_action(RESERVE_ACCOUNT, "regreserve"_n, data)
+         .find("has no canonical slug_name spelling") != std::string::npos);
+   }
+
+   // Control: spellable codes on the same shape still register.
+   BOOST_REQUIRE_EQUAL(success(),
+      regreserve("ETH", "ETH", "PRIMARY",
+                 /*chain_amount*/ 1'000'000, /*wire_amount*/ 2'000'000));
 } FC_LOG_AND_RETHROW() }
 
 // A token whose depot-frame precision is below 9 (e.g. a 6-decimal stablecoin)
@@ -486,9 +552,9 @@ BOOST_FIXTURE_TEST_CASE(regreserve_bounds_metadata, sysio_reserve_tester) { try 
 
 BOOST_FIXTURE_TEST_CASE(oncrtreserve_requires_msgch_auth, sysio_reserve_tester) { try {
    BOOST_REQUIRE(push_action(RESERVE_ACCOUNT, "oncrtreserve"_n, mvo()
-      ("chain_code",            codename_mvo("ETH"))
-      ("token_code",            codename_mvo("ETH"))
-      ("reserve_code",          codename_mvo("USERRES"))
+      ("chain_code",            "ETH")
+      ("token_code",            "ETH")
+      ("reserve_code",          "USERRES")
       ("name",                  "user reserve")
       ("description",           "")
       ("external_token_amount", 1000)
@@ -509,9 +575,9 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_unregistered_chain_soft_skips_before_queueo
    deploy_msgch();
 
    BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
-      ("chain_code",            codename_mvo("NOCHAIN"))
-      ("token_code",            codename_mvo("ETH"))
-      ("reserve_code",          codename_mvo("USERRES"))
+      ("chain_code",            "NOCHAIN")
+      ("token_code",            "ETH")
+      ("reserve_code",          "USERRES")
       ("name",                  "user reserve")
       ("description",           "")
       ("external_token_amount", 1000)
@@ -526,15 +592,52 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_unregistered_chain_soft_skips_before_queueo
    BOOST_REQUIRE(find_reserve("NOCHAIN", "ETH", "USERRES").is_null());
 } FC_LOG_AND_RETHROW() }
 
+// A reserve_code is chosen by the CALLER on the outpost -- ETH `create_reserve` and SOL
+// `create_reserve_handler` validate only that it is non-zero -- and the creator's escrow is
+// taken BEFORE the RESERVE_CREATE goes out. A code with no canonical spelling must therefore
+// be REFUNDED, never dropped: a drop strands the funds in the outpost's PENDING record with
+// no cancel path, since the outpost cannot release escrow on its own authority.
+BOOST_FIXTURE_TEST_CASE(oncrtreserve_uncanonical_code_is_cancelled, sysio_reserve_tester) { try {
+   deploy_msgch();
+
+   // Below the leading symbol's floor: decodes to "" and packs back to 0, so it is
+   // not a code and has no spelling.
+   constexpr uint64_t uncanonical = 7;
+   BOOST_REQUIRE(!fc::slug_name{uncanonical}.is_canonical());
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
+      ("chain_code",            "ETH")
+      ("token_code",            "ETH")
+      ("reserve_code",          mvo()("value", uncanonical))
+      ("name",                  "user reserve")
+      ("description",           "")
+      ("external_token_amount", 1000)
+      ("requested_wire_amount", 1000)
+      ("source_token_precision", 9u)
+      ("connector_weight_bps",  5000)
+      ("creator_chain_kind",    ChainKind::CHAIN_KIND_EVM)
+      ("creator_chain_addr",    std::vector<char>(20, '\x01'))
+      ("is_private",            false)
+      ("creator_pub_key",       std::vector<char>(33, '\x02'))
+   ));
+
+   // The refund is what matters: observe the OUTBOUND cancellation, not merely the
+   // absence of a depot row (the row's key IS the unspellable triple, so it could
+   // not be looked up by spelling anyway).
+   BOOST_REQUIRE(!find_queued_attestation(
+      "ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED",
+      sysio::opp::types::ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED).is_null());
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(oncrtreserve_unlinked_creator_is_cancelled, sysio_reserve_tester) { try {
    // Create gating: no authex link exists for the creator's pubkey (the
    // authex account carries no links table here), so the request must be
    // rejected by inserting a CANCELLED row (idempotency + audit) and
    // queueing RESERVE_CREATE_CANCELLED back. Never throws.
    BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
-      ("chain_code",            codename_mvo("ETH"))
-      ("token_code",            codename_mvo("ETH"))
-      ("reserve_code",          codename_mvo("USERRES"))
+      ("chain_code",            "ETH")
+      ("token_code",            "ETH")
+      ("reserve_code",          "USERRES")
       ("name",                  "user reserve")
       ("description",           "")
       ("external_token_amount", 1000)
@@ -569,9 +672,9 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_creator_chain_kind_mismatch_is_cancelled,
    const std::vector<char> creator_address(20, '\x01');
 
    BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
-      ("chain_code",            codename_mvo("ETH"))
-      ("token_code",            codename_mvo("ETH"))
-      ("reserve_code",          codename_mvo("USERRES"))
+      ("chain_code",            "ETH")
+      ("token_code",            "ETH")
+      ("reserve_code",          "USERRES")
       ("name",                  "mismatched creator")
       ("description",           "")
       ("external_token_amount", 1000)
@@ -611,9 +714,9 @@ BOOST_FIXTURE_TEST_CASE(oncnclrsv_requires_registry_creator_kind,
    const std::vector<char> creator_address(20, '\x01');
 
    BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
-      ("chain_code",            codename_mvo("ETH"))
-      ("token_code",            codename_mvo("ETH"))
-      ("reserve_code",          codename_mvo("CANCEL"))
+      ("chain_code",            "ETH")
+      ("token_code",            "ETH")
+      ("reserve_code",          "CANCEL")
       ("name",                  "cancel kind guard")
       ("description",           "")
       ("external_token_amount", 1000)
@@ -630,9 +733,9 @@ BOOST_FIXTURE_TEST_CASE(oncnclrsv_requires_registry_creator_kind,
    BOOST_REQUIRE_EQUAL("RESERVE_STATUS_PENDING", pending["status"].as_string());
 
    BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncnclrsv"_n, mvo()
-      ("chain_code",         codename_mvo("ETH"))
-      ("token_code",         codename_mvo("ETH"))
-      ("reserve_code",       codename_mvo("CANCEL"))
+      ("chain_code",         "ETH")
+      ("token_code",         "ETH")
+      ("reserve_code",       "CANCEL")
       ("creator_chain_kind", ChainKind::CHAIN_KIND_SVM)
       ("creator_chain_addr", creator_address)));
 
@@ -642,9 +745,9 @@ BOOST_FIXTURE_TEST_CASE(oncnclrsv_requires_registry_creator_kind,
                                "attestations"_n, 1).empty());
 
    BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncnclrsv"_n, mvo()
-      ("chain_code",         codename_mvo("ETH"))
-      ("token_code",         codename_mvo("ETH"))
-      ("reserve_code",       codename_mvo("CANCEL"))
+      ("chain_code",         "ETH")
+      ("token_code",         "ETH")
+      ("reserve_code",       "CANCEL")
       ("creator_chain_kind", ChainKind::CHAIN_KIND_EVM)
       ("creator_chain_addr", creator_address)));
 
@@ -665,9 +768,9 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_invalid_creator_address_is_cancelled,
    const auto creator_key = em_pubkey_bytes(creator_pub);
 
    BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
-      ("chain_code",            codename_mvo("ETH"))
-      ("token_code",            codename_mvo("ETH"))
-      ("reserve_code",          codename_mvo("BADADDR"))
+      ("chain_code",            "ETH")
+      ("token_code",            "ETH")
+      ("reserve_code",          "BADADDR")
       ("name",                  "malformed creator address")
       ("description",           "")
       ("external_token_amount", 1000)
@@ -692,9 +795,9 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_invalid_creator_address_is_cancelled,
 BOOST_FIXTURE_TEST_CASE(oncrtreserve_cancelled_relay_does_not_double_refund, sysio_reserve_tester) { try {
    auto crt = [&]() {
       return push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
-         ("chain_code",            codename_mvo("ETH"))
-         ("token_code",            codename_mvo("ETH"))
-         ("reserve_code",          codename_mvo("USERRES"))
+         ("chain_code",            "ETH")
+         ("token_code",            "ETH")
+         ("reserve_code",          "USERRES")
          ("name",                  "user reserve")
          ("description",           "")
          ("external_token_amount", 1000)
@@ -734,9 +837,9 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_cancelled_is_reclaimable_by_linked_creator,
 
    // 1) An UNLINKED creator squats the triple → CANCELLED.
    BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
-      ("chain_code",            codename_mvo("ETH"))
-      ("token_code",            codename_mvo("ETH"))
-      ("reserve_code",          codename_mvo("USERRES"))
+      ("chain_code",            "ETH")
+      ("token_code",            "ETH")
+      ("reserve_code",          "USERRES")
       ("name",                  "squatter")
       ("description",           "squat")
       ("external_token_amount", 1000)
@@ -761,9 +864,9 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_cancelled_is_reclaimable_by_linked_creator,
       recordlink("alice"_n, ChainKind::CHAIN_KIND_EVM, creator_pub));
 
    BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
-      ("chain_code",            codename_mvo("ETH"))
-      ("token_code",            codename_mvo("ETH"))
-      ("reserve_code",          codename_mvo("USERRES"))
+      ("chain_code",            "ETH")
+      ("token_code",            "ETH")
+      ("reserve_code",          "USERRES")
       ("name",                  "rightful owner")
       ("description",           "reclaimed")
       ("external_token_amount", 5000)
@@ -807,9 +910,9 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_invalid_amount_is_cancelled, sysio_reserve_
    // invalid inbound amount). The link is valid, so the amount alone forces the
    // cancel/refund — proving the amount path no longer drops silently.
    BOOST_REQUIRE_EQUAL(success(), push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
-      ("chain_code",            codename_mvo("ETH"))
-      ("token_code",            codename_mvo("ETH"))
-      ("reserve_code",          codename_mvo("USERRES"))
+      ("chain_code",            "ETH")
+      ("token_code",            "ETH")
+      ("reserve_code",          "USERRES")
       ("name",                  "invalid amount")
       ("description",           "")
       ("external_token_amount", 0)
@@ -854,9 +957,9 @@ BOOST_FIXTURE_TEST_CASE(oncrtreserve_oversized_metadata_is_cancelled, sysio_rese
                                    const std::string& name,
                                    const std::string& description) {
       return push_action(MSGCH_ACCOUNT, "oncrtreserve"_n, mvo()
-         ("chain_code",            codename_mvo("ETH"))
-         ("token_code",            codename_mvo("ETH"))
-         ("reserve_code",          codename_mvo(reserve_code))
+         ("chain_code",            "ETH")
+         ("token_code",            "ETH")
+         ("reserve_code",          reserve_code)
          ("name",                  name)
          ("description",           description)
          ("external_token_amount", 1000)
@@ -908,9 +1011,9 @@ BOOST_FIXTURE_TEST_CASE(matchreserve_rejects_unknown_reserve, sysio_reserve_test
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: matchreserve: reserve not found"),
       push_action("alice"_n, "matchreserve"_n, mvo()
-         ("chain_code",   codename_mvo("ETH"))
-         ("token_code",   codename_mvo("ETH"))
-         ("reserve_code", codename_mvo("NOPE"))
+         ("chain_code",   "ETH")
+         ("token_code",   "ETH")
+         ("reserve_code", "NOPE")
          ("matcher",      "alice")
          ("wire_amount",  100)));
 } FC_LOG_AND_RETHROW() }
@@ -922,9 +1025,9 @@ BOOST_FIXTURE_TEST_CASE(matchreserve_rejects_non_pending, sysio_reserve_tester) 
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: matchreserve: reserve is not PENDING"),
       push_action("alice"_n, "matchreserve"_n, mvo()
-         ("chain_code",   codename_mvo("ETH"))
-         ("token_code",   codename_mvo("ETH"))
-         ("reserve_code", codename_mvo("PRIMARY"))
+         ("chain_code",   "ETH")
+         ("token_code",   "ETH")
+         ("reserve_code", "PRIMARY")
          ("matcher",      "alice")
          ("wire_amount",  1000)));
 } FC_LOG_AND_RETHROW() }
@@ -933,13 +1036,13 @@ BOOST_FIXTURE_TEST_CASE(matchreserve_rejects_non_pending, sysio_reserve_tester) 
 
 BOOST_FIXTURE_TEST_CASE(applyswap_requires_uwrit_auth, sysio_reserve_tester) { try {
    BOOST_REQUIRE(push_action("alice"_n, "applyswap"_n, mvo()
-      ("src_chain_code",   codename_mvo("ETH"))
-      ("src_token_code",   codename_mvo("ETH"))
-      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_chain_code",   "ETH")
+      ("src_token_code",   "ETH")
+      ("src_reserve_code", "PRIMARY")
       ("src_amount",       100)
-      ("dst_chain_code",   codename_mvo("SOLANA"))
-      ("dst_token_code",   codename_mvo("SOL"))
-      ("dst_reserve_code", codename_mvo("PRIMARY"))
+      ("dst_chain_code",   "SOLANA")
+      ("dst_token_code",   "SOL")
+      ("dst_reserve_code", "PRIMARY")
       ("dst_amount",       50)
       ("underwriter",      "underwriter1")
    ).find("missing authority of sysio.uwrit") != std::string::npos);
@@ -953,13 +1056,13 @@ BOOST_FIXTURE_TEST_CASE(applyswap_applies_four_legs, sysio_reserve_tester) { try
 
    // w = cp_output(1000, 1000, 100) = 1000*100 / (1000+100) = 90 (floor).
    BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "applyswap"_n, mvo()
-      ("src_chain_code",   codename_mvo("ETH"))
-      ("src_token_code",   codename_mvo("ETH"))
-      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_chain_code",   "ETH")
+      ("src_token_code",   "ETH")
+      ("src_reserve_code", "PRIMARY")
       ("src_amount",       100)
-      ("dst_chain_code",   codename_mvo("SOLANA"))
-      ("dst_token_code",   codename_mvo("SOL"))
-      ("dst_reserve_code", codename_mvo("PRIMARY"))
+      ("dst_chain_code",   "SOLANA")
+      ("dst_token_code",   "SOL")
+      ("dst_reserve_code", "PRIMARY")
       ("dst_amount",       50)
       ("underwriter",      "underwriter1")));
 
@@ -989,13 +1092,13 @@ BOOST_FIXTURE_TEST_CASE(applyswap_rejects_debit_above_curve_output, sysio_reserv
    constexpr int64_t CURVE_OUT = 82;
    auto apply = [&](int64_t dst_amount) {
       return push_action(UWRIT_ACCOUNT, "applyswap"_n, mvo()
-         ("src_chain_code",   codename_mvo("ETH"))
-         ("src_token_code",   codename_mvo("ETH"))
-         ("src_reserve_code", codename_mvo("PRIMARY"))
+         ("src_chain_code",   "ETH")
+         ("src_token_code",   "ETH")
+         ("src_reserve_code", "PRIMARY")
          ("src_amount",       100)
-         ("dst_chain_code",   codename_mvo("SOLANA"))
-         ("dst_token_code",   codename_mvo("SOL"))
-         ("dst_reserve_code", codename_mvo("PRIMARY"))
+         ("dst_chain_code",   "SOLANA")
+         ("dst_token_code",   "SOL")
+         ("dst_reserve_code", "PRIMARY")
          ("dst_amount",       dst_amount)
          ("underwriter",      "underwriter1"));
    };
@@ -1027,13 +1130,13 @@ BOOST_FIXTURE_TEST_CASE(applyswap_charges_fee_and_routes_50_50, sysio_reserve_te
    // fee = 999'000'999 * 10 / 10000 = 999'000 ; underwriter = reward = 499'500 ;
    // net = 999'000'999 - 999'000 = 998'001'999.
    BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "applyswap"_n, mvo()
-      ("src_chain_code",   codename_mvo("ETH"))
-      ("src_token_code",   codename_mvo("ETH"))
-      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_chain_code",   "ETH")
+      ("src_token_code",   "ETH")
+      ("src_reserve_code", "PRIMARY")
       ("src_amount",       1'000'000'000ULL)
-      ("dst_chain_code",   codename_mvo("SOLANA"))
-      ("dst_token_code",   codename_mvo("SOL"))
-      ("dst_reserve_code", codename_mvo("PRIMARY"))
+      ("dst_chain_code",   "SOLANA")
+      ("dst_token_code",   "SOL")
+      ("dst_reserve_code", "PRIMARY")
       ("dst_amount",       100'000'000ULL)
       ("underwriter",      "underwriter1")));
 
@@ -1086,13 +1189,13 @@ BOOST_FIXTURE_TEST_CASE(setconfig_emissions_share_routes_pool_to_treasury, sysio
 
    // Same swap as the 50/50 test: fee 999'000, underwriter 499'500, pool 499'500.
    BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "applyswap"_n, mvo()
-      ("src_chain_code",   codename_mvo("ETH"))
-      ("src_token_code",   codename_mvo("ETH"))
-      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_chain_code",   "ETH")
+      ("src_token_code",   "ETH")
+      ("src_reserve_code", "PRIMARY")
       ("src_amount",       1'000'000'000ULL)
-      ("dst_chain_code",   codename_mvo("SOLANA"))
-      ("dst_token_code",   codename_mvo("SOL"))
-      ("dst_reserve_code", codename_mvo("PRIMARY"))
+      ("dst_chain_code",   "SOLANA")
+      ("dst_token_code",   "SOL")
+      ("dst_reserve_code", "PRIMARY")
       ("dst_amount",       100'000'000ULL)
       ("underwriter",      "underwriter1")));
 
@@ -1114,16 +1217,16 @@ BOOST_FIXTURE_TEST_CASE(setrsvfee_guards_owner_status_and_bounds, sysio_reserve_
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: setrsvfee: reserve has no owner"),
       push_action(RESERVE_ACCOUNT, "setrsvfee"_n, mvo()
-         ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("ETH"))
-         ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 100)));
+         ("chain_code", "ETH")("token_code", "ETH")
+         ("reserve_code", "PRIMARY")("owner_fee_bps", 100)));
 
    // An OWNED reserve: only the owner may set the fee.
    BOOST_REQUIRE_EQUAL(success(),
       regreserve("SOLANA", "SOL", "PRIMARY", 1000, 1000, 5000, false, "alice"_n));
    auto setFee = [&](name signer, uint32_t bps) {
       return push_action(signer, "setrsvfee"_n, mvo()
-         ("chain_code", codename_mvo("SOLANA"))("token_code", codename_mvo("SOL"))
-         ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", bps));
+         ("chain_code", "SOLANA")("token_code", "SOL")
+         ("reserve_code", "PRIMARY")("owner_fee_bps", bps));
    };
    BOOST_REQUIRE(setFee(UNDERWRITER_ACCOUNT, 100).find("missing authority of alice") != std::string::npos);
 
@@ -1142,8 +1245,8 @@ BOOST_FIXTURE_TEST_CASE(setrsvfee_guards_owner_status_and_bounds, sysio_reserve_
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: setrsvfee: reserve not found"),
       push_action("alice"_n, "setrsvfee"_n, mvo()
-         ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("NOPE"))
-         ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 10)));
+         ("chain_code", "ETH")("token_code", "NOPE")
+         ("reserve_code", "PRIMARY")("owner_fee_bps", 10)));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(applyswap_charges_both_reserve_owner_fees, sysio_reserve_tester) { try {
@@ -1158,24 +1261,24 @@ BOOST_FIXTURE_TEST_CASE(applyswap_charges_both_reserve_owner_fees, sysio_reserve
 
    // src 100 bps (1%), dst 200 bps (2%) on the same WIRE leg.
    BOOST_REQUIRE_EQUAL(success(), push_action("alice"_n, "setrsvfee"_n, mvo()
-      ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("ETH"))
-      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 100)));
+      ("chain_code", "ETH")("token_code", "ETH")
+      ("reserve_code", "PRIMARY")("owner_fee_bps", 100)));
    BOOST_REQUIRE_EQUAL(success(), push_action(UNDERWRITER_ACCOUNT, "setrsvfee"_n, mvo()
-      ("chain_code", codename_mvo("SOLANA"))("token_code", codename_mvo("SOL"))
-      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 200)));
+      ("chain_code", "SOLANA")("token_code", "SOL")
+      ("reserve_code", "PRIMARY")("owner_fee_bps", 200)));
 
    const int64_t resv_before = wire_balance(RESERVE_ACCOUNT);
 
    // w_gross = 999'000'999. network 10bps = 999'000; src 1% = 9'990'009;
    // dst 2% = 19'980'019; net = w_gross - (999'000 + 9'990'009 + 19'980'019).
    BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "applyswap"_n, mvo()
-      ("src_chain_code",   codename_mvo("ETH"))
-      ("src_token_code",   codename_mvo("ETH"))
-      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_chain_code",   "ETH")
+      ("src_token_code",   "ETH")
+      ("src_reserve_code", "PRIMARY")
       ("src_amount",       1'000'000'000ULL)
-      ("dst_chain_code",   codename_mvo("SOLANA"))
-      ("dst_token_code",   codename_mvo("SOL"))
-      ("dst_reserve_code", codename_mvo("PRIMARY"))
+      ("dst_chain_code",   "SOLANA")
+      ("dst_token_code",   "SOL")
+      ("dst_reserve_code", "PRIMARY")
       ("dst_amount",       100'000'000ULL)
       ("underwriter",      "underwriter1")));
 
@@ -1203,13 +1306,13 @@ BOOST_FIXTURE_TEST_CASE(single_reserve_paths_charge_only_their_own_side, sysio_r
       regreserve("ETH", "ETH", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL,
                  5000, false, "alice"_n));
    BOOST_REQUIRE_EQUAL(success(), push_action("alice"_n, "setrsvfee"_n, mvo()
-      ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("ETH"))
-      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 100)));
+      ("chain_code", "ETH")("token_code", "ETH")
+      ("reserve_code", "PRIMARY")("owner_fee_bps", 100)));
 
    BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "paywire"_n, mvo()
-      ("src_chain_code",   codename_mvo("ETH"))
-      ("src_token_code",   codename_mvo("ETH"))
-      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_chain_code",   "ETH")
+      ("src_token_code",   "ETH")
+      ("src_reserve_code", "PRIMARY")
       ("src_amount",       1'000'000'000ULL)
       ("recipient",        "alice")
       ("wire_out",         100'000'000ULL)
@@ -1224,12 +1327,12 @@ BOOST_FIXTURE_TEST_CASE(single_reserve_paths_charge_only_their_own_side, sysio_r
       regreserve("SOLANA", "SOL", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL,
                  5000, false, UNDERWRITER_ACCOUNT));
    BOOST_REQUIRE_EQUAL(success(), push_action(UNDERWRITER_ACCOUNT, "setrsvfee"_n, mvo()
-      ("chain_code", codename_mvo("SOLANA"))("token_code", codename_mvo("SOL"))
-      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 200)));
+      ("chain_code", "SOLANA")("token_code", "SOL")
+      ("reserve_code", "PRIMARY")("owner_fee_bps", 200)));
    BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "applyfromwire"_n, mvo()
-      ("dst_chain_code",   codename_mvo("SOLANA"))
-      ("dst_token_code",   codename_mvo("SOL"))
-      ("dst_reserve_code", codename_mvo("PRIMARY"))
+      ("dst_chain_code",   "SOLANA")
+      ("dst_token_code",   "SOL")
+      ("dst_reserve_code", "PRIMARY")
       ("wire_in",          1'000'000'000ULL)
       ("dst_amount",       100'000'000ULL)
       ("underwriter",      "underwriter1")));
@@ -1248,20 +1351,20 @@ BOOST_FIXTURE_TEST_CASE(claimrsvfee_pays_owner_and_guards_auth, sysio_reserve_te
 
    auto claim = [&](name signer) {
       return push_action(signer, "claimrsvfee"_n, mvo()
-         ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("ETH"))
-         ("reserve_code", codename_mvo("PRIMARY")));
+         ("chain_code", "ETH")("token_code", "ETH")
+         ("reserve_code", "PRIMARY"));
    };
    // Nothing earned yet.
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: claimrsvfee: no unclaimed balance"), claim("alice"_n));
 
    BOOST_REQUIRE_EQUAL(success(), push_action("alice"_n, "setrsvfee"_n, mvo()
-      ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("ETH"))
-      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 100)));
+      ("chain_code", "ETH")("token_code", "ETH")
+      ("reserve_code", "PRIMARY")("owner_fee_bps", 100)));
    BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "paywire"_n, mvo()
-      ("src_chain_code",   codename_mvo("ETH"))
-      ("src_token_code",   codename_mvo("ETH"))
-      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_chain_code",   "ETH")
+      ("src_token_code",   "ETH")
+      ("src_reserve_code", "PRIMARY")
       ("src_amount",       1'000'000'000ULL)
       ("recipient",        UNDERWRITER_ACCOUNT)
       ("wire_out",         100'000'000ULL)
@@ -1321,11 +1424,11 @@ BOOST_FIXTURE_TEST_CASE(swapquote_prices_the_reserve_owner_fees, sysio_reserve_t
    BOOST_CHECK_EQUAL(before, expected(0, 0));
 
    BOOST_REQUIRE_EQUAL(success(), push_action("alice"_n, "setrsvfee"_n, mvo()
-      ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("ETH"))
-      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", OWNER_FEE)));
+      ("chain_code", "ETH")("token_code", "ETH")
+      ("reserve_code", "PRIMARY")("owner_fee_bps", OWNER_FEE)));
    BOOST_REQUIRE_EQUAL(success(), push_action(UNDERWRITER_ACCOUNT, "setrsvfee"_n, mvo()
-      ("chain_code", codename_mvo("SOLANA"))("token_code", codename_mvo("SOL"))
-      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", OWNER_FEE)));
+      ("chain_code", "SOLANA")("token_code", "SOL")
+      ("reserve_code", "PRIMARY")("owner_fee_bps", OWNER_FEE)));
    produce_block();
 
    // Both owner fees are now priced in, off the same gross WIRE leg.
@@ -1338,8 +1441,8 @@ BOOST_FIXTURE_TEST_CASE(swapquote_prices_the_reserve_owner_fees, sysio_reserve_t
    // by only that side's share, which a quote summing the wrong reserve's rate
    // (or double-counting one) would not reproduce.
    BOOST_REQUIRE_EQUAL(success(), push_action(UNDERWRITER_ACCOUNT, "setrsvfee"_n, mvo()
-      ("chain_code", codename_mvo("SOLANA"))("token_code", codename_mvo("SOL"))
-      ("reserve_code", codename_mvo("PRIMARY"))("owner_fee_bps", 0)));
+      ("chain_code", "SOLANA")("token_code", "SOL")
+      ("reserve_code", "PRIMARY")("owner_fee_bps", 0)));
    produce_block();
    const uint64_t source_only = swapquote_value("ETH", "ETH", "PRIMARY", FROM,
                                                 "SOLANA", "SOL", "PRIMARY");
@@ -1368,13 +1471,13 @@ BOOST_FIXTURE_TEST_CASE(claimuwfee_pays_accrual_and_zeroes_balance, sysio_reserv
    BOOST_REQUIRE_EQUAL(success(),
       regreserve("SOLANA", "SOL", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL));
    BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "applyswap"_n, mvo()
-      ("src_chain_code",   codename_mvo("ETH"))
-      ("src_token_code",   codename_mvo("ETH"))
-      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_chain_code",   "ETH")
+      ("src_token_code",   "ETH")
+      ("src_reserve_code", "PRIMARY")
       ("src_amount",       1'000'000'000ULL)
-      ("dst_chain_code",   codename_mvo("SOLANA"))
-      ("dst_token_code",   codename_mvo("SOL"))
-      ("dst_reserve_code", codename_mvo("PRIMARY"))
+      ("dst_chain_code",   "SOLANA")
+      ("dst_token_code",   "SOL")
+      ("dst_reserve_code", "PRIMARY")
       ("dst_amount",       100'000'000ULL)
       ("underwriter",      "underwriter1")));
 
@@ -1426,13 +1529,13 @@ BOOST_FIXTURE_TEST_CASE(applyswap_accrues_per_underwriter_and_accumulates, sysio
 
    auto swap_won_by = [&](const char* underwriter) {
       return push_action(UWRIT_ACCOUNT, "applyswap"_n, mvo()
-         ("src_chain_code",   codename_mvo("ETH"))
-         ("src_token_code",   codename_mvo("ETH"))
-         ("src_reserve_code", codename_mvo("PRIMARY"))
+         ("src_chain_code",   "ETH")
+         ("src_token_code",   "ETH")
+         ("src_reserve_code", "PRIMARY")
          ("src_amount",       1'000'000'000ULL)
-         ("dst_chain_code",   codename_mvo("SOLANA"))
-         ("dst_token_code",   codename_mvo("SOL"))
-         ("dst_reserve_code", codename_mvo("PRIMARY"))
+         ("dst_chain_code",   "SOLANA")
+         ("dst_token_code",   "SOL")
+         ("dst_reserve_code", "PRIMARY")
          ("dst_amount",       100'000'000ULL)
          ("underwriter",      underwriter));
    };
@@ -1470,13 +1573,13 @@ BOOST_FIXTURE_TEST_CASE(drainrewards_sweeps_bucket_to_treasury, sysio_reserve_te
    BOOST_REQUIRE_EQUAL(success(),
       regreserve("SOLANA", "SOL", "PRIMARY", 1'000'000'000'000ULL, 1'000'000'000'000ULL));
    BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "applyswap"_n, mvo()
-      ("src_chain_code",   codename_mvo("ETH"))
-      ("src_token_code",   codename_mvo("ETH"))
-      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_chain_code",   "ETH")
+      ("src_token_code",   "ETH")
+      ("src_reserve_code", "PRIMARY")
       ("src_amount",       1'000'000'000ULL)
-      ("dst_chain_code",   codename_mvo("SOLANA"))
-      ("dst_token_code",   codename_mvo("SOL"))
-      ("dst_reserve_code", codename_mvo("PRIMARY"))
+      ("dst_chain_code",   "SOLANA")
+      ("dst_token_code",   "SOL")
+      ("dst_reserve_code", "PRIMARY")
       ("dst_amount",       100'000'000ULL)
       ("underwriter",      "underwriter1")));
 
@@ -1524,9 +1627,9 @@ BOOST_FIXTURE_TEST_CASE(applyfromwire_credits_wire_and_debits_chain, sysio_reser
       regreserve("SOLANA", "SOL", "PRIMARY", 1000, 1000));
 
    BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "applyfromwire"_n, mvo()
-      ("dst_chain_code",   codename_mvo("SOLANA"))
-      ("dst_token_code",   codename_mvo("SOL"))
-      ("dst_reserve_code", codename_mvo("PRIMARY"))
+      ("dst_chain_code",   "SOLANA")
+      ("dst_token_code",   "SOL")
+      ("dst_reserve_code", "PRIMARY")
       ("wire_in",          200)
       ("dst_amount",       100)
       ("underwriter",      "underwriter1")));
@@ -1549,9 +1652,9 @@ BOOST_FIXTURE_TEST_CASE(applyfromwire_rejects_debit_above_curve_output,
    constexpr int64_t CURVE_OUT = 166;
    auto apply = [&](int64_t dst_amount) {
       return push_action(UWRIT_ACCOUNT, "applyfromwire"_n, mvo()
-         ("dst_chain_code",   codename_mvo("SOLANA"))
-         ("dst_token_code",   codename_mvo("SOL"))
-         ("dst_reserve_code", codename_mvo("PRIMARY"))
+         ("dst_chain_code",   "SOLANA")
+         ("dst_token_code",   "SOL")
+         ("dst_reserve_code", "PRIMARY")
          ("wire_in",          200)
          ("dst_amount",       dst_amount)
          ("underwriter",      "underwriter1"));
@@ -1582,9 +1685,9 @@ BOOST_FIXTURE_TEST_CASE(paywire_pays_real_wire_from_custody, sysio_reserve_teste
 
    // Swap-to-WIRE settlement: source books move + alice is paid REAL WIRE.
    BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "paywire"_n, mvo()
-      ("src_chain_code",   codename_mvo("ETH"))
-      ("src_token_code",   codename_mvo("ETH"))
-      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_chain_code",   "ETH")
+      ("src_token_code",   "ETH")
+      ("src_reserve_code", "PRIMARY")
       ("src_amount",       100)
       ("recipient",        "alice")
       ("wire_out",         CURVE_OUT)
@@ -1627,9 +1730,9 @@ BOOST_FIXTURE_TEST_CASE(paywire_rejects_payout_above_curve_output, sysio_reserve
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: paywire: payout exceeds the post-fee WIRE the source leg produced"),
       push_action(UWRIT_ACCOUNT, "paywire"_n, mvo()
-         ("src_chain_code",   codename_mvo("ETH"))
-         ("src_token_code",   codename_mvo("ETH"))
-         ("src_reserve_code", codename_mvo("PRIMARY"))
+         ("src_chain_code",   "ETH")
+         ("src_token_code",   "ETH")
+         ("src_reserve_code", "PRIMARY")
          ("src_amount",       100)
          ("recipient",        "alice")
          ("wire_out",         200)
@@ -1637,9 +1740,9 @@ BOOST_FIXTURE_TEST_CASE(paywire_rejects_payout_above_curve_output, sysio_reserve
 
    // The curve's own output settles cleanly against the same reserve.
    BOOST_REQUIRE_EQUAL(success(), push_action(UWRIT_ACCOUNT, "paywire"_n, mvo()
-      ("src_chain_code",   codename_mvo("ETH"))
-      ("src_token_code",   codename_mvo("ETH"))
-      ("src_reserve_code", codename_mvo("PRIMARY"))
+      ("src_chain_code",   "ETH")
+      ("src_token_code",   "ETH")
+      ("src_reserve_code", "PRIMARY")
       ("src_amount",       100)
       ("recipient",        "alice")
       ("wire_out",         9)

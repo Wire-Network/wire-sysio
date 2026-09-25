@@ -519,6 +519,38 @@ struct http_response_for {
    std::string body() const { return beast::buffers_to_string(response.body().data()); }
 };
 
+/// Notifications have no body; ordinary absent payloads retain their JSON object.
+BOOST_FIXTURE_TEST_CASE(no_content_response_over_unix_socket, http_plugin_test_fixture) {
+   constexpr auto socket_name = "http-response.sock";
+   constexpr auto empty_route = "/v1/node/no_content";
+   constexpr auto ignored_payload_route = "/v1/node/no_content_payload";
+   constexpr auto absent_payload_route = "/v1/node/absent_payload";
+   fc::temp_directory directory;
+   const auto socket = directory.path() / socket_name;
+   auto* plugin = init({bu::framework::current_test_case().p_name->c_str(),
+      "--data-dir", directory.path().c_str(), "--http-server-address", "", "--unix-socket-path", socket.c_str()});
+   BOOST_REQUIRE(plugin);
+   plugin->add_async_api({
+      {empty_route, api_category::node, [](string&&, string&&, url_response_callback&& callback) {
+         callback(magic_enum::enum_integer(http::status::no_content), std::nullopt);
+      }},
+      {ignored_payload_route, api_category::node, [](string&&, string&&, url_response_callback&& callback) {
+         callback(magic_enum::enum_integer(http::status::no_content), fc::variant(true));
+      }},
+      {absent_payload_route, api_category::node, [](string&&, string&&, url_response_callback&& callback) {
+         callback(magic_enum::enum_integer(http::status::ok), std::nullopt);
+      }}
+   });
+   for (const auto* route : {empty_route, ignored_payload_route}) {
+      const http_response_for response(std::filesystem::path(socket.string()), route);
+      BOOST_CHECK(response.status() == http::status::no_content);
+      BOOST_CHECK(response.body().empty());
+   }
+   const http_response_for response(std::filesystem::path(socket.string()), absent_payload_route);
+   BOOST_CHECK(response.status() == http::status::ok);
+   BOOST_CHECK_EQUAL(response.body(), "{}");
+}
+
 BOOST_FIXTURE_TEST_CASE(valid_category_addresses, http_plugin_test_fixture) {
    fc::temp_directory dir;
    auto               data_dir = dir.path() / "data";

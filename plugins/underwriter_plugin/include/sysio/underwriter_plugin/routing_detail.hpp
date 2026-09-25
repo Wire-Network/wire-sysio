@@ -5,7 +5,7 @@
  *        plugin, lifted out of the `.cpp`-private `impl` so they are unit-testable
  *        without standing up a chain.
  *
- * SEC-13 / WSA-027: the v6 depot identifies every value-bearing underwrite leg by
+ * SEC-13 / WSA-027: the depot identifies every value-bearing underwrite leg by
  * its EXACT slug codes — `chain_code`, `token_code`, `reserve_code` — and an
  * underwriter's collateral is posted per exact `(chain_code, token_code)` on every
  * registered outpost. Two active chains of the same VM family (e.g. two EVM
@@ -115,7 +115,7 @@ inline void reserve_buckets(credit_buckets& remaining,
    reserve(dst);
 }
 
-/// Local commit de-dup key — one CONFIRMED leg. Keyed by the exact v6 leg
+/// Local commit de-dup key — one CONFIRMED leg. Keyed by the exact leg
 /// identity `(uwreq_id, chain_code, token_code, reserve_code)` so two legs that
 /// differ only by chain OR reserve (e.g. a same-`(chain, token)` swap with two
 /// reserves) are tracked independently and never suppress each other.
