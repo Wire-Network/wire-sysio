@@ -3151,10 +3151,15 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_scoped_bounds_test, validating_tester ) try
       auto revA = get_table_rows_full(plugin, p, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(revA.rows.size(), 3u);
       BOOST_REQUIRE_EQUAL(revA.more, true);
+      BOOST_REQUIRE(!revA.next_key.empty());
+
+      // next_key is the last row returned and upper_bound is exclusive, so only the lowest row is left.
+      // A double-prefixed bound restarts at the top and returns all four.
       p.upper_bound = revA.next_key;
       p.limit       = 50;
       auto revB = get_table_rows_full(plugin, p, fc::time_point::maximum());
-      BOOST_CHECK_GE(revB.rows.size(), 1u);
+      BOOST_CHECK_EQUAL(revB.rows.size(), 1u);
+      BOOST_CHECK_EQUAL(revB.more, false);
       p.upper_bound.clear();
       p.reverse = false;
    }
