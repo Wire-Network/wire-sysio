@@ -289,7 +289,7 @@ public:
          name = std::string(magic_enum::enum_name(primitive_type::checksum256));
       const auto primitive =
          name == abi_boolean ? std::optional{primitive_type::boolean} : magic_enum::enum_cast<primitive_type>(name);
-      if (primitive && *primitive != primitive_type::slug_name) {
+      if (primitive) {
          result->primitive = *primitive;
          result->logical = primitive_logical(*primitive);
          return result;
@@ -297,13 +297,6 @@ public:
       for (const auto& structure : abi.structs) {
          if (structure.name != name)
             continue;
-         if (primitive == primitive_type::slug_name && structure.base.empty() && structure.fields.size() == 1 &&
-             structure.fields.front().name == constants::value_namespace &&
-             be_key_codec::resolve_key_type(abi, structure.fields.front().type) ==
-                magic_enum::enum_name(primitive_type::uint64)) {
-            result->primitive = primitive_type::slug_name;
-            return result;
-         }
          result->kind = type_kind::structure;
          result->logical = logical_type::json;
          if (!structure.base.empty()) {
@@ -834,16 +827,6 @@ fc::variant decode_key_node(be_key_codec::reader& input, const be_key_codec::key
    budget.check();
    budget.charge_memory(scalar_allocation_bytes);
    if (!shape.is_leaf) {
-      // slug_name is an ABI struct backed by uint64, projected as its canonical name.
-      if (type.primitive == primitive_type::slug_name && type.kind == type_kind::primitive) {
-         const auto raw = be_key_codec::decode_shape(input, shape);
-         value result;
-         result.null = false;
-         result.primitive = primitive_type::slug_name;
-         const auto name = fc::slug_name(raw[constants::value_namespace].as_uint64());
-         result.text = name.to_string();
-         return to_cell(result, budget);
-      }
       fc::mutable_variant_object result;
       if (shape.children.size() != type.fields.size())
          throw query_error(error_kind::ROW_DECODE_ERROR, "Key descriptor mismatch");

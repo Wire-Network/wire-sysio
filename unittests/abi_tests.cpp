@@ -2,6 +2,7 @@
 #include <vector>
 #include <iterator>
 #include <cstdlib>
+#include <limits>
 
 #include <boost/test/unit_test.hpp>
 
@@ -681,6 +682,91 @@ BOOST_AUTO_TEST_CASE(optional_vector)
 } FC_LOG_AND_RETHROW() }
 
 
+
+BOOST_AUTO_TEST_CASE(slug_name_builtin_type)
+{ try {
+   // Guards the `slug_name` entry in configure_built_in_types(). Without it the
+   // spelling resolves as neither builtin nor struct and set_abi's validate()
+   // throws invalid_type_inside_abi; with a same-named ABI struct present it
+   // would instead serialize as {"value":N}. The converted table-read sweep in
+   // contracts/tests cannot catch either case, because fc::slug_name's
+   // from_variant accepts the string, the integer AND the object form, so those
+   // reads pass identically whether or not this registration exists.
+   // The `slug_name` struct_def below is NOT filler. The five registry ABIs on this
+   // branch no longer emit it -- abigen stopped once slug_name became a real builtin --
+   // so this fixture now stands in for a DEPLOYED or legacy ABI that still carries the
+   // shadowed definition, which set_abi must keep resolving the same way. And
+   // `slug_name` is the ONLY builtin name so shadowed (`symbol`, `name`,
+   // `asset` appear in no `structs[]`). `set_abi` has no collision check, so
+   // the ABI is genuinely ambiguous and is resolved only by LOOKUP ORDER —
+   // `built_in_types` at abi_serializer.cpp:706 before `structs` at :778. If
+   // the struct ever won, the field would still encode to 8 bytes but
+   // `binary_to_variant` would yield `{"value":N}`, so the `is_string()`
+   // assertions below are what pin the precedence.
+   const char* test_abi = R"=====(
+   {
+       "version": "sysio::abi/1.0",
+       "types": [],
+       "structs": [{
+           "name": "slug_name",
+           "base": "",
+           "fields": [{
+               "name": "value",
+               "type": "uint64"
+           }]
+       },{
+           "name": "regrow",
+           "base": "",
+           "fields": [{
+               "name": "code",
+               "type": "slug_name"
+           }]
+       }],
+       "actions": [],
+       "tables": [],
+       "ricardian_clauses": []
+   }
+   )=====";
+
+   auto abi = fc::json::from_string(test_abi).as<abi_def>();
+   abi_serializer abis(sysio_contract_abi(abi), yield_fn());
+
+   // Both lookups resolve, and the BUILTIN is the one that wins. Asserting the
+   // serializer's own post-`set_abi` view is stronger than inspecting the input
+   // `abi_def`: it proves `set_abi` KEPT the struct_def rather than dropping or
+   // rejecting it, which is what makes the ambiguity real. Note that if the
+   // struct won instead, the inputs below would not merely render differently —
+   // they would not encode at all, because the struct branch throws
+   // `pack_exception` for a non-object/array input (abi_serializer.cpp:831).
+   BOOST_REQUIRE( abis.is_builtin_type("slug_name") );
+   BOOST_REQUIRE( abis.is_struct("slug_name") );
+
+   // A canonical slug is carried as its STRING spelling, in 8 bytes.
+   auto bytes = abis.variant_to_binary(
+      "regrow", fc::json::from_string(R"({"code":"ETH"})"), yield_fn());
+   BOOST_REQUIRE_EQUAL(bytes.size(), 8u);
+   auto back = abis.binary_to_variant("regrow", bytes, yield_fn());
+   BOOST_REQUIRE(back.get_object()["code"].is_string());
+   BOOST_CHECK_EQUAL(back.get_object()["code"].as_string(), "ETH");
+
+   // A JSON number is never a slug carrier: the field carries a SPELLING, so a number
+   // is refused rather than read as a packed value. (`from_variant` also takes the
+   // transitional `{"value": N}` object; a bare number is not that.)
+   BOOST_CHECK_THROW(
+      abis.variant_to_binary("regrow", fc::json::from_string(R"({"code":7})"), yield_fn()),
+      fc::exception);
+
+   // A value with no canonical spelling renders anyway — you get what you get. Every value
+   // below 2^42 has a zero in the leading symbol slot, so `to_string` truncates
+   // it to "", the same text zero renders. The conversion is TOTAL, exactly like
+   // `name` (`database_utils.hpp`: `name(raw).to_string()`): a read path that
+   // throws costs the whole scan, and a raw uint64 that spells nothing is
+   // self-inflicted — nothing validates the raw ctor for either type.
+   const std::vector<char> planted{ 7, 0, 0, 0, 0, 0, 0, 0 };  // packed LE uint64 7
+   auto rendered = abis.binary_to_variant("regrow", planted, yield_fn());
+   BOOST_CHECK_EQUAL(rendered.get_object()["code"].as_string(), "");
+
+} FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE(uint_types)
 { try {
@@ -3687,6 +3773,113 @@ BOOST_AUTO_TEST_CASE(enum_types)
       BOOST_CHECK(!abis.is_enum("nonexistent"));
 
    } FC_LOG_AND_RETHROW()
+}
+
+BOOST_AUTO_TEST_CASE(enum_underlying_type_ranges)
+{
+   using sysio::testing::fc_exception_message_contains;
+   constexpr int64_t int64_min = std::numeric_limits<int64_t>::min();
+   constexpr int64_t int64_max = std::numeric_limits<int64_t>::max();
+
+   const auto member_name = [](size_t i) { return "m" + std::to_string(i); };
+
+   // An ABI whose only definition is enum "e" over `type`, with members m0, m1, ... carrying `values`.
+   const auto enum_abi = [&](const std::string& type, const std::vector<int64_t>& values) {
+      abi_def abi;
+      abi.version = "sysio::abi/1.1";
+      enum_def e{.name = "e", .type = type};
+      for( const auto value : values )
+         e.values.push_back({.name = member_name(e.values.size()), .value = value});
+      abi.enums.value.push_back(std::move(e));
+      return abi;
+   };
+
+   // The ABI validates, and each member packs as `type` and unpacks back to its name.
+   const auto check_accepted = [&](const std::string& type, const std::vector<int64_t>& values) {
+      BOOST_TEST_CONTEXT("enum over " << type) {
+         try {
+            abi_serializer abis(enum_abi(type, values), yield_fn());
+            for( size_t i = 0; i < values.size(); ++i ) {
+               const auto packed = abis.variant_to_binary("e", fc::variant(member_name(i)), yield_fn());
+               BOOST_TEST(abis.binary_to_variant("e", packed, yield_fn()).as_string() == member_name(i));
+            }
+         } catch( const fc::exception& e ) {
+            BOOST_ERROR(e.top_message());
+         }
+      }
+   };
+
+   const auto check_rejected = [&](const std::string& type, const std::vector<int64_t>& values,
+                                   const std::string& error) {
+      BOOST_TEST_CONTEXT("enum over " << type) {
+         BOOST_CHECK_EXCEPTION(abi_serializer(enum_abi(type, values), yield_fn()), invalid_type_inside_abi,
+                               fc_exception_message_contains(error));
+      }
+   };
+
+   // Each type holds its whole range. Member values are int64, so a 64- or 128-bit type holds every int64 of its
+   // signedness.
+   check_accepted("int8",    {-128, 0, 127});
+   check_accepted("int16",   {-32768, 0, 32767});
+   check_accepted("int32",   {std::numeric_limits<int32_t>::min(), 0, std::numeric_limits<int32_t>::max()});
+   check_accepted("int64",   {int64_min, -5, 0, 5, int64_max});
+   check_accepted("int128",  {int64_min, -5, 0, 5, int64_max});
+   check_accepted("uint8",   {0, 5, 255});
+   check_accepted("uint16",  {0, 5, 65535});
+   check_accepted("uint32",  {0, 5, std::numeric_limits<uint32_t>::max()});
+   check_accepted("uint64",  {0, 5, int64_max});
+   check_accepted("uint128", {0, 5, int64_max});
+
+   // A value that is no member's unpacks as the integer, including one past int64 whose low 64 bits are a member's
+   // value.
+   const auto check_unpacks_as_integer = [&](const std::string& type, const auto& value) {
+      const fc::variant integer(value);
+      BOOST_TEST_CONTEXT("enum over " << type << " holding " << integer.as_string()) {
+         abi_serializer abis(enum_abi(type, {0, 5}), yield_fn());
+         const auto packed = abis.variant_to_binary("e", integer, yield_fn());
+         BOOST_TEST(abis.binary_to_variant("e", packed, yield_fn()).as_string() == integer.as_string());
+      }
+   };
+   const fc::int128  int128_2_64  = fc::int128{1} << 64;
+   const fc::uint128 uint128_2_64 = fc::uint128{1} << 64;
+   const fc::uint128 uint128_max  = ~fc::uint128{0};
+   check_unpacks_as_integer("int64",   int64_t{-6});
+   check_unpacks_as_integer("uint64",  (uint64_t{1} << 63) + 5);
+   check_unpacks_as_integer("int128",  fc::int128{6});
+   check_unpacks_as_integer("int128",  int128_2_64 + 5);
+   check_unpacks_as_integer("int128",  -int128_2_64);
+   check_unpacks_as_integer("int128",  static_cast<fc::int128>(uint128_max >> 1));
+   check_unpacks_as_integer("int128",  static_cast<fc::int128>(~(uint128_max >> 1)));
+   check_unpacks_as_integer("uint128", fc::uint128{6});
+   check_unpacks_as_integer("uint128", uint128_2_64 + 5);
+   check_unpacks_as_integer("uint128", uint128_max);
+
+   // One past either end.
+   const std::string out_of_range = "out of range";
+   check_rejected("int8",    {-129}, out_of_range);
+   check_rejected("int8",    {128}, out_of_range);
+   check_rejected("int16",   {-32769}, out_of_range);
+   check_rejected("int16",   {32768}, out_of_range);
+   check_rejected("int32",   {int64_t{std::numeric_limits<int32_t>::min()} - 1}, out_of_range);
+   check_rejected("int32",   {int64_t{std::numeric_limits<int32_t>::max()} + 1}, out_of_range);
+   check_rejected("uint8",   {-1}, out_of_range);
+   check_rejected("uint8",   {256}, out_of_range);
+   check_rejected("uint16",  {-1}, out_of_range);
+   check_rejected("uint16",  {65536}, out_of_range);
+   check_rejected("uint32",  {-1}, out_of_range);
+   check_rejected("uint32",  {int64_t{std::numeric_limits<uint32_t>::max()} + 1}, out_of_range);
+   check_rejected("uint64",  {-1}, out_of_range);
+   check_rejected("uint128", {-1}, out_of_range);
+   check_rejected("uint128", {int64_min}, out_of_range);
+
+   // Nothing else is an integer type, whether or not the enum has members: not other widths or spellings, and not the
+   // other built-in numeric types.
+   for( const std::string type : {"int", "uint", "int0", "int7", "int08", "int65", "int256", "uint1", "uint512",
+                                  "int8_t", "intx", "varint32", "varuint32", "varint_int64", "varint_uint64", "bool",
+                                  "float64"} ) {
+      check_rejected(type, {}, "invalid underlying type");
+      check_rejected(type, {0}, "invalid underlying type");
+   }
 }
 
 // ===================== Protobuf ABI Serialization Tests =====================

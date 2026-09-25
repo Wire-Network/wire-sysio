@@ -6,8 +6,8 @@
 #include <sysio.chalg/sysio.chalg.hpp>     // dispute trigger + open-dispute gate (disputes table)
 #include <sysio.opreg/sysio.opreg.hpp>     // operator-status delivery gate (operators table)
 #include <sysio.roa.hpp>                    // authoritative Tier-1 electorate preflight
+#include <sysio/slug_name.hpp>
 #include <sysio.opp.common/evm_address.hpp>
-#include <sysio.opp.common/slug_name.hpp>
 #include <sysio.opp.common/safe_ops.hpp>   // to_depot_amount — WSA-028 fail-closed TokenAmount gate
 #include <sysio.opp.common/name_ops.hpp>   // parse_wire_account_name — never-throw account-name parse
 #include <sysio.opp.common/opp_canonical_codec.hpp> // canonical envelope encoding + keccak epoch digest
@@ -53,7 +53,7 @@ constexpr name     ram_payer       = "sysio"_n;
 /// always WIRE.
 constexpr uint32_t WIRE_CHAIN_ID  = 1;
 
-using sysio::slug_name_literals::operator""_s;
+// `operator""_s` is declared at global scope by <sysio/slug_name.hpp>.
 
 /// Codename of the Ethereum outpost — the sole source of node-owner NFT (ERC1155) deposits, which
 /// occur on Ethereum mainnet only. This is the `ChainSpec.code` the launch and dev bootstrap configs
@@ -302,6 +302,33 @@ name resolve_account_from_op_address(const opp::types::ChainAddress& op_address)
    return false;
 }
 
+/// Are a payload's FORGEABLE code fields canonical slug_names?
+///
+/// `chain_code` is proven — `source_chain_binding_ok` binds it to the delivering
+/// outpost. `token_code` / `reserve_code` are NOT: they arrive as raw protobuf
+/// uint64s and reach a slug_name through the non-validating raw constructor, so a
+/// forged payload can carry a value that does not round-trip through its spelling.
+/// Such a value can never have been registered, and rendering is total, so it still
+/// produces text: text that either FAILS validation on the way back, or silently
+/// re-parses as a DIFFERENT, real code.
+///
+/// Drop the attestation instead; never check(), per
+/// feedback_opp_handlers_never_throw — a check() here halts evalcons and stalls
+/// consensus.
+///
+/// `path` labels the dispatch path in the diagnostic. True iff every code is canonical.
+[[nodiscard]] bool payload_codes_canonical(std::initializer_list<sysio::slug_name> codes,
+                                           const char* path) {
+   for (const sysio::slug_name code : codes) {
+      if (!code.is_canonical()) {
+         sysio::print("msgch::", path, ": DROP attestation -- payload code ", code.value,
+                      " has no canonical slug_name spelling\n");
+         return false;
+      }
+   }
+   return true;
+}
+
 /// The syndicating user's key family must be the proven outpost's own: an outpost of family F
 /// verifies and emits F-family keys only, so a key of another family is a forgery whatever it
 /// resolves to. `sysio.liq::park` refuses the other family for an unlinked key; this refuses it
@@ -431,7 +458,7 @@ std::optional<checksum256> to_checksum256_exact(const std::vector<char>& bytes) 
 /// Decode an OperatorAction sub-message and dispatch to the appropriate
 /// sysio.opreg action. Called from the inbound dispatch loop in `evalcons`.
 ///
-/// Sub-type routing (post v6 data-model refactor — codenames everywhere):
+/// Sub-type routing (post data-model refactor — codenames everywhere):
 ///   * DEPOSIT_REQUEST     → opreg::depositinle(account, chain_code, token_code,
 ///                                              amount, actor_chain, actor_addr,
 ///                                              msg_id)
@@ -488,6 +515,12 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
    // no-proto-messages-in-actions rule.
    const sysio::slug_name chain_code_slug{chain_code};
    const sysio::slug_name token_code{oa.amount.token_code};
+   // A DEPOSIT_REQUEST carries outpost custody, so an unspellable token code must be
+   // REFUNDED, not dropped: opreg::depositinle rejects it with DEPOSIT_REVERT before
+   // touching the balance map. Every other action type is a state transition with no
+   // escrow to return, so dropping stays correct there.
+   if (oa.action_type != AT::ACTION_TYPE_DEPOSIT_REQUEST &&
+       !payload_codes_canonical({token_code}, "dispatch_operator_action")) return;
    // WSA-028: TokenAmount.amount is signed on the wire. Gate it through the
    // shared fail-closed parser before any unsigned use — a negative or
    // out-of-range amount is dropped here, never wrapped into a huge collateral
@@ -543,7 +576,7 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
 /// covering this leg); the authoritative copy for verification is the
 /// bytes themselves, stored on `commit_entry.{source,dest}_uic_bytes`.
 ///
-/// Post v6: identity scalars on UIC are codenames (uint64). `chain_code` is the proven source
+/// After the refactor: identity scalars on UIC are codenames (uint64). `chain_code` is the proven source
 /// outpost from `deliver`; `uic.chain_code` is the leg this commit covers. WSA-005 requires the two
 /// to be identical — each leg's underwrite commit is emitted on, and relayed by, that leg's own
 /// outpost (a source-leg UIC rides the source outpost's envelope, a dest-leg UIC the dest outpost's;
@@ -577,6 +610,11 @@ void dispatch_underwrite_commit(name self, const std::vector<char>& data, uint64
    // commit is recorded against a swap leg.
    if (!source_chain_binding_ok(chain_code, uic.chain_code, "dispatch_underwrite_commit")) return;
 
+   const sysio::slug_name uic_token_code{uic.token_code};
+   const sysio::slug_name uic_reserve_code{uic.reserve_code};
+   if (!payload_codes_canonical({uic_token_code, uic_reserve_code},
+                                "dispatch_underwrite_commit")) return;
+
    // Route with the proven `chain_code` (equal to `uic.chain_code`, enforced above) so the leg slot
    // is keyed off provenance, not the payload's self-asserted chain.
    action(
@@ -584,8 +622,8 @@ void dispatch_underwrite_commit(name self, const std::vector<char>& data, uint64
       UWRIT_ACCOUNT, "rcrdcommit"_n,
       std::make_tuple(uic.uw_request_id, *underwriter, chain_code,
                       sysio::slug_name{chain_code},
-                      sysio::slug_name{uic.token_code},
-                      sysio::slug_name{uic.reserve_code},
+                      uic_token_code,
+                      uic_reserve_code,
                       data)
    ).send();
 }
@@ -686,6 +724,12 @@ void dispatch_reserve_create(name self, const std::vector<char>& data, uint64_t 
    // reserve whose external custody is claimed against a different chain B.
    if (!source_chain_binding_ok(chain_code, ext.chain_code, "dispatch_reserve_create")) return;
 
+   // No canonicality drop here: the creator's escrow is already in outpost custody, so
+   // an unspellable token/reserve code must be REFUNDED. reserv::oncrtreserve rejects it
+   // with RESERVE_CREATE_CANCELLED before persisting anything.
+   const sysio::slug_name ext_token_code{ext.amount.token_code};
+   const sysio::slug_name ext_reserve_code{ext.reserve_code};
+
    const uint64_t ext_amount =
       sysio::opp::safe::to_depot_amount(static_cast<int64_t>(ext.amount.amount)).value_or(0);
 
@@ -693,8 +737,8 @@ void dispatch_reserve_create(name self, const std::vector<char>& data, uint64_t 
       permission_level{self, "active"_n},
       RESERV_ACCOUNT, "oncrtreserve"_n,
       std::make_tuple(sysio::slug_name{ext.chain_code},
-                      sysio::slug_name{ext.amount.token_code},
-                      sysio::slug_name{ext.reserve_code},
+                      ext_token_code,
+                      ext_reserve_code,
                       rc.name,
                       rc.description,
                       ext_amount,
@@ -725,12 +769,17 @@ void dispatch_reserve_create_cancel(name self, const std::vector<char>& data, ui
    // delivering outpost so an envelope proven from outpost A cannot cancel a reserve on chain B.
    if (!source_chain_binding_ok(chain_code, cancel.chain_code, "dispatch_reserve_create_cancel")) return;
 
+   const sysio::slug_name cancel_token_code{cancel.token_code};
+   const sysio::slug_name cancel_reserve_code{cancel.reserve_code};
+   if (!payload_codes_canonical({cancel_token_code, cancel_reserve_code},
+                                "dispatch_reserve_create_cancel")) return;
+
    action(
       permission_level{self, "active"_n},
       RESERV_ACCOUNT, "oncnclrsv"_n,
       std::make_tuple(sysio::slug_name{cancel.chain_code},
-                      sysio::slug_name{cancel.token_code},
-                      sysio::slug_name{cancel.reserve_code},
+                      cancel_token_code,
+                      cancel_reserve_code,
                       cancel.creator_addr.kind,
                       cancel.creator_addr.address)
    ).send();
@@ -912,10 +961,10 @@ void dispatch_attestation(name self, uint64_t attestation_id,
       // longer exists; any stray inbound falls through to the default drop below.
 
       case AttestationType::ATTESTATION_TYPE_STAKING_REWARD:
-         // Per-staker staking reward -> sysio.dclaim claim ledger. The v6
+         // Per-staker staking reward -> sysio.dclaim claim ledger. The
          // staking-reward path does not deposit back to a reserve (the
          // external-pool credit and native -> WIRE conversion are
-         // outpost-side), so the pre-v6 reserv::onreward leg is dropped and
+         // outpost-side), so the pre-refactor reserv::onreward leg is dropped and
          // reward_amount.amount is forwarded as the WIRE-denominated credit.
          {
             opp::attestations::StakingReward sr;
@@ -1400,7 +1449,7 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
 
    // Verify outpost exists on the new `sysio.chains::chains` table.
    // `chain_code` is the originating chain's slug_name value (uint64) per
-   // the v6 data-model refactor — the chain row's PK is `code.value`.
+   // the data-model refactor — the chain row's PK is `code.value`.
    // Reject deliveries from the depot self-row (`is_depot==true`) and
    // from inactive chains; both are protocol invariants.
    sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
@@ -1646,7 +1695,7 @@ void msgch::chkcons() {
 
    // Check all active outposts have consensus for the current epoch.
    // Outpost set is sourced from `sysio.chains::chains` filtered to
-   // active && !is_depot per the v6 data-model refactor; outpost ids
+   // active && !is_depot per the data-model refactor; outpost ids
    // in `outpcons` are slug_name values (chain_row::code.value).
    outpost_consensus_t opcons(get_self());
    sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);

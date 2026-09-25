@@ -59,10 +59,6 @@ public:
       }
    }
 
-   static fc::mutable_variant_object codename(std::string_view s) {
-      return mvo()("value", fc::slug_name{s}.value);
-   }
-
    /// `sysio.tokens::regtoken` for a chain-native token; the metadata strings are the
    /// parameters under test, everything else is a fixed valid value.
    action_result regtoken(std::string_view code,
@@ -70,7 +66,7 @@ public:
                           const std::string& description) {
       return push_action(TOKENS_ACCOUNT, "regtoken"_n, mvo()
          ("kind",        TokenKind::TOKEN_KIND_NATIVE)
-         ("code",        codename(code))
+         ("code",        code)
          ("symbol_name", symbol_name)
          ("description", description)
          ("precision",   9)
@@ -98,8 +94,8 @@ public:
             auto row = abi_ser.binary_to_variant(
                "chain_token_row", raw,
                abi_serializer::create_yield_function(abi_serializer_max_time));
-            if (row["chain_code"]["value"].as_uint64() == target_chain &&
-                row["token_code"]["value"].as_uint64() == target_token) {
+            if (row["chain_code"].as<fc::slug_name>().value == target_chain &&
+                row["token_code"].as<fc::slug_name>().value == target_token) {
                return row;
             }
          } catch (...) {
@@ -122,8 +118,8 @@ BOOST_AUTO_TEST_SUITE(sysio_tokens_tests)
 BOOST_FIXTURE_TEST_CASE(regctok_records_binding, sysio_tokens_tester) { try {
    // Native binding.
    BOOST_REQUIRE_EQUAL(success(), push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
-      ("chain_code",    codename("ETH"))
-      ("token_code",    codename("WIRE"))
+      ("chain_code",    "ETH")
+      ("token_code",    "WIRE")
       ("contract_addr", "")
       ("is_native",     true)));
 
@@ -134,14 +130,59 @@ BOOST_FIXTURE_TEST_CASE(regctok_records_binding, sysio_tokens_tester) { try {
 
    // Non-native ERC-20 binding with a contract address.
    BOOST_REQUIRE_EQUAL(success(), push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
-      ("chain_code",    codename("ETH"))
-      ("token_code",    codename("USDC"))
+      ("chain_code",    "ETH")
+      ("token_code",    "USDC")
       ("contract_addr", "01")
       ("is_native",     false)));
 
    auto erc20 = find_chaintoken("ETH", "USDC");
    BOOST_REQUIRE(!erc20.is_null());
    BOOST_REQUIRE_EQUAL(false, erc20["is_native"].as<bool>());
+} FC_LOG_AND_RETHROW() }
+
+// A `slug_name` reaches action JSON either as its canonical STRING or through the
+// transitional object form `{"value": N}`, and only the string arm validates. Neither
+// registry has an erase action, so an uncanonical code would become a permanent row.
+// Rendering is TOTAL and will not complain — the value can decode to "" or to a valid
+// spelling that re-parses as a DIFFERENT code. Both writers are privileged top-level
+// actions and refuse.
+BOOST_FIXTURE_TEST_CASE(regtoken_regctok_uncanonical_code_rejected, sysio_tokens_tester) { try {
+   // Below the leading symbol's floor: decodes to "" and packs back to 0, so it is not a
+   // code and has no spelling.
+   constexpr uint64_t uncanonical = 7;
+   BOOST_REQUIRE(!fc::slug_name{uncanonical}.is_canonical());
+
+   BOOST_REQUIRE(push_action(TOKENS_ACCOUNT, "regtoken"_n, mvo()
+      ("kind",        TokenKind::TOKEN_KIND_NATIVE)
+      ("code",        mvo()("value", uncanonical))
+      ("symbol_name", std::string("bad"))
+      ("description", std::string{})
+      ("precision",   9)
+      ("address",     mvo()("kind", ChainKind::CHAIN_KIND_UNKNOWN)("address", "")))
+      .find("has no canonical slug_name spelling") != std::string::npos);
+
+   // Either half of regctok's composite key is enough to refuse the binding.
+   BOOST_REQUIRE(push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
+      ("chain_code",    mvo()("value", uncanonical))
+      ("token_code",    "WIRE")
+      ("contract_addr", "")
+      ("is_native",     true))
+      .find("has no canonical slug_name spelling") != std::string::npos);
+
+   BOOST_REQUIRE(push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
+      ("chain_code",    "ETH")
+      ("token_code",    mvo()("value", uncanonical))
+      ("contract_addr", "")
+      ("is_native",     true))
+      .find("has no canonical slug_name spelling") != std::string::npos);
+
+   // Control: spellable codes on the same shapes still register.
+   BOOST_REQUIRE_EQUAL(success(), regtoken("WIRE", "Wire", "ok"));
+   BOOST_REQUIRE_EQUAL(success(), push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
+      ("chain_code",    "ETH")
+      ("token_code",    "WIRE")
+      ("contract_addr", "")
+      ("is_native",     true)));
 } FC_LOG_AND_RETHROW() }
 
 // `symbol_name` and `description` are moved into a persisted `token_row` billed to

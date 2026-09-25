@@ -15,8 +15,11 @@ BOOST_AUTO_TEST_CASE(exact_match) {
    contract_action_match matcher("s"_n, "test"_n, contract_action_match::match_type::exact);
 
    BOOST_CHECK(matcher.is_contract_match("test"_n));
-   BOOST_CHECK_EQUAL("test."_n, "test"_n);                // any '.' at the end of a name is really a non-character
-   BOOST_CHECK(matcher.is_contract_match("test."_n));     // which is why this also passes
+   // A trailing '.' is a pad symbol, so "test." PACKS to "test" - but it is not
+   // a valid spelling, so the literal is rejected at compile time. Build it from
+   // the packed value to pin the collapse without a literal that lies.
+   BOOST_CHECK_EQUAL(name{name::pack("test.")}, "test"_n);
+   BOOST_CHECK(matcher.is_contract_match(name{name::pack("test.")}));
 
    BOOST_CHECK(!matcher.is_contract_match(""_n));
    BOOST_CHECK(!matcher.is_contract_match("est"_n));
@@ -37,8 +40,9 @@ BOOST_AUTO_TEST_CASE(suffix_match) {
    BOOST_CHECK(matcher.is_contract_match("fun.test"_n));
    BOOST_CHECK(matcher.is_contract_match("fun.fun.test"_n));
    BOOST_CHECK(matcher.is_contract_match("fun...test"_n));
-   BOOST_CHECK_EQUAL("test."_n, "test"_n);                // any '.' at the end of a name is really a non-character
-   BOOST_CHECK(matcher.is_contract_match("test."_n));     // which is why this also passes
+   // See exact_match: "test." packs to "test" but is not a valid spelling.
+   BOOST_CHECK_EQUAL(name{name::pack("test.")}, "test"_n);
+   BOOST_CHECK(matcher.is_contract_match(name{name::pack("test.")}));
 
    BOOST_CHECK(!matcher.is_contract_match(""_n));
    BOOST_CHECK(!matcher.is_contract_match("est"_n));
@@ -51,7 +55,7 @@ BOOST_AUTO_TEST_CASE(prefix_match) {
    contract_action_match matcher("s"_n, "test"_n, contract_action_match::match_type::prefix);
 
    BOOST_CHECK(matcher.is_contract_match("test"_n));
-   BOOST_CHECK(matcher.is_contract_match("test."_n));
+   BOOST_CHECK(matcher.is_contract_match(name{name::pack("test.")}));
    BOOST_CHECK(matcher.is_contract_match("test.fun"_n));
    BOOST_CHECK(matcher.is_contract_match("test...fun"_n));   //passes because "test.."_n is just "test"_n
 

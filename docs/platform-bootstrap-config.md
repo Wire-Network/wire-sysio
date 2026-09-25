@@ -49,7 +49,8 @@ which are wire messages with packed-uint64 codes, raw `bytes` addresses, and
 lifecycle fields that are outputs. A hand-authored config wants the opposite:
 
 - **Codes are strings** (`"ETHEREUM"`, `"USDC"`, `"PRIMARY"`); the tool packs
-  them via `slug_name` (`[A-Z0-9_]`, ≤ 8 chars).
+  them via `slug_name` (`[A-Z][A-Z0-9_]{0,7}` -- a code must START with a
+  letter, ≤ 8 chars).
 - **Addresses are strings** in chain-native display form (`0x`-hex for EVM,
   base58 for SVM) so each is verifiable against a block explorer. `bytes` would
   render as base64 in JSON.
@@ -164,7 +165,7 @@ because the file is hand-authored and drives irreversible actions. A validator
 | # | Invariant |
 |---|---|
 | V1 | `schema_version == 1`; `network` non-empty |
-| V2 | every code is a valid slug (`[A-Z0-9_]`, ≤ 8 chars) |
+| V2 | every code is a valid slug: `[A-Z][A-Z0-9_]{0,7}` -- leading character must be a letter, ≤ 8 chars |
 | V3 | chain codes unique; exactly one `CHAIN_KIND_WIRE` chain, code `WIRE` |
 | V4 | token codes unique; `chain_code` declared; `precision` ∈ 1..9 (the depot frame — `sysio.tokens::regtoken` rejects anything higher, so a wider bound here would pass validation and then fail mid-bootstrap); native ⇔ kind `NATIVE` + empty address; non-native address well-formed for the chain kind (EVM `0x`+40 hex; SVM base58 → 32 bytes) |
 | V5 | exactly one native token per non-depot chain |

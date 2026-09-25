@@ -9,11 +9,12 @@
  */
 
 #include <sysio/asset.hpp>
-#include <sysio.opp.common/slug_name.hpp>
+#include <sysio/slug_name.hpp>
 
 namespace sysio::opp::wire {
 
-using sysio::slug_name_literals::operator""_s;
+// `operator""_s` is declared at global scope by <sysio/slug_name.hpp>, so it
+// needs no using-declaration here.
 
 /// Native WIRE token symbol and its system-wide nine-decimal precision.
 inline constexpr sysio::symbol asset_symbol{"WIRE", 9};

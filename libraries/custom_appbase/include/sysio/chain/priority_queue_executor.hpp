@@ -163,14 +163,12 @@ public:
       trx_read_write_queue_enabled_.store(enable, std::memory_order_release);
    }
 
+   // Unsynchronized: only safe while no other thread can push to these queues, such as on the main thread during the
+   // write window. read_exclusive and trx_read_write are pushed from any thread, so read them through readable_queue().
    size_t read_only_queue_size() { return pri_queue_.size(exec_queue::read_only); }
    size_t read_write_queue_size() { return pri_queue_.size(exec_queue::read_write); }
-   size_t trx_read_write_queue_size() { return pri_queue_.size(exec_queue::trx_read_write); }
-   size_t read_exclusive_queue_size() { return pri_queue_.size(exec_queue::read_exclusive); }
    bool read_only_queue_empty() { return pri_queue_.empty(exec_queue::read_only); }
    bool read_write_queue_empty() { return pri_queue_.empty(exec_queue::read_write); }
-   bool trx_read_write_queue_empty() { return pri_queue_.empty(exec_queue::trx_read_write); }
-   bool read_exclusive_queue_empty() { return pri_queue_.empty(exec_queue::read_exclusive); }
 
    [[nodiscard]] exec_pri_queue::read_view readable_queue() const { return pri_queue_.readable(); }
 

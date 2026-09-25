@@ -30,7 +30,7 @@
 #include <sysio/kv_scoped_table.hpp>
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opp.common/shadow_yield.hpp>
-#include <sysio.opp.common/slug_name.hpp>
+#include <sysio/slug_name.hpp>
 #include <sysio.opp.common/wire_asset.hpp>
 
 #include <magic_enum/magic_enum.hpp>
