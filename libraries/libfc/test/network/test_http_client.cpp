@@ -412,6 +412,18 @@ void serve_metadata_then_drop_next_request(tcp::socket& socket, std::atomic_bool
    socket.close(ec);
 }
 
+/**
+ * Answer the request the fixture already read, and every later one on @p socket, with a keep-alive response until the
+ * peer closes it. Keeping the connection open leaves the client's pool, not the transport's closed-peer check, as the
+ * only thing that decides whether it is reused.
+ */
+void answer_keep_alive_until_closed(tcp::socket& socket) {
+   do {
+      if (!write_bytes(socket, keep_alive_metadata_response()))
+         return;
+   } while (!read_request_header(socket).empty());
+}
+
 /** Return the JSON error envelope a remote node emits alongside an HTTP 500 response. */
 std::string remote_error_response_body() {
    fc::mutable_variant_object detail;
@@ -822,9 +834,7 @@ BOOST_AUTO_TEST_CASE(idle_connection_pool_cap_can_disable_reuse) {
    scripted_http_server server(
       [&](tcp::socket& socket, const std::atomic_bool&) {
          ++connections;
-         (void)write_bytes(socket, "HTTP/1.1 200 OK\r\n"
-                                   "Content-Length: 2\r\n"
-                                   "Connection: keep-alive\r\n\r\n{}");
+         answer_keep_alive_until_closed(socket);
       },
       true, 2);
    fc::http::transport transport(fc::http::transport_options{
@@ -976,9 +986,7 @@ BOOST_AUTO_TEST_CASE(expired_idle_connection_is_not_reused) {
    scripted_http_server server(
       [&](tcp::socket& socket, const std::atomic_bool&) {
          ++connections;
-         (void)write_bytes(socket, "HTTP/1.1 200 OK\r\n"
-                                   "Content-Length: 2\r\n"
-                                   "Connection: keep-alive\r\n\r\n{}");
+         answer_keep_alive_until_closed(socket);
       },
       true, 2);
    fc::http::transport transport(fc::http::transport_options{
