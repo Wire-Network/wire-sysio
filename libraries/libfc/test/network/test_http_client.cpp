@@ -113,10 +113,15 @@ public:
    /** Stop the response script and release its worker. */
    ~scripted_http_server() {
       _stop = true;
-      boost::system::error_code ec;
-      _acceptor.close(ec);
-      _socket.cancel(ec);
-      _socket.close(ec);
+      {
+         std::scoped_lock lock(_close_mutex);
+         boost::system::error_code ec;
+         _acceptor.close(ec);
+         // Closing does not wake a handler blocked reading the socket on Linux; shutting it down does.
+         _socket.shutdown(tcp::socket::shutdown_both, ec);
+         _socket.cancel(ec);
+         _socket.close(ec);
+      }
       unblock_accept();
       if (_worker.joinable()) {
          _worker.join();
@@ -143,6 +148,7 @@ private:
       boost::system::error_code ec;
       for (size_t connection_index = 0; connection_index < _connections_to_accept; ++connection_index) {
          if (connection_index != 0) {
+            std::scoped_lock lock(_close_mutex);
             _socket = tcp::socket(_io);
          }
          _acceptor.accept(_socket, ec);
@@ -164,9 +170,11 @@ private:
          }
          _handler(_socket, _stop);
          if (connection_index + 1 < _connections_to_accept) {
+            std::scoped_lock lock(_close_mutex);
             _socket.close(ec);
          }
       }
+      std::scoped_lock lock(_close_mutex);
       _acceptor.close(ec);
       _finished = true;
    }
@@ -180,6 +188,8 @@ private:
    size_t _connections_to_accept;
    std::atomic_bool _stop{false};
    std::atomic_bool _finished{false};
+   /// Serializes the listener and socket closes the worker and the destructor both reach; asio's aren't thread-safe.
+   std::mutex _close_mutex;
    std::thread _worker;
 };
 
