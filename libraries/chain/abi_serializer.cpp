@@ -11,7 +11,58 @@
 #include <google/protobuf/dynamic_message.h>
 #include <google/protobuf/util/json_util.h>
 
+#include <algorithm>
+#include <array>
+#include <limits>
+#include <optional>
+
 namespace sysio::chain {
+
+   namespace {
+      constexpr int64_t int64_min = std::numeric_limits<int64_t>::min();
+      constexpr int64_t int64_max = std::numeric_limits<int64_t>::max();
+
+      /// A type an ABI enum may be based on, and the range of member values it holds. Member values are int64
+      /// (`enum_value_def::value`), so a 64- or 128-bit type holds every int64 of its signedness.
+      struct enum_underlying_type {
+         std::string_view name;
+         int64_t          min;
+         int64_t          max;
+      };
+
+      constexpr std::array enum_underlying_types{
+         enum_underlying_type{"int8",    std::numeric_limits<int8_t>::min(),  std::numeric_limits<int8_t>::max()},
+         enum_underlying_type{"int16",   std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::max()},
+         enum_underlying_type{"int32",   std::numeric_limits<int32_t>::min(), std::numeric_limits<int32_t>::max()},
+         enum_underlying_type{"int64",   int64_min,                           int64_max},
+         enum_underlying_type{"int128",  int64_min,                           int64_max},
+         enum_underlying_type{"uint8",   0,                                   std::numeric_limits<uint8_t>::max()},
+         enum_underlying_type{"uint16",  0,                                   std::numeric_limits<uint16_t>::max()},
+         enum_underlying_type{"uint32",  0,                                   std::numeric_limits<uint32_t>::max()},
+         enum_underlying_type{"uint64",  0,                                   int64_max},
+         enum_underlying_type{"uint128", 0,                                   int64_max},
+      };
+
+      /// An unpacked enum value as a member value, or nullopt when it is not an integer within int64 and so is no
+      /// member's. as_int64() alone would reject the 128-bit variants and wrap uint64 ones.
+      std::optional<int64_t> enum_member_value(const fc::variant& v) {
+         if( v.is_int64() )
+            return v.as_int64();
+         if( v.is_int128() ) {
+            const fc::int128 value = v.as_int128();
+            if( value < int64_min || value > int64_max )
+               return std::nullopt;
+            return static_cast<int64_t>(value);
+         }
+         if( v.is_uint64() || v.is_uint128() ) {
+            const fc::uint128 value = v.as_uint128();
+            if( value > static_cast<fc::uint128>(int64_max) )
+               return std::nullopt;
+            return static_cast<int64_t>(value);
+         }
+         return std::nullopt;
+      }
+   } // namespace
 
    const enum_value_def* abi_serializer::find_enum_member_by_value( const enum_def& definition, int64_t value ) {
       for( const auto& member : definition.values )
@@ -345,20 +396,6 @@ namespace sysio::chain {
       return built_in_types.find(type) != built_in_types.end();
    }
 
-   bool abi_serializer::is_integer(const std::string_view& type) const {
-      return type.starts_with("uint") || type.starts_with("int");
-   }
-
-   int abi_serializer::get_integer_size(const std::string_view& type) const {
-      SYS_ASSERT( is_integer(type), invalid_type_inside_abi, "{} is not an integer type",
-                  impl::limit_size(type));
-      if( type.starts_with("uint") ) {
-         return boost::lexical_cast<int>(type.substr(4));
-      } else {
-         return boost::lexical_cast<int>(type.substr(3));
-      }
-   }
-
    bool abi_serializer::is_struct(const std::string_view& type)const {
       return structs.find(resolve_type(type)) != structs.end();
    }
@@ -496,11 +533,11 @@ namespace sysio::chain {
       } FC_CAPTURE_AND_RETHROW( "r: {}", r  ) }
       for( const auto& en : enums ) { try {
         ctx.check_deadline();
-        SYS_ASSERT(is_integer(en.second.type), invalid_type_inside_abi,
-                   "enum '{}' has invalid underlying type '{}' (must be an integer type)", impl::limit_size(en.first), impl::limit_size(en.second.type) );
-
-        int bit_width = get_integer_size(en.second.type);
-        bool is_signed_type = en.second.type.starts_with("int");
+        const auto underlying = std::ranges::find(enum_underlying_types, std::string_view{en.second.type},
+                                                  &enum_underlying_type::name);
+        SYS_ASSERT(underlying != enum_underlying_types.end(), invalid_type_inside_abi,
+                   "enum '{}' has invalid underlying type '{}' (must be a fixed-width integer type)",
+                   impl::limit_size(en.first), impl::limit_size(en.second.type) );
 
         flat_set<string> seen_names;
         flat_set<int64_t> seen_values;
@@ -509,18 +546,9 @@ namespace sysio::chain {
                       "enum '{}' has duplicate member name '{}'", impl::limit_size(en.first), impl::limit_size(ev.name) );
            SYS_ASSERT(seen_values.insert(ev.value).second, invalid_type_inside_abi,
                       "enum '{}' has duplicate value {} (member '{}')", impl::limit_size(en.first), ev.value, impl::limit_size(ev.name) );
-           if( is_signed_type ) {
-              int64_t lo = -(1LL << (bit_width - 1));
-              int64_t hi =  (1LL << (bit_width - 1)) - 1;
-              SYS_ASSERT(ev.value >= lo && ev.value <= hi, invalid_type_inside_abi,
-                         "enum '{}' value '{}' ({}) out of range for '{}'",
-                         impl::limit_size(en.first), impl::limit_size(ev.name), ev.value, impl::limit_size(en.second.type) );
-           } else {
-              uint64_t hi = (bit_width == 64) ? UINT64_MAX : (1ULL << bit_width) - 1;
-              SYS_ASSERT(ev.value >= 0 && static_cast<uint64_t>(ev.value) <= hi, invalid_type_inside_abi,
-                         "enum '{}' value '{}' ({}) out of range for '{}'",
-                         impl::limit_size(en.first), impl::limit_size(ev.name), ev.value, impl::limit_size(en.second.type) );
-           }
+           SYS_ASSERT(ev.value >= underlying->min && ev.value <= underlying->max, invalid_type_inside_abi,
+                      "enum '{}' value '{}' ({}) out of range for '{}'", impl::limit_size(en.first),
+                      impl::limit_size(ev.name), ev.value, impl::limit_size(en.second.type) );
         }
       } FC_CAPTURE_AND_RETHROW( "enum: {}", en.first  ) }
    }
@@ -640,8 +668,10 @@ namespace sysio::chain {
          SYS_ASSERT( btype != built_in_types.end(), invalid_type_inside_abi,
                      "Enum '{}' has unknown underlying type '{}'", impl::limit_size(rtype), impl::limit_size(e_itr->second.type) );
          auto int_var = btype->second.first(stream, false, false, ctx.get_yield_function());
-         if( const auto* member = find_enum_member_by_value( e_itr->second, int_var.as_int64() ) )
-            return fc::variant(member->name);
+         if( const auto member_value = enum_member_value(int_var) ) {
+            if( const auto* member = find_enum_member_by_value( e_itr->second, *member_value ) )
+               return fc::variant(member->name);
+         }
          return int_var; // Unknown value — return as integer
       } else {
          auto v_itr = variants.find(rtype);

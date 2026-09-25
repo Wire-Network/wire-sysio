@@ -2,6 +2,7 @@
 #include <vector>
 #include <iterator>
 #include <cstdlib>
+#include <limits>
 
 #include <boost/test/unit_test.hpp>
 
@@ -3772,6 +3773,113 @@ BOOST_AUTO_TEST_CASE(enum_types)
       BOOST_CHECK(!abis.is_enum("nonexistent"));
 
    } FC_LOG_AND_RETHROW()
+}
+
+BOOST_AUTO_TEST_CASE(enum_underlying_type_ranges)
+{
+   using sysio::testing::fc_exception_message_contains;
+   constexpr int64_t int64_min = std::numeric_limits<int64_t>::min();
+   constexpr int64_t int64_max = std::numeric_limits<int64_t>::max();
+
+   const auto member_name = [](size_t i) { return "m" + std::to_string(i); };
+
+   // An ABI whose only definition is enum "e" over `type`, with members m0, m1, ... carrying `values`.
+   const auto enum_abi = [&](const std::string& type, const std::vector<int64_t>& values) {
+      abi_def abi;
+      abi.version = "sysio::abi/1.1";
+      enum_def e{.name = "e", .type = type};
+      for( const auto value : values )
+         e.values.push_back({.name = member_name(e.values.size()), .value = value});
+      abi.enums.value.push_back(std::move(e));
+      return abi;
+   };
+
+   // The ABI validates, and each member packs as `type` and unpacks back to its name.
+   const auto check_accepted = [&](const std::string& type, const std::vector<int64_t>& values) {
+      BOOST_TEST_CONTEXT("enum over " << type) {
+         try {
+            abi_serializer abis(enum_abi(type, values), yield_fn());
+            for( size_t i = 0; i < values.size(); ++i ) {
+               const auto packed = abis.variant_to_binary("e", fc::variant(member_name(i)), yield_fn());
+               BOOST_TEST(abis.binary_to_variant("e", packed, yield_fn()).as_string() == member_name(i));
+            }
+         } catch( const fc::exception& e ) {
+            BOOST_ERROR(e.top_message());
+         }
+      }
+   };
+
+   const auto check_rejected = [&](const std::string& type, const std::vector<int64_t>& values,
+                                   const std::string& error) {
+      BOOST_TEST_CONTEXT("enum over " << type) {
+         BOOST_CHECK_EXCEPTION(abi_serializer(enum_abi(type, values), yield_fn()), invalid_type_inside_abi,
+                               fc_exception_message_contains(error));
+      }
+   };
+
+   // Each type holds its whole range. Member values are int64, so a 64- or 128-bit type holds every int64 of its
+   // signedness.
+   check_accepted("int8",    {-128, 0, 127});
+   check_accepted("int16",   {-32768, 0, 32767});
+   check_accepted("int32",   {std::numeric_limits<int32_t>::min(), 0, std::numeric_limits<int32_t>::max()});
+   check_accepted("int64",   {int64_min, -5, 0, 5, int64_max});
+   check_accepted("int128",  {int64_min, -5, 0, 5, int64_max});
+   check_accepted("uint8",   {0, 5, 255});
+   check_accepted("uint16",  {0, 5, 65535});
+   check_accepted("uint32",  {0, 5, std::numeric_limits<uint32_t>::max()});
+   check_accepted("uint64",  {0, 5, int64_max});
+   check_accepted("uint128", {0, 5, int64_max});
+
+   // A value that is no member's unpacks as the integer, including one past int64 whose low 64 bits are a member's
+   // value.
+   const auto check_unpacks_as_integer = [&](const std::string& type, const auto& value) {
+      const fc::variant integer(value);
+      BOOST_TEST_CONTEXT("enum over " << type << " holding " << integer.as_string()) {
+         abi_serializer abis(enum_abi(type, {0, 5}), yield_fn());
+         const auto packed = abis.variant_to_binary("e", integer, yield_fn());
+         BOOST_TEST(abis.binary_to_variant("e", packed, yield_fn()).as_string() == integer.as_string());
+      }
+   };
+   const fc::int128  int128_2_64  = fc::int128{1} << 64;
+   const fc::uint128 uint128_2_64 = fc::uint128{1} << 64;
+   const fc::uint128 uint128_max  = ~fc::uint128{0};
+   check_unpacks_as_integer("int64",   int64_t{-6});
+   check_unpacks_as_integer("uint64",  (uint64_t{1} << 63) + 5);
+   check_unpacks_as_integer("int128",  fc::int128{6});
+   check_unpacks_as_integer("int128",  int128_2_64 + 5);
+   check_unpacks_as_integer("int128",  -int128_2_64);
+   check_unpacks_as_integer("int128",  static_cast<fc::int128>(uint128_max >> 1));
+   check_unpacks_as_integer("int128",  static_cast<fc::int128>(~(uint128_max >> 1)));
+   check_unpacks_as_integer("uint128", fc::uint128{6});
+   check_unpacks_as_integer("uint128", uint128_2_64 + 5);
+   check_unpacks_as_integer("uint128", uint128_max);
+
+   // One past either end.
+   const std::string out_of_range = "out of range";
+   check_rejected("int8",    {-129}, out_of_range);
+   check_rejected("int8",    {128}, out_of_range);
+   check_rejected("int16",   {-32769}, out_of_range);
+   check_rejected("int16",   {32768}, out_of_range);
+   check_rejected("int32",   {int64_t{std::numeric_limits<int32_t>::min()} - 1}, out_of_range);
+   check_rejected("int32",   {int64_t{std::numeric_limits<int32_t>::max()} + 1}, out_of_range);
+   check_rejected("uint8",   {-1}, out_of_range);
+   check_rejected("uint8",   {256}, out_of_range);
+   check_rejected("uint16",  {-1}, out_of_range);
+   check_rejected("uint16",  {65536}, out_of_range);
+   check_rejected("uint32",  {-1}, out_of_range);
+   check_rejected("uint32",  {int64_t{std::numeric_limits<uint32_t>::max()} + 1}, out_of_range);
+   check_rejected("uint64",  {-1}, out_of_range);
+   check_rejected("uint128", {-1}, out_of_range);
+   check_rejected("uint128", {int64_min}, out_of_range);
+
+   // Nothing else is an integer type, whether or not the enum has members: not other widths or spellings, and not the
+   // other built-in numeric types.
+   for( const std::string type : {"int", "uint", "int0", "int7", "int08", "int65", "int256", "uint1", "uint512",
+                                  "int8_t", "intx", "varint32", "varuint32", "varint_int64", "varint_uint64", "bool",
+                                  "float64"} ) {
+      check_rejected(type, {}, "invalid underlying type");
+      check_rejected(type, {0}, "invalid underlying type");
+   }
 }
 
 // ===================== Protobuf ABI Serialization Tests =====================
