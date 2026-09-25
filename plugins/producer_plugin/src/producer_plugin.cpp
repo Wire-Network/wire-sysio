@@ -872,7 +872,7 @@ public:
     * implies that this method has been called with the handler in the state where it should be
     * cancelled but wasn't able to be.
     */
-   uint32_t _timer_corelation_id = 0;
+   std::atomic<uint32_t> _timer_corelation_id{0}; // written on main thread, read on the timer thread
 
    // path to write the snapshots to
    std::filesystem::path _snapshots_dir;
