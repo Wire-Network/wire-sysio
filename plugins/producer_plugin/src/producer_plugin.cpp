@@ -872,7 +872,7 @@ public:
     * implies that this method has been called with the handler in the state where it should be
     * cancelled but wasn't able to be.
     */
-   uint32_t _timer_corelation_id = 0;
+   std::atomic<uint32_t> _timer_corelation_id{0}; // written on main thread, read on the timer thread
 
    // path to write the snapshots to
    std::filesystem::path _snapshots_dir;
@@ -979,6 +979,13 @@ public:
 
    bool irreversible_mode() const {
       return _db_read_mode == db_read_mode::IRREVERSIBLE;
+   }
+
+   /// True if a received block is waiting to be applied, so speculative and read-only work should yield to it.
+   /// Irreversible mode applies blocks only once they become irreversible, so a received block never qualifies.
+   /// Thread-safe: `_received_block` is atomic and the read mode is fixed after initialize.
+   bool received_block_pending(uint32_t pending_block_num) const {
+      return !irreversible_mode() && _received_block >= pending_block_num;
    }
 
    void on_accepted_block(const signed_block_ptr& block, const block_id_type& id) {
@@ -1890,6 +1897,8 @@ void producer_plugin::plugin_startup() {
 
 void producer_plugin_impl::plugin_shutdown() {
    _timer_thread.stop();
+   // wake read-only threads waiting for read window work; with the timer thread stopped nothing else would
+   app().executor().stop();
    _ro_thread_pool.stop();
    // unapplied transaction queue holds lambdas that reference plugins
    _unapplied_transactions.clear();
@@ -2290,10 +2299,7 @@ bool producer_plugin_impl::should_interrupt_start_block(const fc::time_point& de
       return deadline <= fc::time_point::now();
    }
    // if we can produce then honor deadline so production starts on time.
-   // if in irreversible mode then a received block should not interrupt since the incoming block is not processed until
-   // it becomes irreversible. We could check if LIB changed, but doesn't seem like the extra complexity is worth it.
-   return (is_configured_producer() && deadline <= fc::time_point::now())
-          || (!irreversible_mode() && _received_block >= pending_block_num);
+   return (is_configured_producer() && deadline <= fc::time_point::now()) || received_block_pending(pending_block_num);
 }
 
 producer_plugin_impl::start_block_result
@@ -3286,6 +3292,9 @@ void producer_plugin::process_blocks() {
 
 void producer_plugin::received_block(uint32_t block_num, chain::fork_db_add_t fork_db_add_result) {
    my->_received_block = block_num;
+   // irreversible mode applies received blocks only once they become irreversible, so there is nothing to interrupt for
+   if (my->irreversible_mode())
+      return;
    // fork_db_add_t::fork_switch means head block of best fork (different from the current branch) is received.
    // Since a better fork is available, interrupt current block validation and allow a fork switch to the better branch.
    if (fork_db_add_result == fork_db_add_t::appended_to_head) {
@@ -3379,19 +3388,23 @@ void producer_plugin_impl::switch_to_read_window() {
    _time_tracker.pause();
 
    // we are in write window, so no read-only trx threads are processing transactions.
-   if (app().executor().read_only_queue_empty() && app().executor().read_exclusive_queue_empty()) { // no read-only tasks to process. stay in write window
-      start_write_window();                          // restart write window timer for next round
+   // read_exclusive is pushed from any thread, so read the sizes under the queue lock
+   const auto [read_only_size, read_exclusive_size] = [] {
+      auto queue = app().executor().readable_queue();
+      return std::pair{queue.size(exec_queue::read_only), queue.size(exec_queue::read_exclusive)};
+   }();
+   if (read_only_size == 0 && read_exclusive_size == 0) { // no read-only tasks to process. stay in write window
+      start_write_window();                               // restart write window timer for next round
       return;
    }
-   fc_dlog(_log, "Read only queue size {}, read exclusive size {}",
-           app().executor().read_only_queue_size(), app().executor().read_exclusive_queue_size());
+   fc_dlog(_log, "Read only queue size {}, read exclusive size {}", read_only_size, read_exclusive_size);
 
    uint32_t pending_block_num = chain.head().block_num() + 1;
    _ro_read_window_start_time = fc::time_point::now();
    _ro_window_deadline        = _ro_read_window_start_time + _ro_read_window_effective_time_us;
-   app().executor().set_to_read_window([received_block = &_received_block, pending_block_num, ro_window_deadline = _ro_window_deadline]() {
-         return fc::time_point::now() >= ro_window_deadline || (received_block->load() >= pending_block_num); // should_exit()
-      });
+   app().executor().set_to_read_window([this, pending_block_num, ro_window_deadline = _ro_window_deadline]() {
+      return fc::time_point::now() >= ro_window_deadline || received_block_pending(pending_block_num); // should_exit()
+   });
    chain.set_to_read_window();
    chain.set_db_read_only_mode();
    _ro_all_threads_exec_time_us = 0;
@@ -3442,9 +3455,9 @@ void producer_plugin_impl::switch_to_read_window() {
 bool producer_plugin_impl::read_only_execution_task(uint32_t pending_block_num) {
    // We have 3 ways to break out the while loop:
    // 1. pass read window deadline
-   // 2. net_plugin receives a block
+   // 2. net_plugin receives a block to apply now, see received_block_pending()
    // 3. no read-only tasks to execute
-   while (fc::time_point::now() < _ro_window_deadline && _received_block < pending_block_num) {
+   while (fc::time_point::now() < _ro_window_deadline && !received_block_pending(pending_block_num)) {
       bool more = app().executor().execute_highest_read(); // blocks until all read only threads are idle
       if (!more) {
          break;
