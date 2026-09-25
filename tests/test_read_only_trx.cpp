@@ -7,6 +7,7 @@
 #include <sysio/chain/config.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/controller.hpp>
+#include <sysio/chain/fork_database.hpp>
 #include <sysio/chain/genesis_state.hpp>
 #include <sysio/chain/thread_utils.hpp>
 #include <sysio/chain/transaction.hpp>
@@ -233,6 +234,88 @@ BOOST_AUTO_TEST_CASE(with_8_read_only_threads_no_tierup) {
 #endif
                                             };
    test_trxs_common(specific_args);
+}
+
+/// In irreversible mode head is LIB, so the block net_plugin reports is normally ahead of head. That block is applied
+/// only once irreversible, so it must not keep read windows from running read_exclusive tasks.
+void test_irreversible_read_window(std::vector<const char*>& specific_args) {
+   try {
+      using namespace std::chrono_literals;
+      fc::temp_directory temp;
+      appbase::scoped_app app;
+      auto temp_dir_str = temp.path().string();
+      // a node that is not a producer has no default genesis it can start from, so give it the tester's
+      const std::string genesis_file = (temp.path() / "genesis.json").string();
+      fc::json::save_to_file(sysio::testing::base_tester::default_genesis(), genesis_file);
+
+      constexpr uint32_t num_tasks = 64;
+      std::atomic<uint32_t> num_executed = 0; // declared before on_exit so it outlives every posted task
+
+      std::promise<std::tuple<producer_plugin*, block_num_type>> plugin_promise;
+      std::future<std::tuple<producer_plugin*, block_num_type>> plugin_fut = plugin_promise.get_future();
+      std::thread app_thread( [&]() {
+         try {
+            std::vector<const char*> argv = {
+               "test",  // dummy executible name
+               "--data-dir", temp_dir_str.c_str(),
+               "--config-dir", temp_dir_str.c_str(),
+               "--genesis-json", genesis_file.c_str(),
+               "--read-mode=irreversible",
+               "--read-only-write-window-time-us=100000",
+               "--read-only-read-window-time-us=100000"
+            };
+            argv.insert(argv.end(), specific_args.begin(), specific_args.end());
+            app->initialize<chain_plugin, producer_plugin>(argv.size(), (char**)&argv[0]);
+            // as nodeop does, so quit() releases read threads waiting in a read window before shutdown joins them
+            app->set_stop_executor_cb([&app, prod = app->find_plugin<producer_plugin>()]() {
+               prod->interrupt();
+               app->get_io_context().stop();
+            });
+            app->startup();
+            // Capture this thread as main_thread_id_ before releasing the promise; scoped_app was constructed on the
+            // outer thread.
+            app->executor().set_main_thread_id();
+            plugin_promise.set_value({app->find_plugin<producer_plugin>(),
+                                      app->find_plugin<chain_plugin>()->chain().head().block_num()});
+            app->exec();
+            return;
+         } FC_LOG_AND_DROP()
+         BOOST_CHECK(!"app threw exception see logged error");
+      } );
+      auto on_exit = fc::make_scoped_exit([&](){
+         app->quit();
+         if (app_thread.joinable())
+            app_thread.join();
+      });
+
+      BOOST_REQUIRE(plugin_fut.wait_for(30s) == std::future_status::ready);
+      auto [prod_plug, head_block_num] = plugin_fut.get();
+
+      // what net_plugin reports on a live network, where the fork database head is ahead of LIB
+      prod_plug->received_block(head_block_num + 2, fork_db_add_t::appended_to_head);
+
+      for (uint32_t i = 0; i < num_tasks; ++i) {
+         app->executor().post( priority::low, exec_queue::read_exclusive, [&num_executed]() { ++num_executed; } );
+      }
+
+      const auto deadline = fc::time_point::now() + fc::seconds(10);
+      while (num_executed < num_tasks && fc::time_point::now() < deadline) {
+         std::this_thread::sleep_for(10ms);
+      }
+      BOOST_CHECK_EQUAL( num_executed.load(), num_tasks );
+   } FC_LOG_AND_RETHROW()
+}
+
+// read_exclusive tasks run in irreversible mode on 1 thread
+BOOST_AUTO_TEST_CASE(irreversible_with_1_read_only_threads) {
+   std::vector<const char*> specific_args = { "--read-only-threads=1" };
+   test_irreversible_read_window(specific_args);
+}
+
+// read_exclusive tasks run in irreversible mode on 3 threads
+BOOST_AUTO_TEST_CASE(irreversible_with_3_read_only_threads) {
+   std::vector<const char*> specific_args = { "--read-only-threads=3" };
+   test_irreversible_read_window(specific_args);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
