@@ -3386,12 +3386,16 @@ void producer_plugin_impl::switch_to_read_window() {
    _time_tracker.pause();
 
    // we are in write window, so no read-only trx threads are processing transactions.
-   if (app().executor().read_only_queue_empty() && app().executor().read_exclusive_queue_empty()) { // no read-only tasks to process. stay in write window
-      start_write_window();                          // restart write window timer for next round
+   // read_exclusive is pushed from any thread, so read the sizes under the queue lock
+   const auto [read_only_size, read_exclusive_size] = [] {
+      auto queue = app().executor().readable_queue();
+      return std::pair{queue.size(exec_queue::read_only), queue.size(exec_queue::read_exclusive)};
+   }();
+   if (read_only_size == 0 && read_exclusive_size == 0) { // no read-only tasks to process. stay in write window
+      start_write_window();                               // restart write window timer for next round
       return;
    }
-   fc_dlog(_log, "Read only queue size {}, read exclusive size {}",
-           app().executor().read_only_queue_size(), app().executor().read_exclusive_queue_size());
+   fc_dlog(_log, "Read only queue size {}, read exclusive size {}", read_only_size, read_exclusive_size);
 
    uint32_t pending_block_num = chain.head().block_num() + 1;
    _ro_read_window_start_time = fc::time_point::now();
