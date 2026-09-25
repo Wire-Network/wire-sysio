@@ -618,8 +618,7 @@ public:
    }
 
    /// `sysio.reserv::wireclaims` balance owed to `acc`, or 0 when there is no row.
-   /// Requires deploy_reserv(). Credited by paywire / refundwire, drained by claimwire, and
-   /// reclaimed to the treasury by the retention sweep sysio.epoch::advance inlines.
+   /// Requires deploy_reserv(). Credited by paywire / refundwire and withdrawn only by claimwire.
    uint64_t wire_claimable( account_name acc ) {
       const account_name RESERV = "sysio.reserv"_n;
       auto data = get_row_by_account(RESERV, RESERV, "wireclaims"_n, acc);
@@ -5059,18 +5058,10 @@ BOOST_FIXTURE_TEST_CASE( advance_gate_blocks_on_insufficient_treasury_balance, s
    BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), 0u );
 } FC_LOG_AND_RETHROW()
 
-// A balance-blocked epoch reclaims forfeited WIRE and unblocks ITSELF, with no manual sweep and
-// no top-up. This pins the placement of the `sysio.reserv::sweepclaims` inline in advance: it sits
-// BEFORE the emissions gate, so a BALANCE_INSUFFICIENT epoch still queues the reclaim on its way
-// out. Move that call below the gate (where the other maintenance sweeps live) and the epoch
-// returns without ever reclaiming the WIRE that covers its own shortfall -- every retry repeating
-// it, with `sweepclaims` taking only epoch/reserv authority so no keeper can break the cycle.
-//
-// The two-attempt shape is the guarantee, not an artifact: `action.send()` QUEUES the inline, so
-// this advance's gate has already read the treasury by the time the reclaim executes. The first
-// attempt therefore records the block AND performs the reclaim; the next chkcons retry sees the
-// larger balance and advances.
-BOOST_FIXTURE_TEST_CASE( expired_wire_claims_unblock_a_balance_blocked_epoch, sysio_emissions_tester ) try {
+/// Aged reserve claims remain owed to recipients even when the treasury cannot fund emissions.
+/// Repeated blocked advances preserve custody; a treasury top-up allows the epoch to advance
+/// against a reserve contract with no sweepclaims action, after which the recipient can withdraw.
+BOOST_FIXTURE_TEST_CASE( aged_wire_claims_never_fund_a_balance_blocked_epoch, sysio_emissions_tester ) try {
    const account_name RESERV = "sysio.reserv"_n;
 
    create_t5_holding_accounts();
@@ -5088,37 +5079,34 @@ BOOST_FIXTURE_TEST_CASE( expired_wire_claims_unblock_a_balance_blocked_epoch, sy
    // Fund the escrow the refund gives back, SEPARATELY from the reserve's booked liquidity.
    // `regreserve` books RESERVE_SEED into `reserve_wire_amount`, and `refundwire` credits a claim
    // without debiting that row — in production it is reached only after `swapfromwire` has already
-   // deposited the user's in-flight escrow on top. Skipping that deposit would make the sweep hand
-   // the treasury registered reserve liquidity instead of forfeited escrow, so the test would
-   // unblock emissions by breaking reserv's custody invariant rather than by reclaiming a claim.
-   constexpr uint64_t FORFEIT = 100'000'000'000ULL;
+   // deposited the user's in-flight escrow on top. Both liabilities need separate backing.
+   constexpr uint64_t OWED_REFUND = 100'000'000'000ULL;
    base_tester::push_action(
       TOKEN, "transfer"_n,
       vector<permission_level>{{ config::system_account_name, "active"_n }},
       mvo()("from", config::system_account_name)
            ("to", RESERV)
-           ("quantity", asset(static_cast<int64_t>(FORFEIT), WIRE_SYMBOL))
+           ("quantity", asset(static_cast<int64_t>(OWED_REFUND), WIRE_SYMBOL))
            ("memo", "in-flight swap-from-WIRE escrow the refund returns")
    );
    produce_blocks(1);
-   BOOST_REQUIRE_EQUAL( RESERVE_SEED + FORFEIT,
+   BOOST_REQUIRE_EQUAL( RESERVE_SEED + OWED_REFUND,
                         static_cast<uint64_t>(get_wire_balance(RESERV).get_amount()) );
 
    // A swap-from-WIRE refund credits a claimable balance that nobody ever pulls. Custody now
-   // reads `reserve_wire_amount (RESERVE_SEED) + Σ wireclaims (FORFEIT)`.
+   // reads `reserve_wire_amount (RESERVE_SEED) + Σ wireclaims (OWED_REFUND)`.
    create_user_accounts({ "lapseduser"_n });
    BOOST_REQUIRE_EQUAL( success(), push_reserv_action(UWRIT, "refundwire"_n, mvo()
       ("recipient",      "lapseduser")
-      ("wire_amount",    FORFEIT)
+      ("wire_amount",    OWED_REFUND)
       ("revert_fee_bps", 0)) );
-   BOOST_REQUIRE_EQUAL( FORFEIT, wire_claimable("lapseduser"_n) );
+   BOOST_REQUIRE_EQUAL( OWED_REFUND, wire_claimable("lapseduser"_n) );
 
-   // Age past the one-year window with NO further credit, so `credit_wire_claim`'s opportunistic
-   // sweep never fires and the epoch-driven one is the only thing that can collect the row.
+   // More than a year without settlement activity never forfeits escrow.
    produce_block();
    produce_block(fc::days(366));
    produce_blocks(2);
-   BOOST_REQUIRE_EQUAL( FORFEIT, wire_claimable("lapseduser"_n) );
+   BOOST_REQUIRE_EQUAL( OWED_REFUND, wire_claimable("lapseduser"_n) );
 
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
@@ -5126,12 +5114,12 @@ BOOST_FIXTURE_TEST_CASE( expired_wire_claims_unblock_a_balance_blocked_epoch, sy
    // Epoch 1's emission is the annual initial scaled to the fixture's 60s epoch; it is also the
    // period total, since nothing has accrued yet.
    const int64_t period_emission = test_scale_annual_to_epoch(ANNUAL_INITIAL_EMISSION, 60);
-   BOOST_REQUIRE_GT( period_emission, static_cast<int64_t>(FORFEIT) );
+   BOOST_REQUIRE_GT( period_emission, static_cast<int64_t>(OWED_REFUND) );
 
-   // Leave the treasury short by EXACTLY the forfeited claim.
+   // Leave the treasury short by exactly the owed refund.
    create_user_accounts({ "lapsedrain"_n });
    const int64_t balance = get_wire_balance(config::system_account_name).get_amount();
-   const int64_t target  = period_emission - static_cast<int64_t>(FORFEIT);
+   const int64_t target  = period_emission - static_cast<int64_t>(OWED_REFUND);
    BOOST_REQUIRE_GT( balance, target );
    base_tester::push_action(
       TOKEN, "transfer"_n,
@@ -5139,11 +5127,11 @@ BOOST_FIXTURE_TEST_CASE( expired_wire_claims_unblock_a_balance_blocked_epoch, sy
       mvo()("from", config::system_account_name)
            ("to", "lapsedrain"_n)
            ("quantity", asset(balance - target, WIRE_SYMBOL))
-           ("memo", "leave the treasury one forfeited claim short of the epoch emission")
+           ("memo", "leave the treasury one refund short of the epoch emission")
    );
    produce_blocks(1);
 
-   // FIRST attempt: blocked on the balance the gate could see, and the queued reclaim still runs.
+   // The first blocked attempt cannot take custody of user funds to cover emissions.
    produce_blocks(130);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
 
@@ -5153,17 +5141,29 @@ BOOST_FIXTURE_TEST_CASE( expired_wire_claims_unblock_a_balance_blocked_epoch, sy
    BOOST_REQUIRE_EQUAL( blocked["attempted_emission"].as<int64_t>(), period_emission );
    BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), 0u );
 
-   // The forfeited claim is gone and its WIRE is in the treasury -- reclaimed by the same
-   // transaction that recorded the block.
-   BOOST_REQUIRE_EQUAL( 0u, wire_claimable("lapseduser"_n) );
-   BOOST_REQUIRE_EQUAL( period_emission, get_wire_balance(config::system_account_name).get_amount() );
+   BOOST_REQUIRE_EQUAL( OWED_REFUND, wire_claimable("lapseduser"_n) );
+   BOOST_REQUIRE_EQUAL( target, get_wire_balance(config::system_account_name).get_amount() );
+   BOOST_REQUIRE_EQUAL( RESERVE_SEED + OWED_REFUND,
+                        static_cast<uint64_t>(get_wire_balance(RESERV).get_amount()) );
 
-   // What moved was the ESCROW, not the reserve. Custody is back to exactly the booked
-   // `reserve_wire_amount`, so the epoch unblocked itself on forfeited value rather than on
-   // registered liquidity.
-   BOOST_REQUIRE_EQUAL( RESERVE_SEED, static_cast<uint64_t>(get_wire_balance(RESERV).get_amount()) );
+   // A retry must remain blocked rather than observe reclaimed user escrow.
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), 0u );
+   BOOST_REQUIRE( !get_blocklog_row(1u).is_null() );
+   BOOST_REQUIRE_EQUAL( OWED_REFUND, wire_claimable("lapseduser"_n) );
+   BOOST_REQUIRE_EQUAL( target, get_wire_balance(config::system_account_name).get_amount() );
+   BOOST_REQUIRE_EQUAL( RESERVE_SEED + OWED_REFUND,
+                        static_cast<uint64_t>(get_wire_balance(RESERV).get_amount()) );
 
-   // SECOND attempt: no manual sweepclaims, no funding -- the epoch advances on its own.
+   // Funding from a separate account covers the exact shortfall and allows normal advancement.
+   base_tester::push_action(
+      TOKEN, "transfer"_n,
+      vector<permission_level>{{ "lapsedrain"_n, "active"_n }},
+      mvo()("from", "lapsedrain"_n)("to", config::system_account_name)
+           ("quantity", asset(static_cast<int64_t>(OWED_REFUND), WIRE_SYMBOL))
+           ("memo", "fund the emission shortfall")
+   );
    produce_blocks(130);
    BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
 
@@ -5172,6 +5172,19 @@ BOOST_FIXTURE_TEST_CASE( expired_wire_claims_unblock_a_balance_blocked_epoch, sy
    BOOST_REQUIRE_EQUAL( est["current_epoch_index"].as<uint32_t>(), 1u );
    BOOST_REQUIRE( get_blocklog_row(1u).is_null() );
    BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), 1u );
+   BOOST_REQUIRE_EQUAL( OWED_REFUND, wire_claimable("lapseduser"_n) );
+   BOOST_REQUIRE_EQUAL( RESERVE_SEED + OWED_REFUND,
+                        static_cast<uint64_t>(get_wire_balance(RESERV).get_amount()) );
+
+   const int64_t treasury_after_emission = get_wire_balance(config::system_account_name).get_amount();
+   const int64_t claimant_before = get_wire_balance("lapseduser"_n).get_amount();
+   BOOST_REQUIRE_EQUAL( success(), push_reserv_action("lapseduser"_n, "claimwire"_n,
+                                                   mvo()("account", "lapseduser"_n)) );
+   BOOST_REQUIRE_EQUAL( 0u, wire_claimable("lapseduser"_n) );
+   BOOST_REQUIRE_EQUAL( claimant_before + static_cast<int64_t>(OWED_REFUND),
+                        get_wire_balance("lapseduser"_n).get_amount() );
+   BOOST_REQUIRE_EQUAL( RESERVE_SEED, static_cast<uint64_t>(get_wire_balance(RESERV).get_amount()) );
+   BOOST_REQUIRE_EQUAL( treasury_after_emission, get_wire_balance(config::system_account_name).get_amount() );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( roa_forcereg_inlines_addnodeowner_happy_path, sysio_emissions_tester ) try {

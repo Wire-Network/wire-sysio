@@ -1,7 +1,7 @@
 # System-contract upgrade order
 
 The system contracts are not independent deployables. `sysio.epoch::advance`
-inlines actions into six other contracts, and the emissions gate reads two more
+inlines actions into five other contracts, and the emissions gate reads two
 contracts' tables, so a release's contract builds are only correct **as a set**.
 Upgrading them one at a time creates windows in which a new caller meets an old
 callee.
@@ -121,7 +121,6 @@ Everything `sysio.epoch::advance` inlines, directly:
 
 | Callee | Actions |
 |---|---|
-| `sysio.reserv` | `sweepclaims` |
 | `sysio.uwrit` | `chklocks`, `pruneuwreqs`, `drainfwq` |
 | `sysio.opreg` | `recorddel`, `termcheck`, `flushwtdw` |
 | `sysio.chalg` | `slashop` |
@@ -200,7 +199,7 @@ path, not a replacement for the normal quiesced deployment. Do not downgrade
 while `batchepochs` is non-empty. T5 must also be initialized before its first
 successful epoch advance.
 
-## The two rules for future changes
+## The rules for future changes
 
 1. **A contract that gains an action `advance` inlines deploys BEFORE
    `sysio.epoch`.** Otherwise the new caller reaches an old callee that cannot
@@ -208,6 +207,8 @@ successful epoch advance.
 2. **A contract whose new state the gate must reserve deploys AFTER
    `sysio.epoch`.** Otherwise the new writer commits state the old gate does not
    know to reserve, and the gate authorizes what the treasury cannot cover.
+3. **Remove an inline caller BEFORE removing its callee action**, or deploy
+   both in the same transaction. An older caller still requires that action.
 
 **The two edges point in OPPOSITE directions along the dependency arrow, so they
 cannot be collapsed into one inequality.** State them separately:
@@ -225,10 +226,15 @@ state that aborts every advance.
 
 ## Staged rollout (when one transaction is not possible)
 
-For the SEC-150 claimable-payout release the order is:
+For the WIRE-339 no-expiry release, deploy `sysio.epoch` before
+`sysio.reserv`, or deploy them in the same transaction. Epoch must stop
+calling the removed reserve sweep action before reserve stops dispatching it;
+otherwise every `advance` aborts. This reverses the reserve/epoch ordering
+used when SEC-150 introduced the sweep. If also introducing the SEC-150
+pay-claim accounting, the order is:
 
 ```
-sysio.reserv  ->  sysio.epoch  ->  sysio.system
+sysio.epoch  ->  sysio.reserv / sysio.system
 ```
 
 `sysio.opreg` and `sysio.uwrit` are free to land anywhere in the sequence: they
@@ -237,13 +243,20 @@ no other contract reads their new tables.
 
 | Edge | Why |
 |---|---|
-| `sysio.reserv` before `sysio.epoch` | The new `advance` inlines `sysio.reserv::sweepclaims`, guarded only on the account existing. An old `sysio.reserv` build has the account and not the action, so the inline asserts and every advance aborts. |
+| `sysio.epoch` before `sysio.reserv` | Epoch must stop inlining the reserve sweep before reserve removes that action. |
 | `sysio.epoch` before `sysio.system` | The new `payepoch` retains WIRE in `payclaims` and reserves it in `payclaimtot`. The old gate counts that backing as spendable, so a later pay period can double-commit it and leave credited claims underfunded. |
 
-Every intermediate state of that order is safe. A new `sysio.reserv` under an old
-`sysio.epoch` is simply never asked to sweep — the retention deadline then rests
-on `credit_wire_claim`'s opportunistic sweep until epoch catches up. A new
-`sysio.epoch` under an old `sysio.system` reads a `payclaimtot` whose KV key does
+Removing expiry fields and indexes is a pre-launch schema change. Activate
+the no-expiry contracts on fresh state; this release provides no migration of
+older claim-row encodings. All four claim ledgers retain balances and storage
+until claimed, including reserve swap payouts and refunds. Keep settlement
+and claim traffic quiesced while deploying the coordinated contracts.
+
+Rebuild `sysio.epoch.wasm` from the final merged source. PR #603 also changes
+that artifact, so whichever PR lands second must regenerate it instead of
+selecting one side's binary during a merge.
+
+A new `sysio.epoch` under an old `sysio.system` reads a `payclaimtot` whose KV key does
 not exist yet, so `get_or_default` yields a zero reserve — the correct answer
 while nothing is credited, and the absent-key case rather than the
 short-decode one (see [above](#why-a-mixed-version-is-not-merely-degraded)).
@@ -284,10 +297,11 @@ The safe procedure is therefore:
 2. **Drain or migrate all three claim tables** — claimants pull, or the balances
    are migrated. This step is the one that actually gates the rollback, and it
    cannot be completed unilaterally: a claimant who never claims holds it open.
-3. **Roll back the coupled trio in the order `sysio.system` → `sysio.epoch` →
-   `sysio.reserv`** — the mirror of the upgrade order, so the writer is retired
-   before the reader that accounts for it, and the caller before the callee it
-   would otherwise inline into.
+3. **Retire the `sysio.system` claim writer before its epoch accounting reader.**
+   If restoring an epoch build that calls the removed reserve sweep, restore
+   the matching reserve action first (or atomically with epoch). This ordering
+   does not make older claim-row encodings compatible; drain or migrate them
+   before any rollback.
 4. **Roll `sysio.opreg` back only once its remits are handled.**
 
 **A live chain with uncooperative claimants is not safely downgradeable** by

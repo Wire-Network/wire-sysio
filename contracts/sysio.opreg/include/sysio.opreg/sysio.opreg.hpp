@@ -554,8 +554,8 @@ namespace sysio {
       /// sysio RAM pool even after `prune` removes its operator record, so storage grows with
       /// historical operators rather than with the live set. Accepted here for the same reason as
       /// `sysio.system::payclaims`: forfeiting returned collateral is an economic decision, not a
-      /// RAM one. (Contrast `sysio.reserv::wireclaims`, whose recipient set is unbounded AND
-      /// caller-influenced, and which pays for its sweep with forfeiture.)
+      /// RAM one. Reserve swap payouts and refunds follow the same no-expiry policy despite
+      /// their unbounded, caller-influenced recipient set.
       ///
       /// WIRE-339 policy: returned collateral never expires, including after operator pruning.
       /// Rows deliberately omit expiry metadata and indexes; custody is retained until claimed.

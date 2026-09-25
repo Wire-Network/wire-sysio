@@ -235,8 +235,8 @@ struct node_claim_result {
 // operators churn, and every departed account that never calls `claimpay` leaves a row billed to
 // the sysio RAM pool forever, so system-funded claim storage grows with historical participants
 // rather than with the live set. That is a known, accepted cost here: expiring earned pay is an
-// economic decision, not a RAM one, and the alternative (`sysio.reserv::wireclaims`, whose
-// recipient set is unbounded AND caller-influenced) buys its sweep by forfeiting balances.
+// economic decision, not a RAM one. The same no-expiry policy covers reserve swap payouts
+// and refunds, despite their unbounded, caller-influenced recipient set.
 //
 /// WIRE-339 policy: earned pay never expires, including after a recipient stops participating.
 /// Rows deliberately omit expiry metadata and indexes; balances remain reserved until claimed.

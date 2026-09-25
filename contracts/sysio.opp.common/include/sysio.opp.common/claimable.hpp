@@ -37,8 +37,7 @@
  *                                      contract's token (currently WIRE for every consumer) --
  *                                      these helpers never name a symbol; `pay_out`'s caller
  *                                      supplies it
- *   * `uint32_t expires_at_sec`     -- optional; when present it is maintained by `credit` and
- *                                      makes the row eligible for `sweep_expired`
+ * All consumers retain credited balances indefinitely, until the recipient claims them.
  */
 
 #include <sysio/action.hpp>
@@ -50,25 +49,8 @@
 
 #include <cstdint>
 #include <string>
-#include <type_traits>
-#include <utility>
-#include <vector>
 
 namespace sysio::opp::claimable {
-
-/// Compile-time detection of the optional `expires_at_sec` member on a claimable row.
-///
-/// A row that omits the field opts out of expiry entirely: nothing stamps it and `sweep_expired`
-/// cannot select it. `payclaims` and `remitclaims` omit the field because earned pay and returned
-/// collateral remain claimable indefinitely. `wireclaims` retains expiry and its retention sweep.
-template<class Row, class = void>
-struct has_expiry : std::false_type {};
-
-template<class Row>
-struct has_expiry<Row, std::void_t<decltype(std::declval<Row&>().expires_at_sec)>> : std::true_type {};
-
-template<class Row>
-inline constexpr bool has_expiry_v = has_expiry<Row>::value;
 
 /// Saturating credit, capped at `safe::depot_amount_max` (2^62-1) rather than `UINT64_MAX`.
 ///
@@ -93,26 +75,16 @@ inline uint64_t add_capped(uint64_t balance, uint64_t amount) {
 /// @param payer    RAM payer for a newly created row.
 /// @param key      primary key for the recipient.
 /// @param fresh    prototype row used when the key is absent; the caller pre-fills the identifying
-///                 fields (`account`, ...) and this function sets `balance` (and `expires_at_sec`).
+///                 fields (`account`, ...) and this function sets `balance`.
 /// @param amount   atomic units to credit, in the caller's token (see the row contract above).
-/// @param expires_at_sec  absolute expiry stamp, ignored unless the row carries the field. Passing
-///                 the refreshed expiry on every credit means an account with ongoing activity
-///                 never expires mid-stream.
 template<class Table, class Key, class Row>
-void credit(Table& tbl, sysio::name payer, const Key& key, Row fresh, uint64_t amount,
-            uint32_t expires_at_sec = 0) {
+void credit(Table& tbl, sysio::name payer, const Key& key, Row fresh, uint64_t amount) {
    if (amount == 0) return;
 
    fresh.balance = add_capped(0, amount);
-   if constexpr (has_expiry_v<Row>) {
-      fresh.expires_at_sec = expires_at_sec;
-   }
 
    tbl.upsert(payer, key, fresh, [&](Row& r) {
       r.balance = add_capped(r.balance, amount);
-      if constexpr (has_expiry_v<Row>) {
-         r.expires_at_sec = expires_at_sec;
-      }
    });
 }
 
@@ -149,49 +121,6 @@ uint64_t pay_out(Table& tbl, const Key& key, sysio::name self, sysio::name token
    ).send();
 
    return amount;
-}
-
-/// Bounded sweep of rows past their expiry, returning the reclaimed total.
-///
-/// Iterates the caller's expiry-ordered secondary index so the oldest rows are visited first and
-/// the scan can stop at the first live row -- a bounded scan over the PRIMARY (account-ordered)
-/// index would repeatedly re-walk the same low-key live rows and might never reach an expired one.
-///
-/// Expired keys are collected first and erased afterwards, rather than erasing through the
-/// secondary iterator mid-walk: mutating a kv secondary index while iterating it is the same
-/// foot-gun `sysio.system::payepoch` avoids with its `to_reset` snapshot.
-///
-/// Never throws, so it is safe to call from the credit path as an on-write retention contract (the
-/// shape `sysio.opreg::prune_dellog` uses).
-///
-/// @param tbl        the contract's claimable kv table.
-/// @param by_expiry  secondary index ordered by `expires_at_sec`.
-/// @param to_key     maps a row to its primary key.
-/// @param now_sec    current wall-clock seconds.
-/// @param max_rows   hard bound on rows erased in one call, keeping the caller inside its CPU
-///                   deadline.
-template<class Table, class Index, class ToKey>
-uint64_t sweep_expired(Table& tbl, Index& by_expiry, ToKey&& to_key, uint32_t now_sec,
-                       uint32_t max_rows) {
-   using Key = std::decay_t<decltype(to_key(*by_expiry.begin()))>;
-
-   std::vector<Key> doomed;
-   uint64_t reclaimed = 0;
-
-   for (auto it = by_expiry.begin(); it != by_expiry.end() && doomed.size() < max_rows; ++it) {
-      // A zero stamp means "never expires"; such rows sort first, so skip rather than stop.
-      if (it->expires_at_sec == 0) continue;
-      // Index is expiry-ordered: the first live row means every later row is live too.
-      if (it->expires_at_sec > now_sec) break;
-      reclaimed = safe::add_sat_u64(reclaimed, it->balance);
-      doomed.push_back(to_key(*it));
-   }
-
-   for (const auto& k : doomed) {
-      tbl.erase(k);
-   }
-
-   return reclaimed;
 }
 
 } // namespace sysio::opp::claimable
