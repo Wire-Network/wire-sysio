@@ -131,9 +131,6 @@ public:
    /** Return the ephemeral loopback port assigned to this server. */
    uint16_t port() const { return _port; }
 
-   /** Return whether the configured server script has completed. */
-   bool finished() const { return _finished.load(); }
-
 private:
    /** Connect to the listener so a platform that does not cancel synchronous accept can exit. */
    void unblock_accept() {
@@ -176,7 +173,6 @@ private:
       }
       std::scoped_lock lock(_close_mutex);
       _acceptor.close(ec);
-      _finished = true;
    }
 
    boost::asio::io_context _io;
@@ -187,7 +183,6 @@ private:
    bool _consume_request_header;
    size_t _connections_to_accept;
    std::atomic_bool _stop{false};
-   std::atomic_bool _finished{false};
    /// Serializes the listener and socket closes the worker and the destructor both reach; asio's aren't thread-safe.
    std::mutex _close_mutex;
    std::thread _worker;
@@ -404,6 +399,19 @@ std::string keep_alive_metadata_response() {
           "Connection: keep-alive\r\n\r\n{}";
 }
 
+/**
+ * Answer the metadata request on @p socket with keep-alive, then drop the connection unanswered once the next request
+ * arrives on it, recording that arrival in @p request_arrived. The connection stays open until then because the
+ * transport discards, rather than reuses, an idle connection whose peer has already closed it.
+ */
+void serve_metadata_then_drop_next_request(tcp::socket& socket, std::atomic_bool& request_arrived) {
+   if (!write_bytes(socket, keep_alive_metadata_response()))
+      return;
+   request_arrived = !read_request_header(socket).empty();
+   boost::system::error_code ec;
+   socket.close(ec);
+}
+
 /** Return the JSON error envelope a remote node emits alongside an HTTP 500 response. */
 std::string remote_error_response_body() {
    fc::mutable_variant_object detail;
@@ -471,6 +479,24 @@ uint16_t unconnectable_loopback_port() {
    boost::system::error_code ec;
    probe.close(ec);
    return port;
+}
+
+/**
+ * Wait until loopback @p port refuses connections; false if it is still not refusing after 1000 probes, about a second
+ * on loopback. A listener that has just closed keeps accepting for a few milliseconds on the hosts described at
+ * unconnectable_loopback_port.
+ */
+bool wait_until_refused(uint16_t port) {
+   boost::asio::io_context io;
+   for (size_t attempt = 0; attempt < 1'000; ++attempt) {
+      tcp::socket probe(io);
+      boost::system::error_code ec;
+      probe.connect(tcp::endpoint(boost::asio::ip::address_v4::loopback(), port), ec);
+      if (ec == boost::asio::error::connection_refused)
+         return true;
+      std::this_thread::sleep_for(1ms);
+   }
+   return false;
 }
 
 /** Return the URL for @p server. */
@@ -2296,16 +2322,14 @@ BOOST_AUTO_TEST_CASE(healthy_metadata_connection_is_reused_for_download) {
    BOOST_CHECK_EQUAL(read_file(output), exact_body);
 }
 
-/// A cached connection closed after metadata should retry the idempotent download once.
+/// A cached connection that goes stale in use should retry the idempotent download once on a fresh connection.
 BOOST_AUTO_TEST_CASE(stale_metadata_connection_retries_download_on_fresh_connection) {
    std::atomic_size_t connection_index{0};
+   std::atomic_bool reused_request_received{false};
    scripted_http_server server(
       [&](tcp::socket& socket, const std::atomic_bool&) {
          if (connection_index.fetch_add(1) == 0) {
-            if (write_bytes(socket, keep_alive_metadata_response())) {
-               boost::system::error_code ec;
-               socket.shutdown(tcp::socket::shutdown_both, ec);
-            }
+            serve_metadata_then_drop_next_request(socket, reused_request_received);
             return;
          }
          write_bytes(socket, fixed_length_header(exact_body_bytes) + std::string(exact_body));
@@ -2323,17 +2347,16 @@ BOOST_AUTO_TEST_CASE(stale_metadata_connection_retries_download_on_fresh_connect
    options.retry_failed_reused_connection = true;
    BOOST_REQUIRE_NO_THROW(
       client.post_to_file(server_url(server), fc::variant(fc::mutable_variant_object()), output, options));
+   BOOST_CHECK(reused_request_received);
    BOOST_CHECK_EQUAL(connection_index.load(), 2U);
    BOOST_CHECK_EQUAL(read_file(output), exact_body);
 }
 
-/// A failed reconnect after stale reuse must unwind without touching an invalid connection iterator.
+/// A failed reconnect after a cached connection goes stale in use surfaces the connect failure and leaves no files.
 BOOST_AUTO_TEST_CASE(stale_metadata_reconnect_failure_cleans_up_safely) {
-   scripted_http_server server([](tcp::socket& socket, const std::atomic_bool&) {
-      if (write_bytes(socket, keep_alive_metadata_response())) {
-         boost::system::error_code ec;
-         socket.shutdown(tcp::socket::shutdown_both, ec);
-      }
+   std::atomic_bool reused_request_received{false};
+   scripted_http_server server([&](tcp::socket& socket, const std::atomic_bool&) {
+      serve_metadata_then_drop_next_request(socket, reused_request_received);
    });
    fc::temp_directory temp;
    const auto output = temp.path() / "failed-reconnect.bin";
@@ -2343,17 +2366,25 @@ BOOST_AUTO_TEST_CASE(stale_metadata_reconnect_failure_cleans_up_safely) {
 
    BOOST_REQUIRE_NO_THROW(
       client.post_sync(server_url(server), fc::variant(fc::mutable_variant_object()), metadata_deadline));
-   for (size_t wait_count = 0; wait_count < 1'000 && !server.finished(); ++wait_count) {
-      std::this_thread::sleep_for(1ms);
-   }
-   BOOST_REQUIRE(server.finished());
    auto options = download_options(exact_body_bytes);
    options.retry_failed_reused_connection = true;
+   // The server stops listening when it drops the stale connection; hold the retry until that port refuses.
+   size_t connecting_phases = 0;
+   bool refused_before_reconnect = false;
+   options.status_callback = [&](const fc::http_file_download_status& status) {
+      if (status.phase == fc::http_file_download_phase::connecting && ++connecting_phases == 2)
+         refused_before_reconnect = wait_until_refused(server.port());
+   };
    BOOST_CHECK_EXCEPTION(
       client.post_to_file(server_url(server), fc::variant(fc::mutable_variant_object()), output, options),
       fc::exception, [](const fc::exception& error) {
-         return error.to_detail_string().find("Failed to connect") != std::string::npos;
+         const auto detail = error.to_detail_string();
+         return detail.find("Failed to connect") != std::string::npos &&
+                detail.find("retry_exhausted") == std::string::npos;
       });
+   BOOST_CHECK(reused_request_received);
+   BOOST_CHECK_EQUAL(connecting_phases, 2U);
+   BOOST_CHECK(refused_before_reconnect);
    check_download_files_removed(output);
 }
 
