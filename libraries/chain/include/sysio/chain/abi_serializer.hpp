@@ -59,8 +59,6 @@ struct abi_serializer {
    bool      is_type( const std::string_view& type, const yield_function_t& yield )const;
    bool      is_type(const std::string_view& type, const fc::microseconds& max_serialization_time)const;
    bool      is_builtin_type(const std::string_view& type)const;
-   bool      is_integer(const std::string_view& type) const;
-   int       get_integer_size(const std::string_view& type) const;
    bool      is_struct(const std::string_view& type)const;
    bool      is_enum(const std::string_view& type)const;
 
@@ -144,6 +142,13 @@ struct abi_serializer {
                      "recursive definition, max_recursion_depth {} ", max_recursion_depth );
       };
    }
+
+   /// The member of an ABI enum carrying the given underlying value, or nullptr for an unlisted value.
+   static const enum_value_def* find_enum_member_by_value( const enum_def& definition, int64_t value );
+   /// The member of an ABI enum spelled by `name`: the exact member name, else the single member whose
+   /// name ends in '_' followed by `name` (members commonly share a prefix derived from the type name,
+   /// so "ethereum" binds "chain_kind_ethereum"). Nullptr when nothing matches or the suffix is ambiguous.
+   static const enum_value_def* find_enum_member_by_name( const enum_def& definition, std::string_view name );
 
 private:
 

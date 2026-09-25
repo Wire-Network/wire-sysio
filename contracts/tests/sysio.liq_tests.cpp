@@ -413,8 +413,8 @@ BOOST_AUTO_TEST_SUITE(sysio_liq_tests)
 BOOST_FIXTURE_TEST_CASE(create_binds_an_active_liq_token, sysio_liq_tester) try {
    const auto st = stat_row();
    BOOST_REQUIRE_EQUAL(0, st["supply"].as<asset>().get_amount());
-   BOOST_REQUIRE_EQUAL(slug_value(SOLANA), st["chain_code"]["value"].as_uint64());
-   BOOST_REQUIRE_EQUAL(slug_value(LIQSOL), st["token_code"]["value"].as_uint64());
+   BOOST_REQUIRE_EQUAL(SOLANA, st["chain_code"].as_string());
+   BOOST_REQUIRE_EQUAL(LIQSOL, st["token_code"].as_string());
 
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("token_code already has a shadow symbol"),
                        create(symbol::from_string("9,LIQSOLB"), SOLANA, LIQSOL));

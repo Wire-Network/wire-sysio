@@ -26,11 +26,6 @@ using mvo = fc::mutable_variant_object;
 
 namespace {
 
-/// A `slug_name` renders in JSON/ABI as `{value: <uint64>}`.
-inline fc::mutable_variant_object codename_mvo(std::string_view s) {
-   return mvo()("value", fc::slug_name{s}.value);
-}
-
 // Well-formed sample addresses for the accept paths.
 constexpr auto EVM_OPP      = "0x5FbDB2315678afecb367f032d93F642f64180aa3";  // OPP.sol
 constexpr auto EVM_INBOUND  = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";  // OPPInbound.sol
@@ -88,7 +83,7 @@ public:
                           const fc::variant_object& outpost) {
       return push_chains("regchain"_n, mvo()
          ("kind",              kind)
-         ("code",              codename_mvo(code))
+         ("code",              code)
          ("external_chain_id", external_chain_id)
          ("name",              std::string(code))
          ("description",       std::string{})
@@ -97,7 +92,7 @@ public:
 
    action_result setoutpost(std::string_view code, const fc::variant_object& outpost) {
       return push_chains("setoutpost"_n, mvo()
-         ("code",    codename_mvo(code))
+         ("code",    code)
          ("outpost", outpost));
    }
 
@@ -149,6 +144,33 @@ BOOST_FIXTURE_TEST_CASE(regchain_evm_bad_hex_rejected, sysio_chains_tester) { tr
                     evm_outpost_mvo(EVM_OPP, EVM_INBOUND, EVM_OPREG, bad_hex))
                     .find("source_deposit_addr contains a non-hex character") != std::string::npos);
    BOOST_REQUIRE(get_chain("ETH").is_null());   // nothing registered on reject
+} FC_LOG_AND_RETHROW() }
+
+// ── A code with no string spelling cannot reach chain state ──
+// `slug_name`'s canonical carrier is the STRING, but the transitional object form
+// `{"value": N}` packs a raw uint64 with no spelling check — that is how an unspellable
+// code reaches action JSON at all. The registry has no erase action, so such a row would
+// be permanent — and rendering is TOTAL, so nothing downstream reports it: the value can
+// decode to "" or to a valid spelling that re-parses as a DIFFERENT chain code.
+// `regchain` is a privileged top-level action, so unlike an OPP dispatch handler it can
+// simply refuse.
+BOOST_FIXTURE_TEST_CASE(regchain_uncanonical_code_rejected, sysio_chains_tester) { try {
+   // Below the leading symbol's floor: decodes to "" and packs back to 0, so it is not a
+   // code and has no spelling.
+   constexpr uint64_t uncanonical = 7;
+   BOOST_REQUIRE(!fc::slug_name{uncanonical}.is_canonical());
+
+   BOOST_REQUIRE(push_chains("regchain"_n, mvo()
+      ("kind",              ChainKind::CHAIN_KIND_EVM)
+      ("code",              mvo()("value", uncanonical))
+      ("external_chain_id", 1)
+      ("name",              std::string("bad"))
+      ("description",       std::string{})
+      ("outpost",           no_outpost_mvo()))
+      .find("has no canonical slug_name spelling") != std::string::npos);
+
+   // Nothing was registered, and a spellable code on the same shape still succeeds.
+   BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1, no_outpost_mvo()));
 } FC_LOG_AND_RETHROW() }
 
 // ── EVM: empty addresses are allowed (register now, deploy and configure later) ──

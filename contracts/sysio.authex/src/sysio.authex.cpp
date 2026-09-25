@@ -102,8 +102,9 @@ namespace sysio {
    require_auth(account);
 
    // ——— Chain kind validation ———
-   // TODO @jglanz: SUI removed in v6; restore when SUI outpost is added.
-   check(chain_kind == ChainKind::CHAIN_KIND_EVM || chain_kind == ChainKind::CHAIN_KIND_SVM,
+   // TODO @jglanz: SUI removed in the data-model refactor; restore when SUI outpost is added.
+   check(chain_kind == ChainKind::CHAIN_KIND_EVM
+         || chain_kind == ChainKind::CHAIN_KIND_SVM,
          "Invalid chain_kind. Supported: CHAIN_KIND_EVM(2), CHAIN_KIND_SVM(3).");
    check(is_supported_chain_key_pair(chain_kind, pub_key), "chain_kind and pub_key must pair as EVM/EM or SVM/ED");
 

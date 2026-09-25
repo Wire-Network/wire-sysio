@@ -355,16 +355,6 @@
             ]
         },
         {
-            "name": "slug_name",
-            "base": "",
-            "fields": [
-                {
-                    "name": "value",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "sumlocks",
             "base": "",
             "fields": [

@@ -82,6 +82,15 @@ public:
    void update_runtime_options(const runtime_options& options);
    runtime_options get_runtime_options() const;
 
+   /// Time budget enforced on one read-only transaction: the smaller of max-transaction-time and the
+   /// effective read-only read window less its minimum, fixed during initialization. Zero when no
+   /// read-only threads are configured.
+   fc::microseconds get_read_only_max_transaction_time() const;
+   /// End of the current read-only window. Meaningful on a read-only thread inside that window, where
+   /// it is the deadline push_read_only_transaction applies to a read-only transaction; exposed so other
+   /// read-exclusive work stops at the window's end as well.
+   fc::time_point get_read_only_window_deadline() const;
+
    void add_greylist_accounts(const greylist_params& params);
    void remove_greylist_accounts(const greylist_params& params);
    greylist_params get_greylist() const;

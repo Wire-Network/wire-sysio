@@ -1,4 +1,5 @@
 #include <sysio/chain/abi_serializer.hpp>
+#include <fc/slug_name.hpp>
 #include <sysio/chain/asset.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <fc/io/raw.hpp>
@@ -10,7 +11,82 @@
 #include <google/protobuf/dynamic_message.h>
 #include <google/protobuf/util/json_util.h>
 
+#include <algorithm>
+#include <array>
+#include <limits>
+#include <optional>
+
 namespace sysio::chain {
+
+   namespace {
+      constexpr int64_t int64_min = std::numeric_limits<int64_t>::min();
+      constexpr int64_t int64_max = std::numeric_limits<int64_t>::max();
+
+      /// A type an ABI enum may be based on, and the range of member values it holds. Member values are int64
+      /// (`enum_value_def::value`), so a 64- or 128-bit type holds every int64 of its signedness.
+      struct enum_underlying_type {
+         std::string_view name;
+         int64_t          min;
+         int64_t          max;
+      };
+
+      constexpr std::array enum_underlying_types{
+         enum_underlying_type{"int8",    std::numeric_limits<int8_t>::min(),  std::numeric_limits<int8_t>::max()},
+         enum_underlying_type{"int16",   std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::max()},
+         enum_underlying_type{"int32",   std::numeric_limits<int32_t>::min(), std::numeric_limits<int32_t>::max()},
+         enum_underlying_type{"int64",   int64_min,                           int64_max},
+         enum_underlying_type{"int128",  int64_min,                           int64_max},
+         enum_underlying_type{"uint8",   0,                                   std::numeric_limits<uint8_t>::max()},
+         enum_underlying_type{"uint16",  0,                                   std::numeric_limits<uint16_t>::max()},
+         enum_underlying_type{"uint32",  0,                                   std::numeric_limits<uint32_t>::max()},
+         enum_underlying_type{"uint64",  0,                                   int64_max},
+         enum_underlying_type{"uint128", 0,                                   int64_max},
+      };
+
+      /// An unpacked enum value as a member value, or nullopt when it is not an integer within int64 and so is no
+      /// member's. as_int64() alone would reject the 128-bit variants and wrap uint64 ones.
+      std::optional<int64_t> enum_member_value(const fc::variant& v) {
+         if( v.is_int64() )
+            return v.as_int64();
+         if( v.is_int128() ) {
+            const fc::int128 value = v.as_int128();
+            if( value < int64_min || value > int64_max )
+               return std::nullopt;
+            return static_cast<int64_t>(value);
+         }
+         if( v.is_uint64() || v.is_uint128() ) {
+            const fc::uint128 value = v.as_uint128();
+            if( value > static_cast<fc::uint128>(int64_max) )
+               return std::nullopt;
+            return static_cast<int64_t>(value);
+         }
+         return std::nullopt;
+      }
+   } // namespace
+
+   const enum_value_def* abi_serializer::find_enum_member_by_value( const enum_def& definition, int64_t value ) {
+      for( const auto& member : definition.values )
+         if( member.value == value )
+            return &member;
+      return nullptr;
+   }
+
+   const enum_value_def* abi_serializer::find_enum_member_by_name( const enum_def& definition, std::string_view name ) {
+      for( const auto& member : definition.values )
+         if( member.name == name )
+            return &member;
+      constexpr char separator = '_';
+      const enum_value_def* match = nullptr;
+      for( const auto& member : definition.values ) {
+         const auto position = member.name.rfind( separator );
+         if( position == std::string::npos || std::string_view( member.name ).substr( position + 1 ) != name )
+            continue;
+         if( match )
+            return nullptr; // ambiguous: two members end the same way
+         match = &member;
+      }
+      return match;
+   }
 
    const size_t abi_serializer::max_recursion_depth;
 
@@ -135,6 +211,7 @@ namespace sysio::chain {
 
       built_in_types.emplace("symbol",                    pack_unpack<symbol>());
       built_in_types.emplace("symbol_code",               pack_unpack<symbol_code>());
+      built_in_types.emplace("slug_name",                 pack_unpack<fc::slug_name>());
       built_in_types.emplace("asset",                     pack_unpack<asset>());
       built_in_types.emplace("extended_asset",            pack_unpack<extended_asset>());
       built_in_types.emplace("bitset",                    pack_unpack<fc::bitset>());
@@ -319,20 +396,6 @@ namespace sysio::chain {
       return built_in_types.find(type) != built_in_types.end();
    }
 
-   bool abi_serializer::is_integer(const std::string_view& type) const {
-      return type.starts_with("uint") || type.starts_with("int");
-   }
-
-   int abi_serializer::get_integer_size(const std::string_view& type) const {
-      SYS_ASSERT( is_integer(type), invalid_type_inside_abi, "{} is not an integer type",
-                  impl::limit_size(type));
-      if( type.starts_with("uint") ) {
-         return boost::lexical_cast<int>(type.substr(4));
-      } else {
-         return boost::lexical_cast<int>(type.substr(3));
-      }
-   }
-
    bool abi_serializer::is_struct(const std::string_view& type)const {
       return structs.find(resolve_type(type)) != structs.end();
    }
@@ -470,11 +533,11 @@ namespace sysio::chain {
       } FC_CAPTURE_AND_RETHROW( "r: {}", r  ) }
       for( const auto& en : enums ) { try {
         ctx.check_deadline();
-        SYS_ASSERT(is_integer(en.second.type), invalid_type_inside_abi,
-                   "enum '{}' has invalid underlying type '{}' (must be an integer type)", impl::limit_size(en.first), impl::limit_size(en.second.type) );
-
-        int bit_width = get_integer_size(en.second.type);
-        bool is_signed_type = en.second.type.starts_with("int");
+        const auto underlying = std::ranges::find(enum_underlying_types, std::string_view{en.second.type},
+                                                  &enum_underlying_type::name);
+        SYS_ASSERT(underlying != enum_underlying_types.end(), invalid_type_inside_abi,
+                   "enum '{}' has invalid underlying type '{}' (must be a fixed-width integer type)",
+                   impl::limit_size(en.first), impl::limit_size(en.second.type) );
 
         flat_set<string> seen_names;
         flat_set<int64_t> seen_values;
@@ -483,18 +546,9 @@ namespace sysio::chain {
                       "enum '{}' has duplicate member name '{}'", impl::limit_size(en.first), impl::limit_size(ev.name) );
            SYS_ASSERT(seen_values.insert(ev.value).second, invalid_type_inside_abi,
                       "enum '{}' has duplicate value {} (member '{}')", impl::limit_size(en.first), ev.value, impl::limit_size(ev.name) );
-           if( is_signed_type ) {
-              int64_t lo = -(1LL << (bit_width - 1));
-              int64_t hi =  (1LL << (bit_width - 1)) - 1;
-              SYS_ASSERT(ev.value >= lo && ev.value <= hi, invalid_type_inside_abi,
-                         "enum '{}' value '{}' ({}) out of range for '{}'",
-                         impl::limit_size(en.first), impl::limit_size(ev.name), ev.value, impl::limit_size(en.second.type) );
-           } else {
-              uint64_t hi = (bit_width == 64) ? UINT64_MAX : (1ULL << bit_width) - 1;
-              SYS_ASSERT(ev.value >= 0 && static_cast<uint64_t>(ev.value) <= hi, invalid_type_inside_abi,
-                         "enum '{}' value '{}' ({}) out of range for '{}'",
-                         impl::limit_size(en.first), impl::limit_size(ev.name), ev.value, impl::limit_size(en.second.type) );
-           }
+           SYS_ASSERT(ev.value >= underlying->min && ev.value <= underlying->max, invalid_type_inside_abi,
+                      "enum '{}' value '{}' ({}) out of range for '{}'", impl::limit_size(en.first),
+                      impl::limit_size(ev.name), ev.value, impl::limit_size(en.second.type) );
         }
       } FC_CAPTURE_AND_RETHROW( "enum: {}", en.first  ) }
    }
@@ -614,11 +668,9 @@ namespace sysio::chain {
          SYS_ASSERT( btype != built_in_types.end(), invalid_type_inside_abi,
                      "Enum '{}' has unknown underlying type '{}'", impl::limit_size(rtype), impl::limit_size(e_itr->second.type) );
          auto int_var = btype->second.first(stream, false, false, ctx.get_yield_function());
-         auto int_val = int_var.as_int64();
-         for( const auto& ev : e_itr->second.values ) {
-            if( ev.value == int_val ) {
-               return fc::variant(ev.name);
-            }
+         if( const auto member_value = enum_member_value(int_var) ) {
+            if( const auto* member = find_enum_member_by_value( e_itr->second, *member_value ) )
+               return fc::variant(member->name);
          }
          return int_var; // Unknown value — return as integer
       } else {
@@ -720,40 +772,19 @@ namespace sysio::chain {
             _variant_to_binary(fundamental_type(rtype), var, ds, ctx);
          }
       } else if( auto e_itr = enums.find(rtype); e_itr != enums.end() ) {
-         // Enum type: accept string member name or integer value.
-         // For string matching, tries exact match first, then prefix-stripped match
-         // (e.g., "ethereum" matches "chain_kind_ethereum" by stripping the "chain_kind_" prefix).
+         // Enum type: accept a member name (exact, else a unique prefix-stripped match through
+         // find_enum_member_by_name) or an integer value.
          auto btype = built_in_types.find(e_itr->second.type);
          SYS_ASSERT( btype != built_in_types.end(), invalid_type_inside_abi,
                      "Enum '{}' has unknown underlying type '{}'", ctx.maybe_shorten(rtype), ctx.maybe_shorten(e_itr->second.type) );
          fc::variant val_to_pack;
          if( var.is_string() ) {
-            auto name_str = var.get_string();
-            bool found = false;
-            // Pass 1: exact match
-            for( const auto& ev : e_itr->second.values ) {
-               if( ev.name == name_str ) {
-                  val_to_pack = fc::variant(ev.value);
-                  found = true;
-                  break;
-               }
-            }
-            // Pass 2: prefix-stripped match — enum members often have a common prefix
-            // derived from the type name (e.g., "chain_kind_" for type "chain_kind_t").
-            // Try matching "name_str" as a suffix of each member name after a '_' separator.
-            if( !found ) {
-               for( const auto& ev : e_itr->second.values ) {
-                  auto pos = ev.name.rfind('_');
-                  if( pos != std::string::npos && ev.name.substr(pos + 1) == name_str ) {
-                     val_to_pack = fc::variant(ev.value);
-                     found = true;
-                     break;
-                  }
-               }
-            }
-            SYS_ASSERT( found, pack_exception,
-                        "Unknown enum value '{}' for enum '{}' while processing '{}'",
+            const auto& name_str = var.get_string();
+            const auto* member = find_enum_member_by_name( e_itr->second, name_str );
+            SYS_ASSERT( member, pack_exception,
+                        "Unknown or ambiguous enum value '{}' for enum '{}' while processing '{}'",
                         ctx.maybe_shorten(name_str), ctx.maybe_shorten(rtype), ctx.get_path_string() );
+            val_to_pack = fc::variant(member->value);
          } else {
             val_to_pack = var;
          }

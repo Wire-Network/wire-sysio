@@ -10,6 +10,7 @@
 #include <sysio/producer_api_plugin/producer_api_plugin.hpp>
 #include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/prometheus_plugin/prometheus_plugin.hpp>
+#include <sysio/query_engine_plugin/query_engine_plugin.hpp>
 #include <sysio/signature_provider_kms_plugin/signature_provider_kms_plugin.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <sysio/signature_provider_ssm_plugin/signature_provider_ssm_plugin.hpp>
@@ -38,6 +39,7 @@ int main(int argc, char** argv)
    application_base::register_plugin<test_control_api_plugin>();
    application_base::register_plugin<state_history_plugin>();
    application_base::register_plugin<status_monitor_plugin>();
+   application_base::register_plugin<query_engine_plugin>();
    application_base::register_plugin<prometheus_plugin>();
    application_base::register_plugin<chain_api_plugin>();
    application_base::register_plugin<signature_provider_manager_plugin>();

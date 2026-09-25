@@ -58,7 +58,11 @@ jobs:
 
       - name: Install host tools
         run: |
-          brew install ninja ccache pkgconf autoconf automake libtool
+          # openjdk runs the ANTLR parser generator of the query engine plugin at build time. Homebrew
+          # keeps it keg-only, so its bin directory is put on PATH for CMake's find_package(Java).
+          brew install ninja ccache pkgconf autoconf automake libtool openjdk
+          echo "$(brew --prefix openjdk)/bin" >> "$GITHUB_PATH"
+          "$(brew --prefix openjdk)/bin/java" -version
           python3 -m venv "$RUNNER_TEMP/python-venv"
           "$RUNNER_TEMP/python-venv/bin/python" -m pip install --upgrade pip
           "$RUNNER_TEMP/python-venv/bin/python" -m pip install numpy

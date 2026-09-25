@@ -24,6 +24,42 @@
             ]
         },
         {
+            "name": "addslug",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "payload",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "addsslug",
+            "base": "",
+            "fields": [
+                {
+                    "name": "scope",
+                    "type": "uint64"
+                },
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "payload",
+                    "type": "uint64"
+                },
+                {
+                    "name": "alt",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
             "name": "addstruct",
             "base": "",
             "fields": [
@@ -33,6 +69,16 @@
                 },
                 {
                     "name": "payload",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "composite_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
                     "type": "uint64"
                 }
             ]
@@ -106,17 +152,7 @@
             ]
         },
         {
-            "name": "slug_name",
-            "base": "",
-            "fields": [
-                {
-                    "name": "value",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "structobj",
+            "name": "slugobj",
             "base": "",
             "fields": [
                 {
@@ -130,12 +166,64 @@
             ]
         },
         {
-            "name": "structobj_key",
+            "name": "slugobj_key",
             "base": "",
             "fields": [
                 {
                     "name": "code",
                     "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "sslugobj",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "payload",
+                    "type": "uint64"
+                },
+                {
+                    "name": "alt",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "sslugobj_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "structobj",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "composite_key"
+                },
+                {
+                    "name": "payload",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "structobj_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "composite_key"
                 }
             ]
         }
@@ -149,6 +237,16 @@
         {
             "name": "addnumobj",
             "type": "addnumobj",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "addslug",
+            "type": "addslug",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "addsslug",
+            "type": "addsslug",
             "ricardian_contract": ""
         },
         {
@@ -169,14 +267,6 @@
     ],
     "tables": [
         {
-            "name": "hashobj",
-            "type": "hashobj",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 37781
-        },
-        {
             "name": "hashobjs",
             "type": "hashobj",
             "index_type": "i64",
@@ -195,14 +285,6 @@
                     "table_id": 6575
                 }
             ]
-        },
-        {
-            "name": "numobj",
-            "type": "numobj",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 30247
         },
         {
             "name": "numobjs",
@@ -235,11 +317,39 @@
             ]
         },
         {
+            "name": "slugobjs",
+            "type": "slugobj",
+            "index_type": "i64",
+            "key_names": ["code"],
+            "key_types": ["slug_name"],
+            "table_id": 41308
+        },
+        {
+            "name": "sslugobjs",
+            "type": "sslugobj",
+            "index_type": "i64",
+            "key_names": ["scope","code"],
+            "key_types": ["name","slug_name"],
+            "table_id": 32371,
+            "secondary_indexes": [
+                {
+                    "name": "bypayload",
+                    "key_type": "uint64",
+                    "table_id": 64287
+                },
+                {
+                    "name": "byalt",
+                    "key_type": "slug_name",
+                    "table_id": 52539
+                }
+            ]
+        },
+        {
             "name": "structobjs",
             "type": "structobj",
             "index_type": "i64",
             "key_names": ["code"],
-            "key_types": ["slug_name"],
+            "key_types": ["composite_key"],
             "table_id": 12649
         }
     ],

@@ -11,7 +11,7 @@
  * routing/accounting keys.
  *
  * The plugin must key its credit buckets and its local commit de-dup by the
- * EXACT v6 slug codes — `(chain_code, token_code[, reserve_code])` — NOT the
+ * EXACT slug codes — `(chain_code, token_code[, reserve_code])` — NOT the
  * coarse `(ChainKind, TokenKind)` VM family. Otherwise two active chains of the
  * same family (e.g. two EVM outposts) collapse onto one key: their collateral
  * merges into a single bucket and a confirmed commit on one suppresses the

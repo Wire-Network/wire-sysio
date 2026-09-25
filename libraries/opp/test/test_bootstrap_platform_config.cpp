@@ -22,6 +22,7 @@
 #include <fc/slug_name.hpp>
 #include <fc/crypto/base58.hpp>
 
+#include <algorithm>
 #include <cctype>
 #include <fstream>
 #include <map>
@@ -59,8 +60,9 @@ bool parse_strict(const std::string& json, BootstrapPlatformConfig& out, std::st
    return true;
 }
 
-/// True iff `s` is a valid slug_name (alphabet [A-Z0-9_], 1..8 chars). Uses the
-/// real `fc::slug_name`, which throws on an out-of-alphabet or over-length code.
+/// True iff `s` is a valid slug_name: `[A-Z][A-Z0-9_]{0,7}` -- a code must START with
+/// a letter, and is at most 8 characters. Uses the real `fc::slug_name`, which throws
+/// on a digit- or underscore-leading, out-of-alphabet, or over-length code.
 bool slug_ok(const std::string& s) {
    if (s.empty()) return false;
    try {
@@ -185,6 +187,7 @@ std::vector<std::string> validate(const BootstrapPlatformConfig& c) {
    std::set<std::tuple<std::string, std::string, std::string>> triples;
    unsigned __int128 sum_wire = 0;
    for (const auto& r : c.reserves()) {
+      if (!slug_ok(r.code())) e.push_back("V2 reserve code: " + r.code());
       const auto key = std::make_tuple(r.chain_code(), r.token_code(), r.code());
       if (!triples.insert(key).second)
          e.push_back("V6 duplicate reserve: " + r.chain_code() + "/" + r.token_code() + "/" + r.code());
@@ -309,6 +312,24 @@ BOOST_AUTO_TEST_CASE(dev_config_parses_and_validates) {
 }
 
 /// A typo'd / unknown JSON key must fail the strict parse, not be dropped.
+// V2's grammar is `[A-Z][A-Z0-9_]{0,7}`, and the LEADING rule is what makes a bare JSON
+// string unambiguous -- no legal code can be read as a decimal. The public authoring docs
+// advertise that grammar, so it is pinned here rather than left to the constructor.
+BOOST_AUTO_TEST_CASE(v2_slug_grammar_requires_a_leading_letter) {
+   for (const char* ok : {"ETHEREUM", "WIRE", "USDC", "V1", "TRAIL_", "Z_______", "A"})
+      BOOST_CHECK_MESSAGE(slug_ok(ok), std::string("should accept ") + ok);
+
+   for (const char* bad : {"7",          // digit-leading
+                           "1ETH",       // digit-leading
+                           "0X10",       // digit-leading, JS-numeric shaped
+                           "_LEAD",      // underscore-leading
+                           "________",   // underscore-leading
+                           "eth",        // lowercase
+                           "ETH-MAIN",   // out of alphabet
+                           "TOOLONG12"}) // over length
+      BOOST_CHECK_MESSAGE(!slug_ok(bad), std::string("should reject ") + bad);
+}
+
 BOOST_AUTO_TEST_CASE(strict_parse_rejects_unknown_field) {
    BootstrapPlatformConfig cfg;
    std::string err;
@@ -326,6 +347,15 @@ BOOST_AUTO_TEST_CASE(validator_rejects_mutations) {
 
    { auto c = base; c.mutable_chains(1)->set_code("TOOLONG99");         // 9 chars > 8
      BOOST_CHECK(!validate(c).empty()); }                               // V2 over-length slug
+   // Reserve codes get the same V2 grammar as chain and token codes; regreserve
+   // refuses the digit- and underscore-leading ones outright.
+   for (const char* bad : {"1BAD", "_BAD", ""}) {
+      auto c = base; c.mutable_reserves(0)->set_code(bad);
+      const auto errs = validate(c);
+      BOOST_CHECK_MESSAGE(std::any_of(errs.begin(), errs.end(),
+                                      [](const std::string& s) { return s.starts_with("V2 reserve code"); }),
+                          std::string("reserve code should be rejected: '") + bad + "'");
+   }
    { auto c = base; c.mutable_chains(2)->set_kind(ChainKind::CHAIN_KIND_WIRE);
      BOOST_CHECK(!validate(c).empty()); }                               // V3 two depots
    { auto c = base;                                                     // V5 second native on ETHEREUM

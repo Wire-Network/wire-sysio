@@ -6,6 +6,7 @@
 
 #include <sysio/sysio.hpp>
 #include <sysio/crypto.hpp>
+#include <sysio/kv_scoped_table.hpp>
 #include <sysio/kv_table.hpp>
 
 
@@ -98,30 +99,98 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
                             > hashobjs;
 
     // Struct-keyed kv::table — drives the ABI-aware BE key codec's struct
-    // expansion on the live get_table_rows path. Mirrors the v6 registry
-    // tables (e.g. sysio.chains `chains`), whose primary key is the reflected
-    // struct `slug_name { value: uint64 }`. abigen emits
-    // `key_types: ["code"->"slug_name"]` for this table, so JSON bounds and
-    // `next_key` pagination must round-trip the nested `{ "code": { "value": N } }`
-    // key shape — coverage a flat scalar key cannot provide.
-    struct slug_name {
+    // expansion on the live get_table_rows path, so JSON bounds and `next_key`
+    // pagination must round-trip the nested `{ "code": { "value": N } }` key
+    // shape — coverage a flat scalar key cannot provide.
+    //
+    // The name must not collide with an ABI builtin. abigen matches builtins on
+    // the namespace-stripped bare name, so a key struct named after one is
+    // emitted AS that builtin, takes the leaf branch in `build_key_shape`, and
+    // stops exercising struct expansion — while the suite keeps passing.
+    struct composite_key {
         uint64_t value = 0;
-        SYSLIB_SERIALIZE(slug_name, (value))
+        SYSLIB_SERIALIZE(composite_key, (value))
     };
 
     struct structobj_key {
-        slug_name code;
+        composite_key code;
         uint64_t primary_key() const { return code.value; }
         SYSLIB_SERIALIZE(structobj_key, (code))
     };
 
     struct [[sysio::table("structobjs")]] structobj {
-        slug_name code;
+        composite_key code;
         uint64_t  payload = 0;
         SYSLIB_SERIALIZE(structobj, (code)(payload))
     };
 
     typedef sysio::kv::table< "structobjs"_n, structobj_key, structobj > structobjs;
+
+    // Slug-keyed kv::table — the shape every registry table ships
+    // (sysio.chains::chains, sysio.tokens::tokens, sysio.reserv::reserves).
+    //
+    // This one is named after a builtin ON PURPOSE, the exact hazard
+    // `composite_key` above exists to avoid: abigen matches builtins on the
+    // namespace-stripped bare name, so the field reaches the ABI as the bare
+    // `slug_name` and `build_key_shape` takes the LEAF branch. That is what puts
+    // the slug carrier on the live get_table_rows path — a bound and a
+    // `next_key` are the canonical STRING, never a nested object.
+    //
+    // Declared here rather than included from the contract library so the
+    // fixture stays self-contained: the layout is all the ABI sees.
+    struct slug_name {
+        uint64_t value = 0;
+        SYSLIB_SERIALIZE(slug_name, (value))
+    };
+
+    struct slugobj_key {
+        slug_name code;
+        uint64_t primary_key() const { return code.value; }
+        SYSLIB_SERIALIZE(slugobj_key, (code))
+    };
+
+    struct [[sysio::table("slugobjs")]] slugobj {
+        slug_name code;
+        uint64_t  payload = 0;
+        SYSLIB_SERIALIZE(slugobj, (code)(payload))
+    };
+
+    typedef sysio::kv::table< "slugobjs"_n, slugobj_key, slugobj > slugobjs;
+
+    // The same registry shape, but SCOPED — stored as [scope:8B BE][key], with a
+    // secondary index so both cursor paths are reachable.
+    //
+    // Two json=true cursor shapes meet here and only the scoped table can tell
+    // them apart. A decoded JSON key object names the fields WITHIN the scope, so
+    // get_table_rows prepends the scope prefix to it; the RAW cursor a key the
+    // codec cannot name falls back to carries the COMPLETE key and is fed back
+    // verbatim. Getting either one's prefix handling wrong seeks into the wrong
+    // scope — and unscoped `slugobjs` above cannot catch it, since there is no
+    // prefix to double or drop.
+    struct sslugobj_key {
+        slug_name code;
+        uint64_t primary_key() const { return code.value; }
+        SYSLIB_SERIALIZE(sslugobj_key, (code))
+    };
+
+    struct [[sysio::table("sslugobjs")]] sslugobj {
+        slug_name code;
+        uint64_t  payload = 0;
+        // A SLUG-typed secondary. `bypayload` is a uint64 and always decodes, so it
+        // can never reach the secondary cursor's raw fallback; only a secondary whose
+        // key can fail to be NAMED exercises that path.
+        slug_name alt;
+        uint64_t  by_payload() const { return payload; }
+        slug_name by_alt() const { return alt; }
+        SYSLIB_SERIALIZE(sslugobj, (code)(payload)(alt))
+    };
+
+    typedef sysio::kv::scoped_table<
+        "sslugobjs"_n, sslugobj_key, sslugobj,
+        sysio::kv::index<"bypayload"_n,
+                         sysio::const_mem_fun<sslugobj, uint64_t, &sslugobj::by_payload>>,
+        sysio::kv::index<"byalt"_n,
+                         sysio::const_mem_fun<sslugobj, slug_name, &sslugobj::by_alt>>> sslugobjs;
 
    [[sysio::action]]
    void addnumobj(uint64_t input);
@@ -137,10 +206,27 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
    void addhashobj(std::string hashinput);
 
    /// Insert a row into the struct-keyed kv::table `structobjs`.
-   /// @param code     the slug_name value forming the struct primary key
+   /// @param code     the composite_key value forming the struct primary key
    /// @param payload  arbitrary row payload
    [[sysio::action]]
    void addstruct(uint64_t code, uint64_t payload);
+
+   /// Insert a row into the slug-keyed kv::table `slugobjs`.
+   /// @param code     the slug forming the primary key — written as its
+   ///                 canonical string, since `slug_name` is an ABI builtin
+   /// @param payload  arbitrary row payload
+   [[sysio::action]]
+   void addslug(slug_name code, uint64_t payload);
+
+   /// Insert a row into the SCOPED slug-keyed table `sslugobjs`.
+   /// @param scope    the table scope
+   /// @param code     the slug forming the primary key
+   /// @param payload  arbitrary row payload; also the `bypayload` secondary
+   /// @param alt      a second slug, indexed by `byalt` -- a SLUG-typed secondary,
+   ///                 so a non-canonical value here cannot be named and drives the
+   ///                 secondary cursor's raw fallback
+   [[sysio::action]]
+   void addsslug(uint64_t scope, slug_name code, uint64_t payload, slug_name alt);
 
 
 };

@@ -1,0 +1,68 @@
+{
+  "jsonrpc": "2.0",
+  "id": "balances-by-beneficiary",
+  "result": {
+    "schema_version": "1.0",
+    "complete": true,
+    "source": {
+      "owners": [
+        "sample"
+      ],
+      "table": "positions"
+    },
+    "state": {
+      "chain_id": "1111111111111111111111111111111111111111111111111111111111111111",
+      "block_id": "2222222222222222222222222222222222222222222222222222222222222222",
+      "block_num": "42",
+      "block_time": "2026-09-21T12:00:00.000",
+      "read_mode": "head",
+      "last_irreversible_block_num": "40",
+      "abis": [
+        {
+          "owner": "sample",
+          "hash": "3333333333333333333333333333333333333333333333333333333333333333"
+        }
+      ],
+      "captured_at": "2026-09-21T12:00:00.050000Z",
+      "synced": true
+    },
+    "columns": [
+      {
+        "name": "beneficiary",
+        "logical_type": "text",
+        "abi_type": "name",
+        "nullable": false,
+        "encoding": "text"
+      },
+      {
+        "name": "records",
+        "logical_type": "integer",
+        "abi_type": null,
+        "nullable": false,
+        "encoding": "decimal_string"
+      },
+      {
+        "name": "total",
+        "logical_type": "integer",
+        "abi_type": null,
+        "nullable": true,
+        "encoding": "decimal_string"
+      }
+    ],
+    "rows": [
+      {
+        "beneficiary": "alice",
+        "records": "2",
+        "total": "150"
+      }
+    ],
+    "stats": {
+      "scanned_rows": "3",
+      "matched_rows": "3",
+      "groups": "2",
+      "returned_rows": "1",
+      "raw_bytes": "144",
+      "elapsed_us": "1200"
+    }
+  }
+}

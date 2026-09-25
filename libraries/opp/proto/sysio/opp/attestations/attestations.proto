@@ -426,7 +426,7 @@ message AttestationProcessingError {
 }
 
 // ---------------------------------------------------------------------------
-//  Reserve creation flow (v6 — outpost-initiated, depot-matched)
+//  Reserve creation flow (outpost-initiated, depot-matched)
 //
 //  Lifecycle:
 //    1. User calls outpost `create_reserve(...)`. Outpost takes external_token_amount

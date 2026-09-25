@@ -4,7 +4,7 @@
 #include <sysio.reserv/sysio.reserv.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.chains/sysio.chains.hpp>
-#include <sysio.opp.common/slug_name.hpp>
+#include <sysio/slug_name.hpp>
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio.opp.common/name_ops.hpp>
@@ -123,7 +123,7 @@ uint32_t get_current_epoch() {
 }
 
 /// Sum the underwriter's pending withdraws on opreg for the given
-/// `(chain_code, token_code)`. Per v6 plan §B.2 (split-index design):
+/// `(chain_code, token_code)`. Per the split-index design:
 /// `opreg::wtdwqueue_t` exposes only uint64 secondary indexes. The `byaccount`
 /// index keys on `account.value`; rows are filtered on `(chain_code,
 /// token_code)` in memory. Per-account pending-withdraw counts are O(1)-ish
@@ -467,7 +467,7 @@ std::optional<ChainKind> chain_kind_for_code(sysio::slug_name chain_code) {
 /// `feedback_no_zero_sentinels` — outpost id 0 is a real id, so 0 must not
 /// double as "missing").
 ///
-/// Post v6 cross-contract realignment: chain rows live in
+/// After the cross-contract realignment: chain rows live in
 /// `sysio.chains::chains` keyed by `code` (slug_name); the legacy
 /// `sysio.epoch::outposts` table is gone. The "outpost id" returned here is
 /// the chain's `code.value` (uint64). The depot-self row is filtered out so
@@ -1056,6 +1056,31 @@ void uwrit::createuwreq(uint64_t attestation_id,
                        sysio::slug_name{chain_code}, src_reserve_code,
                        "SwapRequest rejected: source chain does not match the proven "
                        "delivering outpost (cross-chain provenance mismatch)");
+      return;
+   }
+
+   // The four payload-controlled codes must have a canonical string spelling, because a
+   // uwreq row IS created from them below on a path that no registry lookup gates: the
+   // zero-quote guard fails closed only when `required_reserves_active` holds, so a
+   // MISSING reserve (the unprovisioned-LP case) falls through to `reqs.emplace` with
+   // these codes stored verbatim. Rendering is total, so an uncanonical code does not
+   // make the row unreadable — it makes it WRONG: the rendered text either fails
+   // validation on the way back, or re-parses as a DIFFERENT reserve than the uwreq was
+   // created from. Refund rather than drop: the user's deposit is escrowed on the source
+   // outpost, so a silent skip would strand it. Never `check()` — we are inside the
+   // evalcons dispatch chain (`feedback_opp_handlers_never_throw`).
+   //
+   // The two CHAIN codes are deliberately absent: `src_chain_code` was just proven equal
+   // to the delivering outpost's `chain_code`, and `dst_chain_code` must pass
+   // `chain_registered_active` below. Both therefore name a `sysio.chains` row, and
+   // `sysio.chains::regchain` refuses a code with no canonical spelling — so the registry itself
+   // carries that guarantee.
+   if (!src_token_code.is_canonical() || !src_reserve_code.is_canonical() ||
+       !dst_token_code.is_canonical() || !dst_reserve_code.is_canonical()) {
+      emit_swap_revert(get_self(), chain_code, attestation_id, sr,
+                       src_chain_code, src_reserve_code,
+                       "SwapRequest rejected: a token or reserve code has no canonical "
+                       "slug_name spelling");
       return;
    }
 
