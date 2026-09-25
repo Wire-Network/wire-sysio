@@ -2437,6 +2437,18 @@ fc::variant strip_scope_fields(fc::variant&& full_key, size_t count) {
    return fc::variant(std::move(stripped));
 }
 
+/// Render a json=true `next_key` for a key the codec could not NAME: the `0x` tag
+/// `fc::from_hex` already understands, followed by the hex of the COMPLETE stored key.
+///
+/// Absolute, never scope-relative. A relative cursor has to be re-prefixed on the way
+/// back in, and a key that is nothing but the scope prefix leaves an EMPTY remainder —
+/// which reads as "no bound" and restarts the page instead of resuming it. The tag
+/// lets the bound parser hand these bytes to the index untouched, so the scope prefix
+/// is never added or removed by agreement between two sites.
+std::string to_raw_cursor(std::string_view key) {
+   return fc::to_hex(key.data(), static_cast<uint32_t>(key.size()), /*add_prefix=*/true);
+}
+
 read_only::get_table_rows_return_t
 read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::time_point& deadline ) const {
    abi_def abi = sysio::chain_apis::get_abi( db, p.code );
@@ -2447,10 +2459,11 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    auto key_types = tbl.key_types;
 
    // Resolve the ABI-aware encode/decode plan once per request. nullopt when a
-   // key type is genuinely unrepresentable. The two JSON paths then diverge: a
-   // JSON bound is REJECTED (clear contract_table_query_exception below), while
-   // JSON key OUTPUT — the decoded `key` field and the `next_key` cursor — falls
-   // back to hex. Hex bounds and hex key output are unaffected either way.
+   // key type is genuinely unrepresentable. Key OUTPUT (the `key` field and the
+   // `next_key` cursor) then falls back to bare hex, and the json=true BOUND
+   // parser accepts hex straight back — so a cursor is always feedable, which is
+   // what page two needs. The same escape covers a leaf the codec can decode but
+   // cannot NAME (a slug_name with no canonical spelling).
    // No in-tree table declares such a key type today (uint256/int256 have no CDT
    // producer), so the nullopt branches below are defensive; the codec rejection
    // that drives them is unit-tested in be_key_codec_tests `rejections`.
@@ -2458,11 +2471,11 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    try {
       key_shapes = chain::be_key_codec::build_key_shapes(abi, key_names, key_types);
    } catch (const fc::exception& e) {
-      // Unrepresentable key type (e.g. uint256/int256): leave key_shapes unset so a
-      // JSON bound is rejected with a clear error while JSON key output falls back to
-      // hex (hex bounds/output keep working). Log so the fallback is diagnosable.
-      dlog("be_key_codec: table {} has no representable JSON key shape; JSON bounds rejected, "
-           "JSON key output falls back to hex ({})",
+      // Unrepresentable key type (e.g. uint256/int256): leave key_shapes unset so
+      // key output falls back to hex, which the bound parser takes back verbatim.
+      // Log so the fallback is diagnosable.
+      dlog("be_key_codec: table {} has no representable JSON key shape; keys render as hex "
+           "and hex bounds are accepted on the way back in ({})",
            p.table, e.top_message());
    }
 
@@ -2596,33 +2609,79 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
                               bound_key_shapes->begin() + static_cast<ptrdiff_t>(scope_key_count));
    }
 
-   // Parse bounds: when json=true, bounds are JSON key objects; when json=false, hex strings.
-   std::vector<char> lb_bytes;
-   if (!effective_lower.empty()) {
-      if (p.json) {
+   // Parse bounds. When json=true the first NON-WHITESPACE character says which of
+   // three forms a bound takes:
+   //   '{'   a JSON key OBJECT — names the fields WITHIN the scope, so the scope
+   //         prefix is prepended below
+   //   "0x"  a RAW cursor — already the COMPLETE stored key, used verbatim
+   //   else  bare hex — within-scope, like the object form
+   // A cursor takes the raw form when the codec could not NAME the key (an
+   // unrepresentable key type, or a slug_name with no canonical spelling); see
+   // to_raw_cursor for why it carries the whole key rather than the remainder.
+   // json=false is hex only and unchanged — the complete stored key, untagged.
+   struct parsed_bound {
+      std::vector<char> bytes;
+      bool              absolute = false; ///< raw cursor: never scope-prefixed again
+   };
+   auto parse_bound = [&](const std::string& bound) {
+      parsed_bound out;
+      // Dispatch on the first non-whitespace character: fc::json::from_string accepts
+      // leading whitespace, so `  {"code":"ETH"}` is a valid JSON bound and must not
+      // reach the hex reader, which throws on the brace.
+      //
+      // An all-whitespace bound is refused rather than trimmed to nothing: the caller
+      // only reaches here with a NON-empty bound, and silently turning one into zero
+      // bytes would read downstream as "no bound" and restart the page.
+      const size_t start = bound.find_first_not_of(" \t\n\r");
+      SYS_ASSERT(start != std::string::npos, chain::contract_table_query_exception,
+                 "Table {} bound is entirely whitespace", p.table);
+      const std::string body = bound.substr(start);
+      if (p.json && body.starts_with('{')) {
          SYS_ASSERT(bound_key_shapes, chain::contract_table_query_exception,
                     "Table {} key type is not representable as a JSON bound; use hex bounds", p.table);
-         auto lb_var = fc::json::from_string(effective_lower);
-         lb_bytes = chain::be_key_codec::encode_key(lb_var, *bound_key_shapes);
-      } else {
-         auto v = fc::from_hex(effective_lower);
-         lb_bytes.assign(reinterpret_cast<const char*>(v.data()),
-                         reinterpret_cast<const char*>(v.data()) + v.size());
+         out.bytes = chain::be_key_codec::encode_key(fc::json::from_string(body), *bound_key_shapes);
+         return out;
       }
+      // fc::from_hex trims the tag itself; this only has to NOTICE it — and only under
+      // json=true, because a json=false bound has always been the complete key whether
+      // or not it carries the prefix, and that meaning must not change here.
+      const std::string hex = fc::trim_hex_prefix(body);
+      out.absolute          = p.json && hex.size() != body.size();
+      const auto v          = fc::from_hex(hex);
+      out.bytes.assign(v.begin(), v.end());
+      // The tag identifies the CARRIER; it does not prove these caller-supplied bytes
+      // belong to the scope this request named. Skipping the prefix on an unchecked
+      // absolute bound is a scope bypass: `scope=B` with a bound naming scope A seeks
+      // into A while the default upper bound is still the end of B, so the scan walks
+      // every scope in between; a bare `0x` decodes to nothing and starts at the front
+      // of the table. `find` shares this path, so it escapes its own scope the same way.
+      //
+      // Rejected rather than clamped — a bound naming another scope is a caller error,
+      // and quietly returning a different range is how that stays invisible.
+      if (out.absolute && !scope_prefix_bytes.empty()) {
+         SYS_ASSERT(out.bytes.size() >= scope_prefix_bytes.size()
+                       && std::equal(scope_prefix_bytes.begin(), scope_prefix_bytes.end(),
+                                     out.bytes.begin()),
+                    chain::contract_table_query_exception,
+                    "Table {} bound '{}' is outside scope {}", p.table, bound, p.scope);
+      }
+      return out;
+   };
+
+   std::vector<char> lb_bytes;
+   bool              lb_absolute = false;
+   if (!effective_lower.empty()) {
+      auto parsed = parse_bound(effective_lower);
+      lb_bytes    = std::move(parsed.bytes);
+      lb_absolute = parsed.absolute;
    }
    std::vector<char> ub_bytes;
+   bool              ub_absolute = false;
    bool has_upper = !effective_upper.empty();
    if (has_upper) {
-      if (p.json) {
-         SYS_ASSERT(bound_key_shapes, chain::contract_table_query_exception,
-                    "Table {} key type is not representable as a JSON bound; use hex bounds", p.table);
-         auto ub_var = fc::json::from_string(effective_upper);
-         ub_bytes = chain::be_key_codec::encode_key(ub_var, *bound_key_shapes);
-      } else {
-         auto v = fc::from_hex(effective_upper);
-         ub_bytes.assign(reinterpret_cast<const char*>(v.data()),
-                         reinterpret_cast<const char*>(v.data()) + v.size());
-      }
+      auto parsed = parse_bound(effective_upper);
+      ub_bytes    = std::move(parsed.bytes);
+      ub_absolute = parsed.absolute;
    }
 
    // For find: upper bound must be exclusive, so increment the encoded bytes
@@ -2647,8 +2706,12 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
             scoped.insert(scoped.end(), bound.begin(), bound.end());
             return scoped;
          };
-         if (!lb_bytes.empty()) lb_bytes = prepend_scope_sec(lb_bytes);
-         if (has_upper)         ub_bytes = prepend_scope_sec(ub_bytes);
+         // Keyed on whether a bound was SUPPLIED, not on its decoded byte length: a
+         // supplied bound that decodes to zero bytes still needs the prefix, or the
+         // scan starts at the front of the table instead of this scope. A raw cursor
+         // is exempt — it already carries the scope.
+         if (!effective_lower.empty() && !lb_absolute) lb_bytes = prepend_scope_sec(lb_bytes);
+         if (has_upper && !ub_absolute)                ub_bytes = prepend_scope_sec(ub_bytes);
       }
    } else if (!resolved_index_name.empty()) {
       // Secondary index on an unscoped kv::table: nothing to prepend.
@@ -2661,9 +2724,12 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
             memcpy(scoped.data() + scope_prefix_bytes.size(), bound.data(), bound.size());
          return scoped;
       };
-      lb_bytes = lb_bytes.empty() ? scope_prefix_bytes : prepend_scope(lb_bytes);
+      // A raw cursor is exempt from both: it is already the complete stored key.
+      if (!lb_absolute)
+         lb_bytes = effective_lower.empty() ? scope_prefix_bytes : prepend_scope(lb_bytes);
       if (has_upper) {
-         ub_bytes = prepend_scope(ub_bytes);
+         if (!ub_absolute)
+            ub_bytes = prepend_scope(ub_bytes);
       } else {
          // No upper bound: iterate the full scope prefix range.
          // Create an exclusive upper bound by incrementing the scope prefix.
@@ -2737,26 +2803,30 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          return r;
       };
 
-      // Format a secondary-index `next_key` value. When `p.json` is set, emit
-      // a JSON object matching the bound syntax (e.g. `{"byowner":"u4"}`) so
-      // `upper_bound = next_key` round-trips through the bound parser, which
-      // expects JSON when `p.json` is set. Otherwise emit hex of the raw sk
-      // bytes. Falls back to hex on any decode failure.
+      // Format a secondary-index `next_key` value. When `p.json` is set, emit a JSON
+      // object matching the bound syntax (e.g. `{"byowner":"u4"}`) so
+      // `upper_bound = next_key` round-trips through the bound parser, which expects
+      // JSON when `p.json` is set. A key the codec cannot NAME falls back to a raw
+      // cursor, which that parser feeds back verbatim — so next_key is always feedable.
       auto emit_secondary_next_key = [&](std::string_view sk) {
          if (p.json) {
             try {
+               // The shape describes the WITHIN-SCOPE fields, so the decode sees the
+               // remainder; the raw fallback below still carries the whole key.
                std::string_view sv = sk;
                if (!scope_prefix_bytes.empty() && sv.size() >= scope_prefix_bytes.size()) {
                   sv.remove_prefix(scope_prefix_bytes.size());
                }
-               FC_ASSERT(bound_key_shapes, "be_key_codec: key shape unresolved (unrepresentable key type); falling back to hex");
+               FC_ASSERT(bound_key_shapes, "be_key_codec: key shape unresolved");
                auto key_var = chain::be_key_codec::decode_key(sv.data(), sv.size(), *bound_key_shapes);
                hp.next_key = fc::json::to_string(key_var, fc::time_point::maximum());
                return;
             } catch (...) {
-               // fall through to hex
+               hp.next_key = to_raw_cursor(sk);
+               return;
             }
          }
+         // json=false takes the stored key verbatim on the way back in.
          hp.next_key = fc::to_hex(sk.data(), sk.size());
       };
 
@@ -2837,6 +2907,7 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       return [p = std::move(hp), abi = std::move(abi), table_name = p.table,
               key_shapes = std::move(key_shapes),
               scope_key_count,
+              scope_prefix_size = scope_prefix_bytes.size(),
               abi_serializer_max_time = abi_serializer_max_time,
               shorten_abi_errors = shorten_abi_errors,
               all_rows    = p.all_rows,
@@ -2855,13 +2926,29 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
             fc::mutable_variant_object obj;
             // For secondary queries, decode the primary key as the key field
             if (p.json) {
+               // A key the codec cannot name comes back as bare hex — the same escape
+               // every other undecodable ABI value uses. It is exact (hex IS the raw
+               // bytes) and the json=true bound parser accepts it back, so next_key
+               // stays feedable.
                try {
-                  FC_ASSERT(key_shapes, "be_key_codec: key shape unresolved (unrepresentable key type); falling back to hex");
+                  FC_ASSERT(key_shapes, "be_key_codec: key shape unresolved");
                   auto full_key = chain::be_key_codec::decode_key(
                      row.key.data(), row.key.size(), *key_shapes);
                   obj["key"] = strip_scope_fields(std::move(full_key), scope_key_count);
                } catch (...) {
-                  obj["key"] = fc::to_hex(row.key.data(), row.key.size());
+                  // strip_scope_fields drops the scope on the JSON path, so the hex
+                  // form is scope-relative too and the two describe the same key.
+                  // Untagged hex still means "within the scope", so it remains
+                  // feedable as a bound.
+                  //
+                  // Except when the remainder is EMPTY — a row whose whole key is the
+                  // scope prefix. "" reads as no bound at all, so the displayed key
+                  // would not be replayable; emit the tagged complete key instead,
+                  // which is (see to_raw_cursor).
+                  obj["key"] = row.key.size() == scope_prefix_size
+                                  ? to_raw_cursor(std::string_view(row.key.data(), row.key.size()))
+                                  : fc::to_hex(row.key.data() + scope_prefix_size,
+                                               row.key.size() - scope_prefix_size);
                }
             } else {
                obj["key"] = fc::to_hex(row.key.data(), row.key.size());
@@ -2916,21 +3003,23 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       const auto& key = page.resume;
       if (p.json) {
          try {
-            FC_ASSERT(key_shapes, "be_key_codec: unresolved key shape; falling back to hex");
+            FC_ASSERT(key_shapes, "be_key_codec: key shape unresolved");
             auto full_key = chain::be_key_codec::decode_key(key.data(), key.size(), *key_shapes);
             hp.next_key = fc::json::to_string(strip_scope_fields(std::move(full_key), scope_key_count),
                                              fc::time_point::maximum());
          } catch (...) {
-            hp.next_key = fc::to_hex(key.data(), key.size());
+            hp.next_key = to_raw_cursor(std::string_view(key.data(), key.size()));
          }
       } else {
-         hp.next_key = fc::to_hex(key.data(), key.size());
+         // json=false takes the stored key verbatim on the way back in.
+         hp.next_key = fc::to_hex(key.data(), static_cast<uint32_t>(key.size()));
       }
    }
 
    return [hp = std::move(hp), abi = std::move(abi), tbl_name = p.table,
            key_shapes = std::move(key_shapes),
            scope_key_count,
+           scope_prefix_size = scope_prefix_bytes.size(),
            abi_serializer_max_time = abi_serializer_max_time,
            shorten_abi_errors = shorten_abi_errors,
            all_rows    = p.all_rows,
@@ -2946,15 +3035,22 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       for (auto& row : hp.rows) {
          fc::mutable_variant_object obj;
 
-         // Decode key -- fall back to hex if BE decode fails
+         // Decode key -- a key the codec cannot name falls back to hex, which the
+         // json=true bound parser accepts back verbatim.
          if (hp.json) {
             try {
-               FC_ASSERT(key_shapes, "be_key_codec: key shape unresolved (unrepresentable key type); falling back to hex");
+               FC_ASSERT(key_shapes, "be_key_codec: key shape unresolved");
                auto full_key = chain::be_key_codec::decode_key(
                   row.key.data(), row.key.size(), *key_shapes);
                obj("key", strip_scope_fields(std::move(full_key), scope_key_count));
             } catch (...) {
-               obj("key", fc::to_hex(row.key.data(), static_cast<uint32_t>(row.key.size())));
+               // Scope-relative, matching strip_scope_fields on the JSON path -- except
+               // when the remainder is EMPTY, where "" would read as no bound and the
+               // displayed key would not be replayable. See the secondary path above.
+               obj("key", row.key.size() == scope_prefix_size
+                             ? to_raw_cursor(std::string_view(row.key.data(), row.key.size()))
+                             : fc::to_hex(row.key.data() + scope_prefix_size,
+                                          static_cast<uint32_t>(row.key.size() - scope_prefix_size)));
             }
          } else {
             obj("key", fc::to_hex(row.key.data(), static_cast<uint32_t>(row.key.size())));

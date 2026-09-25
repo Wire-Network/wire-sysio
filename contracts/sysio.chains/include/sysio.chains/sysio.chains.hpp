@@ -6,7 +6,7 @@
 #include <sysio/system.hpp>
 #include <sysio/privileged.hpp>
 #include <sysio/opp/types/types.pb.hpp>
-#include <sysio.opp.common/slug_name.hpp>
+#include <sysio/slug_name.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 
 namespace sysio {
@@ -76,8 +76,10 @@ namespace sysio {
       /// inline; else `active=false`.
       ///
       /// Validation:
-      ///  * `code` slug_name format already enforced by the type itself at
-      ///     deserialization (alphabet `[A-Z0-9_]+`, ≤8 chars).
+      ///  * `code` canonicality is enforced by the WRITER guard, not by the type:
+      ///     reflected/raw action deserialization writes the packed member directly
+      ///     and validates nothing. A spelling supplied as a string goes through the
+      ///     validating constructor (`[A-Z][A-Z0-9_]{0,7}`); a raw uint64 does not.
       ///  * `code` must be unique.
       ///  * `kind=WIRE` may appear at most once (the depot self-row).
       ///  * `kind=EVM` rows must carry a unique `external_chain_id` — the pair

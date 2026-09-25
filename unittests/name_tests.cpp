@@ -281,20 +281,65 @@ BOOST_AUTO_TEST_CASE(name_suffix_additional_tests) {
    BOOST_CHECK_EQUAL( name{"sys.ioa.cco"}.suffix(), name{"cco"} );
 }
 
+// The literal path and the runtime constructor share ONE algorithm
+// (fc::basic_name::validity_error), so they must agree on every input. Before
+// they were unified they did not: "abcdefghijklm"_n compiled and packed as
+// "abcdefghijkl2" while name{"abcdefghijklm"} threw, and "sysio."_n compiled as
+// "sysio" while name{"sysio."} threw. This pins the agreement.
+BOOST_AUTO_TEST_CASE(literal_and_runtime_validation_agree)
+{
+   // Rejected by BOTH paths. (The literal rejection is a compile error, so it
+   // cannot be asserted here — these pin the predicate the literal's
+   // static_assert uses, alongside the runtime throw.)
+   for (std::string_view bad : { "abcdefghijklm",   // 13th symbol past 'j'
+                                 "abcdefghijklmn",  // too long
+                                 "sysio.",          // trailing pad
+                                 ".",               // pad only
+                                 "SYSIO",           // out of alphabet
+                                 "sysio6",          // '6' is not in .12345a-z
+                                 "a-b",             // punctuation
+                                 "hello world",     // space
+                                 "aaaaaaaaaaaak" }) { // 13th symbol 'k' (16) > 15
+      BOOST_CHECK_MESSAGE(!name::is_valid_literal(bad),
+                          std::string{"should not be a valid literal: "} + std::string{bad});
+      BOOST_CHECK_THROW(name{bad}, name_type_exception);
+   }
+
+   // Accepted by BOTH paths, and pack() is lossless for every one of them —
+   // which is what lets the constructor drop its round-trip check.
+   for (std::string_view good : { "", "e", "sysio", "abc.xyz", "abc.xyz.qrt",
+                                  "abcdefghijkl", "abcdefghijklj", ".sysio",
+                                  "uwrit.alice", "zzzzzzzzzzzz", ".12345",
+                                  "abcdefghij.15" }) {
+      BOOST_CHECK_MESSAGE(name::is_valid_literal(good),
+                          std::string{"should be a valid literal: "} + std::string{good});
+      BOOST_CHECK_NO_THROW(name{good});
+      BOOST_CHECK_EQUAL(name{good}.to_string(), std::string{good});
+   }
+
+   // The spellings that collapse still pack the way they always did — the
+   // encoding is unchanged, only the spellings we accept are.
+   BOOST_CHECK_EQUAL(name{name::pack("sysio.")},        "sysio"_n);
+   BOOST_CHECK_EQUAL(name{name::pack(".")},             ""_n);
+   BOOST_CHECK_EQUAL(name{name::pack("abcdefghijklm")}, "abcdefghijkl2"_n);
+}
+
 BOOST_AUTO_TEST_CASE(name_prefix_tests)
 {
    BOOST_CHECK_EQUAL("e"_n.prefix(), "e"_n);
    BOOST_CHECK_EQUAL(""_n.prefix(), ""_n);
-   BOOST_CHECK_EQUAL("abcdefghijklm"_n.prefix(), "abcdefghijklm"_n);
+   BOOST_CHECK_EQUAL("abcdefghijklj"_n.prefix(), "abcdefghijklj"_n);
    BOOST_CHECK_EQUAL("abcdefghijkl"_n.prefix(), "abcdefghijkl"_n);
    BOOST_CHECK_EQUAL("abc.xyz"_n.prefix(), "abc"_n);
    BOOST_CHECK_EQUAL("abc.xyz.qrt"_n.prefix(), "abc.xyz"_n);
-   BOOST_CHECK_EQUAL("."_n.prefix(), ""_n);
+   // "." is not a valid literal: it spells the pad symbol, which packs to 0.
+   // Construct it from the packed value so the collapse is stated, not implied.
+   BOOST_CHECK_EQUAL(name{name::pack(".")}.prefix(), ""_n);
 
    BOOST_CHECK_EQUAL("sysio.any"_n.prefix(), "sysio"_n);
    BOOST_CHECK_EQUAL("sysio"_n.prefix(), "sysio"_n);
    BOOST_CHECK_EQUAL("sysio"_n.prefix(), config::system_account_name);
-   BOOST_CHECK_EQUAL("sysio."_n.prefix(), "sysio"_n);
+   BOOST_CHECK_EQUAL(name{name::pack("sysio.")}.prefix(), "sysio"_n);
    BOOST_CHECK_EQUAL("sysio.evm"_n.prefix(), "sysio"_n);
    BOOST_CHECK_EQUAL(".sysio"_n.prefix(), ""_n);
    BOOST_CHECK_NE("sysi"_n.prefix(), "sysio"_n);

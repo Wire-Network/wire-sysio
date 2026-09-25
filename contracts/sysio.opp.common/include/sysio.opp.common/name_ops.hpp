@@ -23,7 +23,6 @@
  */
 
 #include <sysio/name.hpp>
-#include <sysio.opp.common/safe_ops.hpp>   // is_valid_name_string
 #include <optional>
 #include <string_view>
 
@@ -32,23 +31,29 @@ namespace sysio::opp::safe {
 /// Parse an inbound account string into a validated `sysio::name`, or
 /// `std::nullopt` when the string is empty or not a canonical account name.
 ///
-/// Validation is delegated to `is_valid_name_string`, which mirrors CDT
-/// `basic_name`'s charset, length, and final-symbol rules exactly, so the returned
-/// `name{s}` is guaranteed to construct without aborting — in particular a
-/// legitimate 13-byte name is accepted where a naive `size() > 12` cap would
-/// wrongly reject it. Callers on the OPP dispatch path MUST treat `std::nullopt`
-/// as "drop this message" and `return`, never as a reason to `check()`-abort.
+/// Validation is delegated to `name::is_valid_literal` — the type's OWN predicate,
+/// the one its constructor and its `_n` literal use — so it cannot drift from what
+/// the constructor accepts. A legitimate 13-byte name whose final symbol fits the
+/// 4-bit final slot is accepted, where a naive `size() > 12` cap would wrongly
+/// reject it. Callers on the OPP dispatch path MUST treat `std::nullopt` as "drop
+/// this message" and `return`, never as a reason to `check()`-abort.
 ///
 /// @param s the candidate account string (no leading/trailing trimming).
 /// @return the constructed `name` iff `s` is a nonempty canonical account name.
 inline std::optional<sysio::name> parse_wire_account_name(std::string_view s) {
-   if (s.empty() || !is_valid_name_string(s)) return std::nullopt;
-   const sysio::name parsed{s};
-   // CDT's numeric name encoding discards trailing dots. Require the exact
-   // round trip so aliases such as `underwriter.` cannot name the same roster
-   // principal differently on the depot and on different outpost runtimes.
-   if (parsed.to_string() != s) return std::nullopt;
-   return parsed;
+   // ASK FIRST, CONSTRUCT SECOND. `name`'s constructor aborts on any spelling it
+   // will not accept, and an abort on this path reverts the whole
+   // evalcons/apply_consensus delivery — so the candidate is never handed to the
+   // constructor until it is known good.
+   //
+   // `is_valid_literal` is the type's OWN validation predicate, the same one its
+   // constructor and its `_n` literal use, so this cannot drift from what the
+   // constructor accepts. It subsumes both checks this helper used to make by
+   // hand: the charset/length mirror, AND the round trip that rejected aliases
+   // like `underwriter.` (a trailing dot is discarded by the encoding, so it
+   // would otherwise name the same roster principal two ways).
+   if (s.empty() || !sysio::name::is_valid_literal(s)) return std::nullopt;
+   return sysio::name{s};
 }
 
 } // namespace sysio::opp::safe

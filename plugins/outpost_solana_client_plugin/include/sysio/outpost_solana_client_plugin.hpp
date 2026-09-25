@@ -199,7 +199,7 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
       , vault_pda(fc::network::solana::system::find_program_address(
            {std::vector<uint8_t>{'o','u','t','p','o','s','t','_','v','a','u','l','t'}},
            prog_id).first)
-      // v6: SOL outpost reserve aggregate is seeded with b"reserve_aggregate"
+      // SOL outpost reserve aggregate is seeded with b"reserve_aggregate"
       // (see `RESERVE_AGGREGATE_SEED` in programs/opp-outpost/src/state/reserve.rs).
       // Previously this used b"outpost_reserve" which derived to a non-existent
       // PDA → epoch_in's `reserve_aggregate` account validation failed with

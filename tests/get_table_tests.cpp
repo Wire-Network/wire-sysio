@@ -453,11 +453,17 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
    push_action("test"_n, "addhashobj"_n, "test"_n, mutable_variant_object()("hashinput", "firstinput"));
    push_action("test"_n, "addhashobj"_n, "test"_n, mutable_variant_object()("hashinput", "secondinput"));
    push_action("test"_n, "addhashobj"_n, "test"_n, mutable_variant_object()("hashinput", "thirdinput"));
-   // structobjs: kv::table keyed by the reflected struct slug_name{value} — the
-   // sysio.chains `chains` key shape. Drives the struct-key path in (sec-10).
+   // structobjs: kv::table keyed by the reflected struct composite_key{value}.
+   // Drives the struct-key expansion path in (sec-10).
    push_action("test"_n, "addstruct"_n, "test"_n, mutable_variant_object()("code", 10)("payload", 100));
    push_action("test"_n, "addstruct"_n, "test"_n, mutable_variant_object()("code", 20)("payload", 200));
    push_action("test"_n, "addstruct"_n, "test"_n, mutable_variant_object()("code", 30)("payload", 300));
+   // slugobjs: kv::table keyed on `slug_name`, the shape every registry table
+   // ships. The code is written as its canonical string — `slug_name` is an ABI
+   // builtin, so that string IS the action's wire form. Drives (sec-11).
+   push_action("test"_n, "addslug"_n, "test"_n, mutable_variant_object()("code", "ETH")("payload", 100));
+   push_action("test"_n, "addslug"_n, "test"_n, mutable_variant_object()("code", "SOL")("payload", 200));
+   push_action("test"_n, "addslug"_n, "test"_n, mutable_variant_object()("code", "WIRE")("payload", 300));
    produce_block();
 
    // The result of the init will populate
@@ -748,15 +754,14 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
    }
 
    // (sec-10) structobjs primary key — kv::table keyed by the reflected struct
-   //          `slug_name { value: uint64 }`, the exact key shape of the v6
-   //          registry tables (sysio.chains `chains`, key_types ["slug_name"]).
+   //          `composite_key { value: uint64 }`.
    //          Exercises the ABI-aware BE key codec's struct-key expansion on the
    //          live get_table_rows path: a JSON bound of the documented nested
    //          `{ "code": { "value": N } }` form (encode_key), and a `next_key`
    //          pagination cursor that round-trips that same nested shape
    //          (decode_key -> next_key -> encode_key). Before the codec became
    //          ABI-aware, any JSON bound here asserted
-   //          "Unsupported BE key type: slug_name".
+   //          "Unsupported BE key type: composite_key".
    {
       // (a) JSON bound of the documented nested struct shape filters inclusively.
       chain_apis::read_only::get_table_rows_params p;
@@ -797,6 +802,304 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
       BOOST_REQUIRE_EQUAL(page2.more, false);
       BOOST_CHECK_EQUAL(page2.rows[0].get_object()["value"].get_object()["code"].get_object()["value"].as_uint64(), 30u);
       BOOST_CHECK_EQUAL(page2.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 300u);
+   }
+
+   // (sec-11) slugobjs primary key — kv::table keyed on `slug_name`, the shape
+   //          every registry table ships. `slug_name` is an ABI builtin, so
+   //          build_key_shape takes the LEAF branch and the carrier is the
+   //          canonical STRING at every boundary: the decoded key, the row
+   //          value, a JSON bound, and the `next_key` cursor. (sec-10) covers
+   //          the struct-node path; the leaf resolves through a different lookup
+   //          (leaf_kind_of, before the struct table) and needs its own
+   //          end-to-end pin.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json  = true;
+      p.code  = "test"_n;
+      // slugobjs is unscoped, exactly like structobjs above — no `scope` is set.
+      p.table = "slugobjs";
+
+      // (a) Both the decoded key and the row value render the canonical string.
+      //     A hex `key` here means the per-row decode threw and fell back.
+      auto all = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(all.rows.size(), 3u);
+      BOOST_REQUIRE(all.rows[0].get_object()["key"].get_object()["code"].is_string());
+      BOOST_CHECK_EQUAL(all.rows[0].get_object()["key"].get_object()["code"].as_string(), "ETH");
+      BOOST_CHECK_EQUAL(all.rows[0].get_object()["value"].get_object()["code"].as_string(), "ETH");
+      BOOST_CHECK_EQUAL(all.rows[1].get_object()["value"].get_object()["code"].as_string(), "SOL");
+      BOOST_CHECK_EQUAL(all.rows[2].get_object()["value"].get_object()["code"].as_string(), "WIRE");
+
+      // (b) A bare-string JSON bound filters inclusively — no nested object, no
+      //     packed integer. MSB-first packing makes key order follow the
+      //     alphabet, so ETH < SOL < WIRE holds in the stored bytes too.
+      p.lower_bound = R"({"code":"SOL"})";
+      auto bounded = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(bounded.rows.size(), 2u); // SOL, WIRE
+      BOOST_CHECK_EQUAL(bounded.rows[0].get_object()["value"].get_object()["code"].as_string(), "SOL");
+      BOOST_CHECK_EQUAL(bounded.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 200u);
+
+      // (c) Pagination: `next_key` carries the same string spelling and is fed
+      //     back verbatim as the next bound.
+      p.lower_bound.clear();
+      p.limit = 2;
+      auto page1 = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(page1.rows.size(), 2u);
+      BOOST_REQUIRE_EQUAL(page1.more, true);
+      BOOST_REQUIRE(!page1.next_key.empty());
+      BOOST_CHECK_EQUAL(page1.rows[0].get_object()["value"].get_object()["code"].as_string(), "ETH");
+      BOOST_CHECK_EQUAL(page1.rows[1].get_object()["value"].get_object()["code"].as_string(), "SOL");
+
+      auto nk = fc::json::from_string(page1.next_key);
+      BOOST_REQUIRE(nk.is_object());
+      BOOST_REQUIRE(nk.get_object()["code"].is_string());
+      BOOST_CHECK_EQUAL(nk.get_object()["code"].as_string(), "WIRE");
+
+      p.lower_bound = page1.next_key;
+      p.limit       = 50;
+      auto page2 = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(page2.rows.size(), 1u);
+      BOOST_REQUIRE_EQUAL(page2.more, false);
+      BOOST_CHECK_EQUAL(page2.rows[0].get_object()["value"].get_object()["code"].as_string(), "WIRE");
+      BOOST_CHECK_EQUAL(page2.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 300u);
+
+      // (d) A key with NO canonical spelling renders as a RAW CURSOR — the `0x` tag
+      //     plus the hex of the whole stored key — and that is accepted straight
+      //     back as a json=true bound, so a cursor landing on one still resumes
+      //     exactly. This is the property pagination needs (encode(decode(key)) ==
+      //     key), and naming such a key could not provide it: slug_name's to_string
+      //     is not injective over raw uint64s.
+      //
+      //     Stored through the transitional object carrier, the only writer left
+      //     that can express a raw value. 34<<42 is the packed former spelling
+      //     "7", which the leading-letter rule now rejects; char[0] = 34 sorts it
+      //     after 'W', so it lands last.
+      push_action("test"_n, "addslug"_n, "test"_n, mutable_variant_object()
+         ("code", mutable_variant_object()("value", uint64_t{34} << 42))("payload", 400));
+
+      p.lower_bound.clear();
+      p.limit = 3;
+      auto pageA = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(pageA.rows.size(), 3u);
+      BOOST_REQUIRE_EQUAL(pageA.more, true);
+      // A tagged raw cursor, not a JSON key object -- the leaf refused to name it.
+      // Unscoped, so the whole key IS the 8-byte slug: 34<<42 = 0000880000000000.
+      BOOST_CHECK_EQUAL(pageA.next_key, "0x0000880000000000");
+
+      p.lower_bound = pageA.next_key;
+      p.limit       = 50;
+      auto pageB = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(pageB.rows.size(), 1u);
+      BOOST_CHECK_EQUAL(pageB.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 400u);
+      // Its own `key` is hex for the same reason...
+      BOOST_CHECK(pageB.rows[0].get_object()["key"].is_string());
+      // ...while the row VALUE still renders, lossily, through the TOTAL
+      //    fc::slug_name::to_variant. A display cell may be lossy; a resume
+      //    token may not, and that asymmetry is deliberate.
+      BOOST_CHECK_EQUAL(pageB.rows[0].get_object()["value"].get_object()["code"].as_string(), "7");
+
+      // Reverse pagination over the same boundary resumes exactly too.
+      p.lower_bound.clear();
+      p.reverse = true;
+      p.limit   = 1;
+      auto revA = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(revA.rows.size(), 1u);
+      BOOST_REQUIRE_EQUAL(revA.more, true);
+      BOOST_CHECK_EQUAL(revA.next_key, "0x0000880000000000");
+      BOOST_CHECK_EQUAL(revA.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 400u);
+
+      p.upper_bound = revA.next_key;
+      p.limit       = 50;
+      auto revB = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(revB.rows.size(), 3u); // WIRE, SOL, ETH
+      BOOST_CHECK_EQUAL(revB.rows[0].get_object()["value"].get_object()["code"].as_string(), "WIRE");
+      p.reverse = false;
+      p.upper_bound.clear();
+   }
+
+   // (sec-11e) SCOPED slug-keyed table. A raw cursor carries the COMPLETE stored
+   //           key and the bound parser feeds it back verbatim, so the scope prefix
+   //           is neither stripped on the way out nor re-added on the way in.
+   //           Unscoped (sec-11d) cannot catch a mistake here — there is no prefix
+   //           to double or drop.
+   {
+      const uint64_t sc = chain::name("sc1").to_uint64_t();
+      // `alt` is the SLUG-typed secondary (`byalt`). It mirrors `code`'s canonicality
+      // so the same boundary row is un-nameable on both the primary and the secondary
+      // cursor; `bypayload` is a uint64 and always decodes, so it cannot reach either.
+      push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
+         ("scope", sc)("code", "ETH")("payload", 10)("alt", "AAA"));
+      push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
+         ("scope", sc)("code", "SOL")("payload", 20)("alt", "BBB"));
+      push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
+         ("scope", sc)("code", "WIRE")("payload", 30)("alt", "CCC"));
+      // The un-nameable one, stored through the transitional object carrier.
+      // 34<<42 is the packed former spelling "7"; char[0] = 34 sorts it last.
+      push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
+         ("scope", sc)("code", mutable_variant_object()("value", uint64_t{34} << 42))
+         ("payload", 40)("alt", mutable_variant_object()("value", uint64_t{34} << 42)));
+
+      chain_apis::read_only::get_table_rows_params p;
+      p.json  = true;
+      p.code  = "test"_n;
+      p.scope = "sc1";
+      p.table = "sslugobjs";
+
+      // Forward: page across the boundary onto the un-nameable key.
+      p.limit = 3;
+      auto pageA = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(pageA.rows.size(), 3u);
+      BOOST_REQUIRE_EQUAL(pageA.more, true);
+      // The tagged ABSOLUTE key: "0x" + scope name("sc1") + slug 34<<42. A cursor
+      // carrying only the within-scope remainder would be "0x0000880000000000",
+      // and the parser — which no longer re-prefixes a tagged bound — would seek
+      // into the wrong scope entirely.
+      BOOST_CHECK_EQUAL(pageA.next_key, "0xc2020000000000000000880000000000");
+
+      p.lower_bound = pageA.next_key;
+      p.limit       = 50;
+      auto pageB = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(pageB.rows.size(), 1u);
+      BOOST_CHECK_EQUAL(pageB.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 40u);
+
+      // Reverse over the same boundary.
+      p.lower_bound.clear();
+      p.reverse = true;
+      p.limit   = 1;
+      auto revA = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(revA.rows.size(), 1u);
+      BOOST_REQUIRE_EQUAL(revA.more, true);
+      BOOST_CHECK_EQUAL(revA.next_key, "0xc2020000000000000000880000000000");
+      BOOST_CHECK_EQUAL(revA.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 40u);
+
+      p.upper_bound = revA.next_key;
+      p.limit       = 50;
+      auto revB = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(revB.rows.size(), 3u);   // WIRE, SOL, ETH
+      BOOST_CHECK_EQUAL(revB.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 30u);
+      p.reverse = false;
+      p.upper_bound.clear();
+
+      // (sec-11f) A raw cursor is usable at its SHORTEST: bytes that are nothing
+      //           but the scope prefix. Nothing writes such a key through
+      //           kv::scoped_table, but kv_set only requires the COMPLETE key to be
+      //           nonempty, so a raw write can store one — and if a cursor ever
+      //           names it, the within-scope remainder is empty. An empty next_key
+      //           reads as "no bound" and restarts the page forever; the tag is
+      //           what keeps even this cursor nonempty and exact.
+      //
+      //           Re-prefixing it would seek to <scope><scope>, past every row.
+      p.lower_bound = "0xc202000000000000";
+      p.limit       = 50;
+      auto scopeStart = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_CHECK_EQUAL(scopeStart.rows.size(), 4u);
+      p.lower_bound.clear();
+
+      // (sec-11g) A JSON bound with leading whitespace still parses as JSON.
+      //           `fc::json::from_string` has always accepted it, so dispatching on
+      //           the first character rather than the first NON-WHITESPACE one sent
+      //           a valid bound to the hex reader, which throws on the brace.
+      p.lower_bound = "  {\"code\":\"SOL\"}";
+      auto padded = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(padded.rows.size(), 3u);   // SOL, WIRE, 7
+      BOOST_CHECK_EQUAL(padded.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 20u);
+
+      //           A bound that is ONLY whitespace is refused, not trimmed away —
+      //           turning one into zero bytes would read as "no bound" downstream
+      //           and silently restart the page.
+      p.lower_bound = "   ";
+      BOOST_CHECK_THROW(
+         get_table_rows_full(plugin, p, fc::time_point::maximum()),
+         chain::contract_table_query_exception
+      );
+      p.lower_bound.clear();
+
+      // (sec-11h) The SECONDARY cursor's raw fallback. `bypayload` is a uint64 and
+      //           always decodes, so only a SLUG-typed secondary can reach the
+      //           emitter's catch at all — `byalt` exists for that.
+      p.index_name = "byalt";
+      p.limit      = 3;
+      auto secA = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(secA.rows.size(), 3u);
+      BOOST_REQUIRE_EQUAL(secA.more, true);
+      // Absolute and tagged, exactly like the primary: "0x" + scope + the packed alt.
+      BOOST_CHECK_EQUAL(secA.next_key, "0xc2020000000000000000880000000000");
+
+      p.lower_bound = secA.next_key;
+      p.limit       = 50;
+      auto secB = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(secB.rows.size(), 1u);
+      BOOST_CHECK_EQUAL(secB.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 40u);
+      p.lower_bound.clear();
+
+      //           REVERSE on the same index. The reverse branch has its own emitter
+      //           call and names the LAST RETURNED row rather than the first unseen
+      //           one, so a forward-only test leaves exactly the half where the
+      //           earlier relative/absolute cursor defects lived.
+      p.reverse = true;
+      p.limit   = 1;
+      auto secRevA = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(secRevA.rows.size(), 1u);
+      BOOST_REQUIRE_EQUAL(secRevA.more, true);
+      BOOST_CHECK_EQUAL(secRevA.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 40u);
+      BOOST_CHECK_EQUAL(secRevA.next_key, "0xc2020000000000000000880000000000");
+
+      p.upper_bound = secRevA.next_key;
+      p.limit       = 50;
+      auto secRevB = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(secRevB.rows.size(), 3u);   // CCC, BBB, AAA
+      BOOST_CHECK_EQUAL(secRevB.rows[0].get_object()["value"].get_object()["payload"].as_uint64(), 30u);
+      p.upper_bound.clear();
+      p.reverse = false;
+      p.index_name.clear();
+
+      // (sec-11i) A raw cursor is a CARRIER tag, not proof of provenance. An absolute
+      //           bound naming a different scope must be refused, not silently
+      //           honoured -- seeking into scope A while the default upper bound is
+      //           still the end of B returns every scope in between. Same for a bound
+      //           too short to carry a scope at all, and for `find`, which feeds both
+      //           bounds from one value.
+      const std::string other_scope_cursor = "0xc302000000000000" "0000154200000000";
+      for (const std::string& bad : { other_scope_cursor,   // names another scope
+                                      std::string("0x"),    // no bytes at all
+                                      std::string("0xc2020000") }) {   // truncated prefix
+         p.lower_bound = bad;
+         BOOST_CHECK_THROW(
+            get_table_rows_full(plugin, p, fc::time_point::maximum()),
+            chain::contract_table_query_exception
+         );
+         p.lower_bound.clear();
+
+         p.upper_bound = bad;
+         BOOST_CHECK_THROW(
+            get_table_rows_full(plugin, p, fc::time_point::maximum()),
+            chain::contract_table_query_exception
+         );
+         p.upper_bound.clear();
+
+         p.find = bad;
+         BOOST_CHECK_THROW(
+            get_table_rows_full(plugin, p, fc::time_point::maximum()),
+            chain::contract_table_query_exception
+         );
+         p.find.clear();
+
+         // ...and the same three on the secondary path.
+         p.index_name  = "byalt";
+         p.lower_bound = bad;
+         BOOST_CHECK_THROW(
+            get_table_rows_full(plugin, p, fc::time_point::maximum()),
+            chain::contract_table_query_exception
+         );
+         p.lower_bound.clear();
+         p.index_name.clear();
+      }
+
+      // The in-scope cursor still works, so the guard rejects provenance and not
+      // every absolute bound.
+      p.lower_bound = "0xc2020000000000000000880000000000";
+      auto stillOk = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_CHECK_EQUAL(stillOk.rows.size(), 1u);
+      p.lower_bound.clear();
    }
 
    // (sec-5) Invalid index name on multi_index — should throw, not silently
