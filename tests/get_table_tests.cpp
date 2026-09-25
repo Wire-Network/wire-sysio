@@ -1818,6 +1818,36 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_reverse_pagination_secondary_hex_test, vali
 
 } FC_LOG_AND_RETHROW()
 
+// An inverted range (upper_bound below lower_bound) is empty on every path. The reverse secondary scan walks down from
+// the upper bound to the lower one, so an inverted range used to start it below its stop; when that table's partition
+// comes first in the whole secondary index, the first step went off the front of the index. The account sorts before
+// every other code, so its partition does come first.
+BOOST_FIXTURE_TEST_CASE( get_kv_rows_inverted_range_test, validating_tester ) try {
+   setup_secrev(*this, "1secrev"_n);
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes,
+                                fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+
+   for (const std::string index : {"", "byowner"}) {
+      for (const bool reverse : {false, true}) {
+         BOOST_TEST_CONTEXT("index='" << index << "' reverse=" << reverse) {
+            chain_apis::read_only::get_table_rows_params p;
+            p.code        = "1secrev"_n;
+            p.table       = "users";
+            p.index_name  = index;
+            p.reverse     = reverse;
+            p.lower_bound = index.empty() ? R"({"id":4})" : R"({"byowner":"u4"})";
+            p.upper_bound = index.empty() ? R"({"id":1})" : R"({"byowner":"u1"})";
+
+            auto page = get_table_rows_kv(plugin, p, fc::time_point::maximum());
+            BOOST_CHECK(page.rows.empty());
+            BOOST_CHECK(!page.more);
+         }
+      }
+   }
+} FC_LOG_AND_RETHROW()
+
 // Test get_table_rows with index_name parameter — full secondary index query
 BOOST_FIXTURE_TEST_CASE( get_kv_rows_index_name_test, validating_tester ) try {
    produce_block();
