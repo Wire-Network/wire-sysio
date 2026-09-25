@@ -93,8 +93,10 @@ primary_scan_page capture_primary_page(const chain::controller& db, const primar
             break;
          }
          copy_row(*iterator);
-         if (iterator != begin && !budget.check && fc::time_point::now() >= budget.deadline) {
-            continuation(iterator->key_view());
+         if (!budget.check && fc::time_point::now() >= budget.deadline) {
+            // `begin` is the partition start, not `lower`, so check that the row below is still in range.
+            if (iterator != begin && std::prev(iterator)->key_view() >= lower)
+               continuation(iterator->key_view());
             break;
          }
       }

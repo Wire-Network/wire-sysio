@@ -2621,7 +2621,9 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    // json=false is hex only and unchanged — the complete stored key, untagged.
    struct parsed_bound {
       std::vector<char> bytes;
-      bool              absolute = false; ///< raw cursor: never scope-prefixed again
+      /// The bytes are already a COMPLETE stored key, scope prefix included, so they
+      /// are never prefixed again -- and must be checked to lie inside the scope.
+      bool              complete = false;
    };
    auto parse_bound = [&](const std::string& bound) {
       parsed_bound out;
@@ -2642,23 +2644,25 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          out.bytes = chain::be_key_codec::encode_key(fc::json::from_string(body), *bound_key_shapes);
          return out;
       }
-      // fc::from_hex trims the tag itself; this only has to NOTICE it — and only under
-      // json=true, because a json=false bound has always been the complete key whether
-      // or not it carries the prefix, and that meaning must not change here.
+      // Which bounds are already COMPLETE keys:
+      //   json=true  + "0x"  -> a raw cursor (fc::from_hex trims the tag itself; this
+      //                        only has to NOTICE it)
+      //   json=true  + hex   -> within-scope, like the key object
+      //   json=false         -> always complete, by the contract this PR restores
       const std::string hex = fc::trim_hex_prefix(body);
-      out.absolute          = p.json && hex.size() != body.size();
+      out.complete          = !p.json || hex.size() != body.size();
       const auto v          = fc::from_hex(hex);
       out.bytes.assign(v.begin(), v.end());
-      // The tag identifies the CARRIER; it does not prove these caller-supplied bytes
-      // belong to the scope this request named. Skipping the prefix on an unchecked
-      // absolute bound is a scope bypass: `scope=B` with a bound naming scope A seeks
-      // into A while the default upper bound is still the end of B, so the scan walks
-      // every scope in between; a bare `0x` decodes to nothing and starts at the front
-      // of the table. `find` shares this path, so it escapes its own scope the same way.
+      // A complete bound carries its own scope, so nothing prefixes it — which makes it
+      // the caller's word for where to start. Unchecked, that is a scope bypass:
+      // `scope=B` with a bound naming scope A seeks into A while the default upper
+      // bound is still the end of B, so the scan walks every scope in between; a bare
+      // `0x` decodes to nothing and starts at the front of the table. `find` shares
+      // this path, so it escapes its own scope the same way.
       //
       // Rejected rather than clamped — a bound naming another scope is a caller error,
       // and quietly returning a different range is how that stays invisible.
-      if (out.absolute && !scope_prefix_bytes.empty()) {
+      if (out.complete && !scope_prefix_bytes.empty()) {
          SYS_ASSERT(out.bytes.size() >= scope_prefix_bytes.size()
                        && std::equal(scope_prefix_bytes.begin(), scope_prefix_bytes.end(),
                                      out.bytes.begin()),
@@ -2669,19 +2673,19 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    };
 
    std::vector<char> lb_bytes;
-   bool              lb_absolute = false;
+   bool              lb_complete = false;
    if (!effective_lower.empty()) {
       auto parsed = parse_bound(effective_lower);
       lb_bytes    = std::move(parsed.bytes);
-      lb_absolute = parsed.absolute;
+      lb_complete = parsed.complete;
    }
    std::vector<char> ub_bytes;
-   bool              ub_absolute = false;
+   bool              ub_complete = false;
    bool has_upper = !effective_upper.empty();
    if (has_upper) {
       auto parsed = parse_bound(effective_upper);
       ub_bytes    = std::move(parsed.bytes);
-      ub_absolute = parsed.absolute;
+      ub_complete = parsed.complete;
    }
 
    // For find: upper bound must be exclusive, so increment the encoded bytes
@@ -2690,60 +2694,46 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       ub_bytes.push_back('\0');
    }
 
-   // When scope is set on a primary query, prepend scope prefix to bounds.
-   if (!resolved_index_name.empty() && !scope_prefix_bytes.empty()) {
-      // Secondary index keys on scoped tables (multi_index / kv_multi_index)
-      // are stored as [scope:8B BE][sec_value:N]. For json=false the caller
-      // supplies the full [scope][value] bytes via hex, but for json=true
-      // `encode_key` produced only the sec_value portion (since bound_key_names
-      // is just the index name). Prepend the scope prefix so the bound
-      // compares byte-for-byte against the stored sec_key.
-      if (p.json) {
-         auto prepend_scope_sec = [&](const std::vector<char>& bound) -> std::vector<char> {
-            std::vector<char> scoped;
-            scoped.reserve(scope_prefix_bytes.size() + bound.size());
-            scoped.insert(scoped.end(), scope_prefix_bytes.begin(), scope_prefix_bytes.end());
-            scoped.insert(scoped.end(), bound.begin(), bound.end());
-            return scoped;
-         };
-         // Keyed on whether a bound was SUPPLIED, not on its decoded byte length: a
-         // supplied bound that decodes to zero bytes still needs the prefix, or the
-         // scan starts at the front of the table instead of this scope. A raw cursor
-         // is exempt — it already carries the scope.
-         if (!effective_lower.empty() && !lb_absolute) lb_bytes = prepend_scope_sec(lb_bytes);
-         if (has_upper && !ub_absolute)                ub_bytes = prepend_scope_sec(ub_bytes);
-      }
-   } else if (!resolved_index_name.empty()) {
-      // Secondary index on an unscoped kv::table: nothing to prepend.
-   } else if (!scope_prefix_bytes.empty()) {
+   // Scope handling for bounds. Two INDEPENDENT jobs, and conflating them is what
+   // produced the two defects this replaces.
+   //
+   //   CONFINEMENT — an ABSENT bound on a scoped table defaults to that scope's own
+   //   range. Without it the scan walks the entire table_id partition, across every
+   //   scope. This has nothing to do with how a supplied bound is encoded, and it
+   //   applies to a secondary index exactly as it does to the primary; the secondary
+   //   branch previously skipped it, so an unbounded scoped secondary query returned
+   //   other scopes' rows.
+   //
+   //   PREFIXING — a SUPPLIED json=true bound names only the within-scope fields, so
+   //   it needs the prefix. A json=false bound is the COMPLETE stored key by contract:
+   //   it is what next_key emits, and what a caller assembles by hand (see the scoped
+   //   secondary bounds in get_kv_rows_index_name_test). A raw `0x` cursor is complete
+   //   as well. Neither is prefixed — the primary branch previously prefixed both,
+   //   which pushed a json=false resume past the end of its own scope.
+   //
+   // Secondary keys are [scope:8B BE][sec_value:N] and primary keys [scope:8B BE][key],
+   // so one prefix range bounds either.
+   if (!scope_prefix_bytes.empty()) {
       auto prepend_scope = [&](const std::vector<char>& bound) -> std::vector<char> {
-         std::vector<char> scoped(scope_prefix_bytes.size() + bound.size());
-         if (!scope_prefix_bytes.empty())
-            memcpy(scoped.data(), scope_prefix_bytes.data(), scope_prefix_bytes.size());
-         if (!bound.empty())
-            memcpy(scoped.data() + scope_prefix_bytes.size(), bound.data(), bound.size());
+         std::vector<char> scoped;
+         scoped.reserve(scope_prefix_bytes.size() + bound.size());
+         scoped.insert(scoped.end(), scope_prefix_bytes.begin(), scope_prefix_bytes.end());
+         scoped.insert(scoped.end(), bound.begin(), bound.end());
          return scoped;
       };
-      // A raw cursor is exempt from both: it is already the complete stored key.
-      if (!lb_absolute)
-         lb_bytes = effective_lower.empty() ? scope_prefix_bytes : prepend_scope(lb_bytes);
+
+      if (effective_lower.empty())
+         lb_bytes = scope_prefix_bytes;
+      else if (!lb_complete)
+         lb_bytes = prepend_scope(lb_bytes);
+
       if (has_upper) {
-         if (!ub_absolute)
+         if (!ub_complete)
             ub_bytes = prepend_scope(ub_bytes);
-      } else {
-         // No upper bound: iterate the full scope prefix range.
-         // Create an exclusive upper bound by incrementing the scope prefix.
-         ub_bytes = scope_prefix_bytes;
-         // Increment the last byte; on overflow, carry.
-         bool carried = true;
-         for (int i = static_cast<int>(ub_bytes.size()) - 1; i >= 0 && carried; --i) {
-            uint8_t b = static_cast<uint8_t>(ub_bytes[i]);
-            if (b < 0xFF) { ub_bytes[i] = static_cast<char>(b + 1); carried = false; }
-            else { ub_bytes[i] = '\0'; }
-         }
-         if (!carried) has_upper = true;
-         // If carried all the way (scope = all 0xFF), no upper bound needed —
-         // iteration will naturally stop at the table_id boundary.
+      } else if (auto scope_upper = primary_prefix_upper(scope_prefix_bytes)) {
+         // No successor (an all-0xFF prefix) leaves the scan to stop at the table_id boundary.
+         ub_bytes  = std::move(*scope_upper);
+         has_upper = true;
       }
    }
 
@@ -2832,20 +2822,23 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
 
       if (!reverse) {
          auto itr = sec_idx.lower_bound(boost::make_tuple(p.code, sec_tid, lb_sv));
+         // Shared by the loop and the deadline cut, so a cut never reports a next row past the upper bound.
+         const auto in_range = [&](const auto& it) {
+            return it != sec_idx.end() && it->code == p.code && it->table_id == sec_tid &&
+                   (!has_upper || it->sec_key_view() < ub_sv);
+         };
          uint32_t count = 0;
-         while (itr != sec_idx.end() && itr->code == p.code && itr->table_id == sec_tid) {
-            auto sk = itr->sec_key_view();
-            if (has_upper && sk >= ub_sv) break;
+         while (in_range(itr)) {
             if (count >= limit) {
                hp.more = true;
-               emit_secondary_next_key(sk);
+               emit_secondary_next_key(itr->sec_key_view());
                break;
             }
             hp.rows.push_back(fetch_primary(*itr));
             ++count;
             ++itr;
             if (fc::time_point::now() >= params_deadline) {
-               if (itr != sec_idx.end() && itr->code == p.code && itr->table_id == sec_tid) {
+               if (in_range(itr)) {
                   hp.more = true;
                   emit_secondary_next_key(itr->sec_key_view());
                }
