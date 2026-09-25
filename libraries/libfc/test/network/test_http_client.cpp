@@ -402,14 +402,15 @@ std::string keep_alive_metadata_response() {
 /**
  * Answer the metadata request on @p socket with keep-alive, then drop the connection unanswered once the next request
  * arrives on it, recording that arrival in @p request_arrived. The connection stays open until then because the
- * transport discards, rather than reuses, an idle connection whose peer has already closed it.
+ * transport discards, rather than reuses, an idle connection whose peer has already closed it. Dropping only shuts the
+ * socket down, and only once a request arrived; the close is left to the fixture, which serializes it with teardown.
  */
 void serve_metadata_then_drop_next_request(tcp::socket& socket, std::atomic_bool& request_arrived) {
-   if (!write_bytes(socket, keep_alive_metadata_response()))
+   if (!write_bytes(socket, keep_alive_metadata_response()) || read_request_header(socket).empty())
       return;
-   request_arrived = !read_request_header(socket).empty();
+   request_arrived = true;
    boost::system::error_code ec;
-   socket.close(ec);
+   socket.shutdown(tcp::socket::shutdown_both, ec);
 }
 
 /**
@@ -2514,7 +2515,6 @@ BOOST_AUTO_TEST_CASE(truncated_fixed_length_response_is_rejected_and_removed) {
       write_bytes(socket, fixed_length_header(exact_body_bytes) + "short");
       boost::system::error_code ec;
       socket.shutdown(tcp::socket::shutdown_send, ec);
-      socket.close(ec);
    });
    fc::temp_directory temp;
    const auto output = temp.path() / "truncated-fixed.bin";
