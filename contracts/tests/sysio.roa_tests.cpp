@@ -646,8 +646,10 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
 
    // verify initial conditions of ROA accounts
    control->get_resource_limits_manager().get_account_limits( "sysio"_n, ram, net, cpu );
-   const int64_t roa_sysio_ram = initial_sysio_ram + 6281267200;
-   BOOST_TEST(ram == roa_sysio_ram); // ram after all tier-1 nodeowners
+   // Registration no longer grants sysio anything (activateroa carved its share out up front), so the
+   // reslimit row is unchanged. The quota is lower by the gift each plain newaccount above drew from it.
+   const int64_t roa_sysio_ram = initial_sysio_ram;
+   BOOST_TEST(ram == roa_sysio_ram - (int64_t)(node_owners.size() - 1) * (int64_t)newaccount_ram);
    control->get_resource_limits_manager().get_account_limits( "sysio.roa"_n, ram, net, cpu );
    BOOST_TEST(ram == 157021280); // ram of roa itself
    control->get_resource_limits_manager().get_account_limits( "sysio.acct"_n, ram, net, cpu );
@@ -838,12 +840,8 @@ BOOST_FIXTURE_TEST_CASE( extend_policy_test, sysio_roa_tester ) try {
     BOOST_TEST(p["issuer"].as_string() == "alice");
     BOOST_TEST(p["bytes_per_unit"].as_string() == "104");
     BOOST_TEST(p["time_block"].as_string() == "1");
-    p = get_policy("sysio"_n, "alice"_n);
-    BOOST_TEST(p["owner"].as_string() == "sysio");
-    BOOST_TEST(p["issuer"].as_string() == "alice");
-    BOOST_TEST(p["net_weight"].as_string() == "0.0000 SYS");
-    BOOST_TEST(p["time_block"].as_string() == "4294967295");
-    BOOST_TEST(p["ram_weight"].as_string() == "301.9840 SYS");
+    // Registration writes no sysio grant policy; activateroa funded sysio's pool up front.
+    BOOST_TEST(get_policy("sysio"_n, "alice"_n).is_null());
 
     // extend policy
     extend_policy("alice"_n, "alice"_n, 42);
@@ -852,24 +850,21 @@ BOOST_FIXTURE_TEST_CASE( extend_policy_test, sysio_roa_tester ) try {
     BOOST_TEST(p["owner"].as_string() == "alice");
     BOOST_TEST(p["issuer"].as_string() == "alice");
     BOOST_TEST(p["time_block"].as_string() == "42");
-    p = get_policy("sysio"_n, "alice"_n);
-    BOOST_TEST(p["owner"].as_string() == "sysio");
-    BOOST_TEST(p["issuer"].as_string() == "alice");
-    BOOST_TEST(p["net_weight"].as_string() == "0.0000 SYS");
-    BOOST_TEST(p["time_block"].as_string() == "4294967295");
 
-    result = extend_policy("sysio"_n, "alice"_n, 42);
+    result = extend_policy("alice"_n, "alice"_n, 42);
     BOOST_REQUIRE_EQUAL(error("assertion failure with message: Cannot reduce a policies existing time_block"), result);
 
-    BOOST_CHECK_EXCEPTION(reduce_roa_policy("alice"_n, "sysio"_n, "0.0000 SYS", "0.0000 SYS", "500.0000 SYS", 0),
-                          sysio_assert_message_exception,
-                          sysio_assert_message_is("Cannot reduce policy before time_block"));
+    result = extend_policy("sysio"_n, "alice"_n, 42);
+    BOOST_REQUIRE_EQUAL(error("assertion failure with message: Policy does not exist under this issuer for this owner"), result);
 
-    expand_roa_policy("alice"_n, "sysio"_n, "0.0000 SYS", "0.0000 SYS", "500.0000 SYS", 0);
+    // A node owner may still grant sysio extra RAM voluntarily, as an ordinary RAM-only policy.
+    add_roa_policy("alice"_n, "sysio"_n, "0.0000 SYS", "0.0000 SYS", "500.0000 SYS", 0, 0);
+    expand_roa_policy("alice"_n, "sysio"_n, "0.0000 SYS", "0.0000 SYS", "1.0000 SYS", 0);
 
     p = get_policy("sysio"_n, "alice"_n);
     BOOST_TEST(p["cpu_weight"].as_string() == "0.0000 SYS");
-    BOOST_TEST(p["ram_weight"].as_string() == "801.9840 SYS");
+    BOOST_TEST(p["ram_weight"].as_string() == "501.0000 SYS");
+    BOOST_TEST(p["time_block"].as_string() == "0");
 
 } FC_LOG_AND_RETHROW()
 
@@ -1791,7 +1786,7 @@ BOOST_FIXTURE_TEST_CASE( newuser_tier2_fails, sysio_roa_full_tester ) try {
 
 // Only tier 1 is provisioned a personal policy at registration -- it is the sole tier that can call
 // newuser, whose sponsorship rows are the only writes billed to a node owner. Tiers 2 and 3 get the
-// nodeowners budget, a reslimit row, and the 10% sysio RAM grant, but no allocation of their own,
+// nodeowners budget and a reslimit row, but no allocation of their own,
 // and can still self-issue afterwards because addpolicy costs the issuer nothing.
 BOOST_FIXTURE_TEST_CASE( regnodeowner_personal_policy_is_tier1_only, sysio_roa_full_tester ) try {
    // The fixture already fills all 21 tier-1 slots, so reuse one rather than registering another.
@@ -1812,20 +1807,21 @@ BOOST_FIXTURE_TEST_CASE( regnodeowner_personal_policy_is_tier1_only, sysio_roa_f
    BOOST_TEST(get_policy("t2owner"_n, "t2owner"_n).is_null());
    BOOST_TEST(get_policy("t3owner"_n, "t3owner"_n).is_null());
 
-   // Every tier still contributes 10% of its allocation to the sysio RAM pool.
-   for (auto owner : {t1owner, "t2owner"_n, "t3owner"_n}) {
-      auto grant = get_policy("sysio"_n, owner);
-      BOOST_REQUIRE(!grant.is_null());
+   // No tier writes a sysio grant policy. Tier 1's budget is net of sysio's 1/10 share; tiers 2 and 3
+   // contribute nothing and keep their whole allocation. Launch fixture: 75,496 SYS supply.
+   const std::array<std::pair<account_name, int64_t>, 3> budgets{{
+      {t1owner, 30'198'400 - 3'019'840}, // T1: 4% of supply, less sysio's share
+      {"t2owner"_n, 1'132'440},          // T2: 0.15%
+      {"t3owner"_n, 22'649},             // T3: 0.003%
+   }};
+   for (const auto& [owner, budget] : budgets) {
+      BOOST_TEST(get_policy("sysio"_n, owner).is_null());
       auto node = get_nodeowner(owner);
       BOOST_REQUIRE(!node.is_null());
-      BOOST_TEST(grant["ram_weight"].as<asset>().get_amount()
-                 == node["total_sys"].as<asset>().get_amount() / 10);
-      BOOST_TEST(grant["net_weight"].as<asset>().get_amount() == 0);
-      BOOST_TEST(grant["cpu_weight"].as<asset>().get_amount() == 0);
+      BOOST_TEST(node["total_sys"].as<asset>().get_amount() == budget);
    }
 
-   // Tier 2/3 hold no bandwidth, and their nodeowners accounting excludes the personal weights,
-   // so the full remainder of the tier budget stays issuable.
+   // Tier 2/3 hold no bandwidth and have allocated nothing, so their whole budget stays issuable.
    for (auto owner : {"t2owner"_n, "t3owner"_n}) {
       int64_t ram, net, cpu;
       control->get_resource_limits_manager().get_account_limits(owner, ram, net, cpu);
@@ -1833,10 +1829,9 @@ BOOST_FIXTURE_TEST_CASE( regnodeowner_personal_policy_is_tier1_only, sysio_roa_f
       BOOST_TEST(cpu == 0);
 
       auto node = get_nodeowner(owner);
-      const int64_t total = node["total_sys"].as<asset>().get_amount();
       BOOST_TEST(node["allocated_bw"].as<asset>().get_amount() == 0);
-      BOOST_TEST(node["allocated_ram"].as<asset>().get_amount() == total / 10);
-      BOOST_TEST(node["allocated_sys"].as<asset>().get_amount() == total / 10);
+      BOOST_TEST(node["allocated_ram"].as<asset>().get_amount() == 0);
+      BOOST_TEST(node["allocated_sys"].as<asset>().get_amount() == 0);
    }
 
    // A tier-3 owner can still issue to itself; sysio.roa pays both the CPU/NET and the row RAM.
@@ -2658,6 +2653,41 @@ BOOST_FIXTURE_TEST_CASE( activateroa_rejects_tiny_supply, roa_unactivated_tester
 // A normal supply still activates cleanly through the same guards.
 BOOST_FIXTURE_TEST_CASE( activateroa_accepts_normal_supply, roa_unactivated_tester ) try {
    BOOST_REQUIRE_NO_THROW( activate("75496.0000 SYS", 104) );
+} FC_LOG_AND_RETHROW()
+
+// activateroa carves sysio's 1/10 share of every tier-1 slot into its pool up front, and the pools plus
+// every node-owner budget partition the supply exactly -- no bytes minted or lost.
+BOOST_FIXTURE_TEST_CASE( activateroa_carves_sysio_pool, roa_unactivated_tester ) try {
+   constexpr int64_t total_units    = 754'960'000; // 75,496.0000 SYS
+   constexpr int64_t bytes_per_unit = 104;
+   activate("75496.0000 SYS", bytes_per_unit);
+
+   auto quota = [&](account_name a) {
+      int64_t ram, net, cpu;
+      control->get_resource_limits_manager().get_account_limits(a, ram, net, cpu);
+      return ram;
+   };
+   const int64_t roa_ram   = quota(ROA);
+   const int64_t sysio_ram = quota(config::system_account_name);
+   const int64_t acct_ram  = quota("sysio.acct"_n);
+
+   // Per-slot allocation and sysio's share, by tier: {count, allocation, share}. Only tier 1 contributes.
+   constexpr std::array<std::array<int64_t, 3>, 3> tiers{{
+      {21,   30'198'400, 3'019'840},
+      {84,    1'132'440,         0},
+      {1000,     22'649,         0},
+   }};
+   int64_t carve = 0, budgets = 0;
+   for (const auto& [count, alloc, share] : tiers) {
+      carve   += count * share;
+      budgets += count * (alloc - share);
+   }
+
+   BOOST_TEST(roa_ram == 157'021'280);
+   BOOST_TEST(acct_ram == (int64_t)newaccount_ram);
+   BOOST_TEST(sysio_ram == roa_ram - acct_ram + carve * bytes_per_unit); // 6.75 GB
+   BOOST_TEST(sysio_ram == 6'752'350'696);
+   BOOST_TEST(roa_ram + sysio_ram + acct_ram + budgets * bytes_per_unit == total_units * bytes_per_unit);
 } FC_LOG_AND_RETHROW()
 
 // A supply above the bound is rejected before the tier math (total_amount * 15, leftover *

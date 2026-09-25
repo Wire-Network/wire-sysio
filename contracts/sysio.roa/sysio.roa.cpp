@@ -21,6 +21,9 @@ namespace sysio {
         /// creators, and sysio.roa is privileged, so node-owner claims must refuse them here.
         constexpr std::string_view RESERVED_SYSTEM_NAME_PREFIX = "sysio.";
 
+        /// sysio's account-creation RAM pool takes 1/10 of every tier-1 allocation, carved out at activateroa.
+        constexpr int64_t SYSIO_POOL_SHARE_DIVISOR{10};
+
         /// Maximum number of generated account names checked before newuser gives up.
         constexpr uint32_t MAX_ACCOUNT_NAME_ATTEMPTS{100};
 
@@ -75,6 +78,14 @@ namespace sysio {
             case 3: return (total_amount * 3 + 50000) / 100000;
             default: check(false, "Invalid tier"); return 0; // check() aborts; return is unreachable
         }
+    }
+
+    // The slice of one owner's tier allocation carved out for sysio's pool. Only tier 1 contributes:
+    // it is the tier that creates accounts (newuser). The owner's budget is the remainder, so
+    // activateroa's carve-out and get_allocation_for_tier always partition the same total.
+    static int64_t tier_sysio_share(uint8_t tier, int64_t total_amount) {
+        if (tier != 1) return 0;
+        return tier_sys_allocation(tier, total_amount) / SYSIO_POOL_SHARE_DIVISOR;
     }
 
     // Every policy weight must be denominated in the core SYS symbol. asset arithmetic only checks
@@ -207,6 +218,12 @@ namespace sysio {
         // Allocated sum
         int64_t allocated = t1_total + t2_total + t3_total;
 
+        // sysio's share of every tier-1 slot, registered or not. It stays inside `allocated`; the owners'
+        // budgets (get_allocation_for_tier) are the tier allocation minus this share.
+        int64_t sysio_carve = tier_sysio_share(1, total_amount) * sysiosystem::emissions::T1_MAX_NODE_OWNERS
+                            + tier_sysio_share(2, total_amount) * sysiosystem::emissions::T2_MAX_NODE_OWNERS
+                            + tier_sysio_share(3, total_amount) * sysiosystem::emissions::T3_MAX_NODE_OWNERS;
+
         // Leftover
         int64_t leftover = total_amount - allocated;
 
@@ -217,19 +234,18 @@ namespace sysio {
         // (positivity and the upper bound are already checked above), so `leftover` is non-negative.
         check(allocated <= total_amount, "Total SYS too small: node-owner reserve exceeds supply");
 
-        // Convert the leftover (SYS units) to bytes and partition it so the grand total of all
-        // reslimits stays exactly total_sys * bytes_per_unit — nothing is minted on top:
-        //   T = node-owner reserve (allocated above) + roa allocation + sysio pool.
-        // sysio.roa keeps half the leftover for its own (growing) bookkeeping tables; sysio gets
-        // the rest as THE pool that funds account creation and every other system contract's RAM
-        // (deployed via setsyscode/setsysabi, which gift the exact bytes out of this pool). Other
-        // system contracts are deliberately NOT pre-allocated here — they self-fund exactly. The
-        // only deduction is the sysio.acct account-creation bucket seed, taken out of sysio's
-        // share so it stays conserved.
+        // Partition so the grand total of all reslimits stays exactly total_sys * bytes_per_unit —
+        // nothing is minted on top:
+        //   T = node-owner budgets (allocated - sysio_carve) + roa allocation + sysio pool.
+        // sysio.roa keeps half the leftover for its own (growing) bookkeeping tables. sysio gets the
+        // other half plus sysio_carve as THE pool that funds account creation and every other system
+        // contract's RAM (setsyscode/setsysabi gift the exact bytes out of it). The sysio.acct
+        // account-creation bucket seed is taken out of sysio's share so it stays conserved.
+        // bytes_per_unit divides newaccount_ram, so these products stay far inside uint64/int64.
         uint64_t leftover_bytes = (uint64_t)leftover * bytes_per_unit;  // leftover >= 0, guarded above
         uint64_t roa_ram_bytes = leftover_bytes / 2;
         const uint64_t acct_seed_bytes = sysiosystem::newaccount_ram;
-        uint64_t sysio_gross = leftover_bytes - roa_ram_bytes;
+        uint64_t sysio_gross = leftover_bytes - roa_ram_bytes + (uint64_t)sysio_carve * bytes_per_unit;
         check(sysio_gross > acct_seed_bytes, "Leftover RAM too small for the account-creation seed");
         uint64_t sysio_ram_bytes = sysio_gross - acct_seed_bytes;
 
@@ -874,7 +890,7 @@ namespace sysio {
         check(nodeowner_count(get_self(), state.network_gen, tier) < tier_cap,
               "node owner tier cap reached");
 
-        // Get the total SYS allocation for this tier
+        // The owner's budget: the tier allocation net of sysio's carve-out
         asset total_sys_allocation = get_allocation_for_tier(tier);
 
         // Only a tier-1 owner is provisioned a personal allocation here. Tier 1 is the sole tier
@@ -905,12 +921,6 @@ namespace sysio {
         allocated_sys += personal_ram_weight;
         allocated_ram += personal_ram_weight; // RAM allocation
 
-        // 10% of total SYS goes to sysio for RAM
-        int64_t sysio_alloc_amount = total_sys_allocation.amount / 10;
-        asset sysio_allocation(sysio_alloc_amount, total_sys_allocation.symbol);
-        allocated_sys += sysio_allocation;
-        allocated_ram += sysio_allocation; // Also RAM allocation since it's for sysio policy
-
         // Minimal default net/cpu for a tier-1 owner: 0.0500 SYS each. Zero for tiers 2 and 3.
         // Adding a zero asset below is a no-op, so the nodeowners totals stay correct for every
         // tier without branching the accounting.
@@ -921,12 +931,6 @@ namespace sysio {
         policies_t policies(get_self(), owner.value);
         auto pol_key = policy_key{owner.value};
 
-        name sysio_account = "sysio"_n;
-        auto sysio_pol_key = policy_key{sysio_account.value};
-        asset zero_asset(0, state.total_sys.symbol);
-
-        // Guard the two policies independently: the sysio RAM grant is created for every tier, so
-        // it must not sit behind the presence of the tier-1-only personal policy.
         if (provision_personal && !policies.contains(pol_key)) {
             // Create personal policy
             policies.emplace(get_self(), pol_key, roa::policies{
@@ -937,20 +941,6 @@ namespace sysio {
                 .ram_weight = personal_ram_weight,
                 .bytes_per_unit = state.bytes_per_unit,
                 .time_block = 1,
-            });
-        }
-
-        if (!policies.contains(sysio_pol_key)) {
-            // Create sysio policy for RAM. Every tier contributes 10% of its allocation to the
-            // network RAM pool that funds newaccount_ram, so this is not tier-gated.
-            policies.emplace(get_self(), sysio_pol_key, roa::policies{
-                .owner = sysio_account,
-                .issuer = owner,
-                .net_weight = zero_asset,
-                .cpu_weight = zero_asset,
-                .ram_weight = sysio_allocation,
-                .bytes_per_unit = state.bytes_per_unit,
-                .time_block = UINT32_MAX, // do not allow to be extended
             });
         }
 
@@ -973,24 +963,6 @@ namespace sysio {
         roa::resources_t owner_res = increase_reslimit(owner, net_cpu_weight, net_cpu_weight,
                                                        (int64_t)personal_ram_bytes, /*require_to_exist=*/false);
         set_resource_limits(owner, (int64_t)owner_res.ram_bytes, owner_res.net.amount, owner_res.cpu.amount);
-
-        // Sysio reslimit
-        reslimit_t sysioreslimit(get_self());
-        auto sysio_res_key = reslimit_key{sysio_account.value};
-        auto sysio_res = sysioreslimit.get(sysio_res_key, "sysio reslimit does not exist.");
-
-        uint64_t sysio_bytes = sysio_allocation.amount * state.bytes_per_unit;
-        sysioreslimit.modify(get_self(), sysio_res_key, [&](auto& row) {
-            // Saturating add, matching increase_reslimit -- this is the one reslimit-row accumulator that
-            // does not route through that helper, so harden it the same way (no-op for realistic values).
-            row.ram_bytes = opp::safe::add_sat_u64(row.ram_bytes, sysio_bytes);
-        });
-
-        // Re-read to get updated value for set_resource_limits
-        sysio_res = sysioreslimit.get(sysio_res_key);
-
-        // Update the RAM allocation, sysio is a system account so -1, -1 for net and cpu to maintain unlimited.
-        set_resource_limits(sysio_account, sysio_res.ram_bytes, -1, -1);
 
         // Finally, record the node owner entry with the new fields
         nodeowners.emplace(get_self(), node_key, roa::nodeowners{
@@ -1030,8 +1002,9 @@ namespace sysio {
         // Ensure the contract is active
         check(state.is_active, "Contract not active yet.");
 
-        // Same fractions/rounding as activateroa's reserve sizing (shared helper).
-        int64_t allocation_amount = tier_sys_allocation(tier, state.total_sys.amount);
+        // Same fractions/rounding as activateroa's reserve sizing, net of sysio's carve-out (shared helpers).
+        int64_t allocation_amount = tier_sys_allocation(tier, state.total_sys.amount)
+                                  - tier_sysio_share(tier, state.total_sys.amount);
         return asset(allocation_amount, state.total_sys.symbol);
     };
 
