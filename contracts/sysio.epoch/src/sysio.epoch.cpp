@@ -630,16 +630,8 @@ void epoch::advance() {
          ).send();
       }
 
-      // NOTE: we intentionally do NOT erase the per-batch-op envelope
-      // metadata rows here. `evalcons` already cleared their heavy
-      // `raw_data` (1-2 KB → 0 bytes) at consensus reach, so the residual
-      // weight is just the tuple `(id, chain_code, epoch_index,
-      // batch_op_name, checksum, ...)` — small and bounded by group
-      // membership × outposts × retained-epochs. A dedicated bounded-
-      // retention sweep belongs in a separate periodic ix; trying to
-      // erase here races with the permissionless `chkcons` →
-      // inline-`advance` pattern that fires from every batchop every
-      // cron tick and trips kv-index-remove on already-evicted buckets.
+      // The envelope rows read above are left in place: `sysio.msgch::deliver`
+      // erases them once they fall out of its retention window.
    }
 
    const bool had_expiring_group = state.current_epoch_index > 0;
@@ -1052,12 +1044,11 @@ void epoch::advance() {
       ).send();
    }
 
-   // Working tables on `sysio.msgch` (`envelopes` / `messages` /
-   // `attestations` / `outenvelopes`) are now drained inline by the
-   // `evalcons` consensus-reach + `buildenv` write paths. The durable
-   // audit trail lives in the `envelope_log` table on the same contract,
-   // capped at `active_outposts * 2 * cfg.epoch_retention_envelope_log_count`
-   // and pruned head-first on overflow. No scheduled cleanup needed.
+   // No scheduled cleanup of `sysio.msgch::envelopes` is needed here:
+   // `deliver` prunes rows older than the previous epoch. The durable audit
+   // trail lives in the `envelope_log` table on the same contract, capped at
+   // `active_outposts * 2 * cfg.epoch_retention_envelope_log_count`
+   // and pruned head-first on overflow.
 }
 
 // ---------------------------------------------------------------------------
