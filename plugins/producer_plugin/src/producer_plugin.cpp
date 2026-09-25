@@ -3290,6 +3290,9 @@ void producer_plugin::process_blocks() {
 
 void producer_plugin::received_block(uint32_t block_num, chain::fork_db_add_t fork_db_add_result) {
    my->_received_block = block_num;
+   // irreversible mode applies received blocks only once they become irreversible, so there is nothing to interrupt for
+   if (my->irreversible_mode())
+      return;
    // fork_db_add_t::fork_switch means head block of best fork (different from the current branch) is received.
    // Since a better fork is available, interrupt current block validation and allow a fork switch to the better branch.
    if (fork_db_add_result == fork_db_add_t::appended_to_head) {
