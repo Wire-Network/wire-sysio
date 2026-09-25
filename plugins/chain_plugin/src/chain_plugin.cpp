@@ -2855,13 +2855,17 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          // next page yields the first row strictly below the last returned
          // one -- i.e. the first unseen row. Setting `next_key` to the first
          // unseen row's sk instead would skip that row at every page boundary.
-         decltype(sec_idx.end()) itr;
-         if (has_upper) {
-            itr = sec_idx.lower_bound(boost::make_tuple(p.code, sec_tid, ub_sv));
-         } else {
-            itr = sec_idx.upper_bound(boost::make_tuple(p.code, sec_tid));
-         }
          auto begin = sec_idx.lower_bound(boost::make_tuple(p.code, sec_tid, lb_sv));
+         decltype(sec_idx.end()) itr;
+         if (!has_upper) {
+            itr = sec_idx.upper_bound(boost::make_tuple(p.code, sec_tid));
+         } else if (ub_sv < lb_sv) {
+            // An inverted range is empty. Seeking the upper bound would start `itr` below `begin`, and the walk down
+            // could then step off the front of the index.
+            itr = begin;
+         } else {
+            itr = sec_idx.lower_bound(boost::make_tuple(p.code, sec_tid, ub_sv));
+         }
          uint32_t count = 0;
          // Remember the last-returned row's sec_key bytes so the cutoff
          // branches below can feed them to `emit_secondary_next_key`.
