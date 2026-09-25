@@ -3245,6 +3245,33 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_scoped_bounds_test, validating_tester ) try
       p.lower_bound.clear();
    }
 
+   // (e) A deadline cut must not report a next row beyond the scope. time_limit_ms=0 cuts every page after one row,
+   //     so the page holding the scope's last row is cut with the other scope's first row next in the index. The
+   //     scope is picked so the other one lies past the end of the scan.
+   for (const bool json : {false, true}) {
+      for (const std::string index : {"", "bypayload"}) {
+         for (const bool rev : {false, true}) {
+            BOOST_TEST_CONTEXT("json=" << json << " index='" << index << "' reverse=" << rev) {
+               chain_apis::read_only::get_table_rows_params p;
+               p.json          = json;
+               p.code          = "test"_n;
+               p.scope         = rev ? "scb" : "sca";
+               p.table         = "sslugobjs";
+               p.index_name    = index;
+               p.reverse       = rev;
+               p.time_limit_ms = 0;
+
+               for (uint32_t page = 1; page <= 4; ++page) {
+                  auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+                  BOOST_CHECK_EQUAL(result.rows.size(), 1u);
+                  BOOST_CHECK_EQUAL(result.more, page < 4);
+                  (rev ? p.upper_bound : p.lower_bound) = result.next_key;
+               }
+            }
+         }
+      }
+   }
+
 } FC_LOG_AND_RETHROW() /// get_kv_rows_scoped_bounds_test
 
 BOOST_AUTO_TEST_SUITE_END()

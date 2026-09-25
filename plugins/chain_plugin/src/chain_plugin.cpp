@@ -2822,20 +2822,23 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
 
       if (!reverse) {
          auto itr = sec_idx.lower_bound(boost::make_tuple(p.code, sec_tid, lb_sv));
+         // Shared by the loop and the deadline cut, so a cut never reports a next row past the upper bound.
+         const auto in_range = [&](const auto& it) {
+            return it != sec_idx.end() && it->code == p.code && it->table_id == sec_tid &&
+                   (!has_upper || it->sec_key_view() < ub_sv);
+         };
          uint32_t count = 0;
-         while (itr != sec_idx.end() && itr->code == p.code && itr->table_id == sec_tid) {
-            auto sk = itr->sec_key_view();
-            if (has_upper && sk >= ub_sv) break;
+         while (in_range(itr)) {
             if (count >= limit) {
                hp.more = true;
-               emit_secondary_next_key(sk);
+               emit_secondary_next_key(itr->sec_key_view());
                break;
             }
             hp.rows.push_back(fetch_primary(*itr));
             ++count;
             ++itr;
             if (fc::time_point::now() >= params_deadline) {
-               if (itr != sec_idx.end() && itr->code == p.code && itr->table_id == sec_tid) {
+               if (in_range(itr)) {
                   hp.more = true;
                   emit_secondary_next_key(itr->sec_key_view());
                }
