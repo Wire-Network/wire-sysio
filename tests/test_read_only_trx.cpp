@@ -266,11 +266,6 @@ void test_irreversible_read_window(std::vector<const char*>& specific_args) {
             };
             argv.insert(argv.end(), specific_args.begin(), specific_args.end());
             app->initialize<chain_plugin, producer_plugin>(argv.size(), (char**)&argv[0]);
-            // as nodeop does, so quit() releases read threads waiting in a read window before shutdown joins them
-            app->set_stop_executor_cb([&app, prod = app->find_plugin<producer_plugin>()]() {
-               prod->interrupt();
-               app->get_io_context().stop();
-            });
             app->startup();
             // Capture this thread as main_thread_id_ before releasing the promise; scoped_app was constructed on the
             // outer thread.

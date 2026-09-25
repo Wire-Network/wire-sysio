@@ -1897,6 +1897,8 @@ void producer_plugin::plugin_startup() {
 
 void producer_plugin_impl::plugin_shutdown() {
    _timer_thread.stop();
+   // wake read-only threads waiting for read window work; with the timer thread stopped nothing else would
+   app().executor().stop();
    _ro_thread_pool.stop();
    // unapplied transaction queue holds lambdas that reference plugins
    _unapplied_transactions.clear();
