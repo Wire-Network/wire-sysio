@@ -74,7 +74,10 @@ public:
       cond_.notify_all();
    }
 
+   /// Takes the lock, as does disable_locking(): pushers on any thread read lock_enabled_ under it, and stop() and the
+   /// read threads use exiting_blocking_ and should_exit_ under it.
    void enable_locking(std::function<bool()> should_exit) {
+      std::scoped_lock g( mtx_ );
       assert(num_read_threads_ > 0 && num_waiting_ == 0);
       lock_enabled_ = true;
       max_waiting_ = num_read_threads_;
@@ -83,6 +86,7 @@ public:
    }
 
    void disable_locking() {
+      std::scoped_lock g( mtx_ );
       lock_enabled_ = false;
       should_exit_ = [](){ assert(false); return true; }; // should not be called when locking is disabled
    }
@@ -121,21 +125,25 @@ private:
       auto create_handler = [&]{
          return std::make_unique<queued_handler<Function>>(handler_id::unique, priority, order, std::forward<Function>(function));
       };
-      if (q == exec_queue::read_exclusive || lock_enabled_) {
+      if (q == exec_queue::trx_read_write) {
+         // called directly from any thread, so lock_enabled_ is read under the lock
+         std::scoped_lock g( mtx_ );
+         if (!lock_enabled_ && !force && empty(exec_queue::trx_read_write)) {
+            // Since empty, post so that io context will queue and call execute_highest; otherwise would not be
+            // processed until something else is posted that triggers io context run_one. In a read window no post is
+            // needed, the switch back to the write window runs the queue.
+            return false;
+         }
+         que.push( create_handler().release() );
+         if (lock_enabled_ && num_waiting_)
+            cond_.notify_one();
+      } else if (q == exec_queue::read_exclusive || lock_enabled_) {
          std::unique_ptr<queued_handler_base> handler = create_handler();
          // called directly from any thread for read_exclusive
          std::scoped_lock g( mtx_ );
          que.push( handler.release() );
          if (num_waiting_)
             cond_.notify_one();
-      } else if (q == exec_queue::trx_read_write) {
-         std::scoped_lock g( mtx_ );
-         if (!force && empty(exec_queue::trx_read_write)) {
-            // Since empty, post so that io context will queue and call execute_highest; otherwise would not be processed
-            // until something else is posted that triggers io context run_one.
-            return false;
-         }
-         que.push( create_handler().release() );
       } else {
          // no lock required, called only from main thread
          que.push( create_handler().release() );

@@ -748,4 +748,39 @@ BOOST_AUTO_TEST_CASE( test_read_view_iteration ) {
    app.join();
 }
 
+// The main thread switches the lock mode at every read/write window and drains trx_read_write in the write window,
+// while net and http threads push to it. Every queued push must run exactly once; TSAN also checks the lock mode is
+// never read or written unsynchronized.
+BOOST_AUTO_TEST_CASE( trx_read_write_add_while_switching_lock_mode ) {
+   appbase::exec_pri_queue queue;
+   queue.init_read_threads(1);
+
+   constexpr size_t num_pushes = 100000;
+   size_t queued = 0;
+   size_t handed_back = 0;
+   size_t executed = 0; // only the draining thread runs the tasks
+   std::atomic<bool> done = false;
+   std::thread pusher( [&]() {
+      for (size_t i = 0; i < num_pushes; ++i) {
+         if (queue.add(priority::medium, exec_queue::trx_read_write, i, [&executed](){ ++executed; }))
+            ++queued;
+         else
+            ++handed_back;
+      }
+      done = true;
+   } );
+   while (!done) {
+      queue.enable_locking([](){ return false; });
+      queue.disable_locking();
+      while (queue.execute_highest_locked(exec_queue::trx_read_write)) // write window drain
+         ;
+   }
+   pusher.join();
+   while (queue.execute_highest_locked(exec_queue::trx_read_write))
+      ;
+
+   BOOST_CHECK_EQUAL( queued + handed_back, num_pushes );
+   BOOST_CHECK_EQUAL( executed, queued );
+}
+
 BOOST_AUTO_TEST_SUITE_END()
