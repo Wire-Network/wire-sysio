@@ -28,6 +28,7 @@ appArgs.add(flag="--num-test-runs", type=int, help="number of times to run the t
 appArgs.add(flag="--sys-vm-oc-enable", type=str, help="specify sys-vm-oc-enable option", default=Utils.SysVmOcEnableAuto)
 appArgs.add(flag="--wasm-runtime", type=str, help="if wanting sys-vm-oc, must use 'sys-vm-oc-forced'",
             default=Utils.defaultWasmRuntime())
+appArgs.add(flag="--api-node-read-mode", type=str, help="read-mode of the API node", default="head")
 
 args=TestHelper.parse_args({"-p","-n","-d","-s","--nodes-file","--seed"
                             ,"--activate-if","--dump-error-details","-v","--leave-running"
@@ -121,6 +122,8 @@ def startCluster():
     specificExtraNodeopArgs[pnodes]+=" "
     specificExtraNodeopArgs[pnodes]+=" --read-only-threads "
     specificExtraNodeopArgs[pnodes]+=str(args.read_only_threads)
+    specificExtraNodeopArgs[pnodes]+=" --read-mode "
+    specificExtraNodeopArgs[pnodes]+=args.api_node_read_mode
     if Utils.shouldSkipBecauseSysVmOcUnavailable(args.sys_vm_oc_enable, args.wasm_runtime):
         Print("sys-vm-oc is unavailable on this platform. Skip the test")
         testSuccessful = True
@@ -483,6 +486,10 @@ def timeoutTest():
 try:
     startCluster()
     deployTestContracts()
+    if args.api_node_read_mode == "irreversible":
+        # the API node sees writes only once they are irreversible
+        if not apiNode.waitForIrreversibleBlock(producerNode.getHeadBlockNum()):
+            errorExit("API node LIB never reached the contract deployments")
 
     basicTests()
 
