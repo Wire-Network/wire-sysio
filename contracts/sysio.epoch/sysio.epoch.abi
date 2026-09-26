@@ -122,6 +122,20 @@
             ]
         },
         {
+            "name": "finishadv",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "emission_amount",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
             "name": "pause",
             "base": "",
             "fields": []
@@ -167,6 +181,11 @@
         {
             "name": "advance",
             "type": "advance",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "finishadv",
+            "type": "finishadv",
             "ricardian_contract": ""
         },
         {
