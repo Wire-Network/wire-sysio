@@ -3304,4 +3304,136 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_scoped_bounds_test, validating_tester ) try
 
 } FC_LOG_AND_RETHROW() /// get_kv_rows_scoped_bounds_test
 
+/// kv::global — a single-row table with no scope, keyed on the table's own name.
+///
+/// The API doc lists kv::global among the supported table types and five production
+/// singletons ship this shape (sysio.opreg::opconfig / opcounters,
+/// sysio.chalg::chalgstate, sysio.uwrit::uwconfig / uwcounters), but nothing read one
+/// through get_table_rows. Its ABI comes out key_names ["name"] / key_types ["name"],
+/// so the key decodes through the NAME leaf and the row's key is the table name itself.
+BOOST_FIXTURE_TEST_CASE( get_kv_rows_global_singleton_test, validating_tester ) try {
+   create_account("test"_n);
+   set_code( "test"_n, test_contracts::get_table_test_wasm() );
+   set_abi( "test"_n, test_contracts::get_table_test_abi() );
+   produce_block();
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes,
+                                fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+
+   chain_apis::read_only::get_table_rows_params p;
+   p.json  = true;
+   p.code  = "test"_n;
+   p.table = "globalobj";
+
+   // (a) Unset: the table exists in the ABI but holds no row. A query must report
+   //     zero rows rather than erroring -- callers poll a singleton before it is set.
+   {
+      auto empty = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_CHECK_EQUAL(empty.rows.size(), 0u);
+      BOOST_CHECK_EQUAL(empty.more, false);
+   }
+
+   push_action("test"_n, "setglobal"_n, "test"_n, mutable_variant_object()
+      ("counter", 42)("label", "hello"));
+   produce_block();
+
+   // (b) Set: exactly one row, keyed on the table's own name.
+   {
+      auto res = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(res.rows.size(), 1u);
+      BOOST_CHECK_EQUAL(res.more, false);
+      BOOST_CHECK_EQUAL(res.rows[0].get_object()["key"].get_object()["name"].as_string(), "globalobj");
+      BOOST_CHECK_EQUAL(res.rows[0].get_object()["value"].get_object()["counter"].as_uint64(), 42u);
+      BOOST_CHECK_EQUAL(res.rows[0].get_object()["value"].get_object()["label"].as_string(), "hello");
+   }
+
+   // (c) Overwriting the singleton replaces the row rather than adding one.
+   {
+      push_action("test"_n, "setglobal"_n, "test"_n, mutable_variant_object()
+         ("counter", 7)("label", "second"));
+      produce_block();
+
+      auto res = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(res.rows.size(), 1u);
+      BOOST_CHECK_EQUAL(res.rows[0].get_object()["value"].get_object()["counter"].as_uint64(), 7u);
+   }
+
+   // (d) json=false returns the row as hex, and the singleton is still singular.
+   {
+      p.json = false;
+      auto res = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(res.rows.size(), 1u);
+      BOOST_CHECK(res.rows[0].get_object()["key"].is_string());
+      p.json = true;
+   }
+
+} FC_LOG_AND_RETHROW() /// get_kv_rows_global_singleton_test
+
+/// Two pagination edges on a SCOPED table that the per-axis cases leave open.
+BOOST_FIXTURE_TEST_CASE( get_kv_rows_pagination_edges_test, validating_tester ) try {
+   create_account("test"_n);
+   set_code( "test"_n, test_contracts::get_table_test_wasm() );
+   set_abi( "test"_n, test_contracts::get_table_test_abi() );
+   produce_block();
+
+   const uint64_t sca = chain::name("sca").to_uint64_t();
+   const uint64_t scb = chain::name("scb").to_uint64_t();
+   for (uint64_t scope : {sca, scb}) {
+      push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
+         ("scope", scope)("code", "ETH")("payload", 10)("alt", "AAA"));
+      push_action("test"_n, "addsslug"_n, "test"_n, mutable_variant_object()
+         ("scope", scope)("code", "SOL")("payload", 20)("alt", "BBB"));
+   }
+   produce_block();
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes,
+                                fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+
+   // (a) scope="" on a SCOPED table walks every scope. With no scope there is no
+   //     prefix to strip, so `scope_key_count` is 0 and the key object KEEPS its
+   //     scope field -- a different next_key shape from the scoped query, and one
+   //     that has to round-trip as a bound on its own terms.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json  = true;
+      p.code  = "test"_n;
+      p.table = "sslugobjs";
+      p.scope = "";
+      p.limit = 3;
+
+      auto page1 = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(page1.rows.size(), 3u);
+      BOOST_REQUIRE_EQUAL(page1.more, true);
+      // The key carries BOTH fields here, unlike a scoped query's stripped key.
+      BOOST_REQUIRE(page1.rows[0].get_object()["key"].get_object().contains("scope"));
+      BOOST_CHECK(page1.rows[0].get_object()["key"].get_object().contains("code"));
+
+      p.lower_bound = page1.next_key;
+      p.limit       = 50;
+      auto page2 = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_CHECK_EQUAL(page2.rows.size(), 1u);   // 4 rows across both scopes
+      BOOST_CHECK_EQUAL(page2.more, false);
+   }
+
+   // (b) limit=0. The row loop tests `count >= limit` before appending, so the page
+   //     comes back empty with the scan still open and a cursor at the first row.
+   //     Pinned because it is indistinguishable from "done" unless `more` is read.
+   {
+      chain_apis::read_only::get_table_rows_params p;
+      p.json  = true;
+      p.code  = "test"_n;
+      p.table = "sslugobjs";
+      p.scope = "sca";
+      p.limit = 0;
+
+      auto res = get_table_rows_full(plugin, p, fc::time_point::maximum());
+      BOOST_CHECK_EQUAL(res.rows.size(), 0u);
+      BOOST_CHECK_EQUAL(res.more, true);
+      BOOST_CHECK(!res.next_key.empty());
+   }
+
+} FC_LOG_AND_RETHROW() /// get_kv_rows_pagination_edges_test
+
 BOOST_AUTO_TEST_SUITE_END()

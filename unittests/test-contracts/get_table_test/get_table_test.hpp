@@ -7,6 +7,7 @@
 #include <sysio/sysio.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/kv_scoped_table.hpp>
+#include <sysio/kv_global.hpp>
 #include <sysio/kv_table.hpp>
 
 
@@ -192,6 +193,20 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
         sysio::kv::index<"byalt"_n,
                          sysio::const_mem_fun<sslugobj, slug_name, &sslugobj::by_alt>>> sslugobjs;
 
+    // kv::global — a SINGLE-row table with no scope, keyed on the table's own name.
+    // Five production contracts ship this shape (sysio.opreg::opconfig / opcounters,
+    // sysio.chalg::chalgstate, sysio.uwrit::uwconfig / uwcounters) and the API doc
+    // lists kv::global as supported, but nothing exercised it through
+    // get_table_rows — so its ABI shape (key_names ["name"], key_types ["name"])
+    // and its empty-vs-set behaviour were both unverified.
+    struct [[sysio::table("globalobj")]] globalobj {
+        uint64_t    counter = 0;
+        std::string label;
+        SYSLIB_SERIALIZE(globalobj, (counter)(label))
+    };
+
+    using globalobjs = sysio::kv::global<"globalobj"_n, globalobj>;
+
    [[sysio::action]]
    void addnumobj(uint64_t input);
 
@@ -227,6 +242,12 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
    ///                 secondary cursor's raw fallback
    [[sysio::action]]
    void addsslug(uint64_t scope, slug_name code, uint64_t payload, slug_name alt);
+
+   /// Set the `kv::global` singleton. Until this runs the table has no row at all,
+   /// which is the state a get_table_rows query must report as zero rows rather
+   /// than as an error.
+   [[sysio::action]]
+   void setglobal(uint64_t counter, std::string label);
 
 
 };
