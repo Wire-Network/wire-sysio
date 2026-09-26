@@ -210,19 +210,20 @@ successful epoch advance.
 3. **Remove an inline caller BEFORE removing its callee action**, or deploy
    both in the same transaction. An older caller still requires that action.
 
-**The two edges point in OPPOSITE directions along the dependency arrow, so they
-cannot be collapsed into one inequality.** State them separately:
+**Call compatibility and state compatibility are separate requirements.**
+The safe order depends on the change:
 
-- **Call edge — `callee_version >= caller_version`.** The contract that RECEIVES
-  an inlined action upgrades first, because the new caller emits an action the
-  old callee cannot dispatch.
+- **Call edge — every action the deployed caller inlines must exist in the
+  deployed callee.** For an added action, deploy the callee first; for a removed
+  action, deploy the caller that stops sending it first. An atomic deployment
+  of both contracts also satisfies the requirement.
 - **Table edge — `reader_version >= writer_version`.** The contract that READS
   the new state upgrades first, because the new writer commits state the old
   reader does not know to account for.
 
-A sentence that says "the caller must never be older than the callee" inverts
-the first one, and following it produces exactly the epoch-new / callee-old
-state that aborts every advance.
+A single caller/callee version inequality cannot describe both adding and
+removing actions. Check the actual actions emitted and dispatched by the
+deployed pair, as well as the state the reader must account for.
 
 ## Staged rollout (when one transaction is not possible)
 
@@ -273,18 +274,21 @@ short-decode one (see [above](#why-a-mixed-version-is-not-merely-degraded)).
 
 **A downgrade is not the upgrade run backwards. It is a data-migration problem
 first, and a code-ordering problem second** — because by the time you want to
-roll back, all three claim tables may hold value that only the NEW code can pay
-out:
+roll back, all four claim ledgers may hold value that older code cannot safely
+decode or pay out:
 
 | Table | Contract | Paid out by | Stranded when that contract rolls back |
 |---|---|---|---|
 | `payclaims` | `sysio.system` | `claimpay` | earned epoch pay |
 | `wireclaims` | `sysio.reserv` | `claimwire` | swap payouts + refunds already withheld from recipients |
 | `remitclaims` | `sysio.opreg` | `claimremit` | debited operator collateral |
+| `pclaims`, `unmapped` | `sysio.dclaim` | `claim` (after AuthX linking via `linkswept` for unmapped balances) | rewards and imported credits whose no-expiry row encodings differ from the old schema |
 
-Every one of those balances is value already taken from someone's spendable
-position and parked behind an action the old build does not have. Rolling back
-with rows present does not degrade — it strands.
+Every one of those balances is owed to a recipient. Depending on the rollback
+target, the old build may lack the withdrawal action or expect an incompatible
+row encoding. Keeping an action with the same name does not make DClaim's
+changed rows safe to read. Rolling back with incompatible rows can strand
+their balances.
 
 There is also a live-writer hazard with no upgrade counterpart: rolling
 `sysio.epoch` back while the new `sysio.system` is still deployed lets `payepoch`
@@ -294,9 +298,15 @@ resumes double-committing while the pile of unreachable claims grows.
 The safe procedure is therefore:
 
 1. **Quiesce the credit writers** so no new claim rows appear.
-2. **Drain or migrate all three claim tables** — claimants pull, or the balances
-   are migrated. This step is the one that actually gates the rollback, and it
-   cannot be completed unilaterally: a claimant who never claims holds it open.
+2. **Drain or migrate all four claim ledgers**, including DClaim's `pclaims`
+   and `unmapped` rows — claimants pull (after linking where needed), or the
+   balances are migrated. This step gates the rollback and cannot be completed
+   unilaterally: a claimant who never claims holds it open. DClaim's `capcfg`
+   singleton also changed encoding when `claim_window_sec` was removed; draining
+   the claim rows does not restore it. Any rollback must restore the target
+   configuration layout while preserving `imported_complete`. Deleting or
+   resetting the singleton would reopen finalized imports. This release does
+   not supply that migration.
 3. **Retire the `sysio.system` claim writer before its epoch accounting reader.**
    If restoring an epoch build that calls the removed reserve sweep, restore
    the matching reserve action first (or atomically with epoch). This ordering

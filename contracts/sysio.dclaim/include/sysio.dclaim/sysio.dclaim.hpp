@@ -5,7 +5,6 @@
 #include <sysio/kv_table.hpp>
 #include <sysio/asset.hpp>
 #include <sysio/crypto.hpp>
-#include <sysio/system.hpp>
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 #include <sysio.opp.common/wire_asset.hpp>

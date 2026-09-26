@@ -5093,7 +5093,7 @@ BOOST_FIXTURE_TEST_CASE( aged_wire_claims_never_fund_a_balance_blocked_epoch, sy
    BOOST_REQUIRE_EQUAL( RESERVE_SEED + OWED_REFUND,
                         static_cast<uint64_t>(get_wire_balance(RESERV).get_amount()) );
 
-   // A swap-from-WIRE refund credits a claimable balance that nobody ever pulls. Custody now
+   // A swap-from-WIRE refund credits a claimable balance left unclaimed until after epoch advancement. Custody now
    // reads `reserve_wire_amount (RESERVE_SEED) + Σ wireclaims (OWED_REFUND)`.
    create_user_accounts({ "lapseduser"_n });
    BOOST_REQUIRE_EQUAL( success(), push_reserv_action(UWRIT, "refundwire"_n, mvo()
