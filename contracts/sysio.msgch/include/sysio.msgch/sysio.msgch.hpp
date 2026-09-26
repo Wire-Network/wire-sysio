@@ -109,20 +109,25 @@ namespace sysio {
 
       /// Inbound envelope delivery — one row per batch-op per outpost per epoch.
       /// Consensus is evaluated by comparing checksums across operators.
+      ///
+      /// Working state, not an audit trail (that is `envlog`). `deliver` prunes rows older than the
+      /// current and previous epoch (`INBOUND_ENVELOPE_RETENTION_EPOCHS` in `src/sysio.msgch.cpp`);
+      /// every on-chain reader only touches the current epoch.
       struct [[sysio::table("envelopes")]] envelope_entry {
          uint64_t                  id;
          uint64_t                  chain_code;
          uint32_t                  epoch_index;
          name                      batch_op_name;
          opp::types::ChainKind     chain_kind;
-         checksum256               checksum;        ///< sha256(raw_data)
+         checksum256               checksum;        ///< sha256 of the delivered bytes
+         /// The delivered bytes. Cleared on the rows present when the epoch's winner is accepted and
+         /// never stored for a late confirmation of it; the retention prune bounds any others.
          std::vector<char>         raw_data;
          time_point                received_at{};
 
          uint128_t by_outpost_epoch() const {
             return opp::outpost_epoch_key(chain_code, epoch_index);
          }
-         uint64_t by_batch_op() const { return batch_op_name.value; }
 
          SYSLIB_SERIALIZE(envelope_entry,
             (id)(chain_code)(epoch_index)(batch_op_name)(chain_kind)
@@ -131,9 +136,7 @@ namespace sysio {
 
       using envelopes_t = sysio::kv::table<"envelopes"_n, id_key, envelope_entry,
          sysio::kv::index<"byoutepoch"_n,
-            sysio::const_mem_fun<envelope_entry, uint128_t, &envelope_entry::by_outpost_epoch>>,
-         sysio::kv::index<"bybatchop"_n,
-            sysio::const_mem_fun<envelope_entry, uint64_t, &envelope_entry::by_batch_op>>
+            sysio::const_mem_fun<envelope_entry, uint128_t, &envelope_entry::by_outpost_epoch>>
       >;
 
       /// Individual message extracted from a consensus-verified envelope.

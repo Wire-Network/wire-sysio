@@ -90,6 +90,18 @@ constexpr size_t   ATTESTATION_OVERHEAD_BYTES = 24;
 /// + payload preamble, and a safety margin for `zpp::bits` length prefixes.
 constexpr size_t   ENVELOPE_BASELINE_BYTES    = 512;
 
+/// Epochs of inbound `envelopes` rows kept: the current epoch, which every on-chain reader uses, and
+/// the previous one, so a batch operator whose cached epoch lags by one still finds its delivery.
+constexpr uint32_t INBOUND_ENVELOPE_RETENTION_EPOCHS = 2;
+
+/// Maximum expired `envelopes` rows a single `deliver` erases. Each delivery adds one row, so a
+/// budget above one outpaces inserts and clears an epoch with few deliveries after a full one.
+constexpr uint32_t ENVELOPE_PRUNE_BUDGET = 4;
+
+static_assert(INBOUND_ENVELOPE_RETENTION_EPOCHS >= 1,
+              "the prune must never reach the current epoch, which every reader depends on");
+static_assert(ENVELOPE_PRUNE_BUDGET > 1, "the prune must outpace the one row each delivery adds");
+
 /// Stable audit marker for a UIC rejected before it can reach `rcrdcommit`.
 constexpr const char* UIC_DISPATCH_REJECTED_LOG_PREFIX =
    "UIC_DISPATCH_REJECTED";
@@ -246,6 +258,24 @@ void write_envelope_log(name self,
         it != tbl.end() && dropped < per_epoch; ) {
       it = tbl.erase(std::move(it));
       ++dropped;
+   }
+}
+
+/// Erase up to `ENVELOPE_PRUNE_BUDGET` inbound `envelopes` rows that fell out of the retention
+/// window, oldest first.
+///
+/// Primary-key order is epoch order: ids come from `available_primary_key()`, `deliver` only
+/// accepts current-epoch envelopes, and rows leave only from the head, so the newest id is never
+/// erased and ids never restart. The walk stops at the first retained row, so a call is O(budget).
+void prune_expired_envelopes(name self, uint32_t current_epoch) {
+   if (current_epoch < INBOUND_ENVELOPE_RETENTION_EPOCHS) return;
+   const uint32_t newest_expired_epoch = current_epoch - INBOUND_ENVELOPE_RETENTION_EPOCHS;
+
+   msgch::envelopes_t envs(self);
+   auto it = envs.begin();
+   for (uint32_t erased = 0; erased < ENVELOPE_PRUNE_BUDGET && it != envs.end() &&
+                             it->epoch_index <= newest_expired_epoch; ++erased) {
+      it = envs.erase(std::move(it));
    }
 }
 
@@ -1270,6 +1300,7 @@ void dispatch_attestation(name self, uint64_t attestation_id,
 
       // Drop heavy raw_data from each per-batch-op envelope row but KEEP the metadata tuple so
       // sysio.epoch::advance can still read per-op checksums + delivery for slash classification.
+      // `deliver` erases the rows once they leave the retention window.
       msgch::envelopes_t envs(self);
       std::vector<uint64_t> ids_to_clear;
       auto modify_idx = envs.get_index<"byoutepoch"_n>();
@@ -1515,24 +1546,22 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    // re-validation. Anything else -- including a divergent envelope arriving after acceptance --
    // still validates against the advanced tip and reverts (fail closed: post-acceptance divergence
    // cannot open a dispute, so there is nothing to record it for).
+   bool late_confirmation = false;
    {
-      bool late_confirmation = false;
-      {
-         msgch::outpost_consensus_t opcons(get_self());
-         auto opc_pk = msgch::outpost_consensus_key{chain_code};
-         if (opcons.contains(opc_pk)) {
-            const auto row    = opcons.get(opc_pk);
-            late_confirmation = row.epoch_index == epoch && row.consensus_reached &&
-                                row.winning_checksum == cs;
-         }
+      msgch::outpost_consensus_t opcons(get_self());
+      auto opc_pk = msgch::outpost_consensus_key{chain_code};
+      if (opcons.contains(opc_pk)) {
+         const auto row    = opcons.get(opc_pk);
+         late_confirmation = row.epoch_index == epoch && row.consensus_reached &&
+                             row.winning_checksum == cs;
       }
-      if (!late_confirmation) {
-         checksum256 ingress_digest{};
-         checksum256 ingress_message_tip{};
-         check(inbound_envelope_valid(get_self(), env_check, chain_code, epoch, ingress_digest,
-                                      ingress_message_tip),
-               "delivered envelope failed inbound-chain or semantic-header validation");
-      }
+   }
+   if (!late_confirmation) {
+      checksum256 ingress_digest{};
+      checksum256 ingress_message_tip{};
+      check(inbound_envelope_valid(get_self(), env_check, chain_code, epoch, ingress_digest,
+                                   ingress_message_tip),
+            "delivered envelope failed inbound-chain or semantic-header validation");
    }
 
    // Store envelope
@@ -1550,9 +1579,15 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
       // is authoritative; this is just the cached projection.
       .chain_kind    = op_row.kind,
       .checksum      = cs,
-      .raw_data      = data,
+      // A late confirmation repeats this epoch's already-applied winner. `outpcons` records that
+      // acceptance, so `apply_consensus` never decodes this bucket's bytes again; `advance` needs
+      // only the metadata.
+      .raw_data      = late_confirmation ? std::vector<char>{} : std::move(data),
       .received_at   = current_time_point(),
    });
+
+   // After the emplace, so the newest id always survives (see prune_expired_envelopes).
+   prune_expired_envelopes(get_self(), epoch);
 
    // Evaluate consensus inline
    action(
@@ -1785,7 +1820,8 @@ void msgch::resolvedisp(uint64_t chain_code, uint32_t epoch_index, checksum256 w
 
    // Locate the winning envelope's raw bytes among this (outpost, epoch)'s deliveries. The dispute
    // path never cleared raw_data (evalcons returned early before the consensus cleanup), so the
-   // bytes are still on file. Copy them out before apply_consensus drains the rows.
+   // bytes are still on file. Copy them out before apply_consensus drains the rows. `deliver`'s
+   // retention prune never reaches them: an open dispute pauses the epoch, so it is still current.
    envelopes_t envs(get_self());
    auto oe_idx = envs.get_index<"byoutepoch"_n>();
    uint128_t composite = opp::outpost_epoch_key(chain_code, epoch_index);
