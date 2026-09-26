@@ -597,16 +597,6 @@
             ]
         },
         {
-            "name": "sweepclaims",
-            "base": "",
-            "fields": [
-                {
-                    "name": "max_rows",
-                    "type": "uint32"
-                }
-            ]
-        },
-        {
             "name": "uw_fee_key",
             "base": "",
             "fields": [
@@ -659,10 +649,6 @@
                 {
                     "name": "balance",
                     "type": "uint64"
-                },
-                {
-                    "name": "expires_at_sec",
-                    "type": "uint32"
                 }
             ]
         },
@@ -769,11 +755,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "sweepclaims",
-            "type": "sweepclaims",
-            "ricardian_contract": ""
-        },
-        {
             "name": "uwfeebal",
             "type": "uwfeebal",
             "ricardian_contract": ""
@@ -830,14 +811,7 @@
             "index_type": "i64",
             "key_names": ["account"],
             "key_types": ["uint64"],
-            "table_id": 22082,
-            "secondary_indexes": [
-                {
-                    "name": "byexpiry",
-                    "key_type": "uint128",
-                    "table_id": 59144
-                }
-            ]
+            "table_id": 22082
         }
     ],
     "ricardian_clauses": [],

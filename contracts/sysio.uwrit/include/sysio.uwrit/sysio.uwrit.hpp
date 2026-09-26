@@ -858,8 +858,7 @@ namespace sysio {
          ///                 the row; `chklocks` always terminalizes it.
          ///   * terminal  — `terminal_epoch + uwconfig.uwreq_retention_epochs`;
          ///                 past it the row is erased.
-         /// 0 means "no deadline, never swept" (same zero-sentinel predicate
-         /// as `sysio.dclaim::flushexpired`).
+         /// 0 means "no deadline, never swept".
          uint32_t                                expires_at_epoch  = 0;
 
          /// Inbound attestation payload (zpp_bits-encoded protobuf).
