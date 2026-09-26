@@ -94,6 +94,20 @@
             ]
         },
         {
+            "name": "globalobj",
+            "base": "",
+            "fields": [
+                {
+                    "name": "counter",
+                    "type": "uint64"
+                },
+                {
+                    "name": "label",
+                    "type": "string"
+                }
+            ]
+        },
+        {
             "name": "hashobj",
             "base": "",
             "fields": [
@@ -148,6 +162,20 @@
                 {
                     "name": "secldouble",
                     "type": "float128"
+                }
+            ]
+        },
+        {
+            "name": "setglobal",
+            "base": "",
+            "fields": [
+                {
+                    "name": "counter",
+                    "type": "uint64"
+                },
+                {
+                    "name": "label",
+                    "type": "string"
                 }
             ]
         },
@@ -263,9 +291,22 @@
             "name": "modifynumobj",
             "type": "modifynumobj",
             "ricardian_contract": ""
+        },
+        {
+            "name": "setglobal",
+            "type": "setglobal",
+            "ricardian_contract": ""
         }
     ],
     "tables": [
+        {
+            "name": "globalobj",
+            "type": "globalobj",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 6537
+        },
         {
             "name": "hashobjs",
             "type": "hashobj",

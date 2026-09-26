@@ -54,3 +54,8 @@ void get_table_test::addsslug(uint64_t scope, slug_name code, uint64_t payload, 
    sslugobjs sslugobjs_table( get_self(), scope );
    sslugobjs_table.emplace( get_self(), { code }, { code, payload, alt } );
 }
+
+void get_table_test::setglobal(uint64_t counter, std::string label) {
+   globalobjs g;
+   g.set( globalobj{ counter, label }, get_self() );
+}
