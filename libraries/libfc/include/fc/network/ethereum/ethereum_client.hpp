@@ -39,6 +39,19 @@ struct ethereum_confirm_options {
    /// Retry / backoff / deadline envelope — shared with the Solana client.
    /// See `fc::task::retry_options` for per-field semantics.
    fc::task::retry_options   retry         = fc::task::retry_option_defaults;
+
+   /// Least gas limit the transaction is funded with, applied AFTER the
+   /// buffered estimate; `0` leaves the estimate alone.
+   ///
+   /// For a call whose execution stops on a `gasleft()` watchdog and records
+   /// where it stopped rather than reverting, `eth_estimateGas` converges on
+   /// the least gas at which the call SUCCEEDS — the smallest amount of work it
+   /// can do and still return cleanly — so the estimate systematically
+   /// under-funds it. A floor lets the caller fund such a call to what the
+   /// chain allows instead. The floor is still subject to the client's
+   /// `max_gas_limit`: a floor above the policy ceiling is a policy rejection,
+   /// never a silently clamped limit.
+   uint64_t                  gas_limit_floor = 0;
 };
 
 inline constexpr ethereum_confirm_options ethereum_confirm_option_defaults{};
@@ -569,10 +582,12 @@ public:
     * @param to Recipient address (contract address for contract calls)
     * @param contract ABI contract definition for encoding the call data
     * @param params Parameters to pass to the contract function
+    * @param gas_limit_floor Least gas limit to fund the transaction with, or 0
+    *        to use the buffered estimate; see `ethereum_confirm_options::gas_limit_floor`
     * @return Configured eip1559_tx ready for signing and submission
     */
    eip1559_tx create_default_tx(const address_compat_type& to, const abi::contract& contract,
-                                const fc::variants& params = {});
+                                const fc::variants& params = {}, uint64_t gas_limit_floor = 0);
 
    /**
     * @brief Gets or creates a typed contract client instance
@@ -700,7 +715,7 @@ ethereum_contract_tx_fn<RT, Args...> ethereum_contract_client::create_tx_and_con
    abi::contract& abi = abi_map[contract.name];
    return [this, &abi, opts](const Args&... args) -> RT {
       contract_invoke_data_items params = {args...};
-      auto tx      = client->create_default_tx(contract_address, abi, params);
+      auto tx      = client->create_default_tx(contract_address, abi, params, opts.gas_limit_floor);
       auto res_var = client->execute_contract_tx_fn(tx, abi, params);
 
       // `execute_contract_tx_fn` returns the submitted tx hash. Await
