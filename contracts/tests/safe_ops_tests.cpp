@@ -24,6 +24,7 @@ using sysio::opp::safe::add_sat_i64;
 using sysio::opp::safe::add_sat_u64;
 using sysio::opp::safe::depot_amount_max;
 using sysio::opp::safe::to_depot_amount;
+using sysio::opp::safe::to_token_amount;
 
 BOOST_AUTO_TEST_SUITE(safe_ops_tests)
 
@@ -97,6 +98,34 @@ BOOST_AUTO_TEST_CASE(to_depot_amount_gates_signed_token_amounts) {
    BOOST_CHECK_EQUAL(to_depot_amount(1'000'000).value(), uint64_t{1'000'000});
    BOOST_CHECK_EQUAL(to_depot_amount(depot_amount_max).value(),       // 2^62 - 1 boundary
                      static_cast<uint64_t>(depot_amount_max));
+}
+
+// to_token_amount is the outbound mirror of to_depot_amount: a depot amount
+// becomes a signed TokenAmount.amount only inside (0, depot_amount_max]. A bare
+// int64 cast of a value at or above 2^63 would go negative on the wire.
+BOOST_AUTO_TEST_CASE(to_token_amount_gates_outbound_depot_amounts) {
+   constexpr uint64_t max_amount = static_cast<uint64_t>(depot_amount_max);
+   constexpr uint64_t sign_bit   = uint64_t{1} << 63;
+
+   // Rejected: zero, and everything past the asset range, including the values
+   // a bare cast would turn negative.
+   BOOST_CHECK(!to_token_amount(0).has_value());
+   BOOST_CHECK(!to_token_amount(max_amount + 1).has_value());               // 2^62
+   BOOST_CHECK(!to_token_amount(static_cast<uint64_t>(INT64_MAX)).has_value());
+   BOOST_CHECK(!to_token_amount(sign_bit).has_value());
+   BOOST_CHECK(!to_token_amount(sign_bit + 1).has_value());
+   BOOST_CHECK(!to_token_amount(UINT64_MAX).has_value());
+
+   // Accepted: returned unchanged.
+   BOOST_CHECK_EQUAL(to_token_amount(1).value(), int64_t{1});
+   BOOST_CHECK_EQUAL(to_token_amount(1'000'000).value(), int64_t{1'000'000});
+   BOOST_CHECK_EQUAL(to_token_amount(max_amount).value(), depot_amount_max);
+
+   // The two gates accept the same range, so an accepted amount survives the
+   // outbound-then-inbound round trip unchanged.
+   for (const uint64_t amount : {uint64_t{1}, uint64_t{1'000'000}, max_amount}) {
+      BOOST_CHECK_EQUAL(to_depot_amount(to_token_amount(amount).value()).value(), amount);
+   }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

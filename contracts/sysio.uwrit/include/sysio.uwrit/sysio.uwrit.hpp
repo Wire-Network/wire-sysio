@@ -152,11 +152,8 @@ namespace sysio {
       // ACTIVE roster grows large.
       static constexpr uint32_t MAX_UWREQ_CANDIDATES = 32;
 
-      // Per-leg cap on a stored verbatim `UnderwriteIntentCommit` payload
-      // (`commit_entry.source_uic_bytes` / `dest_uic_bytes`). A real UIC is a
-      // handful of ids + codes + a signature `verify_uic_signature` already
-      // bounds to 1024 bytes — 2 KiB is ~2x the largest legitimate encoding.
-      static constexpr uint32_t MAX_UIC_LEG_BYTES = 2048;
+      // The per-leg cap on a stored UIC payload (`commit_entry.source_uic_bytes`
+      // / `dest_uic_bytes`) is `opp::MAX_UIC_LEG_BYTES`, shared with sysio.msgch.
 
       // Cap on the stored inbound SwapRequest payload
       // (`uw_request_t.attestation_inbound_data`) at createuwreq.

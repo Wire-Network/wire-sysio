@@ -11,6 +11,7 @@
 #include <sysio.opp.common/safe_ops.hpp>   // to_depot_amount — WSA-028 fail-closed TokenAmount gate
 #include <sysio.opp.common/name_ops.hpp>   // parse_wire_account_name — never-throw account-name parse
 #include <sysio.opp.common/opp_canonical_codec.hpp> // canonical envelope encoding + keccak epoch digest
+#include <sysio.opp.common/uic_codec.hpp>          // bounded UnderwriteIntentCommit decode
 #include <sysio.system/emissions.hpp>      // emitcfg_t / t5state_t existence checks in bootstrap()
 #include <sysio/opp/opp.pb.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
@@ -596,6 +597,19 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
    }
 }
 
+/// Why `dispatch_underwrite_commit` drops a UIC before it reaches `rcrdcommit`.
+enum class uic_dispatch_rejection {
+   oversized_uic,         ///< larger than `opp::MAX_UIC_LEG_BYTES`, which rcrdcommit refuses anyway
+   malformed_uic,         ///< not a decodable UnderwriteIntentCommit
+   invalid_wire_account,  ///< `uw_account.name` is not a valid WIRE account name
+};
+
+/// Log a UIC dropped at dispatch under the stable `UIC_DISPATCH_REJECTED_LOG_PREFIX` marker.
+void log_uic_dispatch_rejection(uint64_t chain_code, uic_dispatch_rejection reason) {
+   const std::string reason_name{magic_enum::enum_name(reason)};
+   sysio::print(UIC_DISPATCH_REJECTED_LOG_PREFIX, ": chain_code=", chain_code, ", reason=", reason_name, "\n");
+}
+
 /// Dispatch an UNDERWRITE_INTENT_COMMIT to sysio.uwrit::rcrdcommit.
 ///
 /// The full UIC bytes are forwarded verbatim so the depot can reconstruct
@@ -614,34 +628,31 @@ void dispatch_operator_action(name self, const std::vector<char>& data,
 /// code, so a forged `uic.chain_code` could misroute the commit onto the wrong leg; we bind it to the
 /// proven outpost and drop on divergence.
 void dispatch_underwrite_commit(name self, const std::vector<char>& data, uint64_t chain_code) {
-   opp::attestations::UnderwriteIntentCommit uic;
-   {
-      auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
-      auto rc = in(uic);
-      if (rc != zpp::bits::errc{}) {
-         sysio::print(UIC_DISPATCH_REJECTED_LOG_PREFIX,
-                      ": chain_code=", chain_code,
-                      ", reason=malformed_uic\n");
-         return;
-      }
+   // rcrdcommit refuses a UIC over this size, so it is not worth decoding.
+   if (data.size() > opp::MAX_UIC_LEG_BYTES) {
+      log_uic_dispatch_rejection(chain_code, uic_dispatch_rejection::oversized_uic);
+      return;
+   }
+   const auto uic = opp::decode_uic(data);
+   if (!uic) {
+      log_uic_dispatch_rejection(chain_code, uic_dispatch_rejection::malformed_uic);
+      return;
    }
    // Pre-validate the relayed account string before constructing `name` below. The CDT `name`
    // ctor aborts on an empty, overlong, or out-of-charset string, and an abort here would revert
    // the whole evalcons/apply_consensus delivery; a malformed name is dropped instead.
-   const auto underwriter = sysio::opp::safe::parse_wire_account_name(uic.uw_account.name);
+   const auto underwriter = sysio::opp::safe::parse_wire_account_name(uic->uw_account.name);
    if (!underwriter) {
-      sysio::print(UIC_DISPATCH_REJECTED_LOG_PREFIX,
-                   ": chain_code=", chain_code,
-                   ", reason=invalid_wire_account\n");
+      log_uic_dispatch_rejection(chain_code, uic_dispatch_rejection::invalid_wire_account);
       return;
    }
 
    // WSA-005: the leg's chain (uic.chain_code) must be the proven delivering outpost before the
    // commit is recorded against a swap leg.
-   if (!source_chain_binding_ok(chain_code, uic.chain_code, "dispatch_underwrite_commit")) return;
+   if (!source_chain_binding_ok(chain_code, uic->chain_code, "dispatch_underwrite_commit")) return;
 
-   const sysio::slug_name uic_token_code{uic.token_code};
-   const sysio::slug_name uic_reserve_code{uic.reserve_code};
+   const sysio::slug_name uic_token_code{uic->token_code};
+   const sysio::slug_name uic_reserve_code{uic->reserve_code};
    if (!payload_codes_canonical({uic_token_code, uic_reserve_code},
                                 "dispatch_underwrite_commit")) return;
 
@@ -650,7 +661,7 @@ void dispatch_underwrite_commit(name self, const std::vector<char>& data, uint64
    action(
       permission_level{self, "active"_n},
       UWRIT_ACCOUNT, "rcrdcommit"_n,
-      std::make_tuple(uic.uw_request_id, *underwriter, chain_code,
+      std::make_tuple(uic->uw_request_id, *underwriter, chain_code,
                       sysio::slug_name{chain_code},
                       uic_token_code,
                       uic_reserve_code,
