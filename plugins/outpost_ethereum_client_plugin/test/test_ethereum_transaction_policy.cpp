@@ -136,26 +136,24 @@ ethabi::contract bytes_argument_function(std::string name) {
    };
 }
 
-/** Build the chunked `epochIn` function ABI. */
-ethabi::contract chunked_epoch_in_function(std::string name) {
+/** Build the whole-envelope `epochIn(uint32,bytes)` function ABI. */
+ethabi::contract whole_envelope_epoch_in_function(std::string name) {
    return ethabi::contract{
       .name = std::move(name),
       .type = ethabi::invoke_target_type::function,
       .inputs = {ethabi::component_type{"epochIndex", ethabi::data_type::uint32},
-                 ethabi::component_type{"chunkIndex", ethabi::data_type::uint16},
-                 ethabi::component_type{"totalChunks", ethabi::data_type::uint16},
-                 ethabi::component_type{"totalBytes", ethabi::data_type::uint32},
-                 ethabi::component_type{"chunkData", ethabi::data_type::bytes}},
+                 ethabi::component_type{"envelopeData", ethabi::data_type::bytes}},
       .outputs = {},
    };
 }
 
-/** Build a function ABI with one address argument. */
-ethabi::contract address_argument_function(std::string name) {
+/** Build the `epochDeliveries(uint32,address)` view ABI. */
+ethabi::contract epoch_deliveries_function(std::string name) {
    return ethabi::contract{
       .name = std::move(name),
       .type = ethabi::invoke_target_type::function,
-      .inputs = {ethabi::component_type{"operator_", ethabi::data_type::address}},
+      .inputs = {ethabi::component_type{"epochIndex", ethabi::data_type::uint32},
+                 ethabi::component_type{"operator_", ethabi::data_type::address}},
       .outputs = {},
    };
 }
@@ -481,6 +479,36 @@ BOOST_AUTO_TEST_CASE(default_transaction_uses_priority_fee_in_estimate_payload_a
    BOOST_CHECK_EQUAL(sign_count.load(), 0u);
 }
 
+/// A gas-limit floor raises an under-estimate to the floor, leaves a larger
+/// buffered estimate alone, and is refused — never clamped — above the policy
+/// ceiling.
+BOOST_AUTO_TEST_CASE(gas_limit_floor_raises_an_under_estimate_and_is_policy_bounded) {
+   std::atomic<size_t> sign_count = 0;
+   const auto provider = make_recording_signer(sign_count);
+   auto policy = bounded_policy();
+   policy.max_gas_limit = 2000;
+   auto client = std::make_shared<recording_ethereum_client>(provider, policy);
+
+   // The fake estimate is 834 -> buffered 1000.
+   BOOST_CHECK_EQUAL(
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 0).gas_limit,
+      1000);
+   BOOST_CHECK_EQUAL(
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 900).gas_limit,
+      1000);
+   BOOST_CHECK_EQUAL(
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 1500).gas_limit,
+      1500);
+   BOOST_CHECK_EQUAL(
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 2000).gas_limit,
+      2000);
+   expect_policy_rejection([&] {
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 2001);
+   });
+   BOOST_CHECK_EQUAL(sign_count.load(), 0u);
+   BOOST_CHECK_EQUAL(client->broadcast_count, 0u);
+}
+
 BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
    std::atomic<size_t> sign_count = 0;
    const auto provider = make_recording_signer(sign_count);
@@ -491,21 +519,17 @@ BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
    sysio::opp_inbound_contract_client inbound{
       client,
       std::string(contract_address),
-      {chunked_epoch_in_function("epochIn"), no_argument_function("nextEpochIndex"),
-       no_argument_function("discardEnvelopeChunks"),
-       address_argument_function("envelopeChunkState"),
+      {whole_envelope_epoch_in_function("epochIn"), no_argument_function("nextEpochIndex"),
+       uint32_argument_function("dispatchSpill"), epoch_deliveries_function("epochDeliveries"),
+       no_argument_function("pendingEpochHash"),
        uint16_argument_function("attestationHandlers")},
    };
-   // Both OPPInbound write wrappers — the per-chunk delivery and the staged
-   // recovery — must be rejected by the policy before signing.
+   // OPPInbound's one write wrapper — the whole-envelope delivery — must be
+   // rejected by the policy before signing. It is funded to the policy ceiling
+   // (999 here), which the ×1.2-buffered estimate of 834 already breaches.
    uint32_t    epoch_index = 1;
-   uint16_t    chunk_index = 0;
-   uint16_t    total_chunks = 1;
-   uint32_t    total_bytes = 1;
-   std::string chunk = "01";
-   expect_policy_rejection(
-      [&] { inbound.epoch_in(epoch_index, chunk_index, total_chunks, total_bytes, chunk); });
-   expect_policy_rejection([&] { inbound.discard_envelope_chunks(); });
+   std::string envelope = "01";
+   expect_policy_rejection([&] { inbound.epoch_in(epoch_index, envelope); });
 
    sysio::opp_contract_client opp{
       client,

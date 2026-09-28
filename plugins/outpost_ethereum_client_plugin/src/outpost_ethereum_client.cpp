@@ -41,7 +41,6 @@ constexpr int ethereum_execution_reverted_code = 3;
 /// ours to clear. Hashed rather than written out as its selector so a reader can check this
 /// against the ABI directly; `chunk_buffer_missing_selector_is_pinned` holds the hash to the
 /// four bytes the contract actually emits.
-constexpr auto chunk_buffer_missing_signature = "OPP_ChunkBufferMissing(address)";
 
 /// The three refusals `SyndicationPool.realizeYield()` raises for its own reasons
 /// (Wire-Network/wire-ethereum#207), hashed the same way;
@@ -74,18 +73,31 @@ constexpr auto tx_realize_yield = "realizeYield";
 } // namespace syndication_pool_abi
 
 namespace opp_inbound_abi {
-constexpr auto view_envelope_chunk_state = "envelopeChunkState";
-constexpr auto view_next_epoch_index     = "nextEpochIndex";
+constexpr auto view_next_epoch_index   = "nextEpochIndex";
+constexpr auto view_dispatch_spill     = "dispatchSpill";
+constexpr auto view_epoch_deliveries   = "epochDeliveries";
+constexpr auto view_pending_epoch_hash = "pendingEpochHash";
 constexpr auto view_attestation_handlers = "attestationHandlers";
 namespace field {
-constexpr auto epoch_index     = "epochIndex";
-constexpr auto owner           = "owner";
-constexpr auto total_chunks    = "totalChunks";
-constexpr auto received_chunks = "receivedChunks";
-constexpr auto total_bytes     = "totalBytes";
-constexpr auto stored_bytes    = "storedBytes";
+constexpr auto tipped     = "tipped";
+constexpr auto dispatched = "dispatched";
+constexpr auto complete   = "complete";
+constexpr auto finalized  = "finalized";
 }
 } // namespace opp_inbound_abi
+
+/// Most `epochIn` continuations one tick sends for one epoch before handing
+/// the rest to the next tick. A bound, not a budget: a full-cap envelope
+/// spills a handful of times at most, and a cursor still advancing past this
+/// many is worth a log line and a fresh tick rather than an unbounded loop
+/// inside one.
+constexpr uint32_t MAX_CONTINUATIONS_PER_TICK = 32;
+
+/// Block tag for reading this outpost's own delivery bookkeeping
+/// (`nextEpochIndex`, `dispatchSpill`, `epochDeliveries`, `pendingEpochHash`).
+/// `latest`, deliberately, where the inbound-envelope read uses `finalized`:
+/// see `outpost_ethereum_client::read_dispatch_spill`.
+constexpr auto PROGRESS_READ_TAG = eth::block_tag_t::latest;
 
 constexpr size_t EVM_ABI_WORD_BYTES            = 32;
 constexpr size_t EVM_ADDRESS_BYTES             = 20;
@@ -152,6 +164,59 @@ bool has_function_abi(const std::vector<eth::abi::contract>& abis, std::string_v
    });
 }
 
+/// Interpret one decoded ABI output word as a boolean.
+///
+/// Tolerates every shape the decoder may hand back for a Solidity `bool` — a
+/// native bool, the decimal strings the numeric path normalises to, or a raw
+/// number. Returns `std::nullopt` for anything else so callers fail closed.
+std::optional<bool> abi_bool_output(const fc::variant& value) {
+   if (value.is_bool()) return value.as_bool();
+   if (value.is_string()) {
+      const auto text = value.as_string();
+      if (text == "true") return true;
+      if (text == "false") return false;
+   }
+   const auto numeric = abi_uint_output(value);
+   if (numeric) return *numeric != 0;
+   return std::nullopt;
+}
+
+/// Pull the single value out of a decoded view result.
+///
+/// libfc picks one of three shapes: a BARE value when the function has one
+/// output, a named object when every output is named, and a positional array
+/// otherwise. A public state-variable getter takes the first path because its
+/// output carries no name; a struct getter takes the second. Reading a scalar
+/// through this keeps a caller indifferent to which one the decoder chose.
+fc::variant decoded_scalar(const fc::variant& decoded) {
+   if (decoded.is_array()) {
+      const auto& items = decoded.get_array();
+      return items.empty() ? fc::variant() : items[0];
+   }
+   if (decoded.is_object()) {
+      const auto& object = decoded.get_object();
+      return object.size() == 0 ? fc::variant() : object.begin()->value();
+   }
+   return decoded;
+}
+
+/// A 32-byte word as the decoder renders it, normalised for comparison:
+/// lower-case hex with no `0x` prefix. Empty when the value is not a string.
+std::string normalized_word(const fc::variant& value) {
+   if (!value.is_string()) return {};
+   std::string word = value.as_string();
+   if (word.size() >= HEX_PREFIX_CHARS && word[0] == '0' && (word[1] == 'x' || word[1] == 'X')) {
+      word.erase(0, HEX_PREFIX_CHARS);
+   }
+   std::ranges::transform(word, word.begin(), [](unsigned char c) { return std::tolower(c); });
+   return word;
+}
+
+/// Whether a normalised word is the zero word (or empty — nothing recorded).
+bool is_zero_word(std::string_view word) {
+   return std::ranges::all_of(word, [](char c) { return c == '0'; });
+}
+
 } // namespace
 
 namespace outpost_ethereum_client_detail {
@@ -162,65 +227,25 @@ bool same_evm_address(std::string_view lhs, std::string_view rhs) {
    return same_hex(left, strip_hex_prefix(rhs));
 }
 
-bool is_chunk_buffer_missing_revert(std::string_view revert_data, std::string_view owner_address) {
-   constexpr size_t selector_chars = EVM_SELECTOR_BYTES * HEX_CHARS_PER_BYTE;
-   constexpr size_t word_chars     = EVM_ABI_WORD_BYTES * HEX_CHARS_PER_BYTE;
-   constexpr size_t address_chars  = EVM_ADDRESS_BYTES * HEX_CHARS_PER_BYTE;
-
-   const auto data = strip_hex_prefix(revert_data);
-   // Selector plus exactly one address word. Requiring the exact length is no more brittle
-   // than the selector test: an error taking different arguments hashes differently.
-   if (data.size() != selector_chars + word_chars) return false;
-
-   if (!same_hex(data.substr(0, selector_chars), selector_hex(chunk_buffer_missing_signature)))
-      return false;
-
-   // The error's sole argument is the contract's `msg.sender`, so the word must be this
-   // relay's own signer, left-padded into 32 bytes.
-   const auto word = data.substr(selector_chars);
-   if (word.find_first_not_of('0') < word_chars - address_chars) return false;
-   return same_evm_address(word.substr(word_chars - address_chars), owner_address);
-}
-
-chunk_resume_decision decide_chunk_resume(const envelope_chunk_state& staged,
-                                          std::string_view            self_address,
-                                          uint32_t                    epoch_index,
-                                          uint16_t                    total_chunks,
-                                          uint32_t                    total_bytes) {
-   // An empty header (`totalChunks == SLOT_EMPTY`) is the reclaimable state the
-   // contract hands back for "never staged" and "already reset". Nothing to
-   // adopt; chunk 0 stages it.
-   if (staged.total_chunks == 0) {
-      return {chunk_resume_action::start_fresh, 0};
+delivery_action decide_delivery(uint32_t              next_epoch_index,
+                                uint32_t              epoch_index,
+                                const dispatch_spill& spill,
+                                bool                  own_delivery_settled) {
+   // The outpost is past this epoch, or has closed it: every transaction
+   // would be a paid late no-op. `finalized` is checked as well as the epoch
+   // cursor because the two are written in one call and reads that race a
+   // just-mined block may see one before the other.
+   if (next_epoch_index > epoch_index || spill.finalized) {
+      return delivery_action::already_finalized;
    }
-
-   // A header owned by someone else is not ours to continue or discard: the
-   // view is owner-bound, so this can only mean the read was answered for a
-   // different signer. Start from 0 and let the contract's ownership guard
-   // arbitrate.
-   if (!same_evm_address(staged.owner, self_address)) {
-      return {chunk_resume_action::start_fresh, 0};
+   // Tipped but unfinished. The contract admits a continuation only from a
+   // relay whose recorded delivery IS the settled digest, so a relay that has
+   // not delivered, or delivered a minority envelope, has nothing to send.
+   if (spill.tipped) {
+      return own_delivery_settled ? delivery_action::continue_dispatch
+                                  : delivery_action::wait_for_deliverer;
    }
-
-   // Our own header, but for a different epoch. On a path-2 consensus retry
-   // this is the signature of an epoch that advanced underneath us, so the
-   // caller confirms against `nextEpochIndex()` before spending gas on late
-   // no-op transactions.
-   if (staged.epoch_index != epoch_index) {
-      return {chunk_resume_action::confirm_epoch_advanced, 0};
-   }
-
-   // Our own CURRENT-epoch header whose declared shape belongs to a different
-   // envelope, or one claiming more stored chunks than a well-formed upload can
-   // hold (the final chunk is never stored, so `receivedChunks` tops out at
-   // `totalChunks - 1`). Either way the staged cells are unusable: discard,
-   // then upload from 0.
-   if (staged.total_chunks != total_chunks || staged.total_bytes != total_bytes ||
-       staged.received_chunks >= total_chunks) {
-      return {chunk_resume_action::discard_and_restart, 0};
-   }
-
-   return {chunk_resume_action::resume, staged.received_chunks};
+   return delivery_action::deliver;
 }
 
 std::optional<realize_yield_refusal> classify_realize_yield_revert(std::string_view revert_data) {
@@ -295,9 +320,10 @@ outpost_ethereum_client::outpost_ethereum_client(
          _entry->client->get_contract<opp_inbound_contract_client>(_opp_inbound_addr, _abis);
    }
 
-   // Every OPPInbound staging header is bound to the delivering signer, so the
-   // chunk-resume read needs this relay's own address on every multi-chunk
-   // delivery. Derive it once here rather than per tick.
+   // OPPInbound records every delivery under the delivering signer, and a
+   // continuation is admitted only from a signer whose recorded digest is the
+   // settled one, so the continuation check needs this relay's own address.
+   // Derive it once here rather than per tick.
    _signer_address_hex = fc::to_hex(_entry->client->get_signer_address(), /*add_prefix=*/true);
 }
 
@@ -311,179 +337,88 @@ outpost_ethereum_client::authenticated_caller_address() const {
    return {address.begin(), address.end()};
 }
 
-detail::envelope_chunk_state outpost_ethereum_client::read_envelope_chunk_state() {
-   detail::envelope_chunk_state state;
-
-   const auto& abi = _opp_inbound_client->get_abi(opp_inbound_abi::view_envelope_chunk_state);
-
-   // Read at `latest`. This is our OWN staging high-water mark, not delivered
-   // content WIRE commits consensus against, so the `finalized`-tag reasoning
-   // that governs `read_inbound_envelope` does not apply — reading it at
-   // `finalized` would re-send every chunk staged in an unfinalized block.
-   std::string operator_address = _signer_address_hex;
-   const auto  raw_hex_var =
-      _opp_inbound_client->envelope_chunk_state(eth::block_tag_t::latest, operator_address);
-   if (!raw_hex_var.is_string()) {
-      wlog("outpost_ethereum_client[{}]: envelopeChunkState returned non-string variant",
-           to_string());
-      return state;
-   }
-   const std::string raw_hex = raw_hex_var.as_string();
-   if (raw_hex.empty() || raw_hex == "0x") {
-      dlog("outpost_ethereum_client[{}]: envelopeChunkState returned empty hex", to_string());
-      return state;
-   }
-
-   const auto decoded = eth::contract_decode_data(abi, raw_hex);
-   dlog("outpost_ethereum_client[{}]: envelopeChunkState decoded={}",
-        to_string(), fc::json::to_string(decoded, fc::json::yield_function_t{}));
-   if (!decoded.is_object()) {
-      wlog("outpost_ethereum_client[{}]: envelopeChunkState result was not a variant object",
-           to_string());
-      return state;
-   }
-
-   const auto& obj = decoded.get_object();
-   for (const auto* key : {opp_inbound_abi::field::epoch_index,
-                           opp_inbound_abi::field::owner,
-                           opp_inbound_abi::field::total_chunks,
-                           opp_inbound_abi::field::received_chunks,
-                           opp_inbound_abi::field::total_bytes,
-                           opp_inbound_abi::field::stored_bytes}) {
-      if (!obj.contains(key)) {
-         wlog("outpost_ethereum_client[{}]: envelopeChunkState result missing '{}' key",
-              to_string(), key);
-         return state;
-      }
-   }
-
-   const auto& owner_var = obj[opp_inbound_abi::field::owner];
-   if (!owner_var.is_string()) {
-      wlog("outpost_ethereum_client[{}]: envelopeChunkState owner was not a string", to_string());
-      return state;
-   }
-
-   // Fail closed on the fields the resume DECISION reads: an unparsable one
-   // must not be silently read as 0, which would fabricate an empty header.
-   const auto epoch_index     = abi_uint_output(obj[opp_inbound_abi::field::epoch_index]);
-   const auto total_chunks    = abi_uint_output(obj[opp_inbound_abi::field::total_chunks]);
-   const auto received_chunks = abi_uint_output(obj[opp_inbound_abi::field::received_chunks]);
-   const auto total_bytes     = abi_uint_output(obj[opp_inbound_abi::field::total_bytes]);
-   if (!epoch_index || !total_chunks || !received_chunks || !total_bytes) {
-      wlog("outpost_ethereum_client[{}]: envelopeChunkState carried an unparsable numeric field",
-           to_string());
-      return state;
-   }
-
-   state.owner           = owner_var.as_string();
-   state.epoch_index     = static_cast<uint32_t>(*epoch_index);
-   state.total_chunks    = static_cast<uint16_t>(*total_chunks);
-   state.received_chunks = static_cast<uint16_t>(*received_chunks);
-   state.total_bytes     = static_cast<uint32_t>(*total_bytes);
-   // `storedBytes` is a uint256 on chain and feeds diagnostics ONLY — it is not
-   // an input to `decide_chunk_resume`. Parse it separately with a 0 default so
-   // a value above UINT64_MAX cannot discard an otherwise-valid header and
-   // force a needless re-upload of chunks the outpost already holds.
-   state.stored_bytes = abi_uint_output(obj[opp_inbound_abi::field::stored_bytes]).value_or(0);
-   return state;
+uint32_t outpost_ethereum_client::read_next_epoch_index() {
+   const auto raw = _opp_inbound_client->next_epoch_index(PROGRESS_READ_TAG);
+   FC_ASSERT(raw.is_string(),
+             "outpost_ethereum_client[{}]: nextEpochIndex returned a non-string variant",
+             to_string());
+   const auto decoded = decoded_scalar(eth::contract_decode_data(
+      _opp_inbound_client->get_abi(opp_inbound_abi::view_next_epoch_index), raw.as_string()));
+   const auto value = abi_uint_output(decoded);
+   FC_ASSERT(value.has_value(),
+             "outpost_ethereum_client[{}]: nextEpochIndex was not a parsable numeric output",
+             to_string());
+   return static_cast<uint32_t>(*value);
 }
 
-std::optional<uint16_t> outpost_ethereum_client::resume_chunk_index(
-   uint32_t       epoch_index,
-   uint16_t       total_chunks,
-   uint32_t       total_bytes,
-   fc::time_point deadline_abs) {
-   throw_if_past_deadline(deadline_abs, OP_DELIVER_OUTBOUND);
-   const auto staged   = read_envelope_chunk_state();
-   const auto decision = detail::decide_chunk_resume(
-      staged, _signer_address_hex, epoch_index, total_chunks, total_bytes);
+detail::dispatch_spill outpost_ethereum_client::read_dispatch_spill(uint32_t epoch_index) {
+   // `ethereum_contract_call_fn` binds its arguments as non-const lvalue
+   // references, so the epoch needs a named local.
+   uint32_t   epoch_arg = epoch_index;
+   const auto raw       = _opp_inbound_client->dispatch_spill(PROGRESS_READ_TAG, epoch_arg);
+   FC_ASSERT(raw.is_string(),
+             "outpost_ethereum_client[{}]: dispatchSpill returned a non-string variant",
+             to_string());
+   const auto decoded = eth::contract_decode_data(
+      _opp_inbound_client->get_abi(opp_inbound_abi::view_dispatch_spill), raw.as_string());
+   dlog("outpost_ethereum_client[{}]: dispatchSpill({}) decoded={}",
+        to_string(), epoch_index, fc::json::to_string(decoded, fc::json::yield_function_t{}));
+   FC_ASSERT(decoded.is_object(),
+             "outpost_ethereum_client[{}]: dispatchSpill result was not a variant object",
+             to_string());
 
-   dlog("outpost_ethereum_client[{}]: chunk resume epoch={} total_chunks={} action={} "
-        "staged(epoch={} owner={} chunks={} received={} bytes={})",
-        to_string(), epoch_index, total_chunks,
-        magic_enum::enum_name(decision.action),
-        staged.epoch_index, staged.owner, staged.total_chunks,
-        staged.received_chunks, staged.total_bytes);
+   // Fail closed on every field: an unparsable one must not be silently read
+   // as "not tipped", which would send a fresh delivery into an epoch that
+   // has already settled and be refused as a non-deliverer.
+   const auto& object     = decoded.get_object();
+   const auto  read_bool  = [&](const char* key) {
+      FC_ASSERT(object.contains(key),
+                "outpost_ethereum_client[{}]: dispatchSpill result missing '{}'", to_string(), key);
+      const auto value = abi_bool_output(object[key]);
+      FC_ASSERT(value.has_value(),
+                "outpost_ethereum_client[{}]: dispatchSpill '{}' was not a boolean output",
+                to_string(), key);
+      return *value;
+   };
+   FC_ASSERT(object.contains(opp_inbound_abi::field::dispatched),
+             "outpost_ethereum_client[{}]: dispatchSpill result missing '{}'",
+             to_string(), opp_inbound_abi::field::dispatched);
+   const auto dispatched = abi_uint_output(object[opp_inbound_abi::field::dispatched]);
+   FC_ASSERT(dispatched.has_value(),
+             "outpost_ethereum_client[{}]: dispatchSpill '{}' was not a numeric output",
+             to_string(), opp_inbound_abi::field::dispatched);
 
-   switch (decision.action) {
-   case detail::chunk_resume_action::start_fresh:
-      return uint16_t{0};
+   detail::dispatch_spill spill;
+   spill.tipped     = read_bool(opp_inbound_abi::field::tipped);
+   spill.dispatched = static_cast<uint16_t>(*dispatched);
+   spill.complete   = read_bool(opp_inbound_abi::field::complete);
+   spill.finalized  = read_bool(opp_inbound_abi::field::finalized);
+   return spill;
+}
 
-   case detail::chunk_resume_action::resume:
-      ilog("outpost_ethereum_client[{}]: resuming epoch={} delivery at chunk {}/{} "
-           "from the on-chain staging high-water mark",
-           to_string(), epoch_index, decision.start_chunk, total_chunks);
-      return decision.start_chunk;
+bool outpost_ethereum_client::own_delivery_settled(uint32_t epoch_index) {
+   uint32_t    epoch_arg    = epoch_index;
+   std::string operator_arg = _signer_address_hex;
+   const auto  delivered_raw =
+      _opp_inbound_client->epoch_deliveries(PROGRESS_READ_TAG, epoch_arg, operator_arg);
+   const auto settled_raw = _opp_inbound_client->pending_epoch_hash(PROGRESS_READ_TAG);
+   FC_ASSERT(delivered_raw.is_string() && settled_raw.is_string(),
+             "outpost_ethereum_client[{}]: epochDeliveries / pendingEpochHash returned a "
+             "non-string variant",
+             to_string());
 
-   case detail::chunk_resume_action::discard_and_restart: {
-      throw_if_past_deadline(deadline_abs, OP_DELIVER_OUTBOUND);
-      try {
-         const auto result = _opp_inbound_client->discard_envelope_chunks();
-         ilog("outpost_ethereum_client[{}]: discarded a superseded epoch={} staging header "
-              "(staged chunks={} bytes={}) tx={}",
-              to_string(), epoch_index, staged.total_chunks, staged.total_bytes,
-              result.as_string());
-      } catch (const fc::network::json_rpc::json_rpc_error& e) {
-         // Only one revert means the header is already clear, and it has to be identified by
-         // what the node returned, not by the exception's type or its code alone. A
-         // protocol-level JSON-RPC error says the node never ran the call at all; a code-3
-         // revert carrying anything else — a wrong implementation behind the proxy, a
-         // reentrancy guard, an unrecognised selector — says it ran and failed for a reason
-         // this path cannot interpret. Either way the discard may not have happened, and
-         // tolerating it would upload against a staging header that is still stale.
-         if (e.code != ethereum_execution_reverted_code ||
-             !detail::is_chunk_buffer_missing_revert(e.data.is_string() ? e.data.as_string() : std::string{},
-                                                     _signer_address_hex))
-            throw;
-         // `OPP_ChunkBufferMissing(self)` from `eth_estimateGas` means the header is already
-         // clear, which is exactly the state we wanted. Tolerate it and upload from chunk 0.
-         //
-         // Deliberately NOT widened: a revert first observed at RECEIPT time
-         // (status=0) is raised by `wait_for_confirmation` as a generic
-         // `fc::exception` (`ethereum_client.cpp` "Ethereum tx {} reverted
-         // (status=0)"), and so are transport failures and deadline expiry.
-         // All three propagate and abandon the tick, which is benign: the next
-         // cron tick re-reads the staging header and resumes from whatever the
-         // chain actually holds.
-         dlog("outpost_ethereum_client[{}]: discardEnvelopeChunks reverted at estimate time, "
-              "treating the staging header as already clear: code={} message='{}'",
-              to_string(), e.code, e.top_message());
-      }
-      return uint16_t{0};
-   }
+   const auto delivered = normalized_word(decoded_scalar(eth::contract_decode_data(
+      _opp_inbound_client->get_abi(opp_inbound_abi::view_epoch_deliveries), delivered_raw.as_string())));
+   const auto settled = normalized_word(decoded_scalar(eth::contract_decode_data(
+      _opp_inbound_client->get_abi(opp_inbound_abi::view_pending_epoch_hash), settled_raw.as_string())));
+   dlog("outpost_ethereum_client[{}]: epoch={} own delivery={} settled={}",
+        to_string(), epoch_index, delivered, settled);
 
-   case detail::chunk_resume_action::confirm_epoch_advanced: {
-      throw_if_past_deadline(deadline_abs, OP_DELIVER_OUTBOUND);
-      const auto next_var = _opp_inbound_client->next_epoch_index(eth::block_tag_t::latest);
-      // `nextEpochIndex()` declares a single output, and `contract_decode_data`
-      // returns a lone component directly rather than wrapping it.
-      const auto next_epoch =
-         next_var.is_string()
-            ? abi_uint_output(eth::contract_decode_data(
-                 _opp_inbound_client->get_abi(opp_inbound_abi::view_next_epoch_index),
-                 next_var.as_string()))
-            : std::optional<uint64_t>{};
-      if (!next_epoch) {
-         wlog("outpost_ethereum_client[{}]: could not read nextEpochIndex while resolving a "
-              "stale staging header; delivering epoch={} from chunk 0",
-              to_string(), epoch_index);
-         return uint16_t{0};
-      }
-      if (*next_epoch > epoch_index) {
-         ilog("outpost_ethereum_client[{}]: skipping epoch={} delivery — the outpost has "
-              "already advanced to epoch {}",
-              to_string(), epoch_index, *next_epoch);
-         return std::nullopt;
-      }
-      return uint16_t{0};
-   }
-   }
-
-   // Unreachable: the switch above covers every `chunk_resume_action`. An enum
-   // can still hold an out-of-range value, so the compiler requires a fallback;
-   // uploading from chunk 0 is the conservative one (the contract absorbs any
-   // replayed chunk as an idempotent no-op).
-   return uint16_t{0};
+   // A zero digest is "nothing recorded" on either side and never a match: an
+   // epoch cannot settle on the zero digest, and a relay that has not
+   // delivered has no claim on the continuation.
+   if (is_zero_word(delivered) || is_zero_word(settled)) return false;
+   return delivered == settled;
 }
 
 std::string outpost_ethereum_client::deliver_outbound_envelope(
@@ -508,52 +443,87 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
              "of {} bytes; OPPInbound will reject it",
              to_string(), total, OPP_MAX_ENVELOPE_BYTES);
 
-   const uint16_t total_chunks = detail::chunk_count_for(total);
-
-   // RESUME — multi-chunk deliveries only. A single-chunk envelope stages
-   // nothing on chain (OPPInbound's fast path assembles straight from
-   // calldata), so the dominant case pays no extra round trip.
-   uint16_t start_chunk = 0;
-   if (total_chunks > 1) {
-      const auto resume =
-         resume_chunk_index(epoch_index, total_chunks, static_cast<uint32_t>(total), deadline_abs);
-      if (!resume) {
-         // The outpost advanced past this epoch; every chunk would be a paid
-         // late no-op. Returning empty marks the epoch handled for this tick.
-         return {};
-      }
-      start_chunk = *resume;
-   }
+   // ONE call carries the whole envelope. Ethereum bounds a transaction by
+   // gas, not size, and a full-cap envelope is ~1.3 M gas of calldata against
+   // EIP-7825's 16.7 M cap; what may not fit is DISPATCH, which the contract
+   // spills across continuations of this same call. The envelope is
+   // re-supplied on every continuation — the outpost never stores its bytes.
+   const std::string envelope_hex = fc::to_hex(envelope_bytes.data(), static_cast<uint32_t>(total));
 
    // Sequential, receipt-confirmed submission — one transaction in flight at a
    // time, so the signer's nonce advances in lock-step and a mid-sequence
-   // failure simply abandons the tick. The next cron tick restarts from the
-   // on-chain high-water mark; the contract absorbs any replayed chunk as an
-   // idempotent no-op.
+   // failure simply abandons the tick. The next cron tick re-reads the
+   // outpost's cursor and picks up wherever the chain actually is.
    std::string last_tx;
-   for (uint16_t chunk = start_chunk; chunk < total_chunks; ++chunk) {
+   bool        delivered_this_tick = false;
+   for (uint32_t call = 0; call <= MAX_CONTINUATIONS_PER_TICK; ++call) {
       throw_if_past_deadline(deadline_abs, OP_DELIVER_OUTBOUND);
 
-      const size_t offset = static_cast<size_t>(chunk) * ETHEREUM_MAX_CHUNK_BYTES;
-      const size_t length = std::min(ETHEREUM_MAX_CHUNK_BYTES, total - offset);
+      const auto next_epoch = read_next_epoch_index();
+      const auto spill      = read_dispatch_spill(epoch_index);
+      // The two settlement reads are only meaningful — and only paid for —
+      // when the epoch is mid-flight.
+      const bool settled = spill.tipped && !spill.finalized && own_delivery_settled(epoch_index);
+      const auto action  = detail::decide_delivery(next_epoch, epoch_index, spill, settled);
+      dlog("outpost_ethereum_client[{}]: epoch={} action={} next_epoch={} "
+           "spill(tipped={} dispatched={} complete={} finalized={}) settled={}",
+           to_string(), epoch_index, magic_enum::enum_name(action), next_epoch,
+           spill.tipped, spill.dispatched, spill.complete, spill.finalized, settled);
 
+      switch (action) {
+      case detail::delivery_action::already_finalized:
+         if (last_tx.empty()) {
+            // Nothing sent: the outpost was already past this epoch when the
+            // tick began. An EMPTY tx id tells the job the epoch is handled.
+            ilog("outpost_ethereum_client[{}]: skipping epoch={} delivery — the outpost has "
+                 "already finalized it (nextEpochIndex={})",
+                 to_string(), epoch_index, next_epoch);
+         }
+         return last_tx;
+
+      case detail::delivery_action::wait_for_deliverer:
+         ilog("outpost_ethereum_client[{}]: epoch={} tipped on a digest this relay did not "
+              "deliver (dispatched={} complete={}); its deliverers carry the continuation",
+              to_string(), epoch_index, spill.dispatched, spill.complete);
+         return last_tx;
+
+      case detail::delivery_action::deliver:
+         if (delivered_this_tick) {
+            // Our delivery is recorded and consensus has not tipped: the
+            // remaining group members have yet to deliver. Re-sending would
+            // be a paid no-op; the job's boundary-gated retry covers path 2.
+            dlog("outpost_ethereum_client[{}]: epoch={} delivery recorded; consensus not yet tipped",
+                 to_string(), epoch_index);
+            return last_tx;
+         }
+         break;
+
+      case detail::delivery_action::continue_dispatch:
+         break;
+      }
+
+      throw_if_past_deadline(deadline_abs, OP_DELIVER_OUTBOUND);
       // `ethereum_contract_tx_fn` binds every argument as a non-const lvalue
-      // reference, so each one needs a named local (the same constraint that
-      // shapes `uw_commit`'s hex local).
-      uint32_t    epoch_arg  = epoch_index;
-      uint16_t    chunk_arg  = chunk;
-      uint16_t    chunks_arg = total_chunks;
-      uint32_t    bytes_arg  = static_cast<uint32_t>(total);
-      std::string chunk_hex =
-         fc::to_hex(envelope_bytes.data() + offset, static_cast<uint32_t>(length));
+      // reference, so each one needs a named local.
+      uint32_t    epoch_arg   = epoch_index;
+      std::string payload_hex = envelope_hex;
+      const auto  result      = _opp_inbound_client->epoch_in(epoch_arg, payload_hex);
+      last_tx                 = result.as_string();
 
-      const auto result =
-         _opp_inbound_client->epoch_in(epoch_arg, chunk_arg, chunks_arg, bytes_arg, chunk_hex);
-      last_tx = result.as_string();
-      ilog("outpost_ethereum_client[{}]: epochIn chunk sent epoch={} chunk={}/{} bytes={} tx={}",
-           to_string(), epoch_index, chunk, total_chunks, length, last_tx);
+      if (action == detail::delivery_action::deliver) {
+         delivered_this_tick = true;
+         ilog("outpost_ethereum_client[{}]: epochIn delivered epoch={} bytes={} tx={}",
+              to_string(), epoch_index, total, last_tx);
+      } else {
+         ilog("outpost_ethereum_client[{}]: epochIn continued epoch={} from attestation {} "
+              "(complete={}) tx={}",
+              to_string(), epoch_index, spill.dispatched, spill.complete, last_tx);
+      }
    }
 
+   wlog("outpost_ethereum_client[{}]: epoch={} still not finalized after {} continuations in "
+        "one tick; the next tick resumes from the outpost's cursor",
+        to_string(), epoch_index, MAX_CONTINUATIONS_PER_TICK);
    return last_tx;
 }
 
