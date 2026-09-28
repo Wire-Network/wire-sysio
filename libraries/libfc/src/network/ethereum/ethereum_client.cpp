@@ -28,6 +28,7 @@ constexpr std::string_view base_fee_per_gas = "base_fee_per_gas";
 constexpr std::string_view max_priority_fee_per_gas = "max_priority_fee_per_gas";
 constexpr std::string_view estimated_gas = "estimated_gas";
 constexpr std::string_view gas_price = "gas_price";
+constexpr std::string_view gas_limit_floor = "gas_limit_floor";
 } // namespace transaction_policy_field
 
 namespace ethereum_rpc_field {
@@ -286,23 +287,40 @@ fc::variant ethereum_client::get_syncing_status() {
  * Constructs a complete EIP-1559 transaction by:
  * - Fetching current gas configuration (base fee, priority fee)
  * - Encoding the contract call data according to the ABI
- * - Estimating gas usage and adding a 20% buffer
+ * - Estimating gas usage and adding a 20% buffer, then raising the result to
+ *   `gas_limit_floor` when the caller funds the call to a floor
  * - Setting the nonce from the pending transaction count
  *
  * @param to The recipient address (contract address for contract calls)
  * @param contract The ABI contract definition for encoding the call data
  * @param params The parameters to pass to the contract function
+ * @param gas_limit_floor Least gas limit to fund with, or 0 for the buffered estimate
  * @return A configured eip1559_tx ready for signing and submission
  * @throws fc::network::json_rpc::json_rpc_exception if any RPC call fails
+ * @throws ethereum_transaction_policy_exception if the estimate or the floor
+ *         breaches the client's `max_gas_limit`
  */
 eip1559_tx ethereum_client::create_default_tx(const address_compat_type& to, const abi::contract& contract,
-                                              const fc::variants& params) {
+                                              const fc::variants& params, uint64_t gas_limit_floor) {
    try {
       auto gc = get_gas_config_unlogged();
       auto data = contract_encode_data(contract, params);
 
       auto estimated_gas = estimate_gas(to, contract, data, gc);
       auto gas_limit = derive_buffered_gas_limit(_transaction_policy, estimated_gas);
+      if (gas_limit_floor != 0) {
+         // The floor is bounded by the same ceiling as the estimate: a caller
+         // asking for more than the policy allows is refused, not clamped, so
+         // an under-funded call is never silently sent.
+         const fc::uint256 floor{gas_limit_floor};
+         if (floor > _transaction_policy.max_gas_limit) {
+            throw_transaction_policy_exception(ethereum_transaction_policy_reason::gas_limit_cap_exceeded,
+                                               transaction_policy_field::gas_limit_floor,
+                                               floor.str(),
+                                               _transaction_policy.max_gas_limit.str());
+         }
+         if (gas_limit < floor) gas_limit = floor;
+      }
 
       return eip1559_tx{.chain_id = get_chain_id(),
                         .nonce = get_transaction_count(get_signer_address(), block_tag_t::pending),
