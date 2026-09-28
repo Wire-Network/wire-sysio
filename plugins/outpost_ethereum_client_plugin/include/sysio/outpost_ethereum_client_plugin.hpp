@@ -47,36 +47,74 @@ struct opp_contract_client : ethereum_contract_client {
       , get_latest_outbound_envelope(create_call<fc::variant>(get_abi("getLatestOutboundEnvelope"))) {}
 };
 
+/// EIP-7825's per-transaction gas cap (2^24) — the most any single `epochIn`
+/// can be funded with, whatever the client's policy allows.
+inline constexpr uint64_t EIP_7825_TX_GAS_CAP = 16'777'216;
+
+/**
+ * @brief Gas an `epochIn` transaction is funded with: the client's policy
+ *        ceiling, bounded by EIP-7825's cap.
+ *
+ * Delivery is funded to a FLOOR rather than to the node's estimate because the
+ * estimate is systematically wrong for this call. `OPPInbound.epochIn` stops
+ * dispatching on a `gasleft()` watchdog and records where it stopped instead
+ * of reverting, so `eth_estimateGas` converges on the least gas at which the
+ * call SUCCEEDS — the consensus tip plus ONE attestation. Funded to that
+ * figure every call would spill after one attestation and an envelope would
+ * cost one transaction per attestation. Funded to the ceiling, one call
+ * carries as much dispatch as the chain allows and the unused remainder is
+ * refunded.
+ *
+ * @param policy The client's local expenditure policy.
+ * @return The floor, in gas.
+ */
+inline uint64_t delivery_gas_limit_floor(const ethereum_transaction_policy& policy) {
+   const fc::uint256 cap{EIP_7825_TX_GAS_CAP};
+   return policy.max_gas_limit < cap ? policy.max_gas_limit.convert_to<uint64_t>() : EIP_7825_TX_GAS_CAP;
+}
+
+/**
+ * @brief Confirmation options for `epochIn`: the defaults, funded to
+ *        `delivery_gas_limit_floor`.
+ * @param client The client whose policy sets the floor; null (an ABI-only
+ *        construction) leaves the floor at zero.
+ * @return The options the `epochIn` wrapper is built with.
+ */
+inline ethereum_confirm_options delivery_confirm_options(const ethereum_client_ptr& client) {
+   ethereum_confirm_options options = ethereum_confirm_option_defaults;
+   if (client) options.gas_limit_floor = delivery_gas_limit_floor(client->transaction_policy());
+   return options;
+}
+
 /// Typed contract client for OPPInbound.sol. Same confirmed-default
-/// policy as `opp_contract_client` for write paths.
+/// policy as `opp_contract_client` for the write path.
 struct opp_inbound_contract_client : ethereum_contract_client {
-   /// `epochIn(uint32 epochIndex, uint16 chunkIndex, uint16 totalChunks,
-   ///          uint32 totalBytes, bytes chunkData)` — ONE chunk of the
-   /// envelope. The contract stages every chunk but the last and finalizes
-   /// inline on the chunk that completes the envelope; there is no terminal
-   /// call and no crank. `chunkData` rides as a hex-encoded string because the
-   /// libfc ABI encoder takes `dt::bytes` that way (see
+   /// `epochIn(uint32 epochIndex, bytes envelopeData)` — the WHOLE envelope in
+   /// ONE call, addressed to its epoch. The call that reaches consensus
+   /// dispatches as many attestations as its gas allows and records where it
+   /// stopped; a continuation is the SAME call with the same arguments, which
+   /// the contract resumes from its cursor. Funded to the policy ceiling — see
+   /// `delivery_gas_limit_floor`. `envelopeData` rides as a hex-encoded string
+   /// because the libfc ABI encoder takes `dt::bytes` that way (see
    /// `ethereum_abi::encode_dynamic_data`).
    ///
    /// `ethereum_contract_tx_fn` binds every argument as a non-const lvalue
-   /// reference, so callers must materialize named locals for all five.
-   ethereum_contract_tx_fn<fc::variant, uint32_t, uint16_t, uint16_t, uint32_t, std::string> epoch_in;
-   /// `discardEnvelopeChunks()` — staged-owner-only recovery, resetting every
-   /// header this signer owns. Invoked by the relay when it finds a
-   /// CURRENT-epoch staging header whose shape belongs to a superseded
-   /// envelope; reverts (`OPP_ChunkBufferMissing`) when nothing is staged,
-   /// which the relay treats as "already clear".
-   ethereum_contract_tx_fn<fc::variant> discard_envelope_chunks;
+   /// reference, so callers must materialize named locals for both.
+   ethereum_contract_tx_fn<fc::variant, uint32_t, std::string> epoch_in;
    /// `nextEpochIndex()` view — the epoch the outpost is currently accepting.
    ethereum_contract_call_fn<fc::variant> next_epoch_index;
-   /// `envelopeChunkState(address operator_)` view — the OWNER-BOUND staging
-   /// header, the relay's resume read. Block tag rides first per
-   /// `ethereum_contract_call_fn`; the address argument is a hex string.
-   /// Returns the raw `eth_call` hex — `create_call<fc::variant>` does not
-   /// auto-decode, so the caller pushes it back through `contract_decode_data`
-   /// against this ABI entry (the same shape `read_inbound_envelope` uses for
-   /// `getLatestOutboundEnvelope`).
-   ethereum_contract_call_fn<fc::variant, std::string> envelope_chunk_state;
+   /// `dispatchSpill(uint32 epochIndex)` view — where a tipped epoch's dispatch
+   /// stands: `(tipped, dispatched, complete, finalized)`. Block tag rides
+   /// first per `ethereum_contract_call_fn`. Returns the raw `eth_call` hex —
+   /// `create_call<fc::variant>` does not auto-decode, so the caller pushes it
+   /// back through `contract_decode_data` against this ABI entry.
+   ethereum_contract_call_fn<fc::variant, uint32_t> dispatch_spill;
+   /// `epochDeliveries(uint32 epochIndex, address operator_)` view — the digest
+   /// `operator_` delivered for the epoch, or zero when it has not delivered.
+   ethereum_contract_call_fn<fc::variant, uint32_t, std::string> epoch_deliveries;
+   /// `pendingEpochHash()` view — the digest consensus settled on for the epoch
+   /// the outpost is processing.
+   ethereum_contract_call_fn<fc::variant> pending_epoch_hash;
    /// `attestationHandlers(uint16 attestationType)` view — the outpost's own
    /// inbound routing table: the `IOPPReceiver` registered for one attestation
    /// type, `address(0)` when none is and `ATTESTATION_BLACKHOLE` when governance
@@ -90,12 +128,12 @@ struct opp_inbound_contract_client : ethereum_contract_client {
                                const address_compat_type& contract_address,
                                const std::vector<fc::network::ethereum::abi::contract>& contracts)
       : ethereum_contract_client(client, contract_address, contracts)
-      , epoch_in(create_tx_and_confirm<fc::variant, uint32_t, uint16_t, uint16_t, uint32_t, std::string>(
-           get_abi("epochIn")))
-      , discard_envelope_chunks(
-           create_tx_and_confirm<fc::variant>(get_abi("discardEnvelopeChunks")))
+      , epoch_in(create_tx_and_confirm<fc::variant, uint32_t, std::string>(
+           get_abi("epochIn"), delivery_confirm_options(client)))
       , next_epoch_index(create_call<fc::variant>(get_abi("nextEpochIndex")))
-      , envelope_chunk_state(create_call<fc::variant, std::string>(get_abi("envelopeChunkState")))
+      , dispatch_spill(create_call<fc::variant, uint32_t>(get_abi("dispatchSpill")))
+      , epoch_deliveries(create_call<fc::variant, uint32_t, std::string>(get_abi("epochDeliveries")))
+      , pending_epoch_hash(create_call<fc::variant>(get_abi("pendingEpochHash")))
       , attestation_handlers(create_call<fc::variant, uint16_t>(get_abi("attestationHandlers"))) {}
 };
 
