@@ -2217,6 +2217,7 @@ public:
    static constexpr uint64_t R_ACCOUNT_KEY_MISMATCH = nodeownerreg_audit::reason_account_key_mismatch;
    static constexpr uint64_t R_DUPLICATE            = nodeownerreg_audit::reason_duplicate;
    static constexpr uint64_t R_LINK_KEY_MISMATCH    = nodeownerreg_audit::reason_link_key_mismatch;
+   static constexpr uint64_t R_TIER_CAP_REACHED     = nodeownerreg_audit::reason_tier_cap_reached;
 
    abi_serializer authex_abi_ser;
 };
@@ -2595,6 +2596,79 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_already_registered, sysio_roa_nodeownreg_tes
    auto audit = get_nodeownerreg(owner);
    BOOST_REQUIRE_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
    BOOST_REQUIRE_EQUAL(audit["reason"].as<uint64_t>(), R_DUPLICATE);
+} FC_LOG_AND_RETHROW()
+
+/// At capacity, both existing and fresh accounts reject without allocating resources or an ETH link.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_full_tier_has_no_registration_side_effects,
+                         sysio_roa_nodeownreg_tester ) try {
+   namespace owners = sysio_system::test_support::nodeowners;
+   owners::fill_tier1(*this, abi_ser);
+   const auto eth_pub = gen_em_key();
+   const auto fresh = "fresh"_n;
+   auto& limits = control->get_resource_limits_manager();
+   int64_t ram_before = 0, ram_after = 0, net = 0, cpu = 0;
+   limits.get_account_limits(config::system_account_name, ram_before, net, cpu);
+   const auto pool_before = get_reslimit(config::system_account_name);
+   const auto bucket_before = get_policy("sysio.acct"_n, config::system_account_name);
+
+   for (const auto owner : {"alice"_n, fresh}) {
+      const auto wire_pub = get_public_key(owner, "active");
+      BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, owners::tier1));
+      produce_block();
+      BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, owners::tier1, eth_pub, wire_pub));
+      produce_block();
+      const auto audit = get_nodeownerreg(owner);
+      BOOST_REQUIRE(!audit.is_null());
+      BOOST_CHECK_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
+      BOOST_CHECK_EQUAL(audit["reason"].as<uint64_t>(), R_TIER_CAP_REACHED);
+      BOOST_CHECK(get_nodeowner(owner).is_null());
+      BOOST_CHECK(get_reslimit(owner).is_null());
+      BOOST_CHECK(get_authex_link(0).is_null());
+      BOOST_CHECK_EQUAL(owners::count(*this, abi_ser, owners::tier1), owners::tier1_cap);
+   }
+   BOOST_CHECK((control->db().find<account_object, by_name>(fresh) == nullptr));
+   limits.get_account_limits(config::system_account_name, ram_after, net, cpu);
+   BOOST_CHECK_EQUAL(ram_after, ram_before);
+   BOOST_CHECK_EQUAL(get_reslimit(config::system_account_name)["ram_bytes"].as_int64(),
+                     pool_before["ram_bytes"].as_int64());
+   BOOST_CHECK_EQUAL(get_policy("sysio.acct"_n, config::system_account_name)["ram_weight"].as<asset>(),
+                     bucket_before["ram_weight"].as<asset>());
+} FC_LOG_AND_RETHROW()
+
+/// Capacity is checked after the existing claim-payload rejection reasons.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_full_tier_preserves_rejection_precedence,
+                         sysio_roa_nodeownreg_tester ) try {
+   namespace owners = sysio_system::test_support::nodeowners;
+   const auto eth_pub = gen_em_key();
+   BOOST_REQUIRE_EQUAL(success(), nodeownreg("alice"_n, owners::tier1, eth_pub,
+                                            get_public_key("alice"_n, "active")));
+   produce_block();
+   const auto linked_key = gen_em_key();
+   BOOST_REQUIRE_EQUAL(success(), recordlink(linked_key, "bob"_n));
+   produce_block();
+   owners::fill_tier1(*this, abi_ser);
+
+   for (const auto& [owner, key, reason] : {
+           std::tuple{"alice"_n, get_public_key("alice"_n, "active"), R_DUPLICATE},
+           std::tuple{"carol"_n, gen_k1_key(), R_ACCOUNT_KEY_MISMATCH},
+           std::tuple{"bob"_n, get_public_key("bob"_n, "active"), R_LINK_KEY_MISMATCH},
+           std::tuple{"toolong"_n, gen_k1_key(), R_NAME_INVALID}}) {
+      BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, key, owners::tier1));
+      produce_block();
+      BOOST_REQUIRE_EQUAL(success(), nodeownreg(owner, owners::tier1, eth_pub, key));
+      produce_block();
+      const auto audit = get_nodeownerreg(owner);
+      BOOST_REQUIRE(!audit.is_null());
+      BOOST_CHECK_EQUAL(audit["status"].as<uint64_t>(), REJECTED);
+      BOOST_CHECK_EQUAL(audit["reason"].as<uint64_t>(), reason);
+      BOOST_CHECK_EQUAL(owners::count(*this, abi_ser, owners::tier1), owners::tier1_cap);
+   }
+   BOOST_CHECK(!get_nodeowner("alice"_n).is_null());
+   BOOST_CHECK(get_nodeowner("bob"_n).is_null());
+   BOOST_CHECK(get_nodeowner("carol"_n).is_null());
+   BOOST_CHECK((control->db().find<account_object, by_name>("toolong"_n) == nullptr));
+   BOOST_CHECK_EQUAL(get_authex_link(1)["pub_key"].as<fc::crypto::public_key>(), linked_key);
+   BOOST_CHECK(get_authex_link(2).is_null());
 } FC_LOG_AND_RETHROW()
 
 // Invalid tier is a depot/system invariant -> hard abort (not a soft-fail).

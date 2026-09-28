@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/testing/tester.hpp>
 
 #include <fc/exception/exception.hpp>
@@ -145,6 +146,51 @@ inline constexpr uint64_t reason_owner_not_account    = 2;
 inline constexpr uint64_t reason_account_key_mismatch = 3;
 inline constexpr uint64_t reason_duplicate            = 4;
 inline constexpr uint64_t reason_link_key_mismatch    = 5;
+inline constexpr uint64_t reason_tier_cap_reached     = 6;
 } // namespace nodeownerreg
+
+namespace nodeowners {
+/// Host-side mirror of the consensus Tier-1 cap in sysio.system/emissions.hpp.
+inline constexpr uint32_t tier1_cap = 21;
+inline constexpr uint8_t tier1 = 1;
+inline constexpr auto account = "sysio.roa"_n;
+inline constexpr auto table = "nodeowners"_n;
+
+/// Count authoritative owners in one generation, independently of the optional emissions mirror.
+template <typename Tester>
+uint32_t count(Tester& tester, abi_serializer& serializer, uint8_t tier, uint64_t generation = 0) {
+   const auto& index = tester.control->db().template get_index<kv_index, by_code_key>();
+   const auto scope_start = make_kv_scoped_key(generation, uint64_t{0});
+   const auto scope_end = make_kv_scoped_key(generation + 1, uint64_t{0});
+   const auto table_id = compute_table_id(table.to_uint64_t());
+   auto it = index.lower_bound(boost::make_tuple(account, table_id, scope_start.to_string_view()));
+   const auto end = index.lower_bound(boost::make_tuple(account, table_id, scope_end.to_string_view()));
+   uint32_t result = 0;
+   for (; it != end; ++it) {
+      const std::vector<char> bytes(it->value.begin(), it->value.end());
+      const auto row = serializer.binary_to_variant(
+         "nodeowners", bytes, abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
+      if (row["tier"].template as<uint8_t>() == tier) ++result;
+   }
+   return result;
+}
+
+/// Fill Tier 1 to a requested occupancy, including the owner installed by genesis.
+template <typename Tester>
+void fill_tier1(Tester& tester, abi_serializer& serializer, uint32_t occupancy = tier1_cap) {
+   const auto initial = count(tester, serializer, tier1);
+   BOOST_REQUIRE_LE(initial, occupancy);
+   BOOST_REQUIRE_LE(occupancy, tier1_cap);
+   for (uint32_t i = initial; i < occupancy; ++i) {
+      const name owner{std::string{"cap"} + char('a' + i)};
+      tester.create_accounts({owner}, false, false, false, false);
+      BOOST_REQUIRE_EQUAL(Tester::success(), push_contract_action(
+         tester, account, serializer, account, "forcereg"_n,
+         fc::mutable_variant_object()("owner", owner)("tier", tier1)));
+      tester.produce_block();
+   }
+   BOOST_REQUIRE_EQUAL(count(tester, serializer, tier1), occupancy);
+}
+} // namespace nodeowners
 
 } // namespace sysio_system::test_support

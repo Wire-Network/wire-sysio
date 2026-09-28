@@ -725,8 +725,8 @@ namespace sysio {
         // create) and then this action, both declaring permission_level{sysio.roa, active}.
         // Privileged sysio.msgch may declare that target permission without a cross-contract active
         // grant, so deployment must preserve msgch's privileged status. Inline actions run
-        // depth-first, so newnameduser's newaccount has already executed and `owner` exists by the
-        // time this runs.
+        // depth-first, so any newaccount has executed before this runs. Invalid names and full
+        // tiers skip creation; this action records their rejection instead.
         require_auth(get_self());
 
         // ---- Envelope / system invariants (depot misuse) ----
@@ -760,10 +760,12 @@ namespace sysio {
             return;
         }
 
-        // (2) the account must exist. newnameduser creates it in-flow; a valid name that still has
-        // no account means creation did not occur (defensive -- normally unreachable).
+        // (2) newnameduser skips creation at capacity to avoid spending sysio's RAM on a rejected
+        // claim. Otherwise a missing account means the creation step did not occur.
         if (!is_account(owner)) {
-            record_nodereg(owner, tier, REJECTED, OWNER_NOT_ACCOUNT, gen);
+            const auto reason = nodeowner_count(get_self(), gen, tier) >= nodeowner_cap(tier)
+                ? TIER_CAP_REACHED : OWNER_NOT_ACCOUNT;
+            record_nodereg(owner, tier, REJECTED, reason, gen);
             return;
         }
 
@@ -1166,6 +1168,10 @@ namespace sysio {
         // (non-throwing) and let nodeownreg soft-fail with NAME_INVALID. Without this guard a bad
         // name would either abort the depot dispatch or create an account the claim then rejects.
         if (!valid_name_for_tier(account, tier)) return;
+
+        // A full tier is another soft rejection. Leave the account and sysio's RAM pool untouched;
+        // nodeownreg records TIER_CAP_REACHED even though no account was created.
+        if (nodeowner_count(get_self(), state.network_gen, tier) >= nodeowner_cap(tier)) return;
 
         // Create the account with the holder's key as both owner and active.
         auto auth = sysiosystem::authority{1, {{pubkey, 1}}, {}};
