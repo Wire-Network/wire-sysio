@@ -5,6 +5,7 @@
 #include <sysio.token/sysio.token.hpp>
 #include <sysio.tokens/sysio.tokens.hpp>
 #include <sysio.opp.common/amm_math.hpp>
+#include <sysio.opp.common/decimal.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <sysio/print.hpp>
@@ -77,6 +78,13 @@ void drop(const char* path, const char* reason) {
    sysio::print("sysio.liq::", path, ": DROP -- ", reason, "\n");
 }
 
+/// A new shadow's `min_desyndicate`: one whole token over `liq::DEFAULT_MIN_DESYNDICATE_DIVISOR`, at
+/// least one subunit.
+asset default_min_desyndicate(symbol sym) {
+   const int64_t one_token = opp::precision_from_decimals(sym.precision());
+   return asset{ std::max<int64_t>(1, one_token / liq::DEFAULT_MIN_DESYNDICATE_DIVISOR), sym };
+}
+
 } // namespace
 
 // ---------------------------------------------------------------------------
@@ -104,10 +112,11 @@ void liq::create(symbol sym, sysio::slug_name chain_code, sysio::slug_name token
    stats statstable(get_self());
    check(!stat_by_token(token_code).has_value(), "token_code already has a shadow symbol");
    statstable.emplace(ram_payer, symbol_key{ sym.code().raw() }, currency_stats{
-      .supply      = asset{ 0, sym },
-      .chain_code  = chain_code,
-      .token_code  = token_code,
-      .pair_symbol = symbol_code{},
+      .supply          = asset{ 0, sym },
+      .chain_code      = chain_code,
+      .token_code      = token_code,
+      .pair_symbol     = symbol_code{},
+      .min_desyndicate = default_min_desyndicate(sym),
    }, "symbol already exists");
 }
 
@@ -128,6 +137,17 @@ void liq::recredit(name holder, asset quantity) {
    check(quantity.symbol == st.supply.symbol, "symbol precision mismatch");
    check(mint(quantity.symbol.code(), static_cast<uint64_t>(quantity.amount)), "supply exceeds the asset range");
    adjust_account(holder, quantity, ram_payer);
+}
+
+void liq::setmindesyn(asset minimum) {
+   require_auth(get_self());
+   check(minimum.is_valid() && minimum.amount > 0, "minimum must be positive");
+   const currency_stats st = stat_of(minimum.symbol.code());
+   check(minimum.symbol == st.supply.symbol, "symbol precision mismatch");
+   stats statstable(get_self());
+   statstable.modify(ram_payer, symbol_key{ minimum.symbol.code().raw() }, [&](currency_stats& s) {
+      s.min_desyndicate = minimum;
+   });
 }
 
 // ---------------------------------------------------------------------------
@@ -346,6 +366,9 @@ void liq::desyndicate(name holder, asset quantity) {
    check(quantity.is_valid() && quantity.amount > 0, "quantity must be positive");
    const currency_stats st = stat_of(quantity.symbol.code());
    check(quantity.symbol == st.supply.symbol, "symbol precision mismatch");
+   check(quantity >= st.min_desyndicate, [&] {
+      return "quantity is below the minimum de-syndication of " + st.min_desyndicate.to_string();
+   });
 
    const ChainKind kind   = kind_of_chain(st.chain_code);
    const auto      pubkey = linked_pubkey(holder, kind);
