@@ -1,4 +1,5 @@
 #include <sysio.system/sysio.system.hpp>
+#include <sysio.system/opreg_status.hpp>
 #include <sysio.system/producer_score.hpp>
 #include <sysio.system/snapshot_attest.hpp>
 #include <sysio.system/block_utils.hpp>
@@ -312,6 +313,11 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
    const auto provider_itr = providers.find(snap_provider_key_t{snap_account.value});
    check(provider_itr != providers.end(), provider_not_registered_error);
    const name producer = provider_itr->producer;
+   // Only sysio.opreg standing is re-checked per vote. It leaves ACTIVE on a slash, a termination or a
+   // withdrawal below the collateral minimum, so a mapping whose bond is gone stops counting toward K.
+   // Rank, parking and the finalizer key stay registration-time conditions.
+   check(is_op_active(producer, sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER),
+         producer_not_operator_error);
 
    snap_config_singleton config_singleton(get_self());
    const snap_config config = config_singleton.get_or_default(snap_config{});

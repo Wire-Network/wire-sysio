@@ -599,7 +599,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_unregistered, snapshot_voting_tester) { try
                         votesnaphash("snapprov1"_n, bid, shash));
 } FC_LOG_AND_RETHROW() }
 
-/// Producer eligibility gates entry to the provider set; later lifecycle churn does not retract authority or votes.
+/// Producer eligibility gates entry to the provider set; parking the producer does not retract authority or votes.
 BOOST_FIXTURE_TEST_CASE(votesnaphash_preserves_registered_authority_after_producer_churn, snapshot_voting_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
@@ -989,9 +989,45 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_reports_disagreement_before_eligibility_fai
 
    const auto bid = make_block_id(vote_block_num());
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, make_snap_hash(83)));
-   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer2"_n));
+   // Losing operator standing is the eligibility failure votesnaphash checks; the disagreement wins.
+   terminate_operator("producer2"_n);
    BOOST_REQUIRE_EQUAL(wasm_assert_code(9001),
                         votesnaphash("snapprov2"_n, bid, make_snap_hash(84)));
+} FC_LOG_AND_RETHROW() }
+
+/// Operator standing is re-checked on every vote: a producer whose sysio.opreg row left ACTIVE cannot
+/// keep voting through a mapping it registered while bonded.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_producer_without_operator_standing, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
+   terminate_operator("producer1"_n);
+   BOOST_REQUIRE(!get_snap_provider("snapprov1"_n).is_null());
+
+   const auto block_num = vote_block_num();
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer is not an active PRODUCER operator"),
+                        votesnaphash("snapprov1"_n, make_block_id(block_num), make_snap_hash(85)));
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
+   BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
+} FC_LOG_AND_RETHROW() }
+
+/// The standing check gates new votes only: a vote accepted while the producer was bonded still counts
+/// toward K after its operator row leaves ACTIVE.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_keeps_votes_cast_before_operator_lost_standing, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
+
+   const auto block_num     = vote_block_num();
+   const auto block_id      = make_block_id(block_num);
+   const auto snapshot_hash = make_snap_hash(86);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   terminate_operator("producer1"_n);
+
+   // Even an exact retry of its own pending vote is refused once the producer has no standing.
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer is not an active PRODUCER operator"),
+                        votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(record_blockid_disagreement, snapshot_voting_tester) { try {

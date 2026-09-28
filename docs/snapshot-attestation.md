@@ -142,8 +142,10 @@ rank is what remains once both are excluded, not the answer given to all three.
 The gate keys on the ABSENCE OF A CURRENT MAPPING rather than on never having registered: a
 producer whose row was evicted by the capacity prune is gated again when it re-registers, while a
 producer that still holds one replaces it ungated, for the reason below.
-Eligibility is not rechecked while voting, so a producer that was eligible when it entered the
-provider set keeps a stable delegation through ordinary producer churn.
+Of these conditions only operator standing is rechecked while voting: `votesnaphash` rejects a new
+vote whose producer is no longer an ACTIVE `OPERATOR_TYPE_PRODUCER` row in sysio.opreg, which
+happens on a slash, a termination, or a withdrawal below the collateral minimum. Rank, activity and
+the finalizer key are not rechecked, so ordinary producer churn cannot interrupt a delegation.
 
 The registration table is capped at 30. Normal producer lifecycle actions do no attestation work.
 Only when a gated registration encounters a full table does `regsnapprov` lazily remove every
@@ -177,18 +179,20 @@ is still refused one while ineligible, whether or not it held one before.
 ### Voting and quorum
 
 After computing a snapshot, a provider calls `votesnaphash(snap_account, block_id,
-snapshot_hash)`. The contract checks that `snap_account` is a registered provider, derives
-`block_num` from `block_id`, and accumulates the vote.
+snapshot_hash)`. The contract checks that `snap_account` is a registered provider whose producer is
+still an ACTIVE `OPERATOR_TYPE_PRODUCER` in sysio.opreg, derives `block_num` from `block_id`, and
+accumulates the vote.
 
 `min_providers` is the governance-set fixed K: every tuple finalizes after K distinct producer
 votes. Its stored default is zero, which disables voting until governance chooses the launch value.
 K does not scale with the number of registered mappings; governance explicitly owns that security
 and liveness tradeoff. Configuration changes apply to pending heights, and retrying an existing
-vote finalizes its tuple if a newly lowered K is already met.
+vote, from a producer that still has operator standing, finalizes its tuple if a newly lowered K is
+already met.
 
-A producer may retry the same tuple idempotently and may vote at multiple scheduled heights, but
-cannot submit two different tuples at one height. Registration and producer-status churn never
-removes an accepted vote.
+A producer may retry the same tuple idempotently while it keeps its operator standing, and may vote
+at multiple scheduled heights, but cannot submit two different tuples at one height. Registration
+and producer-status churn never removes an accepted vote.
 
 Only exact multiples of 25,000 are accepted. This bounds the height space to the provider schedule
 and rejects manual/on-demand snapshots before they can create pending rows.
@@ -326,8 +330,10 @@ clio push action sysio votesnaphash \
 
 - Trust reduces to: a quorum of durable provider registrations honestly computed the snapshot
   hash. Each producer was schedulable and within the top 30 rank positions when it entered the
-  provider set. That is checked on admission, not on each mapping row: rotation replaces the
-  `snap_account` ungated, and eligibility is not continuously revalidated afterward.
+  provider set. Rank and the finalizer key are checked on admission, not on each mapping row:
+  rotation replaces the `snap_account` ungated. A vote is also accepted only while its producer's
+  sysio.opreg row is an ACTIVE PRODUCER, so a bond withdrawn to fund another account stops the first
+  account's mapping from voting again. Votes accepted earlier keep counting toward K.
 - Determinism is what makes a quorum meaningful: if honest providers could compute different
   hashes for the same block, votes would never converge. The fixed snapshot format and
   canonical section ordering remove that ambiguity.
@@ -343,8 +349,9 @@ clio push action sysio votesnaphash \
 - Contract tests (`contracts/tests/sysio.snapshot_attest_tests.cpp`) cover registration, rotation
   and `delsnapprov` retirement, rejections that name the failed eligibility condition,
   side-effect-free uniqueness failures, traceable lazy full-table pruning, fixed-K configuration,
-  scheduled-height rejection, monotonic votes across churn and heights, equivocation/disagreement
-  rejection, finalization purging, and the `getsnaphash` query.
+  scheduled-height rejection, per-vote operator-standing rejection, monotonic votes across churn
+  and heights, equivocation/disagreement rejection, finalization purging, and the `getsnaphash`
+  query.
 - Unit tests (`unittests/snapshot_attest_tests.cpp`) cover snapshot round-trip hash
   stability, a full chain whose snapshot hash matches its on-chain record, mismatch
   detection, the no-attestation case, and survival of attestation state across a snapshot

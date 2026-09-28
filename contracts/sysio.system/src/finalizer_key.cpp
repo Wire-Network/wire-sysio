@@ -145,10 +145,12 @@ namespace sysiosystem {
    // Returns last proposed finalizers
    const std::vector<finalizer_auth_info>& system_contract::get_last_proposed_finalizers() {
       if( !_last_prop_finalizers_cached.has_value() ) {
+         // emplace, never `= {}`: assigning `{}` resets the optional to empty rather than engaging it,
+         // and the dereference below would read an unconstructed vector.
          if( !_last_prop_finalizers.exists() ) {
-            _last_prop_finalizers_cached = {};
+            _last_prop_finalizers_cached.emplace();
          } else {
-            _last_prop_finalizers_cached = _last_prop_finalizers.get().last_proposed_finalizers;
+            _last_prop_finalizers_cached.emplace(_last_prop_finalizers.get().last_proposed_finalizers);
          }
       }
 

@@ -179,11 +179,14 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     *
     * Votes aggregate per (block_num, block_id, snapshot_hash) and finalize when the current fixed
     * min_providers value is reached. Votes are monotonic, producer equivocation is rejected per
-    * height, and retrying the same tuple is idempotent. Snapshot heights must be exact multiples of
+    * height, and retrying the same tuple is idempotent while the producer keeps its operator standing.
+    * Snapshot heights must be exact multiples of
     * protocol::snapshot_attestation::block_spacing. Rejects with snap_hash_disagreement_error when
     * a final record at the height differs by block id or snapshot hash. A height without its own
     * final record cannot be reopened below the latest attested height after pending rows have been
-    * purged.
+    * purged. Rejects a new vote whose producer is no longer an ACTIVE PRODUCER operator in
+    * sysio.opreg; rank, parking and the finalizer key are checked only at registration, and votes
+    * accepted earlier keep counting.
     */
    [[sysio::action]]
    void votesnaphash(name snap_account, checksum256 block_id, checksum256 snapshot_hash);
@@ -195,8 +198,8 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     *
     * No attestation is permitted until this action stores a nonzero min_providers. Governance is
     * responsible for choosing K with the desired security and liveness tradeoff. Configuration
-    * changes apply to pending heights; an exact vote retry finalizes a tuple that already meets a
-    * newly lowered K.
+    * changes apply to pending heights; an exact vote retry, from a producer that still has operator
+    * standing, finalizes a tuple that already meets a newly lowered K.
     */
    [[sysio::action]]
    void setsnpcfg(uint32_t min_providers);

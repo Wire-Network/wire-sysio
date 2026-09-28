@@ -127,12 +127,12 @@ getsnaphash(block_num)                    // read-only — returns attested reco
 - The table is capped at 30. Producer lifecycle actions do no attestation work. Only a gated registration that finds the table full lazily removes mappings, evicting every producer that would now fail the gate: one that has no `producers` row, has gone inactive, lost its ACTIVE `OPERATOR_TYPE_PRODUCER` row in sysio.opreg or its active finalizer key, or ranks outside the top 30. Pending votes remain monotonic.
 **Voting:**
 - The contract accepts only block heights divisible by 25,000, matching the automatic provider schedule; manual/on-demand heights are rejected.
-- Votes accumulate per `(block_num, block_id, snapshot_hash)` tuple. A producer can vote at multiple scheduled heights but cannot equivocate at one height, and exact retries are idempotent.
+- Votes accumulate per `(block_num, block_id, snapshot_hash)` tuple. A producer can vote at multiple scheduled heights but cannot equivocate at one height, and exact retries are idempotent while the producer keeps its operator standing. A vote is accepted only while the producer is an ACTIVE PRODUCER operator in sysio.opreg.
 - Registration, producer, and configuration churn never retracts an accepted vote.
 **Attestation threshold:**
 - `min_providers` is the fixed governance-set K required for every tuple.
 - It defaults to zero, disabling voting until governance configures it in the range 1..30.
-- K does not scale with registrations. Configuration changes apply to pending heights, and an exact retry can finalize a tuple that already meets a lowered K.
+- K does not scale with registrations. Configuration changes apply to pending heights, and an exact retry from a producer that still has operator standing can finalize a tuple that already meets a lowered K.
 **Storage:**
 - `snap_vote` stores each competing tuple and its monotonic producer voters. Votes remain at every scheduled height until finalization.
 - When one tuple reaches quorum, the contract writes `snap_record { block_num, block_id, snapshot_hash, attested_at_block }` and purges pending tuples through that height.
