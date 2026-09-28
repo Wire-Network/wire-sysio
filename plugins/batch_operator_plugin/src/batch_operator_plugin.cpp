@@ -1193,7 +1193,7 @@ void batch_operator_plugin::set_program_options(options_description& cli,
         "How often to check epoch state (ms)");
    // SIZING RULE for batch-delivery-timeout-ms: it bounds the WHOLE outbound
    // delivery, and an Ethereum delivery is now one transaction PER CHUNK
-   // (ETHEREUM_MAX_CHUNK_BYTES = 8192; Solana chunks at 672). Size it as
+   // (whole-envelope on Ethereum, continued while it spills; Solana chunks at 672). Size it as
    //     total chunks x (target block time + confirmation margin)
    // for the largest envelope the outpost is expected to carry. At the 32768
    // byte platform envelope cap that is 4 Ethereum chunks, so the 15000 ms

@@ -14,115 +14,57 @@
 
 namespace sysio {
 
-/// Per-`epochIn` chunk payload limit on Ethereum.
-///
-/// MIRROR DUTY — compiled into BOTH sides and never configured: this value must
-/// equal `MAX_CHUNK_BYTES` in wire-ethereum's `contracts/outpost/OPPCommon.sol`
-/// (re-declared as the public constant `OPPInbound.MAX_CHUNK_BYTES` so the
-/// hardhat drift-guard suite can pin it). Deliveries carrying more than this in
-/// a single transaction were demonstrated to break the Ethereum envelope
-/// exchange, so `deliver_outbound_envelope` splits an envelope into
-/// `ceil(size / ETHEREUM_MAX_CHUNK_BYTES)` transactions: every non-final chunk
-/// is EXACTLY this many bytes and the final chunk carries the remainder.
-///
-/// A multiple of 32 so the contract's staging-cell writes stay word-aligned.
-/// Against `OPP_MAX_ENVELOPE_BYTES` this yields at most
-/// `ceil(32'768 / 8'192) == 4` chunks — and there is no terminal call: the
-/// contract finalizes inline on the chunk that completes the envelope. This is
-/// the Ethereum analogue of `SOLANA_MAX_CHUNK_BYTES` (672).
-inline constexpr size_t ETHEREUM_MAX_CHUNK_BYTES = 8'192;
-
 namespace outpost_ethereum_client_detail {
 
-/// Number of `epochIn` transactions one envelope of `total_bytes` costs.
-/// Ceil-division, matching `OPPInbound`'s own `totalChunks` validation — the
-/// contract rejects any delivery whose declared `totalChunks` differs.
-constexpr uint16_t chunk_count_for(size_t total_bytes) {
-   return static_cast<uint16_t>((total_bytes + ETHEREUM_MAX_CHUNK_BYTES - 1) /
-                                ETHEREUM_MAX_CHUNK_BYTES);
-}
-
-/// Decoded `OPPInbound.envelopeChunkState(address)` view result — the
-/// owner-bound staging header this operator has (or has not) left on chain.
-///
-/// A never-staged / fully-reclaimed header decodes as all-zero, which the
-/// contract spells `totalChunks == SLOT_EMPTY (0)`; `decide_chunk_resume`
-/// treats that as "nothing to adopt".
-struct envelope_chunk_state {
-   /// WIRE epoch the staged header belongs to.
-   uint32_t    epoch_index     = 0;
-   /// Staging owner, as the ABI decoder returns it (lower-case `0x`-hex), or
-   /// empty when the read failed / no header exists.
-   std::string owner;
-   /// Declared chunk count of the staged envelope; 0 == empty header.
-   uint16_t    total_chunks    = 0;
-   /// Chunks actually STORED on chain. The final chunk is never stored, so
-   /// this never reaches `total_chunks` for a well-formed header.
-   uint16_t    received_chunks = 0;
-   /// Declared total envelope size of the staged envelope.
-   uint32_t    total_bytes     = 0;
-   /// Sum of the stored cells' lengths — diagnostics only.
-   uint64_t    stored_bytes    = 0;
+/// Decoded `OPPInbound.dispatchSpill(uint32)` view result — where a tipped
+/// epoch's processing stands. All-false/zero for an epoch that has not tipped,
+/// which is also what an unreadable response decodes to.
+struct dispatch_spill {
+   /// Consensus settled the epoch's digest and dispatch began.
+   bool     tipped     = false;
+   /// Attestations routed so far — also where the next continuation resumes.
+   uint16_t dispatched = 0;
+   /// Every attestation has been routed.
+   bool     complete   = false;
+   /// The outbound envelope has been emitted and `nextEpochIndex` advanced.
+   bool     finalized  = false;
 };
 
-/// What the relay should do about the staging header it just read.
-enum class chunk_resume_action {
-   /// Nothing adoptable on chain — send every chunk from index 0.
-   start_fresh,
-   /// Our own header for this exact epoch and shape — continue from its
-   /// high-water mark.
-   resume,
-   /// Our own CURRENT-epoch header with a different shape (a superseded
-   /// envelope for the same epoch) — `discardEnvelopeChunks()` first, then
-   /// send from index 0.
-   discard_and_restart,
-   /// Our own header for a DIFFERENT epoch — read `nextEpochIndex()` to find
-   /// out whether the epoch under delivery has already been consumed; if it
-   /// has, the delivery is skipped entirely (it would only buy late-no-op gas).
-   confirm_epoch_advanced
-};
-
-/// `decide_chunk_resume`'s verdict.
-struct chunk_resume_decision {
-   chunk_resume_action action      = chunk_resume_action::start_fresh;
-   /// First chunk index to send. Meaningful for `resume`; 0 for every other
-   /// action.
-   uint16_t            start_chunk = 0;
+/// What the relay should do about the epoch it is holding, given the outpost's
+/// view of that epoch.
+enum class delivery_action {
+   /// The epoch has not tipped: deliver the envelope — a first delivery, or
+   /// the idempotent same-digest re-delivery a path-2 consensus retry is.
+   deliver,
+   /// The epoch tipped on THIS relay's digest and is not finished: re-supply
+   /// the envelope so the outpost dispatches the next stretch.
+   continue_dispatch,
+   /// The epoch tipped on a digest this relay did not deliver. Only a relay
+   /// whose recorded delivery matches the settled digest may continue it, so
+   /// there is nothing for this one to send.
+   wait_for_deliverer,
+   /// The outpost has already finalized this epoch: nothing to send.
+   already_finalized
 };
 
 /// Compare two EVM addresses for identity, tolerating an absent `0x` prefix
 /// and EIP-55 checksum casing on either side.
 bool same_evm_address(std::string_view lhs, std::string_view rhs);
 
-/// True when `revert_data` is exactly `OPP_ChunkBufferMissing(owner_address)`.
+/// Decide the relay's next move for `epoch_index`.
 ///
-/// `discardEnvelopeChunks()` raises that error, and only that error, when it
-/// finds nothing of ours to clear — the one revert meaning the staging header
-/// is already in the state the caller wanted. Every other revert (a wrong
-/// implementation behind the proxy, a reentrancy guard, an unrecognised
-/// selector) must not be mistaken for it.
+/// Pure and side-effect free so the table is unit-testable without an EVM
+/// node; the caller performs whichever RPC the verdict names.
 ///
-/// @param revert_data    `json_rpc_error::data`, the node's revert bytes as
-///                       `0x`-hex; empty or truncated data returns false.
-/// @param owner_address  the signer this relay expects the contract to name.
-bool is_chunk_buffer_missing_revert(std::string_view revert_data, std::string_view owner_address);
-
-/// Decide how to resume (or abandon) a chunked delivery given the on-chain
-/// staging header.
-///
-/// Pure and side-effect free so the decision table is unit-testable without an
-/// EVM node; the caller performs whichever RPC the returned action names.
-///
-/// @param staged        header read back from `envelopeChunkState(self)`.
-/// @param self_address  this relay's own signer address.
-/// @param epoch_index   WIRE epoch being delivered.
-/// @param total_chunks  chunk count of the envelope being delivered.
-/// @param total_bytes   size of the envelope being delivered.
-chunk_resume_decision decide_chunk_resume(const envelope_chunk_state& staged,
-                                          std::string_view            self_address,
-                                          uint32_t                    epoch_index,
-                                          uint16_t                    total_chunks,
-                                          uint32_t                    total_bytes);
+/// @param next_epoch_index      the outpost's `nextEpochIndex()`.
+/// @param epoch_index           WIRE epoch being delivered.
+/// @param spill                 the outpost's `dispatchSpill(epoch_index)`.
+/// @param own_delivery_settled  whether this relay's recorded delivery digest
+///                              equals the settled `pendingEpochHash`.
+delivery_action decide_delivery(uint32_t              next_epoch_index,
+                                uint32_t              epoch_index,
+                                const dispatch_spill& spill,
+                                bool                  own_delivery_settled);
 
 /// Why `SyndicationPool.realizeYield()` refused, read from the node's revert bytes.
 enum class realize_yield_refusal {
@@ -206,10 +148,9 @@ public:
    const std::string&               opp_address()                 const { return _opp_addr; }
    const std::string&               opp_inbound_address()         const { return _opp_inbound_addr; }
    const std::string&               operator_registry_address()   const { return _operator_registry_addr; }
-   /// This relay's own signer address in `0x`-hex — the identity every staging
-   /// header is bound to. Derived once at construction; the chunk resume path
-   /// compares it against `envelopeChunkState`'s `owner` on every multi-chunk
-   /// delivery, so it is cached rather than re-derived per tick.
+   /// This relay's own signer address in `0x`-hex — the identity the outpost
+   /// records deliveries under. Derived once at construction; the continuation
+   /// check compares the digest recorded under it against the settled one.
    const std::string&               signer_address_hex()          const { return _signer_address_hex; }
    /// The liq syndication pool the crank drives, `0x`-hex, or empty until the
    /// outpost's `DESYNDICATE_LIQ` handler has been discovered.
@@ -228,32 +169,31 @@ private:
    /// @throws fc::exception on transport failure.
    std::optional<std::string> discover_syndication_pool();
 
-   /// Read `OPPInbound.envelopeChunkState(self)` at `latest` and decode it.
-   ///
-   /// `latest` is correct here (unlike `read_inbound_envelope`, which reads at
-   /// `finalized`): this is our OWN staging high-water mark, not delivered
-   /// content WIRE consensus commits against. Reading it at `finalized` would
-   /// re-send chunks already staged in unfinalized blocks every tick.
-   ///
-   /// A malformed / unreadable response yields an all-zero state, which
-   /// degrades to `start_fresh` — the contract absorbs the replayed chunks as
-   /// idempotent no-ops.
-   ///
-   /// @throws fc::exception on transport failure or deadline expiry.
-   outpost_ethereum_client_detail::envelope_chunk_state read_envelope_chunk_state();
+   /// Read `OPPInbound.nextEpochIndex()` at `latest`.
+   /// @throws fc::exception on transport failure, deadline expiry, or an
+   ///         unparsable response.
+   uint32_t read_next_epoch_index();
 
-   /// First chunk index to send for this delivery, or `std::nullopt` when the
-   /// epoch has already advanced past `epoch_index` and the delivery must be
-   /// skipped outright.
+   /// Read `OPPInbound.dispatchSpill(epoch_index)` at `latest` and decode it.
    ///
-   /// Multi-chunk deliveries only — a single-chunk envelope stages nothing, so
-   /// the dominant case pays no extra RPC.
+   /// `latest`, deliberately, where `read_inbound_envelope` reads at
+   /// `finalized`: the cursor is this outpost's own bookkeeping about work
+   /// this relay is doing right now, and the worst a reorg can cost is a
+   /// re-sent transaction the contract already treats as an idempotent no-op.
+   /// Finality lags head by roughly 64 blocks, so a continuation gated on it
+   /// would wait that out between every stretch of dispatch.
    ///
-   /// @throws fc::exception on transport failure or deadline expiry.
-   std::optional<uint16_t> resume_chunk_index(uint32_t       epoch_index,
-                                              uint16_t       total_chunks,
-                                              uint32_t       total_bytes,
-                                              fc::time_point deadline_abs);
+   /// @throws fc::exception on transport failure, deadline expiry, or an
+   ///         unparsable response.
+   outpost_ethereum_client_detail::dispatch_spill read_dispatch_spill(uint32_t epoch_index);
+
+   /// Whether the digest this relay delivered for `epoch_index` is the one
+   /// consensus settled on (`epochDeliveries(epoch, self) == pendingEpochHash`).
+   /// False when this relay has not delivered, or delivered a minority digest.
+   ///
+   /// @throws fc::exception on transport failure, deadline expiry, or an
+   ///         unparsable response.
+   bool own_delivery_settled(uint32_t epoch_index);
 
    ethereum_client_entry_ptr                              _entry;
    std::string                                            _opp_addr;
