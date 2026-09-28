@@ -40,6 +40,8 @@
 #include "contracts.hpp"
 #include "contract_test_support.hpp"
 
+#include <map>
+
 using namespace sysio::testing;
 using namespace sysio;
 using namespace sysio::chain;
@@ -70,6 +72,30 @@ constexpr std::string_view THREE_TO_THREE_RIGHT_PAYLOAD = "three-to-three-right"
 /// are not host-compilable).
 constexpr uint32_t INBOUND_ENVELOPE_RETENTION_EPOCHS = 2;
 constexpr uint32_t ENVELOPE_PRUNE_BUDGET             = 4;
+
+/// Mirrors of the packing limits in `sysio.msgch.hpp` (contract headers are not host-compilable).
+constexpr size_t MAX_ENVELOPE_BYTES         = 32'768;
+constexpr size_t ENVELOPE_BASELINE_BYTES    = 512;
+constexpr size_t ATTESTATION_OVERHEAD_BYTES = 24;
+constexpr size_t SCHEDULE_LANE_BUDGET_BYTES = MAX_ENVELOPE_BYTES / 4 * 3;
+/// The largest `data` a schedule-lane row can ship: it fits an otherwise empty envelope.
+constexpr size_t MAX_ATTESTATION_DATA_BYTES =
+   MAX_ENVELOPE_BYTES - ENVELOPE_BASELINE_BYTES - ATTESTATION_OVERHEAD_BYTES;
+/// The largest `data` an other-lane row can ship: it fits beside a full schedule lane.
+constexpr size_t MAX_OTHER_ATTESTATION_DATA_BYTES =
+   MAX_ENVELOPE_BYTES - ENVELOPE_BASELINE_BYTES - SCHEDULE_LANE_BUDGET_BYTES - ATTESTATION_OVERHEAD_BYTES;
+
+/// What `sysio.epoch::advance` prints when it withholds each operator schedule attestation.
+constexpr std::string_view WITHHOLDING_OPERATORS             = "withholding Operators";
+constexpr std::string_view WITHHOLDING_BATCH_OPERATOR_GROUPS = "withholding BatchOperatorGroups";
+
+/// Challenger accounts the roster tests register: a prefix of `CHALLENGER_NAME_PREFIX`, then a suffix of
+/// `CHALLENGER_SUFFIX_LENGTH` base-31 digits that keeps each unique, `CHALLENGERS_PER_BLOCK` to a block.
+constexpr std::string_view CHALLENGER_NAME_PREFIX     = "rosterop";
+constexpr std::string_view CHALLENGER_NAME_DIGITS     = "abcdefghijklmnopqrstuvwxyz12345";
+constexpr size_t           CHALLENGER_SUFFIX_LENGTH   = 4;
+constexpr size_t           CHALLENGER_NAME_MAX_LENGTH = CHALLENGER_NAME_PREFIX.size() + CHALLENGER_SUFFIX_LENGTH;
+constexpr uint32_t         CHALLENGERS_PER_BLOCK      = 50;
 
 /// sysio.opreg action identifiers used by the WNS-16 fixture.
 namespace opreg_actions {
@@ -107,12 +133,14 @@ constexpr name CHECK_CONSENSUS = "chkcons"_n;
 
 /// sysio.msgch table identifiers used by the WNS-16 fixture.
 namespace msgch_tables {
-constexpr name ENVELOPES = "envelopes"_n;
+constexpr name ENVELOPES    = "envelopes"_n;
+constexpr name ATTESTATIONS = "attestations"_n;
 } // namespace msgch_tables
 
-/// sysio.msgch secondary-index identifiers used by the envelopes retention tests.
+/// sysio.msgch secondary-index identifiers used by the envelopes retention and outbound queue tests.
 namespace msgch_indexes {
 constexpr name BY_OUTPOST_EPOCH = "byoutepoch"_n;
+constexpr name BY_QUEUE         = "byqueue"_n;
 } // namespace msgch_indexes
 
 /// sysio.msgch ABI type identifiers used by the WNS-16 fixture.
@@ -643,6 +671,20 @@ public:
       return n;
    }
 
+   /// Stored `byqueue` entries of `attestations`; zero once every row is gone, unless an erase left an
+   /// orphan behind.
+   size_t attestation_queue_index_entries() {
+      const auto  table_id = compute_sec_table_id(msgch_tables::ATTESTATIONS.to_uint64_t(),
+                                                  msgch_indexes::BY_QUEUE.to_uint64_t());
+      const auto& idx = control->db().get_index<kv_index_index, by_code_table_id_seckey>();
+      size_t n = 0;
+      for (auto itr = idx.lower_bound(boost::make_tuple(MSGCH_ACCOUNT, table_id));
+           itr != idx.end() && itr->code == MSGCH_ACCOUNT && itr->table_id == table_id; ++itr) {
+         ++n;
+      }
+      return n;
+   }
+
    /// Chain tip of the inbound stream when a test feeds both outposts identical envelopes: the next
    /// delivery continues from the last accepted envelope's digest and message id (raw 32-byte
    /// strings, empty at stream genesis).
@@ -803,6 +845,131 @@ public:
       auto env = decode_envelope(row["raw_envelope"].as<std::vector<char>>());
       BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
       return env.messages(0).payload().attestations_size();
+   }
+
+   /// One letter per attestation of the most recent envelope for `chain_code`, in order: O for OPERATORS,
+   /// G for BATCH_OPERATOR_GROUPS, otherwise the first byte of the attestation's data (the tests tag each
+   /// row they queue with its own byte).
+   std::string shipped_letters(uint64_t chain_code) {
+      const auto row = find_outbound_envelope(chain_code);
+      BOOST_REQUIRE(!row.is_null());
+      const auto env = decode_envelope(row["raw_envelope"].as<std::vector<char>>());
+      BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
+      std::string letters;
+      for (const auto& att : env.messages(0).payload().attestations()) {
+         if (att.type() == sysio::opp::types::ATTESTATION_TYPE_OPERATORS) {
+            letters.push_back('O');
+         } else if (att.type() == sysio::opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS) {
+            letters.push_back('G');
+         } else {
+            BOOST_REQUIRE(!att.data().empty());
+            letters.push_back(att.data().front());
+         }
+      }
+      return letters;
+   }
+
+   /// The OPERATORS roster the most recent envelope for `chain_code` carries, as account name to status.
+   std::map<std::string, sysio::opp::types::OperatorStatus> shipped_roster(uint64_t chain_code) {
+      const auto row = find_outbound_envelope(chain_code);
+      BOOST_REQUIRE(!row.is_null());
+      const auto env = decode_envelope(row["raw_envelope"].as<std::vector<char>>());
+      BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
+      std::map<std::string, sysio::opp::types::OperatorStatus> roster;
+      bool found = false;
+      for (const auto& att : env.messages(0).payload().attestations()) {
+         if (att.type() != sysio::opp::types::ATTESTATION_TYPE_OPERATORS) continue;
+         sysio::opp::attestations::Operators operators;
+         BOOST_REQUIRE(operators.ParseFromArray(att.data().data(), static_cast<int>(att.data().size())));
+         roster.clear();
+         for (const auto& entry : operators.operators()) roster[entry.account().name()] = entry.status();
+         found = true;
+      }
+      BOOST_REQUIRE_MESSAGE(found, "outbound envelope carries no OPERATORS attestation");
+      return roster;
+   }
+
+   /// The schedule estimate of the most recent envelope for `chain_code`, summed the way `advance` sums it:
+   /// the data of each OPERATORS and BATCH_OPERATOR_GROUPS attestation that shipped, plus its overhead.
+   size_t shipped_schedule_estimate_bytes(uint64_t chain_code) {
+      const auto row = find_outbound_envelope(chain_code);
+      BOOST_REQUIRE(!row.is_null());
+      const auto env = decode_envelope(row["raw_envelope"].as<std::vector<char>>());
+      BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
+      size_t bytes = 0;
+      for (const auto& att : env.messages(0).payload().attestations()) {
+         if (att.type() == sysio::opp::types::ATTESTATION_TYPE_OPERATORS ||
+             att.type() == sysio::opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS) {
+            bytes += ATTESTATION_OVERHEAD_BYTES + att.data().size();
+         }
+      }
+      return bytes;
+   }
+
+   /// Register `account` as an operator of `type` through opreg's own authority, which needs no account
+   /// or authex link. A bootstrapped registration is ACTIVE at once; any other stays UNKNOWN until bonded.
+   action_result register_operator(name account, opp::types::OperatorType type, bool bootstrapped) {
+      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
+         ("account",         account.to_string())
+         ("type",            type)
+         ("is_bootstrapped", bootstrapped));
+   }
+
+   /// Challenger account `index`, `length` characters long: the start of `CHALLENGER_NAME_PREFIX`, then
+   /// `index` in `CHALLENGER_SUFFIX_LENGTH` base-31 digits, so each index names a different account.
+   static std::string challenger_name(uint32_t index, size_t length) {
+      BOOST_REQUIRE(length >= CHALLENGER_SUFFIX_LENGTH && length <= CHALLENGER_NAME_MAX_LENGTH);
+      std::string account(CHALLENGER_NAME_PREFIX.substr(0, length - CHALLENGER_SUFFIX_LENGTH));
+      for (size_t digit = 0; digit < CHALLENGER_SUFFIX_LENGTH; ++digit, index /= CHALLENGER_NAME_DIGITS.size()) {
+         account.push_back(CHALLENGER_NAME_DIGITS[index % CHALLENGER_NAME_DIGITS.size()]);
+      }
+      return account;
+   }
+
+   /// Bytes an ACTIVE challenger named `account` adds to an OPERATORS attestation: its entry and the
+   /// entry's own framing, encoded as the outposts decode it.
+   static size_t challenger_roster_bytes(const std::string& account) {
+      sysio::opp::attestations::Operators roster;
+      auto* entry = roster.add_operators();
+      entry->mutable_account()->set_name(account);
+      entry->set_type(sysio::opp::types::OPERATOR_TYPE_CHALLENGER);
+      entry->set_status(sysio::opp::types::OPERATOR_STATUS_ACTIVE);
+      return roster.ByteSizeLong();
+   }
+
+   /// Register a bootstrapped, so ACTIVE, challenger with a fresh name `length` characters long. A
+   /// challenger adds roster bytes and leaves the batch schedule as it is.
+   name add_challenger(size_t length) {
+      const name account(challenger_name(challengers_registered, length));
+      BOOST_REQUIRE_EQUAL(success(),
+                          register_operator(account, opp::types::OperatorType::OPERATOR_TYPE_CHALLENGER, true));
+      if (++challengers_registered % CHALLENGERS_PER_BLOCK == 0) produce_block();
+      return account;
+   }
+
+   /// Register challengers that add exactly `bytes` to the OPERATORS roster, as few as full-length names
+   /// allow, and return them. Each takes an even share of `bytes`, which sets its name's length: an entry
+   /// grows by one byte per name character.
+   std::vector<name> grow_roster(size_t bytes) {
+      const size_t full_entry_bytes = challenger_roster_bytes(challenger_name(0, CHALLENGER_NAME_MAX_LENGTH));
+      const size_t entries          = (bytes + full_entry_bytes - 1) / full_entry_bytes;
+      std::vector<name> added;
+      for (size_t i = 0; i < entries; ++i) {
+         const size_t share = bytes / entries + (i < bytes % entries ? 1 : 0);
+         added.push_back(add_challenger(CHALLENGER_NAME_MAX_LENGTH - (full_entry_bytes - share)));
+         BOOST_REQUIRE_EQUAL(share, challenger_roster_bytes(added.back().to_string()));
+      }
+      return added;
+   }
+
+   /// `advance_one_epoch`, returning everything the advance and its inline actions printed.
+   std::string advance_one_epoch_console() {
+      elapse_epoch_boundary();
+      const auto trace = base_tester::push_action(EPOCH_ACCOUNT, "advance"_n, MSGCH_ACCOUNT, mvo());
+      produce_blocks();
+      std::string console;
+      for (const auto& action_trace : trace->action_traces) console += action_trace.console;
+      return console;
    }
 
    // -- SEC-28 rotation-termination helpers (drive recorddel/termcheck through the REAL advance) --
@@ -998,6 +1165,8 @@ public:
    }
 
    abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chalg_abi, chains_abi, uwrit_abi, roa_abi;
+   /// Challengers `add_challenger` has registered, which also numbers the next one's name.
+   uint32_t challengers_registered = 0;
 };
 
 // ---------------------------------------------------------------------------
@@ -2199,6 +2368,182 @@ BOOST_FIXTURE_TEST_CASE(advance_withholds_batch_operator_groups_when_next_group_
    }
    BOOST_REQUIRE_MESSAGE(observed_withhold,
       "starved window never withheld BATCH_OPERATOR_GROUPS -- an empty active group was published");
+} FC_LOG_AND_RETHROW() }
+
+/// An attestation no envelope can carry must not halt `advance`, which sends `buildenv` inline. The
+/// oversized roster is dropped, the epoch advances, and everything queued behind it ships in the same
+/// envelope: the schedule the advance queues itself, then the other row. Nothing is left behind, row or
+/// index entry.
+BOOST_FIXTURE_TEST_CASE(advance_drops_an_oversized_attestation_and_ships_the_rest, sysio_msgch_chain_tester) { try {
+   bootstrap();
+   const uint32_t epoch = current_epoch();
+
+   const std::string queued_behind = "queued behind the oversized row";
+   BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, sysio::opp::types::ATTESTATION_TYPE_OPERATORS,
+                                           std::vector<char>(MAX_ATTESTATION_DATA_BYTES + 1, 'x')));
+   BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, sysio::opp::types::ATTESTATION_TYPE_SWAP_REMIT,
+                                           std::vector<char>(queued_behind.begin(), queued_behind.end())));
+
+   BOOST_REQUIRE_EQUAL(epoch + 1, advance_one_epoch());
+
+   const auto row = find_outbound_envelope(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(!row.is_null());
+   const auto env = decode_envelope(row["raw_envelope"].as<std::vector<char>>());
+   BOOST_REQUIRE_EQUAL(env.epoch_index(), epoch + 1);
+   BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
+   const auto& shipped = env.messages(0).payload().attestations();
+   BOOST_REQUIRE_EQUAL(shipped.size(), 3);
+   BOOST_REQUIRE(shipped[0].type() == sysio::opp::types::ATTESTATION_TYPE_OPERATORS);
+   BOOST_REQUIRE_LE(shipped[0].data().size(), MAX_ATTESTATION_DATA_BYTES);
+   BOOST_REQUIRE(shipped[1].type() == sysio::opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS);
+   BOOST_REQUIRE(shipped[2].type() == sysio::opp::types::ATTESTATION_TYPE_SWAP_REMIT);
+   BOOST_REQUIRE_EQUAL(shipped[2].data(), queued_behind);
+
+   BOOST_REQUIRE_EQUAL(0u, attestation_count(ETH_OUTPOST_ID, epoch));
+   BOOST_REQUIRE_EQUAL(0u, attestation_count(ETH_OUTPOST_ID, epoch + 1));
+   BOOST_REQUIRE_EQUAL(0u, attestation_queue_index_entries());
+} FC_LOG_AND_RETHROW() }
+
+/// The operator schedule ships ahead of a backlog. In strict queue order, more than an envelope of other
+/// rows queued before `advance` would push the BATCH_OPERATOR_GROUPS it queues out of the epoch's
+/// envelope, and an outpost that seats groups only from it would refuse the next epoch's deliverers.
+/// The schedule leads instead, OPERATORS first, and the backlog follows oldest first up to the budget;
+/// the rest ships next epoch, again behind that epoch's schedule.
+BOOST_FIXTURE_TEST_CASE(advance_ships_the_schedule_ahead_of_a_full_backlog, sysio_msgch_chain_tester) { try {
+   bootstrap();
+   const uint32_t epoch = current_epoch();
+
+   // Four of these fit an envelope beside the schedule and a fifth does not, so the backlog alone
+   // overflows the envelope; each is within the other lane's bound.
+   constexpr size_t QUARTER_OF_AN_ENVELOPE = 7'000;
+   for (char tag : std::string("abcde")) {
+      BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, sysio::opp::types::ATTESTATION_TYPE_SWAP_REMIT,
+                                              std::vector<char>(QUARTER_OF_AN_ENVELOPE, tag)));
+   }
+
+   BOOST_REQUIRE_EQUAL(epoch + 1, advance_one_epoch());
+   BOOST_REQUIRE_EQUAL("OGabcd", shipped_letters(ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(1u, attestation_count(ETH_OUTPOST_ID, epoch));
+
+   BOOST_REQUIRE_EQUAL(epoch + 2, advance_one_epoch());
+   BOOST_REQUIRE_EQUAL("OGe", shipped_letters(ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(0u, attestation_count(ETH_OUTPOST_ID, epoch));
+} FC_LOG_AND_RETHROW() }
+
+/// Under the lane an other-lane row never meets an empty envelope, because the schedule `advance` queues
+/// packs first every epoch. A row too large to fit beside a full schedule lane would therefore hold up
+/// its lane for good, so it is dropped even when it would fit an empty envelope. A row at the bound, and
+/// the small row queued behind the dropped ones, ship in that same envelope.
+BOOST_FIXTURE_TEST_CASE(advance_drops_other_rows_that_cannot_fit_beside_the_schedule, sysio_msgch_chain_tester) { try {
+   bootstrap();
+   const uint32_t epoch = current_epoch();
+
+   const auto queue = [&](char tag, size_t size) {
+      BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, sysio::opp::types::ATTESTATION_TYPE_SWAP_REMIT,
+                                              std::vector<char>(size, tag)));
+   };
+   queue('x', MAX_ATTESTATION_DATA_BYTES);             // fits an empty envelope, never beside the schedule
+   queue('y', MAX_OTHER_ATTESTATION_DATA_BYTES + 1);   // one byte over the other lane's bound
+   queue('b', MAX_OTHER_ATTESTATION_DATA_BYTES);       // at the bound
+   queue('m', 1);
+
+   BOOST_REQUIRE_EQUAL(epoch + 1, advance_one_epoch());
+   BOOST_REQUIRE_EQUAL("OGbm", shipped_letters(ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(0u, attestation_count(ETH_OUTPOST_ID, epoch));
+} FC_LOG_AND_RETHROW() }
+
+/// The OPERATORS roster lists ACTIVE and SLASHED operators only. A registration never bonded (UNKNOWN) and
+/// a TERMINATED operator add nothing to it; a SLASHED one stays, because the Solana outpost resolves a
+/// slash's target through the roster.
+BOOST_FIXTURE_TEST_CASE(advance_roster_lists_only_active_and_slashed_operators, sysio_msgch_chain_tester) { try {
+   bootstrap();
+   BOOST_REQUIRE_EQUAL(success(), register_operator(BATCHOP_B, opp::types::OperatorType::OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), register_operator(BATCHOP_C, opp::types::OperatorType::OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), register_operator(BATCHOP_D, opp::types::OperatorType::OPERATOR_TYPE_BATCH, false));
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, CHALG_ACCOUNT, "slash"_n,
+                                       mvo()("account", BATCHOP_B.to_string())("reason", std::string("roster test"))));
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "terminate"_n,
+                                       mvo()("account", BATCHOP_C.to_string())("reason", std::string("roster test"))));
+   BOOST_REQUIRE(opp::types::OperatorStatus::OPERATOR_STATUS_UNKNOWN ==
+                 get_operator(BATCHOP_D)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+   produce_blocks();
+
+   advance_one_epoch();
+   const std::map<std::string, opp::types::OperatorStatus> expected{
+      {BATCHOP.to_string(),   opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE},
+      {BATCHOP_B.to_string(), opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED},
+   };
+   BOOST_REQUIRE(expected == shipped_roster(ETH_OUTPOST_ID));
+   BOOST_REQUIRE(expected == shipped_roster(SOL_OUTPOST_ID));
+} FC_LOG_AND_RETHROW() }
+
+/// A roster that would take the schedule past its budget is withheld with a diagnostic, the way an empty
+/// window is: `advance` still advances, BATCH_OPERATOR_GROUPS still ships, and so does the other lane.
+BOOST_FIXTURE_TEST_CASE(advance_withholds_a_roster_over_the_schedule_budget, sysio_msgch_chain_tester) { try {
+   bootstrap();
+   const uint32_t epoch = current_epoch();
+
+   // About 22 roster bytes each, so these alone take the roster past the 24 KiB budget.
+   constexpr uint32_t ROSTER_OPERATORS = 1'200;
+   for (uint32_t i = 0; i < ROSTER_OPERATORS; ++i) add_challenger(CHALLENGER_NAME_MAX_LENGTH);
+   BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, sysio::opp::types::ATTESTATION_TYPE_SWAP_REMIT,
+                                           std::vector<char>{'m'}));
+
+   const auto console = advance_one_epoch_console();
+   BOOST_REQUIRE_MESSAGE(console.find(WITHHOLDING_OPERATORS) != std::string::npos, console);
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   BOOST_REQUIRE_EQUAL("Gm", shipped_letters(ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL("G", shipped_letters(SOL_OUTPOST_ID));
+} FC_LOG_AND_RETHROW() }
+
+/// The roster is withheld only past the budget. A schedule whose estimate is exactly the budget ships whole;
+/// one byte more, from a slash that widens one status, withholds OPERATORS with the diagnostic, and the epoch
+/// still advances with BATCH_OPERATOR_GROUPS.
+BOOST_FIXTURE_TEST_CASE(advance_withholds_the_roster_one_byte_past_the_budget, sysio_msgch_chain_tester) { try {
+   bootstrap();
+
+   const auto challengers = grow_roster(SCHEDULE_LANE_BUDGET_BYTES - shipped_schedule_estimate_bytes(ETH_OUTPOST_ID));
+   const auto at_budget   = advance_one_epoch_console();
+   BOOST_REQUIRE_MESSAGE(at_budget.find(WITHHOLDING_OPERATORS) == std::string::npos, at_budget);
+   for (const uint64_t outpost : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      BOOST_REQUIRE_EQUAL("OG", shipped_letters(outpost));
+      BOOST_REQUIRE_EQUAL(SCHEDULE_LANE_BUDGET_BYTES, shipped_schedule_estimate_bytes(outpost));
+   }
+
+   // SLASHED encodes one byte wider than ACTIVE, and a slashed operator stays on the roster.
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, CHALG_ACCOUNT, "slash"_n,
+                                       mvo()("account", challengers.front().to_string())
+                                            ("reason", std::string("one byte past the budget"))));
+   const uint32_t epoch       = current_epoch();
+   const auto     past_budget = advance_one_epoch_console();
+   const std::string one_byte_over =
+      "operator schedule needs " + std::to_string(SCHEDULE_LANE_BUDGET_BYTES + 1) + " estimated bytes";
+   BOOST_REQUIRE_MESSAGE(past_budget.find(one_byte_over) != std::string::npos, past_budget);
+   BOOST_REQUIRE_MESSAGE(past_budget.find(WITHHOLDING_OPERATORS) != std::string::npos, past_budget);
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   for (const uint64_t outpost : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      BOOST_REQUIRE_EQUAL("G", shipped_letters(outpost));
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// BATCH_OPERATOR_GROUPS counts toward the budget only when it ships. Terminating the only batch operator
+/// empties the next group, so the groups attestation is withheld, and a roster whose own estimate is the whole
+/// budget ships although the groups attestation would have taken the schedule past it.
+BOOST_FIXTURE_TEST_CASE(advance_counts_batch_operator_groups_toward_the_budget_only_when_they_ship,
+                        sysio_msgch_chain_tester) { try {
+   bootstrap();
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "terminate"_n,
+                                       mvo()("account", BATCHOP.to_string())("reason", std::string("empty window"))));
+   // A terminated operator leaves the roster, so the challengers make up all of it.
+   grow_roster(SCHEDULE_LANE_BUDGET_BYTES - ATTESTATION_OVERHEAD_BYTES);
+
+   const auto console = advance_one_epoch_console();
+   BOOST_REQUIRE_MESSAGE(console.find(WITHHOLDING_BATCH_OPERATOR_GROUPS) != std::string::npos, console);
+   BOOST_REQUIRE_MESSAGE(console.find(WITHHOLDING_OPERATORS) == std::string::npos, console);
+   for (const uint64_t outpost : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      BOOST_REQUIRE_EQUAL("O", shipped_letters(outpost));
+      BOOST_REQUIRE_EQUAL(SCHEDULE_LANE_BUDGET_BYTES, shipped_schedule_estimate_bytes(outpost));
+   }
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------

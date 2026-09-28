@@ -10,6 +10,11 @@
 #include <sysio.opp.common/opp_table_types.hpp>
 #include <sysio.opp.common/opp_keys.hpp>
 
+#include <magic_enum/magic_enum.hpp>
+
+#include <limits>
+#include <type_traits>
+
 namespace sysio {
 
 
@@ -74,9 +79,14 @@ namespace sysio {
       ///   * `sysio.opreg::*` — `OPERATOR_ACTION` family (WITHDRAW_REMIT,
       ///     SLASH) — once the reserve-flow work lands the same pattern
       ///     reaches every depot-authorised outbound.
+      ///   * `sysio.liq::desyndicate`: `DESYNDICATE_LIQ` to the shadow's outpost.
+      ///
+      /// Rows ship oldest first, except that the operator schedule (`queue_lane::schedule`) ships ahead
+      /// of other traffic. `data` over its lane's `max_attestation_data_bytes` can never ship; `buildenv`
+      /// drops it with a diagnostic.
       ///
       /// Gated to the depot's own system contracts (sysio.epoch / .opreg /
-      /// .uwrit / .reserv, plus msgch itself): each sends under its own
+      /// .uwrit / .reserv / .liq, plus msgch itself): each sends under its own
       /// {self, active} authority. The gate is required because a forged
       /// READY attestation rides out inside the next group-signed outbound
       /// envelope, which the outpost authenticates by the group signature —
@@ -87,14 +97,90 @@ namespace sysio {
                     opp::types::AttestationType attest_type,
                     std::vector<char> data);
 
-      /// Build outbound envelope from READY attestations for an outpost.
-      /// Collects attestations, packs into OPP Envelope, stores in outenvelopes.
+      /// Pack the outpost's READY attestations, in `queue_lane` order and oldest first within a lane, into
+      /// one outbound envelope of at most `MAX_ENVELOPE_BYTES` and store it in `outenvelopes`; the rest
+      /// stay READY for the next epoch. The walk stops at the first attestation that does not fit, so
+      /// however deep the queue it reads the rows it packs (at most one envelope's worth), the rows it
+      /// drops, and the one row it stops on. An attestation larger than its lane can ever ship
+      /// (`max_attestation_data_bytes`) is erased with a diagnostic instead of aborting
+      /// `sysio.epoch::advance`, which sends this inline.
       /// Stamps the envelope's route endpoints (start = WIRE, end = the
       /// destination's `sysio.chains` `{kind, external_chain_id}`) so the
       /// receiving outpost can reject an envelope a misconfigured relay
       /// delivered to the wrong same-kind chain.
       [[sysio::action]]
       void buildenv(uint64_t chain_code);
+
+      // -----------------------------------------------------------------------
+      //  Outbound queue
+      // -----------------------------------------------------------------------
+
+      /// Packing lane of an outbound attestation. `buildenv` packs every `schedule` row before any `other`
+      /// row, oldest first within each: an outpost seats the next epoch's batch-operator group only from
+      /// BATCH_OPERATOR_GROUPS, so other traffic queued ahead of it would leave the next epoch's
+      /// deliverers unseated and that epoch undeliverable.
+      enum class queue_lane : uint8_t {
+         schedule = 0,   ///< the operator roster and group window `sysio.epoch::advance` queues each epoch
+         other    = 1,   ///< everything else
+      };
+
+      /// The lane `type` packs in. Within `schedule`, queue order keeps OPERATORS ahead of the
+      /// BATCH_OPERATOR_GROUPS that `advance` queues after it, which the Ethereum outpost relies on.
+      static queue_lane lane_of(opp::types::AttestationType type) {
+         switch (type) {
+            case opp::types::AttestationType::ATTESTATION_TYPE_OPERATORS:
+            case opp::types::AttestationType::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS:
+               return queue_lane::schedule;
+            default:
+               return queue_lane::other;
+         }
+      }
+
+      /// Hard cap on an encoded envelope in both directions, the same as the Solana (`MAX_ENVELOPE_BYTES`)
+      /// and Ethereum (`OPP.MAX_ENVELOPE_BYTES`) outposts' caps. Ethereum binds it: a cold
+      /// `emitOutboundEnvelope` of a near-64-KiB envelope costs about 45 M gas, about 2.7x the EIP-7825
+      /// per-transaction cap of 16 777 216. `deliver` rejects a larger inbound envelope before hashing it.
+      static constexpr size_t MAX_ENVELOPE_BYTES = 32'768;
+
+      /// Conservative per-attestation framing the `buildenv` packing estimate charges on top of `data`:
+      /// protobuf tags, length prefixes and the type and data-size fields. It over-counts the encoding, so
+      /// the estimate errs towards a gap; the encoded-size check after serialisation is the backstop.
+      static constexpr size_t ATTESTATION_OVERHEAD_BYTES = 24;
+
+      /// Conservative envelope and message header bytes the packing estimate starts from: the `Envelope`
+      /// header fields, the wrapping `Message`, its header and payload preamble, and a margin for length
+      /// prefixes.
+      static constexpr size_t ENVELOPE_BASELINE_BYTES = 512;
+
+      /// Estimated envelope bytes of one attestation carrying `data_bytes` of `data`.
+      static constexpr size_t attestation_estimate_bytes(size_t data_bytes) {
+         return ATTESTATION_OVERHEAD_BYTES + data_bytes;
+      }
+
+      /// Largest `data` that fits an otherwise empty envelope: the bound of a `schedule` row.
+      static constexpr size_t MAX_ATTESTATION_DATA_BYTES =
+         MAX_ENVELOPE_BYTES - ENVELOPE_BASELINE_BYTES - ATTESTATION_OVERHEAD_BYTES;
+
+      /// Estimated bytes the operator schedule (the `schedule` lane, overhead included) may use in one
+      /// envelope. `sysio.epoch::advance` withholds a roster that would take the schedule past it, and
+      /// `buildenv` reports a schedule that does. Three quarters of the envelope, equal to the Solana
+      /// outpost's OPERATORS payload byte cap (`MAX_OPERATORS_PAYLOAD_BYTES`). Staying within it clears
+      /// only that size check: Solana also skips a roster over its `MAX_OPERATORS` entry cap, one that
+      /// maps two names to one key, and one that resolves to no operators.
+      static constexpr size_t SCHEDULE_LANE_BUDGET_BYTES = MAX_ENVELOPE_BYTES / 4 * 3;
+
+      /// Largest `data` that fits beside a full schedule lane: the bound of an `other` row. While the
+      /// schedule stays within its budget, every `other` row `buildenv` keeps ships once it reaches the
+      /// front of its lane.
+      static constexpr size_t MAX_OTHER_ATTESTATION_DATA_BYTES =
+         MAX_ENVELOPE_BYTES - ENVELOPE_BASELINE_BYTES - SCHEDULE_LANE_BUDGET_BYTES - ATTESTATION_OVERHEAD_BYTES;
+      static_assert(MAX_OTHER_ATTESTATION_DATA_BYTES < MAX_ATTESTATION_DATA_BYTES,
+                    "the schedule budget must leave the other lane a tighter bound than an empty envelope");
+
+      /// Largest `data` a row in `lane` can ever ship with; `buildenv` drops a larger one.
+      static constexpr size_t max_attestation_data_bytes(queue_lane lane) {
+         return lane == queue_lane::schedule ? MAX_ATTESTATION_DATA_BYTES : MAX_OTHER_ATTESTATION_DATA_BYTES;
+      }
 
       // -----------------------------------------------------------------------
       //  Tables
@@ -183,22 +269,30 @@ namespace sysio {
          uint64_t                        ready_timestamp;
          uint64_t                        processed_timestamp;
 
-         uint64_t by_status() const { return static_cast<uint64_t>(status); }
-         uint64_t by_type()   const { return static_cast<uint64_t>(type); }
-         uint64_t by_epoch()  const { return epoch_index; }
+         /// Key of the `byqueue` index: `status`, `chain_code` and the packing lane, most significant first,
+         /// each field lossless. Entries sharing a key iterate in primary-key order, which is queue order,
+         /// so one outpost's rows in one status sit together in packing order: the schedule lane first,
+         /// each lane oldest first.
+         static uint128_t queue_key(opp::types::AttestationStatus status, uint64_t chain_code, queue_lane lane) {
+            constexpr uint32_t lane_bits  = std::numeric_limits<std::underlying_type_t<queue_lane>>::digits;
+            constexpr uint32_t chain_bits = std::numeric_limits<uint64_t>::digits;
+            return (static_cast<uint128_t>(magic_enum::enum_integer(status)) << (chain_bits + lane_bits)) |
+                   (static_cast<uint128_t>(chain_code) << lane_bits) |
+                   static_cast<uint128_t>(magic_enum::enum_integer(lane));
+         }
+
+         uint128_t by_queue() const { return queue_key(status, chain_code, lane_of(type)); }
 
          SYSLIB_SERIALIZE(attestation_entry,
             (id)(chain_code)(epoch_index)(type)(status)(data)
             (pending_timestamp)(ready_timestamp)(processed_timestamp))
       };
 
+      /// `byqueue` is the per-outpost outbound queue: `buildenv` packs its outpost's READY rows, and
+      /// clears the PROCESSED ones, each through one range of this index.
       using attestations_t = sysio::kv::table<"attestations"_n, id_key, attestation_entry,
-         sysio::kv::index<"bystatus"_n,
-            sysio::const_mem_fun<attestation_entry, uint64_t, &attestation_entry::by_status>>,
-         sysio::kv::index<"bytype"_n,
-            sysio::const_mem_fun<attestation_entry, uint64_t, &attestation_entry::by_type>>,
-         sysio::kv::index<"byepoch"_n,
-            sysio::const_mem_fun<attestation_entry, uint64_t, &attestation_entry::by_epoch>>
+         sysio::kv::index<"byqueue"_n,
+            sysio::const_mem_fun<attestation_entry, uint128_t, &attestation_entry::by_queue>>
       >;
 
       /// Outbound envelope table. One-deep per outpost: `buildenv` erases every older row for the

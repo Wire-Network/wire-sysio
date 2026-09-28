@@ -442,19 +442,9 @@
             "table_id": 4978,
             "secondary_indexes": [
                 {
-                    "name": "bystatus",
-                    "key_type": "uint64",
-                    "table_id": 15348
-                },
-                {
-                    "name": "bytype",
-                    "key_type": "uint64",
-                    "table_id": 31638
-                },
-                {
-                    "name": "byepoch",
-                    "key_type": "uint64",
-                    "table_id": 21249
+                    "name": "byqueue",
+                    "key_type": "uint128",
+                    "table_id": 11308
                 }
             ]
         },
