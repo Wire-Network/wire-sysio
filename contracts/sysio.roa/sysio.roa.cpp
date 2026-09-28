@@ -799,7 +799,15 @@ namespace sysio {
             }
         }
 
-        // (6) a pre-existing reslimit row no longer blocks registration. An attacker can plant one on
+        // (6) capacity exhaustion is a terminal claim outcome, not a malformed envelope. Soft-fail
+        // so another claim in the same consensus envelope cannot roll back every registration and
+        // leave batch operators retrying the deterministically failing envelope forever.
+        if (nodeowner_count(get_self(), gen, tier) >= nodeowner_cap(tier)) {
+            record_nodereg(owner, tier, REJECTED, TIER_CAP_REACHED, gen);
+            return;
+        }
+
+        // (7) a pre-existing reslimit row no longer blocks registration. An attacker can plant one on
         // any account via addpolicy (no target consent), which previously forced this claim into a
         // permanent OWNER_HAS_RESLIMIT soft-fail -- a valid registration could be griefed indefinitely.
         // regnodeowner now reconciles instead: it stacks the node-owner allocation onto the existing
@@ -867,6 +875,20 @@ namespace sysio {
         return false;
     }
 
+    uint32_t roa::nodeowner_cap(uint8_t tier) {
+        switch (tier) {
+        case 1:
+            return sysiosystem::emissions::T1_MAX_NODE_OWNERS;
+        case 2:
+            return sysiosystem::emissions::T2_MAX_NODE_OWNERS;
+        case 3:
+            return sysiosystem::emissions::T3_MAX_NODE_OWNERS;
+        default:
+            check(false, "Tier level must be between 1 and 3");
+        }
+        return 0;
+    }
+
     void roa::regnodeowner(const name& owner, const uint8_t& tier) {
 
         roastate_t roastate(get_self());
@@ -880,14 +902,7 @@ namespace sysio {
         // ROA rows are the authoritative membership set. Enforce the tier caps here instead of
         // relying on sysio.system::nodecount, which is an optional emissions-distribution mirror
         // and deliberately misses registrations made before setemitcfg.
-        uint32_t tier_cap = 0;
-        switch (tier) {
-        case 1: tier_cap = sysiosystem::emissions::T1_MAX_NODE_OWNERS; break;
-        case 2: tier_cap = sysiosystem::emissions::T2_MAX_NODE_OWNERS; break;
-        case 3: tier_cap = sysiosystem::emissions::T3_MAX_NODE_OWNERS; break;
-        default: check(false, "Tier level must be between 1 and 3");
-        }
-        check(nodeowner_count(get_self(), state.network_gen, tier) < tier_cap,
+        check(nodeowner_count(get_self(), state.network_gen, tier) < nodeowner_cap(tier),
               "node owner tier cap reached");
 
         // The owner's budget: the tier allocation net of sysio's carve-out
