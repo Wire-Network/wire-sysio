@@ -280,7 +280,8 @@ void prune_expired_envelopes(name self, uint32_t current_epoch) {
 }
 
 /// Resolve `op_address` (chain-kind + raw pubkey bytes) to the operator's
-/// WIRE account name via `sysio.authex::links`'s `bypubkey` index. Returns
+/// WIRE account name via `sysio.authex::links`'s `bypubkey` index, the same
+/// lookup as `sysio::linked_account_for_key` that regoperator checks. Returns
 /// `name{}` (zero) on miss — caller treats that as "operator not linked,
 /// drop the attestation".
 name resolve_account_from_op_address(const opp::types::ChainAddress& op_address) {

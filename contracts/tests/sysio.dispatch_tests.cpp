@@ -531,6 +531,25 @@ public:
       uwrit_op_eth_pubkey = create_eth_authex_link(UWRIT_OP);
    }
 
+   /// Link `account` to the EM key `pub` through the trusted depot path, which does not require the
+   /// key to be unused; `native_address` is the key's EVM address so the DClaim sweep is well-formed.
+   action_result recordlink_eth(name account, const fc::crypto::public_key& pub) {
+      const auto address = fc::crypto::ethereum::address_to_bytes(pub);
+      return push(AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
+         ("account",        account)
+         ("chain_kind",     ChainKind::CHAIN_KIND_EVM)
+         ("pub_key",        pub)
+         ("native_address", std::vector<char>(address.begin(), address.end())));
+   }
+
+   /// `regoperator` signed by the operator itself, the path that enforces the AuthX link checks.
+   action_result regoperator_self(name account, OperatorType type) {
+      return push(OPREG_ACCOUNT, opreg_abi, account, "regoperator"_n, mvo()
+         ("account",         account.to_string())
+         ("type",            type)
+         ("is_bootstrapped", false));
+   }
+
    /// Push `sysio.opreg::setconfig` with the dispatch-suite defaults, varying
    /// the underwriter and (optionally) producer collateral requirements. Batch
    /// minimums stay empty (those operators are bootstrapped or unused here). The
@@ -1605,6 +1624,59 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_deposit_to_opreg, sysio_dispatch_tester)
    BOOST_REQUIRE(!bal.is_null());
    BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(DEPOSIT_AMOUNT),
                        bal["balance"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+/// Message `regoperator` rejects with when an account's link key routes to a different account.
+constexpr auto link_key_routes_elsewhere_error =
+   "assertion failure with message: authex link key for outpost chain routes to another account";
+
+// recordlink lets one external key back several Wire accounts, but deposits and withdrawals route a key
+// to the account that linked it first. An operator whose link key routes elsewhere would have its
+// collateral credited to that other account, so regoperator refuses it. The first account still
+// registers, and a deposit from the key reaches it.
+BOOST_FIXTURE_TEST_CASE(regoperator_requires_link_key_to_route_to_the_registrant, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   const name first  = "linkop.a"_n;
+   const name second = "linkop.b"_n;
+   create_accounts({first, second});
+   const auto shared_key =
+      fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
+   BOOST_REQUIRE_EQUAL(success(), recordlink_eth(first, shared_key));
+   BOOST_REQUIRE_EQUAL(success(), recordlink_eth(second, shared_key));
+   produce_block();
+
+   BOOST_REQUIRE_EQUAL(error(link_key_routes_elsewhere_error),
+                       regoperator_self(second, OperatorType::OPERATOR_TYPE_UNDERWRITER));
+   BOOST_REQUIRE(get_operator(second).is_null());
+   BOOST_REQUIRE_EQUAL(success(), regoperator_self(first, OperatorType::OPERATOR_TYPE_UNDERWRITER));
+
+   constexpr int64_t DEPOSIT_AMOUNT = 1'000'000;
+   const auto eth_code = fc::slug_name{"ETH"}.value;
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth_code, encode_envelope_with_one_attestation(
+      current_epoch(), sysio::opp::types::ATTESTATION_TYPE_OPERATOR_ACTION,
+      encode_operator_action(sysio::opp::attestations::OperatorAction::ACTION_TYPE_DEPOSIT_REQUEST,
+                             sysio::opp::types::CHAIN_KIND_EVM, em_pubkey_bytes(shared_key),
+                             eth_code, eth_code, DEPOSIT_AMOUNT))));
+   const auto bal = find_balance(get_operator(first), "ETH", "ETH");
+   BOOST_REQUIRE(!bal.is_null());
+   BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(DEPOSIT_AMOUNT), bal["balance"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+// createlink refuses a key that is already linked, but a later recordlink may still attach that key to
+// another account. The createlink owner linked first, so it keeps the operator slot for the key.
+BOOST_FIXTURE_TEST_CASE(regoperator_keeps_createlink_owner_when_key_is_shared, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   const name owner = "linkop.c"_n;
+   const name later = "linkop.d"_n;
+   create_accounts({owner, later});
+   const auto owner_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
+   create_eth_authex_link(owner, owner_key);
+   BOOST_REQUIRE_EQUAL(success(), recordlink_eth(later, owner_key.get_public_key()));
+   produce_block();
+
+   BOOST_REQUIRE_EQUAL(error(link_key_routes_elsewhere_error),
+                       regoperator_self(later, OperatorType::OPERATOR_TYPE_UNDERWRITER));
+   BOOST_REQUIRE_EQUAL(success(), regoperator_self(owner, OperatorType::OPERATOR_TYPE_UNDERWRITER));
 } FC_LOG_AND_RETHROW() }
 
 // A payload `token_code` with no canonical spelling is DROPPED, never stored.

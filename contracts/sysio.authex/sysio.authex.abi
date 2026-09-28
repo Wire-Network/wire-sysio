@@ -4,11 +4,6 @@
     "types": [],
     "structs": [
         {
-            "name": "clearlinks",
-            "base": "",
-            "fields": []
-        },
-        {
             "name": "createlink",
             "base": "",
             "fields": [
@@ -90,11 +85,6 @@
         }
     ],
     "actions": [
-        {
-            "name": "clearlinks",
-            "type": "clearlinks",
-            "ricardian_contract": ""
-        },
         {
             "name": "createlink",
             "type": "createlink",
