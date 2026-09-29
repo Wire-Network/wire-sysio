@@ -118,6 +118,9 @@ add_contract_suite(sysio_system_finalizer_key_tests sysio.finalizer_key_tests.cp
 add_contract_suite(sysio_inline_auth_tests sysio.inline_auth_tests.cpp ACCOUNTS sysio.system test.sendinline)
 add_contract_suite(sysio_system_limitauth_tests sysio.limitauth_tests.cpp ACCOUNTS
   sysio.msig sysio.system sysio.token)
+add_contract_suite(sysio_liq_tests sysio.liq_tests.cpp ACCOUNTS
+  sysio.authex sysio.chains sysio.liq sysio.msgch
+  sysio.swap sysio.token sysio.tokens)
 add_contract_suite(sysio_msgch_chain_tests sysio.msgch_chain_tests.cpp ACCOUNTS
   sysio.chains sysio.chalg sysio.epoch sysio.msgch
   sysio.opreg sysio.roa sysio.system sysio.token
@@ -138,6 +141,9 @@ add_contract_suite(sysio_roa_tests sysio.roa_tests.cpp ACCOUNTS
   sysio.token test.noop test.sendinline)
 add_contract_suite(sysio_snapshot_attest_tests sysio.snapshot_attest_tests.cpp ACCOUNTS
   sysio.msig sysio.system sysio.token)
+add_contract_suite(sysio_swap_tests sysio.swap_tests.cpp ACCOUNTS
+  sysio.chains sysio.liq sysio.opp.common sysio.swap
+  sysio.token sysio.tokens test.badtoken)
 add_contract_suite(sysio_system_blockinfo_tests sysio.system_blockinfo_tests.cpp ACCOUNTS
   sysio.msig sysio.system sysio.token test.blockinfo_tester)
 add_contract_suite(sysio_system_tests sysio.system_tests.cpp ACCOUNTS
@@ -147,6 +153,7 @@ add_contract_suite(sysio_token_tests sysio.token_tests.cpp ACCOUNTS
 add_contract_suite(sysio_tokens_tests sysio.tokens_tests.cpp ACCOUNTS sysio.tokens)
 add_contract_suite(sysio_uwrit_tests sysio.uwrit_tests.cpp ACCOUNTS sysio.uwrit)
 add_contract_suite(sysio_wrap_tests sysio.wrap_tests.cpp ACCOUNTS sysio.msig sysio.wrap)
+add_contract_suite(twap_tests twap_tests.cpp ACCOUNTS sysio.opp.common)
 get_property(_registered_suites GLOBAL PROPERTY CONTRACT_REGISTERED_SUITES)
 
 # Fail at configure time when a source introduces a suite without registering it.
