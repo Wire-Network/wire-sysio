@@ -133,7 +133,7 @@ try:
     for name in keyedProdNames:
         n = producers[name]
         blsKey = n.keys[0].blspubkey
-        blsPop = n.keys[0].blspop
+        blsPop = Utils.finalizerRegistrationProof(name, n.keys[0].blsprivkey)
         data = json.dumps({
             "finalizer_name": name,
             "finalizer_key": blsKey,

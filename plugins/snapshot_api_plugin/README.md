@@ -101,9 +101,11 @@ clio push action sysio regproducer \
 # schedulable producers -- an ACTIVE OPERATOR_TYPE_PRODUCER operator in sysio.opreg carrying an
 # active finalizer key. There is no action that assigns a rank.
 clio push action sysio regfinkey \
-  '{"finalizer_name": "myproducer1", "finalizer_key": "PUB_BLS...", "proof_of_possession": "SIG_BLS..."}' \
+  '{"finalizer_name": "myproducer1", "finalizer_key": "PUB_BLS...", "proof_of_possession": "REG_BLS_V1:SIG_BLS_...:SIG_BLS_..."}' \
   -p myproducer1@active
 ```
+
+Generate the account-bound proof with `sys-util bls create pop --file producer-bls.key --finalizer myproducer1`.
 
 ### 2. Register a snapshot provider account
 

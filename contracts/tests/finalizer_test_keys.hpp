@@ -8,8 +8,10 @@
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
+#include <sysio/chain/finalizer_registration.hpp>
 
 #include <fc/reflect/reflect.hpp>
+#include <fc/crypto/hex.hpp>
 #include <fc/variant.hpp>
 
 #include <string>
@@ -18,11 +20,25 @@
 
 namespace sysio_test {
 
-/// A BLS finalizer public key paired with its proof-of-possession, as consumed
-/// by sysio.system::regfinkey.
+/// Deterministic BLS key material, retained so each account can sign its own registration.
 struct key_pair_t {
+   fc::crypto::bls::private_key private_key;
    std::string pub_key;
-   std::string pop;
+
+   /// Derive a reproducible key from a public test seed (never production key material).
+   explicit key_pair_t(uint8_t seed)
+      : private_key(std::vector<uint8_t>(32, seed)), pub_key(private_key.get_public_key().to_string()) {}
+
+   /// Build the proof for the named account; callers must not reuse it for another account.
+   std::string proof(sysio::chain::name account) const {
+      return sysio::chain::make_finalizer_registration_proof(account.to_uint64_t(), private_key);
+   }
+
+   /// Return the canonical affine key bytes for table assertions.
+   std::string binary_hex() const {
+      const auto bytes = private_key.get_public_key().serialize();
+      return fc::to_hex(reinterpret_cast<const char*>(bytes.data()), bytes.size());
+   }
 };
 
 /// Mirror of the finalizer authority as serialized inside the system contract's
@@ -52,8 +68,8 @@ FC_REFLECT(sysio_test::last_prop_finalizers_info, (last_proposed_finalizers))
 
 namespace sysio_test {
 
-/// 23 deterministic BLS keypairs. Defined once in sysio.finalizer_key_tests.cpp.
-extern const std::vector<key_pair_t> key_pairs;
+/// 23 deterministic BLS keypairs, initialized on first use after the BLS library is ready.
+const std::vector<key_pair_t>& get_finalizer_test_keys();
 
 /// Reads sysio.system's `lastpropfins` kv::global singleton -- the finalizer
 /// policy most recently proposed by update_ranked_producers -- and returns its

@@ -987,7 +987,7 @@ public:
       for (uint32_t i = 0; i < count && i < names.size(); ++i) {
          auto [privkey, pubkey, pop, sig_provider] = sysio::testing::get_bls_key(names[i]);
          BOOST_REQUIRE_EQUAL(success(),
-            register_finalizer_key(names[i], pubkey.to_string(), pop.to_string()));
+            register_finalizer_key(names[i], pubkey.to_string(), make_finalizer_registration_proof(names[i].to_uint64_t(), privkey)));
          registered.push_back(names[i]);
       }
       set_node_finalizers(registered);
@@ -5930,7 +5930,7 @@ BOOST_FIXTURE_TEST_CASE( noncollateralized_account_cannot_register_then_can_join
    for (uint32_t i = 0; i < 4; ++i) {
       auto [privkey, pubkey, pop, sig_provider] = sysio::testing::get_bls_key(names[i]);
       BOOST_REQUIRE_EQUAL(success(),
-         register_finalizer_key(names[i], pubkey.to_string(), pop.to_string()));
+         register_finalizer_key(names[i], pubkey.to_string(), make_finalizer_registration_proof(names[i].to_uint64_t(), privkey)));
    }
    set_node_finalizers(names);
    produce_blocks(1);
@@ -5945,7 +5945,7 @@ BOOST_FIXTURE_TEST_CASE( noncollateralized_account_cannot_register_then_can_join
    {
       auto [privkey, pubkey, pop, sig_provider] = sysio::testing::get_bls_key(names[4]);
       BOOST_REQUIRE_EQUAL(success(),
-         register_finalizer_key(names[4], pubkey.to_string(), pop.to_string()));
+         register_finalizer_key(names[4], pubkey.to_string(), make_finalizer_registration_proof(names[4].to_uint64_t(), privkey)));
    }
    trigger_reschedule();
 
@@ -6483,7 +6483,7 @@ BOOST_FIXTURE_TEST_CASE( healthy_tier_outranks_the_bootstrap_backstop, producer_
    {
       auto [privkey, pubkey, pop, sig_provider] = sysio::testing::get_bls_key(bootstrap);
       BOOST_REQUIRE_EQUAL( success(),
-         register_finalizer_key(bootstrap, pubkey.to_string(), pop.to_string()) );
+         register_finalizer_key(bootstrap, pubkey.to_string(), make_finalizer_registration_proof(bootstrap.to_uint64_t(), privkey)) );
    }
    produce_blocks(1);
 

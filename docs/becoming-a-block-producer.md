@@ -101,11 +101,22 @@ unbounded signature verification.
 sysio.system::regfinkey(finalizer_name, finalizer_key, proof_of_possession)
 ```
 
-This is a BLS key with its proof of possession, generated with `sys-util`:
+Generate a BLS key, then create a registration proof for your producer account:
 
 ```bash
 sys-util bls create key --to-console
+# Save only the private-key string in an owner-readable file, then:
+sys-util bls create pop --file producer-bls.key --finalizer myproducer1
 ```
+
+Pass the second command's `Proof of Possession` output to `regfinkey`. Its format is
+`REG_BLS_V1:<standard SIG_BLS_ PoP>:<account-bound SIG_BLS_ signature>`. Both parts are
+required: the standard PoP protects aggregate finality against rogue keys, and the second
+signature prevents another account from replaying a pending registration. The signature
+covers ASCII `WIRE:sysio.system:regfinkey:v1` (no NUL), the account's uint64 in little-endian,
+then the canonical 96-byte affine little-endian public key, without lengths or prehashing.
+The ordinary PoP printed by `create key` or `create pop` without `--finalizer` is still used
+by BIOS bootstrap; it cannot register a key with `sysio.system`.
 
 Two rules matter here. The key must be **globally unique**, so you cannot reuse another producer's
 key or share one across accounts you control. And the first key you register is activated

@@ -8,6 +8,8 @@ using namespace sysio::chain;
 struct bls_options {
    std::string key_file;
    std::string private_key_str;
+   /// Account for a regfinkey proof; omitted for an ordinary BIOS PoP.
+   std::string finalizer_name;
 
    // flags
    bool print_console{false};

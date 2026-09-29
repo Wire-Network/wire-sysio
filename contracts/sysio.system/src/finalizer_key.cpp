@@ -1,6 +1,7 @@
 #include <sysio.system/sysio.system.hpp>
 
 #include <sysio/sysio.hpp>
+#include <sysio/finalizer_registration.hpp>
 
 namespace sysiosystem {
    finalizer_auth_info::finalizer_auth_info(const finalizer_info& finalizer)
@@ -175,7 +176,7 @@ namespace sysiosystem {
     *
     * @pre `finalizer_name` must be a registered producer
     * @pre `finalizer_key` must be in base64url format
-    * @pre `proof_of_possession` must be a valid of proof of possession signature
+    * @pre `proof_of_possession` must contain a standard PoP and an account-bound registration signature
     * @pre Authority of `finalizer_name` to register. `linkauth` may be used to allow a lower authrity to exectute this action.
     */
    void system_contract::regfinkey( const name& finalizer_name, const std::string& finalizer_key, const std::string& proof_of_possession) {
@@ -189,12 +190,19 @@ namespace sysiosystem {
       check( !finalizer || finalizer->finalizer_key_count < max_finalizer_keys,
              "finalizer cannot register more than 5 keys" );
 
-      // Basic signature format check
-      check(proof_of_possession.compare(0, 7, "SIG_BLS") == 0, "proof of possession signature does not start with SIG_BLS: " + proof_of_possession);
+      // Only the versioned two-proof format is accepted for account registration.
+      namespace registration = sysio::finalizer_registration;
+      check(registration::has_valid_format(proof_of_possession), "invalid finalizer registration proof format");
 
       // Convert to binary form.
       const auto fin_key_g1 = to_binary(finalizer_key);
-      const auto pop_g2 = sysio::decode_bls_signature_to_g2(proof_of_possession);
+      const auto pop_text = proof_of_possession.substr(registration::proof_prefix.size(), registration::signature_text_size);
+      const auto signature_text = proof_of_possession.substr(registration::proof_prefix.size() + registration::signature_text_size + 1);
+      const auto pop_g2 = sysio::decode_bls_signature_to_g2(pop_text);
+      const auto registration_g2 = sysio::decode_bls_signature_to_g2(signature_text);
+      check(sysio::encode_g2_to_bls_signature(pop_g2) == pop_text &&
+            sysio::encode_g2_to_bls_signature(registration_g2) == signature_text,
+            "noncanonical finalizer registration proof");
 
       // A key set_finalizers would reject must not enter the table. The schedule rebuild proposes
       // every active finalizer key from inside onblock, and a throw there rolls back the rebuild
@@ -211,8 +219,12 @@ namespace sysiosystem {
       const auto hash = get_finalizer_key_hash(fin_key_g1);
       check(idx.find(hash) == idx.end(), "duplicate finalizer key: " + finalizer_key);
 
-      // Proof of possession check
+      // Keep the dedicated PoP hash domain: an ordinary signature alone does not provide
+      // the signing-oracle separation needed to exclude rogue aggregate-finality keys.
       check(sysio::bls_pop_verify(fin_key_g1, pop_g2), "proof of possession check failed");
+      check(sysio::bls_signature_verify(fin_key_g1, registration_g2,
+                                       registration::message(finalizer_name.value, fin_key_g1)),
+            "finalizer registration signature check failed");
 
       // Insert the finalizer key into finalizer_keys table
       auto new_key_id = get_next_finalizer_key_id();

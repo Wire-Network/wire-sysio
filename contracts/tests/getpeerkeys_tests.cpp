@@ -45,7 +45,7 @@ public:
          auto [privkey, pubkey, pop, sig_provider] = sysio::testing::get_bls_key(p);
          BOOST_REQUIRE_EQUAL( success(), push_action(p, "regfinkey"_n, mvo()
             ("finalizer_name", p)("finalizer_key", pubkey.to_string())
-            ("proof_of_possession", pop.to_string())) );
+            ("proof_of_possession", make_finalizer_registration_proof(p.to_uint64_t(), privkey))) );
          registered.push_back(p);
       }
       set_node_finalizers(registered);

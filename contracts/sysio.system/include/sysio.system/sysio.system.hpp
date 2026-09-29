@@ -527,11 +527,14 @@ namespace sysiosystem {
           *
           * @param finalizer_name - account registering `finalizer_key`,
           * @param finalizer_key - key to be registered. The key is in base64url format.
-          * @param proof_of_possession - a valid Proof of Possession signature to show the producer owns the private key of the finalizer_key. The signature is in base64url format.
+          * @param proof_of_possession - REG_BLS_V1:<standard PoP>:<registration signature>, with both
+          * signatures in SIG_BLS_ format. The registration signature covers the ASCII domain
+          * WIRE:sysio.system:regfinkey:v1, the account uint64 little-endian, and the canonical
+          * 96-byte affine little-endian public key, without length prefixes or a prehash.
           *
           * @pre `finalizer_name` must be a registered producer
           * @pre `finalizer_key` must be in base64url format
-          * @pre `proof_of_possession` must be a valid of proof of possession signature
+          * @pre Both the standard PoP and the account-bound registration signature must verify.
           * @pre Authority of `finalizer_name` to register. `linkauth` may be used to allow a lower authrity to exectute this action.
           */
          [[sysio::action]]

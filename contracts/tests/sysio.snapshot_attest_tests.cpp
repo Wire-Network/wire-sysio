@@ -153,7 +153,7 @@ public:
             push_action(p, "regfinkey"_n, mvo()
                ("finalizer_name", p)
                ("finalizer_key", pubkey.to_string())
-               ("proof_of_possession", pop.to_string())));
+               ("proof_of_possession", make_finalizer_registration_proof(p.to_uint64_t(), privkey))));
       }
       produce_blocks();
       set_node_finalizers(names);

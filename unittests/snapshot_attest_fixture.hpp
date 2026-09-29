@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sysio/chain/finalizer_registration.hpp>
+
 #include <sysio/chain/name.hpp>
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/protocol/snapshot_attestation.hpp>
@@ -69,7 +71,7 @@ public:
             push_action(producer_account, "regfinkey"_n,
                mvo()("finalizer_name", producer_account)
                     ("finalizer_key", pubkey.to_string())
-                    ("proof_of_possession", pop.to_string())));
+                    ("proof_of_possession", make_finalizer_registration_proof(producer_account.to_uint64_t(), privkey))));
       }
       set_node_finalizers(std::vector<name>{producer_account});
       produce_blocks();

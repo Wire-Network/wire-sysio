@@ -18,6 +18,7 @@ import shutil
 import sys
 from pathlib import Path
 import threading
+import tempfile
 
 # Fancy import to maintain compatibility with python 3.10
 try:
@@ -546,6 +547,20 @@ class Utils:
         """Run a shell command string and parse its JSON output, optionally with a subprocess timeout."""
         cmdArr=shlex.split(cmd)
         return Utils.runCmdArrReturnJson(cmdArr, trace=trace, silentErrors=silentErrors, timeout=timeout)
+
+    @staticmethod
+    def finalizerRegistrationProof(account, private_key):
+        """Create an account-bound regfinkey proof without exposing the key in process arguments."""
+        with tempfile.NamedTemporaryFile(mode="w+") as key_file:
+            key_file.write(private_key)
+            key_file.flush()
+            output = Utils.processSysioUtilCmd(
+                f"bls create pop --file {shlex.quote(key_file.name)} --finalizer {shlex.quote(account)}",
+                "create finalizer registration proof", silentErrors=False)
+        if output is None:
+            raise RuntimeError("Failed to create finalizer registration proof")
+        return next(line.removeprefix("Proof of Possession: ")
+                    for line in output.splitlines() if line.startswith("Proof of Possession: "))
 
     @staticmethod
     def processSysioUtilCmd(cmd, cmdDesc, silentErrors=True, exitOnError=False, exitMsg=None, timeout=None):

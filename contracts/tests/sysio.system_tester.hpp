@@ -4,6 +4,7 @@
 #include <sysio/testing/bls_utils.hpp>
 #include <sysio/opp/opp.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/finalizer_registration.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include "contracts.hpp"
 #include "contract_test_support.hpp"

@@ -108,6 +108,27 @@ def test_create_key_error_handling():
     # should fail when both arguments are present
     assert Utils.processSysioUtilCmd("bls create key --file out_file --to-console", "conflicting arguments") == None
 
+def test_finalizer_registration_proof():
+    """Exercise the CLI/Python helper with the scalar-one key shared by C++ and TypeScript."""
+    private_key = "PVT_BLS_AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABtas2"
+    alice_proof = Utils.finalizerRegistrationProof("alice1111111", private_key)
+    bob_proof = Utils.finalizerRegistrationProof("bob111111111", private_key)
+    alice_parts = alice_proof.split(":")
+    bob_parts = bob_proof.split(":")
+    assert len(alice_parts) == 3 and alice_parts[0] == "REG_BLS_V1"
+    assert all(len(part) == 270 and part.startswith("SIG_BLS_") for part in alice_parts[1:])
+    ordinary = get_results(Utils.processSysioUtilCmd(
+        f"bls create pop --private-key {private_key}", "ordinary PoP"))
+    assert alice_parts[1] == bob_parts[1] == ordinary["Proof of Possession"]
+    assert alice_parts[2] != bob_parts[2]
+    assert Utils.finalizerRegistrationProof("alice1111111", private_key) == alice_proof
+    assert Utils.processSysioUtilCmd(
+        f"bls create pop --private-key {private_key} --finalizer ALICE", "invalid finalizer") is None
+    assert Utils.processSysioUtilCmd(
+        f"bls create pop --private-key {private_key} --finalizer alice.", "noncanonical finalizer") is None
+    assert Utils.processSysioUtilCmd(
+        f"bls create pop --private-key {private_key} --finalizer ''", "empty finalizer") is None
+
 def test_create_pop_error_handling():
     # should fail with missing arguments (processSysioUtilCmd returning None)
     assert Utils.processSysioUtilCmd("bls create pop", "missing arguments") == None
@@ -154,6 +175,8 @@ try:
     
     # test create pop from private key in file
     test_create_pop_from_file()
+
+    test_finalizer_registration_proof()
 
     # test error handling in create key
     test_create_key_error_handling()

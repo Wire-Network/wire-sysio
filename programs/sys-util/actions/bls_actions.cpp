@@ -4,6 +4,7 @@
 #include <fc/crypto/bls_public_key.hpp>
 #include <fc/crypto/bls_signature.hpp>
 #include <fc/io/secure_file.hpp>
+#include <sysio/chain/finalizer_registration.hpp>
 
 #include <boost/program_options.hpp>
 
@@ -41,6 +42,8 @@ void bls_actions::setup(CLI::App& app) {
    auto* create_pop = create->add_subcommand("pop", "Create proof of possession of the corresponding private key for a given public key")->callback([err_guard]() { err_guard(&bls_actions::create_pop); });
    create_pop->add_option("-f,--file", opt->key_file, "Name of file storing the private key. (one and only one of \"-f,--file\" and \"--private-key\" must be set)");
    create_pop->add_option("--private-key", opt->private_key_str, "The private key. (one and only one of \"-f,--file\" and \"--private-key\" must be set)");
+   create_pop->add_option("--finalizer", opt->finalizer_name, "Create an account-bound regfinkey proof for this finalizer account")
+      ->check([](const std::string& value) { return value.empty() ? "finalizer must not be empty" : ""; });
 }
 
 int bls_actions::create_key() {
@@ -109,7 +112,15 @@ int bls_actions::create_pop() {
    const bls::public_key public_key = private_key.get_public_key();
    const bls::signature pop = private_key.proof_of_possession();
 
-   std::cout << "Proof of Possession: " << pop.to_string()<< "\n";
+   // Ordinary PoPs remain available for BIOS; registration requires the named account.
+   std::string proof = pop.to_string();
+   if (!opt->finalizer_name.empty()) {
+      const name finalizer(opt->finalizer_name);
+      FC_ASSERT(finalizer.to_uint64_t() != 0 && finalizer.to_string() == opt->finalizer_name,
+                "finalizer must be a nonempty canonical account name");
+      proof = make_finalizer_registration_proof(finalizer.to_uint64_t(), private_key);
+   }
+   std::cout << "Proof of Possession: " << proof << "\n";
    std::cout << "Public key: " <<  public_key.to_string() << "\n";
 
    return 0;

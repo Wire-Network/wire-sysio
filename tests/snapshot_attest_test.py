@@ -128,7 +128,7 @@ try:
             json.dumps({
                 "finalizer_name": name,
                 "finalizer_key": node.keys[0].blspubkey,
-                "proof_of_possession": node.keys[0].blspop
+                "proof_of_possession": Utils.finalizerRegistrationProof(name, node.keys[0].blsprivkey)
             }),
             f"--permission {name}@active")
         assert success, f"Failed to register finalizer key for {name}: {trans}"
