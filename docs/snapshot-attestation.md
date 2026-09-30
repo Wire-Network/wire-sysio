@@ -143,9 +143,11 @@ The gate keys on the ABSENCE OF A CURRENT MAPPING rather than on never having re
 producer whose row was evicted by the capacity prune is gated again when it re-registers, while a
 producer that still holds one replaces it ungated, for the reason below.
 Of these conditions only operator standing is rechecked while voting: `votesnaphash` rejects a new
-vote whose producer is no longer an ACTIVE `OPERATOR_TYPE_PRODUCER` row in sysio.opreg, which
-happens on a slash, a termination, or a withdrawal below the collateral minimum. Rank, activity and
-the finalizer key are not rechecked, so ordinary producer churn cannot interrupt a delegation.
+vote whose producer is no longer an ACTIVE `OPERATOR_TYPE_PRODUCER` row in sysio.opreg (a slash, a
+termination, or a withdrawal below the minimum) or whose bond no longer clears the live
+`req_prod_collat`, bootstrapped operators exempt. `sysio.opreg::setconfig` re-evaluates no stored
+status, so a raised minimum takes effect at the producer's next vote. Rank, activity and the
+finalizer key are not rechecked, so ordinary producer churn cannot interrupt a delegation.
 
 The registration table is capped at 30. Normal producer lifecycle actions do no attestation work.
 Only when a gated registration encounters a full table does `regsnapprov` lazily remove every
@@ -180,8 +182,8 @@ is still refused one while ineligible, whether or not it held one before.
 
 After computing a snapshot, a provider calls `votesnaphash(snap_account, block_id,
 snapshot_hash)`. The contract checks that `snap_account` is a registered provider whose producer is
-still an ACTIVE `OPERATOR_TYPE_PRODUCER` in sysio.opreg, derives `block_num` from `block_id`, and
-accumulates the vote.
+still an ACTIVE `OPERATOR_TYPE_PRODUCER` in sysio.opreg that clears the live collateral minimum
+(bootstrapped producers exempt), derives `block_num` from `block_id`, and accumulates the vote.
 
 `min_providers` is the governance-set fixed K: every tuple finalizes after K distinct producer
 votes. Its stored default is zero, which disables voting until governance chooses the launch value.
@@ -332,8 +334,11 @@ clio push action sysio votesnaphash \
   hash. Each producer was schedulable and within the top 30 rank positions when it entered the
   provider set. Rank and the finalizer key are checked on admission, not on each mapping row:
   rotation replaces the `snap_account` ungated. A vote is also accepted only while its producer's
-  sysio.opreg row is an ACTIVE PRODUCER, so a bond withdrawn to fund another account stops the first
-  account's mapping from voting again. Votes accepted earlier keep counting toward K.
+  sysio.opreg row is an ACTIVE PRODUCER whose bond clears the live collateral minimum
+  (bootstrapped producers exempt), so a bond
+  withdrawn to fund another account stops the first account's mapping from voting again, and a
+  minimum raised by governance applies to every provider's next vote. Votes accepted earlier keep
+  counting toward K.
 - Determinism is what makes a quorum meaningful: if honest providers could compute different
   hashes for the same block, votes would never converge. The fixed snapshot format and
   canonical section ordering remove that ambiguity.
@@ -349,9 +354,9 @@ clio push action sysio votesnaphash \
 - Contract tests (`contracts/tests/sysio.snapshot_attest_tests.cpp`) cover registration, rotation
   and `delsnapprov` retirement, rejections that name the failed eligibility condition,
   side-effect-free uniqueness failures, traceable lazy full-table pruning, fixed-K configuration,
-  scheduled-height rejection, per-vote operator-standing rejection, monotonic votes across churn
-  and heights, equivocation/disagreement rejection, finalization purging, and the `getsnaphash`
-  query.
+  scheduled-height rejection, per-vote operator-standing rejection including a raised collateral
+  minimum, monotonic votes across churn and heights, equivocation/disagreement rejection,
+  finalization purging, and the `getsnaphash` query.
 - Unit tests (`unittests/snapshot_attest_tests.cpp`) cover snapshot round-trip hash
   stability, a full chain whose snapshot hash matches its on-chain record, mismatch
   detection, the no-attestation case, and survival of attestation state across a snapshot

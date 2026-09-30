@@ -184,9 +184,9 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     * protocol::snapshot_attestation::block_spacing. Rejects with snap_hash_disagreement_error when
     * a final record at the height differs by block id or snapshot hash. A height without its own
     * final record cannot be reopened below the latest attested height after pending rows have been
-    * purged. Rejects a new vote whose producer is no longer an ACTIVE PRODUCER operator in
-    * sysio.opreg; rank, parking and the finalizer key are checked only at registration, and votes
-    * accepted earlier keep counting.
+    * purged. Rejects a new vote whose producer lacks live operator standing: an ACTIVE PRODUCER operator
+    * in sysio.opreg that clears the live collateral minimum, bootstrapped exempt. Rank, parking and the
+    * finalizer key are checked only at registration, and votes accepted earlier keep counting.
     */
    [[sysio::action]]
    void votesnaphash(name snap_account, checksum256 block_id, checksum256 snapshot_hash);
