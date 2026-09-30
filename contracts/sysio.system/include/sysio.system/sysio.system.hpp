@@ -529,7 +529,7 @@ namespace sysiosystem {
           * @param finalizer_key - key to be registered. The key is in base64url format.
           * @param proof_of_possession - a valid Proof of Possession signature to show the producer owns the private key of the finalizer_key. The signature is in base64url format.
           *
-          * @pre `finalizer_name` must be a registered producer
+          * @pre `finalizer_name` must be an active producer with active producer-operator standing
           * @pre `finalizer_key` must be in base64url format
           * @pre `proof_of_possession` must be a valid of proof of possession signature
           * @pre Authority of `finalizer_name` to register. `linkauth` may be used to allow a lower authrity to exectute this action.
