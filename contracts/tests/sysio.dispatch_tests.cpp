@@ -118,14 +118,18 @@ using typed_attestation = std::pair<sysio::opp::types::AttestationType, std::str
 /// attestations into a single delivery, since the depot deduplicates
 /// per-(batch_op, outpost, epoch) — a second `deliver` from the same batch op in the
 /// same epoch reverts as a duplicate.
+/// Later epochs supply the accepted envelope digest and message ID to continue both inbound chains.
 std::vector<char> encode_envelope_with_mixed_attestations(
    uint32_t epoch_index,
-   const std::vector<typed_attestation>& attestations)
+   const std::vector<typed_attestation>& attestations,
+   const std::string& previous_envelope_hash = {},
+   const std::string& previous_message_id = {})
 {
    sysio::opp::Envelope env;
    env.set_epoch_index(epoch_index);
    env.set_epoch_envelope_index(1);
    env.set_epoch_timestamp(1'775'612'516'983ULL);
+   env.set_previous_envelope_hash(previous_envelope_hash);
 
    auto* msg     = env.add_messages();
    auto* payload = msg->mutable_payload();
@@ -136,7 +140,7 @@ std::vector<char> encode_envelope_with_mixed_attestations(
       att->set_data_size(static_cast<uint32_t>(att_data.size()));
    }
 
-   oracle::finalize_header(*env.mutable_messages(0), {}, 1'775'612'516'983ULL);
+   oracle::finalize_header(*env.mutable_messages(0), previous_message_id, 1'775'612'516'983ULL);
 
    std::vector<char> out(env.ByteSizeLong());
    env.SerializeToArray(out.data(), static_cast<int>(out.size()));
@@ -147,12 +151,15 @@ std::vector<char> encode_envelope_with_mixed_attestations(
 std::vector<char> encode_envelope_with_attestations(
    uint32_t epoch_index,
    sysio::opp::types::AttestationType att_type,
-   const std::vector<std::string>& att_datas)
+   const std::vector<std::string>& att_datas,
+   const std::string& previous_envelope_hash = {},
+   const std::string& previous_message_id = {})
 {
    std::vector<typed_attestation> attestations;
    attestations.reserve(att_datas.size());
    for (const auto& d : att_datas) attestations.emplace_back(att_type, d);
-   return encode_envelope_with_mixed_attestations(epoch_index, attestations);
+   return encode_envelope_with_mixed_attestations(
+      epoch_index, attestations, previous_envelope_hash, previous_message_id);
 }
 
 /// Encode an Envelope wrapping a single attestation.
@@ -2262,6 +2269,69 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    auto pending = get_dclaim_row("pclaims"_n, "pending_claim", CLAIM_ACCOUNT.to_uint64_t());
    BOOST_REQUIRE(!pending.is_null());
    BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 4321);
+} FC_LOG_AND_RETHROW() }
+
+/// One slot and two fresh-name claims must commit the first, reject the second, and keep epochs moving.
+BOOST_FIXTURE_TEST_CASE(dispatch_node_owner_tier_cap_preserves_epoch_progress, sysio_dispatch_tester) { try {
+   namespace owners = sysio_system::test_support::nodeowners;
+   namespace audit = sysio_system::test_support::nodeownerreg;
+   bootstrap_for_dispatch("ETHEREUM");
+   setup_wire_token_and_reserves();
+   enable_epoch_advancement();
+   owners::fill_tier1(*this, roa_abi, owners::tier1_cap - 1);
+
+   constexpr auto first = "claimb"_n;
+   constexpr auto second = "claimc"_n;
+   const auto eth_code = fc::slug_name{"ETHEREUM"}.value;
+   const auto epoch = current_epoch();
+   std::vector<std::string> claims;
+   for (const auto owner : {first, second}) {
+      const auto eth_pub = fc::crypto::private_key::generate(
+         fc::crypto::private_key::key_type::em).get_public_key();
+      claims.push_back(encode_node_owner_registration(
+         owner.to_string(), owners::tier1, sysio::opp::types::WIRE_KEY_TYPE_K1,
+         k1_pubkey_bytes(get_public_key(owner, "active")), em_uncompressed_pubkey_bytes(eth_pub),
+         fc::crypto::ethereum::address_to_bytes(eth_pub)));
+   }
+   const auto envelope = encode_envelope_with_attestations(
+      epoch, sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, claims);
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth_code, envelope));
+   produce_block();
+
+   BOOST_REQUIRE(!get_nodeowner(first).is_null());
+   BOOST_CHECK_EQUAL(get_nodeownerreg(first)["status"].as<uint64_t>(), audit::status_confirmed);
+   BOOST_REQUIRE(get_nodeowner(second).is_null());
+   const auto rejected = get_nodeownerreg(second);
+   BOOST_REQUIRE(!rejected.is_null());
+   BOOST_CHECK_EQUAL(rejected["status"].as<uint64_t>(), audit::status_rejected);
+   BOOST_CHECK_EQUAL(rejected["reason"].as<uint64_t>(), audit::reason_tier_cap_reached);
+   BOOST_CHECK((control->db().find<account_object, by_name>(second) == nullptr));
+   BOOST_CHECK_EQUAL(owners::count(*this, roa_abi, owners::tier1), owners::tier1_cap);
+   BOOST_REQUIRE(!get_envelope(1).is_null());
+
+   // Use the consensus crank, so a rolled-back consensus row cannot be hidden by a privileged advance.
+   produce_block(fc::seconds(120));
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), chkcons());
+   produce_block();
+   BOOST_REQUIRE_EQUAL(current_epoch(), epoch + 1);
+
+   // A later epoch must also accept an envelope and reach consensus while the tier remains full.
+   sysio::opp::Envelope accepted;
+   BOOST_REQUIRE(accepted.ParseFromArray(envelope.data(), static_cast<int>(envelope.size())));
+   const auto next = encode_envelope_with_attestations(
+      current_epoch(), sysio::opp::types::ATTESTATION_TYPE_NODE_OWNER_REG, {claims.back()},
+      oracle::digest_bytes(oracle::epoch_digest(accepted)), accepted.messages(0).header().message_id());
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth_code, next));
+   produce_block();
+   BOOST_REQUIRE(!get_envelope(2).is_null());
+   BOOST_CHECK_EQUAL(get_nodeownerreg(second)["reason"].as<uint64_t>(), audit::reason_tier_cap_reached);
+   BOOST_CHECK((control->db().find<account_object, by_name>(second) == nullptr));
+   produce_block(fc::seconds(120));
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), chkcons());
+   produce_block();
+   BOOST_CHECK_EQUAL(current_epoch(), epoch + 2);
 } FC_LOG_AND_RETHROW() }
 
 // BAR's NodeOwnerRegistration contract emits a 65-byte uncompressed SEC1 key. A compressed EM key

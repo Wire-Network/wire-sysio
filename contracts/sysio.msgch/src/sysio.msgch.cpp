@@ -889,12 +889,13 @@ std::optional<em_identity> em_identity_from_uncompressed_key(const std::vector<c
 /// the vanity-named Wire account from the claim's wire_pub_key, then register the owner and record
 /// the depositor's ETH link. Both steps are inline-sent to sysio.roa declaring {sysio.roa, active}
 /// (permitted because sysio.msgch is privileged; no cross-contract active grant is required),
-/// newnameduser first so its newaccount runs depth-first and the account exists before nodeownreg
-/// executes.
+/// newnameduser first so any newaccount runs depth-first before nodeownreg. Invalid names and full
+/// tiers skip creation; nodeownreg records the rejection without allocating an account.
 ///
 /// Trust-OPP: a malformed envelope (undecodable proto, unparseable name, unusable key bytes,
 /// out-of-range tier) is silently dropped here -- nothing is sent. A well-formed envelope whose
-/// *claim* is bad (name wrong length for tier, account held by a different key, already registered)
+/// *claim* is rejected (name wrong length for tier, account held by a different key, already registered,
+/// tier at capacity)
 /// is soft-failed inside nodeownreg, which records a REJECTED audit row. Neither path aborts the
 /// dispatching transaction.
 ///
