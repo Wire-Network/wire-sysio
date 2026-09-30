@@ -49,7 +49,7 @@ include(GNUInstallDirs)
 include(test-helpers)
 include(boost-test-discovery)
 add_p_test(NAME boost_test_discovery_test
-           COMMAND ${CMAKE_COMMAND} -DGENERATOR=${CMAKE_GENERATOR} -DCXX=${CMAKE_CXX_COMPILER}
+           COMMAND ${CMAKE_COMMAND} -DGENERATOR=${CMAKE_GENERATOR} -DCXX=${CMAKE_CXX_COMPILER} -DCONFIG=$<CONFIG>
                    -P ${CMAKE_SOURCE_DIR}/cmake/test/boost-test-discovery-test.cmake)
 
 set(CLI_CLIENT_EXECUTABLE_NAME clio)

@@ -6,6 +6,8 @@ cmake_policy(PUSH)
 cmake_policy(VERSION 3.19)
 
 set(_BOOST_TEST_LIST_TIMEOUT_SECONDS 60)
+# Longer than one discovery can take, so a process waiting for the lock outlasts the one holding it.
+set(_BOOST_TEST_LOCK_TIMEOUT_SECONDS 180)
 # Stands for "no runtime" in the runtime loop: an empty element cannot be appended to an empty CMake list.
 set(_BOOST_TEST_NO_RUNTIME "<none>")
 
@@ -40,14 +42,25 @@ endfunction()
 
 function(boost_test_discover_tests_impl)
    # Lists arrive as single `;`-joined arguments; the ${ARGN} form splits them where PARSE_ARGV would not.
-   cmake_parse_arguments(arg ""
-      "EXECUTABLE;TESTS_FILE;INCLUDE_FILE;FAILURE_NAME;CMAKE_COMMAND;WORKING_DIRECTORY;NAME;INCLUDE;EXCLUDE"
-      "NAME_STRIP;RUNTIMES;ARGS;PROPERTIES;COST_BY_NAME" ${ARGN})
+   set(single_values EXECUTABLE TESTS_FILE INCLUDE_FILE FAILURE_NAME CMAKE_COMMAND WORKING_DIRECTORY NAME INCLUDE
+       EXCLUDE LOCK_TIMEOUT)
+   cmake_parse_arguments(arg "" "${single_values}" "NAME_STRIP;RUNTIMES;ARGS;PROPERTIES;COST_BY_NAME" ${ARGN})
 
-   # One ctest process discovers at a time, and one that waited finds the script already current. The script is stale
-   # when the executable or the include script is newer (a tie counts) or this implementation changed.
-   file(LOCK "${arg_TESTS_FILE}.lock" GUARD FUNCTION TIMEOUT ${_BOOST_TEST_LIST_TIMEOUT_SECONDS}
-        RESULT_VARIABLE lock_result)
+   # One ctest process discovers at a time, and one that waited finds the script already current. Without the lock the
+   # shared files are not this process's to touch, so it keeps the current list and reports why.
+   if(NOT DEFINED arg_LOCK_TIMEOUT)
+      set(arg_LOCK_TIMEOUT ${_BOOST_TEST_LOCK_TIMEOUT_SECONDS})
+   endif()
+   file(LOCK "${arg_TESTS_FILE}.lock" GUARD FUNCTION TIMEOUT ${arg_LOCK_TIMEOUT} RESULT_VARIABLE lock_result)
+   if(NOT lock_result STREQUAL "0")
+      set(script "")
+      _boost_test_append_failure("${arg_FAILURE_NAME}" "${arg_CMAKE_COMMAND}"
+                                 "cannot lock ${arg_TESTS_FILE}.lock: ${lock_result}" ${arg_PROPERTIES})
+      cmake_language(EVAL CODE "${script}")
+      return()
+   endif()
+   # The script is stale when the executable or the include script is newer (a tie counts) or this implementation
+   # changed.
    if(EXISTS "${arg_TESTS_FILE}" AND
       NOT "${arg_EXECUTABLE}" IS_NEWER_THAN "${arg_TESTS_FILE}" AND
       NOT "${arg_INCLUDE_FILE}" IS_NEWER_THAN "${arg_TESTS_FILE}" AND

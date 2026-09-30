@@ -126,17 +126,54 @@ discover(dups NAME "@NAME@" NAME_STRIP "s$;_test$")
 get_property(tests GLOBAL PROPERTY recorded_tests)
 expect_equal("${tests}" "dup;dup;dups_DISCOVERY_FAILED" "colliding names")
 
+# Without the lock, discovery leaves the shared files alone, keeps the current list and reports why. Another process
+# holds the lock, since CMake crashes when one process locks a file twice, while this one tries once.
+make_executable(lockfail "${listing}" 0)
+file(WRITE "${work}/lockfail_tests.cmake" "# the current list\n")
+file(WRITE "${work}/hold.cmake"
+   "file(LOCK [==[${work}/lockfail_tests.cmake.lock]==])\n"
+   "file(TOUCH [==[${work}/held]==])\n"
+   "foreach(i RANGE 100)\n"
+   "   if(EXISTS [==[${work}/tried]==])\n      break()\n   endif()\n"
+   "   execute_process(COMMAND [==[${CMAKE_COMMAND}]==] -E sleep 0.1)\n"
+   "endforeach()\n")
+file(WRITE "${work}/try.cmake"
+   "foreach(i RANGE 100)\n"
+   "   if(EXISTS [==[${work}/held]==])\n      break()\n   endif()\n"
+   "   execute_process(COMMAND [==[${CMAKE_COMMAND}]==] -E sleep 0.1)\n"
+   "endforeach()\n"
+   "function(add_test name)\n   message(\"registered \${name} \${ARGN}\")\nendfunction()\n"
+   "function(set_tests_properties)\nendfunction()\n"
+   "include([==[${CMAKE_CURRENT_LIST_DIR}/../boost-test-discovery-impl.cmake]==])\n"
+   "boost_test_discover_tests_impl(EXECUTABLE [==[${work}/lockfail.sh]==]\n"
+   "   TESTS_FILE [==[${work}/lockfail_tests.cmake]==] FAILURE_NAME lockfail_DISCOVERY_FAILED\n"
+   "   CMAKE_COMMAND [==[${CMAKE_COMMAND}]==] WORKING_DIRECTORY [==[${work}]==] NAME @UNIT@ LOCK_TIMEOUT 0)\n"
+   "file(TOUCH [==[${work}/tried]==])\n")
+execute_process(COMMAND "${CMAKE_COMMAND}" -P "${work}/hold.cmake" COMMAND "${CMAKE_COMMAND}" -P "${work}/try.cmake"
+                OUTPUT_VARIABLE output ERROR_VARIABLE output TIMEOUT 60)
+expect_contains("${output}" "registered lockfail_DISCOVERY_FAILED" "failed lock")
+expect_contains("${output}" "cannot lock" "failed lock message")
+file(READ "${work}/lockfail_tests.cmake" kept)
+expect_equal("${kept}" "# the current list\n" "list kept without the lock")
+
 make_executable(empty "" 0)
 discover(empty NAME "@UNIT@")
 get_property(tests GLOBAL PROPERTY recorded_tests)
 expect_equal("${tests}" "empty_DISCOVERY_FAILED" "executable listing no units")
 
-# End to end: a tiny project using boost_test_discover_tests(), read back through ctest. GENERATOR and CXX let the
-# ctest entry build it the way the enclosing build is built.
+# End to end: a tiny project using boost_test_discover_tests(), read back through ctest. GENERATOR, CXX and CONFIG let
+# the ctest entry build it the way the enclosing build is built; a multi-config generator needs CONFIG for the nested
+# build and every ctest call.
 get_filename_component(cmake_bin "${CMAKE_COMMAND}" DIRECTORY)
 set(ctest_command "${cmake_bin}/ctest")
 if(NOT GENERATOR)
    set(GENERATOR Ninja)
+endif()
+set(build_config "")
+set(ctest_config "")
+if(CONFIG)
+   set(build_config --config "${CONFIG}")
+   set(ctest_config -C "${CONFIG}")
 endif()
 set(project "${work}/project")
 file(WRITE "${project}/listing.txt" "one_tests*\n    one_case*\ntwo_tests*\n")
@@ -161,6 +198,7 @@ file(WRITE "${project}/CMakeLists.txt"
    "enable_testing()\n"
    "include([==[${CMAKE_CURRENT_LIST_DIR}/../boost-test-discovery.cmake]==])\n"
    "add_executable(fake fake.cpp)\n"
+   "set_target_properties(fake PROPERTIES RUNTIME_OUTPUT_DIRECTORY \"$<1:\${CMAKE_BINARY_DIR}>\")\n"
    "target_compile_definitions(fake PRIVATE [==[LISTING_FILE=\"${project}/listing.txt\"]==])\n"
    "boost_test_discover_tests(fake NAME e2e.@UNIT@.@RUNTIME@ RUNTIMES a b ARGS --x PROPERTIES LABELS lane TIMEOUT 7)\n")
 
@@ -195,11 +233,11 @@ if(CXX)
 endif()
 set(build "${work}/build")
 run("configure" "${CMAKE_COMMAND}" -S "${project}" -B "${build}" -G "${GENERATOR}" ${compiler})
-listed_tests(tests "${build}")
+listed_tests(tests "${build}" ${ctest_config})
 expect_equal("${tests}" "fake_NOT_BUILT" "before the executable is built")
 
-run("build" "${CMAKE_COMMAND}" --build "${build}")
-listed_tests(tests "${build}")
+run("build" "${CMAKE_COMMAND}" --build "${build}" ${build_config})
+listed_tests(tests "${build}" ${ctest_config})
 expect_equal("${tests}" "e2e.one_tests.a;e2e.one_tests.b;e2e.two_tests.a;e2e.two_tests.b" "after the build")
 string(JSON length LENGTH "${json}" tests 0 command)
 math(EXPR last "${length} - 1")
@@ -212,13 +250,13 @@ expect_equal("${arguments}" "--run_test=one_tests;--x;--;--a" "discovered comman
 string(JSON properties GET "${json}" tests 0 properties)
 expect_contains("${properties}" "\"lane\"" "LABELS")
 expect_contains("${properties}" "\"TIMEOUT\"" "TIMEOUT")
-run("running the entries" "${ctest_command}" --output-on-failure WORKING_DIRECTORY "${build}")
+run("running the entries" "${ctest_command}" --output-on-failure ${ctest_config} WORKING_DIRECTORY "${build}")
 
 # A newer executable is listed again: a suite added to it appears without reconfiguring.
 file(APPEND "${project}/listing.txt" "three_tests*\n")
 execute_process(COMMAND "${CMAKE_COMMAND}" -E sleep 1)
 file(TOUCH "${build}/fake")
-listed_tests(tests "${build}")
+listed_tests(tests "${build}" ${ctest_config})
 list(LENGTH tests count)
 expect_equal("${count}" "6" "after the executable changed")
 
