@@ -162,16 +162,18 @@ get_property(tests GLOBAL PROPERTY recorded_tests)
 expect_equal("${tests}" "empty_DISCOVERY_FAILED" "executable listing no units")
 
 # End to end: a tiny project using boost_test_discover_tests(), read back through ctest. GENERATOR, CXX and CONFIG let
-# the ctest entry build it the way the enclosing build is built; a multi-config generator needs CONFIG for the nested
-# build and every ctest call.
+# the ctest entry build it the way the enclosing build is built; under a multi-config generator the nested configure,
+# build and every ctest call need CONFIG, which may be a custom configuration.
 get_filename_component(cmake_bin "${CMAKE_COMMAND}" DIRECTORY)
 set(ctest_command "${cmake_bin}/ctest")
 if(NOT GENERATOR)
    set(GENERATOR Ninja)
 endif()
+set(configure_config "")
 set(build_config "")
 set(ctest_config "")
 if(CONFIG)
+   set(configure_config "-DCMAKE_CONFIGURATION_TYPES=${CONFIG}")
    set(build_config --config "${CONFIG}")
    set(ctest_config -C "${CONFIG}")
 endif()
@@ -232,7 +234,7 @@ if(CXX)
    set(compiler "-DCMAKE_CXX_COMPILER=${CXX}")
 endif()
 set(build "${work}/build")
-run("configure" "${CMAKE_COMMAND}" -S "${project}" -B "${build}" -G "${GENERATOR}" ${compiler})
+run("configure" "${CMAKE_COMMAND}" -S "${project}" -B "${build}" -G "${GENERATOR}" ${compiler} ${configure_config})
 listed_tests(tests "${build}" ${ctest_config})
 expect_equal("${tests}" "fake_NOT_BUILT" "before the executable is built")
 
