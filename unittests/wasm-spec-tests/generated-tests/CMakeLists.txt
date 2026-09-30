@@ -16,39 +16,12 @@ target_include_directories( wasm_spec_test PUBLIC
                             ${CMAKE_CURRENT_BINARY_DIR}/include )
 
 ### MARK TEST SUITES FOR EXECUTION ###
-foreach(TEST_SUITE ${WASM_TESTS}) # create an independent target for each test suite
-  execute_process(COMMAND bash -c "grep -Eo 'BOOST_DATA_TEST_CASE\\(\\w*' '${TEST_SUITE}' | cut -c 22-" OUTPUT_VARIABLE SUITE_NAME OUTPUT_STRIP_TRAILING_WHITESPACE) # get the test suite name from the *.cpp file
-  if (NOT "" STREQUAL "${SUITE_NAME}") # ignore empty lines
-    string(REPLACE "\n" ";" SN_LIST ${SUITE_NAME})
-    foreach(SN ${SN_LIST})
-      foreach(RUNTIME ${SYSIO_WASM_RUNTIMES})
-          if(RUNTIME STREQUAL "native-module" AND NOT BUILD_SYSTEM_CONTRACTS)
-            continue()
-          endif()
-          get_test_property(${SN}_unit_test_${RUNTIME} LABELS TEST_LABEL)
-          if ("NOTFOUND" STREQUAL "${TEST_LABEL}") # prevent duplicates
-            add_wasmspec_test(NAME ${SN}_unit_test_${RUNTIME} COMMAND wasm_spec_test --run_test=${SN} --report_level=detailed --color_output -- --${RUNTIME})
-            # build list of tests to run during coverage testing
-            if(ctest_tests)
-                string(APPEND ctest_tests "|")
-            endif()
-            string(APPEND ctest_tests "${SN}_unit_test_${RUNTIME}")
-          endif()
-      endforeach()
-    endforeach(SN)
-  endif()
-endforeach(TEST_SUITE)
-set(ctest_tests "'${ctest_tests}' -j8") # surround test list string in apostrophies
-
-# The following tests are known to take the longest, bump up their cost (priority) so that they'll run  first
-# even on fresh first time test runs before ctest auto-detects costs
-foreach(RUNTIME ${EOSIO_WASM_RUNTIMES})
-   set_tests_properties(memory_trap_1_check_throw_1_unit_test_${RUNTIME} PROPERTIES COST 4000)
-   set_tests_properties(memory_trap_1_check_throw_2_unit_test_${RUNTIME} PROPERTIES COST 4000)
-   set_tests_properties(conversions_0_check_throw_unit_test_${RUNTIME} PROPERTIES COST 2500)
-   set_tests_properties(unreachable_0_check_throw_unit_test_${RUNTIME} PROPERTIES COST 2500)
-   set_tests_properties(f64_0_pass_unit_test_${RUNTIME} PROPERTIES COST 2500)
-   set_tests_properties(f32_0_pass_unit_test_${RUNTIME} PROPERTIES COST 2500)
-   set_tests_properties(f32_cmp_0_pass_unit_test_${RUNTIME} PROPERTIES COST 2500)
-   set_tests_properties(f64_cmp_0_pass_unit_test_${RUNTIME} PROPERTIES COST 2500)
-endforeach()
+# One entry per generated test case per runtime, discovered from the built executable. COST starts the longest cases
+# first, even on a fresh run before ctest has measured them.
+boost_test_discover_tests(wasm_spec_test
+        NAME @UNIT@_unit_test_@RUNTIME@
+        RUNTIMES ${UNIT_TEST_RUNTIMES}
+        ARGS --report_level=detailed --color_output
+        PROPERTIES LABELS wasm_spec_tests
+        COST_BY_NAME "^memory_trap_1_check_throw_[12]$" 4000
+             "^(conversions|unreachable)_0_check_throw$|^(f32|f64|f32_cmp|f64_cmp)_0_pass$" 2500)
