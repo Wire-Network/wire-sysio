@@ -310,6 +310,8 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
    // incoming epoch_index strictly exceeds it (idempotency guard).
    uint32_t               last_epoch_index    = 0;
    sysio::time_point_sec  last_epoch_time;
+   /// Most recent positive per-epoch share: the base the next share decays from. A zero-share epoch leaves it
+   /// unchanged. Near the end of the budget it may itself be a share clamped to the remainder.
    int64_t                last_epoch_emission = 0;
    int64_t                total_distributed   = 0;
 
@@ -320,7 +322,8 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
    // and resets pending_emission_amount to 0 / period_start_epoch to
    // last_epoch_index+1. With pay_cadence_epochs=1 these two fields
    // are written and immediately reset on every advance, so the
-   // legacy per-epoch behavior is unchanged.
+   // legacy per-epoch behavior is unchanged. The pending amount is
+   // already owed, so net_headroom counts it against the T5 budget.
    int64_t                pending_emission_amount = 0;
    uint32_t               period_start_epoch      = 0;
    // Per-batch-op-schedule-position active-epoch counter. This remains the
@@ -408,37 +411,58 @@ inline fp_math::fp_t compute_per_epoch_decay(uint16_t target_annual_decay_bps,
 }
 
 // ---------------------------------------------------------------------------
-// Pure emission formula. Shared between sysio.system::payepoch (success path)
-// and sysio.epoch's readiness gate (precompute path). One source of truth so
-// the gate-decided amount cannot drift from what payepoch would have computed.
-// Returns 0 when the treasury is at or below the floor (gate sees this as
-// EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED).
-//
-// epoch_duration_sec must be the canonical value from sysio.epoch::epochcfg.
+// T5 budget headroom. The readiness gate, fundclaim, viewepoch and setemitcfg's post-init guard all read the budget
+// through these two helpers.
 // ---------------------------------------------------------------------------
 
+/// T5 budget left before the floor: t5_distributable - t5_floor - total_distributed.
+///
+/// Gross of the open pay period's accrual. The readiness gate decides TREASURY_EXHAUSTED on it; no accrual is sized
+/// against it.
+inline int64_t gross_headroom(const emission_config& cfg, const t5_state& state) {
+   return cfg.t5_distributable - cfg.t5_floor - state.total_distributed;
+}
+
+/// Gross headroom less the emission the open pay period has already accrued: the budget still free to commit.
+///
+/// Accruals and capital draws are sized against it, which keeps
+/// total_distributed + pending_emission_amount <= t5_distributable - t5_floor.
+inline int64_t net_headroom(const emission_config& cfg, const t5_state& state) {
+   return gross_headroom(cfg, state) - state.pending_emission_amount;
+}
+
+/// The per-epoch share the next accrual commits, capped at the net headroom.
+///
+/// The first pay period (epoch_count == 0) accrues the scaled initial emission; later periods decay the last positive
+/// share, clamped to the per-epoch min and max. The share is 0 once the open period has committed the rest of the
+/// budget, or when the curve itself is 0. Shared by sysio.epoch's readiness gate, which accrues it, and viewepoch,
+/// which reports it, so the estimate cannot drift from the accrual.
+///
+/// epoch_duration_sec must be the canonical value from sysio.epoch::epochcfg.
 inline int64_t compute_epoch_emission(const emission_config& cfg,
                                       uint32_t epoch_duration_sec,
-                                      int64_t prev_emission,
-                                      int64_t total_distributed) {
-   const int64_t remaining = cfg.t5_distributable - cfg.t5_floor - total_distributed;
-   if (remaining <= 0) return 0;
+                                      const t5_state& state) {
+   const int64_t headroom = net_headroom(cfg, state);
+   if (headroom <= 0) return 0;
 
-   const fp_math::fp_t factor =
-      compute_per_epoch_decay(cfg.target_annual_decay_bps, epoch_duration_sec);
-   __int128 product = static_cast<__int128>(prev_emission) * factor;
-   int64_t emission = static_cast<int64_t>(product / fp_math::ONE);
+   int64_t emission = 0;
+   if (state.epoch_count == 0) {
+      emission = scale_annual_to_epoch(cfg.annual_initial_emission, epoch_duration_sec);
+   } else {
+      const fp_math::fp_t factor =
+         compute_per_epoch_decay(cfg.target_annual_decay_bps, epoch_duration_sec);
+      const __int128 product = static_cast<__int128>(state.last_epoch_emission) * factor;
+      emission = static_cast<int64_t>(product / fp_math::ONE);
 
-   const int64_t per_epoch_max =
-      scale_annual_to_epoch(cfg.annual_max_emission, epoch_duration_sec);
-   const int64_t per_epoch_min =
-      scale_annual_to_epoch(cfg.annual_min_emission, epoch_duration_sec);
-   if (emission > per_epoch_max) emission = per_epoch_max;
-   if (emission < per_epoch_min) emission = per_epoch_min;
+      const int64_t per_epoch_max =
+         scale_annual_to_epoch(cfg.annual_max_emission, epoch_duration_sec);
+      const int64_t per_epoch_min =
+         scale_annual_to_epoch(cfg.annual_min_emission, epoch_duration_sec);
+      if (emission > per_epoch_max) emission = per_epoch_max;
+      if (emission < per_epoch_min) emission = per_epoch_min;
+   }
 
-   if (emission > remaining) emission = remaining;
-
-   return emission;
+   return std::min(emission, headroom);
 }
 
 // ---------------------------------------------------------------------------
@@ -543,7 +567,9 @@ struct epoch_info_result {
    sysio::time_point_sec  last_epoch_time;
    int64_t                last_epoch_emission = 0;
    int64_t                total_distributed   = 0;
+   /// Net headroom, floored at 0: the budget not yet paid out or accrued to the open pay period.
    int64_t                treasury_remaining  = 0;
+   /// The share the readiness gate would accrue next, so never above treasury_remaining.
    int64_t                next_emission_est   = 0;
    uint32_t               seconds_until_next  = 0;
 

@@ -28,6 +28,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <algorithm>
 #include <map>
 
 #include <sysio/testing/tester.hpp>
@@ -2677,6 +2678,34 @@ BOOST_FIXTURE_TEST_CASE( accrueepoch_saturates_pending_accumulator, sysio_emissi
       get_t5_state()["pending_emission_amount"].as<int64_t>() );
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( accrueepoch_accepts_a_zero_share_and_keeps_the_decay_base, sysio_emissions_tester ) try {
+   // The gate passes a zero share to an open pay period with emission pending once the rest of the budget is committed
+   // or the curve is zero. The epoch must still count toward the period, while the decay base stays at the last
+   // positive share: resetting it would restart the curve at the per-epoch minimum.
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(head_secs()) ) );
+
+   constexpr int64_t positive_share = 5'000'000'000;
+   BOOST_REQUIRE_EQUAL( success(), push_system_action( EPOCH, "accrueepoch"_n, mvo()
+      ("epoch_index", 1)("batch_group_index", 0)("per_epoch_emission", positive_share) ) );
+   const uint64_t slots_per_epoch = pending_nominal_slots();
+   BOOST_REQUIRE_GT( slots_per_epoch, 0u );
+
+   BOOST_REQUIRE_EQUAL( success(), push_system_action( EPOCH, "accrueepoch"_n, mvo()
+      ("epoch_index", 2)("batch_group_index", 0)("per_epoch_emission", int64_t(0)) ) );
+   const auto state = get_t5_state();
+   BOOST_REQUIRE_EQUAL( state["last_epoch_emission"].as<int64_t>(), positive_share );
+   BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), positive_share );
+   BOOST_REQUIRE_EQUAL( state["last_epoch_index"].as<uint32_t>(), 2u );
+   BOOST_REQUIRE_EQUAL( state["batch_group_epochs"].get_array().at(0).as<uint32_t>(), 2u );
+   BOOST_REQUIRE_EQUAL( pending_nominal_slots(), 2 * slots_per_epoch );
+
+   // A negative share is still refused.
+   auto r = push_system_action( EPOCH, "accrueepoch"_n, mvo()
+      ("epoch_index", 3)("batch_group_index", 0)("per_epoch_emission", int64_t(-1)) );
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "accrueepoch per_epoch_emission must be non-negative" );
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE( payepoch_recovers_from_incomplete_batch_roster_history, sysio_emissions_tester ) try {
    // A mixed contract version can reach payepoch without any immutable roster
    // snapshots. That must retain and durably attribute the batch slice rather
@@ -3065,6 +3094,47 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_unreachable_min_emission
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
    require_substr( r, "annual_min_emission per-epoch share exceeds remaining distributable" );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_counts_pending_emission, sysio_emissions_tester ) try {
+   // The open pay period's accrual is owed at its boundary, so the post-init guard must count it alongside what has
+   // been paid out: a budget that covers only the payouts would let the boundary pay past the floor, and the per-epoch
+   // floor must fit in what is left uncommitted.
+   create_t5_holding_accounts();
+   constexpr uint16_t cadence = 2;
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg_with_cadence( config::system_account_name, cadence ) );
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(head_secs() - ONE_EPOCH - 1) ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // epoch 1: the shortened genesis period pays
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // epoch 2: accrues toward epoch 3
+
+   const auto state = get_t5_state();
+   const int64_t pending = state["pending_emission_amount"].as<int64_t>();
+   BOOST_REQUIRE_GT( pending, 0 );
+   const int64_t committed = T5_FLOOR + state["total_distributed"].as<int64_t>() + pending;
+   const int64_t per_epoch_min = test_scale_annual_to_epoch(ANNUAL_MIN_EMISSION, T_EPOCH_SECS);
+
+   auto budget_cfg = [&](int64_t t5_distributable, int64_t annual_min_emission) {
+      return fc::mutable_variant_object( default_emit_cfg(cadence) )
+         .set("t5_distributable",    t5_distributable)
+         .set("annual_min_emission", annual_min_emission);
+   };
+
+   auto r = setemitcfg( config::system_account_name, budget_cfg(committed - 1, 0) );
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "t5_distributable must cover floor + already-distributed + pending emission" );
+
+   r = setemitcfg( config::system_account_name, budget_cfg(committed + per_epoch_min - 1, ANNUAL_MIN_EMISSION) );
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "annual_min_emission per-epoch share exceeds remaining distributable" );
+
+   // Exactly floor + distributed + pending is a workable budget: the boundary accrues a zero share and pays the period
+   // in full.
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg( config::system_account_name, budget_cfg(committed, 0) ) );
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // epoch 3
+   BOOST_REQUIRE_EQUAL( get_epoch_log(3)["total_emission"].as<int64_t>(), pending );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["pending_emission_amount"].as<int64_t>(), 0 );
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
@@ -5546,6 +5616,326 @@ BOOST_FIXTURE_TEST_CASE( pay_cadence_change_via_setemitcfg_takes_effect, sysio_e
       BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), 0 );
       BOOST_REQUIRE_EQUAL( state["period_start_epoch"].as<uint32_t>(), 3u );
    }
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// The end of the T5 budget: shares sized on the headroom net of pending
+// ---------------------------------------------------------------------------
+
+/// Drives the T5 budget to its end at a pay cadence above one.
+///
+/// Its config pushes the whole period emission to the capex bucket, so nothing is credited or retained: every payepoch
+/// adds exactly the period total to total_distributed, and the budget can be checked to the subunit.
+class t5_budget_tail_tester : public sysio_emissions_tester {
+public:
+   /// Every epoch of the first pay period accrues this share (60s epochs).
+   const int64_t initial_share = test_scale_annual_to_epoch(ANNUAL_INITIAL_EMISSION, T_EPOCH_SECS);
+
+   /// Capex-only config at `cadence` whose T5 budget is `budget` subunits above the floor.
+   fc::variant_object capex_only_cfg( uint16_t cadence, int64_t budget ) {
+      return fc::mutable_variant_object( default_emit_cfg(cadence) )
+         .set("t5_distributable", T5_FLOOR + budget)
+         .set("compute_bps",      uint16_t(0))
+         .set("capex_bps",        uint16_t(10'000))
+         .set("governance_bps",   uint16_t(0));
+   }
+
+   /// Apply capex_only_cfg and initialize T5.
+   void start( uint16_t cadence, int64_t budget ) {
+      create_t5_holding_accounts();
+      BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, capex_only_cfg(cadence, budget)) );
+      BOOST_REQUIRE_EQUAL( success(), initt5(config::system_account_name, tpsec(head_secs() - ONE_EPOCH - 1)) );
+   }
+
+   /// Cross the epoch's wall-clock boundary and push advance. A gate block also returns success.
+   void advance_one() {
+      produce_blocks(130);
+      BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   }
+
+   /// The share the gate accrues next, mirroring compute_epoch_emission: the initial share during the first pay period,
+   /// then the decayed last positive share clamped to the per-epoch min/max, either way capped at the budget left net
+   /// of the pending accrual.
+   int64_t expected_share( const fc::variant& state, int64_t budget ) const {
+      const int64_t net = budget - state["total_distributed"].as<int64_t>()
+                                 - state["pending_emission_amount"].as<int64_t>();
+      if (net <= 0) return 0;
+      int64_t curve = initial_share;
+      if (state["epoch_count"].as<uint64_t>() > 0) {
+         curve = std::clamp(
+            test_apply_decay(state["last_epoch_emission"].as<int64_t>(), TARGET_ANNUAL_DECAY_BPS, T_EPOCH_SECS),
+            test_scale_annual_to_epoch(ANNUAL_MIN_EMISSION, T_EPOCH_SECS),
+            test_scale_annual_to_epoch(ANNUAL_MAX_EMISSION, T_EPOCH_SECS));
+      }
+      return std::min(curve, net);
+   }
+
+   /// Advance epochs 1 through `last_epoch`, checking after every advance that the epoch moved, that
+   /// total_distributed + pending_emission_amount never exceeds the budget, and that the epoch accrued expected_share.
+   /// Each boundary must pay exactly what its period accrued, leave nothing pending, and find the period's roster
+   /// history complete, zero-share epochs included.
+   ///
+   /// @return how many of those epochs accrued a zero share.
+   uint32_t walk_epochs( uint16_t cadence, int64_t budget, uint32_t last_epoch ) {
+      uint32_t zero_shares = 0;
+      for (uint32_t epoch = 1; epoch <= last_epoch; ++epoch) {
+         const auto before = get_t5_state();
+         const int64_t share              = expected_share(before, budget);
+         const int64_t distributed_before = before["total_distributed"].as<int64_t>();
+         const int64_t pending_before     = before["pending_emission_amount"].as<int64_t>();
+         const int64_t capex_before       = get_wire_balance(CAPEX_ACCOUNT).get_amount();
+         advance_one();
+
+         const auto after = get_t5_state();
+         const int64_t distributed = after["total_distributed"].as<int64_t>();
+         const int64_t pending     = after["pending_emission_amount"].as<int64_t>();
+         BOOST_REQUIRE_EQUAL( after["last_epoch_index"].as<uint32_t>(), epoch );
+         BOOST_REQUIRE_LE( distributed + pending, budget );
+         if (share == 0) ++zero_shares;
+
+         // period_start_epoch starts at 0, so the genesis period is one epoch short: boundaries fall at cadence - 1,
+         // 2 * cadence - 1, and so on.
+         if ((epoch + 1) % cadence == 0) {
+            const int64_t period = pending_before + share;
+            const auto log = get_epoch_log(epoch);
+            BOOST_REQUIRE_EQUAL( log["total_emission"].as<int64_t>(), period );
+            BOOST_REQUIRE( log["batch_history_complete"].as_bool() );
+            BOOST_REQUIRE_EQUAL( distributed - distributed_before, period );
+            BOOST_REQUIRE_EQUAL( get_wire_balance(CAPEX_ACCOUNT).get_amount() - capex_before, period );
+            BOOST_REQUIRE_EQUAL( pending, 0 );
+         } else {
+            BOOST_REQUIRE_EQUAL( pending - pending_before, share );
+            BOOST_REQUIRE_EQUAL( distributed, distributed_before );
+         }
+      }
+      return zero_shares;
+   }
+
+   /// The budget is cadence - 1/2 shares. The shortened genesis period accrues cadence - 1 of them, leaving the first
+   /// full period half a share: less than `cadence` epochs of emission. That period's first epoch takes the half, its
+   /// other epochs accrue nothing, and its boundary pays exactly the half. The budget is then spent, so the next epoch
+   /// halts.
+   void check_budget_holds_through_the_tail( uint16_t cadence ) {
+      const int64_t budget = (2 * cadence - 1) * initial_share / 2;
+      start(cadence, budget);
+      BOOST_REQUIRE_EQUAL( walk_epochs(cadence, budget, 2u * cadence - 1), static_cast<uint32_t>(cadence - 1) );
+      BOOST_REQUIRE_EQUAL( get_t5_state()["total_distributed"].as<int64_t>(), budget );
+
+      advance_one();
+      const uint32_t halted = 2u * cadence;
+      const auto row = get_blocklog_row(halted);
+      BOOST_REQUIRE( !row.is_null() );
+      BOOST_REQUIRE_EQUAL( row["reason"].as_string(), "EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED" );
+      BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), halted - 1 );
+   }
+
+   /// Move `amount` WIRE from `from` to `to`, signed by `from`.
+   void transfer_wire( account_name from, account_name to, int64_t amount ) {
+      base_tester::push_action( TOKEN, "transfer"_n, vector<permission_level>{{ from, "active"_n }},
+         mvo()("from", from)("to", to)("quantity", asset(amount, WIRE_SYMBOL))("memo", "t5 budget tail test") );
+      produce_blocks(1);
+   }
+
+   static constexpr account_name CAPEX_ACCOUNT = "sysio.ops"_n;
+};
+
+BOOST_FIXTURE_TEST_CASE( tail_pay_period_stays_within_budget_at_cadence_2, t5_budget_tail_tester ) try {
+   check_budget_holds_through_the_tail(2);
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( tail_pay_period_stays_within_budget_at_cadence_4, t5_budget_tail_tester ) try {
+   check_budget_holds_through_the_tail(4);
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( genesis_pay_period_caps_its_shares_at_net_headroom, t5_budget_tail_tester ) try {
+   // Every genesis-period epoch accrues the initial share, capped only by the budget. With 1.5 shares of budget,
+   // epoch 1 takes a full share, epoch 2 the half left net of it, and boundary epoch 3 accrues nothing and pays the
+   // 1.5 shares. The budget is then spent, so epoch 4 halts.
+   constexpr uint16_t cadence = 4;
+   const int64_t budget = 3 * initial_share / 2;
+   start(cadence, budget);
+   BOOST_REQUIRE_EQUAL( walk_epochs(cadence, budget, cadence - 1u), 1u );
+   BOOST_REQUIRE_EQUAL( get_epoch_log(cadence - 1u)["total_emission"].as<int64_t>(), budget );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["total_distributed"].as<int64_t>(), budget );
+
+   advance_one();
+   const auto row = get_blocklog_row(cadence);
+   BOOST_REQUIRE( !row.is_null() );
+   BOOST_REQUIRE_EQUAL( row["reason"].as_string(), "EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED" );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), cadence - 1u );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( zero_share_epochs_keep_the_decay_base, t5_budget_tail_tester ) try {
+   // The first full period opens with 1.5 shares left: a decayed share, then the clamped remainder, then two zero
+   // shares. The zero shares must leave the decay base at that remainder, so once governance raises the budget the
+   // curve resumes from it, not from the per-epoch minimum a reset base would give.
+   constexpr uint16_t cadence = 4;
+   const int64_t budget = 9 * initial_share / 2;
+   start(cadence, budget);
+   BOOST_REQUIRE_EQUAL( walk_epochs(cadence, budget, 2u * cadence - 1), 2u );
+
+   const int64_t decayed   = test_apply_decay(initial_share, TARGET_ANNUAL_DECAY_BPS, T_EPOCH_SECS);
+   const int64_t remainder = budget - 3 * initial_share - decayed;
+   BOOST_REQUIRE_GT( remainder, 0 );
+   BOOST_REQUIRE_LT( remainder, decayed );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_emission"].as<int64_t>(), remainder );
+
+   advance_one();
+   const auto halted = get_blocklog_row(2u * cadence);
+   BOOST_REQUIRE( !halted.is_null() );
+   BOOST_REQUIRE_EQUAL( halted["reason"].as_string(), "EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED" );
+
+   BOOST_REQUIRE_EQUAL( success(),
+      setemitcfg(config::system_account_name, capex_only_cfg(cadence, budget + 10 * initial_share)) );
+   advance_one();
+   const int64_t resumed = test_apply_decay(remainder, TARGET_ANNUAL_DECAY_BPS, T_EPOCH_SECS);
+   BOOST_REQUIRE_GT( resumed, test_scale_annual_to_epoch(ANNUAL_MIN_EMISSION, T_EPOCH_SECS) );
+   const auto state = get_t5_state();
+   BOOST_REQUIRE_EQUAL( state["last_epoch_index"].as<uint32_t>(), 2u * cadence );
+   BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), resumed );
+   BOOST_REQUIRE_EQUAL( state["last_epoch_emission"].as<int64_t>(), resumed );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( zero_curve_pays_the_open_period_then_blocks_with_budget_left, t5_budget_tail_tester ) try {
+   // Governance can zero the curve mid-period while budget remains. The period's remaining epochs accrue nothing but
+   // still advance, and its boundary pays what was pending. The next epoch has a zero share with nothing pending and
+   // must block as TREASURY_EXHAUSTED: letting it through would reach a boundary with an empty period, which payepoch
+   // refuses, aborting every advance. Restoring the curve resumes from the last positive share.
+   constexpr uint16_t cadence = 4;
+   const int64_t budget = 100 * initial_share;
+   start(cadence, budget);
+   walk_epochs(cadence, budget, cadence);   // the genesis period pays at epoch 3; epoch 4 accrues a decayed share
+
+   const int64_t decayed = test_apply_decay(initial_share, TARGET_ANNUAL_DECAY_BPS, T_EPOCH_SECS);
+   BOOST_REQUIRE_EQUAL( get_t5_state()["pending_emission_amount"].as<int64_t>(), decayed );
+
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name,
+      fc::mutable_variant_object( capex_only_cfg(cadence, budget) )
+         .set("annual_max_emission", int64_t(0))
+         .set("annual_min_emission", int64_t(0))) );
+
+   const uint32_t boundary = 2u * cadence - 1;
+   for (uint32_t epoch = cadence + 1; epoch < boundary; ++epoch) {
+      advance_one();
+      const auto state = get_t5_state();
+      BOOST_REQUIRE_EQUAL( state["last_epoch_index"].as<uint32_t>(), epoch );
+      BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), decayed );
+      BOOST_REQUIRE_EQUAL( state["last_epoch_emission"].as<int64_t>(), decayed );
+   }
+
+   const int64_t distributed_before = get_t5_state()["total_distributed"].as<int64_t>();
+   advance_one();
+   BOOST_REQUIRE_EQUAL( get_epoch_log(boundary)["total_emission"].as<int64_t>(), decayed );
+   auto state = get_t5_state();
+   BOOST_REQUIRE_EQUAL( state["last_epoch_index"].as<uint32_t>(), boundary );
+   BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), 0 );
+   const int64_t distributed = state["total_distributed"].as<int64_t>();
+   BOOST_REQUIRE_EQUAL( distributed, distributed_before + decayed );
+
+   advance_one();
+   const auto row = get_blocklog_row(boundary + 1);
+   BOOST_REQUIRE( !row.is_null() );
+   BOOST_REQUIRE_EQUAL( row["reason"].as_string(), "EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED" );
+   BOOST_REQUIRE_EQUAL( row["treasury_remaining"].as<int64_t>(), budget - distributed );
+   BOOST_REQUIRE_LT( distributed, budget );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), boundary );
+
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, capex_only_cfg(cadence, budget)) );
+   advance_one();
+   const int64_t resumed = test_apply_decay(decayed, TARGET_ANNUAL_DECAY_BPS, T_EPOCH_SECS);
+   state = get_t5_state();
+   BOOST_REQUIRE_EQUAL( state["last_epoch_index"].as<uint32_t>(), boundary + 1 );
+   BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), resumed );
+   BOOST_REQUIRE_EQUAL( state["last_epoch_emission"].as<int64_t>(), resumed );
+   BOOST_REQUIRE( get_blocklog_row(boundary + 1).is_null() );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( viewepoch_reports_headroom_net_of_pending, t5_budget_tail_tester ) try {
+   // treasury_remaining must exclude what the open pay period has already accrued, and next_emission_est must be the
+   // share the gate then accrues: zero once the period holds the rest of the budget.
+   constexpr uint16_t cadence = 4;
+   const int64_t budget = 9 * initial_share / 2;
+   start(cadence, budget);
+
+   bool saw_partial_commit = false; // pending > 0 with budget still uncommitted
+   bool saw_full_commit    = false; // pending > 0 and nothing left uncommitted
+   for (uint32_t epoch = 1; epoch <= 2u * cadence - 1; ++epoch) {
+      const auto state = get_t5_state();
+      const int64_t pending = state["pending_emission_amount"].as<int64_t>();
+      const int64_t net     = budget - state["total_distributed"].as<int64_t>() - pending;
+      const auto info = viewepoch();
+      BOOST_REQUIRE_EQUAL( info.treasury_remaining, std::max<int64_t>(net, 0) );
+      saw_partial_commit = saw_partial_commit || (pending > 0 && net > 0);
+      saw_full_commit    = saw_full_commit || (pending > 0 && net == 0 && info.next_emission_est == 0);
+
+      advance_one();
+      const bool boundary = epoch == cadence - 1u || epoch == 2u * cadence - 1;
+      const int64_t accrued = boundary
+         ? get_epoch_log(epoch)["total_emission"].as<int64_t>() - pending
+         : get_t5_state()["pending_emission_amount"].as<int64_t>() - pending;
+      BOOST_REQUIRE_EQUAL( accrued, info.next_emission_est );
+   }
+   BOOST_REQUIRE( saw_partial_commit );
+   BOOST_REQUIRE( saw_full_commit );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( balance_blocked_zero_share_boundary_records_the_period_total, t5_budget_tail_tester ) try {
+   // The tail boundary accrues a zero share, so its period total is all pending. If the treasury cannot cover it, the
+   // blocklog must record that total (the amount the balance test compared) rather than the zero share, and the retry
+   // must pay it in full once the balance is back.
+   const account_name DRAIN = "tailbaldrain"_n;
+   constexpr uint16_t cadence = 4;
+   const int64_t budget = 9 * initial_share / 2;
+   start(cadence, budget);
+   const uint32_t boundary = 2u * cadence - 1;
+   for (uint32_t epoch = 1; epoch < boundary; ++epoch) advance_one();
+
+   const auto state = get_t5_state();
+   const int64_t pending = state["pending_emission_amount"].as<int64_t>();
+   BOOST_REQUIRE_GT( pending, 0 );
+   BOOST_REQUIRE_EQUAL( expected_share(state, budget), 0 );
+
+   create_user_accounts({ DRAIN });
+   const int64_t drained = get_wire_balance(config::system_account_name).get_amount() - pending / 2;
+   transfer_wire(config::system_account_name, DRAIN, drained);
+   advance_one();
+
+   const auto row = get_blocklog_row(boundary);
+   BOOST_REQUIRE( !row.is_null() );
+   BOOST_REQUIRE_EQUAL( row["reason"].as_string(), "EMISSIONS_BLOCK_REASON_BALANCE_INSUFFICIENT" );
+   BOOST_REQUIRE_EQUAL( row["attempted_emission"].as<int64_t>(), pending );
+   BOOST_REQUIRE_EQUAL( row["treasury_remaining"].as<int64_t>(), 0 );
+   BOOST_REQUIRE_EQUAL( row["sysio_balance"].as<int64_t>(), pending / 2 );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), boundary - 1 );
+
+   transfer_wire(DRAIN, config::system_account_name, drained);
+   advance_one();
+   BOOST_REQUIRE( get_blocklog_row(boundary).is_null() );
+   BOOST_REQUIRE_EQUAL( get_epoch_log(boundary)["total_emission"].as<int64_t>(), pending );
+   const auto after = get_t5_state();
+   BOOST_REQUIRE_EQUAL( after["pending_emission_amount"].as<int64_t>(), 0 );
+   BOOST_REQUIRE_EQUAL( after["total_distributed"].as<int64_t>(), budget );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( fundclaim_cannot_draw_the_pending_share_of_the_budget, t5_budget_tail_tester ) try {
+   // A capital draw is capped at the headroom net of the pending accrual, like every share. Once the open period holds
+   // the rest of the budget, a draw gets nothing and is recorded as shortfall.
+   constexpr uint16_t cadence = 4;
+   const int64_t budget = 7 * initial_share / 2;
+   start(cadence, budget);
+   deploy_dclaim_for_signing();
+   for (uint32_t epoch = 1; epoch <= cadence; ++epoch) advance_one();
+
+   const auto state = get_t5_state();
+   const int64_t distributed = state["total_distributed"].as<int64_t>();
+   BOOST_REQUIRE_GT( state["pending_emission_amount"].as<int64_t>(), 0 );
+   BOOST_REQUIRE_EQUAL( expected_share(state, budget), 0 );
+
+   const int64_t request = initial_share;
+   BOOST_REQUIRE_EQUAL( success(), fundclaim("sysio.dclaim"_n, "sysio.dclaim"_n, request) );
+   const auto after = get_t5_state();
+   BOOST_REQUIRE_EQUAL( after["total_distributed"].as<int64_t>(), distributed );
+   BOOST_REQUIRE_EQUAL( after["capital_shortfall_total"].as<int64_t>(), request );
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------

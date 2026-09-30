@@ -757,6 +757,10 @@ namespace sysiosystem {
           * the next payepoch sees the period total. `rcrdbatch` records the
           * corresponding immutable roster separately.
           *
+          * A zero share is valid: the gate passes one to an open pay period with emission pending once the rest of
+          * the T5 budget is committed or the curve is zero. The epoch still counts toward the period, and
+          * `last_epoch_emission` (the decay base) keeps the last positive share.
+          *
           * Because it also runs on the pay epoch, the counter sum that
           * `payepoch` normalizes by includes the epoch being paid. Reading this
           * as "non-pay epochs only" understates that sum by one and is how the
