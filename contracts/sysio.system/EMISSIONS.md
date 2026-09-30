@@ -19,65 +19,20 @@ through a claim action. All amounts are `WIRE` (9-decimal subunits).
 
 The curve decays from `annual_initial_emission` toward `annual_min_emission`
 (clamped by `annual_max_emission`), stops at `t5_floor`, and auto-throttles as
-`total_distributed` rises (capital claims count against it). Each share is also
-capped at the budget the open pay period has not yet committed; see
-[Budget headroom](#budget-headroom-gross-versus-net).
+`total_distributed` rises (capital claims count against it).
 
-## Budget headroom: gross versus net
+## Budget headroom
 
-The T5 budget is `t5_distributable - t5_floor`. Two headrooms are measured
-against it, both defined once in `emissions.hpp`:
+The T5 budget is `t5_distributable - t5_floor`. Accruals and capital draws are
+sized against the part not yet paid out or accrued (`net_headroom` in
+`emissions.hpp`), so `total_distributed + pending_emission_amount` never
+exceeds the budget. `setemitcfg` refuses a budget below
+`t5_floor + total_distributed + pending_emission_amount`.
 
-- **Gross headroom** (`gross_headroom`): `t5_distributable - t5_floor -
-  total_distributed`, the budget left once paid-out emission and capital draws
-  are counted.
-- **Net headroom** (`net_headroom`): the gross headroom minus
-  `pending_emission_amount`. The open pay period's accruals are owed to its
-  boundary `payepoch`, so they are committed even though `total_distributed`
-  does not include them yet.
-
-Every accrual and every capital draw (`fundclaim`) is sized against the **net**
-headroom, so `total_distributed + pending_emission_amount <= t5_distributable -
-t5_floor` holds after every accrual, payout and draw, at any
-`pay_cadence_epochs`: a pay period can never commit more than the budget.
-`setemitcfg` keeps that true across a config change. Once T5 is initialized it
-refuses a `t5_distributable` below `t5_floor + total_distributed +
-pending_emission_amount`, and an `annual_min_emission` whose per-epoch share
-exceeds the net headroom.
-
-The readiness gate decides `TREASURY_EXHAUSTED` on the **gross** headroom: it
-blocks every epoch once that is `<= 0`, and also when the curve itself yields a
-zero share while nothing is pending.
-
-**The zero-share epoch.** Near the end of the budget, a pay period can commit
-the whole remainder before its boundary. A period can also see the curve itself
-drop to zero, for example after `setemitcfg` sets `annual_max_emission` to 0
-once the first payout has happened (the first pay period runs on
-`annual_initial_emission`). Either way, once the period has accrued something,
-its later epochs accrue a zero share but still advance, and the boundary
-`payepoch` settles exactly what the period accrued, so nothing is left stranded
-in `pending_emission_amount`. A
-zero-share epoch still counts toward its period: its batch-operator roster and
-producer block slots share the period's emission like any other epoch.
-`accrueepoch` leaves `last_epoch_emission` unchanged on a zero share, so the
-next share decays from the last positive one; near the end of the budget that
-share may itself have been clamped to the remainder. Once payouts and capital
-draws have spent the gross headroom, every epoch blocks with
-`TREASURY_EXHAUSTED` until governance raises the budget. With a zero curve, the
-first epoch after the boundary blocks the same way, because its share is zero
-and nothing is pending.
-
-The gate's balance test does **not** subtract `t5_floor`. It only checks that
-sysio's WIRE, less unclaimed `payclaims`, covers the period total. That balance
-also backs WIRE outside the T5 budget (node-owner vesting and the reserve
-earmarks in `docs/platform-bootstrap-config.md`), so it is no measure of the
-floor; the accounting bound above is what protects it.
-
-`viewepoch` reports `treasury_remaining` as the net headroom (floored at 0) and
-`next_emission_est` as the share the gate would accrue next, which never exceeds
-it. The `sysio.epoch` blocklog's `treasury_remaining` is the same net headroom,
-not floored, and its `attempted_emission` is the period total on a pay epoch
-(what the balance test compared), otherwise the epoch's share.
+Once the open pay period has accrued the rest of the budget, its remaining
+epochs accrue zero and still advance, and its `payepoch` settles what was
+accrued. Epochs block with `TREASURY_EXHAUSTED` once the budget is spent, or
+when the curve yields zero with nothing pending.
 
 ## How each bucket reaches its recipient
 
@@ -285,7 +240,7 @@ period_emission
 | `payepoch` | `sysio.epoch` | Distribute the period's compute / capex / governance (credits `payclaims`; pushes only the category buckets) |
 | `fundclaim` | the recipient: `sysio.dclaim` or `sysio.liq` | Lazy capital drain into the recipient (never-throw) |
 | `viewnodedist` | read-only | Preview a node owner's claimable amount |
-| `viewepoch` | read-only | Uncommitted budget (net headroom) / next-emission estimate |
+| `viewepoch` | read-only | Remaining budget / next-emission estimate |
 | `viewemitcfg` | read-only | Current emission config |
 
 ## Tables
