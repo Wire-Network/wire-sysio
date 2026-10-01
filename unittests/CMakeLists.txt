@@ -59,6 +59,9 @@ unittest_target(
   protocol_feature_digest_tests.cpp
 ) # build unit tests as one executable
 
+# snapshot_attest_fixture.hpp includes the snapshot-attestation constants owned by the sysio.system contract.
+target_include_directories(unit_test PRIVATE ${CMAKE_SOURCE_DIR}/contracts/sysio.system/include)
+
 # No pkg-config cflags; keep flags minimal & portable
 target_compile_options(unit_test PUBLIC -DDISABLE_SYSLIB_SERIALIZE)
 

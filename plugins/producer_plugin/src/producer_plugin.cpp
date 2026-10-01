@@ -12,7 +12,7 @@
 #include <sysio/chain/unapplied_transaction_queue.hpp>
 #include <sysio/chain/fork_database.hpp>
 #include <sysio/chain/platform_timer.hpp>
-#include <sysio/protocol/snapshot_attestation.hpp>
+#include <sysio.system/snapshot_attest_constants.hpp>
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
 
 #include <fc/io/json.hpp>
@@ -86,7 +86,7 @@ fc::logger        _transient_trx_failed_trace_log;
 
 namespace sysio {
 
-namespace snapshot_attest = protocol::snapshot_attestation;
+namespace snapshot_attest = sysiosystem::snapshot_attestation;
 
 using namespace sysio::chain;
 using namespace sysio::chain::plugin_interface;
