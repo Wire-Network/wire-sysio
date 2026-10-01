@@ -1,0 +1,592 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "accept",
+            "base": "",
+            "fields": [
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                },
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "addbounty",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "approve",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "bond_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "hold_bps",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "bond_counters",
+            "base": "",
+            "fields": [
+                {
+                    "name": "next_request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "bond_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "bond_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "underwriter",
+                    "type": "name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "yield",
+                    "type": "position"
+                },
+                {
+                    "name": "paid",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "claim",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "escrow_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "kind",
+                    "type": "uint8"
+                }
+            ]
+        },
+        {
+            "name": "escrow_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "kind",
+                    "type": "escrow_kind"
+                },
+                {
+                    "name": "funder",
+                    "type": "name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "yield",
+                    "type": "position"
+                },
+                {
+                    "name": "paid",
+                    "type": "bool"
+                },
+                {
+                    "name": "payee",
+                    "type": "name"
+                },
+                {
+                    "name": "payout",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "hold",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "beneficiary",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "pool_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "pool_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "pool",
+                    "type": "yield_pool"
+                }
+            ]
+        },
+        {
+            "name": "position",
+            "base": "",
+            "fields": [
+                {
+                    "name": "index_checkpoint",
+                    "type": "uint128"
+                },
+                {
+                    "name": "owed_wire",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "prune",
+            "base": "",
+            "fields": [
+                {
+                    "name": "from_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "limit",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "request",
+            "base": "",
+            "fields": [
+                {
+                    "name": "issuer",
+                    "type": "name"
+                },
+                {
+                    "name": "schema",
+                    "type": "name"
+                },
+                {
+                    "name": "statement",
+                    "type": "bytes"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "covered",
+                    "type": "uint64"
+                },
+                {
+                    "name": "bounty",
+                    "type": "uint64"
+                },
+                {
+                    "name": "window_sec",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "request_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "request_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "issuer",
+                    "type": "name"
+                },
+                {
+                    "name": "schema",
+                    "type": "name"
+                },
+                {
+                    "name": "statement",
+                    "type": "bytes"
+                },
+                {
+                    "name": "statement_digest",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "covered",
+                    "type": "uint64"
+                },
+                {
+                    "name": "bonded",
+                    "type": "uint64"
+                },
+                {
+                    "name": "bounty",
+                    "type": "uint64"
+                },
+                {
+                    "name": "window_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "state",
+                    "type": "request_state"
+                },
+                {
+                    "name": "created_at",
+                    "type": "time_point"
+                },
+                {
+                    "name": "bonded_at",
+                    "type": "time_point"
+                },
+                {
+                    "name": "hold_bond",
+                    "type": "uint64"
+                },
+                {
+                    "name": "hold_beneficiary",
+                    "type": "name"
+                },
+                {
+                    "name": "held_at",
+                    "type": "time_point"
+                },
+                {
+                    "name": "resolved_at",
+                    "type": "time_point"
+                },
+                {
+                    "name": "resolved_index",
+                    "type": "uint128"
+                },
+                {
+                    "name": "forfeit_pending",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "rslvinvalid",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "rslvvalid",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "setconfig",
+            "base": "",
+            "fields": [
+                {
+                    "name": "hold_bps",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "sweepyield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "yield_pool",
+            "base": "",
+            "fields": [
+                {
+                    "name": "received",
+                    "type": "uint64"
+                },
+                {
+                    "name": "credited",
+                    "type": "uint64"
+                },
+                {
+                    "name": "pulled_index",
+                    "type": "uint128"
+                },
+                {
+                    "name": "pulled_owed",
+                    "type": "uint64"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "accept",
+            "type": "accept",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "addbounty",
+            "type": "addbounty",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "approve",
+            "type": "approve",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "claim",
+            "type": "claim",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "hold",
+            "type": "hold",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "prune",
+            "type": "prune",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "request",
+            "type": "request",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "rslvinvalid",
+            "type": "rslvinvalid",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "rslvvalid",
+            "type": "rslvvalid",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setconfig",
+            "type": "setconfig",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sweepyield",
+            "type": "sweepyield",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "bondconfig",
+            "type": "bond_config",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 62572
+        },
+        {
+            "name": "bondcounters",
+            "type": "bond_counters",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 27899
+        },
+        {
+            "name": "bonds",
+            "type": "bond_row",
+            "index_type": "i64",
+            "key_names": ["request_id","underwriter"],
+            "key_types": ["uint64","name"],
+            "table_id": 51812
+        },
+        {
+            "name": "escrows",
+            "type": "escrow_row",
+            "index_type": "i64",
+            "key_names": ["request_id","kind"],
+            "key_types": ["uint64","uint8"],
+            "table_id": 13593
+        },
+        {
+            "name": "requests",
+            "type": "request_row",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 25292,
+            "secondary_indexes": [
+                {
+                    "name": "bystatement",
+                    "key_type": "checksum256",
+                    "table_id": 20108
+                }
+            ]
+        },
+        {
+            "name": "yieldpool",
+            "type": "pool_row",
+            "index_type": "i64",
+            "key_names": ["token_code"],
+            "key_types": ["uint64"],
+            "table_id": 51955
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": [],
+    "enums": [
+        {
+            "name": "escrow_kind",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "BOUNTY",
+                    "value": 0
+                },
+                {
+                    "name": "HOLD_BOND",
+                    "value": 1
+                }
+            ]
+        },
+        {
+            "name": "request_state",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "OPEN",
+                    "value": 0
+                },
+                {
+                    "name": "BONDED",
+                    "value": 1
+                },
+                {
+                    "name": "APPROVED",
+                    "value": 2
+                },
+                {
+                    "name": "HELD",
+                    "value": 3
+                },
+                {
+                    "name": "VALID",
+                    "value": 4
+                },
+                {
+                    "name": "INVALID",
+                    "value": 5
+                }
+            ]
+        }
+    ]
+}

@@ -100,6 +100,9 @@ add_contract_suite(sysio_andon_tests sysio.andon_tests.cpp ACCOUNTS
   sysio.synd sysio.token sysio.tokens sysio.chains
   sysio.authex sysio.msgch sysio.epoch)
 add_contract_suite(sysio_authex_tests sysio.authex_tests.cpp ACCOUNTS sysio.authex)
+add_contract_suite(sysio_bond_tests sysio.bond_tests.cpp ACCOUNTS sysio.andon
+  sysio.authex sysio.bond sysio.chains sysio.liq
+  sysio.msgch sysio.opp.common sysio.token sysio.tokens)
 add_contract_suite(sysio_bios_if_tests sysio.bios_inst_fin_tests.cpp ACCOUNTS sysio.bios)
 add_contract_suite(sysio_chains_tests sysio.chains_tests.cpp ACCOUNTS sysio.chains)
 add_contract_suite(sysio_councl_tests sysio.councl_tests.cpp ACCOUNTS
