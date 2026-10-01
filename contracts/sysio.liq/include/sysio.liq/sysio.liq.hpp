@@ -197,6 +197,12 @@ namespace sysio {
       using symbol_key = opp::shadow::symbol_key;
 
       /// One shadow symbol: its supply and the registry rows it mirrors.
+      ///
+      /// LAYOUT IS SHARED STATE. Other contracts deserialize this row on consensus paths:
+      /// `sysio.opreg` resolves a depot-native collateral token through the `bytoken` index on its
+      /// never-throw remit paths (withdraw flush, lock release, termination) as well as its signed
+      /// actions, and `sysio.chalg` prices shadow collateral from it. Changing the layout means
+      /// `sysio.liq` and every one of those readers redeploy together.
       struct [[sysio::table("stat")]] currency_stats {
          asset            supply;
          sysio::slug_name chain_code;    ///< the outpost whose liq this shadow mirrors
@@ -208,8 +214,24 @@ namespace sysio {
          SYSLIB_SERIALIZE(currency_stats, (supply)(chain_code)(token_code)(pair_symbol))
       };
 
+      /// Secondary index of `stat` keyed on each shadow symbol's registry `token_code` -- the one
+      /// declaration of its name; `find_stat_by_token` is the one lookup through it.
+      static constexpr name STAT_BY_TOKEN_INDEX = "bytoken"_n;
+
       using stats = kv::table<"stat"_n, symbol_key, currency_stats,
-         kv::index<"bytoken"_n, const_mem_fun<currency_stats, uint64_t, &currency_stats::by_token_code>>>;
+         kv::index<STAT_BY_TOKEN_INDEX, const_mem_fun<currency_stats, uint64_t, &currency_stats::by_token_code>>>;
+
+      /// The `stat` row of the shadow symbol registered under registry `token_code` in the
+      /// `sysio.liq` deployed at `liq_account`, or `std::nullopt` when none is. Never throws. The ONE
+      /// stat-by-token lookup: `sysio.liq` itself, `sysio.opreg`'s depot-native token resolver
+      /// (including its never-throw remit paths) and `sysio.chalg`'s collateral pricing all use it.
+      static std::optional<currency_stats> find_stat_by_token(name liq_account, sysio::slug_name token_code) {
+         stats statstable(liq_account);
+         auto  by_token = statstable.get_index<STAT_BY_TOKEN_INDEX>();
+         auto  it       = by_token.find(token_code.value);
+         if (it == by_token.end()) return std::nullopt;
+         return *it;
+      }
 
       /// Holder rows (scope = holder, key = symbol code) and the per-symbol
       /// index, laid out by sysio.opp.common/shadow_yield.hpp.

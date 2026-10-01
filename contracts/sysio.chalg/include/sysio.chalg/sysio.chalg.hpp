@@ -407,6 +407,7 @@ namespace sysio {
       static constexpr name UWRIT_ACCOUNT  = "sysio.uwrit"_n;
       static constexpr name RESERV_ACCOUNT = "sysio.reserv"_n;
       static constexpr name TOKEN_ACCOUNT  = "sysio.token"_n;
+      static constexpr name LIQ_ACCOUNT    = "sysio.liq"_n;
 
       using DisputeStatus = opp::types::DisputeStatus;
       using NodeOwnerTier = opp::types::NodeOwnerTier;

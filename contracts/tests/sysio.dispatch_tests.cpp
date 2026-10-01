@@ -1550,6 +1550,12 @@ public:
       return row.is_null() ? 0 : row["quantity"].as<asset>().get_amount();
    }
 
+   /// Seed a shadow-collateral position through the ledger's governance credit action.
+   action_result mint_shadow(name holder, uint64_t amount) {
+      return push(LIQ_ACCOUNT, liq_abi, LIQ_ACCOUNT, "recredit"_n, mvo()
+         ("holder", holder)("quantity", asset(static_cast<int64_t>(amount), LIQETH_SYM)));
+   }
+
    /// The per-outpost inbound cursor (`last_sequence`, `last_epoch`); null before any credit lands.
    fc::variant liq_cursor(std::string_view chain_code) {
       return liq_row("liqcursors"_n, "liq_cursor", LIQ_ACCOUNT, fc::slug_name{chain_code}.value);
@@ -6162,10 +6168,15 @@ public:
             total += amount;   // already WIRE — no curve
             continue;
          }
+         // A depot-native shadow bucket `(WIRE, LIQETH)` is priced on the outpost pair its
+         // `sysio.liq` stat row mirrors — `chalg::pricing_pair_for`; without a stat row it keeps
+         // its own (unreserved) pair.
+         const auto pair = chain == wire ? shadow_outpost_pair(token) : std::nullopt;
          // A bucket with no ACTIVE reserve, or one whose books floor the conversion to zero,
          // contributes the contract's floor rather than voiding the quote — mirrors
          // `chalg::min_uwchal_bucket_wire`.
-         const auto row = first_active_reserve(chain, token);
+         const auto row = pair ? first_active_reserve(pair->first, pair->second)
+                               : first_active_reserve(chain, token);
          const uint64_t bucket_wire =
             row.is_null() ? 0
                           : sysio::opp::amm::token_to_wire(row["reserve_chain_amount"].as_uint64(),
@@ -6175,6 +6186,27 @@ public:
          total += (bucket_wire > 0 ? bucket_wire : MIN_UWCHAL_BUCKET_WIRE);
       }
       return total;
+   }
+
+   /// The outpost `(chain_code, token_code)` pair the `sysio.liq` shadow symbol registered under
+   /// registry token code `token` mirrors, read off its `stat` row; `std::nullopt` when no shadow
+   /// symbol names `token` (or `sysio.liq` holds no stat rows at all). Walks the table rather
+   /// than the `bytoken` index — the host mirror of `chalg::pricing_pair_for`'s lookup.
+   std::optional<std::pair<uint64_t, uint64_t>> shadow_outpost_pair(uint64_t token) {
+      const auto& db       = control->db();
+      const auto  table_id = chain::compute_table_id("stat"_n.to_uint64_t());
+      const auto& kv_idx   = db.get_index<chain::kv_index, chain::by_code_key>();
+      auto itr = kv_idx.lower_bound(boost::make_tuple(LIQ_ACCOUNT, table_id, std::string_view{}));
+      for (; itr != kv_idx.end() && itr->code == LIQ_ACCOUNT && itr->table_id == table_id; ++itr) {
+         std::vector<char> raw(itr->value.size());
+         if (!raw.empty()) std::memcpy(raw.data(), itr->value.data(), raw.size());
+         const auto row = liq_abi.binary_to_variant("currency_stats", raw,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+         if (row["token_code"].as<fc::slug_name>().value == token) {
+            return std::make_pair(row["chain_code"].as<fc::slug_name>().value, token);
+         }
+      }
+      return std::nullopt;
    }
 
    /// The FIRST ACTIVE reserve for a (chain, token) pair — the row the contract's `bychaintok`
@@ -6323,7 +6355,8 @@ BOOST_FIXTURE_TEST_CASE(wire_direct_deposit_adds_exact_units_to_uwchalbond,
       "transfer"_n, mvo()("from", "sysio")("to", UWRIT_OP.to_string())
          ("quantity", direct_deposit)("memo", "fund native collateral")));
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, UWRIT_OP, "deposit"_n, mvo()
-      ("account", UWRIT_OP.to_string())("amount", static_cast<uint64_t>(direct_deposit.get_amount()))));
+      ("account", UWRIT_OP.to_string())("token_code", codename_mvo("WIRE"))
+      ("amount", static_cast<uint64_t>(direct_deposit.get_amount()))));
 
    const uint64_t after = uwchalbond(ATT_ID, UWRIT_OP);
    BOOST_REQUIRE_EQUAL(before + static_cast<uint64_t>(direct_deposit.get_amount()), after);
@@ -6409,6 +6442,132 @@ BOOST_FIXTURE_TEST_CASE(dust_collateral_bucket_still_quotes_a_bond, sysio_uwchal
    BOOST_REQUIRE_EQUAL(success(),
       openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no such deposit"));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(quoted), wire_balance(CHALG_ACCOUNT));
+} FC_LOG_AND_RETHROW() }
+
+/// A depot-native shadow LIQ bucket is keyed `(WIRE, LIQETH)` by `sysio.opreg::deposit`, and no
+/// reserve carries that pair. The shadow mirrors the ETH outpost's LIQETH 1:1 in depot units, so
+/// the bond prices it on the `(ETH, LIQETH)` books its `sysio.liq` stat row names: the same N
+/// bonded as a shadow and escrowed on the outpost adds the same WIRE to the quote — well above
+/// the unpriceable-bucket floor — and filing escrows that quote.
+BOOST_FIXTURE_TEST_CASE(uwchal_bond_prices_depot_native_shadow_bucket_on_its_outpost_pair,
+                        sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9820;
+   /// Bonded amount, in atomic LIQETH, on each side of the comparison.
+   constexpr uint64_t BONDED = 5 * static_cast<uint64_t>(LIQ_UNIT);
+   /// WIRE depth of the (ETH, LIQETH) reserve — twice its token depth, so a LIQETH is worth
+   /// about 2 WIRE and the priced bucket is far from both par and the floor.
+   constexpr uint64_t LIQETH_RESERVE_TOKEN = 1'000'000'000'000ull;
+   constexpr uint64_t LIQETH_RESERVE_WIRE  = 2'000'000'000'000ull;
+   make_confirmed_uwreq(ATT_ID);
+   setup_liq_for_dispatch();
+   BOOST_REQUIRE_EQUAL(success(), regreserve_active_amounts("ETH", "LIQETH", "PRIMARY",
+                                                            LIQETH_RESERVE_TOKEN, LIQETH_RESERVE_WIRE));
+
+   // Mint the shadow as sysio.synd releases it, then bond it through the operator-signed path.
+   BOOST_REQUIRE_EQUAL(success(), mint_shadow(UWRIT_OP, BONDED));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(BONDED), liq_balance(UWRIT_OP));
+
+   const uint64_t base = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_GT(base, 0u);
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, UWRIT_OP, "deposit"_n, mvo()
+      ("account", UWRIT_OP.to_string())("token_code", codename_mvo("LIQETH"))("amount", BONDED)));
+   // Pin the premise: the bucket landed on the depot-native key, which no reserve carries.
+   const uint64_t wire = fc::slug_name{"WIRE"}.value, liqeth = fc::slug_name{"LIQETH"}.value;
+   BOOST_REQUIRE_EQUAL(BONDED, find_balance(get_operator(UWRIT_OP), "WIRE", "LIQETH")["balance"].as_uint64());
+   BOOST_REQUIRE(first_active_reserve(wire, liqeth).is_null());
+
+   const uint64_t with_shadow = uwchalbond(ATT_ID, UWRIT_OP);
+   const uint64_t shadow_wire = with_shadow - base;
+
+   // The same amount escrowed on the ETH outpost, priced on the same untouched books.
+   BOOST_REQUIRE_EQUAL(success(), depositinle_credit(UWRIT_OP, "ETH", "LIQETH", BONDED));
+   const uint64_t with_both   = uwchalbond(ATT_ID, UWRIT_OP);
+   const uint64_t outpost_wire = with_both - with_shadow;
+
+   BOOST_REQUIRE_EQUAL(outpost_wire, shadow_wire);
+   BOOST_REQUIRE_GT(shadow_wire, MIN_UWCHAL_BUCKET_WIRE);
+   BOOST_REQUIRE_GT(shadow_wire, BONDED);   // priced at ~2 WIRE per LIQETH, not at par
+   BOOST_REQUIRE_EQUAL(expected_bond(UWRIT_OP), with_both);
+
+   // The charge path agrees with the quote: filing escrows exactly it.
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no such deposit"));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(with_both), wire_balance(CHALG_ACCOUNT));
+} FC_LOG_AND_RETHROW() }
+
+/// A depot-native shadow bucket bonded through `sysio.opreg::deposit` prices on its outpost pair,
+/// and when that pair has no ACTIVE reserve it contributes the unpriceable-bucket floor rather than
+/// voiding the quote: an unquotable bucket must never block filing, the immunity switch the floor
+/// exists to close. No `(ETH, LIQETH)` reserve is registered here.
+BOOST_FIXTURE_TEST_CASE(uwchal_bond_floors_shadow_bucket_without_active_outpost_reserve,
+                        sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9821;
+   constexpr uint64_t BONDED = 5 * static_cast<uint64_t>(LIQ_UNIT);
+   make_confirmed_uwreq(ATT_ID);
+   setup_liq_for_dispatch();
+
+   const uint64_t eth = fc::slug_name{"ETH"}.value, liqeth = fc::slug_name{"LIQETH"}.value;
+   BOOST_REQUIRE(first_active_reserve(eth, liqeth).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), mint_shadow(UWRIT_OP, BONDED));
+   const uint64_t priced_only = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_GT(priced_only, 0u);
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, UWRIT_OP, "deposit"_n, mvo()
+      ("account", UWRIT_OP.to_string())("token_code", codename_mvo("LIQETH"))("amount", BONDED)));
+   BOOST_REQUIRE_EQUAL(BONDED, find_balance(get_operator(UWRIT_OP), "WIRE", "LIQETH")["balance"].as_uint64());
+
+   const uint64_t quoted = uwchalbond(ATT_ID, UWRIT_OP);
+   BOOST_REQUIRE_EQUAL(priced_only + MIN_UWCHAL_BUCKET_WIRE, quoted);
+   BOOST_REQUIRE_EQUAL(expected_bond(UWRIT_OP), quoted);
+
+   BOOST_REQUIRE_EQUAL(success(),
+      openuwchal(CHALLENGER, ATT_ID, UWRIT_OP, REASON_DEPOSIT_MISSING, "no such deposit"));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(quoted), wire_balance(CHALG_ACCOUNT));
+} FC_LOG_AND_RETHROW() }
+
+/// A lock release on a TERMINATED operator pays the shadow yield termination could not cover. The
+/// operator bonds shadow beside its locked (ETH, ETH) collateral; yield is distributed but not swept
+/// before termination, so the payout covers none of it and it stays banked on the shadow row. Once
+/// a sweep fills the pool, the next `releaselock` -- inline from `sysio.epoch::advance` in
+/// production, on the (ETH, ETH) lock here -- settles every shadow row the operator holds and
+/// credits the banked yield to its WIRE claim.
+BOOST_FIXTURE_TEST_CASE(releaselock_on_terminated_operator_pays_banked_shadow_yield,
+                        sysio_uwchal_tester) { try {
+   constexpr uint64_t ATT_ID = 9822;
+   constexpr uint64_t BONDED = 5 * static_cast<uint64_t>(LIQ_UNIT);
+   make_confirmed_uwreq(ATT_ID);   // locks the whole (ETH, ETH) bond
+   setup_liq_for_dispatch();
+   BOOST_REQUIRE_EQUAL(success(), mint_shadow(UWRIT_OP, BONDED));
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, UWRIT_OP, "deposit"_n, mvo()
+      ("account", UWRIT_OP.to_string())("token_code", codename_mvo("LIQETH"))("amount", BONDED)));
+
+   BOOST_REQUIRE_EQUAL(success(), push(LIQ_ACCOUNT, liq_abi, config::system_account_name, "addyield"_n, mvo()
+      ("from", "sysio")("quantity", "10.000000000 WIRE")("target", LIQETH_SYM.to_symbol_code())));
+
+   const auto wire_claim = [&]() -> uint64_t {
+      const auto data = get_row_by_id(OPREG_ACCOUNT, UWRIT_OP, "remitclaims"_n, fc::slug_name{"WIRE"}.value);
+      return data.empty() ? 0 : opreg_abi.binary_to_variant("remit_claim", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time))["balance"].as_uint64();
+   };
+   const auto banked = [&]() -> uint64_t {
+      return find_balance(get_operator(UWRIT_OP), "WIRE", "LIQETH")["shadow_yield"]["owed_wire"].as_uint64();
+   };
+
+   BOOST_REQUIRE_EQUAL(success(), terminate_op(UWRIT_OP, "test termination"));
+   const auto terminated = get_operator(UWRIT_OP);
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_TERMINATED", terminated["status"].as_string());
+   BOOST_REQUIRE_LT(0u, find_balance(terminated, "ETH", "ETH")["balance"].as_uint64());   // locked remainder
+   const uint64_t owed_at_termination = banked();
+   BOOST_REQUIRE_LT(0u, owed_at_termination);
+   BOOST_REQUIRE_EQUAL(0u, wire_claim());   // the pool was empty: nothing covered yet
+
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, CHALLENGER, "sweepyield"_n, mvo()
+      ("token_code", codename_mvo("LIQETH"))));
+   BOOST_REQUIRE_EQUAL(0u, wire_claim());   // a sweep only fills the pool
+
+   BOOST_REQUIRE_EQUAL(success(), releaselock_direct(UWRIT_OP, "ETH", "ETH", LEG_AMOUNT));
+   BOOST_REQUIRE_EQUAL(owed_at_termination, wire_claim());
+   BOOST_REQUIRE_EQUAL(0u, banked());
 } FC_LOG_AND_RETHROW() }
 
 // Filing escrows exactly the quoted bond, stamps every lock with the challenge id, and records

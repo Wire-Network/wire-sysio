@@ -4,6 +4,7 @@
 #include <sysio.uwrit/sysio.uwrit.hpp>   // uwreq + lock reads for the underwriter challenge
 #include <sysio.reserv/sysio.reserv.hpp> // reserve books that price the challenge bond
 #include <sysio.opreg/sysio.opreg.hpp>   // operator status guard before slashing
+#include <sysio.liq/sysio.liq.hpp>       // shadow stat rows naming a depot-native bucket's outpost pair
 #include <sysio.opp.common/amm_math.hpp> // token_to_wire — the bond's WIRE valuation
 #include <sysio.opp.common/wire_asset.hpp>
 #include <magic_enum/magic_enum.hpp>
@@ -29,8 +30,8 @@ constexpr const char* DISPUTE_REQUIRES_TWO_CANDIDATES =
    "a dispute requires at least two candidate envelope versions";
 
 /// Floor valuation, in WIRE atomic units, for a NONZERO collateral bucket the depot cannot price —
-/// its `(chain_code, token_code)` pair carries no ACTIVE reserve, or the pair's books floor the
-/// conversion to zero (dust).
+/// its pricing pair (see `pricing_pair_for`) carries no ACTIVE reserve, or the pair's books floor
+/// the conversion to zero (dust).
 ///
 /// Pricing such a bucket at this floor rather than refusing the whole quote is deliberate, and the
 /// direction matters. Collateral ingress (`opreg::depositinle`) accepts any positive amount for any
@@ -42,8 +43,49 @@ constexpr const char* DISPUTE_REQUIRES_TWO_CANDIDATES =
 /// bucket always contributes the same amount, so `uwchalbond` and `openuwchal` still agree.
 ///
 /// Shares the provisional-pricing caveat on `compute_uwchal_bond`: acceptable while collateral is
-/// small, and a real valuation for unreserved pairs is part of that same pre-launch revisit.
+/// small, and a real valuation for unreserved pairs is part of that same pre-launch revisit. A
+/// depot-native shadow LIQ bucket is NOT such a pair: it is priced on its outpost pair's live
+/// books, and it floors here only when that outpost pair has no ACTIVE reserve (or its books floor
+/// the conversion to zero). `opreg::deposit` bonds only tokens its resolver finds a `sysio.liq`
+/// stat row for, so a WIRE-chain bucket without one is not a bucket the operator-signed path can
+/// create; `pricing_pair_for` still falls back to the bucket's own, unreserved pair for it rather
+/// than abort.
 constexpr uint64_t MIN_UWCHAL_BUCKET_WIRE = 1;
+
+/// The `(chain_code, token_code)` pair whose reserve books price one collateral bucket — the key
+/// `compute_uwchal_bond` walks the `bychaintok` index by.
+struct pricing_pair {
+   sysio::slug_name chain_code; ///< chain of the reserve that prices the bucket
+   sysio::slug_name token_code; ///< token of the reserve that prices the bucket
+
+   /// The `sysio.reserv` `bychaintok` composite key for this pair (`reserve_row::by_chain_token`).
+   uint128_t by_chain_token() const {
+      return (static_cast<uint128_t>(chain_code.value) << 64) | token_code.value;
+   }
+};
+
+/// The pair whose reserve prices collateral bucket `bal`. The native `(WIRE, WIRE)` bucket never
+/// reaches here — `compute_uwchal_bond` counts it at face value first.
+///
+///   * A depot-native shadow LIQ bucket, keyed `(opp::wire::chain_code, token_code)` by
+///     `sysio.opreg`, mirrors one outpost liq token 1:1 in depot units. No reserve carries the
+///     WIRE-chain key, so the bucket is priced on the outpost pair its `sysio.liq` `stat` row
+///     names (`currency_stats::chain_code` / `token_code`), found through the `bytoken` index on
+///     the bucket's registry token code — the lookup `sysio.opreg` resolves shadow custody with.
+///   * A WIRE-chain bucket with no stat row, and every outpost-escrowed bucket, is priced on its
+///     own pair; for the former that pair carries no reserve, so it floors at
+///     `MIN_UWCHAL_BUCKET_WIRE`.
+///
+/// Never throws: `uwchalbond`'s soft contract answers every unpriceable state with a number, not
+/// an abort, and a throw here would let a bucket the depot cannot resolve block `openuwchal` —
+/// the underwriter-controlled immunity switch `MIN_UWCHAL_BUCKET_WIRE` exists to close. A missing
+/// stat row therefore degrades to the floor.
+pricing_pair pricing_pair_for(name liq_account, const opreg::balance_entry& bal) {
+   if (bal.chain_code != opp::wire::chain_code) return {bal.chain_code, bal.token_code};
+   const auto stat = liq::find_stat_by_token(liq_account, bal.token_code);
+   if (!stat) return {bal.chain_code, bal.token_code};
+   return {stat->chain_code, stat->token_code};
+}
 
 /// Wall-clock now in ms — the clock `sysio.uwrit`'s lock window runs on
 /// (`lock_entry.expires_at_ms`), so challenge deadlines compare like-for-like.
@@ -85,7 +127,8 @@ struct uwchal_bond_quote {
 ///
 /// Deposits are per-outpost and per-token — native and ERC-20/SPL alike — so each bucket is
 /// quoted on its pair's live reserve books and the quotes summed. A WIRE-denominated bucket, if
-/// one exists, contributes directly.
+/// one exists, contributes directly. A depot-native shadow LIQ bucket `(WIRE, LIQETH)` is quoted
+/// on the books of the outpost pair it mirrors 1:1 (`(ETH, LIQETH)`) — see `pricing_pair_for`.
 ///
 /// **REVISIT (Jonathan, 2026-08-11 — "make a note to revisit").** Two provisional choices here:
 ///   1. A (chain, token) pair may carry SEVERAL active reserves — PRIMARY plus private ones — at
@@ -108,7 +151,8 @@ struct uwchal_bond_quote {
 /// A bucket the depot cannot price does NOT void the quote — it contributes
 /// `MIN_UWCHAL_BUCKET_WIRE`. Voiding made unpriceability an underwriter-controlled immunity
 /// switch, since collateral ingress never required a quoteable pair; that constant carries the
-/// full argument.
+/// full argument. A shadow bucket is priced on its outpost pair and floors when that pair has no
+/// ACTIVE reserve.
 ///
 /// The bound is the TRANSFERABLE asset range (2^62-1), not `uint64_t`'s: `openuwchal` escrows the
 /// quote as `asset(static_cast<int64_t>(quote.bond), opp::wire::asset_symbol)`, and `asset`'s range
@@ -121,7 +165,7 @@ struct uwchal_bond_quote {
 /// keeps the advertised bond and what filing can actually escrow in agreement — the same range
 /// discipline `credit_bond` applies on the payout side.
 uwchal_bond_quote compute_uwchal_bond(name uwrit_account, name reserv_account, name opreg_account,
-                                      uint64_t uwreq_id, name underwriter) {
+                                      name liq_account, uint64_t uwreq_id, name underwriter) {
    uwchal_bond_quote quote;
    const uint64_t now_ms = current_time_ms();
 
@@ -158,10 +202,11 @@ uwchal_bond_quote compute_uwchal_bond(name uwrit_account, name reserv_account, n
          total += bal.balance;   // already WIRE — no curve to ride
          continue;
       }
-      // FIRST ACTIVE reserve for the pair. A pair may carry several (PRIMARY plus private
+      // FIRST ACTIVE reserve for the bucket's pricing pair — its own pair, or for a depot-native
+      // shadow bucket the outpost pair it mirrors. A pair may carry several (PRIMARY plus private
       // ones) at different depths, so this pricing is deliberately provisional — see the
       // revisit note on the declaration.
-      const uint128_t ck = (static_cast<uint128_t>(bal.chain_code.value) << 64) | bal.token_code.value;
+      const uint128_t ck = pricing_pair_for(liq_account, bal).by_chain_token();
       uint64_t bucket_wire = 0;
       for (auto it = by_chain_token.lower_bound(ck);
            it != by_chain_token.end() && it->by_chain_token() == ck; ++it) {
@@ -453,7 +498,8 @@ void chalg::openuwchal(name challenger, uint64_t uwreq_id, name underwriter,
 
    // Price the bond off the SAME formula `uwchalbond` quotes. Zero live locks means the window
    // has closed (or never opened); an unpriceable bond refuses the filing rather than guessing.
-   const auto quote = compute_uwchal_bond(UWRIT_ACCOUNT, RESERV_ACCOUNT, OPREG_ACCOUNT, uwreq_id, underwriter);
+   const auto quote =
+      compute_uwchal_bond(UWRIT_ACCOUNT, RESERV_ACCOUNT, OPREG_ACCOUNT, LIQ_ACCOUNT, uwreq_id, underwriter);
    check(quote.live_locks > 0,
          "openuwchal: no live collateral locks to challenge (the lock window has closed)");
    check(quote.bond > 0, "openuwchal: challenge bond cannot be priced");
@@ -710,7 +756,9 @@ uint64_t chalg::uwchalbond(uint64_t uwreq_id, name underwriter) {
    const uint128_t composite = (static_cast<uint128_t>(uwreq_id) << 64) | underwriter.value;
    if (uq_idx.find(composite) != uq_idx.end()) return 0; // already challenged — a verdict is final
 
-   return compute_uwchal_bond(UWRIT_ACCOUNT, RESERV_ACCOUNT, OPREG_ACCOUNT, uwreq_id, underwriter).bond;
+   const auto quote =
+      compute_uwchal_bond(UWRIT_ACCOUNT, RESERV_ACCOUNT, OPREG_ACCOUNT, LIQ_ACCOUNT, uwreq_id, underwriter);
+   return quote.bond;
 }
 
 } // namespace sysio
