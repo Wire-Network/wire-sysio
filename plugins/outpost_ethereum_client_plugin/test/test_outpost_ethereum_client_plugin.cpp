@@ -623,6 +623,9 @@ constexpr std::string_view test_moved_syndication_pool_address = "0xDc64a140Aa3E
 constexpr std::string_view no_yield_selector             = "053716d1";
 constexpr std::string_view yield_below_deadband_selector = "45441430";
 constexpr std::string_view pool_underbacked_selector     = "358cc7e9";
+/// `keccak256("EnforcedPause()")[0..4]`: OpenZeppelin `Pausable`'s refusal, which
+/// `realizeYield()`'s `whenNotPaused` raises while the pool's panic role has frozen it.
+constexpr std::string_view enforced_pause_selector       = "d93c0665";
 /// `AccessManagedUnauthorized(address)`: what a signer without the `yield_operator` role gets.
 constexpr std::string_view access_managed_unauthorized_selector = "068ca9d8";
 constexpr uint64_t test_yield_delta    = 5;
@@ -1660,6 +1663,11 @@ BOOST_AUTO_TEST_CASE(realize_yield_refusal_selectors_are_pinned) try {
    BOOST_CHECK(crank::classify_realize_yield_revert(encode_two_word_revert(
                   pool_underbacked_selector, test_yield_delta, test_yield_deadband)) ==
                refusal::underbacked);
+   BOOST_CHECK(crank::classify_realize_yield_revert(std::string(hex_prefix) +
+                                                    std::string(enforced_pause_selector)) == refusal::paused);
+   // `EnforcedPause()` takes no arguments; one with a word attached is not it.
+   BOOST_CHECK(!crank::classify_realize_yield_revert(
+      std::string(hex_prefix) + std::string(enforced_pause_selector) + abi_word(1)));
 
    BOOST_CHECK(!crank::classify_realize_yield_revert(
       std::string(hex_prefix) + std::string(no_yield_selector) + abi_word(1)));
@@ -1767,8 +1775,9 @@ BOOST_AUTO_TEST_CASE(crank_outpost_rebinds_when_the_registered_pool_moves) try {
       fixture->outpost->syndication_pool_address(), test_moved_syndication_pool_address));
 } FC_LOG_AND_RETHROW();
 
-/// The pool's own three refusals are outcomes of the crank, not failures: nothing to report is
-/// debug-quiet, an underbacked pool is a warning, and none of them propagate.
+/// The pool's own refusals are outcomes of the crank, not failures: nothing to report is
+/// debug-quiet, an underbacked pool is a warning, a paused (frozen) pool is info, and none of
+/// them propagate.
 BOOST_AUTO_TEST_CASE(crank_outpost_reads_the_pools_own_refusals_as_outcomes) try {
    const std::vector<std::pair<std::string, std::string>> refusals{
       {"WIRE_NoYield()", std::string(hex_prefix) + std::string(no_yield_selector)},
@@ -1776,6 +1785,7 @@ BOOST_AUTO_TEST_CASE(crank_outpost_reads_the_pools_own_refusals_as_outcomes) try
        encode_two_word_revert(yield_below_deadband_selector, test_yield_delta, test_yield_deadband)},
       {"WIRE_PoolUnderbacked(uint64,uint64)",
        encode_two_word_revert(pool_underbacked_selector, test_yield_delta, test_yield_deadband)},
+      {"EnforcedPause()", std::string(hex_prefix) + std::string(enforced_pause_selector)},
    };
    for (const auto& [description, revert_data] : refusals) {
       BOOST_TEST_CONTEXT(description) {

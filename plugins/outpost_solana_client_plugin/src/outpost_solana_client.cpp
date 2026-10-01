@@ -685,6 +685,16 @@ fc::network::solana::solana_public_key derive_liqsol_bucket_authority_pda(
    return literal_seed_pda(program_id, LIQSOL_BUCKET_SEED);
 }
 
+/// The `PendingPayout` PDA of one depot request id. Full contract on the header
+/// declaration.
+fc::network::solana::solana_public_key derive_pending_desyndication_pda(
+   const fc::network::solana::solana_public_key& program_id, uint64_t request_id) {
+   return fc::network::solana::system::find_program_address(
+      {std::vector<uint8_t>(PENDING_DESYNDICATION_SEED.begin(), PENDING_DESYNDICATION_SEED.end()),
+       u64_seed(request_id)},
+      program_id).first;
+}
+
 /// The `UserRecord` PDA of one liqSOL token account. Full contract on the
 /// header declaration.
 fc::network::solana::solana_public_key derive_liqsol_user_record_pda(
@@ -720,6 +730,14 @@ void assert_distribution_state_shape(const fc::network::solana::idl::program& pr
 void assert_global_state_shape(const fc::network::solana::idl::program& program) {
    namespace idl = fc::network::solana::idl;
    const auto& fields = declared_account_fields(program, global_state::account_name);
+   // The emergency stop is optional -- a program that predates it declares none --
+   // but a declared one is read as a bool, so any other type is a drifted IDL.
+   for (const auto& field : fields) {
+      if (field.name != global_state::field_frozen) continue;
+      FC_ASSERT(field.type.is_primitive() && field.type.primitive == idl::primitive_type::bool_t,
+                "GlobalState '{}' must be declared bool, got '{}'; the yield crank gates on it",
+                global_state::field_frozen, describe_idl_type(field.type));
+   }
    for (const auto& field : fields) {
       if (field.name != global_state::field_wire_state) continue;
       FC_ASSERT(field.type.is_defined(),
@@ -742,13 +760,30 @@ void assert_global_state_shape(const fc::network::solana::idl::program& program)
              global_state::field_wire_state);
 }
 
+bool liq_outpost_frozen(const fc::variant_object& global_state_row) {
+   auto frozen = global_state_row.find(global_state::field_frozen);
+   if (frozen == global_state_row.end()) return false;   // the IDL declares no emergency stop
+   return !frozen->value().is_bool() || frozen->value().as_bool();
+}
+
 bool liq_yield_report_due(const fc::variant_object& global_state_row) {
+   if (liq_outpost_frozen(global_state_row)) return false;
    auto state = global_state_row.find(global_state::field_wire_state);
    if (state == global_state_row.end() || !state->value().is_object()) return false;
    const auto& state_obj = state->value().get_object();
    auto variant = state_obj.find(IDL_ENUM_VARIANT_KEY);
    return variant != state_obj.end() && variant->value().is_string() &&
           variant->value().as_string() == global_state::post_launch;
+}
+
+bool global_state_predates_freeze(const fc::network::solana::idl::program& program, size_t account_bytes) {
+   if (!program.find_account(global_state::account_name)) return false;
+   const auto& fields = declared_account_fields(program, global_state::account_name);
+   const bool declares_frozen = std::any_of(fields.begin(), fields.end(), [](const auto& field) {
+      return field.name == global_state::field_frozen;
+   });
+   return declares_frozen &&
+          account_bytes <= global_state::anchor_discriminator_bytes + global_state::pre_freeze_init_space;
 }
 
 fc::network::solana::account_overrides_t report_liq_yield_overrides(
@@ -1166,7 +1201,7 @@ extract_inbound_effects(const std::vector<char>& envelope_bytes) {
                if (!dl.ParseFromString(entry.data())) continue;
                if (auto pk = sol_pubkey_from_chain_address(dl.user())) {
                   effects.push_back(inbound_effect{
-                     at, effect_shape::desyndicate_liq, *pk, std::nullopt, std::nullopt});
+                     at, effect_shape::desyndicate_liq, *pk, std::nullopt, std::nullopt, dl.request_id()});
                }
                break;
             }
@@ -1365,10 +1400,21 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
       // first because the handler loads them before anything else and turns an
       // uninitialized pool into a logged skip; every later account aborts the
       // window when missing, which is the caller-fixable retry the program wants.
+      //
+      // The request's `PendingPayout` PDA follows them, writable, whether or not
+      // the pool reads: `defer_desyndication` creates it when the outpost is
+      // frozen (checked right after the singletons, before any pool account) or a
+      // share record is still the legacy layout (after them), and aborts the
+      // window with `EffectAccountMissing` when it is absent. The paid path never
+      // touches it. Request id 0 cannot key one -- the handler records that payout
+      // as unpaid before asking for the account -- so it gets none.
       if (effect.shape == effect_shape::desyndicate_liq) {
          if (!effect.recipient) continue;
          add(derive_liqsol_global_state_pda(program_id), true);
          add(derive_liqsol_distribution_state_pda(program_id), true);
+         if (effect.desyndication_request_id.value_or(0) != 0) {
+            add(derive_pending_desyndication_pda(program_id, *effect.desyndication_request_id), true);
+         }
 
          const auto& pool_opt = liq_pool();
          if (!pool_opt.has_value()) {
@@ -2135,9 +2181,28 @@ void outpost_solana_client::crank_outpost(uint32_t epoch_index, fc::microseconds
            to_string(), global_state_pda.to_string(fc::yield_function_t{}));
       return;
    }
-   const auto global_v = _program_client->decode_account_info_data(
+   // A GlobalState still at the pre-freeze layout cannot carry the `frozen` the
+   // loaded IDL declares, so decoding it would run past its end; the program
+   // refuses the crank on it until `migrate_global_state_liq_fields` grows it.
+   if (outpost_solana_client_detail::global_state_predates_freeze(*_program_client->get_program(),
+                                                                  global_info->data.size())) {
+      wlog("outpost_solana_client[{}]: GlobalState at {} is {} bytes, the layout before the emergency "
+           "stop; report_liq_yield is not due until migrate_global_state_liq_fields grows it",
+           to_string(), global_state_pda.to_string(fc::yield_function_t{}), global_info->data.size());
+      return;
+   }
+   const auto  global_v   = _program_client->decode_account_info_data(
       outpost_solana_client_detail::global_state::account_name, global_info->data);
-   if (!outpost_solana_client_detail::liq_yield_report_due(global_v.get_object())) {
+   const auto& global_row = global_v.get_object();
+   // The emergency stop: the program refuses `report_liq_yield` while it is set.
+   // An expected state (the andon playbook clears it), not a failed crank.
+   if (outpost_solana_client_detail::liq_outpost_frozen(global_row)) {
+      ilog("outpost_solana_client[{}]: outpost is frozen (GlobalState.frozen) -- report_liq_yield is "
+           "not sent for epoch {}",
+           to_string(), epoch_index);
+      return;
+   }
+   if (!outpost_solana_client_detail::liq_yield_report_due(global_row)) {
       dlog("outpost_solana_client[{}]: outpost is not PostLaunch -- no liq yield to report",
            to_string());
       return;

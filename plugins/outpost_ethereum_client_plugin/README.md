@@ -153,12 +153,14 @@ comes back, and re-binds if it changes. `address(0)` and `ATTESTATION_BLACKHOLE`
 without `realizeYield` means an outpost deployment that predates the pool; both leave the crank idle at debug
 level.
 
-`realizeYield()` refuses at estimate time, before any gas is spent, and the relay reads the pool's own three
+`realizeYield()` refuses at estimate time, before any gas is spent, and the relay reads the pool's own
 refusals as outcomes rather than failures: `WIRE_NoYield()` and `WIRE_YieldBelowDeadband(uint64,uint64)` are
 the quiet steady state (debug), `WIRE_PoolUnderbacked(uint64,uint64)` is a warning (the loss path is not in
-that contract). Any other revert — a signer without the pool's `yield_operator` role, a paused endpoint, a
-foreign implementation — and any transport failure propagate to the job, which logs the failed crank and
-retries with the next epoch's delivery.
+that contract), and `EnforcedPause()` — raised only by `SyndicationPool`'s own pause, when its panic role has
+frozen the pool (the OPP endpoint has no pause) — is logged at info every epoch until it is unpaused. Any other
+revert — a signer without the pool's `yield_operator` role, a foreign implementation — and any transport failure
+propagate to the job, which logs the failed crank and retries with the next epoch's delivery. The relay never cranks `payPendingDesyndication`; paying a
+desyndication stored while the pool was paused is the operator playbook's step.
 
 ## Enabling / configuration
 

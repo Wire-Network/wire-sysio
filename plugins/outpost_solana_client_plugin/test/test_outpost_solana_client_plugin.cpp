@@ -1159,17 +1159,21 @@ BOOST_AUTO_TEST_CASE(extract_effects_slash_carries_collateral_position_key) try 
 
 namespace {
 
-/// Build a `DESYNDICATE_LIQ` entry releasing `token_code` to `user`. The decoder
-/// reads only `user` -- the pool mint comes from `DistributionState`, not the
-/// payload -- so the other fields stay neutral.
+/// The depot request id `desyndicate_liq_entry` stamps unless a case names one.
+constexpr uint64_t default_desyndication_request_id = 1;
+
+/// Build a `DESYNDICATE_LIQ` entry releasing `token_code` to `user` under
+/// `request_id`. The decoder reads `user` and `request_id` -- the pool mint comes
+/// from `DistributionState`, not the payload -- so the other fields stay neutral.
 sysio::opp::AttestationEntry desyndicate_liq_entry(uint64_t                               token_code,
-                                                   const sysio::opp::types::ChainAddress& user) {
+                                                   const sysio::opp::types::ChainAddress& user,
+                                                   uint64_t request_id = default_desyndication_request_id) {
    sysio::opp::attestations::DesyndicateLIQ dl;
    dl.set_chain_code(900);
    *dl.mutable_user() = user;
    dl.mutable_amount()->set_token_code(token_code);
    dl.mutable_amount()->set_amount(777);
-   dl.set_request_id(1);
+   dl.set_request_id(request_id);
    std::string body;
    dl.SerializeToString(&body);
 
@@ -1187,9 +1191,10 @@ BOOST_AUTO_TEST_CASE(extract_effects_desyndicate_liq_carries_the_user) try {
    // singletons, the transfer's accounts and the hook's accounts out of
    // remaining_accounts, and a manifest that omits them aborts the dispatch
    // call and pins the cursor on this attestation for every retry.
+   constexpr uint64_t request_id = 0x0102030405060708;
    auto user     = filled_pubkey(0xAB);
    auto envelope = envelope_with_entries({
-      desyndicate_liq_entry(700, make_sol_addr(user)),
+      desyndicate_liq_entry(700, make_sol_addr(user), request_id),
       // Not an SVM pubkey: dropped here and logged-and-skipped on chain, while
       // the flat index still advances past it.
       desyndicate_liq_entry(700, make_eth_addr_32(user)),
@@ -1205,9 +1210,13 @@ BOOST_AUTO_TEST_CASE(extract_effects_desyndicate_liq_carries_the_user) try {
    BOOST_CHECK(effects[0].recipient->serialize() == user);
    BOOST_CHECK(!effects[0].reserve.has_value());
    BOOST_CHECK(!effects[0].collateral_token_code.has_value());
+   // The request id keys the pending-payout PDA a frozen outpost stores the payout at.
+   BOOST_REQUIRE(effects[0].desyndication_request_id.has_value());
+   BOOST_CHECK_EQUAL(*effects[0].desyndication_request_id, request_id);
 
    BOOST_CHECK_EQUAL(effects[1].attestation_index, 2u);
    BOOST_CHECK(effects[1].shape == detail::effect_shape::withdraw_remit);
+   BOOST_CHECK(!effects[1].desyndication_request_id.has_value());
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(extract_effects_keeps_distinct_collateral_token_codes) try {
@@ -1651,10 +1660,12 @@ BOOST_AUTO_TEST_CASE(build_manifests_follows_reserve_custody_per_reserve) try {
 
 namespace {
 
-/// One DESYNDICATE_LIQ effect at `index` releasing syndicated liqSOL to `user`.
-manifest_detail::inbound_effect desyndicate_liq_effect(size_t index, const solana_public_key& user) {
+/// One DESYNDICATE_LIQ effect at `index` releasing syndicated liqSOL to `user`
+/// under the depot's `request_id`.
+manifest_detail::inbound_effect desyndicate_liq_effect(size_t index, const solana_public_key& user,
+                                                       uint64_t request_id) {
    return manifest_detail::inbound_effect{
-      index, manifest_detail::effect_shape::desyndicate_liq, user, std::nullopt, std::nullopt};
+      index, manifest_detail::effect_shape::desyndicate_liq, user, std::nullopt, std::nullopt, request_id};
 }
 
 /// Whether `key` rides `metas` as WRITABLE.
@@ -1672,8 +1683,9 @@ bool manifest_writes(const std::vector<account_meta>& metas, const solana_public
 // singletons (writable), the pool authority, the pool and user Token-2022 ATAs
 // with their `UserRecord`s (all writable), the bucket ATA, the mint, Token-2022,
 // and the hook's accounts -- the bucket authority, the mint's extra-metas PDA,
-// the hook program and liqsol-core. One DistributionState read serves every
-// desyndication in the envelope.
+// the hook program and liqsol-core -- plus the request's pending-payout PDA
+// (writable, right after the singletons) a frozen outpost stores the payout at.
+// One DistributionState read serves every desyndication in the envelope.
 BOOST_AUTO_TEST_CASE(build_manifests_desyndicate_liq_derives_the_pool_accounts) try {
    const auto liqsol_mint  = measurement_pubkey(90);
    const auto hook_program = measurement_pubkey(91);
@@ -1684,8 +1696,9 @@ BOOST_AUTO_TEST_CASE(build_manifests_desyndicate_liq_derives_the_pool_accounts) 
    harness.put_liq_pool(liqsol_mint);
    harness.put_hook(liqsol_mint, hook_program, {});
 
+   const std::array<uint64_t, 2> request_ids{7, 0x0102030405060708};
    const auto manifests = harness.build(
-      {desyndicate_liq_effect(0, user_a), desyndicate_liq_effect(1, user_b)}, 2);
+      {desyndicate_liq_effect(0, user_a, request_ids[0]), desyndicate_liq_effect(1, user_b, request_ids[1])}, 2);
    BOOST_REQUIRE_EQUAL(manifests.size(), 2u);
    BOOST_CHECK_EQUAL(harness.liq_pool_reads, 1u);
 
@@ -1702,10 +1715,18 @@ BOOST_AUTO_TEST_CASE(build_manifests_desyndicate_liq_derives_the_pool_accounts) 
       const auto& m        = manifests[i];
       const auto& user     = i == 0 ? user_a : user_b;
       const auto  user_ata = system::get_associated_token_address(user, liqsol_mint, token_2022);
+      const auto  pending  = manifest_detail::derive_pending_desyndication_pda(program_id, request_ids[i]);
       BOOST_TEST_CONTEXT("attestation " << i) {
-         BOOST_CHECK_EQUAL(m.size(), 14u);
+         BOOST_REQUIRE_EQUAL(m.size(), 15u);
          BOOST_CHECK(manifest_writes(m, global_state));
          BOOST_CHECK(manifest_writes(m, distribution));
+         // The pending-payout PDA follows the two singletons, writable: the
+         // handler's frozen deferral creates it before touching any pool account.
+         BOOST_CHECK(m[0].key == global_state && m[1].key == distribution && m[2].key == pending);
+         BOOST_CHECK(manifest_writes(m, pending));
+         // Each request keys its own PDA.
+         BOOST_CHECK(!manifest_has(m, manifest_detail::derive_pending_desyndication_pda(
+                                         program_id, request_ids[1 - i])));
          BOOST_CHECK(manifest_has(m, pool_authority) && !manifest_writes(m, pool_authority));
          BOOST_CHECK(manifest_writes(m, pool_ata));
          BOOST_CHECK(manifest_writes(m, user_ata));
@@ -1729,14 +1750,85 @@ BOOST_AUTO_TEST_CASE(build_manifests_desyndicate_liq_derives_the_pool_accounts) 
 // singletons only: the handler loads them first and turns an uninitialized
 // pool into a logged skip, so nothing behind them is derivable or required.
 BOOST_AUTO_TEST_CASE(build_manifests_desyndicate_liq_degrades_to_the_state_singletons) try {
+   constexpr uint64_t     request_id = 11;
    manifest_build_harness harness;   // no pool seeded
-   const auto manifests = harness.build({desyndicate_liq_effect(0, measurement_pubkey(94))}, 1);
+   const auto manifests = harness.build({desyndicate_liq_effect(0, measurement_pubkey(94), request_id)}, 1);
    BOOST_REQUIRE_EQUAL(manifests.size(), 1u);
    const auto& m = manifests[0];
-   BOOST_CHECK_EQUAL(m.size(), 2u);
+   BOOST_CHECK_EQUAL(m.size(), 3u);
    BOOST_CHECK(manifest_writes(m, manifest_detail::derive_liqsol_global_state_pda(harness.program_id)));
    BOOST_CHECK(manifest_writes(m, manifest_detail::derive_liqsol_distribution_state_pda(harness.program_id)));
+   // A frozen outpost defers before it reads the pool, so the pending-payout PDA
+   // rides even when the pool read degrades.
+   BOOST_CHECK(manifest_writes(m, manifest_detail::derive_pending_desyndication_pda(harness.program_id, request_id)));
    BOOST_CHECK_EQUAL(harness.hook_reads, 0u);
+} FC_LOG_AND_RETHROW();
+
+// Request id 0 is "no id": it cannot key a PendingPayout, and the handler records
+// such a payout as unpaid before it asks for the pending account, so the manifest
+// carries no pending-payout PDA for it -- and nothing else changes.
+BOOST_AUTO_TEST_CASE(build_manifests_desyndicate_liq_omits_the_pending_pda_for_request_id_zero) try {
+   const auto liqsol_mint  = measurement_pubkey(90);
+   const auto hook_program = measurement_pubkey(91);
+   const auto user         = measurement_pubkey(92);
+
+   manifest_build_harness harness;
+   harness.put_liq_pool(liqsol_mint);
+   harness.put_hook(liqsol_mint, hook_program, {});
+
+   const auto manifests = harness.build({desyndicate_liq_effect(0, user, 0),
+                                         // An effect built without an id at all behaves the same.
+                                         manifest_detail::inbound_effect{
+                                            1, manifest_detail::effect_shape::desyndicate_liq, user,
+                                            std::nullopt, std::nullopt, std::nullopt}},
+                                        2);
+   BOOST_REQUIRE_EQUAL(manifests.size(), 2u);
+   for (size_t i = 0; i < manifests.size(); ++i) {
+      BOOST_TEST_CONTEXT("attestation " << i) {
+         BOOST_CHECK_EQUAL(manifests[i].size(), 14u);
+         BOOST_CHECK(!manifest_has(manifests[i],
+                                   manifest_detail::derive_pending_desyndication_pda(harness.program_id, 0)));
+      }
+   }
+
+   manifest_build_harness degraded;   // no pool seeded
+   const auto bare = degraded.build({desyndicate_liq_effect(0, user, 0)}, 1);
+   BOOST_REQUIRE_EQUAL(bare.size(), 1u);
+   BOOST_CHECK_EQUAL(bare[0].size(), 2u);
+} FC_LOG_AND_RETHROW();
+
+// The pending-payout PDA is derived exactly as wire-solana's
+// `PendingPayout::find_address` does: `["pending_desyndication",
+// request_id.to_le_bytes()]` under liqsol-core. The expected addresses were
+// computed independently with `@solana/web3.js`'s `findProgramAddressSync`
+// against liqsol-core's declared program id; a multi-byte id pins the
+// little-endian encoding.
+BOOST_AUTO_TEST_CASE(pending_desyndication_pda_matches_the_program_derivation) try {
+   const auto liqsol_core = solana_public_key::from_base58_string("5nBtmutQLrRKBUxNfHJPDjiW5u8id6QM9Hhjg1D1g1XH");
+   const std::vector<std::pair<uint64_t, std::string>> expected{
+      {1, "6nDs1ohHKjjBjDp9KD8BDvjjqs2ZEYeR3eTHyF7ZNA8T"},
+      {7, "BV578hrPb772NQkcMxVUS55QFsJpZw9Xq9hAQXiJioJd"},
+      {0x0102030405060708, "5K37mePygNUJ3W9nwD4fkFH9ehUxMVKNyseipwmMrfED"},
+   };
+   for (const auto& [request_id, address] : expected) {
+      BOOST_TEST_CONTEXT("request_id " << request_id) {
+         BOOST_CHECK_EQUAL(manifest_detail::derive_pending_desyndication_pda(liqsol_core, request_id)
+                              .to_string(fc::yield_function_t{}),
+                           address);
+      }
+   }
+   // The seed constant is the program's `PENDING_PAYOUT_SEED`, and the derivation
+   // spells it through that constant.
+   BOOST_CHECK_EQUAL(manifest_detail::PENDING_DESYNDICATION_SEED, "pending_desyndication");
+   std::vector<uint8_t> id_le(sizeof(uint64_t));
+   for (size_t i = 0; i < id_le.size(); ++i) id_le[i] = static_cast<uint8_t>(uint64_t{7} >> (8 * i));
+   BOOST_CHECK(manifest_detail::derive_pending_desyndication_pda(liqsol_core, 7) ==
+               system::find_program_address(
+                  {std::vector<uint8_t>(manifest_detail::PENDING_DESYNDICATION_SEED.begin(),
+                                        manifest_detail::PENDING_DESYNDICATION_SEED.end()),
+                   id_le},
+                  liqsol_core)
+                  .first);
 } FC_LOG_AND_RETHROW();
 
 namespace {
@@ -1982,6 +2074,38 @@ BOOST_AUTO_TEST_CASE(hook_manifest_worst_case_fits_the_dispatch_budget) try {
    // <= check while leaving zero headroom.
    BOOST_CHECK_EQUAL(manifests[0].size(), 13u);
    BOOST_CHECK_EQUAL(manifests[1].size(), 13u);
+} FC_LOG_AND_RETHROW();
+
+/// The DESYNDICATE_LIQ manifest under the REAL liqSOL hook declaration, pending-
+/// payout PDA included. Every meta the hook declares resolves to an account the
+/// handler already requires (liqsol-core, the two `UserRecord`s,
+/// `DistributionState`, the bucket ATA), so the hook adds only its program and
+/// extra-metas PDA and one desyndication costs 15 of the 16 dynamic slots. The
+/// packer therefore carries one desyndication per dispatch window (two would
+/// need 18). Pinned exactly so the next program-side account spends the last
+/// slot visibly.
+BOOST_AUTO_TEST_CASE(desyndicate_liq_manifest_under_the_real_hook_fits_the_dispatch_budget) try {
+   const auto liqsol_mint  = measurement_pubkey(110);
+   const auto hook_program = measurement_pubkey(111);
+
+   manifest_build_harness harness;
+   const auto bucket_ata = system::get_associated_token_address(
+      manifest_detail::derive_liqsol_bucket_authority_pda(harness.program_id), liqsol_mint,
+      system::program_ids::TOKEN_2022_PROGRAM);
+   harness.put_liq_pool(liqsol_mint);
+   harness.put_hook(liqsol_mint, hook_program,
+                    {literal_meta(harness.program_id, false),
+                     external_pda_meta(5, {seed_literal{"user_record"}, seed_account_key{0}}, true),
+                     external_pda_meta(5, {seed_literal{"user_record"}, seed_account_key{2}}, true),
+                     external_pda_meta(5, {seed_literal{"distribution_state"}}, true),
+                     literal_meta(bucket_ata, false)});
+
+   const auto manifests = harness.build({desyndicate_liq_effect(0, measurement_pubkey(112), 9)}, 1);
+   BOOST_REQUIRE_EQUAL(manifests.size(), 1u);
+   BOOST_CHECK_LE(manifests[0].size(), sysio::MAX_TERMINAL_DYNAMIC_ACCOUNTS);
+   BOOST_CHECK_EQUAL(manifests[0].size(), 15u);
+   BOOST_CHECK(manifest_has(manifests[0],
+                            manifest_detail::derive_pending_desyndication_pda(harness.program_id, 9)));
 } FC_LOG_AND_RETHROW();
 
 /// A `ExtraAccountMeta` may legally demand a signature. The dispatch
@@ -3121,10 +3245,13 @@ BOOST_AUTO_TEST_CASE(distribution_state_shape_accepts_a_pubkey_mint_and_rejects_
 namespace {
 
 /// A synthetic program declaring `GlobalState` with `wire_state` of enum type
-/// `WireState` carrying `variants`.
-idl::program global_state_program(std::vector<std::string> variants, bool fields_in_types_section) {
-   auto prog = named_account_program(
-      "GlobalState", {{"wire_state", idl::idl_type::make_defined("WireState")}}, fields_in_types_section);
+/// `WireState` carrying `variants`, and -- when `frozen_type` is set -- a
+/// trailing `frozen` field of that type.
+idl::program global_state_program(std::vector<std::string> variants, bool fields_in_types_section,
+                                  std::optional<idl::idl_type> frozen_type = std::nullopt) {
+   std::vector<idl::field> fields{{"wire_state", idl::idl_type::make_defined("WireState")}};
+   if (frozen_type) fields.push_back({"frozen", *frozen_type});
+   auto prog = named_account_program("GlobalState", std::move(fields), fields_in_types_section);
    idl::type_def wire_state;
    wire_state.name          = "WireState";
    wire_state.enum_variants = std::vector<idl::enum_variant>{};
@@ -3156,6 +3283,13 @@ BOOST_AUTO_TEST_CASE(global_state_shape_requires_a_post_launch_variant) try {
          BOOST_CHECK_THROW(assert_global_state_shape(named_account_program(
                               "GlobalState", {{"wire_state", prim(idl::primitive_type::u8)}}, in_types)),
                            fc::assert_exception);
+         // The emergency stop is optional (a program predating it declares none),
+         // but when declared it must be the bool the crank reads.
+         BOOST_CHECK_NO_THROW(assert_global_state_shape(
+            global_state_program({"PostLaunch"}, in_types, prim(idl::primitive_type::bool_t))));
+         BOOST_CHECK_THROW(assert_global_state_shape(
+                              global_state_program({"PostLaunch"}, in_types, prim(idl::primitive_type::u8))),
+                           fc::assert_exception);
       }
    }
 } FC_LOG_AND_RETHROW();
@@ -3173,6 +3307,61 @@ BOOST_AUTO_TEST_CASE(liq_yield_report_is_due_only_post_launch) try {
    BOOST_CHECK(!liq_yield_report_due(fc::mutable_variant_object()("paused", false)));
    // A bare string is not the decoder's shape: never due rather than guessed.
    BOOST_CHECK(!liq_yield_report_due(fc::mutable_variant_object()("wire_state", "PostLaunch")));
+} FC_LOG_AND_RETHROW();
+
+// The emergency stop: while `GlobalState.frozen` is set the program refuses
+// `report_liq_yield`, so the crank does not fire. A row without `frozen` comes
+// from an IDL that declares no emergency stop and stays due; a `frozen` of any
+// other shape is a misdecoded row and never due.
+BOOST_AUTO_TEST_CASE(liq_yield_report_is_not_due_while_the_outpost_is_frozen) try {
+   using sysio::outpost_solana_client_detail::liq_outpost_frozen;
+   using sysio::outpost_solana_client_detail::liq_yield_report_due;
+   auto state = [](const char* variant, std::optional<fc::variant> frozen) {
+      fc::mutable_variant_object row;
+      row("wire_state", fc::mutable_variant_object()("variant", variant));
+      if (frozen) row("frozen", *frozen);
+      return fc::variant_object(row);
+   };
+   BOOST_CHECK(!liq_outpost_frozen(state("PostLaunch", fc::variant(false))));
+   BOOST_CHECK(liq_yield_report_due(state("PostLaunch", fc::variant(false))));
+
+   BOOST_CHECK(liq_outpost_frozen(state("PostLaunch", fc::variant(true))));
+   BOOST_CHECK(!liq_yield_report_due(state("PostLaunch", fc::variant(true))));
+   BOOST_CHECK(!liq_yield_report_due(state("PreLaunch", fc::variant(true))));
+
+   BOOST_CHECK(!liq_outpost_frozen(state("PostLaunch", std::nullopt)));
+   BOOST_CHECK(liq_yield_report_due(state("PostLaunch", std::nullopt)));
+
+   BOOST_CHECK(liq_outpost_frozen(state("PostLaunch", fc::variant(uint64_t{0}))));
+   BOOST_CHECK(!liq_yield_report_due(state("PostLaunch", fc::variant("false"))));
+} FC_LOG_AND_RETHROW();
+
+// A `GlobalState` still at the pre-freeze layout (8 + 131 bytes, wire-solana
+// `GLOBAL_STATE_PRE_FREEZE_INIT_SPACE`) cannot carry the `frozen` the loaded IDL
+// declares: the crank treats it as not due instead of decoding past its end. The
+// grown account (one byte longer) is read normally, and an IDL that declares no
+// emergency stop never gates on the length.
+BOOST_AUTO_TEST_CASE(global_state_predates_freeze_only_under_an_idl_that_declares_it) try {
+   namespace detail = sysio::outpost_solana_client_detail;
+   using detail::global_state_predates_freeze;
+   constexpr size_t pre_freeze_bytes =
+      detail::global_state::anchor_discriminator_bytes + detail::global_state::pre_freeze_init_space;
+   BOOST_CHECK_EQUAL(pre_freeze_bytes, 139u);
+
+   for (bool in_types : {false, true}) {
+      BOOST_TEST_CONTEXT("fields in types section: " << in_types) {
+         const auto with_freeze =
+            global_state_program({"PostLaunch"}, in_types, prim(idl::primitive_type::bool_t));
+         BOOST_CHECK(global_state_predates_freeze(with_freeze, pre_freeze_bytes));
+         // The layout before the liq fields (8 + 115) is older still.
+         BOOST_CHECK(global_state_predates_freeze(with_freeze, pre_freeze_bytes - 16));
+         BOOST_CHECK(!global_state_predates_freeze(with_freeze, pre_freeze_bytes + 1));
+
+         const auto without_freeze = global_state_program({"PostLaunch"}, in_types);
+         BOOST_CHECK(!global_state_predates_freeze(without_freeze, pre_freeze_bytes));
+      }
+   }
+   BOOST_CHECK(!global_state_predates_freeze(idl::program{}, 0));
 } FC_LOG_AND_RETHROW();
 
 // The overrides cover every non-signer account `report_liq_yield` declares, and

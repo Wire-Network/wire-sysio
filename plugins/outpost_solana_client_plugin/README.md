@@ -458,7 +458,7 @@ attestation. The shapes and what each derives:
 | `withdraw_remit`, `slash`, `deposit_revert` | `OPERATOR_ACTION` | the operator / depositor, their `CollateralPosition` PDA, and under SPL custody the collateral vault, the destination ATA and the token program |
 | `swap_remit`, `swap_revert` | `SWAP_REMIT`, `SWAP_REVERT` | the `Reserve` PDA, and under SPL custody the reserve vault, the recipient's ATA, the custody mint, its token program and any transfer-hook metas |
 | `reserve_ready`, `reserve_create_cancelled` | `RESERVE_READY`, `RESERVE_CREATE_CANCELLED` | the `Reserve` PDA, plus the creator's refund accounts for the cancel |
-| `desyndicate_liq` | `DESYNDICATE_LIQ` | the liqSOL pool's `GlobalState` and `DistributionState` singletons, the pool authority, the pool and user Token-2022 ATAs with their `UserRecord`s, the bucket ATA, the liqSOL mint, Token-2022, the bucket authority, the mint's transfer-hook program and extra-metas PDA, and liqsol-core itself |
+| `desyndicate_liq` | `DESYNDICATE_LIQ` | the liqSOL pool's `GlobalState` and `DistributionState` singletons, the pool authority, the pool and user Token-2022 ATAs with their `UserRecord`s, the bucket ATA, the liqSOL mint, Token-2022, the bucket authority, the mint's transfer-hook program and extra-metas PDA, and liqsol-core itself; plus, for every non-zero request id and even when `DistributionState` cannot be read, the writable `PendingPayout` PDA (`["pending_desyndication", request_id_le8]`) the handler stores the payout at whenever it cannot pay inline: the outpost is frozen, the solvency check finds a custody shortfall, a share record is still the legacy layout, or the settlement meets any other chain-state refusal (wire-solana `PendingPayoutReason`: `OutpostFrozen`, `CustodyShortfall`, `LegacyUserRecord`, `SettlementRefused`). Without it any of these aborts the dispatch with `EffectAccountMissing` |
 
 Custody is read from the account the on-chain handler branches on (`Reserve`,
 `CollateralPosition`, `DistributionState`), never from the mutable `OutpostConfig` token
@@ -477,8 +477,11 @@ Once per epoch, right after this operator's envelope delivery lands, the outboun
 job calls `crank_outpost`. On Solana that is liqsol-core's permissionless
 `report_liq_yield`: it claims the syndicated pool's pending rewards and reports the delta
 since the previous report as one `LIQ_YIELD` attestation (a no-op on chain when nothing
-new was claimed). The relay reads `GlobalState.wire_state` first and submits only
-PostLaunch, derives every account of the instruction (`report_liq_yield_overrides`),
+new was claimed). The relay reads `GlobalState` first and submits only when it is
+PostLaunch and its emergency stop (`frozen`) is clear -- a frozen outpost is logged at
+info and skipped, and an account still at the pre-freeze layout (8 + 131 bytes, not yet
+grown by `migrate_global_state_liq_fields`) is logged and treated as not due. It derives
+every account of the instruction (`report_liq_yield_overrides`),
 signs with the operator's Solana key, and skips on a program that does not declare the
 instruction. A failed crank is logged by the job and retried with the next epoch's
 delivery.

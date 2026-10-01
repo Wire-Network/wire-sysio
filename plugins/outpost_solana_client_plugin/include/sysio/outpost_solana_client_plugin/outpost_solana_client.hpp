@@ -5,6 +5,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -483,6 +484,18 @@ namespace global_state {
    /// The `WireState` variant in which the syndicated pool is outpost property
    /// and `report_liq_yield` is accepted.
    constexpr auto post_launch      = "PostLaunch";
+   /// The emergency-stop flag (wire-solana `GlobalState.frozen`, set by
+   /// `set_frozen`). While it is set the program refuses `report_liq_yield`
+   /// and stores every `DESYNDICATE_LIQ` as a pending payout instead of paying it.
+   constexpr auto field_frozen     = "frozen";
+   /// Byte width of an Anchor account discriminator, which precedes the Borsh body.
+   inline constexpr size_t anchor_discriminator_bytes = 8;
+   /// `GlobalState::INIT_SPACE` before `frozen` was appended -- a byte-exact mirror
+   /// of wire-solana's `GLOBAL_STATE_PRE_FREEZE_INIT_SPACE`. An account whose body is
+   /// no longer than this predates the freeze and has not been grown by
+   /// `migrate_global_state_liq_fields`; the program refuses every handler that reads
+   /// the current layout on it.
+   inline constexpr size_t pre_freeze_init_space = 131;
 } // namespace global_state
 
 /// The key libfc's IDL decoder renders an enum field's variant name under.
@@ -514,10 +527,30 @@ namespace report_liq_yield_accounts {
    constexpr auto system_program           = "system_program";
 } // namespace report_liq_yield_accounts
 
-/// True iff a decoded `GlobalState` says the outpost is PostLaunch -- the one
-/// state `report_liq_yield` accepts. Anything else (another state, a missing or
-/// misshaped field) reads as "not due", so the crank never pays for a refused tx.
+/// True iff a decoded `GlobalState` says the outpost's emergency stop is set.
+/// `frozen` absent from the row means the loaded IDL declares no emergency stop
+/// (a program that predates it), which is "not frozen"; `frozen` present but not
+/// a bool is a misdecoded row and reads as frozen, so the crank never pays for a
+/// tx the program could refuse.
+bool liq_outpost_frozen(const fc::variant_object& global_state);
+
+/// True iff a decoded `GlobalState` says `report_liq_yield` would be accepted:
+/// the outpost is PostLaunch and not frozen (`liq_outpost_frozen`). Anything
+/// else (another state, a missing or misshaped field, the emergency stop) reads
+/// as "not due", so the crank never pays for a refused tx.
 bool liq_yield_report_due(const fc::variant_object& global_state);
+
+/// True iff the loaded IDL declares `GlobalState.frozen` but the on-chain account
+/// is too short to carry it: `account_bytes` is no longer than the discriminator
+/// plus `global_state::pre_freeze_init_space`. Such an account has not been grown
+/// by `migrate_global_state_liq_fields`; the IDL-driven decode would run past its
+/// end, and the program refuses the crank on it anyway, so the crank treats it as
+/// "not due". An IDL without `frozen` never predates the freeze -- its program has
+/// no emergency stop and its own layout is the current one.
+///
+/// @param program        the loaded outpost program IDL.
+/// @param account_bytes  the `GlobalState` account's data length, discriminator included.
+bool global_state_predates_freeze(const fc::network::solana::idl::program& program, size_t account_bytes);
 
 /// The `report_liq_yield` account overrides: every named account of the
 /// instruction except the signer, derived from the program id, the pool's
@@ -532,7 +565,8 @@ fc::network::solana::account_overrides_t report_liq_yield_overrides(
    const fc::network::solana::solana_public_key& outbound_message_buffer_pda);
 
 /// Assert the loaded IDL declares `GlobalState` with a `wire_state` whose enum
-/// type carries the `PostLaunch` variant the yield crank gates on. Boot-checked
+/// type carries the `PostLaunch` variant the yield crank gates on, and -- when it
+/// declares the `frozen` emergency stop at all -- declares it as a bool. Boot-checked
 /// only on a program that declares `report_liq_yield`.
 void assert_global_state_shape(const fc::network::solana::idl::program& program);
 
@@ -774,6 +808,25 @@ derive_liqsol_pool_authority_pda(const fc::network::solana::solana_public_key& p
 fc::network::solana::solana_public_key
 derive_liqsol_bucket_authority_pda(const fc::network::solana::solana_public_key& program_id);
 
+/// Seed prefix of liqsol-core's `PendingPayout` PDA -- a byte-exact mirror of
+/// wire-solana's `PENDING_PAYOUT_SEED` (`states/pending_payout.rs`). Exported so
+/// the derivation and its tests spell the seed through ONE constant.
+inline constexpr std::string_view PENDING_DESYNDICATION_SEED = "pending_desyndication";
+
+/// The `PendingPayout` PDA a `DESYNDICATE_LIQ` is stored at when the outpost
+/// cannot pay it inline (the emergency stop, or a legacy `UserRecord`): seeds
+/// `["pending_desyndication", request_id.to_le_bytes()]`, byte-exact with
+/// wire-solana's `PendingPayout::find_address` and `defer_desyndication`. A seed
+/// drift derives a well-formed WRONG address; the handler then aborts the
+/// dispatch window with `EffectAccountMissing` on every retry.
+///
+/// @param program_id  the liqsol-core program id.
+/// @param request_id  the depot's `DesyndicateLIQ.request_id` (never 0 on a real
+///                    desyndication; the manifest omits the PDA for 0).
+fc::network::solana::solana_public_key
+derive_pending_desyndication_pda(const fc::network::solana::solana_public_key& program_id,
+                                 uint64_t                                      request_id);
+
 /// The `UserRecord` PDA of one liqSOL token account: seeds
 /// `["user_record", token_account.as_ref()]`.
 fc::network::solana::solana_public_key
@@ -849,6 +902,10 @@ struct inbound_effect {
    /// `deposit_revert`): the `token_code` keying the `CollateralPosition`
    /// PDA and its pinned custody lookup.
    std::optional<uint64_t>                               collateral_token_code;
+   /// Set for `desyndicate_liq`: the depot's `DesyndicateLIQ.request_id`, which
+   /// keys the `PendingPayout` PDA the handler stores the payout at when it
+   /// cannot pay inline (`derive_pending_desyndication_pda`).
+   std::optional<uint64_t>                               desyndication_request_id;
 };
 
 /// Walk `envelope_bytes` ONCE and return every attestation that needs effect
@@ -913,8 +970,13 @@ uint32_t count_inbound_attestations(const std::vector<char>& envelope_bytes);
 ///   * `desyndicate_liq` derives everything from the user, the program's fixed
 ///     pool PDAs and the mint on `DistributionState`, read through
 ///     `read_liq_pool` at most ONCE per build. A degraded (empty) read costs
-///     the attestation everything but the two state singletons, which is what
-///     lets the handler log-and-skip an uninitialized pool instead of aborting.
+///     the attestation everything but the two state singletons and the
+///     pending-payout PDA, which is what lets the handler log-and-skip an
+///     uninitialized pool instead of aborting. The pending-payout PDA
+///     (`derive_pending_desyndication_pda`, writable) rides right after the
+///     singletons for every non-zero request id, pool read or not: the handler's
+///     frozen-outpost deferral needs it before any pool account, and its
+///     legacy-`UserRecord` deferral after them; the paid path never touches it.
 ///
 /// @param program_id            outpost program id, for PDA derivation.
 /// @param effects               account-needing attestations, in dispatch order.
