@@ -44,6 +44,8 @@ struct contracts {
    static std::vector<char>    liq_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.liq/sysio.liq.abi"); }
    static std::vector<uint8_t> bond_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.bond/sysio.bond.wasm"); }
    static std::vector<char>    bond_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.bond/sysio.bond.abi"); }
+   static std::vector<uint8_t> synd_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.synd/sysio.synd.wasm"); }
+   static std::vector<char>    synd_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.synd/sysio.synd.abi"); }
    static std::vector<uint8_t> andon_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.andon/sysio.andon.wasm"); }
    static std::vector<char>    andon_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.andon/sysio.andon.abi"); }
    /// The checked-in bootstrap configs (`dex-config.*.json`) the launch-ingestion tests replay.

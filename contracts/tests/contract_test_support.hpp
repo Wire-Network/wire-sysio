@@ -2,11 +2,22 @@
 
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
+#include <sysio/opp/types/types.pb.h>
 #include <sysio/testing/tester.hpp>
 
+#include <fc/crypto/elliptic_em.hpp>
+#include <fc/crypto/hex.hpp>
+#include <fc/crypto/keccak256.hpp>
+#include <fc/crypto/private_key.hpp>
+#include <fc/crypto/public_key.hpp>
+#include <fc/crypto/signature.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/slug_name.hpp>
 #include <fc/variant_object.hpp>
+
+#include <magic_enum/magic_enum.hpp>
+
+#include <string>
 
 namespace sysio_system::test_support {
 
@@ -149,6 +160,26 @@ inline fc::mutable_variant_object svm_outpost_mvo(std::string_view program_id) {
       ("opp_inbound_addr",       std::string{})
       ("operator_registry_addr", std::string{})
       ("source_deposit_addr",    std::string{});
+}
+
+/// The message `sysio.authex::createlink` verifies a signature over, for an EM key, composed
+/// exactly as the contract composes it: `"PUB_EM_" + hex(compressed 33 bytes)`, the account, the
+/// chain kind's integer, the nonce and the fixed suffix, `|`-separated.
+inline std::string build_link_message(const fc::crypto::public_key& pub_key, const std::string& account,
+                                      sysio::opp::types::ChainKind chain_kind, uint64_t nonce) {
+   const auto compressed  = pub_key.get<fc::em::public_key_shim>().serialize();   // std::array<char, 33>
+   const auto pub_key_str = "PUB_EM_" + fc::to_hex(compressed.data(), compressed.size());
+   return pub_key_str + "|" + account + "|" + std::to_string(magic_enum::enum_integer(chain_kind)) + "|" +
+          std::to_string(nonce) + "|createlink auth";
+}
+
+/// Sign a `createlink` for `account` on `chain_kind` with the EM key `priv` at `nonce`: keccak of the
+/// message, signed as the contract recovers it (the EM signer wraps the digest in EIP-191).
+inline fc::crypto::signature sign_createlink(const fc::crypto::private_key& priv, const std::string& account,
+                                             sysio::opp::types::ChainKind chain_kind, uint64_t nonce) {
+   const auto msg_hash =
+      fc::crypto::keccak256::hash(build_link_message(priv.get_public_key(), account, chain_kind, nonce));
+   return priv.sign(fc::sha256(reinterpret_cast<const char*>(msg_hash.data()), 32));
 }
 
 /// Mirrors of sysio.roa's `nodeownerreg` audit values (`reg_status` / `reject_reason` in sysio.roa.hpp).

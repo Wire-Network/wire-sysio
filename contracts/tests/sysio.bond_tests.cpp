@@ -11,8 +11,6 @@
 
 #include "contracts.hpp"
 #include "contract_test_support.hpp"
-#include "liq_test_support.hpp"
-#include <fc/crypto/private_key.hpp>
 
 #include <optional>
 #include <string>
@@ -128,7 +126,8 @@ struct raw_yield_index {
 FC_REFLECT(raw_yield_index, (index)(pot)(carry))
 
 /// sysio.bond on the depot: the registries and custody contracts it resolves tokens through,
-/// sysio.liq as the shadow custody contract and yield source. The treasury supply of WIRE sits on `sysio`, as the bootstrap leaves it.
+/// sysio.liq as the shadow custody contract and yield source, and sysio.synd as the signer that
+/// mints shadow LIQ (an account only). The treasury supply of WIRE sits on `sysio`, as the bootstrap leaves it.
 class sysio_bond_tester : public tester {
 public:
    static constexpr auto BOND_ACCOUNT   = "sysio.bond"_n;
@@ -175,7 +174,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_LIQ, LIQSOL, 9));
       BOOST_REQUIRE_EQUAL(success(), create_shadow(LIQSOL_SYM, LIQSOL));
 
-      // Shadow LIQSOL for the issuer and two underwriters, seeded through governance.
+      // Shadow LIQSOL for the issuer and two underwriters, minted by sysio.synd, the only minter.
       for (auto holder : { "alice"_n, "bob"_n, "issuer"_n }) {
          BOOST_REQUIRE_EQUAL(success(), mint(holder, 1'000 * UNIT));
          BOOST_REQUIRE_EQUAL(1'000 * UNIT, liq_balance(holder));
@@ -227,11 +226,11 @@ public:
       return push(LIQ_ACCOUNT, liq_abi_ser, LIQ_ACCOUNT, "create"_n, mvo()
          ("sym", sym)("chain_code", codename_mvo(SOLANA))("token_code", codename_mvo(token_code)));
    }
-   /// Seed a nine-decimal fixture token through the ledger's governance credit action.
+   /// Mint `amount` of the shadow of `token_code` (LIQSOL by default) to `account`, signed as
+   /// sysio.synd.
    action_result mint(name account, uint64_t amount, std::string_view token_code = LIQSOL) {
-      const symbol sym{LIQSOL_SYM.decimals(), std::string(token_code)};
-      return push(LIQ_ACCOUNT, liq_abi_ser, LIQ_ACCOUNT, "recredit"_n, mvo()
-         ("holder", account)("quantity", asset(static_cast<int64_t>(amount), sym)));
+      return push(LIQ_ACCOUNT, liq_abi_ser, SYND_ACCOUNT, "mint"_n, mvo()
+         ("to", account)("token_code", codename_mvo(token_code))("amount", amount));
    }
    /// Distribute `amount` WIRE from `from` to the holders of `sym` (LIQSOL by default) through
    /// sysio.liq, raising its index.
@@ -240,23 +239,14 @@ public:
          ("from", from)("quantity", asset(static_cast<int64_t>(amount), WIRE_SYM))
          ("target", sym.to_symbol_code()));
    }
-   /// Burn the fixture holder's shadow through the ledger's desyndication action.
-   /// A trusted SVM link supplies the outbound destination for the supply-drain case.
+   /// Burn `amount` of `holder`'s shadow `sym` (the shadow of registry token `token_code`) the way a
+   /// de-syndication does: the holder moves it to sysio.synd, which burns it out of its own row.
    action_result burn_shadow(name holder, uint64_t amount, symbol sym, std::string_view token_code) {
-      constexpr auto authex_account = "sysio.authex"_n;
-      constexpr auto msgch_account = "sysio.msgch"_n;
-      for (auto account : {authex_account, msgch_account})
-         if (control->find_account(account) == nullptr) create_accounts({account});
-      abi_serializer authex_ser, msgch_ser;
-      deploy(authex_account, contracts::authex_wasm(), contracts::authex_abi(), authex_ser, true);
-      deploy(msgch_account, contracts::msgch_wasm(), contracts::msgch_abi(), msgch_ser, true);
-      const auto pubkey = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::ed).get_public_key();
-      auto result = push(authex_account, authex_ser, authex_account, "recordlink"_n, mvo()
-         ("account", holder)("chain_kind", ChainKind::CHAIN_KIND_SVM)("pub_key", pubkey)
-         ("native_address", sysio_liq::test_support::native_address_of(pubkey)));
-      if (result != success()) return result;
-      return push(LIQ_ACCOUNT, liq_abi_ser, holder, "desyndicate"_n, mvo()
-         ("holder", holder)("quantity", asset(static_cast<int64_t>(amount), sym)));
+      auto r = push(LIQ_ACCOUNT, liq_abi_ser, holder, "transfer"_n, mvo()
+         ("from", holder)("to", SYND_ACCOUNT)("quantity", asset(static_cast<int64_t>(amount), sym))("memo", ""));
+      if (r != success()) return r;
+      return push(LIQ_ACCOUNT, liq_abi_ser, SYND_ACCOUNT, "burn"_n, mvo()
+         ("token_code", codename_mvo(token_code))("amount", amount));
    }
    /// sysio.liq pays `holder` the WIRE its LIQSOL row is owed.
    action_result liq_claim(name holder) {

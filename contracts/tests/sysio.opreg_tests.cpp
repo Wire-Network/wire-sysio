@@ -196,7 +196,7 @@ constexpr auto regchain = "regchain"_n;
 constexpr auto regtoken = "regtoken"_n;
 constexpr auto regctok  = "regctok"_n;
 constexpr auto create   = "create"_n;
-constexpr auto mint     = "recredit"_n;
+constexpr auto mint     = "mint"_n;
 constexpr auto queueout = "queueout"_n;
 } // namespace shadow_action
 
@@ -748,11 +748,12 @@ public:
          ("token_code", codename_mvo(kLiqEthCodename))));
    }
 
-   /// Seed `holder` with shadow LIQ through the ledger's governance credit action.
+   /// Put `amount` LIQETH shadow in `holder`'s hands the way the depot mints it: `sysio.synd`, the
+   /// ledger's only minter, calling `mint`.
    void mint_shadow(name holder, uint64_t amount) {
       const int64_t before = shadow_balance(holder);
-      BOOST_REQUIRE_EQUAL(success(), push_contract(LIQ_ACCOUNT, liq_abi_ser, LIQ_ACCOUNT, shadow_action::mint,
-         mvo()("holder", holder)("quantity", asset(static_cast<int64_t>(amount), kLiqEthSymbol))));
+      BOOST_REQUIRE_EQUAL(success(), push_contract(LIQ_ACCOUNT, liq_abi_ser, SYND_ACCOUNT, shadow_action::mint,
+         mvo()("to", holder)("token_code", codename_mvo(kLiqEthCodename))("amount", amount)));
       BOOST_REQUIRE_EQUAL(before + static_cast<int64_t>(amount), shadow_balance(holder));
    }
 

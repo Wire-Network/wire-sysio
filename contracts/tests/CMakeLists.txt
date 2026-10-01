@@ -108,10 +108,10 @@ add_contract_suite(sysio_chains_tests sysio.chains_tests.cpp ACCOUNTS sysio.chai
 add_contract_suite(sysio_councl_tests sysio.councl_tests.cpp ACCOUNTS
   sysio.councl sysio.msig sysio.system sysio.token)
 add_contract_suite(sysio_dclaim_tests sysio.dclaim_tests.cpp ACCOUNTS sysio.dclaim)
-add_contract_suite(sysio_dispatch_tests sysio.dispatch_tests.cpp ACCOUNTS
-  sysio.authex sysio.chains sysio.chalg sysio.epoch
+add_contract_suite(sysio_dispatch_tests sysio.dispatch_tests.cpp ACCOUNTS sysio.andon
+  sysio.authex sysio.bond sysio.chains sysio.chalg sysio.epoch
   sysio.msgch sysio.opreg sysio.opp.common sysio.reserv
-  sysio.system sysio.token sysio.uwrit)
+  sysio.synd sysio.system sysio.token sysio.uwrit)
 add_contract_suite(sysio_dispute_tests sysio.dispute_tests.cpp ACCOUNTS
   sysio.chains sysio.chalg sysio.epoch sysio.msgch
   sysio.msig sysio.opreg sysio.roa sysio.system
@@ -125,9 +125,8 @@ add_contract_suite(sysio_system_finalizer_key_tests sysio.finalizer_key_tests.cp
 add_contract_suite(sysio_inline_auth_tests sysio.inline_auth_tests.cpp ACCOUNTS sysio.system test.sendinline)
 add_contract_suite(sysio_system_limitauth_tests sysio.limitauth_tests.cpp ACCOUNTS
   sysio.msig sysio.system sysio.token)
-add_contract_suite(sysio_liq_tests sysio.liq_tests.cpp ACCOUNTS
-  sysio.authex sysio.chains sysio.liq sysio.msgch
-  sysio.swap sysio.token sysio.tokens)
+add_contract_suite(sysio_liq_tests sysio.liq_tests.cpp ACCOUNTS sysio.andon
+  sysio.chains sysio.liq sysio.swap sysio.token sysio.tokens)
 add_contract_suite(sysio_msgch_chain_tests sysio.msgch_chain_tests.cpp ACCOUNTS
   sysio.chains sysio.chalg sysio.epoch sysio.msgch
   sysio.opreg sysio.roa sysio.system sysio.token
@@ -148,9 +147,13 @@ add_contract_suite(sysio_roa_tests sysio.roa_tests.cpp ACCOUNTS
   sysio.token test.noop test.sendinline)
 add_contract_suite(sysio_snapshot_attest_tests sysio.snapshot_attest_tests.cpp ACCOUNTS
   sysio.msig sysio.system sysio.token)
-add_contract_suite(sysio_swap_tests sysio.swap_tests.cpp ACCOUNTS
+add_contract_suite(sysio_swap_tests sysio.swap_tests.cpp ACCOUNTS sysio.andon
   sysio.chains sysio.liq sysio.opp.common sysio.swap
   sysio.token sysio.tokens test.badtoken)
+add_contract_suite(sysio_synd_tests sysio.synd_tests.cpp ACCOUNTS sysio.andon
+  sysio.authex sysio.bond sysio.chains sysio.dclaim sysio.epoch
+  sysio.liq sysio.msgch sysio.opp.common sysio.swap sysio.synd
+  sysio.token sysio.tokens)
 add_contract_suite(sysio_system_blockinfo_tests sysio.system_blockinfo_tests.cpp ACCOUNTS
   sysio.msig sysio.system sysio.token test.blockinfo_tester)
 add_contract_suite(sysio_system_tests sysio.system_tests.cpp ACCOUNTS
