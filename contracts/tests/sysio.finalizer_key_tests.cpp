@@ -180,6 +180,42 @@ BOOST_FIXTURE_TEST_CASE(register_finalizer_key_failure_tests, finalizer_key_test
 } // register_finalizer_key_invalid_key_tests
 FC_LOG_AND_RETHROW()
 
+/// Inactive producer rows cannot add keys; reactivation and key cleanup remain available.
+BOOST_FIXTURE_TEST_CASE(register_finalizer_key_requires_active_producer, finalizer_key_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), regproducer(alice));
+   BOOST_REQUIRE_EQUAL(success(), register_finalizer_key(alice, finalizer_key_1, pop_1));
+
+   BOOST_REQUIRE_EQUAL(success(), push_action(alice, "unregprod"_n, mvo()("producer", alice)));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("finalizer alice1111111 is not an eligible producer"),
+                       register_finalizer_key(alice, finalizer_key_2, pop_2));
+   BOOST_REQUIRE_EQUAL(1, get_finalizer_info(alice)["finalizer_key_count"].as_uint64());
+   // Losing eligibility must not prevent cleanup of keys already registered.
+   BOOST_REQUIRE_EQUAL(success(), delete_finalizer_key(alice, finalizer_key_1));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("finalizer alice1111111 is not an eligible producer"),
+                       register_finalizer_key(alice, finalizer_key_2, pop_2));
+
+   // A producer with live operator standing can reactivate and register again.
+   BOOST_REQUIRE_EQUAL(success(), regproducer(alice));
+   BOOST_REQUIRE_EQUAL(success(), register_finalizer_key(alice, finalizer_key_2, pop_2));
+   BOOST_REQUIRE_EQUAL(success(), push_action("sysio"_n, "rmvproducer"_n, mvo()("producer", alice)));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("finalizer alice1111111 is not an eligible producer"),
+                       register_finalizer_key(alice, finalizer_key_3, pop_3));
+   BOOST_REQUIRE_EQUAL(1, get_finalizer_info(alice)["finalizer_key_count"].as_uint64());
+   BOOST_REQUIRE_EQUAL(success(), delete_finalizer_key(alice, finalizer_key_2));
+} FC_LOG_AND_RETHROW()
+
+/// A terminated operator cannot reserve a finalizer key despite retaining its producer row.
+BOOST_FIXTURE_TEST_CASE(register_finalizer_key_requires_active_operator, finalizer_key_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), regproducer(alice));
+   terminate_operator(alice);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("finalizer alice1111111 is not an eligible producer"),
+                       register_finalizer_key(alice, finalizer_key_1, pop_1));
+   BOOST_REQUIRE(get_finalizer_info(alice).is_null());
+   // A rejected registration must not reserve the key against an eligible producer.
+   BOOST_REQUIRE_EQUAL(success(), regproducer(bob));
+   BOOST_REQUIRE_EQUAL(success(), register_finalizer_key(bob, finalizer_key_1, pop_1));
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE(register_finalizer_key_by_same_finalizer_tests, finalizer_key_tester) try {
    add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
 

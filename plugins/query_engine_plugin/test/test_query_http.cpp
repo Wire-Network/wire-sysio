@@ -82,9 +82,11 @@ struct http_application {
                                     "--chain-state-db-size-mb",
                                     "64",
                                     "--chain-state-db-guard-size-mb",
-                                    "0",
-                                    "--sys-vm-oc-enable",
-                                    "none"};
+                                    "0"};
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+      // chain_plugin registers this option only in builds with the OC runtime.
+      args.insert(args.end(), {"--sys-vm-oc-enable", "none"});
+#endif
       if (enabled)
          args.insert(args.end(), {"--plugin", "sysio::query_engine_plugin"});
       if (enable_http)
