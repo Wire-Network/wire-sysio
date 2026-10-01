@@ -56,6 +56,7 @@ add_subdirectory(sysio.councl)
 add_subdirectory(sysio.reserv)
 add_subdirectory(sysio.dclaim)
 
+add_subdirectory(sysio.andon)
 add_subdirectory(sysio.token)
 add_subdirectory(sysio.wrap)
 add_subdirectory(sysio.swap)

@@ -95,6 +95,10 @@ add_contract_suite(sysio_producer_score_tests emissions_tests.cpp ACCOUNTS
 add_contract_suite(getpeerkeys_tests getpeerkeys_tests.cpp ACCOUNTS
   sysio.msig sysio.system sysio.token)
 add_contract_suite(safe_ops_tests safe_ops_tests.cpp ACCOUNTS sysio.opp.common)
+add_contract_suite(sysio_andon_tests sysio.andon_tests.cpp ACCOUNTS
+  sysio.andon sysio.bond sysio.liq sysio.swap
+  sysio.synd sysio.token sysio.tokens sysio.chains
+  sysio.authex sysio.msgch sysio.epoch)
 add_contract_suite(sysio_authex_tests sysio.authex_tests.cpp ACCOUNTS sysio.authex)
 add_contract_suite(sysio_bios_if_tests sysio.bios_inst_fin_tests.cpp ACCOUNTS sysio.bios)
 add_contract_suite(sysio_chains_tests sysio.chains_tests.cpp ACCOUNTS sysio.chains)

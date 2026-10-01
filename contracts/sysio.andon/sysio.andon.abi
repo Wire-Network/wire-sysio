@@ -1,0 +1,162 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "addpuller",
+            "base": "",
+            "fields": [
+                {
+                    "name": "contract",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "andon_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "panic",
+                    "type": "name"
+                },
+                {
+                    "name": "pullers",
+                    "type": "name[]"
+                }
+            ]
+        },
+        {
+            "name": "clear",
+            "base": "",
+            "fields": [
+                {
+                    "name": "actor",
+                    "type": "name"
+                },
+                {
+                    "name": "note",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "cord_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pulled",
+                    "type": "bool"
+                },
+                {
+                    "name": "pulled_by",
+                    "type": "name"
+                },
+                {
+                    "name": "pulled_at",
+                    "type": "time_point"
+                },
+                {
+                    "name": "reason",
+                    "type": "string"
+                },
+                {
+                    "name": "pulled_at_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "cleared_by",
+                    "type": "name"
+                },
+                {
+                    "name": "cleared_at",
+                    "type": "time_point"
+                },
+                {
+                    "name": "note",
+                    "type": "string"
+                },
+                {
+                    "name": "cleared_at_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "pull_count",
+                    "type": "uint64"
+                },
+                {
+                    "name": "frozen_epochs",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "pull",
+            "base": "",
+            "fields": [
+                {
+                    "name": "actor",
+                    "type": "name"
+                },
+                {
+                    "name": "reason",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "setpanic",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "addpuller",
+            "type": "addpuller",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "clear",
+            "type": "clear",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "pull",
+            "type": "pull",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setpanic",
+            "type": "setpanic",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "andonconfig",
+            "type": "andon_config",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 58557
+        },
+        {
+            "name": "cord",
+            "type": "cord_state",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 28648
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}

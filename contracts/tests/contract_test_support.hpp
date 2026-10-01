@@ -76,18 +76,32 @@ typename Tester::action_result push_contract_action(Tester& tester, name contrac
    }
 }
 
+/// Push one ABI-encoded action and land it in its own block for stable TaPoS, handing back its
+/// trace in `trace` (null after a failure) so a test can inspect inline actions and notifications.
+template <typename Tester>
+typename Tester::action_result push_contract_action_and_produce_block(
+   Tester& tester, name contract, abi_serializer& serializer, name signer, name action_name,
+   const fc::variant_object& data, transaction_trace_ptr& trace, std::vector<permission_level> authorization = {}) {
+   trace.reset();
+   try {
+      trace = push_contract_action_trace(tester, contract, serializer, signer, action_name, data,
+                                         std::move(authorization));
+      tester.produce_block();
+      return Tester::success();
+   } catch (const fc::exception& ex) {
+      trace.reset();
+      return Tester::error(ex.top_message());
+   }
+}
+
 /// Push one ABI-encoded action and land it in its own block for stable TaPoS.
 template <typename Tester>
 typename Tester::action_result push_contract_action_and_produce_block(
    Tester& tester, name contract, abi_serializer& serializer, name signer, name action_name,
    const fc::variant_object& data, std::vector<permission_level> authorization = {}) {
-   try {
-      push_contract_action_trace(tester, contract, serializer, signer, action_name, data, std::move(authorization));
-      tester.produce_block();
-      return Tester::success();
-   } catch (const fc::exception& ex) {
-      return Tester::error(ex.top_message());
-   }
+   transaction_trace_ptr trace;
+   return push_contract_action_and_produce_block(tester, contract, serializer, signer, action_name, data, trace,
+                                                 std::move(authorization));
 }
 
 // ---------------------------------------------------------------------------
@@ -192,5 +206,50 @@ void fill_tier1(Tester& tester, abi_serializer& serializer, uint32_t occupancy =
    BOOST_REQUIRE_EQUAL(count(tester, serializer, tier1), occupancy);
 }
 } // namespace nodeowners
+
+// ---------------------------------------------------------------------------
+//  sysio.andon: the depot's emergency stop, for the suites of the contracts it freezes
+// ---------------------------------------------------------------------------
+
+namespace andon {
+
+/// The account the depot deploys sysio.andon on, which every frozen contract reads.
+inline constexpr auto account = "sysio.andon"_n;
+/// The configuration authority, which may also pull and clear the cord.
+inline constexpr auto system_account = "sysio"_n;
+
+/// Create sysio.andon's account when it does not exist, deploy `wasm` and `abi` on it privileged (as the
+/// depot deploys it) and load its ABI into `ser`.
+template <typename Tester>
+void deploy(Tester& tester, abi_serializer& ser, const std::vector<uint8_t>& wasm, const std::vector<char>& abi) {
+   if (tester.control->find_account(account) == nullptr) tester.create_accounts({account});
+   tester.set_code(account, wasm);
+   tester.set_abi(account, abi.data());
+   tester.set_privileged(account);
+   tester.produce_blocks();
+   load_account_abi(tester, account, ser);
+}
+
+/// Pull the cord as `actor`, signed by it.
+template <typename Tester>
+typename Tester::action_result pull(Tester& tester, abi_serializer& ser, name actor = system_account,
+                                    const std::string& reason = "test") {
+   return push_contract_action_and_produce_block(tester, account, ser, actor, "pull"_n,
+                                                 fc::mutable_variant_object()("actor", actor)("reason", reason));
+}
+
+/// Clear the cord as `actor`, signed by it.
+template <typename Tester>
+typename Tester::action_result clear(Tester& tester, abi_serializer& ser, name actor = system_account,
+                                     const std::string& note = "test") {
+   return push_contract_action_and_produce_block(tester, account, ser, actor, "clear"_n,
+                                                 fc::mutable_variant_object()("actor", actor)("note", note));
+}
+
+/// The message of the refusal every frozen signed action raises (`andon::FROZEN_MESSAGE`); a suite
+/// compares against `wasm_assert_msg(frozen_message)`.
+inline constexpr const char* frozen_message = "the andon cord is pulled: funds cannot leave custody";
+
+} // namespace andon
 
 } // namespace sysio_system::test_support
