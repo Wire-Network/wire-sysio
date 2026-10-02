@@ -4301,4 +4301,121 @@ BOOST_FIXTURE_TEST_CASE(generic_custody_shortfall_freezes_and_repair_resumes, ge
    BOOST_REQUIRE_EQUAL(0, pending(sym(1)));
 }
 
+// Governance resolves truth without collateral; providers supply collateral and
+// retain their challenge window. Compare the downstream economic trace, not the
+// deliberately different bond state or escrow owner.
+BOOST_AUTO_TEST_CASE(generic_governance_and_provider_release_have_identical_settlement) {
+   constexpr uint64_t Principal = 8 * external::Unit + 17;
+   constexpr uint64_t Yield = 2 * external::Unit;
+   constexpr uint64_t Return = external::Unit + 29;
+   constexpr uint32_t FeeBps = 37;
+   constexpr uint64_t Tranche = 3 * external::Unit;
+   constexpr uint64_t PrincipalFee = 2 * (Tranche * FeeBps / BPS_DENOMINATOR) +
+      (Principal - 2 * Tranche) * FeeBps / BPS_DENOMINATOR;
+   for (size_t i = 0; i < external::Assets.size(); ++i) {
+      for (const bool parked : {false, true}) {
+         std::vector<std::array<int64_t, 7>> provider_trace;
+         for (const bool governance : {false, true}) {
+            BOOST_TEST_CONTEXT("chain=" << external::Assets[i].chain << " parked=" << parked
+                               << " governance=" << governance) {
+               generic_synd_tester t;
+               auto& outpost = t.outposts[i];
+               const auto& a = outpost.asset();
+               const auto token = t.sym(i);
+               const auto private_key = fc::crypto::private_key::generate(a.kind == ChainKind::CHAIN_KIND_EVM
+                  ? fc::crypto::private_key::key_type::em : fc::crypto::private_key::key_type::ed);
+               const auto key = private_key.get_public_key();
+               const auto bytes = parked ? (a.kind == ChainKind::CHAIN_KIND_EVM ? t.em_bytes(key) : t.ed_bytes(key))
+                                         : t.users[i];
+               const auto holder = parked ? "bob"_n : "alice"_n;
+               BOOST_REQUIRE_EQUAL(t.success(), t.setconfig(a.chain, a.token,
+                  {.synd_fee_bps = FeeBps, .desynd_fee_bps = FeeBps,
+                   .synd_burst = 3 * external::Unit, .synd_refill = 3 * external::Unit, .window_sec = t.Window}));
+               const auto digest = t.digest_of("resolution parity");
+               sysio::opp::attestations::SyndicateLIQ deposit;
+               sysio::opp::attestations::LIQYield yield;
+               BOOST_REQUIRE(deposit.ParseFromString(outpost.deposit(bytes, Principal).second));
+               BOOST_REQUIRE(yield.ParseFromString(outpost.yield(Yield).second));
+               BOOST_REQUIRE_EQUAL(t.success(), t.set_epoch(1));
+               BOOST_REQUIRE_EQUAL(t.success(), t.onsynd(a.chain, 1, digest, deposit.sequence(), a.kind,
+                  bytes, a.token, Principal, t.MSGCH_ACCOUNT, deposit.total_syndicated()));
+               BOOST_REQUIRE_EQUAL(t.success(), t.onyield(a.chain, 1, digest, yield.sequence(), yield.epoch(),
+                  a.token, Yield, t.MSGCH_ACCOUNT, yield.total_syndicated()));
+               BOOST_REQUIRE_EQUAL(t.success(), t.closeenv(a.chain, 1, digest));
+               const auto request = t.envelope_row(a.chain, a.token, 1)["request_id"].as_uint64();
+               BOOST_REQUIRE_EQUAL(t.success(), t.crank());
+               BOOST_REQUIRE_EQUAL(0, t.liq_balance(holder, token));
+               BOOST_REQUIRE_EQUAL(0u, t.parked_balance(a.token, a.kind, bytes));
+               BOOST_REQUIRE_EQUAL(0u, t.envelope_row(a.chain, a.token, 1)["released"].as_uint64());
+               if (governance) {
+                  BOOST_REQUIRE_NE(t.success(), t.push(t.BOND_ACCOUNT, t.bond_abi_ser, "alice"_n,
+                     "rslvvalid"_n, mvo()("request_id", request)));
+                  BOOST_REQUIRE_EQUAL(t.success(), t.rule(request, true));
+                  BOOST_REQUIRE_EQUAL(0u, t.bond_request(request)["bonded"].as_uint64());
+               } else {
+                  t.accept(request);
+                  BOOST_REQUIRE_NE(t.success(), t.push(t.BOND_ACCOUNT, t.bond_abi_ser, "alice"_n,
+                     "approve"_n, mvo()("request_id", request)));
+               }
+               std::vector<std::array<int64_t, 7>> trace;
+               const auto capture = [&] {
+                  t.conservation();
+                  trace.push_back({t.supply(token), t.pending(token), t.liq_balance(holder, token),
+                     int64_t(t.parked_balance(a.token, a.kind, bytes)), int64_t(t.feepot_balance(a.token)),
+                     int64_t(t.envelope_row(a.chain, a.token, 1)["released"].as_uint64()),
+                     int64_t(outpost.custody())});
+               };
+               BOOST_REQUIRE_EQUAL(t.success(), t.andon_pull());
+               BOOST_REQUIRE_EQUAL(t.success(), t.crank());
+               BOOST_REQUIRE_EQUAL(0u, t.envelope_row(a.chain, a.token, 1)["released"].as_uint64());
+               // conservation() also requires the cord clear, so capture after clear.
+               BOOST_REQUIRE_EQUAL(t.success(), t.andon_clear());
+               for (uint32_t epoch = 2; epoch <= 6; ++epoch) {
+                  BOOST_REQUIRE_EQUAL(t.success(), t.set_epoch(epoch));
+                  BOOST_REQUIRE_EQUAL(t.success(), t.crank());
+                  capture();
+                  BOOST_REQUIRE_EQUAL(t.success(), t.crank());
+                  capture(); // same epoch must not replenish the bucket
+               }
+               BOOST_REQUIRE_EQUAL(STATE_DONE, t.envelope_row(a.chain, a.token, 1)["state"].as_string());
+               BOOST_REQUIRE_EQUAL(Principal + Yield,
+                  t.envelope_row(a.chain, a.token, 1)["released"].as_uint64());
+               if (!governance) {
+                  t.produce_block(fc::seconds(t.Window + 1));
+                  BOOST_REQUIRE_EQUAL(t.success(), t.push(t.BOND_ACCOUNT, t.bond_abi_ser, "alice"_n,
+                     "approve"_n, mvo()("request_id", request)));
+                  BOOST_REQUIRE_EQUAL(t.success(), t.bond_claim(request, "dave"_n));
+               }
+               if (parked) BOOST_REQUIRE_EQUAL(t.success(), t.createlink(holder, private_key, a.kind));
+               BOOST_REQUIRE_EQUAL(0u, t.parked_balance(a.token, a.kind, bytes));
+               BOOST_REQUIRE_EQUAL(int64_t(Principal - PrincipalFee), t.liq_balance(holder, token));
+               BOOST_REQUIRE_EQUAL(PrincipalFee, t.feepot_balance(a.token));
+               BOOST_REQUIRE_EQUAL(int64_t(Yield), t.pending(token));
+               BOOST_REQUIRE_EQUAL(int64_t(t.Bootstrap), t.liq_balance("dave"_n, token));
+               capture();
+               BOOST_REQUIRE_EQUAL(t.success(), t.desyndicate(holder, Return, token));
+               const auto outbound = queued_desyndication(t, 1);
+               BOOST_REQUIRE_EQUAL(a.kind, outbound.user().kind());
+               BOOST_REQUIRE_EQUAL(std::string(bytes.begin(), bytes.end()), outbound.user().address());
+               BOOST_REQUIRE_EQUAL(Return - Return * FeeBps / BPS_DENOMINATOR, outbound.amount().amount());
+               BOOST_REQUIRE(outpost.receive(outbound));
+               BOOST_REQUIRE(!outpost.receive(outbound));
+               capture();
+               if (governance) {
+                  constexpr std::array<std::string_view, 7> Fields{
+                     "supply", "pending yield", "recipient balance", "parked credit",
+                     "fee pot", "released", "external custody"};
+                  BOOST_REQUIRE_EQUAL(provider_trace.size(), trace.size());
+                  for (size_t checkpoint = 0; checkpoint < trace.size(); ++checkpoint)
+                     for (size_t field = 0; field < Fields.size(); ++field)
+                        BOOST_TEST_CONTEXT("checkpoint=" << checkpoint << " field=" << Fields[field]) {
+                           BOOST_REQUIRE_EQUAL(provider_trace[checkpoint][field], trace[checkpoint][field]);
+                        }
+               } else provider_trace = trace;
+            }
+         }
+      }
+   }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

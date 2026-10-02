@@ -151,3 +151,21 @@ No production contract changes were needed for these fixture repairs.
 The external cluster flows were not rerun for this test-only patch. The generated
 campaign covers 24 linked rounds across three seeds; this result does not claim
 exhaustive exploration or a measured production line-coverage percentage.
+
+## Governance shortcut parity
+
+`generic_governance_and_provider_release_have_identical_settlement` compares
+unbonded `sysio.bond::rslvvalid` with real funded `accept`, followed by ordinary
+window-gated `approve` and collateral claim. Both EC1/NTA and EC2/NTB run with
+linked and initially unlinked recipients. The test compares the economic trace
+through frozen release, successive partial releases, same-epoch no-refill, fee
+rounding, principal/link delivery, pending yield, and actual return instructions
+paid exactly once by the external model. It also rejects unauthorized governance
+and early provider approval. All 1,824 assertions passed; the complete syndication
+and bond suites passed 152 cases and 12,311 assertions.
+
+Only the downstream settlement trace is equivalent. Bond state, escrow ownership,
+challenge timing, provider returns and bounty allocation deliberately differ.
+Provider, challenge and INVALID native tests remain essential, as do the live
+flows specifically exercising providers. The governance shortcut in transport
+flows cannot stand in for their coverage. The parity regression is included in the regular `sysio_synd_tests` suite.
