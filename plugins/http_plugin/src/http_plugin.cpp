@@ -587,7 +587,7 @@ namespace sysio {
       auto handler_ptr = std::make_shared<raw_url_handler>(std::move(handler));
       internal_handler.fn = [handler_ptr](detail::abstract_conn_ptr conn, string&& r, string&& b, url_response_callback&&) {
          try {
-            (*handler_ptr)(std::move(conn), std::move(r), std::move(b));
+            (*handler_ptr)(conn, std::move(r), std::move(b)); // a copy: the catch still needs conn
          } catch (...) {
             conn->handle_exception();
          }

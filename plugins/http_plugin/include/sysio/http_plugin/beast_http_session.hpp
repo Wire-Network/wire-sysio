@@ -64,8 +64,9 @@ std::string to_log_string(const T& req, size_t max_size = 1024) {
    return buffer;
 }
 
-// use the Curiously Recurring Template Pattern so that
-// the same code works with both regular TCP sockets and UNIX sockets
+/// An HTTP session over a TCP or a UNIX socket. It has no lock or strand: at most one asynchronous operation is
+/// outstanding, and whoever starts one must not touch the session afterwards, as its completion may already be running
+/// on an http thread.
 template <class Socket>
 class beast_http_session : public detail::abstract_conn,
                            public std::enable_shared_from_this<beast_http_session<Socket>> {
@@ -411,6 +412,7 @@ public:
       }
    }
 
+   /// @copydoc detail::abstract_conn::handle_exception
    virtual void handle_exception() final {
       std::string err_str;
       try {
@@ -457,12 +459,13 @@ public:
 
 
       if(is_send_exception_response_) {
+         is_send_exception_response_ = false; // at most one exception response per session
          set_content_type_header(http_content_type::json);
          res_->keep_alive(false);
          res_->set(http::field::server, BOOST_BEAST_VERSION_STRING);
 
+         // keep_alive is false, so the write completion closes the connection
          send_response(std::move(err_str), static_cast<unsigned int>(http::status::internal_server_error));
-         do_eof();
       }
    }
 
