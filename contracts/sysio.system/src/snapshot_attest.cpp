@@ -14,8 +14,6 @@ namespace sysiosystem {
 
 namespace {
 
-namespace snapshot_protocol = sysio::protocol::snapshot_attestation;
-
 constexpr char producer_not_registered_error[] = "producer is not registered";
 constexpr char producer_not_active_error[] = "producer is not active";
 constexpr char producer_rank_too_high_error[] = "producer rank exceeds maximum for snapshot providers";
@@ -296,7 +294,7 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
 
    const uint32_t block_num = block_info::block_height_from_id(block_id);
    check(block_num > 0, invalid_block_id_error);
-   check(snapshot_protocol::is_scheduled_block(block_num), unscheduled_block_id_error);
+   check(snapshot_attestation::is_scheduled_block(block_num), unscheduled_block_id_error);
    check(block_num <= sysio::current_block_number(), future_block_id_error);
 
    snap_records_table records(get_self());
