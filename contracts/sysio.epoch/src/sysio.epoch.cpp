@@ -77,11 +77,18 @@ inline bool is_active_outpost(const sysio::chains::chain_row& row) {
 struct emissions_gate_result {
    bool                  ready              = false;
    bool                  is_pay_epoch       = false; // true on the period-boundary epoch where payepoch fires
-   int64_t               emission_amount    = 0;  // per-epoch emission for THIS epoch (always populated when ready)
+   /// This epoch's share, sized on the net headroom. May be 0 when ready: the open pay period has emission pending, and
+   /// either it has committed the rest of the budget or the curve is zero.
+   int64_t               emission_amount    = 0;
    int64_t               period_emission    = 0;  // pending + emission_amount; populated only on pay-epoch
-   int64_t               treasury_remaining = 0;  // for blocklog row
+   /// Net headroom (budget not yet paid out or accrued), for the blocklog row.
+   int64_t               treasury_remaining = 0;
    int64_t               sysio_balance      = 0;  // for blocklog row
    EmissionsBlockReason  reason             = opp::types::EMISSIONS_BLOCK_REASON_UNSPECIFIED;
+
+   /// What the gate tried to authorize, for the blocklog row: the period total on a pay epoch (the amount the balance
+   /// test compares), otherwise this epoch's share.
+   int64_t attempted_emission() const { return is_pay_epoch ? period_emission : emission_amount; }
 };
 
 emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec,
@@ -102,26 +109,22 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec,
       return r;
    }
    const auto t5s = t5s_tbl.get();
-   r.treasury_remaining = cfg.t5_distributable - cfg.t5_floor - t5s.total_distributed;
+   r.treasury_remaining = sysiosystem::emissions::net_headroom(cfg, t5s);
 
    // epoch_duration_sec is the canonical value from sysio.epoch::epochcfg,
    // passed by advance() so this gate and sysio.system see identical inputs
    // and the gate doesn't repeat advance()'s read of the same singleton.
 
-   // Compute would-be per-epoch emission. First-epoch case: use initial; cap at remaining.
-   if (t5s.epoch_count == 0) {
-      r.emission_amount = sysiosystem::emissions::scale_annual_to_epoch(
-         cfg.annual_initial_emission, epoch_duration_sec);
-      if (r.emission_amount > r.treasury_remaining) r.emission_amount = r.treasury_remaining;
-   } else {
-      r.emission_amount = sysiosystem::emissions::compute_epoch_emission(
-         cfg, epoch_duration_sec, t5s.last_epoch_emission, t5s.total_distributed);
-   }
+   // Capped at the net headroom, so the open pay period can never commit more than the budget.
+   r.emission_amount = sysiosystem::emissions::compute_epoch_emission(cfg, epoch_duration_sec, t5s);
 
-   // TREASURY_EXHAUSTED gates every epoch (pay or non-pay). A zero per-epoch
-   // emission means the treasury is at floor; advancing the epoch silently
-   // would let the chain roll forward into a depleted treasury.
-   if (r.emission_amount <= 0) {
+   // TREASURY_EXHAUSTED gates every epoch (pay or non-pay) and is decided on the GROSS headroom: advancing past a
+   // spent budget would roll the chain forward into a depleted treasury. An open period whose share drops to zero,
+   // because it has committed the rest of the budget or the curve is zero, still advances and pays what it accrued at
+   // its boundary. A zero share with nothing pending blocks: there is nothing to pay, and payepoch asserts on an empty
+   // period, which would abort advance.
+   if (sysiosystem::emissions::gross_headroom(cfg, t5s) <= 0 ||
+       (r.emission_amount <= 0 && t5s.pending_emission_amount <= 0)) {
       r.reason = opp::types::EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED;
       return r;
    }
@@ -203,7 +206,7 @@ void record_gate_block(name self, uint32_t epoch_index, const emissions_gate_res
       log_tbl.emplace(ram_payer, pk, epoch::blocklog_entry{
          .epoch_index        = epoch_index,
          .reason             = gate.reason,
-         .attempted_emission = gate.emission_amount,
+         .attempted_emission = gate.attempted_emission(),
          .treasury_remaining = gate.treasury_remaining,
          .sysio_balance      = gate.sysio_balance,
          .first_blocked_at   = now_secs,
@@ -215,7 +218,7 @@ void record_gate_block(name self, uint32_t epoch_index, const emissions_gate_res
 
    log_tbl.modify(ram_payer, pk, [&](auto& row) {
       row.reason             = gate.reason;
-      row.attempted_emission = gate.emission_amount;
+      row.attempted_emission = gate.attempted_emission();
       row.treasury_remaining = gate.treasury_remaining;
       row.sysio_balance      = gate.sysio_balance;
       row.last_retry_at      = now_secs;
@@ -1000,7 +1003,7 @@ void epoch::advance() {
    // Emissions side. Three inline actions queued in FIFO order:
    //   1. accrueepoch: always queued. Records this epoch's per-epoch share
    //      onto t5state (pending_emission_amount + batch_group_epochs[group]
-   //      + last_epoch_emission for decay continuity).
+   //      + last_epoch_emission for decay continuity). The share may be 0.
    //   2. rcrdbatch: always queued. Records the immutable roster that accrued
    //      this epoch after the schedule has slid for the next advance.
    //   3. payepoch: queued only on pay-epochs. Reads the now-updated t5state

@@ -21,6 +21,19 @@ The curve decays from `annual_initial_emission` toward `annual_min_emission`
 (clamped by `annual_max_emission`), stops at `t5_floor`, and auto-throttles as
 `total_distributed` rises (capital claims count against it).
 
+## Budget headroom
+
+The T5 budget is `t5_distributable - t5_floor`. Accruals and capital draws are
+sized against the part not yet paid out or accrued (`net_headroom` in
+`emissions.hpp`), so `total_distributed + pending_emission_amount` never
+exceeds the budget. `setemitcfg` refuses a budget below
+`t5_floor + total_distributed + pending_emission_amount`.
+
+Once the open pay period has accrued the rest of the budget, its remaining
+epochs accrue zero and still advance, and its `payepoch` settles what was
+accrued. Epochs block with `TREASURY_EXHAUSTED` once the budget is spent, or
+when the curve yields zero with nothing pending.
+
 ## How each bucket reaches its recipient
 
 `payepoch` runs inline from `sysio.epoch::advance`, which must never abort. A
@@ -227,7 +240,7 @@ period_emission
 | `payepoch` | `sysio.epoch` | Distribute the period's compute / capex / governance (credits `payclaims`; pushes only the category buckets) |
 | `fundclaim` | the recipient: `sysio.dclaim` or `sysio.liq` | Lazy capital drain into the recipient (never-throw) |
 | `viewnodedist` | read-only | Preview a node owner's claimable amount |
-| `viewepoch` | read-only | Current treasury / next-emission estimate |
+| `viewepoch` | read-only | Remaining budget / next-emission estimate |
 | `viewemitcfg` | read-only | Current emission config |
 
 ## Tables
