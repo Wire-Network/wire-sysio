@@ -2,7 +2,7 @@
 
 #include <sysio/chain/name.hpp>
 #include <sysio/chain/snapshot.hpp>
-#include <sysio/protocol/snapshot_attestation.hpp>
+#include <sysio.system/snapshot_attest_constants.hpp>
 
 #include <sysio_system_tester.hpp>
 
@@ -17,7 +17,7 @@ using namespace sysio;
 using namespace sysio::chain;
 using namespace sysio::testing;
 using mvo = fc::mutable_variant_object;
-namespace snapshot_attestation = sysio::protocol::snapshot_attestation;
+namespace snapshot_attestation = sysiosystem::snapshot_attestation;
 
 /// Producer registered for the shared snapshot-attestation tests.
 inline constexpr auto producer_account = "producer1"_n;

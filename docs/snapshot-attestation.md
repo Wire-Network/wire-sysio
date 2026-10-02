@@ -107,6 +107,7 @@ following the same pattern as `peer_keys`.
 
 Files:
 - `contracts/sysio.system/include/sysio.system/snapshot_attest.hpp`
+- `contracts/sysio.system/include/sysio.system/snapshot_attest_constants.hpp` -- constants shared with the node
 - `contracts/sysio.system/src/snapshot_attest.cpp`
 
 ### Actions

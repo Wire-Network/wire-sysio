@@ -5,7 +5,7 @@
 
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/resource_limits.hpp>
-#include <sysio/protocol/snapshot_attestation.hpp>
+#include <sysio.system/snapshot_attest_constants.hpp>
 #include <sysio/testing/tester.hpp>
 
 #include <fc/exception/exception.hpp>
@@ -254,7 +254,7 @@ public:
    /// multiple, and is it at or below the head -- before it reads any table, so a test asserting on
    /// either of those needs no chain history at all and belongs on the base fixture.
    static constexpr uint32_t scheduled_height(uint32_t period) {
-      return period * sysio::protocol::snapshot_attestation::block_spacing;
+      return period * sysiosystem::snapshot_attestation::block_spacing;
    }
 
    /// The latest attestable height at or below the head.
@@ -264,7 +264,7 @@ public:
    /// for one has no attestable height and says so, rather than silently buying one mid-test at
    /// several times the price.
    uint32_t vote_block_num() {
-      const uint32_t spacing = sysio::protocol::snapshot_attestation::block_spacing;
+      const uint32_t spacing = sysiosystem::snapshot_attestation::block_spacing;
       // Commit registrations and configuration the test queued before reading the height.
       produce_block();
       const uint32_t head_block_num = control->head().block_num();
@@ -1026,7 +1026,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_keeps_scheduled_heights_independent_until_f
 
    // Both heights are already behind the head -- the fixture built two cadence periods up front.
    const uint32_t newer_block_num = vote_block_num();
-   const uint32_t older_block_num = newer_block_num - sysio::protocol::snapshot_attestation::block_spacing;
+   const uint32_t older_block_num = newer_block_num - sysiosystem::snapshot_attestation::block_spacing;
    const auto older_block_id = make_block_id(older_block_num);
    const auto older_hash = make_snap_hash(5);
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, older_block_id, older_hash));
@@ -1053,7 +1053,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_reopening_purged_historical_height,
 
    // Both heights are already behind the head -- the fixture built two cadence periods up front.
    const uint32_t newer_block_num = vote_block_num();
-   const uint32_t older_block_num = newer_block_num - sysio::protocol::snapshot_attestation::block_spacing;
+   const uint32_t older_block_num = newer_block_num - sysiosystem::snapshot_attestation::block_spacing;
    const auto older_block_id = make_block_id(older_block_num);
    const auto older_hash = make_snap_hash(25);
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, older_block_id, older_hash));

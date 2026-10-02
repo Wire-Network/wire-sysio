@@ -26,6 +26,8 @@ on:
       - ".github/workflows/macos_arm64_build.yaml"
       - ".github/vcpkg-triplets/**"
       - "cmake/**"
+      # The host build compiles headers from this contract include dir (chain_plugin.hpp includes one).
+      - "contracts/sysio.system/include/**"
       - "libraries/**"
       - "plugins/**"
       - "programs/**"

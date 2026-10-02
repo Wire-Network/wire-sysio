@@ -9,6 +9,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <sysio.system/snapshot_attest_constants.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/account_object.hpp>
 #include <sysio/chain/application.hpp>
@@ -28,7 +29,6 @@
 #include <sysio/chain_plugin/tracked_votes.hpp>
 #include <sysio/chain_plugin/trx_finality_status_processing.hpp>
 #include <sysio/chain_plugin/trx_retry_db.hpp>
-#include <sysio/protocol/snapshot_attestation.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <vector>
 
@@ -149,13 +149,13 @@ namespace sysio {
    /** Return the canonical physical KV table identifier for final snapshot attestations. */
    inline uint16_t snapshot_attestation_table_id() {
       return chain::compute_table_id(
-         chain::name{protocol::snapshot_attestation::table_snaprecords}.to_uint64_t());
+         chain::name{sysiosystem::snapshot_attestation::table_snaprecords}.to_uint64_t());
    }
 
    /** Return the canonical physical KV table identifier for snapshot attestation configuration. */
    inline uint16_t snapshot_attestation_config_table_id() {
       return chain::compute_table_id(
-         chain::name{protocol::snapshot_attestation::table_snapconfig}.to_uint64_t());
+         chain::name{sysiosystem::snapshot_attestation::table_snapconfig}.to_uint64_t());
    }
 
    /** Compare both immutable tuple components loaded from a snapshot with an attested record. */
