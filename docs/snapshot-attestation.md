@@ -193,9 +193,10 @@ and liveness tradeoff. Configuration changes apply to pending heights, and retry
 vote, from a producer that still has operator standing, finalizes its tuple if a newly lowered K is
 already met.
 
-A producer may retry the same tuple idempotently while it keeps its operator standing, and may vote
-at multiple scheduled heights, but cannot submit two different tuples at one height. Registration
-and producer-status churn never removes an accepted vote.
+A producer may retry a pending tuple idempotently while it keeps its operator standing (retrying a
+finalized tuple is a no-op), and may vote at multiple scheduled heights, but cannot submit two
+different tuples at one height. Registration and producer-status churn never removes an accepted
+vote.
 
 Only exact multiples of 25,000 are accepted. This bounds the height space to the provider schedule
 and rejects manual/on-demand snapshots before they can create pending rows.

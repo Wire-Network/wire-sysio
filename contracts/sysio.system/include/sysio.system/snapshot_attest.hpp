@@ -179,14 +179,14 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     *
     * Votes aggregate per (block_num, block_id, snapshot_hash) and finalize when the current fixed
     * min_providers value is reached. Votes are monotonic, producer equivocation is rejected per
-    * height, and retrying the same tuple is idempotent while the producer keeps its operator standing.
-    * Snapshot heights must be exact multiples of
-    * snapshot_attestation::block_spacing. Rejects with snap_hash_disagreement_error when
-    * a final record at the height differs by block id or snapshot hash. A height without its own
-    * final record cannot be reopened below the latest attested height after pending rows have been
-    * purged. Rejects a new vote whose producer lacks live operator standing: an ACTIVE PRODUCER operator
-    * in sysio.opreg that clears the live collateral minimum, bootstrapped exempt. Rank, parking and the
-    * finalizer key are checked only at registration, and votes accepted earlier keep counting.
+    * height, and retrying the same tuple is idempotent. Snapshot heights must be exact multiples of
+    * snapshot_attestation::block_spacing. Rejects with snap_hash_disagreement_error when a final
+    * record at the height differs by block id or snapshot hash. A height without its own final record
+    * cannot be reopened below the latest attested height after pending rows have been purged.
+    *
+    * A new vote, or a retry while the tuple is pending, requires live operator standing: an ACTIVE
+    * PRODUCER in sysio.opreg that clears the live collateral minimum, bootstrapped exempt. Votes
+    * accepted earlier keep counting.
     */
    [[sysio::action]]
    void votesnaphash(name snap_account, checksum256 block_id, checksum256 snapshot_hash);
