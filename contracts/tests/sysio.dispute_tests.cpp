@@ -164,6 +164,9 @@ public:
       set_code(account, wasm);
       set_abi(account, abi.data());
       set_privileged(account);
+      // Each deployment gets its own block; fixture setup must not depend on
+      // the combined WASM sizes fitting the remaining block NET budget.
+      produce_blocks();
       load_abi(account, out_ser);
    }
 

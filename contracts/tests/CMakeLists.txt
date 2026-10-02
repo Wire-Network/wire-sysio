@@ -19,6 +19,15 @@ add_test(NAME contract_type_generator_test
                 -s ${CMAKE_SOURCE_DIR}/contracts/tools/tests
                 -p test_generate_sysio_contract_types.py)
 
+# Keep the reviewed flow/native boundary map from silently losing its tests.
+add_test(NAME depot_flow_coverage_map
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/contracts/tools/verify_depot_flow_coverage.py)
+add_test(NAME depot_flow_coverage_map_tests
+        COMMAND ${Python3_EXECUTABLE} -m unittest discover
+                -s ${CMAKE_SOURCE_DIR}/contracts/tools/tests
+                -p test_verify_depot_flow_coverage.py)
+set_tests_properties(depot_flow_coverage_map depot_flow_coverage_map_tests PROPERTIES LABELS "contract;depot-flow")
+
 # build unit test executable
 file(GLOB UNIT_TESTS CONFIGURE_DEPENDS "*.cpp" "*.hpp") # find all unit test suites
 set(CONTRACT_UNIT_TEST_EXE contracts_unit_test)
@@ -78,6 +87,7 @@ function(add_contract_suite SUITE_NAME SOURCE_FILE)
 endfunction()
 
 # Every runnable top-level suite is visible here with its owning source.
+add_contract_suite(external_chain_simulator_tests external_chain_simulator_tests.cpp)
 add_contract_suite(amm_math_tests amm_math_tests.cpp ACCOUNTS sysio.opp.common)
 add_contract_suite(council_math_tests council_math_tests.cpp ACCOUNTS sysio.councl)
 add_contract_suite(sysio_emissions_tests emissions_tests.cpp ACCOUNTS

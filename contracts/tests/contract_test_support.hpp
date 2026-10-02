@@ -6,6 +6,8 @@
 #include <sysio/testing/tester.hpp>
 
 #include <fc/crypto/elliptic_em.hpp>
+#include <fc/crypto/elliptic_ed.hpp>
+#include <fc/crypto/base58.hpp>
 #include <fc/crypto/hex.hpp>
 #include <fc/crypto/keccak256.hpp>
 #include <fc/crypto/private_key.hpp>
@@ -162,23 +164,36 @@ inline fc::mutable_variant_object svm_outpost_mvo(std::string_view program_id) {
       ("source_deposit_addr",    std::string{});
 }
 
-/// The message `sysio.authex::createlink` verifies a signature over, for an EM key, composed
-/// exactly as the contract composes it: `"PUB_EM_" + hex(compressed 33 bytes)`, the account, the
-/// chain kind's integer, the nonce and the fixed suffix, `|`-separated.
+/// The user-link signature domain for EM (hex compressed key) and ED (base58
+/// raw key), followed by account, chain kind, nonce and the fixed suffix.
 inline std::string build_link_message(const fc::crypto::public_key& pub_key, const std::string& account,
                                       sysio::opp::types::ChainKind chain_kind, uint64_t nonce) {
-   const auto compressed  = pub_key.get<fc::em::public_key_shim>().serialize();   // std::array<char, 33>
-   const auto pub_key_str = "PUB_EM_" + fc::to_hex(compressed.data(), compressed.size());
+   std::string pub_key_str;
+   if (pub_key.type() == fc::crypto::public_key::key_type::ed) {
+      const auto raw = pub_key.get<fc::crypto::ed::public_key_shim>().serialize();
+      pub_key_str = "PUB_ED_" + fc::to_base58(reinterpret_cast<const char*>(raw.data()), raw.size(), [] {});
+   } else {
+      const auto compressed = pub_key.get<fc::em::public_key_shim>().serialize();
+      pub_key_str = "PUB_EM_" + fc::to_hex(compressed.data(), compressed.size());
+   }
    return pub_key_str + "|" + account + "|" + std::to_string(magic_enum::enum_integer(chain_kind)) + "|" +
           std::to_string(nonce) + "|createlink auth";
 }
 
-/// Sign a `createlink` for `account` on `chain_kind` with the EM key `priv` at `nonce`: keccak of the
-/// message, signed as the contract recovers it (the EM signer wraps the digest in EIP-191).
+/// Sign the contract's curve-specific digest: EM uses keccak/EIP-191; ED uses
+/// SHA-256 mapped to printable ASCII before the ED digest signing operation.
 inline fc::crypto::signature sign_createlink(const fc::crypto::private_key& priv, const std::string& account,
                                              sysio::opp::types::ChainKind chain_kind, uint64_t nonce) {
-   const auto msg_hash =
-      fc::crypto::keccak256::hash(build_link_message(priv.get_public_key(), account, chain_kind, nonce));
+   const auto message = build_link_message(priv.get_public_key(), account, chain_kind, nonce);
+   if (priv.get_public_key().type() == fc::crypto::public_key::key_type::ed) {
+      constexpr unsigned char PrintableStart = 33, PrintableCount = 94;
+      const auto raw = fc::sha256::hash(message);
+      std::array<char, 32> mapped;
+      for (size_t i = 0; i < mapped.size(); ++i)
+         mapped[i] = char((static_cast<unsigned char>(raw.data()[i]) % PrintableCount) + PrintableStart);
+      return priv.sign(fc::sha256(mapped.data(), mapped.size()));
+   }
+   const auto msg_hash = fc::crypto::keccak256::hash(message);
    return priv.sign(fc::sha256(reinterpret_cast<const char*>(msg_hash.data()), 32));
 }
 

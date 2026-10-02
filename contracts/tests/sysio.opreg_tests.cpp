@@ -9,6 +9,7 @@
 #include <limits>
 
 #include "contracts.hpp"
+#include "external_chain_simulator.hpp"
 #include "contract_test_support.hpp"
 #include "shadow_yield_reference.hpp"
 #include <sysio/opp/opp.hpp>
@@ -719,33 +720,37 @@ public:
    /// same registrations `sysio.liq_tests` seeds). Called per case rather than from the
    /// constructor: an active ETH chain row would turn the ETH-bucket slashes and remits of the
    /// other cases into real `sysio.msgch` queueouts and change what those cases exercise.
-   void setup_shadow_liq() {
+   void setup_shadow_liq(const std::vector<sysio::testing::external::asset_spec>& assets =
+         {{"ETH", "LIQETH", ChainKind::CHAIN_KIND_EVM, kEthExternalChainId}}) {
       deploy_privileged(CHAINS_ACCOUNT, contracts::chains_wasm(), contracts::chains_abi(), chains_abi_ser);
       deploy_privileged(TOKENS_ACCOUNT, contracts::tokens_wasm(), contracts::tokens_abi(), tokens_abi_ser);
       deploy_privileged(LIQ_ACCOUNT,    contracts::liq_wasm(),    contracts::liq_abi(),    liq_abi_ser);
 
-      // Registered inside the epoch-0 bootstrap window, so the rows land ACTIVE.
-      BOOST_REQUIRE_EQUAL(success(), push_contract(CHAINS_ACCOUNT, chains_abi_ser, CHAINS_ACCOUNT,
-         shadow_action::regchain, mvo()
-         ("kind", ChainKind::CHAIN_KIND_EVM)("code", codename_mvo(kEthCodename))
-         ("external_chain_id", kEthExternalChainId)("name", std::string(kEthCodename))
-         ("description", std::string{})("outpost", sysio_system::test_support::no_outpost_mvo())));
+      for (const auto& a : assets) {
+         const auto sym = symbol::from_string(std::string("9,") + a.token);
+         // Registered inside the epoch-0 bootstrap window, so the rows land ACTIVE.
+         BOOST_REQUIRE_EQUAL(success(), push_contract(CHAINS_ACCOUNT, chains_abi_ser, CHAINS_ACCOUNT,
+            shadow_action::regchain, mvo()
+            ("kind", a.kind)("code", codename_mvo(a.chain))
+            ("external_chain_id", a.id)("name", std::string(a.chain))
+            ("description", std::string{})("outpost", sysio_system::test_support::no_outpost_mvo())));
 
-      const std::vector<char> address(kEvmAddressBytes, kPlaceholderAddressByte);
-      BOOST_REQUIRE_EQUAL(success(), push_contract(TOKENS_ACCOUNT, tokens_abi_ser, TOKENS_ACCOUNT,
-         shadow_action::regtoken, mvo()
-         ("kind", TokenKind::TOKEN_KIND_LIQ)("code", codename_mvo(kLiqEthCodename))
-         ("symbol_name", std::string(kLiqEthCodename))("description", std::string{})
-         ("precision", kLiqEthSymbol.decimals())
-         ("address", mvo()("kind", ChainKind::CHAIN_KIND_EVM)("address", address))));
-      BOOST_REQUIRE_EQUAL(success(), push_contract(TOKENS_ACCOUNT, tokens_abi_ser, TOKENS_ACCOUNT,
-         shadow_action::regctok, mvo()
-         ("chain_code", codename_mvo(kEthCodename))("token_code", codename_mvo(kLiqEthCodename))
-         ("contract_addr", address)("is_native", false)));
+         const std::vector<char> address(a.kind == ChainKind::CHAIN_KIND_SVM ? 32 : kEvmAddressBytes, kPlaceholderAddressByte);
+         BOOST_REQUIRE_EQUAL(success(), push_contract(TOKENS_ACCOUNT, tokens_abi_ser, TOKENS_ACCOUNT,
+            shadow_action::regtoken, mvo()
+            ("kind", TokenKind::TOKEN_KIND_LIQ)("code", codename_mvo(a.token))
+            ("symbol_name", std::string(a.token))("description", std::string{})
+            ("precision", sym.decimals())
+            ("address", mvo()("kind", a.kind)("address", address))));
+         BOOST_REQUIRE_EQUAL(success(), push_contract(TOKENS_ACCOUNT, tokens_abi_ser, TOKENS_ACCOUNT,
+            shadow_action::regctok, mvo()
+            ("chain_code", codename_mvo(a.chain))("token_code", codename_mvo(a.token))
+            ("contract_addr", address)("is_native", false)));
 
-      BOOST_REQUIRE_EQUAL(success(), push_contract(LIQ_ACCOUNT, liq_abi_ser, LIQ_ACCOUNT, shadow_action::create,
-         mvo()("sym", kLiqEthSymbol)("chain_code", codename_mvo(kEthCodename))
-         ("token_code", codename_mvo(kLiqEthCodename))));
+         BOOST_REQUIRE_EQUAL(success(), push_contract(LIQ_ACCOUNT, liq_abi_ser, LIQ_ACCOUNT, shadow_action::create,
+            mvo()("sym", sym)("chain_code", codename_mvo(a.chain))
+            ("token_code", codename_mvo(a.token))));
+      }
    }
 
    /// Put `amount` LIQETH shadow in `holder`'s hands the way the depot mints it: `sysio.synd`, the
@@ -2924,4 +2929,84 @@ BOOST_FIXTURE_TEST_CASE(reregistration_forfeits_banked_yield_but_keeps_remit_cla
    BOOST_REQUIRE_EQUAL(success(), claimremit(kYieldBonderA, kLiqEthCodename));
 } FC_LOG_AND_RETHROW() }
 
+
+// This is the dual-shadow producer flow's depot policy with generic symbols.
+// Registration of the Ethereum node NFT itself remains in the ETH-specific suites.
+BOOST_FIXTURE_TEST_CASE(two_generic_depot_assets_are_both_required_and_withdrawals_preserve_identity,
+                        sysio_opreg_tester) {
+   using namespace sysio::testing::external;
+   constexpr uint64_t Minimum = 2 * Unit;
+   constexpr uint64_t Funding = 4 * Unit;
+   const auto account = kEligibilityProducer;
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kTestMaxProducers, kTestMaxBatchOperators, kTestMaxUnderwriters,
+      kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses, kMaxAcceptedPctMisses24h, kTerminateWindowMs,
+      {make_chain_min_bond(kWireCodename, First.token, Minimum),
+       make_chain_min_bond(kWireCodename, Second.token, Minimum)}, {}, {}));
+   BOOST_REQUIRE_EQUAL(success(), regoperator(account, OPERATOR_TYPE_PRODUCER, false));
+   setup_shadow_liq({First, Second});
+   for (const auto& a : Assets) {
+      BOOST_REQUIRE_EQUAL(success(), push_contract(LIQ_ACCOUNT, liq_abi_ser, SYND_ACCOUNT, shadow_action::mint,
+         mvo()("to", account)("token_code", codename_mvo(a.token))("amount", Funding)));
+   }
+   const auto active = [&] {
+      return get_operator(account)[eligibility_field::status].as<OperatorStatus>() ==
+         OperatorStatus::OPERATOR_STATUS_ACTIVE;
+   };
+   BOOST_REQUIRE(!active());
+   // Surplus of the first token never substitutes for the missing second token.
+   BOOST_REQUIRE_EQUAL(success(), deposit(account, First.token, Funding));
+   BOOST_REQUIRE(!active());
+   BOOST_REQUIRE_EQUAL(success(), deposit(account, Second.token, Minimum - 1));
+   BOOST_REQUIRE(!active());
+   BOOST_REQUIRE_EQUAL(success(), deposit(account, Second.token, 1));
+   BOOST_REQUIRE(active());
+   // Exercise either required token independently. Reservations must affect
+   // eligibility immediately, before epoch maintenance moves any custody.
+   for (const auto& a : Assets) {
+      const auto sym = symbol::from_string(std::string("9,") + a.token);
+      const auto other = symbol::from_string(std::string("9,") + (a.id == First.id ? Second.token : First.token));
+      const auto other_before = get_currency_balance(LIQ_ACCOUNT, other, account).get_amount();
+      const uint64_t withdrawn = a.id == First.id ? Funding : Minimum;
+      const auto before = get_currency_balance(LIQ_ACCOUNT, sym, account).get_amount();
+      BOOST_REQUIRE_EQUAL(success(), withdraw(account, a.token, withdrawn));
+      BOOST_REQUIRE(!active());
+      BOOST_REQUIRE_EQUAL(before, get_currency_balance(LIQ_ACCOUNT, sym, account).get_amount());
+      produce_block(); // Distinct TAPOS for repeated maintenance actions.
+      BOOST_REQUIRE_EQUAL(success(), flushwtdw(kFlushAllMaturedEpoch));
+      const auto claim = get_remitclaim(account, a.token);
+      BOOST_REQUIRE(!claim.is_null());
+      BOOST_REQUIRE_EQUAL(withdrawn, claim["balance"].as_uint64());
+      BOOST_REQUIRE_EQUAL(success(), claimremit(account, a.token));
+      BOOST_REQUIRE_EQUAL(before + int64_t(withdrawn), get_currency_balance(LIQ_ACCOUNT, sym, account).get_amount());
+      BOOST_REQUIRE_EQUAL(other_before, get_currency_balance(LIQ_ACCOUNT, other, account).get_amount());
+      BOOST_REQUIRE(get_remitclaim(account, a.token).is_null());
+      BOOST_REQUIRE_EQUAL(success(), deposit(account, a.token, Minimum));
+      BOOST_REQUIRE(active());
+   }
+}
+
+BOOST_FIXTURE_TEST_CASE(native_wire_partial_withdrawal_stays_active_and_claims_exactly, sysio_opreg_tester) {
+   constexpr uint64_t Minimum = 2 * kWireUnit;
+   constexpr uint64_t Bond = 2 * Minimum;
+   const auto account = kEligibilityBatchOperator;
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kTestMaxProducers, kTestMaxBatchOperators, kTestMaxUnderwriters,
+      kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses, kMaxAcceptedPctMisses24h, kTerminateWindowMs,
+      {}, {make_chain_min_bond(kWireCodename, kWireCodename, Minimum)}, {}));
+   BOOST_REQUIRE_EQUAL(success(), regoperator(account, OPERATOR_TYPE_BATCH, false));
+   setup_wire_token_and_fund(account, kWireFundingQuantity);
+   const auto before = wire_balance(account);
+   BOOST_REQUIRE_EQUAL(success(), deposit(account, kWireCodename, Bond));
+   BOOST_REQUIRE_EQUAL(before - int64_t(Bond), wire_balance(account));
+   BOOST_REQUIRE_EQUAL(success(), withdraw(account, kWireCodename, Minimum));
+   BOOST_REQUIRE(get_operator(account)[eligibility_field::status].as<OperatorStatus>() ==
+      OperatorStatus::OPERATOR_STATUS_ACTIVE);
+   BOOST_REQUIRE_EQUAL(before - int64_t(Bond), wire_balance(account));
+   BOOST_REQUIRE_EQUAL(success(), flushwtdw(kFlushAllMaturedEpoch));
+   BOOST_REQUIRE_EQUAL(Minimum, get_remitclaim(account, kWireCodename)["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(success(), claimremit(account, kWireCodename));
+   BOOST_REQUIRE_EQUAL(before - int64_t(Minimum), wire_balance(account));
+   BOOST_REQUIRE(get_remitclaim(account, kWireCodename).is_null());
+   BOOST_REQUIRE(get_operator(account)[eligibility_field::status].as<OperatorStatus>() ==
+      OperatorStatus::OPERATOR_STATUS_ACTIVE);
+}
 BOOST_AUTO_TEST_SUITE_END()

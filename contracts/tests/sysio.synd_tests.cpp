@@ -11,6 +11,7 @@
 #include <fc/crypto/base58.hpp>
 #include <fc/crypto/elliptic_ed.hpp>
 #include <fc/crypto/elliptic_em.hpp>
+#include <fc/crypto/ethereum/ethereum_types.hpp>
 #include <fc/crypto/hex.hpp>
 #include <fc/crypto/public_key.hpp>
 #include <fc/crypto/sha256.hpp>
@@ -20,6 +21,8 @@
 #include "contracts.hpp"
 #include "contract_test_support.hpp"
 #include "shadow_yield_reference.hpp"
+#include "external_chain_simulator.hpp"
+#include <random>
 
 #include <algorithm>
 #include <fstream>
@@ -157,8 +160,12 @@ constexpr uint32_t PRUNE_RETENTION_SEC = 604'800;
 constexpr uint64_t DEPOT_AMOUNT_MAX = (uint64_t{1} << 62) - 1;
 
 /// The chain-native address `sysio.authex::recordlink` carries beside a linked key. On SVM that is the
-/// ED key's own 32 bytes -- the form sysio.synd parks against and sweeps by.
+/// ED key's own 32 bytes; on EVM it is the derived 20-byte address.
 std::vector<char> native_address_of(const fc::crypto::public_key& pub_key) {
+   if (pub_key.type() == fc::crypto::public_key::key_type::em) {
+      const auto address = fc::crypto::ethereum::address_to_bytes(pub_key);
+      return {address.begin(), address.end()};
+   }
    const auto raw = pub_key.get<fc::crypto::ed::public_key_shim>().serialize();
    return std::vector<char>(raw.begin(), raw.end());
 }
@@ -377,13 +384,14 @@ public:
          ("account", account)("chain_kind", ChainKind::CHAIN_KIND_SVM)("pub_key", key)
          ("native_address", native_address_of(key)));
    }
-   /// Link `account` to the EM key behind `priv` on EVM through a user-signed `sysio.authex::createlink`,
+   /// Link `account` to the key behind `priv` through a user-signed `sysio.authex::createlink`,
    /// which sends `linkswept` to sysio.synd inline.
-   action_result createlink_evm(name account, const fc::crypto::private_key& priv) {
+   action_result createlink(name account, const fc::crypto::private_key& priv,
+                            ChainKind kind = ChainKind::CHAIN_KIND_EVM) {
       const uint64_t nonce = control->head().block_time().time_since_epoch().count() / 1000;
       return push(AUTHEX_ACCOUNT, authex_abi_ser, account, "createlink"_n, mvo()
-         ("chain_kind", ChainKind::CHAIN_KIND_EVM)("account", account.to_string())
-         ("sig", sysio_system::test_support::sign_createlink(priv, account.to_string(), ChainKind::CHAIN_KIND_EVM,
+         ("chain_kind", kind)("account", account.to_string())
+         ("sig", sysio_system::test_support::sign_createlink(priv, account.to_string(), kind,
                                                              nonce))
          ("pub_key", priv.get_public_key())("nonce", nonce));
    }
@@ -1359,7 +1367,7 @@ BOOST_FIXTURE_TEST_CASE(createlink_sweeps_parked_from_synd, sysio_synd_tester) t
    BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, 3 * UNIT, LIQETH_SYM));
 
    const int64_t alice_wire = wire_balance("alice"_n);
-   BOOST_REQUIRE_EQUAL(success(), createlink_evm("alice"_n, priv));
+   BOOST_REQUIRE_EQUAL(success(), createlink("alice"_n, priv));
    BOOST_REQUIRE(executed(SYND_ACCOUNT, "linkswept"_n));
    BOOST_REQUIRE(parked_row(LIQETH, ChainKind::CHAIN_KIND_EVM, pubkey).is_null());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(30 * UNIT), liq_balance("alice"_n, LIQETH_SYM));
@@ -3426,7 +3434,7 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_defers_the_parked_delivery_of_a_new_link, sysio
    BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, 3 * UNIT, LIQETH_SYM));
 
    BOOST_REQUIRE_EQUAL(success(), andon_pull());
-   BOOST_REQUIRE_EQUAL(success(), createlink_evm("alice"_n, priv));
+   BOOST_REQUIRE_EQUAL(success(), createlink("alice"_n, priv));
    BOOST_REQUIRE(executed(SYND_ACCOUNT, "linkswept"_n));
    BOOST_REQUIRE(console_has(LINKSWEPT_FROZEN));
    BOOST_REQUIRE_EQUAL(30 * UNIT, parked_balance(LIQETH, ChainKind::CHAIN_KIND_EVM, pubkey));
@@ -4037,5 +4045,260 @@ BOOST_FIXTURE_TEST_CASE(a_shortfall_on_a_pulled_cord_adds_a_row_and_aborts_nothi
    BOOST_REQUIRE_EQUAL(success(), closeenv(SOLANA, 1, digest));
    BOOST_REQUIRE(console_has(QUEUE_FROZEN));
 } FC_LOG_AND_RETHROW()
+
+
+// These scenarios start with custody-backed bootstrap credits. Unlike the narrow
+// bond fixture's underwrite(), accepting a request never creates extra collateral.
+struct generic_synd_tester : sysio_synd_tester {
+   static constexpr uint64_t Bootstrap = 1'000 * UNIT;
+   static constexpr uint32_t Window = 3600;
+   std::array<external::chain, 2> outposts{external::chain(external::First), external::chain(external::Second)};
+   std::array<std::vector<char>, 2> users;
+
+   generic_synd_tester() : sysio_synd_tester(false) {
+      for (size_t i = 0; i < outposts.size(); ++i) {
+         const auto& a = outposts[i].asset();
+         BOOST_REQUIRE_EQUAL(success(), regchain(a.kind, a.chain, a.id));
+         BOOST_REQUIRE_EQUAL(success(), regtoken(a.token, a.kind, a.chain));
+         BOOST_REQUIRE_EQUAL(success(), create_shadow(sym(i), a.chain, a.token));
+         for (const name account : {"alice"_n, "carol"_n, "dave"_n}) {
+            const auto key = a.kind == ChainKind::CHAIN_KIND_EVM ? em_key() : ed_key();
+            const auto bytes = a.kind == ChainKind::CHAIN_KIND_EVM ? em_bytes(key) : ed_bytes(key);
+            BOOST_REQUIRE_EQUAL(success(), push(AUTHEX_ACCOUNT, authex_abi_ser, AUTHEX_ACCOUNT, "recordlink"_n,
+               mvo()("account", account)("chain_kind", a.kind)("pub_key", key)
+                  ("native_address", native_address_of(key))));
+            if (account == "alice"_n) users[i] = bytes;
+            else {
+               outposts[i].donate(Bootstrap);
+               BOOST_REQUIRE_EQUAL(success(), importsynd(a.chain, a.token, {credit(bytes, Bootstrap)}));
+            }
+         }
+         BOOST_REQUIRE_EQUAL(success(), setconfig(a.chain, a.token,
+            {.synd_burst = 3 * UNIT, .synd_refill = 3 * UNIT, .window_sec = Window}));
+      }
+      BOOST_REQUIRE_EQUAL(success(), importdone());
+   }
+   symbol sym(size_t i) const { return symbol::from_string(std::string("9,") + outposts[i].asset().token); }
+   void conservation() {
+      for (size_t i = 0; i < outposts.size(); ++i) {
+         const auto token = sym(i);
+         BOOST_REQUIRE_EQUAL(supply(token), liq_balance("alice"_n, token) + liq_balance("carol"_n, token) +
+            liq_balance("dave"_n, token) + liq_balance("bob"_n, token) + liq_balance(SWAP_ACCOUNT, token) +
+            liq_balance(LIQ_ACCOUNT, token) + liq_balance(SYND_ACCOUNT, token) + liq_balance(BOND_ACCOUNT, token));
+         BOOST_REQUIRE_LE(uint64_t(supply(token) + pending(token)), outposts[i].custody());
+      }
+      require_no_shortfall();
+   }
+   void accept(uint64_t request) {
+      BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi_ser, "dave"_n, "accept"_n,
+         mvo()("underwriter", "dave"_n)("request_id", request)("amount", bond_request(request)["covered"])));
+      conservation();
+   }
+};
+
+// Fixed seeds make failures reproducible; generated choices vary chain order,
+// amount, challenge outcome, freeze timing, release count, and return amount.
+// Each round consumes the preceding round's balances and sequence cursors.
+BOOST_AUTO_TEST_CASE(generated_generic_custody_bond_challenge_and_return_sequences) {
+   constexpr std::array<uint32_t, 3> Seeds{0x51a7, 0xc011a7, 0xb0ad};
+   constexpr size_t Rounds = 8;
+   for (const auto seed : Seeds) {
+      generic_synd_tester t;
+      std::mt19937 random(seed);
+      uint32_t epoch = 1;
+      uint64_t return_id = 0;
+      for (size_t step = 0; step < Rounds; ++step) {
+         BOOST_TEST_CONTEXT("seed=" << seed << " step=" << step) {
+            const size_t i = random() % t.outposts.size();
+            auto& external = t.outposts[i];
+            const auto& a = external.asset();
+            const auto token = t.sym(i);
+            const auto other_token = t.sym(1 - i);
+            const auto other_state = [&] {
+               return std::array<int64_t, 6>{t.supply(other_token), t.liq_balance("alice"_n, other_token),
+                  t.liq_balance("carol"_n, other_token), t.liq_balance("dave"_n, other_token),
+                  t.liq_balance(t.SYND_ACCOUNT, other_token), t.liq_balance(t.BOND_ACCOUNT, other_token)};
+            };
+            const auto untouched = other_state();
+            const uint64_t amount = (7 + random() % 9) * t.UNIT;
+            const bool invalid = step % 3 == 0;
+            const bool challenged = invalid || (random() % 2 == 0);
+            const auto before = t.liq_balance("alice"_n, token);
+            const auto supply_before = t.supply(token);
+            BOOST_REQUIRE_EQUAL(t.success(), t.set_epoch(epoch));
+            const auto report = external.deposit(t.users[i], amount);
+            sysio::opp::attestations::SyndicateLIQ deposit;
+            BOOST_REQUIRE(deposit.ParseFromString(report.second));
+            const auto digest = t.digest_of(std::to_string(seed) + ":" + std::to_string(step));
+            const auto ingest = [&] {
+               return t.onsynd(a.chain, epoch, digest, deposit.sequence(), a.kind, t.users[i], a.token,
+                  amount, t.MSGCH_ACCOUNT, deposit.total_syndicated());
+            };
+            BOOST_REQUIRE_EQUAL(t.success(), ingest());
+            t.conservation();
+            // Authenticated duplicate delivery cannot mint a second time.
+            BOOST_REQUIRE_EQUAL(t.success(), ingest());
+            BOOST_REQUIRE_EQUAL(supply_before + int64_t(amount), t.supply(token));
+            BOOST_REQUIRE_EQUAL(t.success(), t.closeenv(a.chain, epoch, digest));
+            const auto request = t.envelope_row(a.chain, a.token, epoch)["request_id"].as_uint64();
+            t.accept(request);
+            BOOST_REQUIRE_EQUAL(t.success(), t.crank());
+            const auto released = t.liq_balance("alice"_n, token) - before;
+            BOOST_REQUIRE_EQUAL(int64_t(3 * t.UNIT), released);
+            t.conservation();
+            if (random() % 2 == 0) {
+               BOOST_REQUIRE_EQUAL(t.success(), t.andon_pull());
+               const auto frozen_supply = t.supply(token);
+               BOOST_REQUIRE_EQUAL(t.frozen(), t.desyndicate("alice"_n, t.UNIT, token));
+               BOOST_REQUIRE_EQUAL(frozen_supply, t.supply(token));
+               BOOST_REQUIRE_EQUAL(t.success(), t.andon_clear());
+            }
+            if (challenged) {
+               BOOST_REQUIRE_EQUAL(t.success(), t.challenge("carol"_n, a.chain, a.token, epoch));
+               BOOST_REQUIRE_EQUAL(t.success(), t.crank());
+               BOOST_REQUIRE_EQUAL(before + released, t.liq_balance("alice"_n, token));
+               BOOST_REQUIRE_EQUAL(t.success(), t.rule(request, !invalid));
+            } else {
+               t.produce_block(fc::seconds(t.Window + 1));
+               BOOST_REQUIRE_EQUAL(t.success(), t.push(t.BOND_ACCOUNT, t.bond_abi_ser, "carol"_n, "approve"_n,
+                  mvo()("request_id", request)));
+            }
+            if (invalid) {
+               BOOST_REQUIRE_EQUAL(t.success(), t.crank());
+               BOOST_REQUIRE_EQUAL(supply_before, t.supply(token));
+               BOOST_REQUIRE_EQUAL(STATE_INVALID, t.envelope_row(a.chain, a.token, epoch)["state"].as_string());
+               BOOST_REQUIRE_EQUAL(t.success(), t.bond_claim(request, "carol"_n));
+            } else {
+               // Drain by advancing real queue budgets; bounded iteration catches stalls.
+               for (size_t drain = 0; drain < 6; ++drain) {
+                  BOOST_REQUIRE_EQUAL(t.success(), t.set_epoch(++epoch));
+                  BOOST_REQUIRE_EQUAL(t.success(), t.crank());
+                  t.conservation();
+               }
+               BOOST_REQUIRE_EQUAL(before + int64_t(amount), t.liq_balance("alice"_n, token));
+               BOOST_REQUIRE_EQUAL(t.success(), t.bond_claim(request, "dave"_n));
+            }
+            t.conservation();
+            const uint64_t returned = (1 + random() % 3) * t.UNIT;
+            BOOST_REQUIRE_EQUAL(t.success(), t.desyndicate("alice"_n, returned, token));
+            const auto outbound = queued_desyndication(t, ++return_id);
+            BOOST_REQUIRE_EQUAL(returned, outbound.amount().amount());
+            external.freeze();
+            BOOST_REQUIRE(!external.receive(outbound));
+            BOOST_REQUIRE(!external.receive(outbound));
+            external.clear();
+            BOOST_REQUIRE(external.settle(outbound.request_id()));
+            BOOST_REQUIRE(!external.receive(outbound));
+            t.conservation();
+            BOOST_REQUIRE(untouched == other_state());
+            ++epoch;
+         }
+      }
+   }
+}
+
+
+BOOST_FIXTURE_TEST_CASE(generic_parked_credit_yield_conversion_and_fee_rounded_return, generic_synd_tester) {
+   constexpr uint64_t Principal = 101 * UNIT + 17;
+   constexpr uint64_t Yield = 10 * UNIT;
+   constexpr uint32_t FeeBps = 37;
+   constexpr uint64_t PoolSeed = 1'000 * UNIT;
+   constexpr uint32_t Horizon = 86'400, DepthBps = 300;
+   constexpr int64_t ClipFloor = 1000;
+   BOOST_REQUIRE_EQUAL(success(), push(LIQ_ACCOUNT, liq_abi_ser, SYSIO_ACCOUNT, "setkicker"_n, mvo()("bps", 0)));
+   for (size_t i = 0; i < outposts.size(); ++i) {
+      BOOST_TEST_CONTEXT("chain=" << outposts[i].asset().chain) {
+         auto& external = outposts[i];
+         const auto& a = external.asset();
+         const auto token = sym(i);
+         const auto pair = symbol::from_string(i == 0 ? "9,POOLA" : "9,POOLB");
+         external.donate(PoolSeed);
+         BOOST_REQUIRE_EQUAL(success(), create_pool(a.chain, a.token, pair, PoolSeed, PoolSeed,
+            30, 0, Horizon, DepthBps, ClipFloor));
+         BOOST_REQUIRE_EQUAL(success(), setconfig(a.chain, a.token,
+            {.synd_fee_bps = FeeBps, .desynd_fee_bps = FeeBps, .window_sec = Window}));
+         const auto private_key = fc::crypto::private_key::generate(a.kind == ChainKind::CHAIN_KIND_EVM
+            ? fc::crypto::private_key::key_type::em : fc::crypto::private_key::key_type::ed);
+         const auto key = private_key.get_public_key();
+         const auto bytes = a.kind == ChainKind::CHAIN_KIND_EVM ? em_bytes(key) : ed_bytes(key);
+         sysio::opp::attestations::SyndicateLIQ deposit;
+         BOOST_REQUIRE(deposit.ParseFromString(external.deposit(bytes, Principal).second));
+         sysio::opp::attestations::LIQYield report;
+         BOOST_REQUIRE(report.ParseFromString(external.yield(Yield).second));
+         const auto digest = digest_of(a.chain);
+         constexpr uint32_t Epoch = 1;
+         BOOST_REQUIRE_EQUAL(success(), onsynd(a.chain, Epoch, digest, deposit.sequence(), a.kind, bytes,
+            a.token, Principal, MSGCH_ACCOUNT, deposit.total_syndicated()));
+         BOOST_REQUIRE_EQUAL(success(), onyield(a.chain, Epoch, digest, report.sequence(), report.epoch(),
+            a.token, Yield, MSGCH_ACCOUNT, report.total_syndicated()));
+         BOOST_REQUIRE_EQUAL(success(), closeenv(a.chain, Epoch, digest));
+         BOOST_REQUIRE_EQUAL(0, pending(token));
+         BOOST_REQUIRE_EQUAL(0u, parked_balance(a.token, a.kind, bytes));
+         accept(envelope_row(a.chain, a.token, Epoch)["request_id"].as_uint64());
+         BOOST_REQUIRE_EQUAL(success(), crank());
+         const uint64_t fee = Principal * FeeBps / BPS_DENOMINATOR;
+         BOOST_REQUIRE_EQUAL(Principal - fee, parked_balance(a.token, a.kind, bytes));
+         BOOST_REQUIRE_EQUAL(fee, feepot_balance(a.token));
+         BOOST_REQUIRE_EQUAL(int64_t(Yield), pending(token));
+         conservation();
+         // Link notification crosses authex -> synd -> liq and consumes the parked row once.
+         BOOST_REQUIRE_EQUAL(success(), createlink("bob"_n, private_key, a.kind));
+         BOOST_REQUIRE_EQUAL(int64_t(Principal - fee), liq_balance("bob"_n, token));
+         BOOST_REQUIRE_EQUAL(0u, parked_balance(a.token, a.kind, bytes));
+         BOOST_REQUIRE_EQUAL(success(), sweep("bob"_n, a.kind));
+         BOOST_REQUIRE_EQUAL(int64_t(Principal - fee), liq_balance("bob"_n, token));
+         BOOST_REQUIRE_EQUAL(success(), push(LIQ_ACCOUNT, liq_abi_ser, "alice"_n, "queueyield"_n,
+            mvo()("sym", token.to_symbol_code())));
+         BOOST_REQUIRE_EQUAL(0, pending(token));
+         conservation();
+         produce_blocks(40);
+         BOOST_REQUIRE_EQUAL(success(), push(SWAP_ACCOUNT, swap_abi_ser, "alice"_n, "tickyield"_n,
+            mvo()("pair_token", pair.to_symbol_code())));
+         const auto owed = liq_owed("bob"_n, token);
+         BOOST_REQUIRE_GT(owed, 0);
+         const auto wire_before = wire_balance("bob"_n);
+         BOOST_REQUIRE_EQUAL(success(), liq_claim("bob"_n, token));
+         BOOST_REQUIRE_EQUAL(wire_before + owed, wire_balance("bob"_n));
+         BOOST_REQUIRE_EQUAL(0, liq_owed("bob"_n, token));
+         constexpr uint64_t Return = 3 * UNIT + 29;
+         BOOST_REQUIRE_EQUAL(success(), desyndicate("bob"_n, Return, token));
+         const auto outbound = queued_desyndication(*this, i + 1);
+         BOOST_REQUIRE_EQUAL(Return - Return * FeeBps / BPS_DENOMINATOR, outbound.amount().amount());
+         BOOST_REQUIRE(external.receive(outbound));
+         BOOST_REQUIRE(!external.receive(outbound));
+         conservation();
+      }
+   }
+}
+
+BOOST_FIXTURE_TEST_CASE(generic_custody_shortfall_freezes_and_repair_resumes, generic_synd_tester) {
+   auto& external = outposts.front();
+   const auto& a = external.asset();
+   external.lose(3 * UNIT);
+   sysio::opp::attestations::LIQYield report;
+   BOOST_REQUIRE(report.ParseFromString(external.yield(UNIT).second));
+   const auto digest = digest_of("generic shortfall");
+   BOOST_REQUIRE_EQUAL(success(), onyield(a.chain, 1, digest, report.sequence(), report.epoch(), a.token,
+      UNIT, MSGCH_ACCOUNT, report.total_syndicated()));
+   BOOST_REQUIRE(cord_pulled());
+   BOOST_REQUIRE_EQUAL(1u, mismatch_rows().size());
+   BOOST_REQUIRE_EQUAL(report.total_syndicated(), mismatch_rows().front()["reported"].as_uint64());
+   BOOST_REQUIRE_EQUAL(uint64_t(supply(sym(0))), mismatch_rows().front()["expected"].as_uint64());
+   BOOST_REQUIRE_EQUAL(success(), closeenv(a.chain, 1, digest));
+   const auto id = envelope_row(a.chain, a.token, 1)["request_id"].as_uint64();
+   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi_ser, "dave"_n, "accept"_n,
+      mvo()("underwriter", "dave"_n)("request_id", id)("amount", UNIT)));
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   BOOST_REQUIRE_EQUAL(0, pending(sym(0)));
+   external.donate(3 * UNIT);
+   BOOST_REQUIRE_EQUAL(success(), andon_clear());
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   BOOST_REQUIRE_EQUAL(int64_t(UNIT), pending(sym(0)));
+   BOOST_REQUIRE_EQUAL(uint64_t(supply(sym(0)) + pending(sym(0))), external.custody());
+   BOOST_REQUIRE(!cord_pulled());
+   // Clearing the cord does not erase incident evidence or touch the other chain.
+   BOOST_REQUIRE_EQUAL(1u, mismatch_rows().size());
+   BOOST_REQUIRE_EQUAL(0, pending(sym(1)));
+}
 
 BOOST_AUTO_TEST_SUITE_END()

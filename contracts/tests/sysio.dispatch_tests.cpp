@@ -45,6 +45,7 @@
 #include <sstream>
 
 #include "contracts.hpp"
+#include "external_chain_simulator.hpp"
 #include "contract_test_support.hpp"
 #include "test_symbol.hpp"
 // Canonical-encoding + header-derivation oracle: inbound envelopes must carry
@@ -1480,12 +1481,13 @@ public:
 
    /// Register `code` on sysio.tokens as `kind` at the depot's 9-decimal precision and bind
    /// it to `chain_code` (EVM address bytes; the registries only check the length).
-   action_result regtoken(TokenKind kind, std::string_view code, std::string_view chain_code) {
-      const std::vector<char> addr(20, '\x5a');
+   action_result regtoken(TokenKind kind, std::string_view code, std::string_view chain_code,
+                          ChainKind family = ChainKind::CHAIN_KIND_EVM) {
+      const std::vector<char> addr(family == ChainKind::CHAIN_KIND_SVM ? 32 : 20, '\x5a');
       auto r = push(TOKENS_ACCOUNT, tokens_abi, TOKENS_ACCOUNT, "regtoken"_n, mvo()
          ("kind", kind)("code", codename_mvo(code))("symbol_name", std::string(code))
          ("description", std::string{})("precision", 9)
-         ("address", mvo()("kind", ChainKind::CHAIN_KIND_EVM)("address", addr)));
+         ("address", mvo()("kind", family)("address", addr)));
       if (r != success()) return r;
       return push(TOKENS_ACCOUNT, tokens_abi, TOKENS_ACCOUNT, "regctok"_n, mvo()
          ("chain_code", codename_mvo(chain_code))("token_code", codename_mvo(code))
@@ -1497,17 +1499,19 @@ public:
    /// plain ERC20 ("USDCETH") and a liq token nobody opened a shadow for ("LIQTWO").
    /// `bootstrap_for_dispatch` must have run first — registrations inside the epoch-0
    /// bootstrap window land ACTIVE.
-   void setup_liq_for_dispatch() {
+   void setup_liq_for_dispatch(std::string_view chain = "ETH", std::string_view token = "LIQETH",
+                               ChainKind family = ChainKind::CHAIN_KIND_EVM) {
       create_accounts({TOKENS_ACCOUNT, LIQ_ACCOUNT, SYND_ACCOUNT});
       produce_blocks();
       deploy(TOKENS_ACCOUNT, contracts::tokens_wasm(), contracts::tokens_abi(), tokens_abi);
       deploy(LIQ_ACCOUNT,    contracts::liq_wasm(),    contracts::liq_abi(),    liq_abi);
       deploy(SYND_ACCOUNT,   contracts::synd_wasm(),   contracts::synd_abi(),   synd_abi);
-      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_LIQ,   "LIQETH",  "ETH"));
-      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_LIQ,   "LIQTWO",  "ETH"));
-      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_ERC20, "USDCETH", "ETH"));
+      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_LIQ,   token, chain, family));
+      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_LIQ,   "LIQTWO", chain, family));
+      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_ERC20, "USDCETH", chain, family));
       BOOST_REQUIRE_EQUAL(success(), push(LIQ_ACCOUNT, liq_abi, LIQ_ACCOUNT, "create"_n, mvo()
-         ("sym", LIQETH_SYM)("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("LIQETH"))));
+         ("sym", symbol::from_string("9," + std::string(token)))("chain_code", codename_mvo(chain))
+         ("token_code", codename_mvo(token))));
       produce_blocks();
    }
 
@@ -1518,20 +1522,20 @@ public:
    }
 
    /// `holder`'s LIQETH shadow balance; 0 without a row.
-   int64_t liq_balance(name holder) {
-      const auto row = liq_row("accounts"_n, "account", holder, LIQETH_SYM.to_symbol_code().value);
+   int64_t liq_balance(name holder, symbol token = LIQETH_SYM) {
+      const auto row = liq_row("accounts"_n, "account", holder, token.to_symbol_code().value);
       return row.is_null() ? 0 : row["balance"].as<asset>().get_amount();
    }
 
    /// The LIQETH shadow supply; 0 without a stat row.
-   int64_t liq_supply() {
-      const auto row = liq_row("stat"_n, "currency_stats", LIQ_ACCOUNT, LIQETH_SYM.to_symbol_code().value);
+   int64_t liq_supply(symbol token = LIQETH_SYM) {
+      const auto row = liq_row("stat"_n, "currency_stats", LIQ_ACCOUNT, token.to_symbol_code().value);
       return row.is_null() ? 0 : row["supply"].as<asset>().get_amount();
    }
 
    /// LIQETH yield reported by the outpost and not yet queued to the swap; 0 without a row.
-   int64_t liq_pending() {
-      const auto row = liq_row("liqpending"_n, "pending_yield", LIQ_ACCOUNT, LIQETH_SYM.to_symbol_code().value);
+   int64_t liq_pending(symbol token = LIQETH_SYM) {
+      const auto row = liq_row("liqpending"_n, "pending_yield", LIQ_ACCOUNT, token.to_symbol_code().value);
       return row.is_null() ? 0 : row["quantity"].as<asset>().get_amount();
    }
 
@@ -7746,4 +7750,111 @@ BOOST_FIXTURE_TEST_CASE(a_shortfall_freezes_the_same_envelopes_queue_step, sysio
    BOOST_CHECK(!envelope["share_pending"].as_bool());
 } FC_LOG_AND_RETHROW() }
 
+
+// The host-side simulator feeds canonical protobuf envelopes into the production
+// msgch -> epoch consensus -> synd -> liq path. No patched OPP or dispatch stub.
+BOOST_AUTO_TEST_CASE(generic_external_simulator_drives_production_dispatch) {
+   for (const auto& a : sysio::testing::external::Assets) {
+      BOOST_TEST_CONTEXT("chain=" << a.chain << " token=" << a.token) {
+         sysio_dispatch_tester t;
+         t.bootstrap_for_dispatch(a.chain, a.kind);
+         t.setup_liq_for_dispatch(a.chain, a.token, a.kind);
+         sysio::testing::external::chain outpost(a);
+         const auto token = symbol::from_string(std::string("9,") + a.token);
+         const auto key = a.kind == ChainKind::CHAIN_KIND_EVM ? t.uwrit_op_eth_pubkey : std::vector<char>(32, '\x42');
+         const auto deposit = outpost.deposit(key, 9 * t.LIQ_UNIT);
+         const auto yield = outpost.yield(2 * t.LIQ_UNIT);
+         const auto epoch = t.current_epoch();
+         const auto bytes = outpost.envelope(epoch, {deposit, yield, deposit});
+         const auto trace = t.deliver_trace(fc::slug_name{a.chain}.value, bytes);
+         BOOST_REQUIRE(trace != nullptr);
+         BOOST_REQUIRE(!trace->except);
+         BOOST_REQUIRE_EQUAL(2u, t.synd_items().size());
+         BOOST_CHECK_EQUAL(9 * t.LIQ_UNIT, t.liq_supply(token));
+         BOOST_CHECK_EQUAL(9 * t.LIQ_UNIT, t.liq_balance(t.SYND_ACCOUNT, token));
+         BOOST_CHECK_EQUAL(0, t.liq_pending(token));
+         BOOST_CHECK_EQUAL(2u, t.synd_cursor(a.chain)["last_sequence"].as_uint64());
+         const auto envelope = t.synd_envelope(a.chain, a.token, epoch);
+         BOOST_REQUIRE(!envelope.is_null());
+         BOOST_CHECK_EQUAL("WAITING", envelope["state"].as_string());
+         BOOST_CHECK_EQUAL(t.accepted_envelope_digest(fc::slug_name{a.chain}.value),
+                           envelope["digest"].as<fc::sha256>());
+         BOOST_CHECK(t.synd_rows("mismatch"_n).empty());
+      }
+   }
+}
+
+
+// A real staking-reward envelope crosses msgch -> dclaim -> system -> token.
+// Small treasury liquidity deliberately reaches the second fundclaim cap.
+BOOST_FIXTURE_TEST_CASE(generic_staking_rewards_fund_claim_and_dedupe_through_dispatch, sysio_dispatch_tester) {
+   using namespace sysio::testing::external;
+   bootstrap_for_dispatch(First.chain, First.kind);
+   deploy(TOKEN_ACCOUNT, contracts::token_wasm(), contracts::token_abi(), token_abi);
+   BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, TOKEN_ACCOUNT, "create"_n,
+      mvo()("issuer", "sysio")("maximum_supply", "100.000000000 WIRE")));
+   BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, config::system_account_name, "issue"_n,
+      mvo()("to", "sysio")("quantity", "100.000000000 WIRE")("memo", "reward funding")));
+   enable_epoch_advancement();
+   external::chain outpost(First);
+   constexpr uint64_t Reward = 10 * Unit;
+   sysio::opp::attestations::StakingReward reward;
+   reward.set_chain_code(fc::slug_name{First.chain}.value);
+   reward.mutable_staker_wire_account()->set_name(UWRIT_OP.to_string());
+   reward.set_share_bps(10'000);
+   reward.set_reward_epoch_index(current_epoch());
+   reward.set_external_epoch_ref(1);
+   reward.mutable_reward_amount()->set_token_code(fc::slug_name{"WIRE"}.value);
+   reward.mutable_reward_amount()->set_amount(Reward);
+   reward.mutable_staker_native_address()->set_kind(First.kind);
+   const std::vector<char> address(20, '\x31');
+   reward.mutable_staker_native_address()->set_address(address.data(), address.size());
+   const auto body = reward.SerializeAsString();
+   const auto bytes = outpost.envelope(current_epoch(), {
+      {ATTESTATION_TYPE_STAKING_REWARD, body}, {ATTESTATION_TYPE_STAKING_REWARD, body}});
+   const auto trace = deliver_trace(fc::slug_name{First.chain}.value, bytes);
+   BOOST_REQUIRE(trace && !trace->except);
+   const auto wire = symbol::from_string("9,WIRE");
+   const auto balance = [&](name account) { return get_currency_balance(TOKEN_ACCOUNT, wire, account).get_amount(); };
+   BOOST_REQUIRE_EQUAL(Reward, get_dclaim_row("pclaims"_n, "pending_claim", UWRIT_OP.to_uint64_t())
+      ["balance"].as<asset>().get_amount());
+   BOOST_REQUIRE_EQUAL(Reward, balance(DCLAIM_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(90 * Unit, balance(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), push(DCLAIM_ACCOUNT, dclaim_abi, UWRIT_OP, "claim"_n,
+      mvo()("wire_account", UWRIT_OP)));
+   BOOST_REQUIRE_EQUAL(Reward, balance(UWRIT_OP));
+   BOOST_REQUIRE_EQUAL(0, balance(DCLAIM_ACCOUNT));
+   BOOST_REQUIRE(get_dclaim_row("pclaims"_n, "pending_claim", UWRIT_OP.to_uint64_t()).is_null());
+   // The soak's launch import has its own funding path: pre-fund, import an
+   // unlinked identity, authenticate the link, then claim the exact WIRE credit.
+   constexpr uint64_t Imported = 5 * Unit;
+   const auto private_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
+   const auto native = fc::crypto::ethereum::address_to_bytes(private_key.get_public_key());
+   const std::vector<char> native_address(native.begin(), native.end());
+   BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, config::system_account_name, "transfer"_n,
+      mvo()("from", "sysio")("to", DCLAIM_ACCOUNT)("quantity", asset(Imported, wire))("memo", "import backing")));
+   BOOST_REQUIRE_EQUAL(success(), push(DCLAIM_ACCOUNT, dclaim_abi, DCLAIM_ACCOUNT, "importseed"_n,
+      mvo()("chain", First.kind)("credits", fc::variants{
+         mvo()("native_address", native_address)("wire_atomic", int64_t(Imported))})));
+   BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   create_eth_authex_link(CLAIM_ACCOUNT, private_key);
+   BOOST_REQUIRE(get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   BOOST_REQUIRE_EQUAL(Imported, get_dclaim_row("pclaims"_n, "pending_claim", CLAIM_ACCOUNT.to_uint64_t())
+      ["balance"].as<asset>().get_amount());
+   BOOST_REQUIRE_EQUAL(success(), push(DCLAIM_ACCOUNT, dclaim_abi, CLAIM_ACCOUNT, "claim"_n,
+      mvo()("wire_account", CLAIM_ACCOUNT)));
+   BOOST_REQUIRE_EQUAL(Imported, balance(CLAIM_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(0, balance(DCLAIM_ACCOUNT));
+   const auto funding_left = balance(config::system_account_name);
+   // A new reward at the authenticated downstream boundary exceeds liquid
+   // treasury funds. Credit is retained, but funding cannot overspend custody.
+   BOOST_REQUIRE_EQUAL(success(), push(DCLAIM_ACCOUNT, dclaim_abi, MSGCH_ACCOUNT, "onreward"_n,
+      mvo()("chain_code", fc::slug_name{First.chain}.value)("staker_wire_account", UWRIT_OP.to_string())
+         ("reward_chain", First.kind)("staker_native_addr", address)("reward_amount", 100 * Unit)
+         ("reward_epoch_index", current_epoch())("external_epoch_ref", 2)("share_bps", 10'000)));
+   BOOST_REQUIRE_EQUAL(funding_left, balance(DCLAIM_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(0, balance(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(100 * Unit, get_dclaim_row("pclaims"_n, "pending_claim", UWRIT_OP.to_uint64_t())
+      ["balance"].as<asset>().get_amount());
+}
 BOOST_AUTO_TEST_SUITE_END()
