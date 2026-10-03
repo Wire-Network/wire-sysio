@@ -717,7 +717,7 @@ BOOST_FIXTURE_TEST_CASE(termcheck_terminates_at_duty_rotation_cadence, sysio_opr
    // resident operator is recorded once per 3-epoch rotation, so a
    // consecutive-miss run reaching the threshold spans
    // (threshold + 1) * kDutyRotationMs of wall clock — the arithmetic the
-   // SEC-28 span bound protects. Drive one outpost's records at exactly that
+   // span bound protects. Drive one record per duty epoch at exactly that
    // cadence under a window sized by the bound (with one rotation of margin
    // for block-time skew) and require the run to stay observable end to end.
    BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kWindowBoundEpochDurationSec));
