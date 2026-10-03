@@ -171,7 +171,7 @@ namespace sysiosystem {
       /// producer's slot did not deliver is simply never counted, so its pay stays in the treasury.
       /// The count SURVIVES a park, a demotion, or a lost key: a producer that is not schedulable
       /// at a payepoch is neither paid nor reset, and whatever it made is paid at the first
-      /// payepoch where it is schedulable again (never, for a slashed or terminated one).
+      /// payepoch where it is schedulable again (never, for a slashed one).
       uint32_t                                                 unpaid_blocks = 0;
       time_point                                               last_claim_time;
       uint16_t                                                 location = 0;

@@ -51,8 +51,12 @@ namespace sysio {
              * @param cpu_weight The amount of SYS allocated for CPU
              * @param ram_weight The amount of SYS allocated for RAM.
              * @param time_block A block number, the policy can't be reclaimed or reduced before this block.
+             *                   A value at or below the current block issues the grant unlocked (reducible
+             *                   immediately); extendpolicy adds or lengthens a lock.
              * @param network_gen Generation of issuer, in cases where you are a Node Owner in multiple,
-             *                     specifies which allocation of SYS to pull from.
+             *                     specifies which allocation of SYS to pull from. Must not exceed the
+             *                     current generation, which is always 0: only the one-shot activateroa
+             *                     sets it.
              */
             [[sysio::action]]
             void addpolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint32_t& time_block, const uint8_t& network_gen);
@@ -68,7 +72,9 @@ namespace sysio {
              * @param cpu_weight The amount in SYS to increase CPU by.
              * @param ram_weight The amount in SYS to increase RAM by.
              * @param network_gen Generation of issuer, in cases where you are a Node Owner in multiple,
-             *                     specifies which allocation of SYS to pull from.
+             *                     specifies which allocation of SYS to pull from. Must not exceed the
+             *                     current generation, which is always 0: only the one-shot activateroa
+             *                     sets it.
              */
             [[sysio::action]]
             void expandpolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint8_t& network_gen);
@@ -85,7 +91,7 @@ namespace sysio {
 
             /**
              * @brief Decrease the resource limits on an existing policy. Subtracts new weights from
-             *        existing values. Only callable after policy's time_block.
+             *        existing values. Only callable once the current block reaches the policy's time_block.
              *
              * Note: Will reclaim UPTO ram_weight worth of bytes, limited to the pool of unused bytes on 'owner's reslimit and upper bound by the policy ram_weight.
              *
@@ -100,7 +106,9 @@ namespace sysio {
              * @param cpu_weight The non-negative amount in SYS to decrease CPU by.
              * @param ram_weight The non-negative amount in SYS to attempt decreasing RAM by, returning only
              * @param network_gen Generation of issuer, in cases where you are a Node Owner in multiple,
-             *                     specifies which allocation of SYS to adjust.
+             *                     specifies which allocation of SYS to adjust. Must not exceed the
+             *                     current generation, which is always 0: only the one-shot activateroa
+             *                     sets it.
              */
             [[sysio::action]]
             void reducepolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint8_t& network_gen);
@@ -327,6 +335,11 @@ namespace sysio {
                 SYSLIB_SERIALIZE(policy_key, (owner))
             };
 
+            /**
+             * A row does not record the network generation that funded it; expandpolicy and reducepolicy
+             * adjust whichever generation's budget the caller names. A future generation rotation must add
+             * that field before those two actions can be generation-safe.
+             */
             struct [[sysio::table("policies")]] policies {
                 name owner;                 // Account name this policy applies to.
                 name issuer;                // Account name of the Node Owner who issued this policy.
