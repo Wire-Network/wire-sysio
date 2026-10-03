@@ -368,6 +368,10 @@ void opreg::regoperator(name account,
          auto link_it = namechain_idx.find(composite_key);
          check(link_it != namechain_idx.end(),
                "missing authex link for outpost chain");
+         // Deposits and withdrawals route by this key, so it must route back here: a key another
+         // account linked first would send this operator's collateral traffic to that account.
+         check(linked_account_for_key(AUTHEX_ACCOUNT, link_it->pub_key) == account,
+               "authex link key for outpost chain routes to another account");
       }
    }
 

@@ -273,9 +273,6 @@ namespace sysio {
         const sysio::public_key &pub_key,
         const uint64_t nonce);
 
-    // ! For testing only, remove before MAINNET deployment.
-    [[sysio::action]] void clearlinks();
-
     /**
      * Record an external-chain public-key link WITHOUT signature verification -- the trusted,
      * depot-only counterpart to createlink. The OPP NodeOwnerRegistration dispatch has already
@@ -353,4 +350,24 @@ namespace sysio {
      */
     static std::array<uint8_t, 4> digestSuffixRipemd160(const std::array<char, 33> &data, const std::string &extra);
   };
+
+  /**
+   * @brief The Wire account an external key routes to.
+   *
+   * Operator deposits and withdrawals resolve the outpost-supplied key through the `bypubkey`
+   * index, and `find` returns the lowest-keyed row. `recordlink` lets several accounts hold one
+   * key, so only the first of them receives traffic for it. Link rows are never erased and keys only
+   * grow, so an account's routing never changes once linked; an unlink action would break the
+   * guarantee sysio.opreg::regoperator relies on.
+   *
+   * @param authex_account the account hosting the `links` table.
+   * @param pk             the external key, an EM or ED variant.
+   * @return the account the key routes to, or `name{}` when no link holds it.
+   */
+  inline name linked_account_for_key(name authex_account, const public_key& pk) {
+     authex::links_t links(authex_account);
+     auto by_pubkey = links.get_index<"bypubkey"_n>();
+     auto it = by_pubkey.find(pubkey_to_checksum256(pk));
+     return it == by_pubkey.end() ? name{} : it->username;
+  }
 }
