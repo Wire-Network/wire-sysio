@@ -119,30 +119,6 @@ namespace sysio {
       static constexpr uint32_t MIN_OWNER_FEE_BPS = 1;    // 0.01%
       static constexpr uint32_t MAX_OWNER_FEE_BPS = 9900; // 99%
 
-      // Claimable-WIRE retention. `refundwire` / `paywire` credit an unbounded, caller-influenced
-      // set of accounts, and the rows bill to the sysio RAM pool, so an abandoned dust row would
-      // otherwise occupy system-paid RAM forever. A row not pulled within this window is swept and
-      // its balance returns to the emissions treasury.
-      //
-      // One year is deliberately far longer than any plausible claim latency: forfeiture is a RAM
-      // backstop, not an economic lever. (Contrast `sysio.dclaim::claim_window_sec`, which is
-      // governance-tunable because staker windows ARE policy.) Promote this to config if that ever
-      // changes; a constant keeps the swap-settlement surface unchanged in the meantime.
-      static constexpr uint32_t WIRE_CLAIM_WINDOW_SEC = 365 * 24 * 60 * 60;
-
-      // Rows swept per credit. Bounds the on-write retention sweep so a settlement action reached
-      // from `sysio.epoch::advance` (via `drainfwq`) stays inside its CPU deadline, the same shape
-      // `sysio.opreg::prune_dellog` uses.
-      static constexpr uint32_t MAX_CLAIM_SWEEP_PER_CREDIT = 4;
-
-      // Rows swept per epoch by `sweepclaims`, which `sysio.epoch::advance` inlines. Larger than
-      // the per-credit budget because this is the trigger that has to actually drain a backlog:
-      // the on-write sweep only fires while settlement traffic arrives, so if swaps stop, this is
-      // the only thing that revisits an aged-out row. Sized like the other advance-inlined bounds
-      // (`MAX_LOCK_RELEASE_PER_EPOCH`, `MAX_WTDW_FLUSH_PER_EPOCH`) to stay well inside advance's
-      // hard, uncatchable CPU deadline; an oversized backlog simply drains across later epochs.
-      static constexpr uint32_t MAX_CLAIM_SWEEP_PER_EPOCH = 32;
-
       // -----------------------------------------------------------------------
       //  Actions
       // -----------------------------------------------------------------------
@@ -433,30 +409,10 @@ namespace sysio {
       /// whose transfer-notify handler aborts blocks nothing but its own claim.
       /// Throws when there is nothing to claim, which reaches only the caller.
       ///
-      /// Also refuses a row past `expires_at_sec`. The sweep is bounded and
-      /// best-effort, so an expired row can wait many epochs for its turn;
-      /// without this check the retention deadline would mean "swept eventually"
-      /// rather than "claimable until", and a forfeit balance would still pay
-      /// out in the meantime.
+      /// Swap payouts and refunds remain claimable indefinitely. Their backing
+      /// stays in this contract's custody until the claimant pulls it.
       [[sysio::action]]
       void claimwire(sysio::name account);
-
-      /// Auth = `sysio.epoch` or self. Erase up to `max_rows` `wireclaims` rows
-      /// whose one-year retention window has closed and push their total to the
-      /// emissions treasury.
-      ///
-      /// `sysio.epoch::advance` inlines this every epoch with
-      /// `MAX_CLAIM_SWEEP_PER_EPOCH`. That is what makes the retention deadline
-      /// real: `credit_wire_claim` also sweeps, but only as a side effect of a
-      /// later credit, so with settlement traffic stopped no action would ever
-      /// revisit an aged-out row — leaving an unbounded, system-funded table and
-      /// the WIRE it reserves outstanding indefinitely.
-      ///
-      /// Bounded and never-throwing past the auth gate for the usual reason: it
-      /// runs inline inside `advance`, where an abort stalls epoch progress
-      /// chain-wide. An oversized backlog drains across later epochs.
-      [[sysio::action]]
-      void sweepclaims(uint32_t max_rows);
 
       /// Auth = self (`sysio.reserv`). Set the contract's fee-routing config.
       ///
@@ -669,25 +625,15 @@ namespace sysio {
          SYSLIB_SERIALIZE(wireclaim_key, (account))
       };
 
+      /// Indefinitely claimable swap payout/refund; storage remains until the recipient claims.
       struct [[sysio::table("wireclaims")]] wire_claim {
          sysio::name account;
-         uint64_t    balance        = 0;   // atomic WIRE units owed, not yet claimed
-         uint32_t    expires_at_sec = 0;   // swept back to the treasury once past
+         uint64_t    balance = 0;   // atomic WIRE units owed, not yet claimed
 
-         /// Expiry-major composite so the secondary index orders by expiry and the retention sweep
-         /// can stop at the first live row. The account tail only breaks ties, keeping the key
-         /// unique when many rows share an expiry second.
-         uint128_t by_expiry() const {
-            return (static_cast<uint128_t>(expires_at_sec) << 64) | account.value;
-         }
-
-         SYSLIB_SERIALIZE(wire_claim, (account)(balance)(expires_at_sec))
+         SYSLIB_SERIALIZE(wire_claim, (account)(balance))
       };
 
-      using wireclaims_t = sysio::kv::table<"wireclaims"_n, wireclaim_key, wire_claim,
-         sysio::kv::index<"byexpiry"_n,
-            sysio::const_mem_fun<wire_claim, uint128_t, &wire_claim::by_expiry>>
-      >;
+      using wireclaims_t = sysio::kv::table<"wireclaims"_n, wireclaim_key, wire_claim>;
 
       /// Key for `uwfees` — one row per earning underwriter account.
       struct uw_fee_key {

@@ -126,7 +126,6 @@ namespace sysio {
       static constexpr name AUTHEX_ACCOUNT = "sysio.authex"_n;
       static constexpr name CHAINS_ACCOUNT = "sysio.chains"_n;
       static constexpr name UWRIT_ACCOUNT  = "sysio.uwrit"_n;
-      static constexpr name RESERV_ACCOUNT = "sysio.reserv"_n;
 
       /// Bounds on `epoch_duration_sec`. Floor is a typo-guard: below it a pay
       /// period holds fewer block slots than one producer rotation, so the

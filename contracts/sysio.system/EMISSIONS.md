@@ -189,8 +189,9 @@ kicker (`kicker_bps` of each intake from the swap, the intake that is yield) fro
 the pool, so `fundclaim` names its recipient, which must be one of those two
 contracts.
 
-Unclaimed rows expire after `cap_config.claim_window_sec` and revert to the
-dclaim pool via `flushexpired`. `fundclaim` and the whole OPP inbound path are
+Unclaimed DClaim balances never expire, including rewards and imported credits
+awaiting AuthX linking. They remain owed until claimed and are not forfeited to
+the capital fund; their rows retain RAM indefinitely. `fundclaim` and the whole OPP inbound path are
 never-throw (transfers are capped / soft-dropped so a bad row cannot abort the
 message chain), whereas `claimnodedis` and `claim` are ordinary user actions
 that `check`-abort on bad input.

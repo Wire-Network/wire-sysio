@@ -1,7 +1,7 @@
 # System-contract upgrade order
 
 The system contracts are not independent deployables. `sysio.epoch::advance`
-inlines actions into six other contracts, and the emissions gate reads two more
+inlines actions into five other contracts, and the emissions gate reads two
 contracts' tables, so a release's contract builds are only correct **as a set**.
 Upgrading them one at a time creates windows in which a new caller meets an old
 callee.
@@ -121,7 +121,6 @@ Everything `sysio.epoch::advance` inlines, directly:
 
 | Callee | Actions |
 |---|---|
-| `sysio.reserv` | `sweepclaims` |
 | `sysio.uwrit` | `chklocks`, `pruneuwreqs`, `drainfwq` |
 | `sysio.opreg` | `recorddel`, `termcheck`, `flushwtdw` |
 | `sysio.chalg` | `slashop` |
@@ -200,7 +199,7 @@ path, not a replacement for the normal quiesced deployment. Do not downgrade
 while `batchepochs` is non-empty. T5 must also be initialized before its first
 successful epoch advance.
 
-## The two rules for future changes
+## The rules for future changes
 
 1. **A contract that gains an action `advance` inlines deploys BEFORE
    `sysio.epoch`.** Otherwise the new caller reaches an old callee that cannot
@@ -208,27 +207,35 @@ successful epoch advance.
 2. **A contract whose new state the gate must reserve deploys AFTER
    `sysio.epoch`.** Otherwise the new writer commits state the old gate does not
    know to reserve, and the gate authorizes what the treasury cannot cover.
+3. **Remove an inline caller BEFORE removing its callee action**, or deploy
+   both in the same transaction. An older caller still requires that action.
 
-**The two edges point in OPPOSITE directions along the dependency arrow, so they
-cannot be collapsed into one inequality.** State them separately:
+**Call compatibility and state compatibility are separate requirements.**
+The safe order depends on the change:
 
-- **Call edge — `callee_version >= caller_version`.** The contract that RECEIVES
-  an inlined action upgrades first, because the new caller emits an action the
-  old callee cannot dispatch.
+- **Call edge — every action the deployed caller inlines must exist in the
+  deployed callee.** For an added action, deploy the callee first; for a removed
+  action, deploy the caller that stops sending it first. An atomic deployment
+  of both contracts also satisfies the requirement.
 - **Table edge — `reader_version >= writer_version`.** The contract that READS
   the new state upgrades first, because the new writer commits state the old
   reader does not know to account for.
 
-A sentence that says "the caller must never be older than the callee" inverts
-the first one, and following it produces exactly the epoch-new / callee-old
-state that aborts every advance.
+A single caller/callee version inequality cannot describe both adding and
+removing actions. Check the actual actions emitted and dispatched by the
+deployed pair, as well as the state the reader must account for.
 
 ## Staged rollout (when one transaction is not possible)
 
-For the SEC-150 claimable-payout release the order is:
+For the WIRE-339 no-expiry release, deploy `sysio.epoch` before
+`sysio.reserv`, or deploy them in the same transaction. Epoch must stop
+calling the removed reserve sweep action before reserve stops dispatching it;
+otherwise every `advance` aborts. This reverses the reserve/epoch ordering
+used when SEC-150 introduced the sweep. If also introducing the SEC-150
+pay-claim accounting, the order is:
 
 ```
-sysio.reserv  ->  sysio.epoch  ->  sysio.system
+sysio.epoch  ->  sysio.reserv / sysio.system
 ```
 
 `sysio.opreg` and `sysio.uwrit` are free to land anywhere in the sequence: they
@@ -237,13 +244,20 @@ no other contract reads their new tables.
 
 | Edge | Why |
 |---|---|
-| `sysio.reserv` before `sysio.epoch` | The new `advance` inlines `sysio.reserv::sweepclaims`, guarded only on the account existing. An old `sysio.reserv` build has the account and not the action, so the inline asserts and every advance aborts. |
+| `sysio.epoch` before `sysio.reserv` | Epoch must stop inlining the reserve sweep before reserve removes that action. |
 | `sysio.epoch` before `sysio.system` | The new `payepoch` retains WIRE in `payclaims` and reserves it in `payclaimtot`. The old gate counts that backing as spendable, so a later pay period can double-commit it and leave credited claims underfunded. |
 
-Every intermediate state of that order is safe. A new `sysio.reserv` under an old
-`sysio.epoch` is simply never asked to sweep — the retention deadline then rests
-on `credit_wire_claim`'s opportunistic sweep until epoch catches up. A new
-`sysio.epoch` under an old `sysio.system` reads a `payclaimtot` whose KV key does
+Removing expiry fields and indexes is a pre-launch schema change. Activate
+the no-expiry contracts on fresh state; this release provides no migration of
+older claim-row encodings. All four claim ledgers retain balances and storage
+until claimed, including reserve swap payouts and refunds. Keep settlement
+and claim traffic quiesced while deploying the coordinated contracts.
+
+Rebuild `sysio.epoch.wasm` from the final merged source. PR #603 also changes
+that artifact, so whichever PR lands second must regenerate it instead of
+selecting one side's binary during a merge.
+
+A new `sysio.epoch` under an old `sysio.system` reads a `payclaimtot` whose KV key does
 not exist yet, so `get_or_default` yields a zero reserve — the correct answer
 while nothing is credited, and the absent-key case rather than the
 short-decode one (see [above](#why-a-mixed-version-is-not-merely-degraded)).
@@ -260,18 +274,21 @@ short-decode one (see [above](#why-a-mixed-version-is-not-merely-degraded)).
 
 **A downgrade is not the upgrade run backwards. It is a data-migration problem
 first, and a code-ordering problem second** — because by the time you want to
-roll back, all three claim tables may hold value that only the NEW code can pay
-out:
+roll back, all four claim ledgers may hold value that older code cannot safely
+decode or pay out:
 
 | Table | Contract | Paid out by | Stranded when that contract rolls back |
 |---|---|---|---|
 | `payclaims` | `sysio.system` | `claimpay` | earned epoch pay |
 | `wireclaims` | `sysio.reserv` | `claimwire` | swap payouts + refunds already withheld from recipients |
 | `remitclaims` | `sysio.opreg` | `claimremit` | debited operator collateral |
+| `pclaims`, `unmapped` | `sysio.dclaim` | `claim` (after AuthX linking via `linkswept` for unmapped balances) | rewards and imported credits whose no-expiry row encodings differ from the old schema |
 
-Every one of those balances is value already taken from someone's spendable
-position and parked behind an action the old build does not have. Rolling back
-with rows present does not degrade — it strands.
+Every one of those balances is owed to a recipient. Depending on the rollback
+target, the old build may lack the withdrawal action or expect an incompatible
+row encoding. Keeping an action with the same name does not make DClaim's
+changed rows safe to read. Rolling back with incompatible rows can strand
+their balances.
 
 There is also a live-writer hazard with no upgrade counterpart: rolling
 `sysio.epoch` back while the new `sysio.system` is still deployed lets `payepoch`
@@ -281,13 +298,20 @@ resumes double-committing while the pile of unreachable claims grows.
 The safe procedure is therefore:
 
 1. **Quiesce the credit writers** so no new claim rows appear.
-2. **Drain or migrate all three claim tables** — claimants pull, or the balances
-   are migrated. This step is the one that actually gates the rollback, and it
-   cannot be completed unilaterally: a claimant who never claims holds it open.
-3. **Roll back the coupled trio in the order `sysio.system` → `sysio.epoch` →
-   `sysio.reserv`** — the mirror of the upgrade order, so the writer is retired
-   before the reader that accounts for it, and the caller before the callee it
-   would otherwise inline into.
+2. **Drain or migrate all four claim ledgers**, including DClaim's `pclaims`
+   and `unmapped` rows — claimants pull (after linking where needed), or the
+   balances are migrated. This step gates the rollback and cannot be completed
+   unilaterally: a claimant who never claims holds it open. DClaim's `capcfg`
+   singleton also changed encoding when `claim_window_sec` was removed; draining
+   the claim rows does not restore it. Any rollback must restore the target
+   configuration layout while preserving `imported_complete`. Deleting or
+   resetting the singleton would reopen finalized imports. This release does
+   not supply that migration.
+3. **Retire the `sysio.system` claim writer before its epoch accounting reader.**
+   If restoring an epoch build that calls the removed reserve sweep, restore
+   the matching reserve action first (or atomically with epoch). This ordering
+   does not make older claim-row encodings compatible; drain or migrate them
+   before any rollback.
 4. **Roll `sysio.opreg` back only once its remits are handled.**
 
 **A live chain with uncooperative claimants is not safely downgradeable** by
