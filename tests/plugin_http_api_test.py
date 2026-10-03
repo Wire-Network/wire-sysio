@@ -1519,18 +1519,16 @@ class PluginHttpTest(unittest.TestCase):
             Utils.Print('resp3_data= \n', resp3_data)
 
 
-            # wait for socket to close
-            time.sleep(0.5)
-            # send request 2 again.  this should fail because request 3 has "Connection: close" in header
-            Utils.Print('sending request 2 again')
+            # request 3 has "Connection: close" in header, so the server must close the connection after response 3
+            Utils.Print('waiting for the server to close the connection')
             try:
-                sock.settimeout(3)
-                sock.send(bytes(req2, enc))
-                d = sock.recv(64)
-                if(len(d) > 0):
-                    Utils.errorExit('Socket still open after "Connection: close" in header: ' + d.decode(enc))
-            except (ConnectionResetError, BrokenPipeError):
-                pass
+                d = sock.recv(1)
+            except ConnectionResetError:
+                d = b""
+            except socket.timeout:
+                Utils.errorExit('Socket still open after "Connection: close" in header: no end of stream')
+            if len(d) > 0:
+                Utils.errorExit(f'Socket still open after "Connection: close" in header: received {d!r}')
 
             Utils.Print("Socket connection closed as expected")
 
