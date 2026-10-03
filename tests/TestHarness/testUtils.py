@@ -827,34 +827,35 @@ class Utils:
         return hdr + body
 
     @staticmethod
-    def readSocketData(sock : socket.socket, maxMsgSize : int) -> bytes:
-        """Read data from a socket until maxMsgSize is reached or timeout
-        Retrusn data as bytes object"""
-        sock.settimeout(1)
-        moreData = True
-        data = None
-        bufSize = 64
-        while moreData and maxMsgSize > 0:
-            try:
-                bufSize = min(bufSize, maxMsgSize)
-                d = sock.recv(bufSize)
-                dataSz = len(d)
-                maxMsgSize -= dataSz
-                if data is None:
-                    data = d
-                else:
-                    data += d
-                moreData = (dataSz == bufSize)
-            except Exception as e:
-                moreData = False
-        return data
-
-    @staticmethod
-    def readSocketDataStr(sock : socket.socket, maxMsgSize : int, enc : str) -> str:
-        """Read data from a socket until maxMsgSize is reached or timeout
-        Retrusn data as decoded string object"""
-        data = Utils.readSocketData(sock, maxMsgSize)
-        return data.decode(enc)
+    def readHttpResponse(sock : socket.socket, maxMsgSize : int, enc : str) -> str:
+        """Read one HTTP response from sock, its headers and then exactly Content-Length bytes of body, and return
+        it decoded. The request must have been the only one outstanding. Raises socket.timeout per the socket's
+        timeout, and RuntimeError when the peer closes before the response is complete, the response has no
+        Content-Length or is larger than maxMsgSize, or bytes past its end arrive with it."""
+        data = b""
+        while b"\r\n\r\n" not in data:
+            if len(data) > maxMsgSize:
+                raise RuntimeError(f"no end of response headers within {maxMsgSize} bytes")
+            chunk = sock.recv(65536)
+            if not chunk:
+                raise RuntimeError(f"connection closed after {len(data)} bytes of response headers")
+            data += chunk
+        head, _, body = data.partition(b"\r\n\r\n")
+        match = re.search(rb"^content-length:\s*(\d+)\s*$", head, re.IGNORECASE | re.MULTILINE)
+        if not match:
+            raise RuntimeError(f"response without Content-Length: {head.decode(enc, 'replace')}")
+        length = int(match.group(1))
+        size = len(head) + len(b"\r\n\r\n") + length
+        if size > maxMsgSize:
+            raise RuntimeError(f"response of {size} bytes exceeds {maxMsgSize} bytes")
+        while len(body) < length:
+            chunk = sock.recv(min(65536, length - len(body)))
+            if not chunk:
+                raise RuntimeError(f"connection closed after {len(body)} of {length} body bytes")
+            body += chunk
+        if len(body) > length:
+            raise RuntimeError(f"{len(body) - length} unexpected bytes after a {length} byte response body")
+        return (head + b"\r\n\r\n" + body).decode(enc)
 
     @staticmethod
     def getNodeopVersion():
