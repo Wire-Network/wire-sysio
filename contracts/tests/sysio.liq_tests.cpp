@@ -250,6 +250,9 @@ public:
    action_result recredit(name holder, int64_t amount, name signer = LIQ_ACCOUNT) {
       return push_liq(signer, "recredit"_n, mvo()("holder", holder)("quantity", asset(amount, LIQSOL_SYM)));
    }
+   action_result setmindesyn(const asset& minimum, name signer = LIQ_ACCOUNT) {
+      return push_liq(signer, "setmindesyn"_n, mvo()("minimum", minimum));
+   }
    action_result regliqpool(std::string_view chain_code, std::string_view token_code, symbol pair_symbol,
                             uint64_t initial_chain_amount, uint64_t initial_wire_amount, int32_t fee = 30,
                             int64_t locked_shares = 0, uint32_t horizon_sec = 86400, uint32_t depth_cap_bps = 300,
@@ -901,6 +904,64 @@ BOOST_FIXTURE_TEST_CASE(desyndicate_burns_and_queues_the_attestation, sysio_liq_
    BOOST_REQUIRE_EQUAL(success(), recredit("alice"_n, 10 * UNIT));
    BOOST_REQUIRE_EQUAL(60 * UNIT, shadow_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(160 * UNIT, supply());
+} FC_LOG_AND_RETHROW()
+
+// Each de-syndication queues a sysio-billed outbound row and a relayer-paid payout, so the symbol's
+// floor refuses dust: below it is rejected, at it is accepted, and only this contract moves it.
+BOOST_FIXTURE_TEST_CASE(desyndicate_enforces_the_symbol_minimum, sysio_liq_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), mintsynd(SOLANA, 1, "alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), recordlink("alice"_n, ChainKind::CHAIN_KIND_SVM, ed_key()));
+
+   // `create` starts the shadow at one hundredth of a whole token.
+   constexpr int64_t default_minimum = UNIT / 100;
+   BOOST_REQUIRE_EQUAL("0.010000000 LIQSOL", stat_row()["min_desyndicate"].as_string());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("quantity is below the minimum de-syndication of 0.010000000 LIQSOL"),
+                       desyndicate("alice"_n, default_minimum - 1));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, default_minimum));
+   const auto att = attestation_row(1);
+   BOOST_REQUIRE(!att.is_null());
+   const auto data = att["data"].as<std::vector<char>>();
+   sysio::opp::attestations::DesyndicateLIQ msg;
+   BOOST_REQUIRE(msg.ParseFromArray(data.data(), static_cast<int>(data.size())));
+   BOOST_REQUIRE_EQUAL(default_minimum, msg.amount().amount());
+
+   // Only this contract retunes it, never to zero, and only in the shadow's own precision.
+   BOOST_REQUIRE(mentions(setmindesyn(asset(UNIT, LIQSOL_SYM), "alice"_n), "missing authority of sysio.liq"));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("minimum must be positive"), setmindesyn(asset(0, LIQSOL_SYM)));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("minimum must be positive"), setmindesyn(asset(-1, LIQSOL_SYM)));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("symbol precision mismatch"),
+                       setmindesyn(asset(1, symbol::from_string("6,LIQSOL"))));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("shadow symbol does not exist"), setmindesyn(asset(1, LIQETH_SYM)));
+
+   // Raising the floor refuses what the default admitted; lowering it to one subunit admits that.
+   BOOST_REQUIRE_EQUAL(success(), setmindesyn(asset(UNIT, LIQSOL_SYM)));
+   BOOST_REQUIRE_EQUAL("1.000000000 LIQSOL", stat_row()["min_desyndicate"].as_string());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("quantity is below the minimum de-syndication of 1.000000000 LIQSOL"),
+                       desyndicate("alice"_n, UNIT - 1));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, UNIT));
+   BOOST_REQUIRE_EQUAL(success(), setmindesyn(asset(1, LIQSOL_SYM)));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 1));
+
+   BOOST_REQUIRE_EQUAL(100 * UNIT - default_minimum - UNIT - 1, shadow_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(100 * UNIT - default_minimum - UNIT - 1, supply());
+   BOOST_REQUIRE_EQUAL(4u, counters_row()["next_request_id"].as_uint64());
+} FC_LOG_AND_RETHROW()
+
+// The default floor is one hundredth of a whole token in the shadow's own precision, and never less
+// than one subunit.
+BOOST_FIXTURE_TEST_CASE(create_scales_the_default_minimum_to_the_precision, sysio_liq_tester) try {
+   const auto create_at = [&](std::string_view code, uint32_t precision) {
+      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_LIQ, code, precision, ChainKind::CHAIN_KIND_EVM,
+                                              ETH, std::vector<char>(20, char(0x5a))));
+      const symbol sym(static_cast<uint8_t>(precision), code);
+      BOOST_REQUIRE_EQUAL(success(), create(sym, ETH, code));
+      return stat_row(sym)["min_desyndicate"].as_string();
+   };
+   BOOST_REQUIRE_EQUAL("0.010000000 LIQSOL", stat_row()["min_desyndicate"].as_string());
+   BOOST_REQUIRE_EQUAL("0.010000 LIQSIX", create_at("LIQSIX", 6));
+   BOOST_REQUIRE_EQUAL("0.01 LIQTWO", create_at("LIQTWO", 2));
+   BOOST_REQUIRE_EQUAL("0.1 LIQONE", create_at("LIQONE", 1));
+   BOOST_REQUIRE_EQUAL("1 LIQZERO", create_at("LIQZERO", 0));
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------

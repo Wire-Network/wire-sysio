@@ -46,6 +46,13 @@ to be AuthX-linked for the token's chain, settles and burns the shadow, and queu
 `sysio.msgch::queueout`. Request ids start at 1. The burn is final: an outpost
 refusal is reconciled from its log by governance through `recredit`.
 
+`quantity` must reach the symbol's `min_desyndicate`. Every de-syndication is a
+sysio-billed outbound row and a payout the outpost relay pays for, so the floor keeps
+dust from buying either. `create` sets it to one hundredth of a whole token (never
+below one subunit), and `setmindesyn` retunes it per symbol. A holder can be left with
+less than the floor, for example after a partial exit or a small transfer in; that
+remainder can still be transferred, swapped, or topped up and then de-syndicated.
+
 **Launch ingestion (epoch-0 bootstrap window, privileged caller).** `regliqpool`
 mints the LCO liq to `sysio`, deposits it with the T5 dex earmark WIRE into
 `sysio.swap`, creates the pair (`sysio` fee authority, the shadow as yield leg)
@@ -57,7 +64,7 @@ import.
 
 | Table | Scope / key | Row |
 |---|---|---|
-| `stat` | symbol code | `supply`, `chain_code`, `token_code`, `pair_symbol` (empty until `regliqpool`); index `bytoken` |
+| `stat` | symbol code | `supply`, `chain_code`, `token_code`, `pair_symbol` (empty until `regliqpool`), `min_desyndicate`; index `bytoken` |
 | `accounts` | holder / symbol code | `balance`, `index_checkpoint` (uint128), `owed_wire` |
 | `yieldidx` | symbol code | `index` (uint128), `pot`, `carry` |
 | `parked` | symbol code, chain kind, pubkey | `chain_kind`, `pubkey`, `holding` (an account row) |
@@ -73,6 +80,7 @@ import.
 | `create(sym, chain_code, token_code)` | self | Register a shadow for an active `TOKEN_KIND_LIQ` token bound to an active outpost |
 | `setkicker(bps)` | `sysio` | Kicker for the intakes from now on |
 | `recredit(holder, quantity)` | self | Mint back after an outpost refused a de-syndication |
+| `setmindesyn(minimum)` | self | Smallest quantity `desyndicate` accepts for `minimum`'s symbol; positive |
 | `mintsynd(chain_code, sequence, account, token_code, amount)` | `sysio.msgch` | SYNDICATE_LIQ, linked user |
 | `park(chain_code, sequence, chain_kind, pubkey, token_code, amount)` | `sysio.msgch` | SYNDICATE_LIQ, unlinked user |
 | `mintyield(chain_code, sequence, epoch, token_code, amount)` | `sysio.msgch` | LIQ_YIELD into the pending balance |
@@ -89,7 +97,7 @@ import.
 
 In order: `sysio.roa::setsyscode` for `sysio.liq`; the chain and its liq token
 registered and active in `sysio.chains` / `sysio.tokens`; `create` per shadow
-symbol; `setkicker` if the default is not wanted; `regliqpool` per pool;
+symbol; `setkicker` and `setmindesyn` if the defaults are not wanted; `regliqpool` per pool;
 `importsynd` batches; `importdone`. `sysio.swap` must be configured
 (`setconfig`) before `regliqpool`, and the batch-operator crank pushes
 `queueyield` per symbol and `sysio.swap::tickyield` per pair.

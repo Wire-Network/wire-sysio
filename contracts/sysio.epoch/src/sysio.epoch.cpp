@@ -19,6 +19,7 @@
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <magic_enum/magic_enum.hpp>
+#include <array>
 
 namespace sysio {
 
@@ -56,6 +57,22 @@ namespace opreg_actions {
 constexpr name RECORD_DELIVERY = "recorddel"_n;
 constexpr name TERMINATION_CHECK = "termcheck"_n;
 } // namespace opreg_actions
+
+/// Action identifiers owned by sysio.msgch and invoked while closing an epoch.
+namespace msgch_actions {
+constexpr name QUEUE_OUT = "queueout"_n;
+} // namespace msgch_actions
+
+/// Operator statuses the OPERATORS roster lists; both outposts treat an operator missing from the
+/// latest roster as not active. UNKNOWN (registered without the required bond) is left out because
+/// registration is permissionless, so listing it would let anyone inflate the roster; the cost is
+/// that such an operator's bond misses the Solana outpost's deposit priority lane. Leaving TERMINATED
+/// out is safe: `releaselock` may still remit its locked collateral, and WITHDRAW_REMIT needs no
+/// roster entry on either outpost. SLASHED stays because `opreg::slash` marks the row before it emits
+/// the SLASH, and the Solana outpost resolves a slash's target, and keeps its tombstone, through the
+/// roster.
+constexpr std::array ROSTER_STATUSES = {OperatorStatus::OPERATOR_STATUS_ACTIVE,
+                                        OperatorStatus::OPERATOR_STATUS_SLASHED};
 
 /// Durable reason prefix for an epoch-delivery classification slash.
 constexpr const char* NON_CANONICAL_DELIVERY_REASON_PREFIX =
@@ -763,75 +780,65 @@ void epoch::advance() {
       std::make_tuple(state.current_epoch_index)
    ).send();
 
-   // Queue OPERATORS attestation (full roster with authex chain addresses) for each outpost.
-   // IMPORTANT: Must come before BATCH_OPERATOR_GROUPS so that the ETH outpost's
-   // _handleOperators populates operatorEthAddress before _handleBatchOperatorGroups
-   // looks up those addresses.
+   // The operator schedule: the OPERATORS roster (with each operator's authex chain addresses) and the
+   // BATCH_OPERATOR_GROUPS window. Both are encoded before either is queued because together they must
+   // fit the schedule lane's share of the envelope (`msgch::SCHEDULE_LANE_BUDGET_BYTES`).
+   //
+   // The roster lists `ROSTER_STATUSES` only, walked through opreg's `bystatus` index.
+   std::vector<char> encoded_operators;
    {
       opp::attestations::Operators ops_attest;
       opreg::operators_t opreg_ops(OPREG_ACCOUNT);
+      auto status_idx = opreg_ops.get_index<"bystatus"_n>();
       authex::links_t authex_links(AUTHEX_ACCOUNT);
       auto links_by_name = authex_links.get_index<"byname"_n>();
 
-      for (auto it = opreg_ops.begin(); it != opreg_ops.end(); ++it) {
-         opp::attestations::OperatorEntry entry;
-         entry.account.name = it->account.to_string();
-         entry.type = it->type;
-         entry.status = it->status;
+      for (const auto roster_status : ROSTER_STATUSES) {
+         for (auto it = status_idx.lower_bound(magic_enum::enum_integer(roster_status));
+              it != status_idx.end() && it->status == roster_status; ++it) {
+            opp::attestations::OperatorEntry entry;
+            entry.account.name = it->account.to_string();
+            entry.type = it->type;
+            entry.status = it->status;
 
-         // Collect all authex-linked chain addresses for this operator.
-         // Store raw public key bytes from the variant (33 bytes for EM/secp256k1,
-         // 32 bytes for ED/Ed25519).
-         auto link_it = links_by_name.lower_bound(it->account.value);
-         while (link_it != links_by_name.end() && link_it->username == it->account) {
-            opp::types::ChainAddress chain_addr;
-            chain_addr.kind = link_it->chain_kind;
+            // Collect all authex-linked chain addresses for this operator.
+            // Store raw public key bytes from the variant (33 bytes for EM/secp256k1,
+            // 32 bytes for ED/Ed25519).
+            auto link_it = links_by_name.lower_bound(it->account.value);
+            while (link_it != links_by_name.end() && link_it->username == it->account) {
+               opp::types::ChainAddress chain_addr;
+               chain_addr.kind = link_it->chain_kind;
 
-            std::visit([&](const auto& key_data) {
-               using T = std::decay_t<decltype(key_data)>;
-               if constexpr (std::is_same_v<T, webauthn_public_key>) {
-                  // EM (secp256k1 compressed) — 33 bytes in key.key
-                  chain_addr.address.assign(key_data.key.begin(), key_data.key.end());
-               } else if constexpr (std::is_same_v<T, ed_public_key>) {
-                  // ED (Ed25519) — 32 bytes
-                  chain_addr.address.assign(
-                     reinterpret_cast<const char*>(key_data.data()),
-                     reinterpret_cast<const char*>(key_data.data() + key_data.size()));
-               } else if constexpr (std::is_same_v<T, ecc_public_key>) {
-                  // K1/R1 (secp256k1/P-256 compressed) — 33 bytes
-                  chain_addr.address.assign(key_data.begin(), key_data.end());
-               }
-               // Skip BLS keys — not used for chain address linking
-            }, link_it->pub_key);
+               std::visit([&](const auto& key_data) {
+                  using T = std::decay_t<decltype(key_data)>;
+                  if constexpr (std::is_same_v<T, webauthn_public_key>) {
+                     // EM (secp256k1 compressed): 33 bytes in key.key
+                     chain_addr.address.assign(key_data.key.begin(), key_data.key.end());
+                  } else if constexpr (std::is_same_v<T, ed_public_key>) {
+                     // ED (Ed25519): 32 bytes
+                     chain_addr.address.assign(
+                        reinterpret_cast<const char*>(key_data.data()),
+                        reinterpret_cast<const char*>(key_data.data() + key_data.size()));
+                  } else if constexpr (std::is_same_v<T, ecc_public_key>) {
+                     // K1/R1 (secp256k1/P-256 compressed): 33 bytes
+                     chain_addr.address.assign(key_data.begin(), key_data.end());
+                  }
+                  // Skip BLS keys, which are not used for chain address linking.
+               }, link_it->pub_key);
 
-            entry.addresses.push_back(std::move(chain_addr));
-            ++link_it;
+               entry.addresses.push_back(std::move(chain_addr));
+               ++link_it;
+            }
+
+            ops_attest.operators.push_back(std::move(entry));
          }
-
-         ops_attest.operators.push_back(std::move(entry));
       }
 
-      std::vector<char> encoded;
-      auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
+      auto out = zpp::bits::out{encoded_operators, zpp::bits::no_size{}};
       (void)out(ops_attest);
-
-      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-      for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
-         if (!is_active_outpost(*it)) continue;
-         action(
-            permission_level{get_self(), "owner"_n},
-            MSGCH_ACCOUNT,
-            "queueout"_n,
-            std::make_tuple(
-               it->code.value,
-               opp::types::ATTESTATION_TYPE_OPERATORS,
-               encoded
-            )
-         ).send();
-      }
    }
 
-   // Queue BATCH_OPERATOR_GROUPS attestation for each outpost.
+   // Encode the BATCH_OPERATOR_GROUPS attestation, queued with the roster below.
    //
    // Ships ALL groups, and an active index that points ONE EPOCH AHEAD --
    // at the group that will be on duty for `current_epoch_index + 1`, not the
@@ -857,6 +864,8 @@ void epoch::advance() {
    //
    // `epoch_index` stays the epoch this envelope IS for; it identifies the
    // envelope, not the roster, and no outpost reads it.
+   std::vector<char> encoded_groups;
+   bool              have_next_group = false;
    {
       opp::attestations::BatchOperatorGroups attest;
       // The window SLIDES; it does not rotate. `advance` erases the front and
@@ -919,7 +928,7 @@ void epoch::advance() {
       // Withheld by SKIPPING THE QUEUEOUT ONLY -- never by returning from
       // `advance`, which still has the epoch's remaining attestations and
       // actions to issue after this block.
-      const bool have_next_group =
+      have_next_group =
          next_group_index < group_count && !state.batch_op_groups[next_group_index].empty();
       if (!have_next_group) {
          sysio::print("sysio.epoch::advance: no non-empty next group to publish at epoch ",
@@ -947,27 +956,40 @@ void epoch::advance() {
          attest.groups.push_back(std::move(grp));
       }
 
-      std::vector<char> encoded;
-      auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
+      auto out = zpp::bits::out{encoded_groups, zpp::bits::no_size{}};
       (void)out(attest);
+   }
 
-      // `have_next_group` gates the QUEUEOUT, not `advance` -- see above.
-      if (have_next_group) {
-         sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-         for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
-            if (!is_active_outpost(*it)) continue;
-            action(
-               permission_level{get_self(), "owner"_n},
-               MSGCH_ACCOUNT,
-               "queueout"_n,
-               std::make_tuple(
-                  it->code.value,
-                  opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS,
-                  encoded
-               )
-            ).send();
-         }
+   // A roster that would take the schedule past its budget is withheld the same way: its queueout is
+   // skipped, `advance` goes on, and the outposts keep the roster they hold. BATCH_OPERATOR_GROUPS
+   // counts toward the budget only when it ships.
+   const size_t schedule_bytes =
+      msgch::attestation_estimate_bytes(encoded_operators.size()) +
+      (have_next_group ? msgch::attestation_estimate_bytes(encoded_groups.size()) : 0);
+   const bool ship_operators = schedule_bytes <= msgch::SCHEDULE_LANE_BUDGET_BYTES;
+   if (!ship_operators) {
+      sysio::print("sysio.epoch::advance: operator schedule needs ", schedule_bytes,
+                   " estimated bytes at epoch ", state.current_epoch_index, ", over its ",
+                   msgch::SCHEDULE_LANE_BUDGET_BYTES, "-byte budget; withholding Operators (",
+                   encoded_operators.size(), " bytes), outposts retain their previous roster\n");
+   }
+
+   // Every outpost's OPERATORS queueout goes out before any BATCH_OPERATOR_GROUPS one: the ETH
+   // outpost's `_handleOperators` populates `operatorEthAddress` before `_handleBatchOperatorGroups`
+   // looks those addresses up. `have_next_group` gates the queueout, not `advance`; see above.
+   const auto queue_to_active_outposts = [&](opp::types::AttestationType type, const std::vector<char>& data) {
+      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+      for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
+         if (!is_active_outpost(*it)) continue;
+         action(permission_level{get_self(), "owner"_n}, MSGCH_ACCOUNT, msgch_actions::QUEUE_OUT,
+                std::make_tuple(it->code.value, type, data)).send();
       }
+   };
+   if (ship_operators) {
+      queue_to_active_outposts(opp::types::ATTESTATION_TYPE_OPERATORS, encoded_operators);
+   }
+   if (have_next_group) {
+      queue_to_active_outposts(opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS, encoded_groups);
    }
 
    // Drain the swap-from-WIRE queue: each row queued via
