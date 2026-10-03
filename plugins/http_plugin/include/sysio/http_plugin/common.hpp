@@ -71,8 +71,8 @@ struct abstract_conn {
    virtual void decrement_bytes_in_flight(size_t sz) = 0;
    virtual void send_busy_response(std::string&& what) = 0;
 
-   /// Log the exception being handled and send it as a 500 response, after which the connection closes. Call only
-   /// from a catch block, as the caller's last use of the connection.
+   /// Answer the exception being handled with an error response. Call only from a catch block, as the caller's last
+   /// use of the connection.
    virtual void handle_exception() = 0;
 
    /// Set the Content-Type header of the response to be sent, replacing the type of the handler that serves it.
