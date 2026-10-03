@@ -18,6 +18,7 @@ constexpr char producer_not_registered_error[] = "producer is not registered";
 constexpr char producer_not_active_error[] = "producer is not active";
 constexpr char producer_rank_too_high_error[] = "producer rank exceeds maximum for snapshot providers";
 constexpr char producer_not_operator_error[] = "producer is not an active PRODUCER operator";
+constexpr char producer_no_live_standing_error[] = "producer does not meet the live PRODUCER operator requirements";
 constexpr char producer_no_finalizer_key_error[] = "producer has no active finalizer key";
 constexpr char provider_not_registered_error[] = "snap_account is not a registered snapshot provider";
 constexpr char provider_already_registered_error[] = "snap_account is already registered as a provider";
@@ -310,6 +311,10 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
    const auto provider_itr = providers.find(snap_provider_key_t{snap_account.value});
    check(provider_itr != providers.end(), provider_not_registered_error);
    const name producer = provider_itr->producer;
+   // Each vote re-checks the producer's live operator standing: ACTIVE in sysio.opreg and clear of the live
+   // collateral minimum, bootstrapped exempt. A slash, a termination or a withdrawal below the minimum ends it, and a
+   // raised minimum takes effect at the next vote. Rank, parking and the finalizer key stay registration-time conditions.
+   check(producer_rank::has_live_producer_standing(producer), producer_no_live_standing_error);
 
    snap_config_singleton config_singleton(get_self());
    const snap_config config = config_singleton.get_or_default(snap_config{});

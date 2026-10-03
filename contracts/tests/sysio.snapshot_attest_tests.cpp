@@ -39,9 +39,13 @@ public:
     *   (`snapshot_voting_tester`); 2 reaches the second, for the purging tests that need two
     *   scheduled heights live at once (`snapshot_multi_height_tester`). A test pays for the
     *   periods its assertions actually require and no more.
+    * @param bonded_producers producers registered as NON-bootstrapped operators bonded at exactly `producer_min_bond`,
+    *   rather than bootstrapped like the rest; they sort ahead of the bootstrapped tier. Supplied here for the same
+    *   finalizer-key reason as `extra_producers`. Empty, the default, installs no collateral config.
     */
    explicit snapshot_attest_tester(const std::vector<account_name>& extra_producers,
-                                   uint32_t cadence_periods = 0)
+                                   uint32_t cadence_periods = 0,
+                                   const std::vector<account_name>& bonded_producers = {})
       // A cadence-advancing fixture stops ONE level short of `full`, so the chain reaches the
       // attestable height with only `sysio.bios` on the system account. bios declares no
       // `onblock`, so those blocks execute no contract code at all — where under `sysio.system`
@@ -62,6 +66,7 @@ public:
       std::vector<account_name> producers = fixture_producers();
       producers.insert(producers.end(), extra_producers.begin(), extra_producers.end());
       setup_producer_accounts(producers);
+      setup_producer_accounts(bonded_producers);
 
       // Create snap provider accounts with resources
       const std::vector<account_name> snap_accounts = {
@@ -78,6 +83,9 @@ public:
       // regproducer is admitted, so install the bootstrapped fixture operators first.
       deploy_opreg_once();
       register_producer_operators(std::vector<name>(producers.begin(), producers.end()));
+      register_bonded_producer_operators(bonded_producers);
+      // Past opreg registration a bonded producer is set up like any other.
+      producers.insert(producers.end(), bonded_producers.begin(), bonded_producers.end());
       for (const auto& p : producers) {
          regproducer(p);
       }
@@ -157,6 +165,74 @@ public:
       }
       produce_blocks();
       set_node_finalizers(names);
+   }
+
+   /// Chain and token of the one producer collateral pair `set_producer_min_bond` requires.
+   static constexpr std::string_view bond_chain = "ETH";
+   static constexpr std::string_view bond_token = "ETH";
+
+   /// The producer minimum `register_bonded_producer_operators` installs, and the bond each bonded producer posts.
+   static constexpr uint64_t producer_min_bond = 1'000'000;
+
+   /// Replace sysio.opreg's producer collateral requirement with `min_bond` on the one required pair.
+   ///
+   /// `setconfig` re-evaluates no operator, so a status earned under the previous minimum stays stored.
+   void set_producer_min_bond(uint64_t min_bond) {
+      base_tester::push_action("sysio.opreg"_n, "setconfig"_n, "sysio.opreg"_n, mvo()
+         ("max_available_producers",          uint32_t{21})
+         ("max_available_batch_ops",          uint32_t{63})
+         ("max_available_underwriters",       uint32_t{21})
+         ("terminate_prune_delay_ms",         uint64_t{600'000})
+         ("terminate_max_consecutive_misses", uint32_t{5})
+         ("terminate_max_pct_misses_24h",     uint32_t{5})
+         ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
+         ("req_prod_collat",                  fc::variants{fc::variant(mvo()
+            ("chain_code",          bond_chain)
+            ("token_code",          bond_token)
+            ("min_bond",            min_bond)
+            ("config_timestamp_ms", uint64_t{0}))})
+         ("req_batchop_collat",               fc::variants{})
+         ("req_uw_collat",                    fc::variants{}));
+      produce_block();
+   }
+
+   /// Credit `amount` to `producer`'s bond on the required pair, as sysio.msgch delivers an inbound deposit. opreg
+   /// re-evaluates the operator's status on the balance change.
+   void credit_producer_bond(name producer, uint64_t amount) {
+      base_tester::push_action("sysio.opreg"_n, "depositinle"_n, "sysio.opreg"_n, mvo()
+         ("account",             producer)
+         ("chain_code",          bond_chain)
+         ("token_code",          bond_token)
+         ("amount",              amount)
+         ("actor_chain",         sysio::opp::types::ChainKind::CHAIN_KIND_EVM)
+         ("actor_address",       std::vector<char>(20, '\x06'))
+         ("original_message_id", fc::sha256()));
+      produce_block();
+   }
+
+   /// Register each name as a NON-bootstrapped PRODUCER operator bonded at exactly `producer_min_bond`. The deposit
+   /// that clears the minimum is what makes opreg promote it to ACTIVE, which `regproducer` then admits.
+   void register_bonded_producer_operators(const std::vector<name>& names) {
+      if (names.empty()) return;
+      set_producer_min_bond(producer_min_bond);
+      for (const auto& p : names) {
+         base_tester::push_action("sysio.opreg"_n, "regoperator"_n, "sysio.opreg"_n, mvo()
+            ("account", p)
+            ("type", sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER)
+            ("is_bootstrapped", false));
+         credit_producer_bond(p, producer_min_bond);
+      }
+   }
+
+   /// The status sysio.opreg stores on `account`'s operator row.
+   sysio::opp::types::OperatorStatus opreg_status(name account) {
+      const auto data = get_row_by_account("sysio.opreg"_n, "sysio.opreg"_n, "operators"_n, account);
+      BOOST_REQUIRE(!data.empty());
+      const auto opreg_abi = get_resolver()("sysio.opreg"_n);
+      BOOST_REQUIRE(opreg_abi.has_value());
+      const auto row = opreg_abi->binary_to_variant(
+         "operator_entry", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+      return row["status"].as<sysio::opp::types::OperatorStatus>();
    }
 
    /** Produce a block with traces, skipping duplicate validation only after cadence mode begins. */
@@ -339,6 +415,15 @@ struct snapshot_voting_tester : public snapshot_attest_tester {
 struct snapshot_multi_height_tester : public snapshot_attest_tester {
    snapshot_multi_height_tester()
       : snapshot_attest_tester(std::vector<account_name>{}, /*cadence_periods*/ 2) {}
+};
+
+/// Voting fixture with one producer bonded as a NON-bootstrapped operator at exactly the producer minimum, beside the
+/// fixture's five bootstrapped ones: the only kind of producer a collateral minimum can apply to.
+struct snapshot_bonded_voting_tester : public snapshot_attest_tester {
+   static constexpr account_name bonded_producer = "bondedprod"_n;
+
+   snapshot_bonded_voting_tester()
+      : snapshot_attest_tester(std::vector<account_name>{}, /*cadence_periods*/ 1, {bonded_producer}) {}
 };
 
 BOOST_AUTO_TEST_SUITE(sysio_snapshot_attest_tests)
@@ -599,7 +684,7 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_unregistered, snapshot_voting_tester) { try
                         votesnaphash("snapprov1"_n, bid, shash));
 } FC_LOG_AND_RETHROW() }
 
-/// Producer eligibility gates entry to the provider set; later lifecycle churn does not retract authority or votes.
+/// Producer eligibility gates entry to the provider set; parking the producer does not retract authority or votes.
 BOOST_FIXTURE_TEST_CASE(votesnaphash_preserves_registered_authority_after_producer_churn, snapshot_voting_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
    BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
@@ -989,9 +1074,73 @@ BOOST_FIXTURE_TEST_CASE(votesnaphash_reports_disagreement_before_eligibility_fai
 
    const auto bid = make_block_id(vote_block_num());
    BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, bid, make_snap_hash(83)));
-   BOOST_REQUIRE_EQUAL(success(), unregproducer("producer2"_n));
+   // Losing operator standing is the eligibility failure votesnaphash checks; the disagreement wins.
+   terminate_operator("producer2"_n);
    BOOST_REQUIRE_EQUAL(wasm_assert_code(9001),
                         votesnaphash("snapprov2"_n, bid, make_snap_hash(84)));
+} FC_LOG_AND_RETHROW() }
+
+/// Operator standing is re-checked on every vote: a producer whose sysio.opreg row left ACTIVE cannot
+/// keep voting through a mapping it registered while bonded.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_producer_without_operator_standing, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
+   terminate_operator("producer1"_n);
+   BOOST_REQUIRE(!get_snap_provider("snapprov1"_n).is_null());
+
+   const auto block_num = vote_block_num();
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer does not meet the live PRODUCER operator requirements"),
+                        votesnaphash("snapprov1"_n, make_block_id(block_num), make_snap_hash(85)));
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
+   BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
+} FC_LOG_AND_RETHROW() }
+
+/// The standing check gates new votes only: a vote accepted while the producer was bonded still counts
+/// toward K after its operator row leaves ACTIVE.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_keeps_votes_cast_before_operator_lost_standing, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer2"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
+
+   const auto block_num     = vote_block_num();
+   const auto block_id      = make_block_id(block_num);
+   const auto snapshot_hash = make_snap_hash(86);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   terminate_operator("producer1"_n);
+
+   // Even an exact retry of its own pending vote is refused once the producer has no standing.
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer does not meet the live PRODUCER operator requirements"),
+                        votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// A raised collateral minimum reaches the vote gate without any sweep. `sysio.opreg::setconfig` re-evaluates no
+/// stored status, so a producer left short by the raise is still ACTIVE in opreg; the gate measures its bond against
+/// the live requirement instead. Bootstrapped producers are exempt, and restoring the bond restores the vote.
+BOOST_FIXTURE_TEST_CASE(votesnaphash_rejects_producer_below_raised_collateral_minimum,
+                        snapshot_bonded_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov(bonded_producer, "snapprov1"_n));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov2"_n));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
+
+   set_producer_min_bond(producer_min_bond * 2);
+   BOOST_REQUIRE_EQUAL(sysio::opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE, opreg_status(bonded_producer));
+
+   const auto block_num     = vote_block_num();
+   const auto block_id      = make_block_id(block_num);
+   const auto snapshot_hash = make_snap_hash(87);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("producer does not meet the live PRODUCER operator requirements"),
+                       votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE_EQUAL(0u, snapshot_vote_count());
+
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov2"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE(getsnaphash(block_num).is_null());
+
+   // Topping the bond up to the raised minimum restores the vote, which completes the quorum.
+   credit_producer_bond(bonded_producer, producer_min_bond);
+   BOOST_REQUIRE_EQUAL(success(), votesnaphash("snapprov1"_n, block_id, snapshot_hash));
+   BOOST_REQUIRE(!getsnaphash(block_num).is_null());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(record_blockid_disagreement, snapshot_voting_tester) { try {
