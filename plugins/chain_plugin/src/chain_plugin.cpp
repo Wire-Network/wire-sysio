@@ -12,7 +12,7 @@
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/contract_action_match.hpp>
 #include <sysio/chain/snapshot.hpp>
-#include <sysio/protocol/snapshot_attestation.hpp>
+#include <sysio.system/snapshot_attest_constants.hpp>
 #include <sysio/chain/subjective_billing.hpp>
 #include <sysio/chain/deep_mind.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
@@ -67,7 +67,7 @@ constexpr sysio::outbound_http::transport_option_names
       .proxy = "snapshot-endpoint-proxy",
    };
 
-namespace snapshot_attest = sysio::protocol::snapshot_attestation;
+namespace snapshot_attest = sysiosystem::snapshot_attestation;
 
 /// Priority of every block channel delivery. One priority keeps deliveries in emission order for a subscriber of
 /// several channels; medium is process_incoming_block's, so deliveries run between block-apply batches.

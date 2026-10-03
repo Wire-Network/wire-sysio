@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sysio/chain_plugin/chain_plugin.hpp>
-#include <sysio/protocol/snapshot_attestation.hpp>
+#include <sysio.system/snapshot_attest_constants.hpp>
 
 #include <fc/crypto/blake3.hpp>
 #include <fc/io/json.hpp>
@@ -48,15 +48,15 @@ inline bool is_servable_snapshot_attestation(
 
    try {
       const auto& record = row.get_object();
-      return record[protocol::snapshot_attestation::field::block_num].as_uint64()
+      return record[sysiosystem::snapshot_attestation::field::block_num].as_uint64()
                 == expected_block_num
-             && record[protocol::snapshot_attestation::field::attested_at_block].as_uint64()
+             && record[sysiosystem::snapshot_attestation::field::attested_at_block].as_uint64()
                    <= last_irreversible_block_num
              && snapshot_attestation_record_matches(
                    expected_block_id, expected_snapshot_hash,
-                   record[protocol::snapshot_attestation::field::block_id]
+                   record[sysiosystem::snapshot_attestation::field::block_id]
                       .as<chain::block_id_type>(),
-                   record[protocol::snapshot_attestation::field::snapshot_hash].as_string());
+                   record[sysiosystem::snapshot_attestation::field::snapshot_hash].as_string());
    } catch (...) {
       return false;
    }
@@ -66,7 +66,7 @@ inline bool is_servable_snapshot_attestation(
 inline std::optional<uint32_t> snapshot_attestation_block_num(const fc::variant& row) {
    try {
       const uint64_t raw_block_num =
-         row.get_object()[protocol::snapshot_attestation::field::block_num].as_uint64();
+         row.get_object()[sysiosystem::snapshot_attestation::field::block_num].as_uint64();
       if (raw_block_num > std::numeric_limits<uint32_t>::max()) {
          return std::nullopt;
       }
@@ -83,7 +83,7 @@ bool is_servable_catalog_snapshot_attestation(const Catalog& catalog,
                                               uint32_t last_irreversible_block_num,
                                               IsAvailable&& is_available) {
    const auto block_num = snapshot_attestation_block_num(row);
-   if (!block_num || !protocol::snapshot_attestation::is_scheduled_block(*block_num)) {
+   if (!block_num || !sysiosystem::snapshot_attestation::is_scheduled_block(*block_num)) {
       return false;
    }
 
@@ -116,7 +116,7 @@ auto discover_latest_servable_scheduled_snapshot(std::shared_ptr<const Catalog> 
    std::optional<uint32_t> oldest_available_scheduled;
    std::optional<uint32_t> newest_available_scheduled;
    for (const auto& [block_num, entry] : catalog) {
-      if (!protocol::snapshot_attestation::is_scheduled_block(block_num)
+      if (!sysiosystem::snapshot_attestation::is_scheduled_block(block_num)
           || !is_available(entry)) {
          continue;
       }
@@ -134,7 +134,7 @@ auto discover_latest_servable_scheduled_snapshot(std::shared_ptr<const Catalog> 
    params.reverse = true;
    params.upper_bound = fc::json::to_string(
       fc::mutable_variant_object()
-      (protocol::snapshot_attestation::field::block_num,
+      (sysiosystem::snapshot_attestation::field::block_num,
        static_cast<uint64_t>(*newest_available_scheduled) + 1),
       fc::time_point::maximum());
    // A timed-out table read leaves its executor task queued, so the copied request filter must own
@@ -175,7 +175,7 @@ auto discover_latest_servable_scheduled_snapshot(std::shared_ptr<const Catalog> 
 /** Return whether an entry may be served explicitly: manual, or scheduled and attested. */
 template <typename Snapshot, typename IsAttested>
 bool is_snapshot_servable(uint32_t block_num, const Snapshot& snapshot, IsAttested&& is_attested) {
-   return !protocol::snapshot_attestation::is_scheduled_block(block_num)
+   return !sysiosystem::snapshot_attestation::is_scheduled_block(block_num)
           || is_attested(snapshot);
 }
 
