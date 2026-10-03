@@ -16,6 +16,7 @@
 #define BOOST_TEST_MODULE http_plugin unit tests
 #include <boost/test/included/unit_test.hpp>
 
+#include <array>
 #include <iostream>
 #include <thread>
 #include <future>
@@ -477,6 +478,9 @@ BOOST_AUTO_TEST_CASE(invalid_category_addresses) {
                   .contains(unable_to_listen_msg));
 }
 
+using unix_stream = beast::basic_stream<boost::asio::local::stream_protocol, beast::tcp_stream::executor_type,
+                                        beast::unlimited_rate_policy>;
+
 struct http_response_for {
    net::io_context                    ioc;
    http::response<http::dynamic_body> response;
@@ -493,9 +497,6 @@ struct http_response_for {
    }
 
    http_response_for(std::filesystem::path addr, const char* path) {
-      using unix_stream = beast::basic_stream<boost::asio::local::stream_protocol, beast::tcp_stream::executor_type,
-                                              beast::unlimited_rate_policy>;
-
       unix_stream stream(ioc);
       stream.connect(addr.c_str());
       initiate(stream, "", path);
@@ -1001,6 +1002,122 @@ BOOST_FIXTURE_TEST_CASE(plaintext_responses, http_plugin_test_fixture) {
       BOOST_CHECK_EQUAL(std::string(resp.response[http::field::content_type]), "application/json");
       BOOST_CHECK_EQUAL(resp.body(), "{}");
    }
+}
+
+/// Turns logging off until destroyed.
+struct quiet_log {
+   const fc::log_level level = fc::logger::default_logger().get_log_level();
+   quiet_log() { fc::logger::default_logger().set_log_level(fc::log_level::off); }
+   ~quiet_log() { fc::logger::default_logger().set_log_level(level); }
+};
+
+/// Keeps logging off until the application has stopped: a session logs every exception it reports.
+struct quiet_http_plugin_test_fixture : quiet_log, http_plugin_test_fixture {
+   static constexpr auto http_thread_route = "/v1/node/throw_on_http_thread";
+   static constexpr auto app_thread_route = "/v1/node/throw_on_app_thread";
+   static constexpr auto raw_route = "/v1/node/throw_in_raw_handler";
+   static constexpr std::array failing_routes{http_thread_route, app_thread_route, raw_route};
+
+   fc::temp_directory directory;
+   const std::filesystem::path socket = directory.path() / "http-exception.sock";
+
+   /// Add the failing routes; each handler throws `message`.
+   void add_failing_routes(http_plugin& plugin, const std::string& message) {
+      const auto fail = [message](string&&, string&&, url_response_callback&&) { throw std::runtime_error(message); };
+      plugin.add_async_api({{http_thread_route, api_category::node, fail}});
+      plugin.add_api({{app_thread_route, api_category::node, fail}}, appbase::exec_queue::read_write);
+      plugin.add_raw_handler(raw_route, api_category::node, [message](detail::abstract_conn_ptr, string&&, string&&) {
+         throw std::runtime_error(message);
+      });
+   }
+};
+
+/// One request on its own unix-socket connection, given up after a deadline.
+struct unix_exchange {
+   http::response<http::string_body> response;
+   beast::error_code error; ///< why the response did not arrive whole, if it did not
+   beast::error_code after; ///< result of reading past the response; unset if error
+
+   unix_exchange(const std::filesystem::path& socket, const char* route, unsigned version = 11) {
+      net::io_context ioc;
+      unix_stream stream(ioc);
+      const http::request<http::string_body> request{http::verb::post, route, version};
+      beast::flat_buffer buffer;
+      http::response<http::string_body> next;
+      stream.expires_after(std::chrono::seconds(30));
+      stream.async_connect(net::local::stream_protocol::endpoint(socket.string()), [&](beast::error_code connect_ec) {
+         error = connect_ec;
+         if (error)
+            return;
+         http::async_write(stream, request, [&](beast::error_code write_ec, size_t) {
+            error = write_ec;
+            if (error)
+               return;
+            http::async_read(stream, buffer, response, [&](beast::error_code read_ec, size_t) {
+               error = read_ec;
+               if (error)
+                  return;
+               http::async_read(stream, buffer, next, [&](beast::error_code past_ec, size_t) { after = past_ec; });
+            });
+         });
+      });
+      ioc.run();
+   }
+
+   /// A whole 500 response, then end of stream.
+   bool reported_and_closed() const {
+      return !error && response.result() == http::status::internal_server_error &&
+             after == http::error::end_of_stream;
+   }
+};
+
+/// An exception response is written whole before its connection closes, wherever the handler threw.
+BOOST_FIXTURE_TEST_CASE(exception_response_is_complete_before_close, quiet_http_plugin_test_fixture) {
+   // Far more than a socket send buffer holds, so the response cannot be written in one non-blocking send.
+   constexpr size_t message_size = 1024 * 1024;
+   const std::string message(message_size, 'x');
+   // No response deadline and verbose errors, so the response carries the whole message whatever the load.
+   auto* plugin = init({bu::framework::current_test_case().p_name->c_str(), "--data-dir", directory.path().c_str(),
+                        "--http-server-address", "", "--unix-socket-path", socket.c_str(),
+                        "--http-max-response-time-ms", "-1", "--verbose-http-errors"});
+   BOOST_REQUIRE(plugin);
+   add_failing_routes(*plugin, message);
+
+   for (const auto* route : failing_routes) {
+      for (const unsigned version : {10u, 11u}) {
+         const unix_exchange exchange(socket, route, version);
+         BOOST_REQUIRE_MESSAGE(!exchange.error, route << " HTTP " << version << ": " << exchange.error.message());
+         BOOST_CHECK(exchange.response.result() == http::status::internal_server_error);
+         BOOST_CHECK(!exchange.response.keep_alive());
+         BOOST_CHECK(exchange.response.body().find(message) != std::string::npos);
+         BOOST_CHECK_MESSAGE(exchange.after == http::error::end_of_stream, exchange.after.message());
+      }
+   }
+}
+
+/// Requests failing at once on several threads each get their whole error response on a connection that then closes.
+BOOST_FIXTURE_TEST_CASE(concurrent_exception_responses, quiet_http_plugin_test_fixture) {
+   constexpr uint32_t clients = 8;
+   constexpr uint32_t requests_per_client = 64;
+   auto* plugin = init({bu::framework::current_test_case().p_name->c_str(), "--data-dir", directory.path().c_str(),
+                        "--http-server-address", "", "--unix-socket-path", socket.c_str(), "--http-threads", "4"});
+   BOOST_REQUIRE(plugin);
+   add_failing_routes(*plugin, "failed");
+
+   std::atomic<uint32_t> reported{0};
+   std::vector<std::thread> threads;
+   for (uint32_t client = 0; client < clients; ++client)
+      threads.emplace_back([&, client] {
+         for (uint32_t request = 0; request < requests_per_client; ++request) {
+            const auto* route = failing_routes[(client + request) % failing_routes.size()];
+            if (!unix_exchange(socket, route).reported_and_closed())
+               return;
+            ++reported;
+         }
+      });
+   for (auto& thread : threads)
+      thread.join();
+   BOOST_CHECK_EQUAL(reported.load(), clients * requests_per_client);
 }
 
 //A warning for future tests: destruction of http_plugin_test_fixture sometimes does not destroy http_plugin's listeners. Tests
