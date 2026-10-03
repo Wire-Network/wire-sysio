@@ -8,6 +8,7 @@
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio.opp.common/name_ops.hpp>
+#include <sysio.opp.common/uic_codec.hpp>
 #include <sysio.opp.common/wire_asset.hpp>
 #include <sysio/opp/uic_signature_canonical.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
@@ -104,6 +105,26 @@ constexpr const char* UIC_SIGNATURE_REJECTED_REASON_PREFIX =
 
 /// Separates the rejected leg from its typed verification result.
 constexpr const char* UIC_SIGNATURE_REJECTED_REASON_SEPARATOR = " signature: ";
+
+/// SWAP_REVERT reason when a private reserve would serve a WIRE-endpoint swap.
+constexpr const char* PRIVATE_RESERVE_WIRE_ENDPOINT_REASON =
+   "private reserves are excluded from WIRE-endpoint swaps";
+
+/// SWAP_REVERT reason when a private reserve's counterpart lacks the same WIRE owner.
+constexpr const char* PRIVATE_RESERVE_OWNER_MISMATCH_REASON =
+   "private reserve pairing violation: counterpart reserve must be owned by the same WIRE account";
+
+/// Candidate-release reason when race resolution rejects a request for reserve privacy.
+constexpr const char* PRIVATE_RESERVE_COMMIT_REASON =
+   "uwreq rejected: reserve privacy violation at race resolution";
+
+/// SWAP_REVERT reason when the settlement quote does not fit an OPP TokenAmount.
+constexpr const char* REMIT_AMOUNT_OUT_OF_RANGE_REASON =
+   "swap unremittable at race resolution: quoted amount is outside the OPP token amount range";
+
+/// Candidate-release reason when the settlement quote does not fit an OPP TokenAmount.
+constexpr const char* REMIT_AMOUNT_OUT_OF_RANGE_COMMIT_REASON =
+   "uwreq rejected: destination quote outside the OPP token amount range";
 
 /// Fixed serialized-size allowance for a NEW `commit_entry`'s non-vector
 /// fields (underwriter name, two timestamp/outpost-id pairs, status, empty
@@ -523,6 +544,26 @@ std::optional<reserve::reserve_row> find_active_reserve(sysio::slug_name chain_c
    return row;
 }
 
+/// The reserve-privacy rule for one swap route, used wherever uwrit admits, drains or settles a
+/// swap. A private reserve never serves a WIRE-endpoint swap, and pairs only with a counterpart
+/// owned by the same WIRE account (the authex-linked matcher recorded at match time). A missing row
+/// is not private.
+///
+/// @param src_r source reserve, or nullopt for a missing reserve or a depot (WIRE) leg.
+/// @param dst_r destination reserve, same convention.
+/// @param wire_endpoint true when either leg is the depot.
+/// @return the SWAP_REVERT reason for a violation, or nullptr when the route complies.
+const char* reserve_privacy_violation(const std::optional<reserve::reserve_row>& src_r,
+                                      const std::optional<reserve::reserve_row>& dst_r,
+                                      bool wire_endpoint) {
+   const bool src_private = src_r && src_r->is_private;
+   const bool dst_private = dst_r && dst_r->is_private;
+   if (!src_private && !dst_private) return nullptr;
+   if (wire_endpoint) return PRIVATE_RESERVE_WIRE_ENDPOINT_REASON;
+   const bool same_owner = src_r && dst_r && src_r->owner != name{} && src_r->owner == dst_r->owner;
+   return same_owner ? nullptr : PRIVATE_RESERVE_OWNER_MISMATCH_REASON;
+}
+
 /// Parse a WIRE account name from its string-spelling bytes (the canonical
 /// `ChainAddress.address` encoding for CHAIN_KIND_WIRE). Delegates to the shared
 /// `sysio::opp::safe::parse_wire_account_name`, which validates charset, length,
@@ -547,13 +588,16 @@ std::vector<char> wire_name_bytes(name n) {
 /// non-throwing instead of letting a `check()` abort the evalcons dispatch
 /// chain and stall OPP consensus chain-wide.
 enum class swap_remit_disp {
-   ok,            ///< envelope built — proceed to settle + `queue_swap_remit`
+   ok,            ///< remit built, amount pending: proceed to settle + `queue_swap_remit`
    terminal,      ///< no underwriter can EVER remit this uwreq — REJECT + refund
    disqualified,  ///< THIS candidate cannot remit — skip it, leave uwreq PENDING
 };
 
-/// Pre-validate + build (but do NOT send) the outbound SWAP_REMIT envelope
-/// for `candidate` winning `req`, mutating no state.
+/// Pre-validate + build (but do NOT send) the outbound SWAP_REMIT for
+/// `candidate` winning `req`, mutating no state. Every field is set except
+/// `amount`: `req.dst_amount` can still be a stale or zero ingestion quote
+/// here, so `try_select_winner` sets the amount once the settlement quote is
+/// final and fits an OPP TokenAmount.
 ///
 /// **Non-throwing.** The former `emit_swap_remit` ran AFTER the caller's
 /// `reserv::applyswap` / `applyfromwire` reserve mutation and resolved the
@@ -563,11 +607,11 @@ enum class swap_remit_disp {
 /// envelope and stalls OPP epoch advancement chain-wide. This function instead
 /// reports a `swap_remit_disp` so the caller can disqualify the candidate (or
 /// reject the uwreq) cleanly. It is called BEFORE any lock / CONFIRMED /
-/// reserve write; `queue_swap_remit` (below) only ships the pre-built envelope,
-/// AFTER the reserve books have moved (so every intervening quote prices the
-/// post-swap books).
+/// reserve write; `queue_swap_remit` (below) only ships the remit, AFTER the
+/// reserve books have moved (so every intervening quote prices the post-swap
+/// books).
 ///
-/// On `ok`, `dst_outpost_id` + `encoded` carry the ready-to-send envelope.
+/// On `ok`, `dst_outpost_id` + `remit` carry the remit awaiting its amount.
 /// Failure classification:
 ///   * stored-request decode / dst outpost / dst chain-kind — uwreq-wide and
 ///     identical for every candidate ⇒ `terminal` (REJECT + refund/revert).
@@ -576,7 +620,7 @@ enum class swap_remit_disp {
 swap_remit_disp try_build_swap_remit(const uwrit::uw_request_t& req,
                                      name candidate,
                                      uint64_t& dst_outpost_id,
-                                     std::vector<char>& encoded) {
+                                     opp::attestations::SwapRemit& remit) {
    // Decode the stored SwapRequest for its `recipient` (the row keeps only
    // chain/kind/amount summaries). Same bytes for every candidate ⇒ terminal.
    opp::attestations::SwapRequest sr;
@@ -612,8 +656,7 @@ swap_remit_disp try_build_swap_remit(const uwrit::uw_request_t& req,
    std::vector<char> uw_addr = sysio::pubkey_to_bytes(it->pub_key);
    if (uw_addr.empty()) return swap_remit_disp::disqualified;
 
-   // All identities resolved — build the envelope.
-   opp::attestations::SwapRemit remit;
+   // All identities resolved; build the remit.
    remit.recipient = sr.recipient;
    // FORCE recipient.kind to the dst chain's actual ChainKind. The ETH
    // outpost ships SwapRequest with `recipient.kind = CHAIN_KIND_UNKNOWN`
@@ -623,10 +666,6 @@ swap_remit_disp try_build_swap_remit(const uwrit::uw_request_t& req,
    // → on-chain `handle_swap_remit` rejects "recipient not in
    // remaining_accounts". Per the project rule against 0-as-sentinel enums.
    remit.recipient.kind = dst_kind;
-   remit.amount = opp::types::TokenAmount{
-      .token_code = req.dst_token_code.value,
-      .amount     = static_cast<int64_t>(req.dst_amount),
-   };
    // `original_message_id` low 8 bytes encode uwreq_id; the reflected
    // SWAP_REMIT envelope back to msgch's dispatch uses this for the
    // release-trigger decode (see sysio.msgch.cpp's SWAP_REMIT case).
@@ -640,23 +679,22 @@ swap_remit_disp try_build_swap_remit(const uwrit::uw_request_t& req,
    remit.underwriter.kind    = dst_kind;
    remit.underwriter.address = std::move(uw_addr);
    remit.unlock_timestamp    = 0;
-
-   // `no_size{}` — see emit_swap_revert for the rationale.
-   encoded.clear();
-   auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
-   (void)out(remit);
    dst_outpost_id = *dst_outpost_opt;
    return swap_remit_disp::ok;
 }
 
-/// Queue a pre-built SWAP_REMIT envelope (from `try_build_swap_remit`) to the
-/// destination outpost. Sent by `try_select_winner` AFTER the reserve mutation
-/// in the same transaction, so every intervening quote prices the post-swap
-/// books. The destination outpost's ReserveManager (ETH) / reserve PDA (SOL)
-/// pays the recipient inline via `_handleSwapRemit` / `handle_swap_remit`.
-/// Non-throwing.
+/// Encode the SWAP_REMIT that `try_build_swap_remit` built and
+/// `try_select_winner` priced, and queue it to the destination outpost. Sent by
+/// `try_select_winner` AFTER the reserve mutation in the same transaction, so
+/// every intervening quote prices the post-swap books. The destination
+/// outpost's ReserveManager (ETH) / reserve PDA (SOL) pays the recipient inline
+/// via `_handleSwapRemit` / `handle_swap_remit`. Non-throwing.
 void queue_swap_remit(name self, uint64_t dst_outpost_id,
-                      const std::vector<char>& encoded) {
+                      const opp::attestations::SwapRemit& remit) {
+   // `no_size{}`: see emit_swap_revert for the rationale.
+   std::vector<char> encoded;
+   auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
+   (void)out(remit);
    action(
       permission_level{self, "active"_n},
       uwrit::MSGCH_ACCOUNT, "queueout"_n,
@@ -756,14 +794,10 @@ uic_signature_result verify_uic_signature(name underwriter,
                                           const std::vector<char>& uic_bytes) {
    if (uic_bytes.empty()) return uic_signature_result::empty_uic;
 
-   // Decode the UIC payload.
-   opp::attestations::UnderwriteIntentCommit uic;
-   {
-      auto in = zpp::bits::in{
-         std::span{uic_bytes.data(), uic_bytes.size()},
-         zpp::bits::no_size{}};
-      if (in(uic) != zpp::bits::errc{}) return uic_signature_result::malformed_uic;
-   }
+   // Decode the UIC payload; `decode_uic` bounds every allocation.
+   auto decoded_uic = opp::decode_uic(uic_bytes);
+   if (!decoded_uic) return uic_signature_result::malformed_uic;
+   auto& uic = *decoded_uic;
 
    // Require the exact canonical protobuf encoding before hashing or recovery.
    // zpp decode normalizes duplicate/default/unknown-field representations;
@@ -1170,39 +1204,17 @@ void uwrit::createuwreq(uint64_t attestation_id,
       return;
    }
 
-   // Privacy gate — a private reserve only swaps against a counterpart
-   // reserve owned by the same WIRE account (the authex-linked matcher
-   // recorded at match time), and is excluded from WIRE-endpoint swaps
-   // entirely. Ownership is immutable while a reserve is ACTIVE, so this
-   // ingestion-time gate needs no race-time recheck.
+   // Privacy gate (`reserve_privacy_violation`). A reserve that is missing,
+   // PENDING or CANCELLED here can still become an ACTIVE private reserve
+   // before settlement, so `try_select_winner` applies the same rule again.
    {
       const auto src_r = find_reserve(src_chain_code, src_token_code, src_reserve_code);
-      if (dst_depot) {
-         // Swap-to-WIRE: only the source reserve exists — it must be public.
-         if (src_r && src_r->is_private) {
-            emit_swap_revert(get_self(), chain_code, attestation_id, sr,
-                             src_chain_code, src_reserve_code,
-                             "SwapRequest rejected: private reserves are "
-                             "excluded from WIRE-endpoint swaps");
-            return;
-         }
-      } else {
-         const auto dst_r = find_reserve(dst_chain_code, dst_token_code, dst_reserve_code);
-         const bool src_priv = src_r && src_r->is_private;
-         const bool dst_priv = dst_r && dst_r->is_private;
-         if (src_priv || dst_priv) {
-            const bool same_owner = src_r && dst_r
-                                    && src_r->owner != name{}
-                                    && src_r->owner == dst_r->owner;
-            if (!same_owner) {
-               emit_swap_revert(get_self(), chain_code, attestation_id, sr,
-                                src_chain_code, src_reserve_code,
-                                "SwapRequest rejected: private reserve pairing "
-                                "violation — counterpart reserve must be owned "
-                                "by the same WIRE account");
-               return;
-            }
-         }
+      const auto dst_r = dst_depot ? std::nullopt
+                                   : find_reserve(dst_chain_code, dst_token_code, dst_reserve_code);
+      if (const char* violation = reserve_privacy_violation(src_r, dst_r, dst_depot)) {
+         emit_swap_revert(get_self(), chain_code, attestation_id, sr,
+                          src_chain_code, src_reserve_code, violation);
+         return;
       }
    }
 
@@ -1453,13 +1465,13 @@ void reject_and_refund(name self, uwrit::uwreqs_t& reqs, const uwrit::id_key& pk
 /// (WIRE) leg needs no UIC, no bond, and no lock — single-leg swaps
 /// (to/from WIRE) therefore resolve on their one outpost commit. On a win:
 /// verify the required legs' signatures + bond, pre-validate reserve
-/// liquidity against the local mirror AND pre-build the outbound SWAP_REMIT
-/// envelope (so both the inline reserv settlement actions and the remit are
-/// unreachable-failure by construction — nothing past the CONFIRMED write can
-/// `check()`-abort and stall evalcons), push one lock per required leg (a 12h
-/// wall-clock challenge window — never released by delivery: `chklocks` sweeps
-/// it at expiry, or `sweeplocks` erases it earlier on an UPHELD challenge),
-/// mark CONFIRMED, then settle:
+/// liquidity against the local mirror AND pre-build the outbound SWAP_REMIT,
+/// priced once the settlement quote is final (so both the inline reserv
+/// settlement actions and the remit are unreachable-failure by construction:
+/// nothing past the CONFIRMED write can `check()`-abort and stall evalcons),
+/// push one lock per required leg (a 12h wall-clock challenge window, never
+/// released by delivery: `chklocks` sweeps it at expiry, or `sweeplocks`
+/// erases it earlier on an UPHELD challenge), mark CONFIRMED, then settle:
 ///   * normal     — reserv::applyswap  + SWAP_REMIT to the dst outpost
 ///   * from-WIRE  — reserv::applyfromwire + SWAP_REMIT to the dst outpost
 ///   * to-WIRE    — reserv::paywire (REAL WIRE to the recipient; no remit)
@@ -1626,9 +1638,9 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
    // Request-wide build failures remain terminal, and every outcome here is
    // still after the authoritative bond gate above.
    uint64_t remit_dst_outpost_id = 0;
-   std::vector<char> remit_encoded;
+   opp::attestations::SwapRemit remit;
    if (dst_needed) {
-      switch (try_build_swap_remit(req, candidate, remit_dst_outpost_id, remit_encoded)) {
+      switch (try_build_swap_remit(req, candidate, remit_dst_outpost_id, remit)) {
          case swap_remit_disp::ok:
             break;
          case swap_remit_disp::disqualified:
@@ -1675,6 +1687,24 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
                    uwreq_id, ", leaving request PENDING\n");
       return;
    }
+
+   // Reserve privacy. createuwreq applies the same rule, but a reserve that
+   // was missing, PENDING or CANCELLED at ingestion can since have become an
+   // ACTIVE private reserve: a new registration, a matchreserve, or
+   // oncrtreserve's reclaim of a CANCELLED row. A non-zero quote means every
+   // required reserve is ACTIVE, and an ACTIVE reserve's privacy and owner
+   // never change, so the verdict is final.
+   const auto src_r = src_needed
+      ? find_active_reserve(req.src_chain_code, req.src_token_code, req.src_reserve_code)
+      : std::nullopt;
+   const auto dst_r = dst_needed
+      ? find_active_reserve(req.dst_chain_code, req.dst_token_code, req.dst_reserve_code)
+      : std::nullopt;
+   if (const char* violation = reserve_privacy_violation(src_r, dst_r, !src_needed || !dst_needed)) {
+      reject_and_refund(self, reqs, pk, req, src_needed, violation, PRIVATE_RESERVE_COMMIT_REASON);
+      return;
+   }
+
    // Slippage — the live settlement quote against the user's ORIGINAL
    // `target_amount`, never against the previous quote. Measuring drift from
    // `dst_amount` (the ingestion quote) would compound the tolerance across the
@@ -1698,6 +1728,24 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
             "uwreq reverted at race resolution (variance drift)");
          return;
       }
+   }
+
+   // Outpost payout amount. The SWAP_REMIT carries the quote as a signed OPP
+   // TokenAmount, where a bare cast would turn a quote at or above 2^63
+   // negative. Terminal, and ahead of any lock / CONFIRMED / reserve write.
+   // The bond gate above keeps this unreachable while opreg caps every
+   // collateral bucket at asset::max_amount.
+   if (dst_needed) {
+      const std::optional<int64_t> remit_amount = opp::safe::to_token_amount(req.dst_amount);
+      if (!remit_amount) {
+         reject_and_refund(self, reqs, pk, req, src_needed,
+                           REMIT_AMOUNT_OUT_OF_RANGE_REASON, REMIT_AMOUNT_OUT_OF_RANGE_COMMIT_REASON);
+         return;
+      }
+      remit.amount = opp::types::TokenAmount{
+         .token_code = req.dst_token_code.value,
+         .amount     = *remit_amount,
+      };
    }
 
    // ── Settlement pre-checks against the local reserve mirror ───────────
@@ -1755,7 +1803,6 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
             "uwreq rejected: to-WIRE quote exceeds asset max_amount");
          return;
       }
-      auto src_r = find_active_reserve(req.src_chain_code, req.src_token_code, req.src_reserve_code);
       // paywire gives up `dst_amount` (to the recipient) + the fee (on the gross
       // WIRE leg) out of the source reserve's WIRE; pre-validate that exact sum.
       // `dst_amount` is bounded <= asset::max_amount above and `to_wire_fee`
@@ -1781,10 +1828,9 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
          return;
       }
    } else if (!src_needed) {
-      // Swap-from-WIRE. drainfwq validated at queue-drain; re-validate the
-      // live state (privacy is immutable, but liquidity can drift).
-      auto dst_r = find_active_reserve(req.dst_chain_code, req.dst_token_code, req.dst_reserve_code);
-      if (!dst_r || dst_r->is_private || dst_r->reserve_chain_amount < req.dst_amount) {
+      // Swap-from-WIRE. drainfwq validated at queue-drain; liquidity can
+      // drift since, so re-validate it.
+      if (!dst_r || dst_r->reserve_chain_amount < req.dst_amount) {
          sysio::print("try_select_winner: destination reserve cannot settle uwreq ",
                       uwreq_id, ", leaving request PENDING\n");
          return;
@@ -1793,8 +1839,6 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
       // Normal outpost↔outpost swap — both rows must cover the four-leg
       // apply (the WIRE intermediate is derived from the same pre-mutation
       // source row `applyswap` will read).
-      auto src_r = find_active_reserve(req.src_chain_code, req.src_token_code, req.src_reserve_code);
-      auto dst_r = find_active_reserve(req.dst_chain_code, req.dst_token_code, req.dst_reserve_code);
       // applyswap debits the gross weighted WIRE intermediate from the source
       // (the fee is taken from it before the net reaches dst); pre-validate the
       // same conditions applyswap will check.
@@ -1919,7 +1963,7 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
          std::make_tuple(req.dst_chain_code, req.dst_token_code, req.dst_reserve_code,
                           req.src_amount, req.dst_amount, candidate)
       ).send();
-      queue_swap_remit(self, remit_dst_outpost_id, remit_encoded);
+      queue_swap_remit(self, remit_dst_outpost_id, remit);
    } else {
       // Normal swap: emit-time four-leg apply, then the remit tail.
       action(
@@ -1930,7 +1974,7 @@ void try_select_winner(name self, uint64_t uwreq_id, name candidate,
                           req.dst_chain_code, req.dst_token_code, req.dst_reserve_code,
                           req.dst_amount, candidate)
       ).send();
-      queue_swap_remit(self, remit_dst_outpost_id, remit_encoded);
+      queue_swap_remit(self, remit_dst_outpost_id, remit);
    }
 }
 
@@ -2058,7 +2102,7 @@ void uwrit::rcrdcommit(uint64_t uwreq_id,
 
    // Reject oversized blobs before protobuf decoding, hashing, or recovery.
    // Candidate evidence/status/reason/timestamps remain untouched.
-   if (uic_bytes.size() > MAX_UIC_LEG_BYTES) {
+   if (uic_bytes.size() > opp::MAX_UIC_LEG_BYTES) {
       sysio::print("rcrdcommit: uwreq ", uwreq_id, " UIC payload of ",
                    uic_bytes.size(), " bytes exceeds the per-leg cap, skipping\n");
       return;
@@ -2172,7 +2216,7 @@ void uwrit::swapfromwire(name                  user,
       check(r.has_value(), "swapfromwire: target reserve not found");
       check(r->status == ReserveStatus::RESERVE_STATUS_ACTIVE,
             "swapfromwire: target reserve not ACTIVE");
-      check(!r->is_private,
+      check(!reserve_privacy_violation(std::nullopt, r, /*wire_endpoint*/ true),
             "swapfromwire: private reserves are excluded from WIRE-endpoint swaps");
    }
 
@@ -2281,7 +2325,7 @@ void uwrit::drainfwq() {
          refund_and_drop("target reserve missing or not ACTIVE", REFUND_FEE_EXEMPT_BPS);
          continue;
       }
-      if (r->is_private) {
+      if (reserve_privacy_violation(std::nullopt, r, /*wire_endpoint*/ true)) {
          refund_and_drop("target reserve is private (excluded from WIRE-endpoint swaps)",
                          REFUND_FEE_EXEMPT_BPS);
          continue;
