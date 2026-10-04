@@ -14,8 +14,8 @@
  * de-syndication and pre-launch import goes through sysio.synd too, which burns with
  * `burn` and mints the replayed positions; a LIQ_YIELD report it releases lands through
  * `mintyield` in a pending balance outside supply that the permissionless `queueyield`
- * hands to sysio.swap's reservoir. The burn of a de-syndication is final; `recredit` is
- * governance's reconciliation of an outpost refusal.
+ * hands to sysio.swap's reservoir. Return recovery is request-keyed in sysio.synd;
+ * `recredit` remains exceptional privileged supply repair.
  * Yield intake: sysio.swap's tick sells reservoir shadow and pays the proceeds in
  * through `addyield`, which also draws the kicker from T5 (sysio.system::fundclaim).
  * Launch: `regliqpool` seeds the swap's yield pool inside the epoch-0 bootstrap window.
@@ -88,6 +88,9 @@ namespace sysio {
       /// Governance: mint `quantity` back to `holder` after its outpost refused
       /// a de-syndication (reconciled from the outpost log). Requires this
       /// contract's authority.
+      /// Legacy exceptional supply repair, still requiring this contract's authority. Normal external
+      /// return recovery must use sysio.synd::refundreturn so request identity and exactly-once handling
+      /// are enforced. This action is not evidence that an external return was rejected.
       [[sysio::action]] void recredit(name holder, asset quantity);
 
       // -----------------------------------------------------------------------
@@ -140,6 +143,11 @@ namespace sysio {
       /// Move `quantity` of a shadow from `from` to `to`, settling both rows first. While the
       /// `sysio.andon` cord is pulled, refused unless `to` is a custody contract. Auth=from.
       [[sysio::action]] void transfer(name from, name to, asset quantity, string memo);
+
+      /// Credit an existing custody obligation without notifying either account. Only sysio.synd
+      /// and sysio.bond may debit their own balance. Settles both yield positions, preserves supply,
+      /// and requires the Andon cord clear, including self-settlement.
+      [[sysio::action]] void settle(name custodian, name beneficiary, asset quantity);
       [[sysio::action]] void open(name owner, symbol symbol, name ram_payer);
       /// Erase `owner`'s empty row for `symbol`. Refused while the row is still
       /// owed yield, so closing never discards WIRE.

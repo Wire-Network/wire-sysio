@@ -312,6 +312,24 @@
             ]
         },
         {
+            "name": "settle",
+            "base": "",
+            "fields": [
+                {
+                    "name": "custodian",
+                    "type": "name"
+                },
+                {
+                    "name": "beneficiary",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
             "name": "symbol_key",
             "base": "",
             "fields": [
@@ -431,6 +449,11 @@
         {
             "name": "setkicker",
             "type": "setkicker",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "settle",
+            "type": "settle",
             "ricardian_contract": ""
         },
         {

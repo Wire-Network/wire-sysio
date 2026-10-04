@@ -126,46 +126,6 @@
             ]
         },
         {
-            "name": "desynd_key",
-            "base": "",
-            "fields": [
-                {
-                    "name": "request_id",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "desynd_row",
-            "base": "",
-            "fields": [
-                {
-                    "name": "request_id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "chain_code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "token_code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "amount",
-                    "type": "uint64"
-                },
-                {
-                    "name": "desyndicated_sum",
-                    "type": "uint64"
-                },
-                {
-                    "name": "total_syndicated",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "desyndicate",
             "base": "",
             "fields": [
@@ -308,6 +268,16 @@
             ]
         },
         {
+            "name": "finishreturn",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "import_credit",
             "base": "",
             "fields": [
@@ -439,20 +409,16 @@
                     "type": "slug_name"
                 },
                 {
-                    "name": "syndicated_sum",
-                    "type": "uint64"
-                },
-                {
-                    "name": "yield_sum",
-                    "type": "uint64"
-                },
-                {
-                    "name": "desyndicated_sum",
-                    "type": "uint64"
-                },
-                {
                     "name": "queue_epoch",
                     "type": "uint32"
+                },
+                {
+                    "name": "underwriting_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "retained_from_epoch",
+                    "type": "uint64"
                 }
             ]
         },
@@ -483,7 +449,7 @@
                     "type": "uint64"
                 },
                 {
-                    "name": "sequence",
+                    "name": "token_code",
                     "type": "uint64"
                 }
             ]
@@ -679,6 +645,96 @@
             ]
         },
         {
+            "name": "pruneenv",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "limit",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "reconcile",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "reported",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "refundreturn",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "return_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "return_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "holder",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "pubkey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "setconfig",
             "base": "",
             "fields": [
@@ -749,6 +805,34 @@
                 {
                     "name": "token_code",
                     "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "sync",
+            "base": "",
+            "fields": [
+                {
+                    "name": "limit",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "syncenv",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
                 }
             ]
         },
@@ -845,6 +929,14 @@
                 {
                     "name": "queue_cursor",
                     "type": "uint64"
+                },
+                {
+                    "name": "underwriting_cursor",
+                    "type": "uint64"
+                },
+                {
+                    "name": "sync_cursor",
+                    "type": "envelope_key"
                 }
             ]
         },
@@ -908,6 +1000,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "finishreturn",
+            "type": "finishreturn",
+            "ricardian_contract": ""
+        },
+        {
             "name": "importdone",
             "type": "importdone",
             "ricardian_contract": ""
@@ -933,6 +1030,21 @@
             "ricardian_contract": ""
         },
         {
+            "name": "pruneenv",
+            "type": "pruneenv",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "reconcile",
+            "type": "reconcile",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "refundreturn",
+            "type": "refundreturn",
+            "ricardian_contract": ""
+        },
+        {
             "name": "setconfig",
             "type": "setconfig",
             "ricardian_contract": ""
@@ -946,6 +1058,16 @@
             "name": "sweepyield",
             "type": "sweepyield",
             "ricardian_contract": ""
+        },
+        {
+            "name": "sync",
+            "type": "sync",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "syncenv",
+            "type": "syncenv",
+            "ricardian_contract": ""
         }
     ],
     "tables": [
@@ -956,14 +1078,6 @@
             "key_names": ["chain_code","token_code","direction"],
             "key_types": ["uint64","uint64","uint8"],
             "table_id": 59616
-        },
-        {
-            "name": "desyndlog",
-            "type": "desynd_row",
-            "index_type": "i64",
-            "key_names": ["request_id"],
-            "key_types": ["uint64"],
-            "table_id": 52931
         },
         {
             "name": "envelopes",
@@ -1001,7 +1115,7 @@
             "name": "mismatch",
             "type": "mismatch_row",
             "index_type": "i64",
-            "key_names": ["chain_code","sequence"],
+            "key_names": ["chain_code","token_code"],
             "key_types": ["uint64","uint64"],
             "table_id": 57982
         },
@@ -1012,6 +1126,14 @@
             "key_names": ["token_code","chain_kind","pubkey"],
             "key_types": ["uint64","uint64","bytes"],
             "table_id": 38854
+        },
+        {
+            "name": "returns",
+            "type": "return_row",
+            "index_type": "i64",
+            "key_names": ["request_id"],
+            "key_types": ["uint64"],
+            "table_id": 25676
         },
         {
             "name": "syndconfig",

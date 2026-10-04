@@ -484,6 +484,20 @@ public:
       }
       return seen;
    }
+   std::vector<seen_transfer> settlements() {
+      std::vector<seen_transfer> seen;
+      if (!last_trace) return seen;
+      for (const auto& at : last_trace->action_traces) {
+         if (at.act.account != LIQ_ACCOUNT || at.act.name != "settle"_n || at.receiver != LIQ_ACCOUNT) continue;
+         const auto v = liq_abi_ser.binary_to_variant("settle", at.act.data,
+                                              abi_serializer::create_yield_function(abi_serializer_max_time));
+         seen.push_back({v["custodian"].as<name>(), v["beneficiary"].as<name>(), v["quantity"].as<asset>(), {}});
+      }
+      return seen;
+   }
+   action_result claimwire(name account) {
+      return push_bond(account, "claimwire"_n, mvo()("account", account));
+   }
    /// The `sysio.liq::addyield` actions the last pushed transaction executed, as `(from, quantity)`.
    std::vector<std::pair<name, asset>> addyields() {
       std::vector<std::pair<name, asset>> seen;
@@ -916,7 +930,7 @@ BOOST_FIXTURE_TEST_CASE(approve_after_the_window, sysio_bond_tester) try {
 
    BOOST_REQUIRE_EQUAL(success(), approve(1));
    BOOST_REQUIRE(!notified("issuer"_n, "approve"_n));   // a state change only
-   BOOST_REQUIRE(transfers_on(LIQ_ACCOUNT, liq_abi_ser).empty());
+   BOOST_REQUIRE(settlements().empty());
    const auto row = request_row_of(1);
    BOOST_REQUIRE_EQUAL(STATE_APPROVED, request_state_of(1));
    const auto resolved_at = row["resolved_at"].as<time_point>();
@@ -1081,7 +1095,7 @@ BOOST_FIXTURE_TEST_CASE(approved_returns_bonds_and_splits_the_bounty_by_stake, s
 
    BOOST_REQUIRE_EQUAL(success(), claim(1, "bob"_n));
    BOOST_REQUIRE_EQUAL(bob + 6 * UNIT + 6 * UNIT / 10, liq_balance("bob"_n));
-   const auto paid = transfers_on(LIQ_ACCOUNT, liq_abi_ser);
+   const auto paid = settlements();
    BOOST_REQUIRE_EQUAL(1u, paid.size());   // bond and bounty share in one transfer
    BOOST_REQUIRE_EQUAL("bob", paid.front().to.to_string());
    BOOST_REQUIRE_EQUAL(6 * UNIT + 6 * UNIT / 10, paid.front().quantity.get_amount());
@@ -1109,7 +1123,7 @@ BOOST_FIXTURE_TEST_CASE(valid_after_a_hold_pays_the_hold_bond_to_the_underwriter
    BOOST_REQUIRE(!notified("issuer"_n, "rslvvalid"_n));
    BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(1));
    BOOST_REQUIRE(request_row_of(1)["resolved_at"].as<time_point>() != time_point{});
-   BOOST_REQUIRE(transfers_on(LIQ_ACCOUNT, liq_abi_ser).empty());   // a ruling sends nothing
+   BOOST_REQUIRE(settlements().empty());   // a ruling sends nothing
    BOOST_REQUIRE_EQUAL(issuer, liq_balance("issuer"_n));
    // Fully bonded: no escrow awards anything outside the underwriters.
    BOOST_REQUIRE_EQUAL(0u, raw_escrow_of(1, KIND_BOUNTY_BYTE).payout);
@@ -1141,7 +1155,7 @@ BOOST_FIXTURE_TEST_CASE(valid_while_partly_bonded_pays_the_unbonded_share_to_sys
    // hold bond's to the issuer.
    BOOST_REQUIRE_EQUAL(success(), rslvvalid(SYSIO_ACCOUNT, 1));
    BOOST_REQUIRE(!notified("issuer"_n, "rslvvalid"_n));
-   BOOST_REQUIRE(transfers_on(LIQ_ACCOUNT, liq_abi_ser).empty());
+   BOOST_REQUIRE(settlements().empty());
    BOOST_REQUIRE_EQUAL(sysio, liq_balance(SYSIO_ACCOUNT));
    BOOST_REQUIRE_EQUAL(issuer, liq_balance("issuer"_n));
    auto bounty = raw_escrow_of(1, KIND_BOUNTY_BYTE);
@@ -1157,9 +1171,8 @@ BOOST_FIXTURE_TEST_CASE(valid_while_partly_bonded_pays_the_unbonded_share_to_sys
    BOOST_REQUIRE_EQUAL(sysio + 6 * UNIT / 10, liq_balance(SYSIO_ACCOUNT));
    BOOST_REQUIRE_EQUAL(success(), claim(1, "issuer"_n));
    BOOST_REQUIRE_EQUAL(issuer + 6 * UNIT / 10, liq_balance("issuer"_n));
-   const auto paid = transfers_on(LIQ_ACCOUNT, liq_abi_ser);
+   const auto paid = settlements();
    BOOST_REQUIRE_EQUAL(1u, paid.size());
-   BOOST_REQUIRE_EQUAL(std::string(claim_memo), paid.front().memo);
    BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(nothing_msg)), claim(1, SYSIO_ACCOUNT, "carol"_n));
    // The escrows keep what remains for the underwriters.
    BOOST_REQUIRE_EQUAL(4 * UNIT / 10, raw_escrow_of(1, KIND_BOUNTY_BYTE).amount);
@@ -1181,11 +1194,11 @@ BOOST_FIXTURE_TEST_CASE(valid_with_nothing_bonded, sysio_bond_tester) try {
    const auto sysio  = liq_balance(SYSIO_ACCOUNT);
    BOOST_REQUIRE_EQUAL(success(), rslvvalid(SYSIO_ACCOUNT, 1));
    BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(1));
-   BOOST_REQUIRE(transfers_on(LIQ_ACCOUNT, liq_abi_ser).empty());
+   BOOST_REQUIRE(settlements().empty());
    BOOST_REQUIRE_EQUAL(success(), claim(1, SYSIO_ACCOUNT));
    BOOST_REQUIRE_EQUAL(sysio + 1 * UNIT, liq_balance(SYSIO_ACCOUNT));
    BOOST_REQUIRE_EQUAL(issuer, liq_balance("issuer"_n));
-   BOOST_REQUIRE_EQUAL(1u, transfers_on(LIQ_ACCOUNT, liq_abi_ser).size());
+   BOOST_REQUIRE_EQUAL(1u, settlements().size());
    BOOST_REQUIRE_EQUAL(0u, raw_escrow_of(1, KIND_BOUNTY_BYTE).amount);
    BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(nothing_msg)), claim(1, "issuer"_n));
 
@@ -1223,7 +1236,7 @@ BOOST_FIXTURE_TEST_CASE(invalid_after_a_hold_forfeits_bonds_to_the_issuer_and_pa
    BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 1));
    BOOST_REQUIRE(!notified("issuer"_n, "rslvinvalid"_n));
    BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(1));
-   BOOST_REQUIRE(transfers_on(LIQ_ACCOUNT, liq_abi_ser).empty());
+   BOOST_REQUIRE(settlements().empty());
    BOOST_REQUIRE_EQUAL(issuer, liq_balance("issuer"_n));
    BOOST_REQUIRE_EQUAL(10 * UNIT, request_row_of(1)["forfeit_pending"].as_uint64());
    BOOST_REQUIRE_EQUAL("carol"_n, raw_escrow_of(1, KIND_BOUNTY_BYTE).payee);
@@ -1234,10 +1247,9 @@ BOOST_FIXTURE_TEST_CASE(invalid_after_a_hold_forfeits_bonds_to_the_issuer_and_pa
    // Every bond reaches the issuer's claim as ONE transfer under the forfeit memo.
    BOOST_REQUIRE_EQUAL(success(), claim(1, "issuer"_n, "carol"_n));
    BOOST_REQUIRE_EQUAL(issuer + 10 * UNIT, liq_balance("issuer"_n));
-   auto sent = transfers_on(LIQ_ACCOUNT, liq_abi_ser);
+   auto sent = settlements();
    BOOST_REQUIRE_EQUAL(1u, sent.size());
    BOOST_REQUIRE_EQUAL("issuer"_n, sent.front().to);
-   BOOST_REQUIRE_EQUAL(std::string(forfeit_memo), sent.front().memo);
    BOOST_REQUIRE_EQUAL(10 * UNIT, sent.front().quantity.get_amount());
    BOOST_REQUIRE_EQUAL(0u, request_row_of(1)["forfeit_pending"].as_uint64());
    BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(nothing_msg)), claim(1, "issuer"_n));
@@ -1245,9 +1257,8 @@ BOOST_FIXTURE_TEST_CASE(invalid_after_a_hold_forfeits_bonds_to_the_issuer_and_pa
    // The challenger pulls the hold bond and the bounty in one transfer.
    BOOST_REQUIRE_EQUAL(success(), claim(1, "carol"_n));
    BOOST_REQUIRE_EQUAL(carol + 1 * UNIT + 1 * UNIT, liq_balance("carol"_n));
-   sent = transfers_on(LIQ_ACCOUNT, liq_abi_ser);
+   sent = settlements();
    BOOST_REQUIRE_EQUAL(1u, sent.size());
-   BOOST_REQUIRE_EQUAL(std::string(claim_memo), sent.front().memo);
    BOOST_REQUIRE_EQUAL(0u, liq_balance(BOND_ACCOUNT));
    BOOST_REQUIRE_EQUAL(0u, raw_escrow_of(1, KIND_BOUNTY_BYTE).amount);
    BOOST_REQUIRE_EQUAL(0u, raw_escrow_of(1, KIND_HOLD_BOND_BYTE).amount);
@@ -1266,16 +1277,14 @@ BOOST_FIXTURE_TEST_CASE(invalid_on_a_partly_bonded_request_forfeits_the_partial_
    BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 1));
    BOOST_REQUIRE(!notified("issuer"_n, "rslvinvalid"_n));
    BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(1));
-   BOOST_REQUIRE(transfers_on(LIQ_ACCOUNT, liq_abi_ser).empty());
+   BOOST_REQUIRE(settlements().empty());
    BOOST_REQUIRE_EQUAL(success(), claim(1, "issuer"_n));
    BOOST_REQUIRE_EQUAL(issuer + 4 * UNIT + 1 * UNIT, liq_balance("issuer"_n));   // forfeit and bounty returned
 
    // The forfeit and the returned bounty arrive as two transfers; only the forfeit carries its memo.
-   const auto sent = transfers_on(LIQ_ACCOUNT, liq_abi_ser);
+   const auto sent = settlements();
    BOOST_REQUIRE_EQUAL(2u, sent.size());
-   BOOST_REQUIRE_EQUAL(std::string(forfeit_memo), sent.front().memo);
    BOOST_REQUIRE_EQUAL(4 * UNIT, sent.front().quantity.get_amount());
-   BOOST_REQUIRE(sent.back().memo != std::string(forfeit_memo));
    BOOST_REQUIRE_EQUAL(1 * UNIT, sent.back().quantity.get_amount());
    BOOST_REQUIRE_EQUAL(0u, liq_balance(BOND_ACCOUNT));
 } FC_LOG_AND_RETHROW()
@@ -1323,13 +1332,13 @@ BOOST_FIXTURE_TEST_CASE(a_missing_hold_bond_row_is_no_hold_bond, sysio_bond_test
    BOOST_REQUIRE(escrow_row_of(1, KIND_HOLD_BOND_BYTE).is_null());
    BOOST_REQUIRE_EQUAL(success(), rslvvalid(SYSIO_ACCOUNT, 1));
    BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(1));
-   BOOST_REQUIRE(transfers_on(LIQ_ACCOUNT, liq_abi_ser).empty());
+   BOOST_REQUIRE(settlements().empty());
 
    BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, 'b'), LIQX, 1, 0));
    BOOST_REQUIRE_EQUAL(success(), hold("issuer"_n, 2, "carol"_n));
    BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 2));
    BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(2));
-   BOOST_REQUIRE(transfers_on(LIQ_ACCOUNT, liq_abi_ser).empty());
+   BOOST_REQUIRE(settlements().empty());
 
    pass_retention();
    BOOST_REQUIRE_EQUAL(success(), prune(0, 10));
@@ -1373,19 +1382,80 @@ BOOST_FIXTURE_TEST_CASE(a_hostile_issuer_blocks_only_its_own_claim, sysio_bond_t
    BOOST_REQUIRE_EQUAL(success(), claim(2, SYSIO_ACCOUNT, "carol"_n));
    BOOST_REQUIRE_EQUAL(sysio + 6 * UNIT / 10, liq_balance(SYSIO_ACCOUNT));
 
-   // The issuer's own claims fail on its rejection, and what it is owed stays recorded.
+   // LIQ credits cannot invoke the issuer's rejecting code.
    const auto issuer = liq_balance("issuer"_n);
-   BOOST_REQUIRE(claim(3, "issuer"_n, "carol"_n).find("rejecting all notifications") != std::string::npos);
-   BOOST_REQUIRE(claim(2, "issuer"_n, "carol"_n).find("rejecting all notifications") != std::string::npos);
-   BOOST_REQUIRE_EQUAL(issuer, liq_balance("issuer"_n));
-   BOOST_REQUIRE_EQUAL(6 * UNIT, request_row_of(3)["forfeit_pending"].as_uint64());
-   BOOST_REQUIRE_EQUAL(1 * UNIT, raw_escrow_of(3, KIND_BOUNTY_BYTE).payout);
-   BOOST_REQUIRE_EQUAL(6 * UNIT / 10, raw_escrow_of(2, KIND_HOLD_BOND_BYTE).payout);
+   BOOST_REQUIRE_EQUAL(success(), claim(3, "issuer"_n, "carol"_n));
+   BOOST_REQUIRE(!notified("issuer"_n, "settle"_n));
+   BOOST_REQUIRE_EQUAL(success(), claim(2, "issuer"_n, "carol"_n));
+   BOOST_REQUIRE(!notified("issuer"_n, "settle"_n));
+   BOOST_REQUIRE_EQUAL(issuer + 7 * UNIT + 6 * UNIT / 10, liq_balance("issuer"_n));
+   BOOST_REQUIRE_EQUAL(0u, request_row_of(3)["forfeit_pending"].as_uint64());
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
 // Yield
 // ---------------------------------------------------------------------------
+
+BOOST_FIXTURE_TEST_CASE(unbacked_yield_survives_pruning_and_never_repays_principal, sysio_bond_tester) try {
+   bonded_request(1, 'a', 3600);
+   const auto start = liq_index();
+   uint64_t earned = 0, received = 0;
+   for (unsigned i = 0; i < 20 && earned <= received; ++i) {
+      BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, UNIT));
+      BOOST_REQUIRE_EQUAL(success(), sweepyield(LIQSOL));
+      earned = static_cast<uint64_t>(static_cast<fc::uint128_t>(10 * UNIT) * (liq_index() - start) / YIELD_INDEX_SCALE);
+      received = pool_row_of()["pool"]["received"].as_uint64();
+   }
+   BOOST_REQUIRE_GT(earned, received);
+   pass_window(3600);
+   BOOST_REQUIRE_EQUAL(success(), approve(1));
+   const auto principal_before = liq_balance("alice"_n);
+   BOOST_REQUIRE_EQUAL(success(), claim(1, "alice"_n));
+   BOOST_REQUIRE_EQUAL(principal_before + 10 * UNIT, liq_balance("alice"_n));
+   const auto residual = raw_bond_of(1, "alice"_n).yield.owed_wire;
+   BOOST_REQUIRE_GT(residual, 0u);
+   BOOST_REQUIRE(raw_bond_of(1, "alice"_n).paid);
+   pass_retention();
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 100));
+   BOOST_REQUIRE(!request_row_of(1).is_null());
+   BOOST_REQUIRE_EQUAL(residual, raw_bond_of(1, "alice"_n).yield.owed_wire);
+   // Unattributed custody earns slack that can back the already-recorded residual.
+   BOOST_REQUIRE_EQUAL(success(), mint(BOND_ACCOUNT, 10 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, UNIT));
+   BOOST_REQUIRE_EQUAL(success(), claim(1, "alice"_n));
+   BOOST_REQUIRE_EQUAL(principal_before + 10 * UNIT, liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(0u, raw_bond_of(1, "alice"_n).yield.owed_wire);
+   const auto wire_before = wire_balance("alice"_n);
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
+   BOOST_REQUIRE_EQUAL(wire_before + earned, wire_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 100));
+   BOOST_REQUIRE(request_row_of(1).is_null());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE(rejected_wire_cannot_block_liq_or_expire_with_request, sysio_bond_tester) try {
+   bonded_request(1, 'a', 3600);
+   BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, 100 * UNIT));
+   pass_window(3600);
+   BOOST_REQUIRE_EQUAL(success(), approve(1));
+   const auto before_liq = liq_balance("alice"_n);
+   const auto before_wire = wire_balance("alice"_n);
+   const auto earned = liq_owed(BOND_ACCOUNT);
+   set_code("alice"_n, contracts::util::block_transfer_wasm());
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), claim(1, "alice"_n));
+   BOOST_REQUIRE_EQUAL(before_liq + 10 * UNIT, liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(before_wire, wire_balance("alice"_n));
+   BOOST_REQUIRE(!notified("alice"_n, "settle"_n));
+   BOOST_REQUIRE(!notified("alice"_n, "transfer"_n));
+   BOOST_REQUIRE(claimwire("alice"_n) != success());
+   pass_retention();
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 100));
+   set_code("alice"_n, std::vector<uint8_t>{});
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
+   BOOST_REQUIRE_EQUAL(before_wire + earned, wire_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(nothing_msg)), claimwire("alice"_n));
+} FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE(bond_yield_is_paid_with_the_bond, sysio_bond_tester) try {
    constexpr uint32_t window_sec = 3600;
@@ -1408,6 +1478,7 @@ BOOST_FIXTURE_TEST_CASE(bond_yield_is_paid_with_the_bond, sysio_bond_tester) try
    BOOST_REQUIRE_EQUAL(success(), claim(1, "alice"_n));
    BOOST_REQUIRE_EQUAL(alice_liq + 10 * UNIT, liq_balance("alice"_n));
    // alice is the only bond: she is paid exactly what was pulled.
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
    BOOST_REQUIRE_EQUAL(alice_wire + owed, wire_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(bond_wire, wire_balance(BOND_ACCOUNT));
    BOOST_REQUIRE_EQUAL(owed, pool_row_of()["pool"]["credited"].as_uint64());
@@ -1431,6 +1502,7 @@ BOOST_FIXTURE_TEST_CASE(claim_pulls_the_yield_itself_up_to_the_claim, sysio_bond
 
    const auto alice_wire = wire_balance("alice"_n);
    BOOST_REQUIRE_EQUAL(success(), claim(1, "alice"_n));
+   BOOST_REQUIRE_EQUAL(success(), claimwire("alice"_n));
    BOOST_REQUIRE_EQUAL(alice_wire + at_claim, wire_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(0u, liq_owed(BOND_ACCOUNT));
 } FC_LOG_AND_RETHROW()
@@ -1455,6 +1527,7 @@ BOOST_FIXTURE_TEST_CASE(escrow_yield_after_approval_reaches_the_funder, sysio_bo
    BOOST_REQUIRE(first > 0);
    auto issuer_wire = wire_balance("issuer"_n);
    BOOST_REQUIRE_EQUAL(success(), claim(1, "issuer"_n));
+   BOOST_REQUIRE_EQUAL(success(), claimwire("issuer"_n));
    BOOST_REQUIRE_EQUAL(issuer_wire + first, wire_balance("issuer"_n));
    auto escrow = raw_escrow_of(1, KIND_BOUNTY_BYTE);
    BOOST_REQUIRE_EQUAL(1 * UNIT, escrow.amount);   // alice's share is still held
@@ -1473,6 +1546,7 @@ BOOST_FIXTURE_TEST_CASE(escrow_yield_after_approval_reaches_the_funder, sysio_bo
    issuer_wire = wire_balance("issuer"_n);
    BOOST_REQUIRE_EQUAL(success(), claim(1, "issuer"_n));
    // The pool is first-come-first-served; the last taker may be short one atomic unit of rounding.
+   BOOST_REQUIRE_EQUAL(success(), claimwire("issuer"_n));
    const auto second_paid = wire_balance("issuer"_n) - issuer_wire;
    BOOST_REQUIRE(second_paid <= second && second_paid + 1 >= second);
    BOOST_REQUIRE(raw_escrow_of(1, KIND_BOUNTY_BYTE).paid);
@@ -1498,7 +1572,7 @@ BOOST_FIXTURE_TEST_CASE(forfeited_bond_yield_returns_to_the_ledger_as_bonus_yiel
    // The underwriter receives nothing; the forfeited bond's WIRE goes to sysio.liq for LIQSOL.
    BOOST_REQUIRE_EQUAL(alice_wire, wire_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(alice_liq, liq_balance("alice"_n));
-   BOOST_REQUIRE(transfers_on(LIQ_ACCOUNT, liq_abi_ser).empty());
+   BOOST_REQUIRE(settlements().empty());
    const auto added = addyields();
    BOOST_REQUIRE_EQUAL(1u, added.size());
    BOOST_REQUIRE_EQUAL("sysio.bond", added.front().first.to_string());
@@ -1536,6 +1610,7 @@ BOOST_FIXTURE_TEST_CASE(escrow_is_paid_once_every_bond_is_paid_despite_a_remaind
 
    const auto issuer_wire = wire_balance("issuer"_n);
    BOOST_REQUIRE_EQUAL(success(), claim(1, "issuer"_n));
+   BOOST_REQUIRE_EQUAL(success(), claimwire("issuer"_n));
    BOOST_REQUIRE_GT(wire_balance("issuer"_n), issuer_wire);
    escrow = raw_escrow_of(1, KIND_BOUNTY_BYTE);
    BOOST_REQUIRE_EQUAL(1u, escrow.amount);
@@ -1724,6 +1799,25 @@ BOOST_FIXTURE_TEST_CASE(prune_keeps_a_ruling_for_the_retention_period, sysio_bon
 
    // Once the retention period has passed, it goes.
    produce_block(fc::seconds(10));
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 10));
+   BOOST_REQUIRE(request_row_of(1).is_null());
+} FC_LOG_AND_RETHROW()
+
+/// Durable results survive a fully paid settlement and arbitrary delay until the authenticated issuer
+/// acknowledges; acknowledgement itself neither settles a request nor blocks independent claims.
+BOOST_FIXTURE_TEST_CASE(durable_outcome_requires_issuer_acknowledgement, sysio_bond_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), push_bond("issuer"_n, "requestkeep"_n, mvo()
+      ("issuer", "issuer"_n)("schema", "oppenvelope"_n)("statement", bytes(32, 'a'))
+      ("token_code", codename_mvo(LIQSOL))("covered", 10 * UNIT)("bounty", 0)("window_sec", WINDOW_SEC)));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("request is not resolved"),
+                       push_bond("issuer"_n, "ack"_n, mvo()("request_id", 1)));
+   BOOST_REQUIRE_EQUAL(success(), rslvinvalid(SYSIO_ACCOUNT, 1));
+   pass_retention();
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 10));
+   BOOST_REQUIRE_EQUAL(STATE_INVALID, request_state_of(1));
+   BOOST_REQUIRE_NE(success(), push_bond("alice"_n, "ack"_n, mvo()("request_id", 1)));
+   BOOST_REQUIRE_EQUAL(success(), push_bond("issuer"_n, "ack"_n, mvo()("request_id", 1)));
+   BOOST_REQUIRE_EQUAL(success(), push_bond("issuer"_n, "ack"_n, mvo()("request_id", 1)));
    BOOST_REQUIRE_EQUAL(success(), prune(0, 10));
    BOOST_REQUIRE(request_row_of(1).is_null());
 } FC_LOG_AND_RETHROW()

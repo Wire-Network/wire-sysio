@@ -22,6 +22,16 @@
             ]
         },
         {
+            "name": "ack",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "addbounty",
             "base": "",
             "fields": [
@@ -113,6 +123,16 @@
                     "name": "request_id",
                     "type": "uint64"
                 },
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "claimwire",
+            "base": "",
+            "fields": [
                 {
                     "name": "account",
                     "type": "name"
@@ -360,6 +380,44 @@
                 {
                     "name": "forfeit_pending",
                     "type": "uint64"
+                },
+                {
+                    "name": "outcome_acknowledged",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "requestkeep",
+            "base": "",
+            "fields": [
+                {
+                    "name": "issuer",
+                    "type": "name"
+                },
+                {
+                    "name": "schema",
+                    "type": "name"
+                },
+                {
+                    "name": "statement",
+                    "type": "bytes"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "covered",
+                    "type": "uint64"
+                },
+                {
+                    "name": "bounty",
+                    "type": "uint64"
+                },
+                {
+                    "name": "window_sec",
+                    "type": "uint32"
                 }
             ]
         },
@@ -404,6 +462,30 @@
             ]
         },
         {
+            "name": "wire_claim",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "wire_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "yield_pool",
             "base": "",
             "fields": [
@@ -433,6 +515,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "ack",
+            "type": "ack",
+            "ricardian_contract": ""
+        },
+        {
             "name": "addbounty",
             "type": "addbounty",
             "ricardian_contract": ""
@@ -448,6 +535,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "claimwire",
+            "type": "claimwire",
+            "ricardian_contract": ""
+        },
+        {
             "name": "hold",
             "type": "hold",
             "ricardian_contract": ""
@@ -460,6 +552,11 @@
         {
             "name": "request",
             "type": "request",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "requestkeep",
+            "type": "requestkeep",
             "ricardian_contract": ""
         },
         {
@@ -530,6 +627,14 @@
                     "table_id": 20108
                 }
             ]
+        },
+        {
+            "name": "wireclaims",
+            "type": "wire_claim",
+            "index_type": "i64",
+            "key_names": ["account"],
+            "key_types": ["name"],
+            "table_id": 22082
         },
         {
             "name": "yieldpool",

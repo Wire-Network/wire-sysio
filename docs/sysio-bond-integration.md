@@ -94,7 +94,7 @@ Every payment is pulled by `claim(request_id, account)`, one account per call, s
 over the underwriters and no party's refusal blocks another. Anyone may call it; the payment goes to
 `account`. A claim with nothing owed is refused with `nothing to claim`.
 
-- **Underwriters** claim the bond and its shares in one transfer, and the WIRE yield in a second.
+- **Underwriters** settle the bond and its shares with `claim`, then withdraw earned WIRE with `claimwire`.
 - **The issuer** of an INVALID request claims the forfeit, in its own transfer (below), and the
   bounty back when there was no hold. On VALID after a hold of a partly bonded request it claims the
   unbonded share of the hold bond; the hold bond of a fully bonded request is all the underwriters'.
@@ -107,7 +107,7 @@ when claimed.
 
 ## The emergency stop
 
-While the depot's `sysio.andon` cord is pulled, `claim` is refused (`the andon cord is pulled: funds
+While the depot's `sysio.andon` cord is pulled, `claim` and `claimwire` are refused (`the andon cord is pulled: funds
 cannot leave custody`): every payout waits for the clear. Everything else runs -- `request`,
 `addbounty`, `accept`, `hold`, `approve`, the rulings, `sweepyield` and `prune` -- and every transfer
 into `sysio.bond` (a bounty, a bond, a hold bond) succeeds, so bonds can be placed and requests held
@@ -117,12 +117,11 @@ contract that claims from a path that must not throw reads the cord first with
 `andon::pulled(andon::ANDON_ACCOUNT)` (`sysio.andon.hpp`) and waits while it is pulled, as the
 syndication contract does.
 
-## The forfeit transfer
+## The forfeit payment
 
-The issuer's `claim` on an INVALID request pays every bond in ONE `transfer` of the whole bonded
-amount, whatever the number of underwriters, with the memo `sysio.bond::forfeit`. An issuer contract
-recognizes a forfeit by that memo on an incoming transfer from `sysio.bond`. The bounty and the hold
-bond never arrive under that memo.
+The issuer's `claim` on an INVALID request pays its bonded forfeit through a LIQ ledger settlement,
+or through an ordinary transfer with memo `sysio.bond::forfeit` for WIRE-denominated requests.
+Clients read the request's recorded outcome; LIQ invokes no incoming-transfer handler.
 
 What a client does with a forfeit depends on the token:
 
@@ -138,7 +137,7 @@ position (`docs/shadow-custody-integration.md`). `sweepyield(token_code)` pulls 
 owed; `claim` also pulls before it pays.
 
 - A returned bond is held until it is claimed, and earns until then: its position settles at the
-  live index at the claim, and the WIRE goes to its underwriter with the bond.
+  live index at the claim, and its WIRE is banked for the underwriter to withdraw with `claimwire`.
 - A forfeited bond becomes the issuer's at `rslvinvalid`, which records the index in
   `resolved_index`; its position settles there. What the forfeit earns while it waits for the
   issuer's claim is slack. The bond's WIRE never goes to the underwriter: claiming it pays the WIRE
@@ -154,7 +153,44 @@ owed; `claim` also pulls before it pays.
 
 `prune(from_id, limit)` walks the requests from id `from_id` up and acts on at most `limit` terminal
 requests. It erases a request with its rows once they are all paid or owe nothing -- the forfeit and
-every award claimed -- and its ruling is at least `PRUNE_RETENTION_SEC` (seven days) old, so a polling
-issuer always sees the ruling first. A request it keeps still loses its bond rows already paid out: an
-unclaimed payout holds no other underwriter's RAM. A request whose token no longer resolves is skipped.
+every award claimed, with no residual owed yield -- and its ruling is at least `PRUNE_RETENTION_SEC`
+(seven days) old. Durable requests also require issuer acknowledgement. Paid bond rows with no
+residual yield may be erased independently; an unrelated unclaimed payout does not hold their RAM. A request whose token no longer resolves is skipped.
 Anyone may call it.
+
+## Durable outcome consumption
+
+Polling contract issuers should use `requestkeep` (same arguments as `request`) and call `ack(request_id)`
+after storing a terminal result. Only the issuer may acknowledge; acknowledgement is idempotent and
+requires a terminal request. Rulings never notify the issuer, and claims do not require acknowledgement.
+`prune` requires acknowledgement in addition to its existing retention and fully-paid checks for these
+requests. Ordinary `request` retains its existing retention behavior.
+
+The public `find_request`, `request_refusal`, and `settlement_due` accessors provide stable statement
+lookup, shared admission rules, and outstanding settlement principal without client knowledge of counters
+or escrow representation. Statement deduplication lasts while the request exists; durable delivery does
+not add a permanent replay archive after acknowledged requests are pruned. Issuers must enforce their
+own replay policy (syndication retains its envelope/sequence guards).
+
+The durable request flag and syndication's independent cursors change table layouts. A deployment with
+existing rows needs a coordinated table migration; fresh prelaunch state needs none. This change does
+not provide a migration action or recover outcomes already pruned under the old contract.
+
+## Ledger settlement and independent WIRE claims
+
+LIQ principal, awards and forfeits use `sysio.liq::settle(custodian, beneficiary, quantity)`.
+Only `sysio.synd` and `sysio.bond` can debit their own existing LIQ through this action.
+It settles both yield positions, leaves supply unchanged, invokes neither account, and requires
+Andon clear even for a custody recipient or self-settlement. Ordinary token transfers keep their
+notifications and existing behavior.
+
+`claim(request_id, account)` credits LIQ immediately and records earned WIRE in the account's
+backed `wireclaims` balance. `claimwire(account)` withdraws that WIRE separately to the named
+account. It is permissionless and respects Andon; a failed recipient transfer rolls back only the
+WIRE withdrawal. The WIRE balance survives request pruning and never expires. Checked additions
+reject overflow atomically. Yield the pool cannot cover remains on the original bond or escrow row;
+that residual prevents pruning and can be retried without paying principal twice or earning yield
+on returned principal. WIRE-denominated requests retain their ordinary, per-recipient claims.
+
+Clients must read the recorded outcome and balances rather than infer a LIQ forfeit from a transfer
+memo. LIQ settlement has no memo or transfer notification.

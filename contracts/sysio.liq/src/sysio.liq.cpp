@@ -15,6 +15,15 @@ namespace sysio {
 
 namespace {
 
+constexpr auto unsupported_custodian_msg = "unsupported custodian";
+constexpr auto beneficiary_account_does_not_exist_msg = "beneficiary account does not exist";
+constexpr auto invalid_quantity_msg = "invalid quantity";
+constexpr auto must_settle_positive_quantity_msg = "must settle positive quantity";
+constexpr auto symbol_precision_mismatch_msg = "symbol precision mismatch";
+constexpr auto overdrawn_balance_msg = "overdrawn balance";
+constexpr name bond_account = "sysio.bond"_n;
+
+
 using opp::types::ChainKind;
 using opp::types::TokenKind;
 using u128 = opp::shadow::u128;
@@ -87,7 +96,7 @@ void liq::recredit(name holder, asset quantity) {
    check(is_account(holder), "holder account does not exist");
    check(quantity.is_valid() && quantity.amount > 0, "quantity must be positive");
    const currency_stats st = stat_of(quantity.symbol.code());
-   check(quantity.symbol == st.supply.symbol, "symbol precision mismatch");
+   check(quantity.symbol == st.supply.symbol, symbol_precision_mismatch_msg);
    check(grow_supply(quantity.symbol.code(), static_cast<uint64_t>(quantity.amount)), "supply exceeds the asset range");
    adjust_account(holder, quantity, ram_payer);
 }
@@ -228,20 +237,39 @@ void liq::transfer(name from, name to, asset quantity, string memo) {
    require_recipient(from);
    require_recipient(to);
 
-   check(quantity.is_valid(), "invalid quantity");
+   check(quantity.is_valid(), invalid_quantity_msg);
    check(quantity.amount > 0, "must transfer positive quantity");
-   check(quantity.symbol == st.supply.symbol, "symbol precision mismatch");
+   check(quantity.symbol == st.supply.symbol, symbol_precision_mismatch_msg);
    check(memo.size() <= MAX_MEMO_BYTES, "memo has more than 256 bytes");
 
    adjust_account(from, -quantity, ram_payer);
    adjust_account(to, quantity, ram_payer);
 }
 
+void liq::settle(name custodian, name beneficiary, asset quantity) {
+   check(custodian == SYND_ACCOUNT || custodian == bond_account, unsupported_custodian_msg);
+   require_auth(custodian);
+   andon::check_clear(andon::ANDON_ACCOUNT);
+   check(is_account(beneficiary), beneficiary_account_does_not_exist_msg);
+   check(quantity.is_valid(), invalid_quantity_msg);
+   check(quantity.amount > 0, must_settle_positive_quantity_msg);
+   const currency_stats st = stat_of(quantity.symbol.code());
+   check(quantity.symbol == st.supply.symbol, symbol_precision_mismatch_msg);
+   if (custodian == beneficiary) {
+      const auto row = accounts(get_self(), custodian.value).try_get(symbol_key{quantity.symbol.code().raw()});
+      check(row && row->balance.amount >= quantity.amount, overdrawn_balance_msg);
+      adjust_account(custodian, asset{0, quantity.symbol}, ram_payer);
+   } else {
+      adjust_account(custodian, -quantity, ram_payer);
+      adjust_account(beneficiary, quantity, ram_payer);
+   }
+}
+
 void liq::open(name owner, symbol symbol, name ram_payer_) {
    require_auth(ram_payer_);
    check(is_account(owner), "owner account does not exist");
    const currency_stats st = stat_of(symbol.code());
-   check(st.supply.symbol == symbol, "symbol precision mismatch");
+   check(st.supply.symbol == symbol, symbol_precision_mismatch_msg);
    accounts holdings(get_self(), owner.value);
    if (!holdings.contains(symbol_key{ symbol.code().raw() })) {
       adjust_account(owner, asset{ 0, symbol }, ram_payer_);
@@ -417,7 +445,7 @@ void liq::settle_and_adjust(opp::shadow::account& row, u128 index, const asset& 
    row.owed_wire        = opp::shadow::owed(row, index);   // settle before mutate
    row.index_checkpoint = index;
    row.balance         += delta;
-   check(row.balance.amount >= 0, "overdrawn balance");
+   check(row.balance.amount >= 0, overdrawn_balance_msg);
 }
 
 void liq::adjust_account(name owner, const asset& delta, name payer) {

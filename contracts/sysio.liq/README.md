@@ -92,3 +92,10 @@ symbol; `setkicker` if the default is not wanted; `regliqpool` per pool; then
 The Solana relay must carry the `DESYNDICATE_LIQ` effect shape before
 `sysio.synd` is deployed: a delivered `DesyndicateLIQ` without its accounts aborts
 the outpost's handler and wedges the epoch.
+
+### Custody settlement
+
+`settle(custodian, beneficiary, quantity)` lets only `sysio.synd` and `sysio.bond`, under their own
+authority, credit existing LIQ to a beneficiary without sender or recipient notifications. Both yield
+positions settle before balances change; supply is unchanged. Self-settlement checks the balance and
+settles yield once. Andon must be clear in all cases. Ordinary `transfer` keeps its notification behavior.

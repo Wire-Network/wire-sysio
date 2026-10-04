@@ -24,6 +24,10 @@ namespace sysio {
 
 namespace {
 
+constexpr name settle_action = "settle"_n;
+constexpr auto request_is_not_resolved_msg = "request is not resolved";
+
+
 using opp::custody::depot_native_token;
 using opp::custody::pull_depot_native;
 using opp::custody::transfer_depot_native;
@@ -65,22 +69,22 @@ constexpr std::string_view claim_memo = "sysio.bond::claim";
 constexpr std::string_view claim_yield_memo = "sysio.bond::claim yield";
 
 /// Message of the `check` a covered or bonded amount off the token's increment raises.
-constexpr std::string_view bond_increment_msg = "amount must be a positive multiple of the bond increment";
+using bond_validation::bond_increment_msg;
 
 /// Message of the `check` a token with fewer than BOND_INCREMENT_DECIMALS decimals raises.
-constexpr std::string_view precision_msg = "token precision is below the bond increment";
+using bond_validation::precision_msg;
 
 /// Message of the `check` a token code that is neither WIRE nor a shadow LIQ symbol raises.
-constexpr std::string_view unsupported_token_msg = "unsupported bond token";
+using bond_validation::unsupported_token_msg;
 
 /// Message of the `check` a statement longer than MAX_STATEMENT_BYTES raises.
-constexpr std::string_view statement_len_msg = "statement exceeds the maximum length";
+using bond_validation::statement_len_msg;
 
 /// Message of the `check` a second request for the same issuer and statement raises.
-constexpr std::string_view duplicate_msg = "a request for this statement already exists";
+using bond_validation::duplicate_msg;
 
 /// Message of the `check` a zero challenge window raises.
-constexpr std::string_view window_msg = "window must be positive";
+using bond_validation::window_msg;
 
 /// Message of the `check` `setconfig` raises for a hold percentage of zero or above one whole.
 constexpr std::string_view hold_bps_range_msg = "hold_bps must be positive and at most the basis-point denominator";
@@ -89,7 +93,7 @@ constexpr std::string_view hold_bps_range_msg = "hold_bps must be positive and a
 constexpr std::string_view amount_positive_msg = "amount must be positive";
 
 /// Message of the `check` an amount no `asset` can carry raises.
-constexpr std::string_view amount_range_msg = "amount exceeds the asset range";
+using bond_validation::amount_range_msg;
 
 /// Message of the `check` an action naming an unknown request raises.
 constexpr std::string_view request_missing_msg = "request not found";
@@ -276,6 +280,7 @@ bool fully_paid(name self, const bond::request_row& req, u128 live_index) {
    bond::bonds_t bonds(self);
    for (auto it = bonds.lower_bound(bond::bond_key{.request_id = req.id, .underwriter = name{}});
         it != bonds.end() && it->request_id == req.id; ++it) {
+      if (it->yield.owed_wire > 0) return false;
       if (it->paid) continue;
       if (returns_bonds || owed_at(it->yield, it->amount, req.token_code, req.resolved_index) > 0) return false;
    }
@@ -283,7 +288,7 @@ bool fully_paid(name self, const bond::request_row& req, u128 live_index) {
    for (const auto kind : magic_enum::enum_values<bond::escrow_kind>()) {
       const auto row = escrows.try_get(bond::escrow_key_of(req.id, kind));
       if (!row) continue;
-      if (row->payout > 0) return false;
+      if (row->payout > 0 || row->yield.owed_wire > 0) return false;
       if (!row->paid && owed_at(row->yield, row->amount, req.token_code, live_index) > 0) return false;
    }
    return true;
@@ -326,15 +331,9 @@ void bond::setconfig(uint32_t hold_bps) {
 void bond::request(name issuer, name schema, std::vector<char> statement, sysio::slug_name token_code,
                    uint64_t covered, uint64_t bounty, uint32_t window_sec) {
    require_auth(issuer);
-   check(statement.size() <= MAX_STATEMENT_BYTES, statement_len_msg);
-
+   const auto refusal = request_refusal(get_self(), issuer, schema, statement, token_code, covered, bounty, window_sec);
+   check(refusal.empty(), refusal);
    const auto custody = resolve_bond_token(token_code);
-   check(custody.has_value(), unsupported_token_msg);
-   const auto increment = increment_of(custody->sym);
-   check(increment.has_value(), precision_msg);
-   check(is_increment_multiple(covered, *increment), bond_increment_msg);
-   check(covered <= max_asset_amount && bounty <= max_asset_amount, amount_range_msg);
-   check(window_sec > 0, window_msg);
 
    request_row row{
       .id               = 0,
@@ -374,6 +373,24 @@ void bond::request(name issuer, name schema, std::vector<char> statement, sysio:
       escrow_tokens(get_self(), row.id, escrow_kind::BOUNTY, issuer, bounty, token_code, *custody,
                     request_bounty_memo);
    }
+}
+
+void bond::requestkeep(name issuer, name schema, std::vector<char> statement, sysio::slug_name token_code,
+                       uint64_t covered, uint64_t bounty, uint32_t window_sec) {
+   request(issuer, schema, statement, token_code, covered, bounty, window_sec);
+   const auto row = find_request(get_self(), issuer, schema, statement);
+   requests_t(get_self()).modify(same_payer, request_key{row->id}, [](request_row& r) {
+      r.outcome_acknowledged = false;
+   });
+}
+
+void bond::ack(uint64_t request_id) {
+   requests_t requests(get_self());
+   const auto row = requests.try_get(request_key{request_id});
+   check(row.has_value(), request_missing_msg);
+   require_auth(row->issuer);
+   check(is_terminal(row->state), request_is_not_resolved_msg);
+   requests.modify(same_payer, request_key{request_id}, [](request_row& r) { r.outcome_acknowledged = true; });
 }
 
 void bond::addbounty(uint64_t request_id, uint64_t amount) {
@@ -556,10 +573,9 @@ void bond::sweepyield(sysio::slug_name token_code) {
 
 // claim - pay `account` what terminal request `request_id` owes it.
 //
-// Every payout of a request is pulled here, one account per call, so a party that refuses transfers
-// blocks only its own claim. The issuer of an INVALID request takes the forfeit in ONE transfer
-// under `forfeit_memo`; everything else in the request's token goes in one transfer under
-// `claim_memo`, and the WIRE yield in another.
+// Each account settles independently. LIQ credits invoke no recipient code. Earned WIRE is
+// recorded into a backed claim balance and withdrawn separately; WIRE-denominated requests keep
+// ordinary transfer claims.
 //
 // A returned bond and an escrow are still held here, so they settle at sysio.liq's LIVE index: what
 // they earn up to the claim is their owner's. A forfeited bond settles at the request's
@@ -567,7 +583,7 @@ void bond::sweepyield(sysio::slug_name token_code) {
 // sysio.liq (the custody library's obligation 3), so what the rows take is covered by WIRE that
 // arrives ahead of the payouts queued after it. The rows are marked paid before any transfer is
 // queued, so a transfer-notify handler that re-enters `claim` finds nothing left. What the pool
-// cannot cover of a row's yield is at most rounding dust and stays in the contract.
+// cannot cover stays owed on the original row and prevents pruning until paid.
 //
 // An escrow keeps earning while it holds shares or a payout not yet claimed, so its funder may claim
 // more than once; the funder's claim marks it paid once no bond is owed a share of it and its payout
@@ -604,16 +620,20 @@ void bond::claim(uint64_t request_id, name account) {
 
    bonds_t        bonds(get_self());
    const bond_key bkey{.request_id = request_id, .underwriter = account};
-   if (auto row = bonds.try_get(bkey); row && !row->paid) {
+   if (auto row = bonds.try_get(bkey); row && (!row->paid || row->yield.owed_wire > 0)) {
       uint64_t earned = 0;
       bool     earns  = false;
       if (shadow) {
-         custody::settle(row->yield, row->amount, forfeit ? req->resolved_index : live);
+         if (!row->paid) custody::settle(row->yield, row->amount, forfeit ? req->resolved_index : live);
          earns  = row->yield.owed_wire > 0;
          earned = custody::take(row->yield, pool.pool);
       }
       bool paid = false;
-      if (!forfeit) {
+      if (row->paid) {
+         if (forfeit) forfeit_wire = earned;
+         else wire_out = earned;
+         paid = earned > 0;
+      } else if (!forfeit) {
          const uint64_t bounty_share    = bond::share_of(row->amount, req->bounty, req->covered);
          const uint64_t hold_bond_share = bond::share_of(row->amount, req->hold_bond, req->covered);
          add_to_transfer(token_out, row->amount);
@@ -649,10 +669,10 @@ void bond::claim(uint64_t request_id, name account) {
          row->payout = 0;
          changed     = true;
       }
-      if (shadow && !row->paid && row->funder == account) {
-         custody::settle(row->yield, row->amount, live);
+      if (shadow && (!row->paid || row->yield.owed_wire > 0) && row->funder == account) {
+         if (!row->paid) custody::settle(row->yield, row->amount, live);
          if (row->yield.owed_wire > 0) {
-            wire_out  = opp::safe::add_sat_u64(wire_out, custody::take(row->yield, pool.pool));
+            add_to_transfer(wire_out, custody::take(row->yield, pool.pool));
             row->paid = row->payout == 0 && shares_settled(get_self(), *req);
             changed   = true;
          }
@@ -665,15 +685,40 @@ void bond::claim(uint64_t request_id, name account) {
    check(found, nothing_msg);
    if (shadow) yieldpools_t(get_self()).set(ram_payer, pool_key{req->token_code.value}, pool);
 
-   if (forfeit_out > 0) transfer_depot_native(get_self(), account, *custody_token, forfeit_out, forfeit_memo);
-   if (token_out > 0) transfer_depot_native(get_self(), account, *custody_token, token_out, claim_memo);
-   if (wire_out > 0) transfer_depot_native(get_self(), account, wire_custody(), wire_out, claim_yield_memo);
+   const auto pay = [&](uint64_t amount, std::string_view memo) {
+      if (amount == 0) return;
+      if (shadow) {
+         action(permission_level{get_self(), active_permission}, LIQ_ACCOUNT, settle_action,
+                std::make_tuple(get_self(), account, asset{static_cast<int64_t>(amount), custody_token->sym})).send();
+      } else {
+         transfer_depot_native(get_self(), account, *custody_token, amount, memo);
+      }
+   };
+   pay(forfeit_out, forfeit_memo);
+   pay(token_out, claim_memo);
+   if (wire_out > 0) {
+      wireclaims_t claims(get_self());
+      const wire_key key{account};
+      auto balance = claims.try_get(key).value_or(wire_claim{account, 0});
+      add_to_transfer(balance.amount, wire_out);
+      claims.set(ram_payer, key, balance);
+   }
    // sysio.liq refuses a distribution to a symbol with no supply: the WIRE then stays in the contract.
    if (forfeit_wire > 0 && has_supply(req->token_code)) {
       action(permission_level{get_self(), active_permission}, LIQ_ACCOUNT, opp::shadow::ADDYIELD_ACTION,
              std::make_tuple(get_self(), asset(static_cast<int64_t>(forfeit_wire), opp::wire::asset_symbol), sym))
          .send();
    }
+}
+
+void bond::claimwire(name account) {
+   andon::check_clear(andon::ANDON_ACCOUNT);
+   wireclaims_t claims(get_self());
+   const wire_key key{account};
+   const auto balance = claims.try_get(key);
+   check(balance && balance->amount > 0, nothing_msg);
+   claims.erase(key);
+   transfer_depot_native(get_self(), account, wire_custody(), balance->amount, claim_yield_memo);
 }
 
 // prune - erase terminal requests nothing is owed on, with their rows, and paid bond rows.
@@ -697,7 +742,7 @@ void bond::prune(uint64_t from_id, uint32_t limit) {
       const auto custody_token = resolve_bond_token(it->token_code);
       if (!custody_token) continue;
       const bool retained = now < it->resolved_at + seconds(PRUNE_RETENTION_SEC);
-      if (!retained && fully_paid(get_self(), *it, live_index_of(it->token_code, *custody_token))) {
+      if (!retained && it->outcome_acknowledged && fully_paid(get_self(), *it, live_index_of(it->token_code, *custody_token))) {
          prunable.push_back(it->id);
          ++acted;
          continue;
@@ -705,7 +750,7 @@ void bond::prune(uint64_t from_id, uint32_t limit) {
       const size_t before = paid_bonds.size();
       for (auto bit = bonds.lower_bound(bond_key{.request_id = it->id, .underwriter = name{}});
            bit != bonds.end() && bit->request_id == it->id; ++bit) {
-         if (bit->paid) paid_bonds.push_back(bond_key{.request_id = it->id, .underwriter = bit->underwriter});
+         if (bit->paid && bit->yield.owed_wire == 0) paid_bonds.push_back(bond_key{.request_id = it->id, .underwriter = bit->underwriter});
       }
       if (paid_bonds.size() != before) ++acted;
    }

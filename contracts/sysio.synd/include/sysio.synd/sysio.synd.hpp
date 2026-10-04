@@ -17,37 +17,20 @@
  *     WAITING, and to the `(outpost, token)` running sums in `ledger`.
  * An envelope that carried no syndication or yield report writes nothing here.
  *
- * The queue. `closeenv`, inline and within CLOSEENV_QUEUE_LIMIT, and the permissionless `crank` run
- * one step of the queue over every outpost and token, from the oldest envelope not yet finished and
- * from the pair the previous step ran out on (or the pair after it, when that pair moved nothing),
- * until its budget or its examination cap (4 times the budget: one per pair visited, one per
- * envelope looked at, one per item row read) is spent, so a step reads a bounded number of rows
- * whatever the number of pairs:
- *   1. an envelope whose request is issued is refreshed from its `sysio.bond` row, found through the
- *      request's `bystatement` key -- BONDED makes it RELEASABLE, HELD makes it HELD; `sysio.bond`
- *      notifies no one, so the step reads the row. The refresh spends no budget and runs whatever the
- *      pair's flows. The first time the row is APPROVED, VALID or INVALID the outcome is recorded on the
- *      envelope and the row is never read again (`sysio.bond` may prune it): APPROVED and VALID make
- *      the envelope RELEASABLE, INVALID burns it (below). A challenged request ruled VALID snapshots
- *      the unbonded share of the hold bond `sysio.bond` awards the issuer, and the challenger who paid
- *      it, on the envelope (`hold_share`, `hold_beneficiary`, `share_pending`); the first step with the
- *      cord clear claims the award when it is still owed and forwards the share from the snapshot,
- *      once;
- *   2. the items of a RELEASABLE envelope are released in id order: a syndication through the pair's
- *      bucket and fee, to the account its pubkey has linked NOW or into `parked` (where an account
- *      with contract code also takes delivery, so its refusal cannot stall the queue), the WIRE the
- *      item earned credited to the account through `sysio.liq::creditowed`; a yield report by
- *      `sysio.liq::mintyield`, with no fee and no budget. An envelope with no item left is DONE. A
- *      flow that stops for the step (an empty or unset bucket, a full headroom) costs nothing more;
- *   3. the oldest WAITING envelope asks `sysio.bond` to underwrite its statement, but only when no
- *      earlier envelope of the pair holds a request that is neither bonded nor ruled: one request at
- *      a time per outpost and token, in envelope order. Every condition `sysio.bond::request` checks
- *      is verified here first; when one fails the envelope stays WAITING and the reason is printed.
- * The step never throws; what it cannot do now it leaves for the next step. A step sees at most as
- * many envelopes of a pair as its budget and cap allow, counted from the oldest unfinished one, so a
- * pair whose blocked backlog is longer than that window needs a `crank` with a large limit before
- * `sysio.bond`'s prune retention elapses, or the outcome of a later envelope can be pruned unrecorded
- * and that envelope strands.
+ * The queue. `closeenv` and permissionless `crank(limit)` run three independently bounded phases:
+ *   1. `sync(limit)` advances a persistent envelope cursor, including DONE envelopes awaiting finality.
+ *      `syncenv` targets one envelope. Terminal outcomes and settlement snapshots are recorded before
+ *      acknowledging bond. This phase moves no funds and operates while the cord is pulled.
+ *   2. FIFO release advances from `queue_epoch`. BONDED makes an envelope RELEASABLE; HELD pauses it.
+ *      Syndications pass through the bucket and fee into linked accounts or parked balances. Yield
+ *      reports use mintyield. INVALID burns from the snapshotted settlement; VALID forwards a pending
+ *      challenger share. Neither payout path runs while frozen. Empty item sets become DONE.
+ *   3. Underwriting advances from each pair's `underwriting_epoch`, past fully bonded or ruled requests,
+ *      and issues its oldest WAITING envelope. Shared bond validation protects non-throwing intake;
+ *      requestkeep retains outcomes until acknowledged. A queued syncenv records the real assigned ID.
+ * Each of phases 2 and 3 has its own `limit` work budget and `4 * limit` examination cap, with separate
+ * pair cursors. Outcome consumption therefore does not require a large release budget or a polling
+ * deadline. Late settlement discovered after DONE rewinds the release cursor to that envelope.
  *
  * Challenge. Any account may `challenge` an envelope that is REQUESTED, RELEASABLE or DONE while its
  * request is OPEN or BONDED: it pays the request's hold bond plus the pair's `challenge_extra` in the
@@ -79,8 +62,8 @@
  * level (and any desyndication of a pair with no `syndconfig` row), then moves the holder's shadow here.
  * The fee, `quantity * desynd_fee_bps / 10000` floored, stays in `feepot`; the rest is burned with
  * `sysio.liq::burn`, queued as DESYNDICATE_LIQ to the token's outpost with the next request id, and
- * recorded in `desyndlog` and in the ledger's `desyndicated_sum`. The bucket drops by the whole quantity.
- * The attestation and `desyndlog` carry `total_syndicated`, the depot's outstanding shadow of the symbol
+ * retained in `returns` until governance establishes its external outcome. The bucket drops by the whole quantity.
+ * The attestation carries `total_syndicated`, the depot's outstanding shadow of the symbol
  * after the burn (`liq::outstanding_of`), for the outpost's custody check.
  *
  * The solvency check. Each SYNDICATE_LIQ and LIQ_YIELD carries `total_syndicated`, the outpost's live
@@ -94,14 +77,14 @@
  * before it. The check is one-sided, `custody >= outstanding`, because every message in flight moves
  * custody up or the outstanding down: a syndication is locked before it is minted, a desyndication burned
  * before it is paid (or while its payout is stored as pending), yield claimed before it is reported; an
- * INVALID envelope is burned while the outpost keeps the custody, a `sysio.liq::recredit` after an outpost
- * refusal grows the supply the outpost still holds, and anyone may send tokens to a custody account. An
+ * INVALID envelope is burned while the outpost keeps the custody, a request-keyed `refundreturn` after
+ * definitive external cancellation restores supply the outpost still holds, and anyone may send tokens to a custody account. An
  * excess is printed (`EXCESS`) and nothing else. A shortfall writes a `mismatch` row, pulls the
  * `sysio.andon` cord when this contract is a registered puller (`andon::may_pull`) and the cord is clear,
  * prints why when it does not, and the message is then held, minted and added to its envelope exactly as
  * without it. A total is not a slashable fact. Nothing on this path throws. The check reads live balances
- * only: the ledger's running sums are Part B's forensic record and are not read by it, so a governance
- * `recredit`, which grows the supply directly, is seen by the next comparison with no entry here.
+ * only. Each pair retains its latest unresolved incident, cleared only by explicit governance reconciliation.
+ * No lifetime reporting totals or completed-return archive are retained.
  *
  * Emergency stop. While the `sysio.andon` cord is pulled nothing leaves this contract, and nothing it
  * holds is burned: the queue step still refreshes requests, records outcomes and issues requests, but
@@ -265,24 +248,40 @@ namespace sysio {
                                        uint64_t synd_refill, uint64_t desynd_burst, uint64_t desynd_refill,
                                        uint32_t window_sec, uint64_t bounty, uint64_t challenge_extra);
 
-      /// Run one step of the queue with at most `limit` units of work: each item released, burned or
-      /// found unable to move spends one, and so does each request issued. Refreshing an envelope from
-      /// its request spends none, so the envelopes the step reaches are refreshed whatever the pair's
-      /// flows. An item of a flow that has stopped for the step -- syndications behind an empty or unset
-      /// bucket, yields behind a full headroom -- is passed over without spending. A separate cap of
-      /// 4 x `limit` examinations -- one per pair visited (its ledger, config and first envelope
-      /// lookup), one per envelope looked at, one per item row read -- bounds the rows the step reads
-      /// to a constant multiple of `limit`, whatever the number of pairs, idle or blocked. The step
-      /// ends when either runs out, and the next starts at the pair it ended on, or at the pair after it
-      /// when that pair released and burned nothing (`syndstate.queue_cursor`): a pair that keeps moving
-      /// holds the cursor until its backlog drains, and a pair that moves nothing never holds it. A pair
-      /// the cap reached before it could look at any of its envelopes keeps the cursor. A pair whose
-      /// blocked backlog is longer than one step's window needs a `crank` with a large limit before
-      /// `sysio.bond`'s prune retention elapses, or a later envelope's outcome can be pruned unrecorded.
-      /// Permissionless, and never throws -- what cannot move now waits for the next step. While the
-      /// `sysio.andon` cord is pulled the step releases, forwards and burns nothing (the file comment's
-      /// emergency stop).
+      /// Run bounded outcome synchronization, FIFO release, and underwriting, in that order. Sync
+      /// visits at most `limit` envelopes; underwriting and release each have `limit` work units and
+      /// `4 * limit` examinations, with independent cursors. Permissionless. Blocked work waits; while
+      /// frozen only synchronization and request issuance run. Durable outcomes have no polling deadline.
       [[sysio::action]] void crank(uint32_t limit);
+
+      /// Synchronize one issued envelope's request identity and terminal outcome without releasing,
+      /// burning or claiming funds. Permissionless; safe while frozen and independent of FIFO release.
+      [[sysio::action]] void syncenv(sysio::slug_name chain_code, sysio::slug_name token_code,
+                                   uint32_t epoch_index);
+
+      /// Synchronize at most `limit` envelopes from a persistent cursor, including DONE envelopes
+      /// still awaiting a ruling. Permissionless; no recipient code or funds movement.
+      [[sysio::action]] void sync(uint32_t limit);
+
+      /// Erase at most `limit` settled prefix envelopes, retaining a replay floor. Stops at the first
+      /// unfinished row; DONE before finality, unacknowledged outcomes, items and pending shares stay.
+      /// Permissionless, counts every examined envelope, and never moves funds.
+      [[sysio::action]] void pruneenv(sysio::slug_name chain_code, sysio::slug_name token_code, uint32_t limit);
+
+      /// Governance attests that custody is reconciled at `reported` base units, which must cover
+      /// current outstanding supply. Erases this pair's incident, leaving the global Andon cord alone.
+      /// This is a trusted governance statement, not an on-chain measurement of external custody.
+      [[sysio::action]] void reconcile(sysio::slug_name chain_code, sysio::slug_name token_code, uint64_t reported);
+
+      /// Governance confirms an outstanding return was externally paid/completed. Erases the pending
+      /// obligation without depot credit. External finality is established off-chain; auth=sysio.
+      [[sysio::action]] void finishreturn(uint64_t request_id);
+
+      /// Governance attests irreversible external rejection/cancellation: nothing was paid and no
+      /// payable external obligation remains. Restore exactly the net burned amount to the original
+      /// holder, atomically erase the outstanding row, and reject a duplicate. Auth=sysio. No timeout
+      /// or mere queued/pending/duplicate-request observation is sufficient evidence for this action.
+      [[sysio::action]] void refundreturn(uint64_t request_id);
 
       /// Drop the envelope of outpost `chain_code`, token `token_code` and depot epoch `epoch_index`, OPEN or
       /// WAITING with no request issued: burn its SYNDICATION items out of this contract's `sysio.liq` row
@@ -300,8 +299,8 @@ namespace sysio {
       /// INVALID ruling. The envelope becomes HELD, and the pair's `queue_epoch` is rewound to it so the
       /// queue processes the ruling even for an envelope it had finished. A charge of zero (a hold bond
       /// that rounds to zero and no `challenge_extra`) is refused. One challenge per request.
-      /// `challenger` may not be this contract, `sysio.bond`, or an account with contract code (a share
-      /// of the hold bond may be forwarded to it inside the queue step, which must never throw).
+      /// `challenger` may not be this contract or `sysio.bond`. Contract accounts receive refunds
+      /// through ledger settlement without recipient execution.
       /// Challenger's authority; any row the challenge creates bills the `sysio` RAM pool.
       [[sysio::action]] void challenge(name challenger, sysio::slug_name chain_code, sysio::slug_name token_code,
                                        uint32_t epoch_index);
@@ -322,14 +321,10 @@ namespace sysio {
       /// cord is pulled. Permissionless.
       [[sysio::action]] void sweep(name account, opp::types::ChainKind chain_kind);
 
-      /// AuthX link completed for `account` on `chain_kind`: deliver every parked row of `pubkey` to
-      /// `account`, its banked WIRE included. Inline from `sysio.authex::createlink`, so a missing
-      /// account, this contract itself, or a pubkey that does not fit `chain_kind` returns without
-      /// effect rather than aborting the user's link. The shadow is delivered by a `sysio.liq::transfer`,
-      /// which notifies `account`: a contract account whose transfer handler throws aborts its own
-      /// `createlink` and so cannot link while it holds parked shadow (the banked WIRE is credited
-      /// through `sysio.liq::creditowed`, which notifies no one). While the `sysio.andon` cord is pulled it
-      /// delivers nothing and returns, so the link stands and `sweep` delivers after the clear.
+      /// AuthX link completed: deliver parked principal by callback-free LIQ settlement and banked
+      /// WIRE by creditowed. A missing account or malformed key returns quietly. Contract accounts,
+      /// including this custodian, can receive without executing code. While Andon is pulled, the
+      /// link stands and sweep delivers after the clear.
       /// Auth=sysio.authex.
       [[sysio::action]] void linkswept(name account, opp::types::ChainKind chain_kind, std::vector<char> pubkey);
 
@@ -343,12 +338,12 @@ namespace sysio {
       /// a pair with no `syndconfig` row. The quantity moves from the holder's own `sysio.liq` row (never
       /// a held or parked balance) to this contract. The fee, `quantity * desynd_fee_bps /
       /// BPS_DENOMINATOR` floored, stays in `feepot`; the net rest is burned with `sysio.liq::burn`, and
-      /// is what the attestation, `desyndlog` and the ledger's `desyndicated_sum` carry. The bucket drops
+      /// is what the attestation, `returns` carry. The bucket drops
       /// by the whole quantity. A fee that rounds to zero burns and queues the whole quantity; a fee of
       /// the whole quantity is refused. The request takes the next id from `syndcounters`. The attestation
-      /// and `desyndlog` also carry `total_syndicated`, the depot's outstanding shadow of the symbol after
+      /// carries `total_syndicated`, the depot's outstanding shadow of the symbol after
       /// this burn (`liq::outstanding_of`: supply plus parked yield, net of the burned amount). The burn is
-      /// final: an outpost refusal is reconciled by governance through `sysio.liq::recredit`. Refused while
+      /// final: an outpost refusal is reconciled by governance through request-keyed `refundreturn`. Refused while
       /// the `sysio.andon` cord is pulled. Holder's authority.
       [[sysio::action]] void desyndicate(name holder, asset quantity);
 
@@ -472,18 +467,16 @@ namespace sysio {
          SYSLIB_SERIALIZE(ledger_key, (chain_code)(token_code))
       };
 
-      /// Running sums of everything admitted for one outpost and token, from the first message on.
+      /// Operational queue positions and replay floor for one outpost/token; no lifetime totals.
       struct [[sysio::table("ledger")]] ledger_row {
          sysio::slug_name chain_code;            ///< the outpost
          sysio::slug_name token_code;            ///< the liq token
-         uint64_t         syndicated_sum   = 0;  ///< base units of every SYNDICATE_LIQ admitted
-         uint64_t         yield_sum        = 0;  ///< base units of every LIQ_YIELD admitted
-         uint64_t         desyndicated_sum = 0;  ///< base units of every DESYNDICATE_LIQ queued, net of fees
          /// The queue's cursor: no envelope of an earlier epoch is left to refresh or release, so the
          /// queue step starts here.
          uint32_t         queue_epoch      = 0;
-         SYSLIB_SERIALIZE(ledger_row, (chain_code)(token_code)(syndicated_sum)(yield_sum)(desyndicated_sum)
-                          (queue_epoch))
+         uint32_t         underwriting_epoch = 0; ///< oldest envelope still gating issuance, independent of release
+         uint64_t retained_from_epoch = 0; ///< epochs below this floor were compacted and cannot reopen
+         SYSLIB_SERIALIZE(ledger_row, (chain_code)(token_code)(queue_epoch)(underwriting_epoch)(retained_from_epoch))
       };
 
       /// Ledger rows by outpost and token.
@@ -555,27 +548,26 @@ namespace sysio {
       /// Parked rows by token, chain family and pubkey.
       using parkeds_t = kv::table<"parked"_n, parked_key, parked_row>;
 
-      /// Key of `desyndlog`: one row per DESYNDICATE_LIQ request.
-      struct desynd_key {
-         uint64_t request_id;   ///< the request id the attestation carries
-         SYSLIB_SERIALIZE(desynd_key, (request_id))
+      /// Stable identity of an outstanding external return. IDs are never reused.
+      struct return_key {
+         uint64_t request_id;
+         SYSLIB_SERIALIZE(return_key, (request_id))
       };
 
-      /// One queued DESYNDICATE_LIQ, the running sum of its outpost and token after it, and the
-      /// outstanding shadow total the attestation carried.
-      struct [[sysio::table("desyndlog")]] desynd_row {
-         uint64_t         request_id       = 0;   ///< the request id the attestation carries
-         sysio::slug_name chain_code;             ///< the outpost it was queued to
-         sysio::slug_name token_code;             ///< the liq token
-         uint64_t         amount           = 0;   ///< base units burned and queued, net of the fee
-         uint64_t         desyndicated_sum = 0;   ///< the ledger's `desyndicated_sum` after this request
-         uint64_t         total_syndicated = 0;   ///< the depot's outstanding shadow after this burn, as carried
-         SYSLIB_SERIALIZE(desynd_row, (request_id)(chain_code)(token_code)(amount)(desyndicated_sum)
-                                      (total_syndicated))
+      /// A burned return awaiting an externally established outcome. Contains only what governance
+      /// needs to identify the obligation and restore its original holder if it is definitively rejected.
+      struct [[sysio::table("returns")]] return_row {
+         uint64_t request_id = 0; ///< DESYNDICATE_LIQ identity
+         name holder; ///< original depot holder; later wallet linking cannot redirect a refund
+         sysio::slug_name chain_code; ///< destination outpost
+         sysio::slug_name token_code; ///< burned token
+         opp::types::ChainKind chain_kind; ///< destination key family
+         std::vector<char> pubkey; ///< destination captured when queued
+         uint64_t amount = 0; ///< exact net burned amount; the fee is not refundable here
+         SYSLIB_SERIALIZE(return_row, (request_id)(holder)(chain_code)(token_code)(chain_kind)(pubkey)(amount))
       };
-
-      /// Desyndications by request id.
-      using desyndlog_t = kv::table<"desyndlog"_n, desynd_key, desynd_row>;
+      /// Outstanding returns only; completed/refunded rows are erased atomically.
+      using returns_t = kv::table<"returns"_n, return_key, return_row>;
 
       /// Contract-wide state.
       struct [[sysio::table("syndstate")]] synd_state {
@@ -584,7 +576,9 @@ namespace sysio {
          /// the last step ran out on (budget or examination cap), or the one after it when that pair
          /// moved nothing.
          uint64_t queue_cursor    = 0;
-         SYSLIB_SERIALIZE(synd_state, (import_complete)(queue_cursor))
+         uint64_t underwriting_cursor = 0; ///< independent pair cursor for request issuance
+         envelope_key sync_cursor{}; ///< next envelope inspected by the independent outcome sweep
+         SYSLIB_SERIALIZE(synd_state, (import_complete)(queue_cursor)(underwriting_cursor)(sync_cursor))
       };
 
       /// The state singleton.
@@ -655,18 +649,15 @@ namespace sysio {
       /// Fee pots by token code.
       using feepots_t = kv::table<"feepot"_n, token_key, fee_row>;
 
-      /// Key of `mismatch`: the outpost and the sequence of the message that reported the shortfall. An
-      /// admitted sequence is unique per outpost (`admit_sequence`) and only an admitted message is
-      /// compared, so the row needs no id counter of its own (the spec's `id` key, spec 4.2).
+      /// One unresolved custody incident per outpost/token.
       struct mismatch_key {
          uint64_t chain_code;   ///< the outpost's registry code value
-         uint64_t sequence;     ///< the outpost sequence of the message
-         SYSLIB_SERIALIZE(mismatch_key, (chain_code)(sequence))
+         uint64_t token_code;   ///< the affected token
+         SYSLIB_SERIALIZE(mismatch_key, (chain_code)(token_code))
       };
 
-      /// One custody shortfall: an admitted SYNDICATE_LIQ or LIQ_YIELD whose `total_syndicated`, the
-      /// outpost's live custody of the token, was below the depot's outstanding shadow of it. Rows
-      /// accumulate: nothing prunes them at v1, and each one bills the `sysio` RAM pool.
+      /// Latest shortfall evidence for an unresolved incident. A healthy report does not implicitly
+      /// clear it; governance explicitly reconciles it against current outstanding supply.
       struct [[sysio::table("mismatch")]] mismatch_row {
          sysio::slug_name chain_code;                            ///< the outpost that reported it
          sysio::slug_name token_code;                            ///< the liq token
@@ -682,7 +673,7 @@ namespace sysio {
                           (at))
       };
 
-      /// Custody shortfalls by outpost and sequence.
+      /// Current custody incidents by outpost and token.
       using mismatches_t = kv::table<"mismatch"_n, mismatch_key, mismatch_row>;
 
    private:
@@ -693,7 +684,7 @@ namespace sysio {
       /// The solvency check of one admitted message on path `path`: `reported`, the outpost custody of the
       /// shadow `st` the message carried, against `expected`, the depot's outstanding shadow of it. At or
       /// above: nothing, but an excess prints `EXCESS`. Below: a `mismatch` row keyed `(chain_code,
-      /// sequence)` for the message of `kind` in the envelope of depot epoch `epoch_index`, and a
+      /// token_code)` for the message of `kind` in the envelope of depot epoch `epoch_index`, and a
       /// `sysio.andon::pull` when `andon::may_pull` admits this contract and the cord is clear; otherwise
       /// the reason the cord was not pulled is printed. Never throws; the caller processes the message
       /// as usual either way.

@@ -300,6 +300,36 @@ BOOST_AUTO_TEST_SUITE(sysio_liq_tests)
 // Registration
 // ---------------------------------------------------------------------------
 
+BOOST_FIXTURE_TEST_CASE(custody_settlement_preserves_supply_yield_and_ignores_callbacks, sysio_liq_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), mint(SYND_ACCOUNT, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), mint("bob"_n, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, 10 * UNIT));
+   const auto custody_owed = owed(SYND_ACCOUNT);
+   const auto bob_owed = owed("bob"_n);
+   const auto before_supply = supply();
+   auto settle = [&](name signer, name custodian, name beneficiary, asset quantity) {
+      return push_liq(signer, "settle"_n, mvo()("custodian", custodian)("beneficiary", beneficiary)("quantity", quantity));
+   };
+   BOOST_REQUIRE(mentions(settle("alice"_n, "alice"_n, "bob"_n, asset(UNIT, LIQSOL_SYM)), "unsupported custodian"));
+   BOOST_REQUIRE(mentions(settle("alice"_n, SYND_ACCOUNT, "bob"_n, asset(UNIT, LIQSOL_SYM)), "missing authority"));
+   BOOST_REQUIRE(mentions(settle(SYND_ACCOUNT, SYND_ACCOUNT, "bob"_n, asset(0, LIQSOL_SYM)), "positive"));
+   BOOST_REQUIRE(mentions(settle(SYND_ACCOUNT, SYND_ACCOUNT, "bob"_n, asset(101 * UNIT, LIQSOL_SYM)), "overdrawn"));
+   BOOST_REQUIRE(mentions(settle(SYND_ACCOUNT, SYND_ACCOUNT, "bob"_n, asset(UNIT, symbol::from_string("4,LIQSOL"))), "precision"));
+   BOOST_REQUIRE_EQUAL(success(), settle(SYND_ACCOUNT, SYND_ACCOUNT, SYND_ACCOUNT, asset(100 * UNIT, LIQSOL_SYM)));
+   BOOST_REQUIRE_EQUAL(100 * UNIT, shadow_balance(SYND_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(custody_owed, owed(SYND_ACCOUNT));
+   BOOST_REQUIRE(mentions(transfer_shadow(SYND_ACCOUNT, SYND_ACCOUNT, UNIT), "cannot transfer to self"));
+   set_code("bob"_n, contracts::util::block_transfer_wasm());
+   produce_blocks();
+   BOOST_REQUIRE(transfer_shadow(SYND_ACCOUNT, "bob"_n, UNIT) != success());
+   BOOST_REQUIRE_EQUAL(success(), settle(SYND_ACCOUNT, SYND_ACCOUNT, "bob"_n, asset(40 * UNIT, LIQSOL_SYM)));
+   BOOST_REQUIRE_EQUAL(60 * UNIT, shadow_balance(SYND_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(140 * UNIT, shadow_balance("bob"_n));
+   BOOST_REQUIRE_EQUAL(before_supply, supply());
+   BOOST_REQUIRE_EQUAL(custody_owed, owed(SYND_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(bob_owed, owed("bob"_n));
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE(create_binds_an_active_liq_token, sysio_liq_tester) try {
    const auto st = stat_row();
    BOOST_REQUIRE_EQUAL(0, st["supply"].as<asset>().get_amount());
@@ -725,6 +755,10 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_admits_transfers_into_custody_and_refuses_the_r
    BOOST_REQUIRE_EQUAL(frozen, transfer_shadow("sysio.bond"_n, "bob"_n, UNIT));
    BOOST_REQUIRE_EQUAL(frozen, transfer_shadow("alice"_n, SWAP_ACCOUNT, UNIT));
    BOOST_REQUIRE_EQUAL(0, shadow_balance("bob"_n));
+   for (auto beneficiary : {"bob"_n, SYND_ACCOUNT, "sysio.bond"_n}) {
+      BOOST_REQUIRE_EQUAL(frozen, push_liq(SYND_ACCOUNT, "settle"_n,
+         mvo()("custodian", SYND_ACCOUNT)("beneficiary", beneficiary)("quantity", asset(UNIT, LIQSOL_SYM))));
+   }
    // A holder's claim and queueyield are refused; a custody contract claims its own row.
    const int64_t alice_owed = owed("alice"_n);
    BOOST_REQUIRE_LT(0, alice_owed);

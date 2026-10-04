@@ -34,6 +34,9 @@
 #include <sysio/slug_name.hpp>
 #include <sysio/symbol.hpp>
 #include <sysio/time.hpp>
+#include <sysio/asset.hpp>
+#include <sysio.opp.common/depot_native_token.hpp>
+#include <string_view>
 #include <sysio.opp.common/shadow_custody_types.hpp>
 
 #include <magic_enum/magic_enum.hpp>
@@ -45,6 +48,17 @@
 #include <vector>
 
 namespace sysio {
+
+namespace bond_validation {
+inline constexpr std::string_view bond_increment_msg = "amount must be a positive multiple of the bond increment";
+inline constexpr std::string_view precision_msg = "token precision is below the bond increment";
+inline constexpr std::string_view unsupported_token_msg = "unsupported bond token";
+inline constexpr std::string_view statement_len_msg = "statement exceeds the maximum length";
+inline constexpr std::string_view duplicate_msg = "a request for this statement already exists";
+inline constexpr std::string_view window_msg = "window must be positive";
+inline constexpr std::string_view amount_range_msg = "amount exceeds the asset range";
+} // namespace bond_validation
+
 
    class [[sysio::contract("sysio.bond")]] bond : public contract {
    public:
@@ -65,8 +79,7 @@ namespace sysio {
       static constexpr uint32_t MAX_STATEMENT_BYTES     = 1024;
       /// Hold bond, in basis points of the covered amount, until `setconfig` sets another.
       static constexpr uint32_t DEFAULT_HOLD_BPS        = 1000;
-      /// Seconds a terminal request stays after its ruling before `prune` may erase it: seven days, so
-      /// an issuer that polls the request row, rather than being notified, always sees the ruling.
+      /// Minimum retention for ordinary requests. Durable requests additionally require issuer acknowledgement.
       static constexpr uint32_t PRUNE_RETENTION_SEC     = 7 * 24 * 60 * 60;
       /// One whole, in basis points.
       static constexpr uint32_t BPS_DENOMINATOR         = 10000;
@@ -146,6 +159,15 @@ namespace sysio {
                                      sysio::slug_name token_code, uint64_t covered, uint64_t bounty,
                                      uint32_t window_sec);
 
+      /// Issue a request with durable terminal delivery. Identical to `request`, except pruning also
+      /// requires the issuer's `ack`. Rulings and claims remain independent of acknowledgement.
+      [[sysio::action]] void requestkeep(name issuer, name schema, std::vector<char> statement,
+                                       sysio::slug_name token_code, uint64_t covered, uint64_t bounty,
+                                       uint32_t window_sec);
+
+      /// Acknowledge a terminal outcome after durably consuming it. Auth=issuer; idempotent.
+      [[sysio::action]] void ack(uint64_t request_id);
+
       /// Raise the bounty of request `request_id`, not yet terminal, by `amount`, pulled from the
       /// issuer. Auth=issuer.
       [[sysio::action]] void addbounty(uint64_t request_id, uint64_t amount);
@@ -186,17 +208,33 @@ namespace sysio {
 
       /// Pay `account` what terminal request `request_id` owes it, in one call:
       ///   - to the issuer of an INVALID request, the forfeit: the whole bonded amount in ONE
-      ///     `transfer` with memo `sysio.bond::forfeit`;
+      ///     LIQ settlement (a `transfer` with memo `sysio.bond::forfeit` for WIRE);
       ///   - for its bond on an APPROVED or VALID request, the bond plus its stake's share of the
       ///     bounty and the hold bond, and the WIRE the bond earned; for its bond on an INVALID
       ///     request, nothing -- the WIRE the forfeited bond earned is paid into `sysio.liq` as bonus
       ///     yield of the token, or kept by the contract while the token has no supply;
       ///   - what a ruling awarded it out of an escrow (`escrow_row::payout`);
       ///   - for an escrow it funded, the WIRE the escrow earned.
-      /// Everything in the request's token but the forfeit goes in one transfer, the WIRE in another.
+      /// LIQ uses callback-free settlement; earned WIRE is recorded for separate `claimwire`.
+      /// WIRE-denominated requests retain ordinary transfers. Residual unpaid yield prevents pruning.
       /// Refused when nothing is owed, and while the `sysio.andon` cord is pulled (what is owed stays
       /// recorded until the cord clears). Permissionless.
       [[sysio::action]] void claim(uint64_t request_id, name account);
+
+      /// Withdraw the backed WIRE yield balance recorded by LIQ claims. Permissionless, fixed payee;
+      /// a rejecting recipient leaves this balance intact without blocking LIQ settlement.
+      [[sysio::action]] void claimwire(name account);
+
+      struct wire_key {
+         name account;
+         SYSLIB_SERIALIZE(wire_key, (account))
+      };
+      struct [[sysio::table("wireclaims")]] wire_claim {
+         name account;
+         uint64_t amount = 0;
+         SYSLIB_SERIALIZE(wire_claim, (account)(amount))
+      };
+      using wireclaims_t = kv::table<"wireclaims"_n, wire_key, wire_claim>;
 
       /// Walk the terminal requests from id `from_id` up and act on at most `limit` of them. A request
       /// whose rows are all paid or owe nothing, and that was ruled at least PRUNE_RETENTION_SEC ago, is
@@ -256,12 +294,14 @@ namespace sysio {
          /// other state.
          uint64_t          forfeit_pending;
 
+         bool outcome_acknowledged = true; ///< false for durable requests until the issuer acknowledges
+
          /// The key of the `bystatement` index, which admits one request per issuer and statement.
          checksum256 by_statement() const { return statement_key_of(issuer, statement_digest); }
 
          SYSLIB_SERIALIZE(request_row, (id)(issuer)(schema)(statement)(statement_digest)(token_code)(covered)(bonded)
                           (bounty)(window_sec)(state)(created_at)(bonded_at)(hold_bond)(hold_beneficiary)(held_at)
-                          (resolved_at)(resolved_index)(forfeit_pending))
+                          (resolved_at)(resolved_index)(forfeit_pending)(outcome_acknowledged))
       };
 
       /// Secondary index of `requests` on `request_row::by_statement` -- the one declaration of its name.
@@ -270,6 +310,34 @@ namespace sysio {
       /// Requests by id, with the issuer-and-statement index.
       using requests_t = kv::table<"requests"_n, request_key, request_row,
          kv::index<STATEMENT_INDEX, const_mem_fun<request_row, checksum256, &request_row::by_statement>>>;
+
+      /// Resolve the stable issuer-and-statement identity without exposing index layout to clients.
+      static std::optional<request_row> find_request(name code, name issuer, name schema,
+                                                    const std::vector<char>& statement) {
+         requests_t requests(code);
+         const auto index = requests.get_index<STATEMENT_INDEX>();
+         const auto it = index.find(statement_key_of(issuer, statement_digest_of(schema, statement)));
+         return it == index.end() ? std::nullopt : std::optional<request_row>{*it};
+      }
+
+      /// Shared admission checks. Empty means admissible; the refusal is safe for intake to report
+      /// without throwing. Transfer authority and available bounty remain the caller's responsibility.
+      static std::string_view request_refusal(name code, name issuer, name schema,
+                                             const std::vector<char>& statement, sysio::slug_name token_code,
+                                             uint64_t covered, uint64_t bounty, uint32_t window_sec) {
+         if (statement.size() > MAX_STATEMENT_BYTES) return bond_validation::statement_len_msg;
+         const auto token = opp::custody::resolve_depot_native_token(LIQ_ACCOUNT, TOKEN_ACCOUNT, token_code);
+         if (!token) return bond_validation::unsupported_token_msg;
+         const auto increment = increment_of(token->sym);
+         if (!increment) return bond_validation::precision_msg;
+         if (covered == 0 || covered % *increment != 0)
+            return bond_validation::bond_increment_msg;
+         if (covered > static_cast<uint64_t>(asset::max_amount) || bounty > static_cast<uint64_t>(asset::max_amount))
+            return bond_validation::amount_range_msg;
+         if (window_sec == 0) return bond_validation::window_msg;
+         if (find_request(code, issuer, schema, statement)) return bond_validation::duplicate_msg;
+         return {};
+      }
 
       /// Key of `bonds`.
       struct bond_key {
@@ -330,6 +398,21 @@ namespace sysio {
       /// The key of request `request_id`'s escrow of `kind`.
       static escrow_key escrow_key_of(uint64_t request_id, escrow_kind kind) {
          return escrow_key{.request_id = request_id, .kind = magic_enum::enum_integer(kind)};
+      }
+
+      /// Principal still awarded to an account by settlement, excluding its underwriting stake and
+      /// escrow yield. Clients need not interpret escrow rows or their paid flags.
+      static uint64_t settlement_due(name code, uint64_t request_id, name account) {
+         requests_t requests(code);
+         const auto req = requests.try_get(request_key{request_id});
+         if (!req) return 0;
+         uint64_t due = req->issuer == account ? req->forfeit_pending : 0;
+         escrows_t escrows(code);
+         for (const auto kind : magic_enum::enum_values<escrow_kind>()) {
+            const auto escrow = escrows.try_get(escrow_key_of(request_id, kind));
+            if (escrow && escrow->payee == account) due += escrow->payout;
+         }
+         return due;
       }
 
       /// Key of `yieldpool`.
