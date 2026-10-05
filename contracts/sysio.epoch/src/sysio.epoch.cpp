@@ -484,9 +484,13 @@ void epoch::advance() {
    // For each (outpost × member of the expiring group):
    //   - scan `msgch::envelopes` (`byoutepoch` index) for any row matching
    //     (chain_code, current_epoch_index, batch_op_name == member)
-   //   - collect the delivery result and every non-canonical deliverer
-   //   - slash all non-canonical deliverers before delivery accounting can
-   //     terminate them, then record the result and run `termcheck`
+   //   - count the outposts the member delivered to and collect every
+   //     non-canonical deliverer
+   // Then slash all non-canonical deliverers before delivery accounting can
+   // terminate them, and record ONE result per member: delivered only if it
+   // delivered to every active outpost. `sysio.opreg`'s miss thresholds and
+   // window bound count duty epochs, so a record per outpost would scale the
+   // miss ladder with the outpost count.
    //
    // The outpost set is sourced via a cross-contract read of
    // `sysio.chains::chains` (no local mirror) filtered to
@@ -513,18 +517,23 @@ void epoch::advance() {
       // operator, which would abort advance and stall the chain).
       std::vector<name> to_slash;
 
-      /// A delivery result retained until non-canonical offenders have been
-      /// slashed. `recorddel` remains an audit record even for a newly
+      /// One member's delivery result for the expiring epoch, accumulated across
+      /// the active outposts and retained until non-canonical offenders have
+      /// been slashed. `recorddel` remains an audit record even for a newly
       /// slashed operator, while `termcheck` safely skips non-ACTIVE rows.
       struct delivery_observation {
          name member;
-         bool did_deliver;
+         uint32_t outposts_delivered = 0; ///< Active outposts this member delivered to.
       };
       std::vector<delivery_observation> observations;
+      observations.reserve(expiring_group.size());
+      for (const auto& member : expiring_group) observations.push_back({member});
+      uint32_t active_outposts = 0;
 
       sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
       for (auto op_it = chains_tbl.begin(); op_it != chains_tbl.end(); ++op_it) {
          if (!is_active_outpost(*op_it)) continue;
+         ++active_outposts;
 
          const uint64_t chain_code = op_it->code.value;
          const uint128_t composite =
@@ -563,17 +572,17 @@ void epoch::advance() {
             }
          }
 
-         for (const auto& member : expiring_group) {
+         for (auto& observation : observations) {
             bool        did_deliver = false;
             checksum256 member_checksum{};
             for (size_t i = 0; i < delivered.size(); ++i) {
-               if (delivered[i] == member) {
+               if (delivered[i] == observation.member) {
                   did_deliver     = true;
                   member_checksum = delivered_checksums[i];
                   break;
                }
             }
-            observations.push_back({member, did_deliver});
+            if (did_deliver) ++observation.outposts_delivered;
 
             // Single slash path (dispute-vote design, per-operator outcome table): a delivered
             // NON-canonical checksum is a fault -> slash. Silence (no delivery) is never slashed; it
@@ -581,9 +590,9 @@ void epoch::advance() {
             if (did_deliver && have_winner && member_checksum != winner) {
                bool queued = false;
                for (const auto& s : to_slash) {
-                  if (s == member) { queued = true; break; }
+                  if (s == observation.member) { queued = true; break; }
                }
-               if (!queued) to_slash.push_back(member);
+               if (!queued) to_slash.push_back(observation.member);
             }
          }
       }
@@ -615,19 +624,25 @@ void epoch::advance() {
       // Preserve the delivery history after slashing. A non-canonical operator is already
       // SLASHED here, so opreg::termcheck returns without converting the punitive outcome into a
       // termination/remit. Other group members retain their normal delivery accounting.
-      for (const auto& observation : observations) {
-         action(
-            permission_level{get_self(), "owner"_n},
-            OPREG_ACCOUNT,
-            opreg_actions::RECORD_DELIVERY,
-            std::make_tuple(observation.member, state.current_epoch_index, observation.did_deliver)
-         ).send();
-         action(
-            permission_level{get_self(), "owner"_n},
-            OPREG_ACCOUNT,
-            opreg_actions::TERMINATION_CHECK,
-            std::make_tuple(observation.member)
-         ).send();
+      //
+      // One record per member for this duty epoch; missing any active outpost makes it a miss. With
+      // no active outpost the group had nothing to deliver, so nothing is recorded.
+      if (active_outposts > 0) {
+         for (const auto& observation : observations) {
+            const bool delivered_everywhere = observation.outposts_delivered == active_outposts;
+            action(
+               permission_level{get_self(), "owner"_n},
+               OPREG_ACCOUNT,
+               opreg_actions::RECORD_DELIVERY,
+               std::make_tuple(observation.member, state.current_epoch_index, delivered_everywhere)
+            ).send();
+            action(
+               permission_level{get_self(), "owner"_n},
+               OPREG_ACCOUNT,
+               opreg_actions::TERMINATION_CHECK,
+               std::make_tuple(observation.member)
+            ).send();
+         }
       }
 
       // The envelope rows read above are left in place: `sysio.msgch::deliver`

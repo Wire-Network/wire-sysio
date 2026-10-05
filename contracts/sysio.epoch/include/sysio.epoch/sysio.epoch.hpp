@@ -145,9 +145,9 @@ namespace sysio {
       static constexpr uint32_t MAX_BATCH_OP_GROUPS = 255;
 
       /// Upper bound on `operators_per_epoch` (the size of one schedule group).
-      /// Every member of the expiring group costs two inline actions per active
-      /// outpost in `advance` (opreg::recorddel + opreg::termcheck) plus an inline
-      /// transfer in sysio.system::payepoch, so group size directly scales the
+      /// Every member of the expiring group costs two inline actions in
+      /// `advance` (opreg::recorddel + opreg::termcheck) plus a payclaims
+      /// credit in sysio.system::payepoch, so group size directly scales the
       /// epoch-boundary transaction; an absurd value (which the product equality
       /// alone cannot reject -- UINT32_MAX groups of one is internally consistent)
       /// would abort `advance` on its vector reserves and halt epoch advancement
