@@ -58,9 +58,6 @@ constexpr sysio::name GOVERNANCE_ACCOUNT         = "sysio.gov"_n;
 constexpr sysio::name CAPEX_OPERATIONS_ACCOUNT   = "sysio.ops"_n;
 constexpr sysio::name TOKEN_CONTRACT             = "sysio.token"_n;
 constexpr sysio::name ROA_CONTRACT               = "sysio.roa"_n;
-// sysio.reserv holds the swap-fee rewards bucket that payepoch folds into the
-// per-epoch batch-operator distribution.
-constexpr sysio::name RESERV_CONTRACT            = "sysio.reserv"_n;
 
 namespace memo {
    constexpr std::string_view capital          = "T5 capital";
@@ -142,34 +139,6 @@ int64_t get_wire_balance(name account) {
    sysio::token::token::acct_key key{sysio::opp::wire::asset_symbol.code().raw()};
    if (!acct_tbl.contains(key)) return 0;
    return acct_tbl.get(key).balance.amount;
-}
-
-// Local layout-compatible view of sysio.reserv's rewards_bucket singleton. A
-// [[sysio::table]]-attributed struct cannot be shared into sysio.system's
-// translation unit -- doing so corrupts this contract's read-only-action return
-// codegen (getpeerkeys) -- so the layout is mirrored here. The kv row is keyed
-// by table name ("rewardbkt") + the reserv account scope, so this reads the
-// exact bytes reserv wrote. MUST stay in lockstep with sysio.reserv.hpp's
-// rewards_bucket (balance, lifetime_accrued); the cross-contract read is
-// exercised end-to-end by t5_emissions_tests/payepoch_folds_swap_fee_rewards,
-// which fails if the two layouts ever diverge.
-struct reserv_rewards_bucket {
-   uint64_t balance          = 0;
-   uint64_t lifetime_accrued = 0;
-   SYSLIB_SERIALIZE(reserv_rewards_bucket, (balance)(lifetime_accrued))
-};
-using reserv_rewardbkt_t = sysio::kv::global<"rewardbkt"_n, reserv_rewards_bucket>;
-
-// Read the live swap-fee rewards balance held in sysio.reserv's custody.
-// Returns 0 when never accrued. Clamps to asset::max_amount because the value is
-// later carried as a sysio::asset (drained + transferred as WIRE); the bucket is
-// backed by real WIRE so the clamp is only a defensive guard against accounting
-// drift constructing an out-of-range asset.
-int64_t get_reserv_rewards_balance() {
-   reserv_rewardbkt_t bkt(RESERV_CONTRACT);
-   const uint64_t bal = bkt.get_or_default(reserv_rewards_bucket{}).balance;
-   constexpr uint64_t max_amt = static_cast<uint64_t>(sysio::asset::max_amount);
-   return bal > max_amt ? sysio::asset::max_amount : static_cast<int64_t>(bal);
 }
 
 // ---------------------------------------------------------------------------
@@ -826,7 +795,6 @@ void system_contract::payepoch(uint32_t epoch_index,
    batchepochs_t batch_history(get_self());
    std::vector<recorded_batch_group> recorded_batch_groups;
    bool batch_history_complete = accrued_epochs > 0;
-   bool has_nonempty_batch_roster = false;
    int64_t recorded_epochs = 0;
    uint32_t batch_payout_credits = 0;
    uint64_t expected_epoch_index = state.period_start_epoch;
@@ -863,8 +831,6 @@ void system_contract::payepoch(uint32_t epoch_index,
             batch_history_complete = false;
          } else {
             batch_payout_credits = static_cast<uint32_t>(credits_with_group);
-            has_nonempty_batch_roster =
-               has_nonempty_batch_roster || !it->members.empty();
             recorded_batch_groups.push_back(recorded_batch_group{
                .members       = it->members,
                .active_epochs = 1,
@@ -880,58 +846,11 @@ void system_contract::payepoch(uint32_t epoch_index,
       && recorded_epochs == accrued_epochs
       && expected_epoch_index == static_cast<uint64_t>(epoch_index) + 1;
 
-   // ----- Swap-fee rewards fold-in -----
-   // The BATCH-OPERATOR half of collected swap fees accrues in sysio.reserv's
-   // rewards_bucket. The other half accrues per-underwriter in sysio.reserv and
-   // is drawn by that account's own `claimuwfee` — it never passes through this
-   // treasury. (When reserv's `fee_emissions_share_bps` dial is non-zero, that
-   // configured share of the batch-op half is transferred straight to this
-   // account at collection time and never enters the bucket; the dial defaults
-   // to zero, leaving the whole half here.) Fold the whole bucket into THIS
-   // period's batch-operator distribution so batch ops receive it alongside
-   // emissions, weighted identically by active-epoch count.
-   //
-   // Producers are NOT paid out of swap fees: the fee compensates the parties
-   // that carry an individual swap — the underwriter who locks collateral for it
-   // and the batch operators who relay it — while producers earn emissions for
-   // securing the chain. So `producer_bps` / `batch_op_bps` govern the emission
-   // `compute_amount` split only, and the entire drained fee pool goes to the
-   // batch-op distribution below.
-   //
-   // The fee WIRE lives in sysio.reserv's custody. Sweep it only when immutable
-   // roster history is complete and at least one roster can receive a share;
-   // otherwise leave the bucket in reserv so a later payable period can
-   // distribute it. When swept, drainrewards is queued FIRST
-   // (ahead of every payout transfer): inline actions execute depth-first, so the
-   // drain -- and the reserv->sysio transfer it queues -- run to completion before
-   // any sibling payout queued after it, landing the WIRE in this account's balance
-   // first. MUST remain ahead of the first send_wire_transfer below.
-   //
-   // Fees are funded by that transfer, NOT the T5 treasury, so fee payouts are
-   // tracked in `fee_paid` and excluded from total_distributed (which governs
-   // the emission curve). After a sweep, any amount skipped for an empty roster
-   // alongside a non-empty one, non-ACTIVE members, or integer-division
-   // remainders stays in this treasury. Incomplete or all-empty history leaves
-   // the entire bucket in reserv.
-   int64_t fee_batch_pool = 0;
-   if (batch_history_complete && has_nonempty_batch_roster) {
-      fee_batch_pool = get_reserv_rewards_balance();
-      if (fee_batch_pool > 0) {
-         sysio::action(
-            {get_self(), "active"_n},
-            RESERV_CONTRACT,
-            "drainrewards"_n,
-            std::make_tuple(fee_batch_pool)
-         ).send();
-      }
-   }
-
    // "paid" here means DISTRIBUTED -- credited to `payclaims` for producers / standbys /
    // batch operators, transferred for the category buckets. Both leave the treasury's
    // spendable position, which is what these counters feed.
    int64_t actual_paid = 0; // emission actually distributed (counts toward total_distributed)
    int64_t batch_emission_paid = 0;
-   int64_t fee_paid    = 0; // swap-fee rewards actually distributed (does NOT count toward treasury)
 
    // =======================================================================
    // Producer + standby pay.
@@ -1128,18 +1047,13 @@ void system_contract::payepoch(uint32_t epoch_index,
       const int64_t members = static_cast<int64_t>(group.size());
       const int64_t group_pool = static_cast<int64_t>(
          static_cast<__int128>(batch_pool) * active_epochs / accrued_epochs);
-      const int64_t fee_group_pool = static_cast<int64_t>(
-         static_cast<__int128>(fee_batch_pool) * active_epochs / accrued_epochs);
       const int64_t per_member     = group_pool / members;
-      const int64_t fee_per_member = fee_group_pool / members;
 
       for (const auto& m : group) {
          if (!is_op_active(m, OperatorType::OPERATOR_TYPE_BATCH)) continue;
-         // One credit carries both the emission and the fee share.
-         credit_pay(get_self(), m, per_member + fee_per_member, memo::batch_op_reward);
+         credit_pay(get_self(), m, per_member, memo::batch_op_reward);
          actual_paid += per_member;
          batch_emission_paid += per_member;
-         fee_paid    += fee_per_member;
       }
    };
 
@@ -1155,7 +1069,6 @@ void system_contract::payepoch(uint32_t epoch_index,
    }
 
    const int64_t batch_emission_retained = batch_pool - batch_emission_paid;
-   const int64_t batch_fee_retained = fee_batch_pool - fee_paid;
 
    // A pay period is the history lifetime. Clear only after an actual accrued
    // period: on the defensive zero-accrual path the history is preserved rather
@@ -1240,10 +1153,10 @@ void system_contract::payepoch(uint32_t epoch_index,
       .compute_amount    = compute_amount,
       .capex_amount      = capex_amount,
       .governance_amount = governance_amount,
-      .fee_distributed   = fee_paid,
+      .fee_distributed   = 0, // Reserved legacy audit field.
       .batch_history_complete  = batch_history_complete,
       .batch_emission_retained = batch_emission_retained,
-      .batch_fee_retained      = batch_fee_retained,
+      .batch_fee_retained      = 0, // Reserved legacy audit field.
    });
 
    // Head-first prune of the audit log past its retention cap. Rows are added

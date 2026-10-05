@@ -2,7 +2,6 @@
 #include <sysio.epoch/sysio.epoch.hpp>
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.authex/sysio.authex.hpp>
-#include <sysio.uwrit/sysio.uwrit.hpp>
 #include <sysio.liq/sysio.liq.hpp>
 #include <sysio/slug_name.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
@@ -24,7 +23,6 @@ using opp::types::OperatorStatus;
 using opp::types::AttestationType;
 using opp::attestations::OperatorAction;
 using opp::attestations::OperatorActionLog;
-using opp::attestations::DepositRevert;
 
 namespace {
 
@@ -58,10 +56,6 @@ constexpr std::string_view no_yield_owed_msg = "no yield owed";
 constexpr std::string_view yield_not_covered_msg =
    "owed yield is rounding dust the WIRE received from sysio.liq does not cover; only later slack can cover it";
 
-/// Recent-actions reason `depositinle` records when it drops a credit naming the depot chain.
-constexpr std::string_view depot_chain_credit_msg =
-   "depot-chain collateral is bonded through deposit, never credited from an outpost";
-
 /// Message of the `check` `sweepyield` raises for WIRE, which is not a shadow token.
 constexpr std::string_view wire_earns_no_yield_msg = "WIRE collateral earns no shadow yield";
 
@@ -85,7 +79,7 @@ bool earns_shadow_yield(sysio::slug_name chain_code, sysio::slug_name token_code
 /// Credit a WIRE-chain remit of `token_code` to the operator's claimable row instead of
 /// transferring it.
 ///
-/// Every caller (withdraw flush, deferred lock release, termination payout) is reachable from
+/// Every caller (withdraw flush and termination payout) is reachable from
 /// `sysio.epoch::advance`, which must never abort. A custody contract's `transfer` notifies the
 /// operator, and the chain runs notified receivers with no exception isolation, so a pushed remit
 /// would let an operator's notify handler abort `advance` and halt epoch advancement chain-wide.
@@ -112,45 +106,6 @@ void credit_remit_claim(name self, name account, sysio::slug_name token_code, ui
 
 uint64_t current_time_ms() {
    return static_cast<uint64_t>(current_time_point().sec_since_epoch()) * 1000;
-}
-
-/// Compute the composite key matching `withdraw_request::by_account_ck` /
-/// `sysio::uwrit::lock_entry::by_underwriter_ck`. Centralized so both the
-/// indexer and the lookups stay in lockstep.
-///
-/// Phase 6 layout: three uint64s — `account.value`, `chain_code.value`,
-/// `token_code.value` — packed in that order into a 24-byte buffer and
-/// hashed with sha256, producing a `checksum256`. The previous uint128
-/// composite layout (account<<64 | chain<<32 | token) is gone; the wider
-/// slug_name values no longer fit in 32 bits each.
-checksum256 make_account_chain_token_key(name account,
-                                         sysio::slug_name chain_code,
-                                         sysio::slug_name token_code) {
-   std::array<uint8_t, 24> buf{};
-   uint64_t acc_v = account.value;
-   std::memcpy(buf.data() +  0, &acc_v,            8);
-   std::memcpy(buf.data() +  8, &chain_code.value, 8);
-   std::memcpy(buf.data() + 16, &token_code.value, 8);
-   return sysio::sha256(reinterpret_cast<const char*>(buf.data()), buf.size());
-}
-
-/// Find the outpost id registered with sysio.chains for a given chain. Returns
-/// `std::nullopt` if no matching chain row exists (the caller is responsible
-/// for handling that case — typically by skipping the queueout for chains
-/// without an outpost, e.g. WIRE-direct flows).
-///
-/// After the cross-contract realignment: chain rows live in
-/// `sysio.chains::chains` keyed by `code` (slug_name); the legacy
-/// `sysio.epoch::outposts` table is gone. The "outpost id" returned here is
-/// the chain's `code.value` (uint64) — callers that still expect a small
-/// numeric id should use the slug_name value instead.
-std::optional<uint64_t> find_outpost_id_for_chain(sysio::slug_name chain_code) {
-   sysio::chains::chains_t chains_tbl(name{"sysio.chains"_n});
-   sysio::chains::chain_key pk{chain_code};
-   if (!chains_tbl.contains(pk)) return std::nullopt;
-   const auto row = chains_tbl.get(pk);
-   if (row.is_depot) return std::nullopt;   // WIRE-direct flows don't queueout
-   return chain_code.value;
 }
 
 /// Resolve a `sysio::slug_name` chain identifier to its `ChainKind` enum by
@@ -213,46 +168,11 @@ void require_canonical_codes(const std::vector<opreg::chain_min_bond>& v,
    }
 }
 
-/// True iff `sysio.uwrit::locks` still holds ANY row for `account`, on any
-/// `(chain_code, token_code)` pair. Existence-only, so it stops at the first row
-/// instead of summing like `sum_locks_inline` — the settlement gate needs to know
-/// whether deferred settlement is still outstanding, not how much.
-bool has_active_locks(name account) {
-   uwrit::locks_t locks(opreg::UWRIT_ACCOUNT);
-   auto idx = locks.template get_index<"byuw"_n>();
-   return idx.lower_bound(account.value) != idx.upper_bound(account.value);
-}
-
-/// True iff a TERMINATED operator's collateral is completely settled — every
-/// balance bucket drained AND no `sysio.uwrit` lock still naming the account.
-///
-/// This is the precondition for erasing a terminated `operators` row, on EVERY
-/// path that erases one — `prune` and the re-registration replace in
-/// `regoperator` (WNS-01). `terminate_inline` remits only the immediately-
-/// unlocked portion and deliberately LEAVES the locked remainder in the row, so
-/// `releaselock` can emit its deferred WITHDRAW_REMIT when
-/// `sysio.uwrit::chklocks` later releases each lock. `releaselock` settles only
-/// SLASHED / TERMINATED rows and returns early when the row is missing, so
-/// destroying or resetting it before that settlement lands permanently strands
-/// the retained collateral: WIRE-side custody keeps it with no ledger entry to
-/// release against, and the outpost keeps its escrow with no attestation that
-/// could ever free it.
-///
-/// Balance rows are checked by VALUE, not by `balances.empty()` —
-/// `subtract_balance` zeroes a bucket in place and never erases the entry. Banked shadow yield does
-/// NOT count: it never blocks the erase, and whatever is still unclaimed then is forfeited -- the
-/// prune delay is the terminated operator's window to `claimyield` (see `terminate`).
-///
-/// A row that never settles is never erased, and that is the intended outcome:
-/// an unprunable row costs some RAM, while an erased one costs the operator
-/// their bond. In correct operation the wait is bounded — `chklocks` releases
-/// every lock at its wall-clock expiry, and each `releaselock` drains the
-/// matching bucket, so the predicate goes true on its own.
 bool is_fully_settled(const opreg::operator_entry& op) {
    for (const auto& bal : op.balances) {
       if (bal.balance > 0) return false;
    }
-   return !has_active_locks(op.account);
+   return true;
 }
 
 } // anonymous namespace
@@ -385,19 +305,9 @@ void opreg::regoperator(name account,
       auto existing = ops.get(op_pk);
       check(existing.status == OperatorStatus::OPERATOR_STATUS_TERMINATED,
             "operator already registered");
-      // Re-registration REPLACES the terminated row, so it is an erase path and
-      // carries the same settlement precondition as `prune` (WNS-01). Without
-      // it, a terminated underwriter could re-register while its locks are still
-      // live: the retained balance row is replaced by a fresh healthy one, and
-      // when `chklocks` later fans out `releaselock` it sees a non-terminated
-      // operator and no-ops — stranding the old collateral exactly as pruning
-      // early would have. Re-registration stays blocked until settlement lands;
-      // `chklocks` releases every lock at its wall-clock expiry, so the wait is
-      // bounded.
       check(is_fully_settled(existing),
             "operator has unsettled collateral: a terminated operator may only "
-            "re-register once its balances are drained and no underwriting locks "
-            "remain");
+            "re-register once its balances are drained");
       ops.erase(op_pk);
    }
 
@@ -444,39 +354,10 @@ void opreg::regoperator(name account,
 }
 
 // ---------------------------------------------------------------------------
-//  Internal helpers — balance / lock / withdraw rollup
+//  Internal helpers — balance / withdraw rollup
 // ---------------------------------------------------------------------------
 
 namespace {
-
-/// The active lock total on `sysio.uwrit` for a given (op, chain, token) —
-/// an O(1) read of uwrit's `locksums` rollup. Returns 0 when the operator
-/// holds no live locks on that chain/token (the rollup erases a bucket's row
-/// once it empties, so an absent row IS zero).
-///
-/// This used to scan `sysio.uwrit::locks` through its `byuw` index and filter
-/// `(chain_code, token_code)` in memory, on the stated assumption that
-/// per-underwriter lock counts are "O(1)-ish in steady state so the scan is
-/// cheap". That assumption does not hold: uwrit locks are held for the full
-/// wall-clock challenge window and are never released by delivery, so a
-/// bucket's live lock count is (settlement rate × lock duration). uwrit now
-/// maintains the total at the THREE sites that can change it:
-///
-///   * `try_select_winner` — ADDS, one lock per required leg, on a win.
-///   * `chklocks`          — DECREMENTS, releasing locks at expiry.
-///   * `sweeplocks`        — DECREMENTS, erasing the held locks of a
-///                           commitment whose underwriter-fault challenge was
-///                           UPHELD (WIRE-297), outside `chklocks`.
-///
-/// That third path is the one this PR's stale-cache bug came from, so the
-/// count is worth keeping exact here: this reader trusts the rollup
-/// completely, and a bucket left positive after its last lock row is gone
-/// suppresses that collateral forever. See `uwrit::lock_sum`.
-uint64_t sum_locks_inline(name account, sysio::slug_name chain_code, sysio::slug_name token_code) {
-   uwrit::locksums_t sums(opreg::UWRIT_ACCOUNT);
-   uwrit::lock_sum_key pk{account, chain_code, token_code};
-   return sums.contains(pk) ? sums.get(pk).amount : 0;
-}
 
 /// Sum the pending (not-yet-flushed) withdraws on this contract for a given
 /// (op, chain, token). Subtracted by `available()` so a queued withdraw
@@ -522,7 +403,7 @@ bool has_terminal_status(OperatorStatus status) {
 }
 
 /// Compute available balance for a given (op, chain, token). The single
-/// rollup formula: balance - sum(active locks) - sum(pending withdraws),
+/// rollup formula: balance - sum(pending withdraws),
 /// gated by status. Slashed / terminated operators read as zero.
 uint64_t available_inline(const opreg::operator_entry& op,
                           sysio::slug_name chain_code, sysio::slug_name token_code) {
@@ -532,30 +413,23 @@ uint64_t available_inline(const opreg::operator_entry& op,
    const auto* bal = find_balance(op, chain_code, token_code);
    if (!bal) return 0;
 
-   uint64_t locked  = sum_locks_inline(op.account, chain_code, token_code);
    uint64_t pending = sum_pending_withdraws(op.account, chain_code, token_code);
-   // Saturating: a wrap of locked+pending would understate `reserved` and
-   // overstate availability — the direction that admits an overcommit. The
-   // cap is unreachable for real amounts.
-   uint64_t reserved = opp::safe::add_sat_u64(locked, pending);
-   return bal->balance > reserved ? bal->balance - reserved : 0;
+   return bal->balance > pending ? bal->balance - pending : 0;
 }
 
-/// Balance minus active locks (NOT pending withdraws). Used by `slash()` to
-/// determine how much can be slashed immediately — pending withdraws of a
+/// The full balance is slashable, including queued withdrawals. Withdrawals of a
 /// slashed operator are forfeit (silently dropped at flush time).
 uint64_t slashable_now(const opreg::operator_entry& op,
                        sysio::slug_name chain_code, sysio::slug_name token_code) {
    const auto* bal = find_balance(op, chain_code, token_code);
    if (!bal) return 0;
-   uint64_t locked = sum_locks_inline(op.account, chain_code, token_code);
-   return bal->balance > locked ? bal->balance - locked : 0;
+   return bal->balance;
 }
 
 /// Check whether the operator's available balance on (chain_code, token_code)
 /// covers the role's minimum bond on that pair.
 ///
-/// Bootstrapped operators are ACTIVE-by-fiat and bypass the per-outpost
+/// Bootstrapped operators are ACTIVE-by-fiat and bypass the per-token
 /// bond check regardless of how `req_*_collat` is configured — they
 /// represent system-installed operators that the depot trusts without
 /// requiring collateral. Non-bootstrapped operators must satisfy every
@@ -664,7 +538,7 @@ uint64_t take_yield(name self, opreg::balance_entry& b) {
 }
 
 /// Settle every shadow row the operator holds and take what each has earned, as far as each pool
-/// covers, for the TERMINATED payouts (termination itself, then each later lock release). Returns
+/// covers, for the TERMINATED payout. Returns
 /// the amount taken per row, for the caller to credit to the operator's WIRE claim alongside the
 /// principal; what a pool could not cover stays banked for `claimyield`. Never throws.
 std::vector<uint64_t> take_all_earned_yield(name self, opreg::operator_entry& o) {
@@ -842,12 +716,7 @@ opp::types::ChainAddress operator_chain_address(name account, sysio::slug_name c
 /// ready for either logging on the operator's row or queueing as an
 /// outbound OPERATOR_ACTION attestation. Pure — no side effects.
 ///
-/// LP routing for the slashed funds is depot-side concern resolved via
-/// `sysio.reserve::resolve_lp` at slash-handler time; outposts on receipt
-/// only need to seize their share, so the attestation does not encode it.
-/// The `OperatorActionLog.timestamp` covers the audit trail; once an
-/// operator is slashed all subsequent OperatorActions are dropped+logged
-/// as failures, so per-action epoch is redundant on the message itself.
+/// This payload records a depot-local slash in the operator audit trail.
 OperatorAction build_slash_action(name account,
                                   OperatorType type,
                                   sysio::slug_name chain_code,
@@ -865,69 +734,6 @@ OperatorAction build_slash_action(name account,
    oa.chain_code  = chain_code.value;
    oa.reason      = reason;
    return oa;
-}
-
-/// Queue an OPERATOR_ACTION(SLASH) attestation outbound to the outpost
-/// matching `chain_code`. No-op if the chain is WIRE (slashed funds stay on
-/// the WIRE chain) or has no registered outpost.
-void emit_slash_attestation(name self, const OperatorAction& slash_action) {
-   const sysio::slug_name chain_code{slash_action.chain_code};
-   if (chain_code == opp::wire::chain_code) return;
-   auto resolved = find_outpost_id_for_chain(chain_code);
-   if (!resolved) return;   // no outpost on this chain — nothing to slash through
-
-   // `no_size{}` — raw protobuf bytes, no 4-byte zpp length prefix. The
-   // outpost decodes the attestation `data` field as a pure protobuf
-   // message; a size prefix would corrupt the first field tag.
-   std::vector<char> encoded;
-   auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
-   (void)out(slash_action);
-
-   action(
-      permission_level{self, "active"_n},
-      opreg::MSGCH_ACCOUNT, "queueout"_n,
-      std::make_tuple(*resolved,
-         AttestationType::ATTESTATION_TYPE_OPERATOR_ACTION, encoded)
-   ).send();
-}
-
-/// Queue a DEPOSIT_REVERT attestation outbound to the source outpost so
-/// escrowed funds get refunded to the depositor (minus the outpost-side
-/// gas penalty, computed locally on the outpost when the revert is
-/// processed). Called by `opreg::depositinle` whenever validation rejects
-/// an inbound DEPOSIT_REQUEST.
-void emit_deposit_revert(name self,
-                         sysio::slug_name source_chain_code,
-                         const opp::types::ChainAddress& depositor,
-                         sysio::slug_name token_code,
-                         uint64_t amount,
-                         const checksum256& original_message_id,
-                         const std::string& reason) {
-   auto chain_code = find_outpost_id_for_chain(source_chain_code);
-   if (!chain_code) return;     // no outpost on this chain — nothing to refund through
-
-   opp::attestations::DepositRevert dr;
-   dr.depositor = depositor;
-   opp::types::TokenAmount ta;
-   ta.token_code = token_code.value;
-   ta.amount     = zpp::bits::vint64_t{static_cast<int64_t>(amount)};
-   dr.refund_amount = ta;
-   const auto& mh = original_message_id.extract_as_byte_array();
-   dr.original_deposit_message_id.assign(mh.begin(), mh.end());
-   dr.reason     = reason;
-   dr.chain_code = source_chain_code.value;
-
-   // `no_size{}` — see emit_slash_attestation for the rationale.
-   std::vector<char> encoded;
-   auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
-   (void)out(dr);
-
-   action(
-      permission_level{self, "active"_n},
-      opreg::MSGCH_ACCOUNT, "queueout"_n,
-      std::make_tuple(*chain_code,
-         AttestationType::ATTESTATION_TYPE_DEPOSIT_REVERT, encoded)
-   ).send();
 }
 
 /// Append an OperatorActionLog entry to the operator's `recent_actions`
@@ -965,43 +771,6 @@ void append_action_log(opreg::operators_t& ops,
    });
 }
 
-/// Encode + queue an OPERATOR_ACTION(WITHDRAW_REMIT) attestation to the
-/// outpost matching `chain_code`. `op_address` carries the operator's authex-
-/// linked chain pubkey so the outpost can derive the destination address.
-void emit_withdraw_remit(name self,
-                         name account,
-                         OperatorType type,
-                         sysio::slug_name chain_code,
-                         sysio::slug_name token_code,
-                         uint64_t amount,
-                         uint64_t request_id) {
-   auto resolved = find_outpost_id_for_chain(chain_code);
-   if (!resolved) return;
-
-   OperatorAction oa;
-   oa.action_type = OperatorAction::ACTION_TYPE_WITHDRAW_REMIT;
-   oa.op_address  = operator_chain_address(account, chain_code);
-   oa.type        = type;
-   opp::types::TokenAmount ta;
-   ta.token_code = token_code.value;
-   ta.amount     = zpp::bits::vint64_t{static_cast<int64_t>(amount)};
-   oa.amount     = ta;
-   oa.request_id = request_id;
-   oa.chain_code = chain_code.value;
-
-   // `no_size{}` — see emit_slash_attestation for the rationale.
-   std::vector<char> encoded;
-   auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
-   (void)out(oa);
-
-   action(
-      permission_level{self, "active"_n},
-      opreg::MSGCH_ACCOUNT, "queueout"_n,
-      std::make_tuple(*resolved,
-         AttestationType::ATTESTATION_TYPE_OPERATOR_ACTION, encoded)
-   ).send();
-}
-
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
@@ -1017,19 +786,12 @@ void reevaluate_eligibility(opreg::operators_t& ops,
                             name self,
                             name account);
 
-/// Result of `try_enqueue_withdraw` — non-throwing variant for the
-/// msgch-dispatched `withdrawinle` path so failures get logged on the
-/// operator's row instead of reverting the inbound dispatch tx.
 struct enqueue_result {
    bool        success;
    uint64_t    request_id;   // valid only when success == true
    std::string error_message;
 };
 
-/// Validate + insert a `wtdwqueue` row. Does NOT throw on validation
-/// failure — returns the diagnostic in `enqueue_result`. Used by both
-/// `withdrawinle` (msgch-dispatched, log-don't-revert) and `withdraw`
-/// (operator-callable depot-native, also log-don't-revert).
 enqueue_result try_enqueue_withdraw(name account,
                                     sysio::slug_name chain_code,
                                     sysio::slug_name token_code,
@@ -1158,10 +920,7 @@ OperatorAction build_deposit_action(const opp::types::ChainAddress& op_address,
 // registry cannot custody reverts, so a request that could never be paid out
 // is never queued. Every other validation failure DOES NOT revert — it
 // appends a failure entry to the operator's `recent_actions` ring buffer,
-// matching the OPP-dispatched path (`withdrawinle`). The operator reads the
-// outcome via WIRE JSON-RPC. Outpost-held collateral is withdrawn by calling
-// the holding outpost's withdraw entry point — that path arrives at
-// `withdrawinle` instead.
+// The operator reads the recorded result through WIRE JSON-RPC.
 void opreg::withdraw(name account, sysio::slug_name token_code, uint64_t amount) {
    require_auth(account);
    check(resolve_depot_native_token(token_code).has_value(), unsupported_token_msg);
@@ -1171,35 +930,6 @@ void opreg::withdraw(name account, sysio::slug_name token_code, uint64_t amount)
 
    auto result = try_enqueue_withdraw(account, opp::wire::chain_code, token_code, amount);
    auto action = build_withdraw_request_action(account, opp::wire::chain_code, token_code, amount,
-                                               result.request_id);
-   append_action_log(ops, op_pk, action, result.success, std::move(result.error_message));
-   if (result.success) {
-      reevaluate_eligibility(ops, op_pk, get_self(), account);
-   }
-}
-
-// ---------------------------------------------------------------------------
-//  withdrawinle — internal: outpost-driven withdraw request (msgch-inline)
-// ---------------------------------------------------------------------------
-//
-// Inline-dispatched from `sysio.msgch::evalcons` for inbound
-// OPERATOR_ACTION(WITHDRAW_REQUEST) attestations. Validation failures DO
-// NOT revert (revert would kill the entire envelope's dispatch); the
-// outcome is appended to the operator's `recent_actions` ring so they
-// can read why their request was dropped via WIRE JSON-RPC. Escrowed
-// funds stay in outpost custody on rejection — the operator re-issues
-// once the underlying condition resolves.
-void opreg::withdrawinle(name account,
-                         sysio::slug_name chain_code,
-                         sysio::slug_name token_code,
-                         uint64_t amount) {
-   require_auth(get_self());
-
-   operators_t ops(get_self());
-   auto op_pk = operator_key{account.value};
-
-   auto result = try_enqueue_withdraw(account, chain_code, token_code, amount);
-   auto action = build_withdraw_request_action(account, chain_code, token_code, amount,
                                                result.request_id);
    append_action_log(ops, op_pk, action, result.success, std::move(result.error_message));
    if (result.success) {
@@ -1315,27 +1045,8 @@ void opreg::deposit(name account, sysio::slug_name token_code, uint64_t amount) 
    check(op.status != OperatorStatus::OPERATOR_STATUS_SLASHED &&
          op.status != OperatorStatus::OPERATOR_STATUS_TERMINATED,
          "operator not in a deposit-eligible state");
-   // Bootstrapped operators are ACTIVE by fiat and bypass `meets_role_min` entirely, so collateral
-   // credited to one can never affect its eligibility -- the deposit would be accepted into a
-   // balance that does nothing. `depositinle` already rejects them; this closes the depot-native
-   // path. There is deliberately no way to collateralise a bootstrap: an operator who wants a
-   // collateralised producer registers a new account.
    check(!op.is_bootstrapped, "bootstrapped operators cannot deposit collateral");
 
-   // Credit collateral BEFORE the inbound custody transfer, with the cap check
-   // performed ATOMICALLY inside the same `modify` as the credit — reading the
-   // live row, not the `op` copy read above. This closes a reentrancy window on
-   // operator accounts that carry contract code: the custody contract's
-   // `transfer` notifies `from` (the operator), and that notification handler
-   // could re-enter `deposit`. A separate pre-read-then-check-then-credit could
-   // let two credits pass against the same stale balance and push the row past
-   // `asset::max_amount` — recreating the withdraw/terminate remit abort
-   // (`asset(balance, symbol)` aborts above the limit). Checking inside the
-   // modify makes check+credit indivisible, and crediting before the transfer
-   // means any re-entry observes the committed balance. A direct user deposit may
-   // legitimately `check()`-throw here (unlike the never-throw OPP `depositinle`);
-   // if the transfer below aborts (operator lacks the tokens) the whole
-   // transaction — including this credit — rolls back. (SEC-103; PR #449 review.)
    ops.modify(same_payer, op_pk, [&](auto& o) {
       check(amount <= MAX_COLLATERAL_AMOUNT &&
                balance_of(o, opp::wire::chain_code, token_code) <= MAX_COLLATERAL_AMOUNT - amount,
@@ -1352,124 +1063,6 @@ void opreg::deposit(name account, sysio::slug_name token_code, uint64_t amount) 
       operator_chain_address(account, opp::wire::chain_code),
       opp::wire::chain_code, token_code, amount);
    append_action_log(ops, op_pk, deposit_action, /*success*/ true, "");
-
-   reevaluate_eligibility(ops, op_pk, get_self(), account);
-}
-
-// ---------------------------------------------------------------------------
-//  depositinle — internal: outpost-driven collateral credit (msgch-inline)
-// ---------------------------------------------------------------------------
-//
-// Inline-dispatched from `sysio.msgch::evalcons` for inbound
-// OPERATOR_ACTION(DEPOSIT_REQUEST) attestations. Validation failures DO
-// NOT revert — reverting from inside the inline dispatch would abort the
-// entire envelope. Instead, the failure is logged on the operator's
-// `recent_actions` ring (when an entry exists) and a `DEPOSIT_REVERT`
-// attestation is queued outbound to the source outpost so the escrowed
-// funds can be refunded to the depositor (minus the outpost-side gas
-// penalty, computed locally on the outpost when the revert is processed).
-//
-// `actor_chain` is retained as `opp::types::ChainKind` per the
-// ChainAddress flattening pattern — the depositor's source-chain
-// `ChainAddress.kind` field is still ChainKind on the wire and is not
-// part of the slug_name refactor.
-void opreg::depositinle(name account,
-                        sysio::slug_name chain_code,
-                        sysio::slug_name token_code,
-                        uint64_t amount,
-                        opp::types::ChainKind actor_chain,
-                        std::vector<char> actor_address,
-                        checksum256 original_message_id) {
-   require_auth(get_self());
-
-   operators_t ops(get_self());
-   auto op_pk = operator_key{account.value};
-
-   // Reconstruct the depositor's ChainAddress locally — the proto message
-   // type stays out of the ABI but is fine to use inside the contract for
-   // building OPERATOR_ACTION logs and DEPOSIT_REVERT correlation.
-   opp::types::ChainAddress actor;
-   actor.kind    = actor_chain;
-   actor.address = std::move(actor_address);
-
-   auto deposit_action = build_deposit_action(actor, chain_code, token_code, amount);
-
-   // A credit naming the depot chain would create a depot-native row no custody transfer ever
-   // funded: depot-native collateral is bonded only through `deposit`, whose inbound transfer pays
-   // for it. `sysio.msgch` never dispatches such a credit today; refuse it here too. Dropped, not
-   // reverted -- there is no outpost holding anything to refund -- and never thrown, because this
-   // runs inside an envelope's dispatch.
-   if (chain_code == opp::wire::chain_code) {
-      append_action_log(ops, op_pk, deposit_action, false, std::string(depot_chain_credit_msg));
-      return;
-   }
-
-   // The balance map is keyed by (chain_code, token_code), so an uncanonical token
-   // code must not be persisted: rendering is total and will not complain, but the
-   // code can render a valid spelling that re-parses as a DIFFERENT code, aliasing
-   // one operator's balance onto another's key. The outpost has already taken
-   // custody, so refund rather than drop.
-   if (!token_code.is_canonical()) {
-      const std::string err = "token code has no canonical slug_name spelling";
-      emit_deposit_revert(get_self(), chain_code, actor, token_code, amount,
-                          original_message_id, err);
-      append_action_log(ops, op_pk, deposit_action, false, err);
-      return;
-   }
-   if (amount == 0) {
-      const std::string err = "amount must be positive";
-      emit_deposit_revert(get_self(), chain_code, actor, token_code, amount,
-                          original_message_id, err);
-      append_action_log(ops, op_pk, deposit_action, false, err);
-      return;
-   }
-   if (!ops.contains(op_pk)) {
-      // No entry to log to. The DEPOSIT_REVERT IS the audit record for the
-      // outpost — outpost emits a local refund event the depositor reads.
-      emit_deposit_revert(get_self(), chain_code, actor, token_code, amount,
-                          original_message_id, "operator not registered");
-      return;
-   }
-   auto op = ops.get(op_pk);
-   if (op.status == OperatorStatus::OPERATOR_STATUS_SLASHED ||
-       op.status == OperatorStatus::OPERATOR_STATUS_TERMINATED) {
-      const std::string err = "operator not in a deposit-eligible state";
-      emit_deposit_revert(get_self(), chain_code, actor, token_code, amount,
-                          original_message_id, err);
-      append_action_log(ops, op_pk, deposit_action, false, err);
-      return;
-   }
-   // Bootstrapped operators are bonded by fiat — no deposit is ever
-   // permitted for them. Reject via DEPOSIT_REVERT (NOT a throw, per
-   // the no-throws-in-OPP-handlers rule — a throw here would halt the
-   // entire envelope's evalcons → chain stalls). The outpost refunds
-   // the depositor when it processes the revert.
-   if (op.is_bootstrapped) {
-      const std::string err = "bootstrapped operator cannot accept deposits";
-      emit_deposit_revert(get_self(), chain_code, actor, token_code, amount,
-                          original_message_id, err);
-      append_action_log(ops, op_pk, deposit_action, false, err);
-      return;
-   }
-   // SEC-103 (WSA-028 follow-up): the credited collateral must stay within the
-   // asset magnitude range so the depot-native claim payout's `asset(balance,
-   // symbol)` can never abort — an abort on this OPP-inbound path would stall
-   // consensus. The msgch ingress gate already bounds a single `amount` to
-   // `asset::max_amount`; this additionally bounds the running sum. Fail closed
-   // by refunding via DEPOSIT_REVERT — never `check()`.
-   if (amount > MAX_COLLATERAL_AMOUNT ||
-       balance_of(op, chain_code, token_code) > MAX_COLLATERAL_AMOUNT - amount) {
-      const std::string err = "deposit would exceed max collateral";
-      emit_deposit_revert(get_self(), chain_code, actor, token_code, amount,
-                          original_message_id, err);
-      append_action_log(ops, op_pk, deposit_action, false, err);
-      return;
-   }
-
-   ops.modify(same_payer, op_pk, [&](auto& o) {
-      add_balance(o, chain_code, token_code, amount);
-   });
-   append_action_log(ops, op_pk, deposit_action, true, "");
 
    reevaluate_eligibility(ops, op_pk, get_self(), account);
 }
@@ -1516,7 +1109,7 @@ void opreg::flushwtdw(uint32_t current_epoch) {
       auto op = ops.get(op_pk);
 
       if (op.status == OperatorStatus::OPERATOR_STATUS_SLASHED) {
-         // Slashed during the wait — funds went to the LP via the slash flow.
+         // Slashed during the wait; the operator no longer owns the collateral.
          append_action_log(ops, op_pk, remit_action, false,
                            "operator slashed during withdraw-wait window");
          queue.erase(wkey);
@@ -1524,11 +1117,6 @@ void opreg::flushwtdw(uint32_t current_epoch) {
       }
 
       if (op.status == OperatorStatus::OPERATOR_STATUS_TERMINATED) {
-         // Terminated during the wait — terminate_inline already remitted the operator's full
-         // unlocked balance (which covered this queued amount), so the row is moot. Erase without
-         // subtracting; otherwise subtract_balance would underflow and abort this epoch-inline
-         // action, permanently stalling epoch advancement (the balance was reduced to sum(locks)
-         // by terminate_inline, leaving nothing to cover the matured withdraw).
          append_action_log(ops, op_pk, remit_action, false,
                            "operator terminated during withdraw-wait window");
          queue.erase(wkey);
@@ -1558,14 +1146,8 @@ void opreg::flushwtdw(uint32_t current_epoch) {
       // transfer happens here, and the operator receives nothing until it calls `claimremit`. The
       // row's `token_code` is carried as-is, never resolved here. This path runs inline from
       // `sysio.epoch::advance`, where a pushed transfer would let the operator's notify handler
-      // abort epoch advancement chain-wide. For outpost chains: queue an
-      // OPERATOR_ACTION(WITHDRAW_REMIT) to the outpost so it can release the escrow on its end.
-      if (row.chain_code == opp::wire::chain_code) {
-         credit_remit_claim(get_self(), row.account, row.token_code, row.amount);
-      } else {
-         emit_withdraw_remit(get_self(), row.account, op.type,
-                             row.chain_code, row.token_code, row.amount, row.request_id);
-      }
+      // abort epoch advancement chain-wide.
+      credit_remit_claim(get_self(), row.account, row.token_code, row.amount);
       append_action_log(ops, op_pk, remit_action, true, "");
 
       // Remove the matured reservation before eligibility is recomputed. The
@@ -1643,7 +1225,7 @@ void opreg::processuw(name account, bool was_eligible, bool is_eligible) {
 }
 
 // ---------------------------------------------------------------------------
-//  slash — punitive removal; routes unlocked funds to LP, defers locked
+//  slash — punitive removal of the depot collateral balance
 // ---------------------------------------------------------------------------
 void opreg::slash(name account, std::string reason) {
    require_auth(CHALG_ACCOUNT);
@@ -1658,9 +1240,7 @@ void opreg::slash(name account, std::string reason) {
 
    auto now = current_time_ms();
 
-   // Snapshot the slashable amounts per (chain_code, token_code) BEFORE
-   // marking SLASHED (the status flip would zero `slashable_now` via
-   // available()).
+   // Snapshot the full collateral balance for the slash and audit log.
    struct slash_pair { sysio::slug_name chain_code; sysio::slug_name token_code; uint64_t amount; };
    std::vector<slash_pair> to_slash;
    for (const auto& bal : op.balances) {
@@ -1670,9 +1250,7 @@ void opreg::slash(name account, std::string reason) {
       }
    }
 
-   // Flip status + decrement balances by the slashable_now portion.
-   // Locked portion (== sum_locks) remains in `balance`; sysio.uwrit::release
-   // will deferred-slash it as each lock resolves.
+   // Mark SLASHED and remove each collateral balance; custody remains here.
    ops.modify(same_payer, op_pk, [&](auto& o) {
       o.status        = OperatorStatus::OPERATOR_STATUS_SLASHED;
       o.updated_at    = now;
@@ -1689,97 +1267,10 @@ void opreg::slash(name account, std::string reason) {
       auto slash_action = build_slash_action(op.account, op.type,
                                              sp.chain_code, sp.token_code, sp.amount,
                                              reason);
-      emit_slash_attestation(get_self(), slash_action);
       append_action_log(ops, op_pk, slash_action, /*success*/ true, "");
    }
 
    notify_producer_standing(get_self(), op);
-}
-
-// ---------------------------------------------------------------------------
-//  releaselock — deferred-slash / deferred-remit / no-op on lock release
-// ---------------------------------------------------------------------------
-void opreg::releaselock(name account,
-                        sysio::slug_name chain_code,
-                        sysio::slug_name token_code,
-                        uint64_t amount) {
-   require_auth(UWRIT_ACCOUNT);
-   check(amount > 0, "amount must be positive");
-
-   operators_t ops(get_self());
-   auto op_pk = operator_key{account.value};
-   if (!ops.contains(op_pk)) return;
-   auto op = ops.get(op_pk);
-
-   if (op.status != OperatorStatus::OPERATOR_STATUS_SLASHED &&
-       op.status != OperatorStatus::OPERATOR_STATUS_TERMINATED) {
-      // Healthy underwriter: balance was never decremented at lock time.
-      // uwrit::release just erases the lock row; opreg has no work.
-      return;
-   }
-
-   // SLASHED or TERMINATED — decrement opreg balance and emit the matching
-   // outbound attestation (deferred-slash to LP or deferred-remit to authex).
-   //
-   // Clamp the settled amount to the live balance bucket. In correct
-   // operation sum(active locks) <= balance for every (underwriter,
-   // chain_code, token_code) — the sysio.uwrit winner check reserves the
-   // aggregate per collateral bucket before writing locks — so `amount`
-   // never exceeds the remaining balance and this clamp is a no-op.
-   // It is the safety net for any residual/over-committed lock set:
-   // releaselock runs INLINE inside `sysio.uwrit::chklocks` at
-   // `sysio.epoch::advance`, and a `subtract_balance` underflow `check()`
-   // there would abort the advance and permanently stall epoch advancement
-   // chain-wide (`epoch-stall-is-fatal`). Settle — and attest — only what the
-   // balance can actually back.
-   uint64_t settle_amount = amount;
-   if (const auto* bal = find_balance(op, chain_code, token_code)) {
-      if (settle_amount > bal->balance) settle_amount = bal->balance;
-   } else {
-      settle_amount = 0;   // no balance row for this bucket — nothing to settle
-   }
-   if (settle_amount == 0) {
-      // Bucket already fully drained (e.g. by prior releases of an
-      // over-committed set) — the caller has erased the lock row; emit no
-      // zero-value slash/remit attestation.
-      return;
-   }
-
-   // A TERMINATED operator's shadow rows kept earning on their locked remainder since the
-   // termination payout; pay that yield with the principal, as the payout did -- the part the pool
-   // covers is credited, the rest stays banked for `claimyield` within the claim window. A SLASHED
-   // operator keeps it all on the row, claimable through `claimyield` (its locked remainder earned
-   // until this deferred slash).
-   std::vector<uint64_t> yield_credits;
-   ops.modify(same_payer, op_pk, [&](auto& o) {
-      subtract_balance(o, chain_code, token_code, settle_amount);
-      if (op.status == OperatorStatus::OPERATOR_STATUS_TERMINATED) {
-         yield_credits = take_all_earned_yield(get_self(), o);
-      }
-   });
-
-   if (op.status == OperatorStatus::OPERATOR_STATUS_SLASHED) {
-      auto slash_action = build_slash_action(op.account, op.type,
-                                             chain_code, token_code, settle_amount,
-                                             /*reason*/ "deferred slash on lock release");
-      emit_slash_attestation(get_self(), slash_action);
-      append_action_log(ops, op_pk, slash_action, /*success*/ true, "");
-   } else {
-      // TERMINATED — for depot-native, CREDIT the operator's `remitclaims` row in this lock's token;
-      // it is paid only when it calls `claimremit`. The termination itself already committed in an earlier epoch, so a
-      // pushed transfer here could not undo it — what it WOULD do is abort this lock release, which
-      // `chklocks` runs inline from `sysio.epoch::advance`, stalling epoch advancement chain-wide
-      // and leaving the lock unreleased on every retry. (Aborting the termination itself is the
-      // `terminate_inline` case below.) Otherwise queue WITHDRAW_REMIT so the outpost can transfer
-      // to the authex destination. request_id == 0 (this remit isn't queued in wtdwqueue).
-      if (chain_code == opp::wire::chain_code) {
-         credit_remit_claim(get_self(), account, token_code, settle_amount);
-      } else {
-         emit_withdraw_remit(get_self(), op.account, op.type,
-                             chain_code, token_code, settle_amount, /*request_id*/ 0);
-      }
-      credit_yield(get_self(), account, yield_credits);
-   }
 }
 
 // ---------------------------------------------------------------------------
@@ -1791,7 +1282,7 @@ namespace {
 /// Internal terminate body — used by both the operator-removal path
 /// (`termcheck` -> `terminate` inline) and the slashing-equivalent path for
 /// completeness. Marks status TERMINATED and remits each
-/// (chain_code, token_code) balance back to the operator via WITHDRAW_REMIT.
+/// depot-native token balance to a pull claim for the operator.
 void terminate_inline(name self, name account, const std::string& reason) {
    opreg::operators_t ops(self);
    auto op_pk = opreg::operator_key{account.value};
@@ -1807,20 +1298,14 @@ void terminate_inline(name self, name account, const std::string& reason) {
    std::vector<remit_pair> to_remit;
    for (const auto& bal : op.balances) {
       uint64_t amt = slashable_now(op, bal.chain_code, bal.token_code);
-      // For termination we route the unlocked portion. The locked portion
-      // gets remitted at lock-release time by sysio.uwrit::release (deferred-
-      // remit, symmetric with deferred-slash).
+      // Termination returns the full remaining balance through pull claims.
       if (amt > 0) {
          to_remit.push_back({bal.chain_code, bal.token_code, amt});
       }
    }
 
-   // Every shadow row is settled (the subtraction settles the remitted ones; the collection below
-   // settles the rest, e.g. a row whose balance is all locked) and its banked yield is paid with
-   // the principal to the WIRE claim row, up to what `yieldpool` covers; this path pushes nothing
-   // and so cannot pull more from sysio.liq. The uncovered rest stays banked for `claimyield`
-   // within the claim window (see `terminate`). Yield on a locked remainder keeps accruing until
-   // `releaselock` settles that remainder and pays it the same way.
+   // Settle earned shadow yield alongside principal, up to the yield pool balance.
+   // Uncovered yield stays banked for claimyield during the termination claim window.
    std::vector<uint64_t> yield_credits;
    ops.modify(same_payer, op_pk, [&](auto& o) {
       o.status        = OperatorStatus::OPERATOR_STATUS_TERMINATED;
@@ -1832,25 +1317,10 @@ void terminate_inline(name self, name account, const std::string& reason) {
       yield_credits = take_all_earned_yield(self, o);
    });
 
-   // Remit each (chain_code, token_code). For WIRE-chain: CREDIT `remitclaims` in the row's token,
-   // which the operator pulls with `claimremit` -- nothing is transferred from here. For outpost
-   // chains: queue WITHDRAW_REMIT.
-   //
-   // After each remit, append a WITHDRAW_REMIT entry to the operator's
-   // `recent_actions` ring buffer so the audit trail mirrors the
-   // operator-initiated withdraw flow (`flushwtdw` does the same). Without
-   // this entry, downstream consumers polling `operators[op].recent_actions`
-   // for proof of remit emission see only the prior DEPOSIT_REQUESTs and
-   // miss the termination payout — same semantic gap on TERMINATED ops as on
-   // a normal queued withdraw, only resolvable by querying msgch internals
-   // (which are transient — the rows drain on the next `buildenv`).
+   // Credit each token's pull claim and append its local withdrawal audit entry.
+   // No recipient notification can interrupt epoch-driven termination.
    for (const auto& rp : to_remit) {
-      if (rp.chain_code == opp::wire::chain_code) {
-         credit_remit_claim(self, account, rp.token_code, rp.amount);
-      } else {
-         emit_withdraw_remit(self, account, op.type,
-                             rp.chain_code, rp.token_code, rp.amount, /*request_id*/ 0);
-      }
+      credit_remit_claim(self, account, rp.token_code, rp.amount);
       OperatorAction remit_action = build_withdraw_remit_action(
          account, rp.chain_code, rp.token_code, rp.amount, /*request_id*/ 0);
       append_action_log(ops, op_pk, remit_action, /*success*/ true,
@@ -1871,7 +1341,7 @@ void opreg::terminate(name account, std::string reason) {
 
 // claimremit - pull depot-native collateral credited by a WIRE-chain remit, one token at a time.
 //
-// The remit paths (withdraw flush, deferred lock release, termination payout) credit rather than
+// The remit paths (withdraw flush and termination payout) credit rather than
 // transfer because every one of them is reachable from `sysio.epoch::advance`, which must never
 // abort. This is the only place such a balance becomes a transfer, and it carries the operator's
 // own authority, so a hostile transfer-notify handler blocks nothing but this caller's own claim.
@@ -2077,25 +1547,8 @@ void opreg::prune() {
    operators_t ops(get_self());
    auto status_idx = ops.get_index<"bystatus"_n>();
 
-   // Erase a TERMINATED row only when BOTH gates pass: the prune delay has
-   // elapsed AND the operator's collateral is completely settled (WNS-01 — see
-   // `is_fully_settled`). The delay alone is not sufficient: `terminate_inline`
-   // intentionally retains the locked portion of every balance for
-   // `releaselock` to settle when `sysio.uwrit::chklocks` frees the lock, and
-   // `releaselock` no-ops the moment the operator row is gone. Since `prune` is
-   // permissionless, gating on the delay alone let ANY caller strand a
-   // terminated operator's locked collateral by cranking it first.
-   //
-   // The budget counts rows EXAMINED, not rows erased — same convention as
-   // `flushwtdw`'s `flushed` and `drainfwq`'s `drained`. Each candidate costs a
-   // `sysio.uwrit::locks` index probe whether or not it ends up erased, so
-   // counting only erases would let a long prefix of delay-elapsed but unsettled
-   // rows do unbounded work and blow this permissionless crank's CPU deadline.
-   //
-   // A capped scan means rows beyond the budget wait for a later crank. That
-   // converges rather than starving: every unsettled row is settled by
-   // `chklocks` at its locks' wall-clock expiry and then erased, so the
-   // unprunable prefix drains on its own.
+   // Wait for both the retention delay and complete principal/yield settlement.
+   // Count examined rows so unsettled entries cannot make this crank unbounded.
    uint32_t examined = 0;
    for (auto it = status_idx.lower_bound(
            magic_enum::enum_integer(OperatorStatus::OPERATOR_STATUS_TERMINATED));

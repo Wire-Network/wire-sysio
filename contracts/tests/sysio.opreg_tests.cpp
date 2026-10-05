@@ -497,52 +497,19 @@ public:
          /*terminate_window_ms=*/terminate_window_ms,
          /*req_prod_collat=*/{},
          /*req_batchop_collat=*/{
-            make_chain_min_bond("ETH", "ETH", kTestMinBond),
+            make_chain_min_bond("WIRE", "NTA", kTestMinBond),
          },
          /*req_uw_collat=*/{}));
 
       BOOST_REQUIRE_EQUAL(success(),
          regoperator(account, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
       BOOST_REQUIRE_EQUAL(success(),
-         depositinle(account, "ETH", "ETH", kTestMinBond));
+         bond_generic(account, "NTA", kTestMinBond));
       produce_blocks();
 
       auto op = get_operator(account);
       BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
       BOOST_REQUIRE_EQUAL(0, op["is_bootstrapped"].as_uint64());
-   }
-
-   // ── Collateral-action helpers (msgch-dispatched paths, codenames) ──
-
-   /// `depositinle`: dispatched from sysio.msgch.
-   /// Signature: `(account, chain_code, token_code, amount,
-   ///                actor_chain ChainKind, actor_address bytes,
-   ///                original_message_id checksum256)`.
-   action_result depositinle(name account,
-                             std::string_view chain_code, std::string_view token_code,
-                             uint64_t amount,
-                             ChainKind actor_chain = ChainKind::CHAIN_KIND_EVM,
-                             const std::vector<char>& actor_address = {},
-                             const std::string& original_message_id_hex = std::string(64, '0')) {
-      return push_opreg_action(OPREG_ACCOUNT, "depositinle"_n, mvo()
-         ("account",              account)
-         ("chain_code",           chain_code)
-         ("token_code",           token_code)
-         ("amount",               amount)
-         ("actor_chain",          actor_chain)
-         ("actor_address",        actor_address)
-         ("original_message_id",  original_message_id_hex));
-   }
-
-   /// `withdrawinle`: same dispatch / auth model as `depositinle`.
-   action_result withdrawinle(name account,
-                              std::string_view chain_code, std::string_view token_code,
-                              uint64_t amount) {
-      return push_opreg_action(OPREG_ACCOUNT, "withdrawinle"_n, mvo()
-         ("account",     account)
-         ("chain_code",  chain_code)
-         ("token_code",  token_code)
-         ("amount",      amount));
    }
 
    /// `withdraw`: operator-authorized request against the depot-native `(WIRE, token_code)` row.
@@ -599,16 +566,6 @@ public:
          ("account",      account)
          ("was_eligible", was_eligible)
          ("is_eligible",  is_eligible));
-   }
-
-   action_result releaselock(name signer, name account,
-                             std::string_view chain_code, std::string_view token_code,
-                             uint64_t amount) {
-      return push_opreg_action(signer, "releaselock"_n, mvo()
-         ("account",     account)
-         ("chain_code",  chain_code)
-         ("token_code",  token_code)
-         ("amount",      amount));
    }
 
    /// Read a wtdwqueue row by request_id (primary key).
@@ -694,6 +651,19 @@ public:
       set_code(who, contracts::util::block_transfer_wasm());
       set_abi(who, contracts::util::block_transfer_abi().data());
       produce_blocks();
+   }
+
+   bool generic_assets_ready = false;
+
+   /// Mint generic shadow LIQ through sysio.synd and bond it through the public native action.
+   action_result bond_generic(name account, std::string_view token, uint64_t amount) {
+      if (!generic_assets_ready) {
+         setup_shadow_liq({sysio::testing::external::First, sysio::testing::external::Second});
+         generic_assets_ready = true;
+      }
+      BOOST_REQUIRE_EQUAL(success(), push_contract(LIQ_ACCOUNT, liq_abi_ser, SYND_ACCOUNT,
+         shadow_action::mint, mvo()("to", account)("token_code", codename_mvo(token))("amount", amount)));
+      return deposit(account, token, amount);
    }
 
    // ── Shadow LIQ collateral (sysio.liq) ──
@@ -961,14 +931,14 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_min_bond, sysio_opreg_tester) { t
             "(an empty requirement set imposes no bond)"),
       setconfig(21, 63, 21, kDefaultPruneDelayMs,
                 kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
-                {}, {}, { make_chain_min_bond("ETH", "ETH", kRejectedZeroMinBond) })
+                {}, {}, { make_chain_min_bond("WIRE", "NTA", kRejectedZeroMinBond) })
    );
    // The identical shape with a positive min_bond is accepted.
    BOOST_REQUIRE_EQUAL(
       success(),
       setconfig(21, 63, 21, kDefaultPruneDelayMs,
                 kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
-                {}, {}, { make_chain_min_bond("ETH", "ETH", kTestMinBond) })
+                {}, {}, { make_chain_min_bond("WIRE", "NTA", kTestMinBond) })
    );
 } FC_LOG_AND_RETHROW() }
 
@@ -1000,7 +970,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_uncanonical_collateral_code, sysio_opr
       success(),
       setconfig(21, 63, 21, kDefaultPruneDelayMs,
                 kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
-                {}, {}, { make_chain_min_bond("ETH", "ETH", kTestMinBond) })
+                {}, {}, { make_chain_min_bond("WIRE", "NTA", kTestMinBond) })
    );
 } FC_LOG_AND_RETHROW() }
 
@@ -1312,13 +1282,13 @@ BOOST_FIXTURE_TEST_CASE(deposit_credits_balance_row, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
 
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 1'000'000));
+      bond_generic("uwrit.alice"_n, "NTA", 1'000'000));
 
    auto op = get_operator("uwrit.alice"_n);
    auto balances = op["balances"].get_array();
    BOOST_REQUIRE_EQUAL(1, balances.size());
-   BOOST_REQUIRE_EQUAL(cn("ETH").value, balances[0]["chain_code"].as<fc::slug_name>().value);
-   BOOST_REQUIRE_EQUAL(cn("ETH").value, balances[0]["token_code"].as<fc::slug_name>().value);
+   BOOST_REQUIRE_EQUAL(cn("WIRE").value, balances[0]["chain_code"].as<fc::slug_name>().value);
+   BOOST_REQUIRE_EQUAL(cn("NTA").value, balances[0]["token_code"].as<fc::slug_name>().value);
    BOOST_REQUIRE_EQUAL(1'000'000,       balances[0]["balance"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
@@ -1327,53 +1297,14 @@ BOOST_FIXTURE_TEST_CASE(deposit_aggregates_into_existing_balance_row, sysio_opre
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
 
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 100));
+      bond_generic("uwrit.alice"_n, "NTA", 100));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 50));
+      bond_generic("uwrit.alice"_n, "NTA", 50));
 
    auto op = get_operator("uwrit.alice"_n);
    auto balances = op["balances"].get_array();
    BOOST_REQUIRE_EQUAL(1, balances.size());     // single row, NOT two
    BOOST_REQUIRE_EQUAL(150, balances[0]["balance"].as_uint64());
-} FC_LOG_AND_RETHROW() }
-
-// SEC-103 (WSA-028 follow-up): operator collateral must never accumulate past
-// asset::max_amount (2^62-1). A balance above the asset range would abort the
-// depot-native claim payout's asset(balance, symbol); on the never-throw
-// depositinle (OPP-inbound) path that abort would stall consensus. depositinle
-// gates the RUNNING SUM: a credit that would push the balance over the cap is
-// refunded via DEPOSIT_REVERT (the action still succeeds — never throws) and the
-// stored balance is left unchanged. The single-value WSA-028 wrap is closed
-// upstream in sysio.msgch; this is the accumulation guard.
-BOOST_FIXTURE_TEST_CASE(depositinle_credit_over_max_collateral_is_reverted, sysio_opreg_tester) { try {
-   // asset::max_amount — the Antelope asset magnitude limit (2^62 - 1), the cap
-   // sysio.opreg enforces on a single balance row.
-   constexpr uint64_t MAX_COLLATERAL = (uint64_t{1} << 62) - 1;
-
-   BOOST_REQUIRE_EQUAL(success(), setconfig());
-   BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
-
-   // Credit the balance up to EXACTLY the cap — accepted (the boundary is inclusive).
-   BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", MAX_COLLATERAL));
-   {
-      auto op       = get_operator("uwrit.alice"_n);
-      auto balances = op["balances"].get_array();
-      BOOST_REQUIRE_EQUAL(1, balances.size());
-      BOOST_REQUIRE_EQUAL(MAX_COLLATERAL, balances[0]["balance"].as_uint64());
-   }
-
-   // A further +1 would push the sum to 2^62 (one past asset::max_amount). It is
-   // refunded via DEPOSIT_REVERT: the action succeeds (never throws) and the
-   // stored balance is unchanged — the credit did NOT wrap or saturate it in.
-   BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 1));
-   {
-      auto op       = get_operator("uwrit.alice"_n);
-      auto balances = op["balances"].get_array();
-      BOOST_REQUIRE_EQUAL(1, balances.size());
-      BOOST_REQUIRE_EQUAL(MAX_COLLATERAL, balances[0]["balance"].as_uint64());
-   }
 } FC_LOG_AND_RETHROW() }
 
 /// WIRE-375 / WNS-40: direct depot deposits must custody the same 9-decimal WIRE
@@ -1470,28 +1401,23 @@ BOOST_FIXTURE_TEST_CASE(deposit_keeps_chain_token_pairs_separate, sysio_opreg_te
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
 
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 100));
+      bond_generic("uwrit.alice"_n, "NTA", 100));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "SOL", "SOL", 200));
+      bond_generic("uwrit.alice"_n, "NTB", 200));
 
    auto op = get_operator("uwrit.alice"_n);
    auto balances = op["balances"].get_array();
    BOOST_REQUIRE_EQUAL(2, balances.size());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(depositinle_logs_failure_when_operator_slashed, sysio_opreg_tester) { try {
+BOOST_FIXTURE_TEST_CASE(deposit_rejects_slashed_operator, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(), slash("uwrit.alice"_n, "test slash"));
-
-   BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 100));
-
-   auto entry = latest_action_log("uwrit.alice"_n);
-   BOOST_REQUIRE(!entry.is_null());
-   BOOST_REQUIRE_EQUAL(false, entry["success"].as_bool());
-   BOOST_REQUIRE_EQUAL(std::string("operator not in a deposit-eligible state"),
-                       entry["error_message"].as_string());
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: operator not in a deposit-eligible state"),
+                       bond_generic("uwrit.alice"_n, "NTA", 100));
+   BOOST_CHECK(get_operator("uwrit.alice"_n)["balances"].get_array().empty());
+   BOOST_CHECK_EQUAL(100, get_currency_balance(LIQ_ACCOUNT, symbol(9, "NTA"), "uwrit.alice"_n).get_amount());
 } FC_LOG_AND_RETHROW() }
 
 // ── queuewtdw + cancelwtdw ──
@@ -1500,10 +1426,10 @@ BOOST_FIXTURE_TEST_CASE(queuewtdw_creates_request_row, sysio_opreg_tester) { try
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+      bond_generic("uwrit.alice"_n, "NTA", 1000));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 400));
+      withdraw("uwrit.alice"_n, "NTA", 400));
 
    auto row = get_wtdw(1);   // monotonic id starts at 1
    BOOST_REQUIRE(!row.is_null());
@@ -1511,14 +1437,14 @@ BOOST_FIXTURE_TEST_CASE(queuewtdw_creates_request_row, sysio_opreg_tester) { try
    BOOST_REQUIRE_EQUAL(400,        row["amount"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(withdrawinle_logs_failure_on_insufficient_available, sysio_opreg_tester) { try {
+BOOST_FIXTURE_TEST_CASE(withdraw_logs_failure_on_insufficient_available, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 100));
+      bond_generic("uwrit.alice"_n, "NTA", 100));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 200));
+      withdraw("uwrit.alice"_n, "NTA", 200));
 
    auto entry = latest_action_log("uwrit.alice"_n);
    BOOST_REQUIRE(!entry.is_null());
@@ -1527,18 +1453,18 @@ BOOST_FIXTURE_TEST_CASE(withdrawinle_logs_failure_on_insufficient_available, sys
                        entry["error_message"].as_string());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(withdrawinle_subtracts_from_available_on_subsequent_call,
+BOOST_FIXTURE_TEST_CASE(withdraw_subtracts_from_available_on_subsequent_call,
                         sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+      bond_generic("uwrit.alice"_n, "NTA", 1000));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 700));
+      withdraw("uwrit.alice"_n, "NTA", 700));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 400));
+      withdraw("uwrit.alice"_n, "NTA", 400));
 
    auto entry = latest_action_log("uwrit.alice"_n);
    BOOST_REQUIRE(!entry.is_null());
@@ -1549,20 +1475,20 @@ BOOST_FIXTURE_TEST_CASE(withdrawinle_subtracts_from_available_on_subsequent_call
    BOOST_REQUIRE(get_wtdw(2).is_null());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(withdrawinle_allows_requests_across_collateral_buckets,
+BOOST_FIXTURE_TEST_CASE(withdraw_allows_requests_across_collateral_buckets,
                         sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+      bond_generic("uwrit.alice"_n, "NTA", 1000));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "SOL", "SOL", 1000));
+      bond_generic("uwrit.alice"_n, "NTB", 1000));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 400));
+      withdraw("uwrit.alice"_n, "NTA", 400));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "SOL", "SOL", 400));
+      withdraw("uwrit.alice"_n, "NTB", 400));
 
    auto entry = latest_action_log("uwrit.alice"_n);
    BOOST_REQUIRE(!entry.is_null());
@@ -1571,7 +1497,7 @@ BOOST_FIXTURE_TEST_CASE(withdrawinle_allows_requests_across_collateral_buckets,
    BOOST_REQUIRE(!get_wtdw(2).is_null());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(withdraw_rejects_when_inline_request_is_outstanding_for_same_bucket,
+BOOST_FIXTURE_TEST_CASE(withdraw_rejects_when_request_is_outstanding_for_same_bucket,
                         sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
@@ -1579,7 +1505,8 @@ BOOST_FIXTURE_TEST_CASE(withdraw_rejects_when_inline_request_is_outstanding_for_
    BOOST_REQUIRE_EQUAL(success(), deposit("uwrit.alice"_n, kWireCodename, 1000));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "WIRE", "WIRE", 400));
+      withdraw("uwrit.alice"_n, "WIRE", 400));
+   produce_blocks();
    BOOST_REQUIRE_EQUAL(success(), withdraw("uwrit.alice"_n, kWireCodename, 400));
 
    auto entry = latest_action_log("uwrit.alice"_n);
@@ -1594,11 +1521,11 @@ BOOST_FIXTURE_TEST_CASE(withdraw_rejects_when_inline_request_is_outstanding_for_
 
 /// A successful outpost withdrawal reservation immediately removes an
 /// undercollateralized batch operator from the active set.
-BOOST_FIXTURE_TEST_CASE(withdrawinle_rechecks_eligibility_after_enqueue, sysio_opreg_tester) { try {
+BOOST_FIXTURE_TEST_CASE(withdraw_rechecks_batch_eligibility_after_enqueue, sysio_opreg_tester) { try {
    activate_batch_operator(kEligibilityBatchOperator);
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+      withdraw(kEligibilityBatchOperator, "NTA", kTestMinBond));
 
    auto op = get_operator(kEligibilityBatchOperator);
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN == op[eligibility_field::status].as<OperatorStatus>());
@@ -1637,11 +1564,11 @@ BOOST_FIXTURE_TEST_CASE(withdraw_rechecks_eligibility_after_enqueue, sysio_opreg
 
 /// A rejected outpost withdrawal has no reservation side effect and therefore
 /// cannot change an otherwise eligible operator's status.
-BOOST_FIXTURE_TEST_CASE(withdrawinle_rejection_preserves_eligibility, sysio_opreg_tester) { try {
+BOOST_FIXTURE_TEST_CASE(withdraw_rejection_preserves_eligibility, sysio_opreg_tester) { try {
    activate_batch_operator(kEligibilityBatchOperator);
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kInsufficientTestBond));
+      withdraw(kEligibilityBatchOperator, "NTA", kInsufficientTestBond));
 
    auto op = get_operator(kEligibilityBatchOperator);
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op[eligibility_field::status].as<OperatorStatus>());
@@ -1654,9 +1581,9 @@ BOOST_FIXTURE_TEST_CASE(cancelwtdw_removes_pending_request, sysio_opreg_tester) 
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+      bond_generic("uwrit.alice"_n, "NTA", 1000));
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 400));
+      withdraw("uwrit.alice"_n, "NTA", 400));
 
    BOOST_REQUIRE_EQUAL(success(), cancelwtdw("uwrit.alice"_n, "uwrit.alice"_n, 1));
 
@@ -1664,7 +1591,7 @@ BOOST_FIXTURE_TEST_CASE(cancelwtdw_removes_pending_request, sysio_opreg_tester) 
    BOOST_REQUIRE(row.is_null());
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+      withdraw("uwrit.alice"_n, "NTA", 1000));
    BOOST_REQUIRE(!get_wtdw(2).is_null());
 } FC_LOG_AND_RETHROW() }
 
@@ -1673,7 +1600,7 @@ BOOST_FIXTURE_TEST_CASE(cancelwtdw_removes_pending_request, sysio_opreg_tester) 
 BOOST_FIXTURE_TEST_CASE(cancelwtdw_rechecks_eligibility_after_erase, sysio_opreg_tester) { try {
    activate_batch_operator(kEligibilityBatchOperator);
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+      withdraw(kEligibilityBatchOperator, "NTA", kTestMinBond));
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN ==
                  get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>());
 
@@ -1724,9 +1651,9 @@ BOOST_FIXTURE_TEST_CASE(processbatch_preserves_terminated_bootstrapped_status, s
 BOOST_FIXTURE_TEST_CASE(flushwtdw_rechecks_eligibility_after_erase, sysio_opreg_tester) { try {
    activate_batch_operator(kEligibilityBatchOperator);
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+      bond_generic(kEligibilityBatchOperator, "NTA", kTestMinBond));
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+      withdraw(kEligibilityBatchOperator, "NTA", kTestMinBond));
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
                  get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>());
 
@@ -1741,15 +1668,15 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_allows_operator_to_request_again, sysio_opreg_
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+      bond_generic("uwrit.alice"_n, "NTA", 1000));
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 400));
+      withdraw("uwrit.alice"_n, "NTA", 400));
 
    BOOST_REQUIRE_EQUAL(success(), flushwtdw(kFlushAllMaturedEpoch));
    BOOST_REQUIRE(get_wtdw(1).is_null());
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 600));
+      withdraw("uwrit.alice"_n, "NTA", 600));
    BOOST_REQUIRE(!get_wtdw(2).is_null());
 } FC_LOG_AND_RETHROW() }
 
@@ -1758,9 +1685,9 @@ BOOST_FIXTURE_TEST_CASE(cancelwtdw_rejects_other_operators_request, sysio_opreg_
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.bob"_n,   OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+      bond_generic("uwrit.alice"_n, "NTA", 1000));
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 400));
+      withdraw("uwrit.alice"_n, "NTA", 400));
 
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: not your withdraw request"),
@@ -1774,7 +1701,7 @@ BOOST_FIXTURE_TEST_CASE(terminate_marks_status_and_zeros_unlocked_balance, sysio
    BOOST_REQUIRE_EQUAL(success(),
       regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("batchop.a"_n, "ETH", "ETH", 500));
+      bond_generic("batchop.a"_n, "NTA", 500));
 
    BOOST_REQUIRE_EQUAL(success(), terminate("batchop.a"_n, "rolling-24h: >5% miss rate"));
 
@@ -2088,16 +2015,13 @@ BOOST_FIXTURE_TEST_CASE(remit_claims_for_two_tokens_coexist, sysio_opreg_tester)
 /// operator's ETH-bucket slash does queue an attestation, so the trace probe is live.
 BOOST_FIXTURE_TEST_CASE(slash_shadow_row_emits_no_attestation, sysio_opreg_tester) { try {
    const auto OPERATOR = "uwrit.alice"_n;
-   const auto CONTROL  = "uwrit.bob"_n;
    constexpr uint64_t DEPOSIT = 2 * kWireUnit;
 
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator(OPERATOR, OPERATOR_TYPE_UNDERWRITER, /*is_bootstrapped=*/false));
-   BOOST_REQUIRE_EQUAL(success(), regoperator(CONTROL, OPERATOR_TYPE_UNDERWRITER, /*is_bootstrapped=*/false));
    setup_shadow_liq();
    mint_shadow(OPERATOR, kShadowFunding);
    BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, kLiqEthCodename, DEPOSIT));
-   BOOST_REQUIRE_EQUAL(success(), depositinle(CONTROL, kEthCodename, kEthCodename, DEPOSIT));
 
    // The row under test is the shadow row, custodied as shadow.
    const auto bonded = get_operator(OPERATOR)["balances"].get_array();
@@ -2114,7 +2038,6 @@ BOOST_FIXTURE_TEST_CASE(slash_shadow_row_emits_no_attestation, sysio_opreg_teste
    BOOST_REQUIRE_EQUAL(0u, balances[0]["balance"].as_uint64());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(DEPOSIT), shadow_balance(OPREG_ACCOUNT));
 
-   BOOST_REQUIRE(slash_queues_outbound(CONTROL, kTestSlashReason));
 } FC_LOG_AND_RETHROW() }
 
 /// `claimremit` resolves its token before touching any claim row, so a token opreg cannot
@@ -2211,7 +2134,7 @@ BOOST_FIXTURE_TEST_CASE(recorddel_ignores_withdrawal_ineligibility, sysio_opreg_
    produce_block(fc::seconds(kDeliveryTimestampSeparationSeconds));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+      withdraw(kEligibilityBatchOperator, "NTA", kTestMinBond));
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN ==
                  get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>());
 
@@ -2268,7 +2191,7 @@ BOOST_FIXTURE_TEST_CASE(termcheck_preserves_percent_sample_across_withdrawal_ine
    produce_block(fc::seconds(kDeliveryTimestampSeparationSeconds));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+      withdraw(kEligibilityBatchOperator, "NTA", kTestMinBond));
    BOOST_REQUIRE_EQUAL(success(), cancelwtdw(
       kEligibilityBatchOperator, kEligibilityBatchOperator, kFirstWithdrawalRequestId));
 
@@ -2407,18 +2330,9 @@ BOOST_FIXTURE_TEST_CASE(recorddel_succeeds_without_opconfig, sysio_opreg_tester)
    BOOST_REQUIRE(!get_dellog_entry(1).is_null());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(releaselock_requires_uwrit_authority, sysio_opreg_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), setconfig());
-   BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
-
-   BOOST_REQUIRE(
-      releaselock(OPREG_ACCOUNT, "uwrit.alice"_n, "ETH", "ETH", 100)
-        .find("missing authority of sysio.uwrit") != std::string::npos);
-} FC_LOG_AND_RETHROW() }
-
 // ── setconfig: per-(chain_code, token_code) collateral requirements ──
 
-BOOST_FIXTURE_TEST_CASE(setconfig_two_chain_bond_activation, sysio_opreg_tester) { try {
+BOOST_FIXTURE_TEST_CASE(setconfig_two_native_asset_bond_activation, sysio_opreg_tester) { try {
    constexpr uint64_t MIN_BOND = 1'000'000;
 
    BOOST_REQUIRE_EQUAL(success(), setconfig(
@@ -2427,8 +2341,8 @@ BOOST_FIXTURE_TEST_CASE(setconfig_two_chain_bond_activation, sysio_opreg_tester)
       /*terminate_window_ms=*/24ULL * 60 * 60 * 1000,
       /*req_prod_collat=*/{},
       /*req_batchop_collat=*/{
-         make_chain_min_bond("ETH", "ETH", MIN_BOND),
-         make_chain_min_bond("SOL", "SOL", MIN_BOND),
+         make_chain_min_bond("WIRE", "NTA", MIN_BOND),
+         make_chain_min_bond("WIRE", "NTB", MIN_BOND),
       },
       /*req_uw_collat=*/{}));
 
@@ -2441,13 +2355,13 @@ BOOST_FIXTURE_TEST_CASE(setconfig_two_chain_bond_activation, sysio_opreg_tester)
 
    // After ETH bond: SOL still missing → still UNKNOWN.
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("batchop.a"_n, "ETH", "ETH", MIN_BOND));
+      bond_generic("batchop.a"_n, "NTA", MIN_BOND));
    op = get_operator("batchop.a"_n);
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN == op["status"].as<OperatorStatus>());
 
    // After SOL bond: every requirement met → ACTIVE.
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("batchop.a"_n, "SOL", "SOL", MIN_BOND));
+      bond_generic("batchop.a"_n, "NTB", MIN_BOND));
    op = get_operator("batchop.a"_n);
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
    BOOST_REQUIRE(op["available_at"].as_uint64() > 0);
@@ -2455,8 +2369,8 @@ BOOST_FIXTURE_TEST_CASE(setconfig_two_chain_bond_activation, sysio_opreg_tester)
 
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_duplicate_chain_token_in_collat, sysio_opreg_tester) { try {
    const auto duplicate_vec = std::vector<fc::variant>{
-      make_chain_min_bond("ETH", "ETH", 100),
-      make_chain_min_bond("ETH", "ETH", 200),
+      make_chain_min_bond("WIRE", "NTA", 100),
+      make_chain_min_bond("WIRE", "NTA", 200),
    };
 
    // The duplicate-detection assertion text refers to "(chain, token_kind)"
@@ -2474,7 +2388,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_stamps_collat_config_timestamp, sysio_opreg_te
       21, 63, 21, 600000, 5, 5, 24ULL * 60 * 60 * 1000,
       /*req_prod_collat=*/{},
       /*req_batchop_collat=*/{
-         make_chain_min_bond("ETH", "ETH", 1000),
+         make_chain_min_bond("WIRE", "NTA", 1000),
       },
       /*req_uw_collat=*/{}));
 
@@ -2492,11 +2406,11 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_terminated_operator_does_not_abort, sysio_opre
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(),
       regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
-   BOOST_REQUIRE_EQUAL(success(), depositinle("batchop.a"_n, "ETH", "ETH", 500));
+   BOOST_REQUIRE_EQUAL(success(), bond_generic("batchop.a"_n, "NTA", 500));
 
    // Queue a withdraw of the full balance, then terminate (remits + zeroes the balance), leaving
    // the queued row matured against a now-zero balance.
-   BOOST_REQUIRE_EQUAL(success(), withdrawinle("batchop.a"_n, "ETH", "ETH", 500));
+   BOOST_REQUIRE_EQUAL(success(), withdraw("batchop.a"_n, "NTA", 500));
    BOOST_REQUIRE(!get_wtdw(1).is_null());
    BOOST_REQUIRE_EQUAL(success(), terminate("batchop.a"_n, "rolling-24h miss"));
 
@@ -2525,12 +2439,14 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_bounds_rows_per_epoch, sysio_opreg_tester) { t
    // Each distinct operator contributes its one permitted queue row. Raw name values remain valid
    // Antelope names and avoid coupling this global-bound regression to a fixed account-name list.
    for (uint32_t i = 0; i < N; ++i) {
-      const name account{OPERATOR_NAME_BASE.value + i + 1};
+      const name account{OPERATOR_NAME_BASE.value + ((uint64_t(i) + 1) << 4)};
+      create_accounts({account});
+      produce_blocks();
       BOOST_REQUIRE_EQUAL(success(),
          regoperator(account, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
-      BOOST_REQUIRE_EQUAL(success(), depositinle(account, "ETH", "ETH", i + 1));
+      BOOST_REQUIRE_EQUAL(success(), bond_generic(account, "NTA", i + 1));
       BOOST_REQUIRE_EQUAL(success(),
-         withdrawinle(account, "ETH", "ETH", i + 1));
+         withdraw(account, "NTA", i + 1));
       BOOST_REQUIRE_EQUAL(success(), terminate(account, "rolling-24h miss"));
       produce_blocks();
    }
@@ -2836,20 +2752,6 @@ BOOST_FIXTURE_TEST_CASE(terminated_operator_claims_uncovered_yield_before_prune,
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(kYieldPrincipal), wire_balance(OPREG_ACCOUNT));
 } FC_LOG_AND_RETHROW() }
 
-/// `depositinle` never credits the depot chain: depot-native collateral is bonded only through
-/// `deposit`. The credit is dropped and logged, not thrown, since it runs inside a dispatch.
-BOOST_FIXTURE_TEST_CASE(depositinle_drops_a_depot_chain_credit, sysio_opreg_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), setconfig());
-   BOOST_REQUIRE_EQUAL(success(), regoperator(kYieldBonderA, OPERATOR_TYPE_UNDERWRITER, /*is_bootstrapped=*/false));
-
-   BOOST_REQUIRE_EQUAL(success(), depositinle(kYieldBonderA, kWireCodename, kWireCodename, kWireUnit));
-   BOOST_REQUIRE(depot_native_row(kYieldBonderA, kWireCodename).is_null());
-   const auto entry = latest_action_log(kYieldBonderA);
-   BOOST_REQUIRE(!entry.is_null());
-   BOOST_REQUIRE_EQUAL(false, entry[eligibility_field::success].as_bool());
-   BOOST_REQUIRE_EQUAL(std::string(kDepotChainCreditReason), entry["error_message"].as_string());
-} FC_LOG_AND_RETHROW() }
-
 /// `claimyield` is permissionless: a keeper with no stake cranks it for a TERMINATED operator whose
 /// yield termination could not cover, and the credit lands in the operator's own WIRE claim.
 BOOST_FIXTURE_TEST_CASE(keeper_claims_terminated_operators_yield, sysio_opreg_tester) { try {
@@ -2928,7 +2830,6 @@ BOOST_FIXTURE_TEST_CASE(reregistration_forfeits_banked_yield_but_keeps_remit_cla
    BOOST_REQUIRE_EQUAL(wire_before + static_cast<int64_t>(covered), wire_balance(kYieldBonderA));
    BOOST_REQUIRE_EQUAL(success(), claimremit(kYieldBonderA, kLiqEthCodename));
 } FC_LOG_AND_RETHROW() }
-
 
 // This is the dual-shadow producer flow's depot policy with generic symbols.
 // Registration of the Ethereum node NFT itself remains in the ETH-specific suites.

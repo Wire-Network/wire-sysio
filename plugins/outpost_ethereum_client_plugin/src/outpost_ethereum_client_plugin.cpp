@@ -542,8 +542,7 @@ outpost_ethereum_client_plugin::create_outpost_client(const std::string& eth_cli
                                                        uint64_t chain_code,
                                                        uint32_t chain_id,
                                                        const std::string& opp_addr,
-                                                       const std::string& opp_inbound_addr,
-                                                       const std::string& operator_registry_addr) {
+                                                       const std::string& opp_inbound_addr) {
    const auto entry = my->get_client(eth_client_id);
    FC_ASSERT(entry, "Unknown ethereum client id: {}", eth_client_id);
    const auto chain_name = fc::slug_name{chain_code}.to_string();
@@ -564,7 +563,6 @@ outpost_ethereum_client_plugin::create_outpost_client(const std::string& eth_cli
    return std::make_shared<outpost_ethereum_client>(entry,
                                                     opp_addr,
                                                     opp_inbound_addr,
-                                                    operator_registry_addr,
                                                     std::move(all_abis),
                                                     chain_code,
                                                     chain_id);

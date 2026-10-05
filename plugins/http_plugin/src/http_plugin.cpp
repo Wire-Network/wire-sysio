@@ -75,7 +75,6 @@ namespace sysio {
       if (name == "prometheus") return api_category::prometheus;
       if (name == "test_control") return api_category::test_control;
       if (name == "snapshot_ro") return api_category::snapshot_ro;
-      if (name == "underwriter") return api_category::underwriter;
       return api_category::unknown;
    }
 
@@ -92,9 +91,8 @@ namespace sysio {
       if (category == api_category::prometheus) return "prometheus";
       if (category == api_category::test_control) return "test_control";
       if (category == api_category::snapshot_ro) return "snapshot_ro";
-      if (category == api_category::underwriter) return "underwriter";
       if (category == api_category::node) return "node";
-      // It's a programming error when the control flow reaches this point, 
+      // It's a programming error when the control flow reaches this point,
       // please make sure all the category names are returned from above statements.
       assert(false && "No correspding category name for the category value");
       return "";
@@ -118,8 +116,6 @@ namespace sysio {
          return "sysio::producer_api_plugin";
       if (category == api_category::snapshot_ro)
          return "sysio::snapshot_api_plugin";
-      if (category == api_category::underwriter)
-         return "sysio::underwriter_plugin";
       // It's a programming error when the control flow reaches this point,
       // please make sure all the plugin names are returned from above statements.
       assert(false && "No corresponding plugin for the category value");
@@ -129,7 +125,7 @@ namespace sysio {
    std::string category_names(api_category_set set) {
       if (set == api_category_set::all()) return "all";
       std::string result;
-      for (uint32_t i = 1; i <= static_cast<uint32_t>(api_category::underwriter); i<<=1) {
+      for (uint32_t i = 1; i <= static_cast<uint32_t>(api_category::snapshot_ro); i<<=1) {
          if (set.contains(api_category(i))) {
             result += from_category(api_category(i));
             result += " ";
@@ -152,7 +148,6 @@ namespace sysio {
 
          std::shared_ptr<http_plugin_state> plugin_state{new http_plugin_state(logger())};
          std::atomic<bool> listening;
-
 
          /**
           * Make an internal_url_handler that will run the url_handler on the app() thread and then
@@ -227,7 +222,7 @@ namespace sysio {
              };
             return handler;
          }
-         
+
          bool is_unix_socket_address(const std::string& address) const {
             return address.starts_with("/") || address.starts_with("./") || address.starts_with("../");
          }
@@ -252,7 +247,7 @@ namespace sysio {
          void create_listener(const std::string& address, api_category_set categories) {
             const std::chrono::milliseconds accept_timeout(500);
             auto extra_listening_log_info = " for API categories: " + category_names(categories);
-            using socket_type = typename Protocol::socket; 
+            using socket_type = typename Protocol::socket;
             auto create_session = [this, categories, address](socket_type&& socket) {
                std::string               remote_endpoint;
                if constexpr (std::is_same_v<socket_type, tcp>) {
@@ -335,16 +330,16 @@ namespace sysio {
 
       if (current_http_plugin_defaults.support_categories) {
          cfg.add_options()
-            ("http-category-address", bpo::value<std::vector<string>>(), 
+            ("http-category-address", bpo::value<std::vector<string>>(),
              "The local IP and port to listen for incoming http category connections."
              "  Syntax: category,address\n"
              "    Where the address can be <hostname>:port, <ipaddress>:port or unix socket path;\n"
              "    in addition, unix socket path must starts with '/', './' or '../'. When relative path\n"
              "    is used, it is relative to the data path.\n\n"
              "    Valid categories include chain_ro, chain_rw, db_size, net_ro, net_rw, producer_ro\n"
-             "    producer_rw, snapshot, trace_api, prometheus, test_control, snapshot_ro, and underwriter.\n\n"
-             "    A single `hostname:port` specification can be used by multiple categories\n" 
-             "    However, two specifications having the same port with different hostname strings\n" 
+             "    producer_rw, snapshot, trace_api, prometheus, test_control, and snapshot_ro.\n\n"
+             "    A single `hostname:port` specification can be used by multiple categories\n"
+             "    However, two specifications having the same port with different hostname strings\n"
              "    are always considered as configuration error regardless of whether they can be resolved\n"
              "    into the same set of IP addresses.\n\n"
              "  Examples:\n"
@@ -462,7 +457,7 @@ namespace sysio {
             if (unix_sock_path.size()) {
                if (unix_sock_path[0] != '/') unix_sock_path = "./" + unix_sock_path;
                my->categories_by_address[unix_sock_path].insert(api_category::node);
-            } 
+            }
          }
 
          if (options.count("http-category-address") != 0) {
@@ -486,10 +481,10 @@ namespace sysio {
                auto category_name = spec.substr(0, comma_pos);
                auto category = to_category(category_name);
 
-               SYS_ASSERT(category != api_category::unknown, chain::plugin_config_exception, 
+               SYS_ASSERT(category != api_category::unknown, chain::plugin_config_exception,
                           "invalid category name `{}` for http_category_address", category_name);
 
-               SYS_ASSERT(has_plugin(category_plugin_name(category)), chain::plugin_config_exception, 
+               SYS_ASSERT(has_plugin(category_plugin_name(category)), chain::plugin_config_exception,
                   "--plugin={} is required for --http-category-address={}",
                   category_plugin_name(category), spec);
 
@@ -506,7 +501,6 @@ namespace sysio {
             }
          }
          my->plugin_state->server_header = current_http_plugin_defaults.server_header;
-
 
          //watch out for the returns above when adding new code here
       } FC_LOG_AND_RETHROW()

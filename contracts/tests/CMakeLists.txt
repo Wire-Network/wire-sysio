@@ -92,16 +92,16 @@ add_contract_suite(amm_math_tests amm_math_tests.cpp ACCOUNTS sysio.opp.common)
 add_contract_suite(council_math_tests council_math_tests.cpp ACCOUNTS sysio.councl)
 add_contract_suite(sysio_emissions_tests emissions_tests.cpp ACCOUNTS
   sysio.dclaim sysio.epoch sysio.msig sysio.opreg
-  sysio.reserv sysio.system sysio.token sysio.uwrit)
+   sysio.system sysio.token )
 add_contract_suite(t5_emissions_tests emissions_tests.cpp ACCOUNTS
   sysio.dclaim sysio.epoch sysio.msig sysio.opreg
-  sysio.reserv sysio.system sysio.token sysio.uwrit)
+   sysio.system sysio.token )
 add_contract_suite(sysio_producer_eligibility_tests emissions_tests.cpp ACCOUNTS
   sysio.dclaim sysio.epoch sysio.msig sysio.opreg
-  sysio.reserv sysio.system sysio.token sysio.uwrit)
-add_contract_suite(sysio_producer_score_tests emissions_tests.cpp ACCOUNTS
+   sysio.system sysio.token )
+add_contract_suite(sysio_producer_score_tests emissions_tests.cpp ACCOUNTS sysio.chains sysio.tokens sysio.liq sysio.synd
   sysio.dclaim sysio.epoch sysio.msig sysio.opreg
-  sysio.reserv sysio.system sysio.token sysio.uwrit)
+   sysio.system sysio.token )
 add_contract_suite(getpeerkeys_tests getpeerkeys_tests.cpp ACCOUNTS
   sysio.msig sysio.system sysio.token)
 add_contract_suite(safe_ops_tests safe_ops_tests.cpp ACCOUNTS sysio.opp.common)
@@ -120,15 +120,15 @@ add_contract_suite(sysio_councl_tests sysio.councl_tests.cpp ACCOUNTS
 add_contract_suite(sysio_dclaim_tests sysio.dclaim_tests.cpp ACCOUNTS sysio.dclaim)
 add_contract_suite(sysio_dispatch_tests sysio.dispatch_tests.cpp ACCOUNTS sysio.andon
   sysio.authex sysio.bond sysio.chains sysio.chalg sysio.epoch
-  sysio.msgch sysio.opreg sysio.opp.common sysio.reserv
-  sysio.synd sysio.system sysio.token sysio.uwrit)
+  sysio.msgch sysio.opreg sysio.opp.common
+  sysio.synd sysio.system sysio.token )
 add_contract_suite(sysio_dispute_tests sysio.dispute_tests.cpp ACCOUNTS
   sysio.chains sysio.chalg sysio.epoch sysio.msgch
   sysio.msig sysio.opreg sysio.roa sysio.system
-  sysio.token sysio.uwrit)
+  sysio.token )
 add_contract_suite(sysio_epoch_flushwtdw_tests sysio.epoch_flushwtdw_tests.cpp ACCOUNTS
   sysio.chains sysio.epoch sysio.msgch sysio.opreg
-  sysio.system sysio.token sysio.uwrit)
+  sysio.system sysio.token )
 add_contract_suite(sysio_epoch_tests sysio.epoch_tests.cpp ACCOUNTS sysio.chains sysio.epoch)
 add_contract_suite(sysio_system_finalizer_key_tests sysio.finalizer_key_tests.cpp ACCOUNTS
   sysio.msig sysio.opreg sysio.system sysio.token)
@@ -140,7 +140,7 @@ add_contract_suite(sysio_liq_tests sysio.liq_tests.cpp ACCOUNTS sysio.andon
 add_contract_suite(sysio_msgch_chain_tests sysio.msgch_chain_tests.cpp ACCOUNTS
   sysio.chains sysio.chalg sysio.epoch sysio.msgch
   sysio.opreg sysio.roa sysio.system sysio.token
-  sysio.uwrit)
+  )
 add_contract_suite(sysio_msgch_tests sysio.msgch_tests.cpp ACCOUNTS
   sysio.chains sysio.epoch sysio.msgch)
 add_contract_suite(sysio_msgch_envlog_tests sysio.msgch_tests.cpp ACCOUNTS
@@ -149,9 +149,6 @@ add_contract_suite(sysio_msig_tests sysio.msig_tests.cpp ACCOUNTS
   sysio.msig sysio.system sysio.token test.sendinline)
 add_contract_suite(sysio_opreg_tests sysio.opreg_tests.cpp ACCOUNTS
   sysio.epoch sysio.opreg sysio.token)
-add_contract_suite(sysio_reserve_tests sysio.reserv_tests.cpp ACCOUNTS
-  sysio.authex sysio.chains sysio.msgch sysio.opp.common
-  sysio.reserv sysio.token)
 add_contract_suite(sysio_roa_tests sysio.roa_tests.cpp ACCOUNTS
   sysio.authex sysio.msig sysio.roa sysio.system
   sysio.token test.noop test.sendinline)
@@ -171,7 +168,6 @@ add_contract_suite(sysio_system_tests sysio.system_tests.cpp ACCOUNTS
 add_contract_suite(sysio_token_tests sysio.token_tests.cpp ACCOUNTS
   sysio.msig sysio.system sysio.token)
 add_contract_suite(sysio_tokens_tests sysio.tokens_tests.cpp ACCOUNTS sysio.tokens)
-add_contract_suite(sysio_uwrit_tests sysio.uwrit_tests.cpp ACCOUNTS sysio.uwrit)
 add_contract_suite(sysio_wrap_tests sysio.wrap_tests.cpp ACCOUNTS sysio.msig sysio.wrap)
 add_contract_suite(twap_tests twap_tests.cpp ACCOUNTS sysio.opp.common)
 get_property(_registered_suites GLOBAL PROPERTY CONTRACT_REGISTERED_SUITES)
