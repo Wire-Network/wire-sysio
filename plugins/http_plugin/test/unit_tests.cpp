@@ -1,4 +1,5 @@
 #include <sysio/chain/application.hpp>
+#include <sysio/chain/exceptions.hpp>
 #include <sysio/http_plugin/http_plugin.hpp>
 #include <sysio/http_plugin/common.hpp>
 
@@ -18,6 +19,8 @@
 
 #include <array>
 #include <iostream>
+#include <mutex>
+#include <sstream>
 #include <thread>
 #include <future>
 #include <optional>
@@ -1015,63 +1018,100 @@ struct quiet_log {
 struct quiet_http_plugin_test_fixture : quiet_log, http_plugin_test_fixture {
    static constexpr auto http_thread_route = "/v1/node/throw_on_http_thread";
    static constexpr auto app_thread_route = "/v1/node/throw_on_app_thread";
-   static constexpr auto raw_route = "/v1/node/throw_in_raw_handler";
-   static constexpr std::array failing_routes{http_thread_route, app_thread_route, raw_route};
+   static constexpr auto metrics_route = "/v1/node/throw_in_metrics_observer";
+   static constexpr std::array failing_routes{http_thread_route, app_thread_route, metrics_route};
 
    fc::temp_directory directory;
    const std::filesystem::path socket = directory.path() / "http-exception.sock";
 
-   /// Add the failing routes; each handler throws `message`.
+   /// Add the failing routes, which throw `message`: from the handler on an http thread or the app thread, or from the
+   /// metrics observer before the handler runs.
    void add_failing_routes(http_plugin& plugin, const std::string& message) {
       const auto fail = [message](string&&, string&&, url_response_callback&&) { throw std::runtime_error(message); };
-      plugin.add_async_api({{http_thread_route, api_category::node, fail}});
+      const auto succeed = [](string&&, string&&, url_response_callback&& cb) { cb(200, fc::variant("unreached")); };
+      plugin.add_async_api(
+         {{http_thread_route, api_category::node, fail}, {metrics_route, api_category::node, succeed}});
       plugin.add_api({{app_thread_route, api_category::node, fail}}, appbase::exec_queue::read_write);
-      plugin.add_raw_handler(raw_route, api_category::node, [message](detail::abstract_conn_ptr, string&&, string&&) {
-         throw std::runtime_error(message);
+      plugin.register_update_metrics([message](http_plugin::metrics metrics) {
+         if (metrics.target == metrics_route)
+            throw std::runtime_error(message);
       });
+   }
+
+   /// Whether every session has ended and released its bytes in flight, waiting a while for the last to finish.
+   static bool all_released(const http_plugin& plugin) {
+      const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(30);
+      while (plugin.requests_in_flight() != 0 || plugin.bytes_in_flight() != 0) {
+         if (std::chrono::steady_clock::now() > deadline)
+            return false;
+         std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      }
+      return true;
+   }
+
+   /// Listen on the unix socket with default options.
+   http_plugin* init_on_socket() {
+      return init({bu::framework::current_test_case().p_name->c_str(), "--data-dir", directory.path().c_str(),
+                   "--http-server-address", "", "--unix-socket-path", socket.c_str()});
    }
 };
 
-/// One request on its own unix-socket connection, given up after a deadline.
+/// Requests sent one after another on one unix-socket connection, each once the previous response is in, given up
+/// after a deadline. With `read_past`, it also reads past the last response.
 struct unix_exchange {
-   http::response<http::string_body> response;
-   beast::error_code error; ///< why the response did not arrive whole, if it did not
-   beast::error_code after; ///< result of reading past the response; unset if error
+   std::vector<http::response<http::string_body>> responses;
+   beast::error_code error; ///< why a response did not arrive whole, if one did not
+   beast::error_code after; ///< result of reading past the last response; unset if error or not read
 
-   unix_exchange(const std::filesystem::path& socket, const char* route, unsigned version = 11) {
+   unix_exchange(const std::filesystem::path& socket, std::vector<const char*> routes, unsigned version = 11,
+                 bool read_past = true) {
       net::io_context ioc;
       unix_stream stream(ioc);
-      const http::request<http::string_body> request{http::verb::post, route, version};
       beast::flat_buffer buffer;
+      http::request<http::string_body> request;
       http::response<http::string_body> next;
-      stream.expires_after(std::chrono::seconds(30));
-      stream.async_connect(net::local::stream_protocol::endpoint(socket.string()), [&](beast::error_code connect_ec) {
-         error = connect_ec;
-         if (error)
+      std::function<void(size_t)> send = [&](size_t i) {
+         if (i == routes.size()) {
+            if (read_past)
+               http::async_read(stream, buffer, next, [&](beast::error_code past_ec, size_t) { after = past_ec; });
             return;
-         http::async_write(stream, request, [&](beast::error_code write_ec, size_t) {
+         }
+         request = http::request<http::string_body>{http::verb::post, routes[i], version};
+         http::async_write(stream, request, [&, i](beast::error_code write_ec, size_t) {
             error = write_ec;
             if (error)
                return;
-            http::async_read(stream, buffer, response, [&](beast::error_code read_ec, size_t) {
+            http::async_read(stream, buffer, responses.emplace_back(), [&, i](beast::error_code read_ec, size_t) {
                error = read_ec;
-               if (error)
-                  return;
-               http::async_read(stream, buffer, next, [&](beast::error_code past_ec, size_t) { after = past_ec; });
+               if (!error)
+                  send(i + 1);
             });
          });
+      };
+      stream.expires_after(std::chrono::seconds(30));
+      stream.async_connect(net::local::stream_protocol::endpoint(socket.string()), [&](beast::error_code connect_ec) {
+         error = connect_ec;
+         if (!error)
+            send(0);
       });
       ioc.run();
    }
 
+   unix_exchange(const std::filesystem::path& socket, const char* route, unsigned version = 11)
+      : unix_exchange(socket, std::vector{route}, version) {}
+
+   /// The first response.
+   const http::response<http::string_body>& response() const { return responses.front(); }
+
    /// A whole 500 response, then end of stream.
    bool reported_and_closed() const {
-      return !error && response.result() == http::status::internal_server_error &&
+      return !error && responses.size() == 1 && response().result() == http::status::internal_server_error &&
              after == http::error::end_of_stream;
    }
 };
 
-/// An exception response is written whole before its connection closes, wherever the handler threw.
+/// An exception response is written whole before its connection closes, wherever the request failed, and carries the
+/// configured Server header.
 BOOST_FIXTURE_TEST_CASE(exception_response_is_complete_before_close, quiet_http_plugin_test_fixture) {
    // Far more than a socket send buffer holds, so the response cannot be written in one non-blocking send.
    constexpr size_t message_size = 1024 * 1024;
@@ -1087,12 +1127,14 @@ BOOST_FIXTURE_TEST_CASE(exception_response_is_complete_before_close, quiet_http_
       for (const unsigned version : {10u, 11u}) {
          const unix_exchange exchange(socket, route, version);
          BOOST_REQUIRE_MESSAGE(!exchange.error, route << " HTTP " << version << ": " << exchange.error.message());
-         BOOST_CHECK(exchange.response.result() == http::status::internal_server_error);
-         BOOST_CHECK(!exchange.response.keep_alive());
-         BOOST_CHECK(exchange.response.body().find(message) != std::string::npos);
+         BOOST_CHECK(exchange.response().result() == http::status::internal_server_error);
+         BOOST_CHECK(!exchange.response().keep_alive());
+         BOOST_CHECK(exchange.response().body().find(message) != std::string::npos);
+         BOOST_CHECK_EQUAL(std::string(exchange.response()[http::field::server]), http_plugin::get_server_header());
          BOOST_CHECK_MESSAGE(exchange.after == http::error::end_of_stream, exchange.after.message());
       }
    }
+   BOOST_CHECK(all_released(*plugin));
 }
 
 /// Requests failing at once on several threads each get their whole error response on a connection that then closes.
@@ -1105,19 +1147,139 @@ BOOST_FIXTURE_TEST_CASE(concurrent_exception_responses, quiet_http_plugin_test_f
    add_failing_routes(*plugin, "failed");
 
    std::atomic<uint32_t> reported{0};
+   std::mutex failure_mutex;
+   std::string first_failure; ///< what the first failed exchange got, as the server's logs are off
    std::vector<std::thread> threads;
    for (uint32_t client = 0; client < clients; ++client)
       threads.emplace_back([&, client] {
          for (uint32_t request = 0; request < requests_per_client; ++request) {
             const auto* route = failing_routes[(client + request) % failing_routes.size()];
-            if (!unix_exchange(socket, route).reported_and_closed())
+            const unix_exchange exchange(socket, route);
+            if (!exchange.reported_and_closed()) {
+               std::ostringstream failure;
+               failure << route << ": error '" << exchange.error.message() << "', " << exchange.responses.size()
+                       << " response(s)";
+               if (!exchange.responses.empty())
+                  failure << ", the first " << exchange.response().result_int();
+               failure << ", then '" << exchange.after.message() << "'";
+               const std::lock_guard lock(failure_mutex);
+               if (first_failure.empty())
+                  first_failure = failure.str();
                return;
+            }
             ++reported;
          }
       });
    for (auto& thread : threads)
       thread.join();
-   BOOST_CHECK_EQUAL(reported.load(), clients * requests_per_client);
+   BOOST_CHECK_MESSAGE(reported.load() == clients * requests_per_client,
+                       reported.load() << " of " << clients * requests_per_client << " reported; " << first_failure);
+   BOOST_CHECK(all_released(*plugin));
+}
+
+/// A request is answered once even when its handler responds and then throws or reports an exception, or responds
+/// twice: the connection carries only the first response and goes on to serve the next request.
+BOOST_FIXTURE_TEST_CASE(each_request_is_answered_once, quiet_http_plugin_test_fixture) {
+   constexpr auto respond_then_throw_http = "/v1/node/respond_then_throw_on_http_thread";
+   constexpr auto respond_then_throw_app = "/v1/node/respond_then_throw_on_app_thread";
+   constexpr auto respond_twice = "/v1/node/respond_twice";
+   constexpr auto raw_respond_then_throw = "/v1/node/raw_respond_then_throw";
+   constexpr auto raw_respond_then_report = "/v1/node/raw_respond_then_report";
+   constexpr auto raw_respond_twice = "/v1/node/raw_respond_twice";
+   constexpr auto hello = "/v1/node/hello";
+   auto* plugin = init_on_socket();
+   BOOST_REQUIRE(plugin);
+   const auto respond_then_throw = [](string&&, string&&, url_response_callback&& cb) {
+      cb(200, fc::variant("first"));
+      throw std::runtime_error("after responding");
+   };
+   plugin->add_async_api({{respond_then_throw_http, api_category::node, respond_then_throw},
+                          {respond_twice, api_category::node,
+                           [](string&&, string&&, url_response_callback&& cb) {
+                              cb(200, fc::variant("first"));
+                              cb(200, fc::variant("second"));
+                           }},
+                          {hello, api_category::node,
+                           [](string&&, string&&, url_response_callback&& cb) { cb(200, fc::variant("world")); }}});
+   plugin->add_api({{respond_then_throw_app, api_category::node, respond_then_throw}}, appbase::exec_queue::read_write);
+   plugin->add_raw_handler(raw_respond_then_throw, api_category::node,
+                           [](detail::abstract_conn_ptr conn, string&&, string&&) {
+                              conn->send_response(R"("first")", 200);
+                              throw std::runtime_error("after responding");
+                           });
+   plugin->add_raw_handler(raw_respond_then_report, api_category::node,
+                           [](detail::abstract_conn_ptr conn, string&&, string&&) {
+                              conn->send_response(R"("first")", 200);
+                              try {
+                                 throw std::runtime_error("after responding");
+                              } catch (...) {
+                                 conn->handle_exception();
+                              }
+                           });
+   plugin->add_raw_handler(raw_respond_twice, api_category::node,
+                           [](detail::abstract_conn_ptr conn, string&&, string&&) {
+                              conn->send_response(R"("first")", 200);
+                              conn->send_response(R"("second")", 200);
+                           });
+
+   for (const auto* route : {respond_then_throw_http, respond_then_throw_app, respond_twice, raw_respond_then_throw,
+                             raw_respond_then_report, raw_respond_twice}) {
+      const unix_exchange exchange(socket, {route, hello}, 11, false);
+      BOOST_REQUIRE_MESSAGE(!exchange.error, route << ": " << exchange.error.message());
+      BOOST_REQUIRE_EQUAL(exchange.responses.size(), 2u);
+      BOOST_CHECK(exchange.responses[0].result() == http::status::ok);
+      BOOST_CHECK_EQUAL(exchange.responses[0].body(), R"("first")");
+      BOOST_CHECK_EQUAL(exchange.responses[1].body(), R"("world")");
+   }
+}
+
+/// A raw handler's exception, thrown, reported through its connection or raised by a send, is answered like any API
+/// call's: a malformed request is a 400, any other failure a 500, and the connection stays open with no bytes left in
+/// flight.
+BOOST_FIXTURE_TEST_CASE(raw_handler_exceptions_are_api_errors, quiet_http_plugin_test_fixture) {
+   constexpr auto invalid_request = "/v1/node/raw_invalid_request";
+   constexpr auto reported_invalid_request = "/v1/node/raw_reported_invalid_request";
+   constexpr auto internal_error = "/v1/node/raw_internal_error";
+   constexpr auto send_throws = "/v1/node/raw_send_throws";
+   constexpr auto in_flight = "/v1/node/bytes_in_flight";
+   auto* plugin = init_on_socket();
+   BOOST_REQUIRE(plugin);
+   plugin->add_raw_handler(invalid_request, api_category::node, [](detail::abstract_conn_ptr, string&&, string&&) {
+      SYS_THROW(chain::invalid_http_request, "malformed request");
+   });
+   plugin->add_raw_handler(reported_invalid_request, api_category::node,
+                           [](detail::abstract_conn_ptr conn, string&&, string&&) {
+                              try {
+                                 SYS_THROW(chain::invalid_http_request, "malformed request");
+                              } catch (...) {
+                                 conn->handle_exception();
+                              }
+                           });
+   plugin->add_raw_handler(internal_error, api_category::node, [](detail::abstract_conn_ptr, string&&, string&&) {
+      throw std::runtime_error("broken");
+   });
+   plugin->add_raw_handler(send_throws, api_category::node, [](detail::abstract_conn_ptr conn, string&&, string&&) {
+      conn->send_response("a body a 204 cannot carry", 204);
+   });
+   plugin->add_async_api({{in_flight, api_category::node, [plugin](string&&, string&&, url_response_callback&& cb) {
+                              cb(200, fc::variant(plugin->bytes_in_flight()));
+                           }}});
+
+   const std::vector<std::pair<const char*, http::status>> cases{
+      {invalid_request, http::status::bad_request},
+      {reported_invalid_request, http::status::bad_request},
+      {internal_error, http::status::internal_server_error},
+      {send_throws, http::status::internal_server_error}};
+   for (const auto& [route, status] : cases) {
+      const unix_exchange exchange(socket, {route, in_flight}, 11, false);
+      BOOST_REQUIRE_MESSAGE(!exchange.error, route << ": " << exchange.error.message());
+      BOOST_REQUIRE_EQUAL(exchange.responses.size(), 2u);
+      BOOST_CHECK(exchange.responses[0].result() == status);
+      BOOST_CHECK(exchange.responses[0].keep_alive());
+      BOOST_CHECK_EQUAL(fc::json::from_string(exchange.responses[0].body())["code"].as_uint64(),
+                        magic_enum::enum_integer(status));
+      BOOST_CHECK_EQUAL(exchange.responses[1].body(), "0");
+   }
 }
 
 //A warning for future tests: destruction of http_plugin_test_fixture sometimes does not destroy http_plugin's listeners. Tests
