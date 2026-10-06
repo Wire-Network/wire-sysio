@@ -827,14 +827,14 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
          // task alongside liqEth / liqsol-token wiring.
          break;
 
-      // Outbound-only types (depot emits these, never receives them inbound)
-      // and deprecated pre-launch types are dropped silently. SLASH was
-      // formerly its own attestation type; it now rides on OPERATOR_ACTION
-      // with action_type=SLASH and is gated inside `dispatch_operator_action`.
+      // Outbound-only types (depot emits these, never receives them inbound) are dropped silently;
+      // an outpost relaying one back is a benign no-op.
       case AttestationType::ATTESTATION_TYPE_SWAP_REVERT:
       case AttestationType::ATTESTATION_TYPE_DEPOSIT_REVERT:
       case AttestationType::ATTESTATION_TYPE_OPERATORS:
       case AttestationType::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS:
+         break;
+
       case AttestationType::ATTESTATION_TYPE_NODE_OWNER_REG:
          // NFT node-owner claim: create the account + register + record the ETH link. Self-contained
          // (decodes NodeOwnerRegistration, inline-sends sysio.roa); soft-drops a malformed envelope.
