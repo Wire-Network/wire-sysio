@@ -3,7 +3,7 @@
 `signature_provider_manager_plugin` owns every signing key the node uses. It parses each
 `--signature-provider` spec, builds the matching signer, and publishes the whole set through one lookup
 API (by name, by public key, by chain kind, by key type) that `chain_plugin`, `producer_plugin`,
-`net_plugin`, the outpost clients, and `underwriter_plugin` query. An operator never enables it by hand:
+`net_plugin`, and the outpost clients query. An operator never enables it by hand:
 every one of those plugins names it in `APPBASE_PLUGIN_REQUIRES`, so appbase loads and initializes it
 before any consumer. It requires `http_client_plugin`, which it uses for the `KIOD:` scheme.
 
@@ -59,7 +59,7 @@ there is no flag to skip it.
 
 The provider set is immutable once the node is running. Every mutator asserts it was called before startup,
 and all mutation happens on the main thread during the sequential initialize/startup phases, so runtime
-lookups from producer, batch-operator, underwriter, and outpost threads need no synchronization.
+lookups from producer, batch-operator, and outpost threads need no synchronization.
 
 ### Generated default providers
 
@@ -171,6 +171,6 @@ on the generated defaults file. The AWS-backed schemes are tested with their own
   the `kiod` side of a `KIOD:` provider.
 - `http_client_plugin` — the HTTP client a `KIOD:` provider signs through; required by this plugin.
 - `chain_plugin`, `producer_plugin`, `net_plugin`, `outpost_client_plugin`,
-  `outpost_ethereum_client_plugin`, `outpost_solana_client_plugin`, `underwriter_plugin` — consumers that
-  require this plugin and therefore load it automatically.
+  `outpost_ethereum_client_plugin`, `outpost_solana_client_plugin` — consumers that require this plugin and
+  therefore load it automatically.
 - `docs/signature-provider-manager-plugin.md` — the spec reference with worked examples.

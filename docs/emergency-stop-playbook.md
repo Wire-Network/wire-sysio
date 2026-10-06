@@ -14,7 +14,7 @@ chain. The contracts behind it are described in [`sysio-synd.md`](sysio-synd.md)
 |---|---|---|---|
 | Depot | `sysio.andon` `cord` row, `pulled` | `sysio.andon::pull`: the panic account, `sysio`, or a registered puller | `sysio.andon::clear`: the panic account or `sysio` |
 | Solana | liqsol-core `GlobalState.frozen` | `set_frozen(true)`: `GlobalConfig.panic` or `GlobalConfig.admin` | `set_frozen(false)`: the same two |
-| Ethereum | OpenZeppelin `paused()` on `SyndicationPool`, `ReserveManager`, `LiqEthToken`, `StakingModule` | `pause()`: any holder of the `panic` role (the deploy's `panicAccount` and the admin) | `unpause()`: the same |
+| Ethereum | OpenZeppelin `paused()` on `SyndicationPool`, `LiqEthToken`, `StakingModule` | `pause()`: any holder of the `panic` role (the deploy's `panicAccount` and the admin) | `unpause()`: the same |
 
 The three are independent: pulling one changes nothing on the others. When unsure whether a fault
 crossed chains, pull all three.
@@ -33,7 +33,7 @@ playbook; they do not change between incidents unless an account is replaced.
 | `SOL_ADMIN_KEYPAIR` | keypair file of the Solana admin (`GlobalConfig.admin`) |
 | `SOL_CRANK_KEYPAIR` | any funded Solana keypair: it signs `pay_pending_desyndication` |
 | `ETH_RPC_URL` | Ethereum RPC URL of the outpost's network |
-| `SYNDICATION_POOL`, `RESERVE_MANAGER`, `OPP_INBOUND`, `OUTPOST_AUTHORITY`, `OUTPOST_MANAGER` | the `SyndicationPool`, `ReserveManager`, `OPPInbound`, `OutpostManagerAuthority` and `OutpostManager` entries of the outpost deploy's `addressFile` |
+| `SYNDICATION_POOL`, `OPP_INBOUND`, `OUTPOST_AUTHORITY`, `OUTPOST_MANAGER` | the `SyndicationPool`, `OPPInbound`, `OutpostManagerAuthority` and `OutpostManager` entries of the outpost deploy's `addressFile` |
 | `LIQETH_TOKEN`, `STAKING_MODULE`, `LIQETH_AUTHORITY` | the `LiqEthToken`, `StakingModule` and `LiqEthAuthority` entries of the liqEth deploy's `addressFile` |
 
 A few values belong to the incident itself and are set when it happens: `REASON` (why the cord was
@@ -79,9 +79,11 @@ Each item is a deploy or upgrade step. An item not done is a freeze that cannot 
    (`set-panic`, [Solana commands](#solana-commands)) and read it back with `status`.
 3. **Ethereum.** Set `panicAccount` in the deploy (or upgrade) config. A fresh deploy maps `pause` and
    `unpause` to the `panic` role from `permissions/outpost.yaml` and `permissions/liqeth.yaml` and
-   grants the role to `panicAccount` and to the applying admin. An environment deployed earlier gets
-   the mapping from the permissions-only steps `outpost_20260930.01_permissions` and
-   `liqeth_20260930.01_permissions` (wire-ethereum `docs/deploy.md`, Rolling the panic role out).
+   grants the role to `panicAccount` and to the applying admin. On the outpost only `SyndicationPool`
+   is pausable, and since it is not deployed anywhere yet its mapping always comes from
+   `permissions/outpost.yaml`. A liqEth environment deployed earlier gets the mapping from the
+   permissions-only step `liqeth_20260930.01_permissions` (wire-ethereum `docs/deploy.md`, Rolling the
+   panic role out).
 4. **Solana relay funding.** Fund the Solana key each `outpost_solana_client` relay signs
    `dispatch_attestations` with (the public key in its `--signature-provider`, logged at start as
    `Signer public key:`) for the rent of the payouts the outpost may store: on a freeze, a custody
@@ -114,7 +116,8 @@ collateral and the other depot payouts are a separate concern and are not frozen
 - `sysio.opreg::claimremit(account, token_code)` for a shadow LIQ `token_code` pays through `sysio.liq::transfer` to the
   operator, which is not a custody contract, so it IS refused while the cord is pulled; the
   `remitclaims` row stays and is claimed after the clear.
-- The WIRE payouts of `sysio.chalg`, `sysio.uwrit` and `sysio.reserv` read no cord and run.
+- The WIRE payouts of `sysio.system` (`claimpay`, `claimnodedis`) and `sysio.dclaim` (`claim`) read no
+  cord and run.
 
 If an incident involves one of these, the andon cord does not stop it; the owning contract's own
 controls (or a contract redeploy) do.
@@ -143,7 +146,6 @@ the outpost have diverged. The relay skips the yield report of a frozen outpost 
 | Contract | `pause()` stops | Keeps running |
 |---|---|---|
 | `SyndicationPool` | `syndicate` and `realizeYield` (`EnforcedPause`); a depot `DESYNDICATE_LIQ` is stored as a pending desyndication (`DesyndicationDeferred`, reason `OUTPOST_FROZEN`); `payPendingDesyndication` | OPP delivery; views |
-| `ReserveManager` | `create_reserve`, `requestReserveCreateErc20WithPermit`, `requestReserveCreateErc20WithApproval`, `requestSwap`, `requestSwapErc20WithPermit`, `requestSwapErc20WithApproval`, `withdraw` | OPP delivery and attestation handling, including `SWAP_REMIT` and `SWAP_REVERT` payouts. While `LiqEthToken` is paused a liqETH payout fails: a `SWAP_REMIT` is skipped with `SwapRemitUnpayable` ("transfer failed") and a `SWAP_REVERT` refund with `SwapRevertError`. The depot counts both as paid. |
 | `LiqEthToken` | every liqETH transfer, mint and burn | views |
 | `StakingModule` | `batchDeposit`, `topUpValidator` | the rest |
 
@@ -164,9 +166,8 @@ pauses itself and stores the release with reason `CUSTODY_SHORTFALL`
 `OUTPOST_FROZEN` for the whole freeze instead of attempting transfers against a paused token.
 
 **Pause `LiqEthToken` only when the token itself is at fault.** A paused liqETH blocks every transfer,
-so `ReserveManager` cannot pay a liqETH `SWAP_REMIT` or `SWAP_REVERT` that arrives during the pause. It
-skips the payout and logs it (`SwapRemitUnpayable`, `SwapRevertError`), while the depot counts it as
-paid. Each one found in step 9 is reconciled by hand.
+mint and burn, including the liqETH staking flows; desyndications arriving while only the token is
+paused are stored as `SETTLEMENT_REFUSED` and paid by `payPendingDesyndication` after the unpause.
 
 ## Pulling the cord
 
@@ -197,9 +198,8 @@ Pull `SyndicationPool` first:
 
 ```bash
 cast send --rpc-url "$ETH_RPC_URL" --account panic "$SYNDICATION_POOL" 'pause()'
-cast send --rpc-url "$ETH_RPC_URL" --account panic "$RESERVE_MANAGER"  'pause()'
 cast send --rpc-url "$ETH_RPC_URL" --account panic "$STAKING_MODULE"   'pause()'
-for c in "$SYNDICATION_POOL" "$RESERVE_MANAGER" "$STAKING_MODULE"; do
+for c in "$SYNDICATION_POOL" "$STAKING_MODULE"; do
   cast call --rpc-url "$ETH_RPC_URL" "$c" 'paused()(bool)'
 done
 ```
@@ -274,8 +274,8 @@ share wait for the clear.
   `revokeRole` call to the authority. The liqEth side has no handoff, so its admin calls
   `LiqEthAuthority` directly:
   ```bash
-  # Outpost access manager (ReserveManager, SyndicationPool), through OutpostManager
-  ROLE=$(cast call --rpc-url "$ETH_RPC_URL" "$OUTPOST_AUTHORITY" 'getTargetFunctionRole(address,bytes4)(uint64)' "$RESERVE_MANAGER" "$(cast sig 'pause()')")
+  # Outpost access manager (SyndicationPool), through OutpostManager
+  ROLE=$(cast call --rpc-url "$ETH_RPC_URL" "$OUTPOST_AUTHORITY" 'getTargetFunctionRole(address,bytes4)(uint64)' "$SYNDICATION_POOL" "$(cast sig 'pause()')")
   cast send --rpc-url "$ETH_RPC_URL" --account admin "$OUTPOST_MANAGER" 'grantRole(uint64,address)' "$ROLE" "$NEW_ETH_PANIC"
   cast send --rpc-url "$ETH_RPC_URL" --account admin "$OUTPOST_MANAGER" 'execute(address,bytes)' "$OUTPOST_AUTHORITY" \
     "$(cast calldata 'revokeRole(uint64,address)' "$ROLE" "$OLD_ETH_PANIC")"
@@ -341,14 +341,6 @@ and `status` on Solana (`liq_sequence`, the pool ATA balance). What to check:
   outpost; a skipped one is reconciled by the recredit rule
   ([Reconciling](#reconciling-a-desyndication-the-outpost-did-not-pay)).
 - Between two readings during a freeze, no outpost custody balance falls.
-- If `LiqEthToken` was paused: look for liqETH payouts `ReserveManager` skipped between `PAUSE_BLOCK`
-  and the unpause. The depot counts each of them as paid, so each one found is reconciled by hand:
-  ```bash
-  cast logs --rpc-url "$ETH_RPC_URL" --from-block "$PAUSE_BLOCK" --address "$RESERVE_MANAGER" \
-    'SwapRemitUnpayable(uint64 tokenCode, uint64 reserveCode, uint64 depotAmount, bytes32 originalId, string reason)'
-  cast logs --rpc-url "$ETH_RPC_URL" --from-block "$PAUSE_BLOCK" --address "$RESERVE_MANAGER" \
-    'SwapRevertError(address indexed depositor, uint64 tokenCode, uint64 reserveCode, uint256 amount, string amountUnit, bytes32 originalSwapMessageId, bytes errData)'
-  ```
 
 
 ### Reconciling a desyndication the outpost did not pay
@@ -466,7 +458,7 @@ cast logs --rpc-url "$ETH_RPC_URL" --address "$SYNDICATION_POOL" \
 cast call --rpc-url "$ETH_RPC_URL" "$SYNDICATION_POOL" 'paused()(bool)'    # true
 ```
 
-Only `SyndicationPool` is paused; pause `ReserveManager`, `StakingModule` or `LiqEthToken` by hand if the
+Only `SyndicationPool` is paused; pause `StakingModule` or `LiqEthToken` by hand if the
 fault may reach them ([Pulling the cord](#pulling-the-cord)). `payPendingDesyndication` pays the stored
 release after `unpause`, with the same rule as Solana: unpause only once the pool covers the depot's
 outstanding plus every release still stored.
@@ -504,7 +496,6 @@ Unpause `SyndicationPool` last, so the liqETH it pays out can move:
 ```bash
 cast send --rpc-url "$ETH_RPC_URL" --account panic "$LIQETH_TOKEN"     'unpause()'   # only if it was paused
 cast send --rpc-url "$ETH_RPC_URL" --account panic "$STAKING_MODULE"   'unpause()'
-cast send --rpc-url "$ETH_RPC_URL" --account panic "$RESERVE_MANAGER"  'unpause()'
 cast send --rpc-url "$ETH_RPC_URL" --account panic "$SYNDICATION_POOL" 'unpause()'
 ```
 

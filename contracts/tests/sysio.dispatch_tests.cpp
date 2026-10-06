@@ -1033,6 +1033,36 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 4321);
 } FC_LOG_AND_RETHROW() }
 
+// Only ATTESTATION_TYPE_NODE_OWNER_REG reaches the node-owner handler. The outbound-only types
+// (OPERATORS, BATCH_OPERATOR_GROUPS, SWAP_REVERT, DEPOSIT_REVERT) are dropped on receipt even when
+// the payload is a well-formed NodeOwnerRegistration from the node-owner source outpost: a payload
+// that would register CLAIM_ACCOUNT under the real type must leave no owner row and no audit row.
+BOOST_FIXTURE_TEST_CASE(outbound_only_types_never_reach_node_owner_dispatch, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch("ETHEREUM");
+
+   const auto eth_code = fc::slug_name{"ETHEREUM"}.value;
+   auto wire_key = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
+   auto eth_pub = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
+   auto eth_bytes = em_uncompressed_pubkey_bytes(eth_pub);
+   auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_pub);
+   const auto payload = encode_node_owner_registration(
+      CLAIM_ACCOUNT.to_string(), /*tier=*/2,
+      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes, eth_address);
+
+   std::vector<typed_attestation> entries;
+   for (auto type : {ATTESTATION_TYPE_OPERATORS, ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS,
+                     ATTESTATION_TYPE_SWAP_REVERT, ATTESTATION_TYPE_DEPOSIT_REVERT}) {
+      entries.emplace_back(type, payload);
+   }
+   const auto trace = deliver_trace(eth_code,
+      encode_envelope_with_mixed_attestations(current_epoch(), entries));
+   BOOST_REQUIRE(trace != nullptr);
+   BOOST_REQUIRE(!trace->except);
+
+   BOOST_CHECK(get_nodeowner(CLAIM_ACCOUNT).is_null());
+   BOOST_CHECK(get_nodeownerreg(CLAIM_ACCOUNT).is_null());
+} FC_LOG_AND_RETHROW() }
+
 /// One slot and two fresh-name claims must commit the first, reject the second, and keep epochs moving.
 BOOST_FIXTURE_TEST_CASE(dispatch_node_owner_tier_cap_preserves_epoch_progress, sysio_dispatch_tester) { try {
    namespace owners = sysio_system::test_support::nodeowners;

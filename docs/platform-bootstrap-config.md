@@ -1,22 +1,14 @@
 # Platform bootstrap configuration
 
-Launch-day chains, tokens, reserves, and swap settings are described by a
-single human-authored JSON file validated against a protobuf schema. The
-bootstrap tool replays that file onto the chain inside the epoch-0 bootstrap
-window, replacing the dataset that was previously hard-coded in the cluster
-tooling.
-
-> This is the WIRE **platform** bootstrap config — the launch-day registry
-> state (chains, tokens, reserves, global swap settings). The swap reserves it
-> seeds are one part of that state; it is not itself a DEX. (Earlier drafts
-> called the top-level message `DexConfig`; it is now `BootstrapPlatformConfig`.)
-
-This addresses three launch needs:
+Launch-day chains, tokens, shadow-liq yield pools and pre-launch syndicated
+positions are described by a single human-authored JSON file validated against
+a protobuf schema. The bootstrap tool replays that file onto the chain inside
+the epoch-0 bootstrap window (`sysio.epoch` `current_epoch_index == 0`), where
+every registration is privilege-gated and lands active inline.
 
 | Need | Artifact |
 |---|---|
-| A T5 allocation set aside to back the WIRE side of reserves | `BootstrapPlatformConfig.t5_reserve_allocation` — a genesis-config WIRE amount; config + bootstrap arithmetic, **no contract change** |
-| A T5 allocation set aside for launch DEX integration | `BootstrapPlatformConfig.t5_dex_allocation` — reserved earmark (default 0); the on-chain DEX-seeding mechanism is TBD (launch total set by Kyle / Ken) |
+| A T5 allocation set aside to back the WIRE side of the launch yield pools | `BootstrapPlatformConfig.t5_dex_allocation` — drained by `sysio.liq::regliqpool` |
 | A file the bootstrap tool reads for these settings | `etc/config/dex/dex-config.*.json` |
 | A defined input shape for that file | `libraries/opp/proto/sysio/opp/bootstrap/bootstrap.proto` → message `BootstrapPlatformConfig` |
 
@@ -31,29 +23,30 @@ canonical protobuf-JSON encoding of `BootstrapPlatformConfig`.
 - `etc/config/dex/dex-config.launch.example.json` — strawman mainnet launch
   config (placeholder economics; mainnet token addresses marked
   VERIFY-BEFORE-LAUNCH).
-- `etc/config/dex/dex-config.dev.json` — 1:1 mirror of the dev-cluster dataset
-  (9 tokens, 8 reserves), proving the schema carries the full set and driving
-  the test.
+- `etc/config/dex/dex-config.dev.json` — the dev-cluster dataset (3 chains,
+  9 tokens, 2 liq pools, 3 syndications).
 - `libraries/opp/test/test_bootstrap_platform_config.cpp` — strict-parse +
   invariant test in the `test_opp` binary.
+- `contracts/tests/sysio.synd_tests.cpp` — parses the dev config the same
+  strict way to drive its launch-replay cases.
 
 ## Schema
 
-`BootstrapPlatformConfig` holds the schema version, a deployment label, the two
-T5 earmarks (`t5_reserve_allocation`, `t5_dex_allocation`), and repeated
-`ChainSpec` / `TokenSpec` / `ReserveSpec` plus a single `UwritConfig`.
+`BootstrapPlatformConfig` holds the schema version, a deployment label, the T5
+earmarks, and repeated `ChainSpec` / `TokenSpec` / `LiqPoolSpec` /
+`SyndicationSpec`.
 
 The spec messages deliberately differ from the registry carriers in
-`sysio/opp/types/types.proto` (`Chain` / `Token` / `ChainToken` / `Reserve`),
-which are wire messages with packed-uint64 codes, raw `bytes` addresses, and
-lifecycle fields that are outputs. A hand-authored config wants the opposite:
+`sysio/opp/types/types.proto` (`Chain` / `Token` / `ChainToken`), which are wire
+messages with packed-uint64 codes, raw `bytes` addresses, and lifecycle fields
+that are outputs. A hand-authored config wants the opposite:
 
-- **Codes are strings** (`"ETHEREUM"`, `"USDC"`, `"PRIMARY"`); the tool packs
+- **Codes are strings** (`"ETHEREUM"`, `"USDC"`, `"LIQETH"`); the tool packs
   them via `slug_name` (`[A-Z][A-Z0-9_]{0,7}` -- a code must START with a
   letter, ≤ 8 chars).
-- **Addresses are strings** in chain-native display form (`0x`-hex for EVM,
-  base58 for SVM) so each is verifiable against a block explorer. `bytes` would
-  render as base64 in JSON.
+- **Addresses and pubkeys are strings** in chain-native display form (`0x`-hex
+  for EVM, base58 for SVM) so each is verifiable against a block explorer.
+  `bytes` would render as base64 in JSON.
 - **Amounts are uint64 subunits** (9-decimal unless `precision` says
   otherwise). Proto3 canonical JSON renders 64-bit integers as **quoted
   strings** — amounts must be quoted in authored JSON, since launch-scale
@@ -71,108 +64,74 @@ lifecycle fields that are outputs. A hand-authored config wants the opposite:
 |---|---|
 | `ChainSpec` | `sysio.chains::regchain(kind, code, external_chain_id, name, description)` |
 | `TokenSpec` | `sysio.tokens::regtoken(kind, code, symbol_name, description, precision, address)` then `sysio.tokens::regctok(chain_code, token_code, contract_addr, is_native)` |
-| `ReserveSpec` | `sysio.reserv::regreserve(chain_code, token_code, reserve_code, name, description, initial_chain_amount, initial_wire_amount, source_token_precision, connector_weight_bps, is_private, owner)` — `source_token_precision` is **not** a `ReserveSpec` field: it comes from the referenced `TokenSpec.precision` (see below) |
-| `UwritConfig` | `sysio.uwrit::setconfig(fee_bps, collateral_lock_duration_ms, min_fromwire_amount, fromwire_revert_fee_bps, uwreq_pending_timeout_epochs, uwreq_retention_epochs)` — the spec pins the first two; the caller supplies the rest (see below) |
-| `t5_reserve_allocation` | none — feeds the `setemitcfg` arithmetic below |
-| `t5_dex_allocation` | none yet — reserved earmark; carved out of T5 alongside `t5_reserve_allocation` once the DEX-seeding path lands |
+| `LiqPoolSpec` | `sysio.liq::regliqpool(chain_code, token_code, pair_symbol, initial_chain_amount, initial_wire_amount, fee, locked_shares, conversion_horizon_sec, depth_cap_bps, clip_floor)` — mints the LCO shadow to `sysio`, deposits it with the WIRE side from the `sysio` treasury into `sysio.swap`, and creates the pair with the shadow as its yield leg. The shadow symbol must already exist; exactly one pool per shadow |
+| `SyndicationSpec` | `sysio.synd::importsynd(chain_code, token_code, credits[] {pubkey, amount})`, batched by the tool; `sysio.synd::importdone` closes the import |
+| `t5_dex_allocation` | none — feeds the `setemitcfg` arithmetic below |
 
-The `regreserve` signature (with `is_private` + `owner`) and the ms-based
-`setconfig` are the reserve-and-swap-beta surface; this config slots directly
-onto them. `owner` is a WIRE account name (`sysio::name`): empty for public
-reserves, the owning account for private ones.
+`TokenSpec.precision` is the **depot-frame precision**, `min(native precision,
+9)`. `sysio.tokens::regtoken` rejects anything above 9, which is why V4 bounds
+`precision` at 9 rather than 18: a token declared at, say, 18 would satisfy a
+wider validator and then abort the irreversible bootstrap at `regtoken`. Tokens
+whose native precision exceeds the frame (ETH at 18) declare the frame value and
+are downscaled at the outpost boundary.
 
-`regreserve`'s eleven-argument signature includes `source_token_precision` as its
-**eighth** argument, which no `ReserveSpec` field supplies. It is the
-**depot-frame precision of the paired
-token** — i.e. the referenced `TokenSpec.precision`, which is itself
-`min(native precision, 9)`. So the mapping is a lookup, not a new config field:
-resolve `(chain_code, token_code)` to its `TokenSpec` and pass that spec's
-`precision`. `regreserve` rejects a value above 9 (`WIRE_PRECISION`) with
-*"source_token_precision exceeds the depot frame (9) — the outpost must downscale
-to min(native, 9)"*, which is why V4 bounds `precision` at 9 rather than 18:
-a token declared at, say, 18 would satisfy a wider validator and then abort the
-irreversible bootstrap at `regtoken`/`regreserve`. Tokens whose native precision
-exceeds the frame (ETH at 18) declare the frame value and are downscaled at the
-outpost boundary.
+`SyndicationSpec.pubkey` is the identity `SyndicateLIQ.user` carries: base58 of
+the 32-byte Ed25519 key on SVM, 0x-hex of the 33-byte **compressed** secp256k1
+point on EVM (never the 20-byte address). Each credit mints to the account that
+pubkey has linked through `sysio.authex`, or parks it until the link is made.
 
-`UwritConfig` carries only `fee_bps` and `collateral_lock_duration_ms`, while
-`setconfig` takes six arguments. The remaining four —
-`min_fromwire_amount`, `fromwire_revert_fee_bps`, `uwreq_pending_timeout_epochs`,
-`uwreq_retention_epochs` — are **not part of this spec**: a bootstrap caller
-passes the contract's `uw_config` in-struct defaults (5 WIRE floor, 500 bps
-revert fee, and the two uwreq lifecycle windows) unless it has a reason to
-override them.
+### Defined but not consumed
 
-`fee_bps` is the **network** fee and not the whole effective swap fee. Each
-participating non-WIRE leg's reserve independently charges its own
-`owner_fee_bps` off the same WIRE leg; that rate is **not** in `ReserveSpec` and
-is set post-bootstrap via `sysio.reserv::setrsvfee`. The network fee itself
-splits 50/50 between the winning underwriter and a rewards pool
-(`sysio.reserv::FEE_UNDERWRITER_SHARE_BPS`), and that pool splits again by the
-optional `reservcfg` dial `fee_emissions_share_bps` — which nothing seeds, so it
-reads zero until `sysio.reserv::setconfig` first persists a row.
+`bootstrap.proto` still defines `ReserveSpec`, `UwritConfig`,
+`BootstrapPlatformConfig.reserves`, `BootstrapPlatformConfig.uwrit` and
+`t5_reserve_allocation`, and both JSON files still carry values for them. The
+contracts they targeted (`sysio.reserv`, `sysio.uwrit`) have been removed, so no
+bootstrap action consumes them; only `test_bootstrap_platform_config.cpp` still
+parses and validates them (V6–V9).
 
-## T5 reserve earmark
+## T5 DEX earmark
 
-With `A` = the launch T5 allotment, `E` = `t5_reserve_allocation`, and
-`W` = Σ `reserves[].initial_wire_amount`:
+With `A` = the launch T5 allotment, `D` = `t5_dex_allocation`, and
+`W` = Σ `liq_pools[].initial_wire_amount`:
 
-`regreserve` drains each reserve's WIRE side from the `sysio` emissions
-treasury at registration (a real inline `sysio.token::transfer` authorized by
-`sysio@active`). The emissions formula gates on
+`regliqpool` drains each pool's WIRE side from the `sysio` emissions treasury at
+registration. The emissions formula gates on
 `t5_distributable − t5_floor − total_distributed`, and the per-epoch readiness
 gate independently checks the real treasury balance, so the earmark must sit
 **outside** the distributable pool:
 
-1. Config invariant: `0 < W ≤ E`.
-2. Bootstrap sets `setemitcfg.t5_distributable = A − E` (`t5_floor` unchanged —
+1. Config invariant: `W ≤ D`, and `D > 0` whenever any pool is seeded.
+2. Bootstrap sets `setemitcfg.t5_distributable = A − D` (`t5_floor` unchanged —
    the floor is inside the distributable pool).
-3. End-of-bootstrap `sysio` balance ≥ `t5_distributable + E`; after reserves
+3. End-of-bootstrap `sysio` balance ≥ `t5_distributable + D`; after the pools
    drain `W`, balance ≥ `t5_distributable`, so the readiness gate never trips
-   because of reserve funding.
-4. Remainder `E − W` stays in the treasury, inert and outside emissions
+   because of pool funding.
+4. Remainder `D − W` stays in the treasury, inert and outside emissions
    accounting.
 
-Putting `E` *inside* `t5_distributable` instead would make the emissions math
+Putting `D` *inside* `t5_distributable` instead would make the emissions math
 count WIRE that has physically left the treasury — the readiness gate blocks at
 launch scale, and effective emissions headroom silently shrinks by `W`. Hence
 the outside-the-pool earmark.
 
-Each bootstrap `regreserve` transaction must carry `sysio@active` (for the
-treasury drain) alongside `sysio.reserv@active`.
-
-## T5 DEX earmark
-
-`t5_dex_allocation` (`D`) is a second, parallel carve-out of the T5 allotment,
-reserved for launch DEX integration — at least one DEX is seeded at launch, with
-more added later by council vote. It follows the same outside-the-pool rule as
-the reserve earmark, so the full T5 carve-out is `E + D` and
-`t5_distributable = A − E − D`.
-
-It is **reserved**: the on-chain DEX-seeding mechanism is not finalized, so the
-bootstrap tool does not yet drain `D` — the field is carried for forward
-compatibility and defaults to `0` (earmark disabled). The launch total is a
-per-deployment economics decision (Kyle / Ken own the figure). When the seeding
-path lands, the `A − E` arithmetic above generalizes to `A − E − D` with no
-shape change to this config.
-
 ## Validation
 
 Parsing is **strict**: unknown / misspelled keys are rejected, not dropped,
-because the file is hand-authored and drives irreversible actions. A validator
-(reproduced in the test, and to be shared with the bootstrap tool) enforces:
+because the file is hand-authored and drives irreversible actions. The
+validator in `test_bootstrap_platform_config.cpp` enforces:
 
 | # | Invariant |
 |---|---|
 | V1 | `schema_version == 1`; `network` non-empty |
 | V2 | every code is a valid slug: `[A-Z][A-Z0-9_]{0,7}` -- leading character must be a letter, ≤ 8 chars |
 | V3 | chain codes unique; exactly one `CHAIN_KIND_WIRE` chain, code `WIRE` |
-| V4 | token codes unique; `chain_code` declared; `precision` ∈ 1..9 (the depot frame — `sysio.tokens::regtoken` rejects anything higher, so a wider bound here would pass validation and then fail mid-bootstrap); native ⇔ kind `NATIVE` + empty address; non-native address well-formed for the chain kind (EVM `0x`+40 hex; SVM base58 → 32 bytes) |
+| V4 | token codes unique; `chain_code` declared; `precision` ∈ 1..9 (the depot frame); native ⇔ kind `NATIVE` + empty address; non-native address well-formed for the chain kind (EVM `0x`+40 hex; SVM base58 → 32 bytes) |
 | V5 | exactly one native token per non-depot chain |
-| V6 | reserve `(chain, token, code)` unique; references a declared binding; not on the depot; `0 < connector_weight_bps ≤ 9999`; amounts > 0 |
-| V7 | Σ `initial_wire_amount` ≤ `t5_reserve_allocation` > 0 |
-| V8 | `is_private` ⇒ `owner` a valid account name; else `owner` empty |
-| V9 | `uwrit` present; `fee_bps ≤ 9999`; lock duration > 0 |
+| V6–V9 | checks on the unconsumed `reserves` / `uwrit` / `t5_reserve_allocation` fields (see [Defined but not consumed](#defined-but-not-consumed)) |
+| V10 | `t5_dex_allocation > 0` when any liq pool is seeded; Σ `liq_pools[].initial_wire_amount` ≤ `t5_dex_allocation` |
+| V11 | each liq pool references a declared `TOKEN_KIND_LIQ` token on its chain and is unique; `pair_symbol` 1..7 characters `[A-Z]`; seeds > 0; `fee ≤ 9999`; `conversion_horizon_sec > 0`; `depth_cap_bps` ∈ 1..10000; `clip_floor > 0` |
+| V12 | each syndication references a declared liq token on its chain; `pubkey` fits the chain family; `amount > 0` |
+| V13 | a non-zero `custody_total` equals the pool's `initial_chain_amount` plus the sum of that token's `syndications` |
 
 Run the test:
 
@@ -183,24 +142,17 @@ ninja -C build test_opp
 
 ## Follow-ups
 
-- Wire the bootstrap tool to consume `BootstrapPlatformConfig` (the cluster phases become a
-  loop over the parsed config, same order: chains → tokens → bindings →
-  reserves → uwrit), injecting per-deployment contract addresses from
-  deployment artifacts into the dev config.
-- Regenerate the TS/Solidity/Solana model bundles so the tool imports the
-  generated `BootstrapPlatformConfig` type.
-- Fill in launch economics (`t5_reserve_allocation` + per-reserve amounts) and
-  verified mainnet addresses; freeze `dex-config.mainnet.json`.
+- Wire the bootstrap tool to consume `BootstrapPlatformConfig` (the cluster
+  phases become a loop over the parsed config, in order: chains → tokens →
+  bindings → liq pools → syndication import), injecting per-deployment contract
+  addresses from deployment artifacts into the dev config.
+- Fill in launch economics (`t5_dex_allocation` + per-pool amounts) and verified
+  mainnet addresses; freeze `dex-config.mainnet.json`.
 
 ## Open questions
 
-- The earmark `E` and per-reserve amounts are economics decisions
-  (placeholders today).
-- Launch token set: Solana SPL stables? Liquid-staking tokens (addresses exist
-  only once those contracts deploy)?
-- Whether to seed any private reserves directly at launch, or create them all
-  post-launch via the authex-gated outpost flow (default assumption: all
-  post-launch).
+- The earmark `D` and per-pool amounts are economics decisions (placeholders
+  today).
 - Whether to unify the emissions genesis numbers (`A`, `t5_distributable`,
-  `t5_floor`) with this config so the `A − E` arithmetic is checkable in one
+  `t5_floor`) with this config so the `A − D` arithmetic is checkable in one
   place.
