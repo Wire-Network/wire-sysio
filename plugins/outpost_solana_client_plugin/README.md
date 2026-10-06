@@ -94,9 +94,10 @@ Loads one or more Anchor IDL JSON files for use with `solana_program_client`:
 
 Anchor IDL program name of the Solana OPP outpost. When an outpost client is
 constructed, the loaded `--solana-idl-file` set is filtered to programs whose
-IDL name matches this value. The default targets the standalone `opp_outpost`
-program; the clean-room outpost implementation is hosted inside the
-`liqsol-core` program, whose generated IDL is named `liqsol_core`:
+IDL name matches this value. The default names a standalone `opp_outpost`
+program, which wire-solana no longer builds: the OPP outpost is hosted inside the
+`liqsol-core` program, whose generated IDL is named `liqsol_core`, so deployments
+pass:
 
 ```
 --solana-outpost-program-name liqsol_core
@@ -451,25 +452,23 @@ Settlement of a consensus envelope is a separate instruction (`dispatch_attestat
 driven from the on-chain cursor, and every effect account a handler resolves out of
 `remaining_accounts` must be derived by this relay. `extract_inbound_effects` walks the
 envelope once, in dispatch order, and `build_dispatch_manifests` derives one manifest per
-attestation. The shapes and what each derives:
+attestation. Attestations that need no effect account (`OPERATORS`, `BATCH_OPERATOR_GROUPS`)
+keep an empty manifest so the indices stay aligned with the on-chain cursor. The one shape
+that needs effect accounts, and what it derives:
 
 | `effect_shape` | Attestation | Accounts derived |
 |---|---|---|
-| `withdraw_remit`, `slash`, `deposit_revert` | `OPERATOR_ACTION` | the operator / depositor, their `CollateralPosition` PDA, and under SPL custody the collateral vault, the destination ATA and the token program |
-| `swap_remit`, `swap_revert` | `SWAP_REMIT`, `SWAP_REVERT` | the `Reserve` PDA, and under SPL custody the reserve vault, the recipient's ATA, the custody mint, its token program and any transfer-hook metas |
-| `reserve_ready`, `reserve_create_cancelled` | `RESERVE_READY`, `RESERVE_CREATE_CANCELLED` | the `Reserve` PDA, plus the creator's refund accounts for the cancel |
 | `desyndicate_liq` | `DESYNDICATE_LIQ` | the liqSOL pool's `GlobalState` and `DistributionState` singletons, the pool authority, the pool and user Token-2022 ATAs with their `UserRecord`s, the bucket ATA, the liqSOL mint, Token-2022, the bucket authority, the mint's transfer-hook program and extra-metas PDA, and liqsol-core itself; plus, for every non-zero request id and even when `DistributionState` cannot be read, the writable `PendingPayout` PDA (`["pending_desyndication", request_id_le8]`) the handler stores the payout at whenever it cannot pay inline: the outpost is frozen, the solvency check finds a custody shortfall, a share record is still the legacy layout, or the settlement meets any other chain-state refusal (wire-solana `PendingPayoutReason`: `OutpostFrozen`, `CustodyShortfall`, `LegacyUserRecord`, `SettlementRefused`). Without it any of these aborts the dispatch with `EffectAccountMissing` |
 
-Custody is read from the account the on-chain handler branches on (`Reserve`,
-`CollateralPosition`, `DistributionState`), never from the mutable `OutpostConfig` token
-map. An absent account degrades to the accounts the handler needs to log-and-skip; a
+Custody is read from the account the on-chain handler branches on (`DistributionState`),
+never from the mutable `OutpostConfig` token map. An absent account degrades to the accounts the handler needs to log-and-skip; a
 present but unreadable one throws, because a guessed manifest is one the program is
 guaranteed to abort on. Each shape's account list is in lock-step with the program's
 `require_remaining_account` calls in wire-solana `inbound.rs`: a program-side change to
 what a handler requires and the matching shape here must move together. The relay
-boot-checks the declarations it decodes (`Reserve`, `CollateralPosition`,
-`EpochDeliveries`, `LatestOutboundEnvelope`, and `DistributionState` on a program that
-declares it) so a drifted IDL fails at startup rather than on the first drain.
+boot-checks the declarations it decodes (`EpochDeliveries`, `LatestOutboundEnvelope`, and
+`DistributionState` on a program that declares it) so a drifted IDL fails at startup rather
+than on the first drain.
 
 ## Outpost Cranks
 

@@ -20,7 +20,7 @@ before a chain-specific client tries to resolve one.
 ### `sysio/outpost_client/outpost_client.hpp` — the SPI
 
 `outpost_client` is the abstract interface between the plugins that orchestrate OPP work
-(`batch_operator_plugin`, `underwriter_plugin`) and the chain-specific concretes. An orchestrator holds an
+(`batch_operator_plugin`) and the chain-specific concretes. An orchestrator holds an
 `outpost_client_ptr` (a `std::shared_ptr<outpost_client>`) and calls only these virtuals; it never interprets
 an EVM address, a Solana public key, a PDA, or a signature-provider format.
 
@@ -33,7 +33,7 @@ an EVM address, a Solana public key, a PDA, or a signature-provider format.
 | `to_string()` | `{chain_code}:{ChainKind_Name}:{chain_id}`. The default prints `chain_code()` as the raw packed integer, so the row registered as `ETH` against a local chain renders `23373212024832:CHAIN_KIND_EVM:31337`. Virtual, with a default derived from the three getters |
 | `deliver_outbound_envelope(epoch_index, envelope_bytes, deadline)` | OPP outbound — submit one envelope to the remote chain; returns the chain-native transaction id |
 | `read_inbound_envelope(epoch_index, deadline)` | OPP inbound — return the envelope the remote chain produced for this epoch, or an empty vector when the latest slot does not match |
-| `uw_commit(uw_request_id, uic_bytes, deadline)` | Underwriter commit — relay a signed `UnderwriteIntentCommit` through the outpost; returns only after on-chain confirmation |
+| `crank_outpost(epoch_index, deadline)` | Drive the outpost's permissionless per-epoch instructions right after this operator's delivery lands; best-effort, retried next epoch. The default cranks nothing; Solana overrides it with `report_liq_yield`, Ethereum with `SyndicationPool.realizeYield` |
 
 Two rules bind every implementation. Each RPC-bound call must enforce the `deadline` it is passed, so a hung
 remote chain cannot starve a cron worker; the protected helper `throw_if_past_deadline(deadline_abs, op)`
@@ -136,4 +136,4 @@ so the base class's default implementation is not under test. Higher-fidelity mo
 - [`outpost_solana_client_plugin`](../outpost_solana_client_plugin/README.md) — the Solana concrete.
 - `signature_provider_manager_plugin` — required dependency; supplies the signers the concretes resolve by name.
 - `http_client_plugin` — owns the process-wide `--outbound-http-*` transport options this plugin's RPC policy reads.
-- `batch_operator_plugin`, `underwriter_plugin` — the SPI's consumers.
+- `batch_operator_plugin` — the SPI's consumer.

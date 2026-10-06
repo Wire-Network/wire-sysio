@@ -1,7 +1,7 @@
 # System-contract upgrade order
 
 The system contracts are not independent deployables. `sysio.epoch::advance`
-inlines actions into six other contracts, and the emissions gate reads two more
+inlines actions into four other contracts, and the emissions gate reads two
 contracts' tables, so a release's contract builds are only correct **as a set**.
 Upgrading them one at a time creates windows in which a new caller meets an old
 callee.
@@ -16,22 +16,19 @@ Contracts outside the coupled set stage separately, in any order.
 ## The deployment recipe
 
 "Just `setcode` everything in one transaction" fails twice over — once on which
-action deploys each account, once on transaction size — and both bite this
-release specifically.
+action deploys each account, once on transaction size.
 
 **1. The deploy action depends on WHICH account holds the contract — the
 transaction mixes both.**
 
-*Separate system accounts* (`sysio.epoch`, `sysio.reserv`, `sysio.opreg`,
-`sysio.uwrit`, …) deploy through **`sysio.roa::setsyscode(account, vmtype,
-vmversion, code)` / `sysio.roa::setsysabi(account, abi)`**. Those set the
+*Separate system accounts* (`sysio.epoch`, `sysio.opreg`, `sysio.msgch`,
+`sysio.chalg`, `sysio.synd`, …) deploy through **`sysio.roa::setsyscode(account,
+vmtype, vmversion, code)` / `sysio.roa::setsysabi(account, abi)`**. Those set the
 code/abi AND reconcile the account's gifted RAM to its exact new usage out of
 sysio's pool via `giftram`, measured after the write (re-callable: a smaller
 re-deploy reclaims). A raw `setcode` here skips that reconciliation and leaves
-the account paying for the new size out of a finite quota it does not have —
-not theoretical for this release, where `sysio.reserv.wasm` grows **6,040
-bytes** and `sysio.opreg.wasm` grows **2,447 bytes** against a system account's
-small creation allowance.
+the account paying for any growth out of a finite quota it does not have — a
+system account only has a small creation allowance.
 
 *The root `sysio` account* — which holds `sysio.system` and **is the RAM pool
 itself** — deploys with the **native `setcode` / `setabi`**. `giftram` cannot
@@ -45,37 +42,33 @@ lower than the actual quota, and it fails silently: sysio's limit is finite, so
 production bootstrap deploys `system` on `sysio` natively (the harness encodes
 the same split as `ContractSteps.DeployMode.raw` for bios/system/roa).
 
-So the atomic transaction for this release's trio carries **native
-`setcode`/`setabi` for `sysio`** plus **ROA `setsyscode`/`setsysabi` for
-`sysio.epoch` and `sysio.reserv`**.
+So an atomic transaction that includes `sysio.system` carries **native
+`setcode`/`setabi` for `sysio`** plus **ROA `setsyscode`/`setsysabi` for every
+other account in the set**.
 
-**2. The whole release does not fit in one transaction.** The five changed
-WASMs total **579,408 bytes**, already past the default
-`max_transaction_net_usage` of **524,288** (`config::default_max_block_net_usage
-/ 2`) before ABIs or action wrapping. `sysio.msig::propose` receives the
-complete inner transaction before it chunks storage, so proposing through msig
-does not dodge that input NET.
-
-What fits is the **compatibility-coupled trio** — `sysio.reserv`,
-`sysio.epoch`, `sysio.system` — the three the edges below actually couple:
+**2. A large set does not fit in one transaction.** The default
+`max_transaction_net_usage` is **524,288** bytes (`config::default_max_block_net_usage
+/ 2`), and `sysio.msig::propose` receives the complete inner transaction before it
+chunks storage, so proposing through msig does not dodge that input NET. The
+contracts on `advance`'s path are not small (sizes of the builds in this tree):
 
 | | code | abi | total |
 |---|---|---|---|
-| `sysio.epoch` | 75,579 | 6,758 | 82,337 |
-| `sysio.system` | 174,138 | 61,916 | 236,054 |
-| `sysio.reserv` | 84,026 | 24,647 | 108,673 |
-| **trio** | **333,743** | **93,321** | **427,064** |
+| `sysio.epoch` | 95,314 | 6,758 | 102,072 |
+| `sysio.system` | 277,387 | 66,071 | 343,458 |
+| `sysio.opreg` | 115,210 | 27,979 | 143,189 |
+| `sysio.msgch` | 177,916 | 21,421 | 199,337 |
+| `sysio.chalg` | 32,009 | 6,797 | 38,806 |
 
-That leaves ~97 KB against the 524,288 ceiling — enough, but not by so much
-that it can be assumed. **Preflight the packed size of the actual proposal**
-rather than trusting this table, which is a snapshot of one release.
+All five together exceed the ceiling, so a release that changes every one of
+them cannot deploy them atomically. Put in the atomic set only the contracts a
+release's changes actually couple (see [The cross-contract
+edges](#the-cross-contract-edges)), and **preflight the packed size of the actual
+proposal** rather than trusting this table, which is a snapshot of one build.
 
-`sysio.opreg` and `sysio.uwrit` are uncoupled (they gain no action another
-contract inlines, and no other contract reads their new tables), so they stage
-in their own transaction, before or after the trio.
-
-When a future release's coupled set does NOT fit, the options are: split off
-whatever is genuinely uncoupled and stage it, or raise
+When a release's coupled set does NOT fit, the options are: split off whatever is
+genuinely uncoupled and stage it (see [Staged
+rollout](#staged-rollout-when-one-transaction-is-not-possible)), or raise
 `max_transaction_net_usage` via `setparams` first — as a **tested** path, with
 the raise proposed and confirmed before the deploy proposal, never assumed to
 work on the day.
@@ -121,17 +114,18 @@ Everything `sysio.epoch::advance` inlines, directly:
 
 | Callee | Actions |
 |---|---|
-| `sysio.reserv` | `sweepclaims` |
-| `sysio.uwrit` | `chklocks`, `pruneuwreqs`, `drainfwq` |
 | `sysio.opreg` | `recorddel`, `termcheck`, `flushwtdw` |
 | `sysio.chalg` | `slashop` |
 | `sysio.msgch` | `queueout`, `buildenv` |
 | `sysio` | `accrueepoch`, `rcrdbatch`, `payepoch` |
 
-Those callees inline further (`drainfwq` → `sysio.reserv::refundwire`,
-`termcheck` → the `sysio.opreg` remit path, `payepoch` → `sysio.token::transfer`),
-so the transitive subtree — not just the table above — sits inside `advance`'s
-abort surface.
+Those callees inline further (`slashop` → `sysio.opreg::slash`, `termcheck` → the
+`sysio.opreg` termination path that credits `remitclaims`, `payepoch` →
+`sysio.token::transfer` for the pushed capex and governance buckets), so the
+transitive subtree — not just the table above — sits inside `advance`'s abort
+surface. `advance` itself is inlined by `sysio.msgch::chkcons` (and by
+`sysio.msgch::bootstrap` at epoch 0), so `sysio.msgch` is both a caller and a
+callee of `sysio.epoch`.
 
 Independently of inlines, the emissions readiness gate in `sysio.epoch` **reads**
 `sysio.system`'s `emitcfg`, `t5state` and `payclaimtot`, and `sysio.token`'s
@@ -201,8 +195,7 @@ mixed or mid-period deployment. `rcrdbatch` prunes the exact oldest retained
 roster, and `payepoch` removes at most 20 history rows per payment, so even a
 malformed gapped table cannot turn cleanup into an unbounded `advance`.
 If `payepoch` sees missing, stale, non-contiguous, or over-cap history, it
-retains that period's batch-emission slice in the treasury, leaves the swap-fee
-bucket in `sysio.reserv` for the next complete period, records the retained
+retains that period's batch-emission slice in the treasury, records the retained
 emission and incomplete-history status in `epochlog`, and drains stale history
 monotonically before resuming batch payouts. Producer, capex, and governance
 processing still completes. The runtime also shortens a legacy cadence when
@@ -236,28 +229,25 @@ state that aborts every advance.
 
 ## Staged rollout (when one transaction is not possible)
 
-For the SEC-150 claimable-payout release the order is:
-
-```
-sysio.reserv  ->  sysio.epoch  ->  sysio.system
-```
-
-`sysio.opreg` and `sysio.uwrit` are free to land anywhere in the sequence: they
-gain no action any other contract inlines (`claimremit` is user-initiated), and
-no other contract reads their new tables.
+Derive the order from the two rules above for the edges a release actually
+changes. For the edges on `advance`'s path today:
 
 | Edge | Why |
 |---|---|
-| `sysio.reserv` before `sysio.epoch` | The new `advance` inlines `sysio.reserv::sweepclaims`, guarded only on the account existing. An old `sysio.reserv` build has the account and not the action, so the inline asserts and every advance aborts. |
-| `sysio.epoch` before `sysio.system` | The new `payepoch` retains WIRE in `payclaims` and reserves it in `payclaimtot`. The old gate counts that backing as spendable, so a later pay period can double-commit it and leave credited claims underfunded. |
+| `sysio.opreg`, `sysio.chalg`, `sysio.msgch` before `sysio.epoch`, when the release adds or changes an action `advance` inlines into them | Call edge: the new `advance` would otherwise reach a callee that cannot dispatch the action, and every advance aborts. |
+| `sysio` (`sysio.system`) before `sysio.epoch`, when the release adds or changes `accrueepoch` / `rcrdbatch` / `payepoch` | Call edge — but an action `sysio.system` does not implement is silently ignored rather than asserted, so this skew drops the effect instead of stalling. |
+| `sysio.epoch` before `sysio.system`, when `sysio.system` gains state the emissions gate must reserve (as `payclaimtot` reserves unclaimed `payclaims`) | Table edge: the old gate counts the new backing as spendable, so a later pay period can double-commit it and leave credited claims underfunded. |
+| `sysio.epoch` before `sysio.msgch`, when the release adds or changes an action `chkcons` inlines into `sysio.epoch` | Call edge in the other direction. |
 
-Every intermediate state of that order is safe. A new `sysio.reserv` under an old
-`sysio.epoch` is simply never asked to sweep — the retention deadline then rests
-on `credit_wire_claim`'s opportunistic sweep until epoch catches up. A new
-`sysio.epoch` under an old `sysio.system` reads a `payclaimtot` whose KV key does
-not exist yet, so `get_or_default` yields a zero reserve — the correct answer
-while nothing is credited, and the absent-key case rather than the
-short-decode one (see [above](#why-a-mixed-version-is-not-merely-degraded)).
+When a release changes both directions of one pair, the two contracts are a
+compatibility-coupled set and must deploy in one transaction; if they do not fit,
+make the change layout-compatible so that either intermediate state is safe, or
+raise `max_transaction_net_usage` first.
+
+A reader that meets a KV key the new writer has not created yet reads the
+default from `get_or_default` — the correct answer while nothing is written, and
+the absent-key case rather than the short-decode one (see
+[above](#why-a-mixed-version-is-not-merely-degraded)).
 
 ## Downgrades
 
@@ -271,13 +261,12 @@ short-decode one (see [above](#why-a-mixed-version-is-not-merely-degraded)).
 
 **A downgrade is not the upgrade run backwards. It is a data-migration problem
 first, and a code-ordering problem second** — because by the time you want to
-roll back, all three claim tables may hold value that only the NEW code can pay
-out:
+roll back, the claim tables may hold value that only the NEW code can pay out:
 
 | Table | Contract | Paid out by | Stranded when that contract rolls back |
 |---|---|---|---|
 | `payclaims` | `sysio.system` | `claimpay` | earned epoch pay |
-| `wireclaims` | `sysio.reserv` | `claimwire` | swap payouts + refunds already withheld from recipients |
+| `wireclaims` | `sysio.bond` | `claimwire` | WIRE yield earned by underwriters and banked at `claim` |
 | `remitclaims` | `sysio.opreg` | `claimremit` | debited operator collateral |
 
 Every one of those balances is value already taken from someone's spendable
@@ -292,14 +281,14 @@ resumes double-committing while the pile of unreachable claims grows.
 The safe procedure is therefore:
 
 1. **Quiesce the credit writers** so no new claim rows appear.
-2. **Drain or migrate all three claim tables** — claimants pull, or the balances
+2. **Drain or migrate the claim tables** — claimants pull, or the balances
    are migrated. This step is the one that actually gates the rollback, and it
    cannot be completed unilaterally: a claimant who never claims holds it open.
-3. **Roll back the coupled trio in the order `sysio.system` → `sysio.epoch` →
-   `sysio.reserv`** — the mirror of the upgrade order, so the writer is retired
-   before the reader that accounts for it, and the caller before the callee it
-   would otherwise inline into.
-4. **Roll `sysio.opreg` back only once its remits are handled.**
+3. **Roll back the coupled set in the mirror of the upgrade order** — the writer
+   is retired before the reader that accounts for it, and the caller before the
+   callee it would otherwise inline into.
+4. **Roll `sysio.opreg` back only once its remits are handled, and `sysio.bond`
+   only once its `wireclaims` are drained.**
 
 **A live chain with uncooperative claimants is not safely downgradeable** by
 code order alone. If a rollback has to happen anyway, the outstanding balances

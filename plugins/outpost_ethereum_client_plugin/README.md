@@ -3,10 +3,10 @@
 `outpost_ethereum_client_plugin` owns this node's connections to EVM chains. It builds one policy-enforcing
 `ethereum_client` per configured endpoint — each bound to a named Ethereum signature provider and to a
 verified numeric chain id — loads the contract ABIs those connections are driven through, and hands out
-`outpost_client` concretes that speak the chain-agnostic OPP SPI on top of `OPP.sol`, `OPPInbound.sol`, and
-`OperatorRegistry.sol`. An operator enables it whenever the node runs an OPP daemon against an EVM outpost:
-`batch_operator_plugin` and `underwriter_plugin` both name it in `APPBASE_PLUGIN_REQUIRES`, so either of
-those pulls it in, and it can also be loaded alone (as the bundled RPC tool does) to talk to an EVM endpoint
+`outpost_client` concretes that speak the chain-agnostic OPP SPI on top of `OPP.sol` and `OPPInbound.sol`
+(plus the outpost's `SyndicationPool.sol` for the per-epoch crank). An operator enables it whenever the node
+runs an OPP daemon against an EVM outpost: `batch_operator_plugin` names it in `APPBASE_PLUGIN_REQUIRES`, so
+the batch operator pulls it in, and it can also be loaded alone (as the bundled RPC tool does) to talk to an EVM endpoint
 directly.
 
 ## How it works
@@ -27,19 +27,19 @@ plugin_initialize
    v
    publish the client map (only after every client succeeded)
 
-batch_operator_plugin / underwriter_plugin
-   |  create_outpost_client(client-id, chain_code, chain_id, opp, oppInbound, operatorRegistry)
+batch_operator_plugin
+   |  create_outpost_client(client-id, chain_code, chain_id, opp, oppInbound)
    v
-outpost_ethereum_client  -- deliver_outbound_envelope / read_inbound_envelope / uw_commit
+outpost_ethereum_client  -- deliver_outbound_envelope / read_inbound_envelope / crank_outpost
 ```
 
 ### Endpoints, signers, and chain ids
 
 Clients come from exactly one of two sources. The check is an exclusive-or, so configuring both **and**
 configuring neither are rejected with the same message, `Configure exactly one of
---outpost-ethereum-client-config-file or --outpost-ethereum-client`. Because `batch_operator_plugin` and
-`underwriter_plugin` name this plugin in `APPBASE_PLUGIN_REQUIRES`, a node that loads either of them must
-configure an Ethereum client source or it will not start, even if it only intends to serve a Solana
+--outpost-ethereum-client-config-file or --outpost-ethereum-client`. Because `batch_operator_plugin` names
+this plugin in `APPBASE_PLUGIN_REQUIRES`, a node that loads it must configure an Ethereum client source or it
+will not start, even if it only intends to serve a Solana
 outpost.
 
 A **command-line spec** is `<client-id>,<signature-provider-id>,<rpc-url>[,<chain-id>]`. With three fields
@@ -87,9 +87,9 @@ endpoint cannot occupy a cron worker past its budget.
 
 ### The contract clients
 
-Three typed wrappers are built over the shared connection, each only when its address was supplied to
-`create_outpost_client`; passing an empty string for the others is normal, and calling an SPI method whose
-wrapper was not provisioned asserts with a message naming the missing address. A fourth, the syndication
+Two typed wrappers are built over the shared connection, each only when its address was supplied to
+`create_outpost_client`; passing an empty string for the other is normal, and calling an SPI method whose
+wrapper was not provisioned asserts with a message naming the missing address. A third, the syndication
 pool's, is bound by the crank once the outpost names the pool (see [Outpost cranks](#outpost-cranks)).
 State-changing calls go through `create_tx_and_confirm`, which returns only after on-chain inclusion plus
 confirmations — OPP writes are consensus-critical and must not silently drop.
@@ -98,7 +98,6 @@ confirmations — OPP writes are consensus-critical and must not silently drop.
 |---|---|---|
 | `opp_contract_client` | `OPP.sol` | `emitOutboundEnvelope(uint32)` (recovery-only write; no in-tree steady-state caller), `getLatestOutboundEnvelope()` view |
 | `opp_inbound_contract_client` | `OPPInbound.sol` | `epochIn(uint32,uint16,uint16,uint32,bytes)`, `discardEnvelopeChunks()`, `nextEpochIndex()` view, `envelopeChunkState(address)` view, `attestationHandlers(uint16)` view |
-| `operator_registry_contract_client` | `OperatorRegistry.sol` | `commit(bytes)` |
 | `syndication_pool_contract_client` | `SyndicationPool.sol` (Wire-Network/wire-ethereum#207) | `realizeYield()` |
 
 ### Outbound delivery and chunking
@@ -127,18 +126,13 @@ malformed state decodes as all-zero and degrades to starting fresh, which the co
 no-ops. A mid-sequence failure simply abandons the tick; the next one restarts from the on-chain high-water
 mark.
 
-### Inbound reads and underwriter commits
+### Inbound reads
 
 `read_inbound_envelope` makes one `getLatestOutboundEnvelope` view call at the **`finalized`** block tag, not
 `latest`. WIRE consensus on inbound is committed forward against this read, so an operator that read at
 `latest` could reach WIRE-side consensus on a slot that a reorg then removes. The decoded result's epoch is
 compared with the requested one and a mismatch returns an empty vector at debug level, since observing the
 preceding epoch is normal until the consensus-reaching delivery overwrites the slot.
-
-`uw_commit` hex-encodes the canonical `UnderwriteIntentCommit` bytes and calls `OperatorRegistry.commit`,
-returning the transaction hash only after confirmation. The outpost binds the signed EVM caller and the
-claimed ACTIVE roster identity before queuing the unchanged bytes; the WIRE depot remains authoritative for
-the embedded permission signature and bond.
 
 ### Outpost cranks
 
@@ -264,7 +258,6 @@ Per-client runtime lines are prefixed with the SPI label `outpost_ethereum_clien
 - `resuming epoch=... delivery at chunk ...`, `discarded a superseded epoch=... staging header`, and
   `skipping epoch=... delivery — the outpost has ...` on the chunk-resume paths.
 - `read inbound envelope epoch=... bytes=...` after a successful inbound read.
-- `uw_commit confirmed uwreq=... tx_hash=... bytes=...` after a confirmed underwriter commit.
 - Warning-level lines for every malformed view result (`envelopeChunkState returned non-string variant`,
   `latestOutboundEnvelope data_ not a string`, and siblings); an epoch mismatch on the inbound slot stays at
   debug level so steady-state polling is not noisy.
@@ -313,4 +306,3 @@ counter address.
 - `signature_provider_manager_plugin` — required dependency; supplies the Ethereum signer resolved by name.
 - `http_client_plugin` — owns the process-wide `--outbound-http-*` transport fallbacks.
 - `batch_operator_plugin` — calls `create_outpost_client` for the OPP envelope path (`OPP.sol` + `OPPInbound.sol`).
-- `underwriter_plugin` — calls `create_outpost_client` for the `OperatorRegistry.sol` commit relay.

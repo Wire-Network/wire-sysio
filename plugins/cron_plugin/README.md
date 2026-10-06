@@ -2,9 +2,9 @@
 
 `cron_plugin` provides `nodeop` with an in-process cron scheduler: other plugins register functions against
 cron-style schedules and the plugin fires them on a worker pool. It is infrastructure, not an operator-facing
-feature -- it exposes no HTTP endpoint and does nothing on its own. Operators rarely name it: both
-`batch_operator_plugin` and `underwriter_plugin` declare it in `APPBASE_PLUGIN_REQUIRES`, so enabling either one
-loads it automatically. It has no dependencies of its own (`APPBASE_PLUGIN_REQUIRES()` is empty).
+feature -- it exposes no HTTP endpoint and does nothing on its own. Operators rarely name it:
+`batch_operator_plugin` declares it in `APPBASE_PLUGIN_REQUIRES`, so enabling the batch operator loads it
+automatically. It has no dependencies of its own (`APPBASE_PLUGIN_REQUIRES()` is empty).
 
 ## How it works
 
@@ -74,7 +74,7 @@ discovered, so its OPP polling jobs do not contend with anything else on the sha
 
 ## Enabling / configuration
 
-No `plugin =` line is normally needed -- `batch_operator_plugin` and `underwriter_plugin` both require it.
+No `plugin =` line is normally needed -- `batch_operator_plugin` requires it.
 Naming it explicitly is harmless.
 
 `config.ini`:
@@ -147,7 +147,5 @@ trigger pre-computation, the scheduler waking when a new job is added, and day-o
 
 - [`batch_operator_plugin`](../batch_operator_plugin) -- requires this plugin, and additionally creates its own
   private `cron_service` sized from the discovered outpost count for OPP polling jobs.
-- [`underwriter_plugin`](../underwriter_plugin) -- requires this plugin and schedules its scan job on the shared
-  service.
 - [`resource_monitor_plugin`](../resource_monitor_plugin) -- a plugin with its own dedicated timer thread rather
   than a cron job; the two are independent.
