@@ -509,6 +509,42 @@ BOOST_AUTO_TEST_CASE(gas_limit_floor_raises_an_under_estimate_and_is_policy_boun
    BOOST_CHECK_EQUAL(client->broadcast_count, 0u);
 }
 
+/// A cap bounds the limit from above, is handed to the estimate as the gas
+/// the call must fit in, cannot sit below the floor, and is policy-bounded
+/// exactly like the floor.
+BOOST_AUTO_TEST_CASE(gas_limit_cap_bounds_the_limit_and_runs_the_estimate_under_it) {
+   std::atomic<size_t> sign_count = 0;
+   const auto provider = make_recording_signer(sign_count);
+   auto policy = bounded_policy();
+   policy.max_gas_limit = 2000;
+   auto client = std::make_shared<recording_ethereum_client>(provider, policy);
+
+   // No cap: the estimate payload carries no `gas`.
+   client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 0, 0);
+   BOOST_CHECK(!client->estimate_gas_params.get_array().front().get_object().contains("gas"));
+
+   // The fake estimate is 834 -> buffered 1000; a cap of 900 wins.
+   BOOST_CHECK_EQUAL(
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 0, 900).gas_limit,
+      900);
+   BOOST_CHECK_EQUAL(
+      client->estimate_gas_params.get_array().front().get_object()["gas"].as_string(), "0x384");
+   // Floor and cap equal: the transaction carries exactly that.
+   BOOST_CHECK_EQUAL(
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 1500, 1500).gas_limit,
+      1500);
+   // A cap above the policy ceiling is a rejection, not a clamp.
+   expect_policy_rejection([&] {
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 0, 2001);
+   });
+   // A cap below the floor is a caller error.
+   BOOST_CHECK_THROW(
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 1500, 900),
+      fc::exception);
+   BOOST_CHECK_EQUAL(sign_count.load(), 0u);
+   BOOST_CHECK_EQUAL(client->broadcast_count, 0u);
+}
+
 BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
    std::atomic<size_t> sign_count = 0;
    const auto provider = make_recording_signer(sign_count);
@@ -525,11 +561,13 @@ BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
        uint16_argument_function("attestationHandlers")},
    };
    // OPPInbound's one write wrapper — the whole-envelope delivery — must be
-   // rejected by the policy before signing. It is funded to the policy ceiling
-   // (999 here), which the ×1.2-buffered estimate of 834 already breaches.
+   // rejected by the policy before signing. A budget above the policy ceiling
+   // (999 here) is refused outright; one within it still loses to the
+   // ×1.2-buffered estimate of 834, which breaches the ceiling on its own.
    uint32_t    epoch_index = 1;
    std::string envelope = "01";
-   expect_policy_rejection([&] { inbound.epoch_in(epoch_index, envelope); });
+   expect_policy_rejection([&] { inbound.epoch_in(epoch_index, envelope, 1000); });
+   expect_policy_rejection([&] { inbound.epoch_in(epoch_index, envelope, 999); });
 
    sysio::opp_contract_client opp{
       client,

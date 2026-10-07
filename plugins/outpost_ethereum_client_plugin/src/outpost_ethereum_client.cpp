@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <limits>
 #include <optional>
 
 #include <magic_enum/magic_enum.hpp>
@@ -268,6 +269,17 @@ std::optional<realize_yield_refusal> classify_realize_yield_revert(std::string_v
    return std::nullopt;
 }
 
+std::optional<uint32_t> count_envelope_attestations(const std::vector<char>& envelope_bytes) {
+   sysio::opp::Envelope envelope;
+   if (!envelope.ParseFromArray(envelope_bytes.data(), static_cast<int>(envelope_bytes.size()))) {
+      return std::nullopt;
+   }
+   uint64_t count = 0;
+   for (const auto& message : envelope.messages()) count += message.payload().attestations_size();
+   if (count > std::numeric_limits<uint32_t>::max()) return std::nullopt;
+   return static_cast<uint32_t>(count);
+}
+
 std::optional<std::string> address_from_word(std::string_view raw_hex) {
    constexpr size_t word_chars    = EVM_ABI_WORD_BYTES * HEX_CHARS_PER_BYTE;
    constexpr size_t address_chars = EVM_ADDRESS_BYTES * HEX_CHARS_PER_BYTE;
@@ -450,12 +462,25 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
    // re-supplied on every continuation — the outpost never stores its bytes.
    const std::string envelope_hex = fc::to_hex(envelope_bytes.data(), static_cast<uint32_t>(total));
 
+   // Each call is funded to what it has left to carry (`delivery_gas_budget`),
+   // never to a fixed figure: the attestations the outpost's cursor says are
+   // still to dispatch, doubled for every spill already met this tick. An
+   // envelope the relay cannot read is funded to the ceiling.
+   const auto     attestation_count = detail::count_envelope_attestations(envelope_bytes);
+   const uint64_t gas_ceiling       = delivery_gas_ceiling(_entry->client->transaction_policy());
+   if (!attestation_count) {
+      wlog("outpost_ethereum_client[{}]: epoch={} envelope ({} bytes) does not decode as an OPP "
+           "envelope; funding delivery to the ceiling ({} gas)",
+           to_string(), epoch_index, total, gas_ceiling);
+   }
+
    // Sequential, receipt-confirmed submission — one transaction in flight at a
    // time, so the signer's nonce advances in lock-step and a mid-sequence
    // failure simply abandons the tick. The next cron tick re-reads the
    // outpost's cursor and picks up wherever the chain actually is.
    std::string last_tx;
    bool        delivered_this_tick = false;
+   uint32_t    spills_this_tick    = 0;
    for (uint32_t call = 0; call <= MAX_CONTINUATIONS_PER_TICK; ++call) {
       throw_if_past_deadline(deadline_abs, OP_DELIVER_OUTBOUND);
 
@@ -499,25 +524,64 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
          break;
 
       case detail::delivery_action::continue_dispatch:
+         // A continuation behind a call this tick already sent means that
+         // call spilled: what it was funded with did not carry its work, so
+         // the next one is funded to more. A continuation that OPENS the tick
+         // resumes a spill from an earlier tick at the sized budget.
+         if (!last_tx.empty()) ++spills_this_tick;
          break;
       }
 
       throw_if_past_deadline(deadline_abs, OP_DELIVER_OUTBOUND);
-      // `ethereum_contract_tx_fn` binds every argument as a non-const lvalue
-      // reference, so each one needs a named local.
+      // Before the tip nothing is dispatched, so every attestation is still
+      // to carry; after it the outpost's cursor says how many remain, and a
+      // complete dispatch leaves only the emit.
+      std::optional<uint32_t> remaining;
+      if (attestation_count) {
+         const uint32_t done = spill.tipped ? spill.dispatched : 0;
+         remaining = spill.complete ? 0 : (*attestation_count > done ? *attestation_count - done : 0);
+      }
+      uint64_t gas_budget = delivery_gas_budget(delivery_gas_request{
+         .envelope_bytes         = total,
+         .remaining_attestations = remaining,
+         .escalations            = spills_this_tick,
+         .ceiling                = gas_ceiling,
+      });
+      dlog("outpost_ethereum_client[{}]: epoch={} funding epochIn with {} gas (remaining={} "
+           "escalations={} ceiling={})",
+           to_string(), epoch_index, gas_budget,
+           remaining ? std::to_string(*remaining) : "unknown", spills_this_tick, gas_ceiling);
+
+      // The ABI arguments are bound as non-const lvalue references, so each
+      // one needs a named local.
       uint32_t    epoch_arg   = epoch_index;
       std::string payload_hex = envelope_hex;
-      const auto  result      = _opp_inbound_client->epoch_in(epoch_arg, payload_hex);
-      last_tx                 = result.as_string();
+      fc::variant result;
+      try {
+         result = _opp_inbound_client->epoch_in(epoch_arg, payload_hex, gas_budget);
+      } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
+         // The node refused the call at this budget before anything was
+         // signed — the pre-flight estimate runs under the budget. Below the
+         // ceiling that is the budget's fault: retry once with everything the
+         // policy allows. At the ceiling it is the envelope's, and the tick
+         // reports it rather than spending the ceiling on finding out again.
+         if (gas_budget >= gas_ceiling) throw;
+         wlog("outpost_ethereum_client[{}]: epoch={} refused at {} gas ({}); retrying at the "
+              "ceiling ({} gas)",
+              to_string(), epoch_index, gas_budget, refusal.to_string(), gas_ceiling);
+         gas_budget = gas_ceiling;
+         result     = _opp_inbound_client->epoch_in(epoch_arg, payload_hex, gas_budget);
+      }
+      last_tx = result.as_string();
 
       if (action == detail::delivery_action::deliver) {
          delivered_this_tick = true;
-         ilog("outpost_ethereum_client[{}]: epochIn delivered epoch={} bytes={} tx={}",
-              to_string(), epoch_index, total, last_tx);
+         ilog("outpost_ethereum_client[{}]: epochIn delivered epoch={} bytes={} gas={} tx={}",
+              to_string(), epoch_index, total, gas_budget, last_tx);
       } else {
          ilog("outpost_ethereum_client[{}]: epochIn continued epoch={} from attestation {} "
-              "(complete={}) tx={}",
-              to_string(), epoch_index, spill.dispatched, spill.complete, last_tx);
+              "(complete={}) gas={} tx={}",
+              to_string(), epoch_index, spill.dispatched, spill.complete, gas_budget, last_tx);
       }
    }
 

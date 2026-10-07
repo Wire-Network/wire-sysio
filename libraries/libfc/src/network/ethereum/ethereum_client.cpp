@@ -29,12 +29,14 @@ constexpr std::string_view max_priority_fee_per_gas = "max_priority_fee_per_gas"
 constexpr std::string_view estimated_gas = "estimated_gas";
 constexpr std::string_view gas_price = "gas_price";
 constexpr std::string_view gas_limit_floor = "gas_limit_floor";
+constexpr std::string_view gas_limit_cap = "gas_limit_cap";
 } // namespace transaction_policy_field
 
 namespace ethereum_rpc_field {
 constexpr std::string_view base_fee_per_gas = "baseFeePerGas";
 constexpr std::string_view max_priority_fee_per_gas = "maxPriorityFeePerGas";
 constexpr std::string_view max_fee_per_gas = "maxFeePerGas";
+constexpr std::string_view gas = "gas";
 } // namespace ethereum_rpc_field
 
 constexpr std::string_view gas_configuration_operation = "get_gas_config";
@@ -301,25 +303,36 @@ fc::variant ethereum_client::get_syncing_status() {
  *         breaches the client's `max_gas_limit`
  */
 eip1559_tx ethereum_client::create_default_tx(const address_compat_type& to, const abi::contract& contract,
-                                              const fc::variants& params, uint64_t gas_limit_floor) {
+                                              const fc::variants& params, uint64_t gas_limit_floor,
+                                              uint64_t gas_limit_cap) {
+   FC_ASSERT(gas_limit_cap == 0 || gas_limit_cap >= gas_limit_floor,
+             "gas_limit_cap ({}) is below gas_limit_floor ({})", gas_limit_cap, gas_limit_floor);
    try {
       auto gc = get_gas_config_unlogged();
       auto data = contract_encode_data(contract, params);
 
-      auto estimated_gas = estimate_gas(to, contract, data, gc);
+      // The floor and the cap are bounded by the same ceiling as the estimate:
+      // a caller asking for more than the policy allows is refused, not
+      // clamped, so an under-funded call is never silently sent.
+      const auto require_within_policy = [&](uint64_t limit, std::string_view field) {
+         const fc::uint256 wide{limit};
+         if (wide > _transaction_policy.max_gas_limit) {
+            throw_transaction_policy_exception(ethereum_transaction_policy_reason::gas_limit_cap_exceeded,
+                                               field, wide.str(), _transaction_policy.max_gas_limit.str());
+         }
+      };
+      if (gas_limit_cap != 0) require_within_policy(gas_limit_cap, transaction_policy_field::gas_limit_cap);
+
+      auto estimated_gas = estimate_gas(to, contract, data, gc, gas_limit_cap);
       auto gas_limit = derive_buffered_gas_limit(_transaction_policy, estimated_gas);
       if (gas_limit_floor != 0) {
-         // The floor is bounded by the same ceiling as the estimate: a caller
-         // asking for more than the policy allows is refused, not clamped, so
-         // an under-funded call is never silently sent.
+         require_within_policy(gas_limit_floor, transaction_policy_field::gas_limit_floor);
          const fc::uint256 floor{gas_limit_floor};
-         if (floor > _transaction_policy.max_gas_limit) {
-            throw_transaction_policy_exception(ethereum_transaction_policy_reason::gas_limit_cap_exceeded,
-                                               transaction_policy_field::gas_limit_floor,
-                                               floor.str(),
-                                               _transaction_policy.max_gas_limit.str());
-         }
          if (gas_limit < floor) gas_limit = floor;
+      }
+      if (gas_limit_cap != 0) {
+         const fc::uint256 cap{gas_limit_cap};
+         if (gas_limit > cap) gas_limit = cap;
       }
 
       return eip1559_tx{.chain_id = get_chain_id(),
@@ -528,7 +541,8 @@ ethereum_client::gas_config_t ethereum_client::get_gas_config_unlogged() {
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
  */
 fc::uint256 ethereum_client::estimate_gas(const address_compat_type& to, const abi::contract& contract,
-                                          const data_or_params_t& data_or_params, const std::optional<gas_config_t>& gas_config_opt) {
+                                          const data_or_params_t& data_or_params, const std::optional<gas_config_t>& gas_config_opt,
+                                          uint64_t gas_limit_cap) {
    fc::mutable_variant_object tx;
 
    gas_config_t gc = gas_config_opt ? *gas_config_opt : get_gas_config();
@@ -541,6 +555,10 @@ fc::uint256 ethereum_client::estimate_gas(const address_compat_type& to, const a
    (std::string(ethereum_rpc_field::max_fee_per_gas), format_rpc_quantity(gc.max_fee_per_gas))
    ("data", data)
    ("input", data);
+   // A capped estimate is a pre-flight at the budget the transaction will
+   // carry: the node searches only up to `gas` and reports a revert when the
+   // call cannot succeed inside it.
+   if (gas_limit_cap != 0) tx(std::string(ethereum_rpc_field::gas), format_rpc_quantity(fc::uint256{gas_limit_cap}));
 
    auto resp = execute_idempotent("eth_estimateGas", fc::variants{tx});
    return parse_rpc_quantity(resp, transaction_policy_field::estimated_gas);

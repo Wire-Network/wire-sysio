@@ -96,6 +96,12 @@ std::optional<realize_yield_refusal> classify_realize_yield_revert(std::string_v
 /// the hex is not exactly one word of hex digits with a zero 12-byte pad.
 std::optional<std::string> address_from_word(std::string_view raw_hex);
 
+/// How many attestations `envelope_bytes` carries across its messages, or
+/// `std::nullopt` when the bytes do not decode as an OPP envelope. The relay
+/// sizes a delivery's gas budget from it; an unreadable envelope is funded to
+/// the ceiling and left to the contract to judge.
+std::optional<uint32_t> count_envelope_attestations(const std::vector<char>& envelope_bytes);
+
 /// True when `handler_address` names a contract the outpost routes to: neither
 /// `address(0)` (nothing registered) nor `ATTESTATION_BLACKHOLE` (governance
 /// dropped the type).
