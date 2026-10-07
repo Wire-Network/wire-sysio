@@ -507,14 +507,6 @@ BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
       [&] { inbound.epoch_in(epoch_index, chunk_index, total_chunks, total_bytes, chunk); });
    expect_policy_rejection([&] { inbound.discard_envelope_chunks(); });
 
-   sysio::operator_registry_contract_client registry{
-      client,
-      std::string(contract_address),
-      {bytes_argument_function("commit")},
-   };
-   std::string commitment = "01";
-   expect_policy_rejection([&] { registry.commit(commitment); });
-
    sysio::opp_contract_client opp{
       client,
       std::string(contract_address),
@@ -733,7 +725,6 @@ BOOST_AUTO_TEST_CASE(outpost_factory_reports_client_configuration_chain_mismatch
                "client-a",
                chain_code,
                1,
-               std::string(contract_address),
                std::string(contract_address),
                std::string(contract_address));
             BOOST_FAIL("expected client/outpost chain mismatch rejection");

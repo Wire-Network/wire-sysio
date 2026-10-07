@@ -2,11 +2,24 @@
 
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
+#include <sysio/opp/types/types.pb.h>
 #include <sysio/testing/tester.hpp>
 
+#include <fc/crypto/elliptic_em.hpp>
+#include <fc/crypto/elliptic_ed.hpp>
+#include <fc/crypto/base58.hpp>
+#include <fc/crypto/hex.hpp>
+#include <fc/crypto/keccak256.hpp>
+#include <fc/crypto/private_key.hpp>
+#include <fc/crypto/public_key.hpp>
+#include <fc/crypto/signature.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/slug_name.hpp>
 #include <fc/variant_object.hpp>
+
+#include <magic_enum/magic_enum.hpp>
+
+#include <string>
 
 namespace sysio_system::test_support {
 
@@ -76,18 +89,32 @@ typename Tester::action_result push_contract_action(Tester& tester, name contrac
    }
 }
 
+/// Push one ABI-encoded action and land it in its own block for stable TaPoS, handing back its
+/// trace in `trace` (null after a failure) so a test can inspect inline actions and notifications.
+template <typename Tester>
+typename Tester::action_result push_contract_action_and_produce_block(
+   Tester& tester, name contract, abi_serializer& serializer, name signer, name action_name,
+   const fc::variant_object& data, transaction_trace_ptr& trace, std::vector<permission_level> authorization = {}) {
+   trace.reset();
+   try {
+      trace = push_contract_action_trace(tester, contract, serializer, signer, action_name, data,
+                                         std::move(authorization));
+      tester.produce_block();
+      return Tester::success();
+   } catch (const fc::exception& ex) {
+      trace.reset();
+      return Tester::error(ex.top_message());
+   }
+}
+
 /// Push one ABI-encoded action and land it in its own block for stable TaPoS.
 template <typename Tester>
 typename Tester::action_result push_contract_action_and_produce_block(
    Tester& tester, name contract, abi_serializer& serializer, name signer, name action_name,
    const fc::variant_object& data, std::vector<permission_level> authorization = {}) {
-   try {
-      push_contract_action_trace(tester, contract, serializer, signer, action_name, data, std::move(authorization));
-      tester.produce_block();
-      return Tester::success();
-   } catch (const fc::exception& ex) {
-      return Tester::error(ex.top_message());
-   }
+   transaction_trace_ptr trace;
+   return push_contract_action_and_produce_block(tester, contract, serializer, signer, action_name, data, trace,
+                                                 std::move(authorization));
 }
 
 // ---------------------------------------------------------------------------
@@ -135,6 +162,39 @@ inline fc::mutable_variant_object svm_outpost_mvo(std::string_view program_id) {
       ("opp_inbound_addr",       std::string{})
       ("operator_registry_addr", std::string{})
       ("source_deposit_addr",    std::string{});
+}
+
+/// The user-link signature domain for EM (hex compressed key) and ED (base58
+/// raw key), followed by account, chain kind, nonce and the fixed suffix.
+inline std::string build_link_message(const fc::crypto::public_key& pub_key, const std::string& account,
+                                      sysio::opp::types::ChainKind chain_kind, uint64_t nonce) {
+   std::string pub_key_str;
+   if (pub_key.type() == fc::crypto::public_key::key_type::ed) {
+      const auto raw = pub_key.get<fc::crypto::ed::public_key_shim>().serialize();
+      pub_key_str = "PUB_ED_" + fc::to_base58(reinterpret_cast<const char*>(raw.data()), raw.size(), [] {});
+   } else {
+      const auto compressed = pub_key.get<fc::em::public_key_shim>().serialize();
+      pub_key_str = "PUB_EM_" + fc::to_hex(compressed.data(), compressed.size());
+   }
+   return pub_key_str + "|" + account + "|" + std::to_string(magic_enum::enum_integer(chain_kind)) + "|" +
+          std::to_string(nonce) + "|createlink auth";
+}
+
+/// Sign the contract's curve-specific digest: EM uses keccak/EIP-191; ED uses
+/// SHA-256 mapped to printable ASCII before the ED digest signing operation.
+inline fc::crypto::signature sign_createlink(const fc::crypto::private_key& priv, const std::string& account,
+                                             sysio::opp::types::ChainKind chain_kind, uint64_t nonce) {
+   const auto message = build_link_message(priv.get_public_key(), account, chain_kind, nonce);
+   if (priv.get_public_key().type() == fc::crypto::public_key::key_type::ed) {
+      constexpr unsigned char PrintableStart = 33, PrintableCount = 94;
+      const auto raw = fc::sha256::hash(message);
+      std::array<char, 32> mapped;
+      for (size_t i = 0; i < mapped.size(); ++i)
+         mapped[i] = char((static_cast<unsigned char>(raw.data()[i]) % PrintableCount) + PrintableStart);
+      return priv.sign(fc::sha256(mapped.data(), mapped.size()));
+   }
+   const auto msg_hash = fc::crypto::keccak256::hash(message);
+   return priv.sign(fc::sha256(reinterpret_cast<const char*>(msg_hash.data()), 32));
 }
 
 /// Mirrors of sysio.roa's `nodeownerreg` audit values (`reg_status` / `reject_reason` in sysio.roa.hpp).
@@ -192,5 +252,53 @@ void fill_tier1(Tester& tester, abi_serializer& serializer, uint32_t occupancy =
    BOOST_REQUIRE_EQUAL(count(tester, serializer, tier1), occupancy);
 }
 } // namespace nodeowners
+
+// ---------------------------------------------------------------------------
+//  sysio.andon: the depot's emergency stop, for the suites of the contracts it freezes
+// ---------------------------------------------------------------------------
+
+namespace andon {
+
+/// The account the depot deploys sysio.andon on, which every frozen contract reads.
+inline constexpr auto account = "sysio.andon"_n;
+/// The configuration authority, which may also pull and clear the cord.
+inline constexpr auto system_account = "sysio"_n;
+
+/// Create sysio.andon's account when it does not exist, deploy `wasm` and `abi` on it privileged (as the
+/// depot deploys it) and load its ABI into `ser`.
+template <typename Tester>
+void deploy(Tester& tester, abi_serializer& ser, const std::vector<uint8_t>& wasm, const std::vector<char>& abi) {
+   if (tester.control->find_account(account) == nullptr) tester.create_accounts({account});
+   tester.set_code(account, wasm);
+   tester.set_abi(account, abi.data());
+   tester.set_privileged(account);
+   // Match bootstrap: governance controls the Andon account's active authority.
+   tester.set_authority(account, config::active_name,
+                        authority{permission_level{system_account, config::active_name}}, config::owner_name);
+   tester.produce_blocks();
+   load_account_abi(tester, account, ser);
+}
+
+/// Pull with Andon active authorization, signed by its delegated actor.
+template <typename Tester>
+typename Tester::action_result pull(Tester& tester, abi_serializer& ser, name actor = system_account,
+                                    const std::string& reason = "test") {
+   return push_contract_action_and_produce_block(tester, account, ser, actor, "pull"_n,
+                                                 fc::mutable_variant_object()("reason", reason), {{account, config::active_name}});
+}
+
+/// Clear with Andon active authorization, signed by its delegated actor.
+template <typename Tester>
+typename Tester::action_result clear(Tester& tester, abi_serializer& ser, name actor = system_account,
+                                     const std::string& note = "test") {
+   return push_contract_action_and_produce_block(tester, account, ser, actor, "clear"_n,
+                                                 fc::mutable_variant_object()("note", note), {{account, config::active_name}});
+}
+
+/// The message of the refusal every frozen signed action raises (`andon::FROZEN_MESSAGE`); a suite
+/// compares against `wasm_assert_msg(frozen_message)`.
+inline constexpr const char* frozen_message = "the andon cord is pulled: funds cannot leave custody";
+
+} // namespace andon
 
 } // namespace sysio_system::test_support

@@ -9,6 +9,8 @@
 #include <sysio/slug_name.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 
+#include <optional>
+
 namespace sysio {
 
    /**
@@ -152,6 +154,17 @@ namespace sysio {
          sysio::kv::index<"byextid"_n,   sysio::const_mem_fun<chain_row, uint64_t, &chain_row::by_external_chain_id>>,
          sysio::kv::index<"byactive"_n,  sysio::const_mem_fun<chain_row, uint64_t, &chain_row::by_active>>
       >;
+
+      /// The chain family of `chain_code` in the registry deployed at `chains_account` when it is an
+      /// active outpost -- a registered, active row that is not the depot -- else `std::nullopt`. Never
+      /// throws. The ONE outpost-family lookup: `sysio.liq` (behind a checked wrapper), `sysio.msgch`'s
+      /// syndication dispatch and `sysio.synd` all use it.
+      static std::optional<opp::types::ChainKind> outpost_kind_of(name chains_account, sysio::slug_name chain_code) {
+         chains_t   chains_tbl(chains_account);
+         const auto row = chains_tbl.try_get(chain_key{chain_code});
+         if (!row || !row->active || row->is_depot) return std::nullopt;
+         return row->kind;
+      }
    };
 
 } // namespace sysio
