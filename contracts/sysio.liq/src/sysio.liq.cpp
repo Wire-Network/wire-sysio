@@ -1,4 +1,5 @@
 #include <sysio.liq/sysio.liq.hpp>
+#include <sysio.andon/sysio.andon.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
@@ -15,6 +16,15 @@
 namespace sysio {
 
 namespace {
+
+constexpr auto unsupported_custodian_msg = "unsupported custodian";
+constexpr auto beneficiary_account_does_not_exist_msg = "beneficiary account does not exist";
+constexpr auto invalid_quantity_msg = "invalid quantity";
+constexpr auto must_settle_positive_quantity_msg = "must settle positive quantity";
+constexpr auto symbol_precision_mismatch_msg = "symbol precision mismatch";
+constexpr auto overdrawn_balance_msg = "overdrawn balance";
+constexpr name bond_account = "sysio.bond"_n;
+
 
 using opp::types::AttestationType;
 using opp::types::ChainKind;
@@ -198,6 +208,7 @@ void liq::mintyield(sysio::slug_name chain_code, uint64_t sequence, uint64_t epo
 // ---------------------------------------------------------------------------
 
 void liq::queueyield(symbol_code sym) {
+   andon::check_clear(andon::ANDON_ACCOUNT);
    liqpendings pendings(get_self());
    const symbol_key key{ sym.raw() };
    const auto pending = pendings.try_get(key);
@@ -236,18 +247,40 @@ void liq::transfer(name from, name to, asset quantity, string memo) {
    check(from != to, "cannot transfer to self");
    require_auth(from);
    check(is_account(to), "to account does not exist");
+   // While the cord is pulled only a transfer INTO a custody contract passes: bonds, challenges, holds and
+   // desyndications keep flowing in, and nothing leaves.
+   if (!andon::is_custody(to)) andon::check_clear(andon::ANDON_ACCOUNT);
    const currency_stats st = stat_of(quantity.symbol.code());
 
    require_recipient(from);
    require_recipient(to);
 
-   check(quantity.is_valid(), "invalid quantity");
+   check(quantity.is_valid(), invalid_quantity_msg);
    check(quantity.amount > 0, "must transfer positive quantity");
-   check(quantity.symbol == st.supply.symbol, "symbol precision mismatch");
+   check(quantity.symbol == st.supply.symbol, symbol_precision_mismatch_msg);
    check(memo.size() <= MAX_MEMO_BYTES, "memo has more than 256 bytes");
 
    adjust_account(from, -quantity, ram_payer);
    adjust_account(to, quantity, ram_payer);
+}
+
+void liq::settle(name custodian, name beneficiary, asset quantity) {
+   check(custodian == SYND_ACCOUNT || custodian == bond_account, unsupported_custodian_msg);
+   require_auth(custodian);
+   andon::check_clear(andon::ANDON_ACCOUNT);
+   check(is_account(beneficiary), beneficiary_account_does_not_exist_msg);
+   check(quantity.is_valid(), invalid_quantity_msg);
+   check(quantity.amount > 0, must_settle_positive_quantity_msg);
+   const currency_stats st = stat_of(quantity.symbol.code());
+   check(quantity.symbol == st.supply.symbol, symbol_precision_mismatch_msg);
+   if (custodian == beneficiary) {
+      const auto row = accounts(get_self(), custodian.value).try_get(symbol_key{quantity.symbol.code().raw()});
+      check(row && row->balance.amount >= quantity.amount, overdrawn_balance_msg);
+      adjust_account(custodian, asset{0, quantity.symbol}, ram_payer);
+   } else {
+      adjust_account(custodian, -quantity, ram_payer);
+      adjust_account(beneficiary, quantity, ram_payer);
+   }
 }
 
 void liq::open(name owner, symbol symbol, name ram_payer_) {
@@ -274,6 +307,9 @@ void liq::close(name owner, symbol symbol) {
 
 void liq::claim(name holder, symbol_code sym) {
    require_auth(holder);
+   // A custody contract pulling what its own row earned keeps the WIRE in custody; anyone else is refused
+   // while the cord is pulled.
+   if (!andon::is_custody(holder)) andon::check_clear(andon::ANDON_ACCOUNT);
    accounts holdings(get_self(), holder.value);
    const symbol_key key{ sym.raw() };
    const auto row = holdings.try_get(key);

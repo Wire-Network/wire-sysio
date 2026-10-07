@@ -76,18 +76,32 @@ typename Tester::action_result push_contract_action(Tester& tester, name contrac
    }
 }
 
+/// Push one ABI-encoded action and land it in its own block for stable TaPoS, handing back its
+/// trace in `trace` (null after a failure) so a test can inspect inline actions and notifications.
+template <typename Tester>
+typename Tester::action_result push_contract_action_and_produce_block(
+   Tester& tester, name contract, abi_serializer& serializer, name signer, name action_name,
+   const fc::variant_object& data, transaction_trace_ptr& trace, std::vector<permission_level> authorization = {}) {
+   trace.reset();
+   try {
+      trace = push_contract_action_trace(tester, contract, serializer, signer, action_name, data,
+                                         std::move(authorization));
+      tester.produce_block();
+      return Tester::success();
+   } catch (const fc::exception& ex) {
+      trace.reset();
+      return Tester::error(ex.top_message());
+   }
+}
+
 /// Push one ABI-encoded action and land it in its own block for stable TaPoS.
 template <typename Tester>
 typename Tester::action_result push_contract_action_and_produce_block(
    Tester& tester, name contract, abi_serializer& serializer, name signer, name action_name,
    const fc::variant_object& data, std::vector<permission_level> authorization = {}) {
-   try {
-      push_contract_action_trace(tester, contract, serializer, signer, action_name, data, std::move(authorization));
-      tester.produce_block();
-      return Tester::success();
-   } catch (const fc::exception& ex) {
-      return Tester::error(ex.top_message());
-   }
+   transaction_trace_ptr trace;
+   return push_contract_action_and_produce_block(tester, contract, serializer, signer, action_name, data, trace,
+                                                 std::move(authorization));
 }
 
 // ---------------------------------------------------------------------------

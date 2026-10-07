@@ -3,14 +3,6 @@
 #include <tuple>
 
 namespace {
-   // The shadow token's tables, read in place (sysio.opp.common/shadow_yield.hpp):
-   // constructed with the token contract as code, the holder table scoped by the
-   // holder. Declared outside the contract class on purpose: the ABI generator
-   // lists every kv table alias it finds inside the class as the contract's own.
-   using shadow_accounts = sysio::kv::scoped_table<sysio::opp::shadow::ACCOUNTS_TABLE,
-                                                   sysio::opp::shadow::symbol_key, sysio::opp::shadow::account>;
-   using shadow_indexes  = sysio::kv::table<sysio::opp::shadow::YIELD_INDEX_TABLE,
-                                            sysio::opp::shadow::symbol_key, sysio::opp::shadow::yield_index>;
 
    /// Whether a delivered extended asset is exactly the expected one: same
    /// contract, same symbol, same amount. (asset's own == asserts on a symbol
@@ -42,6 +34,7 @@ void swap::closeext( const name& user, const name& to, const extended_symbol& ex
     check( row.has_value(), "User does not have such token" );
     const extended_asset ext_balance = row->balance;
     if (ext_balance.quantity.amount > 0) {
+        require_clear();
         action(permission_level{ get_self(), "active"_n }, ext_balance.contract, "transfer"_n,
           std::make_tuple( get_self(), to, ext_balance.quantity, memo) ).send();
     }
@@ -53,6 +46,7 @@ void swap::ontransfer(name from, name to, asset quantity, string memo) {
     constexpr string_view EXCHANGE   = "exchange:";
 
     if (from == get_self()) return;
+    require_clear();
     check(to == get_self(), "This transfer is not for sysio.swap");
     check(quantity.amount >= 0, "quantity must be positive");
 
@@ -98,6 +92,7 @@ void swap::ontransfer(name from, name to, asset quantity, string memo) {
 
 void swap::withdraw(name user, name to, extended_asset to_withdraw, string memo){
     require_auth( user );
+    require_clear();
     check(to_withdraw.quantity.amount > 0, "quantity must be positive");
     add_signed_ext_balance(user, -to_withdraw);
     action(permission_level{ get_self(), "active"_n }, to_withdraw.contract, "transfer"_n,
@@ -107,6 +102,7 @@ void swap::withdraw(name user, name to, extended_asset to_withdraw, string memo)
 void swap::addliquidity(name user, asset to_buy, 
   asset max_asset1, asset max_asset2) {
     require_auth(user);
+    require_clear();
     check( (to_buy.amount > 0), "to_buy amount must be positive");
     check( (max_asset1.amount >= 0) && (max_asset2.amount >= 0), "assets must be nonnegative");
     add_signed_liq(user, to_buy, true, max_asset1, max_asset2);
@@ -115,6 +111,7 @@ void swap::addliquidity(name user, asset to_buy,
 void swap::remliquidity(name user, asset to_sell,
   asset min_asset1, asset min_asset2) {
     require_auth(user);
+    require_clear();
     check(to_sell.amount > 0, "to_sell amount must be positive");
     check( (min_asset1.amount >= 0) && (min_asset2.amount >= 0), "assets must be nonnegative");
     add_signed_liq(user, -to_sell, false, -min_asset1, -min_asset2);
@@ -187,6 +184,7 @@ void swap::add_signed_liq(name user, asset to_add, bool is_buying,
 void swap::exchange( name user, symbol_code pair_token, 
   extended_asset ext_asset_in, asset min_expected) {
     require_auth(user);
+    require_clear();
     check( ext_asset_in.quantity.amount > 0, "ext_asset_in must be positive" );
     check( min_expected.amount >= 0, "min_expected must be nonnegative" );
     auto ext_asset_out = process_exch(pair_token, ext_asset_in, min_expected);
@@ -306,6 +304,7 @@ std::optional<extended_symbol> yield_leg)
 {
     require_auth( user );
     require_auth( get_self() );
+    require_clear();
     check((initial_pool1.quantity.amount > 0) && (initial_pool2.quantity.amount > 0), "Both assets must be positive");
     check((initial_pool1.quantity.amount < INIT_MAX) && (initial_pool2.quantity.amount < INIT_MAX), "Initial amounts must be less than 10^15");
     uint8_t new_precision = ( initial_pool1.quantity.symbol.precision() + initial_pool2.quantity.symbol.precision() ) / 2;
@@ -408,10 +407,10 @@ const extended_asset& swap::other_pool(const currency_stats& token, const extend
 
 uint64_t swap::owed_yield(const extended_symbol& shadow) const {
     const opp::shadow::symbol_key key{ shadow.get_symbol().code().raw() };
-    shadow_indexes indexes( shadow.get_contract() );
+    sysio::opp::shadow::yield_index_table indexes( shadow.get_contract() );
     const auto index = indexes.try_get( key );
     if (!index || index->index == 0) return 0;
-    shadow_accounts holdings( shadow.get_contract(), get_self().value );
+    sysio::opp::shadow::accounts_table holdings( shadow.get_contract(), get_self().value );
     const auto row = holdings.try_get( key );
     return row ? opp::shadow::owed( *row, index->index ) : 0;
 }
@@ -421,6 +420,8 @@ swap::currency_stats swap::accrue(const pair_key& key, const currency_stats& tok
     const extended_symbol& shadow = *token.yield_leg;
     const uint64_t owed = owed_yield( shadow );
     if (owed == 0) return token;
+    // The claim below moves the pool's WIRE yield out of the shadow token's custody.
+    require_clear();
     check( owed <= uint64_t(MAX), "yield payout overflows" );
     const extended_symbol payout_symbol = other_pool( token, shadow ).get_extended_symbol();
     const extended_asset payout{ asset{ int64_t(owed), payout_symbol.get_symbol() }, payout_symbol.get_contract() };
@@ -564,6 +565,8 @@ void swap::tickyield(symbol_code pair_token) {
                       other_pool( token, shadow ).quantity.amount,
                       int64_t(clip), token.fee ) < min_fee_bearing_output( token.fee )) return;
 
+    // Everything above only measured; the sale moves tokens.
+    require_clear();
     const extended_asset selling{ asset{ int64_t(clip), shadow.get_symbol() }, shadow.get_contract() };
     const symbol proceeds_symbol = other_pool( token, shadow ).quantity.symbol;
     const extended_asset proceeds = process_exch( pair_token, selling, asset{ 0, proceeds_symbol } );

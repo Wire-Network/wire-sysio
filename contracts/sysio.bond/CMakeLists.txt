@@ -1,4 +1,4 @@
-set(contract_name sysio.liq)
+set(contract_name sysio.bond)
 bootstrap_contract(${contract_name})
 
 if(BUILD_SYSTEM_CONTRACTS)
@@ -14,7 +14,7 @@ if(BUILD_SYSTEM_CONTRACTS)
                 TARGET ${contract_name}_native
                 SOURCES ${SOURCES}
                 INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
-                CONTRACT_CLASS "sysio::liq"
+                CONTRACT_CLASS "sysio::bond"
                 HEADERS ${HEADERS}
                 ABI_FILE ${CMAKE_BINARY_DIR}/contracts/${contract_name}/${contract_name}.abi
         )
@@ -29,13 +29,11 @@ if(BUILD_SYSTEM_CONTRACTS)
         target_include_directories(${target}
                 PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.andon/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../../libraries/opp/generated-cdt>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/libfc-lite/include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.authex/include>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.andon/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.chains/include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.epoch/include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.msgch/include>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.liq/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.token/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.tokens/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opp.common/include>

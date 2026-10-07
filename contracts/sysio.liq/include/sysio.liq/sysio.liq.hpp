@@ -58,6 +58,8 @@ namespace sysio {
       static constexpr name SWAP_ACCOUNT   = "sysio.swap"_n;
       /// Governance executes approved proposals as `sysio`; it is also the T5
       /// treasury the bootstrap drains and the holder of the protocol's pool shares.
+      /// The syndication custodian permitted to settle its own LIQ balance.
+      static constexpr name SYND_ACCOUNT = "sysio.synd"_n;
       static constexpr name SYSTEM_ACCOUNT = "sysio"_n;
 
       /// The yield asset. The kicker arrives in it from sysio.system, so every
@@ -130,6 +132,10 @@ namespace sysio {
       // -----------------------------------------------------------------------
 
       [[sysio::action]] void transfer(name from, name to, asset quantity, string memo);
+      /// Credit an existing custody obligation without notifying either account. Only sysio.synd
+      /// and sysio.bond may debit their own balance. Settles both yield positions, preserves supply,
+      /// and requires the Andon cord clear, including self-settlement.
+      [[sysio::action]] void settle(name custodian, name beneficiary, asset quantity);
       [[sysio::action]] void open(name owner, symbol symbol, name ram_payer);
       /// Erase `owner`'s empty row for `symbol`. Refused while the row is still
       /// owed yield, so closing never discards WIRE.
