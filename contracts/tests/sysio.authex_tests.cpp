@@ -131,10 +131,6 @@ public:
       );
    }
 
-   action_result clearlinks( const account_name& signer ) {
-      return push_action( signer, "clearlinks"_n, mvo() );
-   }
-
    action_result recordlink(const account_name& signer, const std::string& account,
                             const fc::crypto::public_key& pub_key,
                             const std::vector<char>& native_address,
@@ -206,19 +202,6 @@ public:
 
 
 BOOST_AUTO_TEST_SUITE(sysio_authex_tests)
-
-// ——— clearlinks tests ———
-
-BOOST_FIXTURE_TEST_CASE( clearlinks_requires_contract_auth, sysio_authex_tester ) try {
-   BOOST_REQUIRE_EQUAL(
-      error("missing authority of sysio.authex"),
-      clearlinks("alice"_n)
-   );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( clearlinks_succeeds_with_contract_auth, sysio_authex_tester ) try {
-   BOOST_REQUIRE_EQUAL( success(), clearlinks(AUTHEX) );
-} FC_LOG_AND_RETHROW()
 
 // ——— createlink: auth failures ———
 
@@ -593,24 +576,13 @@ BOOST_FIXTURE_TEST_CASE( createlink_duplicate_chain_for_user, sysio_authex_teste
    );
 } FC_LOG_AND_RETHROW()
 
-// ——— clearlinks + re-create ———
-
-BOOST_FIXTURE_TEST_CASE( clearlinks_then_recreate, sysio_authex_tester ) try {
+/// Linking records an association only: the linked EM key never lands in the account's permissions.
+BOOST_FIXTURE_TEST_CASE( createlink_leaves_account_permissions_untouched, sysio_authex_tester ) try {
    deploy_dclaim();
-   auto link1 = make_eth_link("alice", now_ms());
-   BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link1.sig, link1.pub, link1.nonce) );
+   auto link = make_eth_link("alice", now_ms());
+   BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce) );
    produce_blocks();
 
-   // clearlinks wipes the links table; a fresh createlink for the same account+chain
-   // must then succeed (the prior link no longer trips the duplicate checks).
-   BOOST_REQUIRE_EQUAL( success(), clearlinks(AUTHEX) );
-   produce_blocks();
-
-   auto link2 = make_eth_link("alice", now_ms());
-   BOOST_REQUIRE_EQUAL( success(), createlink("alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link2.sig, link2.pub, link2.nonce) );
-   produce_blocks();
-
-   // Linking never touches the account's permissions: neither EM key landed in `active`.
    auto& auth_mgr = control->get_authorization_manager();
    const auto* active = auth_mgr.find_permission({"alice"_n, "active"_n});
    BOOST_REQUIRE( active != nullptr );

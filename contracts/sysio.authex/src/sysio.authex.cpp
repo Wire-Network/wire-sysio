@@ -221,20 +221,6 @@ namespace sysio {
 }
 
 
-// ! Clear links table, for testing only. Remove before deployment.
-[[sysio::action]] void authex::clearlinks() {
-   require_auth(get_self());
-
-   links_t links(get_self());
-
-   // Delete all entries in the links table.
-   auto itr = links.begin();
-   while (itr != links.end()) {
-      itr = links.erase(itr);
-   }
-};
-
-
 // Trusted depot-only link insert -- the counterpart to createlink that skips signature/nonce
 // verification. The OPP NodeOwnerRegistration attestation is the proof; privileged sysio.roa
 // declares sysio.authex.active on the inline action, so no cross-contract active-permission
@@ -258,11 +244,9 @@ namespace sysio {
    //
    // We deliberately do NOT reject when `pub_key` is already linked to a *different* account: one
    // external wallet can hold several WireNodes NFTs and therefore legitimately back several Wire
-   // accounts, so one ETH key -> many accounts is allowed on this path. The operator path
-   // (createlink) keeps its 1:1 `bypubkey` check, which also guarantees an operator's link is the
-   // lowest-primary-key row for that key; sysio.msgch's resolve_account_from_op_address does a single
-   // `bypubkey.find()` (lowest-primary-key match), so it still lands on the operator's account rather
-   // than a later node-owner duplicate.
+   // accounts, so one ETH key -> many accounts is allowed on this path. Operator traffic routes a key
+   // to its lowest-keyed row (the same lookup as `linked_account_for_key`), so sysio.opreg::regoperator
+   // refuses a self-registering account whose link key routes elsewhere.
    auto existing = by_namechain.find(to_namechain_key(account, chain_kind));
    if (existing != by_namechain.end()) {
       if (existing->pub_key == pub_key && can_sweep) {
