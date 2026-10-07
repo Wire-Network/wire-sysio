@@ -193,4 +193,52 @@ void fill_tier1(Tester& tester, abi_serializer& serializer, uint32_t occupancy =
 }
 } // namespace nodeowners
 
+// ---------------------------------------------------------------------------
+//  sysio.andon: the depot's emergency stop, for the suites of the contracts it freezes
+// ---------------------------------------------------------------------------
+
+namespace andon {
+
+/// The account the depot deploys sysio.andon on, which every frozen contract reads.
+inline constexpr auto account = "sysio.andon"_n;
+/// The configuration authority, which may also pull and clear the cord.
+inline constexpr auto system_account = "sysio"_n;
+
+/// Create sysio.andon's account when it does not exist, deploy `wasm` and `abi` on it privileged (as the
+/// depot deploys it) and load its ABI into `ser`.
+template <typename Tester>
+void deploy(Tester& tester, abi_serializer& ser, const std::vector<uint8_t>& wasm, const std::vector<char>& abi) {
+   if (tester.control->find_account(account) == nullptr) tester.create_accounts({account});
+   tester.set_code(account, wasm);
+   tester.set_abi(account, abi.data());
+   tester.set_privileged(account);
+   // Match bootstrap: governance controls the Andon account's active authority.
+   tester.set_authority(account, config::active_name,
+                        authority{permission_level{system_account, config::active_name}}, config::owner_name);
+   tester.produce_blocks();
+   load_account_abi(tester, account, ser);
+}
+
+/// Pull with Andon active authorization, signed by its delegated actor.
+template <typename Tester>
+typename Tester::action_result pull(Tester& tester, abi_serializer& ser, name actor = system_account,
+                                    const std::string& reason = "test") {
+   return push_contract_action_and_produce_block(tester, account, ser, actor, "pull"_n,
+                                                 fc::mutable_variant_object()("reason", reason), {{account, config::active_name}});
+}
+
+/// Clear with Andon active authorization, signed by its delegated actor.
+template <typename Tester>
+typename Tester::action_result clear(Tester& tester, abi_serializer& ser, name actor = system_account,
+                                     const std::string& note = "test") {
+   return push_contract_action_and_produce_block(tester, account, ser, actor, "clear"_n,
+                                                 fc::mutable_variant_object()("note", note), {{account, config::active_name}});
+}
+
+/// The message of the refusal every frozen signed action raises (`andon::FROZEN_MESSAGE`); a suite
+/// compares against `wasm_assert_msg(frozen_message)`.
+inline constexpr const char* frozen_message = "the andon cord is pulled: funds cannot leave custody";
+
+} // namespace andon
+
 } // namespace sysio_system::test_support
