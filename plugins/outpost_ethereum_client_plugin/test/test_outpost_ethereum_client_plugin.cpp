@@ -401,6 +401,7 @@ std::string encode_next_epoch_index_result(uint32_t next_epoch_index) {
 struct observed_delivery_call {
    uint32_t    epoch_index;
    std::string envelope_hex;
+   uint64_t    gas_budget;
 };
 
 /// Harness binding a real `outpost_ethereum_client` to a stubbed OPPInbound
@@ -466,6 +467,23 @@ std::vector<char> serialize_envelope(uint32_t epoch) {
    return {serialized.begin(), serialized.end()};
 }
 
+/// Serialize a protobuf envelope whose one message carries `attestations`
+/// attestations of `payload_bytes` each — the shape the delivery budget is
+/// sized from.
+std::vector<char> serialize_envelope_with_attestations(uint32_t epoch, uint32_t attestations,
+                                                       size_t payload_bytes) {
+   sysio::opp::Envelope envelope;
+   envelope.set_epoch_index(epoch);
+   auto* payload = envelope.add_messages()->mutable_payload();
+   for (uint32_t i = 0; i < attestations; ++i) {
+      auto* entry = payload->add_attestations();
+      entry->set_data(std::string(payload_bytes, static_cast<char>('a' + (i % 26))));
+      entry->set_data_size(static_cast<uint32_t>(payload_bytes));
+   }
+   const auto serialized = envelope.SerializeAsString();
+   return {serialized.begin(), serialized.end()};
+}
+
 /// The app, signer, chain connection and client entry every relay fixture
 /// stands on. The connection points at a port nothing listens on, so a wrapper
 /// a case forgot to stub fails loudly instead of dialing anything.
@@ -525,8 +543,8 @@ std::unique_ptr<whole_envelope_delivery_fixture> create_whole_envelope_delivery_
    BOOST_REQUIRE(fixture->inbound);
 
    auto* raw = fixture.get();
-   raw->inbound->epoch_in = [raw](uint32_t& epoch_index, std::string& envelope_hex) -> fc::variant {
-      raw->delivery_calls.push_back(observed_delivery_call{epoch_index, envelope_hex});
+   raw->inbound->epoch_in = [raw](uint32_t& epoch_index, std::string& envelope_hex, uint64_t gas_budget) -> fc::variant {
+      raw->delivery_calls.push_back(observed_delivery_call{epoch_index, envelope_hex, gas_budget});
       if (raw->delivery_calls.size() == 1 && raw->first_call_delay.count() > 0) {
          std::this_thread::sleep_for(raw->first_call_delay);
       }
@@ -1157,10 +1175,10 @@ BOOST_AUTO_TEST_CASE(read_inbound_envelope_validates_latest_slot) try {
 //  Whole-envelope WIRE -> Ethereum delivery
 // ---------------------------------------------------------------------------
 
-/// The gas an `epochIn` is funded with follows the client's policy ceiling and
-/// never exceeds EIP-7825's cap — estimation cannot size a watchdog-bounded
-/// call, so the floor is what carries a full envelope's dispatch.
-BOOST_AUTO_TEST_CASE(delivery_gas_floor_is_the_policy_ceiling_bounded_by_the_cap) try {
+/// The most an `epochIn` may be funded with follows the client's policy
+/// ceiling and never exceeds EIP-7825's cap; the options a call is sent with
+/// pin floor and cap to the one budget, so the pre-flight runs under it.
+BOOST_AUTO_TEST_CASE(delivery_gas_ceiling_is_the_policy_ceiling_bounded_by_the_cap) try {
    ethereum_transaction_policy policy{
       .client_id = std::string(latest_slot_test_entry_id),
       .chain_id = test_evm_chain_id,
@@ -1169,16 +1187,83 @@ BOOST_AUTO_TEST_CASE(delivery_gas_floor_is_the_policy_ceiling_bounded_by_the_cap
       .max_gas_limit = maximum_ethereum_transaction_policy_value(),
       .max_total_native_cost = maximum_ethereum_transaction_policy_value(),
    };
-   BOOST_CHECK_EQUAL(sysio::delivery_gas_limit_floor(policy), sysio::EIP_7825_TX_GAS_CAP);
+   BOOST_CHECK_EQUAL(sysio::delivery_gas_ceiling(policy), sysio::EIP_7825_TX_GAS_CAP);
 
    policy.max_gas_limit = fc::uint256{sysio::EIP_7825_TX_GAS_CAP};
-   BOOST_CHECK_EQUAL(sysio::delivery_gas_limit_floor(policy), sysio::EIP_7825_TX_GAS_CAP);
+   BOOST_CHECK_EQUAL(sysio::delivery_gas_ceiling(policy), sysio::EIP_7825_TX_GAS_CAP);
 
    policy.max_gas_limit = fc::uint256{below_cap_policy_gas_limit};
-   BOOST_CHECK_EQUAL(sysio::delivery_gas_limit_floor(policy), below_cap_policy_gas_limit);
+   BOOST_CHECK_EQUAL(sysio::delivery_gas_ceiling(policy), below_cap_policy_gas_limit);
 
-   // An ABI-only construction has no client to read a policy from: no floor.
-   BOOST_CHECK_EQUAL(sysio::delivery_confirm_options(ethereum_client_ptr{}).gas_limit_floor, 0u);
+   const auto options = sysio::delivery_confirm_options(below_cap_policy_gas_limit);
+   BOOST_CHECK_EQUAL(options.gas_limit_floor, below_cap_policy_gas_limit);
+   BOOST_CHECK_EQUAL(options.gas_limit_cap, below_cap_policy_gas_limit);
+} FC_LOG_AND_RETHROW();
+
+/// A delivery is funded to what it has left to carry — fixed cost, bytes, an
+/// allowance per attestation still to dispatch, the emit — doubled per spill
+/// already met this tick and never past the ceiling; an envelope the relay
+/// cannot read is funded to the ceiling outright.
+BOOST_AUTO_TEST_CASE(delivery_gas_budget_follows_the_remaining_work_and_escalates_to_the_ceiling) try {
+   constexpr uint64_t bytes   = 1'000;
+   constexpr uint64_t ceiling = sysio::EIP_7825_TX_GAS_CAP;
+   const auto budget = [&](uint32_t remaining, uint32_t escalations) {
+      return sysio::delivery_gas_budget(sysio::delivery_gas_request{
+         .envelope_bytes = bytes, .remaining_attestations = remaining, .escalations = escalations, .ceiling = ceiling});
+   };
+   const uint64_t base = sysio::DELIVERY_FIXED_GAS + bytes * sysio::DELIVERY_GAS_PER_BYTE + sysio::EMIT_GAS_ALLOWANCE;
+
+   BOOST_CHECK_EQUAL(budget(0, 0), base);
+   BOOST_CHECK_EQUAL(budget(1, 0), base + sysio::ATTESTATION_GAS_ALLOWANCE);
+   BOOST_CHECK_EQUAL(budget(3, 0), base + 3 * sysio::ATTESTATION_GAS_ALLOWANCE);
+   // Each spill doubles, and the ceiling is where doubling stops.
+   BOOST_CHECK_EQUAL(budget(1, 1), 2 * (base + sysio::ATTESTATION_GAS_ALLOWANCE));
+   BOOST_CHECK_EQUAL(budget(1, 2), ceiling);
+   BOOST_CHECK_EQUAL(budget(1, 40), ceiling);
+   // A full envelope's worth of attestations is above the ceiling on its own.
+   BOOST_CHECK_EQUAL(budget(70, 0), ceiling);
+   // Unreadable: the ceiling, whatever else is known.
+   BOOST_CHECK_EQUAL(sysio::delivery_gas_budget(sysio::delivery_gas_request{
+                        .envelope_bytes = bytes, .remaining_attestations = std::nullopt, .escalations = 0, .ceiling = ceiling}),
+                     ceiling);
+   // Counting is the relay's own read of the envelope.
+   BOOST_CHECK_EQUAL(*sysio::outpost_ethereum_client_detail::count_envelope_attestations(
+                        serialize_envelope_with_attestations(test_wire_epoch, 3, 16)),
+                     3u);
+   BOOST_CHECK(!sysio::outpost_ethereum_client_detail::count_envelope_attestations(make_envelope(mid_envelope_bytes)));
+} FC_LOG_AND_RETHROW();
+
+/// Across a tipped-and-spilled epoch the budget tracks the outpost's cursor:
+/// everything before the tip, what remains after it, only the emit once
+/// dispatch is complete — each continuation doubled for the spill before it.
+BOOST_AUTO_TEST_CASE(delivery_funds_each_call_to_its_remaining_work) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = serialize_envelope_with_attestations(test_wire_epoch, 2, 64);
+   fixture->spill_responses = {
+      encode_dispatch_spill_result(false, 0, false, false),   // before the delivery
+      encode_dispatch_spill_result(true, 1, false, false),    // tipped, spilled after 1
+      encode_dispatch_spill_result(true, 2, true, false),     // dispatched, emit outstanding
+      encode_dispatch_spill_result(true, 2, true, true),      // finalized
+   };
+   fixture->own_delivery_response = encode_word_result(settled_digest_word);
+
+   const auto tx = fixture->outpost->deliver_outbound_envelope(
+      test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
+   BOOST_CHECK(!tx.empty());
+   check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 3);
+
+   const auto expected = [&](uint32_t remaining, uint32_t escalations) {
+      return sysio::delivery_gas_budget(sysio::delivery_gas_request{
+         .envelope_bytes         = envelope.size(),
+         .remaining_attestations = remaining,
+         .escalations            = escalations,
+         .ceiling                = sysio::EIP_7825_TX_GAS_CAP});
+   };
+   BOOST_CHECK_EQUAL(fixture->delivery_calls[0].gas_budget, expected(2, 0));
+   BOOST_CHECK_EQUAL(fixture->delivery_calls[1].gas_budget, expected(1, 1));
+   BOOST_CHECK_EQUAL(fixture->delivery_calls[2].gas_budget, expected(0, 2));
+   BOOST_CHECK(fixture->delivery_calls[0].gas_budget < fixture->delivery_calls[1].gas_budget);
+   BOOST_CHECK(fixture->delivery_calls[0].gas_budget < sysio::EIP_7825_TX_GAS_CAP);
 } FC_LOG_AND_RETHROW();
 
 /// The deliver-or-continue decision table, exercised without an EVM node.
@@ -1238,6 +1323,9 @@ BOOST_AUTO_TEST_CASE(delivery_sends_the_whole_envelope_in_one_call) try {
 
    BOOST_CHECK(!tx.empty());
    check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 1);
+   // Opaque bytes carry no attestation count to size a budget from: the
+   // ceiling, and the contract judges them.
+   BOOST_CHECK_EQUAL(fixture->delivery_calls[0].gas_budget, sysio::EIP_7825_TX_GAS_CAP);
    // Read before the delivery, and once more after it to learn it did not tip.
    BOOST_CHECK_EQUAL(fixture->next_epoch_reads, 2u);
    BOOST_CHECK_EQUAL(fixture->spill_reads, 2u);

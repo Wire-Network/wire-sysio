@@ -1,5 +1,9 @@
 #pragma once
 
+#include <algorithm>
+#include <functional>
+#include <optional>
+
 #include <sysio/outpost_client_plugin.hpp>
 #include <sysio/outpost_client/outpost_client.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
@@ -52,37 +56,94 @@ struct opp_contract_client : ethereum_contract_client {
 inline constexpr uint64_t EIP_7825_TX_GAS_CAP = 16'777'216;
 
 /**
- * @brief Gas an `epochIn` transaction is funded with: the client's policy
+ * @brief The most gas any `epochIn` may be funded with: the client's policy
  *        ceiling, bounded by EIP-7825's cap.
- *
- * Delivery is funded to a FLOOR rather than to the node's estimate because the
- * estimate is systematically wrong for this call. `OPPInbound.epochIn` stops
- * dispatching on a `gasleft()` watchdog and records where it stopped instead
- * of reverting, so `eth_estimateGas` converges on the least gas at which the
- * call SUCCEEDS — the consensus tip plus ONE attestation. Funded to that
- * figure every call would spill after one attestation and an envelope would
- * cost one transaction per attestation. Funded to the ceiling, one call
- * carries as much dispatch as the chain allows and the unused remainder is
- * refunded.
- *
  * @param policy The client's local expenditure policy.
- * @return The floor, in gas.
+ * @return The ceiling, in gas.
  */
-inline uint64_t delivery_gas_limit_floor(const ethereum_transaction_policy& policy) {
+inline uint64_t delivery_gas_ceiling(const ethereum_transaction_policy& policy) {
    const fc::uint256 cap{EIP_7825_TX_GAS_CAP};
    return policy.max_gas_limit < cap ? policy.max_gas_limit.convert_to<uint64_t>() : EIP_7825_TX_GAS_CAP;
 }
 
+/// Gas an `epochIn` pays before its dispatch loop, independent of size: the
+/// transaction base, the delivery record, and the consensus bookkeeping a tip
+/// adds. A ~700-byte tip reaches the loop at ~320k (wire-ethereum
+/// `OPPCapacity`, the under-funded probe); rounded up.
+inline constexpr uint64_t DELIVERY_FIXED_GAS = 500'000;
+/// Gas an `epochIn` pays per envelope byte: calldata (EIP-7623 floors a
+/// calldata-heavy transaction at 40 gas a byte), the linear decode (~50 gas
+/// a byte, measured at the cap) and the dispatch walk; rounded up.
+inline constexpr uint64_t DELIVERY_GAS_PER_BYTE = 120;
+/// Gas allowed per attestation still to dispatch. A remit is tens of
+/// thousands; a routine rotation seating seven unseen operators is ~1.15M.
+/// An attestation that costs more spills, and the next call escalates.
+inline constexpr uint64_t ATTESTATION_GAS_ALLOWANCE = 1'500'000;
+/// Gas left for the outbound emit the finishing call attempts:
+/// `OPPInbound.EmitAttemptGasFloor`, below which the contract defers it.
+inline constexpr uint64_t EMIT_GAS_ALLOWANCE = 4'000'000;
+
+/// What one `epochIn` has to carry, from which its gas budget is sized.
+struct delivery_gas_request {
+   /// Encoded envelope size.
+   uint64_t envelope_bytes = 0;
+   /// Attestations the outpost has not dispatched yet, or `std::nullopt`
+   /// when the envelope could not be read: the budget is then the ceiling.
+   std::optional<uint32_t> remaining_attestations;
+   /// Calls already sent for this epoch in this tick that spilled: each one
+   /// doubles the budget, so a run of attestations dearer than the allowance
+   /// costs at most a logarithmic number of extra calls.
+   uint32_t escalations = 0;
+   /// `delivery_gas_ceiling`.
+   uint64_t ceiling = 0;
+};
+
 /**
- * @brief Confirmation options for `epochIn`: the defaults, funded to
- *        `delivery_gas_limit_floor`.
- * @param client The client whose policy sets the floor; null (an ABI-only
- *        construction) leaves the floor at zero.
- * @return The options the `epochIn` wrapper is built with.
+ * @brief Gas one `epochIn` is funded with.
+ *
+ * Sized to what the call has left to do rather than to the node's estimate or
+ * to the ceiling. The estimate is systematically wrong for this call:
+ * `OPPInbound.epochIn` stops dispatching on a `gasleft()` watchdog and records
+ * where it stopped, so `eth_estimateGas` converges on the least gas at which
+ * the call SUCCEEDS — the tip plus one attestation — and funding to it would
+ * cost one transaction per attestation. The ceiling is wrong the other way:
+ * a node reserves `gas_limit * max_fee_per_gas` of the signer's balance
+ * whatever the call uses, so a small envelope funded to the cap is refused for
+ * balance at exactly the fee levels where delivery matters most.
+ *
+ * The budget is the fixed and per-byte cost, an allowance per attestation
+ * still to dispatch, and the emit; doubled per spill already met this tick;
+ * never above the ceiling. The contract spills what does not fit and the
+ * next call carries on, so an under-estimate costs a continuation, never the
+ * epoch. An envelope that cannot be read is funded to the ceiling.
+ *
+ * @param request What the call has to carry.
+ * @return The budget, in gas.
  */
-inline ethereum_confirm_options delivery_confirm_options(const ethereum_client_ptr& client) {
+inline uint64_t delivery_gas_budget(const delivery_gas_request& request) {
+   if (!request.remaining_attestations) return request.ceiling;
+   uint64_t budget = DELIVERY_FIXED_GAS + request.envelope_bytes * DELIVERY_GAS_PER_BYTE +
+                     uint64_t{*request.remaining_attestations} * ATTESTATION_GAS_ALLOWANCE +
+                     EMIT_GAS_ALLOWANCE;
+   for (uint32_t i = 0; i < request.escalations && budget < request.ceiling; ++i) budget *= 2;
+   return std::min(budget, request.ceiling);
+}
+
+/**
+ * @brief Confirmation options for one `epochIn`: the defaults, funded to
+ *        exactly `gas_budget`.
+ *
+ * Floor and cap are the same figure, so the transaction carries the budget
+ * and the pre-flight estimate runs under it: a call the budget cannot carry
+ * is refused by the node before it is signed.
+ *
+ * @param gas_budget The budget from `delivery_gas_budget`.
+ * @return The options the call is sent with.
+ */
+inline ethereum_confirm_options delivery_confirm_options(uint64_t gas_budget) {
    ethereum_confirm_options options = ethereum_confirm_option_defaults;
-   if (client) options.gas_limit_floor = delivery_gas_limit_floor(client->transaction_policy());
+   options.gas_limit_floor = gas_budget;
+   options.gas_limit_cap   = gas_budget;
    return options;
 }
 
@@ -93,14 +154,16 @@ struct opp_inbound_contract_client : ethereum_contract_client {
    /// ONE call, addressed to its epoch. The call that reaches consensus
    /// dispatches as many attestations as its gas allows and records where it
    /// stopped; a continuation is the SAME call with the same arguments, which
-   /// the contract resumes from its cursor. Funded to the policy ceiling — see
-   /// `delivery_gas_limit_floor`. `envelopeData` rides as a hex-encoded string
-   /// because the libfc ABI encoder takes `dt::bytes` that way (see
+   /// the contract resumes from its cursor. Funded to exactly `gas_budget`
+   /// (see `delivery_gas_budget`), which is why this is not a plain
+   /// `ethereum_contract_tx_fn`: that binds its options once at construction,
+   /// and the budget differs per call. `envelopeData` rides as a hex-encoded
+   /// string because the libfc ABI encoder takes `dt::bytes` that way (see
    /// `ethereum_abi::encode_dynamic_data`).
    ///
-   /// `ethereum_contract_tx_fn` binds every argument as a non-const lvalue
-   /// reference, so callers must materialize named locals for both.
-   ethereum_contract_tx_fn<fc::variant, uint32_t, std::string> epoch_in;
+   /// The ABI arguments are bound as non-const lvalue references, so callers
+   /// must materialize named locals for both.
+   std::function<fc::variant(uint32_t& epoch_index, std::string& envelope_hex, uint64_t gas_budget)> epoch_in;
    /// `nextEpochIndex()` view — the epoch the outpost is currently accepting.
    ethereum_contract_call_fn<fc::variant> next_epoch_index;
    /// `dispatchSpill(uint32 epochIndex)` view — where a tipped epoch's dispatch
@@ -128,8 +191,10 @@ struct opp_inbound_contract_client : ethereum_contract_client {
                                const address_compat_type& contract_address,
                                const std::vector<fc::network::ethereum::abi::contract>& contracts)
       : ethereum_contract_client(client, contract_address, contracts)
-      , epoch_in(create_tx_and_confirm<fc::variant, uint32_t, std::string>(
-           get_abi("epochIn"), delivery_confirm_options(client)))
+      , epoch_in([this](uint32_t& epoch_index, std::string& envelope_hex, uint64_t gas_budget) -> fc::variant {
+           return create_tx_and_confirm<fc::variant, uint32_t, std::string>(
+              get_abi("epochIn"), delivery_confirm_options(gas_budget))(epoch_index, envelope_hex);
+        })
       , next_epoch_index(create_call<fc::variant>(get_abi("nextEpochIndex")))
       , dispatch_spill(create_call<fc::variant, uint32_t>(get_abi("dispatchSpill")))
       , epoch_deliveries(create_call<fc::variant, uint32_t, std::string>(get_abi("epochDeliveries")))
