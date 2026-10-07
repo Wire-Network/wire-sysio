@@ -4,27 +4,34 @@ Cranks Depot and Outpost contracts, ferrying OPP message chains between the WIRE
 
 ## Overview
 
-All 21 batch operators run this plugin in perpetuity. The epoch scheduler (`sysio.epoch`) assigns operators into 3 fixed groups of 7. Each epoch (every 6 minutes), one group is elected; those 7 execute the full epoch cycle.
+Every batch operator runs this plugin. `sysio.epoch` keeps a sliding window of
+`batch_op_groups` groups of `operators_per_epoch` operators (default 3 groups of 7, epochs
+of 6 minutes); the group at the front of the window is elected for the current epoch and
+its members execute the epoch cycle. Each poll the plugin also reads its own
+`sysio.opreg` status and stops relaying once the operator is `SLASHED` or `TERMINATED`.
 
 ## Epoch Cycle
 
-**Phase 1 — Outbound (WIRE → Outposts):**
-1. Crank Depot (`sysio.msgch::crank`) to produce outbound OPP Message Chain
-2. Read the produced chain from Depot tables
-3. Deliver chain to Outpost contract (ETH: `OPPInbound.epochIn()`, SOL: `epoch_in()`)
-4. All 7 independently verify the delivered chain
+Run by every member of the elected group, for every active outpost chain:
 
-**Phase 2 — Inbound (Outposts → WIRE):**
+**Outbound (WIRE → Outposts):**
+1. Read the outpost's outbound envelope that `sysio.epoch::advance` built
+   (`sysio.msgch::buildenv`) from the depot's `outenvelopes` table
+2. Deliver it to the Outpost contract, chunked (ETH: `OPPInbound.epochIn()`, SOL: `epoch_in`)
+3. The outpost reaches consensus once enough group members have delivered identical bytes
+
+**Inbound (Outposts → WIRE):**
 1. The consensus-reaching delivery emits the outpost's outbound envelope
 2. Read the latest outbound envelope from Outpost storage
 3. Deliver its raw protobuf bytes to Depot (`sysio.msgch::deliver`)
-4. Depot evaluates consensus across all 7 deliveries
+4. Depot evaluates consensus across the group's deliveries
 
 ## Depot cranks
 
 Every epoch poll (`--batch-epoch-poll-ms`) also pushes the depot actions nothing on
-chain schedules. `sysio.msgch::chkcons` comes only from the elected operator; the
-rest come from every ACTIVE operator, because the elected one may be the operator
+chain schedules. `sysio.msgch::chkcons` — which advances the epoch once every active
+outpost has consensus and the boundary has passed — comes only from elected operators;
+the rest come from every ACTIVE operator, because the elected one may be the operator
 that is offline, and each is a cheap no-op once its work is done:
 
 | Action | When | Why nothing else drives it |
@@ -34,7 +41,8 @@ that is offline, and each is a cheap no-op once its work is done:
 | `sysio.liq::queueyield(sym)` | every shadow with yield pending from an outpost `LIQ_YIELD` report | the report lands in `sysio.liq`'s pending balance; queuing it into the swap is a separate, permissionless step |
 
 The two yield cranks stay idle, without logging a read failure per poll, until both
-`sysio.swap` and `sysio.liq` are deployed on the depot.
+`sysio.swap` and `sysio.liq` are deployed on the depot. The plugin does not crank
+`sysio.synd::crank`; syndication release is driven by keepers.
 
 ## Configuration
 
@@ -79,5 +87,5 @@ address rather than left pointing at the old one.
 - `chain_plugin` — blockchain state access
 - `cron_plugin` — irreversible block event subscription
 - `signature_provider_manager_plugin` — signing key management
-- `outpost_ethereum_client_plugin` — ETH RPC calls (future)
-- `outpost_solana_client_plugin` — SOL RPC calls (future)
+- `outpost_ethereum_client_plugin` — Ethereum outpost relay
+- `outpost_solana_client_plugin` — Solana outpost relay

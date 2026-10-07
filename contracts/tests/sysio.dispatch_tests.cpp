@@ -45,8 +45,8 @@
 #include <sstream>
 
 #include "contracts.hpp"
+#include "external_chain_simulator.hpp"
 #include "contract_test_support.hpp"
-#include "liq_test_support.hpp"
 #include "test_symbol.hpp"
 // Canonical-encoding + header-derivation oracle: inbound envelopes must carry
 // spec-derived semantic headers or apply_consensus drops them before dispatch.
@@ -59,6 +59,7 @@ using namespace sysio::opp::types;
 
 using mvo = fc::mutable_variant_object;
 using sysio_system::test_support::codename_mvo;
+using sysio_system::test_support::sign_createlink;
 
 namespace {
 
@@ -66,6 +67,10 @@ constexpr uint64_t PROTOBUF_VARINT_PAYLOAD_MASK = 0x7fu;
 constexpr uint32_t PROTOBUF_VARINT_PAYLOAD_BITS = 7u;
 constexpr uint8_t  PROTOBUF_VARINT_CONTINUATION_BIT = 0x80u;
 constexpr uint32_t PROTOBUF_FIELD_TAG_SHIFT = 3u;
+
+/// The outpost custody a SyndicateLIQ or LIQYield fixture carries by default: the whole asset range, at
+/// or above any outstanding shadow a dispatch test can reach.
+constexpr uint64_t CUSTODY_COVERING_ANY_SUPPLY = static_cast<uint64_t>(sysio::chain::asset::max_amount);
 
 /** Append one unsigned protobuf varint to a hostile-wire-format fixture. */
 void append_proto_varint(std::vector<char>& out, uint64_t value) {
@@ -195,28 +200,6 @@ std::vector<char> encode_envelope_padded_to(uint32_t epoch_index, size_t target_
    return padded;
 }
 
-/// Render an EM public key into its canonical contract string —
-/// "PUB_EM_" + hex(compressed_33_bytes).
-std::string contract_em_pubkey_to_string(const fc::crypto::public_key& pk) {
-   const auto& shim = pk.get<fc::em::public_key_shim>();
-   auto compressed = shim.serialize();  // std::array<char, 33>
-   return "PUB_EM_" + fc::to_hex(compressed.data(), compressed.size());
-}
-
-/// Build the createlink message string exactly as `sysio.authex::createlink`
-/// composes it on-chain.
-std::string build_link_message(
-   const fc::crypto::public_key& pub_key,
-   const std::string& account,
-   sysio::opp::types::ChainKind chain_kind,
-   uint64_t nonce)
-{
-   auto pub_key_str = contract_em_pubkey_to_string(pub_key);
-   auto chain_kind_str = std::to_string(magic_enum::enum_integer(chain_kind));
-   return pub_key_str + "|" + account + "|" + chain_kind_str + "|" +
-          std::to_string(nonce) + "|createlink auth";
-}
-
 /// Extract the raw 33-byte compressed pubkey from an EM `public_key`.
 std::vector<char> em_pubkey_bytes(const fc::crypto::public_key& pk) {
    const auto& shim = pk.get<fc::em::public_key_shim>();
@@ -332,11 +315,13 @@ std::string encode_swap_request(
 }
 
 /// Encode a SyndicateLIQ attestation payload: the emitting outpost, the syndicating user's
-/// native pubkey (kind + bytes), the liq TokenAmount, and the per-outpost sequence.
+/// native pubkey (kind + bytes), the liq TokenAmount, the per-outpost sequence and the outpost's
+/// live custody total.
 std::string encode_syndicate_liq(uint64_t chain_code_v,
                                  sysio::opp::types::ChainKind user_kind,
                                  const std::vector<char>& user_pubkey,
-                                 uint64_t token_code_v, int64_t amount, uint64_t sequence)
+                                 uint64_t token_code_v, int64_t amount, uint64_t sequence,
+                                 uint64_t total_syndicated = CUSTODY_COVERING_ANY_SUPPLY)
 {
    sysio::opp::attestations::SyndicateLIQ synd;
    synd.set_chain_code(chain_code_v);
@@ -347,6 +332,7 @@ std::string encode_syndicate_liq(uint64_t chain_code_v,
    amt->set_token_code(token_code_v);
    amt->set_amount(amount);
    synd.set_sequence(sequence);
+   synd.set_total_syndicated(total_syndicated);
 
    std::string out;
    synd.SerializeToString(&out);
@@ -354,9 +340,11 @@ std::string encode_syndicate_liq(uint64_t chain_code_v,
 }
 
 /// Encode a LIQYield attestation payload: the outpost's claimed yield in its liq token,
-/// the per-outpost sequence it shares with SyndicateLIQ, and the outpost epoch of the report.
+/// the per-outpost sequence it shares with SyndicateLIQ, the outpost epoch of the report and the
+/// outpost's live custody total.
 std::string encode_liq_yield(uint64_t chain_code_v, uint64_t token_code_v, int64_t amount,
-                             uint64_t sequence, uint64_t epoch)
+                             uint64_t sequence, uint64_t epoch,
+                             uint64_t total_syndicated = CUSTODY_COVERING_ANY_SUPPLY)
 {
    sysio::opp::attestations::LIQYield report;
    report.set_chain_code(chain_code_v);
@@ -365,6 +353,7 @@ std::string encode_liq_yield(uint64_t chain_code_v, uint64_t token_code_v, int64
    amt->set_amount(amount);
    report.set_sequence(sequence);
    report.set_epoch(epoch);
+   report.set_total_syndicated(total_syndicated);
 
    std::string out;
    report.SerializeToString(&out);
@@ -516,12 +505,7 @@ public:
 
       auto pub  = priv.get_public_key();
       const uint64_t nonce = control->head().block_time().time_since_epoch().count() / 1000;
-
-      auto msg = build_link_message(pub, account.to_string(),
-                                    ChainKind::CHAIN_KIND_EVM, nonce);
-      auto msg_hash = keccak256::hash(msg);
-      auto sig = priv.sign(fc::sha256(reinterpret_cast<const char*>(msg_hash.data()),
-                                      32));
+      auto sig = sign_createlink(priv, account.to_string(), ChainKind::CHAIN_KIND_EVM, nonce);
 
       BOOST_REQUIRE_EQUAL(success(), push(AUTHEX_ACCOUNT, authex_abi, account,
          "createlink"_n, mvo()
@@ -1486,43 +1470,48 @@ public:
          push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n, mvo()));
    }
 
-   // ── sysio.liq inbound routing (SYNDICATE_LIQ / LIQ_YIELD) ─────────────────
+   // ── sysio.synd inbound routing (SYNDICATE_LIQ / LIQ_YIELD) ────────────────
 
    static constexpr auto TOKENS_ACCOUNT = "sysio.tokens"_n;
    static constexpr auto LIQ_ACCOUNT    = "sysio.liq"_n;
+   static constexpr auto SYND_ACCOUNT   = "sysio.synd"_n;
    static inline const symbol LIQETH_SYM = symbol::from_string("9,LIQETH");
    /// One whole liq token in the depot's 9-decimal frame.
    static constexpr int64_t LIQ_UNIT = 1'000'000'000;
 
    /// Register `code` on sysio.tokens as `kind` at the depot's 9-decimal precision and bind
    /// it to `chain_code` (EVM address bytes; the registries only check the length).
-   action_result regtoken(TokenKind kind, std::string_view code, std::string_view chain_code) {
-      const std::vector<char> addr(20, '\x5a');
+   action_result regtoken(TokenKind kind, std::string_view code, std::string_view chain_code,
+                          ChainKind family = ChainKind::CHAIN_KIND_EVM) {
+      const std::vector<char> addr(family == ChainKind::CHAIN_KIND_SVM ? 32 : 20, '\x5a');
       auto r = push(TOKENS_ACCOUNT, tokens_abi, TOKENS_ACCOUNT, "regtoken"_n, mvo()
          ("kind", kind)("code", codename_mvo(code))("symbol_name", std::string(code))
          ("description", std::string{})("precision", 9)
-         ("address", mvo()("kind", ChainKind::CHAIN_KIND_EVM)("address", addr)));
+         ("address", mvo()("kind", family)("address", addr)));
       if (r != success()) return r;
       return push(TOKENS_ACCOUNT, tokens_abi, TOKENS_ACCOUNT, "regctok"_n, mvo()
          ("chain_code", codename_mvo(chain_code))("token_code", codename_mvo(code))
          ("contract_addr", addr)("is_native", false));
    }
 
-   /// Deploy sysio.tokens + sysio.liq and register the bootstrapped outpost's liq token
-   /// ("LIQETH" on ETH) with its shadow, plus two tokens the shadow ledger must refuse: a
+   /// Deploy sysio.tokens, sysio.liq and sysio.synd and register the bootstrapped outpost's liq
+   /// token ("LIQETH" on ETH) with its shadow, plus two tokens the syndication intake must refuse: a
    /// plain ERC20 ("USDCETH") and a liq token nobody opened a shadow for ("LIQTWO").
    /// `bootstrap_for_dispatch` must have run first — registrations inside the epoch-0
    /// bootstrap window land ACTIVE.
-   void setup_liq_for_dispatch() {
-      create_accounts({TOKENS_ACCOUNT, LIQ_ACCOUNT});
+   void setup_liq_for_dispatch(std::string_view chain = "ETH", std::string_view token = "LIQETH",
+                               ChainKind family = ChainKind::CHAIN_KIND_EVM) {
+      create_accounts({TOKENS_ACCOUNT, LIQ_ACCOUNT, SYND_ACCOUNT});
       produce_blocks();
       deploy(TOKENS_ACCOUNT, contracts::tokens_wasm(), contracts::tokens_abi(), tokens_abi);
       deploy(LIQ_ACCOUNT,    contracts::liq_wasm(),    contracts::liq_abi(),    liq_abi);
-      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_LIQ,   "LIQETH",  "ETH"));
-      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_LIQ,   "LIQTWO",  "ETH"));
-      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_ERC20, "USDCETH", "ETH"));
+      deploy(SYND_ACCOUNT,   contracts::synd_wasm(),   contracts::synd_abi(),   synd_abi);
+      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_LIQ,   token, chain, family));
+      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_LIQ,   "LIQTWO", chain, family));
+      BOOST_REQUIRE_EQUAL(success(), regtoken(TokenKind::TOKEN_KIND_ERC20, "USDCETH", chain, family));
       BOOST_REQUIRE_EQUAL(success(), push(LIQ_ACCOUNT, liq_abi, LIQ_ACCOUNT, "create"_n, mvo()
-         ("sym", LIQETH_SYM)("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("LIQETH"))));
+         ("sym", symbol::from_string("9," + std::string(token)))("chain_code", codename_mvo(chain))
+         ("token_code", codename_mvo(token))));
       produce_blocks();
    }
 
@@ -1533,36 +1522,92 @@ public:
    }
 
    /// `holder`'s LIQETH shadow balance; 0 without a row.
-   int64_t liq_balance(name holder) {
-      const auto row = liq_row("accounts"_n, "account", holder, LIQETH_SYM.to_symbol_code().value);
+   int64_t liq_balance(name holder, symbol token = LIQETH_SYM) {
+      const auto row = liq_row("accounts"_n, "account", holder, token.to_symbol_code().value);
       return row.is_null() ? 0 : row["balance"].as<asset>().get_amount();
    }
 
    /// The LIQETH shadow supply; 0 without a stat row.
-   int64_t liq_supply() {
-      const auto row = liq_row("stat"_n, "currency_stats", LIQ_ACCOUNT, LIQETH_SYM.to_symbol_code().value);
+   int64_t liq_supply(symbol token = LIQETH_SYM) {
+      const auto row = liq_row("stat"_n, "currency_stats", LIQ_ACCOUNT, token.to_symbol_code().value);
       return row.is_null() ? 0 : row["supply"].as<asset>().get_amount();
    }
 
    /// LIQETH yield reported by the outpost and not yet queued to the swap; 0 without a row.
-   int64_t liq_pending() {
-      const auto row = liq_row("liqpending"_n, "pending_yield", LIQ_ACCOUNT, LIQETH_SYM.to_symbol_code().value);
+   int64_t liq_pending(symbol token = LIQETH_SYM) {
+      const auto row = liq_row("liqpending"_n, "pending_yield", LIQ_ACCOUNT, token.to_symbol_code().value);
       return row.is_null() ? 0 : row["quantity"].as<asset>().get_amount();
    }
 
-   /// The per-outpost inbound cursor (`last_sequence`, `last_epoch`); null before any credit lands.
-   fc::variant liq_cursor(std::string_view chain_code) {
-      return liq_row("liqcursors"_n, "liq_cursor", LIQ_ACCOUNT, fc::slug_name{chain_code}.value);
+   /// Mint `amount` LIQETH shadow to `holder`, signed as sysio.synd, the ledger's only minter.
+   action_result mint_shadow(name holder, uint64_t amount) {
+      return push(LIQ_ACCOUNT, liq_abi, SYND_ACCOUNT, "mint"_n, mvo()
+         ("to", holder)("token_code", codename_mvo("LIQETH"))("amount", amount));
    }
 
-   /// The LIQETH balance parked against an unlinked `pubkey` of `kind`; 0 without a row.
-   int64_t liq_parked(ChainKind kind, const std::vector<char>& pubkey) {
-      using namespace sysio_liq::test_support;
-      const auto data = parked_row_bytes(*control, LIQ_ACCOUNT, parked_key(LIQETH_SYM.to_symbol_code(), kind, pubkey));
-      if (data.empty()) return 0;
-      const auto row = liq_abi.binary_to_variant(
-         "parked_row", data, abi_serializer::create_yield_function(abi_serializer_max_time));
-      return row["holding"]["balance"].as<asset>().get_amount();
+   fc::variant synd_decode(const char* type, const std::vector<char>& data) {
+      return data.empty() ? fc::variant() : synd_abi.binary_to_variant(
+         type, data, abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// sysio.synd's kv rows of `table`, in key order, as raw values.
+   std::vector<std::vector<char>> synd_rows(name table) {
+      const auto& kv_idx   = control->db().get_index<kv_index, by_code_key>();
+      const auto  table_id = compute_table_id(table.to_uint64_t());
+      std::vector<std::vector<char>> rows;
+      for (auto itr = kv_idx.lower_bound(boost::make_tuple(SYND_ACCOUNT, table_id, std::string_view{}));
+           itr != kv_idx.end() && itr->code == SYND_ACCOUNT && itr->table_id == table_id; ++itr)
+         rows.emplace_back(itr->value.data(), itr->value.data() + itr->value.size());
+      return rows;
+   }
+
+   /// Every held item, in arrival order.
+   std::vector<fc::variant> synd_items() {
+      std::vector<fc::variant> items;
+      for (const auto& value : synd_rows("items"_n)) items.push_back(synd_decode("item_row", value));
+      return items;
+   }
+
+   /// The sysio.synd envelope row of `(chain_code, token_code, epoch)`; null when there is none.
+   fc::variant synd_envelope(std::string_view chain_code, std::string_view token_code, uint32_t epoch) {
+      for (const auto& value : synd_rows("envelopes"_n)) {
+         const auto row = synd_decode("envelope_row", value);
+         if (row["chain_code"].as_string() == chain_code && row["token_code"].as_string() == token_code &&
+             row["epoch_index"].as<uint32_t>() == epoch)
+            return row;
+      }
+      return fc::variant();
+   }
+
+   /// The per-outpost inbound cursor (`last_sequence`, `last_epoch`); null before any message is held.
+   fc::variant synd_cursor(std::string_view chain_code) {
+      return synd_decode("synd_cursor", get_row_by_id(SYND_ACCOUNT, SYND_ACCOUNT, "syndcursors"_n,
+                                                      fc::slug_name{chain_code}.value));
+   }
+
+   /// The canonical digest of the last envelope sysio.msgch accepted from `chain_code`.
+   fc::sha256 accepted_envelope_digest(uint64_t chain_code) {
+      const auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outpcons"_n, chain_code);
+      BOOST_REQUIRE(!data.empty());
+      return msgch_abi.binary_to_variant("outpost_consensus_entry", data,
+         abi_serializer::create_yield_function(abi_serializer_max_time))["envelope_digest"].as<fc::sha256>();
+   }
+
+   /// The data of every sysio.synd `action_name` action `trace` executed, decoded, in execution order.
+   std::vector<fc::variant> synd_action_data(const transaction_trace_ptr& trace, name action_name) {
+      std::vector<fc::variant> decoded;
+      for (const auto& at : trace->action_traces)
+         if (at.receiver == SYND_ACCOUNT && at.act.account == SYND_ACCOUNT && at.act.name == action_name)
+            decoded.push_back(synd_decode(action_name.to_string().c_str(), at.act.data));
+      return decoded;
+   }
+
+   /// The sysio.synd actions `trace` executed, in execution order.
+   static std::vector<name> synd_actions(const transaction_trace_ptr& trace) {
+      std::vector<name> actions;
+      for (const auto& at : trace->action_traces)
+         if (at.receiver == SYND_ACCOUNT && at.act.account == SYND_ACCOUNT) actions.push_back(at.act.name);
+      return actions;
    }
 
    /// Every action's console in `trace`, inline actions included: msgch's own drops print on
@@ -1576,7 +1621,7 @@ public:
    }
 
    abi_serializer msgch_abi, opreg_abi, uwrit_abi, epoch_abi, reserv_abi, authex_abi, dclaim_abi,
-                  chains_abi, roa_abi, token_abi, tokens_abi, liq_abi;
+                  chains_abi, roa_abi, token_abi, tokens_abi, liq_abi, synd_abi;
 
    std::vector<char> uwrit_op_eth_pubkey;
 };
@@ -2269,6 +2314,36 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    auto pending = get_dclaim_row("pclaims"_n, "pending_claim", CLAIM_ACCOUNT.to_uint64_t());
    BOOST_REQUIRE(!pending.is_null());
    BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 4321);
+} FC_LOG_AND_RETHROW() }
+
+// Only ATTESTATION_TYPE_NODE_OWNER_REG reaches the node-owner handler. The outbound-only types
+// (OPERATORS, BATCH_OPERATOR_GROUPS, SWAP_REVERT, DEPOSIT_REVERT) are dropped on receipt even when
+// the payload is a well-formed NodeOwnerRegistration from the node-owner source outpost: a payload
+// that would register CLAIM_ACCOUNT under the real type must leave no owner row and no audit row.
+BOOST_FIXTURE_TEST_CASE(outbound_only_types_never_reach_node_owner_dispatch, sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch("ETHEREUM");
+
+   const auto eth_code = fc::slug_name{"ETHEREUM"}.value;
+   auto wire_key = k1_pubkey_bytes(get_public_key(CLAIM_ACCOUNT, "active"));
+   auto eth_pub = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em).get_public_key();
+   auto eth_bytes = em_uncompressed_pubkey_bytes(eth_pub);
+   auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_pub);
+   const auto payload = encode_node_owner_registration(
+      CLAIM_ACCOUNT.to_string(), /*tier=*/2,
+      sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes, eth_address);
+
+   std::vector<typed_attestation> entries;
+   for (auto type : {ATTESTATION_TYPE_OPERATORS, ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS,
+                     ATTESTATION_TYPE_SWAP_REVERT, ATTESTATION_TYPE_DEPOSIT_REVERT}) {
+      entries.emplace_back(type, payload);
+   }
+   const auto trace = deliver_trace(eth_code,
+      encode_envelope_with_mixed_attestations(current_epoch(), entries));
+   BOOST_REQUIRE(trace != nullptr);
+   BOOST_REQUIRE(!trace->except);
+
+   BOOST_CHECK(get_nodeowner(CLAIM_ACCOUNT).is_null());
+   BOOST_CHECK(get_nodeownerreg(CLAIM_ACCOUNT).is_null());
 } FC_LOG_AND_RETHROW() }
 
 /// One slot and two fresh-name claims must commit the first, reject the second, and keep epochs moving.
@@ -6937,14 +7012,15 @@ BOOST_FIXTURE_TEST_CASE(operator_action_with_a_malformed_address_is_dropped,
    BOOST_CHECK_EQUAL(0u, op["balances"].get_array().size());
 } FC_LOG_AND_RETHROW() }
 
-// ── SYNDICATE_LIQ / LIQ_YIELD -> sysio.liq ──────────────────────────────────
+// ── SYNDICATE_LIQ / LIQ_YIELD -> sysio.synd ─────────────────────────────────
 
-// SYNDICATE_LIQ routes on the AuthX link: a linked user's syndication credits their shadow
-// balance through sysio.liq::mintsynd, an unlinked user's is parked against the pubkey through
-// sysio.liq::park, and the per-outpost sequence is consumed only by a credit that lands — a
-// replay is dropped, a gap is admitted. A malformed payload and an echoed DESYNDICATE_LIQ are
-// dropped too, and nothing aborts the envelope.
-BOOST_FIXTURE_TEST_CASE(syndicate_liq_credits_a_linked_user_and_parks_an_unlinked_one,
+// SYNDICATE_LIQ routes to sysio.synd::onsynd with the envelope's identity, whether the user's key is
+// AuthX-linked or not: sysio.synd holds every syndication as an item of the accepted envelope,
+// minted into its own sysio.liq row, and no account is credited at intake. The per-outpost sequence
+// is consumed only by a message that is held -- a replay is dropped, a gap is admitted. A malformed
+// payload and an echoed DESYNDICATE_LIQ are dropped too, nothing aborts the envelope, and after the
+// last attestation sysio.msgch closes the envelope with one `closeenv`.
+BOOST_FIXTURE_TEST_CASE(msgch_routes_syndicate_liq_to_synd,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
    setup_liq_for_dispatch();
@@ -6955,11 +7031,12 @@ BOOST_FIXTURE_TEST_CASE(syndicate_liq_credits_a_linked_user_and_parks_an_unlinke
    const auto stranger_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
    const auto stranger     = em_pubkey_bytes(stranger_key.get_public_key());
    constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
+   const uint32_t epoch = current_epoch();
 
-   const auto env = encode_envelope_with_mixed_attestations(current_epoch(), {
+   const auto env = encode_envelope_with_mixed_attestations(epoch, {
       {ATTESTATION_TYPE_SYNDICATE_LIQ,   encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 5 * LIQ_UNIT, 1)},
       {ATTESTATION_TYPE_SYNDICATE_LIQ,   encode_syndicate_liq(eth, EVM, stranger,            liqeth, 3 * LIQ_UNIT, 2)},
-      // sequence 2 again: a replay, dropped by sysio.liq
+      // sequence 2 again: a replay, dropped by sysio.synd
       {ATTESTATION_TYPE_SYNDICATE_LIQ,   encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 4 * LIQ_UNIT, 2)},
       // not a SyndicateLIQ at all
       {ATTESTATION_TYPE_SYNDICATE_LIQ,   std::string(1, '\x0a')},
@@ -6973,30 +7050,98 @@ BOOST_FIXTURE_TEST_CASE(syndicate_liq_credits_a_linked_user_and_parks_an_unlinke
    BOOST_REQUIRE(!trace->except);
    const auto console = all_console(trace);
 
-   BOOST_CHECK_EQUAL(6 * LIQ_UNIT, liq_balance(UWRIT_OP));
-   BOOST_CHECK_EQUAL(3 * LIQ_UNIT, liq_parked(EVM, stranger));
+   // Four onsynd (the malformed one never leaves msgch), then exactly one closeenv, last.
+   const auto actions = synd_actions(trace);
+   BOOST_REQUIRE_EQUAL(5u, actions.size());
+   for (size_t i = 0; i < 4; ++i) BOOST_CHECK_EQUAL("onsynd"_n, actions[i]);
+   BOOST_CHECK_EQUAL("closeenv"_n, actions[4]);
+   BOOST_CHECK_NE(std::string::npos, console.find("sysio.synd::onsynd: DROP -- replayed sequence"));
+
+   // The linked and the unlinked key are held alike; nobody is credited.
+   const auto items = synd_items();
+   BOOST_REQUIRE_EQUAL(3u, items.size());
+   BOOST_CHECK(uwrit_op_eth_pubkey == items[0]["pubkey"].as<std::vector<char>>());
+   BOOST_CHECK(stranger == items[1]["pubkey"].as<std::vector<char>>());
+   BOOST_CHECK(uwrit_op_eth_pubkey == items[2]["pubkey"].as<std::vector<char>>());
+   BOOST_CHECK_EQUAL(5 * LIQ_UNIT, items[0]["amount"].as<int64_t>());
+   BOOST_CHECK_EQUAL(3 * LIQ_UNIT, items[1]["amount"].as<int64_t>());
+   BOOST_CHECK_EQUAL(1 * LIQ_UNIT, items[2]["amount"].as<int64_t>());
+   for (const auto& item : items) {
+      BOOST_CHECK_EQUAL("SYNDICATION", item["kind"].as_string());
+      BOOST_CHECK_EQUAL("CHAIN_KIND_EVM", item["chain_kind"].as_string());
+      BOOST_CHECK_EQUAL(epoch, item["epoch_index"].as<uint32_t>());
+   }
+   BOOST_CHECK_EQUAL(9 * LIQ_UNIT, liq_balance(SYND_ACCOUNT));
+   BOOST_CHECK_EQUAL(0, liq_balance(UWRIT_OP));
    BOOST_CHECK_EQUAL(9 * LIQ_UNIT, liq_supply());
    BOOST_CHECK_EQUAL(0, liq_pending());
-   const auto cursor = liq_cursor("ETH");
+   const auto cursor = synd_cursor("ETH");
    BOOST_REQUIRE(!cursor.is_null());
    BOOST_CHECK_EQUAL(9u, cursor["last_sequence"].as<uint64_t>());
    BOOST_CHECK_EQUAL(0u, cursor["last_epoch"].as<uint64_t>());
-   BOOST_CHECK_NE(std::string::npos, console.find("sysio.liq::mintsynd: DROP -- replayed sequence"));
 
-   // The stranger links the key later: createlink sweeps the parked shadow into the new
-   // account inline, so nothing is left parked and no permissionless sweep is needed.
+   // The envelope carries the digest msgch accepted, and closeenv left it WAITING.
+   const auto envelope = synd_envelope("ETH", "LIQETH", epoch);
+   BOOST_REQUIRE(!envelope.is_null());
+   BOOST_CHECK_EQUAL("WAITING", envelope["state"].as_string());
+   BOOST_CHECK_EQUAL(9 * LIQ_UNIT, envelope["synd_total"].as<int64_t>());
+   BOOST_CHECK_EQUAL(3u, envelope["item_count"].as<uint32_t>());
+   BOOST_CHECK_EQUAL(accepted_envelope_digest(eth), envelope["digest"].as<fc::sha256>());
+
+   // Linking the stranger's key later credits nothing at intake: the item stays held.
    create_accounts({"stranger"_n});
    produce_blocks();
    create_eth_authex_link("stranger"_n, stranger_key);
-   BOOST_CHECK_EQUAL(3 * LIQ_UNIT, liq_balance("stranger"_n));
-   BOOST_CHECK_EQUAL(0, liq_parked(EVM, stranger));
-   BOOST_CHECK_EQUAL(9 * LIQ_UNIT, liq_supply());
+   BOOST_CHECK_EQUAL(0, liq_balance("stranger"_n));
+   BOOST_CHECK_EQUAL(3u, synd_items().size());
+   BOOST_CHECK_EQUAL(9 * LIQ_UNIT, liq_balance(SYND_ACCOUNT));
+} FC_LOG_AND_RETHROW() }
+
+// sysio.msgch forwards each message's outpost custody total verbatim as the last argument of
+// `onsynd` and `onyield`: every syndication and yield report of one envelope carries its own reading.
+BOOST_FIXTURE_TEST_CASE(msgch_forwards_the_custody_total_to_synd,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   setup_liq_for_dispatch();
+
+   const auto eth    = fc::slug_name{"ETH"}.value;
+   const auto liqeth = fc::slug_name{"LIQETH"}.value;
+   constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
+   // The custody the outpost read after each lock and after the claim, 1 base unit apart from any
+   // amount so a forwarded amount cannot pass for the total.
+   const uint64_t first_total  = 5 * LIQ_UNIT + 1;
+   const uint64_t second_total = 8 * LIQ_UNIT + 1;
+   const uint64_t yield_total  = 10 * LIQ_UNIT + 1;
+
+   const auto env = encode_envelope_with_mixed_attestations(current_epoch(), {
+      {ATTESTATION_TYPE_SYNDICATE_LIQ,
+       encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 5 * LIQ_UNIT, 1, first_total)},
+      {ATTESTATION_TYPE_SYNDICATE_LIQ,
+       encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 3 * LIQ_UNIT, 2, second_total)},
+      {ATTESTATION_TYPE_LIQ_YIELD, encode_liq_yield(eth, liqeth, 2 * LIQ_UNIT, 3, 42, yield_total)},
+   });
+   const auto trace = deliver_trace(/*proven=*/ eth, env);
+   BOOST_REQUIRE(trace != nullptr);
+   BOOST_REQUIRE(!trace->except);
+
+   const auto syndications = synd_action_data(trace, "onsynd"_n);
+   BOOST_REQUIRE_EQUAL(2u, syndications.size());
+   BOOST_CHECK_EQUAL(5 * LIQ_UNIT, syndications[0]["amount"].as<int64_t>());
+   BOOST_CHECK_EQUAL(first_total, syndications[0]["total_syndicated"].as_uint64());
+   BOOST_CHECK_EQUAL(3 * LIQ_UNIT, syndications[1]["amount"].as<int64_t>());
+   BOOST_CHECK_EQUAL(second_total, syndications[1]["total_syndicated"].as_uint64());
+   const auto reports = synd_action_data(trace, "onyield"_n);
+   BOOST_REQUIRE_EQUAL(1u, reports.size());
+   BOOST_CHECK_EQUAL(2 * LIQ_UNIT, reports[0]["amount"].as<int64_t>());
+   BOOST_CHECK_EQUAL(yield_total, reports[0]["total_syndicated"].as_uint64());
+   // Forwarding changes nothing about intake: both syndications and the report are held.
+   BOOST_CHECK_EQUAL(3u, synd_items().size());
+   BOOST_CHECK_EQUAL(8 * LIQ_UNIT, liq_supply());
 } FC_LOG_AND_RETHROW() }
 
 // The user's key family must be the proven outpost's own. A Solana-family key inside an
-// Ethereum envelope is dropped by msgch before the AuthX lookup, whether an account has linked
-// it (mintsynd receives no family and would have credited that account) or not (park would
-// have refused it); the EVM credit beside them still lands and is the only sequence consumed.
+// Ethereum envelope is dropped by msgch before it reaches sysio.synd, whether an account has linked
+// it or not; the EVM syndication beside them is still held and is the only sequence consumed.
 BOOST_FIXTURE_TEST_CASE(syndicate_liq_refuses_a_key_of_another_chain_family,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
@@ -7028,26 +7173,32 @@ BOOST_FIXTURE_TEST_CASE(syndicate_liq_refuses_a_key_of_another_chain_family,
    BOOST_REQUIRE(!trace->except);
    const auto console = all_console(trace);
 
-   BOOST_CHECK_EQUAL(2 * LIQ_UNIT, liq_balance(UWRIT_OP));
-   BOOST_CHECK_EQUAL(0, liq_parked(SVM, linked_sol));
-   BOOST_CHECK_EQUAL(0, liq_parked(SVM, stranger_sol));
+   const auto actions = synd_actions(trace);
+   BOOST_REQUIRE_EQUAL(2u, actions.size());
+   BOOST_CHECK_EQUAL("onsynd"_n, actions[0]);
+   BOOST_CHECK_EQUAL("closeenv"_n, actions[1]);
+   const auto items = synd_items();
+   BOOST_REQUIRE_EQUAL(1u, items.size());
+   BOOST_CHECK(uwrit_op_eth_pubkey == items[0]["pubkey"].as<std::vector<char>>());
+   BOOST_CHECK_EQUAL(2 * LIQ_UNIT, liq_balance(SYND_ACCOUNT));
+   BOOST_CHECK_EQUAL(0, liq_balance(UWRIT_OP));
    BOOST_CHECK_EQUAL(2 * LIQ_UNIT, liq_supply());
-   const auto cursor = liq_cursor("ETH");
+   const auto cursor = synd_cursor("ETH");
    BOOST_REQUIRE(!cursor.is_null());
    BOOST_CHECK_EQUAL(3u, cursor["last_sequence"].as<uint64_t>());
    const std::string dropped = "msgch::dispatch_syndicate_liq: DROP attestation -- user kind CHAIN_KIND_SVM";
    const auto first = console.find(dropped);
    BOOST_REQUIRE_NE(std::string::npos, first);
    BOOST_CHECK_NE(std::string::npos, console.find(dropped, first + dropped.size()));
-   BOOST_CHECK_EQUAL(std::string::npos, console.find("sysio.liq::park"));
 } FC_LOG_AND_RETHROW() }
 
-// LIQ_YIELD lands in sysio.liq's pending balance (no per-user routing) and stamps the report's
-// epoch on the outpost cursor. Every refusal is dropped at the boundary without aborting the
-// envelope: a payload claiming another chain, a token that is not an active liq token (a plain
-// ERC20, an unregistered code), a liq token with no shadow, a non-positive or oversized amount,
-// an unlinked pubkey of the wrong shape, a replayed sequence, and a malformed payload.
-BOOST_FIXTURE_TEST_CASE(liq_yield_lands_in_pending_and_refusals_are_dropped,
+// LIQ_YIELD routes to sysio.synd::onyield, which holds the amount as a number: nothing is minted and
+// nothing pends, and the report's outpost epoch is stamped on the cursor. Every refusal is dropped
+// without aborting the envelope: by msgch, a payload claiming another chain, a token that is not an
+// active liq token (a plain ERC20, an unregistered code), a non-positive or oversized amount and a
+// malformed payload; by sysio.synd, a liq token with no shadow, an unlinked pubkey of the wrong
+// shape and a replayed sequence.
+BOOST_FIXTURE_TEST_CASE(liq_yield_is_held_by_synd_and_refusals_are_dropped,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
    setup_liq_for_dispatch();
@@ -7060,9 +7211,10 @@ BOOST_FIXTURE_TEST_CASE(liq_yield_lands_in_pending_and_refusals_are_dropped,
    const auto liqnone = fc::slug_name{"LIQNONE"}.value;
    constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
    constexpr int64_t oversized = std::numeric_limits<int64_t>::max();
-   const std::vector<char> evm_address(20, '\x0c');   // an address, not the 33-byte pubkey the link holds
+   const std::vector<char> evm_address(20, '\x0c');   // an address, not the 33-byte pubkey a link holds
+   const uint32_t epoch = current_epoch();
 
-   const auto env = encode_envelope_with_mixed_attestations(current_epoch(), {
+   const auto env = encode_envelope_with_mixed_attestations(epoch, {
       {ATTESTATION_TYPE_LIQ_YIELD,     encode_liq_yield(eth, liqeth, 7 * LIQ_UNIT, 1, 42)},
       // claims another chain than the proven outpost
       {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(solana, EVM, uwrit_op_eth_pubkey, liqeth, 1 * LIQ_UNIT, 2)},
@@ -7073,7 +7225,7 @@ BOOST_FIXTURE_TEST_CASE(liq_yield_lands_in_pending_and_refusals_are_dropped,
       // amounts the fail-closed gate refuses
       {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, -1,        6)},
       {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, oversized, 7)},
-      // unlinked, and not a pubkey the chain family could ever link
+      // not a pubkey the chain family could ever link
       {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, EVM, evm_address, liqeth, 1 * LIQ_UNIT, 8)},
       // yield refusals: another chain, not a liq token, a replayed sequence, malformed
       {ATTESTATION_TYPE_LIQ_YIELD,     encode_liq_yield(solana, liqeth,  1 * LIQ_UNIT, 9,  43)},
@@ -7086,26 +7238,64 @@ BOOST_FIXTURE_TEST_CASE(liq_yield_lands_in_pending_and_refusals_are_dropped,
    BOOST_REQUIRE(!trace->except);
    const auto console = all_console(trace);
 
-   BOOST_CHECK_EQUAL(7 * LIQ_UNIT, liq_pending());
+   const auto items = synd_items();
+   BOOST_REQUIRE_EQUAL(1u, items.size());
+   BOOST_CHECK_EQUAL("YIELD", items[0]["kind"].as_string());
+   BOOST_CHECK_EQUAL(7 * LIQ_UNIT, items[0]["amount"].as<int64_t>());
+   BOOST_CHECK_EQUAL(0, liq_pending());
    BOOST_CHECK_EQUAL(0, liq_supply());
+   BOOST_CHECK_EQUAL(0, liq_balance(SYND_ACCOUNT));
    BOOST_CHECK_EQUAL(0, liq_balance(UWRIT_OP));
-   BOOST_CHECK_EQUAL(0, liq_parked(EVM, evm_address));
-   const auto cursor = liq_cursor("ETH");
+   const auto cursor = synd_cursor("ETH");
    BOOST_REQUIRE(!cursor.is_null());
    BOOST_CHECK_EQUAL(1u,  cursor["last_sequence"].as<uint64_t>());
    BOOST_CHECK_EQUAL(42u, cursor["last_epoch"].as<uint64_t>());
+   const auto envelope = synd_envelope("ETH", "LIQETH", epoch);
+   BOOST_REQUIRE(!envelope.is_null());
+   BOOST_CHECK_EQUAL("WAITING", envelope["state"].as_string());
+   BOOST_CHECK_EQUAL(7 * LIQ_UNIT, envelope["yield_total"].as<int64_t>());
+   BOOST_CHECK_EQUAL(0u, envelope["synd_total"].as<uint64_t>());
 
    BOOST_CHECK_NE(std::string::npos, console.find(
       "msgch::dispatch_syndicate_liq: DROP attestation -- payload chain_code="));
    BOOST_CHECK_NE(std::string::npos, console.find(
       "msgch::dispatch_syndicate_liq: DROP attestation -- token is not an active liq token"));
-   BOOST_CHECK_NE(std::string::npos, console.find("sysio.liq::mintsynd: DROP -- token_code has no shadow symbol"));
-   BOOST_CHECK_NE(std::string::npos, console.find("sysio.liq::park: DROP -- pubkey does not fit the chain family"));
+   BOOST_CHECK_NE(std::string::npos, console.find("sysio.synd::onsynd: DROP -- token_code has no shadow symbol"));
+   BOOST_CHECK_NE(std::string::npos, console.find("sysio.synd::onsynd: DROP -- pubkey does not fit the chain family"));
    BOOST_CHECK_NE(std::string::npos, console.find(
       "msgch::dispatch_liq_yield: DROP attestation -- payload chain_code="));
    BOOST_CHECK_NE(std::string::npos, console.find(
       "msgch::dispatch_liq_yield: DROP attestation -- token is not an active liq token"));
-   BOOST_CHECK_NE(std::string::npos, console.find("sysio.liq::mintyield: DROP -- replayed sequence"));
+   BOOST_CHECK_NE(std::string::npos, console.find("sysio.synd::onyield: DROP -- replayed sequence"));
+} FC_LOG_AND_RETHROW() }
+
+// Review Focus 3: an envelope whose attestations carry no syndication value -- here an echoed
+// DESYNDICATE_LIQ and syndication messages msgch itself drops -- sends sysio.synd nothing, not even
+// a `closeenv`, and leaves no row there.
+BOOST_FIXTURE_TEST_CASE(an_envelope_without_syndication_value_touches_synd_not_at_all,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   setup_liq_for_dispatch();
+
+   const auto eth     = fc::slug_name{"ETH"}.value;
+   const auto solana  = fc::slug_name{"SOLANA"}.value;
+   const auto liqeth  = fc::slug_name{"LIQETH"}.value;
+   const auto usdceth = fc::slug_name{"USDCETH"}.value;
+   constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
+   const auto env = encode_envelope_with_mixed_attestations(current_epoch(), {
+      {ATTESTATION_TYPE_DESYNDICATE_LIQ,
+       encode_desyndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 1 * LIQ_UNIT, 77)},
+      {ATTESTATION_TYPE_SYNDICATE_LIQ,   encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, usdceth, 1 * LIQ_UNIT, 1)},
+      {ATTESTATION_TYPE_LIQ_YIELD,       encode_liq_yield(solana, liqeth, 1 * LIQ_UNIT, 2, 1)},
+   });
+   const auto trace = deliver_trace(/*proven=*/ eth, env);
+   BOOST_REQUIRE(trace != nullptr);
+   BOOST_REQUIRE(!trace->except);
+
+   BOOST_CHECK(synd_actions(trace).empty());
+   for (auto table : { "envelopes"_n, "items"_n, "ledger"_n, "syndcursors"_n })
+      BOOST_CHECK(synd_rows(table).empty());
+   BOOST_CHECK(get_row_by_account(SYND_ACCOUNT, SYND_ACCOUNT, "syndcounters"_n, "syndcounters"_n).empty());
 } FC_LOG_AND_RETHROW() }
 
 // Without a token registry there is no active liq token, so the envelope is delivered and the
@@ -7131,4 +7321,410 @@ BOOST_FIXTURE_TEST_CASE(liq_attestations_are_dropped_without_a_token_registry,
       "msgch::dispatch_liq_yield: DROP attestation -- token is not an active liq token"));
 } FC_LOG_AND_RETHROW() }
 
+// ── The emergency stop (sysio.andon) ─────────────────────────────────────────
+
+// A pulled sysio.andon cord freezes nothing on the envelope path: sysio.msgch accepts the envelope, routes
+// every syndication to sysio.synd, which holds it exactly as it does unfrozen, and closes the envelope with
+// `closeenv`, whose queue step prints that it waits and aborts nothing.
+BOOST_FIXTURE_TEST_CASE(a_pulled_andon_cord_leaves_deliveries_running, sysio_dispatch_tester) { try {
+   namespace andon = sysio_system::test_support::andon;
+   bootstrap_for_dispatch();
+   setup_liq_for_dispatch();
+   abi_serializer andon_abi;
+   andon::deploy(*this, andon_abi, contracts::andon_wasm(), contracts::andon_abi());
+   BOOST_REQUIRE_EQUAL(success(), andon::pull(*this, andon_abi));
+
+   const auto eth    = fc::slug_name{"ETH"}.value;
+   const auto liqeth = fc::slug_name{"LIQETH"}.value;
+   constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
+   const uint32_t epoch = current_epoch();
+   const auto env = encode_envelope_with_mixed_attestations(epoch, {
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 5 * LIQ_UNIT, 1)},
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 3 * LIQ_UNIT, 2)},
+   });
+   const auto trace = deliver_trace(/*proven=*/ eth, env);
+   BOOST_REQUIRE(trace != nullptr);
+   BOOST_REQUIRE(!trace->except);
+   const auto actions = synd_actions(trace);
+   BOOST_REQUIRE_EQUAL(3u, actions.size());
+   BOOST_CHECK_EQUAL("closeenv"_n, actions[2]);
+   BOOST_CHECK_NE(std::string::npos,
+                  all_console(trace).find("sysio.synd::queue: the andon cord is pulled; releases, deliveries and "
+                                          "burns wait for the clear"));
+   BOOST_REQUIRE_EQUAL(2u, synd_items().size());
+   BOOST_CHECK_EQUAL(8 * LIQ_UNIT, liq_balance(SYND_ACCOUNT));
+   BOOST_CHECK_EQUAL(8 * LIQ_UNIT, liq_supply());
+   BOOST_CHECK_EQUAL("WAITING", synd_envelope("ETH", "LIQETH", epoch)["state"].as_string());
+} FC_LOG_AND_RETHROW() }
+
+// A pulled sysio.andon cord leaves `sysio.epoch::advance` running: the genesis advance inline from
+// `sysio.msgch::bootstrap` moves the epoch from 0 to 1 exactly as it does unfrozen.
+BOOST_FIXTURE_TEST_CASE(a_pulled_andon_cord_leaves_advance_running, sysio_dispatch_tester) { try {
+   namespace andon = sysio_system::test_support::andon;
+   bootstrap_for_dispatch();
+   // Deployed before sysio.system is set up, while a new account's code needs no RAM grant.
+   abi_serializer andon_abi;
+   andon::deploy(*this, andon_abi, contracts::andon_wasm(), contracts::andon_abi());
+   BOOST_REQUIRE_EQUAL(success(), andon::pull(*this, andon_abi));
+   setup_wire_token_and_reserves();
+   enable_epoch_advancement();
+
+   BOOST_REQUIRE_EQUAL(current_epoch(), 0u);
+   BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi, MSGCH_ACCOUNT, "bootstrap"_n, mvo()));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(current_epoch(), 1u);
+   BOOST_REQUIRE(get_blocklog(1).is_null());
+} FC_LOG_AND_RETHROW() }
+
+
+// ── The solvency check (sysio.synd) through a delivered envelope ─────────────
+
+// Review focus 3: sysio.msgch sends an envelope's messages to sysio.synd as inline actions, and each
+// `onsynd`'s inline mint runs before the next message (depth-first), so each syndication is compared with
+// the outstanding after its own mint. Two syndications carrying the custody read after each lock are both
+// exact; the yield report after them carries the custody after its claim and reads as an excess of the
+// claimed yield. Nothing is recorded and the cord stays clear.
+BOOST_FIXTURE_TEST_CASE(each_syndication_of_an_envelope_is_compared_after_its_own_mint,
+                        sysio_dispatch_tester) { try {
+   namespace andon = sysio_system::test_support::andon;
+   bootstrap_for_dispatch();
+   abi_serializer andon_abi;
+   andon::deploy(*this, andon_abi, contracts::andon_wasm(), contracts::andon_abi());
+   setup_liq_for_dispatch();
+
+   const auto eth    = fc::slug_name{"ETH"}.value;
+   const auto liqeth = fc::slug_name{"LIQETH"}.value;
+   constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
+   const auto env = encode_envelope_with_mixed_attestations(current_epoch(), {
+      {ATTESTATION_TYPE_SYNDICATE_LIQ,
+       encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 5 * LIQ_UNIT, 1, 5 * LIQ_UNIT)},
+      {ATTESTATION_TYPE_SYNDICATE_LIQ,
+       encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 3 * LIQ_UNIT, 2, 8 * LIQ_UNIT)},
+      {ATTESTATION_TYPE_LIQ_YIELD, encode_liq_yield(eth, liqeth, 2 * LIQ_UNIT, 3, 42, 10 * LIQ_UNIT)},
+   });
+   const auto trace = deliver_trace(/*proven=*/ eth, env);
+   BOOST_REQUIRE(trace != nullptr);
+   BOOST_REQUIRE(!trace->except);
+   const auto console = all_console(trace);
+   BOOST_CHECK_EQUAL(std::string::npos, console.find("sysio.synd::onsynd: EXCESS"));
+   BOOST_CHECK_EQUAL(std::string::npos, console.find("SHORTFALL"));
+   BOOST_CHECK_NE(std::string::npos, console.find("sysio.synd::onyield: EXCESS -- reported " +
+                                                  std::to_string(10 * LIQ_UNIT) + " outstanding " +
+                                                  std::to_string(8 * LIQ_UNIT)));
+   BOOST_CHECK(synd_rows("mismatch"_n).empty());
+   BOOST_CHECK(get_row_by_account(andon::account, andon::account, "cord"_n, "cord"_n).empty());
+   BOOST_CHECK_EQUAL(3u, synd_items().size());
+   BOOST_CHECK_EQUAL(8 * LIQ_UNIT, liq_supply());
+} FC_LOG_AND_RETHROW() }
+
+// Review focus 4: a custody shortfall in a delivered envelope writes its `mismatch` row and pulls the depot
+// cord from inside the consensus transaction; the envelope is accepted, both syndications are held, and
+// the epoch still advances through the consensus crank.
+BOOST_FIXTURE_TEST_CASE(a_custody_shortfall_pulls_the_cord_and_the_epoch_advances, sysio_dispatch_tester) { try {
+   namespace andon = sysio_system::test_support::andon;
+   bootstrap_for_dispatch();
+   // Deployed before sysio.system is set up, while a new account's code needs no RAM grant.
+   abi_serializer andon_abi;
+   andon::deploy(*this, andon_abi, contracts::andon_wasm(), contracts::andon_abi());
+   setup_liq_for_dispatch();
+   setup_wire_token_and_reserves();
+   enable_epoch_advancement();
+
+   const auto eth    = fc::slug_name{"ETH"}.value;
+   const auto liqeth = fc::slug_name{"LIQETH"}.value;
+   constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
+   const uint32_t epoch = current_epoch();
+   // The second syndication carries 7 against 8 outstanding after its mint.
+   const auto env = encode_envelope_with_mixed_attestations(epoch, {
+      {ATTESTATION_TYPE_SYNDICATE_LIQ,
+       encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 5 * LIQ_UNIT, 1, 5 * LIQ_UNIT)},
+      {ATTESTATION_TYPE_SYNDICATE_LIQ,
+       encode_syndicate_liq(eth, EVM, uwrit_op_eth_pubkey, liqeth, 3 * LIQ_UNIT, 2, 7 * LIQ_UNIT)},
+   });
+   const auto trace = deliver_trace(/*proven=*/ eth, env);
+   BOOST_REQUIRE(trace != nullptr);
+   BOOST_REQUIRE(!trace->except);
+   produce_block();   // land the delivery before the clock is moved past its expiration
+   const auto console = all_console(trace);
+   BOOST_CHECK_NE(std::string::npos, console.find("sysio.synd::onsynd: SHORTFALL -- reported " +
+                                                  std::to_string(7 * LIQ_UNIT) + " outstanding " +
+                                                  std::to_string(8 * LIQ_UNIT)));
+   BOOST_CHECK_NE(std::string::npos,
+                  console.find("sysio.synd::onsynd: CORD PULLED -- custody shortfall ETH LIQETH seq 2"));
+
+   const auto rows = synd_rows("mismatch"_n);
+   BOOST_REQUIRE_EQUAL(1u, rows.size());
+   const auto row = synd_decode("mismatch_row", rows[0]);
+   BOOST_CHECK_EQUAL("ETH", row["chain_code"].as_string());
+   BOOST_CHECK_EQUAL("LIQETH", row["token_code"].as_string());
+   BOOST_CHECK_EQUAL(epoch, row["epoch_index"].as<uint32_t>());
+   BOOST_CHECK_EQUAL(2u, row["sequence"].as_uint64());
+   BOOST_CHECK_EQUAL("SYNDICATION", row["kind"].as_string());
+   BOOST_CHECK_EQUAL(7 * LIQ_UNIT, row["reported"].as<int64_t>());
+   BOOST_CHECK_EQUAL(8 * LIQ_UNIT, row["expected"].as<int64_t>());
+
+   const auto cord = andon_abi.binary_to_variant("cord_state",
+      get_row_by_account(andon::account, andon::account, "cord"_n, "cord"_n),
+      abi_serializer::create_yield_function(abi_serializer_max_time));
+   BOOST_REQUIRE(cord["pulled"].as_bool());
+   BOOST_CHECK_EQUAL("custody shortfall ETH LIQETH seq 2", cord["reason"].as_string());
+
+   BOOST_CHECK_EQUAL(2u, synd_items().size());
+   BOOST_CHECK_EQUAL(8 * LIQ_UNIT, liq_supply());
+   BOOST_CHECK_EQUAL(8 * LIQ_UNIT, liq_balance(SYND_ACCOUNT));
+   BOOST_CHECK_EQUAL("WAITING", synd_envelope("ETH", "LIQETH", epoch)["state"].as_string());
+   BOOST_REQUIRE(!get_envelope(1).is_null());
+
+   // The frozen depot still reaches consensus and advances.
+   produce_block(fc::seconds(120));
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), chkcons());
+   produce_block();
+   BOOST_CHECK_EQUAL(current_epoch(), epoch + 1);
+} FC_LOG_AND_RETHROW() }
+
+
+// Review focus 4 with work pending: the cord a shortfall pulls inline from `onsynd` freezes the very
+// queue step `closeenv` runs later in the same delivered envelope. The earlier envelope of the pair was
+// partly bonded, challenged and ruled VALID, so the next step would record the ruling, claim the hold-bond
+// award from sysio.bond, forward the challenger's share and release the syndication to its linked account.
+// Frozen, that step releases nothing, sends no claim and only records VALID with the share pending; the
+// epoch still advances. After the clear, one crank releases the syndication and forwards the share.
+BOOST_FIXTURE_TEST_CASE(a_shortfall_freezes_the_same_envelopes_queue_step, sysio_dispatch_tester) { try {
+   namespace andon = sysio_system::test_support::andon;
+   constexpr auto BOND_ACCOUNT = "sysio.bond"_n;
+   constexpr auto USER         = "synd.user"_n;
+   constexpr auto UNDERWRITER  = "synd.bonder"_n;
+   constexpr auto CHALLENGER   = "synd.chal"_n;
+   bootstrap_for_dispatch();
+   // Deployed before sysio.system is set up, while a new account's code needs no RAM grant.
+   abi_serializer andon_abi, bond_abi;
+   andon::deploy(*this, andon_abi, contracts::andon_wasm(), contracts::andon_abi());
+   setup_liq_for_dispatch();
+   create_accounts({BOND_ACCOUNT, USER, UNDERWRITER, CHALLENGER});
+   produce_blocks();
+   deploy(BOND_ACCOUNT, contracts::bond_wasm(), contracts::bond_abi(), bond_abi);
+   const auto user_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
+   create_eth_authex_link(USER, user_key);
+   const auto user_pubkey = em_pubkey_bytes(user_key.get_public_key());
+   // Buckets wide open, so only the cord stops a release.
+   BOOST_REQUIRE_EQUAL(success(), push(SYND_ACCOUNT, synd_abi, config::system_account_name, "setconfig"_n, mvo()
+      ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("LIQETH"))("synd_fee_bps", 0)
+      ("desynd_fee_bps", 0)("synd_burst", 1'000'000 * LIQ_UNIT)("synd_refill", 1'000'000 * LIQ_UNIT)
+      ("desynd_burst", 0)("desynd_refill", 0)("window_sec", 10800)("bounty", 0)("challenge_extra", 0)));
+   setup_wire_token_and_reserves();
+   enable_epoch_advancement();
+
+   const auto eth    = fc::slug_name{"ETH"}.value;
+   const auto liqeth = fc::slug_name{"LIQETH"}.value;
+   constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
+   const auto executed = [](const transaction_trace_ptr& trace, name code, name action_name) {
+      return std::any_of(trace->action_traces.begin(), trace->action_traces.end(), [&](const auto& at) {
+         return at.receiver == code && at.act.account == code && at.act.name == action_name;
+      });
+   };
+
+   // Envelope A: 10 for the linked user, exact custody. Its closeenv step requests the underwriting.
+   const uint32_t first_epoch = current_epoch();
+   const auto first = encode_envelope_with_mixed_attestations(first_epoch, {
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, EVM, user_pubkey, liqeth, 10 * LIQ_UNIT, 1,
+                                                            10 * LIQ_UNIT)},
+   });
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth, first));
+   produce_block();
+   const uint64_t id = synd_envelope("ETH", "LIQETH", first_epoch)["request_id"].as_uint64();
+   BOOST_REQUIRE_GT(id, 0u);
+   BOOST_REQUIRE_EQUAL("REQUESTED", synd_envelope("ETH", "LIQETH", first_epoch)["state"].as_string());
+
+   // 4 of the 10 bonded, then a challenge and a VALID ruling: the hold bond's unbonded 6/10 is owed back.
+   BOOST_REQUIRE_EQUAL(success(), mint_shadow(UNDERWRITER, 4 * LIQ_UNIT));
+   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi, UNDERWRITER, "accept"_n, mvo()
+      ("underwriter", UNDERWRITER)("request_id", id)("amount", 4 * LIQ_UNIT)));
+   BOOST_REQUIRE_EQUAL(success(), mint_shadow(CHALLENGER, 5 * LIQ_UNIT));
+   BOOST_REQUIRE_EQUAL(success(), push(SYND_ACCOUNT, synd_abi, CHALLENGER, "challenge"_n, mvo()
+      ("challenger", CHALLENGER)("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("LIQETH"))
+      ("epoch_index", first_epoch)));
+   const int64_t hold_bond = 10 * LIQ_UNIT / 10;           // 1000 bps of the 10 covered
+   const int64_t share     = hold_bond * 6 / 10;           // the 6 of 10 no bond covered
+   const int64_t challenger_before = liq_balance(CHALLENGER);
+   BOOST_REQUIRE_EQUAL(5 * LIQ_UNIT - hold_bond, challenger_before);
+   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi, config::system_account_name, "rslvvalid"_n,
+                                       mvo()("request_id", id)));
+   produce_block();   // land the pushes above before the clock is moved past their expiration
+   BOOST_REQUIRE_EQUAL("HELD", synd_envelope("ETH", "LIQETH", first_epoch)["state"].as_string());
+
+   produce_block(fc::seconds(120));
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), chkcons());
+   produce_block();
+   const uint32_t second_epoch = current_epoch();
+   BOOST_REQUIRE_EQUAL(first_epoch + 1, second_epoch);
+
+   // Envelope B: 1 more, carrying 15 against 10 + 4 + 5 + 1 = 20 outstanding.
+   sysio::opp::Envelope accepted;
+   BOOST_REQUIRE(accepted.ParseFromArray(first.data(), static_cast<int>(first.size())));
+   const auto second = encode_envelope_with_mixed_attestations(second_epoch, {
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, EVM, user_pubkey, liqeth, 1 * LIQ_UNIT, 2,
+                                                            15 * LIQ_UNIT)},
+   }, oracle::digest_bytes(oracle::epoch_digest(accepted)), accepted.messages(0).header().message_id());
+   const auto trace = deliver_trace(eth, second);
+   BOOST_REQUIRE(trace != nullptr);
+   BOOST_REQUIRE(!trace->except);
+   produce_block();   // land the delivery before the clock is moved past its expiration
+   const auto console = all_console(trace);
+   BOOST_CHECK_NE(std::string::npos, console.find("sysio.synd::onsynd: SHORTFALL -- reported " +
+                                                  std::to_string(15 * LIQ_UNIT) + " outstanding " +
+                                                  std::to_string(20 * LIQ_UNIT)));
+   BOOST_CHECK(executed(trace, andon::account, "pull"_n));
+   BOOST_CHECK(executed(trace, SYND_ACCOUNT, "closeenv"_n));
+   BOOST_CHECK_NE(std::string::npos,
+                  console.find("sysio.synd::queue: the andon cord is pulled; releases, deliveries and burns wait "
+                               "for the clear"));
+   // Nothing left custody: no release, no claim, no forward.
+   BOOST_CHECK(!executed(trace, BOND_ACCOUNT, "claim"_n));
+   BOOST_CHECK(!executed(trace, LIQ_ACCOUNT, "transfer"_n));
+   BOOST_CHECK_EQUAL(0, liq_balance(USER));
+   BOOST_CHECK_EQUAL(challenger_before, liq_balance(CHALLENGER));
+   auto envelope = synd_envelope("ETH", "LIQETH", first_epoch);
+   BOOST_CHECK_EQUAL("VALID", envelope["outcome"].as_string());
+   BOOST_CHECK(envelope["share_pending"].as_bool());
+   BOOST_CHECK_EQUAL(share, envelope["hold_share"].as<int64_t>());
+   BOOST_CHECK_EQUAL(0u, envelope["released"].as_uint64());
+   BOOST_CHECK_EQUAL(1u, synd_rows("mismatch"_n).size());
+   const auto cord_of = [&] {
+      return andon_abi.binary_to_variant("cord_state",
+         get_row_by_account(andon::account, andon::account, "cord"_n, "cord"_n),
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+   };
+   BOOST_REQUIRE(cord_of()["pulled"].as_bool());
+
+   // The frozen depot still reaches consensus and advances.
+   produce_block(fc::seconds(120));
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), chkcons());
+   produce_block();
+   BOOST_CHECK_EQUAL(second_epoch + 1, current_epoch());
+
+   // Cleared: one crank records nothing new, claims the award, forwards the share and releases the 10.
+   BOOST_REQUIRE_EQUAL(success(), andon::clear(*this, andon_abi));
+   BOOST_REQUIRE(!cord_of()["pulled"].as_bool());
+   const auto crank = push_trace(SYND_ACCOUNT, synd_abi, CHALLENGER, "crank"_n, mvo()("limit", 100));
+   BOOST_REQUIRE(crank != nullptr);
+   BOOST_REQUIRE(!crank->except);
+   produce_block();
+   BOOST_CHECK(executed(crank, BOND_ACCOUNT, "claim"_n));
+   BOOST_CHECK_EQUAL(10 * LIQ_UNIT, liq_balance(USER));
+   BOOST_CHECK_EQUAL(challenger_before + share, liq_balance(CHALLENGER));
+   envelope = synd_envelope("ETH", "LIQETH", first_epoch);
+   BOOST_CHECK_EQUAL("DONE", envelope["state"].as_string());
+   BOOST_CHECK(!envelope["share_pending"].as_bool());
+} FC_LOG_AND_RETHROW() }
+
+
+// The host-side simulator feeds canonical protobuf envelopes into the production
+// msgch -> epoch consensus -> synd -> liq path. No patched OPP or dispatch stub.
+BOOST_AUTO_TEST_CASE(generic_external_simulator_drives_production_dispatch) {
+   for (const auto& a : sysio::testing::external::Assets) {
+      BOOST_TEST_CONTEXT("chain=" << a.chain << " token=" << a.token) {
+         sysio_dispatch_tester t;
+         t.bootstrap_for_dispatch(a.chain, a.kind);
+         t.setup_liq_for_dispatch(a.chain, a.token, a.kind);
+         sysio::testing::external::chain outpost(a);
+         const auto token = symbol::from_string(std::string("9,") + a.token);
+         const auto key = a.kind == ChainKind::CHAIN_KIND_EVM ? t.uwrit_op_eth_pubkey : std::vector<char>(32, '\x42');
+         const auto deposit = outpost.deposit(key, 9 * t.LIQ_UNIT);
+         const auto yield = outpost.yield(2 * t.LIQ_UNIT);
+         const auto epoch = t.current_epoch();
+         const auto bytes = outpost.envelope(epoch, {deposit, yield, deposit});
+         const auto trace = t.deliver_trace(fc::slug_name{a.chain}.value, bytes);
+         BOOST_REQUIRE(trace != nullptr);
+         BOOST_REQUIRE(!trace->except);
+         BOOST_REQUIRE_EQUAL(2u, t.synd_items().size());
+         BOOST_CHECK_EQUAL(9 * t.LIQ_UNIT, t.liq_supply(token));
+         BOOST_CHECK_EQUAL(9 * t.LIQ_UNIT, t.liq_balance(t.SYND_ACCOUNT, token));
+         BOOST_CHECK_EQUAL(0, t.liq_pending(token));
+         BOOST_CHECK_EQUAL(2u, t.synd_cursor(a.chain)["last_sequence"].as_uint64());
+         const auto envelope = t.synd_envelope(a.chain, a.token, epoch);
+         BOOST_REQUIRE(!envelope.is_null());
+         BOOST_CHECK_EQUAL("WAITING", envelope["state"].as_string());
+         BOOST_CHECK_EQUAL(t.accepted_envelope_digest(fc::slug_name{a.chain}.value),
+                           envelope["digest"].as<fc::sha256>());
+         BOOST_CHECK(t.synd_rows("mismatch"_n).empty());
+      }
+   }
+}
+
+
+// A real staking-reward envelope crosses msgch -> dclaim -> system -> token.
+// Small treasury liquidity deliberately reaches the second fundclaim cap.
+BOOST_FIXTURE_TEST_CASE(generic_staking_rewards_fund_claim_and_dedupe_through_dispatch, sysio_dispatch_tester) {
+   using namespace sysio::testing::external;
+   bootstrap_for_dispatch(First.chain, First.kind);
+   deploy(TOKEN_ACCOUNT, contracts::token_wasm(), contracts::token_abi(), token_abi);
+   BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, TOKEN_ACCOUNT, "create"_n,
+      mvo()("issuer", "sysio")("maximum_supply", "100.000000000 WIRE")));
+   BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, config::system_account_name, "issue"_n,
+      mvo()("to", "sysio")("quantity", "100.000000000 WIRE")("memo", "reward funding")));
+   enable_epoch_advancement();
+   external::chain outpost(First);
+   constexpr uint64_t Reward = 10 * Unit;
+   sysio::opp::attestations::StakingReward reward;
+   reward.set_chain_code(fc::slug_name{First.chain}.value);
+   reward.mutable_staker_wire_account()->set_name(UWRIT_OP.to_string());
+   reward.set_share_bps(10'000);
+   reward.set_reward_epoch_index(current_epoch());
+   reward.set_external_epoch_ref(1);
+   reward.mutable_reward_amount()->set_token_code(fc::slug_name{"WIRE"}.value);
+   reward.mutable_reward_amount()->set_amount(Reward);
+   reward.mutable_staker_native_address()->set_kind(First.kind);
+   const std::vector<char> address(20, '\x31');
+   reward.mutable_staker_native_address()->set_address(address.data(), address.size());
+   const auto body = reward.SerializeAsString();
+   const auto bytes = outpost.envelope(current_epoch(), {
+      {ATTESTATION_TYPE_STAKING_REWARD, body}, {ATTESTATION_TYPE_STAKING_REWARD, body}});
+   const auto trace = deliver_trace(fc::slug_name{First.chain}.value, bytes);
+   BOOST_REQUIRE(trace && !trace->except);
+   const auto wire = symbol::from_string("9,WIRE");
+   const auto balance = [&](name account) { return get_currency_balance(TOKEN_ACCOUNT, wire, account).get_amount(); };
+   BOOST_REQUIRE_EQUAL(Reward, get_dclaim_row("pclaims"_n, "pending_claim", UWRIT_OP.to_uint64_t())
+      ["balance"].as<asset>().get_amount());
+   BOOST_REQUIRE_EQUAL(Reward, balance(DCLAIM_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(90 * Unit, balance(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(success(), push(DCLAIM_ACCOUNT, dclaim_abi, UWRIT_OP, "claim"_n,
+      mvo()("wire_account", UWRIT_OP)));
+   BOOST_REQUIRE_EQUAL(Reward, balance(UWRIT_OP));
+   BOOST_REQUIRE_EQUAL(0, balance(DCLAIM_ACCOUNT));
+   BOOST_REQUIRE(get_dclaim_row("pclaims"_n, "pending_claim", UWRIT_OP.to_uint64_t()).is_null());
+   // The soak's launch import has its own funding path: pre-fund, import an
+   // unlinked identity, authenticate the link, then claim the exact WIRE credit.
+   constexpr uint64_t Imported = 5 * Unit;
+   const auto private_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
+   const auto native = fc::crypto::ethereum::address_to_bytes(private_key.get_public_key());
+   const std::vector<char> native_address(native.begin(), native.end());
+   BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, config::system_account_name, "transfer"_n,
+      mvo()("from", "sysio")("to", DCLAIM_ACCOUNT)("quantity", asset(Imported, wire))("memo", "import backing")));
+   BOOST_REQUIRE_EQUAL(success(), push(DCLAIM_ACCOUNT, dclaim_abi, DCLAIM_ACCOUNT, "importseed"_n,
+      mvo()("chain", First.kind)("credits", fc::variants{
+         mvo()("native_address", native_address)("wire_atomic", int64_t(Imported))})));
+   BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   create_eth_authex_link(CLAIM_ACCOUNT, private_key);
+   BOOST_REQUIRE(get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   BOOST_REQUIRE_EQUAL(Imported, get_dclaim_row("pclaims"_n, "pending_claim", CLAIM_ACCOUNT.to_uint64_t())
+      ["balance"].as<asset>().get_amount());
+   BOOST_REQUIRE_EQUAL(success(), push(DCLAIM_ACCOUNT, dclaim_abi, CLAIM_ACCOUNT, "claim"_n,
+      mvo()("wire_account", CLAIM_ACCOUNT)));
+   BOOST_REQUIRE_EQUAL(Imported, balance(CLAIM_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(0, balance(DCLAIM_ACCOUNT));
+   const auto funding_left = balance(config::system_account_name);
+   // A new reward at the authenticated downstream boundary exceeds liquid
+   // treasury funds. Credit is retained, but funding cannot overspend custody.
+   BOOST_REQUIRE_EQUAL(success(), push(DCLAIM_ACCOUNT, dclaim_abi, MSGCH_ACCOUNT, "onreward"_n,
+      mvo()("chain_code", fc::slug_name{First.chain}.value)("staker_wire_account", UWRIT_OP.to_string())
+         ("reward_chain", First.kind)("staker_native_addr", address)("reward_amount", 100 * Unit)
+         ("reward_epoch_index", current_epoch())("external_epoch_ref", 2)("share_bps", 10'000)));
+   BOOST_REQUIRE_EQUAL(funding_left, balance(DCLAIM_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(0, balance(config::system_account_name));
+   BOOST_REQUIRE_EQUAL(100 * Unit, get_dclaim_row("pclaims"_n, "pending_claim", UWRIT_OP.to_uint64_t())
+      ["balance"].as<asset>().get_amount());
+}
 BOOST_AUTO_TEST_SUITE_END()

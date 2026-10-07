@@ -8,6 +8,7 @@
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio.opp.common/claimable.hpp>
+#include <sysio.opp.common/require_privileged.hpp>
 #include <sysio.opp.common/registry_codes.hpp>
 #include <sysio.opp.common/registry_metadata.hpp>
 #include <sysio.opp.common/wire_asset.hpp>
@@ -44,12 +45,6 @@ uint32_t get_current_epoch_index() {
 
 bool is_bootstrap_window() {
    return get_current_epoch_index() == 0;
-}
-
-void require_priv_caller() {
-   require_auth(current_receiver());
-   sysio::check(sysio::is_privileged(current_receiver()),
-                "sysio.reserv: privileged account required");
 }
 
 /// Saturating uint64 credit for reserve balances / rewards-bucket counters. These accumulate from
@@ -374,7 +369,7 @@ void reserve::regreserve(sysio::slug_name chain_code,
                           uint32_t        connector_weight_bps,
                           bool            is_private,
                           sysio::name     owner) {
-   require_priv_caller();
+   opp::require_privileged_self();
    sysio::check(is_bootstrap_window(),
                 "regreserve is bootstrap-window only; post-bootstrap reserves go through create_reserve");
    sysio::check(source_token_precision <= WIRE_PRECISION,

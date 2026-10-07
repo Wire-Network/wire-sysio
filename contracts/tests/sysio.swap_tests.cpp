@@ -96,7 +96,8 @@ public:
         produce_blocks( 2 );
 
         create_accounts( { "alice"_n, "bob"_n, "carol"_n, "sysio.token"_n, "sysio.swap"_n,
-          "badtoken"_n, "anothertoken"_n, "sysio.chains"_n, "sysio.tokens"_n, "sysio.liq"_n, "sysio.msgch"_n } );
+          "badtoken"_n, "anothertoken"_n, "sysio.chains"_n, "sysio.tokens"_n, "sysio.liq"_n, "sysio.msgch"_n,
+          "sysio.synd"_n } );
         produce_blocks( 2 );
 
         // sysio.token bills every row to the system account (ram_payer = "sysio"),
@@ -417,14 +418,12 @@ public:
           ( "sym", SHD4 )( "chain_code", codename_mvo( ShadowChainCodename ) )
           ( "token_code", codename_mvo( ShadowTokenCodename ) ) ) );
     }
-    // Shadow enters supply the way the depot mints it: sysio.msgch credits a
-    // syndication the outpost reported, one sequence per credit.
-    uint64_t liq_sequence = 0;
+    // Shadow enters supply the way the depot mints it: sysio.synd, the only minter,
+    // mints it on sysio.liq.
     action_result shadow_mint( name to, asset quantity ) {
         using sysio_system::test_support::codename_mvo;
-        return push_shadow_action( "sysio.msgch"_n, "mintsynd"_n, mvo()
-          ( "chain_code", codename_mvo( ShadowChainCodename ) )( "sequence", ++liq_sequence )
-          ( "account", to )( "token_code", codename_mvo( ShadowTokenCodename ) )( "amount", quantity.get_amount() ) );
+        return push_shadow_action( "sysio.synd"_n, "mint"_n, mvo()
+          ( "to", to )( "token_code", codename_mvo( ShadowTokenCodename ) )( "amount", quantity.get_amount() ) );
     }
     action_result shadow_transfer( name from, name to, asset quantity, string memo ) {
         return push_shadow_action( from, "transfer"_n, mvo()
@@ -3107,6 +3106,91 @@ BOOST_FIXTURE_TEST_CASE( abi_surface_is_pinned, sysio_swap_tester ) try {
         "accounts", "evodexacnts", "evoindex", "priceaccum", "reservoirs", "stat", "swapconfig",
         "yieldfunds", "yieldpayouts" };
     BOOST_REQUIRE( tables == expected_tables );
+} FC_LOG_AND_RETHROW()
+
+// Review focus 2, sysio.swap: while the sysio.andon cord is pulled every action that moves tokens is refused
+// -- a deposit, a withdrawal, an exchange, adding and removing liquidity, closing a funded deposit and a
+// pair-token transfer -- and what moves nothing runs. After the clear the exchange goes through.
+BOOST_FIXTURE_TEST_CASE( a_freeze_refuses_every_token_move, sysio_swap_tester ) try {
+    namespace andon = sysio_system::test_support::andon;
+    const abi_def swap_abi = swap_abi_def();
+    create_tokens_and_issue();
+    transfer( "anothertoken"_n, "bob"_n, "alice"_n, asset::from_string("500000000.0000 VOICE"), "");
+    abi_ser.set_abi(swap_abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+    many_openext();
+    BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n,
+                                              asset::from_string("10000000.0000 EOS"), "") );
+    BOOST_REQUIRE_EQUAL( success(), seed_transfer( "anothertoken"_n, "alice"_n,
+                                                   asset::from_string("200000000.0000 VOICE"), "") );
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, EVO4, extend(asset::from_string("100000000.0000 VOICE")),
+                                               extend(asset::from_string("1000000.0000 EOS")), 10, name{}) );
+    const int64_t alice_eos = balance("alice"_n, EOS4);
+
+    abi_serializer andon_abi_ser;
+    andon::deploy(*this, andon_abi_ser, contracts::andon_wasm(), contracts::andon_abi());
+    BOOST_REQUIRE_EQUAL( success(), andon::pull(*this, andon_abi_ser) );
+    const auto frozen = wasm_assert_msg(andon::frozen_message);
+
+    BOOST_REQUIRE_EQUAL( frozen, exchange( "alice"_n, EVO, extend(asset::from_string("1.0000 EOS")),
+                                           asset::from_string("0.0000 VOICE")) );
+    BOOST_REQUIRE_EQUAL( frozen, addliquidity( "alice"_n, asset::from_string("1.0000 EVO"),
+                                               asset::from_string("1000.0000 VOICE"), asset::from_string("10.0000 EOS")) );
+    BOOST_REQUIRE_EQUAL( frozen, remliquidity( "alice"_n, asset::from_string("1.0000 EVO"),
+                                               asset::from_string("0.0000 VOICE"), asset::from_string("0.0000 EOS")) );
+    BOOST_REQUIRE_EQUAL( frozen, withdraw( "alice"_n, "alice"_n, extend(asset::from_string("1.0000 EOS"))) );
+    BOOST_REQUIRE_EQUAL( frozen, closeext( "alice"_n, "alice"_n, system_token ) );
+    BOOST_REQUIRE_EQUAL( frozen, transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n,
+                                           asset::from_string("1.0000 EOS"), "") );
+    BOOST_REQUIRE_EQUAL( frozen, push_action( "sysio.swap"_n, "alice"_n, "transfer"_n, mvo()
+       ( "from", "alice"_n )( "to", "bob"_n )( "quantity", asset::from_string("1.0000 EVO") )( "memo", "" )) );
+    BOOST_REQUIRE_EQUAL( alice_eos, balance("alice"_n, EOS4) );
+
+    // What moves nothing runs.
+    BOOST_REQUIRE_EQUAL( success(), sync( EVO ) );
+    BOOST_REQUIRE_EQUAL( success(), changefee( EVO, 20 ) );
+    BOOST_REQUIRE_EQUAL( success(), openext( "carol"_n, "alice"_n, system_token ) );
+
+    BOOST_REQUIRE_EQUAL( success(), andon::clear(*this, andon_abi_ser) );
+    BOOST_REQUIRE_EQUAL( success(), exchange( "alice"_n, EVO, extend(asset::from_string("1.0000 EOS")),
+                                              asset::from_string("0.0000 VOICE")) );
+    BOOST_REQUIRE_EQUAL( alice_eos - 1'0000, balance("alice"_n, EOS4) );
+} FC_LOG_AND_RETHROW()
+
+// The sysio.swap gates that sit where tokens move, not at the top of the action: while the cord is pulled
+// `inittoken` (the seeds leave the deposits for the pool), an accrual with yield owed (it claims WIRE out
+// of sysio.liq) and a tick with a clip to sell are refused; what only reads or configures runs. After the
+// clear all three go through.
+BOOST_FIXTURE_TEST_CASE( a_freeze_refuses_inittoken_accrual_and_a_selling_tick, sysio_swap_yield_tester ) try {
+    namespace andon = sysio_system::test_support::andon;
+    setup_yield_pool();
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, 3600, 1, 1000 ) );
+    fund_yield_in_one_transaction( "alice"_n, SHEO, asset( 1000'0000, SHD4 ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_addyield( "bob"_n, asset( 100'0000, WIRE9 ), SHD ) );
+    produce_blocks( 10 );
+
+    abi_serializer andon_abi_ser;
+    andon::deploy(*this, andon_abi_ser, contracts::andon_wasm(), contracts::andon_abi());
+    BOOST_REQUIRE_EQUAL( success(), andon::pull(*this, andon_abi_ser) );
+    const auto frozen = wasm_assert_msg(andon::frozen_message);
+    const auto pool   = system_balance( SHEO.value );
+
+    BOOST_REQUIRE_EQUAL( frozen, tickyield( SHEO ) );
+    BOOST_REQUIRE_EQUAL( frozen, accrueyield( SHEO ) );
+    BOOST_REQUIRE_EQUAL( frozen, inittoken( "alice"_n, ETUSD5,
+        extend(asset::from_string("1.00 TUSD")), extend( asset( 1'0000, WIRE9 ) ), 10, name{}) );
+    BOOST_REQUIRE( pool == system_balance( SHEO.value ) );
+    BOOST_REQUIRE_EQUAL( 1000'0000, reservoir_of( SHEO ) );
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, 3600, 1, 1000 ) );   // configures, moves nothing
+    BOOST_REQUIRE_EQUAL( success(), sync( SHEO ) );
+
+    BOOST_REQUIRE_EQUAL( success(), andon::clear(*this, andon_abi_ser) );
+    produce_blocks( 10 );
+    BOOST_REQUIRE_EQUAL( success(), accrueyield( SHEO ) );
+    BOOST_REQUIRE_LT( pool.at(1), system_balance( SHEO.value ).at(1) );   // the WIRE side took its yield
+    BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
+    BOOST_REQUIRE_LT( reservoir_of( SHEO ), 1000'0000 );
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, ETUSD5,
+        extend(asset::from_string("1.00 TUSD")), extend( asset( 1'0000, WIRE9 ) ), 10, name{}) );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

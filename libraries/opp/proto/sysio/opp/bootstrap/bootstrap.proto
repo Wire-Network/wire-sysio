@@ -196,7 +196,7 @@ message LiqPoolSpec {
 }
 
 // A pre-launch syndicated position to replay via
-// `sysio.liq::importsynd(chain_code, token_code, credits[] {pubkey, amount})`
+// `sysio.synd::importsynd(chain_code, token_code, credits[] {pubkey, amount})`
 // (batched by the tool; `importdone` closes the import). Filled from the same
 // launch export that produces the WPT credits.
 message SyndicationSpec {

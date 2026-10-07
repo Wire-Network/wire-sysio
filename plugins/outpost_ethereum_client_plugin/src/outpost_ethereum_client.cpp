@@ -49,6 +49,9 @@ constexpr auto chunk_buffer_missing_signature = "OPP_ChunkBufferMissing(address)
 constexpr auto no_yield_signature             = "WIRE_NoYield()";
 constexpr auto yield_below_deadband_signature = "WIRE_YieldBelowDeadband(uint64,uint64)";
 constexpr auto pool_underbacked_signature     = "WIRE_PoolUnderbacked(uint64,uint64)";
+/// OpenZeppelin `Pausable`'s refusal, raised by `realizeYield()`'s `whenNotPaused` while the
+/// pool's panic role has frozen it (wire-ethereum `SyndicationPool.sol`).
+constexpr auto enforced_pause_signature       = "EnforcedPause()";
 
 /// `ATTESTATION_BLACKHOLE` in wire-ethereum's `OPPCommon.sol`: the handler governance
 /// registers to drop an attestation type on purpose. Mirror duty, like
@@ -236,6 +239,7 @@ std::optional<realize_yield_refusal> classify_realize_yield_revert(std::string_v
    if (is(no_yield_signature, 0)) return realize_yield_refusal::no_yield;
    if (is(yield_below_deadband_signature, 2)) return realize_yield_refusal::below_deadband;
    if (is(pool_underbacked_signature, 2)) return realize_yield_refusal::underbacked;
+   if (is(enforced_pause_signature, 0)) return realize_yield_refusal::paused;
    return std::nullopt;
 }
 
@@ -782,10 +786,11 @@ void outpost_ethereum_client::crank_outpost(uint32_t epoch_index, fc::microsecon
       ilog("outpost_ethereum_client[{}]: realizeYield sent for epoch {} tx={}",
            to_string(), epoch_index, result.as_string());
    } catch (const fc::network::json_rpc::json_rpc_error& e) {
-      // A revert at estimate time costs no gas. Only the pool's own three refusals are
-      // outcomes of the crank rather than failures of it; anything else -- a signer without
-      // the `yield_operator` role, a paused endpoint, a foreign implementation -- is the job's
-      // to log as a failed crank, exactly like a transport failure.
+      // A revert at estimate time costs no gas. Only the pool's own refusals -- its three
+      // yield outcomes and `EnforcedPause()`, which comes only from SyndicationPool's own pause
+      // (the OPP endpoint has none) -- are outcomes of the crank rather than failures of it;
+      // anything else -- a signer without the `yield_operator` role, a foreign implementation --
+      // is the job's to log as a failed crank, exactly like a transport failure.
       const auto refusal =
          e.code == ethereum_execution_reverted_code
             ? detail::classify_realize_yield_revert(e.data.is_string() ? e.data.as_string() : std::string{})
@@ -800,6 +805,13 @@ void outpost_ethereum_client::crank_outpost(uint32_t epoch_index, fc::microsecon
       case detail::realize_yield_refusal::underbacked:
          wlog("outpost_ethereum_client[{}]: syndication pool {} is below its principal; realizeYield "
               "refused for epoch {} (the loss path is not in that contract)",
+              to_string(), _syndication_pool_addr, epoch_index);
+         return;
+      case detail::realize_yield_refusal::paused:
+         // The emergency stop: an expected state the andon playbook clears, reported every
+         // epoch at info so it stays visible without reading as a failed crank.
+         ilog("outpost_ethereum_client[{}]: syndication pool {} is paused; realizeYield not reported "
+              "for epoch {}",
               to_string(), _syndication_pool_addr, epoch_index);
          return;
       }

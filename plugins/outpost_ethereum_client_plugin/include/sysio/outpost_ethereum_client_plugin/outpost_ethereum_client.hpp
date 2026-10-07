@@ -133,13 +133,19 @@ enum class realize_yield_refusal {
    below_deadband,
    /// `WIRE_PoolUnderbacked(uint64 balanceDepot, uint64 principal)`: the balance
    /// fell below the principal, a loss the `LIQYield` carrier cannot express.
-   underbacked
+   underbacked,
+   /// `EnforcedPause()`: OpenZeppelin `Pausable`'s refusal. `realizeYield()` is
+   /// `whenNotPaused`, so a pool its panic role has frozen refuses every crank
+   /// until it is unpaused -- an expected state, not a failed crank.
+   paused
 };
 
 /// Classify `realizeYield()`'s revert bytes. `std::nullopt` for anything that is
-/// not one of the pool's own three refusals, exactly shaped (the selector alone,
-/// or the selector plus two words): a role error, a paused endpoint or a foreign
-/// implementation must not pass as a quiet no-op.
+/// not one of the pool's own refusals, exactly shaped (the selector alone, or the
+/// selector plus two words): a role error or a foreign implementation must not
+/// pass as a quiet no-op. `EnforcedPause()` is one of the pool's refusals: it
+/// comes only from `SyndicationPool`'s own pause (`whenNotPaused`), since the
+/// OPP endpoint has no pause of its own.
 ///
 /// @param revert_data  `json_rpc_error::data`, the node's revert bytes as `0x`-hex.
 std::optional<realize_yield_refusal> classify_realize_yield_revert(std::string_view revert_data);

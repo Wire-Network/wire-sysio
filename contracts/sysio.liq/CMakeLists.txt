@@ -29,9 +29,9 @@ if(BUILD_SYSTEM_CONTRACTS)
         target_include_directories(${target}
                 PUBLIC
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.andon/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../../libraries/opp/generated-cdt>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/libfc-lite/include>
+                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.andon/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.authex/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.chains/include>
                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.epoch/include>

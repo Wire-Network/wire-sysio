@@ -3,12 +3,18 @@
 Status: design, approved 2026-08-10. Supersedes the fused terminal-call design
 currently on `feat/resumable-opp-dispatch` (wire-sysio #552, wire-solana #419).
 
+Cross-chain swaps through outposts (`SWAP_REMIT` / `SWAP_REVERT`) and outpost-side
+operator collateral (`OPERATOR_ACTION` remits) have since been removed. The
+remit-class inbound effect on Solana today is the `DESYNDICATE_LIQ` payout; the
+dispatch mechanics below are unchanged by that.
+
 ## Problem
 
 A Solana transaction cannot carry the effect accounts for every attestation in an
 OPP envelope. The packet limit is 1232 bytes serialized and every dynamic account
-costs 32 bytes in the message, so a large envelope — many SPL swap remits across
-distinct reserves — needs more accounts than one transaction can declare. Only
+costs 32 bytes in the message, so a large envelope — many attestations whose
+effects each touch their own accounts (desyndication payouts to distinct
+recipients, for example) — needs more accounts than one transaction can declare. Only
 the relay can size a batch, because only the relay supplies the accounts and
 therefore knows the transaction's real byte cost.
 
@@ -260,10 +266,9 @@ deliberately deleted the SEC-94 estimator allow-list, which was correct; the
 scaffolding to learn `chain.kind`, so it fell out as collateral rather than by
 decision. Restore the bare registration assert with no estimator and no `kind`
 branch. Separately, `buildenv`'s chains fetch now uses the bare `.get()` overload
-and aborts with `"key not found"`; give it the message overload. Three stale
-references describe the deleted guard and must be corrected or a future reader
-will conclude msgch is the backstop: `sysio.reserv.cpp:93-95`,
-`sysio.msgch_tests.cpp:164-170`, `sysio.reserv_tests.cpp:411-414`.
+and aborts with `"key not found"`; give it the message overload. Any remaining
+comment or test that describes the deleted guard (`sysio.msgch_tests.cpp` carried
+one) must be corrected, or a future reader will conclude msgch is the backstop.
 
 Any change under `contracts/**` runs `contracts_unit_test -- --sys-vm` before the
 commit lands, and follows the rebuild + WASM/ABI copy sequence
@@ -308,7 +313,8 @@ Order:
   nonzero cursor, stall break, round exhaustion alarming, and the terminal-shape
   packet-limit measurement.
 - Contracts: `contracts_unit_test -- --sys-vm` for the `queueout` change.
-- Flow: a SOL swap-remit flow whose envelope needs ≥ 2 dispatch rounds, asserting
+- Flow: a SOL flow whose inbound envelope needs ≥ 2 dispatch rounds (for example
+  many desyndication payouts in one epoch), asserting
   the epoch does not advance until the cursor drains. Run via the canonical pair
   (`run-flow.mjs` + `flow-heartbeat-monitor.mjs`) per
   `run-flows-via-canonical-scripts.md`.
