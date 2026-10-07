@@ -41,15 +41,21 @@ namespace swap {
    }
 }
 
-/// `sysio.liq` identifiers the pending-yield crank touches.
+/// `sysio.liq` identifiers the pending-yield crank and the underwriter touch.
 namespace liq {
    constexpr auto account           = "sysio.liq";
    constexpr auto table_liqpending  = "liqpending";
+   constexpr auto table_accounts    = "accounts";
+   constexpr auto table_stat        = "stat";
    constexpr auto action_queueyield = "queueyield";
    namespace field {
       constexpr auto quantity    = "quantity";
       constexpr auto symbol_code = "symbol_code";   ///< the kv key of `liqpending`
       constexpr auto sym         = "sym";           ///< `queueyield`'s argument
+      constexpr auto balance     = "balance";       ///< an `accounts` row's holding
+      constexpr auto supply      = "supply";        ///< a `stat` row's supply, in the shadow's symbol
+      constexpr auto token_code  = "token_code";    ///< a `stat` row's registry token code
+      constexpr auto chain_code  = "chain_code";    ///< a `stat` row's outpost
    }
 }
 
@@ -123,6 +129,11 @@ public:
       return it == _last_push.end() || now - it->second >= interval;
    }
    void mark(const std::string& key, fc::time_point now) { _last_push[key] = now; }
+   /// Forget every key last marked before `cutoff`. With `cutoff` at most `now - interval` this changes no
+   /// answer of `due`, and keys whose subject is gone do not pile up.
+   void forget_before(fc::time_point cutoff) {
+      std::erase_if(_last_push, [&](const auto& entry) { return entry.second < cutoff; });
+   }
 
 private:
    std::map<std::string, fc::time_point> _last_push;

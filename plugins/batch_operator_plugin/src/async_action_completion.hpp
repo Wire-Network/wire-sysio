@@ -28,6 +28,9 @@ public:
    /// This may be called exactly once for each completion instance.
    std::future<void> get_future() { return done.get_future(); }
 
+   /// Whether the push completed and the transaction succeeded. Read after the future is ready.
+   bool succeeded() const { return success.load(std::memory_order_acquire); }
+
    /// Invokes `on_complete` once, suppresses callback exceptions, and signals
    /// the waiter without allowing duplicate asynchronous completions to throw.
    template <typename CompletionHandler>
@@ -58,10 +61,12 @@ public:
       const chain::next_function_variant<chain_apis::read_write::push_transaction_results>& result,
       SuccessHandler&& on_success,
       FailureHandler&& on_failure) {
-      return complete([&result, &on_success, &on_failure] {
+      // `complete` runs this before returning, so the references cannot outlive what they name.
+      return complete([this, &result, &on_success, &on_failure] {
          if (const auto* error = std::get_if<fc::exception_ptr>(&result)) {
             on_failure(*error);
          } else if (std::holds_alternative<chain_apis::read_write::push_transaction_results>(result)) {
+            success.store(true, std::memory_order_release);
             on_success();
          } else {
             const auto& deferred = std::get<std::function<
@@ -70,6 +75,7 @@ public:
             if (const auto* error = std::get_if<fc::exception_ptr>(&deferred_result)) {
                on_failure(*error);
             } else {
+               success.store(true, std::memory_order_release);
                on_success();
             }
          }
@@ -78,6 +84,7 @@ public:
 
 private:
    std::atomic<bool> completed{false};
+   std::atomic<bool> success{false};
    std::promise<void> done;
 };
 

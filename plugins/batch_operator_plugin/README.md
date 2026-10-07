@@ -41,8 +41,8 @@ that is offline, and each is a cheap no-op once its work is done:
 | `sysio.liq::queueyield(sym)` | every shadow with yield pending from an outpost `LIQ_YIELD` report | the report lands in `sysio.liq`'s pending balance; queuing it into the swap is a separate, permissionless step |
 
 The two yield cranks stay idle, without logging a read failure per poll, until both
-`sysio.swap` and `sysio.liq` are deployed on the depot. The plugin does not crank
-`sysio.synd::crank`; syndication release is driven by keepers.
+`sysio.swap` and `sysio.liq` are deployed on the depot. `sysio.synd::crank` is pushed
+by the underwriter every poll (see [Underwriter](#underwriter)).
 
 ## Configuration
 
@@ -52,17 +52,27 @@ The two yield cranks stay idle, without logging a read failure per poll, until b
 | `--batch-epoch-poll-ms` | 15000 | How often to check epoch state (ms) |
 | `--batch-delivery-timeout-ms` | 15000 | Max time to wait for chain delivery confirmation (ms) |
 | `--batch-yield-tick-interval-ms` | 60000 | Minimum spacing between this operator's `sysio.swap::tickyield` pushes per yield pool (ms) |
+| `--batch-underwriter-account` | none | `account` or `account@permission` (default `active`) the underwriter bonds from. Configuring it enables the underwriter |
+| `--batch-underwriter-max-exposure` | none | Most the underwriter may have bonded at once in one shadow token, as an asset (`100.000000000 LIQETH`). Repeat per token; a token without one is not underwritten |
 
 There is no separate enable flag: the relay runs when `--batch-operator-account`
-is configured, the way `producer_plugin` keys off `--producer-name`. The plugin
-must also be listed under `plugin =` (or pulled in as a dependency by
-`external_debugging_plugin`), and requires `read-mode = irreversible`.
+is configured, the way `producer_plugin` keys off `--producer-name`, and the
+underwriter when `--batch-underwriter-account` is; a node may run either or both,
+and the poll and timeout options apply to both. The plugin must also be listed under
+`plugin =` (or pulled in as a dependency by `external_debugging_plugin`), and
+requires `read-mode = irreversible`.
 
-The relay signs with the one operator-configured WIRE signature provider, of any
-key type, whose key alone satisfies `<operator>@active` on chain. At startup the
-node also checks that the key's signatures recover to it and that
-`<operator>@active` may declare every action the relay pushes (`linkauth`). No
-match, more than one, or a failed check stops the node.
+Each role signs with the one operator-configured WIRE signature provider, of any key
+type, whose key alone satisfies its authorization on chain: `<operator>@active` for
+the relay, the configured permission for the underwriter. At startup the node also
+checks that the key's signatures recover to it and that the authorization may
+declare every action the role pushes (`linkauth`). A role that fails either check,
+or matches no provider or more than one, stops the node.
+
+The node exempts the accounts it signs as from subjective CPU billing: both roles
+push on a schedule that loses some pushes (a race another operator won, an action
+the irreversible view does not show done yet), and billed failures would soon have
+the node refuse the account's transactions.
 
 ### Outpost wiring
 
@@ -87,6 +97,56 @@ after the sync gate, where `sysio.chains` is readable. Missing contract
 fail-closed and picked up on a later tick. A `setoutpost` redeploy is likewise
 picked up on the next epoch tick: the relay job is rebuilt against the new
 address rather than left pointing at the old one.
+
+## Underwriter
+
+Any depot account can run the underwriter, with or without the relay, to bond the
+requests `sysio.synd` issues for syndication envelopes. Each poll it:
+
+1. **Verifies each outpost** with an OPEN `sysio.synd` request: the outpost's latest
+   final envelope must be the depot's latest accepted one (`sysio.msgch::outpcons`,
+   same epoch and sha256) or chain to it (`previous_envelope_hash`). `sysio.msgch`
+   accepts only envelopes that continue the accepted chain, so this confirms every
+   earlier one too.
+2. **Bonds** each confirmed OPEN request `sysio.synd` issued under the `oppenvelope`
+   schema, oldest first and for its whole remainder (`sysio.bond::accept`), within
+   the token's exposure cap (bonds not yet claimed count) and the account's
+   `sysio.liq` balance.
+3. **Cranks** `sysio.synd::crank`, which releases what bonding allows and issues the
+   next request.
+4. **Approves** its requests once their challenge window has passed and **claims**
+   them once approved or ruled VALID. It prunes `sysio.bond` and `sysio.synd` every
+   10 minutes.
+
+What it cannot act on waits and is logged, each at most every 5 minutes:
+
+| Condition | Effect |
+|-----------|--------|
+| An outpost cannot be read, or does not confirm the depot's tip yet | That chain's requests wait |
+| An outpost contradicts the depot | That chain's requests wait; an error log names both hashes |
+| The node cannot serve a chain (no RPC client, wrong chain id) | That chain's requests wait; the others go on |
+| No cap, over the cap, or too little balance | The request waits |
+| The `sysio.andon` cord is pulled | Nothing is bonded, approved or claimed until it clears |
+| A request is challenged (HELD) | Reported, whether or not we bonded it: `sysio` rules it |
+| A bond of ours is ruled INVALID while the node runs | Bonding stops until a restart; approvals and claims go on. A forfeited bond is never claimed |
+| A table read fails | The pass does nothing |
+
+### Underwriter setup
+
+On the depot, the underwriter account holds the shadow LIQ it bonds, RAM for its
+bond rows, and CPU for a few pushes per poll. With a dedicated permission, link it to
+exactly the actions it pushes, so the node's key can move the inventory nowhere
+else: `sysio.bond::accept`, `approve`, `claim`, `prune` and `sysio.synd::crank`,
+`pruneenv`. The WIRE its bonds earn is withdrawn with `sysio.bond::claimwire`, which
+stays unlinked.
+
+The node needs an outpost RPC client for every active chain (each client spec names
+a signing key, though the underwriter only reads), the Ethereum OPP ABI files and the
+Solana IDL. Use RPC endpoints independent of the batch operators': the confirmation
+is only as good as the outpost reads. Run one underwriter node per account.
+
+Size each cap for the most the token syndicates in one challenge window
+(`window_sec`, 3 hours by default) plus the time it takes to claim.
 
 ## Dependencies
 

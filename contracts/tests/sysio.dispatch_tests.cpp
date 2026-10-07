@@ -35,8 +35,11 @@
 #include <fc/crypto/ethereum/ethereum_types.hpp>
 #include <magic_enum/magic_enum.hpp>
 
+#include <boost/endian/conversion.hpp>
+
 #include <algorithm>
 #include <array>
+#include <cstring>
 #include <iterator>
 #include <limits>
 #include <map>
@@ -2192,6 +2195,91 @@ BOOST_FIXTURE_TEST_CASE(a_shortfall_freezes_the_same_envelopes_queue_step, sysio
    envelope = synd_envelope("ETH", "LIQETH", first_epoch);
    BOOST_CHECK_EQUAL("DONE", envelope["state"].as_string());
    BOOST_CHECK(!envelope["share_pending"].as_bool());
+} FC_LOG_AND_RETHROW() }
+
+// The flow the batch_operator_plugin underwriter drives, with zero fees and bounty and one account bonding every
+// request in full. The request a delivery opens carries the statement the underwriter verifies (the outpost, the
+// epoch and the digest `sysio.msgch` accepted); bonding releases the syndication on the next queue step; once the
+// challenge window passes anyone approves, and the underwriter's claim returns the whole bond.
+BOOST_FIXTURE_TEST_CASE(a_bond_releases_the_envelope_and_comes_back_after_the_window, sysio_dispatch_tester) {
+try {
+   namespace andon = sysio_system::test_support::andon;
+   constexpr auto     BOND_ACCOUNT = "sysio.bond"_n;
+   constexpr auto     USER         = "synd.user"_n;
+   constexpr auto     UNDERWRITER  = "synd.bonder"_n;
+   constexpr uint32_t window_sec   = 10800;
+   bootstrap_for_dispatch();
+   abi_serializer andon_abi, bond_abi;
+   andon::deploy(*this, andon_abi, contracts::andon_wasm(), contracts::andon_abi());
+   setup_liq_for_dispatch();
+   create_accounts({BOND_ACCOUNT, USER, UNDERWRITER});
+   produce_blocks();
+   deploy(BOND_ACCOUNT, contracts::bond_wasm(), contracts::bond_abi(), bond_abi);
+   const auto user_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::em);
+   create_eth_authex_link(USER, user_key);
+   const auto user_pubkey = em_pubkey_bytes(user_key.get_public_key());
+   BOOST_REQUIRE_EQUAL(success(), push(SYND_ACCOUNT, synd_abi, config::system_account_name, "setconfig"_n, mvo()
+      ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("LIQETH"))("synd_fee_bps", 0)
+      ("desynd_fee_bps", 0)("synd_burst", 1'000'000 * LIQ_UNIT)("synd_refill", 1'000'000 * LIQ_UNIT)
+      ("desynd_burst", 0)("desynd_refill", 0)("window_sec", window_sec)("bounty", 0)("challenge_extra", 0)));
+   setup_wire_token();
+   enable_epoch_advancement();
+   const auto request_of = [&](uint64_t id) {
+      return bond_abi.binary_to_variant("request_row", get_row_by_id(BOND_ACCOUNT, BOND_ACCOUNT, "requests"_n, id),
+                                        abi_serializer::create_yield_function(abi_serializer_max_time));
+   };
+
+   const auto     eth    = fc::slug_name{"ETH"}.value;
+   const auto     liqeth = fc::slug_name{"LIQETH"}.value;
+   const uint32_t epoch  = current_epoch();
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth, encode_envelope_with_mixed_attestations(epoch, {
+      {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, ChainKind::CHAIN_KIND_EVM, user_pubkey, liqeth,
+                                                            10 * LIQ_UNIT, 1, 10 * LIQ_UNIT)},
+   })));
+   produce_block();
+
+   const uint64_t id = synd_envelope("ETH", "LIQETH", epoch)["request_id"].as_uint64();
+   BOOST_REQUIRE_GT(id, 0u);
+   auto request = request_of(id);
+   BOOST_REQUIRE_EQUAL("OPEN", request["state"].as_string());
+   BOOST_REQUIRE_EQUAL("sysio.synd", request["issuer"].as_string());
+   BOOST_REQUIRE_EQUAL("oppenvelope", request["schema"].as_string());
+   BOOST_REQUIRE_EQUAL(10 * LIQ_UNIT, request["covered"].as_int64());
+   // The statement: chain code, epoch, accepted digest and token code, little-endian, 52 bytes.
+   std::vector<char> statement(52);
+   auto* p = reinterpret_cast<unsigned char*>(statement.data());
+   boost::endian::store_little_u64(p, eth);
+   boost::endian::store_little_u32(p + 8, epoch);
+   const auto digest = accepted_envelope_digest(eth);
+   std::memcpy(p + 12, digest.data(), 32);
+   boost::endian::store_little_u64(p + 44, liqeth);
+   BOOST_CHECK(statement == request["statement"].as<std::vector<char>>());
+   BOOST_CHECK_EQUAL(0, liq_balance(USER));   // held until underwritten
+
+   // The underwriter bonds the whole request; a crank releases the syndication rather than the next envelope's
+   // step.
+   BOOST_REQUIRE_EQUAL(success(), mint_shadow(UNDERWRITER, 10 * LIQ_UNIT));
+   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi, UNDERWRITER, "accept"_n, mvo()
+      ("underwriter", UNDERWRITER)("request_id", id)("amount", 10 * LIQ_UNIT)));
+   BOOST_REQUIRE_EQUAL(success(), push(SYND_ACCOUNT, synd_abi, UNDERWRITER, "crank"_n, mvo()("limit", 16)));
+   produce_block();
+   BOOST_CHECK_EQUAL("BONDED", request_of(id)["state"].as_string());
+   BOOST_CHECK_EQUAL(10 * LIQ_UNIT, liq_balance(USER));
+   BOOST_CHECK_EQUAL(0, liq_balance(UNDERWRITER));
+   BOOST_CHECK_EQUAL("DONE", synd_envelope("ETH", "LIQETH", epoch)["state"].as_string());
+
+   // The bond stays at risk for the whole window, then anyone approves and the underwriter claims it back.
+   BOOST_CHECK_EQUAL(wasm_assert_msg("challenge window has not passed"),
+                     push(BOND_ACCOUNT, bond_abi, USER, "approve"_n, mvo()("request_id", id)));
+   produce_block(fc::seconds(window_sec));
+   produce_block();
+   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi, USER, "approve"_n, mvo()("request_id", id)));
+   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi, UNDERWRITER, "claim"_n, mvo()
+      ("request_id", id)("account", UNDERWRITER)));
+   produce_block();
+   BOOST_CHECK_EQUAL("APPROVED", request_of(id)["state"].as_string());
+   BOOST_CHECK_EQUAL(10 * LIQ_UNIT, liq_balance(UNDERWRITER));
+   BOOST_CHECK_EQUAL(10 * LIQ_UNIT, liq_balance(USER));
 } FC_LOG_AND_RETHROW() }
 
 // The host-side simulator feeds canonical protobuf envelopes into the production

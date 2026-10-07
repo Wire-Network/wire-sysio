@@ -1,15 +1,48 @@
 #pragma once
 /**
  * @file role_config.hpp
- * @brief The choice of the key a role of the batch-operator plugin signs with. Pure functions, so the plugin's
- *        tests drive them without a node.
+ * @brief Parsing of the batch-operator plugin's role options and the choice of the key a role signs with. Pure
+ *        functions, so the plugin's tests drive them without a node.
  */
 
 #include <cstddef>
+#include <cstdint>
+#include <map>
 #include <optional>
+#include <string>
 #include <vector>
 
+#include <fc/exception/exception.hpp>
+#include <sysio/chain/asset.hpp>
+#include <sysio/chain/authority.hpp>
+#include <sysio/chain/config.hpp>
+#include <sysio/chain/name.hpp>
+
 namespace sysio::batch_operator_detail {
+
+/// Parse `account[@permission]`, the permission defaulting to `active`. Throws when either part is empty or not a
+/// valid name.
+inline chain::permission_level parse_permission_level(const std::string& spec) {
+   const auto              at = spec.find('@');
+   chain::permission_level level{chain::name(spec.substr(0, at)), chain::config::active_name};
+   if (at != std::string::npos) level.permission = chain::name(spec.substr(at + 1));
+   FC_ASSERT(level.actor.good(), "'{}' names no account", spec);
+   FC_ASSERT(level.permission.good(), "'{}' names no permission", spec);
+   return level;
+}
+
+/// Parse the exposure caps, one asset each, keyed by symbol code. Throws on a malformed asset, an amount that is
+/// not positive, or a symbol named twice.
+inline std::map<uint64_t, chain::asset> parse_exposure_caps(const std::vector<std::string>& specs) {
+   std::map<uint64_t, chain::asset> caps;
+   for (const auto& spec : specs) {
+      const auto cap = chain::asset::from_string(spec);
+      FC_ASSERT(cap.get_amount() > 0, "exposure cap {} must be positive", spec);
+      FC_ASSERT(caps.emplace(cap.get_symbol().to_symbol_code().value, cap).second,
+                "exposure cap names {} more than once", cap.get_symbol().name());
+   }
+   return caps;
+}
 
 /// The provider a role signs with, and how many qualified.
 template <typename Provider>
