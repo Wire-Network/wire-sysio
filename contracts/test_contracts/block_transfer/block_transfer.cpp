@@ -8,7 +8,7 @@
 
 /// Transfer-notify blocking regression helper.
 ///
-/// Deployed onto an account that a system path pays. `sysio.token::transfer` calls
+/// Deployed onto an account that a system path pays. `sysio.token::transfer` and `sysio.liq::transfer` call
 /// `require_recipient(to)`, and `apply_context::exec` dispatches notified receivers in a bare loop
 /// with no exception isolation -- so the assert below aborts the ENTIRE transaction containing the
 /// transfer, every parent inline action included.
@@ -39,6 +39,19 @@ public:
    /// very setup steps (e.g. `swapfromwire`'s escrow leg) needed to reach the path under test.
    [[sysio::on_notify("sysio.token::transfer")]]
    void on_transfer(sysio::name from, sysio::name to, sysio::asset quantity, std::string memo) {
+      reject_incoming(to);
+   }
+
+   /// Reject ordinary LIQ transfers too, so a settlement regression proves that the recipient
+   /// notification was bypassed rather than merely reaching a handler for a different token.
+   [[sysio::on_notify("sysio.liq::transfer")]]
+   void on_liq_transfer(sysio::name from, sysio::name to, sysio::asset quantity, std::string memo) {
+      reject_incoming(to);
+   }
+
+private:
+   /// Outgoing transfers remain available for setup and escrow funding on either token contract.
+   void reject_incoming(sysio::name to) {
       if (to != get_self()) return;
       sysio::check(false, "block_transfer: rejecting incoming transfer");
    }

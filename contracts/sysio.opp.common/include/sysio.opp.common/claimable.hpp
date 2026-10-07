@@ -21,20 +21,21 @@
  * then blocks only its own claim.
  *
  * `sysio.dclaim` established this pattern (`onreward` credits `pending_claims`, `claim` pays out);
- * these helpers generalize it so `sysio.system`, `sysio.reserv` and `sysio.opreg` share one
- * audited implementation rather than three copies.
+ * these helpers generalize it so `sysio.system` and `sysio.opreg` share one
+ * audited implementation rather than duplicate copies.
  *
  * ## Row contract
  *
  * Each contract declares its OWN `[[sysio::table]]`-attributed row and key, because the table name
  * is baked into both the attribute and the `kv::table` template argument, and because a
  * `[[sysio::table]]`-attributed struct cannot be shared into `sysio.system`'s translation unit
- * without corrupting that contract's read-only-action return codegen (see the note on
- * `sysio.reserv::rewards_bucket`). The helpers below are templated over the table instead, and
+ * without corrupting that contract's read-only-action return codegen. The helpers below are
+ * templated over the table instead, and
  * require only that the row expose:
  *
- *   * `uint64_t balance`            -- required, the claimable amount in atomic units of THAT
- *                                      contract's token (currently WIRE for every consumer) --
+ *   * `uint64_t balance`            -- required, the claimable amount in atomic units of the
+ *                                      row's token (WIRE for `payclaims`; the
+ *                                      row's own `token_code` for `sysio.opreg::remitclaims`) --
  *                                      these helpers never name a symbol; `pay_out`'s caller
  *                                      supplies it
  * All consumers retain credited balances indefinitely, until the recipient claims them.
@@ -88,7 +89,7 @@ void credit(Table& tbl, sysio::name payer, const Key& key, Row fresh, uint64_t a
    });
 }
 
-/// Drain a claimable row and emit the single `sysio.token::transfer` that pays it out.
+/// Drain a claimable row and emit the single `token_account::transfer` that pays it out.
 ///
 /// This is the ONLY place a claimable balance becomes a transfer, and it is reached only from an
 /// action carrying the claimant's own authority. A recipient whose notify handler aborts therefore

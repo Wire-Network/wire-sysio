@@ -209,6 +209,8 @@ by explicit block.
 
 **Response (503):** Discovery could not complete before its deadline or after retrying an attestation-table read.
 
+**Response (400):** The body is neither empty nor `{}`.
+
 ### `POST /v1/snapshot/by_block`
 
 Returns metadata for a snapshot at a specific block number. Download eligibility is enforced separately by the raw
@@ -239,7 +241,9 @@ Downloads a snapshot file as a binary stream. Scheduled snapshots return 404 unt
 - `Accept-Ranges: bytes`
 - `Content-Length: <file size>`
 
-**Range header support:** Include a `Range: bytes=START-END` header for partial downloads (resumable transfers). The server responds with `206 Partial Content` and a `Content-Range` header.
+**Response (400):** The body is missing or malformed.
+
+**Range header support:** Include a `Range: bytes=START-END` header for partial downloads (resumable transfers). The server responds with `206 Partial Content` and a `Content-Range` header. An END past the end of the file is clamped to its last byte; a START past it gets `416 Range Not Satisfiable`.
 
 ## Bootstrapping a Node from a Snapshot Endpoint
 

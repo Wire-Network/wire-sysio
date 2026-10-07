@@ -227,7 +227,6 @@ transaction build_measured_legacy_transaction(const std::vector<instruction>& in
    return tx;
 }
 
-
 } // anonymous namespace
 
 BOOST_AUTO_TEST_SUITE(outpost_solana_client_plugin)
@@ -280,7 +279,7 @@ BOOST_AUTO_TEST_CASE(authenticated_caller_address_returns_configured_signer_pubk
       {load_idl_fixture(opp_outpost_idl_fixture)},
       1,
       1,
-      sysio::solana_outpost_role::underwriter);
+      sysio::solana_outpost_role::batch_operator);
 
    const auto expected_caller = sol_client->get_pubkey().serialize();
    const auto actual_caller = outpost.authenticated_caller_address();
@@ -432,7 +431,6 @@ BOOST_AUTO_TEST_CASE(can_load_counter_anchor_idl) try {
    BOOST_CHECK(has_initialize);
    BOOST_CHECK(has_increment);
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(can_load_opp_outpost_idl) try {
    auto prog = load_idl_fixture(opp_outpost_idl_fixture);
 
@@ -444,7 +442,6 @@ BOOST_AUTO_TEST_CASE(can_load_opp_outpost_idl) try {
    BOOST_CHECK(has_epoch_in);
    BOOST_CHECK(has_emit);
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(filter_outpost_program_idls_selects_configured_name) try {
    std::vector<std::pair<std::filesystem::path, std::vector<idl::program>>> idl_files;
    idl_files.emplace_back("counter.json",
@@ -469,96 +466,14 @@ BOOST_AUTO_TEST_CASE(filter_outpost_program_idls_selects_configured_name) try {
    BOOST_CHECK(sysio::filter_outpost_program_idls(idl_files, "liqsol_core").empty());
    BOOST_CHECK(sysio::filter_outpost_program_idls({}, sysio::OPP_SOLANA_OUTPOST_PROGRAM_NAME).empty());
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(outpost_program_name_default_is_opp_outpost) try {
    // The option default is back-compat load-bearing: pre-cleanroom deployments
    // pass no --solana-outpost-program-name and must keep matching opp_outpost.
    BOOST_CHECK_EQUAL(std::string{sysio::OPP_SOLANA_OUTPOST_PROGRAM_NAME}, "opp_outpost");
 } FC_LOG_AND_RETHROW();
-
 namespace {
 
-/// A decoded `Reserve` account object as libfc's IDL decoder renders it:
-/// pubkeys as base58 strings, `custody_decimals` as an integer.
-fc::variant_object reserve_row(const solana_public_key& creator,
-                               const solana_public_key& custody_mint,
-                               unsigned                 custody_decimals,
-                               const solana_public_key& custody_token_program =
-                                  system::program_ids::TOKEN_PROGRAM) {
-   return fc::mutable_variant_object("creator", creator.to_string(fc::yield_function_t{}))(
-      "custody_mint", custody_mint.to_string(fc::yield_function_t{}))(
-      "custody_decimals", custody_decimals)(
-      "custody_token_program", custody_token_program.to_string(fc::yield_function_t{}));
 }
-
-} // anonymous namespace
-
-BOOST_AUTO_TEST_CASE(reserve_info_reads_custody_from_the_reserve_account) try {
-   using sysio::outpost_solana_client_detail::reserve_info_from_account;
-
-   const auto creator       = measurement_pubkey(76);
-   const auto spl_mint      = measurement_pubkey(77);
-   const auto native_marker = system::program_ids::SYSTEM_PROGRAM;
-
-   // SPL custody: the mint and decimals PINNED on the reserve at creation --
-   // the same two values `handle_swap_remit_spl` / `handle_swap_revert_spl`
-   // are handed off `reserve.custody_mint` / `reserve.custody_decimals`.
-   const auto spl = reserve_info_from_account(reserve_row(creator, spl_mint, 6));
-   BOOST_CHECK(spl.creator == creator);
-   BOOST_CHECK(spl.custody_mint == spl_mint);
-   BOOST_CHECK_EQUAL(static_cast<unsigned>(spl.custody_decimals), 6u);
-   BOOST_CHECK(spl.custody_token_program == system::program_ids::TOKEN_PROGRAM);
-
-   // SOL-396: a Token-2022 reserve must round-trip its OWN token program --
-   // the ATA derivation and the token-program account both hang off this, and
-   // silently substituting the legacy default names accounts the program never
-   // asks for (EffectAccountMissing, on every retry, forever).
-   const auto t22_program = measurement_pubkey(80);
-   const auto t22 = reserve_info_from_account(reserve_row(creator, spl_mint, 6, t22_program));
-   BOOST_CHECK(t22.custody_token_program == t22_program);
-
-   // Native custody is the all-zero `NATIVE_TOKEN_MARKER`, which is exactly
-   // what the handler compares against to take the lamport branch.
-   const auto native = reserve_info_from_account(reserve_row(creator, native_marker, 9));
-   BOOST_CHECK(native.custody_mint == native_marker);
-   BOOST_CHECK_EQUAL(static_cast<unsigned>(native.custody_decimals), 9u);
-} FC_LOG_AND_RETHROW();
-
-BOOST_AUTO_TEST_CASE(reserve_info_requires_every_custody_field) try {
-   using sysio::outpost_solana_client_detail::reserve_info_from_account;
-
-   const auto creator  = measurement_pubkey(78);
-   const auto spl_mint = measurement_pubkey(79);
-
-   // A record missing ANY of the three is not one this relay can build an
-   // account-consistent manifest from. Defaulting custody_mint would silently
-   // mean "native" -- the divergence that makes the on-chain call abort.
-   BOOST_CHECK_THROW(
-      reserve_info_from_account(fc::mutable_variant_object(
-         "custody_mint", spl_mint.to_string(fc::yield_function_t{}))("custody_decimals", 6)),
-      fc::assert_exception);
-   BOOST_CHECK_THROW(
-      reserve_info_from_account(fc::mutable_variant_object(
-         "creator", creator.to_string(fc::yield_function_t{}))("custody_decimals", 6)),
-      fc::assert_exception);
-   BOOST_CHECK_THROW(
-      reserve_info_from_account(fc::mutable_variant_object(
-         "creator", creator.to_string(fc::yield_function_t{}))(
-         "custody_mint", spl_mint.to_string(fc::yield_function_t{}))),
-      fc::assert_exception);
-   // ...including the token program: without it the ATA is not derivable at all.
-   BOOST_CHECK_THROW(
-      reserve_info_from_account(fc::mutable_variant_object(
-         "creator", creator.to_string(fc::yield_function_t{}))(
-         "custody_mint", spl_mint.to_string(fc::yield_function_t{}))("custody_decimals", 6)),
-      fc::assert_exception);
-   BOOST_CHECK_THROW(reserve_info_from_account(fc::variant_object{fc::mutable_variant_object{}}),
-                     fc::assert_exception);
-   // Out-of-byte-range decimals: a decoded row disagreeing with the on-chain
-   // u8 must be refused, not truncated.
-   BOOST_CHECK_THROW(reserve_info_from_account(reserve_row(creator, spl_mint, 256)),
-                     fc::assert_exception);
-} FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(opp_outpost_epoch_in_has_chunked_args) try {
    auto prog = load_idl_fixture(opp_outpost_idl_fixture);
@@ -603,7 +518,7 @@ BOOST_AUTO_TEST_CASE(opp_outpost_epoch_in_has_chunked_args) try {
    BOOST_CHECK_EQUAL(dispatch->args[1].name, "dispatch_limit");
    // No inbound_envelopes: the crank settles effects, it does not append the
    // inbound audit record -- that happens once, on the consensus-tipping call.
-   BOOST_CHECK_EQUAL(dispatch->accounts.size(), 11u);
+   BOOST_CHECK_EQUAL(dispatch->accounts.size(), 9u);
    BOOST_CHECK(dispatch->accounts[0].is_signer);
    BOOST_CHECK_EQUAL(dispatch->accounts[4].name, "chunk_buffer");
 
@@ -618,7 +533,6 @@ BOOST_AUTO_TEST_CASE(opp_outpost_epoch_in_has_chunked_args) try {
    BOOST_CHECK_EQUAL(epoch_in->accounts[5].name, "inbound_envelopes");
    BOOST_CHECK_EQUAL(epoch_in->accounts[6].name, "system_program");
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(opp_outpost_dispatch_attestations_present) try {
    // The relay's crank path requires the two-phase program: a deployment
    // whose IDL lacks `dispatch_attestations` must fail at BOOT (the
@@ -637,13 +551,12 @@ BOOST_AUTO_TEST_CASE(opp_outpost_dispatch_attestations_present) try {
 
    // Accounts: caller (permissionless signer), then the same static outpost
    // account list the relay overrides by name in send_dispatch_attestations.
-   BOOST_REQUIRE_EQUAL(dispatch->accounts.size(), 11u);
+   BOOST_REQUIRE_EQUAL(dispatch->accounts.size(), 9u);
    BOOST_CHECK_EQUAL(dispatch->accounts[0].name, "caller");
    BOOST_CHECK(dispatch->accounts[0].is_signer);
    BOOST_CHECK_EQUAL(dispatch->accounts[3].name, "epoch_deliveries");
    BOOST_CHECK_EQUAL(dispatch->accounts[4].name, "chunk_buffer");
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(opp_outpost_cleanup_envelope_chunks_present) try {
    auto prog = load_idl_fixture(opp_outpost_idl_fixture);
 
@@ -664,7 +577,6 @@ BOOST_AUTO_TEST_CASE(opp_outpost_cleanup_envelope_chunks_present) try {
    BOOST_CHECK_EQUAL(cleanup->accounts[3].name, "chunk_buffer");
    BOOST_CHECK_EQUAL(cleanup->accounts[4].name, "uploader");
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(epoch_in_full_data_chunk_fits_packet_limit) try {
    // A full data chunk must serialise under Solana's raw packet limit. Any
    // change to the `epoch_in` account list or argument tuple moves the fixed
@@ -688,7 +600,6 @@ BOOST_AUTO_TEST_CASE(epoch_in_full_data_chunk_fits_packet_limit) try {
    const auto packet = build_measured_legacy_transaction(instructions, fee_payer).serialize();
    BOOST_CHECK_LE(packet.size(), limits::PACKET_DATA_SIZE);
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(dispatch_attestations_full_manifest_fits_packet_limit) try {
    // MAX_TERMINAL_DYNAMIC_ACCOUNTS is a BUDGET, and a budget nobody measures is
    // a guess. It counts only the `remaining_accounts` extras -- not the
@@ -734,7 +645,6 @@ BOOST_AUTO_TEST_CASE(dispatch_attestations_full_manifest_fits_packet_limit) try 
                       << " extras serialises to " << packet.size() << " bytes");
    BOOST_CHECK_LE(packet.size(), limits::PACKET_DATA_SIZE);
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(envelope_chunk_count_math) try {
    // The relay derives `total_chunks` as `ceil(total / MAX_CHUNK_BYTES)`.
    // Verify the arithmetic at sentinel sizes: empty (rejected by the relay
@@ -768,7 +678,6 @@ BOOST_AUTO_TEST_CASE(envelope_chunk_count_math) try {
    const size_t last_chunk_size = 2526 - 3 * sysio::SOLANA_MAX_CHUNK_BYTES;
    BOOST_CHECK_EQUAL(last_chunk_size, 522u);   // 2526 - 2004 = 522
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(opp_outpost_emit_has_wire_epoch_arg) try {
    auto prog = load_idl_fixture(opp_outpost_idl_fixture);
 
@@ -780,8 +689,7 @@ BOOST_AUTO_TEST_CASE(opp_outpost_emit_has_wire_epoch_arg) try {
    BOOST_CHECK_EQUAL(emit->args.size(), 1u);
    BOOST_CHECK_EQUAL(emit->args[0].name, "wire_epoch_index");
 } FC_LOG_AND_RETHROW();
-
-BOOST_AUTO_TEST_CASE(opp_outpost_has_initialize_and_deposit) try {
+BOOST_AUTO_TEST_CASE(opp_outpost_excludes_retired_instruction_entrypoints) try {
    auto prog = load_idl_fixture(opp_outpost_idl_fixture);
 
    // `add_attestation` was retired from the client (attestations flow through
@@ -794,9 +702,8 @@ BOOST_AUTO_TEST_CASE(opp_outpost_has_initialize_and_deposit) try {
    }
    BOOST_CHECK(has_initialize);
    BOOST_CHECK(!has_add);
-   BOOST_CHECK(has_deposit);
+   BOOST_CHECK(!has_deposit);
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(borsh_encode_u32_roundtrip) try {
    borsh::encoder enc;
    enc.write_u32(42);
@@ -806,7 +713,6 @@ BOOST_AUTO_TEST_CASE(borsh_encode_u32_roundtrip) try {
    uint32_t val = dec.read_u32();
    BOOST_CHECK_EQUAL(val, 42u);
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(borsh_encode_bytes_roundtrip) try {
    std::vector<uint8_t> test_data = {0x12, 0x0c, 0x0a, 0x04, 0x08};
    borsh::encoder enc;
@@ -819,7 +725,6 @@ BOOST_AUTO_TEST_CASE(borsh_encode_bytes_roundtrip) try {
    auto decoded = dec.read_bytes();
    BOOST_CHECK(decoded == test_data);
 } FC_LOG_AND_RETHROW();
-
 // ── extract_inbound_effects: the single authoritative envelope decode.
 //    Walks an inbound envelope's attestations in dispatch order and
 //    surfaces one `inbound_effect` per account-needing attestation --
@@ -866,29 +771,30 @@ std::vector<char> envelope_with_entries(
 /// `op_addr`, remitting `token_code`. The decoder reads `op_address`,
 /// `action_type` and `amount.token_code` (SOL-379/380 keys the
 /// CollateralPosition PDA on it); other proto fields stay neutral.
-sysio::opp::AttestationEntry remit_entry(uint64_t                               token_code,
-                                         const sysio::opp::types::ChainAddress& op_addr) {
-   sysio::opp::attestations::OperatorAction oa;
-   oa.set_action_type(sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REMIT);
-   oa.mutable_amount()->set_token_code(token_code);
-   oa.mutable_amount()->set_amount(777);
-   *oa.mutable_op_address() = op_addr;
+constexpr uint64_t default_desyndication_request_id = 1;
+
+sysio::opp::AttestationEntry desyndicate_liq_entry(uint64_t                               token_code,
+                                                   const sysio::opp::types::ChainAddress& user,
+                                                   uint64_t request_id = default_desyndication_request_id) {
+   sysio::opp::attestations::DesyndicateLIQ dl;
+   dl.set_chain_code(900);
+   *dl.mutable_user() = user;
+   dl.mutable_amount()->set_token_code(token_code);
+   dl.mutable_amount()->set_amount(777);
+   dl.set_request_id(request_id);
    std::string body;
-   oa.SerializeToString(&body);
+   dl.SerializeToString(&body);
 
    sysio::opp::AttestationEntry entry;
-   entry.set_type(sysio::opp::types::ATTESTATION_TYPE_OPERATOR_ACTION);
+   entry.set_type(sysio::opp::types::ATTESTATION_TYPE_DESYNDICATE_LIQ);
    entry.set_data(std::move(body));
    return entry;
 }
 
-/// Same as `remit_entry` but for SLASH — surfaced with its own shape so the
-/// manifest can declare the slashed operator's CollateralPosition PDA (and
-/// the reserve_aggregate ATA under SPL custody).
-sysio::opp::AttestationEntry slash_entry(uint64_t                               token_code,
+sysio::opp::AttestationEntry remit_entry(uint64_t                               token_code,
                                          const sysio::opp::types::ChainAddress& op_addr) {
    sysio::opp::attestations::OperatorAction oa;
-   oa.set_action_type(sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_SLASH);
+   oa.set_action_type(sysio::opp::attestations::OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REMIT);
    oa.mutable_amount()->set_token_code(token_code);
    oa.mutable_amount()->set_amount(777);
    *oa.mutable_op_address() = op_addr;
@@ -928,87 +834,6 @@ sysio::opp::AttestationEntry operators_mirror_entry() {
    return entry;
 }
 
-/// Build a `DEPOSIT_REVERT` entry pointing at `depositor_addr`, refunding
-/// `token_code` (keys the CollateralPosition PDA).
-sysio::opp::AttestationEntry revert_entry(uint64_t                               token_code,
-                                          const sysio::opp::types::ChainAddress& depositor_addr) {
-   sysio::opp::attestations::DepositRevert dr;
-   dr.mutable_refund_amount()->set_token_code(token_code);
-   dr.mutable_refund_amount()->set_amount(888);
-   *dr.mutable_depositor() = depositor_addr;
-   std::string body;
-   dr.SerializeToString(&body);
-
-   sysio::opp::AttestationEntry entry;
-   entry.set_type(sysio::opp::types::ATTESTATION_TYPE_DEPOSIT_REVERT);
-   entry.set_data(std::move(body));
-   return entry;
-}
-
-/// Build a `SWAP_REMIT` entry pointing at `recipient_addr`.
-sysio::opp::AttestationEntry swap_remit_entry(uint64_t token_code,
-                                              uint64_t reserve_code,
-                                              const sysio::opp::types::ChainAddress& recipient_addr) {
-   sysio::opp::attestations::SwapRemit remit;
-   remit.mutable_amount()->set_token_code(token_code);
-   remit.mutable_amount()->set_amount(123);
-   remit.set_reserve_code(reserve_code);
-   *remit.mutable_recipient() = recipient_addr;
-   std::string body;
-   remit.SerializeToString(&body);
-
-   sysio::opp::AttestationEntry entry;
-   entry.set_type(sysio::opp::types::ATTESTATION_TYPE_SWAP_REMIT);
-   entry.set_data(std::move(body));
-   return entry;
-}
-
-/// Build a `SWAP_REVERT` entry pointing at `depositor_addr`.
-sysio::opp::AttestationEntry swap_revert_entry(uint64_t token_code,
-                                               uint64_t reserve_code,
-                                               const sysio::opp::types::ChainAddress& depositor_addr) {
-   sysio::opp::attestations::SwapRevert revert;
-   revert.mutable_refund_amount()->set_token_code(token_code);
-   revert.mutable_refund_amount()->set_amount(456);
-   revert.set_source_reserve_code(reserve_code);
-   *revert.mutable_depositor() = depositor_addr;
-   std::string body;
-   revert.SerializeToString(&body);
-
-   sysio::opp::AttestationEntry entry;
-   entry.set_type(sysio::opp::types::ATTESTATION_TYPE_SWAP_REVERT);
-   entry.set_data(std::move(body));
-   return entry;
-}
-
-/// Build a `RESERVE_READY` entry.
-sysio::opp::AttestationEntry reserve_ready_entry(uint64_t token_code, uint64_t reserve_code) {
-   sysio::opp::attestations::ReserveReady ready;
-   ready.set_token_code(token_code);
-   ready.set_reserve_code(reserve_code);
-   std::string body;
-   ready.SerializeToString(&body);
-
-   sysio::opp::AttestationEntry entry;
-   entry.set_type(sysio::opp::types::ATTESTATION_TYPE_RESERVE_READY);
-   entry.set_data(std::move(body));
-   return entry;
-}
-
-/// Build a `RESERVE_CREATE_CANCELLED` entry.
-sysio::opp::AttestationEntry reserve_create_cancelled_entry(uint64_t token_code, uint64_t reserve_code) {
-   sysio::opp::attestations::ReserveCreateCancelled cancelled;
-   cancelled.set_token_code(token_code);
-   cancelled.set_reserve_code(reserve_code);
-   std::string body;
-   cancelled.SerializeToString(&body);
-
-   sysio::opp::AttestationEntry entry;
-   entry.set_type(sysio::opp::types::ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED);
-   entry.set_data(std::move(body));
-   return entry;
-}
-
 std::array<uint8_t, 32> filled_pubkey(uint8_t byte) {
    std::array<uint8_t, 32> arr{};
    arr.fill(byte);
@@ -1022,39 +847,6 @@ BOOST_AUTO_TEST_CASE(extract_effects_empty_envelope_returns_empty) try {
    auto effects = sysio::outpost_solana_client_detail::extract_inbound_effects(envelope);
    BOOST_CHECK(effects.empty());
 } FC_LOG_AND_RETHROW();
-
-BOOST_AUTO_TEST_CASE(extract_effects_single_withdraw_remit) try {
-   namespace detail = sysio::outpost_solana_client_detail;
-   auto op_pk = filled_pubkey(0xAA);
-   auto envelope = envelope_with_entries({remit_entry(501, make_sol_addr(op_pk))});
-
-   const auto effects = detail::extract_inbound_effects(envelope);
-   BOOST_REQUIRE_EQUAL(effects.size(), 1u);
-   BOOST_CHECK_EQUAL(effects[0].attestation_index, 0u);
-   BOOST_CHECK(effects[0].shape == detail::effect_shape::withdraw_remit);
-   BOOST_REQUIRE(effects[0].recipient.has_value());
-   BOOST_CHECK(effects[0].recipient->serialize() == op_pk);
-   BOOST_CHECK(!effects[0].reserve.has_value());
-   // SOL-379: the remit amount's token_code keys the CollateralPosition PDA.
-   BOOST_REQUIRE(effects[0].collateral_token_code.has_value());
-   BOOST_CHECK_EQUAL(*effects[0].collateral_token_code, 501u);
-} FC_LOG_AND_RETHROW();
-
-BOOST_AUTO_TEST_CASE(extract_effects_deposit_revert) try {
-   namespace detail = sysio::outpost_solana_client_detail;
-   auto depositor_pk = filled_pubkey(0xBB);
-   auto envelope = envelope_with_entries({revert_entry(503, make_sol_addr(depositor_pk))});
-
-   const auto effects = detail::extract_inbound_effects(envelope);
-   BOOST_REQUIRE_EQUAL(effects.size(), 1u);
-   BOOST_CHECK(effects[0].shape == detail::effect_shape::deposit_revert);
-   BOOST_REQUIRE(effects[0].recipient.has_value());
-   BOOST_CHECK(effects[0].recipient->serialize() == depositor_pk);
-   // SOL-379: the refund amount's token_code keys the CollateralPosition PDA.
-   BOOST_REQUIRE(effects[0].collateral_token_code.has_value());
-   BOOST_CHECK_EQUAL(*effects[0].collateral_token_code, 503u);
-} FC_LOG_AND_RETHROW();
-
 /// The effect index MUST equal the attestation's flat position in dispatch
 /// order, counting attestations that need no effect accounts.
 ///
@@ -1075,9 +867,9 @@ BOOST_AUTO_TEST_CASE(extract_effects_indices_track_dispatch_order) try {
    // index 1 on chain, so the entries either side must report 0 and 2, not
    // 0 and 1.
    auto envelope = envelope_with_entries({
-      remit_entry(601, make_sol_addr(remit_op)),
+      desyndicate_liq_entry(601, make_sol_addr(remit_op)),
       operators_mirror_entry(),
-      revert_entry(602, make_sol_addr(revert_op)),
+      desyndicate_liq_entry(602, make_sol_addr(revert_op)),
    });
 
    BOOST_CHECK_EQUAL(detail::count_inbound_attestations(envelope), 3u);
@@ -1086,16 +878,15 @@ BOOST_AUTO_TEST_CASE(extract_effects_indices_track_dispatch_order) try {
    BOOST_REQUIRE_EQUAL(effects.size(), 2u);
 
    BOOST_CHECK_EQUAL(effects[0].attestation_index, 0u);
-   BOOST_CHECK(effects[0].shape == detail::effect_shape::withdraw_remit);
+   BOOST_CHECK(effects[0].shape == detail::effect_shape::desyndicate_liq);
    BOOST_REQUIRE(effects[0].recipient.has_value());
    BOOST_CHECK(effects[0].recipient->serialize() == remit_op);
 
    BOOST_CHECK_EQUAL(effects[1].attestation_index, 2u);
-   BOOST_CHECK(effects[1].shape == detail::effect_shape::deposit_revert);
+   BOOST_CHECK(effects[1].shape == detail::effect_shape::desyndicate_liq);
    BOOST_REQUIRE(effects[1].recipient.has_value());
    BOOST_CHECK(effects[1].recipient->serialize() == revert_op);
 } FC_LOG_AND_RETHROW();
-
 /// An envelope the decoder cannot parse yields no effects AND a zero count,
 /// so the relay submits a terminal call claiming nothing rather than one
 /// claiming attestations whose accounts it never derived.
@@ -1105,7 +896,6 @@ BOOST_AUTO_TEST_CASE(extract_effects_on_undecodable_envelope_is_empty) try {
    BOOST_CHECK_EQUAL(detail::count_inbound_attestations(garbage), 0u);
    BOOST_CHECK(detail::extract_inbound_effects(garbage).empty());
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(extract_effects_repeated_recipient_yields_one_entry_per_attestation) try {
    namespace detail = sysio::outpost_solana_client_detail;
    auto op_pk = filled_pubkey(0xCC);
@@ -1117,8 +907,8 @@ BOOST_AUTO_TEST_CASE(extract_effects_repeated_recipient_yields_one_entry_per_att
    // batch's manifests union (pinned by
    // record_terminal_account_dedupes_and_merges_writable).
    auto envelope = envelope_with_entries({
-      remit_entry(600, make_sol_addr(op_pk)),
-      remit_entry(600, make_sol_addr(op_pk)),
+      desyndicate_liq_entry(600, make_sol_addr(op_pk)),
+      desyndicate_liq_entry(600, make_sol_addr(op_pk)),
    });
 
    const auto effects = detail::extract_inbound_effects(envelope);
@@ -1128,56 +918,13 @@ BOOST_AUTO_TEST_CASE(extract_effects_repeated_recipient_yields_one_entry_per_att
    BOOST_CHECK(effects[0].recipient->serialize() == op_pk);
    BOOST_CHECK(effects[1].recipient->serialize() == op_pk);
 } FC_LOG_AND_RETHROW();
-
-BOOST_AUTO_TEST_CASE(extract_effects_slash_carries_collateral_position_key) try {
-   namespace detail = sysio::outpost_solana_client_detail;
-   // SLASH MUST be surfaced (SOL-379/380): the handler resolves the slashed
-   // operator's per-(operator, token_code) CollateralPosition PDA out of
-   // remaining_accounts, and under SPL custody additionally the collateral
-   // vault + reserve_aggregate ATA. An omitted manifest entry would abort
-   // the dispatch call on-chain and stall the cursor on this attestation.
-   auto slash_op = filled_pubkey(0xDD);
-   auto remit_op = filled_pubkey(0xEE);
-   auto envelope = envelope_with_entries({
-      slash_entry(502, make_sol_addr(slash_op)),
-      remit_entry(504, make_sol_addr(remit_op)),
-   });
-
-   const auto effects = detail::extract_inbound_effects(envelope);
-   BOOST_REQUIRE_EQUAL(effects.size(), 2u);
-
-   BOOST_CHECK_EQUAL(effects[0].attestation_index, 0u);
-   BOOST_CHECK(effects[0].shape == detail::effect_shape::slash);
-   BOOST_REQUIRE(effects[0].recipient.has_value());
-   BOOST_CHECK(effects[0].recipient->serialize() == slash_op);
-   BOOST_REQUIRE(effects[0].collateral_token_code.has_value());
-   BOOST_CHECK_EQUAL(*effects[0].collateral_token_code, 502u);
-
-   BOOST_CHECK_EQUAL(effects[1].attestation_index, 1u);
-   BOOST_CHECK(effects[1].shape == detail::effect_shape::withdraw_remit);
-} FC_LOG_AND_RETHROW();
-
 namespace {
 
-/// Build a `DESYNDICATE_LIQ` entry releasing `token_code` to `user`. The decoder
-/// reads only `user` -- the pool mint comes from `DistributionState`, not the
-/// payload -- so the other fields stay neutral.
-sysio::opp::AttestationEntry desyndicate_liq_entry(uint64_t                               token_code,
-                                                   const sysio::opp::types::ChainAddress& user) {
-   sysio::opp::attestations::DesyndicateLIQ dl;
-   dl.set_chain_code(900);
-   *dl.mutable_user() = user;
-   dl.mutable_amount()->set_token_code(token_code);
-   dl.mutable_amount()->set_amount(777);
-   dl.set_request_id(1);
-   std::string body;
-   dl.SerializeToString(&body);
+/// The depot request id `desyndicate_liq_entry` stamps unless a case names one.
 
-   sysio::opp::AttestationEntry entry;
-   entry.set_type(sysio::opp::types::ATTESTATION_TYPE_DESYNDICATE_LIQ);
-   entry.set_data(std::move(body));
-   return entry;
-}
+/// Build a `DESYNDICATE_LIQ` entry releasing `token_code` to `user` under
+/// `request_id`. The decoder reads `user` and `request_id` -- the pool mint comes
+/// from `DistributionState`, not the payload -- so the other fields stay neutral.
 
 } // namespace
 
@@ -1187,9 +934,10 @@ BOOST_AUTO_TEST_CASE(extract_effects_desyndicate_liq_carries_the_user) try {
    // singletons, the transfer's accounts and the hook's accounts out of
    // remaining_accounts, and a manifest that omits them aborts the dispatch
    // call and pins the cursor on this attestation for every retry.
+   constexpr uint64_t request_id = 0x0102030405060708;
    auto user     = filled_pubkey(0xAB);
    auto envelope = envelope_with_entries({
-      desyndicate_liq_entry(700, make_sol_addr(user)),
+      desyndicate_liq_entry(700, make_sol_addr(user), request_id),
       // Not an SVM pubkey: dropped here and logged-and-skipped on chain, while
       // the flat index still advances past it.
       desyndicate_liq_entry(700, make_eth_addr_32(user)),
@@ -1197,35 +945,17 @@ BOOST_AUTO_TEST_CASE(extract_effects_desyndicate_liq_carries_the_user) try {
    });
 
    const auto effects = detail::extract_inbound_effects(envelope);
-   BOOST_REQUIRE_EQUAL(effects.size(), 2u);
+   BOOST_REQUIRE_EQUAL(effects.size(), 1u);
 
    BOOST_CHECK_EQUAL(effects[0].attestation_index, 0u);
    BOOST_CHECK(effects[0].shape == detail::effect_shape::desyndicate_liq);
    BOOST_REQUIRE(effects[0].recipient.has_value());
    BOOST_CHECK(effects[0].recipient->serialize() == user);
-   BOOST_CHECK(!effects[0].reserve.has_value());
-   BOOST_CHECK(!effects[0].collateral_token_code.has_value());
+   // The request id keys the pending-payout PDA a frozen outpost stores the payout at.
+   BOOST_REQUIRE(effects[0].desyndication_request_id.has_value());
+   BOOST_CHECK_EQUAL(*effects[0].desyndication_request_id, request_id);
 
-   BOOST_CHECK_EQUAL(effects[1].attestation_index, 2u);
-   BOOST_CHECK(effects[1].shape == detail::effect_shape::withdraw_remit);
 } FC_LOG_AND_RETHROW();
-
-BOOST_AUTO_TEST_CASE(extract_effects_keeps_distinct_collateral_token_codes) try {
-   namespace detail = sysio::outpost_solana_client_detail;
-   // One operator withdrawing two different token_codes resolves TWO
-   // distinct CollateralPosition PDAs — each effect carries its own key.
-   auto op_pk    = filled_pubkey(0x75);
-   auto envelope = envelope_with_entries({
-      remit_entry(700, make_sol_addr(op_pk)),
-      remit_entry(701, make_sol_addr(op_pk)),
-   });
-
-   const auto effects = detail::extract_inbound_effects(envelope);
-   BOOST_REQUIRE_EQUAL(effects.size(), 2u);
-   BOOST_CHECK_EQUAL(*effects[0].collateral_token_code, 700u);
-   BOOST_CHECK_EQUAL(*effects[1].collateral_token_code, 701u);
-} FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(extract_effects_skips_non_settling_operator_actions) try {
    namespace detail = sysio::outpost_solana_client_detail;
    // A DEPOSIT_REQUEST is outbound-from-outpost — inbound it settles
@@ -1237,23 +967,19 @@ BOOST_AUTO_TEST_CASE(extract_effects_skips_non_settling_operator_actions) try {
    });
 
    const auto effects = detail::extract_inbound_effects(envelope);
-   BOOST_REQUIRE_EQUAL(effects.size(), 1u);
-   BOOST_CHECK_EQUAL(effects[0].attestation_index, 1u);
-   BOOST_CHECK(effects[0].shape == detail::effect_shape::withdraw_remit);
+   BOOST_CHECK(effects.empty());
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(extract_effects_skips_non_solana_chain) try {
    // A WITHDRAW_REMIT whose `op_address` carries kind=ETHEREUM is not
    // for this outpost and must not contribute a SOL effect entry.
    auto eth_bytes = filled_pubkey(0x01);
    auto envelope  = envelope_with_entries({
-      remit_entry(800, make_eth_addr_32(eth_bytes)),
+      desyndicate_liq_entry(800, make_eth_addr_32(eth_bytes)),
    });
 
    auto effects = sysio::outpost_solana_client_detail::extract_inbound_effects(envelope);
    BOOST_CHECK(effects.empty());
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(extract_effects_skips_malformed_address_length) try {
    // 20-byte address with kind=SOLANA — the bytes pass the chain check
    // but fail the length check; the decoder must drop the entry rather
@@ -1263,125 +989,11 @@ BOOST_AUTO_TEST_CASE(extract_effects_skips_malformed_address_length) try {
    std::vector<uint8_t> short_addr(20, 0xAB);
    malformed.set_address(short_addr.data(), short_addr.size());
 
-   auto envelope = envelope_with_entries({remit_entry(801, malformed)});
+   auto envelope = envelope_with_entries({desyndicate_liq_entry(801, malformed)});
 
    auto effects = sysio::outpost_solana_client_detail::extract_inbound_effects(envelope);
    BOOST_CHECK(effects.empty());
 } FC_LOG_AND_RETHROW();
-
-BOOST_AUTO_TEST_CASE(extract_effects_mixed_remit_and_revert_preserved_order) try {
-   namespace detail = sysio::outpost_solana_client_detail;
-   auto op_a       = filled_pubkey(0x10);
-   auto depositor  = filled_pubkey(0x20);
-   auto op_b       = filled_pubkey(0x30);
-   auto envelope   = envelope_with_entries({
-      remit_entry(901, make_sol_addr(op_a)),
-      revert_entry(902, make_sol_addr(depositor)),
-      remit_entry(903, make_sol_addr(op_b)),
-   });
-
-   const auto effects = detail::extract_inbound_effects(envelope);
-   BOOST_REQUIRE_EQUAL(effects.size(), 3u);
-   BOOST_CHECK(effects[0].recipient->serialize() == op_a);
-   BOOST_CHECK(effects[1].recipient->serialize() == depositor);
-   BOOST_CHECK(effects[2].recipient->serialize() == op_b);
-   BOOST_CHECK_EQUAL(effects[0].attestation_index, 0u);
-   BOOST_CHECK_EQUAL(effects[1].attestation_index, 1u);
-   BOOST_CHECK_EQUAL(effects[2].attestation_index, 2u);
-} FC_LOG_AND_RETHROW();
-
-BOOST_AUTO_TEST_CASE(extract_effects_swap_shapes_carry_wallets_and_reserve_seeds) try {
-   namespace detail = sysio::outpost_solana_client_detail;
-   auto swap_recipient = filled_pubkey(0x41);
-   auto swap_depositor = filled_pubkey(0x42);
-   auto withdraw_op    = filled_pubkey(0x43);
-   auto envelope       = envelope_with_entries({
-      swap_remit_entry(10, 20, make_sol_addr(swap_recipient)),
-      swap_revert_entry(11, 21, make_sol_addr(swap_depositor)),
-      remit_entry(12, make_sol_addr(withdraw_op)),
-   });
-
-   const auto effects = detail::extract_inbound_effects(envelope);
-   BOOST_REQUIRE_EQUAL(effects.size(), 3u);
-
-   // SWAP_REMIT: recipient wallet + (token, reserve) seeds for the
-   // Reserve/vault PDA derivations and the recipient ATA. Reserve-backed
-   // shapes carry no collateral key — custody rides the Reserve record.
-   BOOST_CHECK(effects[0].shape == detail::effect_shape::swap_remit);
-   BOOST_CHECK(effects[0].recipient->serialize() == swap_recipient);
-   BOOST_REQUIRE(effects[0].reserve.has_value());
-   BOOST_CHECK_EQUAL(effects[0].reserve->token_code, 10u);
-   BOOST_CHECK_EQUAL(effects[0].reserve->reserve_code, 20u);
-   BOOST_CHECK(!effects[0].collateral_token_code.has_value());
-
-   // SWAP_REVERT: the wallet is the DEPOSITOR (the refund target).
-   BOOST_CHECK(effects[1].shape == detail::effect_shape::swap_revert);
-   BOOST_CHECK(effects[1].recipient->serialize() == swap_depositor);
-   BOOST_REQUIRE(effects[1].reserve.has_value());
-   BOOST_CHECK_EQUAL(effects[1].reserve->token_code, 11u);
-   BOOST_CHECK_EQUAL(effects[1].reserve->reserve_code, 21u);
-   BOOST_CHECK(!effects[1].collateral_token_code.has_value());
-
-   BOOST_CHECK(effects[2].shape == detail::effect_shape::withdraw_remit);
-   BOOST_CHECK(effects[2].recipient->serialize() == withdraw_op);
-} FC_LOG_AND_RETHROW();
-
-BOOST_AUTO_TEST_CASE(extract_effects_reserve_shapes_carry_seeds_per_attestation) try {
-   namespace detail = sysio::outpost_solana_client_detail;
-   auto recipient = filled_pubkey(0x51);
-   auto depositor = filled_pubkey(0x52);
-   // The repeated RESERVE_READY pair appears TWICE: the walk is
-   // per-attestation (the cursor counts both); the duplicate Reserve PDA
-   // merges later in `record_terminal_account`.
-   auto envelope  = envelope_with_entries({
-      swap_remit_entry(100, 200, make_sol_addr(recipient)),
-      swap_revert_entry(101, 201, make_sol_addr(depositor)),
-      reserve_ready_entry(102, 202),
-      reserve_create_cancelled_entry(103, 203),
-      reserve_ready_entry(102, 202),
-   });
-
-   const auto effects = detail::extract_inbound_effects(envelope);
-   BOOST_REQUIRE_EQUAL(effects.size(), 5u);
-   const std::array<std::pair<uint64_t, uint64_t>, 5> expected_seeds{{
-      {100u, 200u}, {101u, 201u}, {102u, 202u}, {103u, 203u}, {102u, 202u}}};
-   for (size_t i = 0; i < expected_seeds.size(); ++i) {
-      BOOST_REQUIRE(effects[i].reserve.has_value());
-      BOOST_CHECK_EQUAL(effects[i].reserve->token_code, expected_seeds[i].first);
-      BOOST_CHECK_EQUAL(effects[i].reserve->reserve_code, expected_seeds[i].second);
-   }
-   BOOST_CHECK(effects[2].shape == detail::effect_shape::reserve_ready);
-   BOOST_CHECK(!effects[2].recipient.has_value());
-   BOOST_CHECK(effects[3].shape == detail::effect_shape::reserve_create_cancelled);
-   BOOST_CHECK(!effects[3].recipient.has_value());
-   BOOST_CHECK(effects[4].shape == detail::effect_shape::reserve_ready);
-} FC_LOG_AND_RETHROW();
-
-BOOST_AUTO_TEST_CASE(extract_effects_reserve_create_cancelled_shape_selects_cancelled_only) try {
-   namespace detail = sysio::outpost_solana_client_detail;
-   auto recipient = filled_pubkey(0x53);
-   auto depositor = filled_pubkey(0x54);
-   auto envelope  = envelope_with_entries({
-      swap_remit_entry(110, 210, make_sol_addr(recipient)),
-      reserve_create_cancelled_entry(111, 211),
-      swap_revert_entry(112, 212, make_sol_addr(depositor)),
-      reserve_create_cancelled_entry(111, 211),
-      reserve_create_cancelled_entry(113, 213),
-   });
-
-   const auto effects = detail::extract_inbound_effects(envelope);
-   BOOST_REQUIRE_EQUAL(effects.size(), 5u);
-   std::vector<std::pair<uint64_t, uint64_t>> cancelled;
-   for (const auto& effect : effects) {
-      if (effect.shape != detail::effect_shape::reserve_create_cancelled) continue;
-      BOOST_REQUIRE(effect.reserve.has_value());
-      cancelled.emplace_back(effect.reserve->token_code, effect.reserve->reserve_code);
-   }
-   const std::vector<std::pair<uint64_t, uint64_t>> expected{
-      {111u, 211u}, {111u, 211u}, {113u, 213u}};
-   BOOST_CHECK(cancelled == expected);
-} FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(record_terminal_account_dedupes_and_merges_writable) try {
    std::vector<account_meta> metas;
    const solana_public_key readonly_key(filled_pubkey(0x55));
@@ -1405,7 +1017,6 @@ BOOST_AUTO_TEST_CASE(record_terminal_account_dedupes_and_merges_writable) try {
    BOOST_CHECK(!metas[1].is_signer);
    BOOST_CHECK(metas[1].is_writable);
 } FC_LOG_AND_RETHROW();
-
 // ── build_dispatch_manifests: the per-attestation account manifests the
 //    dispatch crank packs its windows from, driven through its Reserve and
 //    CollateralPosition read seams. These pin the properties the manifest
@@ -1422,59 +1033,7 @@ namespace manifest_detail = sysio::outpost_solana_client_detail;
 /// as uninitialized accounts. Every call is recorded so memoization is
 /// assertable.
 struct manifest_build_harness {
-   using seeds            = std::pair<uint64_t, uint64_t>;
-   /// One collateral position's full `(operator, token_code)` PDA seed tuple.
-   using collateral_seeds = std::pair<solana_public_key, uint64_t>;
-
    solana_public_key program_id = measurement_pubkey(42);
-   /// The named `reserve_aggregate` account — SPL slash seizures settle into
-   /// its canonical ATA.
-   solana_public_key reserve_aggregate = measurement_pubkey(43);
-   std::map<seeds, manifest_detail::reserve_terminal_info>             records;
-   std::vector<seeds>                                                   reads;
-   std::map<collateral_seeds, manifest_detail::token_custody_info> collateral_records;
-   std::vector<collateral_seeds>                                      collateral_reads;
-
-   void put(uint64_t token_code, uint64_t reserve_code,
-            const solana_public_key& creator, const solana_public_key& custody_mint,
-            uint8_t custody_decimals,
-            const solana_public_key& custody_token_program =
-               system::program_ids::TOKEN_PROGRAM) {
-      records.emplace(seeds{token_code, reserve_code},
-                      manifest_detail::reserve_terminal_info{creator, custody_mint,
-                                                             custody_decimals,
-                                                             custody_token_program});
-   }
-
-   /// Seed one position's pinned custody for the collateral reader.
-   void put_collateral(const solana_public_key& operator_key, uint64_t token_code,
-                       const solana_public_key& custody_mint) {
-      collateral_records.emplace(collateral_seeds{operator_key, token_code},
-                                 manifest_detail::token_custody_info{custody_mint});
-   }
-
-   manifest_detail::reserve_info_reader reader() {
-      return [this](uint64_t token_code,
-                    uint64_t reserve_code) -> std::optional<manifest_detail::reserve_terminal_info> {
-         reads.emplace_back(token_code, reserve_code);
-         auto it = records.find(seeds{token_code, reserve_code});
-         if (it == records.end()) return std::nullopt;
-         return it->second;
-      };
-   }
-
-   /// Scripted stand-in for `collateral_position_custody`: anything absent
-   /// from `collateral_records` reads as an absent-position degrade.
-   manifest_detail::collateral_custody_reader collateral_reader() {
-      return [this](const solana_public_key& operator_key,
-                    uint64_t token_code) -> std::optional<manifest_detail::token_custody_info> {
-         const auto key = collateral_seeds{operator_key, token_code};
-         collateral_reads.emplace_back(key);
-         auto it = collateral_records.find(key);
-         if (it == collateral_records.end()) return std::nullopt;
-         return it->second;
-      };
-   }
 
    /// Per-mint transfer-hook configuration. Empty by default: every mint in
    /// the system today is hook-free, so the manifest is unchanged unless a
@@ -1525,136 +1084,26 @@ struct manifest_build_harness {
       uint32_t                                            total_attestations,
       const std::function<void()>&                        deadline_probe = [] {}) {
       return manifest_detail::build_dispatch_manifests(
-         program_id, effects, total_attestations, deadline_probe, reader(),
-         collateral_reader(), hook_reader(), liq_pool_reader(), reserve_aggregate, "test-relay");
+         program_id, effects, total_attestations, deadline_probe,
+         hook_reader(), liq_pool_reader(), "test-relay");
    }
 };
-
-/// One SWAP_REMIT effect at `index` paying `recipient` out of `(token, reserve)`.
-manifest_detail::inbound_effect swap_remit_effect(size_t index, uint64_t token_code,
-                                                  uint64_t reserve_code,
-                                                  const solana_public_key& recipient) {
-   return manifest_detail::inbound_effect{
-      index, manifest_detail::effect_shape::swap_remit, recipient,
-      manifest_detail::reserve_pda_seeds{token_code, reserve_code}};
-}
-
-/// One SWAP_REVERT effect at `index` refunding `depositor` out of `(token, reserve)`.
-manifest_detail::inbound_effect swap_revert_effect(size_t index, uint64_t token_code,
-                                                   uint64_t reserve_code,
-                                                   const solana_public_key& depositor) {
-   return manifest_detail::inbound_effect{
-      index, manifest_detail::effect_shape::swap_revert, depositor,
-      manifest_detail::reserve_pda_seeds{token_code, reserve_code}};
-}
-
-/// One RESERVE_CREATE_CANCELLED effect at `index` for `(token, reserve)`; the
-/// refund target is the creator read off the Reserve, not a carried recipient.
-manifest_detail::inbound_effect reserve_create_cancelled_effect(size_t index, uint64_t token_code,
-                                                                uint64_t reserve_code) {
-   return manifest_detail::inbound_effect{
-      index, manifest_detail::effect_shape::reserve_create_cancelled, std::nullopt,
-      manifest_detail::reserve_pda_seeds{token_code, reserve_code}};
-}
-
-/// One WITHDRAW_REMIT effect at `index` paying `recipient` out of their
-/// `token_code`-keyed `CollateralPosition`.
-manifest_detail::inbound_effect withdraw_remit_effect(size_t index, uint64_t token_code,
-                                                      const solana_public_key& recipient) {
-   return manifest_detail::inbound_effect{
-      index, manifest_detail::effect_shape::withdraw_remit, recipient, std::nullopt,
-      token_code};
-}
-
-/// One SLASH effect at `index` seizing `operator_key`'s `token_code`-keyed
-/// `CollateralPosition`.
-manifest_detail::inbound_effect slash_effect(size_t index, uint64_t token_code,
-                                             const solana_public_key& operator_key) {
-   return manifest_detail::inbound_effect{
-      index, manifest_detail::effect_shape::slash, operator_key, std::nullopt, token_code};
-}
-
-/// One DEPOSIT_REVERT effect at `index` refunding `depositor`'s
-/// `token_code`-keyed `CollateralPosition`.
-manifest_detail::inbound_effect deposit_revert_effect(size_t index, uint64_t token_code,
-                                                      const solana_public_key& depositor) {
-   return manifest_detail::inbound_effect{
-      index, manifest_detail::effect_shape::deposit_revert, depositor, std::nullopt,
-      token_code};
-}
 
 bool manifest_has(const std::vector<account_meta>& metas, const solana_public_key& key) {
    return std::any_of(metas.begin(), metas.end(),
                       [&](const account_meta& meta) { return meta.key == key; });
 }
 
-} // anonymous namespace
-
-/// Custody MUST come from the Reserve account, never from a token-code-keyed
-/// config map. The program's `handle_swap_remit` branches on
-/// `reserve.custody_mint`; if the relay resolved custody from the mutable
-/// `OutpostConfig.token_addresses_by_code` instead, an admin re-pointing that
-/// token address after the reserve was created would send the relay down the
-/// native branch while the program took the SPL one -- and the missing vault
-/// and recipient-ATA accounts abort the call permanently, wedging the epoch.
-///
-/// The divergence is modelled directly: ONE token_code backs two reserves
-/// whose pinned custody disagrees. A config-keyed lookup could only produce
-/// one answer for both; following the Reserve produces the right answer twice.
-BOOST_AUTO_TEST_CASE(build_manifests_follows_reserve_custody_per_reserve) try {
-   constexpr uint64_t token_code = 111;
-   const auto spl_mint     = measurement_pubkey(77);
-   const auto spl_recipient    = measurement_pubkey(80);
-   const auto native_recipient = measurement_pubkey(81);
-   const auto creator          = measurement_pubkey(82);
-
-   manifest_build_harness harness;
-   harness.put(token_code, 200, creator, spl_mint, 6);                              // SPL custody
-   harness.put(token_code, 201, creator, system::program_ids::SYSTEM_PROGRAM, 9);   // native custody
-
-   const auto manifests = harness.build(
-      {swap_remit_effect(0, token_code, 200, spl_recipient),
-       swap_remit_effect(1, token_code, 201, native_recipient)},
-      2);
-   BOOST_REQUIRE_EQUAL(manifests.size(), 2u);
-
-   // SPL branch: Reserve PDA + vault + the recipient's ATA FOR THE RESERVE'S
-   // OWN MINT + the custody mint + the token program.
-   const auto& spl = manifests[0];
-   BOOST_CHECK(manifest_has(spl, manifest_detail::derive_reserve_pda(
-                                    harness.program_id, token_code, 200)));
-   BOOST_CHECK(manifest_has(spl, manifest_detail::derive_reserve_vault_pda(
-                                    harness.program_id, token_code, 200)));
-   BOOST_CHECK(manifest_has(spl, system::get_associated_token_address(spl_recipient, spl_mint)));
-   // The MINT itself. `reserve_vault_transfer` require_remaining_account()s it
-   // for the checked transfer's decimals, and swap_remit was the one
-   // reserve-backed shape that never carried it -- every SPL swap remit aborted
-   // with EffectAccountMissing and the epoch never closed. Asserted here
-   // because this case previously checked the ATA and token program only,
-   // which is exactly why the omission shipped.
-   BOOST_CHECK(manifest_has(spl, spl_mint));
-   BOOST_CHECK(manifest_has(spl, system::program_ids::TOKEN_PROGRAM));
-   // The bare recipient wallet is the NATIVE branch's account and must not
-   // appear on the SPL one.
-   BOOST_CHECK(!manifest_has(spl, spl_recipient));
-
-   // Native branch, same token_code: Reserve PDA + the recipient wallet, and
-   // NO vault / ATA / token program.
-   const auto& native = manifests[1];
-   BOOST_CHECK(manifest_has(native, manifest_detail::derive_reserve_pda(
-                                       harness.program_id, token_code, 201)));
-   BOOST_CHECK(manifest_has(native, native_recipient));
-   BOOST_CHECK(!manifest_has(native, manifest_detail::derive_reserve_vault_pda(
-                                        harness.program_id, token_code, 201)));
-   BOOST_CHECK(!manifest_has(native, system::program_ids::TOKEN_PROGRAM));
-} FC_LOG_AND_RETHROW();
+}
 
 namespace {
 
-/// One DESYNDICATE_LIQ effect at `index` releasing syndicated liqSOL to `user`.
-manifest_detail::inbound_effect desyndicate_liq_effect(size_t index, const solana_public_key& user) {
+/// One DESYNDICATE_LIQ effect at `index` releasing syndicated liqSOL to `user`
+/// under the depot's `request_id`.
+manifest_detail::inbound_effect desyndicate_liq_effect(size_t index, const solana_public_key& user,
+                                                       uint64_t request_id) {
    return manifest_detail::inbound_effect{
-      index, manifest_detail::effect_shape::desyndicate_liq, user, std::nullopt, std::nullopt};
+      index, manifest_detail::effect_shape::desyndicate_liq, user, request_id};
 }
 
 /// Whether `key` rides `metas` as WRITABLE.
@@ -1666,14 +1115,38 @@ bool manifest_writes(const std::vector<account_meta>& metas, const solana_public
 
 } // namespace
 
+BOOST_AUTO_TEST_CASE(build_liq_manifests_honors_deadline_before_pool_read) try {
+   manifest_build_harness harness;
+   BOOST_CHECK_THROW(
+      harness.build({desyndicate_liq_effect(0, measurement_pubkey(92), 7)}, 1,
+                    [] { FC_THROW_EXCEPTION(fc::timeout_exception, "deadline exceeded"); }),
+      fc::timeout_exception);
+   BOOST_CHECK_EQUAL(harness.liq_pool_reads, 0u);
+   BOOST_CHECK_EQUAL(harness.hook_reads, 0u);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(build_liq_manifests_propagates_pool_rpc_failure) try {
+   manifest_build_harness harness;
+   BOOST_CHECK_THROW(
+      manifest_detail::build_dispatch_manifests(
+         harness.program_id, {desyndicate_liq_effect(0, measurement_pubkey(92), 7)}, 1,
+         [] {}, harness.hook_reader(),
+         []() -> std::optional<manifest_detail::liq_pool_info> {
+            FC_THROW_EXCEPTION(fc::exception, "pool RPC unavailable");
+         }, "test-relay"),
+      fc::exception);
+   BOOST_CHECK_EQUAL(harness.hook_reads, 0u);
+} FC_LOG_AND_RETHROW();
+
 // The DESYNDICATE_LIQ manifest is `handle_desyndicate_liq`'s
 // `require_remaining_account` list, derived from the user's pubkey, the
 // program's fixed pool PDAs and the mint on `DistributionState`: the two state
 // singletons (writable), the pool authority, the pool and user Token-2022 ATAs
 // with their `UserRecord`s (all writable), the bucket ATA, the mint, Token-2022,
 // and the hook's accounts -- the bucket authority, the mint's extra-metas PDA,
-// the hook program and liqsol-core. One DistributionState read serves every
-// desyndication in the envelope.
+// the hook program and liqsol-core -- plus the request's pending-payout PDA
+// (writable, right after the singletons) a frozen outpost stores the payout at.
+// One DistributionState read serves every desyndication in the envelope.
 BOOST_AUTO_TEST_CASE(build_manifests_desyndicate_liq_derives_the_pool_accounts) try {
    const auto liqsol_mint  = measurement_pubkey(90);
    const auto hook_program = measurement_pubkey(91);
@@ -1684,8 +1157,9 @@ BOOST_AUTO_TEST_CASE(build_manifests_desyndicate_liq_derives_the_pool_accounts) 
    harness.put_liq_pool(liqsol_mint);
    harness.put_hook(liqsol_mint, hook_program, {});
 
+   const std::array<uint64_t, 2> request_ids{7, 0x0102030405060708};
    const auto manifests = harness.build(
-      {desyndicate_liq_effect(0, user_a), desyndicate_liq_effect(1, user_b)}, 2);
+      {desyndicate_liq_effect(0, user_a, request_ids[0]), desyndicate_liq_effect(1, user_b, request_ids[1])}, 2);
    BOOST_REQUIRE_EQUAL(manifests.size(), 2u);
    BOOST_CHECK_EQUAL(harness.liq_pool_reads, 1u);
 
@@ -1702,10 +1176,18 @@ BOOST_AUTO_TEST_CASE(build_manifests_desyndicate_liq_derives_the_pool_accounts) 
       const auto& m        = manifests[i];
       const auto& user     = i == 0 ? user_a : user_b;
       const auto  user_ata = system::get_associated_token_address(user, liqsol_mint, token_2022);
+      const auto  pending  = manifest_detail::derive_pending_desyndication_pda(program_id, request_ids[i]);
       BOOST_TEST_CONTEXT("attestation " << i) {
-         BOOST_CHECK_EQUAL(m.size(), 14u);
+         BOOST_REQUIRE_EQUAL(m.size(), 15u);
          BOOST_CHECK(manifest_writes(m, global_state));
          BOOST_CHECK(manifest_writes(m, distribution));
+         // The pending-payout PDA follows the two singletons, writable: the
+         // handler's frozen deferral creates it before touching any pool account.
+         BOOST_CHECK(m[0].key == global_state && m[1].key == distribution && m[2].key == pending);
+         BOOST_CHECK(manifest_writes(m, pending));
+         // Each request keys its own PDA.
+         BOOST_CHECK(!manifest_has(m, manifest_detail::derive_pending_desyndication_pda(
+                                         program_id, request_ids[1 - i])));
          BOOST_CHECK(manifest_has(m, pool_authority) && !manifest_writes(m, pool_authority));
          BOOST_CHECK(manifest_writes(m, pool_ata));
          BOOST_CHECK(manifest_writes(m, user_ata));
@@ -1724,21 +1206,88 @@ BOOST_AUTO_TEST_CASE(build_manifests_desyndicate_liq_derives_the_pool_accounts) 
       }
    }
 } FC_LOG_AND_RETHROW();
-
 // Without a readable `DistributionState` the manifest carries the two state
 // singletons only: the handler loads them first and turns an uninitialized
 // pool into a logged skip, so nothing behind them is derivable or required.
 BOOST_AUTO_TEST_CASE(build_manifests_desyndicate_liq_degrades_to_the_state_singletons) try {
+   constexpr uint64_t     request_id = 11;
    manifest_build_harness harness;   // no pool seeded
-   const auto manifests = harness.build({desyndicate_liq_effect(0, measurement_pubkey(94))}, 1);
+   const auto manifests = harness.build({desyndicate_liq_effect(0, measurement_pubkey(94), request_id)}, 1);
    BOOST_REQUIRE_EQUAL(manifests.size(), 1u);
    const auto& m = manifests[0];
-   BOOST_CHECK_EQUAL(m.size(), 2u);
+   BOOST_CHECK_EQUAL(m.size(), 3u);
    BOOST_CHECK(manifest_writes(m, manifest_detail::derive_liqsol_global_state_pda(harness.program_id)));
    BOOST_CHECK(manifest_writes(m, manifest_detail::derive_liqsol_distribution_state_pda(harness.program_id)));
+   // A frozen outpost defers before it reads the pool, so the pending-payout PDA
+   // rides even when the pool read degrades.
+   BOOST_CHECK(manifest_writes(m, manifest_detail::derive_pending_desyndication_pda(harness.program_id, request_id)));
    BOOST_CHECK_EQUAL(harness.hook_reads, 0u);
 } FC_LOG_AND_RETHROW();
+// Request id 0 is "no id": it cannot key a PendingPayout, and the handler records
+// such a payout as unpaid before it asks for the pending account, so the manifest
+// carries no pending-payout PDA for it -- and nothing else changes.
+BOOST_AUTO_TEST_CASE(build_manifests_desyndicate_liq_omits_the_pending_pda_for_request_id_zero) try {
+   const auto liqsol_mint  = measurement_pubkey(90);
+   const auto hook_program = measurement_pubkey(91);
+   const auto user         = measurement_pubkey(92);
 
+   manifest_build_harness harness;
+   harness.put_liq_pool(liqsol_mint);
+   harness.put_hook(liqsol_mint, hook_program, {});
+
+   const auto manifests = harness.build({desyndicate_liq_effect(0, user, 0),
+                                         // An effect built without an id at all behaves the same.
+                                         manifest_detail::inbound_effect{
+                                            1, manifest_detail::effect_shape::desyndicate_liq, user,
+                                            std::nullopt}},
+                                        2);
+   BOOST_REQUIRE_EQUAL(manifests.size(), 2u);
+   for (size_t i = 0; i < manifests.size(); ++i) {
+      BOOST_TEST_CONTEXT("attestation " << i) {
+         BOOST_CHECK_EQUAL(manifests[i].size(), 14u);
+         BOOST_CHECK(!manifest_has(manifests[i],
+                                   manifest_detail::derive_pending_desyndication_pda(harness.program_id, 0)));
+      }
+   }
+
+   manifest_build_harness degraded;   // no pool seeded
+   const auto bare = degraded.build({desyndicate_liq_effect(0, user, 0)}, 1);
+   BOOST_REQUIRE_EQUAL(bare.size(), 1u);
+   BOOST_CHECK_EQUAL(bare[0].size(), 2u);
+} FC_LOG_AND_RETHROW();
+// The pending-payout PDA is derived exactly as wire-solana's
+// `PendingPayout::find_address` does: `["pending_desyndication",
+// request_id.to_le_bytes()]` under liqsol-core. The expected addresses were
+// computed independently with `@solana/web3.js`'s `findProgramAddressSync`
+// against liqsol-core's declared program id; a multi-byte id pins the
+// little-endian encoding.
+BOOST_AUTO_TEST_CASE(pending_desyndication_pda_matches_the_program_derivation) try {
+   const auto liqsol_core = solana_public_key::from_base58_string("5nBtmutQLrRKBUxNfHJPDjiW5u8id6QM9Hhjg1D1g1XH");
+   const std::vector<std::pair<uint64_t, std::string>> expected{
+      {1, "6nDs1ohHKjjBjDp9KD8BDvjjqs2ZEYeR3eTHyF7ZNA8T"},
+      {7, "BV578hrPb772NQkcMxVUS55QFsJpZw9Xq9hAQXiJioJd"},
+      {0x0102030405060708, "5K37mePygNUJ3W9nwD4fkFH9ehUxMVKNyseipwmMrfED"},
+   };
+   for (const auto& [request_id, address] : expected) {
+      BOOST_TEST_CONTEXT("request_id " << request_id) {
+         BOOST_CHECK_EQUAL(manifest_detail::derive_pending_desyndication_pda(liqsol_core, request_id)
+                              .to_string(fc::yield_function_t{}),
+                           address);
+      }
+   }
+   // The seed constant is the program's `PENDING_PAYOUT_SEED`, and the derivation
+   // spells it through that constant.
+   BOOST_CHECK_EQUAL(manifest_detail::PENDING_DESYNDICATION_SEED, "pending_desyndication");
+   std::vector<uint8_t> id_le(sizeof(uint64_t));
+   for (size_t i = 0; i < id_le.size(); ++i) id_le[i] = static_cast<uint8_t>(uint64_t{7} >> (8 * i));
+   BOOST_CHECK(manifest_detail::derive_pending_desyndication_pda(liqsol_core, 7) ==
+               system::find_program_address(
+                  {std::vector<uint8_t>(manifest_detail::PENDING_DESYNDICATION_SEED.begin(),
+                                        manifest_detail::PENDING_DESYNDICATION_SEED.end()),
+                   id_le},
+                  liqsol_core)
+                  .first);
+} FC_LOG_AND_RETHROW();
 namespace {
 
 /// Pack a seed list into an `ExtraAccountMeta::address_config`, exactly as
@@ -1810,17 +1359,14 @@ manifest_detail::extra_account_meta external_pda_meta(uint8_t program_index,
 /// 2 destination, 3 authority, 4 validation PDA) is load-bearing rather than
 /// decorative.
 BOOST_AUTO_TEST_CASE(build_manifests_carry_transfer_hook_accounts_for_a_hook_mint) try {
-   constexpr uint64_t token_code   = 141;
-   constexpr uint64_t reserve_code = 242;
    const auto spl_mint     = measurement_pubkey(92);
    const auto recipient    = measurement_pubkey(93);
-   const auto creator      = measurement_pubkey(94);
    const auto token_2022 = system::program_ids::TOKEN_2022_PROGRAM;
    const auto hook_program = measurement_pubkey(96);
    const auto hook_owned   = measurement_pubkey(97);   // a literal meta, e.g. liqsol_core
 
    manifest_build_harness harness;
-   harness.put(token_code, reserve_code, creator, spl_mint, 6, token_2022);
+   harness.put_liq_pool(spl_mint);
    harness.put_hook(spl_mint, hook_program,
                     {literal_meta(hook_owned, false),
                      // sender's user_record, seeded on the SOURCE token account (index 0)
@@ -1829,12 +1375,12 @@ BOOST_AUTO_TEST_CASE(build_manifests_carry_transfer_hook_accounts_for_a_hook_min
                      external_pda_meta(5, {seed_literal{"user_record"}, seed_account_key{2}}, true)});
 
    const auto manifests =
-      harness.build({swap_remit_effect(0, token_code, reserve_code, recipient)}, 1);
+      harness.build({desyndicate_liq_effect(0, recipient, 1)}, 1);
    BOOST_REQUIRE_EQUAL(manifests.size(), 1u);
    const auto& m = manifests[0];
 
-   const auto vault = manifest_detail::derive_reserve_vault_pda(harness.program_id, token_code,
-                                                                reserve_code);
+   const auto vault = system::get_associated_token_address(
+      manifest_detail::derive_liqsol_pool_authority_pda(harness.program_id), spl_mint, token_2022);
    const auto dest_ata =
       system::get_associated_token_address(recipient, spl_mint, token_2022);
    const auto validation_pda =
@@ -1870,7 +1416,6 @@ BOOST_AUTO_TEST_CASE(build_manifests_carry_transfer_hook_accounts_for_a_hook_min
    BOOST_CHECK_EQUAL(writable_of(hook_owned), false);
    BOOST_CHECK_EQUAL(writable_of(hook_program), false);
 } FC_LOG_AND_RETHROW();
-
 namespace {
 
 /// Build a well-formed `ExtraAccountMetaList` account: the Execute TLV
@@ -1928,124 +1473,63 @@ BOOST_AUTO_TEST_CASE(extra_account_meta_parser_refuses_malformed_accounts) try {
    wrong_disc[0] ^= 0xff;
    BOOST_CHECK_THROW(parse_extra_account_metas(wrong_disc), fc::assert_exception);
 } FC_LOG_AND_RETHROW();
-
-/// The worst-case hook manifest against the dispatch budget.
-///
-/// `swap_revert` and `reserve_create_cancelled` on a hook mint carry the most
-/// accounts of any shape, and with the REAL liqSOL hook's five declared metas
-/// that comes to 13 of `MAX_TERMINAL_DYNAMIC_ACCOUNTS` (16) -- 15 before the
-/// associated-token and system programs were dropped from both shapes, neither
-/// of which any handler uses (nothing in `inbound.rs` creates an ATA; both
-/// handlers log-and-skip on an uninitialized one). The packer always
-/// takes at least one attestation regardless of size, so a manifest over budget
-/// is not deferred -- `transaction::serialize` throws locally, which the header
-/// documents as "an alarm, not a retry", and the epoch cannot settle at all.
-///
-/// One more declared meta, or one more effect account added program-side, spends
-/// the last slot. Pinning the number here turns that cliff into a failing test
-/// instead of a wedged outpost.
-BOOST_AUTO_TEST_CASE(hook_manifest_worst_case_fits_the_dispatch_budget) try {
-   constexpr uint64_t token_code   = 161;
-   constexpr uint64_t reserve_code = 262;
-   const auto spl_mint     = measurement_pubkey(102);
-   const auto depositor    = measurement_pubkey(103);
-   const auto creator      = measurement_pubkey(104);
-   const auto token_2022 = system::program_ids::TOKEN_2022_PROGRAM;
-   const auto hook_program = measurement_pubkey(106);
-   const auto core_program = measurement_pubkey(107);
-   const auto bucket_ata   = measurement_pubkey(108);
+/// The DESYNDICATE_LIQ manifest under the REAL liqSOL hook declaration, pending-
+/// payout PDA included. Every meta the hook declares resolves to an account the
+/// handler already requires (liqsol-core, the two `UserRecord`s,
+/// `DistributionState`, the bucket ATA), so the hook adds only its program and
+/// extra-metas PDA and one desyndication costs 15 of the 16 dynamic slots. The
+/// packer therefore carries one desyndication per dispatch window (two would
+/// need 18). Pinned exactly so the next program-side account spends the last
+/// slot visibly.
+BOOST_AUTO_TEST_CASE(desyndicate_liq_manifest_under_the_real_hook_fits_the_dispatch_budget) try {
+   const auto liqsol_mint  = measurement_pubkey(110);
+   const auto hook_program = measurement_pubkey(111);
 
    manifest_build_harness harness;
-   harness.put(token_code, reserve_code, creator, spl_mint, 6, token_2022);
-   // The real liqSOL declaration (transfer-hook/src/lib.rs): the core program,
-   // the source and destination `user_record`s, `distribution_state`, and the
-   // bucket token account.
-   harness.put_hook(spl_mint, hook_program,
-                    {literal_meta(core_program, false),
+   const auto bucket_ata = system::get_associated_token_address(
+      manifest_detail::derive_liqsol_bucket_authority_pda(harness.program_id), liqsol_mint,
+      system::program_ids::TOKEN_2022_PROGRAM);
+   harness.put_liq_pool(liqsol_mint);
+   harness.put_hook(liqsol_mint, hook_program,
+                    {literal_meta(harness.program_id, false),
                      external_pda_meta(5, {seed_literal{"user_record"}, seed_account_key{0}}, true),
                      external_pda_meta(5, {seed_literal{"user_record"}, seed_account_key{2}}, true),
                      external_pda_meta(5, {seed_literal{"distribution_state"}}, true),
                      literal_meta(bucket_ata, false)});
 
-   const auto manifests = harness.build(
-      {swap_revert_effect(0, token_code, reserve_code, depositor),
-       reserve_create_cancelled_effect(1, token_code, reserve_code)},
-      2);
-   BOOST_REQUIRE_EQUAL(manifests.size(), 2u);
-
-   for (const auto& m : manifests) {
-      BOOST_TEST_CONTEXT("manifest size " << m.size()) {
-         BOOST_CHECK_LE(m.size(), sysio::MAX_TERMINAL_DYNAMIC_ACCOUNTS);
-      }
-   }
-   // Pinned exactly, not just bounded: a silent creep to 16 would still pass a
-   // <= check while leaving zero headroom.
-   BOOST_CHECK_EQUAL(manifests[0].size(), 13u);
-   BOOST_CHECK_EQUAL(manifests[1].size(), 13u);
+   const auto manifests = harness.build({desyndicate_liq_effect(0, measurement_pubkey(112), 9)}, 1);
+   BOOST_REQUIRE_EQUAL(manifests.size(), 1u);
+   BOOST_CHECK_LE(manifests[0].size(), sysio::MAX_TERMINAL_DYNAMIC_ACCOUNTS);
+   BOOST_CHECK_EQUAL(manifests[0].size(), 15u);
+   BOOST_CHECK(manifest_has(manifests[0],
+                            manifest_detail::derive_pending_desyndication_pda(harness.program_id, 9)));
 } FC_LOG_AND_RETHROW();
-
 /// A `ExtraAccountMeta` may legally demand a signature. The dispatch
 /// transaction is signed by the batch operator alone, so the resolver cannot
 /// satisfy one -- and dropping the flag silently (keeping only key+writable)
 /// would build a manifest that aborts inside the CPI as an unauthorized signer,
 /// with the cursor pinned and no local diagnostic. Refuse at build time.
 BOOST_AUTO_TEST_CASE(hook_manifest_refuses_a_meta_demanding_a_signature) try {
-   constexpr uint64_t token_code   = 171;
-   constexpr uint64_t reserve_code = 272;
    const auto spl_mint     = measurement_pubkey(120);
-   const auto creator      = measurement_pubkey(121);
    const auto recipient    = measurement_pubkey(122);
    const auto hook_program = measurement_pubkey(123);
    const auto needs_sig    = measurement_pubkey(124);
-   const auto token_2022   = system::program_ids::TOKEN_2022_PROGRAM;
 
    manifest_build_harness harness;
-   harness.put(token_code, reserve_code, creator, spl_mint, 6, token_2022);
+   harness.put_liq_pool(spl_mint);
 
    // Sanity: the same declaration WITHOUT the signer flag builds fine, so the
    // rejection below is about the flag and not about the meta being unresolvable.
    harness.put_hook(spl_mint, hook_program, {literal_meta(needs_sig, false)});
    BOOST_CHECK_NO_THROW(
-      harness.build({swap_remit_effect(0, token_code, reserve_code, recipient)}, 1));
+      harness.build({desyndicate_liq_effect(0, recipient, 1)}, 1));
 
    harness.hooks.clear();
    harness.put_hook(spl_mint, hook_program, {signer_meta(needs_sig)});
    BOOST_CHECK_THROW(
-      harness.build({swap_remit_effect(0, token_code, reserve_code, recipient)}, 1),
+      harness.build({desyndicate_liq_effect(0, recipient, 1)}, 1),
       fc::assert_exception);
 } FC_LOG_AND_RETHROW();
-
-/// A legacy-SPL reserve cannot carry a Token-2022 extension, so the mint is
-/// never read for a hook. This is not just an economy: the reader ASSERTS on an
-/// absent or empty mint account, and that assert fails the whole build -- every
-/// attestation in the envelope, not just this effect. Scoping the read to
-/// Token-2022 custody keeps a transient read anomaly on a legacy mint from
-/// wedging an epoch it has no bearing on.
-BOOST_AUTO_TEST_CASE(legacy_spl_custody_never_reads_the_mint_for_a_hook) try {
-   constexpr uint64_t token_code   = 181;
-   constexpr uint64_t reserve_code = 282;
-   const auto spl_mint     = measurement_pubkey(130);
-   const auto creator      = measurement_pubkey(131);
-   const auto recipient    = measurement_pubkey(132);
-   const auto hook_program = measurement_pubkey(133);
-   const auto hook_owned   = measurement_pubkey(134);
-
-   manifest_build_harness harness;
-   harness.put(token_code, reserve_code, creator, spl_mint, 6);   // legacy SPL custody
-   // Declared anyway: if the gate regressed, these accounts would appear.
-   harness.put_hook(spl_mint, hook_program, {literal_meta(hook_owned, false)});
-
-   const auto manifests =
-      harness.build({swap_remit_effect(0, token_code, reserve_code, recipient)}, 1);
-   BOOST_REQUIRE_EQUAL(manifests.size(), 1u);
-
-   BOOST_CHECK_EQUAL(harness.hook_reads, 0u);
-   for (const auto& meta : manifests[0]) {
-      BOOST_CHECK(meta.key != hook_program);
-      BOOST_CHECK(meta.key != hook_owned);
-   }
-} FC_LOG_AND_RETHROW();
-
 /// The mint TLV walk itself: what it reads, and what it refuses.
 ///
 /// The refusals matter for the same reason `parse_extra_account_metas`'s do --
@@ -2108,429 +1592,21 @@ BOOST_AUTO_TEST_CASE(mint_transfer_hook_parser_reads_and_refuses) try {
                                         false)),
                      fc::assert_exception);
 } FC_LOG_AND_RETHROW();
-
-/// A hook-free mint -- every mint in the system today -- must be byte-for-byte
-/// unchanged by the hook support. Pins that this is additive.
-BOOST_AUTO_TEST_CASE(build_manifests_are_unchanged_for_a_hook_free_mint) try {
-   constexpr uint64_t token_code   = 151;
-   constexpr uint64_t reserve_code = 252;
-   const auto spl_mint   = measurement_pubkey(98);
-   const auto recipient  = measurement_pubkey(99);
-   const auto creator    = measurement_pubkey(100);
-   const auto token_2022 = system::program_ids::TOKEN_2022_PROGRAM;
-
-   manifest_build_harness harness;   // no put_hook: the reader returns nullopt
-   harness.put(token_code, reserve_code, creator, spl_mint, 6, token_2022);
-
-   const auto manifests =
-      harness.build({swap_remit_effect(0, token_code, reserve_code, recipient)}, 1);
-   BOOST_REQUIRE_EQUAL(manifests.size(), 1u);
-   // Reserve PDA + vault + recipient ATA + mint + token program, and nothing else.
-   BOOST_CHECK_EQUAL(manifests[0].size(), 5u);
-} FC_LOG_AND_RETHROW();
-
-/// SOL-396: the reserve's OWN `custody_token_program` drives both the ATA
-/// derivation and the token-program account. The same (owner, mint) pair has a
-/// DIFFERENT canonical ATA under Token-2022, so deriving with the legacy
-/// SPL-Token default names an account the program never asks for -- and
-/// `require_remaining_account` then aborts the window on every retry, with the
-/// cursor pinned, forever.
-BOOST_AUTO_TEST_CASE(build_manifests_derive_the_ata_with_the_reserves_token_program) try {
-   constexpr uint64_t token_code   = 121;
-   constexpr uint64_t reserve_code = 222;
-   const auto spl_mint    = measurement_pubkey(84);
-   const auto recipient   = measurement_pubkey(85);
-   const auto creator     = measurement_pubkey(86);
-   const auto token_2022 = system::program_ids::TOKEN_2022_PROGRAM;
-
-   manifest_build_harness harness;
-   harness.put(token_code, reserve_code, creator, spl_mint, 6, token_2022);
-
-   const auto manifests =
-      harness.build({swap_remit_effect(0, token_code, reserve_code, recipient)}, 1);
-   BOOST_REQUIRE_EQUAL(manifests.size(), 1u);
-   const auto& m = manifests[0];
-
-   // The ATA under the RESERVE'S program, and that program as the token
-   // program account.
-   BOOST_CHECK(manifest_has(
-      m, system::get_associated_token_address(recipient, spl_mint, token_2022)));
-   BOOST_CHECK(manifest_has(m, token_2022));
-   BOOST_CHECK(manifest_has(m, spl_mint));
-
-   // And NOT the legacy default's ATA, nor the legacy program.
-   BOOST_CHECK(!manifest_has(m, system::get_associated_token_address(recipient, spl_mint)));
-   BOOST_CHECK(!manifest_has(m, system::program_ids::TOKEN_PROGRAM));
-} FC_LOG_AND_RETHROW();
-
-/// The SAME pinned-token-program derivation must hold for the other two
-/// reserve-backed shapes. Without these, reverting either branch to the legacy
-/// 2-arg `get_associated_token_address` leaves the suite green — which is exactly
-/// how the missing custody mint shipped on `swap_remit` in the first place.
-BOOST_AUTO_TEST_CASE(build_manifests_pin_the_token_program_on_revert_and_cancel) try {
-   constexpr uint64_t token_code   = 131;
-   constexpr uint64_t reserve_code = 232;
-   const auto spl_mint   = measurement_pubkey(88);
-   const auto depositor  = measurement_pubkey(89);
-   const auto creator    = measurement_pubkey(90);
-   const auto token_2022 = system::program_ids::TOKEN_2022_PROGRAM;
-
-   manifest_build_harness harness;
-   harness.put(token_code, reserve_code, creator, spl_mint, 6, token_2022);
-
-   const auto manifests = harness.build(
-      {swap_revert_effect(0, token_code, reserve_code, depositor),
-       reserve_create_cancelled_effect(1, token_code, reserve_code)},
-      2);
-   BOOST_REQUIRE_EQUAL(manifests.size(), 2u);
-
-   // SWAP_REVERT refunds the depositor's ATA under the reserve's own program.
-   const auto& revert = manifests[0];
-   BOOST_CHECK(manifest_has(
-      revert, system::get_associated_token_address(depositor, spl_mint, token_2022)));
-   BOOST_CHECK(manifest_has(revert, token_2022));
-   BOOST_CHECK(manifest_has(revert, spl_mint));
-   BOOST_CHECK(!manifest_has(revert, system::get_associated_token_address(depositor, spl_mint)));
-   BOOST_CHECK(!manifest_has(revert, system::program_ids::TOKEN_PROGRAM));
-
-   // RESERVE_CREATE_CANCELLED refunds the CREATOR's ATA, same program.
-   const auto& cancelled = manifests[1];
-   BOOST_CHECK(manifest_has(
-      cancelled, system::get_associated_token_address(creator, spl_mint, token_2022)));
-   BOOST_CHECK(manifest_has(cancelled, token_2022));
-   BOOST_CHECK(manifest_has(cancelled, spl_mint));
-   BOOST_CHECK(!manifest_has(cancelled, system::get_associated_token_address(creator, spl_mint)));
-   BOOST_CHECK(!manifest_has(cancelled, system::program_ids::TOKEN_PROGRAM));
-} FC_LOG_AND_RETHROW();
-
-/// Collateral custody MUST be resolved per position, never per token code.
-/// The program pins `custody_mint` on each `(operator, token_code)`
-/// `CollateralPosition`, so two operators using the same token code may take
-/// different native/SPL settlement branches. A token-code-only cache would
-/// make one manifest disagree with the program and permanently wedge the
-/// dispatch cursor on `EffectAccountMissing`.
-BOOST_AUTO_TEST_CASE(build_manifests_follows_collateral_custody_per_position) try {
-   constexpr uint64_t token_code = 700;
-   const auto native_operator = measurement_pubkey(96);
-   const auto spl_operator    = measurement_pubkey(97);
-   const auto spl_mint        = measurement_pubkey(98);
-
-   manifest_build_harness harness;
-   harness.put_collateral(native_operator, token_code,
-                          system::program_ids::SYSTEM_PROGRAM);
-   harness.put_collateral(spl_operator, token_code, spl_mint);
-
-   const auto manifests = harness.build(
-      {withdraw_remit_effect(0, token_code, native_operator),
-       withdraw_remit_effect(1, token_code, spl_operator)},
-      2);
-   BOOST_REQUIRE_EQUAL(manifests.size(), 2u);
-
-   // Native position: operator + position only, with no SPL extras.
-   const auto& native = manifests[0];
-   BOOST_REQUIRE_EQUAL(native.size(), 2u);
-   BOOST_CHECK(manifest_has(native, native_operator));
-   BOOST_CHECK(manifest_has(native, manifest_detail::derive_collateral_position_pda(
-                                      harness.program_id, native_operator, token_code)));
-   BOOST_CHECK(!manifest_has(native, manifest_detail::derive_collateral_vault_pda(
-                                       harness.program_id, token_code)));
-   BOOST_CHECK(!manifest_has(native, system::program_ids::TOKEN_PROGRAM));
-
-   // SPL position, same token code: position + collateral vault + operator's
-   // ATA for THIS POSITION'S mint + token program.
-   const auto& spl = manifests[1];
-   BOOST_REQUIRE_EQUAL(spl.size(), 5u);
-   BOOST_CHECK(manifest_has(spl, spl_operator));
-   BOOST_CHECK(manifest_has(spl, manifest_detail::derive_collateral_position_pda(
-                                   harness.program_id, spl_operator, token_code)));
-   BOOST_CHECK(manifest_has(spl, manifest_detail::derive_collateral_vault_pda(
-                                   harness.program_id, token_code)));
-   BOOST_CHECK(manifest_has(spl, system::get_associated_token_address(spl_operator, spl_mint)));
-   BOOST_CHECK(manifest_has(spl, system::program_ids::TOKEN_PROGRAM));
-
-   BOOST_REQUIRE_EQUAL(harness.collateral_reads.size(), 2u);
-   BOOST_CHECK((harness.collateral_reads[0] ==
-                manifest_build_harness::collateral_seeds{native_operator, token_code}));
-   BOOST_CHECK((harness.collateral_reads[1] ==
-                manifest_build_harness::collateral_seeds{spl_operator, token_code}));
-} FC_LOG_AND_RETHROW();
-
-/// SLASH is the one collateral shape whose SPL destination is NOT the
-/// recipient: the seizure settles into the `reserve_aggregate`'s canonical
-/// ATA, and the operator wallet is deliberately absent (SLASH pays nobody
-/// directly). A wrong ATA owner here is the silently-stuck-seizure failure
-/// mode — the handler's uninitialised-destination check degrades to
-/// "status flipped, funds stuck" rather than aborting — so the owner swap is
-/// pinned at the manifest level, native and SPL.
-BOOST_AUTO_TEST_CASE(build_manifests_slash_settles_into_reserve_aggregate_ata) try {
-   constexpr uint64_t token_code = 700;
-   const auto native_operator = measurement_pubkey(90);
-   const auto spl_operator    = measurement_pubkey(91);
-   const auto spl_mint        = measurement_pubkey(92);
-
-   manifest_build_harness harness;
-   harness.put_collateral(native_operator, token_code,
-                          system::program_ids::SYSTEM_PROGRAM);
-   harness.put_collateral(spl_operator, token_code, spl_mint);
-
-   const auto manifests = harness.build(
-      {slash_effect(0, token_code, native_operator),
-       slash_effect(1, token_code, spl_operator)},
-      2);
-   BOOST_REQUIRE_EQUAL(manifests.size(), 2u);
-
-   // Native seizure: position ONLY — the lamports land in the named
-   // `reserve_aggregate` account, and the operator wallet is never declared.
-   const auto& native = manifests[0];
-   BOOST_REQUIRE_EQUAL(native.size(), 1u);
-   BOOST_CHECK(manifest_has(native, manifest_detail::derive_collateral_position_pda(
-                                      harness.program_id, native_operator, token_code)));
-   BOOST_CHECK(!manifest_has(native, native_operator));
-
-   // SPL seizure: position + collateral vault + the RESERVE_AGGREGATE's ATA
-   // (not the operator's) + token program; still no operator wallet.
-   const auto& spl = manifests[1];
-   BOOST_REQUIRE_EQUAL(spl.size(), 4u);
-   BOOST_CHECK(manifest_has(spl, manifest_detail::derive_collateral_position_pda(
-                                   harness.program_id, spl_operator, token_code)));
-   BOOST_CHECK(manifest_has(spl, manifest_detail::derive_collateral_vault_pda(
-                                   harness.program_id, token_code)));
-   BOOST_CHECK(manifest_has(
-      spl, system::get_associated_token_address(harness.reserve_aggregate, spl_mint)));
-   BOOST_CHECK(!manifest_has(spl, system::get_associated_token_address(spl_operator, spl_mint)));
-   BOOST_CHECK(manifest_has(spl, system::program_ids::TOKEN_PROGRAM));
-   BOOST_CHECK(!manifest_has(spl, spl_operator));
-} FC_LOG_AND_RETHROW();
-
-/// DEPOSIT_REVERT settles SPL for real on the companion program
-/// (`handle_deposit_revert`'s non-native branch drains the collateral vault
-/// into the DEPOSITOR's canonical ATA via `resolve_collateral_vault_transfer`,
-/// which `require_remaining_account`s the vault, the destination ATA, and the
-/// token program). A manifest that omits them aborts the dispatch round and
-/// re-packs the identical window from the same cursor on every retry — the
-/// regression this test pins is exactly the earlier "SPL deposit-revert is
-/// refused on-chain" early-return, which held the cursor once the companion
-/// implemented settlement.
-BOOST_AUTO_TEST_CASE(build_manifests_deposit_revert_declares_spl_refund_accounts) try {
-   constexpr uint64_t token_code = 700;
-   const auto native_depositor = measurement_pubkey(93);
-   const auto spl_depositor    = measurement_pubkey(94);
-   const auto spl_mint         = measurement_pubkey(95);
-
-   manifest_build_harness harness;
-   harness.put_collateral(native_depositor, token_code,
-                          system::program_ids::SYSTEM_PROGRAM);
-   harness.put_collateral(spl_depositor, token_code, spl_mint);
-
-   const auto manifests = harness.build(
-      {deposit_revert_effect(0, token_code, native_depositor),
-       deposit_revert_effect(1, token_code, spl_depositor)},
-      2);
-   BOOST_REQUIRE_EQUAL(manifests.size(), 2u);
-
-   // Native refund: depositor + position only, with no SPL extras.
-   const auto& native = manifests[0];
-   BOOST_REQUIRE_EQUAL(native.size(), 2u);
-   BOOST_CHECK(manifest_has(native, native_depositor));
-   BOOST_CHECK(manifest_has(native, manifest_detail::derive_collateral_position_pda(
-                                      harness.program_id, native_depositor, token_code)));
-   BOOST_CHECK(!manifest_has(native, system::program_ids::TOKEN_PROGRAM));
-
-   // SPL refund: depositor wallet (the full-drain close's rent recipient) +
-   // position + collateral vault + the DEPOSITOR's ATA + token program.
-   const auto& spl = manifests[1];
-   BOOST_REQUIRE_EQUAL(spl.size(), 5u);
-   BOOST_CHECK(manifest_has(spl, spl_depositor));
-   BOOST_CHECK(manifest_has(spl, manifest_detail::derive_collateral_position_pda(
-                                   harness.program_id, spl_depositor, token_code)));
-   BOOST_CHECK(manifest_has(spl, manifest_detail::derive_collateral_vault_pda(
-                                   harness.program_id, token_code)));
-   BOOST_CHECK(manifest_has(spl, system::get_associated_token_address(spl_depositor, spl_mint)));
-   BOOST_CHECK(manifest_has(spl, system::program_ids::TOKEN_PROGRAM));
-} FC_LOG_AND_RETHROW();
-
-/// The build reads each DISTINCT reserve exactly once, however many
-/// attestations reference it -- the property that keeps a 500-remit envelope
-/// from costing 500 sequential round-trips per drain. There is no
-/// `OutpostConfig` read on this path at all: custody rides the Reserve.
-BOOST_AUTO_TEST_CASE(build_manifests_reads_each_reserve_once) try {
-   const auto recipient = measurement_pubkey(83);
-   const auto creator   = measurement_pubkey(84);
-   const auto mint      = measurement_pubkey(85);
-
-   manifest_build_harness harness;
-   harness.put(10, 20, creator, mint, 6);
-   harness.put(11, 21, creator, mint, 6);
-
-   // Six attestations across TWO distinct reserves.
-   harness.build({swap_remit_effect(0, 10, 20, recipient),
-                  swap_remit_effect(1, 11, 21, recipient),
-                  swap_remit_effect(2, 10, 20, recipient),
-                  swap_remit_effect(3, 10, 20, recipient),
-                  swap_remit_effect(4, 11, 21, recipient),
-                  swap_remit_effect(5, 10, 20, recipient)},
-                 6);
-
-   BOOST_CHECK_EQUAL(harness.reads.size(), 2u);
-   const std::vector<std::pair<uint64_t, uint64_t>> expected{{10u, 20u}, {11u, 21u}};
-   BOOST_CHECK(harness.reads == expected);
-} FC_LOG_AND_RETHROW();
-
-/// An ABSENT reserve costs THAT attestation its custody-dependent accounts and
-/// nothing else: every other attestation's manifest is still built, so the
-/// envelope's healthy prefix still dispatches. This degrade is safe precisely
-/// because the program skips an uninitialized reserve
-/// (`load_reserve_from_remaining` -> `Ok(None)` -> logged skip), so none of the
-/// omitted accounts is ever reached. The opposite case — a reserve that exists
-/// but this relay cannot read — must NOT come through here; it is pinned by
-/// `build_manifests_propagate_an_unreadable_reserve` below.
-BOOST_AUTO_TEST_CASE(build_manifests_degrade_an_absent_reserve) try {
-   const auto recipient = measurement_pubkey(86);
-   const auto payee     = measurement_pubkey(87);
-   const auto creator   = measurement_pubkey(88);
-   const auto mint      = measurement_pubkey(89);
-
-   manifest_build_harness harness;
-   harness.put(10, 20, creator, mint, 6);
-   // (12, 22) deliberately absent -> the read degrades.
-   // Native custody for the collateral token: the zero-mint marker.
-   harness.put_collateral(payee, 700, system::program_ids::SYSTEM_PROGRAM);
-
-   const auto manifests = harness.build({swap_remit_effect(0, 10, 20, recipient),
-                                         swap_remit_effect(1, 12, 22, recipient),
-                                         withdraw_remit_effect(2, 700, payee)},
-                                        3);
-   BOOST_REQUIRE_EQUAL(manifests.size(), 3u);
-
-   // The healthy SPL attestation is complete.
-   BOOST_CHECK(manifest_has(manifests[0], system::get_associated_token_address(recipient, mint)));
-   // The degraded one still carries everything derivable WITHOUT the record
-   // (Reserve PDA, vault, recipient, token program) -- just not the ATA, which
-   // needs the custody mint.
-   BOOST_CHECK(manifest_has(manifests[1], manifest_detail::derive_reserve_pda(
-                                             harness.program_id, 12, 22)));
-   BOOST_CHECK(manifest_has(manifests[1], manifest_detail::derive_reserve_vault_pda(
-                                             harness.program_id, 12, 22)));
-   BOOST_CHECK(manifest_has(manifests[1], recipient));
-   // The attestation AFTER the degraded one is untouched by it: a native
-   // withdraw remit declares exactly the payee and their CollateralPosition.
-   BOOST_REQUIRE_EQUAL(manifests[2].size(), 2u);
-   BOOST_CHECK(manifest_has(manifests[2], payee));
-   BOOST_CHECK(manifest_has(manifests[2], manifest_detail::derive_collateral_position_pda(
-                                             harness.program_id, payee, 700)));
-
-   // A permanently unusable reserve costs ONE read for the whole build, not
-   // one per attestation referencing it.
-   const auto degraded_reads = std::count(harness.reads.begin(), harness.reads.end(),
-                                          std::pair<uint64_t, uint64_t>{12u, 22u});
-   BOOST_CHECK_EQUAL(degraded_reads, 1);
-} FC_LOG_AND_RETHROW();
-
-/// A reserve that EXISTS but cannot be read by this relay must abort the build,
-/// never degrade into a manifest. The program decodes that account fine, takes
-/// its real branch, and requires the effect accounts that branch needs — the
-/// custody ATA for an SPL remit/revert, the `creator` for a cancel with an
-/// escrow to refund — so a degraded manifest is GUARANTEED to hit
-/// `require_remaining_account` and abort.
-///
-/// That is the difference between a delayed epoch and a wedged one:
-/// `drive_dispatch_rounds` repacks every window from the on-chain cursor, so an
-/// aborting attestation heads every future window and the cursor never moves.
-/// Letting the exception out fails the tick with the cursor untouched, which is
-/// recoverable; shipping the manifest is not.
-BOOST_AUTO_TEST_CASE(build_manifests_propagate_an_unreadable_reserve) try {
-   const auto recipient = measurement_pubkey(94);
-   const auto later     = measurement_pubkey(95);
-
-   manifest_build_harness harness;
-   // The reader models `reserve_info_for_codes` meeting a present-but-
-   // undecodable Reserve: it throws rather than returning empty.
-   auto throwing_reader = [&](uint64_t token_code, uint64_t reserve_code)
-      -> std::optional<manifest_detail::reserve_terminal_info> {
-      harness.reads.emplace_back(token_code, reserve_code);
-      FC_THROW_EXCEPTION(fc::exception, "Reserve exists but is undecodable (test probe)");
-   };
-
-   // BOTH effects are reserve-backed, on DIFFERENT reserves, so the read count
-   // is load-bearing: had the build swallowed the throw and carried on, the
-   // second effect would have paid its own read and `reads` would be 2.
-   BOOST_CHECK_EXCEPTION(
-      manifest_detail::build_dispatch_manifests(
-         harness.program_id,
-         {swap_remit_effect(0, 10, 20, recipient), swap_remit_effect(1, 11, 21, later)},
-         2, [] {}, throwing_reader, harness.collateral_reader(), harness.hook_reader(),
-         harness.liq_pool_reader(), harness.reserve_aggregate, "test-relay"),
-      fc::exception,
-      [](const fc::exception& e) {
-         return e.to_detail_string().find("undecodable") != std::string::npos;
-      });
-   // It failed AT the first bad reserve; the second was never reached.
-   BOOST_REQUIRE_EQUAL(harness.reads.size(), 1u);
-   BOOST_CHECK((harness.reads[0] == std::pair<uint64_t, uint64_t>{10u, 20u}));
-} FC_LOG_AND_RETHROW();
-
-/// The manifest build is where a large envelope burns its tick: the deadline
-/// is probed per effect, BEFORE that effect's reserve read, so an over-deadline
-/// build fails at the loop instead of deep in the RPC layer with the work
-/// already lost and zero dispatches sent.
-BOOST_AUTO_TEST_CASE(build_manifests_probes_deadline_before_each_reserve_read) try {
-   const auto recipient = measurement_pubkey(90);
-   const auto creator   = measurement_pubkey(91);
-   const auto mint      = measurement_pubkey(92);
-
-   manifest_build_harness harness;
-   harness.put(10, 20, creator, mint, 6);
-   harness.put(11, 21, creator, mint, 6);
-
-   uint32_t probes = 0;
-   BOOST_CHECK_EXCEPTION(
-      harness.build({swap_remit_effect(0, 10, 20, recipient),
-                     swap_remit_effect(1, 11, 21, recipient)},
-                    2,
-                    [&] {
-                       if (probes++ > 0) {
-                          FC_THROW_EXCEPTION(fc::timeout_exception,
-                                             "deadline exceeded (test probe)");
-                       }
-                    }),
-      fc::timeout_exception,
-      [](const fc::timeout_exception& e) {
-         return e.to_detail_string().find("deadline exceeded") != std::string::npos;
-      });
-   // Probe fired before the SECOND effect's read, so only the first reserve
-   // was ever fetched.
-   BOOST_REQUIRE_EQUAL(harness.reads.size(), 1u);
-   BOOST_CHECK((harness.reads[0] == std::pair<uint64_t, uint64_t>{10u, 20u}));
-} FC_LOG_AND_RETHROW();
-
 /// The result is sized to the envelope's attestation TOTAL and indexed by the
 /// flat dispatch position, so an attestation needing no effect account keeps
 /// an empty entry and the cursor stays aligned with the manifests.
 BOOST_AUTO_TEST_CASE(build_manifests_index_by_flat_dispatch_position) try {
-   const auto payee = measurement_pubkey(93);
-
    manifest_build_harness harness;
-   // Native custody for the collateral token: the zero-mint marker.
-   harness.put_collateral(payee, 700, system::program_ids::SYSTEM_PROGRAM);
-   // Attestations 0, 1 and 3 contribute no effect at all.
-   const auto manifests = harness.build({withdraw_remit_effect(2, 700, payee)}, 4);
-
+   const auto payee = measurement_pubkey(93);
+   const auto manifests = harness.build({desyndicate_liq_effect(2, payee, 7)}, 4);
    BOOST_REQUIRE_EQUAL(manifests.size(), 4u);
    BOOST_CHECK(manifests[0].empty());
    BOOST_CHECK(manifests[1].empty());
-   BOOST_REQUIRE_EQUAL(manifests[2].size(), 2u);
-   BOOST_CHECK(manifest_has(manifests[2], payee));
-   BOOST_CHECK(manifest_has(manifests[2], manifest_detail::derive_collateral_position_pda(
-                                             harness.program_id, payee, 700)));
    BOOST_CHECK(manifests[3].empty());
-   // A collateral settlement needs no Reserve record — only its one custody
-   // lookup is paid.
-   BOOST_CHECK(harness.reads.empty());
-   BOOST_REQUIRE_EQUAL(harness.collateral_reads.size(), 1u);
-   BOOST_CHECK((harness.collateral_reads[0] ==
-                manifest_build_harness::collateral_seeds{payee, 700u}));
+   BOOST_REQUIRE_EQUAL(manifests[2].size(), 3u);
+   BOOST_CHECK(manifest_has(manifests[2], manifest_detail::derive_pending_desyndication_pda(harness.program_id, 7)));
+   BOOST_CHECK_EQUAL(harness.liq_pool_reads, 1u);
 } FC_LOG_AND_RETHROW();
-
 // ── drive_dispatch_rounds: the dispatch-crank state machine, driven through
 //    its RPC seams (progress read + dispatch send) with a scripted on-chain
 //    model. Both confirmed drain defects (the zero-attestation early return
@@ -2623,28 +1699,24 @@ BOOST_AUTO_TEST_CASE(drive_dispatch_zero_attestation_envelope_sends_one_close_cr
    BOOST_CHECK(harness.sends[0].accounts.empty());
    BOOST_CHECK_EQUAL(sig, "sig-0");
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(drive_dispatch_zero_attestation_waits_for_consensus) try {
    dispatch_drive_harness harness(0, /*consensus_reached=*/false);
    const auto sig = harness.drive({});
    BOOST_CHECK(harness.sends.empty());
    BOOST_CHECK_EQUAL(sig, "");
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(drive_dispatch_consensus_not_reached_sends_nothing) try {
    dispatch_drive_harness harness(3, /*consensus_reached=*/false);
    const auto sig = harness.drive(distinct_manifests(3, 2));
    BOOST_CHECK(harness.sends.empty());
    BOOST_CHECK_EQUAL(sig, "");
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(drive_dispatch_already_drained_cursor_sends_nothing) try {
    dispatch_drive_harness harness(3, true, /*initial_cursor=*/3);
    const auto sig = harness.drive(distinct_manifests(3, 2));
    BOOST_CHECK(harness.sends.empty());
    BOOST_CHECK_EQUAL(sig, "");
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(drive_dispatch_single_round_settles_small_manifests) try {
    // 3 attestations x 2 distinct accounts = a 6-account union, well inside
    // the 16-account budget -- one send covers the whole envelope.
@@ -2655,7 +1727,6 @@ BOOST_AUTO_TEST_CASE(drive_dispatch_single_round_settles_small_manifests) try {
    BOOST_CHECK_EQUAL(harness.sends[0].accounts.size(), 6u);
    BOOST_CHECK_EQUAL(sig, "sig-0");
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(drive_dispatch_packs_union_to_exact_account_budget) try {
    // 8 distinct accounts per attestation: two fill the 16-account budget
    // EXACTLY (16 is allowed; the pack breaks only past it), a third would
@@ -2668,7 +1739,6 @@ BOOST_AUTO_TEST_CASE(drive_dispatch_packs_union_to_exact_account_budget) try {
    BOOST_CHECK_EQUAL(harness.sends[1].limit, 2u);
    BOOST_CHECK_EQUAL(harness.sends[1].accounts.size(), sysio::MAX_TERMINAL_DYNAMIC_ACCOUNTS);
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(drive_dispatch_shared_accounts_pack_as_a_union) try {
    // Every attestation references the SAME 10 accounts: the batch union stays
    // at 10, so all 3 fit one round even though 3 x 10 raw metas would not.
@@ -2682,7 +1752,6 @@ BOOST_AUTO_TEST_CASE(drive_dispatch_shared_accounts_pack_as_a_union) try {
    BOOST_CHECK_EQUAL(harness.sends[0].limit, 3u);
    BOOST_CHECK_EQUAL(harness.sends[0].accounts.size(), 10u);
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(drive_dispatch_resumes_from_nonzero_cursor) try {
    // Cursor already at 2 of 5 (a prior partial drain): the batch starts AT
    // the cursor and carries only the unsettled manifests' accounts.
@@ -2702,7 +1771,6 @@ BOOST_AUTO_TEST_CASE(drive_dispatch_resumes_from_nonzero_cursor) try {
    BOOST_CHECK(sent_has(manifests[2][0].key));    // the resumed window
    BOOST_CHECK(sent_has(manifests[4][1].key));
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(drive_dispatch_oversized_single_manifest_still_takes_one) try {
    // One attestation whose own manifest exceeds the budget: the pack must
    // still take it (alone) so it can make progress -- an unsendable manifest
@@ -2714,7 +1782,6 @@ BOOST_AUTO_TEST_CASE(drive_dispatch_oversized_single_manifest_still_takes_one) t
    BOOST_CHECK_EQUAL(harness.sends[0].limit, 1u);
    BOOST_CHECK_EQUAL(harness.sends[0].accounts.size(), oversized);
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(drive_dispatch_exits_when_cursor_does_not_advance) try {
    // The send lands but the observed cursor does not move: another caller is
    // draining this envelope (or the read raced the write). One send, then a
@@ -2725,7 +1792,6 @@ BOOST_AUTO_TEST_CASE(drive_dispatch_exits_when_cursor_does_not_advance) try {
    BOOST_REQUIRE_EQUAL(harness.sends.size(), 1u);
    BOOST_CHECK_EQUAL(sig, "sig-0");
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(drive_dispatch_round_exhaustion_alarms_and_returns) try {
    // 9-account manifests force one attestation per round; two more
    // attestations than the round budget means the loop stops at the budget.
@@ -2739,7 +1805,6 @@ BOOST_AUTO_TEST_CASE(drive_dispatch_round_exhaustion_alarms_and_returns) try {
    BOOST_CHECK_EQUAL(harness.sends.size(), sysio::MAX_DISPATCH_ROUNDS);
    BOOST_CHECK_EQUAL(sig, "sig-" + std::to_string(sysio::MAX_DISPATCH_ROUNDS - 1));
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(drive_dispatch_deadline_expiry_throws) try {
    // The deadline probe fires once per round, before any read or send. Let
    // round 0 through and expire on round 1: exactly one batch goes out and
@@ -2760,7 +1825,6 @@ BOOST_AUTO_TEST_CASE(drive_dispatch_deadline_expiry_throws) try {
       });
    BOOST_REQUIRE_EQUAL(harness.sends.size(), 1u);
 } FC_LOG_AND_RETHROW();
-
 // ── LatestOutboundEnvelope inbound-read path. The epoch=511 RCA was
 //    hardcoded STANDALONE offsets (epoch@8) silently misreading the
 //    INTEGRATED account (`bump`=0xFF at byte 8, `epoch_index`=1 at byte 9 ⇒
@@ -2978,7 +2042,6 @@ BOOST_AUTO_TEST_CASE(latest_envelope_shape_accepts_known_layouts) try {
       }
    }
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(latest_envelope_shape_rejects_misdeclared_idls) try {
    struct reject_case {
       const char*             name;
@@ -3027,7 +2090,6 @@ BOOST_AUTO_TEST_CASE(latest_envelope_shape_rejects_misdeclared_idls) try {
    BOOST_CHECK_THROW(assert_latest_envelope_shape(latest_envelope_program({}, false)),
                      fc::assert_exception);
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(epoch_deliveries_shape_accepts_the_deployed_declaration) try {
    using sysio::outpost_solana_client_detail::assert_epoch_deliveries_shape;
 
@@ -3037,7 +2099,6 @@ BOOST_AUTO_TEST_CASE(epoch_deliveries_shape_accepts_the_deployed_declaration) tr
    // guaranteed present before the first drain.
    BOOST_CHECK_NO_THROW(assert_epoch_deliveries_shape(load_idl_fixture(opp_outpost_idl_fixture)));
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(epoch_deliveries_shape_rejects_drifted_declarations) try {
    using sysio::outpost_solana_client_detail::assert_epoch_deliveries_shape;
 
@@ -3080,17 +2141,6 @@ BOOST_AUTO_TEST_CASE(epoch_deliveries_shape_rejects_drifted_declarations) try {
    BOOST_CHECK_THROW(assert_epoch_deliveries_shape(named_account_program("EpochDeliveries", {}, false)),
                      fc::assert_exception);
 } FC_LOG_AND_RETHROW();
-
-BOOST_AUTO_TEST_CASE(reserve_shape_accepts_the_deployed_declaration) try {
-   using sysio::outpost_solana_client_detail::assert_reserve_shape;
-
-   // The stub fixture carries the program's own `Reserve` struct, so this is
-   // the boot check running against the declaration a batch operator will meet.
-   // It is what guarantees the manifest builder can always resolve custody and
-   // the cancel-refund creator from a reserve the program can read.
-   BOOST_CHECK_NO_THROW(assert_reserve_shape(load_idl_fixture(opp_outpost_idl_fixture)));
-} FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(distribution_state_shape_accepts_a_pubkey_mint_and_rejects_drift) try {
    using sysio::outpost_solana_client_detail::assert_distribution_state_shape;
 
@@ -3117,14 +2167,16 @@ BOOST_AUTO_TEST_CASE(distribution_state_shape_accepts_a_pubkey_mint_and_rejects_
       }
    }
 } FC_LOG_AND_RETHROW();
-
 namespace {
 
 /// A synthetic program declaring `GlobalState` with `wire_state` of enum type
-/// `WireState` carrying `variants`.
-idl::program global_state_program(std::vector<std::string> variants, bool fields_in_types_section) {
-   auto prog = named_account_program(
-      "GlobalState", {{"wire_state", idl::idl_type::make_defined("WireState")}}, fields_in_types_section);
+/// `WireState` carrying `variants`, and -- when `frozen_type` is set -- a
+/// trailing `frozen` field of that type.
+idl::program global_state_program(std::vector<std::string> variants, bool fields_in_types_section,
+                                  std::optional<idl::idl_type> frozen_type = std::nullopt) {
+   std::vector<idl::field> fields{{"wire_state", idl::idl_type::make_defined("WireState")}};
+   if (frozen_type) fields.push_back({"frozen", *frozen_type});
+   auto prog = named_account_program("GlobalState", std::move(fields), fields_in_types_section);
    idl::type_def wire_state;
    wire_state.name          = "WireState";
    wire_state.enum_variants = std::vector<idl::enum_variant>{};
@@ -3156,10 +2208,16 @@ BOOST_AUTO_TEST_CASE(global_state_shape_requires_a_post_launch_variant) try {
          BOOST_CHECK_THROW(assert_global_state_shape(named_account_program(
                               "GlobalState", {{"wire_state", prim(idl::primitive_type::u8)}}, in_types)),
                            fc::assert_exception);
+         // The emergency stop is optional (a program predating it declares none),
+         // but when declared it must be the bool the crank reads.
+         BOOST_CHECK_NO_THROW(assert_global_state_shape(
+            global_state_program({"PostLaunch"}, in_types, prim(idl::primitive_type::bool_t))));
+         BOOST_CHECK_THROW(assert_global_state_shape(
+                              global_state_program({"PostLaunch"}, in_types, prim(idl::primitive_type::u8))),
+                           fc::assert_exception);
       }
    }
 } FC_LOG_AND_RETHROW();
-
 // The crank gates on the decoder's rendering of `GlobalState.wire_state` -- an
 // enum comes back as `{"variant": <name>}` -- and only PostLaunch is due.
 BOOST_AUTO_TEST_CASE(liq_yield_report_is_due_only_post_launch) try {
@@ -3174,7 +2232,59 @@ BOOST_AUTO_TEST_CASE(liq_yield_report_is_due_only_post_launch) try {
    // A bare string is not the decoder's shape: never due rather than guessed.
    BOOST_CHECK(!liq_yield_report_due(fc::mutable_variant_object()("wire_state", "PostLaunch")));
 } FC_LOG_AND_RETHROW();
+// The emergency stop: while `GlobalState.frozen` is set the program refuses
+// `report_liq_yield`, so the crank does not fire. A row without `frozen` comes
+// from an IDL that declares no emergency stop and stays due; a `frozen` of any
+// other shape is a misdecoded row and never due.
+BOOST_AUTO_TEST_CASE(liq_yield_report_is_not_due_while_the_outpost_is_frozen) try {
+   using sysio::outpost_solana_client_detail::liq_outpost_frozen;
+   using sysio::outpost_solana_client_detail::liq_yield_report_due;
+   auto state = [](const char* variant, std::optional<fc::variant> frozen) {
+      fc::mutable_variant_object row;
+      row("wire_state", fc::mutable_variant_object()("variant", variant));
+      if (frozen) row("frozen", *frozen);
+      return fc::variant_object(row);
+   };
+   BOOST_CHECK(!liq_outpost_frozen(state("PostLaunch", fc::variant(false))));
+   BOOST_CHECK(liq_yield_report_due(state("PostLaunch", fc::variant(false))));
 
+   BOOST_CHECK(liq_outpost_frozen(state("PostLaunch", fc::variant(true))));
+   BOOST_CHECK(!liq_yield_report_due(state("PostLaunch", fc::variant(true))));
+   BOOST_CHECK(!liq_yield_report_due(state("PreLaunch", fc::variant(true))));
+
+   BOOST_CHECK(!liq_outpost_frozen(state("PostLaunch", std::nullopt)));
+   BOOST_CHECK(liq_yield_report_due(state("PostLaunch", std::nullopt)));
+
+   BOOST_CHECK(liq_outpost_frozen(state("PostLaunch", fc::variant(uint64_t{0}))));
+   BOOST_CHECK(!liq_yield_report_due(state("PostLaunch", fc::variant("false"))));
+} FC_LOG_AND_RETHROW();
+// A `GlobalState` still at the pre-freeze layout (8 + 131 bytes, wire-solana
+// `GLOBAL_STATE_PRE_FREEZE_INIT_SPACE`) cannot carry the `frozen` the loaded IDL
+// declares: the crank treats it as not due instead of decoding past its end. The
+// grown account (one byte longer) is read normally, and an IDL that declares no
+// emergency stop never gates on the length.
+BOOST_AUTO_TEST_CASE(global_state_predates_freeze_only_under_an_idl_that_declares_it) try {
+   namespace detail = sysio::outpost_solana_client_detail;
+   using detail::global_state_predates_freeze;
+   constexpr size_t pre_freeze_bytes =
+      detail::global_state::anchor_discriminator_bytes + detail::global_state::pre_freeze_init_space;
+   BOOST_CHECK_EQUAL(pre_freeze_bytes, 139u);
+
+   for (bool in_types : {false, true}) {
+      BOOST_TEST_CONTEXT("fields in types section: " << in_types) {
+         const auto with_freeze =
+            global_state_program({"PostLaunch"}, in_types, prim(idl::primitive_type::bool_t));
+         BOOST_CHECK(global_state_predates_freeze(with_freeze, pre_freeze_bytes));
+         // The layout before the liq fields (8 + 115) is older still.
+         BOOST_CHECK(global_state_predates_freeze(with_freeze, pre_freeze_bytes - 16));
+         BOOST_CHECK(!global_state_predates_freeze(with_freeze, pre_freeze_bytes + 1));
+
+         const auto without_freeze = global_state_program({"PostLaunch"}, in_types);
+         BOOST_CHECK(!global_state_predates_freeze(without_freeze, pre_freeze_bytes));
+      }
+   }
+   BOOST_CHECK(!global_state_predates_freeze(idl::program{}, 0));
+} FC_LOG_AND_RETHROW();
 // The overrides cover every non-signer account `report_liq_yield` declares, and
 // derive each the way the program's `#[derive(Accounts)]` constraints do: the
 // Token-2022 ATAs of the pool and bucket authorities, the `UserRecord`s seeded
@@ -3228,151 +2338,6 @@ BOOST_AUTO_TEST_CASE(report_liq_yield_overrides_resolve_every_declared_account) 
    BOOST_CHECK(overrides.at(accounts::associated_token_program) == system::program_ids::ASSOCIATED_TOKEN_PROGRAM);
    BOOST_CHECK(overrides.at(accounts::system_program) == system::program_ids::SYSTEM_PROGRAM);
 } FC_LOG_AND_RETHROW();
-
-BOOST_AUTO_TEST_CASE(reserve_shape_rejects_drifted_declarations) try {
-   using sysio::outpost_solana_client_detail::assert_reserve_shape;
-
-   // IDL drift here is the realistic way a LIVE, program-readable Reserve
-   // becomes unreadable to this relay — and in flight that is unrecoverable:
-   // the effect account the program's branch requires cannot be derived, the
-   // window aborts, and every later window repacks from the same cursor. Each
-   // shape below must therefore fail at BOOT, while the IDL is still fixable.
-   struct reject_case {
-      const char*             name;
-      std::vector<idl::field> fields;
-   };
-   const auto pubkey_t = prim(idl::primitive_type::pubkey);
-   const auto u8_t     = prim(idl::primitive_type::u8);
-
-   // Every case is the VALID four-field declaration with exactly ONE field
-   // dropped or mis-typed. Building them that way is load-bearing: the previous
-   // cases each omitted `custody_token_program` while testing some other defect,
-   // so deleting the `has_token_program` check (or its is_pubkey branch) left the
-   // whole suite green — the same coverage hole that let the missing custody mint
-   // ship in the first place.
-   const auto valid = [&](const char* drop, const char* retype,
-                          const idl::idl_type& replacement) {
-      std::vector<idl::field> fields;
-      const std::pair<const char*, idl::idl_type> declared[] = {
-         {"creator", pubkey_t},
-         {"custody_mint", pubkey_t},
-         {"custody_decimals", u8_t},
-         {"custody_token_program", pubkey_t},
-      };
-      for (const auto& [name, type] : declared) {
-         if (drop != nullptr && std::string_view(name) == drop) continue;
-         fields.push_back({name,
-                           (retype != nullptr && std::string_view(name) == retype) ? replacement
-                                                                                  : type});
-      }
-      return fields;
-   };
-   const auto none = prim(idl::primitive_type::u8);   // unused placeholder
-
-   std::vector<reject_case> cases;
-   cases.push_back({"creator dropped", valid("creator", nullptr, none)});
-   cases.push_back({"custody_mint dropped", valid("custody_mint", nullptr, none)});
-   cases.push_back({"custody_decimals dropped", valid("custody_decimals", nullptr, none)});
-   // The boot gate this PR adds: a pre-SOL-396 IDL is exactly the valid three
-   // fields with `custody_token_program` absent.
-   cases.push_back({"custody_token_program dropped (pre-SOL-396 IDL)",
-                    valid("custody_token_program", nullptr, none)});
-   cases.push_back({"custody_mint declared as a byte array",
-                    valid(nullptr, "custody_mint", u8_32_array())});
-   cases.push_back({"custody_decimals declared u32",
-                    valid(nullptr, "custody_decimals", prim(idl::primitive_type::u32))});
-   cases.push_back({"custody_token_program declared as a byte array",
-                    valid(nullptr, "custody_token_program", u8_32_array())});
-   cases.push_back({"creator declared as a byte array",
-                    valid(nullptr, "creator", u8_32_array())});
-
-   for (const auto& c : cases) {
-      BOOST_TEST_CONTEXT(c.name) {
-         for (bool in_types : {false, true}) {
-            BOOST_CHECK_THROW(assert_reserve_shape(named_account_program("Reserve", c.fields, in_types)),
-                              fc::assert_exception);
-         }
-      }
-   }
-
-   // No `Reserve` account declared at all, and one declared with no field
-   // definition in either home.
-   BOOST_CHECK_THROW(assert_reserve_shape(idl::program{}), fc::assert_exception);
-   BOOST_CHECK_THROW(assert_reserve_shape(named_account_program("Reserve", {}, false)),
-                     fc::assert_exception);
-} FC_LOG_AND_RETHROW();
-
-BOOST_AUTO_TEST_CASE(collateral_position_shape_accepts_the_expected_declaration) try {
-   using sysio::outpost_solana_client_detail::assert_collateral_position_shape;
-
-   const std::vector<idl::field> fields{
-      {"bump", prim(idl::primitive_type::u8)},
-      {"operator", prim(idl::primitive_type::pubkey)},
-      {"token_code", prim(idl::primitive_type::u64)},
-      {"custody_mint", prim(idl::primitive_type::pubkey)},
-      {"amount", prim(idl::primitive_type::u64)}};
-   for (bool in_types : {false, true}) {
-      BOOST_CHECK_NO_THROW(assert_collateral_position_shape(
-         named_account_program("CollateralPosition", fields, in_types)));
-   }
-} FC_LOG_AND_RETHROW();
-
-BOOST_AUTO_TEST_CASE(collateral_position_shape_rejects_drifted_declarations) try {
-   using sysio::outpost_solana_client_detail::assert_collateral_position_shape;
-
-   struct reject_case {
-      const char*             name;
-      std::vector<idl::field> fields;
-   };
-   const auto pubkey_t = prim(idl::primitive_type::pubkey);
-   const auto u64_t    = prim(idl::primitive_type::u64);
-
-   std::vector<reject_case> cases;
-   cases.push_back({"operator dropped",
-                    {{"token_code", u64_t}, {"custody_mint", pubkey_t}, {"amount", u64_t}}});
-   cases.push_back({"token_code dropped",
-                    {{"operator", pubkey_t}, {"custody_mint", pubkey_t}, {"amount", u64_t}}});
-   cases.push_back({"custody_mint dropped",
-                    {{"operator", pubkey_t}, {"token_code", u64_t}, {"amount", u64_t}}});
-   cases.push_back({"amount dropped",
-                    {{"operator", pubkey_t}, {"token_code", u64_t}, {"custody_mint", pubkey_t}}});
-   cases.push_back({"operator declared as a byte array",
-                    {{"operator", u8_32_array()},
-                     {"token_code", u64_t},
-                     {"custody_mint", pubkey_t},
-                     {"amount", u64_t}}});
-   cases.push_back({"custody_mint declared as a byte array",
-                    {{"operator", pubkey_t},
-                     {"token_code", u64_t},
-                     {"custody_mint", u8_32_array()},
-                     {"amount", u64_t}}});
-   cases.push_back({"token_code declared u32",
-                    {{"operator", pubkey_t},
-                     {"token_code", prim(idl::primitive_type::u32)},
-                     {"custody_mint", pubkey_t},
-                     {"amount", u64_t}}});
-   cases.push_back({"amount declared u32",
-                    {{"operator", pubkey_t},
-                     {"token_code", u64_t},
-                     {"custody_mint", pubkey_t},
-                     {"amount", prim(idl::primitive_type::u32)}}});
-
-   for (const auto& c : cases) {
-      BOOST_TEST_CONTEXT(c.name) {
-         for (bool in_types : {false, true}) {
-            BOOST_CHECK_THROW(assert_collateral_position_shape(
-                                 named_account_program("CollateralPosition", c.fields, in_types)),
-                              fc::assert_exception);
-         }
-      }
-   }
-
-   BOOST_CHECK_THROW(assert_collateral_position_shape(idl::program{}), fc::assert_exception);
-   BOOST_CHECK_THROW(
-      assert_collateral_position_shape(named_account_program("CollateralPosition", {}, false)),
-      fc::assert_exception);
-} FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(decode_latest_envelope_reads_both_known_layouts) try {
    constexpr uint32_t epoch = 7;
    const auto payload  = envelope_payload_bytes(epoch);
@@ -3390,7 +2355,6 @@ BOOST_AUTO_TEST_CASE(decode_latest_envelope_reads_both_known_layouts) try {
       integrated_latest_fields(), integrated_latest_account(epoch, payload, checksum), epoch);
    BOOST_CHECK(bytes_equal(integrated, payload));
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(decode_latest_envelope_catches_field_order_drift) try {
    // The epoch=511 RCA input: an INTEGRATED account (bump=0xFF first) read
    // by a client whose loaded IDL declares the STANDALONE field order. The
@@ -3406,7 +2370,6 @@ BOOST_AUTO_TEST_CASE(decode_latest_envelope_catches_field_order_drift) try {
    // must not be handed drift-garbage bytes.
    BOOST_CHECK(decode_with_layout(standalone_latest_fields(), integrated_account, 511).empty());
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(decode_latest_envelope_rejects_invalid_accounts) try {
    constexpr uint32_t epoch = 7;
    const auto payload  = envelope_payload_bytes(epoch);
@@ -3455,7 +2418,6 @@ BOOST_AUTO_TEST_CASE(decode_latest_envelope_rejects_invalid_accounts) try {
                                      epoch).empty());
    }
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(borsh_payload_bytes_accepts_both_decoded_shapes) try {
    const std::vector<uint8_t> payload = {0x12, 0x00, 0xFF, 0x42};
 
@@ -3474,7 +2436,6 @@ BOOST_AUTO_TEST_CASE(borsh_payload_bytes_accepts_both_decoded_shapes) try {
    BOOST_CHECK_THROW(borsh_payload_bytes(fc::variant(oversized)), fc::assert_exception);
    BOOST_CHECK_THROW(borsh_payload_bytes(fc::variant(static_cast<uint64_t>(7))), fc::assert_exception);
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(libfc_decode_renders_bytes_base64_and_vec_u8_as_array) try {
    // `borsh_payload_bytes` depends on HOW libfc's IDL decoder renders the
    // payload field into a variant: `bytes` as a base64 STRING, `Vec<u8>` as
@@ -3517,7 +2478,6 @@ BOOST_AUTO_TEST_CASE(libfc_decode_renders_bytes_base64_and_vec_u8_as_array) try 
       }
    }
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_CASE(select_program_idls_prefers_declared_address_match) try {
    const auto deployed = measurement_pubkey(90);
    const auto other    = measurement_pubkey(91);
@@ -3553,5 +2513,4 @@ BOOST_AUTO_TEST_CASE(select_program_idls_prefers_declared_address_match) try {
       select_program_idls_matching({named_program(""), named_program("")}, deployed),
       fc::assert_exception);
 } FC_LOG_AND_RETHROW();
-
 BOOST_AUTO_TEST_SUITE_END()

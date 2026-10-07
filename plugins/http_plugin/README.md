@@ -39,7 +39,7 @@ Handlers reach the plugin through three registration paths, and the path decides
 |---|---|---|
 | `add_handler` / `add_api(api, queue, priority)` | posted to the appbase executor, to run in the given `exec_queue` at the given priority. A `read_write` handler runs on the main application thread; a `read_only` handler runs on the main thread too, but also on the read-only thread pool when `--read-only-threads` is greater than 0 | calls that must read chain state under the executor's read window |
 | `add_async_handler` / `add_async_api` | runs inline on an HTTP worker thread | calls that do not touch the controller, or that do their own posting |
-| `add_raw_handler` | inline on an HTTP worker thread, handler owns the connection | binary and file responses (`snapshot_api_plugin` downloads) |
+| `add_raw_handler` | inline on an HTTP worker thread, handler answers through the connection | binary and file responses (`snapshot_api_plugin` downloads) |
 
 Admission control happens in two places. When a connection is accepted, the number of open connections is
 checked against `http-max-in-flight-requests` and a 503 "Busy" response is returned if it is over. For a
@@ -72,10 +72,13 @@ do -- gets them converted to a JSON `error_results` body by a single shared mapp
 `verbose-http-errors` controls how much of the exception log is appended to the body: one detail entry when
 off, up to ten when on.
 
-An exception that escapes a handler never reaches that mapping. It is caught by the connection instead, logged
-at error level, answered with a 500 `Internal Service Error` body, and the connection is closed --
-`keep_alive` is cleared and the socket is shut down immediately after the error response is queued, without
-waiting for the write to complete.
+An exception that escapes an `add_api` or `add_async_api` handler never reaches that mapping: the connection logs
+it at error level, answers 500 `Internal Service Error`, and closes once that response is written. One that
+escapes an `add_raw_handler` handler, or that the handler reports through its connection, gets the mapping, as if
+the handler had passed it to `http_plugin::handle_exception`.
+
+Each request is answered once. A second answer, from a handler that responds twice or throws after responding, is
+logged at error level and dropped.
 
 `plugin_shutdown` stops the HTTP thread pool. `SIGHUP` re-reads the `http_plugin` logger configuration.
 
@@ -94,7 +97,6 @@ be named in a `plugin` option, or startup fails with `plugin_config_exception`.
 | `trace_api` | `sysio::trace_api_plugin` |
 | `prometheus` | `sysio::prometheus_plugin` |
 | `test_control` | `sysio::test_control_api_plugin` |
-| `underwriter` | `sysio::underwriter_plugin` |
 
 `node` is the category of endpoints served on every listener; it is what `http-server-address` and
 `unix-socket-path` bind, and it is not a value accepted by `--http-category-address`.
@@ -162,7 +164,7 @@ All of `http_plugin`'s options are config-file options, so each is equally valid
 |---|---|---|
 | `http-server-address` | `127.0.0.1:8888` | Local IP and port to listen on for incoming HTTP connections. Set to the literal `http-category-address` to enable the `http-category-address` option; leave blank to disable. Under `kiod` the option is registered with no default. |
 | `unix-socket-path` | unset | Filename, relative to the data dir, of a unix socket for HTTP RPC; blank disables it. Must not be set when `http-category-address` is used. Under `kiod` it defaults to `kiod.sock`. |
-| `http-category-address` | unset | `category,address` pair binding one API category to one listen address; may be repeated. The address is `<hostname>:port`, `<ipaddress>:port`, or a unix socket path starting with `/`, `./`, or `../`. Valid categories are `chain_ro`, `chain_rw`, `db_size`, `net_ro`, `net_rw`, `producer_ro`, `producer_rw`, `snapshot`, `trace_api`, `prometheus`, `test_control`, `snapshot_ro`, and `underwriter`. `kiod` does not register this option. |
+| `http-category-address` | unset | `category,address` pair binding one API category to one listen address; may be repeated. The address is `<hostname>:port`, `<ipaddress>:port`, or a unix socket path starting with `/`, `./`, or `../`. Valid categories are `chain_ro`, `chain_rw`, `db_size`, `net_ro`, `net_rw`, `producer_ro`, `producer_rw`, `snapshot`, `trace_api`, `prometheus`, `test_control`, and `snapshot_ro`. `kiod` does not register this option. |
 
 ### Limits and threads
 
@@ -224,8 +226,9 @@ ninja -C build/debug http_plugin_unit_tests
 
 The suite covers body trimming and empty-content detection, `parse_params` for each `http_params_types` mode,
 rejection of invalid `http-category-address` specifications, category-to-address binding and per-listener
-endpoint visibility, loopback detection, and the in-flight byte and request accounting including the
-request-body reservation.
+endpoint visibility, loopback detection, the in-flight byte and request accounting including the
+request-body reservation, exception responses (whole before the connection closes, also under concurrent
+failures), the single answer per request, and the API-error mapping of raw handler exceptions.
 
 ## Related plugins
 
@@ -234,5 +237,5 @@ request-body reservation.
 - `producer_api_plugin` — registers the `producer_ro`, `producer_rw`, and `snapshot` endpoints.
 - [`snapshot_api_plugin`](../snapshot_api_plugin/README.md) — registers the `snapshot_ro` endpoints, and is
   the consumer of `add_raw_handler` for file downloads.
-- `db_size_api_plugin`, `trace_api_plugin`, `prometheus_plugin`, `test_control_api_plugin`,
-  `underwriter_plugin` — the remaining category owners.
+- `db_size_api_plugin`, `trace_api_plugin`, `prometheus_plugin`, `test_control_api_plugin` — the remaining
+  category owners.

@@ -29,25 +29,7 @@ using namespace std;
 using mvo = fc::mutable_variant_object;
 using ChainKind = sysio::opp::types::ChainKind;
 
-// Replicate the contract's pubkey_to_string for EM keys:
-// "PUB_EM_" + hex(compressed_33_bytes)
-static std::string contract_pubkey_to_string(const fc::crypto::public_key& pk) {
-   const auto& shim = pk.get<fc::em::public_key_shim>();
-   auto compressed = shim.serialize(); // std::array<char, 33>
-   return "PUB_EM_" + fc::to_hex(compressed.data(), compressed.size());
-}
-
-// Build the message string exactly as the contract does
-static std::string build_link_message(
-   const fc::crypto::public_key& pub_key,
-   const std::string& account,
-   ChainKind chain_kind,
-   uint64_t nonce
-) {
-    auto pub_key_str = contract_pubkey_to_string(pub_key);
-    auto chain_kind_str = std::to_string(magic_enum::enum_integer(chain_kind));
-    return pub_key_str + "|" + account + "|" + chain_kind_str + "|" + std::to_string(nonce) + "|createlink auth";
-}
+using sysio_system::test_support::build_link_message;
 
 // ——— Tester class ———
 class sysio_authex_tester : public tester {

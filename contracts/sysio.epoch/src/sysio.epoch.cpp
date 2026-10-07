@@ -4,10 +4,6 @@
 #include <sysio.opp.common/opp_keys.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.token/sysio.token.hpp>
-// For uwrit::MAX_LOCK_RELEASE_PER_EPOCH and uwrit::MAX_UWREQ_PRUNE_PER_EPOCH —
-// the per-epoch budgets advance hands to the inline `chklocks` and
-// `pruneuwreqs` sweeps (both constants are owned by sysio.uwrit).
-#include <sysio.uwrit/sysio.uwrit.hpp>
 // Canonical sysio.system emissions types + compute_epoch_emission. The
 // [[sysio::contract("sysio.system")]] attribute on emission_config / t5_state
 // pins them to sysio.system's ABI; no readonly mirror needed here.
@@ -405,34 +401,6 @@ void epoch::advance() {
    // Gate passed: drop any prior block_log row for this epoch (if a previous
    // attempt blocked and we're now succeeding) and proceed.
    clear_gate_block(get_self(), target_epoch);
-
-   // FIRST post-gate step: sweep expired underwriter collateral locks.
-   // Locks are a wall-clock challenge window (12h default; see
-   // sysio.uwrit::uwconfig.collateral_lock_duration_ms) — they are never
-   // released by delivery, only by this sweep. Running it before the
-   // delivery evaluation + withdraw flushing below means collateral freed
-   // by the closing window is visible to this same advance's
-   // `available()`-gated paths (flushwtdw, eligibility).
-   action(
-      permission_level{get_self(), "owner"_n},
-      UWRIT_ACCOUNT,
-      "chklocks"_n,
-      std::make_tuple(uwrit::MAX_LOCK_RELEASE_PER_EPOCH)
-   ).send();
-
-   // Bounded UWREQ lifecycle sweep (SEC-129 / WSA-223): erase terminal
-   // uwreqs whose retention window elapsed; expire + refund PENDING uwreqs
-   // whose race never resolved inside the pending timeout. Runs after
-   // chklocks so both uwrit maintenance sweeps stay adjacent, and before
-   // buildenv so any SWAP_REVERT the expiry path emits rides THIS epoch's
-   // outbound envelopes. Budget-bounded (never throws) — a backlog simply
-   // drains across subsequent epochs.
-   action(
-      permission_level{get_self(), "owner"_n},
-      UWRIT_ACCOUNT,
-      "pruneuwreqs"_n,
-      std::make_tuple(uwrit::MAX_UWREQ_PRUNE_PER_EPOCH)
-   ).send();
 
    // Before incrementing: evaluate per-op delivery state for the EXPIRING
    // epoch. The active group of the expiring epoch (`current_batch_op_group`
@@ -927,19 +895,6 @@ void epoch::advance() {
          }
       }
    }
-
-   // Drain the swap-from-WIRE queue: each row queued via
-   // `sysio.uwrit::swapfromwire` since the last advance is re-validated
-   // (target reserve ACTIVE + public, variance) and either becomes a
-   // PENDING uwreq for the single-leg underwriter race or is refunded.
-   // Runs before `buildenv` so this epoch's envelopes reflect any state
-   // the drain produced; never throws (refund-and-drop semantics).
-   action(
-      permission_level{get_self(), "owner"_n},
-      UWRIT_ACCOUNT,
-      "drainfwq"_n,
-      std::make_tuple()
-   ).send();
 
    // Build outbound envelopes for each outpost
    {

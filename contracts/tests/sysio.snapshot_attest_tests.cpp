@@ -168,8 +168,11 @@ public:
    }
 
    /// Chain and token of the one producer collateral pair `set_producer_min_bond` requires.
-   static constexpr std::string_view bond_chain = "ETH";
-   static constexpr std::string_view bond_token = "ETH";
+   static constexpr std::string_view bond_chain = "WIRE";
+   static constexpr std::string_view bond_token = "WIRE";
+
+   /// The depot-native collateral denomination, separate from the fixture's SYS resource token.
+   static inline const symbol bond_symbol = symbol(9, "WIRE");
 
    /// The producer minimum `register_bonded_producer_operators` installs, and the bond each bonded producer posts.
    static constexpr uint64_t producer_min_bond = 1'000'000;
@@ -196,17 +199,14 @@ public:
       produce_block();
    }
 
-   /// Credit `amount` to `producer`'s bond on the required pair, as sysio.msgch delivers an inbound deposit. opreg
+   /// Fund and deposit real depot-native collateral under the producer's authority. opreg
    /// re-evaluates the operator's status on the balance change.
    void credit_producer_bond(name producer, uint64_t amount) {
-      base_tester::push_action("sysio.opreg"_n, "depositinle"_n, "sysio.opreg"_n, mvo()
-         ("account",             producer)
-         ("chain_code",          bond_chain)
-         ("token_code",          bond_token)
-         ("amount",              amount)
-         ("actor_chain",         sysio::opp::types::ChainKind::CHAIN_KIND_EVM)
-         ("actor_address",       std::vector<char>(20, '\x06'))
-         ("original_message_id", fc::sha256()));
+      issue_and_transfer(producer, asset(static_cast<int64_t>(amount), bond_symbol));
+      base_tester::push_action("sysio.opreg"_n, "deposit"_n, producer, mvo()
+         ("account",    producer)
+         ("token_code", bond_token)
+         ("amount",     amount));
       produce_block();
    }
 
@@ -214,6 +214,7 @@ public:
    /// that clears the minimum is what makes opreg promote it to ACTIVE, which `regproducer` then admits.
    void register_bonded_producer_operators(const std::vector<name>& names) {
       if (names.empty()) return;
+      create_currency("sysio.token"_n, config::system_account_name, asset(asset::max_amount, bond_symbol));
       set_producer_min_bond(producer_min_bond);
       for (const auto& p : names) {
          base_tester::push_action("sysio.opreg"_n, "regoperator"_n, "sysio.opreg"_n, mvo()

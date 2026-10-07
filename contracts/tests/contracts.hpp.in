@@ -24,14 +24,10 @@ struct contracts {
    static std::vector<char>    opreg_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.opreg/sysio.opreg.abi"); }
    static std::vector<uint8_t> msgch_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.msgch/sysio.msgch.wasm"); }
    static std::vector<char>    msgch_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.msgch/sysio.msgch.abi"); }
-   static std::vector<uint8_t> uwrit_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.uwrit/sysio.uwrit.wasm"); }
-   static std::vector<char>    uwrit_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.uwrit/sysio.uwrit.abi"); }
    static std::vector<uint8_t> chalg_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.chalg/sysio.chalg.wasm"); }
    static std::vector<char>    chalg_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.chalg/sysio.chalg.abi"); }
    static std::vector<uint8_t> councl_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.councl/sysio.councl.wasm"); }
    static std::vector<char>    councl_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.councl/sysio.councl.abi"); }
-   static std::vector<uint8_t> reserve_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.reserv/sysio.reserv.wasm"); }
-   static std::vector<char>    reserve_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.reserv/sysio.reserv.abi"); }
    static std::vector<uint8_t> dclaim_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.dclaim/sysio.dclaim.wasm"); }
    static std::vector<char>    dclaim_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.dclaim/sysio.dclaim.abi"); }
    static std::vector<uint8_t> chains_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.chains/sysio.chains.wasm"); }
@@ -42,6 +38,12 @@ struct contracts {
    static std::vector<char>    swap_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.swap/sysio.swap.abi"); }
    static std::vector<uint8_t> liq_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.liq/sysio.liq.wasm"); }
    static std::vector<char>    liq_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.liq/sysio.liq.abi"); }
+   static std::vector<uint8_t> bond_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.bond/sysio.bond.wasm"); }
+   static std::vector<char>    bond_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.bond/sysio.bond.abi"); }
+   static std::vector<uint8_t> synd_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.synd/sysio.synd.wasm"); }
+   static std::vector<char>    synd_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.synd/sysio.synd.abi"); }
+   static std::vector<uint8_t> andon_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.andon/sysio.andon.wasm"); }
+   static std::vector<char>    andon_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.andon/sysio.andon.abi"); }
    /// The checked-in bootstrap configs (`dex-config.*.json`) the launch-ingestion tests replay.
    static std::string          dex_config_dir() { return "${CMAKE_SOURCE_DIR}/etc/config/dex"; }
 
@@ -53,6 +55,8 @@ struct contracts {
       static std::vector<char>    reenter_deposit_abi()  { return read_abi("${CMAKE_SOURCE_DIR}/contracts/test_contracts/reenter_deposit/reenter_deposit.abi"); }
       static std::vector<uint8_t> block_transfer_wasm()  { return read_wasm("${CMAKE_SOURCE_DIR}/contracts/test_contracts/block_transfer/block_transfer.wasm"); }
       static std::vector<char>    block_transfer_abi()   { return read_abi("${CMAKE_SOURCE_DIR}/contracts/test_contracts/block_transfer/block_transfer.abi"); }
+      static std::vector<uint8_t> epoch_stub_wasm()      { return read_wasm("${CMAKE_SOURCE_DIR}/contracts/test_contracts/epoch_stub/epoch_stub.wasm"); }
+      static std::vector<char>    epoch_stub_abi()       { return read_abi("${CMAKE_SOURCE_DIR}/contracts/test_contracts/epoch_stub/epoch_stub.abi"); }
    };
 };
 

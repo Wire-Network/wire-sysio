@@ -10,9 +10,14 @@
 
 #include <boost/asio.hpp>
 
+#include <atomic>
+#include <filesystem>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <regex>
+#include <string>
+#include <string_view>
 
 namespace sysio {
 
@@ -41,6 +46,136 @@ namespace sysio {
 
          bytes_in_flight_reservation(const bytes_in_flight_reservation&) = delete;
          bytes_in_flight_reservation& operator=(const bytes_in_flight_reservation&) = delete;
+      };
+
+      /// What the exception being handled says. Call only from a catch block.
+      std::string current_exception_text() {
+         try {
+            throw;
+         } catch (const fc::exception& e) {
+            return e.to_detail_string();
+         } catch (const std::exception& e) {
+            return e.what();
+         } catch (...) {
+            return "Unknown exception";
+         }
+      }
+
+      /**
+       * A request's one answer: the handler's response or the report of an exception it throws, whichever comes
+       * first. The other is logged and dropped, since a second response would start a second write on a connection
+       * that is still writing the first.
+       */
+      class single_response {
+      public:
+         /// `path` names the request's endpoint in log lines.
+         explicit single_response(std::shared_ptr<const std::string> path) : path_(std::move(path)) {}
+
+         /// Wrap a handler's response callback so that it answers only if nothing has yet.
+         static url_response_callback guard(std::shared_ptr<single_response> self, url_response_callback then) {
+            return [self = std::move(self), then = std::move(then)](int code, std::optional<fc::variant> response) {
+               if (self->claim())
+                  then(code, std::move(response));
+               else
+                  fc_elog(logger(), "{}: response {} after the request was answered; dropped", self->path(), code);
+            };
+         }
+
+         /// Answer the exception being handled with `report`, unless the request was already answered. Call only
+         /// from a catch block.
+         template <typename Report>
+         void report_exception(Report&& report) {
+            if (claim())
+               report();
+            else
+               fc_elog(logger(), "{}: exception after the request was answered; dropped: {}", path(),
+                       current_exception_text());
+         }
+
+         /// Take the answer: true for the first caller only.
+         [[nodiscard]] bool claim() { return !answered_.exchange(true); }
+
+         /// Whether the request has been answered.
+         [[nodiscard]] bool answered() const { return answered_.load(); }
+
+         /// The request's endpoint.
+         const std::string& path() const { return *path_; }
+
+      private:
+         std::shared_ptr<const std::string> path_; ///< shared by every request to the endpoint
+         std::atomic<bool> answered_{false};       ///< set by the first claim()
+      };
+
+      /**
+       * The connection as a raw handler sees it. A send or an exception report through it is the request's
+       * single_response, and an exception is answered like any API call's, through http_plugin::handle_exception.
+       * Once the request is answered it no longer uses the session, which may be writing the response or reading the
+       * next request.
+       */
+      class answering_conn final : public detail::abstract_conn {
+      public:
+         /// `conn` is the session; `api` and `then` answer an exception the way an API call's is answered.
+         answering_conn(detail::abstract_conn_ptr conn, std::shared_ptr<single_response> answer, const char* api,
+                        url_response_callback then)
+            : conn_(std::move(conn)), answer_(std::move(answer)), api_(api), then_(std::move(then)) {}
+
+         // The in-flight counters are the plugin's atomics, safe to use at any time.
+         std::string verify_max_bytes_in_flight(size_t extra_bytes) override {
+            return conn_->verify_max_bytes_in_flight(extra_bytes);
+         }
+         std::string verify_max_requests_in_flight() override { return conn_->verify_max_requests_in_flight(); }
+         void increment_bytes_in_flight(size_t sz) override { conn_->increment_bytes_in_flight(sz); }
+         void decrement_bytes_in_flight(size_t sz) override { conn_->decrement_bytes_in_flight(sz); }
+
+         // The rest uses the session, so only until the request is answered.
+         void set_content_type_header(http_content_type content_type) override {
+            if (!answer_->answered())
+               conn_->set_content_type_header(content_type);
+         }
+         std::string get_request_header(std::string_view field_name) const override {
+            return answer_->answered() ? std::string() : conn_->get_request_header(field_name);
+         }
+         void send_busy_response(std::string&& what) override {
+            send(__func__, [&] { conn_->send_busy_response(std::move(what)); });
+         }
+         void send_response(std::string&& json_body, unsigned int code) override {
+            send(__func__, [&] { conn_->send_response(std::move(json_body), code); });
+         }
+         void send_file_response(const std::filesystem::path& file_path, unsigned int code,
+                                 std::string_view content_type,
+                                 std::optional<std::pair<uint64_t, uint64_t>> byte_range) override {
+            send(__func__, [&] { conn_->send_file_response(file_path, code, content_type, byte_range); });
+         }
+         void handle_exception() override {
+            answer_->report_exception([this] { answer_exception(); });
+         }
+
+      private:
+         /// Run `do_send` as the request's answer. A send that throws has not started its write, so the exception is
+         /// answered instead.
+         template <typename Send>
+         void send(const char* call, Send&& do_send) {
+            if (!answer_->claim()) {
+               fc_elog(logger(), "{}: {} after the request was answered; dropped", answer_->path(), call);
+               return;
+            }
+            try {
+               do_send();
+            } catch (...) {
+               answer_exception();
+            }
+         }
+
+         /// Answer the exception being handled like an API call's. Call only from a catch block, holding the answer.
+         void answer_exception() {
+            conn_->set_content_type_header(http_content_type::json); // the handler may have set another
+            http_plugin::handle_exception(api_, answer_->path().c_str(), {}, then_);
+         }
+
+         detail::abstract_conn_ptr conn_;          ///< the session
+         std::shared_ptr<single_response> answer_; ///< the request's answer
+         const char* api_;                         ///< the endpoint's API category, for log lines
+         url_response_callback then_;              ///< sends an answered exception like an API call's response
       };
    }
 
@@ -75,7 +210,6 @@ namespace sysio {
       if (name == "prometheus") return api_category::prometheus;
       if (name == "test_control") return api_category::test_control;
       if (name == "snapshot_ro") return api_category::snapshot_ro;
-      if (name == "underwriter") return api_category::underwriter;
       return api_category::unknown;
    }
 
@@ -92,9 +226,8 @@ namespace sysio {
       if (category == api_category::prometheus) return "prometheus";
       if (category == api_category::test_control) return "test_control";
       if (category == api_category::snapshot_ro) return "snapshot_ro";
-      if (category == api_category::underwriter) return "underwriter";
       if (category == api_category::node) return "node";
-      // It's a programming error when the control flow reaches this point, 
+      // It's a programming error when the control flow reaches this point,
       // please make sure all the category names are returned from above statements.
       assert(false && "No correspding category name for the category value");
       return "";
@@ -118,8 +251,6 @@ namespace sysio {
          return "sysio::producer_api_plugin";
       if (category == api_category::snapshot_ro)
          return "sysio::snapshot_api_plugin";
-      if (category == api_category::underwriter)
-         return "sysio::underwriter_plugin";
       // It's a programming error when the control flow reaches this point,
       // please make sure all the plugin names are returned from above statements.
       assert(false && "No corresponding plugin for the category value");
@@ -129,7 +260,7 @@ namespace sysio {
    std::string category_names(api_category_set set) {
       if (set == api_category_set::all()) return "all";
       std::string result;
-      for (uint32_t i = 1; i <= static_cast<uint32_t>(api_category::underwriter); i<<=1) {
+      for (uint32_t i = 1; i <= static_cast<uint32_t>(api_category::snapshot_ro); i<<=1) {
          if (set.contains(api_category(i))) {
             result += from_category(api_category(i));
             result += " ";
@@ -153,16 +284,16 @@ namespace sysio {
          std::shared_ptr<http_plugin_state> plugin_state{new http_plugin_state(logger())};
          std::atomic<bool> listening;
 
-
          /**
           * Make an internal_url_handler that will run the url_handler on the app() thread and then
           * return to the http thread pool for response processing
           *
           * The returned handler reserves the request body against bytes_in_flight on admission and releases
           * it (via a shared bytes_in_flight_reservation) when the posted app-thread work completes or is discarded.
-          * @param priority - priority to post to the app thread at
+          * The request is answered once, by the handler's response or its exception (single_response).
+          * @param entry - the endpoint and its handler
           * @param to_queue - execution queue to post to
-          * @param next - the next handler for responses
+          * @param priority - priority to post to the app thread at
           * @param content_type - json or plain txt
           * @return the constructed internal_url_handler
           */
@@ -171,7 +302,8 @@ namespace sysio {
             handler.content_type = content_type;
             handler.category = entry.category;
             auto next_ptr = std::make_shared<url_handler>(std::move(entry.handler));
-            handler.fn = [priority, to_queue, next_ptr=std::move(next_ptr)]
+            handler.fn = [priority, to_queue, next_ptr=std::move(next_ptr),
+                          path=std::make_shared<const std::string>(entry.path)]
                        ( detail::abstract_conn_ptr conn, string&& r, string&& b, url_response_callback&& then ) {
                if (auto error_str = conn->verify_max_bytes_in_flight(b.size()); !error_str.empty()) {
                   conn->send_busy_response(std::move(error_str));
@@ -186,20 +318,21 @@ namespace sysio {
                // shutdown, or is discarded unrun when the queue is cleared.
                auto body_in_flight_guard = std::make_shared<bytes_in_flight_reservation>(conn, b.size());
 
-               url_response_callback wrapped_then = [then=std::move(then)](int code, std::optional<fc::variant> resp) {
-                  then(code, std::move(resp));
-               };
+               std::shared_ptr<single_response> answer = std::make_shared<single_response>(path);
+               url_response_callback wrapped_then = single_response::guard(answer, std::move(then));
 
                // post to the app thread taking shared ownership of next (via std::shared_ptr),
                // sole ownership of the tracked body and the passed in parameters
                // we can't std::move() next_ptr because we post a new lambda for each http request and we need to keep the original
-               app().executor().post( priority, to_queue, [next_ptr, conn=std::move(conn), r=std::move(r), b = std::move(b), wrapped_then=std::move(wrapped_then), body_in_flight_guard=std::move(body_in_flight_guard)]() mutable {
+               app().executor().post( priority, to_queue,
+                  [next_ptr, conn=std::move(conn), r=std::move(r), b=std::move(b), wrapped_then=std::move(wrapped_then),
+                   body_in_flight_guard=std::move(body_in_flight_guard), answer]() mutable {
                   try {
                      if( app().is_quiting() ) return; // http_plugin shutting down, do not call callback
                      // call the `next` url_handler and wrap the response handler
                      (*next_ptr)( std::move(r), std::move(b), std::move(wrapped_then)) ;
                   } catch( ... ) {
-                     conn->handle_exception();
+                     answer->report_exception([&] { conn->handle_exception(); });
                   }
                } );
             };
@@ -210,24 +343,29 @@ namespace sysio {
           * Make an internal_url_handler that will run the url_handler directly
           *
           * Runs inline on the http thread with no app-thread queueing, so the request body does not linger
-          * in a queue and is not separately reserved against bytes_in_flight here.
-          * @param next - the next handler for responses
+          * in a queue and is not separately reserved against bytes_in_flight here. The request is answered once,
+          * by the handler's response or its exception (single_response).
+          * @param entry - the endpoint and its handler
+          * @param content_type - json or plain txt
           * @return the constructed internal_url_handler
           */
          static detail::internal_url_handler make_http_thread_url_handler(api_entry&& entry, http_content_type content_type) {
             detail::internal_url_handler handler;
             handler.content_type = content_type;
             handler.category = entry.category;
-            handler.fn = [next=std::move(entry.handler)]( const detail::abstract_conn_ptr& conn, string&& r, string&& b, url_response_callback&& then ) mutable {
+            handler.fn = [next=std::move(entry.handler), path=std::make_shared<const std::string>(entry.path)](
+                            const detail::abstract_conn_ptr& conn, string&& r, string&& b,
+                            url_response_callback&& then ) mutable {
+               std::shared_ptr<single_response> answer = std::make_shared<single_response>(path);
                try {
-                  next(std::move(r), std::move(b), std::move(then));
+                  next(std::move(r), std::move(b), single_response::guard(answer, std::move(then)));
                } catch( ... ) {
-                  conn->handle_exception();
+                  answer->report_exception([&] { conn->handle_exception(); });
                }
              };
             return handler;
          }
-         
+
          bool is_unix_socket_address(const std::string& address) const {
             return address.starts_with("/") || address.starts_with("./") || address.starts_with("../");
          }
@@ -252,7 +390,7 @@ namespace sysio {
          void create_listener(const std::string& address, api_category_set categories) {
             const std::chrono::milliseconds accept_timeout(500);
             auto extra_listening_log_info = " for API categories: " + category_names(categories);
-            using socket_type = typename Protocol::socket; 
+            using socket_type = typename Protocol::socket;
             auto create_session = [this, categories, address](socket_type&& socket) {
                std::string               remote_endpoint;
                if constexpr (std::is_same_v<socket_type, tcp>) {
@@ -335,16 +473,16 @@ namespace sysio {
 
       if (current_http_plugin_defaults.support_categories) {
          cfg.add_options()
-            ("http-category-address", bpo::value<std::vector<string>>(), 
+            ("http-category-address", bpo::value<std::vector<string>>(),
              "The local IP and port to listen for incoming http category connections."
              "  Syntax: category,address\n"
              "    Where the address can be <hostname>:port, <ipaddress>:port or unix socket path;\n"
              "    in addition, unix socket path must starts with '/', './' or '../'. When relative path\n"
              "    is used, it is relative to the data path.\n\n"
              "    Valid categories include chain_ro, chain_rw, db_size, net_ro, net_rw, producer_ro\n"
-             "    producer_rw, snapshot, trace_api, prometheus, test_control, snapshot_ro, and underwriter.\n\n"
-             "    A single `hostname:port` specification can be used by multiple categories\n" 
-             "    However, two specifications having the same port with different hostname strings\n" 
+             "    producer_rw, snapshot, trace_api, prometheus, test_control, and snapshot_ro.\n\n"
+             "    A single `hostname:port` specification can be used by multiple categories\n"
+             "    However, two specifications having the same port with different hostname strings\n"
              "    are always considered as configuration error regardless of whether they can be resolved\n"
              "    into the same set of IP addresses.\n\n"
              "  Examples:\n"
@@ -462,7 +600,7 @@ namespace sysio {
             if (unix_sock_path.size()) {
                if (unix_sock_path[0] != '/') unix_sock_path = "./" + unix_sock_path;
                my->categories_by_address[unix_sock_path].insert(api_category::node);
-            } 
+            }
          }
 
          if (options.count("http-category-address") != 0) {
@@ -486,10 +624,10 @@ namespace sysio {
                auto category_name = spec.substr(0, comma_pos);
                auto category = to_category(category_name);
 
-               SYS_ASSERT(category != api_category::unknown, chain::plugin_config_exception, 
+               SYS_ASSERT(category != api_category::unknown, chain::plugin_config_exception,
                           "invalid category name `{}` for http_category_address", category_name);
 
-               SYS_ASSERT(has_plugin(category_plugin_name(category)), chain::plugin_config_exception, 
+               SYS_ASSERT(has_plugin(category_plugin_name(category)), chain::plugin_config_exception,
                   "--plugin={} is required for --http-category-address={}",
                   category_plugin_name(category), spec);
 
@@ -506,7 +644,6 @@ namespace sysio {
             }
          }
          my->plugin_state->server_header = current_http_plugin_defaults.server_header;
-
 
          //watch out for the returns above when adding new code here
       } FC_LOG_AND_RETHROW()
@@ -585,11 +722,15 @@ namespace sysio {
       internal_handler.category = category;
       internal_handler.content_type = http_content_type::json; // default, though raw handlers manage their own responses
       auto handler_ptr = std::make_shared<raw_url_handler>(std::move(handler));
-      internal_handler.fn = [handler_ptr](detail::abstract_conn_ptr conn, string&& r, string&& b, url_response_callback&&) {
+      internal_handler.fn = [handler_ptr, api = from_category(category),
+                             endpoint = std::make_shared<const std::string>(path)](
+                               detail::abstract_conn_ptr conn, string&& r, string&& b, url_response_callback&& then) {
+         std::shared_ptr<answering_conn> raw_conn = std::make_shared<answering_conn>(
+            std::move(conn), std::make_shared<single_response>(endpoint), api, std::move(then));
          try {
-            (*handler_ptr)(conn, std::move(r), std::move(b)); // a copy: the catch still needs conn
+            (*handler_ptr)(raw_conn, std::move(r), std::move(b));
          } catch (...) {
-            conn->handle_exception();
+            raw_conn->handle_exception(); // answered like an API call's, so a malformed request is a client error
          }
       };
       auto p = my->plugin_state->url_handlers.emplace(std::move(path), std::move(internal_handler));

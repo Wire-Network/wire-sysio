@@ -53,8 +53,7 @@ the CATEGORY, not the trace:
   carrying neither category.
 
 And `epochlog` does not recover the split either. It records top-level PERIOD aggregates
-— `total_emission`, `compute_amount`, `capex_amount`, `governance_amount`,
-`fee_distributed` — where `compute_amount` is the COMBINED producer + batch-operator
+— `total_emission`, `compute_amount`, `capex_amount`, `governance_amount` — where `compute_amount` is the COMBINED producer + batch-operator
 pool. Neither operator category's actually-credited total is stored, so once both kinds
 of credit accumulate in one `payclaims` row, **the producer-versus-batch-operator split
 is not available anywhere on chain**. What you can attribute: period totals per top-level
@@ -79,21 +78,16 @@ by the full group size). Equal rosters are coalesced before their weighted slice
 is calculated, preserving one group-level rounding step per roster. A credit is
 made only for members that are opreg-ACTIVE, so the slices of skipped (inactive /
 slashed / terminated) members stay in the treasury rather than being redistributed
-to the active ones. When roster history is complete and includes at least one
-non-empty roster, swap-fee rewards from `sysio.reserv`'s `rewards_bucket` are
-swept in (`drainrewards`) and allocated
-**exclusively to the batch-operator
-distribution**, on top of their emission share and weighted by that same
-historical active-epoch count. Producers are not paid out of swap fees, so
-`producer_bps` / `batch_op_bps` govern the emission split only.
+to the active ones. Batch operators are paid from emission only; no swap-fee
+pool is folded into the distribution, so `producer_bps` / `batch_op_bps` split
+the whole compute share.
 
 Allocated is not the same as paid: only **eligible** shares are actually
 credited. Emission WIRE stays in the treasury when an **empty historical
 roster** owns an accrued epoch, when a **member is not opreg-ACTIVE**, as the
 **remainder** of the two integer divisions (per-roster weighting, then the even
 per-member split), or when roster history is incomplete and the whole batch
-emission slice takes the bounded recovery path. Incomplete or entirely empty
-history leaves swap fees in `sysio.reserv` as described below. Every
+emission slice takes the bounded recovery path. Every
 `batchepochs` row represents one accrued epoch, so a zero-epoch historical
 roster cannot arise.
 
@@ -127,8 +121,7 @@ largest accepted period, so even a malformed gapped table cannot turn recovery
 into an unbounded transaction; stale history drains monotonically.
 If `payepoch` sees missing, stale, non-contiguous, or over-cap history, it does
 not guess a roster or abort the enclosing `advance`: it retains that period's
-batch-emission slice in the treasury, leaves the swap-fee bucket in
-`sysio.reserv` for the next complete period, drains the unusable history within
+batch-emission slice in the treasury, drains the unusable history within
 the cleanup bound, and begins clean history after stale rows are gone. A complete
 history remains required to credit batch-operator rewards. Every `epochlog` row
 records whether history was complete and the exact batch-emission amount
@@ -137,12 +130,9 @@ retained, making recovery distinguishable from an ordinary zero-eligible payout.
 `epoch_log_retention_count` counts payment rows, not elapsed epoch indexes, so
 cadence values greater than one retain the configured number of audit records.
 
-`epochlog.fee_distributed` records what was actually paid, while
-`batch_fee_retained` records a swept amount left in treasury because an empty
-roster alongside a non-empty roster, an inactive member, or a division remainder
-prevented its distribution. It is zero for incomplete or entirely empty history
-because those fees remain in `sysio.reserv` for a later payable period. The
-analogous `batch_emission_retained` field records undistributed batch emission.
+`epochlog.batch_emission_retained` records undistributed batch emission.
+`epochlog.fee_distributed` and `epochlog.batch_fee_retained` are reserved
+fields that `payepoch` always writes as zero; no swap-fee sweep feeds them.
 
 ## Retrieved via a claim action (pulled by recipient)
 
@@ -250,5 +240,4 @@ period_emission
 - Driven inline by `sysio.epoch::advance` (`accrueepoch` + `rcrdbatch` + `payepoch`).
 - Reads producer eligibility and operator status from `sysio.opreg`.
 - Reads the canonical epoch duration from `sysio.epoch::epochcfg`.
-- Folds swap-fee rewards from `sysio.reserv` (`drainrewards`).
 - Funds `sysio.dclaim` (staking rewards) and `sysio.liq` (the yield kicker) on demand via `fundclaim`.
