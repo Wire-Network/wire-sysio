@@ -22,7 +22,7 @@
       "tests": [
         "sysio_msgch_chain_tests/terminate_at_duty_rotation_via_advance",
         "sysio_opreg_tests/termcheck_terminates_after_default_consecutive_boundary",
-        "sysio_opreg_tests/claimremit_pays_terminated_operator_and_clears_row",
+        "sysio_opreg_tests/claimremit_never_expires_and_clears_row_after_payment",
         "sysio_opreg_tests/terminate_credits_earned_yield_with_the_principal"
       ]
     },
