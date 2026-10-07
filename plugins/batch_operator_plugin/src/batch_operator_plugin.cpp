@@ -6,14 +6,17 @@
 #include <fc/variant_object.hpp>
 #include <boost/endian/conversion.hpp>
 #include <algorithm>
+#include <array>
 #include <format>
 #include <functional>
 #include <map>
 #include <optional>
+#include <span>
 #include <string_view>
 
 #include "async_action_completion.hpp"
 #include "group_election.hpp"
+#include "role_config.hpp"
 #include "yield_cranks.hpp"
 
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
@@ -56,6 +59,8 @@ namespace {
    constexpr std::size_t EPOCH_TICK_CRON_JOBS = 1;
    /// Exact secondary-index lookups should return at most the matching row.
    constexpr uint32_t EXACT_LOOKUP_LIMIT = 1;
+   /// What a signer signs at startup to show that its signatures recover to its own key.
+   constexpr std::string_view SIGNER_PROBE = "batch_operator_plugin signer probe";
 
    // ── WIRE contract identifiers (actions, tables, indexes, field names) ──
    // Centralised so a contract rename/refactor shows up as one search hit,
@@ -124,6 +129,21 @@ namespace {
    /// `chains` KV table, keyed by slug_name (uint64 packed). Field spellings
    /// are shared with underwriter_plugin, which reads the same rows.
    namespace chains = sysio::opp::depot::chains;
+
+   /// A depot action a role pushes.
+   struct pushed_action {
+      const char* contract;
+      const char* action;
+   };
+
+   /// Every action the relay pushes: `<operator>@active` must be allowed to declare each one (`linkauth`).
+   constexpr std::array RELAY_ACTIONS{
+      pushed_action{msgch::account, msgch::action_deliver},
+      pushed_action{msgch::account, msgch::action_chkcons},
+      pushed_action{chalg::account, chalg::action_chkdispute},
+      pushed_action{batch_operator_detail::swap::account, batch_operator_detail::swap::action_tickyield},
+      pushed_action{batch_operator_detail::liq::account, batch_operator_detail::liq::action_queueyield},
+   };
 }
 
 // ---------------------------------------------------------------------------
@@ -141,6 +161,15 @@ struct outpost_descriptor {
    std::string opp_inbound_addr;
 };
 
+namespace {
+   /// The authorization a role declares on its depot actions and the signature provider whose key alone satisfies
+   /// it, resolved once the node is synced (`impl::resolve_signer`).
+   struct signer {
+      chain::permission_level            auth;
+      fc::crypto::signature_provider_ptr provider;
+   };
+}
+
 // ---------------------------------------------------------------------------
 //  Implementation
 // ---------------------------------------------------------------------------
@@ -153,6 +182,9 @@ struct batch_operator_plugin::impl {
    uint32_t     epoch_poll_ms       = EPOCH_POLL_MS;
    uint32_t     delivery_timeout_ms = DELIVERY_TIMEOUT_MS;
    uint32_t     yield_tick_interval_ms = YIELD_TICK_INTERVAL_MS;
+
+   /// The relay's signer, resolved by `resolve_signers` once the node is synced.
+   std::optional<signer> relay_signer;
 
    // Yield cranks -- see `crank_yield`.
    /// Whether `sysio.swap` and `sysio.liq` run code, refreshed off the read-only
@@ -266,7 +298,7 @@ struct batch_operator_plugin::impl {
       void deliver_to_depot(uint64_t chain_code,
                             const std::vector<char>& raw_messages) override {
          _impl.push_action(
-            msgch::account, msgch::action_deliver, _impl.operator_account,
+            msgch::account, msgch::action_deliver, *_impl.relay_signer,
             fc::mutable_variant_object()
                (msgch::field::batch_op_name, _impl.operator_account.to_string())
                (msgch::field::chain_code,    chain_code)
@@ -373,7 +405,7 @@ struct batch_operator_plugin::impl {
       // but pushing from every batch op wastes trx slots.
       if (election.is_elected) {
          try {
-            push_action(msgch::account, msgch::action_chkcons, operator_account,
+            push_action(msgch::account, msgch::action_chkcons, *relay_signer,
                         fc::mutable_variant_object());
          } catch (const fc::exception& e) {
             dlog("batch_operator: chkcons: {}", e.to_string());
@@ -444,7 +476,7 @@ struct batch_operator_plugin::impl {
          const uint64_t dispute_id = id_it->value().as_uint64();
 
          try {
-            push_action(chalg::account, chalg::action_chkdispute, operator_account,
+            push_action(chalg::account, chalg::action_chkdispute, *relay_signer,
                         fc::mutable_variant_object()(chalg::field::dispute_id, dispute_id));
          } catch (const fc::exception& e) {
             // Expected-transient: the dispute resolved between the scan and the push, or
@@ -543,7 +575,7 @@ struct batch_operator_plugin::impl {
          const auto pool = symbol_code_name(*code);
          if (!yield_tick_spacing.due(pool, now, interval)) continue;
          try {
-            push_action(swap::account, swap::action_tickyield, operator_account,
+            push_action(swap::account, swap::action_tickyield, *relay_signer,
                         fc::mutable_variant_object()(swap::field::pair_token, *code));
             yield_tick_spacing.mark(pool, now);
          } catch (const fc::exception& e) {
@@ -568,7 +600,7 @@ struct batch_operator_plugin::impl {
          const auto  value = row_value(row);
          if (!code || !value || asset_amount(*value, liq::field::quantity) <= 0) continue;
          try {
-            push_action(liq::account, liq::action_queueyield, operator_account,
+            push_action(liq::account, liq::action_queueyield, *relay_signer,
                         fc::mutable_variant_object()(liq::field::sym, *code));
          } catch (const fc::exception& e) {
             // Expected-transient: another operator queued it first. Persistent while
@@ -1012,17 +1044,73 @@ struct batch_operator_plugin::impl {
 
 
    // -----------------------------------------------------------------------
+   //  Signers
+   // -----------------------------------------------------------------------
+
+   /// The signer of `role`, declaring `level`: the one operator-configured WIRE signature provider whose key alone
+   /// satisfies `level` on chain. Nullopt, logged, when there is none, when there is more than one (the choice would
+   /// fall to provider order), when its signatures do not recover to its key, or when `level` may not declare one
+   /// of `actions`. Call on the main thread, after the sync gate.
+   std::optional<signer> resolve_signer(std::string_view role, const chain::permission_level& level,
+                                        std::span<const pushed_action> actions) {
+      const auto& chain  = chain_plug->chain();
+      bool        linked = true;
+      for (const auto& [contract, action] : actions) {
+         if (permission_satisfies_link(chain, level, chain::name(contract), chain::name(action))) continue;
+         elog("batch_operator: {} declares {}@{}, which may not authorize {}::{}: link that action to it",
+              role, level.actor.to_string(), level.permission.to_string(), contract, action);
+         linked = false;
+      }
+      auto&      sig_plug = app().get_plugin<signature_provider_manager_plugin>();
+      const auto choice   = batch_operator_detail::choose_signer(
+         sig_plug.query_providers(std::nullopt, fc::crypto::chain_kind_wire),
+         [&](const fc::crypto::signature_provider_ptr& provider) {
+            return sig_plug.is_operator_configured_provider(provider->key_name) &&
+                   key_alone_satisfies(chain, level, provider->public_key);
+         });
+      if (!choice.chosen) {
+         elog("batch_operator: {} needs exactly one configured WIRE signature provider whose key alone satisfies "
+              "{}@{}, found {}", role, level.actor.to_string(), level.permission.to_string(), choice.matches);
+         return std::nullopt;
+      }
+      if (!signs_for_its_key(role, **choice.chosen) || !linked) return std::nullopt;
+      return signer{.auth = level, .provider = *choice.chosen};
+   }
+
+   /// Whether `provider`'s signature over a probe digest recovers to its own key, which is how the chain checks a
+   /// transaction signature. Logs why not.
+   static bool signs_for_its_key(std::string_view role, const fc::crypto::signature_provider_t& provider) {
+      const auto probe = fc::sha256::hash(SIGNER_PROBE.data(), SIGNER_PROBE.size());
+      try {
+         if (fc::crypto::public_key::recover(provider.sign(probe), probe) == provider.public_key) return true;
+         elog("batch_operator: {}'s signature provider {} makes signatures that do not recover to its key", role,
+              provider.key_name);
+      } catch (const fc::exception& e) {
+         elog("batch_operator: {}'s signature provider {} cannot sign: {}", role, provider.key_name, e.top_message());
+      } catch (const std::exception& e) {
+         elog("batch_operator: {}'s signature provider {} cannot sign: {}", role, provider.key_name, e.what());
+      }
+      return false;
+   }
+
+   /// Resolve the relay's signer; false when it cannot be resolved.
+   bool resolve_signers() {
+      relay_signer = resolve_signer("the relay", {operator_account, chain::config::active_name}, RELAY_ACTIONS);
+      return relay_signer.has_value();
+   }
+
+   // -----------------------------------------------------------------------
    //  Helpers
    // -----------------------------------------------------------------------
 
-   /// Serializes and asynchronously submits a depot action.
+   /// Serializes and asynchronously submits a depot action, declaring `by.auth` and signed by `by.provider`.
    ///
    /// The bounded wait deliberately does not cancel the request. Its callback
    /// retains its API, labels, and completion state so it remains safe if this
    /// function returns after timing out but before the transaction completes.
    void push_action(const std::string& contract,
                     const std::string& action_name,
-                    chain::name auth_account,
+                    const signer& by,
                     const fc::variant_object& data) {
       auto abi_max_time = fc::microseconds(delivery_timeout_ms * 1000);
       auto& chain = chain_plug->chain();
@@ -1043,24 +1131,15 @@ struct batch_operator_plugin::impl {
       // Build the signed transaction
       chain::signed_transaction trx;
       trx.actions.emplace_back(
-         std::vector<chain::permission_level>{{auth_account, chain::config::active_name}},
+         std::vector<chain::permission_level>{by.auth},
          chain::name(contract), chain::name(action_name), std::move(action_data));
 
       trx.set_reference_block(chain.head().id());
       trx.expiration = fc::time_point_sec(chain.head().block_time() + fc::seconds(30));
 
-      // Sign with the operator's WIRE K1 key via signature_provider_manager
-      auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
-      auto wire_providers = sig_plug.query_providers(
-         std::nullopt, fc::crypto::chain_kind_wire, fc::crypto::chain_key_type_wire);
-      if (wire_providers.empty()) {
-         elog("batch_operator: no WIRE K1 signature provider available");
-         return;
-      }
-
       auto chain_id = chain.get_chain_id();
       auto digest = trx.sig_digest(chain_id, trx.context_free_data);
-      trx.signatures.push_back(wire_providers.front()->sign(digest));
+      trx.signatures.push_back(by.provider->sign(digest));
 
       // Pack and push
       auto packed = chain::packed_transaction(std::move(trx), chain::packed_transaction::compression_type::none);
@@ -1085,16 +1164,21 @@ struct batch_operator_plugin::impl {
    //  Sync-gated startup
    // -----------------------------------------------------------------------
 
-   /// The startup body deferred behind the sync gate: outpost
-   /// discovery → private cron_service creation (sized from the discovered
-   /// outposts) → epoch_tick scheduling → per-outpost relay jobs. Runs on the
-   /// main thread from {@link run_deferred_startup_or_quit} once the node is
-   /// synced. Deferral exists because `refresh_outposts` reads `sysio.chains`
-   /// LOCALLY: on a cold-booting operator node still replaying toward the
-   /// deploy blocks the read throws Account/Contract Query Exceptions
-   /// (3060002/3060003) — spurious boot-window errors the gate removes.
+   /// The startup body deferred behind the sync gate: signer resolution, outpost discovery, private cron_service
+   /// creation (sized from the discovered outposts), epoch_tick scheduling, then the per-outpost relay jobs. Runs on
+   /// the main thread from {@link run_deferred_startup_or_quit} once the node is synced. Deferral exists because both
+   /// read chain state LOCALLY (the operator's authority and links, `sysio.chains`): on a cold-booting operator node
+   /// still replaying toward the deploy blocks those reads fail spuriously.
    void run_deferred_startup() {
       if (shutting_down) {
+         return;
+      }
+
+      // The relay pushes as its own account. A key that cannot sign for it, or a permission that may not authorize
+      // its actions, would only fail every push, so stop here instead, before anything is scheduled.
+      if (!resolve_signers()) {
+         elog("batch_operator_plugin: the relay cannot sign its actions, shutting down node (fail-fast)");
+         app().quit();
          return;
       }
 
@@ -1245,10 +1329,11 @@ void batch_operator_plugin::plugin_startup() {
 
    ilog("batch_operator_plugin: starting for account {}", _impl->operator_account.to_string());
 
-   // The startup body's outpost discovery reads `sysio.chains` LOCALLY. On a
-   // cold-booting operator node those reads see mid-sync (possibly genesis)
-   // state and throw spuriously, so the whole body (discovery → cron_service →
-   // epoch_tick → relay jobs) is DEFERRED until the node is synced —
+   // The startup body's signer resolution and outpost discovery read chain
+   // state LOCALLY. On a cold-booting operator node those reads see mid-sync
+   // (possibly genesis) state and fail spuriously, so the whole body (signers,
+   // discovery, cron_service, epoch_tick, relay jobs) is DEFERRED until the
+   // node is synced, per
    // `controller::is_synced()`: the LAST IRREVERSIBLE block's time within
    // `controller::default_sync_recency_ms` of now (the state the reads
    // actually serve under read-mode = irreversible). The wake-up is the

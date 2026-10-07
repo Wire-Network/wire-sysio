@@ -58,6 +58,12 @@ is configured, the way `producer_plugin` keys off `--producer-name`. The plugin
 must also be listed under `plugin =` (or pulled in as a dependency by
 `external_debugging_plugin`), and requires `read-mode = irreversible`.
 
+The relay signs with the one operator-configured WIRE signature provider, of any
+key type, whose key alone satisfies `<operator>@active` on chain. At startup the
+node also checks that the key's signatures recover to it and that
+`<operator>@active` may declare every action the relay pushes (`linkauth`). No
+match, more than one, or a failed check stops the node.
+
 ### Outpost wiring
 
 Nothing about an outpost is declared per node.
