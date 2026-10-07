@@ -18,6 +18,32 @@
             ]
         },
         {
+            "name": "ballot_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "voter",
+                    "type": "name"
+                },
+                {
+                    "name": "round_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "tier",
+                    "type": "election_tier"
+                },
+                {
+                    "name": "flight_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "votes",
+                    "type": "flight_vote[]"
+                }
+            ]
+        },
+        {
             "name": "cand_key",
             "base": "",
             "fields": [
@@ -42,6 +68,14 @@
                 {
                     "name": "elected",
                     "type": "bool"
+                },
+                {
+                    "name": "claim_round",
+                    "type": "uint64"
+                },
+                {
+                    "name": "positions",
+                    "type": "bytes"
                 }
             ]
         },
@@ -108,10 +142,6 @@
                 {
                     "name": "cleanup_stage",
                     "type": "cleanup_stage"
-                },
-                {
-                    "name": "cleanup_seat",
-                    "type": "uint8"
                 }
             ]
         },
@@ -138,6 +168,10 @@
                 {
                     "name": "member",
                     "type": "name"
+                },
+                {
+                    "name": "round_id",
+                    "type": "uint64"
                 }
             ]
         },
@@ -148,18 +182,6 @@
                 {
                     "name": "phase",
                     "type": "election_phase"
-                },
-                {
-                    "name": "active_seat",
-                    "type": "uint8"
-                },
-                {
-                    "name": "tier",
-                    "type": "election_tier"
-                },
-                {
-                    "name": "proposer",
-                    "type": "name"
                 },
                 {
                     "name": "round_id",
@@ -174,64 +196,24 @@
                     "type": "time_point"
                 },
                 {
-                    "name": "elect_N",
-                    "type": "uint32"
-                },
-                {
-                    "name": "eligible_voters",
-                    "type": "uint32"
-                },
-                {
-                    "name": "votes_cast",
-                    "type": "uint32"
-                },
-                {
-                    "name": "tier3_available",
-                    "type": "uint32"
+                    "name": "cursor",
+                    "type": "uint8"
                 },
                 {
                     "name": "seats_filled",
                     "type": "uint8"
                 },
                 {
-                    "name": "voted_bitmap",
-                    "type": "bytes"
-                },
-                {
-                    "name": "c1",
-                    "type": "name"
-                },
-                {
-                    "name": "c2",
-                    "type": "name"
-                },
-                {
-                    "name": "c3",
-                    "type": "name"
-                },
-                {
-                    "name": "yes1",
+                    "name": "backstop_mask",
                     "type": "uint32"
                 },
                 {
-                    "name": "yes2",
-                    "type": "uint32"
+                    "name": "flight_hash",
+                    "type": "checksum256"
                 },
                 {
-                    "name": "yes3",
-                    "type": "uint32"
-                },
-                {
-                    "name": "no1",
-                    "type": "uint32"
-                },
-                {
-                    "name": "no2",
-                    "type": "uint32"
-                },
-                {
-                    "name": "no3",
-                    "type": "uint32"
+                    "name": "round_seed",
+                    "type": "checksum256"
                 },
                 {
                     "name": "acc",
@@ -249,19 +231,92 @@
             "fields": []
         },
         {
+            "name": "flight_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "seat",
+                    "type": "uint64"
+                },
+                {
+                    "name": "round_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "candidates",
+                    "type": "name[]"
+                },
+                {
+                    "name": "automatic",
+                    "type": "bool"
+                },
+                {
+                    "name": "tallies",
+                    "type": "tier_tally[]"
+                }
+            ]
+        },
+        {
+            "name": "flight_vote",
+            "base": "",
+            "fields": [
+                {
+                    "name": "seat",
+                    "type": "uint8"
+                },
+                {
+                    "name": "v1",
+                    "type": "bool"
+                },
+                {
+                    "name": "v2",
+                    "type": "bool"
+                },
+                {
+                    "name": "v3",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
             "name": "forceassign",
             "base": "",
             "fields": [
                 {
+                    "name": "seat",
+                    "type": "uint8"
+                },
+                {
                     "name": "member",
                     "type": "name"
+                },
+                {
+                    "name": "election_gen",
+                    "type": "uint64"
+                },
+                {
+                    "name": "round_id",
+                    "type": "uint64"
                 }
             ]
         },
         {
             "name": "forceback",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "seat",
+                    "type": "uint8"
+                },
+                {
+                    "name": "election_gen",
+                    "type": "uint64"
+                },
+                {
+                    "name": "round_id",
+                    "type": "uint64"
+                }
+            ]
         },
         {
             "name": "index_key",
@@ -298,20 +353,6 @@
             ]
         },
         {
-            "name": "remap_row",
-            "base": "",
-            "fields": [
-                {
-                    "name": "virtual_idx",
-                    "type": "uint64"
-                },
-                {
-                    "name": "actual_idx",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "repcandidate",
             "base": "",
             "fields": [
@@ -332,8 +373,12 @@
                     "type": "name"
                 },
                 {
-                    "name": "expected_round",
-                    "type": "uint64?"
+                    "name": "election_gen",
+                    "type": "uint64"
+                },
+                {
+                    "name": "round_id",
+                    "type": "uint64"
                 }
             ]
         },
@@ -373,6 +418,18 @@
                 {
                     "name": "caller",
                     "type": "name"
+                },
+                {
+                    "name": "election_gen",
+                    "type": "uint64"
+                },
+                {
+                    "name": "round_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "max_steps",
+                    "type": "uint32"
                 }
             ]
         },
@@ -429,6 +486,28 @@
             ]
         },
         {
+            "name": "tier_tally",
+            "base": "",
+            "fields": [
+                {
+                    "name": "votes_cast",
+                    "type": "uint32"
+                },
+                {
+                    "name": "yes1",
+                    "type": "uint32"
+                },
+                {
+                    "name": "yes2",
+                    "type": "uint32"
+                },
+                {
+                    "name": "yes3",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "vote",
             "base": "",
             "fields": [
@@ -437,20 +516,20 @@
                     "type": "name"
                 },
                 {
-                    "name": "v1",
-                    "type": "bool"
+                    "name": "election_gen",
+                    "type": "uint64"
                 },
                 {
-                    "name": "v2",
-                    "type": "bool"
+                    "name": "round_id",
+                    "type": "uint64"
                 },
                 {
-                    "name": "v3",
-                    "type": "bool"
+                    "name": "flight_hash",
+                    "type": "checksum256"
                 },
                 {
-                    "name": "expected_round",
-                    "type": "uint64?"
+                    "name": "votes",
+                    "type": "flight_vote[]"
                 }
             ]
         }
@@ -464,32 +543,32 @@
         {
             "name": "finalizeinit",
             "type": "finalizeinit",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Finalize Election Initialization\nsummary: 'Verify the tier snapshots and open the first seat.'\n---\n\nThe contract owner finalizes initialization: the tier-2 and tier-3 source scans must be complete,\ntheir snapshot sizes are verified against authoritative generation-scoped sysio.roa rows, and the\nfirst council seat's nomination window opens."
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Finalize Election Initialization\nsummary: 'Verify the tier snapshots and open simultaneous nominations.'\n---\n\nThe contract owner finalizes initialization: the tier-2 and tier-3 source scans must be complete,\ntheir snapshot sizes are verified against authoritative generation-scoped sysio.roa rows, and the\nshared nomination window opens for all 21 seats."
         },
         {
             "name": "forceassign",
             "type": "forceassign",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Governance Seat Assignment\nsummary: 'Assign {{nowrap member}} to the current seat.'\n---\n\nThe contract owner seats {{member}} for the current seat. Valid only at the governance backstop,\nreached either after tier-3 exhaustion or through `forceback` recovery of an elapsed attempt."
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Assign a Council Recovery Seat\nsummary: 'Assign {{nowrap member}} to reserved council seat {{seat}}.'\n---\n\nThe contract owner assigns registered, unelected candidate {{member}} to the unfilled governance-reserved seat {{seat}} in election {{election_gen}}, round {{round_id}}. Assignment requires contract-owner authorization and cannot occur during an open voting window. The member's elected flag and seat result update atomically; no member can occupy two seats. Other filled seats and frozen snapshots are preserved."
         },
         {
             "name": "forceback",
             "type": "forceback",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Governance Recovery Backstop\nsummary: 'Move an elapsed active attempt to governance backstop.'\n---\n\nThe contract owner moves an elapsed nomination or voting attempt directly to BACKSTOP. This is an\nexceptional recovery path for an operationally stalled election and cannot be used before the\nactive attempt's inclusive deadline has passed."
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Reserve a Seat for Governance Recovery\nsummary: 'Reserve council seat {{seat}} for manual recovery.'\n---\n\nThe contract owner reserves unfilled seat {{seat}} in election {{election_gen}}, round {{round_id}}, after the applicable nomination or voting window has elapsed. Before voting opens, the withdrawn flight and its position claims are released atomically. Frozen flights remain visible after voting closes. The recovery reservation survives continuation and excludes this seat from ordinary nominations, generation, and tabulation until governance assigns it. Contract-owner authorization is required."
         },
         {
             "name": "loadtier",
             "type": "loadtier",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Load Tier Snapshot\nsummary: 'Append tier-{{nowrap tier}} node owners into the frozen snapshot.'\n---\n\nThe contract owner inspects at most {{max_rows}} node-owner rows from sysio.roa while appending\ntier-{{tier}} identities into the frozen escalation snapshot. A persistent source cursor bounds\nreads as well as writes, and identity deduplication allows a later pass to absorb newly observed\nowners. Called repeatedly until the tier scan is complete."
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Load Tier Snapshot\nsummary: 'Append tier-{{nowrap tier}} node owners into the frozen snapshot.'\n---\n\nThe contract owner inspects at most {{max_rows}} node-owner rows from sysio.roa while appending\ntier-{{tier}} identities into the frozen voting snapshot. A persistent source cursor bounds\nreads as well as writes, and identity deduplication allows a later pass to absorb newly observed\nowners. Called repeatedly until the tier scan is complete."
         },
         {
             "name": "purge",
             "type": "purge",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Purge Election State\nsummary: 'Delete up to {{max_rows}} ephemeral rows from the completed generation.'\n---\n\nThe contract owner deletes at most {{max_rows}} rows from the mode-specific candidate, roster,\ntier-snapshot, remap, and optional partial-council cleanup stages. Completion removes live election\nstate and reopens registration. Completed council history is retained; partial results from an\naborted active election are not."
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Purge Election State\nsummary: 'Delete up to {{max_rows}} ephemeral rows from the completed generation.'\n---\n\nThe contract owner deletes at most {{max_rows}} rows from the mode-specific candidate, roster,\ntier-snapshot, flight, ballot, and optional partial-council cleanup stages. Completion removes live election\nstate and reopens registration. Completed council history is retained; partial results from an\naborted active election are not."
         },
         {
             "name": "repcandidate",
             "type": "repcandidate",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Nominate a Candidate Slate\nsummary: '{{nowrap proposer}} nominates a slate of three candidates.'\n---\n\n{{proposer}} nominates a slate of three distinct, un-elected candidates ({{c1}}, {{c2}}, and\n{{c3}}) for the current seat, opening the voting round. Optional {{expected_round}} binds the\nrequest to a specific round; if the round is stale or elapses during lazy settlement, the action\nfails and rolls back instead of acting as a settlement-only crank. Omitting it preserves the\nsettlement-only behavior.\n\n## Preconditions\n- The caller must be authorized as {{proposer}}.\n- {{proposer}} must be the active proposer for the current seat.\n- The nomination window must not have elapsed.\n- The three candidates must be distinct, registered, and not already elected."
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Nominate or Replace a Council Flight\nsummary: '{{nowrap proposer}} submits an ordered flight for their vacant seat.'\n---\n\n{{proposer}} nominates {{c1}}, {{c2}}, and {{c3}} in priority order for their frozen T1 seat in election {{election_gen}}, round {{round_id}}. Candidates must be distinct, registered, and unelected. Each candidate-position pair can belong to only one flight. During the shared nomination window, a successful replacement releases prior claims and acquires the new claims atomically. A rejected replacement preserves the previous flight. The proposer must authorize this action. Stale identities or elapsed nominations fail; this action never opens voting or acts as a crank."
         },
         {
             "name": "reset",
@@ -504,7 +583,7 @@
         {
             "name": "settle",
             "type": "settle",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Settle Election State\nsummary: '{{nowrap caller}} advances timed-out election state and stirs entropy.'\n---\n\n{{caller}} authorizes a public crank that resolves an elapsed attempt and advances the\nelection while mixing the authenticated caller into the accumulator."
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Advance the Council Round\nsummary: '{{nowrap caller}} advances bounded election work.'\n---\n\nAuthenticated {{caller}} advances election {{election_gen}}, round {{round_id}}, processing at most {{max_steps}} seats (1–21) in the persisted original order. After nominations expire, generation freezes one seed; voting opens only after all flights are finalized. After the shared voting deadline, tabulation processes each seat through T1, T2, T3 and A, B, C, immediately excluding elected members from later seats. A subsequent continuation starts fresh nominations for vacancies while retaining winners and snapshots. Stale identities fail. Exact deadlines do not trigger settlement. This action also contributes public entropy."
         },
         {
             "name": "startinit",
@@ -514,15 +593,23 @@
         {
             "name": "stir",
             "type": "stir",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Stir Entropy\nsummary: '{{nowrap caller}} advances entropy and settles elapsed election state.'\n---\n\n{{caller}} authorizes a public crank that mixes the authenticated caller into the entropy\naccumulator and also advances an elapsed election attempt. Block number and block timestamp are not\nentropy inputs."
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Contribute Council Entropy\nsummary: '{{nowrap caller}} contributes to the public entropy accumulator.'\n---\n\nAuthenticated {{caller}} contributes to the election's deterministic public entropy accumulator. This does not change an already frozen automatic-generation seed or advance election phases. Use settle to drive eligible transitions."
         },
         {
             "name": "vote",
             "type": "vote",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Vote on the Current Slate\nsummary: '{{nowrap voter}} votes on the three current-slate candidates.'\n---\n\n{{voter}} casts an independent yes/no vote on each of the three candidates in the current slate.\nOptional {{expected_round}} binds the ballot to a specific round and makes a stale or\ndeadline-crossing ballot fail instead of silently settling the election.\n\n## Preconditions\n- The caller must be authorized as {{voter}}.\n- Voting must be open for the current slate.\n- {{voter}} must be an eligible voter for the active tier and must not be the proposer.\n- {{voter}} must not have already voted in this round."
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Submit a Council Round Ballot\nsummary: '{{nowrap voter}} submits one immutable ballot for the finalized round.'\n---\n\n{{voter}} submits independent YES/NO decisions in {{votes}} for every eligible flight in ascending seat order. Election {{election_gen}}, round {{round_id}}, and finalized flight commitment {{flight_hash}} must match the active voting window. The voter must authorize the action and belong to a frozen electorate. T1 owners omit their own seat's flight, including automatically generated flights; T2/T3 owners vote on every available flight without implicit YES credit. Ballots cannot be revised or duplicated. Votes and running totals are public. Submissions at the exact deadline are accepted. Results are tabulated only after the shared window closes using fixed electorate thresholds."
         }
     ],
     "tables": [
+        {
+            "name": "ballots",
+            "type": "ballot_row",
+            "index_type": "i64",
+            "key_names": ["scope","account"],
+            "key_types": ["name","uint64"],
+            "table_id": 23362
+        },
         {
             "name": "candidates",
             "type": "candidate_row",
@@ -546,6 +633,14 @@
             "key_names": ["scope","idx"],
             "key_types": ["name","uint64"],
             "table_id": 39085
+        },
+        {
+            "name": "flights",
+            "type": "flight_row",
+            "index_type": "i64",
+            "key_names": ["scope","idx"],
+            "key_types": ["name","uint64"],
+            "table_id": 10538
         },
         {
             "name": "roster",
@@ -599,14 +694,6 @@
                     "table_id": 6673
                 }
             ]
-        },
-        {
-            "name": "tier3remap",
-            "type": "remap_row",
-            "index_type": "i64",
-            "key_names": ["scope","idx"],
-            "key_types": ["name","uint64"],
-            "table_id": 27642
         }
     ],
     "ricardian_clauses": [],
@@ -656,16 +743,20 @@
                     "value": 3
                 },
                 {
-                    "name": "REMAP",
+                    "name": "FLIGHTS",
                     "value": 4
                 },
                 {
-                    "name": "COUNCIL",
+                    "name": "BALLOTS",
                     "value": 5
                 },
                 {
-                    "name": "COMPLETE",
+                    "name": "COUNCIL",
                     "value": 6
+                },
+                {
+                    "name": "COMPLETE",
+                    "value": 7
                 }
             ]
         },
@@ -674,20 +765,28 @@
             "type": "uint8",
             "values": [
                 {
-                    "name": "AWAIT_REP",
+                    "name": "NOMINATING",
                     "value": 0
                 },
                 {
-                    "name": "VOTING",
+                    "name": "GENERATING",
                     "value": 1
                 },
                 {
-                    "name": "BACKSTOP",
+                    "name": "VOTING",
                     "value": 2
                 },
                 {
-                    "name": "DONE",
+                    "name": "TABULATING",
                     "value": 3
+                },
+                {
+                    "name": "CONTINUING",
+                    "value": 4
+                },
+                {
+                    "name": "DONE",
+                    "value": 5
                 }
             ]
         },

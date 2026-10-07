@@ -1,18 +1,20 @@
+#include <sysio/opp/types/types.pb.hpp>
+
+#include <magic_enum/magic_enum.hpp>
+#include <sysio.councl/sysio.councl.hpp>
+#include <sysio.system/emissions.hpp> // shared node-owner caps
+
 #include <algorithm>
 #include <array>
 #include <climits>
 #include <limits>
-#include <magic_enum/magic_enum.hpp>
-#include <sysio.councl/sysio.councl.hpp>
-#include <sysio.roa.hpp>              // roa::roastate_t / roa::nodeowners_t — tier membership
-#include <sysio.system/emissions.hpp> // shared node-owner caps
-#include <sysio/opp/types/types.pb.hpp>
+#include <sysio.roa.hpp> // roa::roastate_t / roa::nodeowners_t — tier membership
 #include <tuple>
 #include <vector>
 
 namespace sysio {
 
-using councl_math::resolve;
+using councl_math::resolve_final;
 using councl_math::round_result;
 
 namespace {
@@ -30,32 +32,22 @@ constexpr name ACTION_FORCE_ASSIGN = "forceasgn"_n; ///< shortened on-chain tag 
 constexpr name ACTION_FORCE_BACKSTOP = "forceback"_n;
 constexpr name ACTION_STIR = "stir"_n;
 
-constexpr uint64_t GR_SCOPE_X_BITS = 40;
-constexpr uint64_t GR_SCOPE_GEN_BITS = 64 - GR_SCOPE_X_BITS;
-constexpr uint64_t GR_SCOPE_X_LIMIT = uint64_t{1} << GR_SCOPE_X_BITS;
-constexpr uint64_t GR_SCOPE_GEN_LIMIT = uint64_t{1} << GR_SCOPE_GEN_BITS;
 constexpr uint32_t INVALID_MEMBER_INDEX = std::numeric_limits<uint32_t>::max();
 
 using NodeOwnerTier = opp::types::NodeOwnerTier;
 
 static_assert(councl::SEATS == sysiosystem::emissions::T1_MAX_NODE_OWNERS,
               "council seats must match the system tier-1 owner cap");
-static_assert(councl_math::win_threshold(councl::T1_VOTERS) + 1 == councl_math::win_threshold(councl::SEATS),
-              "tier-1 and proposer-auto-yes tiers must require the same number of voter approvals");
-static_assert(councl_math::elim_threshold(councl::T1_VOTERS) == councl_math::elim_threshold(councl::SEATS),
-              "tier-1 and proposer-auto-yes tiers must retain equivalent rejection thresholds");
 
 /// Convert a council tier to its stable integer representation for ROA table comparisons.
 constexpr uint8_t tier_integer(councl::election_tier tier) {
    return magic_enum::enum_integer(tier);
 }
 
-static_assert(tier_integer(councl::election_tier::T1) ==
-                 magic_enum::enum_integer(NodeOwnerTier::NODE_OWNER_TIER_T1) &&
+static_assert(tier_integer(councl::election_tier::T1) == magic_enum::enum_integer(NodeOwnerTier::NODE_OWNER_TIER_T1) &&
                  tier_integer(councl::election_tier::T2) ==
                     magic_enum::enum_integer(NodeOwnerTier::NODE_OWNER_TIER_T2) &&
-                 tier_integer(councl::election_tier::T3) ==
-                    magic_enum::enum_integer(NodeOwnerTier::NODE_OWNER_TIER_T3),
+                 tier_integer(councl::election_tier::T3) == magic_enum::enum_integer(NodeOwnerTier::NODE_OWNER_TIER_T3),
               "council and protobuf node-owner tiers must retain identical wire values");
 
 /// Return whether a candidate handle contains only UI-safe printable handle characters.
@@ -139,12 +131,6 @@ checksum256 hash_args(const Args&... args) {
 }
 } // namespace
 
-uint64_t council::gr_scope(uint64_t gen, uint64_t x) {
-   check(gen < GR_SCOPE_GEN_LIMIT, "election generation exceeds scoped-table encoding");
-   check(x < GR_SCOPE_X_LIMIT, "round or seat exceeds scoped-table encoding");
-   return (gen << GR_SCOPE_X_BITS) | x;
-}
-
 // ===========================================================================
 //  Entropy accumulator (Variant B — block number intentionally excluded)
 // ===========================================================================
@@ -188,146 +174,195 @@ uint32_t council::member_index(const config_state& cfg, councl::election_tier ti
 }
 
 // ===========================================================================
-//  Pseudo-random tier proposer selection (§5)
+//  Round state, constrained flights, and final tabulation
 // ===========================================================================
-uint64_t council::selection_index(const election_state& st, uint32_t available) const {
-   check(available > 0, "cannot select from an empty tier");
-   // Seed folds in the seat and round_id so successive selections (even in one block) differ.
-   const uint64_t active_seat = st.active_seat;
-   const uint64_t seed =
-      councl_math::seed_u64(hash_args(st.acc, active_seat, st.round_id).extract_as_byte_array());
-   return councl_math::bounded_index(seed, available);
+void council::check_round(const config_state& cfg, const election_state& st, uint64_t generation,
+                          uint64_t round) const {
+   check(cfg.init_phase == councl::init_phase::READY, "election is not running");
+   check(generation == cfg.election_gen, "election generation does not match");
+   check(round == st.round_id, "round does not match");
 }
 
-name council::select_tier2_proposer(const election_state& st, const config_state& cfg) const {
-   tier2_t t2(get_self(), cfg.election_gen);
-   return t2.get(index_key{selection_index(st, cfg.n2)}, "tier-2 index out of range").owner;
+bool council::in_backstop(const election_state& st, uint8_t seat) {
+   return (st.backstop_mask & (uint32_t{1} << seat)) != 0;
 }
 
-name council::select_tier3_proposer(election_state& st, const config_state& cfg) {
-   // Lazy Fisher-Yates remap: select and remove one virtual slot in O(1) KV operations.
-   const uint32_t avail = st.tier3_available;
-   const uint64_t j = selection_index(st, avail);
-   tier3_remap_t remap(get_self(), gr_scope(cfg.election_gen, st.active_seat));
-   const uint64_t last = avail - 1;
-   const auto selected_key = index_key{j};
-   const auto last_key = index_key{last};
-   const auto selected = remap.try_get(selected_key);
-   const auto last_value = j == last ? selected : remap.try_get(last_key);
-   const uint64_t actual = selected ? selected->actual_idx : j;
-   const uint64_t replacement = last_value ? last_value->actual_idx : last;
-
-   if (j != last)
-      remap.set(RAM_PAYER, selected_key, remap_row{j, replacement});
-   if (last_value)
-      remap.erase(last_key);
-
-   --st.tier3_available;
-   tier3_t t3(get_self(), cfg.election_gen);
-   return t3.get(index_key{actual}, "tier-3 index missing").owner;
-}
-
-// ===========================================================================
-//  State machine internals
-// ===========================================================================
-void council::open_tier_attempt(election_state& st, councl::election_tier tier, name proposer) {
-   st.tier = tier;
-   st.proposer = proposer;
+void council::open_round(election_state& st) {
+   check(st.round_id < std::numeric_limits<uint64_t>::max(), "round identity exhausted");
    ++st.round_id;
-   st.phase = councl::election_phase::AWAIT_REP;
+   st.phase = councl::election_phase::NOMINATING;
    st.round_open_ts = current_time_point();
    st.vote_deadline = time_point{};
-   st.elect_N = 0;
-   st.eligible_voters = 0;
-   st.votes_cast = 0;
-   st.voted_bitmap.clear();
-   st.c1 = st.c2 = st.c3 = name{};
-   st.yes1 = st.yes2 = st.yes3 = 0;
-   st.no1 = st.no2 = st.no3 = 0;
+   st.cursor = 0;
+   st.flight_hash = checksum256{};
+   st.round_seed = checksum256{};
 }
 
-void council::advance_seat(election_state& st, const config_state& cfg) {
-   if (st.seats_filled >= councl::SEATS) {
-      st.phase = councl::election_phase::DONE;
-      return;
+void council::save_flight(const config_state& cfg, const election_state& st, uint8_t seat,
+                          const std::vector<name>& candidates, bool automatic) {
+   check(candidates.size() == councl::SLATE_SIZE, "flight must contain three candidates");
+   check(candidates[0] != candidates[1] && candidates[0] != candidates[2] && candidates[1] != candidates[2],
+         "slate candidates must be distinct");
+   candidates_t registry(get_self(), cfg.election_gen);
+   // Validate against the other seats before releasing anything. Retained own claims are valid.
+   for (uint8_t pos = 0; pos < councl::SLATE_SIZE; ++pos) {
+      const auto candidate = registry.get(cand_key{candidates[pos].value}, "candidate not registered");
+      check(!candidate.elected, "candidate already elected to a seat");
+      check(candidate.claim_round != st.round_id || candidate.positions[pos] == councl::NO_SEAT ||
+               candidate.positions[pos] == seat,
+            "candidate position is reserved by another flight");
    }
-   ++st.active_seat;
-   st.tier3_available = cfg.n3;
-   open_tier_attempt(st, councl::election_tier::T1, roster_owner(cfg, st.active_seat));
+
+   release_flight(cfg, st, seat);
+   for (uint8_t pos = 0; pos < councl::SLATE_SIZE; ++pos)
+      registry.modify(same_payer, cand_key{candidates[pos].value}, [&](auto& row) {
+         if (row.claim_round != st.round_id) {
+            row.claim_round = st.round_id;
+            row.positions.assign(councl::SLATE_SIZE, councl::NO_SEAT);
+         }
+         row.positions[pos] = seat;
+      });
+   flights_t(get_self(), cfg.election_gen)
+      .set(RAM_PAYER, index_key{seat}, flight_row{seat, st.round_id, candidates, automatic});
 }
 
-void council::fail_attempt(election_state& st, const config_state& cfg) {
-   if (st.tier == councl::election_tier::T1 && cfg.n2 > 0) {
-      name proposer = select_tier2_proposer(st, cfg);
-      open_tier_attempt(st, councl::election_tier::T2, proposer);
+void council::release_flight(const config_state& cfg, const election_state& st, uint8_t seat) {
+   flights_t flights(get_self(), cfg.election_gen);
+   const auto previous = flights.try_get(index_key{seat});
+   if (!previous)
       return;
-   }
-
-   if (st.tier3_available == 0) {
-      st.phase = councl::election_phase::BACKSTOP;
-      return;
-   }
-
-   name proposer = select_tier3_proposer(st, cfg);
-   open_tier_attempt(st, councl::election_tier::T3, proposer);
+   candidates_t registry(get_self(), cfg.election_gen);
+   if (previous->round_id == st.round_id)
+      for (uint8_t pos = 0; pos < previous->candidates.size(); ++pos)
+         registry.modify(same_payer, cand_key{previous->candidates[pos].value}, [&](auto& row) {
+            if (row.claim_round == st.round_id && row.positions[pos] == seat)
+               row.positions[pos] = councl::NO_SEAT;
+         });
+   flights.erase(index_key{seat});
 }
 
-void council::seat_member(election_state& st, const config_state& cfg, name member, councl::election_tier filled_tier,
-                          name proposer) {
-   candidates_t cands(get_self(), cfg.election_gen);
-   cands.modify(
+void council::generate_flights(election_state& st, const config_state& cfg, uint32_t max_steps) {
+   candidates_t registry(get_self(), cfg.election_gen);
+   // One bounded pool read per transaction; subsequent constrained draws use memory only.
+   std::vector<candidate_row> pool;
+   pool.reserve(cfg.cand_count);
+   for (auto it = registry.begin(); it != registry.end(); ++it) {
+      check(pool.size() < councl::MAX_CANDIDATES, "candidate pool exceeds the safety limit");
+      pool.push_back(*it);
+   }
+   flights_t flights(get_self(), cfg.election_gen);
+   council_t results(get_self(), cfg.election_gen);
+   for (uint32_t step = 0; step < max_steps && st.cursor < councl::SEATS; ++step, ++st.cursor) {
+      const uint8_t seat = st.cursor;
+      if (results.contains(index_key{seat}) || in_backstop(st, seat))
+         continue;
+      const auto existing = flights.try_get(index_key{seat});
+      if (existing && existing->round_id == st.round_id)
+         continue;
+      std::vector<name> candidates;
+      for (uint8_t pos = 0; pos < councl::SLATE_SIZE; ++pos) {
+         std::vector<size_t> available;
+         for (size_t i = 0; i < pool.size(); ++i) {
+            const auto& candidate = pool[i];
+            if (!candidate.elected &&
+                (candidate.claim_round != st.round_id || candidate.positions[pos] == councl::NO_SEAT) &&
+                std::find(candidates.begin(), candidates.end(), candidate.account) == candidates.end())
+               available.push_back(i);
+         }
+         if (available.empty())
+            break;
+         const auto seed = councl_math::seed_u64(
+            hash_args(st.round_seed, cfg.election_gen, st.round_id, seat, pos).extract_as_byte_array());
+         candidates.push_back(pool[available[councl_math::bounded_index(seed, available.size())]].account);
+      }
+      // Defensive fallback only: the 23-candidate minimum guarantees completion under normal invariants.
+      if (candidates.size() != councl::SLATE_SIZE)
+         continue;
+      save_flight(cfg, st, seat, candidates, true);
+      for (uint8_t pos = 0; pos < councl::SLATE_SIZE; ++pos)
+         for (auto& candidate : pool)
+            if (candidate.account == candidates[pos]) {
+               if (candidate.claim_round != st.round_id) {
+                  candidate.claim_round = st.round_id;
+                  candidate.positions.assign(councl::SLATE_SIZE, councl::NO_SEAT);
+               }
+               candidate.positions[pos] = seat;
+               break;
+            }
+   }
+   if (st.cursor == councl::SEATS)
+      open_voting(st, cfg);
+}
+
+void council::open_voting(election_state& st, const config_state& cfg) {
+   flights_t flights(get_self(), cfg.election_gen);
+   council_t results(get_self(), cfg.election_gen);
+   st.flight_hash = hash_args(cfg.election_gen, st.round_id);
+   for (uint8_t seat = 0; seat < councl::SEATS; ++seat) {
+      const auto flight = flights.try_get(index_key{seat});
+      const std::vector<name> candidates =
+         flight && flight->round_id == st.round_id && !results.contains(index_key{seat}) && !in_backstop(st, seat)
+            ? flight->candidates
+            : std::vector<name>{};
+      st.flight_hash = hash_args(st.flight_hash, seat, candidates);
+   }
+   st.phase = councl::election_phase::VOTING;
+   st.vote_deadline = current_time_point() + sysio::seconds(cfg.time_slot_sec);
+   st.cursor = 0;
+}
+
+void council::seat_member(election_state& st, const config_state& cfg, uint8_t seat, name member,
+                          councl::election_tier filled_tier) {
+   check(seat < councl::SEATS, "invalid council seat");
+   council_t results(get_self(), cfg.election_gen);
+   check(!results.contains(index_key{seat}), "seat already filled");
+   candidates_t registry(get_self(), cfg.election_gen);
+   registry.modify(
       same_payer, cand_key{member.value},
       [&](auto& candidate) {
          check(!candidate.elected, "candidate already elected to a seat");
          candidate.elected = true;
       },
       "member is not a candidate");
-
-   council_t council(get_self(), cfg.election_gen);
-   council.emplace(RAM_PAYER, index_key{st.active_seat},
-                   council_row{
-                      .seat = st.active_seat,
-                      .seat_owner = roster_owner(cfg, st.active_seat),
-                      .filled_tier = filled_tier,
-                      .proposer = proposer,
-                      .member = member,
-                   });
+   const name owner = roster_owner(cfg, seat);
+   results.emplace(RAM_PAYER, index_key{seat},
+                   council_row{seat, owner, filled_tier,
+                               filled_tier == councl::election_tier::GOVERNANCE ? get_self() : owner, member,
+                               st.round_id});
+   st.backstop_mask &= ~(uint32_t{1} << seat);
    ++st.seats_filled;
-   advance_seat(st, cfg);
+   if (st.seats_filled == councl::SEATS)
+      st.phase = councl::election_phase::DONE;
 }
 
-void council::win_attempt(election_state& st, const config_state& cfg, name winner) {
-   seat_member(st, cfg, winner, st.tier, st.proposer);
-}
-
-void council::try_resolve(election_state& st, const config_state& cfg) {
-   if (st.phase != councl::election_phase::VOTING)
-      return;
-
-   const bool all_voted = st.votes_cast >= st.eligible_voters;
-   // Both nomination and voting windows are inclusive at the exact deadline.
-   const bool deadline = current_time_point() > st.vote_deadline;
-
-   auto r = resolve(std::array<uint64_t, councl::SLATE_SIZE>{st.yes1, st.yes2, st.yes3},
-                    std::array<uint64_t, councl::SLATE_SIZE>{st.no1, st.no2, st.no3}, st.elect_N, all_voted, deadline);
-
-   if (r.result == round_result::PENDING)
-      return;
-   if (r.result == round_result::WIN) {
-      name w = (r.winner_index == 0) ? st.c1 : (r.winner_index == 1 ? st.c2 : st.c3);
-      win_attempt(st, cfg, w);
-   } else {
-      fail_attempt(st, cfg);
+void council::tabulate(election_state& st, const config_state& cfg, uint32_t max_steps) {
+   flights_t flights(get_self(), cfg.election_gen);
+   council_t results(get_self(), cfg.election_gen);
+   candidates_t registry(get_self(), cfg.election_gen);
+   const std::array<uint32_t, 3> electorate{councl::T1_VOTERS, cfg.n2, cfg.n3};
+   const std::array<councl::election_tier, 3> tiers{councl::election_tier::T1, councl::election_tier::T2,
+                                                    councl::election_tier::T3};
+   for (uint32_t step = 0; step < max_steps && st.cursor < councl::SEATS; ++step, ++st.cursor) {
+      const uint8_t seat = st.cursor;
+      if (results.contains(index_key{seat}) || in_backstop(st, seat))
+         continue;
+      const auto flight = flights.try_get(index_key{seat});
+      if (!flight || flight->round_id != st.round_id || flight->candidates.size() != councl::SLATE_SIZE)
+         continue;
+      std::array<bool, councl::SLATE_SIZE> elected{};
+      for (uint8_t pos = 0; pos < councl::SLATE_SIZE; ++pos)
+         elected[pos] = registry.get(cand_key{flight->candidates[pos].value}).elected;
+      for (size_t tier = 0; tier < tiers.size(); ++tier) {
+         const auto& tally = flight->tallies[tier];
+         const auto resolution = resolve_final({tally.yes1, tally.yes2, tally.yes3}, elected, electorate[tier]);
+         if (resolution.result == round_result::WIN) {
+            seat_member(st, cfg, seat, flight->candidates[resolution.winner_index], tiers[tier]);
+            break;
+         }
+      }
    }
-}
-
-void council::resolve_or_settle(election_state& st, const config_state& cfg) {
-   if (st.phase == councl::election_phase::AWAIT_REP) {
-      if (current_time_point() > st.round_open_ts + sysio::seconds(cfg.time_slot_sec))
-         fail_attempt(st, cfg); // active proposer missed the nomination window
-   } else if (st.phase == councl::election_phase::VOTING) {
-      try_resolve(st, cfg);
-   }
+   if (st.cursor == councl::SEATS && st.phase != councl::election_phase::DONE)
+      st.phase = councl::election_phase::CONTINUING;
 }
 
 // ===========================================================================
@@ -420,6 +455,7 @@ void council::loadtier(uint8_t tier, uint32_t max_rows) {
             (*election_tier == councl::election_tier::T2 || *election_tier == councl::election_tier::T3),
          "tier must be T2 or T3");
    check(max_rows > 0, "max_rows must be positive");
+   check(max_rows <= councl::MAX_BATCH_ROWS, "max_rows exceeds the safety limit");
    config_t cg(get_self());
    config_state cfg = cg.get("contract not initialized");
    check(cfg.init_phase == councl::init_phase::LOADING, "not in the loading phase");
@@ -484,14 +520,9 @@ void council::finalizeinit() {
    cfg.init_phase = councl::init_phase::READY;
    cg.set(cfg, RAM_PAYER);
 
-   // Open seat 0 with a fresh accumulator seeded from the generation.
    election_state st{};
    st.acc = hash_args(ACC_SEED_TAG, cfg.election_gen);
-   st.stir_count = 0;
-   st.active_seat = 0;
-   st.seats_filled = 0;
-   st.tier3_available = cfg.n3;
-   open_tier_attempt(st, councl::election_tier::T1, roster_owner(cfg, 0));
+   open_round(st);
    state_t(get_self()).set(st, RAM_PAYER);
 }
 
@@ -505,8 +536,7 @@ void council::reset() {
       cfg.cleanup_mode = councl::cleanup_mode::INIT_ABORT;
       cfg.cleanup_stage = councl::cleanup_stage::ROSTER;
    } else {
-      check(cfg.init_phase == councl::init_phase::READY,
-            "reset requires a loading or active election generation");
+      check(cfg.init_phase == councl::init_phase::READY, "reset requires a loading or active election generation");
       state_t sg(get_self());
       const election_state st = sg.get("election state missing");
       cfg.cleanup_mode = st.phase == councl::election_phase::DONE ? councl::cleanup_mode::COMPLETED
@@ -515,13 +545,13 @@ void council::reset() {
    }
 
    cfg.init_phase = councl::init_phase::CLEANING;
-   cfg.cleanup_seat = 0;
    cg.set(cfg, RAM_PAYER);
 }
 
 void council::purge(uint32_t max_rows) {
    require_auth(get_self());
    check(max_rows > 0, "max_rows must be positive");
+   check(max_rows <= councl::MAX_BATCH_ROWS, "max_rows exceeds the safety limit");
 
    config_t cg(get_self());
    config_state cfg = cg.get("contract not initialized");
@@ -564,24 +594,27 @@ void council::purge(uint32_t max_rows) {
          const auto result = erase_rows(table, remaining);
          erased = result.erased;
          if (result.drained) {
-            cfg.cleanup_stage = cfg.cleanup_mode == councl::cleanup_mode::INIT_ABORT
-                                   ? councl::cleanup_stage::COMPLETE
-                                   : councl::cleanup_stage::REMAP;
+            cfg.cleanup_stage = cfg.cleanup_mode == councl::cleanup_mode::INIT_ABORT ? councl::cleanup_stage::COMPLETE
+                                                                                     : councl::cleanup_stage::FLIGHTS;
          }
          break;
       }
-      case councl::cleanup_stage::REMAP: {
-         tier3_remap_t table(get_self(), gr_scope(cfg.election_gen, cfg.cleanup_seat));
+      case councl::cleanup_stage::FLIGHTS: {
+         flights_t table(get_self(), cfg.election_gen);
          const auto result = erase_rows(table, remaining);
          erased = result.erased;
-         if (result.drained) {
-            ++cfg.cleanup_seat;
-            if (cfg.cleanup_seat >= councl::SEATS) {
-               cfg.cleanup_stage = cfg.cleanup_mode == councl::cleanup_mode::ACTIVE_ABORT
-                                      ? councl::cleanup_stage::COUNCIL
-                                      : councl::cleanup_stage::COMPLETE;
-            }
-         }
+         if (result.drained)
+            cfg.cleanup_stage = councl::cleanup_stage::BALLOTS;
+         break;
+      }
+      case councl::cleanup_stage::BALLOTS: {
+         ballots_t table(get_self(), cfg.election_gen);
+         const auto result = erase_rows(table, remaining);
+         erased = result.erased;
+         if (result.drained)
+            cfg.cleanup_stage = cfg.cleanup_mode == councl::cleanup_mode::ACTIVE_ABORT
+                                   ? councl::cleanup_stage::COUNCIL
+                                   : councl::cleanup_stage::COMPLETE;
          break;
       }
       case councl::cleanup_stage::COUNCIL: {
@@ -604,6 +637,7 @@ void council::purge(uint32_t max_rows) {
       check(cfg.cleanup_mode != councl::cleanup_mode::NONE, "cleanup mode is not set");
       const bool preserve_registry = cfg.cleanup_mode == councl::cleanup_mode::INIT_ABORT;
       if (!preserve_registry) {
+         check(cfg.election_gen < std::numeric_limits<uint64_t>::max(), "election generation exhausted");
          ++cfg.election_gen;
          cfg.cand_count = 0;
       }
@@ -613,7 +647,6 @@ void council::purge(uint32_t max_rows) {
       cfg.t2_cursor = cfg.t3_cursor = 0;
       cfg.t2_scan_complete = cfg.t3_scan_complete = false;
       cfg.cleanup_mode = councl::cleanup_mode::NONE;
-      cfg.cleanup_seat = 0;
       state_t(get_self()).remove();
    }
    cg.set(cfg, RAM_PAYER);
@@ -622,175 +655,154 @@ void council::purge(uint32_t max_rows) {
 // ===========================================================================
 //  Election
 // ===========================================================================
-void council::repcandidate(name proposer, name c1, name c2, name c3, std::optional<uint64_t> expected_round) {
+void council::repcandidate(name proposer, name c1, name c2, name c3, uint64_t election_gen, uint64_t round_id) {
    require_auth(proposer);
-   config_t cg(get_self());
-   config_state cfg = cg.get("contract not initialized");
-   check(cfg.init_phase == councl::init_phase::READY, "election is not running");
-
+   const auto cfg = config_t(get_self()).get("contract not initialized");
    state_t sg(get_self());
-   election_state st = sg.get("election state missing");
-   if (expected_round.has_value())
-      check(*expected_round == st.round_id, "round does not match expected_round");
-   do_stir(st, ACTION_REPCANDIDATE, proposer);
-   const uint64_t prior_round = st.round_id;
-   const auto prior_phase = st.phase;
-   resolve_or_settle(st, cfg);
-   if (st.round_id != prior_round || st.phase != prior_phase) {
-      check(!expected_round.has_value(), "round elapsed before nomination could be applied");
-      sg.set(st, RAM_PAYER);
-      return; // stale nomination acted only as a caller-authenticated settlement crank
-   }
-
-   check(st.phase == councl::election_phase::AWAIT_REP, "not accepting nominations right now");
+   auto st = sg.get("election state missing");
+   check_round(cfg, st, election_gen, round_id);
+   check(st.phase == councl::election_phase::NOMINATING, "not accepting nominations right now");
    check(current_time_point() <= st.round_open_ts + sysio::seconds(cfg.time_slot_sec),
          "nomination deadline has elapsed");
-   check(proposer == st.proposer, "not your turn to nominate");
-   check(c1 != c2 && c1 != c3 && c2 != c3, "slate candidates must be distinct");
-
-   candidates_t cands(get_self(), cfg.election_gen);
-   const std::array<name, councl::SLATE_SIZE> slate{c1, c2, c3};
-   for (name c : slate) {
-      auto cr = cands.get(cand_key{c.value}, "candidate not registered");
-      check(!cr.elected, "candidate already elected to a seat");
-   }
-
-   // Open the voting round; tier-2/3 seed the proposer's auto-yes on all three candidates.
-   st.c1 = c1;
-   st.c2 = c2;
-   st.c3 = c3;
-   uint32_t bitmap_members = 0;
-   if (st.tier == councl::election_tier::T1) {
-      st.elect_N = councl::T1_VOTERS;
-      st.eligible_voters = councl::T1_VOTERS;
-      bitmap_members = councl::SEATS;
-      st.yes1 = st.yes2 = st.yes3 = 0;
-   } else {
-      const uint32_t N = st.tier == councl::election_tier::T2 ? cfg.n2 : cfg.n3;
-      st.elect_N = N;
-      st.eligible_voters = (N > 0) ? (N - 1) : 0;
-      bitmap_members = N;
-      st.yes1 = st.yes2 = st.yes3 = 1; // proposer auto-yes
-   }
-   st.voted_bitmap.assign((bitmap_members + CHAR_BIT - 1) / CHAR_BIT, 0);
-   st.no1 = st.no2 = st.no3 = 0;
-   st.votes_cast = 0;
-   st.phase = councl::election_phase::VOTING;
-   st.vote_deadline = current_time_point() + sysio::seconds(cfg.time_slot_sec);
-
-   try_resolve(st, cfg); // resolves immediately when the electorate is trivially small
+   const auto seat = member_index(cfg, councl::election_tier::T1, proposer);
+   check(seat != INVALID_MEMBER_INDEX, "only a frozen tier-1 owner may nominate");
+   council_t results(get_self(), cfg.election_gen);
+   check(!results.contains(index_key{seat}), "seat already filled");
+   check(!in_backstop(st, seat), "seat is reserved for governance");
+   save_flight(cfg, st, seat, {c1, c2, c3}, false);
+   do_stir(st, ACTION_REPCANDIDATE, proposer);
    sg.set(st, RAM_PAYER);
 }
 
-void council::vote(name voter, bool v1, bool v2, bool v3, std::optional<uint64_t> expected_round) {
+void council::vote(name voter, uint64_t election_gen, uint64_t round_id, checksum256 flight_hash,
+                   std::vector<flight_vote> votes) {
    require_auth(voter);
-   config_t cg(get_self());
-   config_state cfg = cg.get("contract not initialized");
-   check(cfg.init_phase == councl::init_phase::READY, "election is not running");
-
+   const auto cfg = config_t(get_self()).get("contract not initialized");
    state_t sg(get_self());
-   election_state st = sg.get("election state missing");
-   if (expected_round.has_value())
-      check(*expected_round == st.round_id, "round does not match expected_round");
-   do_stir(st, ACTION_VOTE, voter);
-   const uint64_t prior_round = st.round_id;
-   const auto prior_phase = st.phase;
-   resolve_or_settle(st, cfg);
-   if (st.round_id != prior_round || st.phase != prior_phase) {
-      check(!expected_round.has_value(), "round elapsed before vote could be applied");
-      sg.set(st, RAM_PAYER);
-      return; // stale vote acted only as a caller-authenticated settlement crank
-   }
-
+   auto st = sg.get("election state missing");
+   check_round(cfg, st, election_gen, round_id);
    check(st.phase == councl::election_phase::VOTING, "voting is not open");
    check(current_time_point() <= st.vote_deadline, "voting deadline has elapsed");
-   check(voter != st.proposer, "the proposer cannot vote on their own slate");
-   const uint32_t voter_index = member_index(cfg, st.tier, voter);
-   check(voter_index != INVALID_MEMBER_INDEX, "not eligible to vote in this tier");
-   const uint32_t byte_index = voter_index / CHAR_BIT;
-   const uint8_t bit_mask = uint8_t{1} << (voter_index % CHAR_BIT);
-   check(byte_index < st.voted_bitmap.size(), "voter index exceeds the frozen tier snapshot");
-   check((st.voted_bitmap[byte_index] & bit_mask) == 0, "already voted in this round");
-   st.voted_bitmap[byte_index] |= bit_mask;
-
-   if (v1)
-      ++st.yes1;
-   else
-      ++st.no1;
-   if (v2)
-      ++st.yes2;
-   else
-      ++st.no2;
-   if (v3)
-      ++st.yes3;
-   else
-      ++st.no3;
-   ++st.votes_cast;
-
-   try_resolve(st, cfg);
+   check(flight_hash == st.flight_hash, "flight set does not match");
+   councl::election_tier tier = councl::election_tier::T1;
+   const uint32_t own_seat = member_index(cfg, tier, voter);
+   if (own_seat == INVALID_MEMBER_INDEX) {
+      tier = councl::election_tier::T2;
+      if (member_index(cfg, tier, voter) == INVALID_MEMBER_INDEX) {
+         tier = councl::election_tier::T3;
+         check(member_index(cfg, tier, voter) != INVALID_MEMBER_INDEX, "not eligible to vote");
+      }
+   }
+   ballots_t ballots(get_self(), cfg.election_gen);
+   const auto previous = ballots.try_get(cand_key{voter.value});
+   check(!previous || previous->round_id != st.round_id, "already voted in this round");
+   check(votes.size() <= councl::SEATS, "too many flight votes");
+   flights_t flights(get_self(), cfg.election_gen);
+   council_t results(get_self(), cfg.election_gen);
+   size_t index = 0;
+   for (uint8_t seat = 0; seat < councl::SEATS; ++seat) {
+      if (seat == own_seat || results.contains(index_key{seat}) || in_backstop(st, seat))
+         continue;
+      const auto flight = flights.try_get(index_key{seat});
+      if (!flight || flight->round_id != st.round_id || flight->candidates.size() != councl::SLATE_SIZE)
+         continue;
+      check(index < votes.size() && votes[index].seat == seat, "ballot must cover every eligible flight in seat order");
+      const auto& decision = votes[index++];
+      flights.modify(same_payer, index_key{seat}, [&](auto& row) {
+         auto& tally = row.tallies[tier_integer(tier) - 1];
+         ++tally.votes_cast;
+         tally.yes1 += decision.v1;
+         tally.yes2 += decision.v2;
+         tally.yes3 += decision.v3;
+      });
+   }
+   check(index == votes.size(), "ballot includes an ineligible flight");
+   ballots.set(RAM_PAYER, cand_key{voter.value}, ballot_row{voter, st.round_id, tier, flight_hash, votes});
+   do_stir(st, ACTION_VOTE, voter);
    sg.set(st, RAM_PAYER);
 }
 
-void council::settle(name caller) {
+void council::settle(name caller, uint64_t election_gen, uint64_t round_id, uint32_t max_steps) {
    require_auth(caller);
-   config_t cg(get_self());
-   config_state cfg = cg.get("contract not initialized");
-   check(cfg.init_phase == councl::init_phase::READY, "election is not running");
-
+   check(max_steps > 0 && max_steps <= councl::SEATS, "max_steps must be between 1 and 21");
+   const auto cfg = config_t(get_self()).get("contract not initialized");
    state_t sg(get_self());
-   election_state st = sg.get("election state missing");
-   check(st.phase != councl::election_phase::DONE, "election is complete");
+   auto st = sg.get("election state missing");
+   check_round(cfg, st, election_gen, round_id);
+   if (st.phase == councl::election_phase::DONE)
+      return;
    do_stir(st, ACTION_SETTLE, caller);
-   resolve_or_settle(st, cfg);
+   switch (st.phase) {
+   case councl::election_phase::NOMINATING:
+      if (current_time_point() > st.round_open_ts + sysio::seconds(cfg.time_slot_sec)) {
+         st.phase = councl::election_phase::GENERATING;
+         st.cursor = 0;
+         st.round_seed = hash_args(st.acc, cfg.election_gen, st.round_id);
+      }
+      break;
+   case councl::election_phase::GENERATING:
+      generate_flights(st, cfg, max_steps);
+      break;
+   case councl::election_phase::VOTING:
+      if (current_time_point() > st.vote_deadline) {
+         st.phase = councl::election_phase::TABULATING;
+         st.cursor = 0;
+      }
+      break;
+   case councl::election_phase::TABULATING:
+      tabulate(st, cfg, max_steps);
+      break;
+   case councl::election_phase::CONTINUING:
+      open_round(st);
+      break;
+   case councl::election_phase::DONE:
+      break;
+   }
    sg.set(st, RAM_PAYER);
 }
 
-void council::forceback() {
+void council::forceback(uint8_t seat, uint64_t election_gen, uint64_t round_id) {
    require_auth(get_self());
-   config_t cg(get_self());
-   config_state cfg = cg.get("contract not initialized");
-   check(cfg.init_phase == councl::init_phase::READY, "election is not running");
-
+   check(seat < councl::SEATS, "invalid council seat");
+   const auto cfg = config_t(get_self()).get("contract not initialized");
    state_t sg(get_self());
-   election_state st = sg.get("election state missing");
-   check(st.phase == councl::election_phase::AWAIT_REP || st.phase == councl::election_phase::VOTING,
-         "no active attempt is eligible for governance recovery");
-
-   const bool elapsed = st.phase == councl::election_phase::AWAIT_REP
-                           ? current_time_point() > st.round_open_ts + sysio::seconds(cfg.time_slot_sec)
-                           : current_time_point() > st.vote_deadline;
-   check(elapsed, "the active attempt has not elapsed");
-
+   auto st = sg.get("election state missing");
+   check_round(cfg, st, election_gen, round_id);
+   council_t results(get_self(), cfg.election_gen);
+   check(!results.contains(index_key{seat}), "seat already filled");
+   const bool nomination =
+      st.phase == councl::election_phase::NOMINATING || st.phase == councl::election_phase::GENERATING;
+   check(current_time_point() > (nomination ? st.round_open_ts + sysio::seconds(cfg.time_slot_sec) : st.vote_deadline),
+         "the active round has not elapsed");
+   st.backstop_mask |= uint32_t{1} << seat;
+   if (nomination)
+      release_flight(cfg, st, seat);
    do_stir(st, ACTION_FORCE_BACKSTOP, get_self());
-   st.phase = councl::election_phase::BACKSTOP;
    sg.set(st, RAM_PAYER);
 }
 
-void council::forceassign(name member) {
+void council::forceassign(uint8_t seat, name member, uint64_t election_gen, uint64_t round_id) {
    require_auth(get_self());
-   config_t cg(get_self());
-   config_state cfg = cg.get("contract not initialized");
-   check(cfg.init_phase == councl::init_phase::READY, "election is not running");
-
+   check(seat < councl::SEATS, "invalid council seat");
+   const auto cfg = config_t(get_self()).get("contract not initialized");
    state_t sg(get_self());
-   election_state st = sg.get("election state missing");
+   auto st = sg.get("election state missing");
+   check_round(cfg, st, election_gen, round_id);
+   check(in_backstop(st, seat), "seat is not awaiting a governance assignment");
+   check(st.phase != councl::election_phase::VOTING || current_time_point() > st.vote_deadline,
+         "voting deadline has not elapsed");
+   seat_member(st, cfg, seat, member, councl::election_tier::GOVERNANCE);
    do_stir(st, ACTION_FORCE_ASSIGN, get_self());
-   check(st.phase == councl::election_phase::BACKSTOP, "not awaiting a governance assignment");
-
-   seat_member(st, cfg, member, councl::election_tier::GOVERNANCE, get_self());
    sg.set(st, RAM_PAYER);
 }
 
 void council::stir(name caller) {
    require_auth(caller);
-   config_t cg(get_self());
-   config_state cfg = cg.get("contract not initialized");
+   const auto cfg = config_t(get_self()).get("contract not initialized");
    check(cfg.init_phase == councl::init_phase::READY, "election is not running");
    state_t sg(get_self());
-   election_state st = sg.get("election has not started");
-   check(st.phase != councl::election_phase::DONE, "election is complete");
+   auto st = sg.get("election state missing");
    do_stir(st, ACTION_STIR, caller);
-   resolve_or_settle(st, cfg);
    sg.set(st, RAM_PAYER);
 }
 
