@@ -777,6 +777,10 @@
                 {
                     "name": "challenge_extra",
                     "type": "uint64"
+                },
+                {
+                    "name": "min_desyndicate",
+                    "type": "uint64"
                 }
             ]
         },
@@ -878,6 +882,10 @@
                 },
                 {
                     "name": "challenge_extra",
+                    "type": "uint64"
+                },
+                {
+                    "name": "min_desyndicate",
                     "type": "uint64"
                 }
             ]

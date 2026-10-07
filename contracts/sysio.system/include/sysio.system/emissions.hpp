@@ -104,10 +104,8 @@ struct [[sysio::table("emitcfg"), sysio::contract("sysio.system")]] emission_con
    int64_t   annual_min_emission;     // per-year floor
 
    // Category splits (basis points). compute + capex + governance must
-   // sum to <= 10000; the remainder is the implicit capital reserve drained
-   // lazily by sysio.dclaim::onreward via sysio.system::fundclaim, not at
-   // payepoch. Sum == 10000 means no implicit reserve (capital draws eat
-   // future periods' headroom).
+   // sum to <= 10000; any unallocated remainder stays in the treasury.
+   // LIQ yield draws no treasury bonus.
    uint16_t  compute_bps;
    uint16_t  capex_bps;
    uint16_t  governance_bps;
@@ -260,8 +258,8 @@ using payclaims_t = sysio::kv::table<"payclaims"_n, payclaim_key, pay_claim>;
 //
 // The WIRE backing unclaimed rows sits in sysio's token balance but is already owed, so every
 // gate that spends against that balance must reserve it -- otherwise the treasury double-commits
-// and a later `claimpay` fails on overdraw, stranding earned pay. Two readers depend on it:
-// `sysio.system::fundclaim` (its balance cap) and `sysio.epoch`'s emissions readiness gate.
+// and a later `claimpay` fails on overdraw, stranding earned pay. Treasury withdrawals
+// and `sysio.epoch`'s emissions readiness gate reserve this total.
 //
 // Held as a maintained counter rather than recomputed by scanning `payclaims`, because the epoch
 // gate reads it on EVERY advance and an O(rows) scan there would grow with the standby set. Kept
@@ -307,12 +305,6 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
    // chains see length 0.
    std::vector<uint32_t>  batch_group_epochs;
 
-   // Cumulative shortfall (WIRE subunits) between requested and actually-
-   // funded capital draws. fundclaim caps each request at the remaining
-   // pool; any unfunded delta is added here so under-sized pools are
-   // visible without breaking the OPP-handler never-throw contract.
-   int64_t                capital_shortfall_total = 0;
-
    /// Block slots the open pay period is entitled to, accumulated as each epoch accrues.
    ///
    /// The DIVISOR has to be built the same way the POOL is. `pending_emission_amount` above adds
@@ -333,7 +325,7 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
       (start_time)(epoch_count)(last_epoch_index)
       (last_epoch_time)(last_epoch_emission)(total_distributed)
       (pending_emission_amount)(period_start_epoch)(batch_group_epochs)
-      (capital_shortfall_total)(pending_nominal_slots))
+      (pending_nominal_slots))
 };
 
 using t5state_t = sysio::kv::global<"t5state"_n, t5_state>;
@@ -478,9 +470,8 @@ struct [[sysio::table("epochlog"), sysio::contract("sysio.system")]] epoch_log {
    uint64_t               epoch_count       = 0;  // internal counter of payepoch invocations
    sysio::time_point_sec  timestamp;
    // Total budget for the period (curve output). compute + capex + governance
-   // are paid out of this at payepoch; the implicit capital reserve
-   // (= total_emission - compute - capex - governance) is drained lazily
-   // by fundclaim across the same period and never appears here.
+   // are paid out of this at payepoch; the unallocated remainder stays in
+   // the treasury and is not a separate payout category.
    int64_t                total_emission    = 0;
    int64_t                compute_amount    = 0;
    int64_t                capex_amount      = 0;

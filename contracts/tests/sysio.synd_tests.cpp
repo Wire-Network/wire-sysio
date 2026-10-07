@@ -56,6 +56,7 @@ constexpr std::string_view REQUEST_OPEN     = "OPEN";
 constexpr std::string_view REQUEST_BONDED   = "BONDED";
 constexpr std::string_view REQUEST_APPROVED = "APPROVED";
 constexpr std::string_view REQUEST_HELD     = "HELD";
+constexpr std::string_view REQUEST_INVALID  = "INVALID";
 /// The `total_syndicated` an intake helper carries by default: the whole asset range, at or above any
 /// outstanding shadow (supply plus parked yield) a test can reach, so an outpost custody of this size
 /// always covers the depot.
@@ -455,14 +456,16 @@ public:
       uint32_t window_sec      = DEFAULT_WINDOW_SEC;
       uint64_t bounty          = 0;
       uint64_t challenge_extra = 0;
+      uint64_t min_desyndicate = 1; ///< Permissive fixture floor for small-value edge cases.
    };
    action_result setconfig(std::string_view chain_code, std::string_view token_code, const pair_config& cfg,
                            name signer = SYSIO_ACCOUNT) {
-      return push(SYND_ACCOUNT, synd_abi_ser, signer, "setconfig"_n, mvo()
+      auto data = mvo()
          ("chain_code", codename_mvo(chain_code))("token_code", codename_mvo(token_code))
          ("synd_fee_bps", cfg.synd_fee_bps)("desynd_fee_bps", cfg.desynd_fee_bps)("synd_burst", cfg.synd_burst)
          ("synd_refill", cfg.synd_refill)("desynd_burst", cfg.desynd_burst)("desynd_refill", cfg.desynd_refill)
-         ("window_sec", cfg.window_sec)("bounty", cfg.bounty)("challenge_extra", cfg.challenge_extra));
+         ("window_sec", cfg.window_sec)("bounty", cfg.bounty)("challenge_extra", cfg.challenge_extra)("min_desyndicate", cfg.min_desyndicate);
+      return push(SYND_ACCOUNT, synd_abi_ser, signer, "setconfig"_n, data);
    }
    action_result dropenv(std::string_view chain_code, std::string_view token_code, uint32_t epoch,
                          name signer = SYSIO_ACCOUNT) {
@@ -1255,12 +1258,13 @@ BOOST_FIXTURE_TEST_CASE(liq_has_none_of_the_moved_actions, sysio_synd_tester) tr
    BOOST_REQUIRE(has_table(synd_abi, "feepot"_n));
    for (auto action : { "setconfig"_n, "crank"_n, "dropenv"_n, "sweepyield"_n })
       BOOST_TEST_CONTEXT(action.to_string()) { BOOST_REQUIRE(has_action(synd_abi, action)); }
-   // The import flag left sysio.liq's config with the import.
+   // Import state moved to syndication, and the bonus config is retired.
    const auto liq_config = std::find_if(liq_abi.structs.begin(), liq_abi.structs.end(),
                                         [](const auto& st) { return st.name == "liq_config"; });
-   BOOST_REQUIRE(liq_config != liq_abi.structs.end());
-   BOOST_REQUIRE(std::none_of(liq_config->fields.begin(), liq_config->fields.end(),
-                              [](const auto& f) { return f.name == "import_complete"; }));
+   BOOST_REQUIRE(liq_config == liq_abi.structs.end());
+   BOOST_REQUIRE(!has_table(liq_abi, "liqconfig"_n));
+   BOOST_REQUIRE(!has_action(liq_abi, "setkicker"_n));
+   BOOST_REQUIRE(!has_action(liq_abi, "addkicker"_n));
    // What stays in the ledger stays.
    for (auto action : { "mint"_n, "burn"_n, "mintyield"_n, "creditowed"_n, "transfer"_n, "claim"_n, "recredit"_n,
                         "regliqpool"_n })
@@ -1590,6 +1594,43 @@ BOOST_FIXTURE_TEST_CASE(desyndicate_carries_the_outstanding_shadow_after_its_bur
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, range - second_total));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(range - 7 * UNIT), supply());
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("supply exceeds the asset range"), liq_mint("alice"_n, LIQSOL, 1));
+} FC_LOG_AND_RETHROW()
+
+/// The gross return minimum rejects dust before custody, budgets or request ids change.
+BOOST_FIXTURE_TEST_CASE(desyndicate_enforces_configured_minimum,
+                        sysio_synd_tester) try {
+   constexpr uint64_t minimum = 10 * UNIT;
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL,
+      {.desynd_fee_bps = 1000, .desynd_burst = 100 * UNIT, .min_desyndicate = minimum}));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("quantity is below the minimum desyndication"),
+                       desyndicate("alice"_n, minimum - 1));
+   BOOST_CHECK_EQUAL(100 * UNIT, liq_balance("alice"_n));
+   BOOST_CHECK_EQUAL(100 * UNIT, supply());
+   BOOST_CHECK(desynd_bucket_row(SOLANA, LIQSOL).is_null());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.desynd_fee_bps = 1000, .min_desyndicate = minimum}));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("quantity is below the minimum desyndication"),
+                       desyndicate("alice"_n, minimum - 1));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, minimum));
+   BOOST_CHECK_EQUAL(9 * UNIT, queued_desyndication(*this, 1).amount().amount());
+   BOOST_CHECK_EQUAL(90 * UNIT, liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.min_desyndicate = 1}));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 1));
+} FC_LOG_AND_RETHROW()
+
+/// Governance cannot configure zero, an unrepresentable minimum, or one above an enabled burst.
+BOOST_FIXTURE_TEST_CASE(setconfig_validates_minimum_return, sysio_synd_tester) try {
+   constexpr auto message = "minimum desyndication must be positive and fit the burst and asset range";
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(message), setconfig(SOLANA, LIQSOL, {.min_desyndicate = 0}));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(message), setconfig(SOLANA, LIQSOL,
+      {.desynd_burst = 0, .min_desyndicate = static_cast<uint64_t>(asset::max_amount) + 1}));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(message), setconfig(SOLANA, LIQSOL,
+      {.desynd_burst = UNIT, .min_desyndicate = UNIT + 1}));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.desynd_burst = 0, .min_desyndicate = UNIT}));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.desynd_burst = UNIT, .min_desyndicate = UNIT}));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL,
+      {.desynd_burst = 0, .min_desyndicate = static_cast<uint64_t>(asset::max_amount)}));
 } FC_LOG_AND_RETHROW()
 
 // The fee, `quantity * desynd_fee_bps / 10000` floored, stays in `feepot` in sysio.synd's own row; only
@@ -2925,6 +2966,44 @@ BOOST_FIXTURE_TEST_CASE(challenge_refused_on_an_approved_request, sysio_synd_tes
    BOOST_REQUIRE_EQUAL(REQUEST_APPROVED, bond_request(id)["state"].as_string());
 } FC_LOG_AND_RETHROW()
 
+/// Approval eligibility does not itself close interventions while the request remains BONDED.
+BOOST_FIXTURE_TEST_CASE(a_frozen_request_can_be_held_or_ruled_invalid_after_its_deadline, sysio_synd_tester) try {
+   constexpr uint32_t window = 60;
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.window_sec = window}));
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
+   syndicate_and_close(1, 1, ed_bytes(ed_key()), LIQSOL, 10 * UNIT);
+   underwrite_envelope(SOLANA, LIQSOL, 1);
+   BOOST_REQUIRE_EQUAL(success(), andon_pull());
+   produce_block(fc::seconds(window + 1));
+   BOOST_REQUIRE_EQUAL(success(), challenge("carol"_n, SOLANA, LIQSOL, 1));
+   BOOST_REQUIRE_EQUAL(REQUEST_HELD, bond_request(1)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi_ser, SYSIO_ACCOUNT, "rslvinvalid"_n,
+                                      mvo()("request_id", 1)));
+   BOOST_REQUIRE_EQUAL(REQUEST_INVALID, bond_request(1)["state"].as_string());
+} FC_LOG_AND_RETHROW()
+
+/// The cord pauses releases, but approval after the deadline permanently closes challenges.
+BOOST_FIXTURE_TEST_CASE(a_freeze_does_not_extend_the_challenge_deadline, sysio_synd_tester) try {
+   constexpr uint32_t window = 60;
+   const auto key = ed_key();
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.window_sec = window}));
+   syndicate_and_close(1, 1, ed_bytes(key), LIQSOL, 10 * UNIT);
+   const auto id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
+   underwrite_envelope(SOLANA, LIQSOL, 1);
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), andon_pull());
+   produce_block(fc::seconds(window + 1));
+   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi_ser, "carol"_n, "approve"_n, mvo()("request_id", id)));
+   BOOST_REQUIRE_EQUAL(REQUEST_APPROVED, bond_request(id)["state"].as_string());
+   BOOST_REQUIRE(mentions(challenge("carol"_n, SOLANA, LIQSOL, 1), CHALLENGE_FINAL));
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   BOOST_CHECK_EQUAL(0, liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(success(), andon_clear());
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   BOOST_CHECK_EQUAL(10 * UNIT, liq_balance("alice"_n));
+} FC_LOG_AND_RETHROW()
+
 // Review Focus 4: an envelope with no request issued yet (WAITING behind an unbonded one), or with no
 // row at all, cannot be challenged; nor can sysio.synd, sysio.bond or an account with contract code
 // challenge.
@@ -4016,7 +4095,7 @@ BOOST_FIXTURE_TEST_CASE(a_released_yield_counts_before_it_is_queued, sysio_synd_
 // `sysio.liq::recredit`, which grows the supply directly, and the outpost still holds what it never paid.
 // The next comparison sees the recredit with nothing recorded in `sysio.synd`: custody 20 matches
 // 16 + 4 exactly, where a check that missed the recredit would read an excess of 4.
-BOOST_FIXTURE_TEST_CASE(a_recredit_is_seen_by_the_next_comparison, sysio_synd_tester) try {
+BOOST_FIXTURE_TEST_CASE(a_return_refund_is_seen_by_the_next_comparison, sysio_synd_tester) try {
    const auto     pubkey = ed_bytes(ed_key());
    constexpr auto SVM    = ChainKind::CHAIN_KIND_SVM;
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 20 * UNIT));   // released: custody 20
@@ -4035,7 +4114,7 @@ BOOST_FIXTURE_TEST_CASE(a_recredit_is_seen_by_the_next_comparison, sysio_synd_te
                                          MSGCH_ACCOUNT, 21 * UNIT));
    BOOST_REQUIRE(!console_has(EXCESS));
    require_no_shortfall();
-   // The recredit wrote nothing to the ledger's running sums: the check does not read them.
+   // The return refund wrote nothing to the ledger's running sums: the check does not read them.
 } FC_LOG_AND_RETHROW()
 
 // Review focus 2: only an admitted message is compared. A replayed sequence, or a message dropped for any
@@ -4303,7 +4382,6 @@ BOOST_FIXTURE_TEST_CASE(generic_parked_credit_yield_conversion_and_fee_rounded_r
    constexpr uint64_t PoolSeed = 1'000 * UNIT;
    constexpr uint32_t Horizon = 86'400, DepthBps = 300;
    constexpr int64_t ClipFloor = 1000;
-   BOOST_REQUIRE_EQUAL(success(), push(LIQ_ACCOUNT, liq_abi_ser, SYSIO_ACCOUNT, "setkicker"_n, mvo()("bps", 0)));
    for (size_t i = 0; i < outposts.size(); ++i) {
       BOOST_TEST_CONTEXT("chain=" << outposts[i].asset().chain) {
          auto& external = outposts[i];

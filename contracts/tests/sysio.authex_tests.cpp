@@ -128,18 +128,13 @@ public:
          ("native_address", native_address));
    }
 
-   action_result onreward(const std::vector<char>& native_address, uint64_t amount,
-                          ChainKind chain_kind = ChainKind::CHAIN_KIND_EVM) {
+   /// Import a pre-launch WIRE credit before testing authenticated link settlement.
+   action_result import_credit(const std::vector<char>& native_address, uint64_t amount,
+                               ChainKind chain_kind = ChainKind::CHAIN_KIND_EVM) {
       return sysio_system::test_support::push_contract_action_and_produce_block(
-         *this, DCLAIM, dclaim_abi_ser, MSGCH, "onreward"_n, mvo()
-            ("chain_code", uint64_t{1})
-            ("staker_wire_account", std::string{})
-            ("reward_chain", chain_kind)
-            ("staker_native_addr", native_address)
-            ("reward_amount", amount)
-            ("reward_epoch_index", uint32_t{7})
-            ("external_epoch_ref", uint64_t{100})
-            ("share_bps", uint32_t{10000}));
+         *this, DCLAIM, dclaim_abi_ser, DCLAIM, "importseed"_n, mvo()
+            ("chain", chain_kind)("credits", fc::variants{
+               mvo()("native_address", native_address)("wire_atomic", static_cast<int64_t>(amount))}));
    }
 
    fc::variant get_dclaim_row(name table, const char* type, uint64_t id) {
@@ -324,7 +319,7 @@ BOOST_FIXTURE_TEST_CASE( createlink_eth_sweeps_prelink_dclaim_rewards, sysio_aut
    const auto address_bytes = fc::crypto::ethereum::address_to_bytes(link.pub);
    const std::vector<char> native_address(address_bytes.begin(), address_bytes.end());
 
-   BOOST_REQUIRE_EQUAL(success(), onreward(native_address, 5000));
+   BOOST_REQUIRE_EQUAL(success(), import_credit(native_address, 5000));
    BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
 
    BOOST_REQUIRE_EQUAL(success(), createlink(
@@ -343,7 +338,7 @@ BOOST_FIXTURE_TEST_CASE( createlink_preserves_old_prelink_dclaim_rewards,
    auto link = make_eth_link("alice", now_ms());
    const auto address_bytes = fc::crypto::ethereum::address_to_bytes(link.pub);
    const std::vector<char> native_address(address_bytes.begin(), address_bytes.end());
-   BOOST_REQUIRE_EQUAL(success(), onreward(native_address, 5000));
+   BOOST_REQUIRE_EQUAL(success(), import_credit(native_address, 5000));
    BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
    constexpr uint32_t years_without_link_sec = 3u * 365u * 24u * 60u * 60u;
    produce_block(fc::seconds(years_without_link_sec));
@@ -402,7 +397,7 @@ BOOST_FIXTURE_TEST_CASE( recordlink_records_link_when_dclaim_is_not_privileged,
    const auto address_bytes = fc::crypto::ethereum::address_to_bytes(public_key);
    const std::vector<char> native_address(address_bytes.begin(), address_bytes.end());
 
-   BOOST_REQUIRE_EQUAL(success(), onreward(native_address, 6500));
+   BOOST_REQUIRE_EQUAL(success(), import_credit(native_address, 6500));
    BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
    set_dclaim_privileged(false);
 
@@ -424,7 +419,7 @@ BOOST_FIXTURE_TEST_CASE( recordlink_eth_sweeps_prelink_dclaim_rewards, sysio_aut
    const auto address_bytes = fc::crypto::ethereum::address_to_bytes(public_key);
    const std::vector<char> native_address(address_bytes.begin(), address_bytes.end());
 
-   BOOST_REQUIRE_EQUAL(success(), onreward(native_address, 7000));
+   BOOST_REQUIRE_EQUAL(success(), import_credit(native_address, 7000));
    BOOST_REQUIRE_EQUAL(success(), recordlink(AUTHEX, "bob", public_key, native_address));
    produce_blocks();
 
@@ -441,7 +436,7 @@ BOOST_FIXTURE_TEST_CASE( recordlink_svm_sweeps_prelink_dclaim_rewards, sysio_aut
    const auto raw_key = public_key.get<fc::crypto::ed::public_key_shim>().serialize();
    const std::vector<char> native_address(raw_key.begin(), raw_key.end());
 
-   BOOST_REQUIRE_EQUAL(success(), onreward(
+   BOOST_REQUIRE_EQUAL(success(), import_credit(
       native_address, 8000, ChainKind::CHAIN_KIND_SVM));
    BOOST_REQUIRE_EQUAL(success(), recordlink(
       AUTHEX, "carol", public_key, native_address, ChainKind::CHAIN_KIND_SVM));
@@ -461,7 +456,7 @@ BOOST_FIXTURE_TEST_CASE( recordlink_svm_mismatched_address_skips_sweep, sysio_au
    std::vector<char> mismatched_address(raw_key.begin(), raw_key.end());
    mismatched_address.front() ^= char{0x01};
 
-   BOOST_REQUIRE_EQUAL(success(), onreward(
+   BOOST_REQUIRE_EQUAL(success(), import_credit(
       mismatched_address, 8500, ChainKind::CHAIN_KIND_SVM));
    BOOST_REQUIRE_EQUAL(success(), recordlink(
       AUTHEX, "carol", public_key, mismatched_address, ChainKind::CHAIN_KIND_SVM));
@@ -483,7 +478,7 @@ BOOST_FIXTURE_TEST_CASE( recordlink_identical_retry_resweeps_dclaim_rewards, sys
    const std::vector<char> native_address(address_bytes.begin(), address_bytes.end());
 
    BOOST_REQUIRE_EQUAL(success(), recordlink(AUTHEX, "bob", public_key, native_address));
-   BOOST_REQUIRE_EQUAL(success(), onreward(native_address, 9000));
+   BOOST_REQUIRE_EQUAL(success(), import_credit(native_address, 9000));
    BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
 
    BOOST_REQUIRE_EQUAL(success(), recordlink(AUTHEX, "bob", public_key, native_address));

@@ -675,20 +675,6 @@
             ]
         },
         {
-            "name": "fundclaim",
-            "base": "",
-            "fields": [
-                {
-                    "name": "recipient",
-                    "type": "name"
-                },
-                {
-                    "name": "amount",
-                    "type": "int64"
-                }
-            ]
-        },
-        {
             "name": "getsnaphash",
             "base": "",
             "fields": [
@@ -1623,10 +1609,6 @@
                     "type": "uint32[]"
                 },
                 {
-                    "name": "capital_shortfall_total",
-                    "type": "int64"
-                },
-                {
                     "name": "pending_nominal_slots",
                     "type": "uint64"
                 }
@@ -1970,11 +1952,6 @@
         {
             "name": "delsnapprov",
             "type": "delsnapprov",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "fundclaim",
-            "type": "fundclaim",
             "ricardian_contract": ""
         },
         {

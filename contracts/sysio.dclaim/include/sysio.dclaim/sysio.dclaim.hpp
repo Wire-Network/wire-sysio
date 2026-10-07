@@ -19,15 +19,8 @@ namespace sysio {
    /**
     * @brief sysio.dclaim — depot-side WIRE distribution and claim ledger.
     *
-    * Holds the pending-WIRE balances owed to LIQ-token stakers and pre-launch
-    * pretoken purchasers, and the per-staker WIRE-side leg of the
-    * `STAKING_REWARD` flow.
-    *
-    * Inbound `STAKING_REWARD` attestations route through `sysio.msgch`, which
-    * dispatches the per-staker body here via `onreward`. The reward arrives
-    * already WIRE-denominated — native -> WIRE conversion and source-chain
-    * precision scaling happen outpost-side — so `onreward` simply credits the
-    * staker's claim ledger.
+    * Holds funded pre-launch WIRE distribution credits and preserves existing claims.
+    * External staking rewards no longer create credits or draw from T5.
     *
     * Ledgers:
     * - `pending_claims` — per-Wire-account WIRE owed. `claim` drains a row via
@@ -35,10 +28,6 @@ namespace sysio {
     * - `unmapped_tokens` — per-(chain, native_pubkey) WIRE owed for stakers /
     *   purchasers without a Wire account yet. Completing AuthX linking
     *   inline-calls `linkswept`, which moves the credit into `pending_claims`.
-    * - `reward_cursors` — per-(chain_code, chain, native_pubkey) high-water
-    *   mark of the last processed source-chain epoch reference. Replays /
-    *   duplicates (`external_epoch_ref <= last`) are rejected at ingest, so no
-    *   per-reward history is retained (roll-up + data-leak safe).
     *
     * Credited and imported balances never expire, including balances waiting
     * for AuthX linking. They remain owed until claimed; there is no expiry
@@ -56,10 +45,7 @@ namespace sysio {
 
       // Well-known accounts.
       static constexpr name AUTHEX_ACCOUNT = "sysio.authex"_n;
-      static constexpr name MSGCH_ACCOUNT  = "sysio.msgch"_n;
       static constexpr name TOKEN_ACCOUNT  = "sysio.token"_n;
-      static constexpr name RESERV_ACCOUNT = "sysio.reserv"_n;
-      static constexpr name SYSTEM_ACCOUNT = "sysio"_n;
 
       /// WIRE token symbol with the system-wide nine-decimal precision.
       static constexpr symbol WIRE_SYM = opp::wire::asset_symbol;
@@ -87,37 +73,6 @@ namespace sysio {
       void linkswept(name wire_account,
                      opp::types::ChainKind chain,
                      std::vector<char> native_pubkey);
-
-      /// Per-staker WIRE-side credit of a `STAKING_REWARD`. Dispatched inline
-      /// by `sysio.msgch` (the proto body flattened to primitives). Dedupes
-      /// on the source-chain epoch reference and credits `pending_claims` (if
-      /// linked) or `unmapped_tokens` (if not). The reward arrives already
-      /// WIRE-denominated; native -> WIRE conversion is outpost-side.
-      /// Auth=sysio.msgch.
-      ///
-      /// @param chain_code          Emitting outpost's chain code (dedupe scope).
-      /// @param staker_wire_account Staker's Wire account name, or "" when not
-      ///                            yet AuthX-linked (then parked by native
-      ///                            address until the link sweep).
-      /// @param reward_chain        Source chain (parking + dedupe key).
-      /// @param staker_native_addr  Staker's raw native address (dedupe +
-      ///                            parking key; always populated).
-      /// @param reward_amount       Absolute WIRE reward amount in atomic
-      ///                            units (already the staker's prorated
-      ///                            portion).
-      /// @param reward_epoch_index  WIRE epoch index (informational / audit).
-      /// @param external_epoch_ref  Source-chain epoch reference; monotonic
-      ///                            per (chain, staker) — dedupe key.
-      /// @param share_bps           Staker share in bps (informational only).
-      [[sysio::action]]
-      void onreward(uint64_t              chain_code,
-                    std::string           staker_wire_account,
-                    opp::types::ChainKind reward_chain,
-                    std::vector<char>     staker_native_addr,
-                    uint64_t              reward_amount,
-                    uint32_t              reward_epoch_index,
-                    uint64_t              external_epoch_ref,
-                    uint32_t              share_bps);
 
       /// One row of an import batch: a pre-launch holder's WIRE credit on
       /// `chain`. `native_address` is the raw on-chain key (20 B for ETH,
@@ -194,37 +149,7 @@ namespace sysio {
             sysio::const_mem_fun<unmapped_token, uint128_t, &unmapped_token::by_chain_addr>>
       >;
 
-      /// Per-(chain_code, chain, native_pubkey) dedupe cursor: the highest
-      /// source-chain epoch reference processed. Anything `<=` is a replay.
-      struct rwdcur_key {
-         uint64_t id;
-         uint64_t primary_key() const { return id; }
-         SYSLIB_SERIALIZE(rwdcur_key, (id))
-      };
-
-      struct [[sysio::table("rwdcursors")]] reward_cursor {
-         uint64_t                  id                      = 0;
-         uint64_t                  chain_code              = 0;
-         opp::types::ChainKind     chain                   = opp::types::ChainKind::CHAIN_KIND_UNKNOWN;
-         std::vector<char>         native_pubkey;
-         uint64_t                  last_external_epoch_ref = 0;
-
-         uint64_t primary_key() const { return id; }
-
-         uint128_t by_chaincode_addr() const {
-            return chaincode_addr_key(chain_code, chain, native_pubkey);
-         }
-
-         SYSLIB_SERIALIZE(reward_cursor,
-            (id)(chain_code)(chain)(native_pubkey)(last_external_epoch_ref))
-      };
-
-      using rwdcursors_t = sysio::kv::table<"rwdcursors"_n, rwdcur_key, reward_cursor,
-         sysio::kv::index<"bychaincode"_n,
-            sysio::const_mem_fun<reward_cursor, uint128_t, &reward_cursor::by_chaincode_addr>>
-      >;
-
-      /// Cap-staking config singleton.
+      /// Bootstrap import config singleton.
       struct [[sysio::table("capcfg")]] cap_config {
          /// One-way flag protecting the bootstrap `importseed` action.
          bool     imported_complete = false;
@@ -236,9 +161,8 @@ namespace sysio {
       /// Monotonic id counters.
       struct [[sysio::table("capcounters")]] cap_counters {
          uint64_t next_unmapped_id = 1;
-         uint64_t next_cursor_id   = 1;
 
-         SYSLIB_SERIALIZE(cap_counters, (next_unmapped_id)(next_cursor_id))
+         SYSLIB_SERIALIZE(cap_counters, (next_unmapped_id))
       };
 
       using capcounters_t = sysio::kv::global<"capcounters"_n, cap_counters>;
@@ -261,19 +185,6 @@ namespace sysio {
          const size_t n = addr.size() < sizeof(uint64_t) ? addr.size() : sizeof(uint64_t);
          std::memcpy(&prefix, addr.data(), n);
          return (static_cast<uint128_t>(chain) << 64) | prefix;
-      }
-
-      /// (chain_code, chain, native address) -> uint128 narrowing key. High 64
-      /// bits = chain_code; low 64 = chain (high 32) xored with the first 4
-      /// address bytes.
-      static uint128_t chaincode_addr_key(uint64_t chain_code,
-                                          opp::types::ChainKind chain,
-                                          const std::vector<char>& addr) {
-         uint32_t prefix = 0;
-         const size_t n = addr.size() < sizeof(uint32_t) ? addr.size() : sizeof(uint32_t);
-         if (n > 0) std::memcpy(&prefix, addr.data(), n);
-         uint64_t lo = (static_cast<uint64_t>(chain) << 32) ^ static_cast<uint64_t>(prefix);
-         return (static_cast<uint128_t>(chain_code) << 64) | lo;
       }
 
    private:

@@ -14,15 +14,16 @@ record, not a line-coverage percentage or a proof that every possible sequence i
 2. **Depot integration tests** exercise inline calls between the real contracts.
    New generic scenarios cover backed import, held intake, bonding, partial
    release, challenge adjudication, freeze/repair, fee rounding, link delivery,
-   yield conversion, reward funding and return instructions.
+   yield conversion, funded import claims and return instructions.
 3. **Cluster flows** retain responsibility for external contract execution,
    operator daemons, networking, finality, actual producer participation and soak
    stability. Native virtual-time tests cannot establish those properties.
 
 `sysio_dispatch_tests/generic_external_simulator_drives_production_dispatch`
 feeds canonical protobuf envelopes into real `sysio.msgch`, its epoch consensus
-path, `sysio.synd` and `sysio.liq` for both transport families. The reward dispatch
-case additionally exercises `sysio.dclaim -> sysio.system -> sysio.token`.
+path, `sysio.synd` and `sysio.liq` for both transport families. The funded import
+case verifies that pre-launch credits link and pay.
+LIQ yield distributes only supplied WIRE. Its regression checks exact holder settlement and no treasury draw.
 Ethereum NFT registration remains covered by the Ethereum-specific dispatch and
 ROA tests: changing that source chain would hide an actual protocol constraint.
 
