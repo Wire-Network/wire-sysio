@@ -6323,7 +6323,8 @@ BOOST_FIXTURE_TEST_CASE(wire_direct_deposit_adds_exact_units_to_uwchalbond,
       "transfer"_n, mvo()("from", "sysio")("to", UWRIT_OP.to_string())
          ("quantity", direct_deposit)("memo", "fund native collateral")));
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, UWRIT_OP, "deposit"_n, mvo()
-      ("account", UWRIT_OP.to_string())("amount", static_cast<uint64_t>(direct_deposit.get_amount()))));
+      ("account", UWRIT_OP.to_string())("token_code", codename_mvo("WIRE"))
+      ("amount", static_cast<uint64_t>(direct_deposit.get_amount()))));
 
    const uint64_t after = uwchalbond(ATT_ID, UWRIT_OP);
    BOOST_REQUIRE_EQUAL(before + static_cast<uint64_t>(direct_deposit.get_amount()), after);

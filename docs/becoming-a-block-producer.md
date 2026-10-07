@@ -62,9 +62,11 @@ Each deposit travels to WIRE over the cross-chain protocol and credits your bala
 `sysio.opreg`.
 
 If the configured requirements include the native WIRE pair, separately call
-`sysio.opreg::deposit(account, amount)` on WIRE, signed by your WIRE account. This native action
-requires an existing non-bootstrapped operator row, transfers WIRE inline, and credits only the
-WIRE-chain pair; it does not replace the Ethereum or Solana outpost deposits.
+`sysio.opreg::deposit(account, token_code, amount)` on WIRE with `token_code` `WIRE`, signed by
+your WIRE account. This native action requires an existing non-bootstrapped operator row,
+transfers the token inline, and credits only the matching WIRE-chain pair; it does not replace
+the Ethereum or Solana outpost deposits. The same action bonds a shadow LIQ symbol such as
+`LIQETH` or `LIQSOL` held on WIRE, one `token_code` per call.
 
 When every required chain is at or above its minimum, your operator status flips to `ACTIVE` on
 its own. No producer rank exists yet: the first score is written only after the producer row and
@@ -266,12 +268,31 @@ under it. It is not applied only to rounds missed from that point on.
   top-up first.
 - **Withdraw** from the chain that holds the bond. An outpost bond is released through that
   outpost's own withdrawal entry point, the counterpart of the deposit you made in step 3, which
-  travels to WIRE and settles against your registry balance. `sysio.opreg::withdraw` is **not**
-  that path: it takes only an account and an amount and applies to your WIRE-native balance, so
-  calling it for an Ethereum or Solana bond fails for insufficient balance and leaves the outpost
-  collateral untouched. Either way the request is queued rather than immediate, and `cancelwtdw`
+  travels to WIRE and settles against your registry balance.
+  `sysio.opreg::withdraw(account, token_code, amount)` is **not** that path: it applies only to
+  your WIRE-native balance in `token_code` (`WIRE` or a shadow LIQ symbol), so calling it for an
+  Ethereum or Solana bond fails for insufficient balance
+  and leaves the outpost collateral untouched. Once a WIRE-native withdrawal flushes, the funds
+  are credited to a per-token claim that you pull with `sysio.opreg::claimremit(account,
+  token_code)`. Either way the request is queued rather than immediate, and `cancelwtdw`
   cancels it before it flushes. Once your balance falls below the minimum on any required chain you
   leave `ACTIVE` and the schedule drops you at the next rebuild.
+- **Collect shadow yield.** Bonded shadow LIQ keeps earning WIRE yield: each bonded unit earns
+  what one unit of that shadow token earns in `sysio.liq`, from the moment it is bonded until it
+  leaves your balance. `sysio.opreg::claimyield(account, token_code)` credits what you have
+  earned to your WIRE claim, which you pull with `sysio.opreg::claimremit(account, WIRE)`. Yield
+  earned before a slash or a withdrawal stays claimable. Yield credits are always backed by WIRE
+  the registry has already pulled from `sysio.liq`. If `claimyield` reports yield not yet
+  covered, anyone can call `sysio.opreg::sweepyield(token_code)` to pull more in once more yield
+  is distributed. On termination the covered part is credited to your WIRE claim alongside the
+  returned principal. The rest stays owed to you: call `claimyield`, which pulls it in, before the
+  registry prunes your terminated operator row after `terminate_prune_delay_ms`. Anything still
+  unclaimed when the row is pruned is forfeited. `claimyield` needs no signature, so anyone,
+  such as a keeper, can call it for you; the credit only ever lands in your own WIRE claim.
+  Shadow stops earning for you when it leaves your bonded balance. After a withdrawal flushes,
+  the shadow waiting in your claim row earns for the registry until you call `claimremit`.
+  Yield is shared first come, first served: rounding can leave the last claimant up to a few
+  atomic WIRE short, and that dust is paid only when later slack covers it.
 - **Slashing** is punitive and permanent. A slashed operator's row is never pruned and the registry
   refuses to re-register it, so a slashed account cannot come back.
 

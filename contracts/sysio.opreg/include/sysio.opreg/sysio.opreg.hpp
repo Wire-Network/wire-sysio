@@ -10,6 +10,7 @@
 #include <sysio/slug_name.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 #include <sysio.opp.common/wire_asset.hpp>
+#include <sysio.opp.common/shadow_custody_types.hpp>
 #include <magic_enum/magic_enum.hpp>
 
 namespace sysio {
@@ -24,9 +25,9 @@ namespace sysio {
     *
     * - One aggregate balance per (operator, chain, token_kind) — NOT a
     *   vector of collateral entries, NOT a locked/available/amount trio.
-    * - `deposit` (operator-callable, WIRE-direct) and `depositinle`
+    * - `deposit` (operator-callable, depot-native WIRE or shadow LIQ) and `depositinle`
     *   (msgch-dispatched from outposts) credit the matching balance row;
-    *   `withdraw` (operator-callable, WIRE-direct) and `withdrawinle`
+    *   `withdraw` (operator-callable, depot-native) and `withdrawinle`
     *   (msgch-dispatched from outposts) enqueue a delayed subtraction;
     *   `slash` zeros the unlocked portion immediately and leaves locks
     *   for `sysio.uwrit::release` to slash deferred.
@@ -51,10 +52,8 @@ namespace sysio {
       static constexpr name CHALG_ACCOUNT  = "sysio.chalg"_n;
       static constexpr name AUTHEX_ACCOUNT = "sysio.authex"_n;
       static constexpr name TOKEN_ACCOUNT  = "sysio.token"_n;
+      static constexpr name LIQ_ACCOUNT    = "sysio.liq"_n;
       static constexpr name SYSTEM_ACCOUNT = "sysio"_n;
-
-      /// WIRE collateral asset held by the depot-side operator registry.
-      static constexpr symbol WIRE_SYM = opp::wire::asset_symbol;
 
       // 2-epoch wait between `queue_withdraw` and `flushwithdraws` releasing
       // funds. Long enough that an operator who would drop below the role
@@ -215,18 +214,36 @@ namespace sysio {
                        opp::types::OperatorType type,
                        bool is_bootstrapped);
 
-      /// Operator-callable: lock WIRE tokens directly as the operator's
-      /// WIRE-side collateral. The tokens transfer in the same transaction;
-      /// the corresponding (operator, opp::wire::chain_code,
-      /// opp::wire::token_code) balance row is
-      /// credited. Reverts on validation failure (no escrow exists yet —
-      /// failure surfaces in the operator's signing tx so they can retry).
+      /// Operator-callable: bond depot-native collateral held on WIRE itself rather than
+      /// escrowed on an outpost. Two kinds of token qualify:
+      ///
+      ///   * WIRE, custodied by `sysio.token` (`token_code == opp::wire::token_code`);
+      ///   * a shadow LIQ symbol (LIQETH, LIQSOL, ...), custodied by `sysio.liq`, named by the
+      ///     liq token's registry code — the `token_code` of its `sysio.liq` `stat` row, never
+      ///     the symbol code.
+      ///
+      /// Any other `token_code` reverts ("unsupported depot-native collateral token"). The tokens
+      /// move from `account` to this contract in the same transaction, under the operator's own
+      /// authority, and credit the `(opp::wire::chain_code, token_code)` balance row: the chain
+      /// is the depot for every depot-native row, because custody is on the depot whichever
+      /// outpost the shadow mirrors. Reverts on any validation failure — nothing is escrowed
+      /// yet, so the failure surfaces in the operator's signing transaction and they retry.
+      ///
+      /// A bonded shadow balance sits on this registry's holder row in `sysio.liq`, so the WIRE
+      /// yield it earns accrues to that one row. Each bonded row checkpoints `sysio.liq`'s own
+      /// index for the symbol (see `balance_entry`), so every bonded unit is attributed exactly
+      /// what one unit of the registry's row earns, for as long as it stays bonded. The operator
+      /// collects it with `claimyield`, then pulls the WIRE with `claimremit(account, WIRE)`.
       [[sysio::action]]
-      void deposit(name account, uint64_t amount);
+      void deposit(name account, sysio::slug_name token_code, uint64_t amount);
 
       /// Internal: credit an outpost-side collateral row. Called by
       /// `sysio.msgch` when it dispatches an `OPERATOR_ACTION(DEPOSIT_REQUEST)`
       /// attestation that came in from an outpost.
+      ///
+      /// A credit naming the depot chain (`chain_code == opp::wire::chain_code`) is dropped and
+      /// logged, never credited: depot-native collateral is bonded only through `deposit`, whose
+      /// custody transfer funds it, and no outpost holds anything to revert.
       ///
       /// Validation failures (unknown account, slashed/terminated operator,
       /// zero amount) DO NOT revert — they are recorded in the operator's
@@ -251,15 +268,19 @@ namespace sysio {
                        std::vector<char>     actor_address,
                        checksum256           original_message_id);
 
-      /// Operator-callable: queue a WIRE-direct collateral withdrawal subject
-      /// to the WITHDRAW_WAIT_EPOCHS wait. Outpost-held collateral is
-      /// withdrawn by calling the holding outpost's withdraw entry point —
-      /// the outpost emits an OPERATOR_ACTION(WITHDRAW_REQUEST) inbound that
-      /// reaches `withdrawinle` instead. Validation failures DO NOT revert —
-      /// they are appended to the operator's `recent_actions` ring buffer
-      /// (matching the OPP-dispatched path's failure semantics).
+      /// Operator-callable: queue a withdrawal of depot-native collateral from the
+      /// `(opp::wire::chain_code, token_code)` row (WIRE or a shadow LIQ symbol; see `deposit`),
+      /// subject to the WITHDRAW_WAIT_EPOCHS wait. When it matures, `flushwtdw` credits a
+      /// `remitclaims` row in `token_code` that the operator pulls with `claimremit`.
+      /// Outpost-held collateral is withdrawn by calling the holding outpost's withdraw entry
+      /// point — the outpost emits an OPERATOR_ACTION(WITHDRAW_REQUEST) inbound that reaches
+      /// `withdrawinle` instead.
+      ///
+      /// A `token_code` this contract cannot custody reverts, like `deposit`. Every other
+      /// validation failure DOES NOT revert — it is appended to the operator's `recent_actions`
+      /// ring buffer (matching the OPP-dispatched path's failure semantics).
       [[sysio::action]]
-      void withdraw(name account, uint64_t amount);
+      void withdraw(name account, sysio::slug_name token_code, uint64_t amount);
 
       /// Internal: queue an outpost-side collateral withdrawal. Called by
       /// `sysio.msgch` when it dispatches an `OPERATOR_ACTION(WITHDRAW_REQUEST)`
@@ -304,6 +325,11 @@ namespace sysio {
       /// the matching LP on each chain via OPERATOR_ACTION(SLASH) attestations.
       /// The locked portion stays in opreg's balance and is slashed at lock-
       /// release time by `sysio.uwrit::release` (deferred-slash).
+      ///
+      /// A depot-native shadow row is settled before the subtraction, so the yield it earned up to
+      /// the slash stays on the row, claimable with `claimyield`. Its locked remainder keeps earning
+      /// until `releaselock` performs the deferred slash, consistent with the deferred-slash
+      /// semantics: until then that shadow is still the operator's balance.
       [[sysio::action]]
       void slash(name account, std::string reason);
 
@@ -339,11 +365,25 @@ namespace sysio {
       /// destination via `OPERATOR_ACTION(WITHDRAW_REMIT)` attestations.
       /// Locks remain alive — `sysio.uwrit::release` will deferred-remit
       /// each lock at its natural release time.
+      ///
+      /// Earned shadow yield is settled and credited to the operator's WIRE claim alongside the
+      /// principal, but only the part `yieldpool` covers: this path is never-throw and cannot pull
+      /// from `sysio.liq`. The uncovered remainder STAYS on the row, and the terminated operator
+      /// collects it with `claimyield`, which pulls first. Each later `releaselock` on the TERMINATED
+      /// operator pays the same way.
+      ///
+      /// Claim window: banked yield never keeps a row from `prune` (or from the operator's own
+      /// re-registration), so whatever is still unclaimed when the row is erased is forfeited to the
+      /// registry. The `terminate_prune_delay_ms` window is therefore the time a terminated operator
+      /// has to call `claimyield` -- or have anyone call it for them, since it is permissionless.
       [[sysio::action]]
       void terminate(name account, std::string reason);
 
-      /// Auth = the claiming operator. Pull WIRE collateral credited by a WIRE-chain remit
-      /// (withdraw flush, deferred lock release, or termination payout) in a single transfer.
+      /// Auth = the claiming operator. Pull the depot-native `token_code` collateral credited by
+      /// a WIRE-chain remit (withdraw flush, deferred lock release, or termination payout) in a
+      /// single transfer from the token's custody contract: `sysio.token` for WIRE, `sysio.liq`
+      /// for a shadow LIQ symbol (see `deposit`). Each token is claimed separately; a
+      /// `token_code` this contract cannot custody reverts before any claim row is read.
       ///
       /// The remit paths credit rather than transfer because they are reachable from
       /// `sysio.epoch::advance`, which must never abort; see `remitclaims`. This is the only place
@@ -352,8 +392,64 @@ namespace sysio {
       ///
       /// Independent of the operator row: `prune` may have erased a settled TERMINATED operator,
       /// and the collateral remains claimable regardless.
+      ///
+      /// Shadow yield credited to a WIRE claim is always backed by WIRE the registry has already
+      /// pulled from `sysio.liq` (see `yieldpool`), so paying it never draws on WIRE collateral.
       [[sysio::action]]
-      void claimremit(name account);
+      void claimremit(name account, sysio::slug_name token_code);
+
+      /// Permissionless crank: claim the WIRE yield `sysio.liq` owes this registry's holder row for
+      /// the shadow symbol of depot-native `token_code` into this contract.
+      ///
+      /// `W` = what the registry's row is owed now (the checked `opp::shadow::owed` over that row
+      /// and `sysio.liq`'s index for the symbol); the action checks `W > 0` and pushes
+      /// `sysio.liq::claim(self, symbol)` under this contract's `active` authority, which reads the
+      /// same row and index with the same formula in the same transaction and so transfers exactly
+      /// `W`; `W` is added to `yieldpool[token_code].received` at the push, in that same
+      /// transaction. Attribution to operators is fixed by their rows' checkpoints against that
+      /// same index, so it does not depend on when this runs. What the sweep changes is coverage:
+      /// yield is credited only out of WIRE already received, so an operator whose `claimyield`
+      /// reports uncovered yield, or a termination payout that should cover everything, needs the
+      /// registry's owed WIRE pulled in first.
+      ///
+      /// No authority is required, because the action moves nothing but yield owed to the registry
+      /// into the registry. Reverts for a token this contract cannot custody, for WIRE (which earns
+      /// no shadow yield), and when nothing is owed ("no yield to sweep").
+      [[sysio::action]]
+      void sweepyield(sysio::slug_name token_code);
+
+      /// Permissionless: no authority is required, because the credit can only land in `account`'s
+      /// own `remitclaims{account, WIRE}` row -- a keeper may crank it, e.g. to rescue a TERMINATED
+      /// operator's yield before `prune` erases the row. First, when the registry's own `sysio.liq`
+      /// row is owed anything, pull it in (`opp::shadow::custody::pull`: push
+      /// `sysio.liq::claim(self, symbol)` and add it to `yieldpool[token_code].received`); a failure
+      /// in that claim reaches only whoever signed this action. Then settle the operator's
+      /// `(opp::wire::chain_code, token_code)` row at `sysio.liq`'s current index and credit
+      /// `min(owed, received - credited)` to
+      /// `remitclaims{account, opp::wire::token_code}`, taking it off the row; the operator pulls
+      /// the WIRE with `claimremit(account, WIRE)`. Works in every status, including SLASHED (yield
+      /// earned before a slash stays claimable) and TERMINATED -- a terminated operator must claim
+      /// before `prune` erases its row, when anything still owed is forfeited (see `terminate`).
+      ///
+      /// Reverts with "no yield owed" when the row has earned nothing (or is not a shadow row), and
+      /// with a rounding-dust message when all it is owed is dust the pool does not cover -- the
+      /// action has just pulled everything `sysio.liq` owed the registry, so only later slack can
+      /// cover it. The remainder stays on the row either way.
+      ///
+      /// Solvency: yield credits never exceed the WIRE actually received from `sysio.liq` for the
+      /// symbol (`yieldpool`), so a WIRE claim holding yield is always backed by swept WIRE and never
+      /// by WIRE collateral. Each bonded unit is attributed `Δindex / SCALE` of `sysio.liq`'s own
+      /// index, the rate the registry's holder row earns. But `sysio.liq` floors the registry row at
+      /// every one of its settles, while an operator row floors once over its whole interval, so the
+      /// operator rows can be owed up to one atomic WIRE per registry settle more than was received.
+      /// That dust stays owed until slack covers it: yield on shadow the registry holds for no bond
+      /// (seized by a slash, awaiting `claimremit`), which is credited to no operator. The pool is
+      /// first-come-first-served across operators, so a dust shortfall falls on whoever claims last,
+      /// not on the row whose flooring created it. The mechanism
+      /// is the `opp::shadow::custody` library; this contract supplies only the policy (which rows
+      /// earn, where credits go, and the claim window).
+      [[sysio::action]]
+      void claimyield(name account, sysio::slug_name token_code);
 
       /// Prune terminated operator rows, plus delivery-log rows that have aged
       /// out of the rolling termination window. Permissionless.
@@ -365,6 +461,10 @@ namespace sysio {
       /// `releaselock` to settle later, and `releaselock` no-ops once the row is
       /// gone; erasing on the delay alone therefore stranded that collateral,
       /// and any caller could trigger it.
+      ///
+      /// Banked shadow yield is NOT part of "settled": it never delays the erase, and whatever a
+      /// terminated operator has not claimed with `claimyield` by then is forfeited to the registry.
+      /// The prune delay is its claim window (see `terminate`).
       [[sysio::action]]
       void prune();
 
@@ -376,13 +476,22 @@ namespace sysio {
       /// is implied by `sysio.uwrit::locks` (consulted by `available()`); the
       /// pending-withdraw portion is implied by this contract's
       /// `withdraw_queue` (also consulted by `available()`).
+      ///
+      /// `shadow_yield` is meaningful only on a depot-native shadow row (`chain_code ==
+      /// opp::wire::chain_code`, `token_code != opp::wire::token_code`), whose bonded shadow earns
+      /// WIRE yield on this registry's `sysio.liq` holder row; it stays zero on every other row. It
+      /// is the `opp::shadow::custody` position of this row's balance: settled at `sysio.liq`'s live
+      /// index for the symbol before every change to `balance` (a new row settles at balance 0, so it
+      /// starts at the current index and is never credited earlier distributions), so a bonded unit
+      /// earns exactly what a unit of the registry's holder row earns while it is bonded.
       struct balance_entry {
-         sysio::slug_name  chain_code;
-         sysio::slug_name  token_code;
-         uint64_t         balance         = 0;
-         uint64_t         last_updated_ms = 0;
+         sysio::slug_name                   chain_code;
+         sysio::slug_name                   token_code;
+         uint64_t                           balance         = 0;
+         uint64_t                           last_updated_ms = 0;
+         opp::shadow::custody::position     shadow_yield;   ///< yield state of `balance` (shadow rows only)
 
-         SYSLIB_SERIALIZE(balance_entry, (chain_code)(token_code)(balance)(last_updated_ms))
+         SYSLIB_SERIALIZE(balance_entry, (chain_code)(token_code)(balance)(last_updated_ms)(shadow_yield))
       };
 
       /// Operators primary key: account name value.
@@ -536,9 +645,10 @@ namespace sysio {
             sysio::const_mem_fun<delivery_log_entry, uint128_t, &delivery_log_entry::by_account_ts>>
       >;
 
-      /// Claimable WIRE collateral owed to an operator by a WIRE-chain remit: a withdraw
+      /// Claimable depot-native collateral owed to an operator by a WIRE-chain remit: a withdraw
       /// flush (`flushwtdw`), a deferred lock release on a TERMINATED operator, or the
-      /// termination payout itself.
+      /// termination payout itself. One row per `(account, token_code)`: WIRE and each shadow
+      /// LIQ symbol an operator bonded are owed, and claimed, separately (see `deposit`).
       ///
       /// All three are reachable from `sysio.epoch::advance` (flush by epoch, termination via
       /// `termcheck`), which must never abort. A pushed `sysio.token::transfer` notifies the
@@ -566,9 +676,12 @@ namespace sysio {
       /// NOTHING EXPIRES TODAY: no `claimable::sweep_expired` call is wired against this table.
       /// `REMIT_CLAIM_WINDOW_SEC` is the provisional window the stamp is computed from, not a
       /// commitment — whether returned collateral should be forfeited at all is open in WIRE-339.
+      ///
+      /// Primary key: the owed operator and the depot-native token it is owed in.
       struct remitclaim_key {
-         uint64_t account;
-         SYSLIB_SERIALIZE(remitclaim_key, (account))
+         uint64_t         account;
+         sysio::slug_name token_code;
+         SYSLIB_SERIALIZE(remitclaim_key, (account)(token_code))
       };
 
       /// Provisional retention window used only to compute `remit_claim::expires_at_sec`. Mirrors
@@ -577,25 +690,46 @@ namespace sysio {
       static constexpr uint32_t REMIT_CLAIM_WINDOW_SEC = 365 * 24 * 60 * 60;
 
       struct [[sysio::table("remitclaims")]] remit_claim {
-         sysio::name account;
-         uint64_t    balance        = 0;   ///< Atomic WIRE units owed, not yet claimed.
-         uint32_t    expires_at_sec = 0;   // recorded by `credit`; read by nothing yet (WIRE-339)
+         sysio::name      account;
+         sysio::slug_name token_code;            ///< Depot-native token owed: WIRE or a shadow LIQ code.
+         uint64_t         balance        = 0;   ///< Atomic units of `token_code` owed, not yet claimed.
+         uint32_t         expires_at_sec = 0;   // recorded by `credit`; read by nothing yet (WIRE-339)
 
          /// Expiry-major composite so the secondary index orders by expiry and a future retention
-         /// sweep can stop at the first live row. The account tail only breaks ties, keeping the
-         /// key unique when many rows share an expiry second. (Same shape as
-         /// `sysio.reserv::wire_claim`.)
+         /// sweep can stop at the first live row. (Same shape as `sysio.reserv::wire_claim`.)
+         ///
+         /// The account tail breaks ties between operators, but NOT between one operator's
+         /// tokens: a remit that credits WIRE and a shadow token in the same second (termination
+         /// pays every depot-native row at once) gives both rows the same composite. The token is
+         /// not folded in because expiry, account and token need 160 bits and the index key is
+         /// 128. The tie is harmless: the host stores each index entry as `(composite, primary
+         /// key)` and keeps that pair unique, and the primary key carries the token, so tied rows
+         /// are distinct entries ordered by token; a sweep reads only the expiry prefix, so
+         /// visiting tied rows in either order changes nothing.
          uint128_t by_expiry() const {
             return (static_cast<uint128_t>(expires_at_sec) << 64) | account.value;
          }
 
-         SYSLIB_SERIALIZE(remit_claim, (account)(balance)(expires_at_sec))
+         SYSLIB_SERIALIZE(remit_claim, (account)(token_code)(balance)(expires_at_sec))
       };
 
       using remitclaims_t = sysio::kv::table<"remitclaims"_n, remitclaim_key, remit_claim,
          sysio::kv::index<"byexpiry"_n,
             sysio::const_mem_fun<remit_claim, uint128_t, &remit_claim::by_expiry>>
       >;
+
+      /// Key of a `yieldpool` row: the depot-native shadow token whose yield the row accounts for.
+      struct yield_pool_key {
+         sysio::slug_name token_code;
+         SYSLIB_SERIALIZE(yield_pool_key, (token_code))
+      };
+
+      /// Per depot-native shadow token: the `opp::shadow::custody::yield_pool` capping every yield
+      /// credit at the WIRE this registry has actually pulled from `sysio.liq` for it (`received`,
+      /// recorded at each pushed claim by `sweepyield` / `claimyield`) minus what it has already
+      /// credited to operators' WIRE claims (`credited`). The cap keeps yield credits from ever
+      /// drawing on the WIRE collateral held in the same `sysio.token` balance.
+      using yieldpool_t = sysio::kv::table<"yieldpool"_n, yield_pool_key, opp::shadow::custody::yield_pool>;
 
       /// Singleton holding the next-issued `request_id` / `log_id`. Keeps
       /// the auto-increment monotonic across action calls.

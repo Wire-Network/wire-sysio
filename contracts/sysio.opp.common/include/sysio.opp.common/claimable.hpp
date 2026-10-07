@@ -33,8 +33,9 @@
  * `sysio.reserv::rewards_bucket`). The helpers below are templated over the table instead, and
  * require only that the row expose:
  *
- *   * `uint64_t balance`            -- required, the claimable amount in atomic units of THAT
- *                                      contract's token (currently WIRE for every consumer) --
+ *   * `uint64_t balance`            -- required, the claimable amount in atomic units of the
+ *                                      row's token (WIRE for `payclaims` and `wireclaims`; the
+ *                                      row's own `token_code` for `sysio.opreg::remitclaims`) --
  *                                      these helpers never name a symbol; `pay_out`'s caller
  *                                      supplies it
  *   * `uint32_t expires_at_sec`     -- optional; when present it is maintained by `credit` and
@@ -118,7 +119,7 @@ void credit(Table& tbl, sysio::name payer, const Key& key, Row fresh, uint64_t a
    });
 }
 
-/// Drain a claimable row and emit the single `sysio.token::transfer` that pays it out.
+/// Drain a claimable row and emit the single `token_account::transfer` that pays it out.
 ///
 /// This is the ONLY place a claimable balance becomes a transfer, and it is reached only from an
 /// action carrying the claimant's own authority. A recipient whose notify handler aborts therefore

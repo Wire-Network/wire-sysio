@@ -7035,7 +7035,8 @@ BOOST_FIXTURE_TEST_CASE( deposit_rejects_a_bootstrapped_operator, producer_score
    auto names = setup_ranked_producers(1);
 
    BOOST_REQUIRE_EQUAL( wasm_assert_msg("bootstrapped operators cannot deposit collateral"),
-      push_opreg_action(names[0], "deposit"_n, mvo()("account", names[0])("amount", uint64_t{1'000})) );
+      push_opreg_action(names[0], "deposit"_n, mvo()("account", names[0])("token_code", "WIRE")
+                                                     ("amount", uint64_t{1'000})) );
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
