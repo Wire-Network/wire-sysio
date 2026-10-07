@@ -329,6 +329,61 @@ public:
       return fc::variant{};
    }
 
+   /// Push `buildenv` for `chain_code` and return what it printed.
+   std::string buildenv_console(uint64_t chain_code) {
+      const auto trace = base_tester::push_action(MSGCH_ACCOUNT, "buildenv"_n, EPOCH_ACCOUNT,
+                                                  mvo()("chain_code", chain_code));
+      std::string console;
+      for (const auto& action_trace : trace->action_traces) console += action_trace.console;
+      return console;
+   }
+
+   /// Whether attestation `id` is still stored.
+   bool attestation_stored(uint64_t id) {
+      return !get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "attestations"_n, id).empty();
+   }
+
+   /// The stored `outenvelopes` row for `chain_code` (the table keeps one per outpost), or null.
+   fc::variant outbound_envelope_row(uint64_t chain_code, uint64_t scan_until = 32) {
+      for (uint64_t id = 0; id < scan_until; ++id) {
+         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
+         if (data.empty()) continue;
+         auto row = msgch_abi.binary_to_variant(
+            "outbound_envelope", data,
+            abi_serializer::create_yield_function(abi_serializer_max_time));
+         if (row["chain_code"].as_uint64() == chain_code) return row;
+      }
+      return fc::variant{};
+   }
+
+   /// The raw envelope stored for `chain_code`; fails the test when there is none.
+   std::vector<char> outbound_envelope_bytes(uint64_t chain_code) {
+      const auto row = outbound_envelope_row(chain_code);
+      BOOST_REQUIRE(!row.is_null());
+      return row["raw_envelope"].as<std::vector<char>>();
+   }
+
+   /// The envelope stored for `chain_code`, decoded; `buildenv` always wraps one message.
+   opp::Envelope outbound_envelope_for(uint64_t chain_code) {
+      const auto raw = outbound_envelope_bytes(chain_code);
+      opp::Envelope env;
+      BOOST_REQUIRE(env.ParseFromArray(raw.data(), static_cast<int>(raw.size())));
+      BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
+      return env;
+   }
+
+   /// The first byte of every attestation the envelope stored for `chain_code` carries, in order.
+   /// The packing tests fill each payload with its own tag byte.
+   std::string shipped_tags(uint64_t chain_code) {
+      const auto  env = outbound_envelope_for(chain_code);
+      std::string tags;
+      for (const auto& att : env.messages(0).payload().attestations()) {
+         BOOST_REQUIRE(!att.data().empty());
+         tags.push_back(att.data().front());
+      }
+      return tags;
+   }
+
    /// Count populated `envlog` rows in the id range `[0, max_id_exclusive)`.
    /// Cheap enough for the test scales here (≤ a few thousand probes).
    uint32_t envlog_row_count_until(uint64_t max_id_exclusive) {
@@ -358,6 +413,18 @@ constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
 
 constexpr auto EVM_TEST_ATTESTATION_TYPE       = opp::types::ATTESTATION_TYPE_OPERATORS;
 constexpr auto SWAP_REMIT_ATTESTATION_TYPE    = opp::types::ATTESTATION_TYPE_SWAP_REMIT;
+
+/// Mirrors of the packing limits in `sysio.msgch.hpp` (contract headers are not host-compilable).
+constexpr size_t MAX_ENVELOPE_BYTES         = 32'768;
+constexpr size_t ENVELOPE_BASELINE_BYTES    = 512;
+constexpr size_t ATTESTATION_OVERHEAD_BYTES = 24;
+constexpr size_t SCHEDULE_LANE_BUDGET_BYTES = MAX_ENVELOPE_BYTES / 4 * 3;
+/// The largest schedule-lane `data` that can ship; one byte more fits no envelope and is dropped.
+constexpr size_t MAX_ATTESTATION_DATA_BYTES =
+   MAX_ENVELOPE_BYTES - ENVELOPE_BASELINE_BYTES - ATTESTATION_OVERHEAD_BYTES;
+/// The largest other-lane `data` that can ship; one byte more fits no envelope beside a full schedule lane.
+constexpr size_t MAX_OTHER_ATTESTATION_DATA_BYTES =
+   MAX_ENVELOPE_BYTES - ENVELOPE_BASELINE_BYTES - SCHEDULE_LANE_BUDGET_BYTES - ATTESTATION_OVERHEAD_BYTES;
 
 } // anonymous namespace
 
@@ -621,6 +688,188 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
    uint32_t still_ready_after_emit2 =
       count_ready_attestations(/*chain_code=*/ETH_OUTPOST_ID, /*scan_until=*/TOTAL_ATTESTATIONS + 4);
    BOOST_REQUIRE_EQUAL(still_ready_after_emit2, 0u);
+} FC_LOG_AND_RETHROW() }
+
+/// `buildenv` walks only its own outpost's READY queue, oldest first, and stops at the first row that
+/// does not fit. Rows behind that point are not reached, not even one its lane could never ship, and the
+/// other outpost's rows, oversized or not, are neither packed nor dropped.
+BOOST_FIXTURE_TEST_CASE(buildenv_packs_one_outpost_queue_in_order_up_to_the_budget,
+                        sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   register_outpost(opp::types::CHAIN_KIND_SVM, 0);
+   produce_blocks();
+
+   // Four of these fit one envelope and a fifth does not; each is within the other lane's bound.
+   constexpr size_t QUARTER_OF_AN_ENVELOPE = 7'000;
+   const auto queue = [&](uint64_t chain_code, char tag, size_t size) {
+      BOOST_REQUIRE_EQUAL(success(), queueout_with_data(chain_code, SWAP_REMIT_ATTESTATION_TYPE,
+                                                        std::vector<char>(size, tag)));
+   };
+   // Attestation ids run 1..8 in queue order, the two outposts interleaved.
+   queue(SOL_OUTPOST_ID, 'S', MAX_OTHER_ATTESTATION_DATA_BYTES + 1);   // 1
+   queue(ETH_OUTPOST_ID, 'a', QUARTER_OF_AN_ENVELOPE);                 // 2
+   queue(SOL_OUTPOST_ID, 's', 1);                                      // 3
+   queue(ETH_OUTPOST_ID, 'b', QUARTER_OF_AN_ENVELOPE);                 // 4
+   queue(ETH_OUTPOST_ID, 'c', QUARTER_OF_AN_ENVELOPE);                 // 5
+   queue(ETH_OUTPOST_ID, 'd', QUARTER_OF_AN_ENVELOPE);                 // 6
+   queue(ETH_OUTPOST_ID, 'e', QUARTER_OF_AN_ENVELOPE);                 // 7: does not fit behind a to d
+   queue(ETH_OUTPOST_ID, 'X', MAX_OTHER_ATTESTATION_DATA_BYTES + 1);   // 8: behind the stop point
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL("abcd", shipped_tags(ETH_OUTPOST_ID));
+   BOOST_REQUIRE(!attestation_stored(2) && !attestation_stored(4) && !attestation_stored(5) && !attestation_stored(6));
+   BOOST_REQUIRE(attestation_stored(7));
+   BOOST_REQUIRE_MESSAGE(attestation_stored(8), "the walk went past the first row that did not fit");
+   BOOST_REQUIRE_MESSAGE(attestation_stored(1) && attestation_stored(3), "the walk touched another outpost's queue");
+   BOOST_REQUIRE(outbound_envelope_row(SOL_OUTPOST_ID).is_null());
+
+   // The next envelope ships e, and the walk now reaches X and drops it.
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL("e", shipped_tags(ETH_OUTPOST_ID));
+   BOOST_REQUIRE(!attestation_stored(7) && !attestation_stored(8));
+
+   // SOL's own walk drops its oversized head and ships the row behind it in the same envelope.
+   BOOST_REQUIRE_EQUAL(success(), buildenv(SOL_OUTPOST_ID));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL("s", shipped_tags(SOL_OUTPOST_ID));
+   BOOST_REQUIRE(!attestation_stored(1) && !attestation_stored(3));
+} FC_LOG_AND_RETHROW() }
+
+/// Each lane's drop bound is exact. A schedule row that just fits an otherwise empty envelope ships alone
+/// within the cap. An other-lane row at its bound, the most that fits beside a full schedule lane, ships;
+/// one byte over is dropped with a diagnostic, and the row queued behind it ships in the same envelope.
+BOOST_FIXTURE_TEST_CASE(buildenv_drops_only_what_its_lane_can_never_ship, sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   produce_blocks();
+
+   const auto queue = [&](opp::types::AttestationType type, char tag, size_t size) {
+      BOOST_REQUIRE_EQUAL(success(), queueout_with_data(ETH_OUTPOST_ID, type, std::vector<char>(size, tag)));
+   };
+   queue(EVM_TEST_ATTESTATION_TYPE, 'a', MAX_ATTESTATION_DATA_BYTES);                // 1: schedule, fills it alone
+   queue(SWAP_REMIT_ATTESTATION_TYPE, 'b', MAX_OTHER_ATTESTATION_DATA_BYTES);        // 2: other, at its bound
+   queue(SWAP_REMIT_ATTESTATION_TYPE, 'x', MAX_OTHER_ATTESTATION_DATA_BYTES + 1);    // 3: other, one byte over
+   queue(SWAP_REMIT_ATTESTATION_TYPE, 'c', 1);                                       // 4
+   produce_blocks();
+
+   const auto first = buildenv_console(ETH_OUTPOST_ID);
+   produce_blocks();
+   BOOST_REQUIRE_MESSAGE(first.find("DROP") == std::string::npos, first);
+   BOOST_REQUIRE_EQUAL("a", shipped_tags(ETH_OUTPOST_ID));
+   BOOST_REQUIRE_LE(outbound_envelope_bytes(ETH_OUTPOST_ID).size(), MAX_ENVELOPE_BYTES);
+   BOOST_REQUIRE(attestation_stored(2) && attestation_stored(3) && attestation_stored(4));
+
+   const auto second = buildenv_console(ETH_OUTPOST_ID);
+   produce_blocks();
+   BOOST_REQUIRE_MESSAGE(second.find("DROP attestation 3 (") != std::string::npos, second);
+   BOOST_REQUIRE_EQUAL("bc", shipped_tags(ETH_OUTPOST_ID));
+   BOOST_REQUIRE(!attestation_stored(2) && !attestation_stored(3) && !attestation_stored(4));
+} FC_LOG_AND_RETHROW() }
+
+/// The lane bounds leave no gap. A schedule whose estimate is its whole budget and an other-lane row at its
+/// bound together estimate exactly `MAX_ENVELOPE_BYTES`, and both ship in one envelope within the cap: nothing
+/// is dropped, and the trim loop does not pop the other row. A single schedule row leaves the estimate the
+/// least slack over the real encoding, and an earlier emit gives the envelope both chain links.
+BOOST_FIXTURE_TEST_CASE(buildenv_ships_the_largest_other_row_beside_a_full_schedule, sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   produce_blocks();
+
+   const auto queue = [&](opp::types::AttestationType type, char tag, size_t size) {
+      BOOST_REQUIRE_EQUAL(success(), queueout_with_data(ETH_OUTPOST_ID, type, std::vector<char>(size, tag)));
+   };
+   queue(SWAP_REMIT_ATTESTATION_TYPE, 'p', 1);
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
+   produce_blocks();
+
+   queue(EVM_TEST_ATTESTATION_TYPE, 'a', SCHEDULE_LANE_BUDGET_BYTES - ATTESTATION_OVERHEAD_BYTES);
+   queue(SWAP_REMIT_ATTESTATION_TYPE, 'b', MAX_OTHER_ATTESTATION_DATA_BYTES);
+   produce_blocks();
+
+   const auto console = buildenv_console(ETH_OUTPOST_ID);
+   produce_blocks();
+   BOOST_REQUIRE_MESSAGE(console.find("DROP") == std::string::npos, console);
+   BOOST_REQUIRE_EQUAL("ab", shipped_tags(ETH_OUTPOST_ID));
+   const auto env = outbound_envelope_for(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(!env.previous_envelope_hash().empty() && !env.messages(0).header().previous_message_id().empty());
+   const size_t envelope_bytes = outbound_envelope_bytes(ETH_OUTPOST_ID).size();
+   BOOST_TEST_MESSAGE("a full schedule beside the largest other row encodes to " << envelope_bytes << " bytes");
+   BOOST_REQUIRE_LE(envelope_bytes, MAX_ENVELOPE_BYTES);
+} FC_LOG_AND_RETHROW() }
+
+/// A queue emptied by drops still emits the epoch's envelope, carrying no attestations, because each
+/// outpost answers the depot's envelope with its own; an empty queue emits none.
+BOOST_FIXTURE_TEST_CASE(buildenv_emits_an_empty_envelope_when_it_drops_the_whole_queue,
+                        sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
+   produce_blocks();
+   BOOST_REQUIRE(outbound_envelope_row(ETH_OUTPOST_ID).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), queueout_with_data(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE,
+                                                     std::vector<char>(MAX_ATTESTATION_DATA_BYTES + 1, 'x')));
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
+   produce_blocks();
+   BOOST_REQUIRE(!attestation_stored(1));
+   BOOST_REQUIRE_EQUAL(0, outbound_envelope_for(ETH_OUTPOST_ID).messages(0).payload().attestations_size());
+} FC_LOG_AND_RETHROW() }
+
+/// The operator schedule packs ahead of other traffic whatever the queue order, and each lane keeps its own
+/// queue order, so OPERATORS stays ahead of the BATCH_OPERATOR_GROUPS queued after it.
+BOOST_FIXTURE_TEST_CASE(buildenv_packs_the_operator_schedule_first, sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   produce_blocks();
+
+   const auto queue = [&](opp::types::AttestationType type, char tag) {
+      BOOST_REQUIRE_EQUAL(success(), queueout_with_data(ETH_OUTPOST_ID, type, std::vector<char>{tag}));
+   };
+   queue(SWAP_REMIT_ATTESTATION_TYPE, 'a');
+   queue(opp::types::ATTESTATION_TYPE_OPERATORS, 'o');
+   queue(SWAP_REMIT_ATTESTATION_TYPE, 'b');
+   queue(opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS, 'g');
+   queue(opp::types::ATTESTATION_TYPE_OPERATORS, 'p');
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL("ogpab", shipped_tags(ETH_OUTPOST_ID));
+} FC_LOG_AND_RETHROW() }
+
+/// A schedule over its budget still ships, since each row fits an envelope, but `buildenv` reports it: it can
+/// hold other-lane rows back. A schedule exactly at the budget is not reported.
+BOOST_FIXTURE_TEST_CASE(buildenv_reports_a_schedule_over_its_budget, sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   produce_blocks();
+
+   constexpr std::string_view over_budget = "over its 24576-byte budget";
+   const auto queue = [&](char tag, size_t size) {
+      BOOST_REQUIRE_EQUAL(success(), queueout_with_data(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE,
+                                                        std::vector<char>(size, tag)));
+   };
+
+   queue('a', SCHEDULE_LANE_BUDGET_BYTES - ATTESTATION_OVERHEAD_BYTES);
+   produce_blocks();
+   const auto at_budget = buildenv_console(ETH_OUTPOST_ID);
+   produce_blocks();
+   BOOST_REQUIRE_MESSAGE(at_budget.find(over_budget) == std::string::npos, at_budget);
+   BOOST_REQUIRE_EQUAL("a", shipped_tags(ETH_OUTPOST_ID));
+
+   queue('b', SCHEDULE_LANE_BUDGET_BYTES - ATTESTATION_OVERHEAD_BYTES + 1);
+   produce_blocks();
+   const auto past_budget = buildenv_console(ETH_OUTPOST_ID);
+   produce_blocks();
+   BOOST_REQUIRE_MESSAGE(past_budget.find(over_budget) != std::string::npos, past_budget);
+   BOOST_REQUIRE_EQUAL("b", shipped_tags(ETH_OUTPOST_ID));
 } FC_LOG_AND_RETHROW() }
 
 // queueout carries no ABI-level auth. Without the depot-contract gate, any account could call it

@@ -67,6 +67,11 @@ namespace sysio {
       /// The kicker at launch: 2% of every yield intake, drawn from T5.
       static constexpr uint32_t DEFAULT_KICKER_BPS = 200;
 
+      /// `create` sets a new shadow's `min_desyndicate` to one whole token divided by this, and never
+      /// below one subunit. Every de-syndication is a sysio-billed outbound row and a relayer-paid
+      /// payout, so the floor keeps dust from buying either.
+      static constexpr int64_t DEFAULT_MIN_DESYNDICATE_DIVISOR = 100;
+
       // -----------------------------------------------------------------------
       //  Deployment and governance
       // -----------------------------------------------------------------------
@@ -85,6 +90,10 @@ namespace sysio {
       /// a de-syndication (reconciled from the outpost log). Requires this
       /// contract's authority.
       [[sysio::action]] void recredit(name holder, asset quantity);
+
+      /// Set the smallest quantity `desyndicate` accepts for `minimum`'s symbol. Requires this
+      /// contract's authority; the minimum must be positive.
+      [[sysio::action]] void setmindesyn(asset minimum);
 
       // -----------------------------------------------------------------------
       //  Inbound OPP effects (sysio.msgch dispatch; never throw)
@@ -153,6 +162,7 @@ namespace sysio {
 
       /// Burn `quantity` of `holder`'s shadow and queue DESYNDICATE_LIQ to the
       /// symbol's outpost, paying the pubkey `holder` has linked for that chain.
+      /// `quantity` must reach the symbol's `min_desyndicate`.
       /// The burn is final: an outpost refusal is reconciled by governance through
       /// `recredit`. Holder's authority.
       [[sysio::action]] void desyndicate(name holder, asset quantity);
@@ -202,10 +212,11 @@ namespace sysio {
          sysio::slug_name chain_code;    ///< the outpost whose liq this shadow mirrors
          sysio::slug_name token_code;    ///< that outpost's liq token in sysio.tokens
          symbol_code      pair_symbol;   ///< the swap's pair token of this shadow's yield pool; empty until regliqpool
+         asset            min_desyndicate;   ///< smallest quantity `desyndicate` accepts; `setmindesyn` retunes it
 
          uint64_t by_token_code() const { return token_code.value; }
 
-         SYSLIB_SERIALIZE(currency_stats, (supply)(chain_code)(token_code)(pair_symbol))
+         SYSLIB_SERIALIZE(currency_stats, (supply)(chain_code)(token_code)(pair_symbol)(min_desyndicate))
       };
 
       using stats = kv::table<"stat"_n, symbol_key, currency_stats,
