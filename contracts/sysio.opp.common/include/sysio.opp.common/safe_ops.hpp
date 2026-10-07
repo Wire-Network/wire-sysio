@@ -72,6 +72,22 @@ inline std::optional<uint64_t> to_depot_amount(int64_t amount) {
    return static_cast<uint64_t>(amount);
 }
 
+/// Fail-closed conversion of a depot amount into an outbound OPP
+/// `TokenAmount.amount`, the inverse of `to_depot_amount`.
+///
+/// The wire field is signed, so a bare `static_cast<int64_t>` turns any value
+/// at or above `2^63` negative. This accepts exactly the range the inbound gate
+/// accepts, so the depot never emits an amount it would refuse to receive.
+///
+/// @param amount a depot-frame amount.
+/// @return the amount as the signed wire value, or `std::nullopt` when it is
+///         zero or above `depot_amount_max`.
+inline std::optional<int64_t> to_token_amount(uint64_t amount) {
+   if (amount == 0)                                      return std::nullopt;
+   if (amount > static_cast<uint64_t>(depot_amount_max)) return std::nullopt;
+   return static_cast<int64_t>(amount);
+}
+
 /// Saturating unsigned 64-bit addition. Returns `a + b`, clamped to
 /// `UINT64_MAX` on overflow instead of wrapping.
 ///
