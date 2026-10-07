@@ -1,0 +1,1286 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "bucket_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "token_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "direction",
+                    "type": "uint8"
+                }
+            ]
+        },
+        {
+            "name": "bucket_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "direction",
+                    "type": "bucket_direction"
+                },
+                {
+                    "name": "level",
+                    "type": "uint64"
+                },
+                {
+                    "name": "last_epoch",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "challenge",
+            "base": "",
+            "fields": [
+                {
+                    "name": "challenger",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "closeenv",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "digest",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "config_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "token_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "crank",
+            "base": "",
+            "fields": [
+                {
+                    "name": "limit",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "cursor_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "desyndicate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "holder",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "dropenv",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "envelope_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "token_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "envelope_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "digest",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "synd_total",
+                    "type": "uint64"
+                },
+                {
+                    "name": "yield_total",
+                    "type": "uint64"
+                },
+                {
+                    "name": "item_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "state",
+                    "type": "envelope_state"
+                },
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "released",
+                    "type": "uint64"
+                },
+                {
+                    "name": "burned",
+                    "type": "uint64"
+                },
+                {
+                    "name": "outcome",
+                    "type": "request_outcome"
+                },
+                {
+                    "name": "forfeit",
+                    "type": "uint64"
+                },
+                {
+                    "name": "bounty_returned",
+                    "type": "uint64"
+                },
+                {
+                    "name": "hold_share",
+                    "type": "uint64"
+                },
+                {
+                    "name": "hold_beneficiary",
+                    "type": "name"
+                },
+                {
+                    "name": "share_pending",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "fee_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "balance",
+                    "type": "uint64"
+                },
+                {
+                    "name": "position",
+                    "type": "position"
+                }
+            ]
+        },
+        {
+            "name": "finishreturn",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "import_credit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pubkey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "importdone",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "importsynd",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "credits",
+                    "type": "import_credit[]"
+                }
+            ]
+        },
+        {
+            "name": "item_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "token_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "item_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "kind",
+                    "type": "item_kind"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "pubkey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "remaining",
+                    "type": "uint64"
+                },
+                {
+                    "name": "position",
+                    "type": "position"
+                }
+            ]
+        },
+        {
+            "name": "ledger_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "token_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "ledger_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "queue_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "underwriting_epoch",
+                    "type": "uint32"
+                },
+                {
+                    "name": "retained_from_epoch",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "linkswept",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "pubkey",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "mismatch_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "token_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "mismatch_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "sequence",
+                    "type": "uint64"
+                },
+                {
+                    "name": "kind",
+                    "type": "item_kind"
+                },
+                {
+                    "name": "reported",
+                    "type": "uint64"
+                },
+                {
+                    "name": "expected",
+                    "type": "uint64"
+                },
+                {
+                    "name": "at",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "onsynd",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "digest",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "sequence",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "pubkey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "total_syndicated",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "onyield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "digest",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "sequence",
+                    "type": "uint64"
+                },
+                {
+                    "name": "outpost_epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "total_syndicated",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "parked_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "uint64"
+                },
+                {
+                    "name": "pubkey",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "parked_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "pubkey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "balance",
+                    "type": "uint64"
+                },
+                {
+                    "name": "position",
+                    "type": "position"
+                }
+            ]
+        },
+        {
+            "name": "pool_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "pool",
+                    "type": "yield_pool"
+                }
+            ]
+        },
+        {
+            "name": "position",
+            "base": "",
+            "fields": [
+                {
+                    "name": "index_checkpoint",
+                    "type": "uint128"
+                },
+                {
+                    "name": "owed_wire",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "pruneenv",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "limit",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "reconcile",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "reported",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "refundreturn",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "return_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "return_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "request_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "holder",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "pubkey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "setconfig",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "synd_fee_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "desynd_fee_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "synd_burst",
+                    "type": "uint64"
+                },
+                {
+                    "name": "synd_refill",
+                    "type": "uint64"
+                },
+                {
+                    "name": "desynd_burst",
+                    "type": "uint64"
+                },
+                {
+                    "name": "desynd_refill",
+                    "type": "uint64"
+                },
+                {
+                    "name": "window_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "bounty",
+                    "type": "uint64"
+                },
+                {
+                    "name": "challenge_extra",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "sweep",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                }
+            ]
+        },
+        {
+            "name": "sweepyield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "sync",
+            "base": "",
+            "fields": [
+                {
+                    "name": "limit",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "syncenv",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "synd_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "synd_fee_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "desynd_fee_bps",
+                    "type": "uint32"
+                },
+                {
+                    "name": "synd_burst",
+                    "type": "uint64"
+                },
+                {
+                    "name": "synd_refill",
+                    "type": "uint64"
+                },
+                {
+                    "name": "desynd_burst",
+                    "type": "uint64"
+                },
+                {
+                    "name": "desynd_refill",
+                    "type": "uint64"
+                },
+                {
+                    "name": "window_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "bounty",
+                    "type": "uint64"
+                },
+                {
+                    "name": "challenge_extra",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "synd_counters",
+            "base": "",
+            "fields": [
+                {
+                    "name": "next_item_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "next_request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "synd_cursor",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "last_sequence",
+                    "type": "uint64"
+                },
+                {
+                    "name": "last_epoch",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "synd_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "import_complete",
+                    "type": "bool"
+                },
+                {
+                    "name": "queue_cursor",
+                    "type": "uint64"
+                },
+                {
+                    "name": "underwriting_cursor",
+                    "type": "uint64"
+                },
+                {
+                    "name": "sync_cursor",
+                    "type": "envelope_key"
+                }
+            ]
+        },
+        {
+            "name": "token_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "yield_pool",
+            "base": "",
+            "fields": [
+                {
+                    "name": "received",
+                    "type": "uint64"
+                },
+                {
+                    "name": "credited",
+                    "type": "uint64"
+                },
+                {
+                    "name": "pulled_index",
+                    "type": "uint128"
+                },
+                {
+                    "name": "pulled_owed",
+                    "type": "uint64"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "challenge",
+            "type": "challenge",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "closeenv",
+            "type": "closeenv",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "crank",
+            "type": "crank",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "desyndicate",
+            "type": "desyndicate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "dropenv",
+            "type": "dropenv",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "finishreturn",
+            "type": "finishreturn",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "importdone",
+            "type": "importdone",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "importsynd",
+            "type": "importsynd",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "linkswept",
+            "type": "linkswept",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "onsynd",
+            "type": "onsynd",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "onyield",
+            "type": "onyield",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "pruneenv",
+            "type": "pruneenv",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "reconcile",
+            "type": "reconcile",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "refundreturn",
+            "type": "refundreturn",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setconfig",
+            "type": "setconfig",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sweep",
+            "type": "sweep",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sweepyield",
+            "type": "sweepyield",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sync",
+            "type": "sync",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "syncenv",
+            "type": "syncenv",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "buckets",
+            "type": "bucket_row",
+            "index_type": "i64",
+            "key_names": ["chain_code","token_code","direction"],
+            "key_types": ["uint64","uint64","uint8"],
+            "table_id": 59616
+        },
+        {
+            "name": "envelopes",
+            "type": "envelope_row",
+            "index_type": "i64",
+            "key_names": ["chain_code","token_code","epoch_index"],
+            "key_types": ["uint64","uint64","uint32"],
+            "table_id": 45555
+        },
+        {
+            "name": "feepot",
+            "type": "fee_row",
+            "index_type": "i64",
+            "key_names": ["token_code"],
+            "key_types": ["uint64"],
+            "table_id": 22642
+        },
+        {
+            "name": "items",
+            "type": "item_row",
+            "index_type": "i64",
+            "key_names": ["chain_code","token_code","epoch_index","id"],
+            "key_types": ["uint64","uint64","uint32","uint64"],
+            "table_id": 37244
+        },
+        {
+            "name": "ledger",
+            "type": "ledger_row",
+            "index_type": "i64",
+            "key_names": ["chain_code","token_code"],
+            "key_types": ["uint64","uint64"],
+            "table_id": 50082
+        },
+        {
+            "name": "mismatch",
+            "type": "mismatch_row",
+            "index_type": "i64",
+            "key_names": ["chain_code","token_code"],
+            "key_types": ["uint64","uint64"],
+            "table_id": 57982
+        },
+        {
+            "name": "parked",
+            "type": "parked_row",
+            "index_type": "i64",
+            "key_names": ["token_code","chain_kind","pubkey"],
+            "key_types": ["uint64","uint64","bytes"],
+            "table_id": 38854
+        },
+        {
+            "name": "returns",
+            "type": "return_row",
+            "index_type": "i64",
+            "key_names": ["request_id"],
+            "key_types": ["uint64"],
+            "table_id": 25676
+        },
+        {
+            "name": "syndconfig",
+            "type": "synd_config",
+            "index_type": "i64",
+            "key_names": ["chain_code","token_code"],
+            "key_types": ["uint64","uint64"],
+            "table_id": 5686
+        },
+        {
+            "name": "syndcounters",
+            "type": "synd_counters",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 36549
+        },
+        {
+            "name": "syndcursors",
+            "type": "synd_cursor",
+            "index_type": "i64",
+            "key_names": ["chain_code"],
+            "key_types": ["uint64"],
+            "table_id": 42845
+        },
+        {
+            "name": "syndstate",
+            "type": "synd_state",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 53531
+        },
+        {
+            "name": "yieldpool",
+            "type": "pool_row",
+            "index_type": "i64",
+            "key_names": ["token_code"],
+            "key_types": ["uint64"],
+            "table_id": 51955
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": [],
+    "enums": [
+        {
+            "name": "ChainKind",
+            "type": "int32",
+            "values": [
+                {
+                    "name": "CHAIN_KIND_UNKNOWN",
+                    "value": 0
+                },
+                {
+                    "name": "CHAIN_KIND_WIRE",
+                    "value": 1
+                },
+                {
+                    "name": "CHAIN_KIND_EVM",
+                    "value": 2
+                },
+                {
+                    "name": "CHAIN_KIND_SVM",
+                    "value": 3
+                }
+            ]
+        },
+        {
+            "name": "bucket_direction",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "SYNDICATION",
+                    "value": 0
+                },
+                {
+                    "name": "DESYNDICATION",
+                    "value": 1
+                }
+            ]
+        },
+        {
+            "name": "envelope_state",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "OPEN",
+                    "value": 0
+                },
+                {
+                    "name": "WAITING",
+                    "value": 1
+                },
+                {
+                    "name": "REQUESTED",
+                    "value": 2
+                },
+                {
+                    "name": "RELEASABLE",
+                    "value": 3
+                },
+                {
+                    "name": "HELD",
+                    "value": 4
+                },
+                {
+                    "name": "INVALID",
+                    "value": 5
+                },
+                {
+                    "name": "DONE",
+                    "value": 6
+                }
+            ]
+        },
+        {
+            "name": "item_kind",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "SYNDICATION",
+                    "value": 0
+                },
+                {
+                    "name": "YIELD",
+                    "value": 1
+                }
+            ]
+        },
+        {
+            "name": "request_outcome",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "PENDING",
+                    "value": 0
+                },
+                {
+                    "name": "APPROVED",
+                    "value": 1
+                },
+                {
+                    "name": "VALID",
+                    "value": 2
+                },
+                {
+                    "name": "INVALID",
+                    "value": 3
+                }
+            ]
+        }
+    ]
+}

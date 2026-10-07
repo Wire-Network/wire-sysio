@@ -163,61 +163,6 @@
       ]
     },
     {
-      "name": "deposit",
-      "discriminator": [
-        242,
-        35,
-        198,
-        137,
-        82,
-        225,
-        242,
-        182
-      ],
-      "accounts": [
-        {
-          "name": "depositor",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "config"
-        },
-        {
-          "name": "operator_registry"
-        },
-        {
-          "name": "outbound_message_buffer",
-          "writable": true
-        },
-        {
-          "name": "vault",
-          "writable": true
-        },
-        {
-          "name": "collateral_position",
-          "writable": true
-        },
-        {
-          "name": "system_program"
-        }
-      ],
-      "args": [
-        {
-          "name": "operator_type",
-          "type": "u32"
-        },
-        {
-          "name": "token_code",
-          "type": "u64"
-        },
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "cleanup_envelope_chunks",
       "discriminator": [
         224,
@@ -299,14 +244,6 @@
         },
         {
           "name": "latest_outbound_envelope",
-          "writable": true
-        },
-        {
-          "name": "vault",
-          "writable": true
-        },
-        {
-          "name": "reserve_aggregate",
           "writable": true
         },
         {
@@ -420,19 +357,6 @@
       ]
     },
     {
-      "name": "Reserve",
-      "discriminator": [
-        43,
-        242,
-        204,
-        202,
-        26,
-        247,
-        59,
-        127
-      ]
-    },
-    {
       "name": "OperatorRegistry",
       "discriminator": [
         194,
@@ -482,6 +406,19 @@
         170,
         4,
         103
+      ]
+    },
+    {
+      "name": "LatestOutboundEnvelope",
+      "discriminator": [
+        74,
+        80,
+        163,
+        159,
+        178,
+        236,
+        249,
+        15
       ]
     }
   ],
@@ -572,88 +509,6 @@
                   "name": "TokenPrecisionEntry"
                 }
               }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "Reserve",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "bump",
-            "type": "u8"
-          },
-          {
-            "name": "token_code",
-            "type": "u64"
-          },
-          {
-            "name": "reserve_code",
-            "type": "u64"
-          },
-          {
-            "name": "external_token_amount",
-            "type": "u64"
-          },
-          {
-            "name": "requested_wire_amount",
-            "type": "u64"
-          },
-          {
-            "name": "connector_weight_bps",
-            "type": "u32"
-          },
-          {
-            "name": "status",
-            "type": {
-              "defined": {
-                "name": "ReserveStatus"
-              }
-            }
-          },
-          {
-            "name": "creator",
-            "type": "pubkey"
-          },
-          {
-            "name": "custody_mint",
-            "type": "pubkey"
-          },
-          {
-            "name": "custody_decimals",
-            "type": "u8"
-          },
-          {
-            "name": "custody_token_program",
-            "type": "pubkey"
-          },
-          {
-            "name": "name_len",
-            "type": "u8"
-          },
-          {
-            "name": "name_bytes",
-            "type": {
-              "array": [
-                "u8",
-                64
-              ]
-            }
-          },
-          {
-            "name": "description_len",
-            "type": "u16"
-          },
-          {
-            "name": "description_bytes",
-            "type": {
-              "array": [
-                "u8",
-                256
-              ]
             }
           }
         ]
@@ -840,6 +695,37 @@
           },
           {
             "name": "Launching"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LatestOutboundEnvelope",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "epoch_index",
+            "type": "u32"
+          },
+          {
+            "name": "checksum",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "data",
+            "type": {
+              "vec": "u8"
+            }
           }
         ]
       }

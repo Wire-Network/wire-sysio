@@ -20,6 +20,12 @@ The collection of system contracts consists of the following individual contract
 * [multisig contract](contracts/sysio.msig/include/sysio.msig/sysio.msig.hpp): A contract that enables proposing transactions on the blockchain, collecting authorization approvals for many accounts, and then executing the actions within the transaction after authorization requirements of the transaction have been reached. (Note: this contract must be deployed to a privileged account.)
 * [wrap contract](contracts/sysio.wrap/include/sysio.wrap/sysio.wrap.hpp): A contract that wraps around any transaction and allows for executing its actions without needing to satisfy the authorization requirements of the transaction. If used, the permissions of the account hosting this contract should be configured to only allow highly trusted parties (e.g. the operators of the blockchain) to have the ability to execute its actions. (Note: this contract must be deployed to a privileged account.)
 
+## Depot flow tests
+
+See [Depot flow coverage](tests/DEPOT_FLOW_TESTING.md) for the native mirrors of
+all enabled cluster flows, the generic external-chain simulator, deterministic
+action sequences, and focused/full validation commands.
+
 ## Branches
 
 The `master` branch contains the latest stable branch 

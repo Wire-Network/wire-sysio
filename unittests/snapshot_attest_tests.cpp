@@ -1,7 +1,7 @@
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/chain/contract_table_objects.hpp>
-#include <sysio/protocol/snapshot_attestation.hpp>
+#include <sysio.system/snapshot_attest_constants.hpp>
 #include <sysio/testing/tester.hpp>
 
 #include <boost/test/unit_test.hpp>

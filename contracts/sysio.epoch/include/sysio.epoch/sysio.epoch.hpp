@@ -129,8 +129,21 @@ namespace sysio {
       static constexpr name OPREG_ACCOUNT  = "sysio.opreg"_n;
       static constexpr name AUTHEX_ACCOUNT = "sysio.authex"_n;
       static constexpr name CHAINS_ACCOUNT = "sysio.chains"_n;
-      static constexpr name UWRIT_ACCOUNT  = "sysio.uwrit"_n;
-      static constexpr name RESERV_ACCOUNT = "sysio.reserv"_n;
+
+      /// True while the depot is in its epoch-0 bootstrap window: no epoch state yet, or the
+      /// current epoch index is still 0. Never throws. The one window test `sysio.liq`'s
+      /// `regliqpool` and `sysio.synd`'s `importsynd` gate their launch ingestion on.
+      static bool in_bootstrap_window() {
+         epochstate_t es(EPOCH_ACCOUNT);
+         return !es.exists() || es.get().current_epoch_index == 0;
+      }
+
+      /// The depot's current epoch index, or 0 before the first epoch state is written. Never
+      /// throws. The one reader of the index alone: `sysio.msgch` and `sysio.synd`'s bucket ticks.
+      static uint32_t current_epoch_index() {
+         epochstate_t es(EPOCH_ACCOUNT);
+         return es.exists() ? es.get().current_epoch_index : 0;
+      }
 
       /// Bounds on `epoch_duration_sec`. Floor is a typo-guard: below it a pay
       /// period holds fewer block slots than one producer rotation, so the

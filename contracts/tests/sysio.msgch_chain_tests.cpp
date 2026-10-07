@@ -57,6 +57,8 @@ constexpr uint64_t ETH_OUTPOST_ID = "ETH"_s.value;
 constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
 constexpr std::string_view ETH_CHAIN_CODE = "ETH";
 constexpr std::string_view SOL_CHAIN_CODE = "SOL";
+/// Native collateral used by the operator fixtures.
+constexpr std::string_view WIRE_CHAIN_CODE = "WIRE";
 constexpr uint64_t BATCH_OPERATOR_MINIMUM_COLLATERAL = 1;
 constexpr uint64_t TABLE_SCAN_LIMIT = 64;
 constexpr uint32_t ONE_OPERATOR_PER_TIED_VERSION = 1;
@@ -212,7 +214,6 @@ public:
    static constexpr auto MSGCH_ACCOUNT  = "sysio.msgch"_n;
    static constexpr auto CHALG_ACCOUNT  = "sysio.chalg"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
-   static constexpr auto UWRIT_ACCOUNT  = "sysio.uwrit"_n;
    static constexpr auto ROA_ACCOUNT    = "sysio.roa"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
    static constexpr auto BATCHOP_B      = "batchop.b"_n;
@@ -242,7 +243,7 @@ public:
       // pay-epoch transfers. Same bootstrap rationale as sysio_epoch_flushwtdw_tester.
       create_accounts({
          TOKEN_ACCOUNT, EPOCH_ACCOUNT, OPREG_ACCOUNT, MSGCH_ACCOUNT,
-         CHALG_ACCOUNT, CHAINS_ACCOUNT, UWRIT_ACCOUNT,
+         CHALG_ACCOUNT, CHAINS_ACCOUNT,
          BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E, BATCHOP_F,
          "sysio.dclaim"_n, "sysio.gov"_n, "sysio.ops"_n
       }, false, true, !empty_roa);
@@ -253,7 +254,6 @@ public:
       deploy(OPREG_ACCOUNT,  contracts::opreg_wasm(),  contracts::opreg_abi(),  opreg_abi);
       deploy(MSGCH_ACCOUNT,  contracts::msgch_wasm(),  contracts::msgch_abi(),  msgch_abi);
       deploy(CHAINS_ACCOUNT, contracts::chains_wasm(), contracts::chains_abi(), chains_abi);
-      deploy(UWRIT_ACCOUNT,  contracts::uwrit_wasm(),  contracts::uwrit_abi(),  uwrit_abi);
       deploy(TOKEN_ACCOUNT,  contracts::token_wasm(),  contracts::token_abi(),  token_abi);
       produce_blocks(1);
 
@@ -380,14 +380,11 @@ public:
             ("req_prod_collat",                  fc::variants{})
             // Empty collateral requirements intentionally keep non-bootstrapped
             // operators UNKNOWN. Give the WNS-16 fixture's non-bootstrapped
-            // operator the one-unit ETH and SOL requirements it satisfies below.
+            // operator the one-unit native WIRE requirement it satisfies below.
             ("req_batchop_collat",               batchop_is_bootstrapped
                                                    ? fc::variants{}
                                                    : fc::variants{
-                                                        make_chain_min_bond(ETH_CHAIN_CODE, ETH_CHAIN_CODE,
-                                                                            BATCH_OPERATOR_MINIMUM_COLLATERAL),
-                                                        make_chain_min_bond(SOL_CHAIN_CODE, SOL_CHAIN_CODE,
-                                                                            BATCH_OPERATOR_MINIMUM_COLLATERAL) })
+                                                        make_chain_min_bond(WIRE_CHAIN_CODE, WIRE_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL) })
             ("req_uw_collat",                    fc::variants{})));
 
       const std::vector<name> available_batch_ops{
@@ -409,11 +406,7 @@ public:
       // A non-bootstrapped batch operator starts UNKNOWN and becomes ACTIVE
       // only after a collateral update re-evaluates its role eligibility.
       if (!batchop_is_bootstrapped) {
-         BOOST_REQUIRE_EQUAL(success(), depositinle(BATCHOP, ETH_CHAIN_CODE, ETH_CHAIN_CODE,
-                                                    BATCH_OPERATOR_MINIMUM_COLLATERAL));
-         BOOST_REQUIRE_EQUAL(success(), depositinle(BATCHOP, SOL_CHAIN_CODE, SOL_CHAIN_CODE,
-                                                    BATCH_OPERATOR_MINIMUM_COLLATERAL,
-                                                    opp::types::ChainKind::CHAIN_KIND_SVM));
+         BOOST_REQUIRE_EQUAL(success(), fund_and_bond(BATCHOP, BATCH_OPERATOR_MINIMUM_COLLATERAL));
       }
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
@@ -948,8 +941,7 @@ public:
             (opreg_config_fields::TERMINATE_WINDOW_MS,              TERMINATE_WINDOW_MS)
             (opreg_config_fields::REQUIRED_PRODUCER_COLLATERAL,     fc::variants{})
             (opreg_config_fields::REQUIRED_BATCH_OPERATOR_COLLATERAL, fc::variants{
-               make_chain_min_bond(ETH_CHAIN_CODE, ETH_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL),
-               make_chain_min_bond(SOL_CHAIN_CODE, SOL_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL) })
+               make_chain_min_bond(WIRE_CHAIN_CODE, WIRE_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL) })
             (opreg_config_fields::REQUIRED_UNDERWRITER_COLLATERAL,  fc::variants{})));
    }
 
@@ -961,19 +953,14 @@ public:
       produce_blocks();
    }
 
-   /// Inline collateral credit (the path sysio.msgch drives in production; pushed directly here) that
-   /// lifts a non-bootstrapped operator to ACTIVE once its bond meets the configured minimum.
-   action_result depositinle(name account, std::string_view chain_code, std::string_view token_code,
-                             uint64_t amount,
-                             opp::types::ChainKind actor_chain = opp::types::ChainKind::CHAIN_KIND_EVM) {
-      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
-         ("account",             account.to_string())
-         ("chain_code",          chain_code)
-         ("token_code",          token_code)
-         ("amount",              amount)
-         ("actor_chain",         actor_chain)
-         ("actor_address",       std::vector<char>{})
-         ("original_message_id", std::string(64, '0')));
+   /// Fund the operator's native WIRE balance and deposit its bond through sysio.opreg.
+   /// A non-bootstrapped operator becomes ACTIVE once it meets the configured minimum.
+   action_result fund_and_bond(name account, uint64_t amount) {
+      BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, SYSIO_ACCOUNT, "transfer"_n,
+         mvo()("from", SYSIO_ACCOUNT)("to", account)
+         ("quantity", asset(static_cast<int64_t>(amount), symbol(9, "WIRE")))("memo", "bond funding")));
+      return push(OPREG_ACCOUNT, opreg_abi, account, "deposit"_n,
+         mvo()("account", account)("token_code", WIRE_CHAIN_CODE)("amount", amount));
    }
 
    /// bootstrap() variant for a real rotation: THREE single-operator groups (so a resident op is on
@@ -1001,19 +988,22 @@ public:
          ("terminate_max_pct_misses_24h",     99)
          ("terminate_window_ms",              terminate_window_ms)
          ("req_prod_collat",                  fc::variants{})
-         ("req_batchop_collat",               fc::variants{ make_chain_min_bond("ETH", "ETH", 1) })
+         ("req_batchop_collat",               fc::variants{
+            make_chain_min_bond(WIRE_CHAIN_CODE, WIRE_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL) })
          ("req_uw_collat",                    fc::variants{})));
 
       register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, "ETH", 31337);
 
-      // BATCHOP is the termination target: NON-bootstrapped (bootstrapped operators are exempt from
-      // rolling-window termination -- see opreg::termcheck) and collateralized so it activates.
+      // BATCHOP is normally the non-bootstrapped termination target, bonded so it activates.
+      // Healthy-rotation tests opt into bootstrap exemption and require no collateral deposit.
       // BATCHOP_B / BATCHOP_C are bootstrapped fillers for the other two groups. schbatchgps sorts
       // non-bootstrapped first, so BATCHOP lands in group 0 (on duty at epochs 1, 4, 7, ...).
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
          ("account", BATCHOP.to_string())("type", opp::types::OperatorType::OPERATOR_TYPE_BATCH)
          ("is_bootstrapped", batchop_is_bootstrapped)));
-      BOOST_REQUIRE_EQUAL(success(), depositinle(BATCHOP, "ETH", "ETH", 1));
+      if (!batchop_is_bootstrapped) {
+         BOOST_REQUIRE_EQUAL(success(), fund_and_bond(BATCHOP, BATCH_OPERATOR_MINIMUM_COLLATERAL));
+      }
       for (const auto& op : {BATCHOP_B, BATCHOP_C}) {
          BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
             ("account", op.to_string())("type", opp::types::OperatorType::OPERATOR_TYPE_BATCH)
@@ -1030,7 +1020,7 @@ public:
       produce_blocks();
    }
 
-   abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chalg_abi, chains_abi, uwrit_abi, roa_abi;
+   abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chalg_abi, chains_abi, roa_abi;
 };
 
 // ---------------------------------------------------------------------------
@@ -1669,7 +1659,7 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    constexpr const char* kHistoricalMissPayload            = "history-miss";
    constexpr const char* kCanonicalPayload                 = "canonical";
    constexpr const char* kNonCanonicalPayload              = "non-canonical";
-   constexpr uint32_t kExpectedSlashActionsPerOutpost      = 1;
+   constexpr uint32_t kExpectedSlashActionsPerOutpost      = 0;
    constexpr uint32_t kEpochAdvanceCount                   = 1;
    constexpr uint32_t kExpectedDeliveredLogCount           = 4;
 

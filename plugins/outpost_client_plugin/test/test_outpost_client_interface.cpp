@@ -34,9 +34,6 @@ public:
                                          const std::vector<char>&,
                                          fc::microseconds) override { return {}; }
    std::vector<char> read_inbound_envelope(uint32_t, fc::microseconds) override { return {}; }
-   std::string uw_commit(uint64_t,
-                         const std::vector<char>&,
-                         fc::microseconds) override { return {}; }
 
 private:
    sysio::opp::types::ChainKind _kind;

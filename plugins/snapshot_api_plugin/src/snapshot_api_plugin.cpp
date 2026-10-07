@@ -10,11 +10,14 @@
 #include <fc/crypto/blake3.hpp>
 
 #include <atomic>
+#include <charconv>
 #include <filesystem>
+#include <limits>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <regex>
+#include <string_view>
 #include <system_error>
 
 namespace sysio {
@@ -36,6 +39,18 @@ constexpr unsigned int snapshot_discovery_not_found_status = 404;
 
 /// HTTP status returned when scheduled-snapshot discovery cannot complete reliably.
 constexpr unsigned int snapshot_discovery_unavailable_status = 503;
+
+/// HTTP status returned when the requested block has no servable snapshot.
+constexpr unsigned int snapshot_download_not_found_status = 404;
+
+/// HTTP status of a whole snapshot file download.
+constexpr unsigned int snapshot_download_success_status = 200;
+
+/// Content type of a snapshot file download.
+constexpr std::string_view snapshot_download_content_type = "application/octet-stream";
+
+/// Request header that asks for part of a snapshot file.
+constexpr std::string_view snapshot_download_range_header = "Range";
 
 /// Request and ABI-decoder budget for one steady-state attestation-record lookup.
 constexpr auto snapshot_attestation_query_timeout =
@@ -73,6 +88,17 @@ bool is_snapshot_file_available(const snapshot_entry& entry) {
    std::error_code error;
    return std::filesystem::is_regular_file(entry.file_path, error);
 }
+
+namespace {
+
+/** Parse a Range bound, the decimal digits the Range pattern matched, saturating at the largest byte offset. */
+uint64_t parse_range_bound(std::string_view digits) {
+   uint64_t value = 0;
+   const std::from_chars_result result = std::from_chars(digits.data(), digits.data() + digits.size(), value);
+   return result.ec == std::errc::result_out_of_range ? std::numeric_limits<uint64_t>::max() : value;
+}
+
+} // namespace
 
 } // namespace sysio
 
@@ -289,37 +315,34 @@ void snapshot_api_plugin::plugin_startup() {
    auto& http = app().get_plugin<http_plugin>();
    const auto snapshot_discovery_max_response_time = http.get_max_response_time();
 
-   // /v1/snapshot/latest - discover on the HTTP worker so chain reads can use the read executor
+   // /v1/snapshot/latest - discover on the HTTP worker so chain reads can use the read executor.
+   // add_raw_handler answers what these handlers throw as an API error, so a malformed request is a 400.
    http.add_raw_handler("/v1/snapshot/latest", api_category::snapshot_ro,
       [impl, snapshot_discovery_max_response_time](
          sysio::detail::abstract_conn_ptr conn, string&&, string&& body) {
-         try {
-            parse_params<std::string, http_params_types::no_params>(body);
-            const auto result = impl->get_latest(snapshot_discovery_max_response_time);
-            if (result.status == snapshot_api::snapshot_discovery_status::not_found) {
-               conn->send_response(fc::json::to_string(
-                                      fc::mutable_variant_object()
-                                      ("message", no_servable_scheduled_snapshots_message),
-                                      fc::time_point::maximum()),
-                                   snapshot_discovery_not_found_status);
-               return;
-            }
-            if (result.status == snapshot_api::snapshot_discovery_status::unavailable) {
-               conn->send_response(fc::json::to_string(
-                                      fc::mutable_variant_object()
-                                      ("message", snapshot_discovery_unavailable_message),
-                                      fc::time_point::maximum()),
-                                   snapshot_discovery_unavailable_status);
-               return;
-            }
-            const auto& entry = *result.snapshot;
-            snapshot_metadata meta{entry.block_num, entry.block_id, entry.block_time, entry.root_hash};
-            conn->send_response(
-               fc::json::to_string(fc::variant(meta), fc::time_point::maximum()),
-               snapshot_discovery_success_status);
-         } catch (...) {
-            conn->handle_exception();
+         parse_params<std::string, http_params_types::no_params>(body);
+         const auto result = impl->get_latest(snapshot_discovery_max_response_time);
+         if (result.status == snapshot_api::snapshot_discovery_status::not_found) {
+            conn->send_response(fc::json::to_string(
+                                   fc::mutable_variant_object()
+                                   ("message", no_servable_scheduled_snapshots_message),
+                                   fc::time_point::maximum()),
+                                snapshot_discovery_not_found_status);
+            return;
          }
+         if (result.status == snapshot_api::snapshot_discovery_status::unavailable) {
+            conn->send_response(fc::json::to_string(
+                                   fc::mutable_variant_object()
+                                   ("message", snapshot_discovery_unavailable_message),
+                                   fc::time_point::maximum()),
+                                snapshot_discovery_unavailable_status);
+            return;
+         }
+         const auto& entry = *result.snapshot;
+         snapshot_metadata meta{entry.block_num, entry.block_id, entry.block_time, entry.root_hash};
+         conn->send_response(
+            fc::json::to_string(fc::variant(meta), fc::time_point::maximum()),
+            snapshot_discovery_success_status);
       });
 
    // /v1/snapshot/by_block - return metadata of snapshot at specific block
@@ -345,37 +368,34 @@ void snapshot_api_plugin::plugin_startup() {
    // /v1/snapshot/download - serve snapshot file
    http.add_raw_handler("/v1/snapshot/download", api_category::snapshot_ro,
       [impl](sysio::detail::abstract_conn_ptr conn, string&&, string&& body) {
-         try {
-            auto params = parse_params<download_params, http_params_types::params_required>(body);
-            auto entry = impl->get_by_block(params.block_num);
-            if (!entry || !impl->is_servable_snapshot(*entry)) {
-               conn->send_response(fc::json::to_string(
-                                      fc::mutable_variant_object()
-                                      ("code", 404)
-                                      ("message", "No snapshot found for block " + std::to_string(params.block_num)),
-                                      fc::time_point::maximum()),
-                                   404);
-               return;
-            }
-
-            // Parse Range header if present
-            std::optional<std::pair<uint64_t, uint64_t>> byte_range;
-            auto range_header = conn->get_request_header("Range");
-            if (!range_header.empty()) {
-               // Parse "bytes=START-END" format
-               std::regex range_re("bytes=(\\d+)-(\\d*)");
-               std::smatch match;
-               if (std::regex_match(range_header, match, range_re)) {
-                  uint64_t start = std::stoull(match[1].str());
-                  uint64_t end = match[2].str().empty() ? entry->file_size - 1 : std::stoull(match[2].str());
-                  byte_range = std::make_pair(start, end);
-               }
-            }
-
-            conn->send_file_response(entry->file_path, 200, "application/octet-stream", byte_range);
-         } catch (...) {
-            conn->handle_exception();
+         auto params = parse_params<download_params, http_params_types::params_required>(body);
+         auto entry = impl->get_by_block(params.block_num);
+         if (!entry || !impl->is_servable_snapshot(*entry)) {
+            conn->send_response(fc::json::to_string(
+                                   fc::mutable_variant_object()
+                                   ("code", snapshot_download_not_found_status)
+                                   ("message", "No snapshot found for block " + std::to_string(params.block_num)),
+                                   fc::time_point::maximum()),
+                                snapshot_download_not_found_status);
+            return;
          }
+
+         // Parse Range header if present
+         std::optional<std::pair<uint64_t, uint64_t>> byte_range;
+         auto range_header = conn->get_request_header(snapshot_download_range_header);
+         if (!range_header.empty()) {
+            // Parse "bytes=START-END" format
+            std::regex range_re("bytes=(\\d+)-(\\d*)");
+            std::smatch match;
+            if (std::regex_match(range_header, match, range_re)) {
+               uint64_t start = parse_range_bound(match[1].str());
+               uint64_t end = match[2].str().empty() ? entry->file_size - 1 : parse_range_bound(match[2].str());
+               byte_range = std::make_pair(start, end);
+            }
+         }
+
+         conn->send_file_response(entry->file_path, snapshot_download_success_status, snapshot_download_content_type,
+                                  byte_range);
       });
 
    ilog("snapshot_api_plugin: {} snapshot(s) catalogued", impl->catalog_.size());
