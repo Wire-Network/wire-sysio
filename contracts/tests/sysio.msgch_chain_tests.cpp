@@ -27,6 +27,7 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/kv_table_objects.hpp>   // kv_index / kv_index_index for the envelopes retention walk
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/opp.pb.h>
 
@@ -50,10 +51,6 @@ using mvo = fc::mutable_variant_object;
 
 namespace {
 
-inline fc::mutable_variant_object codename_mvo(std::string_view s) {
-   return mvo()("value", fc::slug_name{s}.value);
-}
-
 using fc::slug_name_literals::operator""_s;
 
 constexpr uint64_t ETH_OUTPOST_ID = "ETH"_s.value;
@@ -68,6 +65,11 @@ constexpr std::string_view ONE_TO_ONE_LEFT_PAYLOAD = "one-to-one-left";
 constexpr std::string_view ONE_TO_ONE_RIGHT_PAYLOAD = "one-to-one-right";
 constexpr std::string_view THREE_TO_THREE_LEFT_PAYLOAD = "three-to-three-left";
 constexpr std::string_view THREE_TO_THREE_RIGHT_PAYLOAD = "three-to-three-right";
+
+/// Mirrors of the inbound `envelopes` retention constants in `sysio.msgch.cpp` (contract headers
+/// are not host-compilable).
+constexpr uint32_t INBOUND_ENVELOPE_RETENTION_EPOCHS = 2;
+constexpr uint32_t ENVELOPE_PRUNE_BUDGET             = 4;
 
 /// sysio.opreg action identifiers used by the WNS-16 fixture.
 namespace opreg_actions {
@@ -108,6 +110,11 @@ namespace msgch_tables {
 constexpr name ENVELOPES = "envelopes"_n;
 } // namespace msgch_tables
 
+/// sysio.msgch secondary-index identifiers used by the envelopes retention tests.
+namespace msgch_indexes {
+constexpr name BY_OUTPOST_EPOCH = "byoutepoch"_n;
+} // namespace msgch_indexes
+
 /// sysio.msgch ABI type identifiers used by the WNS-16 fixture.
 namespace msgch_abi_types {
 constexpr const char* ENVELOPE_ENTRY = "envelope_entry";
@@ -115,6 +122,8 @@ constexpr const char* ENVELOPE_ENTRY = "envelope_entry";
 
 /// sysio.msgch ABI field identifiers used by the WNS-16 fixture.
 namespace msgch_fields {
+constexpr const char* ID            = "id";
+constexpr const char* RAW_DATA      = "raw_data";
 constexpr const char* CHAIN_CODE    = "chain_code";
 constexpr const char* EPOCH_INDEX   = "epoch_index";
 constexpr const char* BATCH_OP_NAME = "batch_op_name";
@@ -203,7 +212,6 @@ public:
    static constexpr auto MSGCH_ACCOUNT  = "sysio.msgch"_n;
    static constexpr auto CHALG_ACCOUNT  = "sysio.chalg"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
-   static constexpr auto UWRIT_ACCOUNT  = "sysio.uwrit"_n;
    static constexpr auto ROA_ACCOUNT    = "sysio.roa"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
    static constexpr auto BATCHOP_B      = "batchop.b"_n;
@@ -233,7 +241,7 @@ public:
       // pay-epoch transfers. Same bootstrap rationale as sysio_epoch_flushwtdw_tester.
       create_accounts({
          TOKEN_ACCOUNT, EPOCH_ACCOUNT, OPREG_ACCOUNT, MSGCH_ACCOUNT,
-         CHALG_ACCOUNT, CHAINS_ACCOUNT, UWRIT_ACCOUNT,
+         CHALG_ACCOUNT, CHAINS_ACCOUNT,
          BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E, BATCHOP_F,
          "sysio.dclaim"_n, "sysio.gov"_n, "sysio.ops"_n
       }, false, true, !empty_roa);
@@ -244,7 +252,6 @@ public:
       deploy(OPREG_ACCOUNT,  contracts::opreg_wasm(),  contracts::opreg_abi(),  opreg_abi);
       deploy(MSGCH_ACCOUNT,  contracts::msgch_wasm(),  contracts::msgch_abi(),  msgch_abi);
       deploy(CHAINS_ACCOUNT, contracts::chains_wasm(), contracts::chains_abi(), chains_abi);
-      deploy(UWRIT_ACCOUNT,  contracts::uwrit_wasm(),  contracts::uwrit_abi(),  uwrit_abi);
       deploy(TOKEN_ACCOUNT,  contracts::token_wasm(),  contracts::token_abi(),  token_abi);
       produce_blocks(1);
 
@@ -375,10 +382,7 @@ public:
             ("req_batchop_collat",               batchop_is_bootstrapped
                                                    ? fc::variants{}
                                                    : fc::variants{
-                                                        make_chain_min_bond(ETH_CHAIN_CODE, ETH_CHAIN_CODE,
-                                                                            BATCH_OPERATOR_MINIMUM_COLLATERAL),
-                                                        make_chain_min_bond(SOL_CHAIN_CODE, SOL_CHAIN_CODE,
-                                                                            BATCH_OPERATOR_MINIMUM_COLLATERAL) })
+                                                        make_chain_min_bond("WIRE", "WIRE", BATCH_OPERATOR_MINIMUM_COLLATERAL) })
             ("req_uw_collat",                    fc::variants{})));
 
       const std::vector<name> available_batch_ops{
@@ -400,11 +404,7 @@ public:
       // A non-bootstrapped batch operator starts UNKNOWN and becomes ACTIVE
       // only after a collateral update re-evaluates its role eligibility.
       if (!batchop_is_bootstrapped) {
-         BOOST_REQUIRE_EQUAL(success(), depositinle(BATCHOP, ETH_CHAIN_CODE, ETH_CHAIN_CODE,
-                                                    BATCH_OPERATOR_MINIMUM_COLLATERAL));
-         BOOST_REQUIRE_EQUAL(success(), depositinle(BATCHOP, SOL_CHAIN_CODE, SOL_CHAIN_CODE,
-                                                    BATCH_OPERATOR_MINIMUM_COLLATERAL,
-                                                    opp::types::ChainKind::CHAIN_KIND_SVM));
+         BOOST_REQUIRE_EQUAL(success(), fund_and_bond(BATCHOP, BATCH_OPERATOR_MINIMUM_COLLATERAL));
       }
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
@@ -420,7 +420,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT,
          "regchain"_n, mvo()
             ("kind",              kind)
-            ("code",              codename_mvo(code))
+            ("code",              code)
             ("external_chain_id", chain_id)
             ("name",              std::string("outpost-test"))
             ("description",       std::string{})
@@ -592,6 +592,88 @@ public:
              row[msgch_fields::BATCH_OP_NAME].as_string() == batch_op.to_string()) return row;
       }
       return fc::variant{};
+   }
+
+   /// Every inbound `envelopes` row in primary-key order, read straight from chainbase so the walk
+   /// does not depend on ids staying inside a fixed probe range.
+   std::vector<fc::variant> envelope_rows() {
+      const auto  table_id = compute_table_id(msgch_tables::ENVELOPES.to_uint64_t());
+      const auto& kv_idx   = control->db().get_index<kv_index, by_code_key>();
+      std::vector<fc::variant> rows;
+      for (auto itr = kv_idx.lower_bound(boost::make_tuple(MSGCH_ACCOUNT, table_id, std::string_view{}));
+           itr != kv_idx.end() && itr->code == MSGCH_ACCOUNT && itr->table_id == table_id; ++itr) {
+         std::vector<char> raw(itr->value.size());
+         if (!raw.empty()) std::memcpy(raw.data(), itr->value.data(), raw.size());
+         rows.push_back(msgch_abi.binary_to_variant(
+            msgch_abi_types::ENVELOPE_ENTRY, raw,
+            abi_serializer::create_yield_function(abi_serializer_max_time)));
+      }
+      return rows;
+   }
+
+   /// `envelopes` rows recorded for `epoch_index`, across outposts and operators.
+   uint32_t envelope_rows_for_epoch(uint32_t epoch_index) {
+      uint32_t n = 0;
+      for (const auto& row : envelope_rows()) {
+         if (row[msgch_fields::EPOCH_INDEX].as<uint32_t>() == epoch_index) ++n;
+      }
+      return n;
+   }
+
+   /// Stored `byoutepoch` secondary entries of `envelopes`; equals the row count unless an erase
+   /// left an orphan behind.
+   size_t envelope_index_entries() {
+      const auto  table_id = compute_sec_table_id(msgch_tables::ENVELOPES.to_uint64_t(),
+                                                  msgch_indexes::BY_OUTPOST_EPOCH.to_uint64_t());
+      const auto& idx = control->db().get_index<kv_index_index, by_code_table_id_seckey>();
+      size_t n = 0;
+      for (auto itr = idx.lower_bound(boost::make_tuple(MSGCH_ACCOUNT, table_id));
+           itr != idx.end() && itr->code == MSGCH_ACCOUNT && itr->table_id == table_id; ++itr) {
+         ++n;
+      }
+      return n;
+   }
+
+   /// Chain tip of the inbound stream when a test feeds both outposts identical envelopes: the next
+   /// delivery continues from the last accepted envelope's digest and message id (raw 32-byte
+   /// strings, empty at stream genesis).
+   struct inbound_stream_tip {
+      std::string envelope_digest;
+      std::string message_id;
+   };
+
+   /// Current-epoch envelope carrying `payload`, chained from `tip`.
+   std::vector<char> encode_chained_delivery(std::string_view payload, const inbound_stream_tip& tip) {
+      return encode_delivery(current_epoch(), std::string(payload), tip.envelope_digest,
+                             tip.message_id);
+   }
+
+   /// `tip` after `envelope` is accepted.
+   inbound_stream_tip next_stream_tip(const std::vector<char>& envelope) {
+      return {oracle::digest_bytes(oracle::epoch_digest(decode_envelope(envelope))),
+              delivery_message_id(envelope)};
+   }
+
+   /// Every operator in `ops` delivers the same chained envelope to both outposts, so each outpost
+   /// reaches unanimous consensus for the current epoch; `tip` moves to the delivered envelope.
+   void deliver_unanimous_epoch(const std::vector<name>& ops, std::string_view payload,
+                                inbound_stream_tip& tip) {
+      const auto envelope = encode_chained_delivery(payload, tip);
+      for (const uint64_t outpost : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+         for (const auto& op : ops) {
+            BOOST_REQUIRE_EQUAL(success(), deliver_as(op, outpost, envelope));
+         }
+      }
+      produce_blocks();
+      tip = next_stream_tip(envelope);
+   }
+
+   /// Cross the epoch boundary and advance through the production `chkcons -> advance` route.
+   void close_epoch() {
+      const uint32_t epoch = current_epoch();
+      elapse_epoch_boundary();
+      advance_via_consensus();
+      BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
    }
 
    /// Count attestation rows recorded for (`chain_code`, `epoch_index`); the observable effect
@@ -798,8 +880,8 @@ public:
    static fc::variant make_chain_min_bond(std::string_view chain_code, std::string_view token_code,
                                           uint64_t min_bond) {
       return fc::variant(mvo()
-         ("chain_code",          codename_mvo(chain_code))
-         ("token_code",          codename_mvo(token_code))
+         ("chain_code",          chain_code)
+         ("token_code",          token_code)
          ("min_bond",            min_bond)
          ("config_timestamp_ms", uint64_t{0}));
    }
@@ -840,17 +922,12 @@ public:
 
    /// Inline collateral credit (the path sysio.msgch drives in production; pushed directly here) that
    /// lifts a non-bootstrapped operator to ACTIVE once its bond meets the configured minimum.
-   action_result depositinle(name account, std::string_view chain_code, std::string_view token_code,
-                             uint64_t amount,
-                             opp::types::ChainKind actor_chain = opp::types::ChainKind::CHAIN_KIND_EVM) {
-      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
-         ("account",             account.to_string())
-         ("chain_code",          codename_mvo(chain_code))
-         ("token_code",          codename_mvo(token_code))
-         ("amount",              amount)
-         ("actor_chain",         actor_chain)
-         ("actor_address",       std::vector<char>{})
-         ("original_message_id", std::string(64, '0')));
+   action_result fund_and_bond(name account, uint64_t amount) {
+      BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, SYSIO_ACCOUNT, "transfer"_n,
+         mvo()("from", SYSIO_ACCOUNT)("to", account)
+         ("quantity", asset(static_cast<int64_t>(amount), symbol(9, "WIRE")))("memo", "bond funding")));
+      return push(OPREG_ACCOUNT, opreg_abi, account, "deposit"_n,
+         mvo()("account", account)("token_code", "WIRE")("amount", amount));
    }
 
    /// bootstrap() variant for a real rotation: THREE single-operator groups (so a resident op is on
@@ -878,7 +955,7 @@ public:
          ("terminate_max_pct_misses_24h",     99)
          ("terminate_window_ms",              terminate_window_ms)
          ("req_prod_collat",                  fc::variants{})
-         ("req_batchop_collat",               fc::variants{ make_chain_min_bond("ETH", "ETH", 1) })
+         ("req_batchop_collat",               fc::variants{ make_chain_min_bond("WIRE", "WIRE", 1) })
          ("req_uw_collat",                    fc::variants{})));
 
       register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, "ETH", 31337);
@@ -890,7 +967,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
          ("account", BATCHOP.to_string())("type", opp::types::OperatorType::OPERATOR_TYPE_BATCH)
          ("is_bootstrapped", false)));
-      BOOST_REQUIRE_EQUAL(success(), depositinle(BATCHOP, "ETH", "ETH", 1));
+      BOOST_REQUIRE_EQUAL(success(), fund_and_bond(BATCHOP, 1));
       for (const auto& op : {BATCHOP_B, BATCHOP_C}) {
          BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
             ("account", op.to_string())("type", opp::types::OperatorType::OPERATOR_TYPE_BATCH)
@@ -906,7 +983,7 @@ public:
       produce_blocks();
    }
 
-   abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chalg_abi, chains_abi, uwrit_abi, roa_abi;
+   abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chalg_abi, chains_abi, roa_abi;
 };
 
 // ---------------------------------------------------------------------------
@@ -1469,6 +1546,10 @@ BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_
    {
       auto opc = get_outpcons(ETH_OUTPOST_ID);
       BOOST_REQUIRE(opc.is_null() || !opc["consensus_reached"].as<bool>());
+      // Until a winner is accepted the delivered bytes are held for the consensus decode.
+      auto row = find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP);
+      BOOST_REQUIRE(!row.is_null());
+      BOOST_REQUIRE(row[msgch_fields::RAW_DATA].as<std::vector<char>>() == winner);
    }
 
    // Second delivery after the boundary: majority (2 of 3) tips consensus and advances the tip
@@ -1504,6 +1585,16 @@ BOOST_FIXTURE_TEST_CASE(late_confirmation_after_consensus_recorded, sysio_msgch_
       error("assertion failure with message: operator already delivered for this outpost+epoch"),
       deliver_as(BATCHOP_C, ETH_OUTPOST_ID, winner));
 
+   // The confirmation row keeps only what advance() classifies: its checksum matches the winner,
+   // and the bytes, which duplicate the already-applied winner, are not stored.
+   {
+      auto row = find_inbound_delivery(ETH_OUTPOST_ID, epoch, BATCHOP_C);
+      BOOST_REQUIRE(!row.is_null());
+      BOOST_REQUIRE_EQUAL(row[msgch_fields::CHECKSUM].as_string(),
+                          fc::sha256::hash(winner.data(), winner.size()).str());
+      BOOST_REQUIRE(row[msgch_fields::RAW_DATA].as<std::vector<char>>().empty());
+   }
+
    // Acceptance state is untouched by the late confirmation: same tip, same epoch, attestations
    // dispatched exactly once.
    {
@@ -1531,7 +1622,7 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
    constexpr const char* kHistoricalMissPayload            = "history-miss";
    constexpr const char* kCanonicalPayload                 = "canonical";
    constexpr const char* kNonCanonicalPayload              = "non-canonical";
-   constexpr uint32_t kExpectedSlashActionsPerOutpost      = 1;
+   constexpr uint32_t kExpectedSlashActionsPerOutpost      = 0;
    constexpr uint32_t kEpochAdvanceCount                   = 1;
    constexpr uint32_t kExpectedDeliveredLogCount           = 4;
 
@@ -2094,6 +2185,139 @@ BOOST_FIXTURE_TEST_CASE(advance_withholds_batch_operator_groups_when_next_group_
    }
    BOOST_REQUIRE_MESSAGE(observed_withhold,
       "starved window never withheld BATCH_OPERATOR_GROUPS -- an empty active group was published");
+} FC_LOG_AND_RETHROW() }
+
+// ---------------------------------------------------------------------------
+//  Inbound `envelopes` retention: `deliver` prunes rows older than the
+//  previous epoch, a bounded number per call.
+// ---------------------------------------------------------------------------
+
+/// Real `deliver -> chkcons -> advance` cycles leave exactly the retained epochs' rows: nothing
+/// older than the window, every row of the previous epoch (the window's lower edge), ids that keep
+/// increasing across epochs, and no orphaned `byoutepoch` entries.
+BOOST_FIXTURE_TEST_CASE(envelopes_pruned_beyond_retention_window, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kBatchOperatorCount = 3;
+   constexpr uint32_t kOutpostCount       = 2;
+   constexpr uint32_t kRowsPerEpoch       = kBatchOperatorCount * kOutpostCount;
+   constexpr uint32_t kEpochsDriven       = INBOUND_ENVELOPE_RETENTION_EPOCHS + 2;
+   const std::vector<name> ops{BATCHOP, BATCHOP_B, BATCHOP_C};
+
+   bootstrap(kBatchOperatorCount);
+   const uint32_t first_epoch = current_epoch();
+   inbound_stream_tip tip;
+   uint64_t newest_id = 0;
+   for (uint32_t driven = 1; driven <= kEpochsDriven; ++driven) {
+      const uint32_t epoch = current_epoch();
+      deliver_unanimous_epoch(ops, "retention-" + std::to_string(epoch), tip);
+
+      const auto rows = envelope_rows();
+      const uint32_t retained_epochs = std::min(driven, INBOUND_ENVELOPE_RETENTION_EPOCHS);
+      BOOST_REQUIRE_EQUAL(rows.size(), retained_epochs * kRowsPerEpoch);
+      BOOST_REQUIRE_EQUAL(envelope_index_entries(), rows.size());
+      for (const auto& row : rows) {
+         BOOST_REQUIRE_GT(row[msgch_fields::EPOCH_INDEX].as<uint32_t>() +
+                             INBOUND_ENVELOPE_RETENTION_EPOCHS, epoch);
+      }
+      if (epoch > first_epoch) BOOST_REQUIRE_EQUAL(envelope_rows_for_epoch(epoch - 1), kRowsPerEpoch);
+
+      // Primary-key order is epoch order and ids never restart after a prune.
+      uint64_t previous_id = 0;
+      for (const auto& row : rows) {
+         BOOST_REQUIRE_GT(row[msgch_fields::ID].as_uint64(), previous_id);
+         previous_id = row[msgch_fields::ID].as_uint64();
+      }
+      BOOST_REQUIRE_GT(previous_id, newest_id);
+      newest_id = previous_id;
+
+      close_epoch();
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// One delivery erases at most `ENVELOPE_PRUNE_BUDGET` expired rows, oldest first, and never a
+/// retained one. With more expired rows than one budget, the first delivery of an epoch leaves the
+/// newest expired rows for the next delivery, which clears them without touching the previous epoch.
+BOOST_FIXTURE_TEST_CASE(envelope_prune_bounded_per_delivery, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t kBatchOperatorCount = 3;
+   constexpr uint32_t kOutpostCount       = 2;
+   constexpr uint32_t kRowsPerEpoch       = kBatchOperatorCount * kOutpostCount;
+   static_assert(kRowsPerEpoch > ENVELOPE_PRUNE_BUDGET && kRowsPerEpoch <= 2 * ENVELOPE_PRUNE_BUDGET,
+                 "the expired epoch must take exactly two deliveries to clear");
+   const std::vector<name> ops{BATCHOP, BATCHOP_B, BATCHOP_C};
+
+   bootstrap(kBatchOperatorCount);
+   const uint32_t expiring_epoch = current_epoch();
+   inbound_stream_tip tip;
+   for (uint32_t i = 0; i < INBOUND_ENVELOPE_RETENTION_EPOCHS; ++i) {
+      deliver_unanimous_epoch(ops, "budget-" + std::to_string(current_epoch()), tip);
+      close_epoch();
+   }
+   const uint32_t epoch = current_epoch();
+   BOOST_REQUIRE_EQUAL(expiring_epoch + INBOUND_ENVELOPE_RETENTION_EPOCHS, epoch);
+
+   std::vector<uint64_t> expiring_ids;
+   for (const auto& row : envelope_rows()) {
+      if (row[msgch_fields::EPOCH_INDEX].as<uint32_t>() == expiring_epoch) {
+         expiring_ids.push_back(row[msgch_fields::ID].as_uint64());
+      }
+   }
+   BOOST_REQUIRE_EQUAL(expiring_ids.size(), kRowsPerEpoch);
+
+   const auto envelope = encode_chained_delivery("budget-" + std::to_string(epoch), tip);
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(envelope_rows_for_epoch(expiring_epoch), kRowsPerEpoch - ENVELOPE_PRUNE_BUDGET);
+   BOOST_REQUIRE_EQUAL(envelope_rows().front()[msgch_fields::ID].as_uint64(),
+                       expiring_ids[ENVELOPE_PRUNE_BUDGET]);
+   BOOST_REQUIRE_EQUAL(envelope_rows_for_epoch(expiring_epoch + 1), kRowsPerEpoch);
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(envelope_rows_for_epoch(expiring_epoch), 0u);
+   BOOST_REQUIRE_EQUAL(envelope_rows_for_epoch(expiring_epoch + 1), kRowsPerEpoch);
+   BOOST_REQUIRE_EQUAL(envelope_rows_for_epoch(epoch), 2u);
+   BOOST_REQUIRE_EQUAL(envelope_index_entries(), envelope_rows().size());
+} FC_LOG_AND_RETHROW() }
+
+/// Dispute resolution still works once the prune is live. Two clean epochs run first, so the
+/// disputed epoch's deliveries prune the oldest epoch; ETH then splits 1-1, a Tier-1 vote resolves
+/// it from the retained rows (`opendispute` pauses the epoch, so they stay current), and `advance`
+/// slashes the losing deliverer.
+BOOST_FIXTURE_TEST_CASE(dispute_resolves_while_envelopes_are_pruned, sysio_msgch_chain_tester) { try {
+   const std::vector<name> ops{BATCHOP, BATCHOP_B};
+   bootstrap(ONE_TO_ONE_TIE_GROUP_SIZE);
+   const uint32_t first_epoch = current_epoch();
+   inbound_stream_tip tip;
+   for (uint32_t i = 0; i < INBOUND_ENVELOPE_RETENTION_EPOCHS; ++i) {
+      deliver_unanimous_epoch(ops, "pre-dispute-" + std::to_string(current_epoch()), tip);
+      close_epoch();
+   }
+   const uint32_t epoch = current_epoch();
+
+   const auto left  = encode_chained_delivery(ONE_TO_ONE_LEFT_PAYLOAD, tip);
+   const auto right = encode_chained_delivery(ONE_TO_ONE_RIGHT_PAYLOAD, tip);
+   const auto left_checksum  = fc::sha256::hash(left.data(), left.size());
+   const auto right_checksum = fc::sha256::hash(right.data(), right.size());
+   for (const auto& op : ops) {
+      BOOST_REQUIRE_EQUAL(success(), deliver_as(op, SOL_OUTPOST_ID, left));
+   }
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, left));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, right));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(envelope_rows_for_epoch(first_epoch), 0u);
+
+   elapse_epoch_boundary();
+   advance_via_consensus();
+   assert_open_tie_dispute(epoch, {left_checksum, right_checksum},
+                           {ONE_OPERATOR_PER_TIED_VERSION, ONE_OPERATOR_PER_TIED_VERSION});
+   BOOST_REQUIRE(epoch_is_paused());
+
+   resolve_tie_dispute(epoch, left_checksum);
+   advance_via_consensus();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_SLASHED,
+                       get_operator(BATCHOP_B)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
+                       get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

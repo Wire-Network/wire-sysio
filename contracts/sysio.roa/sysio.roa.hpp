@@ -19,6 +19,9 @@ namespace sysio {
             /**
              * @brief Initializes sysio.roa, should be called as last step in Bios Boot Sequence, activating the ROA resource management system.
              *
+             * Reserves every node-owner tier slot and carves 1/10 of each tier-1 slot's allocation out to
+             * `sysio` up front as the account-creation RAM pool; node owners later register against the rest.
+             *
              * @param total_sys The total starting SYS of the network.
              * @param bytes_per_unit The amount of bytes .0001 SYS is worth, set in roastate table. If SYS precision is different, same concept applies, the single smallest unit of the core token.
              */
@@ -128,13 +131,13 @@ namespace sysio {
             /**
              * @brief Registers a node owner when the depot (sysio.msgch) processes an inbound OPP
              *        NodeOwnerRegistration attestation. The register step of the NFT claim flow; the
-             *        depot inline-sends newnameduser (account create) immediately before this so the
-             *        account already exists when nodeownreg runs.
+             *        depot inline-sends newnameduser immediately before this. It creates a missing
+             *        account only when the name is valid and the tier has registration capacity.
              *
              * Trust-OPP: the OPP envelope is the deposit proof, so this RECORDS the depositor's ETH
              * key as a sysio.authex link (inline recordlink) rather than verifying a pre-existing
              * createlink. Claim-payload problems (bad name, account controlled by a different key,
-             * already registered) are soft-failed -- recorded in `nodeownerreg` with a reject_reason
+             * already registered, tier full) are soft-failed -- recorded in `nodeownerreg` with a reject_reason
              * and returned -- never thrown, so the dispatching transaction commits. Depot/system
              * invariants (tier range, ETH key type, ROA active) stay hard checks.
              *
@@ -187,6 +190,8 @@ namespace sysio {
              * Dispatched by privileged sysio.msgch as {sysio.roa, active}, without a cross-contract
              * active grant, like nodeownreg. Idempotent: a no-op if the account already exists.
              * Tier-based name rules: tier-1 = 2-6 char prefix; tier 2/3 = up to 12 chars.
+             * Invalid names and full tiers skip creation without spending RAM; nodeownreg records
+             * the rejection. Capacity comes from the live generation's authoritative owner rows.
              *
              * @param account The user-chosen account name.
              * @param pubkey  The holder's K1 public key (becomes owner and active).
@@ -273,7 +278,7 @@ namespace sysio {
             struct [[sysio::table("nodeowners")]] nodeowners {
                 name owner;          // Node Owners account name.
                 uint8_t tier;        // Represents what tier they hold: 1, 2, or 3
-                asset total_sys;     // Total SYS alloted based on tier.
+                asset total_sys;     // SYS alloted based on tier, net of sysio's tier-1 carve-out.
                 asset allocated_sys; // Total SYS allocated via policies they issued.
                 asset allocated_bw;  // Total SYS allocated to CPU / NET.
                 asset allocated_ram; // Total SYS allocated to RAM.
@@ -381,7 +386,8 @@ namespace sysio {
                 OWNER_NOT_ACCOUNT    = 2,  // account does not exist (creation did not occur)
                 ACCOUNT_KEY_MISMATCH = 3,  // existing account's active authority != the single claimed wire key
                 DUPLICATE            = 4,  // owner is already a registered node owner
-                LINK_KEY_MISMATCH    = 5   // account already carries a different external-chain link key
+                LINK_KEY_MISMATCH    = 5,  // account already carries a different external-chain link key
+                TIER_CAP_REACHED     = 6   // the claimed tier has no remaining registration capacity
                 // (OWNER_HAS_RESLIMIT removed: a pre-existing reslimit row no longer rejects registration --
                 //  regnodeowner reconciles it via increase_reslimit. Pre-launch: no stored rows to migrate. SEC-087.)
             };
@@ -452,11 +458,10 @@ namespace sysio {
 
             /**
              * @brief Registers 'owner' as a Node Owner scoped by network_gen, granting the tier's SYS
-             *        allotment and contributing 10% of it to the network RAM pool.
+             *        allotment (net of sysio's tier-1 share, which activateroa already carved out).
              *
              * Every tier gets a `nodeowners` row (the budget and the membership that gates policy
-             * issuance), a reslimit row, and a policy granting 10% of the tier allocation to `sysio`
-             * for the account-creation RAM pool.
+             * issuance) and a reslimit row.
              *
              * Only tier 1 additionally gets a personal self-issued policy. It is the only tier that can
              * call `newuser`, whose `sponsors` / `sponsorcount` rows are the sole writes in this
@@ -473,6 +478,17 @@ namespace sysio {
              */
 
             void regnodeowner(const name& owner, const uint8_t& tier);
+
+            /**
+             * @brief Return the consensus-defined registration cap for `tier`.
+             *
+             * Centralizes the economic constants used by the soft-fail OPP claim preflight and the
+             * hard invariant retained in `regnodeowner`.
+             *
+             * @param tier Node-owner tier; must be 1, 2, or 3.
+             * @return Maximum registered owners for the tier.
+             */
+            static uint32_t nodeowner_cap(uint8_t tier);
 
             /**
              * @brief Upsert a row in the `nodeownerreg` audit table. Used by `nodeownreg` to
@@ -519,9 +535,10 @@ namespace sysio {
 
 
             /**
-             * @brief A simple getter for totall allotted SYS based on tier number: 1, 2, 3. Matches rounding and logic used in activation.
+             * @brief A node owner's SYS budget for tier 1, 2, or 3: the tier allocation, net of sysio's
+             *        carve-out for tier 1. Matches the rounding activateroa uses to size the reserve.
              *
-             * @return An asset containing the amount of SYS this tier gets
+             * @return An asset containing the amount of SYS a node owner of this tier may issue
              */
             asset get_allocation_for_tier(uint8_t tier);
 

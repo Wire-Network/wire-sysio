@@ -1,4 +1,5 @@
 #include <sysio.system/sysio.system.hpp>
+#include <sysio.system/producer_score.hpp>
 
 #include <sysio/sysio.hpp>
 
@@ -145,10 +146,12 @@ namespace sysiosystem {
    // Returns last proposed finalizers
    const std::vector<finalizer_auth_info>& system_contract::get_last_proposed_finalizers() {
       if( !_last_prop_finalizers_cached.has_value() ) {
+         // emplace, never `= {}`: assigning `{}` resets the optional to empty rather than engaging it,
+         // and the dereference below would read an unconstructed vector.
          if( !_last_prop_finalizers.exists() ) {
-            _last_prop_finalizers_cached = {};
+            _last_prop_finalizers_cached.emplace();
          } else {
-            _last_prop_finalizers_cached = _last_prop_finalizers.get().last_proposed_finalizers;
+            _last_prop_finalizers_cached.emplace(_last_prop_finalizers.get().last_proposed_finalizers);
          }
       }
 
@@ -173,7 +176,7 @@ namespace sysiosystem {
    /*
     * Action to register a finalizer key
     *
-    * @pre `finalizer_name` must be a registered producer
+    * @pre `finalizer_name` must be an active producer with active producer-operator standing
     * @pre `finalizer_key` must be in base64url format
     * @pre `proof_of_possession` must be a valid of proof of possession signature
     * @pre Authority of `finalizer_name` to register. `linkauth` may be used to allow a lower authrity to exectute this action.
@@ -183,6 +186,8 @@ namespace sysiosystem {
 
       auto prod_key = producer_key_t{finalizer_name.value};
       check( _producers.contains(prod_key), "finalizer " + finalizer_name.to_string() + " is not a registered producer");
+      check( producer_rank::is_eligible_operator(_producers.get(prod_key)),
+             "finalizer " + finalizer_name.to_string() + " is not an eligible producer" );
 
       const auto fin_key = finalizer_key_t{finalizer_name.value};
       const auto finalizer = _finalizers.try_get(fin_key);

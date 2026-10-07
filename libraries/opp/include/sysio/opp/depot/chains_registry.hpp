@@ -23,7 +23,7 @@ inline constexpr auto table_chains = "chains";
 
 /// Field names on a `chain_row` as they surface through the ABI serializer.
 namespace field {
-   inline constexpr auto code              = "code";              // {value: uint64} slug_name
+   inline constexpr auto code              = "code";              // slug_name (canonical string)
    inline constexpr auto kind              = "kind";              // ChainKind enum (string spelling)
    inline constexpr auto external_chain_id = "external_chain_id"; // uint32
    inline constexpr auto is_depot          = "is_depot";          // bool — the single WIRE-self row

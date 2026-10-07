@@ -19,12 +19,6 @@ using mvo = fc::mutable_variant_object;
 
 namespace {
 
-/// Build a slug_name mvo: `{"value": <uint64>}` matches the ABI surface for
-/// `sysio::slug_name` fields.
-inline fc::mutable_variant_object codename_mvo(std::string_view s) {
-   return mvo()("value", fc::slug_name{s}.value);
-}
-
 } // anonymous namespace
 
 class sysio_msgch_tester : public tester {
@@ -98,7 +92,7 @@ public:
                           uint32_t chain_id) {
       base_tester::push_action(CHAINS_ACCOUNT, "regchain"_n, CHAINS_ACCOUNT, mvo()
          ("kind",              kind)
-         ("code",              codename_mvo(code))
+         ("code",              code)
          ("external_chain_id", chain_id)
          ("name",              std::string("outpost"))
          ("description",       std::string{})
@@ -164,7 +158,7 @@ BOOST_FIXTURE_TEST_CASE(deliver_invalid_request, sysio_msgch_tester) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(queueout_basic, sysio_msgch_tester) { try {
-   // v6: chain_code is the chain's slug_name value. queueout requires a
+   // Chain_code is the chain's slug_name value. queueout requires a
    // registered chain row -- a pure registration/ops gate (the terminal
    // account estimator that once lived behind it is deleted): an unregistered
    // code would otherwise create a READY row no epoch fan-out ever drains.
@@ -181,7 +175,7 @@ BOOST_FIXTURE_TEST_CASE(queueout_basic, sysio_msgch_tester) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(buildenv_basic, sysio_msgch_tester) { try {
-   // v6 buildenv looks up the chain row in sysio.chains before doing any
+   // buildenv looks up the chain row in sysio.chains before doing any
    // packing work; without a registered chain it would fail with "key not
    // found". The empty-queue early-return happens before that lookup, so
    // an unregistered chain_code still returns success when there are no
@@ -257,7 +251,7 @@ public:
          ));
    }
 
-   /// v6 replacement for `regoutpost` — register a chain row in sysio.chains.
+   /// Replacement for `regoutpost` — register a chain row in sysio.chains.
    /// The slug_name `code` carries the per-chain identity that used to come
    /// from `ChainKind`. Tests pass a deterministic spelling derived from the
    /// `kind` so successive callers don't collide.
@@ -268,7 +262,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(),
          push_action(CHAINS_ACCOUNT, CHAINS_ACCOUNT, "regchain"_n, mvo()
             ("kind",              kind)
-            ("code",              codename_mvo(code))
+            ("code",              code)
             ("external_chain_id", chain_id)
             ("name",              std::string("outpost"))
             ("description",       std::string{})
@@ -354,7 +348,7 @@ namespace {
 
 using fc::slug_name_literals::operator""_s;
 
-/// In v6, `chain_code` is the chain's slug_name value (uint64). All envlog
+/// `chain_code` is the chain's slug_name value (uint64). All envlog
 /// tests register one EVM-class chain via `register_outpost(...)` which uses
 /// the spelling `"ETH"`. ETH_OUTPOST_ID is the slug_name's packed value.
 constexpr uint64_t ETH_OUTPOST_ID = "ETH"_s.value;
@@ -364,7 +358,6 @@ constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
 
 constexpr auto EVM_TEST_ATTESTATION_TYPE       = opp::types::ATTESTATION_TYPE_OPERATORS;
 constexpr auto SWAP_REMIT_ATTESTATION_TYPE    = opp::types::ATTESTATION_TYPE_SWAP_REMIT;
-
 
 } // anonymous namespace
 

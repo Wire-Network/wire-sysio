@@ -1,5 +1,7 @@
 #pragma once
 
+#include <magic_enum/magic_enum.hpp>
+
 #include <sysio/chain/thread_utils.hpp>// for thread pool
 #include <sysio/http_plugin/http_plugin.hpp>
 
@@ -68,6 +70,9 @@ struct abstract_conn {
    /// Release sz bytes previously reserved with increment_bytes_in_flight.
    virtual void decrement_bytes_in_flight(size_t sz) = 0;
    virtual void send_busy_response(std::string&& what) = 0;
+
+   /// Answer the exception being handled with an error response. Call only from a catch block, as the caller's last
+   /// use of the connection.
    virtual void handle_exception() = 0;
 
    /// Set the Content-Type header of the response to be sent, replacing the type of the handler that serves it.
@@ -197,7 +202,10 @@ inline auto make_http_response_handler(http_plugin_state& plugin_state, detail::
                                                           response.has_value() && response->is_string();
                               if (content_type == http_content_type::plaintext && !plaintext_body)
                                  session_ptr->set_content_type_header(http_content_type::json);
-                              if (response.has_value()) {
+                              // HTTP 204 never carries a body, including JSON-RPC notifications.
+                              if (code == magic_enum::enum_integer(boost::beast::http::status::no_content)) {
+                                 session_ptr->send_response({}, code);
+                              } else if (response.has_value()) {
                                  std::string json = plaintext_body
                                                        ? response->as_string()
                                                        : fc::json::to_string(*response, fc::time_point::maximum());

@@ -32,6 +32,18 @@ namespace sysio::chain {
       // Pinned in name_tests.cpp::encoding_golden_values.
       static constexpr fc::basic_name_endianness packing = fc::basic_name_endianness::MSB;
 
+      // The rejection messages. bad_final_symbol_message restates the classic
+      // SYSIO rule: 13 symbols x 5 bits exceeds 64, so the thirteenth slot holds
+      // only 4 bits — symbols 0-15, i.e. '.', '1'-'5', 'a'-'j'.
+      static constexpr const char* bad_char_message =
+         "character is not in allowed character set for names ([.1-5a-z])";
+      static constexpr const char* too_long_message = "string is too long to be a valid name";
+      static constexpr const char* bad_final_symbol_message =
+         "thirteenth character in name cannot be a letter that comes after j";
+      // Spring's wording: a legal character in an illegal position (a trailing
+      // pad) leaves a spelling that does not round-trip through to_string().
+      static constexpr const char* not_normalized_message = "name is not properly normalized";
+
       // Declared here, defined in name.cpp — keeps <sysio/chain/exceptions.hpp>
       // and the SYS_ASSERT machinery out of this very widely-included header.
       [[noreturn]] static void throw_invalid( std::string_view in, const char* why );

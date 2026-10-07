@@ -130,43 +130,6 @@ public:
                                                    fc::microseconds deadline) = 0;
 
    /**
-    * @brief UNDERWRITER COMMIT — submit a signed `UnderwriteIntentCommit`
-    *        (UIC) through an ACTIVE-role-gated outpost relay.
-    *
-    * Called by the underwriter plugin (or any future plugin that issues
-    * outpost-side commits) to deliver a signed intent without the caller
-    * knowing the outpost's contract surface, ABI / IDL layout, or message
-    * encoding. The chain-specific concrete resolves which contract or
-    * program action to invoke, how to encode the bytes for the wire, and
-    * how to await on-chain confirmation. The current outposts accept only a
-    * canonically encoded UIC whose claimed WIRE account and external address
-    * match the authenticated caller's current ACTIVE underwriter roster row.
-    * They queue the original validated bytes unchanged. The WIRE depot remains
-    * authoritative for validating the embedded permission signature and bond.
-    *
-    * Returns only after on-chain inclusion + confirmations — the caller
-    * uses the return value as a "this leg landed" signal before recording
-    * the commit locally. Late-arriving commits (after consensus has already
-    * been reached for the underlying envelope) are benign no-ops on the
-    * outpost side per `opp-consensus.md`; they still confirm here.
-    *
-    * @param uw_request_id  The depot's `sysio.uwrit::uwreqs` row id this
-    *                       UIC is committing to. Used only for log
-    *                       correlation; the on-chain call carries the original
-    *                       validated UIC bytes.
-    * @param uic_bytes      Serialized `UnderwriteIntentCommit` (protobuf
-    *                       encoded, signed by an authorized WIRE K1, R1,
-    *                       EM, or ED permission key).
-    * @param deadline       Upper bound on the total time spent talking to
-    *                       the remote chain for this call.
-    * @return Chain-native tx id / signature suitable for logs.
-    * @throws fc::exception on RPC failure, tx revert, or deadline expiry.
-    */
-   virtual std::string uw_commit(uint64_t                 uw_request_id,
-                                 const std::vector<char>& uic_bytes,
-                                 fc::microseconds         deadline) = 0;
-
-   /**
     * @brief OUTPOST CRANKS — drive the outpost's permissionless per-epoch
     *        instructions that nothing on the outpost schedules.
     *

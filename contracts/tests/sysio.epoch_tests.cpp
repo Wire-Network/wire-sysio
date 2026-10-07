@@ -17,7 +17,7 @@ using namespace sysio::opp::types;
 
 using mvo = fc::mutable_variant_object;
 
-/// v6: `regoutpost` is gone; `sysio.chains::regchain` is its replacement. The
+/// `regoutpost` is gone; `sysio.chains::regchain` is its replacement. The
 /// tests still focus on epoch lifecycle, so they only depend on a `sysio.chains`
 /// row existing for downstream epoch lookups.
 class sysio_epoch_tester : public tester {
@@ -98,16 +98,15 @@ public:
       return push_epoch_action(EPOCH_ACCOUNT, "schbatchgps"_n, mvo());
    }
 
-   /// v6 replacement for `regoutpost`: register a chain row in `sysio.chains`.
+   /// Replacement for `regoutpost`: register a chain row in `sysio.chains`.
    /// Codenames stand in for the old `ChainKind` per-chain identity.
    action_result regchain(ChainKind kind, const std::string& code_str,
                           uint32_t external_chain_id,
                           const std::string& name_str = "test outpost",
                           const std::string& description = "") {
-      auto code_v = fc::slug_name{code_str};
       return push_chains_action(CHAINS_ACCOUNT, "regchain"_n, mvo()
          ("kind", kind)
-         ("code", mvo()("value", code_v.value))
+         ("code", code_str)
          ("external_chain_id", external_chain_id)
          ("name", name_str)
          ("description", description)

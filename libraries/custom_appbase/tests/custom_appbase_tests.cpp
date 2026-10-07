@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE( default_exec_window ) {
       // read_only_queue should only contain the current lambda function,
       // and read_write_queue should have executed all its functions
       BOOST_REQUIRE_EQUAL( app->executor().read_only_queue_size(), 0u); // pop()s before execute
-      BOOST_REQUIRE_EQUAL( app->executor().read_exclusive_queue_size(), 0u );
+      BOOST_REQUIRE_EQUAL( app->executor().readable_queue().size(exec_queue::read_exclusive), 0u );
       BOOST_REQUIRE_EQUAL( app->executor().read_write_queue_size(), 0u );
       app->quit();
       } );
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE( default_exec_window ) {
 
    // all queues are cleared when exiting application::exec()
    BOOST_REQUIRE_EQUAL( app->executor().read_only_queue_empty(), true);
-   BOOST_REQUIRE_EQUAL( app->executor().read_exclusive_queue_empty(), true);
+   BOOST_REQUIRE_EQUAL( app->executor().readable_queue().empty(exec_queue::read_exclusive), true);
    BOOST_REQUIRE_EQUAL( app->executor().read_write_queue_empty(), true);
 
    // exactly number of both queues' functions processed
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE( exec_with_unique_handler_id ) {
       // read_only_queue should only contain the current lambda function,
       // and read_write_queue should have executed all its functions
       BOOST_REQUIRE_EQUAL( app->executor().read_only_queue_size(), 0u); // pop()s before execute
-      BOOST_REQUIRE_EQUAL( app->executor().read_exclusive_queue_size(), 0u );
+      BOOST_REQUIRE_EQUAL( app->executor().readable_queue().size(exec_queue::read_exclusive), 0u );
       BOOST_REQUIRE_EQUAL( app->executor().read_write_queue_size(), 0u );
       app->quit();
       } );
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE( exec_with_unique_handler_id ) {
 
    // all queues are cleared when exiting application::exec()
    BOOST_REQUIRE_EQUAL( app->executor().read_only_queue_empty(), true);
-   BOOST_REQUIRE_EQUAL( app->executor().read_exclusive_queue_empty(), true);
+   BOOST_REQUIRE_EQUAL( app->executor().readable_queue().empty(exec_queue::read_exclusive), true);
    BOOST_REQUIRE_EQUAL( app->executor().read_write_queue_empty(), true);
 
    // exactly number of both queues' functions processed
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE( exec_perf ) {
       // read_only_queue should only contain the current lambda function,
       // and read_write_queue should have executed all its functions
       BOOST_REQUIRE_EQUAL( app->executor().read_only_queue_size(), 0u); // pop()s before execute
-      BOOST_REQUIRE_EQUAL( app->executor().read_exclusive_queue_size(), 0u );
+      BOOST_REQUIRE_EQUAL( app->executor().readable_queue().size(exec_queue::read_exclusive), 0u );
       BOOST_REQUIRE_EQUAL( app->executor().read_write_queue_size(), 0u );
       app->quit();
       } );
@@ -230,7 +230,7 @@ BOOST_AUTO_TEST_CASE( exec_with_handler_id ) {
       // read_only_queue should only contain the current lambda function,
       // and read_write_queue should have executed all its functions
       BOOST_REQUIRE_EQUAL( app->executor().read_only_queue_size(), 0u); // pop()s before execute
-      BOOST_REQUIRE_EQUAL( app->executor().read_exclusive_queue_size(), 0u );
+      BOOST_REQUIRE_EQUAL( app->executor().readable_queue().size(exec_queue::read_exclusive), 0u );
       BOOST_REQUIRE_EQUAL( app->executor().read_write_queue_size(), 0u );
       app->quit();
       } );
@@ -240,7 +240,7 @@ BOOST_AUTO_TEST_CASE( exec_with_handler_id ) {
 
    // all queues are cleared when exiting application::exec()
    BOOST_REQUIRE_EQUAL( app->executor().read_only_queue_empty(), true);
-   BOOST_REQUIRE_EQUAL( app->executor().read_exclusive_queue_empty(), true);
+   BOOST_REQUIRE_EQUAL( app->executor().readable_queue().empty(exec_queue::read_exclusive), true);
    BOOST_REQUIRE_EQUAL( app->executor().read_write_queue_empty(), true);
 
    // does not post if one already exists at the same priority
@@ -289,7 +289,7 @@ BOOST_AUTO_TEST_CASE( execute_from_read_only_queue ) {
    app->executor().post( priority::lowest, exec_queue::read_only, [&]() {
       // read_queue should be empty (read window pops before execute) and write_queue should have all its functions
       BOOST_REQUIRE_EQUAL( app->executor().read_only_queue_size(), 0u); // pop()s before execute
-      BOOST_REQUIRE_EQUAL( app->executor().read_exclusive_queue_size(), 2u);
+      BOOST_REQUIRE_EQUAL( app->executor().readable_queue().size(exec_queue::read_exclusive), 2u);
       BOOST_REQUIRE_EQUAL( app->executor().read_write_queue_size(), 4u );
       app->quit();
       } );
@@ -297,7 +297,7 @@ BOOST_AUTO_TEST_CASE( execute_from_read_only_queue ) {
 
    // all queues are cleared when exiting application::exec()
    BOOST_REQUIRE_EQUAL( app->executor().read_only_queue_empty(), true);
-   BOOST_REQUIRE_EQUAL( app->executor().read_exclusive_queue_empty(), true);
+   BOOST_REQUIRE_EQUAL( app->executor().readable_queue().empty(exec_queue::read_exclusive), true);
    BOOST_REQUIRE_EQUAL( app->executor().read_write_queue_empty(), true);
 
    // exactly number of posts processed
@@ -339,7 +339,7 @@ BOOST_AUTO_TEST_CASE( execute_from_empty_read_only_queue ) {
    app->executor().post( priority::lowest, exec_queue::read_only, [&]() {
       // read_queue should be empty (read window pops before execute) and write_queue should have all its functions
       BOOST_REQUIRE_EQUAL( app->executor().read_only_queue_size(), 0u); // pop()s before execute
-      BOOST_REQUIRE_EQUAL( app->executor().read_exclusive_queue_size(), 0u);
+      BOOST_REQUIRE_EQUAL( app->executor().readable_queue().size(exec_queue::read_exclusive), 0u);
       BOOST_REQUIRE_EQUAL( app->executor().read_write_queue_size(), 10u );
       app->quit();
       } );
@@ -378,7 +378,7 @@ BOOST_AUTO_TEST_CASE( execute_from_read_only_and_read_write_queues ) {
    app->executor().post( priority::lowest, exec_queue::read_only, [&]() {
       // read_queue should have current function and write_queue's functions are all executed 
       BOOST_REQUIRE_EQUAL( app->executor().read_only_queue_size(), 0u); // pop()s before execute
-      BOOST_REQUIRE_EQUAL( app->executor().read_exclusive_queue_size(), 0u);
+      BOOST_REQUIRE_EQUAL( app->executor().readable_queue().size(exec_queue::read_exclusive), 0u);
       BOOST_REQUIRE_EQUAL( app->executor().read_write_queue_size(), 0u );
       app->quit();
       } );
@@ -387,7 +387,7 @@ BOOST_AUTO_TEST_CASE( execute_from_read_only_and_read_write_queues ) {
 
    // queues are emptied after exec
    BOOST_REQUIRE_EQUAL( app->executor().read_only_queue_empty(), true);
-   BOOST_REQUIRE_EQUAL( app->executor().read_exclusive_queue_empty(), true);
+   BOOST_REQUIRE_EQUAL( app->executor().readable_queue().empty(exec_queue::read_exclusive), true);
    BOOST_REQUIRE_EQUAL( app->executor().read_write_queue_empty(), true);
 
    // exactly number of posts processed
@@ -446,8 +446,9 @@ BOOST_AUTO_TEST_CASE( execute_from_read_only_and_read_write_and_trx_read_write_q
    // stop application. Use lowest at the end to make sure this executes the last
    app->executor().post( priority::lowest, exec_queue::trx_read_write, [&]() {
       // read_queue should have current function and write_queue's functions are all executed
-      BOOST_REQUIRE_EQUAL( app->executor().trx_read_write_queue_size(), 0u); // pop()s before execute
-      BOOST_REQUIRE_EQUAL( app->executor().read_exclusive_queue_size(), 0u);
+      // pop()s before execute
+      BOOST_REQUIRE_EQUAL( app->executor().readable_queue().size(exec_queue::trx_read_write), 0u);
+      BOOST_REQUIRE_EQUAL( app->executor().readable_queue().size(exec_queue::read_exclusive), 0u);
       BOOST_REQUIRE_EQUAL( app->executor().read_write_queue_size(), 0u );
       BOOST_REQUIRE_EQUAL( app->executor().read_only_queue_size(), 0u);
       app->quit();
@@ -458,9 +459,9 @@ BOOST_AUTO_TEST_CASE( execute_from_read_only_and_read_write_and_trx_read_write_q
 
    // queues are emptied after exec
    BOOST_REQUIRE_EQUAL( app->executor().read_only_queue_empty(), true);
-   BOOST_REQUIRE_EQUAL( app->executor().read_exclusive_queue_empty(), true);
+   BOOST_REQUIRE_EQUAL( app->executor().readable_queue().empty(exec_queue::read_exclusive), true);
    BOOST_REQUIRE_EQUAL( app->executor().read_write_queue_empty(), true);
-   BOOST_REQUIRE_EQUAL( app->executor().trx_read_write_queue_empty(), true);
+   BOOST_REQUIRE_EQUAL( app->executor().readable_queue().empty(exec_queue::trx_read_write), true);
 
    // exactly number of posts processed
    BOOST_REQUIRE_EQUAL( rslts.size(), 17u );
@@ -521,7 +522,12 @@ BOOST_AUTO_TEST_CASE( execute_from_read_only_and_read_exclusive_queues ) {
    
    while( true ) {
       app->get_io_context().poll();
-      size_t s = app->executor().read_only_queue_size() + app->executor().read_exclusive_queue_size() + app->executor().read_write_queue_size();
+      size_t s = 0;
+      {
+         auto queue = app->executor().readable_queue();
+         s = queue.size(exec_queue::read_only) + queue.size(exec_queue::read_exclusive) +
+             queue.size(exec_queue::read_write);
+      }
       if (s == 17)
          break;
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -549,7 +555,7 @@ BOOST_AUTO_TEST_CASE( execute_from_read_only_and_read_exclusive_queues ) {
 
    // queues are emptied after exec
    BOOST_REQUIRE_EQUAL( app->executor().read_only_queue_empty(), true);
-   BOOST_REQUIRE_EQUAL( app->executor().read_exclusive_queue_empty(), true);
+   BOOST_REQUIRE_EQUAL( app->executor().readable_queue().empty(exec_queue::read_exclusive), true);
    BOOST_REQUIRE_EQUAL( app->executor().read_write_queue_empty(), true);
 
    // exactly number of posts processed
@@ -708,10 +714,12 @@ BOOST_AUTO_TEST_CASE( test_read_view_iteration ) {
    auto work = make_work_guard(app->get_io_context());
    while( true ) {
       app->get_io_context().poll();
-      size_t s = app->executor().read_only_queue_size() +
-                 app->executor().read_exclusive_queue_size() +
-                 app->executor().read_write_queue_size() +
-                 app->executor().trx_read_write_queue_size();
+      size_t s = 0;
+      {
+         auto queue = app->executor().readable_queue();
+         s = queue.size(exec_queue::read_only) + queue.size(exec_queue::read_exclusive) +
+             queue.size(exec_queue::read_write) + queue.size(exec_queue::trx_read_write);
+      }
       if (s == 8)
          break;
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -723,7 +731,6 @@ BOOST_AUTO_TEST_CASE( test_read_view_iteration ) {
       auto e = read_queue.end(exec_queue::trx_read_write);
       BOOST_REQUIRE(b != e);
       BOOST_TEST(std::distance(b, e) == 4);
-      BOOST_REQUIRE_EQUAL( app->executor().trx_read_write_queue_size(), 4u );
       BOOST_REQUIRE_EQUAL( read_queue.size(exec_queue::trx_read_write), 4u );
       int v = read_queue.function_from_iter<functor>(b).some_other_function();
       BOOST_CHECK_EQUAL(v, 2);
@@ -739,6 +746,41 @@ BOOST_AUTO_TEST_CASE( test_read_view_iteration ) {
    work.reset();
    app->quit();
    app.join();
+}
+
+// The main thread switches the lock mode at every read/write window and drains trx_read_write in the write window,
+// while net and http threads push to it. Every queued push must run exactly once; TSAN also checks the lock mode is
+// never read or written unsynchronized.
+BOOST_AUTO_TEST_CASE( trx_read_write_add_while_switching_lock_mode ) {
+   appbase::exec_pri_queue queue;
+   queue.init_read_threads(1);
+
+   constexpr size_t num_pushes = 100000;
+   size_t queued = 0;
+   size_t handed_back = 0;
+   size_t executed = 0; // only the draining thread runs the tasks
+   std::atomic<bool> done = false;
+   std::thread pusher( [&]() {
+      for (size_t i = 0; i < num_pushes; ++i) {
+         if (queue.add(priority::medium, exec_queue::trx_read_write, i, [&executed](){ ++executed; }))
+            ++queued;
+         else
+            ++handed_back;
+      }
+      done = true;
+   } );
+   while (!done) {
+      queue.enable_locking([](){ return false; });
+      queue.disable_locking();
+      while (queue.execute_highest_locked(exec_queue::trx_read_write)) // write window drain
+         ;
+   }
+   pusher.join();
+   while (queue.execute_highest_locked(exec_queue::trx_read_write))
+      ;
+
+   BOOST_CHECK_EQUAL( queued + handed_back, num_pushes );
+   BOOST_CHECK_EQUAL( executed, queued );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

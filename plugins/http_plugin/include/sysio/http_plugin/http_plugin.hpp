@@ -18,7 +18,7 @@ namespace sysio {
     */
    using url_response_callback = std::function<void(int,std::optional<fc::variant>)>;
 
-   /// Handler that receives the connection directly (for binary/file responses)
+   /// Handler that answers through the connection it is given (for binary/file responses)
    using raw_url_handler = std::function<void(::sysio::detail::abstract_conn_ptr, string&&, string&&)>;
 
    /**
@@ -26,8 +26,8 @@ namespace sysio {
     *
     * URL handlers have this type
     *
-    * The handler must guarantee that url_response_callback() is called;
-    * otherwise, the connection will hang and result in a memory leak.
+    * The handler must call url_response_callback() exactly once. A request it never answers hangs its
+    * connection; a second answer is logged and dropped.
     *
     * Arguments: url, request_body, response_callback
     **/
@@ -111,8 +111,8 @@ namespace sysio {
               add_async_handler(std::move(call), content_type);
         }
 
-        /// Register a raw handler that receives the abstract_conn directly.
-        /// Use for endpoints that need to send binary/file responses.
+        /// Register a raw handler, which answers through the connection it is given, for endpoints that send binary
+        /// or file responses.
         void add_raw_handler(string path, api_category category, raw_url_handler handler);
 
         // standard exception handling for api handlers

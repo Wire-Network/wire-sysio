@@ -10,6 +10,7 @@
 #include <sysio/producer_api_plugin/producer_api_plugin.hpp>
 #include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/prometheus_plugin/prometheus_plugin.hpp>
+#include <sysio/query_engine_plugin/query_engine_plugin.hpp>
 #include <sysio/signature_provider_kms_plugin/signature_provider_kms_plugin.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <sysio/signature_provider_ssm_plugin/signature_provider_ssm_plugin.hpp>
@@ -19,7 +20,6 @@
 #include <sysio/test_control_api_plugin/test_control_api_plugin.hpp>
 #include <sysio/test_control_plugin/test_control_plugin.hpp>
 #include <sysio/trace_api/trace_api_plugin.hpp>
-#include <sysio/underwriter_plugin/underwriter_plugin.hpp>
 
 using namespace appbase;
 using namespace sysio;
@@ -38,6 +38,7 @@ int main(int argc, char** argv)
    application_base::register_plugin<test_control_api_plugin>();
    application_base::register_plugin<state_history_plugin>();
    application_base::register_plugin<status_monitor_plugin>();
+   application_base::register_plugin<query_engine_plugin>();
    application_base::register_plugin<prometheus_plugin>();
    application_base::register_plugin<chain_api_plugin>();
    application_base::register_plugin<signature_provider_manager_plugin>();
@@ -45,7 +46,6 @@ int main(int argc, char** argv)
    application_base::register_plugin<signature_provider_kms_plugin>();
    application_base::register_plugin<batch_operator_plugin>();
    application_base::register_plugin<external_debugging_plugin>();
-   application_base::register_plugin<underwriter_plugin>();
    auto r = exe.init<
       resource_monitor_plugin,
       chain_plugin,

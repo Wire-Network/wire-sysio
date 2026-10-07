@@ -1,0 +1,408 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "WIRE query.execute response v1",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "jsonrpc": {
+          "enum": [
+            "2.0"
+          ]
+        },
+        "id": {
+          "$ref": "#/definitions/id"
+        },
+        "result": {
+          "$ref": "#/definitions/result"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "jsonrpc",
+        "id",
+        "error"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "jsonrpc": {
+          "enum": [
+            "2.0"
+          ]
+        },
+        "id": {
+          "$ref": "#/definitions/id"
+        },
+        "error": {
+          "$ref": "#/definitions/error"
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "id": {
+      "type": [
+        "string",
+        "integer",
+        "null"
+      ],
+      "maxLength": 128,
+      "minimum": -4294967295,
+      "maximum": 4294967295
+    },
+    "unsignedDecimal": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)$"
+    },
+    "cell": {
+      "oneOf": [
+        {
+          "type": [
+            "null",
+            "boolean",
+            "string"
+          ]
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/cell"
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/cell"
+          }
+        }
+      ]
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "owners",
+        "table"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "owners": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 13,
+            "pattern": "^[a-z1-5.]+$"
+          }
+        },
+        "table": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "required": [
+        "chain_id",
+        "block_id",
+        "block_num",
+        "block_time",
+        "read_mode",
+        "last_irreversible_block_num",
+        "abis",
+        "captured_at",
+        "synced"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "chain_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "block_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "block_num": {
+          "$ref": "#/definitions/unsignedDecimal"
+        },
+        "block_time": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,6})?$"
+        },
+        "read_mode": {
+          "enum": [
+            "head",
+            "irreversible"
+          ]
+        },
+        "last_irreversible_block_num": {
+          "$ref": "#/definitions/unsignedDecimal"
+        },
+        "abis": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {
+            "type": "object",
+            "required": [
+              "owner",
+              "hash"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "owner": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 13,
+                "pattern": "^[a-z1-5.]+$"
+              },
+              "hash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        },
+        "captured_at": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,6})?Z$"
+        },
+        "synced": {
+          "type": "boolean"
+        }
+      }
+    },
+    "column": {
+      "type": "object",
+      "required": [
+        "name",
+        "logical_type",
+        "abi_type",
+        "nullable",
+        "encoding"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "logical_type": {
+          "enum": [
+            "integer",
+            "decimal",
+            "boolean",
+            "text",
+            "time",
+            "asset",
+            "extended_asset",
+            "json",
+            "ieee_hex",
+            "enumeration"
+          ]
+        },
+        "abi_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "nullable": {
+          "type": "boolean"
+        },
+        "encoding": {
+          "enum": [
+            "decimal_string",
+            "boolean",
+            "text",
+            "asset_object",
+            "json",
+            "ieee_hex"
+          ]
+        }
+      }
+    },
+    "stats": {
+      "type": "object",
+      "required": [
+        "scanned_rows",
+        "matched_rows",
+        "groups",
+        "returned_rows",
+        "raw_bytes",
+        "elapsed_us"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "scanned_rows": {
+          "$ref": "#/definitions/unsignedDecimal"
+        },
+        "matched_rows": {
+          "$ref": "#/definitions/unsignedDecimal"
+        },
+        "groups": {
+          "$ref": "#/definitions/unsignedDecimal"
+        },
+        "returned_rows": {
+          "$ref": "#/definitions/unsignedDecimal"
+        },
+        "raw_bytes": {
+          "$ref": "#/definitions/unsignedDecimal"
+        },
+        "elapsed_us": {
+          "$ref": "#/definitions/unsignedDecimal"
+        }
+      }
+    },
+    "error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message",
+        "data"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            -32700,
+            -32600,
+            -32601,
+            -32602,
+            -32010,
+            -32011,
+            -32012,
+            -32013,
+            -32014,
+            -32015,
+            -32016,
+            -32017,
+            -32018,
+            -32019,
+            -32603
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "required": [
+            "kind",
+            "retryable",
+            "line",
+            "column",
+            "limit"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "enum": [
+                "PARSE_ERROR",
+                "INVALID_REQUEST",
+                "METHOD_NOT_FOUND",
+                "INVALID_PARAMS",
+                "QUERY_SYNTAX",
+                "QUERY_SEMANTICS",
+                "QUERY_LIMIT",
+                "QUERY_TIMEOUT",
+                "QUERY_BUSY",
+                "SCHEMA_CHANGED",
+                "ROW_DECODE_ERROR",
+                "VALUE_ERROR",
+                "STATE_UNAVAILABLE",
+                "QUERY_CANCELLED",
+                "INTERNAL_ERROR"
+              ]
+            },
+            "retryable": {
+              "type": "boolean"
+            },
+            "line": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1
+            },
+            "column": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1
+            },
+            "limit": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "complete",
+        "source",
+        "state",
+        "columns",
+        "rows",
+        "stats"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "enum": [
+            "1.0"
+          ]
+        },
+        "complete": {
+          "enum": [
+            true
+          ]
+        },
+        "source": {
+          "$ref": "#/definitions/source"
+        },
+        "state": {
+          "$ref": "#/definitions/state"
+        },
+        "columns": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/column"
+          }
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/definitions/cell"
+            }
+          }
+        },
+        "stats": {
+          "$ref": "#/definitions/stats"
+        }
+      }
+    }
+  }
+}

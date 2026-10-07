@@ -184,8 +184,8 @@ private:
 };
 
 /**
- * JSON-RPC endpoint that either serves two calls on one connection or closes
- * the first keep-alive connection before accepting the second call.
+ * JSON-RPC endpoint that either serves two calls on one connection, or drops the first keep-alive connection when the
+ * second call arrives on it and serves that call's replay on a new connection.
  */
 class reusable_json_rpc_server {
 public:
@@ -244,8 +244,8 @@ private:
       return socket;
    }
 
-   /** Read one complete request and send the matching JSON-RPC response. */
-   bool serve_request(tcp::socket& socket, int64_t response_id, std::string_view result, bool keep_alive) {
+   /** Read and count one complete request; false if the read failed. */
+   bool read_request(tcp::socket& socket) {
       boost::beast::flat_buffer request_buffer;
       boost::beast::http::request<boost::beast::http::string_body> request;
       boost::system::error_code error;
@@ -253,6 +253,13 @@ private:
       if (error)
          return false;
       _request_count.fetch_add(1);
+      return true;
+   }
+
+   /** Read one complete request and send the matching JSON-RPC response. */
+   bool serve_request(tcp::socket& socket, int64_t response_id, std::string_view result, bool keep_alive) {
+      if (!read_request(socket))
+         return false;
 
       boost::beast::http::response<boost::beast::http::string_body> response{boost::beast::http::status::ok, 11};
       response.set(boost::beast::http::field::content_type, "application/json");
@@ -260,6 +267,7 @@ private:
       response.body() =
          "{\"jsonrpc\":\"2.0\",\"id\":" + std::to_string(response_id) + ",\"result\":\"" + std::string(result) + "\"}";
       response.prepare_payload();
+      boost::system::error_code error;
       boost::beast::http::write(socket, response, error);
       return !error;
    }
@@ -277,6 +285,9 @@ private:
          return;
       }
 
+      // Hold the connection open until the second call arrives on it, so the client really reuses it, then drop that
+      // call unanswered.
+      (void)read_request(*first);
       boost::system::error_code error;
       first->shutdown(tcp::socket::shutdown_both, error);
       first->close(error);
@@ -527,7 +538,8 @@ BOOST_AUTO_TEST_CASE(idempotent_call_recovers_from_a_stale_cached_connection) {
    BOOST_CHECK_EQUAL(client.call_idempotent("wire_first_probe").as_string(), "first");
    BOOST_CHECK_EQUAL(client.call_idempotent("wire_second_probe").as_string(), "second");
    BOOST_CHECK_EQUAL(server.connection_count(), 2U);
-   BOOST_CHECK_EQUAL(server.request_count(), 2U);
+   // The second call reaches the server twice: on the stale connection, which drops it, and as the replay.
+   BOOST_CHECK_EQUAL(server.request_count(), 3U);
 }
 
 /// Caller-supplied retry options cannot make a default call replay.

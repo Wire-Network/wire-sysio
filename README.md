@@ -50,7 +50,10 @@ artifacts, and the interpreted `sys-vm` runtime. CDT contract rebuilds, `sys-vm-
 contract debugging are not part of this support tier yet.
 
 ```bash
-brew install cmake ninja ccache pkgconf autoconf automake libtool
+# openjdk runs the ANTLR parser generator of the query engine plugin at build time; Homebrew keeps
+# it keg-only, so its bin directory has to be on PATH for CMake's find_package(Java) to see it.
+brew install cmake ninja ccache pkgconf autoconf automake libtool openjdk
+export PATH="$(brew --prefix openjdk)/bin:$PATH"
 git submodule update --init --recursive vcpkg libraries/appbase
 ./vcpkg/bootstrap-vcpkg.sh
 

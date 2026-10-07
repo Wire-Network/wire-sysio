@@ -5,9 +5,13 @@
 #include <fc/variant_object.hpp>
 #include <fc/slug_name.hpp>
 
+#include <algorithm>
 #include <limits>
 
 #include "contracts.hpp"
+#include "external_chain_simulator.hpp"
+#include "contract_test_support.hpp"
+#include "shadow_yield_reference.hpp"
 #include <sysio/opp/opp.hpp>
 
 using namespace sysio::testing;
@@ -17,6 +21,7 @@ using namespace fc;
 using namespace sysio::opp::types;
 
 using mvo = fc::mutable_variant_object;
+using sysio_system::test_support::codename_mvo;
 
 namespace {
 
@@ -126,6 +131,36 @@ constexpr std::string_view kWireFundingQuantity = "10.000000000 WIRE";
 /// Maximum WIRE quantity representable by an Antelope asset.
 constexpr std::string_view kWireMaximumSupply = "4611686018.427387903 WIRE";
 
+/// Liq token whose `sysio.liq` shadow symbol backs depot-native shadow collateral. The
+/// collateral row's `token_code` is this registry code, not the symbol code.
+constexpr std::string_view kLiqEthCodename = "LIQETH";
+
+/// Shadow symbol `sysio.liq` mints for kLiqEthCodename, at the token's depot precision.
+const symbol kLiqEthSymbol{9, "LIQETH"};
+
+/// Token code with no `sysio.liq` shadow symbol and no WIRE identity.
+constexpr std::string_view kUnknownTokenCodename = "NOPE";
+
+/// External chain id the shadow fixture registers its ETH outpost under.
+constexpr uint32_t kEthExternalChainId = 1;
+
+/// Byte width of an EVM contract address.
+constexpr size_t kEvmAddressBytes = 20;
+
+/// Filler byte of the placeholder LIQETH contract address on the ETH outpost.
+constexpr char kPlaceholderAddressByte = 0x5a;
+
+/// Shadow minted to each shadow-collateral operator, in atomic LIQETH units.
+constexpr uint64_t kShadowFunding = 10 * kWireUnit;
+
+/// Error raised by the depot-native token resolver for a token it cannot custody.
+constexpr std::string_view kUnsupportedTokenError =
+   "assertion failure with message: unsupported depot-native collateral token";
+
+/// Error raised by `claimremit` when no claim row exists for the requested token.
+constexpr std::string_view kNoClaimableRemitError =
+   "assertion failure with message: no claimable remit for this account";
+
 /// Punishment reason used by terminal-status eligibility regressions.
 constexpr std::string_view kTestSlashReason = "test slash";
 
@@ -139,9 +174,11 @@ constexpr auto cancel   = "cancelwtdw"_n;
 constexpr auto flush    = "flushwtdw"_n;
 } // namespace withdrawal_action
 
-/// Contract action identifiers used by direct collateral deposit helpers.
+/// Contract action identifiers used by direct collateral deposit and claim helpers.
 namespace collateral_action {
-constexpr auto deposit = "deposit"_n;
+constexpr auto deposit    = "deposit"_n;
+constexpr auto claimremit = "claimremit"_n;
+constexpr auto available  = "available"_n;
 } // namespace collateral_action
 
 /// Contract field identifiers used by withdrawal lifecycle helpers.
@@ -150,7 +187,19 @@ constexpr char account[]       = "account";
 constexpr char amount[]        = "amount";
 constexpr char request_id[]    = "request_id";
 constexpr char current_epoch[] = "current_epoch";
+constexpr char chain_code[]    = "chain_code";
+constexpr char token_code[]    = "token_code";
 } // namespace withdrawal_field
+
+/// Registry and shadow-token actions the shadow-collateral fixture drives.
+namespace shadow_action {
+constexpr auto regchain = "regchain"_n;
+constexpr auto regtoken = "regtoken"_n;
+constexpr auto regctok  = "regctok"_n;
+constexpr auto create   = "create"_n;
+constexpr auto mint     = "mint"_n;
+constexpr auto queueout = "queueout"_n;
+} // namespace shadow_action
 
 /// Result field identifiers inspected by focused eligibility tests.
 namespace eligibility_field {
@@ -189,9 +238,80 @@ constexpr uint32_t kDellogPrunePerWrite = 4;
 /// Mirrors opreg's MAX_DELLOG_PRUNE_PER_CRANK.
 constexpr uint32_t kDellogPrunePerCrank = 64;
 
+/// Shadow-yield forwarding: actions opreg and sysio.liq expose for it.
+namespace yield_action {
+constexpr auto sweepyield = "sweepyield"_n;
+constexpr auto claimyield = "claimyield"_n;
+constexpr auto addyield   = "addyield"_n;
+} // namespace yield_action
+
+/// First shadow-yield bonder: holds a quarter of the bonded shadow.
+constexpr auto kYieldBonderA = "uwrit.alice"_n;
+
+/// Second shadow-yield bonder: holds three quarters of the bonded shadow.
+constexpr auto kYieldBonderB = "uwrit.bob"_n;
+
+/// Shadow holder that never bonds, so the registry holds only part of the supply and the
+/// registry's share of a distribution is not a round number.
+constexpr auto kYieldBystander = "batchop.b"_n;
+
+/// WIRE holder that funds `sysio.liq::addyield` distributions.
+constexpr auto kYieldDonor = "batchop.c"_n;
+
+/// Account that cranks the permissionless `sweepyield`: neither a bonder nor the registry.
+constexpr auto kYieldCranker = "producer.a"_n;
+
+/// WIRE issued to kYieldDonor, enough for every distribution a yield case makes.
+constexpr std::string_view kYieldDonorFunding = "1000.000000000 WIRE";
+
+/// Shadow kYieldBonderA bonds, in atomic LIQETH units.
+constexpr uint64_t kYieldBondA = 1 * kWireUnit;
+
+/// Shadow kYieldBonderB bonds: three times kYieldBondA.
+constexpr uint64_t kYieldBondB = 3 * kWireUnit;
+
+/// Shadow kYieldBystander holds unbonded: an uneven third of a unit.
+constexpr uint64_t kYieldBystanderHolding = kWireUnit / 3;
+
+/// WIRE distributed to the LIQETH holders by one `addyield`, in atomic units.
+constexpr int64_t kYieldDistribution = 40 * static_cast<int64_t>(kWireUnit);
+
+/// Error raised by `sweepyield` when the registry's `sysio.liq` row is owed nothing.
+constexpr std::string_view kNoYieldToSweepError = "assertion failure with message: no yield to sweep";
+
+/// Error raised by `claimyield` when the operator's row has earned nothing.
+constexpr std::string_view kNoYieldOwedError = "assertion failure with message: no yield owed";
+
+/// Error raised by `claimyield` when the row is owed yield the registry's pool cannot yet cover.
+constexpr std::string_view kYieldNotCoveredError =
+   "assertion failure with message: owed yield is rounding dust the WIRE received from sysio.liq does not "
+   "cover; only later slack can cover it";
+
+/// Recent-actions reason `depositinle` records when it drops a credit naming the depot chain.
+constexpr std::string_view kDepotChainCreditReason =
+   "depot-chain collateral is bonded through deposit, never credited from an outpost";
+
+/// Account with no stake in the yield cases that cranks `claimyield` for someone else.
+constexpr auto kYieldKeeper = "uwrit.a"_n;
+
+/// Operator holding WIRE collateral in the dust cases, so the registry's `sysio.token` balance mixes
+/// collateral principal with swept yield.
+constexpr auto kYieldPrincipalHolder = "batchop.a"_n;
+
+/// WIRE collateral kYieldPrincipalHolder bonds in the dust cases.
+constexpr uint64_t kYieldPrincipal = 5 * kWireUnit;
+
+/// Distribute-and-sweep rounds in the dust cases: enough for the registry row's per-settle flooring
+/// to fall at least one atomic WIRE behind the operator row's single floor.
+constexpr int kDustRounds = 3;
+
+/// Error raised by `sweepyield` for WIRE, which earns no shadow yield.
+constexpr std::string_view kWireEarnsNoYieldError =
+   "assertion failure with message: WIRE collateral earns no shadow yield";
+
 } // namespace
 
-/// v6 data-model: per-chain identity has moved from `ChainKind` enums to
+/// Data model: per-chain identity has moved from `ChainKind` enums to
 /// `sysio::slug_name`-keyed registries (`sysio.chains`, `sysio.tokens`,
 /// `sysio.reserv`). The test fixture treats the codenames as opaque uint64
 /// values; per-chain spelling ("ETH", "SOL", "WIRE", "LIQETH", ...) maps to
@@ -204,12 +324,18 @@ public:
    static constexpr auto CHALG_ACCOUNT  = "sysio.chalg"_n;
    static constexpr auto MSGCH_ACCOUNT  = "sysio.msgch"_n;
    static constexpr auto TOKEN_ACCOUNT  = "sysio.token"_n;
+   static constexpr auto LIQ_ACCOUNT    = "sysio.liq"_n;
+   /// The shadow ledger's only minter; an account is enough to sign as it here.
+   static constexpr auto SYND_ACCOUNT   = "sysio.synd"_n;
+   static constexpr auto TOKENS_ACCOUNT = "sysio.tokens"_n;
+   static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
 
    sysio_opreg_tester() {
       produce_blocks(2);
 
       create_accounts({
          OPREG_ACCOUNT, EPOCH_ACCOUNT, CHALG_ACCOUNT, MSGCH_ACCOUNT, TOKEN_ACCOUNT,
+         LIQ_ACCOUNT, SYND_ACCOUNT, TOKENS_ACCOUNT, CHAINS_ACCOUNT,
          "batchop.a"_n, "batchop.b"_n, "batchop.c"_n,
          "uwrit.a"_n, "producer.a"_n,
          "uwrit.alice"_n, "uwrit.bob"_n,         // for Task 2 deposit/withdraw/cancel tests
@@ -243,19 +369,13 @@ public:
       epoch_abi_ser.set_abi(std::move(epoch_abi), abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-   // ── SlugName helpers (v6) ──
+   // ── SlugName helpers ──
    //
    // Codenames are 8-byte packed identifiers (`fc::slug_name`). The contract's
    // `sysio::slug_name` and the host-side `fc::slug_name` use the same packing
    // algorithm so values are byte-identical across the boundary.
 
    static fc::slug_name cn(std::string_view s) { return fc::slug_name{s}; }
-
-   /// Build a slug_name mvo suitable for an action argument:
-   /// `{"value": <uint64>}` matches the ABI surface for slug_name fields.
-   static fc::mutable_variant_object codename_mvo(std::string_view s) {
-      return mvo()("value", fc::slug_name{s}.value);
-   }
 
    // ── Action helpers ──
 
@@ -291,14 +411,14 @@ public:
    }
 
    /// Build a single `chain_min_bond` entry as an fc::variant suitable for
-   /// `setconfig`'s `req_*_collat` vector arguments. v6: identity is by
+   /// `setconfig`'s `req_*_collat` vector arguments. identity is by
    /// (chain_code, token_code) codenames rather than the old enums.
    static fc::variant make_chain_min_bond(std::string_view chain_code,
                                           std::string_view token_code,
                                           uint64_t min_bond) {
       return fc::variant(mvo()
-         ("chain_code",           codename_mvo(chain_code))
-         ("token_code",           codename_mvo(token_code))
+         ("chain_code",           chain_code)
+         ("token_code",           token_code)
          ("min_bond",             min_bond)
          ("config_timestamp_ms",  uint64_t{0}));
    }
@@ -377,14 +497,14 @@ public:
          /*terminate_window_ms=*/terminate_window_ms,
          /*req_prod_collat=*/{},
          /*req_batchop_collat=*/{
-            make_chain_min_bond("ETH", "ETH", kTestMinBond),
+            make_chain_min_bond("WIRE", "NTA", kTestMinBond),
          },
          /*req_uw_collat=*/{}));
 
       BOOST_REQUIRE_EQUAL(success(),
          regoperator(account, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
       BOOST_REQUIRE_EQUAL(success(),
-         depositinle(account, "ETH", "ETH", kTestMinBond));
+         bond_generic(account, "NTA", kTestMinBond));
       produce_blocks();
 
       auto op = get_operator(account);
@@ -392,51 +512,33 @@ public:
       BOOST_REQUIRE_EQUAL(0, op["is_bootstrapped"].as_uint64());
    }
 
-   // ── Collateral-action helpers (msgch-dispatched paths, v6 codenames) ──
-
-   /// `depositinle`: dispatched from sysio.msgch.
-   /// v6 signature: `(account, chain_code, token_code, amount,
-   ///                actor_chain ChainKind, actor_address bytes,
-   ///                original_message_id checksum256)`.
-   action_result depositinle(name account,
-                             std::string_view chain_code, std::string_view token_code,
-                             uint64_t amount,
-                             ChainKind actor_chain = ChainKind::CHAIN_KIND_EVM,
-                             const std::vector<char>& actor_address = {},
-                             const std::string& original_message_id_hex = std::string(64, '0')) {
-      return push_opreg_action(OPREG_ACCOUNT, "depositinle"_n, mvo()
-         ("account",              account)
-         ("chain_code",           codename_mvo(chain_code))
-         ("token_code",           codename_mvo(token_code))
-         ("amount",               amount)
-         ("actor_chain",          actor_chain)
-         ("actor_address",        actor_address)
-         ("original_message_id",  original_message_id_hex));
-   }
-
-   /// `withdrawinle`: same dispatch / auth model as `depositinle`.
-   action_result withdrawinle(name account,
-                              std::string_view chain_code, std::string_view token_code,
-                              uint64_t amount) {
-      return push_opreg_action(OPREG_ACCOUNT, "withdrawinle"_n, mvo()
-         ("account",     account)
-         ("chain_code",  codename_mvo(chain_code))
-         ("token_code",  codename_mvo(token_code))
-         ("amount",      amount));
-   }
-
-   /// `withdraw`: operator-authorized WIRE-direct withdrawal request.
-   action_result withdraw(name account, uint64_t amount) {
+   /// `withdraw`: operator-authorized request against the depot-native `(WIRE, token_code)` row.
+   action_result withdraw(name account, std::string_view token_code, uint64_t amount) {
       return push_opreg_action(account, withdrawal_action::withdraw, mvo()
-         (withdrawal_field::account, account)
-         (withdrawal_field::amount,  amount));
+         (withdrawal_field::account,    account)
+         (withdrawal_field::token_code, token_code)
+         (withdrawal_field::amount,     amount));
    }
 
-   /// `deposit`: operator-authorized WIRE-direct collateral deposit.
-   action_result deposit(name account, uint64_t amount) {
+   /// `deposit`: operator-authorized depot-native collateral deposit of `token_code`.
+   action_result deposit(name account, std::string_view token_code, uint64_t amount) {
       return push_opreg_action(account, collateral_action::deposit, mvo()
-         (withdrawal_field::account, account)
-         (withdrawal_field::amount, amount));
+         (withdrawal_field::account,    account)
+         (withdrawal_field::token_code, token_code)
+         (withdrawal_field::amount,     amount));
+   }
+
+   /// Read-only `available(account, chain_code, token_code)`, taken from the action's return value.
+   /// A block is produced after each read so the same query can be repeated later in a case
+   /// without being rejected as a duplicate transaction.
+   uint64_t available(name account, std::string_view chain_code, std::string_view token_code) {
+      auto trace = base_tester::push_action(OPREG_ACCOUNT, collateral_action::available, OPREG_ACCOUNT, mvo()
+         (withdrawal_field::account,    account)
+         (withdrawal_field::chain_code, chain_code)
+         (withdrawal_field::token_code, token_code));
+      BOOST_REQUIRE(trace && !trace->action_traces.empty());
+      produce_blocks();
+      return fc::raw::unpack<uint64_t>(trace->action_traces[0].return_value);
    }
 
    /// Cancel an operator-owned queued withdrawal request.
@@ -464,16 +566,6 @@ public:
          ("account",      account)
          ("was_eligible", was_eligible)
          ("is_eligible",  is_eligible));
-   }
-
-   action_result releaselock(name signer, name account,
-                             std::string_view chain_code, std::string_view token_code,
-                             uint64_t amount) {
-      return push_opreg_action(signer, "releaselock"_n, mvo()
-         ("account",     account)
-         ("chain_code",  codename_mvo(chain_code))
-         ("token_code",  codename_mvo(token_code))
-         ("amount",      amount));
    }
 
    /// Read a wtdwqueue row by request_id (primary key).
@@ -516,16 +608,22 @@ public:
       return log.empty() ? fc::variant() : log.back();
    }
 
-   /// Claimable WIRE row credited by a WIRE-chain remit. Empty variant when absent.
-   fc::variant get_remitclaim(name account) {
-      auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "remitclaims"_n, account);
+   /// Claimable `token_code` row credited by a WIRE-chain remit. Empty variant when absent.
+   ///
+   /// The row key `{account, token_code}` is two big-endian words, which is exactly the
+   /// `[scope][id]` layout `get_row_by_id` probes first — so the account rides as the scope.
+   fc::variant get_remitclaim(name account, std::string_view token_code) {
+      auto data = get_row_by_id(OPREG_ACCOUNT, account, "remitclaims"_n, cn(token_code).value);
       return data.empty() ? fc::variant() : opreg_abi_ser.binary_to_variant(
          "remit_claim", data,
          abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-   action_result claimremit(name account) {
-      return push_opreg_action(account, "claimremit"_n, mvo()("account", account));
+   /// Operator-authorized pull of the `token_code` claim row.
+   action_result claimremit(name account, std::string_view token_code) {
+      return push_opreg_action(account, collateral_action::claimremit, mvo()
+         (withdrawal_field::account,    account)
+         (withdrawal_field::token_code, token_code));
    }
 
    /// Stand up sysio.token with the opreg WIRE asset and fund `who`, so a
@@ -555,8 +653,224 @@ public:
       produce_blocks();
    }
 
+   bool generic_assets_ready = false;
+
+   /// Mint generic shadow LIQ through sysio.synd and bond it through the public native action.
+   action_result bond_generic(name account, std::string_view token, uint64_t amount) {
+      if (!generic_assets_ready) {
+         setup_shadow_liq({sysio::testing::external::First, sysio::testing::external::Second});
+         generic_assets_ready = true;
+      }
+      BOOST_REQUIRE_EQUAL(success(), push_contract(LIQ_ACCOUNT, liq_abi_ser, SYND_ACCOUNT,
+         shadow_action::mint, mvo()("to", account)("token_code", codename_mvo(token))("amount", amount)));
+      return deposit(account, token, amount);
+   }
+
+   // ── Shadow LIQ collateral (sysio.liq) ──
+
+   /// Deploy a privileged registry or token contract and load its ABI serializer.
+   void deploy_privileged(name account, const std::vector<uint8_t>& wasm, const std::vector<char>& abi,
+                          abi_serializer& ser) {
+      set_code(account, wasm);
+      set_abi(account, abi.data());
+      set_privileged(account);
+      produce_blocks();
+      sysio_system::test_support::load_account_abi(*this, account, ser);
+   }
+
+   /// Push an ABI-encoded action on a contract other than opreg and produce a block.
+   action_result push_contract(name code, abi_serializer& ser, name signer, name action_name,
+                               const variant_object& data) {
+      return sysio_system::test_support::push_contract_action_and_produce_block(*this, code, ser, signer,
+                                                                                action_name, data);
+   }
+
+   /// Stand up what a shadow-collateral case needs: the ETH outpost in `sysio.chains`, its
+   /// LIQETH liq token in `sysio.tokens`, and the LIQETH shadow symbol in `sysio.liq` (the
+   /// same registrations `sysio.liq_tests` seeds). Called per case rather than from the
+   /// constructor: an active ETH chain row would turn the ETH-bucket slashes and remits of the
+   /// other cases into real `sysio.msgch` queueouts and change what those cases exercise.
+   void setup_shadow_liq(const std::vector<sysio::testing::external::asset_spec>& assets =
+         {{"ETH", "LIQETH", ChainKind::CHAIN_KIND_EVM, kEthExternalChainId}}) {
+      deploy_privileged(CHAINS_ACCOUNT, contracts::chains_wasm(), contracts::chains_abi(), chains_abi_ser);
+      deploy_privileged(TOKENS_ACCOUNT, contracts::tokens_wasm(), contracts::tokens_abi(), tokens_abi_ser);
+      deploy_privileged(LIQ_ACCOUNT,    contracts::liq_wasm(),    contracts::liq_abi(),    liq_abi_ser);
+
+      for (const auto& a : assets) {
+         const auto sym = symbol::from_string(std::string("9,") + a.token);
+         // Registered inside the epoch-0 bootstrap window, so the rows land ACTIVE.
+         BOOST_REQUIRE_EQUAL(success(), push_contract(CHAINS_ACCOUNT, chains_abi_ser, CHAINS_ACCOUNT,
+            shadow_action::regchain, mvo()
+            ("kind", a.kind)("code", codename_mvo(a.chain))
+            ("external_chain_id", a.id)("name", std::string(a.chain))
+            ("description", std::string{})("outpost", sysio_system::test_support::no_outpost_mvo())));
+
+         const std::vector<char> address(a.kind == ChainKind::CHAIN_KIND_SVM ? 32 : kEvmAddressBytes, kPlaceholderAddressByte);
+         BOOST_REQUIRE_EQUAL(success(), push_contract(TOKENS_ACCOUNT, tokens_abi_ser, TOKENS_ACCOUNT,
+            shadow_action::regtoken, mvo()
+            ("kind", TokenKind::TOKEN_KIND_LIQ)("code", codename_mvo(a.token))
+            ("symbol_name", std::string(a.token))("description", std::string{})
+            ("precision", sym.decimals())
+            ("address", mvo()("kind", a.kind)("address", address))));
+         BOOST_REQUIRE_EQUAL(success(), push_contract(TOKENS_ACCOUNT, tokens_abi_ser, TOKENS_ACCOUNT,
+            shadow_action::regctok, mvo()
+            ("chain_code", codename_mvo(a.chain))("token_code", codename_mvo(a.token))
+            ("contract_addr", address)("is_native", false)));
+
+         BOOST_REQUIRE_EQUAL(success(), push_contract(LIQ_ACCOUNT, liq_abi_ser, LIQ_ACCOUNT, shadow_action::create,
+            mvo()("sym", sym)("chain_code", codename_mvo(a.chain))
+            ("token_code", codename_mvo(a.token))));
+      }
+   }
+
+   /// Put `amount` LIQETH shadow in `holder`'s hands the way the depot mints it: `sysio.synd`, the
+   /// ledger's only minter, calling `mint`.
+   void mint_shadow(name holder, uint64_t amount) {
+      const int64_t before = shadow_balance(holder);
+      BOOST_REQUIRE_EQUAL(success(), push_contract(LIQ_ACCOUNT, liq_abi_ser, SYND_ACCOUNT, shadow_action::mint,
+         mvo()("to", holder)("token_code", codename_mvo(kLiqEthCodename))("amount", amount)));
+      BOOST_REQUIRE_EQUAL(before + static_cast<int64_t>(amount), shadow_balance(holder));
+   }
+
+   /// Read one account's LIQETH shadow balance in atomic units.
+   int64_t shadow_balance(name account) {
+      return get_currency_balance(LIQ_ACCOUNT, kLiqEthSymbol, account).get_amount();
+   }
+
+   /// Slash through the chalg-authorized surface and report whether the transaction queued any
+   /// `sysio.msgch::queueout`, i.e. whether a slash attestation left for an outpost.
+   bool slash_queues_outbound(name account, std::string_view reason) {
+      auto trace = base_tester::push_action(OPREG_ACCOUNT, "slash"_n, CHALG_ACCOUNT, mvo()
+         ("account", account)
+         ("reason",  std::string(reason)));
+      BOOST_REQUIRE(trace);
+      produce_blocks();
+      return std::any_of(trace->action_traces.begin(), trace->action_traces.end(), [](const action_trace& at) {
+         return at.act.account == MSGCH_ACCOUNT && at.act.name == shadow_action::queueout;
+      });
+   }
+
+   // ── Shadow-yield forwarding ──
+
+   /// Register the two underwriters, fund kYieldDonor with WIRE, and mint kYieldBondA / kYieldBondB
+   /// LIQETH to the bonders and kYieldBystanderHolding to kYieldBystander -- nothing bonded yet.
+   void setup_yield_holders() {
+      BOOST_REQUIRE_EQUAL(success(), setconfig());
+      BOOST_REQUIRE_EQUAL(success(), regoperator(kYieldBonderA, OPERATOR_TYPE_UNDERWRITER, /*is_bootstrapped=*/false));
+      BOOST_REQUIRE_EQUAL(success(), regoperator(kYieldBonderB, OPERATOR_TYPE_UNDERWRITER, /*is_bootstrapped=*/false));
+      setup_wire_token_and_fund(kYieldDonor, kYieldDonorFunding);
+      setup_shadow_liq();
+      mint_shadow(kYieldBonderA, kYieldBondA);
+      mint_shadow(kYieldBonderB, kYieldBondB);
+      mint_shadow(kYieldBystander, kYieldBystanderHolding);
+   }
+
+   /// `setup_yield_holders`, then both underwriters bond everything they were minted.
+   void setup_yield_bonders() {
+      setup_yield_holders();
+      BOOST_REQUIRE_EQUAL(success(), deposit(kYieldBonderA, kLiqEthCodename, kYieldBondA));
+      BOOST_REQUIRE_EQUAL(success(), deposit(kYieldBonderB, kLiqEthCodename, kYieldBondB));
+   }
+
+   /// `sysio.liq::addyield`: kYieldDonor distributes `amount` WIRE to every LIQETH holder.
+   action_result addyield(int64_t amount) {
+      return push_contract(LIQ_ACCOUNT, liq_abi_ser, kYieldDonor, yield_action::addyield, mvo()
+         ("from", kYieldDonor)("quantity", asset(amount, kWireSymbol))("target", kLiqEthSymbol.to_symbol_code()));
+   }
+
+   /// Permissionless `sweepyield(token_code)`, cranked by kYieldCranker.
+   action_result sweepyield(std::string_view token_code) {
+      return push_opreg_action(kYieldCranker, yield_action::sweepyield, mvo()
+         (withdrawal_field::token_code, token_code));
+   }
+
+   /// Operator-authorized `claimyield(account, token_code)`.
+   action_result claimyield(name account, std::string_view token_code) {
+      return push_opreg_action(account, yield_action::claimyield, mvo()
+         (withdrawal_field::account,    account)
+         (withdrawal_field::token_code, token_code));
+   }
+
+   /// `sysio.liq`'s cumulative LIQETH index, 0 before the first distribution. Every bonded unit's
+   /// checkpoint tracks this index.
+   fc::uint128_t liq_index() {
+      const auto data = get_row_by_id(LIQ_ACCOUNT, LIQ_ACCOUNT, "yieldidx"_n, kLiqEthSymbol.to_symbol_code().value);
+      return data.empty() ? fc::uint128_t{0}
+                          : liq_abi_ser.binary_to_variant("yield_index", data,
+                               abi_serializer::create_yield_function(abi_serializer_max_time))["index"].as_uint128();
+   }
+
+   /// `account`'s depot-native `(WIRE, token_code)` balance row; empty variant when absent.
+   fc::variant depot_native_row(name account, std::string_view token_code) {
+      const auto op = get_operator(account);   // held: the loop below references into it
+      for (const auto& bal : op["balances"].get_array()) {
+         if (bal["chain_code"].as<fc::slug_name>().value == cn(kWireCodename).value &&
+             bal["token_code"].as<fc::slug_name>().value == cn(token_code).value) {
+            return bal;
+         }
+      }
+      return fc::variant();
+   }
+
+   /// What `sysio.liq` owes the registry's LIQETH holder row now, by the shadow yield spec.
+   int64_t registry_liq_owed() {
+      const auto sym_code = kLiqEthSymbol.to_symbol_code().value;
+      const auto holder   = liq_abi_ser.binary_to_variant("account",
+         get_row_by_id(LIQ_ACCOUNT, OPREG_ACCOUNT, "accounts"_n, sym_code),
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+      return yield_reference::owed(holder["balance"].as<asset>().get_amount(), liq_index(),
+                                   holder["index_checkpoint"].as_uint128(), holder["owed_wire"].as_uint64());
+   }
+
+   /// Sweep LIQETH and return the WIRE it moved into the registry, asserting that the same
+   /// amount left `sysio.liq` and that it equals what the spec says the registry was owed.
+   int64_t sweep_liqeth() {
+      const int64_t owed          = registry_liq_owed();
+      const int64_t opreg_before  = wire_balance(OPREG_ACCOUNT);
+      const int64_t liq_before    = wire_balance(LIQ_ACCOUNT);
+      BOOST_REQUIRE_EQUAL(success(), sweepyield(kLiqEthCodename));
+      const int64_t swept = wire_balance(OPREG_ACCOUNT) - opreg_before;
+      BOOST_REQUIRE_EQUAL(owed, swept);
+      BOOST_REQUIRE_EQUAL(liq_before - swept, wire_balance(LIQ_ACCOUNT));
+      return swept;
+   }
+
+   /// The dust setup: kYieldPrincipalHolder bonds kYieldPrincipal WIRE collateral, A is the only
+   /// shadow bonder so the registry's `sysio.liq` row holds exactly A's shadow, then kDustRounds
+   /// rounds of addyield + sweep. Returns the WIRE the registry received from `sysio.liq`, having
+   /// asserted after every sweep that the registry's WIRE is exactly principal plus receipts.
+   int64_t setup_yield_dust() {
+      setup_yield_holders();
+      BOOST_REQUIRE_EQUAL(success(),
+                          regoperator(kYieldPrincipalHolder, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
+      base_tester::push_action(TOKEN_ACCOUNT, "transfer"_n, kYieldDonor, mvo()
+         ("from", kYieldDonor)("to", kYieldPrincipalHolder)
+         ("quantity", asset(static_cast<int64_t>(kYieldPrincipal), kWireSymbol))("memo", std::string{}));
+      BOOST_REQUIRE_EQUAL(success(), deposit(kYieldPrincipalHolder, kWireCodename, kYieldPrincipal));
+      BOOST_REQUIRE_EQUAL(success(), deposit(kYieldBonderA, kLiqEthCodename, kYieldBondA));
+
+      int64_t received = 0;
+      for (int round = 0; round < kDustRounds; ++round) {
+         BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+         received += sweep_liqeth();
+         BOOST_REQUIRE_EQUAL(static_cast<int64_t>(kYieldPrincipal) + received, wire_balance(OPREG_ACCOUNT));
+      }
+      return received;
+   }
+
+   /// `claimyield` and return what it credited to the operator's WIRE claim row.
+   int64_t claim_yield_credit(name account) {
+      const auto before = get_remitclaim(account, kWireCodename);
+      const int64_t claimed_before = before.is_null() ? 0 : static_cast<int64_t>(before["balance"].as_uint64());
+      BOOST_REQUIRE_EQUAL(success(), claimyield(account, kLiqEthCodename));
+      return static_cast<int64_t>(get_remitclaim(account, kWireCodename)["balance"].as_uint64()) - claimed_before;
+   }
+
    abi_serializer opreg_abi_ser;
    abi_serializer epoch_abi_ser;
+   abi_serializer chains_abi_ser;
+   abi_serializer tokens_abi_ser;
+   abi_serializer liq_abi_ser;
 };
 
 // ---- Tests ----
@@ -617,14 +931,46 @@ BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_min_bond, sysio_opreg_tester) { t
             "(an empty requirement set imposes no bond)"),
       setconfig(21, 63, 21, kDefaultPruneDelayMs,
                 kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
-                {}, {}, { make_chain_min_bond("ETH", "ETH", kRejectedZeroMinBond) })
+                {}, {}, { make_chain_min_bond("WIRE", "NTA", kRejectedZeroMinBond) })
    );
    // The identical shape with a positive min_bond is accepted.
    BOOST_REQUIRE_EQUAL(
       success(),
       setconfig(21, 63, 21, kDefaultPruneDelayMs,
                 kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
-                {}, {}, { make_chain_min_bond("ETH", "ETH", kTestMinBond) })
+                {}, {}, { make_chain_min_bond("WIRE", "NTA", kTestMinBond) })
+   );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_FIXTURE_TEST_CASE(setconfig_rejects_uncanonical_collateral_code, sysio_opreg_tester) { try {
+   // A `slug_name` reaches action JSON either as its canonical STRING or through the
+   // transitional object form `{"value": N}`, and only the string arm validates. These
+   // entries persist on the config row, and rendering is TOTAL so an uncanonical code
+   // never announces itself — it can decode to "" or to a valid spelling that re-parses
+   // as a DIFFERENT code. `setconfig` is a privileged top-level action and refuses.
+   constexpr uint64_t uncanonical = 7;   // decodes to "", packs back to 0 — not a code
+   BOOST_REQUIRE(!fc::slug_name{uncanonical}.is_canonical());
+
+   const auto bad_chain = fc::variant(mvo()
+      ("chain_code",          mvo()("value", uncanonical))
+      ("token_code",          "ETH")
+      ("min_bond",            kTestMinBond)
+      ("config_timestamp_ms", uint64_t{0}));
+
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: req_uw_collat: code 7 has no canonical "
+            "slug_name spelling"),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
+                {}, {}, { bad_chain })
+   );
+
+   // The identical shape with a spellable code is accepted.
+   BOOST_REQUIRE_EQUAL(
+      success(),
+      setconfig(21, 63, 21, kDefaultPruneDelayMs,
+                kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h, kTerminateWindowMs,
+                {}, {}, { make_chain_min_bond("WIRE", "NTA", kTestMinBond) })
    );
 } FC_LOG_AND_RETHROW() }
 
@@ -936,13 +1282,13 @@ BOOST_FIXTURE_TEST_CASE(deposit_credits_balance_row, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
 
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 1'000'000));
+      bond_generic("uwrit.alice"_n, "NTA", 1'000'000));
 
    auto op = get_operator("uwrit.alice"_n);
    auto balances = op["balances"].get_array();
    BOOST_REQUIRE_EQUAL(1, balances.size());
-   BOOST_REQUIRE_EQUAL(cn("ETH").value, balances[0]["chain_code"]["value"].as_uint64());
-   BOOST_REQUIRE_EQUAL(cn("ETH").value, balances[0]["token_code"]["value"].as_uint64());
+   BOOST_REQUIRE_EQUAL(cn("WIRE").value, balances[0]["chain_code"].as<fc::slug_name>().value);
+   BOOST_REQUIRE_EQUAL(cn("NTA").value, balances[0]["token_code"].as<fc::slug_name>().value);
    BOOST_REQUIRE_EQUAL(1'000'000,       balances[0]["balance"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
@@ -951,53 +1297,14 @@ BOOST_FIXTURE_TEST_CASE(deposit_aggregates_into_existing_balance_row, sysio_opre
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
 
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 100));
+      bond_generic("uwrit.alice"_n, "NTA", 100));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 50));
+      bond_generic("uwrit.alice"_n, "NTA", 50));
 
    auto op = get_operator("uwrit.alice"_n);
    auto balances = op["balances"].get_array();
    BOOST_REQUIRE_EQUAL(1, balances.size());     // single row, NOT two
    BOOST_REQUIRE_EQUAL(150, balances[0]["balance"].as_uint64());
-} FC_LOG_AND_RETHROW() }
-
-// SEC-103 (WSA-028 follow-up): operator collateral must never accumulate past
-// asset::max_amount (2^62-1). A balance above the asset range would abort the
-// WIRE-direct remit path's asset(balance, WIRE_SYM); on the never-throw
-// depositinle (OPP-inbound) path that abort would stall consensus. depositinle
-// gates the RUNNING SUM: a credit that would push the balance over the cap is
-// refunded via DEPOSIT_REVERT (the action still succeeds — never throws) and the
-// stored balance is left unchanged. The single-value WSA-028 wrap is closed
-// upstream in sysio.msgch; this is the accumulation guard.
-BOOST_FIXTURE_TEST_CASE(depositinle_credit_over_max_collateral_is_reverted, sysio_opreg_tester) { try {
-   // asset::max_amount — the Antelope asset magnitude limit (2^62 - 1), the cap
-   // sysio.opreg enforces on a single balance row.
-   constexpr uint64_t MAX_COLLATERAL = (uint64_t{1} << 62) - 1;
-
-   BOOST_REQUIRE_EQUAL(success(), setconfig());
-   BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
-
-   // Credit the balance up to EXACTLY the cap — accepted (the boundary is inclusive).
-   BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", MAX_COLLATERAL));
-   {
-      auto op       = get_operator("uwrit.alice"_n);
-      auto balances = op["balances"].get_array();
-      BOOST_REQUIRE_EQUAL(1, balances.size());
-      BOOST_REQUIRE_EQUAL(MAX_COLLATERAL, balances[0]["balance"].as_uint64());
-   }
-
-   // A further +1 would push the sum to 2^62 (one past asset::max_amount). It is
-   // refunded via DEPOSIT_REVERT: the action succeeds (never throws) and the
-   // stored balance is unchanged — the credit did NOT wrap or saturate it in.
-   BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 1));
-   {
-      auto op       = get_operator("uwrit.alice"_n);
-      auto balances = op["balances"].get_array();
-      BOOST_REQUIRE_EQUAL(1, balances.size());
-      BOOST_REQUIRE_EQUAL(MAX_COLLATERAL, balances[0]["balance"].as_uint64());
-   }
 } FC_LOG_AND_RETHROW() }
 
 /// WIRE-375 / WNS-40: direct depot deposits must custody the same 9-decimal WIRE
@@ -1027,7 +1334,7 @@ BOOST_FIXTURE_TEST_CASE(deposit_custodies_and_credits_wire_units, sysio_opreg_te
 
    const int64_t operator_before = wire_balance(OPERATOR);
    const int64_t opreg_before = wire_balance(OPREG_ACCOUNT);
-   BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, DEPOSIT));
+   BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, kWireCodename, DEPOSIT));
 
    BOOST_REQUIRE_EQUAL(operator_before - static_cast<int64_t>(DEPOSIT), wire_balance(OPERATOR));
    BOOST_REQUIRE_EQUAL(opreg_before + static_cast<int64_t>(DEPOSIT), wire_balance(OPREG_ACCOUNT));
@@ -1035,8 +1342,8 @@ BOOST_FIXTURE_TEST_CASE(deposit_custodies_and_credits_wire_units, sysio_opreg_te
    auto op = get_operator(OPERATOR);
    auto balances = op["balances"].get_array();
    BOOST_REQUIRE_EQUAL(1u, balances.size());
-   BOOST_REQUIRE_EQUAL(cn(kWireCodename).value, balances[0]["chain_code"]["value"].as_uint64());
-   BOOST_REQUIRE_EQUAL(cn(kWireCodename).value, balances[0]["token_code"]["value"].as_uint64());
+   BOOST_REQUIRE_EQUAL(cn(kWireCodename).value, balances[0]["chain_code"].as<fc::slug_name>().value);
+   BOOST_REQUIRE_EQUAL(cn(kWireCodename).value, balances[0]["token_code"].as<fc::slug_name>().value);
    BOOST_REQUIRE_EQUAL(DEPOSIT, balances[0]["balance"].as_uint64());
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
 } FC_LOG_AND_RETHROW() }
@@ -1078,7 +1385,7 @@ BOOST_FIXTURE_TEST_CASE(deposit_reentrancy_cannot_exceed_max_collateral, sysio_o
    // outgoing WIRE transfer notifies the operator, and its handler re-enters
    // deposit(+1). The +1 would push the row to 2^62 — its in-modify cap check trips
    // and aborts the whole transaction. No over-credit is possible.
-   auto r = deposit(OPERATOR, MAX_COLLATERAL);
+   auto r = deposit(OPERATOR, kWireCodename, MAX_COLLATERAL);
    BOOST_REQUIRE_MESSAGE(r != success(), "re-entrant over-cap deposit unexpectedly succeeded");
    BOOST_REQUIRE_MESSAGE(r.find("deposit would exceed max collateral") != std::string::npos,
                          "unexpected failure reason: " + r);
@@ -1094,28 +1401,23 @@ BOOST_FIXTURE_TEST_CASE(deposit_keeps_chain_token_pairs_separate, sysio_opreg_te
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
 
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 100));
+      bond_generic("uwrit.alice"_n, "NTA", 100));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "SOL", "SOL", 200));
+      bond_generic("uwrit.alice"_n, "NTB", 200));
 
    auto op = get_operator("uwrit.alice"_n);
    auto balances = op["balances"].get_array();
    BOOST_REQUIRE_EQUAL(2, balances.size());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(depositinle_logs_failure_when_operator_slashed, sysio_opreg_tester) { try {
+BOOST_FIXTURE_TEST_CASE(deposit_rejects_slashed_operator, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(), slash("uwrit.alice"_n, "test slash"));
-
-   BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 100));
-
-   auto entry = latest_action_log("uwrit.alice"_n);
-   BOOST_REQUIRE(!entry.is_null());
-   BOOST_REQUIRE_EQUAL(false, entry["success"].as_bool());
-   BOOST_REQUIRE_EQUAL(std::string("operator not in a deposit-eligible state"),
-                       entry["error_message"].as_string());
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: operator not in a deposit-eligible state"),
+                       bond_generic("uwrit.alice"_n, "NTA", 100));
+   BOOST_CHECK(get_operator("uwrit.alice"_n)["balances"].get_array().empty());
+   BOOST_CHECK_EQUAL(100, get_currency_balance(LIQ_ACCOUNT, symbol(9, "NTA"), "uwrit.alice"_n).get_amount());
 } FC_LOG_AND_RETHROW() }
 
 // ── queuewtdw + cancelwtdw ──
@@ -1124,10 +1426,10 @@ BOOST_FIXTURE_TEST_CASE(queuewtdw_creates_request_row, sysio_opreg_tester) { try
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+      bond_generic("uwrit.alice"_n, "NTA", 1000));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 400));
+      withdraw("uwrit.alice"_n, "NTA", 400));
 
    auto row = get_wtdw(1);   // monotonic id starts at 1
    BOOST_REQUIRE(!row.is_null());
@@ -1135,14 +1437,14 @@ BOOST_FIXTURE_TEST_CASE(queuewtdw_creates_request_row, sysio_opreg_tester) { try
    BOOST_REQUIRE_EQUAL(400,        row["amount"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(withdrawinle_logs_failure_on_insufficient_available, sysio_opreg_tester) { try {
+BOOST_FIXTURE_TEST_CASE(withdraw_logs_failure_on_insufficient_available, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 100));
+      bond_generic("uwrit.alice"_n, "NTA", 100));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 200));
+      withdraw("uwrit.alice"_n, "NTA", 200));
 
    auto entry = latest_action_log("uwrit.alice"_n);
    BOOST_REQUIRE(!entry.is_null());
@@ -1151,18 +1453,18 @@ BOOST_FIXTURE_TEST_CASE(withdrawinle_logs_failure_on_insufficient_available, sys
                        entry["error_message"].as_string());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(withdrawinle_subtracts_from_available_on_subsequent_call,
+BOOST_FIXTURE_TEST_CASE(withdraw_subtracts_from_available_on_subsequent_call,
                         sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+      bond_generic("uwrit.alice"_n, "NTA", 1000));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 700));
+      withdraw("uwrit.alice"_n, "NTA", 700));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 400));
+      withdraw("uwrit.alice"_n, "NTA", 400));
 
    auto entry = latest_action_log("uwrit.alice"_n);
    BOOST_REQUIRE(!entry.is_null());
@@ -1173,20 +1475,20 @@ BOOST_FIXTURE_TEST_CASE(withdrawinle_subtracts_from_available_on_subsequent_call
    BOOST_REQUIRE(get_wtdw(2).is_null());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(withdrawinle_allows_requests_across_collateral_buckets,
+BOOST_FIXTURE_TEST_CASE(withdraw_allows_requests_across_collateral_buckets,
                         sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+      bond_generic("uwrit.alice"_n, "NTA", 1000));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "SOL", "SOL", 1000));
+      bond_generic("uwrit.alice"_n, "NTB", 1000));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 400));
+      withdraw("uwrit.alice"_n, "NTA", 400));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "SOL", "SOL", 400));
+      withdraw("uwrit.alice"_n, "NTB", 400));
 
    auto entry = latest_action_log("uwrit.alice"_n);
    BOOST_REQUIRE(!entry.is_null());
@@ -1195,16 +1497,17 @@ BOOST_FIXTURE_TEST_CASE(withdrawinle_allows_requests_across_collateral_buckets,
    BOOST_REQUIRE(!get_wtdw(2).is_null());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(withdraw_rejects_when_inline_request_is_outstanding_for_same_bucket,
+BOOST_FIXTURE_TEST_CASE(withdraw_rejects_when_request_is_outstanding_for_same_bucket,
                         sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
-   BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "WIRE", "WIRE", 1000));
+   setup_wire_token_and_fund("uwrit.alice"_n, kWireFundingQuantity);
+   BOOST_REQUIRE_EQUAL(success(), deposit("uwrit.alice"_n, kWireCodename, 1000));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "WIRE", "WIRE", 400));
-   BOOST_REQUIRE_EQUAL(success(), withdraw("uwrit.alice"_n, 400));
+      withdraw("uwrit.alice"_n, "WIRE", 400));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), withdraw("uwrit.alice"_n, kWireCodename, 400));
 
    auto entry = latest_action_log("uwrit.alice"_n);
    BOOST_REQUIRE(!entry.is_null());
@@ -1218,11 +1521,11 @@ BOOST_FIXTURE_TEST_CASE(withdraw_rejects_when_inline_request_is_outstanding_for_
 
 /// A successful outpost withdrawal reservation immediately removes an
 /// undercollateralized batch operator from the active set.
-BOOST_FIXTURE_TEST_CASE(withdrawinle_rechecks_eligibility_after_enqueue, sysio_opreg_tester) { try {
+BOOST_FIXTURE_TEST_CASE(withdraw_rechecks_batch_eligibility_after_enqueue, sysio_opreg_tester) { try {
    activate_batch_operator(kEligibilityBatchOperator);
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+      withdraw(kEligibilityBatchOperator, "NTA", kTestMinBond));
 
    auto op = get_operator(kEligibilityBatchOperator);
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN == op[eligibility_field::status].as<OperatorStatus>());
@@ -1247,12 +1550,12 @@ BOOST_FIXTURE_TEST_CASE(withdraw_rechecks_eligibility_after_enqueue, sysio_opreg
       /*req_uw_collat=*/{}));
    BOOST_REQUIRE_EQUAL(success(),
       regoperator(kEligibilityProducer, OPERATOR_TYPE_PRODUCER, /*is_bootstrapped=*/false));
-   BOOST_REQUIRE_EQUAL(success(),
-      depositinle(kEligibilityProducer, kWireCodename, kWireCodename, kTestMinBond));
+   setup_wire_token_and_fund(kEligibilityProducer, kWireFundingQuantity);
+   BOOST_REQUIRE_EQUAL(success(), deposit(kEligibilityProducer, kWireCodename, kTestMinBond));
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
                  get_operator(kEligibilityProducer)[eligibility_field::status].as<OperatorStatus>());
 
-   BOOST_REQUIRE_EQUAL(success(), withdraw(kEligibilityProducer, kTestMinBond));
+   BOOST_REQUIRE_EQUAL(success(), withdraw(kEligibilityProducer, kWireCodename, kTestMinBond));
 
    auto op = get_operator(kEligibilityProducer);
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN == op[eligibility_field::status].as<OperatorStatus>());
@@ -1261,11 +1564,11 @@ BOOST_FIXTURE_TEST_CASE(withdraw_rechecks_eligibility_after_enqueue, sysio_opreg
 
 /// A rejected outpost withdrawal has no reservation side effect and therefore
 /// cannot change an otherwise eligible operator's status.
-BOOST_FIXTURE_TEST_CASE(withdrawinle_rejection_preserves_eligibility, sysio_opreg_tester) { try {
+BOOST_FIXTURE_TEST_CASE(withdraw_rejection_preserves_eligibility, sysio_opreg_tester) { try {
    activate_batch_operator(kEligibilityBatchOperator);
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kInsufficientTestBond));
+      withdraw(kEligibilityBatchOperator, "NTA", kInsufficientTestBond));
 
    auto op = get_operator(kEligibilityBatchOperator);
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op[eligibility_field::status].as<OperatorStatus>());
@@ -1278,9 +1581,9 @@ BOOST_FIXTURE_TEST_CASE(cancelwtdw_removes_pending_request, sysio_opreg_tester) 
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+      bond_generic("uwrit.alice"_n, "NTA", 1000));
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 400));
+      withdraw("uwrit.alice"_n, "NTA", 400));
 
    BOOST_REQUIRE_EQUAL(success(), cancelwtdw("uwrit.alice"_n, "uwrit.alice"_n, 1));
 
@@ -1288,7 +1591,7 @@ BOOST_FIXTURE_TEST_CASE(cancelwtdw_removes_pending_request, sysio_opreg_tester) 
    BOOST_REQUIRE(row.is_null());
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+      withdraw("uwrit.alice"_n, "NTA", 1000));
    BOOST_REQUIRE(!get_wtdw(2).is_null());
 } FC_LOG_AND_RETHROW() }
 
@@ -1297,7 +1600,7 @@ BOOST_FIXTURE_TEST_CASE(cancelwtdw_removes_pending_request, sysio_opreg_tester) 
 BOOST_FIXTURE_TEST_CASE(cancelwtdw_rechecks_eligibility_after_erase, sysio_opreg_tester) { try {
    activate_batch_operator(kEligibilityBatchOperator);
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+      withdraw(kEligibilityBatchOperator, "NTA", kTestMinBond));
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN ==
                  get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>());
 
@@ -1348,9 +1651,9 @@ BOOST_FIXTURE_TEST_CASE(processbatch_preserves_terminated_bootstrapped_status, s
 BOOST_FIXTURE_TEST_CASE(flushwtdw_rechecks_eligibility_after_erase, sysio_opreg_tester) { try {
    activate_batch_operator(kEligibilityBatchOperator);
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+      bond_generic(kEligibilityBatchOperator, "NTA", kTestMinBond));
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+      withdraw(kEligibilityBatchOperator, "NTA", kTestMinBond));
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
                  get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>());
 
@@ -1365,15 +1668,15 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_allows_operator_to_request_again, sysio_opreg_
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+      bond_generic("uwrit.alice"_n, "NTA", 1000));
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 400));
+      withdraw("uwrit.alice"_n, "NTA", 400));
 
    BOOST_REQUIRE_EQUAL(success(), flushwtdw(kFlushAllMaturedEpoch));
    BOOST_REQUIRE(get_wtdw(1).is_null());
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 600));
+      withdraw("uwrit.alice"_n, "NTA", 600));
    BOOST_REQUIRE(!get_wtdw(2).is_null());
 } FC_LOG_AND_RETHROW() }
 
@@ -1382,9 +1685,9 @@ BOOST_FIXTURE_TEST_CASE(cancelwtdw_rejects_other_operators_request, sysio_opreg_
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.bob"_n,   OPERATOR_TYPE_UNDERWRITER, false));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("uwrit.alice"_n, "ETH", "ETH", 1000));
+      bond_generic("uwrit.alice"_n, "NTA", 1000));
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle("uwrit.alice"_n, "ETH", "ETH", 400));
+      withdraw("uwrit.alice"_n, "NTA", 400));
 
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: not your withdraw request"),
@@ -1398,7 +1701,7 @@ BOOST_FIXTURE_TEST_CASE(terminate_marks_status_and_zeros_unlocked_balance, sysio
    BOOST_REQUIRE_EQUAL(success(),
       regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("batchop.a"_n, "ETH", "ETH", 500));
+      bond_generic("batchop.a"_n, "NTA", 500));
 
    BOOST_REQUIRE_EQUAL(success(), terminate("batchop.a"_n, "rolling-24h: >5% miss rate"));
 
@@ -1434,7 +1737,7 @@ BOOST_FIXTURE_TEST_CASE(terminate_survives_operator_blocking_its_own_remit, sysi
    // Real WIRE collateral on the WIRE chain, so termination takes the WIRE-direct remit
    // branch rather than emitting a WITHDRAW_REMIT attestation to an outpost.
    setup_wire_token_and_fund(OPERATOR, kWireFundingQuantity);
-   BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, DEPOSIT));
+   BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, kWireCodename, DEPOSIT));
 
    // Arm the operator AFTER the deposit: `deposit`'s escrow leg is an OUTGOING transfer, which the
    // blocking contract deliberately ignores, but deploying afterwards keeps the setup honest about
@@ -1451,18 +1754,18 @@ BOOST_FIXTURE_TEST_CASE(terminate_survives_operator_blocking_its_own_remit, sysi
    BOOST_REQUIRE_EQUAL(0u, balances[0]["balance"].as_uint64());   // debited, not stranded
 
    // The collateral is owed, in full, in the claim ledger.
-   auto claim = get_remitclaim(OPERATOR);
+   auto claim = get_remitclaim(OPERATOR, kWireCodename);
    BOOST_REQUIRE(!claim.is_null());
    BOOST_REQUIRE_EQUAL(DEPOSIT, claim["balance"].as_uint64());
 
    // ...and the blocker's reach ends there: its own claim is the one thing it breaks.
-   auto r = claimremit(OPERATOR);
+   auto r = claimremit(OPERATOR, kWireCodename);
    BOOST_REQUIRE_MESSAGE(r != success(), "blocking operator unexpectedly claimed its own remit");
    BOOST_REQUIRE_MESSAGE(r.find("block_transfer: rejecting incoming transfer") != std::string::npos,
                          "unexpected failure reason: " + r);
 
    // The failed claim rolled back whole -- the balance is still owed, not burned.
-   BOOST_REQUIRE_EQUAL(DEPOSIT, get_remitclaim(OPERATOR)["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(DEPOSIT, get_remitclaim(OPERATOR, kWireCodename)["balance"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 // Positive control: a cooperative operator pulls its terminated collateral normally, and
@@ -1476,14 +1779,14 @@ BOOST_FIXTURE_TEST_CASE(claimremit_pays_terminated_operator_and_clears_row, sysi
    BOOST_REQUIRE_EQUAL(success(),
       regoperator(OPERATOR, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
    setup_wire_token_and_fund(OPERATOR, kWireFundingQuantity);
-   BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, DEPOSIT));
+   BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, kWireCodename, DEPOSIT));
    BOOST_REQUIRE_EQUAL(success(), terminate(OPERATOR, "rolling-24h miss"));
 
-   BOOST_REQUIRE_EQUAL(DEPOSIT, get_remitclaim(OPERATOR)["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(DEPOSIT, get_remitclaim(OPERATOR, kWireCodename)["balance"].as_uint64());
    const int64_t balance_before_claim = wire_balance(OPERATOR);
-   BOOST_REQUIRE_EQUAL(success(), claimremit(OPERATOR));
+   BOOST_REQUIRE_EQUAL(success(), claimremit(OPERATOR, kWireCodename));
    BOOST_REQUIRE_EQUAL(balance_before_claim + static_cast<int64_t>(DEPOSIT), wire_balance(OPERATOR));
-   BOOST_REQUIRE(get_remitclaim(OPERATOR).is_null());   // row erased by the payout
+   BOOST_REQUIRE(get_remitclaim(OPERATOR, kWireCodename).is_null());   // row erased by the payout
 
    // Double-claim finds nothing -- the erase happens before the transfer, closing the re-entrancy
    // window a notify handler would otherwise use to drain the row twice. Advance a block first:
@@ -1492,7 +1795,258 @@ BOOST_FIXTURE_TEST_CASE(claimremit_pays_terminated_operator_and_clears_row, sysi
    produce_blocks();
    BOOST_REQUIRE_EQUAL(
       error("assertion failure with message: no claimable remit for this account"),
-      claimremit(OPERATOR));
+      claimremit(OPERATOR, kWireCodename));
+} FC_LOG_AND_RETHROW() }
+
+// ── depot-native shadow LIQ collateral (sysio.liq) ──
+
+/// A shadow LIQ deposit custodies the shadow in `sysio.liq` and credits the depot-native
+/// `(WIRE, LIQETH)` row: the chain is the depot, the token is the liq token's registry code.
+BOOST_FIXTURE_TEST_CASE(deposit_shadow_liq_credits_wire_chain_row, sysio_opreg_tester) { try {
+   const auto OPERATOR = "uwrit.alice"_n;
+   constexpr uint64_t DEPOSIT = 2 * kWireUnit;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator(OPERATOR, OPERATOR_TYPE_UNDERWRITER, /*is_bootstrapped=*/false));
+   setup_wire_token_and_fund(OPERATOR, kWireFundingQuantity);
+   setup_shadow_liq();
+   mint_shadow(OPERATOR, kShadowFunding);
+
+   const int64_t operator_shadow_before = shadow_balance(OPERATOR);
+   const int64_t opreg_shadow_before    = shadow_balance(OPREG_ACCOUNT);
+   const int64_t operator_wire_before   = wire_balance(OPERATOR);
+   const int64_t opreg_wire_before      = wire_balance(OPREG_ACCOUNT);
+
+   BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, kLiqEthCodename, DEPOSIT));
+
+   BOOST_REQUIRE_EQUAL(operator_shadow_before - static_cast<int64_t>(DEPOSIT), shadow_balance(OPERATOR));
+   BOOST_REQUIRE_EQUAL(opreg_shadow_before + static_cast<int64_t>(DEPOSIT), shadow_balance(OPREG_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(operator_wire_before, wire_balance(OPERATOR));
+   BOOST_REQUIRE_EQUAL(opreg_wire_before, wire_balance(OPREG_ACCOUNT));
+
+   auto balances = get_operator(OPERATOR)["balances"].get_array();
+   BOOST_REQUIRE_EQUAL(1u, balances.size());
+   BOOST_REQUIRE_EQUAL(cn(kWireCodename).value, balances[0]["chain_code"].as<fc::slug_name>().value);
+   BOOST_REQUIRE_EQUAL(cn(kLiqEthCodename).value, balances[0]["token_code"].as<fc::slug_name>().value);
+   BOOST_REQUIRE_EQUAL(DEPOSIT, balances[0]["balance"].as_uint64());
+
+   // The recent-actions entry names the token actually deposited, not the WIRE constant.
+   auto entry = latest_action_log(OPERATOR);
+   BOOST_REQUIRE(!entry.is_null());
+   BOOST_REQUIRE_EQUAL(true, entry[eligibility_field::success].as_bool());
+   BOOST_REQUIRE_EQUAL(cn(kLiqEthCodename).value, entry["action"]["amount"]["token_code"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+/// A token with no `sysio.liq` shadow symbol that is not WIRE cannot be custodied: the
+/// deposit reverts with the resolver's message and moves nothing.
+BOOST_FIXTURE_TEST_CASE(deposit_unknown_token_is_rejected, sysio_opreg_tester) { try {
+   const auto OPERATOR = "uwrit.alice"_n;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator(OPERATOR, OPERATOR_TYPE_UNDERWRITER, /*is_bootstrapped=*/false));
+   setup_shadow_liq();
+   mint_shadow(OPERATOR, kShadowFunding);
+
+   const int64_t operator_shadow_before = shadow_balance(OPERATOR);
+   BOOST_REQUIRE_EQUAL(error(std::string(kUnsupportedTokenError)),
+                       deposit(OPERATOR, kUnknownTokenCodename, kWireUnit));
+
+   BOOST_REQUIRE_EQUAL(0u, get_operator(OPERATOR)["balances"].get_array().size());
+   BOOST_REQUIRE_EQUAL(operator_shadow_before, shadow_balance(OPERATOR));
+   BOOST_REQUIRE_EQUAL(0, shadow_balance(OPREG_ACCOUNT));
+} FC_LOG_AND_RETHROW() }
+
+/// A withdraw of a token opreg cannot custody reverts with the resolver's message instead of
+/// logging: it queues no request and leaves no `recent_actions` entry, so a request that could
+/// never be paid out never exists.
+BOOST_FIXTURE_TEST_CASE(withdraw_unknown_token_is_rejected, sysio_opreg_tester) { try {
+   const auto OPERATOR = "uwrit.alice"_n;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator(OPERATOR, OPERATOR_TYPE_UNDERWRITER, /*is_bootstrapped=*/false));
+   setup_shadow_liq();
+   const auto actions_before = get_operator(OPERATOR)["recent_actions"].get_array().size();
+
+   BOOST_REQUIRE_EQUAL(error(std::string(kUnsupportedTokenError)),
+                       withdraw(OPERATOR, kUnknownTokenCodename, kWireUnit));
+
+   BOOST_REQUIRE(get_wtdw(kFirstWithdrawalRequestId).is_null());
+   BOOST_REQUIRE_EQUAL(actions_before, get_operator(OPERATOR)["recent_actions"].get_array().size());
+} FC_LOG_AND_RETHROW() }
+
+/// WIRE and shadow deposits by one operator land in two rows, and `available()` rolls each up
+/// on its own: a pending shadow withdraw reserves shadow only.
+BOOST_FIXTURE_TEST_CASE(deposit_keeps_wire_and_shadow_rows_separate, sysio_opreg_tester) { try {
+   const auto OPERATOR = "uwrit.alice"_n;
+   constexpr uint64_t WIRE_DEPOSIT   = 3 * kWireUnit;
+   constexpr uint64_t SHADOW_DEPOSIT = 2 * kWireUnit;
+   constexpr uint64_t SHADOW_WITHDRAW = kWireUnit;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator(OPERATOR, OPERATOR_TYPE_UNDERWRITER, /*is_bootstrapped=*/false));
+   setup_wire_token_and_fund(OPERATOR, kWireFundingQuantity);
+   setup_shadow_liq();
+   mint_shadow(OPERATOR, kShadowFunding);
+
+   BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, kWireCodename, WIRE_DEPOSIT));
+   BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, kLiqEthCodename, SHADOW_DEPOSIT));
+
+   auto balances = get_operator(OPERATOR)["balances"].get_array();
+   BOOST_REQUIRE_EQUAL(2u, balances.size());
+   BOOST_REQUIRE_EQUAL(WIRE_DEPOSIT, available(OPERATOR, kWireCodename, kWireCodename));
+   BOOST_REQUIRE_EQUAL(SHADOW_DEPOSIT, available(OPERATOR, kWireCodename, kLiqEthCodename));
+
+   BOOST_REQUIRE_EQUAL(success(), withdraw(OPERATOR, kLiqEthCodename, SHADOW_WITHDRAW));
+   BOOST_REQUIRE_EQUAL(true, latest_action_log(OPERATOR)[eligibility_field::success].as_bool());
+   BOOST_REQUIRE_EQUAL(WIRE_DEPOSIT, available(OPERATOR, kWireCodename, kWireCodename));
+   BOOST_REQUIRE_EQUAL(SHADOW_DEPOSIT - SHADOW_WITHDRAW, available(OPERATOR, kWireCodename, kLiqEthCodename));
+} FC_LOG_AND_RETHROW() }
+
+/// A `(WIRE, LIQETH)` role minimum is met by the shadow row alone: a WIRE deposit of the same
+/// amount leaves the batch operator ineligible, and the shadow deposit activates it.
+///
+/// The fixture registers through the privileged path, like every eligibility case here, so the
+/// self-registration AuthX link check never runs; eligibility itself reads only balances.
+BOOST_FIXTURE_TEST_CASE(shadow_row_satisfies_role_minimum, sysio_opreg_tester) { try {
+   constexpr uint64_t MIN_BOND = kWireUnit;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig(
+      /*max_prod=*/kTestMaxProducers,
+      /*max_batch=*/kTestMaxBatchOperators,
+      /*max_uw=*/kTestMaxUnderwriters,
+      /*prune_delay=*/kDefaultPruneDelayMs,
+      /*max_consec_misses=*/kDefaultMaxConsecutiveMisses,
+      /*max_pct_misses_24h=*/kMaxAcceptedPctMisses24h,
+      /*terminate_window_ms=*/kTerminateWindowMs,
+      /*req_prod_collat=*/{},
+      /*req_batchop_collat=*/{
+         make_chain_min_bond(kWireCodename, kLiqEthCodename, MIN_BOND),
+      },
+      /*req_uw_collat=*/{}));
+   BOOST_REQUIRE_EQUAL(success(),
+      regoperator(kEligibilityBatchOperator, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
+   setup_wire_token_and_fund(kEligibilityBatchOperator, kWireFundingQuantity);
+   setup_shadow_liq();
+   mint_shadow(kEligibilityBatchOperator, kShadowFunding);
+
+   BOOST_REQUIRE_EQUAL(success(), deposit(kEligibilityBatchOperator, kWireCodename, MIN_BOND));
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN ==
+                 get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>());
+
+   BOOST_REQUIRE_EQUAL(success(), deposit(kEligibilityBatchOperator, kLiqEthCodename, MIN_BOND));
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE ==
+                 get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>());
+} FC_LOG_AND_RETHROW() }
+
+/// A shadow withdraw matures into a `(operator, LIQETH)` claim, and `claimremit` pays it back
+/// through `sysio.liq`; the WIRE claim key stays empty.
+BOOST_FIXTURE_TEST_CASE(withdraw_shadow_flush_credits_token_claim_and_claimremit_pays_liq,
+                        sysio_opreg_tester) { try {
+   const auto OPERATOR = "uwrit.alice"_n;
+   constexpr uint64_t DEPOSIT = 2 * kWireUnit;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator(OPERATOR, OPERATOR_TYPE_UNDERWRITER, /*is_bootstrapped=*/false));
+   setup_shadow_liq();
+   mint_shadow(OPERATOR, kShadowFunding);
+   BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, kLiqEthCodename, DEPOSIT));
+
+   BOOST_REQUIRE_EQUAL(success(), withdraw(OPERATOR, kLiqEthCodename, DEPOSIT));
+   auto request = get_wtdw(kFirstWithdrawalRequestId);
+   BOOST_REQUIRE(!request.is_null());
+   BOOST_REQUIRE_EQUAL(cn(kWireCodename).value, request["chain_code"].as<fc::slug_name>().value);
+   BOOST_REQUIRE_EQUAL(cn(kLiqEthCodename).value, request["token_code"].as<fc::slug_name>().value);
+
+   BOOST_REQUIRE_EQUAL(success(), flushwtdw(kFlushAllMaturedEpoch));
+   BOOST_REQUIRE(get_wtdw(kFirstWithdrawalRequestId).is_null());
+
+   auto claim = get_remitclaim(OPERATOR, kLiqEthCodename);
+   BOOST_REQUIRE(!claim.is_null());
+   BOOST_REQUIRE_EQUAL(cn(kLiqEthCodename).value, claim["token_code"].as<fc::slug_name>().value);
+   BOOST_REQUIRE_EQUAL(DEPOSIT, claim["balance"].as_uint64());
+   BOOST_REQUIRE(get_remitclaim(OPERATOR, kWireCodename).is_null());
+
+   const int64_t operator_shadow_before = shadow_balance(OPERATOR);
+   const int64_t opreg_shadow_before    = shadow_balance(OPREG_ACCOUNT);
+   BOOST_REQUIRE_EQUAL(success(), claimremit(OPERATOR, kLiqEthCodename));
+   BOOST_REQUIRE_EQUAL(operator_shadow_before + static_cast<int64_t>(DEPOSIT), shadow_balance(OPERATOR));
+   BOOST_REQUIRE_EQUAL(opreg_shadow_before - static_cast<int64_t>(DEPOSIT), shadow_balance(OPREG_ACCOUNT));
+   BOOST_REQUIRE(get_remitclaim(OPERATOR, kLiqEthCodename).is_null());
+
+   BOOST_REQUIRE_EQUAL(error(std::string(kNoClaimableRemitError)), claimremit(OPERATOR, kWireCodename));
+} FC_LOG_AND_RETHROW() }
+
+/// WIRE and shadow claims outstanding at once are independent rows: each `claimremit` pays its
+/// own token only and leaves the other claim whole.
+BOOST_FIXTURE_TEST_CASE(remit_claims_for_two_tokens_coexist, sysio_opreg_tester) { try {
+   const auto OPERATOR = "batchop.a"_n;
+   constexpr uint64_t WIRE_DEPOSIT   = 3 * kWireUnit;
+   constexpr uint64_t SHADOW_DEPOSIT = 2 * kWireUnit;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator(OPERATOR, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
+   setup_wire_token_and_fund(OPERATOR, kWireFundingQuantity);
+   setup_shadow_liq();
+   mint_shadow(OPERATOR, kShadowFunding);
+   BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, kWireCodename, WIRE_DEPOSIT));
+   BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, kLiqEthCodename, SHADOW_DEPOSIT));
+
+   // Termination remits both depot-native rows into their own claim rows.
+   BOOST_REQUIRE_EQUAL(success(), terminate(OPERATOR, std::string(kTestTerminationReason)));
+   BOOST_REQUIRE_EQUAL(WIRE_DEPOSIT, get_remitclaim(OPERATOR, kWireCodename)["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(SHADOW_DEPOSIT, get_remitclaim(OPERATOR, kLiqEthCodename)["balance"].as_uint64());
+
+   const int64_t wire_before   = wire_balance(OPERATOR);
+   const int64_t shadow_before = shadow_balance(OPERATOR);
+   BOOST_REQUIRE_EQUAL(success(), claimremit(OPERATOR, kWireCodename));
+   BOOST_REQUIRE_EQUAL(wire_before + static_cast<int64_t>(WIRE_DEPOSIT), wire_balance(OPERATOR));
+   BOOST_REQUIRE_EQUAL(shadow_before, shadow_balance(OPERATOR));
+   BOOST_REQUIRE(get_remitclaim(OPERATOR, kWireCodename).is_null());
+   BOOST_REQUIRE_EQUAL(SHADOW_DEPOSIT, get_remitclaim(OPERATOR, kLiqEthCodename)["balance"].as_uint64());
+
+   BOOST_REQUIRE_EQUAL(success(), claimremit(OPERATOR, kLiqEthCodename));
+   BOOST_REQUIRE_EQUAL(shadow_before + static_cast<int64_t>(SHADOW_DEPOSIT), shadow_balance(OPERATOR));
+   BOOST_REQUIRE_EQUAL(wire_before + static_cast<int64_t>(WIRE_DEPOSIT), wire_balance(OPERATOR));
+   BOOST_REQUIRE(get_remitclaim(OPERATOR, kLiqEthCodename).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// Slashing a `(WIRE, LIQETH)` row subtracts the balance and sends nothing to an outpost: the
+/// shadow is depot-native, so it stays in `sysio.opreg`'s `sysio.liq` account. The control
+/// operator's ETH-bucket slash does queue an attestation, so the trace probe is live.
+BOOST_FIXTURE_TEST_CASE(slash_shadow_row_emits_no_attestation, sysio_opreg_tester) { try {
+   const auto OPERATOR = "uwrit.alice"_n;
+   constexpr uint64_t DEPOSIT = 2 * kWireUnit;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator(OPERATOR, OPERATOR_TYPE_UNDERWRITER, /*is_bootstrapped=*/false));
+   setup_shadow_liq();
+   mint_shadow(OPERATOR, kShadowFunding);
+   BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, kLiqEthCodename, DEPOSIT));
+
+   // The row under test is the shadow row, custodied as shadow.
+   const auto bonded = get_operator(OPERATOR)["balances"].get_array();
+   BOOST_REQUIRE_EQUAL(1u, bonded.size());
+   BOOST_REQUIRE_EQUAL(cn(kLiqEthCodename).value, bonded[0]["token_code"].as<fc::slug_name>().value);
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(DEPOSIT), shadow_balance(OPREG_ACCOUNT));
+
+   BOOST_REQUIRE(!slash_queues_outbound(OPERATOR, kTestSlashReason));
+
+   auto op = get_operator(OPERATOR);
+   BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_SLASHED == op[eligibility_field::status].as<OperatorStatus>());
+   auto balances = op["balances"].get_array();
+   BOOST_REQUIRE_EQUAL(1u, balances.size());
+   BOOST_REQUIRE_EQUAL(0u, balances[0]["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(DEPOSIT), shadow_balance(OPREG_ACCOUNT));
+
+} FC_LOG_AND_RETHROW() }
+
+/// `claimremit` resolves its token before touching any claim row, so a token opreg cannot
+/// custody is refused with the resolver's message.
+BOOST_FIXTURE_TEST_CASE(claimremit_unknown_token_is_rejected, sysio_opreg_tester) { try {
+   setup_shadow_liq();
+
+   BOOST_REQUIRE_EQUAL(error(std::string(kUnsupportedTokenError)),
+                       claimremit("uwrit.alice"_n, kUnknownTokenCodename));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(terminate_rejects_already_slashed_operator, sysio_opreg_tester) { try {
@@ -1580,7 +2134,7 @@ BOOST_FIXTURE_TEST_CASE(recorddel_ignores_withdrawal_ineligibility, sysio_opreg_
    produce_block(fc::seconds(kDeliveryTimestampSeparationSeconds));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+      withdraw(kEligibilityBatchOperator, "NTA", kTestMinBond));
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN ==
                  get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>());
 
@@ -1637,7 +2191,7 @@ BOOST_FIXTURE_TEST_CASE(termcheck_preserves_percent_sample_across_withdrawal_ine
    produce_block(fc::seconds(kDeliveryTimestampSeparationSeconds));
 
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle(kEligibilityBatchOperator, kEthCodename, kEthCodename, kTestMinBond));
+      withdraw(kEligibilityBatchOperator, "NTA", kTestMinBond));
    BOOST_REQUIRE_EQUAL(success(), cancelwtdw(
       kEligibilityBatchOperator, kEligibilityBatchOperator, kFirstWithdrawalRequestId));
 
@@ -1776,18 +2330,9 @@ BOOST_FIXTURE_TEST_CASE(recorddel_succeeds_without_opconfig, sysio_opreg_tester)
    BOOST_REQUIRE(!get_dellog_entry(1).is_null());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(releaselock_requires_uwrit_authority, sysio_opreg_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), setconfig());
-   BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.alice"_n, OPERATOR_TYPE_UNDERWRITER, false));
-
-   BOOST_REQUIRE(
-      releaselock(OPREG_ACCOUNT, "uwrit.alice"_n, "ETH", "ETH", 100)
-        .find("missing authority of sysio.uwrit") != std::string::npos);
-} FC_LOG_AND_RETHROW() }
-
 // ── setconfig: per-(chain_code, token_code) collateral requirements ──
 
-BOOST_FIXTURE_TEST_CASE(setconfig_two_chain_bond_activation, sysio_opreg_tester) { try {
+BOOST_FIXTURE_TEST_CASE(setconfig_two_native_asset_bond_activation, sysio_opreg_tester) { try {
    constexpr uint64_t MIN_BOND = 1'000'000;
 
    BOOST_REQUIRE_EQUAL(success(), setconfig(
@@ -1796,8 +2341,8 @@ BOOST_FIXTURE_TEST_CASE(setconfig_two_chain_bond_activation, sysio_opreg_tester)
       /*terminate_window_ms=*/24ULL * 60 * 60 * 1000,
       /*req_prod_collat=*/{},
       /*req_batchop_collat=*/{
-         make_chain_min_bond("ETH", "ETH", MIN_BOND),
-         make_chain_min_bond("SOL", "SOL", MIN_BOND),
+         make_chain_min_bond("WIRE", "NTA", MIN_BOND),
+         make_chain_min_bond("WIRE", "NTB", MIN_BOND),
       },
       /*req_uw_collat=*/{}));
 
@@ -1810,13 +2355,13 @@ BOOST_FIXTURE_TEST_CASE(setconfig_two_chain_bond_activation, sysio_opreg_tester)
 
    // After ETH bond: SOL still missing → still UNKNOWN.
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("batchop.a"_n, "ETH", "ETH", MIN_BOND));
+      bond_generic("batchop.a"_n, "NTA", MIN_BOND));
    op = get_operator("batchop.a"_n);
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_UNKNOWN == op["status"].as<OperatorStatus>());
 
    // After SOL bond: every requirement met → ACTIVE.
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle("batchop.a"_n, "SOL", "SOL", MIN_BOND));
+      bond_generic("batchop.a"_n, "NTB", MIN_BOND));
    op = get_operator("batchop.a"_n);
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
    BOOST_REQUIRE(op["available_at"].as_uint64() > 0);
@@ -1824,8 +2369,8 @@ BOOST_FIXTURE_TEST_CASE(setconfig_two_chain_bond_activation, sysio_opreg_tester)
 
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_duplicate_chain_token_in_collat, sysio_opreg_tester) { try {
    const auto duplicate_vec = std::vector<fc::variant>{
-      make_chain_min_bond("ETH", "ETH", 100),
-      make_chain_min_bond("ETH", "ETH", 200),
+      make_chain_min_bond("WIRE", "NTA", 100),
+      make_chain_min_bond("WIRE", "NTA", 200),
    };
 
    // The duplicate-detection assertion text refers to "(chain, token_kind)"
@@ -1843,7 +2388,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_stamps_collat_config_timestamp, sysio_opreg_te
       21, 63, 21, 600000, 5, 5, 24ULL * 60 * 60 * 1000,
       /*req_prod_collat=*/{},
       /*req_batchop_collat=*/{
-         make_chain_min_bond("ETH", "ETH", 1000),
+         make_chain_min_bond("WIRE", "NTA", 1000),
       },
       /*req_uw_collat=*/{}));
 
@@ -1861,11 +2406,11 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_terminated_operator_does_not_abort, sysio_opre
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(),
       regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
-   BOOST_REQUIRE_EQUAL(success(), depositinle("batchop.a"_n, "ETH", "ETH", 500));
+   BOOST_REQUIRE_EQUAL(success(), bond_generic("batchop.a"_n, "NTA", 500));
 
    // Queue a withdraw of the full balance, then terminate (remits + zeroes the balance), leaving
    // the queued row matured against a now-zero balance.
-   BOOST_REQUIRE_EQUAL(success(), withdrawinle("batchop.a"_n, "ETH", "ETH", 500));
+   BOOST_REQUIRE_EQUAL(success(), withdraw("batchop.a"_n, "NTA", 500));
    BOOST_REQUIRE(!get_wtdw(1).is_null());
    BOOST_REQUIRE_EQUAL(success(), terminate("batchop.a"_n, "rolling-24h miss"));
 
@@ -1894,12 +2439,14 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_bounds_rows_per_epoch, sysio_opreg_tester) { t
    // Each distinct operator contributes its one permitted queue row. Raw name values remain valid
    // Antelope names and avoid coupling this global-bound regression to a fixed account-name list.
    for (uint32_t i = 0; i < N; ++i) {
-      const name account{OPERATOR_NAME_BASE.value + i + 1};
+      const name account{OPERATOR_NAME_BASE.value + ((uint64_t(i) + 1) << 4)};
+      create_accounts({account});
+      produce_blocks();
       BOOST_REQUIRE_EQUAL(success(),
          regoperator(account, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
-      BOOST_REQUIRE_EQUAL(success(), depositinle(account, "ETH", "ETH", i + 1));
+      BOOST_REQUIRE_EQUAL(success(), bond_generic(account, "NTA", i + 1));
       BOOST_REQUIRE_EQUAL(success(),
-         withdrawinle(account, "ETH", "ETH", i + 1));
+         withdraw(account, "NTA", i + 1));
       BOOST_REQUIRE_EQUAL(success(), terminate(account, "rolling-24h miss"));
       produce_blocks();
    }
@@ -1926,4 +2473,441 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_bounds_rows_per_epoch, sysio_opreg_tester) { t
    BOOST_REQUIRE_EQUAL(0u, count_pending());
 } FC_LOG_AND_RETHROW() }
 
+// ── shadow-bond yield forwarding ──
+//
+// A bonded row's checkpoint tracks sysio.liq's own LIQETH index: a bonded unit earns exactly what a
+// unit on the registry's liq holder row earns, from the moment it is bonded until it leaves the row.
+
+/// A sweep claims exactly what `sysio.liq` owes the registry's holder row into the registry, and
+/// leaves the registry owed nothing.
+BOOST_FIXTURE_TEST_CASE(sweepyield_claims_the_registry_yield, sysio_opreg_tester) { try {
+   setup_yield_bonders();
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   const int64_t swept = sweep_liqeth();
+   BOOST_REQUIRE_LT(0, swept);
+   BOOST_REQUIRE_LT(swept, kYieldDistribution);   // the bystander's share stayed in sysio.liq
+   BOOST_REQUIRE_EQUAL(yield_reference::owed(kYieldBondA + kYieldBondB, liq_index(), 0), swept);
+   BOOST_REQUIRE_EQUAL(0, registry_liq_owed());
+} FC_LOG_AND_RETHROW() }
+
+/// Each bonder is credited its own units' share of the distribution, even with no sweep first:
+/// `claimyield` pulls the registry's owed WIRE itself, so `claimremit(WIRE)` can pay at once. A
+/// second claim with nothing new earned is refused.
+BOOST_FIXTURE_TEST_CASE(claimyield_credits_pro_rata_and_claimremit_pays_wire, sysio_opreg_tester) { try {
+   setup_yield_bonders();
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   const fc::uint128_t index = liq_index();
+   const int64_t registry_owed = registry_liq_owed();
+   const int64_t opreg_before  = wire_balance(OPREG_ACCOUNT);
+
+   const int64_t a_credit = claim_yield_credit(kYieldBonderA);
+   BOOST_REQUIRE_EQUAL(yield_reference::owed(kYieldBondA, index, 0), a_credit);
+   BOOST_REQUIRE_EQUAL(opreg_before + registry_owed, wire_balance(OPREG_ACCOUNT));   // pulled in by the claim
+   BOOST_REQUIRE_EQUAL(0, registry_liq_owed());
+
+   const int64_t b_credit = claim_yield_credit(kYieldBonderB);
+   BOOST_REQUIRE_EQUAL(yield_reference::owed(kYieldBondB, index, 0), b_credit);
+   BOOST_REQUIRE_LE(a_credit + b_credit, registry_owed);   // attribution never exceeds the registry's claim
+
+   const auto a_row = depot_native_row(kYieldBonderA, kLiqEthCodename);
+   BOOST_REQUIRE_EQUAL(0u, a_row["shadow_yield"]["owed_wire"].as_uint64());
+   BOOST_REQUIRE_EQUAL(index, a_row["shadow_yield"]["index_checkpoint"].as_uint128());
+
+   const int64_t a_wire_before = wire_balance(kYieldBonderA);
+   BOOST_REQUIRE_EQUAL(success(), claimremit(kYieldBonderA, kWireCodename));
+   BOOST_REQUIRE_EQUAL(a_wire_before + a_credit, wire_balance(kYieldBonderA));
+   BOOST_REQUIRE(get_remitclaim(kYieldBonderA, kWireCodename).is_null());
+
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(error(std::string(kNoYieldOwedError)), claimyield(kYieldBonderA, kLiqEthCodename));
+} FC_LOG_AND_RETHROW() }
+
+/// A balance change settles the row first: A's claim is its first-distribution share at its old
+/// balance plus its second-distribution share at the new one, and B is paid on one balance throughout.
+BOOST_FIXTURE_TEST_CASE(yield_settles_before_a_balance_change, sysio_opreg_tester) { try {
+   setup_yield_bonders();
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   const fc::uint128_t first_index = liq_index();
+
+   mint_shadow(kYieldBonderA, kYieldBondA);
+   BOOST_REQUIRE_EQUAL(success(), deposit(kYieldBonderA, kLiqEthCodename, kYieldBondA));
+   const auto a_row = depot_native_row(kYieldBonderA, kLiqEthCodename);
+   BOOST_REQUIRE_EQUAL(first_index, a_row["shadow_yield"]["index_checkpoint"].as_uint128());
+   BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(yield_reference::owed(kYieldBondA, first_index, 0)),
+                       a_row["shadow_yield"]["owed_wire"].as_uint64());
+
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   const fc::uint128_t second_index = liq_index();
+
+   BOOST_REQUIRE_EQUAL(yield_reference::owed(kYieldBondA, first_index, 0) +
+                          yield_reference::owed(2 * kYieldBondA, second_index, first_index),
+                       claim_yield_credit(kYieldBonderA));
+   BOOST_REQUIRE_EQUAL(yield_reference::owed(kYieldBondB, second_index, 0), claim_yield_credit(kYieldBonderB));
+} FC_LOG_AND_RETHROW() }
+
+/// A sweep with nothing owed is refused -- before any distribution, and again right after a sweep
+/// has drained the registry's row. WIRE, which earns no shadow yield, is refused too.
+BOOST_FIXTURE_TEST_CASE(sweepyield_with_nothing_owed_is_rejected, sysio_opreg_tester) { try {
+   setup_yield_bonders();
+   BOOST_REQUIRE_EQUAL(error(std::string(kNoYieldToSweepError)), sweepyield(kLiqEthCodename));
+
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   sweep_liqeth();
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(error(std::string(kNoYieldToSweepError)), sweepyield(kLiqEthCodename));
+
+   BOOST_REQUIRE_EQUAL(error(std::string(kWireEarnsNoYieldError)), sweepyield(kWireCodename));
+   BOOST_REQUIRE_EQUAL(error(std::string(kUnsupportedTokenError)), sweepyield(kUnknownTokenCodename));
+} FC_LOG_AND_RETHROW() }
+
+/// Termination pays the yield a bond earned alongside its principal: WIRE yield in the WIRE claim
+/// row, the shadow in the LIQETH claim row. Termination cannot pull from sysio.liq, so the yield is
+/// swept first and the pool covers it in full.
+BOOST_FIXTURE_TEST_CASE(terminate_credits_earned_yield_with_the_principal, sysio_opreg_tester) { try {
+   setup_yield_bonders();
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   const int64_t a_yield = yield_reference::owed(kYieldBondA, liq_index(), 0);
+   sweep_liqeth();
+
+   BOOST_REQUIRE_EQUAL(success(), terminate(kYieldBonderA, std::string(kTestTerminationReason)));
+   BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(a_yield),
+                       get_remitclaim(kYieldBonderA, kWireCodename)["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(kYieldBondA, get_remitclaim(kYieldBonderA, kLiqEthCodename)["balance"].as_uint64());
+   const auto a_row = depot_native_row(kYieldBonderA, kLiqEthCodename);
+   BOOST_REQUIRE_EQUAL(0u, a_row["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(0u, a_row["shadow_yield"]["owed_wire"].as_uint64());
+
+   const int64_t wire_before   = wire_balance(kYieldBonderA);
+   const int64_t shadow_before = shadow_balance(kYieldBonderA);
+   BOOST_REQUIRE_EQUAL(success(), claimremit(kYieldBonderA, kWireCodename));
+   BOOST_REQUIRE_EQUAL(success(), claimremit(kYieldBonderA, kLiqEthCodename));
+   BOOST_REQUIRE_EQUAL(wire_before + a_yield, wire_balance(kYieldBonderA));
+   BOOST_REQUIRE_EQUAL(shadow_before + static_cast<int64_t>(kYieldBondA), shadow_balance(kYieldBonderA));
+   BOOST_REQUIRE_EQUAL(error(std::string(kNoYieldOwedError)), claimyield(kYieldBonderA, kLiqEthCodename));
+} FC_LOG_AND_RETHROW() }
+
+/// A slash settles before it seizes: the yield earned up to the slash stays claimable, and the
+/// seized principal earns the operator nothing after it.
+BOOST_FIXTURE_TEST_CASE(slash_keeps_yield_earned_before_the_slash, sysio_opreg_tester) { try {
+   setup_yield_bonders();
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   const fc::uint128_t first_index = liq_index();
+
+   BOOST_REQUIRE_EQUAL(success(), slash(kYieldBonderA, std::string(kTestSlashReason)));
+   BOOST_REQUIRE_EQUAL(0u, depot_native_row(kYieldBonderA, kLiqEthCodename)["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(yield_reference::owed(kYieldBondA, first_index, 0), claim_yield_credit(kYieldBonderA));
+
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(error(std::string(kNoYieldOwedError)), claimyield(kYieldBonderA, kLiqEthCodename));
+   BOOST_REQUIRE_EQUAL(yield_reference::owed(kYieldBondB, liq_index(), 0), claim_yield_credit(kYieldBonderB));
+} FC_LOG_AND_RETHROW() }
+
+/// With every bond slashed the registry still holds the seized shadow and still earns on it: the
+/// sweep claims that WIRE into the registry, and no operator is owed any of it.
+BOOST_FIXTURE_TEST_CASE(sweepyield_with_no_bonded_balance_keeps_wire_in_registry, sysio_opreg_tester) { try {
+   setup_yield_bonders();
+   BOOST_REQUIRE_EQUAL(success(), slash(kYieldBonderA, std::string(kTestSlashReason)));
+   BOOST_REQUIRE_EQUAL(success(), slash(kYieldBonderB, std::string(kTestSlashReason)));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(kYieldBondA + kYieldBondB), shadow_balance(OPREG_ACCOUNT));
+
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   BOOST_REQUIRE_LT(0, sweep_liqeth());
+   BOOST_REQUIRE_EQUAL(error(std::string(kNoYieldOwedError)), claimyield(kYieldBonderA, kLiqEthCodename));
+   BOOST_REQUIRE_EQUAL(error(std::string(kNoYieldOwedError)), claimyield(kYieldBonderB, kLiqEthCodename));
+} FC_LOG_AND_RETHROW() }
+
+/// WIRE collateral earns no shadow yield: depositing and withdrawing it leaves the row's yield
+/// fields at zero, and there is nothing to claim on it.
+BOOST_FIXTURE_TEST_CASE(wire_rows_never_earn_shadow_yield, sysio_opreg_tester) { try {
+   const auto OPERATOR = kYieldBonderA;
+   constexpr uint64_t DEPOSIT = 3 * kWireUnit;
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator(OPERATOR, OPERATOR_TYPE_UNDERWRITER, /*is_bootstrapped=*/false));
+   setup_wire_token_and_fund(OPERATOR, kWireFundingQuantity);
+   BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, kWireCodename, DEPOSIT));
+   BOOST_REQUIRE_EQUAL(success(), withdraw(OPERATOR, kWireCodename, kWireUnit));
+   BOOST_REQUIRE_EQUAL(success(), flushwtdw(kFlushAllMaturedEpoch));
+
+   const auto row = depot_native_row(OPERATOR, kWireCodename);
+   BOOST_REQUIRE_EQUAL(DEPOSIT - kWireUnit, row["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(fc::uint128_t{0}, row["shadow_yield"]["index_checkpoint"].as_uint128());
+   BOOST_REQUIRE_EQUAL(0u, row["shadow_yield"]["owed_wire"].as_uint64());
+   BOOST_REQUIRE_EQUAL(error(std::string(kNoYieldOwedError)), claimyield(OPERATOR, kWireCodename));
+} FC_LOG_AND_RETHROW() }
+
+/// A bond made after a distribution starts at the index that distribution left: it cannot capture
+/// yield earned before it existed, however the sweep is timed. A, bonded throughout, keeps its
+/// whole share -- which is everything the registry earned.
+BOOST_FIXTURE_TEST_CASE(late_depositor_cannot_capture_earlier_yield, sysio_opreg_tester) { try {
+   setup_yield_holders();
+   BOOST_REQUIRE_EQUAL(success(), deposit(kYieldBonderA, kLiqEthCodename, kYieldBondA));
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   const fc::uint128_t index = liq_index();
+
+   BOOST_REQUIRE_EQUAL(success(), deposit(kYieldBonderB, kLiqEthCodename, kYieldBondB));
+   BOOST_REQUIRE_EQUAL(index,
+      depot_native_row(kYieldBonderB, kLiqEthCodename)["shadow_yield"]["index_checkpoint"].as_uint128());
+   const int64_t swept = sweep_liqeth();
+
+   BOOST_REQUIRE_EQUAL(error(std::string(kNoYieldOwedError)), claimyield(kYieldBonderB, kLiqEthCodename));
+   const int64_t a_credit = claim_yield_credit(kYieldBonderA);
+   BOOST_REQUIRE_EQUAL(yield_reference::owed(kYieldBondA, index, 0), a_credit);
+   BOOST_REQUIRE_EQUAL(swept, a_credit);
+} FC_LOG_AND_RETHROW() }
+
+/// Units withdrawn before any sweep keep the yield they earned while bonded: the flush settles the
+/// row before debiting it, so the timing of the sweep changes nothing.
+BOOST_FIXTURE_TEST_CASE(withdrawn_units_keep_yield_earned_while_bonded, sysio_opreg_tester) { try {
+   setup_yield_bonders();
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   const fc::uint128_t index = liq_index();
+
+   BOOST_REQUIRE_EQUAL(success(), withdraw(kYieldBonderA, kLiqEthCodename, kYieldBondA));
+   BOOST_REQUIRE_EQUAL(success(), flushwtdw(kFlushAllMaturedEpoch));
+   BOOST_REQUIRE_EQUAL(0u, depot_native_row(kYieldBonderA, kLiqEthCodename)["balance"].as_uint64());
+   sweep_liqeth();
+
+   BOOST_REQUIRE_EQUAL(yield_reference::owed(kYieldBondA, index, 0), claim_yield_credit(kYieldBonderA));
+   BOOST_REQUIRE_EQUAL(yield_reference::owed(kYieldBondB, index, 0), claim_yield_credit(kYieldBonderB));
+} FC_LOG_AND_RETHROW() }
+
+/// Shadow the registry holds for no bond -- here A's seized shadow -- earns for the registry, not
+/// for the remaining bonders: B is credited its own units' share only, and the rest of the sweep
+/// stays in the registry.
+BOOST_FIXTURE_TEST_CASE(registry_keeps_yield_on_unbonded_holdings, sysio_opreg_tester) { try {
+   setup_yield_bonders();
+   BOOST_REQUIRE_EQUAL(success(), slash(kYieldBonderA, std::string(kTestSlashReason)));
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   const fc::uint128_t index = liq_index();
+
+   const int64_t swept    = sweep_liqeth();
+   const int64_t b_credit = claim_yield_credit(kYieldBonderB);
+   BOOST_REQUIRE_EQUAL(yield_reference::owed(kYieldBondB, index, 0), b_credit);
+
+   // What stays in the registry is the seized units' share, up to one unit of per-row flooring.
+   const int64_t seized_share = yield_reference::owed(kYieldBondA, index, 0);
+   BOOST_REQUIRE_EQUAL(swept, wire_balance(OPREG_ACCOUNT));
+   BOOST_REQUIRE_GE(wire_balance(OPREG_ACCOUNT) - b_credit, seized_share);
+   BOOST_REQUIRE_LE(wire_balance(OPREG_ACCOUNT) - b_credit, seized_share + 1);
+   BOOST_REQUIRE_EQUAL(error(std::string(kNoYieldOwedError)), claimyield(kYieldBonderA, kLiqEthCodename));
+} FC_LOG_AND_RETHROW() }
+
+/// Strict solvency: an operator's yield is credited only out of WIRE the registry actually received
+/// from sysio.liq. With A the only bonder, the registry row floors at each of its settles while A's
+/// row floors once, so A is owed a little more than was received: the claim credits exactly what
+/// was received, the dust stays on A's row, and paying the claim leaves the WIRE collateral whole.
+BOOST_FIXTURE_TEST_CASE(yield_credit_never_exceeds_wire_received_from_liq, sysio_opreg_tester) { try {
+   const int64_t received = setup_yield_dust();
+   const int64_t a_owed   = yield_reference::owed(kYieldBondA, liq_index(), 0);
+   const int64_t dust     = a_owed - received;
+   BOOST_REQUIRE_LT(0, dust);   // the case exists only if flooring left A owed more than received
+
+   BOOST_REQUIRE_EQUAL(received, claim_yield_credit(kYieldBonderA));
+   BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(dust),
+                       depot_native_row(kYieldBonderA, kLiqEthCodename)["shadow_yield"]["owed_wire"].as_uint64());
+
+   BOOST_REQUIRE_EQUAL(success(), claimremit(kYieldBonderA, kWireCodename));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(kYieldPrincipal), wire_balance(OPREG_ACCOUNT));
+   produce_blocks();   // a repeat of the same claim in the same block is a duplicate transaction
+   BOOST_REQUIRE_EQUAL(error(std::string(kYieldNotCoveredError)), claimyield(kYieldBonderA, kLiqEthCodename));
+} FC_LOG_AND_RETHROW() }
+
+/// Termination can pay only what the pool covers, since it cannot pull from sysio.liq. The rest --
+/// here a whole unswept distribution plus flooring dust -- stays banked on the terminated row, and
+/// the operator collects it with `claimyield`, which pulls first. Banked yield never makes the row
+/// unsettled: `prune` erases it with dust still owed once the claim window (the prune delay) ends,
+/// and that remainder is forfeited to the registry.
+BOOST_FIXTURE_TEST_CASE(terminated_operator_claims_uncovered_yield_before_prune, sysio_opreg_tester) { try {
+   const int64_t received = setup_yield_dust();
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));   // not swept before termination
+   const int64_t a_owed = yield_reference::owed(kYieldBondA, liq_index(), 0);
+
+   BOOST_REQUIRE_EQUAL(success(), terminate(kYieldBonderA, std::string(kTestTerminationReason)));
+   BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(received),
+                       get_remitclaim(kYieldBonderA, kWireCodename)["balance"].as_uint64());
+   const auto terminated_row = depot_native_row(kYieldBonderA, kLiqEthCodename);
+   BOOST_REQUIRE_EQUAL(0u, terminated_row["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(a_owed - received),
+                       terminated_row["shadow_yield"]["owed_wire"].as_uint64());
+
+   // The claim pulls the unswept distribution and credits it; flooring dust stays banked.
+   const int64_t registry_owed = registry_liq_owed();
+   BOOST_REQUIRE_EQUAL(registry_owed, claim_yield_credit(kYieldBonderA));
+   const int64_t dust = a_owed - received - registry_owed;
+   BOOST_REQUIRE_LT(0, dust);
+   BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(dust),
+                       depot_native_row(kYieldBonderA, kLiqEthCodename)["shadow_yield"]["owed_wire"].as_uint64());
+
+   // The dust does not hold the row: prune erases it after the delay and the dust is forfeited.
+   // Commit the claim first: a transaction left pending across the time jump would expire.
+   produce_blocks();
+   produce_block(fc::milliseconds(kDefaultPruneDelayMs));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), prune());
+   BOOST_REQUIRE(get_operator(kYieldBonderA).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), claimremit(kYieldBonderA, kWireCodename));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(kYieldPrincipal), wire_balance(OPREG_ACCOUNT));
+} FC_LOG_AND_RETHROW() }
+
+/// `claimyield` is permissionless: a keeper with no stake cranks it for a TERMINATED operator whose
+/// yield termination could not cover, and the credit lands in the operator's own WIRE claim.
+BOOST_FIXTURE_TEST_CASE(keeper_claims_terminated_operators_yield, sysio_opreg_tester) { try {
+   setup_yield_bonders();
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));   // not swept before termination
+   const int64_t a_owed = yield_reference::owed(kYieldBondA, liq_index(), 0);
+
+   BOOST_REQUIRE_EQUAL(success(), terminate(kYieldBonderA, std::string(kTestTerminationReason)));
+   BOOST_REQUIRE(get_remitclaim(kYieldBonderA, kWireCodename).is_null());   // nothing was covered yet
+   BOOST_REQUIRE(get_remitclaim(kYieldKeeper, kWireCodename).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), push_opreg_action(kYieldKeeper, yield_action::claimyield, mvo()
+      (withdrawal_field::account, kYieldBonderA)(withdrawal_field::token_code, kLiqEthCodename)));
+   BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(a_owed),
+                       get_remitclaim(kYieldBonderA, kWireCodename)["balance"].as_uint64());
+   BOOST_REQUIRE(get_remitclaim(kYieldKeeper, kWireCodename).is_null());   // the keeper gains nothing
+
+   const int64_t wire_before = wire_balance(kYieldBonderA);
+   BOOST_REQUIRE_EQUAL(success(), claimremit(kYieldBonderA, kWireCodename));
+   BOOST_REQUIRE_EQUAL(wire_before + a_owed, wire_balance(kYieldBonderA));
+} FC_LOG_AND_RETHROW() }
+
+/// A row that withdrew everything earns nothing while empty: re-bonding later settles the gap at a
+/// balance of 0, so the claim is the first bond's share plus the re-bond's share, and nothing for
+/// the distribution in between.
+BOOST_FIXTURE_TEST_CASE(rebond_after_full_withdrawal_earns_nothing_for_the_gap, sysio_opreg_tester) { try {
+   setup_yield_bonders();
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   const fc::uint128_t first_index = liq_index();
+
+   BOOST_REQUIRE_EQUAL(success(), withdraw(kYieldBonderA, kLiqEthCodename, kYieldBondA));
+   BOOST_REQUIRE_EQUAL(success(), flushwtdw(kFlushAllMaturedEpoch));
+   BOOST_REQUIRE_EQUAL(success(), claimremit(kYieldBonderA, kLiqEthCodename));
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));   // the gap: A holds nothing bonded
+   const fc::uint128_t gap_index = liq_index();
+
+   BOOST_REQUIRE_EQUAL(success(), deposit(kYieldBonderA, kLiqEthCodename, kYieldBondA));
+   const auto rebonded = depot_native_row(kYieldBonderA, kLiqEthCodename);
+   BOOST_REQUIRE_EQUAL(gap_index, rebonded["shadow_yield"]["index_checkpoint"].as_uint128());
+   BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(yield_reference::owed(kYieldBondA, first_index, 0)),
+                       rebonded["shadow_yield"]["owed_wire"].as_uint64());
+
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   BOOST_REQUIRE_EQUAL(yield_reference::owed(kYieldBondA, first_index, 0) +
+                          yield_reference::owed(kYieldBondA, liq_index(), gap_index),
+                       claim_yield_credit(kYieldBonderA));
+} FC_LOG_AND_RETHROW() }
+
+/// Re-registering a settled TERMINATED operator replaces its row, and with it any yield still
+/// banked on it -- the claim window closes -- while the claim rows termination already credited
+/// live in `remitclaims`, independent of the operator row, and still pay.
+BOOST_FIXTURE_TEST_CASE(reregistration_forfeits_banked_yield_but_keeps_remit_claims, sysio_opreg_tester) { try {
+   // A is the only bonder, so the first sweep's pool covers exactly A's first share and the unswept
+   // second distribution stays banked on A's row at termination.
+   setup_yield_holders();
+   BOOST_REQUIRE_EQUAL(success(), deposit(kYieldBonderA, kLiqEthCodename, kYieldBondA));
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   const int64_t first_swept = sweep_liqeth();
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));   // not swept: stays banked on A's row
+
+   BOOST_REQUIRE_EQUAL(success(), terminate(kYieldBonderA, std::string(kTestTerminationReason)));
+   const uint64_t covered = get_remitclaim(kYieldBonderA, kWireCodename)["balance"].as_uint64();
+   BOOST_REQUIRE_LT(0u, covered);
+   BOOST_REQUIRE_LE(covered, static_cast<uint64_t>(first_swept));
+   BOOST_REQUIRE_LT(0u, depot_native_row(kYieldBonderA, kLiqEthCodename)["shadow_yield"]["owed_wire"].as_uint64());
+
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), regoperator(kYieldBonderA, OPERATOR_TYPE_UNDERWRITER, /*is_bootstrapped=*/false));
+   BOOST_REQUIRE(depot_native_row(kYieldBonderA, kLiqEthCodename).is_null());   // banked yield gone with the row
+   BOOST_REQUIRE_EQUAL(error(std::string(kNoYieldOwedError)), claimyield(kYieldBonderA, kLiqEthCodename));
+
+   BOOST_REQUIRE_EQUAL(covered, get_remitclaim(kYieldBonderA, kWireCodename)["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(kYieldBondA, get_remitclaim(kYieldBonderA, kLiqEthCodename)["balance"].as_uint64());
+   const int64_t wire_before = wire_balance(kYieldBonderA);
+   BOOST_REQUIRE_EQUAL(success(), claimremit(kYieldBonderA, kWireCodename));
+   BOOST_REQUIRE_EQUAL(wire_before + static_cast<int64_t>(covered), wire_balance(kYieldBonderA));
+   BOOST_REQUIRE_EQUAL(success(), claimremit(kYieldBonderA, kLiqEthCodename));
+} FC_LOG_AND_RETHROW() }
+
+// This is the dual-shadow producer flow's depot policy with generic symbols.
+// Registration of the Ethereum node NFT itself remains in the ETH-specific suites.
+BOOST_FIXTURE_TEST_CASE(two_generic_depot_assets_are_both_required_and_withdrawals_preserve_identity,
+                        sysio_opreg_tester) {
+   using namespace sysio::testing::external;
+   constexpr uint64_t Minimum = 2 * Unit;
+   constexpr uint64_t Funding = 4 * Unit;
+   const auto account = kEligibilityProducer;
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kTestMaxProducers, kTestMaxBatchOperators, kTestMaxUnderwriters,
+      kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses, kMaxAcceptedPctMisses24h, kTerminateWindowMs,
+      {make_chain_min_bond(kWireCodename, First.token, Minimum),
+       make_chain_min_bond(kWireCodename, Second.token, Minimum)}, {}, {}));
+   BOOST_REQUIRE_EQUAL(success(), regoperator(account, OPERATOR_TYPE_PRODUCER, false));
+   setup_shadow_liq({First, Second});
+   for (const auto& a : Assets) {
+      BOOST_REQUIRE_EQUAL(success(), push_contract(LIQ_ACCOUNT, liq_abi_ser, SYND_ACCOUNT, shadow_action::mint,
+         mvo()("to", account)("token_code", codename_mvo(a.token))("amount", Funding)));
+   }
+   const auto active = [&] {
+      return get_operator(account)[eligibility_field::status].as<OperatorStatus>() ==
+         OperatorStatus::OPERATOR_STATUS_ACTIVE;
+   };
+   BOOST_REQUIRE(!active());
+   // Surplus of the first token never substitutes for the missing second token.
+   BOOST_REQUIRE_EQUAL(success(), deposit(account, First.token, Funding));
+   BOOST_REQUIRE(!active());
+   BOOST_REQUIRE_EQUAL(success(), deposit(account, Second.token, Minimum - 1));
+   BOOST_REQUIRE(!active());
+   BOOST_REQUIRE_EQUAL(success(), deposit(account, Second.token, 1));
+   BOOST_REQUIRE(active());
+   // Exercise either required token independently. Reservations must affect
+   // eligibility immediately, before epoch maintenance moves any custody.
+   for (const auto& a : Assets) {
+      const auto sym = symbol::from_string(std::string("9,") + a.token);
+      const auto other = symbol::from_string(std::string("9,") + (a.id == First.id ? Second.token : First.token));
+      const auto other_before = get_currency_balance(LIQ_ACCOUNT, other, account).get_amount();
+      const uint64_t withdrawn = a.id == First.id ? Funding : Minimum;
+      const auto before = get_currency_balance(LIQ_ACCOUNT, sym, account).get_amount();
+      BOOST_REQUIRE_EQUAL(success(), withdraw(account, a.token, withdrawn));
+      BOOST_REQUIRE(!active());
+      BOOST_REQUIRE_EQUAL(before, get_currency_balance(LIQ_ACCOUNT, sym, account).get_amount());
+      produce_block(); // Distinct TAPOS for repeated maintenance actions.
+      BOOST_REQUIRE_EQUAL(success(), flushwtdw(kFlushAllMaturedEpoch));
+      const auto claim = get_remitclaim(account, a.token);
+      BOOST_REQUIRE(!claim.is_null());
+      BOOST_REQUIRE_EQUAL(withdrawn, claim["balance"].as_uint64());
+      BOOST_REQUIRE_EQUAL(success(), claimremit(account, a.token));
+      BOOST_REQUIRE_EQUAL(before + int64_t(withdrawn), get_currency_balance(LIQ_ACCOUNT, sym, account).get_amount());
+      BOOST_REQUIRE_EQUAL(other_before, get_currency_balance(LIQ_ACCOUNT, other, account).get_amount());
+      BOOST_REQUIRE(get_remitclaim(account, a.token).is_null());
+      BOOST_REQUIRE_EQUAL(success(), deposit(account, a.token, Minimum));
+      BOOST_REQUIRE(active());
+   }
+}
+
+BOOST_FIXTURE_TEST_CASE(native_wire_partial_withdrawal_stays_active_and_claims_exactly, sysio_opreg_tester) {
+   constexpr uint64_t Minimum = 2 * kWireUnit;
+   constexpr uint64_t Bond = 2 * Minimum;
+   const auto account = kEligibilityBatchOperator;
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kTestMaxProducers, kTestMaxBatchOperators, kTestMaxUnderwriters,
+      kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses, kMaxAcceptedPctMisses24h, kTerminateWindowMs,
+      {}, {make_chain_min_bond(kWireCodename, kWireCodename, Minimum)}, {}));
+   BOOST_REQUIRE_EQUAL(success(), regoperator(account, OPERATOR_TYPE_BATCH, false));
+   setup_wire_token_and_fund(account, kWireFundingQuantity);
+   const auto before = wire_balance(account);
+   BOOST_REQUIRE_EQUAL(success(), deposit(account, kWireCodename, Bond));
+   BOOST_REQUIRE_EQUAL(before - int64_t(Bond), wire_balance(account));
+   BOOST_REQUIRE_EQUAL(success(), withdraw(account, kWireCodename, Minimum));
+   BOOST_REQUIRE(get_operator(account)[eligibility_field::status].as<OperatorStatus>() ==
+      OperatorStatus::OPERATOR_STATUS_ACTIVE);
+   BOOST_REQUIRE_EQUAL(before - int64_t(Bond), wire_balance(account));
+   BOOST_REQUIRE_EQUAL(success(), flushwtdw(kFlushAllMaturedEpoch));
+   BOOST_REQUIRE_EQUAL(Minimum, get_remitclaim(account, kWireCodename)["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(success(), claimremit(account, kWireCodename));
+   BOOST_REQUIRE_EQUAL(before - int64_t(Minimum), wire_balance(account));
+   BOOST_REQUIRE(get_remitclaim(account, kWireCodename).is_null());
+   BOOST_REQUIRE(get_operator(account)[eligibility_field::status].as<OperatorStatus>() ==
+      OperatorStatus::OPERATOR_STATUS_ACTIVE);
+}
 BOOST_AUTO_TEST_SUITE_END()

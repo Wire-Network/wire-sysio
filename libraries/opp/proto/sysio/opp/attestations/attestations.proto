@@ -426,7 +426,7 @@ message AttestationProcessingError {
 }
 
 // ---------------------------------------------------------------------------
-//  Reserve creation flow (v6 — outpost-initiated, depot-matched)
+//  Reserve creation flow (outpost-initiated, depot-matched)
 //
 //  Lifecycle:
 //    1. User calls outpost `create_reserve(...)`. Outpost takes external_token_amount
@@ -562,6 +562,12 @@ message SyndicateLIQ {
   sysio.opp.types.TokenAmount  amount     = 3;
   // Per-outpost monotonic sequence shared with LIQYield; dedupe key.
   uint64                       sequence   = 4;
+  // The OUTPOST's live custody balance of the liq token, read when the
+  // message is built and after this syndication is locked, in the depot
+  // frame of `amount`: the liqsol_pool token account on Solana,
+  // SyndicationPool.poolBalanceDepot() on Ethereum. The depot checks it is
+  // at least its outstanding shadow of the token.
+  uint64                       total_syndicated = 5;
 }
 
 // Outpost -> Depot. Yield the outpost claimed for the syndicated liq pool since
@@ -576,6 +582,11 @@ message LIQYield {
   uint64                      sequence   = 3;
   // Outpost-chain epoch at which the report was taken. Informational.
   uint64                      epoch      = 4;
+  // The OUTPOST's live custody balance of the liq token, read when the
+  // report is built and after the yield is claimed into custody, in the
+  // depot frame of `amount` (the same reading SyndicateLIQ carries). The
+  // depot checks it is at least its outstanding shadow of the token.
+  uint64                      total_syndicated = 5;
 }
 
 // Depot -> Outpost. Release `amount` liq tokens from the outpost's syndicated
@@ -597,4 +608,9 @@ message DesyndicateLIQ {
   sysio.opp.types.TokenAmount  amount     = 3;
   // Depot-side request id for correlation in outpost logs.
   uint64                       request_id = 4;
+  // The DEPOT's live outstanding shadow of the liq token after this burn:
+  // the sysio.liq supply of the shadow symbol plus its yield parked in
+  // liqpending, in base units of `amount`. The outpost checks its custody
+  // after this payout is at least this total.
+  uint64                       total_syndicated = 5;
 }

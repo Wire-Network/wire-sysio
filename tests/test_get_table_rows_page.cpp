@@ -311,4 +311,86 @@ BOOST_FIXTURE_TEST_CASE(find_with_index_returns_single_match_even_when_all_rows,
    BOOST_CHECK_EQUAL(res.rows[0].get_object()["sec64"].as_uint64(), 3u);
 } FC_LOG_AND_RETHROW()
 
+// `filter` runs AFTER pagination, so a page can come back SHORT -- or empty -- while `more` is still true and
+// `next_key` points past the rows the predicate dropped. A caller that stops when `rows` is empty terminates
+// early and silently misses the rest of the table. Nothing pinned that interaction.
+BOOST_FIXTURE_TEST_CASE(filter_can_empty_a_page_without_ending_the_scan, validating_tester) try {
+   deploy_contract(*this);
+   populate_numobjs(*this, 10);
+
+   auto p  = numobjs_params();
+   p.limit = 3;                       // rows 0,1,2 -- the predicate rejects all three
+   p.filter = [](const fc::variant& row) {
+      return row.get_object()["value"].get_object()["sec64"].as_uint64() >= 5;
+   };
+
+   auto ro  = make_read_only(*this);
+   auto res = run(ro, p);
+
+   BOOST_CHECK_EQUAL(res.rows.size(), 0u);      // every row on this page was dropped
+   BOOST_CHECK_EQUAL(res.more, true);           // ...but the scan is NOT finished
+   BOOST_CHECK(!res.next_key.empty());          // ...and the cursor still advances
+
+   // Resuming from that cursor reaches the rows the predicate wanted, which is the
+   // property an empty-page-means-done caller would have missed.
+   p.lower_bound = res.next_key;
+   p.limit       = 50;
+   auto rest = run(ro, p);
+   BOOST_CHECK_EQUAL(rest.rows.size(), 5u);     // 5..9
+} FC_LOG_AND_RETHROW()
+
+// `values_only` with `json=false`: the param's own documentation promises each row is "a bare hex string, not an
+// object". Every values_only case ran json=true, so the documented hex shape was never exercised.
+BOOST_FIXTURE_TEST_CASE(values_only_with_json_false_yields_bare_hex, validating_tester) try {
+   deploy_contract(*this);
+   populate_numobjs(*this, 3);
+
+   auto p        = numobjs_params();
+   p.json        = false;
+   p.values_only = true;
+
+   auto ro  = make_read_only(*this);
+   auto res = run(ro, p);
+
+   BOOST_REQUIRE_EQUAL(res.rows.size(), 3u);
+   for (const auto& row : res.rows) {
+      BOOST_CHECK(row.is_string());             // bare hex, NOT {key, value}
+      BOOST_CHECK(!row.get_string().empty());
+      BOOST_CHECK_EQUAL(row.get_string().find_first_not_of("0123456789abcdef"), std::string::npos);
+   }
+
+   // Without values_only the same query wraps each row, so the assertion above is
+   // about values_only and not about json=false on its own.
+   p.values_only.reset();
+   auto wrapped = run(ro, p);
+   BOOST_REQUIRE_EQUAL(wrapped.rows.size(), 3u);
+   BOOST_CHECK(wrapped.rows[0].is_object());
+} FC_LOG_AND_RETHROW()
+
+// `values_only` + `show_payer`. values_only replaces the row with its `value` field, and `payer` is a SIBLING of
+// that field -- so asking for both silently drops the payer. This pins the behaviour as it stands; whether the
+// combination should instead error, or preserve the payer, is a separate question from whether it is tested.
+BOOST_FIXTURE_TEST_CASE(values_only_discards_show_payer, validating_tester) try {
+   deploy_contract(*this);
+   populate_numobjs(*this, 3);
+
+   auto ro = make_read_only(*this);
+
+   auto p_payer       = numobjs_params();
+   p_payer.show_payer = true;
+   auto with_payer    = run(ro, p_payer);
+   BOOST_REQUIRE_EQUAL(with_payer.rows.size(), 3u);
+   BOOST_REQUIRE(with_payer.rows[0].get_object().contains("payer"));   // present on its own
+
+   auto p_both        = numobjs_params();
+   p_both.show_payer  = true;
+   p_both.values_only = true;
+   auto both          = run(ro, p_both);
+
+   BOOST_REQUIRE_EQUAL(both.rows.size(), 3u);
+   // The wrapper is gone, and the payer went with it -- silently.
+   BOOST_CHECK(!both.rows[0].get_object().contains("payer"));
+   BOOST_CHECK(both.rows[0].get_object().contains("sec64"));
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()

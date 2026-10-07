@@ -4,14 +4,6 @@
 #include <sysio.opp.common/opp_keys.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.token/sysio.token.hpp>
-// For uwrit::MAX_LOCK_RELEASE_PER_EPOCH and uwrit::MAX_UWREQ_PRUNE_PER_EPOCH —
-// the per-epoch budgets advance hands to the inline `chklocks` and
-// `pruneuwreqs` sweeps (both constants are owned by sysio.uwrit).
-#include <sysio.uwrit/sysio.uwrit.hpp>
-// For reserve::MAX_CLAIM_SWEEP_PER_EPOCH — the per-epoch budget advance hands
-// to the inline `sweepclaims` retention sweep (the constant is owned by
-// sysio.reserv).
-#include <sysio.reserv/sysio.reserv.hpp>
 // Canonical sysio.system emissions types + compute_epoch_emission. The
 // [[sysio::contract("sysio.system")]] attribute on emission_config / t5_state
 // pins them to sysio.system's ABI; no readonly mirror needed here.
@@ -391,44 +383,6 @@ void epoch::advance() {
    // eventually passes on a subsequent chkcons retry.
    const uint32_t target_epoch = state.current_epoch_index + 1;
 
-   // Bounded retention sweep of expired `sysio.reserv::wireclaims`: erase rows whose one-year
-   // window closed and return their WIRE to the treasury.
-   //
-   // Runs BEFORE the emissions gate, deliberately. This is maintenance, not economics, and the
-   // WIRE it reclaims lands in the very balance the gate measures -- so ordering it after the gate
-   // creates a deadlock: an epoch blocked as BALANCE_INSUFFICIENT returns below without ever
-   // reclaiming forfeited WIRE that could cover the shortfall, and every retry takes the same
-   // path. The contract would be sitting on the funds needed to unblock itself. `sweepclaims`
-   // takes only epoch or reserv authority, so no ordinary keeper could break that cycle either.
-   //
-   // Safe to run ahead of the gate because it is bounded, never-throwing past its auth check, and
-   // touches no epoch state -- a blocked epoch that sweeps and still cannot pay is exactly as
-   // blocked as before, minus some expired rows.
-   //
-   // `sysio.reserv` also sweeps opportunistically when crediting a new claim, but that only fires
-   // while settlement traffic arrives; this call is what makes the deadline hold when swaps stop.
-   //
-   // GUARDED on the account existing. Dispatching an inline action to an absent code account is a
-   // hard `action_validate_exception`, which inside `advance` is a chain-wide epoch stall.
-   // `sysio.reserv` is not a precondition for advancing an epoch -- a chain can advance before
-   // reserves are ever deployed -- and nothing can have accrued a wireclaim in that state, so
-   // skipping is precisely correct rather than merely defensive.
-   //
-   // That guard covers an ABSENT account, not a STALE one: an old `sysio.reserv` build has the
-   // account and not the action, and the CDT dispatcher asserts on an action it does not
-   // implement -- so deploying `sysio.epoch` ahead of `sysio.reserv` aborts every advance. The
-   // deploy is therefore one atomic `sysio.msig` transaction, or `sysio.reserv` first. Both this
-   // edge and the `sysio.epoch`-before-`sysio.system` one the emissions gate creates are written
-   // up in `docs/contract-upgrade-order.md`.
-   if (is_account(RESERV_ACCOUNT)) {
-      action(
-         permission_level{get_self(), "owner"_n},
-         RESERV_ACCOUNT,
-         "sweepclaims"_n,
-         std::make_tuple(reserve::MAX_CLAIM_SWEEP_PER_EPOCH)
-      ).send();
-   }
-
    const auto gate = check_emissions_ready(
       cfg.epoch_duration_sec, cfg.operators_per_epoch, target_epoch);
    if (!gate.ready) {
@@ -447,34 +401,6 @@ void epoch::advance() {
    // Gate passed: drop any prior block_log row for this epoch (if a previous
    // attempt blocked and we're now succeeding) and proceed.
    clear_gate_block(get_self(), target_epoch);
-
-   // FIRST post-gate step: sweep expired underwriter collateral locks.
-   // Locks are a wall-clock challenge window (12h default; see
-   // sysio.uwrit::uwconfig.collateral_lock_duration_ms) — they are never
-   // released by delivery, only by this sweep. Running it before the
-   // delivery evaluation + withdraw flushing below means collateral freed
-   // by the closing window is visible to this same advance's
-   // `available()`-gated paths (flushwtdw, eligibility).
-   action(
-      permission_level{get_self(), "owner"_n},
-      UWRIT_ACCOUNT,
-      "chklocks"_n,
-      std::make_tuple(uwrit::MAX_LOCK_RELEASE_PER_EPOCH)
-   ).send();
-
-   // Bounded UWREQ lifecycle sweep (SEC-129 / WSA-223): erase terminal
-   // uwreqs whose retention window elapsed; expire + refund PENDING uwreqs
-   // whose race never resolved inside the pending timeout. Runs after
-   // chklocks so both uwrit maintenance sweeps stay adjacent, and before
-   // buildenv so any SWAP_REVERT the expiry path emits rides THIS epoch's
-   // outbound envelopes. Budget-bounded (never throws) — a backlog simply
-   // drains across subsequent epochs.
-   action(
-      permission_level{get_self(), "owner"_n},
-      UWRIT_ACCOUNT,
-      "pruneuwreqs"_n,
-      std::make_tuple(uwrit::MAX_UWREQ_PRUNE_PER_EPOCH)
-   ).send();
 
    // Before incrementing: evaluate per-op delivery state for the EXPIRING
    // epoch. The active group of the expiring epoch (`current_batch_op_group`
@@ -630,16 +556,8 @@ void epoch::advance() {
          ).send();
       }
 
-      // NOTE: we intentionally do NOT erase the per-batch-op envelope
-      // metadata rows here. `evalcons` already cleared their heavy
-      // `raw_data` (1-2 KB → 0 bytes) at consensus reach, so the residual
-      // weight is just the tuple `(id, chain_code, epoch_index,
-      // batch_op_name, checksum, ...)` — small and bounded by group
-      // membership × outposts × retained-epochs. A dedicated bounded-
-      // retention sweep belongs in a separate periodic ix; trying to
-      // erase here races with the permissionless `chkcons` →
-      // inline-`advance` pattern that fires from every batchop every
-      // cron tick and trips kv-index-remove on already-evicted buckets.
+      // The envelope rows read above are left in place: `sysio.msgch::deliver`
+      // erases them once they fall out of its retention window.
    }
 
    const bool had_expiring_group = state.current_epoch_index > 0;
@@ -978,19 +896,6 @@ void epoch::advance() {
       }
    }
 
-   // Drain the swap-from-WIRE queue: each row queued via
-   // `sysio.uwrit::swapfromwire` since the last advance is re-validated
-   // (target reserve ACTIVE + public, variance) and either becomes a
-   // PENDING uwreq for the single-leg underwriter race or is refunded.
-   // Runs before `buildenv` so this epoch's envelopes reflect any state
-   // the drain produced; never throws (refund-and-drop semantics).
-   action(
-      permission_level{get_self(), "owner"_n},
-      UWRIT_ACCOUNT,
-      "drainfwq"_n,
-      std::make_tuple()
-   ).send();
-
    // Build outbound envelopes for each outpost
    {
       sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
@@ -1052,12 +957,11 @@ void epoch::advance() {
       ).send();
    }
 
-   // Working tables on `sysio.msgch` (`envelopes` / `messages` /
-   // `attestations` / `outenvelopes`) are now drained inline by the
-   // `evalcons` consensus-reach + `buildenv` write paths. The durable
-   // audit trail lives in the `envelope_log` table on the same contract,
-   // capped at `active_outposts * 2 * cfg.epoch_retention_envelope_log_count`
-   // and pruned head-first on overflow. No scheduled cleanup needed.
+   // No scheduled cleanup of `sysio.msgch::envelopes` is needed here:
+   // `deliver` prunes rows older than the previous epoch. The durable audit
+   // trail lives in the `envelope_log` table on the same contract, capped at
+   // `active_outposts * 2 * cfg.epoch_retention_envelope_log_count`
+   // and pruned head-first on overflow.
 }
 
 // ---------------------------------------------------------------------------

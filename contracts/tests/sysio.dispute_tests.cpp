@@ -50,11 +50,6 @@ using mvo = fc::mutable_variant_object;
 
 namespace {
 
-/// SlugName mvo helper for v6 chain-registry action arguments.
-inline fc::mutable_variant_object codename_mvo(std::string_view s) {
-   return mvo()("value", fc::slug_name{s}.value);
-}
-
 /// Build an `authority` whose active permission is the account's own active key plus a list of
 /// `{actor, sysio.code}` co-signers — lets the listed contracts authorize inline actions as `account`.
 authority active_with_code_authors(name account, const std::vector<name>& code_authors) {
@@ -101,7 +96,6 @@ public:
    static constexpr auto EPOCH_ACCOUNT  = "sysio.epoch"_n;
    static constexpr auto MSGCH_ACCOUNT  = "sysio.msgch"_n;
    static constexpr auto OPREG_ACCOUNT  = "sysio.opreg"_n;
-   static constexpr auto UWRIT_ACCOUNT  = "sysio.uwrit"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
    static constexpr auto ROA_ACCOUNT    = "sysio.roa"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
@@ -116,7 +110,7 @@ public:
 
       create_accounts({
          CHALG_ACCOUNT, EPOCH_ACCOUNT, MSGCH_ACCOUNT, OPREG_ACCOUNT,
-         UWRIT_ACCOUNT, CHAINS_ACCOUNT, BATCHOP
+         CHAINS_ACCOUNT, BATCHOP, "sysio.token"_n
       });
       // Tier-1 voter accounts (node owners) and a Tier-2 account (ineligible voter). Created without
       // a roa policy so regnodeowner's reslimit creation does not collide.
@@ -129,7 +123,6 @@ public:
       deploy(EPOCH_ACCOUNT,  contracts::epoch_wasm(),  contracts::epoch_abi(),  epoch_abi);
       deploy(MSGCH_ACCOUNT,  contracts::msgch_wasm(),  contracts::msgch_abi(),  msgch_abi);
       deploy(OPREG_ACCOUNT,  contracts::opreg_wasm(),  contracts::opreg_abi(),  opreg_abi);
-      deploy(UWRIT_ACCOUNT,  contracts::uwrit_wasm(),  contracts::uwrit_abi(),  uwrit_abi);
       deploy(CHAINS_ACCOUNT, contracts::chains_wasm(), contracts::chains_abi(), chains_abi);
 
       // sysio.roa is a genesis system account already running this build's code; load its abi.
@@ -169,6 +162,9 @@ public:
       set_code(account, wasm);
       set_abi(account, abi.data());
       set_privileged(account);
+      // Each deployment gets its own block; fixture setup must not depend on
+      // the combined WASM sizes fitting the remaining block NET budget.
+      produce_blocks();
       load_abi(account, out_ser);
    }
 
@@ -213,7 +209,7 @@ public:
          ("is_bootstrapped", true)));
 
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
-         ("kind", ChainKind::CHAIN_KIND_EVM)("code", codename_mvo("ETH"))
+         ("kind", ChainKind::CHAIN_KIND_EVM)("code", "ETH")
          ("external_chain_id", 31337)("name", std::string("ethereum-test"))("description", std::string{})
          ("outpost", sysio_system::test_support::no_outpost_mvo())));
 
@@ -369,24 +365,29 @@ public:
    static fc::variant make_chain_min_bond(std::string_view chain_code,
                                           std::string_view token_code, uint64_t min_bond) {
       return fc::variant(mvo()
-         ("chain_code", codename_mvo(chain_code))("token_code", codename_mvo(token_code))
+         ("chain_code", chain_code)("token_code", token_code)
          ("min_bond", min_bond)("config_timestamp_ms", uint64_t{0}));
    }
 
-   action_result depositinle(name account, std::string_view chain_code,
-                             std::string_view token_code, uint64_t amount) {
-      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
-         ("account", account.to_string())("chain_code", codename_mvo(chain_code))
-         ("token_code", codename_mvo(token_code))("amount", amount)
-         ("actor_chain", ChainKind::CHAIN_KIND_EVM)("actor_address", std::vector<char>{})
-         ("original_message_id", std::string(64, '0')));
+   action_result fund_and_bond(name account, uint64_t amount) {
+      const auto token = "sysio.token"_n;
+      set_code(token, contracts::token_wasm());
+      set_abi(token, contracts::token_abi().data());
+      set_privileged(token);
+      base_tester::push_action(token, "create"_n, token,
+         mvo()("issuer", "sysio")("maximum_supply", "1000000000.000000000 WIRE"));
+      const auto quantity = asset(static_cast<int64_t>(amount), symbol(9, "WIRE"));
+      base_tester::push_action(token, "issue"_n, config::system_account_name,
+         mvo()("to", "sysio")("quantity", quantity)("memo", "bond funding"));
+      base_tester::push_action(token, "transfer"_n, config::system_account_name,
+         mvo()("from", "sysio")("to", account)("quantity", quantity)("memo", "bond funding"));
+      return push(OPREG_ACCOUNT, opreg_abi, account, "deposit"_n,
+         mvo()("account", account)("token_code", "WIRE")("amount", amount));
    }
 
-   action_result withdrawinle(name account, std::string_view chain_code,
-                              std::string_view token_code, uint64_t amount) {
-      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "withdrawinle"_n, mvo()
-         ("account", account.to_string())("chain_code", codename_mvo(chain_code))
-         ("token_code", codename_mvo(token_code))("amount", amount));
+   action_result withdraw(name account, uint64_t amount) {
+      return push(OPREG_ACCOUNT, opreg_abi, account, "withdraw"_n,
+         mvo()("account", account)("token_code", "WIRE")("amount", amount));
    }
 
    action_result flushwtdw(uint32_t up_to_epoch) {
@@ -405,7 +406,7 @@ public:
          ("batch_op_name", op.to_string())("chain_code", chain_code)("data", data));
    }
 
-   abi_serializer chalg_abi, epoch_abi, msgch_abi, opreg_abi, uwrit_abi, chains_abi, roa_abi, system_abi;
+   abi_serializer chalg_abi, epoch_abi, msgch_abi, opreg_abi, chains_abi, roa_abi, system_abi;
 };
 
 /// The same OPP stack WITHOUT the emissions configuration: for tests that register node owners
@@ -903,7 +904,7 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_after_last_open_dispute, sysio_
    // A second EVM outpost (distinct external_chain_id) so a second (outpost, epoch) dispute can
    // exist concurrently with the ETH one.
    BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
-      ("kind", ChainKind::CHAIN_KIND_EVM)("code", codename_mvo("BASE"))
+      ("kind", ChainKind::CHAIN_KIND_EVM)("code", "BASE")
       ("external_chain_id", 8453)("name", std::string("base-test"))("description", std::string{})
       ("outpost", sysio_system::test_support::no_outpost_mvo())));
    const uint64_t base_code = fc::slug_name{"BASE"}.value;
@@ -1066,14 +1067,14 @@ BOOST_FIXTURE_TEST_CASE(deliver_rejects_decollateralized_unknown_group_member, s
       ("terminate_prune_delay_ms", 600000)("terminate_max_consecutive_misses", 5)
       ("terminate_max_pct_misses_24h", 5)("terminate_window_ms", uint64_t{24ULL * 60 * 60 * 1000})
       ("req_prod_collat", fc::variants{})
-      ("req_batchop_collat", fc::variants{make_chain_min_bond("ETH", "ETH", MIN_BOND)})
+      ("req_batchop_collat", fc::variants{make_chain_min_bond("WIRE", "WIRE", MIN_BOND)})
       ("req_uw_collat", fc::variants{})));
 
    // Register + fully collateralize batchop.b -> ACTIVE.
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
       ("account", BATCHOP_B.to_string())("type", OperatorType::OPERATOR_TYPE_BATCH)
       ("is_bootstrapped", false)));
-   BOOST_REQUIRE_EQUAL(success(), depositinle(BATCHOP_B, "ETH", "ETH", MIN_BOND));
+   BOOST_REQUIRE_EQUAL(success(), fund_and_bond(BATCHOP_B, MIN_BOND));
    BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", operator_status(BATCHOP_B));
 
    // Schedule it into the single-slot group (non-bootstrapped sorts ahead of the
@@ -1084,7 +1085,7 @@ BOOST_FIXTURE_TEST_CASE(deliver_rejects_decollateralized_unknown_group_member, s
 
    // Withdraw the full bond and flush past maturity -> reevaluate drops it to UNKNOWN.
    // The epoch group snapshot is untouched (no reschedule), so it stays resident.
-   BOOST_REQUIRE_EQUAL(success(), withdrawinle(BATCHOP_B, "ETH", "ETH", MIN_BOND));
+   BOOST_REQUIRE_EQUAL(success(), withdraw(BATCHOP_B, MIN_BOND));
    BOOST_REQUIRE_EQUAL(success(), flushwtdw(1'000'000u));
    BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_UNKNOWN", operator_status(BATCHOP_B));
    BOOST_REQUIRE(group_contains(current_group(), BATCHOP_B));

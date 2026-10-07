@@ -16,9 +16,14 @@
  *      `subtract_balance` abort slip through into settlement.
  *
  * The helpers below were previously copied into individual contracts
- * (`sysio.dclaim`'s `is_valid_name_string`, `sysio.reserv`'s `add_capped_u64`).
- * They live here so every OPP contract validates names and saturates the same
- * way — one place to change, one place to audit.
+ * (`sysio.reserv`'s `add_capped_u64`). They live here so every OPP contract
+ * saturates the same way — one place to change, one place to audit.
+ *
+ * Name VALIDATION is deliberately not here: it belongs to `sysio::name` itself
+ * (`name::is_valid_literal`, the predicate its own constructor uses). A copy in
+ * this header went stale the moment the type gained a rule it did not know
+ * about, and this header is included host-side, where the CDT name header is
+ * not available — so the copy could not be made to delegate. See name_ops.hpp.
  */
 
 #include <cstdint>
@@ -65,34 +70,6 @@ inline std::optional<uint64_t> to_depot_amount(int64_t amount) {
    if (amount <= 0)               return std::nullopt;
    if (amount > depot_amount_max) return std::nullopt;
    return static_cast<uint64_t>(amount);
-}
-
-/// Non-throwing validation of a string destined for `name(std::string_view)`.
-///
-/// CDT's `name` constructor `check(false, ...)`-aborts on a string longer than
-/// 13 characters, one containing a character outside ".12345abcdefghijklmnopqrstuvwxyz",
-/// or one whose 13th character exceeds the 4-bit final symbol (value > 15). A
-/// cross-chain-supplied account string must therefore be validated here and
-/// soft-skipped, never fed blindly into `name()` from inside the dispatch
-/// chain. Mirrors CDT `basic_name`'s `char_to_value` + length rules exactly so
-/// the *full* CDT name domain is accepted — in particular a legitimate 13-byte
-/// name (final symbol in `.`/`1`-`5`/`a`-`j`) passes, where a naive
-/// `size() > 12` length cap would wrongly reject it.
-///
-/// @param s the candidate account string (no leading/trailing trimming).
-/// @return true iff `name(s)` would construct without aborting.
-inline bool is_valid_name_string(std::string_view s) {
-   if (s.size() > 13) return false;
-   for (std::size_t i = 0; i < s.size(); ++i) {
-      const char c = s[i];
-      uint8_t v;
-      if      (c == '.')               v = 0;
-      else if (c >= '1' && c <= '5')   v = static_cast<uint8_t>(c - '1' + 1);
-      else if (c >= 'a' && c <= 'z')   v = static_cast<uint8_t>(c - 'a' + 6);
-      else return false;                       // character outside the name alphabet
-      if (i == 12 && v > 15) return false;     // 13th character encodes only 4 bits
-   }
-   return true;
 }
 
 /// Saturating unsigned 64-bit addition. Returns `a + b`, clamped to

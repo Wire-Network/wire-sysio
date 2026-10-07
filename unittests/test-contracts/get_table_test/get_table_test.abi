@@ -24,6 +24,42 @@
             ]
         },
         {
+            "name": "addslug",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "payload",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "addsslug",
+            "base": "",
+            "fields": [
+                {
+                    "name": "scope",
+                    "type": "uint64"
+                },
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "payload",
+                    "type": "uint64"
+                },
+                {
+                    "name": "alt",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
             "name": "addstruct",
             "base": "",
             "fields": [
@@ -38,12 +74,36 @@
             ]
         },
         {
+            "name": "composite_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "erasenumobj",
             "base": "",
             "fields": [
                 {
                     "name": "id",
                     "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "globalobj",
+            "base": "",
+            "fields": [
+                {
+                    "name": "counter",
+                    "type": "uint64"
+                },
+                {
+                    "name": "label",
+                    "type": "string"
                 }
             ]
         },
@@ -106,17 +166,21 @@
             ]
         },
         {
-            "name": "slug_name",
+            "name": "setglobal",
             "base": "",
             "fields": [
                 {
-                    "name": "value",
+                    "name": "counter",
                     "type": "uint64"
+                },
+                {
+                    "name": "label",
+                    "type": "string"
                 }
             ]
         },
         {
-            "name": "structobj",
+            "name": "slugobj",
             "base": "",
             "fields": [
                 {
@@ -130,12 +194,64 @@
             ]
         },
         {
-            "name": "structobj_key",
+            "name": "slugobj_key",
             "base": "",
             "fields": [
                 {
                     "name": "code",
                     "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "sslugobj",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "payload",
+                    "type": "uint64"
+                },
+                {
+                    "name": "alt",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "sslugobj_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "structobj",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "composite_key"
+                },
+                {
+                    "name": "payload",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "structobj_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "code",
+                    "type": "composite_key"
                 }
             ]
         }
@@ -152,6 +268,16 @@
             "ricardian_contract": ""
         },
         {
+            "name": "addslug",
+            "type": "addslug",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "addsslug",
+            "type": "addsslug",
+            "ricardian_contract": ""
+        },
+        {
             "name": "addstruct",
             "type": "addstruct",
             "ricardian_contract": ""
@@ -165,16 +291,21 @@
             "name": "modifynumobj",
             "type": "modifynumobj",
             "ricardian_contract": ""
+        },
+        {
+            "name": "setglobal",
+            "type": "setglobal",
+            "ricardian_contract": ""
         }
     ],
     "tables": [
         {
-            "name": "hashobj",
-            "type": "hashobj",
+            "name": "globalobj",
+            "type": "globalobj",
             "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 37781
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 6537
         },
         {
             "name": "hashobjs",
@@ -195,14 +326,6 @@
                     "table_id": 6575
                 }
             ]
-        },
-        {
-            "name": "numobj",
-            "type": "numobj",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 30247
         },
         {
             "name": "numobjs",
@@ -235,11 +358,39 @@
             ]
         },
         {
+            "name": "slugobjs",
+            "type": "slugobj",
+            "index_type": "i64",
+            "key_names": ["code"],
+            "key_types": ["slug_name"],
+            "table_id": 41308
+        },
+        {
+            "name": "sslugobjs",
+            "type": "sslugobj",
+            "index_type": "i64",
+            "key_names": ["scope","code"],
+            "key_types": ["name","slug_name"],
+            "table_id": 32371,
+            "secondary_indexes": [
+                {
+                    "name": "bypayload",
+                    "key_type": "uint64",
+                    "table_id": 64287
+                },
+                {
+                    "name": "byalt",
+                    "key_type": "slug_name",
+                    "table_id": 52539
+                }
+            ]
+        },
+        {
             "name": "structobjs",
             "type": "structobj",
             "index_type": "i64",
             "key_names": ["code"],
-            "key_types": ["slug_name"],
+            "key_types": ["composite_key"],
             "table_id": 12649
         }
     ],

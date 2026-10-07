@@ -1,0 +1,307 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "composite_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "beneficiary",
+                    "type": "name"
+                },
+                {
+                    "name": "sequence",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "erase",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "nested_value",
+            "base": "",
+            "fields": [
+                {
+                    "name": "score",
+                    "type": "int64"
+                },
+                {
+                    "name": "numbers",
+                    "type": "uint64[]"
+                }
+            ]
+        },
+        {
+            "name": "position",
+            "base": "",
+            "fields": [
+                {
+                    "name": "beneficiary",
+                    "type": "name"
+                },
+                {
+                    "name": "amount",
+                    "type": "int64"
+                },
+                {
+                    "name": "nullable",
+                    "type": "int64?"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                },
+                {
+                    "name": "created",
+                    "type": "time_point"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                },
+                {
+                    "name": "nested",
+                    "type": "nested_value"
+                },
+                {
+                    "name": "enabled",
+                    "type": "bool"
+                },
+                {
+                    "name": "status",
+                    "type": "position_status"
+                }
+            ]
+        },
+        {
+            "name": "position_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "put",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "row",
+                    "type": "position"
+                }
+            ]
+        },
+        {
+            "name": "putcomp",
+            "base": "",
+            "fields": [
+                {
+                    "name": "beneficiary",
+                    "type": "name"
+                },
+                {
+                    "name": "sequence",
+                    "type": "uint64"
+                },
+                {
+                    "name": "row",
+                    "type": "position"
+                }
+            ]
+        },
+        {
+            "name": "putfasp",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "row",
+                    "type": "position"
+                }
+            ]
+        },
+        {
+            "name": "putwide",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "seed",
+            "base": "",
+            "fields": [
+                {
+                    "name": "first",
+                    "type": "uint64"
+                },
+                {
+                    "name": "count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "beneficiary",
+                    "type": "name"
+                },
+                {
+                    "name": "amount",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "wide_value",
+            "base": "",
+            "fields": [
+                {
+                    "name": "signed_value",
+                    "type": "int128"
+                },
+                {
+                    "name": "unsigned_value",
+                    "type": "uint128"
+                },
+                {
+                    "name": "float_value",
+                    "type": "float32"
+                },
+                {
+                    "name": "double_value",
+                    "type": "float64"
+                },
+                {
+                    "name": "quad_value",
+                    "type": "float128"
+                },
+                {
+                    "name": "digest",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "choice",
+                    "type": "variant_uint64_string"
+                },
+                {
+                    "name": "extension",
+                    "type": "uint64$"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "erase",
+            "type": "erase",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "put",
+            "type": "put",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "putcomp",
+            "type": "putcomp",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "putfasp",
+            "type": "putfasp",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "putwide",
+            "type": "putwide",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "seed",
+            "type": "seed",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "composite",
+            "type": "position",
+            "index_type": "i64",
+            "key_names": ["beneficiary","sequence"],
+            "key_types": ["name","uint64"],
+            "table_id": 22163
+        },
+        {
+            "name": "fasp",
+            "type": "position",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 65535
+        },
+        {
+            "name": "positions",
+            "type": "position",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 39131
+        },
+        {
+            "name": "wide",
+            "type": "wide_value",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 6202
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [
+        {
+            "name": "variant_uint64_string",
+            "types": ["uint64","string"]
+        }
+    ],
+    "action_results": [],
+    "enums": [
+        {
+            "name": "position_status",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "POSITION_STATUS_OPEN",
+                    "value": 0
+                },
+                {
+                    "name": "POSITION_STATUS_CLOSED",
+                    "value": 1
+                },
+                {
+                    "name": "POSITION_STATUS_ARCHIVED",
+                    "value": 5
+                }
+            ]
+        }
+    ]
+}

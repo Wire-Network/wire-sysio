@@ -15,7 +15,8 @@ namespace fc {
    static logger the_default_logger;
 
    logger::impl::impl() :_parent(nullptr) {
-      auto sink = std::make_shared<spdlog::sinks::stderr_color_sink_st>();
+      // unconfigured loggers share this sink across threads, so it must lock
+      auto sink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
       sink->set_color(spdlog::level::debug, sink->green);
       sink->set_color(spdlog::level::info, sink->reset);
       sink->set_color(spdlog::level::warn, sink->yellow);

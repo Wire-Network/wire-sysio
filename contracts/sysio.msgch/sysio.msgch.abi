@@ -478,11 +478,6 @@
                     "name": "byoutepoch",
                     "key_type": "uint128",
                     "table_id": 57096
-                },
-                {
-                    "name": "bybatchop",
-                    "key_type": "uint64",
-                    "table_id": 5961
                 }
             ]
         },

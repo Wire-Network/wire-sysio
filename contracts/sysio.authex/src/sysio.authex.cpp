@@ -10,7 +10,7 @@ using namespace sysio;
 // sysio funds the RAM for every link row (system-paid) -- createlink and recordlink alike.
 constexpr name link_row_payer = "sysio"_n;
 constexpr name dclaim_account = "sysio.dclaim"_n;
-constexpr name liq_account = "sysio.liq"_n;
+constexpr name synd_account = "sysio.synd"_n;
 constexpr name linkswept_action = "linkswept"_n;
 constexpr auto dclaim_not_ready_message =
    "sysio.dclaim must be deployed and privileged before creating a link";
@@ -67,24 +67,24 @@ void try_send_linked_rewards_sweep(const name self, const name account,
    if (dclaim_ready()) send_linked_rewards_sweep(self, account, chain_kind, native_address);
 }
 
-/** Return whether the shadow-liq ledger can receive a system-paid link sweep. */
-[[nodiscard]] bool liq_ready() {
-   return is_account(liq_account) && is_privileged(liq_account);
+/** Return whether the syndication contract can receive a system-paid link sweep. */
+[[nodiscard]] bool synd_ready() {
+   return is_account(synd_account) && is_privileged(synd_account);
 }
 
 /**
  * Best-effort sweep of the shadow liq parked against a user-created link's key.
  *
- * sysio.liq parks by the key bytes an outpost reports (the 33-byte EM key or the 32-byte ED
+ * sysio.synd parks by the key bytes an outpost reports (the 33-byte EM key or the 32-byte ED
  * key), so it receives the verified key, not the derived address the DClaim sweep takes. The
- * sweep is optional by design: nothing is parked before sysio.liq exists, and a link created
- * while it was absent is served by the permissionless `sysio.liq::sweep`.
+ * sweep is optional by design: nothing is parked before sysio.synd exists, and a link created
+ * while it was absent is served by the permissionless `sysio.synd::sweep`.
  */
 void try_send_parked_liq_sweep(const name self, const name account,
                                const opp::types::ChainKind chain_kind,
                                const std::vector<char>& pubkey) {
-   if (!liq_ready()) return;
-   action(permission_level{self, "active"_n}, liq_account, linkswept_action,
+   if (!synd_ready()) return;
+   action(permission_level{self, "active"_n}, synd_account, linkswept_action,
           std::make_tuple(account, chain_kind, pubkey)).send();
 }
 
@@ -102,8 +102,9 @@ namespace sysio {
    require_auth(account);
 
    // ——— Chain kind validation ———
-   // TODO @jglanz: SUI removed in v6; restore when SUI outpost is added.
-   check(chain_kind == ChainKind::CHAIN_KIND_EVM || chain_kind == ChainKind::CHAIN_KIND_SVM,
+   // TODO @jglanz: SUI removed in the data-model refactor; restore when SUI outpost is added.
+   check(chain_kind == ChainKind::CHAIN_KIND_EVM
+         || chain_kind == ChainKind::CHAIN_KIND_SVM,
          "Invalid chain_kind. Supported: CHAIN_KIND_EVM(2), CHAIN_KIND_SVM(3).");
    check(is_supported_chain_key_pair(chain_kind, pub_key), "chain_kind and pub_key must pair as EVM/EM or SVM/ED");
 

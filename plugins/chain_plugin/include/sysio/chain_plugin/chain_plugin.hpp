@@ -9,6 +9,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <sysio.system/snapshot_attest_constants.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/account_object.hpp>
 #include <sysio/chain/application.hpp>
@@ -28,7 +29,6 @@
 #include <sysio/chain_plugin/tracked_votes.hpp>
 #include <sysio/chain_plugin/trx_finality_status_processing.hpp>
 #include <sysio/chain_plugin/trx_retry_db.hpp>
-#include <sysio/protocol/snapshot_attestation.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <vector>
 
@@ -149,13 +149,13 @@ namespace sysio {
    /** Return the canonical physical KV table identifier for final snapshot attestations. */
    inline uint16_t snapshot_attestation_table_id() {
       return chain::compute_table_id(
-         chain::name{protocol::snapshot_attestation::table_snaprecords}.to_uint64_t());
+         chain::name{sysiosystem::snapshot_attestation::table_snaprecords}.to_uint64_t());
    }
 
    /** Return the canonical physical KV table identifier for snapshot attestation configuration. */
    inline uint16_t snapshot_attestation_config_table_id() {
       return chain::compute_table_id(
-         chain::name{protocol::snapshot_attestation::table_snapconfig}.to_uint64_t());
+         chain::name{sysiosystem::snapshot_attestation::table_snapconfig}.to_uint64_t());
    }
 
    /** Compare both immutable tuple components loaded from a snapshot with an attested record. */
@@ -530,7 +530,7 @@ public:
       string               scope;                     ///< empty = unscoped query, non-empty = scope prefix (parsed via ABI key type)
       string               find;                      ///< exact key lookup (JSON obj or hex); errors if combined with lower/upper
       string               index_name;                ///< secondary index name (e.g. "byowner") or numeric position (e.g. "2")
-      string               lower_bound;               ///< inclusive lower key (JSON obj when json=true, hex when json=false)
+      string               lower_bound;               ///< inclusive lower key; forward pagination feeds `next_key` here. json=true: a JSON key object, untagged hex (both within-scope), or a `0x` raw cursor (complete key, verbatim). json=false: hex of the complete key
       string               upper_bound;               ///< exclusive upper key
       uint32_t             limit = 50;                ///< max rows to return in a single page; the caller paginates by re-issuing with `lower_bound`/`upper_bound = next_key`. Capped per page by the deadline.
       std::optional<bool>  reverse;                   ///< iterate in reverse; pairs with `limit` to return the most recent N rows
@@ -553,7 +553,7 @@ public:
    struct get_table_rows_result {
       fc::variants         rows;                      ///< array of {key: {...}, value: {...}, payer?: "..."} objects (or bare values when `values_only` is set)
       bool                 more = false;
-      string               next_key;                  ///< scope-stripped key for pagination
+      string               next_key;                  ///< pagination cursor -- feed to `lower_bound` forward, `upper_bound` in reverse. A scope-stripped key object, or a `0x` raw cursor (complete key) when the ABI cannot name the key
    };
 
    using get_table_rows_return_t = std::function<chain::t_or_exception<get_table_rows_result>()>;

@@ -3,9 +3,9 @@
 `chain_plugin` owns the blockchain itself. It constructs and configures the `controller` — block log, chain
 state database, fork database, WASM runtime, protocol features, whitelists and blacklists — brings it up from
 genesis, a snapshot, or existing state, and relays the controller's signals onto the appbase channels
-declared in `chain_interface`. Those channels have few subscribers: `batch_operator_plugin` and
-`underwriter_plugin` take `irreversible_block` as their sync gate, and nothing else subscribes to any of
-them — `net_plugin` connects to the controller's signals directly instead. `nodeop` initializes it on every
+declared in `chain_interface`. Those channels have few subscribers: `batch_operator_plugin` takes
+`irreversible_block` as its sync gate and `status_monitor_plugin` ships one snapshot per irreversible block;
+nothing else subscribes to any of them — `net_plugin` connects to the controller's signals directly instead. `nodeop` initializes it on every
 run alongside `resource_monitor_plugin`, `net_plugin`, and `producer_plugin`, so there is no `plugin =` line
 to add; it pulls in `signature_provider_manager_plugin` through `APPBASE_PLUGIN_REQUIRES`, which in turn
 pulls in `http_client_plugin`. It registers no HTTP endpoints of its own — `chain_api_plugin` publishes the
