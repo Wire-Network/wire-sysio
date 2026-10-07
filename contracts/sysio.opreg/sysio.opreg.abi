@@ -267,40 +267,6 @@
             ]
         },
         {
-            "name": "depositinle",
-            "base": "",
-            "fields": [
-                {
-                    "name": "account",
-                    "type": "name"
-                },
-                {
-                    "name": "chain_code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "token_code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "amount",
-                    "type": "uint64"
-                },
-                {
-                    "name": "actor_chain",
-                    "type": "ChainKind"
-                },
-                {
-                    "name": "actor_address",
-                    "type": "bytes"
-                },
-                {
-                    "name": "original_message_id",
-                    "type": "checksum256"
-                }
-            ]
-        },
-        {
             "name": "flushwtdw",
             "base": "",
             "fields": [
@@ -540,28 +506,6 @@
             ]
         },
         {
-            "name": "releaselock",
-            "base": "",
-            "fields": [
-                {
-                    "name": "account",
-                    "type": "name"
-                },
-                {
-                    "name": "chain_code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "token_code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "amount",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "remit_claim",
             "base": "",
             "fields": [
@@ -774,28 +718,6 @@
             ]
         },
         {
-            "name": "withdrawinle",
-            "base": "",
-            "fields": [
-                {
-                    "name": "account",
-                    "type": "name"
-                },
-                {
-                    "name": "chain_code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "token_code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "amount",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "yield_pool",
             "base": "",
             "fields": [
@@ -855,11 +777,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "depositinle",
-            "type": "depositinle",
-            "ricardian_contract": ""
-        },
-        {
             "name": "flushwtdw",
             "type": "flushwtdw",
             "ricardian_contract": ""
@@ -895,11 +812,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "releaselock",
-            "type": "releaselock",
-            "ricardian_contract": ""
-        },
-        {
             "name": "setconfig",
             "type": "setconfig",
             "ricardian_contract": ""
@@ -927,11 +839,6 @@
         {
             "name": "withdraw",
             "type": "withdraw",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "withdrawinle",
-            "type": "withdrawinle",
             "ricardian_contract": ""
         }
     ],

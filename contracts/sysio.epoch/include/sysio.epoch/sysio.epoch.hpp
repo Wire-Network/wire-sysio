@@ -125,8 +125,6 @@ namespace sysio {
       static constexpr name OPREG_ACCOUNT  = "sysio.opreg"_n;
       static constexpr name AUTHEX_ACCOUNT = "sysio.authex"_n;
       static constexpr name CHAINS_ACCOUNT = "sysio.chains"_n;
-      static constexpr name UWRIT_ACCOUNT  = "sysio.uwrit"_n;
-      static constexpr name RESERV_ACCOUNT = "sysio.reserv"_n;
 
       /// True while the depot is in its epoch-0 bootstrap window: no epoch state yet, or the
       /// current epoch index is still 0. Never throws. The one window test `sysio.liq`'s

@@ -33,7 +33,6 @@ public:
    static constexpr auto MSGCH_ACCOUNT  = "sysio.msgch"_n;
    static constexpr auto CHALG_ACCOUNT  = "sysio.chalg"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
-   static constexpr auto UWRIT_ACCOUNT  = "sysio.uwrit"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
    static constexpr auto UWRIT_OP       = "uwrit.alice"_n;
    static constexpr auto UWRIT_OP_B     = "uwrit.bob"_n;
@@ -63,7 +62,7 @@ public:
       // throws `account_name_exists_exception`.
       create_accounts({
          TOKEN_ACCOUNT, EPOCH_ACCOUNT, OPREG_ACCOUNT, MSGCH_ACCOUNT,
-         CHALG_ACCOUNT, CHAINS_ACCOUNT, UWRIT_ACCOUNT, BATCHOP, UWRIT_OP,
+         CHALG_ACCOUNT, CHAINS_ACCOUNT, BATCHOP, UWRIT_OP,
          UWRIT_OP_B, UWRIT_OP_C,
          "sysio.dclaim"_n, "sysio.gov"_n, "sysio.ops"_n
       });
@@ -79,7 +78,6 @@ public:
       deploy(OPREG_ACCOUNT,  contracts::opreg_wasm(),  contracts::opreg_abi(),  opreg_abi);
       deploy(MSGCH_ACCOUNT,  contracts::msgch_wasm(),  contracts::msgch_abi(),  msgch_abi);
       deploy(CHAINS_ACCOUNT, contracts::chains_wasm(), contracts::chains_abi(), chains_abi);
-      deploy(UWRIT_ACCOUNT,  contracts::uwrit_wasm(),  contracts::uwrit_abi(),  uwrit_abi);
       deploy(TOKEN_ACCOUNT,  contracts::token_wasm(),  contracts::token_abi(),  token_abi);
       produce_blocks(1);
 
@@ -288,29 +286,6 @@ public:
          ("is_bootstrapped",  false));
    }
 
-   /// Direct opreg::depositinle, signed as opreg itself.
-   /// Signature: codenames for chain and token, plus the actor identity.
-   action_result depositinle(name account, std::string_view chain_code,
-                             std::string_view token_code, uint64_t amount) {
-      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
-         ("account",              account.to_string())
-         ("chain_code",           chain_code)
-         ("token_code",           token_code)
-         ("amount",               amount)
-         ("actor_chain",          ChainKind::CHAIN_KIND_EVM)
-         ("actor_address",        std::vector<char>{})
-         ("original_message_id",  std::string(64, '0')));
-   }
-
-   action_result withdrawinle(name account, std::string_view chain_code,
-                              std::string_view token_code, uint64_t amount) {
-      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "withdrawinle"_n, mvo()
-         ("account",     account.to_string())
-         ("chain_code",  chain_code)
-         ("token_code",  token_code)
-         ("amount",      amount));
-   }
-
    action_result slash(name account, std::string reason) {
       return push(OPREG_ACCOUNT, opreg_abi, CHALG_ACCOUNT, "slash"_n, mvo()
          ("account", account.to_string())
@@ -363,23 +338,30 @@ public:
       return n;
    }
 
-   std::vector<std::vector<char>>
-   collect_attestation_data(sysio::opp::types::AttestationType expected,
-                            uint64_t scan_until = 32) {
-      std::vector<std::vector<char>> out;
-      for (uint64_t id = 0; id < scan_until; ++id) {
-         auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT,
-                                   "attestations"_n, id);
-         if (data.empty()) continue;
-         auto row = msgch_abi.binary_to_variant("attestation_entry", data,
-            abi_serializer::create_yield_function(abi_serializer_max_time));
-         if (row["type"].as<sysio::opp::types::AttestationType>() != expected) continue;
-         out.push_back(row["data"].as<std::vector<char>>());
-      }
-      return out;
+   action_result fund_and_bond(name account, std::string_view chain, std::string_view token, uint64_t amount) {
+      BOOST_REQUIRE_EQUAL("WIRE", chain);
+      const auto quantity = asset(static_cast<int64_t>(amount), symbol(9, "WIRE"));
+      BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, SYSIO_ACCOUNT, "transfer"_n,
+         mvo()("from", SYSIO_ACCOUNT)("to", account)("quantity", quantity)("memo", "bond funding")));
+      return push(OPREG_ACCOUNT, opreg_abi, account, "deposit"_n,
+         mvo()("account", account)("token_code", token)("amount", amount));
    }
 
-   abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chains_abi, uwrit_abi;
+   action_result withdraw(name account, std::string_view chain, std::string_view token, uint64_t amount) {
+      BOOST_REQUIRE_EQUAL("WIRE", chain);
+      return push(OPREG_ACCOUNT, opreg_abi, account, "withdraw"_n,
+         mvo()("account", account)("token_code", token)("amount", amount));
+   }
+
+   void claim_exact(name account, uint64_t amount) {
+      const auto before = get_currency_balance(TOKEN_ACCOUNT, symbol(9, "WIRE"), account).get_amount();
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, account, "claimremit"_n,
+         mvo()("account", account)("token_code", "WIRE")));
+      BOOST_CHECK_EQUAL(before + amount,
+         get_currency_balance(TOKEN_ACCOUNT, symbol(9, "WIRE"), account).get_amount());
+   }
+
+   abi_serializer sysio_abi, token_abi, epoch_abi, opreg_abi, msgch_abi, chains_abi;
 };
 
 // ---- Tests ----
@@ -394,29 +376,30 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_requires_epoch_auth, sysio_epoch_flushwtdw_tes
    BOOST_REQUIRE(r.find("missing authority of sysio.epoch") != std::string::npos);
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(advance_drains_matured_eth_withdraw, sysio_epoch_flushwtdw_tester) { try {
+BOOST_FIXTURE_TEST_CASE(advance_releases_matured_native_withdraw, sysio_epoch_flushwtdw_tester) { try {
    bootstrap_for_flushwtdw();
 
    constexpr uint64_t INITIAL_DEPOSIT = 5'000'000;
    constexpr uint64_t WITHDRAW_AMOUNT = 2'000'000;
 
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle(UWRIT_OP, "ETH", "ETH", INITIAL_DEPOSIT));
+      fund_and_bond(UWRIT_OP, "WIRE", "WIRE", INITIAL_DEPOSIT));
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle(UWRIT_OP, "ETH", "ETH", WITHDRAW_AMOUNT));
+      withdraw(UWRIT_OP, "WIRE", "WIRE", WITHDRAW_AMOUNT));
 
    BOOST_REQUIRE(!get_wtdw(1).is_null());
-   BOOST_REQUIRE_EQUAL(INITIAL_DEPOSIT, balance_of(UWRIT_OP, "ETH", "ETH"));
+   BOOST_REQUIRE_EQUAL(INITIAL_DEPOSIT, balance_of(UWRIT_OP, "WIRE", "WIRE"));
 
    advance_one_epoch();
    advance_one_epoch();
 
    BOOST_REQUIRE(get_wtdw(1).is_null());
    BOOST_REQUIRE_EQUAL(INITIAL_DEPOSIT - WITHDRAW_AMOUNT,
-                       balance_of(UWRIT_OP, "ETH", "ETH"));
+                       balance_of(UWRIT_OP, "WIRE", "WIRE"));
+   claim_exact(UWRIT_OP, WITHDRAW_AMOUNT);
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(flushwtdw_direct_emits_withdraw_remit_attestation,
+BOOST_FIXTURE_TEST_CASE(flushwtdw_credits_native_claim_without_outbound_attestation,
                         sysio_epoch_flushwtdw_tester) { try {
    bootstrap_for_flushwtdw();
 
@@ -424,9 +407,9 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_direct_emits_withdraw_remit_attestation,
    constexpr uint64_t WITHDRAW_AMOUNT =   400'000;
 
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle(UWRIT_OP, "ETH", "ETH", INITIAL_DEPOSIT));
+      fund_and_bond(UWRIT_OP, "WIRE", "WIRE", INITIAL_DEPOSIT));
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle(UWRIT_OP, "ETH", "ETH", WITHDRAW_AMOUNT));
+      withdraw(UWRIT_OP, "WIRE", "WIRE", WITHDRAW_AMOUNT));
 
    constexpr uint32_t FUTURE_EPOCH = 100;
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, EPOCH_ACCOUNT,
@@ -434,10 +417,11 @@ BOOST_FIXTURE_TEST_CASE(flushwtdw_direct_emits_withdraw_remit_attestation,
 
    BOOST_REQUIRE(get_wtdw(1).is_null());
    BOOST_REQUIRE_EQUAL(INITIAL_DEPOSIT - WITHDRAW_AMOUNT,
-                       balance_of(UWRIT_OP, "ETH", "ETH"));
+                       balance_of(UWRIT_OP, "WIRE", "WIRE"));
 
-   BOOST_REQUIRE_GE(count_attestations(
-      sysio::opp::types::AttestationType::ATTESTATION_TYPE_OPERATOR_ACTION), 1u);
+   BOOST_REQUIRE_EQUAL(count_attestations(
+      sysio::opp::types::AttestationType::ATTESTATION_TYPE_OPERATOR_ACTION), 0u);
+   claim_exact(UWRIT_OP, WITHDRAW_AMOUNT);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(single_advance_leaves_immature_row_intact,
@@ -448,14 +432,14 @@ BOOST_FIXTURE_TEST_CASE(single_advance_leaves_immature_row_intact,
    constexpr uint64_t WITHDRAW_AMOUNT =   400'000;
 
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle(UWRIT_OP, "ETH", "ETH", INITIAL_DEPOSIT));
+      fund_and_bond(UWRIT_OP, "WIRE", "WIRE", INITIAL_DEPOSIT));
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle(UWRIT_OP, "ETH", "ETH", WITHDRAW_AMOUNT));
+      withdraw(UWRIT_OP, "WIRE", "WIRE", WITHDRAW_AMOUNT));
 
    advance_one_epoch();   // only one boundary — eligible_at_epoch is +2
 
    BOOST_REQUIRE(!get_wtdw(1).is_null());
-   BOOST_REQUIRE_EQUAL(INITIAL_DEPOSIT, balance_of(UWRIT_OP, "ETH", "ETH"));
+   BOOST_REQUIRE_EQUAL(INITIAL_DEPOSIT, balance_of(UWRIT_OP, "WIRE", "WIRE"));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(slashed_operator_withdraw_drops_silently,
@@ -466,107 +450,19 @@ BOOST_FIXTURE_TEST_CASE(slashed_operator_withdraw_drops_silently,
    constexpr uint64_t WITHDRAW_AMOUNT =   400'000;
 
    BOOST_REQUIRE_EQUAL(success(),
-      depositinle(UWRIT_OP, "ETH", "ETH", INITIAL_DEPOSIT));
+      fund_and_bond(UWRIT_OP, "WIRE", "WIRE", INITIAL_DEPOSIT));
    BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle(UWRIT_OP, "ETH", "ETH", WITHDRAW_AMOUNT));
+      withdraw(UWRIT_OP, "WIRE", "WIRE", WITHDRAW_AMOUNT));
 
    BOOST_REQUIRE_EQUAL(success(), slash(UWRIT_OP, "test slash"));
-   uint64_t balance_after_slash = balance_of(UWRIT_OP, "ETH", "ETH");
+   uint64_t balance_after_slash = balance_of(UWRIT_OP, "WIRE", "WIRE");
 
    advance_one_epoch();
    advance_one_epoch();
 
    BOOST_REQUIRE(get_wtdw(1).is_null());
    BOOST_REQUIRE_EQUAL(balance_after_slash,
-                       balance_of(UWRIT_OP, "ETH", "ETH"));
-} FC_LOG_AND_RETHROW() }
-
-/// The "clean protobuf" regression tests below verify that the bytes
-/// emitted by `sysio.opreg::emit_*` parse as a standard protobuf
-/// `OperatorAction` message. They were originally written against the v5
-/// OperatorAction proto (with a `chain` ChainKind field and a
-/// `TokenAmount.kind` TokenKind field). The proto carries
-/// `chain_code` (uint64) and `amount.token_code` (uint64) instead — same
-/// shape, different field semantics — so the parse + field-1-tag-byte
-/// invariant still holds.
-BOOST_FIXTURE_TEST_CASE(flushwtdw_attestation_data_is_clean_protobuf,
-                        sysio_epoch_flushwtdw_tester) { try {
-   bootstrap_for_flushwtdw();
-
-   constexpr uint64_t INITIAL_DEPOSIT = 1'000'000;
-   constexpr uint64_t WITHDRAW_AMOUNT =   400'000;
-
-   BOOST_REQUIRE_EQUAL(success(),
-      depositinle(UWRIT_OP, "ETH", "ETH", INITIAL_DEPOSIT));
-   BOOST_REQUIRE_EQUAL(success(),
-      withdrawinle(UWRIT_OP, "ETH", "ETH", WITHDRAW_AMOUNT));
-
-   constexpr uint32_t FUTURE_EPOCH = 100;
-   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, EPOCH_ACCOUNT,
-      "flushwtdw"_n, mvo()("current_epoch", FUTURE_EPOCH)));
-
-   auto rows = collect_attestation_data(
-      sysio::opp::types::AttestationType::ATTESTATION_TYPE_OPERATOR_ACTION);
-   BOOST_REQUIRE_EQUAL(rows.size(), 1u);
-   const auto& bytes = rows.front();
-   BOOST_REQUIRE(!bytes.empty());
-
-   // First byte MUST be a valid protobuf field-1-varint tag (0x08 =
-   // OperatorAction.action_type).
-   BOOST_REQUIRE_EQUAL(static_cast<uint8_t>(bytes.front()), 0x08u);
-
-   sysio::opp::attestations::OperatorAction oa;
-   BOOST_REQUIRE(oa.ParseFromArray(bytes.data(),
-                                   static_cast<int>(bytes.size())));
-   BOOST_REQUIRE_EQUAL(
-      static_cast<int>(oa.action_type()),
-      static_cast<int>(sysio::opp::attestations::
-                         OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REMIT));
-   BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(oa.amount().amount()),
-                       WITHDRAW_AMOUNT);
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(flushwtdw_multiple_attestations_all_clean_protobuf,
-                        sysio_epoch_flushwtdw_tester) { try {
-   bootstrap_for_flushwtdw();
-
-   constexpr uint64_t INITIAL_DEPOSIT  = 1'000'000;
-
-   const std::array<name, 3> operators{ UWRIT_OP, UWRIT_OP_B, UWRIT_OP_C };
-   const std::array<uint64_t, 3> withdraws{ 100'000, 200'000, 300'000 };
-
-   BOOST_REQUIRE_EQUAL(success(), regunderwriter(UWRIT_OP_B));
-   BOOST_REQUIRE_EQUAL(success(), regunderwriter(UWRIT_OP_C));
-   for (size_t i = 0; i < operators.size(); ++i) {
-      BOOST_REQUIRE_EQUAL(success(),
-         depositinle(operators[i], "ETH", "ETH", INITIAL_DEPOSIT));
-      BOOST_REQUIRE_EQUAL(success(),
-         withdrawinle(operators[i], "ETH", "ETH", withdraws[i]));
-   }
-
-   constexpr uint32_t FUTURE_EPOCH = 100;
-   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, EPOCH_ACCOUNT,
-      "flushwtdw"_n, mvo()("current_epoch", FUTURE_EPOCH)));
-
-   auto rows = collect_attestation_data(
-      sysio::opp::types::AttestationType::ATTESTATION_TYPE_OPERATOR_ACTION);
-   BOOST_REQUIRE_EQUAL(rows.size(), withdraws.size());
-
-   for (size_t i = 0; i < rows.size(); ++i) {
-      const auto& bytes = rows[i];
-      BOOST_REQUIRE(!bytes.empty());
-      BOOST_REQUIRE_EQUAL(static_cast<uint8_t>(bytes.front()), 0x08u);
-
-      sysio::opp::attestations::OperatorAction oa;
-      BOOST_REQUIRE(oa.ParseFromArray(bytes.data(),
-                                      static_cast<int>(bytes.size())));
-      BOOST_REQUIRE_EQUAL(
-         static_cast<int>(oa.action_type()),
-         static_cast<int>(sysio::opp::attestations::
-                            OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REMIT));
-      BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(oa.amount().amount()),
-                          withdraws[i]);
-   }
+                       balance_of(UWRIT_OP, "WIRE", "WIRE"));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

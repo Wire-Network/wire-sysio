@@ -177,7 +177,6 @@ public:
    outpost_ethereum_client(ethereum_client_entry_ptr                                entry,
                            std::string                                              opp_addr,
                            std::string                                              opp_inbound_addr,
-                           std::string                                              operator_registry_addr,
                            std::vector<fc::network::ethereum::abi::contract>        abis,
                            uint64_t                                                 chain_code,
                            uint32_t                                                 chain_id);
@@ -196,10 +195,6 @@ public:
    std::vector<char> read_inbound_envelope(uint32_t         epoch_index,
                                            fc::microseconds deadline) override;
 
-   std::string uw_commit(uint64_t                 uw_request_id,
-                         const std::vector<char>& uic_bytes,
-                         fc::microseconds         deadline) override;
-
    /// The Ethereum crank: `SyndicationPool.realizeYield()` on the pool the
    /// outpost registers as its `DESYNDICATE_LIQ` handler. Idle, at debug level,
    /// while the ABI set carries no `realizeYield` (a deployment that predates
@@ -211,7 +206,6 @@ public:
    const ethereum_client_entry_ptr& entry()                       const { return _entry; }
    const std::string&               opp_address()                 const { return _opp_addr; }
    const std::string&               opp_inbound_address()         const { return _opp_inbound_addr; }
-   const std::string&               operator_registry_address()   const { return _operator_registry_addr; }
    /// This relay's own signer address in `0x`-hex — the identity every staging
    /// header is bound to. Derived once at construction; the chunk resume path
    /// compares it against `envelopeChunkState`'s `owner` on every multi-chunk
@@ -264,10 +258,10 @@ private:
    ethereum_client_entry_ptr                              _entry;
    std::string                                            _opp_addr;
    std::string                                            _opp_inbound_addr;
-   std::string                                            _operator_registry_addr;
+
    std::shared_ptr<opp_contract_client>                   _opp_client;
    std::shared_ptr<opp_inbound_contract_client>           _opp_inbound_client;
-   std::shared_ptr<operator_registry_contract_client>     _operator_registry_client;  // nullable
+     // nullable
    /// The plugin's loaded ABI set, kept for the wrapper bound after construction.
    std::vector<fc::network::ethereum::abi::contract>      _abis;
    /// See `syndication_pool_address()` / `bind_syndication_pool`.

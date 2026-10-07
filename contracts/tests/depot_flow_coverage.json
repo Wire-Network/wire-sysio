@@ -1,6 +1,6 @@
 {
-  "tools_branch": "feature/syndication-underwriting",
-  "tools_head": "686f09cdaf0463873a4d6c80c72bd47cc96a0f1d",
+  "tools_branch": "feature/deprecated-cleanup",
+  "tools_head": "ed871bd7fa072ec273b896e0ab247072427cd37d",
   "flows": [
     {
       "name": "flow-batch-operator-slashing",

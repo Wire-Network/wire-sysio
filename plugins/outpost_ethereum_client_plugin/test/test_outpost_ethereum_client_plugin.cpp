@@ -6,7 +6,6 @@
 #include <boost/beast/http.hpp>
 #include <boost/process/v1/io.hpp>
 
-
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -87,7 +86,6 @@ std::vector<std::uint8_t> test_tx_01_unsigned_result{
    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3c, 0xc0
 };
-
 
 std::string test_tx_01_r      = "93166a3ed10a4050dce7261c4ca8bcba16a1731117c453a326a1742c959b33f0";
 std::string test_tx_01_s      = "7c17a232cd69ce93f21a30579a2a94309b2d71918043134b4c5df5788078a0e4";
@@ -575,7 +573,6 @@ std::unique_ptr<chunked_delivery_fixture> create_chunked_delivery_fixture() {
       stack.entry,
       /*opp_addr=*/std::string{},
       inbound_address,
-      /*operator_registry_addr=*/std::string{},
       abis,
       test_outpost_chain_code,
       test_evm_chain_id);
@@ -716,7 +713,6 @@ std::unique_ptr<crank_fixture> create_crank_fixture(bool with_pool_abi = true) {
       stack.entry,
       /*opp_addr=*/std::string{},
       inbound_address,
-      /*operator_registry_addr=*/std::string{},
       fixture->abis,
       test_outpost_chain_code,
       test_evm_chain_id);
@@ -1113,7 +1109,6 @@ BOOST_AUTO_TEST_CASE(read_inbound_envelope_validates_latest_slot) try {
    sysio::outpost_ethereum_client outpost(
       entry,
       opp_address,
-      "",
       "",
       abis,
       test_outpost_chain_code,
@@ -1913,7 +1908,6 @@ BOOST_AUTO_TEST_CASE(can_encode_tx_01) try {
          chain_key_type_ethereum,
          "0x8318535b54105d4a7aae60c08fc45f9687181b4fdfc625bd1a753fa7397fed753547f11ca8696646f2f3acb08e31016afac23e630c5d11f59f61fef57b0d2aa5",
          private_key_spec);
-
 
    // Provider should be retrievable
    // Sign raw unsigned TX bytes — eth_client_signer hashes with keccak256 internally
