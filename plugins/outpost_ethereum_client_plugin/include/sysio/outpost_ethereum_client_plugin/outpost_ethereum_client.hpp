@@ -133,13 +133,19 @@ enum class realize_yield_refusal {
    below_deadband,
    /// `WIRE_PoolUnderbacked(uint64 balanceDepot, uint64 principal)`: the balance
    /// fell below the principal, a loss the `LIQYield` carrier cannot express.
-   underbacked
+   underbacked,
+   /// `EnforcedPause()`: OpenZeppelin `Pausable`'s refusal. `realizeYield()` is
+   /// `whenNotPaused`, so a pool its panic role has frozen refuses every crank
+   /// until it is unpaused -- an expected state, not a failed crank.
+   paused
 };
 
 /// Classify `realizeYield()`'s revert bytes. `std::nullopt` for anything that is
-/// not one of the pool's own three refusals, exactly shaped (the selector alone,
-/// or the selector plus two words): a role error, a paused endpoint or a foreign
-/// implementation must not pass as a quiet no-op.
+/// not one of the pool's own refusals, exactly shaped (the selector alone, or the
+/// selector plus two words): a role error or a foreign implementation must not
+/// pass as a quiet no-op. `EnforcedPause()` is one of the pool's refusals: it
+/// comes only from `SyndicationPool`'s own pause (`whenNotPaused`), since the
+/// OPP endpoint has no pause of its own.
 ///
 /// @param revert_data  `json_rpc_error::data`, the node's revert bytes as `0x`-hex.
 std::optional<realize_yield_refusal> classify_realize_yield_revert(std::string_view revert_data);
@@ -171,7 +177,6 @@ public:
    outpost_ethereum_client(ethereum_client_entry_ptr                                entry,
                            std::string                                              opp_addr,
                            std::string                                              opp_inbound_addr,
-                           std::string                                              operator_registry_addr,
                            std::vector<fc::network::ethereum::abi::contract>        abis,
                            uint64_t                                                 chain_code,
                            uint32_t                                                 chain_id);
@@ -190,10 +195,6 @@ public:
    std::vector<char> read_inbound_envelope(uint32_t         epoch_index,
                                            fc::microseconds deadline) override;
 
-   std::string uw_commit(uint64_t                 uw_request_id,
-                         const std::vector<char>& uic_bytes,
-                         fc::microseconds         deadline) override;
-
    /// The Ethereum crank: `SyndicationPool.realizeYield()` on the pool the
    /// outpost registers as its `DESYNDICATE_LIQ` handler. Idle, at debug level,
    /// while the ABI set carries no `realizeYield` (a deployment that predates
@@ -205,7 +206,6 @@ public:
    const ethereum_client_entry_ptr& entry()                       const { return _entry; }
    const std::string&               opp_address()                 const { return _opp_addr; }
    const std::string&               opp_inbound_address()         const { return _opp_inbound_addr; }
-   const std::string&               operator_registry_address()   const { return _operator_registry_addr; }
    /// This relay's own signer address in `0x`-hex — the identity every staging
    /// header is bound to. Derived once at construction; the chunk resume path
    /// compares it against `envelopeChunkState`'s `owner` on every multi-chunk
@@ -258,10 +258,10 @@ private:
    ethereum_client_entry_ptr                              _entry;
    std::string                                            _opp_addr;
    std::string                                            _opp_inbound_addr;
-   std::string                                            _operator_registry_addr;
+
    std::shared_ptr<opp_contract_client>                   _opp_client;
    std::shared_ptr<opp_inbound_contract_client>           _opp_inbound_client;
-   std::shared_ptr<operator_registry_contract_client>     _operator_registry_client;  // nullable
+     // nullable
    /// The plugin's loaded ABI set, kept for the wrapper bound after construction.
    std::vector<fc::network::ethereum::abi::contract>      _abis;
    /// See `syndication_pool_address()` / `bind_syndication_pool`.

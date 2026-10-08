@@ -14,10 +14,10 @@
 # /v1/chain/get_table_rows — it now always invokes `getproposal` over the
 # read-only RPC. This test exercises the full end-to-end path:
 #
-#   1. Stand up a single-node cluster with the new sysio.msig wasm.
+#   1. Stand up a producer and read-only API node with sysio.msig.
 #   2. Create alice and bob accounts.
 #   3. Build a JSON inner transaction containing two `setcode` actions, each
-#      carrying the full sysio.system wasm (~134 KiB). Total ≈ 270 KiB,
+#      carrying a fixed-size WASM fixture (~128 KiB). Total ≈ 256 KiB,
 #      which forces the contract to chunk the proposal across two rows.
 #   4. Submit it via `clio multisig propose_trx`.
 #   5. Run `clio multisig review` and verify the JSON output reflects the
@@ -34,8 +34,8 @@
 ###############################################################
 
 import copy
+import hashlib
 import json
-import os
 import shlex
 import tempfile
 from pathlib import Path
@@ -121,23 +121,27 @@ try:
         errorExit("Failed to publish sysio.msig contract.")
 
     # ----- Build a chunked-size inner transaction.
-    # Two setcode actions stacked together, each carrying the full sysio.system
-    # wasm (~134 KiB), gives a serialized inner trx of ~270 KiB. The contract's
-    # chunk threshold is 200 KiB, so this is guaranteed to take the chunked
-    # storage path.
-    #
-    # `multisig propose_trx` now accepts the natural JSON shape (structured
-    # `action.data` objects, recursively encoded against each contract's ABI)
-    # in addition to the legacy pre-hex form — the same fallback that
-    # `clio push transaction` uses. So we just hand it the trx as JSON.
-    system_wasm_path = cluster.contractsPath / 'sysio.system' / 'sysio.system.wasm'
-    if not system_wasm_path.exists():
-        errorExit(f"sysio.system.wasm not found at {system_wasm_path}; build BUILD_SYSTEM_CONTRACTS=ON")
+    # A valid empty WASM module with a padding custom section makes the two
+    # actions exceed the msig chunk threshold while staying comfortably below
+    # the transaction NET limit. Do not use a production contract here: its
+    # growth can make the outer propose transaction exceed that limit before
+    # the chunked storage/review path is exercised.
+    fixture_payload_size = 128 * 1024
+    proposal_chunk_size = 200 * 1024
+    # Custom sections contain a length-prefixed name followed by arbitrary
+    # bytes. An empty name is encoded by the initial zero byte.
+    custom_section = bytes(1 + fixture_payload_size)
+    section_size = len(custom_section)
+    encoded_size = bytearray()
+    while section_size >= 0x80:
+        encoded_size.append((section_size & 0x7f) | 0x80)
+        section_size >>= 7
+    encoded_size.append(section_size)
+    fixture_wasm = b"\x00asm\x01\x00\x00\x00" + b"\x00" + encoded_size + custom_section
+    fixture_wasm_hex = fixture_wasm.hex()
+    Print(f"fixture wasm size = {len(fixture_wasm)} bytes")
 
-    with open(system_wasm_path, 'rb') as f:
-        system_wasm_hex = f.read().hex()
-    Print(f"system wasm size = {len(system_wasm_hex) // 2} bytes")
-
+    # Structured action.data objects exercise propose_trx's ABI encoding too.
     test_workdir = Path(tempfile.mkdtemp(prefix='msig_review_test_'))
 
     inner_trx = {
@@ -158,7 +162,7 @@ try:
                     "account":   "alice",
                     "vmtype":    0,
                     "vmversion": 0,
-                    "code":      system_wasm_hex,
+                    "code":      fixture_wasm_hex,
                 },
             },
             {
@@ -169,7 +173,7 @@ try:
                     "account":   "bob",
                     "vmtype":    0,
                     "vmversion": 0,
-                    "code":      system_wasm_hex,
+                    "code":      fixture_wasm_hex,
                 },
             },
         ],
@@ -247,18 +251,21 @@ try:
         assert a["data"]["account"] == expected_target, \
             f"action[{i}] target is {a['data']['account']}, expected {expected_target}"
 
-    # Chunked-storage metadata: chunk_count > 0 proves the contract took the
+        assert a["data"]["code"] == fixture_wasm_hex, \
+            f"action[{i}] WASM payload did not round-trip intact"
+
+    # Chunked-storage metadata: two chunks prove the contract took the
     # chunked path, total_size matches the expected packed inner trx, and
     # trx_hash is populated. If clio were silently using a stale get_table_rows
     # path, packed_transaction would be empty and any of these would catch it.
     assert "chunk_count" in review_result, "review missing chunk_count metadata"
     chunk_count = int(review_result["chunk_count"])
-    assert chunk_count > 0, f"expected chunk_count > 0, got {chunk_count}"
+    assert chunk_count == 2, f"expected 2 chunks, got {chunk_count}"
 
     assert "total_size" in review_result, "review missing total_size metadata"
     total_size = int(review_result["total_size"])
-    assert total_size > 200 * 1024, \
-        f"expected total_size > 200 KiB, got {total_size}"
+    assert proposal_chunk_size < total_size < 2 * proposal_chunk_size, \
+        f"expected an inner transaction spanning two chunks, got {total_size} bytes"
 
     assert "trx_hash" in review_result and len(review_result["trx_hash"]) == 64, \
         f"trx_hash missing or wrong length: {review_result.get('trx_hash')}"
@@ -270,9 +277,10 @@ try:
     # populated. We confirm by checking that the field is non-empty in the
     # review output (i.e. clio is not echoing the empty inline field).
     assert "packed_transaction" in review_result, "packed_transaction missing in review"
-    assert len(review_result["packed_transaction"]) > 200 * 1024 * 2, \
-        ("packed_transaction in review is empty or too small — clio may not be "
-         "going through the read-only getproposal path")
+    packed_transaction = bytes.fromhex(review_result["packed_transaction"])
+    assert len(packed_transaction) == total_size, "reassembled transaction size mismatch"
+    assert hashlib.sha256(packed_transaction).hexdigest() == review_result["trx_hash"], \
+        "reassembled transaction hash mismatch"
 
     # ----- Same call with --show-approvals exercises the approvals branches.
     Print("Run `multisig review --show-approvals` against the API node")

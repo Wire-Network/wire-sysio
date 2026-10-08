@@ -97,7 +97,6 @@ be named in a `plugin` option, or startup fails with `plugin_config_exception`.
 | `trace_api` | `sysio::trace_api_plugin` |
 | `prometheus` | `sysio::prometheus_plugin` |
 | `test_control` | `sysio::test_control_api_plugin` |
-| `underwriter` | `sysio::underwriter_plugin` |
 
 `node` is the category of endpoints served on every listener; it is what `http-server-address` and
 `unix-socket-path` bind, and it is not a value accepted by `--http-category-address`.
@@ -165,7 +164,7 @@ All of `http_plugin`'s options are config-file options, so each is equally valid
 |---|---|---|
 | `http-server-address` | `127.0.0.1:8888` | Local IP and port to listen on for incoming HTTP connections. Set to the literal `http-category-address` to enable the `http-category-address` option; leave blank to disable. Under `kiod` the option is registered with no default. |
 | `unix-socket-path` | unset | Filename, relative to the data dir, of a unix socket for HTTP RPC; blank disables it. Must not be set when `http-category-address` is used. Under `kiod` it defaults to `kiod.sock`. |
-| `http-category-address` | unset | `category,address` pair binding one API category to one listen address; may be repeated. The address is `<hostname>:port`, `<ipaddress>:port`, or a unix socket path starting with `/`, `./`, or `../`. Valid categories are `chain_ro`, `chain_rw`, `db_size`, `net_ro`, `net_rw`, `producer_ro`, `producer_rw`, `snapshot`, `trace_api`, `prometheus`, `test_control`, `snapshot_ro`, and `underwriter`. `kiod` does not register this option. |
+| `http-category-address` | unset | `category,address` pair binding one API category to one listen address; may be repeated. The address is `<hostname>:port`, `<ipaddress>:port`, or a unix socket path starting with `/`, `./`, or `../`. Valid categories are `chain_ro`, `chain_rw`, `db_size`, `net_ro`, `net_rw`, `producer_ro`, `producer_rw`, `snapshot`, `trace_api`, `prometheus`, `test_control`, and `snapshot_ro`. `kiod` does not register this option. |
 
 ### Limits and threads
 
@@ -238,5 +237,5 @@ failures), the single answer per request, and the API-error mapping of raw handl
 - `producer_api_plugin` — registers the `producer_ro`, `producer_rw`, and `snapshot` endpoints.
 - [`snapshot_api_plugin`](../snapshot_api_plugin/README.md) — registers the `snapshot_ro` endpoints, and is
   the consumer of `add_raw_handler` for file downloads.
-- `db_size_api_plugin`, `trace_api_plugin`, `prometheus_plugin`, `test_control_api_plugin`,
-  `underwriter_plugin` — the remaining category owners.
+- `db_size_api_plugin`, `trace_api_plugin`, `prometheus_plugin`, `test_control_api_plugin` — the remaining
+  category owners.

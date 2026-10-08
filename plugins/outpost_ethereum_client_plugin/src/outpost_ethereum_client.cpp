@@ -28,7 +28,7 @@ namespace detail = outpost_ethereum_client_detail;
 // ── Op labels used for deadline-exceeded error messages ──────────────────
 constexpr std::string_view OP_DELIVER_OUTBOUND = "deliver_outbound_envelope";
 constexpr std::string_view OP_READ_INBOUND     = "read_inbound_envelope";
-constexpr std::string_view OP_UW_COMMIT        = "uw_commit";
+
 constexpr std::string_view OP_REALIZE_YIELD    = "crank_outpost:realizeYield";
 
 /// Execution APIs code for a call the node executed and that reverted, as distinct from a
@@ -49,6 +49,9 @@ constexpr auto chunk_buffer_missing_signature = "OPP_ChunkBufferMissing(address)
 constexpr auto no_yield_signature             = "WIRE_NoYield()";
 constexpr auto yield_below_deadband_signature = "WIRE_YieldBelowDeadband(uint64,uint64)";
 constexpr auto pool_underbacked_signature     = "WIRE_PoolUnderbacked(uint64,uint64)";
+/// OpenZeppelin `Pausable`'s refusal, raised by `realizeYield()`'s `whenNotPaused` while the
+/// pool's panic role has frozen it (wire-ethereum `SyndicationPool.sol`).
+constexpr auto enforced_pause_signature       = "EnforcedPause()";
 
 /// `ATTESTATION_BLACKHOLE` in wire-ethereum's `OPPCommon.sol`: the handler governance
 /// registers to drop an attestation type on purpose. Mirror duty, like
@@ -236,6 +239,7 @@ std::optional<realize_yield_refusal> classify_realize_yield_revert(std::string_v
    if (is(no_yield_signature, 0)) return realize_yield_refusal::no_yield;
    if (is(yield_below_deadband_signature, 2)) return realize_yield_refusal::below_deadband;
    if (is(pool_underbacked_signature, 2)) return realize_yield_refusal::underbacked;
+   if (is(enforced_pause_signature, 0)) return realize_yield_refusal::paused;
    return std::nullopt;
 }
 
@@ -263,14 +267,12 @@ outpost_ethereum_client::outpost_ethereum_client(
    ethereum_client_entry_ptr                         entry,
    std::string                                       opp_addr,
    std::string                                       opp_inbound_addr,
-   std::string                                       operator_registry_addr,
    std::vector<fc::network::ethereum::abi::contract> abis,
    uint64_t                                          chain_code,
    uint32_t                                          chain_id)
    : _entry(std::move(entry))
    , _opp_addr(std::move(opp_addr))
    , _opp_inbound_addr(std::move(opp_inbound_addr))
-   , _operator_registry_addr(std::move(operator_registry_addr))
    , _abis(std::move(abis))
    , _outpost_id(chain_code)
    , _chain_id(chain_id) {
@@ -291,10 +293,6 @@ outpost_ethereum_client::outpost_ethereum_client(
    if (!_opp_inbound_addr.empty()) {
       _opp_inbound_client =
          _entry->client->get_contract<opp_inbound_contract_client>(_opp_inbound_addr, _abis);
-   }
-   if (!_operator_registry_addr.empty()) {
-      _operator_registry_client =
-         _entry->client->get_contract<operator_registry_contract_client>(_operator_registry_addr, _abis);
    }
 
    // Every OPPInbound staging header is bound to the delivering signer, so the
@@ -688,40 +686,6 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
    return out;
 }
 
-std::string outpost_ethereum_client::uw_commit(
-   uint64_t                 uw_request_id,
-   const std::vector<char>& uic_bytes,
-   fc::microseconds         deadline) {
-   const auto deadline_abs = fc::time_point::now() + deadline;
-   fc::task::deadline_scope rpc_deadline(deadline_abs);
-
-   throw_if_past_deadline(deadline_abs, OP_UW_COMMIT);
-
-   FC_ASSERT(_operator_registry_client,
-             "outpost_ethereum_client[{}]: uw_commit requires an OperatorRegistry "
-             "address — pass operator_registry_addr to create_outpost_client",
-             to_string());
-
-   // Solidity `commit(bytes uicBytes)` takes a `bytes` parameter; the
-   // libfc ABI encoder for `dt::bytes` expects a hex-encoded string
-   // (see ethereum_abi.cpp::encode_dynamic_data). Building the variant
-   // around the raw `std::vector<uint8_t>` triggers an `fc::bad_cast`
-   // inside the encoder — the typed wrapper takes the hex form directly.
-   //
-   // The `ethereum_contract_tx_fn<fc::variant, std::string>` signature
-   // binds the argument as a non-const `std::string&`, so the local
-   // must be a non-const lvalue (mirroring the `epoch_in(envelope_hex)`
-   // pattern in `deliver_outbound_envelope`).
-   std::string uic_hex = std::string("0x") +
-      fc::to_hex(uic_bytes.data(), uic_bytes.size());
-
-   const auto result  = _operator_registry_client->commit(uic_hex);
-   const auto tx_hash = result.as_string();
-   ilog("outpost_ethereum_client[{}]: uw_commit confirmed uwreq={} tx_hash={} bytes={}",
-        to_string(), uw_request_id, tx_hash, uic_bytes.size());
-   return tx_hash;
-}
-
 void outpost_ethereum_client::bind_syndication_pool(
    std::string address, std::shared_ptr<syndication_pool_contract_client> client) {
    FC_ASSERT(client, "outpost_ethereum_client[{}]: bind_syndication_pool needs a wrapper", to_string());
@@ -782,10 +746,11 @@ void outpost_ethereum_client::crank_outpost(uint32_t epoch_index, fc::microsecon
       ilog("outpost_ethereum_client[{}]: realizeYield sent for epoch {} tx={}",
            to_string(), epoch_index, result.as_string());
    } catch (const fc::network::json_rpc::json_rpc_error& e) {
-      // A revert at estimate time costs no gas. Only the pool's own three refusals are
-      // outcomes of the crank rather than failures of it; anything else -- a signer without
-      // the `yield_operator` role, a paused endpoint, a foreign implementation -- is the job's
-      // to log as a failed crank, exactly like a transport failure.
+      // A revert at estimate time costs no gas. Only the pool's own refusals -- its three
+      // yield outcomes and `EnforcedPause()`, which comes only from SyndicationPool's own pause
+      // (the OPP endpoint has none) -- are outcomes of the crank rather than failures of it;
+      // anything else -- a signer without the `yield_operator` role, a foreign implementation --
+      // is the job's to log as a failed crank, exactly like a transport failure.
       const auto refusal =
          e.code == ethereum_execution_reverted_code
             ? detail::classify_realize_yield_revert(e.data.is_string() ? e.data.as_string() : std::string{})
@@ -800,6 +765,13 @@ void outpost_ethereum_client::crank_outpost(uint32_t epoch_index, fc::microsecon
       case detail::realize_yield_refusal::underbacked:
          wlog("outpost_ethereum_client[{}]: syndication pool {} is below its principal; realizeYield "
               "refused for epoch {} (the loss path is not in that contract)",
+              to_string(), _syndication_pool_addr, epoch_index);
+         return;
+      case detail::realize_yield_refusal::paused:
+         // The emergency stop: an expected state the andon playbook clears, reported every
+         // epoch at info so it stays visible without reading as a failed crank.
+         ilog("outpost_ethereum_client[{}]: syndication pool {} is paused; realizeYield not reported "
+              "for epoch {}",
               to_string(), _syndication_pool_addr, epoch_index);
          return;
       }

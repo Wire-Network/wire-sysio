@@ -17,7 +17,6 @@ enum class api_category : uint32_t {
    prometheus   = 1 << 9,
    test_control = 1 << 10,
    snapshot_ro  = 1 << 11,  // public read-only snapshot metadata + download
-   underwriter  = 1 << 12,  // read-only underwriter diagnostics (stats/commits)
    node        = UINT32_MAX
 };
 
@@ -30,10 +29,10 @@ public:
       for (auto c: l)
          insert(c);
    }
-   constexpr bool contains(api_category category) const { 
+   constexpr bool contains(api_category category) const {
       return sysio::chain::has_field(data, category);
    }
-   constexpr void insert(api_category category) { 
+   constexpr void insert(api_category category) {
       data = sysio::chain::set_field(data, category, true);
    }
 

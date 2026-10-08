@@ -26,6 +26,8 @@ public:
    static constexpr auto MSGCH_ACCOUNT  = "sysio.msgch"_n;
    static constexpr auto AUTHEX_ACCOUNT = "sysio.authex"_n;
    static constexpr auto TOKEN_ACCOUNT  = "sysio.token"_n;
+   static constexpr uint32_t YEARS_WITHOUT_CLAIM_SEC = 3u * 365u * 24u * 60u * 60u;
+   inline static const symbol WIRE_SYMBOL{9, "WIRE"};
 
    sysio_dclaim_tester() {
       produce_blocks(2);
@@ -95,6 +97,35 @@ public:
    fc::variant unmapped_row(uint64_t id) { return get_kv("unmapped"_n, "unmapped_token", id); }
    fc::variant cursor_row(uint64_t id)   { return get_kv("rwdcursors"_n, "reward_cursor", id); }
 
+   /// Fund DClaim with real WIRE so delayed claims exercise transfers and row erasure.
+   void fund_claims() {
+      set_code(TOKEN_ACCOUNT, contracts::token_wasm());
+      set_abi(TOKEN_ACCOUNT, contracts::token_abi().data());
+      set_privileged(TOKEN_ACCOUNT);
+      produce_blocks();
+      base_tester::push_action(TOKEN_ACCOUNT, "create"_n, TOKEN_ACCOUNT,
+         mvo()("issuer", "sysio")("maximum_supply", "1000000000.000000000 WIRE"));
+      base_tester::push_action(TOKEN_ACCOUNT, "issue"_n, config::system_account_name,
+         mvo()("to", "sysio")("quantity", "1.000000000 WIRE")("memo", "seed"));
+      base_tester::push_action(TOKEN_ACCOUNT, "transfer"_n, config::system_account_name,
+         mvo()("from", "sysio")("to", DCLAIM_ACCOUNT)
+              ("quantity", "1.000000000 WIRE")("memo", "fund claims"));
+   }
+
+   /// Claim once after arbitrary inactivity, checking exact payment and replay rejection.
+   void check_claim(name account, int64_t amount) {
+      const auto before = get_currency_balance(TOKEN_ACCOUNT, WIRE_SYMBOL, account);
+      const auto funding_before = get_currency_balance(TOKEN_ACCOUNT, WIRE_SYMBOL, DCLAIM_ACCOUNT);
+      BOOST_REQUIRE_EQUAL(push_dclaim(account, "claim"_n, mvo()("wire_account", account)), success());
+      BOOST_REQUIRE(pending_of(account).is_null());
+      BOOST_REQUIRE_EQUAL(get_currency_balance(TOKEN_ACCOUNT, WIRE_SYMBOL, account).get_amount(),
+                          before.get_amount() + amount);
+      BOOST_REQUIRE_EQUAL(get_currency_balance(TOKEN_ACCOUNT, WIRE_SYMBOL, DCLAIM_ACCOUNT).get_amount(),
+                          funding_before.get_amount() - amount);
+      BOOST_REQUIRE_EQUAL(push_dclaim(account, "claim"_n, mvo()("wire_account", account)),
+                          wasm_assert_msg("no pending claim"));
+   }
+
    std::vector<char> addr20{std::vector<char>(20, char(0xA1))};
 
    abi_serializer dclaim_abi_ser;
@@ -138,28 +169,6 @@ BOOST_FIXTURE_TEST_CASE(importdone_locks_subsequent_importseed, sysio_dclaim_tes
       success());
 } FC_LOG_AND_RETHROW() }
 
-// -- setclmwindow --
-
-BOOST_FIXTURE_TEST_CASE(setclmwindow_rejects_zero, sysio_dclaim_tester) { try {
-   BOOST_REQUIRE_NE(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n, mvo()("window_sec", 0)), success());
-   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n, mvo()("window_sec", 3600)), success());
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(setclmwindow_rejects_excess_window, sysio_dclaim_tester) { try {
-   // The ten-year ceiling is accepted; one second beyond it is rejected before
-   // the window could overflow `now_sec() + window_sec` and mark fresh claims
-   // expired the moment they are written.
-   constexpr uint32_t ten_years_sec = 10u * 365 * 24 * 60 * 60;
-   BOOST_REQUIRE_EQUAL(success(),
-      push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n, mvo()("window_sec", ten_years_sec)));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("window_sec exceeds the ten-year ceiling"),
-      push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n, mvo()("window_sec", ten_years_sec + 1)));
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(setclmwindow_requires_self_auth, sysio_dclaim_tester) { try {
-   BOOST_REQUIRE_NE(push_dclaim("alice"_n, "setclmwindow"_n, mvo()("window_sec", 3600)), success());
-} FC_LOG_AND_RETHROW() }
-
 // -- onreward auth + routing --
 
 BOOST_FIXTURE_TEST_CASE(onreward_requires_msgch_auth, sysio_dclaim_tester) { try {
@@ -199,18 +208,11 @@ BOOST_FIXTURE_TEST_CASE(onreward_unlinked_parks_unmapped_then_linkswept, sysio_d
    BOOST_REQUIRE_EQUAL(pending_of("bob"_n)["balance"].as<asset>().get_amount(), 5000);
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(linkswept_preserves_original_unmapped_expiry, sysio_dclaim_tester) { try {
-   constexpr uint32_t original_window_sec = 120;
-   constexpr uint32_t replacement_window_sec = 3600;
-   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n,
-      mvo()("window_sec", original_window_sec)), success());
+BOOST_FIXTURE_TEST_CASE(linkswept_preserves_old_unmapped_rewards, sysio_dclaim_tester) { try {
+   fund_claims();
    BOOST_REQUIRE_EQUAL(onreward(MSGCH_ACCOUNT, 1, "", ChainKind::CHAIN_KIND_EVM,
       addr20, 5000, 7, 100), success());
-   const auto original_expiry = unmapped_row(1)["expires_at_sec"].as<uint32_t>();
-
-   produce_block(fc::seconds(5));
-   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n,
-      mvo()("window_sec", replacement_window_sec)), success());
+   produce_block(fc::seconds(YEARS_WITHOUT_CLAIM_SEC));
    BOOST_REQUIRE_EQUAL(push_dclaim(AUTHEX_ACCOUNT, "linkswept"_n, mvo()
       ("wire_account", "bob")
       ("chain", ChainKind::CHAIN_KIND_EVM)
@@ -219,27 +221,20 @@ BOOST_FIXTURE_TEST_CASE(linkswept_preserves_original_unmapped_expiry, sysio_dcla
    const auto pending = pending_of("bob"_n);
    BOOST_REQUIRE(!pending.is_null());
    BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 5000);
-   BOOST_REQUIRE_EQUAL(pending["expires_at_sec"].as<uint32_t>(), original_expiry);
+   BOOST_REQUIRE(unmapped_row(1).is_null());
+   produce_block(fc::seconds(YEARS_WITHOUT_CLAIM_SEC));
+   check_claim("bob"_n, 5000);
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(linkswept_does_not_shorten_newer_aggregate_expiry, sysio_dclaim_tester) { try {
-   constexpr uint32_t older_window_sec = 120;
-   constexpr uint32_t newer_window_sec = 3600;
+BOOST_FIXTURE_TEST_CASE(linkswept_adds_old_rewards_to_newer_pending_balance, sysio_dclaim_tester) { try {
+   fund_claims();
    const std::vector<char> newer_addr(20, char(0xB2));
 
-   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n,
-      mvo()("window_sec", older_window_sec)), success());
    BOOST_REQUIRE_EQUAL(onreward(MSGCH_ACCOUNT, 1, "", ChainKind::CHAIN_KIND_EVM,
       addr20, 5000, 7, 100), success());
-   const auto older_expiry = unmapped_row(1)["expires_at_sec"].as<uint32_t>();
-
-   produce_block(fc::seconds(5));
-   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n,
-      mvo()("window_sec", newer_window_sec)), success());
+   produce_block(fc::seconds(YEARS_WITHOUT_CLAIM_SEC));
    BOOST_REQUIRE_EQUAL(onreward(MSGCH_ACCOUNT, 1, "bob", ChainKind::CHAIN_KIND_EVM,
       newer_addr, 2000, 8, 101), success());
-   const auto newer_expiry = pending_of("bob"_n)["expires_at_sec"].as<uint32_t>();
-   BOOST_REQUIRE_GT(newer_expiry, older_expiry);
 
    BOOST_REQUIRE_EQUAL(push_dclaim(AUTHEX_ACCOUNT, "linkswept"_n, mvo()
       ("wire_account", "bob")
@@ -248,27 +243,19 @@ BOOST_FIXTURE_TEST_CASE(linkswept_does_not_shorten_newer_aggregate_expiry, sysio
 
    const auto pending = pending_of("bob"_n);
    BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 7000);
-   BOOST_REQUIRE_EQUAL(pending["expires_at_sec"].as<uint32_t>(), newer_expiry);
+   BOOST_REQUIRE(unmapped_row(1).is_null());
+   check_claim("bob"_n, 7000);
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(linkswept_adopts_newer_migrated_expiry, sysio_dclaim_tester) { try {
-   constexpr uint32_t older_window_sec = 120;
-   constexpr uint32_t newer_window_sec = 3600;
+BOOST_FIXTURE_TEST_CASE(linkswept_adds_newer_rewards_to_old_pending_balance, sysio_dclaim_tester) { try {
+   fund_claims();
    const std::vector<char> newer_addr(20, char(0xB2));
 
-   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n,
-      mvo()("window_sec", older_window_sec)), success());
    BOOST_REQUIRE_EQUAL(onreward(MSGCH_ACCOUNT, 1, "bob", ChainKind::CHAIN_KIND_EVM,
       addr20, 2000, 7, 100), success());
-   const auto older_expiry = pending_of("bob"_n)["expires_at_sec"].as<uint32_t>();
-
-   produce_block(fc::seconds(5));
-   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n,
-      mvo()("window_sec", newer_window_sec)), success());
+   produce_block(fc::seconds(YEARS_WITHOUT_CLAIM_SEC));
    BOOST_REQUIRE_EQUAL(onreward(MSGCH_ACCOUNT, 1, "", ChainKind::CHAIN_KIND_EVM,
       newer_addr, 5000, 8, 101), success());
-   const auto newer_expiry = unmapped_row(1)["expires_at_sec"].as<uint32_t>();
-   BOOST_REQUIRE_GT(newer_expiry, older_expiry);
 
    BOOST_REQUIRE_EQUAL(push_dclaim(AUTHEX_ACCOUNT, "linkswept"_n, mvo()
       ("wire_account", "bob")
@@ -277,24 +264,24 @@ BOOST_FIXTURE_TEST_CASE(linkswept_adopts_newer_migrated_expiry, sysio_dclaim_tes
 
    const auto pending = pending_of("bob"_n);
    BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 7000);
-   BOOST_REQUIRE_EQUAL(pending["expires_at_sec"].as<uint32_t>(), newer_expiry);
+   BOOST_REQUIRE(unmapped_row(1).is_null());
+   check_claim("bob"_n, 7000);
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(linkswept_forfeits_expired_unmapped_balance, sysio_dclaim_tester) { try {
-   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n,
-      mvo()("window_sec", uint32_t{1})), success());
-   BOOST_REQUIRE_EQUAL(onreward(MSGCH_ACCOUNT, 1, "", ChainKind::CHAIN_KIND_EVM,
-      addr20, 5000, 7, 100), success());
-   BOOST_REQUIRE(!unmapped_row(1).is_null());
-   produce_blocks(10);
-   produce_block(fc::seconds(5));
-
+BOOST_FIXTURE_TEST_CASE(imported_balances_remain_claimable_after_years, sysio_dclaim_tester) { try {
+   fund_claims();
+   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "importseed"_n, mvo()
+      ("chain", ChainKind::CHAIN_KIND_EVM)
+      ("credits", fc::variants{mvo()("native_address", addr20)("wire_atomic", int64_t{5000})})), success());
+   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "importdone"_n, mvo{}), success());
+   produce_block(fc::seconds(YEARS_WITHOUT_CLAIM_SEC));
    BOOST_REQUIRE_EQUAL(push_dclaim(AUTHEX_ACCOUNT, "linkswept"_n, mvo()
       ("wire_account", "bob")
       ("chain", ChainKind::CHAIN_KIND_EVM)
       ("native_pubkey", addr20)), success());
    BOOST_REQUIRE(unmapped_row(1).is_null());
-   BOOST_REQUIRE(pending_of("bob"_n).is_null());
+   produce_block(fc::seconds(YEARS_WITHOUT_CLAIM_SEC));
+   check_claim("bob"_n, 5000);
 } FC_LOG_AND_RETHROW() }
 
 // -- dedupe cursor --
@@ -318,21 +305,19 @@ BOOST_FIXTURE_TEST_CASE(onreward_dedupes_stale_external_ref, sysio_dclaim_tester
    BOOST_REQUIRE_EQUAL(pending_of("alice"_n)["balance"].as<asset>().get_amount(), 2000);
 } FC_LOG_AND_RETHROW() }
 
-// -- claimable window expiry / reversion --
+// -- indefinitely claimable balances --
 
-BOOST_FIXTURE_TEST_CASE(flushexpired_reverts_expired_pending, sysio_dclaim_tester) { try {
-   BOOST_REQUIRE_EQUAL(push_dclaim(DCLAIM_ACCOUNT, "setclmwindow"_n, mvo()("window_sec", 1)), success());
+BOOST_FIXTURE_TEST_CASE(pending_rewards_remain_claimable_after_years, sysio_dclaim_tester) { try {
+   fund_claims();
    BOOST_REQUIRE_EQUAL(
       onreward(MSGCH_ACCOUNT, 1, "alice", ChainKind::CHAIN_KIND_EVM, addr20, 1000, 7, 100),
       success());
    BOOST_REQUIRE(!pending_of("alice"_n).is_null());
 
-   // Advance chain time well past the 1-second window.
-   produce_blocks(10);
-   produce_block(fc::seconds(5));
-
-   BOOST_REQUIRE_EQUAL(push_dclaim("alice"_n, "flushexpired"_n, mvo()("max_rows", 50)), success());
-   BOOST_REQUIRE(pending_of("alice"_n).is_null());   // reverted to capital fund
+   produce_block(fc::seconds(YEARS_WITHOUT_CLAIM_SEC));
+   BOOST_REQUIRE_EQUAL(pending_of("alice"_n)["balance"].as<asset>().get_amount(), 1000);
+   BOOST_REQUIRE_NE(push_dclaim("bob"_n, "claim"_n, mvo()("wire_account", "alice")), success());
+   check_claim("alice"_n, 1000);
 } FC_LOG_AND_RETHROW() }
 
 // onreward runs inside the OPP inbound dispatch chain (msgch::evalcons), where an abort rolls back

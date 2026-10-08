@@ -12,7 +12,6 @@ macro(chain_target TARGET)
             PRIVATE
             batch_operator_plugin
             external_debugging_plugin
-            underwriter_plugin
             chain_api_plugin
             db_size_api_plugin
             net_api_plugin

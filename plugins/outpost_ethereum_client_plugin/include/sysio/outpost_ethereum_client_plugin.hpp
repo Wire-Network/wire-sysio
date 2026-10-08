@@ -122,30 +122,6 @@ struct syndication_pool_contract_client : ethereum_contract_client {
       , realize_yield(create_tx_and_confirm<fc::variant>(get_abi("realizeYield"))) {}
 };
 
-/// Typed contract client for OperatorRegistry.sol. Carries the actions
-/// plugins reach for outside the OPP envelope path — today `commit`
-/// (underwriter UIC relay); future deposit / withdraw / slash actions
-/// land here as additional `ethereum_contract_tx_fn` members.
-///
-/// State-changing actions use `create_tx_and_confirm` so the call
-/// returns only after on-chain inclusion + confirmations — the caller
-/// uses the return as a "this leg landed" signal before recording the
-/// action locally.
-struct operator_registry_contract_client : ethereum_contract_client {
-   /// `commit(bytes uicBytes)` — submits the original canonical
-   /// `UnderwriteIntentCommit` bytes. OperatorRegistry binds their signed EVM
-   /// caller and claimed ACTIVE roster identity before queuing the unchanged
-   /// bytes. The hardhat-generated ABI passes the parameter as a hex-encoded
-   /// string (per `ethereum_abi::encode_dynamic_data` for `dt::bytes`).
-   ethereum_contract_tx_fn<fc::variant, std::string> commit;
-
-   operator_registry_contract_client(const ethereum_client_ptr& client,
-                                     const address_compat_type& contract_address,
-                                     const std::vector<fc::network::ethereum::abi::contract>& contracts)
-      : ethereum_contract_client(client, contract_address, contracts)
-      , commit(create_tx_and_confirm<fc::variant, std::string>(get_abi("commit"))) {}
-};
-
 class outpost_ethereum_client_plugin : public appbase::plugin<outpost_ethereum_client_plugin> {
 public:
    APPBASE_PLUGIN_REQUIRES((outpost_client_plugin)(signature_provider_manager_plugin))
@@ -197,12 +173,10 @@ public:
                                                        uint64_t           chain_code,
                                                        uint32_t           chain_id,
                                                        const std::string& opp_addr,
-                                                       const std::string& opp_inbound_addr,
-                                                       const std::string& operator_registry_addr = "");
+                                                       const std::string& opp_inbound_addr);
 
 private:
    std::unique_ptr<class outpost_ethereum_client_plugin_impl> my;
 };
-
 
 } // namespace sysio

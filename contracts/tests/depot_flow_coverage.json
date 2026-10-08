@@ -1,0 +1,169 @@
+{
+  "tools_branch": "feature/deprecated-cleanup",
+  "tools_head": "ed871bd7fa072ec273b896e0ab247072427cd37d",
+  "flows": [
+    {
+      "name": "flow-batch-operator-slashing",
+      "wire_behavior": "Conflicting canonical deliveries open a dispute and pause epochs; electorate adjudication selects the winner, slashes losers, excludes them from scheduling, and resumes consensus. Depot shadow slashes remain on WIRE.",
+      "cluster_only": "Daemon submission and real external envelope transport.",
+      "tests": [
+        "sysio_dispute_tests/opendispute_writes_row_and_pauses",
+        "sysio_dispute_tests/chkdispute_fast_path_resolves",
+        "sysio_dispute_tests/slashed_op_excluded_from_scheduling_no_double_slash",
+        "sysio_msgch_chain_tests/noncanonical_delivery_slashes_before_termination",
+        "sysio_msgch_chain_tests/short_group_after_slash_still_reaches_consensus",
+        "sysio_opreg_tests/slash_shadow_row_emits_no_attestation"
+      ]
+    },
+    {
+      "name": "flow-batch-operator-termination",
+      "wire_behavior": "Missed duties accumulate at rotation cadence; threshold crossing terminates the operator, excludes future duty, and preserves claimable collateral/yield until paid.",
+      "cluster_only": "Stopping real daemons and observing wall-clock missed delivery.",
+      "tests": [
+        "sysio_msgch_chain_tests/terminate_at_duty_rotation_via_advance",
+        "sysio_opreg_tests/termcheck_terminates_after_default_consecutive_boundary",
+        "sysio_opreg_tests/claimremit_never_expires_and_clears_row_after_payment",
+        "sysio_opreg_tests/terminate_credits_earned_yield_with_the_principal"
+      ]
+    },
+    {
+      "name": "flow-emergency-stop",
+      "wire_behavior": "Freeze permits incoming custody and bonding but blocks releases, withdrawals and conversion; elapsed epochs refill budget up to its burst cap after clear. Clear resumes pending work. Honest shortfall records evidence and pulls the cord.",
+      "cluster_only": "Real external freeze propagation, transaction refusal and payout retry.",
+      "tests": [
+        "sysio_synd_tests/a_freeze_stops_release_and_refill_is_capped_at_burst",
+        "sysio_synd_tests/a_freeze_admits_what_comes_in_and_refuses_what_leaves",
+        "sysio_synd_tests/a_freeze_defers_the_parked_delivery_of_a_new_link",
+        "sysio_synd_tests/a_freeze_defers_the_invalid_burn",
+        "sysio_synd_tests/a_freeze_still_issues_requests_and_takes_bonds",
+        "sysio_synd_tests/a_syndication_shortfall_records_pulls_and_still_holds",
+        "sysio_synd_tests/generated_generic_custody_bond_challenge_and_return_sequences",
+        "sysio_synd_tests/generic_custody_shortfall_freezes_and_repair_resumes",
+        "sysio_dispatch_tests/a_custody_shortfall_pulls_the_cord_and_the_epoch_advances",
+        "sysio_dispatch_tests/a_shortfall_freezes_the_same_envelopes_queue_step"
+      ]
+    },
+    {
+      "name": "flow-emissions-soak",
+      "wire_behavior": "Epoch accrual, category distribution, floor/ceiling bounds and imported prelink rewards becoming claimable after authenticated linking.",
+      "cluster_only": "Multi-hour daemon/node stability, forks and external chain synchronization; native virtual time is not a soak.",
+      "tests": [
+        "t5_emissions_tests/subsequent_epochs_apply_decay",
+        "t5_emissions_tests/emission_capped_at_distributable_ceiling",
+        "t5_emissions_tests/category_split_matches_basis_points",
+        "t5_emissions_tests/governance_gets_remainder_no_dust_loss",
+        "sysio_dclaim_tests/importseed_accepts_credit_batch",
+        "sysio_authex_tests/createlink_eth_sweeps_prelink_dclaim_rewards",
+        "sysio_dispatch_tests/generic_staking_rewards_fund_claim_and_dedupe_through_dispatch"
+      ]
+    },
+    {
+      "name": "flow-liq-syndication",
+      "wire_behavior": "Canonical generic custody reports enter production msgch consensus, mint held shadow, retain held yield outside supply, close envelopes, suppress sequence replays and keep custody checks healthy.",
+      "cluster_only": "Real SOL staking/minting and permissionless yield reports, operator relay and liveness.",
+      "tests": [
+        "sysio_dispatch_tests/generic_external_simulator_drives_production_dispatch",
+        "sysio_synd_tests/onsynd_holds_linked_and_unlinked_alike",
+        "sysio_synd_tests/custody_equal_to_the_outstanding_records_nothing"
+      ]
+    },
+    {
+      "name": "flow-liq-yield",
+      "wire_behavior": "Custody-backed syndication releases to parked credit, linking delivers once, bonded yield enters pending, queueyield/tickyield sell through the real AMM, the index pays exact WIRE owed, and fee-rounded redemption queues the net amount.",
+      "cluster_only": "Real outpost native deposit, yield emission and payout execution.",
+      "tests": [
+        "sysio_synd_tests/generic_parked_credit_yield_conversion_and_fee_rounded_return",
+        "sysio_liq_tests/queued_yield_sells_through_the_pool_and_pays_holders",
+        "sysio_synd_tests/createlink_sweeps_parked_from_synd"
+      ]
+    },
+    {
+      "name": "flow-node-owner-nft",
+      "wire_behavior": "Ethereum-bound registration creates the node owner, resource policy and tier counts; mismatched keys, malformed ETH identity, duplicates and full tiers reject without side effects.",
+      "cluster_only": "Ethereum NFT mint/ownership and upstream claim emission.",
+      "tests": [
+        "sysio_roa_tests/nodeownreg_happy_path",
+        "sysio_roa_tests/nodeownreg_rejects_malformed_eth_address_lengths",
+        "sysio_roa_tests/nodeownreg_account_key_mismatch",
+        "sysio_roa_tests/nodeownreg_full_tier_has_no_registration_side_effects",
+        "sysio_emissions_tests/addnodeowner_increments_node_count_per_tier",
+        "sysio_dispatch_tests/dispatch_routes_node_owner_reg_to_roa"
+      ]
+    },
+    {
+      "name": "flow-operator-collateral-deposit",
+      "wire_behavior": "Depot-native collateral moves into opreg custody, withdrawal reservation updates eligibility, maturity credits token-specific remit claims, and claims return exact principal. Generic dual shadow coverage supplements WIRE coverage.",
+      "cluster_only": "Node provisioning and live batch daemon duty while collateral changes.",
+      "tests": [
+        "sysio_opreg_tests/withdraw_rechecks_eligibility_after_enqueue",
+        "sysio_opreg_tests/withdraw_shadow_flush_credits_token_claim_and_claimremit_pays_liq",
+        "sysio_opreg_tests/two_generic_depot_assets_are_both_required_and_withdrawals_preserve_identity",
+        "sysio_opreg_tests/native_wire_partial_withdrawal_stays_active_and_claims_exactly"
+      ]
+    },
+    {
+      "name": "flow-producer-registration",
+      "wire_behavior": "Both required depot shadow assets must meet their own minimum; surplus cannot substitute, either withdrawal loses eligibility immediately, maturity/claim preserves asset identity. Producer registration, scoring, finalizer keys and scheduling enforce eligibility.",
+      "cluster_only": "Ethereum NFT provisioning and live producer process/block production. Generic NTA/NTB mirror the 2 LIQETH plus 2 LIQSOL policy; NFT tests remain Ethereum-specific.",
+      "tests": [
+        "sysio_opreg_tests/two_generic_depot_assets_are_both_required_and_withdrawals_preserve_identity",
+        "sysio_producer_eligibility_tests/noncollateralized_account_cannot_register_then_can_join",
+        "sysio_producer_score_tests/collateral_is_minimum_across_required_pairs",
+        "sysio_producer_score_tests/a_bonded_producer_without_a_finalizer_key_holds_no_rank",
+        "sysio_producer_score_tests/stale_active_status_cannot_bypass_raised_collateral_minimum",
+        "sysio_producer_score_tests/collateralised_producers_displace_the_bootstrap_at_the_boundary"
+      ]
+    },
+    {
+      "name": "flow-syndication-challenge",
+      "wire_behavior": "Partial release then challenge freezes progress; INVALID burns held intake and released value from the forfeited bond, preserves recipient funds, pots surplus and pays challenger. VALID resumes. Generated backed sequences check conservation after transitions.",
+      "cluster_only": "Real external custody excess after invalidation and transport.",
+      "tests": [
+        "sysio_synd_tests/generated_generic_custody_bond_challenge_and_return_sequences",
+        "sysio_synd_tests/invalid_burns_held_items_and_the_released_part_of_the_forfeit",
+        "sysio_synd_tests/challenge_charges_bond_plus_extra_and_holds",
+        "sysio_synd_tests/bounty_comes_from_the_fee_pot_or_is_zero",
+        "sysio_synd_tests/invalid_after_a_yield_release_keeps_the_supply_whole"
+      ]
+    },
+    {
+      "name": "flow-syndication-rate-limit",
+      "wire_behavior": "FIFO partial release, same-epoch no refill, epoch-bounded refill, oversized item draining and atomic over-budget redemption refusal.",
+      "cluster_only": "Live epoch-boundary synchronization and irreversible confirmation timing.",
+      "tests": [
+        "sysio_synd_tests/bucket_limits_a_tranche_and_refills_per_epoch",
+        "sysio_synd_tests/oversize_item_releases_in_tranches",
+        "sysio_synd_tests/desyndicate_refuses_over_budget",
+        "sysio_synd_tests/generated_generic_custody_bond_challenge_and_return_sequences"
+      ]
+    },
+    {
+      "name": "flow-syndication-underwriting",
+      "wire_behavior": "Held intake needs collateral before release, exact fees accrue, unlinked credits park, authenticated links deliver, approval/claim obey windows, and pruned outcomes remain usable.",
+      "cluster_only": "Actual outpost deposits and operator transport.",
+      "tests": [
+        "sysio_synd_tests/closeenv_issues_one_request_per_token",
+        "sysio_synd_tests/bonded_request_makes_the_envelope_releasable",
+        "sysio_synd_tests/release_pays_the_fee_and_credits_the_account",
+        "sysio_synd_tests/generic_parked_credit_yield_conversion_and_fee_rounded_return",
+        "sysio_synd_tests/a_pruned_request_keeps_its_pair_releasing",
+        "sysio_bond_tests/approve_refuses_before_the_window_and_when_unbonded",
+        "sysio_bond_tests/approved_returns_bonds_and_splits_the_bounty_by_stake",
+        "sysio_synd_tests/second_envelope_waits_until_the_first_is_bonded"
+      ]
+    },
+    {
+      "name": "flow-yield-distribution",
+      "wire_behavior": "Staking reward credits linked/unmapped WIRE claims, suppresses stale external references, funds through accounting and liquid balance caps, and records shortfall.",
+      "cluster_only": "Ethereum mock emitter and real STAKING_REWARD transport.",
+      "tests": [
+        "sysio_dclaim_tests/onreward_linked_credits_pending_claims",
+        "sysio_dclaim_tests/onreward_unlinked_parks_unmapped_then_linkswept",
+        "sysio_dclaim_tests/onreward_dedupes_stale_external_ref",
+        "t5_emissions_tests/fundclaim_transfers_and_tracks_distributed",
+        "t5_emissions_tests/fundclaim_caps_to_remaining_pool_and_records_shortfall",
+        "sysio_dispatch_tests/generic_staking_rewards_fund_claim_and_dedupe_through_dispatch"
+      ]
+    }
+  ]
+}

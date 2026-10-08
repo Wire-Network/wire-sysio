@@ -29,25 +29,7 @@ using namespace std;
 using mvo = fc::mutable_variant_object;
 using ChainKind = sysio::opp::types::ChainKind;
 
-// Replicate the contract's pubkey_to_string for EM keys:
-// "PUB_EM_" + hex(compressed_33_bytes)
-static std::string contract_pubkey_to_string(const fc::crypto::public_key& pk) {
-   const auto& shim = pk.get<fc::em::public_key_shim>();
-   auto compressed = shim.serialize(); // std::array<char, 33>
-   return "PUB_EM_" + fc::to_hex(compressed.data(), compressed.size());
-}
-
-// Build the message string exactly as the contract does
-static std::string build_link_message(
-   const fc::crypto::public_key& pub_key,
-   const std::string& account,
-   ChainKind chain_kind,
-   uint64_t nonce
-) {
-    auto pub_key_str = contract_pubkey_to_string(pub_key);
-    auto chain_kind_str = std::to_string(magic_enum::enum_integer(chain_kind));
-    return pub_key_str + "|" + account + "|" + chain_kind_str + "|" + std::to_string(nonce) + "|createlink auth";
-}
+using sysio_system::test_support::build_link_message;
 
 // ——— Tester class ———
 class sysio_authex_tester : public tester {
@@ -355,20 +337,21 @@ BOOST_FIXTURE_TEST_CASE( createlink_eth_sweeps_prelink_dclaim_rewards, sysio_aut
    BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 5000);
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( createlink_forfeits_expired_prelink_dclaim_rewards,
+BOOST_FIXTURE_TEST_CASE( createlink_preserves_old_prelink_dclaim_rewards,
                          sysio_authex_tester ) try {
    deploy_dclaim();
-   BOOST_REQUIRE_EQUAL(success(),
-      sysio_system::test_support::push_contract_action_and_produce_block(
-         *this, DCLAIM, dclaim_abi_ser, DCLAIM, "setclmwindow"_n,
-         mvo()("window_sec", uint32_t{1})));
    auto link = make_eth_link("alice", now_ms());
    const auto address_bytes = fc::crypto::ethereum::address_to_bytes(link.pub);
    const std::vector<char> native_address(address_bytes.begin(), address_bytes.end());
    BOOST_REQUIRE_EQUAL(success(), onreward(native_address, 5000));
    BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
-   produce_blocks(10);
-   produce_block(fc::seconds(5));
+   constexpr uint32_t years_without_link_sec = 3u * 365u * 24u * 60u * 60u;
+   produce_block(fc::seconds(years_without_link_sec));
+   // Refresh the link proof's nonce after the wait; the reward itself remains old.
+   link.nonce = now_ms();
+   const auto message = build_link_message(link.pub, "alice", ChainKind::CHAIN_KIND_EVM, link.nonce);
+   const auto message_hash = fc::crypto::keccak256::hash(message);
+   link.sig = link.priv.sign(fc::sha256(reinterpret_cast<const char*>(message_hash.data()), 32));
 
    BOOST_REQUIRE_EQUAL(success(), createlink(
       "alice"_n, ChainKind::CHAIN_KIND_EVM, "alice", link.sig, link.pub, link.nonce));
@@ -376,7 +359,9 @@ BOOST_FIXTURE_TEST_CASE( createlink_forfeits_expired_prelink_dclaim_rewards,
 
    BOOST_REQUIRE(!get_link(0).is_null());
    BOOST_REQUIRE(get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
-   BOOST_REQUIRE(get_dclaim_row("pclaims"_n, "pending_claim", "alice"_n.to_uint64_t()).is_null());
+   const auto pending = get_dclaim_row("pclaims"_n, "pending_claim", "alice"_n.to_uint64_t());
+   BOOST_REQUIRE(!pending.is_null());
+   BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 5000);
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( recordlink_records_link_when_dclaim_is_missing, sysio_authex_tester ) try {
