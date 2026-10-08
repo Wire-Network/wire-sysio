@@ -289,18 +289,22 @@ fc::variant ethereum_client::get_syncing_status() {
  * Constructs a complete EIP-1559 transaction by:
  * - Fetching current gas configuration (base fee, priority fee)
  * - Encoding the contract call data according to the ABI
- * - Estimating gas usage and adding a 20% buffer, then raising the result to
- *   `gas_limit_floor` when the caller funds the call to a floor
+ * - Sizing the gas limit: with a cap, the cap IS the limit and the estimate
+ *   is a pre-flight at that gas; without one, the estimate plus a 20% buffer,
+ *   raised to `gas_limit_floor` when the caller funds the call to a floor
  * - Setting the nonce from the pending transaction count
  *
  * @param to The recipient address (contract address for contract calls)
  * @param contract The ABI contract definition for encoding the call data
  * @param params The parameters to pass to the contract function
  * @param gas_limit_floor Least gas limit to fund with, or 0 for the buffered estimate
+ * @param gas_limit_cap The limit to send with, or 0 for the buffered estimate
  * @return A configured eip1559_tx ready for signing and submission
- * @throws fc::network::json_rpc::json_rpc_exception if any RPC call fails
- * @throws ethereum_transaction_policy_exception if the estimate or the floor
- *         breaches the client's `max_gas_limit`
+ * @throws fc::network::json_rpc::json_rpc_exception if any RPC call fails --
+ *         including the node refusing a capped pre-flight that cannot succeed
+ *         inside the cap
+ * @throws ethereum_transaction_policy_exception if the estimate, the floor or
+ *         the cap breaches the client's `max_gas_limit`
  */
 eip1559_tx ethereum_client::create_default_tx(const address_compat_type& to, const abi::contract& contract,
                                               const fc::variants& params, uint64_t gas_limit_floor,
@@ -321,18 +325,27 @@ eip1559_tx ethereum_client::create_default_tx(const address_compat_type& to, con
                                                field, wide.str(), _transaction_policy.max_gas_limit.str());
          }
       };
-      if (gas_limit_cap != 0) require_within_policy(gas_limit_cap, transaction_policy_field::gas_limit_cap);
 
-      auto estimated_gas = estimate_gas(to, contract, data, gc, gas_limit_cap);
-      auto gas_limit = derive_buffered_gas_limit(_transaction_policy, estimated_gas);
-      if (gas_limit_floor != 0) {
-         require_within_policy(gas_limit_floor, transaction_policy_field::gas_limit_floor);
-         const fc::uint256 floor{gas_limit_floor};
-         if (gas_limit < floor) gas_limit = floor;
-      }
+      fc::uint256 gas_limit;
       if (gas_limit_cap != 0) {
-         const fc::uint256 cap{gas_limit_cap};
-         if (gas_limit > cap) gas_limit = cap;
+         // A capped call is sent with exactly the cap. The estimate runs under
+         // it as a pre-flight -- the node refuses a call that cannot succeed
+         // inside the cap -- and its VALUE is discarded: what is simulated is
+         // what is sent, so neither the headroom buffer nor the buffered
+         // ceiling check has anything to add. (Buffering a call that uses most
+         // of its cap would only manufacture a policy rejection for a
+         // transaction the cap already carries.)
+         require_within_policy(gas_limit_cap, transaction_policy_field::gas_limit_cap);
+         (void) estimate_gas(to, contract, data, gc, gas_limit_cap);
+         gas_limit = fc::uint256{gas_limit_cap};
+      } else {
+         auto estimated_gas = estimate_gas(to, contract, data, gc, 0);
+         gas_limit = derive_buffered_gas_limit(_transaction_policy, estimated_gas);
+         if (gas_limit_floor != 0) {
+            require_within_policy(gas_limit_floor, transaction_policy_field::gas_limit_floor);
+            const fc::uint256 floor{gas_limit_floor};
+            if (gas_limit < floor) gas_limit = floor;
+         }
       }
 
       return eip1559_tx{.chain_id = get_chain_id(),
@@ -614,6 +627,12 @@ std::string ethereum_client::send_raw_transaction(const std::string& raw_tx_data
 
 std::string ethereum_client::wait_for_confirmation(const std::string& tx_hash,
                                                     const ethereum_confirm_options& opts) {
+   (void) wait_for_receipt(tx_hash, opts);
+   return tx_hash;
+}
+
+fc::variant ethereum_client::wait_for_receipt(const std::string& tx_hash,
+                                              const ethereum_confirm_options& opts) {
    // Phase 1: wait for the receipt to exist. A null result means the tx
    // hasn't been included yet — retry with backoff. A `status == 0` means
    // the EVM executed the tx and reverted — propagate as a fatal error so
@@ -640,7 +659,7 @@ std::string ethereum_client::wait_for_confirmation(const std::string& tx_hash,
    if (opts.confirmations <= 1) {
       // Receipt exists: tx is in the head block. That's one confirmation by
       // definition; no further wait required.
-      return tx_hash;
+      return receipt;
    }
 
    // Phase 2: wait for `opts.confirmations - 1` more blocks on top of the
@@ -663,7 +682,7 @@ std::string ethereum_client::wait_for_confirmation(const std::string& tx_hash,
          return std::nullopt;
       });
 
-   return tx_hash;
+   return receipt;
 }
 
 std::string ethereum_client::send_transaction_and_confirm(const std::string& raw_tx_data,
