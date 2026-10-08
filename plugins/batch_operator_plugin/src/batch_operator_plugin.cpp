@@ -37,7 +37,6 @@
 #include <sysio/chain/transaction.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/opp/opp.hpp>
-#include <sysio/opp/opp.pb.h>
 #include <sysio/opp/attestations/attestations.pb.h>
 #include <sysio/outpost_ethereum_client_plugin/outpost_ethereum_client.hpp>
 #include <sysio/outpost_solana_client_plugin/outpost_solana_client.hpp>
@@ -50,12 +49,17 @@ namespace eth = fc::network::ethereum;
 namespace sol = fc::network::solana;
 
 namespace {
-   constexpr auto DELIVERY_TIMEOUT_MS  = 15000;
-   constexpr auto EPOCH_POLL_MS        = 15000;
-   constexpr auto EPOCH_EDGE_BUFFER_MS = 2500;
+   constexpr fc::microseconds DELIVERY_TIMEOUT  = fc::seconds(15);
+   constexpr fc::microseconds EPOCH_POLL        = fc::seconds(15);
+   constexpr fc::microseconds EPOCH_EDGE_BUFFER = fc::milliseconds(2500);
    /// Minimum spacing between this operator's `sysio.swap::tickyield` pushes per
    /// yield pool (`--batch-yield-tick-interval-ms`).
-   constexpr auto YIELD_TICK_INTERVAL_MS = 60000;
+   constexpr fc::microseconds YIELD_TICK_INTERVAL = fc::minutes(1);
+
+   /// `d` in whole milliseconds, the unit of the `-ms` options and of cron schedules.
+   constexpr uint32_t whole_milliseconds(fc::microseconds d) {
+      return static_cast<uint32_t>(d.count() / fc::milliseconds(1).count());
+   }
 
    /// Minimum private cron-service thread count even when 0 outposts are
    /// discovered at startup — keeps `epoch_tick` viable so a cold-sync node
@@ -71,22 +75,18 @@ namespace {
    constexpr uint32_t EXACT_LOOKUP_LIMIT = 1;
    /// How long past the head block's time a pushed transaction stays valid.
    constexpr fc::microseconds PUSH_EXPIRATION = fc::seconds(30);
-   /// Spacing of the warning that `sysio.chains` could not be read, per caller.
-   constexpr auto OUTPOSTS_READ_WARN_INTERVAL_MS = 30000;
 
    /// Work units of the `sysio.synd::crank` the underwriter pushes every pass.
    constexpr uint32_t UNDERWRITER_CRANK_LIMIT = 16;
    /// Requests one `sysio.bond::prune`, and envelopes one `sysio.synd::pruneenv`, act on.
    constexpr uint32_t UNDERWRITER_PRUNE_LIMIT = 64;
    /// Spacing of the underwriter's prunes.
-   constexpr auto UNDERWRITER_PRUNE_INTERVAL_MS = 600000;
+   constexpr fc::microseconds UNDERWRITER_PRUNE_INTERVAL = fc::minutes(10);
    /// Spacing of the underwriter's rebuild of its outpost clients from `sysio.chains`.
-   constexpr auto UNDERWRITER_CLIENTS_INTERVAL_MS = 60000;
-   /// Spacing of the underwriter's pushes of one action on one request: until the irreversible view shows a push,
-   /// every pass plans it again.
-   constexpr auto UNDERWRITER_PUSH_INTERVAL_MS = 60000;
-   /// Spacing of the repeated report of one request, or one condition, the underwriter cannot act on.
-   constexpr auto UNDERWRITER_ALERT_INTERVAL_MS = 300000;
+   constexpr fc::microseconds UNDERWRITER_CLIENTS_INTERVAL = fc::minutes(1);
+   /// Spacing of the underwriter's crank while no envelope request is in play: a bucket refill or a cleared cord
+   /// still lets queued releases move.
+   constexpr fc::microseconds UNDERWRITER_IDLE_CRANK_INTERVAL = fc::minutes(5);
    /// What a signer signs at startup to show that its signatures recover to its own key.
    constexpr std::string_view SIGNER_PROBE = "batch_operator_plugin signer probe";
 
@@ -99,21 +99,17 @@ namespace {
       constexpr auto account             = "sysio.msgch";
       constexpr auto table_envelopes     = "envelopes";
       constexpr auto table_outenvelopes  = "outenvelopes";
-      /// The latest accepted inbound envelope per outpost, which the underwriter verifies.
-      constexpr auto table_outpcons      = "outpcons";
       constexpr auto action_deliver      = "deliver";
       constexpr auto action_chkcons      = "chkcons";
-      /// Field names on `envelope_entry` / `outbound_envelope` / `outpost_consensus_entry` rows.
+      /// Field names on `envelope_entry` / `outbound_envelope` rows.
       namespace field {
-         constexpr auto chain_code       = "chain_code";
-         constexpr auto epoch_index      = "epoch_index";
-         constexpr auto status           = "status";
-         constexpr auto raw_envelope     = "raw_envelope";
-         constexpr auto envelope_hash    = "envelope_hash";
-         constexpr auto batch_op_name    = "batch_op_name";
-         constexpr auto data             = "data";
-         constexpr auto winning_checksum = "winning_checksum";
-         constexpr auto envelope_digest  = "envelope_digest";
+         constexpr auto chain_code     = "chain_code";
+         constexpr auto epoch_index    = "epoch_index";
+         constexpr auto status         = "status";
+         constexpr auto raw_envelope   = "raw_envelope";
+         constexpr auto envelope_hash  = "envelope_hash";
+         constexpr auto batch_op_name  = "batch_op_name";
+         constexpr auto data           = "data";
       }
    }
 
@@ -191,24 +187,8 @@ namespace {
 
    /// The contracts the underwriter reads and pushes to; it idles until every one runs code. Not `sysio.andon`:
    /// until that runs code there is no cord to pull.
-   constexpr std::array UNDERWRITER_CONTRACTS{uw::bond::account, uw::synd::account, msgch::account,
+   constexpr std::array UNDERWRITER_CONTRACTS{uw::bond::account, uw::synd::account,
                                               batch_operator_detail::liq::account};
-
-   /// What the underwriter reports, each spaced per subject by UNDERWRITER_ALERT_INTERVAL_MS.
-   enum class alert_kind : uint8_t {
-      FROZEN,          ///< the andon cord is pulled
-      HALTED,          ///< bonding stopped after a forfeit
-      HELD,            ///< a request with the underwriter's bond on it is challenged
-      BLOCKED,         ///< a request was challenged before anyone bonded it
-      FORFEITED,       ///< a request with the underwriter's bond on it was ruled INVALID
-      WAITING,         ///< an OPEN request is not bonded this pass
-      CONTRADICTED,    ///< an outpost contradicts the depot's accepted envelope
-      UNCONFIRMED,     ///< an outpost could not be read, or does not confirm the depot's tip yet
-      UNSERVICEABLE,   ///< this node cannot verify a chain
-      UNDECODABLE,     ///< a row the underwriter needs does not decode
-      CAP_MISMATCH,    ///< an exposure cap's precision is not its shadow's
-      CAP_UNUSED,      ///< an exposure cap names no shadow
-   };
 }
 
 // ---------------------------------------------------------------------------
@@ -274,15 +254,20 @@ namespace {
       return it == outposts.end() ? nullptr : &*it;
    }
 
+   /// `find_outpost` by the chain's registry code as a slug.
+   const outpost_descriptor* find_outpost(const std::vector<outpost_descriptor>& outposts, fc::slug_name chain_code) {
+      return find_outpost(outposts, chain_code.value);
+   }
+
    /// Whether `account` runs code. Call from a read window.
    bool runs_code(const chain::controller& controller, std::string_view account) {
-      const auto* meta = controller.find_account_metadata(chain::name(account));
+      const chain::account_metadata_object* meta = controller.find_account_metadata(chain::name(account));
       return meta != nullptr && meta->code_hash != chain::digest_type();
    }
 
    /// "request <id> (<chain> <token> epoch <n>)", or "request <id>" when its statement does not decode.
    std::string describe(const uw::request& r) {
-      const auto s = uw::decode_statement(r.statement);
+      const std::optional<uw::envelope_statement> s = uw::decode_statement(r.statement);
       if (!s) return std::format("request {}", r.id);
       return std::format("request {} ({} {} epoch {})", r.id, s->chain_code.to_string(), s->token_code.to_string(),
                          s->epoch_index);
@@ -298,9 +283,9 @@ struct batch_operator_plugin::impl {
    /// Derived from `operator_account` at plugin_initialize: the relay runs iff
    /// an account was configured. There is no separate enable flag.
    bool         enabled             = false;
-   uint32_t     epoch_poll_ms       = EPOCH_POLL_MS;
-   uint32_t     delivery_timeout_ms = DELIVERY_TIMEOUT_MS;
-   uint32_t     yield_tick_interval_ms = YIELD_TICK_INTERVAL_MS;
+   fc::microseconds epoch_poll          = EPOCH_POLL;
+   fc::microseconds delivery_timeout    = DELIVERY_TIMEOUT;
+   fc::microseconds yield_tick_interval = YIELD_TICK_INTERVAL;
 
    /// `account@permission` the underwriter bonds and claims as (`batch-underwriter-account`).
    chain::permission_level underwriter_auth;
@@ -308,28 +293,33 @@ struct batch_operator_plugin::impl {
    /// with or without the relay.
    bool                    underwriter_enabled = false;
    /// `batch-underwriter-max-exposure`, by shadow symbol code: the most the underwriter may have bonded at once.
-   std::map<uint64_t, chain::asset> underwriter_caps;
+   std::map<chain::symbol_code, chain::asset> underwriter_caps;
 
    /// The relay's and the underwriter's signers, resolved by `resolve_signers` once the node is synced.
    std::optional<signer> relay_signer;
    std::optional<signer> underwriter_signer;
 
-   /// Whether the contracts the underwriter needs run code (`UNDERWRITER_CONTRACTS`), and whether `sysio.andon`
-   /// does, refreshed off the read-only queue every pass as `yield_contracts_deployed` is.
-   std::atomic<bool> underwriter_contracts_deployed{false};
-   std::atomic<bool> andon_deployed{false};
+   /// What the underwriter reads in a read window every pass (`refresh_underwriter_chain_view`), acting on the last
+   /// reading: whether the contracts it needs run code (`UNDERWRITER_CONTRACTS`), whether `sysio.andon` does, the head
+   /// block's time, and whether its key still satisfies its permission.
+   std::atomic<bool>           underwriter_contracts_deployed{false};
+   std::atomic<bool>           andon_deployed{false};
+   std::atomic<fc::time_point> underwriter_head_time{};
+   std::atomic<bool>           underwriter_signer_valid{true};
+   /// Whether the relay's key still satisfies `<operator>@active`, read with the yield contracts' presence.
+   std::atomic<bool>           relay_signer_valid{true};
 
    // Underwriter state, see `underwriter_tick`. Touched only from the underwriter's cron job.
-   std::map<uint64_t, built_outpost_client> underwriter_clients;   ///< by outpost chain code
+   std::map<fc::slug_name, built_outpost_client> underwriter_clients;   ///< by outpost chain code
    fc::time_point                           underwriter_clients_at;   ///< last rebuild of `underwriter_clients`
    fc::time_point                           underwriter_pruned_at;    ///< last prune
-   batch_operator_detail::crank_spacing     underwriter_alerts;
-   batch_operator_detail::crank_spacing     underwriter_pushes;
-   /// The request whose INVALID ruling forfeited a bond of the underwriter's while it ran: it bonds nothing more
-   /// until restarted.
-   std::optional<uint64_t>                  underwriter_halted_by;
-   /// The forfeits on chain at the first pass, which do not stop bonding (`note_forfeits`).
-   std::optional<std::set<uint64_t>>        underwriter_known_forfeits;
+   fc::time_point                           underwriter_cranked_at;   ///< last crank
+   /// The lowest `sysio.bond::requests` id the next pass reads (`underwriter::next_scan_start`); 0 reads them all.
+   uw::request_id_t                         underwriter_scan_from = 0;
+   /// Every request the underwriter bonded, until its request row is pruned (`underwriter::remember_bonded`).
+   std::set<uw::request_id_t>               underwriter_bonded;
+   /// Which forfeit stops bonding (`underwriter::forfeit_watch`).
+   uw::forfeit_watch                        underwriter_forfeits;
 
    // Yield cranks -- see `crank_yield`.
    /// Whether `sysio.swap` and `sysio.liq` run code, refreshed off the read-only
@@ -349,9 +339,6 @@ struct batch_operator_plugin::impl {
    fc::time_point           epoch_start;
    fc::time_point           next_epoch_start;
    std::vector<outpost_descriptor> outposts;
-   /// Last `sysio.chains` read-failure warning, per caller (`read_active_outposts`).
-   fc::time_point           relay_outposts_warn;
-   fc::time_point           underwriter_outposts_warn;
 
    // Operator awareness — set by `poll_own_status()` from sysio.opreg::operators.
    // SLASHED / TERMINATED operators MUST stop relaying: continued deliveries
@@ -495,15 +482,14 @@ struct batch_operator_plugin::impl {
    /// so chainbase iteration runs during the controller's read window instead of racing with block apply.
    sysio::chain_apis::read_only::get_table_rows_result
    read_table(sysio::chain_apis::read_only::get_table_rows_params p) {
-      return chain_plug->read_table_rows(std::move(p), fc::milliseconds(delivery_timeout_ms),
-                                         "batch_operator", shutting_down);
+      return chain_plug->read_table_rows(std::move(p), delivery_timeout, "batch_operator", shutting_down);
    }
 
    /// `read_table`, but nullopt when the read failed (logged by chain_plugin), so a caller that must not act on a
    /// partial view can tell a failure from an empty table.
    std::optional<sysio::chain_apis::read_only::get_table_rows_result>
    read_table_checked(sysio::chain_apis::read_only::get_table_rows_params p) {
-      return chain_plug->read_table_rows_checked(std::move(p), fc::milliseconds(delivery_timeout_ms),
+      return chain_plug->read_table_rows_checked(std::move(p), delivery_timeout,
                                                  chain_plug->get_abi_serializer_max_time(), "batch_operator",
                                                  shutting_down);
    }
@@ -517,7 +503,7 @@ struct batch_operator_plugin::impl {
       p.table       = std::string(table);
       p.all_rows    = true;
       p.values_only = true;
-      auto rows = read_table_checked(std::move(p));
+      std::optional<sysio::chain_apis::read_only::get_table_rows_result> rows = read_table_checked(std::move(p));
       if (!rows) return std::nullopt;
       return std::move(rows->rows);
    }
@@ -568,6 +554,7 @@ struct batch_operator_plugin::impl {
          poll_own_status();
       } FC_LOG_AND_DROP();
       if (!is_active) return;
+      if (!relay_signer_valid) report_stale_signer(*relay_signer, "the relay");
 
       // chkcons advances the epoch on consensus. Only the elected operator
       // should push it — the contract verifies authorization regardless,
@@ -670,6 +657,7 @@ struct batch_operator_plugin::impl {
          if (shutting_down) return;
          const auto& controller = chain_plug->chain();
          const bool  deployed   = runs_code(controller, swap::account) && runs_code(controller, liq::account);
+         note_signer_validity(controller, relay_signer, relay_signer_valid);
          if (yield_contracts_deployed.exchange(deployed) != deployed) {
             ilog("batch_operator: yield cranks {}: {} and {} {}",
                  deployed ? "active" : "idle", swap::account, liq::account,
@@ -731,14 +719,13 @@ struct batch_operator_plugin::impl {
       }
 
       const auto now      = fc::time_point::now();
-      const auto interval = fc::milliseconds(yield_tick_interval_ms);
       for (const auto& r : pool_rows.rows) {
          const auto code = row_symbol_code(r.get_object());
          if (!code) continue;
          const auto queued = queued_by_pool.find(code->value);
          if (queued == queued_by_pool.end() || queued->second <= 0) continue;
          const auto pool = symbol_code_name(*code);
-         if (!yield_tick_spacing.due(pool, now, interval)) continue;
+         if (!yield_tick_spacing.due(pool, now, yield_tick_interval)) continue;
          try {
             push_action(swap::account, swap::action_tickyield, *relay_signer,
                         fc::mutable_variant_object()(swap::field::pair_token, *code));
@@ -924,21 +911,16 @@ struct batch_operator_plugin::impl {
    /// Startup race: in a multi-node cluster the batch-op node replays blocks from the producer asynchronously.
    /// There's a brief window where `sysio.chains` exists on the producer but the local node hasn't replayed far
    /// enough to see it, and the read fails (logged by chain_plugin). The caller keeps its last-known set and retries
-   /// on its next tick; `last_warn` (the caller's own, as relay and underwriter poll on different threads) spaces
-   /// the warning.
-   std::optional<std::vector<outpost_descriptor>> read_active_outposts(fc::time_point& last_warn) {
-      auto rows = read_all_rows(chains::account, chains::account, chains::table_chains);
+   /// on its next tick.
+   std::optional<std::vector<outpost_descriptor>> read_active_outposts() {
+      const std::optional<fc::variants> rows = read_all_rows(chains::account, chains::account, chains::table_chains);
       if (!rows) {
-         const auto now = fc::time_point::now();
-         if (now - last_warn >= fc::milliseconds(OUTPOSTS_READ_WARN_INTERVAL_MS)) {
-            wlog("batch_operator: outpost refresh deferred: sysio.chains could not be read");
-            last_warn = now;
-         }
+         wlog("batch_operator: outpost refresh deferred: sysio.chains could not be read");
          return std::nullopt;
       }
       std::vector<outpost_descriptor> active;
-      for (auto& row : *rows) {
-         auto obj = row.get_object();
+      for (const fc::variant& row : *rows) {
+         const fc::variant_object& obj = row.get_object();
          // `code` is a `slug_name`. fc::slug_name's own from_variant reads the
          // decoded slug string ("" for zero) and the transitional
          // `{value: <uint64>}` object, so the shape is not probed here.
@@ -958,7 +940,7 @@ struct batch_operator_plugin::impl {
          // `make_outpost_client` exactly like a row governance has not configured yet.
          if (auto out_it = obj.find(chains::field::outpost);
              out_it != obj.end() && out_it->value().is_object()) {
-            const auto& out_obj = out_it->value().get_object();
+            const fc::variant_object& out_obj = out_it->value().get_object();
             if (auto a = out_obj.find(chains::field::outpost_addr::opp_addr); a != out_obj.end())
                od.opp_addr = a->value().as_string();
             if (auto a = out_obj.find(chains::field::outpost_addr::opp_inbound_addr); a != out_obj.end())
@@ -970,7 +952,7 @@ struct batch_operator_plugin::impl {
    }
 
    void refresh_outposts() {
-      auto active = read_active_outposts(relay_outposts_warn);
+      std::optional<std::vector<outpost_descriptor>> active = read_active_outposts();
       if (!active) return;   // keep the last-known set; jobs built from it continue to work
       outposts = std::move(*active);
       ilog("batch_operator: loaded {} outposts (sysio.chains)", outposts.size());
@@ -987,14 +969,15 @@ struct batch_operator_plugin::impl {
       std::string                            unserviceable;
    };
 
-   /// Build the outpost client for `op` with the chain-specific plugin factories.
+   /// Build the outpost client for `op` with the chain-specific plugin factories, for `role` (which Solana IDL
+   /// declarations it validates at boot).
    ///
    /// A missing RPC client, an unsupported chain kind or a factory refusal is local configuration only the
    /// operator can fix, reported as `unserviceable`. Missing CONTRACT ADDRESSES are governance state on the row,
    /// fixable with `sysio.chains::setoutpost` without touching any node, so the chain is skipped (no client, no
    /// reason) and picked up on a later refresh.
-   client_build make_outpost_client(const outpost_descriptor& op) {
-      const auto code_str = fc::slug_name{op.id}.to_string();
+   client_build make_outpost_client(const outpost_descriptor& op, solana_outpost_role role) {
+      const std::string code_str = fc::slug_name{op.id}.to_string();
       try {
          if (op.chain_kind == CHAIN_KIND_EVM) {
             // Bind this exact outpost to its own remote identity: the RPC
@@ -1030,8 +1013,7 @@ struct batch_operator_plugin::impl {
                     code_str);
                return {};
             }
-            return {.client = sol_plug->create_outpost_client(code_str, op.id, op.chain_id, op.opp_addr,
-                                                              solana_outpost_role::batch_operator)};
+            return {.client = sol_plug->create_outpost_client(code_str, op.id, op.chain_id, op.opp_addr, role)};
          }
          // A chain kind this build does not know how to serve is just as
          // unserviceable as a missing client, and equally unfixable
@@ -1052,32 +1034,35 @@ struct batch_operator_plugin::impl {
       }
    }
 
-   /// Build, with `wrap(op, client)`, what `built` lacks for each chain in `active`. Returns the chains this node
-   /// cannot serve; a chain whose row has no remote address yet is skipped until `setoutpost` supplies one.
-   template <typename Built, typename Wrap>
-   std::vector<unserviceable_chain> build_missing(std::map<uint64_t, Built>& built,
-                                                  const std::vector<outpost_descriptor>& active, Wrap&& wrap) {
+   /// Build, with `wrap(op, client)`, what `built` lacks for each chain in `active`, the clients made for `role`.
+   /// Returns the chains this node cannot serve; a chain whose row has no remote address yet is skipped until
+   /// `setoutpost` supplies one.
+   template <typename Key, typename Built, typename Wrap>
+   std::vector<unserviceable_chain> build_missing(std::map<Key, Built>& built,
+                                                  const std::vector<outpost_descriptor>& active,
+                                                  solana_outpost_role role, Wrap&& wrap) {
       std::vector<unserviceable_chain> unserviceable;
-      for (const auto& op : active) {
-         if (built.contains(op.id)) continue;
-         auto made = make_outpost_client(op);
+      for (const outpost_descriptor& op : active) {
+         const Key key{op.id};
+         if (built.contains(key)) continue;
+         client_build made = make_outpost_client(op, role);
          if (!made.unserviceable.empty()) {
             unserviceable.push_back({fc::slug_name{op.id}.to_string(), std::move(made.unserviceable)});
             continue;
          }
          if (!made.client) continue;   // no remote address on the row yet
-         built.emplace(op.id, wrap(op, made.client));
+         built.emplace(key, wrap(op, made.client));
       }
       return unserviceable;
    }
 
    /// Drop what `built` holds for a chain that left `active`, or whose deployment moved (`setoutpost`), calling
    /// `on_drop(chain_code, why)` for each, so the next `build_missing` builds it again for the new address.
-   template <typename Built, typename OnDrop>
-   static void drop_stale(std::map<uint64_t, Built>& built, const std::vector<outpost_descriptor>& active,
+   template <typename Key, typename Built, typename OnDrop>
+   static void drop_stale(std::map<Key, Built>& built, const std::vector<outpost_descriptor>& active,
                           OnDrop&& on_drop) {
       for (auto it = built.begin(); it != built.end();) {
-         const auto* current = find_outpost(active, it->first);
+         const outpost_descriptor* current = find_outpost(active, it->first);
          if (current != nullptr && it->second.deployment.matches(*current)) {
             ++it;
             continue;
@@ -1110,10 +1095,11 @@ struct batch_operator_plugin::impl {
    /// runs after the sync gate, where `sysio.chains` is actually readable.
    void build_opp_jobs() {
       if (!depot_ops_backing) return; // plugin not initialized yet
-      const auto unserviceable = build_missing(
-         opp_jobs, outposts, [&](const outpost_descriptor& op, const std::shared_ptr<sysio::outpost_client>& client) {
-            auto job = std::make_shared<sysio::outpost_opp_job>(
-               client, *depot_ops_backing, fc::milliseconds(delivery_timeout_ms));
+      const std::vector<unserviceable_chain> unserviceable = build_missing(
+         opp_jobs, outposts, solana_outpost_role::batch_operator,
+         [&](const outpost_descriptor& op, const std::shared_ptr<sysio::outpost_client>& client) {
+            std::shared_ptr<sysio::outpost_opp_job> job =
+               std::make_shared<sysio::outpost_opp_job>(client, *depot_ops_backing, delivery_timeout);
             ilog("batch_operator: built outpost_opp_job for {}", client->to_string());
             return built_opp_job{std::move(job), outpost_deployment{op}};
          });
@@ -1160,7 +1146,7 @@ struct batch_operator_plugin::impl {
                                                      std::string_view direction,
                                                      void (sysio::outpost_opp_job::*runner)()) {
       sysio::services::cron_service::job_schedule sched;
-      sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{epoch_poll_ms}};
+      sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{whole_milliseconds(epoch_poll)}};
       sysio::services::cron_service::job_metadata_t meta;
       meta.label         = std::format("outpost_opp_{}_{}", direction, chain_code);
       meta.one_at_a_time = true;
@@ -1171,7 +1157,7 @@ struct batch_operator_plugin::impl {
                               meta);
       cron_job_ids.push_back(id);
       ilog("batch_operator_plugin: scheduled {} for {} (id={}, every {}ms)",
-           meta.label, job->client().to_string(), id, epoch_poll_ms);
+           meta.label, job->client().to_string(), id, whole_milliseconds(epoch_poll));
       return id;
    }
 
@@ -1199,13 +1185,12 @@ struct batch_operator_plugin::impl {
    /// Blocks operations only in the narrow buffer zones at epoch boundaries.
    /// Once past next_epoch_start, operations are allowed (epoch is overdue).
    bool within_epoch_window() const {
-      auto now = fc::time_point::now();
-      auto buffer = fc::milliseconds(EPOCH_EDGE_BUFFER_MS);
-      if (now < epoch_start + buffer) return false;  // too close to epoch start
+      const fc::time_point now = fc::time_point::now();
+      if (now < epoch_start + EPOCH_EDGE_BUFFER) return false;  // too close to epoch start
       // Only block in the narrow window BEFORE next_epoch_start.
       // Once past next_epoch_start, the epoch is overdue — allow operations.
       if (next_epoch_start != fc::time_point() &&
-          now > next_epoch_start - buffer &&
+          now > next_epoch_start - EPOCH_EDGE_BUFFER &&
           now < next_epoch_start) return false;
       return true;
    }
@@ -1222,16 +1207,17 @@ struct batch_operator_plugin::impl {
    /// of `actions`. Call on the main thread, after the sync gate.
    std::optional<signer> resolve_signer(std::string_view role, const chain::permission_level& level,
                                         std::span<const pushed_action> actions) {
-      const auto& chain  = chain_plug->chain();
-      bool        linked = true;
+      const chain::controller& chain  = chain_plug->chain();
+      bool                     linked = true;
       for (const auto& [contract, action] : actions) {
          if (permission_satisfies_link(chain, level, chain::name(contract), chain::name(action))) continue;
          elog("batch_operator: {} declares {}@{}, which may not authorize {}::{}: link that action to it",
               role, level.actor.to_string(), level.permission.to_string(), contract, action);
          linked = false;
       }
-      auto&      sig_plug = app().get_plugin<signature_provider_manager_plugin>();
-      const auto choice   = batch_operator_detail::choose_signer(
+      signature_provider_manager_plugin& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
+      const batch_operator_detail::signer_choice<fc::crypto::signature_provider_ptr> choice =
+         batch_operator_detail::choose_signer(
          sig_plug.query_providers(std::nullopt, fc::crypto::chain_kind_wire),
          [&](const fc::crypto::signature_provider_ptr& provider) {
             return sig_plug.is_operator_configured_provider(provider->key_name) &&
@@ -1249,7 +1235,7 @@ struct batch_operator_plugin::impl {
    /// Whether `provider`'s signature over a probe digest recovers to its own key, which is how the chain checks a
    /// transaction signature. Logs why not.
    static bool signs_for_its_key(std::string_view role, const fc::crypto::signature_provider_t& provider) {
-      const auto probe = fc::sha256::hash(SIGNER_PROBE.data(), SIGNER_PROBE.size());
+      const fc::sha256 probe = fc::sha256::hash(SIGNER_PROBE.data(), SIGNER_PROBE.size());
       try {
          if (fc::crypto::public_key::recover(provider.sign(probe), probe) == provider.public_key) return true;
          elog("batch_operator: {}'s signature provider {} makes signatures that do not recover to its key", role,
@@ -1286,12 +1272,12 @@ struct batch_operator_plugin::impl {
     * `underwriter::plan_actions` makes every decision; this reads its inputs and pushes its actions, all signed by
     * `underwriter_signer`.
     *
-    * Bonding is what releases an envelope's syndications, so a request is bonded only when the outpost's own latest
-    * envelope confirms the depot's accepted chain through the request's epoch, within the token's exposure cap and
-    * the account's balance, while the andon cord is clear, and while no bond of the underwriter's has been ruled
-    * INVALID since the node started. A pass whose table reads fail does nothing: planning from part of the state
-    * could exceed a cap or miss a freeze. What it cannot act on waits for a later pass and is reported, spaced by
-    * UNDERWRITER_ALERT_INTERVAL_MS.
+    * Bonding is what releases an envelope's syndications, so a request is bonded only when its outpost's own record
+    * of the envelope it emitted for the statement's epoch carries the statement's digest, within the token's exposure
+    * cap and the account's balance, while the andon cord is clear, and while no bond of the underwriter's has been
+    * ruled INVALID since the node started. A pass whose table reads fail does nothing: planning from part of the state
+    * could exceed a cap or miss a freeze. What it cannot act on waits for a later pass and is logged on every pass
+    * it holds; deduplicating those lines is left to log tooling.
     */
    void underwriter_tick() {
       if (shutting_down || !underwriter_enabled) return;
@@ -1302,46 +1288,54 @@ struct batch_operator_plugin::impl {
 
    /// The body of `underwriter_tick`.
    void run_underwriter_pass() {
-      refresh_underwriter_contract_presence();
+      refresh_underwriter_chain_view();
       if (!underwriter_contracts_deployed) return;
-
-      const auto now = fc::time_point::now();
-      underwriter_alerts.forget_before(now - fc::milliseconds(UNDERWRITER_ALERT_INTERVAL_MS));
-      underwriter_pushes.forget_before(now - fc::milliseconds(UNDERWRITER_PUSH_INTERVAL_MS));
-      if (now - underwriter_clients_at >= fc::milliseconds(UNDERWRITER_CLIENTS_INTERVAL_MS)) {
+      if (!underwriter_signer_valid) {   // nothing it pushes could be authorized
+         report_stale_signer(*underwriter_signer, "the underwriter");
+         return;
+      }
+      // Chain time, which the contracts judge windows by; the wall clock only spaces this node's own housekeeping.
+      const fc::time_point head_time = underwriter_head_time.load();
+      if (head_time == fc::time_point()) return;
+      const fc::time_point now = fc::time_point::now();
+      if (now - underwriter_clients_at >= UNDERWRITER_CLIENTS_INTERVAL) {
          underwriter_clients_at = now;
-         underwriter_refresh_clients(now);
+         underwriter_refresh_clients();
       }
 
-      const auto tokens = read_liq_tokens(now);
+      const std::optional<std::map<fc::slug_name, liq_token>> tokens = read_liq_tokens();
       if (!tokens) return;
-      auto in = read_underwriter_state(*tokens, now);
+      std::optional<uw::plan_inputs> in = read_underwriter_state(*tokens, head_time);
       if (!in || shutting_down) return;
-      note_forfeits(uw::forfeited_requests(in->requests, in->bonds));
-      in->halted = underwriter_halted_by.has_value();
-      if (!in->frozen && !in->halted) {
-         auto verified = verify_outposts(in->requests, now);
-         if (!verified) return;
-         in->verified = std::move(*verified);
+      uw::remember_bonded(underwriter_bonded, in->bonds, in->requests);
+      if (underwriter_forfeits.note(uw::forfeited_requests(in->requests, underwriter_bonded))) {
+         elog("batch_operator: underwriter stops bonding until the node is restarted: request {} was ruled INVALID "
+              "with our bond on it", *underwriter_forfeits.halted_by);
       }
-      const auto plan = uw::plan_actions(*in);
-      report_plan(*in, plan, now);
-      push_plan(plan, now);
+      in->bonded = underwriter_bonded;
+      in->halted = underwriter_forfeits.halted_by.has_value();
+      if (!in->frozen && !in->halted) in->emitted = read_emitted_digests(in->requests);
+      const uw::plan plan = uw::plan_actions(*in);
+      report_plan(*in, plan);
+      push_plan(plan, uw::synd_has_work(in->requests), now);
+      underwriter_scan_from = uw::next_scan_start(underwriter_scan_from, in->requests, in->bonds, underwriter_bonded);
 
-      if (now - underwriter_pruned_at >= fc::milliseconds(UNDERWRITER_PRUNE_INTERVAL_MS)) {
+      if (now - underwriter_pruned_at >= UNDERWRITER_PRUNE_INTERVAL) {
          underwriter_pruned_at = now;
-         underwriter_prune(in->requests, *tokens);
+         underwriter_prune(*tokens);
       }
    }
 
-   /// Refresh `underwriter_contracts_deployed` and `andon_deployed` from a read window, as
-   /// `refresh_yield_contract_presence` does for the yield cranks.
-   void refresh_underwriter_contract_presence() {
+   /// Refresh what the underwriter reads in a read window: the contracts' presence, the head block's time and its
+   /// key's validity, as `refresh_yield_contract_presence` does for the yield cranks.
+   void refresh_underwriter_chain_view() {
       app().executor().post(appbase::priority::low, appbase::exec_queue::read_only, [this] {
          if (shutting_down) return;
-         const auto& controller = chain_plug->chain();
-         andon_deployed         = runs_code(controller, uw::andon::account);
-         const bool deployed    = std::ranges::all_of(UNDERWRITER_CONTRACTS, [&](const char* account) {
+         const chain::controller& controller = chain_plug->chain();
+         andon_deployed                      = runs_code(controller, uw::andon::account);
+         underwriter_head_time               = controller.head().block_time();
+         note_signer_validity(controller, underwriter_signer, underwriter_signer_valid);
+         const bool deployed = std::ranges::all_of(UNDERWRITER_CONTRACTS, [&](const char* account) {
             return runs_code(controller, account);
          });
          if (underwriter_contracts_deployed.exchange(deployed) != deployed) {
@@ -1355,13 +1349,17 @@ struct batch_operator_plugin::impl {
       });
    }
 
-   /// Run `report` at most once per UNDERWRITER_ALERT_INTERVAL_MS for `kind` about `subject`.
-   template <typename Report>
-   void underwriter_alert(alert_kind kind, std::string_view subject, fc::time_point now, Report&& report) {
-      const auto key = std::format("{}:{}", magic_enum::enum_name(kind), subject);
-      if (!underwriter_alerts.due(key, now, fc::milliseconds(UNDERWRITER_ALERT_INTERVAL_MS))) return;
-      report();
-      underwriter_alerts.mark(key, now);
+   /// Refresh `valid` from whether `s`'s key still satisfies its authorization on chain. A rotated key needs a
+   /// restart: signers are chosen once, at startup. Call from a read window.
+   static void note_signer_validity(const chain::controller& chain, const std::optional<signer>& s,
+                                    std::atomic<bool>& valid) {
+      if (s) valid = key_alone_satisfies(chain, s->auth, s->provider->public_key);
+   }
+
+   /// Log that `s`'s key no longer satisfies its authorization.
+   static void report_stale_signer(const signer& s, std::string_view role) {
+      elog("batch_operator: {}'s key no longer satisfies {}@{}; restart the node with the new key", role,
+           s.auth.actor.to_string(), s.auth.permission.to_string());
    }
 
    /// Push one action as the underwriter. True when the transaction was accepted; a refusal is logged by the push
@@ -1378,123 +1376,98 @@ struct batch_operator_plugin::impl {
       return false;
    }
 
-   /// `underwriter_push` of `action` on request `request_id`, at most once per UNDERWRITER_PUSH_INTERVAL_MS.
-   bool underwriter_push_for(uint64_t request_id, const char* contract, const char* action,
-                             const fc::variant_object& data, fc::time_point now) {
-      const auto key = std::format("{}::{}:{}", contract, action, request_id);
-      if (!underwriter_pushes.due(key, now, fc::milliseconds(UNDERWRITER_PUSH_INTERVAL_MS))) return false;
-      underwriter_pushes.mark(key, now);
-      return underwriter_push(contract, action, data);
-   }
-
    /// Push what the plan decided: accepts first, so their releases start this pass, then the crank, approves and
-   /// claims.
-   void push_plan(const uw::plan& plan, fc::time_point now) {
-      for (const auto& accept : plan.accepts) {
-         if (underwriter_push_for(accept.request_id, uw::bond::account, uw::bond::action_accept,
-                                  fc::mutable_variant_object()
-                                     (uw::bond::field::underwriter, underwriter_auth.actor)
-                                     (uw::bond::field::request_id,  accept.request_id)
-                                     (uw::bond::field::amount,      accept.amount),
-                                  now)) {
-            ilog("batch_operator: underwriter bonded request {} ({} base units)", accept.request_id, accept.amount);
+   /// claims. A push the irreversible view does not show yet is planned, and refused, again next pass. `synd_busy`
+   /// says `sysio.synd` has an envelope request in play or an outcome to acknowledge.
+   void push_plan(const uw::plan& plan, bool synd_busy, fc::time_point now) {
+      for (const uw::accept_action& accept : plan.accepts) {
+         // Accepted by this node only: it can still fail where it lands, so the bond is known from its row.
+         if (underwriter_push(uw::bond::account, uw::bond::action_accept,
+                              fc::mutable_variant_object()
+                                 (uw::bond::field::underwriter, underwriter_auth.actor)
+                                 (uw::bond::field::request_id,  accept.request_id)
+                                 (uw::bond::field::amount,      accept.amount.get_amount()))) {
+            ilog("batch_operator: underwriter pushed an accept of request {} ({})", accept.request_id,
+                 accept.amount.to_string());
          }
       }
-      // Every pass: one crank moves a bounded amount of work, and what a bucket refill, a cleared cord or a ruling
-      // allows waits for the next one.
-      underwriter_push(uw::synd::account, uw::synd::action_crank,
-                       fc::mutable_variant_object()(uw::synd::field::limit, UNDERWRITER_CRANK_LIMIT));
-      for (const uint64_t id : plan.approves) {
-         underwriter_push_for(id, uw::bond::account, uw::bond::action_approve,
-                              fc::mutable_variant_object()(uw::bond::field::request_id, id), now);
+      // One crank moves a bounded amount of work. Every pass while synd is busy; otherwise now and then, for what a
+      // bucket refill or a cleared cord lets through.
+      if (synd_busy || now - underwriter_cranked_at >= UNDERWRITER_IDLE_CRANK_INTERVAL) {
+         underwriter_cranked_at = now;
+         underwriter_push(uw::synd::account, uw::synd::action_crank,
+                          fc::mutable_variant_object()(uw::synd::field::limit, UNDERWRITER_CRANK_LIMIT));
       }
-      for (const uint64_t id : plan.claims) {
-         underwriter_push_for(id, uw::bond::account, uw::bond::action_claim,
-                              fc::mutable_variant_object()
-                                 (uw::bond::field::request_id, id)
-                                 (uw::bond::field::account,    underwriter_auth.actor),
-                              now);
+      for (const uw::request_id_t id : plan.approves) {
+         underwriter_push(uw::bond::account, uw::bond::action_approve,
+                          fc::mutable_variant_object()(uw::bond::field::request_id, id));
+      }
+      for (const uw::request_id_t id : plan.claims) {
+         underwriter_push(uw::bond::account, uw::bond::action_claim,
+                          fc::mutable_variant_object()
+                             (uw::bond::field::request_id, id)
+                             (uw::bond::field::account,    underwriter_auth.actor));
       }
    }
 
    /// Report what the plan leaves to people: a freeze, a halt, challenged and forfeited requests, and requests left
    /// unbonded.
-   void report_plan(const uw::plan_inputs& in, const uw::plan& plan, fc::time_point now) {
-      std::map<uint64_t, const uw::request*> by_id;
-      for (const auto& r : in.requests) by_id.emplace(r.id, &r);
-      const auto name_of = [&](uint64_t id) {
+   void report_plan(const uw::plan_inputs& in, const uw::plan& plan) {
+      std::map<uw::request_id_t, const uw::request*> by_id;
+      for (const uw::request& r : in.requests) by_id.emplace(r.id, &r);
+      const auto name_of = [&](uw::request_id_t id) {
          const auto r = by_id.find(id);
          return r == by_id.end() ? std::format("request {}", id) : describe(*r->second);
       };
       if (in.frozen) {
-         underwriter_alert(alert_kind::FROZEN, uw::andon::account, now, [&] {
-            wlog("batch_operator: underwriter paused: the sysio.andon cord is pulled, so nothing is bonded, approved "
-                 "or claimed until it clears");
-         });
+         wlog("batch_operator: underwriter paused: the sysio.andon cord is pulled, so nothing is bonded, approved or "
+              "claimed until it clears");
       }
-      if (underwriter_halted_by) {
-         underwriter_alert(alert_kind::HALTED, underwriter_auth.actor.to_string(), now, [&] {
-            elog("batch_operator: underwriter bonds nothing until the node is restarted: {} was ruled INVALID with "
-                 "our bond on it", name_of(*underwriter_halted_by));
-         });
+      if (underwriter_forfeits.halted_by) {
+         elog("batch_operator: underwriter bonds nothing until the node is restarted: {} was ruled INVALID with our "
+              "bond on it", name_of(*underwriter_forfeits.halted_by));
       }
-      for (const uint64_t id : plan.held) {
-         underwriter_alert(alert_kind::HELD, std::to_string(id), now, [&] {
-            elog("batch_operator: underwriter {} is challenged (HELD) with our bond on it: sysio must rule it",
-                 name_of(id));
-         });
+      for (const uw::request_id_t id : plan.held) {
+         elog("batch_operator: underwriter {} is challenged (HELD) with our bond on it: sysio must rule it",
+              name_of(id));
       }
-      for (const uint64_t id : plan.blocked) {
-         underwriter_alert(alert_kind::BLOCKED, std::to_string(id), now, [&] {
-            elog("batch_operator: underwriter {} was challenged (HELD) before it was bonded: its pair releases "
-                 "nothing until sysio rules it", name_of(id));
-         });
+      for (const uw::request_id_t id : plan.blocked) {
+         elog("batch_operator: underwriter {} was challenged (HELD) before it was bonded: its pair releases nothing "
+              "until sysio rules it", name_of(id));
       }
-      for (const uint64_t id : plan.forfeited) {
-         underwriter_alert(alert_kind::FORFEITED, std::to_string(id), now, [&] {
-            elog("batch_operator: underwriter {} was ruled INVALID: our bond on it is forfeited", name_of(id));
-         });
+      for (const uw::request_id_t id : plan.forfeited) {
+         elog("batch_operator: underwriter {} was ruled INVALID: our bond on it is forfeited", name_of(id));
       }
-      for (const auto& waiting : plan.waiting) {
-         underwriter_alert(alert_kind::WAITING, std::to_string(waiting.request_id), now, [&] {
-            wlog("batch_operator: underwriter left {} unbonded: {}", name_of(waiting.request_id),
-                 magic_enum::enum_name(waiting.reason));
-         });
+      for (const uw::waiting_request& waiting : plan.waiting) {
+         if (waiting.reason == uw::wait_reason::CONTRADICTED) {
+            report_contradiction(in, waiting.request_id);
+            continue;
+         }
+         wlog("batch_operator: underwriter left {} unbonded: {}", name_of(waiting.request_id),
+              magic_enum::enum_name(waiting.reason));
       }
    }
 
-   /// Stop bonding when one of the underwriter's bonds is newly ruled INVALID: it bonded an envelope `sysio` ruled
-   /// false, so something it trusts is wrong. The forfeits on chain at the first pass do not stop it, so a restart
-   /// is what resumes bonding.
-   void note_forfeits(const std::vector<uint64_t>& forfeited) {
-      if (!underwriter_known_forfeits) {
-         underwriter_known_forfeits.emplace(forfeited.begin(), forfeited.end());
-         return;
-      }
-      if (underwriter_halted_by) return;
-      for (const uint64_t id : forfeited) {
-         if (underwriter_known_forfeits->contains(id)) continue;
-         underwriter_halted_by = id;
-         elog("batch_operator: underwriter stops bonding until the node is restarted: request {} was ruled INVALID "
-              "with our bond on it", id);
-         return;
-      }
+   /// Report a request whose statement names a digest its outpost did not record for that epoch: the depot accepted
+   /// an envelope the outpost never emitted, or the statement misstates it. It is never bonded.
+   void report_contradiction(const uw::plan_inputs& in, uw::request_id_t request_id) {
+      const auto r = std::ranges::find(in.requests, request_id, &uw::request::id);
+      if (r == in.requests.end()) return;
+      const std::optional<uw::envelope_statement> s = uw::decode_statement(r->statement);
+      if (!s) return;
+      const auto emitted = in.emitted.find({s->chain_code, s->epoch_index});
+      if (emitted == in.emitted.end()) return;
+      elog("batch_operator: underwriter: {} states digest {}, but outpost {} recorded {} for epoch {}; not bonded",
+           describe(*r), s->digest.str(), s->chain_code.to_string(), emitted->second.str(), s->epoch_index);
    }
 
-   /// `sysio.bond::prune` from the oldest terminal envelope request, and `sysio.synd::pruneenv` for every shadow's
-   /// pair. Both are permissionless and act on at most UNDERWRITER_PRUNE_LIMIT rows.
-   void underwriter_prune(const std::vector<uw::request>& requests, const std::map<fc::slug_name, liq_token>& tokens) {
-      std::optional<uint64_t> oldest_terminal;
-      for (const auto& r : requests) {
-         if (!uw::is_envelope_request(r) || !uw::is_terminal(r.state)) continue;
-         if (!oldest_terminal || r.id < *oldest_terminal) oldest_terminal = r.id;
-      }
-      if (oldest_terminal) {
-         underwriter_push(uw::bond::account, uw::bond::action_prune,
-                          fc::mutable_variant_object()
-                             (uw::bond::field::from_id, *oldest_terminal)
-                             (uw::bond::field::limit,   UNDERWRITER_PRUNE_LIMIT));
-      }
+   /// `sysio.bond::prune` from the first request, and `sysio.synd::pruneenv` for every shadow's pair. Both are
+   /// permissionless and act on at most UNDERWRITER_PRUNE_LIMIT rows.
+   void underwriter_prune(const std::map<fc::slug_name, liq_token>& tokens) {
+      underwriter_push(uw::bond::account, uw::bond::action_prune,
+                       fc::mutable_variant_object()
+                          (uw::bond::field::from_id, 0)
+                          (uw::bond::field::limit,   UNDERWRITER_PRUNE_LIMIT));
       for (const auto& [token_code, token] : tokens) {
          underwriter_push(uw::synd::account, uw::synd::action_pruneenv,
                           fc::mutable_variant_object()
@@ -1506,24 +1479,20 @@ struct batch_operator_plugin::impl {
 
    /// Keep one outpost client per active chain for verification, rebuilding one whose deployment moved. A chain this
    /// node cannot serve is reported and its requests wait; the other chains go on.
-   void underwriter_refresh_clients(fc::time_point now) {
+   void underwriter_refresh_clients() {
       try {
-         const auto active = read_active_outposts(underwriter_outposts_warn);
+         const std::optional<std::vector<outpost_descriptor>> active = read_active_outposts();
          if (!active) return;
-         drop_stale(underwriter_clients, *active, [](uint64_t chain_code, std::string_view why) {
-            ilog("batch_operator: underwriter dropped its client for {} outpost {}", why,
-                 fc::slug_name{chain_code}.to_string());
+         drop_stale(underwriter_clients, *active, [](fc::slug_name chain_code, std::string_view why) {
+            ilog("batch_operator: underwriter dropped its client for {} outpost {}", why, chain_code.to_string());
          });
-         const auto unserviceable = build_missing(
-            underwriter_clients, *active,
+         const std::vector<unserviceable_chain> unserviceable = build_missing(
+            underwriter_clients, *active, solana_outpost_role::underwriter,
             [](const outpost_descriptor& op, const std::shared_ptr<sysio::outpost_client>& client) {
                return built_outpost_client{client, outpost_deployment{op}};
             });
-         for (const auto& chain : unserviceable) {
-            underwriter_alert(alert_kind::UNSERVICEABLE, chain.code, now, [&] {
-               elog("batch_operator: underwriter cannot verify chain {}, its requests wait: {}", chain.code,
-                    chain.why);
-            });
+         for (const unserviceable_chain& chain : unserviceable) {
+            elog("batch_operator: underwriter cannot verify chain {}, its requests wait: {}", chain.code, chain.why);
          }
       } catch (const fc::exception& e) {
          wlog("batch_operator: underwriter could not refresh its outpost clients: {}", e.top_message());
@@ -1537,61 +1506,87 @@ struct batch_operator_plugin::impl {
                                                          fc::time_point now) {
       uw::plan_inputs in;
       in.now        = now;
-      auto requests = read_bond_requests(now);
+      std::optional<std::vector<uw::request>> requests = read_bond_requests(underwriter_scan_from, symbols_of(tokens));
       if (!requests) return std::nullopt;
       in.requests = std::move(*requests);
-      auto bonds  = read_own_bonds();
+      std::optional<std::map<uw::request_id_t, uw::bond_position>> bonds = read_own_bonds(in.requests);
       if (!bonds) return std::nullopt;
-      in.bonds      = std::move(*bonds);
-      in.caps       = caps_by_token(tokens, now);
-      auto balances = read_own_balances(tokens);
+      in.bonds = std::move(*bonds);
+      in.caps  = caps_by_token(tokens);
+      std::optional<std::map<fc::slug_name, chain::asset>> balances = read_own_balances(tokens);
       if (!balances) return std::nullopt;
-      in.balances       = std::move(*balances);
-      const auto frozen = read_cord_pulled(now);
+      in.balances                     = std::move(*balances);
+      const std::optional<bool> frozen = read_cord_pulled();
       if (!frozen) return std::nullopt;
       in.frozen = *frozen;
       return in;
    }
 
-   /// Every `sysio.bond::requests` row that decodes, or nullopt when the read failed.
-   std::optional<std::vector<uw::request>> read_bond_requests(fc::time_point now) {
-      const auto rows = read_all_rows(uw::bond::account, uw::bond::account, uw::bond::table_requests);
-      if (!rows) return std::nullopt;
+   /// The symbol of every token a request can be bonded in: each `sysio.liq` shadow, and WIRE.
+   static uw::token_symbols symbols_of(const std::map<fc::slug_name, liq_token>& tokens) {
+      uw::token_symbols out{{uw::wire::token_code, uw::wire::asset_symbol}};
+      for (const auto& [token_code, token] : tokens) out.emplace(token_code, token.symbol);
+      return out;
+   }
+
+   /// Every `sysio.bond::requests` row from id `from` that decodes with `symbols`, or nullopt when the read failed.
+   std::optional<std::vector<uw::request>> read_bond_requests(uw::request_id_t from, const uw::token_symbols& symbols) {
+      sysio::chain_apis::read_only::get_table_rows_params p;
+      p.code        = chain::name(uw::bond::account);
+      p.scope       = uw::bond::account;
+      p.table       = uw::bond::table_requests;
+      p.lower_bound = fc::json::to_string(fc::mutable_variant_object()(uw::bond::field::id, from),
+                                          fc::json::yield_function_t{});
+      p.all_rows    = true;
+      p.values_only = true;
+      std::optional<sysio::chain_apis::read_only::get_table_rows_result> read = read_table_checked(std::move(p));
+      if (!read) return std::nullopt;
       std::vector<uw::request> out;
       size_t                   undecodable = 0;
-      for (const auto& r : *rows) {
-         if (auto decoded = uw::decode_request(r.get_object())) out.push_back(std::move(*decoded));
+      for (const fc::variant& r : read->rows) {
+         std::optional<uw::request> decoded = uw::decode_request(r.get_object(), symbols);
+         if (decoded) out.push_back(std::move(*decoded));
          else ++undecodable;
       }
       if (undecodable > 0) {
-         underwriter_alert(alert_kind::UNDECODABLE, uw::bond::table_requests, now, [&] {
-            elog("batch_operator: underwriter skips {} sysio.bond::requests row(s) that do not decode", undecodable);
-         });
+         elog("batch_operator: underwriter skips {} sysio.bond::requests row(s) that do not decode", undecodable);
       }
       return out;
    }
 
-   /// The underwriter's `sysio.bond::bonds` rows by request id, or nullopt when the read failed.
-   std::optional<std::map<uint64_t, uw::bond_position>> read_own_bonds() {
-      const auto rows = read_all_rows(uw::bond::account, uw::bond::account, uw::bond::table_bonds);
+   /// The underwriter's `sysio.bond::bonds` rows by request id, each in its request's token, or nullopt when the read
+   /// failed or one of them does not decode or names no request among `requests`: a bond it cannot read or attribute
+   /// to a token must not drop out of its exposure.
+   std::optional<std::map<uw::request_id_t, uw::bond_position>>
+   read_own_bonds(const std::vector<uw::request>& requests) {
+      const std::optional<fc::variants> rows =
+         read_all_rows(uw::bond::account, uw::bond::account, uw::bond::table_bonds);
       if (!rows) return std::nullopt;
-      std::map<uint64_t, uw::bond_position> out;
-      for (const auto& r : *rows) {
-         if (auto b = uw::decode_bond(r.get_object(), underwriter_auth.actor)) out.emplace(b->request_id, *b);
+      std::map<uw::request_id_t, uw::bond_position> out;
+      try {
+         for (const fc::variant& r : *rows) {
+            const std::optional<uw::bond_position> b =
+               uw::decode_bond(r.get_object(), underwriter_auth.actor, requests);
+            if (b) out.emplace(b->request_id, *b);
+         }
+      } catch (const fc::exception& e) {
+         elog("batch_operator: underwriter skips this pass: {}", e.top_message());
+         underwriter_scan_from = 0;   // read every request next pass, in case the scan window was what missed one
+         return std::nullopt;
       }
       return out;
    }
 
    /// Every `sysio.liq` shadow by registry token code, or nullopt when the read failed.
-   std::optional<std::map<fc::slug_name, liq_token>> read_liq_tokens(fc::time_point now) {
+   std::optional<std::map<fc::slug_name, liq_token>> read_liq_tokens() {
       namespace liq   = batch_operator_detail::liq;
-      const auto rows = read_all_rows(liq::account, liq::account, liq::table_stat);
+      const std::optional<fc::variants> rows = read_all_rows(liq::account, liq::account, liq::table_stat);
       if (!rows) return std::nullopt;
       std::map<fc::slug_name, liq_token> out;
-      size_t                        undecodable = 0;
-      for (const auto& r : *rows) {
+      size_t                             undecodable = 0;
+      for (const fc::variant& r : *rows) {
          try {
-            const auto& row = r.get_object();
+            const fc::variant_object& row = r.get_object();
             out.emplace(row[liq::field::token_code].as<fc::slug_name>(),
                         liq_token{
                            .symbol     = chain::asset::from_string(row[liq::field::supply].as_string()).get_symbol(),
@@ -1602,9 +1597,7 @@ struct batch_operator_plugin::impl {
          }
       }
       if (undecodable > 0) {
-         underwriter_alert(alert_kind::UNDECODABLE, liq::table_stat, now, [&] {
-            elog("batch_operator: underwriter skips {} sysio.liq::stat row(s) that do not decode", undecodable);
-         });
+         elog("batch_operator: underwriter skips {} sysio.liq::stat row(s) that do not decode", undecodable);
       }
       return out;
    }
@@ -1612,58 +1605,56 @@ struct batch_operator_plugin::impl {
    /// The configured exposure caps keyed by registry token code. A cap whose precision differs from its shadow's is
    /// not applied, so that token's requests wait with no cap until the configuration is fixed; a cap that names no
    /// shadow is reported.
-   std::map<fc::slug_name, uint64_t> caps_by_token(const std::map<fc::slug_name, liq_token>& tokens,
-                                                   fc::time_point now) {
-      std::map<fc::slug_name, uint64_t> out;
-      std::set<uint64_t>           named;   // symbol codes of the caps that name a shadow
+   std::map<fc::slug_name, chain::asset> caps_by_token(const std::map<fc::slug_name, liq_token>& tokens) {
+      std::map<fc::slug_name, chain::asset> out;
+      std::set<chain::symbol_code>          named;   // the caps that name a shadow
       for (const auto& [token_code, token] : tokens) {
-         const auto cap = underwriter_caps.find(token.symbol.to_symbol_code().value);
+         const auto cap = underwriter_caps.find(token.symbol.to_symbol_code());
          if (cap == underwriter_caps.end()) continue;
          named.insert(cap->first);
          if (cap->second.get_symbol() != token.symbol) {
-            underwriter_alert(alert_kind::CAP_MISMATCH, token.symbol.name(), now, [&] {
-               elog("batch_operator: batch-underwriter-max-exposure {} does not match the shadow's symbol {}; "
-                    "not underwriting it", cap->second.to_string(), token.symbol.to_string());
-            });
+            elog("batch_operator: batch-underwriter-max-exposure {} does not match the shadow's symbol {}; not "
+                 "underwriting it", cap->second.to_string(), token.symbol.to_string());
             continue;
          }
-         out.emplace(token_code, static_cast<uint64_t>(cap->second.get_amount()));
+         out.emplace(token_code, cap->second);
       }
       for (const auto& [code, cap] : underwriter_caps) {
          if (named.contains(code)) continue;
-         underwriter_alert(alert_kind::CAP_UNUSED, cap.get_symbol().name(), now, [&] {
-            wlog("batch_operator: batch-underwriter-max-exposure {} names no sysio.liq shadow", cap.to_string());
-         });
+         wlog("batch_operator: batch-underwriter-max-exposure {} names no sysio.liq shadow", cap.to_string());
       }
       return out;
    }
 
    /// The underwriter's `sysio.liq` balances by registry token code, or nullopt when the read failed.
-   std::optional<std::map<fc::slug_name, uint64_t>>
+   std::optional<std::map<fc::slug_name, chain::asset>>
    read_own_balances(const std::map<fc::slug_name, liq_token>& tokens) {
-      namespace liq   = batch_operator_detail::liq;
-      const auto rows = read_all_rows(liq::account, underwriter_auth.actor.to_string(), liq::table_accounts);
+      namespace liq = batch_operator_detail::liq;
+      const std::optional<fc::variants> rows =
+         read_all_rows(liq::account, underwriter_auth.actor.to_string(), liq::table_accounts);
       if (!rows) return std::nullopt;
-      std::map<uint64_t, int64_t> by_symbol;   // symbol code -> amount
-      for (const auto& r : *rows) {
+      std::map<chain::symbol_code, chain::asset> by_symbol;
+      for (const fc::variant& r : *rows) {
          try {
-            const auto held = chain::asset::from_string(r.get_object()[liq::field::balance].as_string());
-            by_symbol[held.get_symbol().to_symbol_code().value] = held.get_amount();
+            const chain::asset held = chain::asset::from_string(r.get_object()[liq::field::balance].as_string());
+            by_symbol.insert_or_assign(held.get_symbol().to_symbol_code(), held);
          } catch (const fc::exception&) {
             // A row that does not decode is no balance to bond from.
          }
       }
-      std::map<fc::slug_name, uint64_t> out;
+      std::map<fc::slug_name, chain::asset> out;
       for (const auto& [token_code, token] : tokens) {
-         const auto held = by_symbol.find(token.symbol.to_symbol_code().value);
-         if (held != by_symbol.end() && held->second > 0) out.emplace(token_code, static_cast<uint64_t>(held->second));
+         const auto held = by_symbol.find(token.symbol.to_symbol_code());
+         if (held != by_symbol.end() && held->second.get_symbol() == token.symbol && held->second.get_amount() > 0) {
+            out.emplace(token_code, held->second);
+         }
       }
       return out;
    }
 
    /// Whether the `sysio.andon` cord is pulled, or nullopt when that cannot be read. Clear until `sysio.andon` runs
    /// code, and while it holds no cord row.
-   std::optional<bool> read_cord_pulled(fc::time_point now) {
+   std::optional<bool> read_cord_pulled() {
       if (!andon_deployed) return false;
       sysio::chain_apis::read_only::get_table_rows_params p;
       p.code        = chain::name(uw::andon::account);
@@ -1671,158 +1662,34 @@ struct batch_operator_plugin::impl {
       p.table       = uw::andon::table_cord;
       p.limit       = 1;
       p.values_only = true;
-      const auto rows = read_table_checked(std::move(p));
+      const std::optional<sysio::chain_apis::read_only::get_table_rows_result> rows = read_table_checked(std::move(p));
       if (!rows) return std::nullopt;
       if (rows->rows.empty()) return false;
       try {
          return rows->rows.front().get_object()[uw::andon::field::pulled].as_bool();
       } catch (const fc::exception&) {
-         underwriter_alert(alert_kind::UNDECODABLE, uw::andon::table_cord, now, [&] {
-            elog("batch_operator: underwriter pauses: the sysio.andon cord does not decode");
-         });
+         elog("batch_operator: underwriter pauses: the sysio.andon cord does not decode");
          return std::nullopt;
       }
    }
 
-   /// The last depot epoch each outpost confirms, for the outposts with an OPEN envelope request, or nullopt when
-   /// `sysio.msgch::outpcons` could not be read. Each chain is verified on its own: one that cannot be read or does
-   /// not confirm leaves only its own requests waiting.
-   std::optional<std::map<fc::slug_name, uint32_t>> verify_outposts(const std::vector<uw::request>& requests,
-                                                                    fc::time_point now) {
-      std::set<fc::slug_name> chain_codes;
-      for (const auto& r : requests) {
-         if (r.state != uw::request_state::OPEN || !uw::is_envelope_request(r)) continue;
-         if (const auto s = uw::decode_statement(r.statement)) chain_codes.insert(s->chain_code);
-      }
-      std::map<fc::slug_name, uint32_t> verified;
-      if (chain_codes.empty()) return verified;
-      const auto tips = read_depot_tips();
-      if (!tips) return std::nullopt;
-      for (const fc::slug_name chain_code : chain_codes) {
-         if (shutting_down) break;
-         try {
-            if (const auto epoch = verify_outpost(chain_code, *tips, now)) verified.emplace(chain_code, *epoch);
-         } catch (const fc::exception& e) {
-            report_unconfirmed(chain_code, now, e.top_message());
-         } catch (const std::exception& e) {
-            report_unconfirmed(chain_code, now, e.what());
-         }
-      }
-      return verified;
+   /// The digest each outpost recorded for the envelope it emitted, for every (chain, epoch) an OPEN envelope request
+   /// names, read at finality. A chain whose read fails is reported and leaves only its own requests waiting.
+   std::map<uw::envelope_key, fc::sha256> read_emitted_digests(const std::vector<uw::request>& requests) {
+      return uw::collect_emitted(
+         uw::wanted_envelopes(requests),
+         [&](fc::slug_name chain_code, uint32_t epoch) -> std::optional<fc::sha256> {
+            if (shutting_down) return std::nullopt;
+            const auto client = underwriter_clients.find(chain_code);
+            FC_ASSERT(client != underwriter_clients.end(), "this node has no client for it");
+            return client->second.client->read_emitted_envelope_digest(epoch, delivery_timeout);
+         },
+         [](fc::slug_name chain_code, const std::string& why) { report_unreadable(chain_code, why); });
    }
 
-   /// The depot epoch through which `chain_code`'s outpost confirms the depot's accepted envelopes, or nullopt,
-   /// reported, when it confirms none.
-   std::optional<uint32_t> verify_outpost(fc::slug_name chain_code, const std::map<fc::slug_name, uw::depot_tip>& tips,
-                                          fc::time_point now) {
-      const auto tip = tips.find(chain_code);
-      if (tip == tips.end()) {
-         report_unconfirmed(chain_code, now, "the depot has accepted no envelope from it");
-         return std::nullopt;
-      }
-      const auto client = underwriter_clients.find(chain_code.value);   // keyed by the registry id
-      if (client == underwriter_clients.end()) {
-         report_unconfirmed(chain_code, now, "this node has no client for it");
-         return std::nullopt;
-      }
-      const uint32_t tip_epoch = tip->second.epoch_index;
-      const auto     read      = read_outpost_latest(*client->second.client, tip_epoch);
-      if (!read.failure.empty()) {
-         report_unconfirmed(chain_code, now, read.failure);
-         return std::nullopt;
-      }
-      if (!read.envelope) {
-         report_unconfirmed(chain_code, now,
-                            std::format("its latest final envelope is for neither epoch {} nor the next", tip_epoch));
-         return std::nullopt;
-      }
-      switch (uw::verify_tip(tip->second, *read.envelope)) {
-      case uw::tip_verdict::CONFIRMED:
-         return tip_epoch;
-      case uw::tip_verdict::CONTRADICTED: {
-         const auto  chain    = chain_code.to_string();
-         const auto& envelope = *read.envelope;
-         underwriter_alert(alert_kind::CONTRADICTED, chain, now, [&] {
-            elog("batch_operator: underwriter: outpost {} CONTRADICTS the depot's accepted envelope for epoch {} "
-                 "(depot sha256 {} digest {}; outpost epoch {} sha256 {} previous {}); its requests are not bonded",
-                 chain, tip_epoch, tip->second.winning_checksum.str(), tip->second.envelope_digest.str(),
-                 envelope.epoch_index, envelope.bytes_sha256.str(),
-                 fc::to_hex(envelope.previous_envelope_hash.data(), envelope.previous_envelope_hash.size()));
-         });
-         return std::nullopt;
-      }
-      case uw::tip_verdict::UNKNOWN:
-         report_unconfirmed(chain_code, now,
-                            std::format("its envelope is for epoch {}, the depot's tip is {}",
-                                        read.envelope->epoch_index, tip_epoch));
-         return std::nullopt;
-      }
-      return std::nullopt;
-   }
-
-   /// Report, spaced, that `chain_code`'s outpost confirms nothing this pass, and why.
-   void report_unconfirmed(fc::slug_name chain_code, fc::time_point now, std::string_view why) {
-      const auto chain = chain_code.to_string();
-      underwriter_alert(alert_kind::UNCONFIRMED, chain, now, [&] {
-         wlog("batch_operator: underwriter cannot confirm outpost {} yet, its requests wait: {}", chain, why);
-      });
-   }
-
-   /// `sysio.msgch::outpcons`, the latest accepted envelope per outpost chain code, or nullopt when the read failed.
-   std::optional<std::map<fc::slug_name, uw::depot_tip>> read_depot_tips() {
-      const auto rows = read_all_rows(msgch::account, msgch::account, msgch::table_outpcons);
-      if (!rows) return std::nullopt;
-      std::map<fc::slug_name, uw::depot_tip> out;
-      for (const auto& r : *rows) {
-         try {
-            const auto& row = r.get_object();
-            out.emplace(fc::slug_name{row[msgch::field::chain_code].as_uint64()},
-                        uw::depot_tip{
-                           .epoch_index      = static_cast<uint32_t>(row[msgch::field::epoch_index].as_uint64()),
-                           .winning_checksum = row[msgch::field::winning_checksum].as<fc::sha256>(),
-                           .envelope_digest  = row[msgch::field::envelope_digest].as<fc::sha256>(),
-                        });
-         } catch (const fc::exception&) {
-            // A tip that does not decode confirms nothing: that chain's requests wait.
-         }
-      }
-      return out;
-   }
-
-   /// The outpost's latest envelope as `read_outpost_latest` found it.
-   struct outpost_read {
-      std::optional<uw::outpost_envelope> envelope;   ///< set when it is for the depot's tip epoch or the next
-      std::string                         failure;    ///< why the read failed; empty when it did not
-   };
-
-   /// The outpost's latest emitted envelope when it is for the depot's tip epoch or the one after it, the only two
-   /// `verify_tip` can use. The outpost client reads at finality. The epoch after the tip is read first: a read for
-   /// an epoch older than the outpost's latest makes the Solana client warn of drift.
-   outpost_read read_outpost_latest(sysio::outpost_client& client, uint32_t tip_epoch) {
-      const auto deadline = fc::milliseconds(delivery_timeout_ms);
-      for (const uint64_t epoch : {uint64_t{tip_epoch} + 1, uint64_t{tip_epoch}}) {
-         if (epoch > std::numeric_limits<uint32_t>::max()) continue;
-         std::vector<char> raw;
-         try {
-            raw = client.read_inbound_envelope(static_cast<uint32_t>(epoch), deadline);
-         } catch (const fc::exception& e) {
-            return {.failure = e.top_message()};
-         } catch (const std::exception& e) {
-            return {.failure = e.what()};
-         }
-         if (raw.empty()) continue;   // the outpost's latest envelope is for another epoch
-         sysio::opp::Envelope envelope;
-         if (!envelope.ParseFromArray(raw.data(), static_cast<int>(raw.size()))) {
-            return {.failure = "its envelope does not parse"};
-         }
-         const auto& previous = envelope.previous_envelope_hash();
-         return {.envelope = uw::outpost_envelope{
-                    .epoch_index            = envelope.epoch_index(),
-                    .bytes_sha256           = fc::sha256::hash(raw.data(), raw.size()),
-                    .previous_envelope_hash = std::vector<char>(previous.begin(), previous.end()),
-                 }};
-      }
-      return {};
+   /// Report that `chain_code`'s outpost could not be read this pass, and why.
+   static void report_unreadable(fc::slug_name chain_code, std::string_view why) {
+      wlog("batch_operator: underwriter cannot read outpost {}, its requests wait: {}", chain_code.to_string(), why);
    }
 
    // -----------------------------------------------------------------------
@@ -1839,10 +1706,9 @@ struct batch_operator_plugin::impl {
    /// head): call on the main thread or in a read window. Nullopt, logged, when it cannot be built.
    std::optional<unsigned_trx> build_unsigned(const std::string& contract, const std::string& action_name,
                                               const chain::permission_level& auth, const fc::variant_object& data) {
-      const fc::microseconds   abi_max_time = fc::milliseconds(delivery_timeout_ms);
-      const chain::controller& chain        = chain_plug->chain();
+      const chain::controller& chain = chain_plug->chain();
       try {
-         auto resolver = make_resolver(chain, abi_max_time, throw_on_yield::no);
+         auto resolver = make_resolver(chain, delivery_timeout, throw_on_yield::no);
          std::optional<chain::abi_serializer> abis_opt = resolver(chain::name(contract));
          if (!abis_opt) {
             elog("batch_operator: no ABI found for {}", contract);
@@ -1850,7 +1716,7 @@ struct batch_operator_plugin::impl {
          }
          const chain::type_name action_type = abis_opt->get_action_type(chain::name(action_name));
          chain::bytes action_data = abis_opt->variant_to_binary(
-            action_type, fc::variant(data), chain::abi_serializer::create_yield_function(abi_max_time));
+            action_type, fc::variant(data), chain::abi_serializer::create_yield_function(delivery_timeout));
          unsigned_trx out;
          out.trx.actions.emplace_back(std::vector<chain::permission_level>{auth}, chain::name(contract),
                                       chain::name(action_name), std::move(action_data));
@@ -1872,7 +1738,7 @@ struct batch_operator_plugin::impl {
                const std::string& contract, const std::string& action_name, const fc::variant& packed_var) {
       try {
          std::shared_ptr<read_write> rw =
-            std::make_shared<read_write>(chain_plug->get_read_write_api(fc::milliseconds(delivery_timeout_ms)));
+            std::make_shared<read_write>(chain_plug->get_read_write_api(delivery_timeout));
          rw->push_transaction(
             packed_var.get_object(),
             batch_operator_detail::create_push_action_callback(rw, completion, contract, action_name));
@@ -1893,7 +1759,7 @@ struct batch_operator_plugin::impl {
    }
 
    /// Build, sign and submit a depot action, declaring `by.auth` and signed by `by.provider`. True when the node
-   /// accepted the transaction within `delivery_timeout_ms`; a refusal is logged by the push callback.
+   /// accepted the transaction within `delivery_timeout`; a refusal is logged by the push callback.
    ///
    /// Called from cron threads, which may not read chain state: the build runs in a read window and the submission
    /// on the main thread, while the signature, possibly a remote signer, stays here. The waits do not cancel
@@ -1903,7 +1769,7 @@ struct batch_operator_plugin::impl {
                     const signer& by,
                     const fc::variant_object& data) {
       if (shutting_down) return false;
-      const fc::time_point deadline = fc::time_point::now() + fc::milliseconds(delivery_timeout_ms);
+      const fc::time_point deadline = fc::time_point::now() + delivery_timeout;
       const bool           on_main  = std::this_thread::get_id() == app().executor().get_main_thread_id();
 
       std::optional<unsigned_trx> trx;
@@ -2006,14 +1872,14 @@ struct batch_operator_plugin::impl {
       ilog("batch_operator_plugin: cron_service started with {} thread(s) ({} outpost(s) discovered)",
            thread_count, outpost_count);
 
-      const auto poll_ms = epoch_poll_ms;
+      const uint32_t poll_ms = whole_milliseconds(epoch_poll);
       auto schedule_poll = [&](std::string label, std::function<void()> poll) {
          sysio::services::cron_service::job_schedule sched;
          sched.milliseconds = {sysio::services::cron_service::job_schedule::step_value{poll_ms}};
          sysio::services::cron_service::job_metadata_t meta;
          meta.label          = std::move(label);
          meta.one_at_a_time  = true;
-         auto id = cron_svc->add(sched, std::move(poll), meta);
+         sysio::services::cron_service::job_id_t id = cron_svc->add(sched, std::move(poll), meta);
          cron_job_ids.push_back(id);
          ilog("batch_operator_plugin: scheduled {} (id={}, every {}ms)", meta.label, id, poll_ms);
       };
@@ -2071,7 +1937,7 @@ void batch_operator_plugin::set_program_options(options_description& cli,
    // would otherwise silently promote a debug node to a batch operator.
    opts("batch-operator-account", bpo::value<std::string>(),
         "WIRE account name for this batch operator. Configuring an account enables the relay.");
-   opts("batch-epoch-poll-ms", bpo::value<uint32_t>()->default_value(EPOCH_POLL_MS),
+   opts("batch-epoch-poll-ms", bpo::value<uint32_t>()->default_value(whole_milliseconds(EPOCH_POLL)),
         "How often to check epoch state (ms)");
    // SIZING RULE for batch-delivery-timeout-ms: it bounds the WHOLE outbound
    // delivery, and an Ethereum delivery is now one transaction PER CHUNK
@@ -2089,9 +1955,10 @@ void batch_operator_plugin::set_program_options(options_description& cli,
    // chunking deliberately rather than as a blanket tuning step.
    // Help text below must stay ASCII with no " --" sequence (PerformanceHarness
    // splits nodeop --help output on that token).
-   opts("batch-delivery-timeout-ms", bpo::value<uint32_t>()->default_value(DELIVERY_TIMEOUT_MS),
+   opts("batch-delivery-timeout-ms", bpo::value<uint32_t>()->default_value(whole_milliseconds(DELIVERY_TIMEOUT)),
         "Max time to wait for chain delivery confirmation (ms)");
-   opts("batch-yield-tick-interval-ms", bpo::value<uint32_t>()->default_value(YIELD_TICK_INTERVAL_MS),
+   opts("batch-yield-tick-interval-ms",
+        bpo::value<uint32_t>()->default_value(whole_milliseconds(YIELD_TICK_INTERVAL)),
         "Minimum spacing between this operator's sysio.swap::tickyield pushes per yield pool (ms)");
    // Same presence-is-the-switch rule as batch-operator-account, independently of it: a node may run the
    // underwriter, the relay, or both.
@@ -2107,12 +1974,12 @@ void batch_operator_plugin::set_program_options(options_description& cli,
 void batch_operator_plugin::plugin_initialize(const variables_map& options) {
    if (options.count("batch-operator-account"))
       _impl->operator_account = chain::name(options["batch-operator-account"].as<std::string>());
-   _impl->epoch_poll_ms       = options["batch-epoch-poll-ms"].as<uint32_t>();
-   _impl->delivery_timeout_ms = options["batch-delivery-timeout-ms"].as<uint32_t>();
-   _impl->yield_tick_interval_ms = options["batch-yield-tick-interval-ms"].as<uint32_t>();
+   _impl->epoch_poll          = fc::milliseconds(options["batch-epoch-poll-ms"].as<uint32_t>());
+   _impl->delivery_timeout    = fc::milliseconds(options["batch-delivery-timeout-ms"].as<uint32_t>());
+   _impl->yield_tick_interval = fc::milliseconds(options["batch-yield-tick-interval-ms"].as<uint32_t>());
    _impl->enabled             = _impl->operator_account.good();
    if (options.count("batch-underwriter-account")) {
-      const auto& spec = options["batch-underwriter-account"].as<std::string>();
+      const std::string& spec = options["batch-underwriter-account"].as<std::string>();
       try {
          _impl->underwriter_auth = batch_operator_detail::parse_permission_level(spec);
       } FC_RETHROW_EXCEPTIONS(error, "invalid batch-underwriter-account '{}'", spec)
@@ -2150,7 +2017,7 @@ void batch_operator_plugin::plugin_initialize(const variables_map& options) {
    // pushes (a race another operator won, a dispute already resolved, an action the irreversible view does not show
    // done yet). Billed, an account would soon have every transaction refused by its own node, so the node exempts
    // the accounts it signs as.
-   auto& billing = _impl->chain_plug->chain().get_mutable_subjective_billing();
+   chain::subjective_billing& billing = _impl->chain_plug->chain().get_mutable_subjective_billing();
    for (const chain::name account : {_impl->operator_account, _impl->underwriter_auth.actor}) {
       if (!account.good()) continue;
       billing.disable_account(account);

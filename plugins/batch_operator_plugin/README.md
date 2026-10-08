@@ -72,7 +72,14 @@ or matches no provider or more than one, stops the node.
 The node exempts the accounts it signs as from subjective CPU billing: both roles
 push on a schedule that loses some pushes (a race another operator won, an action
 the irreversible view does not show done yet), and billed failures would soon have
-the node refuse the account's transactions.
+the node refuse the account's transactions. The exemption also stops the node from
+throttling anyone else's failing transactions that name those accounts, so an
+operator node must not expose its transaction push API publicly.
+
+Signers are chosen once, at startup. Each poll the node checks that each role's key
+still satisfies its authorization; after `updateauth` rotates it, the role stops
+pushing (the underwriter) or logs (the relay) until the node is restarted with the
+new key.
 
 ### Outpost wiring
 
@@ -103,33 +110,39 @@ address rather than left pointing at the old one.
 Any depot account can run the underwriter, with or without the relay, to bond the
 requests `sysio.synd` issues for syndication envelopes. Each poll it:
 
-1. **Verifies each outpost** with an OPEN `sysio.synd` request: the outpost's latest
-   final envelope must be the depot's latest accepted one (`sysio.msgch::outpcons`,
-   same epoch and sha256) or chain to it (`previous_envelope_hash`). `sysio.msgch`
-   accepts only envelopes that continue the accepted chain, so this confirms every
-   earlier one too.
-2. **Bonds** each confirmed OPEN request `sysio.synd` issued under the `oppenvelope`
+1. **Verifies each statement against its outpost.** An OPEN request states the
+   outpost, the depot epoch and the digest of the envelope the depot accepted. The
+   outpost keeps its own write-once record of each envelope it emitted, the keccak256
+   of its canonical bytes (Ethereum `OPP.outboundEnvelopes`, Solana's outbound
+   `EnvelopeLog`); read at finality, that record must carry the statement's digest.
+   Whether the statement is true is checked against the outpost alone; amounts,
+   states and windows still come from the depot's tables.
+2. **Bonds** each verified OPEN request `sysio.synd` issued under the `oppenvelope`
    schema, oldest first and for its whole remainder (`sysio.bond::accept`), within
    the token's exposure cap (bonds not yet claimed count) and the account's
    `sysio.liq` balance.
 3. **Cranks** `sysio.synd::crank`, which releases what bonding allows and issues the
-   next request.
-4. **Approves** its requests once their challenge window has passed and **claims**
-   them once approved or ruled VALID. It prunes `sysio.bond` and `sysio.synd` every
-   10 minutes.
+   next request: every poll while an envelope request is in play or has an outcome
+   `sysio.synd` has not acknowledged, otherwise every 5 minutes.
+4. **Approves** its requests once their challenge window has passed by chain time,
+   and **claims** them once approved or ruled VALID, and again while yield the pool
+   could not yet cover is owed. It prunes `sysio.bond` and `sysio.synd` every 10
+   minutes.
 
-What it cannot act on waits and is logged, each at most every 5 minutes:
+What it cannot act on waits and is logged on every poll it holds; deduplicating
+those lines is left to log tooling:
 
 | Condition | Effect |
 |-----------|--------|
-| An outpost cannot be read, or does not confirm the depot's tip yet | That chain's requests wait |
-| An outpost contradicts the depot | That chain's requests wait; an error log names both hashes |
+| An outpost cannot be read | That chain's requests wait |
+| The outpost holds no final record for the statement's epoch | The request waits |
+| The outpost recorded another digest for that epoch | Never bonded; an error log names both digests |
 | The node cannot serve a chain (no RPC client, wrong chain id) | That chain's requests wait; the others go on |
 | No cap, over the cap, or too little balance | The request waits |
 | The `sysio.andon` cord is pulled | Nothing is bonded, approved or claimed until it clears |
 | A request is challenged (HELD) | Reported, whether or not we bonded it: `sysio` rules it |
-| A bond of ours is ruled INVALID while the node runs | Bonding stops until a restart; approvals and claims go on. A forfeited bond is never claimed |
-| A table read fails | The pass does nothing |
+| A bond of ours is ruled INVALID while the node runs, even one since claimed or pruned | Bonding stops until a restart; approvals and claims go on. A forfeited bond is never claimed |
+| A table read fails, or a row behind one of our bonds does not decode | The pass does nothing |
 
 ### Underwriter setup
 
@@ -141,9 +154,12 @@ else: `sysio.bond::accept`, `approve`, `claim`, `prune` and `sysio.synd::crank`,
 stays unlinked.
 
 The node needs an outpost RPC client for every active chain (each client spec names
-a signing key, though the underwriter only reads), the Ethereum OPP ABI files and the
-Solana IDL. Use RPC endpoints independent of the batch operators': the confirmation
-is only as good as the outpost reads. Run one underwriter node per account.
+a signing key, though the underwriter only reads), the Ethereum OPP ABI files (which
+must declare `outboundEnvelopes`) and the Solana IDL (which must declare
+`EnvelopeLog`). Use RPC endpoints independent of the batch operators': the
+verification is only as good as the outpost reads. A request whose epoch has left
+the outpost's record window (200 epochs on Ethereum, 128 on Solana by default) can
+no longer be verified and waits. Run one underwriter node per account.
 
 Size each cap for the most the token syndicates in one challenge window
 (`window_sec`, 3 hours by default) plus the time it takes to claim.

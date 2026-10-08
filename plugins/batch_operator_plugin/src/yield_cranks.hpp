@@ -129,11 +129,6 @@ public:
       return it == _last_push.end() || now - it->second >= interval;
    }
    void mark(const std::string& key, fc::time_point now) { _last_push[key] = now; }
-   /// Forget every key last marked before `cutoff`. With `cutoff` at most `now - interval` this changes no
-   /// answer of `due`, and keys whose subject is gone do not pile up.
-   void forget_before(fc::time_point cutoff) {
-      std::erase_if(_last_push, [&](const auto& entry) { return entry.second < cutoff; });
-   }
 
 private:
    std::map<std::string, fc::time_point> _last_push;

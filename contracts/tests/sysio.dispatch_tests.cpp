@@ -2232,10 +2232,11 @@ try {
    const auto     eth    = fc::slug_name{"ETH"}.value;
    const auto     liqeth = fc::slug_name{"LIQETH"}.value;
    const uint32_t epoch  = current_epoch();
-   BOOST_REQUIRE_EQUAL(success(), deliver(eth, encode_envelope_with_mixed_attestations(epoch, {
+   const auto     delivered = encode_envelope_with_mixed_attestations(epoch, {
       {ATTESTATION_TYPE_SYNDICATE_LIQ, encode_syndicate_liq(eth, ChainKind::CHAIN_KIND_EVM, user_pubkey, liqeth,
                                                             10 * LIQ_UNIT, 1, 10 * LIQ_UNIT)},
-   })));
+   });
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth, delivered));
    produce_block();
 
    const uint64_t id = synd_envelope("ETH", "LIQETH", epoch)["request_id"].as_uint64();
@@ -2254,6 +2255,11 @@ try {
    std::memcpy(p + 12, digest.data(), 32);
    boost::endian::store_little_u64(p + 44, liqeth);
    BOOST_CHECK(statement == request["statement"].as<std::vector<char>>());
+   // The underwriter bonds a statement only when the outpost's record of the envelope carries its digest. An outpost
+   // records keccak256 of the canonical bytes it emits (`envelope_hash` empty): the same digest.
+   sysio::opp::Envelope emitted;
+   BOOST_REQUIRE(emitted.ParseFromArray(delivered.data(), static_cast<int>(delivered.size())));
+   BOOST_CHECK(std::memcmp(oracle::epoch_digest(emitted).data(), digest.data(), 32) == 0);
    BOOST_CHECK_EQUAL(0, liq_balance(USER));   // held until underwritten
 
    // The underwriter bonds the whole request; a crank releases the syndication rather than the next envelope's

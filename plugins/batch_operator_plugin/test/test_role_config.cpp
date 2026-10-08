@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(exposure_caps_are_keyed_by_symbol_code) {
    const auto caps = parse_exposure_caps({"100.000000000 LIQETH", "5.000000000 LIQSOL"});
    BOOST_REQUIRE_EQUAL(2u, caps.size());
    const auto liqeth = sysio::chain::asset::from_string("100.000000000 LIQETH");
-   const auto found  = caps.find(liqeth.get_symbol().to_symbol_code().value);
+   const auto found  = caps.find(liqeth.get_symbol().to_symbol_code());
    BOOST_REQUIRE(found != caps.end());
    BOOST_CHECK(liqeth == found->second);
    BOOST_CHECK(parse_exposure_caps({}).empty());
