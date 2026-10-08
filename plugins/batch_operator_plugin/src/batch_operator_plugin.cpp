@@ -10,12 +10,14 @@
 #include <array>
 #include <format>
 #include <functional>
+#include <future>
 #include <limits>
 #include <map>
 #include <optional>
 #include <set>
 #include <span>
 #include <string_view>
+#include <thread>
 
 #include "async_action_completion.hpp"
 #include "group_election.hpp"
@@ -67,6 +69,8 @@ namespace {
    constexpr std::size_t UNDERWRITER_CRON_JOBS = 1;
    /// Exact secondary-index lookups should return at most the matching row.
    constexpr uint32_t EXACT_LOOKUP_LIMIT = 1;
+   /// How long past the head block's time a pushed transaction stays valid.
+   constexpr fc::microseconds PUSH_EXPIRATION = fc::seconds(30);
    /// Spacing of the warning that `sysio.chains` could not be read, per caller.
    constexpr auto OUTPOSTS_READ_WARN_INTERVAL_MS = 30000;
 
@@ -1825,60 +1829,124 @@ struct batch_operator_plugin::impl {
    //  Helpers
    // -----------------------------------------------------------------------
 
-   /// Serializes and asynchronously submits a depot action, declaring `by.auth` and signed by `by.provider`. True
-   /// when the transaction was accepted within `delivery_timeout_ms`; a refusal is logged by the push callback.
+   /// An unsigned depot transaction and the digest its signature covers.
+   struct unsigned_trx {
+      chain::signed_transaction trx;
+      chain::digest_type        digest;
+   };
+
+   /// `contract::action_name` declaring `auth`, unsigned, against the current head. Reads chain state (the ABI, the
+   /// head): call on the main thread or in a read window. Nullopt, logged, when it cannot be built.
+   std::optional<unsigned_trx> build_unsigned(const std::string& contract, const std::string& action_name,
+                                              const chain::permission_level& auth, const fc::variant_object& data) {
+      const fc::microseconds   abi_max_time = fc::milliseconds(delivery_timeout_ms);
+      const chain::controller& chain        = chain_plug->chain();
+      try {
+         auto resolver = make_resolver(chain, abi_max_time, throw_on_yield::no);
+         std::optional<chain::abi_serializer> abis_opt = resolver(chain::name(contract));
+         if (!abis_opt) {
+            elog("batch_operator: no ABI found for {}", contract);
+            return std::nullopt;
+         }
+         const chain::type_name action_type = abis_opt->get_action_type(chain::name(action_name));
+         chain::bytes action_data = abis_opt->variant_to_binary(
+            action_type, fc::variant(data), chain::abi_serializer::create_yield_function(abi_max_time));
+         unsigned_trx out;
+         out.trx.actions.emplace_back(std::vector<chain::permission_level>{auth}, chain::name(contract),
+                                      chain::name(action_name), std::move(action_data));
+         out.trx.set_reference_block(chain.head().id());
+         out.trx.expiration = fc::time_point_sec(chain.head().block_time() + PUSH_EXPIRATION);
+         out.digest         = out.trx.sig_digest(chain.get_chain_id(), out.trx.context_free_data);
+         return out;
+      } catch (const fc::exception& e) {
+         elog("batch_operator: cannot build {}::{}: {}", contract, action_name, e.to_string());
+      } catch (const std::exception& e) {
+         elog("batch_operator: cannot build {}::{}: {}", contract, action_name, e.what());
+      }
+      return std::nullopt;
+   }
+
+   /// Submit a signed transaction through `read_write::push_transaction`, completing `completion`. Resolves ABIs:
+   /// call on the main thread.
+   void submit(const std::shared_ptr<batch_operator_detail::async_action_completion>& completion,
+               const std::string& contract, const std::string& action_name, const fc::variant& packed_var) {
+      try {
+         std::shared_ptr<read_write> rw =
+            std::make_shared<read_write>(chain_plug->get_read_write_api(fc::milliseconds(delivery_timeout_ms)));
+         rw->push_transaction(
+            packed_var.get_object(),
+            batch_operator_detail::create_push_action_callback(rw, completion, contract, action_name));
+      } catch (const fc::exception& e) {
+         completion->complete([&] { elog(batch_operator_detail::push_action_log::failure, contract, action_name,
+                                         e.to_string()); });
+      } catch (const std::exception& e) {
+         completion->complete([&] { elog(batch_operator_detail::push_action_log::failure, contract, action_name,
+                                         e.what()); });
+      }
+   }
+
+   /// Whether `future` is ready by `deadline`.
+   template <typename T>
+   static bool ready_by(const std::future<T>& future, fc::time_point deadline) {
+      const fc::microseconds left = std::max(deadline - fc::time_point::now(), fc::microseconds(0));
+      return future.wait_for(std::chrono::microseconds(left.count())) == std::future_status::ready;
+   }
+
+   /// Build, sign and submit a depot action, declaring `by.auth` and signed by `by.provider`. True when the node
+   /// accepted the transaction within `delivery_timeout_ms`; a refusal is logged by the push callback.
    ///
-   /// The bounded wait deliberately does not cancel the request. Its callback
-   /// retains its API, labels, and completion state so it remains safe if this
-   /// function returns after timing out but before the transaction completes.
+   /// Called from cron threads, which may not read chain state: the build runs in a read window and the submission
+   /// on the main thread, while the signature, possibly a remote signer, stays here. The waits do not cancel
+   /// anything: each posted task owns what it uses, so returning on a timeout is safe.
    bool push_action(const std::string& contract,
                     const std::string& action_name,
                     const signer& by,
                     const fc::variant_object& data) {
-      auto abi_max_time = fc::microseconds(delivery_timeout_ms * 1000);
-      auto& chain = chain_plug->chain();
+      if (shutting_down) return false;
+      const fc::time_point deadline = fc::time_point::now() + fc::milliseconds(delivery_timeout_ms);
+      const bool           on_main  = std::this_thread::get_id() == app().executor().get_main_thread_id();
 
-      // Resolve ABI and serialize action data
-      auto resolver = make_resolver(chain, abi_max_time, throw_on_yield::no);
-      auto abis_opt = resolver(chain::name(contract));
-      if (!abis_opt) {
-         elog("batch_operator: no ABI found for {}", contract);
-         return false;
+      std::optional<unsigned_trx> trx;
+      if (on_main) {
+         trx = build_unsigned(contract, action_name, by.auth, data);
+      } else {
+         std::shared_ptr<std::promise<std::optional<unsigned_trx>>> built =
+            std::make_shared<std::promise<std::optional<unsigned_trx>>>();
+         std::future<std::optional<unsigned_trx>> built_future = built->get_future();
+         // Shutdown is checked again when the task runs, since chain state may be going away by then.
+         app().executor().post(appbase::priority::medium, appbase::exec_queue::read_only,
+                               [this, built, contract, action_name, auth = by.auth, data = fc::variant_object(data)] {
+                                  if (shutting_down) {
+                                     built->set_value(std::nullopt);
+                                     return;
+                                  }
+                                  built->set_value(build_unsigned(contract, action_name, auth, data));
+                               });
+         if (!ready_by(built_future, deadline)) {
+            elog("batch_operator: push {}::{} timed out before signing", contract, action_name);
+            return false;
+         }
+         trx = built_future.get();
       }
-
-      auto action_type = abis_opt->get_action_type(chain::name(action_name));
-      auto action_data = abis_opt->variant_to_binary(
-         action_type, fc::variant(data),
-         chain::abi_serializer::create_yield_function(abi_max_time));
-
-      // Build the signed transaction
-      chain::signed_transaction trx;
-      trx.actions.emplace_back(
-         std::vector<chain::permission_level>{by.auth},
-         chain::name(contract), chain::name(action_name), std::move(action_data));
-
-      trx.set_reference_block(chain.head().id());
-      trx.expiration = fc::time_point_sec(chain.head().block_time() + fc::seconds(30));
-
-      auto chain_id = chain.get_chain_id();
-      auto digest = trx.sig_digest(chain_id, trx.context_free_data);
-      trx.signatures.push_back(by.provider->sign(digest));
-
-      // Pack and push
-      auto packed = chain::packed_transaction(std::move(trx), chain::packed_transaction::compression_type::none);
-      auto rw = std::make_shared<read_write>(chain_plug->get_read_write_api(abi_max_time));
+      if (!trx) return false;
+      trx->trx.signatures.push_back(by.provider->sign(trx->digest));
 
       fc::variant packed_var;
-      chain::to_variant(packed, packed_var);
-
-      auto completion = std::make_shared<batch_operator_detail::async_action_completion>();
-      auto future = completion->get_future();
-
-      rw->push_transaction(
-         packed_var.get_object(),
-         batch_operator_detail::create_push_action_callback(rw, completion, contract, action_name));
-
-      if (future.wait_for(std::chrono::milliseconds(delivery_timeout_ms)) == std::future_status::timeout) {
+      chain::to_variant(
+         chain::packed_transaction(std::move(trx->trx), chain::packed_transaction::compression_type::none),
+         packed_var);
+      std::shared_ptr<batch_operator_detail::async_action_completion> completion =
+         std::make_shared<batch_operator_detail::async_action_completion>();
+      std::future<void> future = completion->get_future();
+      if (on_main) {
+         submit(completion, contract, action_name, packed_var);
+      } else {
+         app().executor().post(appbase::priority::medium, appbase::exec_queue::read_write,
+                               [this, completion, contract, action_name, packed_var = std::move(packed_var)] {
+                                  submit(completion, contract, action_name, packed_var);
+                               });
+      }
+      if (!ready_by(future, deadline)) {
          elog("batch_operator: push {}::{} timed out", contract, action_name);
          return false;
       }
