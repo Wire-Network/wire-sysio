@@ -55,13 +55,14 @@ BOOST_AUTO_TEST_CASE(query_request_schema_paging_members) {
 
 /// The response schema requires the complete, strictly shaped page object.
 BOOST_AUTO_TEST_CASE(query_response_schema_page_member) {
-   BOOST_CHECK(!schema_violation(paged_response_with("limit", fc::variant()), response_schema));
-   BOOST_CHECK(schema_violation(paged_response_with("has_more", std::nullopt), response_schema));
-   BOOST_CHECK(schema_violation(paged_response_with("has_more", fc::variant("true")), response_schema));
-   BOOST_CHECK(schema_violation(paged_response_with("total_rows", fc::variant(uint64_t{7})), response_schema));
-   BOOST_CHECK(schema_violation(paged_response_with("offset", fc::variant("-1")), response_schema));
-   BOOST_CHECK(schema_violation(paged_response_with("limit", fc::variant("02")), response_schema));
-   BOOST_CHECK(schema_violation(paged_response_with("limit", fc::variant(uint64_t{2})), response_schema));
+   BOOST_CHECK(!schema_violation(paged_response_with(response_field::limit, fc::variant()), response_schema));
+   BOOST_CHECK(schema_violation(paged_response_with(response_field::has_more, std::nullopt), response_schema));
+   BOOST_CHECK(schema_violation(paged_response_with(response_field::has_more, fc::variant("true")), response_schema));
+   BOOST_CHECK(
+      schema_violation(paged_response_with(response_field::total_rows, fc::variant(uint64_t{7})), response_schema));
+   BOOST_CHECK(schema_violation(paged_response_with(response_field::offset, fc::variant("-1")), response_schema));
+   BOOST_CHECK(schema_violation(paged_response_with(response_field::limit, fc::variant("02")), response_schema));
+   BOOST_CHECK(schema_violation(paged_response_with(response_field::limit, fc::variant(uint64_t{2})), response_schema));
    BOOST_CHECK(schema_violation(paged_response_with("cursor", fc::variant("next")), response_schema));
    BOOST_CHECK(schema_violation(
       paged_response([](fc::mutable_variant_object& result) { result.erase(response_field::page); }), response_schema));

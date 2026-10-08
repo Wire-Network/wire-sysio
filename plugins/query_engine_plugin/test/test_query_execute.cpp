@@ -70,16 +70,17 @@ BOOST_AUTO_TEST_CASE(page_window_metadata) {
    const auto expect_page = [](const query_result& result, const std::string& offset,
                                const std::optional<std::string>& limit, const std::string& returned,
                                const std::string& total, bool has_more) {
-      BOOST_CHECK_EQUAL(result.page["offset"].as_string(), offset);
+      BOOST_CHECK_EQUAL(result.page[response_field::offset].as_string(), offset);
       if (limit)
-         BOOST_CHECK_EQUAL(result.page["limit"].as_string(), *limit);
+         BOOST_CHECK_EQUAL(result.page[response_field::limit].as_string(), *limit);
       else
-         BOOST_CHECK(result.page["limit"].is_null());
-      BOOST_CHECK_EQUAL(result.page["returned_rows"].as_string(), returned);
-      BOOST_CHECK_EQUAL(result.page["total_rows"].as_string(), total);
-      BOOST_CHECK_EQUAL(result.page["has_more"].as_bool(), has_more);
-      BOOST_CHECK_EQUAL(result.page["returned_rows"].as_string(), result.stats["returned_rows"].as_string());
-      BOOST_CHECK_EQUAL(result.page["returned_rows"].as_string(), std::to_string(result.rows.size()));
+         BOOST_CHECK(result.page[response_field::limit].is_null());
+      BOOST_CHECK_EQUAL(result.page[response_field::returned_rows].as_string(), returned);
+      BOOST_CHECK_EQUAL(result.page[response_field::total_rows].as_string(), total);
+      BOOST_CHECK_EQUAL(result.page[response_field::has_more].as_bool(), has_more);
+      BOOST_CHECK_EQUAL(result.page[response_field::returned_rows].as_string(),
+                        result.stats[response_field::returned_rows].as_string());
+      BOOST_CHECK_EQUAL(result.page[response_field::returned_rows].as_string(), std::to_string(result.rows.size()));
    };
    expect_page(execute(engine, reads, ordered_sql), "0", std::nullopt, "3", "3", false);
    expect_page(execute(engine, reads, ordered_sql, query_options{.limit = 1, .offset = 1}), "1", "1", "1", "3", true);
@@ -118,6 +119,16 @@ BOOST_AUTO_TEST_CASE(page_window_metadata) {
 
 /// Request options replace limit/offset and may move the deadline earlier, never later.
 BOOST_AUTO_TEST_CASE(request_options_only_lower_the_deadline) {
+   // Time already elapsed since the request started when its options are applied.
+   constexpr auto elapsed_before_options = std::chrono::milliseconds(100);
+   // A request timeout below the configured one, so it moves the deadline earlier.
+   constexpr auto lowered_timeout = std::chrono::milliseconds(250);
+   // A request timeout above an already lowered one, which must not move the deadline later.
+   constexpr auto longer_timeout = std::chrono::milliseconds(500);
+   // A finite request timeout applied to a budget that started without a deadline.
+   constexpr auto unbounded_request_timeout = std::chrono::milliseconds(100);
+   /// A timeout below zero, which is rejected as invalid.
+   constexpr auto negative_timeout = std::chrono::milliseconds(-1);
    const auto origin = query_budget::clock::time_point{} + std::chrono::hours(1);
    auto current = origin;
    const auto now = [&] { return current; };
@@ -134,20 +145,20 @@ BOOST_AUTO_TEST_CASE(request_options_only_lower_the_deadline) {
    BOOST_CHECK(!budget.options.limit);
    BOOST_CHECK_EQUAL(budget.options.offset, 0);
    // Measured from the request's start, not from the moment the options are applied.
-   current = origin + std::chrono::milliseconds(100);
+   current = origin + elapsed_before_options;
    // A timeout exactly equal to the time remaining from the start leaves the deadline as it is.
    budget.apply_request_options(query_options{.timeout = config.timeout});
    BOOST_CHECK(budget.deadline == origin + config.timeout);
    BOOST_CHECK(budget.options.timeout.value_or(config.timeout) == config.timeout);
-   budget.apply_request_options(query_options{.timeout = std::chrono::milliseconds(250)});
-   BOOST_CHECK(budget.deadline == origin + std::chrono::milliseconds(250));
-   BOOST_CHECK(budget.options.timeout == std::chrono::milliseconds(250));
-   budget.apply_request_options(query_options{.timeout = std::chrono::milliseconds(250)});
-   BOOST_CHECK(budget.deadline == origin + std::chrono::milliseconds(250));
-   budget.apply_request_options(query_options{.timeout = std::chrono::milliseconds(500)});
-   BOOST_CHECK(budget.deadline == origin + std::chrono::milliseconds(250));
-   BOOST_CHECK(budget.options.timeout == std::chrono::milliseconds(250));
-   current = origin + std::chrono::milliseconds(250);
+   budget.apply_request_options(query_options{.timeout = lowered_timeout});
+   BOOST_CHECK(budget.deadline == origin + lowered_timeout);
+   BOOST_CHECK(budget.options.timeout == lowered_timeout);
+   budget.apply_request_options(query_options{.timeout = lowered_timeout});
+   BOOST_CHECK(budget.deadline == origin + lowered_timeout);
+   budget.apply_request_options(query_options{.timeout = longer_timeout});
+   BOOST_CHECK(budget.deadline == origin + lowered_timeout);
+   BOOST_CHECK(budget.options.timeout == lowered_timeout);
+   current = origin + lowered_timeout;
    BOOST_CHECK_EXCEPTION(budget.check(), query_error,
                          [](const auto& error) { return error.kind == error_kind::QUERY_TIMEOUT; });
    // An explicit no-deadline budget still accepts a finite request deadline, and no_deadline itself
@@ -155,14 +166,14 @@ BOOST_AUTO_TEST_CASE(request_options_only_lower_the_deadline) {
    query_budget unbounded(config, now, query_options{.timeout = constants::no_deadline});
    unbounded.apply_request_options(query_options{.timeout = constants::no_deadline});
    BOOST_CHECK(unbounded.deadline == query_budget::clock::time_point::max());
-   unbounded.apply_request_options(query_options{.timeout = std::chrono::milliseconds(100)});
-   BOOST_CHECK(unbounded.deadline == unbounded.started + std::chrono::milliseconds(100));
-   BOOST_CHECK(unbounded.options.timeout == std::chrono::milliseconds(100));
+   unbounded.apply_request_options(query_options{.timeout = unbounded_request_timeout});
+   BOOST_CHECK(unbounded.deadline == unbounded.started + unbounded_request_timeout);
+   BOOST_CHECK(unbounded.options.timeout == unbounded_request_timeout);
    // A negative timeout exceeds no limit, so none is named, and the rejected request changes nothing.
-   BOOST_CHECK_EXCEPTION(
-      unbounded.apply_request_options(query_options{.timeout = std::chrono::milliseconds(-1), .limit = 1}), query_error,
-      [](const auto& error) { return error.kind == error_kind::INVALID_PARAMS && !error.limit; });
-   BOOST_CHECK(unbounded.deadline == unbounded.started + std::chrono::milliseconds(100));
+   BOOST_CHECK_EXCEPTION(unbounded.apply_request_options(query_options{.timeout = negative_timeout, .limit = 1}),
+                         query_error,
+                         [](const auto& error) { return error.kind == error_kind::INVALID_PARAMS && !error.limit; });
+   BOOST_CHECK(unbounded.deadline == unbounded.started + unbounded_request_timeout);
    BOOST_CHECK(!unbounded.options.limit);
 }
 

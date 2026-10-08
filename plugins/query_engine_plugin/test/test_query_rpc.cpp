@@ -46,8 +46,10 @@ fc::variant expect_invalid_params(const std::string& members, const query_config
    const auto envelope = create_error(&request, *request.invocation_error);
    validate_document(fc::json::to_string(envelope, fc::time_point::maximum()), "query-response");
    BOOST_CHECK_EQUAL(envelope["id"].as_string(), request_id);
-   BOOST_CHECK_EQUAL(envelope["error"]["code"].as_int64(), error_code(error_kind::INVALID_PARAMS));
-   BOOST_CHECK_EQUAL(envelope["error"]["data"]["kind"].as_string(), "INVALID_PARAMS");
+   BOOST_CHECK_EQUAL(envelope[response_field::error][response_field::code].as_int64(),
+                     error_code(error_kind::INVALID_PARAMS));
+   BOOST_CHECK_EQUAL(envelope[response_field::error][response_field::data][response_field::kind].as_string(),
+                     magic_enum::enum_name(error_kind::INVALID_PARAMS));
    return envelope;
 }
 } // namespace
@@ -134,11 +136,14 @@ BOOST_AUTO_TEST_CASE(paging_parameters_parse_exactly) {
    const auto configured = parse_params_request(R"(,"timeout_ms":)" + std::to_string(defaults::timeout.count()));
    BOOST_REQUIRE(!configured.invocation_error);
    BOOST_CHECK(configured.options.timeout == defaults::timeout);
+   constexpr auto raised_timeout_factor = 5;
+   constexpr auto above_default_timeout = defaults::timeout + std::chrono::milliseconds(1);
    query_config longer;
-   longer.timeout = defaults::timeout * 5;
-   const auto raised = parse_params_request(R"(,"timeout_ms":1001)", longer);
+   longer.timeout = defaults::timeout * raised_timeout_factor;
+   const auto raised =
+      parse_params_request(R"(,"timeout_ms":)" + std::to_string(above_default_timeout.count()), longer);
    BOOST_REQUIRE(!raised.invocation_error);
-   BOOST_CHECK(raised.options.timeout == std::chrono::milliseconds(1001));
+   BOOST_CHECK(raised.options.timeout == above_default_timeout);
 }
 
 /// Every malformed, out-of-range, unknown or duplicated params member is INVALID_PARAMS.
@@ -166,16 +171,21 @@ BOOST_AUTO_TEST_CASE(paging_parameters_reject_invalid_members) {
                                R"(,"limit":1,"limit":2)",
                                R"(,"query":"SELECT * FROM sample.wide")"}) {
       const auto envelope = expect_invalid_params(members);
-      BOOST_CHECK_MESSAGE(envelope["error"]["data"]["limit"].is_null(), members);
+      BOOST_CHECK_MESSAGE(envelope[response_field::error][response_field::data][response_field::limit].is_null(),
+                          members);
    }
-   BOOST_CHECK_EQUAL(expect_invalid_params(R"(,"limit":-1)")["error"]["message"].as_string(),
-                     "limit must be an integer in [0, 9007199254740991]");
-   BOOST_CHECK_EQUAL(expect_invalid_params(R"(,"timeout_ms":0)")["error"]["message"].as_string(),
-                     "timeout_ms must be an integer in [1, 9007199254740991]");
+   BOOST_CHECK_EQUAL(
+      expect_invalid_params(R"(,"limit":-1)")[response_field::error][response_field::message].as_string(),
+      "limit must be an integer in [0, 9007199254740991]");
+   BOOST_CHECK_EQUAL(
+      expect_invalid_params(R"(,"timeout_ms":0)")[response_field::error][response_field::message].as_string(),
+      "timeout_ms must be an integer in [1, 9007199254740991]");
    // A timeout above the configured deadline names the option it may only lower.
-   for (const auto& timeout : {std::to_string(defaults::timeout.count() + 1), std::string("9007199254740991")}) {
+   for (const auto& timeout :
+        {std::to_string(defaults::timeout.count() + 1), std::to_string(constants::max_request_integer)}) {
       const auto envelope = expect_invalid_params(R"(,"timeout_ms":)" + timeout);
-      BOOST_CHECK_EQUAL(envelope["error"]["data"]["limit"].as_string(), option::timeout_ms);
+      BOOST_CHECK_EQUAL(envelope[response_field::error][response_field::data][response_field::limit].as_string(),
+                        option::timeout_ms);
    }
    for (const auto* params : {R"([])", R"("SELECT")", R"(null)", R"({})"}) {
       query_budget budget({});
