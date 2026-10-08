@@ -129,13 +129,6 @@ inline std::string flag(const char* option) {
    return std::string("--") + option;
 }
 
-/// Production JSON-RPC envelope without a second route implementation.
-inline std::string request_body(const std::string& sql) {
-   return fc::json::to_string(fc::mutable_variant_object()("jsonrpc", constants::version)("id", "test")(
-                                 "method", constants::method)("params", fc::mutable_variant_object()("query", sql)),
-                              fc::time_point::maximum());
-}
-
 /// Run the production HTTP handler through its worker queues, with a finite test harness deadline.
 inline fc::variant submit(query_http_handler& handler, read_queue& reads, const std::string& sql) {
    std::promise<fc::variant> completion;

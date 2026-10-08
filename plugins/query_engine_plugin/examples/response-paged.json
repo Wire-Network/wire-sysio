@@ -1,6 +1,6 @@
 {
   "jsonrpc": "2.0",
-  "id": "balances-by-beneficiary",
+  "id": "positions-page-2",
   "result": {
     "schema_version": "1.1",
     "complete": true,
@@ -28,6 +28,13 @@
     },
     "columns": [
       {
+        "name": "id",
+        "logical_type": "integer",
+        "abi_type": "uint64",
+        "nullable": false,
+        "encoding": "decimal_string"
+      },
+      {
         "name": "beneficiary",
         "logical_type": "text",
         "abi_type": "name",
@@ -35,41 +42,39 @@
         "encoding": "text"
       },
       {
-        "name": "records",
+        "name": "amount",
         "logical_type": "integer",
-        "abi_type": null,
+        "abi_type": "int64",
         "nullable": false,
-        "encoding": "decimal_string"
-      },
-      {
-        "name": "total",
-        "logical_type": "integer",
-        "abi_type": null,
-        "nullable": true,
         "encoding": "decimal_string"
       }
     ],
     "rows": [
       {
-        "beneficiary": "alice",
-        "records": "2",
-        "total": "150"
+        "id": "5",
+        "beneficiary": "bob",
+        "amount": "40"
+      },
+      {
+        "id": "3",
+        "beneficiary": "bob",
+        "amount": "20"
       }
     ],
     "stats": {
-      "scanned_rows": "3",
-      "matched_rows": "3",
-      "groups": "2",
-      "returned_rows": "1",
-      "raw_bytes": "144",
-      "elapsed_us": "1200"
+      "scanned_rows": "7",
+      "matched_rows": "7",
+      "groups": "0",
+      "returned_rows": "2",
+      "raw_bytes": "336",
+      "elapsed_us": "900"
     },
     "page": {
-      "offset": "0",
-      "limit": "20",
-      "returned_rows": "1",
-      "total_rows": "1",
-      "has_more": false
+      "offset": "2",
+      "limit": "2",
+      "returned_rows": "2",
+      "total_rows": "7",
+      "has_more": true
     }
   }
 }

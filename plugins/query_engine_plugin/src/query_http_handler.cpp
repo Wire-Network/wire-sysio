@@ -150,6 +150,7 @@ struct query_http_handler::impl {
    }
 
    /// Bound ingress independently of engine admission, including queued HTTP bodies and response buffers.
+   /// The request's own `limit`, `offset` and `timeout_ms` are applied to the budget before admission.
    void submit(std::string body, url_response_callback callback) {
       auto budget = engine->create_budget(query_options{.timeout = engine->config().timeout});
       query_request parsed;
@@ -158,6 +159,16 @@ struct query_http_handler::impl {
       } catch (const query_error& error) {
          respond(nullptr, std::move(callback), create_error(nullptr, error));
          return;
+      }
+      // The parse budget becomes the request budget: the validated limit/offset page the output and a
+      // requested timeout_ms may only move the deadline, still measured from ingress, earlier. A
+      // rejection there is an invocation error of the parsed request, answered like any other.
+      if (!parsed.invocation_error) {
+         try {
+            budget->apply_request_options(parsed.options);
+         } catch (const query_error& error) {
+            parsed.invocation_error = error;
+         }
       }
       if (parsed.invocation_error) {
          respond(&parsed, std::move(callback), create_error(&parsed, *parsed.invocation_error));

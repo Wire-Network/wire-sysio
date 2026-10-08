@@ -1,6 +1,7 @@
 #pragma once
 #include <fc/io/json.hpp>
 #include <fc/variant_object.hpp>
+#include <sysio/query_engine_plugin/query.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -8,11 +9,30 @@
 #include <rapidjson/schema.h>
 #include <rapidjson/stringbuffer.h>
 
+#include <algorithm>
 #include <fstream>
+#include <optional>
 #include <regex>
 #include <set>
+#include <string>
 
 namespace sysio::query_engine::test {
+/// The `id` every test request envelope carries.
+inline constexpr auto request_id = "test";
+/// A query over the fixture's wide table, for envelope tests that never execute it.
+inline constexpr auto wide_select_sql = "SELECT * FROM sample.wide";
+
+/// The production `query.execute` envelope whose params carry `query` plus `members`, each written
+/// `,"name":value` and spelled verbatim so number tokens reach the parser, route or validator exactly
+/// as written. No second route implementation is involved.
+inline std::string request_body(const std::string& sql, const std::string& members = {}) {
+   const auto json = [](const std::string& text) {
+      return fc::json::to_string(fc::variant(text), fc::time_point::maximum());
+   };
+   return R"({"jsonrpc":)" + json(constants::version) + R"(,"id":)" + json(request_id) + R"(,"method":)" +
+          json(constants::method) + R"(,"params":{)" + json(request_field::query) + ":" + json(sql) + members + "}}";
+}
+
 /// Read a checked-in schema/example independently of the test's working directory.
 inline std::string read_document(const std::string& relative) {
    std::ifstream input(std::string(QUERY_PLUGIN_SOURCE_DIR) + "/" + relative);
@@ -20,8 +40,9 @@ inline std::string read_document(const std::string& relative) {
    return {std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()};
 }
 
-/// Validate the exact serialized body using the shipped Draft-04 schema.
-inline void validate_document(const std::string& body, const std::string& schema_name) {
+/// Check the exact serialized body against the shipped Draft-04 schema, returning the JSON pointer of
+/// the first violation, or nothing when the body is valid.
+inline std::optional<std::string> schema_violation(const std::string& body, const std::string& schema_name) {
    rapidjson::Document schema_json, document;
    schema_json.Parse(read_document("schema/" + schema_name + ".schema.json").c_str());
    BOOST_REQUIRE(!schema_json.HasParseError());
@@ -29,10 +50,17 @@ inline void validate_document(const std::string& body, const std::string& schema
    BOOST_REQUIRE_MESSAGE(!document.HasParseError(), body);
    rapidjson::SchemaDocument schema(schema_json);
    rapidjson::SchemaValidator validator(schema);
-   const bool valid = document.Accept(validator);
+   if (document.Accept(validator))
+      return std::nullopt;
    rapidjson::StringBuffer path;
    validator.GetInvalidDocumentPointer().StringifyUriFragment(path);
-   BOOST_REQUIRE_MESSAGE(valid, schema_name << " at " << path.GetString() << ": " << body);
+   return std::string(path.GetString());
+}
+
+/// Validate the exact serialized body using the shipped Draft-04 schema.
+inline void validate_document(const std::string& body, const std::string& schema_name) {
+   const auto violation = schema_violation(body, schema_name);
+   BOOST_REQUIRE_MESSAGE(!violation, schema_name << " at " << violation.value_or("") << ": " << body);
 }
 
 /// Dynamic columns impose invariants which a static JSON schema cannot express.
@@ -51,6 +79,15 @@ inline void validate_response(const std::string& body) {
       BOOST_REQUIRE(names.insert(column["name"].as_string()).second);
    const auto& rows = result["rows"].get_array();
    BOOST_CHECK_EQUAL(result["stats"]["returned_rows"].as_string(), std::to_string(rows.size()));
+   // The page window agrees with the rows and work counters it describes.
+   const auto& page = result["page"];
+   BOOST_CHECK_EQUAL(page["returned_rows"].as_string(), result["stats"]["returned_rows"].as_string());
+   const auto offset = std::stoull(page["offset"].as_string());
+   const auto total = std::stoull(page["total_rows"].as_string());
+   BOOST_CHECK_LE(rows.size(), total - std::min(offset, total));
+   BOOST_CHECK_EQUAL(page["has_more"].as_bool(), std::min(offset, total) + rows.size() < total);
+   if (!page["limit"].is_null())
+      BOOST_CHECK_LE(rows.size(), std::stoull(page["limit"].as_string()));
    for (const auto& row : rows) {
       BOOST_REQUIRE_EQUAL(row.get_object().size(), names.size());
       for (const auto& column : result["columns"].get_array()) {

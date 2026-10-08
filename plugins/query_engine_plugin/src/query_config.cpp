@@ -7,6 +7,9 @@
 namespace sysio::query_engine {
 
 namespace {
+constexpr auto negative_timeout_message = "Timeout must be a nonnegative millisecond count";
+constexpr auto clock_range_message = "Timeout exceeds the monotonic clock range";
+
 /// Parse decimal option text without accepting a leading minus through unsigned wraparound.
 template <typename T>
 T option_value(const boost::program_options::variables_map& options, const char* name, T fallback) {
@@ -133,21 +136,22 @@ query_budget::query_budget(query_config config, now_function now, const std::opt
    , deadline(clock::time_point::max()) {
    config.validate();
    // An unset per-call timeout applies the configured deadline; only constants::no_deadline opts out.
-   const auto timeout = this->options.timeout.value_or(config.timeout);
+   deadline = deadline_for(this->options.timeout.value_or(config.timeout));
+}
+
+query_budget::clock::time_point query_budget::deadline_for(std::chrono::milliseconds timeout) const {
+   // A negative timeout exceeded no limit; it is simply not a duration, so no option is named.
    if (timeout < std::chrono::milliseconds::zero())
-      throw query_error(error_kind::INVALID_PARAMS, "Timeout must be a nonnegative millisecond count", std::nullopt,
-                        option::timeout_ms);
+      throw query_error(error_kind::INVALID_PARAMS, negative_timeout_message);
    if (timeout == constants::no_deadline)
-      return;
+      return clock::time_point::max();
    const auto maximum = std::chrono::duration_cast<std::chrono::milliseconds>(clock::duration::max());
    if (timeout > maximum)
-      throw query_error(error_kind::INVALID_PARAMS, "Timeout exceeds the monotonic clock range", std::nullopt,
-                        option::timeout_ms);
+      throw query_error(error_kind::INVALID_PARAMS, clock_range_message, std::nullopt, option::timeout_ms);
    const auto duration = std::chrono::duration_cast<clock::duration>(timeout);
-   if (started > deadline - duration)
-      throw query_error(error_kind::INVALID_PARAMS, "Timeout exceeds the monotonic clock range", std::nullopt,
-                        option::timeout_ms);
-   deadline = started + duration;
+   if (started > clock::time_point::max() - duration)
+      throw query_error(error_kind::INVALID_PARAMS, clock_range_message, std::nullopt, option::timeout_ms);
+   return started + duration;
 }
 
 void query_budget::check() const {
@@ -214,6 +218,20 @@ void query_budget::charge_raw(uint64_t rows, uint64_t bytes) {
 
 uint64_t query_budget::elapsed_us() const {
    return std::chrono::duration_cast<std::chrono::microseconds>(now() - started).count();
+}
+
+void query_budget::apply_request_options(const query_options& requested) {
+   // Validate before mutating, so a rejected request leaves the budget as it was.
+   const auto lowered = requested.timeout && *requested.timeout < options.timeout.value_or(config.timeout);
+   const auto lowered_deadline = lowered ? deadline_for(*requested.timeout) : deadline;
+   options.limit = requested.limit;
+   options.offset = requested.offset;
+   // Compare whole-millisecond timeouts rather than clock time points, so a large request
+   // (constants::no_deadline included) cannot overflow; one that does not lower simply leaves the deadline.
+   if (lowered) {
+      deadline = lowered_deadline;
+      options.timeout = requested.timeout;
+   }
 }
 
 } // namespace sysio::query_engine

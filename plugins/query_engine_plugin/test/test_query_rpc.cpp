@@ -33,6 +33,23 @@ query_request parse_id_request(const std::string& id) {
                            ",\"method\":\"query.execute\",\"params\":{\"query\":\"SELECT * FROM sample.wide\"}}",
                         budget);
 }
+/// Parse a request whose params carry `query` plus the given members.
+query_request parse_params_request(const std::string& members, const query_config& config = {}) {
+   query_budget budget(config);
+   return parse_request(request_body(wide_select_sql, members), budget);
+}
+/// A rejected params member is an invocation error: INVALID_PARAMS on the wire with the echoed ID.
+fc::variant expect_invalid_params(const std::string& members, const query_config& config = {}) {
+   const auto request = parse_params_request(members, config);
+   BOOST_REQUIRE_MESSAGE(request.invocation_error, members);
+   BOOST_CHECK_MESSAGE(request.invocation_error->kind == error_kind::INVALID_PARAMS, members);
+   const auto envelope = create_error(&request, *request.invocation_error);
+   validate_document(fc::json::to_string(envelope, fc::time_point::maximum()), "query-response");
+   BOOST_CHECK_EQUAL(envelope["id"].as_string(), request_id);
+   BOOST_CHECK_EQUAL(envelope["error"]["code"].as_int64(), error_code(error_kind::INVALID_PARAMS));
+   BOOST_CHECK_EQUAL(envelope["error"]["data"]["kind"].as_string(), "INVALID_PARAMS");
+   return envelope;
+}
 } // namespace
 
 BOOST_AUTO_TEST_SUITE(query_rpc)
@@ -74,6 +91,99 @@ BOOST_AUTO_TEST_CASE(envelopes_notifications_and_invocation_errors) {
    BOOST_CHECK_EQUAL(invalid.id.as_int64(), 7);
    BOOST_REQUIRE(invalid.invocation_error);
    BOOST_CHECK(invalid.invocation_error->kind == error_kind::INVALID_PARAMS);
+}
+
+/// `{query}` alone keeps every option at its default; limit, offset and timeout_ms are exact JSON
+/// integers, including fraction and exponent spellings of an integral value.
+BOOST_AUTO_TEST_CASE(paging_parameters_parse_exactly) {
+   const auto plain = parse_params_request("");
+   BOOST_REQUIRE(!plain.invocation_error);
+   BOOST_CHECK_EQUAL(plain.query, wide_select_sql);
+   BOOST_CHECK(!plain.options.limit);
+   BOOST_CHECK_EQUAL(plain.options.offset, 0);
+   BOOST_CHECK(!plain.options.timeout);
+   for (const auto& [members, limit] : std::vector<std::pair<std::string, uint64_t>>{
+           {R"(,"limit":2)",                2                             },
+           {R"(,"limit":2e0)",              2                             },
+           {R"(,"limit":20e-1)",            2                             },
+           {R"(,"limit":2.0)",              2                             },
+           {R"(,"limit":0)",                0                             },
+           {R"(,"limit":9007199254740991)", constants::max_request_integer}
+   }) {
+      const auto request = parse_params_request(members);
+      BOOST_REQUIRE_MESSAGE(!request.invocation_error, members);
+      BOOST_REQUIRE(request.options.limit);
+      BOOST_CHECK_EQUAL(*request.options.limit, limit);
+   }
+   for (const auto& [members, offset] : std::vector<std::pair<std::string, uint64_t>>{
+           {R"(,"offset":3)",                3                             },
+           {R"(,"offset":-0)",               0                             },
+           {R"(,"offset":3E+0)",             3                             },
+           {R"(,"offset":9007199254740991)", constants::max_request_integer}
+   }) {
+      const auto request = parse_params_request(members);
+      BOOST_REQUIRE_MESSAGE(!request.invocation_error, members);
+      BOOST_CHECK_EQUAL(request.options.offset, offset);
+   }
+   const auto timed = parse_params_request(R"(,"timeout_ms":5e2,"offset":1,"limit":4)");
+   BOOST_REQUIRE(!timed.invocation_error);
+   BOOST_CHECK(timed.options.timeout == std::chrono::milliseconds(500));
+   BOOST_CHECK_EQUAL(timed.options.offset, 1);
+   BOOST_CHECK_EQUAL(timed.options.limit.value_or(0), 4);
+   // The configured timeout itself is the largest accepted value.
+   const auto configured = parse_params_request(R"(,"timeout_ms":)" + std::to_string(defaults::timeout.count()));
+   BOOST_REQUIRE(!configured.invocation_error);
+   BOOST_CHECK(configured.options.timeout == defaults::timeout);
+   query_config longer;
+   longer.timeout = defaults::timeout * 5;
+   const auto raised = parse_params_request(R"(,"timeout_ms":1001)", longer);
+   BOOST_REQUIRE(!raised.invocation_error);
+   BOOST_CHECK(raised.options.timeout == std::chrono::milliseconds(1001));
+}
+
+/// Every malformed, out-of-range, unknown or duplicated params member is INVALID_PARAMS.
+BOOST_AUTO_TEST_CASE(paging_parameters_reject_invalid_members) {
+   for (const auto* members : {R"(,"limit":"2")",
+                               R"(,"limit":-1)",
+                               R"(,"limit":1.5)",
+                               R"(,"limit":9007199254740992)",
+                               R"(,"limit":1e16)",
+                               R"(,"limit":null)",
+                               R"(,"limit":true)",
+                               R"(,"limit":[2])",
+                               R"(,"limit":{"value":2})",
+                               R"(,"offset":"0")",
+                               R"(,"offset":-1)",
+                               R"(,"offset":0.5)",
+                               R"(,"offset":9007199254740992)",
+                               R"(,"offset":null)",
+                               R"(,"timeout_ms":0)",
+                               R"(,"timeout_ms":-5)",
+                               R"(,"timeout_ms":"500")",
+                               R"(,"timeout_ms":1.5)",
+                               R"(,"timeout_ms":null)",
+                               R"(,"owner":"sample")",
+                               R"(,"limit":1,"limit":2)",
+                               R"(,"query":"SELECT * FROM sample.wide")"}) {
+      const auto envelope = expect_invalid_params(members);
+      BOOST_CHECK_MESSAGE(envelope["error"]["data"]["limit"].is_null(), members);
+   }
+   BOOST_CHECK_EQUAL(expect_invalid_params(R"(,"limit":-1)")["error"]["message"].as_string(),
+                     "limit must be an integer in [0, 9007199254740991]");
+   BOOST_CHECK_EQUAL(expect_invalid_params(R"(,"timeout_ms":0)")["error"]["message"].as_string(),
+                     "timeout_ms must be an integer in [1, 9007199254740991]");
+   // A timeout above the configured deadline names the option it may only lower.
+   for (const auto& timeout : {std::to_string(defaults::timeout.count() + 1), std::string("9007199254740991")}) {
+      const auto envelope = expect_invalid_params(R"(,"timeout_ms":)" + timeout);
+      BOOST_CHECK_EQUAL(envelope["error"]["data"]["limit"].as_string(), option::timeout_ms);
+   }
+   for (const auto* params : {R"([])", R"("SELECT")", R"(null)", R"({})"}) {
+      query_budget budget({});
+      const auto request = parse_request(
+         std::string(R"({"jsonrpc":"2.0","id":7,"method":"query.execute","params":)") + params + "}", budget);
+      BOOST_REQUIRE_MESSAGE(request.invocation_error, params);
+      BOOST_CHECK(request.invocation_error->kind == error_kind::INVALID_PARAMS);
+   }
 }
 
 BOOST_AUTO_TEST_CASE(startup_rejects_invalid_unsigned_options) {

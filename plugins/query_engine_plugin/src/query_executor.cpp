@@ -230,6 +230,14 @@ projected_row project(const typed_plan& plan, const std::vector<value>& fields, 
    }
    return result;
 }
+
+/// The effective window size: the smaller of an explicit SQL LIMIT and the per-call limit, or none
+/// when neither is set.
+std::optional<uint64_t> combined_limit(const std::optional<uint64_t>& sql, const std::optional<uint64_t>& call) {
+   if (sql && call)
+      return std::min(*sql, *call);
+   return sql ? sql : call;
+}
 } // namespace
 
 int compare_keys(const std::vector<char>& left, const std::vector<char>& right) {
@@ -317,9 +325,10 @@ query_result evaluate(const typed_plan& plan, captured_input input, query_budget
             return left.owner < right.owner;
          return compare_keys(left.primary_key, right.primary_key) < 0;
       });
-      const auto offset = std::min<uint64_t>(output.size(), budget.options.offset);
-      const auto count = std::min({uint64_t(output.size()) - offset, plan.ast.limit.value_or(output.size()),
-                                   budget.options.limit.value_or(output.size())});
+      const uint64_t total = output.size();
+      const auto offset = std::min<uint64_t>(total, budget.options.offset);
+      const auto window_limit = combined_limit(plan.ast.limit, budget.options.limit);
+      const auto count = std::min(total - offset, window_limit.value_or(total));
       budget.assert_limit(count, budget.config.max_result_rows, option::max_result_rows);
       budget.charge_memory(count * sizeof(fc::variant_object) * allocation_factor +
                            plan.columns.size() * sizeof(output_column));
@@ -350,12 +359,19 @@ query_result evaluate(const typed_plan& plan, captured_input input, query_budget
          response_field::returned_rows, std::to_string(count))(
          response_field::raw_bytes, std::to_string(budget.raw_bytes))(response_field::elapsed_us,
                                                                       std::to_string(budget.elapsed_us()));
+      // The window over the complete ordered output: the requested offset (which may lie beyond it),
+      // the effective limit, and whether rows remain after this page.
+      auto page = fc::mutable_variant_object()(response_field::offset, std::to_string(budget.options.offset))(
+         response_field::limit, window_limit ? fc::variant(std::to_string(*window_limit))
+                                             : fc::variant())(response_field::returned_rows, std::to_string(count))(
+         response_field::total_rows, std::to_string(total))(response_field::has_more, offset + count < total);
       budget.check();
       return {.source = std::move(source),
               .state = input.state.get_object(),
               .columns = std::move(columns),
               .rows = std::move(rows),
-              .stats = std::move(stats)};
+              .stats = std::move(stats),
+              .page = std::move(page)};
    } catch (const std::overflow_error&) {
       throw query_error(error_kind::VALUE_ERROR, "Aggregate overflow");
    }
