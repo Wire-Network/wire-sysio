@@ -80,14 +80,15 @@ inline void validate_response(const std::string& body) {
    const auto& rows = result["rows"].get_array();
    BOOST_CHECK_EQUAL(result["stats"]["returned_rows"].as_string(), std::to_string(rows.size()));
    // The page window agrees with the rows and work counters it describes.
-   const auto& page = result["page"];
-   BOOST_CHECK_EQUAL(page["returned_rows"].as_string(), result["stats"]["returned_rows"].as_string());
-   const auto offset = std::stoull(page["offset"].as_string());
-   const auto total = std::stoull(page["total_rows"].as_string());
+   const auto& page = result[response_field::page];
+   BOOST_CHECK_EQUAL(page[response_field::returned_rows].as_string(),
+                     result[response_field::stats][response_field::returned_rows].as_string());
+   const auto offset = std::stoull(page[response_field::offset].as_string());
+   const auto total = std::stoull(page[response_field::total_rows].as_string());
    BOOST_CHECK_LE(rows.size(), total - std::min(offset, total));
-   BOOST_CHECK_EQUAL(page["has_more"].as_bool(), std::min(offset, total) + rows.size() < total);
-   if (!page["limit"].is_null())
-      BOOST_CHECK_LE(rows.size(), std::stoull(page["limit"].as_string()));
+   BOOST_CHECK_EQUAL(page[response_field::has_more].as_bool(), std::min(offset, total) + rows.size() < total);
+   if (!page[response_field::limit].is_null())
+      BOOST_CHECK_LE(rows.size(), std::stoull(page[response_field::limit].as_string()));
    for (const auto& row : rows) {
       BOOST_REQUIRE_EQUAL(row.get_object().size(), names.size());
       for (const auto& column : result["columns"].get_array()) {

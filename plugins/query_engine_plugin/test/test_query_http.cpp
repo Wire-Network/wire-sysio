@@ -523,9 +523,11 @@ BOOST_AUTO_TEST_CASE(query_http_paging_options) {
    };
 
    const auto unpaged = query("");
-   BOOST_REQUIRE(unpaged.get_object().contains("error"));
-   BOOST_CHECK_EQUAL(unpaged["error"]["data"]["kind"].as_string(), "QUERY_LIMIT");
-   BOOST_CHECK_EQUAL(unpaged["error"]["data"]["limit"].as_string(), option::max_result_rows);
+   BOOST_REQUIRE(unpaged.get_object().contains(response_field::error));
+   BOOST_CHECK_EQUAL(unpaged[response_field::error][response_field::data][response_field::kind].as_string(),
+                     magic_enum::enum_name(error_kind::QUERY_LIMIT));
+   BOOST_CHECK_EQUAL(unpaged[response_field::error][response_field::data][response_field::limit].as_string(),
+                     option::max_result_rows);
 
    // An explicit limit is still capped: one row above the cap fails the same way, the cap itself pages.
    const auto above_cap = query(R"(,"limit":)" + std::to_string(result_row_cap + 1));
@@ -547,17 +549,18 @@ BOOST_AUTO_TEST_CASE(query_http_paging_options) {
       BOOST_REQUIRE_LT(offset, total_rows);
       const auto response =
          query(R"(,"limit":)" + std::to_string(page_size) + R"(,"offset":)" + std::to_string(offset));
-      BOOST_REQUIRE_MESSAGE(response.get_object().contains("result"),
+      BOOST_REQUIRE_MESSAGE(response.get_object().contains(response_field::result),
                             fc::json::to_string(response, fc::time_point::maximum()));
-      const auto& result = response["result"];
-      BOOST_CHECK_EQUAL(result["schema_version"].as_string(), constants::schema_version);
-      BOOST_CHECK(result["complete"].as_bool());
-      BOOST_CHECK_EQUAL(result["page"]["offset"].as_string(), std::to_string(offset));
-      BOOST_CHECK_EQUAL(result["page"]["limit"].as_string(), std::to_string(page_size));
-      BOOST_CHECK_EQUAL(result["page"]["total_rows"].as_string(), std::to_string(total_rows));
-      for (const auto& row : result["rows"].get_array())
+      const auto& result = response[response_field::result];
+      BOOST_CHECK_EQUAL(result[response_field::schema_version].as_string(), constants::schema_version);
+      BOOST_CHECK(result[response_field::complete].as_bool());
+      BOOST_CHECK_EQUAL(result[response_field::page][response_field::offset].as_string(), std::to_string(offset));
+      BOOST_CHECK_EQUAL(result[response_field::page][response_field::limit].as_string(), std::to_string(page_size));
+      BOOST_CHECK_EQUAL(result[response_field::page][response_field::total_rows].as_string(),
+                        std::to_string(total_rows));
+      for (const auto& row : result[response_field::rows].get_array())
          ids.push_back(row["id"].as_string());
-      if (!result["page"]["has_more"].as_bool())
+      if (!result[response_field::page][response_field::has_more].as_bool())
          break;
    }
    BOOST_REQUIRE_EQUAL(ids.size(), total_rows);
@@ -565,25 +568,30 @@ BOOST_AUTO_TEST_CASE(query_http_paging_options) {
       BOOST_CHECK_EQUAL(ids[i], std::to_string(i + 1));
 
    const auto beyond = query(R"(,"offset":)" + std::to_string(total_rows + fixture_rows));
-   BOOST_REQUIRE(beyond.get_object().contains("result"));
-   BOOST_CHECK(beyond["result"]["rows"].get_array().empty());
-   BOOST_CHECK(!beyond["result"]["page"]["has_more"].as_bool());
-   BOOST_CHECK_EQUAL(beyond["result"]["page"]["total_rows"].as_string(), std::to_string(total_rows));
+   BOOST_REQUIRE(beyond.get_object().contains(response_field::result));
+   BOOST_CHECK(beyond[response_field::result][response_field::rows].get_array().empty());
+   BOOST_CHECK(!beyond[response_field::result][response_field::page][response_field::has_more].as_bool());
+   BOOST_CHECK_EQUAL(beyond[response_field::result][response_field::page][response_field::total_rows].as_string(),
+                     std::to_string(total_rows));
 
    const auto columns_only = query(R"(,"limit":0)");
-   BOOST_REQUIRE(columns_only.get_object().contains("result"));
-   BOOST_CHECK(columns_only["result"]["rows"].get_array().empty());
-   BOOST_CHECK_EQUAL(columns_only["result"]["columns"].get_array().size(), 2);
-   BOOST_CHECK_EQUAL(columns_only["result"]["page"]["limit"].as_string(), "0");
-   BOOST_CHECK(columns_only["result"]["page"]["has_more"].as_bool());
+   BOOST_REQUIRE(columns_only.get_object().contains(response_field::result));
+   BOOST_CHECK(columns_only[response_field::result][response_field::rows].get_array().empty());
+   BOOST_CHECK_EQUAL(columns_only[response_field::result][response_field::columns].get_array().size(), 2);
+   BOOST_CHECK_EQUAL(columns_only[response_field::result][response_field::page][response_field::limit].as_string(),
+                     "0");
+   BOOST_CHECK(columns_only[response_field::result][response_field::page][response_field::has_more].as_bool());
 
    // timeout_ms may only lower the configured deadline; malformed members are invocation errors.
    const auto raised = query(R"(,"limit":1,"timeout_ms":)" +
                              std::to_string(std::chrono::milliseconds(default_query_timeout).count() + 1));
-   BOOST_CHECK_EQUAL(raised["error"]["data"]["kind"].as_string(), "INVALID_PARAMS");
-   BOOST_CHECK_EQUAL(raised["error"]["data"]["limit"].as_string(), option::timeout_ms);
+   BOOST_CHECK_EQUAL(raised[response_field::error][response_field::data][response_field::kind].as_string(),
+                     magic_enum::enum_name(error_kind::INVALID_PARAMS));
+   BOOST_CHECK_EQUAL(raised[response_field::error][response_field::data][response_field::limit].as_string(),
+                     option::timeout_ms);
    for (const auto* members : {R"(,"limit":"1")", R"(,"offset":-1)", R"(,"limit":1.5)", R"(,"cursor":1)"})
-      BOOST_CHECK_EQUAL(query(members)["error"]["data"]["kind"].as_string(), "INVALID_PARAMS");
+      BOOST_CHECK_EQUAL(query(members)[response_field::error][response_field::data][response_field::kind].as_string(),
+                        magic_enum::enum_name(error_kind::INVALID_PARAMS));
 }
 
 /// A request's timeout_ms lowers its deadline, measured from ingress: while the application thread
@@ -618,16 +626,17 @@ BOOST_AUTO_TEST_CASE(query_http_timeout_ms_lowers_the_deadline) {
    BOOST_REQUIRE(lowered_ready == std::future_status::ready);
    BOOST_CHECK(configured_pending == std::future_status::timeout);
    const auto timed_out = fc::json::from_string(lowered.get().body());
-   BOOST_REQUIRE_MESSAGE(timed_out.get_object().contains("error"),
+   BOOST_REQUIRE_MESSAGE(timed_out.get_object().contains(response_field::error),
                          fc::json::to_string(timed_out, fc::time_point::maximum()));
-   BOOST_CHECK_EQUAL(timed_out["error"]["data"]["kind"].as_string(), "QUERY_TIMEOUT");
+   BOOST_CHECK_EQUAL(timed_out[response_field::error][response_field::data][response_field::kind].as_string(),
+                     magic_enum::enum_name(error_kind::QUERY_TIMEOUT));
    BOOST_REQUIRE(blocked.wait_for(test_wait) == std::future_status::ready);
    blocked.get();
    BOOST_REQUIRE(configured.wait_for(test_wait) == std::future_status::ready);
    const auto completed = fc::json::from_string(configured.get().body());
-   BOOST_REQUIRE_MESSAGE(completed.get_object().contains("result"),
+   BOOST_REQUIRE_MESSAGE(completed.get_object().contains(response_field::result),
                          fc::json::to_string(completed, fc::time_point::maximum()));
-   BOOST_CHECK_EQUAL(completed["result"]["rows"].get_array().size(), 1);
+   BOOST_CHECK_EQUAL(completed[response_field::result][response_field::rows].get_array().size(), 1);
 }
 
 /// Saturating admission rejects another HTTP request without waiting for chain work.
