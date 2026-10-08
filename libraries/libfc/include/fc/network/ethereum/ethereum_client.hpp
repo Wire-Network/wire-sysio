@@ -50,16 +50,20 @@ struct ethereum_confirm_options {
    /// under-funds it. A floor lets the caller fund such a call to what the
    /// chain allows instead. The floor is still subject to the client's
    /// `max_gas_limit`: a floor above the policy ceiling is a policy rejection,
-   /// never a silently clamped limit.
+   /// never a silently clamped limit. Ignored when `gas_limit_cap` is set: the
+   /// cap is then the limit outright.
    uint64_t                  gas_limit_floor = 0;
 
-   /// Most gas the transaction is funded with, and the gas the pre-flight
-   /// estimate is asked to fit in; `0` leaves both unbounded (the policy
-   /// ceiling still applies). With a cap the estimate runs under exactly the
-   /// budget the transaction will carry, so a call that cannot succeed inside
-   /// it is refused by the node before anything is signed, instead of being
-   /// sent and reverting on chain for the whole budget. Must be at least the
-   /// floor; a cap above the policy ceiling is a policy rejection.
+   /// The gas limit the transaction is sent with, and the gas the pre-flight
+   /// estimate runs under; `0` leaves the limit to the buffered estimate (and
+   /// the floor). A capped call is sent with EXACTLY this limit: the estimate
+   /// is a pre-flight at that gas and nothing more, so a call that cannot
+   /// succeed inside it is refused by the node before anything is signed,
+   /// instead of being sent and reverting on chain for the whole budget. The
+   /// estimate's value is not an input to the limit -- neither the headroom
+   /// buffer nor the buffered-estimate ceiling check applies, since what is
+   /// simulated is exactly what is sent. Must be at least the floor; a cap
+   /// above the policy ceiling is a policy rejection.
    uint64_t                  gas_limit_cap = 0;
 };
 
@@ -506,6 +510,28 @@ public:
                                          ethereum_confirm_option_defaults);
 
    /**
+    * @brief Wait for a previously-submitted tx hash to be included and
+    *        confirmed at `opts.confirmations` depth, and return its receipt.
+    *
+    * The receipt is the authoritative record of what the transaction did:
+    * its `blockNumber` pins every follow-up read to the block that holds the
+    * effect, and its `logs` carry the events the contract emitted. A caller
+    * that decides its next move from those reads the receipt rather than
+    * re-reading state at `latest`, which a lagging backend may serve from a
+    * block before the transaction landed.
+    *
+    * Same two-phase wait as `wait_for_confirmation`.
+    *
+    * @param tx_hash Transaction hash returned by an earlier submit.
+    * @param opts    Confirmation depth + retry/backoff envelope.
+    * @return The `eth_getTransactionReceipt` object, as the node returned it.
+    * @throws fc::timeout_exception on deadline expiry, fc::exception on an
+    *         on-chain revert (`status == 0`).
+    */
+   fc::variant wait_for_receipt(const std::string& tx_hash,
+                                const ethereum_confirm_options& opts = ethereum_confirm_option_defaults);
+
+   /**
     * @brief Retrieves logs based on filter parameters.
     * @param params The filter parameters for fetching logs.
     * @return The logs in JSON format.
@@ -595,7 +621,7 @@ public:
     * @param params Parameters to pass to the contract function
     * @param gas_limit_floor Least gas limit to fund the transaction with, or 0
     *        to use the buffered estimate; see `ethereum_confirm_options::gas_limit_floor`
-    * @param gas_limit_cap Most gas to fund it with, and the bound the estimate
+    * @param gas_limit_cap The gas limit to send with, and the bound the estimate
     *        runs under, or 0 for none; see `ethereum_confirm_options::gas_limit_cap`
     * @return Configured eip1559_tx ready for signing and submission
     */
