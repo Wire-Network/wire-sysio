@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "WIRE query.execute response v1",
+  "title": "WIRE query.execute response v1.1",
   "oneOf": [
     {
       "type": "object",
@@ -266,6 +266,41 @@
         }
       }
     },
+    "page": {
+      "type": "object",
+      "required": [
+        "offset",
+        "limit",
+        "returned_rows",
+        "total_rows",
+        "has_more"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "offset": {
+          "$ref": "#/definitions/unsignedDecimal"
+        },
+        "limit": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/unsignedDecimal"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "returned_rows": {
+          "$ref": "#/definitions/unsignedDecimal"
+        },
+        "total_rows": {
+          "$ref": "#/definitions/unsignedDecimal"
+        },
+        "has_more": {
+          "type": "boolean"
+        }
+      }
+    },
     "error": {
       "type": "object",
       "required": [
@@ -363,13 +398,14 @@
         "state",
         "columns",
         "rows",
-        "stats"
+        "stats",
+        "page"
       ],
       "additionalProperties": false,
       "properties": {
         "schema_version": {
           "enum": [
-            "1.0"
+            "1.1"
           ]
         },
         "complete": {
@@ -401,6 +437,9 @@
         },
         "stats": {
           "$ref": "#/definitions/stats"
+        },
+        "page": {
+          "$ref": "#/definitions/page"
         }
       }
     }

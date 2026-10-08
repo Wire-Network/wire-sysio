@@ -6,6 +6,14 @@
     "params"
   ],
   "additionalProperties": false,
+  "definitions": {
+    "requestInteger": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991,
+      "description": "An exact JSON integer in [0, 2^53-1], the range every JSON client represents exactly."
+    }
+  },
   "properties": {
     "jsonrpc": {
       "enum": [
@@ -38,10 +46,27 @@
           "type": "string",
           "minLength": 1,
           "description": "UTF-8 SQL; runtime enforces the configured byte limit (default 16384)."
+        },
+        "limit": {
+          "$ref": "#/definitions/requestInteger",
+          "description": "Maximum rows in this page, combined with an SQL LIMIT by taking the smaller; 0 returns columns only. The page is still capped by query-max-result-rows."
+        },
+        "offset": {
+          "$ref": "#/definitions/requestInteger",
+          "description": "Rows of the complete, ordered output skipped before the page; beyond the end yields an empty page."
+        },
+        "timeout_ms": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/requestInteger"
+            }
+          ],
+          "minimum": 1,
+          "description": "Request deadline in milliseconds, counted from ingress; may only lower the configured query-timeout-ms (a larger value is INVALID_PARAMS)."
         }
       }
     }
   },
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "WIRE query.execute single-request profile v1"
+  "title": "WIRE query.execute single-request profile v1.1"
 }

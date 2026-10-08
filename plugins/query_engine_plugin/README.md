@@ -45,7 +45,7 @@ for (const fc::variant_object& row : result.rows) {
 
 The public interface is `query_result execute(const std::string& query,
 const std::optional<query_options>& options = std::nullopt)`. `query_result` carries `schema_version`,
-`complete`, `source`, `state`, `columns`, `stats`, and `std::vector<fc::variant_object> rows`.
+`complete`, `source`, `state`, `columns`, `stats`, `page`, and `std::vector<fc::variant_object> rows`.
 Failures throw `query_error`; C++ execution does not create an RPC envelope.
 
 `query_options.timeout` is an optional `std::chrono::milliseconds`. Unset, it applies the configured
@@ -109,13 +109,15 @@ canonical typed group-key order. LIMIT follows complete grouping, HAVING and ord
 valid. Exceeding a server cap fails the query; it never silently truncates totals.
 
 No JOIN, subquery, UNION, DISTINCT, SQL OFFSET, arbitrary arithmetic/functions, writes or DDL.
-C++ pagination uses `query_options.offset`; HTTP params remain exactly `{query}`.
+Pagination uses `query_options` in C++ and the `limit` / `offset` / `timeout_ms` params over HTTP
+(see [Paging](#paging)).
 Primary-key equality, leading composite-key prefix and range predicates can narrow capture. Other
 predicates use a bounded scan and residual evaluation. Secondary-index optimization is not included.
 
 ## Values and response
 
-Send a JSON-RPC 2.0 object with method `query.execute` and exactly one named parameter, `query`:
+Send a JSON-RPC 2.0 object with method `query.execute` and named parameters: the required `query`,
+plus the optional paging members described under [Paging](#paging):
 
 ```json
 {"jsonrpc":"2.0","id":"totals","method":"query.execute","params":{"query":"SELECT SUM(amount) AS total FROM sample.positions"}}
@@ -127,8 +129,8 @@ either `result` or `error`. Notifications omit `id` and return HTTP 204 with an 
 invocation failures. Malformed envelopes and unsupported batch arrays return errors with null ID.
 HTTP limits enforced before dispatch retain the HTTP plugin's normal transport behavior.
 
-Every successful result contains `schema_version`, `complete: true`, `source`, `state`, `columns`,
-`rows`, and `stats`. `source.owners` and `state.abis` identify every selected owner. `state.block_id`
+Every successful result contains `schema_version` (`1.1`), `complete: true`, `source`, `state`,
+`columns`, `rows`, `stats`, and `page`. `source.owners` and `state.abis` identify every selected owner. `state.block_id`
 identifies the applied state captured by all internal pages; metadata also includes read mode,
 irreversible height, chain ID, capture time and local sync status. `synced: false` does not prevent
 reads. A head state may subsequently be forked out; this is a current-state read, not a finality claim.
@@ -171,7 +173,66 @@ and the residual predicate always agree with the decoded text.
 Only the fields a query references are decoded; every other ABI node is skipped, so `COUNT(*)`
 reads no row bytes and a projected scan is charged for one decoded row at a time.
 
-See [schema/README.md](schema/README.md), the normative schemas, and [examples/request.json](examples/request.json).
+### Paging
+
+Every `query_options` field is available over HTTP as an optional member of `params`:
+
+| Member | Value | Meaning |
+|---|---|---|
+| `limit` | integer in [0, 9007199254740991] | Maximum rows in this page; the smaller of it and an SQL LIMIT applies. `0` returns no rows: the columns and `page` are still present. The page is still capped by `query-max-result-rows`, failing with QUERY_LIMIT rather than truncating. |
+| `offset` | integer in [0, 9007199254740991] | Rows of the complete, ordered output skipped before the page. An offset beyond the end returns an empty page. |
+| `timeout_ms` | integer in [1, `query-timeout-ms`] | A request deadline that may only LOWER the configured one; it still counts from request ingress, queue time included. |
+
+The members are JSON numbers with an integral value (`2`, `2.0` and `2e0` are all 2), read exactly
+from the token and never through a host float; the 2^53-1 bound keeps every value exact in every
+JSON client. A string, null, boolean, fractional, negative or out-of-range value, a `timeout_ms`
+above the configured `query-timeout-ms` (whose `error.data.limit` names `query-timeout-ms`), any
+other member, or a repeated member is INVALID_PARAMS. HTTP cannot extend or disable the configured
+deadline; only C++ callers may opt out with `constants::no_deadline`.
+
+The second two-row page, verbatim from [examples/request-paged.json](examples/request-paged.json):
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": "positions-page-2",
+  "method": "query.execute",
+  "params": {
+    "query": "SELECT key.id AS id, beneficiary, amount FROM sample.positions ORDER BY amount DESC",
+    "limit": 2,
+    "offset": 2,
+    "timeout_ms": 500
+  }
+}
+```
+
+`offset` applies to the complete evaluated output, before any SQL LIMIT: the output is never cut to
+the SQL LIMIT first and then skipped into. An SQL LIMIT therefore acts as a cap on the page size,
+exactly like the `limit` member — `... LIMIT 1` with `"offset": 1` returns the second output row — and
+`page.total_rows` and `page.has_more` always describe the complete output, not an SQL-LIMIT-truncated
+one.
+
+Every result carries `page`, the window it returned over the complete evaluated output:
+
+| Member | Value |
+|---|---|
+| `offset` | the requested offset, as an unsigned decimal string |
+| `limit` | the effective limit — the smaller of SQL LIMIT and `limit` — as a decimal string, or null when neither is set |
+| `returned_rows` | rows in this response; always equal to `stats.returned_rows` |
+| `total_rows` | rows of the complete output: rows passing WHERE for a detail query, groups passing HAVING for a grouped one |
+| `has_more` | whether output rows remain after this page: `min(offset, total_rows) + returned_rows < total_rows` |
+
+Each page is a separate request evaluated at its own block snapshot, so pages taken while the chain
+advances can overlap or skip rows; compare `state.block_id` across pages when a consistent view
+matters. Pagination never reduces the input evaluated: aggregation, HAVING and ordering always see
+every row, and `query-max-scan-rows` still bounds the whole scan. `complete: true` keeps its meaning
+— evaluation finished for the snapshot and nothing was silently truncated — while `has_more` says
+whether rows exist beyond this window. Paging is how a result larger than `query-max-result-rows`
+is read: a single unpaged request for it fails with QUERY_LIMIT.
+
+See [schema/README.md](schema/README.md), the normative schemas, [examples/request.json](examples/request.json)
+and the paged pair [examples/request-paged.json](examples/request-paged.json) /
+[examples/response-paged.json](examples/response-paged.json).
 
 ## Resource limits
 
@@ -182,14 +243,14 @@ All options are immutable, positive integers available through CLI or config.ini
 | query-worker-threads | 2 | Query workers; the optional HTTP adapter has the same number of separate workers |
 | query-max-in-flight | 4 | Engine admissions including retained reads; also the independent HTTP ingress cap |
 | query-max-query-bytes | 16384 | SQL bytes before ANTLR |
-| query-timeout-ms | 1000 | Request deadline, including ingress/queue time; C++ callers may opt out per call |
+| query-timeout-ms | 1000 | Request deadline, including ingress/queue time; HTTP `timeout_ms` may only lower it; C++ callers may opt out per call |
 | query-max-capture-ms | producer_plugin's read-only transaction time | Each chain read callback (the ABI copy and the coherent data capture); unset, the smaller of that time and `query-timeout-ms`; a configured value may not exceed it |
 | query-max-abi-bytes | 1048576 | ABI blob size per selected owner, checked before copy |
 | query-max-scan-rows | 100000 | Total candidate rows across owners |
 | query-max-raw-bytes | 67108864 | Copied ABI, raw rows, continuation and capture overhead |
 | query-max-memory-bytes | 134217728 | Conservative allocation charges per request; a decoded row's charges are released once it is folded in |
 | query-max-groups | 10000 | Aggregate groups |
-| query-max-result-rows | 10000 | Output rows after offset and SQL/per-call limit |
+| query-max-result-rows | 10000 | Output rows of one page, after offset and SQL/per-call limit |
 | query-max-response-bytes | 8388608 | Encoded success envelope bytes |
 
 Additional bounds are 4096 tokens, depth 64, 2048 AST/ABI descriptor nodes, 64 owners and 512 rows

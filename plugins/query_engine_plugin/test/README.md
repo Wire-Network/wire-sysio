@@ -63,7 +63,14 @@ handler with requests in flight and re-queue a read the window cut short, restor
 charges (rows and bytes against an uncut reference run, every counter at unit level), naming the
 window in a later deadline failure over both the C++ and the HTTP path until a retry succeeds, and
 never retrying a capture that overran its own budget; `query_execute` pins the caller-owned budget
-contract (required, single use). Integration tests also pin that a text extreme,
+contract (required, single use), the `page` window for detail and grouped queries (offset beyond the
+end, `limit` 0, the smaller of SQL LIMIT and the per-call limit) and request options that only ever
+move a deadline earlier. `query_rpc` pins the HTTP paging params (`limit`, `offset`, `timeout_ms`
+as exact JSON integers within their bounds, a `timeout_ms` above `query-timeout-ms`, unknown and
+duplicate members), and the schema suite validates the paged examples and the new members' negative
+cases. The application tests page over HTTP past `query-max-result-rows` (an unpaged request still
+fails with QUERY_LIMIT) and show a lowered `timeout_ms` timing out while the configured deadline
+does not. Integration tests also pin that a text extreme,
 finalized aggregates and the engine's peak statistic track live state. The application tests pin the
 read-exclusive queue (a write window longer than the deadline times a query out), the capture budget
 derived from the read window, and that the plugin binds the window on every read (the capture

@@ -10,6 +10,8 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 
+#include <magic_enum/magic_enum.hpp>
+
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -494,6 +496,138 @@ BOOST_AUTO_TEST_CASE(query_http_irreversible_read_mode) {
    BOOST_CHECK_EQUAL(result["state"]["read_mode"].as_string(), "irreversible");
    BOOST_CHECK_EQUAL(result["rows"][size_t{0}]["total"].as_string(), "150");
    BOOST_CHECK_LE(result["state"]["block_num"].as_uint64(), result["state"]["last_irreversible_block_num"].as_uint64());
+}
+
+/// HTTP pages over the complete ordered output: pages concatenate to the full result even when that
+/// result exceeds `query-max-result-rows`, which a single unpaged request still fails with QUERY_LIMIT.
+BOOST_AUTO_TEST_CASE(query_http_paging_options) {
+   constexpr uint32_t seeded_rows = 9;
+   constexpr uint64_t fixture_rows = 3;
+   constexpr uint64_t total_rows = fixture_rows + seeded_rows;
+   constexpr uint64_t result_row_cap = 5;
+   constexpr uint64_t page_size = 4;
+   constexpr auto rows_sql = "SELECT key.id AS id, amount FROM sample.positions";
+   chain_fixture fixture;
+   fixture.seed(account, fixture_rows + 1, seeded_rows, "carol"_n, 5);
+   fixture.produce_block();
+   http_application server;
+   BOOST_REQUIRE(
+      server.initialize(true, default_read_threads, {flag(option::max_result_rows), std::to_string(result_row_cap)}) ==
+      chain::exit_code::SUCCESS);
+   server.start();
+   server.sync(fixture);
+   const auto query = [&](const std::string& members) {
+      const auto response = server.request(request_body(rows_sql, members));
+      BOOST_REQUIRE(response.result() == http::status::ok);
+      return fc::json::from_string(response.body());
+   };
+
+   const auto unpaged = query("");
+   BOOST_REQUIRE(unpaged.get_object().contains("error"));
+   BOOST_CHECK_EQUAL(unpaged["error"]["data"]["kind"].as_string(), "QUERY_LIMIT");
+   BOOST_CHECK_EQUAL(unpaged["error"]["data"]["limit"].as_string(), option::max_result_rows);
+
+   // An explicit limit is still capped: one row above the cap fails the same way, the cap itself pages.
+   const auto above_cap = query(R"(,"limit":)" + std::to_string(result_row_cap + 1));
+   BOOST_REQUIRE(above_cap.get_object().contains(response_field::error));
+   const auto& above_cap_data = above_cap[response_field::error][response_field::data];
+   BOOST_CHECK_EQUAL(above_cap_data[response_field::kind].as_string(), magic_enum::enum_name(error_kind::QUERY_LIMIT));
+   BOOST_CHECK_EQUAL(above_cap_data[response_field::limit].as_string(), option::max_result_rows);
+   const auto at_cap = query(R"(,"limit":)" + std::to_string(result_row_cap));
+   BOOST_REQUIRE_MESSAGE(at_cap.get_object().contains(response_field::result),
+                         fc::json::to_string(at_cap, fc::time_point::maximum()));
+   const auto& at_cap_page = at_cap[response_field::result][response_field::page];
+   BOOST_CHECK_EQUAL(at_cap[response_field::result][response_field::rows].get_array().size(), result_row_cap);
+   BOOST_CHECK_EQUAL(at_cap_page[response_field::limit].as_string(), std::to_string(result_row_cap));
+   BOOST_CHECK_EQUAL(at_cap_page[response_field::total_rows].as_string(), std::to_string(total_rows));
+   BOOST_CHECK(at_cap_page[response_field::has_more].as_bool());
+
+   std::vector<std::string> ids;
+   for (uint64_t offset = 0;; offset += page_size) {
+      BOOST_REQUIRE_LT(offset, total_rows);
+      const auto response =
+         query(R"(,"limit":)" + std::to_string(page_size) + R"(,"offset":)" + std::to_string(offset));
+      BOOST_REQUIRE_MESSAGE(response.get_object().contains("result"),
+                            fc::json::to_string(response, fc::time_point::maximum()));
+      const auto& result = response["result"];
+      BOOST_CHECK_EQUAL(result["schema_version"].as_string(), constants::schema_version);
+      BOOST_CHECK(result["complete"].as_bool());
+      BOOST_CHECK_EQUAL(result["page"]["offset"].as_string(), std::to_string(offset));
+      BOOST_CHECK_EQUAL(result["page"]["limit"].as_string(), std::to_string(page_size));
+      BOOST_CHECK_EQUAL(result["page"]["total_rows"].as_string(), std::to_string(total_rows));
+      for (const auto& row : result["rows"].get_array())
+         ids.push_back(row["id"].as_string());
+      if (!result["page"]["has_more"].as_bool())
+         break;
+   }
+   BOOST_REQUIRE_EQUAL(ids.size(), total_rows);
+   for (uint64_t i = 0; i < total_rows; ++i)
+      BOOST_CHECK_EQUAL(ids[i], std::to_string(i + 1));
+
+   const auto beyond = query(R"(,"offset":)" + std::to_string(total_rows + fixture_rows));
+   BOOST_REQUIRE(beyond.get_object().contains("result"));
+   BOOST_CHECK(beyond["result"]["rows"].get_array().empty());
+   BOOST_CHECK(!beyond["result"]["page"]["has_more"].as_bool());
+   BOOST_CHECK_EQUAL(beyond["result"]["page"]["total_rows"].as_string(), std::to_string(total_rows));
+
+   const auto columns_only = query(R"(,"limit":0)");
+   BOOST_REQUIRE(columns_only.get_object().contains("result"));
+   BOOST_CHECK(columns_only["result"]["rows"].get_array().empty());
+   BOOST_CHECK_EQUAL(columns_only["result"]["columns"].get_array().size(), 2);
+   BOOST_CHECK_EQUAL(columns_only["result"]["page"]["limit"].as_string(), "0");
+   BOOST_CHECK(columns_only["result"]["page"]["has_more"].as_bool());
+
+   // timeout_ms may only lower the configured deadline; malformed members are invocation errors.
+   const auto raised = query(R"(,"limit":1,"timeout_ms":)" +
+                             std::to_string(std::chrono::milliseconds(default_query_timeout).count() + 1));
+   BOOST_CHECK_EQUAL(raised["error"]["data"]["kind"].as_string(), "INVALID_PARAMS");
+   BOOST_CHECK_EQUAL(raised["error"]["data"]["limit"].as_string(), option::timeout_ms);
+   for (const auto* members : {R"(,"limit":"1")", R"(,"offset":-1)", R"(,"limit":1.5)", R"(,"cursor":1)"})
+      BOOST_CHECK_EQUAL(query(members)["error"]["data"]["kind"].as_string(), "INVALID_PARAMS");
+}
+
+/// A request's timeout_ms lowers its deadline, measured from ingress: while the application thread
+/// holds the write window no read can capture, so the lowered request times out while the same query
+/// under the configured deadline completes once the window opens.
+BOOST_AUTO_TEST_CASE(query_http_timeout_ms_lowers_the_deadline) {
+   constexpr auto lowered_timeout = std::chrono::milliseconds(200);
+   chain_fixture fixture;
+   http_application server;
+   BOOST_REQUIRE(server.initialize(true) == chain::exit_code::SUCCESS);
+   server.start();
+   server.sync(fixture);
+   auto entered = std::make_shared<std::promise<void>>();
+   auto reached = entered->get_future();
+   auto resume = std::make_shared<std::promise<void>>();
+   const auto release = resume->get_future().share();
+   auto blocked = server.post_write([entered, release] {
+      entered->set_value();
+      if (release.wait_for(test_wait) != std::future_status::ready)
+         throw std::runtime_error("Deadline barrier was not released");
+   });
+   BOOST_REQUIRE(reached.wait_for(test_wait) == std::future_status::ready);
+   auto lowered = std::async(std::launch::async, [&] {
+      return server.request(request_body(selected_sql, R"(,"timeout_ms":)" + std::to_string(lowered_timeout.count())));
+   });
+   auto configured = std::async(std::launch::async, [&] { return server.request(request_body(selected_sql)); });
+   const auto lowered_ready = lowered.wait_for(test_wait);
+   // With the window still closed, the configured request outlives the lowered deadline by at least
+   // another lowered interval rather than merely not having finished at the same instant.
+   const auto configured_pending = configured.wait_for(lowered_timeout);
+   resume->set_value();
+   BOOST_REQUIRE(lowered_ready == std::future_status::ready);
+   BOOST_CHECK(configured_pending == std::future_status::timeout);
+   const auto timed_out = fc::json::from_string(lowered.get().body());
+   BOOST_REQUIRE_MESSAGE(timed_out.get_object().contains("error"),
+                         fc::json::to_string(timed_out, fc::time_point::maximum()));
+   BOOST_CHECK_EQUAL(timed_out["error"]["data"]["kind"].as_string(), "QUERY_TIMEOUT");
+   BOOST_REQUIRE(blocked.wait_for(test_wait) == std::future_status::ready);
+   blocked.get();
+   BOOST_REQUIRE(configured.wait_for(test_wait) == std::future_status::ready);
+   const auto completed = fc::json::from_string(configured.get().body());
+   BOOST_REQUIRE_MESSAGE(completed.get_object().contains("result"),
+                         fc::json::to_string(completed, fc::time_point::maximum()));
+   BOOST_CHECK_EQUAL(completed["result"]["rows"].get_array().size(), 1);
 }
 
 /// Saturating admission rejects another HTTP request without waiting for chain work.
