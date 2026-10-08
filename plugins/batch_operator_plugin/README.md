@@ -17,7 +17,8 @@ Run by every member of the elected group, for every active outpost chain:
 **Outbound (WIRE → Outposts):**
 1. Read the outpost's outbound envelope that `sysio.epoch::advance` built
    (`sysio.msgch::buildenv`) from the depot's `outenvelopes` table
-2. Deliver it to the Outpost contract, chunked (ETH: `OPPInbound.epochIn()`, SOL: `epoch_in`)
+2. Deliver it to the Outpost contract (ETH: one `OPPInbound.epochIn()` carrying the whole envelope,
+   continued while its dispatch spills; SOL: `epoch_in`, chunked)
 3. The outpost reaches consensus once enough group members have delivered identical bytes
 
 **Inbound (Outposts → WIRE):**
