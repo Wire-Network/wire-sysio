@@ -59,6 +59,23 @@ optional, but when present all four fields must be set, each amount must be a ca
 (digits only, non-zero, no leading zero), and `max_priority_fee_per_gas_wei` must not exceed
 `max_fee_per_gas_wei`. File-configured chain ids are always verified against `eth_chainId`.
 
+A client that delivers OPP envelopes (one handed an `OPPInbound` address by `create_outpost_client`) must
+also fund a delivery: its `max_gas_limit`, bounded by EIP-7825's 16 777 216 per-transaction cap, has to
+reach `DELIVERY_MINIMUM_GAS_CEILING` (9 932 160 gas — what an envelope at the 32 768-byte platform cap
+costs to deliver and tip, dispatch one attestation at its allowance, and emit). The relay refuses to be
+built on a smaller ceiling, since the largest envelope the platform allows could never complete on it. The
+total-cost term binds at the fee a call is sent at: when `max_total_native_cost_wei / max_fee_per_gas_wei`
+is below that minimum the relay starts with a warning, and deliveries at fees near the policy maximum spill
+into more continuations than their budgets size for.
+
+What the signer needs follows from the same arithmetic. Every `epochIn` is sent with its budget as the gas
+limit — a full-cap first delivery at the EIP-7825 cap, less for a continuation — and a node reserves
+`gas_limit x max_fee_per_gas` of the signer's balance for it whatever the call uses (about 0.7 ETH at
+16 777 216 gas and a 20 gwei base fee, returned on inclusion minus the gas burnt). A default geth also
+refuses a submission whose `gas_limit x maxFeePerGas` exceeds its 1 ETH `--rpc.txfeecap` (about 59.6 gwei at
+the cap); raise that cap on the operator's own node or accept that deliveries at higher fees are refused by
+the node rather than by the policy.
+
 Chain-id resolution is retried before it gives up: initial backoff 200 ms, doubling to a 1 s ceiling, under a
 5 s total budget. Failure raises `plugin_config_exception` naming the client, the sanitized endpoint, and a
 stable `last_failure` category rather than the response body.
@@ -97,34 +114,64 @@ confirmations — OPP writes are consensus-critical and must not silently drop.
 | Wrapper | Contract | Members |
 |---|---|---|
 | `opp_contract_client` | `OPP.sol` | `emitOutboundEnvelope(uint32)` (recovery-only write; no in-tree steady-state caller), `getLatestOutboundEnvelope()` view |
-| `opp_inbound_contract_client` | `OPPInbound.sol` | `epochIn(uint32,uint16,uint16,uint32,bytes)`, `discardEnvelopeChunks()`, `nextEpochIndex()` view, `envelopeChunkState(address)` view, `attestationHandlers(uint16)` view |
+| `opp_inbound_contract_client` | `OPPInbound.sol` | `epochIn(uint32,bytes)` (funded per call, returns the confirmed receipt), `nextEpochIndex()`, `dispatchSpill(uint32)`, `epochDeliveries(uint32,address)`, `pendingEpochHash()`, `pendingConsensusForDigest(bytes32)` and `attestationHandlers(uint16)` views |
 | `syndication_pool_contract_client` | `SyndicationPool.sol` (Wire-Network/wire-ethereum#207) | `realizeYield()` |
 
-### Outbound delivery and chunking
+### Outbound delivery
 
 `deliver_outbound_envelope` refuses an empty envelope and one larger than `OPP_MAX_ENVELOPE_BYTES` (32 768),
-then splits the rest into `ceil(size / ETHEREUM_MAX_CHUNK_BYTES)` `epochIn` transactions.
-`ETHEREUM_MAX_CHUNK_BYTES` is 8 192 — a compiled-in mirror of `MAX_CHUNK_BYTES` in wire-ethereum's
-`OPPCommon.sol`, never configured — so an envelope costs at most four transactions. Every non-final chunk is
-exactly that size and the final chunk carries the remainder; there is no terminal call and no crank, because
-the contract finalizes inline on the chunk that completes the envelope. Chunks are submitted sequentially
-with one transaction in flight at a time, so the signer's nonce advances in lock-step.
+then sends the WHOLE envelope in ONE `epochIn(uint32,bytes)`. Ethereum bounds a transaction by gas, not
+size — a full-cap envelope is ~1.3 M gas of calldata against EIP-7825's 16.7 M cap — and what may not fit
+in one call is dispatch, which the contract spills: the call that reaches consensus routes as many
+attestations as its gas allows, records where it stopped in `dispatchSpill(epoch)`, and a continuation is
+the SAME call with the same arguments, resumed from that cursor. The outpost never stores the envelope's
+bytes; every continuation re-supplies them.
 
-A single-chunk envelope stages nothing on chain and pays no extra round trip. A multi-chunk delivery first
-reads `envelopeChunkState(self)` at the `latest` block tag — this is the relay's own staging high-water mark,
-not content WIRE commits consensus against — and decides what to do from the header alone:
+**Reads are pinned to one block.** Every decision is taken from `nextEpochIndex()`, `dispatchSpill(epoch)`,
+`epochDeliveries(epoch, self)` and `pendingEpochHash()` read at ONE block number — the head when the tick
+starts, then the block each confirmed call landed in (from its receipt) — never at `latest`, which a
+backend behind the block that just confirmed could serve from before the call. A backend that does not
+know the block yet is retried for a bounded time. The reads are not at `finalized` either: the cursor is
+the outpost's own bookkeeping about work this relay is doing now, a reorg costs at most a re-sent call the
+contract treats as an idempotent no-op, and a continuation gated on finality would wait ~64 blocks between
+every stretch of dispatch.
 
-| Staged header | Action |
+From those reads the relay decides, per `outpost_ethereum_client_detail::decide_delivery`:
+
+| Outpost state | Action |
 |---|---|
-| Empty (`totalChunks == 0`), or owned by another signer | Send every chunk from index 0 |
-| Ours, same epoch, same chunk count and total size, plausible progress | Resume from `receivedChunks` |
-| Ours, same epoch, different shape, or more stored chunks than a well-formed upload can hold | `discardEnvelopeChunks()`, then send from index 0 |
-| Ours, a different epoch | Read `nextEpochIndex()`; if the outpost has already consumed this epoch, skip the delivery entirely rather than pay for late no-ops |
+| `nextEpochIndex > epoch`, or the spill cursor reports `finalized` | Nothing to send; an EMPTY tx id marks the epoch handled |
+| `nextEpochIndex < epoch` | The outpost is behind: `outpost_delivery_incomplete_exception`, retried next tick |
+| Tipped and unfinished, and this relay's recorded digest IS `pendingEpochHash` | Continue: re-send the envelope (after checking its `keccak256` is the settled digest) |
+| Tipped and unfinished on a digest this relay did not deliver, or delivered a minority of | Nothing to send; its deliverers carry the continuation |
+| Untipped, nothing recorded for this relay | Deliver |
+| Untipped, this relay recorded, and `pendingConsensusForDigest(own digest)` says the boundary has elapsed and a strict majority agrees | Re-deliver, so the outpost re-runs its path-2 tip |
+| Untipped, this relay recorded, otherwise | Nothing to send until more of the group delivers |
 
-A `discardEnvelopeChunks()` that reverts at estimate time is treated as "already clear". An unreadable or
-malformed state decodes as all-zero and degrades to starting fresh, which the contract absorbs as idempotent
-no-ops. A mid-sequence failure simply abandons the tick; the next one restarts from the on-chain high-water
-mark.
+**Each call is funded to what it has left to carry** (`delivery_gas_budget`): a fixed cost, a per-byte cost,
+an allowance per attestation the cursor says is still to dispatch, and the emit — doubled for each call this
+tick that fell short, never above the ceiling. The ceiling (`delivery_gas_ceiling`) is the policy's
+`max_gas_limit` bounded by EIP-7825's cap AND by what `max_total_native_cost` pays for at the current fee,
+so a budget it admits is never refused by the policy at signing. The node's estimate is deliberately not
+the budget: `epochIn` stops on a `gasleft()` watchdog and records where it stopped, so `eth_estimateGas`
+converges on the least gas at which the call succeeds — the tip plus one attestation. Instead the budget is
+both the pre-flight estimate's gas and the limit the transaction is sent with, so a call that cannot run
+inside it is refused before anything is signed, and one that can is sent with exactly it.
+
+**Every call paid for must move the cursor.** After each confirmed call the relay reads the outpost again at
+the receipt's block; a call that advanced nothing (no delivery recorded, no tip, no dispatch progress, no
+finalization) was under-funded for the attestation at the cursor, and the next one is funded higher. A
+node refusal at estimate time is classified by its revert: `OPP_DispatchUnderfunded` and
+`OPP_HandlerGasExhausted` below the ceiling retry once at the ceiling; `OPP_NonSequentialEpoch`,
+`OPP_OperatorAlreadyDelivered`, `OPP_NotActiveOperator` and `OPP_DigestMismatch` mean the outpost moved
+under the read (another relay's call landed), so the relay re-reads at the head and decides again, a
+bounded number of times. A call at the ceiling that advances nothing, or is refused for gas at the ceiling,
+is an attestation no funding carries: logged once at error level per cursor position, then the tick ends in
+`outpost_delivery_incomplete_exception` so the job retries rather than marks the epoch handled. The same
+exception ends a tick that reaches `MAX_CONTINUATIONS_PER_TICK` (32) calls with the epoch still open.
+
+Calls are submitted sequentially, one in flight at a time, so the signer's nonce advances in lock-step; a
+mid-sequence failure or deadline abandons the tick, and the next one resumes from the outpost's cursor.
 
 ### Inbound reads
 
@@ -254,13 +301,20 @@ Startup and configuration:
 
 Per-client runtime lines are prefixed with the SPI label `outpost_ethereum_client[{chain_code}:{ChainKind}:{chain_id}]`:
 
-- `epochIn chunk sent epoch=... chunk=.../... bytes=... tx=...` for each delivered chunk.
-- `resuming epoch=... delivery at chunk ...`, `discarded a superseded epoch=... staging header`, and
-  `skipping epoch=... delivery — the outpost has ...` on the chunk-resume paths.
+- `epochIn delivered|continued epoch=... bytes=... gas=... block=... tx=... — recorded=... tipped=...
+  dispatched=... finalized=...` for each confirmed call, summarising the `OPPInbound` events in its receipt.
+- `skipping epoch=... delivery — the outpost has already finalized it`, `tipped on a digest this relay did
+  not deliver`, `delivery already recorded; consensus not tipped`, `re-delivering to run the boundary tip`
+  and `not delivered — the outpost is still on epoch ...` for each decision that sends nothing (or
+  re-sends).
+- `refused at ... gas (...); retrying at the ceiling` at warning level for a gas refusal below the ceiling,
+  and `cannot advance past attestation N at the ceiling` at error level — once per cursor position — when
+  no funding carries the attestation there; `still open after N calls in one tick` at warning level when
+  the per-tick bound is reached.
 - `read inbound envelope epoch=... bytes=...` after a successful inbound read.
-- Warning-level lines for every malformed view result (`envelopeChunkState returned non-string variant`,
-  `latestOutboundEnvelope data_ not a string`, and siblings); an epoch mismatch on the inbound slot stays at
-  debug level so steady-state polling is not noisy.
+- Warning-level lines for every malformed view result (`latestOutboundEnvelope data_ not a string` and
+  siblings); an epoch mismatch on the inbound slot stays at debug level so steady-state polling is not
+  noisy.
 
 ## Tests
 
@@ -272,9 +326,12 @@ ninja -C build/debug test_outpost_ethereum_client_plugin
 Two suites run in that binary. `outpost_ethereum_client_plugin` covers option registration, chain-id
 resolution and verification (explicit, RPC-resolved, mismatched, malformed, out-of-range, and transient
 transport failure), signature-provider rejection cases, contract-client construction and ABI encoding, the
-chunk-count and chunk-resume decision tables, and every delivery path — single-chunk, multi-chunk in order,
-resume from a staged high-water mark, peer-owned header, superseded header, reverting discard, epoch
-advanced, deadline abandonment, and the empty and over-cap rejections — and the outpost crank: idle without
+delivery decision table, settlement and receipt classification, the gas budget and ceilings, and every
+delivery path — one call, tip-and-spill continued in the same tick, resume from a tipped cursor, minority
+and never-delivered digests, consensus retry gated on the outpost's own majority view, pinned-block reads,
+escalation after a call that advanced nothing and the stall report at the ceiling, revert classification,
+outpost behind, the per-tick bound, epoch advanced, deadline abandonment, and the empty and over-cap
+rejections — and the outpost crank: idle without
 the pool ABI or a registered handler, binding the registered pool and re-binding on a change, the pool's own
 three refusals, unrecognised reverts and protocol errors, and deadline abandonment.
 `outpost_ethereum_transaction_policy_tests` covers the expenditure-policy boundary: that a rejection happens

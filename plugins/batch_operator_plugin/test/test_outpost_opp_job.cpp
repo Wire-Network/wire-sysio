@@ -7,6 +7,7 @@
 #include <fc/network/json_rpc/json_rpc_client.hpp>
 
 #include <sysio/batch_operator_plugin/outpost_opp_job.hpp>
+#include <sysio/chain/exceptions.hpp>
 
 #include "mocks/mock_depot_ops.hpp"
 #include "mocks/mock_outpost_client.hpp"
@@ -284,6 +285,37 @@ BOOST_AUTO_TEST_CASE(run_outbound_swallows_exceptions_and_does_not_mark_epoch) {
    // Two emits total: one for the failed attempt, one for the recovered retry.
    // Same epoch + same envelope ⇒ same hash, so the sink dedupes on disk.
    BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 2u);
+}
+
+/// A delivery the relay could not finish with — the outpost behind, a
+/// continuation bound reached, a stalled call at the gas ceiling — is not a
+/// failure and not a handled epoch: the job neither cranks nor marks it, and
+/// the next tick delivers again.
+BOOST_AUTO_TEST_CASE(run_outbound_retries_an_incomplete_delivery_next_tick_without_cranking) {
+   auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
+   mock_depot_ops depot;
+   depot.epoch = 5;
+   outbound_envelope_record rec;
+   rec.raw_envelope = {'x'};
+   depot.pending_response = [rec](uint64_t, uint32_t) -> std::optional<outbound_envelope_record> {
+      return rec;
+   };
+   client->deliver_response = [](const auto&) -> std::string {
+      SYS_THROW(sysio::chain::outpost_delivery_incomplete_exception, "still open");
+   };
+
+   outpost_opp_job job(client, depot, kDeadline);
+   BOOST_CHECK_NO_THROW(job.run_outbound());
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 1u);
+   BOOST_CHECK_EQUAL(client->crank_calls.size(), 0u);
+
+   // Not marked: the next tick resumes it, and the crank rides the delivery that lands.
+   client->deliver_response = [](const auto&) { return std::string{"0xfinished"}; };
+   job.run_outbound();
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 2u);
+   BOOST_CHECK_EQUAL(client->crank_calls.size(), 1u);
+   job.run_outbound();
+   BOOST_CHECK_EQUAL(client->outbound_calls.size(), 2u);
 }
 
 BOOST_AUTO_TEST_CASE(run_outbound_emits_event_on_failure_and_retries_next_tick) {
