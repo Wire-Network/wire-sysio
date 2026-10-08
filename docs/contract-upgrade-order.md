@@ -250,6 +250,33 @@ the absent-key case rather than the short-decode one (see
 
 ## Downgrades
 
+### No-expiry claim layouts (WIRE-339 / WIRE-353)
+
+This pre-launch change requires fresh state for the changed serialized layouts. Operator
+pay (`sysio.system::payclaims`), per-token returned collateral and credited yield
+(`sysio.opreg::remitclaims`), and DClaim pending/unmapped balances omit expiry fields and
+indexes. DClaim also removes the claim-window field from `capcfg` and the `setclmwindow`
+and `flushexpired` actions. There is no in-place table migration or compatibility shim.
+
+Operator pruning and re-registration preserve any earned but uncredited shadow yield in
+`sysio.opreg::yielddebts`, keyed by account and token. `claimyield` can collect this debt
+without an operator record, only to the original account's WIRE remit and only within
+that token's received-yield pool. Debt does not accrue again or expire; rounding dust
+remains owed until backing is available. A full WIRE remit rejects collection atomically.
+These system-funded rows deliberately retain storage until the beneficiary collects them.
+
+`sysio.reserv` and `sysio.uwrit` are retired by the syndication architecture. Do not
+restore their old sweep actions or deployment edges. `sysio.bond` already retains unpaid
+claims, and its paid-only cleanup remains unchanged.
+
+Before any separately designed rollback, stop all affected claim writers and settle or
+explicitly preserve every liability, including archived yield debt and unlinked DClaim
+credits. Restoring the old ABI alone cannot decode these rows. DClaim's finalized
+`imported_complete` flag must remain set when adapting `capcfg`; restoring its old claim
+window must never reopen imports. Removal of an inline action requires retiring its
+callers first; addition requires deploying the callee first. Fresh-state bootstrap must
+use a matching contract set and generated SDK interface.
+
 > **WIRE-350 pre-launch note:** Provider nodes that previously started with the old automatic
 > snapshot schedule must delete their local `snapshot-schedule.json` once before starting this
 > build. The old `(spacing=25000, start=24999, end=MAX)` request and the corrected
@@ -267,10 +294,11 @@ roll back, the claim tables may hold value that only the NEW code can pay out:
 | `payclaims` | `sysio.system` | `claimpay` | earned epoch pay |
 | `wireclaims` | `sysio.bond` | `claimwire` | WIRE yield earned by underwriters and banked at `claim` |
 | `remitclaims` | `sysio.opreg` | `claimremit` | debited operator collateral |
+| `yielddebts` | `sysio.opreg` | `claimyield`, then `claimremit` | banked yield retained after operator removal |
+| `pclaims`, `unmapped` | `sysio.dclaim` | `claim`, after `linkswept` for unlinked credits | rewards and imported credits |
 
-Every one of those balances is value already taken from someone's spendable
-position and parked behind an action the old build does not have. Rolling back
-with rows present does not degrade — it strands.
+These rows record obligations, including earned yield that its pool cannot yet cover.
+Rolling back without preserving them can strand both backed claims and unpaid yield debt.
 
 There is also a live-writer hazard with no upgrade counterpart: rolling
 `sysio.epoch` back while the new `sysio.system` is still deployed lets `payepoch`

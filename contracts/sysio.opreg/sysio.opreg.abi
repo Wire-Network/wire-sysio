@@ -520,10 +520,6 @@
                 {
                     "name": "balance",
                     "type": "uint64"
-                },
-                {
-                    "name": "expires_at_sec",
-                    "type": "uint32"
                 }
             ]
         },
@@ -718,6 +714,24 @@
             ]
         },
         {
+            "name": "yield_debt",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "owed_wire",
+                    "type": "uint128"
+                }
+            ]
+        },
+        {
             "name": "yield_pool",
             "base": "",
             "fields": [
@@ -900,14 +914,7 @@
             "index_type": "i64",
             "key_names": ["account","token_code"],
             "key_types": ["uint64","slug_name"],
-            "table_id": 45499,
-            "secondary_indexes": [
-                {
-                    "name": "byexpiry",
-                    "key_type": "uint128",
-                    "table_id": 43905
-                }
-            ]
+            "table_id": 45499
         },
         {
             "name": "wtdwqueue",
@@ -928,6 +935,14 @@
                     "table_id": 34233
                 }
             ]
+        },
+        {
+            "name": "yielddebts",
+            "type": "yield_debt",
+            "index_type": "i64",
+            "key_names": ["account","token_code"],
+            "key_types": ["uint64","slug_name"],
+            "table_id": 2779
         },
         {
             "name": "yieldpool",
