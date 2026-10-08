@@ -2,6 +2,7 @@
 
 #include <span>
 #include <compare>
+#include <string_view>
 #include <fc/fwd.hpp>
 #include <fc/string.hpp>
 #include <fc/platform_independence.hpp>
@@ -22,7 +23,7 @@ class sha256 : public add_packhash_to_hash<sha256>
     using byte_array_type = std::array<uint8_t, sha256::byte_size>;
 
     sha256();
-    explicit sha256( const std::string& hex_str );
+    explicit sha256( std::string_view hex_str );
     explicit sha256( const hash_array_type& hash_arr  );
     explicit sha256( const char *data, size_t size );
 
