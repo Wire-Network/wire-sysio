@@ -7,6 +7,7 @@
 #include <sysio/outpost_client_plugin.hpp>
 #include <sysio/outpost_client/outpost_client.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
+#include <fc/int256.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/network/ethereum/ethereum_client.hpp>
 
@@ -56,14 +57,36 @@ struct opp_contract_client : ethereum_contract_client {
 inline constexpr uint64_t EIP_7825_TX_GAS_CAP = 16'777'216;
 
 /**
- * @brief The most gas any `epochIn` may be funded with: the client's policy
- *        ceiling, bounded by EIP-7825's cap.
+ * @brief The most gas any `epochIn` may be funded with under the policy's
+ *        static limit: `max_gas_limit`, bounded by EIP-7825's cap.
  * @param policy The client's local expenditure policy.
  * @return The ceiling, in gas.
  */
 inline uint64_t delivery_gas_ceiling(const ethereum_transaction_policy& policy) {
    const fc::uint256 cap{EIP_7825_TX_GAS_CAP};
    return policy.max_gas_limit < cap ? policy.max_gas_limit.convert_to<uint64_t>() : EIP_7825_TX_GAS_CAP;
+}
+
+/**
+ * @brief The most gas any `epochIn` may be funded with at a given fee: the
+ *        static ceiling, further bounded by what `max_total_native_cost`
+ *        pays for at `max_fee_per_gas`.
+ *
+ * The policy refuses a transaction whose `gas_limit * max_fee_per_gas`
+ * exceeds `max_total_native_cost`, so a limit the static ceiling admits can
+ * still be a rejection at the fee the call is sent at. Sizing to this
+ * ceiling turns that late rejection into a smaller budget the contract
+ * spills across continuations instead.
+ *
+ * @param policy          The client's local expenditure policy.
+ * @param max_fee_per_gas The fee the call will be sent at.
+ * @return The ceiling, in gas; the static ceiling when the fee is zero.
+ */
+inline uint64_t delivery_gas_ceiling(const ethereum_transaction_policy& policy, const fc::uint256& max_fee_per_gas) {
+   const uint64_t static_ceiling = delivery_gas_ceiling(policy);
+   if (max_fee_per_gas == 0) return static_ceiling;
+   const fc::uint256 affordable = policy.max_total_native_cost / max_fee_per_gas;
+   return affordable < fc::uint256{static_ceiling} ? affordable.convert_to<uint64_t>() : static_ceiling;
 }
 
 /// Gas an `epochIn` pays before its dispatch loop, independent of size: the
@@ -82,6 +105,15 @@ inline constexpr uint64_t ATTESTATION_GAS_ALLOWANCE = 1'500'000;
 /// Gas left for the outbound emit the finishing call attempts:
 /// `OPPInbound.EmitAttemptGasFloor`, below which the contract defers it.
 inline constexpr uint64_t EMIT_GAS_ALLOWANCE = 4'000'000;
+
+/// The least static ceiling the relay accepts: what a full-cap envelope costs
+/// to deliver and tip, dispatch one attestation at its allowance, and emit.
+/// Under less, the largest envelope the platform allows cannot complete on
+/// this client, so the relay refuses to be built on it rather than discover
+/// that one epoch at a time.
+inline constexpr uint64_t DELIVERY_MINIMUM_GAS_CEILING = DELIVERY_FIXED_GAS +
+                                                        OPP_MAX_ENVELOPE_BYTES * DELIVERY_GAS_PER_BYTE +
+                                                        ATTESTATION_GAS_ALLOWANCE + EMIT_GAS_ALLOWANCE;
 
 /// What one `epochIn` has to carry, from which its gas budget is sized.
 struct delivery_gas_request {
@@ -133,9 +165,10 @@ inline uint64_t delivery_gas_budget(const delivery_gas_request& request) {
  * @brief Confirmation options for one `epochIn`: the defaults, funded to
  *        exactly `gas_budget`.
  *
- * Floor and cap are the same figure, so the transaction carries the budget
- * and the pre-flight estimate runs under it: a call the budget cannot carry
- * is refused by the node before it is signed.
+ * The cap is the limit the transaction is sent with and the gas its
+ * pre-flight estimate runs under: a call the budget cannot carry is refused
+ * by the node before it is signed, and a call that can is sent with the
+ * budget, never with a buffered estimate.
  *
  * @param gas_budget The budget from `delivery_gas_budget`.
  * @return The options the call is sent with.
@@ -147,6 +180,56 @@ inline ethereum_confirm_options delivery_confirm_options(uint64_t gas_budget) {
    return options;
 }
 
+/// `eth_getTransactionReceipt` field names the relay reads.
+namespace ethereum_receipt_field {
+inline constexpr auto block_number = "blockNumber";
+inline constexpr auto logs         = "logs";
+} // namespace ethereum_receipt_field
+
+/// What one `epochIn` left on chain, read from its receipt once it confirmed.
+struct epoch_in_receipt {
+   /// The transaction's hash, for logs.
+   std::string  tx_hash;
+   /// The block that holds the transaction. Every read that decides the
+   /// relay's next move is pinned to it, so a backend lagging behind the block
+   /// that just confirmed cannot report the state from before the call.
+   fc::uint256  block_number;
+   /// The receipt's `logs`, as the node returned them: what the call did.
+   fc::variants logs;
+};
+
+/**
+ * @brief Read an `epoch_in_receipt` out of an `eth_getTransactionReceipt` result.
+ * @param tx_hash The confirmed transaction's hash.
+ * @param receipt The receipt object as `ethereum_client::wait_for_receipt` returned it.
+ * @return The block number and logs the relay acts on.
+ * @throws fc::exception when the receipt is not an object or carries no block number.
+ */
+inline epoch_in_receipt parse_epoch_in_receipt(std::string tx_hash, const fc::variant& receipt) {
+   FC_ASSERT(receipt.is_object(), "transaction receipt for {} is not an object", tx_hash);
+   const auto& object = receipt.get_object();
+   FC_ASSERT(object.contains(ethereum_receipt_field::block_number),
+             "transaction receipt for {} carries no blockNumber", tx_hash);
+   epoch_in_receipt parsed{.tx_hash      = std::move(tx_hash),
+                           .block_number = fc::to_uint256(object[ethereum_receipt_field::block_number]),
+                           .logs         = {}};
+   if (object.contains(ethereum_receipt_field::logs) && object[ethereum_receipt_field::logs].is_array()) {
+      parsed.logs = object[ethereum_receipt_field::logs].get_array();
+   }
+   return parsed;
+}
+
+/// ABI entry names of `OPPInbound.sol` the typed wrapper binds.
+namespace opp_inbound_abi_name {
+inline constexpr auto epoch_in                     = "epochIn";
+inline constexpr auto next_epoch_index             = "nextEpochIndex";
+inline constexpr auto dispatch_spill               = "dispatchSpill";
+inline constexpr auto epoch_deliveries             = "epochDeliveries";
+inline constexpr auto pending_epoch_hash           = "pendingEpochHash";
+inline constexpr auto pending_consensus_for_digest = "pendingConsensusForDigest";
+inline constexpr auto attestation_handlers         = "attestationHandlers";
+} // namespace opp_inbound_abi_name
+
 /// Typed contract client for OPPInbound.sol. Same confirmed-default
 /// policy as `opp_contract_client` for the write path.
 struct opp_inbound_contract_client : ethereum_contract_client {
@@ -157,13 +240,15 @@ struct opp_inbound_contract_client : ethereum_contract_client {
    /// the contract resumes from its cursor. Funded to exactly `gas_budget`
    /// (see `delivery_gas_budget`), which is why this is not a plain
    /// `ethereum_contract_tx_fn`: that binds its options once at construction,
-   /// and the budget differs per call. `envelopeData` rides as a hex-encoded
-   /// string because the libfc ABI encoder takes `dt::bytes` that way (see
+   /// and the budget differs per call. Returns the confirmed receipt rather
+   /// than the hash alone, because the relay's next move is decided from the
+   /// block the call landed in. `envelopeData` rides as a hex-encoded string
+   /// because the libfc ABI encoder takes `dt::bytes` that way (see
    /// `ethereum_abi::encode_dynamic_data`).
    ///
    /// The ABI arguments are bound as non-const lvalue references, so callers
    /// must materialize named locals for both.
-   std::function<fc::variant(uint32_t& epoch_index, std::string& envelope_hex, uint64_t gas_budget)> epoch_in;
+   std::function<epoch_in_receipt(uint32_t& epoch_index, std::string& envelope_hex, uint64_t gas_budget)> epoch_in;
    /// `nextEpochIndex()` view — the epoch the outpost is currently accepting.
    ethereum_contract_call_fn<fc::variant> next_epoch_index;
    /// `dispatchSpill(uint32 epochIndex)` view — where a tipped epoch's dispatch
@@ -178,6 +263,12 @@ struct opp_inbound_contract_client : ethereum_contract_client {
    /// `pendingEpochHash()` view — the digest consensus settled on for the epoch
    /// the outpost is processing.
    ethereum_contract_call_fn<fc::variant> pending_epoch_hash;
+   /// `pendingConsensusForDigest(bytes32 digest)` view — how close the current
+   /// epoch is to tipping on `digest`: `(nextEpoch, agreeing, groupSize,
+   /// currentEpochStartedAtTs, epochDurationSec_)`. The relay reads it before a
+   /// consensus retry, so a re-delivery is sent only when the contract's own
+   /// path-2 predicate would fire. The digest rides as `0x`-hex.
+   ethereum_contract_call_fn<fc::variant, std::string> pending_consensus_for_digest;
    /// `attestationHandlers(uint16 attestationType)` view — the outpost's own
    /// inbound routing table: the `IOPPReceiver` registered for one attestation
    /// type, `address(0)` when none is and `ATTESTATION_BLACKHOLE` when governance
@@ -191,15 +282,23 @@ struct opp_inbound_contract_client : ethereum_contract_client {
                                const address_compat_type& contract_address,
                                const std::vector<fc::network::ethereum::abi::contract>& contracts)
       : ethereum_contract_client(client, contract_address, contracts)
-      , epoch_in([this](uint32_t& epoch_index, std::string& envelope_hex, uint64_t gas_budget) -> fc::variant {
-           return create_tx_and_confirm<fc::variant, uint32_t, std::string>(
-              get_abi("epochIn"), delivery_confirm_options(gas_budget))(epoch_index, envelope_hex);
+      , epoch_in([this](uint32_t& epoch_index, std::string& envelope_hex, uint64_t gas_budget) -> epoch_in_receipt {
+           const auto& abi     = get_abi(opp_inbound_abi_name::epoch_in);
+           const auto  options = delivery_confirm_options(gas_budget);
+           contract_invoke_data_items params = {epoch_index, envelope_hex};
+           auto tx = this->client->create_default_tx(this->contract_address, abi, params, options.gas_limit_floor,
+                                                     options.gas_limit_cap);
+           const auto tx_hash = this->client->execute_contract_tx_fn(tx, abi, params).as_string();
+           return parse_epoch_in_receipt(tx_hash, this->client->wait_for_receipt(tx_hash, options));
         })
-      , next_epoch_index(create_call<fc::variant>(get_abi("nextEpochIndex")))
-      , dispatch_spill(create_call<fc::variant, uint32_t>(get_abi("dispatchSpill")))
-      , epoch_deliveries(create_call<fc::variant, uint32_t, std::string>(get_abi("epochDeliveries")))
-      , pending_epoch_hash(create_call<fc::variant>(get_abi("pendingEpochHash")))
-      , attestation_handlers(create_call<fc::variant, uint16_t>(get_abi("attestationHandlers"))) {}
+      , next_epoch_index(create_call<fc::variant>(get_abi(opp_inbound_abi_name::next_epoch_index)))
+      , dispatch_spill(create_call<fc::variant, uint32_t>(get_abi(opp_inbound_abi_name::dispatch_spill)))
+      , epoch_deliveries(
+           create_call<fc::variant, uint32_t, std::string>(get_abi(opp_inbound_abi_name::epoch_deliveries)))
+      , pending_epoch_hash(create_call<fc::variant>(get_abi(opp_inbound_abi_name::pending_epoch_hash)))
+      , pending_consensus_for_digest(
+           create_call<fc::variant, std::string>(get_abi(opp_inbound_abi_name::pending_consensus_for_digest)))
+      , attestation_handlers(create_call<fc::variant, uint16_t>(get_abi(opp_inbound_abi_name::attestation_handlers))) {}
 };
 
 /// Typed contract client for wire-ethereum's `SyndicationPool.sol`, the liq

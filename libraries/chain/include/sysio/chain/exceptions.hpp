@@ -438,6 +438,8 @@ namespace sysio { namespace chain {
                                     3110007, "Missing Trace API Plugin" )
       FC_DECLARE_DERIVED_EXCEPTION( signing_transient_exception,                  plugin_exception,
                                     3110008, "Transient signing-provider failure; the operation should be retried" )
+      FC_DECLARE_DERIVED_EXCEPTION( outpost_delivery_incomplete_exception,        plugin_exception,
+                                    3110009, "Outpost delivery left the epoch open; the next tick resumes it" )
 
 
    FC_DECLARE_DERIVED_EXCEPTION( wallet_exception, chain_exception,

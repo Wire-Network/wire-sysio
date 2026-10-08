@@ -94,14 +94,22 @@ public:
     *
     * Must enforce `deadline` internally; a hung chain RPC must not block the
     * caller beyond this duration. Solana may chunk one envelope across
-    * multiple `epoch_in` transactions; the consensus-reaching transaction
+    * multiple `epoch_in` transactions; Ethereum sends the whole envelope in
+    * one `epochIn` and re-sends it while the outpost reports the epoch tipped
+    * on this relay's digest and unfinished. The consensus-reaching transaction
     * performs the outpost's outbound emit internally.
     *
     * @param epoch_index     The current WIRE epoch this envelope belongs to.
     * @param envelope_bytes  Raw protobuf `opp::Envelope` bytes.
     * @param deadline        Upper bound on the total time spent talking to the
     *                        remote chain for this call.
-    * @return Chain-native transaction id / signature suitable for logs.
+    * @return Chain-native transaction id / signature suitable for logs, or
+    *         EMPTY when the relay found nothing to send and the epoch counts
+    *         as handled (the outpost had already finalized it, or it settled
+    *         on another relay's envelope).
+    * @throws chain::outpost_delivery_incomplete_exception when the epoch is
+    *         left open for THIS relay to finish on a later tick; the job does
+    *         not mark it handled.
     * @throws fc::exception on RPC failure or deadline expiry.
     */
    virtual std::string deliver_outbound_envelope(uint32_t                 epoch_index,

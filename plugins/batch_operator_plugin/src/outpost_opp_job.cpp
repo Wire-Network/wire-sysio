@@ -5,6 +5,8 @@
 #include <fc/log/logger.hpp>
 #include <fc/network/json_rpc/json_rpc_client.hpp>
 
+#include <sysio/chain/exceptions.hpp>
+
 namespace sysio {
 
 namespace {
@@ -117,11 +119,15 @@ void outpost_opp_job::run_outbound() {
    } FC_LOG_AND_DROP("outpost_opp_job[{}]: emit_debug_envelope threw", _client->to_string());
 
    try {
-      // An EMPTY tx id is a defined outcome, not a failure: the relay skipped a
-      // delivery whose epoch the outpost has already advanced past (chunked
-      // Ethereum deliveries read that back before spending gas on late no-ops).
-      // The epoch is correctly marked handled below; the relay's own
-      // "skipping epoch=..." ilog is the truthful record of what happened.
+      // An EMPTY tx id is a defined outcome, not a failure: the relay found
+      // nothing to send — the outpost had already finalized the epoch, or
+      // (Ethereum) it tipped on another relay's digest, or this relay's
+      // delivery is recorded and waits on the rest of the group. The epoch is
+      // correctly marked handled below; the relay's own ilog is the truthful
+      // record of what happened. An epoch the relay could NOT finish with —
+      // the outpost behind, a continuation bound reached, a call at the gas
+      // ceiling that advanced nothing — arrives as
+      // `outpost_delivery_incomplete_exception` and is retried next tick.
       auto tx_id = _client->deliver_outbound_envelope(epoch, pending->raw_envelope, _outpost_deadline);
       ilog("outpost_opp_job[{}]: {} outbound envelope ({} bytes) tx={}",
            _client->to_string(),
@@ -135,6 +141,11 @@ void outpost_opp_job::run_outbound() {
       } else {
          _last_outbound_epoch = epoch;
       }
+   } catch (const chain::outpost_delivery_incomplete_exception& e) {
+      // Expected while an epoch spans ticks: not a failure, and not marked
+      // handled, so the next tick resumes it from the outpost's cursor.
+      ilog("outpost_opp_job[{}]: outbound delivery for epoch {} continues next tick: {}",
+           _client->to_string(), epoch, e.top_message());
    } catch (const fc::network::json_rpc::json_rpc_error& e) {
       wlog("outpost_opp_job[{}]: outbound delivery failed: code={} message='{}' data={} detail='{}'",
            _client->to_string(), e.code, e.top_message(),
