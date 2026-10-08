@@ -2019,6 +2019,50 @@ idl::program named_program(std::string address) {
    return prog;
 }
 
+/// Stub outpost program + the outbound `EnvelopeLog` as liqsol-core declares it: {bump, envelopes: Vec<
+/// EnvelopeRecord{epoch_index, emitted_at, checksum}>}.
+idl::program outpost_program_with_envelope_log() {
+   constexpr std::string_view envelope_log    = "EnvelopeLog";
+   constexpr std::string_view envelope_record = "EnvelopeRecord";
+   auto prog = load_idl_fixture(opp_outpost_idl_fixture);
+   std::erase_if(prog.accounts, [&](const idl::account& a) { return a.name == envelope_log; });
+   std::erase_if(prog.types,
+                 [&](const idl::type_def& t) { return t.name == envelope_log || t.name == envelope_record; });
+
+   idl::type_def record;
+   record.name          = std::string{envelope_record};
+   record.struct_fields = std::vector<idl::field>{{"epoch_index", prim(idl::primitive_type::u32)},
+                                                  {"emitted_at", prim(idl::primitive_type::u64)},
+                                                  {"checksum", u8_32_array()}};
+   prog.types.push_back(std::move(record));
+   idl::type_def log;
+   log.name          = std::string{envelope_log};
+   log.struct_fields = std::vector<idl::field>{
+      {"bump", prim(idl::primitive_type::u8)},
+      {"envelopes", idl::idl_type::make_vec(idl::idl_type::make_defined(std::string{envelope_record}))}};
+   prog.types.push_back(std::move(log));
+   idl::account account;
+   account.name = std::string{envelope_log};
+   account.compute_discriminator();
+   prog.accounts.push_back(std::move(account));
+   return prog;
+}
+
+/// Serialize an `EnvelopeLog` account holding one record per (epoch, checksum).
+std::vector<uint8_t> envelope_log_account(const std::vector<std::pair<uint32_t, std::array<uint8_t, 32>>>& records) {
+   borsh::encoder enc;
+   const auto disc = idl::compute_account_discriminator("EnvelopeLog");
+   enc.write_fixed_bytes(disc.data(), disc.size());
+   enc.write_u8(0xFF); // bump
+   enc.write_u32(static_cast<uint32_t>(records.size()));
+   for (const auto& [epoch, checksum] : records) {
+      enc.write_u32(epoch);
+      enc.write_u64(1'700'000'000); // emitted_at
+      enc.write_fixed_bytes(checksum.data(), checksum.size());
+   }
+   return enc.data();
+}
+
 } // anonymous namespace
 
 BOOST_AUTO_TEST_CASE(latest_envelope_shape_accepts_known_layouts) try {
@@ -2513,4 +2557,48 @@ BOOST_AUTO_TEST_CASE(select_program_idls_prefers_declared_address_match) try {
       select_program_idls_matching({named_program(""), named_program("")}, deployed),
       fc::assert_exception);
 } FC_LOG_AND_RETHROW();
+BOOST_AUTO_TEST_CASE(envelope_log_shape_is_checked_for_the_underwriter) try {
+   using sysio::outpost_solana_client_detail::assert_envelope_log_shape;
+   auto prog = outpost_program_with_envelope_log();
+   BOOST_CHECK_NO_THROW(assert_envelope_log_shape(prog));
+
+   // A checksum that is not [u8; 32] cannot carry a keccak digest.
+   auto drifted = prog;
+   for (auto& type : drifted.types) {
+      if (type.name != "EnvelopeRecord") continue;
+      for (auto& field : *type.struct_fields) {
+         if (field.name == "checksum") field.type = idl::idl_type::make_array(prim(idl::primitive_type::u8), 20);
+      }
+   }
+   BOOST_CHECK_THROW(assert_envelope_log_shape(drifted), fc::exception);
+
+   // No EnvelopeLog at all.
+   auto missing = prog;
+   std::erase_if(missing.accounts, [](const idl::account& a) { return a.name == "EnvelopeLog"; });
+   std::erase_if(missing.types, [](const idl::type_def& t) { return t.name == "EnvelopeLog"; });
+   BOOST_CHECK_THROW(assert_envelope_log_shape(missing), fc::exception);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(decode_envelope_log_digest_finds_the_epochs_record) try {
+   using sysio::outpost_solana_client_detail::decode_envelope_log_digest;
+   const auto prog = outpost_program_with_envelope_log();
+   sysio::opp_solana_outpost_client program_client(solana_client_ptr{}, measurement_pubkey(42), {prog});
+
+   const auto c7      = keccak_checksum(envelope_payload_bytes(7));
+   const auto c8      = keccak_checksum(envelope_payload_bytes(8));
+   const auto account = envelope_log_account({{7, c7}, {8, c8}});
+   const auto d8      = decode_envelope_log_digest(program_client, account, 8);
+   BOOST_REQUIRE(d8.has_value());
+   BOOST_CHECK(std::memcmp(d8->data(), c8.data(), c8.size()) == 0);
+
+   // No record for the epoch: not emitted yet, or past the program's retention.
+   BOOST_CHECK(!decode_envelope_log_digest(program_client, account, 9).has_value());
+   BOOST_CHECK(!decode_envelope_log_digest(program_client, envelope_log_account({}), 7).has_value());
+
+   // Another account's bytes are a failed read, not an answer.
+   BOOST_CHECK_THROW(decode_envelope_log_digest(program_client,
+                                                standalone_latest_account(7, envelope_payload_bytes(7), c7), 7),
+                     fc::exception);
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_SUITE_END()

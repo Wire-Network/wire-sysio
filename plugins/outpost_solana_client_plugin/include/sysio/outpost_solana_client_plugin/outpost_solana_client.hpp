@@ -166,6 +166,14 @@ std::vector<char> decode_latest_envelope_account(opp_solana_outpost_client&  pro
                                                  uint32_t                    epoch_index,
                                                  const std::string&          log_label);
 
+/// The checksum of the outbound `EnvelopeLog` record for `epoch_index` in the fetched account bytes, decoded
+/// through the loaded IDL: the keccak256 the program recorded when it emitted that epoch's envelope. Nullopt when
+/// the log holds no record for the epoch. Throws when the bytes do not decode as an `EnvelopeLog`. Exposed for the
+/// plugin's unit tests, which drive it against synthesized accounts.
+std::optional<fc::sha256> decode_envelope_log_digest(opp_solana_outpost_client&  program_client,
+                                                     const std::vector<uint8_t>& account_data,
+                                                     uint32_t                    epoch_index);
+
 /// Assert that the loaded IDL's `EpochDeliveries` declaration carries the
 /// fields the dispatch cursor read depends on: `consensus_reached` (bool) and
 /// `dispatched_count` (u32), in either IDL field home (inline on the account
@@ -184,6 +192,14 @@ std::vector<char> decode_latest_envelope_account(opp_solana_outpost_client&  pro
 /// @throws fc::exception if the account, either field, or either field's type
 ///         is absent or disagrees with what the cursor read decodes.
 void assert_epoch_deliveries_shape(const fc::network::solana::idl::program& program);
+
+/// Assert the loaded IDL declares the outbound `EnvelopeLog` the way `decode_envelope_log_digest` reads it: an
+/// `envelopes` vector of records carrying `epoch_index` (u32) and `checksum` ([u8; 32]). Called at construction for
+/// the underwriter role, so a drifted IDL fails at boot instead of on every pass.
+///
+/// @param program  the program's loaded Anchor IDL.
+/// @throws fc::exception if the account, the vector, the record type or either field is absent or misdeclared.
+void assert_envelope_log_shape(const fc::network::solana::idl::program& program);
 
 /// Assert the loaded IDL declares `DistributionState` with the one field a
 /// DESYNDICATE_LIQ manifest resolves from it: `liqsol_mint` (pubkey). Only the
@@ -506,6 +522,11 @@ public:
 
    std::vector<char> read_inbound_envelope(uint32_t         epoch_index,
                                            fc::microseconds deadline) override;
+
+   /// The outbound `EnvelopeLog` PDA at `finalized`: the checksum the program recorded when it emitted that
+   /// epoch's envelope.
+   std::optional<fc::sha256> read_emitted_envelope_digest(uint32_t         epoch_index,
+                                                          fc::microseconds deadline) override;
 
    // Expose for inspection / tests
    const solana_client_entry_ptr&                entry()                 const { return _entry; }

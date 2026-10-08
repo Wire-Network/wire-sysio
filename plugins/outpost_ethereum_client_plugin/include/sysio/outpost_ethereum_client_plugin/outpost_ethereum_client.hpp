@@ -195,6 +195,11 @@ public:
    std::vector<char> read_inbound_envelope(uint32_t         epoch_index,
                                            fc::microseconds deadline) override;
 
+   /// `OPP.outboundEnvelopes(epoch)` at `finalized`: the checksum the outpost recorded when it emitted that epoch's
+   /// envelope. Throws when the loaded OPP ABI does not declare the view.
+   std::optional<fc::sha256> read_emitted_envelope_digest(uint32_t         epoch_index,
+                                                          fc::microseconds deadline) override;
+
    /// The Ethereum crank: `SyndicationPool.realizeYield()` on the pool the
    /// outpost registers as its `DESYNDICATE_LIQ` handler. Idle, at debug level,
    /// while the ABI set carries no `realizeYield` (a deployment that predates
