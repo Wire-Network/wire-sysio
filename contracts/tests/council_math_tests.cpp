@@ -1,6 +1,6 @@
 /**
  * @file council_math_tests.cpp
- * @brief Final YES qualification, fixed electorate thresholds, and deterministic draw helpers.
+ * @brief Final YES qualification, submitted-ballot thresholds, and deterministic draw helpers.
  */
 #include <boost/test/unit_test.hpp>
 
@@ -13,8 +13,13 @@ using namespace sysio::councl_math;
 BOOST_AUTO_TEST_SUITE(council_math_tests)
 
 BOOST_AUTO_TEST_CASE(thresholds) {
+   BOOST_CHECK_EQUAL(win_threshold(1), 1u);
+   BOOST_CHECK_EQUAL(win_threshold(10), 7u);
    BOOST_CHECK_EQUAL(win_threshold(20), 14u);
+   BOOST_CHECK_EQUAL(win_threshold(21), 15u);
+   BOOST_CHECK_EQUAL(win_threshold(30), 21u);
    BOOST_CHECK_EQUAL(win_threshold(84), 57u);
+   BOOST_CHECK_EQUAL(win_threshold(100), 67u);
    BOOST_CHECK_EQUAL(win_threshold(1000), 667u);
    for (uint64_t n = 1; n <= 2000; ++n) {
       BOOST_CHECK_EQUAL(win_threshold(n), (2 * n) / 3 + 1);
@@ -36,13 +41,15 @@ BOOST_AUTO_TEST_CASE(priority_and_already_elected_candidates) {
    BOOST_CHECK(resolve_final({20, 20, 20}, {true, true, true}, 20).result == round_result::FAIL);
 }
 
-BOOST_AUTO_TEST_CASE(empty_small_and_low_turnout_tiers) {
+BOOST_AUTO_TEST_CASE(empty_small_and_submitted_ballot_tiers) {
    BOOST_CHECK(resolve_final({1, 1, 1}, {false, false, false}, 0).result == round_result::FAIL);
    BOOST_CHECK(resolve_final({0, 0, 0}, {false, false, false}, 1).result == round_result::FAIL);
    BOOST_CHECK_EQUAL(resolve_final({0, 1, 0}, {false, false, false}, 1).winner_index, 1u);
    BOOST_CHECK(resolve_final({1, 1, 1}, {false, false, false}, 2).result == round_result::FAIL);
    BOOST_CHECK(resolve_final({2, 2, 2}, {false, false, false}, 3).result == round_result::FAIL);
    BOOST_CHECK(resolve_final({13, 0, 0}, {false, false, false}, 20).result == round_result::FAIL);
+   BOOST_CHECK_EQUAL(resolve_final({13, 0, 0}, {false, false, false}, 13).winner_index, 0u);
+   BOOST_CHECK_EQUAL(resolve_final({14, 15, 0}, {false, false, false}, 21).winner_index, 1u);
 }
 
 BOOST_AUTO_TEST_CASE(final_resolution_matches_first_qualified_unelected_candidate) {

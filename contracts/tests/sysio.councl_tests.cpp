@@ -5,12 +5,16 @@
 #include <fc/io/json.hpp>
 #include <fc/variant_object.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/testing/tester.hpp>
 
 #include <boost/test/unit_test.hpp>
 
+#include <algorithm>
 #include <array>
+#include <cstdlib>
+#include <fstream>
 #include <map>
 #include <set>
 #include <string>
@@ -36,7 +40,6 @@ constexpr auto IP_REG = "REG";
 constexpr auto IP_LOADING = "LOADING";
 constexpr auto IP_READY = "READY";
 constexpr auto IP_CLEANING = "CLEANING";
-constexpr auto TIER_GOVERNANCE = "GOVERNANCE";
 constexpr auto TIER_T1 = "T1";
 constexpr auto TIER_T2 = "T2";
 constexpr auto TIER_T3 = "T3";
@@ -82,6 +85,21 @@ public:
    std::vector<name> candidates_; // >= 23
 
    abi_serializer councl_abi, roa_abi, system_abi;
+
+   /// Opt-in measured runs use real CPU billing and retain aggregate action costs for a JSON report.
+   struct resource_sample {
+      uint64_t calls = 0;
+      uint64_t elapsed_total_us = 0;
+      uint64_t elapsed_max_us = 0;
+      uint64_t billed_total_us = 0;
+      uint64_t billed_max_us = 0;
+      int64_t ram_delta = 0;
+      int64_t ram_peak_growth = 0;
+   };
+   bool measure_resources = false;
+   std::map<std::string, resource_sample> resource_samples;
+   int64_t measured_ram_balance = 0;
+   int64_t measured_ram_peak = 0;
 
    explicit sysio_councl_tester(bool configure_emissions = true) {
       produce_blocks(2);
@@ -186,8 +204,62 @@ public:
    // ── generic action push (lands each action in its own block for distinct TaPoS) ─────────────
    action_result push(name contract, abi_serializer& ser, name signer, name action_name,
                       const fc::variant_object& data) {
+      if (measure_resources && contract == COUNCL_ACCOUNT) {
+         try {
+            std::string label = action_name.to_string();
+            if (action_name == "settle"_n)
+               label += "/" + phase();
+            else if (action_name == "vote"_n)
+               label += std::find(t1_owners.begin(), t1_owners.end(), signer) != t1_owners.end()   ? "/T1"
+                        : std::find(t2_owners.begin(), t2_owners.end(), signer) != t2_owners.end() ? "/T2"
+                                                                                                   : "/T3";
+            auto trx = sysio_system::test_support::create_contract_action_transaction(*this, contract, ser, signer,
+                                                                                      action_name, data);
+            const auto budget = control->get_global_properties().configuration.max_transaction_cpu_usage;
+            // Passing zero disables the tester's fixed explicit billing. The chain enforces its CPU limit,
+            // while this separate wall deadline also bounds signature recovery and host processing.
+            const auto trace = push_transaction(trx, fc::time_point::now() + fc::microseconds(budget), 0);
+            auto& sample = resource_samples[label];
+            ++sample.calls;
+            sample.elapsed_total_us += trace->elapsed.count();
+            sample.elapsed_max_us = std::max(sample.elapsed_max_us, uint64_t(trace->elapsed.count()));
+            sample.billed_total_us += trace->total_cpu_usage_us.value;
+            sample.billed_max_us = std::max(sample.billed_max_us, uint64_t(trace->total_cpu_usage_us.value));
+            int64_t ram_delta = 0;
+            for (const auto& action_trace : trace->action_traces)
+               for (const auto& delta : action_trace.account_ram_deltas)
+                  ram_delta += delta.delta;
+            sample.ram_delta += ram_delta;
+            sample.ram_peak_growth = std::max(sample.ram_peak_growth, ram_delta);
+            measured_ram_balance += ram_delta;
+            measured_ram_peak = std::max(measured_ram_peak, measured_ram_balance);
+            produce_block();
+            return success();
+         } catch (const fc::exception& ex) {
+            return error(ex.top_message());
+         }
+      }
       return sysio_system::test_support::push_contract_action_and_produce_block(*this, contract, ser, signer,
                                                                                 action_name, data);
+   }
+
+   /// Persist measured transaction costs without treating this machine's timings as production budgets.
+   void write_resource_report(const char* path) {
+      fc::variants samples;
+      for (const auto& [label, sample] : resource_samples)
+         samples.emplace_back(mvo()("action", label)("calls", sample.calls)(
+            "elapsed_total_us", sample.elapsed_total_us)("elapsed_max_us", sample.elapsed_max_us)(
+            "billed_total_us", sample.billed_total_us)("billed_max_us", sample.billed_max_us)(
+            "ram_delta_bytes", sample.ram_delta)("ram_max_growth_bytes", sample.ram_peak_growth));
+      std::ofstream output(path);
+      BOOST_REQUIRE_MESSAGE(output.good(), "Cannot create council resource report");
+      output << json_text(
+         mvo()("candidate_count", 1000)("tier_sizes", fc::variants{21, 84, 1000})("explicit_cpu_billing", false)(
+            "max_transaction_cpu_usage_us", control->get_global_properties().configuration.max_transaction_cpu_usage)(
+            "council_action_ram_peak_bytes", measured_ram_peak)("council_action_ram_remaining_bytes",
+                                                                measured_ram_balance)("samples", samples));
+      output.close();
+      BOOST_REQUIRE_MESSAGE(output.good(), "Cannot write council resource report");
    }
 
    // ── councl action wrappers ────────────────────────────────────────────────
@@ -227,8 +299,7 @@ public:
       for (uint8_t seat = 0; seat < t1_owners.size(); ++seat) {
          const auto flight = get_flight(seat);
          if (t1_owners[seat] == voter || !council_member(seat).to_string().empty() || flight.is_null() ||
-             flight["round_id"].as<uint64_t>() != round_id() ||
-             (get_state()["backstop_mask"].as<uint32_t>() & (uint32_t{1} << seat)))
+             flight["round_id"].as<uint64_t>() != round_id())
             continue;
          const auto selected = choices.find(seat);
          const std::array<bool, 3> values = selected == choices.end() ? std::array<bool, 3>{} : selected->second;
@@ -255,18 +326,6 @@ public:
    /// Contribute entropy without changing frozen flights or an existing generation seed.
    action_result stir(name caller) {
       return push(COUNCL_ACCOUNT, councl_abi, caller, "stir"_n, mvo()("caller", caller.to_string()));
-   }
-   /// Reserve a specific elapsed seat for governance.
-   action_result forceback(uint8_t seat) {
-      auto data = identity();
-      data("seat", seat);
-      return push(COUNCL_ACCOUNT, councl_abi, COUNCL_ACCOUNT, "forceback"_n, data);
-   }
-   /// Assign a specific reserved seat.
-   action_result forceassign(uint8_t seat, name member) {
-      auto data = identity();
-      data("seat", seat)("member", member.to_string());
-      return push(COUNCL_ACCOUNT, councl_abi, COUNCL_ACCOUNT, "forceassign"_n, data);
    }
    /// Read a public flight row.
    fc::variant get_flight(uint8_t seat, uint64_t generation = GEN0) {
@@ -785,6 +844,10 @@ BOOST_FIXTURE_TEST_CASE(ballot_guards_and_public_tallies, sysio_councl_tester) {
    BOOST_REQUIRE_EQUAL(ballot(voter).size(), 20u);
    BOOST_REQUIRE_EQUAL(ballot(t2_owners[0]).size(), 21u);
    BOOST_REQUIRE_EQUAL(ballot(t3_owners[0]).size(), 21u);
+   const auto unchanged_state = json_text(get_state());
+   std::vector<std::string> unchanged_flights;
+   for (uint8_t seat = 0; seat < 21; ++seat)
+      unchanged_flights.push_back(json_text(get_flight(seat)));
    auto decisions = ballot(voter);
    decisions.pop_back();
    BOOST_CHECK(push(COUNCL_ACCOUNT, councl_abi, voter, "vote"_n, vote_data(voter, decisions)) != success());
@@ -801,12 +864,27 @@ BOOST_FIXTURE_TEST_CASE(ballot_guards_and_public_tallies, sysio_councl_tester) {
    decisions = ballot(voter);
    decisions.insert(decisions.begin(), mvo()("seat", 0)("v1", true)("v2", true)("v3", true));
    BOOST_CHECK(push(COUNCL_ACCOUNT, councl_abi, voter, "vote"_n, vote_data(voter, decisions)) != success());
+   decisions = ballot(voter);
+   decisions.emplace_back(mvo()("seat", 21)("v1", true)("v2", true)("v3", true));
+   BOOST_CHECK(push(COUNCL_ACCOUNT, councl_abi, voter, "vote"_n, vote_data(voter, decisions)) != success());
+   decisions = ballot(voter);
+   std::swap(decisions[0], decisions[1]);
+   BOOST_CHECK(push(COUNCL_ACCOUNT, councl_abi, voter, "vote"_n, vote_data(voter, decisions)) != success());
    BOOST_CHECK(push(COUNCL_ACCOUNT, councl_abi, t1_owners[1], "vote"_n, vote_data(voter, ballot(voter))) != success());
    BOOST_CHECK(vote(candidates_[0]) != success());
+   BOOST_CHECK_EQUAL(json_text(get_state()), unchanged_state);
+   BOOST_CHECK(get_ballot(voter).is_null());
+   for (uint8_t seat = 0; seat < 21; ++seat)
+      BOOST_CHECK_EQUAL(json_text(get_flight(seat)), unchanged_flights[seat]);
    BOOST_REQUIRE_EQUAL(success(), vote(voter, {
                                                  {1, {true, true, true}}
    }));
+   const auto after_valid = json_text(get_state());
+   const auto stored_ballot = json_text(get_ballot(voter));
    BOOST_CHECK(vote(voter) != success());
+   BOOST_CHECK_EQUAL(json_text(get_state()), after_valid);
+   BOOST_CHECK_EQUAL(json_text(get_ballot(voter)), stored_ballot);
+   BOOST_CHECK_EQUAL(get_state()["t1_ballots"].as_uint64(), 1u);
    const auto tally = get_flight(1)["tallies"].get_array()[0];
    BOOST_CHECK_EQUAL(tally["yes1"].as_uint64(), 1u);
    BOOST_CHECK_EQUAL(tally["yes2"].as_uint64(), 1u);
@@ -820,13 +898,15 @@ BOOST_FIXTURE_TEST_CASE(ballot_guards_and_public_tallies, sysio_councl_tester) {
    BOOST_REQUIRE_EQUAL(success(), vote(t3_owners[0], {
                                                         {0, {true, false, false}}
    }));
+   BOOST_CHECK_EQUAL(get_state()["t2_ballots"].as_uint64(), 1u);
+   BOOST_CHECK_EQUAL(get_state()["t3_ballots"].as_uint64(), 1u);
    BOOST_CHECK_EQUAL(seats_filled(), 0u); // no early seating even in one-member tiers
    close_votes();
    BOOST_CHECK_EQUAL(council_seat(0)["filled_tier"].as_string(), TIER_T2);
    BOOST_CHECK_EQUAL(council_member(0).to_string(), get_flight(0)["candidates"].get_array()[1].as_string());
 }
 
-/// Final qualification accepts B with 14 YES even when A has only five explicit NO votes.
+/// Fourteen submitted ballots need ten YES; B qualifies while A's nine YES do not.
 BOOST_FIXTURE_TEST_CASE(final_yes_resolution_and_continuation, sysio_councl_tester) {
    init_ready();
    BOOST_REQUIRE_EQUAL(success(), repcandidate(t1_owners[0], candidates_[0], candidates_[1], candidates_[2]));
@@ -846,6 +926,9 @@ BOOST_FIXTURE_TEST_CASE(final_yes_resolution_and_continuation, sysio_councl_test
    BOOST_REQUIRE_EQUAL(success(), settle());
    BOOST_REQUIRE_EQUAL(round_id(), old_round + 1);
    BOOST_REQUIRE_EQUAL(phase(), PH_NOMINATING);
+   BOOST_CHECK_EQUAL(get_state()["t1_ballots"].as_uint64(), 0u);
+   BOOST_CHECK_EQUAL(get_state()["t2_ballots"].as_uint64(), 0u);
+   BOOST_CHECK_EQUAL(get_state()["t3_ballots"].as_uint64(), 0u);
    BOOST_CHECK_EQUAL(council_member(0).to_string(), candidates_[1].to_string());
    BOOST_CHECK(repcandidate(t1_owners[0], candidates_[3], candidates_[4], candidates_[5]) != success());
    BOOST_CHECK(repcandidate(t1_owners[1], candidates_[1], candidates_[4], candidates_[5]) != success());
@@ -856,6 +939,7 @@ BOOST_FIXTURE_TEST_CASE(final_yes_resolution_and_continuation, sysio_councl_test
    BOOST_REQUIRE_EQUAL(ballot(t1_owners[0]).size(), 20u); // filled owner votes on every vacancy
    BOOST_REQUIRE_EQUAL(ballot(t1_owners[1]).size(), 19u);
    BOOST_CHECK(push(COUNCL_ACCOUNT, councl_abi, t1_owners[20], "vote"_n, stale) != success());
+   BOOST_CHECK_EQUAL(get_state()["t1_ballots"].as_uint64(), 0u);
    for (const auto owner : t1_owners) {
       if (owner == t1_owners[1])
          continue;
@@ -866,8 +950,43 @@ BOOST_FIXTURE_TEST_CASE(final_yes_resolution_and_continuation, sysio_councl_test
          break;
    }
    close_votes();
-   BOOST_CHECK(council_member(1).to_string().empty()); // denominator stays 20, not vacancies or turnout
+   BOOST_CHECK_EQUAL(get_state()["t1_ballots"].as_uint64(), 13u);
+   BOOST_CHECK_EQUAL(council_member(1).to_string(), candidates_[0].to_string());
+   BOOST_CHECK_EQUAL(seats_filled(), 2u);
+}
+
+/// All T1 flights share the same denominator, including the owner whose own flight they omit.
+BOOST_FIXTURE_TEST_CASE(roundwide_t1_count_includes_own_flight_omissions, sysio_councl_tester) {
+   init_ready();
+   BOOST_REQUIRE_EQUAL(success(), repcandidate(t1_owners[0], candidates_[0], candidates_[1], candidates_[2]));
+   BOOST_REQUIRE_EQUAL(success(), repcandidate(t1_owners[1], candidates_[3], candidates_[4], candidates_[5]));
+   open_votes();
+   for (size_t i = 0; i < t1_owners.size(); ++i)
+      BOOST_REQUIRE_EQUAL(success(), vote(t1_owners[i], {
+                                                           {0, {i >= 1 && i <= 14, false, false}},
+                                                           {1, {false, i != 1 && i <= 15, false}}
+      }));
+   BOOST_CHECK_EQUAL(get_state()["t1_ballots"].as_uint64(), 21u);
+   for (uint8_t seat = 0; seat < 21; ++seat)
+      BOOST_CHECK_EQUAL(get_flight(seat)["tallies"].get_array()[0]["votes_cast"].as_uint64(), 20u);
+   close_votes();
+   BOOST_CHECK(council_member(0).to_string().empty()); // B=21 requires 15, even though only 20 can vote on a flight.
+   BOOST_CHECK_EQUAL(council_member(1).to_string(), candidates_[4].to_string());
    BOOST_CHECK_EQUAL(seats_filled(), 1u);
+}
+
+/// Ten submissions require seven YES; the absent seat owner is not a frozen-electorate penalty.
+BOOST_FIXTURE_TEST_CASE(ten_t1_ballots_need_seven_yes, sysio_councl_tester) {
+   init_ready();
+   BOOST_REQUIRE_EQUAL(success(), repcandidate(t1_owners[0], candidates_[0], candidates_[1], candidates_[2]));
+   open_votes();
+   for (size_t i = 1; i <= 10; ++i)
+      BOOST_REQUIRE_EQUAL(success(), vote(t1_owners[i], {
+                                                           {0, {i <= 6, i <= 7, false}}
+      }));
+   BOOST_CHECK_EQUAL(get_state()["t1_ballots"].as_uint64(), 10u);
+   close_votes();
+   BOOST_CHECK_EQUAL(council_member(0).to_string(), candidates_[1].to_string());
 }
 
 /// Each seat fully evaluates T1/T2/T3 before the next seat; elected candidates never transfer votes.
@@ -914,12 +1033,22 @@ BOOST_FIXTURE_TEST_CASE(no_implicit_votes_and_full_rejection, sysio_councl_teste
    close_votes();
    BOOST_CHECK_EQUAL(seats_filled(), 0u);
    BOOST_REQUIRE_EQUAL(success(), settle());
+   BOOST_CHECK_EQUAL(get_state()["t1_ballots"].as_uint64(), 0u);
+   BOOST_CHECK_EQUAL(get_state()["t2_ballots"].as_uint64(), 0u);
+   BOOST_CHECK_EQUAL(get_state()["t3_ballots"].as_uint64(), 0u);
    open_votes();
    close_votes();
    BOOST_CHECK_EQUAL(seats_filled(), 0u);
+   BOOST_REQUIRE_EQUAL(success(), settle());
+   BOOST_CHECK_EQUAL(round_id(), 3u);
+   open_votes();
+   BOOST_REQUIRE_EQUAL(ballot(t2_owners[0]).size(), 21u);
+   close_votes(1);
+   BOOST_CHECK_EQUAL(seats_filled(), 0u);
+   BOOST_CHECK_EQUAL(phase(), PH_CONTINUING);
 }
 
-/// Frozen owner identities and denominators survive later ROA registrations and continuation.
+/// Frozen membership survives owner churn; submitted ballots alone determine qualification.
 BOOST_FIXTURE_TEST_CASE(snapshot_stability_across_owner_churn, sysio_councl_tester) {
    init_ready(23, 2, 1);
    const name newcomer{"newowner"};
@@ -927,9 +1056,7 @@ BOOST_FIXTURE_TEST_CASE(snapshot_stability_across_owner_churn, sysio_councl_test
    forcereg_owner(newcomer, 2);
    open_votes();
    BOOST_CHECK(vote(newcomer) != success());
-   BOOST_REQUIRE_EQUAL(success(), vote(t2_owners[0], {
-                                                        {0, {true, true, true}}
-   }));
+   BOOST_REQUIRE_EQUAL(success(), vote(t2_owners[0]));
    close_votes();
    BOOST_CHECK(council_member(0).to_string().empty());
    BOOST_REQUIRE_EQUAL(success(), settle());
@@ -939,46 +1066,33 @@ BOOST_FIXTURE_TEST_CASE(snapshot_stability_across_owner_churn, sysio_councl_test
    BOOST_REQUIRE_EQUAL(success(), vote(t2_owners[0], {
                                                         {0, {true, false, false}}
    }));
-   BOOST_REQUIRE_EQUAL(success(), vote(t2_owners[1], {
-                                                        {0, {true, false, false}}
-   }));
+   BOOST_CHECK_EQUAL(get_state()["t2_ballots"].as_uint64(), 1u);
    close_votes();
    BOOST_CHECK_EQUAL(council_seat(0)["filled_tier"].as_string(), TIER_T2);
 }
 
-/// Recovery preserves unique members under public settlement and releases withdrawn reservations.
-BOOST_FIXTURE_TEST_CASE(governance_recovery_and_active_abort, sysio_councl_tester) {
-   init_ready();
+/// Explicit abort deletes genuinely elected partial results and all round ballot state.
+BOOST_FIXTURE_TEST_CASE(partial_election_active_abort, sysio_councl_tester) {
+   init_ready(23, 1, 0);
    for (uint8_t seat = 0; seat < 21; ++seat)
-      BOOST_REQUIRE_EQUAL(success(), repcandidate(t1_owners[seat], candidates_[seat], candidates_[(seat + 1) % 23],
-                                                  candidates_[(seat + 2) % 23]));
-   BOOST_CHECK(forceback(0) != success());
-   auto unauthorized = identity();
-   unauthorized("seat", 0);
-   BOOST_CHECK(push(COUNCL_ACCOUNT, councl_abi, candidates_[0], "forceback"_n, unauthorized) != success());
-   produce_block(fc::seconds(TIME_SLOT + 1));
-   for (uint8_t seat = 0; seat < 20; ++seat) {
-      BOOST_REQUIRE_EQUAL(success(), forceback(seat));
-      BOOST_REQUIRE_EQUAL(success(), forceassign(seat, candidates_[seat]));
-   }
-   BOOST_CHECK(forceassign(0, candidates_[20]) != success());
-   BOOST_CHECK(forceback(0) != success());
-   BOOST_REQUIRE_EQUAL(success(), forceback(20));
-   BOOST_CHECK(forceassign(20, candidates_[0]) != success());
-   unauthorized = identity();
-   unauthorized("seat", 20)("member", candidates_[20].to_string());
-   BOOST_CHECK(push(COUNCL_ACCOUNT, councl_abi, candidates_[0], "forceassign"_n, unauthorized) != success());
-   BOOST_REQUIRE_EQUAL(success(), settle());
-   BOOST_REQUIRE_EQUAL(success(), settle());
-   BOOST_CHECK(forceassign(20, candidates_[20]) != success()); // open shared window
+      BOOST_REQUIRE_EQUAL(
+         success(), repcandidate(t1_owners[seat], candidates_[seat], candidates_[seat + 1], candidates_[seat + 2]));
+   open_votes();
+   std::map<uint8_t, std::array<bool, 3>> choices;
+   for (uint8_t seat = 0; seat < 20; ++seat)
+      choices[seat] = {true, false, false};
+   BOOST_REQUIRE_EQUAL(success(), vote(t2_owners[0], choices));
    close_votes();
-   BOOST_CHECK_EQUAL(seats_filled(), 20u);
+   BOOST_REQUIRE_EQUAL(seats_filled(), 20u);
+   BOOST_CHECK(push(COUNCL_ACCOUNT, councl_abi, candidates_[0], "reset"_n, mvo()) != success());
    BOOST_REQUIRE_EQUAL(success(), reset());
    finish_cleanup(5);
    BOOST_CHECK(!state_exists());
-   BOOST_CHECK(council_member(0).to_string().empty());
+   for (uint8_t seat = 0; seat < 21; ++seat)
+      BOOST_CHECK(council_member(seat).to_string().empty());
    BOOST_CHECK(!candidate_exists(candidates_[0]));
    BOOST_CHECK(get_flight(0).is_null());
+   BOOST_CHECK(get_ballot(t2_owners[0]).is_null());
    BOOST_CHECK_EQUAL(election_gen(), 1u);
 }
 
@@ -1072,7 +1186,10 @@ BOOST_FIXTURE_TEST_CASE(inclusive_nomination_and_voting_deadlines, sysio_councl_
                                                         {0, {true, true, true}}
    }));
    BOOST_CHECK_EQUAL(phase(), PH_VOTING);
+   const auto before_late_ballot = json_text(get_state());
    BOOST_CHECK(vote(t1_owners[2]) != success());
+   BOOST_CHECK_EQUAL(json_text(get_state()), before_late_ballot);
+   BOOST_CHECK(get_ballot(t1_owners[2]).is_null());
    BOOST_REQUIRE_EQUAL(success(), settle());
    BOOST_CHECK_EQUAL(phase(), PH_TABULATING);
 
@@ -1090,19 +1207,21 @@ BOOST_FIXTURE_TEST_CASE(inclusive_nomination_and_voting_deadlines, sysio_councl_
    BOOST_CHECK_EQUAL(exact.phase(), PH_TABULATING);
 }
 
-/// Recovery of twenty seats must leave all three remaining candidates available for the last flight.
-BOOST_FIXTURE_TEST_CASE(recovery_releases_claims_before_automatic_generation, sysio_councl_tester) {
-   init_ready();
-   for (uint8_t seat = 0; seat < 3; ++seat)
-      BOOST_REQUIRE_EQUAL(success(), repcandidate(t1_owners[seat], candidates_[20 + seat], candidates_[seat],
-                                                  candidates_[(seat + 1) % 3]));
-   produce_block(fc::seconds(TIME_SLOT + 1));
+/// Twenty elected members leave exactly three candidates; even an empty own-seat ballot counts.
+BOOST_FIXTURE_TEST_CASE(last_vacancy_empty_owner_ballot_and_three_remaining_candidates, sysio_councl_tester) {
+   init_ready(23, 1, 0);
+   for (uint8_t seat = 0; seat < 21; ++seat)
+      BOOST_REQUIRE_EQUAL(
+         success(), repcandidate(t1_owners[seat], candidates_[seat], candidates_[seat + 1], candidates_[seat + 2]));
+   open_votes();
+   std::map<uint8_t, std::array<bool, 3>> choices;
+   for (uint8_t seat = 0; seat < 20; ++seat)
+      choices[seat] = {true, false, false};
+   BOOST_REQUIRE_EQUAL(success(), vote(t2_owners[0], choices));
+   close_votes();
+   BOOST_REQUIRE_EQUAL(seats_filled(), 20u);
    BOOST_REQUIRE_EQUAL(success(), settle());
-   for (uint8_t seat = 0; seat < 20; ++seat) {
-      BOOST_REQUIRE_EQUAL(success(), forceback(seat));
-      BOOST_REQUIRE_EQUAL(success(), forceassign(seat, candidates_[seat]));
-   }
-   BOOST_REQUIRE_EQUAL(success(), settle());
+   open_votes();
    const auto names = get_flight(20)["candidates"].get_array();
    BOOST_REQUIRE_EQUAL(names.size(), 3u);
    std::set<std::string> remaining;
@@ -1110,20 +1229,39 @@ BOOST_FIXTURE_TEST_CASE(recovery_releases_claims_before_automatic_generation, sy
       remaining.insert(candidate.as_string());
    BOOST_CHECK(remaining == std::set<std::string>({candidates_[20].to_string(), candidates_[21].to_string(),
                                                    candidates_[22].to_string()}));
-   for (const auto voter : t1_owners) {
-      if (voter == t1_owners[20])
-         continue;
-      BOOST_REQUIRE_EQUAL(success(), vote(voter, {
-                                                    {20, {true, true, true}}
-      }));
-   }
+   BOOST_REQUIRE(ballot(t1_owners[20]).empty());
+   BOOST_REQUIRE_EQUAL(ballot(t1_owners[0]).size(), 1u);
+   BOOST_REQUIRE_EQUAL(success(), vote(t1_owners[0], {
+                                                        {20, {true, true, true}}
+   }));
+   BOOST_REQUIRE_EQUAL(success(), vote(t1_owners[20]));
+   BOOST_CHECK_EQUAL(get_state()["t1_ballots"].as_uint64(), 2u);
+   BOOST_CHECK_EQUAL(get_flight(20)["tallies"].get_array()[0]["votes_cast"].as_uint64(), 1u);
+   BOOST_CHECK(get_ballot(t1_owners[20])["votes"].get_array().empty());
    close_votes();
-   BOOST_CHECK_EQUAL(phase(), PH_DONE);
+   BOOST_CHECK_EQUAL(seats_filled(), 20u); // Two submitted ballots need two YES, despite one eligible flight voter.
+   BOOST_REQUIRE_EQUAL(success(), settle());
+   BOOST_CHECK_EQUAL(get_state()["t1_ballots"].as_uint64(), 0u);
+   open_votes();
+   BOOST_CHECK_EQUAL(get_flight(20)["tallies"].get_array()[0]["votes_cast"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(success(), vote(t1_owners[0], {
+                                                        {20, {true, true, true}}
+   }));
+   close_votes();
+   BOOST_CHECK_EQUAL(phase(), PH_DONE); // One submitted ballot needs one YES: there is no additional quorum.
 }
 
-/// Maximum frozen tiers, full-size public ballots, cap thresholds, and bounded ballot cleanup.
+/// Maximum pool and tiers, full public ballots, and bounded cleanup; opt in to actual resource measurements.
 BOOST_FIXTURE_TEST_CASE(maximum_tiers_and_ballot_storage, sysio_councl_tester) {
-   register_candidates(23);
+   const char* resource_report = std::getenv("WIRE_COUNCIL_RESOURCE_REPORT");
+   measure_resources = resource_report && *resource_report;
+   register_candidates(candidates_.size());
+   for (size_t i = candidates_.size(); i < 1000; ++i) {
+      const name candidate = bulk_name('x', i);
+      mk_candidate(candidate);
+      BOOST_REQUIRE_EQUAL(success(), addcandidate(candidate, "handle"));
+      candidates_.push_back(candidate);
+   }
    register_tiers();
    for (size_t i = 0; i < 84; ++i) {
       const name owner = bulk_name('z', i);
@@ -1141,6 +1279,7 @@ BOOST_FIXTURE_TEST_CASE(maximum_tiers_and_ballot_storage, sysio_councl_tester) {
    load_tier_fully(2, 100);
    load_tier_fully(3, 100);
    BOOST_REQUIRE_EQUAL(success(), finalizeinit());
+   BOOST_CHECK_EQUAL(get_config()["cand_count"].as_uint64(), 1000u);
    BOOST_CHECK_EQUAL(get_config()["n2"].as_uint64(), 84u);
    BOOST_CHECK_EQUAL(get_config()["n3"].as_uint64(), 1000u);
    BOOST_CHECK(loadtier(3, 1001) != success());
@@ -1160,6 +1299,9 @@ BOOST_FIXTURE_TEST_CASE(maximum_tiers_and_ballot_storage, sysio_councl_tester) {
       }));
    for (const auto owner : t1_owners)
       BOOST_REQUIRE_EQUAL(success(), vote(owner));
+   BOOST_CHECK_EQUAL(get_state()["t1_ballots"].as_uint64(), 21u);
+   BOOST_CHECK_EQUAL(get_state()["t2_ballots"].as_uint64(), 84u);
+   BOOST_CHECK_EQUAL(get_state()["t3_ballots"].as_uint64(), 1000u);
    BOOST_CHECK_EQUAL(get_flight(0)["tallies"].get_array()[2]["votes_cast"].as_uint64(), 1000u);
    BOOST_CHECK_EQUAL(seats_filled(), 0u);
    close_votes();
@@ -1174,46 +1316,58 @@ BOOST_FIXTURE_TEST_CASE(maximum_tiers_and_ballot_storage, sysio_councl_tester) {
    BOOST_CHECK(get_ballot(t3_owners.back()).is_null());
    BOOST_CHECK(get_ballot(t1_owners.back()).is_null());
    BOOST_CHECK(council_member(0).to_string().empty());
+   if (measure_resources)
+      write_resource_report(resource_report);
 }
 
-/// Recovery can interleave with ordered settlement and persists until assigned across continuation.
-BOOST_FIXTURE_TEST_CASE(recovery_interleaves_with_tabulation_and_continuation, sysio_councl_tester) {
+/// Sixteen winners remain fixed while all five vacancies enter a fresh round and complete by voting.
+BOOST_FIXTURE_TEST_CASE(sixteen_winners_then_five_vacancies_complete, sysio_councl_tester) {
    init_ready(23, 1, 0);
-   for (uint8_t seat = 0; seat < 3; ++seat)
-      BOOST_REQUIRE_EQUAL(success(), repcandidate(t1_owners[seat], candidates_[seat * 3], candidates_[seat * 3 + 1],
-                                                  candidates_[seat * 3 + 2]));
+   for (uint8_t seat = 0; seat < 21; ++seat)
+      BOOST_REQUIRE_EQUAL(
+         success(), repcandidate(t1_owners[seat], candidates_[seat], candidates_[seat + 1], candidates_[seat + 2]));
    open_votes();
-   BOOST_REQUIRE_EQUAL(
-      success(),
-      vote(t2_owners[0], {
-                            {0, {true, false, false}},
-                            {1, {true, false, false}},
-                            {2, {false, true, false}}
-   }));
-   produce_block(fc::seconds(TIME_SLOT + 1));
-   BOOST_REQUIRE_EQUAL(success(), settle());
-   BOOST_REQUIRE_EQUAL(success(), settle(1));
-   BOOST_REQUIRE_EQUAL(council_member(0).to_string(), candidates_[0].to_string());
-   BOOST_REQUIRE_EQUAL(success(), forceback(1));
-   BOOST_CHECK(forceassign(1, candidates_[0]) != success());
-   BOOST_REQUIRE_EQUAL(success(), forceassign(1, candidates_[7]));
-   BOOST_CHECK_EQUAL(council_seat(1)["filled_tier"].as_string(), TIER_GOVERNANCE);
-   BOOST_REQUIRE_EQUAL(success(), settle());
-   BOOST_CHECK(council_member(2).to_string().empty());
-   BOOST_REQUIRE_EQUAL(success(), forceback(3));
-   BOOST_REQUIRE_EQUAL(success(), forceback(3));
-   BOOST_REQUIRE_EQUAL(success(), settle());
-   BOOST_CHECK_EQUAL(get_state()["backstop_mask"].as_uint64(), uint32_t{1} << 3);
-   BOOST_CHECK(repcandidate(t1_owners[3], candidates_[3], candidates_[4], candidates_[5]) != success());
-   open_votes();
-   BOOST_CHECK_EQUAL(ballot(t2_owners[0]).size(), 18u);
-   BOOST_CHECK(forceassign(3, candidates_[9]) != success());
-   produce_block(fc::seconds(TIME_SLOT + 1));
-   BOOST_REQUIRE_EQUAL(success(), forceassign(3, candidates_[9]));
-   BOOST_REQUIRE_EQUAL(success(), settle());
-   BOOST_REQUIRE_EQUAL(success(), settle());
-   BOOST_CHECK_EQUAL(seats_filled(), 3u);
-   BOOST_CHECK_EQUAL(get_state()["backstop_mask"].as_uint64(), 0u);
+   const auto stale_ballot = vote_data(t2_owners[0], ballot(t2_owners[0]));
+   auto stale_settle = identity();
+   stale_settle("caller", t1_owners[0].to_string())("max_steps", 21);
+   std::map<uint8_t, std::array<bool, 3>> choices;
+   for (uint8_t seat = 0; seat < 16; ++seat)
+      choices[seat] = {true, false, false};
+   BOOST_REQUIRE_EQUAL(success(), vote(t2_owners[0], choices));
+   close_votes(1);
+   BOOST_REQUIRE_EQUAL(seats_filled(), 16u);
+   std::vector<std::string> winners;
+   for (uint8_t seat = 0; seat < 16; ++seat)
+      winners.push_back(json_text(council_seat(seat)));
+   BOOST_REQUIRE_EQUAL(success(), settle(1, t1_owners[20]));
+   BOOST_CHECK_EQUAL(round_id(), 2u);
+   BOOST_CHECK_EQUAL(get_state()["t2_ballots"].as_uint64(), 0u);
+   BOOST_CHECK(push(COUNCL_ACCOUNT, councl_abi, t1_owners[0], "settle"_n, stale_settle) != success());
+   for (uint8_t seat = 16; seat < 21; ++seat)
+      BOOST_REQUIRE_EQUAL(
+         success(), repcandidate(t1_owners[seat], candidates_[seat], candidates_[seat + 1], candidates_[seat + 2]));
+   open_votes(1);
+   BOOST_CHECK_EQUAL(ballot(t2_owners[0]).size(), 5u);
+   BOOST_CHECK_EQUAL(ballot(t1_owners[0]).size(), 5u);
+   BOOST_CHECK_EQUAL(ballot(t1_owners[20]).size(), 4u);
+   BOOST_CHECK(push(COUNCL_ACCOUNT, councl_abi, t2_owners[0], "vote"_n, stale_ballot) != success());
+   BOOST_CHECK_EQUAL(get_state()["t2_ballots"].as_uint64(), 0u);
+   choices.clear();
+   for (uint8_t seat = 16; seat < 21; ++seat)
+      choices[seat] = {true, false, false};
+   BOOST_REQUIRE_EQUAL(success(), vote(t2_owners[0], choices));
+   close_votes(1);
+   BOOST_REQUIRE_EQUAL(seats_filled(), 21u);
+   BOOST_REQUIRE_EQUAL(phase(), PH_DONE);
+   std::set<std::string> unique_members;
+   for (uint8_t seat = 0; seat < 21; ++seat) {
+      BOOST_CHECK_EQUAL(council_member(seat).to_string(), candidates_[seat].to_string());
+      BOOST_CHECK(unique_members.insert(council_member(seat).to_string()).second);
+      if (seat < 16)
+         BOOST_CHECK_EQUAL(json_text(council_seat(seat)), winners[seat]);
+      else
+         BOOST_CHECK_EQUAL(council_seat(seat)["round_id"].as_uint64(), 2u);
+   }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

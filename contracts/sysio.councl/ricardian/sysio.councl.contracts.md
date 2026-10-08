@@ -112,7 +112,7 @@ title: Submit a Council Round Ballot
 summary: '{{nowrap voter}} submits one immutable ballot for the finalized round.'
 ---
 
-{{voter}} submits independent YES/NO decisions in {{votes}} for every eligible flight in ascending seat order. Election {{election_gen}}, round {{round_id}}, and finalized flight commitment {{flight_hash}} must match the active voting window. The voter must authorize the action and belong to a frozen electorate. T1 owners omit their own seat's flight, including automatically generated flights; T2/T3 owners vote on every available flight without implicit YES credit. Ballots cannot be revised or duplicated. Votes and running totals are public. Submissions at the exact deadline are accepted. Results are tabulated only after the shared window closes using fixed electorate thresholds.
+{{voter}} submits independent YES/NO decisions in {{votes}} for every eligible flight in ascending seat order. Election {{election_gen}}, round {{round_id}}, and finalized flight commitment {{flight_hash}} must match the active voting window. The voter must authorize the action and belong to a frozen electorate. T1 owners omit their own seat's flight, including automatically generated flights; T2/T3 owners vote on every available flight without implicit YES credit. Ballots cannot be revised or duplicated. Votes and running totals are public. Submissions at the exact deadline are accepted. Results are tabulated only after the shared window closes. The YES threshold is floor(2*B/3)+1, where B is all accepted ballots from that tier in this round, identical for every flight. A valid empty T1 ballot still counts toward B. Zero submissions cannot elect; there is no additional turnout quorum.
 
 <h1 class="contract">settle</h1>
 
@@ -122,27 +122,7 @@ title: Advance the Council Round
 summary: '{{nowrap caller}} advances bounded election work.'
 ---
 
-Authenticated {{caller}} advances election {{election_gen}}, round {{round_id}}, processing at most {{max_steps}} seats (1–21) in the persisted original order. After nominations expire, generation freezes one seed; voting opens only after all flights are finalized. After the shared voting deadline, tabulation processes each seat through T1, T2, T3 and A, B, C, immediately excluding elected members from later seats. A subsequent continuation starts fresh nominations for vacancies while retaining winners and snapshots. Stale identities fail. Exact deadlines do not trigger settlement. This action also contributes public entropy.
-
-<h1 class="contract">forceback</h1>
-
----
-spec_version: "0.2.0"
-title: Reserve a Seat for Governance Recovery
-summary: 'Reserve council seat {{seat}} for manual recovery.'
----
-
-The contract owner reserves unfilled seat {{seat}} in election {{election_gen}}, round {{round_id}}, after the applicable nomination or voting window has elapsed. Before voting opens, the withdrawn flight and its position claims are released atomically. Frozen flights remain visible after voting closes. The recovery reservation survives continuation and excludes this seat from ordinary nominations, generation, and tabulation until governance assigns it. Contract-owner authorization is required.
-
-<h1 class="contract">forceassign</h1>
-
----
-spec_version: "0.2.0"
-title: Assign a Council Recovery Seat
-summary: 'Assign {{nowrap member}} to reserved council seat {{seat}}.'
----
-
-The contract owner assigns registered, unelected candidate {{member}} to the unfilled governance-reserved seat {{seat}} in election {{election_gen}}, round {{round_id}}. Assignment requires contract-owner authorization and cannot occur during an open voting window. The member's elected flag and seat result update atomically; no member can occupy two seats. Other filled seats and frozen snapshots are preserved.
+Authenticated {{caller}} advances election {{election_gen}}, round {{round_id}}, processing at most {{max_steps}} seats (1–21) in the persisted original order. After nominations expire, generation freezes one seed; voting opens only after all flights are finalized. After the shared voting deadline, tabulation processes each seat through T1, T2, T3 and A, B, C, immediately excluding elected members from later seats. A subsequent continuation starts fresh nominations, tallies, and ballot counters for every vacancy while retaining winners and snapshots. Rounds repeat until all 21 seats are filled; there is no manual assignment fallback. Stale identities fail. Exact deadlines do not trigger settlement. This action also contributes public entropy.
 
 <h1 class="contract">stir</h1>
 

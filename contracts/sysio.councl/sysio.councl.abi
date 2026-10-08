@@ -204,7 +204,15 @@
                     "type": "uint8"
                 },
                 {
-                    "name": "backstop_mask",
+                    "name": "t1_ballots",
+                    "type": "uint32"
+                },
+                {
+                    "name": "t2_ballots",
+                    "type": "uint32"
+                },
+                {
+                    "name": "t3_ballots",
                     "type": "uint32"
                 },
                 {
@@ -275,46 +283,6 @@
                 {
                     "name": "v3",
                     "type": "bool"
-                }
-            ]
-        },
-        {
-            "name": "forceassign",
-            "base": "",
-            "fields": [
-                {
-                    "name": "seat",
-                    "type": "uint8"
-                },
-                {
-                    "name": "member",
-                    "type": "name"
-                },
-                {
-                    "name": "election_gen",
-                    "type": "uint64"
-                },
-                {
-                    "name": "round_id",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "forceback",
-            "base": "",
-            "fields": [
-                {
-                    "name": "seat",
-                    "type": "uint8"
-                },
-                {
-                    "name": "election_gen",
-                    "type": "uint64"
-                },
-                {
-                    "name": "round_id",
-                    "type": "uint64"
                 }
             ]
         },
@@ -546,16 +514,6 @@
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Finalize Election Initialization\nsummary: 'Verify the tier snapshots and open simultaneous nominations.'\n---\n\nThe contract owner finalizes initialization: the tier-2 and tier-3 source scans must be complete,\ntheir snapshot sizes are verified against authoritative generation-scoped sysio.roa rows, and the\nshared nomination window opens for all 21 seats."
         },
         {
-            "name": "forceassign",
-            "type": "forceassign",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Assign a Council Recovery Seat\nsummary: 'Assign {{nowrap member}} to reserved council seat {{seat}}.'\n---\n\nThe contract owner assigns registered, unelected candidate {{member}} to the unfilled governance-reserved seat {{seat}} in election {{election_gen}}, round {{round_id}}. Assignment requires contract-owner authorization and cannot occur during an open voting window. The member's elected flag and seat result update atomically; no member can occupy two seats. Other filled seats and frozen snapshots are preserved."
-        },
-        {
-            "name": "forceback",
-            "type": "forceback",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Reserve a Seat for Governance Recovery\nsummary: 'Reserve council seat {{seat}} for manual recovery.'\n---\n\nThe contract owner reserves unfilled seat {{seat}} in election {{election_gen}}, round {{round_id}}, after the applicable nomination or voting window has elapsed. Before voting opens, the withdrawn flight and its position claims are released atomically. Frozen flights remain visible after voting closes. The recovery reservation survives continuation and excludes this seat from ordinary nominations, generation, and tabulation until governance assigns it. Contract-owner authorization is required."
-        },
-        {
             "name": "loadtier",
             "type": "loadtier",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Load Tier Snapshot\nsummary: 'Append tier-{{nowrap tier}} node owners into the frozen snapshot.'\n---\n\nThe contract owner inspects at most {{max_rows}} node-owner rows from sysio.roa while appending\ntier-{{tier}} identities into the frozen voting snapshot. A persistent source cursor bounds\nreads as well as writes, and identity deduplication allows a later pass to absorb newly observed\nowners. Called repeatedly until the tier scan is complete."
@@ -583,7 +541,7 @@
         {
             "name": "settle",
             "type": "settle",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Advance the Council Round\nsummary: '{{nowrap caller}} advances bounded election work.'\n---\n\nAuthenticated {{caller}} advances election {{election_gen}}, round {{round_id}}, processing at most {{max_steps}} seats (1–21) in the persisted original order. After nominations expire, generation freezes one seed; voting opens only after all flights are finalized. After the shared voting deadline, tabulation processes each seat through T1, T2, T3 and A, B, C, immediately excluding elected members from later seats. A subsequent continuation starts fresh nominations for vacancies while retaining winners and snapshots. Stale identities fail. Exact deadlines do not trigger settlement. This action also contributes public entropy."
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Advance the Council Round\nsummary: '{{nowrap caller}} advances bounded election work.'\n---\n\nAuthenticated {{caller}} advances election {{election_gen}}, round {{round_id}}, processing at most {{max_steps}} seats (1–21) in the persisted original order. After nominations expire, generation freezes one seed; voting opens only after all flights are finalized. After the shared voting deadline, tabulation processes each seat through T1, T2, T3 and A, B, C, immediately excluding elected members from later seats. A subsequent continuation starts fresh nominations, tallies, and ballot counters for every vacancy while retaining winners and snapshots. Rounds repeat until all 21 seats are filled; there is no manual assignment fallback. Stale identities fail. Exact deadlines do not trigger settlement. This action also contributes public entropy."
         },
         {
             "name": "startinit",
@@ -598,7 +556,7 @@
         {
             "name": "vote",
             "type": "vote",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Submit a Council Round Ballot\nsummary: '{{nowrap voter}} submits one immutable ballot for the finalized round.'\n---\n\n{{voter}} submits independent YES/NO decisions in {{votes}} for every eligible flight in ascending seat order. Election {{election_gen}}, round {{round_id}}, and finalized flight commitment {{flight_hash}} must match the active voting window. The voter must authorize the action and belong to a frozen electorate. T1 owners omit their own seat's flight, including automatically generated flights; T2/T3 owners vote on every available flight without implicit YES credit. Ballots cannot be revised or duplicated. Votes and running totals are public. Submissions at the exact deadline are accepted. Results are tabulated only after the shared window closes using fixed electorate thresholds."
+            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Submit a Council Round Ballot\nsummary: '{{nowrap voter}} submits one immutable ballot for the finalized round.'\n---\n\n{{voter}} submits independent YES/NO decisions in {{votes}} for every eligible flight in ascending seat order. Election {{election_gen}}, round {{round_id}}, and finalized flight commitment {{flight_hash}} must match the active voting window. The voter must authorize the action and belong to a frozen electorate. T1 owners omit their own seat's flight, including automatically generated flights; T2/T3 owners vote on every available flight without implicit YES credit. Ballots cannot be revised or duplicated. Votes and running totals are public. Submissions at the exact deadline are accepted. Results are tabulated only after the shared window closes. The YES threshold is floor(2*B/3)+1, where B is all accepted ballots from that tier in this round, identical for every flight. A valid empty T1 ballot still counts toward B. Zero submissions cannot elect; there is no additional turnout quorum."
         }
     ],
     "tables": [
@@ -794,10 +752,6 @@
             "name": "election_tier",
             "type": "uint8",
             "values": [
-                {
-                    "name": "GOVERNANCE",
-                    "value": 0
-                },
                 {
                     "name": "T1",
                     "value": 1

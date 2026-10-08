@@ -29,7 +29,7 @@ Any authenticated caller can invoke `settle(caller, election_gen, round_id, max_
 
 ## Flights and reservations
 
-`repcandidate(proposer, c1, c2, c3, election_gen, round_id)` requires the frozen T1 owner's authorization and a vacant, ordinary seat. All vacant owners can nominate concurrently. A, B, and C are ordered preferences and must be distinct, registered, unelected candidates.
+`repcandidate(proposer, c1, c2, c3, election_gen, round_id)` requires the frozen T1 owner's authorization and a vacant seat. All vacant owners can nominate concurrently. A, B, and C are ordered preferences and must be distinct, registered, unelected candidates.
 
 Each (candidate, position) can belong to one seat per round. A candidate may occur in different positions in other flights. First accepted nominations reserve positions. Owners may atomically replace or reorder their flights while nominations remain open: validation permits their own retained claims, rejects conflicts with other seats, and releases old claims only in a successful transaction. Failed replacements preserve the previous flight and reservations.
 
@@ -47,7 +47,9 @@ A ballot lists `{seat, v1, v2, v3}` for every eligible available flight in ascen
 
 One immutable ballot per owner per round is stored publicly. Membership is resolved from the frozen snapshots. Each flight stores separate T1/T2/T3 vote counts and three YES counts; NO for an occurrence is the tier's vote count minus that occurrence's YES count. Approvals are never pooled across occurrences of the same candidate.
 
-Thresholds are `floor(2*N/3)+1` of the full frozen eligible electorate, never turnout. T1 always uses N=20 and needs 14 YES. T2/T3 use actual snapshot sizes: at their caps, 57/84 and 667/1,000. Empty tiers cannot elect anyone.
+Thresholds are `floor(2*B/3)+1`, where B is the total accepted ballots submitted by that tier in the current round. State exposes `t1_ballots`, `t2_ballots`, and `t3_ballots`; the same tier denominator applies to every flight. Frozen membership determines who may submit, not the threshold. Per-flight vote counts remain audit data and are not denominators. Invalid or duplicate ballots change neither counters nor tallies.
+
+All 21 T1 owners submitting means B=21 and 15 YES are required, although each flight receives at most 20 T1 decisions. Ten T1 submissions require 7 YES; 30 T2 submissions require 21; 100 T3 submissions require 67. A tier with zero submissions cannot elect. There is no additional participation quorum: one submitted ballot with one YES can qualify a candidate. If only a T1 owner's own seat remains vacant, their complete ballot is empty and still counts once toward B. These turnout consequences are intentional; operators and clients must not substitute a per-flight denominator or exclude empty valid ballots.
 
 ## Final tabulation
 
@@ -56,24 +58,18 @@ After the common window closes:
 1. Process each vacant original seat in ascending order.
 2. For that seat, consider T1, then T2, then T3.
 3. Within a tier, scan A, then B, then C.
-4. Skip already elected candidates and select the first candidate meeting that tier's full-electorate YES threshold.
+4. Skip already elected candidates and select the first candidate meeting that tier's submitted-ballot YES threshold.
 5. Record the seat immediately, mark the member elected for the entire election, and stop processing that seat.
 
-There is no explicit-NO elimination gate. With 20 eligible owners, A at 9 YES/5 NO and B at 14 YES/0 NO elects B at closure. Skipping an elected candidate does not transfer votes or change denominators.
+There is no explicit-NO elimination gate. With 14 submitted tier ballots, A at 9 YES/5 NO and B at 14 YES/0 NO elects B at closure (threshold 10). Skipping an elected candidate does not transfer votes or change denominators.
 
 Seat priority is evaluated before tier priority globally: an earlier seat's T3 winner can remove a candidate from a later seat with T1 support. This greedy algorithm can leave vacancies that a different assignment would avoid; maximizing filled seats is not its objective.
 
-## Continuation, recovery, and reset
+## Continuation and reset
 
-Normal continuation retains all results, elected flags, registration, and snapshots. Only vacant ordinary seats receive fresh nominations. Losing candidates can be nominated again. Ballots and tallies start fresh; stale round requests fail. Original seat IDs and T1 denominators remain unchanged.
+Normal continuation retains all results, elected flags, registration, and snapshots. Every vacant seat receives fresh nominations in each subsequent round until all 21 seats are filled. Losing candidates can be nominated again. Ballots, tallies, and submitted-ballot counters start fresh; stale round requests fail. Original seat IDs remain unchanged.
 
-Governance retains a separate recovery route:
-
-- `forceback(seat, election_gen, round_id)` reserves an elapsed unfilled seat for governance. Before voting opens, it atomically releases that seat's claims and removes its mutable flight, preserving automatic-generation availability. After voting has closed, its frozen flight remains visible.
-- The per-seat backstop reservation survives continuation and excludes that seat from ordinary nominations/generation/tabulation until assignment.
-- `forceassign(seat, member, election_gen, round_id)` requires a reserved unfilled seat and a registered unelected member. Assignment and candidate/result updates are atomic. Assignment cannot occur during an open shared voting window. It can interleave with closed-window settlement without duplicating members or replacing results.
-
-These actions require contract authority, distinct from public crank authorization. Repeated ordinary rounds do not guarantee completion; governance remains trusted. Recorded partial results do not add partial-council powers or a new term-activation protocol.
+There is no manual assignment or reservation of a vacancy for governance, and no round limit that switches to a fallback. Repeated rounds do not guarantee completion if candidates never receive enough approvals. Recorded partial results do not add partial-council powers or a new term-activation protocol.
 
 `reset()` is an authorized abort/retirement operation, never continuation. During LOADING it preserves candidate registration and the generation while cleaning staged snapshots. During an unfinished election it deletes partial council results; after DONE it retains completed council history. `purge(max_rows)` performs bounded staged cleanup of candidates, snapshots, flights, ballots, and (for an abort) results, then advances the generation and reopens registration. Generation and round counters reject overflow.
 
@@ -90,8 +86,8 @@ These actions require contract authority, distinct from public crank authorizati
 
 Ephemeral storage does not grow with the number of continuation rounds. Latest flights/ballots remain visibly labeled by round until overwritten; clients must filter by the active round. On-chain action history carries earlier submissions; this contract does not retain an unbounded ballot archive. Completed council history remains after retirement.
 
-The actual CDT build produces the tracked council ABI/WASM. `contracts/tools/generate-sysio-contract-types.py` produces the matching `wire-libraries-ts` SDK interfaces and registry. SDK tests verify typed action preparation and ABI serialization. Hub's legacy council UI requires a separate integration follow-up. Rich profiles, new candidate eligibility policy, stronger randomness, and migrations are outside WIRE-418.
+The actual CDT build produces the tracked council ABI/WASM. `contracts/tools/generate-sysio-contract-types.py` produces the matching `wire-libraries-ts` SDK interfaces and registry. SDK tests verify typed action preparation and ABI serialization. Hub's legacy council UI requires a separate integration follow-up. Rich profiles, new candidate eligibility policy, stronger randomness, and migrations are outside WIRE-418. See [OPERATIONS.md](OPERATIONS.md) for window announcements, crank ownership, and client state handling.
 
 ## Validation
 
-The focused `council_math_tests` and `sysio_councl_tests` suites cover final qualification, reservations and rollback, minimum/maximum candidate pools, shared ballots, snapshot/owner churn, caps, deadlines, batching equivalence, ordered duplicate elimination, continuation, recovery, and cleanup. Run contract behavior against the matching generated artifacts with explicit `--sys-vm-jit`. Broader runtime/OS regression coverage belongs to remote CI.
+The focused `council_math_tests` and `sysio_councl_tests` suites cover final qualification, reservations and rollback, minimum/maximum candidate pools, shared ballots, snapshot/owner churn, caps, deadlines, batching equivalence, ordered duplicate elimination, repeated continuation, and cleanup. Run contract behavior against the matching generated artifacts with explicit `--sys-vm-jit`. Broader runtime/OS regression coverage belongs to remote CI.

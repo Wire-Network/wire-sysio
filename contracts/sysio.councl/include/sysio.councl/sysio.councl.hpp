@@ -23,7 +23,6 @@ namespace sysio {
 /// Contract-wide constants and identifiers for sysio.councl.
 namespace councl {
 inline constexpr uint8_t SEATS = 21;                             ///< tier-1 owners == council seats
-inline constexpr uint8_t T1_VOTERS = 20;                         ///< SEATS - 1 (seat owner never votes)
 inline constexpr uint8_t NO_SEAT = SEATS;                        ///< unreserved candidate position
 inline constexpr uint32_t MAX_BATCH_ROWS = 1000;                 ///< snapshot/cleanup transaction limit
 inline constexpr uint8_t SLATE_SIZE = 3;                         ///< candidates per repcandidate
@@ -61,8 +60,8 @@ enum class cleanup_mode : uint8_t {
    COMPLETED = 3     ///< retire a completed generation while retaining council history
 };
 
-/// Frozen voting tier or the authority responsible for a completed seat.
-enum class election_tier : uint8_t { GOVERNANCE = 0, T1 = 1, T2 = 2, T3 = 3 };
+/// Frozen voting tier, with stable values matching the ROA owner tiers.
+enum class election_tier : uint8_t { T1 = 1, T2 = 2, T3 = 3 };
 
 /// Ordered cleanup stages used by the batched `purge` action.
 enum class cleanup_stage : uint8_t {
@@ -76,7 +75,6 @@ enum class cleanup_stage : uint8_t {
    COMPLETE = 7
 };
 
-static_assert(T1_VOTERS == SEATS - 1, "tier-1 electorate must exclude exactly the seat owner");
 static_assert(SLATE_SIZE == 3, "the fixed action and state schema require a three-candidate slate");
 } // namespace councl
 
@@ -85,7 +83,7 @@ static_assert(SLATE_SIZE == 3, "the fixed action and state schema require a thre
  *
  * Actions fall into three groups: registration (`addcandidate`/`rmcandidate`), staged init
  * (`startinit`/`loadtier`/`finalizeinit`, plus `reset`/`purge`), and the election
- * (`repcandidate`/`vote`/`settle`/`forceback`/`forceassign`). `stir` is a public,
+ * (`repcandidate`/`vote`/`settle`). `stir` is a public,
  * caller-authenticated entropy crank.
  */
 class [[sysio::contract("sysio.councl")]] council : public contract {
@@ -145,6 +143,8 @@ public:
 
    /// Cast one immutable ballot covering every eligible flight in ascending seat order.
    /// Required identities bind the signature to the frozen candidates, election, and round.
+   /// Every accepted ballot contributes once to its tier's round-wide threshold denominator,
+   /// including a T1 ballot whose only remaining flight is its excluded own seat.
    [[sysio::action]]
    void vote(name voter, uint64_t election_gen, uint64_t round_id, checksum256 flight_hash,
              std::vector<flight_vote> votes);
@@ -153,15 +153,6 @@ public:
    /// Generation and tabulation have separate transitions; retries cannot reopen old rounds.
    [[sysio::action]]
    void settle(name caller, uint64_t election_gen, uint64_t round_id, uint32_t max_steps);
-
-   /// Governance reserves one elapsed unfilled seat for manual recovery. Reservation persists
-   /// across continuation and prevents ordinary nominations, generation, or tabulation of it.
-   [[sysio::action]]
-   void forceback(uint8_t seat, uint64_t election_gen, uint64_t round_id);
-
-   /// Assign a registered unelected member to a reserved recovery seat, atomically.
-   [[sysio::action]]
-   void forceassign(uint8_t seat, name member, uint64_t election_gen, uint64_t round_id);
 
    /// Authenticated entropy contribution. Never alters a seed already frozen for generation.
    [[sysio::action]]
@@ -203,14 +194,16 @@ public:
       time_point vote_deadline{};
       uint8_t cursor = 0; ///< next original seat for generation or tabulation
       uint8_t seats_filled = 0;
-      uint32_t backstop_mask = 0; ///< governance-reserved vacant seats
-      checksum256 flight_hash{};  ///< canonical generation/round/ordered-flight commitment
-      checksum256 round_seed{};   ///< frozen once on entry to GENERATING
+      uint32_t t1_ballots = 0;   ///< accepted T1 ballots this round, including own-flight exclusions
+      uint32_t t2_ballots = 0;   ///< accepted T2 ballots this round
+      uint32_t t3_ballots = 0;   ///< accepted T3 ballots this round
+      checksum256 flight_hash{}; ///< canonical generation/round/ordered-flight commitment
+      checksum256 round_seed{};  ///< frozen once on entry to GENERATING
       checksum256 acc{};
       uint64_t stir_count = 0;
       SYSLIB_SERIALIZE(
          election_state,
-         (phase)(round_id)(round_open_ts)(vote_deadline)(cursor)(seats_filled)(backstop_mask)(flight_hash)(round_seed)(acc)(stir_count))
+         (phase)(round_id)(round_open_ts)(vote_deadline)(cursor)(seats_filled)(t1_ballots)(t2_ballots)(t3_ballots)(flight_hash)(round_seed)(acc)(stir_count))
    };
    using state_t = sysio::kv::global<"state"_n, election_state>;
 
@@ -269,7 +262,7 @@ public:
    };
    using candidates_t = sysio::kv::scoped_table<"candidates"_n, cand_key, candidate_row>;
 
-   /// Public counts for one tier in one flight; absent voters never count as YES.
+   /// Public counts for one tier in one flight; votes_cast is an audit count, not the denominator.
    struct tier_tally {
       uint32_t votes_cast = 0;
       uint32_t yes1 = 0, yes2 = 0, yes3 = 0;
@@ -302,8 +295,8 @@ public:
    struct [[sysio::table("council")]] council_row {
       uint64_t seat;
       name seat_owner;                   ///< roster[seat] — the tier-1 owner of this seat
-      councl::election_tier filled_tier; ///< tier that filled this seat, or GOVERNANCE
-      name proposer;                     ///< frozen T1 seat owner, or governance for manual assignment
+      councl::election_tier filled_tier; ///< tier whose final YES tally filled this seat
+      name proposer;                     ///< frozen T1 seat owner
       name member;                       ///< the elected candidate
       uint64_t round_id;                 ///< round in which the seat was filled
       SYSLIB_SERIALIZE(council_row, (seat)(seat_owner)(filled_tier)(proposer)(member)(round_id))
@@ -315,25 +308,24 @@ private:
    void check_round(const config_state& cfg, const election_state& st, uint64_t generation, uint64_t round) const;
    /// Mix an authenticated action tag, actor, and monotonic stir count into the accumulator.
    void do_stir(election_state& st, name action_tag, name actor);
-   /// Open a fresh nomination round without changing registered candidates, snapshots, or winners.
+   /// Open nominations for every vacancy and reset tier ballot counts, preserving candidates,
+   /// frozen snapshots, and winners. Old-round flights, tallies, and claims become inactive.
    void open_round(election_state& st);
    /// Atomically replace one flight and its candidate-position reservations.
    void save_flight(const config_state& cfg, const election_state& st, uint8_t seat,
                     const std::vector<name>& candidates, bool automatic);
-   /// Release current claims and remove a mutable flight during replacement or manual recovery.
+   /// Release current claims and remove a mutable flight during atomic replacement.
    void release_flight(const config_state& cfg, const election_state& st, uint8_t seat);
    /// Generate missing flights in original seat order with a fixed per-round seed.
    void generate_flights(election_state& st, const config_state& cfg, uint32_t max_steps);
    /// Commit all finalized flights, then open the shared voting window.
    void open_voting(election_state& st, const config_state& cfg);
-   /// Process a bounded prefix of remaining seats using tier/position priority.
+   /// Process a bounded prefix of remaining seats using tier/position priority and each tier's
+   /// round-wide submitted-ballot denominator, including T1 ballots omitting their own flight.
    void tabulate(election_state& st, const config_state& cfg, uint32_t max_steps);
    /// Persist a unique member/result without advancing any unrelated seat.
    void seat_member(election_state& st, const config_state& cfg, uint8_t seat, name member,
                     councl::election_tier filled_tier);
-   /// Whether this seat is reserved for governance rather than ordinary round work.
-   static bool in_backstop(const election_state& st, uint8_t seat);
-
    // roa helpers
    /// Read the current ROA network generation.
    uint8_t roa_network_gen() const;

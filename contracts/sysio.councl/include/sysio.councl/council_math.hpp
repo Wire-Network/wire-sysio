@@ -10,7 +10,8 @@
  * seed-derivation boundary (`seed_u64` / `bounded_index`); keep exact-value assertions
  * for those in a small regeneratable golden table and assert *properties* everywhere else.
  *
- * Final tallies use tier priority followed by candidate priority; turnout never changes N.
+ * Final tallies use tier priority followed by candidate priority. Every flight in a tier uses
+ * that tier's total accepted ballots for the round as its threshold denominator.
  */
 
 #include <array>
@@ -19,9 +20,9 @@
 
 namespace sysio::councl_math {
 
-/// YES votes needed to elect, for an electorate of size `n`:  floor(2n/3) + 1.
-inline constexpr uint64_t win_threshold(uint64_t n) {
-   return (2 * n) / 3 + 1;
+/// YES votes needed to elect from `ballots` submitted within the tier: floor(2 * ballots / 3) + 1.
+inline constexpr uint64_t win_threshold(uint64_t ballots) {
+   return (2 * ballots) / 3 + 1;
 }
 
 /// NO votes that make a candidate impossible to elect (ceil(n/3)).
@@ -45,12 +46,14 @@ struct resolution {
  * @brief Select the first qualifying unelected candidate from one tier's final YES tallies.
  * Only call after the shared window closes. An earlier candidate below threshold does not
  * block a later one. Already elected candidates are skipped without redistributing approvals.
+ * `submitted_ballots` is the round-wide tier total, including T1 ballots that omit their own
+ * flight. It is not the frozen membership size or this flight's votes_cast. Zero ballots fail.
  */
 inline constexpr resolution resolve_final(const std::array<uint64_t, 3>& yes, const std::array<bool, 3>& elected,
-                                          uint64_t N) {
-   if (N != 0)
+                                          uint64_t submitted_ballots) {
+   if (submitted_ballots != 0)
       for (uint8_t i = 0; i < 3; ++i)
-         if (!elected[i] && yes[i] >= win_threshold(N))
+         if (!elected[i] && yes[i] >= win_threshold(submitted_ballots))
             return {round_result::WIN, i};
    return {round_result::FAIL, 0};
 }
