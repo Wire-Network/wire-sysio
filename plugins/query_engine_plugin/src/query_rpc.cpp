@@ -29,6 +29,10 @@ constexpr auto invalid_parameter_name_message = "Unknown query parameter";
 constexpr auto duplicate_parameter_message = "Duplicate query parameter";
 constexpr auto integer_range_format = "{} must be an integer in [{}, {}]";
 constexpr auto lowers_only_format = "{} may only lower {}";
+/// Nesting depth of the root object's members.
+constexpr uint32_t root_depth = 1;
+/// Nesting depth of the members of params.
+constexpr uint32_t params_depth = 2;
 /// Every member of the root request object.
 constexpr auto envelope_members = std::to_array<std::string_view>({key_version, key_id, key_method, key_params});
 constexpr uint32_t parse_flags =
@@ -65,28 +69,28 @@ struct envelope_preflight : rapidjson::BaseReaderHandler<rapidjson::UTF8<>, enve
    }
    /// Record the kind of a value written directly under a request_field member of params.
    void record(token_kind token) {
-      if (depth == 2 && parameter)
+      if (depth == params_depth && parameter)
          parameter_kinds[*parameter] = token;
    }
    bool Key(const char* text, rapidjson::SizeType length, bool) {
       budget.check();
-      if (depth == 1) {
+      if (depth == root_depth) {
          root_key.assign(text, length);
          parameter.reset();
-      } else if (depth == 2 && root_key == key_params)
+      } else if (depth == params_depth && root_key == key_params)
          parameter = slot(std::string_view(text, length));
       return true;
    }
    bool String(const char*, rapidjson::SizeType, bool) {
-      if (depth == 1 && root_key == key_version)
+      if (depth == root_depth && root_key == key_version)
          version_string = true;
-      if (depth == 1 && root_key == key_method)
+      if (depth == root_depth && root_key == key_method)
          method_string = true;
       record(token_kind::string);
       return true;
    }
    bool RawNumber(const char*, rapidjson::SizeType, bool) {
-      if (depth == 1 && root_key == key_id)
+      if (depth == root_depth && root_key == key_id)
          id_number = true;
       record(token_kind::number);
       return true;
@@ -106,6 +110,11 @@ struct envelope_preflight : rapidjson::BaseReaderHandler<rapidjson::UTF8<>, enve
    }
 };
 
+/// Preserve embedded NUL bytes so validation never accepts a truncated spelling.
+std::string_view to_string_view(const rapidjson::Value& value) {
+   return {value.GetString(), value.GetStringLength()};
+}
+
 /// Why an object's member names fail a closed member list.
 enum class member_violation { unknown, duplicate };
 
@@ -114,7 +123,7 @@ std::optional<member_violation> find_member_violation(const rapidjson::Value& ob
                                                       std::span<const std::string_view> allowed) {
    std::set<std::string_view> names;
    for (auto member = object.MemberBegin(); member != object.MemberEnd(); ++member) {
-      const std::string_view name(member->name.GetString(), member->name.GetStringLength());
+      const std::string_view name = to_string_view(member->name);
       if (std::find(allowed.begin(), allowed.end(), name) == allowed.end())
          return member_violation::unknown;
       if (!names.insert(name).second)
@@ -197,11 +206,6 @@ int64_t parse_id(std::string_view number) {
    return id->negative ? -magnitude : magnitude;
 }
 
-/// Preserve embedded NUL bytes so validation never accepts a truncated spelling.
-std::string_view string_view(const rapidjson::Value& value) {
-   return {value.GetString(), value.GetStringLength()};
-}
-
 /// An optional integer member of params and the inclusive range its exact value must lie in.
 struct integer_parameter {
    std::string_view field;
@@ -226,7 +230,7 @@ std::optional<uint64_t> parse_integer_parameter(const rapidjson::Value& params, 
       return std::nullopt;
    const std::optional<integral_value> value =
       preflight.kind(parameter.field) == token_kind::number && member->value.IsString()
-         ? parse_integral(string_view(member->value), parameter.maximum)
+         ? parse_integral(to_string_view(member->value), parameter.maximum)
          : std::nullopt;
    if (!value || (value->negative && value->magnitude) || value->magnitude < parameter.minimum)
       throw query_error(error_kind::INVALID_PARAMS,
@@ -251,7 +255,7 @@ query_options parse_parameters(const rapidjson::Value& params, const envelope_pr
       throw query_error(error_kind::INVALID_PARAMS, invalid_params_message);
    query_options options;
    options.limit = parse_integer_parameter(params, preflight, limit_parameter);
-   options.offset = parse_integer_parameter(params, preflight, offset_parameter).value_or(0);
+   options.offset = parse_integer_parameter(params, preflight, offset_parameter).value_or(options.offset);
    if (const auto milliseconds = parse_integer_parameter(params, preflight, timeout_parameter)) {
       if (*milliseconds > static_cast<uint64_t>(config.timeout.count()))
          throw query_error(error_kind::INVALID_PARAMS,
@@ -281,7 +285,7 @@ query_request parse_request(std::string_view body, query_budget& budget) {
    if (find_member_violation(document, envelope_members))
       throw query_error(error_kind::INVALID_REQUEST, invalid_envelope_message);
    if (!document.HasMember(key_version) || !preflight.version_string || !document[key_version].IsString() ||
-       string_view(document[key_version]) != constants::version || !document.HasMember(key_method) ||
+       to_string_view(document[key_version]) != constants::version || !document.HasMember(key_method) ||
        !preflight.method_string || !document[key_method].IsString())
       throw query_error(error_kind::INVALID_REQUEST, invalid_envelope_message);
    query_request request;
@@ -291,13 +295,13 @@ query_request parse_request(std::string_view body, query_budget& budget) {
       if (id.IsNull())
          request.id = fc::variant();
       else if (preflight.id_number && id.IsString())
-         request.id = parse_id(string_view(id));
-      else if (id.IsString() && characters(string_view(id)) <= constants::max_id_characters)
-         request.id = std::string(string_view(id));
+         request.id = parse_id(to_string_view(id));
+      else if (id.IsString() && characters(to_string_view(id)) <= constants::max_id_characters)
+         request.id = std::string(to_string_view(id));
       else
          throw query_error(error_kind::INVALID_REQUEST, invalid_envelope_message);
    }
-   if (string_view(document[key_method]) != constants::method) {
+   if (to_string_view(document[key_method]) != constants::method) {
       request.invocation_error.emplace(error_kind::METHOD_NOT_FOUND, "Method not found");
       return request;
    }
@@ -313,7 +317,7 @@ query_request parse_request(std::string_view body, query_budget& budget) {
       request.invocation_error = error;
       return request;
    }
-   const auto sql = string_view(params[request_field::query]);
+   const auto sql = to_string_view(params[request_field::query]);
    if (sql.size() > budget.config.max_query_bytes) {
       request.invocation_error.emplace(error_kind::QUERY_LIMIT, "Query resource limit exceeded", std::nullopt,
                                        option::max_query_bytes);
