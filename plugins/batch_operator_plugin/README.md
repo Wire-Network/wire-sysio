@@ -161,8 +161,10 @@ verification is only as good as the outpost reads. A request whose record has le
 the outpost can no longer be verified and waits until `sysio` rules it. Ethereum keeps
 200 epochs by default, but Solana keeps only its last 10 records, so a Solana request
 must be verified within about 10 epochs. Before `sysio.chains::setoutpost` replaces an
-active outpost's deployment, let that chain's OPEN requests settle: the underwriter
-reads only the new deployment's records. Run one underwriter node per account.
+active outpost's deployment, let that chain's `sysio.synd` envelopes drain, those
+still waiting for a request included: the underwriter reads only the new deployment's
+records. Run one underwriter node per account, and bond from that account by no
+other means: a cap counts only the bonds its node makes.
 
 Size each cap for the most the token syndicates in one challenge window
 (`window_sec`, 3 hours by default) plus the time it takes to claim.
