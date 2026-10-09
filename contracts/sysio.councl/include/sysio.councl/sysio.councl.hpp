@@ -2,19 +2,20 @@
 
 /**
  * @file sysio.councl.hpp
- * @brief Council election contract — fills 21 council seats via a tier-1 → tier-2 → tier-3
- *        escalation ladder with strict-priority slate voting. See DESIGN.md for the full model.
+ * @brief Council election contract — fills 21 council seats through simultaneous flights and
+ *        shared voting rounds across all frozen owner tiers. See DESIGN.md for the full model.
  */
 
-#include <optional>
-#include <string>
-#include <sysio.councl/council_math.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/kv_global.hpp>
 #include <sysio/kv_scoped_table.hpp>
 #include <sysio/kv_table.hpp>
 #include <sysio/sysio.hpp>
 #include <sysio/system.hpp>
+
+#include <sysio.councl/council_math.hpp>
+
+#include <string>
 #include <vector>
 
 namespace sysio {
@@ -22,7 +23,8 @@ namespace sysio {
 /// Contract-wide constants and identifiers for sysio.councl.
 namespace councl {
 inline constexpr uint8_t SEATS = 21;                             ///< tier-1 owners == council seats
-inline constexpr uint8_t T1_VOTERS = 20;                         ///< SEATS - 1 (seat owner never votes)
+inline constexpr uint8_t NO_SEAT = SEATS;                        ///< unreserved candidate position
+inline constexpr uint32_t MAX_BATCH_ROWS = 1000;                 ///< snapshot/cleanup transaction limit
 inline constexpr uint8_t SLATE_SIZE = 3;                         ///< candidates per repcandidate
 inline constexpr uint8_t MIN_CANDIDATES = SEATS + 2;             ///< 23: <=20 elected before the last seat, +3
 inline constexpr uint32_t MAX_CANDIDATES = 1000;                 ///< hard bound on one generation's candidate pool
@@ -32,12 +34,14 @@ inline constexpr uint64_t MAX_TIME_SLOT_SEC = 30 * 24 * 60 * 60; ///< thirty-day
 constexpr name ROA_ACCOUNT = "sysio.roa"_n; ///< owner of the nodeowners / roastate tables
 constexpr name SYSTEM_ACCOUNT = "sysio"_n;  ///< system RAM pool payer
 
-/// Lifecycle phase of the active election attempt.
+/// Lifecycle phase of the shared election round.
 enum class election_phase : uint8_t {
-   AWAIT_REP = 0, ///< waiting for the active proposer's nomination
-   VOTING = 1,    ///< a slate is open for voting
-   BACKSTOP = 2,  ///< awaiting governance assignment
-   DONE = 3       ///< all seats are filled
+   NOMINATING = 0, ///< vacant T1 owners may replace their flights
+   GENERATING = 1, ///< missing flights generated in seat order from a frozen seed
+   VOTING = 2,     ///< immutable flights share one inclusive voting deadline
+   TABULATING = 3, ///< final tallies processed in seat order
+   CONTINUING = 4, ///< next crank opens a fresh round for remaining vacancies
+   DONE = 5        ///< all 21 seats filled
 };
 
 /// Lifecycle phase of election initialization and generation cleanup.
@@ -56,8 +60,8 @@ enum class cleanup_mode : uint8_t {
    COMPLETED = 3     ///< retire a completed generation while retaining council history
 };
 
-/// Tier responsible for an attempt or completed seat.
-enum class election_tier : uint8_t { GOVERNANCE = 0, T1 = 1, T2 = 2, T3 = 3 };
+/// Frozen voting tier, with stable values matching the ROA owner tiers.
+enum class election_tier : uint8_t { T1 = 1, T2 = 2, T3 = 3 };
 
 /// Ordered cleanup stages used by the batched `purge` action.
 enum class cleanup_stage : uint8_t {
@@ -65,12 +69,12 @@ enum class cleanup_stage : uint8_t {
    ROSTER = 1,
    TIER2 = 2,
    TIER3 = 3,
-   REMAP = 4,
-   COUNCIL = 5,
-   COMPLETE = 6
+   FLIGHTS = 4,
+   BALLOTS = 5,
+   COUNCIL = 6,
+   COMPLETE = 7
 };
 
-static_assert(T1_VOTERS == SEATS - 1, "tier-1 electorate must exclude exactly the seat owner");
 static_assert(SLATE_SIZE == 3, "the fixed action and state schema require a three-candidate slate");
 } // namespace councl
 
@@ -79,7 +83,7 @@ static_assert(SLATE_SIZE == 3, "the fixed action and state schema require a thre
  *
  * Actions fall into three groups: registration (`addcandidate`/`rmcandidate`), staged init
  * (`startinit`/`loadtier`/`finalizeinit`, plus `reset`/`purge`), and the election
- * (`repcandidate`/`vote`/`settle`/`forceback`/`forceassign`). `stir` is a public,
+ * (`repcandidate`/`vote`/`settle`). `stir` is a public,
  * caller-authenticated entropy crank.
  */
 class [[sysio::contract("sysio.councl")]] council : public contract {
@@ -110,7 +114,7 @@ public:
    [[sysio::action]]
    void loadtier(uint8_t tier, uint32_t max_rows);
 
-   /// Finalize init: verify the tier-2/3 snapshots are complete and open seat 0. Governance only.
+   /// Finalize init: verify the tier-2/3 snapshots and open simultaneous nominations. Governance only.
    [[sysio::action]]
    void finalizeinit();
 
@@ -126,31 +130,31 @@ public:
 
    // ---- Election -----------------------------------------------------------
 
-   /// The active proposer nominates a slate of 3 distinct, un-elected candidates. When supplied,
-   /// `expected_round` makes a stale or deadline-crossing request fail instead of acting as a
-   /// settlement-only crank.
+   /// Submit or atomically replace the owner's three ordered candidates in this election round.
    [[sysio::action]]
-   void repcandidate(name proposer, name c1, name c2, name c3, std::optional<uint64_t> expected_round);
+   void repcandidate(name proposer, name c1, name c2, name c3, uint64_t election_gen, uint64_t round_id);
 
-   /// Cast an independent yes/no on each of the 3 current-slate candidates. One vote per voter
-   /// per attempt is enforced by a compact bitmap; the proposer never votes on their own slate.
-   /// `expected_round` provides optional fail-loud round binding.
+   /// One occurrence's independent public YES/NO decisions, identified by its stable seat.
+   struct flight_vote {
+      uint8_t seat;
+      bool v1 = false, v2 = false, v3 = false;
+      SYSLIB_SERIALIZE(flight_vote, (seat)(v1)(v2)(v3))
+   };
+
+   /// Cast one immutable ballot covering every eligible flight in ascending seat order.
+   /// Required identities bind the signature to the frozen candidates, election, and round.
+   /// Every accepted ballot contributes once to its tier's round-wide threshold denominator,
+   /// including a T1 ballot whose only remaining flight is its excluded own seat.
    [[sysio::action]]
-   void vote(name voter, bool v1, bool v2, bool v3, std::optional<uint64_t> expected_round);
+   void vote(name voter, uint64_t election_gen, uint64_t round_id, checksum256 flight_hash,
+             std::vector<flight_vote> votes);
 
-   /// Public caller-authenticated crank: push a timed-out attempt forward and stir entropy.
+   /// Authenticated public crank. Process at most max_steps seats (1..21), in cursor order.
+   /// Generation and tabulation have separate transitions; retries cannot reopen old rounds.
    [[sysio::action]]
-   void settle(name caller);
+   void settle(name caller, uint64_t election_gen, uint64_t round_id, uint32_t max_steps);
 
-   /// Governance recovery: move an elapsed active attempt directly to BACKSTOP.
-   [[sysio::action]]
-   void forceback();
-
-   /// Governance backstop: seat an un-elected candidate when tier-3 is exhausted (phase BACKSTOP).
-   [[sysio::action]]
-   void forceassign(name member);
-
-   /// Public caller-authenticated entropy crank; also advances elapsed election state.
+   /// Authenticated entropy contribution. Never alters a seed already frozen for generation.
    [[sysio::action]]
    void stir(name caller);
 
@@ -162,54 +166,44 @@ public:
    struct [[sysio::table("config")]] config_state {
       councl::init_phase init_phase = councl::init_phase::REG;
       uint64_t time_slot_sec = 0;
-      uint8_t network_gen = 0;   ///< roa network generation captured at startinit
-      uint64_t election_gen = 0; ///< scope for all per-election tables
-      uint32_t n2 = 0;           ///< tier-2 snapshot size (set at finalize)
-      uint32_t n3 = 0;           ///< tier-3 snapshot size
-      uint32_t t2_loaded = 0;    ///< tier-2 loaded-row count and next snapshot index
-      uint32_t t3_loaded = 0;    ///< tier-3 loaded-row count and next snapshot index
-      uint64_t t2_cursor = 0;         ///< last roa primary owner inspected by the tier-2 scan
-      uint64_t t3_cursor = 0;         ///< last roa primary owner inspected by the tier-3 scan
+      uint8_t network_gen = 0;       ///< roa network generation captured at startinit
+      uint64_t election_gen = 0;     ///< scope for all per-election tables
+      uint32_t n2 = 0;               ///< tier-2 snapshot size (set at finalize)
+      uint32_t n3 = 0;               ///< tier-3 snapshot size
+      uint32_t t2_loaded = 0;        ///< tier-2 loaded-row count and next snapshot index
+      uint32_t t3_loaded = 0;        ///< tier-3 loaded-row count and next snapshot index
+      uint64_t t2_cursor = 0;        ///< last roa primary owner inspected by the tier-2 scan
+      uint64_t t3_cursor = 0;        ///< last roa primary owner inspected by the tier-3 scan
       bool t2_scan_complete = false; ///< tier-2 scan reached the end of the roa owner scope
       bool t3_scan_complete = false; ///< tier-3 scan reached the end of the roa owner scope
-      uint32_t cand_count = 0;        ///< registered candidates (current generation)
+      uint32_t cand_count = 0;       ///< registered candidates (current generation)
       councl::cleanup_mode cleanup_mode = councl::cleanup_mode::NONE;
       councl::cleanup_stage cleanup_stage = councl::cleanup_stage::COMPLETE;
-      uint8_t cleanup_seat = 0; ///< remap scope currently being purged
 
       SYSLIB_SERIALIZE(
          config_state,
-         (init_phase)(time_slot_sec)(network_gen)(election_gen)(n2)(n3)(t2_loaded)(t3_loaded)(t2_cursor)(t3_cursor)
-            (t2_scan_complete)(t3_scan_complete)(cand_count)(cleanup_mode)(cleanup_stage)(cleanup_seat))
+         (init_phase)(time_slot_sec)(network_gen)(election_gen)(n2)(n3)(t2_loaded)(t3_loaded)(t2_cursor)(t3_cursor)(t2_scan_complete)(t3_scan_complete)(cand_count)(cleanup_mode)(cleanup_stage))
    };
    using config_t = sysio::kv::global<"config"_n, config_state>;
 
-   /// Live election cursor + current round tallies + entropy accumulator.
+   /// Bounded phase/progress state. Round identities remain fresh while winners are retained.
    struct [[sysio::table("state")]] election_state {
-      councl::election_phase phase = councl::election_phase::AWAIT_REP;
-      uint8_t active_seat = 0; ///< 0..20
-      councl::election_tier tier = councl::election_tier::T1;
-      name proposer{};
-      uint64_t round_id = 0;      ///< monotonic attempt counter (also selection nonce)
-      time_point round_open_ts{}; ///< when the current attempt opened (propose-deadline base)
+      councl::election_phase phase = councl::election_phase::NOMINATING;
+      uint64_t round_id = 0;
+      time_point round_open_ts{};
       time_point vote_deadline{};
-      uint32_t elect_N = 0;         ///< electorate size of the current round
-      uint32_t eligible_voters = 0; ///< voters expected this round (excludes the proposer)
-      uint32_t votes_cast = 0;
-      uint32_t tier3_available = 0; ///< untried tier-3 proposers for the current seat
+      uint8_t cursor = 0; ///< next original seat for generation or tabulation
       uint8_t seats_filled = 0;
-      std::vector<uint8_t> voted_bitmap; ///< one bit per frozen tier member; prevents duplicate votes
-      // current slate + independent per-candidate tallies
-      name c1{}, c2{}, c3{};
-      uint32_t yes1 = 0, yes2 = 0, yes3 = 0;
-      uint32_t no1 = 0, no2 = 0, no3 = 0;
-      // entropy accumulator (Variant B)
+      uint32_t t1_ballots = 0;   ///< accepted T1 ballots this round, including own-flight exclusions
+      uint32_t t2_ballots = 0;   ///< accepted T2 ballots this round
+      uint32_t t3_ballots = 0;   ///< accepted T3 ballots this round
+      checksum256 flight_hash{}; ///< canonical generation/round/ordered-flight commitment
+      checksum256 round_seed{};  ///< frozen once on entry to GENERATING
       checksum256 acc{};
       uint64_t stir_count = 0;
-
       SYSLIB_SERIALIZE(
          election_state,
-         (phase)(active_seat)(tier)(proposer)(round_id)(round_open_ts)(vote_deadline)(elect_N)(eligible_voters)(votes_cast)(tier3_available)(seats_filled)(voted_bitmap)(c1)(c2)(c3)(yes1)(yes2)(yes3)(no1)(no2)(no3)(acc)(stir_count))
+         (phase)(round_id)(round_open_ts)(vote_deadline)(cursor)(seats_filled)(t1_ballots)(t2_ballots)(t3_ballots)(flight_hash)(round_seed)(acc)(stir_count))
    };
    using state_t = sysio::kv::global<"state"_n, election_state>;
 
@@ -262,60 +256,76 @@ public:
       name account;
       std::string handle;
       bool elected = false;
-      SYSLIB_SERIALIZE(candidate_row, (account)(handle)(elected))
+      uint64_t claim_round = 0; ///< older claims are logically released when a new round opens
+      std::vector<uint8_t> positions = {councl::NO_SEAT, councl::NO_SEAT, councl::NO_SEAT};
+      SYSLIB_SERIALIZE(candidate_row, (account)(handle)(elected)(claim_round)(positions))
    };
    using candidates_t = sysio::kv::scoped_table<"candidates"_n, cand_key, candidate_row>;
 
-   /// Fisher-Yates virtual-to-actual index remap for O(1) tier-3 selection.
-   struct [[sysio::table("tier3remap")]] remap_row {
-      uint64_t virtual_idx;
-      uint64_t actual_idx;
-      SYSLIB_SERIALIZE(remap_row, (virtual_idx)(actual_idx))
+   /// Public counts for one tier in one flight; votes_cast is an audit count, not the denominator.
+   struct tier_tally {
+      uint32_t votes_cast = 0;
+      uint32_t yes1 = 0, yes2 = 0, yes3 = 0;
+      SYSLIB_SERIALIZE(tier_tally, (votes_cast)(yes1)(yes2)(yes3))
    };
-   using tier3_remap_t = sysio::kv::scoped_table<"tier3remap"_n, index_key, remap_row>;
+
+   /// Current/latest flight at a stable seat. Old-round rows are ignored and overwritten.
+   struct [[sysio::table("flights")]] flight_row {
+      uint64_t seat;
+      uint64_t round_id;
+      std::vector<name> candidates;
+      bool automatic = false;
+      std::vector<tier_tally> tallies = std::vector<tier_tally>(3);
+      SYSLIB_SERIALIZE(flight_row, (seat)(round_id)(candidates)(automatic)(tallies))
+   };
+   using flights_t = sysio::kv::scoped_table<"flights"_n, index_key, flight_row>;
+
+   /// Public ballot, immutable within its round; overwritten only by this voter in a later round.
+   struct [[sysio::table("ballots")]] ballot_row {
+      name voter;
+      uint64_t round_id;
+      councl::election_tier tier;
+      checksum256 flight_hash;
+      std::vector<flight_vote> votes;
+      SYSLIB_SERIALIZE(ballot_row, (voter)(round_id)(tier)(flight_hash)(votes))
+   };
+   using ballots_t = sysio::kv::scoped_table<"ballots"_n, cand_key, ballot_row>;
 
    /// A filled council seat (the 21 outputs). Scoped by generation.
    struct [[sysio::table("council")]] council_row {
       uint64_t seat;
       name seat_owner;                   ///< roster[seat] — the tier-1 owner of this seat
-      councl::election_tier filled_tier; ///< tier that filled this seat, or GOVERNANCE
-      name proposer;                     ///< the account whose slate won
+      councl::election_tier filled_tier; ///< tier whose final YES tally filled this seat
+      name proposer;                     ///< frozen T1 seat owner
       name member;                       ///< the elected candidate
-      SYSLIB_SERIALIZE(council_row, (seat)(seat_owner)(filled_tier)(proposer)(member))
+      uint64_t round_id;                 ///< round in which the seat was filled
+      SYSLIB_SERIALIZE(council_row, (seat)(seat_owner)(filled_tier)(proposer)(member)(round_id))
    };
    using council_t = sysio::kv::scoped_table<"council"_n, index_key, council_row>;
 
 private:
-   /// Fold a generation and bounded seat-like value into one scoped-table key.
-   static uint64_t gr_scope(uint64_t gen, uint64_t x);
-
-   // Entropy + selection
+   /// Reject stale signed requests before any state mutation.
+   void check_round(const config_state& cfg, const election_state& st, uint64_t generation, uint64_t round) const;
    /// Mix an authenticated action tag, actor, and monotonic stir count into the accumulator.
    void do_stir(election_state& st, name action_tag, name actor);
-   /// Derive a deterministic virtual index for the current seat and round.
-   uint64_t selection_index(const election_state& st, uint32_t available) const;
-   /// Select the tier-2 proposer without mutating the frozen snapshot.
-   name select_tier2_proposer(const election_state& st, const config_state& cfg) const;
-   /// Select and remove one tier-3 proposer through the persistent Fisher-Yates remap.
-   name select_tier3_proposer(election_state& st, const config_state& cfg);
-
-   // State machine
-   /// Resolve completed voting or advance an elapsed nomination/voting attempt.
-   void resolve_or_settle(election_state& st, const config_state& cfg);
-   /// Evaluate the current slate and apply a win or failed-attempt transition when conclusive.
-   void try_resolve(election_state& st, const config_state& cfg);
-   /// Persist a filled council seat and advance the election cursor.
-   void seat_member(election_state& st, const config_state& cfg, name member, councl::election_tier filled_tier,
-                    name proposer);
-   /// Complete the current attempt with its strict-priority winner.
-   void win_attempt(election_state& st, const config_state& cfg, name winner);
-   /// Escalate a failed attempt or enter the governance backstop when no proposer remains.
-   void fail_attempt(election_state& st, const config_state& cfg);
-   /// Open a fresh nomination attempt for the specified tier and proposer.
-   void open_tier_attempt(election_state& st, councl::election_tier tier, name proposer);
-   /// Advance to the next seat, or mark the election done after the final seat.
-   void advance_seat(election_state& st, const config_state& cfg);
-
+   /// Open nominations for every vacancy and reset tier ballot counts, preserving candidates,
+   /// frozen snapshots, and winners. Old-round flights, tallies, and claims become inactive.
+   void open_round(election_state& st);
+   /// Atomically replace one flight and its candidate-position reservations.
+   void save_flight(const config_state& cfg, const election_state& st, uint8_t seat,
+                    const std::vector<name>& candidates, bool automatic);
+   /// Release current claims and remove a mutable flight during atomic replacement.
+   void release_flight(const config_state& cfg, const election_state& st, uint8_t seat);
+   /// Generate missing flights in original seat order with a fixed per-round seed.
+   void generate_flights(election_state& st, const config_state& cfg, uint32_t max_steps);
+   /// Commit all finalized flights, then open the shared voting window.
+   void open_voting(election_state& st, const config_state& cfg);
+   /// Process a bounded prefix of remaining seats using tier/position priority and each tier's
+   /// round-wide submitted-ballot denominator, including T1 ballots omitting their own flight.
+   void tabulate(election_state& st, const config_state& cfg, uint32_t max_steps);
+   /// Persist a unique member/result without advancing any unrelated seat.
+   void seat_member(election_state& st, const config_state& cfg, uint8_t seat, name member,
+                    councl::election_tier filled_tier);
    // roa helpers
    /// Read the current ROA network generation.
    uint8_t roa_network_gen() const;
