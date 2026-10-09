@@ -2231,7 +2231,8 @@ try {
    BOOST_REQUIRE_EQUAL(success(), push(SYND_ACCOUNT, synd_abi, config::system_account_name, "setconfig"_n, mvo()
       ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("LIQETH"))("synd_fee_bps", 0)
       ("desynd_fee_bps", 0)("synd_burst", 1'000'000 * LIQ_UNIT)("synd_refill", 1'000'000 * LIQ_UNIT)
-      ("desynd_burst", 0)("desynd_refill", 0)("window_sec", window_sec)("bounty", 0)("challenge_extra", 0)));
+      ("desynd_burst", 0)("desynd_refill", 0)("window_sec", window_sec)("bounty", 0)("challenge_extra", 0)
+      ("min_desyndicate", 1)));
    setup_wire_token();
    enable_epoch_advancement();
    const auto request_of = [&](uint64_t id) {
