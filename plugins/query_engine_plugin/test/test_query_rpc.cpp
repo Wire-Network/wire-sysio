@@ -46,8 +46,7 @@ fc::variant expect_invalid_params(const std::string& members, const query_config
    const auto envelope = create_error(&request, *request.invocation_error);
    validate_document(fc::json::to_string(envelope, fc::time_point::maximum()), "query-response");
    BOOST_CHECK_EQUAL(envelope["id"].as_string(), request_id);
-   BOOST_CHECK_EQUAL(envelope[response_field::error][response_field::code].as_int64(),
-                     error_code(error_kind::INVALID_PARAMS));
+   BOOST_CHECK_EQUAL(envelope[response_field::error][response_field::code].as_int64(), -32602);
    BOOST_CHECK_EQUAL(envelope[response_field::error][response_field::data][response_field::kind].as_string(),
                      magic_enum::enum_name(error_kind::INVALID_PARAMS));
    return envelope;

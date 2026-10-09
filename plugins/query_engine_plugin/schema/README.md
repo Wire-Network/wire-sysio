@@ -11,14 +11,12 @@ Request `params` hold the required `query` and the optional paging members `limi
 `query-timeout-ms` as INVALID_PARAMS, because a request may only lower the deadline. Request
 integers are exact JSON numbers; response counters are unsigned decimal strings.
 
-Success and error envelopes are mutually exclusive. A successful result is always complete for the
-submitted SQL, including its explicit LIMIT. Budget/decode failures contain only an error.
-`page` describes the returned window over the complete evaluated output: the requested `offset`,
-the effective `limit` (the smaller of SQL LIMIT and the request limit, or null), `returned_rows`
-(equal to `stats.returned_rows`), `total_rows` (rows passing WHERE, or groups passing HAVING) and
-`has_more`, which is true exactly when `min(offset, total_rows) + returned_rows < total_rows`. A
-page with `has_more: true` is still `complete`: nothing was truncated, more rows simply lie beyond
-the window.
+Success and error envelopes are mutually exclusive. A successful result is never silently truncated:
+`page` says which window of the complete evaluated output it holds. Budget/decode failures contain
+only an error. `page` carries the requested `offset`, the effective `limit` (the smaller of SQL LIMIT
+and the request limit, or null), `returned_rows` (equal to `stats.returned_rows`), `total_rows` (rows
+passing WHERE, or groups passing HAVING) and `has_more`, which is true exactly when
+`min(offset, total_rows) + returned_rows < total_rows`.
 
 `source.owners` lists distinct contract accounts in chain-name order. `state.abis` contains the
 matching owner/hash entries in the same order. Every row was captured at `state.block_id` in one

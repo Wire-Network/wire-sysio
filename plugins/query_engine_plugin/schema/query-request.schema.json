@@ -49,7 +49,7 @@
         },
         "limit": {
           "$ref": "#/definitions/requestInteger",
-          "description": "Maximum rows in this page, combined with an SQL LIMIT by taking the smaller; 0 returns columns only. The page is still capped by query-max-result-rows."
+          "description": "Maximum rows in this page, combined with an SQL LIMIT by taking the smaller; 0 returns no rows. A page above query-max-result-rows fails with QUERY_LIMIT."
         },
         "offset": {
           "$ref": "#/definitions/requestInteger",

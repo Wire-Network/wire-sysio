@@ -160,20 +160,12 @@ struct query_http_handler::impl {
          respond(nullptr, std::move(callback), create_error(nullptr, error));
          return;
       }
-      // The parse budget becomes the request budget: the validated limit/offset page the output and a
-      // requested timeout_ms may only move the deadline, still measured from ingress, earlier. A
-      // rejection there is an invocation error of the parsed request, answered like any other.
-      if (!parsed.invocation_error) {
-         try {
-            budget->apply_request_options(parsed.options);
-         } catch (const query_error& error) {
-            parsed.invocation_error = error;
-         }
-      }
       if (parsed.invocation_error) {
          respond(&parsed, std::move(callback), create_error(&parsed, *parsed.invocation_error));
          return;
       }
+      // Cannot throw: timeout_ms is at most the configured timeout, whose deadline this budget already holds.
+      budget->apply_request_options(parsed.options);
       auto task = std::make_shared<http_task>();
       task->request = std::move(parsed);
       task->budget = std::move(budget);
