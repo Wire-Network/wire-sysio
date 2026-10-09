@@ -419,6 +419,7 @@ BOOST_AUTO_TEST_CASE(rulings_are_claimed_and_held_or_forfeited_bonds_reported) {
    BOOST_CHECK(out.held == std::vector<uint64_t>{2});
    BOOST_CHECK(out.blocked.empty());
    BOOST_CHECK(out.forfeited == std::vector<uint64_t>{3});
+   BOOST_CHECK(out.forfeit_claims == std::vector<uint64_t>{3});   // what it earned is settled with the housekeeping
    // The forfeited 90 no longer counts against the cap; the unclaimed valid and held 10s do: 20 + 80 fits in 100.
    BOOST_REQUIRE_EQUAL(1u, out.accepts.size());
    BOOST_CHECK_EQUAL(4u, out.accepts[0].request_id);
@@ -463,6 +464,7 @@ BOOST_AUTO_TEST_CASE(nothing_is_bonded_approved_or_claimed_while_the_cord_is_pul
    BOOST_CHECK(out.accepts.empty());
    BOOST_CHECK(out.approves.empty());
    BOOST_CHECK(out.claims.empty());
+   BOOST_CHECK(out.forfeit_claims.empty());
    BOOST_CHECK(out.waiting.empty());   // a frozen pass does not report waits
    // What needs people is still reported.
    BOOST_CHECK(out.held == std::vector<uint64_t>{3});
@@ -472,6 +474,7 @@ BOOST_AUTO_TEST_CASE(nothing_is_bonded_approved_or_claimed_while_the_cord_is_pul
    out = plan_actions(in);
    BOOST_CHECK(out.approves == std::vector<uint64_t>{1});
    BOOST_CHECK(out.claims == std::vector<uint64_t>{2});
+   BOOST_CHECK(out.forfeit_claims == std::vector<uint64_t>{4});
    BOOST_REQUIRE_EQUAL(1u, out.accepts.size());
    BOOST_CHECK_EQUAL(5u, out.accepts[0].request_id);
 }
@@ -524,6 +527,30 @@ BOOST_AUTO_TEST_CASE(a_forfeit_is_reported_after_anyone_claims_or_prunes_the_bon
    const auto out = plan_actions(in);
    BOOST_CHECK((out.forfeited == std::vector<uint64_t>{1, 2}));
    BOOST_CHECK(out.claims.empty());
+   BOOST_CHECK(out.forfeit_claims.empty());   // nothing of ours is left to settle on either
+}
+
+BOOST_AUTO_TEST_CASE(what_a_forfeited_bond_earned_is_claimed_with_the_housekeeping) {
+   auto in = eth_inputs();
+   const auto invalid = [](uint64_t id) {
+      auto r  = synd_request(id, eth, id, liqeth, 10);
+      r.state = request_state::INVALID;
+      return r;
+   };
+   in.requests = {invalid(1), invalid(2), invalid(3), invalid(4)};
+   // Unclaimed, claimed with WIRE the pool could not cover, and settled; 4 is someone else's.
+   in.bonds    = {{1, {.request_id = 1, .amount = liqeth_units(10)}},
+                  {2, {.request_id = 2, .amount = liqeth_units(10), .paid = true, .owed_wire = wire_units(5)}},
+                  {3, {.request_id = 3, .amount = liqeth_units(10), .paid = true}}};
+   in.bonded   = {1, 2, 3};
+   auto out = plan_actions(in);
+   BOOST_CHECK((out.forfeit_claims == std::vector<uint64_t>{1, 2}));
+   BOOST_CHECK(out.claims.empty());   // never claimed every pass: a bond that earned nothing has nothing to claim
+   BOOST_CHECK((out.forfeited == std::vector<uint64_t>{1, 2, 3}));
+
+   in.frozen = true;   // claims are refused while the cord is pulled
+   out = plan_actions(in);
+   BOOST_CHECK(out.forfeit_claims.empty());
 }
 
 BOOST_AUTO_TEST_CASE(owed_yield_is_claimed_after_the_principal) {
@@ -543,10 +570,12 @@ BOOST_AUTO_TEST_CASE(owed_yield_is_claimed_after_the_principal) {
                   {4, {.request_id = 4, .amount = liqeth_units(10), .paid = true, .owed_wire = wire_units(5)}}};
    auto out = plan_actions(in);
    BOOST_CHECK((out.claims == std::vector<uint64_t>{1, 2}));   // never the settled or the forfeited one
+   BOOST_CHECK(out.forfeit_claims == std::vector<uint64_t>{4});
 
    in.frozen = true;
    out = plan_actions(in);
    BOOST_CHECK(out.claims.empty());
+   BOOST_CHECK(out.forfeit_claims.empty());
 }
 
 BOOST_AUTO_TEST_CASE(only_approved_valid_and_invalid_are_terminal) {

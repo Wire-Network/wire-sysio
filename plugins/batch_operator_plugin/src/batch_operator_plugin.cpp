@@ -80,8 +80,8 @@ namespace {
    constexpr uint32_t UNDERWRITER_CRANK_LIMIT = 16;
    /// Requests one `sysio.bond::prune`, and envelopes one `sysio.synd::pruneenv`, act on.
    constexpr uint32_t UNDERWRITER_PRUNE_LIMIT = 64;
-   /// Spacing of the underwriter's prunes.
-   constexpr fc::microseconds UNDERWRITER_PRUNE_INTERVAL = fc::minutes(10);
+   /// Spacing of the underwriter's housekeeping: its prunes, and its claims of what a forfeited bond earned.
+   constexpr fc::microseconds UNDERWRITER_HOUSEKEEPING_INTERVAL = fc::minutes(10);
    /// Spacing of the underwriter's rebuild of its outpost clients from `sysio.chains`.
    constexpr fc::microseconds UNDERWRITER_CLIENTS_INTERVAL = fc::minutes(1);
    /// Spacing of the underwriter's crank while no envelope request is in play: a bucket refill or a cleared cord
@@ -312,7 +312,7 @@ struct batch_operator_plugin::impl {
    // Underwriter state, see `underwriter_tick`. Touched only from the underwriter's cron job.
    std::map<fc::slug_name, built_outpost_client> underwriter_clients;   ///< by outpost chain code
    fc::time_point                           underwriter_clients_at;   ///< last rebuild of `underwriter_clients`
-   fc::time_point                           underwriter_pruned_at;    ///< last prune
+   fc::time_point                           underwriter_housekeeping_at;   ///< last housekeeping
    fc::time_point                           underwriter_cranked_at;   ///< last crank
    /// The lowest `sysio.bond::requests` id the next pass reads (`underwriter::next_scan_start`); 0 reads them all.
    uw::request_id_t                         underwriter_scan_from = 0;
@@ -1322,8 +1322,9 @@ struct batch_operator_plugin::impl {
       push_plan(plan, uw::synd_has_work(in->requests), now);
       underwriter_scan_from = uw::next_scan_start(underwriter_scan_from, in->requests, in->bonds, underwriter_bonded);
 
-      if (now - underwriter_pruned_at >= UNDERWRITER_PRUNE_INTERVAL) {
-         underwriter_pruned_at = now;
+      if (now - underwriter_housekeeping_at >= UNDERWRITER_HOUSEKEEPING_INTERVAL) {
+         underwriter_housekeeping_at = now;
+         for (const uw::request_id_t id : plan.forfeit_claims) underwriter_claim(id);
          underwriter_prune(*tokens);
       }
    }
@@ -1404,12 +1405,15 @@ struct batch_operator_plugin::impl {
          underwriter_push(uw::bond::account, uw::bond::action_approve,
                           fc::mutable_variant_object()(uw::bond::field::request_id, id));
       }
-      for (const uw::request_id_t id : plan.claims) {
-         underwriter_push(uw::bond::account, uw::bond::action_claim,
-                          fc::mutable_variant_object()
-                             (uw::bond::field::request_id, id)
-                             (uw::bond::field::account,    underwriter_auth.actor));
-      }
+      for (const uw::request_id_t id : plan.claims) underwriter_claim(id);
+   }
+
+   /// Push `sysio.bond::claim` of the underwriter's bond on request `id`.
+   void underwriter_claim(uw::request_id_t id) {
+      underwriter_push(uw::bond::account, uw::bond::action_claim,
+                       fc::mutable_variant_object()
+                          (uw::bond::field::request_id, id)
+                          (uw::bond::field::account,    underwriter_auth.actor));
    }
 
    /// Report what the plan leaves to people: a freeze, a halt, challenged and forfeited requests, and requests left

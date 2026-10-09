@@ -126,8 +126,9 @@ requests `sysio.synd` issues for syndication envelopes. Each poll it:
    `sysio.synd` has not acknowledged, otherwise every 5 minutes.
 4. **Approves** its requests once their challenge window has passed by chain time,
    and **claims** them once approved or ruled VALID, and again while yield the pool
-   could not yet cover is owed. It prunes `sysio.bond` and `sysio.synd` every 10
-   minutes.
+   could not yet cover is owed. Every 10 minutes it claims what a forfeited bond
+   earned, which pays it into `sysio.liq` so the request can be pruned, and prunes
+   `sysio.bond` and `sysio.synd`.
 
 What it cannot act on waits and is logged on every poll it holds; deduplicating
 those lines is left to log tooling:
@@ -141,7 +142,7 @@ those lines is left to log tooling:
 | No cap, over the cap, or too little balance | The request waits |
 | The `sysio.andon` cord is pulled | Nothing is bonded, approved or claimed until it clears |
 | A request is challenged (HELD) | Reported, whether or not we bonded it: `sysio` rules it |
-| A bond of ours is ruled INVALID while the node runs, even one since claimed or pruned | Bonding stops until a restart; approvals and claims go on. A forfeited bond is never claimed |
+| A bond of ours is ruled INVALID while the node runs, even one since claimed or pruned | Bonding stops until a restart; approvals and claims go on. A forfeited bond's principal is not returned |
 | A table read fails, or a row behind one of our bonds does not decode | The pass does nothing |
 
 ### Underwriter setup

@@ -362,6 +362,9 @@ struct plan {
    std::vector<request_id_t>    held;           ///< bonded by the underwriter and challenged: `sysio` must rule
    std::vector<request_id_t>    blocked;        ///< challenged before anyone bonded: stalls its pair until ruled
    std::vector<request_id_t>    forfeited;      ///< bonded by the underwriter and ruled INVALID
+   /// Ruled INVALID with what the underwriter's bond earned still unsettled: claimed with the housekeeping. The claim
+   /// returns no principal; it pays the earnings into `sysio.liq`, which lets `sysio.bond` prune the request.
+   std::vector<request_id_t>    forfeit_claims;
    std::vector<waiting_request> waiting;
 };
 
@@ -410,6 +413,8 @@ inline plan plan_actions(const plan_inputs& in) {
    for (const request* r : ordered) {
       const auto bond = in.bonds.find(r->id);
       const bool ours = bond != in.bonds.end();
+      // Our bond row is unpaid, or WIRE the pool could not yet cover is still owed on it: a claim has work to do.
+      const bool unsettled = ours && (!bond->second.paid || bond->second.owed_wire.get_amount() > 0);
       switch (r->state) {
       case request_state::OPEN: {
          if (in.frozen || in.halted || r->bonded >= r->covered) break;
@@ -437,12 +442,11 @@ inline plan plan_actions(const plan_inputs& in) {
          break;
       case request_state::APPROVED:
       case request_state::VALID:
-         if (!in.frozen && ours && (!bond->second.paid || bond->second.owed_wire.get_amount() > 0)) {
-            out.claims.push_back(r->id);
-         }
+         if (!in.frozen && unsettled) out.claims.push_back(r->id);
          break;
-      case request_state::INVALID:
-         break;   // reported through `forfeited`, never claimed
+      case request_state::INVALID:   // reported through `forfeited`
+         if (!in.frozen && unsettled) out.forfeit_claims.push_back(r->id);
+         break;
       case request_state::HELD:
          if (ours) out.held.push_back(r->id);
          else out.blocked.push_back(r->id);
