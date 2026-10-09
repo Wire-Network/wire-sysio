@@ -178,6 +178,7 @@ bool is_fully_settled(const opreg::operator_entry& op) {
 /// Preserve already-banked yield before erasing a principal-settled operator. Both callers are
 /// caller-signed actions, so an impossible accumulator overflow rejects the erase atomically.
 /// This does not create backed claims or touch a yield pool; claimyield later applies its cap.
+/// Cast explicitly because CDT defines uint128_t as a multi-token macro.
 void preserve_yield_debt(name self, const opreg::operator_entry& op) {
    opreg::yielddebts_t debts(self);
    for (const auto& balance : op.balances) {
@@ -186,7 +187,7 @@ void preserve_yield_debt(name self, const opreg::operator_entry& op) {
       const opreg::remitclaim_key key{op.account.value, balance.token_code};
       auto debt = debts.try_get(key).value_or(opreg::yield_debt{
          .account = op.account, .token_code = balance.token_code});
-      check(debt.owed_wire <= ~uint128_t{0} - owed, yield_debt_overflow_msg);
+      check(debt.owed_wire <= ~static_cast<uint128_t>(0) - owed, yield_debt_overflow_msg);
       debt.owed_wire += owed;
       debts.upsert(ram_payer, key, debt);
    }
@@ -1442,7 +1443,7 @@ void opreg::claimyield(name account, sysio::slug_name token_code) {
       const yield_pool_key pool_key{token_code};
       auto pool = pools.try_get(pool_key).value_or(custody::yield_pool{});
       custody::position banked{.owed_wire = static_cast<uint64_t>(
-         std::min(debt->owed_wire, uint128_t{std::numeric_limits<uint64_t>::max()}))};
+         std::min(debt->owed_wire, static_cast<uint128_t>(std::numeric_limits<uint64_t>::max())))};
       const uint64_t taken = take_bounded_yield(banked, pool, room);
       credited = taken;
       debt->owed_wire -= taken;
