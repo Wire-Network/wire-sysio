@@ -525,6 +525,35 @@ BOOST_FIXTURE_TEST_CASE(delete_last_finalizer_key_test, finalizer_key_tester) tr
 }
 FC_LOG_AND_RETHROW() // delete_last_finalizer_key_test
 
+// A deleted key can be registered again. The new registration gets a fresh id, because key ids are
+// never reused, even once no row holds the old one.
+BOOST_FIXTURE_TEST_CASE(reregister_deleted_finalizer_key_gets_new_id, finalizer_key_tester) try {
+   BOOST_REQUIRE_EQUAL( success(), regproducer(alice) );
+
+   BOOST_REQUIRE_EQUAL( success(), register_finalizer_key(alice, finalizer_key_1, pop_1) );
+   const uint64_t first_id = get_finalizer_info(alice)["active_key_id"].as_uint64();
+
+   // Deleting alice's only key erases her finalizer row along with the key row.
+   BOOST_REQUIRE_EQUAL( success(), delete_finalizer_key(alice, finalizer_key_1) );
+   BOOST_REQUIRE( get_finalizer_info(alice).is_null() );
+   BOOST_REQUIRE( get_finalizer_key_info(first_id).is_null() );
+
+   BOOST_REQUIRE_EQUAL( success(), register_finalizer_key(alice, finalizer_key_1, pop_1) );
+
+   // The key is active again under a new id, and the old id stays vacant.
+   const auto alice_info = get_finalizer_info(alice);
+   const uint64_t second_id = alice_info["active_key_id"].as_uint64();
+   BOOST_REQUIRE_GT( second_id, first_id );
+   BOOST_REQUIRE_EQUAL( 1, alice_info["finalizer_key_count"].as_uint64() );
+   BOOST_REQUIRE_EQUAL( finalizer_key_binary_1, alice_info["active_key_binary"].as_string() );
+
+   const auto key_info = get_finalizer_key_info(second_id);
+   BOOST_REQUIRE_EQUAL( "alice1111111", key_info["finalizer_name"].as_string() );
+   BOOST_REQUIRE_EQUAL( finalizer_key_1, key_info["finalizer_key"].as_string() );
+   BOOST_REQUIRE( get_finalizer_key_info(first_id).is_null() );
+}
+FC_LOG_AND_RETHROW() // reregister_deleted_finalizer_key_gets_new_id
+
 // After registering keys and waiting for update_ranked_producers, test key activation
 BOOST_FIXTURE_TEST_CASE(multi_activation_tests, finalizer_key_tester) try {
    auto producer_names = activate_producers_with_operators();
