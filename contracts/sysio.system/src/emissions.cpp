@@ -50,9 +50,6 @@ constexpr int64_t  MS_PER_SECOND          = 1000;
 // Basis-point denominator for all category / sub-split ratios.
 constexpr int64_t  BPS_DENOMINATOR        = 10000;
 
-constexpr sysio::name CAPITAL_ACCOUNT            = "sysio.dclaim"_n;
-// The shadow-liq token draws the yield kicker through fundclaim beside sysio.dclaim.
-constexpr sysio::name LIQ_ACCOUNT                = "sysio.liq"_n;
 constexpr sysio::name GOVERNANCE_ACCOUNT         = "sysio.gov"_n;
 // Capex ("capital expenditure") bucket lives on sysio.ops -- operational spend.
 constexpr sysio::name CAPEX_OPERATIONS_ACCOUNT   = "sysio.ops"_n;
@@ -60,7 +57,6 @@ constexpr sysio::name TOKEN_CONTRACT             = "sysio.token"_n;
 constexpr sysio::name ROA_CONTRACT               = "sysio.roa"_n;
 
 namespace memo {
-   constexpr std::string_view capital          = "T5 capital";
    constexpr std::string_view capex            = "T5 capex";
    constexpr std::string_view governance       = "T5 governance";
    constexpr std::string_view batch_op_reward  = "T5 batch operator reward";
@@ -152,19 +148,14 @@ int64_t get_wire_balance(name account) {
 // account the protocol does not control therefore hands it an abort switch over every parent
 // inline action.
 //
-// THREE call sites remain, and every one targets a PROTOCOL-CONTROLLED account. What makes each
-// safe differs, and the difference is the thing to preserve:
+// Two automatic call sites target protocol-controlled holding accounts with no deployed code:
 //
-//   * `fundclaim`             -> `sysio.dclaim`  — DEPLOYED contracts, not bare accounts. Safe
-//                                `sysio.liq`       because both are protocol-controlled and neither
-//                                                  has a failing `sysio.token::transfer` notify
-//                                                  path; that invariant must hold as they evolve.
 //   * `payepoch` (capex)      -> `sysio.ops`     — no code deployed
 //   * `payepoch` (governance) -> `sysio.gov`     — no code deployed
 //
 // The two `payepoch` pushes are on the never-throw `advance` path, so those two accounts are the
 // ones that could abort epoch advancement if code were ever deployed on them — see the standing
-// constraint at that call site. Adding a fourth AUTOMATIC destination outside protocol control
+// constraint at that call site. Adding another AUTOMATIC destination outside protocol control
 // reopens the vulnerability this file exists to close.
 //
 // The scope is automatic payouts on never-throw paths. A claimant-authorized action MAY transfer
@@ -202,18 +193,11 @@ void credit_pay(name self, name to, int64_t amount, std::string_view /*memo_str*
    if (amount <= 0) return;
    const uint64_t amt = static_cast<uint64_t>(amount);
 
-   // The expiry stamp is RECORDED, not acted on: no sweep is wired against `payclaims` (see the
-   // note on the table). Refreshing it on every credit means an account still being paid never
-   // ages, so the stamp already carries the "last had activity" signal a future retention pass
-   // (WIRE-339) needs, rather than that history starting the day a sweep lands.
-   const uint32_t now_sec = current_time_point().sec_since_epoch();
-
    payclaims_t claims(self);
    sysio::opp::claimable::credit(claims, self, payclaim_key{to.value},
-                                 pay_claim{.account_name = to}, amt,
-                                 now_sec + PAY_CLAIM_WINDOW_SEC);
+                                 pay_claim{.account_name = to}, amt);
 
-   // Reserve the credited WIRE so fundclaim and the epoch gate cannot re-commit it. Saturates on
+   // Reserve the credited WIRE so treasury withdrawals and the epoch gate cannot re-commit it. Saturates on
    // the same cap as the row itself, keeping the counter consistent with the sum of the rows.
    payclaimtot_t tot_tbl(self);
    auto tot = tot_tbl.get_or_default(pay_claim_total{});
@@ -278,10 +262,8 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
                  "annual_min_emission must be <= annual_max_emission");
 
    // BPS splits. compute + capex + governance bound what payepoch transfers
-   // each period; the remainder (10000 - that sum) is the implicit capital
-   // reserve, drained lazily by sysio.dclaim::onreward via fundclaim. Sum
-   // exactly 10000 means no implicit reserve (capital draws come out of
-   // future periods' headroom). Sum > 10000 would over-commit period_emission.
+   // each period; any remainder stays in the treasury. Sum > 10000
+   // would over-commit period_emission.
    const uint32_t paid_at_payepoch_bps =
       static_cast<uint32_t>(cfg.compute_bps)
       + static_cast<uint32_t>(cfg.capex_bps)
@@ -484,7 +466,7 @@ void system_contract::claimnodedis(const sysio::name& account_name) {
    sysio::check(info.can_claim, "claim amount below minimum threshold");
 
    // Node-owner vesting draws on the SAME `sysio` WIRE balance that backs unclaimed epoch pay, so
-   // it must respect the same reserve `fundclaim` and the epoch readiness gate hold. `payclaims`
+   // it must respect the same reserve the epoch readiness gate holds. `payclaims`
    // rows are already owed: paying them out is a promise this contract has made and cannot revoke,
    // whereas this withdrawal is a claim on the free remainder.
    //
@@ -529,7 +511,7 @@ void system_contract::claimnodedis(const sysio::name& account_name) {
 //
 // The row is erased before the transfer is queued (inside pay_out), so a notify handler that
 // re-enters claimpay finds no row and cannot double spend. The outstanding-total counter is
-// decremented in lockstep, releasing the reserve that fundclaim and the epoch gate hold against it.
+// decremented in lockstep, releasing the reserve held against treasury withdrawals and the epoch gate.
 void system_contract::claimpay(const sysio::name& account_name) {
    require_auth(account_name);
 
@@ -542,7 +524,7 @@ void system_contract::claimpay(const sysio::name& account_name) {
    auto tot = tot_tbl.get_or_default(pay_claim_total{});
    // Defensive floor: the counter and the row sum are maintained together, so `paid` can only
    // exceed `outstanding` if they have already diverged. Clamping keeps the reserve from
-   // underflowing into a huge value that would freeze fundclaim and the epoch gate permanently.
+   // underflowing into a huge value that would freeze treasury withdrawals and the epoch gate permanently.
    tot.outstanding = (paid >= tot.outstanding) ? 0 : tot.outstanding - paid;
    tot_tbl.set(tot, get_self());
 }
@@ -702,11 +684,8 @@ void system_contract::rcrdbatch(uint32_t epoch_index, std::vector<sysio::name> m
 //   - per-epoch emission > 0 (treasury not at floor)
 //   - sysio's WIRE balance >= period_emission (pending + this epoch's share)
 //
-// Capital is NOT paid here. The implicit capital reserve
-// (period_emission - compute - capex - governance) stays in sysio's balance
-// and is drained lazily by fundclaim as sysio.dclaim::onreward fires, so
-// dclaim has funds the moment a claim is credited rather than at the next
-// pay-epoch.
+// The unallocated remainder (period_emission - compute - capex - governance)
+// stays in sysio's balance. LIQ yield draws no treasury bonus.
 //
 // Swap-fee rewards: when immutable roster history is complete and contains at
 // least one non-empty roster, the batch-operator share of collected swap fees
@@ -753,10 +732,8 @@ void system_contract::payepoch(uint32_t epoch_index,
 
    // ----- Category splits -----
    // payepoch transfers compute + capex + governance only. The implicit
-   // capital reserve (period_emission - compute - capex - governance) stays
-   // in sysio's balance and is drained lazily by fundclaim as
-   // sysio.dclaim::onreward fires. Sum-to-10000 BPS means zero reserve;
-   // sum < 10000 leaves the remainder available for capital coverage.
+   // remainder (period_emission - compute - capex - governance) stays
+   // in sysio's balance. Sum-to-10000 BPS means no unallocated remainder.
    const int64_t compute_amount    = split_bps(period_emission, cfg.compute_bps);
    const int64_t capex_amount      = split_bps(period_emission, cfg.capex_bps);
    const int64_t governance_amount = split_bps(period_emission, cfg.governance_bps);
@@ -1089,13 +1066,10 @@ void system_contract::payepoch(uint32_t epoch_index,
    }
 
    // =======================================================================
-   // Category buckets: fixed accounts, no opreg filter. Capital is NOT paid
-   // here -- it drains lazily via fundclaim per incoming OPP claim, so
-   // dclaim has WIRE the moment the claim is credited rather than waiting
-   // for the next pay-epoch.
+   // Category buckets: fixed accounts, no opreg filter. The unallocated
+   // remainder stays in the treasury; LIQ yield has no capital draw.
    // =======================================================================
-   // PUSHED, not credited -- the deliberate exception to this contract's pull rule, and the same
-   // exception `fundclaim` already makes for `sysio.dclaim`.
+   // PUSHED, not credited -- the deliberate exception to this contract's pull rule.
    //
    // The pull model exists because a payout to an account the protocol does not control lets that
    // account's transfer-notify handler abort `advance`. These two are protocol-owned holding
@@ -1105,9 +1079,9 @@ void system_contract::payepoch(uint32_t epoch_index,
    // Crediting them instead would strand the money. A claim needs `require_auth(account_name)`,
    // and a `sysio.*` account can neither sign nor be acted for here: `sysio.roa` forces
    // `net_weight`/`cpu_weight` to zero for every account whose prefix is `sysio`
-   // (`is_sysio_account`), so they cannot pay for a transaction, and unlike `sysio.dclaim` they
+   // (`is_sysio_account`), so they cannot pay for a transaction. They also
    // have no contract of their own to emit the claim inline. Their pay would accrue in
-   // `payclaims` forever while `payclaimtot` reserved the backing WIRE against `fundclaim` and the
+   // `payclaims` forever while `payclaimtot` reserved the backing WIRE against treasury withdrawals and the
    // epoch readiness gate -- a permanent, growing reservation of WIRE nobody can move.
    //
    // This is a standing constraint on the two accounts, not a reason to revisit this call: any
@@ -1174,83 +1148,6 @@ void system_contract::payepoch(uint32_t epoch_index,
          state.epoch_count - first_it->epoch_count + 1;
       if (live_count <= cfg.epoch_log_retention_count) break;
       epoch_table.erase(first_it);
-   }
-}
-
-// fundclaim - transfer up to `amount` WIRE from sysio's drainable pool to
-// `recipient`, one of the two capital drains: sysio.dclaim, inline from
-// sysio.dclaim::onreward as each STAKING_REWARD attestation lands, and
-// sysio.liq, inline from sysio.liq::addyield for the kicker on each yield
-// intake. Either way the recipient is funded against the credit it just took
-// on before anyone can attempt to claim it.
-//
-// Never throws for those two callers. STAKING_REWARD dispatch from sysio.msgch
-// must not be aborted on emissions-side conditions (the never-throw contract
-// for OPP inbound handlers), so a pool-too-small case caps the transfer at
-// what's available and accrues the unfunded delta to
-// t5state.capital_shortfall_total for operator visibility. A recipient that is
-// not a drain is refused, which reaches only the stranger who asked.
-//
-// The transfer cap is the minimum of three caps that all must hold:
-//   * `amount`                                                -- requested
-//   * `lifetime headroom - pending_emission_amount`           -- accounting
-//   * `sysio WIRE balance - pending_emission_amount
-//                         - outstanding payclaims`            -- balance
-// Both accounting and balance caps reserve `pending_emission_amount` for
-// the next payepoch. `pending_emission_amount` is curve emission already
-// accrued via accrueepoch but not yet paid; payepoch will distribute
-// it across compute/capital/capex/governance. Drawing against those funds
-// here would either trip the emissions readiness gate at the next epoch
-// boundary (BALANCE_INSUFFICIENT) or leave payepoch's credits unbacked.
-//
-// The balance cap ALSO reserves outstanding `payclaims`. Those balances have
-// already been credited to producers / standbys / batch operators but not yet
-// pulled, so the WIRE backing them is still sitting in this account's
-// token balance while being fully owed. Spending it here would leave a later
-// `claimpay` unable to transfer, stranding earned pay -- the claimable-payout
-// equivalent of the "overdrawn balance" abort this cap has always guarded.
-//
-// Negative or zero requests are silent no-ops (defensive). The amount
-// actually transferred counts toward total_distributed -- the curve sees
-// less remaining headroom on its next per-epoch computation and emissions
-// auto-throttle to match real claim load.
-void system_contract::fundclaim(name recipient, int64_t amount) {
-   require_auth(recipient);
-   check(recipient == CAPITAL_ACCOUNT || recipient == LIQ_ACCOUNT,
-         "fundclaim: recipient is not a capital drain");
-
-   if (amount <= 0) return;
-
-   t5state_t t5s(get_self());
-   if (!t5s.exists()) return; // pre-init: silently absorb
-   auto state = t5s.get();
-
-   payclaimtot_t claim_tot_tbl(get_self());
-   const int64_t claims_reserve =
-      static_cast<int64_t>(claim_tot_tbl.get_or_default(pay_claim_total{}).outstanding);
-
-   const auto cfg = get_emit_cfg(get_self());
-   const int64_t lifetime_headroom    = cfg.t5_distributable - cfg.t5_floor - state.total_distributed;
-   const int64_t pending_reserve      = state.pending_emission_amount;
-   const int64_t sysio_balance        = get_wire_balance(get_self());
-   const int64_t accounting_available = lifetime_headroom - pending_reserve;
-   const int64_t balance_available    = sysio_balance - pending_reserve - claims_reserve;
-
-   const int64_t cap = std::min({amount, accounting_available, balance_available});
-   const int64_t to_transfer = (cap > 0) ? cap : 0;
-   const int64_t shortfall   = amount - to_transfer;
-
-   if (to_transfer > 0) {
-      send_wire_transfer(get_self(), recipient, to_transfer, memo::capital);
-      state.total_distributed += to_transfer;
-   }
-
-   if (shortfall > 0) {
-      state.capital_shortfall_total += shortfall;
-   }
-
-   if (to_transfer > 0 || shortfall > 0) {
-      t5s.set(state, get_self());
    }
 }
 

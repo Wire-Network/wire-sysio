@@ -1,7 +1,6 @@
 {
   "schema_version": 1,
   "network": "mainnet-launch",
-  "t5_reserve_allocation": "10000000000000000",
   "chains": [
     { "kind": "CHAIN_KIND_WIRE", "code": "WIRE", "external_chain_id": 0,
       "name": "Wire Network", "description": "WIRE depot chain" },
@@ -30,35 +29,5 @@
       "precision": 9, "chain_code": "ETHEREUM",
       "contract_address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
       "is_native": false }
-  ],
-  "reserves": [
-    { "code": "PRIMARY", "chain_code": "ETHEREUM", "token_code": "ETH",
-      "name": "ETH primary reserve",
-      "description": "TBD-BY-ECONOMICS: placeholder amounts",
-      "initial_chain_amount": "1000000000000",
-      "initial_wire_amount": "2000000000000000",
-      "connector_weight_bps": 5000, "is_private": false, "owner": "" },
-    { "code": "PRIMARY", "chain_code": "ETHEREUM", "token_code": "USDC",
-      "name": "USDC primary reserve",
-      "description": "TBD-BY-ECONOMICS: placeholder amounts",
-      "initial_chain_amount": "2000000000000000",
-      "initial_wire_amount": "2000000000000000",
-      "connector_weight_bps": 5000, "is_private": false, "owner": "" },
-    { "code": "PRIMARY", "chain_code": "ETHEREUM", "token_code": "USDT",
-      "name": "USDT primary reserve",
-      "description": "TBD-BY-ECONOMICS: placeholder amounts",
-      "initial_chain_amount": "2000000000000000",
-      "initial_wire_amount": "2000000000000000",
-      "connector_weight_bps": 5000, "is_private": false, "owner": "" },
-    { "code": "PRIMARY", "chain_code": "SOLANA", "token_code": "SOL",
-      "name": "SOL primary reserve",
-      "description": "TBD-BY-ECONOMICS: placeholder amounts",
-      "initial_chain_amount": "10000000000000",
-      "initial_wire_amount": "2000000000000000",
-      "connector_weight_bps": 5000, "is_private": false, "owner": "" }
-  ],
-  "uwrit": {
-    "fee_bps": 10,
-    "collateral_lock_duration_ms": "43200000"
-  }
+  ]
 }

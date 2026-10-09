@@ -215,10 +215,9 @@ static constexpr uint16_t COMPUTE_BPS            = 4000;
 static constexpr uint16_t CAPEX_BPS              = 2000;
 static constexpr uint16_t GOV_BPS                = 1000;
 // Implicit capital reserve = whatever the three explicit shares leave behind.
-// At the fixture defaults (4000 + 2000 + 1000), this is 3000 bps. Drained
-// lazily via sysio.dclaim::onreward -> sysio.system::fundclaim, not paid at
-// payepoch -- so it doesn't appear in t5state.total_distributed until the
-// underlying fundclaim transfer happens.
+// At the fixture defaults (4000 + 2000 + 1000), this is 3000 bps,
+// held in the treasury, not paid at payepoch and excluded from
+// t5state.total_distributed.
 // The implicit capital reserve at these defaults is
 // 10000 - COMPUTE_BPS - CAPEX_BPS - GOV_BPS = 3000 bps.
 static constexpr uint16_t PRODUCER_BPS           = 7000;
@@ -236,7 +235,7 @@ static constexpr uint32_t T_EPOCH_SECS            = 60;
 // Helper: amount NOT transferred at payepoch when no producers / batch
 // members are paid. Equals producer_pool + batch_pool (compute share, both
 // undistributed) + implicit capital reserve (never paid at payepoch --
-// drained lazily via fundclaim). The implicit reserve naturally absorbs
+// retained in the treasury). The implicit reserve naturally absorbs
 // the rounding dust from per-share split_bps floors, so the cleanest
 // definition is `emission - (everything payepoch actually transfers)`,
 // which collapses to `emission - capex_split - gov_split` when no
@@ -499,29 +498,7 @@ public:
       produce_blocks(1);
    }
 
-   /// Deploy the real sysio.dclaim contract on the placeholder account and
-   /// mark it privileged. Required only by tests that push actions signed by
-   /// sysio.dclaim (e.g. fundclaim, which `require_auth(CAPITAL_ACCOUNT)`):
-   /// the sysio.* accounts get a 0-NET ROA policy, so without a deployed
-   /// contract + privileged flag they cannot afford the inline transaction
-   /// NET. Idempotent.
-   void deploy_dclaim_for_signing() {
-      const account_name DCLAIM = "sysio.dclaim"_n;
-      if (get_roa_policy(DCLAIM, "nodedaddy"_n).is_null()) {
-         auto tr = addpolicy_ram_only("nodedaddy"_n, DCLAIM,
-            asset::from_string("500.0000 SYS"));
-         BOOST_REQUIRE( tr );
-         BOOST_REQUIRE( !tr->except );
-         produce_blocks(1);
-      }
-      set_code( DCLAIM, contracts::dclaim_wasm() );
-      set_abi ( DCLAIM, contracts::dclaim_abi().data() );
-      set_privileged( DCLAIM );
-      produce_blocks(1);
-   }
-
-   /// The same for sysio.liq, the other capital drain: deployed and privileged
-   /// so a test can sign fundclaim as it.
+   /// Deploy and privilege sysio.liq for native shadow collateral tests.
    void deploy_liq_for_signing() {
       const account_name LIQ = "sysio.liq"_n;
       if (!control->db().find<account_object, by_name>(LIQ)) {
@@ -645,14 +622,6 @@ public:
          signer,
          "initt5"_n,
          mvo()("start_time", start)
-      );
-   }
-
-   action_result fundclaim( account_name signer, account_name recipient, int64_t amount ) {
-      return push_system_action(
-         signer,
-         "fundclaim"_n,
-         mvo()("recipient", recipient)("amount", amount)
       );
    }
 
@@ -1078,7 +1047,7 @@ public:
 
    /// Total epoch pay credited but not yet pulled, across every recipient (the `payclaimtot`
    /// singleton the contract maintains). This WIRE still sits in the treasury's token balance
-   /// while being fully owed, which is why `fundclaim` and the epoch readiness gate both reserve
+   /// while being fully owed, which is why treasury withdrawals and the epoch readiness gate both reserve
    /// it -- and why treasury-balance assertions must account for it.
    int64_t pay_outstanding_total() {
       auto data = get_row_by_account(config::system_account_name, config::system_account_name,
@@ -2123,7 +2092,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_requires_sysio_auth, sysio_emissions_tester 
 
 BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_category_bps, sysio_emissions_tester ) try {
    // compute + capex + governance must be <= 10000 (the remainder is the
-   // implicit capital reserve drained lazily by fundclaim).
+   // unallocated remainder retained in the treasury).
    auto cfg = mvo()
       ("t1_allocation", int64_t(1)) ("t2_allocation", int64_t(1)) ("t3_allocation", int64_t(1))
       ("t1_duration", uint32_t(1))  ("t2_duration", uint32_t(1))  ("t3_duration", uint32_t(1))
@@ -3213,7 +3182,7 @@ BOOST_FIXTURE_TEST_CASE( category_split_matches_basis_points, sysio_emissions_te
    BOOST_REQUIRE_EQUAL( compute, test_split_bps(total, COMPUTE_BPS) );
    // capex gets only its base split (no producer dust redirect)
    BOOST_REQUIRE_EQUAL( capex, test_split_bps(total, CAPEX_BPS) );
-   // capital is NOT in the epoch_log -- drained lazily via fundclaim, not at payepoch.
+   // the unallocated remainder is not an epoch_log payout category.
    BOOST_REQUIRE( !log.get_object().contains("capital_amount") );
 } FC_LOG_AND_RETHROW()
 
@@ -3228,7 +3197,7 @@ BOOST_FIXTURE_TEST_CASE( governance_gets_remainder_no_dust_loss, sysio_emissions
    int64_t gov     = log["governance_amount"].as<int64_t>();
 
    // governance is its own BPS share of total (independent of compute/capex):
-   // the implicit capital reserve (drained lazily via fundclaim) is what
+   // the unallocated treasury remainder is what
    // absorbs any unallocated remainder, not governance.
    BOOST_REQUIRE_EQUAL( gov, test_split_bps(total, uint16_t(1000)) );
 } FC_LOG_AND_RETHROW()
@@ -3499,6 +3468,37 @@ BOOST_FIXTURE_TEST_CASE( blocking_producer_cannot_stall_payepoch, sysio_emission
    BOOST_REQUIRE_EQUAL( 0, get_wire_balance("producerb"_n).get_amount() );
 } FC_LOG_AND_RETHROW()
 
+/// Earned pay remains reserved and claimable after years without a new credit.
+BOOST_FIXTURE_TEST_CASE( payclaims_never_expire, sysio_emissions_tester ) try {
+   create_t5_holding_accounts();
+   setup_producers(3);
+   wait_for_producer_schedule();
+   produce_complete_cycles(3, 2);
+
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+
+   const auto producer = "producera"_n;
+   const int64_t owed = pay_claimable(producer);
+   const int64_t outstanding = pay_outstanding_total();
+   const int64_t balance_before_claim = get_wire_balance(producer).get_amount();
+   BOOST_REQUIRE_GT( owed, 0 );
+
+   constexpr uint32_t INACTIVE_DAYS = 3 * 365;
+   produce_block();
+   produce_block(fc::days(INACTIVE_DAYS));
+   produce_blocks(2);
+   BOOST_REQUIRE_EQUAL( owed, pay_claimable(producer) );
+   BOOST_REQUIRE_EQUAL( outstanding, pay_outstanding_total() );
+
+   BOOST_REQUIRE_EQUAL( success(),
+      push_system_action(producer, "claimpay"_n, mvo()("account_name", producer)) );
+   BOOST_REQUIRE_EQUAL( balance_before_claim + owed, get_wire_balance(producer).get_amount() );
+   BOOST_REQUIRE_EQUAL( 0, pay_claimable(producer) );
+   BOOST_REQUIRE_EQUAL( outstanding - owed, pay_outstanding_total() );
+} FC_LOG_AND_RETHROW()
+
 // ---------------------------------------------------------------------------
 // Holding account stub transfers
 // ---------------------------------------------------------------------------
@@ -3528,14 +3528,13 @@ BOOST_FIXTURE_TEST_CASE( holding_accounts_receive_correct_amounts, sysio_emissio
    // so what they "received" is a real balance delta. They are protocol-owned holding accounts
    // with no code (no notify handler to abort `advance`) and, being `sysio.*`, no net/cpu to sign
    // a claim with and no contract to emit one inline: crediting them would strand the pay in
-   // `payclaims` permanently. `sysio.dclaim` is pushed for the same reason, via fundclaim.
+   // `payclaims` permanently.
    int64_t dclaim_received   = get_wire_balance("sysio.dclaim"_n).get_amount() - dclaim_before.get_amount();
    int64_t gov_received   = get_wire_balance("sysio.gov"_n).get_amount() - gov_before.get_amount();
    int64_t batch_received = get_wire_balance("sysio.batch"_n).get_amount() - batch_before.get_amount();
    int64_t ops_received   = get_wire_balance("sysio.ops"_n).get_amount() - ops_before.get_amount();
 
-   // dclaim is not funded at payepoch anymore -- capital draws are lazy
-   // via sysio.dclaim::onreward -> sysio.system::fundclaim.
+   // DClaim receives no emissions allocation.
    BOOST_REQUIRE_EQUAL( dclaim_received, 0 );
    BOOST_REQUIRE_EQUAL( gov_received, gov );
    // sysio.batch is not an emissions recipient anymore -- batch pay goes to the
@@ -4056,7 +4055,7 @@ BOOST_FIXTURE_TEST_CASE( multi_epoch_cumulative_accounting, sysio_emissions_test
 BOOST_FIXTURE_TEST_CASE( category_splits_sum_to_emission, sysio_emissions_tester ) try {
    // Verify compute + capex + governance + implicit_capital_reserve == total_emission.
    // The implicit capital reserve isn't recorded in epoch_log (drained lazily
-   // by fundclaim); back it out from the curve total to confirm the math.
+   // in the treasury); back it out from the curve total to confirm the math.
    create_t5_holding_accounts();
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
@@ -4111,7 +4110,7 @@ BOOST_FIXTURE_TEST_CASE( epoch_log_records_all_fields, sysio_emissions_tester ) 
       test_scale_annual_to_epoch(ANNUAL_INITIAL_EMISSION, 60) );
 
    // All recorded category amounts are positive (capital_amount is no
-   // longer in epoch_log -- drained lazily via fundclaim).
+   // longer in epoch_log -- retained in the treasury).
    BOOST_REQUIRE( log["compute_amount"].as<int64_t>() > 0 );
    BOOST_REQUIRE( log["capex_amount"].as<int64_t>() > 0 );
    BOOST_REQUIRE( log["governance_amount"].as<int64_t>() > 0 );
@@ -4653,7 +4652,7 @@ BOOST_FIXTURE_TEST_CASE( opreg_unregistered_account_cannot_become_producer, sysi
 } FC_LOG_AND_RETHROW()
 
 // Node-owner vesting draws on the same `sysio` WIRE balance that backs unclaimed epoch pay, so it
-// has to respect the same reserve `fundclaim` and the epoch gate hold. Without that, a vested owner
+// has to respect the same reserve the epoch gate holds. Without that, a vested owner
 // can withdraw WIRE already promised to a `payclaims` row, leaving the later `claimpay` unpayable
 // and `payepoch` balance-blocked from then on. That exposure is new: before payouts became
 // claimable, epoch pay had already left the treasury by the time a node claim ran.
@@ -5178,165 +5177,6 @@ BOOST_FIXTURE_TEST_CASE( pay_cadence_change_via_setemitcfg_takes_effect, sysio_e
       BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), 0 );
       BOOST_REQUIRE_EQUAL( state["period_start_epoch"].as<uint32_t>(), 3u );
    }
-} FC_LOG_AND_RETHROW()
-
-// ---------------------------------------------------------------------------
-// fundclaim: per-onreward immediate funding for sysio.dclaim
-// ---------------------------------------------------------------------------
-
-BOOST_FIXTURE_TEST_CASE( fundclaim_requires_the_recipients_auth, sysio_emissions_tester ) try {
-   create_t5_holding_accounts();
-   deploy_dclaim_for_signing();
-   const uint32_t start = head_secs() - ONE_EPOCH - 1;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   // alice has no claim to sysio.dclaim's authority.
-   create_user_accounts({ "alice"_n });
-   auto r = fundclaim( "alice"_n, "sysio.dclaim"_n, int64_t(1'000'000) );
-   BOOST_REQUIRE( r != success() );
-   require_substr( r, "missing authority of sysio.dclaim" );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( fundclaim_refuses_a_recipient_that_is_not_a_drain, sysio_emissions_tester ) try {
-   create_t5_holding_accounts();
-   const uint32_t start = head_secs() - ONE_EPOCH - 1;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   // alice signs for herself; only the two drains may be funded.
-   create_user_accounts({ "alice"_n });
-   auto r = fundclaim( "alice"_n, "alice"_n, int64_t(1'000'000) );
-   BOOST_REQUIRE( r != success() );
-   require_substr( r, "recipient is not a capital drain" );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( fundclaim_transfers_and_tracks_distributed, sysio_emissions_tester ) try {
-   create_t5_holding_accounts();
-   deploy_dclaim_for_signing();
-   const uint32_t start = head_secs() - ONE_EPOCH - 1;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   const asset sysio_before  = get_wire_balance_paid( config::system_account_name );
-   const asset dclaim_before = get_wire_balance_paid( "sysio.dclaim"_n );
-   const int64_t distributed_before = get_t5_state()["total_distributed"].as<int64_t>();
-
-   const int64_t amt = int64_t(50'000'000'000);   // 50 WIRE
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, "sysio.dclaim"_n, amt ) );
-
-   const asset sysio_after  = get_wire_balance_paid( config::system_account_name );
-   const asset dclaim_after = get_wire_balance_paid( "sysio.dclaim"_n );
-   const auto state = get_t5_state();
-
-   BOOST_REQUIRE_EQUAL( sysio_before.get_amount()  - sysio_after.get_amount(),  amt );
-   BOOST_REQUIRE_EQUAL( dclaim_after.get_amount() - dclaim_before.get_amount(), amt );
-   BOOST_REQUIRE_EQUAL( state["total_distributed"].as<int64_t>(), distributed_before + amt );
-   BOOST_REQUIRE_EQUAL( state["capital_shortfall_total"].as<int64_t>(), 0 );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( fundclaim_no_op_for_zero_or_negative, sysio_emissions_tester ) try {
-   create_t5_holding_accounts();
-   deploy_dclaim_for_signing();
-   const uint32_t start = head_secs() - ONE_EPOCH - 1;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   const asset dclaim_before = get_wire_balance_paid( "sysio.dclaim"_n );
-   const int64_t distributed_before = get_t5_state()["total_distributed"].as<int64_t>();
-
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, "sysio.dclaim"_n, int64_t(0) ) );
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, "sysio.dclaim"_n, int64_t(-100) ) );
-
-   BOOST_REQUIRE_EQUAL( get_wire_balance_paid( "sysio.dclaim"_n ).get_amount(),
-                        dclaim_before.get_amount() );
-   BOOST_REQUIRE_EQUAL( get_t5_state()["total_distributed"].as<int64_t>(),
-                        distributed_before );
-   BOOST_REQUIRE_EQUAL( get_t5_state()["capital_shortfall_total"].as<int64_t>(), 0 );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( fundclaim_caps_to_remaining_pool_and_records_shortfall, sysio_emissions_tester ) try {
-   // Squeeze t5_distributable down to a small headroom over t5_floor so the
-   // next fundclaim has a hard cap. Verify the partial transfer and the
-   // shortfall accumulator.
-   create_t5_holding_accounts();
-   deploy_dclaim_for_signing();
-   const uint32_t start = head_secs() - ONE_EPOCH - 1;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   // Shrink drainable headroom to exactly 1000 subunits via a fresh emitcfg.
-   // The post-init guard requires t5_distributable >= t5_floor + total_distributed,
-   // so set t5_floor to 0 and t5_distributable just above current total_distributed.
-   const int64_t already = get_t5_state()["total_distributed"].as<int64_t>();
-   const int64_t headroom = 1000;
-   auto cfg = mvo()
-      ("t1_allocation", T1_ALLOCATION.get_amount())
-      ("t2_allocation", T2_ALLOCATION.get_amount())
-      ("t3_allocation", T3_ALLOCATION.get_amount())
-      ("t1_duration", T1_DURATION) ("t2_duration", T2_DURATION) ("t3_duration", T3_DURATION)
-      ("min_claimable", MIN_CLAIMABLE_AMOUNT)
-      ("t5_distributable", already + headroom)
-      ("t5_floor", int64_t(0))
-      ("target_annual_decay_bps", TARGET_ANNUAL_DECAY_BPS)
-      ("annual_initial_emission", ANNUAL_INITIAL_EMISSION)
-      ("annual_max_emission", ANNUAL_MAX_EMISSION)
-      // annual_min_emission=0 so the post-init guard (per_epoch_min <= remaining)
-      // doesn't reject the deliberately-tiny pool used by this test.
-      ("annual_min_emission", int64_t(0))
-      ("compute_bps", COMPUTE_BPS)
-      ("capex_bps", CAPEX_BPS) ("governance_bps", GOV_BPS)
-      ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", T_STANDBY_END_RANK)("standby_bps", T_STANDBY_BPS)
-      ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
-   BOOST_REQUIRE_EQUAL( success(), setemitcfg( config::system_account_name, cfg ) );
-
-   const asset dclaim_before = get_wire_balance_paid( "sysio.dclaim"_n );
-
-   // Request 3x the headroom; expect partial transfer of `headroom`, shortfall = 2x.
-   const int64_t request   = headroom * 3;
-   const int64_t shortfall = request - headroom;
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, "sysio.dclaim"_n, request ) );
-
-   const asset dclaim_after = get_wire_balance_paid( "sysio.dclaim"_n );
-   const auto state = get_t5_state();
-   BOOST_REQUIRE_EQUAL( dclaim_after.get_amount() - dclaim_before.get_amount(), headroom );
-   BOOST_REQUIRE_EQUAL( state["total_distributed"].as<int64_t>(), already + headroom );
-   BOOST_REQUIRE_EQUAL( state["capital_shortfall_total"].as<int64_t>(), shortfall );
-
-   // A further request after pool is exhausted is a full shortfall.
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, "sysio.dclaim"_n, int64_t(500) ) );
-   const auto state2 = get_t5_state();
-   BOOST_REQUIRE_EQUAL( get_wire_balance_paid( "sysio.dclaim"_n ).get_amount(),
-                        dclaim_after.get_amount() );
-   BOOST_REQUIRE_EQUAL( state2["total_distributed"].as<int64_t>(), already + headroom );
-   BOOST_REQUIRE_EQUAL( state2["capital_shortfall_total"].as<int64_t>(), shortfall + 500 );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( fundclaim_silent_when_t5state_missing, sysio_emissions_tester ) try {
-   // initt5 NOT called, so t5state.exists() is false. fundclaim must absorb
-   // the call without throwing or mutating any state.
-   create_t5_holding_accounts();
-   deploy_dclaim_for_signing();
-   const asset dclaim_before = get_wire_balance_paid( "sysio.dclaim"_n );
-
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, "sysio.dclaim"_n, int64_t(1'000'000) ) );
-
-   BOOST_REQUIRE_EQUAL( get_wire_balance_paid( "sysio.dclaim"_n ).get_amount(),
-                        dclaim_before.get_amount() );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( fundclaim_funds_the_liq_kicker_drain, sysio_emissions_tester ) try {
-   // sysio.liq draws the yield kicker through the same drain as sysio.dclaim.
-   create_t5_holding_accounts();
-   deploy_liq_for_signing();
-   const uint32_t start = head_secs() - ONE_EPOCH - 1;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   const asset   liq_before         = get_wire_balance( "sysio.liq"_n );
-   const int64_t distributed_before = get_t5_state()["total_distributed"].as<int64_t>();
-
-   const int64_t amt = int64_t(2'000'000'000);   // 2 WIRE
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.liq"_n, "sysio.liq"_n, amt ) );
-
-   BOOST_REQUIRE_EQUAL( get_wire_balance( "sysio.liq"_n ).get_amount() - liq_before.get_amount(), amt );
-   BOOST_REQUIRE_EQUAL( get_t5_state()["total_distributed"].as<int64_t>(), distributed_before + amt );
-   BOOST_REQUIRE_EQUAL( get_t5_state()["capital_shortfall_total"].as<int64_t>(), 0 );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END() // t5_emissions_tests

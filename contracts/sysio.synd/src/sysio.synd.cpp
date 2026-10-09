@@ -110,6 +110,9 @@ constexpr std::string_view request_final_message =
 constexpr std::string_view charge_range_message  = "hold bond plus challenge extra exceeds the asset range";
 constexpr std::string_view desynd_unset_message  = "desyndication budget is not configured";
 constexpr std::string_view desynd_budget_message = "desyndication exceeds the current budget";
+constexpr std::string_view min_desynd_config_message =
+   "minimum desyndication must be positive and fit the burst and asset range";
+constexpr std::string_view min_desynd_quantity_message = "quantity is below the minimum desyndication";
 constexpr std::string_view desynd_net_message    = "desyndication net of the fee must be positive";
 
 /// Diagnostic path names of the intake actions.
@@ -1140,7 +1143,8 @@ void synd::closeenv(sysio::slug_name chain_code, uint32_t epoch_index, checksum2
 
 void synd::setconfig(sysio::slug_name chain_code, sysio::slug_name token_code, uint32_t synd_fee_bps,
                      uint32_t desynd_fee_bps, uint64_t synd_burst, uint64_t synd_refill, uint64_t desynd_burst,
-                     uint64_t desynd_refill, uint32_t window_sec, uint64_t bounty, uint64_t challenge_extra) {
+                     uint64_t desynd_refill, uint32_t window_sec, uint64_t bounty, uint64_t challenge_extra,
+                     uint64_t min_desyndicate) {
    require_auth(SYSTEM_ACCOUNT);
    check(outpost_kind(chain_code).has_value(), not_outpost_message.data());
    const auto st = liq::find_stat_by_token(LIQ_ACCOUNT, token_code);
@@ -1153,6 +1157,8 @@ void synd::setconfig(sysio::slug_name chain_code, sysio::slug_name token_code, u
    }
 
    syndconfig_t configs(get_self());
+   check(min_desyndicate > 0 && min_desyndicate <= max_asset_amount &&
+         (desynd_burst == 0 || min_desyndicate <= desynd_burst), min_desynd_config_message.data());
    configs.set(ram_payer, config_key{.chain_code = chain_code.value, .token_code = token_code.value},
                synd_config{
                   .chain_code      = chain_code,
@@ -1166,6 +1172,7 @@ void synd::setconfig(sysio::slug_name chain_code, sysio::slug_name token_code, u
                   .window_sec      = window_sec,
                   .bounty          = bounty,
                   .challenge_extra = challenge_extra,
+                  .min_desyndicate = min_desyndicate,
                });
 }
 
@@ -1441,6 +1448,7 @@ void synd::desyndicate(name holder, asset quantity) {
                                                       .token_code = st.token_code.value});
    check(config.has_value(), desynd_unset_message.data());
    const uint64_t quantity_units = static_cast<uint64_t>(quantity.amount);
+   check(quantity_units >= config->min_desyndicate, min_desynd_quantity_message.data());
    bucket_row     bucket = tick_bucket(get_self(), st.chain_code, st.token_code, bucket_direction::DESYNDICATION,
                                        config->desynd_burst, config->desynd_refill, epoch::current_epoch_index());
    check(quantity_units <= bucket.level, desynd_budget_message.data());

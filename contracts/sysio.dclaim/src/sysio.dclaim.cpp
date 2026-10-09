@@ -1,5 +1,4 @@
 #include <sysio.dclaim/sysio.dclaim.hpp>
-#include <sysio.opp.common/safe_ops.hpp>
 
 #include <cstdint>
 #include <string>
@@ -15,17 +14,10 @@ using opp::types::ChainKind;
 // model, as sysio.token uses): the account stays finite at code+abi size; growth draws from the pool.
 constexpr name ram_payer = "sysio"_n;
 
-/// Deterministic wall-clock seconds (block time). Used for the claimable
-/// window; epoch indices carried on the attestation are for audit only.
-uint32_t now_sec() {
-   return static_cast<uint32_t>(current_time_point().sec_since_epoch());
-}
-
 /// Exact-match scan over a uint128 secondary index: `lower_bound` then walk
 /// while the narrowing key still matches, returning the first row the
 /// predicate accepts (or `idx.end()`). The uint128 key only narrows; the
-/// predicate resolves prefix collisions deterministically. One implementation
-/// shared by the unmapped + cursor lookups (no duplicated scan loops).
+/// predicate resolves prefix collisions deterministically for unmapped-credit lookups.
 template<class Index, class KeyFn, class MatchFn>
 auto scan_find(Index& idx, uint128_t key, KeyFn key_of, MatchFn matches) {
    auto it = idx.lower_bound(key);
@@ -34,12 +26,6 @@ auto scan_find(Index& idx, uint128_t key, KeyFn key_of, MatchFn matches) {
    }
    if (it != idx.end() && key_of(*it) == key && matches(*it)) return it;
    return idx.end();
-}
-
-/// Current claimable-reward window (seconds) from config, default if unset.
-uint32_t config_window(name self) {
-   dclaim::capcfg_t cfg(self);
-   return cfg.get_or_default(dclaim::cap_config{}).claim_window_sec;
 }
 
 /// Allocate the next id from one of the monotonic counters. `pick` returns a
@@ -54,63 +40,32 @@ uint64_t next_id(name self, Pick pick) {
    return id;
 }
 
-/// Non-throwing validation of a string destined for `name(std::string_view)`. Shared with every
-/// other OPP inbound handler via `sysio.opp.common/safe_ops.hpp` so the never-throw name domain is
-/// defined and audited in exactly one place.
-
 /// Saturating WIRE credit. `asset::operator+=` aborts on overflow past `asset::max_amount`
-/// (2^62-1); credit_wire runs inside the never-throw OPP inbound path (via onreward), so cap at
-/// the asset maximum rather than abort. A single staker balance approaching 2^62 atomic WIRE units
-/// is not reachable in practice — the cap exists purely to preserve the never-throw contract.
+/// (2^62-1). AuthX linkswept is reachable through OPP node-owner registration and must not
+/// abort that delivery. Both imported and swept balances preserve saturation at the asset maximum.
 inline void add_wire_capped(asset& balance, const asset& amt) {
    const int64_t room = asset::max_amount - balance.amount;   // balance.amount in [0, max_amount]
    balance.amount += (amt.amount <= room ? amt.amount : room);
 }
 
-/**
- * Credit a pending account balance with an explicit absolute expiry.
- *
- * Normal rewards replace the aggregate expiry so a new reward refreshes the
- * account-level claim window. Link migration instead retains the later
- * effective deadline: folding an older parked reward into an account must not
- * make newer rewards expire early. A zero deadline means no expiry and is
- * therefore later than every finite deadline.
- */
-void credit_pending(name self, name wacct, const asset& amt, uint32_t expires_at_sec,
-                    bool retain_later_expiry = false) {
+/// Credit a pending account balance that remains claimable indefinitely.
+void credit_pending(name self, name wacct, const asset& amt) {
    dclaim::pclaims_t pclaims(self);
    auto it = pclaims.find(dclaim::pclaim_key{wacct.value});
    if (it == pclaims.end()) {
       pclaims.emplace(ram_payer, dclaim::pclaim_key{wacct.value},
          dclaim::pending_claim{ .wire_account = wacct,
-                               .balance = amt,
-                               .expires_at_sec = expires_at_sec });
+                               .balance = amt });
    } else {
       pclaims.modify(same_payer, dclaim::pclaim_key{wacct.value}, [&](auto& r) {
          add_wire_capped(r.balance, amt);
-         if (!retain_later_expiry) {
-            r.expires_at_sec = expires_at_sec;
-         } else if (r.expires_at_sec != 0 &&
-                    (expires_at_sec == 0 || expires_at_sec > r.expires_at_sec)) {
-            r.expires_at_sec = expires_at_sec;
-         }
       });
    }
 }
 
-/// Credit `amt` WIRE to the staker. Linked (`wacct` set) -> `pending_claims`;
-/// otherwise parked in `unmapped_tokens` keyed by (chain, addr). A new reward
-/// refreshes the destination row to now + window. Link migration bypasses this
-/// helper so it can retain the parked row's original absolute expiry.
-void credit_wire(name self, name wacct, ChainKind chain,
-                 const std::vector<char>& addr, const asset& amt, uint32_t window) {
-   const uint32_t exp = now_sec() + window;
-
-   if (wacct.value != 0) {
-      credit_pending(self, wacct, amt, exp);
-      return;
-   }
-
+/// Park an imported WIRE credit by native identity until AuthX links it to a claim account.
+void credit_unmapped(name self, ChainKind chain,
+                     const std::vector<char>& addr, const asset& amt) {
    dclaim::unmapped_t unmapped(self);
    auto idx = unmapped.template get_index<"bychainad"_n>();
    auto it = scan_find(idx, dclaim::chain_addr_key(chain, addr),
@@ -126,51 +81,13 @@ void credit_wire(name self, name wacct, ChainKind chain,
          dclaim::unmapped_token{ .id             = id,
                               .chain_kind     = chain,
                               .native_pubkey  = addr,
-                              .balance        = amt,
-                              .expires_at_sec = exp });
+                              .balance        = amt });
    } else {
       uint64_t rid = it->id;
       unmapped.modify(same_payer, dclaim::unmapped_key{rid}, [&](auto& r) {
          add_wire_capped(r.balance, amt);
-         r.expires_at_sec  = exp;
       });
    }
-}
-
-/// Dedupe at ingest. Returns true if `(chain_code, chain, addr)` has not seen
-/// `ext_ref` (or any >= it) yet — and advances the cursor. Returns false for a
-/// replay / out-of-order duplicate (`ext_ref <= last`). Advancing here (not at
-/// conversion time) means a replay is rejected even while an earlier reward is
-/// still staged awaiting a quote.
-bool cursor_admit(name self, uint64_t chain_code, ChainKind chain,
-                  const std::vector<char>& addr, uint64_t ext_ref) {
-   dclaim::rwdcursors_t cur(self);
-   auto idx = cur.template get_index<"bychaincode"_n>();
-   auto it = scan_find(idx, dclaim::chaincode_addr_key(chain_code, chain, addr),
-                       [](const auto& r) { return r.by_chaincode_addr(); },
-                       [&](const auto& r) {
-                          return r.chain_code == chain_code
-                              && r.chain      == chain
-                              && r.native_pubkey == addr;
-                       });
-   if (it == idx.end()) {
-      uint64_t id = next_id(self, [](dclaim::cap_counters& c) -> uint64_t& {
-         return c.next_cursor_id;
-      });
-      cur.emplace(ram_payer, dclaim::rwdcur_key{id},
-         dclaim::reward_cursor{ .id         = id,
-                             .chain_code = chain_code,
-                             .chain      = chain,
-                             .native_pubkey = addr,
-                             .last_external_epoch_ref = ext_ref });
-      return true;
-   }
-   if (ext_ref <= it->last_external_epoch_ref) return false;
-   uint64_t rid = it->id;
-   cur.modify(same_payer, dclaim::rwdcur_key{rid}, [&](auto& r) {
-      r.last_external_epoch_ref = ext_ref;
-   });
-   return true;
 }
 
 } // anonymous namespace
@@ -184,22 +101,6 @@ void dclaim::setconfig() {
    if (!cfg.exists()) {
       cfg.set(cap_config{}, ram_payer);
    }
-}
-
-// ---------------------------------------------------------------------------
-//  setclmwindow
-// ---------------------------------------------------------------------------
-void dclaim::setclmwindow(uint32_t window_sec) {
-   require_auth(get_self());
-   check(window_sec > 0, "window_sec must be positive");
-   // Reject a window so large that `now_sec() + window_sec` overflows uint32 and
-   // wraps the claim expiry into the past, which would let flushexpired prune
-   // freshly credited rewards immediately.
-   check(window_sec <= MAX_CLAIM_WINDOW_SEC, "window_sec exceeds the ten-year ceiling");
-   capcfg_t cfg(get_self());
-   cap_config c = cfg.get_or_default(cap_config{});
-   c.claim_window_sec = window_sec;
-   cfg.set(c, ram_payer);
 }
 
 // ---------------------------------------------------------------------------
@@ -238,104 +139,10 @@ void dclaim::linkswept(name wire_account, ChainKind chain, std::vector<char> nat
                            return r.chain_kind == chain && r.native_pubkey == native_pubkey;
                         });
    if (uit != uidx.end()) {
-      // Linking must not give an already-expired parked balance a fresh claim window. Erase it
-      // exactly as flushexpired would: its WIRE remains in the DClaim capital fund.
-      if (uit->expires_at_sec != 0 && now_sec() >= uit->expires_at_sec) {
-         unmapped.erase(unmapped_key{uit->id});
-         return;
-      }
       const asset bal = uit->balance;
-      const uint32_t expires_at_sec = uit->expires_at_sec;
       const uint64_t row_id = uit->id;
       unmapped.erase(unmapped_key{row_id});
-      // Preserve the parked row's deadline when it creates the account aggregate. If an aggregate
-      // already exists, its later effective deadline governs so newer rewards cannot expire early.
-      credit_pending(get_self(), wire_account, bal, expires_at_sec, true);
-   }
-}
-
-// ---------------------------------------------------------------------------
-//  onreward — per-staker WIRE-side credit of a STAKING_REWARD
-// ---------------------------------------------------------------------------
-void dclaim::onreward(uint64_t              chain_code,
-                   std::string           staker_wire_account,
-                   opp::types::ChainKind reward_chain,
-                   std::vector<char>     staker_native_addr,
-                   uint64_t              reward_amount,
-                   uint32_t              reward_epoch_index,
-                   uint64_t              external_epoch_ref,
-                   uint32_t              share_bps) {
-   require_auth(MSGCH_ACCOUNT);
-
-   // Tolerate degenerate input rather than aborting the inbound OPP envelope
-   // (the verifier role lives upstream in msgch::evalcons; dclaim trusts but
-   // must not break the message chain on a malformed row). reward_amount is cross-chain-supplied;
-   // bound it to the asset range here so an oversized value soft-drops instead of aborting later
-   // when the WIRE asset is constructed/credited (asset()/operator+= range-check abort).
-   if (reward_amount == 0 || reward_amount > static_cast<uint64_t>(asset::max_amount) ||
-       staker_native_addr.empty()) return;
-
-   // Dedupe at ingest so a replay / out-of-order duplicate is rejected.
-   if (!cursor_admit(get_self(), chain_code, reward_chain,
-                     staker_native_addr, external_epoch_ref)) {
-      return;
-   }
-
-   name wacct;   // value 0 == not yet AuthX-linked
-   // Validate the cross-chain-supplied account string before constructing name(): an invalid
-   // string is treated as unlinked (credit parked by native address) rather than aborting the
-   // inbound dispatch via name()'s internal check(). `is_valid_literal` is name's OWN predicate --
-   // the one its constructor uses -- so it cannot drift from what the constructor accepts.
-   if (!staker_wire_account.empty() && sysio::name::is_valid_literal(staker_wire_account)) {
-      wacct = name(staker_wire_account);
-   }
-
-   // reward_amount arrives already WIRE-denominated -- native -> WIRE
-   // conversion and source-chain precision scaling are outpost-side -- so the
-   // claim ledger is credited directly.
-   credit_wire(get_self(), wacct, reward_chain, staker_native_addr,
-               asset{ static_cast<int64_t>(reward_amount), WIRE_SYM },
-               config_window(get_self()));
-
-   // Pull funding from sysio.system's drainable pool so the dclaim balance
-   // covers this credit immediately -- a staker can claim in the next block
-   // rather than waiting for a pay-epoch. sysio.system::fundclaim caps to
-   // the remaining pool and never throws, preserving the never-throw
-   // contract for OPP inbound dispatch.
-   action(
-      permission_level{ get_self(), "active"_n },
-      SYSTEM_ACCOUNT,
-      "fundclaim"_n,
-      std::make_tuple(get_self(), static_cast<int64_t>(reward_amount))
-   ).send();
-}
-
-// ---------------------------------------------------------------------------
-//  flushexpired — prune expired rows; credited WIRE reverts to the capital
-//  fund (it simply stays in the sysio.dclaim balance once the row is erased).
-// ---------------------------------------------------------------------------
-void dclaim::flushexpired(uint32_t max_rows) {
-   const uint32_t cutoff = now_sec();
-   uint32_t budget = max_rows;
-
-   pclaims_t pclaims(get_self());
-   for (auto it = pclaims.begin(); it != pclaims.end() && budget > 0; ) {
-      const pending_claim row = *it;
-      ++it;
-      if (row.expires_at_sec != 0 && cutoff >= row.expires_at_sec) {
-         pclaims.erase(pclaim_key{row.wire_account.value});
-         --budget;
-      }
-   }
-
-   unmapped_t unmapped(get_self());
-   for (auto it = unmapped.begin(); it != unmapped.end() && budget > 0; ) {
-      const unmapped_token row = *it;
-      ++it;
-      if (row.expires_at_sec != 0 && cutoff >= row.expires_at_sec) {
-         unmapped.erase(unmapped_key{row.id});
-         --budget;
-      }
+      credit_pending(get_self(), wire_account, bal);
    }
 }
 
@@ -351,18 +158,14 @@ void dclaim::importseed(ChainKind chain, std::vector<import_credit> credits) {
 
    if (credits.empty()) return;
 
-   const uint32_t window = current_cfg.claim_window_sec;
-
    for (const auto& credit : credits) {
       check(credit.wire_atomic >= 0, "negative wire_atomic");
       check(!credit.native_address.empty(), "empty native_address");
       if (credit.wire_atomic == 0) continue;
 
-      // Pre-launch holders are unlinked by definition -> name{} routes the
-      // credit to unmapped_tokens, with the same upsert + expiry path as
-      // staking rewards (one implementation in credit_wire).
-      credit_wire(get_self(), name{}, chain, credit.native_address,
-                  asset{ credit.wire_atomic, WIRE_SYM }, window);
+      // Pre-launch holders remain unmapped until an AuthX link sweeps their credit.
+      credit_unmapped(get_self(), chain, credit.native_address,
+                  asset{ credit.wire_atomic, WIRE_SYM });
    }
 }
 

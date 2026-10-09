@@ -64,10 +64,6 @@ using sysio_system::test_support::sign_createlink;
 
 namespace {
 
-constexpr uint64_t PROTOBUF_VARINT_PAYLOAD_MASK = 0x7fu;
-constexpr uint32_t PROTOBUF_VARINT_PAYLOAD_BITS = 7u;
-constexpr uint8_t  PROTOBUF_VARINT_CONTINUATION_BIT = 0x80u;
-constexpr uint32_t PROTOBUF_FIELD_TAG_SHIFT = 3u;
 
 /// The outpost custody a SyndicateLIQ or LIQYield fixture carries by default: the whole asset range, at
 /// or above any outstanding shadow a dispatch test can reach.
@@ -98,7 +94,8 @@ std::vector<char> encode_envelope_with_mixed_attestations(
    uint32_t epoch_index,
    const std::vector<typed_attestation>& attestations,
    const std::string& previous_envelope_hash = {},
-   const std::string& previous_message_id = {})
+   const std::string& previous_message_id = {},
+   const std::vector<int32_t>& unknown_types = {})
 {
    sysio::opp::Envelope env;
    env.set_epoch_index(epoch_index);
@@ -108,6 +105,14 @@ std::vector<char> encode_envelope_with_mixed_attestations(
 
    auto* msg     = env.add_messages();
    auto* payload = msg->mutable_payload();
+   // Open protobuf enums retain raw wire discriminants, including undeclared values.
+   constexpr auto type_field = "type";
+   for (const auto raw_type : unknown_types) {
+      auto* att = payload->add_attestations();
+      att->GetReflection()->SetEnumValue(att, att->GetDescriptor()->FindFieldByName(type_field), raw_type);
+      att->set_data(std::string(1, '\x0a'));
+      att->set_data_size(1);
+   }
    for (const auto& [att_type, att_data] : attestations) {
       auto* att = payload->add_attestations();
       att->set_type(att_type);
@@ -1003,14 +1008,12 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
    auto eth_bytes = em_uncompressed_pubkey_bytes(eth_pub);
    auto eth_address = fc::crypto::ethereum::address_to_bytes(eth_pub);
 
-   // Seed a pre-link reward at the key-derived address, then deliberately put a conflicting address
+   // Seed a pre-link import at the key-derived address, then deliberately put a conflicting address
    // in the redundant actor field. Dispatch must derive from actor_pub_key and sweep the real row.
    const std::vector<char> native_address(eth_address.begin(), eth_address.end());
-   BOOST_REQUIRE_EQUAL(success(), push(DCLAIM_ACCOUNT, dclaim_abi, MSGCH_ACCOUNT, "onreward"_n, mvo()
-      ("chain_code", eth_code)("staker_wire_account", std::string{})
-      ("reward_chain", ChainKind::CHAIN_KIND_EVM)("staker_native_addr", native_address)
-      ("reward_amount", uint64_t{4321})("reward_epoch_index", uint32_t{7})
-      ("external_epoch_ref", uint64_t{100})("share_bps", uint32_t{10000})));
+   BOOST_REQUIRE_EQUAL(success(), push(DCLAIM_ACCOUNT, dclaim_abi, DCLAIM_ACCOUNT, "importseed"_n, mvo()
+      ("chain", ChainKind::CHAIN_KIND_EVM)("credits", fc::variants{
+         mvo()("native_address", native_address)("wire_atomic", int64_t{4321})})));
    BOOST_REQUIRE(!get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
    std::fill(eth_address.begin(), eth_address.end(), uint8_t{0xA5});
 
@@ -1659,18 +1662,24 @@ BOOST_FIXTURE_TEST_CASE(retired_attestations_do_not_mutate_collateral_or_block_l
    std::vector<typed_attestation> entries;
    for (auto type : {ATTESTATION_TYPE_OPERATOR_ACTION, ATTESTATION_TYPE_SWAP_REQUEST,
                      ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT,
-                     ATTESTATION_TYPE_RESERVE_CREATE, ATTESTATION_TYPE_RESERVE_CREATE_CANCEL}) {
+                     ATTESTATION_TYPE_RESERVE_CREATE_CANCEL}) {
       entries.emplace_back(type, std::string(1, '\x0a'));
    }
    entries.emplace_back(ATTESTATION_TYPE_SYNDICATE_LIQ,
       encode_syndicate_liq(eth, ChainKind::CHAIN_KIND_EVM, uwrit_op_eth_pubkey,
                           liqeth, LIQ_UNIT, 1));
+   constexpr int32_t removed_reward_type = 60950;
+   constexpr int32_t removed_reserve_create_type = 60958;
+   constexpr int32_t undeclared_type = 65000;
    const auto trace = deliver_trace(eth,
-      encode_envelope_with_mixed_attestations(current_epoch(), entries));
+      encode_envelope_with_mixed_attestations(current_epoch(), entries, {}, {},
+                                             {removed_reward_type, removed_reserve_create_type, undeclared_type}));
    BOOST_REQUIRE(trace != nullptr);
    BOOST_REQUIRE(!trace->except);
    BOOST_CHECK(get_operator(UWRIT_OP)["balances"].get_array().empty());
    BOOST_CHECK(get_wtdw(0).is_null());
+   BOOST_CHECK(get_dclaim_row("unmapped"_n, "unmapped_token", 1).is_null());
+   BOOST_CHECK(get_dclaim_row("pclaims"_n, "pending_claim", UWRIT_OP.to_uint64_t()).is_null());
    BOOST_REQUIRE_EQUAL(1u, synd_items().size());
    BOOST_CHECK_EQUAL(LIQ_UNIT, liq_supply());
    BOOST_CHECK_EQUAL(LIQ_UNIT, liq_balance(SYND_ACCOUNT));
@@ -2088,7 +2097,8 @@ BOOST_FIXTURE_TEST_CASE(a_shortfall_freezes_the_same_envelopes_queue_step, sysio
    BOOST_REQUIRE_EQUAL(success(), push(SYND_ACCOUNT, synd_abi, config::system_account_name, "setconfig"_n, mvo()
       ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("LIQETH"))("synd_fee_bps", 0)
       ("desynd_fee_bps", 0)("synd_burst", 1'000'000 * LIQ_UNIT)("synd_refill", 1'000'000 * LIQ_UNIT)
-      ("desynd_burst", 0)("desynd_refill", 0)("window_sec", 10800)("bounty", 0)("challenge_extra", 0)));
+      ("desynd_burst", 0)("desynd_refill", 0)("window_sec", 10800)("bounty", 0)("challenge_extra", 0)
+      ("min_desyndicate", 1)));
    setup_wire_token();
    enable_epoch_advancement();
 
@@ -2321,46 +2331,18 @@ BOOST_AUTO_TEST_CASE(generic_external_simulator_drives_production_dispatch) {
    }
 }
 
-// A real staking-reward envelope crosses msgch -> dclaim -> system -> token.
-// Small treasury liquidity deliberately reaches the second fundclaim cap.
-BOOST_FIXTURE_TEST_CASE(generic_staking_rewards_fund_claim_and_dedupe_through_dispatch, sysio_dispatch_tester) {
+// Funded pre-launch imports link and settle the exact token balance.
+BOOST_FIXTURE_TEST_CASE(funded_import_claims_link_and_settle, sysio_dispatch_tester) {
    using namespace sysio::testing::external;
    bootstrap_for_dispatch(First.chain, First.kind);
    deploy(TOKEN_ACCOUNT, contracts::token_wasm(), contracts::token_abi(), token_abi);
    BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, TOKEN_ACCOUNT, "create"_n,
       mvo()("issuer", "sysio")("maximum_supply", "100.000000000 WIRE")));
    BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, config::system_account_name, "issue"_n,
-      mvo()("to", "sysio")("quantity", "100.000000000 WIRE")("memo", "reward funding")));
+      mvo()("to", "sysio")("quantity", "100.000000000 WIRE")("memo", "import funding")));
    enable_epoch_advancement();
-   external::chain outpost(First);
-   constexpr uint64_t Reward = 10 * Unit;
-   sysio::opp::attestations::StakingReward reward;
-   reward.set_chain_code(fc::slug_name{First.chain}.value);
-   reward.mutable_staker_wire_account()->set_name(UWRIT_OP.to_string());
-   reward.set_share_bps(10'000);
-   reward.set_reward_epoch_index(current_epoch());
-   reward.set_external_epoch_ref(1);
-   reward.mutable_reward_amount()->set_token_code(fc::slug_name{"WIRE"}.value);
-   reward.mutable_reward_amount()->set_amount(Reward);
-   reward.mutable_staker_native_address()->set_kind(First.kind);
-   const std::vector<char> address(20, '\x31');
-   reward.mutable_staker_native_address()->set_address(address.data(), address.size());
-   const auto body = reward.SerializeAsString();
-   const auto bytes = outpost.envelope(current_epoch(), {
-      {ATTESTATION_TYPE_STAKING_REWARD, body}, {ATTESTATION_TYPE_STAKING_REWARD, body}});
-   const auto trace = deliver_trace(fc::slug_name{First.chain}.value, bytes);
-   BOOST_REQUIRE(trace && !trace->except);
    const auto wire = symbol::from_string("9,WIRE");
    const auto balance = [&](name account) { return get_currency_balance(TOKEN_ACCOUNT, wire, account).get_amount(); };
-   BOOST_REQUIRE_EQUAL(Reward, get_dclaim_row("pclaims"_n, "pending_claim", UWRIT_OP.to_uint64_t())
-      ["balance"].as<asset>().get_amount());
-   BOOST_REQUIRE_EQUAL(Reward, balance(DCLAIM_ACCOUNT));
-   BOOST_REQUIRE_EQUAL(90 * Unit, balance(config::system_account_name));
-   BOOST_REQUIRE_EQUAL(success(), push(DCLAIM_ACCOUNT, dclaim_abi, UWRIT_OP, "claim"_n,
-      mvo()("wire_account", UWRIT_OP)));
-   BOOST_REQUIRE_EQUAL(Reward, balance(UWRIT_OP));
-   BOOST_REQUIRE_EQUAL(0, balance(DCLAIM_ACCOUNT));
-   BOOST_REQUIRE(get_dclaim_row("pclaims"_n, "pending_claim", UWRIT_OP.to_uint64_t()).is_null());
    // The soak's launch import has its own funding path: pre-fund, import an
    // unlinked identity, authenticate the link, then claim the exact WIRE credit.
    constexpr uint64_t Imported = 5 * Unit;
@@ -2381,16 +2363,5 @@ BOOST_FIXTURE_TEST_CASE(generic_staking_rewards_fund_claim_and_dedupe_through_di
       mvo()("wire_account", CLAIM_ACCOUNT)));
    BOOST_REQUIRE_EQUAL(Imported, balance(CLAIM_ACCOUNT));
    BOOST_REQUIRE_EQUAL(0, balance(DCLAIM_ACCOUNT));
-   const auto funding_left = balance(config::system_account_name);
-   // A new reward at the authenticated downstream boundary exceeds liquid
-   // treasury funds. Credit is retained, but funding cannot overspend custody.
-   BOOST_REQUIRE_EQUAL(success(), push(DCLAIM_ACCOUNT, dclaim_abi, MSGCH_ACCOUNT, "onreward"_n,
-      mvo()("chain_code", fc::slug_name{First.chain}.value)("staker_wire_account", UWRIT_OP.to_string())
-         ("reward_chain", First.kind)("staker_native_addr", address)("reward_amount", 100 * Unit)
-         ("reward_epoch_index", current_epoch())("external_epoch_ref", 2)("share_bps", 10'000)));
-   BOOST_REQUIRE_EQUAL(funding_left, balance(DCLAIM_ACCOUNT));
-   BOOST_REQUIRE_EQUAL(0, balance(config::system_account_name));
-   BOOST_REQUIRE_EQUAL(100 * Unit, get_dclaim_row("pclaims"_n, "pending_claim", UWRIT_OP.to_uint64_t())
-      ["balance"].as<asset>().get_amount());
 }
 BOOST_AUTO_TEST_SUITE_END()

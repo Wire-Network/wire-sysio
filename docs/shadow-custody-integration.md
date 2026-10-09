@@ -98,8 +98,10 @@ is allowed only because the transfer is sent in the same action (obligation 0).
 4. **Credit sub-holders only with what `settle_and_take` returns**, into a ledger they pull from
    (`claimable.hpp`). Never push a transfer from a path that must not throw.
 5. **Decide your policy** for yield the pool cannot yet cover, and for yield left unclaimed when a
-   row is erased. `sysio.opreg` keeps uncovered yield on the row, and forfeits whatever is unclaimed
-   when `prune` erases a terminated operator.
+   row is erased. `sysio.opreg` keeps uncovered yield on the live row, then archives banked debt in
+   `yielddebts` before pruning or replacing a terminated operator. The original account can collect
+   it indefinitely through `claimyield`, without an operator registration. Archived debt earns no
+   further yield and uses the same token-specific backing cap; it never draws on WIRE collateral.
 
 ## What never throws
 
