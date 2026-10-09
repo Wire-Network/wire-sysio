@@ -716,9 +716,8 @@ namespace {
 /// Look up `account`'s registered public key for `chain_code` from
 /// `sysio.authex::links` (`bynamechain` index) and pack it into a
 /// `ChainAddress`. Returns `{UNKNOWN, []}` when the chain isn't registered
-/// or no authex link exists — the downstream outpost / depot lookup then
-/// fails gracefully (the depot's `dispatch_operator_action` rejects empty
-/// `op_address.address`).
+/// or no authex link exists; the OPERATOR_ACTION audit record then carries an
+/// empty `op_address`.
 ///
 /// After the refactor: `authex::links.bynamechain` is still keyed by `(name, ChainKind)`
 /// and `ChainAddress.kind` is still `ChainKind`. opreg now stores chains by
@@ -772,8 +771,7 @@ OperatorAction build_slash_action(name account,
 ///
 /// Caller passes the operator's primary key + the OperatorAction payload
 /// (DEPOSIT_REQUEST / WITHDRAW_REQUEST / WITHDRAW_REMIT / SLASH) plus the
-/// outcome. No-op if the operator entry doesn't exist (unknown-operator
-/// path handles its own audit via DEPOSIT_REVERT outbound).
+/// outcome. No-op if the operator entry does not exist.
 void append_action_log(opreg::operators_t& ops,
                        const opreg::operator_key& op_pk,
                        const OperatorAction& action,

@@ -80,14 +80,6 @@
                 {
                     "name": "opp_inbound_addr",
                     "type": "string"
-                },
-                {
-                    "name": "operator_registry_addr",
-                    "type": "string"
-                },
-                {
-                    "name": "source_deposit_addr",
-                    "type": "string"
                 }
             ]
         },

@@ -28,7 +28,7 @@ namespace sysio {
     *    on other chains) and `is_native` (exactly one per Chain). Chain-native
     *    decimal precision is NOT stored here — the depot's per-token precision
     *    lives on `sysio.tokens::token_row.precision` (the single source of
-    *    truth) and on each `sysio.reserv` reserve row; the outpost owns the
+    *    truth); the outpost owns the
     *    chain-native ↔ depot-frame conversion at its boundary.
     *
     * ## Lifecycle (unified bootstrap + post-bootstrap, per

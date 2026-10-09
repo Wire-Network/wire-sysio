@@ -1,7 +1,7 @@
 /// Pure-logic unit tests for `sysio::opp::depot::opreg_status::compute_is_active`.
 ///
 /// Exercises the awareness decision table consumed by `batch_operator_plugin`
-/// and `underwriter_plugin` each tick. The actual chain read happens through
+/// each tick. The actual chain read happens through
 /// `chain_plugin::read_table_rows` (integration territory; covered by the
 /// flow tests in `wire-tools-ts`); this test pins the status-to-decision
 /// mapping in isolation.

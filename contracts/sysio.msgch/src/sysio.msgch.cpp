@@ -1,6 +1,6 @@
 #include <sysio.msgch/sysio.msgch.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
-#include <sysio.authex/sysio.authex.hpp>
+#include <sysio/crypto.hpp>                 // public_key / ecc_public_key for node-owner key validation
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.tokens/sysio.tokens.hpp>   // active-liq-token gate on the SYNDICATE_LIQ / LIQ_YIELD paths
 #include <sysio.chalg/sysio.chalg.hpp>     // dispute trigger + open-dispute gate (disputes table)
@@ -37,7 +37,6 @@ constexpr auto     EPOCH_ACCOUNT   = "sysio.epoch"_n;
 constexpr auto     OPREG_ACCOUNT   = "sysio.opreg"_n;
 
 constexpr auto     CHALG_ACCOUNT   = "sysio.chalg"_n;
-constexpr auto     AUTHEX_ACCOUNT  = "sysio.authex"_n;
 constexpr auto     CHAINS_ACCOUNT  = "sysio.chains"_n;
 constexpr auto     TOKENS_ACCOUNT  = "sysio.tokens"_n;
 
@@ -139,10 +138,8 @@ constexpr const char* DISPUTE_NO_TIER_ONE_ELECTORATE_LOG =
 /// at every `attestations_t` insertion site. The `attseq` singleton survives the
 /// `buildenv` cleanup of `ATTESTATION_STATUS_PROCESSED` rows, so the
 /// monotonic counter keeps advancing across phases even when the atts
-/// table is drained. Without this, Phase N+1's inbound `SwapRequest`
-/// inherits Phase 1's attestation_id and collides with the existing UWREQ
-/// row in `sysio.uwrit` — `createuwreq`'s idempotency guard then
-/// silently drops the new swap.
+/// table is drained. Reusing an erased row's id would give a later attestation
+/// the same identity as an earlier audit record.
 ///
 /// First call materialises the row at `next = 2` and returns `1`.
 /// Subsequent calls return the current `next` and post-increment.
@@ -286,39 +283,21 @@ void prune_expired_envelopes(name self, uint32_t current_epoch) {
    }
 }
 
-/// Resolve `op_address` (chain-kind + raw pubkey bytes) to the operator's
-/// WIRE account name via `sysio.authex::links`'s `bypubkey` index. Returns
-/// `name{}` (zero) on miss — caller treats that as "operator not linked,
-/// drop the attestation".
-name resolve_account_from_op_address(const opp::types::ChainAddress& op_address) {
-   // No key a link could hold (unsupported kind, wrong width) is a miss, never a hash:
-   // `pubkey_to_checksum256` aborts on anything but an EM / ED variant.
-   const auto pk = public_key_from_op_address(op_address.kind, op_address.address);
-   if (!pk) return name{};
-   auto digest = sysio::pubkey_to_checksum256(*pk);
-   sysio::authex::links_t links(AUTHEX_ACCOUNT);
-   auto by_pubkey = links.get_index<"bypubkey"_n>();
-   auto it = by_pubkey.find(digest);
-   if (it == by_pubkey.end()) return name{};
-   return it->username;
-}
-
 /// Inbound source-chain binding check (WSA-005).
 ///
 /// A consensus-reached envelope is delivered for exactly ONE proven source outpost:
 /// `proven_chain_code`, which `deliver` validated as an active, non-depot row on
 /// `sysio.chains` before the envelope reached consensus. Every value-bearing attestation the
 /// envelope carries ALSO embeds its own chain identifier in the decoded payload
-/// (`OperatorAction.chain_code`, `UnderwriteIntentCommit.chain_code`,
-/// `ReserveAmount.chain_code`, `ReserveCreateCancel.chain_code`). That embedded identifier MUST
+/// (`SyndicateLIQ.chain_code`, `LIQYield.chain_code`). That embedded identifier MUST
 /// equal the proven source outpost: in the OPP model an attestation about chain X is always relayed
 /// by outpost X, as exercised by the active intake paths in `sysio.dispatch_tests`.
 ///
 /// A mismatch means an envelope proven from outpost A is asking the depot to apply a value-bearing
 /// effect on a different chain B. Batch-operator consensus proves only that A's operators agree on
 /// the envelope bytes; it does NOT prove the depositor acted on B. Applying the effect anyway would
-/// let a compromised or malicious A-operator quorum drive deposits, withdrawals, swaps, underwrite
-/// value-bearing mutations against an unrelated chain B's ledger — the
+/// let a compromised or malicious A-operator quorum mutate an unrelated chain B's
+/// syndication ledger — the
 /// cross-chain provenance forgery WSA-005 describes.
 ///
 /// Per `feedback_opp_handlers_never_throw`, dispatch must never abort the envelope on a single bad
@@ -336,33 +315,6 @@ name resolve_account_from_op_address(const opp::types::ChainAddress& op_address)
                 " does not match the proven source outpost chain_code=", proven_chain_code,
                 " (WSA-005 cross-chain provenance mismatch)\n");
    return false;
-}
-
-/// Are a payload's FORGEABLE code fields canonical slug_names?
-///
-/// `chain_code` is proven — `source_chain_binding_ok` binds it to the delivering
-/// outpost. `token_code` / `reserve_code` are NOT: they arrive as raw protobuf
-/// uint64s and reach a slug_name through the non-validating raw constructor, so a
-/// forged payload can carry a value that does not round-trip through its spelling.
-/// Such a value can never have been registered, and rendering is total, so it still
-/// produces text: text that either FAILS validation on the way back, or silently
-/// re-parses as a DIFFERENT, real code.
-///
-/// Drop the attestation instead; never check(), per
-/// feedback_opp_handlers_never_throw — a check() here halts evalcons and stalls
-/// consensus.
-///
-/// `path` labels the dispatch path in the diagnostic. True iff every code is canonical.
-[[nodiscard]] bool payload_codes_canonical(std::initializer_list<sysio::slug_name> codes,
-                                           const char* path) {
-   for (const sysio::slug_name code : codes) {
-      if (!code.is_canonical()) {
-         sysio::print("msgch::", path, ": DROP attestation -- payload code ", code.value,
-                      " has no canonical slug_name spelling\n");
-         return false;
-      }
-   }
-   return true;
 }
 
 /// The syndicating user's key family must be the proven outpost's own: an outpost of family F
@@ -692,47 +644,23 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
 /// Per-attestation dispatch entry. Called from the inbound extraction loop
 /// in `evalcons` after a consensus envelope has been unpacked. Dispatch is
 /// best-effort — silently no-ops on unknown / out-of-scope types so the
-/// inbound stream can keep flowing even when the depot hasn't yet wired up
-/// every handler (e.g. the deferred STAKE / UNSTAKE / STAKE_UPDATE staking
-/// lifecycle types).
+/// inbound stream keeps flowing past a value this depot does not handle.
 ///
 /// `epoch_index` and `envelope_digest` identify the accepted envelope the attestation came in; the
 /// syndication paths forward them to `sysio.synd`. Returns true iff the attestation was routed to
 /// `sysio.synd` as syndication value (`onsynd` or `onyield` sent), which obliges the caller to close
 /// the envelope there once its last attestation is dispatched.
-[[nodiscard]] bool dispatch_attestation(name self, uint64_t attestation_id,
+[[nodiscard]] bool dispatch_attestation(name self,
                                         AttestationType type,
                                         const std::vector<char>& data,
                                         uint64_t chain_code,
-                                        const checksum256& original_message_id,
                                         uint32_t epoch_index,
                                         const checksum256& envelope_digest) {
    bool carried_syndication_value = false;
    switch (type) {
       case AttestationType::ATTESTATION_TYPE_OPERATOR_ACTION:
-      case AttestationType::ATTESTATION_TYPE_SWAP_REQUEST:
-      case AttestationType::ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT:
-         // Retired external collateral and dual-commit swap ingress.
+         // Inbound echoes of the native collateral audit are inert.
          break;
-
-      case AttestationType::ATTESTATION_TYPE_SWAP_REMIT:
-         // Depot → outpost outbound-only. No outpost ever echoes a
-         // SwapRemit back (verified: ETH `_handleSwapRemit` and SOL
-         // `handle_swap_remit` only pay the recipient + emit local
-         // events; failure is SWAP_REJECTED). The old "reflected remit
-         // = delivery ack → uwrit::release" dispatch here was dead code:
-         // success is implicit absent SWAP_REJECTED, and underwriter
-         // locks are released exclusively by the wall-clock challenge
-         // window sweep (`sysio.uwrit::chklocks` at epoch advance). A
-         // misbehaving outpost relaying one inbound is a benign no-op.
-         break;
-
-      // ATTESTATION_TYPE_SWAP_REJECTED was dispatched here → sysio.reserv::onreject.
-      // REMOVED: outposts no longer echo a rejection. Every REMIT is depot-initiated
-      // against a verified reserve ledger, so the destination outpost can always pay
-      // (or log+skips locally on a misconfig) — there is no post-underwriting rejection
-      // and no reserve-ledger reconciliation. The retired type (enum slot 60957) no
-      // longer exists; any stray inbound falls through to the default drop below.
 
       case AttestationType::ATTESTATION_TYPE_SYNDICATE_LIQ:
          carried_syndication_value = dispatch_syndicate_liq(self, data, chain_code, epoch_index, envelope_digest);
@@ -747,45 +675,14 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
          // outpost echoing one inbound is a benign no-op.
          break;
 
-      case AttestationType::ATTESTATION_TYPE_RESERVE_CREATE_CANCEL:
-         // Retired external reserve lifecycle.
-         break;
-
-      case AttestationType::ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED:
-      case AttestationType::ATTESTATION_TYPE_RESERVE_READY:
-         // Depot → outpost outbound-only. Should never appear inbound at
-         // the depot; if a misbehaving outpost relays one back it is a
-         // benign no-op. Silently drop per `feedback_opp_handlers_never_throw`.
-         break;
-
-      case AttestationType::ATTESTATION_TYPE_RESERVE_BALANCE_SHEET:
-         // Per-epoch sanity check from the outpost. The depot is the
-         // ground truth; this is informational. Decode and emit a
-         // diagnostic event but do not auto-mutate the reserve — drift
-         // detection / alerting belongs to off-chain monitors that
-         // tail the chain log. Falling through silently is also
-         // acceptable today; the row is persisted in `attestations`
-         // for post-hoc inspection.
-         break;
-
       case AttestationType::ATTESTATION_TYPE_CHALLENGE_REQUEST:
       case AttestationType::ATTESTATION_TYPE_CHALLENGE_RESPONSE:
          // No depot-side handler. Envelope disputes are resolved on the WIRE side by evalcons
          // opening a sysio.chalg dispute vote, not by inbound challenge attestations.
          break;
 
-      case AttestationType::ATTESTATION_TYPE_STAKE:
-      case AttestationType::ATTESTATION_TYPE_UNSTAKE:
-      case AttestationType::ATTESTATION_TYPE_STAKE_UPDATE:
-      case AttestationType::ATTESTATION_TYPE_STAKE_RESULT:
-         // Validator-staking lifecycle; depot-side handlers land in a later
-         // task alongside liqEth / liqsol-token wiring.
-         break;
-
       // Outbound-only types (depot emits these, never receives them inbound) are dropped silently;
       // an outpost relaying one back is a benign no-op.
-      case AttestationType::ATTESTATION_TYPE_SWAP_REVERT:
-      case AttestationType::ATTESTATION_TYPE_DEPOSIT_REVERT:
       case AttestationType::ATTESTATION_TYPE_OPERATORS:
       case AttestationType::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS:
          break;
@@ -796,10 +693,6 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
          dispatch_node_owner_reg(data, chain_code);
          break;
 
-      case AttestationType::ATTESTATION_TYPE_PRETOKEN_PURCHASE:
-      case AttestationType::ATTESTATION_TYPE_PRETOKEN_YIELD:
-      case AttestationType::ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE:
-      case AttestationType::ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR:
       case AttestationType::ATTESTATION_TYPE_UNSPECIFIED:
       default:
          break;
@@ -967,16 +860,7 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
             .ready_timestamp     = now_sec,
             .processed_timestamp = now_sec,
          });
-         // Reconstruct the OPP message_id as a checksum256 for downstream correlation.
-         checksum256 m_id;
-         {
-            auto& mid = msg.header.message_id;
-            std::array<uint8_t, 32> rawid{};
-            const size_t n = std::min<size_t>(mid.size(), 32);
-            for (size_t i = 0; i < n; ++i) rawid[i] = static_cast<uint8_t>(mid[i]);
-            m_id = checksum256{rawid};
-         }
-         if (dispatch_attestation(self, att_id, entry.type, entry.data, chain_code, m_id, epoch_index,
+         if (dispatch_attestation(self, entry.type, entry.data, chain_code, epoch_index,
                                   envelope_digest)) {
             carried_syndication_value = true;
          }
@@ -1566,9 +1450,9 @@ void msgch::queueout(uint64_t chain_code,
    // Authorization gate: only the depot's own system contracts may queue an outbound
    // attestation. queueout carries no ABI-level auth, so without this check ANY account could
    // call it directly and inject a forged attestation that buildenv() then packs into the
-   // depot's group-signed outbound envelope — a forged SWAP_REMIT / WITHDRAW_REMIT / SLASH that
-   // the outpost authenticates by the group signature and executes. The intended callers
-   // (sysio.epoch / .opreg / .uwrit / .reserv / .synd) each send under their own {self, active}
+   // depot's group-signed outbound envelope — a forged DESYNDICATE_LIQ that
+   // the outpost authenticates by the group signature and executes. The authorized callers
+   // (sysio.epoch / .opreg / .synd) each send under their own {self, active}
    // authority; get_self() permits msgch's own inline use and governance.
    check(has_auth(EPOCH_ACCOUNT) || has_auth(OPREG_ACCOUNT) ||
          has_auth(synd::account) || has_auth(get_self()),
@@ -1577,7 +1461,7 @@ void msgch::queueout(uint64_t chain_code,
    // The chains registry is the ONLY authority on which chain codes exist.
    //
    // This is not an attack gate -- the authorization check above is. It is an
-   // ops gate: all eight production call sites derive their code from
+   // ops gate: production call sites derive their code from
    // sysio.chains, but a governance msig holding one of those authorities can
    // call queueout directly, and a typo'd code used to abort here. Without it
    // the row is created READY and is then unreachable forever: epoch::advance

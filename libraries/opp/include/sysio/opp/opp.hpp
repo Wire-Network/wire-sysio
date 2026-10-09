@@ -8,7 +8,7 @@
  * Provides FC_REFLECT_ENUM for all OPP protobuf enum types so they work with
  * fc::variant serialization, ABI serializer, and the testing framework.
  *
- * Used by: contract unit tests, batch_operator_plugin, underwriter_plugin,
+ * Used by: contract unit tests, batch_operator_plugin,
  * and any host-side code that needs to serialize OPP enum values.
  */
 
@@ -68,13 +68,6 @@ FC_REFLECT_ENUM(sysio::opp::types::TokenKind,
    (TOKEN_KIND_SPL_NFT)
    (TOKEN_KIND_LIQ))
 
-// Reserve lifecycle
-FC_REFLECT_ENUM(sysio::opp::types::ReserveStatus,
-   (RESERVE_STATUS_UNKNOWN)
-   (RESERVE_STATUS_PENDING)
-   (RESERVE_STATUS_ACTIVE)
-   (RESERVE_STATUS_CANCELLED))
-
 // ---------------------------------------------------------------------------
 //  Attestation enums
 // ---------------------------------------------------------------------------
@@ -82,29 +75,11 @@ FC_REFLECT_ENUM(sysio::opp::types::ReserveStatus,
 FC_REFLECT_ENUM(sysio::opp::types::AttestationType,
    (ATTESTATION_TYPE_UNSPECIFIED)
    (ATTESTATION_TYPE_OPERATOR_ACTION)
-   (ATTESTATION_TYPE_STAKE)
-   (ATTESTATION_TYPE_UNSTAKE)
-   (ATTESTATION_TYPE_PRETOKEN_PURCHASE)
-   (ATTESTATION_TYPE_PRETOKEN_YIELD)
-   (ATTESTATION_TYPE_RESERVE_BALANCE_SHEET)
-   (ATTESTATION_TYPE_STAKE_UPDATE)
-   (ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE)
    (ATTESTATION_TYPE_CHALLENGE_RESPONSE)
-   (ATTESTATION_TYPE_SWAP_REQUEST)
-   (ATTESTATION_TYPE_SWAP_REMIT)
    (ATTESTATION_TYPE_CHALLENGE_REQUEST)
    (ATTESTATION_TYPE_OPERATORS)
    (ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS)
    (ATTESTATION_TYPE_NODE_OWNER_REG)
-   (ATTESTATION_TYPE_STAKE_RESULT)
-   (ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR)
-   (ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT)
-   (ATTESTATION_TYPE_SWAP_REVERT)
-   (ATTESTATION_TYPE_DEPOSIT_REVERT)
-   (ATTESTATION_TYPE_RESERVE_CREATE_CANCEL)
-   (ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED)
-   (ATTESTATION_TYPE_RESERVE_READY)
-   (ATTESTATION_TYPE_EMISSIONS_BLOCKED)
    (ATTESTATION_TYPE_SYNDICATE_LIQ)
    (ATTESTATION_TYPE_LIQ_YIELD)
    (ATTESTATION_TYPE_DESYNDICATE_LIQ))
@@ -126,9 +101,6 @@ FC_REFLECT_ENUM(sysio::opp::attestations::OperatorAction_ActionType,
    (OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REQUEST)
    (OperatorAction_ActionType_ACTION_TYPE_WITHDRAW_REMIT)
    (OperatorAction_ActionType_ACTION_TYPE_SLASH))
-
-// ReserveTarget_Kind removed in the data-model refactor — the carrier (renamed `ReserveAmount`)
-// is now (chain_code, reserve_code, TokenAmount) in the depot 9-dec frame.
 
 FC_REFLECT_ENUM(sysio::opp::types::AttestationStatus,
    (ATTESTATION_STATUS_PENDING)
@@ -162,24 +134,8 @@ FC_REFLECT_ENUM(sysio::opp::types::EnvelopeStatus,
    (ENVELOPE_STATUS_CONFIRMED))
 
 // ---------------------------------------------------------------------------
-//  Underwriting enums
+//  Challenge and dispute enums
 // ---------------------------------------------------------------------------
-
-FC_REFLECT_ENUM(sysio::opp::types::UnderwriteRequestStatus,
-   (UNDERWRITE_REQUEST_STATUS_PENDING)
-   (UNDERWRITE_REQUEST_STATUS_CONFIRMED)
-   (UNDERWRITE_REQUEST_STATUS_REJECTED)
-   (UNDERWRITE_REQUEST_STATUS_COMPLETED)
-   (UNDERWRITE_REQUEST_STATUS_EXPIRED))
-
-FC_REFLECT_ENUM(sysio::opp::types::UnderwriteStatus,
-   (UNDERWRITE_STATUS_INTENT_CREATED)
-   (UNDERWRITE_STATUS_INTENT_SUBMITTED)
-   (UNDERWRITE_STATUS_INTENT_CONFIRMED)
-   (UNDERWRITE_STATUS_READY)
-   (UNDERWRITE_STATUS_RELEASED)
-   (UNDERWRITE_STATUS_SLASHED)
-   (UNDERWRITE_STATUS_DISQUALIFIED))
 
 FC_REFLECT_ENUM(sysio::opp::types::ChallengeStatus,
    (CHALLENGE_STATUS_CHALLENGE_SENT)
@@ -197,14 +153,6 @@ FC_REFLECT_ENUM(sysio::opp::types::NodeOwnerTier,
    (NODE_OWNER_TIER_T1)
    (NODE_OWNER_TIER_T2)
    (NODE_OWNER_TIER_T3))
-
-FC_REFLECT_ENUM(sysio::opp::types::StakeStatus,
-   (STAKE_STATUS_UNKNOWN)
-   (STAKE_STATUS_WARMUP)
-   (STAKE_STATUS_COOLDOWN)
-   (STAKE_STATUS_ACTIVE)
-   (STAKE_STATUS_TERMINATED)
-   (STAKE_STATUS_SLASHED))
 
 FC_REFLECT_ENUM(sysio::opp::debugging::DebugOutpostEndpointsType,
    (DEBUG_OUTPOST_ENDPOINTS_TYPE_UNKNOWN)

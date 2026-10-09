@@ -12,7 +12,7 @@
 
 // Producer ranking -- the packed sort key and the governance-tunable weights behind it.
 //
-// This header is deliberately LIGHT: it carries no sysio.opreg / sysio.uwrit dependency, so
+// This header is deliberately LIGHT: it carries no sysio.opreg dependency, so
 // sysio.system.hpp can include it for `producer_info::rank_score`'s default. The factors that read
 // the operator registry live in producer_score.hpp, included only by the translation units that
 // actually compute a score -- the same split opreg_status.hpp uses for the same reason.

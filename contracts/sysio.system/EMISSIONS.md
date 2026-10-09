@@ -77,9 +77,8 @@ by the full group size). Equal rosters are coalesced before their weighted slice
 is calculated, preserving one group-level rounding step per roster. A credit is
 made only for members that are opreg-ACTIVE, so the slices of skipped (inactive /
 slashed / terminated) members stay in the treasury rather than being redistributed
-to the active ones. Batch operators are paid from emission only; no swap-fee
-pool is folded into the distribution, so `producer_bps` / `batch_op_bps` split
-the whole compute share.
+to the active ones. Batch operators are paid from emission only, so
+`producer_bps` / `batch_op_bps` split the whole compute share.
 
 Allocated is not the same as paid: only **eligible** shares are actually
 credited. Emission WIRE stays in the treasury when an **empty historical
@@ -130,8 +129,6 @@ retained, making recovery distinguishable from an ordinary zero-eligible payout.
 cadence values greater than one retain the configured number of audit records.
 
 `epochlog.batch_emission_retained` records undistributed batch emission.
-`epochlog.fee_distributed` and `epochlog.batch_fee_retained` are reserved
-fields that `payepoch` always writes as zero; no swap-fee sweep feeds them.
 
 ## Retrieved via a claim action (pulled by recipient)
 

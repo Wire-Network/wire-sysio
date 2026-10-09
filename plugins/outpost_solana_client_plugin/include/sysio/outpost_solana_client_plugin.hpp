@@ -97,8 +97,8 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    /// Anchor `remaining_accounts`. The cranker
    /// (`outpost_solana_client::deliver_outbound_envelope`) decodes the
    /// committed envelope and builds account metas for every effect account the
-   /// terminal handlers may touch: operator/depositor wallets, Reserve PDAs,
-   /// SPL vaults, canonical ATAs, mints, and token/ATA/system programs. Data
+   /// terminal handlers may touch: syndicated LIQ custody, recipient wallets,
+   /// canonical ATAs, mints, and token/ATA/system programs. Data
    /// chunks ignore the slice — only the zero-data terminal call's account
    /// list matters for dispatch.
    solana_program_tx_fn<std::string, uint32_t, uint16_t, uint16_t, uint32_t,
@@ -234,8 +234,8 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
            }
            // Resolve the IDL's declared accounts first, then append any
            // extra `remaining_accounts` the cranker decoded from the
-           // inbound envelope (operator / depositor wallets, reserve PDAs,
-           // SPL vaults, and token programs that effect handlers need to
+           // inbound envelope (syndicated LIQ custody, recipient wallets,
+           // and token programs that effect handlers need to
            // address).
            // Anchor's runtime exposes everything past the IDL's declared
            // accounts as `ctx.remaining_accounts`; the relay supplies full

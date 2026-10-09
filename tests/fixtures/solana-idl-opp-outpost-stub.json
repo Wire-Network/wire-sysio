@@ -579,23 +579,6 @@
       }
     },
     {
-      "name": "ReserveStatus",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Pending"
-          },
-          {
-            "name": "Active"
-          },
-          {
-            "name": "Cancelled"
-          }
-        ]
-      }
-    },
-    {
       "name": "TokenAddressEntry",
       "type": {
         "kind": "struct",

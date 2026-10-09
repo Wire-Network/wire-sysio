@@ -67,16 +67,11 @@ namespace sysio {
       /// targeted depot → outpost envelopes:
       ///   * `sysio.epoch::advance` — `OPERATORS`, `BATCH_OPERATOR_GROUPS`
       ///     fanout to every active outpost.
-      ///   * `sysio.reserv::matchreserve` — `RESERVE_READY` to the
-      ///     reserve's owning outpost (chain_code).
-      ///   * `sysio.reserv::oncnclrsv` — `RESERVE_CREATE_CANCELLED` to
-      ///     the reserve's owning outpost on race-win cancel.
-      ///   * `sysio.opreg::*` — `OPERATOR_ACTION` family (WITHDRAW_REMIT,
-      ///     SLASH) — once the reserve-flow work lands the same pattern
-      ///     reaches every depot-authorised outbound.
+      ///   * `sysio.synd::desyndicate` — `DESYNDICATE_LIQ` releases from
+      ///     the destination's syndicated LIQ custody.
       ///
-      /// Gated to the depot's own system contracts (sysio.epoch / .opreg /
-      /// .uwrit / .reserv, plus msgch itself): each sends under its own
+      /// Gated to sysio.epoch, sysio.opreg, sysio.synd, and msgch itself:
+      /// each sends under its own
       /// {self, active} authority. The gate is required because a forged
       /// READY attestation rides out inside the next group-signed outbound
       /// envelope, which the outpost authenticates by the group signature —
@@ -295,11 +290,7 @@ namespace sysio {
       /// also carry `status = PROCESSED` (they go straight to dispatch),
       /// so the cleanup drains both. Once the atts table is empty,
       /// `available_primary_key()` resets to 0, our `std::max(1, ...)`
-      /// floor bumps it to 1 — and the next inbound `SwapRequest` gets
-      /// the SAME attestation_id as a prior phase. The downstream
-      /// `sysio.uwrit::createuwreq` idempotency guard
-      /// (`reqs.contains(pk)`) then short-circuits the second phase,
-      /// silently dropping the new swap.
+      /// floor bumps it to 1, reusing a prior attestation's audit identity.
       ///
       /// `att_seq` is a one-row table holding `next` — the next id to
       /// mint. `mint_att_id()` reads + bumps it atomically. Cleanup

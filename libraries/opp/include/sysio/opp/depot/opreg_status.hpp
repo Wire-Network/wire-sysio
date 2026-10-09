@@ -8,7 +8,7 @@
  * @file
  * Depot-side helper for the `sysio.opreg::operators[].status` field.
  *
- * Both `batch_operator_plugin` and `underwriter_plugin` poll their own status
+ * The batch-operator relay polls its own status
  * row each tick to decide whether to keep relaying. The spelling set IS the
  * protobuf `OperatorStatus` enum, so the string is parsed through the generated
  * descriptor rather than compared against copies of its names — a proto rename

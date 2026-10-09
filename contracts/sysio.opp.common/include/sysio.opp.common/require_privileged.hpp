@@ -19,8 +19,7 @@ inline constexpr std::string_view PRIVILEGED_REQUIRED_SUFFIX = ": privileged acc
 
 /// Refuse unless the contract now executing (`current_receiver()`) signed the action and is
 /// privileged: the gate of the launch-ingestion and registry-seeding actions a system contract runs
-/// under its own authority (`sysio.liq::regliqpool`, `sysio.synd::importsynd`,
-/// `sysio.reserv::regreserve`). The refusal names the contract: `<account>: privileged account
+/// under its own authority (`sysio.liq::regliqpool`, `sysio.synd::importsynd`). The refusal names the contract: `<account>: privileged account
 /// required`. The ONE such gate; every system contract that needs it calls this.
 inline void require_privileged_self() {
    const name self = current_receiver();
