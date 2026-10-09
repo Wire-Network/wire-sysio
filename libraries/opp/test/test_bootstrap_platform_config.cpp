@@ -29,7 +29,6 @@
 #include <set>
 #include <sstream>
 #include <string>
-#include <tuple>
 #include <vector>
 
 namespace gpb = google::protobuf;
@@ -108,18 +107,6 @@ bool pair_symbol_ok(const std::string& s) {
    return true;
 }
 
-/// Lightweight Antelope account-name check for the private-reserve `owner`.
-/// The contract is the authority; this catches gross authoring mistakes
-/// (charset `.a-z1-5`, non-empty, <= 13 chars).
-bool account_name_ok(const std::string& s) {
-   if (s.empty() || s.size() > 13) return false;
-   for (char c : s) {
-      const bool ok = (c >= 'a' && c <= 'z') || (c >= '1' && c <= '5') || c == '.';
-      if (!ok) return false;
-   }
-   return true;
-}
-
 /// Validate a parsed config against the launch invariants V1..V13. Returns a
 /// list of human-readable failures (empty == valid).
 std::vector<std::string> validate(const BootstrapPlatformConfig& c) {
@@ -147,7 +134,6 @@ std::vector<std::string> validate(const BootstrapPlatformConfig& c) {
    // tokens: V2 slug, V4 binding + precision + address well-formedness
    std::set<std::string>                       token_codes;
    std::map<std::string, int>                  native_per_chain;
-   std::set<std::pair<std::string, std::string>> bindings;
    std::set<std::pair<std::string, std::string>> liq_bindings;   // the TOKEN_KIND_LIQ subset
    for (const auto& t : c.tokens()) {
       if (!slug_ok(t.code()))                    e.push_back("V2 token code: " + t.code());
@@ -165,7 +151,6 @@ std::vector<std::string> validate(const BootstrapPlatformConfig& c) {
       // precision exceeds the frame (ETH at 18) declares min(native, 9) and is
       // downscaled at the outpost boundary.
       if (t.precision() < 1 || t.precision() > 9) e.push_back("V4 token precision: " + t.code());
-      bindings.insert({t.chain_code(), t.code()});
       if (t.is_native()) {
          ++native_per_chain[t.chain_code()];
          if (t.kind() != TokenKind::TOKEN_KIND_NATIVE || !t.contract_address().empty())
@@ -182,48 +167,6 @@ std::vector<std::string> validate(const BootstrapPlatformConfig& c) {
    for (const auto& ch : c.chains())
       if (ch.kind() != ChainKind::CHAIN_KIND_WIRE && native_per_chain[ch.code()] != 1)
          e.push_back("V5 expected exactly one native token on chain " + ch.code());
-
-   // reserves: V6 uniqueness/binding/weight/amount, V7 earmark, V8 owner
-   std::set<std::tuple<std::string, std::string, std::string>> triples;
-   unsigned __int128 sum_wire = 0;
-   for (const auto& r : c.reserves()) {
-      if (!slug_ok(r.code())) e.push_back("V2 reserve code: " + r.code());
-      const auto key = std::make_tuple(r.chain_code(), r.token_code(), r.code());
-      if (!triples.insert(key).second)
-         e.push_back("V6 duplicate reserve: " + r.chain_code() + "/" + r.token_code() + "/" + r.code());
-      if (!bindings.count({r.chain_code(), r.token_code()}))
-         e.push_back("V6 reserve references undeclared binding: " + r.chain_code() + "/" + r.token_code());
-      const auto it = chain_kind.find(r.chain_code());
-      if (it != chain_kind.end() && it->second == ChainKind::CHAIN_KIND_WIRE)
-         e.push_back("V6 reserve cannot live on the depot chain");
-      // 1..9999 only: 10000 zeroes the token-side weight (dead reserve) and is
-      // rejected on-chain by regreserve/oncrtreserve (MAX_CONNECTOR_WEIGHT_BPS).
-      if (!(r.connector_weight_bps() > 0 && r.connector_weight_bps() <= 9999))
-         e.push_back("V6 connector_weight_bps out of range");
-      if (r.initial_chain_amount() == 0 || r.initial_wire_amount() == 0)
-         e.push_back("V6 reserve amounts must be > 0");
-      sum_wire += r.initial_wire_amount();
-      if (r.is_private() && !account_name_ok(r.owner()))
-         e.push_back("V8 private reserve needs a valid owner account name");
-      if (!r.is_private() && !r.owner().empty())
-         e.push_back("V8 public reserve must not name an owner");
-   }
-
-   // V7 — WIRE earmark covers the reserve WIRE sides
-   if (c.t5_reserve_allocation() == 0) e.push_back("V7 t5_reserve_allocation must be > 0");
-   if (sum_wire > static_cast<unsigned __int128>(c.t5_reserve_allocation()))
-      e.push_back("V7 sum(initial_wire_amount) exceeds t5_reserve_allocation");
-
-   // V9 — uwrit config
-   if (!c.has_uwrit()) {
-      e.push_back("V9 uwrit config missing");
-   } else {
-      const auto& u = c.uwrit();
-      // fee_bps <= 9999: a 10000 (100%) fee zeroes the post-fee WIRE leg and is
-      // rejected on-chain by sysio.uwrit::setconfig (MAX_FEE_BPS).
-      if (u.fee_bps() > 9999)                        e.push_back("V9 fee_bps > 9999 (100%)");
-      if (u.collateral_lock_duration_ms() == 0)      e.push_back("V9 collateral_lock_duration_ms must be > 0");
-   }
 
    // liq pools: V11 binding / uniqueness / parameters, V10 earmark
    std::map<std::pair<std::string, std::string>, unsigned __int128> pool_seed;
@@ -296,7 +239,6 @@ BOOST_AUTO_TEST_CASE(launch_example_parses_and_validates) {
    BOOST_REQUIRE_MESSAGE(parse_strict(slurp(CONFIG_DIR + "/dex-config.launch.example.json"), cfg, err), err);
    for (const auto& v : validate(cfg)) BOOST_ERROR(v);
    BOOST_CHECK_EQUAL(cfg.chains_size(), 3);
-   BOOST_CHECK_EQUAL(cfg.reserves_size(), 4);
 }
 
 /// The dev-cluster mirror parses strictly and satisfies every invariant.
@@ -306,7 +248,6 @@ BOOST_AUTO_TEST_CASE(dev_config_parses_and_validates) {
    BOOST_REQUIRE_MESSAGE(parse_strict(slurp(CONFIG_DIR + "/dex-config.dev.json"), cfg, err), err);
    for (const auto& v : validate(cfg)) BOOST_ERROR(v);
    BOOST_CHECK_EQUAL(cfg.tokens_size(), 9);
-   BOOST_CHECK_EQUAL(cfg.reserves_size(), 6);      // the two liq tokens are pools, not reserves
    BOOST_CHECK_EQUAL(cfg.liq_pools_size(), 2);
    BOOST_CHECK_EQUAL(cfg.syndications_size(), 3);
 }
@@ -337,6 +278,20 @@ BOOST_AUTO_TEST_CASE(strict_parse_rejects_unknown_field) {
    BOOST_CHECK(!parse_strict(bad, cfg, err));
 }
 
+/// Retired configuration keys must fail strict parsing instead of being silently ignored.
+BOOST_AUTO_TEST_CASE(strict_parse_rejects_removed_fields_and_unsupported_version) {
+   for (const char* field : {R"("reserves": [])", R"("uwrit": {})", R"("t5_reserve_allocation": "1")"}) {
+      BootstrapPlatformConfig cfg;
+      std::string err;
+      BOOST_CHECK(!parse_strict(std::string{R"({"schema_version":1,"network":"x",)"} + field + "}", cfg, err));
+   }
+   BootstrapPlatformConfig cfg;
+   std::string err;
+   BOOST_REQUIRE(parse_strict(slurp(CONFIG_DIR + "/dex-config.dev.json"), cfg, err));
+   cfg.set_schema_version(2);
+   BOOST_CHECK(!validate(cfg).empty());
+}
+
 /// Each single-field mutation of the valid dev config trips at least one
 /// invariant (one mutation per targeted check).
 BOOST_AUTO_TEST_CASE(validator_rejects_mutations) {
@@ -347,15 +302,6 @@ BOOST_AUTO_TEST_CASE(validator_rejects_mutations) {
 
    { auto c = base; c.mutable_chains(1)->set_code("TOOLONG99");         // 9 chars > 8
      BOOST_CHECK(!validate(c).empty()); }                               // V2 over-length slug
-   // Reserve codes get the same V2 grammar as chain and token codes; regreserve
-   // refuses the digit- and underscore-leading ones outright.
-   for (const char* bad : {"1BAD", "_BAD", ""}) {
-      auto c = base; c.mutable_reserves(0)->set_code(bad);
-      const auto errs = validate(c);
-      BOOST_CHECK_MESSAGE(std::any_of(errs.begin(), errs.end(),
-                                      [](const std::string& s) { return s.starts_with("V2 reserve code"); }),
-                          std::string("reserve code should be rejected: '") + bad + "'");
-   }
    { auto c = base; c.mutable_chains(2)->set_kind(ChainKind::CHAIN_KIND_WIRE);
      BOOST_CHECK(!validate(c).empty()); }                               // V3 two depots
    { auto c = base;                                                     // V5 second native on ETHEREUM
@@ -375,14 +321,6 @@ BOOST_AUTO_TEST_CASE(validator_rejects_mutations) {
      BOOST_CHECK(!validate(c).empty()); }                               // V4 native ETH precision, not downscaled
    { auto c = base; c.mutable_tokens(0)->set_precision(9);
      BOOST_CHECK(validate(c).empty()); }                                // V4 the frame itself stays valid
-   { auto c = base; c.mutable_reserves(0)->set_connector_weight_bps(10000);
-     BOOST_CHECK(!validate(c).empty()); }                               // V6 weight 10000 rejected (zero token-side weight)
-   { auto c = base; c.set_t5_reserve_allocation(1);
-     BOOST_CHECK(!validate(c).empty()); }                               // V7 earmark too small
-   { auto c = base; c.mutable_reserves(0)->set_is_private(true);        // V8 private without owner
-     BOOST_CHECK(!validate(c).empty()); }
-   { auto c = base; c.mutable_uwrit()->set_fee_bps(10000);
-     BOOST_CHECK(!validate(c).empty()); }                               // V9 fee_bps 10000 rejected (100% zeroes post-fee WIRE)
    { auto c = base; c.set_t5_dex_allocation(1);
      BOOST_CHECK(!validate(c).empty()); }                               // V10 dex earmark too small
    { auto c = base; c.mutable_liq_pools(0)->set_token_code("USDC");     // V11 an ERC-20 is not a liq token

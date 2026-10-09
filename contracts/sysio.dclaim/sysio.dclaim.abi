@@ -20,10 +20,6 @@
                 {
                     "name": "next_unmapped_id",
                     "type": "uint64"
-                },
-                {
-                    "name": "next_cursor_id",
-                    "type": "uint64"
                 }
             ]
         },
@@ -89,44 +85,6 @@
             ]
         },
         {
-            "name": "onreward",
-            "base": "",
-            "fields": [
-                {
-                    "name": "chain_code",
-                    "type": "uint64"
-                },
-                {
-                    "name": "staker_wire_account",
-                    "type": "string"
-                },
-                {
-                    "name": "reward_chain",
-                    "type": "ChainKind"
-                },
-                {
-                    "name": "staker_native_addr",
-                    "type": "bytes"
-                },
-                {
-                    "name": "reward_amount",
-                    "type": "uint64"
-                },
-                {
-                    "name": "reward_epoch_index",
-                    "type": "uint32"
-                },
-                {
-                    "name": "external_epoch_ref",
-                    "type": "uint64"
-                },
-                {
-                    "name": "share_bps",
-                    "type": "uint32"
-                }
-            ]
-        },
-        {
             "name": "pclaim_key",
             "base": "",
             "fields": [
@@ -147,42 +105,6 @@
                 {
                     "name": "balance",
                     "type": "asset"
-                }
-            ]
-        },
-        {
-            "name": "reward_cursor",
-            "base": "",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "chain_code",
-                    "type": "uint64"
-                },
-                {
-                    "name": "chain",
-                    "type": "ChainKind"
-                },
-                {
-                    "name": "native_pubkey",
-                    "type": "bytes"
-                },
-                {
-                    "name": "last_external_epoch_ref",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "rwdcur_key",
-            "base": "",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "uint64"
                 }
             ]
         },
@@ -246,11 +168,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "onreward",
-            "type": "onreward",
-            "ricardian_contract": ""
-        },
-        {
             "name": "setconfig",
             "type": "setconfig",
             "ricardian_contract": ""
@@ -280,21 +197,6 @@
             "key_names": ["wire_account"],
             "key_types": ["uint64"],
             "table_id": 16291
-        },
-        {
-            "name": "rwdcursors",
-            "type": "reward_cursor",
-            "index_type": "i64",
-            "key_names": ["id"],
-            "key_types": ["uint64"],
-            "table_id": 64468,
-            "secondary_indexes": [
-                {
-                    "name": "bychaincode",
-                    "key_type": "uint128",
-                    "table_id": 60686
-                }
-            ]
         },
         {
             "name": "unmapped",

@@ -309,17 +309,16 @@ name resolve_account_from_op_address(const opp::types::ChainAddress& op_address)
 /// `proven_chain_code`, which `deliver` validated as an active, non-depot row on
 /// `sysio.chains` before the envelope reached consensus. Every value-bearing attestation the
 /// envelope carries ALSO embeds its own chain identifier in the decoded payload
-/// (`OperatorAction.chain_code`, `UnderwriteIntentCommit.chain_code`, `StakingReward.chain_code`,
+/// (`OperatorAction.chain_code`, `UnderwriteIntentCommit.chain_code`,
 /// `ReserveAmount.chain_code`, `ReserveCreateCancel.chain_code`). That embedded identifier MUST
 /// equal the proven source outpost: in the OPP model an attestation about chain X is always relayed
-/// by outpost X (confirmed across every leg in `sysio.dispatch_tests`, and stated in the proto —
-/// `ReserveCreate.external_amount.chain_code` is documented as "the outpost's own chain").
+/// by outpost X, as exercised by the active intake paths in `sysio.dispatch_tests`.
 ///
 /// A mismatch means an envelope proven from outpost A is asking the depot to apply a value-bearing
 /// effect on a different chain B. Batch-operator consensus proves only that A's operators agree on
 /// the envelope bytes; it does NOT prove the depositor acted on B. Applying the effect anyway would
 /// let a compromised or malicious A-operator quorum drive deposits, withdrawals, swaps, underwrite
-/// commits, reserve mutations, or staking credits against an unrelated chain B's ledger — the
+/// value-bearing mutations against an unrelated chain B's ledger — the
 /// cross-chain provenance forgery WSA-005 describes.
 ///
 /// Per `feedback_opp_handlers_never_throw`, dispatch must never abort the envelope on a single bad
@@ -735,49 +734,6 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
       // and no reserve-ledger reconciliation. The retired type (enum slot 60957) no
       // longer exists; any stray inbound falls through to the default drop below.
 
-      case AttestationType::ATTESTATION_TYPE_STAKING_REWARD:
-         // Per-staker staking reward -> sysio.dclaim claim ledger. The
-         // staking-reward path does not deposit back to a reserve (the
-         // external-pool credit and native -> WIRE conversion are
-         // outpost-side), so the pre-refactor reserv::onreward leg is dropped and
-         // reward_amount.amount is forwarded as the WIRE-denominated credit.
-         {
-            opp::attestations::StakingReward sr;
-            auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
-            auto rc = in(sr);
-            if (rc != zpp::bits::errc{}) break;
-            // WSA-005: the reward-emitting chain (sr.chain_code) must be the proven delivering
-            // outpost before any claim credit is recorded.
-            if (!source_chain_binding_ok(chain_code, sr.chain_code, "staking_reward")) break;
-            // WSA-028: gate the signed reward through the shared fail-closed
-            // parser. A negative or out-of-range reward is dropped at the
-            // boundary so it never reaches the claim ledger (dclaim also
-            // soft-drops oversized values, but every inbound TokenAmount is
-            // validated uniformly at ingress). Never-throw: break, do not check().
-            const std::optional<uint64_t> reward_opt =
-               sysio::opp::safe::to_depot_amount(static_cast<int64_t>(sr.reward_amount.amount));
-            if (!reward_opt) break;
-            const uint64_t reward_raw = *reward_opt;
-            // staker_wire_account.name is the raw account string (empty =>
-            // staker not yet AuthX-linked, so sysio.dclaim parks by native
-            // address). staker_native_address carries the chain (kind) and
-            // the raw address bytes. Credit against the PROVEN chain_code
-            // (equal to sr.chain_code, enforced above), never the payload's copy.
-            action(
-               permission_level{self, "active"_n},
-               "sysio.dclaim"_n, "onreward"_n,
-               std::make_tuple(chain_code,
-                               sr.staker_wire_account.name,
-                               sr.staker_native_address.kind,
-                               sr.staker_native_address.address,
-                               reward_raw,
-                               sr.reward_epoch_index,
-                               sr.external_epoch_ref,
-                               sr.share_bps)
-            ).send();
-         }
-         break;
-
       case AttestationType::ATTESTATION_TYPE_SYNDICATE_LIQ:
          carried_syndication_value = dispatch_syndicate_liq(self, data, chain_code, epoch_index, envelope_digest);
          break;
@@ -791,7 +747,6 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
          // outpost echoing one inbound is a benign no-op.
          break;
 
-      case AttestationType::ATTESTATION_TYPE_RESERVE_CREATE:
       case AttestationType::ATTESTATION_TYPE_RESERVE_CREATE_CANCEL:
          // Retired external reserve lifecycle.
          break;

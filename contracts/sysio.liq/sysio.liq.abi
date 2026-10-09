@@ -22,24 +22,6 @@
             ]
         },
         {
-            "name": "addkicker",
-            "base": "",
-            "fields": [
-                {
-                    "name": "sym",
-                    "type": "symbol_code"
-                },
-                {
-                    "name": "base_balance",
-                    "type": "int64"
-                },
-                {
-                    "name": "requested",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "addyield",
             "base": "",
             "fields": [
@@ -154,16 +136,6 @@
                 {
                     "name": "pair_symbol",
                     "type": "symbol_code"
-                }
-            ]
-        },
-        {
-            "name": "liq_config",
-            "base": "",
-            "fields": [
-                {
-                    "name": "kicker_bps",
-                    "type": "uint32"
                 }
             ]
         },
@@ -302,16 +274,6 @@
             ]
         },
         {
-            "name": "setkicker",
-            "base": "",
-            "fields": [
-                {
-                    "name": "bps",
-                    "type": "uint32"
-                }
-            ]
-        },
-        {
             "name": "settle",
             "base": "",
             "fields": [
@@ -382,11 +344,6 @@
     ],
     "actions": [
         {
-            "name": "addkicker",
-            "type": "addkicker",
-            "ricardian_contract": ""
-        },
-        {
             "name": "addyield",
             "type": "addyield",
             "ricardian_contract": ""
@@ -447,11 +404,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "setkicker",
-            "type": "setkicker",
-            "ricardian_contract": ""
-        },
-        {
             "name": "settle",
             "type": "settle",
             "ricardian_contract": ""
@@ -470,14 +422,6 @@
             "key_names": ["scope","symbol_code"],
             "key_types": ["name","uint64"],
             "table_id": 25660
-        },
-        {
-            "name": "liqconfig",
-            "type": "liq_config",
-            "index_type": "i64",
-            "key_names": ["name"],
-            "key_types": ["name"],
-            "table_id": 57729
         },
         {
             "name": "liqpending",

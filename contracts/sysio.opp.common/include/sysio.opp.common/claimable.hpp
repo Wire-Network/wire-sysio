@@ -20,7 +20,7 @@
  * the recipient later pulls it with an action carrying its own authority. A handler that aborts
  * then blocks only its own claim.
  *
- * `sysio.dclaim` established this pattern (`onreward` credits `pending_claims`, `claim` pays out);
+ * `sysio.dclaim` uses this pattern (`linkswept` credits `pending_claims`, `claim` pays out);
  * these helpers generalize it so `sysio.system` and `sysio.opreg` share one
  * audited implementation rather than duplicate copies.
  *

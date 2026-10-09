@@ -148,7 +148,7 @@ WIRE-352 adds separate inline edges whose failure behavior depends on the caller
 | `sysio.synd::challenge` | `sysio.liq::transfer`, `sysio.bond::hold` | Deploy `sysio.bond` before or with `sysio.synd`. | A signed action: a missing or refusing callee fails only the challenge, which the challenger can retry. |
 | Andon custody readers: swap, liq, bond, synd | Three-field `cord` row | Deploy all five from the same revision on a fresh deployment; configure native pull/clear permissions. | Existing cord rows use an incompatible layout; no in-place migration is supplied. |
 | Syndication custody shortfall | Andon `pull(reason)` with `sysio.andon@active` | Deploy Andon before syndication carries traffic. Privileged syndication needs no custom pull permission. | Missing account/permission or incompatible code fails the transaction atomically. |
-| `sysio.synd` reading its own `mismatch` rows | its own table: `mismatch` is new | Deploy this `sysio.synd` fresh, as the row below requires. | Rows accumulate with no prune; nothing else reads them. |
+| `sysio.synd` reading its own `mismatch` rows | its own table: `mismatch` is new | Deploy this `sysio.synd` fresh, as the row below requires. | One latest incident per chain/token; a new shortfall overwrites it. Snapshot evidence externally before governance reconciliation erases it. |
 | Syndication envelope and bucket rows | Current ABI layouts | Deploy fresh without rows from earlier layouts. | Buckets now store level and last epoch only; no frozen-epoch marker or migration is included. |
 
 Production deployment through `sysio.roa::setsyscode` privileges `sysio.dclaim`
@@ -321,3 +321,17 @@ The safe procedure is therefore:
 code order alone. If a rollback has to happen anyway, the outstanding balances
 are a liability to settle deliberately, not a detail the deploy sequence
 absorbs.
+
+## PR 662 follow-on pre-launch deployment
+
+Deploy this revision on fresh state and regenerate the OPP models and SDK contract types together.
+There is no migration or compatibility path for earlier development deployments. Recreate development
+clusters rather than decoding their former configuration and emissions rows.
+
+The external staking-reward message, dispatch, DClaim reward cursor/counter, T5 bonus funding action
+and shortfall counter, and LIQ bonus actions/configuration are removed. Funded pre-launch imports,
+LIQ earned-yield distribution and their normal claim actions remain.
+
+`sysio.synd::setconfig` requires `min_desyndicate` as an ordinary uint64, and `syndconfig` stores it
+as an ordinary field. Bootstrap schema version 1 contains chains, tokens, LIQ pools and syndications;
+it has no external-reserve or underwriting configuration.

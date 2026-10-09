@@ -35,18 +35,13 @@ contract. The swap sells it in clips through the pool and pays the proceeds in
 through `addyield`, which advances the index by `quantity / supply`, carries the
 remainder and pulls the WIRE by inline transfer.
 
-**The kicker.** On the swap's intake, the one that is yield, `addyield` requests
-`kicker_bps` (default 200) of the intake from T5 through
-`sysio.system::fundclaim(sysio.liq, amount)`, then folds what actually landed into
-the same index with `addkicker`, measured against the balance the pull left. A
-donation from any other account distributes only itself: the treasury never tops
-up what is not yield, or a near-sole holder could donate, claim it back with the
-kicker on top, and repeat. A short T5 reduces the kicker only. `setkicker` (auth
-`sysio`, the account council proposals execute as) changes the next intake.
+Yield distributions credit only WIRE supplied by the swap or a donor. No T5-funded bonus is added.
 
 **De-syndication reconciliation.** `sysio.synd::desyndicate` burns through `burn`;
 the burn is final. An outpost refusal is reconciled from its log by governance
-through `recredit`.
+through `sysio.synd::refundreturn(request_id)` only after irreversible external cancellation.
+A final external payment is acknowledged with `finishreturn`; pending returns remain open.
+`recredit` is reserved for exceptional repairs and must not recover a tracked return.
 
 **Launch ingestion (epoch-0 bootstrap window, privileged caller).** `regliqpool`
 mints the LCO liq to `sysio`, deposits it with the T5 dex earmark WIRE into
@@ -62,29 +57,26 @@ and sets the tick parameters. The pre-launch positions are replayed by
 | `accounts` | holder / symbol code | `balance`, `index_checkpoint` (uint128), `owed_wire` |
 | `yieldidx` | symbol code | `index` (uint128), `pot`, `carry` |
 | `liqpending` | symbol code | `quantity` minted by LIQ_YIELD and not yet queued; counts against the asset range beside supply |
-| `liqconfig` | singleton | `kicker_bps` |
 
 ## Actions
 
 | Action | Auth | Purpose |
 |---|---|---|
 | `create(sym, chain_code, token_code)` | self | Register a shadow for an active `TOKEN_KIND_LIQ` token bound to an active outpost |
-| `setkicker(bps)` | `sysio` | Kicker for the intakes from now on |
-| `recredit(holder, quantity)` | self | Mint back after an outpost refused a de-syndication |
+| `recredit(holder, quantity)` | self | Exceptional privileged repair; tracked returns use `sysio.synd::refundreturn` to avoid double minting |
 | `mint(to, token_code, amount)` | `sysio.synd` | Mint shadow into a holder row |
 | `burn(token_code, amount)` | `sysio.synd` | Burn shadow out of `sysio.synd`'s own row |
 | `mintyield(chain_code, token_code, amount)` | `sysio.synd` | LIQ_YIELD into the pending balance |
 | `queueyield(sym)` | none | Pending yield into the swap's reservoir |
 | `transfer`, `open`, `close`, `claim` | holder | `sysio.token`'s shape; `close` refuses while yield is owed |
 | `addyield(from, quantity, target)` | `from` | Distribute WIRE to `target`'s holders |
-| `addkicker(sym, base_balance, requested)` | self | Inline from `addyield` |
 | `regliqpool(...)` | privileged caller, epoch 0 | Seed a shadow's yield pool |
 
 ## Deployment
 
 In order: `sysio.roa::setsyscode` for `sysio.liq`; the chain and its liq token
 registered and active in `sysio.chains` / `sysio.tokens`; `create` per shadow
-symbol; `setkicker` if the default is not wanted; `regliqpool` per pool; then
+symbol; `regliqpool` per pool; then
 `sysio.synd`'s `importsynd` batches and `importdone`. `sysio.swap` must be configured
 (`setconfig`) before `regliqpool`, and the batch-operator crank pushes
 `queueyield` per symbol and `sysio.swap::tickyield` per pair.

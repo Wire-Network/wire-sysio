@@ -40,7 +40,9 @@
         "sysio_synd_tests/generated_generic_custody_bond_challenge_and_return_sequences",
         "sysio_synd_tests/generic_custody_shortfall_freezes_and_repair_resumes",
         "sysio_dispatch_tests/a_custody_shortfall_pulls_the_cord_and_the_epoch_advances",
-        "sysio_dispatch_tests/a_shortfall_freezes_the_same_envelopes_queue_step"
+        "sysio_dispatch_tests/a_shortfall_freezes_the_same_envelopes_queue_step",
+        "sysio_synd_tests/a_freeze_does_not_extend_the_challenge_deadline",
+        "sysio_synd_tests/a_frozen_request_can_be_held_or_ruled_invalid_after_its_deadline"
       ]
     },
     {
@@ -54,7 +56,10 @@
         "t5_emissions_tests/governance_gets_remainder_no_dust_loss",
         "sysio_dclaim_tests/importseed_accepts_credit_batch",
         "sysio_authex_tests/createlink_eth_sweeps_prelink_dclaim_rewards",
-        "sysio_dispatch_tests/generic_staking_rewards_fund_claim_and_dedupe_through_dispatch"
+        "sysio_dispatch_tests/funded_import_claims_link_and_settle",
+        "sysio_dclaim_tests/importseed_linked_credits_pending_claims",
+        "sysio_dclaim_tests/importseed_unlinked_parks_unmapped_then_linkswept",
+        "sysio_dclaim_tests/linkswept_caps_combined_imports_without_aborting"
       ]
     },
     {
@@ -74,7 +79,8 @@
       "tests": [
         "sysio_synd_tests/generic_parked_credit_yield_conversion_and_fee_rounded_return",
         "sysio_liq_tests/queued_yield_sells_through_the_pool_and_pays_holders",
-        "sysio_synd_tests/createlink_sweeps_parked_from_synd"
+        "sysio_synd_tests/createlink_sweeps_parked_from_synd",
+        "sysio_liq_tests/addyield_distributes_only_supplied_wire"
       ]
     },
     {
@@ -134,7 +140,9 @@
         "sysio_synd_tests/bucket_limits_a_tranche_and_refills_per_epoch",
         "sysio_synd_tests/oversize_item_releases_in_tranches",
         "sysio_synd_tests/desyndicate_refuses_over_budget",
-        "sysio_synd_tests/generated_generic_custody_bond_challenge_and_return_sequences"
+        "sysio_synd_tests/generated_generic_custody_bond_challenge_and_return_sequences",
+        "sysio_synd_tests/desyndicate_enforces_configured_minimum",
+        "sysio_synd_tests/setconfig_validates_minimum_return"
       ]
     },
     {
@@ -150,19 +158,6 @@
         "sysio_bond_tests/approve_refuses_before_the_window_and_when_unbonded",
         "sysio_bond_tests/approved_returns_bonds_and_splits_the_bounty_by_stake",
         "sysio_synd_tests/second_envelope_waits_until_the_first_is_bonded"
-      ]
-    },
-    {
-      "name": "flow-yield-distribution",
-      "wire_behavior": "Staking reward credits linked/unmapped WIRE claims, suppresses stale external references, funds through accounting and liquid balance caps, and records shortfall.",
-      "cluster_only": "Ethereum mock emitter and real STAKING_REWARD transport.",
-      "tests": [
-        "sysio_dclaim_tests/onreward_linked_credits_pending_claims",
-        "sysio_dclaim_tests/onreward_unlinked_parks_unmapped_then_linkswept",
-        "sysio_dclaim_tests/onreward_dedupes_stale_external_ref",
-        "t5_emissions_tests/fundclaim_transfers_and_tracks_distributed",
-        "t5_emissions_tests/fundclaim_caps_to_remaining_pool_and_records_shortfall",
-        "sysio_dispatch_tests/generic_staking_rewards_fund_claim_and_dedupe_through_dispatch"
       ]
     }
   ]
