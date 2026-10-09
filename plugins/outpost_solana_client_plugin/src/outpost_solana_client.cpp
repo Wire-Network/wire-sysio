@@ -35,6 +35,7 @@ constexpr auto REPORT_LIQ_YIELD_INSTRUCTION = "report_liq_yield";
 constexpr std::string_view OP_DISPATCH_ATTESTATIONS =
    "deliver_outbound_envelope:dispatch_attestations";
 constexpr std::string_view OP_READ_LATEST = "read_inbound_envelope:get_account_info";
+constexpr std::string_view OP_READ_EMITTED_DIGEST = "read_emitted_envelope_digest:get_account_info";
 
 /// Anchor seed literals for the outpost program's per-epoch PDAs. Byte-exact
 /// mirrors of the program's `EPOCH_DELIVERIES_SEED` / `ENVELOPE_CHUNKS_SEED`
@@ -113,6 +114,15 @@ namespace latest_envelope {
    constexpr auto field_data     = "data";
    constexpr auto field_checksum = "checksum";
 } // namespace latest_envelope
+
+/// Identifiers of the outbound `EnvelopeLog` account: one record of each envelope the program emitted, kept for
+/// its retention window.
+namespace envelope_log {
+   constexpr auto account_name    = "EnvelopeLog";
+   constexpr auto field_envelopes = "envelopes";
+   constexpr auto field_epoch     = "epoch_index";
+   constexpr auto field_checksum  = "checksum";
+} // namespace envelope_log
 
 /// Identifiers of the per-epoch `EpochDeliveries` account + the two fields the
 /// dispatch cursor read consumes. Both are validated at boot for the
@@ -274,6 +284,43 @@ void assert_epoch_deliveries_shape(const fc::network::solana::idl::program& prog
              "EpochDeliveries IDL missing '{}' field; the dispatch crank would resume from 0 on "
              "every tick and re-send settled windows forever",
              epoch_deliveries::field_dispatched_count);
+}
+
+/// Assert the loaded IDL declares the outbound `EnvelopeLog` the way the digest reader decodes it. Full contract on
+/// the header declaration.
+void assert_envelope_log_shape(const fc::network::solana::idl::program& program) {
+   namespace idl = fc::network::solana::idl;
+   const std::vector<idl::field>& fields = declared_account_fields(program, envelope_log::account_name);
+   const auto log = std::ranges::find(fields, std::string_view{envelope_log::field_envelopes}, &idl::field::name);
+   FC_ASSERT(log != fields.end(), "EnvelopeLog IDL missing '{}' field", envelope_log::field_envelopes);
+   FC_ASSERT(log->type.is_vec() && log->type.vec_element && log->type.vec_element->is_defined() &&
+                log->type.vec_element->defined_name,
+             "EnvelopeLog '{}' must be declared a Vec of a defined record type, got '{}'",
+             envelope_log::field_envelopes, describe_idl_type(log->type));
+
+   const std::string&   record_name = *log->type.vec_element->defined_name;
+   const idl::type_def* record      = program.find_type(record_name);
+   FC_ASSERT(record && record->is_struct() && record->struct_fields, "IDL '{}' has no struct field definition",
+             record_name);
+   bool has_epoch    = false;
+   bool has_checksum = false;
+   for (const idl::field& field : *record->struct_fields) {
+      if (field.name == envelope_log::field_epoch) {
+         FC_ASSERT(field.type.is_primitive() && field.type.primitive == idl::primitive_type::u32,
+                   "{} '{}' must be declared u32, got '{}'", record_name, envelope_log::field_epoch,
+                   describe_idl_type(field.type));
+         has_epoch = true;
+      } else if (field.name == envelope_log::field_checksum) {
+         FC_ASSERT(field.type.is_array() && field.type.array_len == sizeof(fc::sha256) && field.type.array_element &&
+                      field.type.array_element->is_primitive() &&
+                      field.type.array_element->primitive == idl::primitive_type::u8,
+                   "{} '{}' must be declared [u8; 32], got '{}'", record_name, envelope_log::field_checksum,
+                   describe_idl_type(field.type));
+         has_checksum = true;
+      }
+   }
+   FC_ASSERT(has_epoch, "{} IDL missing '{}' field", record_name, envelope_log::field_epoch);
+   FC_ASSERT(has_checksum, "{} IDL missing '{}' field", record_name, envelope_log::field_checksum);
 }
 
 /// Keep only the candidate IDLs whose declared address matches the deployed
@@ -1207,6 +1254,29 @@ std::string drive_dispatch_rounds(
    return last_sig;
 }
 
+std::optional<fc::sha256> decode_envelope_log_digest(opp_solana_outpost_client&  program_client,
+                                                     const std::vector<uint8_t>& account_data,
+                                                     uint32_t                    epoch_index) {
+   const fc::variant   decoded   = program_client.decode_account_info_data(envelope_log::account_name, account_data);
+   const fc::variants& envelopes = decoded.get_object()[envelope_log::field_envelopes].get_array();
+   for (const fc::variant& entry : envelopes) {
+      const fc::variant_object& record = entry.get_object();
+      if (record[envelope_log::field_epoch].as_uint64() != epoch_index) continue;
+      const fc::variants& checksum = record[envelope_log::field_checksum].get_array();
+      FC_ASSERT(checksum.size() == sizeof(fc::sha256), "EnvelopeLog record for epoch {} carries a {}-byte checksum",
+                epoch_index, checksum.size());
+      fc::sha256 digest;
+      for (size_t i = 0; i < checksum.size(); ++i) {
+         const uint64_t byte = checksum[i].as_uint64();
+         FC_ASSERT(byte <= std::numeric_limits<uint8_t>::max(), "EnvelopeLog checksum byte {} is out of range",
+                   byte);
+         digest.data()[i] = static_cast<char>(byte);
+      }
+      return digest;
+   }
+   return std::nullopt;
+}
+
 } // namespace outpost_solana_client_detail
 
 outpost_solana_client::outpost_solana_client(
@@ -1241,6 +1311,11 @@ outpost_solana_client::outpost_solana_client(
    // (`create_outpost_client`) rather than on the first inbound poll - the
    // poll loop wlogs and retries forever, which would hide the misconfig.
    // The IDL is immutable after construction, so the check can never go stale.
+   if (role == solana_outpost_role::underwriter) {
+      FC_ASSERT(_program_client->get_program(),
+                "outpost_solana_client: no IDL program loaded; cannot validate the EnvelopeLog declaration");
+      outpost_solana_client_detail::assert_envelope_log_shape(*_program_client->get_program());
+   }
    if (role == solana_outpost_role::batch_operator) {
       FC_ASSERT(_program_client->get_program(),
                 "outpost_solana_client: no IDL program loaded; cannot validate "
@@ -1686,6 +1761,22 @@ std::string outpost_solana_client::deliver_outbound_envelope(
            to_string(), epoch_index, e.what());
    }
    return last_sig;
+}
+
+std::optional<fc::sha256> outpost_solana_client::read_emitted_envelope_digest(uint32_t         epoch_index,
+                                                                              fc::microseconds deadline) {
+   const fc::time_point deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
+
+   throw_if_past_deadline(deadline_abs, OP_READ_EMITTED_DIGEST);
+   // `finalized`, as `read_inbound_envelope` reads: a record from a slot that can still roll back proves nothing.
+   const std::optional<fc::network::solana::account_info> info = _entry->client->get_account_info(
+      _program_client->outbound_envelopes_pda, fc::network::solana::commitment_t::finalized);
+   if (!info.has_value()) return std::nullopt;   // the log is created at initialize: nothing recorded yet
+   FC_ASSERT(info->owner == _program_id,
+             "outpost_solana_client[{}]: the outbound envelope log is owned by {} instead of program {}", to_string(),
+             info->owner.to_string(fc::yield_function_t{}), _program_id.to_string(fc::yield_function_t{}));
+   return outpost_solana_client_detail::decode_envelope_log_digest(*_program_client, info->data, epoch_index);
 }
 
 std::vector<char> outpost_solana_client::read_inbound_envelope(

@@ -832,13 +832,6 @@ public:
                    std::string_view log_prefix,
                    const std::atomic<bool>& shutdown_flag);
 
-   /// Return true when `provider_key` is a direct key whose weight alone
-   /// reaches `actor`'s active threshold or its owner ancestor. Call only from
-   /// the main app thread or an executor read window.
-   bool provider_can_authorize_active_alone(
-      chain::name actor,
-      const fc::crypto::public_key& provider_key) const;
-
    void accept_transaction(const chain::packed_transaction_ptr& trx, chain::plugin_interface::next_function<chain::transaction_trace_ptr> next);
 
    // Only call this after plugin_initialize()!
@@ -874,6 +867,18 @@ private:
 
    unique_ptr<class chain_plugin_impl> my;
 };
+
+/// True when a signature by `key` alone satisfies the authority of `level`, as the chain's authority checker
+/// evaluates a transaction's signatures (delegated account permissions included). Call only from the main app
+/// thread or an executor read window.
+bool key_alone_satisfies(const chain::controller& chain, const chain::permission_level& level,
+                         const fc::crypto::public_key& key);
+
+/// True when an action `code::action` may declare `level`, by the check a transaction gets: the permission
+/// `level.actor` linked to it (`linkauth`), or `active` when none is, must be `level.permission` or a child of it.
+/// Call only from the main app thread or an executor read window.
+bool permission_satisfies_link(const chain::controller& chain, const chain::permission_level& level,
+                               chain::name code, chain::name action);
 
 } // namespace sysio
 

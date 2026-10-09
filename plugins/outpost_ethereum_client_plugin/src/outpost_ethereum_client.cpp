@@ -28,6 +28,7 @@ namespace detail = outpost_ethereum_client_detail;
 // ── Op labels used for deadline-exceeded error messages ──────────────────
 constexpr std::string_view OP_DELIVER_OUTBOUND = "deliver_outbound_envelope";
 constexpr std::string_view OP_READ_INBOUND     = "read_inbound_envelope";
+constexpr std::string_view OP_READ_EMITTED_DIGEST = "read_emitted_envelope_digest";
 
 constexpr std::string_view OP_REALIZE_YIELD    = "crank_outpost:realizeYield";
 
@@ -66,6 +67,9 @@ constexpr auto view_latest_outbound_envelope = "getLatestOutboundEnvelope";
 namespace field {
 constexpr auto epoch = "epoch_";
 constexpr auto data  = "data_";
+/// `outboundEnvelopes(uint32)` record fields.
+constexpr auto record_epoch_index = "epochIndex";
+constexpr auto record_checksum    = "checksum";
 }
 } // namespace opp_abi
 
@@ -684,6 +688,46 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
    ilog("outpost_ethereum_client[{}]: read inbound envelope epoch={} bytes={}",
         to_string(), epoch_index, out.size());
    return out;
+}
+
+std::optional<fc::sha256> outpost_ethereum_client::read_emitted_envelope_digest(uint32_t         epoch_index,
+                                                                                fc::microseconds deadline) {
+   const fc::time_point deadline_abs = fc::time_point::now() + deadline;
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
+
+   throw_if_past_deadline(deadline_abs, OP_READ_EMITTED_DIGEST);
+   FC_ASSERT(_opp_client, "outpost_ethereum_client[{}]: read_emitted_envelope_digest requires an OPP address",
+             to_string());
+   FC_ASSERT(_opp_client->outbound_envelopes, "outpost_ethereum_client[{}]: the loaded OPP ABI declares no {} view",
+             to_string(), opp_contract_client::view_outbound_envelopes);
+
+   // `finalized`, as `read_inbound_envelope` reads: a record from a block that can still reorg out proves nothing.
+   uint32_t          epoch   = epoch_index;
+   const fc::variant raw_var = _opp_client->outbound_envelopes(eth::block_tag_t::finalized, epoch);
+   // Three static words: (uint32 epochIndex, uint64 emittedAt, bytes32 checksum).
+   constexpr size_t record_hex_chars = HEX_PREFIX_CHARS + 3 * EVM_ABI_WORD_BYTES * HEX_CHARS_PER_BYTE;
+   FC_ASSERT(raw_var.is_string() && raw_var.as_string().size() == record_hex_chars,
+             "outpost_ethereum_client[{}]: {}({}) did not return one record", to_string(),
+             opp_contract_client::view_outbound_envelopes, epoch_index);
+   const fc::variant decoded = eth::contract_decode_data(
+      _opp_client->get_abi(opp_contract_client::view_outbound_envelopes), raw_var.as_string());
+   FC_ASSERT(decoded.is_object(), "outpost_ethereum_client[{}]: {}({}) did not decode", to_string(),
+             opp_contract_client::view_outbound_envelopes, epoch_index);
+   const fc::variant_object& record = decoded.get_object();
+
+   const std::optional<uint64_t> recorded_epoch = abi_uint_output(record[opp_abi::field::record_epoch_index]);
+   FC_ASSERT(recorded_epoch, "outpost_ethereum_client[{}]: {}({}) carried an unparsable epoch", to_string(),
+             opp_contract_client::view_outbound_envelopes, epoch_index);
+   if (*recorded_epoch == 0) return std::nullopt;   // an absent mapping entry reads as all zeros
+   FC_ASSERT(*recorded_epoch == epoch_index, "outpost_ethereum_client[{}]: {}({}) holds the record of epoch {}",
+             to_string(), opp_contract_client::view_outbound_envelopes, epoch_index, *recorded_epoch);
+
+   const std::string      checksum_hex = record[opp_abi::field::record_checksum].as_string();
+   const std::string_view checksum     = strip_hex_prefix(checksum_hex);
+   FC_ASSERT(checksum.size() == sizeof(fc::sha256) * HEX_CHARS_PER_BYTE,
+             "outpost_ethereum_client[{}]: {}({}) carried a malformed checksum", to_string(),
+             opp_contract_client::view_outbound_envelopes, epoch_index);
+   return fc::sha256(checksum);
 }
 
 void outpost_ethereum_client::bind_syndication_pool(

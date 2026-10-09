@@ -34,6 +34,7 @@ public:
                                          const std::vector<char>&,
                                          fc::microseconds) override { return {}; }
    std::vector<char> read_inbound_envelope(uint32_t, fc::microseconds) override { return {}; }
+   std::optional<fc::sha256> read_emitted_envelope_digest(uint32_t, fc::microseconds) override { return {}; }
 
 private:
    sysio::opp::types::ChainKind _kind;

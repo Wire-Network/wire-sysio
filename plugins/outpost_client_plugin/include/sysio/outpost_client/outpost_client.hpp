@@ -4,10 +4,12 @@
 #include <cstdint>
 #include <format>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
+#include <fc/crypto/sha256.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/time.hpp>
 #include <sysio/opp/opp.hpp>
@@ -128,6 +130,18 @@ public:
     */
    virtual std::vector<char> read_inbound_envelope(uint32_t         epoch_index,
                                                    fc::microseconds deadline) = 0;
+
+   /**
+    * @brief The digest of the envelope this outpost emitted for `epoch_index`, from the outpost's own write-once
+    *        record of its emits: keccak256 of the canonical encoded envelope, which is the protocol's epoch digest
+    *        and what the next envelope carries as `previous_envelope_hash`. Read at finality.
+    *
+    * @return The digest, or nullopt when the outpost holds no final record for that epoch: nothing emitted for it
+    *         yet, or the record has left the outpost's retention window.
+    * @throws fc::exception on RPC failure, deadline expiry, or an outpost interface that keeps no such record.
+    */
+   virtual std::optional<fc::sha256> read_emitted_envelope_digest(uint32_t         epoch_index,
+                                                                  fc::microseconds deadline) = 0;
 
    /**
     * @brief OUTPOST CRANKS — drive the outpost's permissionless per-epoch

@@ -18,6 +18,10 @@ namespace sysio {
    /// All 21 batch operators run this plugin in perpetuity. The epoch scheduler
    /// (sysio.epoch) assigns operators into 3 groups of 7. Each epoch, one group
    /// is elected; those 7 execute the full epoch cycle (outbound then inbound).
+   ///
+   /// With `batch-underwriter-account` it also runs, or only runs, the
+   /// underwriter: it bonds each sysio.synd envelope request once the outpost
+   /// confirms the envelope, then approves and claims the bond.
    class batch_operator_plugin : public appbase::plugin<batch_operator_plugin> {
    public:
       APPBASE_PLUGIN_REQUIRES(

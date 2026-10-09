@@ -41,15 +41,21 @@ namespace swap {
    }
 }
 
-/// `sysio.liq` identifiers the pending-yield crank touches.
+/// `sysio.liq` identifiers the pending-yield crank and the underwriter touch.
 namespace liq {
    constexpr auto account           = "sysio.liq";
    constexpr auto table_liqpending  = "liqpending";
+   constexpr auto table_accounts    = "accounts";
+   constexpr auto table_stat        = "stat";
    constexpr auto action_queueyield = "queueyield";
    namespace field {
       constexpr auto quantity    = "quantity";
       constexpr auto symbol_code = "symbol_code";   ///< the kv key of `liqpending`
       constexpr auto sym         = "sym";           ///< `queueyield`'s argument
+      constexpr auto balance     = "balance";       ///< an `accounts` row's holding
+      constexpr auto supply      = "supply";        ///< a `stat` row's supply, in the shadow's symbol
+      constexpr auto token_code  = "token_code";    ///< a `stat` row's registry token code
+      constexpr auto chain_code  = "chain_code";    ///< a `stat` row's outpost
    }
 }
 
