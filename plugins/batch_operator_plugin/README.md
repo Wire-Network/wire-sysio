@@ -157,9 +157,12 @@ The node needs an outpost RPC client for every active chain (each client spec na
 a signing key, though the underwriter only reads), the Ethereum OPP ABI files (which
 must declare `outboundEnvelopes`) and the Solana IDL (which must declare
 `EnvelopeLog`). Use RPC endpoints independent of the batch operators': the
-verification is only as good as the outpost reads. A request whose epoch has left
-the outpost's record window (200 epochs on Ethereum, 128 on Solana by default) can
-no longer be verified and waits. Run one underwriter node per account.
+verification is only as good as the outpost reads. A request whose record has left
+the outpost can no longer be verified and waits until `sysio` rules it. Ethereum keeps
+200 epochs by default, but Solana keeps only its last 10 records, so a Solana request
+must be verified within about 10 epochs. Before `sysio.chains::setoutpost` replaces an
+active outpost's deployment, let that chain's OPEN requests settle: the underwriter
+reads only the new deployment's records. Run one underwriter node per account.
 
 Size each cap for the most the token syndicates in one challenge window
 (`window_sec`, 3 hours by default) plus the time it takes to claim.

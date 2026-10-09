@@ -494,13 +494,15 @@ struct batch_operator_plugin::impl {
                                                  shutting_down);
    }
 
-   /// Every row of `code::table`, values only, or nullopt when the read failed. `scope` filters only a table whose
-   /// first key is `scope`.
-   std::optional<fc::variants> read_all_rows(std::string_view code, std::string_view scope, std::string_view table) {
+   /// Every row of `code::table` from the key `from` (a key object; empty starts at the first row), values only, or
+   /// nullopt when the read failed. `scope` filters only a table whose first key is `scope`.
+   std::optional<fc::variants> read_all_rows(std::string_view code, std::string_view scope, std::string_view table,
+                                             const fc::variant_object& from = {}) {
       sysio::chain_apis::read_only::get_table_rows_params p;
       p.code        = chain::name(code);
       p.scope       = std::string(scope);
       p.table       = std::string(table);
+      if (from.size() > 0) p.lower_bound = fc::json::to_string(from, fc::json::yield_function_t{});
       p.all_rows    = true;
       p.values_only = true;
       std::optional<sysio::chain_apis::read_only::get_table_rows_result> rows = read_table_checked(std::move(p));
@@ -1509,7 +1511,8 @@ struct batch_operator_plugin::impl {
       std::optional<std::vector<uw::request>> requests = read_bond_requests(underwriter_scan_from, symbols_of(tokens));
       if (!requests) return std::nullopt;
       in.requests = std::move(*requests);
-      std::optional<std::map<uw::request_id_t, uw::bond_position>> bonds = read_own_bonds(in.requests);
+      std::optional<std::map<uw::request_id_t, uw::bond_position>> bonds =
+         read_own_bonds(underwriter_scan_from, in.requests);
       if (!bonds) return std::nullopt;
       in.bonds = std::move(*bonds);
       in.caps  = caps_by_token(tokens);
@@ -1531,19 +1534,13 @@ struct batch_operator_plugin::impl {
 
    /// Every `sysio.bond::requests` row from id `from` that decodes with `symbols`, or nullopt when the read failed.
    std::optional<std::vector<uw::request>> read_bond_requests(uw::request_id_t from, const uw::token_symbols& symbols) {
-      sysio::chain_apis::read_only::get_table_rows_params p;
-      p.code        = chain::name(uw::bond::account);
-      p.scope       = uw::bond::account;
-      p.table       = uw::bond::table_requests;
-      p.lower_bound = fc::json::to_string(fc::mutable_variant_object()(uw::bond::field::id, from),
-                                          fc::json::yield_function_t{});
-      p.all_rows    = true;
-      p.values_only = true;
-      std::optional<sysio::chain_apis::read_only::get_table_rows_result> read = read_table_checked(std::move(p));
-      if (!read) return std::nullopt;
+      const std::optional<fc::variants> rows = read_all_rows(uw::bond::account, uw::bond::account,
+                                                             uw::bond::table_requests,
+                                                             fc::mutable_variant_object()(uw::bond::field::id, from));
+      if (!rows) return std::nullopt;
       std::vector<uw::request> out;
       size_t                   undecodable = 0;
-      for (const fc::variant& r : read->rows) {
+      for (const fc::variant& r : *rows) {
          std::optional<uw::request> decoded = uw::decode_request(r.get_object(), symbols);
          if (decoded) out.push_back(std::move(*decoded));
          else ++undecodable;
@@ -1554,13 +1551,16 @@ struct batch_operator_plugin::impl {
       return out;
    }
 
-   /// The underwriter's `sysio.bond::bonds` rows by request id, each in its request's token, or nullopt when the read
-   /// failed or one of them does not decode or names no request among `requests`: a bond it cannot read or attribute
-   /// to a token must not drop out of its exposure.
+   /// The underwriter's `sysio.bond::bonds` rows on requests from id `from`, by request id, each in its request's
+   /// token, or nullopt when the read failed or one of them does not decode or names no request among `requests`: a
+   /// bond it cannot read or attribute to a token must not drop out of its exposure. The table is keyed by request id
+   /// first, and the scan window `from` holds every request the underwriter has a bond on.
    std::optional<std::map<uw::request_id_t, uw::bond_position>>
-   read_own_bonds(const std::vector<uw::request>& requests) {
+   read_own_bonds(uw::request_id_t from, const std::vector<uw::request>& requests) {
       const std::optional<fc::variants> rows =
-         read_all_rows(uw::bond::account, uw::bond::account, uw::bond::table_bonds);
+         read_all_rows(uw::bond::account, uw::bond::account, uw::bond::table_bonds,
+                       fc::mutable_variant_object()(uw::bond::field::request_id, from)
+                                                   (uw::bond::field::underwriter, chain::name()));
       if (!rows) return std::nullopt;
       std::map<uw::request_id_t, uw::bond_position> out;
       try {
