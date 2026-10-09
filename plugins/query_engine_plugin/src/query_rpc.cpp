@@ -1,6 +1,7 @@
 #include <fc/variant_object.hpp>
 #include <sysio/query_engine_plugin/query.hpp>
 
+#include <fmt/format.h>
 #include <magic_enum/magic_enum.hpp>
 #include <rapidjson/document.h>
 #include <rapidjson/memorystream.h>
@@ -9,6 +10,7 @@
 #include <algorithm>
 #include <array>
 #include <charconv>
+#include <iterator>
 #include <limits>
 #include <set>
 #include <span>
@@ -25,31 +27,54 @@ constexpr auto invalid_envelope_message = "Invalid JSON-RPC request";
 constexpr auto invalid_params_message = "Expected named query parameter";
 constexpr auto invalid_parameter_name_message = "Unknown query parameter";
 constexpr auto duplicate_parameter_message = "Duplicate query parameter";
-constexpr auto lowers_only_infix = " may only lower ";
+constexpr auto integer_range_format = "{} must be an integer in [{}, {}]";
+constexpr auto lowers_only_format = "{} may only lower {}";
 /// Every member of the root request object.
 constexpr auto envelope_members = std::to_array<std::string_view>({key_version, key_id, key_method, key_params});
 constexpr uint32_t parse_flags =
    rapidjson::kParseValidateEncodingFlag | rapidjson::kParseNumbersAsStringsFlag | rapidjson::kParseIterativeFlag;
 
+/// The JSON token a params member's value was written as; `other` is anything else, or an absent member.
+enum class token_kind : uint8_t { other, string, number };
+
 /// Preflight bounds JSON nesting and retains token kinds without ever parsing a host float. Under
 /// kParseNumbersAsStringsFlag the document holds numbers as strings, so the token kind of every
-/// top-level params member is recorded here.
+/// request_field member of params is recorded here.
 struct envelope_preflight : rapidjson::BaseReaderHandler<rapidjson::UTF8<>, envelope_preflight> {
    query_budget& budget;
    uint32_t depth = 0;
    std::string root_key;
-   std::string parameter_key;
    bool version_string = false, method_string = false, id_number = false;
-   /// params members whose value token was a JSON string, respectively a JSON number.
-   std::set<std::string, std::less<>> string_parameters, numeric_parameters;
+   /// Value token kinds of the request_field::all members of params, in that order.
+   std::array<token_kind, request_field::all.size()> parameter_kinds{};
+   /// Slot in parameter_kinds of the params member being read; empty for any other name.
+   std::optional<size_t> parameter;
    explicit envelope_preflight(query_budget& budget)
       : budget(budget) {}
+   /// The slot of `name` in request_field::all.
+   static std::optional<size_t> slot(std::string_view name) {
+      const auto found = std::ranges::find(request_field::all, name);
+      if (found == request_field::all.end())
+         return std::nullopt;
+      return static_cast<size_t>(std::distance(request_field::all.begin(), found));
+   }
+   /// The recorded value token kind of the params member `name`.
+   token_kind kind(std::string_view name) const {
+      const std::optional<size_t> index = slot(name);
+      return index ? parameter_kinds[*index] : token_kind::other;
+   }
+   /// Record the kind of a value written directly under a request_field member of params.
+   void record(token_kind token) {
+      if (depth == 2 && parameter)
+         parameter_kinds[*parameter] = token;
+   }
    bool Key(const char* text, rapidjson::SizeType length, bool) {
       budget.check();
-      if (depth == 1)
+      if (depth == 1) {
          root_key.assign(text, length);
-      else if (depth == 2 && root_key == key_params)
-         parameter_key.assign(text, length);
+         parameter.reset();
+      } else if (depth == 2 && root_key == key_params)
+         parameter = slot(std::string_view(text, length));
       return true;
    }
    bool String(const char*, rapidjson::SizeType, bool) {
@@ -57,15 +82,13 @@ struct envelope_preflight : rapidjson::BaseReaderHandler<rapidjson::UTF8<>, enve
          version_string = true;
       if (depth == 1 && root_key == key_method)
          method_string = true;
-      if (depth == 2 && root_key == key_params)
-         string_parameters.insert(parameter_key);
+      record(token_kind::string);
       return true;
    }
    bool RawNumber(const char*, rapidjson::SizeType, bool) {
       if (depth == 1 && root_key == key_id)
          id_number = true;
-      if (depth == 2 && root_key == key_params)
-         numeric_parameters.insert(parameter_key);
+      record(token_kind::number);
       return true;
    }
    bool StartObject() {
@@ -155,8 +178,7 @@ std::optional<integral_value> parse_integral(std::string_view number, uint64_t m
    digits.append(size_t(-scale), '0');
    for (char character : digits) {
       const uint64_t digit = character - '0';
-      // Defensive: the digit-count check above already keeps every current bound (at most 16 digits)
-      // far from overflow, but a `magnitude_bound` near UINT64_MAX admits 20-digit tokens that would wrap.
+      // A bound near UINT64_MAX admits 20-digit tokens, which would otherwise wrap.
       if (result.magnitude > (std::numeric_limits<uint64_t>::max() - digit) / constants::decimal_base)
          return std::nullopt;
       result.magnitude = result.magnitude * constants::decimal_base + digit;
@@ -197,16 +219,18 @@ constexpr integer_parameter timeout_parameter{request_field::timeout_ms, constan
 /// or boolean) whose exact value lies in the parameter's range; anything else is INVALID_PARAMS.
 std::optional<uint64_t> parse_integer_parameter(const rapidjson::Value& params, const envelope_preflight& preflight,
                                                 const integer_parameter& parameter) {
-   const auto member = params.FindMember(rapidjson::StringRef(parameter.field.data(), parameter.field.size()));
+   // A Value key carries its length; a bare StringRef converts to const char* and FindMember would strlen it.
+   const rapidjson::Value name(rapidjson::StringRef(parameter.field.data(), parameter.field.size()));
+   const auto member = params.FindMember(name);
    if (member == params.MemberEnd())
       return std::nullopt;
-   const auto value = preflight.numeric_parameters.contains(parameter.field) && member->value.IsString()
-                         ? parse_integral(string_view(member->value), parameter.maximum)
-                         : std::nullopt;
+   const std::optional<integral_value> value =
+      preflight.kind(parameter.field) == token_kind::number && member->value.IsString()
+         ? parse_integral(string_view(member->value), parameter.maximum)
+         : std::nullopt;
    if (!value || (value->negative && value->magnitude) || value->magnitude < parameter.minimum)
-      throw query_error(error_kind::INVALID_PARAMS, std::string(parameter.field) + " must be an integer in [" +
-                                                       std::to_string(parameter.minimum) + ", " +
-                                                       std::to_string(parameter.maximum) + "]");
+      throw query_error(error_kind::INVALID_PARAMS,
+                        fmt::format(integer_range_format, parameter.field, parameter.minimum, parameter.maximum));
    return value->magnitude;
 }
 
@@ -222,7 +246,7 @@ query_options parse_parameters(const rapidjson::Value& params, const envelope_pr
                                                        ? invalid_parameter_name_message
                                                        : duplicate_parameter_message);
    const auto query = params.FindMember(request_field::query);
-   if (query == params.MemberEnd() || !preflight.string_parameters.contains(request_field::query) ||
+   if (query == params.MemberEnd() || preflight.kind(request_field::query) != token_kind::string ||
        !query->value.IsString() || query->value.GetStringLength() == 0)
       throw query_error(error_kind::INVALID_PARAMS, invalid_params_message);
    query_options options;
@@ -231,7 +255,7 @@ query_options parse_parameters(const rapidjson::Value& params, const envelope_pr
    if (const auto milliseconds = parse_integer_parameter(params, preflight, timeout_parameter)) {
       if (*milliseconds > static_cast<uint64_t>(config.timeout.count()))
          throw query_error(error_kind::INVALID_PARAMS,
-                           std::string(request_field::timeout_ms) + lowers_only_infix + option::timeout_ms,
+                           fmt::format(lowers_only_format, request_field::timeout_ms, option::timeout_ms),
                            std::nullopt, option::timeout_ms);
       options.timeout = std::chrono::milliseconds(*milliseconds);
    }
