@@ -6,10 +6,10 @@ The request schema describes the single-request profile; method validation and S
 in the service. Notifications have no response document (HTTP 204, empty body).
 
 Request `params` hold the required `query` and the optional paging members `limit` and `offset`
-(integers in [0, 9007199254740991]) and `timeout_ms` (an integer of at least 1). The schema bounds
-`timeout_ms` only by that range; the service additionally rejects a value above the configured
-`query-timeout-ms` as INVALID_PARAMS, because a request may only lower the deadline. Request
-integers are exact JSON numbers; response counters are unsigned decimal strings.
+(integers in [0, 9007199254740991]) and `timeout_ms` (an integer in [1, 9007199254740991]). The
+schema bounds `timeout_ms` only by that range; the service additionally rejects a value above the
+configured `query-timeout-ms` as INVALID_PARAMS, because a request may only lower the deadline.
+Request integers are exact JSON numbers; response counters are unsigned decimal strings.
 
 Success and error envelopes are mutually exclusive. A successful result is never silently truncated:
 `page` says which window of the complete evaluated output it holds. Budget/decode failures contain
