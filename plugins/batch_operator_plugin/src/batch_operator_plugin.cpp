@@ -1192,19 +1192,21 @@ void batch_operator_plugin::set_program_options(options_description& cli,
    opts("batch-epoch-poll-ms", bpo::value<uint32_t>()->default_value(EPOCH_POLL_MS),
         "How often to check epoch state (ms)");
    // SIZING RULE for batch-delivery-timeout-ms: it bounds the WHOLE outbound
-   // delivery, and an Ethereum delivery is now one transaction PER CHUNK
-   // (ETHEREUM_MAX_CHUNK_BYTES = 8192; Solana chunks at 672). Size it as
-   //     total chunks x (target block time + confirmation margin)
-   // for the largest envelope the outpost is expected to carry. At the 32768
-   // byte platform envelope cap that is 4 Ethereum chunks, so the 15000 ms
-   // default covers a 1 s block time with wide margin. Undersizing is not fatal:
-   // the relay resumes from the on-chain per-operator high-water mark on the
-   // next cron tick, so a truncated tick converges rather than restarting from
-   // chunk zero. SHARED KNOB: this same value also bounds the depot
-   // push_action completion wait (see push_action above); post-WIRE-331 a
-   // timeout there is safe (the async_action_completion callback retains its
-   // own state), but raising this option lengthens BOTH waits, so raise it for
-   // chunking deliberately rather than as a blanket tuning step.
+   // delivery, which is a sequence of confirmed transactions. On Ethereum the
+   // whole envelope goes in ONE `epochIn`, continued by a further call for each
+   // time the outpost's dispatch spills (a full-cap envelope spills a handful
+   // of times at most); on Solana the envelope is chunked at 672 bytes. Size it
+   // as
+   //     expected transactions x (target block time + confirmation margin)
+   // for the largest envelope the outpost is expected to carry; the 15000 ms
+   // default covers a 1 s block time with wide margin. Undersizing is not
+   // fatal: the relay resumes from the outpost's on-chain cursor on the next
+   // cron tick, so a truncated tick converges rather than restarting. SHARED
+   // KNOB: this same value also bounds the depot push_action completion wait
+   // (see push_action above); post-WIRE-331 a timeout there is safe (the
+   // async_action_completion callback retains its own state), but raising this
+   // option lengthens BOTH waits, so raise it for delivery deliberately rather
+   // than as a blanket tuning step.
    // Help text below must stay ASCII with no " --" sequence (PerformanceHarness
    // splits nodeop --help output on that token).
    opts("batch-delivery-timeout-ms", bpo::value<uint32_t>()->default_value(DELIVERY_TIMEOUT_MS),

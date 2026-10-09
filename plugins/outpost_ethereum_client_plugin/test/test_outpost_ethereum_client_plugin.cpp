@@ -28,6 +28,7 @@
 #include <fc/network/json_rpc/json_rpc_client.hpp>
 #include <magic_enum/magic_enum.hpp>
 
+#include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <fc-test/build_info.hpp>
@@ -199,39 +200,41 @@ constexpr size_t rpc_length_oversized_envelope_bytes = sysio::OPP_MAX_ENVELOPE_B
 constexpr char malformed_envelope_byte = static_cast<char>(0xff);
 constexpr char oversized_envelope_fill_byte = static_cast<char>(0x01);
 
-// ── Chunked `epochIn` fixtures ───────────────────────────────────────────
+// ── Whole-envelope `epochIn` fixtures ────────────────────────────────────
 constexpr std::string_view test_opp_inbound_address = "e7f1725E7734CE288F8367e1Bb143E90bb3F0512";
-/// keccak256("epochIn(uint32,uint16,uint16,uint32,bytes)")[0..4).
-constexpr std::string_view epoch_in_selector = "c3e558bc";
+/// keccak256("epochIn(uint32,bytes)")[0..4).
+constexpr std::string_view epoch_in_selector = "004e356a";
+/// keccak256("epochIn(uint32,uint16,uint16,uint32,bytes)")[0..4) — the retired chunked form.
+constexpr std::string_view retired_chunked_epoch_in_selector = "c3e558bc";
 /// keccak256("epochIn(bytes)")[0..4) — the retired single-transaction form.
 constexpr std::string_view retired_single_bytes_epoch_in_selector = "cfae3118";
-constexpr size_t evm_address_bytes = 20;
-constexpr size_t evm_address_hex_chars = evm_address_bytes * hex_chars_per_byte;
-constexpr size_t epoch_in_input_count = 5;
-/// A peer operator's address, used to prove an unowned staging header is ignored.
-constexpr std::string_view foreign_operator_address =
-   "0x90F79bf6EB2c4f870365E785982E1f101E93b906";
-/// Envelope sizes exercising the chunk loop: three full chunks + a remainder,
-/// and the exact platform cap (four full chunks).
-constexpr size_t three_chunk_envelope_bytes = 2 * sysio::ETHEREUM_MAX_CHUNK_BYTES + 3'616;
+constexpr size_t epoch_in_input_count = 2;
+/// The digest consensus settled on, a digest that diverges from it, and the
+/// zero word the outpost reports for a relay that never delivered.
+constexpr std::string_view settled_digest_word =
+   "1111111111111111111111111111111111111111111111111111111111111111";
+constexpr std::string_view divergent_digest_word =
+   "2222222222222222222222222222222222222222222222222222222222222222";
+constexpr std::string_view zero_digest_word =
+   "0000000000000000000000000000000000000000000000000000000000000000";
+/// A mid-size envelope — large enough that a chunked relay would have split it.
+constexpr size_t mid_envelope_bytes = 20'000;
 /// `derive_buffered_gas_limit` applies a ×1.2 buffer, so a policy pinned at
 /// EIP-7825's per-transaction cap rejects any estimate above 13 981 013.
-constexpr uint64_t eip_7825_tx_gas_cap = 16'777'216;
 constexpr uint64_t under_cap_gas_estimate = 13'000'000;
 constexpr uint64_t under_cap_buffered_gas_limit = 15'600'000;
 constexpr uint64_t over_cap_gas_estimate = 14'000'000;
+/// A policy ceiling below EIP-7825's cap, to prove the floor follows the policy.
+constexpr uint64_t below_cap_policy_gas_limit = 9'000'000;
+
 /// JSON-RPC error code anvil/geth report for a reverted call.
 constexpr int contract_revert_rpc_code = 3;
-
 /// JSON-RPC parse error: the node never executed the call, so nothing on chain changed.
 constexpr int json_rpc_parse_error_code = -32700;
 
-/// `keccak256("OPP_ChunkBufferMissing(address)")[0..4]`, written out rather than recomputed so
-/// these tests pin the client's own hashing of that signature instead of restating it.
-constexpr std::string_view chunk_buffer_missing_selector = "dca69e67";
-/// A selector the client must not accept. `OPP_NoChunkSlot(address)` is a real neighbouring
-/// error of the same shape, so a length or padding check alone would let it through.
-constexpr std::string_view no_chunk_slot_selector = "9ecbc704";
+/// A one-address custom error the client has no reading for — the same shape as
+/// `AccessManagedUnauthorized(address)`, a different selector.
+constexpr std::string_view unrelated_address_error_selector = "dca69e67";
 /// Any address that is not this relay's signer, for the revert naming a different operator.
 constexpr std::string_view test_other_operator_address = "0x00000000000000000000000000000000deadbeef";
 
@@ -374,34 +377,20 @@ std::string encode_latest_outbound_result(uint32_t epoch, const std::vector<char
           abi_word(data.size()) + data_hex;
 }
 
-/// 2^70 encoded as one 32-byte ABI word — a `storedBytes` value that no uint64
-/// can hold, used to prove the diagnostics-only field cannot veto a resume.
-std::string stored_bytes_above_uint64_word() {
-   const std::string value = "4" + std::string(17, '0');   // 2^70 == 0x4 << 68
-   return std::string(evm_abi_word_hex_chars - value.size(), '0') + value;
+/// Encode the raw return bytes for the `dispatchSpill(uint32)` view — four
+/// static outputs, so the words are simply concatenated with no offset table.
+std::string encode_dispatch_spill_result(bool     tipped,
+                                         uint16_t dispatched,
+                                         bool     complete,
+                                         bool     finalized) {
+   return std::string(hex_prefix) + abi_word(tipped ? 1 : 0) + abi_word(dispatched) +
+          abi_word(complete ? 1 : 0) + abi_word(finalized ? 1 : 0);
 }
 
-/// Encode the raw return bytes for `envelopeChunkState(address)` — six static
-/// outputs, so the words are simply concatenated with no offset table.
-///
-/// `stored_bytes_word`, when non-empty, replaces the encoded `storedBytes` word
-/// so a test can present a uint256 beyond the uint64 range.
-std::string encode_envelope_chunk_state_result(uint32_t         epoch_index,
-                                               std::string_view owner_address,
-                                               uint16_t         total_chunks,
-                                               uint16_t         received_chunks,
-                                               uint32_t         total_bytes,
-                                               uint64_t         stored_bytes,
-                                               std::string_view stored_bytes_word = {}) {
-   std::string owner{owner_address};
-   if (owner.starts_with(hex_prefix)) owner.erase(0, hex_prefix.size());
-   BOOST_REQUIRE_EQUAL(owner.size(), evm_address_hex_chars);
-   const std::string stored =
-      stored_bytes_word.empty() ? abi_word(stored_bytes) : std::string(stored_bytes_word);
-   BOOST_REQUIRE_EQUAL(stored.size(), evm_abi_word_hex_chars);
-   return std::string(hex_prefix) + abi_word(epoch_index) +
-          std::string(evm_abi_word_hex_chars - evm_address_hex_chars, '0') + owner +
-          abi_word(total_chunks) + abi_word(received_chunks) + abi_word(total_bytes) + stored;
+/// Encode the raw return bytes for a single-`bytes32` view.
+std::string encode_word_result(std::string_view word) {
+   BOOST_REQUIRE_EQUAL(word.size(), evm_abi_word_hex_chars);
+   return std::string(hex_prefix) + std::string(word);
 }
 
 /// Encode the raw return bytes for the single-output `nextEpochIndex()` view.
@@ -409,25 +398,159 @@ std::string encode_next_epoch_index_result(uint32_t next_epoch_index) {
    return std::string(hex_prefix) + abi_word(next_epoch_index);
 }
 
+/// ABI-encode one address as the single word an `address` getter returns.
+std::string encode_address_word(std::string_view address_hex) {
+   std::string_view address = address_hex;
+   if (address.starts_with("0x") || address.starts_with("0X")) address.remove_prefix(2);
+   return std::string(hex_prefix) + std::string(evm_abi_word_hex_chars - address.size(), '0') +
+          std::string(address);
+}
+
 /// One `epochIn` invocation as the stubbed typed wrapper observed it.
-struct observed_chunk_call {
+struct observed_delivery_call {
    uint32_t    epoch_index;
-   uint16_t    chunk_index;
-   uint16_t    total_chunks;
-   uint32_t    total_bytes;
-   std::string chunk_hex;
+   std::string envelope_hex;
+   uint64_t    gas_budget;
 };
 
+/// The head block the scripted chain reports when a tick starts; each
+/// confirmed call lands one block later.
+constexpr uint64_t test_head_block = 100;
+/// Fee RPC answers for the scripted chain: a 10 wei tip over a 45 wei base
+/// fee, so the derived `max_fee_per_gas` is 100 wei and the policy's
+/// total-cost term never binds under the maximum policy.
+constexpr std::string_view test_priority_fee_hex = "0xa";
+constexpr std::string_view test_base_fee_hex     = "0x2d";
+/// Event topics of the `OPPInbound` events a delivery receipt carries —
+/// `keccak256` of each signature, written out so the tests pin the client's own
+/// hashing rather than restate it.
+constexpr std::string_view epoch_delivery_topic =
+   "cafc00e7c35f462868d78e8228850e885bd0870978967c446c6bb67122a3fb28";
+constexpr std::string_view epoch_consensus_topic =
+   "a77ed82a4a8c2f7b412630e92b1c8f59e6645b05820a8b0ed43ae5fac990491c";
+constexpr std::string_view epoch_dispatch_progressed_topic =
+   "1aaaa8b219dd84dddbfc5836221ae6ca620f0ec0711a5fb907846becfacc9500";
+constexpr std::string_view epoch_complete_topic =
+   "e784b22f2061de501b77364cab02ee109528afe4ddc8d423d076f6b49021b58e";
+/// Selectors of the `epochIn` refusals the relay classifies, written out the
+/// same way (`keccak256(signature)[0..4]`).
+constexpr std::string_view dispatch_underfunded_selector       = "e76ff350";
+constexpr std::string_view handler_gas_exhausted_selector      = "a117d554";
+constexpr std::string_view non_sequential_epoch_selector       = "fa7d07a0";
+constexpr std::string_view operator_already_delivered_selector = "208216ac";
+constexpr std::string_view not_active_operator_selector        = "abc01454";
+constexpr std::string_view digest_mismatch_selector            = "40d6b4cd";
+/// `keccak256` of the empty byte string, pinning `envelope_digest_word`.
+constexpr std::string_view keccak256_of_empty =
+   "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470";
+/// A group of three: a strict majority is two.
+constexpr uint32_t test_group_size = 3;
+constexpr uint32_t test_majority   = test_group_size / 2 + 1;
+/// A policy ceiling under what a full-cap envelope needs, for the refusal to build on it.
+constexpr uint64_t undeliverable_policy_gas_limit = 2'000'000;
+/// One ether, for the total-cost ceiling.
+constexpr uint64_t one_ether_wei = 1'000'000'000'000'000'000ULL;
+constexpr uint64_t hundred_gwei  = 100'000'000'000ULL;
+
+/// The chain-level RPCs the relay issues outside the typed wrappers
+/// (`eth_blockNumber`, the fee pair), answered from a script so the real
+/// client never dials its dead endpoint for them. Anything else still does,
+/// and fails loudly.
+struct scripted_rpc {
+   fc::uint256 head_block{test_head_block};
+   size_t      block_number_reads = 0;
+};
+
+class scripted_ethereum_client final : public ethereum_client {
+public:
+   scripted_ethereum_client(const fc::crypto::signature_provider_ptr& provider, ethereum_transaction_policy policy,
+                            std::shared_ptr<scripted_rpc> script)
+      : ethereum_client(provider, std::variant<std::string, fc::url>{std::string(latest_slot_test_rpc_url)},
+                        std::move(policy))
+      , _script(std::move(script)) {}
+
+   fc::variant execute(const std::string& method, const fc::variant& params) override {
+      if (const auto scripted = answer(method)) return *scripted;
+      return ethereum_client::execute(method, params);
+   }
+   fc::variant execute_idempotent(const std::string& method, const fc::variant& params) override {
+      if (const auto scripted = answer(method)) return *scripted;
+      return ethereum_client::execute_idempotent(method, params);
+   }
+
+private:
+   std::optional<fc::variant> answer(const std::string& method) {
+      if (method == "eth_blockNumber") {
+         ++_script->block_number_reads;
+         return fc::variant(format_rpc_quantity(_script->head_block));
+      }
+      if (method == "eth_maxPriorityFeePerGas") return fc::variant(std::string(test_priority_fee_hex));
+      if (method == "eth_getBlockByNumber") {
+         return fc::variant(fc::mutable_variant_object("baseFeePerGas", std::string(test_base_fee_hex)));
+      }
+      return std::nullopt;
+   }
+
+   std::shared_ptr<scripted_rpc> _script;
+};
+
+/// Encode the raw return bytes for the `pendingConsensusForDigest(bytes32)`
+/// view — five static outputs, concatenated.
+std::string encode_pending_consensus_result(uint32_t next_epoch, uint32_t agreeing, uint32_t group_size,
+                                            uint64_t epoch_started_at, uint32_t epoch_duration_sec) {
+   return std::string(hex_prefix) + abi_word(next_epoch) + abi_word(agreeing) + abi_word(group_size) +
+          abi_word(epoch_started_at) + abi_word(epoch_duration_sec);
+}
+
+/// One receipt log entry as a node returns it.
+fc::variant receipt_log(std::string_view address, const std::vector<std::string>& topics, std::string data_hex) {
+   fc::variants topic_variants;
+   for (const auto& topic : topics) topic_variants.emplace_back(topic);
+   return fc::mutable_variant_object("address", std::string(address))("topics", std::move(topic_variants))(
+      "data", std::string(hex_prefix) + std::move(data_hex));
+}
+
+std::string prefixed(std::string_view word) { return std::string(hex_prefix) + std::string(word); }
+
+fc::variant epoch_delivery_log(std::string_view address, uint32_t epoch, std::string_view operator_hex,
+                               std::string_view digest_word) {
+   return receipt_log(address, {prefixed(epoch_delivery_topic), prefixed(abi_word(epoch)),
+                                encode_address_word(operator_hex)},
+                      std::string(digest_word));
+}
+fc::variant epoch_consensus_log(std::string_view address, uint32_t epoch, std::string_view digest_word,
+                                uint32_t count) {
+   return receipt_log(address, {prefixed(epoch_consensus_topic), prefixed(abi_word(epoch))},
+                      std::string(digest_word) + abi_word(count));
+}
+fc::variant epoch_dispatch_progressed_log(std::string_view address, uint32_t epoch, uint16_t dispatched) {
+   return receipt_log(address, {prefixed(epoch_dispatch_progressed_topic), prefixed(abi_word(epoch))},
+                      abi_word(dispatched));
+}
+fc::variant epoch_complete_log(std::string_view address, uint32_t epoch) {
+   return receipt_log(address, {prefixed(epoch_complete_topic)}, abi_word(epoch));
+}
+
+/// A node's refusal of `epochIn` with one of the contract's custom errors: the
+/// execution-reverted code and the selector followed by `words` zero words.
+fc::network::json_rpc::json_rpc_error epoch_in_refusal(std::string_view selector, size_t words) {
+   std::string data = prefixed(selector);
+   for (size_t i = 0; i < words; ++i) data += abi_word(0);
+   return fc::network::json_rpc::json_rpc_error(contract_revert_rpc_code, "execution reverted", fc::variant(data));
+}
+
 /// Harness binding a real `outpost_ethereum_client` to a stubbed OPPInbound
-/// wrapper.
+/// wrapper over a scripted chain.
 ///
 /// `ethereum_client::get_contract` caches one typed wrapper per address, so a
 /// wrapper materialized here is the SAME object the client resolves in its
 /// constructor — replacing its `std::function` members intercepts every RPC at
 /// the typed callable boundary, exactly as the `getLatestOutboundEnvelope`
-/// coverage above does.
-struct chunked_delivery_fixture {
-   ~chunked_delivery_fixture() {
+/// coverage above does. The stubbed `epochIn` confirms in a fresh block each
+/// time and answers with a receipt the case scripts; every view records the
+/// block it was pinned to.
+struct whole_envelope_delivery_fixture {
+   ~whole_envelope_delivery_fixture() {
       outpost.reset();
       inbound.reset();
       tester.reset();
@@ -435,31 +558,79 @@ struct chunked_delivery_fixture {
    }
 
    std::unique_ptr<sig_provider_tester>                tester;
+   std::shared_ptr<scripted_rpc>                       rpc;
    std::shared_ptr<sysio::opp_inbound_contract_client> inbound;
    std::unique_ptr<sysio::outpost_ethereum_client>     outpost;
 
-   std::vector<observed_chunk_call> chunk_calls;
-   size_t                           chunk_state_reads = 0;
-   size_t                           discard_calls     = 0;
-   size_t                           next_epoch_reads  = 0;
+   /// Every `epochIn` that confirmed.
+   std::vector<observed_delivery_call> delivery_calls;
+   /// The budget of every `epochIn` attempt, refused ones included.
+   std::vector<uint64_t>               attempted_budgets;
+   /// Per attempt, in order, a refusal the stub throws instead of confirming;
+   /// attempts past the end confirm.
+   std::vector<std::optional<fc::network::json_rpc::json_rpc_error>> refusals;
+   size_t                              next_epoch_reads = 0;
+   size_t                              spill_reads      = 0;
+   size_t                              settlement_reads = 0;
+   size_t                              consensus_reads  = 0;
+   /// The block parameter of every stubbed view read, in order.
+   std::vector<std::string>            read_blocks;
+   /// The digest every `pendingConsensusForDigest` read asked about.
+   std::vector<std::string>            consensus_digests;
 
-   /// Response the stubbed `envelopeChunkState` view returns; the default is
-   /// the all-zero (never staged) header.
-   std::string chunk_state_response =
-      encode_envelope_chunk_state_result(0, std::string(evm_address_hex_chars, '0'), 0, 0, 0, 0);
-   /// Response the stubbed `nextEpochIndex` view returns.
-   std::string next_epoch_index_response = encode_next_epoch_index_result(0);
-   /// When set, the stubbed `discardEnvelopeChunks` write throws it.
-   std::optional<fc::network::json_rpc::json_rpc_error> discard_failure;
+   /// Responses the stubbed `nextEpochIndex` view returns, one per read; the
+   /// last one repeats. The default is an outpost on the delivered epoch.
+   std::vector<std::string> next_epoch_index_responses{encode_next_epoch_index_result(test_wire_epoch)};
+   /// Responses the stubbed `dispatchSpill` view returns, one per read in
+   /// order; the last one repeats. The default is the never-tipped cursor.
+   std::vector<std::string> spill_responses{encode_dispatch_spill_result(false, 0, false, false)};
+   /// Responses the stubbed `epochDeliveries(epoch, self)` view returns, one
+   /// per read; the last repeats. The default: nothing recorded on the first
+   /// read, a record on every read after it (the delivery landed).
+   std::vector<std::string> own_delivery_responses{encode_word_result(zero_digest_word),
+                                                   encode_word_result(settled_digest_word)};
+   /// Response the stubbed `pendingEpochHash` view returns.
+   std::string pending_hash_response = encode_word_result(settled_digest_word);
+   /// Response the stubbed `pendingConsensusForDigest` view returns. The
+   /// default: this relay alone has delivered, the boundary long past.
+   std::string consensus_response = encode_pending_consensus_result(test_wire_epoch, 1, test_group_size, 0, 0);
+   /// Receipt logs per confirmed call, in order; the last repeats. The default
+   /// is the delivery record alone. `std::nullopt` entries use the default.
+   std::vector<std::optional<fc::variants>> receipt_logs;
    /// Wall-clock the FIRST stubbed `epochIn` burns before returning, standing in
    /// for a slow chain. Applied only to the first call so a deadline set below
-   /// it expires deterministically at the SECOND chunk's pre-flight check.
-   std::chrono::milliseconds first_chunk_delay{0};
+   /// it expires deterministically at the next pre-flight check.
+   std::chrono::milliseconds first_call_delay{0};
+
+   template <typename T>
+   static const T& response_at(const std::vector<T>& responses, size_t n) {
+      return responses[std::min(n, responses.size() - 1)];
+   }
+
+   /// Script the outpost as settled on `envelope`'s own digest with this relay
+   /// as its deliverer — the shape every continuation case needs. The record
+   /// appears from the `recorded_from_read`-th read on: 0 when the tick finds
+   /// it already there (a resume), 1 when the tick's own delivery lands it.
+   void settle_on(const std::vector<char>& envelope, size_t recorded_from_read = 0) {
+      const auto digest = sysio::outpost_ethereum_client_detail::envelope_digest_word(envelope);
+      own_delivery_responses.assign(recorded_from_read, encode_word_result(zero_digest_word));
+      own_delivery_responses.push_back(encode_word_result(digest));
+      pending_hash_response = encode_word_result(digest);
+   }
+
+   /// The distinct blocks the view reads were pinned to, adjacent repeats collapsed.
+   std::vector<std::string> blocks_read() const {
+      std::vector<std::string> blocks;
+      for (const auto& block : read_blocks) {
+         if (blocks.empty() || blocks.back() != block) blocks.push_back(block);
+      }
+      return blocks;
+   }
 };
 
 /// Build an envelope of exactly `size` bytes whose content varies per index, so
-/// a mis-sliced chunk cannot accidentally compare equal to the right one.
-std::vector<char> make_chunked_envelope(size_t size) {
+/// a mis-sliced payload cannot accidentally compare equal to the right one.
+std::vector<char> make_envelope(size_t size) {
    std::vector<char> envelope(size);
    for (size_t i = 0; i < size; ++i) {
       envelope[i] = static_cast<char>((i * 31 + 7) & 0xff);
@@ -475,21 +646,48 @@ std::vector<char> serialize_envelope(uint32_t epoch) {
    return {serialized.begin(), serialized.end()};
 }
 
-/// Stand up a `chunked_delivery_fixture`: a real `outpost_ethereum_client`
-/// whose OPPInbound wrapper has every typed callable replaced by a recording
-/// stub. The caller owns the returned fixture; the stubs capture it by
-/// reference, so it must not be moved after this returns.
+/// Serialize a protobuf envelope whose one message carries `attestations`
+/// attestations of `payload_bytes` each — the shape the delivery budget is
+/// sized from.
+std::vector<char> serialize_envelope_with_attestations(uint32_t epoch, uint32_t attestations,
+                                                       size_t payload_bytes) {
+   sysio::opp::Envelope envelope;
+   envelope.set_epoch_index(epoch);
+   auto* payload = envelope.add_messages()->mutable_payload();
+   for (uint32_t i = 0; i < attestations; ++i) {
+      auto* entry = payload->add_attestations();
+      entry->set_data(std::string(payload_bytes, static_cast<char>('a' + (i % 26))));
+      entry->set_data_size(static_cast<uint32_t>(payload_bytes));
+   }
+   const auto serialized = envelope.SerializeAsString();
+   return {serialized.begin(), serialized.end()};
+}
+
 /// The app, signer, chain connection and client entry every relay fixture
 /// stands on. The connection points at a port nothing listens on, so a wrapper
-/// a case forgot to stub fails loudly instead of dialing anything.
+/// a case forgot to stub fails loudly instead of dialing anything; the few
+/// chain-level RPCs the relay issues itself are answered by `rpc`.
 struct relay_test_stack {
    std::unique_ptr<sig_provider_tester>             tester;
    fc::crypto::signature_provider_ptr               sig_provider;
+   std::shared_ptr<scripted_rpc>                    rpc;
    ethereum_client_ptr                              eth_client;
    std::shared_ptr<sysio::ethereum_client_entry_t>  entry;
 };
 
-relay_test_stack create_relay_test_stack() {
+/// The maximum policy, with `max_gas_limit` overridden when a case needs a ceiling.
+ethereum_transaction_policy relay_test_policy(fc::uint256 max_gas_limit = maximum_ethereum_transaction_policy_value()) {
+   return ethereum_transaction_policy{
+      .client_id = std::string(latest_slot_test_entry_id),
+      .chain_id = test_evm_chain_id,
+      .max_priority_fee_per_gas = maximum_ethereum_transaction_policy_value(),
+      .max_fee_per_gas = maximum_ethereum_transaction_policy_value(),
+      .max_gas_limit = max_gas_limit,
+      .max_total_native_cost = maximum_ethereum_transaction_policy_value(),
+   };
+}
+
+relay_test_stack create_relay_test_stack(ethereum_transaction_policy transaction_policy = relay_test_policy()) {
    relay_test_stack stack;
    stack.tester = create_app();
 
@@ -500,18 +698,9 @@ relay_test_stack create_relay_test_stack() {
       std::string(latest_slot_test_public_key),
       to_private_key_spec(std::string(latest_slot_test_private_key)));
 
-   ethereum_transaction_policy transaction_policy{
-      .client_id = std::string(latest_slot_test_entry_id),
-      .chain_id = test_evm_chain_id,
-      .max_priority_fee_per_gas = maximum_ethereum_transaction_policy_value(),
-      .max_fee_per_gas = maximum_ethereum_transaction_policy_value(),
-      .max_gas_limit = maximum_ethereum_transaction_policy_value(),
-      .max_total_native_cost = maximum_ethereum_transaction_policy_value(),
-   };
-   stack.eth_client = std::make_shared<ethereum_client>(
-      stack.sig_provider,
-      std::variant<std::string, fc::url>{std::string(latest_slot_test_rpc_url)},
-      std::move(transaction_policy));
+   stack.rpc        = std::make_shared<scripted_rpc>();
+   stack.eth_client = std::make_shared<scripted_ethereum_client>(stack.sig_provider, std::move(transaction_policy),
+                                                                 stack.rpc);
 
    stack.entry = std::make_shared<sysio::ethereum_client_entry_t>();
    stack.entry->id = latest_slot_test_entry_id;
@@ -521,10 +710,15 @@ relay_test_stack create_relay_test_stack() {
    return stack;
 }
 
-std::unique_ptr<chunked_delivery_fixture> create_chunked_delivery_fixture() {
-   auto fixture = std::make_unique<chunked_delivery_fixture>();
+/// Stand up a `whole_envelope_delivery_fixture`: a real `outpost_ethereum_client`
+/// whose OPPInbound wrapper has every typed callable replaced by a recording
+/// stub. The caller owns the returned fixture; the stubs capture it by
+/// reference, so it must not be moved after this returns.
+std::unique_ptr<whole_envelope_delivery_fixture> create_whole_envelope_delivery_fixture() {
+   auto fixture = std::make_unique<whole_envelope_delivery_fixture>();
    auto stack = create_relay_test_stack();
    fixture->tester = std::move(stack.tester);
+   fixture->rpc    = stack.rpc;
    auto eth_client = stack.eth_client;
 
    auto              abis = load_abi_fixture(opp_inbound_abi_fixture);
@@ -534,40 +728,66 @@ std::unique_ptr<chunked_delivery_fixture> create_chunked_delivery_fixture() {
    BOOST_REQUIRE(fixture->inbound);
 
    auto* raw = fixture.get();
-   raw->inbound->epoch_in = [raw](uint32_t&    epoch_index,
-                                  uint16_t&    chunk_index,
-                                  uint16_t&    total_chunks,
-                                  uint32_t&    total_bytes,
-                                  std::string& chunk_hex) -> fc::variant {
-      raw->chunk_calls.push_back(
-         observed_chunk_call{epoch_index, chunk_index, total_chunks, total_bytes, chunk_hex});
-      if (raw->chunk_calls.size() == 1 && raw->first_chunk_delay.count() > 0) {
-         std::this_thread::sleep_for(raw->first_chunk_delay);
+   raw->inbound->epoch_in = [raw, inbound_address](uint32_t& epoch_index, std::string& envelope_hex,
+                                                   uint64_t gas_budget) -> sysio::epoch_in_receipt {
+      const size_t attempt = raw->attempted_budgets.size();
+      raw->attempted_budgets.push_back(gas_budget);
+      if (attempt < raw->refusals.size() && raw->refusals[attempt]) throw *raw->refusals[attempt];
+
+      raw->delivery_calls.push_back(observed_delivery_call{epoch_index, envelope_hex, gas_budget});
+      if (raw->delivery_calls.size() == 1 && raw->first_call_delay.count() > 0) {
+         std::this_thread::sleep_for(raw->first_call_delay);
       }
-      return fc::variant(std::string(hex_prefix) + abi_word(raw->chunk_calls.size()));
+      const size_t call = raw->delivery_calls.size();
+      sysio::epoch_in_receipt receipt;
+      receipt.tx_hash      = std::string(hex_prefix) + abi_word(call);
+      receipt.block_number = fc::uint256{test_head_block + call};
+      const auto scripted  = raw->receipt_logs.empty()
+                                ? std::nullopt
+                                : whole_envelope_delivery_fixture::response_at(raw->receipt_logs, call - 1);
+      receipt.logs = scripted ? *scripted
+                              : fc::variants{epoch_delivery_log(inbound_address, epoch_index,
+                                                                raw->outpost->signer_address_hex(),
+                                                                settled_digest_word)};
+      return receipt;
    };
-   raw->inbound->envelope_chunk_state =
-      [raw](const block_number_or_tag_t& block, std::string& operator_address) -> fc::variant {
-         // The resume read is our OWN staging high-water mark, so it must be
-         // taken at `latest` — reading it at `finalized` would replay chunks
-         // staged in unfinalized blocks on every tick.
-         BOOST_CHECK(std::holds_alternative<block_tag_t>(block));
-         BOOST_CHECK(std::get<block_tag_t>(block) == block_tag_t::latest);
-         BOOST_CHECK(!operator_address.empty());
-         ++raw->chunk_state_reads;
-         return fc::variant(raw->chunk_state_response);
+   // Every bookkeeping read is pinned to a block number — the head the tick
+   // started at, or the block the last call confirmed in — never a tag.
+   const auto note_pinned = [raw](const block_number_or_tag_t& block) {
+      BOOST_REQUIRE(std::holds_alternative<std::string>(block));
+      raw->read_blocks.push_back(std::get<std::string>(block));
+   };
+   raw->inbound->next_epoch_index = [raw, note_pinned](const block_number_or_tag_t& block) -> fc::variant {
+      note_pinned(block);
+      return fc::variant(
+         whole_envelope_delivery_fixture::response_at(raw->next_epoch_index_responses, raw->next_epoch_reads++));
+   };
+   raw->inbound->dispatch_spill =
+      [raw, note_pinned](const block_number_or_tag_t& block, uint32_t& epoch_index) -> fc::variant {
+         note_pinned(block);
+         BOOST_CHECK_EQUAL(epoch_index, test_wire_epoch);
+         return fc::variant(whole_envelope_delivery_fixture::response_at(raw->spill_responses, raw->spill_reads++));
       };
-   raw->inbound->discard_envelope_chunks = [raw]() -> fc::variant {
-      ++raw->discard_calls;
-      if (raw->discard_failure) throw *raw->discard_failure;
-      return fc::variant(std::string(hex_prefix) + abi_word(0));
+   raw->inbound->epoch_deliveries =
+      [raw, note_pinned](const block_number_or_tag_t& block, uint32_t& epoch_index,
+                         std::string& operator_address) -> fc::variant {
+         note_pinned(block);
+         BOOST_CHECK_EQUAL(epoch_index, test_wire_epoch);
+         BOOST_CHECK_EQUAL(operator_address, raw->outpost->signer_address_hex());
+         return fc::variant(
+            whole_envelope_delivery_fixture::response_at(raw->own_delivery_responses, raw->settlement_reads++));
+      };
+   raw->inbound->pending_epoch_hash = [raw, note_pinned](const block_number_or_tag_t& block) -> fc::variant {
+      note_pinned(block);
+      return fc::variant(raw->pending_hash_response);
    };
-   raw->inbound->next_epoch_index = [raw](const block_number_or_tag_t& block) -> fc::variant {
-      BOOST_CHECK(std::holds_alternative<block_tag_t>(block));
-      BOOST_CHECK(std::get<block_tag_t>(block) == block_tag_t::latest);
-      ++raw->next_epoch_reads;
-      return fc::variant(raw->next_epoch_index_response);
-   };
+   raw->inbound->pending_consensus_for_digest =
+      [raw, note_pinned](const block_number_or_tag_t& block, std::string& digest) -> fc::variant {
+         note_pinned(block);
+         ++raw->consensus_reads;
+         raw->consensus_digests.push_back(digest);
+         return fc::variant(raw->consensus_response);
+      };
 
    fixture->outpost = std::make_unique<sysio::outpost_ethereum_client>(
       stack.entry,
@@ -579,34 +799,22 @@ std::unique_ptr<chunked_delivery_fixture> create_chunked_delivery_fixture() {
    return fixture;
 }
 
-/// Assert that `calls` covers `[first_chunk, total_chunks)` of `envelope` with
-/// exact slices: every non-final chunk is exactly `ETHEREUM_MAX_CHUNK_BYTES`
-/// and the final one carries the remainder.
-void check_chunk_call_sequence(const std::vector<observed_chunk_call>& calls,
-                               const std::vector<char>&                envelope,
-                               uint32_t                                epoch_index,
-                               uint16_t                                first_chunk) {
-   const auto total_chunks = sysio::outpost_ethereum_client_detail::chunk_count_for(envelope.size());
-   BOOST_REQUIRE_EQUAL(calls.size(), static_cast<size_t>(total_chunks - first_chunk));
-
-   for (size_t i = 0; i < calls.size(); ++i) {
-      const auto& call  = calls[i];
-      const auto  chunk = static_cast<uint16_t>(first_chunk + i);
+/// Assert that every observed `epochIn` carried `envelope` whole, addressed to
+/// `epoch_index`.
+void check_delivery_calls(const std::vector<observed_delivery_call>& calls,
+                          const std::vector<char>&                   envelope,
+                          uint32_t                                   epoch_index,
+                          size_t                                     expected_calls) {
+   BOOST_REQUIRE_EQUAL(calls.size(), expected_calls);
+   const auto expected_hex = fc::to_hex(envelope.data(), static_cast<uint32_t>(envelope.size()));
+   for (const auto& call : calls) {
       BOOST_CHECK_EQUAL(call.epoch_index, epoch_index);
-      BOOST_CHECK_EQUAL(call.chunk_index, chunk);
-      BOOST_CHECK_EQUAL(call.total_chunks, total_chunks);
-      BOOST_CHECK_EQUAL(call.total_bytes, static_cast<uint32_t>(envelope.size()));
-
-      const size_t offset = static_cast<size_t>(chunk) * sysio::ETHEREUM_MAX_CHUNK_BYTES;
-      const size_t length =
-         std::min(sysio::ETHEREUM_MAX_CHUNK_BYTES, envelope.size() - offset);
-      if (chunk + 1 < total_chunks) {
-         BOOST_CHECK_EQUAL(length, sysio::ETHEREUM_MAX_CHUNK_BYTES);
-      }
-      BOOST_CHECK_EQUAL(call.chunk_hex,
-                        fc::to_hex(envelope.data() + offset, static_cast<uint32_t>(length)));
+      BOOST_CHECK_EQUAL(call.envelope_hex, expected_hex);
    }
 }
+
+/// The block parameter a read pinned to `block` carries.
+std::string pinned_block_hex(uint64_t block) { return format_rpc_quantity(fc::uint256{block}); }
 
 // ── `crank_outpost` fixtures ─────────────────────────────────────────────
 constexpr std::string_view syndication_pool_abi_fixture = "ethereum-abi-syndication-pool.json";
@@ -616,7 +824,7 @@ constexpr std::string_view attestation_blackhole_address = "0x000000000000000000
 constexpr std::string_view test_syndication_pool_address = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";
 constexpr std::string_view test_moved_syndication_pool_address = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9";
 /// `keccak256("WIRE_NoYield()")[0..4]` and the pool's other two refusals, written out so these
-/// tests pin the client's own hashing of the signatures (as `chunk_buffer_missing_selector` does).
+/// tests pin the client's own hashing of the signatures rather than restating it.
 constexpr std::string_view no_yield_selector             = "053716d1";
 constexpr std::string_view yield_below_deadband_selector = "45441430";
 constexpr std::string_view pool_underbacked_selector     = "358cc7e9";
@@ -627,14 +835,6 @@ constexpr std::string_view enforced_pause_selector       = "d93c0665";
 constexpr std::string_view access_managed_unauthorized_selector = "068ca9d8";
 constexpr uint64_t test_yield_delta    = 5;
 constexpr uint64_t test_yield_deadband = 10;
-
-/// ABI-encode one address as the single word an `address` getter returns.
-std::string encode_address_word(std::string_view address_hex) {
-   std::string_view address = address_hex;
-   if (address.starts_with("0x") || address.starts_with("0X")) address.remove_prefix(2);
-   return std::string(hex_prefix) + std::string(evm_abi_word_hex_chars - address.size(), '0') +
-          std::string(address);
-}
 
 /// ABI-encode a two-`uint64` custom error the way a node returns it in `error.data`.
 std::string encode_two_word_revert(std::string_view selector, uint64_t first, uint64_t second) {
@@ -959,23 +1159,32 @@ BOOST_AUTO_TEST_CASE(opp_inbound_contract_client_construction) try {
    BOOST_CHECK(!abis.empty());
 
    // Every ABI entry the typed `opp_inbound_contract_client` binds at
-   // construction: the chunked write, the owner-bound resume read, the
-   // recovery write, and the epoch view the resume path falls back on.
-   bool has_epoch_in = false, has_next_epoch = false;
+   // construction: the whole-envelope write and the five views the
+   // deliver-or-continue decision reads. The staged-chunk surface is gone.
+   bool has_epoch_in = false, has_next_epoch = false, has_spill = false;
+   bool has_deliveries = false, has_pending_hash = false, has_pending_consensus = false;
    bool has_discard = false, has_chunk_state = false;
    for (auto& c : abis) {
       if (c.name == "epochIn") has_epoch_in = true;
       if (c.name == "nextEpochIndex") has_next_epoch = true;
+      if (c.name == "dispatchSpill") has_spill = true;
+      if (c.name == "epochDeliveries") has_deliveries = true;
+      if (c.name == "pendingEpochHash") has_pending_hash = true;
+      if (c.name == "pendingConsensusForDigest") has_pending_consensus = true;
       if (c.name == "discardEnvelopeChunks") has_discard = true;
       if (c.name == "envelopeChunkState") has_chunk_state = true;
    }
    BOOST_CHECK(has_epoch_in);
    BOOST_CHECK(has_next_epoch);
-   BOOST_CHECK(has_discard);
-   BOOST_CHECK(has_chunk_state);
+   BOOST_CHECK(has_spill);
+   BOOST_CHECK(has_deliveries);
+   BOOST_CHECK(has_pending_hash);
+   BOOST_CHECK(has_pending_consensus);
+   BOOST_CHECK(!has_discard);
+   BOOST_CHECK(!has_chunk_state);
 } FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(epoch_in_abi_encoding_with_chunk_params) try {
+BOOST_AUTO_TEST_CASE(epoch_in_abi_encoding_whole_envelope) try {
    auto abis = load_abi_fixture(opp_inbound_abi_fixture);
 
    // Find the epochIn ABI entry
@@ -985,30 +1194,24 @@ BOOST_AUTO_TEST_CASE(epoch_in_abi_encoding_with_chunk_params) try {
    }
    BOOST_REQUIRE(epoch_in_abi != nullptr);
 
-   // Chunked delivery: (uint32 epochIndex, uint16 chunkIndex, uint16 totalChunks,
-   //                    uint32 totalBytes, bytes chunkData)
+   // Whole-envelope delivery: (uint32 epochIndex, bytes envelopeData).
    BOOST_REQUIRE_EQUAL(epoch_in_abi->inputs.size(), epoch_in_input_count);
    BOOST_CHECK(epoch_in_abi->inputs[0].type == eth::abi::data_type::uint32);
-   BOOST_CHECK(epoch_in_abi->inputs[1].type == eth::abi::data_type::uint16);
-   BOOST_CHECK(epoch_in_abi->inputs[2].type == eth::abi::data_type::uint16);
-   BOOST_CHECK(epoch_in_abi->inputs[3].type == eth::abi::data_type::uint32);
-   BOOST_CHECK(epoch_in_abi->inputs[4].type == eth::abi::data_type::bytes);
+   BOOST_CHECK(epoch_in_abi->inputs[1].type == eth::abi::data_type::bytes);
 
-   // Encode the five chunk params — this is what the batch operator now does.
-   std::string test_chunk_hex = "120c0a040800100012040800100028deeef5ce06300138";
+   // Encode the two params — this is what the batch operator does.
+   std::string test_envelope_hex = "120c0a040800100012040800100028deeef5ce06300138";
    auto encoded = contract_encode_data(
       *epoch_in_abi,
-      std::vector<fc::variant>{fc::variant(uint64_t{test_wire_epoch}),
-                               fc::variant(uint64_t{0}),
-                               fc::variant(uint64_t{1}),
-                               fc::variant(uint64_t{test_chunk_hex.size() / hex_chars_per_byte}),
-                               fc::variant(test_chunk_hex)});
+      std::vector<fc::variant>{fc::variant(uint64_t{test_wire_epoch}), fc::variant(test_envelope_hex)});
    BOOST_CHECK(!encoded.empty());
 
-   // keccak256("epochIn(uint32,uint16,uint16,uint32,bytes)")[0..4) — the old
-   // single-`bytes` selector (0xcfae3118) is gone with the old signature.
+   // keccak256("epochIn(uint32,bytes)")[0..4) — neither retired form's
+   // selector survives.
    BOOST_CHECK_EQUAL(encoded.substr(0, evm_function_selector_hex_chars),
                      std::string(epoch_in_selector));
+   BOOST_CHECK(encoded.substr(0, evm_function_selector_hex_chars) !=
+               std::string(retired_chunked_epoch_in_selector));
    BOOST_CHECK(encoded.substr(0, evm_function_selector_hex_chars) !=
                std::string(retired_single_bytes_epoch_in_selector));
 
@@ -1173,135 +1376,351 @@ BOOST_AUTO_TEST_CASE(read_inbound_envelope_validates_latest_slot) try {
 } FC_LOG_AND_RETHROW();
 
 // ---------------------------------------------------------------------------
-//  Chunked WIRE -> Ethereum envelope delivery
+//  Whole-envelope WIRE -> Ethereum delivery
 // ---------------------------------------------------------------------------
 
-/// Pin the compiled chunk constants and the ceil-division that derives
-/// `totalChunks`. These values are mirrored in wire-ethereum's
-/// `OPPCommon.sol`; a silent drift on either side breaks every delivery, so
-/// both sides carry an equivalent pin.
-BOOST_AUTO_TEST_CASE(envelope_chunk_count_math) try {
-   namespace chunking = sysio::outpost_ethereum_client_detail;
+/// The most an `epochIn` may be funded with follows the client's policy
+/// ceiling and never exceeds EIP-7825's cap; the options a call is sent with
+/// pin floor and cap to the one budget, so the pre-flight runs under it.
+BOOST_AUTO_TEST_CASE(delivery_gas_ceiling_is_the_policy_ceiling_bounded_by_the_cap) try {
+   auto policy = relay_test_policy();
+   BOOST_CHECK_EQUAL(sysio::delivery_gas_ceiling(policy), sysio::EIP_7825_TX_GAS_CAP);
 
-   BOOST_CHECK_EQUAL(sysio::ETHEREUM_MAX_CHUNK_BYTES, 8'192u);
-   // Word-aligned so OPPInbound's staging-cell writes stay whole-word.
-   BOOST_CHECK_EQUAL(sysio::ETHEREUM_MAX_CHUNK_BYTES % evm_abi_word_bytes, 0u);
-   BOOST_CHECK_EQUAL(sysio::OPP_MAX_ENVELOPE_BYTES, 32'768u);
+   policy.max_gas_limit = fc::uint256{sysio::EIP_7825_TX_GAS_CAP};
+   BOOST_CHECK_EQUAL(sysio::delivery_gas_ceiling(policy), sysio::EIP_7825_TX_GAS_CAP);
 
-   BOOST_CHECK_EQUAL(chunking::chunk_count_for(1), 1u);
-   BOOST_CHECK_EQUAL(chunking::chunk_count_for(sysio::ETHEREUM_MAX_CHUNK_BYTES), 1u);
-   BOOST_CHECK_EQUAL(chunking::chunk_count_for(sysio::ETHEREUM_MAX_CHUNK_BYTES + 1), 2u);
-   BOOST_CHECK_EQUAL(chunking::chunk_count_for(2 * sysio::ETHEREUM_MAX_CHUNK_BYTES), 2u);
-   BOOST_CHECK_EQUAL(chunking::chunk_count_for(2 * sysio::ETHEREUM_MAX_CHUNK_BYTES + 1), 3u);
-   BOOST_CHECK_EQUAL(chunking::chunk_count_for(3 * sysio::ETHEREUM_MAX_CHUNK_BYTES), 3u);
-   // The platform cap is an exact multiple: four full chunks, no remainder.
-   BOOST_CHECK_EQUAL(chunking::chunk_count_for(sysio::OPP_MAX_ENVELOPE_BYTES), 4u);
-   BOOST_CHECK_EQUAL(sysio::OPP_MAX_ENVELOPE_BYTES % sysio::ETHEREUM_MAX_CHUNK_BYTES, 0u);
+   policy.max_gas_limit = fc::uint256{below_cap_policy_gas_limit};
+   BOOST_CHECK_EQUAL(sysio::delivery_gas_ceiling(policy), below_cap_policy_gas_limit);
 
-   // Ragged tail: the first chunks are exactly MAX_CHUNK_BYTES, the last is
-   // the remainder.
-   BOOST_CHECK_EQUAL(chunking::chunk_count_for(three_chunk_envelope_bytes), 3u);
-   BOOST_CHECK_EQUAL(three_chunk_envelope_bytes - 2 * sysio::ETHEREUM_MAX_CHUNK_BYTES, 3'616u);
-
-   // Unlike Solana — whose relay sends `chunks + 1` transactions because a
-   // zero-data terminal call triggers finalization — Ethereum finalizes inline
-   // on the chunk that completes the envelope, so the transaction count equals
-   // the chunk count exactly. The delivery cases below pin that by counting
-   // observed `epochIn` calls against `chunk_count_for`.
+   const auto options = sysio::delivery_confirm_options(below_cap_policy_gas_limit);
+   BOOST_CHECK_EQUAL(options.gas_limit_floor, below_cap_policy_gas_limit);
+   BOOST_CHECK_EQUAL(options.gas_limit_cap, below_cap_policy_gas_limit);
 } FC_LOG_AND_RETHROW();
 
-/// The client hashes `OPP_ChunkBufferMissing(address)` to recognise the one tolerable discard
-/// revert. This pins that hash against the four bytes the deployed contract actually emits, so
-/// a wrong signature string cannot quietly make every revert unrecognisable — which would look
-/// like nothing more than a few extra abandoned ticks.
-BOOST_AUTO_TEST_CASE(chunk_buffer_missing_selector_is_pinned) try {
-   namespace chunking = sysio::outpost_ethereum_client_detail;
-   const std::string self{"0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"};
+/// At a fee, the ceiling is also what the policy's total-cost term pays for:
+/// one ether at a hundred gwei is ten million gas, under the cap; a zero fee
+/// or an ample budget leaves the static ceiling in force.
+BOOST_AUTO_TEST_CASE(delivery_gas_ceiling_is_bounded_by_the_total_cost_at_the_fee) try {
+   auto policy = relay_test_policy();
+   policy.max_total_native_cost = fc::uint256{one_ether_wei};
+   constexpr uint64_t affordable_at_hundred_gwei = one_ether_wei / hundred_gwei;
+   static_assert(affordable_at_hundred_gwei < sysio::EIP_7825_TX_GAS_CAP);
 
-   BOOST_CHECK(chunking::is_chunk_buffer_missing_revert(
-      encode_address_revert(chunk_buffer_missing_selector, self), self));
-   // The node lower-cases what it returns; the configured signer may be checksummed.
-   BOOST_CHECK(chunking::is_chunk_buffer_missing_revert(
-      encode_address_revert(chunk_buffer_missing_selector, self), fc::to_lower(self)));
-
-   // Right selector, wrong operator.
-   BOOST_CHECK(!chunking::is_chunk_buffer_missing_revert(
-      encode_address_revert(chunk_buffer_missing_selector, foreign_operator_address), self));
-   // Right shape, different error.
-   BOOST_CHECK(!chunking::is_chunk_buffer_missing_revert(
-      encode_address_revert(no_chunk_slot_selector, self), self));
-   // Nothing to identify it by.
-   BOOST_CHECK(!chunking::is_chunk_buffer_missing_revert("", self));
-   BOOST_CHECK(!chunking::is_chunk_buffer_missing_revert("0x", self));
-
-   // A non-zero byte in the padding is not our address however it decodes.
-   auto corrupt_padding = encode_address_revert(chunk_buffer_missing_selector, self);
-   corrupt_padding[hex_prefix.size() + chunk_buffer_missing_selector.size()] = '1';
-   BOOST_CHECK(!chunking::is_chunk_buffer_missing_revert(corrupt_padding, self));
+   BOOST_CHECK_EQUAL(sysio::delivery_gas_ceiling(policy, fc::uint256{hundred_gwei}), affordable_at_hundred_gwei);
+   BOOST_CHECK_EQUAL(sysio::delivery_gas_ceiling(policy, fc::uint256{0}), sysio::EIP_7825_TX_GAS_CAP);
+   BOOST_CHECK_EQUAL(sysio::delivery_gas_ceiling(policy, fc::uint256{1}), sysio::EIP_7825_TX_GAS_CAP);
+   // The static ceiling still binds when it is the lower of the two.
+   policy.max_gas_limit = fc::uint256{below_cap_policy_gas_limit};
+   BOOST_CHECK_EQUAL(sysio::delivery_gas_ceiling(policy, fc::uint256{1}), below_cap_policy_gas_limit);
+   BOOST_CHECK_EQUAL(sysio::delivery_gas_ceiling(policy, fc::uint256{hundred_gwei}),
+                     std::min(affordable_at_hundred_gwei, below_cap_policy_gas_limit));
 } FC_LOG_AND_RETHROW();
 
-/// The resume decision table, exercised without an EVM node.
-BOOST_AUTO_TEST_CASE(chunk_resume_decision_table) try {
-   namespace chunking = sysio::outpost_ethereum_client_detail;
-   using action = chunking::chunk_resume_action;
+/// A delivery is funded to what it has left to carry — fixed cost, bytes, an
+/// allowance per attestation still to dispatch, the emit — doubled per spill
+/// already met this tick and never past the ceiling; an envelope the relay
+/// cannot read is funded to the ceiling outright.
+BOOST_AUTO_TEST_CASE(delivery_gas_budget_follows_the_remaining_work_and_escalates_to_the_ceiling) try {
+   constexpr uint64_t bytes   = 1'000;
+   constexpr uint64_t ceiling = sysio::EIP_7825_TX_GAS_CAP;
+   const auto budget = [&](uint32_t remaining, uint32_t escalations) {
+      return sysio::delivery_gas_budget(sysio::delivery_gas_request{
+         .envelope_bytes = bytes, .remaining_attestations = remaining, .escalations = escalations, .ceiling = ceiling});
+   };
+   const uint64_t base = sysio::DELIVERY_FIXED_GAS + bytes * sysio::DELIVERY_GAS_PER_BYTE + sysio::EMIT_GAS_ALLOWANCE;
 
-   // Same address, EIP-55 checksummed and all-lower-case — the ABI decoder
-   // returns the latter, operators and tooling quote the former.
-   const std::string self{"0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"};
-   const std::string self_lower{"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266"};
-   const uint16_t    total_chunks = 4;
-   const uint32_t    total_bytes  = sysio::OPP_MAX_ENVELOPE_BYTES;
+   BOOST_CHECK_EQUAL(budget(0, 0), base);
+   BOOST_CHECK_EQUAL(budget(1, 0), base + sysio::ATTESTATION_GAS_ALLOWANCE);
+   BOOST_CHECK_EQUAL(budget(3, 0), base + 3 * sysio::ATTESTATION_GAS_ALLOWANCE);
+   // Each spill doubles, and the ceiling is where doubling stops.
+   BOOST_CHECK_EQUAL(budget(1, 1), 2 * (base + sysio::ATTESTATION_GAS_ALLOWANCE));
+   BOOST_CHECK_EQUAL(budget(1, 2), ceiling);
+   BOOST_CHECK_EQUAL(budget(1, 40), ceiling);
+   // A full envelope's worth of attestations is above the ceiling on its own.
+   BOOST_CHECK_EQUAL(budget(70, 0), ceiling);
+   // Unreadable: the ceiling, whatever else is known.
+   BOOST_CHECK_EQUAL(sysio::delivery_gas_budget(sysio::delivery_gas_request{
+                        .envelope_bytes = bytes, .remaining_attestations = std::nullopt, .escalations = 0, .ceiling = ceiling}),
+                     ceiling);
+   // Counting is the relay's own read of the envelope.
+   BOOST_CHECK_EQUAL(*sysio::outpost_ethereum_client_detail::count_envelope_attestations(
+                        serialize_envelope_with_attestations(test_wire_epoch, 3, 16)),
+                     3u);
+   BOOST_CHECK(!sysio::outpost_ethereum_client_detail::count_envelope_attestations(make_envelope(mid_envelope_bytes)));
+   // The least ceiling the relay accepts is one full-cap delivery's worth.
+   BOOST_CHECK_EQUAL(sysio::DELIVERY_MINIMUM_GAS_CEILING,
+                     sysio::DELIVERY_FIXED_GAS + sysio::OPP_MAX_ENVELOPE_BYTES * sysio::DELIVERY_GAS_PER_BYTE +
+                        sysio::ATTESTATION_GAS_ALLOWANCE + sysio::EMIT_GAS_ALLOWANCE);
+   BOOST_CHECK(sysio::DELIVERY_MINIMUM_GAS_CEILING < sysio::EIP_7825_TX_GAS_CAP);
+} FC_LOG_AND_RETHROW();
 
-   const auto decide = [&](const chunking::envelope_chunk_state& staged) {
-      return chunking::decide_chunk_resume(staged, self, test_wire_epoch, total_chunks, total_bytes);
+/// A relay that delivers is refused a policy whose ceiling cannot complete a
+/// full-cap envelope; one that only reads the outpost (no OPPInbound address)
+/// is not, since it never funds a delivery.
+BOOST_AUTO_TEST_CASE(relay_refuses_a_policy_ceiling_below_one_full_delivery) try {
+   static_assert(undeliverable_policy_gas_limit < sysio::DELIVERY_MINIMUM_GAS_CEILING);
+   auto stack = create_relay_test_stack(relay_test_policy(fc::uint256{undeliverable_policy_gas_limit}));
+   auto abis  = load_abi_fixture(opp_inbound_abi_fixture);
+   const auto opp_abis = load_abi_fixture(opp_abi_fixture);
+   abis.insert(abis.end(), opp_abis.begin(), opp_abis.end());
+
+   BOOST_CHECK_THROW(sysio::outpost_ethereum_client(stack.entry, std::string{}, std::string(test_opp_inbound_address),
+                                                    abis, test_outpost_chain_code, test_evm_chain_id),
+                     sysio::chain::plugin_config_exception);
+   BOOST_CHECK_NO_THROW(sysio::outpost_ethereum_client(stack.entry, std::string(test_opp_address), std::string{},
+                                                       abis, test_outpost_chain_code, test_evm_chain_id));
+
+   stack.tester.reset();
+   appbase::application::reset_app_singleton();
+} FC_LOG_AND_RETHROW();
+
+/// Across a tipped-and-spilled epoch the budget tracks the outpost's cursor:
+/// everything before the tip, what remains after it, only the emit once
+/// dispatch is complete — each continuation doubled for the spill before it.
+/// Every read is pinned: the head when the tick starts, then the block each
+/// confirmed call landed in.
+BOOST_AUTO_TEST_CASE(delivery_funds_each_call_to_its_remaining_work) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = serialize_envelope_with_attestations(test_wire_epoch, 2, 64);
+   fixture->spill_responses = {
+      encode_dispatch_spill_result(false, 0, false, false),   // before the delivery
+      encode_dispatch_spill_result(true, 1, false, false),    // tipped, spilled after 1
+      encode_dispatch_spill_result(true, 2, true, false),     // dispatched, emit outstanding
+      encode_dispatch_spill_result(true, 2, true, true),      // finalized
+   };
+   fixture->settle_on(envelope, /*recorded_from_read=*/1);
+
+   const auto tx = fixture->outpost->deliver_outbound_envelope(
+      test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
+   BOOST_CHECK(!tx.empty());
+   check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 3);
+
+   const auto expected = [&](uint32_t remaining, uint32_t escalations) {
+      return sysio::delivery_gas_budget(sysio::delivery_gas_request{
+         .envelope_bytes         = envelope.size(),
+         .remaining_attestations = remaining,
+         .escalations            = escalations,
+         .ceiling                = sysio::EIP_7825_TX_GAS_CAP});
+   };
+   BOOST_CHECK_EQUAL(fixture->delivery_calls[0].gas_budget, expected(2, 0));
+   BOOST_CHECK_EQUAL(fixture->delivery_calls[1].gas_budget, expected(1, 1));
+   BOOST_CHECK_EQUAL(fixture->delivery_calls[2].gas_budget, expected(0, 2));
+   BOOST_CHECK(fixture->delivery_calls[0].gas_budget < fixture->delivery_calls[1].gas_budget);
+   BOOST_CHECK(fixture->delivery_calls[0].gas_budget < sysio::EIP_7825_TX_GAS_CAP);
+
+   // One head read, then a read at each of the three receipt blocks.
+   BOOST_CHECK_EQUAL(fixture->rpc->block_number_reads, 1u);
+   const std::vector<std::string> expected_blocks{pinned_block_hex(test_head_block), pinned_block_hex(test_head_block + 1),
+                                                  pinned_block_hex(test_head_block + 2), pinned_block_hex(test_head_block + 3)};
+   const auto blocks = fixture->blocks_read();
+   BOOST_CHECK_EQUAL_COLLECTIONS(blocks.begin(), blocks.end(), expected_blocks.begin(), expected_blocks.end());
+} FC_LOG_AND_RETHROW();
+
+/// The deliver-or-continue decision table, exercised without an EVM node.
+BOOST_AUTO_TEST_CASE(delivery_decision_table) try {
+   namespace detail = sysio::outpost_ethereum_client_detail;
+   using action     = detail::delivery_action;
+   using settlement = detail::delivery_settlement;
+
+   const detail::dispatch_spill untipped{};
+   const detail::dispatch_spill mid_flight{.tipped = true, .dispatched = 3, .complete = false, .finalized = false};
+   const detail::dispatch_spill emit_pending{.tipped = true, .dispatched = 9, .complete = true, .finalized = false};
+   const detail::dispatch_spill finalized{.tipped = true, .dispatched = 9, .complete = true, .finalized = true};
+   const auto decide = [](uint32_t next, const detail::dispatch_spill& spill, settlement s, bool majority) {
+      return detail::decide_delivery(next, test_wire_epoch, spill, s, majority);
    };
 
-   // Address comparison tolerates prefix and EIP-55 casing differences.
-   BOOST_CHECK(chunking::same_evm_address(self, self_lower));
-   BOOST_CHECK(chunking::same_evm_address(self, self.substr(hex_prefix.size())));
-   BOOST_CHECK(!chunking::same_evm_address(self, foreign_operator_address));
-   BOOST_CHECK(!chunking::same_evm_address("", self));
+   // Not tipped, nothing recorded: deliver.
+   BOOST_CHECK(decide(test_wire_epoch, untipped, settlement::never_delivered, false) == action::deliver);
+   BOOST_CHECK(decide(test_wire_epoch, untipped, settlement::never_delivered, true) == action::deliver);
+   // Not tipped, recorded: re-deliver only when the outpost's own majority view says it would tip.
+   BOOST_CHECK(decide(test_wire_epoch, untipped, settlement::recorded, true) == action::retry_consensus);
+   BOOST_CHECK(decide(test_wire_epoch, untipped, settlement::recorded, false) == action::await_peers);
 
-   // No header at all -> start at chunk 0.
-   BOOST_CHECK(decide({}).action == action::start_fresh);
-   BOOST_CHECK_EQUAL(decide({}).start_chunk, 0u);
+   // Tipped and unfinished: only the settled digest's deliverer continues.
+   BOOST_CHECK(decide(test_wire_epoch, mid_flight, settlement::settled, false) == action::continue_dispatch);
+   BOOST_CHECK(decide(test_wire_epoch, emit_pending, settlement::settled, false) == action::continue_dispatch);
+   BOOST_CHECK(decide(test_wire_epoch, mid_flight, settlement::never_delivered, false) == action::wait_for_deliverer);
+   BOOST_CHECK(decide(test_wire_epoch, mid_flight, settlement::divergent, false) == action::wait_for_deliverer);
+   BOOST_CHECK(decide(test_wire_epoch, emit_pending, settlement::divergent, true) == action::wait_for_deliverer);
 
-   // A peer's header is not ours to continue or discard.
-   chunking::envelope_chunk_state foreign{
-      test_wire_epoch, std::string(foreign_operator_address), total_chunks, 2, total_bytes, 0};
-   BOOST_CHECK(decide(foreign).action == action::start_fresh);
-   BOOST_CHECK_EQUAL(decide(foreign).start_chunk, 0u);
+   // Closed, by either signal: nothing to send.
+   BOOST_CHECK(decide(test_wire_epoch, finalized, settlement::settled, false) == action::already_finalized);
+   BOOST_CHECK(decide(test_different_wire_epoch, untipped, settlement::never_delivered, false) == action::already_finalized);
+   BOOST_CHECK(decide(test_different_wire_epoch, mid_flight, settlement::settled, false) == action::already_finalized);
 
-   // Our own header, same epoch and shape -> resume at the high-water mark.
-   chunking::envelope_chunk_state matching{test_wire_epoch, self, total_chunks, 2, total_bytes, 0};
-   BOOST_CHECK(decide(matching).action == action::resume);
-   BOOST_CHECK_EQUAL(decide(matching).start_chunk, 2u);
-
-   // Same epoch, different shape -> discard the superseded cells, restart.
-   chunking::envelope_chunk_state wrong_chunk_count = matching;
-   wrong_chunk_count.total_chunks = total_chunks - 1;
-   BOOST_CHECK(decide(wrong_chunk_count).action == action::discard_and_restart);
-
-   chunking::envelope_chunk_state wrong_size = matching;
-   wrong_size.total_bytes = total_bytes - 1;
-   BOOST_CHECK(decide(wrong_size).action == action::discard_and_restart);
-
-   // The final chunk is never stored, so receivedChunks can never reach
-   // totalChunks; a header claiming otherwise is unusable.
-   chunking::envelope_chunk_state over_received = matching;
-   over_received.received_chunks = total_chunks;
-   BOOST_CHECK(decide(over_received).action == action::discard_and_restart);
-
-   // Our own header for a different epoch -> confirm against nextEpochIndex.
-   chunking::envelope_chunk_state stale = matching;
-   stale.epoch_index = test_stale_wire_epoch;
-   BOOST_CHECK(decide(stale).action == action::confirm_epoch_advanced);
-   BOOST_CHECK_EQUAL(decide(stale).start_chunk, 0u);
+   // The outpost has not reached this epoch: a delivery would be refused as non-sequential.
+   BOOST_CHECK(decide(test_stale_wire_epoch, untipped, settlement::never_delivered, false) == action::outpost_behind);
+   BOOST_CHECK(decide(test_stale_wire_epoch, mid_flight, settlement::settled, false) == action::outpost_behind);
 } FC_LOG_AND_RETHROW();
 
-/// Guard rails before any transaction is signed.
+/// This relay's record is classified against the settled digest only once the
+/// epoch tipped; a malformed word is an error, never "nothing recorded".
+BOOST_AUTO_TEST_CASE(delivery_settlement_classification) try {
+   namespace detail = sysio::outpost_ethereum_client_detail;
+   using settlement = detail::delivery_settlement;
+
+   BOOST_CHECK(detail::classify_settlement(zero_digest_word, settled_digest_word, false) == settlement::never_delivered);
+   BOOST_CHECK(detail::classify_settlement(zero_digest_word, settled_digest_word, true) == settlement::never_delivered);
+   BOOST_CHECK(detail::classify_settlement(settled_digest_word, settled_digest_word, false) == settlement::recorded);
+   BOOST_CHECK(detail::classify_settlement(divergent_digest_word, settled_digest_word, false) == settlement::recorded);
+   BOOST_CHECK(detail::classify_settlement(settled_digest_word, settled_digest_word, true) == settlement::settled);
+   BOOST_CHECK(detail::classify_settlement(divergent_digest_word, settled_digest_word, true) == settlement::divergent);
+   // Checksum casing on either side does not split a match.
+   const std::string upper{"1111111111111111111111111111111111111111111111111111111111111111"};
+   BOOST_CHECK(detail::classify_settlement(upper, settled_digest_word, true) == settlement::settled);
+
+   BOOST_CHECK_THROW(detail::classify_settlement("", settled_digest_word, true), fc::exception);
+   BOOST_CHECK_THROW(detail::classify_settlement(settled_digest_word, "0x", true), fc::exception);
+   BOOST_CHECK_THROW(detail::classify_settlement(std::string(settled_digest_word) + "0", settled_digest_word, true),
+                     fc::exception);
+} FC_LOG_AND_RETHROW();
+
+/// The contract's path-2 predicate, mirrored: the boundary elapsed AND a
+/// strict majority agreeing; an empty group never tips.
+BOOST_AUTO_TEST_CASE(majority_tip_is_the_contracts_path_2_predicate) try {
+   namespace detail = sysio::outpost_ethereum_client_detail;
+   constexpr uint64_t started  = 1'000;
+   constexpr uint32_t duration = 60;
+   constexpr uint64_t boundary = started + duration;
+   const auto view = [](uint32_t agreeing, uint32_t group) {
+      return detail::pending_consensus{.next_epoch = test_wire_epoch, .agreeing = agreeing, .group_size = group,
+                                       .epoch_started_at = started, .epoch_duration_sec = duration};
+   };
+
+   BOOST_CHECK(detail::majority_tip_reachable(view(test_majority, test_group_size), boundary));
+   BOOST_CHECK(detail::majority_tip_reachable(view(test_group_size, test_group_size), boundary + 1));
+   BOOST_CHECK(!detail::majority_tip_reachable(view(test_majority, test_group_size), boundary - 1));
+   BOOST_CHECK(!detail::majority_tip_reachable(view(test_majority - 1, test_group_size), boundary));
+   BOOST_CHECK(!detail::majority_tip_reachable(view(0, 0), boundary));
+   // A group of one tips on its own delivery; the strict majority of five is three.
+   BOOST_CHECK(detail::majority_tip_reachable(view(1, 1), boundary));
+   BOOST_CHECK(detail::majority_tip_reachable(view(3, 5), boundary));
+   BOOST_CHECK(!detail::majority_tip_reachable(view(2, 5), boundary));
+} FC_LOG_AND_RETHROW();
+
+/// The progress invariant: every field the outpost moves counts as progress,
+/// and nothing else does.
+BOOST_AUTO_TEST_CASE(advanced_tracks_every_cursor_field) try {
+   namespace detail = sysio::outpost_ethereum_client_detail;
+   const detail::delivery_progress before{.next_epoch_index = test_wire_epoch,
+                                          .spill            = {},
+                                          .own_digest       = std::string(zero_digest_word),
+                                          .settled_digest   = std::string(zero_digest_word)};
+   BOOST_CHECK(!detail::advanced(before, before));
+
+   auto recorded = before;
+   recorded.own_digest = std::string(settled_digest_word);
+   BOOST_CHECK(detail::advanced(before, recorded));
+   auto tipped = before;
+   tipped.spill.tipped = true;
+   BOOST_CHECK(detail::advanced(before, tipped));
+   auto dispatched = tipped;
+   dispatched.spill.dispatched = 1;
+   BOOST_CHECK(detail::advanced(tipped, dispatched));
+   BOOST_CHECK(!detail::advanced(dispatched, dispatched));
+   auto complete = dispatched;
+   complete.spill.complete = true;
+   BOOST_CHECK(detail::advanced(dispatched, complete));
+   auto finalized = complete;
+   finalized.spill.finalized = true;
+   BOOST_CHECK(detail::advanced(complete, finalized));
+   auto next_epoch = before;
+   next_epoch.next_epoch_index = test_different_wire_epoch;
+   BOOST_CHECK(detail::advanced(before, next_epoch));
+   // The settled digest changing on its own is another epoch's business, not progress here.
+   auto resettled = before;
+   resettled.settled_digest = std::string(settled_digest_word);
+   BOOST_CHECK(!detail::advanced(before, resettled));
+} FC_LOG_AND_RETHROW();
+
+/// The `epochIn` refusals are identified by selector AND shape, exactly as the
+/// pool's are, and only for a call the node executed.
+BOOST_AUTO_TEST_CASE(epoch_in_revert_selectors_are_pinned) try {
+   namespace detail = sysio::outpost_ethereum_client_detail;
+   using revert     = detail::epoch_in_revert;
+   const auto data  = [](std::string_view selector, size_t words) {
+      return epoch_in_refusal(selector, words).data.as_string();
+   };
+
+   BOOST_CHECK(detail::classify_epoch_in_revert(contract_revert_rpc_code, data(dispatch_underfunded_selector, 2)) ==
+               revert::dispatch_underfunded);
+   BOOST_CHECK(detail::classify_epoch_in_revert(contract_revert_rpc_code, data(handler_gas_exhausted_selector, 3)) ==
+               revert::handler_gas_exhausted);
+   BOOST_CHECK(detail::classify_epoch_in_revert(contract_revert_rpc_code, data(non_sequential_epoch_selector, 2)) ==
+               revert::non_sequential_epoch);
+   BOOST_CHECK(detail::classify_epoch_in_revert(contract_revert_rpc_code, data(operator_already_delivered_selector, 2)) ==
+               revert::operator_already_delivered);
+   BOOST_CHECK(detail::classify_epoch_in_revert(contract_revert_rpc_code, data(not_active_operator_selector, 1)) ==
+               revert::not_active_operator);
+   BOOST_CHECK(detail::classify_epoch_in_revert(contract_revert_rpc_code, data(digest_mismatch_selector, 2)) ==
+               revert::digest_mismatch);
+
+   // Wrong shape, wrong selector, a protocol error, or no bytes: not a known refusal.
+   BOOST_CHECK(!detail::classify_epoch_in_revert(contract_revert_rpc_code, data(dispatch_underfunded_selector, 1)));
+   BOOST_CHECK(!detail::classify_epoch_in_revert(contract_revert_rpc_code, data(not_active_operator_selector, 2)));
+   BOOST_CHECK(!detail::classify_epoch_in_revert(contract_revert_rpc_code, data(no_yield_selector, 0)));
+   BOOST_CHECK(!detail::classify_epoch_in_revert(json_rpc_parse_error_code, data(dispatch_underfunded_selector, 2)));
+   BOOST_CHECK(!detail::classify_epoch_in_revert(contract_revert_rpc_code, ""));
+   BOOST_CHECK(!detail::classify_epoch_in_revert(contract_revert_rpc_code, "0x"));
+} FC_LOG_AND_RETHROW();
+
+/// A confirmed call's receipt is summarised from the `OPPInbound` events in it,
+/// for this epoch and this relay only; logs from other contracts, other epochs
+/// and other operators are ignored.
+BOOST_AUTO_TEST_CASE(delivery_receipts_summarise_the_outposts_events) try {
+   namespace detail = sysio::outpost_ethereum_client_detail;
+   const std::string inbound{test_opp_inbound_address};
+   const std::string self{test_other_operator_address};
+   const std::string other{test_syndication_pool_address};
+
+   const auto nothing = detail::summarize_delivery_receipt({}, inbound, test_wire_epoch, self);
+   BOOST_CHECK(!nothing.recorded && !nothing.tipped && !nothing.dispatched && !nothing.finalized);
+
+   const fc::variants full{
+      epoch_delivery_log(inbound, test_wire_epoch, self, settled_digest_word),
+      epoch_consensus_log(inbound, test_wire_epoch, settled_digest_word, test_group_size),
+      epoch_dispatch_progressed_log(inbound, test_wire_epoch, 4),
+      epoch_complete_log(inbound, test_wire_epoch),
+   };
+   const auto summary = detail::summarize_delivery_receipt(full, inbound, test_wire_epoch, self);
+   BOOST_CHECK(summary.recorded);
+   BOOST_CHECK(summary.tipped);
+   BOOST_REQUIRE(summary.dispatched.has_value());
+   BOOST_CHECK_EQUAL(*summary.dispatched, 4u);
+   BOOST_CHECK(summary.finalized);
+   // Addresses compare without their checksum casing.
+   std::string upper_inbound = inbound;
+   std::ranges::transform(upper_inbound, upper_inbound.begin(), [](unsigned char c) { return std::toupper(c); });
+   BOOST_CHECK(detail::summarize_delivery_receipt(full, upper_inbound, test_wire_epoch, self).recorded);
+
+   const fc::variants foreign{
+      epoch_delivery_log(other, test_wire_epoch, self, settled_digest_word),            // another contract
+      epoch_delivery_log(inbound, test_wire_epoch, other, settled_digest_word),         // another operator
+      epoch_consensus_log(inbound, test_different_wire_epoch, settled_digest_word, 1),  // another epoch
+      epoch_dispatch_progressed_log(inbound, test_different_wire_epoch, 4),
+      epoch_complete_log(inbound, test_different_wire_epoch),
+      fc::variant("not a log object"),
+   };
+   const auto ignored = detail::summarize_delivery_receipt(foreign, inbound, test_wire_epoch, self);
+   BOOST_CHECK(!ignored.recorded && !ignored.tipped && !ignored.dispatched && !ignored.finalized);
+
+   // The receipt parser keeps the block and the logs, and refuses a receipt without a block.
+   const auto parsed = sysio::parse_epoch_in_receipt(
+      "0x1", fc::mutable_variant_object("blockNumber", pinned_block_hex(test_head_block))("logs", full));
+   BOOST_CHECK_EQUAL(parsed.tx_hash, "0x1");
+   BOOST_CHECK_EQUAL(parsed.block_number, fc::uint256{test_head_block});
+   BOOST_CHECK_EQUAL(parsed.logs.size(), full.size());
+   BOOST_CHECK(sysio::parse_epoch_in_receipt("0x1", fc::mutable_variant_object("blockNumber", "0x1")).logs.empty());
+   BOOST_CHECK_THROW(sysio::parse_epoch_in_receipt("0x1", fc::mutable_variant_object("logs", full)), fc::exception);
+   BOOST_CHECK_THROW(sysio::parse_epoch_in_receipt("0x1", fc::variant("0x1")), fc::exception);
+
+   // The digest the relay compares against the settled one is keccak256 of the bytes.
+   BOOST_CHECK_EQUAL(detail::envelope_digest_word({}), keccak256_of_empty);
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(delivery_rejects_empty_and_over_cap_envelopes) try {
-   auto fixture = create_chunked_delivery_fixture();
+   auto fixture = create_whole_envelope_delivery_fixture();
 
    BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
                         test_wire_epoch, {}, fc::seconds(test_rpc_deadline_seconds)),
@@ -1312,340 +1731,476 @@ BOOST_AUTO_TEST_CASE(delivery_rejects_empty_and_over_cap_envelopes) try {
                         test_wire_epoch, over_cap, fc::seconds(test_rpc_deadline_seconds)),
                      fc::assert_exception);
 
-   BOOST_CHECK_EQUAL(fixture->chunk_calls.size(), 0u);
-   BOOST_CHECK_EQUAL(fixture->chunk_state_reads, 0u);
+   BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 0u);
+   BOOST_CHECK_EQUAL(fixture->next_epoch_reads, 0u);
+   BOOST_CHECK_EQUAL(fixture->spill_reads, 0u);
 } FC_LOG_AND_RETHROW();
 
-/// The dominant case: an envelope at or below one chunk is a single
-/// transaction that stages nothing, so the resume read is skipped entirely.
-BOOST_AUTO_TEST_CASE(single_chunk_delivery_skips_the_resume_read) try {
-   auto fixture  = create_chunked_delivery_fixture();
-   auto envelope = make_chunked_envelope(sysio::ETHEREUM_MAX_CHUNK_BYTES);
+/// The dominant case: the whole envelope goes in ONE call, and once the
+/// delivery is recorded without tipping (the rest of the group has yet to
+/// deliver) the tick stops rather than re-sending a paid no-op.
+BOOST_AUTO_TEST_CASE(delivery_sends_the_whole_envelope_in_one_call) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(sysio::OPP_MAX_ENVELOPE_BYTES);
 
    const auto tx = fixture->outpost->deliver_outbound_envelope(
       test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
 
    BOOST_CHECK(!tx.empty());
-   BOOST_CHECK_EQUAL(fixture->chunk_state_reads, 0u);
-   BOOST_CHECK_EQUAL(fixture->discard_calls, 0u);
-   BOOST_CHECK_EQUAL(fixture->next_epoch_reads, 0u);
-   check_chunk_call_sequence(fixture->chunk_calls, envelope, test_wire_epoch, 0);
+   check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 1);
+   // Opaque bytes carry no attestation count to size a budget from: the
+   // ceiling, and the contract judges them.
+   BOOST_CHECK_EQUAL(fixture->delivery_calls[0].gas_budget, sysio::EIP_7825_TX_GAS_CAP);
+   // Read at the head before the delivery, and once more at the receipt's
+   // block after it to learn it was recorded and did not tip.
+   BOOST_CHECK_EQUAL(fixture->next_epoch_reads, 2u);
+   BOOST_CHECK_EQUAL(fixture->spill_reads, 2u);
+   BOOST_CHECK_EQUAL(fixture->settlement_reads, 2u);
+   const std::vector<std::string> expected_blocks{pinned_block_hex(test_head_block), pinned_block_hex(test_head_block + 1)};
+   const auto blocks = fixture->blocks_read();
+   BOOST_CHECK_EQUAL_COLLECTIONS(blocks.begin(), blocks.end(), expected_blocks.begin(), expected_blocks.end());
+   // The tip check ran in the delivery itself: no consensus read follows a send.
+   BOOST_CHECK_EQUAL(fixture->consensus_reads, 0u);
 } FC_LOG_AND_RETHROW();
 
-/// A multi-chunk delivery with nothing staged sends every chunk in order, each
-/// exactly MAX_CHUNK_BYTES but the last.
-BOOST_AUTO_TEST_CASE(multi_chunk_delivery_sends_every_chunk_in_order) try {
-   auto fixture  = create_chunked_delivery_fixture();
-   auto envelope = make_chunked_envelope(three_chunk_envelope_bytes);
-
-   fixture->outpost->deliver_outbound_envelope(
-      test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
-
-   BOOST_CHECK_EQUAL(fixture->chunk_state_reads, 1u);
-   BOOST_CHECK_EQUAL(fixture->discard_calls, 0u);
-   check_chunk_call_sequence(fixture->chunk_calls, envelope, test_wire_epoch, 0);
-} FC_LOG_AND_RETHROW();
-
-/// Resume: an own, matching header advances the start index to the on-chain
-/// high-water mark. Without this a tick whose budget covers k transactions
-/// re-sends chunks 0..k-1 forever and never reaches chunk k.
-BOOST_AUTO_TEST_CASE(multi_chunk_delivery_resumes_from_the_staged_high_water_mark) try {
-   auto fixture  = create_chunked_delivery_fixture();
-   auto envelope = make_chunked_envelope(three_chunk_envelope_bytes);
-
-   constexpr uint16_t staged_chunks = 2;
-   fixture->chunk_state_response = encode_envelope_chunk_state_result(
-      test_wire_epoch,
-      fixture->outpost->signer_address_hex(),
-      sysio::outpost_ethereum_client_detail::chunk_count_for(envelope.size()),
-      staged_chunks,
-      static_cast<uint32_t>(envelope.size()),
-      static_cast<uint64_t>(staged_chunks) * sysio::ETHEREUM_MAX_CHUNK_BYTES);
-
-   fixture->outpost->deliver_outbound_envelope(
-      test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
-
-   BOOST_CHECK_EQUAL(fixture->chunk_state_reads, 1u);
-   BOOST_CHECK_EQUAL(fixture->discard_calls, 0u);
-   check_chunk_call_sequence(fixture->chunk_calls, envelope, test_wire_epoch, staged_chunks);
-} FC_LOG_AND_RETHROW();
-
-/// `storedBytes` is a uint256 the relay only logs. A value beyond the uint64
-/// range must NOT invalidate the header: doing so would drop back to chunk 0
-/// and re-upload cells the outpost already holds.
-BOOST_AUTO_TEST_CASE(multi_chunk_delivery_resumes_despite_an_oversized_stored_bytes_field) try {
-   auto fixture  = create_chunked_delivery_fixture();
-   auto envelope = make_chunked_envelope(three_chunk_envelope_bytes);
-
-   constexpr uint16_t staged_chunks = 2;
-   fixture->chunk_state_response = encode_envelope_chunk_state_result(
-      test_wire_epoch,
-      fixture->outpost->signer_address_hex(),
-      sysio::outpost_ethereum_client_detail::chunk_count_for(envelope.size()),
-      staged_chunks,
-      static_cast<uint32_t>(envelope.size()),
-      /*stored_bytes=*/0,
-      stored_bytes_above_uint64_word());
-
-   fixture->outpost->deliver_outbound_envelope(
-      test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
-
-   BOOST_CHECK_EQUAL(fixture->discard_calls, 0u);
-   check_chunk_call_sequence(fixture->chunk_calls, envelope, test_wire_epoch, staged_chunks);
-} FC_LOG_AND_RETHROW();
-
-/// Mid-sequence deadline expiry — the scenario resume exists for.
-///
-/// The first chunk burns more wall clock than the whole delivery budget, so the
-/// SECOND chunk's pre-flight `throw_if_past_deadline` fires: the tick abandons
-/// after a PARTIAL, correctly-ordered prefix rather than rolling back. The next
-/// cron tick then resumes from the on-chain high-water mark instead of
-/// re-sending chunk 0 forever (the livelock this design removes).
-BOOST_AUTO_TEST_CASE(multi_chunk_delivery_abandons_on_deadline_then_resumes_next_tick) try {
-   auto fixture  = create_chunked_delivery_fixture();
-   auto envelope = make_chunked_envelope(three_chunk_envelope_bytes);
-   BOOST_REQUIRE_EQUAL(
-      sysio::outpost_ethereum_client_detail::chunk_count_for(envelope.size()), 3u);
-
-   constexpr int64_t delivery_budget_ms = 50;
-   fixture->first_chunk_delay = std::chrono::milliseconds{delivery_budget_ms * 4};
-
-   BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
-                        test_wire_epoch, envelope, fc::milliseconds(delivery_budget_ms)),
-                     fc::timeout_exception);
-
-   // Exactly one chunk landed, and it is a correct prefix of the envelope.
-   BOOST_REQUIRE_EQUAL(fixture->chunk_calls.size(), 1u);
-   BOOST_CHECK_EQUAL(fixture->chunk_calls[0].chunk_index, 0u);
-   BOOST_CHECK_EQUAL(fixture->chunk_calls[0].chunk_hex,
-                     fc::to_hex(envelope.data(), sysio::ETHEREUM_MAX_CHUNK_BYTES));
-
-   // Next tick: the outpost reports the one staged chunk, and the relay picks
-   // up at chunk 1 rather than restarting.
-   fixture->chunk_calls.clear();
-   fixture->first_chunk_delay = std::chrono::milliseconds{0};
-   fixture->chunk_state_response = encode_envelope_chunk_state_result(
-      test_wire_epoch,
-      fixture->outpost->signer_address_hex(),
-      sysio::outpost_ethereum_client_detail::chunk_count_for(envelope.size()),
-      1,
-      static_cast<uint32_t>(envelope.size()),
-      sysio::ETHEREUM_MAX_CHUNK_BYTES);
-
-   fixture->outpost->deliver_outbound_envelope(
-      test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
-
-   BOOST_CHECK_EQUAL(fixture->discard_calls, 0u);
-   check_chunk_call_sequence(fixture->chunk_calls, envelope, test_wire_epoch, 1);
-} FC_LOG_AND_RETHROW();
-
-/// A staging header owned by a peer is never adopted and never discarded — the
-/// delivery simply starts at chunk 0 and lets the contract's ownership guard
-/// arbitrate.
-BOOST_AUTO_TEST_CASE(multi_chunk_delivery_ignores_a_peer_owned_header) try {
-   auto fixture  = create_chunked_delivery_fixture();
-   auto envelope = make_chunked_envelope(three_chunk_envelope_bytes);
-
-   fixture->chunk_state_response = encode_envelope_chunk_state_result(
-      test_wire_epoch,
-      foreign_operator_address,
-      sysio::outpost_ethereum_client_detail::chunk_count_for(envelope.size()),
-      2,
-      static_cast<uint32_t>(envelope.size()),
-      0);
-
-   fixture->outpost->deliver_outbound_envelope(
-      test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
-
-   BOOST_CHECK_EQUAL(fixture->discard_calls, 0u);
-   BOOST_CHECK_EQUAL(fixture->next_epoch_reads, 0u);
-   check_chunk_call_sequence(fixture->chunk_calls, envelope, test_wire_epoch, 0);
-} FC_LOG_AND_RETHROW();
-
-/// A CURRENT-epoch header describing a different envelope is discarded first,
-/// then the upload restarts from chunk 0.
-BOOST_AUTO_TEST_CASE(multi_chunk_delivery_discards_a_superseded_current_epoch_header) try {
-   auto fixture  = create_chunked_delivery_fixture();
-   auto envelope = make_chunked_envelope(three_chunk_envelope_bytes);
-
-   fixture->chunk_state_response = encode_envelope_chunk_state_result(
-      test_wire_epoch,
-      fixture->outpost->signer_address_hex(),
-      sysio::outpost_ethereum_client_detail::chunk_count_for(envelope.size()),
-      1,
-      static_cast<uint32_t>(envelope.size()) - 1,  // a different envelope, same epoch
-      sysio::ETHEREUM_MAX_CHUNK_BYTES);
-
-   fixture->outpost->deliver_outbound_envelope(
-      test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
-
-   BOOST_CHECK_EQUAL(fixture->discard_calls, 1u);
-   check_chunk_call_sequence(fixture->chunk_calls, envelope, test_wire_epoch, 0);
-} FC_LOG_AND_RETHROW();
-
-/// A reverting discard means the header is ALREADY clear (the contract's
-/// `OPP_ChunkBufferMissing`), which is exactly the state the relay wanted:
-/// log it and upload from chunk 0. Only transport failures abandon the tick.
-BOOST_AUTO_TEST_CASE(multi_chunk_delivery_treats_a_reverting_discard_as_already_clear) try {
-   auto fixture  = create_chunked_delivery_fixture();
-   auto envelope = make_chunked_envelope(three_chunk_envelope_bytes);
-
-   fixture->chunk_state_response = encode_envelope_chunk_state_result(
-      test_wire_epoch,
-      fixture->outpost->signer_address_hex(),
-      sysio::outpost_ethereum_client_detail::chunk_count_for(envelope.size()),
-      1,
-      static_cast<uint32_t>(envelope.size()) - 1,
-      sysio::ETHEREUM_MAX_CHUNK_BYTES);
-   fixture->discard_failure = fc::network::json_rpc::json_rpc_error(
-      contract_revert_rpc_code, "execution reverted",
-      fc::variant{encode_address_revert(chunk_buffer_missing_selector,
-                                        fixture->outpost->signer_address_hex())});
-
-   fixture->outpost->deliver_outbound_envelope(
-      test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
-
-   BOOST_CHECK_EQUAL(fixture->discard_calls, 1u);
-   check_chunk_call_sequence(fixture->chunk_calls, envelope, test_wire_epoch, 0);
-} FC_LOG_AND_RETHROW();
-
-/// A revert the client cannot identify is NOT proof the staging header is clear.
-///
-/// Code 3 says only that the EVM executed and reverted. A node whose proxy points at a
-/// mismatched implementation, or that returns no revert bytes at all, produces the same code
-/// for a completely different reason — and the superseded header may still be staged. Each of
-/// these must abandon the tick rather than upload chunk 0 against it.
-///
-/// Abandoning is self-healing rather than terminal: this path is only reached when a header
-/// WAS read, so the next cron tick re-reads it and either resumes or starts fresh.
-BOOST_AUTO_TEST_CASE(multi_chunk_delivery_abandons_on_an_unrecognized_discard_revert) try {
-   auto envelope = make_chunked_envelope(three_chunk_envelope_bytes);
-   // Built against a throwaway fixture so the cases can name this relay's real signer.
-   const auto signer = create_chunked_delivery_fixture()->outpost->signer_address_hex();
-
-   const std::vector<std::pair<std::string, std::string>> unrecognized{
-      {"no revert bytes at all", ""},
-      {"an empty revert payload", "0x"},
-      {"a neighbouring error of identical shape",
-       encode_address_revert(no_chunk_slot_selector, signer)},
-      {"our error naming a different operator",
-       encode_address_revert(chunk_buffer_missing_selector, test_other_operator_address)},
-      {"our selector with the argument truncated away",
-       "0x" + std::string(chunk_buffer_missing_selector)},
-   };
-
-   for (const auto& [description, revert_data] : unrecognized) {
-      BOOST_TEST_CONTEXT(description) {
-         auto fixture = create_chunked_delivery_fixture();
-         fixture->chunk_state_response = encode_envelope_chunk_state_result(
-            test_wire_epoch,
-            fixture->outpost->signer_address_hex(),
-            sysio::outpost_ethereum_client_detail::chunk_count_for(envelope.size()),
-            1,
-            static_cast<uint32_t>(envelope.size()) - 1,
-            sysio::ETHEREUM_MAX_CHUNK_BYTES);
-         fixture->discard_failure = fc::network::json_rpc::json_rpc_error(
-            contract_revert_rpc_code, "execution reverted", fc::variant{revert_data});
-
-         BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
-                              test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
-                           fc::exception);
-
-         BOOST_CHECK_EQUAL(fixture->discard_calls, 1u);
-         BOOST_CHECK(fixture->chunk_calls.empty());
-      }
-   }
-} FC_LOG_AND_RETHROW();
-
-/// A JSON-RPC protocol error is NOT a revert, and must abandon the tick rather than be tolerated.
-///
-/// A parse error means the node never executed the call, so the staging header may still hold
-/// the superseded envelope. Treating it as "already clear" would upload chunk 0 against that
-/// stale header. Such a response is required by the JSON-RPC specification to carry a null id,
-/// which the transport now decodes as json_rpc_error rather than a bare fc::exception, so this
-/// catch discriminates on the code instead of on the exception type.
-BOOST_AUTO_TEST_CASE(multi_chunk_delivery_abandons_on_a_protocol_error_during_discard) try {
-   auto fixture  = create_chunked_delivery_fixture();
-   auto envelope = make_chunked_envelope(three_chunk_envelope_bytes);
-
-   fixture->chunk_state_response = encode_envelope_chunk_state_result(
-      test_wire_epoch,
-      fixture->outpost->signer_address_hex(),
-      sysio::outpost_ethereum_client_detail::chunk_count_for(envelope.size()),
-      1,
-      static_cast<uint32_t>(envelope.size()) - 1,
-      sysio::ETHEREUM_MAX_CHUNK_BYTES);
-   // The payload is a well-formed OPP_ChunkBufferMissing naming this signer, so only the code
-   // distinguishes it. A JSON-RPC error object may carry `data`, and with an empty one here the
-   // selector check would reject it first and the code guard would never be exercised.
-   fixture->discard_failure = fc::network::json_rpc::json_rpc_error(
-      json_rpc_parse_error_code, "Parse error",
-      fc::variant{encode_address_revert(chunk_buffer_missing_selector,
-                                        fixture->outpost->signer_address_hex())});
-
-   BOOST_CHECK_THROW(
-      fixture->outpost->deliver_outbound_envelope(test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
-      fc::exception);
-
-   BOOST_CHECK_EQUAL(fixture->discard_calls, 1u);
-   BOOST_CHECK(fixture->chunk_calls.empty());
-} FC_LOG_AND_RETHROW();
-
-/// A stale OWN header on a consensus retry is the signature of an epoch that
-/// advanced underneath us. One `nextEpochIndex()` read confirms it, and the
-/// delivery is abandoned before a single transaction is signed — otherwise the
-/// retry pays for up to `totalChunks` late no-ops.
-BOOST_AUTO_TEST_CASE(multi_chunk_delivery_skips_when_the_outpost_epoch_advanced) try {
-   auto fixture  = create_chunked_delivery_fixture();
-   auto envelope = make_chunked_envelope(three_chunk_envelope_bytes);
-
-   // A header epoch differing from the delivery epoch triggers the
-   // confirmation read.
-   fixture->chunk_state_response = encode_envelope_chunk_state_result(
-      test_stale_wire_epoch,
-      fixture->outpost->signer_address_hex(),
-      sysio::outpost_ethereum_client_detail::chunk_count_for(envelope.size()),
-      1,
-      static_cast<uint32_t>(envelope.size()),
-      sysio::ETHEREUM_MAX_CHUNK_BYTES);
-   fixture->next_epoch_index_response = encode_next_epoch_index_result(test_different_wire_epoch);
+/// A consensus retry against an epoch the outpost has already moved past is
+/// abandoned before a single transaction is signed — it would only buy a late
+/// no-op — and the EMPTY tx id marks the epoch handled.
+BOOST_AUTO_TEST_CASE(delivery_skips_when_the_outpost_epoch_advanced) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->next_epoch_index_responses = {encode_next_epoch_index_result(test_different_wire_epoch)};
 
    const auto tx = fixture->outpost->deliver_outbound_envelope(
       test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
 
    BOOST_CHECK(tx.empty());
+   BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 0u);
    BOOST_CHECK_EQUAL(fixture->next_epoch_reads, 1u);
-   BOOST_CHECK_EQUAL(fixture->chunk_calls.size(), 0u);
-   BOOST_CHECK_EQUAL(fixture->discard_calls, 0u);
 } FC_LOG_AND_RETHROW();
 
-/// The same stale-header shape when the outpost has NOT advanced: the epoch is
-/// still deliverable, so the upload proceeds from chunk 0.
-BOOST_AUTO_TEST_CASE(multi_chunk_delivery_proceeds_when_the_outpost_epoch_has_not_advanced) try {
-   auto fixture  = create_chunked_delivery_fixture();
-   auto envelope = make_chunked_envelope(three_chunk_envelope_bytes);
+/// The cursor's own `finalized` flag closes the epoch even when the epoch
+/// cursor read has not caught up with it.
+BOOST_AUTO_TEST_CASE(delivery_skips_an_epoch_the_cursor_reports_finalized) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->spill_responses = {encode_dispatch_spill_result(true, 5, true, true)};
 
-   fixture->chunk_state_response = encode_envelope_chunk_state_result(
-      test_stale_wire_epoch,
-      fixture->outpost->signer_address_hex(),
-      sysio::outpost_ethereum_client_detail::chunk_count_for(envelope.size()),
-      1,
-      static_cast<uint32_t>(envelope.size()),
-      sysio::ETHEREUM_MAX_CHUNK_BYTES);
-   fixture->next_epoch_index_response = encode_next_epoch_index_result(test_wire_epoch);
-
-   fixture->outpost->deliver_outbound_envelope(
+   const auto tx = fixture->outpost->deliver_outbound_envelope(
       test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
 
+   BOOST_CHECK(tx.empty());
+   BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 0u);
    BOOST_CHECK_EQUAL(fixture->next_epoch_reads, 1u);
-   check_chunk_call_sequence(fixture->chunk_calls, envelope, test_wire_epoch, 0);
+} FC_LOG_AND_RETHROW();
+
+/// An outpost still on an earlier epoch cannot take this delivery yet: nothing
+/// is sent, and the tick ends in the retry exception rather than marking the
+/// epoch handled.
+BOOST_AUTO_TEST_CASE(delivery_waits_for_an_outpost_that_is_behind) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->next_epoch_index_responses = {encode_next_epoch_index_result(test_stale_wire_epoch)};
+
+   BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
+                        test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 0u);
+   BOOST_CHECK_EQUAL(fixture->attempted_budgets.size(), 0u);
+} FC_LOG_AND_RETHROW();
+
+/// A delivery that tips and spills is continued in the SAME tick: the relay
+/// re-supplies the envelope until the outpost reports the epoch finalized.
+BOOST_AUTO_TEST_CASE(delivery_that_tips_and_spills_continues_in_the_same_tick) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(sysio::OPP_MAX_ENVELOPE_BYTES);
+   fixture->spill_responses = {
+      encode_dispatch_spill_result(false, 0, false, false),   // before the delivery
+      encode_dispatch_spill_result(true, 4, false, false),    // tipped, spilled after 4
+      encode_dispatch_spill_result(true, 11, true, false),    // dispatched, emit outstanding
+      encode_dispatch_spill_result(true, 11, true, true),     // finalized
+   };
+   fixture->settle_on(envelope, /*recorded_from_read=*/1);
+
+   const auto tx = fixture->outpost->deliver_outbound_envelope(
+      test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
+
+   BOOST_CHECK(!tx.empty());
+   // The delivery, then two continuations — every one carrying the whole envelope.
+   check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 3);
+   BOOST_CHECK_EQUAL(fixture->spill_reads, 4u);
+   BOOST_CHECK_EQUAL(fixture->settlement_reads, 4u);
+} FC_LOG_AND_RETHROW();
+
+/// Resume: a tick that finds the epoch already tipped on this relay's digest
+/// picks the continuation up without a fresh delivery — the contract would
+/// refuse one, and the relay does not pay to find that out.
+BOOST_AUTO_TEST_CASE(delivery_continues_a_tipped_epoch_it_delivered_until_it_finalizes) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->spill_responses = {
+      encode_dispatch_spill_result(true, 3, false, false),
+      encode_dispatch_spill_result(true, 3, true, false),
+      encode_dispatch_spill_result(true, 3, true, true),
+   };
+   fixture->settle_on(envelope);
+
+   const auto tx = fixture->outpost->deliver_outbound_envelope(
+      test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
+
+   BOOST_CHECK(!tx.empty());
+   check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 2);
+   BOOST_CHECK_EQUAL(fixture->settlement_reads, 3u);
+} FC_LOG_AND_RETHROW();
+
+/// A continuation is sent only with the bytes consensus settled on: an
+/// envelope whose digest is not the settled one is this relay's problem to
+/// report, not the outpost's to refuse for a fee.
+BOOST_AUTO_TEST_CASE(delivery_does_not_continue_with_an_envelope_that_is_not_the_settled_digest) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->spill_responses        = {encode_dispatch_spill_result(true, 3, false, false)};
+   fixture->own_delivery_responses = {encode_word_result(settled_digest_word)};
+   fixture->pending_hash_response  = encode_word_result(settled_digest_word);
+
+   const auto tx = fixture->outpost->deliver_outbound_envelope(
+      test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
+
+   BOOST_CHECK(tx.empty());
+   BOOST_CHECK_EQUAL(fixture->attempted_budgets.size(), 0u);
+} FC_LOG_AND_RETHROW();
+
+/// A relay that never delivered has no claim on a tipped epoch's
+/// continuation: its deliverers carry it, and this relay sends nothing.
+BOOST_AUTO_TEST_CASE(delivery_leaves_a_tipped_epoch_it_did_not_deliver_to_its_deliverers) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->spill_responses        = {encode_dispatch_spill_result(true, 2, false, false)};
+   fixture->own_delivery_responses = {encode_word_result(zero_digest_word)};
+
+   const auto tx = fixture->outpost->deliver_outbound_envelope(
+      test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
+
+   BOOST_CHECK(tx.empty());
+   BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 0u);
+   BOOST_CHECK_EQUAL(fixture->settlement_reads, 1u);
+} FC_LOG_AND_RETHROW();
+
+/// A relay whose delivery settled on a DIFFERENT digest — a minority envelope
+/// — must not resume the epoch from its own divergent bytes.
+BOOST_AUTO_TEST_CASE(delivery_does_not_continue_from_a_minority_digest) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->spill_responses        = {encode_dispatch_spill_result(true, 2, false, false)};
+   fixture->own_delivery_responses = {encode_word_result(divergent_digest_word)};
+
+   const auto tx = fixture->outpost->deliver_outbound_envelope(
+      test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
+
+   BOOST_CHECK(tx.empty());
+   BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 0u);
+} FC_LOG_AND_RETHROW();
+
+/// A recorded, untipped delivery is re-sent only when the outpost's own
+/// consensus view says the re-send would tip it — the boundary elapsed and a
+/// strict majority agreeing — and only once per tick. The ordinary first
+/// delivery of a tick (`delivery_sends_the_whole_envelope_in_one_call`) is the
+/// recorded-untipped-after-a-send case, which returns normally.
+BOOST_AUTO_TEST_CASE(delivery_retries_consensus_only_when_the_outposts_majority_view_allows) try {
+   const uint64_t now = fc::time_point::now().sec_since_epoch();
+   constexpr uint32_t duration = 60;
+   const auto consensus = [&](uint32_t agreeing, uint64_t started_at) {
+      return encode_pending_consensus_result(test_wire_epoch, agreeing, test_group_size, started_at, duration);
+   };
+
+   // Boundary elapsed, majority agreeing: one re-delivery, then the tick stops.
+   {
+      auto fixture  = create_whole_envelope_delivery_fixture();
+      auto envelope = make_envelope(mid_envelope_bytes);
+      fixture->own_delivery_responses = {encode_word_result(settled_digest_word)};
+      fixture->consensus_response     = consensus(test_majority, now - duration - 1);
+
+      const auto tx = fixture->outpost->deliver_outbound_envelope(
+         test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
+
+      BOOST_CHECK(!tx.empty());
+      check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 1);
+      BOOST_CHECK_EQUAL(fixture->consensus_reads, 1u);
+      BOOST_REQUIRE_EQUAL(fixture->consensus_digests.size(), 1u);
+      BOOST_CHECK_EQUAL(fixture->consensus_digests.front(), prefixed(settled_digest_word));
+   }
+   // Majority not reached: nothing to send.
+   {
+      auto fixture  = create_whole_envelope_delivery_fixture();
+      auto envelope = make_envelope(mid_envelope_bytes);
+      fixture->own_delivery_responses = {encode_word_result(settled_digest_word)};
+      fixture->consensus_response     = consensus(test_majority - 1, now - duration - 1);
+
+      const auto tx = fixture->outpost->deliver_outbound_envelope(
+         test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
+
+      BOOST_CHECK(tx.empty());
+      BOOST_CHECK_EQUAL(fixture->attempted_budgets.size(), 0u);
+      BOOST_CHECK_EQUAL(fixture->consensus_reads, 1u);
+   }
+   // Boundary not elapsed on the outpost: nothing to send, however many agree
+   // — and not a used-up retry either: the epoch stays open for the next tick.
+   {
+      auto fixture  = create_whole_envelope_delivery_fixture();
+      auto envelope = make_envelope(mid_envelope_bytes);
+      fixture->own_delivery_responses = {encode_word_result(settled_digest_word)};
+      fixture->consensus_response     = consensus(test_group_size, now + duration);
+
+      BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
+                           test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
+                        sysio::chain::outpost_delivery_incomplete_exception);
+      BOOST_CHECK_EQUAL(fixture->attempted_budgets.size(), 0u);
+      BOOST_CHECK_EQUAL(fixture->consensus_reads, 1u);
+   }
+} FC_LOG_AND_RETHROW();
+
+/// A call that confirms but moves nothing — no record, no tip, no dispatch
+/// progress — was under-funded for the attestation at the cursor: the next is
+/// funded double, and a call at the ceiling that still moves nothing ends the
+/// tick in the retry exception instead of a fourth paid no-op.
+BOOST_AUTO_TEST_CASE(delivery_escalates_after_a_call_that_advanced_nothing_and_stops_at_the_ceiling) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = serialize_envelope_with_attestations(test_wire_epoch, 1, 16);
+   // The outpost never records the delivery, whatever is sent.
+   fixture->own_delivery_responses = {encode_word_result(zero_digest_word)};
+   fixture->receipt_logs           = {fc::variants{}};
+
+   BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
+                        test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+
+   const auto expected = [&](uint32_t escalations) {
+      return sysio::delivery_gas_budget(sysio::delivery_gas_request{
+         .envelope_bytes         = envelope.size(),
+         .remaining_attestations = 1,
+         .escalations            = escalations,
+         .ceiling                = sysio::EIP_7825_TX_GAS_CAP});
+   };
+   BOOST_REQUIRE_EQUAL(expected(2), sysio::EIP_7825_TX_GAS_CAP);
+   check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 3);
+   BOOST_CHECK_EQUAL(fixture->delivery_calls[0].gas_budget, expected(0));
+   BOOST_CHECK_EQUAL(fixture->delivery_calls[1].gas_budget, expected(1));
+   BOOST_CHECK_EQUAL(fixture->delivery_calls[2].gas_budget, sysio::EIP_7825_TX_GAS_CAP);
+   // Each read after a send was pinned to that send's block.
+   BOOST_CHECK_EQUAL(fixture->blocks_read().size(), 4u);
+
+   // The next tick finds the same stall and reports it the same way, without
+   // paying for the under-funded calls again: straight to the ceiling.
+   fixture->delivery_calls.clear();
+   BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
+                        test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 3u);
+} FC_LOG_AND_RETHROW();
+
+/// A node refusal for gas below the ceiling is retried once at the ceiling;
+/// one at the ceiling is the stalled-epoch report, with nothing sent.
+BOOST_AUTO_TEST_CASE(delivery_retries_a_gas_refusal_at_the_ceiling_and_reports_one_there) try {
+   {
+      auto fixture  = create_whole_envelope_delivery_fixture();
+      auto envelope = serialize_envelope_with_attestations(test_wire_epoch, 2, 64);
+      fixture->refusals = {epoch_in_refusal(dispatch_underfunded_selector, 2)};
+
+      const auto tx = fixture->outpost->deliver_outbound_envelope(
+         test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
+
+      BOOST_CHECK(!tx.empty());
+      check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 1);
+      BOOST_REQUIRE_EQUAL(fixture->attempted_budgets.size(), 2u);
+      BOOST_CHECK(fixture->attempted_budgets[0] < sysio::EIP_7825_TX_GAS_CAP);
+      BOOST_CHECK_EQUAL(fixture->attempted_budgets[1], sysio::EIP_7825_TX_GAS_CAP);
+      BOOST_CHECK_EQUAL(fixture->delivery_calls[0].gas_budget, sysio::EIP_7825_TX_GAS_CAP);
+   }
+   {
+      auto fixture  = create_whole_envelope_delivery_fixture();
+      auto envelope = make_envelope(mid_envelope_bytes);   // unreadable: funded to the ceiling outright
+      fixture->refusals = {epoch_in_refusal(handler_gas_exhausted_selector, 3)};
+
+      BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
+                           test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
+                        sysio::chain::outpost_delivery_incomplete_exception);
+      BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 0u);
+      BOOST_REQUIRE_EQUAL(fixture->attempted_budgets.size(), 1u);
+      BOOST_CHECK_EQUAL(fixture->attempted_budgets[0], sysio::EIP_7825_TX_GAS_CAP);
+   }
+   // Any other refusal is the job's to see.
+   {
+      auto fixture  = create_whole_envelope_delivery_fixture();
+      auto envelope = make_envelope(mid_envelope_bytes);
+      fixture->refusals = {fc::network::json_rpc::json_rpc_error(json_rpc_parse_error_code, "parse error")};
+
+      BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
+                           test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
+                        fc::network::json_rpc::json_rpc_error);
+      BOOST_CHECK_EQUAL(fixture->attempted_budgets.size(), 1u);
+   }
+} FC_LOG_AND_RETHROW();
+
+/// A refusal that says the outpost moved under the read — here, the epoch
+/// finalized between the read and the send — is answered by a fresh read at
+/// the head, not a guess; one that survives fresh reads is reported.
+BOOST_AUTO_TEST_CASE(delivery_rereads_at_the_head_after_a_stale_refusal) try {
+   {
+      auto fixture  = create_whole_envelope_delivery_fixture();
+      auto envelope = make_envelope(mid_envelope_bytes);
+      fixture->refusals                   = {epoch_in_refusal(non_sequential_epoch_selector, 2)};
+      fixture->next_epoch_index_responses = {encode_next_epoch_index_result(test_wire_epoch),
+                                             encode_next_epoch_index_result(test_different_wire_epoch)};
+
+      const auto tx = fixture->outpost->deliver_outbound_envelope(
+         test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
+
+      BOOST_CHECK(tx.empty());
+      BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 0u);
+      BOOST_CHECK_EQUAL(fixture->attempted_budgets.size(), 1u);
+      BOOST_CHECK_EQUAL(fixture->next_epoch_reads, 2u);
+      BOOST_CHECK_EQUAL(fixture->rpc->block_number_reads, 2u);
+   }
+   {
+      auto fixture  = create_whole_envelope_delivery_fixture();
+      auto envelope = make_envelope(mid_envelope_bytes);
+      fixture->refusals = {epoch_in_refusal(not_active_operator_selector, 1),
+                           epoch_in_refusal(not_active_operator_selector, 1),
+                           epoch_in_refusal(not_active_operator_selector, 1)};
+      fixture->own_delivery_responses = {encode_word_result(zero_digest_word)};
+
+      BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
+                           test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
+                        fc::network::json_rpc::json_rpc_error);
+      BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 0u);
+      BOOST_CHECK_EQUAL(fixture->attempted_budgets.size(), 3u);
+   }
+} FC_LOG_AND_RETHROW();
+
+/// A tick sends at most `MAX_CONTINUATIONS_PER_TICK` calls; an epoch still
+/// open after that is handed to the next tick through the retry exception,
+/// never marked handled.
+BOOST_AUTO_TEST_CASE(delivery_ends_the_tick_at_the_continuation_bound) try {
+   constexpr uint16_t continuation_bound = 32;
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   // Every call dispatches one more attestation and spills again.
+   for (uint16_t dispatched = 1; dispatched <= continuation_bound + 1; ++dispatched) {
+      fixture->spill_responses.push_back(encode_dispatch_spill_result(true, dispatched, false, false));
+   }
+   fixture->spill_responses.erase(fixture->spill_responses.begin());   // drop the never-tipped default
+   fixture->settle_on(envelope);
+
+   BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
+                        test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, continuation_bound);
+   // The bound was decided from a read AFTER the last send, at its block.
+   BOOST_CHECK_EQUAL(fixture->spill_reads, continuation_bound + 1u);
+} FC_LOG_AND_RETHROW();
+
+/// The cursor readers fail closed: a spill word that does not decode, or a
+/// digest that is not one 32-byte word, is an error, never "not tipped" or
+/// "never delivered" — either of which would send a fresh delivery into an
+/// epoch that may already have settled.
+BOOST_AUTO_TEST_CASE(delivery_fails_closed_on_malformed_cursor_reads) try {
+   {
+      auto fixture  = create_whole_envelope_delivery_fixture();
+      auto envelope = make_envelope(mid_envelope_bytes);
+      fixture->spill_responses = {std::string(hex_prefix) + abi_word(1)};   // one word of four
+      BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
+                           test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
+                        fc::exception);
+      BOOST_CHECK_EQUAL(fixture->attempted_budgets.size(), 0u);
+   }
+   {
+      auto fixture  = create_whole_envelope_delivery_fixture();
+      auto envelope = make_envelope(mid_envelope_bytes);
+      fixture->own_delivery_responses = {std::string(hex_prefix)};   // no word at all
+      BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
+                           test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
+                        fc::exception);
+      BOOST_CHECK_EQUAL(fixture->attempted_budgets.size(), 0u);
+   }
+   {
+      auto fixture  = create_whole_envelope_delivery_fixture();
+      auto envelope = make_envelope(mid_envelope_bytes);
+      fixture->next_epoch_index_responses = {"0xzz"};
+      // The ABI decoder's own refusal of a non-hex response, not an fc::exception.
+      BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
+                           test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
+                        std::exception);
+      BOOST_CHECK_EQUAL(fixture->attempted_budgets.size(), 0u);
+   }
+} FC_LOG_AND_RETHROW();
+
+/// A transport failure on a continuation propagates after the delivery that
+/// landed stands: the tick abandons, nothing is rolled back, and the next tick
+/// resumes from the outpost's cursor.
+BOOST_AUTO_TEST_CASE(delivery_propagates_a_transport_failure_on_a_continuation) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(sysio::OPP_MAX_ENVELOPE_BYTES);
+   fixture->spill_responses = {
+      encode_dispatch_spill_result(false, 0, false, false),
+      encode_dispatch_spill_result(true, 4, false, false),
+   };
+   fixture->settle_on(envelope, /*recorded_from_read=*/1);
+   fixture->refusals = {std::nullopt, fc::network::json_rpc::json_rpc_error(json_rpc_parse_error_code, "gateway timeout")};
+
+   BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
+                        test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
+                     fc::network::json_rpc::json_rpc_error);
+   check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 1);
+   BOOST_CHECK_EQUAL(fixture->attempted_budgets.size(), 2u);
+} FC_LOG_AND_RETHROW();
+
+/// Mid-sequence deadline expiry — the scenario the cursor exists for.
+///
+/// The delivery burns more wall clock than the whole budget, so the
+/// continuation's pre-flight `throw_if_past_deadline` fires: the tick abandons
+/// after the delivery landed rather than rolling anything back. The next tick
+/// reads the cursor and continues from it instead of re-delivering.
+BOOST_AUTO_TEST_CASE(delivery_abandons_on_deadline_then_continues_next_tick) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(sysio::OPP_MAX_ENVELOPE_BYTES);
+
+   constexpr int64_t delivery_budget_ms = 50;
+   fixture->first_call_delay = std::chrono::milliseconds{delivery_budget_ms * 4};
+   fixture->spill_responses = {
+      encode_dispatch_spill_result(false, 0, false, false),
+      encode_dispatch_spill_result(true, 6, false, false),
+   };
+   fixture->settle_on(envelope, /*recorded_from_read=*/1);
+
+   BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
+                        test_wire_epoch, envelope, fc::milliseconds(delivery_budget_ms)),
+                     fc::timeout_exception);
+
+   // Exactly the delivery landed, carrying the whole envelope.
+   check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 1);
+
+   // Next tick: the outpost reports the epoch tipped on our digest with six
+   // attestations routed, and the relay continues rather than re-delivering.
+   fixture->delivery_calls.clear();
+   fixture->first_call_delay = std::chrono::milliseconds{0};
+   fixture->spill_reads = 0;
+   fixture->spill_responses = {
+      encode_dispatch_spill_result(true, 6, false, false),
+      encode_dispatch_spill_result(true, 6, true, true),
+   };
+
+   const auto tx = fixture->outpost->deliver_outbound_envelope(
+      test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
+
+   BOOST_CHECK(!tx.empty());
+   check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 1);
 } FC_LOG_AND_RETHROW();
 
 // ── `crank_outpost` ──────────────────────────────────────────────────────
 
-/// The pool's three refusals are identified by selector AND shape, exactly as
-/// `OPP_ChunkBufferMissing` is: a neighbouring error, a role error, a refusal with the wrong
-/// argument count, and no bytes at all are none of them.
+/// The pool's three refusals are identified by selector AND shape, exactly as the `epochIn`
+/// refusals are: a neighbouring error, a role error, a refusal with the wrong argument count,
+/// and no bytes at all are none of them.
 BOOST_AUTO_TEST_CASE(realize_yield_refusal_selectors_are_pinned) try {
    namespace crank = sysio::outpost_ethereum_client_detail;
    using refusal   = crank::realize_yield_refusal;
@@ -1671,7 +2226,7 @@ BOOST_AUTO_TEST_CASE(realize_yield_refusal_selectors_are_pinned) try {
    BOOST_CHECK(!crank::classify_realize_yield_revert(
       encode_address_revert(access_managed_unauthorized_selector, test_other_operator_address)));
    BOOST_CHECK(!crank::classify_realize_yield_revert(
-      encode_address_revert(chunk_buffer_missing_selector, test_other_operator_address)));
+      encode_address_revert(unrelated_address_error_selector, test_other_operator_address)));
    BOOST_CHECK(!crank::classify_realize_yield_revert(""));
    BOOST_CHECK(!crank::classify_realize_yield_revert("0x"));
 } FC_LOG_AND_RETHROW();
@@ -1853,7 +2408,7 @@ BOOST_AUTO_TEST_CASE(gas_limit_policy_bounds_the_buffered_limit_at_the_eip_7825_
       .chain_id = test_evm_chain_id,
       .max_priority_fee_per_gas = maximum_ethereum_transaction_policy_value(),
       .max_fee_per_gas = maximum_ethereum_transaction_policy_value(),
-      .max_gas_limit = fc::uint256{eip_7825_tx_gas_cap},
+      .max_gas_limit = fc::uint256{sysio::EIP_7825_TX_GAS_CAP},
       .max_total_native_cost = maximum_ethereum_transaction_policy_value(),
    };
 
