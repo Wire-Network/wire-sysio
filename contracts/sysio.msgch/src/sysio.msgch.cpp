@@ -693,8 +693,7 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
 /// in `evalcons` after a consensus envelope has been unpacked. Dispatch is
 /// best-effort — silently no-ops on unknown / out-of-scope types so the
 /// inbound stream can keep flowing even when the depot hasn't yet wired up
-/// every handler (e.g. the deferred STAKE / UNSTAKE / STAKE_UPDATE staking
-/// lifecycle types).
+/// every handler (for example, STAKE_UPDATE from the separate staking track).
 ///
 /// `epoch_index` and `envelope_digest` identify the accepted envelope the attestation came in; the
 /// syndication paths forward them to `sysio.synd`. Returns true iff the attestation was routed to
@@ -774,8 +773,6 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
          // opening a sysio.chalg dispute vote, not by inbound challenge attestations.
          break;
 
-      case AttestationType::ATTESTATION_TYPE_STAKE:
-      case AttestationType::ATTESTATION_TYPE_UNSTAKE:
       case AttestationType::ATTESTATION_TYPE_STAKE_UPDATE:
       case AttestationType::ATTESTATION_TYPE_STAKE_RESULT:
          // Validator-staking lifecycle; depot-side handlers land in a later
