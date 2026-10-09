@@ -222,11 +222,11 @@ Every result carries `page`, the window it returned over the complete evaluated 
 | `total_rows` | rows of the complete output: rows passing WHERE for a detail query, groups passing HAVING for a grouped one |
 | `has_more` | whether output rows remain after this page: `min(offset, total_rows) + returned_rows < total_rows` |
 
-Each page is a separate request evaluated at its own block snapshot, so pages taken while the chain
+Each page is a separate request evaluated at its own chain state, so pages taken while the chain
 advances can overlap or skip rows; compare `state.block_id` across pages when a consistent view
 matters. Pagination never reduces the input evaluated: aggregation, HAVING and ordering always see
 every row, and `query-max-scan-rows` still bounds the whole scan. `complete: true` keeps its meaning
-— evaluation finished for the snapshot and nothing was silently truncated — while `has_more` says
+— evaluation finished for that state and nothing was silently truncated — while `has_more` says
 whether rows exist beyond this window. Paging is how a result larger than `query-max-result-rows`
 is read: a single unpaged request for it fails with QUERY_LIMIT.
 
@@ -255,8 +255,8 @@ All options are immutable, positive integers available through CLI or config.ini
 
 Additional bounds are 4096 tokens, depth 64, 2048 AST/ABI descriptor nodes, 64 owners and 512 rows
 per internal page; `error.data.limit` names them `sql-tokens`, `sql-depth`, `sql-nodes`,
-`sql-owners`, `abi-depth` and `abi-nodes`, distinct from the option names. Pages do not yield to
-another chain state. The capture bound is producer_plugin's read-only transaction time — the
+`sql-owners`, `abi-depth` and `abi-nodes`, distinct from the option names. Internal pages do not yield
+to another chain state. The capture bound is producer_plugin's read-only transaction time — the
 smaller of `max-transaction-time` and the effective read-only read window less its minimum — and
 every check inside a read callback also honors the current read window's own end, so a capture that
 starts late in a window stops at the window's end instead of running its full budget past it and

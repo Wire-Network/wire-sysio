@@ -47,7 +47,8 @@ void add_options(boost::program_options::options_description& options) {
    options.add_options()(
       option::timeout_ms,
       boost::program_options::value<std::string>()->default_value(std::to_string(defaults::timeout.count())),
-      "Query deadline in milliseconds, including queue time; C++ callers may opt out per call");
+      "Query deadline in milliseconds, including queue time; HTTP timeout_ms may only lower it; C++ callers may "
+      "opt out per call");
    // No default: producer_plugin's read-only transaction budget governs unless an operator sets a
    // tighter capture bound, and a configured value may never exceed that budget.
    options.add_options()(option::max_capture_ms, boost::program_options::value<std::string>(),
@@ -221,13 +222,12 @@ uint64_t query_budget::elapsed_us() const {
 }
 
 void query_budget::apply_request_options(const query_options& requested) {
-   // Validate before mutating, so a rejected request leaves the budget as it was.
+   // Compared as durations: constants::no_deadline would overflow a time point.
    const auto lowered = requested.timeout && *requested.timeout < options.timeout.value_or(config.timeout);
+   // Validated before any mutation, so a rejected request leaves the budget as it was.
    const auto lowered_deadline = lowered ? deadline_for(*requested.timeout) : deadline;
    options.limit = requested.limit;
    options.offset = requested.offset;
-   // Compare whole-millisecond timeouts rather than clock time points, so a large request
-   // (constants::no_deadline included) cannot overflow; one that does not lower simply leaves the deadline.
    if (lowered) {
       deadline = lowered_deadline;
       options.timeout = requested.timeout;

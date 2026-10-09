@@ -89,10 +89,18 @@ BOOST_AUTO_TEST_CASE(page_window_metadata) {
    expect_page(execute(engine, reads, ordered_sql, query_options{.offset = 5}), "5", std::nullopt, "0", "3", false);
    // Likewise past the last group: the total still counts every group passing HAVING.
    expect_page(execute(engine, reads, grouped_sql, query_options{.offset = 5}), "5", std::nullopt, "0", "2", false);
-   // LIMIT 0 returns the columns and the complete row count without any rows.
+   // An offset exactly at the end is an empty, final page too; one row earlier holds the last row.
+   expect_page(execute(engine, reads, ordered_sql, query_options{.offset = 3}), "3", std::nullopt, "0", "3", false);
+   expect_page(execute(engine, reads, ordered_sql, query_options{.offset = 2}), "2", std::nullopt, "1", "3", false);
+   // An output with no rows has no further page.
+   expect_page(execute(engine, reads, "SELECT key.id AS id FROM sample.positions WHERE amount > 1000000"), "0",
+               std::nullopt, "0", "0", false);
+   // A per-call limit of 0 returns the columns and the complete row count without any rows.
    const auto columns_only = execute(engine, reads, ordered_sql, query_options{.limit = 0});
    BOOST_CHECK_EQUAL(columns_only.columns.size(), 2);
    expect_page(columns_only, "0", "0", "0", "3", true);
+   // SQL LIMIT 0 is the same empty window over an output that still has rows.
+   expect_page(execute(engine, reads, std::string(ordered_sql) + " LIMIT 0"), "0", "0", "0", "3", true);
    // The effective limit is the smaller of the SQL LIMIT and the per-call limit.
    const auto sql_limit_one = std::string(ordered_sql) + " LIMIT 1";
    expect_page(execute(engine, reads, sql_limit_one, query_options{.limit = 2}), "0", "1", "1", "3", true);
@@ -146,7 +154,7 @@ BOOST_AUTO_TEST_CASE(request_options_only_lower_the_deadline) {
    BOOST_CHECK_EQUAL(budget.options.offset, 0);
    // Measured from the request's start, not from the moment the options are applied.
    current = origin + elapsed_before_options;
-   // A timeout exactly equal to the time remaining from the start leaves the deadline as it is.
+   // A timeout equal to the configured one does not lower the deadline.
    budget.apply_request_options(query_options{.timeout = config.timeout});
    BOOST_CHECK(budget.deadline == origin + config.timeout);
    BOOST_CHECK(budget.options.timeout.value_or(config.timeout) == config.timeout);

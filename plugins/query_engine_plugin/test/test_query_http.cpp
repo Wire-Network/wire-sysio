@@ -582,6 +582,13 @@ BOOST_AUTO_TEST_CASE(query_http_paging_options) {
                      "0");
    BOOST_CHECK(columns_only[response_field::result][response_field::page][response_field::has_more].as_bool());
 
+   // A lowered timeout_ms the query fits within still returns its page.
+   const auto lowered_timeout_ms = std::chrono::milliseconds(default_query_timeout).count() - 1;
+   const auto lowered = query(R"(,"limit":1,"timeout_ms":)" + std::to_string(lowered_timeout_ms));
+   BOOST_REQUIRE_MESSAGE(lowered.get_object().contains(response_field::result),
+                         fc::json::to_string(lowered, fc::time_point::maximum()));
+   BOOST_CHECK_EQUAL(lowered[response_field::result][response_field::rows].get_array().size(), 1);
+
    // timeout_ms may only lower the configured deadline; malformed members are invocation errors.
    const auto raised = query(R"(,"limit":1,"timeout_ms":)" +
                              std::to_string(std::chrono::milliseconds(default_query_timeout).count() + 1));

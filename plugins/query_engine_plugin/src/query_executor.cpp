@@ -359,8 +359,6 @@ query_result evaluate(const typed_plan& plan, captured_input input, query_budget
          response_field::returned_rows, std::to_string(count))(
          response_field::raw_bytes, std::to_string(budget.raw_bytes))(response_field::elapsed_us,
                                                                       std::to_string(budget.elapsed_us()));
-      // The window over the complete ordered output: the requested offset (which may lie beyond it),
-      // the effective limit, and whether rows remain after this page.
       auto page = fc::mutable_variant_object()(response_field::offset, std::to_string(budget.options.offset))(
          response_field::limit, window_limit ? fc::variant(std::to_string(*window_limit))
                                              : fc::variant())(response_field::returned_rows, std::to_string(count))(
