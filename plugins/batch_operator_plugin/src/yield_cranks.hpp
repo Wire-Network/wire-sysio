@@ -1,11 +1,12 @@
 #pragma once
 /**
  * @file yield_cranks.hpp
- * @brief The decisions behind the depot's two yield cranks -- which `sysio.swap`
+ * @brief The decisions behind the depot's yield cranks -- which `sysio.swap`
  *        yield pools are worth a `tickyield`, which `sysio.liq` shadows are worth a
- *        `queueyield` -- and the per-key spacing that keeps one operator from
- *        cranking the same pool every poll. Pure functions over decoded rows, so
- *        the plugin's tests drive them without a chain.
+ *        `queueyield`, which `sysio.kicker` pools are worth a `kick` -- and the
+ *        per-key spacing that keeps one operator from cranking the same pool every
+ *        poll. Pure functions over decoded rows, so the plugin's tests drive them
+ *        without a chain.
  */
 
 #include <cstdint>
@@ -50,6 +51,19 @@ namespace liq {
       constexpr auto quantity    = "quantity";
       constexpr auto symbol_code = "symbol_code";   ///< the kv key of `liqpending`
       constexpr auto sym         = "sym";           ///< `queueyield`'s argument
+   }
+}
+
+/// `sysio.kicker` identifiers the kick crank touches.
+namespace kicker {
+   constexpr auto account         = "sysio.kicker";
+   constexpr auto table_kickcfg   = "kickcfg";     ///< the `kv::global` config singleton
+   constexpr auto table_kickpools = "kickpools";   ///< one row per LIQ token
+   constexpr auto action_kick     = "kick";
+   namespace field {
+      constexpr auto min_interval_sec = "min_interval_sec";
+      constexpr auto last_kick        = "last_kick";
+      constexpr auto sym              = "sym";   ///< the pool row's token and `kick`'s argument
    }
 }
 
@@ -110,6 +124,45 @@ inline bool is_tickable_pool(const fc::variant_object& stat_row) {
           positive(swap::field::conversion_horizon_sec) &&
           positive(swap::field::depth_cap_bps) &&
           positive(swap::field::clip_floor);
+}
+
+/// The minimum accrual interval of a `sysio.kicker::kickcfg` value, or nullopt when
+/// the field is absent, unreadable or zero -- `setconfig` refuses zero, so a zero
+/// here is a row the crank cannot reason about and pushes nothing on.
+inline std::optional<fc::microseconds> kick_min_interval(const fc::variant_object& config) {
+   auto it = config.find(kicker::field::min_interval_sec);
+   if (it == config.end()) return std::nullopt;
+   try {
+      const auto seconds = it->value().as_uint64();
+      if (seconds == 0) return std::nullopt;
+      return fc::seconds(static_cast<int64_t>(seconds));
+   } catch (const fc::exception&) {
+      return std::nullopt;
+   }
+}
+
+/// The `last_kick` of a `sysio.kicker::kickpools` value, or nullopt when the field
+/// is absent or does not parse.
+inline std::optional<fc::time_point> kick_last_kick(const fc::variant_object& pool) {
+   auto it = pool.find(kicker::field::last_kick);
+   if (it == pool.end()) return std::nullopt;
+   try {
+      return it->value().as<fc::time_point>();
+   } catch (const fc::exception&) {
+      return std::nullopt;
+   }
+}
+
+/// True iff `kick` would get past its own clock check at `now`: at least
+/// `min_interval` has passed since the pool's `last_kick` (the action returns
+/// without writing when `now <= last_kick` or the elapsed time is shorter). A row
+/// whose `last_kick` does not parse is never due. This is the gate that keeps the
+/// crank from pushing a no-op `kick` every poll between payments; what the clock
+/// check cannot see (an Andon hold, a gift below `min_gift`) is bounded by the
+/// caller's `crank_spacing`.
+inline bool kick_due(const fc::variant_object& pool, fc::microseconds min_interval, fc::time_point now) {
+   const auto last_kick = kick_last_kick(pool);
+   return last_kick && now > *last_kick && now - *last_kick >= min_interval;
 }
 
 /// One push per `interval` per key from this operator. `tickyield` is harmless to

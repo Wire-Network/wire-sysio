@@ -85,7 +85,7 @@ Elected via Appointed Proof of Stake (APoS). They validate transactions and prod
 Operators scheduled in groups of `operators_per_epoch` (default 21 operators in 3 groups of 7); one group is on duty per epoch, and the schedule slides forward every epoch. They run the `batch_operator_plugin` and are responsible for:
 - Reading each outpost's outbound envelope and delivering it to `sysio.msgch`
 - Relaying the depot's outbound envelopes to each outpost
-- Cranking the depot: `sysio.msgch::chkcons` (epoch advance), `sysio.chalg::chkdispute`, `sysio.swap::tickyield`, `sysio.liq::queueyield`
+- Cranking the depot: `sysio.msgch::chkcons` (epoch advance), `sysio.chalg::chkdispute`, `sysio.swap::tickyield`, `sysio.liq::queueyield`, `sysio.kicker::kick`
 
 Batch operators post depot-native collateral on `sysio.opreg`; a non-canonical delivery is slashed and missed deliveries lead to termination.
 

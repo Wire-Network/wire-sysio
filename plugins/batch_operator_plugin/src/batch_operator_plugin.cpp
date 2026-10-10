@@ -45,6 +45,15 @@ namespace {
    /// Minimum spacing between this operator's `sysio.swap::tickyield` pushes per
    /// yield pool (`--batch-yield-tick-interval-ms`).
    constexpr auto YIELD_TICK_INTERVAL_MS = 60000;
+   /// Minimum spacing between this operator's `sysio.kicker::kick` pushes per LIQ
+   /// token (`--batch-kick-interval-ms`). The tickyield default: the on-chain
+   /// `min_interval_sec` already gates the push, so this only bounds the retries
+   /// a kick that cannot pay (Andon hold, gift below `min_gift`) would otherwise
+   /// repeat every poll.
+   constexpr auto KICK_INTERVAL_MS = 60000;
+   /// `--batch-kick-crank` default: on, like every other depot crank, which
+   /// runs whenever its contract is deployed.
+   constexpr bool KICK_CRANK_ENABLED = true;
 
    /// Minimum private cron-service thread count even when 0 outposts are
    /// discovered at startup — keeps `epoch_tick` viable so a cold-sync node
@@ -56,6 +65,8 @@ namespace {
    constexpr std::size_t EPOCH_TICK_CRON_JOBS = 1;
    /// Exact secondary-index lookups should return at most the matching row.
    constexpr uint32_t EXACT_LOOKUP_LIMIT = 1;
+   /// A `kv::global` singleton table holds exactly one row.
+   constexpr uint32_t SINGLETON_ROW_LIMIT = 1;
 
    // ── WIRE contract identifiers (actions, tables, indexes, field names) ──
    // Centralised so a contract rename/refactor shows up as one search hit,
@@ -153,8 +164,11 @@ struct batch_operator_plugin::impl {
    uint32_t     epoch_poll_ms       = EPOCH_POLL_MS;
    uint32_t     delivery_timeout_ms = DELIVERY_TIMEOUT_MS;
    uint32_t     yield_tick_interval_ms = YIELD_TICK_INTERVAL_MS;
+   /// `--batch-kick-crank`: whether this operator pushes `sysio.kicker::kick`.
+   bool         kick_crank_enabled     = KICK_CRANK_ENABLED;
+   uint32_t     kick_interval_ms       = KICK_INTERVAL_MS;
 
-   // Yield cranks -- see `crank_yield`.
+   // Yield cranks -- see `crank_yield` and `crank_kicks`.
    /// Whether `sysio.swap` and `sysio.liq` run code, refreshed off the read-only
    /// executor queue every poll (a chainbase read belongs in a read window). The
    /// cranks act on the last reading rather than wait for a fresh one: one poll
@@ -162,6 +176,9 @@ struct batch_operator_plugin::impl {
    /// off chainbase.
    std::atomic<bool>                    yield_contracts_deployed{false};
    batch_operator_detail::crank_spacing yield_tick_spacing;
+   /// Whether `sysio.kicker` runs code, refreshed with `yield_contracts_deployed`.
+   std::atomic<bool>                    kicker_deployed{false};
+   batch_operator_detail::crank_spacing kick_spacing;
 
    // Epoch state tracked across polls
    uint32_t                 current_epoch = 0;
@@ -388,10 +405,18 @@ struct batch_operator_plugin::impl {
 
       // Sell queued yield and queue reported yield. Not gated on `is_elected`
       // either — see crank_yield. Idle until both contracts are deployed.
-      refresh_yield_contract_presence();
+      refresh_crank_contract_presence();
       if (yield_contracts_deployed) {
          try {
             crank_yield();
+         } FC_LOG_AND_DROP();
+      }
+
+      // Pay accrued kicker gifts. Not gated on `is_elected` — see crank_kicks.
+      // Idle until `sysio.kicker` is deployed, or when this operator opted out.
+      if (kick_crank_enabled && kicker_deployed) {
+         try {
+            crank_kicks();
          } FC_LOG_AND_DROP();
       }
    }
@@ -455,12 +480,13 @@ struct batch_operator_plugin::impl {
    }
 
    /**
-    * Refresh `yield_contracts_deployed` from a read window. `sysio.swap` and
-    * `sysio.liq` are the two contracts the yield cranks read, and a depot whose
-    * bootstrap has not deployed them (or never will) must not pay a failed table
-    * read -- an `elog` per poll -- for tables that legitimately do not exist.
+    * Refresh `yield_contracts_deployed` and `kicker_deployed` from a read window.
+    * `sysio.swap` and `sysio.liq` are the two contracts the yield cranks read,
+    * `sysio.kicker` the one the kick crank reads, and a depot whose bootstrap has
+    * not deployed them (or never will) must not pay a failed table read -- an
+    * `elog` per poll -- for tables that legitimately do not exist.
     */
-   void refresh_yield_contract_presence() {
+   void refresh_crank_contract_presence() {
       // `this` outlives every queued task: appbase drains the executor before it
       // destroys plugins (the same guarantee chain_plugin::read_table_rows_checked
       // relies on for its own posted scans).
@@ -477,6 +503,12 @@ struct batch_operator_plugin::impl {
             ilog("batch_operator: yield cranks {}: {} and {} {}",
                  deployed ? "active" : "idle", swap::account, liq::account,
                  deployed ? "are deployed" : "are not both deployed");
+         }
+         const bool kicker_runs = runs_code(kicker::account);
+         if (kicker_deployed.exchange(kicker_runs) != kicker_runs) {
+            ilog("batch_operator: kick crank {}: {} is {}",
+                 kicker_runs ? "active" : "idle", kicker::account,
+                 kicker_runs ? "deployed" : "not deployed");
          }
       });
    }
@@ -574,6 +606,69 @@ struct batch_operator_plugin::impl {
             // Expected-transient: another operator queued it first. Persistent while
             // the shadow has no yield pool yet (`regliqpool` still to come).
             dlog("batch_operator: queueyield({}): {}", symbol_code_name(*code), e.to_string());
+         }
+      }
+   }
+
+   /**
+    * Crank `sysio.kicker::kick(sym)` for every kicker pool whose minimum accrual
+    * interval has elapsed since its `last_kick`.
+    *
+    * `kick` is permissionless and nothing on chain schedules it, and its cadence
+    * is a security control (`contracts/sysio.system/EMISSIONS.md`): the gift is
+    * priced at the swap's spot ratio for the whole unpaid interval, so the take
+    * of a pump-kick-unwind grows with the time since the last payment. Prompt
+    * kicks keep that interval near `min_interval_sec`.
+    *
+    * Like `crank_yield`, NOT gated on `is_elected`: the elected operator may be
+    * the one that is offline. The push is skipped while `kick_due` says the
+    * action would return at its clock check, so the node spends nothing between
+    * payments; a kick that passes the clock but cannot pay (an Andon hold, a gift
+    * below `min_gift`, an exhausted budget) is bounded by `kick_spacing` to one
+    * push per pool per `batch-kick-interval-ms`. The spacing is marked on every
+    * attempt, failed or not: a pool whose swap pair is gone fails every push
+    * until governance acts, and must not cost a failed transaction every poll.
+    */
+   void crank_kicks() {
+      using namespace batch_operator_detail;
+      // The config singleton: without it `kick` asserts "kicker not configured".
+      sysio::chain_apis::read_only::get_table_rows_params config;
+      config.code        = chain::name(kicker::account);
+      config.scope       = kicker::account;
+      config.table       = kicker::table_kickcfg;
+      config.limit       = SINGLETON_ROW_LIMIT;
+      config.values_only = true;
+      auto config_rows = read_table(std::move(config));
+      if (config_rows.rows.empty() || !config_rows.rows.front().is_object()) return;
+      const auto min_interval = kick_min_interval(config_rows.rows.front().get_object());
+      if (!min_interval) return;
+
+      // The pools, keyed by the LIQ symbol code `kick` takes.
+      const auto now = fc::time_point::now();
+      sysio::chain_apis::read_only::get_table_rows_params pools;
+      pools.code     = chain::name(kicker::account);
+      pools.scope    = kicker::account;
+      pools.table    = kicker::table_kickpools;
+      pools.all_rows = true;
+      pools.filter   = [min_interval = *min_interval, now](const fc::variant& row) {
+         const auto value = row_value(row.get_object());
+         return value && kick_due(*value, min_interval, now);
+      };
+      const auto interval = fc::milliseconds(kick_interval_ms);
+      for (const auto& r : read_table(std::move(pools)).rows) {
+         const auto code = row_symbol_code(r.get_object());
+         if (!code) continue;
+         const auto pool = symbol_code_name(*code);
+         if (!kick_spacing.due(pool, now, interval)) continue;
+         kick_spacing.mark(pool, now);
+         try {
+            push_action(kicker::account, kicker::action_kick, operator_account,
+                        fc::mutable_variant_object()(kicker::field::sym, *code));
+         } catch (const fc::exception& e) {
+            // Expected-transient: governance removed the pool between the scan and
+            // the push. Persistent while the pool's LIQ/WIRE swap pair is missing or
+            // invalid, which only governance can repair.
+            dlog("batch_operator: kick({}): {}", pool, e.to_string());
          }
       }
    }
@@ -1211,6 +1306,10 @@ void batch_operator_plugin::set_program_options(options_description& cli,
         "Max time to wait for chain delivery confirmation (ms)");
    opts("batch-yield-tick-interval-ms", bpo::value<uint32_t>()->default_value(YIELD_TICK_INTERVAL_MS),
         "Minimum spacing between this operator's sysio.swap::tickyield pushes per yield pool (ms)");
+   opts("batch-kick-crank", bpo::value<bool>()->default_value(KICK_CRANK_ENABLED),
+        "Push sysio.kicker::kick for every kicker pool whose minimum interval has elapsed");
+   opts("batch-kick-interval-ms", bpo::value<uint32_t>()->default_value(KICK_INTERVAL_MS),
+        "Minimum spacing between this operator's sysio.kicker::kick pushes per LIQ token (ms)");
 }
 
 void batch_operator_plugin::plugin_initialize(const variables_map& options) {
@@ -1219,7 +1318,9 @@ void batch_operator_plugin::plugin_initialize(const variables_map& options) {
    _impl->epoch_poll_ms       = options["batch-epoch-poll-ms"].as<uint32_t>();
    _impl->delivery_timeout_ms = options["batch-delivery-timeout-ms"].as<uint32_t>();
    _impl->yield_tick_interval_ms = options["batch-yield-tick-interval-ms"].as<uint32_t>();
-   _impl->enabled             = _impl->operator_account.good();
+   _impl->kick_crank_enabled     = options["batch-kick-crank"].as<bool>();
+   _impl->kick_interval_ms       = options["batch-kick-interval-ms"].as<uint32_t>();
+   _impl->enabled            = _impl->operator_account.good();
    _impl->chain_plug = &app().get_plugin<chain_plugin>();
    _impl->cron_plug  = &app().get_plugin<cron_plugin>();
    _impl->eth_plug   = &app().get_plugin<outpost_ethereum_client_plugin>();

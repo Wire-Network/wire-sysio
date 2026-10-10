@@ -187,8 +187,10 @@ There is no catch-up cap.
 
 With spot pricing, a permissionless kick and no catch-up cap, **kick cadence is a
 security control**: an attacker can pump the pool, kick, and swap back. The take
-scales with the unpaid interval. `min_interval_sec` is a floor, not a schedule;
-operators must arrange and monitor actual kicks externally.
+scales with the unpaid interval. `min_interval_sec` is a floor, not a schedule:
+every ACTIVE batch operator pushes `kick(sym)` once a pool's interval has elapsed
+(`batch_operator_plugin`, `--batch-kick-crank`), and governance still monitors
+`last_kick` for a pool that stops advancing.
 
 `shortfall_amount` records `gift - paid` for the latest shortfall, not cumulative
 debt. `shortfall_time` records that observation. `gift_overflow` records a gift

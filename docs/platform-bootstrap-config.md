@@ -121,7 +121,8 @@ After `setemitcfg`/`initt5` and each `regliqpool`, governance (`sysio`) calls
 C++ defaults are 200 bps and 1,000,000,000 WIRE subunits; all action fields must
 be supplied by ABI clients. Zero disables the per-pool daily cap. A third LIQ
 requires these same configuration calls and no kicker code change. Any keeper
-may call `kick(sym)`; `setpool` changes the whole open interval's rate and
+may call `kick(sym)`, and every ACTIVE batch operator does once a pool's interval
+has elapsed; `setpool` changes the whole open interval's rate and
 `rmpool` stops accrual. Re-adding starts a new clock and pays no history.
 
 The kicker earmark `K` uses a governance action, **not a new bootstrap proto field**.
@@ -130,8 +131,8 @@ Set `t5_distributable = A - D - K` and retain enough WIRE to back both earmarks.
 not validate the off-chain earmark arithmetic. Governance must back every replacement
 with treasury funds outside emissions. The reserve guard protects pending emissions,
 claims, and the remaining emission ceiling; it does not reserve node-owner vest. Partial payments advance
-a floored pro-rata clock. Arrange and monitor actual kicks: the minimum interval
-is a floor, and spot-price manipulation exposure scales with the unpaid interval.
+a floored pro-rata clock. Monitor actual kicks: the batch-operator crank is the
+schedule, the minimum interval is a floor, and spot-price manipulation exposure scales with the unpaid interval.
 The legacy Python boot tool does not deploy the LIQ/swap subsystem; the platform
 bootstrap client must create/deploy/configure the kicker in its LIQ flow.
 
