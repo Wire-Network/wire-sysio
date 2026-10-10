@@ -150,23 +150,17 @@ public:
     *
     * Resolves the shared chain-connection entry by id, flattens the plugin's
     * loaded ABI set, and constructs an `outpost_ethereum_client` bound to the
-    * given OPP / OPPInbound / OperatorRegistry contract addresses.
+    * given OPP / OPPInbound contract addresses.
     *
-    * All three contract addresses are independently optional — pass an
-    * empty string for any the caller doesn't need. The SPI virtuals that
-    * require an unprovisioned wrapper assert at call time with a clear
-    * diagnostic; the SPI shape itself stays uniform regardless. Per
-    * `outpost-client-spi.md`, address configuration is a per-caller
-    * concern (batch operator wires OPP + OPPInbound; underwriter wires
-    * OperatorRegistry; both share the same SPI surface).
+    * An empty address leaves that capability unprovisioned. Methods that need
+    * the missing wrapper fail with a diagnostic; callers provision only the
+    * capabilities they use.
     *
     * @param eth_client_id     Id from the file configuration or CLI client option.
     * @param chain_code        Outpost id from `sysio.chains::chains`.
-    * @param chain_id          Numeric chain id from the outpost row (e.g. 31337, 1).
+    * @param chain_id          Numeric chain id from the outpost row.
     * @param opp_addr          Hex address of the `OPP.sol` contract, or empty.
     * @param opp_inbound_addr  Hex address of the `OPPInbound.sol` contract, or empty.
-    * @param operator_registry_addr  Hex address of the `OperatorRegistry.sol`
-    *                                contract, or empty.
     * @throws fc::exception if the client id is unknown.
     */
    std::shared_ptr<outpost_client> create_outpost_client(const std::string& eth_client_id,

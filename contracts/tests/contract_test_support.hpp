@@ -133,35 +133,26 @@ inline fc::mutable_variant_object codename_mvo(std::string_view s) {
 }
 
 /// Every field empty — a chain registered before its remote contracts exist.
-/// Valid for any kind; both operator daemons fail closed and skip such a row.
+/// Valid for any kind; the batch-operator relay fails closed and skips such a row.
 inline fc::mutable_variant_object no_outpost_mvo() {
    return fc::mutable_variant_object()
-      ("opp_addr",               std::string{})
-      ("opp_inbound_addr",       std::string{})
-      ("operator_registry_addr", std::string{})
-      ("source_deposit_addr",    std::string{});
+      ("opp_addr",         std::string{})
+      ("opp_inbound_addr", std::string{});
 }
 
-/// EVM form: each role is a distinct 0x-prefixed 20-byte hex contract address.
-inline fc::mutable_variant_object evm_outpost_mvo(std::string_view opp,
-                                                  std::string_view opp_inbound,
-                                                  std::string_view operator_registry,
-                                                  std::string_view source_deposit) {
+/// EVM form: the OPP and OPPInbound contracts, each a 0x-prefixed 20-byte hex address.
+inline fc::mutable_variant_object evm_outpost_mvo(std::string_view opp, std::string_view opp_inbound) {
    return fc::mutable_variant_object()
-      ("opp_addr",               std::string{opp})
-      ("opp_inbound_addr",       std::string{opp_inbound})
-      ("operator_registry_addr", std::string{operator_registry})
-      ("source_deposit_addr",    std::string{source_deposit});
+      ("opp_addr",         std::string{opp})
+      ("opp_inbound_addr", std::string{opp_inbound});
 }
 
-/// SVM form: one base58 program id serves every role, so the other three fields
-/// must stay empty — the contract rejects a set that fills them in.
+/// SVM form: one base58 program id sends and receives envelopes, so
+/// `opp_inbound_addr` must stay empty — the contract rejects a set that fills it in.
 inline fc::mutable_variant_object svm_outpost_mvo(std::string_view program_id) {
    return fc::mutable_variant_object()
-      ("opp_addr",               std::string{program_id})
-      ("opp_inbound_addr",       std::string{})
-      ("operator_registry_addr", std::string{})
-      ("source_deposit_addr",    std::string{});
+      ("opp_addr",         std::string{program_id})
+      ("opp_inbound_addr", std::string{});
 }
 
 /// The user-link signature domain for EM (hex compressed key) and ED (base58

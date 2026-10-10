@@ -80,38 +80,6 @@ namespace sysio {
       void chkdispute(uint64_t dispute_id);
 
       // -----------------------------------------------------------------------
-      //  Underwriter-fault challenge (WIRE-297)
-      // -----------------------------------------------------------------------
-      //
-      // The OPP envelope dispute's sibling. Same adjudication machinery — Tier-1 electorate
-      // snapshotted at open, fixed quorum floor(N/2)+1, record-only votes, permissionless tally
-      // crank, resolution through the `slashop` -> `opreg::slash` chokepoint — with the
-      // differences the problem forces:
-      //
-      //   * A human FILES it (the depot can observe envelope divergence itself; a source-chain
-      //     fault it cannot — someone must allege it), so filing is permissionless and priced
-      //     with a challenger bond.
-      //   * The ballot is a VERDICT (uphold / reject), not a choice among candidate versions.
-      //   * It never pauses the epoch: an unresolved challenge is survivable — the challenged
-      //     collateral lock simply lapses back to a normal release — so the chain keeps advancing.
-      //   * The vote deadline is the commitment's own collateral-lock expiry, and there is NO
-      //     after-deadline relaxed tally: a challenge "must be voted on before the window
-      //     expires" (Jonathan, 2026-07-27); past it the challenge LAPSES with a full bond
-      //     refund. Envelope disputes relax after their deadline only because a paused chain
-      //     MUST eventually resolve.
-
-      /// The fault a challenger alleges against the winning underwriter's commit. The council
-      /// adjudicates the allegation against source-chain state (not visible to the depot) and
-      /// votes; the enum classifies the case for the audit row and indexers.
-
-      /// A Tier-1 voter's ballot in an underwriter challenge. The two reject flavours let the
-      /// council separate an honest mistake (bond refunded to the challenger) from a frivolous or
-      /// malicious challenge (bond forfeited to the wrongly-challenged underwriter) — forfeiture
-      /// only ever happens by explicit council judgment, never by default.
-
-      /// Terminal verdict of a challenge (NONE while it is OPEN).
-
-      // -----------------------------------------------------------------------
       //  Tables
       // -----------------------------------------------------------------------
 
@@ -195,37 +163,6 @@ namespace sysio {
       };
 
       using chalgstate_t = sysio::kv::global<"chalgstate"_n, chalg_state>;
-
-      /// Challenge primary key (auto-incrementing id).
-
-      /// An underwriter-fault challenge. Opened permissionlessly against one CONFIRMED
-      /// commitment; resolved by a Tier-1 vote or lapsed at the lock window's end. The row
-      /// survives resolution as the guard that a commitment is challenged at most once, ever
-      /// (mirrors one-dispute-per-(outpost, epoch)) and as the verdict record.
-      ///
-      /// It does NOT survive at full size: `chkuwchal` compacts it to a fixed-width tombstone on
-      /// resolution, clearing the two variable-length fields (`detail`, `electorate`) and erasing
-      /// the challenge's ballot rows. Filing is permissionless and the bond comes back on every
-      /// non-forfeit outcome, so recycled bond capital could otherwise pin unbounded
-      /// caller-controlled bytes in RAM billed to `sysio`; compacting bounds the retained
-      /// variable-length state by the number of CONCURRENTLY OPEN challenges — each backed by a
-      /// live lock set and an escrowed bond — rather than by every challenge ever filed. The full
-      /// filing and every ballot stay permanently readable in the action-trace history that
-      /// indexers consume.
-
-      /// Challenge-vote primary key (the voting Tier-1 owner). The vote table is scoped by
-      /// `chal_id`, so the owner alone is unique within a challenge.
-
-      /// One Tier-1 ballot in an underwriter challenge. Scoped by `chal_id`. Live only while the
-      /// challenge is OPEN — it is the tally input and the one-vote-per-owner gate, and neither
-      /// applies to a resolved challenge, so `chkuwchal` erases the scope on resolution.
-
-      /// Claimable-bond primary key (the account the payout is owed to).
-
-      /// WIRE this contract holds on an account's behalf out of a resolved challenge's escrow.
-      /// `chkuwchal` credits it; `claimbond` pays it out and erases the row. Credits ACCUMULATE
-      /// per account, so the table is bounded by the number of accounts with an unclaimed payout
-      /// — not by the number of challenges ever resolved.
 
    private:
       // Well-known accounts

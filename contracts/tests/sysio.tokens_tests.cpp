@@ -74,8 +74,7 @@ public:
    }
 
    /// `chaintokens` is a uint128-keyed kv::table; `get_row_by_id` only supports
-   /// uint64 keys, so walk the table by its DB index and match the slug pair
-   /// (the same workaround sysio.reserv_tests uses for its checksum-keyed table).
+   /// uint64 keys, so walk the table by its DB index and match the slug pair.
    fc::variant find_chaintoken(std::string_view chain_code, std::string_view token_code) {
       const auto target_chain = fc::slug_name{chain_code}.value;
       const auto target_token = fc::slug_name{token_code}.value;

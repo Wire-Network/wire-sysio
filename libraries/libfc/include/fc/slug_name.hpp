@@ -145,8 +145,8 @@ using slug_name_literals::operator""_s;
 ///
 /// Render a slug as its spelling. TOTAL, like sysio::chain::name — a renderer is
 /// a READ path, and a throwing one turns one bad row into a failure of everything
-/// that scans it (an unspellable code would stall every underwriter_plugin commit,
-/// not just that cell). Validation lives on the WRITE path: from_variant's string
+/// that scans it (an unspellable code would stall every relay that reads the
+/// registry, not just that cell). Validation lives on the WRITE path: from_variant's string
 /// arm goes through the validating constructor, so a non-canonical spelling is
 /// refused at construction.
 ///

@@ -31,9 +31,8 @@ namespace sysiosystem {
        * opreg's `available()`: available() subtracts pending withdraws, and withdraw / cancelwtdw are
        * both free, uncapped and cooldown-free, so an operator could oscillate their own rank without
        * moving funds. Score tracks what can be taken from you, and a queued withdraw does not reduce
-       * exposure. Nothing is subtracted for sysio.uwrit locks: an account holds exactly one operator
-       * row of one type, and only ACTIVE underwriters ever carry locks, so a PRODUCER's whole balance
-       * is slashable.
+       * exposure. `sysio.opreg::slash` removes the whole balance, so a PRODUCER's whole balance is
+       * what it puts at stake.
        *
        * @param op         the operator row read from sysio.opreg.
        * @param chain_code the chain slug of the pair.

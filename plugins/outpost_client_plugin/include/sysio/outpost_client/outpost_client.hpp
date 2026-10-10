@@ -62,11 +62,8 @@ public:
     *
     * Ethereum returns the 20-byte address derived from the configured
     * transaction signer. Solana returns the configured signer's 32-byte
-    * public key. Underwriter UIC construction signs this value into
-    * `uw_ext_chain_addr`, so the canonical payload contains no omitted
-    * default byte field and records the local transaction signer as signed
-    * metadata. The outpost binds this field and the claimed WIRE account to
-    * the authenticated caller and its current ACTIVE underwriter roster row.
+    * public key. The returned address identifies the configured transaction
+    * signer for chain-native client operations.
     *
     * @return Opaque chain-native address bytes; 20 bytes for Ethereum and 32
     *         bytes for Solana.

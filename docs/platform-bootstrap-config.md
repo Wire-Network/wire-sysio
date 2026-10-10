@@ -36,10 +36,9 @@ canonical protobuf-JSON encoding of `BootstrapPlatformConfig`.
 earmarks, and repeated `ChainSpec` / `TokenSpec` / `LiqPoolSpec` /
 `SyndicationSpec`.
 
-The spec messages deliberately differ from the registry carriers in
-`sysio/opp/types/types.proto` (`Chain` / `Token` / `ChainToken`), which are wire
-messages with packed-uint64 codes, raw `bytes` addresses, and lifecycle fields
-that are outputs. A hand-authored config wants the opposite:
+The spec messages deliberately differ from the registry rows of `sysio.chains`
+and `sysio.tokens`, which hold packed-uint64 codes, raw `bytes` addresses, and
+lifecycle fields that are outputs. A hand-authored config wants the opposite:
 
 - **Codes are strings** (`"ETHEREUM"`, `"USDC"`, `"LIQETH"`); the tool packs
   them via `slug_name` (`[A-Z][A-Z0-9_]{0,7}` -- a code must START with a
@@ -53,7 +52,7 @@ that are outputs. A hand-authored config wants the opposite:
   values exceed 2^53.
 - **Enums appear by full value name** (`"TOKEN_KIND_ERC20"`), reusing the
   `ChainKind` / `TokenKind` enums via import.
-- `ChainToken` binding is folded into `TokenSpec` (a token binds to exactly one
+- The chain-token binding (`sysio.tokens` `chaintokens` row) is folded into `TokenSpec` (a token binds to exactly one
   chain; multi-chain assets use distinct codes such as `USDC` vs `USDCSOL`).
 - There is no `is_depot` field — the depot chain is the single
   `CHAIN_KIND_WIRE` entry.

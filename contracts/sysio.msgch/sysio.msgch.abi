@@ -578,50 +578,6 @@
                     "value": 2001
                 },
                 {
-                    "name": "ATTESTATION_TYPE_STAKE",
-                    "value": 3001
-                },
-                {
-                    "name": "ATTESTATION_TYPE_UNSTAKE",
-                    "value": 3002
-                },
-                {
-                    "name": "ATTESTATION_TYPE_PRETOKEN_PURCHASE",
-                    "value": 3004
-                },
-                {
-                    "name": "ATTESTATION_TYPE_PRETOKEN_YIELD",
-                    "value": 3006
-                },
-                {
-                    "name": "ATTESTATION_TYPE_RESERVE_BALANCE_SHEET",
-                    "value": 43520
-                },
-                {
-                    "name": "ATTESTATION_TYPE_STAKE_UPDATE",
-                    "value": 60928
-                },
-                {
-                    "name": "ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE",
-                    "value": 60930
-                },
-                {
-                    "name": "ATTESTATION_TYPE_CHALLENGE_RESPONSE",
-                    "value": 60932
-                },
-                {
-                    "name": "ATTESTATION_TYPE_SWAP_REQUEST",
-                    "value": 60934
-                },
-                {
-                    "name": "ATTESTATION_TYPE_SWAP_REMIT",
-                    "value": 60944
-                },
-                {
-                    "name": "ATTESTATION_TYPE_CHALLENGE_REQUEST",
-                    "value": 60945
-                },
-                {
                     "name": "ATTESTATION_TYPE_OPERATORS",
                     "value": 60947
                 },
@@ -632,42 +588,6 @@
                 {
                     "name": "ATTESTATION_TYPE_NODE_OWNER_REG",
                     "value": 60949
-                },
-                {
-                    "name": "ATTESTATION_TYPE_STAKE_RESULT",
-                    "value": 60951
-                },
-                {
-                    "name": "ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR",
-                    "value": 60952
-                },
-                {
-                    "name": "ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT",
-                    "value": 60953
-                },
-                {
-                    "name": "ATTESTATION_TYPE_SWAP_REVERT",
-                    "value": 60955
-                },
-                {
-                    "name": "ATTESTATION_TYPE_DEPOSIT_REVERT",
-                    "value": 60956
-                },
-                {
-                    "name": "ATTESTATION_TYPE_RESERVE_CREATE_CANCEL",
-                    "value": 60959
-                },
-                {
-                    "name": "ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED",
-                    "value": 60960
-                },
-                {
-                    "name": "ATTESTATION_TYPE_RESERVE_READY",
-                    "value": 60961
-                },
-                {
-                    "name": "ATTESTATION_TYPE_EMISSIONS_BLOCKED",
-                    "value": 60962
                 },
                 {
                     "name": "ATTESTATION_TYPE_SYNDICATE_LIQ",

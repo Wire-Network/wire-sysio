@@ -138,11 +138,10 @@ namespace outpost_solana_client_detail {
 
 namespace {
 
-/// Wrap a 32-byte address slice from `op_address.address` /
-/// `depositor.address` into a `solana_public_key`. Returns nullopt
-/// on the wrong chain kind or a malformed length — caller drops these
-/// attestations from the remaining_accounts list (the on-chain handler
-/// will log+skip them too, so no fatal failure).
+/// Wrap a 32-byte address slice from a DesyndicateLIQ `user.address` into a
+/// `solana_public_key`. Returns nullopt on the wrong chain kind or a malformed
+/// length — the caller drops that attestation from the remaining_accounts list
+/// (the on-chain handler will log+skip it too, so no fatal failure).
 std::optional<fc::network::solana::solana_public_key> sol_pubkey_from_chain_address(
    const sysio::opp::types::ChainAddress& addr) {
    if (addr.kind() != sysio::opp::types::CHAIN_KIND_SVM) return std::nullopt;
@@ -979,10 +978,10 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
       fc::network::solana::system::program_ids::TOKEN_2022_PROGRAM;
 
    // One read per DISTINCT custody mint for the whole build, matching the two
-   // caches around it. Without this every reserve-backed SPL attestation pays a
+   // caches around it. Without this every syndicated SPL payout pays a
    // `get_account_info(custody_mint)` -- two when the mint has a hook, since the
-   // reader also reads the validation PDA -- so an envelope with 30 SPL remits
-   // over 3 reserves would go from 3 reads to 33, inside a build that probes the
+   // reader also reads the validation PDA -- so repeated payouts of one mint
+   // would repeat those reads inside a build that probes the
    // deadline per effect and aborts wholesale on a transient RPC throw.
    // `nullopt` (no hook) is memoised too: that is every mint in the system today.
    std::map<fc::network::solana::solana_public_key, std::optional<mint_transfer_hook>> hook_cache;
@@ -1005,7 +1004,7 @@ std::vector<std::vector<fc::network::solana::account_meta>> build_dispatch_manif
 
    std::vector<std::vector<fc::network::solana::account_meta>> per_attestation(total_attestations);
    for (const auto& effect : effects) {
-      // The deadline is probed per effect, BEFORE its reserve read: a build
+      // The deadline is probed per effect, BEFORE its custody read: a build
       // that runs past the tick deadline must fail here, where the remaining
       // work is known, rather than deep inside the RPC layer with every
       // manifest already paid for and none of them dispatched.
@@ -1264,7 +1263,7 @@ outpost_solana_client::outpost_solana_client(
       // the integrated liqsol-core program declares it -- a standalone outpost
       // IDL has no syndicated pool to release from, and its DistributionState
       // PDA never exists on chain. Where it IS declared, a drifted `liqsol_mint`
-      // would wedge every desyndication window the way a drifted Reserve would.
+      // would wedge every desyndication window.
       if (_program_client->get_program()->find_account(distribution_state::account_name)) {
          outpost_solana_client_detail::assert_distribution_state_shape(
             *_program_client->get_program());
@@ -1418,9 +1417,8 @@ std::string outpost_solana_client::drain_dispatch(
 
    // Per-attestation manifests, indexed by the SAME flat position the on-chain
    // dispatch cursor counts. Attestations needing no effect account keep an
-   // empty entry so the indices stay aligned. The build reads ONE account per
-   // distinct Reserve or CollateralPosition -- the exact PDA the handlers
-   // themselves branch on -- probes the deadline per effect, and degrades a
+   // empty entry so the indices stay aligned. The build reads the syndicated
+   // pool once, probes the deadline per effect, and degrades a
    // single absent account instead of abandoning the envelope's other
    // manifests.
    const auto effects = outpost_solana_client_detail::extract_inbound_effects(envelope_bytes);
@@ -1454,7 +1452,7 @@ std::string outpost_solana_client::drain_dispatch(
 
 /// Read one custody mint's transfer-hook configuration off chain.
 ///
-/// Called only for a Token-2022 custody reserve -- a legacy-SPL reserve cannot
+/// Called only for a Token-2022 custody mint -- a legacy-SPL mint cannot
 /// carry the extension, so the caller gates and this never reads that mint.
 ///
 /// No TransferHook extension, or a hook explicitly disabled (an all-zero
@@ -1468,7 +1466,7 @@ std::string outpost_solana_client::drain_dispatch(
 std::optional<outpost_solana_client_detail::mint_transfer_hook>
 outpost_solana_client::mint_transfer_hook_for(
    const fc::network::solana::solana_public_key& custody_mint) {
-   // NOT degraded to `nullopt`: the custody mint is pinned on a Reserve that
+   // NOT degraded to `nullopt`: the custody mint is pinned on a syndicated pool that
    // demonstrably exists, so "absent" is an anomaly (a lagging bank behind the
    // default commitment, say), not a mint without a hook. Reporting "no hook"
    // here would build a hook-free manifest for a hook mint and abort inside the
@@ -1476,7 +1474,7 @@ outpost_solana_client::mint_transfer_hook_for(
    // refuses for the validation PDA below.
    const auto mint_info = _entry->client->get_account_info(custody_mint);
    FC_ASSERT(mint_info.has_value() && !mint_info->data.empty(),
-             "custody mint {} is absent or empty; it is pinned on an existing Reserve, so this "
+             "custody mint {} is absent or empty; it is pinned on an existing syndicated pool, so this "
              "is a read anomaly rather than a mint without a transfer hook",
              custody_mint.to_string(fc::yield_function_t{}));
 
@@ -1764,7 +1762,7 @@ std::vector<char> outpost_solana_client::read_inbound_envelope(
    // field order drives the decode, so the same nodeop reads both the
    // standalone `opp_outpost` and integrated `liqsol_core`
    // `LatestOutboundEnvelope` layouts value-exactly (same path the class
-   // already uses for `Reserve` / `OutpostConfig`). For inbound-reading roles
+   // uses for `DistributionState`). For inbound-reading roles
    // the account declaration was validated at boot, so a decode failure here
    // signals IDL-vs-deployment drift and is logged at warning level.
    return outpost_solana_client_detail::decode_latest_envelope_account(

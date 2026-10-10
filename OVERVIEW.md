@@ -38,7 +38,6 @@ OPP uses a universal chain-agnostic address system:
 
 - **ChainKind** enum: `WIRE`, `EVM`, `SVM`
 - **ChainAddress**: `(ChainKind, raw_bytes_address)` — no translation or mapping needed
-- **ChainSignature**: `(actor, key_type, signature_bytes)` — supports native chain signatures
 
 This allows a single unified message format across all supported chains.
 

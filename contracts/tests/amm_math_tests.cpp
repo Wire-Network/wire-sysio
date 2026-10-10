@@ -141,8 +141,8 @@ BOOST_AUTO_TEST_CASE(convenience_wrappers) {
 /// WIRE leg, leaving `net == 0`. That degenerate post-fee leg is what let a
 /// from-WIRE / token-to-token swap debit destination reserve liquidity while
 /// crediting zero WIRE. Any NETWORK fee below 100% leaves a positive remainder
-/// for every positive input, which is why `sysio.uwrit::setconfig` rejects
-/// `fee_bps >= BPS_TOTAL`.
+/// for every positive input, which is why a fee configuration must stay below
+/// `BPS_TOTAL` (`sysio.swap` caps its pair fee at `MAX_FEE`, 9999).
 ///
 /// That cap does NOT make `net == 0` unconstructible at settlement, and this
 /// suite must not imply it does: reserve owner fees ride the same leg under a
@@ -177,8 +177,8 @@ BOOST_AUTO_TEST_CASE(split_wire_fee_boundaries) {
 
 /// Stage 2 of the split: `emissions_share_bps` divides the REWARDS POOL (what is
 /// left after the underwriter's cut), not the whole fee. The default is 0 — the
-/// whole pool is allocated to the batch-operator distribution and no fee leaves
-/// `sysio.reserv` custody.
+/// whole pool is allocated to the batch-operator distribution and nothing goes
+/// to the emissions treasury.
 BOOST_AUTO_TEST_CASE(split_wire_fee_emissions_share_divides_the_rewards_pool) {
    constexpr uint64_t AMOUNT  = 1'000'000ULL;
    constexpr uint32_t FEE_BPS = 1'000;   // 10% -> fee 100'000
@@ -280,15 +280,13 @@ BOOST_AUTO_TEST_CASE(split_wire_fee_stacked_rates_cannot_wrap_the_total) {
 }
 
 /// A zero `net` is an intentionally REJECTED CONFIGURATION, not unreachable
-/// defense-in-depth. The two caps bound their rates INDEPENDENTLY — nothing
-/// cross-checks the sum — so the maximum network fee `sysio.uwrit::setconfig`
-/// accepts plus the minimum owner fee `sysio.reserv::setrsvfee` accepts already
-/// consumes the whole leg. This pins that reachability so the `net > 0` checks in
-/// `applyswap` / `applyfromwire` are never mistaken for dead code again.
+/// defense-in-depth. Each rate can sit below 100% on its own while their SUM
+/// does not — the kernel never cross-checks it — so a 9999 bps network fee plus
+/// a 1 bps owner fee already consumes the whole leg. This pins that reachability
+/// so a caller's `net > 0` check is never mistaken for dead code.
 BOOST_AUTO_TEST_CASE(split_wire_fee_reaches_the_leg_under_valid_configuration) {
-   // Mirrors the on-chain caps: sysio.uwrit::MAX_FEE_BPS / sysio.reserv's
-   // [MIN_OWNER_FEE_BPS, MAX_OWNER_FEE_BPS]. Duplicated as literals because this
-   // suite tests the shared AMM kernel and does not link either contract.
+   // The highest network fee below 100% and the smallest nonzero owner fee; this
+   // suite tests the shared AMM kernel and links no contract.
    constexpr uint32_t MAX_FEE_BPS       = 9'999; // 99.99% network fee
    constexpr uint32_t MIN_OWNER_FEE_BPS = 1;     // 0.01% reserve owner fee
 

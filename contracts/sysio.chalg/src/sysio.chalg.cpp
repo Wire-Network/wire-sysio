@@ -52,10 +52,9 @@ void chalg::slashop(name operator_acct, std::string reason) {
    check(has_auth(get_self()) || has_auth(EPOCH_ACCOUNT),
          "slashop requires sysio.chalg or sysio.epoch authority");
 
-   // Slash via sysio.opreg — the canonical bond ledger. opreg routes the slashable portion
-   // (`balance - sum(active locks)`) to the matching LP on each (chain, token_kind) the operator has
-   // bond on, marks the operator SLASHED, and lets sysio.uwrit::release deferred-slash the locked
-   // portion as each underwriter lock resolves.
+   // Slash via sysio.opreg — the canonical bond ledger. opreg removes every collateral balance the
+   // operator holds, keeps the custody with the registry, marks the operator SLASHED, and records
+   // one OPERATOR_ACTION(SLASH) audit entry per (chain, token) balance.
    action(
       permission_level{get_self(), "active"_n},
       OPREG_ACCOUNT,
@@ -172,9 +171,8 @@ void chalg::votedispute(name owner, uint64_t dispute_id, checksum256 chosen_chec
 void chalg::chkdispute(uint64_t dispute_id) {
    // Permissionless crank, driven by `batch_operator_plugin`'s epoch tick
    // (`--batch-epoch-poll-ms`, 15s default) from every ACTIVE batch operator.
-   // That cadence is this action's ONLY driver: unlike `chkuwchal`, which
-   // `sysio.uwrit::chklocks` pokes from every `sysio.epoch::advance`, a dispute
-   // pauses `advance` itself, so no inline poke can reach here.
+   // That cadence is this action's ONLY driver: a dispute pauses
+   // `sysio.epoch::advance` itself, so no inline poke from the epoch cycle can reach here.
    disputes_t disputes(get_self());
    auto d_pk = dispute_key{dispute_id};
    auto d = disputes.get(d_pk, "dispute not found");

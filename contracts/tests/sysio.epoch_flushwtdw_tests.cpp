@@ -71,9 +71,8 @@ public:
       // Deploy OPP contracts. These are privileged because epoch::advance
       // sends inline actions to opreg with `permission_level{epoch, owner}`,
       // which require_auth(epoch) accepts only when epoch is privileged.
-      // epoch::advance also iterates sysio.chains::chains and inlines into
-      // sysio.uwrit::chklocks, so both must be deployed for those cross-
-      // contract calls to resolve.
+      // epoch::advance also iterates sysio.chains::chains, so it must be
+      // deployed for that cross-contract read to resolve.
       deploy(EPOCH_ACCOUNT,  contracts::epoch_wasm(),  contracts::epoch_abi(),  epoch_abi);
       deploy(OPREG_ACCOUNT,  contracts::opreg_wasm(),  contracts::opreg_abi(),  opreg_abi);
       deploy(MSGCH_ACCOUNT,  contracts::msgch_wasm(),  contracts::msgch_abi(),  msgch_abi);
