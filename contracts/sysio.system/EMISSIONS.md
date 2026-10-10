@@ -253,6 +253,16 @@ than **1,000 WIRE per pool per day**, which is also the C++ default. Zero is inv
 Retries and configuration changes retain the current day's spending. Set `min_gift`
 no higher than a day's expected accrual if the pool is intended to pay.
 
+TWAP, bounded accrual and the mandatory cap apply independently of keeper cadence.
+`min_interval_sec` is a floor, not a schedule:
+every ACTIVE batch operator pushes `kick(sym)` once a pool could pay — its interval has
+elapsed, its LIQ supply is not zero, its observation spans the window, and its budget and
+UTC-day allowance cover `min_gift` (`batch_operator_plugin`, `--batch-kick-crank`) — and governance still monitors
+`last_kick` for a pool that stops advancing. An attempt that still does not pay is retried
+with a doubling backoff of up to an hour. Each poll reads and attempts at most ten pools,
+resuming the next page on the next poll; a complete sweep prunes removed symbols. For
+the supplies it looks up only those pools' `sysio.liq::stat` rows, one exact read each.
+
 `shortfall_amount` records `gift - paid` for the latest shortfall, not cumulative
 debt. `shortfall_time` records that observation. `gift_overflow` records a gift
 outside the asset range: this implementation pays nothing and retains the clock,
