@@ -1631,6 +1631,8 @@ BOOST_FIXTURE_TEST_CASE(retired_attestations_do_not_mutate_collateral_or_block_l
    constexpr int32_t removed_stake_update_type = 60928;
    constexpr int32_t removed_stake_result_type = 60951;
    constexpr int32_t removed_processing_error_type = 60952;
+   constexpr int32_t removed_challenge_response_type = 60932;
+   constexpr int32_t removed_challenge_request_type = 60945;
    constexpr int32_t undeclared_type = 65000;
    const auto trace = deliver_trace(eth,
       encode_envelope_with_mixed_attestations(current_epoch(), entries, {}, {},
@@ -1644,7 +1646,9 @@ BOOST_FIXTURE_TEST_CASE(retired_attestations_do_not_mutate_collateral_or_block_l
                                               removed_swap_revert_type, removed_deposit_revert_type,
                                               removed_stake_type, removed_unstake_type,
                                               removed_stake_update_type, removed_stake_result_type,
-                                              removed_processing_error_type, undeclared_type}));
+                                              removed_processing_error_type,
+                                              removed_challenge_response_type,
+                                              removed_challenge_request_type, undeclared_type}));
    BOOST_REQUIRE(trace != nullptr);
    BOOST_REQUIRE(!trace->except);
    BOOST_CHECK(get_operator(UWRIT_OP)["balances"].get_array().empty());

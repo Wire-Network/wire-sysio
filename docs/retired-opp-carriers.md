@@ -24,6 +24,8 @@ Tools, Libraries, and Hub; generated build output was checked separately.
 | Underwriter outpost roles in the chain registry | `operator_registry_addr` (the underwriter's `uw_commit` target) and `source_deposit_addr` (its swap-deposit verify path) had no reader once the underwriter daemon was deleted; the batch-operator relay reads only `opp_addr` and `opp_inbound_addr`, and the shared `resolve_role_addr` helper had no caller. | Both `sysio.chains::outpost_addrs` fields, their validation, their shared field names, and `resolve_role_addr` |
 | Staking lifecycle carriers | Ethereum's only STAKE/UNSTAKE producers, `StakingManager.sendStakeAttestation` and `sendUnstakeAttestation`, are internal and have no caller (`stakeLiqETH` is a `_notWired` stub). Nothing produces `StakeUpdate` or `StakeResult`, msgch dropped all four types in one deferred case, and Solana listed them only to keep its classification exhaustive. | `PretokenStakeChange`, `StakeUpdate`, `StakeResult`, `StakeStatus`, the STAKE, UNSTAKE, STAKE_UPDATE and STAKE_RESULT discriminants, their serializers, reflections and depot case |
 | Attestation processing error report | No chain produces `AttestationProcessingError`; msgch ignored it and the Tools codec only displayed it. | `AttestationProcessingError` and its discriminant |
+| Challenge attestations | No chain produces CHALLENGE_REQUEST or CHALLENGE_RESPONSE; msgch dropped both, Solana listed them only to keep its classification exhaustive, and Tools only displayed them. `sysio.chalg` disputes run on `DisputeStatus` through evalcons, not on inbound attestations. | `ChallengeRequest`, `ChallengeOperatorHash`, their discriminants, serializers and depot case |
+| Unused schema declarations | `ChainKeyType`, `ChainSignature`, `WirePermission`, `ChainRequestStatus`, `ChallengeStatus` and `DebugEnvelopeDataRecord` had only declarations, enum reflections or uncalled serializers. `Chain`, `Token` and `ChainToken` were described as the registry's carriers, but `sysio.chains` and `sysio.tokens` store their own row structs and nothing encodes these messages. | The declarations, their reflections and serializers; `ChainKind` and `TokenKind` stay |
 | Swap-fee emission audit fields | The `sysio.reserv` rewards-bucket sweep that fed them was deleted; `payepoch` wrote both as constant zero. | `epochlog.fee_distributed`, `epochlog.batch_fee_retained`, and the fee-sweep descriptions |
 | Dead depot helpers | msgch's operator-address resolver and its payload-code canonicality check served only the retired operator/swap/reserve ingress (the live LIQ paths reject unregistered codes through the token registry); the `uwreqs` locked-amount row type had no table; the underwriter-challenge declarations in `sysio.chalg` were gone but their documentation remained. | `resolve_account_from_op_address`, `payload_codes_canonical`, `opp_table::locked_amount_t`, the orphaned challenge documentation, and the dispatch suite's swap-race fixture configuration |
 
@@ -33,15 +35,16 @@ Existing active discriminants and payload field numbers keep their values.
 ## Retained live or planned surfaces
 
 - `OperatorAction` and `OperatorActionLog` record native collateral changes in
-  `sysio.opreg`. Solana also uses operator actions to mirror slashed status.
+  `sysio.opreg`. They are audit records: the depot queues no OPERATOR_ACTION
+  attestation, and outposts learn a slashed status from the OPERATORS roster.
   Removing external custody does not remove this audit/eligibility protocol.
   The existing `reserve_code` field stays zero in depot-native audit records;
   changing the live table payload is outside this carrier cleanup.
 - `StakingManager.sol` remains the staking-track placeholder. The post-launch
   staking design defines its own attestations; none of the removed carriers is
   reserved for it.
-- Challenge/dispute types remain separate from the deleted underwriter race.
-  `sysio.chalg` owns live depot disputes; this change does not retire that work.
+- `sysio.chalg` owns live depot disputes (`DisputeStatus`, opened by evalcons);
+  only the producer-less challenge attestations were removed.
 - Operators, batch-operator groups, node-owner registration, LIQ syndication,
   yield, and desyndication remain active. Their schemas and routing are retained.
 - Chain/token registries, native swaps and their AMM helper, native collateral,

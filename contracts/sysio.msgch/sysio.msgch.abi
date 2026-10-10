@@ -578,14 +578,6 @@
                     "value": 2001
                 },
                 {
-                    "name": "ATTESTATION_TYPE_CHALLENGE_RESPONSE",
-                    "value": 60932
-                },
-                {
-                    "name": "ATTESTATION_TYPE_CHALLENGE_REQUEST",
-                    "value": 60945
-                },
-                {
                     "name": "ATTESTATION_TYPE_OPERATORS",
                     "value": 60947
                 },

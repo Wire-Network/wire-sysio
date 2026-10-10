@@ -341,7 +341,6 @@ namespace sysio {
    private:
 
       using ChainKind          = opp::types::ChainKind;
-      using ChainRequestStatus = opp::types::ChainRequestStatus;
       using MessageDirection    = opp::types::MessageDirection;
       using MessageStatus       = opp::types::MessageStatus;
       using EnvelopeStatus      = opp::types::EnvelopeStatus;

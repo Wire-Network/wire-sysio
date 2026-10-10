@@ -15,10 +15,9 @@ option cc_enable_arenas = true;
 //  bootstrap window (sysio.epoch current_epoch_index == 0): every registration
 //  is priv-gated and lands ACTIVE inline.
 //
-//  Authoring conventions — these differ DELIBERATELY from the registry
-//  carriers in sysio/opp/types/types.proto (`Chain` / `Token` / `ChainToken`),
-//  which are wire messages with packed-uint64 codes, raw `bytes`
-//  addresses, and lifecycle fields that are outputs, not inputs:
+//  Authoring conventions — these differ DELIBERATELY from the registry rows
+//  of sysio.chains and sysio.tokens, which hold packed-uint64 codes, raw
+//  `bytes` addresses, and lifecycle fields that are outputs, not inputs:
 //
 //    * codes are STRINGS ("ETHEREUM", "USDC"); the tool packs them
 //      via slug_name ([A-Z][A-Z0-9_]{0,7} -- must start with a letter, <= 8

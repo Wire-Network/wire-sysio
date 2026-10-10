@@ -675,12 +675,6 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
          // outpost echoing one inbound is a benign no-op.
          break;
 
-      case AttestationType::ATTESTATION_TYPE_CHALLENGE_REQUEST:
-      case AttestationType::ATTESTATION_TYPE_CHALLENGE_RESPONSE:
-         // No depot-side handler. Envelope disputes are resolved on the WIRE side by evalcons
-         // opening a sysio.chalg dispute vote, not by inbound challenge attestations.
-         break;
-
       // Outbound-only types (depot emits these, never receives them inbound) are dropped silently;
       // an outpost relaying one back is a benign no-op.
       case AttestationType::ATTESTATION_TYPE_OPERATORS:

@@ -27,14 +27,6 @@ FC_REFLECT_ENUM(sysio::opp::types::ChainKind,
    (CHAIN_KIND_EVM)
    (CHAIN_KIND_SVM))
 
-FC_REFLECT_ENUM(sysio::opp::types::ChainKeyType,
-   (CHAIN_KEY_TYPE_UNKNOWN)
-   (CHAIN_KEY_TYPE_WIRE)
-   (CHAIN_KEY_TYPE_WIRE_BLS)
-   (CHAIN_KEY_TYPE_ETHEREUM)
-   (CHAIN_KEY_TYPE_SOLANA)
-   (CHAIN_KEY_TYPE_SUI))
-
 // ---------------------------------------------------------------------------
 //  Operator enums
 // ---------------------------------------------------------------------------
@@ -75,8 +67,6 @@ FC_REFLECT_ENUM(sysio::opp::types::TokenKind,
 FC_REFLECT_ENUM(sysio::opp::types::AttestationType,
    (ATTESTATION_TYPE_UNSPECIFIED)
    (ATTESTATION_TYPE_OPERATOR_ACTION)
-   (ATTESTATION_TYPE_CHALLENGE_RESPONSE)
-   (ATTESTATION_TYPE_CHALLENGE_REQUEST)
    (ATTESTATION_TYPE_OPERATORS)
    (ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS)
    (ATTESTATION_TYPE_NODE_OWNER_REG)
@@ -111,13 +101,6 @@ FC_REFLECT_ENUM(sysio::opp::types::AttestationStatus,
 //  Message channel / depot enums
 // ---------------------------------------------------------------------------
 
-FC_REFLECT_ENUM(sysio::opp::types::ChainRequestStatus,
-   (CHAIN_REQUEST_STATUS_PENDING)
-   (CHAIN_REQUEST_STATUS_COLLECTING)
-   (CHAIN_REQUEST_STATUS_CONSENSUS_OK)
-   (CHAIN_REQUEST_STATUS_CONSENSUS_FAIL)
-   (CHAIN_REQUEST_STATUS_CHALLENGED))
-
 FC_REFLECT_ENUM(sysio::opp::types::MessageDirection,
    (MESSAGE_DIRECTION_INBOUND)
    (MESSAGE_DIRECTION_OUTBOUND))
@@ -136,12 +119,6 @@ FC_REFLECT_ENUM(sysio::opp::types::EnvelopeStatus,
 // ---------------------------------------------------------------------------
 //  Challenge and dispute enums
 // ---------------------------------------------------------------------------
-
-FC_REFLECT_ENUM(sysio::opp::types::ChallengeStatus,
-   (CHALLENGE_STATUS_CHALLENGE_SENT)
-   (CHALLENGE_STATUS_RESPONSE_RECEIVED)
-   (CHALLENGE_STATUS_RESOLVED)
-   (CHALLENGE_STATUS_ESCALATED))
 
 FC_REFLECT_ENUM(sysio::opp::types::DisputeStatus,
    (DISPUTE_STATUS_UNKNOWN)

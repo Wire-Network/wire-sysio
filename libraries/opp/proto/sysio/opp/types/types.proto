@@ -23,27 +23,17 @@ enum ChainKind  {
 
 // Chain instance identifier — used by `Envelope.Endpoints` to identify
 // source / destination chains by `(ChainKind, external_chain_id)`. The
-// first-class registry row is `Chain` (defined below); `ChainId` is the
-// compact projection carried on the OPP wire for envelope endpoints.
+// registry row lives in `sysio.chains`; `ChainId` is the compact projection
+// carried on the OPP wire for envelope endpoints.
 message ChainId {
   ChainKind kind = 1;
   uint32    id   = 2;
 }
 
-enum ChainKeyType {
-  CHAIN_KEY_TYPE_UNKNOWN  = 0;
-  CHAIN_KEY_TYPE_WIRE     = 1;
-  CHAIN_KEY_TYPE_WIRE_BLS = 2;
-  CHAIN_KEY_TYPE_ETHEREUM = 3;
-  CHAIN_KEY_TYPE_SOLANA   = 4;
-  CHAIN_KEY_TYPE_SUI      = 5;
-}
-
 // Wire public_key variant type. Identifies which `sysio::public_key` alternative the `WireKey.key`
 // raw bytes decode to. The bytes carry NO leading variant-index byte -- this enum is the type
 // discriminant instead. Values are (variant index + 1), leaving 0 for UNKNOWN per the proto3
-// convention used throughout this file. Distinct from `ChainKeyType`, which is keyed on chain family
-// (WIRE/ETHEREUM/SOLANA/...) and cannot express R1 or WebAuthn.
+// convention used throughout this file.
 enum WireKeyType {
   WIRE_KEY_TYPE_UNKNOWN = 0;
   WIRE_KEY_TYPE_K1      = 1;   // secp256k1            (sysio::public_key variant index 0)
@@ -70,19 +60,8 @@ message ChainAddress {
   bytes     address = 2;
 }
 
-message ChainSignature {
-  ChainAddress actor     = 1;
-  ChainKeyType key_type  = 2;
-  bytes        signature = 3;
-}
-
 message WireAccount {
   string name = 1;
-}
-
-message WirePermission {
-  WireAccount account    = 1;
-  string      permission = 2;   // e.g. "active", "owner"
 }
 
 // ---------------------------------------------------------------------------
@@ -90,7 +69,7 @@ message WirePermission {
 //
 //  Per-token identity (ETH, USDC, POLY, LIQETH, …) is data, NOT enum values.
 //  This enum carries only the TOKEN STANDARD; individual tokens get a
-//  `Token` registry row keyed by `Token.code` (slug_name / uint64).
+//  `sysio.tokens` registry row keyed by their code (slug_name / uint64).
 // ---------------------------------------------------------------------------
 
 enum TokenKind {
@@ -122,53 +101,6 @@ message TokenAmount {
 }
 
 // ---------------------------------------------------------------------------
-//  Registry entities (Chain / Token / ChainToken)
-//
-//  These are the proto carriers for the depot's registry tables on the new
-//  contracts `sysio.chains` and `sysio.tokens`.
-//  Wire format: `code` fields are uint64 (packed slug_name); see slug_name.hpp
-//  on the contract side and fc/slug_name.hpp on the host side.
-// ---------------------------------------------------------------------------
-
-message Chain {
-  ChainKind kind                = 1;
-  uint64    code                = 2;   // PRIMARY KEY — slug_name
-  uint32    external_chain_id   = 3;   // e.g. 1 (ETH mainnet), 137 (Polygon), 0 (WIRE / SOL mainnet)
-  string    name                = 4;
-  string    description         = 5;
-  bool      is_depot            = 6;   // exactly one row has true (code = "WIRE")
-  bool      active              = 7;
-  uint64    registered_at_ms    = 8;
-  uint64    activated_at_ms     = 9;
-}
-
-message Token {
-  TokenKind    kind              = 1;
-  uint64       code              = 2;   // PRIMARY KEY — slug_name
-  string       symbol_name       = 3;   // "Ethereum" / "USD Coin" / "Liquid ETH"
-  string       description       = 4;
-  uint32       precision         = 5;   // default 9
-  ChainAddress address           = 6;   // canonical chain-of-origin address for non-native tokens; empty for NATIVE
-  bool         active            = 7;
-  uint64       registered_at_ms  = 8;
-  uint64       activated_at_ms   = 9;
-}
-
-message ChainToken {
-  uint64 chain_code            = 1;
-  uint64 token_code            = 2;
-  bytes  contract_addr         = 3;   // chain-specific encoding; empty for native
-  // (field 4 retired — `precision_override` was removed; precision conversion
-  //  is purely an outpost-internal concern, not depot-tracked state.)
-  reserved 4;
-  reserved "precision_override";
-  bool   is_native             = 5;   // exactly one per Chain
-  bool   active                = 6;
-  uint64 registered_at_ms      = 7;
-  uint64 activated_at_ms       = 8;
-}
-
-// ---------------------------------------------------------------------------
 //  Attestation discriminant
 // ---------------------------------------------------------------------------
 
@@ -176,9 +108,7 @@ enum AttestationType {
   ATTESTATION_TYPE_UNSPECIFIED = 0;
   ATTESTATION_TYPE_OPERATOR_ACTION = 2001; // 0x07D1
   // 60929 (0xEE01) was ATTESTATION_TYPE_NATIVE_YIELD_REWARD — removed; do not reuse.
-  ATTESTATION_TYPE_CHALLENGE_RESPONSE = 60932;
   // 60933 was standalone SLASH_OPERATOR — removed; SLASH is now an OperatorAction sub-type.
-  ATTESTATION_TYPE_CHALLENGE_REQUEST = 60945;
   // 60946 was ATTESTATION_TYPE_EPOCH_SYNC — removed; do not reuse.
   ATTESTATION_TYPE_OPERATORS = 60947;
   // 60948 was ATTESTATION_TYPE_REMIT_CONFIRM — removed; do not reuse.
@@ -234,14 +164,6 @@ enum OperatorStatus {
 //  Depot contract state enums
 // ---------------------------------------------------------------------------
 
-enum ChainRequestStatus {
-  CHAIN_REQUEST_STATUS_PENDING        = 0;
-  CHAIN_REQUEST_STATUS_COLLECTING     = 1;
-  CHAIN_REQUEST_STATUS_CONSENSUS_OK   = 2;
-  CHAIN_REQUEST_STATUS_CONSENSUS_FAIL = 3;
-  CHAIN_REQUEST_STATUS_CHALLENGED     = 4;
-}
-
 enum MessageDirection {
   MESSAGE_DIRECTION_INBOUND  = 0;
   MESSAGE_DIRECTION_OUTBOUND = 1;
@@ -264,13 +186,6 @@ enum AttestationStatus {
   ATTESTATION_STATUS_PENDING   = 0;
   ATTESTATION_STATUS_READY     = 1;
   ATTESTATION_STATUS_PROCESSED = 2;
-}
-
-enum ChallengeStatus {
-  CHALLENGE_STATUS_CHALLENGE_SENT    = 0;
-  CHALLENGE_STATUS_RESPONSE_RECEIVED = 1;
-  CHALLENGE_STATUS_RESOLVED          = 2;
-  CHALLENGE_STATUS_ESCALATED         = 3;
 }
 
 // Node-owner registration tier (sysio.roa::nodeownreg). Mirrors the MockWireNodes NodeInfo tier and

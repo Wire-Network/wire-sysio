@@ -102,16 +102,6 @@ DataStream& operator>>(DataStream& ds, ChainAddress& t) {
    return ds >> t.kind >> t.address;
 }
 
-// ChainSignature: { ChainAddress actor; ChainKeyType key_type; vector<char> signature; }
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const ChainSignature& t) {
-   return ds << t.actor << t.key_type << t.signature;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, ChainSignature& t) {
-   return ds >> t.actor >> t.key_type >> t.signature;
-}
-
 // WireAccount: { string name; }
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const WireAccount& t) {
@@ -120,49 +110,6 @@ DataStream& operator<<(DataStream& ds, const WireAccount& t) {
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, WireAccount& t) {
    return ds >> t.name;
-}
-
-// WirePermission: { WireAccount account; string permission; }
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const WirePermission& t) {
-   return ds << t.account << t.permission;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, WirePermission& t) {
-   return ds >> t.account >> t.permission;
-}
-
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const Chain& t) {
-   return ds << t.kind << t.code << t.external_chain_id << t.name << t.description
-             << t.is_depot << t.active << t.registered_at_ms << t.activated_at_ms;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, Chain& t) {
-   return ds >> t.kind >> t.code >> t.external_chain_id >> t.name >> t.description
-             >> t.is_depot >> t.active >> t.registered_at_ms >> t.activated_at_ms;
-}
-
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const Token& t) {
-   return ds << t.kind << t.code << t.symbol_name << t.description << t.precision
-             << t.address << t.active << t.registered_at_ms << t.activated_at_ms;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, Token& t) {
-   return ds >> t.kind >> t.code >> t.symbol_name >> t.description >> t.precision
-             >> t.address >> t.active >> t.registered_at_ms >> t.activated_at_ms;
-}
-
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const ChainToken& t) {
-   return ds << t.chain_code << t.token_code << t.contract_addr
-             << t.is_native << t.active << t.registered_at_ms << t.activated_at_ms;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, ChainToken& t) {
-   return ds >> t.chain_code >> t.token_code >> t.contract_addr
-             >> t.is_native >> t.active >> t.registered_at_ms >> t.activated_at_ms;
 }
 
 } // namespace sysio::opp::types
@@ -276,29 +223,6 @@ DataStream& operator<<(DataStream& ds, const OperatorActionLog& t) {
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, OperatorActionLog& t) {
    return ds >> t.action >> t.success >> t.timestamp >> t.error_message;
-}
-
-// ChallengeOperatorHash — field name `operator_` (trailing underscore) because
-// `operator` is a C++ keyword.
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const ChallengeOperatorHash& t) {
-   return ds << t.operator_ << t.chain_hash;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, ChallengeOperatorHash& t) {
-   return ds >> t.operator_ >> t.chain_hash;
-}
-
-// ChallengeRequest
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const ChallengeRequest& t) {
-   return ds << t.epoch_index << t.round << t.original_chain_hash
-             << t.operator_hashes;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, ChallengeRequest& t) {
-   return ds >> t.epoch_index >> t.round >> t.original_chain_hash
-             >> t.operator_hashes;
 }
 
 // OperatorEntry — one row of the OPERATORS attestation roster.

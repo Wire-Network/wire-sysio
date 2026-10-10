@@ -741,8 +741,7 @@ opp::types::ChainAddress operator_chain_address(name account, sysio::slug_name c
 
 /// Build the `OperatorAction(action_type=SLASH)` payload for a given
 /// (account, chain_code, token_code) slash. Returns the OperatorAction
-/// ready for either logging on the operator's row or queueing as an
-/// outbound OPERATOR_ACTION attestation. Pure — no side effects.
+/// ready for logging on the operator's row. Pure — no side effects.
 ///
 /// This payload records a depot-local slash in the operator audit trail.
 OperatorAction build_slash_action(name account,
@@ -1287,9 +1286,10 @@ void opreg::slash(name account, std::string reason) {
       }
    });
 
-   // Emit one OPERATOR_ACTION(SLASH) per (chain_code, token_code) with non-zero
-   // slashable, AND append each as a recent_actions log entry on the
-   // operator's row (success=true since the slash itself was applied).
+   // Record one SLASH entry per (chain_code, token_code) with non-zero slashable
+   // in the operator's recent_actions log (success=true since the slash itself
+   // was applied). Nothing is sent to an outpost: they learn the SLASHED status
+   // from the next OPERATORS roster.
    for (const auto& sp : to_slash) {
       auto slash_action = build_slash_action(op.account, op.type,
                                              sp.chain_code, sp.token_code, sp.amount,

@@ -15,9 +15,10 @@
 namespace {
 
 /// Removed lifecycle discriminants, plus an undeclared control.
-constexpr std::array removed_wire_types{3001, 3002, 3004, 3006, 43520, 60928, 60930, 60934,
-                                        60944, 60950, 60951, 60952, 60953, 60955, 60956,
-                                        60958, 60959, 60960, 60961, 60962, 65000};
+constexpr std::array removed_wire_types{3001, 3002, 3004, 3006, 43520, 60928, 60930, 60932,
+                                        60934, 60944, 60945, 60950, 60951, 60952, 60953,
+                                        60955, 60956, 60958, 60959, 60960, 60961, 60962,
+                                        65000};
 constexpr auto type_field = "type";
 using fc::slug_name_literals::operator""_s;
 constexpr auto chain_code = "SOLANA"_s.value;
@@ -45,7 +46,9 @@ constexpr std::array removed_attestation_type_names{
    "ATTESTATION_TYPE_RESERVE_CREATE_CANCEL",
    "ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED",
    "ATTESTATION_TYPE_RESERVE_READY",
-   "ATTESTATION_TYPE_EMISSIONS_BLOCKED"};
+   "ATTESTATION_TYPE_EMISSIONS_BLOCKED",
+   "ATTESTATION_TYPE_CHALLENGE_RESPONSE",
+   "ATTESTATION_TYPE_CHALLENGE_REQUEST"};
 constexpr auto attestation_type_enum = "sysio.opp.types.AttestationType";
 
 } // namespace
@@ -80,13 +83,24 @@ BOOST_AUTO_TEST_CASE(generated_api_omits_retired_lifecycle_messages) {
            "sysio.opp.attestations.PretokenStakeChange",
            "sysio.opp.attestations.StakeUpdate",
            "sysio.opp.attestations.StakeResult",
-           "sysio.opp.attestations.AttestationProcessingError"}) {
+           "sysio.opp.attestations.AttestationProcessingError",
+           "sysio.opp.attestations.ChallengeRequest",
+           "sysio.opp.attestations.ChallengeOperatorHash",
+           "sysio.opp.types.ChainSignature",
+           "sysio.opp.types.WirePermission",
+           "sysio.opp.types.Chain",
+           "sysio.opp.types.Token",
+           "sysio.opp.types.ChainToken",
+           "sysio.opp.debugging.DebugEnvelopeDataRecord"}) {
       BOOST_CHECK_MESSAGE(pool->FindMessageTypeByName(name) == nullptr, name);
    }
    for (const auto* name : {"sysio.opp.types.ReserveStatus",
                             "sysio.opp.types.UnderwriteRequestStatus",
                             "sysio.opp.types.UnderwriteStatus",
-                            "sysio.opp.types.StakeStatus"}) {
+                            "sysio.opp.types.StakeStatus",
+                            "sysio.opp.types.ChainKeyType",
+                            "sysio.opp.types.ChainRequestStatus",
+                            "sysio.opp.types.ChallengeStatus"}) {
       BOOST_CHECK_MESSAGE(pool->FindEnumTypeByName(name) == nullptr, name);
    }
 }
