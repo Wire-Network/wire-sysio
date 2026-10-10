@@ -8,7 +8,7 @@
 #include <sysio/kv_scoped_table.hpp>
 #include <sysio/kv_global.hpp>
 #include <sysio.opp.common/amm_math.hpp>
-#include <sysio.opp.common/twap.hpp>
+#include <sysio.opp.common/swap_state.hpp>
 #include <sysio.opp.common/shadow_yield.hpp>
 #include <sysio.andon/sysio.andon.hpp>
 #include <algorithm>
@@ -168,11 +168,8 @@ namespace sysio {
 
          // --- Keys ---
 
-         /// A pair's rows in `stat` and `priceaccum`: keyed by the LP token's symbol code.
-         struct pair_key {
-            uint64_t symbol_code;
-            SYSLIB_SERIALIZE(pair_key, (symbol_code))
-         };
+         /// Shared primary key, serialized identically for writers and readers.
+         using pair_key = opp::swap_state::pair_key;
 
          /// An LP-token balance row, scoped by its owner: keyed by the symbol code.
          struct account_key {
@@ -231,31 +228,8 @@ namespace sysio {
             SYSLIB_SERIALIZE(evodex_account, (balance))
          };
 
-         struct [[sysio::table("stat")]] currency_stats {
-            asset          supply;
-            asset          max_supply;
-            name           issuer;
-            extended_asset pool1;
-            extended_asset pool2;
-            int            fee;
-            name           fee_authority;   ///< whose signature changefee requires for this pair
-            asset          locked_shares;   ///< part of `supply` held by no account, never redeemable
-            std::optional<extended_symbol> yield_leg;   ///< the shadow leg of a yield pool; empty for a plain pool
-            uint32_t       conversion_horizon_sec = 0;  ///< H: the reservoir is meant to sell over this long
-            uint32_t       depth_cap_bps          = 0;  ///< hard ceiling on one clip, bps of the pool's shadow side
-            int64_t        clip_floor             = 0;  ///< least a clip may be, in units of the shadow
-            int64_t        last_tick_depth        = 0;  ///< the shadow side as of the last setyield or selling tick.
-                                                        ///< The depth cap is taken against the SMALLER of this and
-                                                        ///< the current side, so a shadow side inflated inside one
-                                                        ///< transaction cannot widen the cap that bounds it.
-            time_point     last_tick{};                 ///< elapsed-time base of the clip formula: the last tick that
-                                                        ///< sold, the last setyield, or when the reservoir last
-                                                        ///< went from empty to funded, whichever is latest. A tick
-                                                        ///< that sells nothing deliberately leaves it alone.
-            SYSLIB_SERIALIZE(currency_stats, (supply)(max_supply)(issuer)(pool1)(pool2)(fee)(fee_authority)
-                                             (locked_shares)(yield_leg)(conversion_horizon_sec)(depth_cap_bps)
-                                             (clip_floor)(last_tick_depth)(last_tick))
-         };
+         /// Shared AMM pair row; alias declares the table owned by this contract.
+         using currency_stats = opp::swap_state::currency_stats;
 
          /// A yield payout the contract has claimed and credited to `pair` but not yet
          /// received. `quantity` is what the shadow contract's `claim` must deliver,
@@ -292,27 +266,17 @@ namespace sysio {
             SYSLIB_SERIALIZE(pair_index, (evo_symbol))
          };
 
-         /// Cumulative-price accumulators for a pair (sysio.opp.common/twap.hpp).
-         /// `price1` sums the Q64.64 price of one unit of pool1 in units of pool2,
-         /// times elapsed microseconds; `price2` the reverse. Both advance, at the
-         /// spot price that held since `last_update`, immediately before the pools
-         /// change and on `sync`. A reader snapshots the row at t0 and computes
-         /// `twap::average_price(twap::difference(now, snapshot), t - t0)`.
-         struct [[sysio::table("priceaccum")]] price_accumulator {
-            sysio::opp::twap::cumulative_price price1;
-            sysio::opp::twap::cumulative_price price2;
-            time_point                         last_update;
-            SYSLIB_SERIALIZE(price_accumulator, (price1)(price2)(last_update))
-         };
+         /// Shared cumulative-price row.
+         using price_accumulator = opp::swap_state::price_accumulator;
 
          // --- Tables ---
 
          using swapconfig_t = kv::global<"swapconfig"_n, swap_config>;
          using accounts    = kv::scoped_table<"accounts"_n,    account_key,         account>;
          using evodexacnts = kv::scoped_table<"evodexacnts"_n, extended_symbol_key, evodex_account>;
-         using stats       = kv::table<"stat"_n,       pair_key,          currency_stats>;
+         using stats       = opp::swap_state::stats;
          using evoindexes  = kv::table<"evoindex"_n,   pair_identity_key, pair_index>;
-         using priceaccums = kv::table<"priceaccum"_n, pair_key,          price_accumulator>;
+         using priceaccums = opp::swap_state::priceaccums;
          using yieldpayouts = kv::table<"yieldpayouts"_n, contract_key, payout_receipt>;
          using yieldfunds   = kv::table<"yieldfunds"_n,   funder_key,   fund_receipt>;
          using reservoirs   = kv::table<"reservoirs"_n,   pair_key,     reservoir>;
