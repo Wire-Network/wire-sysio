@@ -36,6 +36,19 @@ mvo kv(const char* code, mvo value) {
    return mvo()("key", mvo()("symbol_code", raw_code(code)))("value", std::move(value));
 }
 
+/// A `sysio.kicker::kickpools` value as the chain renders it: the LIQ token, its
+/// rate and minimum, and the accrual clock as an ISO time point.
+mvo kick_pool_row(fc::time_point last_kick) {
+   return mvo()
+      ("sym",              shadow_code)
+      ("rate_bps",         200)
+      ("min_gift",         one_token)
+      ("last_kick",        last_kick.to_iso_string())
+      ("gifted_total",     "0")
+      ("shortfall_amount", 0)
+      ("max_gift_per_day", 0);
+}
+
 } // namespace
 
 BOOST_AUTO_TEST_SUITE(yield_cranks_tests)
@@ -89,6 +102,72 @@ BOOST_AUTO_TEST_CASE(row_value_unwraps_the_kv_wrapper) {
    BOOST_REQUIRE(value.has_value());
    BOOST_CHECK_EQUAL(2 * one_token, asset_amount((*value)["balance"].get_object(), "quantity"));
    BOOST_CHECK(!row_value(mvo()("key", mvo())).has_value());
+}
+
+BOOST_AUTO_TEST_CASE(kick_min_interval_reads_the_config_and_refuses_what_setconfig_would) {
+   const auto interval = kick_min_interval(mvo()("budget_remaining", 0)("min_interval_sec", 3600));
+   BOOST_REQUIRE(interval.has_value());
+   BOOST_CHECK_EQUAL(fc::seconds(3600).count(), interval->count());
+
+   BOOST_CHECK(!kick_min_interval(mvo()("budget_remaining", 0)).has_value());   // absent
+   BOOST_CHECK(!kick_min_interval(mvo()("min_interval_sec", 0)).has_value());   // setconfig refuses 0
+   BOOST_CHECK(!kick_min_interval(mvo()("min_interval_sec", "not a number")).has_value());
+}
+
+BOOST_AUTO_TEST_CASE(kick_is_due_exactly_when_the_contract_clock_check_passes) {
+   const auto last_kick    = fc::time_point::from_iso_string("2026-10-10T12:00:00.000");
+   const auto min_interval = fc::seconds(3600);
+   const auto pool         = kick_pool_row(last_kick);
+
+   // `kick` returns without writing while `now - last_kick < min_interval`.
+   BOOST_CHECK(!kick_due(pool, min_interval, last_kick));
+   BOOST_CHECK(!kick_due(pool, min_interval, last_kick + min_interval - fc::microseconds(1)));
+   BOOST_CHECK(kick_due(pool, min_interval, last_kick + min_interval));
+   BOOST_CHECK(kick_due(pool, min_interval, last_kick + fc::days(3)));   // a long-unpaid pool stays due
+   // A clock ahead of this node's (read from a later block) is never due.
+   BOOST_CHECK(!kick_due(pool, min_interval, last_kick - fc::seconds(1)));
+}
+
+BOOST_AUTO_TEST_CASE(kick_last_kick_parses_the_rendered_time_point_and_nothing_else) {
+   const auto last_kick = fc::time_point::from_iso_string("2026-10-10T12:00:00.500");
+   const auto parsed    = kick_last_kick(kick_pool_row(last_kick));
+   BOOST_REQUIRE(parsed.has_value());
+   BOOST_CHECK(*parsed == last_kick);
+
+   auto missing = kick_pool_row(last_kick);
+   missing.erase("last_kick");
+   BOOST_CHECK(!kick_last_kick(missing).has_value());
+   BOOST_CHECK(!kick_due(missing, fc::seconds(1), last_kick + fc::days(1)));   // unreadable row: no push
+
+   auto garbled = kick_pool_row(last_kick);
+   garbled.set("last_kick", mvo()("not", "a time"));
+   BOOST_CHECK(!kick_last_kick(garbled).has_value());
+   BOOST_CHECK(!kick_due(garbled, fc::seconds(1), last_kick + fc::days(1)));
+}
+
+BOOST_AUTO_TEST_CASE(a_due_kick_pool_is_keyed_and_spaced_like_the_yield_cranks) {
+   // The crank reads `kickpools` with its kv keys: the key is the `kick` argument.
+   const auto last_kick = fc::time_point::from_iso_string("2026-10-10T12:00:00.000");
+   const auto row       = kv(shadow_code, kick_pool_row(last_kick));
+   const auto code      = row_symbol_code(row);
+   const auto value     = row_value(row);
+   BOOST_REQUIRE(code.has_value());
+   BOOST_REQUIRE(value.has_value());
+   BOOST_CHECK_EQUAL(std::string(shadow_code), symbol_code_name(*code));
+
+   // An Andon hold or a below-minimum gift leaves `last_kick` alone, so the pool
+   // stays due; the spacing is what keeps the retries to one per interval.
+   const auto min_interval = fc::seconds(3600);
+   const auto retry        = fc::seconds(60);
+   const auto now          = last_kick + min_interval;
+   const auto pool         = symbol_code_name(*code);
+   crank_spacing spacing;
+   BOOST_REQUIRE(kick_due(*value, min_interval, now));
+   BOOST_CHECK(spacing.due(pool, now, retry));
+   spacing.mark(pool, now);
+   BOOST_CHECK(kick_due(*value, min_interval, now + fc::seconds(15)));
+   BOOST_CHECK(!spacing.due(pool, now + fc::seconds(15), retry));
+   BOOST_CHECK(spacing.due(pool, now + retry, retry));
 }
 
 BOOST_AUTO_TEST_CASE(crank_spacing_allows_one_push_per_interval_per_key) {
