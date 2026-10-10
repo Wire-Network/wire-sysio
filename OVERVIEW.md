@@ -111,6 +111,7 @@ Holders of a node-owner NFT who commit it on the Ethereum outpost (`NODE_OWNER_R
 | **sysio.bond** | Generic bonded underwriting of provable statements |
 | **sysio.liq** | Shadow liq tokens (`LIQETH`, `LIQSOL`) minted against outpost custody, with a WIRE yield index |
 | **sysio.swap** | Depot-local constant-product AMM; every pair's second leg is WIRE |
+| **sysio.kicker** | Budgeted simple-accrual T5 WIRE gifts to LIQ holders, at the current swap spot price |
 | **sysio.dclaim** | Funded WIRE launch import, account linking and claims |
 | **sysio.andon** | Emergency stop: one cord freezing depot fund egress |
 | **sysio.roa** | Resources and node-owner registry |
