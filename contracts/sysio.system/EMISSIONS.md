@@ -159,10 +159,45 @@ owner calls `claimnodedis` (auth = their own account) to transfer the
 newly-vested amount, gated by `min_claimable` (memo `Node Owner distribution`).
 `viewnodedist` is the read-only preview.
 
-### LIQ yield and retired capital draws
+### LIQ yield and the independent kicker earmark
 
-LIQ holders receive only supplied WIRE yield proceeds and donations. The T5 yield bonus and
-`fundclaim` action are removed. Any unallocated emissions remainder stays in the treasury.
+LIQ holders receive supplied WIRE proceeds and donations through `sysio.liq::addyield`.
+The retired per-intake bonus and `fundclaim` action remain removed. `sysio.kicker` is a
+separate privileged contract: a permissionless `kick(sym)` draws from `sysio` within a
+governance earmark and distributes the gift to all holders through `addyield`.
+
+The gift is simple accrual on the **current** LIQ `stat.supply` at the **current spot**
+ratio of the registered LIQ/WIRE swap pool, for the entire time since the last payment.
+Each token has its own clock and rate (default 200 bps); a year is 31,557,600 seconds.
+The two arithmetic floors favour the treasury. This explicitly reprices an unpaid interval
+at today's supply, rate and spot, including any spot-price manipulation before the kick.
+
+Governance sets an absolute `budget_remaining` outside `t5_distributable`. Kicker draws
+never modify `t5state.total_distributed`. Every draw reserves `pending_emission_amount`,
+`payclaimtot.outstanding`, and the nonnegative remaining emission ceiling
+(`t5_distributable - t5_floor - total_distributed`) from the live WIRE balance.
+Absent emissions configuration or T5 state permits no draw.
+
+Funding or a daily allowance below the accrued gift pays the available amount if it
+meets `min_gift`, then advances `last_kick` by `floor(elapsed * paid / gift)`.
+The unpaid remainder keeps accruing; a gift above the daily cap cannot deadlock.
+A below-minimum allowance or Andon hold leaves the clock open. An empty supply
+resets the clock and all shortfall diagnostics, except during an Andon hold.
+There is no catch-up cap.
+
+With spot pricing, a permissionless kick and no catch-up cap, **kick cadence is a
+security control**: an attacker can pump the pool, kick, and swap back. The take
+scales with the unpaid interval. `min_interval_sec` is a floor, not a schedule:
+every ACTIVE batch operator pushes `kick(sym)` once a pool's interval has elapsed
+(`batch_operator_plugin`, `--batch-kick-crank`), and governance still monitors
+`last_kick` for a pool that stops advancing.
+
+`shortfall_amount` records `gift - paid` for the latest shortfall, not cumulative
+debt. `shortfall_time` records that observation. `gift_overflow` records a gift
+outside the asset range: this implementation pays nothing and retains the clock,
+because it does not compute an exact partial-payment denominator for overflow.
+A later full payment clears all three diagnostics. An unallocated emissions
+remainder stays in the treasury; it does not authorize a kicker budget by itself.
 
 The external staking-reward message and `sysio.dclaim::onreward` are removed. Pre-launch imports
 and already funded DClaim balances still link through AuthX and pay through

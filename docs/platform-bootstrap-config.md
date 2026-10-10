@@ -84,8 +84,8 @@ pubkey has linked through `sysio.authex`, or parks it until the link is made.
 
 `ReserveSpec`, `UwritConfig`, `reserves`, `uwrit` and `t5_reserve_allocation` are removed from the
 pre-launch schema. Authored JSON uses schema version 1; strict parsing rejects removed keys.
-The DEX earmark alone is subtracted from the T5 allotment. Regenerate matching OPP models and
-bootstrap clients for a fresh deployment.
+The schema carries only the DEX earmark. Subtract any separately configured kicker earmark
+as described below. Regenerate matching OPP models and bootstrap clients for a fresh deployment.
 
 ## T5 DEX earmark
 
@@ -111,6 +111,30 @@ Putting `D` *inside* `t5_distributable` instead would make the emissions math
 count WIRE that has physically left the treasury — the readiness gate blocks at
 launch scale, and effective emissions headroom silently shrinks by `W`. Hence
 the outside-the-pool earmark.
+
+## Kicker deployment and earmark
+
+Deploy `sysio.kicker` privileged with `sysio.roa::setsyscode`, alongside LIQ and swap.
+After `setemitcfg`/`initt5` and each `regliqpool`, governance (`sysio`) calls
+`sysio.kicker::setconfig({budget_remaining, min_interval_sec})`, then
+`addpool(sym, rate_bps, min_gift, max_gift_per_day)` for each LIQ token. The
+C++ defaults are 200 bps and 1,000,000,000 WIRE subunits; all action fields must
+be supplied by ABI clients. Zero disables the per-pool daily cap. A third LIQ
+requires these same configuration calls and no kicker code change. Any keeper
+may call `kick(sym)`, and every ACTIVE batch operator does once a pool's interval
+has elapsed; `setpool` changes the whole open interval's rate and
+`rmpool` stops accrual. Re-adding starts a new clock and pays no history.
+
+The kicker earmark `K` uses a governance action, **not a new bootstrap proto field**.
+Set `t5_distributable = A - D - K` and retain enough WIRE to back both earmarks.
+`setconfig` replaces the remaining budget; it is not an additive top-up and does
+not validate the off-chain earmark arithmetic. Governance must back every replacement
+with treasury funds outside emissions. The reserve guard protects pending emissions,
+claims, and the remaining emission ceiling; it does not reserve node-owner vest. Partial payments advance
+a floored pro-rata clock. Monitor actual kicks: the batch-operator crank is the
+schedule, the minimum interval is a floor, and spot-price manipulation exposure scales with the unpaid interval.
+The legacy Python boot tool does not deploy the LIQ/swap subsystem; the platform
+bootstrap client must create/deploy/configure the kicker in its LIQ flow.
 
 ## Validation
 

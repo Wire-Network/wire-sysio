@@ -36,6 +36,10 @@ struct contracts {
    static std::vector<char>    tokens_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.tokens/sysio.tokens.abi"); }
    static std::vector<uint8_t> swap_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.swap/sysio.swap.wasm"); }
    static std::vector<char>    swap_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.swap/sysio.swap.abi"); }
+   /// Privileged T5 gifts to LIQ holders, built from this checkout.
+   static std::vector<uint8_t> kicker_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.kicker/sysio.kicker.wasm"); }
+   /// ABI paired with the committed kicker WASM.
+   static std::vector<char> kicker_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.kicker/sysio.kicker.abi"); }
    static std::vector<uint8_t> liq_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.liq/sysio.liq.wasm"); }
    static std::vector<char>    liq_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.liq/sysio.liq.abi"); }
    static std::vector<uint8_t> bond_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.bond/sysio.bond.wasm"); }

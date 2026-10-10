@@ -39,10 +39,17 @@ that is offline, and each is a cheap no-op once its work is done:
 | `sysio.chalg::chkdispute(dispute_id)` | every OPEN envelope dispute | a dispute pauses `sysio.epoch::advance`, so no inline poke can reach it |
 | `sysio.swap::tickyield(pair_token)` | every yield pool whose reservoir has a queued balance, at most once per `--batch-yield-tick-interval-ms` per pool from this operator | the reservoir is sold into the pool as time passes; only a tick moves the clock |
 | `sysio.liq::queueyield(sym)` | every shadow with yield pending from an outpost `LIQ_YIELD` report | the report lands in `sysio.liq`'s pending balance; queuing it into the swap is a separate, permissionless step |
+| `sysio.kicker::kick(sym)` | every kicker pool whose `kickcfg.min_interval_sec` has elapsed since its `last_kick`, at most once per `--batch-kick-interval-ms` per pool from this operator | the gift accrues with time and only a kick pays it; its cadence is a security control (`contracts/sysio.system/EMISSIONS.md`) |
 
 The two yield cranks stay idle, without logging a read failure per poll, until both
-`sysio.swap` and `sysio.liq` are deployed on the depot. The plugin does not crank
-`sysio.synd::crank`; syndication release is driven by keepers.
+`sysio.swap` and `sysio.liq` are deployed on the depot; the kick crank likewise until
+`sysio.kicker` is deployed, and it pushes nothing before `setconfig`. Between payments
+the kick crank reads the pools and pushes nothing, because `kick` would return at its
+own clock check. A kick that passes the clock but cannot pay — an Andon hold, a gift
+below `min_gift`, an exhausted budget — leaves `last_kick` where it was, so
+`--batch-kick-interval-ms` is what bounds the retries; it is spent on every attempt,
+failed or not. `--batch-kick-crank=false` turns the kick crank off on this node. The
+plugin does not crank `sysio.synd::crank`; syndication release is driven by keepers.
 
 ## Configuration
 
@@ -52,6 +59,8 @@ The two yield cranks stay idle, without logging a read failure per poll, until b
 | `--batch-epoch-poll-ms` | 15000 | How often to check epoch state (ms) |
 | `--batch-delivery-timeout-ms` | 15000 | Max time to wait for chain delivery confirmation (ms) |
 | `--batch-yield-tick-interval-ms` | 60000 | Minimum spacing between this operator's `sysio.swap::tickyield` pushes per yield pool (ms) |
+| `--batch-kick-crank` | true | Push `sysio.kicker::kick` for every kicker pool whose minimum interval has elapsed |
+| `--batch-kick-interval-ms` | 60000 | Minimum spacing between this operator's `sysio.kicker::kick` pushes per LIQ token (ms) |
 
 There is no separate enable flag: the relay runs when `--batch-operator-account`
 is configured, the way `producer_plugin` keys off `--producer-name`. The plugin

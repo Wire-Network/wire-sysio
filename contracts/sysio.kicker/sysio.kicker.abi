@@ -1,0 +1,203 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "addpool",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sym",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "rate_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "min_gift",
+                    "type": "uint64"
+                },
+                {
+                    "name": "max_gift_per_day",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "kick",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sym",
+                    "type": "symbol_code"
+                }
+            ]
+        },
+        {
+            "name": "kick_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "budget_remaining",
+                    "type": "uint64"
+                },
+                {
+                    "name": "min_interval_sec",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "kick_pool",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sym",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "rate_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "min_gift",
+                    "type": "uint64"
+                },
+                {
+                    "name": "last_kick",
+                    "type": "time_point"
+                },
+                {
+                    "name": "gifted_total",
+                    "type": "uint128"
+                },
+                {
+                    "name": "shortfall_amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "shortfall_time",
+                    "type": "time_point"
+                },
+                {
+                    "name": "gift_overflow",
+                    "type": "bool"
+                },
+                {
+                    "name": "max_gift_per_day",
+                    "type": "uint64"
+                },
+                {
+                    "name": "day",
+                    "type": "uint64"
+                },
+                {
+                    "name": "spent_today",
+                    "type": "uint128"
+                }
+            ]
+        },
+        {
+            "name": "pool_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "symbol_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "rmpool",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sym",
+                    "type": "symbol_code"
+                }
+            ]
+        },
+        {
+            "name": "setconfig",
+            "base": "",
+            "fields": [
+                {
+                    "name": "cfg",
+                    "type": "kick_config"
+                }
+            ]
+        },
+        {
+            "name": "setpool",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sym",
+                    "type": "symbol_code"
+                },
+                {
+                    "name": "rate_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "min_gift",
+                    "type": "uint64"
+                },
+                {
+                    "name": "max_gift_per_day",
+                    "type": "uint64"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "addpool",
+            "type": "addpool",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "kick",
+            "type": "kick",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "rmpool",
+            "type": "rmpool",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setconfig",
+            "type": "setconfig",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setpool",
+            "type": "setpool",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "kickcfg",
+            "type": "kick_config",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 50218
+        },
+        {
+            "name": "kickpools",
+            "type": "kick_pool",
+            "index_type": "i64",
+            "key_names": ["symbol_code"],
+            "key_types": ["uint64"],
+            "table_id": 1606
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}
