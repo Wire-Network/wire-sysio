@@ -2,7 +2,9 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <array>
 #include <string>
+#include <string_view>
 #include <vector>
 
 using namespace sysio::batch_operator_detail;
@@ -62,6 +64,26 @@ BOOST_AUTO_TEST_CASE(a_signer_is_chosen_only_when_exactly_one_provider_qualifies
    const auto two = choose_signer(providers, [](int p) { return p % 2 == 0; });
    BOOST_CHECK(!two.chosen.has_value());
    BOOST_CHECK_EQUAL(2u, two.matches);
+}
+
+/// Review of #675: the relay required its permission to authorize `sysio.kicker::kick` even with
+/// `--batch-kick-crank=false`, so an unsatisfied kick link stopped a node that would never push it.
+BOOST_AUTO_TEST_CASE(a_disabled_crank_action_is_not_required_of_the_permission) {
+   constexpr std::array always{pushed_action{"sysio.msgch", "deliver"}, pushed_action{"sysio.msgch", "chkcons"}};
+   constexpr pushed_action kick{"sysio.kicker", "kick"};
+   // The relay's permission may declare every action except the kick.
+   const auto linked = [](const pushed_action& a) { return std::string_view(a.action) != "kick"; };
+
+   const auto disabled = required_actions(always, std::array{optional_action{kick, false}});
+   BOOST_CHECK_EQUAL(always.size(), disabled.size());
+   BOOST_CHECK(unlinked_actions(disabled, linked).empty());   // startup resolves the relay's signer
+
+   const auto enabled = required_actions(always, std::array{optional_action{kick, true}});
+   BOOST_REQUIRE_EQUAL(always.size() + 1, enabled.size());
+   const auto unlinked = unlinked_actions(enabled, linked);
+   BOOST_REQUIRE_EQUAL(1u, unlinked.size());   // startup refuses, naming the action to link
+   BOOST_CHECK_EQUAL(std::string("sysio.kicker"), unlinked.front().contract);
+   BOOST_CHECK_EQUAL(std::string("kick"), unlinked.front().action);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
