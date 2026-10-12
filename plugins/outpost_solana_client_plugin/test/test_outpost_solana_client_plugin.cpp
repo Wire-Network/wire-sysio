@@ -767,11 +767,12 @@ std::vector<char> envelope_with_entries(
    return std::vector<char>(buf.begin(), buf.end());
 }
 
-/// Build an `OPERATOR_ACTION(WITHDRAW_REMIT)` entry pointing at
-/// `op_addr`, remitting `token_code`. The decoder reads `op_address`,
-/// `action_type` and `amount.token_code` (SOL-379/380 keys the
-/// CollateralPosition PDA on it); other proto fields stay neutral.
+/// The depot request id `desyndicate_liq_entry` stamps unless a case names one.
 constexpr uint64_t default_desyndication_request_id = 1;
+
+/// Build a `DESYNDICATE_LIQ` entry releasing `token_code` to `user` under
+/// `request_id`. The decoder reads `user` and `request_id` -- the pool mint comes
+/// from `DistributionState`, not the payload -- so the other fields stay neutral.
 
 sysio::opp::AttestationEntry desyndicate_liq_entry(uint64_t                               token_code,
                                                    const sysio::opp::types::ChainAddress& user,
@@ -791,6 +792,8 @@ sysio::opp::AttestationEntry desyndicate_liq_entry(uint64_t                     
    return entry;
 }
 
+/// Build an `OPERATOR_ACTION(WITHDRAW_REMIT)` entry for `op_addr`. The relay derives no Solana
+/// effect from operator actions, so it must contribute no manifest entry.
 sysio::opp::AttestationEntry remit_entry(uint64_t                               token_code,
                                          const sysio::opp::types::ChainAddress& op_addr) {
    sysio::opp::attestations::OperatorAction oa;
@@ -899,12 +902,12 @@ BOOST_AUTO_TEST_CASE(extract_effects_on_undecodable_envelope_is_empty) try {
 BOOST_AUTO_TEST_CASE(extract_effects_repeated_recipient_yields_one_entry_per_attestation) try {
    namespace detail = sysio::outpost_solana_client_detail;
    auto op_pk = filled_pubkey(0xCC);
-   // Two identical WITHDRAW_REMITs to the same operator and token_code. The
+   // Two identical DESYNDICATE_LIQs to the same recipient and token_code. The
    // walk is per-attestation with NO cross-attestation dedup -- the cursor
    // counts both, so collapsing them would misalign every later
-   // dispatch_limit -- and the duplicate ACCOUNTS (operator wallet,
-   // CollateralPosition PDA) merge later in `record_terminal_account` when a
-   // batch's manifests union (pinned by
+   // dispatch_limit -- and the duplicate ACCOUNTS (recipient wallet and its
+   // token account) merge later in `record_terminal_account` when a batch's
+   // manifests union (pinned by
    // record_terminal_account_dedupes_and_merges_writable).
    auto envelope = envelope_with_entries({
       desyndicate_liq_entry(600, make_sol_addr(op_pk)),
@@ -918,16 +921,6 @@ BOOST_AUTO_TEST_CASE(extract_effects_repeated_recipient_yields_one_entry_per_att
    BOOST_CHECK(effects[0].recipient->serialize() == op_pk);
    BOOST_CHECK(effects[1].recipient->serialize() == op_pk);
 } FC_LOG_AND_RETHROW();
-namespace {
-
-/// The depot request id `desyndicate_liq_entry` stamps unless a case names one.
-
-/// Build a `DESYNDICATE_LIQ` entry releasing `token_code` to `user` under
-/// `request_id`. The decoder reads `user` and `request_id` -- the pool mint comes
-/// from `DistributionState`, not the payload -- so the other fields stay neutral.
-
-} // namespace
-
 BOOST_AUTO_TEST_CASE(extract_effects_desyndicate_liq_carries_the_user) try {
    namespace detail = sysio::outpost_solana_client_detail;
    // DESYNDICATE_LIQ MUST be surfaced: the handler resolves the pool's state
@@ -970,7 +963,7 @@ BOOST_AUTO_TEST_CASE(extract_effects_skips_non_settling_operator_actions) try {
    BOOST_CHECK(effects.empty());
 } FC_LOG_AND_RETHROW();
 BOOST_AUTO_TEST_CASE(extract_effects_skips_non_solana_chain) try {
-   // A WITHDRAW_REMIT whose `op_address` carries kind=ETHEREUM is not
+   // A DESYNDICATE_LIQ whose `user` carries kind=ETHEREUM is not
    // for this outpost and must not contribute a SOL effect entry.
    auto eth_bytes = filled_pubkey(0x01);
    auto envelope  = envelope_with_entries({
@@ -1018,20 +1011,20 @@ BOOST_AUTO_TEST_CASE(record_terminal_account_dedupes_and_merges_writable) try {
    BOOST_CHECK(metas[1].is_writable);
 } FC_LOG_AND_RETHROW();
 // ── build_dispatch_manifests: the per-attestation account manifests the
-//    dispatch crank packs its windows from, driven through its Reserve and
-//    CollateralPosition read seams. These pin the properties the manifest
+//    dispatch crank packs its windows from, driven through its transfer-hook
+//    and DistributionState read seams. These pin the properties the manifest
 //    build must hold before a single dispatch is sent: custody comes from the
-//    exact account the on-chain handler branches on, reads are memoised by the
-//    account's full PDA seed tuple, and an absent account degrades only itself.
+//    exact account the on-chain handler branches on, the pool singleton is read
+//    once per build, and an absent account degrades only itself.
 
 namespace {
 
 namespace manifest_detail = sysio::outpost_solana_client_detail;
 
-/// Scripted stand-in for the Reserve and CollateralPosition reads a manifest
-/// build performs. The record maps are on-chain truth; absent entries degrade
-/// as uninitialized accounts. Every call is recorded so memoization is
-/// assertable.
+/// Scripted stand-in for the transfer-hook and DistributionState reads a
+/// manifest build performs. The seeded values are on-chain truth; absent
+/// entries degrade as uninitialized accounts. Every call is counted so
+/// memoization is assertable.
 struct manifest_build_harness {
    solana_public_key program_id = measurement_pubkey(42);
 
@@ -1347,7 +1340,7 @@ manifest_detail::extra_account_meta external_pda_meta(uint8_t program_index,
 /// A hook-bearing Token-2022 custody mint -- the case SOL-396 exists for, and
 /// the one the ATA-derivation cases above do NOT cover.
 ///
-/// `reserve_vault_transfer` routes through
+/// `settle_desyndication` pays through
 /// `spl_token_2022::onchain::invoke_transfer_checked`, which for such a mint
 /// resolves the hook program, its ExtraAccountMetaList PDA, and every account
 /// that PDA declares out of `remaining_accounts`. Omitting them aborts the CPI
@@ -1915,7 +1908,7 @@ idl::program latest_envelope_program(std::vector<idl::field> fields, bool fields
 /// Build a minimal synthetic program declaring ONE account named `account_name`
 /// with `fields`, in either IDL field home — the drift shapes a boot check must
 /// refuse before a batch operator ever cranks. Shared by the `EpochDeliveries`
-/// and `Reserve` shape tests so both drive the same declaration machinery.
+/// and `DistributionState` shape tests so both drive the same declaration machinery.
 idl::program named_account_program(std::string account_name, std::vector<idl::field> fields,
                                    bool fields_in_types_section) {
    idl::program prog;

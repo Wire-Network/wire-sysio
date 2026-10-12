@@ -3,10 +3,10 @@
  * @file registry_metadata.hpp
  * @brief Byte bounds for the human-readable metadata every depot registry row carries.
  *
- * The depot's three system-owned registries -- `sysio.chains::chains`,
- * `sysio.tokens::tokens`, and `sysio.reserv::reserves` -- each persist two
+ * The depot's system-owned registries -- `sysio.chains::chains` and
+ * `sysio.tokens::tokens` -- each persist two
  * free-form strings alongside their typed columns: a short display LABEL
- * (`Chain.name`, `Token.symbol_name`, `Reserve.name`) and a longer
+ * (`Chain.name`, `Token.symbol_name`) and a longer
  * DESCRIPTION. Both land in chain state rather than transient action data.
  *
  * Those rows bill to `ram_payer = "sysio"` -- the shared system pool -- so an
@@ -16,8 +16,8 @@
  * business-appropriate size, inflating state and making the registries expensive
  * to inspect. Every registration action bounds both strings before `emplace`.
  *
- * The limits live here, once, so the three registries cannot drift apart, and
- * so raising a bound is a single reviewed edit rather than three. The precedent
+ * The limits live here, once, so the registries cannot drift apart, and
+ * so raising a bound is a single reviewed edit rather than one per registry. The precedent
  * for bounding a persisted contract string is `sysio.token::issue`'s
  * `memo.size() <= 256`; `description_max_bytes` matches it deliberately.
  */
@@ -31,12 +31,11 @@
 namespace sysio::opp::registry {
 
 /// Maximum byte length of a registry row's short display label --
-/// `Chain.name`, `Token.symbol_name`, `Reserve.name`.
+/// `Chain.name`, `Token.symbol_name`.
 ///
 /// The bound exists to stop a row consuming up to the KV/action ceiling of
 /// system-paid state; it is NOT a house style for terse names. Real labels run
-/// well past ticker length -- a reserve names its full leg
-/// ("ETHEREUM-ETH/WIRE unlinked-creator reserve" is 42 bytes) -- so the bound
+/// well past ticker length for descriptive chain and token names, so the bound
 /// is set with room for descriptive names rather than at the current longest.
 /// A label that has to be shortened to satisfy this is a sign the bound is
 /// wrong, not the label.

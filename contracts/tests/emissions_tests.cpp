@@ -358,7 +358,7 @@ public:
       create_accounts({ OPREG, EPOCH, CHALG, MSGCH });
       produce_blocks(1);
 
-      // OPREG, EPOCH and UWRIT have real contract code set below and need the
+      // OPREG and EPOCH have real contract code set below and need the
       // full RAM policy; CHALG and MSGCH are inline-target placeholders with
       // no code deployed. Sizing the placeholders down keeps the sixth
       // allocation within nodedaddy's tier-1 SYS pool.
@@ -2570,12 +2570,9 @@ BOOST_FIXTURE_TEST_CASE( payepoch_recovers_from_incomplete_batch_roster_history,
    BOOST_REQUIRE(!log["batch_history_complete"].as_bool());
    BOOST_REQUIRE_EQUAL(compute - producer_pool,
                        log["batch_emission_retained"].as<int64_t>());
-   BOOST_REQUIRE_EQUAL(int64_t(0), log["fee_distributed"].as<int64_t>());
-   BOOST_REQUIRE_EQUAL(int64_t(0), log["batch_fee_retained"].as<int64_t>());
 
-   // The next complete period must pick up the same retained fee bucket. This
-   // proves the recovery path did not merely leave it readable before silently
-   // clearing or replacing it on the following pay epoch.
+   // The next complete period pays from complete roster history again. This
+   // proves the recovery path reset history rather than leaving the period stuck.
    create_accounts({ BATCH_OP }, false, false, false, true);
    BOOST_REQUIRE_EQUAL(success(),
       register_operator(BATCH_OP, OperatorType::OPERATOR_TYPE_BATCH,
@@ -4187,14 +4184,10 @@ BOOST_FIXTURE_TEST_CASE( single_active_producer_paid_per_block, sysio_emissions_
 // while `setemitcfg` may change pay_cadence_epochs at any time. Normalizing by
 // cfg.pay_cadence_epochs instead of the accrued total made those two disagree:
 // cadence 3 -> 1 after one accrual leaves the counters summing to 2 against a
-// divisor of 1, paying 2x batch_pool AND 2x fee_batch_pool. The surplus fee is the
-// dangerous half — only ONE fee pool was swept from sysio.reserv, so the extra is
-// drawn from this treasury, and fee payouts are excluded from total_distributed,
-// so it never shows up against the emission curve.
+// divisor of 1, paying 2x batch_pool, with the surplus drawn from this treasury.
 //
-// Runs with an ACTIVE batch group and a NON-ZERO fee, because with either absent
-// the overpayment is unobservable: no group means nothing is distributed, and a
-// zero fee makes the fee half of the bug invisible.
+// Runs with an ACTIVE batch group, because with none the overpayment is
+// unobservable: nothing is distributed.
 BOOST_FIXTURE_TEST_CASE( cadence_drop_midperiod_does_not_multiply_batch_payout,
                          sysio_emissions_tester ) try {
    const account_name BATCH_OP = "batchopb"_n;
@@ -4240,10 +4233,6 @@ BOOST_FIXTURE_TEST_CASE( cadence_drop_midperiod_does_not_multiply_batch_payout,
    // total (2) gives it the whole pool exactly once -- not twice.
    const int64_t got = get_wire_balance_paid(BATCH_OP).get_amount() - bal_before;
    BOOST_REQUIRE_EQUAL( got, batch_pool );
-
-   // The load-bearing assertion: the fee is distributed ONCE. Under the old
-   // divisor this was 2 * fee_total, with the surplus drawn from the treasury.
-   BOOST_REQUIRE_EQUAL( log["fee_distributed"].as<int64_t>(), 0 );
 
    // And the emission side is not double-paid either: the producer's count spans both accrued
    // epochs and is paid once, over the two epochs' worth of slots.

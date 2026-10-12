@@ -76,7 +76,6 @@ constexpr auto tx_realize_yield = "realizeYield";
 namespace opp_inbound_abi {
 constexpr auto view_envelope_chunk_state = "envelopeChunkState";
 constexpr auto view_next_epoch_index     = "nextEpochIndex";
-constexpr auto view_attestation_handlers = "attestationHandlers";
 namespace field {
 constexpr auto epoch_index     = "epochIndex";
 constexpr auto owner           = "owner";
@@ -279,8 +278,7 @@ outpost_ethereum_client::outpost_ethereum_client(
    FC_ASSERT(_entry && _entry->client, "ethereum_client_entry must carry a client");
 
    // Each contract wrapper is materialized only if its address was
-   // supplied. A caller that only consumes one outpost capability (e.g.
-   // the underwriter calling `uw_commit` against OperatorRegistry) can
+   // supplied. A caller that only consumes one outpost capability can
    // pass empty strings for the addresses it doesn't use; the methods
    // covering an unprovisioned wrapper assert on entry with a clear
    // diagnostic. Per `outpost-client-spi.md`: address configuration is
@@ -539,7 +537,7 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
 
       // `ethereum_contract_tx_fn` binds every argument as a non-const lvalue
       // reference, so each one needs a named local (the same constraint that
-      // shapes `uw_commit`'s hex local).
+      // preserves the RPC's chain-native byte encoding).
       uint32_t    epoch_arg  = epoch_index;
       uint16_t    chunk_arg  = chunk;
       uint16_t    chunks_arg = total_chunks;

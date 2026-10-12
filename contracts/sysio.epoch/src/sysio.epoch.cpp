@@ -571,6 +571,8 @@ void epoch::advance() {
 
    // Withdrawal flushing can also change eligibility. Its nested callbacks
    // must complete before schedule selection and roster serialization.
+   // Matured withdrawals credit remitclaims and record a local audit entry;
+   // no attestation is sent from this path.
    // Inline siblings execute their complete subtrees in order, atomically.
    action(
       permission_level{get_self(), "owner"_n},

@@ -717,9 +717,8 @@ namespace {
 /// Look up `account`'s registered public key for `chain_code` from
 /// `sysio.authex::links` (`bynamechain` index) and pack it into a
 /// `ChainAddress`. Returns `{UNKNOWN, []}` when the chain isn't registered
-/// or no authex link exists — the downstream outpost / depot lookup then
-/// fails gracefully (the depot's `dispatch_operator_action` rejects empty
-/// `op_address.address`).
+/// or no authex link exists; the OPERATOR_ACTION audit record then carries an
+/// empty `op_address`.
 ///
 /// After the refactor: `authex::links.bynamechain` is still keyed by `(name, ChainKind)`
 /// and `ChainAddress.kind` is still `ChainKind`. opreg now stores chains by
@@ -743,8 +742,7 @@ opp::types::ChainAddress operator_chain_address(name account, sysio::slug_name c
 
 /// Build the `OperatorAction(action_type=SLASH)` payload for a given
 /// (account, chain_code, token_code) slash. Returns the OperatorAction
-/// ready for either logging on the operator's row or queueing as an
-/// outbound OPERATOR_ACTION attestation. Pure — no side effects.
+/// ready for logging on the operator's row. Pure — no side effects.
 ///
 /// This payload records a depot-local slash in the operator audit trail.
 OperatorAction build_slash_action(name account,
@@ -773,8 +771,7 @@ OperatorAction build_slash_action(name account,
 ///
 /// Caller passes the operator's primary key + the OperatorAction payload
 /// (DEPOSIT_REQUEST / WITHDRAW_REQUEST / WITHDRAW_REMIT / SLASH) plus the
-/// outcome. No-op if the operator entry doesn't exist (unknown-operator
-/// path handles its own audit via DEPOSIT_REVERT outbound).
+/// outcome. No-op if the operator entry does not exist.
 void append_action_log(opreg::operators_t& ops,
                        const opreg::operator_key& op_pk,
                        const OperatorAction& action,
@@ -1290,9 +1287,10 @@ void opreg::slash(name account, std::string reason) {
       }
    });
 
-   // Emit one OPERATOR_ACTION(SLASH) per (chain_code, token_code) with non-zero
-   // slashable, AND append each as a recent_actions log entry on the
-   // operator's row (success=true since the slash itself was applied).
+   // Record one SLASH entry per (chain_code, token_code) with non-zero slashable
+   // in the operator's recent_actions log (success=true since the slash itself
+   // was applied). Nothing is sent to an outpost: they learn the SLASHED status
+   // from the next OPERATORS roster.
    for (const auto& sp : to_slash) {
       auto slash_action = build_slash_action(op.account, op.type,
                                              sp.chain_code, sp.token_code, sp.amount,

@@ -1,11 +1,5 @@
-/// Cross-contract dispatch tests for sysio.msgch's per-attestation-type
-/// routing (Task 4 of the operator-collateral plan).
-///
-/// Data model: identity moved to slug_name-keyed registries. The dispatch
-/// surface still routes `OPERATOR_ACTION` payloads into opreg, but the
-/// payload schema now carries `chain_code` (slug_name uint64) instead of a
-/// `ChainKind chain` field, and `TokenAmount.token_code` (slug_name uint64)
-/// instead of `TokenAmount.kind` (TokenKind enum).
+/// Cross-contract dispatch tests for accepted OPP envelopes: LIQ intake,
+/// node-owner registration, source binding, and inert retired payloads.
 
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
@@ -20,9 +14,6 @@
 #include <sysio/opp/opp.pb.h>
 #include <sysio/opp/attestations/attestations.pb.h>
 #include <sysio/opp/types/types.pb.h>
-// The depot's swap kernel — tests re-derive both the quote settlement must pay
-// and (via token_to_wire) the challenge-bond reference math.
-#include <sysio.opp.common/amm_math.hpp>
 
 #include <fc/variant_object.hpp>
 #include <fc/slug_name.hpp>
@@ -65,18 +56,6 @@ namespace {
 /// The outpost custody a SyndicateLIQ or LIQYield fixture carries by default: the whole asset range, at
 /// or above any outstanding shadow a dispatch test can reach.
 constexpr uint64_t CUSTODY_COVERING_ANY_SUPPLY = static_cast<uint64_t>(sysio::chain::asset::max_amount);
-
-/// One `chain_min_bond` entry for `sysio.opreg::setconfig`'s `req_*_collat`
-/// vectors. `config_timestamp_ms` is stamped by the contract, so 0 here.
-inline fc::variant chain_min_bond_mvo(std::string_view chain_code,
-                                      std::string_view token_code,
-                                      uint64_t min_bond) {
-   return fc::variant(mvo()
-      ("chain_code",          chain_code)
-      ("token_code",          token_code)
-      ("min_bond",            min_bond)
-      ("config_timestamp_ms", uint64_t{0}));
-}
 
 /// One attestation of an envelope under construction: its type and its encoded payload.
 using typed_attestation = std::pair<sysio::opp::types::AttestationType, std::string>;
@@ -155,18 +134,18 @@ std::vector<char> encode_envelope_with_one_attestation(
 constexpr size_t MAX_ENVELOPE_BYTES = 32'768;
 
 /// Encode a decodable envelope whose serialised size is EXACTLY `target_bytes`, padded with a
-/// single out-of-scope STAKE attestation (dispatch drops it with no value-bearing effect). Probe
-/// once with `target_bytes` of padding to measure the fixed protobuf overhead, then rebuild with
-/// the pad shrunk by that overhead: at sizes near the 32 KiB envelope cap every nested length
+/// single OPERATORS attestation (an outbound-only roster echo that dispatch drops with no
+/// value-bearing effect). Probe once with `target_bytes` of padding to measure the fixed protobuf
+/// overhead, then rebuild with the pad shrunk by that overhead: at sizes near the 32 KiB envelope cap every nested length
 /// prefix and the `data_size` varint sit in the same 3-byte width band (16 KiB .. 2 MiB), so the
 /// second pass lands exactly on target — the final REQUIRE pins it.
 std::vector<char> encode_envelope_padded_to(uint32_t epoch_index, size_t target_bytes) {
    auto probe = encode_envelope_with_one_attestation(
-      epoch_index, sysio::opp::types::ATTESTATION_TYPE_STAKE, std::string(target_bytes, 'x'));
+      epoch_index, sysio::opp::types::ATTESTATION_TYPE_OPERATORS, std::string(target_bytes, 'x'));
    BOOST_REQUIRE_GT(probe.size(), target_bytes);
    const size_t overhead = probe.size() - target_bytes;
    auto padded = encode_envelope_with_one_attestation(
-      epoch_index, sysio::opp::types::ATTESTATION_TYPE_STAKE,
+      epoch_index, sysio::opp::types::ATTESTATION_TYPE_OPERATORS,
       std::string(target_bytes - overhead, 'x'));
    BOOST_REQUIRE_EQUAL(target_bytes, padded.size());
    return padded;
@@ -347,6 +326,8 @@ public:
    // path -- exercises the dispatch decode + routing without the account-creation machinery).
    static constexpr auto CLAIM_ACCOUNT  = "claimacct"_n;
    static constexpr uint64_t ROA_NETWORK_GEN = 0;
+   /// Termination prune delay for the suite's opreg config: ten minutes, far beyond any test's wall clock.
+   static constexpr uint64_t TERMINATE_PRUNE_DELAY_MS = 10ULL * 60 * 1000;
 
    sysio_dispatch_tester() {
       produce_blocks(2);
@@ -445,34 +426,25 @@ public:
       uwrit_op_eth_pubkey = create_eth_authex_link(UWRIT_OP);
    }
 
-   /// Push `sysio.opreg::setconfig` with the dispatch-suite defaults, varying
-   /// the underwriter and (optionally) producer collateral requirements. Batch
-   /// minimums stay empty (those operators are bootstrapped or unused here). The
-   /// race resolver gates winner selection on ACTIVE UNDERWRITER, and
-   /// `req_uw_collat` is what promotes UWRIT_OP to ACTIVE via
-   /// `opreg::processuw`; the eligibility-gate tests tune these to make a
-   /// candidate ACTIVE (a funded producer) or keep one inactive while funded.
-   /// `prune_delay_ms` defaults to 10 minutes — far beyond any test's wall
-   /// clock, so `prune` cases that want to exercise a gate OTHER than the delay
-   /// lower it explicitly.
-   action_result opreg_setconfig_collat(const fc::variants& req_uw_collat,
-                                        const fc::variants& req_prod_collat = fc::variants{},
-                                        uint64_t prune_delay_ms = 600000) {
+   /// Push `sysio.opreg::setconfig` with the dispatch-suite defaults. No role carries a collateral
+   /// minimum: the batch operator is bootstrapped, and UWRIT_OP is registered only as the linked
+   /// wallet whose balances the dispatch cases assert stay untouched.
+   action_result opreg_setconfig() {
       return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "setconfig"_n, mvo()
          ("max_available_producers",          21)
          ("max_available_batch_ops",          63)
          ("max_available_underwriters",       21)
-         ("terminate_prune_delay_ms",         prune_delay_ms)
+         ("terminate_prune_delay_ms",         TERMINATE_PRUNE_DELAY_MS)
          ("terminate_max_consecutive_misses", 5)
          ("terminate_max_pct_misses_24h",     5)
          ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
-         ("req_prod_collat",                  req_prod_collat)
+         ("req_prod_collat",                  fc::variants{})
          ("req_batchop_collat",               fc::variants{})
-         ("req_uw_collat",                    req_uw_collat));
+         ("req_uw_collat",                    fc::variants{}));
    }
 
    // `outpost_code` / `outpost_kind` name the single bootstrapped outpost. They default to the EVM
-   // "ETH" chain used by the deposit/withdraw/swap/underwrite cases. The node-owner happy path passes
+   // "ETH" chain used by the LIQ syndication cases. The node-owner happy path passes
    // "ETHEREUM" so the source it binds against (msgch's NODE_OWNER_SRC_CHAIN) is the scheduled outpost
    // and reaches consensus; the non-EVM drop case passes an SVM "SOLANA" so its delivery also reaches
    // consensus and the drop is exercised at the source binding, not merely the consensus gate. The
@@ -487,15 +459,7 @@ public:
             ("batch_op_groups",                     1)
             ("epoch_retention_envelope_log_count",  200)));
 
-      // A 1-unit ETH/ETH underwriter minimum: every swap-race test funds
-      // UWRIT_OP's ETH bond, so this promotes it to ACTIVE via
-      // `opreg::processuw` (it registers UNKNOWN — underwriters cannot be
-      // bootstrapped). The race resolver now gates winner selection on ACTIVE
-      // UNDERWRITER, so the happy-path winner tests need a genuinely-active
-      // underwriter. Adds NO balance row — deposit-routing assertions (exact /
-      // zero balances) are unaffected.
-      BOOST_REQUIRE_EQUAL(success(),
-         opreg_setconfig_collat(fc::variants{chain_min_bond_mvo("ETH", "ETH", 1)}));
+      BOOST_REQUIRE_EQUAL(success(), opreg_setconfig());
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
          "regoperator"_n, mvo()
@@ -649,14 +613,12 @@ public:
               type, data, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-   /** Produce a complete serialized fixed-size variant for a shim type. */
-
    // ── SEC-129 / WSA-223: real epoch-aging helpers ──────────────────────────
    //
    // The bootstrap advance gate-blocks on missing emissions state, so every
-   // dispatch test normally runs at epoch 0. The UWREQ lifecycle sweep is
-   // trigger-driven off real advances, so its tests configure emissions the
-   // way emissions_tests.cpp does and then genuinely advance the epoch index.
+   // dispatch test normally runs at epoch 0. Tests that need real advances
+   // configure emissions the way emissions_tests.cpp does and then genuinely
+   // advance the epoch index.
 
    /// Push a sysio.system action (ABI resolved from chain state — the system
    /// account runs this build's genesis code, like sysio.roa above).
@@ -728,19 +690,6 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push_system(config::system_account_name, "initt5"_n,
          mvo()("start_time", time_point_sec(control->head().block_time()))));
       produce_blocks();
-   }
-
-   /// Cross one epoch boundary and advance. epoch_duration_sec is 60 in this
-   /// fixture (bootstrap_for_dispatch); 124 half-second blocks = 62s crosses
-   /// it. advance is pushed with the epoch contract's own authority (advance
-   /// accepts sysio.msgch OR sysio.epoch post-genesis). Each successful
-   /// advance fires the real inline maintenance chain — chklocks,
-   /// pruneuwreqs(MAX_UWREQ_PRUNE_PER_EPOCH), drainfwq, buildenv — exactly as
-   /// in production.
-   void age_one_epoch() {
-      produce_blocks(124);
-      BOOST_REQUIRE_EQUAL(success(),
-         push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n, mvo()));
    }
 
    // ── sysio.synd inbound routing (SYNDICATE_LIQ / LIQ_YIELD) ────────────────
@@ -917,7 +866,7 @@ BOOST_FIXTURE_TEST_CASE(dispatch_silently_drops_out_of_scope_types, sysio_dispat
    const auto eth_code = fc::slug_name{"ETH"}.value;
    auto envelope = encode_envelope_with_one_attestation(
       current_epoch(),
-      sysio::opp::types::ATTESTATION_TYPE_STAKE,
+      sysio::opp::types::ATTESTATION_TYPE_OPERATORS,
       std::string{});
 
    BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));
@@ -939,7 +888,7 @@ BOOST_FIXTURE_TEST_CASE(deliver_duplicate_from_same_operator_reverts, sysio_disp
    const auto eth_code = fc::slug_name{"ETH"}.value;
    auto envelope = encode_envelope_with_one_attestation(
       current_epoch(),
-      sysio::opp::types::ATTESTATION_TYPE_STAKE,
+      sysio::opp::types::ATTESTATION_TYPE_OPERATORS,
       std::string{});
 
    BOOST_REQUIRE_EQUAL(success(), deliver(/*chain_code=*/eth_code, envelope));
@@ -1037,7 +986,7 @@ BOOST_FIXTURE_TEST_CASE(dispatch_routes_node_owner_reg_to_roa, sysio_dispatch_te
 } FC_LOG_AND_RETHROW() }
 
 // Only ATTESTATION_TYPE_NODE_OWNER_REG reaches the node-owner handler. The outbound-only types
-// (OPERATORS, BATCH_OPERATOR_GROUPS, SWAP_REVERT, DEPOSIT_REVERT) are dropped on receipt even when
+// (OPERATORS, BATCH_OPERATOR_GROUPS) are dropped on receipt even when
 // the payload is a well-formed NodeOwnerRegistration from the node-owner source outpost: a payload
 // that would register CLAIM_ACCOUNT under the real type must leave no owner row and no audit row.
 BOOST_FIXTURE_TEST_CASE(outbound_only_types_never_reach_node_owner_dispatch, sysio_dispatch_tester) { try {
@@ -1053,8 +1002,7 @@ BOOST_FIXTURE_TEST_CASE(outbound_only_types_never_reach_node_owner_dispatch, sys
       sysio::opp::types::WIRE_KEY_TYPE_K1, wire_key, eth_bytes, eth_address);
 
    std::vector<typed_attestation> entries;
-   for (auto type : {ATTESTATION_TYPE_OPERATORS, ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS,
-                     ATTESTATION_TYPE_SWAP_REVERT, ATTESTATION_TYPE_DEPOSIT_REVERT}) {
+   for (auto type : {ATTESTATION_TYPE_OPERATORS, ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS}) {
       entries.emplace_back(type, payload);
    }
    const auto trace = deliver_trace(eth_code,
@@ -1657,9 +1605,7 @@ BOOST_FIXTURE_TEST_CASE(retired_attestations_do_not_mutate_collateral_or_block_l
    const auto eth = fc::slug_name{"ETH"}.value;
    const auto liqeth = fc::slug_name{"LIQETH"}.value;
    std::vector<typed_attestation> entries;
-   for (auto type : {ATTESTATION_TYPE_OPERATOR_ACTION, ATTESTATION_TYPE_SWAP_REQUEST,
-                     ATTESTATION_TYPE_UNDERWRITE_INTENT_COMMIT,
-                     ATTESTATION_TYPE_RESERVE_CREATE_CANCEL}) {
+   for (auto type : {ATTESTATION_TYPE_OPERATOR_ACTION}) {
       entries.emplace_back(type, std::string(1, '\x0a'));
    }
    entries.emplace_back(ATTESTATION_TYPE_SYNDICATE_LIQ,
@@ -1667,10 +1613,42 @@ BOOST_FIXTURE_TEST_CASE(retired_attestations_do_not_mutate_collateral_or_block_l
                           liqeth, LIQ_UNIT, 1));
    constexpr int32_t removed_reward_type = 60950;
    constexpr int32_t removed_reserve_create_type = 60958;
+   constexpr int32_t removed_pretoken_purchase_type = 3004;
+   constexpr int32_t removed_pretoken_yield_type = 3006;
+   constexpr int32_t removed_wire_purchase_type = 60930;
+   constexpr int32_t removed_reserve_cancel_type = 60959;
+   constexpr int32_t removed_reserve_cancelled_type = 60960;
+   constexpr int32_t removed_reserve_ready_type = 60961;
+   constexpr int32_t removed_reserve_snapshot_type = 43520;
+   constexpr int32_t removed_emissions_blocked_type = 60962;
+   constexpr int32_t removed_swap_request_type = 60934;
+   constexpr int32_t removed_swap_remit_type = 60944;
+   constexpr int32_t removed_underwrite_commit_type = 60953;
+   constexpr int32_t removed_swap_revert_type = 60955;
+   constexpr int32_t removed_deposit_revert_type = 60956;
+   constexpr int32_t removed_stake_type = 3001;
+   constexpr int32_t removed_unstake_type = 3002;
+   constexpr int32_t removed_stake_update_type = 60928;
+   constexpr int32_t removed_stake_result_type = 60951;
+   constexpr int32_t removed_processing_error_type = 60952;
+   constexpr int32_t removed_challenge_response_type = 60932;
+   constexpr int32_t removed_challenge_request_type = 60945;
    constexpr int32_t undeclared_type = 65000;
    const auto trace = deliver_trace(eth,
       encode_envelope_with_mixed_attestations(current_epoch(), entries, {}, {},
-                                             {removed_reward_type, removed_reserve_create_type, undeclared_type}));
+                                             {removed_reward_type, removed_reserve_create_type,
+                                              removed_pretoken_purchase_type, removed_pretoken_yield_type,
+                                              removed_wire_purchase_type,
+                                              removed_reserve_cancel_type, removed_reserve_cancelled_type,
+                                              removed_reserve_ready_type, removed_reserve_snapshot_type,
+                                              removed_emissions_blocked_type, removed_swap_request_type,
+                                              removed_swap_remit_type, removed_underwrite_commit_type,
+                                              removed_swap_revert_type, removed_deposit_revert_type,
+                                              removed_stake_type, removed_unstake_type,
+                                              removed_stake_update_type, removed_stake_result_type,
+                                              removed_processing_error_type,
+                                              removed_challenge_response_type,
+                                              removed_challenge_request_type, undeclared_type}));
    BOOST_REQUIRE(trace != nullptr);
    BOOST_REQUIRE(!trace->except);
    BOOST_CHECK(get_operator(UWRIT_OP)["balances"].get_array().empty());
