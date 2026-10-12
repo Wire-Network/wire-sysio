@@ -312,8 +312,8 @@ constexpr std::string_view kWireEarnsNoYieldError =
 } // namespace
 
 /// Data model: per-chain identity has moved from `ChainKind` enums to
-/// `sysio::slug_name`-keyed registries (`sysio.chains`, `sysio.tokens`,
-/// `sysio.reserv`). The test fixture treats the codenames as opaque uint64
+/// `sysio::slug_name`-keyed registries (`sysio.chains`, `sysio.tokens`).
+/// The test fixture treats the codenames as opaque uint64
 /// values; per-chain spelling ("ETH", "SOL", "WIRE", "LIQETH", ...) maps to
 /// the host-side `fc::slug_name` packing algorithm so the bytes match what
 /// the contract emplaces under.

@@ -260,7 +260,7 @@ namespace sysio {
    // external wallet can hold several WireNodes NFTs and therefore legitimately back several Wire
    // accounts, so one ETH key -> many accounts is allowed on this path. The operator path
    // (createlink) keeps its 1:1 `bypubkey` check, which also guarantees an operator's link is the
-   // lowest-primary-key row for that key; sysio.msgch's resolve_account_from_op_address does a single
+   // lowest-primary-key row for that key; sysio.synd's linked_account does a single
    // `bypubkey.find()` (lowest-primary-key match), so it still lands on the operator's account rather
    // than a later node-owner duplicate.
    auto existing = by_namechain.find(to_namechain_key(account, chain_kind));

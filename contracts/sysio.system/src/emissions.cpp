@@ -687,19 +687,10 @@ void system_contract::rcrdbatch(uint32_t epoch_index, std::vector<sysio::name> m
 // The unallocated remainder (period_emission - compute - capex - governance)
 // stays in sysio's balance. LIQ yield draws no treasury bonus.
 //
-// Swap-fee rewards: when immutable roster history is complete and contains at
-// least one non-empty roster, the batch-operator share of collected swap fees
-// (sysio.reserv's rewards_bucket) is swept here via an inline drainrewards and
-// allocated EXCLUSIVELY to the batch-operator distribution, on top of their
-// emission share and weighted by the same historical-roster active-epoch count.
-// Incomplete or all-empty history leaves the bucket in sysio.reserv for a later
-// payable period.
-// Producers are NOT paid out of swap fees, so producer_bps / batch_op_bps govern
-// the emission split only -- see the fold-in comment at the drain. Allocated is
-// not paid: only ELIGIBLE shares go out, and any skipped amount from a completed
-// sweep stays in this treasury. The audit row records retained batch emission,
-// retained swept fees, and whether roster history was complete. Fees are funded
-// by the sweep (not the treasury) and so are excluded from total_distributed.
+// The batch-operator slice is weighted by the immutable historical-roster
+// active-epoch count. Allocated is not paid: only ELIGIBLE shares go out, and any
+// skipped amount stays in this treasury. The audit row records retained batch
+// emission and whether roster history was complete.
 //
 // Single-trx semantics guarantee gate conditions hold through this call;
 // payepoch trusts the gate-computed period_emission and does not recompute.
@@ -955,9 +946,6 @@ void system_contract::payepoch(uint32_t epoch_index,
       // one subunit. Correcting it took a second pass that could overdraw the pool.
       const uint64_t slot_divisor = std::max<uint64_t>(std::max(nominal_slots, produced_blocks), 1);
 
-      // Producers are paid the emission share only — swap fees go to the
-      // underwriter + batch operators (see the fold-in comment above).
-      //
       // A row's blocks are cleared ONLY when the block portion actually credited something. The
       // division is integer, so a small pool over a large divisor can round a real block count to
       // zero pay; clearing the count then would destroy work the producer did, which is the one
@@ -1040,9 +1028,9 @@ void system_contract::payepoch(uint32_t epoch_index,
       }
    } else if (accrued_epochs > 0) {
       // Do not guess a roster during a mixed-version upgrade or an incomplete
-      // first period: retain its batch emission in the treasury, leave swap fees
-      // in sysio.reserv, and let the next period establish complete history.
-      sysio::print("batch roster history incomplete; retaining batch emission and deferring swap fees\n");
+      // first period: retain its batch emission in the treasury and let the
+      // next period establish complete history.
+      sysio::print("batch roster history incomplete; retaining batch emission\n");
    }
 
    const int64_t batch_emission_retained = batch_pool - batch_emission_paid;
@@ -1110,10 +1098,8 @@ void system_contract::payepoch(uint32_t epoch_index,
 
    t5s.set(state, get_self());
 
-   // Audit log: records the AUTHORIZED period emission + the four category
-   // amounts for the period that just paid, plus the swap-fee rewards folded
-   // into the batch-operator distribution (fee_distributed, sourced from swap
-   // fees rather than the treasury). (Producer / batch-op sub-distribution is
+   // Audit log: records the AUTHORIZED period emission + the three category
+   // amounts for the period that just paid. (Producer / batch-op sub-distribution is
    // implicit. Those shares are CREDITED to `payclaims` rather than transferred, so a
    // recipient no longer appears as its own transfer trace -- per-recipient attribution
    // comes from the `payclaims` row deltas, and the eventual `claimpay`.) One row per
@@ -1127,10 +1113,8 @@ void system_contract::payepoch(uint32_t epoch_index,
       .compute_amount    = compute_amount,
       .capex_amount      = capex_amount,
       .governance_amount = governance_amount,
-      .fee_distributed   = 0, // Reserved legacy audit field.
       .batch_history_complete  = batch_history_complete,
       .batch_emission_retained = batch_emission_retained,
-      .batch_fee_retained      = 0, // Reserved legacy audit field.
    });
 
    // Head-first prune of the audit log past its retention cap. Rows are added

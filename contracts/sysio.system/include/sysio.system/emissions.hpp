@@ -476,27 +476,17 @@ struct [[sysio::table("epochlog"), sysio::contract("sysio.system")]] epoch_log {
    int64_t                compute_amount    = 0;
    int64_t                capex_amount      = 0;
    int64_t                governance_amount = 0;
-   // Swap-fee rewards (sysio.reserv rewards_bucket) actually distributed to
-   // batch operators this period, ON TOP of the emission above. Sourced from
-   // collected swap fees, not the T5 treasury, so it is NOT included in
-   // total_emission / total_distributed. Excludes the underwriter half of every
-   // fee, which accrues in sysio.reserv and is claimed there — it never reaches
-   // this treasury and so never appears in this log.
-   int64_t                fee_distributed   = 0;
    // Durable attribution for WIRE left in the treasury by the batch payout.
-   // Retained emission includes incomplete-history recovery; retained swept
-   // fees arise only after a non-empty roster enabled the sweep, from another
-   // empty roster, inactive members, or integer-division remainders. Incomplete
-   // and all-empty history leave fees in sysio.reserv.
+   // Retained emission includes incomplete-history recovery, empty rosters,
+   // inactive members, and integer-division remainders.
    // history_complete distinguishes recovery from eligibility shortfalls.
    bool                   batch_history_complete   = false;
    int64_t                batch_emission_retained  = 0;
-   int64_t                batch_fee_retained       = 0;
 
    SYSLIB_SERIALIZE(epoch_log,
       (sysio_epoch_index)(epoch_count)(timestamp)(total_emission)
-      (compute_amount)(capex_amount)(governance_amount)(fee_distributed)
-      (batch_history_complete)(batch_emission_retained)(batch_fee_retained))
+      (compute_amount)(capex_amount)(governance_amount)
+      (batch_history_complete)(batch_emission_retained))
 };
 
 using epochlog_t = sysio::kv::table<"epochlog"_n, epochlog_key, epoch_log>;
