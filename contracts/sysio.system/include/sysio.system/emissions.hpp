@@ -104,10 +104,8 @@ struct [[sysio::table("emitcfg"), sysio::contract("sysio.system")]] emission_con
    int64_t   annual_min_emission;     // per-year floor
 
    // Category splits (basis points). compute + capex + governance must
-   // sum to <= 10000; the remainder is the implicit capital reserve drained
-   // lazily by sysio.dclaim::onreward via sysio.system::fundclaim, not at
-   // payepoch. Sum == 10000 means no implicit reserve (capital draws eat
-   // future periods' headroom).
+   // sum to <= 10000; any unallocated remainder stays in the treasury.
+   // LIQ yield draws no treasury bonus.
    uint16_t  compute_bps;
    uint16_t  capex_bps;
    uint16_t  governance_bps;
@@ -235,56 +233,33 @@ struct node_claim_result {
 // operators churn, and every departed account that never calls `claimpay` leaves a row billed to
 // the sysio RAM pool forever, so system-funded claim storage grows with historical participants
 // rather than with the live set. That is a known, accepted cost here: expiring earned pay is an
-// economic decision, not a RAM one, and the alternative (`sysio.reserv::wireclaims`, whose
-// recipient set is unbounded AND caller-influenced) buys its sweep by forfeiting balances.
+// economic decision, not a RAM one. Returned collateral, banked operator yield and DClaim
+// rewards follow the same no-expiry policy.
 //
-// The row therefore carries `expires_at_sec` and an expiry-ordered index NOW, even though nothing
-// reads them yet. Landing the schema is free before launch and expensive after it; wiring the
-// sweep is the part that needs a decision, so the two are deliberately separated. `credit`
-// maintains the stamp, so by the time WIRE-339 picks the question up there is real age data to
-// reason about instead of a table that starts counting from the day the field is added.
-//
-// NOTHING EXPIRES TODAY: no `claimable::sweep_expired` call is wired against this table, so the
-// stamp is recorded and ignored. `PAY_CLAIM_WINDOW_SEC` is the provisional window that stamp is
-// computed from, not a commitment — whether earned pay should be forfeited at all, and over what
-// window, is the open economic decision in WIRE-339.
+/// WIRE-339 policy: earned pay never expires, including after a recipient stops participating.
+/// Rows deliberately omit expiry metadata and indexes; balances remain reserved until claimed.
 
 struct payclaim_key {
    uint64_t account_name;
    SYSLIB_SERIALIZE(payclaim_key, (account_name))
 };
 
-// Provisional retention window used only to compute `pay_claim::expires_at_sec`. Mirrors
-// `sysio.reserv::WIRE_CLAIM_WINDOW_SEC` so the two claimable tables age on the same scale; the
-// value is revisited when (and if) a sweep is wired.
-inline constexpr uint32_t PAY_CLAIM_WINDOW_SEC = 365 * 24 * 60 * 60;
-
+/// Earned WIRE held indefinitely for the recipient to claim.
 struct [[sysio::table("payclaims"), sysio::contract("sysio.system")]] pay_claim {
    sysio::name account_name;
-   uint64_t    balance        = 0;   // atomic WIRE units owed, not yet claimed
-   uint32_t    expires_at_sec = 0;   // recorded by `credit`; read by nothing yet (WIRE-339)
+   uint64_t    balance = 0;   ///< Atomic WIRE units owed, not yet claimed.
 
-   /// Expiry-major composite so the secondary index orders by expiry and a future retention sweep
-   /// can stop at the first live row. The account tail only breaks ties, keeping the key unique
-   /// when many rows share an expiry second. (Same shape as `sysio.reserv::wire_claim`.)
-   uint128_t by_expiry() const {
-      return (static_cast<uint128_t>(expires_at_sec) << 64) | account_name.value;
-   }
-
-   SYSLIB_SERIALIZE(pay_claim, (account_name)(balance)(expires_at_sec))
+   SYSLIB_SERIALIZE(pay_claim, (account_name)(balance))
 };
 
-using payclaims_t = sysio::kv::table<"payclaims"_n, payclaim_key, pay_claim,
-   sysio::kv::index<"byexpiry"_n,
-      sysio::const_mem_fun<pay_claim, uint128_t, &pay_claim::by_expiry>>
->;
+using payclaims_t = sysio::kv::table<"payclaims"_n, payclaim_key, pay_claim>;
 
 // Running total of every outstanding `payclaims` balance.
 //
 // The WIRE backing unclaimed rows sits in sysio's token balance but is already owed, so every
 // gate that spends against that balance must reserve it -- otherwise the treasury double-commits
-// and a later `claimpay` fails on overdraw, stranding earned pay. Two readers depend on it:
-// `sysio.system::fundclaim` (its balance cap) and `sysio.epoch`'s emissions readiness gate.
+// and a later `claimpay` fails on overdraw, stranding earned pay. Treasury withdrawals
+// and `sysio.epoch`'s emissions readiness gate reserve this total.
 //
 // Held as a maintained counter rather than recomputed by scanning `payclaims`, because the epoch
 // gate reads it on EVERY advance and an O(rows) scan there would grow with the standby set. Kept
@@ -330,12 +305,6 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
    // chains see length 0.
    std::vector<uint32_t>  batch_group_epochs;
 
-   // Cumulative shortfall (WIRE subunits) between requested and actually-
-   // funded capital draws. fundclaim caps each request at the remaining
-   // pool; any unfunded delta is added here so under-sized pools are
-   // visible without breaking the OPP-handler never-throw contract.
-   int64_t                capital_shortfall_total = 0;
-
    /// Block slots the open pay period is entitled to, accumulated as each epoch accrues.
    ///
    /// The DIVISOR has to be built the same way the POOL is. `pending_emission_amount` above adds
@@ -356,7 +325,7 @@ struct [[sysio::table("t5state"), sysio::contract("sysio.system")]] t5_state {
       (start_time)(epoch_count)(last_epoch_index)
       (last_epoch_time)(last_epoch_emission)(total_distributed)
       (pending_emission_amount)(period_start_epoch)(batch_group_epochs)
-      (capital_shortfall_total)(pending_nominal_slots))
+      (pending_nominal_slots))
 };
 
 using t5state_t = sysio::kv::global<"t5state"_n, t5_state>;
@@ -501,9 +470,8 @@ struct [[sysio::table("epochlog"), sysio::contract("sysio.system")]] epoch_log {
    uint64_t               epoch_count       = 0;  // internal counter of payepoch invocations
    sysio::time_point_sec  timestamp;
    // Total budget for the period (curve output). compute + capex + governance
-   // are paid out of this at payepoch; the implicit capital reserve
-   // (= total_emission - compute - capex - governance) is drained lazily
-   // by fundclaim across the same period and never appears here.
+   // are paid out of this at payepoch; the unallocated remainder stays in
+   // the treasury and is not a separate payout category.
    int64_t                total_emission    = 0;
    int64_t                compute_amount    = 0;
    int64_t                capex_amount      = 0;

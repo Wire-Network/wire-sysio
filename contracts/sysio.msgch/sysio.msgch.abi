@@ -634,10 +634,6 @@
                     "value": 60949
                 },
                 {
-                    "name": "ATTESTATION_TYPE_STAKING_REWARD",
-                    "value": 60950
-                },
-                {
                     "name": "ATTESTATION_TYPE_STAKE_RESULT",
                     "value": 60951
                 },
@@ -656,10 +652,6 @@
                 {
                     "name": "ATTESTATION_TYPE_DEPOSIT_REVERT",
                     "value": 60956
-                },
-                {
-                    "name": "ATTESTATION_TYPE_RESERVE_CREATE",
-                    "value": 60958
                 },
                 {
                     "name": "ATTESTATION_TYPE_RESERVE_CREATE_CANCEL",

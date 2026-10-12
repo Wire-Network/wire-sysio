@@ -17,7 +17,7 @@
  * hands to sysio.swap's reservoir. Return recovery is request-keyed in sysio.synd;
  * `recredit` remains exceptional privileged supply repair.
  * Yield intake: sysio.swap's tick sells reservoir shadow and pays the proceeds in
- * through `addyield`, which also draws the kicker from T5 (sysio.system::fundclaim).
+ * through `addyield`, which distributes only the supplied WIRE proceeds.
  * Launch: `regliqpool` seeds the swap's yield pool inside the epoch-0 bootstrap window.
  *
  * Emergency stop: while the `sysio.andon` cord is pulled, `transfer` to anything but a
@@ -30,7 +30,6 @@
 
 #include <sysio/sysio.hpp>
 #include <sysio/asset.hpp>
-#include <sysio/kv_global.hpp>
 #include <sysio/kv_table.hpp>
 #include <sysio/kv_scoped_table.hpp>
 #include <sysio/opp/types/types.pb.hpp>
@@ -61,12 +60,8 @@ namespace sysio {
       /// treasury the bootstrap drains and the holder of the protocol's pool shares.
       static constexpr name SYSTEM_ACCOUNT = "sysio"_n;
 
-      /// The yield asset. The kicker arrives in it from sysio.system, so every
-      /// pot is in WIRE and nothing else.
+      /// The yield asset: every pot holds supplied WIRE proceeds.
       static constexpr symbol WIRE_SYM = opp::wire::asset_symbol;
-
-      /// The kicker at launch: 2% of every yield intake, drawn from T5.
-      static constexpr uint32_t DEFAULT_KICKER_BPS = 200;
 
       // -----------------------------------------------------------------------
       //  Deployment and governance
@@ -81,16 +76,8 @@ namespace sysio {
       /// Requires this contract's authority.
       [[sysio::action]] void create(symbol sym, sysio::slug_name chain_code, sysio::slug_name token_code);
 
-      /// Set the kicker, in basis points of each yield intake, for the intakes
-      /// from now on. Auth=sysio: council proposals execute as it.
-      [[sysio::action]] void setkicker(uint32_t bps);
-
-      /// Governance: mint `quantity` back to `holder` after its outpost refused
-      /// a de-syndication (reconciled from the outpost log). Requires this
-      /// contract's authority.
-      /// Legacy exceptional supply repair, still requiring this contract's authority. Normal external
-      /// return recovery must use sysio.synd::refundreturn so request identity and exactly-once handling
-      /// are enforced. This action is not evidence that an external return was rejected.
+      /// Privileged supply repair requiring this contract's authority; never recover a return
+      /// tracked in sysio.synd::returns, which must use request-keyed refundreturn instead.
       [[sysio::action]] void recredit(name holder, asset quantity);
 
       // -----------------------------------------------------------------------
@@ -158,13 +145,8 @@ namespace sysio {
       [[sysio::action]] void claim(name holder, symbol_code sym);
       /// Distribute `quantity` WIRE to `target`'s holders: the index advances by
       /// quantity / supply with the remainder carried and the WIRE is pulled from
-      /// `from` by inline transfer. The kicker is requested from T5 only when
-      /// `from` is the swap; any other donation distributes itself alone.
+      /// `from` by inline transfer. No treasury bonus is added.
       [[sysio::action]] void addyield(name from, asset quantity, symbol_code target);
-      /// Fold the kicker `fundclaim` delivered into `sym`'s index: what this
-      /// contract's WIRE balance now exceeds `base_balance` by, at most
-      /// `requested`. Inline from `addyield`; this contract's authority.
-      [[sysio::action]] void addkicker(symbol_code sym, int64_t base_balance, uint64_t requested);
 
       // -----------------------------------------------------------------------
       //  Launch ingestion (privileged caller, epoch-0 bootstrap window)
@@ -263,13 +245,6 @@ namespace sysio {
          return outstanding < range ? range - outstanding : 0;
       }
 
-      struct [[sysio::table("liqconfig")]] liq_config {
-         uint32_t kicker_bps = DEFAULT_KICKER_BPS;
-         SYSLIB_SERIALIZE(liq_config, (kicker_bps))
-      };
-
-      using liqconfig_t = kv::global<"liqconfig"_n, liq_config>;
-
    private:
       using ChainKind = opp::types::ChainKind;
       using u128      = opp::shadow::u128;
@@ -282,8 +257,6 @@ namespace sysio {
       ChainKind kind_of_chain(sysio::slug_name chain_code) const;
       /// `sym`'s index now; zero before the first distribution.
       u128 current_index(symbol_code sym) const;
-      /// This contract's WIRE balance on sysio.token; zero without a row.
-      int64_t wire_balance() const;
 
       /// The one funnel every balance move goes through: settle `row` at `index`,
       /// stamp it, then apply `delta`. Nothing else writes `balance`.

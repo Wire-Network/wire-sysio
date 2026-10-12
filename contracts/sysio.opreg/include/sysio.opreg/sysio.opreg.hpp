@@ -308,8 +308,8 @@ namespace sysio {
       void sweepyield(sysio::slug_name token_code);
 
       /// Permissionless: no authority is required, because the credit can only land in `account`'s
-      /// own `remitclaims{account, WIRE}` row -- a keeper may crank it, e.g. to rescue a TERMINATED
-      /// operator's yield before `prune` erases the row. First, when the registry's own `sysio.liq`
+      /// own `remitclaims{account, WIRE}` row. Banked yield survives pruning and re-registration in
+      /// `yielddebts`; no operator record is required to collect that debt. First, when the registry's own `sysio.liq`
       /// row is owed anything, pull it in (`opp::shadow::custody::pull`: push
       /// `sysio.liq::claim(self, symbol)` and add it to `yieldpool[token_code].received`); a failure
       /// in that claim reaches only whoever signed this action. Then settle the operator's
@@ -317,8 +317,8 @@ namespace sysio {
       /// `min(owed, received - credited)` to
       /// `remitclaims{account, opp::wire::token_code}`, taking it off the row; the operator pulls
       /// the WIRE with `claimremit(account, WIRE)`. Works in every status, including SLASHED (yield
-      /// earned before a slash stays claimable) and TERMINATED -- a terminated operator must claim
-      /// before `prune` erases its row, when anything still owed is forfeited (see `terminate`).
+      /// earned before a slash stays claimable) and TERMINATED. Neither removing the operator row
+      /// nor re-registering expires or redirects earned yield; unpaid debt never accrues new yield.
       ///
       /// Reverts with "no yield owed" when the row has earned nothing (or is not a shadow row), and
       /// with a rounding-dust message when all it is owed is dust the pool does not cover -- the
@@ -336,7 +336,8 @@ namespace sysio {
       /// first-come-first-served across operators, so a dust shortfall falls on whoever claims last,
       /// not on the row whose flooring created it. The mechanism
       /// is the `opp::shadow::custody` library; this contract supplies only the policy (which rows
-      /// earn, where credits go, and the claim window).
+      /// earn and where credits go). Debt and live yield share this same backing cap. A full WIRE
+      /// remit rejects the claim atomically rather than saturating away earned value.
       [[sysio::action]]
       void claimyield(name account, sysio::slug_name token_code);
 
@@ -505,25 +506,28 @@ namespace sysio {
          SYSLIB_SERIALIZE(remitclaim_key, (account)(token_code))
       };
 
-      static constexpr uint32_t REMIT_CLAIM_WINDOW_SEC = 365 * 24 * 60 * 60;
-
+      /// Returned collateral and credited yield remain available indefinitely, independently of operator records.
       struct [[sysio::table("remitclaims")]] remit_claim {
          sysio::name      account;
          sysio::slug_name token_code;            ///< Depot-native token owed: WIRE or a shadow LIQ code.
          uint64_t         balance        = 0;   ///< Atomic units of `token_code` owed, not yet claimed.
-         uint32_t         expires_at_sec = 0;   // recorded by `credit`; read by nothing yet (WIRE-339)
 
-         uint128_t by_expiry() const {
-            return (static_cast<uint128_t>(expires_at_sec) << 64) | account.value;
-         }
-
-         SYSLIB_SERIALIZE(remit_claim, (account)(token_code)(balance)(expires_at_sec))
+         SYSLIB_SERIALIZE(remit_claim, (account)(token_code)(balance))
       };
 
-      using remitclaims_t = sysio::kv::table<"remitclaims"_n, remitclaim_key, remit_claim,
-         sysio::kv::index<"byexpiry"_n,
-            sysio::const_mem_fun<remit_claim, uint128_t, &remit_claim::by_expiry>>
-      >;
+      using remitclaims_t = sysio::kv::table<"remitclaims"_n, remitclaim_key, remit_claim>;
+
+      /// Earned WIRE not yet covered by a shadow token's yield pool, retained across operator
+      /// pruning and re-registration. No new yield accrues here; only banked debt is transferred.
+      /// The wider accumulator preserves debts from repeated registrations without saturation.
+      struct [[sysio::table("yielddebts")]] yield_debt {
+         sysio::name      account;
+         sysio::slug_name token_code;
+         uint128_t        owed_wire = 0;
+         SYSLIB_SERIALIZE(yield_debt, (account)(token_code)(owed_wire))
+      };
+
+      using yielddebts_t = sysio::kv::table<"yielddebts"_n, remitclaim_key, yield_debt>;
 
       /// Key of a `yieldpool` row: the depot-native shadow token whose yield the row accounts for.
       struct yield_pool_key {

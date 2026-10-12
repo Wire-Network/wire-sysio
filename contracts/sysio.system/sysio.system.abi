@@ -675,20 +675,6 @@
             ]
         },
         {
-            "name": "fundclaim",
-            "base": "",
-            "fields": [
-                {
-                    "name": "recipient",
-                    "type": "name"
-                },
-                {
-                    "name": "amount",
-                    "type": "int64"
-                }
-            ]
-        },
-        {
             "name": "getsnaphash",
             "base": "",
             "fields": [
@@ -915,10 +901,6 @@
                 {
                     "name": "balance",
                     "type": "uint64"
-                },
-                {
-                    "name": "expires_at_sec",
-                    "type": "uint32"
                 }
             ]
         },
@@ -1627,10 +1609,6 @@
                     "type": "uint32[]"
                 },
                 {
-                    "name": "capital_shortfall_total",
-                    "type": "int64"
-                },
-                {
                     "name": "pending_nominal_slots",
                     "type": "uint64"
                 }
@@ -1977,11 +1955,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "fundclaim",
-            "type": "fundclaim",
-            "ricardian_contract": ""
-        },
-        {
             "name": "getsnaphash",
             "type": "getsnaphash",
             "ricardian_contract": ""
@@ -2315,14 +2288,7 @@
             "index_type": "i64",
             "key_names": ["account_name"],
             "key_types": ["uint64"],
-            "table_id": 829,
-            "secondary_indexes": [
-                {
-                    "name": "byexpiry",
-                    "key_type": "uint128",
-                    "table_id": 24323
-                }
-            ]
+            "table_id": 829
         },
         {
             "name": "payclaimtot",

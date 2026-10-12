@@ -19,7 +19,7 @@ through a claim action. All amounts are `WIRE` (9-decimal subunits).
 
 The curve decays from `annual_initial_emission` toward `annual_min_emission`
 (clamped by `annual_max_emission`), stops at `t5_floor`, and auto-throttles as
-`total_distributed` rises (capital claims count against it).
+`total_distributed` rises.
 
 ## How each bucket reaches its recipient
 
@@ -64,8 +64,7 @@ claim transfer.
 a claim needs `require_auth(account_name)`, `sysio.roa` forces
 `net_weight`/`cpu_weight` to zero for every `sysio`-prefixed account, and neither
 carries a contract that could emit the claim inline. They are protocol-owned
-holding accounts with no code, so the notify-handler risk does not apply — the
-same exception `fundclaim` makes for `sysio.dclaim`.
+holding accounts with no code, so the notify-handler risk does not apply.
 
 Producer pay is per block produced: the active slice of the producer pool is
 divided by the period's nominal slot count, raised to the blocks actually
@@ -146,7 +145,7 @@ first.
 
 The credited WIRE never leaves the treasury's token balance until it is claimed,
 so every gate that spends against that balance reserves it via the
-`payclaimtot.outstanding` counter: `fundclaim`'s balance cap, `sysio.epoch`'s
+`payclaimtot.outstanding` counter: `sysio.epoch`'s
 emissions readiness gate, and `claimnodedis`, which refuses a node-owner
 withdrawal that would eat into pay already owed. Without that reserve the
 treasury double-commits and a later claim fails on overdraw.
@@ -160,35 +159,20 @@ owner calls `claimnodedis` (auth = their own account) to transfer the
 newly-vested amount, gated by `min_claimable` (memo `Node Owner distribution`).
 `viewnodedist` is the read-only preview.
 
-### Staking rewards / capital -- `sysio.dclaim::claim(wire_account)`
+### LIQ yield and retired capital draws
 
-The capital bucket is the implicit remainder
-(`10000 - compute_bps - capex_bps - governance_bps`). It is NOT paid at
-payepoch; it stays in sysio's balance and drains lazily:
+LIQ holders receive only supplied WIRE yield proceeds and donations. The T5 yield bonus and
+`fundclaim` action are removed. Any unallocated emissions remainder stays in the treasury.
 
-1. A cross-chain `STAKING_REWARD` OPP message lands on `sysio.dclaim::onreward`.
-2. `onreward` credits the staker's `pclaims` (pending-claims) row (or parks it
-   in `unmapped` when the account is not yet AuthX-linked) and calls
-   `sysio.system::fundclaim` to pull matching WIRE from the pool into
-   `sysio.dclaim`.
-3. The staker calls `dclaim::claim` (auth = their own account) to transfer the
-   accumulated balance out (memo `sysio.dclaim claim`).
-
-`sysio.liq` draws through the same action: its `addyield` requests the yield
-kicker (`kicker_bps` of each intake from the swap, the intake that is yield) from
-the pool, so `fundclaim` names its recipient, which must be one of those two
-contracts.
-
-Unclaimed rows expire after `cap_config.claim_window_sec` and revert to the
-dclaim pool via `flushexpired`. `fundclaim` and the whole OPP inbound path are
-never-throw (transfers are capped / soft-dropped so a bad row cannot abort the
-message chain), whereas `claimnodedis` and `claim` are ordinary user actions
-that `check`-abort on bad input.
+The external staking-reward message and `sysio.dclaim::onreward` are removed. Pre-launch imports
+and already funded DClaim balances still link through AuthX and pay through
+`claim(wire_account)`. These balances never expire, including credits awaiting linking;
+they remain owed until claimed, and their rows retain RAM indefinitely.
 
 ## Category split (basis points)
 
 `compute_bps + capex_bps + governance_bps <= 10000`; the remainder is the
-implicit capital reserve drained through `fundclaim`. `producer_bps +
+unallocated treasury remainder. `producer_bps +
 batch_op_bps == 10000` (sub-split of compute). All set via `setemitcfg`.
 
 ```
@@ -199,7 +183,7 @@ period_emission
   |                       '-- batch_op_bps --> batch operators       (claimpay)
   |-- capex_bps ------> sysio.ops                                    (pushed)
   |-- governance_bps -> sysio.gov                                    (pushed)
-  '-- remainder ------> capital reserve -> sysio.dclaim / sysio.liq (fundclaim)  (claim)
+  '-- remainder ------> retained in sysio treasury
 ```
 
 ## Emission actions
@@ -215,7 +199,6 @@ period_emission
 | `accrueepoch` | `sysio.epoch` | Accrue this epoch's curve share |
 | `rcrdbatch` | `sysio.epoch` | Record the batch-operator roster for this accrued epoch |
 | `payepoch` | `sysio.epoch` | Distribute the period's compute / capex / governance (credits `payclaims`; pushes only the category buckets) |
-| `fundclaim` | the recipient: `sysio.dclaim` or `sysio.liq` | Lazy capital drain into the recipient (never-throw) |
 | `viewnodedist` | read-only | Preview a node owner's claimable amount |
 | `viewepoch` | read-only | Current treasury / next-emission estimate |
 | `viewemitcfg` | read-only | Current emission config |
@@ -239,4 +222,3 @@ period_emission
 - Driven inline by `sysio.epoch::advance` (`accrueepoch` + `rcrdbatch` + `payepoch`).
 - Reads producer eligibility and operator status from `sysio.opreg`.
 - Reads the canonical epoch duration from `sysio.epoch::epochcfg`.
-- Funds `sysio.dclaim` (staking rewards) and `sysio.liq` (the yield kicker) on demand via `fundclaim`.

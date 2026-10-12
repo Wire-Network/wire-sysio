@@ -30,7 +30,7 @@ Envelope (one per outpost per epoch, per direction)
 - **Epochs**: Time-bounded intervals managed by `sysio.epoch` — one global epoch clock for every chain. Each epoch has one group of batch operators on duty as relayers.
 - **Envelopes**: Epoch-level containers. Each envelope carries the epoch index and timestamp, its route endpoints, and `previous_envelope_hash` — the digest of the previous envelope on the same (depot, outpost) stream — so each direction forms a hash chain. An envelope is capped at 32,768 bytes on every chain.
 - **Messages**: Individual cross-chain payloads containing a header (message ID, sequence, checksum, encoding flags) and a payload (an array of attestation entries).
-- **Attestations**: Typed data units that represent cross-chain actions — operator rosters, liquidity syndication and desyndication, yield reports, node-owner registrations, staking rewards.
+- **Attestations**: Typed data units that represent cross-chain actions — operator rosters, liquidity syndication and desyndication, yield reports and node-owner registrations.
 
 ### Chain Addressing
 
@@ -71,7 +71,6 @@ This allows a single unified message format across all supported chains.
 | **Liquidity Syndication** | `SYNDICATE_LIQ`, `LIQ_YIELD` | outpost → depot | A user syndicating liq tokens into outpost custody; realized custody yield |
 | **Liquidity Desyndication** | `DESYNDICATE_LIQ` | depot → outpost | Return syndicated liq tokens to a holder on the outpost |
 | **Node Owners** | `NODE_OWNER_REG` | outpost → depot | Node-owner NFT committed on Ethereum, registering the owner on the depot |
-| **Staking** | `STAKING_REWARD` | outpost → depot | Per-staker reward credited to the `sysio.dclaim` claim ledger (validator-staking lifecycle types are reserved but deferred) |
 
 Cross-chain swaps routed through outposts, outpost reserves and outpost-side operator collateral have been removed. Swaps are a depot-local AMM (`sysio.swap`) with no outpost participation; operator collateral is held on the depot by `sysio.opreg`.
 
@@ -112,7 +111,7 @@ Holders of a node-owner NFT who commit it on the Ethereum outpost (`NODE_OWNER_R
 | **sysio.bond** | Generic bonded underwriting of provable statements |
 | **sysio.liq** | Shadow liq tokens (`LIQETH`, `LIQSOL`) minted against outpost custody, with a WIRE yield index |
 | **sysio.swap** | Depot-local constant-product AMM; every pair's second leg is WIRE |
-| **sysio.dclaim** | WIRE claim ledger (launch import, staking rewards) |
+| **sysio.dclaim** | Funded WIRE launch import, account linking and claims |
 | **sysio.andon** | Emergency stop: one cord freezing depot fund egress |
 | **sysio.roa** | Resources and node-owner registry |
 | **sysio.authex** | Links a depot account to its external-chain keys |

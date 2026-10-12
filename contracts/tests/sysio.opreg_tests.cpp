@@ -619,6 +619,41 @@ public:
          abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
+   /// Banked yield retained independently of an operator's registration, or zero when absent.
+   fc::uint128_t yield_debt(name account, std::string_view token_code = kLiqEthCodename) {
+      const auto data = get_row_by_id(OPREG_ACCOUNT, account, "yielddebts"_n, cn(token_code).value);
+      return data.empty() ? fc::uint128_t{0} : opreg_abi_ser.binary_to_variant(
+         "yield_debt", data, abi_serializer::create_yield_function(abi_serializer_max_time))["owed_wire"].as_uint128();
+   }
+
+   /// Seed an existing ledger field at an arithmetic boundary without issuing impossible token
+   /// supplies. Used only to verify that rejected claims/archival roll back the whole transaction.
+   void rewrite_claim_field(name table, const char* row_type, name account, std::string_view token_code,
+                            const char* field, const fc::variant& value) {
+      std::string key;
+      const auto append_word = [&](uint64_t word) {
+         for (int shift = 56; shift >= 0; shift -= 8) key.push_back(char(word >> shift));
+      };
+      if (table != "yieldpool"_n) append_word(account.to_uint64_t());
+      append_word(cn(token_code).value);
+      const auto& idx = control->db().get_index<kv_index, by_code_key>();
+      const auto it = idx.find(boost::make_tuple(OPREG_ACCOUNT, compute_table_id(table.to_uint64_t()),
+                                                std::string_view(key)));
+      BOOST_REQUIRE(it != idx.end());
+      const std::vector<char> data(it->value.data(), it->value.data() + it->value.size());
+      mvo row(opreg_abi_ser.binary_to_variant(row_type, data,
+         abi_serializer::create_yield_function(abi_serializer_max_time)).get_object());
+      row.set(field, value);
+      const auto encoded = opreg_abi_ser.variant_to_binary(row_type, row,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+      auto& db = const_cast<chainbase::database&>(control->db());
+      db.modify(*it, [&](auto& r) { r.value.assign(encoded.data(), encoded.size()); });
+      const std::vector<char> stored(it->value.data(), it->value.data() + it->value.size());
+      const auto observed = opreg_abi_ser.binary_to_variant(row_type, stored,
+         abi_serializer::create_yield_function(abi_serializer_max_time));
+      BOOST_REQUIRE_EQUAL(value.as_string(), observed[field].as_string());
+   }
+
    /// Operator-authorized pull of the `token_code` claim row.
    action_result claimremit(name account, std::string_view token_code) {
       return push_opreg_action(account, collateral_action::claimremit, mvo()
@@ -1768,10 +1803,8 @@ BOOST_FIXTURE_TEST_CASE(terminate_survives_operator_blocking_its_own_remit, sysi
    BOOST_REQUIRE_EQUAL(DEPOSIT, get_remitclaim(OPERATOR, kWireCodename)["balance"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
-// Positive control: a cooperative operator pulls its terminated collateral normally, and
-// the claim row is consumed. Pairs with the test above -- together they pin that the claimable
-// path pays everyone except the account that refuses payment.
-BOOST_FIXTURE_TEST_CASE(claimremit_pays_terminated_operator_and_clears_row, sysio_opreg_tester) { try {
+/// Returned collateral remains claimable after years of inactivity and operator pruning.
+BOOST_FIXTURE_TEST_CASE(claimremit_never_expires_and_clears_row_after_payment, sysio_opreg_tester) { try {
    const auto OPERATOR    = "batchop.a"_n;
    const uint64_t DEPOSIT = 5000;
 
@@ -1782,6 +1815,13 @@ BOOST_FIXTURE_TEST_CASE(claimremit_pays_terminated_operator_and_clears_row, sysi
    BOOST_REQUIRE_EQUAL(success(), deposit(OPERATOR, kWireCodename, DEPOSIT));
    BOOST_REQUIRE_EQUAL(success(), terminate(OPERATOR, "rolling-24h miss"));
 
+   BOOST_REQUIRE_EQUAL(DEPOSIT, get_remitclaim(OPERATOR, kWireCodename)["balance"].as_uint64());
+   constexpr uint32_t INACTIVE_DAYS = 3 * 365;
+   produce_block();
+   produce_block(fc::days(INACTIVE_DAYS));
+   produce_blocks(2);
+   BOOST_REQUIRE_EQUAL(success(), prune());
+   BOOST_REQUIRE(get_operator(OPERATOR).is_null());
    BOOST_REQUIRE_EQUAL(DEPOSIT, get_remitclaim(OPERATOR, kWireCodename)["balance"].as_uint64());
    const int64_t balance_before_claim = wire_balance(OPERATOR);
    BOOST_REQUIRE_EQUAL(success(), claimremit(OPERATOR, kWireCodename));
@@ -1966,6 +2006,10 @@ BOOST_FIXTURE_TEST_CASE(withdraw_shadow_flush_credits_token_claim_and_claimremit
    BOOST_REQUIRE_EQUAL(DEPOSIT, claim["balance"].as_uint64());
    BOOST_REQUIRE(get_remitclaim(OPERATOR, kWireCodename).is_null());
 
+   constexpr unsigned InactiveYears = 3;
+   produce_blocks();
+   produce_block(fc::days(InactiveYears * 365));
+   produce_blocks();
    const int64_t operator_shadow_before = shadow_balance(OPERATOR);
    const int64_t opreg_shadow_before    = shadow_balance(OPREG_ACCOUNT);
    BOOST_REQUIRE_EQUAL(success(), claimremit(OPERATOR, kLiqEthCodename));
@@ -2716,10 +2760,9 @@ BOOST_FIXTURE_TEST_CASE(yield_credit_never_exceeds_wire_received_from_liq, sysio
 
 /// Termination can pay only what the pool covers, since it cannot pull from sysio.liq. The rest --
 /// here a whole unswept distribution plus flooring dust -- stays banked on the terminated row, and
-/// the operator collects it with `claimyield`, which pulls first. Banked yield never makes the row
-/// unsettled: `prune` erases it with dust still owed once the claim window (the prune delay) ends,
-/// and that remainder is forfeited to the registry.
-BOOST_FIXTURE_TEST_CASE(terminated_operator_claims_uncovered_yield_before_prune, sysio_opreg_tester) { try {
+/// the operator collects it with `claimyield`, which pulls first. Pruning archives the remaining
+/// debt indefinitely without retaining the operator registration or spending WIRE collateral.
+BOOST_FIXTURE_TEST_CASE(terminated_operator_yield_survives_prune, sysio_opreg_tester) { try {
    const int64_t received = setup_yield_dust();
    BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));   // not swept before termination
    const int64_t a_owed = yield_reference::owed(kYieldBondA, liq_index(), 0);
@@ -2740,16 +2783,33 @@ BOOST_FIXTURE_TEST_CASE(terminated_operator_claims_uncovered_yield_before_prune,
    BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(dust),
                        depot_native_row(kYieldBonderA, kLiqEthCodename)["shadow_yield"]["owed_wire"].as_uint64());
 
-   // The dust does not hold the row: prune erases it after the delay and the dust is forfeited.
+   // The dust does not hold the operator row: pruning archives the exact amount owed.
    // Commit the claim first: a transaction left pending across the time jump would expire.
    produce_blocks();
    produce_block(fc::milliseconds(kDefaultPruneDelayMs));
    produce_blocks();
    BOOST_REQUIRE_EQUAL(success(), prune());
    BOOST_REQUIRE(get_operator(kYieldBonderA).is_null());
+   BOOST_REQUIRE_EQUAL(fc::uint128_t{static_cast<uint64_t>(dust)}, yield_debt(kYieldBonderA));
+
+   produce_blocks();
+   produce_block(fc::days(3 * 365));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(error(std::string(kYieldNotCoveredError)), claimyield(kYieldBonderA, kLiqEthCodename));
+   BOOST_REQUIRE_EQUAL(fc::uint128_t{static_cast<uint64_t>(dust)}, yield_debt(kYieldBonderA));
+
+   // Returned shadow still held by the registry earns slack; it can cover the debt without an
+   // operator record. A keeper can collect it only for the original account.
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   BOOST_REQUIRE_EQUAL(success(), push_opreg_action(kYieldKeeper, yield_action::claimyield, mvo()
+      (withdrawal_field::account, kYieldBonderA)(withdrawal_field::token_code, kLiqEthCodename)));
+   BOOST_REQUIRE_EQUAL(fc::uint128_t{0}, yield_debt(kYieldBonderA));
+   BOOST_REQUIRE(get_remitclaim(kYieldKeeper, kWireCodename).is_null());
+   BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(a_owed),
+                       get_remitclaim(kYieldBonderA, kWireCodename)["balance"].as_uint64());
 
    BOOST_REQUIRE_EQUAL(success(), claimremit(kYieldBonderA, kWireCodename));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(kYieldPrincipal), wire_balance(OPREG_ACCOUNT));
+   BOOST_REQUIRE_GE(wire_balance(OPREG_ACCOUNT), static_cast<int64_t>(kYieldPrincipal));
 } FC_LOG_AND_RETHROW() }
 
 /// `claimyield` is permissionless: a keeper with no stake cranks it for a TERMINATED operator whose
@@ -2800,10 +2860,9 @@ BOOST_FIXTURE_TEST_CASE(rebond_after_full_withdrawal_earns_nothing_for_the_gap, 
                        claim_yield_credit(kYieldBonderA));
 } FC_LOG_AND_RETHROW() }
 
-/// Re-registering a settled TERMINATED operator replaces its row, and with it any yield still
-/// banked on it -- the claim window closes -- while the claim rows termination already credited
-/// live in `remitclaims`, independent of the operator row, and still pay.
-BOOST_FIXTURE_TEST_CASE(reregistration_forfeits_banked_yield_but_keeps_remit_claims, sysio_opreg_tester) { try {
+/// Re-registration replaces only operator state: already-earned debt and backed remits remain
+/// payable, even though the new registration has no collateral or yield position.
+BOOST_FIXTURE_TEST_CASE(reregistration_preserves_banked_yield_and_remit_claims, sysio_opreg_tester) { try {
    // A is the only bonder, so the first sweep's pool covers exactly A's first share and the unswept
    // second distribution stays banked on A's row at termination.
    setup_yield_holders();
@@ -2816,12 +2875,13 @@ BOOST_FIXTURE_TEST_CASE(reregistration_forfeits_banked_yield_but_keeps_remit_cla
    const uint64_t covered = get_remitclaim(kYieldBonderA, kWireCodename)["balance"].as_uint64();
    BOOST_REQUIRE_LT(0u, covered);
    BOOST_REQUIRE_LE(covered, static_cast<uint64_t>(first_swept));
-   BOOST_REQUIRE_LT(0u, depot_native_row(kYieldBonderA, kLiqEthCodename)["shadow_yield"]["owed_wire"].as_uint64());
+   const uint64_t owed = depot_native_row(kYieldBonderA, kLiqEthCodename)["shadow_yield"]["owed_wire"].as_uint64();
+   BOOST_REQUIRE_LT(0u, owed);
 
    produce_blocks();
    BOOST_REQUIRE_EQUAL(success(), regoperator(kYieldBonderA, OPERATOR_TYPE_UNDERWRITER, /*is_bootstrapped=*/false));
-   BOOST_REQUIRE(depot_native_row(kYieldBonderA, kLiqEthCodename).is_null());   // banked yield gone with the row
-   BOOST_REQUIRE_EQUAL(error(std::string(kNoYieldOwedError)), claimyield(kYieldBonderA, kLiqEthCodename));
+   BOOST_REQUIRE(depot_native_row(kYieldBonderA, kLiqEthCodename).is_null());
+   BOOST_REQUIRE_EQUAL(fc::uint128_t{owed}, yield_debt(kYieldBonderA));
 
    BOOST_REQUIRE_EQUAL(covered, get_remitclaim(kYieldBonderA, kWireCodename)["balance"].as_uint64());
    BOOST_REQUIRE_EQUAL(kYieldBondA, get_remitclaim(kYieldBonderA, kLiqEthCodename)["balance"].as_uint64());
@@ -2829,6 +2889,134 @@ BOOST_FIXTURE_TEST_CASE(reregistration_forfeits_banked_yield_but_keeps_remit_cla
    BOOST_REQUIRE_EQUAL(success(), claimremit(kYieldBonderA, kWireCodename));
    BOOST_REQUIRE_EQUAL(wire_before + static_cast<int64_t>(covered), wire_balance(kYieldBonderA));
    BOOST_REQUIRE_EQUAL(success(), claimremit(kYieldBonderA, kLiqEthCodename));
+   BOOST_REQUIRE_EQUAL(success(), claimyield(kYieldBonderA, kLiqEthCodename));
+   const uint64_t paid = get_remitclaim(kYieldBonderA, kWireCodename)["balance"].as_uint64();
+   BOOST_REQUIRE_EQUAL(fc::uint128_t{owed}, fc::uint128_t{paid} + yield_debt(kYieldBonderA));
+} FC_LOG_AND_RETHROW() }
+
+/// Two retirement cycles accumulate debt under the same token; a fresh position earns only
+/// its own interval, and a single claim conserves both archived debt and current yield.
+BOOST_FIXTURE_TEST_CASE(repeated_reregistration_preserves_debt_and_live_yield, sysio_opreg_tester) { try {
+   setup_yield_holders();
+   fc::uint128_t total_debt = 0;
+   constexpr unsigned RetirementCycles = 2;
+   for (unsigned cycle = 0; cycle < RetirementCycles; ++cycle) {
+      BOOST_REQUIRE_EQUAL(success(), deposit(kYieldBonderA, kLiqEthCodename, kYieldBondA));
+      BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+      BOOST_REQUIRE_EQUAL(success(), terminate(kYieldBonderA, std::string(kTestTerminationReason)));
+      total_debt += depot_native_row(kYieldBonderA, kLiqEthCodename)["shadow_yield"]["owed_wire"].as_uint64();
+      produce_blocks();
+      BOOST_REQUIRE_EQUAL(success(), regoperator(kYieldBonderA, OPERATOR_TYPE_UNDERWRITER, false));
+      BOOST_REQUIRE_EQUAL(total_debt, yield_debt(kYieldBonderA));
+      BOOST_REQUIRE_EQUAL(success(), claimremit(kYieldBonderA, kLiqEthCodename));
+   }
+   BOOST_REQUIRE_EQUAL(success(), deposit(kYieldBonderA, kLiqEthCodename, kYieldBondA));
+   const auto checkpoint = liq_index();
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   const uint64_t new_yield = yield_reference::owed(kYieldBondA, liq_index(), checkpoint);
+   const int64_t credited = claim_yield_credit(kYieldBonderA);
+   const uint64_t live_owed = depot_native_row(kYieldBonderA, kLiqEthCodename)["shadow_yield"]["owed_wire"].as_uint64();
+   BOOST_REQUIRE_EQUAL(total_debt + new_yield,
+                       fc::uint128_t{static_cast<uint64_t>(credited)} + yield_debt(kYieldBonderA) + live_owed);
+   BOOST_REQUIRE_EQUAL(kYieldBondA, depot_native_row(kYieldBonderA, kLiqEthCodename)["balance"].as_uint64());
+   const int64_t before = wire_balance(kYieldBonderA);
+   BOOST_REQUIRE_EQUAL(success(), claimremit(kYieldBonderA, kWireCodename));
+   BOOST_REQUIRE_EQUAL(before + credited, wire_balance(kYieldBonderA));
+} FC_LOG_AND_RETHROW() }
+
+/// A full WIRE remit must reject collection: neither detached debt, the pool, nor
+/// the registry's unswept LIQ yield can be consumed by a saturating credit.
+BOOST_FIXTURE_TEST_CASE(full_remit_rolls_back_archived_yield_claim, sysio_opreg_tester) { try {
+   setup_yield_dust();
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   BOOST_REQUIRE_EQUAL(success(), terminate(kYieldBonderA, std::string(kTestTerminationReason)));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), regoperator(kYieldBonderA, OPERATOR_TYPE_UNDERWRITER, false));
+   const auto debt_before = yield_debt(kYieldBonderA);
+   const auto claim_before = get_remitclaim(kYieldBonderA, kWireCodename)["balance"].as_uint64();
+   const auto registry_before = wire_balance(OPREG_ACCOUNT);
+   const auto liq_owed_before = registry_liq_owed();
+   rewrite_claim_field("remitclaims"_n, "remit_claim", kYieldBonderA, kWireCodename, "balance",
+                       uint64_t{asset::max_amount});
+   constexpr auto FullRemitError = "assertion failure with message: claim WIRE remit before collecting more yield";
+   BOOST_REQUIRE_EQUAL(error(FullRemitError), claimyield(kYieldBonderA, kLiqEthCodename));
+   BOOST_REQUIRE_EQUAL(debt_before, yield_debt(kYieldBonderA));
+   BOOST_REQUIRE_EQUAL(registry_before, wire_balance(OPREG_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(liq_owed_before, registry_liq_owed());
+   rewrite_claim_field("remitclaims"_n, "remit_claim", kYieldBonderA, kWireCodename, "balance", claim_before);
+   produce_blocks();
+   const int64_t credited = claim_yield_credit(kYieldBonderA);
+   BOOST_REQUIRE_EQUAL(debt_before, fc::uint128_t{static_cast<uint64_t>(credited)} + yield_debt(kYieldBonderA));
+} FC_LOG_AND_RETHROW() }
+
+/// Archived debt can exceed one asset across registrations. Collection must fill at most one
+/// remit, preserve the remainder, and make progress again once that remit has been collected.
+BOOST_FIXTURE_TEST_CASE(large_archived_yield_collects_in_bounded_parts, sysio_opreg_tester) { try {
+   setup_yield_dust();
+   BOOST_REQUIRE_EQUAL(success(), terminate(kYieldBonderA, std::string(kTestTerminationReason)));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), regoperator(kYieldBonderA, OPERATOR_TYPE_UNDERWRITER, false));
+   const uint64_t old_credited = get_remitclaim(kYieldBonderA, kWireCodename)["balance"].as_uint64();
+   const uint64_t capacity = asset::max_amount;
+   const fc::uint128_t debt = fc::uint128_t{capacity} + 1;
+   // Boundary-only state injection: exercising arithmetic beyond a single token supply does not
+   // require minting that supply. No transfer is attempted against the synthetic backing pool.
+   rewrite_claim_field("yielddebts"_n, "yield_debt", kYieldBonderA, kLiqEthCodename, "owed_wire", debt);
+   rewrite_claim_field("yieldpool"_n, "yield_pool", kYieldBonderA, kLiqEthCodename, "received",
+                       old_credited + capacity + 1);
+   rewrite_claim_field("remitclaims"_n, "remit_claim", kYieldBonderA, kWireCodename, "balance", uint64_t{0});
+   BOOST_REQUIRE_EQUAL(success(), claimyield(kYieldBonderA, kLiqEthCodename));
+   BOOST_REQUIRE_EQUAL(capacity, get_remitclaim(kYieldBonderA, kWireCodename)["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(fc::uint128_t{1}, yield_debt(kYieldBonderA));
+   rewrite_claim_field("remitclaims"_n, "remit_claim", kYieldBonderA, kWireCodename, "balance", uint64_t{0});
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), claimyield(kYieldBonderA, kLiqEthCodename));
+   BOOST_REQUIRE_EQUAL(1u, get_remitclaim(kYieldBonderA, kWireCodename)["balance"].as_uint64());
+   BOOST_REQUIRE_EQUAL(fc::uint128_t{0}, yield_debt(kYieldBonderA));
+} FC_LOG_AND_RETHROW() }
+
+/// A downstream LIQ claim failure rolls back the predicted pool receipt, archived-debt debit
+/// and WIRE remit together; restoring LIQ lets the same entitlement be collected once.
+BOOST_FIXTURE_TEST_CASE(failed_liq_pull_preserves_archived_yield, sysio_opreg_tester) { try {
+   setup_yield_holders();
+   BOOST_REQUIRE_EQUAL(success(), deposit(kYieldBonderA, kLiqEthCodename, kYieldBondA));
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   BOOST_REQUIRE_EQUAL(success(), terminate(kYieldBonderA, std::string(kTestTerminationReason)));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), regoperator(kYieldBonderA, OPERATOR_TYPE_UNDERWRITER, false));
+   const auto debt_before = yield_debt(kYieldBonderA);
+   const auto balance_before = wire_balance(OPREG_ACCOUNT);
+   const auto owed_before = registry_liq_owed();
+   // The token dispatcher rejects LIQ's claim action. Keep LIQ's tables/ABI so the opreg
+   // preflight reads valid state and the queued downstream action is the failing boundary.
+   set_code(LIQ_ACCOUNT, contracts::token_wasm());
+   produce_blocks();
+   BOOST_REQUIRE(claimyield(kYieldBonderA, kLiqEthCodename) != success());
+   BOOST_REQUIRE_EQUAL(debt_before, yield_debt(kYieldBonderA));
+   BOOST_REQUIRE(get_remitclaim(kYieldBonderA, kWireCodename).is_null());
+   BOOST_REQUIRE_EQUAL(balance_before, wire_balance(OPREG_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(owed_before, registry_liq_owed());
+   set_code(LIQ_ACCOUNT, contracts::liq_wasm());
+   produce_blocks();
+   const auto credited = claim_yield_credit(kYieldBonderA);
+   BOOST_REQUIRE_EQUAL(debt_before, fc::uint128_t{static_cast<uint64_t>(credited)} + yield_debt(kYieldBonderA));
+} FC_LOG_AND_RETHROW() }
+
+/// A missing debt key for another token cannot consume the real token's pool or change its debt.
+BOOST_FIXTURE_TEST_CASE(archived_yield_keeps_token_identity, sysio_opreg_tester) { try {
+   setup_yield_holders();
+   BOOST_REQUIRE_EQUAL(success(), deposit(kYieldBonderA, kLiqEthCodename, kYieldBondA));
+   BOOST_REQUIRE_EQUAL(success(), addyield(kYieldDistribution));
+   BOOST_REQUIRE_EQUAL(success(), terminate(kYieldBonderA, std::string(kTestTerminationReason)));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), regoperator(kYieldBonderA, OPERATOR_TYPE_UNDERWRITER, false));
+   const auto debt_before = yield_debt(kYieldBonderA);
+   const auto registry_before = wire_balance(OPREG_ACCOUNT);
+   BOOST_REQUIRE_EQUAL(error(std::string(kNoYieldOwedError)), claimyield(kYieldBonderA, kWireCodename));
+   BOOST_REQUIRE_EQUAL(debt_before, yield_debt(kYieldBonderA));
+   BOOST_REQUIRE_EQUAL(fc::uint128_t{0}, yield_debt(kYieldBonderA, kWireCodename));
+   BOOST_REQUIRE_EQUAL(registry_before, wire_balance(OPREG_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(success(), claimyield(kYieldBonderA, kLiqEthCodename));
 } FC_LOG_AND_RETHROW() }
 
 // This is the dual-shadow producer flow's depot policy with generic symbols.

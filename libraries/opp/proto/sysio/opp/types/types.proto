@@ -215,8 +215,7 @@ message Reserve {
 // canonical 9-decimal frame: outpost-side producers convert chain-native
 // units at the boundary (EVM `PrecisionLib.toDepot`, SVM
 // `precision::to_depot`) before shipping, exactly like the swap-request
-// paths. Carried by RESERVE_CREATE (custodied external amount),
-// RESERVE_BALANCE_SHEET (per-reserve balance entries), and SLASH routing
+// paths. Carried by RESERVE_BALANCE_SHEET (per-reserve balance entries) and SLASH routing
 // (seized-funds destination).
 message ReserveAmount {
   uint64      chain_code   = 1;
@@ -256,7 +255,6 @@ enum AttestationType {
   // 60948 was ATTESTATION_TYPE_REMIT_CONFIRM — removed; do not reuse.
   ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS = 60943;
   ATTESTATION_TYPE_NODE_OWNER_REG = 60949;
-  ATTESTATION_TYPE_STAKING_REWARD = 60950;
   ATTESTATION_TYPE_STAKE_RESULT = 60951;
   ATTESTATION_TYPE_ATTESTATION_PROCESSING_ERROR = 60952;
 
@@ -270,9 +268,8 @@ enum AttestationType {
 
   // ---------------------------------------------------------------------------
   //  Reserve-flow attestations (data-model refactor, 2026-05-19)
-  //  Outpost-initiated reserve creation with depot-side matching handshake.
+  //  Retained cancellation and matching carriers for the retired reserve flow.
   // ---------------------------------------------------------------------------
-  ATTESTATION_TYPE_RESERVE_CREATE           = 60958; // 0xEE1E  outpost → depot
   ATTESTATION_TYPE_RESERVE_CREATE_CANCEL    = 60959; // 0xEE1F  outpost → depot
   ATTESTATION_TYPE_RESERVE_CREATE_CANCELLED = 60960; // 0xEE20  depot   → outpost
   ATTESTATION_TYPE_RESERVE_READY            = 60961; // 0xEE21  depot   → outpost

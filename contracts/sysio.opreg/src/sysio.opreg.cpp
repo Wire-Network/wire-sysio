@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <array>
 #include <cstring>
+#include <limits>
 
 namespace sysio {
 
@@ -56,6 +57,12 @@ constexpr std::string_view no_yield_owed_msg = "no yield owed";
 constexpr std::string_view yield_not_covered_msg =
    "owed yield is rounding dust the WIRE received from sysio.liq does not cover; only later slack can cover it";
 
+/// A corrupt or exhausted archived-debt accumulator cannot be erased with its operator record.
+constexpr std::string_view yield_debt_overflow_msg = "yield debt overflow";
+
+/// Collecting yield must not saturate away value already removed from a debt and backing pool.
+constexpr std::string_view yield_remit_full_msg = "claim WIRE remit before collecting more yield";
+
 /// Message of the `check` `sweepyield` raises for WIRE, which is not a shadow token.
 constexpr std::string_view wire_earns_no_yield_msg = "WIRE collateral earns no shadow yield";
 
@@ -92,16 +99,9 @@ bool earns_shadow_yield(sysio::slug_name chain_code, sysio::slug_name token_code
 void credit_remit_claim(name self, name account, sysio::slug_name token_code, uint64_t amount) {
    if (amount == 0) return;
 
-   // The expiry stamp is RECORDED, not acted on: no sweep is wired against `remitclaims` (see the
-   // note on the table). Refreshing it on every credit means an operator still being remitted
-   // never ages, so the stamp already carries the "last had activity" signal a future retention
-   // pass (WIRE-339) needs, rather than that history starting the day a sweep lands.
-   const uint32_t now_sec = current_time_point().sec_since_epoch();
-
    opreg::remitclaims_t claims(self);
    sysio::opp::claimable::credit(claims, ram_payer, opreg::remitclaim_key{account.value, token_code},
-                                 opreg::remit_claim{.account = account, .token_code = token_code}, amount,
-                                 now_sec + opreg::REMIT_CLAIM_WINDOW_SEC);
+                                 opreg::remit_claim{.account = account, .token_code = token_code}, amount);
 }
 
 uint64_t current_time_ms() {
@@ -173,6 +173,23 @@ bool is_fully_settled(const opreg::operator_entry& op) {
       if (bal.balance > 0) return false;
    }
    return true;
+}
+
+/// Preserve already-banked yield before erasing a principal-settled operator. Both callers are
+/// caller-signed actions, so an impossible accumulator overflow rejects the erase atomically.
+/// This does not create backed claims or touch a yield pool; claimyield later applies its cap.
+void preserve_yield_debt(name self, const opreg::operator_entry& op) {
+   opreg::yielddebts_t debts(self);
+   for (const auto& balance : op.balances) {
+      const uint64_t owed = balance.shadow_yield.owed_wire;
+      if (owed == 0) continue;
+      const opreg::remitclaim_key key{op.account.value, balance.token_code};
+      auto debt = debts.try_get(key).value_or(opreg::yield_debt{
+         .account = op.account, .token_code = balance.token_code});
+      check(debt.owed_wire <= ~uint128_t{0} - owed, yield_debt_overflow_msg);
+      debt.owed_wire += owed;
+      debts.upsert(ram_payer, key, debt);
+   }
 }
 
 } // anonymous namespace
@@ -308,6 +325,7 @@ void opreg::regoperator(name account,
       check(is_fully_settled(existing),
             "operator has unsettled collateral: a terminated operator may only "
             "re-register once its balances are drained");
+      preserve_yield_debt(get_self(), existing);
       ops.erase(op_pk);
    }
 
@@ -503,6 +521,15 @@ uint64_t balance_of(const opreg::operator_entry& o,
 
 namespace custody = opp::shadow::custody;
 
+/// Take backed yield up to the destination remit's remaining capacity, leaving the untaken
+/// entitlement on the original position. The custody helper remains the sole backing cap.
+uint64_t take_bounded_yield(custody::position& position, custody::yield_pool& pool, uint64_t limit) {
+   custody::position payable{.owed_wire = std::min(position.owed_wire, limit)};
+   const uint64_t taken = custody::take(payable, pool);
+   position.owed_wire -= taken;
+   return taken;
+}
+
 /// The `sysio.liq` shadow symbol behind depot-native `token_code`, or `std::nullopt` when the
 /// resolver finds none (WIRE, or an unknown code). Never throws, so the never-throw paths skip on
 /// `std::nullopt` -- impossible for a row that was bonded through the resolver.
@@ -526,13 +553,15 @@ std::optional<symbol_code> earning_symbol(const opreg::balance_entry& b) {
 /// covers (`custody::settle_and_take`); the uncovered rest stays banked on the row. Returns the
 /// amount taken, which the caller credits to the operator's WIRE claim; 0 for any other row. Never
 /// throws.
-uint64_t take_yield(name self, opreg::balance_entry& b) {
+uint64_t take_yield(name self, opreg::balance_entry& b,
+                    uint64_t limit = std::numeric_limits<uint64_t>::max()) {
    const auto sym = earning_symbol(b);
    if (!sym) return 0;
    opreg::yieldpool_t          pools(self);
    const opreg::yield_pool_key key{b.token_code};
    auto pool = pools.try_get(key).value_or(custody::yield_pool{});
-   const uint64_t taken = custody::settle_and_take(b.shadow_yield, b.balance, pool, opreg::LIQ_ACCOUNT, *sym);
+   custody::settle(b.shadow_yield, b.balance, custody::live_index(opreg::LIQ_ACCOUNT, *sym));
+   const uint64_t taken = take_bounded_yield(b.shadow_yield, pool, limit);
    if (taken > 0) pools.upsert(ram_payer, key, pool);
    return taken;
 }
@@ -1305,7 +1334,7 @@ void terminate_inline(name self, name account, const std::string& reason) {
    }
 
    // Settle earned shadow yield alongside principal, up to the yield pool balance.
-   // Uncovered yield stays banked for claimyield during the termination claim window.
+   // Uncovered yield stays banked for claimyield indefinitely, including after operator removal.
    std::vector<uint64_t> yield_credits;
    ops.modify(same_payer, op_pk, [&](auto& o) {
       o.status        = OperatorStatus::OPERATOR_STATUS_TERMINATED;
@@ -1381,34 +1410,63 @@ void opreg::sweepyield(sysio::slug_name token_code) {
 // claimyield - credit an operator's earned shadow yield to its WIRE claim row.
 //
 // Permissionless: the credit can only land in `account`'s own `remitclaims{account, WIRE}` row, so
-// anyone may crank it -- a keeper can rescue a TERMINATED operator's yield before `prune` erases the
-// row. First pulls whatever sysio.liq owes the registry's row into the pool, then credits the
+// anyone may crank it, including after pruning or re-registration archived the debt.
+// First pulls whatever sysio.liq owes the registry's row into the pool, then credits the
 // row's earned yield up to what the pool covers. Credits rather than transfers, like every other
 // payout here, so the WIRE leaves only through `claimremit` under the operator's own authority.
 // Allowed in any status: yield earned before a slash stays the operator's.
 void opreg::claimyield(name account, sysio::slug_name token_code) {
    operators_t ops(get_self());
    const auto  op_pk = operator_key{account.value};
-   check(ops.contains(op_pk), "operator not found");
+   yielddebts_t debts(get_self());
+   const remitclaim_key debt_key{account.value, token_code};
+   auto debt = debts.try_get(debt_key);
+   const bool has_operator = ops.contains(op_pk);
+   check(has_operator || debt.has_value(), "operator not found");
+
+   remitclaims_t claims(get_self());
+   const auto existing = claims.try_get(remitclaim_key{account.value, opp::wire::token_code});
+   const uint64_t balance = existing ? existing->balance : 0;
+   check(balance < opp::safe::depot_amount_max, yield_remit_full_msg);
+   const uint64_t room = opp::safe::depot_amount_max - balance;
 
    // WIRE and unknown codes have no shadow symbol and fall through to "no yield owed" below.
    if (const auto sym = shadow_symbol_of(token_code)) {
       pull_registry_yield(get_self(), token_code, *sym);
    }
 
-   uint64_t credited  = 0;
-   uint64_t remaining = 0;
-   ops.modify(same_payer, op_pk, [&](auto& o) {
-      for (auto& b : o.balances) {
-         if (b.chain_code == opp::wire::chain_code && b.token_code == token_code) {
-            credited  = take_yield(get_self(), b);
-            remaining = b.shadow_yield.owed_wire;
-         }
+   uint64_t credited = 0;
+   bool has_remaining = false;
+   if (debt) {
+      yieldpool_t pools(get_self());
+      const yield_pool_key pool_key{token_code};
+      auto pool = pools.try_get(pool_key).value_or(custody::yield_pool{});
+      custody::position banked{.owed_wire = static_cast<uint64_t>(
+         std::min(debt->owed_wire, uint128_t{std::numeric_limits<uint64_t>::max()}))};
+      const uint64_t taken = take_bounded_yield(banked, pool, room);
+      credited = taken;
+      debt->owed_wire -= taken;
+      has_remaining = debt->owed_wire > 0;
+      if (taken > 0) {
+         pools.upsert(ram_payer, pool_key, pool);
+         if (debt->owed_wire == 0) debts.erase(debt_key);
+         else debts.upsert(ram_payer, debt_key, *debt);
       }
-   });
-   check(credited > 0 || remaining > 0, no_yield_owed_msg);
+   }
+   if (has_operator) {
+      ops.modify(same_payer, op_pk, [&](auto& o) {
+         for (auto& b : o.balances) {
+            if (b.chain_code == opp::wire::chain_code && b.token_code == token_code) {
+               credited += take_yield(get_self(), b, room - credited);
+               has_remaining = has_remaining || b.shadow_yield.owed_wire > 0;
+            }
+         }
+      });
+   }
+   check(credited > 0 || has_remaining, no_yield_owed_msg);
    check(credited > 0, yield_not_covered_msg);
 
+   // Both takes were limited to the same remaining room, so credit cannot saturate away debt.
    // No OperatorAction names a yield claim, so none is appended to `recent_actions`.
    credit_remit_claim(get_self(), account, opp::wire::token_code, credited);
 }
@@ -1547,7 +1605,7 @@ void opreg::prune() {
    operators_t ops(get_self());
    auto status_idx = ops.get_index<"bystatus"_n>();
 
-   // Wait for both the retention delay and complete principal/yield settlement.
+   // Wait for the retention delay and principal settlement; preserve unpaid yield separately.
    // Count examined rows so unsettled entries cannot make this crank unbounded.
    uint32_t examined = 0;
    for (auto it = status_idx.lower_bound(
@@ -1559,6 +1617,7 @@ void opreg::prune() {
       const bool delay_elapsed = it->terminated_at > 0
                                  && now - it->terminated_at >= cfg.terminate_prune_delay_ms;
       if (delay_elapsed && is_fully_settled(*it)) {
+         preserve_yield_debt(get_self(), *it);
          it = status_idx.erase(std::move(it));
       } else {
          ++it;

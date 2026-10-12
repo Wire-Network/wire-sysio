@@ -551,44 +551,9 @@ DataStream& operator>>(DataStream& ds, NodeOwnerReg& t) {
    return ds >> t.owner_address >> t.token_id >> t.nft_address;
 }
 
-// StakingReward: the single staker-reward feedback path. `sysio.msgch`
-// dispatches the per-staker body to `sysio.dclaim::onreward` (the WIRE-side
-// claim ledger); the amount is already WIRE-denominated, so there is no
-// reserve leg. Field order mirrors the proto (1..7).
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const StakingReward& t) {
-   return ds << t.chain_code << t.staker_wire_account << t.share_bps
-             << t.reward_epoch_index << t.external_epoch_ref
-             << t.reward_amount << t.staker_native_address;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, StakingReward& t) {
-   return ds >> t.chain_code >> t.staker_wire_account >> t.share_bps
-             >> t.reward_epoch_index >> t.external_epoch_ref
-             >> t.reward_amount >> t.staker_native_address;
-}
-
 // ---------------------------------------------------------------------------
 //  Reserve-flow attestations
 // ---------------------------------------------------------------------------
-
-// ReserveCreate — reserve identity + custodied amount travel together in
-// `external_amount` (a depot-frame `ReserveAmount`); field order mirrors
-// the generated struct (proto fields 4,5,7,8,9,10,11,12).
-template <typename DataStream>
-DataStream& operator<<(DataStream& ds, const ReserveCreate& t) {
-   return ds << t.name << t.description
-             << t.requested_wire_amount << t.connector_weight_bps
-             << t.creator_addr << t.is_private << t.creator_pub_key
-             << t.external_amount;
-}
-template <typename DataStream>
-DataStream& operator>>(DataStream& ds, ReserveCreate& t) {
-   return ds >> t.name >> t.description
-             >> t.requested_wire_amount >> t.connector_weight_bps
-             >> t.creator_addr >> t.is_private >> t.creator_pub_key
-             >> t.external_amount;
-}
 
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const ReserveCreateCancel& t) {

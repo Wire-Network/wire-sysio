@@ -80,14 +80,12 @@ the 32-byte Ed25519 key on SVM, 0x-hex of the 33-byte **compressed** secp256k1
 point on EVM (never the 20-byte address). Each credit mints to the account that
 pubkey has linked through `sysio.authex`, or parks it until the link is made.
 
-### Defined but not consumed
+### Launch schema
 
-`bootstrap.proto` still defines `ReserveSpec`, `UwritConfig`,
-`BootstrapPlatformConfig.reserves`, `BootstrapPlatformConfig.uwrit` and
-`t5_reserve_allocation`, and both JSON files still carry values for them. The
-contracts they targeted (`sysio.reserv`, `sysio.uwrit`) have been removed, so no
-bootstrap action consumes them; only `test_bootstrap_platform_config.cpp` still
-parses and validates them (V6–V9).
+`ReserveSpec`, `UwritConfig`, `reserves`, `uwrit` and `t5_reserve_allocation` are removed from the
+pre-launch schema. Authored JSON uses schema version 1; strict parsing rejects removed keys.
+The DEX earmark alone is subtracted from the T5 allotment. Regenerate matching OPP models and
+bootstrap clients for a fresh deployment.
 
 ## T5 DEX earmark
 
@@ -127,7 +125,7 @@ validator in `test_bootstrap_platform_config.cpp` enforces:
 | V3 | chain codes unique; exactly one `CHAIN_KIND_WIRE` chain, code `WIRE` |
 | V4 | token codes unique; `chain_code` declared; `precision` ∈ 1..9 (the depot frame); native ⇔ kind `NATIVE` + empty address; non-native address well-formed for the chain kind (EVM `0x`+40 hex; SVM base58 → 32 bytes) |
 | V5 | exactly one native token per non-depot chain |
-| V6–V9 | checks on the unconsumed `reserves` / `uwrit` / `t5_reserve_allocation` fields (see [Defined but not consumed](#defined-but-not-consumed)) |
+| V6–V9 | retired with the external-reserve and underwriting configuration |
 | V10 | `t5_dex_allocation > 0` when any liq pool is seeded; Σ `liq_pools[].initial_wire_amount` ≤ `t5_dex_allocation` |
 | V11 | each liq pool references a declared `TOKEN_KIND_LIQ` token on its chain and is unique; `pair_symbol` 1..7 characters `[A-Z]`; seeds > 0; `fee ≤ 9999`; `conversion_horizon_sec > 0`; `depth_cap_bps` ∈ 1..10000; `clip_floor > 0` |
 | V12 | each syndication references a declared liq token on its chain; `pubkey` fits the chain family; `amount > 0` |

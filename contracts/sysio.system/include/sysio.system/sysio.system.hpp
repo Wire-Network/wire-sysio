@@ -689,8 +689,8 @@ namespace sysiosystem {
           * The T5 category buckets (`sysio.ops` capex, `sysio.gov` governance) are NOT credited
           * here — payepoch transfers to them directly. A claim needs `require_auth(account_name)`
           * and neither can ever produce it: `sysio.roa` forces `net_weight`/`cpu_weight` to zero
-          * for every `sysio`-prefixed account, so they cannot pay for a transaction, and unlike
-          * `sysio.dclaim` they carry no contract that could emit the claim inline. They are
+          * for every `sysio`-prefixed account, so they cannot pay for a transaction. They also
+          * carry no contract that could emit the claim inline. They are
           * protocol-owned holding accounts with no code, so the notify-handler threat the pull
           * model defends against does not exist for them. See the note at the push site in
           * emissions.cpp for the standing constraint that keeps it that way.
@@ -721,7 +721,7 @@ namespace sysiosystem {
           * `period_emission` is the gate-computed sum of pending accrued
           * emissions plus this epoch's per-epoch share. payepoch trusts that
           * value (single-trx semantics make recomputation unnecessary) and
-          * distributes it across producer / batch / capital / capex / gov
+          * distributes it across producer / batch / capex / gov
           * pools as today, scaled to the period.
           *
           * `batch_op_groups` is retained as an ABI-compatible reserved field;
@@ -778,27 +778,6 @@ namespace sysiosystem {
           */
          [[sysio::action]]
          void rcrdbatch(uint32_t epoch_index, std::vector<sysio::name> members);
-
-         /**
-          * Fund a capital draw against the T5 drainable pool for `recipient`,
-          * one of the two drains: sysio.dclaim, inline from its `onreward` as
-          * each STAKING_REWARD lands, and sysio.liq, inline from its `addyield`
-          * for the kicker on each yield intake. The recipient is funded the
-          * moment its ledger row is written, so a claim can follow at once.
-          * Auth: the recipient.
-          *
-          * Never throws for those two callers (OPP-handler never-throw
-          * contract): if the pool cannot cover `amount`, the transfer caps at
-          * what's available and the unfunded delta is accrued to
-          * t5state.capital_shortfall_total for operator visibility. Any other
-          * recipient is refused.
-          *
-          * Amounts actually transferred count toward t5state.total_distributed
-          * so the emission curve auto-throttles via its remaining-headroom
-          * clamp.
-          */
-         [[sysio::action]]
-         void fundclaim(sysio::name recipient, int64_t amount);
 
          /**
           * Read-only: current T5 treasury emission state.

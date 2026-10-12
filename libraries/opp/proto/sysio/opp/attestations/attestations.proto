@@ -371,46 +371,6 @@ message NodeOwnerReg {
   sysio.opp.types.ChainAddress nft_address   = 3;
 }
 
-// Staking reward distribution (Outpost -> Depot), per staker per source-chain
-// reward period.
-//
-// Emitted by an outpost when a staker's slice of a validator-reward
-// distribution has been computed. The amount arrives already
-// WIRE-denominated; the native -> WIRE conversion and the per-staker
-// proration are done outpost-side. `sysio.msgch` dispatches the per-staker
-// body to `sysio.dclaim::onreward`, which credits the staker's claim ledger
-// directly without re-splitting (`pending_claims` if the staker has an
-// AuthX-linked WIRE account, otherwise parked in `unmapped_tokens` keyed by
-// the native address until they link).
-message StakingReward {
-  // Chain code emitting the reward — identifies the (chain, validator) context.
-  uint64                       chain_code = 1;
-  // The staker's WIRE account. May be empty when the staker has not yet
-  // completed AuthX linking; in that case the depot parks the reward by
-  // `staker_native_address` until the link sweep moves it to the claim ledger.
-  sysio.opp.types.WireAccount  staker_wire_account = 2;
-  // The staker's share of the reward in basis points (10000 = 100%).
-  // Informational / audit only — `reward_amount` is already the staker's
-  // absolute, already-prorated portion (the depot does not re-split).
-  uint32                       share_bps = 3;
-  // WIRE epoch index in which this reward is being recorded. Informational for
-  // roll-up / audit; dedupe and pruning key off `external_epoch_ref`.
-  uint32                       reward_epoch_index = 4;
-  // Source-chain reward-period reference (the external chain's epoch / period
-  // number for this distribution). Monotonic per (outpost, staker); the depot
-  // dedupes and rolls up against it and rejects anything at or below the last
-  // processed value, so no per-period history is retained (data-leak safe).
-  uint64                       external_epoch_ref = 5;
-  // Absolute reward amount being credited, already WIRE-denominated: the outpost
-  // does the native -> WIRE conversion and source-chain precision scaling, so the
-  // depot credits reward_amount.amount as WIRE directly.
-  sysio.opp.types.TokenAmount  reward_amount = 6;
-  // The staker's native (ETH / SOL / ...) address — the address they staked
-  // from. Always populated so a not-yet-linked staker's reward can be parked
-  // and made claimable the moment they complete AuthX linking.
-  sysio.opp.types.ChainAddress staker_native_address = 7;
-}
-
 message StakeResult {
   sysio.opp.types.ChainAddress owner_address = 1;
   sysio.opp.types.TokenAmount  amount        = 2;
@@ -425,67 +385,7 @@ message AttestationProcessingError {
   string                           error_message  = 4;
 }
 
-// ---------------------------------------------------------------------------
-//  Reserve creation flow (outpost-initiated, depot-matched)
-//
-//  Lifecycle:
-//    1. User calls outpost `create_reserve(...)`. Outpost takes external_token_amount
-//       custody, inserts a local PENDING reserve record, queues RESERVE_CREATE.
-//    2. Depot receives RESERVE_CREATE → `sysio.reserv::oncrtreserve(...)` inserts
-//       a row with status=PENDING (creator_addr remembered for cancel refund).
-//    3. Any WIRE account calls `sysio.reserv::matchreserve(...)` putting up
-//       requested_wire_amount WIRE → status flips to ACTIVE → RESERVE_READY queued.
-//    4. Outpost dispatches RESERVE_READY → marks local reserve ACTIVE; reserve
-//       is now usable for swap routing.
-//
-//  Cancel path (anywhere before match wins):
-//    a. Creator calls outpost `cancel_create_reserve(...)`. Outpost queues
-//       RESERVE_CREATE_CANCEL. DOES NOT mutate local state.
-//    b. Depot receives RESERVE_CREATE_CANCEL:
-//          - If status == PENDING: set to CANCELLED, queue RESERVE_CREATE_CANCELLED.
-//          - Else (race lost to match): silent no-op per
-//            feedback_opp_handlers_never_throw.md — no attestation emitted.
-//    c. Outpost dispatches RESERVE_CREATE_CANCELLED → refunds the original
-//       external_token_amount to creator_addr; marks local reserve CANCELLED.
-// ---------------------------------------------------------------------------
-
-// Outpost -> Depot. Open a new PENDING reserve.
-message ReserveCreate {
-  // (fields 1-3 + 6 retired — the reserve identity and the custodied
-  //  amount now travel together in `external_amount`, see below.)
-  reserved 1, 2, 3, 6;
-  reserved "chain_code", "token_code", "reserve_code", "external_token_amount";
-  string                        name                   = 4;
-  string                        description            = 5;
-  uint64                        requested_wire_amount  = 7;
-  uint32                        connector_weight_bps   = 8;   // Bancor WIRE-side weight in bps (1..9999); 10000 is rejected by oncrtreserve (zero token-side weight = dead reserve).
-  sysio.opp.types.ChainAddress  creator_addr           = 9;   // refund target on cancel
-  // Private reserves restrict swap counterparts to reserve_codes owned by the
-  // same WIRE account (ownership = the authex-linked account that matches).
-  // Immutable after create.
-  bool                          is_private             = 10;
-  // The creator's chain public key, used by the depot to resolve the creator's
-  // authex link (`sysio.authex::links.bypubkey`). EVM chains: REQUIRED — the
-  // 33-byte compressed secp256k1 key, verified on-outpost to derive to
-  // msg.sender (a 20-byte EVM address cannot be reverse-mapped to a key).
-  // SVM chains: may be empty — `creator_addr.address` already IS the signer's
-  // 32-byte ed25519 public key and the depot falls back to it.
-  bytes                         creator_pub_key        = 11;
-  // Reserve identity — (chain_code = the outpost's own chain, reserve_code,
-  // amount.token_code) — plus the custodied external-token amount, in the
-  // depot's canonical 9-decimal frame. The outpost converts its chain-native
-  // escrow units at the boundary (EVM `PrecisionLib.toDepot`, SVM
-  // `precision::to_depot`) exactly like the swap paths; the outpost's LOCAL
-  // reserve record keeps the raw chain-native amount for refunds.
-  sysio.opp.types.ReserveAmount external_amount        = 12;
-  // Depot-frame decimal precision of the reserve's source token side = min(native, 9):
-  // the outpost downscales anything above the 9-dec frame cap at its boundary
-  // and reports the frame precision it used here, so the depot's reserve row is
-  // self-describing and never assumes 9. The WIRE/target side is always the WIRE
-  // token's 9 (WIRE_PRECISION), so it is not carried.
-  uint32                        source_token_precision = 13;
-}
-
+// Retained carriers for the retired reserve cancellation/matching lifecycle.
 // Outpost -> Depot. Creator cancels their PENDING reserve.
 message ReserveCreateCancel {
   uint64                       chain_code   = 1;

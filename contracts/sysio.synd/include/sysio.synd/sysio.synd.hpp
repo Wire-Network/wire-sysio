@@ -242,10 +242,13 @@ namespace sysio {
       /// of zero burst, releases no syndication of the pair; and a shadow whose precision is below
       /// `bond::BOND_INCREMENT_DECIMALS` can never be underwritten, so every envelope of it waits (only
       /// `dropenv` clears one). Auth=sysio.
+      /// `min_desyndicate` is a positive gross quantity in shadow base units, at most a nonzero
+      /// desyndication burst. Every configuration supplies this value explicitly.
       [[sysio::action]] void setconfig(sysio::slug_name chain_code, sysio::slug_name token_code,
                                        uint32_t synd_fee_bps, uint32_t desynd_fee_bps, uint64_t synd_burst,
                                        uint64_t synd_refill, uint64_t desynd_burst, uint64_t desynd_refill,
-                                       uint32_t window_sec, uint64_t bounty, uint64_t challenge_extra);
+                                       uint32_t window_sec, uint64_t bounty, uint64_t challenge_extra,
+                                       uint64_t min_desyndicate);
 
       /// Run bounded outcome synchronization, FIFO release, and underwriting, in that order. Sync
       /// visits at most `limit` envelopes; underwriting and release each have `limit` work units and
@@ -603,8 +606,9 @@ namespace sysio {
          uint32_t         window_sec       = DEFAULT_WINDOW_SEC;   ///< challenge window of each request
          uint64_t         bounty           = 0;   ///< bounty posted on each request, paid from `feepot`
          uint64_t         challenge_extra  = 0;   ///< charged to a challenger on top of the hold bond
+         uint64_t min_desyndicate; ///< Positive gross return minimum.
          SYSLIB_SERIALIZE(synd_config, (chain_code)(token_code)(synd_fee_bps)(desynd_fee_bps)(synd_burst)
-                          (synd_refill)(desynd_burst)(desynd_refill)(window_sec)(bounty)(challenge_extra))
+                          (synd_refill)(desynd_burst)(desynd_refill)(window_sec)(bounty)(challenge_extra)(min_desyndicate))
       };
 
       /// Rules by outpost and token.

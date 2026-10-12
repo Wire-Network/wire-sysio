@@ -42,22 +42,28 @@ and `OLD_ETH_PANIC` (when the panic account is replaced), `PAUSE_BLOCK` (the Eth
 first `pause()`), `REQUEST_ID` (a deferred desyndication being paid), `RELAY_SIGNER` (a Solana
 relay signer's public key), and, for an envelope in doubt, `CHALLENGER`, `CHAIN_CODE`, `TOKEN_CODE`,
 `EPOCH_INDEX` and `BOND_REQUEST_ID` (see [Holding and ruling](#holding-and-ruling-steps-5-and-6)), and,
-for a skipped desyndication being recredited, `HOLDER` and `QUANTITY` (see
-[Reconciling](#reconciling-a-desyndication-the-outpost-did-not-pay)).
+for return resolution, `REQUEST_ID` alone (see
+[Reconciling](#reconciling-a-desyndication-the-outpost-did-not-pay)). Pair-level custody reconciliation
+uses `CHAIN_CODE`, `TOKEN_CODE` and `REPORTED` (verified live custody in base units).
 
 Ethereum transactions below are sent with Foundry's `cast` and a keystore named with `--account`
 (`--ledger` works the same way). `SyndicationPool` is not deployed in any environment yet
 (wire-ethereum `docs/deploy.md`, Rollout); until it is, skip its lines.
 
 Every `clio get table` is written in the v6 form `clio get table <code> <table> -S <scope>`. The tables
-read here (`sysio.andon` `cord` and `andonconfig`, `sysio.synd` `envelopes`, `ledger`, `syndcursors` and
-`desyndlog`, `sysio.epoch` `epochstate`, `sysio.msgch` `envlog`) are unscoped KV tables stored under
+read here (`sysio.andon` `cord`, `sysio.synd` `envelopes`, `ledger`, `syndcursors` and
+`returns`, `sysio.bond` `requests`, `sysio.epoch` `epochstate`, `sysio.msgch` `envlog`) are unscoped KV tables stored under
 their contract's own account, so the scope is the contract account; rows come back as `{key, value}`.
 
 Depot actions signed by `sysio` are shown as `-p sysio@active`. Where `sysio` is held by a multisig,
 propose the same action and data with `clio multisig propose` and execute it once approved.
 
 ## Before an incident
+
+Fund each designated challenger with the relevant shadow LIQ token before a freeze, enough for
+the request hold bond plus the pair's `challenge_extra`. While frozen, `sysio.liq::transfer`
+refuses funding an ordinary challenger account; transfers from an already funded challenger
+into protocol custody remain allowed.
 
 Each item is a deploy or upgrade step. An item not done is a freeze that cannot be pulled.
 
@@ -227,15 +233,19 @@ Pausing a paused contract reverts (`EnforcedPause`), which is harmless: it was a
 | 2 | Replace the panic account in case its key is the fault ([Replacing the panic account](#replacing-the-panic-account)). | Skip. |
 | 3 | Record the block, the epoch and the last accepted envelope digest on each chain ([Recording](#recording-the-state-of-each-chain)). | Same. |
 | 4 | Read the depot's `mismatch` table and each outpost's shortfall records, and compare each outpost's custody with the depot's outstanding shadow ([Comparing totals](#comparing-totals), [A shortfall-triggered pull](#a-shortfall-triggered-pull)). | Same. No new `mismatch` row; custody covers the outstanding. |
-| 5 | For each envelope in doubt, place a hold (`sysio.synd::challenge`), or rule it invalid (`sysio.bond::rslvinvalid`) if it is unbonded. | None. |
+| 5 | Before each request's challenge window ends, hold every doubtful OPEN/BONDED request (`sysio.synd::challenge`) or obtain a governance invalid ruling (`sysio.bond::rslvinvalid`). | None. |
 | 6 | `sysio` rules each held request (`rslvvalid` / `rslvinvalid`). Invalid envelopes burn as in §4.7 once the cord clears. | None. |
 | 7 | Fix and redeploy the faulty contract while still frozen, in the order of [`contract-upgrade-order.md`](contract-upgrade-order.md). | None. |
-| 8 | Repair custody and clear the outposts first. Have each repaired outpost emit a post-repair message (or wait for its next one); wait for depot admission, verify its sequence in `syndcursors` and no `mismatch` row for it, then clear the depot cord and do the work that waited ([Clearing](#clearing-outposts-first-then-the-depot)). | Same admission check before clearing the depot. |
+| 8 | Repair custody and clear the outposts first. Have each repaired outpost emit a post-repair message (or wait for its next one); wait for depot admission, verify its admission and healthy custody report, run governance `reconcile` for every affected pair, verify its incident is erased, then clear the depot cord and do the work that waited ([Clearing](#clearing-outposts-first-then-the-depot)). | Same admission check before clearing the depot. |
 | 9 | Continue monitoring admitted messages from each outpost for `mismatch` rows and `SHORTFALL` ([Comparing totals](#comparing-totals)). Record earlier pre-repair sequences reporting the known shortfall as part of this incident. | Same. |
 | 10 | Write up the cause and what was burned or returned ([What to record](#what-to-record)). | Write up what triggered the pull. |
 
-Challenge windows keep counting during a freeze and challenges stay open, so step 5 can be done while
-frozen. A frozen queue step still issues requests, so `crank` during the freeze gives every WAITING
+Challenge windows keep counting during a freeze. Read `sysio.bond::requests`: a BONDED request
+becomes eligible for permissionless approval at `bonded_at + window_sec`; an OPEN request has
+no running challenge deadline yet. `approve` ignores the cord. A challenge or `rslvinvalid`
+still works after the deadline while the request remains OPEN/BONDED, but approval can win
+that race at any time. Once APPROVED, neither intervention is allowed and held items release
+after clear. Act before approval eligibility whenever possible. A frozen queue step still issues requests, so `crank` during the freeze gives every WAITING
 envelope a request to hold or rule.
 
 ### Holding and ruling (steps 5 and 6)
@@ -243,6 +253,7 @@ envelope a request to hold or rule.
 ```bash
 clio -u "$DEPOT_URL" get table sysio.synd envelopes -S sysio.synd -r -l 50   # chain_code, token_code, epoch_index, state, request_id
 clio -u "$DEPOT_URL" push action sysio.synd crank '[256]' -p "$PANIC@active"   # issues the requests of WAITING envelopes
+clio -u "$DEPOT_URL" get table sysio.bond requests -S sysio.bond -l 100   # match request_id; state, bonded_at, window_sec; read every result page
 clio -u "$DEPOT_URL" push action sysio.synd challenge \
   "{\"challenger\": \"$CHALLENGER\", \"chain_code\": $CHAIN_CODE, \"token_code\": $TOKEN_CODE, \"epoch_index\": $EPOCH_INDEX}" \
   -p "$CHALLENGER@active"
@@ -253,8 +264,7 @@ clio -u "$DEPOT_URL" push action sysio.bond rslvvalid   "[$BOND_REQUEST_ID]" -p 
 `CHAIN_CODE` and `TOKEN_CODE` are the `chain_code` and `token_code` objects exactly as the `envelopes`
 row prints them, `EPOCH_INDEX` its `epoch_index`, and `BOND_REQUEST_ID` its `request_id`. `challenge`
 accepts only an envelope in state REQUESTED, RELEASABLE or DONE whose request is OPEN or BONDED: a
-WAITING envelope has no request yet, so run `crank` first. `CHALLENGER` must be an account with no
-contract code, and not `sysio.synd` or `sysio.bond`. The challenger pays the request's hold bond plus the pair's `challenge_extra`; both transfers go into
+WAITING envelope has no request yet, so run `crank` first. `CHALLENGER` must not be `sysio.synd` or `sysio.bond`; contract accounts are supported through ledger settlement. The challenger pays the request's hold bond plus the pair's `challenge_extra`; both transfers go into
 custody, so the challenge runs while the depot is frozen. `rslvinvalid` rules a request bonded or not,
 so an unbonded envelope in doubt is ruled invalid directly. The queue records each ruling on its next
 step; while the cord is pulled the burn of an INVALID envelope and the forward of a VALID ruling's hold
@@ -317,11 +327,11 @@ of the token (the `sysio.liq` supply plus the yield in `liqpending`) as it admit
 it is written to `mismatch` and pulls the cord. Custody above it is normal and only printed as `EXCESS`.
 
 ```bash
-clio -u "$DEPOT_URL" get table sysio.synd mismatch -S sysio.synd -l 100   # every shortfall: chain_code, token_code, epoch_index, sequence, kind, reported, expected, at
+clio -u "$DEPOT_URL" get table sysio.synd mismatch -S sysio.synd -l 100   # latest unresolved incident per pair: chain_code, token_code, epoch_index, sequence, kind, reported, expected, at
 clio -u "$DEPOT_URL" get table sysio.liq stat -S sysio.liq                 # supply per shadow symbol
 clio -u "$DEPOT_URL" get table sysio.liq liqpending -S sysio.liq           # released yield not yet queued
 clio -u "$DEPOT_URL" get table sysio.synd syndcursors -S sysio.synd        # last_sequence admitted per outpost
-clio -u "$DEPOT_URL" get table sysio.synd desyndlog -S sysio.synd -r -l 20 # total_syndicated each desyndication carried
+clio -u "$DEPOT_URL" get table sysio.synd returns -S sysio.synd -r -l 20 # outstanding unpaid return obligations
 cast call --rpc-url "$ETH_RPC_URL" "$SYNDICATION_POOL" 'poolBalanceDepot()(uint64)'
 cast call --rpc-url "$ETH_RPC_URL" "$SYNDICATION_POOL" 'liqSequence()(uint64)'
 ```
@@ -331,23 +341,25 @@ and `status` on Solana (`liq_sequence`, the pool ATA balance). What to check:
 - Each `mismatch` row names the outpost, token and sequence of the message that reported the shortfall,
   the custody it reported and the outstanding it was compared with (`expected`). Match the sequence to
   the outpost's `synd` call (Solana) or `Syndicated` / yield event (Ethereum) to find the envelope.
-  Rows are never pruned; note the last one read, so the next reading shows only new rows.
+  There is one row per `(chain_code, token_code)`: each new shortfall overwrites it. Snapshot
+  every observed row and its admission trace externally. Only governance `reconcile` erases it;
+  a later healthy report does not erase the incident.
 - Now: each outpost's custody (the Solana pool ATA, `poolBalanceDepot`) is at least the depot's
   outstanding for its token (`supply` plus `liqpending`). Messages in flight only widen the margin: an
-  unpaid or pending desyndication, an INVALID burn and a `recredit` all leave custody above the
+  unpaid or pending desyndication, an INVALID burn and a request-keyed `refundreturn` all leave custody above the
   outstanding.
 - `syndcursors.last_sequence` for an outpost is at most the outpost's sequence (`liqSequence` /
   `liq_sequence`); the gap is messages the depot has not yet admitted, and so not yet compared.
-- Every `desyndlog` request id the outpost has not paid is still in flight on the depot, stored as a
+- Every `returns` request id the outpost has not paid is still in flight on the depot, stored as a
   pending payout on the outpost ([Deferred desyndications](#deferred-desyndications)), or skipped by the
-  outpost; a skipped one is reconciled by the recredit rule
+  outpost; a permanently cancelled one is reconciled by the return recovery rule
   ([Reconciling](#reconciling-a-desyndication-the-outpost-did-not-pay)).
 - Between two readings during a freeze, no outpost custody balance falls.
 
 
 ### Reconciling a desyndication the outpost did not pay
 
-Match every `desyndlog` request id with the outpost's record of it. Each one is paid, stored or skipped
+Match every `returns` request id with the outpost's record of it. Each one is paid, stored or skipped
 ([`sysio-synd.md`](sysio-synd.md), Desyndication):
 
 - **Paid**: Solana logs `opp_outpost: desyndicate_liq: paid ... request_id=<id>` (wire-solana
@@ -357,37 +369,51 @@ Match every `desyndlog` request id with the outpost's record of it. Each one is 
   `desyndicationsPaid(requestId)` is true.
 - **Stored**: a `PendingPayout` exists at `["pending_desyndication", request_id_le8]` (`npx ts-node scripts/wire-config/emergencyStop.ts
   pending`), or `pendingDesyndications(requestId)` has a non-zero `depotAmount`. Pay it
-  ([Deferred desyndications](#deferred-desyndications)). Never recredit it.
+  ([Deferred desyndications](#deferred-desyndications)). Keep the depot return row; never refund a pending or still-payable payout.
 - **Skipped**: Solana logged `opp_outpost: DesyndicateLIQError ... request_id=<id> err_data=<reason>`
   (`inbound.rs:4986-4994`) for a content or configuration refusal; Ethereum emitted
   `DesyndicationDropped(requestId, depotAmount, reason)` with `wrong chain`,
   `wrong token`, `amount out of range` or `unresolvable recipient` (wire-ethereum
   `contracts/outpost/SyndicationPool.sol:594-618` at d4fbb8f8).
 
-**The recredit rule.** Governance returns the shadow of a skipped desyndication with
-`sysio.liq::recredit`, and only after confirming the outpost holds no record of the request and never
-paid it:
+**The return recovery rule.** Read the request in `sysio.synd::returns`, which retains its original
+holder, token and net burned amount. Establish the external outcome with transaction finality and
+the outpost's paid/pending records. A timeout, absence of a pending record, a duplicate event or a
+rejected submission alone does not prove cancellation: a queued or replayable payout may still pay.
+
+- **Paid and final:** governance calls `finishreturn(request_id)` to erase the depot obligation;
+  it mints nothing.
+- **Pending, stored or still payable:** keep the depot row and pay/retry on the outpost. Never refund.
+- **Irreversibly rejected or cancelled:** only after proving nothing was paid and no payable external
+  obligation remains, governance calls `refundreturn(request_id)`. It restores exactly the net burned
+  amount to the original holder and erases the row atomically. A duplicate refund fails. The fee
+  stays collected. Governance can resolve returns while the depot is frozen: restoring shadow
+  mints into custody accounting without paying out external assets.
 
 ```bash
-# Solana: the PendingPayout PDA of REQUEST_ID must not exist
-ANCHOR_PROVIDER_URL="$SOL_RPC" ANCHOR_WALLET="$SOL_CRANK_KEYPAIR" npx ts-node scripts/wire-config/emergencyStop.ts pending   # REQUEST_ID not listed
-# Ethereum: nothing stored (depotAmount 0) and never paid (false)
-cast call --rpc-url "$ETH_RPC_URL" "$SYNDICATION_POOL" 'pendingDesyndications(uint64)(address,uint64,uint8)' "$REQUEST_ID"
+clio -u "$DEPOT_URL" get table sysio.synd returns -S sysio.synd -r -l 50
 cast call --rpc-url "$ETH_RPC_URL" "$SYNDICATION_POOL" 'desyndicationsPaid(uint64)(bool)' "$REQUEST_ID"
-# The depot: the net amount of the request, then the recredit to the holder who signed the desyndicate
-clio -u "$DEPOT_URL" get table sysio.synd desyndlog -S sysio.synd -r -l 50   # the row whose request_id is REQUEST_ID
-clio -u "$DEPOT_URL" push action sysio.liq recredit "[\"$HOLDER\", \"$QUANTITY\"]" -p sysio.liq@active
+cast call --rpc-url "$ETH_RPC_URL" "$SYNDICATION_POOL" 'pendingDesyndications(uint64)(address,uint64,uint8)' "$REQUEST_ID"
+ANCHOR_PROVIDER_URL="$SOL_RPC" ANCHOR_WALLET="$SOL_ADMIN_KEYPAIR" npx ts-node scripts/wire-config/emergencyStop.ts pending
 ```
 
-`recredit` is signed by `sysio.liq` itself (`contracts/sysio.liq/src/sysio.liq.cpp:86`); `QUANTITY` is the
-`desyndlog` row's `amount` in the shadow symbol. A stored release is paid by the crank: recrediting it as
-well pays the holder twice, and the crank's payment then takes custody down by the amount the recredit
-added to the outstanding. The Ethereum drops `already paid` and `already pending`
-(`SyndicationPool.sol:609-612`, `:638-641`, `:687-690`) and Solana's `DesyndicateLIQAlreadyPending`
-(`inbound.rs:5361-5378`) are
-re-emits of an id already paid or stored: never recredit them either. A recredit writes nothing in
-`sysio.synd`; the next comparison reads the grown supply, and the custody the outpost never paid out
-covers it.
+After external payment is final, acknowledge only that outcome:
+
+```bash
+clio -u "$DEPOT_URL" push action sysio.synd finishreturn "[$REQUEST_ID]" -p sysio@active
+```
+
+After irreversible cancellation is independently proven, with nothing paid or still payable, refund instead:
+
+```bash
+clio -u "$DEPOT_URL" push action sysio.synd refundreturn "[$REQUEST_ID]" -p sysio@active
+```
+
+`sysio.liq::recredit` is a separate privileged repair and must not recover a tracked return: it leaves
+the `returns` row open, allowing a later refund to mint the same amount again. The Ethereum drops
+`already paid` / `already pending` and Solana's `DesyndicateLIQAlreadyPending` are duplicate notices,
+never evidence of irreversible cancellation. Retain the incident's paid/cancelled transaction evidence
+externally; completed depot return rows are erased rather than archived.
 
 ### A shortfall-triggered pull
 
@@ -405,17 +431,18 @@ may have crossed.
 
 **Depot.** A cord pulled by `sysio.synd` is identifiable in the action trace and has a reason of the form
 `custody shortfall <chain> <token> seq <n>`. Start at step 3 of [the playbook](#the-playbook): the
-`mismatch` row for `(<chain>, <n>)` has the figures (`reported`, `expected`). The message that reported
-it was still held and minted, and every later message is compared too: each further shortfall adds its
-own row while the cord stays pulled (`CORD ALREADY PULLED -- the shortfall is recorded` on the console).
+`mismatch` row for `(chain_code, token_code)` has the figures (`reported`, `expected`).
+The message that reported it was still held and minted. Each later shortfall overwrites that pair's
+row, even while the cord remains pulled. Snapshot every observed overwrite and its admission trace
+externally; the table is not an incident history.
 
-Repairing custody does not change a `SyndicateLIQ` or `LIQYield` already built: it still carries the
-pre-repair custody. If admitted after the depot cord is cleared, that message can write a `mismatch`
-row and pull the cord again. Repair custody, have the repaired outpost emit a message after the repair
-(or wait for its next one), then wait for the depot to admit that message and confirm no `mismatch`
-row for its sequence before clearing the depot cord. Use the `syndcursors` check under
-[Clearing](#clearing-outposts-first-then-the-depot). Mismatch rows for earlier pre-repair sequences
-reporting the known shortfall are expected: record them under this incident, not as a new incident.
+Repairing custody does not change reports already built with pre-repair custody. Such a report can
+write another incident and pull the cord again. Verify admission of a post-repair report, snapshot the
+latest incident, then call governance `reconcile(chain_code, token_code, reported)` with verified live
+custody covering current outstanding. A healthy report does not erase the incident. Verify every
+affected pair is reconciled before clearing the depot cord; a later stale shortfall requires the same
+verification and reconciliation again. Use the admission checks under
+[Clearing](#clearing-outposts-first-then-the-depot).
 
 Andon must be deployed before processing envelopes. A failed inline pull aborts the
 transaction atomically when the account or declared permission is missing. Bootstrap must
@@ -472,7 +499,7 @@ raised on both sides. Recovery at v1 is a top-up. Send liqETH to the pool until 
 covers the depot's outstanding plus every stored release (a plain transfer: a donation only raises
 custody), then unpause the pool and pay the stored releases. Have the repaired outpost emit a
 post-repair message (or wait for its next one), wait for depot admission and confirm no `mismatch` row
-for it as below; only then clear the depot cord. A governance
+for the pair after governance reconciliation below; only then clear the depot cord. A governance
 write-down of the depot's outstanding instead is pending the owner's ruling.
 
 ## Clearing: outposts first, then the depot
@@ -517,15 +544,30 @@ clio -u "$DEPOT_URL" get table sysio.synd mismatch -S sysio.synd
 ```
 
 For the repaired outpost's `chain_code`, wait until `syndcursors.last_sequence` reaches the post-repair
-message's `sequence`, and confirm there is no `mismatch` row with that `(chain_code, sequence)`.
+message's `sequence`. Snapshot the current incident for each `(chain_code, token_code)`;
+a healthy report does not erase its earlier mismatch. Confirm the post-repair admission trace has no
+new shortfall.
+
 Read all result pages when checking these tables. Confirm the message was actually admitted: if the
 cursor has already advanced past it, a lower-sequence message can be dropped as a replay, so the
 cursor alone plus an absent mismatch is not proof that this message passed the custody check.
 Use its admission trace, or observe a later post-repair message's admission and check that sequence.
 A mismatch on the post-repair message means recovery is not complete; investigate before clearing.
-Earlier pre-repair sequences can add mismatch rows while waiting: retain and record them as evidence
-of this incident, not as a new incident. Once the post-repair admission check passes for every repaired
-outpost, clear the depot cord:
+Earlier pre-repair sequences can overwrite the pair's mismatch while waiting: snapshot each one
+externally. After a confirmed healthy post-repair admission, set `CHAIN_CODE` and `TOKEN_CODE` to the
+objects printed by the row and `REPORTED` to independently verified live custody in base units:
+
+```bash
+clio -u "$DEPOT_URL" push action sysio.synd reconcile \
+  "{\"chain_code\": $CHAIN_CODE, \"token_code\": $TOKEN_CODE, \"reported\": $REPORTED}" -p sysio@active
+clio -u "$DEPOT_URL" get table sysio.synd mismatch -S sysio.synd
+```
+
+`reconcile` requires reported custody to cover current outstanding shadow and erases only this
+pair's incident. It is a trusted governance attestation, not an on-chain external measurement, and
+does not clear the cord. Repeat for every affected pair. Any newly admitted shortfall requires another
+repair; read all table pages and ensure every affected pair's incident is absent before clearing.
+Once these checks pass for every repaired outpost, clear the depot cord:
 
 ```bash
 clio -u "$DEPOT_URL" push action sysio.andon clear "[\"$NOTE\"]" -p sysio.andon@clear
@@ -557,7 +599,7 @@ A desyndication an outpost stored instead of paying (while it was frozen, on a c
 on a refused settlement) was burned on the depot and is held on the outpost. Neither relay pays it:
 paying it is this step, once its cause clears (for a freeze or a shortfall, after the outpost clears).
 Each record is paid exactly once; a second payment fails. Match each one against the depot's
-`desyndlog` by request id.
+`returns` by request id.
 
 ### Paying on Solana
 
@@ -700,14 +742,16 @@ Keep one record per incident, real or false alarm:
 - the `mismatch` rows and the custody and outstanding readings of [Comparing totals](#comparing-totals), at the pull and after the
   first envelope from each outpost following the clear; for a custody repair, also the post-repair
   message's chain and sequence, emission and admission evidence, the observed `syndcursors.last_sequence`,
-  the absence of its `mismatch` row before clearing, and earlier pre-repair mismatch rows;
+  the governance reconciliation transaction, absence of each affected pair's incident before clearing,
+  and external snapshots of earlier pre-repair mismatch rows;
 - for a real incident: each envelope held or ruled, its request id and outcome, what was burned
   (`envelopes.burned`) and what was returned; each redeploy;
 - every deferred desyndication: request id, amount, reason, the transaction that paid it, and any still
   unpaid with its refusal; for a `CustodyShortfall` / `CUSTODY_SHORTFALL` record, the two balances it
   carries;
-- every skipped desyndication recredited: request id, holder, quantity, and the reads that showed no
-  record and no payment;
+- every return finished or refunded: request id, original holder, net amount, and final external
+  evidence proving final payment or irreversible cancellation with nothing paid and no payable
+  external obligation remaining;
 - whether the panic account was replaced, and the new one;
 - for a false alarm: what triggered the pull and what, if anything, should change so it does not recur.
 

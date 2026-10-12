@@ -23,18 +23,6 @@ using namespace fc;
 using mvo = fc::mutable_variant_object;
 using sysio_system::test_support::codename_mvo;
 
-namespace {
-
-/// The action data of `sysio.system::fundclaim(name recipient, int64_t amount)`, for
-/// reading the kicker request out of an addyield trace.
-struct fundclaim_args {
-   name    recipient;
-   int64_t amount;
-};
-
-} // anonymous namespace
-FC_REFLECT( fundclaim_args, (recipient)(amount) )
-
 /// sysio.liq end to end on the depot: the registries it validates against, the
 /// swap it feeds, and sysio.synd as the signer of every mint and burn (an account
 /// only; sysio.msgch is an account too, a signer that is not sysio.synd). The
@@ -182,13 +170,6 @@ public:
       return push_liq(from, "addyield"_n, mvo()("from", from)("quantity", asset(wire_amount, WIRE_SYM))
          ("target", target.to_symbol_code()));
    }
-   action_result addkicker(name signer, symbol sym, int64_t base_balance, uint64_t requested) {
-      return push_liq(signer, "addkicker"_n, mvo()("sym", sym.to_symbol_code())("base_balance", base_balance)
-         ("requested", requested));
-   }
-   action_result setkicker(name signer, uint32_t bps) {
-      return push_liq(signer, "setkicker"_n, mvo()("bps", bps));
-   }
    action_result recredit(name holder, int64_t amount, name signer = LIQ_ACCOUNT) {
       return push_liq(signer, "recredit"_n, mvo()("holder", holder)("quantity", asset(amount, LIQSOL_SYM)));
    }
@@ -251,9 +232,6 @@ public:
    }
    fc::variant pending_row(symbol sym = LIQSOL_SYM) {
       return liq_row("liqpending"_n, "pending_yield", LIQ_ACCOUNT, sym.to_symbol_code().value);
-   }
-   fc::variant config_row() {
-      return decode(liq_abi_ser, "liq_config", get_row_by_account(LIQ_ACCOUNT, LIQ_ACCOUNT, "liqconfig"_n, "liqconfig"_n));
    }
    int64_t wire_balance(name holder) {
       const auto row = decode(token_abi_ser, "account",
@@ -482,76 +460,33 @@ BOOST_FIXTURE_TEST_CASE(the_index_grows_past_64_bits, sysio_liq_tester) try {
    BOOST_REQUIRE_EQUAL(donation, owed("alice"_n));
 } FC_LOG_AND_RETHROW()
 
-// ---------------------------------------------------------------------------
-// The kicker
-// ---------------------------------------------------------------------------
-
-BOOST_FIXTURE_TEST_CASE(addyield_requests_the_kicker_from_t5, sysio_liq_tester) try {
+/// Swap proceeds and donations distribute exactly their funding without drawing from T5.
+BOOST_FIXTURE_TEST_CASE(addyield_distributes_only_supplied_wire, sysio_liq_tester) try {
+   constexpr int64_t intake = 100 * UNIT;
    BOOST_REQUIRE_EQUAL(success(), mint("alice"_n, 100 * UNIT));
-   BOOST_REQUIRE_EQUAL(uint32_t(200), config_row().is_null() ? 200u : config_row()["kicker_bps"].as<uint32_t>());
-
-   // The swap's intake is the one that is yield, so it is the one that earns the
-   // kicker. Stand in for the pool's proceeds: WIRE deposited on the swap.
-   BOOST_REQUIRE_EQUAL(success(), openext("alice"_n, "alice"_n, extended_symbol{ WIRE_SYM, TOKEN_ACCOUNT }));
-   BOOST_REQUIRE_EQUAL(success(), transfer_wire("alice"_n, SWAP_ACCOUNT, 300 * UNIT));
-   // 100 WIRE in from `from`; whether the trace carries the 2% fundclaim for
-   // this contract and the fold that follows it.
-   const auto intake = [&](name from) {
-      auto trace = base_tester::push_action(LIQ_ACCOUNT, "addyield"_n, from, mvo()
-         ("from", from)("quantity", asset(100 * UNIT, WIRE_SYM))("target", LIQSOL_SYM.to_symbol_code()));
+   BOOST_REQUIRE_EQUAL(success(), openext("alice"_n, "alice"_n, extended_symbol{WIRE_SYM, TOKEN_ACCOUNT}));
+   BOOST_REQUIRE_EQUAL(success(), transfer_wire("alice"_n, SWAP_ACCOUNT, intake));
+   const auto treasury_before = wire_balance(SYSIO_ACCOUNT);
+   const auto holder_before = wire_balance("alice"_n);
+   for (const auto from : {SWAP_ACCOUNT, "carol"_n}) {
+      const auto source_before = wire_balance(from);
+      const auto trace = base_tester::push_action(LIQ_ACCOUNT, "addyield"_n, from, mvo()
+         ("from", from)("quantity", asset(intake, WIRE_SYM))("target", LIQSOL_SYM.to_symbol_code()));
+      BOOST_REQUIRE(trace && !trace->except);
       produce_block();
-      bool requested = false, folded = false;
-      for (const auto& at : trace->action_traces) {
-         if (at.act.account == SYSIO_ACCOUNT && at.act.name == "fundclaim"_n) {
-            const auto args = fc::raw::unpack<fundclaim_args>(at.act.data);
-            BOOST_REQUIRE_EQUAL(LIQ_ACCOUNT, args.recipient);
-            BOOST_REQUIRE_EQUAL(2 * UNIT, args.amount);
-            requested = true;
-         }
-         if (at.act.account == LIQ_ACCOUNT && at.act.name == "addkicker"_n) folded = true;
+      for (const auto& action : trace->action_traces) {
+         BOOST_CHECK(action.act.account != SYSIO_ACCOUNT);
+         BOOST_CHECK(action.act.name != "addkicker"_n);
       }
-      return std::make_pair(requested, folded);
-   };
-
-   // sysio runs no emissions here, so the request lands nothing and the fold is
-   // a no-op: holders get the base yield and nothing else.
-   BOOST_REQUIRE(intake(SWAP_ACCOUNT) == std::make_pair(true, true));
-   BOOST_REQUIRE_EQUAL(100 * UNIT, owed("alice"_n));
-   BOOST_REQUIRE_EQUAL(uint64_t(100 * UNIT), pot());
-
-   // A donation from anyone else distributes only itself: no request, no fold.
-   // Otherwise a near-sole holder could donate, claim it back with the kicker on
-   // top, and repeat against the treasury.
-   BOOST_REQUIRE(intake("carol"_n) == std::make_pair(false, false));
-   BOOST_REQUIRE_EQUAL(200 * UNIT, owed("alice"_n));
-   BOOST_REQUIRE_EQUAL(uint64_t(200 * UNIT), pot());
-
-   // With the kicker off, the swap's intake makes no request either.
-   BOOST_REQUIRE(mentions(setkicker("alice"_n, 0), "missing authority of sysio"));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("kicker_bps out of range"), setkicker(SYSIO_ACCOUNT, 10'001));
-   BOOST_REQUIRE_EQUAL(success(), setkicker(SYSIO_ACCOUNT, 0));
-   BOOST_REQUIRE_EQUAL(0u, config_row()["kicker_bps"].as<uint32_t>());
-   BOOST_REQUIRE(intake(SWAP_ACCOUNT) == std::make_pair(false, false));
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE(addkicker_folds_only_what_landed, sysio_liq_tester) try {
-   BOOST_REQUIRE_EQUAL(success(), mint("alice"_n, 100 * UNIT));
-   // Stand in for T5: 5 WIRE arrive at the contract.
-   BOOST_REQUIRE_EQUAL(success(), transfer_wire("carol"_n, LIQ_ACCOUNT, 5 * UNIT));
-   const int64_t balance = wire_balance(LIQ_ACCOUNT);
-
-   BOOST_REQUIRE(mentions(addkicker("alice"_n, LIQSOL_SYM, balance - 2 * UNIT, 3 * UNIT), "missing authority of sysio.liq"));
-   // 2 WIRE over the base, 3 requested: 2 fold in.
-   BOOST_REQUIRE_EQUAL(success(), addkicker(LIQ_ACCOUNT, LIQSOL_SYM, balance - 2 * UNIT, 3 * UNIT));
-   BOOST_REQUIRE_EQUAL(uint64_t(2 * UNIT), pot());
-   BOOST_REQUIRE_EQUAL(2 * UNIT, owed("alice"_n));
-   // 2 over, 1 requested: only the request folds in.
-   BOOST_REQUIRE_EQUAL(success(), addkicker(LIQ_ACCOUNT, LIQSOL_SYM, balance - 2 * UNIT, UNIT));
-   BOOST_REQUIRE_EQUAL(uint64_t(3 * UNIT), pot());
-   // Nothing over the base: nothing folds.
-   BOOST_REQUIRE_EQUAL(success(), addkicker(LIQ_ACCOUNT, LIQSOL_SYM, balance, UNIT));
-   BOOST_REQUIRE_EQUAL(uint64_t(3 * UNIT), pot());
-   BOOST_REQUIRE_EQUAL(3 * UNIT, owed("alice"_n));
+      BOOST_CHECK_EQUAL(source_before - intake, wire_balance(from));
+      BOOST_CHECK_EQUAL(treasury_before, wire_balance(SYSIO_ACCOUNT));
+   }
+   BOOST_REQUIRE_EQUAL(2 * intake, owed("alice"_n));
+   BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(2 * intake), pot());
+   BOOST_REQUIRE_EQUAL(success(), claim("alice"_n));
+   BOOST_CHECK_EQUAL(holder_before + 2 * intake, wire_balance("alice"_n));
+   BOOST_CHECK_EQUAL(0, pot());
+   BOOST_CHECK_EQUAL(0, owed("alice"_n));
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
@@ -559,7 +494,6 @@ BOOST_FIXTURE_TEST_CASE(addkicker_folds_only_what_landed, sysio_liq_tester) try 
 // ---------------------------------------------------------------------------
 
 BOOST_FIXTURE_TEST_CASE(queued_yield_sells_through_the_pool_and_pays_holders, sysio_liq_tester) try {
-   BOOST_REQUIRE_EQUAL(success(), setkicker(SYSIO_ACCOUNT, 0));
    BOOST_REQUIRE_EQUAL(success(), mint("alice"_n, 100 * UNIT));
 
    // Nothing pending: queueing is a no-op, and the pool does not exist yet.
@@ -623,7 +557,6 @@ BOOST_FIXTURE_TEST_CASE(queued_yield_sells_through_the_pool_and_pays_holders, sy
 // measures its headroom net of what is parked in liqpending, so queueyield can always
 // mint it. A report past that headroom is dropped whole, so no value is clipped.
 BOOST_FIXTURE_TEST_CASE(pending_yield_is_reserved_against_the_asset_range, sysio_liq_tester) try {
-   BOOST_REQUIRE_EQUAL(success(), setkicker(SYSIO_ACCOUNT, 0));
    // The pool first, while the range is open: regliqpool mints the LCO seed. Then one
    // syndication takes supply to 100 base units under the range.
    BOOST_REQUIRE_EQUAL(success(), regliqpool(SOLANA, LIQSOL, POOL_SYM, 1000 * UNIT, 1000 * UNIT));
@@ -710,9 +643,8 @@ BOOST_FIXTURE_TEST_CASE(regliqpool_refusals, sysio_liq_tester) try {
 // Governance reconciliation
 // ---------------------------------------------------------------------------
 
-// An outpost that refused a de-syndication is reconciled by governance: `recredit` mints the burned
-// amount back to the holder, growing the supply by exactly that, and only this contract may sign it.
-BOOST_FIXTURE_TEST_CASE(recredit_mints_a_refused_desyndication_back, sysio_liq_tester) try {
+/// Exceptional supply repair preserves existing yield and requires the LIQ contract authority.
+BOOST_FIXTURE_TEST_CASE(privileged_supply_repair_preserves_existing_yield, sysio_liq_tester) try {
    BOOST_REQUIRE_EQUAL(success(), mint("alice"_n, 60 * UNIT));
    BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, 6 * UNIT));
 
