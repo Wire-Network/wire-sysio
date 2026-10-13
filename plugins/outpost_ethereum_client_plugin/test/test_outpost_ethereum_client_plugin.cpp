@@ -231,6 +231,11 @@ constexpr uint64_t below_cap_policy_gas_limit = 9'000'000;
 constexpr int contract_revert_rpc_code = 3;
 /// JSON-RPC parse error: the node never executed the call, so nothing on chain changed.
 constexpr int json_rpc_parse_error_code = -32700;
+/// The server error geth answers a read pinned to a block it does not have yet
+/// with ("header not found") — what a load-balanced backend behind the one that
+/// confirmed the relay's transaction returns.
+constexpr int              unknown_block_rpc_code    = -32000;
+constexpr std::string_view unknown_block_rpc_message = "header not found";
 
 /// A one-address custom error the client has no reading for — the same shape as
 /// `AccessManagedUnauthorized(address)`, a different selector.
@@ -539,6 +544,12 @@ fc::network::json_rpc::json_rpc_error epoch_in_refusal(std::string_view selector
    return fc::network::json_rpc::json_rpc_error(contract_revert_rpc_code, "execution reverted", fc::variant(data));
 }
 
+/// A node's refusal of a read pinned to a block it has not seen yet — a
+/// load-balanced backend behind the one that confirmed the relay's call.
+fc::network::json_rpc::json_rpc_error unknown_block_refusal() {
+   return fc::network::json_rpc::json_rpc_error(unknown_block_rpc_code, std::string(unknown_block_rpc_message));
+}
+
 /// Harness binding a real `outpost_ethereum_client` to a stubbed OPPInbound
 /// wrapper over a scripted chain.
 ///
@@ -569,8 +580,14 @@ struct whole_envelope_delivery_fixture {
    /// Per attempt, in order, a refusal the stub throws instead of confirming;
    /// attempts past the end confirm.
    std::vector<std::optional<fc::network::json_rpc::json_rpc_error>> refusals;
-   size_t                              next_epoch_reads = 0;
-   size_t                              spill_reads      = 0;
+   /// Per `dispatchSpill` read attempt, in order, an error the stub throws
+   /// instead of answering — a backend that cannot serve the pinned block yet.
+   /// Attempts past the end answer. A refused attempt consumes no response.
+   std::vector<std::optional<fc::network::json_rpc::json_rpc_error>> spill_read_refusals;
+   size_t                              next_epoch_reads    = 0;
+   size_t                              spill_reads         = 0;
+   /// Every `dispatchSpill` read attempt, refused ones included.
+   size_t                              spill_read_attempts = 0;
    size_t                              settlement_reads = 0;
    size_t                              consensus_reads  = 0;
    /// The block parameter of every stubbed view read, in order.
@@ -766,6 +783,10 @@ std::unique_ptr<whole_envelope_delivery_fixture> create_whole_envelope_delivery_
       [raw, note_pinned](const block_number_or_tag_t& block, uint32_t& epoch_index) -> fc::variant {
          note_pinned(block);
          BOOST_CHECK_EQUAL(epoch_index, test_wire_epoch);
+         const size_t attempt = raw->spill_read_attempts++;
+         if (attempt < raw->spill_read_refusals.size() && raw->spill_read_refusals[attempt]) {
+            throw *raw->spill_read_refusals[attempt];
+         }
          return fc::variant(whole_envelope_delivery_fixture::response_at(raw->spill_responses, raw->spill_reads++));
       };
    raw->inbound->epoch_deliveries =
@@ -2075,6 +2096,86 @@ BOOST_AUTO_TEST_CASE(delivery_rereads_at_the_head_after_a_stale_refusal) try {
       BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 0u);
       BOOST_CHECK_EQUAL(fixture->attempted_budgets.size(), 3u);
    }
+} FC_LOG_AND_RETHROW();
+
+/// A progress read refused by a backend that has not seen the pinned block yet
+/// is retried AT THAT BLOCK, and the tick decides from the read that succeeds.
+/// The refusal is never mistaken for state: it is not "not tipped" (which would
+/// send a duplicate delivery), and the retry never falls back to a fresh head
+/// read. Covered both at the tick-start head and — the case the receipt pinning
+/// exists for — at the block the relay's own call just confirmed in.
+BOOST_AUTO_TEST_CASE(delivery_retries_a_progress_read_the_backend_cannot_serve_yet) try {
+   const std::vector<std::string> expected_blocks{pinned_block_hex(test_head_block),
+                                                  pinned_block_hex(test_head_block + 1)};
+   // Refused once at the head, before anything is sent.
+   {
+      auto fixture  = create_whole_envelope_delivery_fixture();
+      auto envelope = make_envelope(mid_envelope_bytes);
+      fixture->spill_read_refusals = {unknown_block_refusal()};
+
+      const auto tx = fixture->outpost->deliver_outbound_envelope(
+         test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
+
+      BOOST_CHECK(!tx.empty());
+      check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 1);
+      // Three attempts at the cursor: refused at the head, answered at the head,
+      // answered at the receipt's block. Only the answers consume a response.
+      BOOST_CHECK_EQUAL(fixture->spill_read_attempts, 3u);
+      BOOST_CHECK_EQUAL(fixture->spill_reads, 2u);
+      // The refused attempt's earlier reads are discarded and re-read whole.
+      BOOST_CHECK_EQUAL(fixture->next_epoch_reads, 3u);
+      const auto blocks = fixture->blocks_read();
+      BOOST_CHECK_EQUAL_COLLECTIONS(blocks.begin(), blocks.end(), expected_blocks.begin(), expected_blocks.end());
+      BOOST_CHECK_EQUAL(fixture->rpc->block_number_reads, 1u);
+   }
+   // Refused once at the receipt's block, right after the relay's own delivery.
+   {
+      auto fixture  = create_whole_envelope_delivery_fixture();
+      auto envelope = make_envelope(mid_envelope_bytes);
+      fixture->spill_read_refusals = {std::nullopt, unknown_block_refusal()};
+
+      const auto tx = fixture->outpost->deliver_outbound_envelope(
+         test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
+
+      BOOST_CHECK(!tx.empty());
+      // ONE delivery: the refused read did not read as "nothing recorded".
+      check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 1);
+      BOOST_CHECK_EQUAL(fixture->spill_read_attempts, 3u);
+      BOOST_CHECK_EQUAL(fixture->spill_reads, 2u);
+      BOOST_CHECK_EQUAL(fixture->next_epoch_reads, 3u);
+      // The retry stayed on the receipt's block; the head was never re-read.
+      const auto blocks = fixture->blocks_read();
+      BOOST_CHECK_EQUAL_COLLECTIONS(blocks.begin(), blocks.end(), expected_blocks.begin(), expected_blocks.end());
+      BOOST_CHECK_EQUAL(fixture->rpc->block_number_reads, 1u);
+   }
+} FC_LOG_AND_RETHROW();
+
+/// A backend that never catches up to the pinned block within the tick's
+/// deadline ends the tick in a timeout — which the job retries — never in a
+/// decision taken without the read, and never in a second, paid delivery.
+BOOST_AUTO_TEST_CASE(delivery_times_out_rather_than_guess_when_the_pinned_block_never_serves) try {
+   /// More refusals than the retry's backoff can attempt inside the deadline.
+   constexpr size_t persistent_refusal_attempts = 64;
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->spill_read_refusals.push_back(std::nullopt);   // the head read before the delivery answers
+   fixture->spill_read_refusals.insert(fixture->spill_read_refusals.end(), persistent_refusal_attempts,
+                                       unknown_block_refusal());
+
+   BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
+                        test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
+                     fc::timeout_exception);
+
+   check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 1);
+   // The read was retried, not abandoned after the first refusal …
+   BOOST_CHECK_GT(fixture->spill_read_attempts, 2u);
+   BOOST_CHECK_EQUAL(fixture->spill_reads, 1u);
+   // … and every retry stayed pinned to the receipt's block.
+   const std::vector<std::string> expected_blocks{pinned_block_hex(test_head_block),
+                                                  pinned_block_hex(test_head_block + 1)};
+   const auto blocks = fixture->blocks_read();
+   BOOST_CHECK_EQUAL_COLLECTIONS(blocks.begin(), blocks.end(), expected_blocks.begin(), expected_blocks.end());
+   BOOST_CHECK_EQUAL(fixture->rpc->block_number_reads, 1u);
 } FC_LOG_AND_RETHROW();
 
 /// A tick sends at most `MAX_CONTINUATIONS_PER_TICK` calls; an epoch still
