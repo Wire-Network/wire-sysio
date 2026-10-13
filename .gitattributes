@@ -1,2 +1,0 @@
-# Vendored unified diffs must preserve their source context whitespace.
-cmake/vcpkg-ports/**/*.patch -whitespace

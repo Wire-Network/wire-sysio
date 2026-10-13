@@ -30,8 +30,9 @@ For Intel macOS or a source-built distribution, use
 `bash scripts/llvm/build-toolchain.sh PREFIX BUILD_DIRECTORY` with an LLVM-supported
 bootstrap compiler. Export that prefix as `WIRE_LLVM_ROOT`. The source builder
 verifies the pinned source archive and builds both X86 and AArch64 backends.
-To select GCC, add `-DCMAKE_C_COMPILER=gcc-15 -DCMAKE_CXX_COMPILER=g++-15` to a
-fresh configure. All paths must refer to native host toolchains.
+To select GCC for both the host project and its dependencies, set
+`CC=gcc-15 CXX=g++-15` for a fresh configure. The triplets track these compiler
+overrides in the dependency cache. All paths must refer to native host toolchains.
 
 `cmake/llvm-toolchain.cmake` applies the same C++ ABI to the host project and
 vcpkg dependencies. `lib/wire-static` contains only links to the distribution's
@@ -42,10 +43,10 @@ the final programs for accidental shared C++ runtime dependencies.
 
 ## Dependency and runtime scope
 
-The default vcpkg baseline and Wire registry baseline stay fixed. LLVM alone
-is overridden to 23.1.3 using upstream vcpkg commit
+The default vcpkg baseline stays fixed. LLVM is overridden to 23.1.3 using upstream vcpkg commit
 `c52c09caca13081c628ade492d334033f7130edc`; its upstream patch set replaces the
-18.1.6 port patches. Local overlays retain existing dependency source revisions:
+18.1.6 port patches. The pinned Wire registry carries the following compatibility
+patches while retaining existing dependency source revisions:
 
 - BLS12-381 explicitly includes `<vector>` rather than depending on a transitive include.
 - GMP's custom C++ compiler probe honors `LDFLAGS` and `LIBS` for libc++ linkage.

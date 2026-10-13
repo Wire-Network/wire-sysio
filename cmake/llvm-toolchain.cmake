@@ -11,13 +11,34 @@ list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES WIRE_LLVM_ROOT CMAKE_C_COMPILER
 
 # Explicit compiler overrides retain the GCC CI lane; the default is Clang 23.
 if(NOT CMAKE_C_COMPILER)
-  set(CMAKE_C_COMPILER "${WIRE_LLVM_ROOT}/bin/clang")
+  if(DEFINED ENV{CC} AND NOT "$ENV{CC}" STREQUAL "")
+    set(CMAKE_C_COMPILER "$ENV{CC}")
+  else()
+    set(CMAKE_C_COMPILER "${WIRE_LLVM_ROOT}/bin/clang")
+  endif()
 endif()
 if(NOT CMAKE_CXX_COMPILER)
-  set(CMAKE_CXX_COMPILER "${WIRE_LLVM_ROOT}/bin/clang++")
+  if(DEFINED ENV{CXX} AND NOT "$ENV{CXX}" STREQUAL "")
+    set(CMAKE_CXX_COMPILER "$ENV{CXX}")
+  else()
+    set(CMAKE_CXX_COMPILER "${WIRE_LLVM_ROOT}/bin/clang++")
+  endif()
 endif()
 set(CMAKE_AR "${WIRE_LLVM_ROOT}/bin/llvm-ar")
 set(CMAKE_RANLIB "${WIRE_LLVM_ROOT}/bin/llvm-ranlib")
+
+# Upstream Clang does not infer Xcode's SDK the way Apple Clang does. Make it
+# explicit so vcpkg also forwards -isysroot to non-CMake dependency probes.
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin" AND NOT CMAKE_OSX_SYSROOT)
+  if(DEFINED ENV{SDKROOT} AND NOT "$ENV{SDKROOT}" STREQUAL "")
+    set(CMAKE_OSX_SYSROOT "$ENV{SDKROOT}" CACHE PATH "macOS SDK" FORCE)
+  else()
+    execute_process(COMMAND xcrun --sdk macosx --show-sdk-path
+                    OUTPUT_VARIABLE _wire_macos_sdk OUTPUT_STRIP_TRAILING_WHITESPACE
+                    COMMAND_ERROR_IS_FATAL ANY)
+    set(CMAKE_OSX_SYSROOT "${_wire_macos_sdk}" CACHE PATH "macOS SDK" FORCE)
+  endif()
+endif()
 
 # Chainloading replaces vcpkg's native toolchain. Retain its architecture, PIC,
 # port flags and configuration-specific linker settings before adding our ABI.
