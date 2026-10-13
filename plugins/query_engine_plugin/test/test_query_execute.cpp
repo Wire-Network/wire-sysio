@@ -63,6 +63,128 @@ BOOST_AUTO_TEST_CASE(limit_offset_and_aggregate_semantics) {
       execute(engine, reads, ordered_sql, query_options{.limit = std::numeric_limits<uint64_t>::max()}).rows.size(), 3);
 }
 
+/// `page` describes the window over the complete ordered output for detail and grouped queries.
+BOOST_AUTO_TEST_CASE(page_window_metadata) {
+   read_queue reads;
+   query_engine engine({}, reads.create_api(*validating_node));
+   const auto expect_page = [](const query_result& result, const std::string& offset,
+                               const std::optional<std::string>& limit, const std::string& returned,
+                               const std::string& total, bool has_more) {
+      BOOST_CHECK_EQUAL(result.page[response_field::offset].as_string(), offset);
+      if (limit)
+         BOOST_CHECK_EQUAL(result.page[response_field::limit].as_string(), *limit);
+      else
+         BOOST_CHECK(result.page[response_field::limit].is_null());
+      BOOST_CHECK_EQUAL(result.page[response_field::returned_rows].as_string(), returned);
+      BOOST_CHECK_EQUAL(result.page[response_field::total_rows].as_string(), total);
+      BOOST_CHECK_EQUAL(result.page[response_field::has_more].as_bool(), has_more);
+      BOOST_CHECK_EQUAL(result.page[response_field::returned_rows].as_string(),
+                        result.stats[response_field::returned_rows].as_string());
+      BOOST_CHECK_EQUAL(result.page[response_field::returned_rows].as_string(), std::to_string(result.rows.size()));
+   };
+   expect_page(execute(engine, reads, ordered_sql), "0", std::nullopt, "3", "3", false);
+   expect_page(execute(engine, reads, ordered_sql, query_options{.limit = 1, .offset = 1}), "1", "1", "1", "3", true);
+   expect_page(execute(engine, reads, ordered_sql, query_options{.limit = 2, .offset = 1}), "1", "2", "2", "3", false);
+   // An offset beyond the end yields an empty, final page that still reports the requested offset.
+   expect_page(execute(engine, reads, ordered_sql, query_options{.offset = 5}), "5", std::nullopt, "0", "3", false);
+   // Likewise past the last group: the total still counts every group passing HAVING.
+   expect_page(execute(engine, reads, grouped_sql, query_options{.offset = 5}), "5", std::nullopt, "0", "2", false);
+   // An offset exactly at the end is an empty, final page too; one row earlier holds the last row.
+   expect_page(execute(engine, reads, ordered_sql, query_options{.offset = 3}), "3", std::nullopt, "0", "3", false);
+   expect_page(execute(engine, reads, ordered_sql, query_options{.offset = 2}), "2", std::nullopt, "1", "3", false);
+   // An output with no rows has no further page.
+   expect_page(execute(engine, reads, "SELECT key.id AS id FROM sample.positions WHERE amount > 1000000"), "0",
+               std::nullopt, "0", "0", false);
+   // A per-call limit of 0 returns the columns and the complete row count without any rows.
+   const auto columns_only = execute(engine, reads, ordered_sql, query_options{.limit = 0});
+   BOOST_CHECK_EQUAL(columns_only.columns.size(), 2);
+   expect_page(columns_only, "0", "0", "0", "3", true);
+   // SQL LIMIT 0 is the same empty window over an output that still has rows.
+   expect_page(execute(engine, reads, std::string(ordered_sql) + " LIMIT 0"), "0", "0", "0", "3", true);
+   // The effective limit is the smaller of the SQL LIMIT and the per-call limit.
+   const auto sql_limit_one = std::string(ordered_sql) + " LIMIT 1";
+   expect_page(execute(engine, reads, sql_limit_one, query_options{.limit = 2}), "0", "1", "1", "3", true);
+   expect_page(execute(engine, reads, sql_limit_one), "0", "1", "1", "3", true);
+   expect_page(execute(engine, reads, std::string(ordered_sql) + " LIMIT 5", query_options{.limit = 2}), "0", "2", "2",
+               "3", true);
+   // Detail totals count rows passing WHERE; grouped totals count groups passing HAVING.
+   expect_page(execute(engine, reads, "SELECT key.id AS id FROM sample.positions WHERE amount >= 60"), "0",
+               std::nullopt, "2", "2", false);
+   expect_page(execute(engine, reads, grouped_sql, query_options{.limit = 1}), "0", "1", "1", "2", true);
+   expect_page(execute(engine, reads,
+                       "SELECT beneficiary, SUM(amount) AS total FROM sample.positions GROUP BY beneficiary "
+                       "HAVING SUM(amount) > 100"),
+               "0", std::nullopt, "1", "1", false);
+   // Paging through the output one row at a time reproduces the unpaged order.
+   const auto all = execute(engine, reads, ordered_sql);
+   for (uint64_t offset = 0; offset < all.rows.size(); ++offset) {
+      const auto page = execute(engine, reads, ordered_sql, query_options{.limit = 1, .offset = offset});
+      BOOST_REQUIRE_EQUAL(page.rows.size(), 1);
+      BOOST_CHECK_EQUAL(page.rows[0]["id"].as_string(), all.rows[offset]["id"].as_string());
+   }
+   engine.stop();
+}
+
+/// Request options replace limit/offset and may move the deadline earlier, never later.
+BOOST_AUTO_TEST_CASE(request_options_only_lower_the_deadline) {
+   // Time already elapsed since the request started when its options are applied.
+   constexpr auto elapsed_before_options = std::chrono::milliseconds(100);
+   // A request timeout below the configured one, so it moves the deadline earlier.
+   constexpr auto lowered_timeout = std::chrono::milliseconds(250);
+   // A request timeout above an already lowered one, which must not move the deadline later.
+   constexpr auto longer_timeout = std::chrono::milliseconds(500);
+   // A finite request timeout applied to a budget that started without a deadline.
+   constexpr auto unbounded_request_timeout = std::chrono::milliseconds(100);
+   /// A timeout below zero, which is rejected as invalid.
+   constexpr auto negative_timeout = std::chrono::milliseconds(-1);
+   const auto origin = query_budget::clock::time_point{} + std::chrono::hours(1);
+   auto current = origin;
+   const auto now = [&] { return current; };
+   query_config config;
+   query_budget budget(config, now);
+   BOOST_CHECK(budget.deadline == origin + config.timeout);
+   budget.apply_request_options(query_options{.limit = 4, .offset = 2});
+   BOOST_CHECK_EQUAL(budget.options.limit.value_or(0), 4);
+   BOOST_CHECK_EQUAL(budget.options.offset, 2);
+   BOOST_CHECK(budget.deadline == origin + config.timeout);
+   budget.apply_request_options(query_options{.timeout = config.timeout * 2});
+   BOOST_CHECK(budget.deadline == origin + config.timeout);
+   BOOST_CHECK(budget.options.timeout.value_or(config.timeout) == config.timeout);
+   BOOST_CHECK(!budget.options.limit);
+   BOOST_CHECK_EQUAL(budget.options.offset, 0);
+   // Measured from the request's start, not from the moment the options are applied.
+   current = origin + elapsed_before_options;
+   // A timeout equal to the configured one does not lower the deadline.
+   budget.apply_request_options(query_options{.timeout = config.timeout});
+   BOOST_CHECK(budget.deadline == origin + config.timeout);
+   BOOST_CHECK(budget.options.timeout.value_or(config.timeout) == config.timeout);
+   budget.apply_request_options(query_options{.timeout = lowered_timeout});
+   BOOST_CHECK(budget.deadline == origin + lowered_timeout);
+   BOOST_CHECK(budget.options.timeout == lowered_timeout);
+   budget.apply_request_options(query_options{.timeout = lowered_timeout});
+   BOOST_CHECK(budget.deadline == origin + lowered_timeout);
+   budget.apply_request_options(query_options{.timeout = longer_timeout});
+   BOOST_CHECK(budget.deadline == origin + lowered_timeout);
+   BOOST_CHECK(budget.options.timeout == lowered_timeout);
+   current = origin + lowered_timeout;
+   BOOST_CHECK_EXCEPTION(budget.check(), query_error,
+                         [](const auto& error) { return error.kind == error_kind::QUERY_TIMEOUT; });
+   // An explicit no-deadline budget still accepts a finite request deadline, and no_deadline itself
+   // leaves it unbounded without overflowing the clock.
+   query_budget unbounded(config, now, query_options{.timeout = constants::no_deadline});
+   unbounded.apply_request_options(query_options{.timeout = constants::no_deadline});
+   BOOST_CHECK(unbounded.deadline == query_budget::clock::time_point::max());
+   unbounded.apply_request_options(query_options{.timeout = unbounded_request_timeout});
+   BOOST_CHECK(unbounded.deadline == unbounded.started + unbounded_request_timeout);
+   BOOST_CHECK(unbounded.options.timeout == unbounded_request_timeout);
+   // A negative timeout exceeds no limit, so none is named, and the rejected request changes nothing.
+   BOOST_CHECK_EXCEPTION(unbounded.apply_request_options(query_options{.timeout = negative_timeout, .limit = 1}),
+                         query_error,
+                         [](const auto& error) { return error.kind == error_kind::INVALID_PARAMS && !error.limit; });
+   BOOST_CHECK(unbounded.deadline == unbounded.started + unbounded_request_timeout);
+   BOOST_CHECK(!unbounded.options.limit);
+}
+
 /// Absent and default-constructed options apply the configured deadline; only no_deadline opts out.
 BOOST_AUTO_TEST_CASE(default_timeout_is_configured_and_no_deadline_is_explicit) {
    for (const auto& options : {std::optional<query_options>{}, std::optional<query_options>{query_options{}},
@@ -91,9 +213,16 @@ BOOST_AUTO_TEST_CASE(option_errors_and_resource_limits) {
    query_config config;
    config.max_result_rows = 1;
    query_engine engine(config, reads.create_api(*validating_node));
-   for (const auto timeout : {std::chrono::milliseconds(-2), constants::no_deadline - std::chrono::milliseconds(1)})
-      BOOST_CHECK_EXCEPTION(execute(engine, reads, ordered_sql, query_options{.timeout = timeout}), query_error,
-                            [](const auto& error) { return error.kind == error_kind::INVALID_PARAMS; });
+   // A negative timeout names no limit; one beyond the clock's range names the timeout option.
+   for (const auto& [timeout, limit] : std::vector<std::pair<std::chrono::milliseconds, std::optional<std::string>>>{
+           {std::chrono::milliseconds(-2),                         std::nullopt      },
+           {constants::no_deadline - std::chrono::milliseconds(1), option::timeout_ms}
+   }) {
+      const auto expected = limit;
+      BOOST_CHECK_EXCEPTION(
+         execute(engine, reads, ordered_sql, query_options{.timeout = timeout}), query_error,
+         [&](const auto& error) { return error.kind == error_kind::INVALID_PARAMS && error.limit == expected; });
+   }
    BOOST_CHECK_EXCEPTION(execute(engine, reads, ordered_sql, query_options{.timeout = std::chrono::milliseconds(0)}),
                          query_error, [](const auto& error) { return error.kind == error_kind::QUERY_TIMEOUT; });
    BOOST_CHECK_EXCEPTION(execute(engine, reads, ordered_sql), query_error, [](const auto& error) {

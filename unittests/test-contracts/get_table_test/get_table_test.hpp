@@ -128,7 +128,7 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
     typedef sysio::kv::table< "structobjs"_n, structobj_key, structobj > structobjs;
 
     // Slug-keyed kv::table — the shape every registry table ships
-    // (sysio.chains::chains, sysio.tokens::tokens, sysio.reserv::reserves).
+    // (sysio.chains::chains, sysio.tokens::tokens).
     //
     // This one is named after a builtin ON PURPOSE, the exact hazard
     // `composite_key` above exists to avoid: abigen matches builtins on the
@@ -194,8 +194,8 @@ class [[sysio::contract]] get_table_test : public sysio::contract {
                          sysio::const_mem_fun<sslugobj, slug_name, &sslugobj::by_alt>>> sslugobjs;
 
     // kv::global — a SINGLE-row table with no scope, keyed on the table's own name.
-    // Five production contracts ship this shape (sysio.opreg::opconfig / opcounters,
-    // sysio.chalg::chalgstate, sysio.uwrit::uwconfig / uwcounters) and the API doc
+    // Production contracts ship this shape (sysio.opreg::opconfig / opcounters,
+    // sysio.chalg::chalgstate, sysio.epoch::epochstate, ...) and the API doc
     // lists kv::global as supported, but nothing exercised it through
     // get_table_rows — so its ABI shape (key_names ["name"], key_types ["name"])
     // and its empty-vs-set behaviour were both unverified.

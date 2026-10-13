@@ -89,8 +89,8 @@ namespace {
          constexpr auto status = "status";
       }
       // `OperatorStatus` enum spellings + the `is_active` decision live
-      // in `sysio/opp/depot/opreg_status.hpp` so underwriter_plugin can pull
-      // the same source of truth without a cross-plugin dependency.
+      // in `sysio/opp/depot/opreg_status.hpp`, beside the other shared depot
+      // row views, so any client reads the same source of truth.
    }
 
    namespace epoch {
@@ -122,7 +122,7 @@ namespace {
    /// Chain registry was split out of `sysio.epoch` onto its own
    /// `sysio.chains` contract. The `outposts` table was replaced by the
    /// `chains` KV table, keyed by slug_name (uint64 packed). Field spellings
-   /// are shared with underwriter_plugin, which reads the same rows.
+   /// live in the shared `sysio/opp/depot/chains_registry.hpp` row view.
    namespace chains = sysio::opp::depot::chains;
 }
 
@@ -401,11 +401,9 @@ struct batch_operator_plugin::impl {
     *
     * `sysio.chalg::opendispute` sends `sysio.epoch::pause`, and `chkdispute` is
     * the ONLY action that tallies the Tier-1 votes, dispatches the winning
-    * envelope and lifts that pause. Nothing on chain drives it: its sibling
-    * `chkuwchal` needs no cadence because `sysio.uwrit::chklocks` pokes it from
-    * every `sysio.epoch::advance` — which works precisely because an
-    * underwriter challenge does NOT pause the chain. An envelope dispute halts
-    * `advance` itself, so no inline poke can reach it. Without this crank a
+    * envelope and lifts that pause. Nothing on chain drives it: an envelope
+    * dispute halts `sysio.epoch::advance` itself, so no inline poke from the
+    * epoch cycle can reach it. Without this crank a
     * dispute stays OPEN after Tier-1 has already reached quorum, and epoch
     * advancement is paused indefinitely.
     *

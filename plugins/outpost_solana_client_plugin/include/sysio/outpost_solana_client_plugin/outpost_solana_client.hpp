@@ -218,7 +218,7 @@ struct extra_account_meta {
 /// too short to carry its authority and program id. Neither can be read as
 /// "no hook" without risking a hook-free manifest for a hook mint.
 ///
-/// A hook mint is the case SOL-396 exists for: `reserve_vault_transfer` routes
+/// A hook mint is the case SOL-396 exists for: `settle_desyndication` pays
 /// through `spl_token_2022::onchain::invoke_transfer_checked`, which for such a
 /// mint resolves the hook program, its validation PDA and every account that
 /// PDA declares OUT OF `remaining_accounts`. Omitting them aborts the dispatch
@@ -542,8 +542,8 @@ private:
    /// Read the syndicated liqSOL pool's facts off `DistributionState` -- the
    /// account `handle_desyndicate_liq` binds the pool's mint from. Absent or
    /// empty degrades (the handler log-and-skips an uninitialized pool); present
-   /// but unreadable THROWS, as `reserve_info_for_codes` does, because a guessed
-   /// mint would name accounts the program never asks for.
+   /// but unreadable THROWS, because a guessed mint would name accounts the
+   /// program never asks for.
    std::optional<outpost_solana_client_detail::liq_pool_info> syndicated_liq_pool();
 
    /// The outpost's per-epoch crank: liqsol-core's permissionless

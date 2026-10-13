@@ -261,8 +261,8 @@ outstanding down, so none of them raises a false alarm:
 - yield is claimed into custody before it is reported, and reported before it is released;
 - an envelope ruled INVALID or dropped with `dropenv` is burned on the depot (`sysio.synd.cpp:819`,
   `:1260`) while the outpost keeps the custody;
-- a `recredit` of a skipped desyndication returns shadow the outpost never paid out (see
-  [The recredit rule](#desyndication));
+- a request-keyed `refundreturn` restores shadow only after definitive external cancellation (see
+  [Desyndication](#desyndication));
 - anyone can send tokens to a custody account.
 
 Every writer of the depot outstanding is matched by custody, or is a launch or governance act:
@@ -273,7 +273,8 @@ Every writer of the depot outstanding is matched by custody, or is a launch or g
 | `mintyield` (pending) | `:138-150` | the yield the outpost claimed into custody before it reported it |
 | `queueyield` | `:205` | moves pending into supply; the outstanding is unchanged |
 | `burn` | `:118` | lowers the outstanding: a desyndication, an INVALID ruling, `dropenv` |
-| `recredit` | `:91` | governance: custody the outpost never paid out (the recredit rule) |
+| `mint` (from `refundreturn`) | governance | restores a tracked return only after irreversible external cancellation; erases the return atomically |
+| `recredit` | privileged repair | exceptional repair only; never recover a tracked return through this action |
 | `regliqpool` | `:355` | launch: the LCO liquidity, "already in outpost custody" (`:353-354`) |
 
 ### What happens on each side
@@ -320,10 +321,12 @@ and the latest `(chain_code, token_code)` incident must be reconciled explicitly
 message's emission after repair and its actual admission. `admit_sequence` drops any sequence at or
 below the cursor, so a cursor already past the message plus no incident does not alone prove that
 message was admitted: verify its admission trace or observe a later post-repair message being admitted.
-Only after this check passes for every repaired outpost may the depot cord clear. Mismatch rows for
-earlier pre-repair sequences reporting the known shortfall are expected and must be recorded as part
-of the existing incident, not treated as a new incident. A mismatch on the post-repair message still
-requires investigation before clearing.
+Governance then calls `reconcile(chain_code, token_code, reported)` for each affected pair with
+verified live custody covering current outstanding shadow; snapshot the incident before this erases it.
+`reconcile` leaves the cord pulled. Only after all affected incidents are erased and these admission
+checks pass may the depot cord clear. A late pre-repair report can overwrite the same pair incident
+and pull the cord again; snapshot its evidence and reconcile the pair again after verifying healthy
+live custody. A shortfall on a post-repair report requires investigation before clearing.
 
 ### What counts as slack
 
@@ -492,7 +495,7 @@ Envelope states: OPEN, WAITING, REQUESTED, RELEASABLE, HELD, INVALID, DONE.
 ## Configuration
 
 `setconfig(chain_code, token_code, synd_fee_bps, desynd_fee_bps, synd_burst, synd_refill,
-desynd_burst, desynd_refill, window_sec, bounty, challenge_extra)`, signed by `sysio`. It replaces the
+desynd_burst, desynd_refill, window_sec, bounty, challenge_extra, min_desyndicate)`, signed by `sysio`. It replaces the
 pair's whole row.
 
 | Knob | Default (no row) | Meaning |
@@ -500,6 +503,7 @@ pair's whole row.
 | `synd_fee_bps` | 0 | fee on each released syndication tranche, at most 10000 |
 | `desynd_fee_bps` | 0 | fee on each desyndication, at most 10000 |
 | `synd_burst`, `synd_refill` | unset: nothing releases | syndication bucket size, and refill per depot epoch, in base units |
+| `min_desyndicate` | explicit bootstrap value: 1,000,000 | shared gross return floor (0.001 SOL at nine decimals), intentionally arbitrary; at most a nonzero desyndication burst; rejected before moving custody |
 | `desynd_burst`, `desynd_refill` | unset: nothing desyndicates | desyndication bucket size and refill |
 | `window_sec` | 10800 | challenge window of each request; above 0 |
 | `bounty` | 0 | bounty posted on each request, paid from the fee pot |

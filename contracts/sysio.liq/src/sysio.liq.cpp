@@ -2,14 +2,11 @@
 #include <sysio.andon/sysio.andon.hpp>
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
-#include <sysio.token/sysio.token.hpp>
 #include <sysio.tokens/sysio.tokens.hpp>
-#include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/require_privileged.hpp>
 #include <sysio.opp.common/safe_ops.hpp>
 #include <sysio/print.hpp>
 
-#include <algorithm>
 
 namespace sysio {
 
@@ -80,15 +77,6 @@ void liq::create(symbol sym, sysio::slug_name chain_code, sysio::slug_name token
       .token_code  = token_code,
       .pair_symbol = symbol_code{},
    }, "symbol already exists");
-}
-
-void liq::setkicker(uint32_t bps) {
-   require_auth(SYSTEM_ACCOUNT);
-   check(bps <= opp::amm::BPS_TOTAL, "kicker_bps out of range");
-   liqconfig_t config(get_self());
-   liq_config cfg = config.get_or_default(liq_config{});
-   cfg.kicker_bps = bps;
-   config.set(cfg, ram_payer);
 }
 
 void liq::recredit(name holder, asset quantity) {
@@ -324,33 +312,6 @@ void liq::addyield(name from, asset quantity, symbol_code target) {
    distribute(target, static_cast<uint64_t>(quantity.amount));
    action(active_of(from), TOKEN_ACCOUNT, "transfer"_n,
           std::make_tuple(from, get_self(), quantity, std::string{ YIELD_MEMO })).send();
-
-   // The kicker: `kicker_bps` of the intake, requested from T5 -- only on the
-   // swap's intake, the one that is yield (tickyield's proceeds). A donation
-   // draws nothing: a near-sole holder could otherwise donate, claim it back
-   // with the kicker on top, and repeat against the treasury. fundclaim caps
-   // the draw and never throws, so what actually lands is folded in afterwards
-   // by addkicker, measured against the balance the pull above will have left.
-   if (from != SWAP_ACCOUNT) return;
-   liqconfig_t config(get_self());
-   const uint32_t kicker_bps = config.get_or_default(liq_config{}).kicker_bps;
-   const uint64_t kicker = static_cast<uint64_t>(
-      static_cast<u128>(quantity.amount) * kicker_bps / opp::amm::BPS_TOTAL);
-   if (kicker == 0) return;
-   const int64_t base_balance = wire_balance() + quantity.amount;
-   action(active_of(get_self()), SYSTEM_ACCOUNT, "fundclaim"_n,
-          std::make_tuple(get_self(), static_cast<int64_t>(kicker))).send();
-   action(active_of(get_self()), get_self(), "addkicker"_n,
-          std::make_tuple(target, base_balance, kicker)).send();
-}
-
-void liq::addkicker(symbol_code sym, int64_t base_balance, uint64_t requested) {
-   require_auth(get_self());
-   const int64_t received = wire_balance() - base_balance;
-   if (received <= 0) return;   // T5 had nothing to give: base yield only
-   const currency_stats st = stat_of(sym);
-   if (st.supply.amount <= 0) return;
-   distribute(sym, std::min<uint64_t>(static_cast<uint64_t>(received), requested));
 }
 
 // ---------------------------------------------------------------------------
@@ -433,12 +394,6 @@ u128 liq::current_index(symbol_code sym) const {
    yieldidxs indexes(get_self());
    const auto idx = indexes.try_get(symbol_key{ sym.raw() });
    return idx ? idx->index : 0;
-}
-
-int64_t liq::wire_balance() const {
-   token::accounts holdings(TOKEN_ACCOUNT, get_self().value);
-   const auto row = holdings.try_get(token::acct_key{ WIRE_SYM.code().raw() });
-   return row ? row->balance.amount : 0;
 }
 
 void liq::settle_and_adjust(opp::shadow::account& row, u128 index, const asset& delta) {

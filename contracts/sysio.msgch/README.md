@@ -51,8 +51,6 @@ Inbound (outpost → depot):
   `sysio.synd::closeenv`, only when at least one of them reached `sysio.synd`.
 - `NODE_OWNER_REG` → `sysio.roa` (account creation and node-owner registration, recording the
   outpost link).
-- `STAKING_REWARD` → `sysio.dclaim::onreward`, after binding the reward's chain to the proven
-  delivering outpost.
 - Every other type is dropped. Every refusal is a logged drop, never an abort.
 
 Outbound (depot → outpost), queued through `queueout`:
@@ -65,4 +63,4 @@ Outbound (depot → outpost), queued through `queueout`:
 - Reads epoch state from `sysio.epoch` and operator status from `sysio.opreg`
 - Opens disputes on `sysio.chalg` (`opendispute`); `sysio.chalg::chkdispute` calls back into `resolvedisp`
 - Triggers `sysio.epoch::advance` from `chkcons` (and from `bootstrap` at epoch 0)
-- Routes inbound attestations to `sysio.synd`, `sysio.roa` and `sysio.dclaim`
+- Routes inbound attestations to `sysio.synd` and `sysio.roa`; node-owner linking can indirectly sweep funded DClaim imports
