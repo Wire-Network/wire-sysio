@@ -1,0 +1,11 @@
+diff --git a/include/bls12-381/scalar.hpp b/include/bls12-381/scalar.hpp
+--- a/include/bls12-381/scalar.hpp
++++ b/include/bls12-381/scalar.hpp
+@@ -7,6 +7,7 @@
+ #include <stdexcept>
+ #include <bit>
+ #include <string_view>
++#include <vector>
+ 
+ #include <bls12-381/fp.hpp>
+ #include <bls12-381/g.hpp>

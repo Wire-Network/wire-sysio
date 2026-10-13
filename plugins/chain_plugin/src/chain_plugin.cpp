@@ -718,7 +718,8 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
          ("maximum-variable-signature-length", bpo::value<uint32_t>()->default_value(16384u),
           "Subjectively limit the maximum length of variable components in a variable legnth signature to this size in bytes")
          ("trusted-producer", bpo::value<vector<string>>()->composing(), "Indicate a producer whose blocks headers signed by it will be fully validated, but transactions in those validated blocks will be trusted.")
-         ("database-map-mode", bpo::value<chainbase::pinnable_mapped_file::map_mode>()->default_value(chainbase::pinnable_mapped_file::map_mode::mapped),
+         // Supply the display text explicitly; Boost's numeric enum trait casts -1 outside this enum's range.
+         ("database-map-mode", bpo::value<chainbase::pinnable_mapped_file::map_mode>()->default_value(chainbase::pinnable_mapped_file::map_mode::mapped, "mapped"),
           "Database map mode (\"mapped\", \"mapped_private\", \"heap\", or \"locked\").\n"
           "In \"mapped\" mode database is memory mapped as a file.\n"
           "In \"mapped_private\" mode database is memory mapped as a file using a private mapping (no disk writeback until program exit).\n"

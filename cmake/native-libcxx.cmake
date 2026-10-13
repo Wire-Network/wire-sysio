@@ -1,0 +1,25 @@
+# Debug native modules and their host must share exception/unwinder state.
+# The C++ dependencies remain static archives with the same libc++ ABI.
+if("native-module" IN_LIST SYSIO_WASM_RUNTIMES)
+  include(GNUInstallDirs)
+  file(RELATIVE_PATH _wire_runtime_install_path "/${CMAKE_INSTALL_BINDIR}" "/${CMAKE_INSTALL_LIBDIR}")
+  set(_wire_shared_libraries "-L\"${_wire_runtime_dir}\" -lc++ -lc++abi -lunwind")
+  if(APPLE)
+    set(_wire_runtime_suffix dylib)
+    list(APPEND CMAKE_INSTALL_RPATH "@loader_path/${_wire_runtime_install_path}")
+  else()
+    set(_wire_runtime_suffix so)
+    # Keep all three direct dependencies: RUNPATH does not cover indirect loads.
+    set(_wire_shared_libraries "-L\"${_wire_runtime_dir}\" -Wl,--no-as-needed -lc++ -lc++abi -lunwind -Wl,--as-needed")
+    list(APPEND CMAKE_INSTALL_RPATH "$ORIGIN/${_wire_runtime_install_path}")
+  endif()
+  foreach(_wire_runtime c++ c++abi unwind)
+    if(NOT EXISTS "${_wire_runtime_dir}/lib${_wire_runtime}.${_wire_runtime_suffix}")
+      message(FATAL_ERROR "Native debugging requires shared ${_wire_runtime} in WIRE_LLVM_ROOT")
+    endif()
+  endforeach()
+  string(REPLACE "-L\"${_wire_static_dir}\" -lc++ -lc++abi -lunwind"
+         "${_wire_shared_libraries}" CMAKE_CXX_STANDARD_LIBRARIES "${_wire_cxx_libraries}")
+  string(REPLACE " -static-libgcc" "" CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES}")
+  list(APPEND CMAKE_BUILD_RPATH "${_wire_runtime_dir}")
+endif()

@@ -1,9 +1,10 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg-configuration.schema.json",
+  "overlay-ports": ["cmake/vcpkg-ports"],
   "default-registry": {
     "kind": "git",
     "baseline": "74e6536215718009aae747d86d84b78376bf9e09",
-    "reference": "bc71aa640f89933294f16e004b212c7fd3183eed",
+    "reference": "c52c09caca13081c628ade492d334033f7130edc",
     "repository": "https://github.com/Microsoft/vcpkg"
   },
   "registries": [

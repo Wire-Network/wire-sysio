@@ -1,0 +1,24 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -22,7 +22,8 @@
+ set(CMAKE_CXX_EXTENSIONS ON)
+ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+ 
+-set(CMAKE_CXX_FLAGS "-fdiagnostics-color=always")
++# Preserve the caller's standard-library and ABI flags.
++string(APPEND CMAKE_CXX_FLAGS " -fdiagnostics-color=always")
+ set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+ 
+ # ##################################################################################################
+--- a/tools/addr2line.cpp
++++ b/tools/addr2line.cpp
+@@ -95,7 +95,8 @@
+    using namespace sysio::vm;
+    auto code = read_wasm(filename);
+    nm_debug_info info;
+-   module mod;
++   // Qualify the type to avoid the C++20 module contextual keyword.
++   sysio::vm::module mod;
+    binary_parser<null_writer, nm_options, nm_debug_info> parser(mod.allocator);
+    parser.parse_module(code, mod, info);
+    {

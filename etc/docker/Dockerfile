@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile
 # Stages:
 #   1) distro-deps   - Install OS-level toolchain and libraries (base for all other stages)
-#   2) source-deps   - Build clang 18
+#   2) source-deps   - Install LLVM 23.1.3 and its C++ runtime
 #   3) app-source-*  - Prepare application sources (from local context or remote repo)
 #   4) app-build-*   - Build the application from the chosen app-source-* stage
 #
@@ -28,12 +28,12 @@ ENV CDT_BUILD_DIR="${CDT_DIR}/build/${BUILD_TYPE}"
 ENV APP_DEV_BUILD_DIR="${APP_DIR}/build/debug-docker"
 ENV CDT_DEV_BUILD_DIR="${CDT_DIR}/build/debug-docker"
 
-ENV CLANG_18_DIR=/opt/clang/clang-18
+ENV WIRE_LLVM_ROOT=/opt/llvm-23.1.3
 
 # vcpkg deterministic behavior (manifests/registries/versions + compiler tracking)
 ENV VCPKG_FEATURE_FLAGS=manifests,registries,versions,compilertracking
-ENV VCPKG_DEFAULT_TRIPLET=x64-linux
-ENV VCPKG_OVERLAY_TRIPLETS=/wire/wire-sysio/vcpkg/triplets
+ENV VCPKG_DEFAULT_TRIPLET=x64-linux-release
+ENV VCPKG_OVERLAY_TRIPLETS=/wire/wire-sysio/.github/vcpkg-triplets
 
 # Core package tools and repository helpers
 RUN apt-get update && \
@@ -84,32 +84,12 @@ RUN mkdir -p /opt/ccache-storage && ccache -M 40GB -d /opt/ccache-storage
 
 # Stage 2: source-deps
 FROM distro-deps AS source-deps
-# Prepare build context for Clang 18 scripts
-RUN mkdir -p /opt/clang/scripts
-
-# Build clang-18 once; this layer will cache unless scripts or args change
-RUN --mount=type=bind,from=clang-18-scripts,target=/opt/clang/scripts \
-    BASE_DIR=/opt/clang /opt/clang/scripts/clang-18-ubuntu-build-source.sh
-
-ENV PATH="${CLANG_18_DIR}/bin:${PATH}"
-
-# A tiny chainloaded toolchain so vcpkg sub-builds always use clang-18
-RUN cat > /opt/clang/clang18-vcpkg-toolchain.cmake <<'EOF'
-set(CMAKE_C_COMPILER   /opt/clang/clang-18/bin/clang)
-set(CMAKE_CXX_COMPILER /opt/clang/clang-18/bin/clang++)
-set(CMAKE_AR           /opt/clang/clang-18/bin/llvm-ar)
-set(CMAKE_RANLIB       /opt/clang/clang-18/bin/llvm-ranlib)
-# Be explicit; some ports gate on language level
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-EOF
-
-# Make sure vcpkg keeps (and uses) the chainloaded toolchain in all sub-configures
-ENV B2_TOOLSET=clang \
-    CC=${CLANG_18_DIR}/bin/clang \
-    CXX=${CLANG_18_DIR}/bin/clang++ \
-    VCPKG_CHAINLOAD_TOOLCHAIN_FILE=/opt/clang/clang18-vcpkg-toolchain.cmake \
-    VCPKG_KEEP_ENV_VARS="CC;CXX;AR;RANLIB;B2_TOOLSET;VCPKG_CHAINLOAD_TOOLCHAIN_FILE"
+# The same verified host distribution is used by local builds and CI.
+RUN --mount=type=bind,from=llvm-scripts,target=/opt/llvm-scripts \
+    bash /opt/llvm-scripts/install-toolchain.sh "${WIRE_LLVM_ROOT}"
+ENV PATH="${WIRE_LLVM_ROOT}/bin:${PATH}"
+ENV CC=${WIRE_LLVM_ROOT}/bin/clang \
+    CXX=${WIRE_LLVM_ROOT}/bin/clang++
 
 ENV MAX_JOBS=16
 
@@ -159,9 +139,8 @@ RUN set -eux; \
       -DCMAKE_TOOLCHAIN_FILE="${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
       -DCMAKE_C_COMPILER="${CC}" \
       -DCMAKE_CXX_COMPILER="${CXX}" \
-      -DCMAKE_AR="${CLANG_18_DIR}/bin/llvm-ar" \
-      -DCMAKE_RANLIB="${CLANG_18_DIR}/bin/llvm-ranlib" \
-      -DCMAKE_PREFIX_PATH="${CLANG_18_DIR}" \
+      -DCMAKE_AR="${WIRE_LLVM_ROOT}/bin/llvm-ar" \
+      -DCMAKE_RANLIB="${WIRE_LLVM_ROOT}/bin/llvm-ranlib" \
       -DENABLE_CCACHE=ON 
 
 RUN cmake --build . -- -j$(( $([[ "$(nproc)" -gt ${MAX_JOBS} ]] && echo ${MAX_JOBS} || nproc) - 1 ))
@@ -184,7 +163,6 @@ RUN env CC=${CC} CXX=${CXX} \
     -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
     -DCMAKE_C_COMPILER=${CC} \
     -DCMAKE_CXX_COMPILER=${CXX} \
-    -DCMAKE_PREFIX_PATH="${CLANG_18_DIR}" \
     -DENABLE_CCACHE=ON
 
 RUN cmake --build . -- -j$(( $([[ "$(nproc)" -gt ${MAX_JOBS} ]] && echo ${MAX_JOBS} || nproc) - 1 ))
@@ -233,8 +211,7 @@ RUN env CC=${CC} CXX=${CXX} \
         -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
         -DCMAKE_C_COMPILER=${CC} \
         -DCMAKE_CXX_COMPILER=${CXX} \
-        -DCMAKE_PREFIX_PATH="${CLANG_18_DIR}" \
-        -Dsysio_DIR=${APP_BUILD_DIR} \
+          -Dsysio_DIR=${APP_BUILD_DIR} \
         -DENABLE_CCACHE=ON
 
 RUN  cmake --build . -- -j$(( $([[ "$(nproc)" -gt ${MAX_JOBS} ]] && echo ${MAX_JOBS} || nproc) - 1 ))

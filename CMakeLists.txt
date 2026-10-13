@@ -6,6 +6,35 @@ cmake_minimum_required(VERSION 3.19)
 # up.
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 
+# Select the same libc++ ABI for the application and vcpkg before project()
+# enables languages or installs dependencies. Contract builds use a separate
+# CDT toolchain and do not execute this host project.
+if(WIRE_LLVM_ROOT)
+  # A cached/-D prefix must also reach vcpkg's isolated port processes.
+  set(ENV{WIRE_LLVM_ROOT} "${WIRE_LLVM_ROOT}")
+endif()
+set(VCPKG_CHAINLOAD_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/cmake/llvm-toolchain.cmake"
+    CACHE FILEPATH "Host LLVM/libc++ toolchain")
+set(VCPKG_OVERLAY_TRIPLETS "${CMAKE_CURRENT_SOURCE_DIR}/.github/vcpkg-triplets"
+    CACHE PATH "Release-only dependency triplets")
+if(NOT VCPKG_TARGET_TRIPLET)
+  # Host processor variables are not populated until project() on a fresh build.
+  cmake_host_system_information(RESULT CMAKE_HOST_SYSTEM_PROCESSOR QUERY OS_PLATFORM)
+  if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64)$")
+    set(_wire_host_arch arm64)
+  elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64)$")
+    set(_wire_host_arch x64)
+  else()
+    message(FATAL_ERROR "Specify a supported VCPKG_TARGET_TRIPLET for ${CMAKE_HOST_SYSTEM_PROCESSOR}")
+  endif()
+  if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+    set(VCPKG_TARGET_TRIPLET "${_wire_host_arch}-osx-release" CACHE STRING "vcpkg target")
+  else()
+    set(VCPKG_TARGET_TRIPLET "${_wire_host_arch}-linux-release" CACHE STRING "vcpkg target")
+  endif()
+endif()
+set(VCPKG_HOST_TRIPLET "${VCPKG_TARGET_TRIPLET}" CACHE STRING "vcpkg host")
+
 # Set vcpkg toolchain if not already set
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
@@ -29,6 +58,11 @@ else()
 endif()
 
 project(wire-sysio)
+
+include(cmake/check-libcxx.cmake)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 15)
+  message(FATAL_ERROR "libc++ 23 requires GCC 15 or later")
+endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(build-options NO_POLICY_SCOPE)
@@ -100,6 +134,8 @@ endif()
 
 
 # based on http://www.delorie.com/gnu/docs/gdb/gdb_70.html
+include(cmake/native-libcxx.cmake)
+
 # uncomment this line to tell GDB about macros (slows compile times)
 # set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -gdwarf-2 -g3" )
 
@@ -151,6 +187,31 @@ add_subdirectory(tools)
 add_subdirectory(benchmark)
 
 add_subdirectory(contracts)
+# CDT's native MODULE helper predates the host libc++ ABI. Remove only its
+# explicit GNU runtime libraries; WASM targets and CDT itself remain unchanged.
+function(wire_native_contract_runtime directory)
+  get_property(_targets DIRECTORY "${directory}" PROPERTY BUILDSYSTEM_TARGETS)
+  foreach(_target IN LISTS _targets)
+    get_target_property(_type "${_target}" TYPE)
+    if(_type STREQUAL "MODULE_LIBRARY")
+      get_target_property(_libraries "${_target}" LINK_LIBRARIES)
+      list(REMOVE_ITEM _libraries gcc_s stdc++)
+      set_property(TARGET "${_target}" PROPERTY LINK_LIBRARIES "${_libraries}")
+    endif()
+  endforeach()
+  get_property(_directories DIRECTORY "${directory}" PROPERTY SUBDIRECTORIES)
+  foreach(_directory IN LISTS _directories)
+    wire_native_contract_runtime("${_directory}")
+  endforeach()
+endfunction()
+if("native-module" IN_LIST SYSIO_WASM_RUNTIMES)
+  wire_native_contract_runtime("${CMAKE_CURRENT_SOURCE_DIR}/contracts")
+  # Make Debug packages portable without depending on the build host's prefix.
+  file(GLOB _wire_shared_runtime_files "${_wire_runtime_dir}/libc++.so*"
+       "${_wire_runtime_dir}/libc++abi.so*" "${_wire_runtime_dir}/libunwind.so*"
+       "${_wire_runtime_dir}/libc++*.dylib" "${_wire_runtime_dir}/libunwind*.dylib")
+  install(FILES ${_wire_shared_runtime_files} DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT base)
+endif()
 add_subdirectory(contracts/tests)
 
 if(TARGET test_chain_plugin AND TARGET contracts_project)
@@ -163,10 +224,15 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sysio.version.hpp DESTINATION ${CMAKE_
 set(SYSIO_ROOT_DIR "${CMAKE_INSTALL_FULL_LIBDIR}")
 configure_file(${CMAKE_SOURCE_DIR}/cmake/sysio-config.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/sysio-config.cmake @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/cmake/SysioTester.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioTester.cmake @ONLY)
+configure_file(cmake/llvm-toolchain.cmake lib/cmake/sysio/llvm-toolchain.cmake COPYONLY)
+configure_file(cmake/check-libcxx.cmake lib/cmake/sysio/check-libcxx.cmake COPYONLY)
+configure_file(cmake/native-libcxx.cmake lib/cmake/sysio/native-libcxx.cmake COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/cmake/SysioCheckVersion.cmake ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioCheckVersion.cmake COPYONLY)
 
 install(FILES ${CMAKE_BINARY_DIR}/lib/cmake/sysio/sysio-config.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sysio COMPONENT dev)
 install(FILES ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioTester.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sysio COMPONENT dev)
+install(FILES cmake/llvm-toolchain.cmake cmake/check-libcxx.cmake cmake/native-libcxx.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sysio COMPONENT dev)
 install(FILES ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sysio COMPONENT dev)
 
 include(cmake/licenses.cmake)
