@@ -51,6 +51,9 @@ patches while retaining existing dependency source revisions:
 - BLS12-381 explicitly includes `<vector>` rather than depending on a transitive include.
 - GMP's custom C++ compiler probe honors `LDFLAGS` and `LIBS` for libc++ linkage.
 - sys-vm preserves caller C++ flags and qualifies its `module` type for Clang 23.
+- AWS CRT disables speculative devirtualization only for its MQTT adapter source
+  when compiled with GCC 15 and libc++ 23, avoiding recursive `std::function`
+  inlining failures. Clang and libstdc++ builds retain their optimization settings.
 
 The LLVM dependency builds X86 and AArch64 targets with RTTI. Runtime platform
 gates remain in the root `CMakeLists.txt`; this upgrade does not enable OC on
