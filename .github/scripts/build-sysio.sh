@@ -9,6 +9,13 @@ VCPKG_TARGET_TRIPLET="${VCPKG_TARGET_TRIPLET:-x64-linux-release}"
 VCPKG_HOST_TRIPLET="${VCPKG_HOST_TRIPLET:-$VCPKG_TARGET_TRIPLET}"
 VCPKG_OVERLAY_TRIPLETS="${VCPKG_OVERLAY_TRIPLETS:-$GITHUB_WORKSPACE/.github/vcpkg-triplets}"
 
+# ANTLR and its generated consumers share libc++ container annotations.
+# Track this choice in vcpkg so ASan never reuses the ordinary runtime archive.
+export WIRE_ASAN_ANTLR=0
+if [[ "${SYSIO_PLATFORM_NAME:-}" == asan ]]; then
+  export WIRE_ASAN_ANTLR=1
+fi
+
 # Provision libc++ before vcpkg: all host C++ dependencies must be rebuilt with
 # this ABI, while CDT remains an independently selected contract toolchain.
 export WIRE_LLVM_ROOT="${WIRE_LLVM_ROOT:-${RUNNER_TEMP:-$GITHUB_WORKSPACE/build}/llvm-23.1.3}"

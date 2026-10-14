@@ -59,6 +59,11 @@ patches while retaining existing dependency source revisions:
   when compiled with GCC 15 and libc++ 23, avoiding recursive `std::function`
   inlining failures. Clang and libstdc++ builds retain their optimization settings.
 
+The ASan lane also instruments the ANTLR runtime. Generated parser code and
+ANTLR share libc++ containers, so both must update their sanitizer annotations.
+The triplet tracks this choice in the ANTLR package ABI; other lanes retain the
+ordinary runtime archive and container checks remain enabled.
+
 The LLVM dependency builds X86 and AArch64 targets with RTTI. Runtime platform
 gates remain in the root `CMakeLists.txt`; this upgrade does not enable OC on
 additional platforms. OC continues to use the existing RuntimeDyld compilation
