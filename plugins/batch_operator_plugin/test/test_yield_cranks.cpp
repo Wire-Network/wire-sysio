@@ -14,6 +14,18 @@ using mvo = fc::mutable_variant_object;
 
 namespace {
 
+/// Independent deployment fixtures: both TWAP settings must preserve the supplied cadence.
+constexpr uint32_t short_twap_window_sec = 60;
+constexpr uint32_t production_twap_window_sec = 86'400;
+constexpr uint32_t configured_min_interval_sec = 3600;
+/// Extra kickcfg fields supplied by this test; the crank only consumes min_interval_sec.
+namespace kicker_fixture {
+namespace field {
+constexpr auto budget_remaining = "budget_remaining";
+constexpr auto twap_window_sec = "twap_window_sec";
+}
+}
+
 constexpr auto    pool_code    = "POOLB";
 constexpr auto    shadow_code  = "LIQSOL";
 constexpr int64_t one_token    = 1'000'000'000;   // one whole 9-decimal token, in subunits
@@ -105,9 +117,13 @@ BOOST_AUTO_TEST_CASE(row_value_unwraps_the_kv_wrapper) {
 }
 
 BOOST_AUTO_TEST_CASE(kick_min_interval_reads_the_config_and_refuses_what_setconfig_would) {
-   const auto interval = kick_min_interval(mvo()("budget_remaining", 0)("min_interval_sec", 3600));
-   BOOST_REQUIRE(interval.has_value());
-   BOOST_CHECK_EQUAL(fc::seconds(3600).count(), interval->count());
+   // Full kickcfg rows at both supported deployment settings retain the configured payment cadence.
+   for (const uint32_t window : {short_twap_window_sec, production_twap_window_sec}) {
+      const auto interval = kick_min_interval(mvo()(kicker_fixture::field::budget_remaining, 0)
+         (kicker::field::min_interval_sec, configured_min_interval_sec)(kicker_fixture::field::twap_window_sec, window));
+      BOOST_REQUIRE(interval.has_value());
+      BOOST_CHECK_EQUAL(fc::seconds(configured_min_interval_sec).count(), interval->count());
+   }
 
    BOOST_CHECK(!kick_min_interval(mvo()("budget_remaining", 0)).has_value());   // absent
    BOOST_CHECK(!kick_min_interval(mvo()("min_interval_sec", 0)).has_value());   // setconfig refuses 0
@@ -181,6 +197,35 @@ BOOST_AUTO_TEST_CASE(crank_spacing_allows_one_push_per_interval_per_key) {
    BOOST_CHECK(spacing.due(pool_code, t0 + fc::seconds(60), interval));
    // Keys are independent: a tick on one pool does not delay another.
    BOOST_CHECK(spacing.due(shadow_code, t0, interval));
+}
+
+/// A multi-page sweep retains all live pools and drops retired retry keys only on completion.
+BOOST_AUTO_TEST_CASE(kick_scan_pages_fairly_and_prunes_removed_pools) {
+   static_assert(kicker::pools_per_poll == 10);
+   constexpr auto next_page = "{\"symbol_code\":123}";
+   constexpr auto retired = "RETIRED";
+   const auto now = fc::time_point::now();
+   const auto interval = fc::seconds(60);
+   crank_spacing spacing;
+   kick_pool_scan scan;
+   spacing.mark(pool_code, now);
+   spacing.mark(shadow_code, now);
+   spacing.mark(retired, now);
+   BOOST_CHECK(scan.lower_bound().empty());
+   scan.observe(pool_code);
+   scan.finish_page(true, next_page, spacing);
+   BOOST_CHECK_EQUAL(next_page, scan.lower_bound());
+   BOOST_CHECK(!spacing.due(retired, now, interval));
+   scan.observe(shadow_code);
+   scan.finish_page(false, {}, spacing);
+   BOOST_CHECK(scan.lower_bound().empty());
+   BOOST_CHECK(!spacing.due(pool_code, now, interval));
+   BOOST_CHECK(!spacing.due(shadow_code, now, interval));
+   BOOST_CHECK(spacing.due(retired, now, interval));
+   // An empty table prunes everything; re-added symbols can be attempted immediately.
+   scan.finish_page(false, {}, spacing);
+   BOOST_CHECK(spacing.due(pool_code, now, interval));
+   BOOST_CHECK(spacing.due(shadow_code, now, interval));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

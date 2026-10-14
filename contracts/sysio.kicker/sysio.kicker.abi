@@ -26,6 +26,20 @@
             ]
         },
         {
+            "name": "cumulative_price",
+            "base": "",
+            "fields": [
+                {
+                    "name": "lo",
+                    "type": "uint128"
+                },
+                {
+                    "name": "hi",
+                    "type": "uint128"
+                }
+            ]
+        },
+        {
             "name": "kick",
             "base": "",
             "fields": [
@@ -45,6 +59,10 @@
                 },
                 {
                     "name": "min_interval_sec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "twap_window_sec",
                     "type": "uint32"
                 }
             ]
@@ -96,6 +114,14 @@
                 {
                     "name": "spent_today",
                     "type": "uint128"
+                },
+                {
+                    "name": "price_snapshot",
+                    "type": "cumulative_price"
+                },
+                {
+                    "name": "price_time",
+                    "type": "time_point"
                 }
             ]
         },

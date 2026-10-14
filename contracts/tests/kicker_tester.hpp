@@ -9,6 +9,15 @@ namespace kicker_test_support {
 namespace math = sysio::kicker_math;
 using kicker_test_reference::wide;
 using kicker_test_reference::reference;
+/// Configuration field identifiers shared by the kicker fixture and its assertions.
+namespace kicker {
+namespace field {
+inline constexpr auto cfg = "cfg";
+inline constexpr auto budget_remaining = "budget_remaining";
+inline constexpr auto min_interval_sec = "min_interval_sec";
+inline constexpr auto twap_window_sec = "twap_window_sec";
+}
+}
 /// Real LIQ/swap/kicker plus emissions and epoch contracts; treasury state can be stressed explicitly.
 class kicker_tester : public sysio_liq_tester {
 public:
@@ -46,19 +55,26 @@ public:
       BOOST_REQUIRE_EQUAL(success(), configure(budget));
       BOOST_REQUIRE_EQUAL(success(), add());
    }
-   /// Change the absolute earmark and minimum payment spacing.
-   action_result configure(uint64_t remaining, uint32_t interval = 3600, name signer = SYSIO_ACCOUNT) {
+   /// Change the absolute earmark, minimum payment spacing and TWAP observation window.
+   action_result configure(uint64_t remaining, uint32_t interval = math::default_min_interval_sec,
+                           name signer = SYSIO_ACCOUNT, uint32_t window = math::default_twap_window_sec) {
       return push(KICKER, kicker_ser, signer, "setconfig"_n,
-                  mvo()("cfg", mvo()("budget_remaining", remaining)("min_interval_sec", interval)));
+                  mvo()(kicker::field::cfg, mvo()(kicker::field::budget_remaining, remaining)
+                     (kicker::field::min_interval_sec, interval)(kicker::field::twap_window_sec, window)));
+   }
+   /// Decode the current governance settings, including defaults serialized by configure.
+   fc::variant configuration() {
+      return decode(kicker_ser, "kick_config", get_row_by_id(KICKER, KICKER, "kickcfg"_n, "kickcfg"_n.value));
    }
    /// Start a token at the protocol defaults unless the test supplies overrides.
    action_result add(symbol sym = LIQSOL_SYM, uint16_t rate = math::default_rate_bps,
-                     uint64_t minimum = math::default_min_gift, uint64_t cap = 0, name signer = SYSIO_ACCOUNT) {
+                     uint64_t minimum = math::default_min_gift, uint64_t cap = math::max_daily_gift,
+                     name signer = SYSIO_ACCOUNT) {
       return push(KICKER, kicker_ser, signer, "addpool"_n,
                   mvo()("sym", sym.to_symbol_code())("rate_bps", rate)("min_gift", minimum)("max_gift_per_day", cap));
    }
    /// Change a pool without closing its current accrual interval.
-   action_result change(uint16_t rate, uint64_t minimum, uint64_t cap = 0, symbol sym = LIQSOL_SYM,
+   action_result change(uint16_t rate, uint64_t minimum, uint64_t cap = math::max_daily_gift, symbol sym = LIQSOL_SYM,
                         name signer = SYSIO_ACCOUNT) {
       return push(KICKER, kicker_ser, signer, "setpool"_n,
                   mvo()("sym", sym.to_symbol_code())("rate_bps", rate)("min_gift", minimum)("max_gift_per_day", cap));
@@ -107,17 +123,50 @@ public:
    uint64_t elapsed(symbol sym = LIQSOL_SYM) {
       return (control->pending_block_time() - kick_clock(sym)).count();
    }
-   /// Expected next payment uses the current supply and live pool, never an accumulator.
+   /// Independent 256-bit TWAP oracle over serialized swap history, including the idle tail.
    uint64_t expected(symbol sym = LIQSOL_SYM) {
       const auto row = stat_row(sym);
       const auto pair_code = symbol::from_string("9," + row["pair_symbol"].as_string());
       const auto pair = swap_pool_row(pair_code);
-      return reference(row["supply"].as<asset>().get_amount(), pool(sym)["rate_bps"].as_uint64(), elapsed(sym),
-                       pair["pool2"]["quantity"].as<asset>().get_amount(),
-                       pair["pool1"]["quantity"].as<asset>().get_amount());
+      const auto observation = pool(sym);
+      const auto now = control->pending_block_time();
+      const auto span = (now - observation["price_time"].as<time_point>()).count();
+      if (span < configuration()[kicker::field::twap_window_sec].as_uint64() * math::micros_per_sec) return 0;
+      const auto accum = decode(swap_abi_ser, "price_accumulator",
+         get_row_by_id(SWAP_ACCOUNT, SWAP_ACCOUNT, "priceaccum"_n, pair_code.to_symbol_code().value));
+      const auto cumulative = [](const fc::variant& v) -> wide {
+         return (wide(v["hi"].as_uint128()) << 128) + wide(v["lo"].as_uint128());
+      };
+      const auto wire = pair["pool2"]["quantity"].as<asset>().get_amount();
+      const auto shadow = pair["pool1"]["quantity"].as<asset>().get_amount();
+      const wide spot = shadow ? (wide(wire) << 64) / shadow : wide(0);
+      const wide current = cumulative(accum["price1"]) + spot * (now - accum["last_update"].as<time_point>()).count();
+      const wide price = (current - cumulative(observation["price_snapshot"])) / span;
+      const wide accrued = wide(row["supply"].as<asset>().get_amount()) * observation["rate_bps"].as_uint64() *
+         std::min(elapsed(sym), math::max_catchup_us) / (wide(10'000) * 31'557'600 * 1'000'000);
+      return static_cast<uint64_t>((accrued * price) >> 64);
    }
    /// Advance chain time in one block, without waiting on the host clock.
    void wait(uint64_t seconds) { produce_block(fc::seconds(seconds)); }
+   /// Inject a known span of price history for arithmetic stress tests, independent of live reserves.
+   void price_history(symbol sym, symbol pair, uint64_t wire, uint64_t shadow, uint32_t seconds = math::day_sec) {
+      constexpr auto accumulator_table = "priceaccum"_n;
+      constexpr auto pool_table = "kickpools"_n;
+      const auto now = control->pending_block_time();
+      const auto start = now - fc::seconds(seconds);
+      const auto zero = mvo()("lo", fc::uint128_t{0})("hi", fc::uint128_t{0});
+      const wide cumulative = ((wide(wire) << 64) / shadow) * (now - start).count();
+      const wide mask = (wide(1) << 128) - 1;
+      auto accum = mvo()("price1", mvo()("lo", static_cast<fc::uint128_t>(cumulative & mask))
+         ("hi", static_cast<fc::uint128_t>(cumulative >> 128)))("price2", zero)("last_update", now);
+      write_row(SWAP_ACCOUNT, swap_abi_ser, accumulator_table, pair.to_symbol_code().value, "price_accumulator", accum);
+      // Preserve the exact microsecond accrual clock: ABI JSON time formatting truncates it.
+      auto data = get_row_by_id(KICKER, KICKER, pool_table, sym.to_symbol_code().value);
+      const auto observation = fc::raw::pack(std::make_tuple(fc::uint128_t{0}, fc::uint128_t{0}, start));
+      BOOST_REQUIRE_GE(data.size(), observation.size());
+      std::copy(observation.begin(), observation.end(), data.end() - observation.size());
+      write_raw_row(KICKER, pool_table, sym.to_symbol_code().value, data);
+   }
    /// Read a reserve-owning singleton through the deployed system ABI.
    fc::variant treasury(name table, const char* type) {
       return decode(system_ser, type, get_row_by_id(SYSIO_ACCOUNT, SYSIO_ACCOUNT, table, table.value));
@@ -131,6 +180,10 @@ public:
                   const variant_object& value) {
       const auto encoded = ser.variant_to_binary(type, value,
          abi_serializer::create_yield_function(abi_serializer_max_time));
+      write_raw_row(code, table, id, encoded);
+   }
+   /// Store exact serialized bytes without routing time_point fields through JSON.
+   void write_raw_row(name code, name table, uint64_t id, const std::vector<char>& encoded) {
       char key[chain::kv_pri_key_size];
       chain::kv_encode_be64(key, id);
       auto& db = const_cast<chainbase::database&>(control->db());

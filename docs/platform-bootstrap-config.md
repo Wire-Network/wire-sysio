@@ -115,10 +115,11 @@ the outside-the-pool earmark.
 
 Deploy `sysio.kicker` privileged with `sysio.roa::setsyscode`, alongside LIQ and swap.
 After `setemitcfg`/`initt5` and each `regliqpool`, governance (`sysio`) calls
-`sysio.kicker::setconfig({budget_remaining, min_interval_sec})`, then
+`sysio.kicker::setconfig({budget_remaining, min_interval_sec, twap_window_sec})`, then
 `addpool(sym, rate_bps, min_gift, max_gift_per_day)` for each LIQ token. The
 C++ defaults are 200 bps and 1,000,000,000 WIRE subunits; all action fields must
-be supplied by ABI clients. Zero disables the per-pool daily cap. A third LIQ
+be supplied by ABI clients. The daily cap defaults to 1,000 WIRE, must be positive,
+and cannot exceed 1,000 WIRE per pool. A third LIQ
 requires these same configuration calls and no kicker code change. Any keeper
 may call `kick(sym)`, and every ACTIVE batch operator does once a pool's interval
 has elapsed; `setpool` changes the whole open interval's rate and
@@ -130,8 +131,25 @@ Set `t5_distributable = A - D - K` and retain enough WIRE to back both earmarks.
 not validate the off-chain earmark arithmetic. Governance must back every replacement
 with treasury funds outside emissions. The reserve guard protects pending emissions,
 claims, and the remaining emission ceiling; it does not reserve node-owner vest. Partial payments advance
-a floored pro-rata clock. Monitor actual kicks: the batch-operator crank is the
-schedule, the minimum interval is a floor, and spot-price manipulation exposure scales with the unpaid interval.
+a floored pro-rata clock within at most 72 hours of accrual; payment forfeits older
+accrual. Pricing uses swap's cumulative-price TWAP with an observation since registration
+or the last full payment of at least `kickcfg.twap_window_sec` seconds. This governance
+setting defaults to **86,400 seconds (one day)** and must be at least **60 seconds**.
+Production keeps one day; test clusters may use a shorter window, with `min_interval_sec`
+and `min_gift` low enough to permit payment. A change applies on the next `kick` to the
+in-flight observation without resetting `price_time`, `price_snapshot` or the accrual
+clock. Lowering the window can make that observation immediately eligible; raising it
+makes the same observation wait until the new window elapses.
+Monitor actual kicks: the batch-operator
+crank is the schedule, the minimum interval is a floor, and TWAP warm-up also gates payment.
+
+A one-block price spike in a shallow pool contributes its duration weight to the
+arithmetic TWAP. A large trade held across one block can push the bounded gift to
+the daily cap. A holder of most of the LIQ supply, who receives most of that gift,
+can then profit from the round trip. This residual risk is accepted.
+Governance registers only pools with deep liquidity and sets `max_gift_per_day`
+well under the cost of moving that pool's price.
+
 The legacy Python boot tool does not deploy the LIQ/swap subsystem; the platform
 bootstrap client must create/deploy/configure the kicker in its LIQ flow.
 

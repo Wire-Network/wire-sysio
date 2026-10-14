@@ -25,11 +25,13 @@ constexpr auto invalid_minimum = "invalid minimum gift";
 constexpr auto invalid_cap = "invalid daily cap";
 constexpr auto invalid_budget = "budget exceeds asset range";
 constexpr auto invalid_interval = "minimum interval must be positive";
+constexpr auto invalid_twap_window = "TWAP window must be at least 60 seconds";
 constexpr auto invalid_symbol = "invalid LIQ symbol";
 constexpr auto missing_shadow = "LIQ token does not exist";
 constexpr auto duplicate_pool = "pool already configured";
 constexpr auto unknown_pool = "unknown kicker pool";
 constexpr auto negative_supply = "negative LIQ supply";
+constexpr auto missing_price = "swap price accumulator does not exist";
 } // namespace errors
 
 /// Inline treasury draw memo, preserved on the token transfer trace.
@@ -48,6 +50,16 @@ opp::swap_state::currency_stats pair_for(symbol_code sym, const liq::currency_st
          pair.yield_leg->get_symbol() == shadow.supply.symbol, errors::invalid_pair);
    check(pair.pool1.quantity.amount >= 0 && pair.pool2.quantity.amount >= 0, errors::negative_reserve);
    return pair;
+}
+/// Extend swap's pre-mutation cumulative price to now without changing or settling the swap pool.
+opp::twap::cumulative_price current_price(const opp::swap_state::currency_stats& pair, time_point now) {
+   const auto accum = opp::swap_state::priceaccums(opp::swap_state::account).get(
+      {pair.supply.symbol.code().raw()}, errors::missing_price);
+   auto price = accum.price1;
+   if (now > accum.last_update)
+      opp::twap::accumulate(price, opp::twap::price_fp(pair.pool2.quantity.amount, pair.pool1.quantity.amount),
+                            (now - accum.last_update).count());
+   return price;
 }
 /// Reserve pending emissions, outstanding claims and the remaining emission ceiling; missing state fails closed.
 uint64_t treasury_available() {
@@ -77,13 +89,14 @@ uint64_t treasury_available() {
 void kicker::validate_pool(uint16_t rate_bps, uint64_t min_gift, uint64_t max_gift_per_day) {
    check(rate_bps <= kicker_math::bps_scale, errors::invalid_rate);
    check(min_gift > 0 && min_gift <= kicker_math::max_amount, errors::invalid_minimum);
-   check(max_gift_per_day <= kicker_math::max_amount &&
-         (max_gift_per_day == 0 || max_gift_per_day >= min_gift), errors::invalid_cap);
+   check(max_gift_per_day >= min_gift && max_gift_per_day <= kicker_math::max_daily_gift,
+         errors::invalid_cap);
 }
 void kicker::setconfig(kick_config cfg) {
    require_auth(system_account);
    check(cfg.budget_remaining <= kicker_math::max_amount, errors::invalid_budget);
    check(cfg.min_interval_sec > 0, errors::invalid_interval);
+   check(cfg.twap_window_sec >= kicker_math::min_twap_window_sec, errors::invalid_twap_window);
    config_table(get_self()).set(cfg, system_account);
 }
 void kicker::addpool(symbol_code sym, uint16_t rate_bps, uint64_t min_gift, uint64_t max_gift_per_day) {
@@ -91,7 +104,7 @@ void kicker::addpool(symbol_code sym, uint16_t rate_bps, uint64_t min_gift, uint
    validate_pool(rate_bps, min_gift, max_gift_per_day);
    check(sym.is_valid(), errors::invalid_symbol);
    const auto shadow = liq::stats(liq_account).get({sym.raw()}, errors::missing_shadow);
-   pair_for(sym, shadow);
+   const auto pair = pair_for(sym, shadow);
    pools_table rows(get_self());
    check(rows.find({sym.raw()}) == rows.end(), errors::duplicate_pool);
    kick_pool pool;
@@ -100,6 +113,8 @@ void kicker::addpool(symbol_code sym, uint16_t rate_bps, uint64_t min_gift, uint
    pool.min_gift = min_gift;
    pool.max_gift_per_day = max_gift_per_day;
    pool.last_kick = current_time_point();
+   pool.price_time = pool.last_kick;
+   pool.price_snapshot = current_price(pair, pool.price_time);
    rows.emplace(system_account, {sym.raw()}, [&](auto& row) { row = pool; });
 }
 void kicker::setpool(symbol_code sym, uint16_t rate_bps, uint64_t min_gift, uint64_t max_gift_per_day) {
@@ -128,8 +143,8 @@ void kicker::kick(symbol_code sym) {
    auto pool = rows.get({sym.raw()}, errors::unknown_pool);
    const auto now = current_time_point();
    if (now <= pool.last_kick) return;
-   const uint64_t elapsed = (now - pool.last_kick).count();
-   if (elapsed < static_cast<uint64_t>(cfg.min_interval_sec) * kicker_math::micros_per_sec ||
+   const uint64_t unpaid = (now - pool.last_kick).count();
+   if (unpaid < static_cast<uint64_t>(cfg.min_interval_sec) * kicker_math::micros_per_sec ||
        andon::pulled(andon::ANDON_ACCOUNT)) return;
    const auto shadow = liq::stats(liq_account).get({sym.raw()}, errors::missing_shadow);
    check(shadow.supply.amount >= 0, errors::negative_supply);
@@ -142,16 +157,20 @@ void kicker::kick(symbol_code sym) {
       return;
    }
    const auto pair = pair_for(sym, shadow);
-   const auto gift = kicker_math::gift(shadow.supply.amount, pool.rate_bps, elapsed,
-                                      pair.pool2.quantity.amount, pair.pool1.quantity.amount);
+   if (now <= pool.price_time || (now - pool.price_time).count() <
+       static_cast<uint64_t>(cfg.twap_window_sec) * kicker_math::micros_per_sec) return;
+   const auto cumulative = current_price(pair, now);
+   const auto price = opp::twap::average_price(opp::twap::difference(cumulative, pool.price_snapshot),
+                                             (now - pool.price_time).count());
+   const auto elapsed = std::min(unpaid, kicker_math::max_catchup_us);
+   const auto gift = kicker_math::gift_at_price(shadow.supply.amount, pool.rate_bps, elapsed, price);
    if (gift && *gift < pool.min_gift) return;
    const uint64_t day = static_cast<uint64_t>(now.time_since_epoch().count()) /
                         (kicker_math::day_sec * kicker_math::micros_per_sec);
    const uint128_t spent = day == pool.day ? pool.spent_today : 0;
    uint64_t available = std::min(cfg.budget_remaining, treasury_available());
-   if (pool.max_gift_per_day != 0)
-      available = std::min(available, pool.max_gift_per_day > spent
-                                         ? pool.max_gift_per_day - static_cast<uint64_t>(spent) : 0);
+   available = std::min(available, pool.max_gift_per_day > spent
+                                     ? pool.max_gift_per_day - static_cast<uint64_t>(spent) : 0);
    // Overflow has no exact representable denominator: keep the entire interval open.
    const uint64_t paid = gift && available >= pool.min_gift ? std::min(*gift, available) : 0;
    pool.shortfall_amount = gift ? *gift - paid : 0;
@@ -163,7 +182,12 @@ void kicker::kick(symbol_code sym) {
    }
    // Both operands fit uint64; the widened product is exact, floored per the owner's ruling; the sub-microsecond
    // remainder stays in the open interval (holder-favoured, < 1 subunit at realistic supply).
-   pool.last_kick += microseconds(static_cast<int64_t>(static_cast<uint128_t>(elapsed) * paid / *gift));
+   pool.last_kick = now - microseconds(elapsed) +
+      microseconds(static_cast<int64_t>(static_cast<uint128_t>(elapsed) * paid / *gift));
+   if (paid == *gift) {
+      pool.price_snapshot = cumulative;
+      pool.price_time = now;
+   }
    pool.gifted_total += paid;
    pool.shortfall_time = pool.shortfall_amount ? now : time_point{};
    pool.day = day;

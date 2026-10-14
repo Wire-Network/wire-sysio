@@ -1,7 +1,7 @@
 /** @file sysio.kicker_fuzz_tests.cpp
  * @brief Seeded differential sequences: the model is independent in ARITHMETIC;
  * its control flow follows the rulings in kick()'s order.
- * Supply/spot/reserve rows are deliberately injected boundary inputs, not a model of swap execution.
+ * Supply/configured-span price history/reserve rows are injected boundary inputs, not a model of swap execution.
  * Two real LIQ pools share real treasury transfers and addyield; no kicker math helper is the oracle.
  */
 #include "kicker_tester.hpp"
@@ -15,6 +15,12 @@ using kicker_test_reference::wide;
 /// Literal protocol units, independently specified by the owner's rulings.
 constexpr uint64_t unit = 1'000'000'000, micros = 1'000'000, day_seconds = 86'400;
 constexpr uint64_t basis_points = 10'000;
+/// Independent literal safety limits for the differential model.
+constexpr uint64_t catchup_micros = 259'200'000'000;
+constexpr uint64_t daily_ceiling = 1000 * unit;
+/// Independent governance observation settings and maturity boundaries.
+constexpr uint32_t minimum_window = 60, default_window = 86'400;
+constexpr std::array<uint32_t, 3> windows{minimum_window, default_window, 2 * default_window};
 /// Random campaign sizes and logarithmic input scales; no step selects a forced outcome.
 constexpr uint32_t default_spacing = 3600;
 /// Longer randomly selected spacing exposes funded short intervals in the fixed campaign.
@@ -39,6 +45,7 @@ constexpr auto sym = "sym", distributable = "t5_distributable", supply = "supply
 constexpr auto distributed = "total_distributed", floor = "t5_floor";
 constexpr auto pool1 = "pool1", pool2 = "pool2", pot = "pot", carry = "carry", index = "index";
 constexpr auto budget = "budget_remaining", spacing = "min_interval_sec";
+constexpr auto window = "twap_window_sec";
 }
 /// Historical campaign identity combines kicker PR 675 with the original source SHA prefix 651c01.
 constexpr uint64_t seed_base = 0x675'651c01;
@@ -106,14 +113,16 @@ void compare(const state& a, const state& b) {
 /// Apply kick rulings in order using shared wide exact interest and floored Q64 valuation.
 uint64_t advance(state& s, int64_t now, uint64_t supply, uint64_t wire, uint64_t shadow,
                  uint64_t budget, uint64_t treasury, uint64_t pending, uint64_t claims,
-                 uint64_t remaining, uint32_t spacing, bool held) {
+                 uint64_t remaining, uint32_t spacing, bool held,
+                 uint32_t window = default_window, uint32_t observation = default_window) {
    BOOST_REQUIRE_GT(now, s.clock);
    if (uint64_t(now - s.clock) < spacing * micros || held) return 0;
    if (!supply) {
       s.clock = now; s.shortfall = 0; s.observed = 0; s.overflow = false;
       return 0;
    }
-   const auto elapsed = uint64_t(now - s.clock);
+   if (observation < window) return 0;
+   const auto elapsed = std::min(uint64_t(now - s.clock), catchup_micros);
    const wide gift = kicker_test_reference::wide_reference(supply, s.rate, elapsed, wire, shadow);
    if (gift < s.minimum) return 0;
    const wide reserve = wide(pending) + claims + remaining;
@@ -121,13 +130,13 @@ uint64_t advance(state& s, int64_t now, uint64_t supply, uint64_t wire, uint64_t
    available = std::min(available, budget);
    const auto today = uint64_t(now) / (day_seconds * micros);
    const auto spent = today == s.day ? s.spent : 0;
-   if (s.cap) available = std::min(available, spent >= s.cap ? 0 : s.cap - spent);
+   available = std::min(available, spent >= s.cap ? 0 : s.cap - spent);
    s.overflow = gift > asset_limit;
    const uint64_t paid = !s.overflow && available >= s.minimum ? std::min(uint64_t(gift), available) : 0;
    s.shortfall = s.overflow ? 0 : uint64_t(gift) - paid;
    s.observed = s.shortfall || s.overflow ? now : 0;
    if (paid) {
-      s.clock += int64_t(wide(elapsed) * paid / gift);
+      s.clock = now - elapsed + int64_t(wide(elapsed) * paid / gift);
       s.total += paid; s.day = today; s.spent = spent + paid;
    }
    return paid;
@@ -164,7 +173,8 @@ void fund(kicker_tester& t, uint64_t target) {
 /// Execute one kick and check the complete model, custody, budget, yield distribution and unchanged treasury.
 uint64_t check_kick(kicker_tester& t, state& expected, symbol sym, uint64_t supply, uint64_t wire,
                     uint64_t shadow, uint64_t budget, uint64_t pending, uint64_t claims,
-                    uint64_t remaining, uint32_t spacing, bool held) {
+                    uint64_t remaining, uint32_t spacing, bool held,
+                    uint32_t window = default_window, uint32_t observation = default_window) {
    const auto before = t.wire_balance(t.SYSIO_ACCOUNT);
    const auto liq_before = t.wire_balance(t.LIQ_ACCOUNT);
    const auto system_before = t.get_row_by_id(t.SYSIO_ACCOUNT, t.SYSIO_ACCOUNT, state_table, state_table.value);
@@ -173,8 +183,11 @@ uint64_t check_kick(kicker_tester& t, state& expected, symbol sym, uint64_t supp
    const auto carry = pot_before.is_null() ? 0 : pot_before[field::carry].as_uint64();
    const auto index = pot_before.is_null() ? fc::uint128_t{0} : pot_before[field::index].as_uint128();
    const auto now = t.control->pending_block_time().time_since_epoch().count();
+   const auto token = t.stat_row(sym);
+   const auto pair = symbol::from_string(std::string(precision_prefix) + token["pair_symbol"].as_string());
+   t.price_history(sym, pair, wire, shadow, observation);
    const auto paid = advance(expected, now, supply, wire, shadow, budget, before,
-                             pending, claims, remaining, spacing, held);
+                             pending, claims, remaining, spacing, held, window, observation);
    BOOST_REQUIRE_EQUAL(t.success(), t.kick(sym));
    compare(expected, read(t, sym));
    BOOST_REQUIRE_EQUAL(before - paid, t.wire_balance(t.SYSIO_ACCOUNT));
@@ -184,6 +197,7 @@ uint64_t check_kick(kicker_tester& t, state& expected, symbol sym, uint64_t supp
       t.get_row_by_id(t.KICKER, t.KICKER, config_table, config_table.value));
    BOOST_REQUIRE_EQUAL(budget - paid, actual_cfg[field::budget].as_uint64());
    BOOST_REQUIRE_EQUAL(spacing, actual_cfg[field::spacing].as_uint64());
+   BOOST_REQUIRE_EQUAL(window, actual_cfg[field::window].as_uint64());
    BOOST_REQUIRE(system_before == t.get_row_by_id(t.SYSIO_ACCOUNT, t.SYSIO_ACCOUNT,
       state_table, state_table.value));
    const auto idx = t.index_row(sym);
@@ -201,6 +215,27 @@ uint64_t check_kick(kicker_tester& t, state& expected, symbol sym, uint64_t supp
 } // namespace
 
 BOOST_AUTO_TEST_SUITE(sysio_kicker_fuzz_tests)
+/// Independently model below/equal/above maturity at minimum, default and multi-day governance windows.
+BOOST_AUTO_TEST_CASE(kicker_fuzz_window_boundaries) {
+   for (const auto window : windows) {
+      for (const uint32_t observation : {window - 1, window, window + 1}) {
+         BOOST_TEST_CONTEXT("window=" << window << " observation=" << observation) {
+            kicker_tester t;
+            BOOST_REQUIRE_EQUAL(t.success(), t.change(basis_points, 1));
+            BOOST_REQUIRE_EQUAL(t.success(), t.configure(boundary_funding, 1, t.SYSIO_ACCOUNT, window));
+            t.wait(day_seconds);
+            fund(t, boundary_funding + 3 * unit);
+            inject_reserves(t, unit, unit, unit, boundary_distributed);
+            inject_price(t, t.LIQSOL_SYM, t.POOL_SYM, boundary_supply, unit, unit);
+            auto expected = read(t, t.LIQSOL_SYM);
+            const auto paid = check_kick(t, expected, t.LIQSOL_SYM, boundary_supply, unit, unit,
+                                        boundary_funding, unit, unit, unit, 1, false, window, observation);
+            BOOST_CHECK_EQUAL(paid > 0, observation >= window);
+         }
+      }
+   }
+}
+
 /// Every named boundary owns a fresh fixture and asserts its outcome directly.
 BOOST_AUTO_TEST_CASE(kicker_fuzz_boundaries) {
    /// Isolated fixtures for the protocol gates and arithmetic boundaries.
@@ -221,7 +256,7 @@ BOOST_AUTO_TEST_CASE(kicker_fuzz_boundaries) {
          BOOST_REQUIRE_EQUAL(t.success(), t.add());
          uint64_t minimum = boundary_minimum, budget = boundary_funding, available = boundary_funding;
          uint64_t supply = boundary_supply, wire = unit, shadow = unit;
-         uint64_t pending = unit, claims = unit, remaining = unit, cap = 0;
+         uint64_t pending = unit, claims = unit, remaining = unit, cap = daily_ceiling;
          uint32_t spacing = 1;
          if (kind == boundary::treasury_min_minus_one) available = minimum - 1;
          if (kind == boundary::budget_min_minus_one) budget = minimum - 1;
@@ -271,7 +306,8 @@ BOOST_AUTO_TEST_CASE(kicker_fuzz_boundaries) {
             inject_price(t, t.LIQSOL_SYM, t.POOL_SYM, supply, wire, shadow);
          }
          const auto old = expected;
-         const auto gift = kicker_test_reference::wide_reference(supply, expected.rate, t.elapsed(), wire, shadow);
+         const auto gift = kicker_test_reference::wide_reference(supply, expected.rate,
+            std::min(t.elapsed(), catchup_micros), wire, shadow);
          if (kind == boundary::spacing) BOOST_REQUIRE_GT(gift, minimum);
          const auto paid = check_kick(t, expected, t.LIQSOL_SYM, supply, wire, shadow, budget,
                                      pending, claims, remaining, spacing, kind == boundary::hold);
@@ -366,13 +402,14 @@ BOOST_AUTO_TEST_CASE(kicker_fuzz_sequences) {
                      }
                      expected.rate = random() % (basis_points + 1);
                      expected.minimum = 1 + random() % (minimum_range * unit);
-                     expected.cap = random() % exhaustion_denominator == 0 ? 0
+                     expected.cap = random() % exhaustion_denominator == 0 ? daily_ceiling
                         : expected.minimum + random() % (funding_range * unit);
                      BOOST_REQUIRE_EQUAL(t.success(), t.change(expected.rate, expected.minimum, expected.cap, symbols[i]));
                      const uint32_t spacing = random() % 2 ? random_spacing : 1;
                      const uint64_t budget = random() % exhaustion_denominator == 0
                         ? 0 : random() % (funding_range * unit);
-                     BOOST_REQUIRE_EQUAL(t.success(), t.configure(budget, spacing));
+                     const auto window = step % 2 ? minimum_window : default_window;
+                     BOOST_REQUIRE_EQUAL(t.success(), t.configure(budget, spacing, t.SYSIO_ACCOUNT, window));
                      fund(t, treasury_base * unit + random() % (funding_range * unit));
                      const auto treasury = uint64_t(t.wire_balance(t.SYSIO_ACCOUNT));
                      const uint64_t pending = random() % (reserve_range * unit);
@@ -395,9 +432,9 @@ BOOST_AUTO_TEST_CASE(kicker_fuzz_sequences) {
                      const auto unspaced_payable = advance(without_spacing, now, supply, wire, shadow, budget, treasury,
                                                            pending, claims, remaining, 0, held);
                      const auto gift = kicker_test_reference::wide_reference(supply, old.rate,
-                                                                             uint64_t(now - old.clock), wire, shadow);
+                                                                             std::min(uint64_t(now - old.clock), catchup_micros), wire, shadow);
                      const auto paid = check_kick(t, expected, symbols[i], supply, wire, shadow, budget,
-                                                 pending, claims, remaining, spacing, held);
+                                                 pending, claims, remaining, spacing, held, window);
                      compare(model[1 - i], read(t, symbols[1 - i]));
                      const bool priced = !held && uint64_t(now - old.clock) >= spacing * micros;
                      const bool payable_gift = priced && gift >= old.minimum && gift <= asset_limit;

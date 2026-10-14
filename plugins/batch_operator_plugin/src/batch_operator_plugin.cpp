@@ -347,6 +347,8 @@ struct batch_operator_plugin::impl {
    /// Whether `sysio.kicker` runs code, refreshed with `yield_contracts_deployed`.
    std::atomic<bool>                    kicker_deployed{false};
    batch_operator_detail::crank_spacing kick_spacing;
+   /// Fair bounded traversal of kicker pools across polls.
+   batch_operator_detail::kick_pool_scan kick_scan;
 
    // Epoch state tracked across polls
    uint32_t                 current_epoch = 0;
@@ -799,11 +801,9 @@ struct batch_operator_plugin::impl {
     * Crank `sysio.kicker::kick(sym)` for every kicker pool whose minimum accrual
     * interval has elapsed since its `last_kick`.
     *
-    * `kick` is permissionless and nothing on chain schedules it, and its cadence
-    * is a security control (`contracts/sysio.system/EMISSIONS.md`): the gift is
-    * priced at the swap's spot ratio for the whole unpaid interval, so the take
-    * of a pump-kick-unwind grows with the time since the last payment. Prompt
-    * kicks keep that interval near `min_interval_sec`.
+    * Read at most ten pools per poll and retain the next-key cursor, so this
+    * crank cannot monopolize the relay loop as governance adds pools. Complete
+    * sweeps prune removed symbols from retry spacing.
     *
     * Like `crank_yield`, NOT gated on `is_elected`: the elected operator may be
     * the one that is offline. The push is skipped while `kick_due` says the
@@ -834,16 +834,17 @@ struct batch_operator_plugin::impl {
       pools.code     = chain::name(kicker::account);
       pools.scope    = kicker::account;
       pools.table    = kicker::table_kickpools;
-      pools.all_rows = true;
-      pools.filter   = [min_interval = *min_interval, now](const fc::variant& row) {
-         const auto value = row_value(row.get_object());
-         return value && kick_due(*value, min_interval, now);
-      };
+      pools.limit = kicker::pools_per_poll;
+      pools.lower_bound = kick_scan.lower_bound();
+      const auto page = read_table(std::move(pools));
       const auto interval = kick_interval;
-      for (const auto& r : read_table(std::move(pools)).rows) {
+      for (const auto& r : page.rows) {
          const auto code = row_symbol_code(r.get_object());
          if (!code) continue;
          const auto pool = symbol_code_name(*code);
+         kick_scan.observe(pool);
+         const auto value = row_value(r.get_object());
+         if (!value || !kick_due(*value, *min_interval, now)) continue;
          if (!kick_spacing.due(pool, now, interval)) continue;
          kick_spacing.mark(pool, now);
          try {
@@ -856,6 +857,7 @@ struct batch_operator_plugin::impl {
             dlog("batch_operator: kick({}): {}", pool, e.to_string());
          }
       }
+      kick_scan.finish_page(page.more, page.next_key, kick_spacing);
    }
 
    /**

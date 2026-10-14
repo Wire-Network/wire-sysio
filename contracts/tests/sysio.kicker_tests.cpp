@@ -2,6 +2,13 @@
 
 namespace {
 namespace math = sysio::kicker_math;
+namespace kicker = kicker_test_support::kicker;
+/// Independent expectations pin the governance defaults and validation boundary.
+constexpr uint32_t expected_default_twap_window_sec = 86'400;
+constexpr uint32_t expected_min_twap_window_sec = 60;
+constexpr uint32_t below_min_twap_window_sec = expected_min_twap_window_sec - 1;
+constexpr uint32_t disabled_twap_window_sec = 0;
+constexpr auto invalid_twap_window_message = "TWAP window must be at least 60 seconds";
 using kicker_test_reference::wide;
 using kicker_test_reference::reference;
 using kicker_test_support::kicker_tester;
@@ -36,7 +43,7 @@ BOOST_FIXTURE_TEST_CASE(skip_then_pay_and_pro_rata_claim, kicker_tester) {
    BOOST_CHECK_EQUAL(before + claimable, wire_balance("alice"_n));
 }
 
-/// Integer floors remain the only frequency dependence at a fixed principal and spot price.
+/// Regular daily payments preserve simple accrual; a missed week can recover only 72 hours.
 BOOST_AUTO_TEST_CASE(call_pattern_independence) {
    constexpr uint64_t supply = 100'000'000'000'000;
    constexpr uint64_t day = math::day_sec * math::micros_per_sec;
@@ -49,24 +56,25 @@ BOOST_AUTO_TEST_CASE(call_pattern_independence) {
    BOOST_REQUIRE_EQUAL(single.success(), single.change(200, 1));
    const auto start_f = frequent.kick_clock();
    const auto start_s = single.kick_clock();
+   uint64_t expected_frequent = 0;
    for (unsigned i = 0; i < 7; ++i) {
       frequent.wait(math::day_sec);
+      expected_frequent += reference(supply, 200, frequent.elapsed(), 1, 1);
       BOOST_REQUIRE_EQUAL(frequent.success(), frequent.kick());
    }
    const auto span = frequent.kick_clock() - start_f;
    const auto wait_span = span - (single.control->pending_block_time() - start_s);
    single.produce_block(wait_span);
    BOOST_REQUIRE_EQUAL(single.success(), single.kick());
-   // One block-slot timestamp offset is explicitly priced in the independent reference.
-   const auto expected_single = reference(100'000'000'000'000, 200,
-      (single.kick_clock() - start_s).count(), 1, 1);
+   // Daily payments include their block-slot offsets; the missed week is bounded to 72 hours.
+   const auto expected_single = reference(supply, 200, 3 * day, 1, 1);
    BOOST_CHECK_EQUAL(expected_single, single.paid());
-   const auto expected_frequent = reference(100'000'000'000'000, 200, span.count(), 1, 1);
-   BOOST_CHECK_LE(expected_frequent - frequent.paid(), 7);
+   BOOST_CHECK_EQUAL(expected_frequent, frequent.paid());
+   BOOST_CHECK_GT(frequent.paid(), 2 * single.paid());
 }
 
-/// A swap just before kick reprices the entire unpaid span at spot, as governance ruled.
-BOOST_FIXTURE_TEST_CASE(spot_after_trade_and_current_supply, kicker_tester) {
+/// A real trade just before kick has only its elapsed-time weight, with a 72-hour accrual bound.
+BOOST_FIXTURE_TEST_CASE(twap_after_trade_and_current_supply, kicker_tester) {
    wait(math::day_sec);
    const auto old_gift = expected();
    BOOST_REQUIRE_EQUAL(success(), openext("bob"_n, "bob"_n, extended_symbol{WIRE_SYM, TOKEN_ACCOUNT}));
@@ -76,10 +84,133 @@ BOOST_FIXTURE_TEST_CASE(spot_after_trade_and_current_supply, kicker_tester) {
    BOOST_REQUIRE_EQUAL(success(), exchange("bob"_n, POOL_SYM, extended_asset{asset(seed, WIRE_SYM), TOKEN_ACCOUNT},
                                            asset(1, LIQSOL_SYM)));
    BOOST_REQUIRE_EQUAL(success(), mint("bob"_n, holder));
-   const auto spot_gift = expected();
+   const auto twap_gift = expected();
+   const auto pair = swap_pool_row(POOL_SYM);
+   const auto spot_gift = reference(supply(), 200, math::max_catchup_us,
+      pair["pool2"]["quantity"].as<asset>().get_amount(), pair["pool1"]["quantity"].as<asset>().get_amount());
    BOOST_REQUIRE_GT(spot_gift, 3 * old_gift);
+   BOOST_CHECK_LT(twap_gift, 2 * old_gift); // Current supply grew by 25%, while spot nearly quadrupled.
    BOOST_REQUIRE_EQUAL(success(), kick());
-   BOOST_CHECK_EQUAL(spot_gift, paid());
+   BOOST_CHECK_EQUAL(twap_gift, paid());
+   const auto first = paid();
+   BOOST_REQUIRE_EQUAL(success(), kick());
+   BOOST_CHECK_EQUAL(first, paid());
+}
+
+/// The review's ten-million-WIRE pump contributes zero weight when kick follows in the same block.
+BOOST_FIXTURE_TEST_CASE(large_same_block_trade_cannot_amplify_gift, kicker_tester) {
+   constexpr uint64_t attack = 10'000'000 * UNIT;
+   wait(3 * math::day_sec);
+   BOOST_REQUIRE_EQUAL(success(), openext("bob"_n, "bob"_n, extended_symbol{WIRE_SYM, TOKEN_ACCOUNT}));
+   BOOST_REQUIRE_EQUAL(success(), openext("bob"_n, "bob"_n, extended_symbol{LIQSOL_SYM, LIQ_ACCOUNT}));
+   BOOST_REQUIRE_EQUAL(success(), transfer_wire(SYSIO_ACCOUNT, "bob"_n, attack));
+   BOOST_REQUIRE_EQUAL(success(), transfer_wire("bob"_n, SWAP_ACCOUNT, attack));
+   const auto baseline = expected();
+   base_tester::push_action(SWAP_ACCOUNT, "exchange"_n, "bob"_n, mvo()
+      ("user", "bob"_n)("pair_token", POOL_SYM.to_symbol_code())
+      ("ext_asset_in", extended_asset{asset(attack, WIRE_SYM), TOKEN_ACCOUNT})
+      ("min_expected", asset(1, LIQSOL_SYM)));
+   BOOST_REQUIRE_EQUAL(baseline, expected());
+   base_tester::push_action(KICKER, "kick"_n, "bob"_n, mvo()("sym", LIQSOL_SYM.to_symbol_code()));
+   BOOST_CHECK_EQUAL(baseline, paid());
+   BOOST_CHECK_EQUAL(reference(supply(), 200, math::max_catchup_us, 1, 1), paid());
+   produce_block();
+}
+
+/// Even a tiny minimum and abundant funds cannot bypass the first full day of observation.
+BOOST_FIXTURE_TEST_CASE(twap_warmup_is_enforced, kicker_tester) {
+   BOOST_REQUIRE_EQUAL(success(), change(200, 1));
+   BOOST_REQUIRE_EQUAL(success(), configure(budget, 1));
+   const auto initial = bytes();
+   const auto until_boundary = uint64_t(math::default_twap_window_sec) * math::micros_per_sec -
+                               elapsed() - config::block_interval_us;
+   produce_block(fc::microseconds(until_boundary));
+   BOOST_REQUIRE_EQUAL(success(), kick());
+   BOOST_CHECK(bytes() == initial);
+   BOOST_REQUIRE_EQUAL(success(), kick());
+   BOOST_CHECK_GT(paid(), 0);
+}
+
+/// Governance defaults to one day, accepts one minute, and rejects every shorter window atomically.
+BOOST_FIXTURE_TEST_CASE(twap_window_config_validation, kicker_tester) {
+   BOOST_CHECK_EQUAL(expected_default_twap_window_sec, configuration()[kicker::field::twap_window_sec].as_uint64());
+   BOOST_CHECK_EQUAL(expected_min_twap_window_sec, math::min_twap_window_sec);
+   BOOST_REQUIRE_EQUAL(success(), configure(budget, 1, SYSIO_ACCOUNT, math::min_twap_window_sec));
+   BOOST_CHECK_EQUAL(expected_min_twap_window_sec, configuration()[kicker::field::twap_window_sec].as_uint64());
+   for (const uint32_t window : {below_min_twap_window_sec, disabled_twap_window_sec}) {
+      BOOST_CHECK(mentions(configure(budget, 1, SYSIO_ACCOUNT, window), invalid_twap_window_message));
+      BOOST_CHECK_EQUAL(expected_min_twap_window_sec, configuration()[kicker::field::twap_window_sec].as_uint64());
+   }
+}
+
+/// The minimum configured window pays at its inclusive boundary and starts a fresh observation on full payment.
+BOOST_FIXTURE_TEST_CASE(short_twap_window_pays, kicker_tester) {
+   constexpr uint32_t window = math::min_twap_window_sec;
+   BOOST_REQUIRE_EQUAL(success(), change(200, 1));
+   BOOST_REQUIRE_EQUAL(success(), configure(budget, 1, SYSIO_ACCOUNT, window));
+   const auto initial = bytes();
+   produce_block(fc::microseconds(uint64_t(window) * math::micros_per_sec - elapsed() - config::block_interval_us));
+   BOOST_REQUIRE_EQUAL(success(), kick());
+   BOOST_CHECK(bytes() == initial);
+   const auto gift = expected();
+   BOOST_REQUIRE_GT(gift, 0);
+   const auto now = control->pending_block_time();
+   BOOST_REQUIRE_EQUAL(success(), kick());
+   BOOST_CHECK_EQUAL(gift, paid());
+   BOOST_CHECK(pool()["price_time"].as<time_point>() == now);
+   const auto after = bytes();
+   BOOST_REQUIRE_EQUAL(success(), kick());
+   BOOST_CHECK(bytes() == after);
+}
+
+/// Lowering the window preserves all existing history and can make an in-flight observation immediately payable.
+BOOST_FIXTURE_TEST_CASE(lower_twap_window_keeps_open_observation, kicker_tester) {
+   BOOST_REQUIRE_EQUAL(success(), change(200, 1));
+   BOOST_REQUIRE_EQUAL(success(), configure(budget, 1));
+   wait(math::min_twap_window_sec);
+   const auto initial = bytes();
+   BOOST_REQUIRE_EQUAL(success(), kick());
+   BOOST_CHECK(bytes() == initial);
+   BOOST_REQUIRE_EQUAL(success(), configure(budget, 1, SYSIO_ACCOUNT, math::min_twap_window_sec));
+   BOOST_CHECK(bytes() == initial);
+   const auto gift = expected();
+   BOOST_REQUIRE_GT(gift, 0);
+   BOOST_REQUIRE_EQUAL(success(), kick());
+   BOOST_CHECK_EQUAL(gift, paid());
+}
+
+/// Raising the window delays the same in-flight observation, retaining its timestamp, snapshot and accrual clock.
+BOOST_FIXTURE_TEST_CASE(raise_twap_window_keeps_open_observation, kicker_tester) {
+   BOOST_REQUIRE_EQUAL(success(), change(200, 1));
+   BOOST_REQUIRE_EQUAL(success(), configure(budget, 1, SYSIO_ACCOUNT, math::min_twap_window_sec));
+   wait(math::min_twap_window_sec);
+   BOOST_REQUIRE_GT(expected(), 0);
+   const auto initial = bytes();
+   BOOST_REQUIRE_EQUAL(success(), configure(budget, 1));
+   BOOST_CHECK(bytes() == initial);
+   BOOST_REQUIRE_EQUAL(success(), kick());
+   BOOST_CHECK(bytes() == initial);
+   produce_block(fc::microseconds(uint64_t(math::default_twap_window_sec) * math::micros_per_sec - elapsed()));
+   const auto gift = expected();
+   BOOST_REQUIRE_GT(gift, 0);
+   BOOST_REQUIRE_EQUAL(success(), kick());
+   BOOST_CHECK_EQUAL(gift, paid());
+}
+
+/// The default ceiling limits a payable high-supply pool even with ample treasury and budget.
+BOOST_FIXTURE_TEST_CASE(default_daily_cap_is_enforced, kicker_tester) {
+   constexpr uint64_t extra_supply = 25'000'000 * UNIT;
+   BOOST_REQUIRE_EQUAL(success(), mint("alice"_n, extra_supply));
+   wait(math::day_sec);
+   BOOST_REQUIRE_GT(expected(), math::max_daily_gift);
+   BOOST_REQUIRE_EQUAL(success(), kick());
+   BOOST_CHECK_EQUAL(math::max_daily_gift, paid());
+   BOOST_CHECK_EQUAL(math::max_daily_gift, pool()["spent_today"].as_uint128());
+   const auto before = paid();
+   BOOST_REQUIRE_EQUAL(success(), configure(budget));
+   BOOST_REQUIRE_EQUAL(success(), change(200, 1));
+   BOOST_REQUIRE_EQUAL(success(), kick());
+   BOOST_CHECK_EQUAL(before, paid());
 }
 
 /// Funding shortages record the latest deficit without losing the open interval; funding later pays all.
@@ -134,13 +265,13 @@ BOOST_FIXTURE_TEST_CASE(reserve_guard_and_emissions_gate, kicker_tester) {
    EmissionsBlockReason reason;
    BOOST_REQUIRE(EmissionsBlockReason_Parse(log["reason"].as_string(), &reason));
    BOOST_CHECK_EQUAL(EMISSIONS_BLOCK_REASON_BALANCE_INSUFFICIENT, reason);
-   const auto clock = kick_clock();
-   const auto span = elapsed();
+   const auto span = std::min(elapsed(), math::max_catchup_us);
+   const auto base = control->pending_block_time() - fc::microseconds(span);
    BOOST_REQUIRE_EQUAL(success(), kick());
    BOOST_CHECK_EQUAL(available, paid());
    BOOST_CHECK_EQUAL(pending + claims + ceiling, wire_balance(SYSIO_ACCOUNT));
    BOOST_CHECK_EQUAL(static_cast<uint64_t>(wide(span) * available / gift),
-      (kick_clock() - clock).count());
+      (kick_clock() - base).count());
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH, epoch_ser, EPOCH, "advance"_n, mvo()));
    const auto epoch = decode(epoch_ser, "epoch_state",
       get_row_by_id(EPOCH, EPOCH, "epochstate"_n, "epochstate"_n.value));
@@ -167,7 +298,7 @@ BOOST_FIXTURE_TEST_CASE(reserve_bounds_and_exhausted_ceiling, kicker_tester) {
    BOOST_CHECK_EQUAL(0, wire_balance(SYSIO_ACCOUNT));
 }
 
-/// Andon holds every clock and the first clear payment includes the stopped span.
+/// Andon holds every clock; clearing pays only the bounded stopped span.
 BOOST_FIXTURE_TEST_CASE(andon_hold_then_pay, kicker_tester) {
    namespace cord = sysio_system::test_support::andon;
    abi_serializer ser;
@@ -194,6 +325,9 @@ BOOST_FIXTURE_TEST_CASE(auth_validation_and_rmpool, kicker_tester) {
    BOOST_CHECK(mentions(change(10001, UNIT), "rate exceeds"));
    BOOST_CHECK(mentions(change(200, 0), "invalid minimum"));
    BOOST_CHECK(mentions(change(200, UNIT, UNIT - 1), "invalid daily cap"));
+   BOOST_CHECK(mentions(change(200, UNIT, 0), "invalid daily cap"));
+   BOOST_CHECK(mentions(add(LIQETH_SYM, 200, UNIT, 0), "invalid daily cap"));
+   BOOST_CHECK(mentions(change(200, UNIT, math::max_daily_gift + 1), "invalid daily cap"));
    BOOST_CHECK(mentions(configure(budget, 0), "interval must be positive"));
    BOOST_CHECK(mentions(configure(math::max_amount + 1), "budget exceeds"));
    BOOST_REQUIRE_EQUAL(success(), push(KICKER, kicker_ser, SYSIO_ACCOUNT, "rmpool"_n,
@@ -213,7 +347,7 @@ BOOST_FIXTURE_TEST_CASE(min_interval_and_same_block, kicker_tester) {
    wait(60);
    BOOST_REQUIRE_EQUAL(success(), kick());
    BOOST_CHECK(bytes() == initial);
-   wait(3600);
+   wait(math::day_sec);
    base_tester::push_action(KICKER, "kick"_n, "alice"_n, mvo()("sym", LIQSOL_SYM.to_symbol_code()));
    const auto first = bytes();
    base_tester::push_action(KICKER, "kick"_n, "bob"_n, mvo()("sym", LIQSOL_SYM.to_symbol_code()));
@@ -228,7 +362,7 @@ BOOST_FIXTURE_TEST_CASE(minimum_boundary_and_rate_change, kicker_tester) {
    BOOST_REQUIRE_EQUAL(success(), change(400, 1));
    BOOST_CHECK(old_clock == kick_clock());
    // setpool itself produces one block; compute the boundary for the next kick's timestamp.
-   const auto future_elapsed = elapsed() + config::block_interval_us;
+   const auto future_elapsed = std::min(elapsed() + config::block_interval_us, math::max_catchup_us);
    const auto boundary = reference(supply(), 400, future_elapsed, 1, 1);
    BOOST_REQUIRE_EQUAL(success(), change(400, boundary));
    BOOST_REQUIRE_EQUAL(boundary, expected());
@@ -236,34 +370,35 @@ BOOST_FIXTURE_TEST_CASE(minimum_boundary_and_rate_change, kicker_tester) {
    BOOST_CHECK_EQUAL(boundary, paid());
 }
 
-/// A three-day outage pays the unchanged daily cap, retaining a floored pro-rata remainder.
+/// A three-day outage pays the daily cap within bounded 72-hour accrual, retaining its floored pro-rata remainder.
 BOOST_FIXTURE_TEST_CASE(daily_cap_partial_catchup, kicker_tester) {
-   BOOST_REQUIRE_EQUAL(success(), change(200, 1, 10 * UNIT));
+   constexpr auto cap = 2 * UNIT;
+   BOOST_REQUIRE_EQUAL(success(), change(200, 1, cap));
    // Align the first payment to UTC noon so the one-hour retry cannot cross a day boundary.
    const auto utc_seconds = control->pending_block_time().time_since_epoch().count() / math::micros_per_sec;
    wait(3 * math::day_sec + (math::day_sec + math::day_sec / 2 - utc_seconds % math::day_sec) % math::day_sec);
-   const auto clock = kick_clock();
-   const auto span = elapsed();
+   const auto span = std::min(elapsed(), math::max_catchup_us);
+   const auto base = control->pending_block_time() - fc::microseconds(span);
    const auto gift = expected();
    const auto now = control->pending_block_time();
-   BOOST_REQUIRE_GT(gift, 10 * UNIT);
+   BOOST_REQUIRE_GT(gift, cap);
    BOOST_REQUIRE_EQUAL(success(), kick());
-   BOOST_CHECK_EQUAL(10 * UNIT, paid());
-   BOOST_CHECK_EQUAL(gift - 10 * UNIT, pool()["shortfall_amount"].as_uint64());
+   BOOST_CHECK_EQUAL(cap, paid());
+   BOOST_CHECK_EQUAL(gift - cap, pool()["shortfall_amount"].as_uint64());
    BOOST_CHECK(pool()["shortfall_time"].as<time_point>() == now);
-   BOOST_CHECK_EQUAL(10 * UNIT, pool()["spent_today"].as_uint128());
+   BOOST_CHECK_EQUAL(cap, pool()["spent_today"].as_uint128());
    const auto payment_day = now.time_since_epoch().count() / (math::day_sec * math::micros_per_sec);
    BOOST_CHECK_EQUAL(payment_day, pool()["day"].as_uint64());
-   const auto advanced = (kick_clock() - clock).count();
-   const wide numerator = wide(span) * (10 * UNIT);
+   const auto advanced = (kick_clock() - base).count();
+   const wide numerator = wide(span) * cap;
    BOOST_CHECK_EQUAL(static_cast<uint64_t>(numerator / gift), advanced);
    BOOST_CHECK(numerator % gift != 0);
    wait(3600);
    const auto open_gift = expected();
    BOOST_REQUIRE_EQUAL(success(), kick());
-   BOOST_CHECK_EQUAL(10 * UNIT, paid());
+   BOOST_CHECK_EQUAL(cap, paid());
    BOOST_CHECK_EQUAL(open_gift, pool()["shortfall_amount"].as_uint64());
-   BOOST_CHECK_EQUAL(10 * UNIT, pool()["spent_today"].as_uint128());
+   BOOST_CHECK_EQUAL(cap, pool()["spent_today"].as_uint128());
    BOOST_CHECK_EQUAL(payment_day, pool()["day"].as_uint64());
    for (unsigned day = 0; day < 4; ++day) {
       const auto before = paid();
@@ -271,10 +406,9 @@ BOOST_FIXTURE_TEST_CASE(daily_cap_partial_catchup, kicker_tester) {
       wait(day == 0 ? math::day_sec - seconds % math::day_sec : math::day_sec);
       BOOST_REQUIRE_EQUAL(success(), kick());
       BOOST_CHECK_GT(paid(), before);
-      BOOST_CHECK_LE(paid() - before, 10 * UNIT);
+      BOOST_CHECK_LE(paid() - before, cap);
    }
-   BOOST_CHECK_EQUAL(0, pool()["shortfall_amount"].as_uint64());
-   BOOST_CHECK_EQUAL(0, pool()["shortfall_time"].as<time_point>().time_since_epoch().count());
+   BOOST_CHECK_GT(pool()["shortfall_amount"].as_uint64(), 0);
    BOOST_CHECK(!pool()["gift_overflow"].as_bool());
 }
 
@@ -311,13 +445,13 @@ BOOST_FIXTURE_TEST_CASE(missing_emitcfg_fails_closed, kicker_tester) {
 BOOST_FIXTURE_TEST_CASE(budget_partial_pro_rata, kicker_tester) {
    BOOST_REQUIRE_EQUAL(success(), configure(2 * UNIT));
    wait(86'400);
-   const auto clock = kick_clock();
-   const auto span = elapsed();
+   const auto span = std::min(elapsed(), math::max_catchup_us);
+   const auto base = control->pending_block_time() - fc::microseconds(span);
    const auto gift = expected();
    BOOST_REQUIRE_EQUAL(success(), kick());
    BOOST_CHECK_EQUAL(2 * UNIT, paid());
    BOOST_CHECK_EQUAL(static_cast<uint64_t>(wide(span) * (2 * UNIT) / gift),
-      (kick_clock() - clock).count());
+      (kick_clock() - base).count());
    BOOST_CHECK_EQUAL(gift - 2 * UNIT, pool()["shortfall_amount"].as_uint64());
    BOOST_REQUIRE_EQUAL(success(), configure(budget));
    wait(3600);
@@ -327,14 +461,19 @@ BOOST_FIXTURE_TEST_CASE(budget_partial_pro_rata, kicker_tester) {
    BOOST_CHECK_EQUAL(0, pool()["shortfall_amount"].as_uint64());
 }
 
-/// Literal Julian-year oracle is independent of the accrual header constants.
-BOOST_FIXTURE_TEST_CASE(literal_year_payment, kicker_tester) {
+/// A year of downtime pays 72 hours' interest and closes the old backlog; a retry cannot recover it.
+BOOST_FIXTURE_TEST_CASE(year_outage_is_bounded, kicker_tester) {
+   BOOST_REQUIRE_EQUAL(success(), change(200, 1));
    const auto start = kick_clock();
    produce_block(fc::microseconds(31'557'600'000'000LL - elapsed()));
    BOOST_REQUIRE_EQUAL(31'557'600'000'000LL, elapsed());
    BOOST_REQUIRE_EQUAL(success(), kick());
-   BOOST_CHECK_EQUAL(2'000'000'000'000LL, paid());
+   BOOST_CHECK_EQUAL(reference(supply(), 200, math::max_catchup_us, 1, 1), paid());
    BOOST_CHECK_EQUAL(31'557'600'000'000LL, (kick_clock() - start).count());
+   const auto first = paid();
+   wait(3600);
+   BOOST_REQUIRE_EQUAL(success(), kick());
+   BOOST_CHECK_EQUAL(first, paid());
 }
 
 /// Each new LIQ token is configured through existing registries and addpool; clocks and rates are independent.
@@ -374,6 +513,7 @@ BOOST_FIXTURE_TEST_CASE(action_overflow_holds_clock, kicker_tester) {
    BOOST_REQUIRE_EQUAL(success(), mint("alice"_n, math::max_amount - supply()));
    BOOST_REQUIRE_EQUAL(success(), change(10000, 1));
    wait(2 * math::year_sec);
+   price_history(LIQSOL_SYM, POOL_SYM, math::max_amount, 1);
    const auto clock = kick_clock();
    BOOST_REQUIRE_EQUAL(success(), kick());
    BOOST_CHECK(pool()["gift_overflow"].as_bool());
@@ -388,6 +528,7 @@ BOOST_FIXTURE_TEST_CASE(action_overflow_holds_clock, kicker_tester) {
    BOOST_REQUIRE_EQUAL(success(), transfer_shadow("alice"_n, SYND_ACCOUNT, math::max_amount - seed));
    BOOST_REQUIRE_EQUAL(success(), push_liq(SYND_ACCOUNT, "burn"_n,
       mvo()("token_code", codename_mvo(LIQSOL))("amount", math::max_amount - seed)));
+   price_history(LIQSOL_SYM, POOL_SYM, 1, 1);
    BOOST_REQUIRE_EQUAL(success(), kick());
    BOOST_CHECK_GT(paid(), 0);
    BOOST_CHECK_EQUAL(0, pool()["shortfall_amount"].as_uint64());
@@ -399,6 +540,7 @@ BOOST_FIXTURE_TEST_CASE(zero_supply_clears_overflow, kicker_tester) {
    BOOST_REQUIRE_EQUAL(success(), mint("alice"_n, math::max_amount - supply()));
    BOOST_REQUIRE_EQUAL(success(), change(10000, 1));
    wait(2 * 31'557'600);
+   price_history(LIQSOL_SYM, POOL_SYM, math::max_amount, 1);
    BOOST_REQUIRE_EQUAL(success(), kick());
    BOOST_REQUIRE(pool()["gift_overflow"].as_bool());
    BOOST_REQUIRE_EQUAL(success(), transfer_shadow("alice"_n, SYND_ACCOUNT, math::max_amount - seed));
@@ -451,9 +593,9 @@ BOOST_FIXTURE_TEST_CASE(zero_supply_resets_clock_without_payment, kicker_tester)
 BOOST_FIXTURE_TEST_CASE(exact_budget_and_atomic_inline_failure, kicker_tester) {
    wait(math::day_sec);
    BOOST_REQUIRE_EQUAL(success(), configure(budget));
-   const auto gift = expected();
    // Configure consumes a half-second block; equality is measured at the ensuing kick time.
-   const auto exact = reference(supply(), 200, elapsed() + config::block_interval_us, 1, 1);
+   const auto exact = reference(supply(), 200,
+      std::min(elapsed() + config::block_interval_us, math::max_catchup_us), 1, 1);
    BOOST_REQUIRE_EQUAL(success(), configure(exact));
    BOOST_REQUIRE_EQUAL(exact, expected());
    BOOST_REQUIRE_EQUAL(success(), kick());
@@ -474,7 +616,7 @@ BOOST_FIXTURE_TEST_CASE(exact_budget_and_atomic_inline_failure, kicker_tester) {
    // Restore sufficient funding because the failed push produced another block.
    BOOST_REQUIRE_EQUAL(success(), configure(budget));
    BOOST_REQUIRE_EQUAL(success(), kick());
-   BOOST_CHECK_GT(paid(), gift);
+   BOOST_CHECK_GT(paid(), exact);
 }
 
 /// A quarter holder claims the exact floored quarter gift when the existing yield-index scale divides supply.
@@ -484,7 +626,7 @@ BOOST_FIXTURE_TEST_CASE(quarter_holder_claims_floored_gift, kicker_tester) {
    BOOST_REQUIRE_EQUAL(success(), create(LIQETH_SYM, ETH, LIQETH));
    BOOST_REQUIRE_EQUAL(success(), regliqpool(ETH, LIQETH, pair, small_seed, small_seed));
    BOOST_REQUIRE_EQUAL(success(), mint("alice"_n, small_holder, LIQETH));
-   BOOST_REQUIRE_EQUAL(success(), add(LIQETH_SYM));
+   BOOST_REQUIRE_EQUAL(success(), add(LIQETH_SYM, math::default_rate_bps, 1));
    wait(math::year_sec);
    const auto gift = expected(LIQETH_SYM);
    BOOST_REQUIRE_EQUAL(success(), kick(LIQETH_SYM));

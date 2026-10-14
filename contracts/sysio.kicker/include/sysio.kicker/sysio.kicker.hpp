@@ -4,8 +4,8 @@
  * @brief Governance-budgeted T5 gifts to LIQ holders, triggered by any keeper.
  *
  * Deploy privileged with roa::setsyscode. Budget is an earmark outside emissions;
- * no draw alters sysio.system::t5state.total_distributed. Spot price and current
- * supply value the entire unpaid interval, including an Andon hold or shortfall.
+ * no draw alters sysio.system::t5state.total_distributed. A configurable TWAP and
+ * current supply value at most 72 hours of unpaid accrual per kick.
  */
 #include <sysio/sysio.hpp>
 #include <sysio/symbol.hpp>
@@ -26,12 +26,14 @@ public:
    /// Native WIRE token contract.
    static constexpr name token_account = "sysio.token"_n;
 
-   /// Governance budget in WIRE subunits and minimum elapsed payment interval.
+   /// Governance budget in WIRE subunits, payment spacing and minimum TWAP observation span.
    struct [[sysio::table("kickcfg")]] kick_config {
       uint64_t budget_remaining = 0; ///< Absolute remaining earmark; setconfig replaces it.
       /// Minimum unpaid accrual interval before an attempt.
       uint32_t min_interval_sec = kicker_math::default_min_interval_sec;
-      SYSLIB_SERIALIZE(kick_config, (budget_remaining)(min_interval_sec))
+      /// Minimum observation span; the next kick uses this value even for an open observation.
+      uint32_t twap_window_sec = kicker_math::default_twap_window_sec;
+      SYSLIB_SERIALIZE(kick_config, (budget_remaining)(min_interval_sec)(twap_window_sec))
    };
    /// Symbol-code primary key for independently configured LIQ tokens.
    struct pool_key {
@@ -48,28 +50,32 @@ public:
       uint64_t shortfall_amount = 0; ///< Latest gift minus paid amount; cleared by full payment or zero supply.
       time_point shortfall_time{}; ///< Last unpaid shortfall, for governance visibility.
       bool gift_overflow = false; ///< Gift exceeded asset range; clock remains open.
-      uint64_t max_gift_per_day = 0; ///< Zero disables the UTC-day spend ceiling.
+      uint64_t max_gift_per_day = kicker_math::max_daily_gift; ///< Positive ceiling, at most 1,000 WIRE per UTC day.
       uint64_t day = 0; ///< UTC day number of the most recent payment.
       uint128_t spent_today = 0;
+      opp::twap::cumulative_price price_snapshot; ///< Swap price1 extended to price_time.
+      time_point price_time{}; ///< Observation starts on addpool or the last full payment.
       SYSLIB_SERIALIZE(kick_pool, (sym)(rate_bps)(min_gift)(last_kick)(gifted_total)
                                 (shortfall_amount)(shortfall_time)(gift_overflow)
-                                (max_gift_per_day)(day)(spent_today))
+                                (max_gift_per_day)(day)(spent_today)(price_snapshot)(price_time))
    };
    /// Governance-owned singleton and per-symbol payment clocks.
    using config_table = kv::global<"kickcfg"_n, kick_config>;
    using pools_table = kv::table<"kickpools"_n, pool_key, kick_pool>;
 
-   /// Replace the remaining budget and interval. Requires sysio; never settles open intervals.
+   /// Replace budget, payment interval and TWAP window. Requires sysio; never settles open intervals.
+   /// The next kick applies the window to the existing price_time/snapshot without restarting observation.
    [[sysio::action]] void setconfig(kick_config cfg);
    /// Start accrual now for a registered LIQ/WIRE yield pair. Requires sysio; defaults to 200 bps and 1 WIRE.
    [[sysio::action]] void addpool(symbol_code sym, uint16_t rate_bps = kicker_math::default_rate_bps,
-                                uint64_t min_gift = kicker_math::default_min_gift, uint64_t max_gift_per_day = 0);
-   /// Change a token's rate/minimum/daily ceiling; the new rate prices the whole open interval. Requires sysio.
+                                uint64_t min_gift = kicker_math::default_min_gift,
+                                uint64_t max_gift_per_day = kicker_math::max_daily_gift);
+   /// Change rate/minimum/daily ceiling without resetting spending or observation; prices bounded accrual. Requires sysio.
    [[sysio::action]] void setpool(symbol_code sym, uint16_t rate_bps, uint64_t min_gift, uint64_t max_gift_per_day);
    /// Stop accrual and erase the row; re-adding starts a new interval. Requires sysio.
    [[sysio::action]] void rmpool(symbol_code sym);
-   /// Permissionless gift; partial payments advance a floored pro-rata clock.
-   /// Skips and overflow retain the unpaid interval.
+   /// Permissionless TWAP gift after the configured observation window; payment forfeits accrual older than 72 hours.
+   /// Partial payments advance a floored pro-rata clock within the bounded 72-hour accrual interval; skips retain state.
    [[sysio::action]] void kick(symbol_code sym);
 private:
    /// Validate governance settings at both pool configuration boundaries.

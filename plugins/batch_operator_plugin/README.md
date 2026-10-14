@@ -39,17 +39,18 @@ that is offline, and each is a cheap no-op once its work is done:
 | `sysio.chalg::chkdispute(dispute_id)` | every OPEN envelope dispute | a dispute pauses `sysio.epoch::advance`, so no inline poke can reach it |
 | `sysio.swap::tickyield(pair_token)` | every yield pool whose reservoir has a queued balance, at most once per `--batch-yield-tick-interval-ms` per pool from this operator | the reservoir is sold into the pool as time passes; only a tick moves the clock |
 | `sysio.liq::queueyield(sym)` | every shadow with yield pending from an outpost `LIQ_YIELD` report | the report lands in `sysio.liq`'s pending balance; queuing it into the swap is a separate, permissionless step |
-| `sysio.kicker::kick(sym)` | every kicker pool whose `kickcfg.min_interval_sec` has elapsed since its `last_kick`, at most once per `--batch-kick-interval-ms` per pool from this operator | the gift accrues with time and only a kick pays it; its cadence is a security control (`contracts/sysio.system/EMISSIONS.md`) |
+| `sysio.kicker::kick(sym)` | at most ten pools per poll, resuming the next page each poll; due pools are attempted at most once per `--batch-kick-interval-ms` | only a kick pays accrued gifts; TWAP, catch-up and daily caps are enforced on chain (`contracts/sysio.system/EMISSIONS.md`) |
 
 The two yield cranks stay idle, without logging a read failure per poll, until both
 `sysio.swap` and `sysio.liq` are deployed on the depot; the kick crank likewise until
 `sysio.kicker` is deployed, and it pushes nothing before `setconfig`. Between payments
 the kick crank reads the pools and pushes nothing, because `kick` would return at its
 own clock check. A kick that passes the clock but cannot pay — an Andon hold, a gift
-below `min_gift`, an exhausted budget — leaves `last_kick` where it was, so
+below `min_gift`, an exhausted budget, or TWAP warm-up — leaves `last_kick` where it was, so
 `--batch-kick-interval-ms` is what bounds the retries; it is spent on every attempt,
-failed or not. `--batch-kick-crank=false` turns the kick crank off on this node. `sysio.synd::crank` is pushed
-by the underwriter every poll (see [Underwriter](#underwriter)).
+failed or not. `--batch-kick-crank=false` turns the kick crank off on this node. The
+plugin prunes removed symbols from retry spacing at the end of each complete pool sweep.
+`sysio.synd::crank` is pushed by the underwriter every poll (see [Underwriter](#underwriter)).
 
 ## Configuration
 
