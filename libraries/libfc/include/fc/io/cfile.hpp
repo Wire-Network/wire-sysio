@@ -274,7 +274,7 @@ public:
    }
 
    void flush() {
-      if( 0 != fflush( _file.get() ) ) {
+      if( 0 != fflush( _file.get() ) || ferror( _file.get() ) ) {
          int err = ferror( _file.get() );
          throw std::ios_base::failure( "cfile: " + _file_path.generic_string() +
                                        " unable to flush file, ferror: " + std::to_string( err ) );
@@ -343,6 +343,17 @@ public:
    void close() {
       _file.reset();
       _open = false;
+   }
+
+   /// Close exactly once and report delayed I/O errors; the handle is closed even when this throws.
+   void close_checked() {
+      FILE* file = _file.release();
+      _open = false;
+      if (file && fclose(file) != 0) {
+         const int error = errno;
+         throw std::ios_base::failure("cfile unable to close: " + _file_path.generic_string(),
+                                      std::error_code(error, std::generic_category()));
+      }
    }
 
    boost::interprocess::mapping_handle_t get_mapping_handle() const {
