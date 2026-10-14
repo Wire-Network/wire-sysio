@@ -49,6 +49,8 @@ The default vcpkg baseline stays fixed. LLVM is overridden to 23.1.3 using upstr
 patches while retaining existing dependency source revisions:
 
 - BLS12-381 explicitly includes `<vector>` rather than depending on a transitive include.
+- Boost.Asio checks the standard library when detecting `std::future`, so GCC
+  with libc++ exposes the same `use_future` completion token as Clang.
 - GMP's custom C++ compiler probe honors `LDFLAGS` and `LIBS` for libc++ linkage.
 - jemalloc preserves C/C++ compiler flags during dependency generation, including
   the macOS SDK and libc++ header paths used to compile the same source.
