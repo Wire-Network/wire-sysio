@@ -2,6 +2,7 @@
 #include <sysio.epoch/sysio.epoch.hpp>
 #include <sysio.opp.common/registry_codes.hpp>
 #include <sysio.opp.common/registry_metadata.hpp>
+#include <sysio.opp.common/registry_references.hpp>
 
 namespace sysio {
 
@@ -105,6 +106,7 @@ void tokens::regctok(sysio::slug_name   chain_code,
    // Both codes form this row's COMPOSITE PRIMARY KEY and are rendered as strings by
    // every reader -- refuse either that does not round-trip before the row becomes permanent.
    opp::registry::check_codes({chain_code, token_code}, "sysio.tokens");
+   opp::registry::check_registered_parents(chain_code, token_code, get_self(), "sysio.tokens");
 
    chaintokens_t tbl(get_self());
    chain_token_key pk{chain_code, token_code};

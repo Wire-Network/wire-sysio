@@ -9,6 +9,7 @@
 #include <sysio.opp.common/shadow_custody.hpp>
 #include <sysio.opp.common/depot_native_token.hpp>
 #include <sysio.opp.common/registry_codes.hpp>
+#include <sysio.opp.common/registry_references.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <magic_enum/magic_enum.hpp>
 #include <zpp_bits.h>
@@ -168,6 +169,19 @@ void require_canonical_codes(const std::vector<opreg::chain_min_bond>& v,
    }
 }
 
+/// Validate every reference before changing the configuration, including bindings
+/// whose parent codes exist independently. Inactive records remain valid references.
+void require_registered_collateral(const std::vector<opreg::chain_min_bond>& requirements,
+                                  const char* role_label) {
+   tokens::chaintokens_t bindings(opp::registry::tokens_account);
+   for (const auto& entry : requirements) {
+      opp::registry::check_registered_parents(entry.chain_code, entry.token_code,
+                                             opp::registry::tokens_account, role_label);
+      check(bindings.contains(tokens::chain_token_key{entry.chain_code, entry.token_code}),
+            std::string(role_label) + opp::registry::missing_binding);
+   }
+}
+
 bool is_fully_settled(const opreg::operator_entry& op) {
    for (const auto& bal : op.balances) {
       if (bal.balance > 0) return false;
@@ -254,6 +268,10 @@ void opreg::setconfig(uint32_t max_available_producers,
    require_positive_min_bond(req_prod_collat,    "req_prod_collat");
    require_positive_min_bond(req_batchop_collat, "req_batchop_collat");
    require_positive_min_bond(req_uw_collat,      "req_uw_collat");
+
+   require_registered_collateral(req_prod_collat,    "req_prod_collat");
+   require_registered_collateral(req_batchop_collat, "req_batchop_collat");
+   require_registered_collateral(req_uw_collat,      "req_uw_collat");
 
    // Stamp every entry's `config_timestamp_ms` with the on-chain time
    // so consumers can detect stale configuration without trusting the

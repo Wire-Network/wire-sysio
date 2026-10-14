@@ -35,6 +35,7 @@
 #include <sysio/opp/opp.hpp>
 
 #include "sysio.system_tester.hpp"
+#include "registry_test_support.hpp"
 #include <sysio/testing/bls_utils.hpp>
 
 #include "finalizer_test_keys.hpp"
@@ -5540,6 +5541,9 @@ struct producer_score_tester : public producer_eligibility_tester {
    /// @return the action result.
    action_result set_producer_collateral(const fc::variants& req_prod_collat,
                                          uint64_t prune_delay_ms = 600'000) {
+      setup_score_shadow();
+      sysio_system::test_support::registry::seed_depot_pair(*this);
+      sysio_system::test_support::registry::seed_depot_pair(*this, second_token);
       return push_opreg_action(OPREG, "setconfig"_n, mvo()
          ("max_available_producers",          uint32_t{21})
          ("max_available_batch_ops",          uint32_t{63})
