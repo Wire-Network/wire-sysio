@@ -10,8 +10,8 @@
     {
       "kind": "git",
       "repository": "https://github.com/wire-network/wire-vcpkg-registry",
-      "baseline": "1e2148ef54e3985973f17eea2a87d953697cd154",
-      "reference": "1e2148ef54e3985973f17eea2a87d953697cd154",
+      "baseline": "c2b06429f406dad190e268bef68fdff658866f25",
+      "reference": "c2b06429f406dad190e268bef68fdff658866f25",
       "packages": [
         "boost",
         "softfloat",
@@ -25,6 +25,7 @@
         "bn256",
         "bls12-381",
         "gmp",
+        "jemalloc",
         "wire-sys-vm",
         "aws-sdk-cpp",
         "aws-crt-cpp",

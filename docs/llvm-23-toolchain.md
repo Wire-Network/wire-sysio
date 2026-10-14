@@ -50,6 +50,8 @@ patches while retaining existing dependency source revisions:
 
 - BLS12-381 explicitly includes `<vector>` rather than depending on a transitive include.
 - GMP's custom C++ compiler probe honors `LDFLAGS` and `LIBS` for libc++ linkage.
+- jemalloc preserves C/C++ compiler flags during dependency generation, including
+  the macOS SDK and libc++ header paths used to compile the same source.
 - sys-vm preserves caller C++ flags and qualifies its `module` type for Clang 23.
 - AWS CRT disables speculative devirtualization only for its MQTT adapter source
   when compiled with GCC 15 and libc++ 23, avoiding recursive `std::function`
