@@ -4,6 +4,7 @@
 
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/block.hpp>
+#include <fstream>
 #include <regex>
 
 using namespace sysio::chain;
@@ -48,6 +49,30 @@ struct block_log_extract_fixture {
 };
 
 BOOST_AUTO_TEST_SUITE(block_log_extraction_tests)
+
+BOOST_FIXTURE_TEST_CASE(empty_active_log_uses_retained_context, block_log_extract_fixture) {
+   fc::temp_directory active_dir;
+   fc::temp_directory retained_dir;
+   {
+      block_log uninitialized(active_dir.path());
+   }
+   BOOST_CHECK(!block_log::extract_chain_context(active_dir.path(), {}));
+   // A segment starting after genesis exercises the fallback after the active log.
+   block_log::extract_block_range(dir.path(), retained_dir.path(), 3, 7);
+   auto id = block_log::extract_chain_id(active_dir.path(), retained_dir.path());
+   BOOST_REQUIRE(id);
+   BOOST_CHECK(*id == gs.compute_chain_id());
+}
+
+BOOST_AUTO_TEST_CASE(empty_retained_log_is_rejected) {
+   fc::temp_directory active_dir;
+   fc::temp_directory retained_dir;
+   {
+      std::ofstream log(retained_dir.path() / "blocks-3-7.log", std::ios::binary);
+   }
+   BOOST_CHECK_THROW(block_log::extract_chain_context(active_dir.path(), retained_dir.path()),
+                     std::ios_base::failure);
+}
 
 BOOST_FIXTURE_TEST_CASE(extract_from_middle, block_log_extract_fixture) try {
 

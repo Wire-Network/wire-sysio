@@ -823,7 +823,7 @@ struct batch_operator_plugin::impl {
                // client is the one registered under this chain's OWN code, and
                // the OPP / OPPInbound contract addresses come from the row
                // itself. `create_outpost_client` additionally asserts the
-               // client's verified eth_chainId equals the row's
+               // client's configured or discovered chain ID equals the row's
                // external_chain_id, so a client registered under the wrong code
                // is caught rather than relayed through.
                auto entry = eth_plug->get_client(code_str);
@@ -832,6 +832,9 @@ struct batch_operator_plugin::impl {
                                                        "under this chain code");
                   continue;
                }
+               // A configured connection awaiting discovery is not missing config.
+               // The normal refresh tick will build its job after publication.
+               if (!entry->client) continue;
                if (op.opp_addr.empty() || op.opp_inbound_addr.empty()) {
                   wlog("batch_operator: outpost {} (EVM) has no OPP/OPPInbound address on its "
                        "sysio.chains row; skipping until sysio.chains::setoutpost supplies both",

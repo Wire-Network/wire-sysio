@@ -2,8 +2,10 @@
 
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/global_property_object.hpp>
+#include <sysio/chain/database_header_object.hpp>
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/testing/tester.hpp>
+#include <fstream>
 
 #include <boost/mpl/list.hpp>
 #include <boost/test/unit_test.hpp>
@@ -86,6 +88,76 @@ class replay_tester : public base_tester {
 };
 
 BOOST_AUTO_TEST_SUITE(restart_chain_tests)
+
+/** Reproduce chain initialization followed by a later plugin failure, before chain startup. */
+BOOST_AUTO_TEST_CASE(restart_after_interrupted_plugin_initialization) {
+   tester reference;
+   auto cfg = reference.get_config();
+   const auto genesis = block_log::extract_genesis_state(cfg.blocks_dir);
+   BOOST_REQUIRE(genesis);
+   fc::temp_directory directory;
+   cfg.state_dir = directory.path() / "state";
+   cfg.blocks_dir = directory.path() / "blocks";
+   cfg.finalizers_dir = directory.path() / "finalizers";
+   for (unsigned attempt = 0; attempt < 2; ++attempt) {
+      {
+         controller interrupted(cfg, genesis->compute_chain_id());
+         interrupted.add_indices();
+         // The Ethereum startup gate used to throw at this lifecycle boundary.
+      }
+      BOOST_CHECK(!controller::extract_chain_id_from_db(cfg.state_dir));
+      BOOST_REQUIRE(std::filesystem::exists(cfg.blocks_dir / "blocks.log"));
+      BOOST_CHECK_EQUAL(std::filesystem::file_size(cfg.blocks_dir / "blocks.log"), 0u);
+      BOOST_CHECK(!block_log::extract_chain_context(cfg.blocks_dir, {}));
+   }
+   {
+      controller restarted(cfg, make_protocol_feature_set(), genesis->compute_chain_id());
+      restarted.add_indices();
+      restarted.startup([] {}, [] { return false; }, *genesis);
+      BOOST_CHECK_EQUAL(restarted.db().get_index<database_header_multi_index>().size(), 1u);
+   }
+   BOOST_REQUIRE(controller::extract_chain_id_from_db(cfg.state_dir));
+   BOOST_CHECK(*controller::extract_chain_id_from_db(cfg.state_dir) == genesis->compute_chain_id());
+}
+
+/** Only an empty active log is uninitialized; partial headers must still fail. */
+BOOST_AUTO_TEST_CASE(restart_rejects_truncated_block_log) {
+   fc::temp_directory directory;
+   {
+      std::ofstream log(directory.path() / "blocks.log", std::ios::binary);
+      log.put('\0');
+   }
+   BOOST_CHECK_THROW(block_log::extract_chain_context(directory.path(), {}), std::ios_base::failure);
+}
+
+/** Revision zero does not permit incompatible or absent version headers on existing state. */
+BOOST_AUTO_TEST_CASE(restart_rejects_incompatible_or_missing_database_header) {
+   tester reference;
+   auto cfg = reference.get_config();
+   fc::temp_directory directory;
+   cfg.state_dir = directory.path() / "state";
+   cfg.blocks_dir = directory.path() / "blocks";
+   cfg.finalizers_dir = directory.path() / "finalizers";
+   {
+      controller interrupted(cfg, reference.control->get_chain_id());
+      interrupted.add_indices();
+   }
+   {
+      chainbase::database db(cfg.state_dir, chainbase::database::read_write, cfg.state_size);
+      db.add_index<database_header_multi_index>();
+      const auto& header = db.get<database_header_object>();
+      db.modify(header, [](auto& value) { value.version = database_header_object::current_version + 1; });
+   }
+   BOOST_CHECK_THROW(controller::extract_chain_id_from_db(cfg.state_dir), bad_database_version_exception);
+   {
+      chainbase::database db(cfg.state_dir, chainbase::database::read_write, cfg.state_size);
+      db.add_index<database_header_multi_index>();
+      db.remove(db.get<database_header_object>());
+      db.add_index<global_property_multi_index>();
+      db.create<global_property_object>([](auto&) {});
+   }
+   BOOST_CHECK_THROW(controller::extract_chain_id_from_db(cfg.state_dir), bad_database_version_exception);
+}
 
 BOOST_AUTO_TEST_CASE_TEMPLATE( test_existing_state_without_block_log, T, testers ) {
    T chain;

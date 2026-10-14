@@ -2,7 +2,7 @@
 
 `outpost_ethereum_client_plugin` owns this node's connections to EVM chains. It builds one policy-enforcing
 `ethereum_client` per configured endpoint — each bound to a named Ethereum signature provider and to a
-verified numeric chain id — loads the contract ABIs those connections are driven through, and hands out
+configured or asynchronously discovered numeric chain id — loads the contract ABIs those connections are driven through, and hands out
 `outpost_client` concretes that speak the chain-agnostic OPP SPI on top of `OPP.sol` and `OPPInbound.sol`
 (plus the outpost's `SyndicationPool.sol` for the per-epoch crank). An operator enables it whenever the node
 runs an OPP daemon against an EVM outpost: `batch_operator_plugin` names it in `APPBASE_PLUGIN_REQUIRES`, so
@@ -12,8 +12,9 @@ directly.
 ## How it works
 
 The plugin declares `APPBASE_PLUGIN_REQUIRES((outpost_client_plugin)(signature_provider_manager_plugin))`,
-so the SPI base and every signing provider are initialized before it runs. All of its work happens in
-`plugin_initialize`; startup and shutdown only log.
+so the SPI base and every signing provider are initialized before it runs. Initialization validates local
+configuration without RPC. Startup launches independent discovery workers for clients without a chain ID;
+shutdown cancels their active requests and backoff waits before joining them.
 
 ```
 plugin_initialize
@@ -22,10 +23,11 @@ plugin_initialize
    |                                  de-duplicated by absolute path
    |  2. exactly one of --outpost-ethereum-client-config-file / --outpost-ethereum-client
    |  3. per client: resolve the named signature provider (must be chain=ethereum, key-type=ethereum)
-   |                 resolve or verify the numeric chain id against eth_chainId
-   |                 construct the ethereum_client under the shared RPC policy
+   |                 use the configured numeric chain id, or stage deferred discovery
+   |                 construct resolved clients under the shared RPC policy
    v
-   publish the client map (only after every client succeeded)
+   publish the client map (only after every local configuration succeeded)
+   |  plugin_startup: discover missing IDs and atomically replace pending entries
 
 batch_operator_plugin
    |  create_outpost_client(client-id, chain_code, chain_id, opp, oppInbound)
@@ -43,10 +45,10 @@ will not start, even if it only intends to serve a Solana
 outpost.
 
 A **command-line spec** is `<client-id>,<signature-provider-id>,<rpc-url>[,<chain-id>]`. With three fields
-the chain id is resolved from the endpoint's `eth_chainId` at startup. With four fields the supplied value —
-a positive 32-bit decimal or `0x` hex quantity — is what the client signs with, and startup additionally
-verifies the endpoint reports the same id, failing with `Chain id mismatch for outpost Ethereum client` when
-it does not. A CLI-configured client carries no local expenditure limits: it is given the maximum transaction
+the chain id is discovered asynchronously through `eth_chainId`. Until then its published entry has a null
+client and cannot sign. With four fields the supplied positive 32-bit decimal or `0x` hex quantity controls
+signing; initialization makes no endpoint-ID query, even if the endpoint reports a different ID.
+A CLI-configured client carries no local expenditure limits: it is given the maximum transaction
 policy.
 
 A **configuration file** is versioned protobuf-JSON validated strictly — unknown fields are rejected, the
@@ -57,11 +59,13 @@ to 64 characters drawn from `[A-Za-z0-9._-]`. An `rpc_url` must parse as `http` 
 host the outbound HTTP layer considers safe, and must carry no `#` fragment. A `transaction_policy` is
 optional, but when present all four fields must be set, each amount must be a canonical decimal string
 (digits only, non-zero, no leading zero), and `max_priority_fee_per_gas_wei` must not exceed
-`max_fee_per_gas_wei`. File-configured chain ids are always verified against `eth_chainId`.
+`max_fee_per_gas_wei`. File-configured chain ids are authoritative without an endpoint-ID query.
 
-Chain-id resolution is retried before it gives up: initial backoff 200 ms, doubling to a 1 s ceiling, under a
-5 s total budget. Failure raises `plugin_config_exception` naming the client, the sanitized endpoint, and a
-stable `last_failure` category rather than the response body.
+Discovery requests have a two-second deadline. Retries continue until success or shutdown, with initial
+backoff of 200 ms doubling to a one-second ceiling. Each client has its own worker; a slow endpoint cannot
+block another client's discovery. Failure logs name the client, sanitized endpoint and bounded failure
+category at most once every 30 seconds. Pending entries are immutable snapshots; callers fetch again to
+observe readiness. The batch operator skips pending entries and builds their jobs on a later refresh tick.
 
 The signature provider is resolved by name and must be explicitly configured — an anonymous alias is
 rejected — and must use `chain=ethereum` with `key-type=ethereum`.
@@ -167,7 +171,7 @@ plugin = sysio::outpost_ethereum_client_plugin
 signature-provider = eth-signer,ethereum,ethereum,<public-key>,KIOD:<kiod-url>
 
 # One client per EVM outpost. For an OPP outpost the client-id MUST be that chain's sysio.chains code.
-# Four fields pin the chain id locally and verify it against the endpoint; three fields resolve it.
+# Four fields pin the signing chain id locally; three fields discover it asynchronously.
 outpost-ethereum-client = ETHEREUM,eth-signer,https://evm-rpc.example.com,31337
 
 # Contract ABIs: JSON arrays of ABI-compliant contract definitions.
@@ -222,7 +226,7 @@ Every option is registered in the config-file description, which appbase also ac
 
 | Option | Default | Meaning |
 |---|---|---|
-| `outpost-ethereum-client` | unset | Multi-token CLI client spec, `<client-id>,<signature-provider-id>,<rpc-url>[,<chain-id>]`. A three-field spec resolves `eth_chainId` during startup; a four-field chain id controls signing and is verified against the endpoint. For a client serving an OPP outpost the client-id must be that chain's `sysio.chains` code. Mutually exclusive with the config-file option. |
+| `outpost-ethereum-client` | unset | Multi-token CLI client spec, `<client-id>,<signature-provider-id>,<rpc-url>[,<chain-id>]`. A three-field spec resolves `eth_chainId` asynchronously; a four-field chain id controls signing without an endpoint-ID check. For a client serving an OPP outpost the client-id must be that chain's `sysio.chains` code. Mutually exclusive with the config-file option. |
 | `outpost-ethereum-client-config-file` | unset | Path to the versioned protobuf-JSON client configuration file. Cannot be combined with `--outpost-ethereum-client`. |
 | `ethereum-abi-file` | unset | Multi-token list of Ethereum contract ABI files; each is a JSON array of ABI-compliant contract definitions. Repeated paths are ignored with a warning. |
 | `outpost-ethereum-additional-ca-file` | unset | PEM CA bundle added to system trust for Ethereum RPC HTTPS requests. |
@@ -265,13 +269,14 @@ Per-client runtime lines are prefixed with the SPI label `outpost_ethereum_clien
 ## Tests
 
 ```bash
-ninja -C build/debug test_outpost_ethereum_client_plugin
-./build/debug/plugins/outpost_ethereum_client_plugin/test_outpost_ethereum_client_plugin
+pnpm install --frozen-lockfile --ignore-scripts
+cmake --build build/debug
+ctest --test-dir build/debug -R '^test_outpost_ethereum_client_plugin$' --output-on-failure
 ```
 
 Two suites run in that binary. `outpost_ethereum_client_plugin` covers option registration, chain-id
-resolution and verification (explicit, RPC-resolved, mismatched, malformed, out-of-range, and transient
-transport failure), signature-provider rejection cases, contract-client construction and ABI encoding, the
+discovery (configured, deferred, malformed, out-of-range, prolonged refusal, actual timeouts, recovery,
+independent clients and cancellation), signature-provider rejection cases, contract-client construction and ABI encoding, the
 chunk-count and chunk-resume decision tables, and every delivery path — single-chunk, multi-chunk in order,
 resume from a staged high-water mark, peer-owned header, superseded header, reverting discard, epoch
 advanced, deadline abandonment, and the empty and over-cap rejections — and the outpost crank: idle without
@@ -281,6 +286,11 @@ three refusals, unrecognised reverts and protocol errors, and deadline abandonme
 before signing or broadcasting, that exact caps pass through once, that two clients enforce their own
 policies, that file and CLI configuration produce the expected policies, and that a partial client map is
 never published. No test dials a public endpoint.
+
+CTest runs this binary through `tests/run_with_bind_config.cjs`, which keeps platform registry reservations
+alive for the test process. It requires Node and the lockfile-pinned `@wireio/cluster-tool` development
+dependency. A built companion may be selected explicitly with `WIRE_TOOLS_TS_ROOT`. For direct filtered
+runs, use that wrapper before the binary and Boost arguments.
 
 A companion RPC tool is built alongside the plugin when `ENABLE_TESTS` is on:
 

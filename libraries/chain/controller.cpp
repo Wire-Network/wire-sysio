@@ -1595,6 +1595,11 @@ struct controller_impl {
 
    void add_indices() {
       controller_index_set::add_indices(db);
+      // Persist format identity before another plugin can fail initialization.
+      // Existing databases must pass the ordinary version checks, even at revision zero.
+      if (db.was_created() && db.get_index<database_header_multi_index>().size() == 0) {
+         db.create<database_header_object>([](auto&) {});
+      }
       kv_database_index_set::add_indices(db);
 
       authorization.add_indices();
@@ -1778,9 +1783,7 @@ struct controller_impl {
       });
 
       db.set_revision( chain_head.block_num() );
-      db.create<database_header_object>([](const auto& header){
-         // nothing to do
-      });
+      validate_db_version(db);
 
       // --- Snapshot state validation ---
       // Singleton enforcement
@@ -1867,10 +1870,8 @@ struct controller_impl {
    }
 
    void initialize_database(const genesis_state& genesis) {
-      // create the database header sigil
-      db.create<database_header_object>([&]( auto& header ){
-         // nothing to do for now
-      });
+      // Index registration already persisted the header, including on a prior interrupted launch.
+      validate_db_version(db);
 
       // Initialize block summary index
       for (int i = 0; i < 0x10000; i++)
