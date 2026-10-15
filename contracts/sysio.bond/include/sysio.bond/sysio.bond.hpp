@@ -2,6 +2,9 @@
 /**
  * @file sysio.bond.hpp
  * @brief sysio.bond: generic underwriting of provable statements on the depot.
+ * @warning TESTNET ONLY -- NEVER MERGE OR DEPLOY OUTSIDE THE CURRENT LEGACY TESTNET.
+ * This branch immediately resolves every new request VALID with the sysio override's
+ * settlement semantics, without underwriting or a challenge window.
  *
  * An issuer registers a statement (a schema name and its bytes) together with a covered amount of a
  * depot-native token and an optional bounty. Underwriters bond the statement in increments of 0.01
@@ -448,6 +451,11 @@ inline constexpr std::string_view amount_range_msg = "amount exceeds the asset r
 
       /// The counters singleton.
       using bondcounters_t = kv::global<"bondcounters"_n, bond_counters>;
+
+   private:
+      /// Apply the VALID ruling and escrow awards without an authority check. Called by the
+      /// sysio-authorized override and, ONLY on this testnet branch, new request creation.
+      void resolve_valid(uint64_t request_id);
    };
 
 } // namespace sysio

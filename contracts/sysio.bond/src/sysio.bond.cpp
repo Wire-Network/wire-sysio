@@ -373,6 +373,10 @@ void bond::request(name issuer, name schema, std::vector<char> statement, sysio:
       escrow_tokens(get_self(), row.id, escrow_kind::BOUNTY, issuer, bounty, token_code, *custody,
                     request_bounty_memo);
    }
+
+   // TESTNET ONLY -- NEVER MERGE: the legacy testnet has no autonomous underwriters.
+   // Apply the sysio override's settlement immediately, after bounty escrow exists.
+   resolve_valid(row.id);
 }
 
 void bond::requestkeep(name issuer, name schema, std::vector<char> statement, sysio::slug_name token_code,
@@ -506,6 +510,10 @@ void bond::approve(uint64_t request_id) {
 // Nothing is sent and no one is notified, so no party can make the ruling fail.
 void bond::rslvvalid(uint64_t request_id) {
    require_auth(SYSTEM_ACCOUNT);
+   resolve_valid(request_id);
+}
+
+void bond::resolve_valid(uint64_t request_id) {
    requests_t requests(get_self());
    const auto req = requests.try_get(request_key{request_id});
    check(req.has_value(), request_missing_msg);
