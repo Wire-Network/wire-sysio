@@ -269,7 +269,7 @@ Per-client runtime lines are prefixed with the SPI label `outpost_ethereum_clien
 ## Tests
 
 ```bash
-pnpm install --frozen-lockfile --ignore-scripts
+pnpm install --no-frozen-lockfile --ignore-scripts
 cmake --build build/debug
 ctest --test-dir build/debug -R '^test_outpost_ethereum_client_plugin$' --output-on-failure
 ```
@@ -288,7 +288,7 @@ policies, that file and CLI configuration produce the expected policies, and tha
 never published. No test dials a public endpoint.
 
 CTest runs this binary through `tests/run_with_bind_config.cjs`, which keeps platform registry reservations
-alive for the test process. It requires Node and the lockfile-pinned `@wireio/cluster-tool` development
+alive for the test process. It requires Node and the version-pinned `@wireio/cluster-tool` development
 dependency. A built companion may be selected explicitly with `WIRE_TOOLS_TS_ROOT`. For direct filtered
 runs, use that wrapper before the binary and Boost arguments.
 

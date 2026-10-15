@@ -1565,10 +1565,7 @@ namespace sysio { namespace chain {
                                       });
       }
 
-      // Opening a new controller creates an empty active log before chain startup.
-      // It has no preamble yet; retain the normal fallback to archived segments.
-      if (first_block_file.empty() && std::filesystem::exists(block_dir / "blocks.log") &&
-          std::filesystem::file_size(block_dir / "blocks.log") > 0) {
+      if (first_block_file.empty() && std::filesystem::exists(block_dir / "blocks.log")) {
          first_block_file = block_dir / "blocks.log";
       }
 

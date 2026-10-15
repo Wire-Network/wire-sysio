@@ -35,7 +35,6 @@ on:
       - "tests/**"
       - "CMakeLists.txt"
       - "package.json"
-      - "pnpm-lock.yaml"
       - "vcpkg.json"
       - "vcpkg-configuration.json"
 
@@ -61,14 +60,15 @@ jobs:
           submodules: recursive
 
       # Native RPC tests allocate ports through the published platform bind registry.
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # actions/setup-node@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: "24"
-      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # pnpm/action-setup@v4
-        with:
-          package_json_file: package.json
+          node-version: 24
+          registry-url: https://registry.npmjs.org
       - name: Install native RPC test dependencies
-        run: pnpm install --frozen-lockfile --ignore-scripts
+        run: pnpm install --no-frozen-lockfile --ignore-scripts
 
       - name: Install host tools
         run: |

@@ -82,8 +82,6 @@ class pinnable_mapped_file {
       ~pinnable_mapped_file();
 
       segment_manager* get_segment_manager() const { return _segment_manager;}
-      /// True only when this open created the database file, never inferred from its contents.
-      bool was_created() const { return _created; }
       size_t           check_memory_and_flush_if_needed();
 
       static ss_allocator_t* get_small_size_allocator(std::byte* seg_mgr);
@@ -119,7 +117,6 @@ class pinnable_mapped_file {
       std::string                                   _database_name;
       size_t                                        _database_size = 0;
       bool                                          _writable = false;
-      bool                                          _created = false;
       bool                                          _sharable = false;
 
       bip::file_mapping                             _file_mapping;
