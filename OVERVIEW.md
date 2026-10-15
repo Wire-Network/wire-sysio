@@ -128,7 +128,6 @@ Holders of a node-owner NFT who commit it on the Ethereum outpost (`NODE_OWNER_R
 | **SyndicationPool.sol** | liqETH custody: `syndicate` (`SYNDICATE_LIQ`), `realizeYield` (`LIQ_YIELD`), `DESYNDICATE_LIQ` payout |
 | **BAR.sol** | Node-owner NFT escrow emitting `NODE_OWNER_REG` |
 | **OutpostManager.sol** | OPP endpoint and role wiring |
-| **StakingManager.sol** | Placeholder for the deferred staking track; its entry points revert |
 
 On Solana the outpost lives in the `liqsol-core` program (`instructions/opp/`), alongside liqSOL staking and syndication.
 
