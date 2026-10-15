@@ -246,6 +246,8 @@ namespace chainbase {
          database& operator=(const database&) = delete;
 
          bool is_read_only() const { return _read_only; }
+         /// Whether this instance created a new backing file rather than opening existing state.
+         bool was_created() const { return _db_file.was_created(); }
          void flush();
 
          struct session {

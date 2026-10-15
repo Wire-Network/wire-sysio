@@ -137,6 +137,7 @@ pinnable_mapped_file::pinnable_mapped_file(const std::filesystem::path& dir, boo
       _file_mapped_region = bip::mapped_region(_file_mapping, bip::read_write);
       file_mapped_segment_manager = new ((char*)_file_mapped_region.get_address()+header_size) segment_manager(shared_file_size-header_size);
       new (_file_mapped_region.get_address()) db_header;
+      _created = true;
    }
    else if(_writable) {
          auto existing_file_size = std::filesystem::file_size(_data_file_path);
@@ -457,6 +458,7 @@ pinnable_mapped_file& pinnable_mapped_file::operator=(pinnable_mapped_file&& o) 
    std::swap(_database_name, o._database_name);
    std::swap(_database_size, o._database_size);
    std::swap(_writable, o._writable);
+   std::swap(_created, o._created);
    std::swap(_sharable, o._sharable);
    std::swap(_file_mapping, o._file_mapping);
    std::swap(_file_mapped_region, o._file_mapped_region);
