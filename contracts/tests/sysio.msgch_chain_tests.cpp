@@ -281,12 +281,7 @@ public:
    }
 
    void load_abi(name account, abi_serializer& out_ser) {
-      const auto* accnt = control->find_account_metadata(account);
-      BOOST_REQUIRE(accnt != nullptr);
-      abi_def parsed_abi;
-      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, parsed_abi), true);
-      out_ser.set_abi(std::move(parsed_abi),
-                      abi_serializer::create_yield_function(abi_serializer_max_time));
+      sysio_system::test_support::load_account_abi(*this, account, out_ser);
    }
 
    void deploy(name account, std::vector<uint8_t> wasm, std::vector<char> abi,
