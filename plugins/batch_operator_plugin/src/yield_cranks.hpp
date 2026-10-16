@@ -1,16 +1,18 @@
 #pragma once
 /**
  * @file yield_cranks.hpp
- * @brief The decisions behind the depot's two yield cranks -- which `sysio.swap`
+ * @brief The decisions behind the depot's yield cranks -- which `sysio.swap`
  *        yield pools are worth a `tickyield`, which `sysio.liq` shadows are worth a
- *        `queueyield` -- and the per-key spacing that keeps one operator from
- *        cranking the same pool every poll. Pure functions over decoded rows, so
- *        the plugin's tests drive them without a chain.
+ *        `queueyield`, which `sysio.kicker` pools are worth a `kick` -- and the
+ *        per-key spacing that keeps one operator from cranking the same pool every
+ *        poll. Pure functions over decoded rows, so the plugin's tests drive them
+ *        without a chain.
  */
 
 #include <cstdint>
 #include <map>
 #include <optional>
+#include <set>
 #include <string>
 
 #include <fc/exception/exception.hpp>
@@ -56,6 +58,21 @@ namespace liq {
       constexpr auto supply      = "supply";        ///< a `stat` row's supply, in the shadow's symbol
       constexpr auto token_code  = "token_code";    ///< a `stat` row's registry token code
       constexpr auto chain_code  = "chain_code";    ///< a `stat` row's outpost
+   }
+}
+
+/// `sysio.kicker` identifiers the kick crank touches.
+namespace kicker {
+   /// Bound both the table scan and serial transaction attempts in one poll.
+   inline constexpr uint32_t pools_per_poll = 10;
+   constexpr auto account         = "sysio.kicker";
+   constexpr auto table_kickcfg   = "kickcfg";     ///< the `kv::global` config singleton
+   constexpr auto table_kickpools = "kickpools";   ///< one row per LIQ token
+   constexpr auto action_kick     = "kick";
+   namespace field {
+      constexpr auto min_interval_sec = "min_interval_sec";
+      constexpr auto last_kick        = "last_kick";
+      constexpr auto sym              = "sym";   ///< the pool row's token and `kick`'s argument
    }
 }
 
@@ -118,6 +135,46 @@ inline bool is_tickable_pool(const fc::variant_object& stat_row) {
           positive(swap::field::clip_floor);
 }
 
+/// The minimum accrual interval of a `sysio.kicker::kickcfg` value, or nullopt when
+/// the field is absent, unreadable or zero -- `setconfig` refuses zero, so a zero
+/// here is a row the crank cannot reason about and pushes nothing on.
+/// TWAP window and observation maturity are enforced by the contract; this cadence reads only min_interval_sec.
+inline std::optional<fc::microseconds> kick_min_interval(const fc::variant_object& config) {
+   auto it = config.find(kicker::field::min_interval_sec);
+   if (it == config.end()) return std::nullopt;
+   try {
+      const auto seconds = it->value().as_uint64();
+      if (seconds == 0) return std::nullopt;
+      return fc::seconds(static_cast<int64_t>(seconds));
+   } catch (const fc::exception&) {
+      return std::nullopt;
+   }
+}
+
+/// The `last_kick` of a `sysio.kicker::kickpools` value, or nullopt when the field
+/// is absent or does not parse.
+inline std::optional<fc::time_point> kick_last_kick(const fc::variant_object& pool) {
+   auto it = pool.find(kicker::field::last_kick);
+   if (it == pool.end()) return std::nullopt;
+   try {
+      return it->value().as<fc::time_point>();
+   } catch (const fc::exception&) {
+      return std::nullopt;
+   }
+}
+
+/// True iff `kick` would get past its own clock check at `now`: at least
+/// `min_interval` has passed since the pool's `last_kick` (the action returns
+/// without writing when `now <= last_kick` or the elapsed time is shorter). A row
+/// whose `last_kick` does not parse is never due. This is the gate that keeps the
+/// crank from pushing a no-op `kick` every poll between payments; what the clock
+/// check cannot see (an Andon hold, a gift below `min_gift`) is bounded by the
+/// caller's `crank_spacing`.
+inline bool kick_due(const fc::variant_object& pool, fc::microseconds min_interval, fc::time_point now) {
+   const auto last_kick = kick_last_kick(pool);
+   return last_kick && now > *last_kick && now - *last_kick >= min_interval;
+}
+
 /// One push per `interval` per key from this operator. `tickyield` is harmless to
 /// crank every block, but every ACTIVE operator polls every few seconds and a
 /// reservoir drains over a horizon of hours, so without spacing the whole group
@@ -129,9 +186,33 @@ public:
       return it == _last_push.end() || now - it->second >= interval;
    }
    void mark(const std::string& key, fc::time_point now) { _last_push[key] = now; }
+   /// Drop retired symbols only after a complete, unfiltered table sweep.
+   void retain(const std::set<std::string>& live) {
+      std::erase_if(_last_push, [&](const auto& entry) { return !live.contains(entry.first); });
+   }
 
 private:
    std::map<std::string, fc::time_point> _last_push;
+};
+
+/// Retain the chain's inclusive next-key cursor and prune spacing at the end of each sweep.
+class kick_pool_scan {
+public:
+   /// Feed directly to get_table_rows.lower_bound; empty starts the next sweep.
+   const std::string& lower_bound() const { return _next; }
+   /// Record every decoded symbol, including pools that are not due.
+   void observe(const std::string& symbol) { _live.insert(symbol); }
+   /// Advance only after a successful page read; a failed read must not prune live pools.
+   void finish_page(bool more, const std::string& next, crank_spacing& spacing) {
+      _next = more ? next : std::string{};
+      if (!more) {
+         spacing.retain(_live);
+         _live.clear();
+      }
+   }
+private:
+   std::string _next;
+   std::set<std::string> _live;
 };
 
 } // namespace sysio::batch_operator_detail

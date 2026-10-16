@@ -156,10 +156,68 @@ owner calls `claimnodedis` (auth = their own account) to transfer the
 newly-vested amount, gated by `min_claimable` (memo `Node Owner distribution`).
 `viewnodedist` is the read-only preview.
 
-### LIQ yield and retired capital draws
+### LIQ yield and the independent kicker earmark
 
-LIQ holders receive only supplied WIRE yield proceeds and donations. The T5 yield bonus and
-`fundclaim` action are removed. Any unallocated emissions remainder stays in the treasury.
+LIQ holders receive supplied WIRE proceeds and donations through `sysio.liq::addyield`.
+The retired per-intake bonus and `fundclaim` action remain removed. `sysio.kicker` is a
+separate privileged contract: a permissionless `kick(sym)` draws from `sysio` within a
+governance earmark and distributes the gift to all holders through `addyield`.
+
+The gift is simple accrual on the **current** LIQ `stat.supply` at a **TWAP**
+of the registered LIQ/WIRE swap pool, for at most the last 72 hours since payment.
+Each token has its own clock and rate (default 200 bps); a year is 31,557,600 seconds.
+The two arithmetic floors favour the treasury. Kicker snapshots swap's `priceaccum.price1`
+on `addpool` and after each full payment. It extends that accumulator to the action time
+using the unchanged-reserve tail, then divides the cumulative difference by elapsed time.
+Governance sets `kickcfg.twap_window_sec` through
+`setconfig({budget_remaining, min_interval_sec, twap_window_sec})`. The window defaults
+to **86,400 seconds (one day)** and must be at least **60 seconds**; production keeps
+one day. Test clusters can configure a shorter window to observe payments, with
+`min_interval_sec` and `min_gift` also low enough to permit them.
+The observation must span at least the configured window; there is no spot fallback during warm-up.
+The next `kick` applies a changed window to the in-flight observation without resetting
+`price_time`, `price_snapshot` or the accrual clock: lowering it can permit payment
+on that attempt; raising it delays eligibility until that same observation is long enough.
+Partial payments and nonpaying attempts retain the observation, so their TWAP can span
+more than the configured window. A same-block trade has zero weight until time passes at the new price.
+
+A one-block price spike in a shallow pool contributes its duration weight to the
+arithmetic TWAP. A large trade held across one block can push the bounded gift to
+the daily cap. A holder of most of the LIQ supply, who receives most of that gift,
+can then profit from the round trip. This residual risk is accepted.
+Governance registers only pools with deep liquidity and sets `max_gift_per_day`
+well under the cost of moving that pool's price.
+
+Governance sets an absolute `budget_remaining` outside `t5_distributable`. Kicker draws
+never modify `t5state.total_distributed`. Every draw reserves `pending_emission_amount`,
+`payclaimtot.outstanding`, and the nonnegative remaining emission ceiling
+(`t5_distributable - t5_floor - total_distributed`) from the live WIRE balance.
+Absent emissions configuration or T5 state permits no draw.
+
+Funding or a daily allowance below the accrued gift pays the available amount if it
+meets `min_gift`, then sets `last_kick` to `now - elapsed + floor(elapsed * paid / gift)`,
+where `elapsed = min(now - last_kick, 72 hours)`. A successful payment forfeits older
+accrual. Within the bounded 72 hours, the unpaid remainder keeps accruing.
+A below-minimum allowance or Andon hold leaves the clock open. An empty supply
+resets the clock and all shortfall diagnostics, except during an Andon hold.
+Governance must set a positive UTC-day ceiling at least `min_gift` and no larger
+than **1,000 WIRE per pool per day**, which is also the C++ default. Zero is invalid.
+Retries and configuration changes retain the current day's spending. Set `min_gift`
+no higher than a day's expected accrual if the pool is intended to pay.
+
+TWAP, bounded accrual and the mandatory cap apply independently of keeper cadence.
+`min_interval_sec` is a floor, not a schedule:
+every ACTIVE batch operator pushes `kick(sym)` once a pool's interval has elapsed
+(`batch_operator_plugin`, `--batch-kick-crank`), and governance still monitors
+`last_kick` for a pool that stops advancing. Each poll reads and attempts at most ten
+pools, resuming the next page on the next poll; a complete sweep prunes removed symbols.
+
+`shortfall_amount` records `gift - paid` for the latest shortfall, not cumulative
+debt. `shortfall_time` records that observation. `gift_overflow` records a gift
+outside the asset range: this implementation pays nothing and retains the clock,
+because it does not compute an exact partial-payment denominator for overflow.
+A later full payment clears all three diagnostics. An unallocated emissions
+remainder stays in the treasury; it does not authorize a kicker budget by itself.
 
 The external staking-reward message and `sysio.dclaim::onreward` are removed. Pre-launch imports
 and already funded DClaim balances still link through AuthX and pay through

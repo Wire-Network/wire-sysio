@@ -14,6 +14,18 @@ using mvo = fc::mutable_variant_object;
 
 namespace {
 
+/// Independent deployment fixtures: both TWAP settings must preserve the supplied cadence.
+constexpr uint32_t short_twap_window_sec = 60;
+constexpr uint32_t production_twap_window_sec = 86'400;
+constexpr uint32_t configured_min_interval_sec = 3600;
+/// Extra kickcfg fields supplied by this test; the crank only consumes min_interval_sec.
+namespace kicker_fixture {
+namespace field {
+constexpr auto budget_remaining = "budget_remaining";
+constexpr auto twap_window_sec = "twap_window_sec";
+}
+}
+
 constexpr auto    pool_code    = "POOLB";
 constexpr auto    shadow_code  = "LIQSOL";
 constexpr int64_t one_token    = 1'000'000'000;   // one whole 9-decimal token, in subunits
@@ -34,6 +46,19 @@ mvo yield_pool_row() {
 /// A `{key, value}` kv row with `code` as the symbol-code key.
 mvo kv(const char* code, mvo value) {
    return mvo()("key", mvo()("symbol_code", raw_code(code)))("value", std::move(value));
+}
+
+/// A `sysio.kicker::kickpools` value as the chain renders it: the LIQ token, its
+/// rate and minimum, and the accrual clock as an ISO time point.
+mvo kick_pool_row(fc::time_point last_kick) {
+   return mvo()
+      ("sym",              shadow_code)
+      ("rate_bps",         200)
+      ("min_gift",         one_token)
+      ("last_kick",        last_kick.to_iso_string())
+      ("gifted_total",     "0")
+      ("shortfall_amount", 0)
+      ("max_gift_per_day", 0);
 }
 
 } // namespace
@@ -91,6 +116,76 @@ BOOST_AUTO_TEST_CASE(row_value_unwraps_the_kv_wrapper) {
    BOOST_CHECK(!row_value(mvo()("key", mvo())).has_value());
 }
 
+BOOST_AUTO_TEST_CASE(kick_min_interval_reads_the_config_and_refuses_what_setconfig_would) {
+   // Full kickcfg rows at both supported deployment settings retain the configured payment cadence.
+   for (const uint32_t window : {short_twap_window_sec, production_twap_window_sec}) {
+      const auto interval = kick_min_interval(mvo()(kicker_fixture::field::budget_remaining, 0)
+         (kicker::field::min_interval_sec, configured_min_interval_sec)(kicker_fixture::field::twap_window_sec, window));
+      BOOST_REQUIRE(interval.has_value());
+      BOOST_CHECK_EQUAL(fc::seconds(configured_min_interval_sec).count(), interval->count());
+   }
+
+   BOOST_CHECK(!kick_min_interval(mvo()("budget_remaining", 0)).has_value());   // absent
+   BOOST_CHECK(!kick_min_interval(mvo()("min_interval_sec", 0)).has_value());   // setconfig refuses 0
+   BOOST_CHECK(!kick_min_interval(mvo()("min_interval_sec", "not a number")).has_value());
+}
+
+BOOST_AUTO_TEST_CASE(kick_is_due_exactly_when_the_contract_clock_check_passes) {
+   const auto last_kick    = fc::time_point::from_iso_string("2026-10-10T12:00:00.000");
+   const auto min_interval = fc::seconds(3600);
+   const auto pool         = kick_pool_row(last_kick);
+
+   // `kick` returns without writing while `now - last_kick < min_interval`.
+   BOOST_CHECK(!kick_due(pool, min_interval, last_kick));
+   BOOST_CHECK(!kick_due(pool, min_interval, last_kick + min_interval - fc::microseconds(1)));
+   BOOST_CHECK(kick_due(pool, min_interval, last_kick + min_interval));
+   BOOST_CHECK(kick_due(pool, min_interval, last_kick + fc::days(3)));   // a long-unpaid pool stays due
+   // A clock ahead of this node's (read from a later block) is never due.
+   BOOST_CHECK(!kick_due(pool, min_interval, last_kick - fc::seconds(1)));
+}
+
+BOOST_AUTO_TEST_CASE(kick_last_kick_parses_the_rendered_time_point_and_nothing_else) {
+   const auto last_kick = fc::time_point::from_iso_string("2026-10-10T12:00:00.500");
+   const auto parsed    = kick_last_kick(kick_pool_row(last_kick));
+   BOOST_REQUIRE(parsed.has_value());
+   BOOST_CHECK(*parsed == last_kick);
+
+   auto missing = kick_pool_row(last_kick);
+   missing.erase("last_kick");
+   BOOST_CHECK(!kick_last_kick(missing).has_value());
+   BOOST_CHECK(!kick_due(missing, fc::seconds(1), last_kick + fc::days(1)));   // unreadable row: no push
+
+   auto garbled = kick_pool_row(last_kick);
+   garbled.set("last_kick", mvo()("not", "a time"));
+   BOOST_CHECK(!kick_last_kick(garbled).has_value());
+   BOOST_CHECK(!kick_due(garbled, fc::seconds(1), last_kick + fc::days(1)));
+}
+
+BOOST_AUTO_TEST_CASE(a_due_kick_pool_is_keyed_and_spaced_like_the_yield_cranks) {
+   // The crank reads `kickpools` with its kv keys: the key is the `kick` argument.
+   const auto last_kick = fc::time_point::from_iso_string("2026-10-10T12:00:00.000");
+   const auto row       = kv(shadow_code, kick_pool_row(last_kick));
+   const auto code      = row_symbol_code(row);
+   const auto value     = row_value(row);
+   BOOST_REQUIRE(code.has_value());
+   BOOST_REQUIRE(value.has_value());
+   BOOST_CHECK_EQUAL(std::string(shadow_code), symbol_code_name(*code));
+
+   // An Andon hold or a below-minimum gift leaves `last_kick` alone, so the pool
+   // stays due; the spacing is what keeps the retries to one per interval.
+   const auto min_interval = fc::seconds(3600);
+   const auto retry        = fc::seconds(60);
+   const auto now          = last_kick + min_interval;
+   const auto pool         = symbol_code_name(*code);
+   crank_spacing spacing;
+   BOOST_REQUIRE(kick_due(*value, min_interval, now));
+   BOOST_CHECK(spacing.due(pool, now, retry));
+   spacing.mark(pool, now);
+   BOOST_CHECK(kick_due(*value, min_interval, now + fc::seconds(15)));
+   BOOST_CHECK(!spacing.due(pool, now + fc::seconds(15), retry));
+   BOOST_CHECK(spacing.due(pool, now + retry, retry));
+}
+
 BOOST_AUTO_TEST_CASE(crank_spacing_allows_one_push_per_interval_per_key) {
    crank_spacing spacing;
    const auto interval = fc::seconds(60);
@@ -102,6 +197,35 @@ BOOST_AUTO_TEST_CASE(crank_spacing_allows_one_push_per_interval_per_key) {
    BOOST_CHECK(spacing.due(pool_code, t0 + fc::seconds(60), interval));
    // Keys are independent: a tick on one pool does not delay another.
    BOOST_CHECK(spacing.due(shadow_code, t0, interval));
+}
+
+/// A multi-page sweep retains all live pools and drops retired retry keys only on completion.
+BOOST_AUTO_TEST_CASE(kick_scan_pages_fairly_and_prunes_removed_pools) {
+   static_assert(kicker::pools_per_poll == 10);
+   constexpr auto next_page = "{\"symbol_code\":123}";
+   constexpr auto retired = "RETIRED";
+   const auto now = fc::time_point::now();
+   const auto interval = fc::seconds(60);
+   crank_spacing spacing;
+   kick_pool_scan scan;
+   spacing.mark(pool_code, now);
+   spacing.mark(shadow_code, now);
+   spacing.mark(retired, now);
+   BOOST_CHECK(scan.lower_bound().empty());
+   scan.observe(pool_code);
+   scan.finish_page(true, next_page, spacing);
+   BOOST_CHECK_EQUAL(next_page, scan.lower_bound());
+   BOOST_CHECK(!spacing.due(retired, now, interval));
+   scan.observe(shadow_code);
+   scan.finish_page(false, {}, spacing);
+   BOOST_CHECK(scan.lower_bound().empty());
+   BOOST_CHECK(!spacing.due(pool_code, now, interval));
+   BOOST_CHECK(!spacing.due(shadow_code, now, interval));
+   BOOST_CHECK(spacing.due(retired, now, interval));
+   // An empty table prunes everything; re-added symbols can be attempted immediately.
+   scan.finish_page(false, {}, spacing);
+   BOOST_CHECK(spacing.due(pool_code, now, interval));
+   BOOST_CHECK(spacing.due(shadow_code, now, interval));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
