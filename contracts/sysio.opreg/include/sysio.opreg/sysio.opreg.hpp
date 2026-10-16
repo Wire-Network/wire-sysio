@@ -247,6 +247,8 @@ namespace sysio {
       [[sysio::action]]
       void processuw(name account, bool was_eligible, bool is_eligible);
 
+      /// Seize an ordinary operator's collateral and mark it SLASHED. Authorized calls for
+      /// bootstrapped operators succeed without mutation, including when invoked by epoch advance.
       [[sysio::action]]
       void slash(name account, std::string reason);
 

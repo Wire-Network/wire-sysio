@@ -40,6 +40,8 @@ namespace sysio {
       /// Evaluate consensus on inbound envelopes for an outpost+epoch.
       /// Called inline from deliver. On consensus: unpacks envelope,
       /// stores messages + attestations, records per-outpost consensus.
+      /// A delivered bootstrapped minority requires a Tier-1 dispute before majority acceptance;
+      /// without an electorate, leave consensus undecided for a later chkcons retry.
       ///
       /// `chain_code` is the originating chain's slug_name value
       /// (see `deliver` for the convention).
