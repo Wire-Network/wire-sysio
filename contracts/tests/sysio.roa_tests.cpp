@@ -1502,6 +1502,40 @@ BOOST_FIXTURE_TEST_CASE( reducepolicy_wrong_symbol, sysio_roa_full_tester ) try 
       sysio_assert_message_is("policy weights must be denominated in the core SYS symbol"));
 } FC_LOG_AND_RETHROW()
 
+// ===== 1c. shared network_gen guard =====
+
+// activateroa fixes the generation at 0 and no action advances it, so each policy action rejects
+// generation 1 while the same call at the current generation goes through.
+BOOST_FIXTURE_TEST_CASE( policy_actions_reject_future_network_gen, sysio_roa_full_tester ) try {
+   constexpr auto future_gen  = NETWORK_GEN + 1;
+   constexpr auto invalid_gen = "Invalid network generation.";
+   const auto issuer = node_owners[2];
+   const auto user   = create_newuser(issuer);
+   produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      add_roa_policy(issuer, user, "2.0000 SYS", "2.0000 SYS", "2.0000 SYS", 0, future_gen),
+      sysio_assert_message_exception, sysio_assert_message_is(invalid_gen));
+   add_roa_policy(issuer, user, "2.0000 SYS", "2.0000 SYS", "2.0000 SYS", 0, NETWORK_GEN);
+
+   BOOST_CHECK_EXCEPTION(
+      expand_roa_policy(issuer, user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", future_gen),
+      sysio_assert_message_exception, sysio_assert_message_is(invalid_gen));
+   expand_roa_policy(issuer, user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", NETWORK_GEN);
+
+   BOOST_CHECK_EXCEPTION(
+      reduce_roa_policy(issuer, user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", future_gen),
+      sysio_assert_message_exception, sysio_assert_message_is(invalid_gen));
+   reduce_roa_policy(issuer, user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", NETWORK_GEN);
+   produce_block();
+
+   // Only the current-generation calls moved the policy: 2 + 1 - 1.
+   const auto p = get_policy(user, issuer);
+   BOOST_TEST(p["net_weight"].as_string() == "2.0000 SYS");
+   BOOST_TEST(p["cpu_weight"].as_string() == "2.0000 SYS");
+   BOOST_TEST(p["ram_weight"].as_string() == "2.0000 SYS");
+} FC_LOG_AND_RETHROW()
+
 // ===== 2. expandpolicy validation =====
 
 // Expand non-existent policy should fail
