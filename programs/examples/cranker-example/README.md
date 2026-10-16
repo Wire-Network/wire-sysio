@@ -41,6 +41,15 @@ available. It assigns maximum-value policy defaults and cannot be combined with
 finite economic boundary, and are not recommended for production; production operators must use
 reviewed finite `transaction_policy` values in the file configuration.
 
+When the CLI chain ID is omitted, discovery continues in the background. Each
+scheduled tick fetches the current client snapshot and skips gas-price reads
+until discovery succeeds; the process can recover without a restart.
+
+After the normal build, run `ctest --test-dir <build-dir> -R '^cranker_startup_recovery$' --output-on-failure`
+to verify delayed discovery, configured-ID operation, and graceful shutdown.
+The test reserves its RPC ports through `BindConfigProvider` and retains a new
+diagnostic directory under the example's build directory for every run.
+
 #### Ethereum ABI File (`--ethereum-abi-file`)
 Path to an Ethereum contract ABI file (relative from current working directory or absolute path). The file should contain a JSON array of ABI-compliant contract definitions.
 

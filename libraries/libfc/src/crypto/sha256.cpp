@@ -17,7 +17,7 @@ namespace fc {
 	  FC_THROW_EXCEPTION( exception, "sha256: size mismatch" );
        memcpy(_hash, data, size );
     }
-    sha256::sha256( const std::string& hex_str ) {
+    sha256::sha256( std::string_view hex_str ) {
       auto bytes_written = fc::from_hex( hex_str, (char*)_hash, sizeof(_hash) );
       if( bytes_written < sizeof(_hash) )
          memset( (char*)_hash + bytes_written, 0, (sizeof(_hash) - bytes_written) );
