@@ -517,6 +517,57 @@ public:
 
 BOOST_AUTO_TEST_SUITE(sysio_bond_tests)
 
+
+/// Legacy-testnet creation needs only issuer authority and immediately uses sysio's VALID ruling.
+BOOST_FIXTURE_TEST_CASE(testnet_requests_resolve_without_underwriters_or_waiting, sysio_bond_tester) try {
+   for (const auto token : {WIRE, LIQSOL}) {
+      const uint64_t id = token == WIRE ? 1 : 2;
+      BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, char(id)), token,
+                                             10 * UNIT, 0));
+      const auto row = request_row_of(id);
+      BOOST_REQUIRE_EQUAL(STATE_VALID, row["state"].as_string());
+      BOOST_REQUIRE_EQUAL(row["created_at"].as_string(), row["resolved_at"].as_string());
+      BOOST_REQUIRE_EQUAL(0u, row["bonded"].as_uint64());
+      BOOST_REQUIRE(bond_rows_of(id).empty());
+      BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(not_accepting_msg)), accept("alice"_n, id, UNIT));
+      BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(hold_state_msg)), hold("issuer"_n, id, "bob"_n));
+      BOOST_REQUIRE_EQUAL(error("missing authority of sysio"), rslvvalid("alice"_n, id));
+   }
+} FC_LOG_AND_RETHROW()
+
+/// Zero underwriting awards the whole bounty to sysio, exactly as the unbonded override does.
+BOOST_FIXTURE_TEST_CASE(testnet_bounties_remain_claimable_by_sysio, sysio_bond_tester) try {
+   for (const auto token : {WIRE, LIQSOL}) {
+      const uint64_t id = token == WIRE ? 1 : 2;
+      BOOST_REQUIRE_EQUAL(success(), request("issuer"_n, "oppenvelope"_n, bytes(32, char(id)), token,
+                                             10 * UNIT, UNIT));
+      const auto escrow = escrow_row_of(id, KIND_BOUNTY_BYTE);
+      BOOST_REQUIRE_EQUAL("sysio", escrow["payee"].as_string());
+      BOOST_REQUIRE_EQUAL(UNIT, escrow["payout"].as_uint64());
+      const auto before = token == WIRE ? wire_balance(SYSIO_ACCOUNT) : liq_balance(SYSIO_ACCOUNT);
+      BOOST_REQUIRE_EQUAL(success(), claim(id, SYSIO_ACCOUNT));
+      const auto after = token == WIRE ? wire_balance(SYSIO_ACCOUNT) : liq_balance(SYSIO_ACCOUNT);
+      BOOST_REQUIRE_EQUAL(before + UNIT, after);
+      BOOST_REQUIRE_EQUAL(0u, escrow_row_of(id, KIND_BOUNTY_BYTE)["payout"].as_uint64());
+   }
+} FC_LOG_AND_RETHROW()
+
+/// requestkeep shares the bypass but retains its durable outcome until the issuer acknowledges it.
+BOOST_FIXTURE_TEST_CASE(testnet_durable_requests_resolve_and_require_ack, sysio_bond_tester) try {
+   BOOST_REQUIRE_EQUAL(success(), push_bond("issuer"_n, "requestkeep"_n, mvo()
+      ("issuer", "issuer"_n)("schema", "oppenvelope"_n)("statement", bytes(32, 'a'))
+      ("token_code", codename_mvo(LIQSOL))("covered", 10 * UNIT)("bounty", 0)("window_sec", WINDOW_SEC)));
+   BOOST_REQUIRE_EQUAL(STATE_VALID, request_state_of(1));
+   BOOST_REQUIRE(!request_row_of(1)["outcome_acknowledged"].as_bool());
+   pass_retention();
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 10));
+   BOOST_REQUIRE(!request_row_of(1).is_null());
+   BOOST_REQUIRE_NE(success(), push_bond("alice"_n, "ack"_n, mvo()("request_id", 1)));
+   BOOST_REQUIRE_EQUAL(success(), push_bond("issuer"_n, "ack"_n, mvo()("request_id", 1)));
+   BOOST_REQUIRE_EQUAL(success(), prune(0, 10));
+   BOOST_REQUIRE(request_row_of(1).is_null());
+} FC_LOG_AND_RETHROW()
+
 // ---------------------------------------------------------------------------
 // Configuration
 // ---------------------------------------------------------------------------
