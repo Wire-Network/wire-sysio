@@ -3,12 +3,15 @@
 #include <sysio/chain/abi_serializer.hpp>
 
 #include <fc/variant_object.hpp>
+#include <fc/io/json.hpp>
 #include <fc/slug_name.hpp>
 
 #include <algorithm>
+#include <array>
 #include <limits>
 
 #include "contracts.hpp"
+#include "registry_test_support.hpp"
 #include "external_chain_simulator.hpp"
 #include "contract_test_support.hpp"
 #include "shadow_yield_reference.hpp"
@@ -367,6 +370,9 @@ public:
       abi_def epoch_abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(epoch_accnt->abi, epoch_abi), true);
       epoch_abi_ser.set_abi(std::move(epoch_abi), abi_serializer::create_yield_function(abi_serializer_max_time));
+      // Seed depot requirements without activating external chains used by remit tests.
+      for (const auto token : {"WIRE", "NTA", "NTB"})
+         sysio_system::test_support::registry::seed_depot_pair(*this, token);
    }
 
    // ── SlugName helpers ──
@@ -703,13 +709,10 @@ public:
 
    // ── Shadow LIQ collateral (sysio.liq) ──
 
-   /// Deploy a privileged registry or token contract and load its ABI serializer.
+   /// Deploy a privileged registry or token contract once and load its ABI serializer.
    void deploy_privileged(name account, const std::vector<uint8_t>& wasm, const std::vector<char>& abi,
                           abi_serializer& ser) {
-      set_code(account, wasm);
-      set_abi(account, abi.data());
-      set_privileged(account);
-      produce_blocks();
+      sysio_system::test_support::registry::deploy(*this, account, wasm, abi);
       sysio_system::test_support::load_account_abi(*this, account, ser);
    }
 
@@ -741,6 +744,7 @@ public:
             ("description", std::string{})("outpost", sysio_system::test_support::no_outpost_mvo())));
 
          const std::vector<char> address(a.kind == ChainKind::CHAIN_KIND_SVM ? 32 : kEvmAddressBytes, kPlaceholderAddressByte);
+         if (get_row_by_id(TOKENS_ACCOUNT, TOKENS_ACCOUNT, "tokens"_n, cn(a.token).value).empty())
          BOOST_REQUIRE_EQUAL(success(), push_contract(TOKENS_ACCOUNT, tokens_abi_ser, TOKENS_ACCOUNT,
             shadow_action::regtoken, mvo()
             ("kind", TokenKind::TOKEN_KIND_LIQ)("code", codename_mvo(a.token))
@@ -926,6 +930,54 @@ BOOST_FIXTURE_TEST_CASE(setconfig_basic, sysio_opreg_tester) { try {
    BOOST_REQUIRE_EQUAL(kDefaultMaxConsecutiveMisses,
                        cfg["terminate_max_consecutive_misses"].as_uint64());
    BOOST_REQUIRE_EQUAL(kDefaultMaxPctMisses24h, cfg["terminate_max_pct_misses_24h"].as_uint64());
+} FC_LOG_AND_RETHROW() }
+
+/// Every role rejects each missing reference, including after a valid entry, atomically.
+BOOST_FIXTURE_TEST_CASE(setconfig_requires_registered_collateral, sysio_opreg_tester) { try {
+   constexpr std::array<const char*, 3> roles{"req_prod_collat", "req_batchop_collat", "req_uw_collat"};
+   constexpr std::array<const char*, 3> errors{
+      ": chain code not registered", ": token code not registered",
+      ": (chain_code, token_code) binding not registered"};
+   const auto valid = make_chain_min_bond("WIRE", "WIRE", kTestMinBond);
+   // NTA exists, but its binding to this independently registered chain does not.
+   deploy_privileged(CHAINS_ACCOUNT, contracts::chains_wasm(), contracts::chains_abi(), chains_abi_ser);
+   BOOST_REQUIRE_EQUAL(success(), push_contract(CHAINS_ACCOUNT, chains_abi_ser, CHAINS_ACCOUNT,
+      shadow_action::regchain, mvo()("kind", ChainKind::CHAIN_KIND_EVM)("code", "UNBOUND")
+         ("external_chain_id", kEthExternalChainId)("name", "Unbound")("description", "")
+         ("outpost", sysio_system::test_support::no_outpost_mvo())));
+   const std::array<fc::variant, 3> invalid{
+      make_chain_min_bond("MISSING", "WIRE", kTestMinBond),
+      make_chain_min_bond("WIRE", "MISSING", kTestMinBond),
+      make_chain_min_bond("UNBOUND", "NTA", kTestMinBond)};
+   const auto configure = [&](const std::array<std::vector<fc::variant>, 3>& lists) {
+      return setconfig(kTestMaxProducers, kTestMaxBatchOperators, kTestMaxUnderwriters,
+         kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
+         kTerminateWindowMs, lists[0], lists[1], lists[2]);
+   };
+   for (size_t role = 0; role < roles.size(); ++role) {
+      for (size_t missing = 0; missing < invalid.size(); ++missing) {
+         std::array<std::vector<fc::variant>, 3> lists{{{valid}, {valid}, {valid}}};
+         lists[role].push_back(invalid[missing]);
+         const auto before = get_opconfig();
+         BOOST_REQUIRE_EQUAL(error(std::string("assertion failure with message: ") + roles[role] + errors[missing]),
+                             configure(lists));
+         BOOST_REQUIRE_EQUAL(fc::json::to_string(before, fc::time_point::maximum()),
+                             fc::json::to_string(get_opconfig(), fc::time_point::maximum()));
+      }
+      // Repeat on an existing configuration, so failures cannot replace its timestamp or lists.
+      BOOST_REQUIRE_EQUAL(success(), configure({{{valid}, {valid}, {valid}}}));
+      produce_blocks();
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// Existence checks permit governance to configure collateral before registry activation.
+BOOST_FIXTURE_TEST_CASE(setconfig_accepts_inactive_registry_rows, sysio_opreg_tester) { try {
+   sysio_system::test_support::registry::make_inactive(*this);
+   const std::vector<fc::variant> requirements{make_chain_min_bond("WIRE", "NTA", kTestMinBond)};
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kTestMaxProducers, kTestMaxBatchOperators,
+      kTestMaxUnderwriters, kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses,
+      kDefaultMaxPctMisses24h, kTerminateWindowMs, requirements, requirements, requirements));
+   BOOST_REQUIRE_EQUAL(1, get_opconfig()["req_prod_collat"].get_array().size());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_queue, sysio_opreg_tester) { try {
@@ -1949,6 +2001,8 @@ BOOST_FIXTURE_TEST_CASE(deposit_keeps_wire_and_shadow_rows_separate, sysio_opreg
 /// self-registration AuthX link check never runs; eligibility itself reads only balances.
 BOOST_FIXTURE_TEST_CASE(shadow_row_satisfies_role_minimum, sysio_opreg_tester) { try {
    constexpr uint64_t MIN_BOND = kWireUnit;
+   setup_shadow_liq();
+   sysio_system::test_support::registry::seed_depot_pair(*this, kLiqEthCodename);
 
    BOOST_REQUIRE_EQUAL(success(), setconfig(
       /*max_prod=*/kTestMaxProducers,
@@ -1966,7 +2020,6 @@ BOOST_FIXTURE_TEST_CASE(shadow_row_satisfies_role_minimum, sysio_opreg_tester) {
    BOOST_REQUIRE_EQUAL(success(),
       regoperator(kEligibilityBatchOperator, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/false));
    setup_wire_token_and_fund(kEligibilityBatchOperator, kWireFundingQuantity);
-   setup_shadow_liq();
    mint_shadow(kEligibilityBatchOperator, kShadowFunding);
 
    BOOST_REQUIRE_EQUAL(success(), deposit(kEligibilityBatchOperator, kWireCodename, MIN_BOND));

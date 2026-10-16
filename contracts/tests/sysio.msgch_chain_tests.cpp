@@ -38,6 +38,7 @@
 #include <magic_enum/magic_enum.hpp>
 
 #include "contracts.hpp"
+#include "registry_test_support.hpp"
 #include "contract_test_support.hpp"
 
 using namespace sysio::testing;
@@ -349,6 +350,7 @@ public:
    /// Configure one test cohort of up to six batch operators, the ETH/SOL outpost rows, its one-group
    /// schedule, and the genesis advance. The configurable cohort supports even split regressions.
    void bootstrap(uint32_t n_batch_ops = 1, bool batchop_is_bootstrapped = true) {
+      sysio_system::test_support::registry::seed_depot_pair(*this);
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "setconfig"_n, mvo()
             ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
@@ -378,7 +380,7 @@ public:
             ("req_prod_collat",                  fc::variants{})
             // Empty collateral requirements intentionally keep non-bootstrapped
             // operators UNKNOWN. Give the WNS-16 fixture's non-bootstrapped
-            // operator the one-unit ETH and SOL requirements it satisfies below.
+            // operator the one-unit depot WIRE requirement it satisfies below.
             ("req_batchop_collat",               batchop_is_bootstrapped
                                                    ? fc::variants{}
                                                    : fc::variants{
@@ -907,8 +909,7 @@ public:
             (opreg_config_fields::TERMINATE_WINDOW_MS,              TERMINATE_WINDOW_MS)
             (opreg_config_fields::REQUIRED_PRODUCER_COLLATERAL,     fc::variants{})
             (opreg_config_fields::REQUIRED_BATCH_OPERATOR_COLLATERAL, fc::variants{
-               make_chain_min_bond(ETH_CHAIN_CODE, ETH_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL),
-               make_chain_min_bond(SOL_CHAIN_CODE, SOL_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL) })
+               make_chain_min_bond("WIRE", "WIRE", BATCH_OPERATOR_MINIMUM_COLLATERAL) })
             (opreg_config_fields::REQUIRED_UNDERWRITER_COLLATERAL,  fc::variants{})));
    }
 
@@ -935,6 +936,7 @@ public:
    /// (99, so an anchored run terminates on the CONSECUTIVE rail), and `terminate_window_ms` set by
    /// the caller (the exact span bound for this schedule). ETH outpost registered; genesis advance run.
    void bootstrap_rotation(uint64_t terminate_window_ms) {
+      sysio_system::test_support::registry::seed_depot_pair(*this);
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
          ("epoch_duration_sec",                 EPOCH_DURATION_SEC)
          ("operators_per_epoch",                1)
