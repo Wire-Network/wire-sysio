@@ -192,6 +192,19 @@ ninja -C $BUILD_DIR unit_test       # Build unit tests
 
 ## Testing Commands
 
+Network tests require Node 24 and the pinned canonical port provider. Run
+`pnpm install --frozen-lockfile --ignore-scripts` at the repository root first.
+CTest wraps NP/LR commands automatically. To run a network script or native
+network binary manually, run from the build directory through
+`python3 tests/bind_registry.py <test command>`. The Node custodian reserves
+192 ports through `BindConfigProvider.resolve`, keeps them registered across
+daemon restarts, and drains the test process group before releasing them.
+Three canonical configurations reserve validated 64-port TCP/UDP windows
+and required auxiliary roles; no Solana validator is started. Native allocations
+queue in arrival order, holding admission through all three canonical resolves. Allocation retries
+only canonical lock contention and explicitly unavailable pinned preferences, with a 900-second total allocation budget included
+in the CTest timeout. Other allocator errors fail immediately.
+
 ### Run All Parallelizable Tests
 ```bash
 cd $BUILD_DIR && ctest -j "$(nproc)" -LE _tests

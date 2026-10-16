@@ -19,6 +19,8 @@
 #include <stdexcept>
 #include <string>
 #include <thread>
+#include <sstream>
+#include <vector>
 
 using namespace sysio;
 using namespace sysio::testing;
@@ -242,25 +244,31 @@ BOOST_AUTO_TEST_CASE(tps_short_run_low_tps)
    constexpr uint32_t test_duration_s = 5;
    constexpr uint32_t test_tps = 5;
    constexpr uint32_t expected_trxs = test_duration_s * test_tps;
-   constexpr uint64_t expected_runtime_us = test_duration_s * 1000000;
-   constexpr uint64_t allowable_runtime_deviation_per = 20;
-   constexpr uint64_t allowable_runtime_deviation_us = expected_runtime_us / allowable_runtime_deviation_per;
-   constexpr int64_t minimum_runtime_us = expected_runtime_us - allowable_runtime_deviation_us;
-   constexpr int64_t maximum_runtime_us = expected_runtime_us + allowable_runtime_deviation_us;
+   constexpr int64_t interval_us = 1000000 / test_tps;
 
    std::shared_ptr<mock_trx_generator> generator = std::make_shared<mock_trx_generator>(expected_trxs);
    std::shared_ptr<simple_tps_monitor> monitor = std::make_shared<simple_tps_monitor>(expected_trxs);
 
    trx_tps_tester<mock_trx_generator, simple_tps_monitor> t1(generator, monitor, {test_duration_s, test_tps});
 
-   fc::time_point start = fc::time_point::now();
-   t1.run();
-   fc::time_point end = fc::time_point::now();
-   fc::microseconds runtime_us = end.time_since_epoch() - start.time_since_epoch();
-
+   BOOST_REQUIRE(t1.run());
    BOOST_REQUIRE_EQUAL(generator->_calls.size(), expected_trxs);
-   BOOST_REQUIRE_GT(runtime_us.count(), minimum_runtime_us);
-   BOOST_REQUIRE_LT(runtime_us.count(), maximum_runtime_us);
+   BOOST_REQUIRE_EQUAL(monitor->_calls.size(), expected_trxs);
+   const auto start = monitor->_calls.front().start_time;
+   for (uint32_t index = 0; index < expected_trxs; ++index) {
+      const auto& stats = monitor->_calls[index];
+      // The schedule is anchored to the initial start, so late callbacks must
+      // catch up rather than accumulate drift. OS scheduling may delay a send;
+      // it must never cause an early send. CTest bounds overall completion.
+      BOOST_CHECK_EQUAL((stats.start_time - start).count(), 0);
+      BOOST_CHECK_EQUAL(stats.trx_interval.count(), interval_us);
+      BOOST_CHECK_EQUAL((stats.next_run - start).count(), (index + 1) * interval_us);
+      BOOST_CHECK_EQUAL((stats.expected_end_time - start).count(), test_duration_s * 1000000);
+      BOOST_CHECK_EQUAL(stats.total_trxs, expected_trxs);
+      BOOST_CHECK_EQUAL(stats.trxs_sent, index + 1);
+      BOOST_CHECK_EQUAL(stats.trxs_left, expected_trxs - index - 1);
+      BOOST_CHECK_GE((generator->_calls[index] - start).count(), index * interval_us);
+   }
 }
 
 BOOST_AUTO_TEST_CASE(tps_short_run_high_tps)
@@ -512,29 +520,44 @@ BOOST_AUTO_TEST_CASE(tps_cant_keep_up_monitored)
    BOOST_REQUIRE_LT(generator->_calls.size(), expected_trxs);
 }
 
-BOOST_AUTO_TEST_CASE(test_port_shard_unsharded_defaults)
+BOOST_AUTO_TEST_CASE(test_port_registry_category_slots)
 {
-   test_port_offset_env_guard env;
-   env.clear();
-
+   const std::string lease = std::getenv("SYSIO_TEST_PORTS");
+   std::vector<uint16_t> ports;
+   std::istringstream input{lease};
+   for(std::string value; std::getline(input, value, ',');)
+      ports.push_back(static_cast<uint16_t>(std::stoul(value)));
+   BOOST_REQUIRE_EQUAL(ports.size(), 192u);
    for(const auto& expected : expected_ports) {
-      BOOST_REQUIRE_EQUAL(get_port(expected.category), expected.unsharded_base);
+      BOOST_REQUIRE_EQUAL(get_port(expected.category), ports.at(expected.slot));
       BOOST_REQUIRE_EQUAL(get_port(expected.category, expected.count - 1),
-                          expected.unsharded_base + expected.count - 1);
+                          ports.at(expected.slot + expected.count - 1));
    }
 }
 
-BOOST_AUTO_TEST_CASE(test_port_shard_sharded_offsets)
+BOOST_AUTO_TEST_CASE(test_port_registry_ignores_legacy_offsets)
 {
    test_port_offset_env_guard env;
    env.set("100");
 
-   constexpr uint32_t offset = 100;
    for(const auto& expected : expected_ports) {
-      BOOST_REQUIRE_EQUAL(get_port(expected.category), compact_shard_anchor_port + offset + expected.slot);
-      BOOST_REQUIRE_EQUAL(get_port(expected.category, expected.count - 1),
-                          compact_shard_anchor_port + offset + expected.slot + expected.count - 1);
+      const auto port = get_port(expected.category);
+      env.set("60000");
+      BOOST_REQUIRE_EQUAL(get_port(expected.category), port);
    }
+}
+
+BOOST_AUTO_TEST_CASE(test_port_registry_rejects_invalid_leases)
+{
+   const std::string lease = std::getenv("SYSIO_TEST_PORTS");
+   const auto first = lease.find(',');
+   const auto last = lease.rfind(',');
+   BOOST_REQUIRE_THROW(parse_registered_ports(lease.substr(0, last)), std::runtime_error);
+   BOOST_REQUIRE_THROW(parse_registered_ports(lease + ",1"), std::runtime_error);
+   BOOST_REQUIRE_THROW(parse_registered_ports("0" + lease.substr(first)), std::runtime_error);
+   BOOST_REQUIRE_THROW(parse_registered_ports("65536" + lease.substr(first)), std::runtime_error);
+   BOOST_REQUIRE_THROW(parse_registered_ports(lease.substr(0, last + 1) + "invalid"), std::runtime_error);
+   BOOST_REQUIRE_THROW(parse_registered_ports(lease.substr(last + 1) + lease.substr(first)), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_port_shard_rejects_invalid_indices)
@@ -556,8 +579,6 @@ BOOST_AUTO_TEST_CASE(test_port_shard_rejects_invalid_offsets)
       BOOST_REQUIRE_THROW(test_port_offset(), std::runtime_error);
    }
 
-   env.set("60000");
-   BOOST_REQUIRE_THROW(get_port(port_category::ipv6_probe, 3), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(trx_generator_constructor)

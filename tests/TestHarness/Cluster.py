@@ -508,7 +508,7 @@ class Cluster(object):
 
             nodeNum = instance.index
             # Bios port is shard-offset to PortBiosHttp; it no longer equals cluster.port+biosNodeId.
-            node_port = Cluster.__BiosPort if nodeNum == Node.biosNodeId else self.port + nodeNum
+            node_port = Cluster.__BiosPort if nodeNum == Node.biosNodeId else Utils.getPort(Utils.PortNodeHttp, nodeNum)
             node = Node(self.host, node_port, nodeNum, Path(instance.data_dir_name),
                         Path(instance.config_dir_name), sysdcmd, unstarted=instance.dont_start,
                         launch_time=launcher.launch_time, walletMgr=self.walletMgr, nodeopVers=self.nodeopVers)
@@ -760,7 +760,7 @@ class Cluster(object):
 
     def getHttpEndpoint(self, nodeId: int):
         """Return the sharded HTTP endpoint for a non-BIOS node."""
-        return f"{self.host}:{self.port + nodeId}"
+        return f"{self.host}:{Utils.getPort(Utils.PortNodeHttp, nodeId)}"
 
     def getNode(self, nodeId=0, exitOnError=True):
         if exitOnError and nodeId >= len(self.nodes):
@@ -1812,7 +1812,7 @@ class Cluster(object):
         with open(startFile, 'r') as file:
             cmd=file.read()
             Utils.Print("unstarted local node cmd: %s" % (cmd))
-        instance=Node(self.host, port=self.port+nodeId, nodeId=nodeId, pid=None, cmd=cmd, walletMgr=self.walletMgr, nodeopVers=self.nodeopVers)
+        instance=Node(self.host, port=Utils.getPort(Utils.PortNodeHttp, nodeId), nodeId=nodeId, pid=None, cmd=cmd, walletMgr=self.walletMgr, nodeopVers=self.nodeopVers)
         if Utils.Debug: Utils.Print("Unstarted Node>", instance)
         return instance
 

@@ -59,7 +59,7 @@ try:
     trxOnlyPort02 = Utils.getPort(Utils.PortTransactionOnly)
     trxOnlyPort03 = Utils.getPort(Utils.PortTransactionOnly, 1)
     # nonProdNode01 will connect normally but will not send blocks because 02 & 03 have specified :trx only
-    specificExtraNodeopArgs[1] = f'--p2p-peer-address localhost:{trxOnlyPort02} --p2p-peer-address localhost:{trxOnlyPort03} '
+    specificExtraNodeopArgs[1] = '--plugin sysio::net_api_plugin '
     # add a trx only listen endpoint to noBlocks02 & noBlocks03
     specificExtraNodeopArgs[2] =  f'--p2p-peer-address {cluster.getBiosP2pEndpoint()} --read-mode speculative ' # connect to bios
     specificExtraNodeopArgs[2] += f'--p2p-listen-endpoint {cluster.getNodeP2pEndpoint(2)} --p2p-server-address {cluster.getNodeP2pEndpoint(2)} '
@@ -83,6 +83,17 @@ try:
 
     assert noBlocks02.verifyAlive(), "node 02 did not launch"
     assert noBlocks03.verifyAlive(), "node 03 did not launch"
+
+    # Dial only after the receivers are listening. A pre-launch connection can
+    # remain pending until the operating system's TCP timeout, beyond this test.
+    for port in (trxOnlyPort02, trxOnlyPort03):
+        endpoint = f'localhost:{port}'
+        nonProdNode01.processUrllibRequest('net', 'connect', endpoint, exitOnError=True)
+        assert Utils.waitForBool(lambda: any(
+            conn['is_socket_open'] and conn['is_transactions_only'] and
+            conn['last_handshake']['p2p_address'].split()[0] == endpoint + ':trx'
+            for conn in nonProdNode01.processUrllibRequest('net', 'connections')['payload']
+        )), f'Transaction-only peer {endpoint} did not complete its handshake'
 
     headBlockNum = nonProdNode01.getHeadBlockNum()
 
@@ -112,14 +123,18 @@ try:
     Print("Verify head no longer advancing after bios killed")
     assert not noBlocks02.waitForHeadToAdvance(), "head advanced on node02 unexpectedly"
     assert not noBlocks03.waitForHeadToAdvance(), "head advanced on node03 unexpectedly"
+    frozenHead02 = noBlocks02.getHeadBlockNum()
+    frozenHead03 = noBlocks03.getHeadBlockNum()
 
     Print("Send transfer trx")
     cmdDesc = "push transaction --skip-sign"
     cmd     = "%s '%s'" % (cmdDesc, json.dumps(trx))
     trans = nonProdNode01.processClioCmd(cmd, cmdDesc, silentErrors=False, exitOnError=True)
 
-    # can't wait for transaction in block, so just sleep
-    time.sleep(0.5)
+    # No producer is running, so observe speculative execution directly rather
+    # than waiting for inclusion in a block or assuming a fixed network delay.
+    assert Utils.waitForBool(lambda: noBlocks02.getAccountSysBalance("sysio") == sysioBalanceBefore - 500000), \
+        "Transaction-only peer did not execute the forwarded transfer"
 
     sysioBalanceNode02 = noBlocks02.getAccountSysBalance("sysio")
     defprodueraBalanceNode02 = noBlocks02.getAccountSysBalance("defproducera")
@@ -131,6 +146,8 @@ try:
 
     assert sysioBalanceBefore == sysioBalanceNode03, f"{sysioBalanceBefore} != {sysioBalanceNode03}"
     assert defprodueraBalanceBefore == defprodueraBalanceNode03, f"{defprodueraBalanceBefore} != {defprodueraBalanceNode03}"
+    assert noBlocks02.getHeadBlockNum() == frozenHead02, "node02 received a block during speculative execution"
+    assert noBlocks03.getHeadBlockNum() == frozenHead03, "node03 received a block while the producer was stopped"
 
     cluster.biosNode.relaunch()
 

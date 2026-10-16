@@ -58,6 +58,15 @@ jobs:
         with:
           submodules: recursive
 
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # actions/setup-node@v4
+        with:
+          node-version: "24"
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # pnpm/action-setup@v4
+        with:
+          package_json_file: package.json
+      - name: Install canonical native-test port registry provider
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
       - name: Install host tools
         run: |
           # openjdk runs the ANTLR parser generator of the query engine plugin at build time. Homebrew
