@@ -66,6 +66,9 @@ constexpr std::string_view yield_remit_full_msg = "claim WIRE remit before colle
 /// Message of the `check` `sweepyield` raises for WIRE, which is not a shadow token.
 constexpr std::string_view wire_earns_no_yield_msg = "WIRE collateral earns no shadow yield";
 
+/// Declining an inline slash must not roll back epoch advancement.
+constexpr const char* bootstrapped_slash_log = "opreg::slash: skipping bootstrapped operator %\n";
+
 /// Resolve a depot-native collateral `token_code` through the shared resolver, against this
 /// registry's custody contracts (`sysio.token` for WIRE, `sysio.liq` for a shadow LIQ symbol).
 ///
@@ -1260,6 +1263,10 @@ void opreg::slash(name account, std::string reason) {
    operators_t ops(get_self());
    auto op_pk = operator_key{account.value};
    auto op = ops.get(op_pk, "operator not found");
+   if (op.is_bootstrapped) {
+      sysio::print_f(bootstrapped_slash_log, account);
+      return;
+   }
    check(op.status != OperatorStatus::OPERATOR_STATUS_SLASHED,
          "operator already slashed");
    check(op.status != OperatorStatus::OPERATOR_STATUS_TERMINATED,

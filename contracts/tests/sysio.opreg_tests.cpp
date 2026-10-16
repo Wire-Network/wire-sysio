@@ -1239,12 +1239,46 @@ BOOST_FIXTURE_TEST_CASE(regoperator_duplicate_rejected, sysio_opreg_tester) { tr
 
 // ── slash ──
 
-BOOST_FIXTURE_TEST_CASE(slash_permanent, sysio_opreg_tester) { try {
+/// A protected operator's entire row (including balances, timestamps and audit history) must
+/// survive repeated authorized slashes. Authorization still applies, even to the no-op branch.
+BOOST_FIXTURE_TEST_CASE(slash_bootstrapped_is_authorized_noop, sysio_opreg_tester) { try {
+   constexpr auto operators_table = "operators"_n;
+   constexpr auto slash_action = "slash"_n;
+   constexpr auto account_field = "account";
+   constexpr auto reason_field = "reason";
+   constexpr auto missing_authority = "missing authority of sysio.chalg";
    BOOST_REQUIRE_EQUAL(success(), setconfig());
-   produce_blocks();
+   for (const auto account : {kEligibilityBatchOperator, kEligibilityProducer}) {
+      const auto type = account == kEligibilityProducer ? OPERATOR_TYPE_PRODUCER : OPERATOR_TYPE_BATCH;
+      BOOST_REQUIRE_EQUAL(success(), regoperator(account, type, /*is_bootstrapped=*/true));
+      // Bootstrapped operators cannot deposit; their seeded balances must remain untouched.
+      const auto before = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, operators_table, account);
+      BOOST_REQUIRE(!before.empty());
+      produce_blocks();
+      BOOST_REQUIRE_EQUAL(error(missing_authority), push_opreg_action(account, slash_action,
+         mvo()(account_field, account)(reason_field, kTestSlashReason)));
+      for (size_t attempt = 0; attempt < 2; ++attempt) {
+         BOOST_REQUIRE_EQUAL(success(), slash(account, std::string{kTestSlashReason}));
+         produce_blocks();
+         BOOST_REQUIRE(before == get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, operators_table, account));
+      }
+   }
+} FC_LOG_AND_RETHROW() }
 
-   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, true));
-   produce_blocks();
+/// Even a previously removed bootstrapped operator soft-declines before the terminal-state check.
+BOOST_FIXTURE_TEST_CASE(slash_terminated_bootstrapped_is_noop, sysio_opreg_tester) { try {
+   constexpr auto operators_table = "operators"_n;
+   BOOST_REQUIRE_EQUAL(success(), setconfig());
+   BOOST_REQUIRE_EQUAL(success(), regoperator(kEligibilityBatchOperator, OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), terminate(kEligibilityBatchOperator, std::string{kTestTerminationReason}));
+   const auto before = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, operators_table, kEligibilityBatchOperator);
+   BOOST_REQUIRE_EQUAL(success(), slash(kEligibilityBatchOperator, std::string{kTestSlashReason}));
+   BOOST_REQUIRE(before == get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, operators_table, kEligibilityBatchOperator));
+} FC_LOG_AND_RETHROW() }
+
+/// Slashing an ordinary funded operator remains permanent.
+BOOST_FIXTURE_TEST_CASE(slash_permanent, sysio_opreg_tester) { try {
+   activate_batch_operator(kEligibilityBatchOperator);
 
    BOOST_REQUIRE_EQUAL(success(), slash("batchop.a"_n, "double sign"));
    produce_blocks();
@@ -1647,13 +1681,9 @@ BOOST_FIXTURE_TEST_CASE(cancelwtdw_rechecks_eligibility_after_erase, sysio_opreg
    BOOST_REQUIRE(get_wtdw(kFirstWithdrawalRequestId).is_null());
 } FC_LOG_AND_RETHROW() }
 
-/// A stale eligibility callback after punishment must not reactivate a
-/// bootstrapped operator, even though bootstrapped operators bypass collateral
-/// minimums.
-BOOST_FIXTURE_TEST_CASE(processbatch_preserves_slashed_bootstrapped_status, sysio_opreg_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), setconfig());
-   BOOST_REQUIRE_EQUAL(success(),
-      regoperator(kEligibilityBatchOperator, OPERATOR_TYPE_BATCH, /*is_bootstrapped=*/true));
+/// A stale eligibility callback after punishment must not reactivate an ordinary operator.
+BOOST_FIXTURE_TEST_CASE(processbatch_preserves_slashed_status, sysio_opreg_tester) { try {
+   activate_batch_operator(kEligibilityBatchOperator);
    BOOST_REQUIRE_EQUAL(success(), slash(kEligibilityBatchOperator, std::string{kTestSlashReason}));
 
    BOOST_REQUIRE_EQUAL(success(), processbatch(
@@ -2093,9 +2123,9 @@ BOOST_FIXTURE_TEST_CASE(claimremit_unknown_token_is_rejected, sysio_opreg_tester
                        claimremit("uwrit.alice"_n, kUnknownTokenCodename));
 } FC_LOG_AND_RETHROW() }
 
+/// Administrative termination still rejects an ordinary operator already punished by slash.
 BOOST_FIXTURE_TEST_CASE(terminate_rejects_already_slashed_operator, sysio_opreg_tester) { try {
-   BOOST_REQUIRE_EQUAL(success(), setconfig());
-   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.a"_n, OPERATOR_TYPE_BATCH, true));
+   activate_batch_operator(kEligibilityBatchOperator);
    BOOST_REQUIRE_EQUAL(success(), slash("batchop.a"_n, "double sign"));
 
    BOOST_REQUIRE_EQUAL(

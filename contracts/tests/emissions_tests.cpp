@@ -279,6 +279,56 @@ static int64_t test_standby_pay(int64_t standby_pool, uint32_t position) {
 
 class sysio_emissions_tester : public tester {
 public:
+   /// Depot-native collateral used by ordinary producer fixtures.
+   static constexpr std::string_view collateral_chain = "WIRE";
+   static constexpr std::string_view collateral_token = "WIRE";
+   static constexpr uint64_t base_min_bond = 1'000'000;
+
+   /// One `(chain, token, min_bond)` entry for opreg's `req_*_collat` vectors. The
+   /// `config_timestamp_ms` supplied here is ignored -- `setconfig` overwrites it with on-chain
+   /// time so consumers never trust the caller's clock.
+   static fc::variant min_bond_mvo(std::string_view chain, std::string_view token, uint64_t min_bond) {
+      return fc::variant(mvo()
+         ("chain_code",          chain)
+         ("token_code",          token)
+         ("min_bond",            min_bond)
+         ("config_timestamp_ms", uint64_t{0}));
+   }
+
+   /// Install an opreg configuration carrying `req_prod_collat`.
+   ///
+   /// @param req_prod_collat producer collateral requirement, built from `min_bond_mvo`.
+   /// @return the action result.
+   action_result set_producer_collateral(const fc::variants& req_prod_collat,
+                                         uint64_t prune_delay_ms = 600'000) {
+      return push_opreg_action(OPREG, "setconfig"_n, mvo()
+         ("max_available_producers",          uint32_t{21})
+         ("max_available_batch_ops",          uint32_t{63})
+         ("max_available_underwriters",       uint32_t{21})
+         ("terminate_prune_delay_ms",         prune_delay_ms)
+         ("terminate_max_consecutive_misses", uint32_t{5})
+         ("terminate_max_pct_misses_24h",     uint32_t{5})
+         ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
+         ("req_prod_collat",                  req_prod_collat)
+         ("req_batchop_collat",               fc::variants{})
+         ("req_uw_collat",                    fc::variants{}));
+   }
+
+   /// The single-pair requirement most tests use.
+   action_result set_single_pair_collateral(uint64_t min_bond = base_min_bond) {
+      return set_producer_collateral(fc::variants{
+         min_bond_mvo(collateral_chain, collateral_token, min_bond)});
+   }
+
+   /// Fund and deposit WIRE so an ordinary producer acquires ACTIVE collateral-backed standing.
+   action_result bond_wire_collateral(account_name account, uint64_t amount) {
+      BOOST_REQUIRE_EQUAL(success(), push_token_action(config::system_account_name, "transfer"_n,
+         mvo()("from", "sysio")("to", account)
+         ("quantity", asset(static_cast<int64_t>(amount), WIRE_SYMBOL))("memo", "bond funding")));
+      return push_opreg_action(account, "deposit"_n,
+         mvo()("account", account)("token_code", collateral_token)("amount", amount));
+   }
+
    sysio_emissions_tester() {
       deploy_system_contract();
 
@@ -867,7 +917,9 @@ public:
       set_node_finalizers(registered);
    }
 
-   void setup_producers( uint32_t count ) {
+   /// Register a cohort with finalizer keys, optionally using ordinary funded operators.
+   void setup_producers(uint32_t count, bool bootstrapped = true) {
+      if (!bootstrapped) BOOST_REQUIRE_EQUAL(success(), set_single_pair_collateral());
       std::vector<account_name> prod_names;
       for (uint32_t i = 0; i < count; ++i) {
          prod_names.push_back(producer_name_at(i));
@@ -881,8 +933,9 @@ public:
       for (auto& pname : prod_names) {
          BOOST_REQUIRE_EQUAL(
             success(),
-            register_operator(pname, OperatorType::OPERATOR_TYPE_PRODUCER, /*bootstrapped=*/true)
+            register_operator(pname, OperatorType::OPERATOR_TYPE_PRODUCER, bootstrapped)
          );
+         if (!bootstrapped) BOOST_REQUIRE_EQUAL(success(), bond_wire_collateral(pname, base_min_bond));
       }
       produce_blocks(1);
 
@@ -4587,7 +4640,7 @@ BOOST_FIXTURE_TEST_CASE( opreg_slashed_producer_excluded_from_pay, sysio_emissio
    // receiving emission pay; their share stays in the treasury rather than
    // being redistributed to surviving producers.
    create_t5_holding_accounts();
-   setup_producers(3);
+   setup_producers(3, /*bootstrapped=*/false);
    wait_for_producer_schedule();
    produce_complete_cycles(3, 2);
 
@@ -5209,21 +5262,22 @@ struct producer_eligibility_tester : public sysio_emissions_tester {
       return push_opreg_action(OPREG, "terminate"_n, mvo()("account", account)("reason", reason));
    }
 
-   /// Registers `count` producers, each an ACTIVE bootstrapped PRODUCER operator
-   /// with an active finalizer key.
+   /// Register `count` ACTIVE producers with finalizer keys, optionally funding ordinary operators.
    ///
    /// Rank is POSITION in the score-ordered "prodrank" index, not a stored ordinal, so nothing
-   /// assigns it here. Every producer registered by this fixture is bootstrapped and holds no
-   /// collateral, so they all land in the bootstrapped tier with an identical composite score --
+   /// assigns it here. All members have the same bootstrap flag and collateral, so they land
+   /// in the same tier with an identical composite score --
    /// and equal keys fall back to primary-key order, which is account-name order. `producer_name_at`
    /// yields ascending names, so positions 1..count follow the index order the caller expects.
    /// The producer/finalizer rows are populated but no schedule is published
    /// until the caller triggers update_ranked_producers via trigger_reschedule().
-   std::vector<account_name> setup_ranked_producers(uint32_t count) {
+   std::vector<account_name> setup_ranked_producers(uint32_t count, bool bootstrapped = true) {
+      if (!bootstrapped) BOOST_REQUIRE_EQUAL(success(), set_single_pair_collateral());
       auto names = producer_names(count);
       create_producer_accounts(names);
       for (auto& p : names) {
-         BOOST_REQUIRE_EQUAL(success(), register_operator(p, OperatorType::OPERATOR_TYPE_PRODUCER, true));
+         BOOST_REQUIRE_EQUAL(success(), register_operator(p, OperatorType::OPERATOR_TYPE_PRODUCER, bootstrapped));
+         if (!bootstrapped) BOOST_REQUIRE_EQUAL(success(), bond_wire_collateral(p, base_min_bond));
       }
       for (auto& p : names) {
          BOOST_REQUIRE_EQUAL(success(), push_system_action(p, "regproducer"_n, mvo()
@@ -5318,7 +5372,7 @@ BOOST_FIXTURE_TEST_CASE( unsignable_producer_key_does_not_stall_rebuild, produce
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( slashed_producer_removed, producer_eligibility_tester ) try {
-   auto names = setup_ranked_producers(5);
+   auto names = setup_ranked_producers(5, /*bootstrapped=*/false);
    trigger_reschedule();
    BOOST_REQUIRE( is_scheduled(names[4]) );
 
@@ -5343,11 +5397,11 @@ BOOST_FIXTURE_TEST_CASE( terminated_producer_removed, producer_eligibility_teste
    BOOST_REQUIRE(  is_scheduled(names[0]) );
 } FC_LOG_AND_RETHROW()
 
-// Parking a producer row makes the next regproducer a reactivation, so even a bootstrapped
-// operator must still have ACTIVE standing. Bootstrap bypasses collateral, never status.
+/// Parking a producer row makes the next regproducer a reactivation, which still requires ACTIVE
+/// standing. Ordinary operators remain inadmissible after either slash or termination.
 BOOST_FIXTURE_TEST_CASE( parked_producer_cannot_reactivate_after_slash_or_termination,
                          producer_eligibility_tester ) try {
-   auto names = setup_ranked_producers(2);
+   auto names = setup_ranked_producers(2, /*bootstrapped=*/false);
    for (const auto& producer : names) {
       BOOST_REQUIRE_EQUAL(success(), push_system_action(
          producer, "unregprod"_n, mvo()("producer", producer)));
@@ -5365,6 +5419,27 @@ BOOST_FIXTURE_TEST_CASE( parked_producer_cannot_reactivate_after_slash_or_termin
             ("location", 0)));
       BOOST_REQUIRE(!get_producer_info(producer)["is_active"].as<bool>());
    }
+} FC_LOG_AND_RETHROW()
+
+/// A parked bootstrapped producer still needs ACTIVE standing to reactivate after termination.
+BOOST_FIXTURE_TEST_CASE( parked_bootstrapped_producer_cannot_reactivate_after_termination,
+                         producer_eligibility_tester ) try {
+   constexpr auto unregister_action = "unregprod"_n;
+   constexpr auto register_action = "regproducer"_n;
+   constexpr auto producer_field = "producer";
+   constexpr auto key_field = "producer_key";
+   constexpr auto url_field = "url";
+   constexpr auto location_field = "location";
+   constexpr auto active_field = "is_active";
+   constexpr auto active_permission = "active";
+   constexpr auto ineligible_error = "producer operator is not eligible for admission";
+   const auto producer = setup_ranked_producers(1).front();
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(producer, unregister_action, mvo()(producer_field, producer)));
+   BOOST_REQUIRE_EQUAL(success(), terminate_operator(producer));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(ineligible_error), push_system_action(producer, register_action, mvo()
+      (producer_field, producer)(key_field, get_public_key(producer, active_permission))
+      (url_field, std::string{})(location_field, 0)));
+   BOOST_REQUIRE(!get_producer_info(producer)[active_field].as<bool>());
 } FC_LOG_AND_RETHROW()
 
 // An account without an ACTIVE producer operator cannot create the persistent producer row. Once
@@ -5440,7 +5515,7 @@ BOOST_FIXTURE_TEST_CASE( standby_backfills_ineligible_active, producer_eligibili
    produce_blocks(1);
 
    // 21 active-rank (1..21) + one standby at rank 22.
-   auto names = setup_ranked_producers(22);
+   auto names = setup_ranked_producers(22, /*bootstrapped=*/false);
    trigger_reschedule();
 
    BOOST_REQUIRE(  is_scheduled(names[0])  );   // rank 1 active
@@ -5458,7 +5533,7 @@ BOOST_FIXTURE_TEST_CASE( standby_backfills_ineligible_active, producer_eligibili
 // ineligible leaves fewer than the floor eligible, so the last good schedule is
 // retained rather than published smaller -- the ineligible producer stays.
 BOOST_FIXTURE_TEST_CASE( schedule_not_shrunk_below_floor, producer_eligibility_tester ) try {
-   auto names = setup_ranked_producers(4);      // min_schedule_size == 4
+   auto names = setup_ranked_producers(4, /*bootstrapped=*/false);      // min_schedule_size == 4
    trigger_reschedule();
    for (const auto& p : names) BOOST_REQUIRE( is_scheduled(p) );
 
@@ -5508,56 +5583,12 @@ struct producer_score_tester : public producer_eligibility_tester {
    /// Slots one producer holds before the round-robin rotates (config::producer_repetitions).
    static constexpr uint32_t slots_per_producer = 12;
 
-   /// Chain/token pair the collateral helpers use. Any pair works -- opreg stores slug names
-   /// opaquely -- so these name a plausible outpost rather than carrying meaning.
-   static constexpr std::string_view collateral_chain = "WIRE";
-   static constexpr std::string_view collateral_token = "WIRE";
-
    /// A second pair, for the "minimum across pairs" case.
    static constexpr std::string_view second_chain = "WIRE";
    static constexpr std::string_view second_token = "NTA";
 
-   /// The minimum bond every collateral test measures its ratios against.
-   static constexpr uint64_t base_min_bond = 1'000'000;
-
    /// The tier packed into a `rank_score`, mirroring `producer_rank::tier_of`.
    static uint64_t tier_of(uint64_t rank_score) { return rank_score >> composite_bits; }
-
-   /// One `(chain, token, min_bond)` entry for opreg's `req_*_collat` vectors. The
-   /// `config_timestamp_ms` supplied here is ignored -- `setconfig` overwrites it with on-chain
-   /// time so consumers never trust the caller's clock.
-   static fc::variant min_bond_mvo(std::string_view chain, std::string_view token, uint64_t min_bond) {
-      return fc::variant(mvo()
-         ("chain_code",          chain)
-         ("token_code",          token)
-         ("min_bond",            min_bond)
-         ("config_timestamp_ms", uint64_t{0}));
-   }
-
-   /// Install an opreg configuration carrying `req_prod_collat`.
-   ///
-   /// @param req_prod_collat producer collateral requirement, built from `min_bond_mvo`.
-   /// @return the action result.
-   action_result set_producer_collateral(const fc::variants& req_prod_collat,
-                                         uint64_t prune_delay_ms = 600'000) {
-      return push_opreg_action(OPREG, "setconfig"_n, mvo()
-         ("max_available_producers",          uint32_t{21})
-         ("max_available_batch_ops",          uint32_t{63})
-         ("max_available_underwriters",       uint32_t{21})
-         ("terminate_prune_delay_ms",         prune_delay_ms)
-         ("terminate_max_consecutive_misses", uint32_t{5})
-         ("terminate_max_pct_misses_24h",     uint32_t{5})
-         ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
-         ("req_prod_collat",                  req_prod_collat)
-         ("req_batchop_collat",               fc::variants{})
-         ("req_uw_collat",                    fc::variants{}));
-   }
-
-   /// The single-pair requirement most tests use.
-   action_result set_single_pair_collateral(uint64_t min_bond = base_min_bond) {
-      return set_producer_collateral(fc::variants{
-         min_bond_mvo(collateral_chain, collateral_token, min_bond)});
-   }
 
    action_result prune_operators() {
       return push_opreg_action(OPREG, "prune"_n, mvo());
@@ -5618,9 +5649,7 @@ struct producer_score_tester : public producer_eligibility_tester {
                                    std::string_view token = collateral_token) {
       BOOST_REQUIRE_EQUAL(chain, "WIRE");
       if (token == "WIRE") {
-         BOOST_REQUIRE_EQUAL(success(), push_token_action(config::system_account_name, "transfer"_n,
-            mvo()("from", "sysio")("to", account)
-            ("quantity", asset(static_cast<int64_t>(amount), WIRE_SYMBOL))("memo", "bond funding")));
+         return bond_wire_collateral(account, amount);
       } else {
          BOOST_REQUIRE_EQUAL(token, "NTA");
          setup_score_shadow();
