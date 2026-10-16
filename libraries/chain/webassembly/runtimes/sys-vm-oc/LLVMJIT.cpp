@@ -27,6 +27,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/LegacyPassManager.h"
+#include "llvm/InitializePasses.h"
+#include "llvm/PassRegistry.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Intrinsics.h"
 #include "llvm/IR/Verifier.h"
@@ -264,6 +266,8 @@ namespace LLVMJIT
 		static bool inited;
 		if(!inited) {
 			inited = true;
+			/// LLVM 23 no longer registers this legacy pass from its constructor.
+			llvm::initializeInstCombine(*llvm::PassRegistry::getPassRegistry());
 			llvm::InitializeNativeTarget();
 			llvm::InitializeNativeTargetAsmPrinter();
 			llvm::InitializeNativeTargetAsmParser();
@@ -289,12 +293,14 @@ namespace LLVMJIT
 		jitModule->compile(llvmModule);
 
 		unsigned num_functions_stack_size_found = 0;
+		/// OC's x86_64 stack-size records start with a little-endian 64-bit address.
+		constexpr auto stack_record_address_size = sizeof(uint64_t);
 		for(const auto& stacksizes : jitModule->unitmemorymanager->stack_sizes) {
-			llvm::DataExtractor ds(llvm::StringRef(reinterpret_cast<const char*>(stacksizes.data()), stacksizes.size()), true, 8);
+			llvm::DataExtractor ds(llvm::StringRef(reinterpret_cast<const char*>(stacksizes.data()), stacksizes.size()), true);
 			uint64_t offset = 0;
 
-			while(ds.isValidOffsetForAddress(offset)) {
-				ds.getAddress(&offset);
+			while(ds.isValidOffsetForDataOfSize(offset, stack_record_address_size)) {
+				ds.getUnsigned(&offset, stack_record_address_size);
 				const uint64_t offset_before_read = offset;
 				const uint64_t stack_size = ds.getULEB128(&offset);
 				WAVM_ASSERT_THROW(offset_before_read != offset);
