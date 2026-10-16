@@ -57,6 +57,8 @@ constexpr uint64_t ETH_OUTPOST_ID = "ETH"_s.value;
 constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
 constexpr std::string_view ETH_CHAIN_CODE = "ETH";
 constexpr std::string_view SOL_CHAIN_CODE = "SOL";
+/// Native collateral used by the operator fixtures.
+constexpr std::string_view WIRE_CHAIN_CODE = "WIRE";
 constexpr uint64_t BATCH_OPERATOR_MINIMUM_COLLATERAL = 1;
 constexpr uint64_t TABLE_SCAN_LIMIT = 64;
 constexpr uint32_t ONE_OPERATOR_PER_TIED_VERSION = 1;
@@ -378,11 +380,11 @@ public:
             ("req_prod_collat",                  fc::variants{})
             // Empty collateral requirements intentionally keep non-bootstrapped
             // operators UNKNOWN. Give the WNS-16 fixture's non-bootstrapped
-            // operator the one-unit ETH and SOL requirements it satisfies below.
+            // operator the one-unit native WIRE requirement it satisfies below.
             ("req_batchop_collat",               batchop_is_bootstrapped
                                                    ? fc::variants{}
                                                    : fc::variants{
-                                                        make_chain_min_bond("WIRE", "WIRE", BATCH_OPERATOR_MINIMUM_COLLATERAL) })
+                                                        make_chain_min_bond(WIRE_CHAIN_CODE, WIRE_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL) })
             ("req_uw_collat",                    fc::variants{})));
 
       const std::vector<name> available_batch_ops{
@@ -769,6 +771,38 @@ public:
       return groups_attestation;
    }
 
+   /// Verify the actual same-epoch OPERATORS snapshot after inline mutations.
+   /// Existing schedule seats may persist until normal rotation removes them;
+   /// the authoritative status must nevertheless revoke them immediately.
+   void require_fresh_roster(uint64_t chain_code, name account,
+                             opp::types::OperatorStatus expected_status) {
+      const auto row = find_outbound_envelope(chain_code);
+      BOOST_REQUIRE(!row.is_null());
+      const auto env = decode_envelope(row["raw_envelope"].as<std::vector<char>>());
+      BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
+      bool found_operator = false;
+      bool have_operators = false;
+      for (const auto& att : env.messages(0).payload().attestations()) {
+         if (att.type() == opp::types::ATTESTATION_TYPE_OPERATORS) {
+            opp::attestations::Operators roster;
+            BOOST_REQUIRE(roster.ParseFromString(att.data()));
+            have_operators = true;
+            for (const auto& entry : roster.operators()) {
+               const auto registered = get_operator(name{entry.account().name()});
+               BOOST_REQUIRE(!registered.is_null());
+               BOOST_REQUIRE_EQUAL(entry.status(), registered["status"].as<opp::types::OperatorStatus>());
+               if (entry.account().name() == account.to_string()) {
+                  BOOST_REQUIRE_EQUAL(entry.status(), expected_status);
+                  found_operator = true;
+               }
+            }
+         } else if (att.type() == opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS) {
+            BOOST_REQUIRE(have_operators);
+         }
+      }
+      BOOST_REQUIRE(found_operator);
+   }
+
    /// How many BATCH_OPERATOR_GROUPS attestations the most recent `advance` shipped to
    /// `chain_code` -- 0 when the depot WITHHELD it. Distinct from
    /// `shipped_batch_operator_groups`, which fails the test on absence: the withhold path
@@ -907,8 +941,7 @@ public:
             (opreg_config_fields::TERMINATE_WINDOW_MS,              TERMINATE_WINDOW_MS)
             (opreg_config_fields::REQUIRED_PRODUCER_COLLATERAL,     fc::variants{})
             (opreg_config_fields::REQUIRED_BATCH_OPERATOR_COLLATERAL, fc::variants{
-               make_chain_min_bond(ETH_CHAIN_CODE, ETH_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL),
-               make_chain_min_bond(SOL_CHAIN_CODE, SOL_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL) })
+               make_chain_min_bond(WIRE_CHAIN_CODE, WIRE_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL) })
             (opreg_config_fields::REQUIRED_UNDERWRITER_COLLATERAL,  fc::variants{})));
    }
 
@@ -920,21 +953,21 @@ public:
       produce_blocks();
    }
 
-   /// Inline collateral credit (the path sysio.msgch drives in production; pushed directly here) that
-   /// lifts a non-bootstrapped operator to ACTIVE once its bond meets the configured minimum.
+   /// Fund the operator's native WIRE balance and deposit its bond through sysio.opreg.
+   /// A non-bootstrapped operator becomes ACTIVE once it meets the configured minimum.
    action_result fund_and_bond(name account, uint64_t amount) {
       BOOST_REQUIRE_EQUAL(success(), push(TOKEN_ACCOUNT, token_abi, SYSIO_ACCOUNT, "transfer"_n,
          mvo()("from", SYSIO_ACCOUNT)("to", account)
          ("quantity", asset(static_cast<int64_t>(amount), symbol(9, "WIRE")))("memo", "bond funding")));
       return push(OPREG_ACCOUNT, opreg_abi, account, "deposit"_n,
-         mvo()("account", account)("token_code", "WIRE")("amount", amount));
+         mvo()("account", account)("token_code", WIRE_CHAIN_CODE)("amount", amount));
    }
 
    /// bootstrap() variant for a real rotation: THREE single-operator groups (so a resident op is on
    /// duty once per 3-epoch rotation), the SEC-28 percent rail disabled up to its accepted ceiling
    /// (99, so an anchored run terminates on the CONSECUTIVE rail), and `terminate_window_ms` set by
    /// the caller (the exact span bound for this schedule). ETH outpost registered; genesis advance run.
-   void bootstrap_rotation(uint64_t terminate_window_ms) {
+   void bootstrap_rotation(uint64_t terminate_window_ms, bool batchop_is_bootstrapped = false) {
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
          ("epoch_duration_sec",                 EPOCH_DURATION_SEC)
          ("operators_per_epoch",                1)
@@ -955,19 +988,22 @@ public:
          ("terminate_max_pct_misses_24h",     99)
          ("terminate_window_ms",              terminate_window_ms)
          ("req_prod_collat",                  fc::variants{})
-         ("req_batchop_collat",               fc::variants{ make_chain_min_bond("WIRE", "WIRE", 1) })
+         ("req_batchop_collat",               fc::variants{
+            make_chain_min_bond(WIRE_CHAIN_CODE, WIRE_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL) })
          ("req_uw_collat",                    fc::variants{})));
 
       register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, "ETH", 31337);
 
-      // BATCHOP is the termination target: NON-bootstrapped (bootstrapped operators are exempt from
-      // rolling-window termination -- see opreg::termcheck) and collateralized so it activates.
+      // BATCHOP is normally the non-bootstrapped termination target, bonded so it activates.
+      // Healthy-rotation tests opt into bootstrap exemption and require no collateral deposit.
       // BATCHOP_B / BATCHOP_C are bootstrapped fillers for the other two groups. schbatchgps sorts
       // non-bootstrapped first, so BATCHOP lands in group 0 (on duty at epochs 1, 4, 7, ...).
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
          ("account", BATCHOP.to_string())("type", opp::types::OperatorType::OPERATOR_TYPE_BATCH)
-         ("is_bootstrapped", false)));
-      BOOST_REQUIRE_EQUAL(success(), fund_and_bond(BATCHOP, 1));
+         ("is_bootstrapped", batchop_is_bootstrapped)));
+      if (!batchop_is_bootstrapped) {
+         BOOST_REQUIRE_EQUAL(success(), fund_and_bond(BATCHOP, BATCH_OPERATOR_MINIMUM_COLLATERAL));
+      }
       for (const auto& op : {BATCHOP_B, BATCHOP_C}) {
          BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
             ("account", op.to_string())("type", opp::types::OperatorType::OPERATOR_TYPE_BATCH)
@@ -976,7 +1012,8 @@ public:
       BOOST_REQUIRE(!get_operator(BATCHOP).is_null());
       BOOST_REQUIRE(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE ==
                     get_operator(BATCHOP)["status"].as<opp::types::OperatorStatus>());
-      BOOST_REQUIRE_EQUAL(0, get_operator(BATCHOP)["is_bootstrapped"].as_uint64());
+      BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(batchop_is_bootstrapped),
+                          get_operator(BATCHOP)["is_bootstrapped"].as_uint64());
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n, mvo()));
@@ -1737,6 +1774,8 @@ BOOST_FIXTURE_TEST_CASE(noncanonical_delivery_slashes_before_termination, sysio_
                        slash_action_count(BATCHOP, SOL_OUTPOST_ID));
    BOOST_REQUIRE_EQUAL(epoch + kEpochAdvanceCount, current_epoch());
    BOOST_REQUIRE_EQUAL(kExpectedDeliveredLogCount, delivered_dellog_count(BATCHOP));
+   for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID})
+      require_fresh_roster(chain, BATCHOP, opp::types::OPERATOR_STATUS_SLASHED);
 } FC_LOG_AND_RETHROW() }
 
 // SEC-28 (huang review): terminate on the CONSECUTIVE-miss rail through the REAL rotation -- a
@@ -1794,6 +1833,7 @@ BOOST_FIXTURE_TEST_CASE(terminate_at_duty_rotation_via_advance, sysio_msgch_chai
          // whereas termination + reason hold either way. BATCHOP delivered exactly once, so exactly
          // one delivered row must remain.
          BOOST_REQUIRE_EQUAL(1u, delivered_dellog_count(BATCHOP));
+         require_fresh_roster(ETH_OUTPOST_ID, BATCHOP, opp::types::OPERATOR_STATUS_TERMINATED);
       } else {
          // Still ACTIVE: BATCHOP must not terminate before its sixth miss (its 7th duty).
          BOOST_REQUIRE(status == opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE);
@@ -2089,10 +2129,9 @@ BOOST_FIXTURE_TEST_CASE(slash_after_delivery_does_not_count_toward_consensus, sy
 /// rotation so every group is promised (and verified) at least once.
 BOOST_FIXTURE_TEST_CASE(advance_ships_lookahead_batch_operator_group, sysio_msgch_chain_tester) { try {
    constexpr uint32_t kGroups = 3;
-   // Termination rails are irrelevant here — a comfortably wide window keeps recorddel/termcheck
-   // quiet while the rotation is walked (same span shape the SEC-28 fixture derives).
+   // Use bootstrap-exempt operators so this test only exercises healthy rotation.
    constexpr uint64_t kRotationWindowMs = 12ULL * kGroups * EPOCH_DURATION_SEC * 1000ULL;
-   bootstrap_rotation(kRotationWindowMs);
+   bootstrap_rotation(kRotationWindowMs, /*batchop_is_bootstrapped=*/true);
 
    for (uint32_t round = 0; round < kGroups + 1; ++round) {
       const auto shipped = shipped_batch_operator_groups(ETH_OUTPOST_ID);
@@ -2150,7 +2189,7 @@ BOOST_FIXTURE_TEST_CASE(advance_ships_group_index_zero_for_single_group, sysio_m
 ///
 /// Asserted here: the BATCH_OPERATOR_GROUPS attestation is absent, AND the envelope still exists
 /// carrying other attestations. The second half is the regression guard that matters — withholding
-/// is implemented by skipping ONE queueout, and an early `return` from `advance` would also produce
+/// is implemented by skipping ONE queueout, and an early `return` from `finishadv` would also produce
 /// a missing roster while silently dropping the rest of the epoch's emissions.
 BOOST_FIXTURE_TEST_CASE(advance_withholds_batch_operator_groups_when_next_group_is_empty,
                         sysio_msgch_chain_tester) { try {
@@ -2185,6 +2224,43 @@ BOOST_FIXTURE_TEST_CASE(advance_withholds_batch_operator_groups_when_next_group_
    }
    BOOST_REQUIRE_MESSAGE(observed_withhold,
       "starved window never withheld BATCH_OPERATOR_GROUPS -- an empty active group was published");
+} FC_LOG_AND_RETHROW() }
+
+/// Same-epoch termination must be visible in both outposts' authoritative
+/// rosters and in normal tail selection. This does not repair existing seats.
+BOOST_FIXTURE_TEST_CASE(advance_roster_excludes_same_epoch_termination,
+                        sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3, /*batchop_is_bootstrapped=*/false);
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT,
+      "regoperator"_n, mvo()("account", BATCHOP_D.to_string())
+         ("type", opp::types::OPERATOR_TYPE_BATCH)("is_bootstrapped", true)));
+   produce_blocks();
+   advance_to_next_epoch();
+   for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      require_fresh_roster(chain, BATCHOP, opp::types::OPERATOR_STATUS_TERMINATED);
+      require_fresh_roster(chain, BATCHOP_B, opp::types::OPERATOR_STATUS_ACTIVE);
+      const auto groups = shipped_batch_operator_groups(chain);
+      BOOST_REQUIRE_EQUAL(groups.groups_size(), 1);
+      BOOST_REQUIRE_EQUAL(groups.groups(0).operators_size(), 3);
+      bool found_standby = false;
+      for (const auto& member : groups.groups(0).operators()) {
+         BOOST_REQUIRE_NE(member.address(), BATCHOP.to_string());
+         BOOST_REQUIRE_EQUAL(get_operator(name{member.address()})["status"].as<opp::types::OperatorStatus>(),
+                             opp::types::OPERATOR_STATUS_ACTIVE);
+         if (member.address() == BATCHOP_D.to_string()) found_standby = true;
+      }
+      BOOST_REQUIRE(found_standby);
+   }
+} FC_LOG_AND_RETHROW() }
+
+/// Even sysio.epoch authority cannot invoke the continuation as a top-level action.
+BOOST_FIXTURE_TEST_CASE(finishadv_rejects_direct_calls, sysio_msgch_chain_tester) { try {
+   bootstrap();
+   const auto args = mvo()("epoch_index", current_epoch())("emission_amount", int64_t{0});
+   BOOST_REQUIRE_EQUAL(error("missing authority of sysio.epoch"),
+      push(EPOCH_ACCOUNT, epoch_abi, BATCHOP, "finishadv"_n, args));
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: finishadv must be sent inline by sysio.epoch"),
+      push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "finishadv"_n, args));
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
