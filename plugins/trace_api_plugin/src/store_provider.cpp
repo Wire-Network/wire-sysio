@@ -719,11 +719,8 @@ namespace sysio::trace_api {
             writer.add(id, block_num);
       }
 
-      // Write to a temp path and atomically rename so concurrent readers never
-      // see a partially written index file.
-      const auto tmp_path = idx_path.parent_path() / (idx_path.filename().string() + ".tmp");
-      writer.write(tmp_path);
-      std::filesystem::rename(tmp_path, idx_path);
+      // The writer publishes a fresh complete index atomically, ignoring stale temporary files.
+      writer.write(idx_path);
       log(std::string("Built trx_id index for slice: ") + std::to_string(slice_number) +
           " (" + std::to_string(writer.entry_count()) + " entries)");
    }
