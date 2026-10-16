@@ -1408,6 +1408,14 @@ public:
                                        /*is_private*/ true, owner);
    }
 
+   /// `regreserve_active` for a PUBLIC reserve owned by `owner`. The privacy rule pairs a private
+   /// reserve by owner, not by flag, so a public counterpart under the same owner is admitted.
+   action_result regreserve_public_owned(std::string_view c, std::string_view t, std::string_view r,
+                                         name owner) {
+      return regreserve_active_amounts(c, t, r, kSeedReserveAmount, kSeedReserveAmount,
+                                       /*is_private*/ false, owner);
+   }
+
    /// `regreserve_active` with explicit pool depths, for a test that needs a deliberately
    /// IMBALANCED reserve. At the 50% connector weight the curve is pure constant product
    /// (`out = wire * amount / (chain + amount)`), so a deep token side over a shallow WIRE side
@@ -5343,10 +5351,11 @@ BOOST_FIXTURE_TEST_CASE(swap_missing_reserve_complete_candidate_recovers_after_p
    BOOST_REQUIRE(!get_lock(2).is_null());
 } FC_LOG_AND_RETHROW() }
 
-// createuwreq's reserve-privacy gate, against rows that exist at ingestion: a private reserve is
-// refused as the source of a to-WIRE swap and against a counterpart that is public or has another
-// owner, while a pair under one owner is admitted. A refusal reverts the deposit and creates no
-// uwreq.
+// createuwreq's reserve-privacy gate, against rows that exist at ingestion. The rule pairs by owner,
+// not by the counterpart's privacy flag: a private reserve is refused as the source of a to-WIRE
+// swap and against a counterpart that is public and unowned or owned by another WIRE account, while
+// a counterpart under the same non-empty owner is admitted whether it is private or public. A
+// refusal reverts the deposit and creates no uwreq.
 BOOST_FIXTURE_TEST_CASE(swap_request_private_reserve_gate_at_ingestion,
                         sysio_dispatch_tester) { try {
    bootstrap_for_dispatch();
@@ -5355,6 +5364,8 @@ BOOST_FIXTURE_TEST_CASE(swap_request_private_reserve_gate_at_ingestion,
    BOOST_REQUIRE_EQUAL(success(), regreserve_private("ETH", "ETH", "PRIVA", LP_OWNER_A));
    BOOST_REQUIRE_EQUAL(success(), regreserve_private("ETH", "ETH", "PRIVB", LP_OWNER_B));
    BOOST_REQUIRE_EQUAL(success(), regreserve_private("ETH", "ETH", "PRIVC", LP_OWNER_A));
+   BOOST_REQUIRE_EQUAL(success(), regreserve_public_owned("ETH", "ETH", "PUBA", LP_OWNER_A));
+   BOOST_REQUIRE_EQUAL(success(), regreserve_public_owned("ETH", "ETH", "PUBB", LP_OWNER_B));
 
    const uint64_t eth     = fc::slug_name{"ETH"}.value;
    const uint64_t wire    = fc::slug_name{"WIRE"}.value;
@@ -5362,6 +5373,8 @@ BOOST_FIXTURE_TEST_CASE(swap_request_private_reserve_gate_at_ingestion,
    const uint64_t priv_a  = fc::slug_name{"PRIVA"}.value;
    const uint64_t priv_b  = fc::slug_name{"PRIVB"}.value;
    const uint64_t priv_c  = fc::slug_name{"PRIVC"}.value;
+   const uint64_t pub_a   = fc::slug_name{"PUBA"}.value;
+   const uint64_t pub_b   = fc::slug_name{"PUBB"}.value;
    constexpr int64_t SRC_AMOUNT = 1'000'000;
    const std::string wire_recipient = UWRIT_OP.to_string();
 
@@ -5382,19 +5395,24 @@ BOOST_FIXTURE_TEST_CASE(swap_request_private_reserve_gate_at_ingestion,
 
    submit(/*att_id*/ 9901, wire, primary);   // to-WIRE out of a private reserve
    submit(/*att_id*/ 9902, eth,  priv_b);    // private pair, different owners
-   submit(/*att_id*/ 9903, eth,  primary);   // private reserve, public counterpart
+   submit(/*att_id*/ 9903, eth,  primary);   // public and unowned counterpart
    submit(/*att_id*/ 9904, eth,  priv_c);    // private pair, one owner
+   submit(/*att_id*/ 9905, eth,  pub_a);     // public counterpart, same owner
+   submit(/*att_id*/ 9906, eth,  pub_b);     // public counterpart, another owner
 
    BOOST_CHECK(get_uwreq(9901).is_null());
    BOOST_CHECK(get_uwreq(9902).is_null());
    BOOST_CHECK(get_uwreq(9903).is_null());
    BOOST_CHECK(!get_uwreq(9904).is_null());
+   BOOST_CHECK(!get_uwreq(9905).is_null());
+   BOOST_CHECK(get_uwreq(9906).is_null());
 
    const auto reverts = queued_swap_reverts();
-   BOOST_REQUIRE_EQUAL(3u, reverts.size());
+   BOOST_REQUIRE_EQUAL(4u, reverts.size());
    BOOST_CHECK_EQUAL(kPrivateWireEndpointReason, reverts[0].reason());
    BOOST_CHECK_EQUAL(kPrivateOwnerMismatchReason, reverts[1].reason());
    BOOST_CHECK_EQUAL(kPrivateOwnerMismatchReason, reverts[2].reason());
+   BOOST_CHECK_EQUAL(kPrivateOwnerMismatchReason, reverts[3].reason());
 } FC_LOG_AND_RETHROW() }
 
 // The ingestion gate can only judge rows that exist. A to-WIRE request naming a source reserve
@@ -5551,6 +5569,55 @@ BOOST_FIXTURE_TEST_CASE(swap_pair_provisioned_private_for_one_owner_settles,
    BOOST_CHECK(!get_lock(1).is_null());
    BOOST_CHECK(!get_lock(2).is_null());
    BOOST_CHECK_EQUAL(dst_before.first - quote, reserve_balances("ETH", "ETH", "PRIVB").first);
+} FC_LOG_AND_RETHROW() }
+
+// The privacy rule pairs by owner, not by flag: a private source settles against a PUBLIC
+// destination that the same WIRE account owns, at race resolution as at ingestion.
+BOOST_FIXTURE_TEST_CASE(swap_private_source_settles_against_public_counterpart_of_same_owner,
+                        sysio_dispatch_tester) { try {
+   bootstrap_for_dispatch();
+   setup_wire_token_and_reserves();
+
+   const uint64_t eth    = fc::slug_name{"ETH"}.value;
+   const uint64_t priv_a = fc::slug_name{"PRIVA"}.value;
+   const uint64_t pub_a  = fc::slug_name{"PUBA"}.value;
+   constexpr uint64_t ATT_ID     = 9914;
+   constexpr int64_t  SRC_AMOUNT = 1'000'000;
+
+   BOOST_REQUIRE_EQUAL(success(),
+      depositinle_credit(UWRIT_OP, "ETH", "ETH", uint64_t{1'000'000'000}));
+   const auto sr = encode_swap_request(
+      ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0a'),
+      eth, eth, priv_a, SRC_AMOUNT,
+      eth, eth, pub_a, /*target*/ SRC_AMOUNT,
+      /*tolerance_bps*/ 1'000'000, ChainKind::CHAIN_KIND_EVM, std::vector<char>(20, '\x0b'));
+   BOOST_REQUIRE_EQUAL(success(), createuwreq_direct(ATT_ID, eth, sr));
+
+   BOOST_REQUIRE_EQUAL(success(), regreserve_private("ETH", "ETH", "PRIVA", LP_OWNER_A));
+   BOOST_REQUIRE_EQUAL(success(), regreserve_public_owned("ETH", "ETH", "PUBA", LP_OWNER_A));
+   const uint64_t quote = expected_quote("ETH", "ETH", "PRIVA", SRC_AMOUNT,
+                                         "ETH", "ETH", "PUBA", kDefaultUwritFeeBps);
+   BOOST_REQUIRE(quote > 0);
+   const auto dst_before = reserve_balances("ETH", "ETH", "PUBA");
+
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PRIVA",
+      create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, priv_a)));
+   BOOST_REQUIRE_EQUAL(success(), rcrdcommit_direct(
+      ATT_ID, UWRIT_OP, eth, "ETH", "ETH", "PUBA",
+      create_signed_uic(UWRIT_OP, ATT_ID, eth, eth, pub_a)));
+
+   const auto req = get_uwreq(ATT_ID);
+   BOOST_REQUIRE_EQUAL("UNDERWRITE_REQUEST_STATUS_CONFIRMED", req["status"].as_string());
+   BOOST_REQUIRE_EQUAL(UWRIT_OP.to_string(), req["winner"].as_string());
+   BOOST_REQUIRE_EQUAL(quote, req["dst_amount"].as_uint64());
+   BOOST_CHECK(queued_swap_reverts().empty());
+   const auto remits = queued_swap_remits();
+   BOOST_REQUIRE_EQUAL(1u, remits.size());
+   BOOST_CHECK_EQUAL(static_cast<int64_t>(quote), remits.front().amount().amount());
+   BOOST_CHECK(!get_lock(1).is_null());
+   BOOST_CHECK(!get_lock(2).is_null());
+   BOOST_CHECK_EQUAL(dst_before.first - quote, reserve_balances("ETH", "ETH", "PUBA").first);
 } FC_LOG_AND_RETHROW() }
 
 // Swap-from-WIRE settles through the same remit path as an outpost-to-outpost swap, with the
