@@ -32,7 +32,9 @@ void load_account_abi(Tester& tester, name account, abi_serializer& out_ser) {
    BOOST_REQUIRE(metadata != nullptr);
    abi_def parsed;
    BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(metadata->abi, parsed), true);
-   out_ser.set_abi(std::move(parsed), abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
+   // Fixture ABI validation checks structure and recursion; dedicated serializer
+   // tests own wall-clock deadlines, independently of contract behavior.
+   out_ser.set_abi(std::move(parsed), abi_serializer::create_depth_yield_function());
 }
 
 /// The authorization an action needs when an unprivileged contract bills RAM to `signer`
@@ -54,7 +56,7 @@ signed_transaction create_contract_action_transaction(Tester& tester, name contr
    act.name = action_name;
    act.data = serializer.variant_to_binary(
       serializer.get_action_type(action_name), data,
-      abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
+      abi_serializer::create_depth_yield_function());
    act.authorization = authorization.empty() ? std::vector<permission_level>{{signer, config::active_name}}
                                              : std::move(authorization);
 

@@ -120,6 +120,76 @@ public:
 
 BOOST_AUTO_TEST_SUITE(sysio_dclaim_tests)
 
+/// A failed inline payout restores the entitlement; funding later permits exactly one full claim.
+BOOST_FIXTURE_TEST_CASE(underfunded_claim_preserves_credit_until_full_payment, sysio_dclaim_tester) { try {
+   constexpr int64_t funding = 1'000'000'000;
+   constexpr int64_t entitlement = funding + 1;
+   fund_claims();
+   BOOST_REQUIRE_EQUAL(success(), seed_credit("alice", addr20, entitlement));
+   const auto before = get_currency_balance(TOKEN_ACCOUNT, WIRE_SYMBOL, "alice"_n);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("overdrawn balance"),
+      push_dclaim("alice"_n, "claim"_n, mvo()("wire_account", "alice")));
+   BOOST_REQUIRE_EQUAL(entitlement, pending_of("alice"_n)["balance"].as<asset>().get_amount());
+   BOOST_REQUIRE_EQUAL(before.get_amount(),
+      get_currency_balance(TOKEN_ACCOUNT, WIRE_SYMBOL, "alice"_n).get_amount());
+   BOOST_REQUIRE_EQUAL(funding,
+      get_currency_balance(TOKEN_ACCOUNT, WIRE_SYMBOL, DCLAIM_ACCOUNT).get_amount());
+
+   base_tester::push_action(TOKEN_ACCOUNT, "issue"_n, config::system_account_name,
+      mvo()("to", "sysio")("quantity", "0.000000001 WIRE")("memo", "complete funding"));
+   base_tester::push_action(TOKEN_ACCOUNT, "transfer"_n, config::system_account_name,
+      mvo()("from", "sysio")("to", DCLAIM_ACCOUNT)
+           ("quantity", "0.000000001 WIRE")("memo", "complete funding"));
+   check_claim("alice"_n, entitlement);
+} FC_LOG_AND_RETHROW() }
+
+/// A malformed later import entry must not leave an earlier credit or consume its row identifier.
+BOOST_FIXTURE_TEST_CASE(invalid_import_batch_rolls_back_all_prior_credits, sysio_dclaim_tester) { try {
+   constexpr int64_t credit = 5000;
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("negative wire_atomic"),
+      push_dclaim(DCLAIM_ACCOUNT, "importseed"_n, mvo()
+         ("chain", ChainKind::CHAIN_KIND_EVM)
+         ("credits", fc::variants{
+            mvo()("native_address", addr20)("wire_atomic", credit),
+            mvo()("native_address", addr20)("wire_atomic", -1)})));
+   BOOST_REQUIRE(unmapped_row(1).is_null());
+   BOOST_REQUIRE_EQUAL(success(), seed_credit("", addr20, credit));
+   BOOST_REQUIRE_EQUAL(credit, unmapped_row(1)["balance"].as<asset>().get_amount());
+   BOOST_REQUIRE(unmapped_row(2).is_null());
+} FC_LOG_AND_RETHROW() }
+
+/// The byte-oriented ledger resolves prefix collisions and isolates identical payloads by chain kind.
+/// This drives linkswept as AuthEx; authenticated, chain-valid wallet linking is covered separately.
+BOOST_FIXTURE_TEST_CASE(import_sweep_matches_full_identity_and_chain, sysio_dclaim_tester) { try {
+   constexpr int64_t first_credit = 1000;
+   constexpr int64_t second_credit = 2000;
+   constexpr int64_t svm_credit = 3000;
+   auto second_address = addr20;
+   second_address.back() = char(0xB2);
+   BOOST_REQUIRE_EQUAL(success(), seed_credit("", addr20, first_credit));
+   BOOST_REQUIRE_EQUAL(success(), seed_credit("", second_address, second_credit));
+   BOOST_REQUIRE_EQUAL(success(), seed_credit("", second_address, second_credit));
+   BOOST_REQUIRE_EQUAL(success(), push_dclaim(DCLAIM_ACCOUNT, "importseed"_n, mvo()
+      ("chain", ChainKind::CHAIN_KIND_SVM)
+      ("credits", fc::variants{mvo()("native_address", addr20)("wire_atomic", svm_credit)})));
+   BOOST_REQUIRE_EQUAL(success(), push_dclaim(AUTHEX_ACCOUNT, "linkswept"_n, mvo()
+      ("wire_account", "bob")("chain", ChainKind::CHAIN_KIND_EVM)("native_pubkey", second_address)));
+   BOOST_REQUIRE_EQUAL(first_credit, unmapped_row(1)["balance"].as<asset>().get_amount());
+   BOOST_REQUIRE(unmapped_row(2).is_null());
+   BOOST_REQUIRE_EQUAL(svm_credit, unmapped_row(3)["balance"].as<asset>().get_amount());
+   BOOST_REQUIRE_EQUAL(2 * second_credit, pending_of("bob"_n)["balance"].as<asset>().get_amount());
+   BOOST_REQUIRE_EQUAL(success(), push_dclaim(AUTHEX_ACCOUNT, "linkswept"_n, mvo()
+      ("wire_account", "alice")("chain", ChainKind::CHAIN_KIND_SVM)("native_pubkey", addr20)));
+   BOOST_REQUIRE_EQUAL(svm_credit, pending_of("alice"_n)["balance"].as<asset>().get_amount());
+   BOOST_REQUIRE(unmapped_row(3).is_null());
+   BOOST_REQUIRE_EQUAL(success(), push_dclaim(AUTHEX_ACCOUNT, "linkswept"_n, mvo()
+      ("wire_account", "alice")("chain", ChainKind::CHAIN_KIND_EVM)("native_pubkey", addr20)));
+   BOOST_REQUIRE(unmapped_row(1).is_null());
+   fund_claims();
+   check_claim("alice"_n, first_credit + svm_credit);
+   check_claim("bob"_n, 2 * second_credit);
+} FC_LOG_AND_RETHROW() }
+
 // -- config / import surface --
 
 BOOST_FIXTURE_TEST_CASE(setconfig_initializes_singleton, sysio_dclaim_tester) { try {

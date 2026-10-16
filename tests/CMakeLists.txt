@@ -1,4 +1,11 @@
 include_directories( "${CMAKE_SOURCE_DIR}/plugins/wallet_plugin/include" )
+configure_file(bind_registry.py bind_registry.py COPYONLY)
+configure_file(bind_registry_lifecycle_test.py bind_registry_lifecycle_test.py COPYONLY)
+configure_file(bind_registry_config.py.in bind_registry_config.py @ONLY)
+configure_file(bind_ports.cjs bind_ports.cjs COPYONLY)
+configure_file(bind_admission.cjs bind_admission.cjs COPYONLY)
+add_p_test(NAME bind_registry_lifecycle_test COMMAND "${SYSIO_TEST_PYTHON}"
+           tests/bind_registry_lifecycle_test.py TIMEOUT 1800)
 
 if( DONT_SKIP_TESTS )
   add_compile_definitions(RUN_FAILING_TESTS=TRUE)
@@ -280,9 +287,9 @@ add_np_test(NAME lib_advance_test COMMAND tests/lib_advance_test.py -v)
 
 add_np_test(NAME producer_rank_test COMMAND tests/producer_rank_test.py -v)
 
-add_p_test(NAME sysio_util_bls_test COMMAND tests/sysio_util_bls_test.py)
-add_p_test(NAME clio_em_key_test COMMAND tests/clio_em_key_test.py)
-add_p_test(NAME sysio_util_snapshot_info_test COMMAND tests/sysio_util_snapshot_info_test.py)
+add_p_test(NAME sysio_util_bls_test AUTO_PORT_OFFSET COMMAND tests/sysio_util_bls_test.py)
+add_p_test(NAME clio_em_key_test AUTO_PORT_OFFSET COMMAND tests/clio_em_key_test.py)
+add_p_test(NAME sysio_util_snapshot_info_test AUTO_PORT_OFFSET COMMAND tests/sysio_util_snapshot_info_test.py)
 
 # Fast, cluster-free check that the hand-maintained Solana OPP outpost IDL stub
 # still matches wire-solana's generated IDL. Skips loudly when the sibling
@@ -317,7 +324,7 @@ add_lr_test(NAME auto_bp_peering_test COMMAND tests/auto_bp_peering_test.py -v)
 add_lr_test(NAME auto_bp_gossip_peering_test COMMAND tests/auto_bp_gossip_peering_test.py -v)
 
 # Fast, cluster-free unit test for the PerformanceHarness post-test trx extraction logic.
-add_p_test(NAME performance_test_basic_query_test COMMAND tests/PerformanceHarness/performance_test_basic_query_test.py)
+add_p_test(NAME performance_test_basic_query_test AUTO_PORT_OFFSET COMMAND tests/PerformanceHarness/performance_test_basic_query_test.py)
 
 add_lr_test(NAME performance_test_bp COMMAND tests/PerformanceHarnessScenarioRunner.py findMax testBpOpMode --max-tps-to-test 50 --test-iteration-min-step 10 --test-iteration-duration-sec 10 --final-iterations-duration-sec 10 --calc-chain-threads lmax overrideBasicTestConfig -v --tps-limit-per-generator 25 --chain-state-db-size-mb 200)
 add_lr_test(NAME performance_test_api COMMAND tests/PerformanceHarnessScenarioRunner.py findMax testApiOpMode --max-tps-to-test 50 --test-iteration-min-step 10 --test-iteration-duration-sec 10 --final-iterations-duration-sec 10 --calc-chain-threads lmax overrideBasicTestConfig -v --tps-limit-per-generator 25 --chain-state-db-size-mb 200)

@@ -37,18 +37,18 @@ def clio_help_test(args):
 def cli11_bugfix_test():
     """Test that subcommand names can be used as option arguments"""
     completed_process = subprocess.run(
-        ['./programs/clio/clio', '--no-auto-kiod', '-u', 'http://localhost:0/',
+        ['./programs/clio/clio', '--no-auto-kiod', '-u', f'http://127.0.0.1:{Utils.getPort(Utils.PortAlternateService)}/',
          'push', 'action', 'accout', 'action', '["data"]', '-p', 'wallet'],
         check=False,
         stderr=subprocess.PIPE)
 
     # The above command must fail because there is no server running
-    # on localhost:0
+    # on the registry-reserved, intentionally unbound endpoint.
     assert(completed_process.returncode != 0)
 
     # Make sure that the command failed because of the connection error,
     # not the command line parsing error.
-    assert(b'Failed http request to nodeop' in completed_process.stderr)
+    assert(b'Failed http request to nodeop' in completed_process.stderr), completed_process.stderr.decode()
 
 
 def cli11_optional_option_arg_test():
@@ -164,14 +164,14 @@ def clio_abi_file_test():
     account = 'sysio.token'
     action = 'transfer'
     unpacked_action_data = '{"from":"aaa","to":"bbb","quantity":"10.0000 SYS","memo":"hello"}'
-    # use URL http://127.0.0.1:12345 to make sure clio not to connect to any running nodeop
-    cmd = ['./programs/clio/clio', '-u', 'http://127.0.0.1:12345', 'convert', 'pack_action_data', account, action, unpacked_action_data]
+    # Use the intentionally unbound registry lease to prevent reaching another nodeop.
+    cmd = ['./programs/clio/clio', '-u', f'http://127.0.0.1:{Utils.getPort(Utils.PortAlternateService)}', 'convert', 'pack_action_data', account, action, unpacked_action_data]
     outs, errs = processClioCommand(cmd)
     assert(b'Failed http request to nodeop' in errs)
 
     # invalid option --abi-file
     invalid_abi_arg = 'sysio.token' + ' ' + token_abi_path
-    cmd = ['./programs/clio/clio', '-u', 'http://127.0.0.1:12345', '--abi-file', invalid_abi_arg, 'convert', 'pack_action_data', account, action, unpacked_action_data]
+    cmd = ['./programs/clio/clio', '-u', f'http://127.0.0.1:{Utils.getPort(Utils.PortAlternateService)}', '--abi-file', invalid_abi_arg, 'convert', 'pack_action_data', account, action, unpacked_action_data]
     outs, errs = processClioCommand(cmd)
     assert(b'please specify --abi-file in form of <contract name>:<abi file path>.' in errs)
 
@@ -180,13 +180,13 @@ def clio_abi_file_test():
     action = 'transfer'
     unpacked_action_data = '{"from":"aaa","to":"bbb","quantity":"10.0000 SYS","memo":"hello"}'
     packed_action_data = '0000000000008c31000000000000ce39a08601000000000004535953000000000568656c6c6f'
-    cmd = ['./programs/clio/clio', '-u','http://127.0.0.1:12345', '--abi-file', token_abi_file_arg, 'convert', 'pack_action_data', account, action, unpacked_action_data]
+    cmd = ['./programs/clio/clio', '-u',f'http://127.0.0.1:{Utils.getPort(Utils.PortAlternateService)}', '--abi-file', token_abi_file_arg, 'convert', 'pack_action_data', account, action, unpacked_action_data]
     outs, errs = processClioCommand(cmd)
     actual = outs.strip()
     assert(actual.decode('utf-8') == packed_action_data)
 
     # unpack token transfer data
-    cmd = ['./programs/clio/clio', '-u','http://127.0.0.1:12345', '--abi-file', token_abi_file_arg, 'convert', 'unpack_action_data', account, action, packed_action_data]
+    cmd = ['./programs/clio/clio', '-u',f'http://127.0.0.1:{Utils.getPort(Utils.PortAlternateService)}', '--abi-file', token_abi_file_arg, 'convert', 'unpack_action_data', account, action, packed_action_data]
     outs, errs = processClioCommand(cmd)
     assert(b'"from": "aaa"' in outs)
     assert(b'"to": "bbb"' in outs)
@@ -220,7 +220,7 @@ def clio_abi_file_test():
         }
     }"""
 
-    cmd = ['./programs/clio/clio', '-u','http://127.0.0.1:12345', '--abi-file', system_abi_file_arg, 'convert', 'pack_action_data', account, action, unpacked_action_data]
+    cmd = ['./programs/clio/clio', '-u',f'http://127.0.0.1:{Utils.getPort(Utils.PortAlternateService)}', '--abi-file', system_abi_file_arg, 'convert', 'pack_action_data', account, action, unpacked_action_data]
     # the packed data hex changed because of the change to sysio in unpacked_action_data above
     packed_action_data = '0000000000eab0c70000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf010000'
     outs, errs = processClioCommand(cmd)
@@ -228,7 +228,7 @@ def clio_abi_file_test():
     assert(actual.decode('utf-8') == packed_action_data)
 
     # unpack account create data
-    cmd = ['./programs/clio/clio', '-u','http://127.0.0.1:12345', '--abi-file', system_abi_file_arg, 'convert', 'unpack_action_data', account, action, packed_action_data]
+    cmd = ['./programs/clio/clio', '-u',f'http://127.0.0.1:{Utils.getPort(Utils.PortAlternateService)}', '--abi-file', system_abi_file_arg, 'convert', 'unpack_action_data', account, action, packed_action_data]
     outs, errs = processClioCommand(cmd)
     assert(b'"creator": "sysio"' in outs)
     assert(b'"name": "bob"' in outs)
@@ -298,7 +298,7 @@ def clio_abi_file_test():
     }"""
 
     expected_output = b'3aacf360ee010b864b7e00000000020000000000eab0c700409e9a2264b89a010000000000eab0c700000000a8ed3232640000000000eab0c70000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000000a6823403eab0c7000000572d3ccdcd010000000000008c3100000000a8ed3232260000000000008c31000000000000ce39a08601000000000004535953000000000568656c6c6f00'
-    cmd = ['./programs/clio/clio', '-u','http://127.0.0.1:12345', '--abi-file', system_abi_file_arg, token_abi_file_arg, 'convert', 'pack_transaction', '--pack-action-data', unpacked_trx]
+    cmd = ['./programs/clio/clio', '-u',f'http://127.0.0.1:{Utils.getPort(Utils.PortAlternateService)}', '--abi-file', system_abi_file_arg, token_abi_file_arg, 'convert', 'pack_transaction', '--pack-action-data', unpacked_trx]
     outs, errs = processClioCommand(cmd)
     assert(expected_output in outs)
 
@@ -311,7 +311,7 @@ def clio_abi_file_test():
         "packed_context_free_data": "",
         "packed_trx": "3aacf360ee010b864b7e00000000020000000000eab0c700409e9a2264b89a010000000000eab0c700000000a8ed3232640000000000eab0c70000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000000a6823403eab0c7000000572d3ccdcd010000000000008c3100000000a8ed3232260000000000008c31000000000000ce39a08601000000000004535953000000000568656c6c6f00"
     }"""
-    cmd = ['./programs/clio/clio', '-u','http://127.0.0.1:12345', '--abi-file', system_abi_file_arg, token_abi_file_arg, 'convert', 'unpack_transaction', '--unpack-action-data', packed_trx]
+    cmd = ['./programs/clio/clio', '-u',f'http://127.0.0.1:{Utils.getPort(Utils.PortAlternateService)}', '--abi-file', system_abi_file_arg, token_abi_file_arg, 'convert', 'unpack_transaction', '--unpack-action-data', packed_trx]
     outs, errs = processClioCommand(cmd)
     assert(b'"creator": "sysio"' in outs)
     assert(b'"name": "bob"' in outs)
@@ -445,7 +445,7 @@ def clio_protobuf_abi_test():
     account = 'prototest'
     action = 'hiproto'
     unpacked_action_data = '{"id":1,"type":2,"note":"hello"}'
-    cmd = ['./programs/clio/clio', '-u', 'http://127.0.0.1:12345', '--abi-file', proto_abi_file_arg,
+    cmd = ['./programs/clio/clio', '-u', f'http://127.0.0.1:{Utils.getPort(Utils.PortAlternateService)}', '--abi-file', proto_abi_file_arg,
            'convert', 'pack_action_data', account, action, unpacked_action_data]
     outs, errs = processClioCommand(cmd)
     packed_data = outs.strip().decode('utf-8')
@@ -453,7 +453,7 @@ def clio_protobuf_abi_test():
     Utils.Print("protobuf pack_action_data: %s -> %s" % (unpacked_action_data, packed_data))
 
     # unpack the packed data and verify round-trip
-    cmd = ['./programs/clio/clio', '-u', 'http://127.0.0.1:12345', '--abi-file', proto_abi_file_arg,
+    cmd = ['./programs/clio/clio', '-u', f'http://127.0.0.1:{Utils.getPort(Utils.PortAlternateService)}', '--abi-file', proto_abi_file_arg,
            'convert', 'unpack_action_data', account, action, packed_data]
     outs, errs = processClioCommand(cmd)
     assert b'"id": 1' in outs, "unpack missing id field"
@@ -464,14 +464,14 @@ def clio_protobuf_abi_test():
     # pack pbaction (different action, same protobuf type)
     action = 'pbaction'
     unpacked_action_data = '{"id":99,"type":0,"note":"test"}'
-    cmd = ['./programs/clio/clio', '-u', 'http://127.0.0.1:12345', '--abi-file', proto_abi_file_arg,
+    cmd = ['./programs/clio/clio', '-u', f'http://127.0.0.1:{Utils.getPort(Utils.PortAlternateService)}', '--abi-file', proto_abi_file_arg,
            'convert', 'pack_action_data', account, action, unpacked_action_data]
     outs, errs = processClioCommand(cmd)
     packed_data2 = outs.strip().decode('utf-8')
     assert len(packed_data2) > 0, "pack_action_data returned empty result for pbaction"
 
     # unpack and verify
-    cmd = ['./programs/clio/clio', '-u', 'http://127.0.0.1:12345', '--abi-file', proto_abi_file_arg,
+    cmd = ['./programs/clio/clio', '-u', f'http://127.0.0.1:{Utils.getPort(Utils.PortAlternateService)}', '--abi-file', proto_abi_file_arg,
            'convert', 'unpack_action_data', account, action, packed_data2]
     outs, errs = processClioCommand(cmd)
     assert b'"id": 99' in outs, "unpack missing id=99"

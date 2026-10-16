@@ -1,6 +1,8 @@
 #pragma once
 
 #include <charconv>
+#include <array>
+#include <set>
 #include <cstdint>
 #include <cstdlib>
 #include <limits>
@@ -82,84 +84,95 @@ inline uint32_t test_port_offset() {
    return offset;
 }
 
-/** Return a deterministic port for a listener class and index in this test's shard. */
+/** Validate the full issued lease before any port can be used. */
+inline std::array<uint16_t, 192> parse_registered_ports(std::string_view value) {
+   std::array<uint16_t, 192> result;
+   std::set<uint16_t> unique;
+   for(auto& port : result) {
+      const auto delimiter = value.find(',');
+      const auto field = value.substr(0, delimiter);
+      uint32_t number = 0;
+      const auto [end, error] = std::from_chars(field.data(), field.data() + field.size(), number);
+      if(error != std::errc{} || end != field.data() + field.size() || number == 0 || number > 65535 ||
+         !unique.insert(static_cast<uint16_t>(number)).second)
+         throw std::runtime_error("Invalid or duplicate port in BindConfigProvider lease");
+      port = static_cast<uint16_t>(number);
+      if(delimiter == std::string_view::npos) {
+         if(&port != &result.back())
+            throw std::runtime_error("BindConfigProvider lease must contain exactly 192 ports");
+         value = {};
+      } else {
+         value.remove_prefix(delimiter + 1);
+         if(&port == &result.back())
+            throw std::runtime_error("BindConfigProvider lease contains extra ports");
+      }
+   }
+   return result;
+}
+
+/** Return the registry-issued port for a listener class and index. */
 inline uint16_t get_port(port_category category, uint32_t index = 0) {
-   const uint32_t offset = test_port_offset();
    uint32_t slot_start = 0;
    uint32_t slot_count = 1;
-   uint32_t unsharded_base_port = 0;
 
    switch(category) {
    case port_category::ship:
       slot_start = compact_ship_slot;
-      unsharded_base_port = 7899;
       break;
    case port_category::state_history:
       slot_start = compact_state_history_slot;
-      unsharded_base_port = default_state_history_port;
       break;
    case port_category::bios_http:
       slot_start = compact_bios_http_slot;
-      unsharded_base_port = 8788;
       break;
    case port_category::bios_p2p:
       slot_start = compact_bios_p2p_slot;
-      unsharded_base_port = compact_bios_p2p_port;
       break;
    case port_category::node_http:
       slot_start = compact_http_slot;
       slot_count = compact_http_last_port - compact_http_first_port + 1;
-      unsharded_base_port = compact_http_first_port;
       break;
    case port_category::alternate_service:
       slot_start = compact_alternate_service_slot;
-      unsharded_base_port = 8976;
       break;
    case port_category::plugin_http_peer:
       slot_start = compact_plugin_http_peer_slot;
-      unsharded_base_port = 9009;
       break;
    case port_category::plugin_http_local:
       slot_start = compact_plugin_http_local_slot;
-      unsharded_base_port = 9011;
       break;
    case port_category::alternate_p2p:
       slot_start = compact_alternate_p2p_slot;
       slot_count = compact_alternate_last_port - compact_alternate_first_port + 1;
-      unsharded_base_port = compact_alternate_first_port;
       break;
    case port_category::p2p:
       slot_start = compact_p2p_slot;
       slot_count = compact_p2p_last_port - compact_p2p_first_port + 1;
-      unsharded_base_port = compact_p2p_first_port;
       break;
    case port_category::wallet:
       slot_start = compact_wallet_base_slot;
       slot_count = wallet_port_count;
-      unsharded_base_port = compact_wallet_first_port;
       break;
    case port_category::transaction_only:
       slot_start = compact_transaction_only_slot;
       slot_count = transaction_only_port_count;
-      unsharded_base_port = compact_transaction_only_first_port;
       break;
    case port_category::ipv6_probe:
       slot_start = compact_ipv6_probe_slot;
       slot_count = compact_ipv6_probe_last_port - compact_ipv6_probe_first_port + 1;
-      unsharded_base_port = compact_ipv6_probe_first_port;
       break;
    }
 
    if(index >= slot_count)
       throw std::runtime_error("port category index is outside the compact test shard range");
 
-   uint32_t shifted_port = unsharded_base_port + index;
-   if(offset != 0)
-      shifted_port = compact_shard_anchor_port + offset + slot_start + index;
-
-   if(shifted_port > std::numeric_limits<uint16_t>::max())
-      throw std::runtime_error(std::string(test_port_offset_env_var) + " shifts the requested port outside uint16_t");
-   return static_cast<uint16_t>(shifted_port);
+   static const auto ports = [] {
+      const char* raw = std::getenv("SYSIO_TEST_PORTS");
+      if(raw == nullptr)
+         throw std::runtime_error("Run network tests through tests/bind_registry.py to obtain a BindConfigProvider lease");
+      return parse_registered_ports(raw);
+   }();
+   return ports.at(slot_start + index);
 }
 
 /** Return the default state-history websocket endpoint for this test shard. */

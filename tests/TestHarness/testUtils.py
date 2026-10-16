@@ -18,6 +18,7 @@ import shutil
 import sys
 from pathlib import Path
 import threading
+from bind_registry import ensure_ports
 
 # Fancy import to maintain compatibility with python 3.10
 try:
@@ -136,12 +137,12 @@ class Utils:
 
     @staticmethod
     def getPort(port_category, index=0):
-        """Return a deterministic port from this test's compact port shard.
+        """Return an issued port from this test's host-global registry lease.
 
         port_category names the listener class and index selects a listener
-        within that class.  CTest assigns each test a unique shard offset, and
-        this allocator keeps all known listener classes inside one bounded
-        192-port shard below the ephemeral range.
+        within that class. The CTest wrapper keeps its canonical Node issuer
+        alive across every daemon launch and restart. Manual Python tests
+        require tests/bind_registry.py too; there is no unregistered fallback.
         """
         assert(isinstance(port_category, str))
         assert(isinstance(index, int))
@@ -172,35 +173,7 @@ class Utils:
             raise RuntimeError(
                 f"Port index {index} is outside category '{port_category}' capacity {slotCount}")
 
-        offset=Utils.getTestPortOffset()
-        if offset == 0:
-            # The unsharded wallet and transaction-only defaults intentionally preserve
-            # historical manual-test ports, including their legacy overlap at 9902/9903.
-            defaultPorts={
-                Utils.PortShip: 7899,
-                Utils.PortStateHistory: 8080,
-                Utils.PortBiosHttp: 8788,
-                Utils.PortBiosP2P: 9776,
-                Utils.PortNodeHttp: 8888,
-                Utils.PortAlternateService: 8976,
-                Utils.PortPluginHttpPeer: 9009,
-                Utils.PortPluginHttpLocal: 9011,
-                Utils.PortAlternateP2P: 9777,
-                Utils.PortP2P: 9876,
-                Utils.PortWallet: 9899,
-                Utils.PortTransactionOnly: 9902,
-                Utils.PortIpv6Probe: 9997,
-            }
-            shiftedPort=defaultPorts[port_category] + index
-        else:
-            shiftedPort=8888 + offset + slotStart + index
-
-        if shiftedPort < 1 or shiftedPort > 65535:
-            raise RuntimeError(
-                f"Port category '{port_category}' index {index} shifted by "
-                f"{Utils.TestPortOffsetEnvVar}={Utils.getTestPortOffset()} "
-                f"produces invalid port {shiftedPort}")
-        return shiftedPort
+        return ensure_ports()[slotStart + index]
 
     @staticmethod
     def nodeopSupportsOption(option):

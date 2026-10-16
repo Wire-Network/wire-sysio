@@ -5,7 +5,12 @@
 #include <fc/filesystem.hpp>
 #include <sysio/chain/exceptions.hpp>
 
+#include <sys/stat.h>
+#include <filesystem>
+#include <sstream>
+#include <spdlog/sinks/ostream_sink.h>
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
+#include <sysio/resource_monitor_plugin/file_space_handler.hpp>
 
 #include <thread>
 
@@ -62,6 +67,48 @@ struct resmon_fixture {
    resource_monitor_plugin _my;
    options_description _cfg;
 };
+
+namespace {
+struct fixed_space_provider {
+   uintmax_t available;
+   int get_stat(const char*, struct stat* result) {
+      result->st_dev = 1;
+      return 0;
+   }
+   std::filesystem::space_info get_space(const std::filesystem::path&, std::error_code& error) {
+      error.clear();
+      return {100, available, available};
+   }
+};
+
+struct captured_monitor_logger {
+   std::ostringstream output;
+   fc::logger logger = fc::logger::default_logger();
+   fc::log_level saved_level = logger.get_log_level();
+   bool saved_enabled = logger.is_enabled();
+   std::unique_ptr<spdlog::logger> saved_logger = std::move(logger.get_agent_logger());
+
+   captured_monitor_logger() {
+      auto sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(output);
+      sink->set_pattern("%v");
+      logger.update_agent_logger(std::make_unique<spdlog::logger>("monitor-cadence", sink));
+      logger.set_log_level(fc::log_level::warn);
+      logger.set_enabled(true);
+   }
+   ~captured_monitor_logger() {
+      logger.update_agent_logger(std::move(saved_logger));
+      logger.set_log_level(saved_level);
+      logger.set_enabled(saved_enabled);
+   }
+   size_t warning_count() const {
+      const auto text = output.str();
+      const std::string warning = "Space usage warning";
+      size_t count = 0;
+      for (size_t pos = 0; (pos = text.find(warning, pos)) != std::string::npos; pos += warning.size()) ++count;
+      return count;
+   }
+};
+}
 
 BOOST_AUTO_TEST_SUITE(resmon_plugin_tests)
    BOOST_FIXTURE_TEST_CASE(intervalTooBig, resmon_fixture)
@@ -196,6 +243,30 @@ BOOST_AUTO_TEST_SUITE(resmon_plugin_tests)
    BOOST_FIXTURE_TEST_CASE(warningIntervalHighBound, resmon_fixture)
    {
       BOOST_REQUIRE_NO_THROW(set_options({"--resource-monitor-warning-interval=450"}));
+   }
+
+   BOOST_AUTO_TEST_CASE(warnings_follow_monitor_ticks)
+   {
+      // Cover both shutdown-threshold and approaching-threshold warnings.
+      // The io_context is never run: invoke real monitor callbacks directly,
+      // so this checks exact cadence without OS scheduling or wall-clock sleeps.
+      for (uintmax_t available : {5u, 12u}) {
+         for (uint32_t interval : {1u, 5u, 30u}) {
+            BOOST_TEST_CONTEXT("available=" << available << ", warning interval=" << interval) {
+               captured_monitor_logger capture;
+               resource_monitor::file_space_handler<fixed_space_provider> monitor(fixed_space_provider{available});
+               monitor.set_threshold(90, 85);
+               monitor.set_shutdown_on_exceeded(false);
+               monitor.set_warning_interval(interval);
+               monitor.add_file_system("mock-filesystem");
+               BOOST_REQUIRE_EQUAL(capture.warning_count(), 0u);
+               for (uint32_t tick = 1; tick <= 3 * interval; ++tick) {
+                  monitor.space_monitor_loop();
+                  BOOST_CHECK_EQUAL(capture.warning_count(), 1u + (tick - 1) / interval);
+               }
+            }
+         }
+      }
    }
 
 BOOST_AUTO_TEST_SUITE_END()

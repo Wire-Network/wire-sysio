@@ -50,6 +50,12 @@ jobs:
       - name: Validate root pnpm lockfile
         run: pnpm install --frozen-lockfile --ignore-scripts
 
+      - name: Validate native registry capacity and lifecycle
+        run: |
+          python3 tests/bind_admission_test.py
+          python3 tests/bind_registry_stress_test.py
+          python3 tests/bind_registry_lifecycle_test.py
+
       - name: Load plop generators
         run: |
           node <<'NODE'
@@ -131,6 +137,15 @@ jobs:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
         with:
           submodules: recursive
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # actions/setup-node@v4
+        with:
+          node-version: "24"
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # pnpm/action-setup@v4
+        with:
+          package_json_file: package.json
+      - name: Install canonical native-test port registry provider
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
       # Split restore/save (not the monolithic actions/cache): the post-job save of
       # the monolithic action runs BEFORE the vcpkg-binary-cache directory has been

@@ -924,14 +924,17 @@ namespace sysio::testing {
       const auto* acnt = control->find_account_metadata(code);
       FC_ASSERT(acnt != nullptr, "account metadata not found");
       auto abi = acnt->get_abi();
-      chain::abi_serializer abis(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
+      // Fixture packing must not turn unrelated contract tests into host-speed
+      // benchmarks. Keep structural/recursion guards; dedicated ABI tests own
+      // serialization deadline assertions.
+      chain::abi_serializer abis(std::move(abi), abi_serializer::create_depth_yield_function());
 
       string action_type_name = abis.get_action_type(acttype);
       FC_ASSERT( action_type_name != string(), "unknown action type {}", acttype );
 
       action act(std::move(auths), code, acttype,
                  abis.variant_to_binary(action_type_name, data,
-                                        abi_serializer::create_yield_function(abi_serializer_max_time)));
+                                        abi_serializer::create_depth_yield_function()));
       return act;
    } FC_CAPTURE_AND_RETHROW("") }
 
