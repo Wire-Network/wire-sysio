@@ -126,36 +126,34 @@ ethabi::contract no_argument_function(std::string name) {
    };
 }
 
-/** Build a function ABI with one dynamic-bytes argument. */
-ethabi::contract bytes_argument_function(std::string name) {
-   return ethabi::contract{
-      .name = std::move(name),
-      .type = ethabi::invoke_target_type::function,
-      .inputs = {ethabi::component_type{"data", ethabi::data_type::bytes}},
-      .outputs = {},
-   };
-}
-
-/** Build the chunked `epochIn` function ABI. */
-ethabi::contract chunked_epoch_in_function(std::string name) {
+/** Build the whole-envelope `epochIn(uint32,bytes)` function ABI. */
+ethabi::contract whole_envelope_epoch_in_function(std::string name) {
    return ethabi::contract{
       .name = std::move(name),
       .type = ethabi::invoke_target_type::function,
       .inputs = {ethabi::component_type{"epochIndex", ethabi::data_type::uint32},
-                 ethabi::component_type{"chunkIndex", ethabi::data_type::uint16},
-                 ethabi::component_type{"totalChunks", ethabi::data_type::uint16},
-                 ethabi::component_type{"totalBytes", ethabi::data_type::uint32},
-                 ethabi::component_type{"chunkData", ethabi::data_type::bytes}},
+                 ethabi::component_type{"envelopeData", ethabi::data_type::bytes}},
       .outputs = {},
    };
 }
 
-/** Build a function ABI with one address argument. */
-ethabi::contract address_argument_function(std::string name) {
+/** Build the `epochDeliveries(uint32,address)` view ABI. */
+ethabi::contract epoch_deliveries_function(std::string name) {
    return ethabi::contract{
       .name = std::move(name),
       .type = ethabi::invoke_target_type::function,
-      .inputs = {ethabi::component_type{"operator_", ethabi::data_type::address}},
+      .inputs = {ethabi::component_type{"epochIndex", ethabi::data_type::uint32},
+                 ethabi::component_type{"operator_", ethabi::data_type::address}},
+      .outputs = {},
+   };
+}
+
+/** Build the `pendingConsensusForDigest(bytes32)` view ABI. */
+ethabi::contract bytes32_argument_function(std::string name) {
+   return ethabi::contract{
+      .name = std::move(name),
+      .type = ethabi::invoke_target_type::function,
+      .inputs = {ethabi::component_type{"digest", ethabi::data_type::bytes32}},
       .outputs = {},
    };
 }
@@ -215,13 +213,18 @@ public:
       }
       if (method == "eth_estimateGas") {
          estimate_gas_params = params;
-         return fc::variant("0x342");
+         return fc::variant(estimate_response);
       }
       if (method == "eth_getTransactionCount") return fc::variant("0x0");
       if (method == "eth_sendRawTransaction") {
          ++broadcast_count;
          return fc::variant(std::string(transaction_hash));
       }
+      if (method == "eth_getTransactionReceipt") {
+         ++receipt_reads;
+         return receipt_response;
+      }
+      if (method == "eth_blockNumber") return fc::variant(block_number_response);
       FC_THROW_EXCEPTION(fc::invalid_arg_exception, "unexpected fake RPC method {}", method);
    }
 
@@ -232,6 +235,13 @@ public:
 
    std::vector<std::string> methods;
    fc::variant              estimate_gas_params;
+   /** What `eth_estimateGas` answers; 834 by default, which buffers to 1000. */
+   std::string              estimate_response = "0x342";
+   /** What `eth_getTransactionReceipt` answers; null (not yet included) by default. */
+   fc::variant              receipt_response;
+   /** What `eth_blockNumber` answers. */
+   std::string              block_number_response = "0x10";
+   size_t                   receipt_reads   = 0;
    size_t                   broadcast_count = 0;
 };
 
@@ -481,6 +491,123 @@ BOOST_AUTO_TEST_CASE(default_transaction_uses_priority_fee_in_estimate_payload_a
    BOOST_CHECK_EQUAL(sign_count.load(), 0u);
 }
 
+/// A gas-limit floor raises an under-estimate to the floor, leaves a larger
+/// buffered estimate alone, and is refused — never clamped — above the policy
+/// ceiling.
+BOOST_AUTO_TEST_CASE(gas_limit_floor_raises_an_under_estimate_and_is_policy_bounded) {
+   std::atomic<size_t> sign_count = 0;
+   const auto provider = make_recording_signer(sign_count);
+   auto policy = bounded_policy();
+   policy.max_gas_limit = 2000;
+   auto client = std::make_shared<recording_ethereum_client>(provider, policy);
+
+   // The fake estimate is 834 -> buffered 1000.
+   BOOST_CHECK_EQUAL(
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 0).gas_limit,
+      1000);
+   BOOST_CHECK_EQUAL(
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 900).gas_limit,
+      1000);
+   BOOST_CHECK_EQUAL(
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 1500).gas_limit,
+      1500);
+   BOOST_CHECK_EQUAL(
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 2000).gas_limit,
+      2000);
+   expect_policy_rejection([&] {
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 2001);
+   });
+   BOOST_CHECK_EQUAL(sign_count.load(), 0u);
+   BOOST_CHECK_EQUAL(client->broadcast_count, 0u);
+}
+
+/// A cap IS the limit: the transaction is sent with exactly it, the estimate
+/// runs under it as a pre-flight only (its value neither raises nor lowers
+/// the limit, and the buffered-estimate ceiling check does not apply), it
+/// cannot sit below the floor, and it is policy-bounded exactly like the floor.
+BOOST_AUTO_TEST_CASE(gas_limit_cap_is_the_limit_and_runs_the_estimate_under_it) {
+   std::atomic<size_t> sign_count = 0;
+   const auto provider = make_recording_signer(sign_count);
+   auto policy = bounded_policy();
+   policy.max_gas_limit = 2000;
+   auto client = std::make_shared<recording_ethereum_client>(provider, policy);
+
+   // No cap: the estimate payload carries no `gas`.
+   client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 0, 0);
+   BOOST_CHECK(!client->estimate_gas_params.get_array().front().get_object().contains("gas"));
+
+   // The fake estimate is 834 -> buffered 1000; a cap of 900 is sent as 900 ...
+   BOOST_CHECK_EQUAL(
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 0, 900).gas_limit,
+      900);
+   BOOST_CHECK_EQUAL(
+      client->estimate_gas_params.get_array().front().get_object()["gas"].as_string(), "0x384");
+   // ... and a cap of 1200 as 1200: the estimate's value is not an input to the limit.
+   BOOST_CHECK_EQUAL(
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 0, 1200).gas_limit,
+      1200);
+   BOOST_CHECK_EQUAL(
+      client->estimate_gas_params.get_array().front().get_object()["gas"].as_string(), "0x4b0");
+   // Floor and cap equal: the transaction carries exactly that.
+   BOOST_CHECK_EQUAL(
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 1500, 1500).gas_limit,
+      1500);
+   // An estimate whose buffer would breach the policy is a rejection without a
+   // cap, and irrelevant with one: 1000 buffers to 1200 > 1000, but a capped
+   // call that fits in 1000 is sent with 1000.
+   client->estimate_response = "0x3e8";
+   policy.max_gas_limit      = 1000;
+   auto tight_client = std::make_shared<recording_ethereum_client>(provider, policy);
+   tight_client->estimate_response = "0x3e8";
+   expect_policy_rejection([&] {
+      tight_client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 0, 0);
+   });
+   BOOST_CHECK_EQUAL(
+      tight_client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 0, 1000).gas_limit,
+      1000);
+   // A cap above the policy ceiling is a rejection, not a clamp.
+   expect_policy_rejection([&] {
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 0, 2001);
+   });
+   // A cap below the floor is a caller error.
+   BOOST_CHECK_THROW(
+      client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 1500, 900),
+      fc::exception);
+   BOOST_CHECK_EQUAL(sign_count.load(), 0u);
+   BOOST_CHECK_EQUAL(client->broadcast_count, 0u);
+   BOOST_CHECK_EQUAL(tight_client->broadcast_count, 0u);
+}
+
+/// The confirmation wait hands back the receipt itself — block number and
+/// logs — so a caller can pin its next reads to the block that holds the
+/// effect; a reverted receipt is an error, and the depth wait still applies.
+BOOST_AUTO_TEST_CASE(wait_for_receipt_returns_the_confirmed_receipt) {
+   std::atomic<size_t> sign_count = 0;
+   const auto provider = make_recording_signer(sign_count);
+   auto client = std::make_shared<recording_ethereum_client>(provider, bounded_policy());
+   const std::string hash{transaction_hash};
+   const fc::variants logs{fc::mutable_variant_object("address", std::string(contract_address))};
+   client->receipt_response = fc::mutable_variant_object("status", "0x1")("blockNumber", "0x10")("logs", logs);
+
+   const auto receipt = client->wait_for_receipt(hash);
+   BOOST_REQUIRE(receipt.is_object());
+   BOOST_CHECK_EQUAL(receipt.get_object()["blockNumber"].as_string(), "0x10");
+   BOOST_CHECK_EQUAL(receipt.get_object()["logs"].get_array().size(), 1u);
+   BOOST_CHECK_EQUAL(client->receipt_reads, 1u);
+   BOOST_CHECK_EQUAL(client->wait_for_confirmation(hash), hash);
+
+   // Two confirmations: the receipt's block plus one, which the fake chain has reached.
+   ethereum_confirm_options two_deep = ethereum_confirm_option_defaults;
+   two_deep.confirmations = 2;
+   client->block_number_response = "0x11";
+   BOOST_CHECK(client->wait_for_receipt(hash, two_deep).is_object());
+   BOOST_CHECK(std::ranges::count(client->methods, "eth_blockNumber") == 1);
+
+   client->receipt_response = fc::mutable_variant_object("status", "0x0")("blockNumber", "0x10");
+   BOOST_CHECK_THROW(client->wait_for_receipt(hash), fc::exception);
+   BOOST_CHECK_EQUAL(sign_count.load(), 0u);
+}
+
 BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
    std::atomic<size_t> sign_count = 0;
    const auto provider = make_recording_signer(sign_count);
@@ -491,21 +618,28 @@ BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
    sysio::opp_inbound_contract_client inbound{
       client,
       std::string(contract_address),
-      {chunked_epoch_in_function("epochIn"), no_argument_function("nextEpochIndex"),
-       no_argument_function("discardEnvelopeChunks"),
-       address_argument_function("envelopeChunkState"),
+      {whole_envelope_epoch_in_function("epochIn"), no_argument_function("nextEpochIndex"),
+       uint32_argument_function("dispatchSpill"), epoch_deliveries_function("epochDeliveries"),
+       no_argument_function("pendingEpochHash"), bytes32_argument_function("pendingConsensusForDigest"),
        uint16_argument_function("attestationHandlers")},
    };
-   // Both OPPInbound write wrappers — the per-chunk delivery and the staged
-   // recovery — must be rejected by the policy before signing.
+   // OPPInbound's one write wrapper — the whole-envelope delivery — must be
+   // rejected by the policy before signing. A budget above the policy ceiling
+   // (999 here) is refused outright; one at the ceiling is sent with exactly
+   // it (the estimate of 834 is a pre-flight under the cap, not an input to
+   // the limit) and comes back as the confirmed receipt.
    uint32_t    epoch_index = 1;
-   uint16_t    chunk_index = 0;
-   uint16_t    total_chunks = 1;
-   uint32_t    total_bytes = 1;
-   std::string chunk = "01";
-   expect_policy_rejection(
-      [&] { inbound.epoch_in(epoch_index, chunk_index, total_chunks, total_bytes, chunk); });
-   expect_policy_rejection([&] { inbound.discard_envelope_chunks(); });
+   std::string envelope = "01";
+   expect_policy_rejection([&] { inbound.epoch_in(epoch_index, envelope, 1000); });
+   client->receipt_response = fc::mutable_variant_object("status", "0x1")("blockNumber", "0x10")("logs", fc::variants{});
+   const auto receipt = inbound.epoch_in(epoch_index, envelope, 999);
+   BOOST_CHECK_EQUAL(receipt.block_number, fc::uint256{16});
+   BOOST_CHECK(receipt.logs.empty());
+   // The budget reached the pre-flight as the gas the call must fit in — the
+   // wrapper hands `delivery_confirm_options(budget)` to `create_default_tx`.
+   BOOST_CHECK_EQUAL(client->estimate_gas_params.get_array().front().get_object()["gas"].as_string(), "0x3e7");
+   BOOST_CHECK_EQUAL(sign_count.load(), 1u);
+   BOOST_CHECK_EQUAL(client->broadcast_count, 1u);
 
    sysio::opp_contract_client opp{
       client,
@@ -522,8 +656,9 @@ BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
    };
    expect_policy_rejection([&] { pool.realize_yield(); });
 
-   BOOST_CHECK_EQUAL(sign_count.load(), 0u);
-   BOOST_CHECK_EQUAL(client->broadcast_count, 0u);
+   // Only the in-policy delivery reached the signer and the wire.
+   BOOST_CHECK_EQUAL(sign_count.load(), 1u);
+   BOOST_CHECK_EQUAL(client->broadcast_count, 1u);
 }
 
 BOOST_AUTO_TEST_CASE(plugin_startup_attaches_unified_client_policies) {
