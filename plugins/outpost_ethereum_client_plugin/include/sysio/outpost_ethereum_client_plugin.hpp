@@ -38,13 +38,22 @@ struct opp_contract_client : ethereum_contract_client {
    /// on every `emitOutboundEnvelope`. Read by the WIRE batch operator
    /// to relay the envelope back to WIRE.
    ethereum_contract_call_fn<fc::variant> get_latest_outbound_envelope;
+   /// The `outboundEnvelopes(uint32)` view's name: the outpost's write-once record of the envelope it emitted for
+   /// an epoch, `(uint32 epochIndex, uint64 emittedAt, bytes32 checksum)`, kept for its retention window.
+   static constexpr auto view_outbound_envelopes = "outboundEnvelopes";
+   /// View `outboundEnvelopes(uint32)`. Empty when the loaded ABI does not declare it, so an older ABI still
+   /// serves the relay, which never reads it.
+   ethereum_contract_call_fn<fc::variant, uint32_t> outbound_envelopes;
 
    opp_contract_client(const ethereum_client_ptr& client,
                        const address_compat_type& contract_address,
                        const std::vector<fc::network::ethereum::abi::contract>& contracts)
       : ethereum_contract_client(client, contract_address, contracts)
       , emit_outbound_envelope(create_tx_and_confirm<fc::variant, uint32_t>(get_abi("emitOutboundEnvelope")))
-      , get_latest_outbound_envelope(create_call<fc::variant>(get_abi("getLatestOutboundEnvelope"))) {}
+      , get_latest_outbound_envelope(create_call<fc::variant>(get_abi("getLatestOutboundEnvelope")))
+      , outbound_envelopes(has_abi(view_outbound_envelopes)
+                              ? create_call<fc::variant, uint32_t>(get_abi(view_outbound_envelopes))
+                              : ethereum_contract_call_fn<fc::variant, uint32_t>{}) {}
 };
 
 /// Typed contract client for OPPInbound.sol. Same confirmed-default

@@ -1920,29 +1920,27 @@ chain_plugin::read_table_rows(chain_apis::read_only::get_table_rows_params param
    return result ? std::move(*result) : chain_apis::read_only::get_table_rows_result{};
 }
 
-bool chain_plugin::provider_can_authorize_active_alone(
-   chain::name actor,
-   const fc::crypto::public_key& provider_key) const {
-   const auto& authorization = chain().get_authorization_manager();
-   // Declaring actor@active may be satisfied by active itself or its owner
-   // ancestor. Mere membership in a multisig authority is insufficient.
-   for (const auto permission : {chain::config::active_name,
-                                 chain::config::owner_name}) {
-      try {
-         const auto& permission_object =
-            authorization.get_permission({actor, permission});
-         if (std::ranges::any_of(
-                permission_object.auth.keys, [&](const auto& weighted_key) {
-                   return weighted_key.key.to_public_key() == provider_key &&
-                          weighted_key.weight >= permission_object.auth.threshold;
-                })) {
-            return true;
-         }
-      } catch (...) {
-         // A missing permission cannot authorize this transaction.
-      }
+bool key_alone_satisfies(const chain::controller& chain, const chain::permission_level& level,
+                         const fc::crypto::public_key& key) {
+   try {
+      chain.get_authorization_manager().check_authorization(level.actor, level.permission, {key}, {}, {}, true);
+      return true;
+   } catch (const fc::exception&) {
+      // Unsatisfied, or the permission does not exist: either way this key cannot sign for `level`.
+      return false;
    }
-   return false;
+}
+
+bool permission_satisfies_link(const chain::controller& chain, const chain::permission_level& level,
+                               chain::name code, chain::name action) {
+   try {
+      // A transaction's own check, with `level` taken as signed so that only its link can fail.
+      chain.get_authorization_manager().check_authorization({chain::action{{level}, code, action, {}}}, {}, {level});
+      return true;
+   } catch (const fc::exception&) {
+      // Not linked so that `level` may declare it, or the permission does not exist.
+      return false;
+   }
 }
 
 void chain_plugin::accept_transaction(const chain::packed_transaction_ptr& trx, next_function<chain::transaction_trace_ptr> next) {

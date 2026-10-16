@@ -12,7 +12,7 @@ documents what it does, how it works, and how to configure it. The plugin lifecy
 
 | Plugin | Description | Docs |
 |---|---|---|
-| `batch_operator_plugin` | Cranks depot and outpost contracts, ferrying OPP message chains between the WIRE chain and the external blockchains (Ethereum, Solana) on the epoch schedule | [README](plugins/batch_operator_plugin/README.md) |
+| `batch_operator_plugin` | Cranks depot and outpost contracts, ferrying OPP message chains between the WIRE chain and the external blockchains (Ethereum, Solana) on the epoch schedule; can also run an underwriter, which bonds `sysio.synd` envelope requests once the outpost confirms them | [README](plugins/batch_operator_plugin/README.md) |
 | `chain_api_plugin` | Publishes chain_plugin's read and write APIs as the `/v1/chain/*` HTTP endpoints | [README](plugins/chain_api_plugin/README.md) |
 | `chain_plugin` | Owns the controller (block log, chain state, fork database, WASM runtime) and relays its signals onto the appbase channels declared in `chain_interface` | [README](plugins/chain_plugin/README.md) |
 | `cron_plugin` | Provides an in-process cron scheduler that other plugins use to run functions on cron-style schedules | [README](plugins/cron_plugin/README.md) |
