@@ -179,7 +179,7 @@ mid-sequence failure or deadline abandons the tick, and the next one resumes fro
 `latest`. WIRE consensus on inbound is committed forward against this read, so an operator that read at
 `latest` could reach WIRE-side consensus on a slot that a reorg then removes. The decoded result's epoch is
 compared with the requested one and a mismatch returns an empty vector at debug level, since observing the
-preceding epoch is normal until the consensus-reaching delivery overwrites the slot.
+preceding epoch is normal until the `epochIn` that emits this one overwrites the slot.
 
 ### Outpost cranks
 

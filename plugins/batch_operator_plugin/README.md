@@ -22,7 +22,8 @@ Run by every member of the elected group, for every active outpost chain:
 3. The outpost reaches consensus once enough group members have delivered identical bytes
 
 **Inbound (Outposts → WIRE):**
-1. The consensus-reaching delivery emits the outpost's outbound envelope
+1. The outpost emits its outbound envelope once it has dispatched the inbound one (ETH: in the `epochIn`
+   that finishes dispatch, a continuation if it spilled; SOL: in the consensus-reaching `epoch_in`)
 2. Read the latest outbound envelope from Outpost storage
 3. Deliver its raw protobuf bytes to Depot (`sysio.msgch::deliver`)
 4. Depot evaluates consensus across the group's deliveries

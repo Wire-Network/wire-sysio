@@ -95,8 +95,9 @@ public:
     * caller beyond this duration. Solana may chunk one envelope across
     * multiple `epoch_in` transactions; Ethereum sends the whole envelope in
     * one `epochIn` and re-sends it while the outpost reports the epoch tipped
-    * on this relay's digest and unfinished. The consensus-reaching transaction
-    * performs the outpost's outbound emit internally.
+    * on this relay's digest and unfinished. The outpost's outbound emit runs in
+    * whichever of those calls finishes dispatch with gas left for it, so after
+    * a spill it is a continuation, not the consensus-reaching call.
     *
     * @param epoch_index     The current WIRE epoch this envelope belongs to.
     * @param envelope_bytes  Raw protobuf `opp::Envelope` bytes.
@@ -121,7 +122,7 @@ public:
     *
     * Filters by `epoch_index` internally. Ethereum and Solana each expose a
     * single latest-outbound storage slot, so a poll may still observe the
-    * preceding epoch until the consensus-reaching delivery overwrites it.
+    * preceding epoch until the delivery that emits this one overwrites it.
     * Delivering that stale envelope to `sysio.msgch::deliver` trips an
     * `envelope epoch_index mismatch` assertion.
     *
