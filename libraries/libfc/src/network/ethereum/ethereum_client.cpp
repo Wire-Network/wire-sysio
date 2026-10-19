@@ -289,9 +289,8 @@ fc::variant ethereum_client::get_syncing_status() {
  * Constructs a complete EIP-1559 transaction by:
  * - Fetching current gas configuration (base fee, priority fee)
  * - Encoding the contract call data according to the ABI
- * - Sizing the gas limit: with a cap, the cap IS the limit and the estimate
- *   is a pre-flight at that gas; without one, the estimate plus a 20% buffer,
- *   raised to `gas_limit_floor` when the caller funds the call to a floor
+ * - Sizing the gas limit: the cap when one is given, else the estimate plus a
+ *   20% buffer, raised to `gas_limit_floor`
  * - Setting the nonce from the pending transaction count
  *
  * @param to The recipient address (contract address for contract calls)
@@ -300,9 +299,8 @@ fc::variant ethereum_client::get_syncing_status() {
  * @param gas_limit_floor Least gas limit to fund with, or 0 for the buffered estimate
  * @param gas_limit_cap The limit to send with, or 0 for the buffered estimate
  * @return A configured eip1559_tx ready for signing and submission
- * @throws fc::network::json_rpc::json_rpc_exception if any RPC call fails --
- *         including the node refusing a capped pre-flight that cannot succeed
- *         inside the cap
+ * @throws fc::network::json_rpc::json_rpc_exception if any RPC call fails,
+ *         including a capped pre-flight that cannot succeed inside the cap
  * @throws ethereum_transaction_policy_exception if the estimate, the floor or
  *         the cap breaches the client's `max_gas_limit`
  */
@@ -315,9 +313,7 @@ eip1559_tx ethereum_client::create_default_tx(const address_compat_type& to, con
       auto gc = get_gas_config_unlogged();
       auto data = contract_encode_data(contract, params);
 
-      // The floor and the cap are bounded by the same ceiling as the estimate:
-      // a caller asking for more than the policy allows is refused, not
-      // clamped, so an under-funded call is never silently sent.
+      // Refused, not clamped: clamping would silently send an under-funded call.
       const auto require_within_policy = [&](uint64_t limit, std::string_view field) {
          const fc::uint256 wide{limit};
          if (wide > _transaction_policy.max_gas_limit) {
@@ -328,13 +324,9 @@ eip1559_tx ethereum_client::create_default_tx(const address_compat_type& to, con
 
       fc::uint256 gas_limit;
       if (gas_limit_cap != 0) {
-         // A capped call is sent with exactly the cap. The estimate runs under
-         // it as a pre-flight -- the node refuses a call that cannot succeed
-         // inside the cap -- and its VALUE is discarded: what is simulated is
-         // what is sent, so neither the headroom buffer nor the buffered
-         // ceiling check has anything to add. (Buffering a call that uses most
-         // of its cap would only manufacture a policy rejection for a
-         // transaction the cap already carries.)
+         // The estimate is only a pre-flight; its value is discarded. Buffering
+         // a call that uses most of its cap would manufacture a policy
+         // rejection for a transaction the cap already carries.
          require_within_policy(gas_limit_cap, transaction_policy_field::gas_limit_cap);
          (void) estimate_gas(to, contract, data, gc, gas_limit_cap);
          gas_limit = fc::uint256{gas_limit_cap};
@@ -568,9 +560,8 @@ fc::uint256 ethereum_client::estimate_gas(const address_compat_type& to, const a
    (std::string(ethereum_rpc_field::max_fee_per_gas), format_rpc_quantity(gc.max_fee_per_gas))
    ("data", data)
    ("input", data);
-   // A capped estimate is a pre-flight at the budget the transaction will
-   // carry: the node searches only up to `gas` and reports a revert when the
-   // call cannot succeed inside it.
+   // With `gas` set, the node searches only up to it and reports a revert when
+   // the call cannot succeed inside it.
    if (gas_limit_cap != 0) tx(std::string(ethereum_rpc_field::gas), format_rpc_quantity(fc::uint256{gas_limit_cap}));
 
    auto resp = execute_idempotent("eth_estimateGas", fc::variants{tx});

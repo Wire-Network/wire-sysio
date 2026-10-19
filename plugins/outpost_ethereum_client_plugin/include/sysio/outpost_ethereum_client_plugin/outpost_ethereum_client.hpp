@@ -323,8 +323,7 @@ public:
    const std::string&               opp_address()                 const { return _opp_addr; }
    const std::string&               opp_inbound_address()         const { return _opp_inbound_addr; }
    /// This relay's own signer address in `0x`-hex — the identity the outpost
-   /// records deliveries under. Derived once at construction; the continuation
-   /// check compares the digest recorded under it against the settled one.
+   /// records deliveries under. Derived once at construction.
    const std::string&               signer_address_hex()          const { return _signer_address_hex; }
    /// The liq syndication pool the crank drives, `0x`-hex, or empty until the
    /// outpost's `DESYNDICATE_LIQ` handler has been discovered.
@@ -349,17 +348,16 @@ private:
    ///
    /// Pinned to a block number, never `latest`: the block is the head read at
    /// the start of the tick, or the block a call this tick confirmed in, so a
-   /// backend serving `latest` from behind that block cannot hand back the
-   /// state from before the call and have the relay pay for it twice. A
-   /// backend that does not know the block yet is retried for a bounded time.
-   /// Not `finalized`, where `read_inbound_envelope` reads at `finalized`: the
-   /// cursor is this outpost's own bookkeeping about work this relay is doing
-   /// right now. A reorg under it costs a paid re-delivery before the tip or a
-   /// refused continuation after it, and the dearer direction — a send not made
-   /// because the read was behind — is what the per-call progress invariant and
-   /// the next tick cover; finality lags head by roughly 64 blocks, and a
-   /// continuation gated on it would wait that out between every stretch of
-   /// dispatch.
+   /// backend lagging behind it cannot hand back the pre-call state and have
+   /// the relay pay for the call twice. A backend that does not know the block
+   /// yet is retried for a bounded time.
+   ///
+   /// Not `finalized` either (unlike `read_inbound_envelope`): finality lags
+   /// head by roughly 64 blocks, and a continuation gated on it would wait that
+   /// out between every stretch of dispatch. A reorg under the read costs a
+   /// paid re-delivery before the tip or a refused continuation after it; a
+   /// send missed because the read was behind is covered by the per-call
+   /// progress invariant and the next tick.
    ///
    /// @throws fc::exception on transport failure, deadline expiry, or an
    ///         unparsable response.

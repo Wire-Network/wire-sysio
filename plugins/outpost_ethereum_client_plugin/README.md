@@ -63,10 +63,10 @@ A client that delivers OPP envelopes (one handed an `OPPInbound` address by `cre
 also fund a delivery: its `max_gas_limit`, bounded by EIP-7825's 16 777 216 per-transaction cap, has to
 reach `DELIVERY_MINIMUM_GAS_CEILING` (9 932 160 gas — what an envelope at the 32 768-byte platform cap
 costs to deliver and tip, dispatch one attestation at its allowance, and emit). The relay refuses to be
-built on a smaller ceiling, since the largest envelope the platform allows could never complete on it. The
-total-cost term binds at the fee a call is sent at: when `max_total_native_cost_wei / max_fee_per_gas_wei`
-is below that minimum the relay starts with a warning, and deliveries at fees near the policy maximum spill
-into more continuations than their budgets size for.
+built on a smaller ceiling, since a full-cap envelope could never complete on it. The total-cost term binds
+at the fee a call is sent at: when `max_total_native_cost_wei / max_fee_per_gas_wei` is below that minimum
+the relay starts with a warning, and deliveries at fees near the policy maximum spill into more
+continuations than their budgets size for.
 
 What the signer needs follows from the same arithmetic. Every `epochIn` is sent with its budget as the gas
 limit — a full-cap first delivery at the EIP-7825 cap, less for a continuation — and a node reserves
@@ -130,11 +130,10 @@ bytes; every continuation re-supplies them.
 **Reads are pinned to one block.** Every decision is taken from `nextEpochIndex()`, `dispatchSpill(epoch)`,
 `epochDeliveries(epoch, self)` and `pendingEpochHash()` read at ONE block number — the head when the tick
 starts, then the block each confirmed call landed in (from its receipt) — never at `latest`, which a
-backend behind the block that just confirmed could serve from before the call. A backend that does not
-know the block yet is retried for a bounded time. The reads are not at `finalized` either: the cursor is
-the outpost's own bookkeeping about work this relay is doing now, a reorg costs at most a re-sent call the
-contract treats as an idempotent no-op, and a continuation gated on finality would wait ~64 blocks between
-every stretch of dispatch.
+backend lagging the block that just confirmed could serve from before the call. A backend that does not
+know the block yet is retried for a bounded time. The reads are not at `finalized` either. The cursor is
+the outpost's bookkeeping for work in progress, a reorg under it costs a paid re-delivery before the tip or a
+refused continuation after it, and gating on finality would wait ~64 blocks between continuations.
 
 From those reads the relay decides, per `outpost_ethereum_client_detail::decide_delivery`:
 
@@ -154,9 +153,9 @@ tick that fell short, never above the ceiling. The ceiling (`delivery_gas_ceilin
 `max_gas_limit` bounded by EIP-7825's cap AND by what `max_total_native_cost` pays for at the current fee,
 so a budget it admits is never refused by the policy at signing. The node's estimate is deliberately not
 the budget: `epochIn` stops on a `gasleft()` watchdog and records where it stopped, so `eth_estimateGas`
-converges on the least gas at which the call succeeds — the tip plus one attestation. Instead the budget is
-both the pre-flight estimate's gas and the limit the transaction is sent with, so a call that cannot run
-inside it is refused before anything is signed, and one that can is sent with exactly it.
+converges on the least gas at which the call succeeds — the tip plus one attestation. The budget is instead
+both the pre-flight estimate's gas and the transaction's limit, so a call that cannot run inside it is
+refused before anything is signed.
 
 **Every call paid for must move the cursor.** After each confirmed call the relay reads the outpost again at
 the receipt's block; a call that advanced nothing (no delivery recorded, no tip, no dispatch progress, no
@@ -331,9 +330,9 @@ delivery path — one call, tip-and-spill continued in the same tick, resume fro
 and never-delivered digests, consensus retry gated on the outpost's own majority view, pinned-block reads,
 escalation after a call that advanced nothing and the stall report at the ceiling, revert classification,
 outpost behind, the per-tick bound, epoch advanced, deadline abandonment, and the empty and over-cap
-rejections — and the outpost crank: idle without
-the pool ABI or a registered handler, binding the registered pool and re-binding on a change, the pool's own
-three refusals, unrecognised reverts and protocol errors, and deadline abandonment.
+rejections — and the outpost crank: idle without the pool ABI or a registered handler, binding the
+registered pool and re-binding on a change, the pool's own three refusals, unrecognised reverts and protocol
+errors, and deadline abandonment.
 `outpost_ethereum_transaction_policy_tests` covers the expenditure-policy boundary: that a rejection happens
 before signing or broadcasting, that exact caps pass through once, that two clients enforce their own
 policies, that file and CLI configuration produce the expected policies, and that a partial client map is

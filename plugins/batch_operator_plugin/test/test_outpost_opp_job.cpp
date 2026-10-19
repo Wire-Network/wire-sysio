@@ -287,10 +287,8 @@ BOOST_AUTO_TEST_CASE(run_outbound_swallows_exceptions_and_does_not_mark_epoch) {
    BOOST_REQUIRE_EQUAL(depot.emitted_events.size(), 2u);
 }
 
-/// A delivery the relay could not finish with — the outpost behind, a
-/// continuation bound reached, a stalled call at the gas ceiling — is not a
-/// failure and not a handled epoch: the job neither cranks nor marks it, and
-/// the next tick delivers again.
+/// An incomplete delivery is neither a failure nor a handled epoch: the job
+/// neither cranks nor marks it, and the next tick delivers again.
 BOOST_AUTO_TEST_CASE(run_outbound_retries_an_incomplete_delivery_next_tick_without_cranking) {
    auto client = make_client(CHAIN_KIND_EVM, 0, 31337);
    mock_depot_ops depot;

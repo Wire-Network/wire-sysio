@@ -556,10 +556,9 @@ fc::network::json_rpc::json_rpc_error unknown_block_refusal() {
 /// `ethereum_client::get_contract` caches one typed wrapper per address, so a
 /// wrapper materialized here is the SAME object the client resolves in its
 /// constructor — replacing its `std::function` members intercepts every RPC at
-/// the typed callable boundary, exactly as the `getLatestOutboundEnvelope`
-/// coverage above does. The stubbed `epochIn` confirms in a fresh block each
-/// time and answers with a receipt the case scripts; every view records the
-/// block it was pinned to.
+/// the typed callable boundary. The stubbed `epochIn` confirms in a fresh block
+/// each time and answers with a receipt the case scripts; every view records
+/// the block it was pinned to.
 struct whole_envelope_delivery_fixture {
    ~whole_envelope_delivery_fixture() {
       outpost.reset();
@@ -729,9 +728,7 @@ relay_test_stack create_relay_test_stack(ethereum_transaction_policy transaction
    return stack;
 }
 
-/// Stand up a `whole_envelope_delivery_fixture`: a real `outpost_ethereum_client`
-/// whose OPPInbound wrapper has every typed callable replaced by a recording
-/// stub. The caller owns the returned fixture; the stubs capture it by
+/// Stand up a `whole_envelope_delivery_fixture`. The stubs capture it by
 /// reference, so it must not be moved after this returns.
 std::unique_ptr<whole_envelope_delivery_fixture> create_whole_envelope_delivery_fixture() {
    auto fixture = std::make_unique<whole_envelope_delivery_fixture>();
@@ -1185,7 +1182,7 @@ BOOST_AUTO_TEST_CASE(opp_inbound_contract_client_construction) try {
 
    // Every ABI entry the typed `opp_inbound_contract_client` binds at
    // construction: the whole-envelope write and the five views the
-   // deliver-or-continue decision reads. The staged-chunk surface is gone.
+   // deliver-or-continue decision reads — and none of the retired staged-chunk surface.
    bool has_epoch_in = false, has_next_epoch = false, has_spill = false;
    bool has_deliveries = false, has_pending_hash = false, has_pending_consensus = false;
    bool has_discard = false, has_chunk_state = false;
@@ -1231,8 +1228,7 @@ BOOST_AUTO_TEST_CASE(epoch_in_abi_encoding_whole_envelope) try {
       std::vector<fc::variant>{fc::variant(uint64_t{test_wire_epoch}), fc::variant(test_envelope_hex)});
    BOOST_CHECK(!encoded.empty());
 
-   // keccak256("epochIn(uint32,bytes)")[0..4) — neither retired form's
-   // selector survives.
+   // Neither retired form's selector survives.
    BOOST_CHECK_EQUAL(encoded.substr(0, evm_function_selector_hex_chars),
                      std::string(epoch_in_selector));
    BOOST_CHECK(encoded.substr(0, evm_function_selector_hex_chars) !=
@@ -2206,11 +2202,9 @@ BOOST_AUTO_TEST_CASE(delivery_rereads_at_the_head_after_a_stale_refusal) try {
 } FC_LOG_AND_RETHROW();
 
 /// A progress read refused by a backend that has not seen the pinned block yet
-/// is retried AT THAT BLOCK, and the tick decides from the read that succeeds.
-/// The refusal is never mistaken for state: it is not "not tipped" (which would
-/// send a duplicate delivery), and the retry never falls back to a fresh head
-/// read. Covered both at the tick-start head and — the case the receipt pinning
-/// exists for — at the block the relay's own call just confirmed in.
+/// is retried AT THAT BLOCK, never taken as "not tipped" (which would send a
+/// duplicate delivery) and never re-read at a fresh head. Covered at the
+/// tick-start head and at the block the relay's own call just confirmed in.
 BOOST_AUTO_TEST_CASE(delivery_retries_a_progress_read_the_backend_cannot_serve_yet) try {
    const std::vector<std::string> expected_blocks{pinned_block_hex(test_head_block),
                                                   pinned_block_hex(test_head_block + 1)};
@@ -2362,12 +2356,10 @@ BOOST_AUTO_TEST_CASE(delivery_propagates_a_transport_failure_on_a_continuation) 
    BOOST_CHECK_EQUAL(fixture->attempted_budgets.size(), 2u);
 } FC_LOG_AND_RETHROW();
 
-/// Mid-sequence deadline expiry — the scenario the cursor exists for.
-///
-/// The delivery burns more wall clock than the whole budget, so the
-/// continuation's pre-flight `throw_if_past_deadline` fires: the tick abandons
-/// after the delivery landed rather than rolling anything back. The next tick
-/// reads the cursor and continues from it instead of re-delivering.
+/// Mid-sequence deadline expiry, the scenario the cursor exists for: the
+/// delivery outlasts the whole budget, so the continuation's pre-flight
+/// `throw_if_past_deadline` abandons the tick with nothing rolled back, and the
+/// next tick continues from the cursor instead of re-delivering.
 BOOST_AUTO_TEST_CASE(delivery_abandons_on_deadline_then_continues_next_tick) try {
    auto fixture  = create_whole_envelope_delivery_fixture();
    auto envelope = make_envelope(sysio::OPP_MAX_ENVELOPE_BYTES);
@@ -2384,7 +2376,6 @@ BOOST_AUTO_TEST_CASE(delivery_abandons_on_deadline_then_continues_next_tick) try
                         test_wire_epoch, envelope, fc::milliseconds(delivery_budget_ms)),
                      fc::timeout_exception);
 
-   // Exactly the delivery landed, carrying the whole envelope.
    check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 1);
 
    // Next tick: the outpost reports the epoch tipped on our digest with six

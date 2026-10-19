@@ -528,10 +528,10 @@ BOOST_AUTO_TEST_CASE(gas_limit_floor_raises_an_under_estimate_and_is_policy_boun
    BOOST_CHECK_EQUAL(client->broadcast_count, 0u);
 }
 
-/// A cap IS the limit: the transaction is sent with exactly it, the estimate
-/// runs under it as a pre-flight only (its value neither raises nor lowers
-/// the limit, and the buffered-estimate ceiling check does not apply), it
-/// cannot sit below the floor, and it is policy-bounded exactly like the floor.
+/// A cap IS the limit: the transaction is sent with exactly it and the estimate
+/// is only a pre-flight under it (its value is not an input, and the
+/// buffered-estimate ceiling check does not apply). A cap below the floor or
+/// above the policy ceiling is refused.
 BOOST_AUTO_TEST_CASE(gas_limit_cap_is_the_limit_and_runs_the_estimate_under_it) {
    std::atomic<size_t> sign_count = 0;
    const auto provider = make_recording_signer(sign_count);
@@ -559,9 +559,8 @@ BOOST_AUTO_TEST_CASE(gas_limit_cap_is_the_limit_and_runs_the_estimate_under_it) 
    BOOST_CHECK_EQUAL(
       client->create_default_tx(std::string(contract_address), no_argument_function("submit"), {}, 1500, 1500).gas_limit,
       1500);
-   // An estimate whose buffer would breach the policy is a rejection without a
-   // cap, and irrelevant with one: 1000 buffers to 1200 > 1000, but a capped
-   // call that fits in 1000 is sent with 1000.
+   // A buffered estimate over the policy is a rejection without a cap and
+   // irrelevant with one: 1000 buffers to 1200 > 1000, yet a 1000 cap is sent.
    client->estimate_response = "0x3e8";
    policy.max_gas_limit      = 1000;
    auto tight_client = std::make_shared<recording_ethereum_client>(provider, policy);
@@ -585,9 +584,9 @@ BOOST_AUTO_TEST_CASE(gas_limit_cap_is_the_limit_and_runs_the_estimate_under_it) 
    BOOST_CHECK_EQUAL(tight_client->broadcast_count, 0u);
 }
 
-/// The confirmation wait hands back the receipt itself — block number and
-/// logs — so a caller can pin its next reads to the block that holds the
-/// effect; a reverted receipt is an error, and the depth wait still applies.
+/// The confirmation wait returns the receipt (block number and logs) so a
+/// caller can pin its next reads to the block holding the effect; a reverted
+/// receipt is an error, and the depth wait still applies.
 BOOST_AUTO_TEST_CASE(wait_for_receipt_returns_the_confirmed_receipt) {
    std::atomic<size_t> sign_count = 0;
    const auto provider = make_recording_signer(sign_count);
@@ -626,8 +625,8 @@ BOOST_AUTO_TEST_CASE(delivery_confirm_options_carry_the_budget_and_the_receipt_w
    BOOST_CHECK(options.retry.total_timeout > ethereum_confirm_option_defaults.retry.total_timeout);
 }
 
-/// The wrapper stops waiting for a receipt at the deadline it is given, not
-/// at a budget of its own: a delivery's deadline is the only one.
+/// The wrapper stops waiting for a receipt at the given deadline, not at a
+/// budget of its own.
 BOOST_AUTO_TEST_CASE(epoch_in_waits_for_its_receipt_until_the_given_deadline) {
    std::atomic<size_t> sign_count = 0;
    const auto provider = make_recording_signer(sign_count);
@@ -672,11 +671,9 @@ BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
        no_argument_function("pendingEpochHash"), bytes32_argument_function("pendingConsensusForDigest"),
        uint16_argument_function("attestationHandlers")},
    };
-   // OPPInbound's one write wrapper — the whole-envelope delivery — must be
-   // rejected by the policy before signing. A budget above the policy ceiling
-   // (999 here) is refused outright; one at the ceiling is sent with exactly
-   // it (the estimate of 834 is a pre-flight under the cap, not an input to
-   // the limit) and comes back as the confirmed receipt.
+   // OPPInbound's one write wrapper: a budget above the policy ceiling (999
+   // here) is refused before signing; one at the ceiling is sent with exactly
+   // it and returns the confirmed receipt.
    uint32_t    epoch_index = 1;
    std::string envelope = "01";
    const auto  deadline = fc::time_point::now() + fc::seconds(receipt_deadline_seconds);

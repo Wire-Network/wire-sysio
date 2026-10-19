@@ -152,11 +152,8 @@ struct delivery_gas_request {
  * whatever the call uses, so a small envelope funded to the cap is refused for
  * balance at exactly the fee levels where delivery matters most.
  *
- * The budget is the fixed and per-byte cost, an allowance per attestation
- * still to dispatch, and the emit; doubled per spill already met this tick;
- * never above the ceiling. The contract spills what does not fit and the
- * next call carries on, so an under-estimate costs a continuation, never the
- * epoch. An envelope that cannot be read is funded to the ceiling.
+ * The contract spills what does not fit and the next call carries on, so an
+ * under-estimate costs a continuation, never the epoch.
  *
  * @param request What the call has to carry.
  * @return The budget, in gas.
@@ -172,12 +169,8 @@ inline uint64_t delivery_gas_budget(const delivery_gas_request& request) {
 
 /**
  * @brief Confirmation options for one `epochIn`: funded to exactly
- *        `gas_budget`, its receipt awaited for `receipt_wait`.
- *
- * The cap is the limit the transaction is sent with and the gas its
- * pre-flight estimate runs under: a call the budget cannot carry is refused
- * by the node before it is signed, and a call that can is sent with the
- * budget, never with a buffered estimate.
+ *        `gas_budget` (floor and cap both), its receipt awaited for
+ *        `receipt_wait`.
  *
  * The receipt wait replaces the library's default retry budget, which would
  * otherwise cap every wait at its own 15 s however long the delivery was
@@ -250,18 +243,15 @@ inline constexpr auto attestation_handlers         = "attestationHandlers";
 /// policy as `opp_contract_client` for the write path.
 struct opp_inbound_contract_client : ethereum_contract_client {
    /// `epochIn(uint32 epochIndex, bytes envelopeData)` — the WHOLE envelope in
-   /// ONE call, addressed to its epoch. The call that reaches consensus
-   /// dispatches as many attestations as its gas allows and records where it
-   /// stopped; a continuation is the SAME call with the same arguments, which
-   /// the contract resumes from its cursor. Funded to exactly `gas_budget`
-   /// (see `delivery_gas_budget`) and its receipt awaited until `deadline`,
-   /// which is why this is not a plain `ethereum_contract_tx_fn`: that binds
-   /// its options once at construction, and both differ per call. Returns the
-   /// confirmed receipt rather
-   /// than the hash alone, because the relay's next move is decided from the
-   /// block the call landed in. `envelopeData` rides as a hex-encoded string
-   /// because the libfc ABI encoder takes `dt::bytes` that way (see
-   /// `ethereum_abi::encode_dynamic_data`).
+   /// ONE call. The call that reaches consensus dispatches as many attestations
+   /// as its gas allows and records where it stopped; a continuation is the
+   /// SAME call with the same arguments, resumed from the contract's cursor.
+   /// Not a plain `ethereum_contract_tx_fn`, which binds its options once at
+   /// construction: the gas budget (see `delivery_gas_budget`) and `deadline`
+   /// differ per call. Returns the confirmed receipt because the relay's next
+   /// move is decided from the block the call landed in. `envelopeData` rides
+   /// as a hex-encoded string because the libfc ABI encoder takes `dt::bytes`
+   /// that way (see `ethereum_abi::encode_dynamic_data`).
    ///
    /// The ABI arguments are bound as non-const lvalue references, so callers
    /// must materialize named locals for both.

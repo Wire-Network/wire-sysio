@@ -229,8 +229,8 @@ std::string normalized_hex(std::string_view value) {
    return hex;
 }
 
-/// A 32-byte word as the decoder renders it, normalised for comparison:
-/// lower-case hex with no `0x` prefix. Empty when the value is not a string.
+/// A 32-byte word as the decoder renders it, normalised as by `normalized_hex`.
+/// Empty when the value is not a string.
 std::string normalized_word(const fc::variant& value) {
    if (!value.is_string()) return {};
    return normalized_hex(value.as_string());
@@ -502,8 +502,7 @@ std::optional<realize_yield_refusal> classify_realize_yield_revert(std::string_v
    if (data.size() < EVM_SELECTOR_HEX_CHARS) return std::nullopt;
    const auto selector       = data.substr(0, EVM_SELECTOR_HEX_CHARS);
    const auto argument_chars = data.size() - EVM_SELECTOR_HEX_CHARS;
-   // Exact shape, as for the `epochIn` refusals: an error with other arguments hashes
-   // differently, and a payload that does not fit the error is not that error.
+   // Exact shape, as for the `epochIn` refusals.
    const auto is = [&](const char* signature, size_t words) {
       return argument_chars == words * EVM_ABI_WORD_HEX_CHARS && same_hex(selector, selector_hex(signature));
    };
@@ -573,13 +572,10 @@ outpost_ethereum_client::outpost_ethereum_client(
       _opp_inbound_client =
          _entry->client->get_contract<opp_inbound_contract_client>(_opp_inbound_addr, _abis);
 
-      // A delivery is funded to what it has to carry, up to the policy's
-      // ceiling. A ceiling under what the largest envelope the platform
-      // allows needs is a configuration that cannot deliver, and it is
-      // refused here rather than discovered one stuck epoch at a time. The
-      // total-cost term is a warning, not a refusal: it binds at the fee a
-      // call is sent at, and only the policy's own maximum is known here; an
-      // unbounded total cost (the maximum policy) has nothing to warn about.
+      // A ceiling below what a full-cap envelope needs cannot deliver, so it
+      // is refused here rather than discovered one stuck epoch at a time.
+      // The total-cost term only warns: it binds at the fee a call is sent
+      // at, and only the policy's maximum fee is known here.
       const auto&    policy  = _entry->client->transaction_policy();
       const uint64_t ceiling = delivery_gas_ceiling(policy);
       SYS_ASSERT(ceiling >= DELIVERY_MINIMUM_GAS_CEILING, chain::plugin_config_exception,
@@ -600,10 +596,9 @@ outpost_ethereum_client::outpost_ethereum_client(
       }
    }
 
-   // OPPInbound records every delivery under the delivering signer, and a
-   // continuation is admitted only from a signer whose recorded digest is the
-   // settled one, so the continuation check needs this relay's own address.
-   // Derive it once here rather than per tick.
+   // OPPInbound keys recorded deliveries by signer, and a continuation is
+   // admitted only from a signer whose recorded digest is the settled one.
+   // Derive the address once here rather than per tick.
    _signer_address_hex = fc::to_hex(_entry->client->get_signer_address(), /*add_prefix=*/true);
 }
 
@@ -700,17 +695,14 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
    // spills across continuations of this same call. The envelope is
    // re-supplied on every continuation — the outpost never stores its bytes.
    const std::string envelope_hex  = fc::to_hex(envelope_bytes.data(), static_cast<uint32_t>(total));
-   // The digest the outpost records for this delivery and settles consensus
-   // on: a continuation is only valid with the bytes that hash to the settled
-   // digest, which the relay checks before paying to find out.
+   // The digest the outpost records for this delivery and settles consensus on.
    const std::string local_digest = detail::envelope_digest_word(envelope_bytes);
 
    // Each call is funded to what it has left to carry (`delivery_gas_budget`),
    // never to a fixed figure: the attestations the outpost's cursor says are
-   // still to dispatch, doubled for every call this tick that fell short. An
-   // envelope the relay cannot read is funded to the ceiling. The ceiling is
-   // what the policy allows AT THE CURRENT FEE, so a budget it admits is a
-   // budget the policy's total-cost term will not refuse at signing.
+   // still to dispatch, doubled for every call this tick that fell short. The
+   // ceiling is what the policy allows AT THE CURRENT FEE, so a budget it
+   // admits is a budget the policy's total-cost term will not refuse at signing.
    const auto     attestation_count = detail::count_envelope_attestations(envelope_bytes);
    const auto     gas_config        = _entry->client->get_gas_config();
    const uint64_t gas_ceiling =
@@ -728,9 +720,8 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
    fc::uint256 pinned_block = _entry->client->get_block_number();
 
    // A call that cannot be sent at its budget, or that was sent and moved
-   // nothing, is reported as a stalled epoch: once at error level for each
-   // place the cursor stalls, then at debug until the cursor moves. The tick
-   // ends in `outpost_delivery_incomplete_exception` so the job retries it.
+   // nothing, is a stalled epoch: logged at error once per stall position,
+   // then at debug until the cursor moves. The throw makes the job retry.
    const auto report_stall = [&](const detail::dispatch_spill& spill, const std::string& reason) {
       const std::pair<uint32_t, uint16_t> where{epoch_index, spill.dispatched};
       if (_reported_stall != where) {
@@ -806,9 +797,7 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
 
       case detail::delivery_action::wait_for_deliverer:
          if (settlement == detail::delivery_settlement::divergent) {
-            // This relay's envelope disagreed with the majority's: worth a
-            // warning with both digests, since it means the depot handed this
-            // relay different bytes than its peers.
+            // The depot handed this relay different bytes than its peers.
             wlog("outpost_ethereum_client[{}]: epoch={} tipped on digest {} but this relay delivered {}; its "
                  "deliverers carry the continuation (dispatched={} complete={})",
                  to_string(), epoch_index, progress.settled_digest, progress.own_digest, progress.spill.dispatched,
@@ -921,8 +910,7 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
          receipt = _opp_inbound_client->epoch_in(epoch_arg, payload_hex, gas_budget, deadline_abs);
       } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
          // The node refused the call before anything was signed: the
-         // pre-flight estimate runs under the budget. Which refusal decides
-         // what the relay does about it.
+         // pre-flight estimate runs under the budget.
          const auto revert = detail::classify_epoch_in_revert(refusal.code, revert_hex(refusal));
          if (!revert) throw;
          switch (*revert) {

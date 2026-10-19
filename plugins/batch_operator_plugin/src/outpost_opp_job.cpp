@@ -119,15 +119,14 @@ void outpost_opp_job::run_outbound() {
    } FC_LOG_AND_DROP("outpost_opp_job[{}]: emit_debug_envelope threw", _client->to_string());
 
    try {
-      // An EMPTY tx id is a defined outcome, not a failure: the relay found
-      // nothing to send — the outpost had already finalized the epoch, or
-      // (Ethereum) it tipped on another relay's digest, or this relay's
-      // delivery is recorded and waits on the rest of the group. The epoch is
-      // correctly marked handled below; the relay's own ilog is the truthful
-      // record of what happened. An epoch the relay could NOT finish with —
-      // the outpost behind, a continuation bound reached, a call at the gas
-      // ceiling that advanced nothing — arrives as
-      // `outpost_delivery_incomplete_exception` and is retried next tick.
+      // An EMPTY tx id is not a failure: the relay had nothing to send. The
+      // outpost already finalized the epoch, or on Ethereum it tipped on
+      // another relay's digest or this relay's delivery is recorded and waits
+      // on the rest of the group. The epoch is marked handled below; the relay's own
+      // ilog records which case. An epoch the relay could NOT finish (outpost
+      // behind, continuation bound reached, a call at the gas ceiling that
+      // advanced nothing) arrives as `outpost_delivery_incomplete_exception`
+      // and is retried next tick.
       auto tx_id = _client->deliver_outbound_envelope(epoch, pending->raw_envelope, _outpost_deadline);
       ilog("outpost_opp_job[{}]: {} outbound envelope ({} bytes) tx={}",
            _client->to_string(),
@@ -142,8 +141,8 @@ void outpost_opp_job::run_outbound() {
          _last_outbound_epoch = epoch;
       }
    } catch (const chain::outpost_delivery_incomplete_exception& e) {
-      // Expected while an epoch spans ticks: not a failure, and not marked
-      // handled, so the next tick resumes it from the outpost's cursor.
+      // Expected while an epoch spans ticks; not marked handled, so the next
+      // tick resumes it from the outpost's cursor.
       ilog("outpost_opp_job[{}]: outbound delivery for epoch {} continues next tick: {}",
            _client->to_string(), epoch, e.top_message());
    } catch (const fc::network::json_rpc::json_rpc_error& e) {
