@@ -76,6 +76,7 @@ std::vector<char> encode_envelope(uint32_t epoch_index, const std::string& tag) 
 
    auto* msg     = env.add_messages();
    auto* payload = msg->mutable_payload();
+   payload->set_version(1); // Dispute candidates must pass the inbound version gate.
    auto* att     = payload->add_attestations();
    att->set_type(AttestationType::ATTESTATION_TYPE_UNSPECIFIED);  // benign: dispatch is a no-op
    att->set_data(tag);

@@ -64,6 +64,11 @@ constexpr name     ram_payer       = "sysio"_n;
 /// always WIRE.
 constexpr uint32_t WIRE_CHAIN_ID  = 1;
 
+/// The payload format emitted and accepted by this release; zero is not an implicit V1.
+constexpr uint32_t SUPPORTED_PAYLOAD_VERSION = 1;
+/// Admission failure distinct from protobuf decoding, header validation, and consensus failures.
+constexpr auto UNSUPPORTED_PAYLOAD_VERSION = "unsupported OPP MessagePayload version";
+
 // `operator""_s` is declared at global scope by <sysio/slug_name.hpp>.
 
 /// Codename of the Ethereum outpost — the sole source of node-owner NFT (ERC1155) deposits, which
@@ -694,6 +699,68 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
    return carried_syndication_value;
 }
 
+/// Read a protobuf uint64 without crossing a submessage boundary or discarding high bits.
+[[nodiscard]] bool bounded_varint(std::span<const char>& data, uint64_t& value) {
+   value = 0;
+   for (unsigned shift = 0; shift < 70; shift += 7) {
+      if (data.empty()) return false;
+      const auto part = static_cast<uint8_t>(data.front());
+      data = data.subspan(1);
+      if (shift == 63 && part > 1) return false;
+      value |= uint64_t(part & 0x7f) << shift;
+      if (!(part & 0x80)) return true;
+   }
+   return false;
+}
+
+/// Validate raw version width before zpp narrows a protobuf varint to uint32. Walk only
+/// Envelope.messages(40) -> Message.payload(2) -> MessagePayload.version(1); opaque
+/// header/attestation bodies keep their existing decoders. Recursion is limited to three levels.
+[[nodiscard]] bool payload_version_encoding_valid(std::span<const char> data, unsigned level = 0) {
+   while (!data.empty()) {
+      uint64_t tag;
+      if (!bounded_varint(data, tag)) return false;
+      const auto field = tag >> 3;
+      const auto wire_type = tag & 7;
+      if (field == 0 || field > 0x1fffffff) return false;
+      const bool nested = (level == 0 && field == 40) || (level == 1 && field == 2);
+      const bool version = level == 2 && field == 1;
+      if ((nested && wire_type != 2) || (version && wire_type != 0)) return false;
+      uint64_t value;
+      if (wire_type == 0) {
+         if (!bounded_varint(data, value) || (version && value > UINT32_MAX)) return false;
+      } else if (wire_type == 2) {
+         if (!bounded_varint(data, value) || value > data.size()) return false;
+         if (nested && !payload_version_encoding_valid(data.first(value), level + 1)) return false;
+         data = data.subspan(value);
+      } else if (wire_type == 1 || wire_type == 5) {
+         const size_t length = wire_type == 1 ? 8 : 4;
+         if (length > data.size()) return false;
+         data = data.subspan(length);
+      } else {
+         return false;
+      }
+   }
+   return true;
+}
+
+/// Check every payload before any delivery or attestation is recorded. Empty envelopes have no
+/// payload version to validate; a message with an omitted payload/version decodes to zero and fails.
+[[nodiscard]] bool payload_versions_supported(const opp::Envelope& envelope,
+                                               uint64_t chain_code, uint32_t epoch_index) {
+   for (size_t i = 0; i < envelope.messages.size(); ++i) {
+      const auto version = static_cast<uint32_t>(envelope.messages[i].payload.version);
+      if (version != SUPPORTED_PAYLOAD_VERSION) {
+         sysio::print_f("DROP unsupported OPP MessagePayload version: chain_code=% epoch=% "
+                        "message=% version=% supported=%\n",
+                        static_cast<unsigned long long>(chain_code), epoch_index,
+                        static_cast<unsigned long long>(i), version, SUPPORTED_PAYLOAD_VERSION);
+         return false;
+      }
+   }
+   return true;
+}
+
 /// Validate an inbound envelope against the per-outpost chains for `chain_code` at `epoch_index`:
 /// the envelope-level chain (`previous_envelope_hash` continues `outpcons.envelope_digest`) and the
 /// per-message semantic headers + inbound message chain (`semantic_headers_ok`). Pure read + compute
@@ -717,6 +784,7 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
                                           uint64_t chain_code, uint32_t epoch_index,
                                           checksum256& out_envelope_digest,
                                           checksum256& out_new_message_tip) {
+   if (!payload_versions_supported(envelope, chain_code, epoch_index)) return false;
    out_envelope_digest = opp::canonical::epoch_digest(envelope);
    checksum256 inbound_message_tip{};
    {
@@ -795,6 +863,7 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
 
    // Decode the protobuf Envelope (raw protobuf, no size prefix).
    opp::Envelope envelope;
+   check(payload_version_encoding_valid(raw), "failed to decode inbound OPP Envelope");
    auto in = zpp::bits::in{std::span{raw.data(), raw.size()}, zpp::bits::no_size{}};
    auto decode_result = in(envelope);
    check(decode_result == zpp::bits::errc{}, "failed to decode inbound OPP Envelope");
@@ -1073,9 +1142,11 @@ void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> d
    uint32_t epoch = epoch::current_epoch_index();
    opp::Envelope env_check;
    {
+      check(payload_version_encoding_valid(data), "failed to decode inbound envelope");
       auto in = zpp::bits::in{std::span{data.data(), data.size()}, zpp::bits::no_size{}};
       auto result = in(env_check);
       check(result == zpp::bits::errc{}, "failed to decode inbound envelope");
+      check(payload_versions_supported(env_check, chain_code, epoch), UNSUPPORTED_PAYLOAD_VERSION);
       uint32_t env_epoch = static_cast<uint32_t>(env_check.epoch_index);
       // Lambda overload: the formatted message (triple std::to_string concat) is built only on the
       // failure path, not on every successful delivery.
@@ -1640,7 +1711,7 @@ void msgch::buildenv(uint64_t chain_code) {
    checksum256 message_id{};
    auto build_packed = [&](const std::vector<opp::AttestationEntry>& src) {
       opp::MessagePayload payload;
-      payload.version = zpp::bits::vuint32_t{1};
+      payload.version = zpp::bits::vuint32_t{SUPPORTED_PAYLOAD_VERSION};
       payload.attestations = src;
 
       const std::vector<char> payload_bytes = opp::canonical::encode(payload);
