@@ -918,7 +918,7 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
       std::string      payload_hex = envelope_hex;
       epoch_in_receipt receipt;
       try {
-         receipt = _opp_inbound_client->epoch_in(epoch_arg, payload_hex, gas_budget);
+         receipt = _opp_inbound_client->epoch_in(epoch_arg, payload_hex, gas_budget, deadline_abs);
       } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
          // The node refused the call before anything was signed: the
          // pre-flight estimate runs under the budget. Which refusal decides
@@ -937,7 +937,7 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
                  "ceiling ({} gas)",
                  to_string(), epoch_index, gas_budget, magic_enum::enum_name(*revert), gas_ceiling);
             gas_budget = gas_ceiling;
-            receipt    = _opp_inbound_client->epoch_in(epoch_arg, payload_hex, gas_budget);
+            receipt    = _opp_inbound_client->epoch_in(epoch_arg, payload_hex, gas_budget, deadline_abs);
             break;
 
          case detail::epoch_in_revert::non_sequential_epoch:

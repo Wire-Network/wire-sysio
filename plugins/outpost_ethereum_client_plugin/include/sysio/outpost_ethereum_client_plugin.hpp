@@ -171,21 +171,28 @@ inline uint64_t delivery_gas_budget(const delivery_gas_request& request) {
 }
 
 /**
- * @brief Confirmation options for one `epochIn`: the defaults, funded to
- *        exactly `gas_budget`.
+ * @brief Confirmation options for one `epochIn`: funded to exactly
+ *        `gas_budget`, its receipt awaited for `receipt_wait`.
  *
  * The cap is the limit the transaction is sent with and the gas its
  * pre-flight estimate runs under: a call the budget cannot carry is refused
  * by the node before it is signed, and a call that can is sent with the
  * budget, never with a buffered estimate.
  *
- * @param gas_budget The budget from `delivery_gas_budget`.
+ * The receipt wait replaces the library's default retry budget, which would
+ * otherwise cap every wait at its own 15 s however long the delivery was
+ * given: on a chain whose blocks come slower than that, raising
+ * `batch-delivery-timeout-ms` would not let a single wait outlast one block.
+ *
+ * @param gas_budget   The budget from `delivery_gas_budget`.
+ * @param receipt_wait How long to wait for the receipt.
  * @return The options the call is sent with.
  */
-inline ethereum_confirm_options delivery_confirm_options(uint64_t gas_budget) {
+inline ethereum_confirm_options delivery_confirm_options(uint64_t gas_budget, fc::microseconds receipt_wait) {
    ethereum_confirm_options options = ethereum_confirm_option_defaults;
-   options.gas_limit_floor = gas_budget;
-   options.gas_limit_cap   = gas_budget;
+   options.gas_limit_floor     = gas_budget;
+   options.gas_limit_cap       = gas_budget;
+   options.retry.total_timeout = receipt_wait;
    return options;
 }
 
@@ -247,9 +254,10 @@ struct opp_inbound_contract_client : ethereum_contract_client {
    /// dispatches as many attestations as its gas allows and records where it
    /// stopped; a continuation is the SAME call with the same arguments, which
    /// the contract resumes from its cursor. Funded to exactly `gas_budget`
-   /// (see `delivery_gas_budget`), which is why this is not a plain
-   /// `ethereum_contract_tx_fn`: that binds its options once at construction,
-   /// and the budget differs per call. Returns the confirmed receipt rather
+   /// (see `delivery_gas_budget`) and its receipt awaited until `deadline`,
+   /// which is why this is not a plain `ethereum_contract_tx_fn`: that binds
+   /// its options once at construction, and both differ per call. Returns the
+   /// confirmed receipt rather
    /// than the hash alone, because the relay's next move is decided from the
    /// block the call landed in. `envelopeData` rides as a hex-encoded string
    /// because the libfc ABI encoder takes `dt::bytes` that way (see
@@ -257,7 +265,9 @@ struct opp_inbound_contract_client : ethereum_contract_client {
    ///
    /// The ABI arguments are bound as non-const lvalue references, so callers
    /// must materialize named locals for both.
-   std::function<epoch_in_receipt(uint32_t& epoch_index, std::string& envelope_hex, uint64_t gas_budget)> epoch_in;
+   std::function<epoch_in_receipt(uint32_t& epoch_index, std::string& envelope_hex, uint64_t gas_budget,
+                                  fc::time_point deadline)>
+      epoch_in;
    /// `nextEpochIndex()` view — the epoch the outpost is currently accepting.
    ethereum_contract_call_fn<fc::variant> next_epoch_index;
    /// `dispatchSpill(uint32 epochIndex)` view — where a tipped epoch's dispatch
@@ -291,14 +301,16 @@ struct opp_inbound_contract_client : ethereum_contract_client {
                                const address_compat_type& contract_address,
                                const std::vector<fc::network::ethereum::abi::contract>& contracts)
       : ethereum_contract_client(client, contract_address, contracts)
-      , epoch_in([this](uint32_t& epoch_index, std::string& envelope_hex, uint64_t gas_budget) -> epoch_in_receipt {
-           const auto& abi     = get_abi(opp_inbound_abi_name::epoch_in);
-           const auto  options = delivery_confirm_options(gas_budget);
+      , epoch_in([this](uint32_t& epoch_index, std::string& envelope_hex, uint64_t gas_budget,
+                        fc::time_point deadline) -> epoch_in_receipt {
+           const auto&                abi    = get_abi(opp_inbound_abi_name::epoch_in);
            contract_invoke_data_items params = {epoch_index, envelope_hex};
-           auto tx = this->client->create_default_tx(this->contract_address, abi, params, options.gas_limit_floor,
-                                                     options.gas_limit_cap);
+           auto tx = this->client->create_default_tx(this->contract_address, abi, params, gas_budget, gas_budget);
            const auto tx_hash = this->client->execute_contract_tx_fn(tx, abi, params).as_string();
-           return parse_epoch_in_receipt(tx_hash, this->client->wait_for_receipt(tx_hash, options));
+           // Measured after the send, so the wait gets exactly what is left.
+           const auto receipt_wait = std::max(fc::microseconds(), deadline - fc::time_point::now());
+           return parse_epoch_in_receipt(
+              tx_hash, this->client->wait_for_receipt(tx_hash, delivery_confirm_options(gas_budget, receipt_wait)));
         })
       , next_epoch_index(create_call<fc::variant>(get_abi(opp_inbound_abi_name::next_epoch_index)))
       , dispatch_spill(create_call<fc::variant, uint32_t>(get_abi(opp_inbound_abi_name::dispatch_spill)))

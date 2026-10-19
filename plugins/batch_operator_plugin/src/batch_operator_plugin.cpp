@@ -1945,8 +1945,8 @@ void batch_operator_plugin::set_program_options(options_description& cli,
    // delivery, which is a sequence of confirmed transactions. On Ethereum the
    // whole envelope goes in ONE `epochIn`, continued by a further call for each
    // time the outpost's dispatch spills (a full-cap envelope spills a handful
-   // of times at most); on Solana the envelope is chunked at 672 bytes. Size it
-   // as
+   // of times at most), and each receipt wait may use whatever of this budget
+   // is left; on Solana the envelope is chunked at 672 bytes. Size it as
    //     expected transactions x (target block time + confirmation margin)
    // for the largest envelope the outpost is expected to carry; the 15000 ms
    // default covers a 1 s block time with wide margin. Undersizing is not
@@ -1960,7 +1960,7 @@ void batch_operator_plugin::set_program_options(options_description& cli,
    // Help text below must stay ASCII with no " --" sequence (PerformanceHarness
    // splits nodeop --help output on that token).
    opts("batch-delivery-timeout-ms", bpo::value<uint32_t>()->default_value(whole_milliseconds(DELIVERY_TIMEOUT)),
-        "Max time to wait for chain delivery confirmation (ms)");
+        "Max time for one outbound delivery, every transaction and confirmation wait included (ms)");
    opts("batch-yield-tick-interval-ms",
         bpo::value<uint32_t>()->default_value(whole_milliseconds(YIELD_TICK_INTERVAL)),
         "Minimum spacing between this operator's sysio.swap::tickyield pushes per yield pool (ms)");

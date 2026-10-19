@@ -44,6 +44,13 @@ constexpr std::string_view rpc_url_placeholder_a = "RPC_URL_A";
 constexpr std::string_view rpc_url_placeholder_b = "RPC_URL_B";
 constexpr std::string_view test_chain_id_quantity = "0x7a69";
 constexpr std::string_view ethereum_mainnet_chain_id_quantity = "0x1";
+/// Receipt deadline for a wrapper call whose receipt is already there.
+constexpr int64_t receipt_deadline_seconds = 30;
+/// Receipt deadline for a wrapper call whose receipt never appears: far below
+/// the library's default retry budget, so a wait that ignored it would show.
+constexpr int64_t short_receipt_deadline_ms = 300;
+/// A receipt wait longer than the library's default retry budget.
+constexpr int64_t long_receipt_wait_seconds = 90;
 using tcp = boost::asio::ip::tcp;
 
 /** One-shot JSON-RPC endpoint used to preserve coverage of the historical three-field CLI client form. */
@@ -608,6 +615,48 @@ BOOST_AUTO_TEST_CASE(wait_for_receipt_returns_the_confirmed_receipt) {
    BOOST_CHECK_EQUAL(sign_count.load(), 0u);
 }
 
+/// One `epochIn`'s options fund it to exactly its budget and wait for its
+/// receipt as long as asked, past the library's default retry budget too.
+BOOST_AUTO_TEST_CASE(delivery_confirm_options_carry_the_budget_and_the_receipt_wait) {
+   constexpr uint64_t budget  = 1'234'567;
+   const auto         options = sysio::delivery_confirm_options(budget, fc::seconds(long_receipt_wait_seconds));
+   BOOST_CHECK_EQUAL(options.gas_limit_floor, budget);
+   BOOST_CHECK_EQUAL(options.gas_limit_cap, budget);
+   BOOST_CHECK(options.retry.total_timeout == fc::seconds(long_receipt_wait_seconds));
+   BOOST_CHECK(options.retry.total_timeout > ethereum_confirm_option_defaults.retry.total_timeout);
+}
+
+/// The wrapper stops waiting for a receipt at the deadline it is given, not
+/// at a budget of its own: a delivery's deadline is the only one.
+BOOST_AUTO_TEST_CASE(epoch_in_waits_for_its_receipt_until_the_given_deadline) {
+   std::atomic<size_t> sign_count = 0;
+   const auto provider = make_recording_signer(sign_count);
+   auto client = std::make_shared<recording_ethereum_client>(provider, bounded_policy());
+   sysio::opp_inbound_contract_client inbound{
+      client,
+      std::string(contract_address),
+      {whole_envelope_epoch_in_function("epochIn"), no_argument_function("nextEpochIndex"),
+       uint32_argument_function("dispatchSpill"), epoch_deliveries_function("epochDeliveries"),
+       no_argument_function("pendingEpochHash"), bytes32_argument_function("pendingConsensusForDigest"),
+       uint16_argument_function("attestationHandlers")},
+   };
+   uint32_t    epoch_index = 1;
+   std::string envelope    = "01";
+
+   // No receipt ever appears.
+   const auto start = fc::time_point::now();
+   BOOST_CHECK_THROW(
+      inbound.epoch_in(epoch_index, envelope, 999, start + fc::milliseconds(short_receipt_deadline_ms)),
+      fc::timeout_exception);
+   const auto waited = fc::time_point::now() - start;
+
+   BOOST_CHECK(waited >= fc::milliseconds(short_receipt_deadline_ms));
+   BOOST_CHECK(waited < ethereum_confirm_option_defaults.retry.total_timeout);
+   BOOST_CHECK_GE(client->receipt_reads, 1u);
+   // The call was sent; only the wait gave up.
+   BOOST_CHECK_EQUAL(client->broadcast_count, 1u);
+}
+
 BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
    std::atomic<size_t> sign_count = 0;
    const auto provider = make_recording_signer(sign_count);
@@ -630,13 +679,13 @@ BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
    // the limit) and comes back as the confirmed receipt.
    uint32_t    epoch_index = 1;
    std::string envelope = "01";
-   expect_policy_rejection([&] { inbound.epoch_in(epoch_index, envelope, 1000); });
+   const auto  deadline = fc::time_point::now() + fc::seconds(receipt_deadline_seconds);
+   expect_policy_rejection([&] { inbound.epoch_in(epoch_index, envelope, 1000, deadline); });
    client->receipt_response = fc::mutable_variant_object("status", "0x1")("blockNumber", "0x10")("logs", fc::variants{});
-   const auto receipt = inbound.epoch_in(epoch_index, envelope, 999);
+   const auto receipt = inbound.epoch_in(epoch_index, envelope, 999, deadline);
    BOOST_CHECK_EQUAL(receipt.block_number, fc::uint256{16});
    BOOST_CHECK(receipt.logs.empty());
-   // The budget reached the pre-flight as the gas the call must fit in — the
-   // wrapper hands `delivery_confirm_options(budget)` to `create_default_tx`.
+   // The budget reached the pre-flight as the gas the call must fit in.
    BOOST_CHECK_EQUAL(client->estimate_gas_params.get_array().front().get_object()["gas"].as_string(), "0x3e7");
    BOOST_CHECK_EQUAL(sign_count.load(), 1u);
    BOOST_CHECK_EQUAL(client->broadcast_count, 1u);

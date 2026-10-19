@@ -577,6 +577,8 @@ struct whole_envelope_delivery_fixture {
    std::vector<observed_delivery_call> delivery_calls;
    /// The budget of every `epochIn` attempt, refused ones included.
    std::vector<uint64_t>               attempted_budgets;
+   /// The receipt deadline of every `epochIn` attempt, refused ones included.
+   std::vector<fc::time_point>         attempted_deadlines;
    /// Per attempt, in order, a refusal the stub throws instead of confirming;
    /// attempts past the end confirm.
    std::vector<std::optional<fc::network::json_rpc::json_rpc_error>> refusals;
@@ -746,9 +748,11 @@ std::unique_ptr<whole_envelope_delivery_fixture> create_whole_envelope_delivery_
 
    auto* raw = fixture.get();
    raw->inbound->epoch_in = [raw, inbound_address](uint32_t& epoch_index, std::string& envelope_hex,
-                                                   uint64_t gas_budget) -> sysio::epoch_in_receipt {
+                                                   uint64_t gas_budget,
+                                                   fc::time_point deadline) -> sysio::epoch_in_receipt {
       const size_t attempt = raw->attempted_budgets.size();
       raw->attempted_budgets.push_back(gas_budget);
+      raw->attempted_deadlines.push_back(deadline);
       if (attempt < raw->refusals.size() && raw->refusals[attempt]) throw *raw->refusals[attempt];
 
       raw->delivery_calls.push_back(observed_delivery_call{epoch_index, envelope_hex, gas_budget});
@@ -1486,8 +1490,7 @@ BOOST_AUTO_TEST_CASE(read_emitted_envelope_digest_reads_the_outpost_record) try 
 // ---------------------------------------------------------------------------
 
 /// The most an `epochIn` may be funded with follows the client's policy
-/// ceiling and never exceeds EIP-7825's cap; the options a call is sent with
-/// pin floor and cap to the one budget, so the pre-flight runs under it.
+/// ceiling and never exceeds EIP-7825's cap.
 BOOST_AUTO_TEST_CASE(delivery_gas_ceiling_is_the_policy_ceiling_bounded_by_the_cap) try {
    auto policy = relay_test_policy();
    BOOST_CHECK_EQUAL(sysio::delivery_gas_ceiling(policy), sysio::EIP_7825_TX_GAS_CAP);
@@ -1497,10 +1500,6 @@ BOOST_AUTO_TEST_CASE(delivery_gas_ceiling_is_the_policy_ceiling_bounded_by_the_c
 
    policy.max_gas_limit = fc::uint256{below_cap_policy_gas_limit};
    BOOST_CHECK_EQUAL(sysio::delivery_gas_ceiling(policy), below_cap_policy_gas_limit);
-
-   const auto options = sysio::delivery_confirm_options(below_cap_policy_gas_limit);
-   BOOST_CHECK_EQUAL(options.gas_limit_floor, below_cap_policy_gas_limit);
-   BOOST_CHECK_EQUAL(options.gas_limit_cap, below_cap_policy_gas_limit);
 } FC_LOG_AND_RETHROW();
 
 /// At a fee, the ceiling is also what the policy's total-cost term pays for:
@@ -2102,6 +2101,29 @@ BOOST_AUTO_TEST_CASE(delivery_escalates_after_a_call_that_advanced_nothing_and_s
                         test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
                      sysio::chain::outpost_delivery_incomplete_exception);
    BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 3u);
+} FC_LOG_AND_RETHROW();
+
+/// Every `epochIn` attempt, the retry after a refusal included, waits for its
+/// receipt until the delivery's own deadline rather than for a fixed budget of
+/// its own, so a deadline sized past one slow block lets a single wait outlast it.
+BOOST_AUTO_TEST_CASE(delivery_awaits_each_receipt_until_the_delivery_deadline) try {
+   /// Longer than the 15 s the library's default retry budget gives one wait.
+   constexpr int64_t long_delivery_deadline_seconds = 60;
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = serialize_envelope_with_attestations(test_wire_epoch, 2, 64);
+   fixture->refusals = {epoch_in_refusal(dispatch_underfunded_selector, 2)};
+
+   const auto before = fc::time_point::now();
+   const auto tx     = fixture->outpost->deliver_outbound_envelope(test_wire_epoch, envelope,
+                                                                   fc::seconds(long_delivery_deadline_seconds));
+   const auto after  = fc::time_point::now();
+
+   BOOST_CHECK(!tx.empty());
+   BOOST_REQUIRE_EQUAL(fixture->attempted_deadlines.size(), 2u);
+   for (const auto& deadline : fixture->attempted_deadlines) {
+      BOOST_CHECK(deadline >= before + fc::seconds(long_delivery_deadline_seconds));
+      BOOST_CHECK(deadline <= after + fc::seconds(long_delivery_deadline_seconds));
+   }
 } FC_LOG_AND_RETHROW();
 
 /// A node refusal for gas below the ceiling is retried once at the ceiling;
