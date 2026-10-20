@@ -107,17 +107,12 @@ jobs:
       - name: Generate & Publish OPP Bundles
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           CHANNEL: ${{ inputs.channel }}
           PACKAGE_VERSION: ${{ inputs.package-version }}
         run: |
-          # `npm publish` (invoked by wire-protobuf-bundler --publish) does NOT read a
-          # bare $NPM_TOKEN env var — it needs an _authToken line in .npmrc. Without
-          # this the publish fails ENEEDAUTH (regression from SEC-41, which scoped the
-          # token to this step but dropped the auth wiring). Writing ~/.npmrc here keeps
-          # the token confined to the push/dispatch publish step — it is never present
-          # during pull_request validation or the dependency install step.
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+          # setup-node's registry configuration reads NODE_AUTH_TOKEN. Supply the
+          # secret only to this push/dispatch step, never to PR validation or the earlier install step.
           args=(--publish)
           # `channel` only exists on the dispatch path (empty on push); 'none'
           # keeps the legacy no-channel behavior byte-identical.

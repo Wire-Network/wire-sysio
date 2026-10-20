@@ -10,6 +10,13 @@
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.27.0",
+  "resolutions": {
+    "@aws-sdk/client-firehose": "3.1102.0",
+    "@aws-sdk/client-kms": "3.1102.0",
+    "@aws-sdk/client-sns": "3.1102.0",
+    "@aws-sdk/client-ssm": "3.1102.0",
+    "@aws-sdk/client-sts": "3.1102.0"
+  },
   "devDependencies": {
     "@3fv/guard": "^1.4.39",
     "@3fv/prelude-ts": "^0.8.37",
