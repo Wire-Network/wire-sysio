@@ -51,6 +51,12 @@
 
 namespace sysio::chain {
 
+namespace {
+constexpr auto missing_database_header_message =
+   "State database has no version header: the launch that created it did not complete startup. "
+   "Rerun once with --delete-all-blocks.";
+}
+
 using resource_limits::resource_limits_manager;
 
 using controller_index_set = index_set<
@@ -1456,7 +1462,7 @@ struct controller_impl {
       const auto& header_idx = db.get_index<database_header_multi_index>().indices().get<by_id>();
 
       SYS_ASSERT(header_idx.begin() != header_idx.end(), bad_database_version_exception,
-                 "state database version pre-dates versioning, please restore from a compatible snapshot or replay!");
+                 missing_database_header_message);
 
       auto header_itr = header_idx.begin();
       header_itr->validate();
@@ -1595,11 +1601,6 @@ struct controller_impl {
 
    void add_indices() {
       controller_index_set::add_indices(db);
-      // Persist format identity before another plugin can fail initialization.
-      // Existing databases must pass the ordinary version checks, even at revision zero.
-      if (db.was_created() && db.get_index<database_header_multi_index>().size() == 0) {
-         db.create<database_header_object>([](auto&) {});
-      }
       kv_database_index_set::add_indices(db);
 
       authorization.add_indices();
@@ -1783,7 +1784,9 @@ struct controller_impl {
       });
 
       db.set_revision( chain_head.block_num() );
-      validate_db_version(db);
+      db.create<database_header_object>([](const auto& header){
+         // nothing to do
+      });
 
       // --- Snapshot state validation ---
       // Singleton enforcement
@@ -1870,8 +1873,10 @@ struct controller_impl {
    }
 
    void initialize_database(const genesis_state& genesis) {
-      // Index registration already persisted the header, including on a prior interrupted launch.
-      validate_db_version(db);
+      // create the database header sigil
+      db.create<database_header_object>([&]( auto& header ){
+         // nothing to do for now
+      });
 
       // Initialize block summary index
       for (int i = 0; i < 0x10000; i++)
