@@ -8,12 +8,14 @@
 
 #include <boost/multiprecision/cpp_int.hpp>
 
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <memory>
 #include <optional>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace sysio::query_engine {
@@ -23,7 +25,7 @@ namespace constants {
 inline constexpr auto endpoint = "/v1/query/execute";
 inline constexpr auto method = "query.execute";
 inline constexpr auto version = "2.0";
-inline constexpr auto schema_version = "1.0";
+inline constexpr auto schema_version = "1.1";
 inline constexpr auto logger = "query";
 inline constexpr uint32_t max_id_characters = 128;
 inline constexpr int64_t max_numeric_id = 4294967295LL;
@@ -40,7 +42,23 @@ inline constexpr uint32_t decimal_base = 10;
 inline constexpr auto value_namespace = "value";
 inline constexpr auto key_namespace = "key";
 inline constexpr size_t max_owners = 64;
+/// Smallest request `limit` and `offset`.
+inline constexpr uint64_t min_request_integer = 0;
+/// Largest request integer (`limit`, `offset`, `timeout_ms`): 2^53-1, exactly representable by every JSON client.
+inline constexpr uint64_t max_request_integer = 9007199254740991ULL;
+/// Smallest request `timeout_ms`; zero would expire before admission.
+inline constexpr uint64_t min_request_timeout_ms = 1;
 } // namespace constants
+
+/// Member names of the `query.execute` params object: one spelling for parsing, errors and documentation.
+namespace request_field {
+inline constexpr auto query = "query";
+inline constexpr auto limit = "limit";
+inline constexpr auto offset = "offset";
+inline constexpr auto timeout_ms = "timeout_ms";
+/// Every member params may carry; any other member is INVALID_PARAMS.
+inline constexpr auto all = std::to_array<std::string_view>({query, limit, offset, timeout_ms});
+} // namespace request_field
 
 /// Names reported in `error.data.limit` for the fixed parser/ABI bounds and for the chain's read
 /// window. None is a query-plugin option, so none carries the `query-` prefix the options use.
@@ -64,6 +82,10 @@ inline constexpr auto state = "state";
 inline constexpr auto columns = "columns";
 inline constexpr auto rows = "rows";
 inline constexpr auto stats = "stats";
+inline constexpr auto page = "page";
+inline constexpr auto offset = "offset";
+inline constexpr auto total_rows = "total_rows";
+inline constexpr auto has_more = "has_more";
 inline constexpr auto owners = "owners";
 inline constexpr auto table = "table";
 inline constexpr auto name = "name";
@@ -235,6 +257,11 @@ public:
    void assert_limit(uint64_t value, uint64_t maximum, const char* limit) const;
    /// Monotonic elapsed time used for result stats and deterministic tests.
    uint64_t elapsed_us() const;
+   /// Apply validated per-request options after the envelope was parsed with this budget: `limit` and
+   /// `offset` replace the current values, and a timeout only ever moves the deadline EARLIER, measured
+   /// from `started`, so ingress and queue time stay inside it; `options.timeout` follows the lowered
+   /// deadline. A negative timeout is INVALID_PARAMS.
+   void apply_request_options(const query_options& requested);
    query_config config;
    query_options options;
    now_function now;
@@ -255,6 +282,11 @@ public:
    uint64_t accounted_bytes = 0;
    /// Highest accounted_bytes reached, unaffected by releases.
    uint64_t peak_accounted_bytes = 0;
+
+private:
+   /// The absolute deadline `timeout` after `started`: no deadline for constants::no_deadline, and
+   /// INVALID_PARAMS for a negative timeout or one beyond the monotonic clock's range.
+   clock::time_point deadline_for(std::chrono::milliseconds timeout) const;
 };
 
 /// Exact, checked integer arithmetic; no host floating-point conversion is permitted.
@@ -469,12 +501,17 @@ struct query_result {
    std::vector<fc::variant_object> columns;
    std::vector<fc::variant_object> rows;
    fc::variant_object stats;
+   /// Window over the complete ordered output: requested `offset`, effective `limit` (the smaller of SQL
+   /// LIMIT and the per-call limit, null when neither is set), `returned_rows`, `total_rows` and `has_more`.
+   fc::variant_object page;
 };
 /// Parsed JSON-RPC request. A missing ID is a notification; null is a valid response ID.
 struct query_request {
    fc::variant id;
    bool notification = false;
    std::string query;
+   /// `limit`, `offset` and `timeout_ms` from params; the timeout never exceeds `query-timeout-ms`.
+   query_options options;
    std::optional<query_error> invocation_error;
 };
 
@@ -552,4 +589,4 @@ query_request parse_request(std::string_view, query_budget&);
 
 } // namespace sysio::query_engine
 
-FC_REFLECT(sysio::query_engine::query_result, (schema_version)(complete)(source)(state)(columns)(rows)(stats))
+FC_REFLECT(sysio::query_engine::query_result, (schema_version)(complete)(source)(state)(columns)(rows)(stats)(page))

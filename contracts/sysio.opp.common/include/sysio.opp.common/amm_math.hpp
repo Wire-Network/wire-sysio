@@ -3,9 +3,8 @@
  * @file amm_math.hpp
  * @brief Deterministic weighted constant-product (Bancor/Balancer) swap math.
  *
- * Shared by `sysio.reserv` (reserve books + `swapquote`) and `sysio.uwrit`
- * (the quote mirror) so the depot's books and its quotes ride exactly one
- * curve. The math is **integer-only and self-contained** (no contract
+ * Used by `sysio.swap`, whose pair quotes (`out_given_in` at equal weights)
+ * and pair fees (`split_wire_fee`) both come from this one kernel. The math is **integer-only and self-contained** (no contract
  * intrinsics, no floating point): it is unit-testable on the host and
  * deterministic on-chain, satisfying the consensus-determinism rules in
  * CLAUDE.md (no floating point on the consensus path).
@@ -228,7 +227,7 @@ inline constexpr uint32_t BPS_TOTAL = 10000;
 /// Decomposition of EVERY fee taken out of a swap's WIRE leg.
 ///
 /// Two independent fees ride the same leg (WIRE-281): the NETWORK fee
-/// (`sysio.uwrit::fee_bps`, split between the winning underwriter, batch
+/// (`fee_bps`, split between the winning underwriter, batch
 /// operators and optionally the emissions treasury) and each participating
 /// RESERVE's own owner fee. A chain-to-chain swap therefore pays three fees —
 /// two reserve owners plus the network — while a WIRE-endpoint swap touches one
@@ -266,28 +265,24 @@ struct wire_fee {
 /// the leg `fee` is clamped to `wire_amount` and the shares sum to MORE than it
 /// (see the clamp note below). Computed in `u128` to avoid overflow.
 ///
-/// **Callers must check `net > 0`.** Stacked rates can reach or exceed the leg,
-/// and that is REACHABLE UNDER VALID CONFIGURATION rather than merely
-/// theoretical: the caps bound each rate INDEPENDENTLY, so a network fee at
-/// `sysio.uwrit::MAX_FEE_BPS` (9999) plus a single reserve owner fee at
-/// `sysio.reserv::MIN_OWNER_FEE_BPS` (1) already totals exactly 100%. A
-/// zero-`net` result is therefore an intentionally REJECTED CONFIGURATION that
-/// every caller must handle — not unreachable defense-in-depth.
+/// **Callers must check `net > 0`.** Stacked rates can reach or exceed the leg
+/// even when each rate is individually below 100%: nothing here bounds their
+/// SUM, so a 9999 bps network fee plus a single 1 bps reserve owner fee already
+/// totals exactly 100%. A zero-`net` result is therefore a REJECTED
+/// CONFIGURATION that every caller must handle — not unreachable
+/// defense-in-depth.
 ///
 /// When the total reaches the leg, `fee` is CLAMPED to `wire_amount` and `net`
 /// is 0 — so in THAT case alone the per-share fields sum to more than `fee`,
-/// which is harmless because no share is ever accrued: the swap is refused
-/// before any accrual. `quote_swap` returns 0 (no quote), and `applyswap` /
-/// `applyfromwire` / `refundwire` assert `net > 0` directly. `paywire` is the
-/// exception worth knowing: it pays the caller's `wire_out` target rather than
-/// `net`, so it never reads the field — it fails closed upstream on the zero
-/// quote, and locally on its `reserve_wire_amount >= wire_out + fee`
-/// sufficiency check.
+/// which is harmless as long as the caller refuses the swap before accruing any
+/// share. `quote_swap` returns 0 (no quote). `sysio.swap` keeps its pair fee
+/// below 100% (`MAX_FEE`, 9999) and passes no reserve owner fee, so its quotes
+/// always net at least one unit.
 ///
-/// Paths with no winning underwriter (a revert refund) pass 0 for
+/// A caller with no underwriter (every `sysio.swap` pair) passes 0 for
 /// `underwriter_share_bps`, sending the whole network fee into the rewards pool.
 /// The trailing rates default to 0, so a caller that charges only the network
-/// fee — a revert, or a quote against a fee-free reserve — omits them.
+/// fee omits them.
 inline wire_fee split_wire_fee(uint64_t wire_amount,
                                uint32_t fee_bps,
                                uint32_t underwriter_share_bps,

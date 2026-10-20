@@ -5,4 +5,9 @@
 # build-time check; if reenter_deposit.cpp changes, rebuild and re-commit the wasm/abi.
 if(BUILD_SYSTEM_CONTRACTS)
     add_contract(reenter_deposit reenter_deposit reenter_deposit.cpp)
+    # The re-entrant deposit names WIRE by the canonical registry code in wire_asset.hpp.
+    target_include_directories(reenter_deposit
+            PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../sysio.opp.common/include>
+    )
 endif()

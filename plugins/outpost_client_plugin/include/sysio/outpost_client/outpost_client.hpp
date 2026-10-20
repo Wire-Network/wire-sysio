@@ -4,10 +4,12 @@
 #include <cstdint>
 #include <format>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
+#include <fc/crypto/sha256.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/time.hpp>
 #include <sysio/opp/opp.hpp>
@@ -62,11 +64,8 @@ public:
     *
     * Ethereum returns the 20-byte address derived from the configured
     * transaction signer. Solana returns the configured signer's 32-byte
-    * public key. Underwriter UIC construction signs this value into
-    * `uw_ext_chain_addr`, so the canonical payload contains no omitted
-    * default byte field and records the local transaction signer as signed
-    * metadata. The outpost binds this field and the claimed WIRE account to
-    * the authenticated caller and its current ACTIVE underwriter roster row.
+    * public key. The returned address identifies the configured transaction
+    * signer for chain-native client operations.
     *
     * @return Opaque chain-native address bytes; 20 bytes for Ethereum and 32
     *         bytes for Solana.
@@ -130,41 +129,16 @@ public:
                                                    fc::microseconds deadline) = 0;
 
    /**
-    * @brief UNDERWRITER COMMIT — submit a signed `UnderwriteIntentCommit`
-    *        (UIC) through an ACTIVE-role-gated outpost relay.
+    * @brief The digest of the envelope this outpost emitted for `epoch_index`, from the outpost's own write-once
+    *        record of its emits: keccak256 of the canonical encoded envelope, which is the protocol's epoch digest
+    *        and what the next envelope carries as `previous_envelope_hash`. Read at finality.
     *
-    * Called by the underwriter plugin (or any future plugin that issues
-    * outpost-side commits) to deliver a signed intent without the caller
-    * knowing the outpost's contract surface, ABI / IDL layout, or message
-    * encoding. The chain-specific concrete resolves which contract or
-    * program action to invoke, how to encode the bytes for the wire, and
-    * how to await on-chain confirmation. The current outposts accept only a
-    * canonically encoded UIC whose claimed WIRE account and external address
-    * match the authenticated caller's current ACTIVE underwriter roster row.
-    * They queue the original validated bytes unchanged. The WIRE depot remains
-    * authoritative for validating the embedded permission signature and bond.
-    *
-    * Returns only after on-chain inclusion + confirmations — the caller
-    * uses the return value as a "this leg landed" signal before recording
-    * the commit locally. Late-arriving commits (after consensus has already
-    * been reached for the underlying envelope) are benign no-ops on the
-    * outpost side per `opp-consensus.md`; they still confirm here.
-    *
-    * @param uw_request_id  The depot's `sysio.uwrit::uwreqs` row id this
-    *                       UIC is committing to. Used only for log
-    *                       correlation; the on-chain call carries the original
-    *                       validated UIC bytes.
-    * @param uic_bytes      Serialized `UnderwriteIntentCommit` (protobuf
-    *                       encoded, signed by an authorized WIRE K1, R1,
-    *                       EM, or ED permission key).
-    * @param deadline       Upper bound on the total time spent talking to
-    *                       the remote chain for this call.
-    * @return Chain-native tx id / signature suitable for logs.
-    * @throws fc::exception on RPC failure, tx revert, or deadline expiry.
+    * @return The digest, or nullopt when the outpost holds no final record for that epoch: nothing emitted for it
+    *         yet, or the record has left the outpost's retention window.
+    * @throws fc::exception on RPC failure, deadline expiry, or an outpost interface that keeps no such record.
     */
-   virtual std::string uw_commit(uint64_t                 uw_request_id,
-                                 const std::vector<char>& uic_bytes,
-                                 fc::microseconds         deadline) = 0;
+   virtual std::optional<fc::sha256> read_emitted_envelope_digest(uint32_t         epoch_index,
+                                                                  fc::microseconds deadline) = 0;
 
    /**
     * @brief OUTPOST CRANKS — drive the outpost's permissionless per-epoch

@@ -353,11 +353,7 @@ using fc::slug_name_literals::operator""_s;
 /// the spelling `"ETH"`. ETH_OUTPOST_ID is the slug_name's packed value.
 constexpr uint64_t ETH_OUTPOST_ID = "ETH"_s.value;
 
-/// Solana/SVM test outpost registered by `register_outpost(CHAIN_KIND_SVM, ...)`.
-constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
-
 constexpr auto EVM_TEST_ATTESTATION_TYPE       = opp::types::ATTESTATION_TYPE_OPERATORS;
-constexpr auto SWAP_REMIT_ATTESTATION_TYPE    = opp::types::ATTESTATION_TYPE_SWAP_REMIT;
 
 } // anonymous namespace
 
@@ -625,10 +621,10 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
 
 // queueout carries no ABI-level auth. Without the depot-contract gate, any account could call it
 // directly and inject a forged READY attestation that buildenv() then packs into the depot's
-// group-signed outbound envelope (a forged SWAP_REMIT / WITHDRAW_REMIT / SLASH the outpost executes).
+// group-signed outbound envelope (a forged DESYNDICATE_LIQ the outpost executes).
 // A direct call from a non-depot account must revert at the auth gate, which is the first statement
 // in queueout (before any state read), so this holds regardless of epoch-state setup. The authorized
-// path (msgch self / epoch / opreg / uwrit / reserv) is covered by the queueout()/buildenv() helpers
+// path (msgch self / epoch / opreg / synd) is covered by the queueout()/buildenv() helpers
 // used throughout this suite, which sign as the depot and succeed.
 BOOST_FIXTURE_TEST_CASE(queueout_rejects_unauthorized_caller, sysio_msgch_tester) { try {
    std::vector<char> forged(8, 0x7f);

@@ -131,13 +131,13 @@ namespace sysio {
             /**
              * @brief Registers a node owner when the depot (sysio.msgch) processes an inbound OPP
              *        NodeOwnerRegistration attestation. The register step of the NFT claim flow; the
-             *        depot inline-sends newnameduser (account create) immediately before this so the
-             *        account already exists when nodeownreg runs.
+             *        depot inline-sends newnameduser immediately before this. It creates a missing
+             *        account only when the name is valid and the tier has registration capacity.
              *
              * Trust-OPP: the OPP envelope is the deposit proof, so this RECORDS the depositor's ETH
              * key as a sysio.authex link (inline recordlink) rather than verifying a pre-existing
              * createlink. Claim-payload problems (bad name, account controlled by a different key,
-             * already registered) are soft-failed -- recorded in `nodeownerreg` with a reject_reason
+             * already registered, tier full) are soft-failed -- recorded in `nodeownerreg` with a reject_reason
              * and returned -- never thrown, so the dispatching transaction commits. Depot/system
              * invariants (tier range, ETH key type, ROA active) stay hard checks.
              *
@@ -190,6 +190,8 @@ namespace sysio {
              * Dispatched by privileged sysio.msgch as {sysio.roa, active}, without a cross-contract
              * active grant, like nodeownreg. Idempotent: a no-op if the account already exists.
              * Tier-based name rules: tier-1 = 2-6 char prefix; tier 2/3 = up to 12 chars.
+             * Invalid names and full tiers skip creation without spending RAM; nodeownreg records
+             * the rejection. Capacity comes from the live generation's authoritative owner rows.
              *
              * @param account The user-chosen account name.
              * @param pubkey  The holder's K1 public key (becomes owner and active).
@@ -384,7 +386,8 @@ namespace sysio {
                 OWNER_NOT_ACCOUNT    = 2,  // account does not exist (creation did not occur)
                 ACCOUNT_KEY_MISMATCH = 3,  // existing account's active authority != the single claimed wire key
                 DUPLICATE            = 4,  // owner is already a registered node owner
-                LINK_KEY_MISMATCH    = 5   // account already carries a different external-chain link key
+                LINK_KEY_MISMATCH    = 5,  // account already carries a different external-chain link key
+                TIER_CAP_REACHED     = 6   // the claimed tier has no remaining registration capacity
                 // (OWNER_HAS_RESLIMIT removed: a pre-existing reslimit row no longer rejects registration --
                 //  regnodeowner reconciles it via increase_reslimit. Pre-launch: no stored rows to migrate. SEC-087.)
             };
@@ -475,6 +478,17 @@ namespace sysio {
              */
 
             void regnodeowner(const name& owner, const uint8_t& tier);
+
+            /**
+             * @brief Return the consensus-defined registration cap for `tier`.
+             *
+             * Centralizes the economic constants used by the soft-fail OPP claim preflight and the
+             * hard invariant retained in `regnodeowner`.
+             *
+             * @param tier Node-owner tier; must be 1, 2, or 3.
+             * @return Maximum registered owners for the tier.
+             */
+            static uint32_t nodeowner_cap(uint8_t tier);
 
             /**
              * @brief Upsert a row in the `nodeownerreg` audit table. Used by `nodeownreg` to

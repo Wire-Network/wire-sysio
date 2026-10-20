@@ -9,21 +9,21 @@ There are two ways onto the schedule, and this guide covers the second:
 
 - **Genesis producers** are placed in the schedule when a chain is bootstrapped. They are
   registered as *bootstrapped* operators, which only the registry contract itself can do.
-- **Collateral-backed producers** post a bond on the outpost chains and earn a schedule position
-  by rank. That is the open path, and it is the one described here.
+- **Collateral-backed producers** post a bond in `sysio.opreg` on WIRE and earn a schedule
+  position by rank. That is the open path, and it is the one described here.
 
 ## What you need before you start
 
 | | |
 |---|---|
 | A WIRE account | The account that will produce blocks. Its `active` permission signs everything below. |
-| An Ethereum wallet | Funded with the required bond plus gas. |
-| A Solana keypair | Funded with the required bond plus fees. |
+| An Ethereum key and a Solana key | Used only to link your WIRE account to each active outpost chain (step 1). No collateral is posted on those chains. |
+| The required collateral, held on WIRE | The tokens `sysio.opreg`'s configuration lists, typically shadow LIQ (`LIQETH`, `LIQSOL`) and/or `WIRE`. |
 | A machine running `nodeop` | Reachable by the peer network, with your signing keys available to it. |
 
-You must bond on **every** chain the network requires, not just one. The requirement lives in
-`sysio.opreg`'s configuration as a per-chain minimum bond, and eligibility takes the **minimum**
-across all of them. Posting extra on the cheapest chain buys you nothing.
+You must bond **every** token the network requires, not just one. The requirement lives in
+`sysio.opreg`'s configuration (`opconfig.req_prod_collat`) as a minimum per token, and
+eligibility needs every one of them met. Posting extra of one token buys you nothing for another.
 
 ## Step 1 — Link your outpost addresses
 
@@ -31,9 +31,9 @@ across all of them. Posting extra on the cheapest chain buys you nothing.
 sysio.authex::createlink(chain_kind, account, sig, pub_key, nonce)
 ```
 
-Sign this once per chain, with your Ethereum and Solana keys respectively. The link is what makes
-a deposit you send on an outpost attributable to your WIRE account; without it the chain has no way
-to know the bond is yours.
+Sign this once per active outpost chain, with your Ethereum and Solana keys respectively.
+`regoperator` refuses an account that lacks a link for any active outpost chain, and the links are
+what the depot publishes for you in the `OPERATORS` roster it sends each outpost.
 
 The `nonce` is a millisecond timestamp and is rejected if it is more than ten minutes old, so
 generate it at signing time.
@@ -51,22 +51,21 @@ the bootstrap process explicitly pushes those privileged `regoperator` actions a
 
 You are now registered but not yet eligible. Your status stays `UNKNOWN` until the bond arrives.
 
-## Step 3 — Post your collateral on each outpost
+## Step 3 — Post your collateral on WIRE
 
-Deposit on the outpost chains themselves, signed by the wallets you linked in step 1:
+Read `opconfig.req_prod_collat` for the tokens and minimums, hold those tokens on WIRE, and bond
+each one:
 
-- **Ethereum** — `OperatorRegistry.deposit(...)`
-- **Solana** — the outpost program's `deposit` instruction
+```
+sysio.opreg::deposit(account, token_code, amount)
+```
 
-Each deposit travels to WIRE over the cross-chain protocol and credits your balance in
-`sysio.opreg`.
+Signed by your WIRE account, one `token_code` per call: `WIRE` or a shadow LIQ symbol such as
+`LIQETH` or `LIQSOL`. The action requires an existing non-bootstrapped operator row, transfers the
+token into `sysio.opreg` inline, and credits your balance. Collateral is held only on WIRE;
+nothing is deposited on the outpost chains.
 
-If the configured requirements include the native WIRE pair, separately call
-`sysio.opreg::deposit(account, amount)` on WIRE, signed by your WIRE account. This native action
-requires an existing non-bootstrapped operator row, transfers WIRE inline, and credits only the
-WIRE-chain pair; it does not replace the Ethereum or Solana outpost deposits.
-
-When every required chain is at or above its minimum, your operator status flips to `ACTIVE` on
+When every required token is at or above its minimum, your operator status flips to `ACTIVE` on
 its own. No producer rank exists yet: the first score is written only after the producer row and
 active finalizer key are created in steps 4 and 5.
 
@@ -174,7 +173,7 @@ arrive. Nobody has to vote them out, and there is no flag day.
 
 | Factor | What it measures |
 |---|---|
-| Collateral | Your bond divided by the required minimum, taken as the **minimum** across every required chain. Linear and uncapped, so more collateral always outranks less. |
+| Collateral | Your bond divided by the required minimum, taken as the **minimum** across every required token. Linear and uncapped, so more collateral always outranks less. |
 | Participation | Falls with each consecutive unserved round and recovers when you serve one. |
 | Snapshot service | Snapshot attestations that reached quorum in the current pay period. Weighted at a tenth of collateral, so it separates producers the bond has left tied rather than outranking a larger bond. |
 
@@ -264,14 +263,27 @@ under it. It is not applied only to rounds missed from that point on.
   simply hold no schedule position. `regproducer` brings you back at the position your collateral
   earns after rechecking current admission; a minimum raised while you were parked requires a
   top-up first.
-- **Withdraw** from the chain that holds the bond. An outpost bond is released through that
-  outpost's own withdrawal entry point, the counterpart of the deposit you made in step 3, which
-  travels to WIRE and settles against your registry balance. `sysio.opreg::withdraw` is **not**
-  that path: it takes only an account and an amount and applies to your WIRE-native balance, so
-  calling it for an Ethereum or Solana bond fails for insufficient balance and leaves the outpost
-  collateral untouched. Either way the request is queued rather than immediate, and `cancelwtdw`
-  cancels it before it flushes. Once your balance falls below the minimum on any required chain you
-  leave `ACTIVE` and the schedule drops you at the next rebuild.
+- **Withdraw** with `sysio.opreg::withdraw(account, token_code, amount)`. The request is queued
+  rather than immediate (`cancelwtdw` cancels it before it flushes); once it flushes at an epoch
+  advance, the funds are credited to a per-token claim that you pull with
+  `sysio.opreg::claimremit(account, token_code)`. Once your balance falls below the minimum for
+  any required token you leave `ACTIVE` and the schedule drops you at the next rebuild.
+- **Collect shadow yield.** Bonded shadow LIQ keeps earning WIRE yield: each bonded unit earns
+  what one unit of that shadow token earns in `sysio.liq`, from the moment it is bonded until it
+  leaves your balance. `sysio.opreg::claimyield(account, token_code)` credits what you have
+  earned to your WIRE claim, which you pull with `sysio.opreg::claimremit(account, WIRE)`. Yield
+  earned before a slash or a withdrawal stays claimable. Yield credits are always backed by WIRE
+  the registry has already pulled from `sysio.liq`. If `claimyield` reports yield not yet
+  covered, anyone can call `sysio.opreg::sweepyield(token_code)` to pull more in once more yield
+  is distributed. On termination the covered part is credited to your WIRE claim alongside the
+  returned principal. The rest stays owed to you: call `claimyield`, which pulls it in, before the
+  registry prunes your terminated operator row after `terminate_prune_delay_ms`. Anything still
+  unclaimed when the row is pruned is forfeited. `claimyield` needs no signature, so anyone,
+  such as a keeper, can call it for you; the credit only ever lands in your own WIRE claim.
+  Shadow stops earning for you when it leaves your bonded balance. After a withdrawal flushes,
+  the shadow waiting in your claim row earns for the registry until you call `claimremit`.
+  Yield is shared first come, first served: rounding can leave the last claimant up to a few
+  atomic WIRE short, and that dust is paid only when later slack covers it.
 - **Slashing** is punitive and permanent. A slashed operator's row is never pruned and the registry
   refuses to re-register it, so a slashed account cannot come back.
 

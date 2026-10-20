@@ -51,7 +51,7 @@ namespace sysio {
    * data. It avoids visually ambiguous characters, making it suitable for
    * financial identifiers, cryptocurrency addresses, and similar contexts.
    *
-   * Defined `inline` in the header so cross-contract callers (e.g. sysio.msgch
+   * Defined `inline` in the header so cross-contract callers (e.g. sysio.synd
    * resolving an authex link by pubkey) can call it without linking against
    * sysio.authex.cpp's WASM.
    *
@@ -93,7 +93,7 @@ namespace sysio {
    * @brief Render a public_key into its canonical "PUB_<curve>_<encoding>" string.
    *
    * Mirrors eosjs-ecc's spelling so that off-chain signers, the authex contract,
-   * and any cross-contract caller (e.g. sysio.msgch's bypubkey lookup) all hash
+   * and any cross-contract caller (e.g. sysio.synd's bypubkey lookup) all hash
    * the same byte sequence into the secondary-index key.
    *
    * Supported variants:
@@ -350,24 +350,4 @@ namespace sysio {
      */
     static std::array<uint8_t, 4> digestSuffixRipemd160(const std::array<char, 33> &data, const std::string &extra);
   };
-
-  /**
-   * @brief The Wire account an external key routes to.
-   *
-   * Operator deposits and withdrawals resolve the outpost-supplied key through the `bypubkey`
-   * index, and `find` returns the lowest-keyed row. `recordlink` lets several accounts hold one
-   * key, so only the first of them receives traffic for it. Link rows are never erased and keys only
-   * grow, so an account's routing never changes once linked; an unlink action would break the
-   * guarantee sysio.opreg::regoperator relies on.
-   *
-   * @param authex_account the account hosting the `links` table.
-   * @param pk             the external key, an EM or ED variant.
-   * @return the account the key routes to, or `name{}` when no link holds it.
-   */
-  inline name linked_account_for_key(name authex_account, const public_key& pk) {
-     authex::links_t links(authex_account);
-     auto by_pubkey = links.get_index<"bypubkey"_n>();
-     auto it = by_pubkey.find(pubkey_to_checksum256(pk));
-     return it == by_pubkey.end() ? name{} : it->username;
-  }
 }

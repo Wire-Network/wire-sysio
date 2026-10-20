@@ -53,6 +53,7 @@ OPP envelope dispute resolution and slash-execution contract.
 - Triggered by `sysio.msgch::evalcons`; dispatches the winning envelope via `sysio.msgch::resolvedisp`
 - Tier-1 electorate snapshot from `sysio.roa::nodeowners`; the active `network_gen` is read through
   the shared canonical ROA accessor
-- Slashes via `sysio.opreg::slash` (opreg routes the unlocked bond to the matching LP and defers the
-  locked portion through `sysio.uwrit::release`)
+- Slashes via `sysio.opreg::slash`: opreg marks the operator `SLASHED` and removes its whole
+  depot-native collateral balance from the operator's row; the slashed tokens stay in
+  `sysio.opreg`'s custody
 - Pauses / unpauses via `sysio.epoch::pause` / `sysio.epoch::unpause`

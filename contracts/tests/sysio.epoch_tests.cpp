@@ -320,8 +320,8 @@ BOOST_FIXTURE_TEST_CASE(regchain_wire_code_reserved_from_other_kinds, sysio_epoc
 
 /// `name` and `description` persist into a row billed to the shared `sysio` RAM pool, so both
 /// are bounded before emplace. CertiK WNS-10 raised this for `sysio.tokens::regtoken`; the same
-/// unbounded pair existed on `sysio.chains::regchain` and `sysio.reserv::regreserve`, and all
-/// three now share `sysio::opp::registry::check_metadata`.
+/// unbounded pair existed on `sysio.chains::regchain`, and both now share
+/// `sysio::opp::registry::check_metadata`.
 BOOST_FIXTURE_TEST_CASE(regchain_bounds_metadata, sysio_epoch_tester) { try {
    BOOST_REQUIRE(regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1, std::string(129, 'x'))
       .find("label exceeds 128 bytes") != std::string::npos);

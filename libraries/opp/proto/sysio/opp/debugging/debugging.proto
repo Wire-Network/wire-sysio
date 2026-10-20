@@ -17,16 +17,6 @@ enum DebugOutpostEndpointsType {
 }
 
 // ---------------------------------------------------------------------------
-//  Envelope data record — sent by opp_tracking_plugin to debugging server
-// ---------------------------------------------------------------------------
-
-message DebugEnvelopeDataRecord {
-  string                       batch_op_name   = 1;
-  DebugOutpostEndpointsType    endpoints_type  = 2;
-  bytes                        envelope_data   = 3;
-}
-
-// ---------------------------------------------------------------------------
 //  Envelope metadata record — stored alongside data files on the server
 // ---------------------------------------------------------------------------
 

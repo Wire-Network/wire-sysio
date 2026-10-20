@@ -6,7 +6,6 @@
 #include <boost/beast/http.hpp>
 #include <boost/process/v1/io.hpp>
 
-
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -87,7 +86,6 @@ std::vector<std::uint8_t> test_tx_01_unsigned_result{
    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3c, 0xc0
 };
-
 
 std::string test_tx_01_r      = "93166a3ed10a4050dce7261c4ca8bcba16a1731117c453a326a1742c959b33f0";
 std::string test_tx_01_s      = "7c17a232cd69ce93f21a30579a2a94309b2d71918043134b4c5df5788078a0e4";
@@ -575,7 +573,6 @@ std::unique_ptr<chunked_delivery_fixture> create_chunked_delivery_fixture() {
       stack.entry,
       /*opp_addr=*/std::string{},
       inbound_address,
-      /*operator_registry_addr=*/std::string{},
       abis,
       test_outpost_chain_code,
       test_evm_chain_id);
@@ -623,6 +620,9 @@ constexpr std::string_view test_moved_syndication_pool_address = "0xDc64a140Aa3E
 constexpr std::string_view no_yield_selector             = "053716d1";
 constexpr std::string_view yield_below_deadband_selector = "45441430";
 constexpr std::string_view pool_underbacked_selector     = "358cc7e9";
+/// `keccak256("EnforcedPause()")[0..4]`: OpenZeppelin `Pausable`'s refusal, which
+/// `realizeYield()`'s `whenNotPaused` raises while the pool's panic role has frozen it.
+constexpr std::string_view enforced_pause_selector       = "d93c0665";
 /// `AccessManagedUnauthorized(address)`: what a signer without the `yield_operator` role gets.
 constexpr std::string_view access_managed_unauthorized_selector = "068ca9d8";
 constexpr uint64_t test_yield_delta    = 5;
@@ -713,7 +713,6 @@ std::unique_ptr<crank_fixture> create_crank_fixture(bool with_pool_abi = true) {
       stack.entry,
       /*opp_addr=*/std::string{},
       inbound_address,
-      /*operator_registry_addr=*/std::string{},
       fixture->abis,
       test_outpost_chain_code,
       test_evm_chain_id);
@@ -1111,7 +1110,6 @@ BOOST_AUTO_TEST_CASE(read_inbound_envelope_validates_latest_slot) try {
       entry,
       opp_address,
       "",
-      "",
       abis,
       test_outpost_chain_code,
       test_evm_chain_id);
@@ -1172,6 +1170,91 @@ BOOST_AUTO_TEST_CASE(read_inbound_envelope_validates_latest_slot) try {
    BOOST_CHECK(outpost.read_inbound_envelope(
       test_wire_epoch,
       fc::seconds(test_rpc_deadline_seconds)).empty());
+} FC_LOG_AND_RETHROW();
+
+/// `outboundEnvelopes(uint32)` returns `(uint32 epochIndex, uint64 emittedAt, bytes32 checksum)`.
+std::string encode_outbound_record_result(uint64_t epoch, const fc::sha256& checksum) {
+   constexpr uint64_t emitted_at = 1'700'000'000;
+   return std::string(hex_prefix) + abi_word(epoch) + abi_word(emitted_at) + checksum.str();
+}
+
+BOOST_AUTO_TEST_CASE(read_emitted_envelope_digest_reads_the_outpost_record) try {
+   auto clean_app = gsl_lite::finally([]() {
+      appbase::application::reset_app_singleton();
+   });
+   auto tester = create_app();
+   auto sig_provider = tester->plugin().create_provider(
+      std::string(latest_slot_test_entry_id),
+      chain_kind_ethereum,
+      chain_key_type_ethereum,
+      std::string(latest_slot_test_public_key),
+      to_private_key_spec(std::string(latest_slot_test_private_key)));
+
+   // One outpost per ABI set: the client caches its typed contract per address.
+   const std::string opp_address{test_opp_address};
+   auto make_outpost = [&](std::vector<fc::network::ethereum::abi::contract> abis) {
+      ethereum_transaction_policy transaction_policy{
+         .client_id = std::string(latest_slot_test_entry_id),
+         .chain_id = test_evm_chain_id,
+         .max_priority_fee_per_gas = maximum_ethereum_transaction_policy_value(),
+         .max_fee_per_gas = maximum_ethereum_transaction_policy_value(),
+         .max_gas_limit = maximum_ethereum_transaction_policy_value(),
+         .max_total_native_cost = maximum_ethereum_transaction_policy_value(),
+      };
+      auto eth_client = std::make_shared<ethereum_client>(
+         sig_provider, std::variant<std::string, fc::url>{std::string{latest_slot_test_rpc_url}},
+         std::move(transaction_policy));
+      auto typed_opp = eth_client->get_contract<sysio::opp_contract_client>(opp_address, abis);
+      auto entry = std::make_shared<sysio::ethereum_client_entry_t>();
+      entry->id = latest_slot_test_entry_id;
+      entry->signature_provider = sig_provider;
+      entry->client = eth_client;
+      entry->chain_id = test_evm_chain_id;
+      auto outpost = std::make_shared<sysio::outpost_ethereum_client>(
+         entry, opp_address, "", abis, test_outpost_chain_code, test_evm_chain_id);
+      return std::make_pair(typed_opp, outpost);
+   };
+
+   auto [typed_opp, outpost] = make_outpost(load_abi_fixture(opp_abi_fixture));
+   BOOST_REQUIRE(typed_opp->outbound_envelopes);
+   auto set_response = [&](std::string response) {
+      typed_opp->outbound_envelopes =
+         [response = std::move(response)](const block_number_or_tag_t& block, uint32_t& epoch) -> fc::variant {
+            BOOST_CHECK(std::holds_alternative<block_tag_t>(block));
+            BOOST_CHECK(std::get<block_tag_t>(block) == block_tag_t::finalized);
+            BOOST_CHECK_EQUAL(epoch, test_wire_epoch);
+            return fc::variant(response);
+         };
+   };
+   const auto deadline = fc::seconds(test_rpc_deadline_seconds);
+   const auto digest   = fc::sha256::hash(std::string("emitted envelope"));
+
+   set_response(encode_outbound_record_result(test_wire_epoch, digest));
+   const auto read = outpost->read_emitted_envelope_digest(test_wire_epoch, deadline);
+   BOOST_REQUIRE(read.has_value());
+   BOOST_CHECK(*read == digest);
+
+   // An absent mapping entry reads as all zeros: nothing emitted, or pruned.
+   set_response(encode_outbound_record_result(0, fc::sha256{}));
+   BOOST_CHECK(!outpost->read_emitted_envelope_digest(test_wire_epoch, deadline).has_value());
+
+   // A record for another epoch, or no data at all, is a failed read rather than an answer.
+   set_response(encode_outbound_record_result(test_stale_wire_epoch, digest));
+   BOOST_CHECK_THROW(outpost->read_emitted_envelope_digest(test_wire_epoch, deadline), fc::exception);
+   set_response(std::string(hex_prefix));
+   BOOST_CHECK_THROW(outpost->read_emitted_envelope_digest(test_wire_epoch, deadline), fc::exception);
+   set_response(encode_outbound_record_result(test_wire_epoch, digest) + abi_word(0));   // more than one record
+   BOOST_CHECK_THROW(outpost->read_emitted_envelope_digest(test_wire_epoch, deadline), fc::exception);
+
+   // An ABI without the view still builds the client, which the relay needs, and the read refuses.
+   auto abis_without_view = load_abi_fixture(opp_abi_fixture);
+   std::erase_if(abis_without_view, [](const fc::network::ethereum::abi::contract& c) {
+      return c.name == sysio::opp_contract_client::view_outbound_envelopes;
+   });
+   auto [typed_without_view, outpost_without_view] = make_outpost(std::move(abis_without_view));
+   BOOST_CHECK(!typed_without_view->outbound_envelopes);
+   BOOST_CHECK(typed_without_view->get_latest_outbound_envelope);
+   BOOST_CHECK_THROW(outpost_without_view->read_emitted_envelope_digest(test_wire_epoch, deadline), fc::exception);
 } FC_LOG_AND_RETHROW();
 
 // ---------------------------------------------------------------------------
@@ -1660,6 +1743,11 @@ BOOST_AUTO_TEST_CASE(realize_yield_refusal_selectors_are_pinned) try {
    BOOST_CHECK(crank::classify_realize_yield_revert(encode_two_word_revert(
                   pool_underbacked_selector, test_yield_delta, test_yield_deadband)) ==
                refusal::underbacked);
+   BOOST_CHECK(crank::classify_realize_yield_revert(std::string(hex_prefix) +
+                                                    std::string(enforced_pause_selector)) == refusal::paused);
+   // `EnforcedPause()` takes no arguments; one with a word attached is not it.
+   BOOST_CHECK(!crank::classify_realize_yield_revert(
+      std::string(hex_prefix) + std::string(enforced_pause_selector) + abi_word(1)));
 
    BOOST_CHECK(!crank::classify_realize_yield_revert(
       std::string(hex_prefix) + std::string(no_yield_selector) + abi_word(1)));
@@ -1767,8 +1855,9 @@ BOOST_AUTO_TEST_CASE(crank_outpost_rebinds_when_the_registered_pool_moves) try {
       fixture->outpost->syndication_pool_address(), test_moved_syndication_pool_address));
 } FC_LOG_AND_RETHROW();
 
-/// The pool's own three refusals are outcomes of the crank, not failures: nothing to report is
-/// debug-quiet, an underbacked pool is a warning, and none of them propagate.
+/// The pool's own refusals are outcomes of the crank, not failures: nothing to report is
+/// debug-quiet, an underbacked pool is a warning, a paused (frozen) pool is info, and none of
+/// them propagate.
 BOOST_AUTO_TEST_CASE(crank_outpost_reads_the_pools_own_refusals_as_outcomes) try {
    const std::vector<std::pair<std::string, std::string>> refusals{
       {"WIRE_NoYield()", std::string(hex_prefix) + std::string(no_yield_selector)},
@@ -1776,6 +1865,7 @@ BOOST_AUTO_TEST_CASE(crank_outpost_reads_the_pools_own_refusals_as_outcomes) try
        encode_two_word_revert(yield_below_deadband_selector, test_yield_delta, test_yield_deadband)},
       {"WIRE_PoolUnderbacked(uint64,uint64)",
        encode_two_word_revert(pool_underbacked_selector, test_yield_delta, test_yield_deadband)},
+      {"EnforcedPause()", std::string(hex_prefix) + std::string(enforced_pause_selector)},
    };
    for (const auto& [description, revert_data] : refusals) {
       BOOST_TEST_CONTEXT(description) {
@@ -1903,7 +1993,6 @@ BOOST_AUTO_TEST_CASE(can_encode_tx_01) try {
          chain_key_type_ethereum,
          "0x8318535b54105d4a7aae60c08fc45f9687181b4fdfc625bd1a753fa7397fed753547f11ca8696646f2f3acb08e31016afac23e630c5d11f59f61fef57b0d2aa5",
          private_key_spec);
-
 
    // Provider should be retrievable
    // Sign raw unsigned TX bytes — eth_client_signer hashes with keccak256 internally

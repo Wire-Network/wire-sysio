@@ -153,6 +153,22 @@ try:
     Print("Test 4 PASSED")
 
     # ---------------------------------------------------------------
+    # Test 4b: a malformed request to a raw snapshot endpoint is a client error
+    # ---------------------------------------------------------------
+    Print("=== Test 4b: malformed requests get 400 ===")
+
+    for call, body in (("download", b""), ("latest", b'{"unexpected": 1}')):
+        req = urllib.request.Request(f"{node0.endpointHttp}/v1/snapshot/{call}", data=body, method="POST")
+        req.add_header("Content-Type", "application/json")
+        try:
+            with urllib.request.urlopen(req) as response:
+                errorExit(f"Expected 400 for a malformed {call} request, got {response.getcode()}")
+        except urllib.error.HTTPError as e:
+            assert e.code == 400, f"Expected 400 for a malformed {call} request, got {e.code}"
+
+    Print("Test 4b PASSED")
+
+    # ---------------------------------------------------------------
     # Test 5: /v1/snapshot/download serves the snapshot file
     # ---------------------------------------------------------------
     Print("=== Test 5: /v1/snapshot/download ===")
@@ -276,6 +292,27 @@ try:
 
         partialData = response.read()
         assert partialData == diskData[rangeStart:]
+
+    # Test 6e: a range bound too large for 64 bits is past EOF: as a start it is unsatisfiable, as an end it is clamped
+    hugeBound = "99999999999999999999999"
+    req = urllib.request.Request(downloadUrl, data=payload, method="POST")
+    req.add_header("Content-Type", "application/json")
+    req.add_header("Range", f"bytes={hugeBound}-")
+    try:
+        with urllib.request.urlopen(req) as response:
+            errorExit(f"Expected 416 for an overflowing Range start, got {response.getcode()}")
+    except urllib.error.HTTPError as e:
+        assert e.code == 416, f"Expected 416 for an overflowing Range start, got {e.code}"
+
+    req = urllib.request.Request(downloadUrl, data=payload, method="POST")
+    req.add_header("Content-Type", "application/json")
+    req.add_header("Range", f"bytes=0-{hugeBound}")
+    with urllib.request.urlopen(req) as response:
+        assert response.getcode() == 206, f"Expected 206, got {response.getcode()}"
+        contentRange = response.getheader("Content-Range")
+        expectedRange = f"bytes 0-{fileSize - 1}/{fileSize}"
+        assert contentRange == expectedRange, f"Content-Range: expected '{expectedRange}', got '{contentRange}'"
+        assert response.read() == diskData
 
     Print("Test 6 PASSED")
 
