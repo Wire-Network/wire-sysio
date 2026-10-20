@@ -18,7 +18,7 @@ if("native-module" IN_LIST SYSIO_WASM_RUNTIMES)
       message(FATAL_ERROR "Native debugging requires shared ${_wire_runtime} in WIRE_LLVM_ROOT")
     endif()
   endforeach()
-  string(REPLACE "-L\"${_wire_static_dir}\" -lc++ -lc++abi -lunwind"
+  string(REPLACE "${_wire_static_libraries}"
          "${_wire_shared_libraries}" CMAKE_CXX_STANDARD_LIBRARIES "${_wire_cxx_libraries}")
   string(REPLACE " -static-libgcc" "" CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES}")
   list(APPEND CMAKE_BUILD_RPATH "${_wire_runtime_dir}")

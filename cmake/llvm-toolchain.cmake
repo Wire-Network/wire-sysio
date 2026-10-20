@@ -86,7 +86,13 @@ if(EXISTS "${WIRE_LLVM_ROOT}/include/${_wire_triple}/c++/v1/__config_site")
 elseif(NOT EXISTS "${_wire_libcxx_include}/__config_site")
   message(FATAL_ERROR "LLVM distribution is missing libc++ target configuration")
 endif()
-set(_wire_cxx_libraries "-L\"${_wire_static_dir}\" -lc++ -lc++abi -lunwind")
+set(_wire_static_libraries "-L\"${_wire_static_dir}\" -lc++ -lc++abi -lunwind")
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+  # Private archive definitions cannot coalesce with Apple's process-wide weak
+  # libc++ symbols. Keep named archives so vcpkg's autotools adapter preserves them.
+  set(_wire_static_libraries "-L\"${_wire_static_dir}\" -Wl,-hidden-lc++ -Wl,-hidden-lc++abi -Wl,-hidden-lunwind")
+endif()
+set(_wire_cxx_libraries "${_wire_static_libraries}")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER MATCHES "(^|/)([^/]*-)?g[+][+](-[0-9]+)?$")
   # GCC's std::move shortcut also folds libc++'s __assoc_state<T*>::move()
   # member to its implicit this pointer, skipping future::get() synchronization

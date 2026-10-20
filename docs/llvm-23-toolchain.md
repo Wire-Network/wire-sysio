@@ -44,7 +44,11 @@ normal optimization and inlining remain enabled.
 vcpkg dependencies. `lib/wire-static` contains only links to the distribution's
 static runtime archives, preventing shared-library selection while supporting
 autoconf dependency probes. Configuration checks `_LIBCPP_VERSION == 230103`
-and links an exception probe. CI also runs `libcxx_runtime_test` and inspects
+and links an exception probe. On macOS, static runtime definitions have private
+visibility so dyld cannot coalesce their weak symbols with Apple's libc++.
+Native Debug builds continue to use the shared runtime trio.
+CI runs the standalone runtime probe before building dependency tools, then runs
+`libcxx_runtime_test` against the final build configuration and inspects
 the final programs for accidental shared C++ runtime dependencies.
 
 ## Dependency and runtime scope
@@ -110,7 +114,7 @@ ctest --test-dir build/libcxx-probe --output-on-failure
 python3 .github/scripts/check-libcxx-linkage.py build/libcxx-probe/libcxx_runtime_test
 ```
 
-The probe exercises pointer-valued futures, allocation, exceptions, RTTI and threads. Configure a separate
+The probe exercises pointer-valued futures, string growth, allocation, exceptions, RTTI and threads. Configure a separate
 probe directory with `-DCMAKE_BUILD_TYPE=Debug` to additionally check bidirectional
 exceptions, destructors, RTTI and ownership across a loaded native module.
 OC limit, interrupt,

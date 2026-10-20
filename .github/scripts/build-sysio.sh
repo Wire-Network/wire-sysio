@@ -28,6 +28,15 @@ else
   export CC="$WIRE_LLVM_ROOT/bin/clang" CXX="$WIRE_LLVM_ROOT/bin/clang++"
 fi
 
+# Exercise the host runtime before building vcpkg's native tools (LLVM TableGen
+# included). A runtime/linker mismatch should fail before dependency compilation.
+cmake -S "$GITHUB_WORKSPACE/cmake/test/libcxx" -B "$BUILD_DIR/libcxx-preflight" -G Ninja \
+  -DCMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/cmake/llvm-toolchain.cmake" \
+  -DWIRE_LLVM_ROOT="$WIRE_LLVM_ROOT" -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_C_COMPILER="$CC" -DCMAKE_CXX_COMPILER="$CXX"
+cmake --build "$BUILD_DIR/libcxx-preflight" --parallel "$BUILD_JOBS"
+ctest --test-dir "$BUILD_DIR/libcxx-preflight" --no-tests=error --output-on-failure
+
 echo "Building for ${SYSIO_PLATFORM_NAME:-unknown platform}"
 echo "Build directory: ${BUILD_DIR}"
 echo "vcpkg target triplet: ${VCPKG_TARGET_TRIPLET}"

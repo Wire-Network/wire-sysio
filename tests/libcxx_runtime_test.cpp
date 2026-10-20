@@ -34,6 +34,16 @@ int main() {
    producer.join();
    if (received != &value)
       return 4;
+   // Exercise out-of-line string growth, including allocations beyond SSO.
+   // On Darwin these calls must stay in the pinned runtime.
+   std::string growing;
+   for (int i = 0; i < 1024; ++i)
+      growing.append("wire");
+   if (growing.size() != 4096)
+      return 5;
+   for (std::size_t i = 0; i < growing.size(); ++i)
+      if (growing[i] != "wire"[i % 4])
+         return 5;
    std::exception_ptr error;
    std::thread worker([&] {
       try {
