@@ -115,11 +115,12 @@ cmake "${cmake_args[@]}"
 cmake --build "$BUILD_DIR" -- -j "$BUILD_JOBS"
 
 # Native Debug modules require a shared runtime; Release packages use static archives.
-runtime_check_args=()
+# Keep the array nonempty: macOS Bash 3.2 rejects empty arrays under set -u.
+runtime_check_command=(python3 .github/scripts/check-libcxx-linkage.py)
 if [[ "$(sed -n 's/^CMAKE_BUILD_TYPE:STRING=//p' "$BUILD_DIR/CMakeCache.txt")" == Debug ]]; then
-  runtime_check_args+=(--shared-runtime-root "$WIRE_LLVM_ROOT")
+  runtime_check_command+=(--shared-runtime-root "$WIRE_LLVM_ROOT")
 fi
-python3 .github/scripts/check-libcxx-linkage.py "${runtime_check_args[@]}" \
+"${runtime_check_command[@]}" \
   "$BUILD_DIR/programs/nodeop/nodeop" "$BUILD_DIR/programs/clio/clio" \
   "$BUILD_DIR/programs/kiod/kiod" "$BUILD_DIR/programs/sys-util/sys-util" \
   "$BUILD_DIR/tests/libcxx_runtime_test"
