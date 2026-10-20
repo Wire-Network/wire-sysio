@@ -91,7 +91,7 @@ Batch operators post depot-native collateral on `sysio.opreg`; a non-canonical d
 Signing keys for outbound submissions can be held locally (`KEY:`) or in a `kiod` daemon (`KIOD:`) — both built into `signature_provider_manager_plugin`. AWS KMS support (`KMS:` — secp256k1/ethereum keys only, remote signing so the key never leaves KMS) is provided by `signature_provider_kms_plugin`, enabled per config with `plugin = sysio::signature_provider_kms_plugin`. See `plugins/signature_provider_kms_plugin/test/README.md` for KMS key setup, IAM requirements, the `KMS:` spec format, and operational notes. AWS SSM Parameter Store support (`SSM:` — all key types) is `signature_provider_ssm_plugin`, enabled with `plugin = sysio::signature_provider_ssm_plugin`: the private key is fetched from a KMS-encrypted `SecureString` parameter once at startup and signing is local thereafter, fast enough for every signing path including block production. See `plugins/signature_provider_ssm_plugin/test/README.md` for parameter setup, IAM requirements, the `SSM:` spec format, and rotation notes. A `KMS:`/`SSM:` spec whose plugin is not enabled fails the boot with an error naming the `plugin =` line to add; host applications that embed the manager without the plugins can still register handlers from `main()` via `register_spec_handler()`.
 
 ### Bond Providers (Underwriters)
-Depot accounts that underwrite provable statements on `sysio.bond` with depot-native tokens (WIRE or shadow LIQ). Today the issuer is `sysio.synd`: each syndication envelope is released only after its statement is bonded. A bond provider accepts a share of a request, earns a pro-rata share of the bounty when the statement is approved, and forfeits the bond to the issuer if the statement is resolved invalid. No plugin or outpost interaction is involved.
+Depot accounts that underwrite provable statements on `sysio.bond` with depot-native tokens (WIRE or shadow LIQ). Today the issuer is `sysio.synd`: each syndication envelope is released only after its statement is bonded. A bond provider accepts a share of a request, earns a pro-rata share of the bounty when the statement is approved, and forfeits the bond to the issuer if the statement is resolved invalid. Any depot account can underwrite with the `batch_operator_plugin`'s underwriter role, which bonds an envelope only once the outpost confirms it.
 
 ### Node Owners
 Holders of a node-owner NFT who commit it on the Ethereum outpost (`NODE_OWNER_REG`). They are registered on `sysio.roa`, receive node-owner WIRE distributions from `sysio.system`, and form the Tier-1 electorate that votes on `sysio.chalg` envelope disputes.
@@ -128,7 +128,6 @@ Holders of a node-owner NFT who commit it on the Ethereum outpost (`NODE_OWNER_R
 | **SyndicationPool.sol** | liqETH custody: `syndicate` (`SYNDICATE_LIQ`), `realizeYield` (`LIQ_YIELD`), `DESYNDICATE_LIQ` payout |
 | **BAR.sol** | Node-owner NFT escrow emitting `NODE_OWNER_REG` |
 | **OutpostManager.sol** | OPP endpoint and role wiring |
-| **StakingManager.sol** | Placeholder for the deferred staking track; its entry points revert |
 
 On Solana the outpost lives in the `liqsol-core` program (`instructions/opp/`), alongside liqSOL staking and syndication.
 

@@ -275,4 +275,68 @@ BOOST_FIXTURE_TEST_CASE( get_account, validating_tester ) try {
    }
 } FC_LOG_AND_RETHROW() /// get_account
 
+BOOST_FIXTURE_TEST_CASE( key_alone_satisfies_follows_the_authority_checker, validating_tester ) try {
+   produce_block();
+   create_accounts({"alice"_n, "bob"_n, "carol"_n}, false, false);
+   produce_block();
+
+   const auto             alice_active = get_public_key("alice"_n, "active");
+   const permission_level alice{"alice"_n, config::active_name};
+   BOOST_CHECK(key_alone_satisfies(*control, alice, alice_active));
+   // Declaring a permission takes that permission's own authority, not its parent's.
+   BOOST_CHECK(key_alone_satisfies(*control, {"alice"_n, config::owner_name}, get_public_key("alice"_n, "owner")));
+   BOOST_CHECK(!key_alone_satisfies(*control, alice, get_public_key("alice"_n, "owner")));
+   BOOST_CHECK(!key_alone_satisfies(*control, {"alice"_n, "nosuch"_n}, alice_active));
+   BOOST_CHECK(!key_alone_satisfies(*control, {"nosuch"_n, config::active_name}, alice_active));
+
+   // A permission delegated to another account's permission is satisfied by that account's key.
+   set_authority("bob"_n, config::active_name, authority(1, {}, {permission_level_weight{alice, 1}}));
+   produce_block();
+   BOOST_CHECK(key_alone_satisfies(*control, {"bob"_n, config::active_name}, alice_active));
+
+   // Under threshold 2, a key of weight 1 is not enough alone; one of weight 2 is.
+   const auto k1 = get_public_key("carol"_n, "k1");
+   const auto k2 = get_public_key("carol"_n, "k2");
+   authority  two_of_two(2, {key_weight{k1, 1}, key_weight{k2, 1}});
+   two_of_two.sort_fields();
+   set_authority("carol"_n, config::active_name, two_of_two);
+   produce_block();
+   BOOST_CHECK(!key_alone_satisfies(*control, {"carol"_n, config::active_name}, k1));
+   authority heavy_k1(2, {key_weight{k1, 2}, key_weight{k2, 1}});
+   heavy_k1.sort_fields();
+   set_authority("carol"_n, config::active_name, heavy_k1);
+   produce_block();
+   BOOST_CHECK(key_alone_satisfies(*control, {"carol"_n, config::active_name}, k1));
+   BOOST_CHECK(!key_alone_satisfies(*control, {"carol"_n, config::active_name}, k2));
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( permission_satisfies_link_follows_linkauth, validating_tester ) try {
+   produce_block();
+   create_accounts({"alice"_n, "bob"_n}, false, false);
+   produce_block();
+   set_authority("alice"_n, "underwrite"_n, authority(get_public_key("alice"_n, "underwrite")), config::active_name);
+   produce_block();
+
+   const permission_level underwrite{"alice"_n, "underwrite"_n};
+   const permission_level active{"alice"_n, config::active_name};
+   // Nothing linked: an action needs active, which active and owner satisfy and a child of active does not.
+   BOOST_CHECK(!permission_satisfies_link(*control, underwrite, "bob"_n, "accept"_n));
+   BOOST_CHECK(permission_satisfies_link(*control, active, "bob"_n, "accept"_n));
+   BOOST_CHECK(permission_satisfies_link(*control, {"alice"_n, config::owner_name}, "bob"_n, "accept"_n));
+
+   link_authority("alice"_n, "bob"_n, "underwrite"_n, "accept"_n);
+   produce_block();
+   BOOST_CHECK(permission_satisfies_link(*control, underwrite, "bob"_n, "accept"_n));
+   BOOST_CHECK(permission_satisfies_link(*control, active, "bob"_n, "accept"_n));
+   BOOST_CHECK(!permission_satisfies_link(*control, underwrite, "bob"_n, "claim"_n));   // links are per action
+
+   // Linked to sysio.any: any permission of the account may declare it.
+   link_authority("alice"_n, "bob"_n, "sysio.any"_n, "anyact"_n);
+   produce_block();
+   BOOST_CHECK(permission_satisfies_link(*control, underwrite, "bob"_n, "anyact"_n));
+
+   // A permission that does not exist satisfies nothing.
+   BOOST_CHECK(!permission_satisfies_link(*control, {"alice"_n, "nosuch"_n}, "bob"_n, "accept"_n));
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()
