@@ -3,6 +3,7 @@
 #include <format>
 #include <functional>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -78,6 +79,19 @@ public:
       return inbound_response(call);
    }
 
+   /// read_emitted_envelope_digest response, by epoch; the default holds no record.
+   std::function<std::optional<fc::sha256>(uint32_t)> emitted_digest_response =
+      [](uint32_t) { return std::optional<fc::sha256>{}; };
+
+   std::optional<fc::sha256> read_emitted_envelope_digest(uint32_t         epoch_index,
+                                                          fc::microseconds deadline) override {
+      {
+         std::lock_guard<std::mutex> lock(_mx);
+         emitted_digest_calls.push_back(inbound_call{epoch_index, deadline});
+      }
+      return emitted_digest_response(epoch_index);
+   }
+
    struct crank_call {
       uint32_t         epoch_index = 0;
       fc::microseconds deadline;
@@ -97,6 +111,7 @@ public:
 
    std::vector<outbound_call> outbound_calls;
    std::vector<inbound_call>  inbound_calls;
+   std::vector<inbound_call>  emitted_digest_calls;
 
    std::vector<crank_call>    crank_calls;
    std::vector<uint8_t>       caller_address;
