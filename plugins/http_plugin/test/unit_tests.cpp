@@ -1231,8 +1231,8 @@ BOOST_FIXTURE_TEST_CASE(each_request_is_answered_once, quiet_http_plugin_test_fi
 }
 
 /// A raw handler's exception, thrown, reported through its connection or raised by a send, is answered like any API
-/// call's: a malformed request is a 400, any other failure a 500, and the connection stays open. After each exchange,
-/// the completed callbacks release all requests and bytes in flight.
+/// call's: a malformed request is a 400, any other failure a 500, and the connection stays open. Once it closes, no
+/// request or byte is left in flight.
 BOOST_FIXTURE_TEST_CASE(raw_handler_exceptions_are_api_errors, quiet_http_plugin_test_fixture) {
    constexpr auto invalid_request = "/v1/node/raw_invalid_request";
    constexpr auto reported_invalid_request = "/v1/node/raw_reported_invalid_request";
@@ -1279,9 +1279,9 @@ BOOST_FIXTURE_TEST_CASE(raw_handler_exceptions_are_api_errors, quiet_http_plugin
       BOOST_CHECK_EQUAL(exchange.responses[1].body(), R"("world")");
       // Receiving a response does not mean its server callback has returned: it can still hold an accounted
       // payload while another HTTP thread handles the next request. Check for leaks after the connection closes.
-      BOOST_REQUIRE_MESSAGE(all_released(*plugin), route << ": " << plugin->requests_in_flight()
-                                                       << " requests and " << plugin->bytes_in_flight()
-                                                       << " bytes remain in flight");
+      const bool released = all_released(*plugin);
+      BOOST_REQUIRE_MESSAGE(released, route << ": " << plugin->requests_in_flight() << " requests and "
+                                            << plugin->bytes_in_flight() << " bytes remain in flight");
    }
 }
 
