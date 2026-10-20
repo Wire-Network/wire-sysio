@@ -1172,6 +1172,91 @@ BOOST_AUTO_TEST_CASE(read_inbound_envelope_validates_latest_slot) try {
       fc::seconds(test_rpc_deadline_seconds)).empty());
 } FC_LOG_AND_RETHROW();
 
+/// `outboundEnvelopes(uint32)` returns `(uint32 epochIndex, uint64 emittedAt, bytes32 checksum)`.
+std::string encode_outbound_record_result(uint64_t epoch, const fc::sha256& checksum) {
+   constexpr uint64_t emitted_at = 1'700'000'000;
+   return std::string(hex_prefix) + abi_word(epoch) + abi_word(emitted_at) + checksum.str();
+}
+
+BOOST_AUTO_TEST_CASE(read_emitted_envelope_digest_reads_the_outpost_record) try {
+   auto clean_app = gsl_lite::finally([]() {
+      appbase::application::reset_app_singleton();
+   });
+   auto tester = create_app();
+   auto sig_provider = tester->plugin().create_provider(
+      std::string(latest_slot_test_entry_id),
+      chain_kind_ethereum,
+      chain_key_type_ethereum,
+      std::string(latest_slot_test_public_key),
+      to_private_key_spec(std::string(latest_slot_test_private_key)));
+
+   // One outpost per ABI set: the client caches its typed contract per address.
+   const std::string opp_address{test_opp_address};
+   auto make_outpost = [&](std::vector<fc::network::ethereum::abi::contract> abis) {
+      ethereum_transaction_policy transaction_policy{
+         .client_id = std::string(latest_slot_test_entry_id),
+         .chain_id = test_evm_chain_id,
+         .max_priority_fee_per_gas = maximum_ethereum_transaction_policy_value(),
+         .max_fee_per_gas = maximum_ethereum_transaction_policy_value(),
+         .max_gas_limit = maximum_ethereum_transaction_policy_value(),
+         .max_total_native_cost = maximum_ethereum_transaction_policy_value(),
+      };
+      auto eth_client = std::make_shared<ethereum_client>(
+         sig_provider, std::variant<std::string, fc::url>{std::string{latest_slot_test_rpc_url}},
+         std::move(transaction_policy));
+      auto typed_opp = eth_client->get_contract<sysio::opp_contract_client>(opp_address, abis);
+      auto entry = std::make_shared<sysio::ethereum_client_entry_t>();
+      entry->id = latest_slot_test_entry_id;
+      entry->signature_provider = sig_provider;
+      entry->client = eth_client;
+      entry->chain_id = test_evm_chain_id;
+      auto outpost = std::make_shared<sysio::outpost_ethereum_client>(
+         entry, opp_address, "", abis, test_outpost_chain_code, test_evm_chain_id);
+      return std::make_pair(typed_opp, outpost);
+   };
+
+   auto [typed_opp, outpost] = make_outpost(load_abi_fixture(opp_abi_fixture));
+   BOOST_REQUIRE(typed_opp->outbound_envelopes);
+   auto set_response = [&](std::string response) {
+      typed_opp->outbound_envelopes =
+         [response = std::move(response)](const block_number_or_tag_t& block, uint32_t& epoch) -> fc::variant {
+            BOOST_CHECK(std::holds_alternative<block_tag_t>(block));
+            BOOST_CHECK(std::get<block_tag_t>(block) == block_tag_t::finalized);
+            BOOST_CHECK_EQUAL(epoch, test_wire_epoch);
+            return fc::variant(response);
+         };
+   };
+   const auto deadline = fc::seconds(test_rpc_deadline_seconds);
+   const auto digest   = fc::sha256::hash(std::string("emitted envelope"));
+
+   set_response(encode_outbound_record_result(test_wire_epoch, digest));
+   const auto read = outpost->read_emitted_envelope_digest(test_wire_epoch, deadline);
+   BOOST_REQUIRE(read.has_value());
+   BOOST_CHECK(*read == digest);
+
+   // An absent mapping entry reads as all zeros: nothing emitted, or pruned.
+   set_response(encode_outbound_record_result(0, fc::sha256{}));
+   BOOST_CHECK(!outpost->read_emitted_envelope_digest(test_wire_epoch, deadline).has_value());
+
+   // A record for another epoch, or no data at all, is a failed read rather than an answer.
+   set_response(encode_outbound_record_result(test_stale_wire_epoch, digest));
+   BOOST_CHECK_THROW(outpost->read_emitted_envelope_digest(test_wire_epoch, deadline), fc::exception);
+   set_response(std::string(hex_prefix));
+   BOOST_CHECK_THROW(outpost->read_emitted_envelope_digest(test_wire_epoch, deadline), fc::exception);
+   set_response(encode_outbound_record_result(test_wire_epoch, digest) + abi_word(0));   // more than one record
+   BOOST_CHECK_THROW(outpost->read_emitted_envelope_digest(test_wire_epoch, deadline), fc::exception);
+
+   // An ABI without the view still builds the client, which the relay needs, and the read refuses.
+   auto abis_without_view = load_abi_fixture(opp_abi_fixture);
+   std::erase_if(abis_without_view, [](const fc::network::ethereum::abi::contract& c) {
+      return c.name == sysio::opp_contract_client::view_outbound_envelopes;
+   });
+   auto [typed_without_view, outpost_without_view] = make_outpost(std::move(abis_without_view));
+   BOOST_CHECK(!typed_without_view->outbound_envelopes);
+   BOOST_CHECK(typed_without_view->get_latest_outbound_envelope);
+   BOOST_CHECK_THROW(outpost_without_view->read_emitted_envelope_digest(test_wire_epoch, deadline), fc::exception);
+} FC_LOG_AND_RETHROW();
+
 // ---------------------------------------------------------------------------
 //  Chunked WIRE -> Ethereum envelope delivery
 // ---------------------------------------------------------------------------

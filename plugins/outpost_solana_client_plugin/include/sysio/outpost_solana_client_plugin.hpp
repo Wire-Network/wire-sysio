@@ -24,6 +24,10 @@ enum class solana_outpost_role {
    /// Delivers outbound envelopes AND polls `read_inbound_envelope` - the
    /// IDL must declare a readable `LatestOutboundEnvelope`, asserted at boot.
    batch_operator,
+   /// Reads only the outpost's record of the envelopes it emitted
+   /// (`read_emitted_envelope_digest`) - the IDL must declare a readable
+   /// outbound `EnvelopeLog`, asserted at boot.
+   underwriter,
 
 };
 

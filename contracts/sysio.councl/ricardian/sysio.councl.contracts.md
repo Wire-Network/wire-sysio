@@ -51,7 +51,7 @@ summary: 'Append tier-{{nowrap tier}} node owners into the frozen snapshot.'
 ---
 
 The contract owner inspects at most {{max_rows}} node-owner rows from sysio.roa while appending
-tier-{{tier}} identities into the frozen escalation snapshot. A persistent source cursor bounds
+tier-{{tier}} identities into the frozen voting snapshot. A persistent source cursor bounds
 reads as well as writes, and identity deduplication allows a later pass to absorb newly observed
 owners. Called repeatedly until the tier scan is complete.
 
@@ -60,12 +60,12 @@ owners. Called repeatedly until the tier scan is complete.
 ---
 spec_version: "0.2.0"
 title: Finalize Election Initialization
-summary: 'Verify the tier snapshots and open the first seat.'
+summary: 'Verify the tier snapshots and open simultaneous nominations.'
 ---
 
 The contract owner finalizes initialization: the tier-2 and tier-3 source scans must be complete,
 their snapshot sizes are verified against authoritative generation-scoped sysio.roa rows, and the
-first council seat's nomination window opens.
+shared nomination window opens for all 21 seats.
 
 <h1 class="contract">reset</h1>
 
@@ -90,7 +90,7 @@ summary: 'Delete up to {{max_rows}} ephemeral rows from the completed generation
 ---
 
 The contract owner deletes at most {{max_rows}} rows from the mode-specific candidate, roster,
-tier-snapshot, remap, and optional partial-council cleanup stages. Completion removes live election
+tier-snapshot, flight, ballot, and optional partial-council cleanup stages. Completion removes live election
 state and reopens registration. Completed council history is retained; partial results from an
 aborted active election are not.
 
@@ -98,82 +98,38 @@ aborted active election are not.
 
 ---
 spec_version: "0.2.0"
-title: Nominate a Candidate Slate
-summary: '{{nowrap proposer}} nominates a slate of three candidates.'
+title: Nominate or Replace a Council Flight
+summary: '{{nowrap proposer}} submits an ordered flight for their vacant seat.'
 ---
 
-{{proposer}} nominates a slate of three distinct, un-elected candidates ({{c1}}, {{c2}}, and
-{{c3}}) for the current seat, opening the voting round. Optional {{expected_round}} binds the
-request to a specific round; if the round is stale or elapses during lazy settlement, the action
-fails and rolls back instead of acting as a settlement-only crank. Omitting it preserves the
-settlement-only behavior.
-
-## Preconditions
-- The caller must be authorized as {{proposer}}.
-- {{proposer}} must be the active proposer for the current seat.
-- The nomination window must not have elapsed.
-- The three candidates must be distinct, registered, and not already elected.
+{{proposer}} nominates {{c1}}, {{c2}}, and {{c3}} in priority order for their frozen T1 seat in election {{election_gen}}, round {{round_id}}. Candidates must be distinct, registered, and unelected. Each candidate-position pair can belong to only one flight. During the shared nomination window, a successful replacement releases prior claims and acquires the new claims atomically. A rejected replacement preserves the previous flight. The proposer must authorize this action. Stale identities or elapsed nominations fail; this action never opens voting or acts as a crank.
 
 <h1 class="contract">vote</h1>
 
 ---
 spec_version: "0.2.0"
-title: Vote on the Current Slate
-summary: '{{nowrap voter}} votes on the three current-slate candidates.'
+title: Submit a Council Round Ballot
+summary: '{{nowrap voter}} submits one immutable ballot for the finalized round.'
 ---
 
-{{voter}} casts an independent yes/no vote on each of the three candidates in the current slate.
-Optional {{expected_round}} binds the ballot to a specific round and makes a stale or
-deadline-crossing ballot fail instead of silently settling the election.
-
-## Preconditions
-- The caller must be authorized as {{voter}}.
-- Voting must be open for the current slate.
-- {{voter}} must be an eligible voter for the active tier and must not be the proposer.
-- {{voter}} must not have already voted in this round.
+{{voter}} submits independent YES/NO decisions in {{votes}} for every eligible flight in ascending seat order. Election {{election_gen}}, round {{round_id}}, and finalized flight commitment {{flight_hash}} must match the active voting window. The voter must authorize the action and belong to a frozen electorate. T1 owners omit their own seat's flight, including automatically generated flights; T2/T3 owners vote on every available flight without implicit YES credit. Ballots cannot be revised or duplicated. Votes and running totals are public. Submissions at the exact deadline are accepted. Results are tabulated only after the shared window closes. The YES threshold is floor(2*B/3)+1, where B is all accepted ballots from that tier in this round, identical for every flight. A valid empty T1 ballot still counts toward B. Zero submissions cannot elect; there is no additional turnout quorum.
 
 <h1 class="contract">settle</h1>
 
 ---
 spec_version: "0.2.0"
-title: Settle Election State
-summary: '{{nowrap caller}} advances timed-out election state and stirs entropy.'
+title: Advance the Council Round
+summary: '{{nowrap caller}} advances bounded election work.'
 ---
 
-{{caller}} authorizes a public crank that resolves an elapsed attempt and advances the
-election while mixing the authenticated caller into the accumulator.
-
-<h1 class="contract">forceback</h1>
-
----
-spec_version: "0.2.0"
-title: Governance Recovery Backstop
-summary: 'Move an elapsed active attempt to governance backstop.'
----
-
-The contract owner moves an elapsed nomination or voting attempt directly to BACKSTOP. This is an
-exceptional recovery path for an operationally stalled election and cannot be used before the
-active attempt's inclusive deadline has passed.
-
-<h1 class="contract">forceassign</h1>
-
----
-spec_version: "0.2.0"
-title: Governance Seat Assignment
-summary: 'Assign {{nowrap member}} to the current seat.'
----
-
-The contract owner seats {{member}} for the current seat. Valid only at the governance backstop,
-reached either after tier-3 exhaustion or through `forceback` recovery of an elapsed attempt.
+Authenticated {{caller}} advances election {{election_gen}}, round {{round_id}}, processing at most {{max_steps}} seats (1–21) in the persisted original order. After nominations expire, generation freezes one seed; voting opens only after all flights are finalized. After the shared voting deadline, tabulation processes each seat through T1, T2, T3 and A, B, C, immediately excluding elected members from later seats. A subsequent continuation starts fresh nominations, tallies, and ballot counters for every vacancy while retaining winners and snapshots. Rounds repeat until all 21 seats are filled; there is no manual assignment fallback. Stale identities fail. Exact deadlines do not trigger settlement. This action also contributes public entropy.
 
 <h1 class="contract">stir</h1>
 
 ---
 spec_version: "0.2.0"
-title: Stir Entropy
-summary: '{{nowrap caller}} advances entropy and settles elapsed election state.'
+title: Contribute Council Entropy
+summary: '{{nowrap caller}} contributes to the public entropy accumulator.'
 ---
 
-{{caller}} authorizes a public crank that mixes the authenticated caller into the entropy
-accumulator and also advances an elapsed election attempt. Block number and block timestamp are not
-entropy inputs.
+Authenticated {{caller}} contributes to the election's deterministic public entropy accumulator. This does not change an already frozen automatic-generation seed or advance election phases. Use settle to drive eligible transitions.
