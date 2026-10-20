@@ -34,6 +34,12 @@ To select GCC for both the host project and its dependencies, set
 `CC=gcc-15 CXX=g++-15` for a fresh configure. The triplets track these compiler
 overrides in the dependency cache. All paths must refer to native host toolchains.
 
+GNU C++ builds disable `-ffold-simple-inlines`: GCC 15 mistakes libc++'s
+pointer-valued future state `move()` member for `std::move`, returning the state
+pointer without waiting or extracting the promised value. The shared toolchain
+applies this setting to dependencies and installed consumers as well as Sysio;
+normal optimization and inlining remain enabled.
+
 `cmake/llvm-toolchain.cmake` applies the same C++ ABI to the host project and
 vcpkg dependencies. `lib/wire-static` contains only links to the distribution's
 static runtime archives, preventing shared-library selection while supporting
@@ -104,7 +110,7 @@ ctest --test-dir build/libcxx-probe --output-on-failure
 python3 .github/scripts/check-libcxx-linkage.py build/libcxx-probe/libcxx_runtime_test
 ```
 
-The probe exercises allocation, exceptions, RTTI and threads. Configure a separate
+The probe exercises pointer-valued futures, allocation, exceptions, RTTI and threads. Configure a separate
 probe directory with `-DCMAKE_BUILD_TYPE=Debug` to additionally check bidirectional
 exceptions, destructors, RTTI and ownership across a loaded native module.
 OC limit, interrupt,

@@ -1,5 +1,6 @@
 #include <version>
 #include <exception>
+#include <future>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
@@ -23,6 +24,16 @@ public:
 int main() {
    if (wire_c_runtime_probe() != 1)
       return 3;
+   // GCC must call libc++'s pointer-valued future state move(), rather than
+   // folding it like std::move and returning the state allocation itself.
+   int value = 42;
+   std::promise<int*> promised;
+   auto result = promised.get_future();
+   std::thread producer([&] { promised.set_value(&value); });
+   auto* received = result.get();
+   producer.join();
+   if (received != &value)
+      return 4;
    std::exception_ptr error;
    std::thread worker([&] {
       try {
@@ -43,5 +54,5 @@ int main() {
           std::string(caught.what()) != probe_message)
          return 2;
    }
-   std::cout << "libc++ " << _LIBCPP_VERSION << ": exceptions, RTTI and threads passed\n";
+   std::cout << "libc++ " << _LIBCPP_VERSION << ": futures, exceptions, RTTI and threads passed\n";
 }

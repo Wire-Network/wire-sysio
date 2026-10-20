@@ -88,6 +88,10 @@ elseif(NOT EXISTS "${_wire_libcxx_include}/__config_site")
 endif()
 set(_wire_cxx_libraries "-L\"${_wire_static_dir}\" -lc++ -lc++abi -lunwind")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER MATCHES "(^|/)([^/]*-)?g[+][+](-[0-9]+)?$")
+  # GCC's std::move shortcut also folds libc++'s __assoc_state<T*>::move()
+  # member to its implicit this pointer, skipping future::get() synchronization
+  # and value extraction. Normal optimization/inlining remains enabled.
+  string(APPEND _wire_cxx_flags " -fno-fold-simple-inlines")
   string(APPEND _wire_cxx_libraries " -nodefaultlibs -lgcc -lm -lc -lpthread -ldl")
 else()
   string(APPEND _wire_cxx_libraries " -nostdlib++")
