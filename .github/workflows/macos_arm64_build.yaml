@@ -101,6 +101,31 @@ jobs:
         run: |
           bash .github/scripts/build-sysio.sh "$(sysctl -n hw.logicalcpu)"
 
+      - name: Collect LLVM runtime linkage on build failure
+        if: failure()
+        run: |
+          mkdir -p "$RUNNER_TEMP/llvm-runtime-linkage"
+          for llvm_build in vcpkg/buildtrees/llvm/arm64-osx-release-*; do
+            binary="$llvm_build/bin/llvm-min-tblgen"
+            [[ -f "$binary" ]] || continue
+            report="$RUNNER_TEMP/llvm-runtime-linkage/$(basename "$llvm_build").txt"
+            {
+              file "$binary"
+              otool -L "$binary"
+              nm -m "$binary"
+              ninja -C "$llvm_build" -t commands bin/llvm-min-tblgen
+            } > "$report" 2>&1 || true
+          done
+          runtime_root="${WIRE_LLVM_ROOT:-$RUNNER_TEMP/llvm-23.1.3}"
+          for archive in "$runtime_root"/lib/wire-static/*.a; do
+            [[ -e "$archive" ]] || continue
+            {
+              ls -l "$archive"
+              file -L "$archive"
+              lipo -info "$archive"
+            } >> "$RUNNER_TEMP/llvm-runtime-linkage/archives.txt" 2>&1 || true
+          done
+
       - name: Save vcpkg binary cache
         if: ${{ success() && steps.restore-vcpkg.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # actions/cache/save@v5
@@ -203,6 +228,7 @@ jobs:
             ${{ env.BUILD_DIR }}/Testing/Temporary/
             ${{ env.BUILD_DIR }}/TestLogs/
             ${{ env.BUILD_DIR }}/PerformanceHarnessScenarioRunnerLogs/
+            ${{ runner.temp }}/llvm-runtime-linkage/
 
       - name: Show diagnostics on failure
         if: failure()
