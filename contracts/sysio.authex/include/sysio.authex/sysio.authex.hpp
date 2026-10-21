@@ -273,9 +273,6 @@ namespace sysio {
         const sysio::public_key &pub_key,
         const uint64_t nonce);
 
-    // ! For testing only, remove before MAINNET deployment.
-    [[sysio::action]] void clearlinks();
-
     /**
      * Record an external-chain public-key link WITHOUT signature verification -- the trusted,
      * depot-only counterpart to createlink. The OPP NodeOwnerRegistration dispatch has already
