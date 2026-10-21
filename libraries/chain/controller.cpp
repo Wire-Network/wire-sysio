@@ -51,6 +51,12 @@
 
 namespace sysio::chain {
 
+namespace {
+constexpr auto missing_database_header_message =
+   "State database has no version header: the launch that created it did not complete startup. "
+   "Rerun once with --delete-all-blocks.";
+}
+
 using resource_limits::resource_limits_manager;
 
 using controller_index_set = index_set<
@@ -1481,7 +1487,7 @@ struct controller_impl {
       const auto& header_idx = db.get_index<database_header_multi_index>().indices().get<by_id>();
 
       SYS_ASSERT(header_idx.begin() != header_idx.end(), bad_database_version_exception,
-                 "state database version pre-dates versioning, please restore from a compatible snapshot or replay!");
+                 missing_database_header_message);
 
       auto header_itr = header_idx.begin();
       header_itr->validate();
