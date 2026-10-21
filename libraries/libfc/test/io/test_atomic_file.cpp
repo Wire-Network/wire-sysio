@@ -47,9 +47,11 @@ BOOST_AUTO_TEST_CASE(ordinary_creation_permissions) {
 
 /// Abandoned and throwing writers remove only their own sibling, including with concurrent writers.
 BOOST_AUTO_TEST_CASE(cleanup_and_stale_siblings) {
-   const auto stale = destination.string() + ".tmp";
+   const auto prefix = "." + destination.filename().string() + ".tmp." + std::to_string(::getpid()) + ".";
+   const auto stale = destination.parent_path() / (prefix + "stale");
    std::ofstream(stale) << "stale";
    fc::io::atomic_file_writer survivor(destination);
+   BOOST_CHECK(survivor.temporary_path().filename().string().starts_with(prefix));
    std::filesystem::path abandoned;
    try {
       fc::io::atomic_file_writer writer(destination);

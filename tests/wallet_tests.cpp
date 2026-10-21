@@ -6,6 +6,7 @@
 #include <fc/filesystem.hpp>
 
 #include <chrono>
+#include <fstream>
 
 #include <boost/test/unit_test.hpp>
 #include <sysio/chain/authority.hpp>
@@ -14,6 +15,33 @@
 namespace sysio {
 
 BOOST_AUTO_TEST_SUITE(wallet_tests)
+
+/// A failed secure save preserves keys on disk; successful replacement keeps owner-only permissions.
+BOOST_AUTO_TEST_CASE(wallet_atomic_save) {
+   using namespace sysio::wallet;
+   fc::temp_directory directory;
+   const auto path = directory.path() / "keys.wallet";
+   wallet_data data;
+   soft_wallet wallet(data);
+   wallet.set_password("pass");
+   wallet.unlock("pass");
+   wallet.set_wallet_filename(path.string());
+   const auto key = fc::crypto::private_key::generate();
+   wallet.import_key(key.to_string({}));
+   BOOST_CHECK(std::filesystem::status(path).permissions() ==
+               (std::filesystem::perms::owner_read | std::filesystem::perms::owner_write));
+
+   const auto alias = directory.path() / "alias.wallet";
+   std::filesystem::create_symlink(path, alias);
+   BOOST_CHECK_THROW(wallet.save_wallet_file(alias.string()), std::ios_base::failure);
+   wallet_data loaded_data;
+   soft_wallet loaded(loaded_data);
+   BOOST_REQUIRE(loaded.load_wallet_file(path.string()));
+   loaded.unlock("pass");
+   BOOST_CHECK(loaded.get_private_key(key.get_public_key()) == key);
+   BOOST_CHECK_EQUAL(std::distance(std::filesystem::directory_iterator(directory.path()),
+                                   std::filesystem::directory_iterator()), 2);
+}
 
 /// Test creating the wallet
 BOOST_AUTO_TEST_CASE(wallet_test)

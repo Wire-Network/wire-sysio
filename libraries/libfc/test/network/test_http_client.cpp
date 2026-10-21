@@ -564,7 +564,7 @@ private:
 
 /** Check all unique temporary siblings, so cleanup tests cannot pass by checking an obsolete fixed path. */
 bool has_partial_file(const std::filesystem::path& output) {
-   const auto prefix = output.filename().string() + ".tmp.";
+   const auto prefix = "." + output.filename().string() + ".tmp.";
    for (const auto& entry : std::filesystem::directory_iterator(output.parent_path())) {
       if (entry.path().filename().string().starts_with(prefix))
          return true;

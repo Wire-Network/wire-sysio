@@ -1068,7 +1068,10 @@ namespace sysio::trace_api {
                compressed_path.replace_extension(_compressed_trace_ext);
 
                log(std::string("Compressing: ") + trace.get_file_path().generic_string());
-               compressed_file::process(trace.get_file_path(), compressed_path.generic_string(), _compression_seek_point_stride);
+               if (!compressed_file::process(trace.get_file_path(), compressed_path, _compression_seek_point_stride)) {
+                  log(std::string("Compression failed; retaining: ") + trace.get_file_path().generic_string());
+                  return;
+               }
 
                // after compression is complete, delete the old uncompressed file
                log(std::string("Removing: ") + trace.get_file_path().generic_string());

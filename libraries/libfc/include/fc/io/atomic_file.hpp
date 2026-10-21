@@ -9,8 +9,9 @@ namespace fc::io {
 /** Own an exclusively created sibling until explicit publication.
  * External writers must finish and check their close before commit(). Declare them after this guard
  * so they release resources before exception cleanup. Concurrent publications are last-rename-wins.
- * Crash leftovers are never reused or removed by another operation; destruction only handles normal
- * unwinding, not process termination. The destination directory must be trusted against path replacement.
+ * Hidden .<target>.tmp.<pid>.<random> leftovers may be removed once the writer process is gone. They are
+ * never reused or removed by another operation; destruction only handles normal unwinding, not process
+ * termination. The destination directory must be trusted against path replacement.
  */
 class atomic_file {
 public:
@@ -21,8 +22,9 @@ public:
       : _destination(std::filesystem::absolute(destination)) {
       std::random_device random;
       for (unsigned attempt = 0; attempt < max_reservation_attempts; ++attempt) {
-         _temporary = _destination.string() + temporary_suffix + std::to_string(random()) + "-" +
-                      std::to_string(random()) + "-" + std::to_string(random());
+         _temporary = _destination.parent_path() / ("." + _destination.filename().string() + temporary_suffix +
+                      std::to_string(::getpid()) + "." + std::to_string(random()) + "-" +
+                      std::to_string(random()) + "-" + std::to_string(random()));
          cfile reservation;
          reservation.set_file_path(_temporary);
          try {
@@ -121,6 +123,8 @@ public:
          throw std::logic_error("Atomic file commit already attempted");
       _commit_attempted = true;
       _file.flush();
+      if (_file.has_error())
+         throw std::ios_base::failure("Cannot publish atomic file after a stream error: " + temporary_path().string());
       _file.close_checked();
       _publication.commit(durable);
    }
