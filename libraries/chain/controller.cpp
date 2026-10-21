@@ -746,7 +746,20 @@ struct controller_impl {
    // state_history_plugin::plugin_initialize before chain_plugin::plugin_startup runs -- must NOT
    // overwrite the previous good file with the still-empty revision-0 dedup.
    fc::scoped_exit<std::function<void()>> write_trx_dedup = [&]() {
-      if( okay_to_persist_dedup ) trx_dedup.write_to_file(conf.state_dir / config::transaction_dedup_filename);
+      if( !okay_to_persist_dedup ) return;
+      const auto path = conf.state_dir / config::transaction_dedup_filename;
+      try {
+         trx_dedup.write_to_file(path);
+      } catch (const fc::exception& e) {
+         elog("Unable to persist transaction dedup to {}: {}. Restore from a snapshot before restarting.",
+              path.string(), e.to_detail_string());
+      } catch (const std::exception& e) {
+         elog("Unable to persist transaction dedup to {}: {}. Restore from a snapshot before restarting.",
+              path.string(), e.what());
+      } catch (...) {
+         elog("Unable to persist transaction dedup to {}: unknown error. Restore from a snapshot before restarting.",
+              path.string());
+      }
    };
    const chain_id_type             chain_id; // read by thread_pool threads, value will not be changed
    std::atomic<bool>               replaying = false;
@@ -1447,7 +1460,19 @@ struct controller_impl {
       bool valid = chain_head.read(conf.state_dir / config::chain_head_filename);
       SYS_ASSERT( valid, database_exception, "No existing chain_head.dat file");
 
-      trx_dedup.read_from_file(conf.state_dir / config::transaction_dedup_filename);
+      const auto dedup_path = conf.state_dir / config::transaction_dedup_filename;
+      bool dedup_loaded = false;
+      try {
+         dedup_loaded = trx_dedup.read_from_file(dedup_path);
+      } catch (const fc::exception& e) {
+         SYS_THROW(database_exception, "Unable to read transaction dedup file {}: {}. Restore from a snapshot.",
+                   dedup_path.string(), e.to_detail_string());
+      } catch (const std::exception& e) {
+         SYS_THROW(database_exception, "Unable to read transaction dedup file {}: {}. Restore from a snapshot.",
+                   dedup_path.string(), e.what());
+      }
+      SYS_ASSERT(dedup_loaded, database_exception,
+                 "Missing or unreadable transaction dedup file {}. Restore from a snapshot.", dedup_path.string());
 
       SYS_ASSERT(db.revision() == chain_head.block_num(), database_exception,
                  "chain_head block num {} does not match chainbase revision {}",
@@ -1509,31 +1534,16 @@ struct controller_impl {
       // align the dedup to it before registering:
       //  - genesis/snapshot loaded membership only (revision 0); a snapshot is an irreversible root,
       //    so the db has no reversible undo sessions and a plain set_revision matches it.
-      //  - existing_state restored the dedup's revision and undo stack from its on-disk file. That
-      //    file is a best-effort cache, NOT an authoritative store like chainbase's mmap'd segment:
-      //    it can legitimately be missing (first start after upgrading to dedup persistence), stale,
-      //    or empty at revision 0 (a startup that aborts before the chain loads -- e.g. a corrupt
-      //    SHiP log failing another plugin's initialize -- still runs the write-on-exit; the guard on
-      //    write_trx_dedup prevents most such clobbers, but an older build or external tooling could
-      //    still leave one). If the loaded range does not match the db exactly, discard it and
-      //    rebuild an empty undo stack aligned to the db: the node starts with degraded dedup memory
-      //    (self-healing as reversible blocks become irreversible) instead of refusing to start. A
-      //    clean restart matches and keeps the full set -- the fast path.
-      // add_undo_participant re-validates the range, so a logic error here still fails loud rather
-      // than registering a divergent participant.
+      //  - existing_state must restore the exact revision range and membership. Starting with an
+      //    empty or stale dedup would accept duplicate transactions and diverge from chain state.
       if (startup == startup_t::existing_state) {
          const auto db_range = db.undo_stack_revision_range();
-         if (trx_dedup.undo_stack_revision_range() != db_range) {
-            const auto dedup_range = trx_dedup.undo_stack_revision_range();
-            wlog( "transaction dedup file revision range [{},{}] does not match database [{},{}]; "
-                  "rebuilding empty dedup aligned to the database (dedup replay protection over the "
-                  "reversible window is rebuilt as those blocks become irreversible)",
-                  dedup_range.first, dedup_range.second, db_range.first, db_range.second );
-            trx_dedup.reset();
-            trx_dedup.set_revision( db_range.first );
-            for( uint64_t r = db_range.first; r < db_range.second; ++r )
-               trx_dedup.add_undo_session();
-         }
+         const auto dedup_range = trx_dedup.undo_stack_revision_range();
+         SYS_ASSERT(dedup_range == db_range, database_exception,
+                    "Transaction dedup file {} revision range [{},{}] does not match database [{},{}]. "
+                    "Restore from a snapshot.",
+                    (conf.state_dir / config::transaction_dedup_filename).string(),
+                    dedup_range.first, dedup_range.second, db_range.first, db_range.second);
       } else {
          trx_dedup.set_revision(static_cast<uint64_t>(db.revision()));
       }

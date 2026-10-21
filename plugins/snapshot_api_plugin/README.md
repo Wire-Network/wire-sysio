@@ -301,7 +301,8 @@ The existing chain database size setting supplies the download ceiling:
 The response-size limit must be positive. A fixed-length response that exceeds the maximum is rejected from its
 `Content-Length` before a temporary file is opened. Chunked or lengthless responses are stopped at the same byte
 ceiling. Available disk space is checked before and throughout the transfer, and a failed transfer removes its
-`.downloading` file.
+hidden `.<target>.tmp.<pid>.<random>` sibling. After a crash, a leftover sibling can be removed once its writer
+process is gone.
 Long transfers recheck after at most 64 MiB or five seconds of progress and retain an additional 64 MiB safety margin
 to bound interference from concurrent disk consumers between probes.
 

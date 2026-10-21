@@ -18,6 +18,25 @@ using namespace std::literals;
 
 BOOST_AUTO_TEST_SUITE(protocol_feature_tests)
 
+/// Default feature specifications are complete JSON files, reusable on restart without leftover siblings.
+BOOST_AUTO_TEST_CASE(default_feature_files_round_trip) {
+   fc::temp_directory directory;
+   const auto path = directory.path() / "features";
+   const auto initial = initialize_protocol_features(path);
+   BOOST_REQUIRE_GT(initial.size(), 0u);
+   BOOST_CHECK_EQUAL(std::distance(std::filesystem::directory_iterator(path),
+                                   std::filesystem::directory_iterator()), initial.size());
+   for (const auto& entry : std::filesystem::directory_iterator(path)) {
+      BOOST_CHECK(entry.path().filename().string().starts_with("BUILTIN-"));
+      BOOST_CHECK(entry.path().extension() == ".json");
+      BOOST_CHECK_NO_THROW(fc::json::from_file(entry.path()));
+   }
+   const auto restored = initialize_protocol_features(path, false);
+   BOOST_CHECK_EQUAL(restored.size(), initial.size());
+   for (const auto& [codename, spec] : builtin_protocol_feature_codenames)
+      BOOST_CHECK(restored.get_builtin_digest(codename) == initial.get_builtin_digest(codename));
+}
+
 namespace {
 
 constexpr std::string_view default_roa_net_cpu_weight = "1.0000 SYS";
