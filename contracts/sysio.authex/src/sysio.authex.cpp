@@ -221,20 +221,6 @@ namespace sysio {
 }
 
 
-// ! Clear links table, for testing only. Remove before deployment.
-[[sysio::action]] void authex::clearlinks() {
-   require_auth(get_self());
-
-   links_t links(get_self());
-
-   // Delete all entries in the links table.
-   auto itr = links.begin();
-   while (itr != links.end()) {
-      itr = links.erase(itr);
-   }
-};
-
-
 // Trusted depot-only link insert -- the counterpart to createlink that skips signature/nonce
 // verification. The OPP NodeOwnerRegistration attestation is the proof; privileged sysio.roa
 // declares sysio.authex.active on the inline action, so no cross-contract active-permission
