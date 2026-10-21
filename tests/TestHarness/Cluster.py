@@ -1341,6 +1341,10 @@ class Cluster(object):
             if not self.deploySystemContract(biosNode, sysioAccount):
                 return None
 
+        if not onlyBios and not onlySetProds:
+            if not self.initializeBootstrapContracts(biosNode, sysioAccount, producerKeys, loadSystemContract):
+                return None
+
         # verify node is synced before setting prods
         headBlockNum=biosNode.getHeadBlockNum()
         assert self.getNode().waitForBlock(headBlockNum, timeout=Utils.systemWaitTimeout)
@@ -1398,6 +1402,18 @@ class Cluster(object):
 
         if onlySetProds: return biosNode
 
+        Utils.Print("Cluster bootstrap done.")
+
+        return True
+
+    def initializeBootstrapContracts(self, biosNode, sysioAccount, producerKeys, loadSystemContract):
+        """Finish bootstrap writes before BIOS gives up production.
+
+        BIOS has no transaction retry service. Once it stops producing, an
+        accepted speculative transaction can be lost while its peers reconnect.
+        Keep all initialization on the active BIOS producer so its unapplied
+        transactions remain eligible for block inclusion during a disconnect.
+        """
         sysioTokenAccount = copy.deepcopy(sysioAccount)
         sysioTokenAccount.name = 'sysio.token'
         contract="sysio.token"
@@ -1600,8 +1616,6 @@ class Cluster(object):
         if loadSystemContract:
             if not self.initializeSystemContract(biosNode, sysioAccount):
                 return None
-
-        Utils.Print("Cluster bootstrap done.")
 
         return True
 
