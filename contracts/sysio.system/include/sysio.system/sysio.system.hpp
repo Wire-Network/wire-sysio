@@ -169,6 +169,7 @@ namespace sysiosystem {
       /// Blocks produced and not yet paid -- the ONE pay input. `payepoch` credits every block at
       /// the period's per-block rate and zeroes the count of every producer it pays; a block the
       /// producer's slot did not deliver is simply never counted, so its pay stays in the treasury.
+      /// At most one round per rotation is counted; see `last_paid_round`.
       /// The count SURVIVES a park, a demotion, or a lost key: a producer that is not schedulable
       /// at a payepoch is neither paid nor reset, and whatever it made is paid at the first
       /// payepoch where it is schedulable again (never, for a slashed or terminated one).
@@ -196,9 +197,13 @@ namespace sysiosystem {
       ///
       /// Inert until T5 is initialised: `current_pay_period` is 0 before then, so every stamp
       /// matches. Bounded -- there is no pay pre-T5, and the snapshot factor saturates.
+      uint32_t                                                 snapshot_period = 0;
+      /// The round (block slot / 12) whose blocks `onblock` last counted toward `unpaid_blocks`, 0
+      /// for never. It counts one round per rotation (round / schedule size), so a schedule switch
+      /// that hands a producer a second round in one rotation does not pay it twice.
       ///
       /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE below.
-      uint32_t                                                 snapshot_period = 0;
+      uint32_t                                                 last_paid_round = 0;
 
       uint64_t by_rank_score()const { return rank_score; }
       bool     active()const      { return is_active;                               }
@@ -211,7 +216,7 @@ namespace sysiosystem {
 
       SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank_score)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority)
                          (consecutive_missed_rounds)(is_demoted)(snapshot_attestations)
-                         (snapshot_period) )
+                         (snapshot_period)(last_paid_round) )
    };
 
    using producers_table = sysio::kv::table< "producers"_n, producer_key_t, producer_info,

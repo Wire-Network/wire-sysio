@@ -1031,6 +1031,10 @@
                 {
                     "name": "snapshot_period",
                     "type": "uint32"
+                },
+                {
+                    "name": "last_paid_round",
+                    "type": "uint32"
                 }
             ]
         },

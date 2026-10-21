@@ -6740,4 +6740,68 @@ BOOST_FIXTURE_TEST_CASE( location_never_selects_a_standby_into_the_schedule, pro
    BOOST_REQUIRE_EQUAL( scheduled_count + 1, producer_rank_position(standby) );
 } FC_LOG_AND_RETHROW()
 
+// A switch can hand a producer a second round inside one rotation; only one round per rotation is
+// paid. Replacing the last producer with a standby that sorts first moves everyone one slot later,
+// so the producer just before the switch point produces again right after it. The switch charges
+// no retained producer a missed round either.
+BOOST_FIXTURE_TEST_CASE( a_switch_never_pays_a_second_round_in_one_rotation, producer_score_tester ) try {
+   constexpr uint32_t scheduled_count = 21;   // max_producers: a rotation is this many rounds
+   auto names = setup_ranked_producers(scheduled_count + 1);
+   const auto standby = names.back();
+   const auto leaving = names[scheduled_count - 1];
+   const std::vector<account_name> before(names.begin(), names.begin() + scheduled_count);
+   std::vector<account_name> after(before.begin(), before.end() - 1);
+   after.insert(after.begin(), standby);
+
+   for (uint32_t i = 0; i < scheduled_count; ++i) {
+      BOOST_REQUIRE_EQUAL( success(), set_location(names[i], static_cast<uint16_t>(i + 1)) );
+   }
+   BOOST_REQUIRE_EQUAL( success(), set_location(standby, 0) );
+   trigger_reschedule();
+   wait_for_active_schedule_order(before);
+
+   // Replay the rule over every block from here on. The rows count each block once it is the head.
+   std::map<account_name, uint32_t> last_paid;
+   std::map<account_name, uint32_t> expected;
+   for (const auto& p : names) {
+      last_paid[p] = get_producer_info(p)["last_paid_round"].as<uint32_t>();
+      expected[p]  = unpaid_blocks_of(p);
+   }
+   uint32_t uncounted = 0;
+   const auto produce_and_replay = [&] {
+      produce_block();
+      const auto producer = control->head().header().producer;
+      const uint32_t round = control->head().header().timestamp.slot / slots_per_producer;
+      auto& last = last_paid[producer];
+      if (last != round) {
+         if (last != 0 && last / scheduled_count == round / scheduled_count) {
+            ++uncounted;
+            return;
+         }
+         last = round;
+      }
+      ++expected[producer];
+   };
+
+   BOOST_REQUIRE_EQUAL( success(), terminate_operator(leaving) );
+   constexpr uint32_t max_blocks = 400;
+   for (uint32_t produced = 0; produced < max_blocks && active_schedule_names() != after; ++produced) {
+      produce_and_replay();
+   }
+   const auto schedule = active_schedule_names();
+   BOOST_REQUIRE_EQUAL_COLLECTIONS(schedule.begin(), schedule.end(), after.begin(), after.end());
+   for (uint32_t i = 0; i < scheduled_count * slots_per_producer; ++i) {
+      produce_and_replay();
+   }
+
+   BOOST_REQUIRE_MESSAGE( uncounted > 0, "no producer took a second round in the switch's rotation" );
+   for (const auto& p : names) {
+      BOOST_REQUIRE_MESSAGE( unpaid_blocks_of(p) == expected[p],
+         p.to_string() << " has " << unpaid_blocks_of(p) << " unpaid blocks, expected " << expected[p] );
+   }
+   for (const auto& p : after) {
+      BOOST_REQUIRE_EQUAL( 0u, missed_rounds_of(p) );
+   }
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END() // sysio_producer_score_tests

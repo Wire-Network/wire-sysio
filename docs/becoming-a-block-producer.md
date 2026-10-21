@@ -81,10 +81,11 @@ sysio.system::regproducer(producer, producer_key, url, location)
 Use `regproducer2` instead if you want a multi-key block-signing authority rather than a single
 key. The `url` is where you publish information about your operation. `location` sets your place
 in the production order: each new schedule runs in ascending `location`, account name breaking
-ties, so producers that pick adjacent numbers take consecutive rounds. It has no effect on rank or
-pay. To move, repeat the registration action you used, `regproducer` or `regproducer2`, with your
-current URL and signing key or authority and the new `location`. The change applies the next time
-the set of scheduled producers changes; a running schedule is never reordered on its own.
+ties, so producers next to each other in that order take consecutive rounds. It has no effect on
+rank or on the per-block rate. To move, repeat the registration action you used, `regproducer` or
+`regproducer2`, with your current URL and signing key or authority and the new `location`. The
+change applies the next time the set of scheduled producers changes; a running schedule is never
+reordered on its own.
 
 Creating a producer row, or reactivating one parked with `unregprod`, succeeds only after
 `sysio.opreg` reports your account as an `ACTIVE` producer that meets the live minimums. Calling
@@ -199,7 +200,9 @@ they are earnings rather than a rating.
 
 Producers are paid **per block produced**. Each block earns the same rate, computed as the active
 share of the producer pool divided by the period's slot count. A block you miss is simply not paid,
-and that pay stays in the treasury rather than being handed to whoever did produce.
+and that pay stays in the treasury rather than being handed to whoever did produce. At most one
+round per rotation of the schedule is paid: if a schedule change gives you a second round in the
+same rotation, its blocks are not.
 
 Positions 22 and beyond, up to a configured end rank, are **standbys**. They draw a retainer from a
 separate slice of the pool, decaying linearly with position, so the network keeps a ready bench.

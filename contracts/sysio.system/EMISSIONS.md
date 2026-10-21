@@ -69,7 +69,9 @@ holding accounts with no code, so the notify-handler risk does not apply.
 Producer pay is per block produced: the active slice of the producer pool is
 divided by the period's nominal slot count, raised to the blocks actually
 produced when a period runs long, and each producer is paid for the blocks it
-made. Standbys draw from a separate slice, at a rank-decreasing weight, and are
+made, at most one round per rotation of the schedule (a switch that hands a
+producer a second round in the same rotation does not pay it twice). Standbys
+draw from a separate slice, at a rank-decreasing weight, and are
 not paid per block. Batch-op pay is weighted by the roster captured for each
 accrued epoch, then split evenly across all
 members of each historical roster (the per-member slice is the group pool divided
