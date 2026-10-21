@@ -314,6 +314,11 @@ void threaded_snapshot_writer::finalize() {
    SYS_ASSERT(out_.good(), snapshot_exception, "Failed to write snapshot file: {}", snapshot_path_.string());
 }
 
+void threaded_snapshot_writer::close() {
+   out_.close();
+   SYS_ASSERT(out_.good(), snapshot_exception, "Failed to close snapshot file: {}", snapshot_path_.string());
+}
+
 // ---- ostream_json_snapshot_writer ----
 
 ostream_json_snapshot_writer::ostream_json_snapshot_writer(std::ostream& snapshot)
