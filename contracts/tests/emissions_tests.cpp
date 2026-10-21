@@ -6674,12 +6674,10 @@ BOOST_FIXTURE_TEST_CASE( collateralised_producers_displace_the_bootstrap_at_the_
 // Schedule order
 // ---------------------------------------------------------------------------
 
-// The scheduled producers take their rounds in ascending `location`, account name breaking ties.
-// Equal locations reproduce plain name order.
-BOOST_FIXTURE_TEST_CASE( schedule_runs_in_location_order, producer_score_tester ) try {
+// A new set of scheduled producers takes its rounds in ascending `location`, account name breaking
+// ties.
+BOOST_FIXTURE_TEST_CASE( a_new_schedule_runs_in_location_order, producer_score_tester ) try {
    auto names = setup_ranked_producers(5);   // producera..producere, every one at location 0
-   trigger_reschedule();
-   wait_for_active_schedule_order(names);
 
    // producerb and producerd tie at 100; the field's full range is usable.
    const std::vector<uint16_t> locations = { std::numeric_limits<uint16_t>::max(), 100, 200, 100, 0 };
@@ -6688,6 +6686,36 @@ BOOST_FIXTURE_TEST_CASE( schedule_runs_in_location_order, producer_score_tester 
    }
    trigger_reschedule();
    wait_for_active_schedule_order({ names[4], names[1], names[3], names[2], names[0] });
+} FC_LOG_AND_RETHROW()
+
+// The set already producing keeps its order through any number of location changes: a reorder alone
+// would reassign rounds at activation, handing one producer two in a row and skipping miss
+// attribution. The new locations apply when the set next changes.
+BOOST_FIXTURE_TEST_CASE( a_location_change_alone_never_reorders_the_schedule, producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);   // producera..producere, every one at location 0
+   trigger_reschedule();
+   wait_for_active_schedule_order(names);
+   const auto version = control->active_producers().version;
+
+   const std::vector<std::vector<uint16_t>> moves = {
+      { 5, 4, 3, 2, 1 },   // reverse the order
+      { 3, 4, 0, 1, 2 },   // then rotate it to start at producerc
+   };
+   for (const auto& locations : moves) {
+      for (uint32_t i = 0; i < names.size(); ++i) {
+         BOOST_REQUIRE_EQUAL( success(), set_location(names[i], locations[i]) );
+      }
+      trigger_reschedule();
+      produce_blocks(3 * slots_per_producer);   // time for any proposal to activate
+      BOOST_REQUIRE_EQUAL( version, control->active_producers().version );
+      const auto schedule = active_schedule_names();
+      BOOST_REQUIRE_EQUAL_COLLECTIONS(schedule.begin(), schedule.end(), names.begin(), names.end());
+   }
+
+   // Terminating producera changes the set; the four left run in their latest location order.
+   BOOST_REQUIRE_EQUAL( success(), terminate_operator(names[0]) );
+   trigger_reschedule();
+   wait_for_active_schedule_order({ names[2], names[3], names[4], names[1] });
 } FC_LOG_AND_RETHROW()
 
 // Location orders the producers rank selected and never selects them: the producer at position 22

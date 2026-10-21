@@ -3336,6 +3336,9 @@ struct controller_impl {
                1
             });
          }
+         // Schedule order is production order, not the ascending order validate() requires of an
+         // authority; snapshot load rejects an unsorted one.
+         auth.sort_fields();
 
          if (permission.auth != auth) {
             db.modify(permission, [&](auto& po) { po.auth = auth; });

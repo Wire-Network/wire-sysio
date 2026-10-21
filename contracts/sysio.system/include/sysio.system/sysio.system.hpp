@@ -174,8 +174,9 @@ namespace sysiosystem {
       /// payepoch where it is schedulable again (never, for a slashed or terminated one).
       uint32_t                                                 unpaid_blocks = 0;
       time_point                                               last_claim_time;
-      /// Schedule-order key: `update_ranked_producers` sorts the scheduled producers by ascending
-      /// location, then by name. It never selects who is scheduled -- rank does that.
+      /// Schedule-order key: `update_ranked_producers` sorts a new set of scheduled producers by
+      /// ascending location, then name, and leaves a running set's order alone. Rank, not location,
+      /// selects who is scheduled.
       uint16_t                                                 location = 0;
       sysio::block_signing_authority                           producer_authority; // added in version 1.9.0
       /// Rounds this producer was scheduled for and did not SERVE, consecutively -- a round is
@@ -454,8 +455,9 @@ namespace sysiosystem {
           * @param producer - account registering to be a producer candidate,
           * @param producer_key - the public key of the block producer, this is the key used by block producer to sign blocks,
           * @param url - the url of the block producer, normally the url of the block producer presentation website,
-          * @param location - the producer's position in the round-robin: the active schedule runs in ascending
-          *        `location` order, account name breaking ties. It does not affect rank or pay.
+          * @param location - the producer's position in the round-robin: a new schedule runs in ascending
+          *        `location` order, account name breaking ties. A change applies when the set of scheduled
+          *        producers next changes. It does not affect rank or pay.
           *
           * @note Creating a producer row, or reactivating one parked by `unregprod`, requires an
           *       ACTIVE OPERATOR_TYPE_PRODUCER operator in sysio.opreg. For ordinary operators,
@@ -479,8 +481,9 @@ namespace sysiosystem {
           * @param producer - account registering to be a producer candidate,
           * @param producer_authority - the weighted threshold multisig block signing authority of the block producer used to sign blocks,
           * @param url - the url of the block producer, normally the url of the block producer presentation website,
-          * @param location - the producer's position in the round-robin: the active schedule runs in ascending
-          *        `location` order, account name breaking ties. It does not affect rank or pay.
+          * @param location - the producer's position in the round-robin: a new schedule runs in ascending
+          *        `location` order, account name breaking ties. A change applies when the set of scheduled
+          *        producers next changes. It does not affect rank or pay.
           *
           * @note Creating a producer row, or reactivating one parked by `unregprod`, requires an
           *       ACTIVE OPERATOR_TYPE_PRODUCER operator in sysio.opreg. For ordinary operators,

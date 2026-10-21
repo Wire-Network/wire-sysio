@@ -80,9 +80,11 @@ sysio.system::regproducer(producer, producer_key, url, location)
 
 Use `regproducer2` instead if you want a multi-key block-signing authority rather than a single
 key. The `url` is where you publish information about your operation. `location` sets your place
-in the production order: the active schedule runs in ascending `location`, account name breaking
+in the production order: each new schedule runs in ascending `location`, account name breaking
 ties, so producers that pick adjacent numbers take consecutive rounds. It has no effect on rank or
-pay. To move, call `regproducer` again with the new number; the next schedule rebuild picks it up.
+pay. To move, repeat the registration action you used, `regproducer` or `regproducer2`, with your
+current URL and signing key or authority and the new `location`. The change applies the next time
+the set of scheduled producers changes; a running schedule is never reordered on its own.
 
 Creating a producer row, or reactivating one parked with `unregprod`, succeeds only after
 `sysio.opreg` reports your account as an `ACTIVE` producer that meets the live minimums. Calling
