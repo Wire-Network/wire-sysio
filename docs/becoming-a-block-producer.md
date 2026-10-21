@@ -79,8 +79,10 @@ sysio.system::regproducer(producer, producer_key, url, location)
 ```
 
 Use `regproducer2` instead if you want a multi-key block-signing authority rather than a single
-key. The `url` is where you publish information about your operation, and `location` is an
-advisory number used for peer topology.
+key. The `url` is where you publish information about your operation. `location` sets your place
+in the production order: the active schedule runs in ascending `location`, account name breaking
+ties, so producers that pick adjacent numbers take consecutive rounds. It has no effect on rank or
+pay. To move, call `regproducer` again with the new number; the next schedule rebuild picks it up.
 
 Creating a producer row, or reactivating one parked with `unregprod`, succeeds only after
 `sysio.opreg` reports your account as an `ACTIVE` producer that meets the live minimums. Calling
@@ -130,7 +132,8 @@ Rank is **position in a score-ordered index**, derived by iteration rather than 
 action. The chain rebuilds the schedule at most once every 120 block slots, roughly a minute; at
 that point the highest ranked eligible producers become the active schedule, and the finalizer
 policy is rebuilt to match. If your score puts you in the top 21 you are scheduled, and you begin
-producing in your slot.
+producing in your slot. Rank decides only whether you are among the 21; your `location` decides
+where in the round you produce.
 
 To hold a position at all you need three things at once: an active producer row, an `ACTIVE`
 producer operator registration backed by collateral, and an active finalizer key. Missing any one

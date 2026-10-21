@@ -5753,6 +5753,23 @@ struct producer_score_tester : public producer_eligibility_tester {
       BOOST_FAIL("producer " << expected.to_string() << " never entered the active schedule");
    }
 
+   /// Produce until the ACTIVE schedule is exactly `expected`, in order, then require it.
+   void wait_for_active_schedule_order(const std::vector<account_name>& expected,
+                                       uint32_t max_blocks = 400) {
+      for (uint32_t produced = 0; produced < max_blocks && active_schedule_names() != expected; ++produced) {
+         produce_blocks(1);
+      }
+      const auto schedule = active_schedule_names();
+      BOOST_REQUIRE_EQUAL_COLLECTIONS(schedule.begin(), schedule.end(), expected.begin(), expected.end());
+   }
+
+   /// Re-register `producer` with its fixture key at `location`, the schedule-order key.
+   action_result set_location(account_name producer, uint16_t location) {
+      return push_system_action(producer, "regproducer"_n, mvo()
+         ("producer", producer)("producer_key", get_public_key(producer, "active"))("url", "")
+         ("location", location));
+   }
+
    /// Skip `target`'s rounds until the schedule has actually dropped it.
    ///
    /// A rebuild only PROPOSES, so a sunk producer holds its slot until that proposal goes final --
@@ -6651,6 +6668,48 @@ BOOST_FIXTURE_TEST_CASE( collateralised_producers_displace_the_bootstrap_at_the_
    BOOST_REQUIRE( !is_scheduled(bootstrap) );
    BOOST_REQUIRE(  is_scheduled(names[0]) );
    BOOST_REQUIRE_EQUAL( "OPERATOR_STATUS_ACTIVE", get_opreg_operator(bootstrap)["status"].as_string() );
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// Schedule order
+// ---------------------------------------------------------------------------
+
+// The scheduled producers take their rounds in ascending `location`, account name breaking ties.
+// Equal locations reproduce plain name order.
+BOOST_FIXTURE_TEST_CASE( schedule_runs_in_location_order, producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);   // producera..producere, every one at location 0
+   trigger_reschedule();
+   wait_for_active_schedule_order(names);
+
+   // producerb and producerd tie at 100; the field's full range is usable.
+   const std::vector<uint16_t> locations = { std::numeric_limits<uint16_t>::max(), 100, 200, 100, 0 };
+   for (uint32_t i = 0; i < names.size(); ++i) {
+      BOOST_REQUIRE_EQUAL( success(), set_location(names[i], locations[i]) );
+   }
+   trigger_reschedule();
+   wait_for_active_schedule_order({ names[4], names[1], names[3], names[2], names[0] });
+} FC_LOG_AND_RETHROW()
+
+// Location orders the producers rank selected and never selects them: the producer at position 22
+// takes the lowest location of all and still holds its position and no slot.
+BOOST_FIXTURE_TEST_CASE( location_never_selects_a_standby_into_the_schedule, producer_score_tester ) try {
+   constexpr uint32_t scheduled_count = 21;   // max_producers
+   auto names = setup_ranked_producers(scheduled_count + 1);
+   const auto standby = names.back();
+
+   // Reverse the name order across the ranked 21; the standby goes to the front of the line.
+   for (uint32_t i = 0; i < scheduled_count; ++i) {
+      BOOST_REQUIRE_EQUAL( success(), set_location(names[i], static_cast<uint16_t>(scheduled_count - i)) );
+   }
+   BOOST_REQUIRE_EQUAL( success(), set_location(standby, 0) );
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL( scheduled_count + 1, producer_rank_position(standby) );
+
+   trigger_reschedule();
+   const std::vector<account_name> by_location(names.rbegin() + 1, names.rend());   // produceru..producera
+   wait_for_active_schedule_order(by_location);
+   BOOST_REQUIRE( !is_scheduled(standby) );
+   BOOST_REQUIRE_EQUAL( scheduled_count + 1, producer_rank_position(standby) );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END() // sysio_producer_score_tests

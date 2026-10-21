@@ -247,8 +247,10 @@ namespace sysiosystem {
          return;
       }
 
-      // Sort by producer name for deterministic ordering
+      // Rank picked WHO is scheduled; `location` sets the order they produce in. The name breaks
+      // ties, so a score change never reorders producers that share a location.
       std::sort( top_producers.begin(), top_producers.end(), []( const value_type& lhs, const value_type& rhs ) {
+         if( lhs.second != rhs.second ) return lhs.second < rhs.second;
          return lhs.first.producer_name < rhs.first.producer_name;
       } );
 
