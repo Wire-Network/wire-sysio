@@ -15,8 +15,10 @@
 #include <algorithm>
 #include <chrono>
 #include <exception>
+#include <future>
 #include <vector>
 #include <iterator>
+#include <stdexcept>
 #include <string>
 #include <thread>
 
@@ -245,6 +247,9 @@ BOOST_AUTO_TEST_CASE( checktime_speculative_max_trx_test ) { try {
    constexpr uint32_t interrupt_max_transaction_cpu_usage = 1'000'000;
    constexpr uint32_t interrupt_warmup_billed_cpu_us = 1;
    constexpr uint32_t interrupt_warmup_max_block_cpu_ms = 10'000;
+   constexpr auto interrupt_delay = std::chrono::milliseconds(50);
+   constexpr auto interrupt_start_timeout = std::chrono::seconds(1);
+   constexpr auto interrupt_start_timeout_message = "Timed out waiting for speculative transaction execution";
    // macOS CI runners can have high scheduler latency; interrupt still must beat this widened transaction limit.
    constexpr int64_t interrupt_expected_max_us = 900'000;
 
@@ -259,11 +264,26 @@ BOOST_AUTO_TEST_CASE( checktime_speculative_max_trx_test ) { try {
    push_trx( interrupt_t, test_pause_action<WASM_TEST_ACTION("test_checktime", "checktime_pass")>{},
              interrupt_warmup_billed_cpu_us, UINT32_MAX, interrupt_warmup_max_block_cpu_ms, true, {}, "pause"_n );
 
+   /** Gate the interrupt on WASM entry, after the transaction timer starts. The warmed contract stays cached,
+    *  so execution does not pause the timer for compilation after this hook. Returning false runs the real WASM.
+    */
+   std::promise<void> interrupt_start_promise;
+   auto interrupt_start_future = interrupt_start_promise.get_future();
+   auto& substitute_apply = interrupt_t.control->get_wasm_interface().substitute_apply;
+   substitute_apply = [&](const digest_type&, uint8_t, uint8_t, apply_context&) {
+      interrupt_start_promise.set_value();
+      return false;
+   };
+   auto reset_substitute_apply = fc::make_scoped_exit([&]() { substitute_apply = {}; });
+
    // verify interrupt works for speculative trxs
    std::exception_ptr interrupt_thread_exception;
    std::thread th( [&]() {
       try {
-         std::this_thread::sleep_for( std::chrono::milliseconds(50) );
+         if (interrupt_start_future.wait_for(interrupt_start_timeout) != std::future_status::ready)
+            throw std::runtime_error(interrupt_start_timeout_message);
+         interrupt_start_future.get();
+         std::this_thread::sleep_for(interrupt_delay);
          interrupt_t.control->interrupt_transaction(controller::interrupt_t::speculative_block_trx);
       } catch (...) {
          interrupt_thread_exception = std::current_exception();
@@ -271,13 +291,14 @@ BOOST_AUTO_TEST_CASE( checktime_speculative_max_trx_test ) { try {
    } );
    auto thread_join_guard = join_thread_on_scope_exit(th);
 
-   before = fc::time_point::now();
+   /** The helper cannot start its delay until push_trx enters WASM, after this monotonic measurement starts. */
+   const auto interrupt_before = std::chrono::steady_clock::now();
    BOOST_CHECK_EXCEPTION( push_trx( interrupt_t,
                                      test_pause_action<WASM_TEST_ACTION("test_checktime", "checktime_failure")>{},
                                      100000, UINT32_MAX, 10000, false, fc::raw::pack(10000000000000000000ULL), "pause"_n ),
                           interrupt_exception, fc_exception_message_contains("interrupt signaled") );
-   after = fc::time_point::now();
-   dur = (after - before).count();
+   const auto interrupt_elapsed = std::chrono::duration_cast<std::chrono::microseconds>(
+      std::chrono::steady_clock::now() - interrupt_before);
    if (th.joinable())
       th.join();
    thread_join_guard.cancel();
@@ -285,8 +306,9 @@ BOOST_AUTO_TEST_CASE( checktime_speculative_max_trx_test ) { try {
       std::rethrow_exception(interrupt_thread_exception);
 
    // Verify the interrupt arrived well before the widened transaction timeout; keep the upper bound generous for CI.
-   BOOST_CHECK_MESSAGE( dur >= 50'000, "elapsed " << dur << "us" );
-   BOOST_CHECK_MESSAGE( dur <= interrupt_expected_max_us, "elapsed " << dur << "us" );
+   BOOST_CHECK_MESSAGE( interrupt_elapsed >= interrupt_delay, "elapsed " << interrupt_elapsed.count() << "us" );
+   BOOST_CHECK_MESSAGE( interrupt_elapsed.count() <= interrupt_expected_max_us,
+                        "elapsed " << interrupt_elapsed.count() << "us" );
 
 } FC_LOG_AND_RETHROW() }
 
