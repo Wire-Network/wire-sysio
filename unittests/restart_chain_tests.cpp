@@ -1,5 +1,5 @@
-#include <sstream>
 #include <fstream>
+#include <sstream>
 
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/global_property_object.hpp>
@@ -88,6 +88,36 @@ class replay_tester : public base_tester {
 };
 
 BOOST_AUTO_TEST_SUITE(restart_chain_tests)
+
+/** An interrupted initialization leaves a state database without a version header. */
+BOOST_AUTO_TEST_CASE(interrupted_initialization_reports_missing_database_header) {
+   tester reference;
+   auto cfg = reference.get_config();
+   fc::temp_directory directory;
+   cfg.state_dir = directory.path() / "state";
+   cfg.blocks_dir = directory.path() / "blocks";
+   cfg.finalizers_dir = directory.path() / "finalizers";
+   {
+      controller interrupted(cfg, reference.control->get_chain_id());
+      interrupted.add_indices();
+   }
+   BOOST_REQUIRE_EXCEPTION(controller::extract_chain_id_from_db(cfg.state_dir), bad_database_version_exception,
+                           [](const auto& ex) {
+                              return ex.top_message() ==
+                                     "State database has no version header: the launch that created it did not complete startup. "
+                                     "Rerun once with --delete-all-blocks.";
+                           });
+}
+
+/** A partially written active log still reports its original read failure. */
+BOOST_AUTO_TEST_CASE(restart_rejects_truncated_block_log) {
+   fc::temp_directory directory;
+   {
+      std::ofstream log(directory.path() / "blocks.log", std::ios::binary);
+      log.put('\0');
+   }
+   BOOST_CHECK_THROW(block_log::extract_chain_context(directory.path(), {}), std::ios_base::failure);
+}
 
 /// Existing chain state must never restart with missing, corrupt, unreadable, or mismatched replay protection.
 BOOST_AUTO_TEST_CASE(dedup_state_required_on_restart) {
