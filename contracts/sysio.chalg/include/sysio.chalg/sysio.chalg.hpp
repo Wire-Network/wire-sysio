@@ -67,6 +67,7 @@ namespace sysio {
       /// `owner` must be a member of the dispute's snapshotted electorate (Tier-1 node owners at
       /// the time the dispute opened -- later registrations cannot join an in-flight dispute);
       /// `chosen_checksum` must be one of the dispute's candidate checksums. One vote per owner.
+      /// Ballots are accepted, past the deadline too, only while the tally has no winner.
       [[sysio::action]]
       void votedispute(name owner, uint64_t dispute_id, checksum256 chosen_checksum);
 
