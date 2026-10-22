@@ -608,19 +608,20 @@ void assert_distribution_state_shape(const fc::network::solana::idl::program& pr
              distribution_state::field_liqsol_mint);
 }
 
-/// Assert the loaded IDL declares `GlobalState.wire_state` as an enum carrying
-/// `PostLaunch`. Full contract on the header declaration.
+/// Assert the loaded IDL declares the current yield-crank fields with their
+/// expected types. Full contract on the header declaration.
 void assert_global_state_shape(const fc::network::solana::idl::program& program) {
    namespace idl = fc::network::solana::idl;
    const auto& fields = declared_account_fields(program, global_state::account_name);
-   // The emergency stop is optional -- a program that predates it declares none --
-   // but a declared one is read as a bool, so any other type is a drifted IDL.
-   for (const auto& field : fields) {
-      if (field.name != global_state::field_frozen) continue;
-      FC_ASSERT(field.type.is_primitive() && field.type.primitive == idl::primitive_type::bool_t,
-                "GlobalState '{}' must be declared bool, got '{}'; the yield crank gates on it",
-                global_state::field_frozen, describe_idl_type(field.type));
-   }
+   const auto frozen = std::find_if(fields.begin(), fields.end(), [](const auto& field) {
+      return field.name == global_state::field_frozen;
+   });
+   FC_ASSERT(frozen != fields.end(),
+             "GlobalState IDL missing '{}'; the yield crank must honor the current-layout emergency stop",
+             global_state::field_frozen);
+   FC_ASSERT(frozen->type.is_primitive() && frozen->type.primitive == idl::primitive_type::bool_t,
+             "GlobalState '{}' must be declared bool, got '{}'; the yield crank gates on it",
+             global_state::field_frozen, describe_idl_type(frozen->type));
    for (const auto& field : fields) {
       if (field.name != global_state::field_wire_state) continue;
       FC_ASSERT(field.type.is_defined(),
@@ -645,7 +646,7 @@ void assert_global_state_shape(const fc::network::solana::idl::program& program)
 
 bool liq_outpost_frozen(const fc::variant_object& global_state_row) {
    auto frozen = global_state_row.find(global_state::field_frozen);
-   if (frozen == global_state_row.end()) return false;   // the IDL declares no emergency stop
+   if (frozen == global_state_row.end()) return true;
    return !frozen->value().is_bool() || frozen->value().as_bool();
 }
 
@@ -657,16 +658,6 @@ bool liq_yield_report_due(const fc::variant_object& global_state_row) {
    auto variant = state_obj.find(IDL_ENUM_VARIANT_KEY);
    return variant != state_obj.end() && variant->value().is_string() &&
           variant->value().as_string() == global_state::post_launch;
-}
-
-bool global_state_predates_freeze(const fc::network::solana::idl::program& program, size_t account_bytes) {
-   if (!program.find_account(global_state::account_name)) return false;
-   const auto& fields = declared_account_fields(program, global_state::account_name);
-   const bool declares_frozen = std::any_of(fields.begin(), fields.end(), [](const auto& field) {
-      return field.name == global_state::field_frozen;
-   });
-   return declares_frozen &&
-          account_bytes <= global_state::anchor_discriminator_bytes + global_state::pre_freeze_init_space;
 }
 
 fc::network::solana::account_overrides_t report_liq_yield_overrides(
@@ -1626,16 +1617,6 @@ void outpost_solana_client::crank_outpost(uint32_t epoch_index, fc::microseconds
    if (!global_info.has_value() || global_info->data.empty()) {
       dlog("outpost_solana_client[{}]: no GlobalState at {} -- no liq yield to report",
            to_string(), global_state_pda.to_string(fc::yield_function_t{}));
-      return;
-   }
-   // A GlobalState still at the pre-freeze layout cannot carry the `frozen` the
-   // loaded IDL declares, so decoding it would run past its end; the program
-   // refuses the crank on it until `migrate_global_state_liq_fields` grows it.
-   if (outpost_solana_client_detail::global_state_predates_freeze(*_program_client->get_program(),
-                                                                  global_info->data.size())) {
-      wlog("outpost_solana_client[{}]: GlobalState at {} is {} bytes, the layout before the emergency "
-           "stop; report_liq_yield is not due until migrate_global_state_liq_fields grows it",
-           to_string(), global_state_pda.to_string(fc::yield_function_t{}), global_info->data.size());
       return;
    }
    const auto  global_v   = _program_client->decode_account_info_data(

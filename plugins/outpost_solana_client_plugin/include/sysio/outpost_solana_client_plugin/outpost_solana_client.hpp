@@ -375,14 +375,6 @@ namespace global_state {
    /// `set_frozen`). While it is set the program refuses `report_liq_yield`
    /// and stores every `DESYNDICATE_LIQ` as a pending payout instead of paying it.
    constexpr auto field_frozen     = "frozen";
-   /// Byte width of an Anchor account discriminator, which precedes the Borsh body.
-   inline constexpr size_t anchor_discriminator_bytes = 8;
-   /// `GlobalState::INIT_SPACE` before `frozen` was appended -- a byte-exact mirror
-   /// of wire-solana's `GLOBAL_STATE_PRE_FREEZE_INIT_SPACE`. An account whose body is
-   /// no longer than this predates the freeze and has not been grown by
-   /// `migrate_global_state_liq_fields`; the program refuses every handler that reads
-   /// the current layout on it.
-   inline constexpr size_t pre_freeze_init_space = 131;
 } // namespace global_state
 
 /// The key libfc's IDL decoder renders an enum field's variant name under.
@@ -415,10 +407,8 @@ namespace report_liq_yield_accounts {
 } // namespace report_liq_yield_accounts
 
 /// True iff a decoded `GlobalState` says the outpost's emergency stop is set.
-/// `frozen` absent from the row means the loaded IDL declares no emergency stop
-/// (a program that predates it), which is "not frozen"; `frozen` present but not
-/// a bool is a misdecoded row and reads as frozen, so the crank never pays for a
-/// tx the program could refuse.
+/// A missing or non-bool `frozen` is a misdecoded current-layout row and reads as
+/// frozen, so the crank never pays for a transaction the program could refuse.
 bool liq_outpost_frozen(const fc::variant_object& global_state);
 
 /// True iff a decoded `GlobalState` says `report_liq_yield` would be accepted:
@@ -426,18 +416,6 @@ bool liq_outpost_frozen(const fc::variant_object& global_state);
 /// else (another state, a missing or misshaped field, the emergency stop) reads
 /// as "not due", so the crank never pays for a refused tx.
 bool liq_yield_report_due(const fc::variant_object& global_state);
-
-/// True iff the loaded IDL declares `GlobalState.frozen` but the on-chain account
-/// is too short to carry it: `account_bytes` is no longer than the discriminator
-/// plus `global_state::pre_freeze_init_space`. Such an account has not been grown
-/// by `migrate_global_state_liq_fields`; the IDL-driven decode would run past its
-/// end, and the program refuses the crank on it anyway, so the crank treats it as
-/// "not due". An IDL without `frozen` never predates the freeze -- its program has
-/// no emergency stop and its own layout is the current one.
-///
-/// @param program        the loaded outpost program IDL.
-/// @param account_bytes  the `GlobalState` account's data length, discriminator included.
-bool global_state_predates_freeze(const fc::network::solana::idl::program& program, size_t account_bytes);
 
 /// The `report_liq_yield` account overrides: every named account of the
 /// instruction except the signer, derived from the program id, the pool's
@@ -452,9 +430,9 @@ fc::network::solana::account_overrides_t report_liq_yield_overrides(
    const fc::network::solana::solana_public_key& outbound_message_buffer_pda);
 
 /// Assert the loaded IDL declares `GlobalState` with a `wire_state` whose enum
-/// type carries the `PostLaunch` variant the yield crank gates on, and -- when it
-/// declares the `frozen` emergency stop at all -- declares it as a bool. Boot-checked
-/// only on a program that declares `report_liq_yield`.
+/// type carries the `PostLaunch` variant the yield crank gates on, and declares
+/// the current-layout `frozen` emergency stop as a bool. Boot-checked only on a
+/// program that declares `report_liq_yield`.
 void assert_global_state_shape(const fc::network::solana::idl::program& program);
 
 } // namespace outpost_solana_client_detail

@@ -9,6 +9,8 @@
 #include <fc/network/solana/solana_idl.hpp>
 #include <fc/network/solana/solana_borsh.hpp>
 
+#include <magic_enum/magic_enum.hpp>
+
 #include <sysio/outpost_solana_client_plugin.hpp>
 #include <sysio/outpost_solana_client_plugin/outpost_solana_client.hpp>
 #include <sysio/outpost_client/rpc_options.hpp>
@@ -2207,12 +2209,13 @@ BOOST_AUTO_TEST_CASE(distribution_state_shape_accepts_a_pubkey_mint_and_rejects_
 namespace {
 
 /// A synthetic program declaring `GlobalState` with `wire_state` of enum type
-/// `WireState` carrying `variants`, and -- when `frozen_type` is set -- a
-/// trailing `frozen` field of that type.
+/// `WireState` carrying `variants`, and -- when `frozen_type` is set -- the
+/// current-layout `frozen` field of that type.
 idl::program global_state_program(std::vector<std::string> variants, bool fields_in_types_section,
                                   std::optional<idl::idl_type> frozen_type = std::nullopt) {
-   std::vector<idl::field> fields{{"wire_state", idl::idl_type::make_defined("WireState")}};
+   std::vector<idl::field> fields;
    if (frozen_type) fields.push_back({"frozen", *frozen_type});
+   fields.push_back({"wire_state", idl::idl_type::make_defined("WireState")});
    auto prog = named_account_program("GlobalState", std::move(fields), fields_in_types_section);
    idl::type_def wire_state;
    wire_state.name          = "WireState";
@@ -2224,6 +2227,52 @@ idl::program global_state_program(std::vector<std::string> variants, bool fields
    }
    prog.types.push_back(std::move(wire_state));
    return prog;
+}
+
+/// Current liqsol-core `GlobalState` byte-layout facts pinned by Solana commit
+/// c9c42ff: 8 discriminator bytes plus 115 Borsh body bytes.
+constexpr size_t current_global_state_account_bytes = 123;
+constexpr size_t current_global_state_frozen_offset = 97;
+constexpr size_t current_global_state_wire_state_offset = 121;
+constexpr uint64_t current_layout_version = 0x8000'0000'0000'0002;
+constexpr uint64_t reportable_yield_accumulated = 90;
+constexpr uint64_t reportable_yield_watermark = 40;
+constexpr uint64_t liq_sequence = 7;
+constexpr size_t current_global_state_reserved_bytes = 23;
+constexpr size_t zeroed_accounting_fields_before_yield = 6;
+constexpr uint8_t current_global_state_bump = 0xFE;
+constexpr uint8_t invalid_borsh_bool = 2;
+constexpr uint8_t invalid_wire_state_variant = std::numeric_limits<uint8_t>::max();
+
+/// Current Borsh discriminants of liqsol-core's `WireState`. Declaration order
+/// is consensus data, so tests convert through `magic_enum` instead of raw casts.
+enum class current_wire_state : uint8_t {
+   pre_launch,
+   post_launch,
+   refund,
+   launching,
+};
+
+/// Borsh-encode the current 123-byte liqsol-core `GlobalState` in its exact
+/// declaration order. The accounting values deliberately carry reportable
+/// yield so the automatic-crank regression represents the failed E2E state.
+std::vector<uint8_t> current_global_state_account(current_wire_state wire_state, bool frozen) {
+   borsh::encoder enc;
+   const auto discriminator = idl::compute_account_discriminator("GlobalState");
+   enc.write_fixed_bytes(discriminator.data(), discriminator.size());
+   enc.write_u64(current_layout_version);
+   enc.write_u64(0);       // yield_index_remainder
+   enc.write_bool(false);  // paused
+   for (size_t i = 0; i < zeroed_accounting_fields_before_yield; ++i) enc.write_u64(0);
+   enc.write_u64(reportable_yield_accumulated);
+   enc.write_u64(liq_sequence);
+   enc.write_u64(reportable_yield_watermark);
+   enc.write_bool(frozen);
+   const std::array<uint8_t, current_global_state_reserved_bytes> reserved{};
+   enc.write_fixed_bytes(reserved.data(), reserved.size());
+   enc.write_u8(magic_enum::enum_integer(wire_state));
+   enc.write_u8(current_global_state_bump);
+   return enc.data();
 }
 
 } // namespace
@@ -2238,17 +2287,23 @@ BOOST_AUTO_TEST_CASE(global_state_shape_requires_a_post_launch_variant) try {
    for (bool in_types : {false, true}) {
       BOOST_TEST_CONTEXT("fields in types section: " << in_types) {
          BOOST_CHECK_NO_THROW(assert_global_state_shape(
-            global_state_program({"PreLaunch", "PostLaunch", "Refund", "Launching"}, in_types)));
+            global_state_program({"PreLaunch", "PostLaunch", "Refund", "Launching"}, in_types,
+                                 prim(idl::primitive_type::bool_t))));
          // The variant the crank gates on renamed away, or the field not an enum.
-         BOOST_CHECK_THROW(assert_global_state_shape(global_state_program({"PreLaunch", "Live"}, in_types)),
+         BOOST_CHECK_THROW(assert_global_state_shape(global_state_program(
+                              {"PreLaunch", "Live"}, in_types, prim(idl::primitive_type::bool_t))),
                            fc::assert_exception);
          BOOST_CHECK_THROW(assert_global_state_shape(named_account_program(
-                              "GlobalState", {{"wire_state", prim(idl::primitive_type::u8)}}, in_types)),
+                              "GlobalState",
+                              {{"frozen", prim(idl::primitive_type::bool_t)},
+                               {"wire_state", prim(idl::primitive_type::u8)}},
+                              in_types)),
                            fc::assert_exception);
-         // The emergency stop is optional (a program predating it declares none),
-         // but when declared it must be the bool the crank reads.
+         // The current reporting layout must declare the bool emergency stop.
          BOOST_CHECK_NO_THROW(assert_global_state_shape(
             global_state_program({"PostLaunch"}, in_types, prim(idl::primitive_type::bool_t))));
+         BOOST_CHECK_THROW(assert_global_state_shape(global_state_program({"PostLaunch"}, in_types)),
+                           fc::assert_exception);
          BOOST_CHECK_THROW(assert_global_state_shape(
                               global_state_program({"PostLaunch"}, in_types, prim(idl::primitive_type::u8))),
                            fc::assert_exception);
@@ -2260,7 +2315,9 @@ BOOST_AUTO_TEST_CASE(global_state_shape_requires_a_post_launch_variant) try {
 BOOST_AUTO_TEST_CASE(liq_yield_report_is_due_only_post_launch) try {
    using sysio::outpost_solana_client_detail::liq_yield_report_due;
    auto state = [](const char* variant) {
-      return fc::mutable_variant_object()("wire_state", fc::mutable_variant_object()("variant", variant));
+      return fc::mutable_variant_object()
+         ("wire_state", fc::mutable_variant_object()("variant", variant))
+         ("frozen", false);
    };
    BOOST_CHECK(liq_yield_report_due(state("PostLaunch")));
    BOOST_CHECK(!liq_yield_report_due(state("PreLaunch")));
@@ -2270,9 +2327,8 @@ BOOST_AUTO_TEST_CASE(liq_yield_report_is_due_only_post_launch) try {
    BOOST_CHECK(!liq_yield_report_due(fc::mutable_variant_object()("wire_state", "PostLaunch")));
 } FC_LOG_AND_RETHROW();
 // The emergency stop: while `GlobalState.frozen` is set the program refuses
-// `report_liq_yield`, so the crank does not fire. A row without `frozen` comes
-// from an IDL that declares no emergency stop and stays due; a `frozen` of any
-// other shape is a misdecoded row and never due.
+// `report_liq_yield`, so the crank does not fire. Missing or misshaped current
+// fields fail closed and are never due.
 BOOST_AUTO_TEST_CASE(liq_yield_report_is_not_due_while_the_outpost_is_frozen) try {
    using sysio::outpost_solana_client_detail::liq_outpost_frozen;
    using sysio::outpost_solana_client_detail::liq_yield_report_due;
@@ -2289,38 +2345,66 @@ BOOST_AUTO_TEST_CASE(liq_yield_report_is_not_due_while_the_outpost_is_frozen) tr
    BOOST_CHECK(!liq_yield_report_due(state("PostLaunch", fc::variant(true))));
    BOOST_CHECK(!liq_yield_report_due(state("PreLaunch", fc::variant(true))));
 
-   BOOST_CHECK(!liq_outpost_frozen(state("PostLaunch", std::nullopt)));
-   BOOST_CHECK(liq_yield_report_due(state("PostLaunch", std::nullopt)));
+   BOOST_CHECK(liq_outpost_frozen(state("PostLaunch", std::nullopt)));
+   BOOST_CHECK(!liq_yield_report_due(state("PostLaunch", std::nullopt)));
 
    BOOST_CHECK(liq_outpost_frozen(state("PostLaunch", fc::variant(uint64_t{0}))));
    BOOST_CHECK(!liq_yield_report_due(state("PostLaunch", fc::variant("false"))));
 } FC_LOG_AND_RETHROW();
-// A `GlobalState` still at the pre-freeze layout (8 + 131 bytes, wire-solana
-// `GLOBAL_STATE_PRE_FREEZE_INIT_SPACE`) cannot carry the `frozen` the loaded IDL
-// declares: the crank treats it as not due instead of decoding past its end. The
-// grown account (one byte longer) is read normally, and an IDL that declares no
-// emergency stop never gates on the length.
-BOOST_AUTO_TEST_CASE(global_state_predates_freeze_only_under_an_idl_that_declares_it) try {
-   namespace detail = sysio::outpost_solana_client_detail;
-   using detail::global_state_predates_freeze;
-   constexpr size_t pre_freeze_bytes =
-      detail::global_state::anchor_discriminator_bytes + detail::global_state::pre_freeze_init_space;
-   BOOST_CHECK_EQUAL(pre_freeze_bytes, 139u);
+// The current 123-byte account is decoded through the same IDL path the crank
+// uses. This is the WIRE-421 regression: the removed <=139-byte gate returned
+// before this decode even though every current field is present in 123 bytes.
+BOOST_AUTO_TEST_CASE(current_global_state_layout_is_eligible_for_automatic_yield_reporting) try {
+   using sysio::outpost_solana_client_detail::liq_yield_report_due;
+   const auto prog = load_idl_fixture(opp_outpost_idl_fixture);
+   sysio::opp_solana_outpost_client program_client(
+      solana_client_ptr{}, measurement_pubkey(42), {prog});
 
-   for (bool in_types : {false, true}) {
-      BOOST_TEST_CONTEXT("fields in types section: " << in_types) {
-         const auto with_freeze =
-            global_state_program({"PostLaunch"}, in_types, prim(idl::primitive_type::bool_t));
-         BOOST_CHECK(global_state_predates_freeze(with_freeze, pre_freeze_bytes));
-         // The layout before the liq fields (8 + 115) is older still.
-         BOOST_CHECK(global_state_predates_freeze(with_freeze, pre_freeze_bytes - 16));
-         BOOST_CHECK(!global_state_predates_freeze(with_freeze, pre_freeze_bytes + 1));
+   const auto account = current_global_state_account(current_wire_state::post_launch, false);
+   BOOST_REQUIRE_EQUAL(account.size(), current_global_state_account_bytes);
+   const auto decoded = program_client.decode_account_info_data("GlobalState", account);
+   const auto& row = decoded.get_object();
+   BOOST_CHECK_EQUAL(row["yield_accumulated_liqsol"].as_uint64(), reportable_yield_accumulated);
+   BOOST_CHECK_EQUAL(row["liq_sequence"].as_uint64(), liq_sequence);
+   BOOST_CHECK_EQUAL(row["liq_yield_reported"].as_uint64(), reportable_yield_watermark);
+   BOOST_CHECK_GT(row["yield_accumulated_liqsol"].as_uint64(), row["liq_yield_reported"].as_uint64());
+   BOOST_CHECK(liq_yield_report_due(row));
 
-         const auto without_freeze = global_state_program({"PostLaunch"}, in_types);
-         BOOST_CHECK(!global_state_predates_freeze(without_freeze, pre_freeze_bytes));
-      }
-   }
-   BOOST_CHECK(!global_state_predates_freeze(idl::program{}, 0));
+   const auto frozen = program_client.decode_account_info_data(
+      "GlobalState", current_global_state_account(current_wire_state::post_launch, true));
+   BOOST_CHECK(!liq_yield_report_due(frozen.get_object()));
+
+   const auto pre_launch = program_client.decode_account_info_data(
+      "GlobalState", current_global_state_account(current_wire_state::pre_launch, false));
+   BOOST_CHECK(!liq_yield_report_due(pre_launch.get_object()));
+} FC_LOG_AND_RETHROW();
+
+// IDL decoding rejects data that cannot be the current account before the
+// crank resolves accounts or submits a transaction.
+BOOST_AUTO_TEST_CASE(current_global_state_layout_rejects_malformed_accounts) try {
+   const auto prog = load_idl_fixture(opp_outpost_idl_fixture);
+   sysio::opp_solana_outpost_client program_client(
+      solana_client_ptr{}, measurement_pubkey(42), {prog});
+
+   auto truncated = current_global_state_account(current_wire_state::post_launch, false);
+   truncated.pop_back();
+   BOOST_CHECK_THROW(program_client.decode_account_info_data("GlobalState", truncated),
+                     fc::assert_exception);
+
+   auto wrong_discriminator = current_global_state_account(current_wire_state::post_launch, false);
+   wrong_discriminator.front() ^= 0x01;
+   BOOST_CHECK_THROW(program_client.decode_account_info_data("GlobalState", wrong_discriminator),
+                     fc::assert_exception);
+
+   auto invalid_frozen = current_global_state_account(current_wire_state::post_launch, false);
+   invalid_frozen[current_global_state_frozen_offset] = invalid_borsh_bool;
+   BOOST_CHECK_THROW(program_client.decode_account_info_data("GlobalState", invalid_frozen),
+                     fc::assert_exception);
+
+   auto invalid_wire_state = current_global_state_account(current_wire_state::post_launch, false);
+   invalid_wire_state[current_global_state_wire_state_offset] = invalid_wire_state_variant;
+   BOOST_CHECK_THROW(program_client.decode_account_info_data("GlobalState", invalid_wire_state),
+                     fc::assert_exception);
 } FC_LOG_AND_RETHROW();
 // The overrides cover every non-signer account `report_liq_yield` declares, and
 // derive each the way the program's `#[derive(Accounts)]` constraints do: the
