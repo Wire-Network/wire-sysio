@@ -3799,6 +3799,10 @@ namespace sysio {
       }
       peer_ilog( p2p_conn_log, this, "Peer authenticated successfully" );
       peer_authenticated.store(true, std::memory_order_relaxed);
+      // An earlier session's benign_other (an expired grace window, say) only governs redialing. This session has
+      // authenticated, so clear it; left set, should_sync_from() would keep this peer out of sync after one span.
+      if( no_retry == go_away_reason::benign_other )
+         no_retry = go_away_reason::no_reason;
       // Re-process peer's handshake now that auth is complete; initial
       // handshake handling deferred sync negotiation while the peer was gated.
       {
