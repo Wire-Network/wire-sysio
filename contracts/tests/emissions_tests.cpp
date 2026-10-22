@@ -5753,6 +5753,23 @@ struct producer_score_tester : public producer_eligibility_tester {
       BOOST_FAIL("producer " << expected.to_string() << " never entered the active schedule");
    }
 
+   /// Produce until the ACTIVE schedule is exactly `expected`, in order, then require it.
+   void wait_for_active_schedule_order(const std::vector<account_name>& expected,
+                                       uint32_t max_blocks = 400) {
+      for (uint32_t produced = 0; produced < max_blocks && active_schedule_names() != expected; ++produced) {
+         produce_blocks(1);
+      }
+      const auto schedule = active_schedule_names();
+      BOOST_REQUIRE_EQUAL_COLLECTIONS(schedule.begin(), schedule.end(), expected.begin(), expected.end());
+   }
+
+   /// Re-register `producer` with its fixture key at `location`, the schedule-order key.
+   action_result set_location(account_name producer, uint16_t location) {
+      return push_system_action(producer, "regproducer"_n, mvo()
+         ("producer", producer)("producer_key", get_public_key(producer, "active"))("url", "")
+         ("location", location));
+   }
+
    /// Skip `target`'s rounds until the schedule has actually dropped it.
    ///
    /// A rebuild only PROPOSES, so a sunk producer holds its slot until that proposal goes final --
@@ -6651,6 +6668,140 @@ BOOST_FIXTURE_TEST_CASE( collateralised_producers_displace_the_bootstrap_at_the_
    BOOST_REQUIRE( !is_scheduled(bootstrap) );
    BOOST_REQUIRE(  is_scheduled(names[0]) );
    BOOST_REQUIRE_EQUAL( "OPERATOR_STATUS_ACTIVE", get_opreg_operator(bootstrap)["status"].as_string() );
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// Schedule order
+// ---------------------------------------------------------------------------
+
+// A new set of scheduled producers takes its rounds in ascending `location`, account name breaking
+// ties.
+BOOST_FIXTURE_TEST_CASE( a_new_schedule_runs_in_location_order, producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);   // producera..producere, every one at location 0
+
+   // producerb and producerd tie at 100; the field's full range is usable.
+   const std::vector<uint16_t> locations = { std::numeric_limits<uint16_t>::max(), 100, 200, 100, 0 };
+   for (uint32_t i = 0; i < names.size(); ++i) {
+      BOOST_REQUIRE_EQUAL( success(), set_location(names[i], locations[i]) );
+   }
+   trigger_reschedule();
+   wait_for_active_schedule_order({ names[4], names[1], names[3], names[2], names[0] });
+} FC_LOG_AND_RETHROW()
+
+// The set already producing keeps its order through any number of location changes: a reorder alone
+// would reassign rounds at activation, handing one producer two in a row and skipping miss
+// attribution. The new locations apply when the set next changes.
+BOOST_FIXTURE_TEST_CASE( a_location_change_alone_never_reorders_the_schedule, producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);   // producera..producere, every one at location 0
+   trigger_reschedule();
+   wait_for_active_schedule_order(names);
+   const auto version = control->active_producers().version;
+
+   const std::vector<std::vector<uint16_t>> moves = {
+      { 5, 4, 3, 2, 1 },   // reverse the order
+      { 3, 4, 0, 1, 2 },   // then rotate it to start at producerc
+   };
+   for (const auto& locations : moves) {
+      for (uint32_t i = 0; i < names.size(); ++i) {
+         BOOST_REQUIRE_EQUAL( success(), set_location(names[i], locations[i]) );
+      }
+      trigger_reschedule();
+      produce_blocks(3 * slots_per_producer);   // time for any proposal to activate
+      BOOST_REQUIRE_EQUAL( version, control->active_producers().version );
+      const auto schedule = active_schedule_names();
+      BOOST_REQUIRE_EQUAL_COLLECTIONS(schedule.begin(), schedule.end(), names.begin(), names.end());
+   }
+
+   // Terminating producera changes the set; the four left run in their latest location order.
+   BOOST_REQUIRE_EQUAL( success(), terminate_operator(names[0]) );
+   trigger_reschedule();
+   wait_for_active_schedule_order({ names[2], names[3], names[4], names[1] });
+} FC_LOG_AND_RETHROW()
+
+// Location orders the producers rank selected and never selects them: the producer at position 22
+// takes the lowest location of all and still holds its position and no slot.
+BOOST_FIXTURE_TEST_CASE( location_never_selects_a_standby_into_the_schedule, producer_score_tester ) try {
+   constexpr uint32_t scheduled_count = 21;   // max_producers
+   auto names = setup_ranked_producers(scheduled_count + 1);
+   const auto standby = names.back();
+
+   // Reverse the name order across the ranked 21; the standby goes to the front of the line.
+   for (uint32_t i = 0; i < scheduled_count; ++i) {
+      BOOST_REQUIRE_EQUAL( success(), set_location(names[i], static_cast<uint16_t>(scheduled_count - i)) );
+   }
+   BOOST_REQUIRE_EQUAL( success(), set_location(standby, 0) );
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL( scheduled_count + 1, producer_rank_position(standby) );
+
+   trigger_reschedule();
+   const std::vector<account_name> by_location(names.rbegin() + 1, names.rend());   // produceru..producera
+   wait_for_active_schedule_order(by_location);
+   BOOST_REQUIRE( !is_scheduled(standby) );
+   BOOST_REQUIRE_EQUAL( scheduled_count + 1, producer_rank_position(standby) );
+} FC_LOG_AND_RETHROW()
+
+// A switch can hand a producer a second round inside one rotation; only one round per rotation is
+// paid. Replacing the last producer with a standby that sorts first moves everyone one slot later,
+// so the producer just before the switch point produces again right after it. The switch charges
+// no retained producer a missed round either.
+BOOST_FIXTURE_TEST_CASE( a_switch_never_pays_a_second_round_in_one_rotation, producer_score_tester ) try {
+   constexpr uint32_t scheduled_count = 21;   // max_producers: a rotation is this many rounds
+   auto names = setup_ranked_producers(scheduled_count + 1);
+   const auto standby = names.back();
+   const auto leaving = names[scheduled_count - 1];
+   const std::vector<account_name> before(names.begin(), names.begin() + scheduled_count);
+   std::vector<account_name> after(before.begin(), before.end() - 1);
+   after.insert(after.begin(), standby);
+
+   for (uint32_t i = 0; i < scheduled_count; ++i) {
+      BOOST_REQUIRE_EQUAL( success(), set_location(names[i], static_cast<uint16_t>(i + 1)) );
+   }
+   BOOST_REQUIRE_EQUAL( success(), set_location(standby, 0) );
+   trigger_reschedule();
+   wait_for_active_schedule_order(before);
+
+   // Replay the rule over every block from here on. The rows count each block once it is the head.
+   std::map<account_name, uint32_t> last_paid;
+   std::map<account_name, uint32_t> expected;
+   for (const auto& p : names) {
+      last_paid[p] = get_producer_info(p)["last_paid_round"].as<uint32_t>();
+      expected[p]  = unpaid_blocks_of(p);
+   }
+   uint32_t uncounted = 0;
+   const auto produce_and_replay = [&] {
+      produce_block();
+      const auto producer = control->head().header().producer;
+      const uint32_t round = control->head().header().timestamp.slot / slots_per_producer;
+      auto& last = last_paid[producer];
+      if (last != round) {
+         if (last != 0 && last / scheduled_count == round / scheduled_count) {
+            ++uncounted;
+            return;
+         }
+         last = round;
+      }
+      ++expected[producer];
+   };
+
+   BOOST_REQUIRE_EQUAL( success(), terminate_operator(leaving) );
+   constexpr uint32_t max_blocks = 400;
+   for (uint32_t produced = 0; produced < max_blocks && active_schedule_names() != after; ++produced) {
+      produce_and_replay();
+   }
+   const auto schedule = active_schedule_names();
+   BOOST_REQUIRE_EQUAL_COLLECTIONS(schedule.begin(), schedule.end(), after.begin(), after.end());
+   for (uint32_t i = 0; i < scheduled_count * slots_per_producer; ++i) {
+      produce_and_replay();
+   }
+
+   BOOST_REQUIRE_MESSAGE( uncounted > 0, "no producer took a second round in the switch's rotation" );
+   for (const auto& p : names) {
+      BOOST_REQUIRE_MESSAGE( unpaid_blocks_of(p) == expected[p],
+         p.to_string() << " has " << unpaid_blocks_of(p) << " unpaid blocks, expected " << expected[p] );
+   }
+   for (const auto& p : after) {
+      BOOST_REQUIRE_EQUAL( 0u, missed_rounds_of(p) );
+   }
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END() // sysio_producer_score_tests
