@@ -247,22 +247,21 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
    check(operators_per_epoch > 0, "operators_per_epoch must be positive");
    check(batch_op_groups > 0, "batch_op_groups must be positive");
    check(batch_op_groups <= MAX_BATCH_OP_GROUPS,
-         "batch_op_groups exceeds the uint8 group-index ceiling (255)");
+         "batch_op_groups exceeds the outpost group ceiling (8)");
    // Widen the product to uint64 so a large operators_per_epoch cannot wrap the
    // uint32 multiply into a small value that spuriously matches a small
    // batch_operator_minimum_active; an honest product beyond uint32 simply fails
    // the equality against the uint32 field, which is the intended rejection.
    check(static_cast<uint64_t>(operators_per_epoch) * batch_op_groups == batch_operator_minimum_active,
          "batch_operator_minimum_active must equal operators_per_epoch * batch_op_groups");
-   // Magnitude bounds, checked after the relationship above so an inconsistent
+   // Magnitude bound, checked after the relationship above so an inconsistent
    // triple reports the equality error. The equality alone cannot reject an
-   // internally consistent but absurd size (UINT32_MAX groups of one), which
-   // would later abort advance() on its schedule-window vector reserves and
-   // halt epoch advancement chain-wide.
+   // internally consistent but absurd size (UINT32_MAX operators in one group),
+   // which would later abort advance() on its schedule-window vector reserves and
+   // halt epoch advancement chain-wide. With both factors bounded, the window
+   // cannot exceed MAX_SCHEDULED_BATCH_OPERATORS.
    check(operators_per_epoch <= MAX_OPERATORS_PER_EPOCH,
-         "operators_per_epoch exceeds the per-epoch schedule ceiling (100)");
-   check(batch_operator_minimum_active <= MAX_SCHEDULED_BATCH_OPERATORS,
-         "batch_operator_minimum_active exceeds the schedule-window ceiling (1000)");
+         "operators_per_epoch exceeds the outpost group-size ceiling (16)");
    check(epoch_retention_envelope_log_count > 0,
          "epoch_retention_envelope_log_count must be positive");
 
@@ -720,7 +719,11 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
 
    state_tbl.set(state, ram_payer);
 
-   // Queue OPERATORS attestation (full roster with authex chain addresses) for each outpost.
+   // Queue the OPERATORS roster for each outpost: every operator seated in the window, with its current
+   // status and authex chain addresses. Outposts read the roster only to map the window's members to
+   // the keys they deliver with (Solana also refuses a window that seats an ineligible member), so the
+   // window is all they need, and the roster stays within MAX_SCHEDULED_BATCH_OPERATORS however many
+   // operators register. A member whose opreg row was pruned is left out.
    // IMPORTANT: Must come before BATCH_OPERATOR_GROUPS so that the ETH outpost's
    // _handleOperators populates operatorEthAddress before _handleBatchOperatorGroups
    // looks up those addresses.
@@ -730,61 +733,70 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
       authex::links_t authex_links(AUTHEX_ACCOUNT);
       auto links_by_name = authex_links.get_index<"byname"_n>();
 
-      for (auto it = opreg_ops.begin(); it != opreg_ops.end(); ++it) {
-         opp::attestations::OperatorEntry entry;
-         entry.account.name = it->account.to_string();
-         entry.type = it->type;
-         entry.status = it->status;
+      for (const auto& group : state.batch_op_groups) {
+         for (const auto& member : group) {
+            const auto op = opreg_ops.try_get(opreg::operator_key{member.value});
+            if (!op) continue;
 
-         // Collect all authex-linked chain addresses for this operator.
-         // Store raw public key bytes from the variant (33 bytes for EM/secp256k1,
-         // 32 bytes for ED/Ed25519).
-         auto link_it = links_by_name.lower_bound(it->account.value);
-         while (link_it != links_by_name.end() && link_it->username == it->account) {
-            opp::types::ChainAddress chain_addr;
-            chain_addr.kind = link_it->chain_kind;
+            opp::attestations::OperatorEntry entry;
+            entry.account.name = member.to_string();
+            entry.type = op->type;
+            entry.status = op->status;
 
-            std::visit([&](const auto& key_data) {
-               using T = std::decay_t<decltype(key_data)>;
-               if constexpr (std::is_same_v<T, webauthn_public_key>) {
-                  // EM (secp256k1 compressed) — 33 bytes in key.key
-                  chain_addr.address.assign(key_data.key.begin(), key_data.key.end());
-               } else if constexpr (std::is_same_v<T, ed_public_key>) {
-                  // ED (Ed25519) — 32 bytes
-                  chain_addr.address.assign(
-                     reinterpret_cast<const char*>(key_data.data()),
-                     reinterpret_cast<const char*>(key_data.data() + key_data.size()));
-               } else if constexpr (std::is_same_v<T, ecc_public_key>) {
-                  // K1/R1 (secp256k1/P-256 compressed) — 33 bytes
-                  chain_addr.address.assign(key_data.begin(), key_data.end());
-               }
-               // Skip BLS keys — not used for chain address linking
-            }, link_it->pub_key);
+            // Collect all authex-linked chain addresses for this operator.
+            // Store raw public key bytes from the variant (33 bytes for EM/secp256k1,
+            // 32 bytes for ED/Ed25519).
+            auto link_it = links_by_name.lower_bound(member.value);
+            while (link_it != links_by_name.end() && link_it->username == member) {
+               opp::types::ChainAddress chain_addr;
+               chain_addr.kind = link_it->chain_kind;
 
-            entry.addresses.push_back(std::move(chain_addr));
-            ++link_it;
+               std::visit([&](const auto& key_data) {
+                  using T = std::decay_t<decltype(key_data)>;
+                  if constexpr (std::is_same_v<T, webauthn_public_key>) {
+                     // EM (secp256k1 compressed) — 33 bytes in key.key
+                     chain_addr.address.assign(key_data.key.begin(), key_data.key.end());
+                  } else if constexpr (std::is_same_v<T, ed_public_key>) {
+                     // ED (Ed25519) — 32 bytes
+                     chain_addr.address.assign(
+                        reinterpret_cast<const char*>(key_data.data()),
+                        reinterpret_cast<const char*>(key_data.data() + key_data.size()));
+                  } else if constexpr (std::is_same_v<T, ecc_public_key>) {
+                     // K1/R1 (secp256k1/P-256 compressed) — 33 bytes
+                     chain_addr.address.assign(key_data.begin(), key_data.end());
+                  }
+                  // Skip BLS keys — not used for chain address linking
+               }, link_it->pub_key);
+
+               entry.addresses.push_back(std::move(chain_addr));
+               ++link_it;
+            }
+
+            ops_attest.operators.push_back(std::move(entry));
          }
-
-         ops_attest.operators.push_back(std::move(entry));
       }
 
-      std::vector<char> encoded;
-      auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
-      (void)out(ops_attest);
+      // An empty roster tells an outpost nothing (Solana skips it as an anomaly), so an empty window
+      // queues none; the BatchOperatorGroups withhold below reports that state.
+      if (!ops_attest.operators.empty()) {
+         std::vector<char> encoded;
+         auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
+         (void)out(ops_attest);
 
-      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-      for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
-         if (!is_active_outpost(*it)) continue;
-         action(
-            permission_level{get_self(), "owner"_n},
-            MSGCH_ACCOUNT,
-            "queueout"_n,
-            std::make_tuple(
-               it->code.value,
-               opp::types::ATTESTATION_TYPE_OPERATORS,
-               encoded
-            )
-         ).send();
+         sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+         for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
+            if (!is_active_outpost(*it)) continue;
+            action(
+               permission_level{get_self(), "owner"_n},
+               MSGCH_ACCOUNT,
+               "queueout"_n,
+               std::make_tuple(
+                  it->code.value,
+                  opp::types::ATTESTATION_TYPE_OPERATORS,
+                  encoded
+               )
+            ).send();
+         }
       }
    }
 

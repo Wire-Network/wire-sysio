@@ -153,41 +153,21 @@ namespace sysio {
       static constexpr uint32_t MIN_EPOCH_DURATION_SEC = 60;
       static constexpr uint32_t MAX_EPOCH_DURATION_SEC = 30u * 24u * 60u * 60u;
 
-      /// Upper bound on the number of batch-operator groups. The active group is
-      /// carried on-chain and in the batch_operator_plugin as a `uint8_t`, which
-      /// reserves 255 as its "not in any group" sentinel. Groups are indexed
-      /// 0..batch_op_groups-1, so capping at 255 keeps the largest index (254)
-      /// below the sentinel and inside the byte, preventing index truncation or a
-      /// collision that would miselect batch operators.
-      static constexpr uint32_t MAX_BATCH_OP_GROUPS = 255;
+      /// Upper bound on the number of batch-operator groups: Solana's operator registry seats at most
+      /// `MAX_OPERATOR_GROUPS` (8), and a window an outpost cannot seat stalls that outpost.
+      static constexpr uint32_t MAX_BATCH_OP_GROUPS = 8;
 
-      /// Upper bound on `operators_per_epoch` (the size of one schedule group).
-      /// Every member of the expiring group costs two inline actions per active
-      /// outpost in `advance` (opreg::recorddel + opreg::termcheck) plus an inline
-      /// transfer in sysio.system::payepoch, so group size directly scales the
-      /// epoch-boundary transaction; an absurd value (which the product equality
-      /// alone cannot reject -- UINT32_MAX groups of one is internally consistent)
-      /// would abort `advance` on its vector reserves and halt epoch advancement
-      /// chain-wide. 100 mirrors sysio.system's producer-pay safety cap
-      /// (MAX_STANDBY_END_RANK) and is an order of magnitude above any practical
-      /// group size.
-      static constexpr uint32_t MAX_OPERATORS_PER_EPOCH = 100;
+      /// Upper bound on `operators_per_epoch` (the size of one schedule group): Solana seats at most
+      /// `MAX_GROUP_MEMBERS` (16) per group. Each member of the expiring group also costs inline actions
+      /// in `advance` (opreg::recorddel + opreg::termcheck per outpost, and a sysio.system::payepoch
+      /// transfer).
+      static constexpr uint32_t MAX_OPERATORS_PER_EPOCH = 16;
 
-      /// Upper bound on `batch_operator_minimum_active`, which the product
-      /// equality pins to the total resident schedule window
-      /// (operators_per_epoch * batch_op_groups). The full window is held in the
-      /// `epochstate` singleton row, flattened into a resident vector on every
-      /// `advance`, and serialized into the per-outpost BatchOperatorGroups
-      /// attestation (~20 bytes per member against the 32 KiB OPP envelope cap).
-      /// The ceiling is unchanged by the platform cap reduction 65 536 -> 32 768,
-      /// but the headroom it leaves is materially tighter: at the ceiling the
-      /// roster attestation alone is ~20 KB, about 62 % of a 32 KiB envelope
-      /// (it was ~31 % of 64 KiB). 1000 members still keeps all three bounded --
-      /// the resident window vector, the epoch-boundary transaction, and the
-      /// attestation -- while far exceeding any practical roster; a roster that
-      /// large would leave little room for value-bearing attestations in the same
-      /// envelope, and `buildenv` would carry the remainder to the next epoch.
-      static constexpr uint32_t MAX_SCHEDULED_BATCH_OPERATORS = 1000;
+      /// Largest schedule window (operators_per_epoch * batch_op_groups, which the product equality pins
+      /// `batch_operator_minimum_active` to), matching Solana's `MAX_OPERATORS` (128) registry. The OPERATORS
+      /// roster and the BatchOperatorGroups attestation list only the window, so this also bounds both
+      /// (about 13 KB of roster at the ceiling).
+      static constexpr uint32_t MAX_SCHEDULED_BATCH_OPERATORS = MAX_BATCH_OP_GROUPS * MAX_OPERATORS_PER_EPOCH;
 
    private:
 

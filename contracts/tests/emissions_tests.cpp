@@ -2746,12 +2746,14 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_caps_batch_roster_history, sysio_emissions_t
 BOOST_FIXTURE_TEST_CASE( emission_config_boundaries_cap_batch_payout_credit_work,
                          sysio_emissions_tester ) try {
    // setemitcfg owns cadence changes. With the epoch roster at its maximum of
-   // 100, cadence two would permit 200 distinct recipient credits and must be
-   // rejected at that boundary.
+   // 16, cadence six permits 96 distinct recipient credits and fits; cadence
+   // seven would permit 112 and must be rejected at that boundary.
    BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
-   BOOST_REQUIRE_EQUAL(success(), init_epoch_state(60, /*operators_per_epoch*/100,
+   BOOST_REQUIRE_EQUAL(success(), init_epoch_state(60, /*operators_per_epoch*/16,
                                                    /*batch_op_groups_count*/3));
-   auto r = setemitcfg_with_cadence(config::system_account_name, uint16_t(2));
+   BOOST_REQUIRE_EQUAL(success(),
+      setemitcfg_with_cadence(config::system_account_name, uint16_t(6)));
+   auto r = setemitcfg_with_cadence(config::system_account_name, uint16_t(7));
    BOOST_REQUIRE(r != success());
    require_substr(r, "pay_cadence_epochs x operators_per_epoch exceeds the batch payout credit safety cap (100)");
 
