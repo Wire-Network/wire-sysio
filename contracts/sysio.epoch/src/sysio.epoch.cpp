@@ -261,7 +261,7 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
    // halt epoch advancement chain-wide. With both factors bounded, the window
    // cannot exceed MAX_SCHEDULED_BATCH_OPERATORS.
    check(operators_per_epoch <= MAX_OPERATORS_PER_EPOCH,
-         "operators_per_epoch exceeds the outpost group-size ceiling (16)");
+         "operators_per_epoch exceeds the outpost group-size ceiling (7)");
    check(epoch_retention_envelope_log_count > 0,
          "epoch_retention_envelope_log_count must be positive");
 

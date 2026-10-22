@@ -35,13 +35,12 @@ inline constexpr uint32_t T2_MAX_NODE_OWNERS = 84;
 inline constexpr uint32_t T3_MAX_NODE_OWNERS = 1000;
 
 // Each recorded roster is the group on duty for one epoch, at most sysio.epoch's
-// MAX_OPERATORS_PER_EPOCH (16) operators. Keeping at most ten epochs of history
+// MAX_OPERATORS_PER_EPOCH (7) operators. Keeping at most ten epochs of history
 // bounds roster retention and coalescing work. The joint cadence x roster-size
 // guard below separately caps the expensive per-recipient payout work at 100
-// credits. With the default 7-operator groups the history bound is the limit; a
-// 16-operator group permits a cadence of at most 6. Raising the credit cap
-// requires separate evidence that a larger mandatory advance fits the
-// transaction CPU/KV budget.
+// credits; at most 7 operators over 10 epochs is 70, so today the history bound
+// is the limit. Raising the credit cap requires separate evidence that a larger
+// mandatory advance fits the transaction CPU/KV budget.
 inline constexpr uint16_t MAX_PAY_CADENCE_EPOCHS = 10;
 inline constexpr uint32_t MAX_BATCH_PAYOUT_CREDITS = 100;
 // payepoch removes at most this many roster-history rows per payment. Normal
@@ -131,8 +130,8 @@ struct [[sysio::table("emitcfg"), sysio::contract("sysio.system")]] emission_con
    // every epoch (matches the original emissions behavior). The roster history
    // retained for a period is explicitly bounded at 10 epochs, while cadence x
    // operators_per_epoch is bounded separately to at most 100 recipient credits
-   // per payout. At the 16-operator group ceiling this makes 6 the maximum
-   // cadence; the default 7-operator groups are held to 10 by the history bound.
+   // per payout. Groups are at most 7 operators, so the history bound is the
+   // limit: 10 epochs is 70 credits.
    // The period aggregate and per-recipient share-by-rounds math
    // remain equivalent to summing per-epoch results. Must be in
    // [1, MAX_PAY_CADENCE_EPOCHS].

@@ -28,7 +28,7 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 
 | Action | Auth | Description |
 |--------|------|-------------|
-| `setconfig` | `sysio.epoch` | Set the epoch configuration. Requires `operators_per_epoch * batch_op_groups == batch_operator_minimum_active` and enforces Solana's seating limits (`MAX_OPERATORS_PER_EPOCH` 16, `MAX_BATCH_OP_GROUPS` 8), so the window holds at most `MAX_SCHEDULED_BATCH_OPERATORS` (128) |
+| `setconfig` | `sysio.epoch` | Set the epoch configuration. Requires `operators_per_epoch * batch_op_groups == batch_operator_minimum_active` and enforces the outposts' limits (`MAX_OPERATORS_PER_EPOCH` 7, Ethereum's group size; `MAX_BATCH_OP_GROUPS` 8, Solana's group count), so the window holds at most `MAX_SCHEDULED_BATCH_OPERATORS` (56) |
 | `schbatchgps` | `sysio.epoch` | Build the initial window from the `ACTIVE` batch operators on `sysio.opreg` (non-bootstrapped first, then bootstrapped, trimmed to `batch_operator_minimum_active`) |
 | `advance` | permissionless at genesis (epoch 0 → 1); afterwards `sysio.msgch` or `sysio.epoch` | Advance the epoch once the wall-clock boundary has passed and the contract is not paused |
 | `pause` | `sysio.chalg` | Set the global pause |
