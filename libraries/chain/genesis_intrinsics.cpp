@@ -117,7 +117,8 @@ const std::vector<const char*> genesis_intrinsics = {
    "kv_idx_prev",
    "kv_idx_key",
    "kv_idx_primary_key",
-   "kv_idx_destroy"
+   "kv_idx_destroy",
+   "ed25519_verify"
 };
 
 } } // namespace sysio::chain

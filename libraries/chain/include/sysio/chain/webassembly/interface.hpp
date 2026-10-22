@@ -372,6 +372,21 @@ namespace webassembly {
          int32_t recover_key(aligned_ptr<const fc::sha256> digest, span<const char> sig, span<char> pub) const;
 
          /**
+          * Verify a nonempty batch of detached Ed25519 signatures over raw message bytes.
+          * Each record is [u32 LE message length][64-byte signature][32-byte key][message], without padding.
+          * Messages may be empty but must not exceed config::max_ed25519_message_size bytes.
+          * Returns false for invalid signatures/keys, malformed records, count mismatches, or trailing bytes.
+          * Repeated messages/keys are permitted; this does not enforce authorization or quorum rules.
+          * Checks transaction time before and after each verification. Resource-limit and WASM memory
+          * exceptions abort the transaction; they are never converted into verification results.
+          * @param entries Packed records; its size is the exact byte length of the batch.
+          * @param count Number of records. Zero returns false; one verifies a single signature.
+          * @return True only if every record verifies and the entire input is consumed.
+          * @ingroup crypto
+          */
+         bool ed25519_verify(span<const char> entries, uint32_t count) const;
+
+         /**
           * Tests if the sha256 hash generated from data matches the provided digest.
           *
           * @ingroup crypto

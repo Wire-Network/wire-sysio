@@ -18,6 +18,11 @@ namespace fc { namespace crypto { namespace ed {
       });
    }
 
+   bool verify_detached(const uint8_t* signature, const uint8_t* data, size_t len, const uint8_t* public_key) {
+      sodium_init_guard();
+      return crypto_sign_verify_detached(signature, data, len, public_key) == 0;
+   }
+
    private_key_shim private_key_shim::generate() {
       sodium_init_guard();
       unsigned char pk[crypto_sign_PUBLICKEYBYTES];
@@ -126,15 +131,7 @@ namespace fc { namespace crypto { namespace ed {
 
    // Verify raw bytes directly (for Solana transaction verification)
    bool signature_shim::verify_solana(const uint8_t* data, size_t len, const public_key_shim& pub) const {
-      sodium_init_guard();
-
-      // Sig starts at offset 32
-      return crypto_sign_verify_detached(
-         _data.data() + crypto_sign_PUBLICKEYBYTES,
-         data,
-         len,
-         pub._data.data()
-      ) == 0;
+      return verify_detached(_data.data() + crypto_sign_PUBLICKEYBYTES, data, len, pub._data.data());
    }
 
    bool is_zero(const public_key_shim& pk) {

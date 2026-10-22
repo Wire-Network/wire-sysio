@@ -7,6 +7,7 @@
 #include <fc/crypto/blake2.hpp>
 #include <fc/crypto/sha3.hpp>
 #include <fc/crypto/k1_recover.hpp>
+#include <fc/crypto/elliptic_ed.hpp>
 #include <bn256/bn256.h>
 #include <bls12-381/bls12-381.hpp>
 #include <openssl/blake2.h>
@@ -30,6 +31,47 @@ namespace {
 }
 
 namespace sysio::chain::webassembly {
+
+   bool interface::ed25519_verify(span<const char> entries, uint32_t count) const {
+      constexpr size_t length_size = sizeof(uint32_t);
+      constexpr size_t signature_size = crypto_sign_BYTES;
+      constexpr size_t public_key_size = crypto_sign_PUBLICKEYBYTES;
+      constexpr size_t header_size = length_size + signature_size + public_key_size;
+      constexpr uint32_t bits_per_byte = 8;
+      static_assert(signature_size == 64 && public_key_size == 32 && length_size == 4);
+
+      context.trx_context.checktime();
+      // Division rejects impossible counts without overflowing a count * header_size product.
+      if (count == 0 || count > entries.size() / header_size)
+         return false;
+
+      const auto* cursor = reinterpret_cast<const uint8_t*>(entries.data());
+      size_t remaining = entries.size();
+      for (uint32_t i = 0; i < count; ++i) {
+         if (remaining < header_size)
+            return false;
+
+         uint32_t message_size = 0;
+         for (size_t byte = 0; byte < length_size; ++byte)
+            message_size |= uint32_t{cursor[byte]} << (byte * bits_per_byte);
+         if (message_size > config::max_ed25519_message_size || message_size > remaining - header_size)
+            return false;
+
+         const auto* signature = cursor + length_size;
+         const auto* public_key = signature + signature_size;
+         const auto* message = public_key + public_key_size;
+         context.trx_context.checktime();
+         const bool valid = fc::crypto::ed::verify_detached(signature, message, message_size, public_key);
+         context.trx_context.checktime();
+         if (!valid)
+            return false;
+
+         const size_t record_size = header_size + message_size;
+         cursor += record_size;
+         remaining -= record_size;
+      }
+      return remaining == 0;
+   }
 
    void interface::assert_recover_key( aligned_ptr<const fc::sha256> digest,
                                        span<const char> sig,

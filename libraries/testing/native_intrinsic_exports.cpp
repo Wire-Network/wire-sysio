@@ -568,6 +568,12 @@ int32_t get_permission_lower_bound(uint64_t account, uint64_t permission, char* 
 // Crypto extensions
 // ============================================================================
 
+/// Dispatch the packed Ed25519 batch ABI through the active native contract context.
+INTRINSIC_EXPORT
+bool ed25519_verify(const char* entries, uint32_t entries_len, uint32_t count) {
+   return native_context_stack::current()->ed25519_verify(span<const char>{entries, entries_len}, count);
+}
+
 INTRINSIC_EXPORT
 int32_t alt_bn128_add(const char* op1, uint32_t op1_len, const char* op2, uint32_t op2_len, char* result, uint32_t result_len) {
    return native_context_stack::current()->alt_bn128_add(

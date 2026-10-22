@@ -12,6 +12,16 @@
 
 namespace fc { namespace crypto { namespace ed {
 
+/**
+ * Verify a detached Ed25519 signature over unchanged bytes using initialized libsodium.
+ * Invalid signature/key encodings return false. Initialization failures remain exceptions.
+ * @param signature Points to crypto_sign_BYTES readable bytes (no embedded public key).
+ * @param data Points to len readable message bytes; empty messages are supported.
+ * @param len Message length in bytes. Callers enforce their own resource limits.
+ * @param public_key Points to crypto_sign_PUBLICKEYBYTES readable bytes.
+ */
+bool verify_detached(const uint8_t* signature, const uint8_t* data, size_t len, const uint8_t* public_key);
+
 // Forward declarations
 struct public_key_shim;
 struct signature_shim;
@@ -87,6 +97,7 @@ struct signature_shim {
    public_key_shim recover(const sha256& digest) const;
 
    bool verify(const sha256& digest, const public_key_shim& pub) const;
+   /// Verify unchanged Solana message bytes using the detached portion of this signature.
    bool verify_solana(const uint8_t* data, size_t len, const public_key_shim& pub) const;
 
    std::string to_string(const fc::yield_function_t& yield)const {
