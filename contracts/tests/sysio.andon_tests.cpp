@@ -55,7 +55,7 @@ public:
    std::vector<char> bytes() { return get_row_by_account(ANDON, ANDON, "cord"_n, "cord"_n); }
    /// Decode the public three-field emergency-stop state.
    fc::variant cord() {
-      return ser.binary_to_variant("cord_state", bytes(), abi_serializer::create_yield_function(abi_serializer_max_time));
+      return ser.binary_to_variant("cord_state", bytes(), fixture_abi_yield_function());
    }
 };
 

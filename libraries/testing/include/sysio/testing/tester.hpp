@@ -180,8 +180,10 @@ namespace sysio::testing {
          static const uint32_t DEFAULT_EXPIRATION_DELTA = 6;
 
          static const uint32_t DEFAULT_BILLED_CPU_TIME_US = 2000;
-         /// Bounded ABI serialization budget with headroom for scheduling delays on loaded test machines.
+         /// Wall-clock ABI serialization budget for unittests; fixture paths use fixture_abi_yield_function().
          static const fc::microseconds abi_serializer_max_time;
+         /// Fixture ABI callback: recursion-depth guard only; dedicated serializer tests own wall-clock deadlines.
+         static abi_serializer::yield_function_t fixture_abi_yield_function() { return abi_serializer::create_depth_yield_function(); }
          static constexpr fc::microseconds default_skip_time = fc::milliseconds(config::block_interval_ms);
 
          static constexpr uint64_t newaccount_ram = 1144; // Should match sysio.system native newaccount_ram
@@ -442,7 +444,7 @@ namespace sysio::testing {
                try {
                   if (const auto* accnt = control->find_account_metadata( name ); accnt != nullptr) {
                      if( abi_def abi; abi_serializer::to_abi( accnt->abi, abi )) {
-                        return abi_serializer( std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ) );
+                        return abi_serializer( std::move(abi), fixture_abi_yield_function() );
                      }
                   }
                   return std::optional<abi_serializer>();

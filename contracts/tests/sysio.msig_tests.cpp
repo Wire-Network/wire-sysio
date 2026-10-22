@@ -32,7 +32,7 @@ public:
       BOOST_REQUIRE( accnt != nullptr );
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
-      abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+      abi_ser.set_abi(abi, fixture_abi_yield_function());
    }
 
    void create_currency( name contract, name manager, asset maxsupply ) {
@@ -90,23 +90,21 @@ public:
          action act;
          act.account = "sysio.msig"_n;
          act.name = name;
-         act.data = abi_ser.variant_to_binary( action_type_name, data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+         act.data = abi_ser.variant_to_binary( action_type_name, data, fixture_abi_yield_function() );
          //std::cout << "test:\n" << fc::to_hex(act.data.data(), act.data.size()) << " size = " << act.data.size() << std::endl;
 
          return base_tester::push_action( std::move(act), auth ? uint64_t(signer) : 0 );
       */
    }
 
-   transaction reqauth( account_name from, const vector<permission_level>& auths,
-                        const fc::microseconds& max_serialization_time, uint32_t delay_sec = 0 );
+   transaction reqauth( account_name from, const vector<permission_level>& auths, uint32_t delay_sec = 0 );
 
    void check_traces(transaction_trace_ptr trace, std::vector<std::map<std::string, name>> res);
 
    abi_serializer abi_ser;
 };
 
-transaction sysio_msig_tester::reqauth( account_name from, const vector<permission_level>& auths,
-                                        const fc::microseconds& max_serialization_time, uint32_t delay_sec ) {
+transaction sysio_msig_tester::reqauth( account_name from, const vector<permission_level>& auths, uint32_t delay_sec ) {
    fc::variants v;
    for ( auto& level : auths ) {
       v.push_back(fc::mutable_variant_object()
@@ -130,7 +128,7 @@ transaction sysio_msig_tester::reqauth( account_name from, const vector<permissi
                })
       );
    transaction trx;
-   abi_serializer::from_variant(pretty_trx, trx, get_resolver(), abi_serializer::create_yield_function(max_serialization_time));
+   abi_serializer::from_variant(pretty_trx, trx, get_resolver(), fixture_abi_yield_function());
    return trx;
 }
 
@@ -150,7 +148,7 @@ void sysio_msig_tester::check_traces(transaction_trace_ptr trace, std::vector<st
 BOOST_AUTO_TEST_SUITE(sysio_msig_tests)
 
 BOOST_FIXTURE_TEST_CASE( propose_approve_execute, sysio_msig_tester ) try {
-   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, abi_serializer_max_time );
+   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}} );
 
    push_action( "alice"_n, "propose"_n, mvo()
                   ("proposer",      "alice")
@@ -197,8 +195,7 @@ BOOST_FIXTURE_TEST_CASE( propose_approve_execute, sysio_msig_tester ) try {
 // unmodified contract too, which is what shows the delayed path was never broken.
 BOOST_FIXTURE_TEST_CASE( propose_approve_execute_with_delay, sysio_msig_tester ) try {
    const uint32_t delay_sec = 60;
-   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}},
-                       abi_serializer_max_time, delay_sec );
+   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, delay_sec );
 
    push_action( "alice"_n, "propose"_n, mvo()
                   ("proposer",      "alice")
@@ -267,8 +264,7 @@ BOOST_FIXTURE_TEST_CASE( delayed_extra_approval_does_not_restart_the_delay, sysi
    const uint32_t delay_sec = 120;
    setup_two_of_three( *this, "threshold"_n );
 
-   auto trx = reqauth( "threshold"_n, {permission_level{"threshold"_n, config::active_name}},
-                       abi_serializer_max_time, delay_sec );
+   auto trx = reqauth( "threshold"_n, {permission_level{"threshold"_n, config::active_name}}, delay_sec );
    push_action( "alice"_n, "propose"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "delayed")
@@ -310,8 +306,7 @@ BOOST_FIXTURE_TEST_CASE( delayed_reapproval_after_invalidate_restarts_the_delay,
    const uint32_t delay_sec = 120;
    setup_two_of_three( *this, "threshold"_n );
 
-   auto trx = reqauth( "threshold"_n, {permission_level{"threshold"_n, config::active_name}},
-                       abi_serializer_max_time, delay_sec );
+   auto trx = reqauth( "threshold"_n, {permission_level{"threshold"_n, config::active_name}}, delay_sec );
    push_action( "alice"_n, "propose"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "delayed")
@@ -360,7 +355,7 @@ BOOST_FIXTURE_TEST_CASE( delayed_reapproval_after_invalidate_restarts_the_delay,
 
 
 BOOST_FIXTURE_TEST_CASE( propose_approve_unapprove, sysio_msig_tester ) try {
-   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, abi_serializer_max_time );
+   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}} );
 
    push_action( "alice"_n, "propose"_n, mvo()
                   ("proposer",      "alice")
@@ -394,7 +389,7 @@ BOOST_FIXTURE_TEST_CASE( propose_approve_unapprove, sysio_msig_tester ) try {
 
 
 BOOST_FIXTURE_TEST_CASE( propose_approve_by_two, sysio_msig_tester ) try {
-   auto trx = reqauth( "alice"_n, vector<permission_level>{ { "alice"_n, config::active_name }, { "bob"_n, config::active_name } }, abi_serializer_max_time );
+   auto trx = reqauth( "alice"_n, vector<permission_level>{ { "alice"_n, config::active_name }, { "bob"_n, config::active_name } } );
    push_action( "alice"_n, "propose"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
@@ -441,7 +436,7 @@ BOOST_FIXTURE_TEST_CASE( propose_approve_by_two, sysio_msig_tester ) try {
 
 
 BOOST_FIXTURE_TEST_CASE( propose_with_wrong_requested_auth, sysio_msig_tester ) try {
-   auto trx = reqauth( "alice"_n, vector<permission_level>{ { "alice"_n, config::active_name },  { "bob"_n, config::active_name } }, abi_serializer_max_time );
+   auto trx = reqauth( "alice"_n, vector<permission_level>{ { "alice"_n, config::active_name },  { "bob"_n, config::active_name } } );
    //try with not enough requested auth
    BOOST_REQUIRE_EXCEPTION( push_action( "alice"_n, "propose"_n, mvo()
                                              ("proposer",      "alice")
@@ -490,7 +485,7 @@ BOOST_FIXTURE_TEST_CASE( big_transaction, sysio_msig_tester ) try {
       );
 
    transaction trx;
-   abi_serializer::from_variant(pretty_trx, trx, get_resolver(), abi_serializer::create_yield_function(abi_serializer_max_time));
+   abi_serializer::from_variant(pretty_trx, trx, get_resolver(), fixture_abi_yield_function());
 
    push_action( "alice"_n, "propose"_n, mvo()
                   ("proposer",      "alice")
@@ -605,7 +600,7 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_all_approve, sysio_msig_tester )
       );
 
    transaction trx;
-   abi_serializer::from_variant(pretty_trx, trx, get_resolver(), abi_serializer::create_yield_function(abi_serializer_max_time));
+   abi_serializer::from_variant(pretty_trx, trx, get_resolver(), fixture_abi_yield_function());
 
    // propose action
    push_action( "alice"_n, "propose"_n, mvo()
@@ -726,7 +721,7 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_major_approve, sysio_msig_tester
       );
 
    transaction trx;
-   abi_serializer::from_variant(pretty_trx, trx, get_resolver(), abi_serializer::create_yield_function(abi_serializer_max_time));
+   abi_serializer::from_variant(pretty_trx, trx, get_resolver(), fixture_abi_yield_function());
 
    // propose action
    push_action( "alice"_n, "propose"_n, mvo()
@@ -785,7 +780,7 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_major_approve, sysio_msig_tester
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( propose_approve_invalidate, sysio_msig_tester ) try {
-   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, abi_serializer_max_time );
+   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}} );
 
    push_action( "alice"_n, "propose"_n, mvo()
                   ("proposer",      "alice")
@@ -828,7 +823,7 @@ BOOST_FIXTURE_TEST_CASE( propose_approve_invalidate, sysio_msig_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( propose_invalidate_approve, sysio_msig_tester ) try {
-   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, abi_serializer_max_time );
+   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}} );
 
    push_action( "alice"_n, "propose"_n, mvo()
                   ("proposer",      "alice")
@@ -872,7 +867,7 @@ BOOST_FIXTURE_TEST_CASE( propose_invalidate_approve, sysio_msig_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( approve_with_hash, sysio_msig_tester ) try {
-   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, abi_serializer_max_time );
+   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}} );
    auto trx_hash = fc::sha256::hash( trx );
    auto not_trx_hash = fc::sha256::hash( trx_hash );
 
@@ -914,7 +909,7 @@ BOOST_FIXTURE_TEST_CASE( approve_with_hash, sysio_msig_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( switch_proposal_and_fail_approve_with_hash, sysio_msig_tester ) try {
-   auto trx1 = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, abi_serializer_max_time );
+   auto trx1 = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}} );
    auto trx1_hash = fc::sha256::hash( trx1 );
 
    push_action( "alice"_n, "propose"_n, mvo()
@@ -926,8 +921,7 @@ BOOST_FIXTURE_TEST_CASE( switch_proposal_and_fail_approve_with_hash, sysio_msig_
 
    auto trx2 = reqauth( "alice"_n,
                        { permission_level{"alice"_n, config::active_name},
-                         permission_level{"alice"_n, config::owner_name}  },
-                       abi_serializer_max_time );
+                         permission_level{"alice"_n, config::owner_name}  } );
 
    push_action( "alice"_n, "cancel"_n, mvo()
                   ("proposer",      "alice")
@@ -1012,7 +1006,7 @@ BOOST_FIXTURE_TEST_CASE( sendinline, sysio_msig_tester ) try {
                                     ("level", permission_level{"sendinline"_n, config::active_name})
    );
 
-   transaction trx = reqauth( "alice"_n, {permission_level{"alice"_n, "perm"_n}}, abi_serializer_max_time );
+   transaction trx = reqauth( "alice"_n, {permission_level{"alice"_n, "perm"_n}} );
 
    base_tester::push_action( "sysio.msig"_n, "propose"_n, "bob"_n, mvo()
                               ("proposer", "bob")
@@ -1104,7 +1098,7 @@ namespace {
 
       transaction trx;
       abi_serializer::from_variant(pretty_trx, trx, t.get_resolver(),
-                                   abi_serializer::create_yield_function(base_tester::abi_serializer_max_time));
+                                   base_tester::fixture_abi_yield_function());
       BOOST_REQUIRE_GT(fc::raw::pack_size(trx), ChunkThreshold);
       BOOST_REQUIRE_LT(fc::raw::pack_size(trx), FixtureTransactionLimit);
       return trx;
@@ -1200,7 +1194,7 @@ BOOST_FIXTURE_TEST_CASE( getproposal_read_only_returns_assembled, sysio_msig_tes
    getproposal_act.data = abi_ser.variant_to_binary(
       "getproposal",
       mvo()("proposer", "alice")("proposal_name", "chunkprop"),
-      abi_serializer::create_yield_function(abi_serializer_max_time));
+      fixture_abi_yield_function());
 
    signed_transaction ro_trx;
    ro_trx.actions.push_back(getproposal_act);
@@ -1217,7 +1211,7 @@ BOOST_FIXTURE_TEST_CASE( getproposal_read_only_returns_assembled, sysio_msig_tes
    // Decode the action_results entry "proposal" and pull out packed_transaction.
    fc::variant decoded = abi_ser.binary_to_variant(
       "proposal", return_value,
-      abi_serializer::create_yield_function(abi_serializer_max_time));
+      fixture_abi_yield_function());
 
    const auto& obj = decoded.get_object();
    const auto& packed_var = obj["packed_transaction"];
@@ -1247,7 +1241,7 @@ BOOST_FIXTURE_TEST_CASE( getproposal_read_only_returns_assembled, sysio_msig_tes
 BOOST_FIXTURE_TEST_CASE( getproposal_read_only_inline, sysio_msig_tester ) try {
    // A reqauth-based trx is well under the chunk threshold (200 KiB), so this
    // exercises the inline storage path.
-   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, abi_serializer_max_time );
+   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}} );
    const bytes original_packed = fc::raw::pack(trx);
    BOOST_REQUIRE_LT( original_packed.size(), 200u * 1024u );  // sanity: must be inline
 
@@ -1265,7 +1259,7 @@ BOOST_FIXTURE_TEST_CASE( getproposal_read_only_inline, sysio_msig_tester ) try {
    getproposal_act.data = abi_ser.variant_to_binary(
       "getproposal",
       mvo()("proposer", "alice")("proposal_name", "smallprop"),
-      abi_serializer::create_yield_function(abi_serializer_max_time));
+      fixture_abi_yield_function());
 
    signed_transaction ro_trx;
    ro_trx.actions.push_back(getproposal_act);
@@ -1281,7 +1275,7 @@ BOOST_FIXTURE_TEST_CASE( getproposal_read_only_inline, sysio_msig_tester ) try {
 
    fc::variant decoded = abi_ser.binary_to_variant(
       "proposal", return_value,
-      abi_serializer::create_yield_function(abi_serializer_max_time));
+      fixture_abi_yield_function());
 
    const auto& obj = decoded.get_object();
    const bytes returned_packed = obj["packed_transaction"].as<bytes>();

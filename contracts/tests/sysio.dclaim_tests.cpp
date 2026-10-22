@@ -42,7 +42,7 @@ public:
       produce_blocks();
 
       dclaim_abi_ser.set_abi(load_abi(DCLAIM_ACCOUNT),
-                          abi_serializer::create_yield_function(abi_serializer_max_time));
+                          fixture_abi_yield_function());
    }
 
    abi_def load_abi(name account) {
@@ -80,7 +80,7 @@ public:
       auto data = get_row_by_id(DCLAIM_ACCOUNT, DCLAIM_ACCOUNT, table, id);
       return data.empty() ? fc::variant()
          : dclaim_abi_ser.binary_to_variant(
-              type, data, abi_serializer::create_yield_function(abi_serializer_max_time));
+              type, data, fixture_abi_yield_function());
    }
    fc::variant pending_of(name acct)  { return get_kv("pclaims"_n,     "pending_claim", acct.to_uint64_t()); }
    fc::variant unmapped_row(uint64_t id) { return get_kv("unmapped"_n, "unmapped_token", id); }

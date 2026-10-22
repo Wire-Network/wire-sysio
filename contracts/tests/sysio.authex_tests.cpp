@@ -54,7 +54,7 @@ public:
       BOOST_REQUIRE( accnt != nullptr );
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
-      abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+      abi_ser.set_abi(abi, fixture_abi_yield_function());
    }
 
    void deploy_dclaim() {
@@ -64,7 +64,7 @@ public:
       set_privileged( DCLAIM );
       produce_blocks();
       dclaim_abi_ser.set_abi(load_abi(DCLAIM),
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    void set_dclaim_privileged(bool is_privileged) {
@@ -90,7 +90,7 @@ public:
       act.name    = name;
       act.data    = abi_ser.variant_to_binary(
          action_type_name, data,
-         abi_serializer::create_yield_function(abi_serializer_max_time)
+         fixture_abi_yield_function()
       );
 
       return base_tester::push_action( std::move(act), signer.to_uint64_t() );
@@ -137,14 +137,14 @@ public:
       auto data = get_row_by_id(DCLAIM, DCLAIM, table, id);
       return data.empty() ? fc::variant()
          : dclaim_abi_ser.binary_to_variant(
-              type, data, abi_serializer::create_yield_function(abi_serializer_max_time));
+              type, data, fixture_abi_yield_function());
    }
 
    fc::variant get_link(uint64_t id) {
       auto data = get_row_by_id(AUTHEX, AUTHEX, "links"_n, id);
       return data.empty() ? fc::variant()
          : abi_ser.binary_to_variant(
-              "links_s", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+              "links_s", data, fixture_abi_yield_function());
    }
 
    uint64_t now_ms() {
