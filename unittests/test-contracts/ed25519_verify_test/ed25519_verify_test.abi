@@ -1,0 +1,94 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "badptr",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "boundary",
+            "base": "",
+            "fields": [
+                {
+                    "name": "entry",
+                    "type": "bytes"
+                },
+                {
+                    "name": "overrun",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "clean",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "stress",
+            "base": "",
+            "fields": [
+                {
+                    "name": "empty_record",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "verify",
+            "base": "",
+            "fields": [
+                {
+                    "name": "entries",
+                    "type": "bytes"
+                },
+                {
+                    "name": "count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "expected",
+                    "type": "bool"
+                },
+                {
+                    "name": "unaligned",
+                    "type": "bool"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "badptr",
+            "type": "badptr",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "boundary",
+            "type": "boundary",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "clean",
+            "type": "clean",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "stress",
+            "type": "stress",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "verify",
+            "type": "verify",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}
