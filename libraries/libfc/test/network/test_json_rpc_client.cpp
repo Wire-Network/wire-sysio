@@ -11,8 +11,6 @@
 #include <boost/beast/http.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include <sys/socket.h>
-
 #include <atomic>
 #include <chrono>
 #include <optional>
@@ -368,11 +366,12 @@ public:
    ~continuation_json_rpc_server() {
       _stop = true;
       {
-         // Wake a worker blocked in a read or write. Only the OS-level shutdown is cross-thread; the
-         // Asio socket object stays worker-owned, and the worker closes it under this same mutex.
+         // Wake a worker blocked in a read or write. shutdown() is the only operation Asio allows to
+         // overlap synchronous I/O; every other socket operation runs under this mutex.
+         boost::system::error_code error;
          std::scoped_lock lock(_socket_mutex);
-         if (_active_socket && _active_socket->is_open())
-            ::shutdown(_active_socket->native_handle(), SHUT_RDWR);
+         if (_active_socket)
+            _active_socket->shutdown(tcp::socket::shutdown_both, error);
       }
       unblock_accept();
       if (_worker.joinable())
@@ -422,11 +421,12 @@ private:
    /** Close one socket with a reset so the client retains a stale cached lease. */
    void reset_socket(tcp::socket& socket) {
       boost::system::error_code error;
+      std::scoped_lock lock(_socket_mutex);
       socket.set_option(boost::asio::socket_base::linger(true, 0), error);
-      close_socket(socket);
+      socket.close(error);
    }
 
-   /** Close the accepted socket under the mutex the destructor holds while it shuts the fd down. */
+   /** Close the accepted socket under the mutex the destructor holds while it shuts the socket down. */
    void close_socket(tcp::socket& socket) {
       boost::system::error_code error;
       std::scoped_lock lock(_socket_mutex);
