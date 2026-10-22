@@ -823,18 +823,19 @@ void system_contract::payepoch(uint32_t epoch_index,
    // =======================================================================
    // Producer + standby pay.
    //
-   // Producers are paid PER BLOCK. The active slice of the producer pool is spread over the block
-   // slots the period held, and every schedulable producer is credited that rate for each block
-   // it made. A missed block is never counted, so its pay stays in the treasury: it does not flow
-   // to the producers that did show up, because the rate does not depend on who did. The divisor
-   // is the period's nominal slot count, raised to the blocks actually produced when a period runs
-   // long (an epoch can extend while a batch operator delivers), so the slice is never exceeded.
+   // Producers are paid PER COUNTED BLOCK. The active slice of the producer pool is spread over the
+   // block slots the period held, and every schedulable producer is credited that rate for each
+   // block `onblock` counted for it: every block it made, at most one round per rotation. A missed
+   // block is never counted, so its pay stays in the treasury: it does not flow to the producers
+   // that did show up, because the rate does not depend on who did. The divisor is the period's
+   // nominal slot count, raised to the blocks counted when a period runs long (an epoch can extend
+   // while a batch operator delivers), so the slice is never exceeded.
    //
    // Standbys (positions 22..cfg.standby_end_rank) draw a retainer from the standby slice
    // (cfg.standby_bps of the pool). Each POSITION holds a fixed share, decaying linearly from
    // position 22, over the constant sum of every position's weight -- a vacant position's share
    // stays in the treasury. Block pay is not gated on position, so a producer that slid from 21
-   // to 22 mid-period is still paid for the blocks it made before the schedule caught up.
+   // to 22 mid-period is still paid for the blocks counted before the schedule caught up.
    //
    // Counters accumulate across non-pay epochs (no reset by accrueepoch) and are zeroed at the
    // end of this action for every producer PAID by it. A producer that is not schedulable when the
@@ -843,8 +844,8 @@ void system_contract::payepoch(uint32_t epoch_index,
    // (a re-keyed producer's return; a terminated operator's, should it settle and re-register;
    // never, for a slashed one, whose row is never pruned and which `regoperator` refuses). A
    // producer BELOW the walk (demoted, parked, unbonded, slashed, terminated -- each rescored at
-   // the event) is not visited at all, with the same effect. Every block a producer makes is paid
-   // exactly once, at the first payepoch where it is payable.
+   // the event) is not visited at all, with the same effect. Every counted block is paid exactly
+   // once, at the first payepoch where it is payable.
    // =======================================================================
    {
       auto prod_by_rank = _producers.get_index<"prodrank"_n>();
