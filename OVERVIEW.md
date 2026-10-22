@@ -66,7 +66,7 @@ This allows a single unified message format across all supported chains.
 
 | Category | Types | Direction | Purpose |
 |----------|-------|-----------|---------|
-| **Operator Rosters** | `OPERATORS`, `BATCH_OPERATOR_GROUPS` | depot → outpost | Full operator roster and the next epoch's batch-operator group, sent every epoch |
+| **Operator Rosters** | `OPERATORS`, `BATCH_OPERATOR_GROUPS` | depot → outpost | The operators the schedule window seats, with their chain addresses, and the next epoch's batch-operator group, sent every epoch |
 | **Liquidity Syndication** | `SYNDICATE_LIQ`, `LIQ_YIELD` | outpost → depot | A user syndicating liq tokens into outpost custody; realized custody yield |
 | **Liquidity Desyndication** | `DESYNDICATE_LIQ` | depot → outpost | Return syndicated liq tokens to a holder on the outpost |
 | **Node Owners** | `NODE_OWNER_REG` | outpost → depot | Node-owner NFT committed on Ethereum, registering the owner on the depot |

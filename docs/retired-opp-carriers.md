@@ -36,7 +36,8 @@ Existing active discriminants and payload field numbers keep their values.
 
 - `OperatorAction` and `OperatorActionLog` record native collateral changes in
   `sysio.opreg`. They are audit records: the depot queues no OPERATOR_ACTION
-  attestation, and outposts learn a slashed status from the OPERATORS roster.
+  attestation, and outposts learn a seated operator's slashed status from the
+  OPERATORS roster, which lists every operator the schedule window seats.
   Removing external custody does not remove this audit/eligibility protocol.
   The existing `reserve_code` field stays zero in depot-native audit records;
   changing the live table payload is outside this carrier cleanup.
