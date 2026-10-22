@@ -155,6 +155,13 @@ Production deployment through `sysio.roa::setsyscode` privileges `sysio.dclaim`
 as part of the deploy, so there is no separate privilege step. The durable
 precondition is ordering: deploy DClaim before any link action can execute.
 
+Finish the pre-launch import (`importseed`, then `importdone`) before the first
+`createlink` or `recordlink` as well. A link sweeps only the credits already in
+`unmapped`, and its holder cannot trigger the sweep again: `createlink` accepts
+one link per account and chain, and only `sysio.authex` may send `linkswept`. A
+credit imported after its key is linked stays in `unmapped`, still owed, until
+an operator sends `linkswept` for it as `sysio.authex`.
+
 The two added address fields are intentionally not a staged compatibility
 protocol. Activate WIRE-352 in a quiesced maintenance window:
 
