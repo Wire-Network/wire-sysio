@@ -11,6 +11,8 @@
 #include <boost/beast/http.hpp>
 #include <boost/test/unit_test.hpp>
 
+#include <sys/socket.h>
+
 #include <atomic>
 #include <chrono>
 #include <optional>
@@ -365,18 +367,18 @@ public:
    /** Stop any blocked socket operation and join the worker. */
    ~continuation_json_rpc_server() {
       _stop = true;
-      boost::system::error_code error;
       {
+         // Wake a worker blocked in a read or write. Only the OS-level shutdown is cross-thread; the
+         // Asio socket object stays worker-owned, and the worker closes it under this same mutex.
          std::scoped_lock lock(_socket_mutex);
-         if (_active_socket) {
-            _active_socket->cancel(error);
-            _active_socket->close(error);
-         }
+         if (_active_socket && _active_socket->is_open())
+            ::shutdown(_active_socket->native_handle(), SHUT_RDWR);
       }
       unblock_accept();
       if (_worker.joinable())
          _worker.join();
       // Asio acceptors are not thread-safe: close only once the worker no longer touches it.
+      boost::system::error_code error;
       _acceptor.close(error);
    }
 
@@ -418,9 +420,16 @@ private:
    }
 
    /** Close one socket with a reset so the client retains a stale cached lease. */
-   static void reset_socket(tcp::socket& socket) {
+   void reset_socket(tcp::socket& socket) {
       boost::system::error_code error;
       socket.set_option(boost::asio::socket_base::linger(true, 0), error);
+      close_socket(socket);
+   }
+
+   /** Close the accepted socket under the mutex the destructor holds while it shuts the fd down. */
+   void close_socket(tcp::socket& socket) {
+      boost::system::error_code error;
+      std::scoped_lock lock(_socket_mutex);
       socket.close(error);
    }
 
@@ -429,15 +438,18 @@ private:
       size_t response_index = 0;
       while (!_stop.load() && response_index < _responses.size()) {
          auto socket = std::make_shared<tcp::socket>(_io);
-         {
-            std::scoped_lock lock(_socket_mutex);
-            _active_socket = socket;
-         }
-
          boost::system::error_code error;
          _acceptor.accept(*socket, error);
          if (error || _stop.load())
             break;
+         {
+            // Publish and re-check _stop atomically with the destructor's shutdown, so a socket
+            // accepted during teardown is either shut down there or never read from here.
+            std::scoped_lock lock(_socket_mutex);
+            if (_stop.load())
+               break;
+            _active_socket = socket;
+         }
          const auto connection = _connection_count.fetch_add(1) + 1;
          boost::beast::flat_buffer request_buffer;
 
@@ -476,7 +488,7 @@ private:
             if (error)
                break;
             if (!response.keep_alive) {
-               socket->close(error);
+               close_socket(*socket);
                break;
             }
          }
