@@ -293,6 +293,8 @@ class Utils:
                                            Utils.SysVmOcTierUpTransferAmount, memo=f"sys vm oc tier-up {transfers}")
             found = Utils.waitForBool(lambda: producerNode.findInLog(logText), timeout=Utils.systemWaitTimeout,
                                       reporter=pushTransfer)
+            # waitForBool can time out right after the last transfer without checking the log again.
+            found = found or producerNode.findInLog(logText)
             assert found, f"producerNode did not log '{logText}' after {transfers} sysio.token transfers"
             Utils.Print(f"found after {transfers} sysio.token transfers")
 
