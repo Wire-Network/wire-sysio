@@ -285,3 +285,37 @@ BOOST_AUTO_TEST_CASE(sign_compact_unknown) {
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+// ---------------------------------------------------------------------------
+// Suite 5: auth_grace_expired
+// ---------------------------------------------------------------------------
+BOOST_AUTO_TEST_SUITE(peer_auth_grace)
+
+namespace {
+   using steady_time = std::chrono::steady_clock::time_point;
+   const steady_time session_start{std::chrono::seconds{1000}};
+   constexpr std::chrono::milliseconds grace{20000};
+   constexpr std::chrono::milliseconds one_ms{1};
+}
+
+BOOST_AUTO_TEST_CASE(not_expired_before_grace) {
+   BOOST_CHECK(!auth_grace_expired(session_start, session_start, grace));
+   BOOST_CHECK(!auth_grace_expired(session_start, session_start + grace - one_ms, grace));
+}
+
+BOOST_AUTO_TEST_CASE(expired_once_grace_elapses) {
+   BOOST_CHECK(auth_grace_expired(session_start, session_start + grace, grace));
+   BOOST_CHECK(auth_grace_expired(session_start, session_start + grace + one_ms, grace));
+}
+
+BOOST_AUTO_TEST_CASE(no_session_never_expires) {
+   BOOST_CHECK(!auth_grace_expired(steady_time::min(), session_start + grace, grace));
+}
+
+BOOST_AUTO_TEST_CASE(check_taken_before_session_start) {
+   // The keepalive ticker samples its time before posting to the strand, where a reconnect may already
+   // have started a newer session.
+   BOOST_CHECK(!auth_grace_expired(session_start, session_start - one_ms, grace));
+}
+
+BOOST_AUTO_TEST_SUITE_END()

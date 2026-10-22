@@ -765,6 +765,9 @@ namespace sysio {
       boost::asio::ip::address_v6::bytes_type remote_endpoint_ip_array GUARDED_BY(conn_mtx);
 
       std::atomic<std::chrono::nanoseconds>  connection_start_time;
+      /// Steady-clock start of the current session, min() while closed; times the peer-auth grace window.
+      /// Strand only. connection_start_time is the wall-clock equivalent reported in metrics.
+      std::chrono::steady_clock::time_point  session_start_time{std::chrono::steady_clock::time_point::min()};
 
       // block nack support
       static constexpr uint16_t consecutive_block_nacks_threshold{2}; // stop sending blocks when reached
@@ -1320,6 +1323,7 @@ namespace sysio {
          peer_dlog( p2p_conn_log, this, "connected" );
          socket_open = true;
          connection_start_time = get_time();
+         session_start_time = std::chrono::steady_clock::now();
          reset_peer_authentication_state();
          start_read_message();
          return true;
@@ -1406,6 +1410,7 @@ namespace sysio {
       org = std::chrono::nanoseconds{0};
       latest_msg_time = std::chrono::steady_clock::time_point::min();
       latest_blk_time = std::chrono::steady_clock::time_point::min();
+      session_start_time = std::chrono::steady_clock::time_point::min();
       set_state(connection_state::closed);
       block_sync_send_start = 0ns;
       block_sync_frame_bytes_sent = 0;
@@ -1536,6 +1541,15 @@ namespace sysio {
 
    // called from connection strand
    void connection::check_heartbeat( std::chrono::steady_clock::time_point current_time ) {
+      // Close a peer still unauthenticated a heartbeat timeout into its session, whether or not it sent anything.
+      // benign_other lets it redial: a timeout says nothing about its key (bad keys are rejected on receipt).
+      if( !peer_authenticated.load(std::memory_order_relaxed) &&
+          peer_auth::auth_grace_expired(session_start_time, current_time, hb_timeout) ) {
+         peer_wlog( p2p_conn_log, this, "Peer did not authenticate in time ({}ms), closing", hb_timeout.count() );
+         no_retry = go_away_reason::benign_other;
+         enqueue( go_away_message{go_away_reason::benign_other} );
+         return;
+      }
       if( latest_msg_time > std::chrono::steady_clock::time_point::min() ) {
          if( current_time > latest_msg_time + hb_timeout ) {
             adjust_peer_score(peer_scoring::heartbeat_timeout);
@@ -1547,13 +1561,6 @@ namespace sysio {
                peer_wlog(p2p_conn_log, this, "heartbeat timed out");
                close(false);
             }
-            return;
-         }
-         // Close peers that haven't authenticated within the heartbeat window
-         if( !peer_authenticated.load(std::memory_order_relaxed) ) {
-            peer_wlog( p2p_conn_log, this, "Peer did not authenticate in time, closing" );
-            no_retry = go_away_reason::authentication;
-            enqueue( go_away_message{go_away_reason::authentication} );
             return;
          }
          if (!my_impl->sync_master->syncing_from_peer()) {
@@ -3792,6 +3799,10 @@ namespace sysio {
       }
       peer_ilog( p2p_conn_log, this, "Peer authenticated successfully" );
       peer_authenticated.store(true, std::memory_order_relaxed);
+      // An earlier session's benign_other (an expired grace window, say) only governs redialing. This session has
+      // authenticated, so clear it; left set, should_sync_from() would keep this peer out of sync after one span.
+      if( no_retry == go_away_reason::benign_other )
+         no_retry = go_away_reason::no_reason;
       // Re-process peer's handshake now that auth is complete; initial
       // handshake handling deferred sync negotiation while the peer was gated.
       {
