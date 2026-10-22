@@ -19,6 +19,8 @@ import sys
 from pathlib import Path
 import threading
 
+from .core_symbol import CORE_SYMBOL
+
 # Fancy import to maintain compatibility with python 3.10
 try:
     from datetime import UTC
@@ -83,6 +85,8 @@ class Utils:
     SysVmOcEnableNone="none"
     SysVmOcForcedRuntime="sys-vm-oc-forced"
     SysVmOcExecutionLogSuffix="with sys vm oc"
+    SysioTokenAccountName="sysio.token"
+    SysVmOcTierUpTransferAmount=f"0.0001 {CORE_SYMBOL}"
 
     ShuttingDown=False
 
@@ -266,8 +270,14 @@ class Utils:
         return sysVmOcEnable in (Utils.SysVmOcEnableAll, Utils.SysVmOcEnableAuto) and Utils.nodeopSupportsSysVmOc()
 
     @staticmethod
-    def assertInitialSysVmOcLogState(producerNode, apiNode, codeHash, sysVmOcEnable, ocSupported):
-        """Verify bootstrap SYS VM OC logging on the node whose configuration controls the expectation."""
+    def assertInitialSysVmOcLogState(cluster, producerNode, apiNode, sysVmOcEnable, ocSupported):
+        """Verify sysio.token SYS VM OC tier-up on the node whose configuration controls the expectation.
+
+        OC compiles in the background, so every bootstrap sysio.token action can run before the compile
+        finishes. When OC is expected, push sysio.token transfers to the producer until one runs under OC.
+        """
+        codeHash = producerNode.getAccountCodeHash(Utils.SysioTokenAccountName)
+        assert codeHash, f"unable to get the {Utils.SysioTokenAccountName} code hash"
         logText = f"executing {codeHash} {Utils.SysVmOcExecutionLogSuffix}"
         if sysVmOcEnable == Utils.SysVmOcEnableNone or not ocSupported:
             Utils.Print(f"search apiNode: {logText} (expect absent)")
@@ -275,8 +285,16 @@ class Utils:
             assert(not found)
         else:
             Utils.Print(f"search producerNode: {logText} (expect present)")
-            found = producerNode.findInLog(logText)
-            assert(found)
+            transfers = 0
+            def pushTransfer():
+                nonlocal transfers
+                transfers += 1
+                producerNode.transferFunds(cluster.sysioAccount, cluster.defproduceraAccount,
+                                           Utils.SysVmOcTierUpTransferAmount, memo=f"sys vm oc tier-up {transfers}")
+            found = Utils.waitForBool(lambda: producerNode.findInLog(logText), timeout=Utils.systemWaitTimeout,
+                                      reporter=pushTransfer)
+            assert found, f"producerNode did not log '{logText}' after {transfers} sysio.token transfers"
+            Utils.Print(f"found after {transfers} sysio.token transfers")
 
     @staticmethod
     def assertSysVmOcLogAbsent(node, codeHash, nodeLabel):

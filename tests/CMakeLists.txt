@@ -197,6 +197,7 @@ add_np_test(NAME interrupt-read-only-trx-parallel-if-sys-vm-oc-test COMMAND test
 # read-only thread-heavy clusters at the same time.
 set(READ_ONLY_TRX_TESTS
   read-only-trx-basic-test
+  read-only-trx-irreversible-test
   read-only-trx-parallel-test
   read-only-trx-parallel-if-sys-vm-oc-test
   read-only-trx-parallel-no-oc-if-test
