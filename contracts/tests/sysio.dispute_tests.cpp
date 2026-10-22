@@ -6,7 +6,8 @@
 ///                     (rejecting an empty electorate)
 ///   * votedispute  -- electorate-snapshot eligibility (the Tier-1 set frozen at open; later
 ///                     registrations cannot join), candidate validation, one-vote,
-///                     dispute-must-be-open
+///                     dispute-must-be-open, no ballot once the tally has a winner (late
+///                     ballots still count while it has none)
 ///   * chkdispute   -- the Tier-1 tally rule against the snapshot: fast path (votes >=
 ///                     floor(N/2)+1 any time) and the post-deadline relaxation (cast >= Q AND a
 ///                     strict majority of cast votes), plus the non-resolving waits (sub-quorum
@@ -96,7 +97,6 @@ public:
    static constexpr auto EPOCH_ACCOUNT  = "sysio.epoch"_n;
    static constexpr auto MSGCH_ACCOUNT  = "sysio.msgch"_n;
    static constexpr auto OPREG_ACCOUNT  = "sysio.opreg"_n;
-   static constexpr auto UWRIT_ACCOUNT  = "sysio.uwrit"_n;
    static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
    static constexpr auto ROA_ACCOUNT    = "sysio.roa"_n;
    static constexpr auto BATCHOP        = "batchop.a"_n;
@@ -111,7 +111,7 @@ public:
 
       create_accounts({
          CHALG_ACCOUNT, EPOCH_ACCOUNT, MSGCH_ACCOUNT, OPREG_ACCOUNT,
-         UWRIT_ACCOUNT, CHAINS_ACCOUNT, BATCHOP
+         CHAINS_ACCOUNT, BATCHOP, "sysio.token"_n
       });
       // Tier-1 voter accounts (node owners) and a Tier-2 account (ineligible voter). Created without
       // a roa policy so regnodeowner's reslimit creation does not collide.
@@ -124,7 +124,6 @@ public:
       deploy(EPOCH_ACCOUNT,  contracts::epoch_wasm(),  contracts::epoch_abi(),  epoch_abi);
       deploy(MSGCH_ACCOUNT,  contracts::msgch_wasm(),  contracts::msgch_abi(),  msgch_abi);
       deploy(OPREG_ACCOUNT,  contracts::opreg_wasm(),  contracts::opreg_abi(),  opreg_abi);
-      deploy(UWRIT_ACCOUNT,  contracts::uwrit_wasm(),  contracts::uwrit_abi(),  uwrit_abi);
       deploy(CHAINS_ACCOUNT, contracts::chains_wasm(), contracts::chains_abi(), chains_abi);
 
       // sysio.roa is a genesis system account already running this build's code; load its abi.
@@ -164,6 +163,9 @@ public:
       set_code(account, wasm);
       set_abi(account, abi.data());
       set_privileged(account);
+      // Each deployment gets its own block; fixture setup must not depend on
+      // the combined WASM sizes fitting the remaining block NET budget.
+      produce_blocks();
       load_abi(account, out_ser);
    }
 
@@ -368,20 +370,25 @@ public:
          ("min_bond", min_bond)("config_timestamp_ms", uint64_t{0}));
    }
 
-   action_result depositinle(name account, std::string_view chain_code,
-                             std::string_view token_code, uint64_t amount) {
-      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "depositinle"_n, mvo()
-         ("account", account.to_string())("chain_code", chain_code)
-         ("token_code", token_code)("amount", amount)
-         ("actor_chain", ChainKind::CHAIN_KIND_EVM)("actor_address", std::vector<char>{})
-         ("original_message_id", std::string(64, '0')));
+   action_result fund_and_bond(name account, uint64_t amount) {
+      const auto token = "sysio.token"_n;
+      set_code(token, contracts::token_wasm());
+      set_abi(token, contracts::token_abi().data());
+      set_privileged(token);
+      base_tester::push_action(token, "create"_n, token,
+         mvo()("issuer", "sysio")("maximum_supply", "1000000000.000000000 WIRE"));
+      const auto quantity = asset(static_cast<int64_t>(amount), symbol(9, "WIRE"));
+      base_tester::push_action(token, "issue"_n, config::system_account_name,
+         mvo()("to", "sysio")("quantity", quantity)("memo", "bond funding"));
+      base_tester::push_action(token, "transfer"_n, config::system_account_name,
+         mvo()("from", "sysio")("to", account)("quantity", quantity)("memo", "bond funding"));
+      return push(OPREG_ACCOUNT, opreg_abi, account, "deposit"_n,
+         mvo()("account", account)("token_code", "WIRE")("amount", amount));
    }
 
-   action_result withdrawinle(name account, std::string_view chain_code,
-                              std::string_view token_code, uint64_t amount) {
-      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "withdrawinle"_n, mvo()
-         ("account", account.to_string())("chain_code", chain_code)
-         ("token_code", token_code)("amount", amount));
+   action_result withdraw(name account, uint64_t amount) {
+      return push(OPREG_ACCOUNT, opreg_abi, account, "withdraw"_n,
+         mvo()("account", account)("token_code", "WIRE")("amount", amount));
    }
 
    action_result flushwtdw(uint32_t up_to_epoch) {
@@ -400,7 +407,7 @@ public:
          ("batch_op_name", op.to_string())("chain_code", chain_code)("data", data));
    }
 
-   abi_serializer chalg_abi, epoch_abi, msgch_abi, opreg_abi, uwrit_abi, chains_abi, roa_abi, system_abi;
+   abi_serializer chalg_abi, epoch_abi, msgch_abi, opreg_abi, chains_abi, roa_abi, system_abi;
 };
 
 /// The same OPP stack WITHOUT the emissions configuration: for tests that register node owners
@@ -887,6 +894,106 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_deadline_tie_waits, sysio_dispute_tester) { t
    BOOST_REQUIRE(epoch_paused());   // unresolved dispute keeps the epoch paused
 } FC_LOG_AND_RETHROW() }
 
+// WNS-59: a late ballot cannot undo a post-deadline winner. With N=5 (Q=3), x=2 / y=1 has a winner
+// once the deadline passes; voter4's late ballot for y would make it 2/2 (no strict majority, no
+// quorum for either) and leave the dispute OPEN, so votedispute refuses it.
+BOOST_FIXTURE_TEST_CASE(votedispute_after_post_deadline_winner_rejected, sysio_dispute_tester) { try {
+   register_node_owner("voter1"_n, 1);
+   register_node_owner("voter2"_n, 1);
+   register_node_owner("voter3"_n, 1);
+   register_node_owner("voter4"_n, 1);   // with nodedaddy: N = 5, Q = 3
+
+   const uint32_t epoch = current_epoch();
+   auto winner_bytes = encode_envelope(epoch, "x");
+   auto cs_x = fc::sha256::hash(winner_bytes.data(), winner_bytes.size());
+   auto cs_y = fc::sha256::hash(std::string("y"));
+   std::vector<fc::variant> cands{
+      candidate(cs_x, {BATCHOP}),
+      candidate(cs_y, {"voter1"_n}),
+   };
+   BOOST_REQUIRE_EQUAL(success(), opendispute(eth_code(), epoch, cands));
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth_code(), winner_bytes));
+
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter1"_n, 1, cs_x));
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 1, cs_x));
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter3"_n, 1, cs_y));
+
+   produce_block(fc::seconds(24 * 60 * 60 + 1));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: dispute already has a winner"),
+      votedispute("voter4"_n, 1, cs_y));
+
+   BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
+   auto d = get_dispute(1);
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_RESOLVED", d["status"].as_string());
+   BOOST_REQUIRE_EQUAL(cs_x.str(), d["winning_checksum"].as_string());
+   BOOST_REQUIRE(!epoch_paused());
+} FC_LOG_AND_RETHROW() }
+
+// Ballots stay open past the deadline while the tally has no winner; closing them there would
+// strand a dispute that is short of quorum. With N=5 (Q=3), x=1 / y=1 is below quorum at the
+// deadline. voter3's late ballot for x gives x a strict majority of a quorum, and voter4's ballot
+// for y, which would undo it, is refused.
+BOOST_FIXTURE_TEST_CASE(votedispute_late_ballot_accepted_without_winner, sysio_dispute_tester) { try {
+   register_node_owner("voter1"_n, 1);
+   register_node_owner("voter2"_n, 1);
+   register_node_owner("voter3"_n, 1);
+   register_node_owner("voter4"_n, 1);   // with nodedaddy: N = 5, Q = 3
+
+   const uint32_t epoch = current_epoch();
+   auto winner_bytes = encode_envelope(epoch, "x");
+   auto cs_x = fc::sha256::hash(winner_bytes.data(), winner_bytes.size());
+   auto cs_y = fc::sha256::hash(std::string("y"));
+   std::vector<fc::variant> cands{
+      candidate(cs_x, {BATCHOP}),
+      candidate(cs_y, {"voter1"_n}),
+   };
+   BOOST_REQUIRE_EQUAL(success(), opendispute(eth_code(), epoch, cands));
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth_code(), winner_bytes));
+
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter1"_n, 1, cs_x));
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 1, cs_y));
+
+   // Past the deadline with cast(2) < Q(3): no winner, so the dispute waits.
+   produce_block(fc::seconds(24 * 60 * 60 + 1));
+   BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_OPEN", get_dispute(1)["status"].as_string());
+
+   // The late ballot counts: cast(3) >= Q(3) AND 2*votes_x(4) > cast(3) -> x wins.
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter3"_n, 1, cs_x));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: dispute already has a winner"),
+      votedispute("voter4"_n, 1, cs_y));
+
+   BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
+   auto d = get_dispute(1);
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_RESOLVED", d["status"].as_string());
+   BOOST_REQUIRE_EQUAL(cs_x.str(), d["winning_checksum"].as_string());
+   BOOST_REQUIRE(!epoch_paused());
+} FC_LOG_AND_RETHROW() }
+
+// The refusal applies before the deadline too, once a checksum reaches Q: with N=3 (Q=2), two votes
+// for x give it the win, and nodedaddy's ballot for y is refused.
+BOOST_FIXTURE_TEST_CASE(votedispute_after_fast_path_winner_rejected, sysio_dispute_tester) { try {
+   register_node_owner("voter1"_n, 1);
+   register_node_owner("voter2"_n, 1);   // with nodedaddy: N = 3, Q = 2
+
+   const uint32_t epoch = current_epoch();
+   auto cs_x = fc::sha256::hash(std::string("x"));
+   auto cs_y = fc::sha256::hash(std::string("y"));
+   std::vector<fc::variant> cands{
+      candidate(cs_x, {BATCHOP}),
+      candidate(cs_y, {"voter1"_n}),
+   };
+   BOOST_REQUIRE_EQUAL(success(), opendispute(eth_code(), epoch, cands));
+
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter1"_n, 1, cs_x));
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 1, cs_x));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: dispute already has a winner"),
+      votedispute(NODE_DADDY, 1, cs_y));
+} FC_LOG_AND_RETHROW() }
+
 // sysio.epoch::is_paused is one flag shared by every dispute: resolving the FIRST of two
 // concurrently open disputes (a second EVM outpost's envelopes can split in the same epoch) must
 // not resume epoch advancement while the second is still voting. The pause lifts only when the
@@ -1061,14 +1168,14 @@ BOOST_FIXTURE_TEST_CASE(deliver_rejects_decollateralized_unknown_group_member, s
       ("terminate_prune_delay_ms", 600000)("terminate_max_consecutive_misses", 5)
       ("terminate_max_pct_misses_24h", 5)("terminate_window_ms", uint64_t{24ULL * 60 * 60 * 1000})
       ("req_prod_collat", fc::variants{})
-      ("req_batchop_collat", fc::variants{make_chain_min_bond("ETH", "ETH", MIN_BOND)})
+      ("req_batchop_collat", fc::variants{make_chain_min_bond("WIRE", "WIRE", MIN_BOND)})
       ("req_uw_collat", fc::variants{})));
 
    // Register + fully collateralize batchop.b -> ACTIVE.
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
       ("account", BATCHOP_B.to_string())("type", OperatorType::OPERATOR_TYPE_BATCH)
       ("is_bootstrapped", false)));
-   BOOST_REQUIRE_EQUAL(success(), depositinle(BATCHOP_B, "ETH", "ETH", MIN_BOND));
+   BOOST_REQUIRE_EQUAL(success(), fund_and_bond(BATCHOP_B, MIN_BOND));
    BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_ACTIVE", operator_status(BATCHOP_B));
 
    // Schedule it into the single-slot group (non-bootstrapped sorts ahead of the
@@ -1079,7 +1186,7 @@ BOOST_FIXTURE_TEST_CASE(deliver_rejects_decollateralized_unknown_group_member, s
 
    // Withdraw the full bond and flush past maturity -> reevaluate drops it to UNKNOWN.
    // The epoch group snapshot is untouched (no reschedule), so it stays resident.
-   BOOST_REQUIRE_EQUAL(success(), withdrawinle(BATCHOP_B, "ETH", "ETH", MIN_BOND));
+   BOOST_REQUIRE_EQUAL(success(), withdraw(BATCHOP_B, MIN_BOND));
    BOOST_REQUIRE_EQUAL(success(), flushwtdw(1'000'000u));
    BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_UNKNOWN", operator_status(BATCHOP_B));
    BOOST_REQUIRE(group_contains(current_group(), BATCHOP_B));

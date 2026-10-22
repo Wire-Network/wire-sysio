@@ -1503,34 +1503,32 @@ class PluginHttpTest(unittest.TestCase):
             # send first request
             Utils.Print('sending request 1')
             sock.send(bytes(req1, enc))
-            resp1_data = Utils.readSocketDataStr(sock, maxMsgSize, enc)
+            resp1_data = Utils.readHttpResponse(sock, maxMsgSize, enc)
             Utils.Print('resp1_data= \n', resp1_data)
 
             # send second request
             Utils.Print('sending request 2')
             sock.send(bytes(req2, enc))
-            resp2_data = Utils.readSocketDataStr(sock, maxMsgSize, enc)
+            resp2_data = Utils.readHttpResponse(sock, maxMsgSize, enc)
             Utils.Print('resp2_data= \n', resp2_data)
 
             # send third request
             Utils.Print('sending request 3')
             sock.send(bytes(req3, enc))
-            resp3_data = Utils.readSocketDataStr(sock, maxMsgSize, enc)
+            resp3_data = Utils.readHttpResponse(sock, maxMsgSize, enc)
             Utils.Print('resp3_data= \n', resp3_data)
 
 
-            # wait for socket to close
-            time.sleep(0.5)
-            # send request 2 again.  this should fail because request 3 has "Connection: close" in header
-            Utils.Print('sending request 2 again')
+            # request 3 has "Connection: close" in header, so the server must close the connection after response 3
+            Utils.Print('waiting for the server to close the connection')
             try:
-                sock.settimeout(3)
-                sock.send(bytes(req2, enc))
-                d = sock.recv(64)
-                if(len(d) > 0):
-                    Utils.errorExit('Socket still open after "Connection: close" in header: ' + d.decode(enc))
-            except Exception as e:
-                pass
+                d = sock.recv(1)
+            except ConnectionResetError:
+                d = b""
+            except socket.timeout:
+                Utils.errorExit('Socket still open after "Connection: close" in header: no end of stream')
+            if len(d) > 0:
+                Utils.errorExit(f'Socket still open after "Connection: close" in header: received {d!r}')
 
             Utils.Print("Socket connection closed as expected")
 

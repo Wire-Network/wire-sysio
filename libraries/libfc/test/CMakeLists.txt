@@ -10,6 +10,7 @@ add_executable( test_fc
         crypto/test_signature_provider.cpp
         crypto/test_webauthn.cpp
         io/test_cfile.cpp
+        io/test_atomic_file.cpp
         io/test_json.cpp
         io/test_json_template.cpp
         io/test_secure_file.cpp

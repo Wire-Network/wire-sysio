@@ -3,5 +3,6 @@ if(BUILD_SYSTEM_CONTRACTS)
    add_contract(sysio.swap sysio.swap sysio.swap.cpp token_functions.cpp)
    target_include_directories(sysio.swap
       PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opp.common/include>)
+             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.opp.common/include>
+             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.andon/include>)
 endif()

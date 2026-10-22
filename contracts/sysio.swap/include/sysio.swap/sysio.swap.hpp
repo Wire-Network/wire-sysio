@@ -10,6 +10,7 @@
 #include <sysio.opp.common/amm_math.hpp>
 #include <sysio.opp.common/twap.hpp>
 #include <sysio.opp.common/shadow_yield.hpp>
+#include <sysio.andon/sysio.andon.hpp>
 #include <algorithm>
 #include <cmath>
 #include <optional>
@@ -19,6 +20,10 @@ using namespace std;
 
 namespace sysio {
 
+   /// The depot AMM. Emergency stop: while the `sysio.andon` cord is pulled every action that moves
+   /// tokens is refused -- deposits (`ontransfer`), `withdraw`, `closeext` of a non-empty balance,
+   /// `addliquidity`, `remliquidity`, `exchange`, `inittoken`, the pair-token `transfer`, a `tickyield`
+   /// that would sell and an accrual that would claim yield -- and everything else runs.
    class [[sysio::contract("sysio.swap")]] swap : public contract {
       public:
          const int64_t MAX = sysio::asset::max_amount;
@@ -157,6 +162,9 @@ namespace sysio {
          [[sysio::action]] void close( const name& owner, const symbol& symbol );
 
       private:
+
+         /// Refuse while the `sysio.andon` cord is pulled: the gate of every action that moves tokens.
+         static void require_clear() { andon::check_clear(andon::ANDON_ACCOUNT); }
 
          // --- Keys ---
 

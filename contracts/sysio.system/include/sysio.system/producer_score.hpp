@@ -31,9 +31,8 @@ namespace sysiosystem {
        * opreg's `available()`: available() subtracts pending withdraws, and withdraw / cancelwtdw are
        * both free, uncapped and cooldown-free, so an operator could oscillate their own rank without
        * moving funds. Score tracks what can be taken from you, and a queued withdraw does not reduce
-       * exposure. Nothing is subtracted for sysio.uwrit locks: an account holds exactly one operator
-       * row of one type, and only ACTIVE underwriters ever carry locks, so a PRODUCER's whole balance
-       * is slashable.
+       * exposure. `sysio.opreg::slash` removes the whole balance, so a PRODUCER's whole balance is
+       * what it puts at stake.
        *
        * @param op         the operator row read from sysio.opreg.
        * @param chain_code the chain slug of the pair.
@@ -112,6 +111,26 @@ namespace sysiosystem {
       inline bool meets_live_producer_minimum(const sysio::opreg::operator_entry& op,
                                               uint64_t collateral_ratio) {
          return op.is_bootstrapped || collateral_ratio >= score_scale;
+      }
+
+      /**
+       * Whether `producer` has live PRODUCER operator standing: an ACTIVE OPERATOR_TYPE_PRODUCER row in
+       * sysio.opreg that clears every live producer collateral minimum, bootstrapped operators exempt.
+       *
+       * `sysio.opreg::setconfig` re-evaluates no stored status, so a raised minimum takes effect wherever
+       * this is tested rather than when opreg next touches the row.
+       *
+       * @param producer the producer account.
+       * @return true iff the producer is an ACTIVE producer operator that meets the live minimum.
+       */
+      inline bool has_live_producer_standing(const sysio::name& producer) {
+         const auto op = find_active_operator(
+            producer, sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER);
+         if (!op) return false;
+
+         sysio::opreg::opconfig_t cfg_tbl(opreg_refs::account);
+         const auto cfg = cfg_tbl.get_or_default(sysio::opreg::op_config{});
+         return meets_live_producer_minimum(*op, collateral_factor(*op, cfg));
       }
 
       /**

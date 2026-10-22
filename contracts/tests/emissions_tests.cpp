@@ -39,6 +39,7 @@
 #include <sysio/testing/bls_utils.hpp>
 
 #include "finalizer_test_keys.hpp"
+#include "contract_test_support.hpp"
 
 #include <fc/variant_object.hpp>
 #include <fc/io/raw.hpp>
@@ -60,7 +61,6 @@ static constexpr account_name OPREG = "sysio.opreg"_n;
 static constexpr account_name EPOCH = "sysio.epoch"_n;
 static constexpr account_name CHALG = "sysio.chalg"_n;
 static constexpr account_name MSGCH = "sysio.msgch"_n;
-static constexpr account_name UWRIT = "sysio.uwrit"_n;
 
 // Keep these in sync with contracts/sysio.system/src/emissions.cpp
 static constexpr uint32_t SECONDS_PER_MONTH = 30u * 24u * 60u * 60u;
@@ -216,10 +216,9 @@ static constexpr uint16_t COMPUTE_BPS            = 4000;
 static constexpr uint16_t CAPEX_BPS              = 2000;
 static constexpr uint16_t GOV_BPS                = 1000;
 // Implicit capital reserve = whatever the three explicit shares leave behind.
-// At the fixture defaults (4000 + 2000 + 1000), this is 3000 bps. Drained
-// lazily via sysio.dclaim::onreward -> sysio.system::fundclaim, not paid at
-// payepoch -- so it doesn't appear in t5state.total_distributed until the
-// underlying fundclaim transfer happens.
+// At the fixture defaults (4000 + 2000 + 1000), this is 3000 bps,
+// held in the treasury, not paid at payepoch and excluded from
+// t5state.total_distributed.
 // The implicit capital reserve at these defaults is
 // 10000 - COMPUTE_BPS - CAPEX_BPS - GOV_BPS = 3000 bps.
 static constexpr uint16_t PRODUCER_BPS           = 7000;
@@ -237,7 +236,7 @@ static constexpr uint32_t T_EPOCH_SECS            = 60;
 // Helper: amount NOT transferred at payepoch when no producers / batch
 // members are paid. Equals producer_pool + batch_pool (compute share, both
 // undistributed) + implicit capital reserve (never paid at payepoch --
-// drained lazily via fundclaim). The implicit reserve naturally absorbs
+// retained in the treasury). The implicit reserve naturally absorbs
 // the rounding dust from per-share split_bps floors, so the cleanest
 // definition is `emission - (everything payepoch actually transfers)`,
 // which collapses to `emission - capex_split - gov_split` when no
@@ -357,16 +356,16 @@ public:
       //
       // Under ROA (active via the base tester), accounts need explicit ROA
       // RAM policies before set_code can succeed for a large contract.
-      create_accounts({ OPREG, EPOCH, CHALG, MSGCH, UWRIT });
+      create_accounts({ OPREG, EPOCH, CHALG, MSGCH });
       produce_blocks(1);
 
-      // OPREG, EPOCH and UWRIT have real contract code set below and need the
+      // OPREG and EPOCH have real contract code set below and need the
       // full RAM policy; CHALG and MSGCH are inline-target placeholders with
       // no code deployed. Sizing the placeholders down keeps the sixth
       // allocation within nodedaddy's tier-1 SYS pool.
-      for (auto acct : { OPREG, EPOCH, CHALG, MSGCH, UWRIT }) {
+      for (auto acct : { OPREG, EPOCH, CHALG, MSGCH }) {
          if (get_roa_policy(acct, "nodedaddy"_n).is_null()) {
-            const bool has_code = acct == OPREG || acct == EPOCH || acct == UWRIT;
+            const bool has_code = acct == OPREG || acct == EPOCH;
             auto tr = addpolicy_ram_only("nodedaddy"_n, acct,
                asset::from_string(has_code ? "500.0000 SYS" : "100.0000 SYS"));
             BOOST_REQUIRE( tr );
@@ -382,12 +381,6 @@ public:
       set_code( EPOCH, contracts::epoch_wasm() );
       set_abi ( EPOCH, contracts::epoch_abi().data() );
       set_privileged( EPOCH );
-
-      // sysio.epoch::advance unconditionally inlines sysio.uwrit::chklocks,
-      // so uwrit must be deployed for advance_epoch_state() to succeed.
-      set_code( UWRIT, contracts::uwrit_wasm() );
-      set_abi ( UWRIT, contracts::uwrit_abi().data() );
-      set_privileged( UWRIT );
 
       produce_blocks(1);
 
@@ -506,29 +499,7 @@ public:
       produce_blocks(1);
    }
 
-   /// Deploy the real sysio.dclaim contract on the placeholder account and
-   /// mark it privileged. Required only by tests that push actions signed by
-   /// sysio.dclaim (e.g. fundclaim, which `require_auth(CAPITAL_ACCOUNT)`):
-   /// the sysio.* accounts get a 0-NET ROA policy, so without a deployed
-   /// contract + privileged flag they cannot afford the inline transaction
-   /// NET. Idempotent.
-   void deploy_dclaim_for_signing() {
-      const account_name DCLAIM = "sysio.dclaim"_n;
-      if (get_roa_policy(DCLAIM, "nodedaddy"_n).is_null()) {
-         auto tr = addpolicy_ram_only("nodedaddy"_n, DCLAIM,
-            asset::from_string("500.0000 SYS"));
-         BOOST_REQUIRE( tr );
-         BOOST_REQUIRE( !tr->except );
-         produce_blocks(1);
-      }
-      set_code( DCLAIM, contracts::dclaim_wasm() );
-      set_abi ( DCLAIM, contracts::dclaim_abi().data() );
-      set_privileged( DCLAIM );
-      produce_blocks(1);
-   }
-
-   /// The same for sysio.liq, the other capital drain: deployed and privileged
-   /// so a test can sign fundclaim as it.
+   /// Deploy and privilege sysio.liq for native shadow collateral tests.
    void deploy_liq_for_signing() {
       const account_name LIQ = "sysio.liq"_n;
       if (!control->db().find<account_object, by_name>(LIQ)) {
@@ -546,95 +517,6 @@ public:
       set_abi ( LIQ, contracts::liq_abi().data() );
       set_privileged( LIQ );
       produce_blocks(1);
-   }
-
-   /// Deploy the real sysio.reserv contract (privileged) so the swap-fee
-   /// fold-in test can seed its rewards bucket via a swap. Mirrors
-   /// deploy_dclaim_for_signing's account + ROA-policy + code pattern.
-   void deploy_reserv() {
-      const account_name RESERV = "sysio.reserv"_n;
-      if (!control->db().find<account_object, by_name>(RESERV)) {
-         create_accounts({ RESERV });
-         produce_blocks(1);
-      }
-      if (get_roa_policy(RESERV, "nodedaddy"_n).is_null()) {
-         auto tr = addpolicy_ram_only("nodedaddy"_n, RESERV, asset::from_string("500.0000 SYS"));
-         BOOST_REQUIRE( tr );
-         BOOST_REQUIRE( !tr->except );
-         produce_blocks(1);
-      }
-      set_code( RESERV, contracts::reserve_wasm() );
-      set_abi ( RESERV, contracts::reserve_abi().data() );
-      set_privileged( RESERV );
-      produce_blocks(1);
-   }
-
-   /// Current balance of sysio.reserv's batch-operator rewards bucket.
-   ///
-   /// Requires deploy_reserv(). A missing bucket is reported as zero.
-   int64_t reserv_reward_balance() {
-      const account_name RESERV = "sysio.reserv"_n;
-      auto data = get_row_by_account(RESERV, RESERV, "rewardbkt"_n, "rewardbkt"_n);
-      if (data.empty()) return 0;
-
-      const auto* meta = control->find_account_metadata(RESERV);
-      BOOST_REQUIRE(meta != nullptr);
-      abi_def def;
-      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(meta->abi, def), true);
-      abi_serializer reserv_ser;
-      reserv_ser.set_abi(def, abi_serializer::create_yield_function(abi_serializer_max_time));
-      auto bucket = reserv_ser.binary_to_variant(
-         "rewards_bucket", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
-      return static_cast<int64_t>(bucket["balance"].as_uint64());
-   }
-
-   /// Deploy sysio.reserv and seed its batch-operator rewards bucket with a
-   /// real bootstrap-window swap fee, returning the exact accrued balance.
-   int64_t seed_reserv_reward_bucket() {
-      const account_name RESERV = "sysio.reserv"_n;
-      const account_name UWRIT = "sysio.uwrit"_n;
-      deploy_reserv();
-
-      BOOST_REQUIRE_EQUAL(success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
-         ("chain_code", "ETH")("token_code", "ETH")("reserve_code", "PRIMARY")
-         ("name", "eth")("description", "")
-         ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
-         ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{})));
-      BOOST_REQUIRE_EQUAL(success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
-         ("chain_code", "SOLANA")("token_code", "SOL")("reserve_code", "PRIMARY")
-         ("name", "sol")("description", "")
-         ("initial_chain_amount", 1'000'000'000'000ULL)("initial_wire_amount", 1'000'000'000'000ULL)
-         ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{})));
-      BOOST_REQUIRE_EQUAL(success(), push_reserv_action(UWRIT, "applyswap"_n, mvo()
-         ("src_chain_code", "ETH")("src_token_code", "ETH")("src_reserve_code", "PRIMARY")
-         ("src_amount", 1'000'000'000ULL)
-         ("dst_chain_code", "SOLANA")("dst_token_code", "SOL")
-         ("dst_reserve_code", "PRIMARY")
-         ("dst_amount", 100'000'000ULL)("underwriter", name{})));
-
-      const int64_t balance = reserv_reward_balance();
-      BOOST_REQUIRE_GT(balance, 0);
-      return balance;
-   }
-
-   /// `sysio.reserv::wireclaims` balance owed to `acc`, or 0 when there is no row.
-   /// Requires deploy_reserv(). Credited by paywire / refundwire, drained by claimwire, and
-   /// reclaimed to the treasury by the retention sweep sysio.epoch::advance inlines.
-   uint64_t wire_claimable( account_name acc ) {
-      const account_name RESERV = "sysio.reserv"_n;
-      auto data = get_row_by_account(RESERV, RESERV, "wireclaims"_n, acc);
-      if (data.empty()) return 0u;
-
-      const auto* meta = control->find_account_metadata( RESERV );
-      BOOST_REQUIRE( meta != nullptr );
-      abi_def def;
-      BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(meta->abi, def), true );
-      abi_serializer reserv_ser;
-      reserv_ser.set_abi( def, abi_serializer::create_yield_function(abi_serializer_max_time) );
-
-      return reserv_ser.binary_to_variant("wire_claim", data,
-                abi_serializer::create_yield_function(abi_serializer_max_time))["balance"].as_uint64();
    }
 
    // -----------------------------
@@ -741,14 +623,6 @@ public:
          signer,
          "initt5"_n,
          mvo()("start_time", start)
-      );
-   }
-
-   action_result fundclaim( account_name signer, account_name recipient, int64_t amount ) {
-      return push_system_action(
-         signer,
-         "fundclaim"_n,
-         mvo()("recipient", recipient)("amount", amount)
       );
    }
 
@@ -1174,7 +1048,7 @@ public:
 
    /// Total epoch pay credited but not yet pulled, across every recipient (the `payclaimtot`
    /// singleton the contract maintains). This WIRE still sits in the treasury's token balance
-   /// while being fully owed, which is why `fundclaim` and the epoch readiness gate both reserve
+   /// while being fully owed, which is why treasury withdrawals and the epoch readiness gate both reserve
    /// it -- and why treasury-balance assertions must account for it.
    int64_t pay_outstanding_total() {
       auto data = get_row_by_account(config::system_account_name, config::system_account_name,
@@ -1434,17 +1308,6 @@ public:
    // calling this for a second+ advance.
    action_result advance_epoch_state(account_name signer = EPOCH) {
       return push_epoch_action(signer, "advance"_n, mvo());
-   }
-
-   // Push an action against the (separately deployed) sysio.reserv contract.
-   // Only the swap-fee fold-in test deploys reserv and uses this.
-   action_result push_reserv_action(account_name signer, action_name act, const variant_object& data) {
-      try {
-         base_tester::push_action("sysio.reserv"_n, act, signer, data);
-         return success();
-      } catch (const fc::exception& ex) {
-         return error(ex.top_message());
-      }
    }
 
    // Convenience: set epoch config only. Genesis advance is deferred so each
@@ -2230,7 +2093,7 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_requires_sysio_auth, sysio_emissions_tester 
 
 BOOST_FIXTURE_TEST_CASE( setemitcfg_rejects_bad_category_bps, sysio_emissions_tester ) try {
    // compute + capex + governance must be <= 10000 (the remainder is the
-   // implicit capital reserve drained lazily by fundclaim).
+   // unallocated remainder retained in the treasury).
    auto cfg = mvo()
       ("t1_allocation", int64_t(1)) ("t2_allocation", int64_t(1)) ("t3_allocation", int64_t(1))
       ("t1_duration", uint32_t(1))  ("t2_duration", uint32_t(1))  ("t3_duration", uint32_t(1))
@@ -2713,7 +2576,6 @@ BOOST_FIXTURE_TEST_CASE( payepoch_recovers_from_incomplete_batch_roster_history,
    const account_name BATCH_OP = "batchopa"_n;
    constexpr int64_t period_emission = 10'000;
    create_t5_holding_accounts();
-   const int64_t fee_total = seed_reserv_reward_bucket();
    BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
    BOOST_REQUIRE_EQUAL(success(), initt5(config::system_account_name, tpsec(head_secs())));
    BOOST_REQUIRE_EQUAL(success(),
@@ -2737,13 +2599,9 @@ BOOST_FIXTURE_TEST_CASE( payepoch_recovers_from_incomplete_batch_roster_history,
    BOOST_REQUIRE(!log["batch_history_complete"].as_bool());
    BOOST_REQUIRE_EQUAL(compute - producer_pool,
                        log["batch_emission_retained"].as<int64_t>());
-   BOOST_REQUIRE_EQUAL(int64_t(0), log["fee_distributed"].as<int64_t>());
-   BOOST_REQUIRE_EQUAL(int64_t(0), log["batch_fee_retained"].as<int64_t>());
-   BOOST_REQUIRE_EQUAL(fee_total, reserv_reward_balance());
 
-   // The next complete period must pick up the same retained fee bucket. This
-   // proves the recovery path did not merely leave it readable before silently
-   // clearing or replacing it on the following pay epoch.
+   // The next complete period pays from complete roster history again. This
+   // proves the recovery path reset history rather than leaving the period stuck.
    create_accounts({ BATCH_OP }, false, false, false, true);
    BOOST_REQUIRE_EQUAL(success(),
       register_operator(BATCH_OP, OperatorType::OPERATOR_TYPE_BATCH,
@@ -2761,8 +2619,7 @@ BOOST_FIXTURE_TEST_CASE( payepoch_recovers_from_incomplete_batch_roster_history,
 
    auto recovery_log = get_epoch_log(2);
    BOOST_REQUIRE(recovery_log["batch_history_complete"].as_bool());
-   BOOST_REQUIRE_EQUAL(fee_total, recovery_log["fee_distributed"].as<int64_t>());
-   BOOST_REQUIRE_EQUAL(int64_t(0), reserv_reward_balance());
+   BOOST_REQUIRE_EQUAL(compute - producer_pool, get_wire_balance_paid(BATCH_OP).get_amount());
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( payepoch_seeds_initial_roster_history_at_activation_epoch, sysio_emissions_tester ) try {
@@ -3392,7 +3249,7 @@ BOOST_FIXTURE_TEST_CASE( category_split_matches_basis_points, sysio_emissions_te
    BOOST_REQUIRE_EQUAL( compute, test_split_bps(total, COMPUTE_BPS) );
    // capex gets only its base split (no producer dust redirect)
    BOOST_REQUIRE_EQUAL( capex, test_split_bps(total, CAPEX_BPS) );
-   // capital is NOT in the epoch_log -- drained lazily via fundclaim, not at payepoch.
+   // the unallocated remainder is not an epoch_log payout category.
    BOOST_REQUIRE( !log.get_object().contains("capital_amount") );
 } FC_LOG_AND_RETHROW()
 
@@ -3407,7 +3264,7 @@ BOOST_FIXTURE_TEST_CASE( governance_gets_remainder_no_dust_loss, sysio_emissions
    int64_t gov     = log["governance_amount"].as<int64_t>();
 
    // governance is its own BPS share of total (independent of compute/capex):
-   // the implicit capital reserve (drained lazily via fundclaim) is what
+   // the unallocated treasury remainder is what
    // absorbs any unallocated remainder, not governance.
    BOOST_REQUIRE_EQUAL( gov, test_split_bps(total, uint16_t(1000)) );
 } FC_LOG_AND_RETHROW()
@@ -3678,6 +3535,37 @@ BOOST_FIXTURE_TEST_CASE( blocking_producer_cannot_stall_payepoch, sysio_emission
    BOOST_REQUIRE_EQUAL( 0, get_wire_balance("producerb"_n).get_amount() );
 } FC_LOG_AND_RETHROW()
 
+/// Earned pay remains reserved and claimable after years without a new credit.
+BOOST_FIXTURE_TEST_CASE( payclaims_never_expire, sysio_emissions_tester ) try {
+   create_t5_holding_accounts();
+   setup_producers(3);
+   wait_for_producer_schedule();
+   produce_complete_cycles(3, 2);
+
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+
+   const auto producer = "producera"_n;
+   const int64_t owed = pay_claimable(producer);
+   const int64_t outstanding = pay_outstanding_total();
+   const int64_t balance_before_claim = get_wire_balance(producer).get_amount();
+   BOOST_REQUIRE_GT( owed, 0 );
+
+   constexpr uint32_t INACTIVE_DAYS = 3 * 365;
+   produce_block();
+   produce_block(fc::days(INACTIVE_DAYS));
+   produce_blocks(2);
+   BOOST_REQUIRE_EQUAL( owed, pay_claimable(producer) );
+   BOOST_REQUIRE_EQUAL( outstanding, pay_outstanding_total() );
+
+   BOOST_REQUIRE_EQUAL( success(),
+      push_system_action(producer, "claimpay"_n, mvo()("account_name", producer)) );
+   BOOST_REQUIRE_EQUAL( balance_before_claim + owed, get_wire_balance(producer).get_amount() );
+   BOOST_REQUIRE_EQUAL( 0, pay_claimable(producer) );
+   BOOST_REQUIRE_EQUAL( outstanding - owed, pay_outstanding_total() );
+} FC_LOG_AND_RETHROW()
+
 // ---------------------------------------------------------------------------
 // Holding account stub transfers
 // ---------------------------------------------------------------------------
@@ -3707,14 +3595,13 @@ BOOST_FIXTURE_TEST_CASE( holding_accounts_receive_correct_amounts, sysio_emissio
    // so what they "received" is a real balance delta. They are protocol-owned holding accounts
    // with no code (no notify handler to abort `advance`) and, being `sysio.*`, no net/cpu to sign
    // a claim with and no contract to emit one inline: crediting them would strand the pay in
-   // `payclaims` permanently. `sysio.dclaim` is pushed for the same reason, via fundclaim.
+   // `payclaims` permanently.
    int64_t dclaim_received   = get_wire_balance("sysio.dclaim"_n).get_amount() - dclaim_before.get_amount();
    int64_t gov_received   = get_wire_balance("sysio.gov"_n).get_amount() - gov_before.get_amount();
    int64_t batch_received = get_wire_balance("sysio.batch"_n).get_amount() - batch_before.get_amount();
    int64_t ops_received   = get_wire_balance("sysio.ops"_n).get_amount() - ops_before.get_amount();
 
-   // dclaim is not funded at payepoch anymore -- capital draws are lazy
-   // via sysio.dclaim::onreward -> sysio.system::fundclaim.
+   // DClaim receives no emissions allocation.
    BOOST_REQUIRE_EQUAL( dclaim_received, 0 );
    BOOST_REQUIRE_EQUAL( gov_received, gov );
    // sysio.batch is not an emissions recipient anymore -- batch pay goes to the
@@ -4235,7 +4122,7 @@ BOOST_FIXTURE_TEST_CASE( multi_epoch_cumulative_accounting, sysio_emissions_test
 BOOST_FIXTURE_TEST_CASE( category_splits_sum_to_emission, sysio_emissions_tester ) try {
    // Verify compute + capex + governance + implicit_capital_reserve == total_emission.
    // The implicit capital reserve isn't recorded in epoch_log (drained lazily
-   // by fundclaim); back it out from the curve total to confirm the math.
+   // in the treasury); back it out from the curve total to confirm the math.
    create_t5_holding_accounts();
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
@@ -4290,7 +4177,7 @@ BOOST_FIXTURE_TEST_CASE( epoch_log_records_all_fields, sysio_emissions_tester ) 
       test_scale_annual_to_epoch(ANNUAL_INITIAL_EMISSION, 60) );
 
    // All recorded category amounts are positive (capital_amount is no
-   // longer in epoch_log -- drained lazily via fundclaim).
+   // longer in epoch_log -- retained in the treasury).
    BOOST_REQUIRE( log["compute_amount"].as<int64_t>() > 0 );
    BOOST_REQUIRE( log["capex_amount"].as<int64_t>() > 0 );
    BOOST_REQUIRE( log["governance_amount"].as<int64_t>() > 0 );
@@ -4362,167 +4249,20 @@ BOOST_FIXTURE_TEST_CASE( single_active_producer_paid_per_block, sysio_emissions_
    BOOST_REQUIRE_LT( got, test_active_pool(compute) );
 } FC_LOG_AND_RETHROW()
 
-// Swap-fee rewards (sysio.reserv rewards_bucket) are folded into payepoch's
-// BATCH-OPERATOR distribution only: batch ops receive them on top of their
-// emission share, and producers receive none of them (producer_bps /
-// batch_op_bps govern the emission split alone). End-to-end: deploy reserv,
-// seed the bucket with a real swap fee, advance to the (cadence-1) pay-epoch,
-// and verify the single producer is paid its emission producer_pool and NOTHING
-// more, the all-empty roster leaves the bucket in reserv, and the fee is NOT
-// counted against the emission treasury.
-BOOST_FIXTURE_TEST_CASE( payepoch_folds_swap_fee_rewards, sysio_emissions_tester ) try {
-   create_t5_holding_accounts();
-   const int64_t fee_total = seed_reserv_reward_bucket();
-
-   // --- Single full-round producer; advance to the cadence-1 pay-epoch ---
-   setup_producers(1);
-   wait_for_producer_schedule();
-   produce_complete_cycles(1, 2);
-
-   const uint32_t start = head_secs() - ONE_EPOCH - 1;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   const int64_t t5_before = get_t5_state()["total_distributed"].as<int64_t>();
-   const uint32_t blocks   = unpaid_blocks_of("producera"_n);
-   const int64_t bal_before = get_wire_balance_paid("producera"_n).get_amount();
-
-   // Must NOT overdraw: payepoch queues the reserv->sysio drain ahead of the
-   // payout transfers, so the swept fee lands in sysio's balance first.
-   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
-
-   const int64_t got = get_wire_balance_paid("producera"_n).get_amount() - bal_before;
-
-   auto log = get_epoch_log(1);
-   const int64_t compute       = log["compute_amount"].as<int64_t>();
-   const int64_t capex         = log["capex_amount"].as<int64_t>();
-   const int64_t gov           = log["governance_amount"].as<int64_t>();
-   const int64_t producer_pool = test_split_bps(compute, PRODUCER_BPS);
-   const int64_t batch_pool    = compute - producer_pool;
-
-   // The producer received its emission share and NOTHING MORE. Swap fees pay
-   // the parties that carry an individual swap — the winning underwriter and the
-   // batch operators that relay it — never producers, who earn emissions for
-   // securing the chain. (The share is the per-block rate times its blocks; the
-   // slots it did not fill and the standby slice stay in the treasury.)
-   BOOST_REQUIRE_EQUAL( got, test_block_pay(test_active_pool(compute), blocks,
-                                            test_nominal_slots(T_EPOCH_SECS)) );
-   BOOST_REQUIRE_LT( got, producer_pool );
-
-   // Nothing was distributed out of the fee: this fixture has no non-empty
-   // rotation group, so the bucket stays in reserv for a future payable period.
-   // This is the NEGATIVE case — a batch operator actually receiving the fee is
-   // `payepoch_pays_swap_fee_to_active_batch_operator` below.
-   BOOST_REQUIRE_EQUAL( log["fee_distributed"].as<int64_t>(), 0 );
-   BOOST_REQUIRE(log["batch_history_complete"].as_bool());
-   BOOST_REQUIRE_EQUAL(log["batch_emission_retained"].as<int64_t>(), batch_pool);
-   BOOST_REQUIRE_EQUAL(log["batch_fee_retained"].as<int64_t>(), int64_t(0));
-
-   BOOST_REQUIRE_EQUAL( reserv_reward_balance(), fee_total );
-
-   // total_distributed counts emission only (the producer's block pay + capex +
-   // gov, with the unfilled slots, the standby slice and the empty batch group's
-   // share staying in treasury) -- the fee is NOT charged against the emission
-   // curve.
-   const int64_t t5_after = get_t5_state()["total_distributed"].as<int64_t>();
-   BOOST_REQUIRE_EQUAL( t5_after - t5_before, got + capex + gov );
-} FC_LOG_AND_RETHROW()
-
-// The POSITIVE counterpart: a swap fee actually reaching an ACTIVE batch
-// operator's balance. `payepoch_folds_swap_fee_rewards` proves that an all-empty
-// history preserves reserv custody; this positive case proves a non-empty,
-// eligible roster drains and distributes the bucket.
-//
-// Scaled to a ONE-member rotation (operators_per_epoch = batch_op_groups = 1) so
-// the arithmetic is exact rather than a proportional bound: with one group active
-// for the single epoch of a cadence-1 period, that member's slice is the entire
-// batch pool and the entire fee pool. Asserts the recipient's balance delta and
-// the exact positive `epochlog.fee_distributed`.
-BOOST_FIXTURE_TEST_CASE( payepoch_pays_swap_fee_to_active_batch_operator, sysio_emissions_tester ) try {
-   const account_name BATCH_OP  = "batchopa"_n;
-
-   create_t5_holding_accounts();
-   const int64_t fee_total = seed_reserv_reward_bucket();
-
-   // --- A one-member rotation group, ACTIVE in opreg ---
-   // Bootstrapped so the ACTIVE flip bypasses the collateral gate (see
-   // .claude/rules/bootstrapped-operator-invariants.md); payepoch's own filter is
-   // `is_op_active(member, OPERATOR_TYPE_BATCH)`, which this satisfies.
-   create_accounts( { BATCH_OP }, false, false, false, true ); // include_ram_gift
-   BOOST_REQUIRE_EQUAL( success(),
-      register_operator( BATCH_OP, OperatorType::OPERATOR_TYPE_BATCH, /*is_bootstrapped*/true ) );
-
-   // operators_per_epoch = batch_op_groups = 1 -> batch_operator_minimum_active
-   // is 1, so this single operator satisfies schbatchgps and fills the whole
-   // window: one group, one member, paid every epoch.
-   BOOST_REQUIRE_EQUAL( success(), init_epoch_state(60, /*operators_per_epoch*/1,
-                                                    /*batch_op_groups_count*/1) );
-   produce_blocks(1);
-   BOOST_REQUIRE_EQUAL( success(), push_epoch_action(EPOCH, "schbatchgps"_n, mvo()) );
-
-   setup_producers(1);
-   wait_for_producer_schedule();
-   produce_complete_cycles(1, 2);
-
-   const uint32_t start = head_secs() - ONE_EPOCH - 1;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   const int64_t t5_before  = get_t5_state()["total_distributed"].as<int64_t>();
-   const uint32_t producer_blocks = unpaid_blocks_of("producera"_n);
-   const int64_t bal_before = get_wire_balance(BATCH_OP).get_amount();
-
-   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
-
-   // --- The payout ---
-   auto log = get_epoch_log(1);
-   const int64_t compute       = log["compute_amount"].as<int64_t>();
-   const int64_t producer_pool = test_split_bps(compute, PRODUCER_BPS);
-   const int64_t batch_pool    = compute - producer_pool;
-
-   // One group, active for the single epoch of a cadence-1 period, one member:
-   // the member's slice is the whole batch pool AND the whole fee pool. The
-   // emission and fee shares ride ONE credit, so the balance delta after the
-   // claim is the sum.
-   const int64_t got = get_wire_balance_paid(BATCH_OP).get_amount() - bal_before;
-   BOOST_REQUIRE_EQUAL( got, batch_pool + fee_total );
-
-   // The fee reached a real recipient — the assertion the negative case cannot
-   // make. Exact value, not merely positive: a fee that leaked into the producer
-   // pool or was double-counted would still be > 0 here.
-   BOOST_REQUIRE_EQUAL( log["fee_distributed"].as<int64_t>(), fee_total );
-   BOOST_REQUIRE(log["batch_history_complete"].as_bool());
-   BOOST_REQUIRE_EQUAL(log["batch_emission_retained"].as<int64_t>(), int64_t(0));
-   BOOST_REQUIRE_EQUAL(log["batch_fee_retained"].as<int64_t>(), int64_t(0));
-
-   // Bucket swept, and the fee is NOT charged against the emission curve —
-   // total_distributed moves by the EMISSION only, excluding fee_total.
-   BOOST_REQUIRE_EQUAL( reserv_reward_balance(), 0 );
-   const int64_t capex = log["capex_amount"].as<int64_t>();
-   const int64_t gov   = log["governance_amount"].as<int64_t>();
-   const int64_t t5_after = get_t5_state()["total_distributed"].as<int64_t>();
-   const int64_t producer_pay = test_block_pay(test_active_pool(compute), producer_blocks,
-                                               test_nominal_slots(T_EPOCH_SECS));
-   BOOST_REQUIRE_EQUAL( t5_after - t5_before, producer_pay + batch_pool + capex + gov );
-} FC_LOG_AND_RETHROW()
-
 // Lowering pay_cadence_epochs MID-PERIOD must not multiply the payout.
 // `accrueepoch` increments one batch_group_epochs slot per epoch unconditionally,
 // while `setemitcfg` may change pay_cadence_epochs at any time. Normalizing by
 // cfg.pay_cadence_epochs instead of the accrued total made those two disagree:
 // cadence 3 -> 1 after one accrual leaves the counters summing to 2 against a
-// divisor of 1, paying 2x batch_pool AND 2x fee_batch_pool. The surplus fee is the
-// dangerous half — only ONE fee pool was swept from sysio.reserv, so the extra is
-// drawn from this treasury, and fee payouts are excluded from total_distributed,
-// so it never shows up against the emission curve.
+// divisor of 1, paying 2x batch_pool, with the surplus drawn from this treasury.
 //
-// Runs with an ACTIVE batch group and a NON-ZERO fee, because with either absent
-// the overpayment is unobservable: no group means nothing is distributed, and a
-// zero fee makes the fee half of the bug invisible.
-BOOST_FIXTURE_TEST_CASE( cadence_drop_midperiod_does_not_multiply_batch_fee_payout,
+// Runs with an ACTIVE batch group, because with none the overpayment is
+// unobservable: nothing is distributed.
+BOOST_FIXTURE_TEST_CASE( cadence_drop_midperiod_does_not_multiply_batch_payout,
                          sysio_emissions_tester ) try {
    const account_name BATCH_OP = "batchopb"_n;
 
    create_t5_holding_accounts();
-   const int64_t fee_total = seed_reserv_reward_bucket();
 
    create_accounts( { BATCH_OP }, false, false, false, true );
    BOOST_REQUIRE_EQUAL( success(),
@@ -4562,12 +4302,7 @@ BOOST_FIXTURE_TEST_CASE( cadence_drop_midperiod_does_not_multiply_batch_fee_payo
    // The single group holds BOTH accrued epochs, so normalizing by the accrued
    // total (2) gives it the whole pool exactly once -- not twice.
    const int64_t got = get_wire_balance_paid(BATCH_OP).get_amount() - bal_before;
-   BOOST_REQUIRE_EQUAL( got, batch_pool + fee_total );
-
-   // The load-bearing assertion: the fee is distributed ONCE. Under the old
-   // divisor this was 2 * fee_total, with the surplus drawn from the treasury.
-   BOOST_REQUIRE_EQUAL( log["fee_distributed"].as<int64_t>(), fee_total );
-   BOOST_REQUIRE_EQUAL( reserv_reward_balance(), 0 );
+   BOOST_REQUIRE_EQUAL( got, batch_pool );
 
    // And the emission side is not double-paid either: the producer's count spans both accrued
    // epochs and is paid once, over the two epochs' worth of slots.
@@ -4976,7 +4711,7 @@ BOOST_FIXTURE_TEST_CASE( opreg_unregistered_account_cannot_become_producer, sysi
 } FC_LOG_AND_RETHROW()
 
 // Node-owner vesting draws on the same `sysio` WIRE balance that backs unclaimed epoch pay, so it
-// has to respect the same reserve `fundclaim` and the epoch gate hold. Without that, a vested owner
+// has to respect the same reserve the epoch gate holds. Without that, a vested owner
 // can withdraw WIRE already promised to a `payclaims` row, leaving the later `claimpay` unpayable
 // and `payepoch` balance-blocked from then on. That exposure is new: before payouts became
 // claimable, epoch pay had already left the treasury by the time a node claim ran.
@@ -5096,121 +4831,6 @@ BOOST_FIXTURE_TEST_CASE( advance_gate_blocks_on_insufficient_treasury_balance, s
 
    // t5state.last_epoch_index unchanged (no payepoch ran).
    BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), 0u );
-} FC_LOG_AND_RETHROW()
-
-// A balance-blocked epoch reclaims forfeited WIRE and unblocks ITSELF, with no manual sweep and
-// no top-up. This pins the placement of the `sysio.reserv::sweepclaims` inline in advance: it sits
-// BEFORE the emissions gate, so a BALANCE_INSUFFICIENT epoch still queues the reclaim on its way
-// out. Move that call below the gate (where the other maintenance sweeps live) and the epoch
-// returns without ever reclaiming the WIRE that covers its own shortfall -- every retry repeating
-// it, with `sweepclaims` taking only epoch/reserv authority so no keeper can break the cycle.
-//
-// The two-attempt shape is the guarantee, not an artifact: `action.send()` QUEUES the inline, so
-// this advance's gate has already read the treasury by the time the reclaim executes. The first
-// attempt therefore records the block AND performs the reclaim; the next chkcons retry sees the
-// larger balance and advances.
-BOOST_FIXTURE_TEST_CASE( expired_wire_claims_unblock_a_balance_blocked_epoch, sysio_emissions_tester ) try {
-   const account_name RESERV = "sysio.reserv"_n;
-
-   create_t5_holding_accounts();
-   deploy_reserv();
-
-   // Move real WIRE into reserv custody so a claim has backing. regreserve is bootstrap-window
-   // only, which holds here: current_epoch_index is still 0.
-   constexpr uint64_t RESERVE_SEED = 1'000'000'000'000ULL;
-   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(RESERV, "regreserve"_n, mvo()
-      ("chain_code", "ETH")("token_code", "ETH")("reserve_code", "PRIMARY")
-      ("name", "eth")("description", "")
-      ("initial_chain_amount", RESERVE_SEED)("initial_wire_amount", RESERVE_SEED)
-      ("source_token_precision", 9u)("connector_weight_bps", 5000u)("is_private", false)("owner", name{}) ) );
-
-   // Fund the escrow the refund gives back, SEPARATELY from the reserve's booked liquidity.
-   // `regreserve` books RESERVE_SEED into `reserve_wire_amount`, and `refundwire` credits a claim
-   // without debiting that row — in production it is reached only after `swapfromwire` has already
-   // deposited the user's in-flight escrow on top. Skipping that deposit would make the sweep hand
-   // the treasury registered reserve liquidity instead of forfeited escrow, so the test would
-   // unblock emissions by breaking reserv's custody invariant rather than by reclaiming a claim.
-   constexpr uint64_t FORFEIT = 100'000'000'000ULL;
-   base_tester::push_action(
-      TOKEN, "transfer"_n,
-      vector<permission_level>{{ config::system_account_name, "active"_n }},
-      mvo()("from", config::system_account_name)
-           ("to", RESERV)
-           ("quantity", asset(static_cast<int64_t>(FORFEIT), WIRE_SYMBOL))
-           ("memo", "in-flight swap-from-WIRE escrow the refund returns")
-   );
-   produce_blocks(1);
-   BOOST_REQUIRE_EQUAL( RESERVE_SEED + FORFEIT,
-                        static_cast<uint64_t>(get_wire_balance(RESERV).get_amount()) );
-
-   // A swap-from-WIRE refund credits a claimable balance that nobody ever pulls. Custody now
-   // reads `reserve_wire_amount (RESERVE_SEED) + Σ wireclaims (FORFEIT)`.
-   create_user_accounts({ "lapseduser"_n });
-   BOOST_REQUIRE_EQUAL( success(), push_reserv_action(UWRIT, "refundwire"_n, mvo()
-      ("recipient",      "lapseduser")
-      ("wire_amount",    FORFEIT)
-      ("revert_fee_bps", 0)) );
-   BOOST_REQUIRE_EQUAL( FORFEIT, wire_claimable("lapseduser"_n) );
-
-   // Age past the one-year window with NO further credit, so `credit_wire_claim`'s opportunistic
-   // sweep never fires and the epoch-driven one is the only thing that can collect the row.
-   produce_block();
-   produce_block(fc::days(366));
-   produce_blocks(2);
-   BOOST_REQUIRE_EQUAL( FORFEIT, wire_claimable("lapseduser"_n) );
-
-   const uint32_t start = head_secs() - ONE_EPOCH - 1;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   // Epoch 1's emission is the annual initial scaled to the fixture's 60s epoch; it is also the
-   // period total, since nothing has accrued yet.
-   const int64_t period_emission = test_scale_annual_to_epoch(ANNUAL_INITIAL_EMISSION, 60);
-   BOOST_REQUIRE_GT( period_emission, static_cast<int64_t>(FORFEIT) );
-
-   // Leave the treasury short by EXACTLY the forfeited claim.
-   create_user_accounts({ "lapsedrain"_n });
-   const int64_t balance = get_wire_balance(config::system_account_name).get_amount();
-   const int64_t target  = period_emission - static_cast<int64_t>(FORFEIT);
-   BOOST_REQUIRE_GT( balance, target );
-   base_tester::push_action(
-      TOKEN, "transfer"_n,
-      vector<permission_level>{{ config::system_account_name, "active"_n }},
-      mvo()("from", config::system_account_name)
-           ("to", "lapsedrain"_n)
-           ("quantity", asset(balance - target, WIRE_SYMBOL))
-           ("memo", "leave the treasury one forfeited claim short of the epoch emission")
-   );
-   produce_blocks(1);
-
-   // FIRST attempt: blocked on the balance the gate could see, and the queued reclaim still runs.
-   produce_blocks(130);
-   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
-
-   auto blocked = get_blocklog_row(1u);
-   BOOST_REQUIRE( !blocked.is_null() );
-   BOOST_REQUIRE_EQUAL( blocked["reason"].as_string(), "EMISSIONS_BLOCK_REASON_BALANCE_INSUFFICIENT" );
-   BOOST_REQUIRE_EQUAL( blocked["attempted_emission"].as<int64_t>(), period_emission );
-   BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), 0u );
-
-   // The forfeited claim is gone and its WIRE is in the treasury -- reclaimed by the same
-   // transaction that recorded the block.
-   BOOST_REQUIRE_EQUAL( 0u, wire_claimable("lapseduser"_n) );
-   BOOST_REQUIRE_EQUAL( period_emission, get_wire_balance(config::system_account_name).get_amount() );
-
-   // What moved was the ESCROW, not the reserve. Custody is back to exactly the booked
-   // `reserve_wire_amount`, so the epoch unblocked itself on forfeited value rather than on
-   // registered liquidity.
-   BOOST_REQUIRE_EQUAL( RESERVE_SEED, static_cast<uint64_t>(get_wire_balance(RESERV).get_amount()) );
-
-   // SECOND attempt: no manual sweepclaims, no funding -- the epoch advances on its own.
-   produce_blocks(130);
-   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state(EPOCH) );
-
-   auto est = get_epoch_state_row();
-   BOOST_REQUIRE( !est.is_null() );
-   BOOST_REQUIRE_EQUAL( est["current_epoch_index"].as<uint32_t>(), 1u );
-   BOOST_REQUIRE( get_blocklog_row(1u).is_null() );
-   BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), 1u );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( roa_forcereg_inlines_addnodeowner_happy_path, sysio_emissions_tester ) try {
@@ -5917,186 +5537,6 @@ BOOST_FIXTURE_TEST_CASE( balance_blocked_zero_share_boundary_records_the_period_
    BOOST_REQUIRE_EQUAL( after["total_distributed"].as<int64_t>(), budget );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( fundclaim_cannot_draw_the_pending_share_of_the_budget, t5_budget_tail_tester ) try {
-   // A capital draw is capped at the headroom net of the pending accrual, like every share. Once the open period holds
-   // the rest of the budget, a draw gets nothing and is recorded as shortfall.
-   constexpr uint16_t cadence = 4;
-   const int64_t budget = 7 * initial_share / 2;
-   start(cadence, budget);
-   deploy_dclaim_for_signing();
-   for (uint32_t epoch = 1; epoch <= cadence; ++epoch) advance_one();
-
-   const auto state = get_t5_state();
-   const int64_t distributed = state["total_distributed"].as<int64_t>();
-   BOOST_REQUIRE_GT( state["pending_emission_amount"].as<int64_t>(), 0 );
-   BOOST_REQUIRE_EQUAL( expected_share(state, budget), 0 );
-
-   const int64_t request = initial_share;
-   BOOST_REQUIRE_EQUAL( success(), fundclaim("sysio.dclaim"_n, "sysio.dclaim"_n, request) );
-   const auto after = get_t5_state();
-   BOOST_REQUIRE_EQUAL( after["total_distributed"].as<int64_t>(), distributed );
-   BOOST_REQUIRE_EQUAL( after["capital_shortfall_total"].as<int64_t>(), request );
-} FC_LOG_AND_RETHROW()
-
-// ---------------------------------------------------------------------------
-// fundclaim: per-onreward immediate funding for sysio.dclaim
-// ---------------------------------------------------------------------------
-
-BOOST_FIXTURE_TEST_CASE( fundclaim_requires_the_recipients_auth, sysio_emissions_tester ) try {
-   create_t5_holding_accounts();
-   deploy_dclaim_for_signing();
-   const uint32_t start = head_secs() - ONE_EPOCH - 1;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   // alice has no claim to sysio.dclaim's authority.
-   create_user_accounts({ "alice"_n });
-   auto r = fundclaim( "alice"_n, "sysio.dclaim"_n, int64_t(1'000'000) );
-   BOOST_REQUIRE( r != success() );
-   require_substr( r, "missing authority of sysio.dclaim" );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( fundclaim_refuses_a_recipient_that_is_not_a_drain, sysio_emissions_tester ) try {
-   create_t5_holding_accounts();
-   const uint32_t start = head_secs() - ONE_EPOCH - 1;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   // alice signs for herself; only the two drains may be funded.
-   create_user_accounts({ "alice"_n });
-   auto r = fundclaim( "alice"_n, "alice"_n, int64_t(1'000'000) );
-   BOOST_REQUIRE( r != success() );
-   require_substr( r, "recipient is not a capital drain" );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( fundclaim_transfers_and_tracks_distributed, sysio_emissions_tester ) try {
-   create_t5_holding_accounts();
-   deploy_dclaim_for_signing();
-   const uint32_t start = head_secs() - ONE_EPOCH - 1;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   const asset sysio_before  = get_wire_balance_paid( config::system_account_name );
-   const asset dclaim_before = get_wire_balance_paid( "sysio.dclaim"_n );
-   const int64_t distributed_before = get_t5_state()["total_distributed"].as<int64_t>();
-
-   const int64_t amt = int64_t(50'000'000'000);   // 50 WIRE
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, "sysio.dclaim"_n, amt ) );
-
-   const asset sysio_after  = get_wire_balance_paid( config::system_account_name );
-   const asset dclaim_after = get_wire_balance_paid( "sysio.dclaim"_n );
-   const auto state = get_t5_state();
-
-   BOOST_REQUIRE_EQUAL( sysio_before.get_amount()  - sysio_after.get_amount(),  amt );
-   BOOST_REQUIRE_EQUAL( dclaim_after.get_amount() - dclaim_before.get_amount(), amt );
-   BOOST_REQUIRE_EQUAL( state["total_distributed"].as<int64_t>(), distributed_before + amt );
-   BOOST_REQUIRE_EQUAL( state["capital_shortfall_total"].as<int64_t>(), 0 );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( fundclaim_no_op_for_zero_or_negative, sysio_emissions_tester ) try {
-   create_t5_holding_accounts();
-   deploy_dclaim_for_signing();
-   const uint32_t start = head_secs() - ONE_EPOCH - 1;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   const asset dclaim_before = get_wire_balance_paid( "sysio.dclaim"_n );
-   const int64_t distributed_before = get_t5_state()["total_distributed"].as<int64_t>();
-
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, "sysio.dclaim"_n, int64_t(0) ) );
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, "sysio.dclaim"_n, int64_t(-100) ) );
-
-   BOOST_REQUIRE_EQUAL( get_wire_balance_paid( "sysio.dclaim"_n ).get_amount(),
-                        dclaim_before.get_amount() );
-   BOOST_REQUIRE_EQUAL( get_t5_state()["total_distributed"].as<int64_t>(),
-                        distributed_before );
-   BOOST_REQUIRE_EQUAL( get_t5_state()["capital_shortfall_total"].as<int64_t>(), 0 );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( fundclaim_caps_to_remaining_pool_and_records_shortfall, sysio_emissions_tester ) try {
-   // Squeeze t5_distributable down to a small headroom over t5_floor so the
-   // next fundclaim has a hard cap. Verify the partial transfer and the
-   // shortfall accumulator.
-   create_t5_holding_accounts();
-   deploy_dclaim_for_signing();
-   const uint32_t start = head_secs() - ONE_EPOCH - 1;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   // Shrink drainable headroom to exactly 1000 subunits via a fresh emitcfg.
-   // The post-init guard requires t5_distributable >= t5_floor + total_distributed,
-   // so set t5_floor to 0 and t5_distributable just above current total_distributed.
-   const int64_t already = get_t5_state()["total_distributed"].as<int64_t>();
-   const int64_t headroom = 1000;
-   auto cfg = mvo()
-      ("t1_allocation", T1_ALLOCATION.get_amount())
-      ("t2_allocation", T2_ALLOCATION.get_amount())
-      ("t3_allocation", T3_ALLOCATION.get_amount())
-      ("t1_duration", T1_DURATION) ("t2_duration", T2_DURATION) ("t3_duration", T3_DURATION)
-      ("min_claimable", MIN_CLAIMABLE_AMOUNT)
-      ("t5_distributable", already + headroom)
-      ("t5_floor", int64_t(0))
-      ("target_annual_decay_bps", TARGET_ANNUAL_DECAY_BPS)
-      ("annual_initial_emission", ANNUAL_INITIAL_EMISSION)
-      ("annual_max_emission", ANNUAL_MAX_EMISSION)
-      // annual_min_emission=0 so the post-init guard (per_epoch_min <= remaining)
-      // doesn't reject the deliberately-tiny pool used by this test.
-      ("annual_min_emission", int64_t(0))
-      ("compute_bps", COMPUTE_BPS)
-      ("capex_bps", CAPEX_BPS) ("governance_bps", GOV_BPS)
-      ("producer_bps", PRODUCER_BPS) ("batch_op_bps", uint16_t(3000))
-      ("standby_end_rank", T_STANDBY_END_RANK)("standby_bps", T_STANDBY_BPS)
-      ("epoch_log_retention_count", uint32_t(8640))("pay_cadence_epochs", uint16_t(1));
-   BOOST_REQUIRE_EQUAL( success(), setemitcfg( config::system_account_name, cfg ) );
-
-   const asset dclaim_before = get_wire_balance_paid( "sysio.dclaim"_n );
-
-   // Request 3x the headroom; expect partial transfer of `headroom`, shortfall = 2x.
-   const int64_t request   = headroom * 3;
-   const int64_t shortfall = request - headroom;
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, "sysio.dclaim"_n, request ) );
-
-   const asset dclaim_after = get_wire_balance_paid( "sysio.dclaim"_n );
-   const auto state = get_t5_state();
-   BOOST_REQUIRE_EQUAL( dclaim_after.get_amount() - dclaim_before.get_amount(), headroom );
-   BOOST_REQUIRE_EQUAL( state["total_distributed"].as<int64_t>(), already + headroom );
-   BOOST_REQUIRE_EQUAL( state["capital_shortfall_total"].as<int64_t>(), shortfall );
-
-   // A further request after pool is exhausted is a full shortfall.
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, "sysio.dclaim"_n, int64_t(500) ) );
-   const auto state2 = get_t5_state();
-   BOOST_REQUIRE_EQUAL( get_wire_balance_paid( "sysio.dclaim"_n ).get_amount(),
-                        dclaim_after.get_amount() );
-   BOOST_REQUIRE_EQUAL( state2["total_distributed"].as<int64_t>(), already + headroom );
-   BOOST_REQUIRE_EQUAL( state2["capital_shortfall_total"].as<int64_t>(), shortfall + 500 );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( fundclaim_silent_when_t5state_missing, sysio_emissions_tester ) try {
-   // initt5 NOT called, so t5state.exists() is false. fundclaim must absorb
-   // the call without throwing or mutating any state.
-   create_t5_holding_accounts();
-   deploy_dclaim_for_signing();
-   const asset dclaim_before = get_wire_balance_paid( "sysio.dclaim"_n );
-
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.dclaim"_n, "sysio.dclaim"_n, int64_t(1'000'000) ) );
-
-   BOOST_REQUIRE_EQUAL( get_wire_balance_paid( "sysio.dclaim"_n ).get_amount(),
-                        dclaim_before.get_amount() );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( fundclaim_funds_the_liq_kicker_drain, sysio_emissions_tester ) try {
-   // sysio.liq draws the yield kicker through the same drain as sysio.dclaim.
-   create_t5_holding_accounts();
-   deploy_liq_for_signing();
-   const uint32_t start = head_secs() - ONE_EPOCH - 1;
-   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
-
-   const asset   liq_before         = get_wire_balance( "sysio.liq"_n );
-   const int64_t distributed_before = get_t5_state()["total_distributed"].as<int64_t>();
-
-   const int64_t amt = int64_t(2'000'000'000);   // 2 WIRE
-   BOOST_REQUIRE_EQUAL( success(), fundclaim( "sysio.liq"_n, "sysio.liq"_n, amt ) );
-
-   BOOST_REQUIRE_EQUAL( get_wire_balance( "sysio.liq"_n ).get_amount() - liq_before.get_amount(), amt );
-   BOOST_REQUIRE_EQUAL( get_t5_state()["total_distributed"].as<int64_t>(), distributed_before + amt );
-   BOOST_REQUIRE_EQUAL( get_t5_state()["capital_shortfall_total"].as<int64_t>(), 0 );
-} FC_LOG_AND_RETHROW()
-
 BOOST_AUTO_TEST_SUITE_END() // t5_emissions_tests
 
 // ===========================================================================
@@ -6439,12 +5879,12 @@ struct producer_score_tester : public producer_eligibility_tester {
 
    /// Chain/token pair the collateral helpers use. Any pair works -- opreg stores slug names
    /// opaquely -- so these name a plausible outpost rather than carrying meaning.
-   static constexpr std::string_view collateral_chain = "ETH";
-   static constexpr std::string_view collateral_token = "ETH";
+   static constexpr std::string_view collateral_chain = "WIRE";
+   static constexpr std::string_view collateral_token = "WIRE";
 
    /// A second pair, for the "minimum across pairs" case.
-   static constexpr std::string_view second_chain = "SOL";
-   static constexpr std::string_view second_token = "SOL";
+   static constexpr std::string_view second_chain = "WIRE";
+   static constexpr std::string_view second_token = "NTA";
 
    /// The minimum bond every collateral test measures its ratios against.
    static constexpr uint64_t base_min_bond = 1'000'000;
@@ -6499,17 +5939,65 @@ struct producer_score_tester : public producer_eligibility_tester {
    /// This is the seam the score hangs off: a credit runs `reevaluate_eligibility`, which
    /// dispatches `processprod` for producers on EVERY balance change, whose notification
    /// sysio.system turns into a rescore.
+   bool native_shadow_ready = false;
+
+   void setup_score_shadow() {
+      if (native_shadow_ready) return;
+      const auto chains = "sysio.chains"_n;
+      const auto tokens = "sysio.tokens"_n;
+      const auto synd = "sysio.synd"_n;
+      const auto liq = "sysio.liq"_n;
+      for (auto account : {chains, tokens, synd}) {
+         if (!control->db().find<account_object, by_name>(account)) {
+            create_accounts({account}, false, false, false, true);
+            produce_blocks(1);
+         }
+         if (account != synd && get_roa_policy(account, "nodedaddy"_n).is_null()) {
+            const auto trace = addpolicy_ram_only("nodedaddy"_n, account, asset::from_string("100.0000 SYS"));
+            BOOST_REQUIRE(trace && !trace->except);
+            produce_blocks(1);
+         }
+      }
+      set_code(chains, contracts::chains_wasm());
+      set_abi(chains, contracts::chains_abi().data());
+      set_privileged(chains);
+      set_code(tokens, contracts::tokens_wasm());
+      set_abi(tokens, contracts::tokens_abi().data());
+      set_privileged(tokens);
+      deploy_liq_for_signing();
+      const std::vector<char> address(20, '\x31');
+      base_tester::push_action(chains, "regchain"_n, chains,
+         mvo()("kind", ChainKind::CHAIN_KIND_EVM)("code", "EC1")("external_chain_id", 1)
+         ("name", "External Chain 1")("description", "")
+         ("outpost", sysio_system::test_support::no_outpost_mvo()));
+      base_tester::push_action(tokens, "regtoken"_n, tokens,
+         mvo()("kind", TokenKind::TOKEN_KIND_LIQ)("code", "NTA")("symbol_name", "NTA")
+         ("description", "Native Token 1")("precision", 9)
+         ("address", mvo()("kind", ChainKind::CHAIN_KIND_EVM)("address", address)));
+      base_tester::push_action(tokens, "regctok"_n, tokens,
+         mvo()("chain_code", "EC1")("token_code", "NTA")("contract_addr", address)("is_native", false));
+      base_tester::push_action(liq, "create"_n, liq,
+         mvo()("sym", "9,NTA")("chain_code", "EC1")("token_code", "NTA"));
+      native_shadow_ready = true;
+   }
+
+   /// Fund and bond real depot-native collateral, driving the production rescore notification.
    action_result credit_collateral(account_name account, uint64_t amount,
                                    std::string_view chain = collateral_chain,
                                    std::string_view token = collateral_token) {
-      return push_opreg_action(OPREG, "depositinle"_n, mvo()
-         ("account",             account)
-         ("chain_code",          chain)
-         ("token_code",          token)
-         ("amount",              amount)
-         ("actor_chain",         ChainKind::CHAIN_KIND_EVM)
-         ("actor_address",       std::vector<char>(20, '\x06'))
-         ("original_message_id", fc::sha256()));
+      BOOST_REQUIRE_EQUAL(chain, "WIRE");
+      if (token == "WIRE") {
+         BOOST_REQUIRE_EQUAL(success(), push_token_action(config::system_account_name, "transfer"_n,
+            mvo()("from", "sysio")("to", account)
+            ("quantity", asset(static_cast<int64_t>(amount), WIRE_SYMBOL))("memo", "bond funding")));
+      } else {
+         BOOST_REQUIRE_EQUAL(token, "NTA");
+         setup_score_shadow();
+         base_tester::push_action("sysio.liq"_n, "mint"_n, "sysio.synd"_n,
+            mvo()("to", account)("token_code", token)("amount", amount));
+      }
+      return push_opreg_action(account, "deposit"_n,
+         mvo()("account", account)("token_code", token)("amount", amount));
    }
 
    /// Push `setscorecfg`. Defaults mirror the contract's own so a test names only the weight it
@@ -6632,6 +6120,23 @@ struct producer_score_tester : public producer_eligibility_tester {
          produce_blocks(1);
       }
       BOOST_FAIL("producer " << expected.to_string() << " never entered the active schedule");
+   }
+
+   /// Produce until the ACTIVE schedule is exactly `expected`, in order, then require it.
+   void wait_for_active_schedule_order(const std::vector<account_name>& expected,
+                                       uint32_t max_blocks = 400) {
+      for (uint32_t produced = 0; produced < max_blocks && active_schedule_names() != expected; ++produced) {
+         produce_blocks(1);
+      }
+      const auto schedule = active_schedule_names();
+      BOOST_REQUIRE_EQUAL_COLLECTIONS(schedule.begin(), schedule.end(), expected.begin(), expected.end());
+   }
+
+   /// Re-register `producer` with its fixture key at `location`, the schedule-order key.
+   action_result set_location(account_name producer, uint16_t location) {
+      return push_system_action(producer, "regproducer"_n, mvo()
+         ("producer", producer)("producer_key", get_public_key(producer, "active"))("url", "")
+         ("location", location));
    }
 
    /// Skip `target`'s rounds until the schedule has actually dropped it.
@@ -7425,7 +6930,8 @@ BOOST_FIXTURE_TEST_CASE( deposit_rejects_a_bootstrapped_operator, producer_score
    auto names = setup_ranked_producers(1);
 
    BOOST_REQUIRE_EQUAL( wasm_assert_msg("bootstrapped operators cannot deposit collateral"),
-      push_opreg_action(names[0], "deposit"_n, mvo()("account", names[0])("amount", uint64_t{1'000})) );
+      push_opreg_action(names[0], "deposit"_n, mvo()("account", names[0])("token_code", "WIRE")
+                                                     ("amount", uint64_t{1'000})) );
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
@@ -7531,6 +7037,140 @@ BOOST_FIXTURE_TEST_CASE( collateralised_producers_displace_the_bootstrap_at_the_
    BOOST_REQUIRE( !is_scheduled(bootstrap) );
    BOOST_REQUIRE(  is_scheduled(names[0]) );
    BOOST_REQUIRE_EQUAL( "OPERATOR_STATUS_ACTIVE", get_opreg_operator(bootstrap)["status"].as_string() );
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// Schedule order
+// ---------------------------------------------------------------------------
+
+// A new set of scheduled producers takes its rounds in ascending `location`, account name breaking
+// ties.
+BOOST_FIXTURE_TEST_CASE( a_new_schedule_runs_in_location_order, producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);   // producera..producere, every one at location 0
+
+   // producerb and producerd tie at 100; the field's full range is usable.
+   const std::vector<uint16_t> locations = { std::numeric_limits<uint16_t>::max(), 100, 200, 100, 0 };
+   for (uint32_t i = 0; i < names.size(); ++i) {
+      BOOST_REQUIRE_EQUAL( success(), set_location(names[i], locations[i]) );
+   }
+   trigger_reschedule();
+   wait_for_active_schedule_order({ names[4], names[1], names[3], names[2], names[0] });
+} FC_LOG_AND_RETHROW()
+
+// The set already producing keeps its order through any number of location changes: a reorder alone
+// would reassign rounds at activation, handing one producer two in a row and skipping miss
+// attribution. The new locations apply when the set next changes.
+BOOST_FIXTURE_TEST_CASE( a_location_change_alone_never_reorders_the_schedule, producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);   // producera..producere, every one at location 0
+   trigger_reschedule();
+   wait_for_active_schedule_order(names);
+   const auto version = control->active_producers().version;
+
+   const std::vector<std::vector<uint16_t>> moves = {
+      { 5, 4, 3, 2, 1 },   // reverse the order
+      { 3, 4, 0, 1, 2 },   // then rotate it to start at producerc
+   };
+   for (const auto& locations : moves) {
+      for (uint32_t i = 0; i < names.size(); ++i) {
+         BOOST_REQUIRE_EQUAL( success(), set_location(names[i], locations[i]) );
+      }
+      trigger_reschedule();
+      produce_blocks(3 * slots_per_producer);   // time for any proposal to activate
+      BOOST_REQUIRE_EQUAL( version, control->active_producers().version );
+      const auto schedule = active_schedule_names();
+      BOOST_REQUIRE_EQUAL_COLLECTIONS(schedule.begin(), schedule.end(), names.begin(), names.end());
+   }
+
+   // Terminating producera changes the set; the four left run in their latest location order.
+   BOOST_REQUIRE_EQUAL( success(), terminate_operator(names[0]) );
+   trigger_reschedule();
+   wait_for_active_schedule_order({ names[2], names[3], names[4], names[1] });
+} FC_LOG_AND_RETHROW()
+
+// Location orders the producers rank selected and never selects them: the producer at position 22
+// takes the lowest location of all and still holds its position and no slot.
+BOOST_FIXTURE_TEST_CASE( location_never_selects_a_standby_into_the_schedule, producer_score_tester ) try {
+   constexpr uint32_t scheduled_count = 21;   // max_producers
+   auto names = setup_ranked_producers(scheduled_count + 1);
+   const auto standby = names.back();
+
+   // Reverse the name order across the ranked 21; the standby goes to the front of the line.
+   for (uint32_t i = 0; i < scheduled_count; ++i) {
+      BOOST_REQUIRE_EQUAL( success(), set_location(names[i], static_cast<uint16_t>(scheduled_count - i)) );
+   }
+   BOOST_REQUIRE_EQUAL( success(), set_location(standby, 0) );
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL( scheduled_count + 1, producer_rank_position(standby) );
+
+   trigger_reschedule();
+   const std::vector<account_name> by_location(names.rbegin() + 1, names.rend());   // produceru..producera
+   wait_for_active_schedule_order(by_location);
+   BOOST_REQUIRE( !is_scheduled(standby) );
+   BOOST_REQUIRE_EQUAL( scheduled_count + 1, producer_rank_position(standby) );
+} FC_LOG_AND_RETHROW()
+
+// A switch can hand a producer a second round inside one rotation; only one round per rotation is
+// paid. Replacing the last producer with a standby that sorts first moves everyone one slot later,
+// so the producer just before the switch point produces again right after it. The switch charges
+// no retained producer a missed round either.
+BOOST_FIXTURE_TEST_CASE( a_switch_never_pays_a_second_round_in_one_rotation, producer_score_tester ) try {
+   constexpr uint32_t scheduled_count = 21;   // max_producers: a rotation is this many rounds
+   auto names = setup_ranked_producers(scheduled_count + 1);
+   const auto standby = names.back();
+   const auto leaving = names[scheduled_count - 1];
+   const std::vector<account_name> before(names.begin(), names.begin() + scheduled_count);
+   std::vector<account_name> after(before.begin(), before.end() - 1);
+   after.insert(after.begin(), standby);
+
+   for (uint32_t i = 0; i < scheduled_count; ++i) {
+      BOOST_REQUIRE_EQUAL( success(), set_location(names[i], static_cast<uint16_t>(i + 1)) );
+   }
+   BOOST_REQUIRE_EQUAL( success(), set_location(standby, 0) );
+   trigger_reschedule();
+   wait_for_active_schedule_order(before);
+
+   // Replay the rule over every block from here on. The rows count each block once it is the head.
+   std::map<account_name, uint32_t> last_paid;
+   std::map<account_name, uint32_t> expected;
+   for (const auto& p : names) {
+      last_paid[p] = get_producer_info(p)["last_paid_round"].as<uint32_t>();
+      expected[p]  = unpaid_blocks_of(p);
+   }
+   uint32_t uncounted = 0;
+   const auto produce_and_replay = [&] {
+      produce_block();
+      const auto producer = control->head().header().producer;
+      const uint32_t round = control->head().header().timestamp.slot / slots_per_producer;
+      auto& last = last_paid[producer];
+      if (last != round) {
+         if (last != 0 && last / scheduled_count == round / scheduled_count) {
+            ++uncounted;
+            return;
+         }
+         last = round;
+      }
+      ++expected[producer];
+   };
+
+   BOOST_REQUIRE_EQUAL( success(), terminate_operator(leaving) );
+   constexpr uint32_t max_blocks = 400;
+   for (uint32_t produced = 0; produced < max_blocks && active_schedule_names() != after; ++produced) {
+      produce_and_replay();
+   }
+   const auto schedule = active_schedule_names();
+   BOOST_REQUIRE_EQUAL_COLLECTIONS(schedule.begin(), schedule.end(), after.begin(), after.end());
+   for (uint32_t i = 0; i < scheduled_count * slots_per_producer; ++i) {
+      produce_and_replay();
+   }
+
+   BOOST_REQUIRE_MESSAGE( uncounted > 0, "no producer took a second round in the switch's rotation" );
+   for (const auto& p : names) {
+      BOOST_REQUIRE_MESSAGE( unpaid_blocks_of(p) == expected[p],
+         p.to_string() << " has " << unpaid_blocks_of(p) << " unpaid blocks, expected " << expected[p] );
+   }
+   for (const auto& p : after) {
+      BOOST_REQUIRE_EQUAL( 0u, missed_rounds_of(p) );
+   }
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END() // sysio_producer_score_tests

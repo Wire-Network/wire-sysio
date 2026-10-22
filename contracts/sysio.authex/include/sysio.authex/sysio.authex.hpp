@@ -51,7 +51,7 @@ namespace sysio {
    * data. It avoids visually ambiguous characters, making it suitable for
    * financial identifiers, cryptocurrency addresses, and similar contexts.
    *
-   * Defined `inline` in the header so cross-contract callers (e.g. sysio.msgch
+   * Defined `inline` in the header so cross-contract callers (e.g. sysio.synd
    * resolving an authex link by pubkey) can call it without linking against
    * sysio.authex.cpp's WASM.
    *
@@ -93,7 +93,7 @@ namespace sysio {
    * @brief Render a public_key into its canonical "PUB_<curve>_<encoding>" string.
    *
    * Mirrors eosjs-ecc's spelling so that off-chain signers, the authex contract,
-   * and any cross-contract caller (e.g. sysio.msgch's bypubkey lookup) all hash
+   * and any cross-contract caller (e.g. sysio.synd's bypubkey lookup) all hash
    * the same byte sequence into the secondary-index key.
    *
    * Supported variants:
@@ -272,9 +272,6 @@ namespace sysio {
         const sysio::signature &sig,
         const sysio::public_key &pub_key,
         const uint64_t nonce);
-
-    // ! For testing only, remove before MAINNET deployment.
-    [[sysio::action]] void clearlinks();
 
     /**
      * Record an external-chain public-key link WITHOUT signature verification -- the trusted,

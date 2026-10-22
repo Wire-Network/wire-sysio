@@ -6,7 +6,6 @@
 #include <sysio/serialize.hpp>
 
 #include <sysio.system/sysio.system.hpp>
-#include <sysio.system/opreg_status.hpp>
 #include <sysio.system/producer_score.hpp>
 #include <sysio.token/sysio.token.hpp>
 
@@ -32,16 +31,8 @@ namespace sysiosystem {
       const auto key = producer_key_t{producer.value};
       const bool needs_admission = !_producers.contains(key) || !_producers.get(key).active();
       if (needs_admission) {
-         const auto op = find_active_operator(
-            producer, sysio::opp::types::OperatorType::OPERATOR_TYPE_PRODUCER);
-         bool admitted = false;
-         if (op) {
-            sysio::opreg::opconfig_t cfg_tbl(opreg_refs::account);
-            const auto cfg = cfg_tbl.get_or_default(sysio::opreg::op_config{});
-            const auto collateral_ratio = producer_rank::collateral_factor(*op, cfg);
-            admitted = producer_rank::meets_live_producer_minimum(*op, collateral_ratio);
-         }
-         check( admitted, "producer operator is not eligible for admission" );
+         check( producer_rank::has_live_producer_standing( producer ),
+                "producer operator is not eligible for admission" );
       }
 
       sysio::public_key producer_key{};
@@ -256,8 +247,20 @@ namespace sysiosystem {
          return;
       }
 
-      // Sort by producer name for deterministic ordering
-      std::sort( top_producers.begin(), top_producers.end(), []( const value_type& lhs, const value_type& rhs ) {
+      // Rank picked WHO is scheduled. A new set runs in `location` order, name breaking ties. The
+      // set already producing keeps its order: a reorder alone reassigns rounds at activation and
+      // skips miss attribution, so a location change must wait for the set to change.
+      const auto active_schedule = sysio::get_active_producers();
+      const auto active_position = [&]( const value_type& p ) {
+         return static_cast<size_t>( std::find( active_schedule.begin(), active_schedule.end(), p.first.producer_name )
+                                     - active_schedule.begin() );
+      };
+      const bool same_set = top_producers.size() == active_schedule.size()
+         && std::all_of( top_producers.begin(), top_producers.end(),
+                         [&]( const value_type& p ) { return active_position( p ) < active_schedule.size(); } );
+      std::sort( top_producers.begin(), top_producers.end(), [&]( const value_type& lhs, const value_type& rhs ) {
+         if( same_set ) return active_position( lhs ) < active_position( rhs );
+         if( lhs.second != rhs.second ) return lhs.second < rhs.second;
          return lhs.first.producer_name < rhs.first.producer_name;
       } );
 

@@ -1,0 +1,11 @@
+{
+  "jsonrpc": "2.0",
+  "id": "positions-page-2",
+  "method": "query.execute",
+  "params": {
+    "query": "SELECT key.id AS id, beneficiary, amount FROM sample.positions ORDER BY amount DESC",
+    "limit": 2,
+    "offset": 2,
+    "timeout_ms": 500
+  }
+}
