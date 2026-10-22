@@ -1,5 +1,7 @@
 #include <sysio/outpost_solana_client_plugin/outpost_solana_client.hpp>
 
+#include <magic_enum/magic_enum.hpp>
+
 #include <algorithm>
 #include <cstring>
 #include <limits>
@@ -608,18 +610,17 @@ void assert_distribution_state_shape(const fc::network::solana::idl::program& pr
              distribution_state::field_liqsol_mint);
 }
 
-/// Assert the loaded IDL declares `GlobalState.wire_state` as an enum carrying
-/// `PostLaunch`. Full contract on the header declaration.
+/// Assert the loaded IDL declares the yield-crank fields with their
+/// expected types. Full contract on the header declaration.
 void assert_global_state_shape(const fc::network::solana::idl::program& program) {
    namespace idl = fc::network::solana::idl;
    const auto& fields = declared_account_fields(program, global_state::account_name);
-   // The emergency stop is optional -- a program that predates it declares none --
-   // but a declared one is read as a bool, so any other type is a drifted IDL.
-   for (const auto& field : fields) {
-      if (field.name != global_state::field_frozen) continue;
-      FC_ASSERT(field.type.is_primitive() && field.type.primitive == idl::primitive_type::bool_t,
+   for (const auto flag : {global_state::field_frozen, global_state::field_paused}) {
+      const auto field = std::ranges::find(fields, std::string_view{flag}, &idl::field::name);
+      FC_ASSERT(field != fields.end(), "GlobalState IDL missing '{}'; the yield crank gates on it", flag);
+      FC_ASSERT(field->type.is_primitive() && field->type.primitive == idl::primitive_type::bool_t,
                 "GlobalState '{}' must be declared bool, got '{}'; the yield crank gates on it",
-                global_state::field_frozen, describe_idl_type(field.type));
+                flag, describe_idl_type(field->type));
    }
    for (const auto& field : fields) {
       if (field.name != global_state::field_wire_state) continue;
@@ -643,14 +644,24 @@ void assert_global_state_shape(const fc::network::solana::idl::program& program)
              global_state::field_wire_state);
 }
 
+namespace {
+/// Fail closed unless the named GlobalState bool is explicitly false.
+bool global_state_flag_blocks_reporting(const fc::variant_object& row, const char* name) {
+   const auto flag = row.find(name);
+   return flag == row.end() || !flag->value().is_bool() || flag->value().as_bool();
+}
+} // namespace
+
 bool liq_outpost_frozen(const fc::variant_object& global_state_row) {
-   auto frozen = global_state_row.find(global_state::field_frozen);
-   if (frozen == global_state_row.end()) return false;   // the IDL declares no emergency stop
-   return !frozen->value().is_bool() || frozen->value().as_bool();
+   return global_state_flag_blocks_reporting(global_state_row, global_state::field_frozen);
+}
+
+bool liq_outpost_paused(const fc::variant_object& global_state_row) {
+   return global_state_flag_blocks_reporting(global_state_row, global_state::field_paused);
 }
 
 bool liq_yield_report_due(const fc::variant_object& global_state_row) {
-   if (liq_outpost_frozen(global_state_row)) return false;
+   if (liq_outpost_frozen(global_state_row) || liq_outpost_paused(global_state_row)) return false;
    auto state = global_state_row.find(global_state::field_wire_state);
    if (state == global_state_row.end() || !state->value().is_object()) return false;
    const auto& state_obj = state->value().get_object();
@@ -659,14 +670,20 @@ bool liq_yield_report_due(const fc::variant_object& global_state_row) {
           variant->value().as_string() == global_state::post_launch;
 }
 
-bool global_state_predates_freeze(const fc::network::solana::idl::program& program, size_t account_bytes) {
-   if (!program.find_account(global_state::account_name)) return false;
-   const auto& fields = declared_account_fields(program, global_state::account_name);
-   const bool declares_frozen = std::any_of(fields.begin(), fields.end(), [](const auto& field) {
-      return field.name == global_state::field_frozen;
-   });
-   return declares_frozen &&
-          account_bytes <= global_state::anchor_discriminator_bytes + global_state::pre_freeze_init_space;
+liq_yield_report_state drive_liq_yield_report(
+   const std::function<std::optional<fc::network::solana::account_info>()>& read_global_state,
+   const std::function<fc::variant(const std::vector<uint8_t>&)>& decode_global_state,
+   const std::function<void(const std::vector<fc::network::solana::instruction>&)>& report_yield) {
+   const auto info = read_global_state();
+   if (!info || info->data.empty()) return liq_yield_report_state::no_account;
+   const auto decoded = decode_global_state(info->data);
+   const auto& row = decoded.get_object();
+   if (liq_outpost_frozen(row)) return liq_yield_report_state::frozen;
+   if (liq_outpost_paused(row)) return liq_yield_report_state::paused;
+   if (!liq_yield_report_due(row)) return liq_yield_report_state::not_due;
+   report_yield({fc::network::solana::system::compute_budget::set_compute_unit_limit(
+      REPORT_LIQ_YIELD_COMPUTE_UNITS)});
+   return liq_yield_report_state::due;
 }
 
 fc::network::solana::account_overrides_t report_liq_yield_overrides(
@@ -1348,7 +1365,7 @@ outpost_solana_client::outpost_solana_client(
               to_string());
       }
       // The yield-report crank exists only where the program declares it. There,
-      // it gates on `GlobalState.wire_state` and derives its accounts from
+      // it gates on `GlobalState.wire_state`, `frozen` and `paused`, and derives its accounts from
       // `DistributionState`, so both declarations are boot-checked with it.
       if (_program_client->has_idl(REPORT_LIQ_YIELD_INSTRUCTION)) {
          FC_ASSERT(_program_client->get_program()->find_account(distribution_state::account_name),
@@ -1617,65 +1634,63 @@ void outpost_solana_client::crank_outpost(uint32_t epoch_index, fc::microseconds
    fc::task::deadline_scope rpc_deadline(deadline_abs);
    throw_if_past_deadline(deadline_abs, OP_REPORT_LIQ_YIELD);
 
-   // PostLaunch only: before the flip the pool's yield belongs to the pretoken
-   // accounting and the program refuses the crank, so the state is read first
-   // and nothing is paid for a refused tx.
+   // Fetch, decode and decide through the same path exercised by the crank tests.
    const auto global_state_pda =
       outpost_solana_client_detail::derive_liqsol_global_state_pda(_program_id);
-   const auto global_info = _entry->client->get_account_info(global_state_pda);
-   if (!global_info.has_value() || global_info->data.empty()) {
-      dlog("outpost_solana_client[{}]: no GlobalState at {} -- no liq yield to report",
-           to_string(), global_state_pda.to_string(fc::yield_function_t{}));
-      return;
+   const auto pda_label = global_state_pda.to_string(fc::yield_function_t{});
+   const auto state = outpost_solana_client_detail::drive_liq_yield_report(
+      [&] { return _entry->client->get_account_info(global_state_pda); },
+      [&](const std::vector<uint8_t>& data) {
+         try {
+            return _program_client->decode_account_info_data(
+               outpost_solana_client_detail::global_state::account_name, data);
+         } catch (const fc::exception& e) {
+            elog("outpost_solana_client[{}]: GlobalState at {} EXISTS ({} bytes) but this relay "
+                 "cannot decode it; refusing report_liq_yield -- check the loaded IDL against "
+                 "the deployed program: {}",
+                 to_string(), pda_label, data.size(), e.to_detail_string());
+            throw;
+         }
+      },
+      [&](const std::vector<fc::network::solana::instruction>& pre_instructions) {
+         const auto pool = syndicated_liq_pool();
+         if (!pool) return; // already logged: no pool, nothing to report
+         const auto hook = mint_transfer_hook_for(pool->liqsol_mint);
+         if (!hook) {
+            wlog("outpost_solana_client[{}]: liqSOL mint {} carries no transfer hook; report_liq_yield "
+                 "needs the hook's accounts and is skipped until the mint is fixed",
+                 to_string(), pool->liqsol_mint.to_string(fc::yield_function_t{}));
+            return;
+         }
+         throw_if_past_deadline(deadline_abs, OP_REPORT_LIQ_YIELD);
+         const auto overrides = outpost_solana_client_detail::report_liq_yield_overrides(
+            _program_id, pool->liqsol_mint, hook->program, _program_client->config_pda,
+            _program_client->outbound_message_buffer_pda);
+         const auto& instr = _program_client->get_idl(REPORT_LIQ_YIELD_INSTRUCTION);
+         // The instruction takes no arguments; the cranker is this operator's own key.
+         const fc::network::solana::program_invoke_data_items params;
+         const auto accounts = _program_client->resolve_accounts(instr, params, overrides);
+         const auto sig = _program_client->execute_tx_and_confirm(instr, accounts, params, pre_instructions);
+         ilog("outpost_solana_client[{}]: report_liq_yield sent for epoch {} sig={}",
+              to_string(), epoch_index, sig);
+      });
+   using report_state = outpost_solana_client_detail::liq_yield_report_state;
+   switch (state) {
+      case report_state::no_account:
+         dlog("outpost_solana_client[{}]: no GlobalState at {} -- no liq yield to report", to_string(), pda_label);
+         break;
+      case report_state::frozen:
+      case report_state::paused:
+         ilog("outpost_solana_client[{}]: outpost is {} (GlobalState.{}) -- report_liq_yield is "
+              "not sent for epoch {}",
+              to_string(), magic_enum::enum_name(state), magic_enum::enum_name(state), epoch_index);
+         break;
+      case report_state::not_due:
+         dlog("outpost_solana_client[{}]: outpost is not PostLaunch -- no liq yield to report", to_string());
+         break;
+      case report_state::due:
+         break;
    }
-   // A GlobalState still at the pre-freeze layout cannot carry the `frozen` the
-   // loaded IDL declares, so decoding it would run past its end; the program
-   // refuses the crank on it until `migrate_global_state_liq_fields` grows it.
-   if (outpost_solana_client_detail::global_state_predates_freeze(*_program_client->get_program(),
-                                                                  global_info->data.size())) {
-      wlog("outpost_solana_client[{}]: GlobalState at {} is {} bytes, the layout before the emergency "
-           "stop; report_liq_yield is not due until migrate_global_state_liq_fields grows it",
-           to_string(), global_state_pda.to_string(fc::yield_function_t{}), global_info->data.size());
-      return;
-   }
-   const auto  global_v   = _program_client->decode_account_info_data(
-      outpost_solana_client_detail::global_state::account_name, global_info->data);
-   const auto& global_row = global_v.get_object();
-   // The emergency stop: the program refuses `report_liq_yield` while it is set.
-   // An expected state (the andon playbook clears it), not a failed crank.
-   if (outpost_solana_client_detail::liq_outpost_frozen(global_row)) {
-      ilog("outpost_solana_client[{}]: outpost is frozen (GlobalState.frozen) -- report_liq_yield is "
-           "not sent for epoch {}",
-           to_string(), epoch_index);
-      return;
-   }
-   if (!outpost_solana_client_detail::liq_yield_report_due(global_row)) {
-      dlog("outpost_solana_client[{}]: outpost is not PostLaunch -- no liq yield to report",
-           to_string());
-      return;
-   }
-
-   const auto pool = syndicated_liq_pool();
-   if (!pool.has_value()) return;   // already logged: no pool, nothing to report
-   const auto hook = mint_transfer_hook_for(pool->liqsol_mint);
-   if (!hook.has_value()) {
-      wlog("outpost_solana_client[{}]: liqSOL mint {} carries no transfer hook; report_liq_yield "
-           "needs the hook's accounts and is skipped until the mint is fixed",
-           to_string(), pool->liqsol_mint.to_string(fc::yield_function_t{}));
-      return;
-   }
-
-   throw_if_past_deadline(deadline_abs, OP_REPORT_LIQ_YIELD);
-   const auto overrides = outpost_solana_client_detail::report_liq_yield_overrides(
-      _program_id, pool->liqsol_mint, hook->program, _program_client->config_pda,
-      _program_client->outbound_message_buffer_pda);
-   const auto& instr = _program_client->get_idl(REPORT_LIQ_YIELD_INSTRUCTION);
-   // The instruction takes no arguments; the cranker is this operator's own key.
-   const fc::network::solana::program_invoke_data_items params;
-   const auto accounts = _program_client->resolve_accounts(instr, params, overrides);
-   const auto sig      = _program_client->execute_tx_and_confirm(instr, accounts, params);
-   ilog("outpost_solana_client[{}]: report_liq_yield sent for epoch {} sig={}",
-        to_string(), epoch_index, sig);
 }
 
 std::string outpost_solana_client::deliver_outbound_envelope(
