@@ -157,16 +157,18 @@ namespace sysio {
       /// `MAX_OPERATOR_GROUPS` (8), and a window an outpost cannot seat stalls that outpost.
       static constexpr uint32_t MAX_BATCH_OP_GROUPS = 8;
 
-      /// Upper bound on `operators_per_epoch` (the size of one schedule group): Solana seats at most
-      /// `MAX_GROUP_MEMBERS` (16) per group. Each member of the expiring group also costs inline actions
-      /// in `advance` (opreg::recorddel + opreg::termcheck per outpost, and a sysio.system::payepoch
-      /// transfer).
-      static constexpr uint32_t MAX_OPERATORS_PER_EPOCH = 16;
+      /// Upper bound on `operators_per_epoch` (the size of one schedule group): Ethereum's OPPInbound is
+      /// sized and tested for `OPERATORS_PER_GROUP` (7), under Solana's `MAX_GROUP_MEMBERS` (16). Each
+      /// member of the expiring group also costs inline actions in `advance` (opreg::recorddel +
+      /// opreg::termcheck per outpost, and a sysio.system::payepoch transfer).
+      static constexpr uint32_t MAX_OPERATORS_PER_EPOCH = 7;
 
       /// Largest schedule window (operators_per_epoch * batch_op_groups, which the product equality pins
-      /// `batch_operator_minimum_active` to), matching Solana's `MAX_OPERATORS` (128) registry. The OPERATORS
-      /// roster and the BatchOperatorGroups attestation list only the window, so this also bounds both
-      /// (about 13 KB of roster at the ceiling).
+      /// `batch_operator_minimum_active` to). The OPERATORS roster and the BatchOperatorGroups attestation
+      /// list only the window, so this also bounds both (about 5.6 KB of roster at the ceiling). Ethereum
+      /// applies the roster in one handler call, so it must fit one transaction: at 8 x 7, with 49 operators
+      /// Ethereum has never seen, it takes about 9.3M gas (12.4M with the outbound queue full) of EIP-7825's
+      /// 16,777,216, while 8 x 16 runs the handler out of gas (WIRE-342).
       static constexpr uint32_t MAX_SCHEDULED_BATCH_OPERATORS = MAX_BATCH_OP_GROUPS * MAX_OPERATORS_PER_EPOCH;
 
    private:

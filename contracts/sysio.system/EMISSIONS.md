@@ -103,9 +103,9 @@ ordinary payment period to at most ten immutable roster snapshots. It also
 validates `pay_cadence_epochs * operators_per_epoch <= 100`, a conservative
 ceiling on expensive per-recipient credits that limits peak work in the
 mandatory `advance` transaction; `sysio.epoch` enforces the same constraint when
-its operator count changes. With the default 7-operator groups the ten-snapshot
-bound is the limit (an hour at six-minute epochs); the largest group `setconfig`
-accepts, 16 operators, allows a cadence of at most 6. When
+its operator count changes. The largest group `setconfig` accepts is 7 operators,
+so the ten-snapshot bound is the limit (an hour at six-minute epochs, 70
+credits). When
 `sysio.epoch` reads an older serialized configuration during an upgrade, it
 effectively shortens the cadence to satisfy both bounds; the stored value is not
 rewritten until a normal `setemitcfg` update. `payepoch` independently refuses

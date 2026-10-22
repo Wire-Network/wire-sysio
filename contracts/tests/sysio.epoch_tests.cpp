@@ -196,24 +196,24 @@ BOOST_FIXTURE_TEST_CASE(setconfig_total_check_survives_uint32_wrap, sysio_epoch_
 
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_oversized_operators_per_epoch, sysio_epoch_tester) { try {
    // Group size drives advance()'s per-epoch inline fanout and vector reserves,
-   // and Solana seats at most 16 per group, so it carries a bound independent of
+   // and Ethereum is sized for 7 per group, so it carries a bound independent of
    // the product equality: a window of UINT32_MAX operators in one group is
    // internally consistent (UINT32_MAX * 1 == UINT32_MAX) yet must be rejected.
-   BOOST_REQUIRE_EQUAL(success(), setconfig(360, 16, 16, 1));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(360, 7, 7, 1));
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: operators_per_epoch exceeds the outpost group-size ceiling (16)"),
-      setconfig(360, 17, 17, 1)
+      error("assertion failure with message: operators_per_epoch exceeds the outpost group-size ceiling (7)"),
+      setconfig(360, 8, 8, 1)
    );
    BOOST_REQUIRE_EQUAL(
-      error("assertion failure with message: operators_per_epoch exceeds the outpost group-size ceiling (16)"),
+      error("assertion failure with message: operators_per_epoch exceeds the outpost group-size ceiling (7)"),
       setconfig(360, 0xFFFF'FFFFu, 0xFFFF'FFFFu, 1)
    );
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_accepts_the_largest_schedule_window, sysio_epoch_tester) { try {
-   // 8 groups of 16 is the largest window an outpost seats (Solana's 128-operator
-   // registry). The two per-factor ceilings bound the window, so it needs none of its own.
-   BOOST_REQUIRE_EQUAL(success(), setconfig(360, 16, 128, 8));
+   // 8 groups of 7 is the largest window the outposts take. The two per-factor ceilings
+   // bound the window, so it needs none of its own.
+   BOOST_REQUIRE_EQUAL(success(), setconfig(360, 7, 56, 8));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(regchain_basic, sysio_epoch_tester) { try {
