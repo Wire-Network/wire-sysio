@@ -366,7 +366,6 @@ public:
    ~continuation_json_rpc_server() {
       _stop = true;
       boost::system::error_code error;
-      _acceptor.close(error);
       {
          std::scoped_lock lock(_socket_mutex);
          if (_active_socket) {
@@ -377,6 +376,8 @@ public:
       unblock_accept();
       if (_worker.joinable())
          _worker.join();
+      // Asio acceptors are not thread-safe: close only once the worker no longer touches it.
+      _acceptor.close(error);
    }
 
    /** Return the loopback URL selected for this endpoint. */
@@ -481,8 +482,6 @@ private:
          }
       }
 
-      boost::system::error_code error;
-      _acceptor.close(error);
       std::scoped_lock lock(_socket_mutex);
       _active_socket.reset();
    }
