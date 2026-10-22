@@ -66,11 +66,12 @@ a claim needs `require_auth(account_name)`, `sysio.roa` forces
 carries a contract that could emit the claim inline. They are protocol-owned
 holding accounts with no code, so the notify-handler risk does not apply.
 
-Producer pay is per block produced: the active slice of the producer pool is
-divided by the period's nominal slot count, raised to the blocks actually
-produced when a period runs long, and each producer is paid for the blocks it
-made, at most one round per rotation of the schedule (a switch that hands a
-producer a second round in the same rotation does not pay it twice). Standbys
+Producer pay is per counted block. `onblock` counts the blocks a producer makes,
+at most one round per rotation of the schedule (a switch that hands a producer a
+second round in the same rotation does not count it). The active slice of the
+producer pool is divided by the period's nominal slot count, raised to the
+blocks counted when a period runs long, and each producer is paid for its
+counted blocks. Standbys
 draw from a separate slice, at a rank-decreasing weight, and are
 not paid per block. Batch-op pay is weighted by the roster captured for each
 accrued epoch, then split evenly across all

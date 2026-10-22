@@ -193,23 +193,23 @@ again and frees the registration slot it held. Only votes that reach quorum are
 credited, so registering alone earns nothing. The credit is a rating of the CURRENT pay period and
 is stamped with it, so it expires at the period boundary rather than being consumed when you leave:
 attestations you earned this period still count if you park and come back inside it, and none of
-them survive into the next one. Blocks you have already produced behave the opposite way, because
-they are earnings rather than a rating.
+them survive into the next one. Blocks already counted toward your pay behave the opposite way,
+because they are earnings rather than a rating.
 
 ## Getting paid
 
-Producers are paid **per block produced**. Each block earns the same rate, computed as the active
-share of the producer pool divided by the period's slot count. A block you miss is simply not paid,
-and that pay stays in the treasury rather than being handed to whoever did produce. At most one
-round per rotation of the schedule is paid: if a schedule change gives you a second round in the
-same rotation, its blocks are not.
+Producers are paid **per counted block**. A block you produce is counted, but only one round per
+rotation of the schedule counts: if a schedule change gives you a second round in the same
+rotation, its blocks are not counted. Each counted block earns the same rate, computed as the
+active share of the producer pool divided by the period's slot count. A block you miss is never
+counted, and that pay stays in the treasury rather than being handed to whoever did produce.
 
 Positions 22 and beyond, up to a configured end rank, are **standbys**. They draw a retainer from a
 separate slice of the pool, decaying linearly with position, so the network keeps a ready bench.
 
-Blocks you have produced are not forfeited. If you are not payable when a payout runs — parked,
-demoted, or temporarily under-collateralized — your block count is held rather than cleared, and it
-is paid at the first payout after you are payable again. Unregistering right after producing and
+Counted blocks are not forfeited. If you are not payable when a payout runs — parked, demoted, or
+temporarily under-collateralized — your count is held rather than cleared, and it is paid at the
+first payout after you are payable again. Unregistering right after producing and
 re-registering before your next round costs you nothing provided you still meet the admission
 requirements; if governance raised a collateral minimum while you were parked, top up first.
 

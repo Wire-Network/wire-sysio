@@ -166,12 +166,12 @@ namespace sysiosystem {
       uint64_t                                                 rank_score = producer_rank::unscored();
       bool                                                     is_active = true;
       std::string                                              url;
-      /// Blocks produced and not yet paid -- the ONE pay input. `payepoch` credits every block at
+      /// Blocks counted and not yet paid -- the ONE pay input. `payepoch` credits every block at
       /// the period's per-block rate and zeroes the count of every producer it pays; a block the
       /// producer's slot did not deliver is simply never counted, so its pay stays in the treasury.
       /// At most one round per rotation is counted; see `last_paid_round`.
       /// The count SURVIVES a park, a demotion, or a lost key: a producer that is not schedulable
-      /// at a payepoch is neither paid nor reset, and whatever it made is paid at the first
+      /// at a payepoch is neither paid nor reset, and whatever was counted is paid at the first
       /// payepoch where it is schedulable again (never, for a slashed or terminated one).
       uint32_t                                                 unpaid_blocks = 0;
       time_point                                               last_claim_time;
@@ -200,7 +200,9 @@ namespace sysiosystem {
       uint32_t                                                 snapshot_period = 0;
       /// The round (block slot / 12) whose blocks `onblock` last counted toward `unpaid_blocks`, 0
       /// for never. It counts one round per rotation (round / schedule size), so a schedule switch
-      /// that hands a producer a second round in one rotation does not pay it twice.
+      /// that hands a producer a second round in one rotation does not pay it twice. Rotations use
+      /// the current size, so a size change, rare once the schedule reaches 21, can count a round
+      /// more or less.
       ///
       /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE below.
       uint32_t                                                 last_paid_round = 0;
