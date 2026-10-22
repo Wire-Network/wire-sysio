@@ -426,7 +426,7 @@ constexpr size_t   MAX_GENERAL_ATTESTATION_DATA_BYTES =
 
 /// Mirrors of the window ceilings `sysio.epoch::setconfig` enforces in `sysio.epoch.hpp`.
 constexpr uint32_t MAX_BATCH_OP_GROUPS     = 8;
-constexpr uint32_t MAX_OPERATORS_PER_EPOCH = 16;
+constexpr uint32_t MAX_OPERATORS_PER_EPOCH = 7;
 
 /// `register_outpost(CHAIN_KIND_SVM, ...)` registers the spelling `"SOL"`.
 constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
@@ -841,7 +841,7 @@ BOOST_FIXTURE_TEST_CASE(buildenv_ships_only_its_own_outposts_rows, sysio_msgch_e
 
 /// WIRE-415: the largest window's schedule rows fit SCHEDULE_LANE_BYTES, so a general row at
 /// MAX_GENERAL_ATTESTATION_DATA_BYTES always ships beside them. Built at the extremes `sysio.epoch` allows:
-/// 8 groups of 16, 13-character names, and an EVM and an SVM link on every operator.
+/// 8 groups of 7, 13-character names, and an EVM and an SVM link on every operator.
 BOOST_AUTO_TEST_CASE(the_largest_windows_schedule_fits_its_lane_budget) { try {
    constexpr size_t EVM_KEY_BYTES = 33;   // a compressed EM key, as authex stores it
    constexpr size_t SVM_KEY_BYTES = 32;   // an ED key

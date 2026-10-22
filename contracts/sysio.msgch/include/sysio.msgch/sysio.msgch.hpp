@@ -72,7 +72,8 @@ namespace sysio {
 
       /// Most envelope bytes one epoch's schedule-lane rows take, counted as `buildenv` estimates them
       /// (`data` plus ATTESTATION_OVERHEAD_BYTES each). The largest window's OPERATORS and
-      /// BATCH_OPERATOR_GROUPS come to about 15.4 KB; 24 KiB also matches Solana's OPERATORS payload cap.
+      /// BATCH_OPERATOR_GROUPS come to about 6.8 KB, and 15.4 KB even at Solana's 16 per group; 24 KiB also
+      /// matches Solana's OPERATORS payload cap.
       static constexpr size_t SCHEDULE_LANE_BYTES = 24 * 1024;
 
       /// Largest general-lane `data` that fits beside a full schedule lane, which every envelope carries
