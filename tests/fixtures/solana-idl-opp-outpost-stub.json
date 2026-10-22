@@ -616,12 +616,65 @@
         "kind": "struct",
         "fields": [
           {
+            "name": "layout_version",
+            "type": "u64"
+          },
+          {
+            "name": "yield_index_remainder",
+            "type": "u64"
+          },
+          {
             "name": "paused",
             "type": "bool"
           },
           {
+            "name": "total_staked_liqsol",
+            "type": "u64"
+          },
+          {
+            "name": "total_purchased_liqsol",
+            "type": "u64"
+          },
+          {
+            "name": "total_shares",
+            "type": "u64"
+          },
+          {
+            "name": "protocol_shares",
+            "type": "u64"
+          },
+          {
+            "name": "current_index",
+            "type": "u64"
+          },
+          {
+            "name": "expected_pool_balance",
+            "type": "u64"
+          },
+          {
             "name": "yield_accumulated_liqsol",
             "type": "u64"
+          },
+          {
+            "name": "liq_sequence",
+            "type": "u64"
+          },
+          {
+            "name": "liq_yield_reported",
+            "type": "u64"
+          },
+          {
+            "name": "frozen",
+            "type": "bool"
+          },
+          {
+            "name": "_reserved",
+            "type": {
+              "array": [
+                "u8",
+                23
+              ]
+            }
           },
           {
             "name": "wire_state",
@@ -634,14 +687,6 @@
           {
             "name": "bump",
             "type": "u8"
-          },
-          {
-            "name": "liq_sequence",
-            "type": "u64"
-          },
-          {
-            "name": "liq_yield_reported",
-            "type": "u64"
           }
         ]
       }
