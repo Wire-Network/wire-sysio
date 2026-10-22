@@ -477,11 +477,13 @@ job calls `crank_outpost`. On Solana that is liqsol-core's permissionless
 `report_liq_yield`: it claims the syndicated pool's pending rewards and reports the delta
 since the previous report as one `LIQ_YIELD` attestation (a no-op on chain when nothing
 new was claimed). The relay reads `GlobalState` first and submits only when it is
-PostLaunch and its emergency stop (`frozen`) is clear -- a frozen outpost is logged at
-info and skipped. The current 123-byte account keeps `liq_sequence`,
-`liq_yield_reported`, and `frozen` inside retired reserved bytes, so no account growth is
-required. The relay decodes that layout through the loaded IDL; a bad discriminator,
-truncated data, or invalid field encoding fails before any transaction is built. It derives
+PostLaunch, its emergency stop (`frozen`) is clear, and `paused` is false. Frozen or
+paused outposts are logged at info and skipped. The relay decodes `GlobalState` through
+the loaded IDL, which must declare bool `frozen` and `paused` fields (checked at startup);
+a bad discriminator, truncated data or an invalid field fails the crank before any
+transaction is built. Decode failures identify the PDA and account length so an IDL/program
+mismatch can be diagnosed. Reports request 800,000 compute units, matching liqsol-core's
+`executeReportLiqYield` helper. The relay derives
 every account of the instruction (`report_liq_yield_overrides`),
 signs with the operator's Solana key, and skips on a program that does not declare the
 instruction. A failed crank is logged by the job and retried with the next epoch's
