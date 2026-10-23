@@ -76,11 +76,10 @@ void log_non_default_options(const std::vector<bpo::basic_option<char>>& options
    string result;
    for (const auto& op : options) {
       bool mask = false;
-      if (op.string_key == "peer-private-key"s
-          || op.string_key == "p2p-auto-bp-peer"s
-          || op.string_key == "status-monitor-password"s) {
+      if (op.string_key == "peer-private-key"s || op.string_key == "p2p-auto-bp-peer"s ||
+          op.string_key == "alert-monitor-password"s || op.string_key == "alert-monitor-query"s) {
          mask = true;
-          }
+      }
       std::string v;
       for (auto i = op.value.cbegin(), b = op.value.cbegin(), e = op.value.cend(); i != e; ++i) {
          if (i != b)

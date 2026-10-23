@@ -40,7 +40,7 @@ returned `handle` for the lifetime of its subscription or registration.
 | `compat::channels::transaction_ack` | `std::pair<fc::exception_ptr, packed_transaction_ptr>` | `producer_plugin` after a speculative transaction is applied or rejected, and `chain_plugin`'s transaction-retry database | `low` |
 
 `irreversible_block` is the one most non-chain plugins consume: `batch_operator_plugin` subscribes to it as
-its sync gate, arming its work only once the node has caught up, and `status_monitor_plugin` renders one
+its sync gate, arming its work only once the node has caught up, and `alert_monitor_plugin` renders one
 document per irreversible block. `net_plugin` subscribes to `compat::channels::transaction_ack` so it can relay or drop a peer's
 transaction according to the result.
 
@@ -113,6 +113,6 @@ to the ack channel. Both run under their own plugin's test target.
 - `net_plugin` — subscribes to `transaction_ack`, and feeds every transaction it accepts from a peer into
   `transaction_async` via `chain_plugin::accept_transaction`.
 - `batch_operator_plugin` — subscribes to `irreversible_block` as its sync gate.
-- `status_monitor_plugin` — subscribes to `irreversible_block` to ship one snapshot per irreversible block.
+- `alert_monitor_plugin` — subscribes to `irreversible_block` to ship one snapshot per irreversible block.
 - [`plugins/usage_pattern.md`](../usage_pattern.md) — when to connect, register, and release these handles
   across the appbase lifecycle.
