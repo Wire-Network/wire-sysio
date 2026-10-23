@@ -33,7 +33,7 @@ public:
       BOOST_REQUIRE( accnt != nullptr );
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
-      abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+      abi_ser.set_abi(abi, fixture_abi_yield_function());
    }
 
    action_result push_action( const account_name& signer, const action_name &name, const variant_object &data ) {
@@ -42,7 +42,7 @@ public:
       action act;
       act.account = "sysio.token"_n;
       act.name    = name;
-      act.data    = abi_ser.variant_to_binary( action_type_name, data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+      act.data    = abi_ser.variant_to_binary( action_type_name, data, fixture_abi_yield_function() );
 
       return base_tester::push_action( std::move(act), signer.to_uint64_t() );
    }
@@ -52,7 +52,7 @@ public:
       auto symb = sysio::chain::symbol::from_string(symbolname);
       auto symbol_code = symb.to_symbol_code().value;
       vector<char> data = get_row_by_account( "sysio.token"_n, name(symbol_code), "stat"_n, account_name(symbol_code) );
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "currency_stats", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "currency_stats", data, fixture_abi_yield_function() );
    }
 
    fc::variant get_account( account_name acc, const string& symbolname)
@@ -60,7 +60,7 @@ public:
       auto symb = sysio::chain::symbol::from_string(symbolname);
       auto symbol_code = symb.to_symbol_code().value;
       vector<char> data = get_row_by_account( "sysio.token"_n, acc, "accounts"_n, account_name(symbol_code) );
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "account", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "account", data, fixture_abi_yield_function() );
    }
 
    action_result create( account_name issuer,

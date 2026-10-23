@@ -21,12 +21,12 @@ struct finalizer_key_tester : sysio_system_tester {
 
    fc::variant get_finalizer_key_info( uint64_t id ) {
       vector<char> data = get_row_by_id( config::system_account_name, config::system_account_name, "finkeys"_n, id );
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "finalizer_key_info", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "finalizer_key_info", data, fixture_abi_yield_function() );
    }
 
    fc::variant get_finalizer_info( const account_name& act ) {
       vector<char> data = get_row_by_account( config::system_account_name, config::system_account_name, "finalizers"_n, act );
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "finalizer_info", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "finalizer_info", data, fixture_abi_yield_function() );
    }
 
    std::vector<finalizer_auth_info> get_last_prop_finalizers_info() {

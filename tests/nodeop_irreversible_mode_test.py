@@ -8,6 +8,7 @@ import subprocess
 import shutil
 
 from TestHarness import Cluster, Node, ReturnType, TestHelper, Utils, WalletMgr, CORE_SYMBOL
+from nodeop_irreversible_mode_progress import waitForHeadLibAndForkDbHeadToAdvance
 
 ###############################################################
 # nodeop_irreversible_mode_test
@@ -81,11 +82,11 @@ def waitForBlksProducedAndLibAdvanced(nodeToWatch=None):
 
 # Ensure that the relaunched node received blks from producers, in other words head and lib is advancing
 def ensureHeadLibAndForkDbHeadIsAdvancing(nodeToTest):
-   head, lib, forkDbHead = getHeadLibAndForkDbHead(nodeToTest)
-   waitForBlksProducedAndLibAdvanced(nodeToTest)
-   headAfterWaiting, libAfterWaiting, forkDbHeadAfterWaiting = getHeadLibAndForkDbHead(nodeToTest)
-   assert headAfterWaiting > head and libAfterWaiting > lib and forkDbHeadAfterWaiting > forkDbHead, \
-      "Either Head ({} -> {})/ Lib ({} -> {})/ Fork Db Head ({} -> {}) is not advancing".format(head, headAfterWaiting, lib, libAfterWaiting, forkDbHead, forkDbHeadAfterWaiting)
+   """Wait for one coherent sample in which head, LIB, and fork-db head have all advanced."""
+   waitForHeadLibAndForkDbHeadToAdvance(
+      lambda: getHeadLibAndForkDbHead(nodeToTest),
+      Utils.waitForBool,
+      libAdvanceTimeout())
 
 # Confirm the head lib and fork db of irreversible mode
 # Under any condition of irreversible mode:
