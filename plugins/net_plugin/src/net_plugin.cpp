@@ -647,10 +647,6 @@ namespace sysio {
       size_t get_block_sync_bytes_sent() const { return block_sync_total_bytes_sent.load(); }
       bool get_block_sync_throttling() const { return block_sync_throttling.load(); }
       boost::asio::ip::port_type get_remote_endpoint_port() const { return remote_endpoint_port.load(); }
-      void set_heartbeat_timeout(std::chrono::milliseconds msec) {
-         hb_timeout = msec;
-      }
-
       uint64_t get_peer_ping_time_ns() const { return peer_ping_time_ns; }
 
       int32_t get_peer_score() const { return peer_score_.get(); }
@@ -790,7 +786,8 @@ namespace sysio {
       /** @} */
       // timestamp for the lastest message
       std::chrono::steady_clock::time_point       latest_msg_time{std::chrono::steady_clock::time_point::min()};
-      std::chrono::milliseconds                   hb_timeout{std::chrono::milliseconds{def_keepalive_interval}};
+      /// Both connection constructors inherit the configured timeout before any asynchronous session work starts.
+      const std::chrono::milliseconds             hb_timeout{my_impl->connections.get_heartbeat_timeout()};
       std::chrono::steady_clock::time_point       latest_blk_time{std::chrono::steady_clock::time_point::min()};
 
       bool connected() const;
@@ -5119,7 +5116,6 @@ namespace sysio {
          resolver->async_resolve(host, port, boost::asio::bind_executor(c->strand,
             [resolver, c, host, port]
             ( const boost::system::error_code& err, const tcp::resolver::results_type& results ) {
-               c->set_heartbeat_timeout( my_impl->connections.get_heartbeat_timeout() );
                if( !err ) {
                   c->connect( results );
                } else {

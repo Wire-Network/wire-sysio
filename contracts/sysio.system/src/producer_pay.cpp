@@ -37,9 +37,20 @@ namespace sysiosystem {
        */
       // Pay is per block: count it. payepoch credits every counted block at the period's rate and
       // zeroes the count; a block this producer's slot did not deliver is simply never counted.
+      // Only one round per rotation counts: a schedule switch can hand a producer a second round
+      // in the same rotation, and paying it would let a reorder pay one producer twice.
       auto key = producer_key_t{producer.value};
       if ( _producers.contains(key) ) {
-         _producers.modify( same_payer, key, []( auto& p ) { p.unpaid_blocks++; });
+         const uint32_t round = timestamp.slot / blocks_per_round;
+         _producers.modify( same_payer, key, [&]( auto& p ) {
+            if( p.last_paid_round != round ) {
+               const auto rotation =
+                  std::max<uint32_t>( static_cast<uint32_t>( sysio::get_active_producers().size() ), 1 );
+               if( p.last_paid_round != 0 && p.last_paid_round / rotation == round / rotation ) return;
+               p.last_paid_round = round;
+            }
+            p.unpaid_blocks++;
+         });
       }
 
       // Attribute the rounds nobody produced. This must happen on every block: the count above
