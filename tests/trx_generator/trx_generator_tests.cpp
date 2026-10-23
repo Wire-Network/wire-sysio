@@ -250,6 +250,32 @@ struct mock_trx_generator {
    }
 };
 
+/** A mock generator whose send number `late_call` takes `delay` to return. */
+struct late_mock_trx_generator {
+   std::vector<fc::time_point> _calls;
+   size_t _late_call;
+   std::chrono::microseconds _delay;
+
+   bool setup() { return true; }
+   bool tear_down() { return true; }
+   bool stop_on_trx_fail() { return false; }
+
+   bool generate_and_send() {
+      _calls.push_back(fc::time_point::now());
+      if (_calls.size() - 1 == _late_call)
+         std::this_thread::sleep_for(_delay);
+      return true;
+   }
+
+   late_mock_trx_generator(size_t expected_num_calls, size_t late_call, std::chrono::microseconds delay)
+       : _late_call(late_call), _delay(delay) {
+      _calls.reserve(expected_num_calls);
+   }
+};
+
+// fc::time_point::now() is the wall clock, so timing checks allow it to step back by this much.
+constexpr int64_t wall_clock_tolerance_us = 2000;
+
 BOOST_AUTO_TEST_SUITE(trx_generator_tests)
 
 BOOST_AUTO_TEST_CASE(tps_short_run_low_tps)
@@ -257,25 +283,64 @@ BOOST_AUTO_TEST_CASE(tps_short_run_low_tps)
    constexpr uint32_t test_duration_s = 5;
    constexpr uint32_t test_tps = 5;
    constexpr uint32_t expected_trxs = test_duration_s * test_tps;
-   constexpr uint64_t expected_runtime_us = test_duration_s * 1000000;
-   constexpr uint64_t allowable_runtime_deviation_per = 20;
-   constexpr uint64_t allowable_runtime_deviation_us = expected_runtime_us / allowable_runtime_deviation_per;
-   constexpr int64_t minimum_runtime_us = expected_runtime_us - allowable_runtime_deviation_us;
-   constexpr int64_t maximum_runtime_us = expected_runtime_us + allowable_runtime_deviation_us;
+   constexpr int64_t interval_us = std::chrono::microseconds(1s).count() / test_tps;
 
    std::shared_ptr<mock_trx_generator> generator = std::make_shared<mock_trx_generator>(expected_trxs);
    std::shared_ptr<simple_tps_monitor> monitor = std::make_shared<simple_tps_monitor>(expected_trxs);
 
    trx_tps_tester<mock_trx_generator, simple_tps_monitor> t1(generator, monitor, {test_duration_s, test_tps});
 
-   fc::time_point start = fc::time_point::now();
-   t1.run();
-   fc::time_point end = fc::time_point::now();
-   fc::microseconds runtime_us = end.time_since_epoch() - start.time_since_epoch();
-
+   BOOST_REQUIRE(t1.run());
    BOOST_REQUIRE_EQUAL(generator->_calls.size(), expected_trxs);
-   BOOST_REQUIRE_GT(runtime_us.count(), minimum_runtime_us);
-   BOOST_REQUIRE_LT(runtime_us.count(), maximum_runtime_us);
+   BOOST_REQUIRE_EQUAL(monitor->_calls.size(), expected_trxs);
+   const auto start = monitor->_calls.front().start_time;
+   for (uint32_t index = 0; index < expected_trxs; ++index) {
+      const auto& stats = monitor->_calls[index];
+      // Send k is due at start + k intervals (anchored, so a late send does not shift the rest; see
+      // tps_catches_up_after_late_send). Being late is the scheduler's business; being early is a bug.
+      BOOST_CHECK_EQUAL((stats.start_time - start).count(), 0);
+      BOOST_CHECK_EQUAL(stats.trx_interval.count(), interval_us);
+      BOOST_CHECK_EQUAL((stats.next_run - start).count(), (index + 1) * interval_us);
+      BOOST_CHECK_EQUAL((stats.expected_end_time - start).count(), test_duration_s * std::chrono::microseconds(1s).count());
+      BOOST_CHECK_EQUAL(stats.trxs_sent, index + 1);
+      BOOST_CHECK_EQUAL(stats.trxs_left, expected_trxs - index - 1);
+      BOOST_CHECK_GE((generator->_calls[index] - start).count(), index * interval_us - wall_clock_tolerance_us);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(tps_catches_up_after_late_send)
+{
+   constexpr uint32_t test_duration_s = 2;
+   constexpr uint32_t test_tps = 5;
+   constexpr uint32_t expected_trxs = test_duration_s * test_tps;
+   constexpr int64_t interval_us = std::chrono::microseconds(1s).count() / test_tps;
+   constexpr uint32_t late_call = 1;
+   constexpr int64_t late_intervals = 4;
+
+   // Send 1 takes 4 intervals, so sends 2..4 are already overdue when they come up: an anchored schedule sends them
+   // without sleeping (negative time to next) instead of pushing every later send back by 4 intervals.
+   auto generator = std::make_shared<late_mock_trx_generator>(expected_trxs, late_call,
+                                                              std::chrono::microseconds(late_intervals * interval_us));
+   auto monitor = std::make_shared<simple_tps_monitor>(expected_trxs);
+   trx_tps_tester<late_mock_trx_generator, simple_tps_monitor> t1(generator, monitor, {test_duration_s, test_tps});
+
+   BOOST_REQUIRE(t1.run());
+   BOOST_REQUIRE_EQUAL(generator->_calls.size(), expected_trxs);
+   BOOST_REQUIRE_EQUAL(monitor->_calls.size(), expected_trxs);
+   const auto start = monitor->_calls.front().start_time;
+   for (uint32_t index = late_call; index < late_call + late_intervals - 1; ++index) {
+      BOOST_TEST_CONTEXT("send " << index) {
+         BOOST_CHECK_EQUAL((monitor->_calls[index].next_run - start).count(), (index + 1) * interval_us);
+         // The monitor sees each send's time to next one send later.
+         BOOST_CHECK_LT(monitor->_calls[index + 1].time_to_next_trx_us, 0);
+      }
+   }
+   for (uint32_t index = 0; index < expected_trxs; ++index) {
+      BOOST_CHECK_GE((generator->_calls[index] - start).count(), index * interval_us - wall_clock_tolerance_us);
+   }
+   // The overdue sends go out back to back: together they take less than one interval.
+   BOOST_CHECK_LT((generator->_calls[late_call + late_intervals - 1] - generator->_calls[late_call + 1]).count(),
+                  interval_us);
 }
 
 BOOST_AUTO_TEST_CASE(tps_short_run_high_tps)
