@@ -82,7 +82,7 @@ public:
       BOOST_REQUIRE(accnt != nullptr);
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
-      abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function(abi_serializer_max_time));
+      abi_ser.set_abi(std::move(abi), fixture_abi_yield_function());
    }
 
    action_result push_action(name signer, name action_name, const variant_object& data) {

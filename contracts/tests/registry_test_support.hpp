@@ -97,7 +97,7 @@ fc::variant binding(Tester& tester, std::string_view chain_code, std::string_vie
    for (; it != index.end() && it->code == tokens && it->table_id == table; ++it) {
       std::vector<char> raw(it->value.begin(), it->value.end());
       auto row = ser.binary_to_variant(binding_row_type, raw,
-         abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
+         Tester::fixture_abi_yield_function());
       if (row[field::chain_code].template as<fc::slug_name>() == fc::slug_name{chain_code} &&
           row[field::token_code].template as<fc::slug_name>() == fc::slug_name{token_code}) return row;
    }
@@ -154,11 +154,11 @@ void make_inactive(Tester& tester) {
          std::vector<char> raw(it->value.begin(), it->value.end());
          const auto row_type = ser.get_table_type(table.to_string());
          const auto row = ser.binary_to_variant(row_type, raw,
-            abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
+            Tester::fixture_abi_yield_function());
          const auto inactive = fc::mutable_variant_object(row.get_object())
             (field::active, false)(field::activated_at_ms, uint64_t{0});
          const auto encoded = ser.variant_to_binary(row_type, inactive,
-            abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
+            Tester::fixture_abi_yield_function());
          db.modify(*it, [&](auto& object) { object.value.assign(encoded.data(), encoded.size()); });
       }
    }

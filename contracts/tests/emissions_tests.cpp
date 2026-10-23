@@ -300,7 +300,7 @@ public:
          BOOST_REQUIRE( accnt != nullptr );
          abi_def abi;
          BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(accnt->abi, abi), true );
-         roa_abi_ser.set_abi( abi, abi_serializer::create_yield_function(abi_serializer_max_time) );
+         roa_abi_ser.set_abi( abi, fixture_abi_yield_function() );
       }
 
       // --- sysio.token setup (only create the account if it doesn't exist) ---
@@ -328,7 +328,7 @@ public:
          BOOST_REQUIRE( accnt != nullptr );
          abi_def abi;
          BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(accnt->abi, abi), true );
-         token_abi_ser.set_abi( abi, abi_serializer::create_yield_function(abi_serializer_max_time) );
+         token_abi_ser.set_abi( abi, fixture_abi_yield_function() );
       }
 
       // --- Ensure WIRE exists + fund sysio for claim transfers ---
@@ -389,14 +389,14 @@ public:
          BOOST_REQUIRE( accnt != nullptr );
          abi_def abi;
          BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(accnt->abi, abi), true );
-         opreg_abi_ser.set_abi( abi, abi_serializer::create_yield_function(abi_serializer_max_time) );
+         opreg_abi_ser.set_abi( abi, fixture_abi_yield_function() );
       }
       {
          const auto* accnt = control->find_account_metadata( EPOCH );
          BOOST_REQUIRE( accnt != nullptr );
          abi_def abi;
          BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(accnt->abi, abi), true );
-         epoch_abi_ser.set_abi( abi, abi_serializer::create_yield_function(abi_serializer_max_time) );
+         epoch_abi_ser.set_abi( abi, fixture_abi_yield_function() );
       }
 
       // --- Set default emission configuration ---
@@ -441,7 +441,7 @@ protected:
       BOOST_REQUIRE( accnt != nullptr );
       abi_def abi;
       BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(accnt->abi, abi), true );
-      sysio_abi_ser.set_abi( abi, abi_serializer::create_yield_function(abi_serializer_max_time) );
+      sysio_abi_ser.set_abi( abi, fixture_abi_yield_function() );
    }
 
 public:
@@ -573,7 +573,7 @@ public:
    void set_legacy_emitcfg_cadence_raw( uint16_t cadence ) {
       const auto bytes = sysio_abi_ser.variant_to_binary(
          "emission_config", default_emit_cfg(cadence),
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
 
       char key_buf[chain::kv_pri_key_size];
       chain::kv_encode_be64(key_buf, "emitcfg"_n.to_uint64_t());
@@ -639,7 +639,7 @@ public:
       act.name    = action_name;
       act.data    = sysio_abi_ser.variant_to_binary(
          sysio_abi_ser.get_action_type(action_name), data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
 
       signed_transaction trx;
       trx.actions.emplace_back(std::move(act));
@@ -707,14 +707,14 @@ public:
                                      "nodecount"_n);
       if (data.empty()) return fc::variant();
       return sysio_abi_ser.binary_to_variant("node_count_state", data,
-          abi_serializer::create_yield_function(abi_serializer_max_time));
+          fixture_abi_yield_function());
    }
 
    fc::variant get_blocklog_row(uint64_t epoch_index) {
       auto data = get_row_by_account(EPOCH, EPOCH, "blocklog"_n, account_name(epoch_index));
       if (data.empty()) return fc::variant();
       return epoch_abi_ser.binary_to_variant("blocklog_entry", data,
-          abi_serializer::create_yield_function(abi_serializer_max_time));
+          fixture_abi_yield_function());
    }
 
    fc::variant get_t5_state() {
@@ -724,7 +724,7 @@ public:
                                      "t5state"_n);
       if (data.empty()) return fc::variant();
       return sysio_abi_ser.binary_to_variant("t5_state", data,
-          abi_serializer::create_yield_function(abi_serializer_max_time));
+          fixture_abi_yield_function());
    }
 
    /// Block slots accumulated for the OPEN pay period, one accrual at a time.
@@ -744,7 +744,7 @@ public:
                                      account_name(sysio_epoch_index));
       if (data.empty()) return fc::variant();
       return sysio_abi_ser.binary_to_variant("epoch_log", data,
-          abi_serializer::create_yield_function(abi_serializer_max_time));
+          fixture_abi_yield_function());
    }
 
    fc::variant get_batch_epoch( uint64_t sysio_epoch_index ) {
@@ -766,7 +766,7 @@ public:
       vector<char> data(it->value.begin(), it->value.end());
       if (data.empty()) return fc::variant();
       return sysio_abi_ser.binary_to_variant("batch_epoch", data,
-          abi_serializer::create_yield_function(abi_serializer_max_time));
+          fixture_abi_yield_function());
    }
 
    // -----------------------------
@@ -780,7 +780,7 @@ public:
                                      producer);
       if (data.empty()) return fc::variant();
       return sysio_abi_ser.binary_to_variant("producer_info", data,
-          abi_serializer::create_yield_function(abi_serializer_max_time));
+          fixture_abi_yield_function());
    }
 
    /// Blocks `producer` has made this pay period -- the row's `unpaid_blocks`, the one pay input.
@@ -1002,7 +1002,7 @@ public:
       return sysio_abi_ser.binary_to_variant(
          "emission_state",
          data,
-         abi_serializer::create_yield_function(abi_serializer_max_time)
+         fixture_abi_yield_function()
       );
    }
 
@@ -1021,7 +1021,7 @@ public:
          : sysio_abi_ser.binary_to_variant(
               "node_owner_distribution",
               data,
-              abi_serializer::create_yield_function(abi_serializer_max_time)
+              fixture_abi_yield_function()
            );
    }
 
@@ -1042,7 +1042,7 @@ public:
                                      "payclaims"_n, acc);
       if (data.empty()) return 0;
       auto v = sysio_abi_ser.binary_to_variant(
-         "pay_claim", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         "pay_claim", data, fixture_abi_yield_function());
       return static_cast<int64_t>(v["balance"].as_uint64());
    }
 
@@ -1055,7 +1055,7 @@ public:
                                      "payclaimtot"_n, "payclaimtot"_n);
       if (data.empty()) return 0;
       auto v = sysio_abi_ser.binary_to_variant(
-         "pay_claim_total", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         "pay_claim_total", data, fixture_abi_yield_function());
       return static_cast<int64_t>(v["outstanding"].as_uint64());
    }
 
@@ -1091,7 +1091,7 @@ public:
          : token_abi_ser.binary_to_variant(
               "currency_stats",
               data,
-              abi_serializer::create_yield_function(abi_serializer_max_time)
+              fixture_abi_yield_function()
            );
    }
 
@@ -1111,7 +1111,7 @@ public:
          : token_abi_ser.binary_to_variant(
               "account",
               data,
-              abi_serializer::create_yield_function(abi_serializer_max_time)
+              fixture_abi_yield_function()
            );
    }
 
@@ -1148,7 +1148,7 @@ protected:
       act.data    = sysio_abi_ser.variant_to_binary(
                       action_type_name,
                       data,
-                      abi_serializer::create_yield_function(abi_serializer_max_time)
+                      fixture_abi_yield_function()
                     );
 
       return base_tester::push_action( std::move(act), signer.to_uint64_t() );
@@ -1173,7 +1173,7 @@ protected:
          { signer, config::active_name } };
       act.data = sysio_abi_ser.variant_to_binary(
          sysio_abi_ser.get_action_type(act_name), data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
 
       signed_transaction trx;
       trx.actions.emplace_back( std::move(act) );
@@ -1220,7 +1220,7 @@ protected:
       act.name    = name;
       act.data    = token_abi_ser.variant_to_binary(
                       action_type_name, data,
-                      abi_serializer::create_yield_function(abi_serializer_max_time)
+                      fixture_abi_yield_function()
                     );
 
       return base_tester::push_action( std::move(act), signer.to_uint64_t() );
@@ -1249,7 +1249,7 @@ protected:
       if (data.empty()) return fc::variant();
       return roa_abi_ser.binary_to_variant(
          "policies", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time)
+         fixture_abi_yield_function()
       );
    }
 
@@ -1328,14 +1328,14 @@ public:
       auto data = get_row_by_account(OPREG, OPREG, "operators"_n, account);
       if (data.empty()) return fc::variant();
       return opreg_abi_ser.binary_to_variant("operator_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    fc::variant get_epoch_state_row() {
       auto data = get_row_by_account(EPOCH, EPOCH, "epochstate"_n, "epochstate"_n);
       if (data.empty()) return fc::variant();
       return epoch_abi_ser.binary_to_variant("epoch_state", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
 protected:
@@ -5251,7 +5251,7 @@ struct producer_eligibility_tester : public sysio_emissions_tester {
                                      "finalizers"_n, producer);
       if (data.empty()) return false;
       auto v = sysio_abi_ser.binary_to_variant("finalizer_info", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       auto ids = sysio_test::get_last_prop_fin_ids(*this, sysio_abi_ser);
       return ids.count(v["active_key_id"].as_uint64()) > 0;
    }
@@ -5681,7 +5681,7 @@ struct producer_score_tester : public producer_eligibility_tester {
                                      "global"_n, "global"_n);
       if (data.empty()) return fc::variant();
       return sysio_abi_ser.binary_to_variant("sysio_global_state", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    bool rescore_pending() {

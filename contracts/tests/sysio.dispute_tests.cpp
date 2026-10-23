@@ -275,21 +275,21 @@ public:
       auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outpcons"_n, chain_code);
       if (data.empty()) return -1;
       auto v = msgch_abi.binary_to_variant("outpost_consensus_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       return v["epoch_index"].as<uint32_t>();
    }
 
    fc::variant get_dispute(uint64_t id) {
       auto data = get_row_by_id(CHALG_ACCOUNT, CHALG_ACCOUNT, "disputes"_n, id);
       return data.empty() ? fc::variant() : chalg_abi.binary_to_variant("dispute_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    bool epoch_paused() {
       auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
       if (data.empty()) return false;
       auto v = epoch_abi.binary_to_variant("epoch_state", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       return v["is_paused"].as_bool();
    }
 
@@ -298,7 +298,7 @@ public:
       auto data = get_row_by_account(CHALG_ACCOUNT, CHALG_ACCOUNT, "chalgstate"_n, "chalgstate"_n);
       if (data.empty()) return 0;
       auto v = chalg_abi.binary_to_variant("chalg_state", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       return v["open_disputes"].as<uint32_t>();
    }
 
@@ -316,14 +316,14 @@ public:
       auto data = get_row_by_account(config::system_account_name, config::system_account_name,
                                      "nodecount"_n, "nodecount"_n);
       return data.empty() ? fc::variant() : system_abi.binary_to_variant("node_count_state", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    uint32_t current_epoch() {
       auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
       if (data.empty()) return 0;
       auto v = epoch_abi.binary_to_variant("epoch_state", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       return v["current_epoch_index"].as<uint32_t>();
    }
 
@@ -333,7 +333,7 @@ public:
       auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
       if (data.empty()) return members;
       auto v = epoch_abi.binary_to_variant("epoch_state", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       const uint64_t cur = v["current_batch_op_group"].as_uint64();
       const auto& groups = v["batch_op_groups"].get_array();
       if (cur >= groups.size()) return members;
@@ -350,7 +350,7 @@ public:
       auto data = get_row_by_id(OPREG_ACCOUNT, OPREG_ACCOUNT, "operators"_n, op.value);
       if (data.empty()) return {};
       auto v = opreg_abi.binary_to_variant("operator_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       return v["status"].as_string();
    }
 

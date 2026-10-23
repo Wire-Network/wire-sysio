@@ -47,6 +47,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_run_test.py ${CMAKE_CURRENT_BI
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_lib_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_lib_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_under_min_avail_ram.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_under_min_avail_ram.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_irreversible_mode_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_irreversible_mode_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_irreversible_mode_progress.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_irreversible_mode_progress.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_irreversible_mode_progress_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_irreversible_mode_progress_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_read_terminate_at_block_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_read_terminate_at_block_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_chainbase_allocation_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_chainbase_allocation_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_protocol_feature_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_protocol_feature_test.py COPYONLY)
@@ -137,6 +139,7 @@ endif()
 #To run plugin_test with all log from blockchain displayed, put --verbose after --, i.e. plugin_test -- --verbose
 add_p_test(NAME plugin_test COMMAND plugin_test --report_level=detailed --color_output)
 add_p_test(NAME bootstrap_order_test COMMAND tests/bootstrap_order_test.py)
+add_p_test(NAME nodeop_irreversible_mode_progress_test COMMAND tests/nodeop_irreversible_mode_progress_test.py)
 add_np_test(NAME bootstrap_disconnect_test COMMAND tests/bootstrap_disconnect_test.py -v)
 
 add_np_test(NAME nodeop_sanity_test COMMAND tests/nodeop_run_test.py -v --sanity-test)
