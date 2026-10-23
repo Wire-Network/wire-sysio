@@ -28,6 +28,22 @@ using sysio_system::test_support::codename_mvo;
 
 namespace {
 
+/// Registry-reference scenario identifiers and configuration fields.
+namespace registry_reference {
+constexpr std::string_view first_token = "NTA";
+constexpr std::string_view second_token = "NTB";
+constexpr std::string_view unbound_chain = "UNBOUND";
+constexpr std::string_view missing_code = "MISSING";
+constexpr char unbound_name[] = "Unbound";
+constexpr char assertion_prefix[] = "assertion failure with message: ";
+constexpr const char* producer_requirements = "req_prod_collat";
+constexpr const char* batch_requirements = "req_batchop_collat";
+constexpr const char* underwriter_requirements = "req_uw_collat";
+} // namespace registry_reference
+
+/// Registry ABI identifiers shared with fixture setup.
+namespace registry_field = sysio_system::test_support::registry::field;
+
 /// Standard opreg prune delay used by focused setconfig tests.
 constexpr uint64_t kDefaultPruneDelayMs = 600000;
 
@@ -371,7 +387,7 @@ public:
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(epoch_accnt->abi, epoch_abi), true);
       epoch_abi_ser.set_abi(std::move(epoch_abi), abi_serializer::create_yield_function(abi_serializer_max_time));
       // Seed depot requirements without activating external chains used by remit tests.
-      for (const auto token : {"WIRE", "NTA", "NTB"})
+      for (const auto token : {kWireCodename, registry_reference::first_token, registry_reference::second_token})
          sysio_system::test_support::registry::seed_depot_pair(*this, token);
    }
 
@@ -744,13 +760,15 @@ public:
             ("description", std::string{})("outpost", sysio_system::test_support::no_outpost_mvo())));
 
          const std::vector<char> address(a.kind == ChainKind::CHAIN_KIND_SVM ? 32 : kEvmAddressBytes, kPlaceholderAddressByte);
-         if (get_row_by_id(TOKENS_ACCOUNT, TOKENS_ACCOUNT, "tokens"_n, cn(a.token).value).empty())
-         BOOST_REQUIRE_EQUAL(success(), push_contract(TOKENS_ACCOUNT, tokens_abi_ser, TOKENS_ACCOUNT,
-            shadow_action::regtoken, mvo()
-            ("kind", TokenKind::TOKEN_KIND_LIQ)("code", codename_mvo(a.token))
-            ("symbol_name", std::string(a.token))("description", std::string{})
-            ("precision", sym.decimals())
-            ("address", mvo()("kind", a.kind)("address", address))));
+         if (get_row_by_id(TOKENS_ACCOUNT, TOKENS_ACCOUNT,
+                          sysio_system::test_support::registry::tokens_table, cn(a.token).value).empty()) {
+            BOOST_REQUIRE_EQUAL(success(), push_contract(TOKENS_ACCOUNT, tokens_abi_ser, TOKENS_ACCOUNT,
+               shadow_action::regtoken, mvo()
+               ("kind", TokenKind::TOKEN_KIND_LIQ)("code", codename_mvo(a.token))
+               ("symbol_name", std::string(a.token))("description", std::string{})
+               ("precision", sym.decimals())
+               ("address", mvo()("kind", a.kind)("address", address))));
+         }
          BOOST_REQUIRE_EQUAL(success(), push_contract(TOKENS_ACCOUNT, tokens_abi_ser, TOKENS_ACCOUNT,
             shadow_action::regctok, mvo()
             ("chain_code", codename_mvo(a.chain))("token_code", codename_mvo(a.token))
@@ -934,21 +952,24 @@ BOOST_FIXTURE_TEST_CASE(setconfig_basic, sysio_opreg_tester) { try {
 
 /// Every role rejects each missing reference, including after a valid entry, atomically.
 BOOST_FIXTURE_TEST_CASE(setconfig_requires_registered_collateral, sysio_opreg_tester) { try {
-   constexpr std::array<const char*, 3> roles{"req_prod_collat", "req_batchop_collat", "req_uw_collat"};
+   constexpr std::array roles{registry_reference::producer_requirements,
+                              registry_reference::batch_requirements, registry_reference::underwriter_requirements};
    constexpr std::array<const char*, 3> errors{
       ": chain code not registered", ": token code not registered",
       ": (chain_code, token_code) binding not registered"};
-   const auto valid = make_chain_min_bond("WIRE", "WIRE", kTestMinBond);
+   const auto valid = make_chain_min_bond(kWireCodename, kWireCodename, kTestMinBond);
    // NTA exists, but its binding to this independently registered chain does not.
    deploy_privileged(CHAINS_ACCOUNT, contracts::chains_wasm(), contracts::chains_abi(), chains_abi_ser);
    BOOST_REQUIRE_EQUAL(success(), push_contract(CHAINS_ACCOUNT, chains_abi_ser, CHAINS_ACCOUNT,
-      shadow_action::regchain, mvo()("kind", ChainKind::CHAIN_KIND_EVM)("code", "UNBOUND")
-         ("external_chain_id", kEthExternalChainId)("name", "Unbound")("description", "")
-         ("outpost", sysio_system::test_support::no_outpost_mvo())));
+      shadow_action::regchain, mvo()(registry_field::kind, ChainKind::CHAIN_KIND_EVM)
+         (registry_field::code, registry_reference::unbound_chain)
+         (registry_field::external_chain_id, kEthExternalChainId)
+         (registry_field::name, registry_reference::unbound_name)(registry_field::description, std::string{})
+         (registry_field::outpost, sysio_system::test_support::no_outpost_mvo())));
    const std::array<fc::variant, 3> invalid{
-      make_chain_min_bond("MISSING", "WIRE", kTestMinBond),
-      make_chain_min_bond("WIRE", "MISSING", kTestMinBond),
-      make_chain_min_bond("UNBOUND", "NTA", kTestMinBond)};
+      make_chain_min_bond(registry_reference::missing_code, kWireCodename, kTestMinBond),
+      make_chain_min_bond(kWireCodename, registry_reference::missing_code, kTestMinBond),
+      make_chain_min_bond(registry_reference::unbound_chain, registry_reference::first_token, kTestMinBond)};
    const auto configure = [&](const std::array<std::vector<fc::variant>, 3>& lists) {
       return setconfig(kTestMaxProducers, kTestMaxBatchOperators, kTestMaxUnderwriters,
          kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses, kDefaultMaxPctMisses24h,
@@ -959,7 +980,7 @@ BOOST_FIXTURE_TEST_CASE(setconfig_requires_registered_collateral, sysio_opreg_te
          std::array<std::vector<fc::variant>, 3> lists{{{valid}, {valid}, {valid}}};
          lists[role].push_back(invalid[missing]);
          const auto before = get_opconfig();
-         BOOST_REQUIRE_EQUAL(error(std::string("assertion failure with message: ") + roles[role] + errors[missing]),
+         BOOST_REQUIRE_EQUAL(error(std::string(registry_reference::assertion_prefix) + roles[role] + errors[missing]),
                              configure(lists));
          BOOST_REQUIRE_EQUAL(fc::json::to_string(before, fc::time_point::maximum()),
                              fc::json::to_string(get_opconfig(), fc::time_point::maximum()));
@@ -973,11 +994,12 @@ BOOST_FIXTURE_TEST_CASE(setconfig_requires_registered_collateral, sysio_opreg_te
 /// Existence checks permit governance to configure collateral before registry activation.
 BOOST_FIXTURE_TEST_CASE(setconfig_accepts_inactive_registry_rows, sysio_opreg_tester) { try {
    sysio_system::test_support::registry::make_inactive(*this);
-   const std::vector<fc::variant> requirements{make_chain_min_bond("WIRE", "NTA", kTestMinBond)};
+   const std::vector<fc::variant> requirements{
+      make_chain_min_bond(kWireCodename, registry_reference::first_token, kTestMinBond)};
    BOOST_REQUIRE_EQUAL(success(), setconfig(kTestMaxProducers, kTestMaxBatchOperators,
       kTestMaxUnderwriters, kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses,
       kDefaultMaxPctMisses24h, kTerminateWindowMs, requirements, requirements, requirements));
-   BOOST_REQUIRE_EQUAL(1, get_opconfig()["req_prod_collat"].get_array().size());
+   BOOST_REQUIRE_EQUAL(1, get_opconfig()[registry_reference::producer_requirements].get_array().size());
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_zero_queue, sysio_opreg_tester) { try {

@@ -28,6 +28,13 @@ using opp::attestations::OperatorActionLog;
 
 namespace {
 
+/// Collateral-list field names used in configuration diagnostics.
+namespace collateral_field {
+constexpr char req_prod_collat[] = "req_prod_collat";
+constexpr char req_batchop_collat[] = "req_batchop_collat";
+constexpr char req_uw_collat[] = "req_uw_collat";
+} // namespace collateral_field
+
 /// Forward declaration -- defined with the other eligibility helpers further down. `regoperator`
 /// needs it so registering a PRODUCER notifies sysio.system to score the new operator row.
 void reevaluate_eligibility(opreg::operators_t& ops,
@@ -257,21 +264,21 @@ void opreg::setconfig(uint32_t max_available_producers,
       }
    }
 
-   require_canonical_codes(req_prod_collat,    "req_prod_collat");
-   require_canonical_codes(req_batchop_collat, "req_batchop_collat");
-   require_canonical_codes(req_uw_collat,      "req_uw_collat");
+   require_canonical_codes(req_prod_collat,    collateral_field::req_prod_collat);
+   require_canonical_codes(req_batchop_collat, collateral_field::req_batchop_collat);
+   require_canonical_codes(req_uw_collat,      collateral_field::req_uw_collat);
 
-   require_no_duplicate_chain_token(req_prod_collat,    "req_prod_collat");
-   require_no_duplicate_chain_token(req_batchop_collat, "req_batchop_collat");
-   require_no_duplicate_chain_token(req_uw_collat,      "req_uw_collat");
+   require_no_duplicate_chain_token(req_prod_collat,    collateral_field::req_prod_collat);
+   require_no_duplicate_chain_token(req_batchop_collat, collateral_field::req_batchop_collat);
+   require_no_duplicate_chain_token(req_uw_collat,      collateral_field::req_uw_collat);
 
-   require_positive_min_bond(req_prod_collat,    "req_prod_collat");
-   require_positive_min_bond(req_batchop_collat, "req_batchop_collat");
-   require_positive_min_bond(req_uw_collat,      "req_uw_collat");
+   require_positive_min_bond(req_prod_collat,    collateral_field::req_prod_collat);
+   require_positive_min_bond(req_batchop_collat, collateral_field::req_batchop_collat);
+   require_positive_min_bond(req_uw_collat,      collateral_field::req_uw_collat);
 
-   require_registered_collateral(req_prod_collat,    "req_prod_collat");
-   require_registered_collateral(req_batchop_collat, "req_batchop_collat");
-   require_registered_collateral(req_uw_collat,      "req_uw_collat");
+   require_registered_collateral(req_prod_collat,    collateral_field::req_prod_collat);
+   require_registered_collateral(req_batchop_collat, collateral_field::req_batchop_collat);
+   require_registered_collateral(req_uw_collat,      collateral_field::req_uw_collat);
 
    // Stamp every entry's `config_timestamp_ms` with the on-chain time
    // so consumers can detect stale configuration without trusting the

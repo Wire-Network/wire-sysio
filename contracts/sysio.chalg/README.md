@@ -38,6 +38,8 @@ OPP envelope dispute resolution and slash-execution contract.
    and fixed quorum, and pauses `sysio.epoch`.
 2. **Vote**: owners in the dispute's frozen Tier-1 electorate call `votedispute` with one of the
    candidate checksums. Later ROA registrations cannot join an in-flight dispute. One vote per owner.
+   Ballots stay open past the deadline while the tally has no winner; once it has one,
+   `votedispute` refuses further ballots, so none can undo it before `chkdispute` records it.
 3. **Tally**: anyone cranks `chkdispute`. With `N` equal to the snapshotted electorate size and
    fixed `Q = floor(N/2)+1`, a checksum reaching `Q` votes wins at any time (fast path); after the 24h
    deadline the bar relaxes to a quorum of cast votes (`cast >= Q`) plus a strict majority of cast

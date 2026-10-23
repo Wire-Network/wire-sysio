@@ -16,6 +16,46 @@ inline constexpr auto bindings_table = "chaintokens"_n;
 inline constexpr std::string_view depot_code = "WIRE";
 inline constexpr uint32_t token_precision = 9;
 
+/// Registry ABI field identifiers shared by fixture helpers.
+namespace field {
+inline constexpr char account[] = "account";
+inline constexpr char ram_bytes[] = "ram_bytes";
+inline constexpr char net_weight[] = "net_weight";
+inline constexpr char cpu_weight[] = "cpu_weight";
+inline constexpr char chain_code[] = "chain_code";
+inline constexpr char token_code[] = "token_code";
+inline constexpr char kind[] = "kind";
+inline constexpr char code[] = "code";
+inline constexpr char external_chain_id[] = "external_chain_id";
+inline constexpr char name[] = "name";
+inline constexpr char description[] = "description";
+inline constexpr char outpost[] = "outpost";
+inline constexpr char symbol_name[] = "symbol_name";
+inline constexpr char precision[] = "precision";
+inline constexpr char address[] = "address";
+inline constexpr char contract_addr[] = "contract_addr";
+inline constexpr char is_native[] = "is_native";
+inline constexpr char active[] = "active";
+inline constexpr char activated_at_ms[] = "activated_at_ms";
+} // namespace field
+
+/// Privileged allocation and registry actions used by fixture setup.
+namespace action {
+inline constexpr auto setacctram = "setacctram"_n;
+inline constexpr auto setacctnet = "setacctnet"_n;
+inline constexpr auto setacctcpu = "setacctcpu"_n;
+inline constexpr auto regchain = "regchain"_n;
+inline constexpr auto regtoken = "regtoken"_n;
+inline constexpr auto regctok = "regctok"_n;
+} // namespace action
+
+/// ABI row type and resource budgets for registry fixtures.
+inline constexpr char binding_row_type[] = "chain_token_row";
+inline constexpr int64_t registry_ram_bytes = 2'000'000;
+inline constexpr int64_t registry_bandwidth_weight = 1'000'000;
+inline constexpr uint64_t depot_chain_id = 0;
+
+
 /// Deploy a registry only when absent, preserving existing rows and fixture setup.
 template <typename Tester>
 void deploy(Tester& tester, name account, const std::vector<uint8_t>& wasm, const std::vector<char>& abi) {
@@ -25,15 +65,15 @@ void deploy(Tester& tester, name account, const std::vector<uint8_t>& wasm, cons
       load_account_abi(tester, config::system_account_name, system_ser);
       // Full-system fixtures give new sysio.* accounts no NET/CPU. BIOS fixtures
       // have unlimited resources and do not expose these allocation actions.
-      if (!system_ser.get_action_type("setacctram"_n).empty()) {
+      if (!system_ser.get_action_type(action::setacctram).empty()) {
          using mvo = fc::mutable_variant_object;
-         for (const auto& [action, field, amount] : {
-                 std::tuple{"setacctram"_n, "ram_bytes", int64_t{2'000'000}},
-                 std::tuple{"setacctnet"_n, "net_weight", int64_t{1'000'000}},
-                 std::tuple{"setacctcpu"_n, "cpu_weight", int64_t{1'000'000}}}) {
+         for (const auto& [action_name, field_name, amount] : {
+                 std::tuple{action::setacctram, field::ram_bytes, registry_ram_bytes},
+                 std::tuple{action::setacctnet, field::net_weight, registry_bandwidth_weight},
+                 std::tuple{action::setacctcpu, field::cpu_weight, registry_bandwidth_weight}}) {
             BOOST_REQUIRE_EQUAL(Tester::success(), push_contract_action_and_produce_block(
                tester, config::system_account_name, system_ser, config::system_account_name,
-               action, mvo()("account", account)(field, amount)));
+               action_name, mvo()(field::account, account)(field_name, amount)));
          }
       }
    }
@@ -56,10 +96,10 @@ fc::variant binding(Tester& tester, std::string_view chain_code, std::string_vie
    auto it = index.lower_bound(boost::make_tuple(tokens, table, std::string_view{}));
    for (; it != index.end() && it->code == tokens && it->table_id == table; ++it) {
       std::vector<char> raw(it->value.begin(), it->value.end());
-      auto row = ser.binary_to_variant("chain_token_row", raw,
+      auto row = ser.binary_to_variant(binding_row_type, raw,
          abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
-      if (row["chain_code"].template as<fc::slug_name>() == fc::slug_name{chain_code} &&
-          row["token_code"].template as<fc::slug_name>() == fc::slug_name{token_code}) return row;
+      if (row[field::chain_code].template as<fc::slug_name>() == fc::slug_name{chain_code} &&
+          row[field::token_code].template as<fc::slug_name>() == fc::slug_name{token_code}) return row;
    }
    return {};
 }
@@ -77,22 +117,24 @@ void seed_depot_pair(Tester& tester, std::string_view token_code = depot_code) {
    load_account_abi(tester, tokens, tokens_ser);
    if (tester.get_row_by_id(chains, chains, chains_table, fc::slug_name{depot_code}.value).empty()) {
       BOOST_REQUIRE_EQUAL(Tester::success(), push_contract_action_and_produce_block(
-         tester, chains, chains_ser, chains, "regchain"_n,
-         mvo()("kind", ChainKind::CHAIN_KIND_WIRE)("code", depot_code)("external_chain_id", 0)
-            ("name", depot_code)("description", "")("outpost", no_outpost_mvo())));
+         tester, chains, chains_ser, chains, action::regchain,
+         mvo()(field::kind, ChainKind::CHAIN_KIND_WIRE)(field::code, depot_code)
+            (field::external_chain_id, depot_chain_id)
+            (field::name, depot_code)(field::description, std::string{})(field::outpost, no_outpost_mvo())));
    }
    if (tester.get_row_by_id(tokens, tokens, tokens_table, fc::slug_name{token_code}.value).empty()) {
       BOOST_REQUIRE_EQUAL(Tester::success(), push_contract_action_and_produce_block(
-         tester, tokens, tokens_ser, tokens, "regtoken"_n,
-         mvo()("kind", token_code == depot_code ? TokenKind::TOKEN_KIND_NATIVE : TokenKind::TOKEN_KIND_LIQ)
-            ("code", token_code)("symbol_name", token_code)("description", "")("precision", token_precision)
-            ("address", mvo()("kind", ChainKind::CHAIN_KIND_UNKNOWN)("address", ""))));
+         tester, tokens, tokens_ser, tokens, action::regtoken,
+         mvo()(field::kind, token_code == depot_code ? TokenKind::TOKEN_KIND_NATIVE : TokenKind::TOKEN_KIND_LIQ)
+            (field::code, token_code)(field::symbol_name, token_code)(field::description, std::string{})
+            (field::precision, token_precision)
+            (field::address, mvo()(field::kind, ChainKind::CHAIN_KIND_UNKNOWN)(field::address, std::string{}))));
    }
    if (binding(tester, depot_code, token_code).is_null()) {
       BOOST_REQUIRE_EQUAL(Tester::success(), push_contract_action_and_produce_block(
-         tester, tokens, tokens_ser, tokens, "regctok"_n,
-         mvo()("chain_code", depot_code)("token_code", token_code)("contract_addr", "")
-            ("is_native", token_code == depot_code)));
+         tester, tokens, tokens_ser, tokens, action::regctok,
+         mvo()(field::chain_code, depot_code)(field::token_code, token_code)(field::contract_addr, std::string{})
+            (field::is_native, token_code == depot_code)));
    }
 }
 
@@ -114,7 +156,7 @@ void make_inactive(Tester& tester) {
          const auto row = ser.binary_to_variant(row_type, raw,
             abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
          const auto inactive = fc::mutable_variant_object(row.get_object())
-            ("active", false)("activated_at_ms", uint64_t{0});
+            (field::active, false)(field::activated_at_ms, uint64_t{0});
          const auto encoded = ser.variant_to_binary(row_type, inactive,
             abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
          db.modify(*it, [&](auto& object) { object.value.assign(encoded.data(), encoded.size()); });

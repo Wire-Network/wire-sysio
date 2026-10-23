@@ -79,8 +79,13 @@ sysio.system::regproducer(producer, producer_key, url, location)
 ```
 
 Use `regproducer2` instead if you want a multi-key block-signing authority rather than a single
-key. The `url` is where you publish information about your operation, and `location` is an
-advisory number used for peer topology.
+key. The `url` is where you publish information about your operation. `location` sets your place
+in the production order: each new schedule runs in ascending `location`, account name breaking
+ties, so producers next to each other in that order take consecutive rounds. It has no effect on
+rank or on the per-block rate. To move, repeat the registration action you used, `regproducer` or
+`regproducer2`, with your current URL and signing key or authority and the new `location`. The
+change applies the next time the set of scheduled producers changes; a running schedule is never
+reordered on its own.
 
 Creating a producer row, or reactivating one parked with `unregprod`, succeeds only after
 `sysio.opreg` reports your account as an `ACTIVE` producer that meets the live minimums. Calling
@@ -130,7 +135,8 @@ Rank is **position in a score-ordered index**, derived by iteration rather than 
 action. The chain rebuilds the schedule at most once every 120 block slots, roughly a minute; at
 that point the highest ranked eligible producers become the active schedule, and the finalizer
 policy is rebuilt to match. If your score puts you in the top 21 you are scheduled, and you begin
-producing in your slot.
+producing in your slot. Rank decides only whether you are among the 21; your `location` decides
+where in the round you produce.
 
 To hold a position at all you need three things at once: an active producer row, an `ACTIVE`
 producer operator registration backed by collateral, and an active finalizer key. Missing any one
@@ -187,21 +193,23 @@ again and frees the registration slot it held. Only votes that reach quorum are
 credited, so registering alone earns nothing. The credit is a rating of the CURRENT pay period and
 is stamped with it, so it expires at the period boundary rather than being consumed when you leave:
 attestations you earned this period still count if you park and come back inside it, and none of
-them survive into the next one. Blocks you have already produced behave the opposite way, because
-they are earnings rather than a rating.
+them survive into the next one. Blocks already counted toward your pay behave the opposite way,
+because they are earnings rather than a rating.
 
 ## Getting paid
 
-Producers are paid **per block produced**. Each block earns the same rate, computed as the active
-share of the producer pool divided by the period's slot count. A block you miss is simply not paid,
-and that pay stays in the treasury rather than being handed to whoever did produce.
+Producers are paid **per counted block**. A block you produce is counted, but only one round per
+rotation of the schedule counts: if a schedule change gives you a second round in the same
+rotation, its blocks are not counted. Each counted block earns the same rate, computed as the
+active share of the producer pool divided by the period's slot count. A block you miss is never
+counted, and that pay stays in the treasury rather than being handed to whoever did produce.
 
 Positions 22 and beyond, up to a configured end rank, are **standbys**. They draw a retainer from a
 separate slice of the pool, decaying linearly with position, so the network keeps a ready bench.
 
-Blocks you have produced are not forfeited. If you are not payable when a payout runs — parked,
-demoted, or temporarily under-collateralized — your block count is held rather than cleared, and it
-is paid at the first payout after you are payable again. Unregistering right after producing and
+Counted blocks are not forfeited. If you are not payable when a payout runs — parked, demoted, or
+temporarily under-collateralized — your count is held rather than cleared, and it is paid at the
+first payout after you are payable again. Unregistering right after producing and
 re-registering before your next round costs you nothing provided you still meet the admission
 requirements; if governance raised a collateral minimum while you were parked, top up first.
 

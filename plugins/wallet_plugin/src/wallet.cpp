@@ -13,6 +13,7 @@
 #include <fc/crypto/elliptic.hpp>
 #include <fc/git_revision.hpp>
 #include <fc/io/json.hpp>
+#include <fc/io/secure_file.hpp>
 #include <fc/crypto/aes.hpp>
 #include <fc/crypto/hex.hpp>
 
@@ -315,27 +316,7 @@ public:
       wlog("saving wallet to file {}", wallet_filename);
 
       string data = fc::json::to_pretty_string(_wallet);
-      try {
-         enable_umask_protection();
-         //
-         // Parentheses on the following declaration fails to compile,
-         // due to the Most Vexing Parse.  Thanks, C++
-         //
-         // http://en.wikipedia.org/wiki/Most_vexing_parse
-         //
-         ofstream outfile{wallet_filename};
-         if (!outfile) {
-            elog("Unable to open file: {}", wallet_filename);
-            SYS_THROW(wallet_exception, "Unable to open file: {}", wallet_filename);
-         }
-         outfile.write(data.c_str(), data.length());
-         outfile.flush();
-         outfile.close();
-         disable_umask_protection();
-      } catch (...) {
-         disable_umask_protection();
-         throw;
-      }
+      fc::write_secure_file(wallet_filename, data);
    }
 
    string      _wallet_filename;

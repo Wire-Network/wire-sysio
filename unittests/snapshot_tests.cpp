@@ -548,6 +548,52 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_deep_permission_chain_in_snapshot, SNAPSHOT_S
    deep_permission_chain_in_snapshot_test<savanna_tester, SNAPSHOT_SUITE>();
 }
 
+// The producer schedule is in production order, which sysio.system sets by producer location rather
+// than by name. The sysio.prods authorities generated from it must still list their accounts in the
+// ascending order validate() requires, or a snapshot taken under that schedule fails to load.
+template<typename TESTER, typename SNAPSHOT_SUITE>
+void unsorted_producer_schedule_in_snapshot_test()
+{
+   TESTER chain;
+   const std::vector<account_name> producers = {"prodc"_n, "proda"_n, "prodb"_n};
+   chain.create_accounts(producers);
+   chain.set_producers(producers);
+
+   const auto active_names = [&] {
+      std::vector<account_name> names;
+      for (const auto& p : chain.control->active_producers().producers) names.push_back(p.producer_name);
+      return names;
+   };
+   constexpr uint32_t max_blocks = 200;
+   for (uint32_t produced = 0; produced < max_blocks && active_names() != producers; ++produced) {
+      chain.produce_block();
+   }
+   const auto schedule = active_names();
+   BOOST_REQUIRE_EQUAL_COLLECTIONS(schedule.begin(), schedule.end(), producers.begin(), producers.end());
+
+   for (const auto permission : {config::active_name, config::majority_producers_permission_name,
+                                 config::minority_producers_permission_name}) {
+      const auto auth = chain.control->get_authorization_manager()
+                           .get_permission(permission_level{config::producers_account_name, permission})
+                           .auth.to_authority();
+      BOOST_TEST(auth.accounts.size() == producers.size());
+      BOOST_REQUIRE_MESSAGE(validate(auth), "sysio.prods@" << permission << " is not a valid authority");
+   }
+
+   chain.control->abort_block();
+   auto writer = SNAPSHOT_SUITE::get_writer();
+   chain.control->write_snapshot(writer);
+   auto snapshot = SNAPSHOT_SUITE::finalize(writer);
+
+   snapshotted_tester snap_chain(chain.get_config(), SNAPSHOT_SUITE::get_reader(snapshot), 0);
+   verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(test_unsorted_producer_schedule_in_snapshot, SNAPSHOT_SUITE, snapshot_suites)
+{
+   unsorted_producer_schedule_in_snapshot_test<savanna_tester, SNAPSHOT_SUITE>();
+}
+
 // A permission row carrying a structurally invalid authority -- here a duplicated key entry,
 // which both breaks the strict key ordering updateauth enforces at creation and double-counts
 // that key's weight toward threshold -- must be rejected at snapshot load rather than silently

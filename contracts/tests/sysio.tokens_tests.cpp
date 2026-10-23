@@ -28,6 +28,35 @@ using namespace sysio::opp::types;
 
 using mvo = fc::mutable_variant_object;
 
+namespace {
+/// Values and expected errors for registry parent/binding regression cases.
+constexpr char kEthCode[] =
+   "ETH";
+constexpr char kEthName[] =
+   "Ethereum";
+constexpr char kWireCode[] =
+   "WIRE";
+constexpr char kWireName[] =
+   "Wire";
+constexpr char kUsdcCode[] =
+   "USDC";
+constexpr char kMissingCode[] =
+   "MISSING";
+constexpr char kMissingChainError[] =
+   "assertion failure with message: sysio.tokens: chain code not registered";
+constexpr char kMissingTokenError[] =
+   "assertion failure with message: sysio.tokens: token code not registered";
+constexpr char kDuplicateBindingError[] =
+   "assertion failure with message: sysio.tokens: (chain_code, token_code) binding already registered";
+constexpr char kDuplicateNativeError[] =
+   "assertion failure with message: sysio.tokens: chain already has an active is_native binding";
+constexpr uint64_t kEthChainId = 1;
+/// Shared registry fixture ABI identifiers.
+namespace registry_action = sysio_system::test_support::registry::action;
+namespace registry_field = sysio_system::test_support::registry::field;
+} // namespace
+
+
 /// Minimal fixture: deploy the privileged sysio.tokens registry on a plain
 /// (non-ROA) tester. With no sysio.epoch deployed, `current_epoch_index`
 /// reads as 0 — the bootstrap window — so registrations come up `active`.
@@ -81,17 +110,19 @@ public:
 
    /// Register a parent chain before testing binding acceptance.
    void regchain() {
-      base_tester::push_action(CHAINS_ACCOUNT, "regchain"_n, CHAINS_ACCOUNT, mvo()
-         ("kind", ChainKind::CHAIN_KIND_EVM)("code", "ETH")("external_chain_id", 1)
-         ("name", "Ethereum")("description", "")
-         ("outpost", sysio_system::test_support::no_outpost_mvo()));
+      base_tester::push_action(CHAINS_ACCOUNT, registry_action::regchain, CHAINS_ACCOUNT, mvo()
+         (registry_field::kind, ChainKind::CHAIN_KIND_EVM)(registry_field::code, kEthCode)
+         (registry_field::external_chain_id, kEthChainId)
+         (registry_field::name, kEthName)(registry_field::description, std::string{})
+         (registry_field::outpost, sysio_system::test_support::no_outpost_mvo()));
       produce_block();
    }
 
    /// Register a binding using the same action shape for all rejection/success paths.
    action_result regctok(std::string_view chain, std::string_view token, bool native = false) {
-      return push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
-         ("chain_code", chain)("token_code", token)("contract_addr", "")("is_native", native));
+      return push_action(TOKENS_ACCOUNT, registry_action::regctok, mvo()
+         (registry_field::chain_code, chain)(registry_field::token_code, token)
+         (registry_field::contract_addr, std::string{})(registry_field::is_native, native));
    }
 
    /// `chaintokens` is a uint128-keyed kv::table; `get_row_by_id` only supports
@@ -112,8 +143,8 @@ BOOST_AUTO_TEST_SUITE(sysio_tokens_tests)
 // Token.precision and the reserve row; the outpost owns the boundary conversion.
 BOOST_FIXTURE_TEST_CASE(regctok_records_binding, sysio_tokens_tester) { try {
    regchain();
-   BOOST_REQUIRE_EQUAL(success(), regtoken("WIRE", "Wire", ""));
-   BOOST_REQUIRE_EQUAL(success(), regtoken("USDC", "USDC", ""));
+   BOOST_REQUIRE_EQUAL(success(), regtoken(kWireCode, kWireName, std::string{}));
+   BOOST_REQUIRE_EQUAL(success(), regtoken(kUsdcCode, kUsdcCode, std::string{}));
    // Native binding.
    BOOST_REQUIRE_EQUAL(success(), push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
       ("chain_code",    "ETH")
@@ -202,40 +233,40 @@ BOOST_FIXTURE_TEST_CASE(regtoken_bounds_metadata, sysio_tokens_tester) { try {
 
 /// Missing parents cannot reserve a binding key; registering them permits a later retry.
 BOOST_FIXTURE_TEST_CASE(regctok_requires_registered_parents, sysio_tokens_tester) { try {
-   BOOST_REQUIRE_EQUAL(error("assertion failure with message: sysio.tokens: chain code not registered"),
-                       regctok("ETH", "WIRE", true));
-   BOOST_REQUIRE(find_chaintoken("ETH", "WIRE").is_null());
+   BOOST_REQUIRE_EQUAL(error(kMissingChainError),
+                       regctok(kEthCode, kWireCode, true));
+   BOOST_REQUIRE(find_chaintoken(kEthCode, kWireCode).is_null());
    regchain();
-   BOOST_REQUIRE_EQUAL(error("assertion failure with message: sysio.tokens: token code not registered"),
-                       regctok("ETH", "WIRE", true));
-   BOOST_REQUIRE(find_chaintoken("ETH", "WIRE").is_null());
-   BOOST_REQUIRE_EQUAL(success(), regtoken("WIRE", "Wire", ""));
-   BOOST_REQUIRE_EQUAL(success(), regctok("ETH", "WIRE", true));
-   const auto before = find_chaintoken("ETH", "WIRE");
-   BOOST_REQUIRE_EQUAL(error("assertion failure with message: sysio.tokens: chain code not registered"),
-                       regctok("MISSING", "WIRE"));
-   BOOST_REQUIRE(find_chaintoken("MISSING", "WIRE").is_null());
+   BOOST_REQUIRE_EQUAL(error(kMissingTokenError),
+                       regctok(kEthCode, kWireCode, true));
+   BOOST_REQUIRE(find_chaintoken(kEthCode, kWireCode).is_null());
+   BOOST_REQUIRE_EQUAL(success(), regtoken(kWireCode, kWireName, std::string{}));
+   BOOST_REQUIRE_EQUAL(success(), regctok(kEthCode, kWireCode, true));
+   const auto before = find_chaintoken(kEthCode, kWireCode);
+   BOOST_REQUIRE_EQUAL(error(kMissingChainError),
+                       regctok(kMissingCode, kWireCode));
+   BOOST_REQUIRE(find_chaintoken(kMissingCode, kWireCode).is_null());
    BOOST_REQUIRE_EQUAL(fc::json::to_string(before, fc::time_point::maximum()),
-                       fc::json::to_string(find_chaintoken("ETH", "WIRE"), fc::time_point::maximum()));
+                       fc::json::to_string(find_chaintoken(kEthCode, kWireCode), fc::time_point::maximum()));
 } FC_LOG_AND_RETHROW() }
 
 /// Parent activation is independent of binding registration; uniqueness rules still apply.
 BOOST_FIXTURE_TEST_CASE(regctok_accepts_inactive_parents_and_preserves_native_rules, sysio_tokens_tester) { try {
    regchain();
-   BOOST_REQUIRE_EQUAL(success(), regtoken("WIRE", "Wire", ""));
-   BOOST_REQUIRE_EQUAL(success(), regtoken("USDC", "USDC", ""));
+   BOOST_REQUIRE_EQUAL(success(), regtoken(kWireCode, kWireName, std::string{}));
+   BOOST_REQUIRE_EQUAL(success(), regtoken(kUsdcCode, kUsdcCode, std::string{}));
    sysio_system::test_support::registry::make_inactive(*this);
-   BOOST_REQUIRE_EQUAL(success(), regctok("ETH", "WIRE", true));
+   BOOST_REQUIRE_EQUAL(success(), regctok(kEthCode, kWireCode, true));
    produce_blocks();
-   const auto before = find_chaintoken("ETH", "WIRE");
-   BOOST_REQUIRE_EQUAL(error("assertion failure with message: sysio.tokens: (chain_code, token_code) binding already registered"),
-                       regctok("ETH", "WIRE", true));
-   BOOST_REQUIRE_EQUAL(error("assertion failure with message: sysio.tokens: chain already has an active is_native binding"),
-                       regctok("ETH", "USDC", true));
-   BOOST_REQUIRE(find_chaintoken("ETH", "USDC").is_null());
+   const auto before = find_chaintoken(kEthCode, kWireCode);
+   BOOST_REQUIRE_EQUAL(error(kDuplicateBindingError),
+                       regctok(kEthCode, kWireCode, true));
+   BOOST_REQUIRE_EQUAL(error(kDuplicateNativeError),
+                       regctok(kEthCode, kUsdcCode, true));
+   BOOST_REQUIRE(find_chaintoken(kEthCode, kUsdcCode).is_null());
    BOOST_REQUIRE_EQUAL(fc::json::to_string(before, fc::time_point::maximum()),
-                       fc::json::to_string(find_chaintoken("ETH", "WIRE"), fc::time_point::maximum()));
-   BOOST_REQUIRE_EQUAL(success(), regctok("ETH", "USDC"));
+                       fc::json::to_string(find_chaintoken(kEthCode, kWireCode), fc::time_point::maximum()));
+   BOOST_REQUIRE_EQUAL(success(), regctok(kEthCode, kUsdcCode));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()
