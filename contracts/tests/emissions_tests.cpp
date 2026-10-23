@@ -54,6 +54,33 @@ using namespace std;
 
 using mvo = fc::mutable_variant_object;
 
+namespace {
+
+/// sysio.system actions exercised by the bootstrapped producer reactivation regression.
+namespace system_actions {
+constexpr auto UNREGISTER_PRODUCER = "unregprod"_n;
+constexpr auto REGISTER_PRODUCER = "regproducer"_n;
+} // namespace system_actions
+
+/// sysio.system ABI fields used by the bootstrapped producer reactivation regression.
+namespace system_fields {
+constexpr auto PRODUCER = "producer";
+constexpr auto PRODUCER_KEY = "producer_key";
+constexpr auto URL = "url";
+constexpr auto LOCATION = "location";
+constexpr auto IS_ACTIVE = "is_active";
+} // namespace system_fields
+
+/// Permission used for producer registration keys.
+namespace system_permissions {
+constexpr auto ACTIVE = "active";
+} // namespace system_permissions
+
+/// Terminated operators cannot reactivate their producer registration.
+constexpr auto INELIGIBLE_PRODUCER_ERROR = "producer operator is not eligible for admission";
+
+} // namespace
+
 // sysio.roa is the authority expected by sysio.system::addnodeowner (require_auth("sysio.roa"_n))
 static constexpr account_name ROA   = "sysio.roa"_n;
 static constexpr account_name OPREG = "sysio.opreg"_n;
@@ -5424,22 +5451,16 @@ BOOST_FIXTURE_TEST_CASE( parked_producer_cannot_reactivate_after_slash_or_termin
 /// A parked bootstrapped producer still needs ACTIVE standing to reactivate after termination.
 BOOST_FIXTURE_TEST_CASE( parked_bootstrapped_producer_cannot_reactivate_after_termination,
                          producer_eligibility_tester ) try {
-   constexpr auto unregister_action = "unregprod"_n;
-   constexpr auto register_action = "regproducer"_n;
-   constexpr auto producer_field = "producer";
-   constexpr auto key_field = "producer_key";
-   constexpr auto url_field = "url";
-   constexpr auto location_field = "location";
-   constexpr auto active_field = "is_active";
-   constexpr auto active_permission = "active";
-   constexpr auto ineligible_error = "producer operator is not eligible for admission";
    const auto producer = setup_ranked_producers(1).front();
-   BOOST_REQUIRE_EQUAL(success(), push_system_action(producer, unregister_action, mvo()(producer_field, producer)));
+   BOOST_REQUIRE_EQUAL(success(), push_system_action(
+      producer, system_actions::UNREGISTER_PRODUCER, mvo()(system_fields::PRODUCER, producer)));
    BOOST_REQUIRE_EQUAL(success(), terminate_operator(producer));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg(ineligible_error), push_system_action(producer, register_action, mvo()
-      (producer_field, producer)(key_field, get_public_key(producer, active_permission))
-      (url_field, std::string{})(location_field, 0)));
-   BOOST_REQUIRE(!get_producer_info(producer)[active_field].as<bool>());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(INELIGIBLE_PRODUCER_ERROR),
+      push_system_action(producer, system_actions::REGISTER_PRODUCER, mvo()
+         (system_fields::PRODUCER, producer)
+         (system_fields::PRODUCER_KEY, get_public_key(producer, system_permissions::ACTIVE))
+         (system_fields::URL, std::string{})(system_fields::LOCATION, 0)));
+   BOOST_REQUIRE(!get_producer_info(producer)[system_fields::IS_ACTIVE].as<bool>());
 } FC_LOG_AND_RETHROW()
 
 // An account without an ACTIVE producer operator cannot create the persistent producer row. Once

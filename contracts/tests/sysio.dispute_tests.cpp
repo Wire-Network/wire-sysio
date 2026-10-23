@@ -51,6 +51,9 @@ using mvo = fc::mutable_variant_object;
 
 namespace {
 
+/// Native collateral used by the ordinary operator fixture.
+constexpr std::string_view WIRE_CHAIN_CODE = "WIRE";
+
 /// Build an `authority` whose active permission is the account's own active key plus a list of
 /// `{actor, sysio.code}` co-signers — lets the listed contracts authorize inline actions as `account`.
 authority active_with_code_authors(name account, const std::vector<name>& code_authors) {
@@ -207,7 +210,7 @@ public:
          ("terminate_max_pct_misses_24h", 5)("terminate_window_ms", uint64_t{24ULL*60*60*1000})
          ("req_prod_collat", fc::variants{})
          ("req_batchop_collat", bootstrapped ? fc::variants{} :
-            fc::variants{make_chain_min_bond("WIRE", "WIRE", minimum_bond)})
+            fc::variants{make_chain_min_bond(WIRE_CHAIN_CODE, WIRE_CHAIN_CODE, minimum_bond)})
          ("req_uw_collat", fc::variants{})));
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()

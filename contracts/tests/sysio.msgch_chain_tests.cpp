@@ -80,10 +80,6 @@ constexpr uint64_t second_dispute_id = 2;
 constexpr const char* majority_payload = "bootstrap-majority";
 constexpr const char* minority_payload = "bootstrap-minority";
 constexpr const char* third_payload = "ordinary-minority";
-constexpr name operators_table = "operators"_n;
-constexpr name terminate_action = "terminate"_n;
-constexpr const char* account_field = "account";
-constexpr const char* reason_field = "reason";
 constexpr const char* removal_reason = "remove dissenter from live eligible set";
 } // namespace bootstrap_dispute
 
@@ -92,13 +88,21 @@ constexpr const char* removal_reason = "remove dissenter from live eligible set"
 constexpr uint32_t INBOUND_ENVELOPE_RETENTION_EPOCHS = 2;
 constexpr uint32_t ENVELOPE_PRUNE_BUDGET             = 4;
 
-/// sysio.opreg action identifiers used by the WNS-16 fixture.
+/// sysio.opreg table identifiers used by the bootstrap dispute regressions.
+namespace opreg_tables {
+constexpr name OPERATORS = "operators"_n;
+} // namespace opreg_tables
+
+/// sysio.opreg action identifiers used by the chain fixture.
 namespace opreg_actions {
 constexpr name SET_CONFIG = "setconfig"_n;
+constexpr name TERMINATE = "terminate"_n;
 } // namespace opreg_actions
 
-/// sysio.opreg ABI field identifiers used by the WNS-16 fixture.
+/// sysio.opreg ABI field identifiers used by the chain fixture.
 namespace opreg_fields {
+constexpr const char* ACCOUNT        = "account";
+constexpr const char* REASON         = "reason";
 constexpr const char* STATUS         = "status";
 constexpr const char* RECENT_ACTIONS = "recent_actions";
 constexpr const char* ACTION         = "action";
@@ -1970,7 +1974,7 @@ BOOST_FIXTURE_TEST_CASE(bootstrapped_minority_disputes_before_dispatch, sysio_ms
    using namespace bootstrap_dispute;
    bootstrap(complete_group_size);
    // Bootstrapped operators cannot deposit collateral; retain their valid seeded row byte-for-byte.
-   const auto before = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, operators_table, BATCHOP_C);
+   const auto before = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, opreg_tables::OPERATORS, BATCHOP_C);
    BOOST_REQUIRE(!before.empty());
    const uint32_t epoch = current_epoch();
    const auto majority = encode_delivery(epoch, majority_payload);
@@ -1995,7 +1999,7 @@ BOOST_FIXTURE_TEST_CASE(bootstrapped_minority_disputes_before_dispatch, sysio_ms
    assert_no_consensus(ETH_OUTPOST_ID, epoch);
    BOOST_REQUIRE(get_dispute(second_dispute_id).is_null());
    BOOST_REQUIRE_EQUAL(epoch, current_epoch());
-   BOOST_REQUIRE(before == get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, operators_table, BATCHOP_C));
+   BOOST_REQUIRE(before == get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, opreg_tables::OPERATORS, BATCHOP_C));
 
    resolve_tie_dispute(epoch, majority_checksum);
    BOOST_REQUIRE(!epoch_is_paused());
@@ -2006,7 +2010,7 @@ BOOST_FIXTURE_TEST_CASE(bootstrapped_minority_disputes_before_dispatch, sysio_ms
    BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
    BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
                        get_operator(BATCHOP_C)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
-   BOOST_REQUIRE(before == get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, operators_table, BATCHOP_C));
+   BOOST_REQUIRE(before == get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, opreg_tables::OPERATORS, BATCHOP_C));
 } FC_LOG_AND_RETHROW() }
 
 /// Four ordinary votes against one bootstrapped vote in a seven-member cohort must dispute even
@@ -2072,8 +2076,8 @@ BOOST_FIXTURE_TEST_CASE(ineligible_bootstrapped_dissent_does_not_dispute, sysio_
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, minority));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, majority));
    BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, majority));
-   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, terminate_action,
-      mvo()(account_field, BATCHOP_C)(reason_field, removal_reason)));
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, opreg_actions::TERMINATE,
+      mvo()(opreg_fields::ACCOUNT, BATCHOP_C)(opreg_fields::REASON, removal_reason)));
    elapse_epoch_boundary();
    advance_via_consensus();
    BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());

@@ -25,6 +25,25 @@ using sysio_system::test_support::codename_mvo;
 
 namespace {
 
+/// sysio.opreg tables inspected by the bootstrap slash regressions.
+namespace opreg_tables {
+constexpr auto OPERATORS = "operators"_n;
+} // namespace opreg_tables
+
+/// sysio.opreg actions exercised by the bootstrap slash regressions.
+namespace opreg_actions {
+constexpr auto SLASH = "slash"_n;
+} // namespace opreg_actions
+
+/// sysio.opreg ABI fields used by the bootstrap slash regressions.
+namespace opreg_fields {
+constexpr auto ACCOUNT = "account";
+constexpr auto REASON = "reason";
+} // namespace opreg_fields
+
+/// Authorization remains mandatory even when a protected operator cannot be slashed.
+constexpr auto kMissingSlashAuthority = "missing authority of sysio.chalg";
+
 /// Standard opreg prune delay used by focused setconfig tests.
 constexpr uint64_t kDefaultPruneDelayMs = 600000;
 
@@ -1242,38 +1261,34 @@ BOOST_FIXTURE_TEST_CASE(regoperator_duplicate_rejected, sysio_opreg_tester) { tr
 /// A protected operator's entire row (including balances, timestamps and audit history) must
 /// survive repeated authorized slashes. Authorization still applies, even to the no-op branch.
 BOOST_FIXTURE_TEST_CASE(slash_bootstrapped_is_authorized_noop, sysio_opreg_tester) { try {
-   constexpr auto operators_table = "operators"_n;
-   constexpr auto slash_action = "slash"_n;
-   constexpr auto account_field = "account";
-   constexpr auto reason_field = "reason";
-   constexpr auto missing_authority = "missing authority of sysio.chalg";
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    for (const auto account : {kEligibilityBatchOperator, kEligibilityProducer}) {
       const auto type = account == kEligibilityProducer ? OPERATOR_TYPE_PRODUCER : OPERATOR_TYPE_BATCH;
       BOOST_REQUIRE_EQUAL(success(), regoperator(account, type, /*is_bootstrapped=*/true));
       // Bootstrapped operators cannot deposit; their seeded balances must remain untouched.
-      const auto before = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, operators_table, account);
+      const auto before = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, opreg_tables::OPERATORS, account);
       BOOST_REQUIRE(!before.empty());
       produce_blocks();
-      BOOST_REQUIRE_EQUAL(error(missing_authority), push_opreg_action(account, slash_action,
-         mvo()(account_field, account)(reason_field, kTestSlashReason)));
+      BOOST_REQUIRE_EQUAL(error(kMissingSlashAuthority), push_opreg_action(account, opreg_actions::SLASH,
+         mvo()(opreg_fields::ACCOUNT, account)(opreg_fields::REASON, kTestSlashReason)));
       for (size_t attempt = 0; attempt < 2; ++attempt) {
          BOOST_REQUIRE_EQUAL(success(), slash(account, std::string{kTestSlashReason}));
          produce_blocks();
-         BOOST_REQUIRE(before == get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, operators_table, account));
+         BOOST_REQUIRE(before == get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, opreg_tables::OPERATORS, account));
       }
    }
 } FC_LOG_AND_RETHROW() }
 
 /// Even a previously removed bootstrapped operator soft-declines before the terminal-state check.
 BOOST_FIXTURE_TEST_CASE(slash_terminated_bootstrapped_is_noop, sysio_opreg_tester) { try {
-   constexpr auto operators_table = "operators"_n;
    BOOST_REQUIRE_EQUAL(success(), setconfig());
    BOOST_REQUIRE_EQUAL(success(), regoperator(kEligibilityBatchOperator, OPERATOR_TYPE_BATCH, true));
    BOOST_REQUIRE_EQUAL(success(), terminate(kEligibilityBatchOperator, std::string{kTestTerminationReason}));
-   const auto before = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, operators_table, kEligibilityBatchOperator);
+   const auto before = get_row_by_account(
+      OPREG_ACCOUNT, OPREG_ACCOUNT, opreg_tables::OPERATORS, kEligibilityBatchOperator);
    BOOST_REQUIRE_EQUAL(success(), slash(kEligibilityBatchOperator, std::string{kTestSlashReason}));
-   BOOST_REQUIRE(before == get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, operators_table, kEligibilityBatchOperator));
+   BOOST_REQUIRE(before == get_row_by_account(
+      OPREG_ACCOUNT, OPREG_ACCOUNT, opreg_tables::OPERATORS, kEligibilityBatchOperator));
 } FC_LOG_AND_RETHROW() }
 
 /// Slashing an ordinary funded operator remains permanent.

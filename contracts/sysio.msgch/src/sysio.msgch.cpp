@@ -133,7 +133,9 @@ constexpr const char* DISPUTE_NO_TIER_ONE_ELECTORATE_LOG =
    "no registered tier-1 node owners\n";
 
 /// Inline action shared by the no-majority and bootstrapped-minority dispute policies.
+namespace chalg_actions {
 constexpr name OPEN_DISPUTE_ACTION = "opendispute"_n;
+} // namespace chalg_actions
 
 /// Mint the next attestation id from the `attseq` singleton.
 ///
@@ -947,7 +949,7 @@ void open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
    action(
       permission_level{self, "active"_n},
       CHALG_ACCOUNT,
-      OPEN_DISPUTE_ACTION,
+      chalg_actions::OPEN_DISPUTE_ACTION,
       std::make_tuple(chain_code, epoch_index, candidates)
    ).send();
 }
