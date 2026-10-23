@@ -172,7 +172,7 @@ namespace sysio {
    /// when chain_plugin's plugin_initialize constructs it, and appbase runs that before any dependent plugin
    /// initializes.
    inline constexpr auto get_info_consumer_plugins =
-      std::to_array<std::string_view>({"sysio::chain_api_plugin", "sysio::status_monitor_plugin"});
+      std::to_array<std::string_view>({"sysio::chain_api_plugin", "sysio::alert_monitor_plugin"});
 
    /// True when any `plugin` option value names a get_info consumer. Substring match, because appbase lets
    /// one option value carry several plugin names; the option is a free-form list, so the match is
