@@ -11,6 +11,7 @@ Usage:
 
 from __future__ import annotations
 
+import atexit
 import copy
 import json
 import os
@@ -36,11 +37,12 @@ WalletMgr: Any = None
 cluster_generator: Any = None
 Account: Any = None
 CORE_SYMBOL: Any = None
+bind_registry: Any = None
 
 
 def _setup_harness(build_dir: Path) -> None:
     """Import TestHarness from <build-dir>/tests/ and bind module globals."""
-    global Utils, Node, WalletMgr, cluster_generator, Account, CORE_SYMBOL  # noqa: PLW0603
+    global Utils, Node, WalletMgr, cluster_generator, Account, CORE_SYMBOL, bind_registry  # noqa: PLW0603
 
     tests_dir = build_dir / "tests"
     harness_marker = tests_dir / "TestHarness" / "core_symbol.py"
@@ -58,6 +60,7 @@ def _setup_harness(build_dir: Path) -> None:
     from TestHarness.launcher import cluster_generator as _cg  # pyright: ignore[reportMissingImports]
     from TestHarness.accounts import Account as _Account  # pyright: ignore[reportMissingImports]
     from TestHarness.core_symbol import CORE_SYMBOL as _CS  # pyright: ignore[reportMissingImports]
+    from TestHarness import bind_registry as _bind_registry  # pyright: ignore[reportMissingImports]
 
     Utils = _Utils
     Node = _Node
@@ -65,6 +68,7 @@ def _setup_harness(build_dir: Path) -> None:
     cluster_generator = _cg
     Account = _Account
     CORE_SYMBOL = _CS  # pyright: ignore[reportConstantRedefinition]
+    bind_registry = _bind_registry
 
 
 # ---------------------------------------------------------------------------
@@ -275,7 +279,7 @@ def _create_cluster(
         node_num = instance.index
         node = Node(
             "localhost",
-            8888 + node_num,
+            instance.http_port,  # From this process's bind-registry lease (see _save_state's "ports").
             node_num,
             Path(instance.data_dir_name),
             Path(instance.config_dir_name),
@@ -338,7 +342,10 @@ def _create_cluster(
             "total_nodes": total_nodes,
             "prod_count": prod_count,
             "topo": topo,
+            "build_dir": str(build_dir),
             "nodes": node_states,
+            # The bind-registry lease the node commands use; 'run' registers it again (see _run_cluster).
+            "ports": bind_registry.ensure_ports(),
         },
     )
 
@@ -795,10 +802,30 @@ def _parse_cluster_keys(total_nodes: int) -> dict[str, Any] | None:
 # ---------------------------------------------------------------------------
 
 
+def _claim_cluster_ports(state: dict[str, Any]) -> None:
+    """Register the cluster's saved ports in the bind registry for the lifetime of this 'run' process.
+
+    'create' leased the ports and wrote them into every node command; that lease ended with 'create'.
+    'run' registers exactly those ports again, so no other process is handed them while the cluster
+    runs, and fails if another live registration took any of them in between.
+    """
+    if "ports" not in state:
+        raise click.ClickException("Cluster state has no port lease. Re-create the cluster with 'create'.")
+    _setup_harness(Path(state["build_dir"]))
+    try:
+        path, _ = bind_registry.register_ports(state["ports"])
+    except bind_registry.PortsHeldError as error:
+        raise click.ClickException(
+            f"{error}. Another process took ports this cluster uses; stop it or re-create the cluster."
+        ) from error
+    atexit.register(bind_registry.release, path)
+
+
 def _run_cluster(chain_dir: Path) -> None:
     """Start all nodes from previously created cluster state and run in foreground."""
     state = _load_state(chain_dir)
     node_states = state["nodes"]
+    _claim_cluster_ports(state)
 
     procs: list[tuple[dict[str, Any], subprocess.Popen[bytes]]] = []
     log_files: list[Any] = []

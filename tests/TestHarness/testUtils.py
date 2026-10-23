@@ -18,6 +18,7 @@ import shutil
 import sys
 from pathlib import Path
 import threading
+from .bind_registry import LEASE_PORT_COUNT, ensure_ports
 
 # Fancy import to maintain compatibility with python 3.10
 try:
@@ -95,7 +96,6 @@ class Utils:
     ConfigDir=f"{DataPath}/"
 
     TimeFmt='%Y-%m-%dT%H:%M:%S.%f'
-    TestPortOffsetEnvVar="SYSIO_TEST_PORT_OFFSET"
     PortShip="ship"
     PortStateHistory="state_history"
     PortBiosHttp="bios_http"
@@ -115,33 +115,18 @@ class Utils:
     PortWalletSlot=164
     PortTransactionOnlySlot=PortWalletSlot + WalletPortCount
     PortIpv6ProbeSlot=PortTransactionOnlySlot + TransactionOnlyPortCount
-    _testPortOffset=None
     _nodeopHelpOutput=None
     # Lock subprocess_results.log writes and cached nodeop option discovery across threads.
     _check_output_lock = threading.Lock()
 
     @staticmethod
-    def getTestPortOffset():
-        """Return the configured per-test port shard offset."""
-        if Utils._testPortOffset is not None:
-            return Utils._testPortOffset
-
-        rawOffset=os.environ.get(Utils.TestPortOffsetEnvVar, "0")
-        if not re.fullmatch(r"[0-9]+", rawOffset):
-            raise RuntimeError(f"{Utils.TestPortOffsetEnvVar} must be an unsigned integer, got '{rawOffset}'")
-        offset=int(rawOffset)
-
-        Utils._testPortOffset=offset
-        return offset
-
-    @staticmethod
     def getPort(port_category, index=0):
-        """Return a deterministic port from this test's compact port shard.
+        """Return this test's leased port for a listener category.
 
         port_category names the listener class and index selects a listener
-        within that class.  CTest assigns each test a unique shard offset, and
-        this allocator keeps all known listener classes inside one bounded
-        192-port shard below the ephemeral range.
+        within that class. Ports come from the bind-registry lease the CTest
+        wrapper (tests/bind_registry.py) passes in SYSIO_TEST_PORTS; a test run
+        by hand takes a lease for itself on the first call.
         """
         assert(isinstance(port_category, str))
         assert(isinstance(index, int))
@@ -168,39 +153,12 @@ class Utils:
             raise RuntimeError(f"Unknown port category '{port_category}'")
 
         slotStart, slotCount=slotRanges[port_category]
+        assert slotStart + slotCount <= LEASE_PORT_COUNT, f"Category '{port_category}' overruns the {LEASE_PORT_COUNT}-port lease"
         if index >= slotCount:
             raise RuntimeError(
                 f"Port index {index} is outside category '{port_category}' capacity {slotCount}")
 
-        offset=Utils.getTestPortOffset()
-        if offset == 0:
-            # The unsharded wallet and transaction-only defaults intentionally preserve
-            # historical manual-test ports, including their legacy overlap at 9902/9903.
-            defaultPorts={
-                Utils.PortShip: 7899,
-                Utils.PortStateHistory: 8080,
-                Utils.PortBiosHttp: 8788,
-                Utils.PortBiosP2P: 9776,
-                Utils.PortNodeHttp: 8888,
-                Utils.PortAlternateService: 8976,
-                Utils.PortPluginHttpPeer: 9009,
-                Utils.PortPluginHttpLocal: 9011,
-                Utils.PortAlternateP2P: 9777,
-                Utils.PortP2P: 9876,
-                Utils.PortWallet: 9899,
-                Utils.PortTransactionOnly: 9902,
-                Utils.PortIpv6Probe: 9997,
-            }
-            shiftedPort=defaultPorts[port_category] + index
-        else:
-            shiftedPort=8888 + offset + slotStart + index
-
-        if shiftedPort < 1 or shiftedPort > 65535:
-            raise RuntimeError(
-                f"Port category '{port_category}' index {index} shifted by "
-                f"{Utils.TestPortOffsetEnvVar}={Utils.getTestPortOffset()} "
-                f"produces invalid port {shiftedPort}")
-        return shiftedPort
+        return ensure_ports()[slotStart + index]
 
     @staticmethod
     def nodeopSupportsOption(option):
@@ -597,7 +555,7 @@ class Utils:
 
     @staticmethod
     def arePortsAvailable(ports):
-        """Check whether final, already-sharded ports are available for listening on."""
+        """Check whether final, already-leased ports are available for listening on."""
         assert(ports)
         if isinstance(ports, int):
             ports={ports}

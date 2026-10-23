@@ -54,10 +54,6 @@ class nodeDefinition:
     data_dir_name: str = field(init=False)
     p2p_port: int = 0
     http_port: int = 0
-    base_p2p_port: ClassVar[int] = Utils.getPort(Utils.PortP2P)
-    base_http_port: ClassVar[int] = Utils.getPort(Utils.PortNodeHttp)
-    bios_p2p_port: ClassVar[int] = Utils.getPort(Utils.PortBiosP2P)
-    bios_http_port: ClassVar[int] = Utils.getPort(Utils.PortBiosHttp)
     host_name: str = 'localhost'
     public_name: str = 'localhost'
     listen_addr: str = '0.0.0.0'
@@ -81,24 +77,24 @@ class nodeDefinition:
 
     @classmethod
     def p2p_bios_port(cls):
-        """Return the BIOS P2P listener port assigned to this test shard."""
-        return cls.bios_p2p_port
+        """Return the BIOS P2P listener port from this test's lease."""
+        return Utils.getPort(Utils.PortBiosP2P)
 
     @classmethod
     def http_bios_port(cls):
-        """Return the BIOS HTTP listener port assigned to this test shard."""
-        return cls.bios_http_port
+        """Return the BIOS HTTP listener port from this test's lease."""
+        return Utils.getPort(Utils.PortBiosHttp)
 
     @classmethod
     def create_p2p_port_generator(cls):
-        """Yield checked P2P ports from this test's shard."""
+        """Yield P2P ports from this test's lease."""
         while True:
             yield Utils.getPort(Utils.PortP2P, cls.p2p_count)
             cls.p2p_count += 1
 
     @classmethod
     def create_http_port_generator(cls):
-        """Yield checked HTTP ports from this test's shard."""
+        """Yield HTTP ports from this test's lease."""
         while True:
             yield Utils.getPort(Utils.PortNodeHttp, cls.http_count)
             cls.http_count += 1

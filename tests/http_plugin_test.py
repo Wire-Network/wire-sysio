@@ -41,8 +41,8 @@ try:
     cluster.getInfos()
 
     node0 = cluster.nodes[0]
-    ## HTTP plugin listens to 127.0.0.1:<sharded-port> by default. With the --http-validate-host=true,
-    ## the HTTP request to "http://localhost:<sharded-port>" should fail because the HOST header doesn't
+    ## HTTP plugin listens to 127.0.0.1:<leased-port> by default. With the --http-validate-host=true,
+    ## the HTTP request to "http://localhost:<leased-port>" should fail because the HOST header doesn't
     ## match "127.0.0.1".
 
     def get_info_status(url):
