@@ -59,7 +59,7 @@ void send_linked_rewards_sweep(const name self, const name account,
  * Best-effort sweep for the trusted inbound path.
  *
  * A missing or non-privileged DClaim deployment cannot safely bill new rows to sysio. Preserve the
- * recorded link so an identical operator-authorized recordlink can retry after bootstrap.
+ * recorded link so governance can retry with an identical recordlink after bootstrap.
  */
 void try_send_linked_rewards_sweep(const name self, const name account,
                                    const opp::types::ChainKind chain_kind,

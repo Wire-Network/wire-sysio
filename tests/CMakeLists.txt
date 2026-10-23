@@ -87,6 +87,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_sync_throttle_test_shape.json ${C
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_no_blocks_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_no_blocks_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_no_blocks_test_shape.json ${CMAKE_CURRENT_BINARY_DIR}/p2p_no_blocks_test_shape.json COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_peer_auth_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_peer_auth_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_peer_auth_grace_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_peer_auth_grace_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_peer_scoring_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_peer_scoring_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/compute_transaction_test.py ${CMAKE_CURRENT_BINARY_DIR}/compute_transaction_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/subjective_billing_test.py ${CMAKE_CURRENT_BINARY_DIR}/subjective_billing_test.py COPYONLY)
@@ -196,6 +197,7 @@ add_np_test(NAME interrupt-read-only-trx-parallel-if-sys-vm-oc-test COMMAND test
 # read-only thread-heavy clusters at the same time.
 set(READ_ONLY_TRX_TESTS
   read-only-trx-basic-test
+  read-only-trx-irreversible-test
   read-only-trx-parallel-test
   read-only-trx-parallel-if-sys-vm-oc-test
   read-only-trx-parallel-no-oc-if-test
@@ -240,6 +242,7 @@ add_np_test(NAME p2p_no_listen_test COMMAND tests/p2p_no_listen_test.py -v)
 add_lr_test(NAME p2p_sync_throttle_test COMMAND tests/p2p_sync_throttle_test.py -v -d 2)
 add_np_test(NAME p2p_no_blocks_if_test COMMAND tests/p2p_no_blocks_test.py -v -d 2)
 add_np_test(NAME p2p_peer_auth_test COMMAND tests/p2p_peer_auth_test.py -v)
+add_np_test(NAME p2p_peer_auth_grace_test COMMAND tests/p2p_peer_auth_grace_test.py -v)
 add_np_test(NAME p2p_peer_scoring_test COMMAND tests/p2p_peer_scoring_test.py -v)
 
 # needs iproute-tc or iproute2 depending on platform

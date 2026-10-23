@@ -84,10 +84,9 @@ Each item is a deploy or upgrade step. An item not done is a freeze that cannot 
    account signs using its own key but declares `sysio.andon@pull` or `sysio.andon@clear`.
    Privileged `sysio.synd` automatically pulls with `sysio.andon@active` on a custody shortfall;
    that declared permission must exist. Deploy Andon before syndication carries traffic.
-2. **Solana.** Upgrade liqsol-core and run the GlobalState migration,
-   `bash-scripts/feature-flags.sh migrate-wire-global-state-liq-fields` (menu entry `mf`, instruction
-   `migrate_global_state_liq_fields`; called "the GlobalState migration" below), in the same
-   maintenance window (see [Upgrade window](#upgrade-window)). Then name the panic account with the admin keypair
+2. **Solana.** Upgrade liqsol-core and load the matching IDL in the relay
+   (see [Upgrade window](#upgrade-window)). `GlobalState.frozen` occupies retired reserved bytes
+   in the deployed 123-byte account; no account-growth migration is required. Name the panic account with the admin keypair
    (`set-panic`, [Solana commands](#solana-commands)) and read it back with `status`.
 3. **Ethereum.** Set `panicAccount` in the deploy (or upgrade) config. A fresh deploy maps `pause` and
    `unpause` to the `panic` role from `permissions/outpost.yaml` and `permissions/liqeth.yaml` and
@@ -150,7 +149,7 @@ any other chain-state refusal once the recipient resolved, logged as `Desyndicat
 `GlobalState.paused` is a different flag with its own meaning; `set_frozen` does not touch it and it is
 not the emergency stop. A `DESYNDICATE_LIQ` with request id 0 cannot key a `PendingPayout` and is
 recorded unpaid; `sysio.synd` numbers desyndications from 1, so this only happens when the depot and
-the outpost have diverged. The relay skips the yield report of a frozen outpost and logs it at info.
+the outpost have diverged. The relay skips the yield report of a frozen or paused outpost and logs it at info.
 
 ### Ethereum outpost
 
@@ -624,7 +623,8 @@ The settlement logs `DesyndicateLIQDeferred user=... token_code=... amount=... r
 pending=<pda> reason=<reason>` (`instructions/opp/inbound.rs:5403-5411`). `pending` lists every
 record (by account type, so none is missed); `pay <request_id>` pays one; `pay-all` pays each in turn
 and reports the ones that refuse. `pay_pending_desyndication` refuses, and keeps the record, while the
-outpost is frozen (`OutpostFrozen`), before the GlobalState migration has run (`GlobalStateMigrationRequired`), while a share
+outpost is frozen (`OutpostFrozen`), while `GlobalState` cannot deserialize or its yield-index
+layout marker is unsupported (`GlobalStateMigrationRequired`), while a share
 record is legacy (`LegacyUserRecordMigrationRequired`), outside PostLaunch, and on any chain-state
 refusal (`PendingDesyndicationNotPayable` 6089, reason logged). On payment the account closes and its
 rent returns to `rent_payer`.
@@ -689,16 +689,17 @@ solana -u "$SOL_RPC" balance "$RELAY_SIGNER"
 
 ## Upgrade window
 
-- **Solana.** The `frozen` flag is appended to `GlobalState` (8+131 to 8+132 bytes). Run the GlobalState
-  migration in the same maintenance window as the liqsol-core upgrade:
-  ```bash
-  bash-scripts/feature-flags.sh migrate-wire-global-state-liq-fields             # dry-run
-  bash-scripts/feature-flags.sh migrate-wire-global-state-liq-fields --execute
-  ```
-  (wire-solana `runbooks/post-launch-cleanup.md`). Until it runs, every typed `GlobalState`
-  instruction refuses the short account, `set_frozen` included, so the outpost cannot be frozen; a
-  `DESYNDICATE_LIQ` aborts its dispatch with `GlobalStateMigrationRequired` (retried after the GlobalState migration, not
-  skipped), so the epoch waits; and the relay treats the yield report as not due and logs a warning.
+- **Solana.** Upgrade liqsol-core and update the relay's loaded IDL together.
+  `liq_sequence`, `liq_yield_reported` and `frozen` occupy retired reserved bytes in the
+  deployed 123-byte `GlobalState`; `wire_state` and `bump` retain their offsets. The removed
+  `migrate_global_state_liq_fields` instruction is not an upgrade step. The relay checks the
+  IDL's bool `frozen` and `paused` declarations at startup, decodes the account using that IDL,
+  and submits yield reports only in unpaused, unfrozen PostLaunch state. A decode failure logs
+  the GlobalState PDA and byte length and fails the crank; it does not imply an account-growth
+  migration. `GlobalStateMigrationRequired` can mean that the account cannot deserialize or that
+  its separate yield-index layout marker is unsupported. Check the deployed program/IDL and
+  marker; follow the program's yield-index upgrade procedure if that marker is unsupported.
+  Configure and verify the panic account and freeze controls before admitting traffic.
 - **Depot.** Deploy `sysio.andon` and configure native pull/clear permissions before the four contracts that read the cord;
   redeploy all five together whenever the `cord` row layout changes
   ([`contract-upgrade-order.md`](contract-upgrade-order.md)).
