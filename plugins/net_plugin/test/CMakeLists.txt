@@ -7,6 +7,7 @@ add_executable( test_net_plugin
         rate_limit_parse_unittest.cpp
         net_msg_wire_unittest.cpp
         peer_auth_unittest.cpp
+        peer_scoring_unittest.cpp
         queued_buffer_unittest.cpp
         subnet_mask_unittest.cpp
         main.cpp

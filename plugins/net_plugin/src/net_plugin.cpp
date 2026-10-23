@@ -308,7 +308,9 @@ namespace sysio {
    class connections_manager {
    public:
       struct connection_detail {
-         std::string host;
+         /// Peer address an outbound connection was configured or requested with. An inbound connection has none,
+         /// so no lookup by host, not even by an empty one, can find it.
+         std::optional<std::string> host;
          connection_ptr c;
       };
 
@@ -317,7 +319,8 @@ namespace sysio {
          indexed_by<
             ordered_non_unique<
                tag<struct by_host>,
-               key<&connection_detail::host>
+               key<&connection_detail::host>,
+               std::less<> // look up by std::string without constructing an optional
             >,
             ordered_unique<
                tag<struct by_connection>,
@@ -383,7 +386,6 @@ namespace sysio {
       /// @return human-readable status string.
       string connect(const string& host, const string& p2p_address);
       string resolve_and_connect(const string& peer_address, const string& listen_address);
-      connection_ptr is_other_connected(const string& peer_address, const connection_ptr& c) const;
       string disconnect(const string& host);
       void close_all();
 
@@ -732,9 +734,16 @@ namespace sysio {
       proto_version_t                net_version = net_version_max;
       std::atomic<uint16_t>   consecutive_immediate_connection_close = 0;
       // bp_config = p2p-auto-bp-peer, bp_gossip = validated gossip connection,
-      // bp_gossip_validating = only used when connection received before peer keys available
+      // bp_gossip_validating = gossip connection not yet validated: gossip received before peer keys were available,
+      //                        or an inbound connection from a gossiped bp's outbound ip address
+      //                        (bp_connection_manager::mark_inbound_bp_connection)
       enum class bp_connection_type { non_bp, bp_config, bp_gossip, bp_gossip_validating };
       std::atomic<bp_connection_type> bp_connection = bp_connection_type::non_bp;
+      /// set by bp_connection_manager::admit_client() when this client takes one of the max_client_count slots
+      std::atomic<bool>       holds_client_slot{false};
+      /// set when this session queues a go-away, which ends it once written: nothing more the peer sends is
+      /// processed, and the session holds no client slot
+      std::atomic<bool>       go_away_queued{false};
       block_status_monitor    block_status_monitor_;
       std::atomic<time_point> last_vote_received;
       /// True once this peer may send ordinary frames to normal handlers.
@@ -762,7 +771,7 @@ namespace sysio {
       std::string                      p2p_address            GUARDED_BY(conn_mtx);
       std::string                      unique_conn_node_id    GUARDED_BY(conn_mtx);
       std::string                      remote_endpoint_ip     GUARDED_BY(conn_mtx);
-      boost::asio::ip::address_v6::bytes_type remote_endpoint_ip_array GUARDED_BY(conn_mtx);
+      boost::asio::ip::address_v6::bytes_type remote_endpoint_ip_array GUARDED_BY(conn_mtx) {};
 
       std::atomic<std::chrono::nanoseconds>  connection_start_time;
       /// Steady-clock start of the current session, min() while closed; times the peer-auth grace window.
@@ -970,6 +979,17 @@ namespace sysio {
          fc::lock_guard g_conn( conn_mtx );
          return !last_handshake_recv.p2p_address.empty();
       }
+
+      /// thread safe
+      /// @return the IP address of the peer last connected to, in net_utils::to_mapped_v6 form; unspecified (::) before
+      ///         the first connect
+      boost::asio::ip::address_v6 remote_address() const {
+         fc::lock_guard g_conn( conn_mtx );
+         return boost::asio::ip::address_v6{remote_endpoint_ip_array};
+      }
+
+      /// thread safe; give up this connection's max_client_count slot, if it holds one
+      void release_client_slot() { holds_client_slot = false; }
    }; // class connection
 
    void queued_buffer::clear_out_queue(connection* conn, boost::system::error_code ec, std::size_t number_of_bytes_written) {
@@ -1190,12 +1210,7 @@ namespace sysio {
       fc::lock_guard g_conn( conn_mtx );
       remote_endpoint_ip = log_remote_endpoint_ip;
       if(!ec) {
-         if(rep.address().is_v4()) {
-            remote_endpoint_ip_array = make_address_v6(boost::asio::ip::v4_mapped, rep.address().to_v4()).to_bytes();
-         }
-         else {
-            remote_endpoint_ip_array = rep.address().to_v6().to_bytes();
-         }
+         remote_endpoint_ip_array = net_utils::to_mapped_v6(rep.address()).to_bytes();
       }
       else {
          fc_dlog( p2p_conn_log, "unable to retrieve remote endpoint for local {}:{}", local_endpoint_ip, local_endpoint_port);
@@ -1370,6 +1385,7 @@ namespace sysio {
    }
 
    void connection::close( bool reconnect, bool shutdown ) {
+      release_client_slot();
       set_state(connection_state::closing);
       boost::asio::post(strand, [self = shared_from_this(), reconnect, shutdown]() {
          self->_close( reconnect, shutdown );
@@ -1419,6 +1435,8 @@ namespace sysio {
       consecutive_blocks_nacks = 0;
       last_block_nack = block_id_type{};
       bp_connection = bp_connection_type::non_bp;
+      holds_client_slot = false;
+      go_away_queued = false;
 
       // if recently received a block from the connection then reset all connection block nacks
       if (last_received_block_time.load() >= my_impl->last_block_received_time.load() - fc::seconds(3)) {
@@ -1844,6 +1862,8 @@ namespace sysio {
       go_away_reason close_after_send = go_away_reason::no_reason;
       if (std::holds_alternative<go_away_message>(m)) {
          close_after_send = std::get<go_away_message>(m).reason;
+         go_away_queued = true;
+         release_client_slot();
       }
 
       buffer_factory buff_factory;
@@ -2924,9 +2944,7 @@ namespace sysio {
          string                    paddr_desc = paddr_str + ":" + std::to_string(paddr_port);
 
          // mask incoming address to /24 (IPv4) or /48 (IPv6) for subnet-level counting
-         const auto addr_v6 = paddr_add.is_v4()
-            ? boost::asio::ip::make_address_v6(boost::asio::ip::v4_mapped, paddr_add.to_v4())
-            : paddr_add.to_v6();
+         const auto addr_v6 = net_utils::to_mapped_v6(paddr_add);
          const uint8_t effective_prefix = addr_v6.is_v4_mapped()
             ? static_cast<uint8_t>(96 + 24)  // IPv4 /24
             : static_cast<uint8_t>(48);       // IPv6 /48
@@ -2974,21 +2992,13 @@ namespace sysio {
             socket.close(ec);
          } else {
             // max_client_count exceeded, attempt score-based eviction
-            connection_ptr victim;
-            int32_t lowest_score = peer_scoring::eviction_threshold;
-            connections.for_each_connection([&victim, &lowest_score](const connection_ptr& conn) {
-               if (conn->socket_is_open() && conn->incoming() &&
-                     conn->bp_connection == connection::bp_connection_type::non_bp) {
-                  auto score = conn->get_peer_score();
-                  if (score < lowest_score) {
-                     lowest_score = score;
-                     victim = conn;
-                  }
-               }
-            });
+            const connection_ptr victim = peer_scoring::select_eviction_victim<connection_ptr>(connections,
+               [](const connection_ptr& conn) {
+                  return conn->incoming() && conn->bp_connection == connection::bp_connection_type::non_bp;
+               });
             if (victim) {
                fc_ilog(p2p_conn_log, "Evicting low-score peer {} (score {}) to accept new connection: {}",
-                       victim->connection_id, lowest_score, paddr_desc);
+                       victim->connection_id, victim->get_peer_score(), paddr_desc);
                victim->close();
                fc_ilog(p2p_conn_log, "Accepted new connection (via eviction): {}", paddr_str);
                connections.any_of_supplied_peers([&listen_address, &paddr_str, &paddr_desc, &limit](const string& peer_addr) {
@@ -3159,6 +3169,9 @@ namespace sysio {
 
    // called from connection strand
    bool connection::process_next_message( uint32_t message_length ) {
+      // A closing connection, or one whose queued go-away ends its session once written, processes nothing more.
+      if( go_away_queued || closed() )
+         return false;
       bytes_received += message_length;
       last_bytes_received = get_time();
       try {
@@ -3598,6 +3611,15 @@ namespace sysio {
          enqueue( go_away_message{ go_away_reason::fatal_other } );
          return;
       }
+      // A session opens with one generation-1 handshake, where the checks and max-clients admission below run; refuse
+      // a session that skips it.
+      const bool first_handshake = !peer_session_established.load(std::memory_order_relaxed);
+      if( first_handshake && msg.generation != 1 ) {
+         peer_wlog( p2p_msg_log, this, "first handshake has generation {}, not 1", msg.generation );
+         no_retry = go_away_reason::fatal_other;
+         enqueue( go_away_message{ go_away_reason::fatal_other } );
+         return;
+      }
 
       const uint32_t peer_froot = block_header::num_from_id(msg.fork_db_root_id);
       const uint32_t peer_fhead = block_header::num_from_id(msg.fork_db_head_id);
@@ -3612,7 +3634,7 @@ namespace sysio {
       g_conn.unlock();
 
       set_state(connection_state::connected);
-      if (msg.generation == 1) {
+      if (first_handshake) {
          if( msg.chain_id != my_impl->chain_id ) {
             peer_ilog( p2p_conn_log, this, "Peer on a different chain. Closing connection" );
             no_retry = go_away_reason::wrong_chain;
@@ -3635,16 +3657,8 @@ namespace sysio {
          g_conn.unlock();
 
          my_impl->mark_configured_bp_connection(this);
-         if (my_impl->exceeding_connection_limit(shared_from_this())) {
-            // When auto bp peering is enabled, create_session() check doesn't have enough information to determine
-            // if a client is a BP peer. In create_session(), it only has the peer address which a node is connecting
-            // from, but it would be different from the address it is listening. The only way to make sure is when the
-            // first handshake message is received with the p2p_address information in the message. Thus the connection
-            // limit checking has to be here when auto bp peering is enabled.
-            fc_dlog(p2p_conn_log, "max_client_count {} exceeded", my_impl->connections.get_max_client_count());
-            my_impl->connections.disconnect(peer_address());
-            return;
-         }
+         if (incoming())
+            my_impl->mark_inbound_bp_connection(this);
 
          if( incoming() ) {
             if (auto [host, port, type] = net_utils::split_host_port_type(msg.p2p_address); !host.empty())
@@ -3677,8 +3691,8 @@ namespace sysio {
          };
          if (my_impl->connections.any_of_connections(is_duplicate)) {
             peer_dlog( p2p_conn_log, this, "sending go_away duplicate, msg.p2p_address: {}", msg.p2p_address );
-            enqueue(go_away_message{go_away_reason::duplicate, conn_node_id});
             no_retry = go_away_reason::duplicate;
+            enqueue(go_away_message{go_away_reason::duplicate, conn_node_id});
             return;
          }
 
@@ -3714,10 +3728,18 @@ namespace sysio {
                   peer_wlog( p2p_conn_log, this, "Peer chain is forked, sending: forked go away" );
                   no_retry = go_away_reason::forked;
                   enqueue( go_away_message( go_away_reason::forked ) );
+                  return;
                }
             } catch( ... ) {
                peer_wlog( p2p_blk_log, this, "caught an exception getting block id for {}", peer_froot );
             }
+         }
+
+         // With auto bp peering, max_client_count is enforced here rather than in create_session(): a bp peer is told
+         // from a client by its handshake's p2p_address as well as its source address. Every check above that turns
+         // the connection away returns, and only an admitted session goes on to be established.
+         if( !my_impl->admit_client(shared_from_this()) ) {
+            return;
          }
 
          if( sent_handshake_count == 0 ) {
@@ -4089,7 +4111,7 @@ namespace sysio {
          return;
 
       if (!my_impl->bp_gossip_initialized()) {
-         bp_connection = bp_connection_type::bp_gossip_validating;
+         my_impl->set_bp_connection(this, bp_connection_type::bp_gossip_validating);
          peer_dlog(p2p_msg_log, this, "received gossip_bp_peers_message before bp gossip initialized");
          return;
       }
@@ -4109,7 +4131,7 @@ namespace sysio {
       // valid gossip peer connection
       if (bp_connection != bp_connection_type::bp_gossip) {
          peer_dlog(p2p_msg_log, this, "bp gossip connection");
-         bp_connection = bp_connection_type::bp_gossip;
+         my_impl->set_bp_connection(this, bp_connection_type::bp_gossip);
       }
 
       if (first_msg) {
@@ -4571,6 +4593,8 @@ namespace sysio {
             "Defaults to true when producer-name is configured, so a producing node always exchanges full blocks.")
          ( "p2p-auto-bp-peer", bpo::value< vector<string> >()->composing(),
            "The account and public p2p endpoint of a block producer node to automatically connect to when it is in producer schedule. Not gossipped.\n"
+           "When host is an IP address, inbound connections from it are that producer's: "
+           "never counted against max-clients or evicted.\n"
            "  Syntax: bp_account,host:port\n"
            "  Example:\n"
            "    producer1,p2p.prod.io:9876\n"
@@ -5034,7 +5058,7 @@ namespace sysio {
    void connections_manager::add( connection_ptr c ) {
       std::lock_guard g( connections_mtx );
       connections.insert( connection_detail{
-         .host = c->peer_address(), 
+         .host = c->incoming() ? std::nullopt : std::optional<std::string>{c->peer_address()},
          .c = std::move(c)} );
    }
 
@@ -5202,18 +5226,6 @@ namespace sysio {
       auto iter = index.find(host);
       if(iter != index.end())
          return iter->c;
-      return {};
-   }
-
-   // thread safe
-   connection_ptr connections_manager::is_other_connected( const string& peer_address, const connection_ptr& c )const {
-      std::shared_lock g( connections_mtx );
-      const auto& index = connections.get<by_host>();
-      const auto& r = index.equal_range(peer_address);
-      for (auto i = r.first; i != r.second; ++i) {
-         if (i->c != c && i->c->connected())
-            return i->c;
-      }
       return {};
    }
 

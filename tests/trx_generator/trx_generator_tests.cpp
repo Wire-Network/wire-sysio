@@ -73,7 +73,8 @@ constexpr std::array expected_ports{
     expected_port{port_category::p2p, 141, 23},
     expected_port{port_category::wallet, 164, 5},
     expected_port{port_category::transaction_only, 169, 2},
-    expected_port{port_category::ipv6_probe, 171, 4}};
+    expected_port{port_category::ipv6_probe, 171, 4},
+    expected_port{port_category::raw_client, 175, 16}};
 
 /** The lease this test was started with; fails the test when it runs without one. */
 std::vector<uint16_t> require_lease() {
