@@ -38,7 +38,8 @@ enum class port_category {
    p2p,
    wallet,
    transaction_only,
-   ipv6_probe
+   ipv6_probe,
+   raw_client // not listeners: source ports of the raw P2P sessions tests/TestHarness/raw_p2p.py dials
 };
 
 /** The slots a category occupies in the lease: `[start, start + count)`. */
@@ -63,6 +64,7 @@ constexpr port_slots slots_of(port_category category) {
    case port_category::wallet:            return {164, 5};
    case port_category::transaction_only:  return {169, 2};
    case port_category::ipv6_probe:        return {171, 4};
+   case port_category::raw_client:        return {175, 16};
    }
    throw std::logic_error("unknown port category");
 }

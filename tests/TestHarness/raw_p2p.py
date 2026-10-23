@@ -5,6 +5,7 @@ messages, block nacks and peer_auth_message. It records the node's handshakes, p
 launches a single nodeop on loopback, outside any Cluster, and waits on what that node logs and reports.
 """
 
+import collections
 import hashlib
 import itertools
 import json
@@ -40,6 +41,11 @@ PRODUCER_NAME = "sysio"
 SUB_MILLISECOND_DIGITS = 3
 # Each launched nodeop takes the next index for its HTTP and P2P ports.
 NODE_INDEXES = itertools.count()
+# raw_client lease slots free for connect() to bind. A closed session's slot goes to the back, so it is reused as
+# late as possible.
+FREE_CLIENT_PORT_INDEXES = collections.deque(range(Utils.RawClientPortCount))
+# struct linger {l_onoff, l_linger} that makes close() reset the connection, leaving no TIME_WAIT on its port.
+LINGER_RESET = struct.pack("ii", 1, 0)
 
 FRAME_LENGTH = struct.Struct("<I")
 TIME_FIELDS = struct.Struct("<qqqq")
@@ -50,6 +56,9 @@ HANDSHAKE_FIELDS = struct.Struct("<H32s32s32s32s32sh")
 NETWORK_VERSION = 1
 INITIAL_GENERATION = 1
 NODE_ID_BYTES = 32
+# The node's log prefix names a session by these bytes of its peer's node id, in hex (fc::sha256::short_id).
+SHORT_ID_START = 4
+SHORT_ID_END = 12
 BLOCK_ID_BYTES = 32
 ZERO_BLOCK_ID = bytes(BLOCK_ID_BYTES)
 VARINT_CONTINUATION_BIT = 0x80
@@ -62,6 +71,7 @@ class MessageTag(IntEnum):
     handshake = 0
     go_away = 1
     time = 2
+    block_request = 4
     block_nack = 9
     peer_auth = 14
 
@@ -96,10 +106,14 @@ def pack_string(text):
 class RawPeer:
     """One P2P session with nodeop over a raw socket, recording what the node sends."""
 
-    def __init__(self, connection, label):
-        """Own a connected socket and pick this session's random node id."""
+    def __init__(self, connection, label, client_port_index=None):
+        """Own a connected socket and pick this session's random node id.
+
+        client_port_index is the raw_client lease slot the socket is bound to, given back when the session closes.
+        """
         self.connection = connection
         self.label = label
+        self.client_port_index = client_port_index
         # (host, port) of our end, which the node reports as the session's remote address; kept past a close.
         self.local_address = connection.getsockname()[:2]
         self.node_id = secrets.token_bytes(NODE_ID_BYTES)
@@ -114,18 +128,45 @@ class RawPeer:
         self.go_away_time = None
 
     def send(self, data):
-        """Write to the node; a reset socket counts as closed."""
+        """Write to the node. When the node has closed the session, first read what it sent, then close ours."""
         try:
             self.connection.sendall(data)
         except OSError:
-            self.closed = True
+            while not self.closed and select.select([self.connection], [], [], 0)[0]:
+                self.receive()
+            self.close()
+
+    def close(self):
+        """Reset the connection, unless it is already closed, and give back its raw_client port."""
+        self.closed = True
+        if self.connection.fileno() != -1:
+            self.connection.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, LINGER_RESET)
+            self.connection.close()
+        if self.client_port_index is not None:
+            FREE_CLIENT_PORT_INDEXES.append(self.client_port_index)
+            self.client_port_index = None
+
+    @property
+    def short_node_id(self):
+        """Return the name the node's log prefix gives this session once it has read the session's handshake."""
+        return self.node_id[SHORT_ID_START:SHORT_ID_END].hex()
+
+    def handshake_frame(self, chain_id, generation=INITIAL_GENERATION, fork_db_root_id=ZERO_BLOCK_ID):
+        """Return a handshake frame for an empty chain, or for one whose root, and head, is fork_db_root_id."""
+        fields = HANDSHAKE_FIELDS.pack(NETWORK_VERSION, chain_id, self.node_id, fork_db_root_id, fork_db_root_id,
+                                       ZERO_BLOCK_ID, generation)
+        address = f"{LOOPBACK}:{self.local_address[1]}"
+        return frame(MessageTag.handshake, fields + pack_string(address) + pack_string(AGENT_NAME))
 
     def send_handshake(self, chain_id, generation=INITIAL_GENERATION):
         """Send a handshake for an empty chain; a first one of generation 1 is what the node accepts."""
-        fields = HANDSHAKE_FIELDS.pack(NETWORK_VERSION, chain_id, self.node_id, ZERO_BLOCK_ID, ZERO_BLOCK_ID,
-                                       ZERO_BLOCK_ID, generation)
-        address = f"{LOOPBACK}:{self.connection.getsockname()[1]}"
-        self.send(frame(MessageTag.handshake, fields + pack_string(address) + pack_string(AGENT_NAME)))
+        self.send(self.handshake_frame(chain_id, generation))
+
+    @staticmethod
+    def block_request_frame(head_id):
+        """Return a block_request_message frame asking for the blocks after head_id."""
+        assert len(head_id) == BLOCK_ID_BYTES, f"Block id must be {BLOCK_ID_BYTES} bytes, got {len(head_id)}"
+        return frame(MessageTag.block_request, head_id)
 
     def auth_digest(self):
         """Return the digest the node verifies: sha256(node id, our node id, chain id), see peer_auth.hpp."""
@@ -153,7 +194,7 @@ class RawPeer:
         except ConnectionResetError:
             data = b""
         if not data:
-            self.closed = True
+            self.close()
             return
         self.buffer.extend(data)
         while len(self.buffer) >= FRAME_LENGTH.size:
@@ -192,6 +233,8 @@ class RawPeer:
                 return predicate()
             if keepalive and (self.last_ping is None or now - self.last_ping >= PING_INTERVAL_SECONDS):
                 self.ping()
+                if self.closed:
+                    continue
             readable, _, _ = select.select([self.connection], [], [], min(POLL_SECONDS, deadline - now))
             if readable:
                 self.receive()
@@ -219,6 +262,8 @@ def run_peers_until(peers, predicate, deadline):
             for peer in open_peers:
                 if peer.last_ping is None or now - peer.last_ping >= PING_INTERVAL_SECONDS:
                     peer.ping()
+            # A ping the node no longer takes closes its session.
+            open_peers = [peer for peer in open_peers if not peer.closed]
         readable, _, _ = select.select([peer.connection for peer in open_peers], [], [],
                                        0 if at_deadline else min(POLL_SECONDS, deadline - now))
         for peer in open_peers:
@@ -326,18 +371,23 @@ def wait_for_chain_id(node):
 def connect(p2p_port, label, source_address=None):
     """Open an incoming session to the node's P2P listener, retrying until it listens.
 
-    source_address is an optional (host, port) to bind the local end of the session to, with SO_REUSEADDR so a
-    rerun can bind it again while an earlier session's TIME_WAIT lasts. Nagle is off, so each message reaches the
-    node when it is sent.
+    The local end binds source_address, a (host, port), or else a free raw_client port of the test's lease on
+    LOOPBACK, which the session gives back when it closes. SO_REUSEADDR lets a rerun bind a port again while an earlier
+    session's TIME_WAIT lasts. Nagle is off, so each message reaches the node when it is sent.
     """
+    client_port_index = None
+    if source_address is None:
+        assert FREE_CLIENT_PORT_INDEXES, \
+            f"{label}: all {Utils.RawClientPortCount} raw_client ports are in open sessions"
+        client_port_index = FREE_CLIENT_PORT_INDEXES.popleft()
+        source_address = (LOOPBACK, Utils.getPort(Utils.PortRawClient, client_port_index))
     deadline = time.monotonic() + STARTUP_TIMEOUT_SECONDS
     while True:
         connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             connection.settimeout(STARTUP_TIMEOUT_SECONDS)
-            if source_address is not None:
-                connection.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                connection.bind(source_address)
+            connection.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            connection.bind(source_address)
             connection.connect((LOOPBACK, p2p_port))
         except ConnectionRefusedError:
             connection.close()
@@ -348,7 +398,7 @@ def connect(p2p_port, label, source_address=None):
             connection.close()
             raise
         connection.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-        return RawPeer(connection, label)
+        return RawPeer(connection, label, client_port_index)
 
 
 def accept_connection(listener, node, deadline):

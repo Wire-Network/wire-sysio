@@ -741,6 +741,9 @@ namespace sysio {
       std::atomic<bp_connection_type> bp_connection = bp_connection_type::non_bp;
       /// set by bp_connection_manager::admit_client() when this client takes one of the max_client_count slots
       std::atomic<bool>       holds_client_slot{false};
+      /// set when this session queues a go-away, which ends it once written: nothing more the peer sends is
+      /// processed, and the session holds no client slot
+      std::atomic<bool>       go_away_queued{false};
       block_status_monitor    block_status_monitor_;
       std::atomic<time_point> last_vote_received;
       /// True once this peer may send ordinary frames to normal handlers.
@@ -984,6 +987,9 @@ namespace sysio {
          fc::lock_guard g_conn( conn_mtx );
          return boost::asio::ip::address_v6{remote_endpoint_ip_array};
       }
+
+      /// thread safe; give up this connection's max_client_count slot, if it holds one
+      void release_client_slot() { holds_client_slot = false; }
    }; // class connection
 
    void queued_buffer::clear_out_queue(connection* conn, boost::system::error_code ec, std::size_t number_of_bytes_written) {
@@ -1379,6 +1385,7 @@ namespace sysio {
    }
 
    void connection::close( bool reconnect, bool shutdown ) {
+      release_client_slot();
       set_state(connection_state::closing);
       boost::asio::post(strand, [self = shared_from_this(), reconnect, shutdown]() {
          self->_close( reconnect, shutdown );
@@ -1429,6 +1436,7 @@ namespace sysio {
       last_block_nack = block_id_type{};
       bp_connection = bp_connection_type::non_bp;
       holds_client_slot = false;
+      go_away_queued = false;
 
       // if recently received a block from the connection then reset all connection block nacks
       if (last_received_block_time.load() >= my_impl->last_block_received_time.load() - fc::seconds(3)) {
@@ -1854,6 +1862,8 @@ namespace sysio {
       go_away_reason close_after_send = go_away_reason::no_reason;
       if (std::holds_alternative<go_away_message>(m)) {
          close_after_send = std::get<go_away_message>(m).reason;
+         go_away_queued = true;
+         release_client_slot();
       }
 
       buffer_factory buff_factory;
@@ -3159,6 +3169,9 @@ namespace sysio {
 
    // called from connection strand
    bool connection::process_next_message( uint32_t message_length ) {
+      // A closing connection, or one whose queued go-away ends its session once written, processes nothing more.
+      if( go_away_queued || closed() )
+         return false;
       bytes_received += message_length;
       last_bytes_received = get_time();
       try {
@@ -3598,9 +3611,10 @@ namespace sysio {
          enqueue( go_away_message{ go_away_reason::fatal_other } );
          return;
       }
-      // A session opens with generation 1, where the checks and max-clients admission below run; refuse one that
-      // skips it.
-      if( msg.generation != 1 && !peer_session_established.load(std::memory_order_relaxed) ) {
+      // A session opens with one generation-1 handshake, where the checks and max-clients admission below run; refuse
+      // a session that skips it.
+      const bool first_handshake = !peer_session_established.load(std::memory_order_relaxed);
+      if( first_handshake && msg.generation != 1 ) {
          peer_wlog( p2p_msg_log, this, "first handshake has generation {}, not 1", msg.generation );
          no_retry = go_away_reason::fatal_other;
          enqueue( go_away_message{ go_away_reason::fatal_other } );
@@ -3620,7 +3634,7 @@ namespace sysio {
       g_conn.unlock();
 
       set_state(connection_state::connected);
-      if (msg.generation == 1) {
+      if (first_handshake) {
          if( msg.chain_id != my_impl->chain_id ) {
             peer_ilog( p2p_conn_log, this, "Peer on a different chain. Closing connection" );
             no_retry = go_away_reason::wrong_chain;
@@ -3714,6 +3728,7 @@ namespace sysio {
                   peer_wlog( p2p_conn_log, this, "Peer chain is forked, sending: forked go away" );
                   no_retry = go_away_reason::forked;
                   enqueue( go_away_message( go_away_reason::forked ) );
+                  return;
                }
             } catch( ... ) {
                peer_wlog( p2p_blk_log, this, "caught an exception getting block id for {}", peer_froot );
@@ -3721,9 +3736,9 @@ namespace sysio {
          }
 
          // With auto bp peering, max_client_count is enforced here rather than in create_session(): a bp peer is told
-         // from a client by its handshake's p2p_address as well as its source address, and a connection the checks
-         // above already turned away takes no one's slot.
-         if( no_retry == go_away_reason::no_reason && !my_impl->admit_client(shared_from_this()) ) {
+         // from a client by its handshake's p2p_address as well as its source address. Every check above that turns
+         // the connection away returns, and only an admitted session goes on to be established.
+         if( !my_impl->admit_client(shared_from_this()) ) {
             return;
          }
 
@@ -4096,7 +4111,7 @@ namespace sysio {
          return;
 
       if (!my_impl->bp_gossip_initialized()) {
-         bp_connection = bp_connection_type::bp_gossip_validating;
+         my_impl->set_bp_connection(this, bp_connection_type::bp_gossip_validating);
          peer_dlog(p2p_msg_log, this, "received gossip_bp_peers_message before bp gossip initialized");
          return;
       }
@@ -4116,7 +4131,7 @@ namespace sysio {
       // valid gossip peer connection
       if (bp_connection != bp_connection_type::bp_gossip) {
          peer_dlog(p2p_msg_log, this, "bp gossip connection");
-         bp_connection = bp_connection_type::bp_gossip;
+         my_impl->set_bp_connection(this, bp_connection_type::bp_gossip);
       }
 
       if (first_msg) {

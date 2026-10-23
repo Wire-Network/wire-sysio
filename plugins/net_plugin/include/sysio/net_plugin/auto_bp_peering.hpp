@@ -321,12 +321,11 @@ public:
 
    /// Only called from connection strand
    /// @return true for a connection that counts against max_client_count once admitted: an inbound non-bp connection
-   ///         that has sent its first handshake, is not closing, and is not being turned away with a queued go-away
-   ///         (no_retry is set before it is queued)
+   ///         that has sent its first handshake, is not closing, and has not queued a go-away this session
    template <typename Conn>
    static bool client_connection(Conn&& conn) {
       return conn->bp_connection == Connection::bp_connection_type::non_bp && !conn->closed() &&
-             conn->no_retry == go_away_reason::no_reason && conn->incoming_and_handshake_received();
+             !conn->go_away_queued && conn->incoming_and_handshake_received();
    }
 
    /// Only called from connection strand
@@ -380,14 +379,15 @@ public:
 
    /// Only called from connection strand, when the first handshake of new_connection is received.
    /// Enforce max_client_count: a client takes a free slot, or over the limit the slot of the client
-   /// select_client_to_evict chooses, which is closed; otherwise it is closed itself. Only admitted clients hold slots,
-   /// and admissions are serialized, so newcomers that handshake together cannot share a slot, and none is refused for
-   /// a handshake still being checked.
+   /// select_client_to_evict chooses, which is closed; otherwise it is closed itself. Slots are taken only here,
+   /// one admission at a time, and given up without the mutex when a client closes, queues a go-away or becomes a bp
+   /// (set_bp_connection, which does take it). A victim is claimed by taking its slot, so one that has just given
+   /// its slot up is not evicted: the count is taken again instead.
    /// @return false when new_connection was refused
    bool admit_client(const std::shared_ptr<Connection>& new_connection) {
       fc::lock_guard g(client_admission_mtx);
-      if (exceeding_connection_limit(new_connection)) {
-         const uint32_t max_clients = self()->connections.get_max_client_count();
+      const uint32_t max_clients = self()->connections.get_max_client_count();
+      while (exceeding_connection_limit(new_connection)) {
          const std::shared_ptr<Connection> victim = select_client_to_evict(new_connection);
          if (!victim) {
             fc_dlog(p2p_conn_log, "max_client_count {} exceeded, no evictable peer, closing connection {}",
@@ -395,13 +395,27 @@ public:
             new_connection->close(false);
             return false;
          }
-         fc_ilog(p2p_conn_log, "max_client_count {} exceeded, evicting low-score peer {} (score {}) for connection {}",
-                 max_clients, victim->connection_id, victim->get_peer_score(), new_connection->connection_id);
-         victim->close();
+         if (victim->holds_client_slot.exchange(false)) {
+            fc_ilog(p2p_conn_log,
+                    "max_client_count {} exceeded, evicting low-score peer {} (score {}) for connection {}",
+                    max_clients, victim->connection_id, victim->get_peer_score(), new_connection->connection_id);
+            victim->close();
+            break;
+         }
       }
       if (client_connection(new_connection))
          new_connection->holds_client_slot = true;
       return true;
+   }
+
+   /// Only called from connection strand. Make conn a bp connection of type, giving up any client slot it holds.
+   /// Taking the admission mutex keeps this from interleaving with admit_client(), so a connection evicted as a
+   /// client was not a bp when it was chosen, and one that has become a bp is never chosen.
+   template <typename BpConnectionType> // Connection::bp_connection_type; Connection is incomplete here
+   void set_bp_connection(Connection* conn, BpConnectionType type) {
+      fc::lock_guard g(client_admission_mtx);
+      conn->release_client_slot();
+      conn->bp_connection = type;
    }
 
    // thread safe

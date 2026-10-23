@@ -32,9 +32,9 @@ from TestHarness import TestHelper, Utils
 from TestHarness.TestHelper import AppArgs
 from TestHarness.raw_p2p import (CONNECTION_CLEANUP_PERIOD_SECONDS, INITIAL_GENERATION, KEEPALIVE_SECONDS, LOOPBACK,
                                  POLL_SECONDS, RECV_BYTES, RESPONSE_TIMEOUT_SECONDS, STARTUP_TIMEOUT_SECONDS,
-                                 GoAwayReason, RawPeer, accept_connection, answer_handshake, launch_nodeop, node_log,
-                                 open_incoming, producer_args, stop_node, wait_for_block, wait_for_chain_id,
-                                 wait_for_log, write_genesis)
+                                 GoAwayReason, RawPeer, accept_connection, answer_handshake, connect, launch_nodeop,
+                                 node_log, open_incoming, producer_args, stop_node, wait_for_block,
+                                 wait_for_chain_id, wait_for_log, write_genesis)
 
 
 # An outgoing connection's heartbeat timeout, and so its authentication grace, is two keepalive intervals.
@@ -228,7 +228,7 @@ def run_late_auth(case_index, args):
         Utils.Print("PASS: late_auth, a dialer authenticating after a keepalive tick stays connected")
     finally:
         if peer is not None:
-            peer.connection.close()
+            peer.close()
         stop_node(node, args)
 
 
@@ -288,7 +288,7 @@ def run_auth_timeout(case_index, args):
             Utils.Print("PASS: auth_timeout, a grace-window close is redialed and a rejected key is not")
         finally:
             for peer in peers:
-                peer.connection.close()
+                peer.close()
             stop_node(node, args)
 
 
@@ -320,7 +320,7 @@ def run_rejected_auth(case_index, args):
                 assert peer.run_until(lambda: peer.closed, time.monotonic() + RESPONSE_TIMEOUT_SECONDS), \
                     f"{name}: node did not close the session"
             finally:
-                peer.connection.close()
+                peer.close()
         Utils.Print("PASS: rejected_auth, bad credentials are rejected on receipt")
     finally:
         stop_node(node, args)
@@ -369,8 +369,9 @@ def run_redial_sync(case_index, args):
                                SCHEDULING_ALLOWANCE_SECONDS)
             connection = accept_connection(listener, sync_node, redial_deadline)
             assert connection is not None, "Sync node did not redial after its grace window closed the session"
-            relay = Relay(connection, socket.create_connection((LOOPBACK, source_p2p_port),
-                                                               timeout=STARTUP_TIMEOUT_SECONDS))
+            upstream = connect(source_p2p_port, "relay to the producing node")
+            peers.append(upstream)
+            relay = Relay(connection, upstream.connection)
             relay.start()
             source_info = source.getInfo(silentErrors=True)
             assert source_info is not None, f"Producing node stopped answering; see {source.data_dir / 'stderr.txt'}"
@@ -387,7 +388,7 @@ def run_redial_sync(case_index, args):
             if relay is not None:
                 relay.stop()
             for peer in peers:
-                peer.connection.close()
+                peer.close()
             stop_node(sync_node, args)
             stop_node(source, args)
 

@@ -108,19 +108,20 @@ lowest-scoring inbound non-BP connection that is below the eviction threshold, a
 that peer and accepts the new connection, logging `Evicting low-score peer <id> (score <n>)`. Only when no
 peer is evictable is the new socket closed, with `max_client_count <n> exceeded, no evictable peer, closing` at
 debug level.
-With BP peering enabled the accept-time check is skipped and the limit is enforced at the first handshake
-instead, once the duplicate, version and fork checks have passed; a session must open with a generation-1 handshake
-to get there. It counts the inbound non-BP clients it has admitted that are not closing or being turned away, so a
-handshake that is rejected or still being checked takes no slot. The handshake identifies a BP peer by its
-`p2p_address`, when that names a `p2p-auto-bp-peer` endpoint, or by the connection's source address: the host of a
-`p2p-auto-bp-peer` entry
-written as an IP address, or, on a node that gossips its own BP endpoints, the outbound IP address a gossiped BP
-signed. A BP peer identified either way is neither counted nor ever evicted. Matching by address needs the BP to
-connect from exactly that address, and exempts everything else that connects from it, such as the BP's other nodes
-behind the same NAT. A client over the limit is then handled as at accept time, one handshake at a time: it takes the
-slot of the lowest-scoring client below the eviction threshold, logging `max_client_count <n> exceeded, evicting
-low-score peer <id> (score <n>) for connection <id>`, or is closed without a go-away, with `max_client_count <n>
-exceeded, no evictable peer, closing connection <id>` at debug level.
+With BP peering enabled the accept-time check is skipped and the limit is enforced at the first handshake instead,
+once the duplicate, version and fork checks have passed; a session must open with a generation-1 handshake to get
+there, and once the node queues it a go-away it processes nothing more the session sends. It counts the inbound
+non-BP clients it has admitted that are not closing or being turned away, so a handshake that is rejected or still
+being checked takes no slot. The handshake identifies a BP peer by its `p2p_address`, when that names a
+`p2p-auto-bp-peer` endpoint, or by the connection's source address: the host of a `p2p-auto-bp-peer` entry written
+as an IP address, or, on a node that gossips its own BP endpoints, the outbound IP address a gossiped BP signed. A
+BP peer identified either way is neither counted nor ever evicted, and a client the node later takes for a BP peer
+from its BP gossip gives up its slot. Matching by address needs the BP to connect from exactly that address, and
+exempts everything else that connects from it, such as the BP's other nodes behind the same NAT. A client over the
+limit is then handled as at accept time, one handshake at a time: it takes the slot of the lowest-scoring client
+below the eviction threshold, logging `max_client_count <n> exceeded, evicting low-score peer <id> (score <n>) for
+connection <id>`, or is closed without a go-away, with `max_client_count <n> exceeded, no evictable peer, closing
+connection <id>` at debug level.
 
 ## Enabling / configuration
 

@@ -14,14 +14,15 @@ threshold, and otherwise refuses it, leaving every other connection alone.
   score.
 * ``handshake_burst``: with auto bp peering, newcomers whose first handshakes are processed at the same time while one
   client is evictable: exactly one of them is admitted, in that client's place.
-* ``handshake_rejections``: with auto bp peering, a session that opens with a handshake other than generation 1 is
-  refused, and newcomers rejected for a wrong chain id stop counting before their go-away is sent, so a valid newcomer
-  handshaking with them still gets the free slot.
+* ``handshake_rejections``: with auto bp peering, a session that opens with a handshake other than generation 1, or
+  on another fork, is refused, and nothing it sent after the rejected handshake is processed. Newcomers rejected for a
+  wrong chain id hold no slot, so a valid newcomer handshaking with them still gets the free one.
 
 A raw peer lowers its own score by nacking blocks the node has made irreversible: each nack of the block after the
 one it last nacked costs it the peer_scoring::block_nack penalty.
 
-Every port the test binds or configures comes from Utils.getPort, the test's port allocation.
+Every port the test binds or configures, the source ports of its raw sessions included, comes from the test's
+bind-registry lease through Utils.getPort.
 """
 
 import json
@@ -32,11 +33,12 @@ import time
 import urllib.request
 from pathlib import Path
 
+import TestHarness
 from TestHarness import TestHelper, Utils
 from TestHarness.TestHelper import AppArgs
-from TestHarness.raw_p2p import (KEEPALIVE_SECONDS, LOOPBACK, RESPONSE_TIMEOUT_SECONDS, GoAwayReason, connect,
-                                 launch_nodeop, producer_args, run_peers_until, stop_node, wait_for_block,
-                                 wait_for_chain_id, wait_for_log, write_genesis)
+from TestHarness.raw_p2p import (BLOCK_ID_BYTES, KEEPALIVE_SECONDS, LOOPBACK, RESPONSE_TIMEOUT_SECONDS, GoAwayReason,
+                                 connect, launch_nodeop, node_log, producer_args, run_peers_until, stop_node,
+                                 wait_for_block, wait_for_chain_id, wait_for_log, write_genesis)
 
 
 MAX_CLIENTS = 2
@@ -67,7 +69,22 @@ REJECTED_PER_BURST = 7
 REJECTION_ROUNDS = 5
 # A first handshake that skips generation 1.
 SKIPPED_GENERATION = 2
+# The node reads one message per completion, so whether it would go on to process the frames sent after a rejected
+# handshake depends on the order its strand runs the go-away's write and the next reads; each of these sessions is
+# another chance for a node without the fix to do so.
+COALESCED_SESSIONS = 32
 CHAIN_ID_BYTES = 32
+# A block id starts with its block number, big-endian; block 1 is the genesis block every node has.
+BLOCK_NUM_BYTES = 4
+GENESIS_BLOCK_NUM = 1
+# A block the node has not made, which a turned-away session asks for after its rejected handshake.
+UNKNOWN_BLOCK_NUM = 4_242_424
+# Blocks the node makes before the rejections, so that a session it went on to admit would have blocks to sync.
+PRODUCED_BLOCKS = 3
+# What the node logs, at debug level, when it negotiates sync for a session it has admitted.
+SYNC_NEGOTIATION_LOG = "] handshake msg.froot"
+# The logger whose level the net_plugin loggers take when the logging config names none of them.
+P2P_PARENT_LOGGER = "net_plugin_impl"
 # Time for the node to accept every newcomer of a burst before any of them handshakes.
 ACCEPT_SECONDS = 0.5
 
@@ -137,13 +154,36 @@ def post_net(node, command, value):
         return json.load(response)
 
 
+def write_debug_p2p_logging(directory):
+    """Write the harness logging config, with the net_plugin loggers at debug level, into directory; return its path."""
+    config = json.loads((Path(TestHarness.__file__).parent / "logging-template.json").read_text())
+    for logger in config["loggers"]:
+        if logger["name"] == P2P_PARENT_LOGGER:
+            logger["level"] = "debug"
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / "logging.json"
+    path.write_text(json.dumps(config, indent=2))
+    return path
+
+
+def negotiated_sync(node, peer):
+    """Whether the node negotiated sync for peer's session, which it does only for a session it admitted."""
+    session = f' - {peer.short_node_id}" - '
+    return any(session in line and SYNC_NEGOTIATION_LOG in line for line in node_log(node).splitlines())
+
+
+def block_id(node, block_num):
+    """Return the id of the node's block block_num."""
+    block = node.processUrllibRequest("chain", "get_block", {"block_num_or_id": block_num})["payload"]
+    return bytes.fromhex(block["id"])
+
+
 def lower_score(node, peer, peers):
     """Nack the node's first NACKED_BLOCKS blocks from peer in one burst, then wait until the score is well below the
     eviction threshold."""
-    block_ids = [bytes.fromhex(node.processUrllibRequest("chain", "get_block", {"block_num_or_id": block_num})
-                               ["payload"]["id"]) for block_num in range(1, NACKED_BLOCKS + 1)]
-    for block_id in block_ids:
-        peer.send_block_nack(block_id)
+    nacked_ids = [block_id(node, block_num) for block_num in range(1, NACKED_BLOCKS + 1)]
+    for nacked_id in nacked_ids:
+        peer.send_block_nack(nacked_id)
 
     def lowered():
         record = connection_of(node, peer)
@@ -156,8 +196,7 @@ def lower_score(node, peer, peers):
 def close_sessions(node, closing, peers):
     """Close the sessions in closing, serving the other peers until the node no longer lists any of them as open."""
     for peer in closing:
-        peer.connection.close()
-        peer.closed = True
+        peer.close()
     others = [peer for peer in peers if not peer.closed]
     assert run_peers_until(others, lambda: all(connection_of(node, peer) is None for peer in closing),
                            time.monotonic() + RESPONSE_TIMEOUT_SECONDS), \
@@ -177,6 +216,15 @@ def assert_refused(peer, peers):
         f"{peer.label}: node did not refuse a client over max-clients"
     assert not peer.handshake_generations, f"{peer.label}: node answered the handshake before refusing it"
     assert peer.go_away is None, f"{peer.label}: node refused the client with go_away {peer.describe_go_away()}"
+
+
+def assert_turned_away(peer, data, reason, peers):
+    """Send data in one write; check that the node answers with go_away reason and closes, never sending a handshake."""
+    peer.send(data)
+    assert run_peers_until(peers, lambda: peer.closed, time.monotonic() + RESPONSE_TIMEOUT_SECONDS), \
+        f"{peer.label}: node kept the session"
+    assert peer.go_away is reason, f"{peer.label}: node sent go_away {peer.describe_go_away()}, not {reason.name}"
+    assert not peer.handshake_generations, f"{peer.label}: node answered a handshake of a session it turned away"
 
 
 def assert_admitted_for(newcomer, victim, peers):
@@ -199,10 +247,10 @@ def can_bind(source_address):
 
 
 def stop_and_close(node, peers, args):
-    """Stop the node, then close the sessions; the node closing first leaves a bound source port no TIME_WAIT."""
+    """Stop the node, then close every session."""
     stop_node(node, args)
     for peer in peers:
-        peer.connection.close()
+        peer.close()
 
 
 def run_accept_limit(case_index, args):
@@ -330,27 +378,51 @@ def run_handshake_rejections(case_index, args):
     node = None
     peers = []
     try:
-        # No blocks are needed, so the node does not produce.
-        node, p2p_port = launch_nodeop("handshake_rejections/node",
-                                       ["--plugin", "sysio::net_api_plugin", "--max-clients", str(MAX_CLIENTS),
-                                        "--p2p-max-nodes-per-host", str(MAX_NODES_PER_SUBNET),
-                                        "--p2p-auto-bp-peer", f"{BP_ACCOUNT},{BP_ADDRESS}:{bp_port}",
-                                        "--net-threads", str(BURST_NET_THREADS)])
+        logging_config = write_debug_p2p_logging(Path(Utils.DataPath) / "handshake_rejections")
+        node, p2p_port = launch_producer("handshake_rejections",
+                                         ["--p2p-auto-bp-peer", f"{BP_ACCOUNT},{BP_ADDRESS}:{bp_port}",
+                                          "--net-threads", str(BURST_NET_THREADS), "--logconf", str(logging_config)])
         chain_id = wait_for_chain_id(node)
+        assert wait_for_block(node, "head_block_num", PRODUCED_BLOCKS, time.monotonic() + PRODUCTION_TIMEOUT_SECONDS), \
+            f"Node did not produce block {PRODUCED_BLOCKS}; see {node.data_dir / 'stderr.txt'}"
         keeper = admit(p2p_port, chain_id, "keeper", peers)
 
-        # A session that opens past generation 1 is refused rather than left holding a slot unchecked.
+        # A session that opens past generation 1, or on another fork, is refused, and a queued go-away ends the session:
+        # a valid handshake and a block request sent with the rejected handshake in the same write are not processed,
+        # so the node never negotiates sync for it, as it does for the admitted keeper.
+        assert run_peers_until(peers, lambda: negotiated_sync(node, keeper),
+                               time.monotonic() + RESPONSE_TIMEOUT_SECONDS), \
+            f"Node logged no '{SYNC_NEGOTIATION_LOG}' for the keeper; see {node.data_dir / 'stderr.txt'}"
+        genesis_id = block_id(node, GENESIS_BLOCK_NUM)
+        unknown_head = UNKNOWN_BLOCK_NUM.to_bytes(BLOCK_NUM_BYTES, "big") + secrets.token_bytes(
+            BLOCK_ID_BYTES - BLOCK_NUM_BYTES)
+        # The genesis block number with an id the node does not have: the node sees the peer on another fork.
+        forked_root = GENESIS_BLOCK_NUM.to_bytes(BLOCK_NUM_BYTES, "big") + secrets.token_bytes(
+            BLOCK_ID_BYTES - BLOCK_NUM_BYTES)
         skipper = connect(p2p_port, "generation skipper")
         peers.append(skipper)
-        skipper.send_handshake(chain_id, generation=SKIPPED_GENERATION)
-        assert run_peers_until(peers, lambda: skipper.closed, time.monotonic() + RESPONSE_TIMEOUT_SECONDS), \
-            f"Node kept a session whose first handshake is generation {SKIPPED_GENERATION}"
-        assert skipper.go_away is GoAwayReason.fatal_other, \
-            f"Node refused the generation skipper with go_away {skipper.describe_go_away()}"
-        assert not skipper.handshake_generations, "Node answered a first handshake that skipped generation 1"
+        assert_turned_away(skipper, skipper.handshake_frame(chain_id, generation=SKIPPED_GENERATION),
+                           GoAwayReason.fatal_other, peers)
+        coalesced_skippers = []
+        for index in range(COALESCED_SESSIONS):
+            coalesced = connect(p2p_port, f"coalesced skipper {index}")
+            peers.append(coalesced)
+            coalesced_skippers.append(coalesced)
+            assert_turned_away(coalesced, (coalesced.handshake_frame(chain_id, generation=SKIPPED_GENERATION) +
+                                           coalesced.handshake_frame(chain_id, fork_db_root_id=genesis_id) +
+                                           coalesced.block_request_frame(unknown_head)),
+                               GoAwayReason.fatal_other, peers)
+        forked = connect(p2p_port, "forked")
+        peers.append(forked)
+        assert_turned_away(forked, (forked.handshake_frame(chain_id, fork_db_root_id=forked_root) +
+                                    forked.block_request_frame(unknown_head)),
+                           GoAwayReason.forked, peers)
+        turned_away_processed = [peer.label for peer in (skipper, *coalesced_skippers, forked)
+                                 if negotiated_sync(node, peer)]
+        assert not turned_away_processed, f"Node negotiated sync for sessions it turned away: {turned_away_processed}"
 
-        # Newcomers rejected for their chain id stop counting before their go-away is flushed, so the valid newcomer
-        # among them gets the slot the keeper leaves free.
+        # Newcomers rejected for their chain id hold no slot, so the valid newcomer among them gets the one the keeper
+        # leaves free.
         for burst_round in range(REJECTION_ROUNDS):
             rejected = [connect(p2p_port, f"wrong chain {burst_round}.{index}") for index in range(REJECTED_PER_BURST)]
             valid = connect(p2p_port, f"valid newcomer {burst_round}")
@@ -375,9 +447,9 @@ def run_handshake_rejections(case_index, args):
             assert not wrong, f"round {burst_round}: {wrong} were not sent go_away wrong_chain"
             assert not keeper.closed, f"round {burst_round}: node closed the keeper"
             close_sessions(node, [valid], peers)
-        Utils.Print(f"PASS: handshake_rejections, a generation-{SKIPPED_GENERATION} first handshake is refused and "
-                    f"{REJECTION_ROUNDS} valid newcomers each got the free slot beside {REJECTED_PER_BURST} "
-                    "rejected ones")
+        Utils.Print(f"PASS: handshake_rejections, sessions opening past generation 1 or on another fork are refused "
+                    f"with nothing after the rejected handshake processed, and {REJECTION_ROUNDS} valid newcomers each "
+                    f"got the free slot beside {REJECTED_PER_BURST} rejected ones")
     finally:
         stop_and_close(node, peers, args)
 

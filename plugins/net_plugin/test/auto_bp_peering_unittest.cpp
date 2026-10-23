@@ -12,8 +12,8 @@ struct mock_connection {
    bool closing            = false;
    int32_t peer_score      = sysio::peer_scoring::baseline;
    uint32_t connection_id  = 0;
-   sysio::go_away_reason no_retry = sysio::go_away_reason::no_reason;
-   bool holds_client_slot  = false;
+   bool go_away_queued     = false;
+   std::atomic<bool> holds_client_slot{false};
    boost::asio::ip::address_v6 address;
    mock_connection(bool bp_connection, bool open, bool received)
      : bp_connection(bp_connection ? bp_connection_type::bp_config : bp_connection_type::non_bp)
@@ -23,8 +23,10 @@ struct mock_connection {
 
    bool socket_is_open() const { return is_open; }
    bool closed() const { return !is_open || closing; }
-   /// as connection::close(), marks the connection closing at once; its socket closes later on its strand
-   void close(bool reconnect = true) { closing = true; }
+   /// as connection::close(), gives up the client slot and marks the connection closing at once; its socket closes
+   /// later on its strand
+   void close(bool reconnect = true) { release_client_slot(); closing = true; }
+   void release_client_slot() { holds_client_slot = false; }
    bool incoming_and_handshake_received() const { return handshake_received; }
    int32_t get_peer_score() const { return peer_score; }
    boost::asio::ip::address_v6 remote_address() const { return address; }
@@ -470,7 +472,7 @@ BOOST_AUTO_TEST_CASE(test_select_client_to_evict) {
    const auto closing      = connection(false, true, true, 0);
    closing->closing = true;
    const auto turned_away  = connection(false, true, true, 0);
-   turned_away->no_retry = sysio::go_away_reason::authentication;
+   turned_away->go_away_queued = true;
    const auto unadmitted   = connection(false, true, true, 0);
    unadmitted->holds_client_slot = false; // a newcomer handshaking alongside, which holds no slot to free
    const auto newcomer     = connection(false, true, true, 0);
@@ -514,9 +516,9 @@ BOOST_AUTO_TEST_CASE(test_departing_clients_not_counted) {
    const auto evicted = admitted_from("192.0.2.10");
    evicted->closing = true; // its socket not yet closed
    const auto turned_away = admitted_from("192.0.2.11");
-   turned_away->no_retry = sysio::go_away_reason::authentication; // its go-away queued, not yet sent
+   turned_away->go_away_queued = true; // its go-away not yet sent
    const auto rejected = inbound_from("192.0.2.12");
-   rejected->no_retry = sysio::go_away_reason::wrong_version; // rejected at its handshake, never admitted
+   rejected->go_away_queued = true; // rejected at its handshake, never admitted
    const auto unadmitted = inbound_from("192.0.2.13"); // its handshake still being checked
    plugin.connections.connections = { admitted_from("192.0.2.9"), evicted, turned_away, rejected, unadmitted };
    BOOST_CHECK_EQUAL(plugin.num_established_clients(), 1u);
@@ -567,7 +569,7 @@ BOOST_AUTO_TEST_CASE(test_admit_client) {
    // one slot free: of newcomers that handshake together, beside one rejected at its handshake, the first admitted
    // takes the slot, as neither the rejected one nor newcomers still undecided hold one; the rest are refused
    const auto rejected = inbound_from("192.0.2.14");
-   rejected->no_retry = sysio::go_away_reason::wrong_version;
+   rejected->go_away_queued = true;
    const std::vector<std::shared_ptr<mock_connection>> burst{ inbound_from("192.0.2.15"), inbound_from("192.0.2.16"),
                                                               inbound_from("192.0.2.17") };
    plugin.connections.connections = { keeper, client, rejected };
@@ -584,6 +586,27 @@ BOOST_AUTO_TEST_CASE(test_admit_client) {
    disabled.connections.connections = { admitted_from("192.0.2.19"), over };
    BOOST_CHECK(disabled.admit_client(over));
    BOOST_CHECK(!over->closing);
+}
+
+BOOST_AUTO_TEST_CASE(test_set_bp_connection_releases_client_slot) {
+   using bp_type = mock_connection::bp_connection_type;
+   mock_net_plugin plugin;
+   plugin.setup_test_peers();
+   plugin.connections.max_client_count = 1;
+   const auto client = admitted_from("192.0.2.9");
+   client->peer_score = sysio::peer_scoring::min_score;
+   const auto newcomer = inbound_from("192.0.2.10");
+   plugin.connections.connections = { client, newcomer };
+   BOOST_CHECK(plugin.select_client_to_evict(newcomer) == client);
+
+   // once its gossip shows it is a bp, it gives up its slot, so it is neither counted nor evicted
+   plugin.set_bp_connection(client.get(), bp_type::bp_gossip);
+   BOOST_CHECK(client->bp_connection == bp_type::bp_gossip);
+   BOOST_CHECK(!client->holds_client_slot);
+   BOOST_CHECK_EQUAL(plugin.num_established_clients(), 0u);
+   BOOST_CHECK(!plugin.select_client_to_evict(newcomer));
+   BOOST_CHECK(plugin.admit_client(newcomer));
+   BOOST_CHECK(!client->closing);
 }
 
 struct bp_peer_info_v2 : sysio::gossip_bp_peers_message::bp_peer_info_v1 {
