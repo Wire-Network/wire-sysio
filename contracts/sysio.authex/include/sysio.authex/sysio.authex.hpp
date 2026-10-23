@@ -285,8 +285,8 @@ namespace sysio {
      * A malformed or mismatched address skips only the sweep, not link insertion. A missing or
      * non-privileged sysio.dclaim deployment likewise skips the sweep. An identical recordlink can
      * retry before node-owner registration completes; after registration, nodeownreg's duplicate
-     * gate returns before this action, so remediation requires an operator-pushed recordlink or
-     * linkswept action.
+     * gate returns before this action, so remediation requires governance to push recordlink or
+     * linkswept as sysio.authex@active.
      *
      * Unlike createlink, this does NOT enforce a unique `pub_key`: one external wallet may hold
      * several WireNodes NFTs and back several Wire accounts, so one ETH key -> many accounts is
