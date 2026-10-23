@@ -92,16 +92,16 @@ namespace sysio {
                     "production default percent-miss threshold must lie inside the accepted bounds");
 
       /// Minimum accepted `terminate_window_ms` for a given consecutive-miss
-      /// threshold and epoch schedule. Delivery records accrue only on an
-      /// operator's DUTY epochs, one per duty epoch: `sysio.epoch::advance`
-      /// runs `recorddel` once per member of the expiring group, combining its
-      /// result across every active outpost. The schedule is a sliding window
-      /// of `batch_op_groups` groups, so a resident operator's duty interval is
-      /// `batch_op_groups` epochs. The rolling window must span the full
-      /// terminating run (`consecutive_misses + 1` records, `consecutive_misses`
-      /// duty intervals end to end) plus one duty interval of boundary slack,
-      /// or records age out (and are pruned) before `termcheck` can observe the
-      /// run, leaving the consecutive rail structurally vacuous. Operators
+      /// threshold and epoch schedule. Delivery records accrue one per DUTY
+      /// epoch: `sysio.epoch::advance` records each member of the expiring
+      /// group once, combined across the active outposts. The schedule is a
+      /// sliding window of `batch_op_groups` groups, so a resident operator's
+      /// duty interval is `batch_op_groups` epochs. The rolling window must
+      /// span the full terminating run (`consecutive_misses + 1` records,
+      /// `consecutive_misses` duty intervals end to end) plus one duty interval
+      /// of boundary slack, or records age out (and are pruned) before
+      /// `termcheck` can observe the run, leaving the consecutive rail
+      /// structurally vacuous. Operators
       /// benched by a surplus roster accrue no records while benched, so no
       /// finite window observes them; the bound governs resident operators,
       /// whose duty interval the sliding schedule pins at `batch_op_groups`
@@ -251,23 +251,19 @@ namespace sysio {
       [[sysio::action]]
       void slash(name account, std::string reason);
 
-      /// Record a batch operator's delivery result for one duty epoch in the
-      /// rolling buffer. Called inline from `sysio.epoch::advance` once per
-      /// expiring-group member; `delivered` is true only if the member delivered
-      /// to every active outpost. Each write also sweeps up to
-      /// `MAX_DELLOG_PRUNE_PER_WRITE` rows that have aged out of the rolling
-      /// termination window, keeping the buffer bounded without a dedicated
-      /// crank.
+      /// Record a batch operator's result for one duty epoch in the rolling
+      /// buffer. Called inline from `sysio.epoch::advance` once per
+      /// expiring-group member; `delivered` only if it reached every active
+      /// outpost. Each write also prunes up to `MAX_DELLOG_PRUNE_PER_WRITE` rows
+      /// that have aged out of the window, so no dedicated crank is needed.
       [[sysio::action]]
       void recorddel(name account, uint32_t epoch, bool delivered);
 
-      /// Evaluate an operator's rolling delivery buffer and inline
-      /// `terminate(...)` when it holds more than
-      /// `terminate_max_consecutive_misses` consecutive misses, or a miss rate
-      /// whose whole-percent value (rounded down) exceeds
-      /// `terminate_max_pct_misses_24h`. Both rails count duty epochs, one row
-      /// each. Called by `sysio.epoch::advance` after every
-      /// `recorddel`.
+      /// Terminate the operator inline when its rolling buffer holds more than
+      /// `terminate_max_consecutive_misses` consecutive misses, or a
+      /// whole-percent miss rate (rounded down) above
+      /// `terminate_max_pct_misses_24h`. Both rails count duty epochs. Called
+      /// by `sysio.epoch::advance` after every `recorddel`.
       [[sysio::action]]
       void termcheck(name account);
 

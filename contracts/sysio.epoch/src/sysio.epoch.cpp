@@ -414,11 +414,10 @@ void epoch::advance() {
    //     (chain_code, current_epoch_index, batch_op_name == member)
    //   - count the outposts the member delivered to and collect every
    //     non-canonical deliverer
-   // Then slash all non-canonical deliverers before delivery accounting can
-   // terminate them, and record ONE result per member: delivered only if it
-   // delivered to every active outpost. `sysio.opreg`'s miss thresholds and
-   // window bound count duty epochs, so a record per outpost would scale the
-   // miss ladder with the outpost count.
+   // Then slash the non-canonical deliverers before delivery accounting can
+   // terminate them, and record one result per member, delivered only if it
+   // reached every active outpost: `sysio.opreg`'s miss thresholds count duty
+   // epochs, not outposts.
    //
    // The outpost set is sourced via a cross-contract read of
    // `sysio.chains::chains` (no local mirror) filtered to
@@ -551,10 +550,8 @@ void epoch::advance() {
 
       // Preserve delivery history and ordinary termination accounting. Inline
       // slashing completes before these actions, and all mutations complete
-      // before finishadv reads the registry for outbound attestations.
-      //
-      // One record per member for this duty epoch; missing any active outpost makes it a miss. With
-      // no active outpost the group had nothing to deliver, so nothing is recorded.
+      // before finishadv reads the registry for outbound attestations. With no
+      // active outpost nothing was due, so nothing is recorded.
       if (active_outposts > 0) {
          for (const auto& observation : observations) {
             const bool delivered_everywhere = observation.outposts_delivered == active_outposts;
