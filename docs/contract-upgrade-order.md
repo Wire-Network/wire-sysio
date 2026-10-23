@@ -169,10 +169,12 @@ credit imported after its key was linked is for governance, through `sysio.msig`
 as `sysio.authex@active`. The `links` row keeps only the account, chain and
 public key, not the native address, so governance derives the address from the
 stored key (SVM: the raw 32-byte ED key; EVM: the canonical 20-byte address of
-the stored EM key, the last 20 bytes of keccak256 of its uncompressed form) and
-checks the link and the exact target `unmapped` row before proposing
-`linkswept`. The same derivation and check come first when governance replays
-the identical `recordlink` for a node-owner link.
+the stored EM key, the trailing 20 bytes of `keccak256(X || Y)` over the 64-byte
+coordinates, without the leading SEC1 `0x04` byte, as
+`opp::evm_address_from_uncompressed_key` computes it) and checks the link and the
+exact target `unmapped` row before proposing `linkswept`. The same derivation and
+check come first when governance replays the identical `recordlink` for a
+node-owner link.
 
 The two added address fields are intentionally not a staged compatibility
 protocol. Activate WIRE-352 in a quiesced maintenance window:
