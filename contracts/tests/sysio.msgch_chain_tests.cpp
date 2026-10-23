@@ -332,12 +332,7 @@ public:
    }
 
    void load_abi(name account, abi_serializer& out_ser) {
-      const auto* accnt = control->find_account_metadata(account);
-      BOOST_REQUIRE(accnt != nullptr);
-      abi_def parsed_abi;
-      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, parsed_abi), true);
-      out_ser.set_abi(std::move(parsed_abi),
-                      abi_serializer::create_yield_function(abi_serializer_max_time));
+      sysio_system::test_support::load_account_abi(*this, account, out_ser);
    }
 
    void deploy(name account, std::vector<uint8_t> wasm, std::vector<char> abi,
@@ -493,7 +488,7 @@ public:
                                      "epochstate"_n, "epochstate"_n);
       if (data.empty()) return 0;
       auto v = epoch_abi.binary_to_variant("epoch_state", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       return v["current_epoch_index"].as<uint32_t>();
    }
 
@@ -558,7 +553,7 @@ public:
       auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outpcons"_n, chain_code);
       return data.empty() ? fc::variant() : msgch_abi.binary_to_variant(
          "outpost_consensus_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    /// Return whether the epoch contract currently holds advancement for an open dispute.
@@ -573,7 +568,7 @@ public:
       auto data = get_row_by_id(CHALG_ACCOUNT, CHALG_ACCOUNT, chalg_tables::DISPUTES, dispute_id);
       return data.empty() ? fc::variant() : chalg_abi.binary_to_variant(
          chalg_abi_types::DISPUTE_ENTRY, data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    /// Assert that the full `chkcons -> evalcons -> opendispute` route recorded the exact split.
@@ -633,7 +628,7 @@ public:
          if (data.empty()) continue;
          auto row = msgch_abi.binary_to_variant(
             msgch_abi_types::ENVELOPE_ENTRY, data,
-            abi_serializer::create_yield_function(abi_serializer_max_time));
+            fixture_abi_yield_function());
          if (row[msgch_fields::CHAIN_CODE].as_uint64() == chain_code &&
              row[msgch_fields::EPOCH_INDEX].as<uint32_t>() == epoch_index &&
              row[msgch_fields::BATCH_OP_NAME].as_string() == batch_op.to_string()) return row;
@@ -651,8 +646,7 @@ public:
            itr != kv_idx.end() && itr->code == code && itr->table_id == table_id; ++itr) {
          std::vector<char> raw(itr->value.size());
          if (!raw.empty()) std::memcpy(raw.data(), itr->value.data(), raw.size());
-         rows.push_back(abi.binary_to_variant(
-            abi_type, raw, abi_serializer::create_yield_function(abi_serializer_max_time)));
+         rows.push_back(abi.binary_to_variant(abi_type, raw, fixture_abi_yield_function()));
       }
       return rows;
    }
@@ -738,7 +732,7 @@ public:
          if (data.empty()) continue;
          auto row = msgch_abi.binary_to_variant(
             "attestation_entry", data,
-            abi_serializer::create_yield_function(abi_serializer_max_time));
+            fixture_abi_yield_function());
          if (row["chain_code"].as_uint64() == chain_code &&
              row["epoch_index"].as<uint32_t>() == epoch_index) ++n;
       }
@@ -885,7 +879,7 @@ public:
    fc::variant get_operator(name account) {
       auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "operators"_n, account);
       return data.empty() ? fc::variant() : opreg_abi.binary_to_variant(
-         "operator_entry", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         "operator_entry", data, fixture_abi_yield_function());
    }
 
    /// Count successful SLASH audit entries for `account` routed to `chain_code`.
@@ -944,7 +938,7 @@ public:
    fc::variant read_epoch_state() {
       auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
       return data.empty() ? fc::variant() : epoch_abi.binary_to_variant(
-         "epoch_state", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         "epoch_state", data, fixture_abi_yield_function());
    }
 
    /// The single batch operator on duty for the CURRENT epoch (rotation setup runs one op per

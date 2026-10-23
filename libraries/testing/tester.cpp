@@ -924,14 +924,14 @@ namespace sysio::testing {
       const auto* acnt = control->find_account_metadata(code);
       FC_ASSERT(acnt != nullptr, "account metadata not found");
       auto abi = acnt->get_abi();
-      chain::abi_serializer abis(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
+      chain::abi_serializer abis(std::move(abi), fixture_abi_yield_function());
 
       string action_type_name = abis.get_action_type(acttype);
       FC_ASSERT( action_type_name != string(), "unknown action type {}", acttype );
 
       action act(std::move(auths), code, acttype,
                  abis.variant_to_binary(action_type_name, data,
-                                        abi_serializer::create_yield_function(abi_serializer_max_time)));
+                                        fixture_abi_yield_function()));
       return act;
    } FC_CAPTURE_AND_RETHROW("") }
 
@@ -949,7 +949,7 @@ namespace sysio::testing {
         );
 
       signed_transaction trx;
-      abi_serializer::from_variant(pretty_trx, trx, get_resolver(), abi_serializer::create_yield_function( abi_serializer_max_time ));
+      abi_serializer::from_variant(pretty_trx, trx, get_resolver(), fixture_abi_yield_function());
       set_transaction_headers(trx);
       for(auto iter = keys.begin(); iter != keys.end(); iter++)
          trx.sign( *iter, control->get_chain_id() );
@@ -994,7 +994,7 @@ namespace sysio::testing {
          );
 
       signed_transaction trx;
-      abi_serializer::from_variant(pretty_trx, trx, get_resolver(), abi_serializer::create_yield_function( abi_serializer_max_time ));
+      abi_serializer::from_variant(pretty_trx, trx, get_resolver(), fixture_abi_yield_function());
       set_transaction_headers(trx);
 
       trx.sign( get_private_key( from, name(sysio::chain::config::active_name).to_string() ), control->get_chain_id()  );
@@ -1022,7 +1022,7 @@ namespace sysio::testing {
          );
 
       signed_transaction trx;
-      abi_serializer::from_variant(pretty_trx, trx, get_resolver(), abi_serializer::create_yield_function( abi_serializer_max_time ));
+      abi_serializer::from_variant(pretty_trx, trx, get_resolver(), fixture_abi_yield_function());
       set_transaction_headers(trx);
 
       trx.sign( get_private_key( currency, name(sysio::chain::config::active_name).to_string() ), control->get_chain_id()  );
