@@ -5,7 +5,7 @@ import signal
 import threading
 import os
 
-from TestHarness import Account, Cluster, ReturnType, TestHelper, Utils, WalletMgr
+from TestHarness import Account, Cluster, TestHelper, Utils, WalletMgr
 from TestHarness.TestHelper import AppArgs
 
 ###############################################################
@@ -55,15 +55,6 @@ producerNode = None
 apiNode = None
 payloadlessAccountName = "payloadless"
 
-def getCodeHash(node, account):
-    # Example get code result: code hash: 67d0598c72e2521a1d588161dad20bbe9f8547beb5ce6d14f3abd550ab27d3dc
-    cmd = f"get code {account}"
-    codeHash = node.processClioCmd(cmd, cmd, silentErrors=False, returnType=ReturnType.raw)
-    if codeHash is None: errorExit(f"Unable to get code {account} from node {node.nodeId}")
-    else: codeHash = codeHash.split(' ')[2].strip()
-    if Utils.Debug: Utils.Print(f"{account} code hash: {codeHash}")
-    return codeHash
-
 def startCluster():
     global total_nodes
     global producerNode
@@ -111,9 +102,8 @@ def startCluster():
     producerNode = cluster.getNode()
     apiNode = cluster.nodes[-1]
 
-    sysioCodeHash = getCodeHash(producerNode, "sysio.token")
     # sysio.* should be using oc unless oc tierup disabled
-    Utils.assertInitialSysVmOcLogState(producerNode, apiNode, sysioCodeHash, args.sys_vm_oc_enable, ocSupported)
+    Utils.assertInitialSysVmOcLogState(cluster, producerNode, apiNode, args.sys_vm_oc_enable, ocSupported)
 
 def deployTestContracts():
     Utils.Print("Create payloadless account and deploy payloadless contract")
