@@ -231,6 +231,8 @@ static constexpr uint32_t T_STANDBY_END_RANK      = 28;
 static constexpr uint16_t T_STANDBY_BPS           = 800;
 /// The fixture's default epoch (init_epoch_state) is 60s at one block per 500ms.
 static constexpr uint32_t T_EPOCH_SECS            = 60;
+/// Seconds in one T5 emission epoch (24 hours).
+static constexpr uint32_t ONE_EPOCH               = 86400u;
 
 // Helper: amount NOT transferred at payepoch when no producers / batch
 // members are paid. Equals producer_pool + batch_pool (compute share, both
@@ -2486,9 +2488,6 @@ BOOST_AUTO_TEST_SUITE_END() // sysio_emissions_tests
 // =============================================================================
 
 BOOST_AUTO_TEST_SUITE(t5_emissions_tests)
-
-// Helper: number of seconds in one epoch (24 hours)
-static constexpr uint32_t ONE_EPOCH = 86400u;
 
 // ---------------------------------------------------------------------------
 // Init
@@ -6448,6 +6447,67 @@ BOOST_FIXTURE_TEST_CASE( pruned_operator_row_stays_demoted_through_rescore_sweep
    BOOST_REQUIRE(!rescore_pending());
    BOOST_REQUIRE_EQUAL(tier_demoted, tier_of(rank_score_of(target)));
    BOOST_REQUIRE(!is_scheduled(target));
+} FC_LOG_AND_RETHROW()
+
+// Termination keeps a producer's counted blocks but credits its bond to its claim, and a new
+// registration starts UNKNOWN with no bond, so the blocks are paid only once it bonds again.
+BOOST_FIXTURE_TEST_CASE( terminated_producer_is_paid_held_blocks_once_bonded_again,
+                         producer_score_tester ) try {
+   create_t5_holding_accounts();
+   const auto names = setup_collateralized_producers(3);
+   BOOST_REQUIRE_EQUAL( success(), set_producer_schedule(names) );
+   produce_blocks(1);
+   wait_for_producer_schedule();
+   produce_complete_cycles(3, 2);
+
+   const uint32_t start = head_secs() - ONE_EPOCH - 1;
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );
+
+   const auto target = names[0];
+   BOOST_REQUIRE_EQUAL( success(), terminate_operator(target) );
+   BOOST_REQUIRE_EQUAL( "OPERATOR_STATUS_TERMINATED", get_opreg_operator(target)["status"].as_string() );
+   const uint32_t held = unpaid_blocks_of(target);
+   BOOST_REQUIRE_GT( held, 0u );
+
+   // A payout the producer is not payable at pays it nothing and keeps its count.
+   const auto require_unpaid_payout = [&] {
+      const uint32_t blocks = unpaid_blocks_of(target);
+      const asset before = get_wire_balance_paid(target);
+      BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+      BOOST_REQUIRE_EQUAL( get_wire_balance_paid(target), before );
+      BOOST_REQUIRE_GE( unpaid_blocks_of(target), blocks );
+   };
+   require_unpaid_payout();
+
+   // Pull the returned bond and register again: the new registration holds no bond.
+   const asset unclaimed = get_wire_balance(target);
+   BOOST_REQUIRE_EQUAL( success(), push_opreg_action(target, "claimremit"_n,
+      mvo()("account", target)("token_code", collateral_token)) );
+   BOOST_REQUIRE_EQUAL( static_cast<int64_t>(base_min_bond),
+                        get_wire_balance(target).get_amount() - unclaimed.get_amount() );
+   BOOST_REQUIRE_EQUAL( success(), push_opreg_action(target, "regoperator"_n, mvo()
+      ("account", target)("type", OperatorType::OPERATOR_TYPE_PRODUCER)("is_bootstrapped", false)) );
+   BOOST_REQUIRE_EQUAL( "OPERATOR_STATUS_UNKNOWN", get_opreg_operator(target)["status"].as_string() );
+   produce_blocks(130);
+   require_unpaid_payout();
+
+   // Bond again: the next payout pays every held block at that period's rate.
+   BOOST_REQUIRE_EQUAL( success(), push_opreg_action(target, "deposit"_n, mvo()
+      ("account", target)("token_code", collateral_token)("amount", base_min_bond)) );
+   BOOST_REQUIRE_EQUAL( "OPERATOR_STATUS_ACTIVE", get_opreg_operator(target)["status"].as_string() );
+   produce_blocks(130);
+
+   uint64_t produced = 0;
+   for (const auto& p : names) produced += unpaid_blocks_of(p);
+   const uint32_t blocks = unpaid_blocks_of(target);
+   BOOST_REQUIRE_GE( blocks, held );
+   const asset before = get_wire_balance_paid(target);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   const int64_t got = get_wire_balance_paid(target).get_amount() - before.get_amount();
+   const int64_t active_pool = test_active_pool(get_epoch_log(3)["compute_amount"].as<int64_t>());
+   const uint64_t divisor = std::max<uint64_t>(produced, test_nominal_slots(T_EPOCH_SECS));
+   BOOST_REQUIRE_EQUAL( got, test_block_pay(active_pool, blocks, divisor) );
+   BOOST_REQUIRE_GT( got, 0 );
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------

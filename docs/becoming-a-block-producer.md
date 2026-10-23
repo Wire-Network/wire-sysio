@@ -213,7 +213,10 @@ first payout after you are payable again. Unregistering right after producing an
 re-registering before your next round costs you nothing provided you still meet the admission
 requirements; if governance raised a collateral minimum while you were parked, top up first.
 
-A terminated producer that settles its collateral and re-registers is paid them too. Slashing is the
+Termination does not forfeit them either, but re-registering alone does not make you payable:
+termination credits your whole bond to your `claimremit` claim, and `regoperator` starts a new
+`UNKNOWN` registration with no bond. Post every required bond again, and call `regproducer` if your
+producer row was parked; the held blocks are paid at the first payout after that. Slashing is the
 exception: a slashed producer can never be payable again, so any blocks it produced and was not yet
 paid for are forfeited.
 
