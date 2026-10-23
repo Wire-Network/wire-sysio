@@ -320,12 +320,21 @@ public:
    }
 
    /// Only called from connection strand
-   /// @return true for a connection counted against max_client_count: an inbound non-bp connection that has sent its
-   ///         first handshake and is not closing, so an evicted or refused connection stops counting at once
+   /// @return true for a connection that counts against max_client_count once admitted: an inbound non-bp connection
+   ///         that has sent its first handshake, is not closing, and is not being turned away with a queued go-away
+   ///         (no_retry is set before it is queued)
+   template <typename Conn>
+   static bool client_connection(Conn&& conn) {
+      return conn->bp_connection == Connection::bp_connection_type::non_bp && !conn->closed() &&
+             conn->no_retry == go_away_reason::no_reason && conn->incoming_and_handshake_received();
+   }
+
+   /// Only called from connection strand
+   /// @return true for a client admit_client() admitted that still holds its max_client_count slot. A client gives its
+   ///         slot up as soon as it is evicted, refused or turned away, and a handshake still being checked holds none.
    template <typename Conn>
    static bool established_client_connection(Conn&& conn) {
-      return conn->bp_connection == Connection::bp_connection_type::non_bp && !conn->closed() &&
-             conn->incoming_and_handshake_received();
+      return conn->holds_client_slot && client_connection(conn);
    }
 
    send_buffer_type get_gossip_bp_initial_send_buffer() {
@@ -353,8 +362,9 @@ public:
    // This should only be called after the first handshake message is received to check if an incoming connection
    // has exceeded the pre-configured max_client_count limit.
    bool exceeding_connection_limit(std::shared_ptr<Connection> new_connection) const {
-      return auto_bp_peering_enabled() && self()->connections.get_max_client_count() != 0 &&
-             established_client_connection(new_connection) && num_established_clients() > self()->connections.get_max_client_count();
+      const uint32_t max_clients = self()->connections.get_max_client_count();
+      return auto_bp_peering_enabled() && max_clients != 0 && client_connection(new_connection) &&
+             num_established_clients() + (new_connection->holds_client_slot ? 0 : 1) > max_clients;
    }
 
    /// Only called from connection strand, when new_connection exceeds the client limit.
@@ -369,25 +379,29 @@ public:
    }
 
    /// Only called from connection strand, when the first handshake of new_connection is received.
-   /// Enforce max_client_count: a client over the limit takes the slot of the client select_client_to_evict chooses,
-   /// which is closed, or else is closed itself. Admissions are serialized and close() marks a connection closing at
-   /// once, so concurrent newcomers neither claim the same victim nor count one another in.
+   /// Enforce max_client_count: a client takes a free slot, or over the limit the slot of the client
+   /// select_client_to_evict chooses, which is closed; otherwise it is closed itself. Only admitted clients hold slots,
+   /// and admissions are serialized, so newcomers that handshake together cannot share a slot, and none is refused for
+   /// a handshake still being checked.
    /// @return false when new_connection was refused
    bool admit_client(const std::shared_ptr<Connection>& new_connection) {
       fc::lock_guard g(client_admission_mtx);
-      if (!exceeding_connection_limit(new_connection))
-         return true;
-      const uint32_t max_clients = self()->connections.get_max_client_count();
-      if (const std::shared_ptr<Connection> victim = select_client_to_evict(new_connection)) {
+      if (exceeding_connection_limit(new_connection)) {
+         const uint32_t max_clients = self()->connections.get_max_client_count();
+         const std::shared_ptr<Connection> victim = select_client_to_evict(new_connection);
+         if (!victim) {
+            fc_dlog(p2p_conn_log, "max_client_count {} exceeded, no evictable peer, closing connection {}",
+                    max_clients, new_connection->connection_id);
+            new_connection->close(false);
+            return false;
+         }
          fc_ilog(p2p_conn_log, "max_client_count {} exceeded, evicting low-score peer {} (score {}) for connection {}",
                  max_clients, victim->connection_id, victim->get_peer_score(), new_connection->connection_id);
          victim->close();
-         return true;
       }
-      fc_dlog(p2p_conn_log, "max_client_count {} exceeded, no evictable peer, closing connection {}",
-              max_clients, new_connection->connection_id);
-      new_connection->close(false);
-      return false;
+      if (client_connection(new_connection))
+         new_connection->holds_client_slot = true;
+      return true;
    }
 
    // thread safe

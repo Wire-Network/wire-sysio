@@ -739,6 +739,8 @@ namespace sysio {
       //                        (bp_connection_manager::mark_inbound_bp_connection)
       enum class bp_connection_type { non_bp, bp_config, bp_gossip, bp_gossip_validating };
       std::atomic<bp_connection_type> bp_connection = bp_connection_type::non_bp;
+      /// set by bp_connection_manager::admit_client() when this client takes one of the max_client_count slots
+      std::atomic<bool>       holds_client_slot{false};
       block_status_monitor    block_status_monitor_;
       std::atomic<time_point> last_vote_received;
       /// True once this peer may send ordinary frames to normal handlers.
@@ -1426,6 +1428,7 @@ namespace sysio {
       consecutive_blocks_nacks = 0;
       last_block_nack = block_id_type{};
       bp_connection = bp_connection_type::non_bp;
+      holds_client_slot = false;
 
       // if recently received a block from the connection then reset all connection block nacks
       if (last_received_block_time.load() >= my_impl->last_block_received_time.load() - fc::seconds(3)) {
@@ -3595,6 +3598,14 @@ namespace sysio {
          enqueue( go_away_message{ go_away_reason::fatal_other } );
          return;
       }
+      // A session opens with generation 1, where the checks and max-clients admission below run; refuse one that
+      // skips it.
+      if( msg.generation != 1 && !peer_session_established.load(std::memory_order_relaxed) ) {
+         peer_wlog( p2p_msg_log, this, "first handshake has generation {}, not 1", msg.generation );
+         no_retry = go_away_reason::fatal_other;
+         enqueue( go_away_message{ go_away_reason::fatal_other } );
+         return;
+      }
 
       const uint32_t peer_froot = block_header::num_from_id(msg.fork_db_root_id);
       const uint32_t peer_fhead = block_header::num_from_id(msg.fork_db_head_id);
@@ -3666,8 +3677,8 @@ namespace sysio {
          };
          if (my_impl->connections.any_of_connections(is_duplicate)) {
             peer_dlog( p2p_conn_log, this, "sending go_away duplicate, msg.p2p_address: {}", msg.p2p_address );
-            enqueue(go_away_message{go_away_reason::duplicate, conn_node_id});
             no_retry = go_away_reason::duplicate;
+            enqueue(go_away_message{go_away_reason::duplicate, conn_node_id});
             return;
          }
 

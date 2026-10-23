@@ -120,10 +120,10 @@ class RawPeer:
         except OSError:
             self.closed = True
 
-    def send_handshake(self, chain_id):
-        """Send a generation-1 handshake for an empty chain, which the node accepts."""
+    def send_handshake(self, chain_id, generation=INITIAL_GENERATION):
+        """Send a handshake for an empty chain; a first one of generation 1 is what the node accepts."""
         fields = HANDSHAKE_FIELDS.pack(NETWORK_VERSION, chain_id, self.node_id, ZERO_BLOCK_ID, ZERO_BLOCK_ID,
-                                       ZERO_BLOCK_ID, INITIAL_GENERATION)
+                                       ZERO_BLOCK_ID, generation)
         address = f"{LOOPBACK}:{self.connection.getsockname()[1]}"
         self.send(frame(MessageTag.handshake, fields + pack_string(address) + pack_string(AGENT_NAME)))
 
@@ -326,18 +326,27 @@ def wait_for_chain_id(node):
 def connect(p2p_port, label, source_address=None):
     """Open an incoming session to the node's P2P listener, retrying until it listens.
 
-    source_address is an optional (host, port) to bind the local end of the session to. Nagle is off, so each
-    message reaches the node when it is sent.
+    source_address is an optional (host, port) to bind the local end of the session to, with SO_REUSEADDR so a
+    rerun can bind it again while an earlier session's TIME_WAIT lasts. Nagle is off, so each message reaches the
+    node when it is sent.
     """
     deadline = time.monotonic() + STARTUP_TIMEOUT_SECONDS
     while True:
+        connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            connection = socket.create_connection((LOOPBACK, p2p_port), timeout=STARTUP_TIMEOUT_SECONDS,
-                                                  source_address=source_address)
+            connection.settimeout(STARTUP_TIMEOUT_SECONDS)
+            if source_address is not None:
+                connection.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                connection.bind(source_address)
+            connection.connect((LOOPBACK, p2p_port))
         except ConnectionRefusedError:
+            connection.close()
             assert time.monotonic() < deadline, f"Node is not listening on P2P port {p2p_port}"
             time.sleep(POLL_SECONDS)
             continue
+        except OSError:
+            connection.close()
+            raise
         connection.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         return RawPeer(connection, label)
 

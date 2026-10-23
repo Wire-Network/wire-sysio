@@ -109,9 +109,11 @@ that peer and accepts the new connection, logging `Evicting low-score peer <id> 
 peer is evictable is the new socket closed, with `max_client_count <n> exceeded, no evictable peer, closing` at
 debug level.
 With BP peering enabled the accept-time check is skipped and the limit is enforced at the first handshake
-instead, once the duplicate, version and fork checks have passed. It counts the inbound non-BP connections that have
-sent their first handshake and are not closing. The handshake identifies a BP peer by its `p2p_address`, when that
-names a `p2p-auto-bp-peer` endpoint, or by the connection's source address: the host of a `p2p-auto-bp-peer` entry
+instead, once the duplicate, version and fork checks have passed; a session must open with a generation-1 handshake
+to get there. It counts the inbound non-BP clients it has admitted that are not closing or being turned away, so a
+handshake that is rejected or still being checked takes no slot. The handshake identifies a BP peer by its
+`p2p_address`, when that names a `p2p-auto-bp-peer` endpoint, or by the connection's source address: the host of a
+`p2p-auto-bp-peer` entry
 written as an IP address, or, on a node that gossips its own BP endpoints, the outbound IP address a gossiped BP
 signed. A BP peer identified either way is neither counted nor ever evicted. Matching by address needs the BP to
 connect from exactly that address, and exempts everything else that connects from it, such as the BP's other nodes
