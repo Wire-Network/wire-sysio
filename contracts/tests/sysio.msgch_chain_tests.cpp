@@ -1302,6 +1302,43 @@ BOOST_FIXTURE_TEST_CASE(buildenv_erases_acknowledged_outenvelope, sysio_msgch_ch
    BOOST_REQUIRE_EQUAL(1u, outbound_envelope_count(ETH_OUTPOST_ID));
 } FC_LOG_AND_RETHROW() }
 
+/// WNS-18 / WIRE-348: with a long unacknowledged backlog of large envelopes, every emit still chains
+/// from the newest retained row, and one acknowledgement prunes the whole prefix in the next emit.
+BOOST_FIXTURE_TEST_CASE(buildenv_handles_unacknowledged_backlog, sysio_msgch_chain_tester) { try {
+   constexpr uint32_t backlog       = 16;
+   constexpr size_t   payload_bytes = 16 * 1024;
+   constexpr uint64_t scan_until    = 128;
+   bootstrap();
+
+   const uint32_t first_epoch = current_epoch();
+   uint32_t       epoch       = first_epoch;
+   for (uint32_t i = 0; i < backlog; ++i) {
+      BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, sysio::opp::types::ATTESTATION_TYPE_OPERATORS,
+                                              std::vector<char>(payload_bytes, static_cast<char>(i))));
+      epoch = advance_one_epoch();
+   }
+   BOOST_REQUIRE_EQUAL(backlog + 1, outbound_envelope_count(ETH_OUTPOST_ID, scan_until));
+
+   // Each retained emit chains from the one before it.
+   for (uint32_t e = first_epoch + 1; e <= epoch; ++e) {
+      const auto prev = outbound_envelope_for_epoch(ETH_OUTPOST_ID, e - 1, scan_until);
+      const auto cur  = outbound_envelope_for_epoch(ETH_OUTPOST_ID, e, scan_until);
+      BOOST_REQUIRE(!prev.is_null());
+      BOOST_REQUIRE(!cur.is_null());
+      const auto env = decode_envelope(cur["raw_envelope"].as<std::vector<char>>());
+      BOOST_REQUIRE_EQUAL(
+         fc::to_hex(env.previous_envelope_hash().data(), env.previous_envelope_hash().size()),
+         prev["envelope_hash"].as_string());
+   }
+
+   // Acknowledging the newest epoch drains the whole prefix in the next emit.
+   BOOST_REQUIRE_EQUAL(success(), deliver(ETH_OUTPOST_ID, encode_delivery(epoch, "alpha")));
+   produce_blocks();
+   const uint32_t next_epoch = advance_one_epoch();
+   BOOST_REQUIRE_EQUAL(1u, outbound_envelope_count(ETH_OUTPOST_ID, scan_until));
+   BOOST_REQUIRE(!outbound_envelope_for_epoch(ETH_OUTPOST_ID, next_epoch, scan_until).is_null());
+} FC_LOG_AND_RETHROW() }
+
 // ---------------------------------------------------------------------------
 //  Inbound: apply_consensus records and verifies the per-outpost chain tip.
 // ---------------------------------------------------------------------------

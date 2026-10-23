@@ -17,6 +17,7 @@
 #include <zpp_bits.h>
 #include <magic_enum/magic_enum.hpp>
 #include <algorithm>
+#include <limits>
 #include <optional>
 
 namespace sysio {
@@ -1602,15 +1603,18 @@ void msgch::buildenv(uint64_t chain_code) {
       candidate_ids.begin(),
       candidate_ids.begin() + included_count);
 
-   // Chain links come from the previous emit, the newest row for this outpost (`byoutepoch` orders by
-   // epoch; `byoutpost` would yield the oldest). No row means genesis: both links chain from empty.
+   // Chain links come from the previous emit, the newest row for this outpost: one step back from the
+   // first `byoutepoch` entry past it, so retained rows are never walked. No row means genesis: both
+   // links chain from empty.
    outenvelopes_t envelopes(get_self());
    std::vector<char> prev_envelope_digest;
    std::vector<char> prev_message_id;
    {
       auto by_epoch = envelopes.get_index<"byoutepoch"_n>();
-      for (auto it = by_epoch.lower_bound(opp::outpost_epoch_key(chain_code, 0));
-           it != by_epoch.end() && it->chain_code == chain_code; ++it) {
+      auto it = by_epoch.upper_bound(
+         opp::outpost_epoch_key(chain_code, std::numeric_limits<uint32_t>::max()));
+      --it;
+      if (it != by_epoch.end() && it->chain_code == chain_code) {
          const auto digest_bytes = it->envelope_hash.extract_as_byte_array();
          prev_envelope_digest.assign(digest_bytes.begin(), digest_bytes.end());
          const auto tip_bytes = it->last_message_id.extract_as_byte_array();
@@ -1738,29 +1742,26 @@ void msgch::buildenv(uint64_t chain_code) {
       // destination's `sysio.chains` row).
       write_envelope_log(get_self(), route_endpoints, epoch, envelope_digest);
 
-      // Drop prior emits the outpost has consumed, and only those: an outpost emits epoch N only after
-      // accepting ours, so `outpcons.epoch_index` covering a row's epoch proves consumption, and a
-      // retained row is the only copy left. No `outpcons` row acknowledges nothing, hence `has_ack`.
+      // Drop the prefix of prior emits the outpost has consumed: an outpost emits epoch N only after
+      // accepting ours, so `outpcons.epoch_index` covering a row's epoch proves consumption. The walk
+      // stops at the first row it does not cover, the oldest copy the outpost still needs; no
+      // `outpcons` row acknowledges nothing.
+      auto by_epoch = envelopes.get_index<"byoutepoch"_n>();
+      auto it = by_epoch.lower_bound(opp::outpost_epoch_key(chain_code, 0));
       outpost_consensus_t opcons(get_self());
-      const auto     opc_pk  = outpost_consensus_key{chain_code};
-      const bool     has_ack = opcons.contains(opc_pk);
-      const uint32_t acked   = has_ack ? opcons.get(opc_pk).epoch_index : 0;
-
-      auto by_outpost = envelopes.get_index<"byoutpost"_n>();
-      for (auto it = by_outpost.lower_bound(chain_code);
-           it != by_outpost.end() && it->chain_code == chain_code; ) {
-         if (it->id == out_id) { ++it; continue; }
-         if (!has_ack || it->epoch_index > acked) {
-            // Not expected: only a transaction signed directly by sysio.msgch or sysio.epoch skips
-            // the `chkcons` consensus check. Logged so a retained row is visible.
-            sysio::print_f("msgch::buildenv: retaining unacknowledged emit chain_code=%llu "
-                           "epoch=%u has_ack=%d acked=%u\n",
-                           static_cast<unsigned long long>(chain_code), it->epoch_index,
-                           static_cast<int>(has_ack), acked);
-            ++it;
-            continue;
+      const auto opc_pk = outpost_consensus_key{chain_code};
+      if (opcons.contains(opc_pk)) {
+         const uint32_t acked = opcons.get(opc_pk).epoch_index;
+         while (it != by_epoch.end() && it->chain_code == chain_code && it->epoch_index <= acked) {
+            if (it->id == out_id) { ++it; continue; }
+            it = by_epoch.erase(std::move(it));
          }
-         it = by_outpost.erase(std::move(it));
+      }
+      if (it != by_epoch.end() && it->chain_code == chain_code && it->id != out_id) {
+         // Not expected: only a transaction signed directly by sysio.msgch or sysio.epoch skips the
+         // `chkcons` consensus check. Logged once so retained rows are visible.
+         sysio::print_f("msgch::buildenv: retaining unacknowledged emits from epoch %u, chain_code=%llu\n",
+                        it->epoch_index, static_cast<unsigned long long>(chain_code));
       }
 
       // Drop the attestations we just consumed (status PROCESSED rows
