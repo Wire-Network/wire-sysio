@@ -32,7 +32,7 @@ void load_account_abi(Tester& tester, name account, abi_serializer& out_ser) {
    BOOST_REQUIRE(metadata != nullptr);
    abi_def parsed;
    BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(metadata->abi, parsed), true);
-   out_ser.set_abi(std::move(parsed), abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
+   out_ser.set_abi(std::move(parsed), Tester::fixture_abi_yield_function());
 }
 
 /// The authorization an action needs when an unprivileged contract bills RAM to `signer`
@@ -54,7 +54,7 @@ signed_transaction create_contract_action_transaction(Tester& tester, name contr
    act.name = action_name;
    act.data = serializer.variant_to_binary(
       serializer.get_action_type(action_name), data,
-      abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
+      Tester::fixture_abi_yield_function());
    act.authorization = authorization.empty() ? std::vector<permission_level>{{signer, config::active_name}}
                                              : std::move(authorization);
 
@@ -220,7 +220,7 @@ uint32_t count(Tester& tester, abi_serializer& serializer, uint8_t tier, uint64_
    for (; it != end; ++it) {
       const std::vector<char> bytes(it->value.begin(), it->value.end());
       const auto row = serializer.binary_to_variant(
-         "nodeowners", bytes, abi_serializer::create_yield_function(Tester::abi_serializer_max_time));
+         "nodeowners", bytes, Tester::fixture_abi_yield_function());
       if (row["tier"].template as<uint8_t>() == tier) ++result;
    }
    return result;

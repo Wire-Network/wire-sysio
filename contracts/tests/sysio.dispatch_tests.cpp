@@ -364,7 +364,7 @@ public:
          abi_def roa_parsed;
          BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(roa_acct->abi, roa_parsed), true);
          roa_abi.set_abi(std::move(roa_parsed),
-                         abi_serializer::create_yield_function(abi_serializer_max_time));
+                         fixture_abi_yield_function());
       }
 
       // Production uses privileged system contracts and installs no cross-contract active grants.
@@ -385,7 +385,7 @@ public:
       abi_def parsed_abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, parsed_abi), true);
       out_ser.set_abi(std::move(parsed_abi),
-                      abi_serializer::create_yield_function(abi_serializer_max_time));
+                      fixture_abi_yield_function());
    }
 
    action_result push(name contract, abi_serializer& ser, name signer,
@@ -517,7 +517,7 @@ public:
                                      "epochstate"_n, "epochstate"_n);
       if (data.empty()) return 0;
       auto v = epoch_abi.binary_to_variant("epoch_state", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       return v["current_epoch_index"].as<uint32_t>();
    }
 
@@ -532,7 +532,7 @@ public:
       auto data = get_row_by_id(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "blocklog"_n, epoch_index);
       return data.empty() ? fc::variant() : epoch_abi.binary_to_variant(
          "blocklog_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    fc::variant get_operator(name account) {
@@ -540,7 +540,7 @@ public:
                                      "operators"_n, account);
       return data.empty() ? fc::variant() : opreg_abi.binary_to_variant(
          "operator_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    fc::variant get_wtdw(uint64_t request_id) {
@@ -548,7 +548,7 @@ public:
                                 "wtdwqueue"_n, request_id);
       return data.empty() ? fc::variant() : opreg_abi.binary_to_variant(
          "withdraw_request", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    /// Read a `sysio.msgch` inbound `envelopes` row (empty variant when absent).
@@ -556,7 +556,7 @@ public:
       auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "envelopes"_n, id);
       return data.empty() ? fc::variant() : msgch_abi.binary_to_variant(
          "envelope_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    /// The first queued outbound attestation of `attest_type`, or a null variant.
@@ -569,7 +569,7 @@ public:
          if (data.empty()) continue;
          auto row = msgch_abi.binary_to_variant(
             "attestation_entry", data,
-            abi_serializer::create_yield_function(abi_serializer_max_time));
+            fixture_abi_yield_function());
          // `type` is an AttestationType; accept either rendering so the helper
          // survives a change in how the enum reflects.
          const auto& t = row["type"];
@@ -590,7 +590,7 @@ public:
       if (it != kv_idx.end() && it->value.size()) {
          std::vector<char> data(it->value.data(), it->value.data() + it->value.size());
          return roa_abi.binary_to_variant("nodeowners", data,
-            abi_serializer::create_yield_function(abi_serializer_max_time));
+            fixture_abi_yield_function());
       }
       return fc::variant();
    }
@@ -604,7 +604,7 @@ public:
       if (it != kv_idx.end() && it->value.size()) {
          std::vector<char> data(it->value.data(), it->value.data() + it->value.size());
          return roa_abi.binary_to_variant("nodeownerreg", data,
-            abi_serializer::create_yield_function(abi_serializer_max_time));
+            fixture_abi_yield_function());
       }
       return fc::variant();
    }
@@ -613,7 +613,7 @@ public:
       auto data = get_row_by_id(DCLAIM_ACCOUNT, DCLAIM_ACCOUNT, table, id);
       return data.empty() ? fc::variant()
          : dclaim_abi.binary_to_variant(
-              type, data, abi_serializer::create_yield_function(abi_serializer_max_time));
+              type, data, fixture_abi_yield_function());
    }
 
    // ── SEC-129 / WSA-223: real epoch-aging helpers ──────────────────────────
@@ -743,7 +743,7 @@ public:
    fc::variant liq_row(name table, const char* type, name scope, uint64_t id) {
       auto data = get_row_by_id(LIQ_ACCOUNT, scope, table, id);
       return data.empty() ? fc::variant() : liq_abi.binary_to_variant(
-         type, data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         type, data, fixture_abi_yield_function());
    }
 
    /// `holder`'s LIQETH shadow balance; 0 without a row.
@@ -772,7 +772,7 @@ public:
 
    fc::variant synd_decode(const char* type, const std::vector<char>& data) {
       return data.empty() ? fc::variant() : synd_abi.binary_to_variant(
-         type, data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         type, data, fixture_abi_yield_function());
    }
 
    /// sysio.synd's kv rows of `table`, in key order, as raw values.
@@ -815,7 +815,7 @@ public:
       const auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outpcons"_n, chain_code);
       BOOST_REQUIRE(!data.empty());
       return msgch_abi.binary_to_variant("outpost_consensus_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time))["envelope_digest"].as<fc::sha256>();
+         fixture_abi_yield_function())["envelope_digest"].as<fc::sha256>();
    }
 
    /// The data of every sysio.synd `action_name` action `trace` executed, decoded, in execution order.
@@ -2030,7 +2030,7 @@ BOOST_FIXTURE_TEST_CASE(a_custody_shortfall_pulls_the_cord_and_the_epoch_advance
 
    const auto cord = andon_abi.binary_to_variant("cord_state",
       get_row_by_account(andon::account, andon::account, "cord"_n, "cord"_n),
-      abi_serializer::create_yield_function(abi_serializer_max_time));
+      fixture_abi_yield_function());
    BOOST_REQUIRE(cord["pulled"].as_bool());
    BOOST_CHECK_EQUAL("custody shortfall ETH LIQETH seq 2", cord["reason"].as_string());
 
@@ -2159,7 +2159,7 @@ BOOST_FIXTURE_TEST_CASE(a_shortfall_freezes_the_same_envelopes_queue_step, sysio
    const auto cord_of = [&] {
       return andon_abi.binary_to_variant("cord_state",
          get_row_by_account(andon::account, andon::account, "cord"_n, "cord"_n),
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    };
    BOOST_REQUIRE(cord_of()["pulled"].as_bool());
 
@@ -2215,7 +2215,7 @@ try {
    enable_epoch_advancement();
    const auto request_of = [&](uint64_t id) {
       return bond_abi.binary_to_variant("request_row", get_row_by_id(BOND_ACCOUNT, BOND_ACCOUNT, "requests"_n, id),
-                                        abi_serializer::create_yield_function(abi_serializer_max_time));
+                                        fixture_abi_yield_function());
    };
 
    const auto     eth    = fc::slug_name{"ETH"}.value;

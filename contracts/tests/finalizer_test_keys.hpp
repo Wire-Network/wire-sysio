@@ -82,7 +82,7 @@ get_last_prop_finalizers(sysio::testing::base_tester& t, sysio::chain::abi_seria
    }
    fc::variant fins_info = sys_abi.binary_to_variant(
       "last_prop_finalizers_info", data,
-      abi_serializer::create_yield_function(sysio::testing::base_tester::abi_serializer_max_time));
+      sysio::testing::base_tester::fixture_abi_yield_function());
    return fins_info["last_proposed_finalizers"].as<std::vector<finalizer_auth_info>>();
 }
 
