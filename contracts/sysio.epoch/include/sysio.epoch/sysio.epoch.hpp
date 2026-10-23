@@ -31,6 +31,10 @@ namespace sysio {
       [[sysio::action]]
       void advance();
 
+      /// Internal continuation after epoch-close operator mutations execute.
+      [[sysio::action]]
+      void finishadv(uint32_t epoch_index, int64_t emission_amount);
+
       /// Group assignment — reads AVAILABLE batch ops from sysio.opreg.
       [[sysio::action]]
       void schbatchgps();
