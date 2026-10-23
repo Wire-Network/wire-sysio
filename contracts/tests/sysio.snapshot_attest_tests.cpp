@@ -232,7 +232,7 @@ public:
       const auto opreg_abi = get_resolver()("sysio.opreg"_n);
       BOOST_REQUIRE(opreg_abi.has_value());
       const auto row = opreg_abi->binary_to_variant(
-         "operator_entry", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         "operator_entry", data, fixture_abi_yield_function());
       return row["status"].as<sysio::opp::types::OperatorStatus>();
    }
 
@@ -299,7 +299,7 @@ public:
          config::system_account_name, config::system_account_name,
          "snaprecords"_n, name(block_num));
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
-         "snap_record", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         "snap_record", data, fixture_abi_yield_function());
    }
 
    /// Return a registered snapshot provider from the contract table.
@@ -308,7 +308,7 @@ public:
          config::system_account_name, config::system_account_name,
          "snapprovs"_n, snap_account);
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
-         "snap_provider", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         "snap_provider", data, fixture_abi_yield_function());
    }
 
    /// Count pending snapshot tuple rows across the scheduled tally space.

@@ -142,12 +142,12 @@ public:
         const auto* accnt1 = control->find_account_metadata( "sysio.token"_n );
         abi_def abi1;
         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt1->abi, abi1), true);
-        abi_ser.set_abi(abi1, abi_serializer::create_yield_function(abi_serializer_max_time));
+        abi_ser.set_abi(abi1, fixture_abi_yield_function());
 
         const auto* shadow_accnt = control->find_account_metadata( "sysio.liq"_n );
         abi_def shadow_abi;
         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(shadow_accnt->abi, shadow_abi), true);
-        shadow_abi_ser.set_abi(shadow_abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+        shadow_abi_ser.set_abi(shadow_abi, fixture_abi_yield_function());
 
         register_shadow_token();
     }
@@ -188,7 +188,7 @@ public:
     fc::variant get_balance( name smartctr, name user, name table, int64_t id, string struc) 
     {
         vector<char> data = get_row_by_account( smartctr, user, table, name(id) );
-        return data.empty() ? fc::variant() : abi_ser.binary_to_variant( struc, data, abi_serializer::create_yield_function(abi_serializer_max_time));
+        return data.empty() ? fc::variant() : abi_ser.binary_to_variant( struc, data, fixture_abi_yield_function());
     }
 
     action_result push_action( const account_name& smartctr, const account_name& signer, const action_name &name, const variant_object &data ) {
@@ -197,7 +197,7 @@ public:
         action act;
         act.account = smartctr;
         act.name    = name;
-        act.data    = abi_ser.variant_to_binary( action_type_name, data, abi_serializer::create_yield_function(abi_serializer_max_time));
+        act.data    = abi_ser.variant_to_binary( action_type_name, data, fixture_abi_yield_function());
 
         return base_tester::push_action( std::move(act), signer.to_uint64_t() );
     }
@@ -324,7 +324,7 @@ public:
     fc::variant pending_funding( name funder ) {
         const auto data = get_kv_row( "sysio.swap"_n, "yieldfunds"_n, { funder.to_uint64_t() } );
         return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "fund_receipt", data,
-                   abi_serializer::create_yield_function(abi_serializer_max_time) );
+                   fixture_abi_yield_function() );
     }
     // Units of shadow queued in `pair`'s reservoir. Requires the row: only yield
     // pools have one.
@@ -332,9 +332,9 @@ public:
         const auto data = get_kv_row( "sysio.swap"_n, "reservoirs"_n, { pair.value } );
         BOOST_REQUIRE_MESSAGE( !data.empty(), "no reservoir row for " << pair );
         const auto row = abi_ser.binary_to_variant( "reservoir", data,
-                             abi_serializer::create_yield_function(abi_serializer_max_time) );
+                             fixture_abi_yield_function() );
         return to_int( fc::json::to_string( row["balance"]["quantity"],
-                       fc::time_point(fc::time_point::now() + abi_serializer_max_time) ) );
+                       fc::time_point::maximum() ) );
     }
     bool has_reservoir( symbol_code pair ) {
         return !get_kv_row( "sysio.swap"_n, "reservoirs"_n, { pair.value } ).empty();
@@ -351,14 +351,14 @@ public:
         announce.authorization = { {from, config::sysio_payer_name}, {from, config::active_name} };
         announce.data = abi_ser.variant_to_binary( "fundyield",
             mvo()( "from", from )( "pair_token", pair )( "quantity", quantity ),
-            abi_serializer::create_yield_function(abi_serializer_max_time) );
+            fixture_abi_yield_function() );
         action deliver;
         deliver.account = "sysio.liq"_n;
         deliver.name    = "transfer"_n;
         deliver.authorization = { {from, config::active_name} };
         deliver.data = shadow_abi_ser.variant_to_binary( "transfer",
             mvo()( "from", from )( "to", "sysio.swap"_n )( "quantity", quantity )( "memo", "" ),
-            abi_serializer::create_yield_function(abi_serializer_max_time) );
+            fixture_abi_yield_function() );
         trx.actions.emplace_back( std::move(announce) );
         trx.actions.emplace_back( std::move(deliver) );
         set_transaction_headers( trx );
@@ -380,7 +380,7 @@ public:
         a.account = "sysio.liq"_n;
         a.name    = act;
         a.data    = shadow_abi_ser.variant_to_binary( shadow_abi_ser.get_action_type(act), data,
-                                                      abi_serializer::create_yield_function(abi_serializer_max_time) );
+                                                      fixture_abi_yield_function() );
         return base_tester::push_action( std::move(a), signer.to_uint64_t() );
     }
     // Push a registry action on `code` (sysio.chains / sysio.tokens), signed by
@@ -454,7 +454,7 @@ public:
             act.name    = "tickyield"_n;
             act.authorization = { {"alice"_n, config::active_name} };
             act.data = abi_ser.variant_to_binary( "tickyield", mvo()( "pair_token", pair ),
-                                                  abi_serializer::create_yield_function(abi_serializer_max_time) );
+                                                  fixture_abi_yield_function() );
             trx.actions.emplace_back( std::move(act) );
         }
         set_transaction_headers( trx );
@@ -527,7 +527,7 @@ public:
             act.authorization = { {user, config::sysio_payer_name}, {user, config::active_name} };
             act.data = abi_ser.variant_to_binary( "exchange", mvo()
                 ( "user", user )( "pair_token", pair )( "ext_asset_in", in )( "min_expected", asset(0, out_symbol) ),
-                abi_serializer::create_yield_function(abi_serializer_max_time) );
+                fixture_abi_yield_function() );
             trx.actions.emplace_back( std::move(act) );
         }
         set_transaction_headers( trx );
@@ -581,12 +581,12 @@ public:
     int64_t tok_balance(name user, int64_t id){
         auto _balance = get_balance("sysio.swap"_n, user, "accounts"_n, id, "account" );
         return to_int(fc::json::to_string(_balance["balance"], 
-          fc::time_point(fc::time_point::now() + abi_serializer_max_time) ));
+          fc::time_point::maximum() ));
     }
     int64_t token_balance(name contract, name user, int64_t id){
         auto _balance = get_balance(contract, user, "accounts"_n, id, "account" );
         return to_int(fc::json::to_string(_balance["balance"], 
-          fc::time_point(fc::time_point::now() + abi_serializer_max_time) ));
+          fc::time_point::maximum() ));
     }
     int64_t to_int(string in) {
         auto sub = in.substr(1,in.length()-2);
@@ -595,11 +595,11 @@ public:
     vector <int64_t> system_balance(int64_t id){
         auto sys_balance_json = get_balance("sysio.swap"_n, name(id), "stat"_n, id, "currency_stats" );   
         auto saldo1 = to_int(fc::json::to_string(sys_balance_json["pool1"]["quantity"], 
-          fc::time_point(fc::time_point::now() + abi_serializer_max_time) ));
+          fc::time_point::maximum() ));
         auto saldo2 = to_int(fc::json::to_string(sys_balance_json["pool2"]["quantity"], 
-          fc::time_point(fc::time_point::now() + abi_serializer_max_time) ));
+          fc::time_point::maximum() ));
         auto minted = to_int(fc::json::to_string(sys_balance_json["supply"], 
-          fc::time_point(fc::time_point::now() + abi_serializer_max_time) ));
+          fc::time_point::maximum() ));
         vector <int64_t> ans = {saldo1, saldo2, minted};
         return ans;
     }
@@ -652,7 +652,7 @@ public:
     int64_t lp_balance( name user, symbol_code pair_token ) {
         auto row = get_balance( "sysio.swap"_n, user, "accounts"_n, pair_token.value, "account" );
         return row.is_null() ? 0 : to_int( fc::json::to_string( row["balance"],
-                 fc::time_point(fc::time_point::now() + abi_serializer_max_time) ) );
+                 fc::time_point::maximum() ) );
     }
     int64_t pool_fee( symbol_code pair_token ) {
         return get_balance( "sysio.swap"_n, name(pair_token.value), "stat"_n, pair_token.value,
@@ -811,9 +811,9 @@ int64_t sysio_swap_tester::deposit_of( name user, const extended_symbol& ext ) {
                                   { user.to_uint64_t(), ext.contract.to_uint64_t(), ext.sym.value() } );
     BOOST_REQUIRE_MESSAGE( !data.empty(), "no deposit row for " << user << " " << ext.sym );
     const auto row = abi_ser.binary_to_variant( "evodex_account", data,
-                                                abi_serializer::create_yield_function(abi_serializer_max_time) );
+                                                fixture_abi_yield_function() );
     return to_int( fc::json::to_string( row["balance"]["quantity"],
-                   fc::time_point(fc::time_point::now() + abi_serializer_max_time) ) );
+                   fc::time_point::maximum() ) );
 }
 
 int64_t sysio_swap_tester::balance( name user, symbol sym ) {
@@ -834,7 +834,7 @@ struct sysio_swap_yield_tester : public sysio_swap_tester {
     // a yield pool on SHD.
     void setup_yield_pool() {
         create_tokens_and_issue();
-        abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+        abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
         many_openext();
         many_transfer();
         BOOST_REQUIRE_EQUAL( success(), shadow_mint( "alice"_n, asset( ShadowIssuance, SHD4 ) ) );
@@ -865,7 +865,7 @@ int64_t sysio_swap_tester::settle_swap( name user, symbol_code pair, asset in, s
 
 void sysio_swap_tester::setup_pools() {
     create_tokens_and_issue();
-    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+    abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
     many_openext();
     many_transfer();
     BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n,
@@ -891,7 +891,7 @@ BOOST_FIXTURE_TEST_CASE( add_rem_liquidity, sysio_swap_tester ) try {
     create_tokens_and_issue();
     transfer( "anothertoken"_n, "bob"_n, "alice"_n, asset::from_string("500000000.0000 VOICE"), "");
 
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));
+    abi_ser.set_abi(abi_evo, fixture_abi_yield_function());
 
     many_openext();
 
@@ -904,8 +904,8 @@ BOOST_FIXTURE_TEST_CASE( add_rem_liquidity, sysio_swap_tester ) try {
 
     auto alice_evo_balance = get_balance("sysio.swap"_n, "alice"_n, "accounts"_n, EVO.value, "account");
     auto bal = mvo() ("balance", asset::from_string("10000000.0000 EVO"));
-    BOOST_REQUIRE_EQUAL( fc::json::to_string(alice_evo_balance, fc::time_point(fc::time_point::now() + abi_serializer_max_time) ), 
-    fc::json::to_string(bal, fc::time_point(fc::time_point::now() + abi_serializer_max_time) ) );
+    BOOST_REQUIRE_EQUAL( fc::json::to_string(alice_evo_balance, fc::time_point::maximum() ),
+    fc::json::to_string(bal, fc::time_point::maximum() ) );
 
 // ADDLIQUIDITY
     BOOST_REQUIRE_EQUAL( error("missing authority of alice"), 
@@ -992,7 +992,7 @@ BOOST_FIXTURE_TEST_CASE( exchange_action, sysio_swap_tester ) try {
     BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt2->abi, abi_evo), true);
     create_tokens_and_issue();
     transfer( "anothertoken"_n, "bob"_n, "alice"_n, asset::from_string("500000000.0000 VOICE"), "");
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));
+    abi_ser.set_abi(abi_evo, fixture_abi_yield_function());
     many_openext();
     transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("10000000.0000 EOS"), "");
     seed_transfer( "anothertoken"_n, "alice"_n, asset::from_string("200000000.0000 VOICE"), "");
@@ -1081,7 +1081,7 @@ BOOST_FIXTURE_TEST_CASE( increasing_poolvalue, sysio_swap_tester) try {
     BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt2->abi, abi_evo), true);
 
     create_tokens_and_issue();
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));
+    abi_ser.set_abi(abi_evo, fixture_abi_yield_function());
     many_openext(); 
     many_transfer();
     transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, 
@@ -1192,7 +1192,7 @@ BOOST_FIXTURE_TEST_CASE( memoexchange_test, sysio_swap_tester ) try {
     prepare_carol_token();
     transfer( "anothertoken"_n, "bob"_n, "alice"_n, asset::from_string("0.0001 VOICE"), "");
 
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));
+    abi_ser.set_abi(abi_evo, fixture_abi_yield_function());
 
     many_openext();
     many_transfer();
@@ -1298,7 +1298,7 @@ BOOST_FIXTURE_TEST_CASE( the_other_actions, sysio_swap_tester ) try {
     const auto* accnt2 = control->find_account_metadata( "sysio.swap"_n );
     abi_def abi_evo;
     BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt2->abi, abi_evo), true);
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));
+    abi_ser.set_abi(abi_evo, fixture_abi_yield_function());
 
     // add_signed_ext_balance
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("extended_symbol not registered for this user,\
@@ -1456,7 +1456,7 @@ struct sysio_swap_unconfigured_tester : public sysio_swap_tester {
 
 BOOST_FIXTURE_TEST_CASE( nothing_works_before_setconfig, sysio_swap_unconfigured_tester ) try {
     create_tokens_and_issue();
-    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+    abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
     many_openext();
     // Without a system token nothing can be deposited, with or without the
     // contract's authority, and no pair can be created, whoever its authority is.
@@ -1490,7 +1490,7 @@ BOOST_FIXTURE_TEST_CASE( nothing_works_before_setconfig, sysio_swap_unconfigured
 
 BOOST_FIXTURE_TEST_CASE( seed_locks_shares, sysio_swap_tester ) try {
     create_tokens_and_issue();
-    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+    abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
     many_openext();
     many_transfer();
     const int64_t minted = 100'000'000'000;   // sqrt(1e10 * 1e12)
@@ -1543,7 +1543,7 @@ BOOST_FIXTURE_TEST_CASE( seed_locks_shares, sysio_swap_tester ) try {
 
 BOOST_FIXTURE_TEST_CASE( yield_leg_rules, sysio_swap_tester ) try {
     create_tokens_and_issue();
-    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+    abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
     many_openext();
     many_transfer();
     const extended_symbol voice{ VOICE4, "anothertoken"_n };
@@ -2306,7 +2306,7 @@ BOOST_FIXTURE_TEST_CASE( fee_authority_configuration, sysio_swap_tester ) try {
     const symbol CVO4 = symbol::from_string("4,CVO");
     BOOST_REQUIRE_EQUAL( success(), create( "sysio.token"_n, "alice"_n, asset::from_string("1000.0000 CVO") ) );
     BOOST_REQUIRE_EQUAL( success(), issue( "sysio.token"_n, "alice"_n, "alice"_n, asset::from_string("1000.0000 CVO"), "" ) );
-    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+    abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
     many_openext();
     many_transfer();
     BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, extended_symbol{ CVO4, "sysio.token"_n } ) );
@@ -2347,7 +2347,7 @@ BOOST_FIXTURE_TEST_CASE( indextable, sysio_swap_tester ) try {
     const auto* accnt2 = control->find_account_metadata( "sysio.swap"_n );
     abi_def abi_evo;
     BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt2->abi, abi_evo), true);
-    abi_ser.set_abi(abi_evo, abi_serializer::create_yield_function(abi_serializer_max_time));
+    abi_ser.set_abi(abi_evo, fixture_abi_yield_function());
     many_openext();
     transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("10000000.0000 EOS"), "");
     seed_transfer( "anothertoken"_n, "alice"_n, asset::from_string("200000000.0000 VOICE"), "");
@@ -2375,7 +2375,7 @@ BOOST_FIXTURE_TEST_CASE( indextable, sysio_swap_tester ) try {
         { "anothertoken"_n.to_uint64_t(), VOICE4.value(), "sysio.token"_n.to_uint64_t(), EOS4.value() } );
     BOOST_REQUIRE( !data.empty() );
     const auto table = abi_ser.binary_to_variant( "pair_index", data,
-                                                  abi_serializer::create_yield_function(abi_serializer_max_time) );
+                                                  fixture_abi_yield_function() );
     BOOST_REQUIRE_EQUAL(table["evo_symbol"], "4,EVO");
     BOOST_REQUIRE( get_kv_row( "sysio.swap"_n, "evoindex"_n,
         { "sysio.token"_n.to_uint64_t(), EOS4.value(), "anothertoken"_n.to_uint64_t(), VOICE4.value() } ).empty() );
@@ -2676,7 +2676,7 @@ BOOST_FIXTURE_TEST_CASE( precision_extremes, sysio_swap_tester ) try {
     // Every unit of every token sits in the contract under alice, so pools and
     // trades can be pushed to the int64 asset ceiling with no external limit.
     create_tokens_and_issue();
-    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+    abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
     many_openext();
     const asset all_eos   = asset::from_string("461168601842738.7903 EOS");
     const asset all_voice = asset::from_string("461168601842738.7903 VOICE");
@@ -2778,7 +2778,7 @@ BOOST_FIXTURE_TEST_CASE( minimum_fee_closes_the_free_window, sysio_swap_tester )
     // A small, balanced pool so single-unit inputs produce single-unit quotes:
     // 1000.0000 EOS against 1000.0000 VOICE, 10 bps.
     create_tokens_and_issue();
-    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+    abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
     many_openext();
     BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("2000.0000 EOS"), "") );
     BOOST_REQUIRE_EQUAL( success(), seed_transfer( "anothertoken"_n, "bob"_n, asset::from_string("2000.0000 VOICE"), "deposit to: alice") );
@@ -2830,7 +2830,7 @@ BOOST_FIXTURE_TEST_CASE( guard_semantics_on_the_memo_path, sysio_swap_tester ) t
     // amount a real token contract refuses, so with it hosting one leg of a
     // pair the swap path can be driven with inputs sysio.token cannot produce.
     create_tokens_and_issue();
-    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+    abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
     // badtoken's EOS is a different token from the system token's EOS: it is the
     // pair's first leg, seeded with the contract's authority.
     BOOST_REQUIRE_EQUAL( success(), openext( "alice"_n, "alice"_n, extended_symbol{EOS4, "badtoken"_n}) );
@@ -2969,7 +2969,7 @@ BOOST_FIXTURE_TEST_CASE( price_accumulators_span_extreme_prices, sysio_swap_test
     // The steepest price int64 balances allow, held for a decade: the sum
     // needs the high limb and the average still recovers the price exactly.
     create_tokens_and_issue();
-    abi_ser.set_abi( swap_abi_def(), abi_serializer::create_yield_function(abi_serializer_max_time) );
+    abi_ser.set_abi( swap_abi_def(), fixture_abi_yield_function() );
     many_openext();
     BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n, asset::from_string("461168601842738.7903 EOS"), "") );
     BOOST_REQUIRE_EQUAL( success(), seed_transfer( "anothertoken"_n, "bob"_n, asset::from_string("461168601842738.7903 VOICE"), "deposit to: alice") );
@@ -3116,7 +3116,7 @@ BOOST_FIXTURE_TEST_CASE( a_freeze_refuses_every_token_move, sysio_swap_tester ) 
     const abi_def swap_abi = swap_abi_def();
     create_tokens_and_issue();
     transfer( "anothertoken"_n, "bob"_n, "alice"_n, asset::from_string("500000000.0000 VOICE"), "");
-    abi_ser.set_abi(swap_abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+    abi_ser.set_abi(swap_abi, fixture_abi_yield_function());
     many_openext();
     BOOST_REQUIRE_EQUAL( success(), transfer( "sysio.token"_n, "alice"_n, "sysio.swap"_n,
                                               asset::from_string("10000000.0000 EOS"), "") );

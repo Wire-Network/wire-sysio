@@ -21,6 +21,18 @@ The curve decays from `annual_initial_emission` toward `annual_min_emission`
 (clamped by `annual_max_emission`), stops at `t5_floor`, and auto-throttles as
 `total_distributed` rises.
 
+## Budget headroom
+
+The T5 budget is `t5_distributable - t5_floor`. Accruals are sized against the
+part not yet paid out or accrued (`net_headroom` in `emissions.hpp`), so
+`total_distributed + pending_emission_amount` never exceeds the budget. `setemitcfg` refuses a budget below
+`t5_floor + total_distributed + pending_emission_amount`.
+
+Once the open pay period has accrued the rest of the budget, its remaining
+epochs accrue zero and still advance, and its `payepoch` settles what was
+accrued. Epochs block with `TREASURY_EXHAUSTED` once the budget is spent, or
+when the curve yields zero with nothing pending.
+
 ## How each bucket reaches its recipient
 
 `payepoch` runs inline from `sysio.epoch::advance`, which must never abort. A
@@ -66,10 +78,13 @@ a claim needs `require_auth(account_name)`, `sysio.roa` forces
 carries a contract that could emit the claim inline. They are protocol-owned
 holding accounts with no code, so the notify-handler risk does not apply.
 
-Producer pay is per block produced: the active slice of the producer pool is
-divided by the period's nominal slot count, raised to the blocks actually
-produced when a period runs long, and each producer is paid for the blocks it
-made. Standbys draw from a separate slice, at a rank-decreasing weight, and are
+Producer pay is per counted block. `onblock` counts the blocks a producer makes,
+at most one round per rotation of the schedule (a switch that hands a producer a
+second round in the same rotation does not count it). The active slice of the
+producer pool is divided by the period's nominal slot count, raised to the
+blocks counted when a period runs long, and each producer is paid for its
+counted blocks. Standbys
+draw from a separate slice, at a rank-decreasing weight, and are
 not paid per block. Batch-op pay is weighted by the roster captured for each
 accrued epoch, then split evenly across all
 members of each historical roster (the per-member slice is the group pool divided
@@ -197,7 +212,7 @@ period_emission
 | `rcrdbatch` | `sysio.epoch` | Record the batch-operator roster for this accrued epoch |
 | `payepoch` | `sysio.epoch` | Distribute the period's compute / capex / governance (credits `payclaims`; pushes only the category buckets) |
 | `viewnodedist` | read-only | Preview a node owner's claimable amount |
-| `viewepoch` | read-only | Current treasury / next-emission estimate |
+| `viewepoch` | read-only | Remaining budget / next-emission estimate |
 | `viewemitcfg` | read-only | Current emission config |
 
 ## Tables

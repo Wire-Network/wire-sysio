@@ -5,6 +5,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <thread>
 
 static_assert(_LIBCPP_VERSION == 230103, "Wire requires libc++ 23.1.3");
@@ -13,6 +14,8 @@ extern "C" int wire_c_runtime_probe(void);
 
 namespace {
 constexpr auto probe_message = "wire-libcxx-runtime";
+constexpr std::string_view growth_fragment = "wire";
+constexpr std::size_t growth_count = 1024;
 /// Polymorphic exception exercises RTTI as well as unwinding across a thread.
 class runtime_probe_error final : public std::runtime_error {
 public:
@@ -37,12 +40,12 @@ int main() {
    // Exercise out-of-line string growth, including allocations beyond SSO.
    // On Darwin these calls must stay in the pinned runtime.
    std::string growing;
-   for (int i = 0; i < 1024; ++i)
-      growing.append("wire");
-   if (growing.size() != 4096)
+   for (std::size_t i = 0; i < growth_count; ++i)
+      growing.append(growth_fragment);
+   if (growing.size() != growth_count * growth_fragment.size())
       return 5;
    for (std::size_t i = 0; i < growing.size(); ++i)
-      if (growing[i] != "wire"[i % 4])
+      if (growing[i] != growth_fragment[i % growth_fragment.size()])
          return 5;
    std::exception_ptr error;
    std::thread worker([&] {

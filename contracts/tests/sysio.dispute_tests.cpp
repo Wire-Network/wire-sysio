@@ -6,7 +6,8 @@
 ///                     (rejecting an empty electorate)
 ///   * votedispute  -- electorate-snapshot eligibility (the Tier-1 set frozen at open; later
 ///                     registrations cannot join), candidate validation, one-vote,
-///                     dispute-must-be-open
+///                     dispute-must-be-open, no ballot once the tally has a winner (late
+///                     ballots still count while it has none)
 ///   * chkdispute   -- the Tier-1 tally rule against the snapshot: fast path (votes >=
 ///                     floor(N/2)+1 any time) and the post-deadline relaxation (cast >= Q AND a
 ///                     strict majority of cast votes), plus the non-resolving waits (sub-quorum
@@ -273,21 +274,21 @@ public:
       auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outpcons"_n, chain_code);
       if (data.empty()) return -1;
       auto v = msgch_abi.binary_to_variant("outpost_consensus_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       return v["epoch_index"].as<uint32_t>();
    }
 
    fc::variant get_dispute(uint64_t id) {
       auto data = get_row_by_id(CHALG_ACCOUNT, CHALG_ACCOUNT, "disputes"_n, id);
       return data.empty() ? fc::variant() : chalg_abi.binary_to_variant("dispute_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    bool epoch_paused() {
       auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
       if (data.empty()) return false;
       auto v = epoch_abi.binary_to_variant("epoch_state", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       return v["is_paused"].as_bool();
    }
 
@@ -296,7 +297,7 @@ public:
       auto data = get_row_by_account(CHALG_ACCOUNT, CHALG_ACCOUNT, "chalgstate"_n, "chalgstate"_n);
       if (data.empty()) return 0;
       auto v = chalg_abi.binary_to_variant("chalg_state", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       return v["open_disputes"].as<uint32_t>();
    }
 
@@ -314,14 +315,14 @@ public:
       auto data = get_row_by_account(config::system_account_name, config::system_account_name,
                                      "nodecount"_n, "nodecount"_n);
       return data.empty() ? fc::variant() : system_abi.binary_to_variant("node_count_state", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    uint32_t current_epoch() {
       auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
       if (data.empty()) return 0;
       auto v = epoch_abi.binary_to_variant("epoch_state", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       return v["current_epoch_index"].as<uint32_t>();
    }
 
@@ -331,7 +332,7 @@ public:
       auto data = get_row_by_account(EPOCH_ACCOUNT, EPOCH_ACCOUNT, "epochstate"_n, "epochstate"_n);
       if (data.empty()) return members;
       auto v = epoch_abi.binary_to_variant("epoch_state", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       const uint64_t cur = v["current_batch_op_group"].as_uint64();
       const auto& groups = v["batch_op_groups"].get_array();
       if (cur >= groups.size()) return members;
@@ -348,7 +349,7 @@ public:
       auto data = get_row_by_id(OPREG_ACCOUNT, OPREG_ACCOUNT, "operators"_n, op.value);
       if (data.empty()) return {};
       auto v = opreg_abi.binary_to_variant("operator_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       return v["status"].as_string();
    }
 
@@ -891,6 +892,106 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_deadline_tie_waits, sysio_dispute_tester) { t
    BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
    BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_OPEN", get_dispute(1)["status"].as_string());
    BOOST_REQUIRE(epoch_paused());   // unresolved dispute keeps the epoch paused
+} FC_LOG_AND_RETHROW() }
+
+// WNS-59: a late ballot cannot undo a post-deadline winner. With N=5 (Q=3), x=2 / y=1 has a winner
+// once the deadline passes; voter4's late ballot for y would make it 2/2 (no strict majority, no
+// quorum for either) and leave the dispute OPEN, so votedispute refuses it.
+BOOST_FIXTURE_TEST_CASE(votedispute_after_post_deadline_winner_rejected, sysio_dispute_tester) { try {
+   register_node_owner("voter1"_n, 1);
+   register_node_owner("voter2"_n, 1);
+   register_node_owner("voter3"_n, 1);
+   register_node_owner("voter4"_n, 1);   // with nodedaddy: N = 5, Q = 3
+
+   const uint32_t epoch = current_epoch();
+   auto winner_bytes = encode_envelope(epoch, "x");
+   auto cs_x = fc::sha256::hash(winner_bytes.data(), winner_bytes.size());
+   auto cs_y = fc::sha256::hash(std::string("y"));
+   std::vector<fc::variant> cands{
+      candidate(cs_x, {BATCHOP}),
+      candidate(cs_y, {"voter1"_n}),
+   };
+   BOOST_REQUIRE_EQUAL(success(), opendispute(eth_code(), epoch, cands));
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth_code(), winner_bytes));
+
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter1"_n, 1, cs_x));
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 1, cs_x));
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter3"_n, 1, cs_y));
+
+   produce_block(fc::seconds(24 * 60 * 60 + 1));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: dispute already has a winner"),
+      votedispute("voter4"_n, 1, cs_y));
+
+   BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
+   auto d = get_dispute(1);
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_RESOLVED", d["status"].as_string());
+   BOOST_REQUIRE_EQUAL(cs_x.str(), d["winning_checksum"].as_string());
+   BOOST_REQUIRE(!epoch_paused());
+} FC_LOG_AND_RETHROW() }
+
+// Ballots stay open past the deadline while the tally has no winner; closing them there would
+// strand a dispute that is short of quorum. With N=5 (Q=3), x=1 / y=1 is below quorum at the
+// deadline. voter3's late ballot for x gives x a strict majority of a quorum, and voter4's ballot
+// for y, which would undo it, is refused.
+BOOST_FIXTURE_TEST_CASE(votedispute_late_ballot_accepted_without_winner, sysio_dispute_tester) { try {
+   register_node_owner("voter1"_n, 1);
+   register_node_owner("voter2"_n, 1);
+   register_node_owner("voter3"_n, 1);
+   register_node_owner("voter4"_n, 1);   // with nodedaddy: N = 5, Q = 3
+
+   const uint32_t epoch = current_epoch();
+   auto winner_bytes = encode_envelope(epoch, "x");
+   auto cs_x = fc::sha256::hash(winner_bytes.data(), winner_bytes.size());
+   auto cs_y = fc::sha256::hash(std::string("y"));
+   std::vector<fc::variant> cands{
+      candidate(cs_x, {BATCHOP}),
+      candidate(cs_y, {"voter1"_n}),
+   };
+   BOOST_REQUIRE_EQUAL(success(), opendispute(eth_code(), epoch, cands));
+   BOOST_REQUIRE_EQUAL(success(), deliver(eth_code(), winner_bytes));
+
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter1"_n, 1, cs_x));
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 1, cs_y));
+
+   // Past the deadline with cast(2) < Q(3): no winner, so the dispute waits.
+   produce_block(fc::seconds(24 * 60 * 60 + 1));
+   BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_OPEN", get_dispute(1)["status"].as_string());
+
+   // The late ballot counts: cast(3) >= Q(3) AND 2*votes_x(4) > cast(3) -> x wins.
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter3"_n, 1, cs_x));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: dispute already has a winner"),
+      votedispute("voter4"_n, 1, cs_y));
+
+   BOOST_REQUIRE_EQUAL(success(), chkdispute(1));
+   auto d = get_dispute(1);
+   BOOST_REQUIRE_EQUAL("DISPUTE_STATUS_RESOLVED", d["status"].as_string());
+   BOOST_REQUIRE_EQUAL(cs_x.str(), d["winning_checksum"].as_string());
+   BOOST_REQUIRE(!epoch_paused());
+} FC_LOG_AND_RETHROW() }
+
+// The refusal applies before the deadline too, once a checksum reaches Q: with N=3 (Q=2), two votes
+// for x give it the win, and nodedaddy's ballot for y is refused.
+BOOST_FIXTURE_TEST_CASE(votedispute_after_fast_path_winner_rejected, sysio_dispute_tester) { try {
+   register_node_owner("voter1"_n, 1);
+   register_node_owner("voter2"_n, 1);   // with nodedaddy: N = 3, Q = 2
+
+   const uint32_t epoch = current_epoch();
+   auto cs_x = fc::sha256::hash(std::string("x"));
+   auto cs_y = fc::sha256::hash(std::string("y"));
+   std::vector<fc::variant> cands{
+      candidate(cs_x, {BATCHOP}),
+      candidate(cs_y, {"voter1"_n}),
+   };
+   BOOST_REQUIRE_EQUAL(success(), opendispute(eth_code(), epoch, cands));
+
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter1"_n, 1, cs_x));
+   BOOST_REQUIRE_EQUAL(success(), votedispute("voter2"_n, 1, cs_x));
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: dispute already has a winner"),
+      votedispute(NODE_DADDY, 1, cs_y));
 } FC_LOG_AND_RETHROW() }
 
 // sysio.epoch::is_paused is one flag shared by every dispute: resolving the FIRST of two

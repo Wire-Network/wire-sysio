@@ -17,6 +17,50 @@ using snapshot_request_id_information = snapshot_scheduler::snapshot_request_id_
 
 BOOST_AUTO_TEST_SUITE(producer_snapshot_scheduler_tests)
 
+/// Rename errors are logged without discarding the old schedule or leaking a temporary sibling.
+BOOST_AUTO_TEST_CASE(schedule_publication_failure) {
+   fc::temp_directory directory;
+   snapshot_scheduler::snapshot_db_json db;
+   db.set_path(directory.path());
+   std::filesystem::create_directory(db.get_json_path());
+   std::ofstream(db.get_json_path() / "sentinel") << "old";
+   const std::vector<snapshot_scheduler::snapshot_schedule_information> schedule;
+   BOOST_CHECK_NO_THROW(db << schedule);
+   BOOST_CHECK(std::filesystem::is_regular_file(db.get_json_path() / "sentinel"));
+   BOOST_CHECK_EQUAL(std::distance(std::filesystem::directory_iterator(directory.path()),
+                                   std::filesystem::directory_iterator()), 1);
+}
+
+/// Snapshot serialization and publication failures remove incomplete output and notify the caller once.
+BOOST_AUTO_TEST_CASE(snapshot_creation_failure_cleanup) {
+   for (bool fail_publication : {false, true}) {
+      testing::tester chain;
+      chain.produce_block();
+      fc::temp_directory directory;
+      const auto snapshots = directory.path() / "snapshots";
+      snapshot_scheduler scheduler;
+      scheduler.set_snapshots_path(snapshots);
+      std::filesystem::path pending;
+      if (fail_publication) {
+         chain.control->abort_block();
+         pending = pending_snapshot<snapshot_scheduler::snapshot_information>::get_pending_path(
+            chain.control->head().id(), snapshots);
+         std::filesystem::create_directories(pending);
+         std::ofstream(pending / "sentinel") << "old";
+      } // Otherwise the pending block makes chain.write_snapshot throw after reserving its output.
+      unsigned errors = 0;
+      scheduler.create_snapshot([&](const auto& result) {
+         BOOST_CHECK(std::holds_alternative<fc::exception_ptr>(result));
+         ++errors;
+      }, *chain.control);
+      BOOST_CHECK_EQUAL(errors, 1u);
+      BOOST_CHECK_EQUAL(std::distance(std::filesystem::directory_iterator(snapshots),
+                                      std::filesystem::directory_iterator()), fail_publication ? 1 : 0);
+      if (fail_publication)
+         BOOST_CHECK(std::filesystem::is_regular_file(pending / "sentinel"));
+   }
+}
+
 BOOST_AUTO_TEST_CASE(snapshot_scheduler_test) {
    fc::logger log;
    snapshot_scheduler scheduler;

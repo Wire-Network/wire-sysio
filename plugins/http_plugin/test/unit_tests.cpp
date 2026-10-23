@@ -1231,14 +1231,14 @@ BOOST_FIXTURE_TEST_CASE(each_request_is_answered_once, quiet_http_plugin_test_fi
 }
 
 /// A raw handler's exception, thrown, reported through its connection or raised by a send, is answered like any API
-/// call's: a malformed request is a 400, any other failure a 500, and the connection stays open with no bytes left in
-/// flight.
+/// call's: a malformed request is a 400, any other failure a 500, and the connection stays open. Once it closes, no
+/// request or byte is left in flight.
 BOOST_FIXTURE_TEST_CASE(raw_handler_exceptions_are_api_errors, quiet_http_plugin_test_fixture) {
    constexpr auto invalid_request = "/v1/node/raw_invalid_request";
    constexpr auto reported_invalid_request = "/v1/node/raw_reported_invalid_request";
    constexpr auto internal_error = "/v1/node/raw_internal_error";
    constexpr auto send_throws = "/v1/node/raw_send_throws";
-   constexpr auto in_flight = "/v1/node/bytes_in_flight";
+   constexpr auto hello = "/v1/node/hello";
    auto* plugin = init_on_socket();
    BOOST_REQUIRE(plugin);
    plugin->add_raw_handler(invalid_request, api_category::node, [](detail::abstract_conn_ptr, string&&, string&&) {
@@ -1258,8 +1258,8 @@ BOOST_FIXTURE_TEST_CASE(raw_handler_exceptions_are_api_errors, quiet_http_plugin
    plugin->add_raw_handler(send_throws, api_category::node, [](detail::abstract_conn_ptr conn, string&&, string&&) {
       conn->send_response("a body a 204 cannot carry", 204);
    });
-   plugin->add_async_api({{in_flight, api_category::node, [plugin](string&&, string&&, url_response_callback&& cb) {
-                              cb(200, fc::variant(plugin->bytes_in_flight()));
+   plugin->add_async_api({{hello, api_category::node, [](string&&, string&&, url_response_callback&& cb) {
+                              cb(200, fc::variant("world"));
                            }}});
 
    const std::vector<std::pair<const char*, http::status>> cases{
@@ -1268,14 +1268,20 @@ BOOST_FIXTURE_TEST_CASE(raw_handler_exceptions_are_api_errors, quiet_http_plugin
       {internal_error, http::status::internal_server_error},
       {send_throws, http::status::internal_server_error}};
    for (const auto& [route, status] : cases) {
-      const unix_exchange exchange(socket, {route, in_flight}, 11, false);
+      const unix_exchange exchange(socket, {route, hello}, 11, false);
       BOOST_REQUIRE_MESSAGE(!exchange.error, route << ": " << exchange.error.message());
       BOOST_REQUIRE_EQUAL(exchange.responses.size(), 2u);
       BOOST_CHECK(exchange.responses[0].result() == status);
       BOOST_CHECK(exchange.responses[0].keep_alive());
       BOOST_CHECK_EQUAL(fc::json::from_string(exchange.responses[0].body())["code"].as_uint64(),
                         magic_enum::enum_integer(status));
-      BOOST_CHECK_EQUAL(exchange.responses[1].body(), "0");
+      BOOST_CHECK(exchange.responses[1].result() == http::status::ok);
+      BOOST_CHECK_EQUAL(exchange.responses[1].body(), R"("world")");
+      // Receiving a response does not mean its server callback has returned: it can still hold an accounted
+      // payload while another HTTP thread handles the next request. Check for leaks after the connection closes.
+      const bool released = all_released(*plugin);
+      BOOST_REQUIRE_MESSAGE(released, route << ": " << plugin->requests_in_flight() << " requests and "
+                                            << plugin->bytes_in_flight() << " bytes remain in flight");
    }
 }
 

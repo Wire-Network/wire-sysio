@@ -9,8 +9,8 @@ using namespace sysio::testing;
 namespace {
 constexpr auto test_account = "codegentest"_n;
 constexpr auto test_action = "check"_n;
-// Keep the comparison operand dynamic inside each function so InstCombine
-// must reason about the negative i32 constant rather than fold a constant call.
+/// Keep the comparison operand dynamic inside each function so InstCombine
+/// must reason about the negative i32 constant rather than fold a constant call.
 constexpr auto signed_constants_wast = R"(
 (module
   (memory 1)

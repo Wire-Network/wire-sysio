@@ -347,16 +347,15 @@ void system_contract::setemitcfg(const emissions::emission_config& cfg) {
          "per-epoch emission ceiling x pay_cadence_epochs exceeds the asset range at current epoch_duration_sec");
    }
 
-   // If t5_state already exists, prevent config changes that would brick future
-   // emissions. Post-init, remaining distributable must still cover what's been
-   // paid, and the per-epoch floor (derived from annual_min_emission and the
-   // canonical epoch_duration_sec) can't exceed what's left to distribute.
-   // initt5 requires sysio.epoch to be configured, so t5_initialized implies
-   // epoch_configured -- safe to use epoch_secs directly.
+   // If t5_state already exists, prevent config changes that would brick future emissions. Post-init, the budget must
+   // still cover what has been paid out AND what the open pay period has accrued (it is owed at the boundary), and the
+   // per-epoch floor (derived from annual_min_emission and the canonical epoch_duration_sec) can't exceed what is left
+   // uncommitted. initt5 requires sysio.epoch to be configured, so t5_initialized implies epoch_configured and
+   // epoch_secs is safe to use directly.
    if (t5_initialized) {
-      sysio::check(cfg.t5_distributable >= cfg.t5_floor + t5now.total_distributed,
-                    "t5_distributable must cover floor + already-distributed");
-      const int64_t remaining = cfg.t5_distributable - cfg.t5_floor - t5now.total_distributed;
+      const int64_t remaining = emissions::net_headroom(cfg, t5now);
+      sysio::check(remaining >= 0,
+                    "t5_distributable must cover floor + already-distributed + pending emission");
       const int64_t per_epoch_min =
          emissions::scale_annual_to_epoch(cfg.annual_min_emission, epoch_secs);
       sysio::check(per_epoch_min <= remaining,
@@ -581,7 +580,7 @@ void system_contract::initt5(const sysio::time_point_sec& start_time) {
 // Updates:
 //   - pending_emission_amount += per_epoch_emission   (drained on pay-epoch)
 //   - batch_group_epochs[batch_group_index] += 1      (drained on pay-epoch)
-//   - last_epoch_emission = per_epoch_emission        (decay continuity)
+//   - last_epoch_emission = per_epoch_emission        (decay continuity; kept on a zero share)
 //   - last_epoch_index = epoch_index                  (replay guard)
 //   - last_epoch_time = now
 //
@@ -592,8 +591,9 @@ void system_contract::accrueepoch(uint32_t epoch_index,
                                   int64_t  per_epoch_emission) {
    require_auth(epoch_refs::account);
 
-   // Defense in depth.
-   sysio::check(per_epoch_emission > 0, "accrueepoch per_epoch_emission must be positive");
+   // Defense in depth. Zero is a valid share: the gate passes one to an open pay period with emission pending once the
+   // rest of the T5 budget is committed or the curve is zero, and the epoch still counts toward that period.
+   sysio::check(per_epoch_emission >= 0, "accrueepoch per_epoch_emission must be non-negative");
 
    t5state_t t5s(get_self());
    sysio::check(t5s.exists(), "t5 state not initialized");
@@ -632,7 +632,10 @@ void system_contract::accrueepoch(uint32_t epoch_index,
    const auto now = time_point_sec{current_time_point()};
    state.last_epoch_index    = epoch_index;
    state.last_epoch_time     = now;
-   state.last_epoch_emission = per_epoch_emission;
+   // A zero share keeps the last positive share as the decay base; storing 0 would restart the curve at the per-epoch
+   // minimum, or at nothing when that minimum is 0. Near the end of the budget the last positive share may itself be
+   // clamped to the remainder.
+   if (per_epoch_emission > 0) state.last_epoch_emission = per_epoch_emission;
 
    t5s.set(state, get_self());
 }
@@ -681,7 +684,8 @@ void system_contract::rcrdbatch(uint32_t epoch_index, std::vector<sysio::name> m
 // emit_cfg.pay_cadence_epochs) after its readiness gate has verified that:
 //   - emitcfg exists
 //   - t5state exists
-//   - per-epoch emission > 0 (treasury not at floor)
+//   - the gross headroom is positive and period_emission is too (this epoch's share may be 0 once earlier epochs
+//     of the period have accrued, if they committed the rest of the budget or the curve has dropped to zero)
 //   - sysio's WIRE balance >= period_emission (pending + this epoch's share)
 //
 // The unallocated remainder (period_emission - compute - capex - governance)
@@ -823,18 +827,19 @@ void system_contract::payepoch(uint32_t epoch_index,
    // =======================================================================
    // Producer + standby pay.
    //
-   // Producers are paid PER BLOCK. The active slice of the producer pool is spread over the block
-   // slots the period held, and every schedulable producer is credited that rate for each block
-   // it made. A missed block is never counted, so its pay stays in the treasury: it does not flow
-   // to the producers that did show up, because the rate does not depend on who did. The divisor
-   // is the period's nominal slot count, raised to the blocks actually produced when a period runs
-   // long (an epoch can extend while a batch operator delivers), so the slice is never exceeded.
+   // Producers are paid PER COUNTED BLOCK. The active slice of the producer pool is spread over the
+   // block slots the period held, and every schedulable producer is credited that rate for each
+   // block `onblock` counted for it: every block it made, at most one round per rotation. A missed
+   // block is never counted, so its pay stays in the treasury: it does not flow to the producers
+   // that did show up, because the rate does not depend on who did. The divisor is the period's
+   // nominal slot count, raised to the blocks counted when a period runs long (an epoch can extend
+   // while a batch operator delivers), so the slice is never exceeded.
    //
    // Standbys (positions 22..cfg.standby_end_rank) draw a retainer from the standby slice
    // (cfg.standby_bps of the pool). Each POSITION holds a fixed share, decaying linearly from
    // position 22, over the constant sum of every position's weight -- a vacant position's share
    // stays in the treasury. Block pay is not gated on position, so a producer that slid from 21
-   // to 22 mid-period is still paid for the blocks it made before the schedule caught up.
+   // to 22 mid-period is still paid for the blocks counted before the schedule caught up.
    //
    // Counters accumulate across non-pay epochs (no reset by accrueepoch) and are zeroed at the
    // end of this action for every producer PAID by it. A producer that is not schedulable when the
@@ -843,8 +848,8 @@ void system_contract::payepoch(uint32_t epoch_index,
    // (a re-keyed producer's return; a terminated operator's, should it settle and re-register;
    // never, for a slashed one, whose row is never pruned and which `regoperator` refuses). A
    // producer BELOW the walk (demoted, parked, unbonded, slashed, terminated -- each rescored at
-   // the event) is not visited at all, with the same effect. Every block a producer makes is paid
-   // exactly once, at the first payepoch where it is payable.
+   // the event) is not visited at all, with the same effect. Every counted block is paid exactly
+   // once, at the first payepoch where it is payable.
    // =======================================================================
    {
       auto prod_by_rank = _producers.get_index<"prodrank"_n>();
@@ -1144,19 +1149,7 @@ emissions::epoch_info_result system_contract::viewepoch() {
    const auto state = t5s.get();
    const auto now   = time_point_sec{current_time_point()};
 
-   int64_t remaining = cfg.t5_distributable - cfg.t5_floor - state.total_distributed;
-   if (remaining < 0) remaining = 0;
-
    const uint32_t epoch_duration_sec = get_epoch_duration_sec();
-
-   int64_t next_est;
-   if (state.epoch_count == 0) {
-      next_est = emissions::scale_annual_to_epoch(cfg.annual_initial_emission, epoch_duration_sec);
-      if (next_est > remaining) next_est = remaining;
-   } else {
-      next_est = emissions::compute_epoch_emission(
-         cfg, epoch_duration_sec, state.last_epoch_emission, state.total_distributed);
-   }
 
    uint32_t secs_until = 0;
    const uint64_t next_epoch_time =
@@ -1171,8 +1164,8 @@ emissions::epoch_info_result system_contract::viewepoch() {
       .last_epoch_time     = state.last_epoch_time,
       .last_epoch_emission = state.last_epoch_emission,
       .total_distributed   = state.total_distributed,
-      .treasury_remaining  = remaining,
-      .next_emission_est   = next_est,
+      .treasury_remaining  = std::max<int64_t>(emissions::net_headroom(cfg, state), 0),
+      .next_emission_est   = emissions::compute_epoch_emission(cfg, epoch_duration_sec, state),
       .seconds_until_next  = secs_until,
    };
 }

@@ -11,6 +11,7 @@
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <magic_enum/magic_enum.hpp>
+#include <algorithm>
 
 namespace sysio {
 
@@ -37,6 +38,7 @@ namespace {
 
 constexpr name SYSTEM_ACCOUNT     = "sysio"_n;
 constexpr name TOKEN_ACCOUNT      = "sysio.token"_n;
+constexpr name FINISH_ADVANCE     = "finishadv"_n;
 
 /// Action identifiers owned by sysio.chalg and invoked by epoch close.
 namespace chalg_actions {
@@ -69,11 +71,18 @@ inline bool is_active_outpost(const sysio::chains::chain_row& row) {
 struct emissions_gate_result {
    bool                  ready              = false;
    bool                  is_pay_epoch       = false; // true on the period-boundary epoch where payepoch fires
-   int64_t               emission_amount    = 0;  // per-epoch emission for THIS epoch (always populated when ready)
+   /// This epoch's share, sized on the net headroom. May be 0 when ready: the open pay period has emission pending, and
+   /// either it has committed the rest of the budget or the curve is zero.
+   int64_t               emission_amount    = 0;
    int64_t               period_emission    = 0;  // pending + emission_amount; populated only on pay-epoch
-   int64_t               treasury_remaining = 0;  // for blocklog row
+   /// Net headroom (budget not yet paid out or accrued), for the blocklog row.
+   int64_t               treasury_remaining = 0;
    int64_t               sysio_balance      = 0;  // for blocklog row
    EmissionsBlockReason  reason             = opp::types::EMISSIONS_BLOCK_REASON_UNSPECIFIED;
+
+   /// What the gate tried to authorize, for the blocklog row: the period total on a pay epoch (the amount the balance
+   /// test compares), otherwise this epoch's share.
+   int64_t attempted_emission() const { return is_pay_epoch ? period_emission : emission_amount; }
 };
 
 emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec,
@@ -94,26 +103,22 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec,
       return r;
    }
    const auto t5s = t5s_tbl.get();
-   r.treasury_remaining = cfg.t5_distributable - cfg.t5_floor - t5s.total_distributed;
+   r.treasury_remaining = sysiosystem::emissions::net_headroom(cfg, t5s);
 
    // epoch_duration_sec is the canonical value from sysio.epoch::epochcfg,
    // passed by advance() so this gate and sysio.system see identical inputs
    // and the gate doesn't repeat advance()'s read of the same singleton.
 
-   // Compute would-be per-epoch emission. First-epoch case: use initial; cap at remaining.
-   if (t5s.epoch_count == 0) {
-      r.emission_amount = sysiosystem::emissions::scale_annual_to_epoch(
-         cfg.annual_initial_emission, epoch_duration_sec);
-      if (r.emission_amount > r.treasury_remaining) r.emission_amount = r.treasury_remaining;
-   } else {
-      r.emission_amount = sysiosystem::emissions::compute_epoch_emission(
-         cfg, epoch_duration_sec, t5s.last_epoch_emission, t5s.total_distributed);
-   }
+   // Capped at the net headroom, so the open pay period can never commit more than the budget.
+   r.emission_amount = sysiosystem::emissions::compute_epoch_emission(cfg, epoch_duration_sec, t5s);
 
-   // TREASURY_EXHAUSTED gates every epoch (pay or non-pay). A zero per-epoch
-   // emission means the treasury is at floor; advancing the epoch silently
-   // would let the chain roll forward into a depleted treasury.
-   if (r.emission_amount <= 0) {
+   // TREASURY_EXHAUSTED gates every epoch (pay or non-pay) and is decided on the GROSS headroom: advancing past a
+   // spent budget would roll the chain forward into a depleted treasury. An open period whose share drops to zero,
+   // because it has committed the rest of the budget or the curve is zero, still advances and pays what it accrued at
+   // its boundary. A zero share with nothing pending blocks: there is nothing to pay, and payepoch asserts on an empty
+   // period, which would abort advance.
+   if (sysiosystem::emissions::gross_headroom(cfg, t5s) <= 0 ||
+       (r.emission_amount <= 0 && t5s.pending_emission_amount <= 0)) {
       r.reason = opp::types::EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED;
       return r;
    }
@@ -195,7 +200,7 @@ void record_gate_block(name self, uint32_t epoch_index, const emissions_gate_res
       log_tbl.emplace(ram_payer, pk, epoch::blocklog_entry{
          .epoch_index        = epoch_index,
          .reason             = gate.reason,
-         .attempted_emission = gate.emission_amount,
+         .attempted_emission = gate.attempted_emission(),
          .treasury_remaining = gate.treasury_remaining,
          .sysio_balance      = gate.sysio_balance,
          .first_blocked_at   = now_secs,
@@ -207,7 +212,7 @@ void record_gate_block(name self, uint32_t epoch_index, const emissions_gate_res
 
    log_tbl.modify(ram_payer, pk, [&](auto& row) {
       row.reason             = gate.reason;
-      row.attempted_emission = gate.emission_amount;
+      row.attempted_emission = gate.attempted_emission();
       row.treasury_remaining = gate.treasury_remaining;
       row.sysio_balance      = gate.sysio_balance;
       row.last_retry_at      = now_secs;
@@ -520,9 +525,9 @@ void epoch::advance() {
       //
       // Invariant — no cross-epoch double slash: opreg::slash THROWS on an already-SLASHED operator,
       // which would abort advance and stall OPP epoch advancement. These inline slashes execute only
-      // after advance returns, so the schedule slide below can temporarily place a just-slashed
-      // operator in its new tail while the operator still reads ACTIVE. That member cannot create a
-      // later non-canonical observation: sysio.msgch::deliver requires its current sysio.opreg status
+      // after advance returns. The finishadv continuation waits for those mutations before
+      // selecting the new tail. A removed member cannot create a later non-canonical
+      // observation: sysio.msgch::deliver requires its current sysio.opreg status
       // to be ACTIVE before accepting delivery. Once the slash has executed, the scheduled SLASHED
       // member cannot deliver or be queued for another non-canonical-delivery slash. The collection
       // above also deduplicates multiple non-canonical observations for one member in this advance.
@@ -538,9 +543,9 @@ void epoch::advance() {
          ).send();
       }
 
-      // Preserve the delivery history after slashing. A non-canonical operator is already
-      // SLASHED here, so opreg::termcheck returns without converting the punitive outcome into a
-      // termination/remit. Other group members retain their normal delivery accounting.
+      // Preserve delivery history and ordinary termination accounting. Inline
+      // slashing completes before these actions, and all mutations complete
+      // before finishadv reads the registry for outbound attestations.
       for (const auto& observation : observations) {
          action(
             permission_level{get_self(), "owner"_n},
@@ -560,13 +565,57 @@ void epoch::advance() {
       // erases them once they fall out of its retention window.
    }
 
-   const bool had_expiring_group = state.current_epoch_index > 0;
-
    state.current_epoch_index++;
    state.current_epoch_start =
       (state.next_epoch_start.sec_since_epoch() == 0) ? now : state.next_epoch_start;
    state.next_epoch_start = state.current_epoch_start +
       microseconds(static_cast<int64_t>(cfg.epoch_duration_sec) * 1'000'000);
+   state_tbl.set(state, ram_payer);
+
+   // Withdrawal flushing can also change eligibility. Its nested callbacks
+   // must complete before schedule selection and roster serialization.
+   // Matured withdrawals credit remitclaims and record a local audit entry;
+   // no attestation is sent from this path.
+   // Inline siblings execute their complete subtrees in order, atomically.
+   action(
+      permission_level{get_self(), "owner"_n},
+      OPREG_ACCOUNT,
+      "flushwtdw"_n,
+      std::make_tuple(state.current_epoch_index)
+   ).send();
+
+   action(
+      permission_level{get_self(), "owner"_n},
+      get_self(),
+      FINISH_ADVANCE,
+      std::make_tuple(state.current_epoch_index, gate.emission_amount)
+   ).send();
+
+   // Preserve payout depth: finishadv and its accrual/history descendants
+   // complete before this sibling executes.
+   if (gate.is_pay_epoch) {
+      action(
+         permission_level{get_self(), "owner"_n},
+         SYSTEM_ACCOUNT,
+         "payepoch"_n,
+         std::make_tuple(
+            state.current_epoch_index,
+            std::vector<std::vector<name>>{},
+            gate.period_emission
+         )
+      ).send();
+   }
+}
+
+void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
+   require_auth(get_self());
+   check(get_sender() == get_self(), "finishadv must be sent inline by sysio.epoch");
+   epochcfg_t cfg_tbl(get_self());
+   const auto cfg = cfg_tbl.get();
+   epochstate_t state_tbl(get_self());
+   auto state = state_tbl.get();
+   check(state.current_epoch_index == epoch_index, "finishadv epoch mismatch");
+   const bool had_expiring_group = epoch_index > 1;
 
    // ── Slide the schedule window ───────────────────────────────────────────
    // Skip on the genesis advance (0 → 1): schbatchgps just placed
@@ -649,7 +698,7 @@ void epoch::advance() {
       // below). Short-but-non-empty is pre-existing behaviour and is not made
       // safe here -- it is reported so the roster can be repaired off-chain.
       if (new_tail.size() < cfg.operators_per_epoch) {
-         sysio::print("sysio.epoch::advance: only ", new_tail.size(), " of ",
+         sysio::print("sysio.epoch::finishadv: only ", new_tail.size(), " of ",
                       cfg.operators_per_epoch,
                       " eligible batch operators for the new tail group at epoch ",
                       state.current_epoch_index + cfg.batch_op_groups - 1,
@@ -673,21 +722,6 @@ void epoch::advance() {
    // No operator table writes needed — group membership is in epoch_state.batch_op_groups.
 
    state_tbl.set(state, ram_payer);
-
-   // Drain matured rows from `sysio.opreg::wtdwqueue`. Operators that queued
-   // a withdrawal at least WITHDRAW_WAIT_EPOCHS ago are now eligible — opreg
-   // subtracts from the balance, records a WITHDRAW_REMIT entry in the
-   // operator's audit log, and CREDITS the operator's `sysio.opreg::remitclaims`
-   // row, which it pulls with `claimremit` — nothing is transferred from this
-   // path, precisely because it runs inline from here. No attestation is sent.
-   // Slashed-during-the-wait rows are dropped silently inside
-   // opreg's flushwtdw. See CLAUDE-WIRE-OPERATOR-COLLATERAL-IMPL-PLAN.md §3.3.
-   action(
-      permission_level{get_self(), "owner"_n},
-      OPREG_ACCOUNT,
-      "flushwtdw"_n,
-      std::make_tuple(state.current_epoch_index)
-   ).send();
 
    // Queue OPERATORS attestation (full roster with authex chain addresses) for each outpost.
    // IMPORTANT: Must come before BATCH_OPERATOR_GROUPS so that the ETH outpost's
@@ -778,14 +812,14 @@ void epoch::advance() {
    //
    // Only the ATTESTATION looks ahead. The depot's own schedule state is
    // untouched -- `current_batch_op_group` still names the group on duty NOW,
-   // and `advance` still slides the window so the front is the current epoch.
+   // and `finishadv` still slides the window so the front is the current epoch.
    // Nothing that reads `epoch_state` changes meaning.
    //
    // `epoch_index` stays the epoch this envelope IS for; it identifies the
    // envelope, not the roster, and no outpost reads it.
    {
       opp::attestations::BatchOperatorGroups attest;
-      // The window SLIDES; it does not rotate. `advance` erases the front and
+      // The window SLIDES; it does not rotate. `finishadv` erases the front and
       // pushes a new tail, and every write to the cursor pins it to 0 (here,
       // and `schbatchgps`) -- so the group on duty NEXT is simply the one
       // after the cursor.
@@ -799,7 +833,7 @@ void epoch::advance() {
       // The bound check is also what keeps an EMPTY schedule off a division.
       // `group_count == 0` is reachable here: the slide above is guarded by
       // `!empty()`, but nothing requires a seated schedule before this block,
-      // and `% 0` is an `i32.rem_u` trap that would abort `advance` and halt
+      // and `% 0` is an `i32.rem_u` trap that would abort `finishadv` and halt
       // epoch advancement chain-wide.
       //
       // Falling back to the cursor covers the single-group case: the same
@@ -843,12 +877,12 @@ void epoch::advance() {
       // carrying an empty group regardless -- so it buys nothing here.
       //
       // Withheld by SKIPPING THE QUEUEOUT ONLY -- never by returning from
-      // `advance`, which still has the epoch's remaining attestations and
+      // `finishadv`, which still has the epoch's remaining attestations and
       // actions to issue after this block.
       const bool have_next_group =
          next_group_index < group_count && !state.batch_op_groups[next_group_index].empty();
       if (!have_next_group) {
-         sysio::print("sysio.epoch::advance: no non-empty next group to publish at epoch ",
+         sysio::print("sysio.epoch::finishadv: no non-empty next group to publish at epoch ",
                       state.current_epoch_index,
                       " (groups=", group_count, ", next_index=", next_group_index,
                       "); withholding BatchOperatorGroups -- outposts retain their "
@@ -877,7 +911,7 @@ void epoch::advance() {
       auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
       (void)out(attest);
 
-      // `have_next_group` gates the QUEUEOUT, not `advance` -- see above.
+      // `have_next_group` gates the QUEUEOUT, not `finishadv` -- see above.
       if (have_next_group) {
          sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
          for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
@@ -910,16 +944,16 @@ void epoch::advance() {
       }
    }
 
-   // Emissions side. Three inline actions queued in FIFO order:
+   // Emissions side. Accrual and history precede advance's payout sibling:
    //   1. accrueepoch: always queued. Records this epoch's per-epoch share
    //      onto t5state (pending_emission_amount + batch_group_epochs[group]
-   //      + last_epoch_emission for decay continuity).
+   //      + last_epoch_emission for decay continuity). The share may be 0.
    //   2. rcrdbatch: always queued. Records the immutable roster that accrued
    //      this epoch after the schedule has slid for the next advance.
    //   3. payepoch: queued only on pay-epochs. Reads the now-updated t5state
    //      (which already includes this epoch's contribution from step 1),
    //      distributes period_emission, and resets the accumulator.
-   // Both run after advance() returns; their FIFO ordering guarantees
+   // The continuation completes before that sibling; this ordering guarantees
    // payepoch sees the post-accrue roster history and state.
    std::vector<name> active_batch_op_members;
    if (state.current_batch_op_group < state.batch_op_groups.size()) {
@@ -933,7 +967,7 @@ void epoch::advance() {
       std::make_tuple(
          state.current_epoch_index,
          state.current_batch_op_group,
-         gate.emission_amount
+         emission_amount
       )
    ).send();
 
@@ -943,19 +977,6 @@ void epoch::advance() {
       "rcrdbatch"_n,
       std::make_tuple(state.current_epoch_index, active_batch_op_members)
    ).send();
-
-   if (gate.is_pay_epoch) {
-      action(
-         permission_level{get_self(), "owner"_n},
-         SYSTEM_ACCOUNT,
-         "payepoch"_n,
-         std::make_tuple(
-            state.current_epoch_index,
-            std::vector<std::vector<name>>{},
-            gate.period_emission
-         )
-      ).send();
-   }
 
    // No scheduled cleanup of `sysio.msgch::envelopes` is needed here:
    // `deliver` prunes rows older than the previous epoch. The durable audit
@@ -973,7 +994,7 @@ void epoch::advance() {
 //  them into N groups (`cfg.batch_op_groups`). The resulting window is
 //  [epoch_1_group, epoch_2_group, ..., epoch_N_group].
 //
-//  After this, every per-epoch `advance` pops the front group and pushes
+//  After this, every per-epoch `finishadv` pops the front group and pushes
 //  a new tail group, where the tail's members are drawn from the ACTIVE
 //  pool MINUS anyone still resident in the N-1 surviving groups. The
 //  window itself encodes "scheduled in the last N-1 epochs"; no separate

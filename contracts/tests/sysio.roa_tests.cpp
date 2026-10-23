@@ -68,7 +68,7 @@ public:
       BOOST_REQUIRE( accnt != nullptr );
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
-      abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+      abi_ser.set_abi(abi, fixture_abi_yield_function());
 
       // Deploy sysio.system, init, and set default emission config
       set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
@@ -87,7 +87,7 @@ public:
          BOOST_REQUIRE( sys_accnt != nullptr );
          abi_def sys_abi;
          BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(sys_accnt->abi, sys_abi), true);
-         sys_abi_ser.set_abi(sys_abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+         sys_abi_ser.set_abi(sys_abi, fixture_abi_yield_function());
       }
 
       setup_emission_config();
@@ -122,7 +122,7 @@ public:
       act.name = "setemitcfg"_n;
       act.authorization = {{config::system_account_name, config::active_name}};
       act.data = sys_abi_ser.variant_to_binary(act_type, mvo()("cfg", cfg),
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
 
       signed_transaction trx;
       trx.actions.push_back(std::move(act));
@@ -138,7 +138,7 @@ public:
       action act;
       act.account = ROA;
       act.name    = name;
-      act.data    = abi_ser.variant_to_binary( action_type_name, data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+      act.data    = abi_ser.variant_to_binary( action_type_name, data, fixture_abi_yield_function() );
 
       return base_tester::push_action( std::move(act), signer.to_uint64_t() );
    }
@@ -173,7 +173,7 @@ public:
       if (it != kv_idx.end()) {
          const vector<char> data(it->value.data(), it->value.data() + it->value.size());
          if (!data.empty()) {
-            return abi_ser.binary_to_variant( "nodeowners", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+            return abi_ser.binary_to_variant( "nodeowners", data, fixture_abi_yield_function() );
          }
       }
       return fc::variant();
@@ -189,7 +189,7 @@ public:
       if (it != kv_idx.end()) {
          const vector<char> data(it->value.data(), it->value.data() + it->value.size());
          if (!data.empty()) {
-            return abi_ser.binary_to_variant( "nodeownerreg", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+            return abi_ser.binary_to_variant( "nodeownerreg", data, fixture_abi_yield_function() );
          }
       }
       return fc::variant();
@@ -204,7 +204,7 @@ public:
       if (it != kv_idx.end()) {
          const vector<char> data(it->value.data(), it->value.data() + it->value.size());
          if (!data.empty()) {
-            return abi_ser.binary_to_variant( "sponsor", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+            return abi_ser.binary_to_variant( "sponsor", data, fixture_abi_yield_function() );
          }
       }
       return fc::variant();
@@ -219,7 +219,7 @@ public:
       if (it != kv_idx.end()) {
          const vector<char> data(it->value.data(), it->value.data() + it->value.size());
          if (!data.empty()) {
-            auto record = abi_ser.binary_to_variant("sponsorcount", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+            auto record = abi_ser.binary_to_variant("sponsorcount", data, fixture_abi_yield_function());
             return record["count"].as<uint64_t>();
          }
       }
@@ -238,7 +238,7 @@ public:
       if (it != kv_idx.end()) {
          const vector<char> data(it->value.data(), it->value.data() + it->value.size());
          if (!data.empty()) {
-            return abi_ser.binary_to_variant( "reslimit", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+            return abi_ser.binary_to_variant( "reslimit", data, fixture_abi_yield_function() );
          }
       }
       return fc::variant();
@@ -253,7 +253,7 @@ public:
       if (it != kv_idx.end()) {
          const vector<char> data(it->value.data(), it->value.data() + it->value.size());
          if (!data.empty()) {
-            return abi_ser.binary_to_variant( "policies", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
+            return abi_ser.binary_to_variant( "policies", data, fixture_abi_yield_function() );
          }
       }
       return fc::variant();
@@ -2138,7 +2138,7 @@ public:
       BOOST_REQUIRE( accnt != nullptr );
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
-      authex_abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+      authex_abi_ser.set_abi(abi, fixture_abi_yield_function());
 
       // Production marks sysio.roa privileged and deliberately installs no cross-contract
       // active-permission delegation. Privilege lets nodeownreg declare sysio.authex.active on its
@@ -2177,7 +2177,7 @@ public:
       auto data = get_row_by_id(AUTHEX, AUTHEX, "links"_n, id);
       return data.empty() ? fc::variant()
          : authex_abi_ser.binary_to_variant(
-              "links_s", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+              "links_s", data, fixture_abi_yield_function());
    }
 
    // Create the claim account in-flow (depot path) with `wire_pub_key` as owner/active.
@@ -2198,7 +2198,7 @@ public:
       act.data          = authex_abi_ser.variant_to_binary("recordlink",
          mvo()("account", account)("chain_kind", opp::types::ChainKind::CHAIN_KIND_EVM)
               ("pub_key", pub_key)("native_address", native_address),
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       return base_tester::push_action(std::move(act), AUTHEX.to_uint64_t());
    }
 
