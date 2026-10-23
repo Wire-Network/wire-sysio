@@ -154,6 +154,8 @@ banked, and a later delivery pays it. Parked funds have already paid the fee and
    the next request id from `syndcounters`. `returns` retains the original holder, destination key,
    outpost, token and exact net amount until its external outcome is established. The attestation
    carries `total_syndicated`, the live outstanding shadow after the burn; no historical total is stored.
+   While the outpost already has `sysio.msgch`'s `MAX_QUEUED_ATTESTATIONS` (512) outbound attestations
+   waiting, `queueout` refuses it and the whole `desyndicate` reverts, burn included.
 
 The burn is final. An outpost either pays the release, stores it and pays it later, or skips it:
 
@@ -526,7 +528,8 @@ desyndication. The row must exist, with the buckets set, before the pair carries
   delivered, and `sysio.liq::claim` pays it.
 - `desyndicate` takes the whole quantity from the holder's balance and releases the quantity less the
   desyndication fee on the outpost. It is refused when the pair's desyndication budget is too low now;
-  it refills every depot epoch.
+  it refills every depot epoch. It is also refused while the outpost's outbound queue is full, which
+  drains every depot epoch.
 
 ## What an operator sees
 

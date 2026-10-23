@@ -107,11 +107,11 @@ constexpr const char* DISPUTE_NO_TIER_ONE_ELECTORATE_LOG =
 /// Mint the next attestation id from the `attseq` singleton.
 ///
 /// Replaces a `std::max<uint64_t>(1, atts.available_primary_key())` call
-/// at every `attestations_t` insertion site. The `attseq` singleton survives the
-/// `buildenv` cleanup of `ATTESTATION_STATUS_PROCESSED` rows, so the
-/// monotonic counter keeps advancing across phases even when the atts
-/// table is drained. Reusing an erased row's id would give a later attestation
-/// the same identity as an earlier audit record.
+/// at every `attestations_t` insertion site. The `attseq` singleton survives
+/// `buildenv` erasing shipped and inbound rows, so the monotonic counter
+/// keeps advancing across phases even when the atts table is drained.
+/// Reusing an erased row's id would give a later attestation the same
+/// identity as an earlier audit record.
 ///
 /// First call materialises the row at `next = 2` and returns `1`.
 /// Subsequent calls return the current `next` and post-increment.
@@ -126,6 +126,12 @@ uint64_t mint_att_id(name self) {
    uint64_t out = row.next;
    seq.modify(same_payer, pk, [&](auto& r) { r.next = out + 1; });
    return out;
+}
+
+/// The outpost's `outqueue` row, or an empty one before its first general-lane attestation.
+msgch::outbound_queue_entry outbound_queue_of(const msgch::outqueue_t& queues, uint64_t chain_code) {
+   return queues.try_get(msgch::outbound_queue_key{chain_code})
+      .value_or(msgch::outbound_queue_entry{.chain_code = chain_code, .queued = 0});
 }
 
 /// Size of the ACTIVE batch-operator group -- the set that can actually deliver for the current
@@ -1429,6 +1435,11 @@ void msgch::queueout(uint64_t chain_code,
    // the row for.
    check(data.size() <= MAX_ATTESTATION_DATA_BYTES,
          "sysio.msgch::queueout: attestation exceeds MAX_ATTESTATION_DATA_BYTES");
+   // A general-lane row must also fit beside the schedule lane every envelope carries first, or it
+   // would stall the general lane behind it for good.
+   const queue_lane lane = lane_of(attest_type);
+   check(lane == queue_lane::schedule || data.size() <= MAX_GENERAL_ATTESTATION_DATA_BYTES,
+         "sysio.msgch::queueout: attestation exceeds MAX_GENERAL_ATTESTATION_DATA_BYTES");
 
    // The chains registry is the ONLY authority on which chain codes exist.
    //
@@ -1437,10 +1448,8 @@ void msgch::queueout(uint64_t chain_code,
    // sysio.chains, but a governance msig holding one of those authorities can
    // call queueout directly, and a typo'd code used to abort here. Without it
    // the row is created READY and is then unreachable forever: epoch::advance
-   // only fans buildenv to registered active outposts, the PROCESSED drain
-   // skips mismatched codes, and no prune action exists -- so it is permanent
-   // sysio-pool RAM, re-walked by the Phase-1 bystatus scan on every buildenv,
-   // for every outpost, every epoch.
+   // only fans buildenv to registered active outposts and no prune action
+   // exists -- so it is permanent sysio-pool RAM.
    //
    // The SVM terminal-account estimator that used to live beside this lookup
    // was deliberately deleted (it made the depot model another chain's packet
@@ -1449,6 +1458,17 @@ void msgch::queueout(uint64_t chain_code,
    sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
    chains_tbl.get(sysio::chains::chain_key{sysio::slug_name{chain_code}},
                   "sysio.msgch::queueout: chain_code is not registered");
+
+   // Backpressure: past the cap, a general-lane row fails its producer's transaction (a `desyndicate`
+   // reverts whole, burn included) instead of growing the queue. Schedule rows are exempt because
+   // `sysio.epoch` queues them inside `advance`, which must not fail.
+   if (lane == queue_lane::general) {
+      outqueue_t queues(get_self());
+      auto       queue = outbound_queue_of(queues, chain_code);
+      check(queue.queued < MAX_QUEUED_ATTESTATIONS, "sysio.msgch::queueout: outbound queue is full for this outpost");
+      ++queue.queued;
+      queues.set(ram_payer, outbound_queue_key{chain_code}, queue);
+   }
 
    auto now_sec = static_cast<uint64_t>(current_time_point().sec_since_epoch());
 
@@ -1471,11 +1491,12 @@ void msgch::queueout(uint64_t chain_code,
 // ---------------------------------------------------------------------------
 //  buildenv — build outbound envelope from READY attestations
 //
-//  Packs as many READY attestations as fit under MAX_ENVELOPE_BYTES into a
-//  single outbound envelope; any that don't fit stay in the table with
-//  status = READY and ride the next epoch's `buildenv` call. Mirrors the
-//  Solana (`emit_outbound_inner`) and Ethereum (`emitOutboundEnvelope`)
-//  packing-loop pattern — never drop, never refuse, always emit what fits.
+//  Packs this outpost's READY attestations in queue order (schedule lane
+//  first, FIFO within a lane) into a single outbound envelope, up to
+//  MAX_ENVELOPE_BYTES and MAX_ENVELOPE_ATTESTATIONS; the rest stay READY and
+//  ride the next epoch's `buildenv` call. Mirrors the Solana
+//  (`emit_outbound_inner`) and Ethereum (`emitOutboundEnvelope`) packing-loop
+//  pattern — never drop, never refuse, always emit what fits.
 //
 //  Each envelope chains from its predecessor on the same outpost stream:
 //  `previous_envelope_hash` carries the prior emit's canonical epoch digest
@@ -1496,36 +1517,57 @@ void msgch::buildenv(uint64_t chain_code) {
 
    uint32_t epoch = epoch::current_epoch_index();
    attestations_t atts(get_self());
-   auto now_sec = static_cast<uint64_t>(current_time_point().sec_since_epoch());
    // OPP wire timestamps (`MessageHeader.timestamp`, `Envelope.epoch_timestamp`) are milliseconds
    // since the Unix epoch (opp.proto). WIRE's half-second blocks make sub-second resolution
-   // meaningful, so emit real milliseconds; `now_sec` stays for the seconds-unit table columns.
+   // meaningful, so emit real milliseconds.
    const uint64_t now_ms =
       static_cast<uint64_t>(current_time_point().time_since_epoch().count()) / 1000;
 
-   // ── Phase 1: collect candidate READY attestations for this outpost.
-   //    Order is the secondary index's natural order, which is stable across
-   //    epochs — preserves cross-epoch attestation ordering for the receiving
-   //    chain.
-   std::vector<opp::AttestationEntry> candidate_entries;
-   std::vector<uint64_t>              candidate_ids;
+   // Phase 1: take this outpost's READY rows in queue order, stopping at the first one that would push
+   // the estimate past MAX_ENVELOPE_BYTES, or at MAX_ENVELOPE_ATTESTATIONS. The walk reads nothing it
+   // does not ship, so its cost does not grow with the backlog, and the rows it leaves keep their place.
+   //
+   // The estimate is conservative. The trim loop below is the source of truth for the encoded size
+   // invariant.
+   //
+   // This pass deliberately does NOT bound the envelope by any destination chain's transaction
+   // capacity. Solana dispatch is resumable: the outpost settles `[cursor, cursor + dispatch_limit)`
+   // per terminal call and the relay loops until the cursor drains, so an envelope that needs more
+   // effect accounts than one Solana transaction can carry is settled across several calls rather
+   // than refused here. Sizing a WIRE consensus envelope against another chain's packet limit put
+   // that chain's MTU inside depot consensus; the cursor removes the need.
+   auto queue = atts.get_index<"byqueue"_n>();
+   const auto in_ready_queue = [&](const auto& row) {
+      return row != queue.end() && row->chain_code == chain_code &&
+             row->status == AttestationStatus::ATTESTATION_STATUS_READY;
+   };
 
-   auto status_idx = atts.get_index<"bystatus"_n>();
-   for (auto it = status_idx.lower_bound(
-           static_cast<uint64_t>(AttestationStatus::ATTESTATION_STATUS_READY));
-        it != status_idx.end() &&
-        it->status == AttestationStatus::ATTESTATION_STATUS_READY; ++it) {
-      if (it->chain_code != chain_code) continue;
+   auto ready = queue.lower_bound(
+      queue_key(chain_code, AttestationStatus::ATTESTATION_STATUS_READY, queue_lane::schedule));
+   if (!in_ready_queue(ready)) return;
+
+   std::vector<opp::AttestationEntry> entries;
+   std::vector<uint64_t>              included_ids;
+   size_t                             estimated_bytes = ENVELOPE_BASELINE_BYTES;
+   for (; in_ready_queue(ready) && entries.size() < MAX_ENVELOPE_ATTESTATIONS; ++ready) {
+      const size_t entry_bytes = ATTESTATION_OVERHEAD_BYTES + ready->data.size();
+      if (estimated_bytes + entry_bytes > MAX_ENVELOPE_BYTES) {
+         break;
+      }
+      estimated_bytes += entry_bytes;
 
       opp::AttestationEntry entry;
-      entry.type = it->type;
-      entry.data_size = zpp::bits::vuint32_t{static_cast<uint32_t>(it->data.size())};
-      entry.data = it->data;
-      candidate_entries.push_back(std::move(entry));
-      candidate_ids.push_back(it->id);
+      entry.type = ready->type;
+      entry.data_size = zpp::bits::vuint32_t{static_cast<uint32_t>(ready->data.size())};
+      entry.data = ready->data;
+      entries.push_back(std::move(entry));
+      included_ids.push_back(ready->id);
    }
 
-   if (candidate_entries.empty()) return;
+   // Invariant, not a reachable failure: `queueout` caps every row at MAX_ATTESTATION_DATA_BYTES, which
+   // is what the estimate leaves an otherwise empty envelope, so the first row always fits.
+   check(!entries.empty(),
+         "sysio.msgch::buildenv: a single READY attestation exceeds the outbound envelope");
 
    const auto op_row = [&]() {
       sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
@@ -1544,39 +1586,6 @@ void msgch::buildenv(uint64_t chain_code) {
    route_endpoints.start.id   = WIRE_CHAIN_ID;
    route_endpoints.end.kind   = op_row.kind;
    route_endpoints.end.id     = op_row.external_chain_id;
-
-   // Phase 2: estimator-based initial pick. Walk candidates in order, accumulating a conservative byte
-   // estimate; stop once the next one would push the envelope over MAX_ENVELOPE_BYTES. The trim loop
-   // below is the source of truth for the encoded size invariant.
-   //
-   // This pass deliberately does NOT bound the envelope by any destination chain's transaction
-   // capacity. Solana dispatch is resumable: the outpost settles `[cursor, cursor + dispatch_limit)`
-   // per terminal call and the relay loops until the cursor drains, so an envelope that needs more
-   // effect accounts than one Solana transaction can carry is settled across several calls rather
-   // than refused here. Sizing a WIRE consensus envelope against another chain's packet limit put
-   // that chain's MTU inside depot consensus; the cursor removes the need.
-   size_t              included_count = 0;
-   size_t              estimated_bytes = ENVELOPE_BASELINE_BYTES;
-   for (const auto& entry : candidate_entries) {
-      const size_t entry_bytes = ATTESTATION_OVERHEAD_BYTES + entry.data.size();
-      if (estimated_bytes + entry_bytes > MAX_ENVELOPE_BYTES) {
-         break;
-      }
-      estimated_bytes += entry_bytes;
-      ++included_count;
-   }
-
-   // Invariant, not a reachable failure: `queueout` caps every row at MAX_ATTESTATION_DATA_BYTES, which
-   // is what the estimate leaves an otherwise empty envelope, so the first candidate always fits.
-   check(included_count > 0,
-         "sysio.msgch::buildenv: a single READY attestation exceeds the outbound envelope");
-
-   std::vector<opp::AttestationEntry> entries(
-      std::make_move_iterator(candidate_entries.begin()),
-      std::make_move_iterator(candidate_entries.begin() + included_count));
-   std::vector<uint64_t> included_ids(
-      candidate_ids.begin(),
-      candidate_ids.begin() + included_count);
 
    // Chain links: the previous envelope emitted for this outpost. `outenvelopes` is one-deep per
    // outpost (see the cleanup below), so the single surviving row is the previous emit; its
@@ -1663,10 +1672,10 @@ void msgch::buildenv(uint64_t chain_code) {
    // under-counted relative to the actual zpp::bits encoding for this candidate set), pop the last
    // entry and retry. This loop -- not the estimator -- is the sole authority on the size invariant. It
    // replaces the previous post-build hard abort, which left this action in a dead-letter loop on
-   // estimator drift: the PROCESSED markings would roll back with the aborted tx, the same set would
-   // re-pack against the same estimator next epoch, and the same check would trip again. Popped entries
-   // stay READY and ride the next `buildenv` call. PROCESSED marking is deferred until after the loop
-   // converges so a popped entry never needs a status revert.
+   // estimator drift: the erasures would roll back with the aborted tx, the same set would re-pack
+   // against the same estimator next epoch, and the same check would trip again. Popped entries stay
+   // READY and ride the next `buildenv` call. Erasure waits until the loop converges, so a popped entry
+   // is never touched.
    std::vector<char> packed = build_packed(entries);
    while (packed.size() > MAX_ENVELOPE_BYTES) {
       // Invariant: the estimate over-counts the real encoding, so one row within the `queueout` cap
@@ -1679,16 +1688,20 @@ void msgch::buildenv(uint64_t chain_code) {
       packed = build_packed(entries);
    }
 
-   // Mark the surviving attestations as PROCESSED. Remaining candidates (popped by the trim loop or
-   // never picked by the estimator) stay READY for the next epoch's `buildenv` call.
-   for (uint64_t aid : included_ids) {
-      auto att_pk = id_key{aid};
-      if (atts.contains(att_pk)) {
-         atts.modify(same_payer, att_pk, [&](auto& a) {
-            a.status              = AttestationStatus::ATTESTATION_STATUS_PROCESSED;
-            a.processed_timestamp = now_sec;
-         });
-      }
+   // The shipped rows' bytes are in `packed` now: erase them, and count the general-lane ones out of the
+   // outpost's queue. Rows the walk stopped before, or the trim loop popped, stay READY for the next
+   // epoch's `buildenv` call.
+   uint32_t general_shipped = 0;
+   for (size_t i = 0; i < included_ids.size(); ++i) {
+      if (lane_of(entries[i].type) == queue_lane::general) ++general_shipped;
+      atts.erase(id_key{included_ids[i]});
+   }
+   if (general_shipped > 0) {
+      outqueue_t queues(get_self());
+      auto       queue = outbound_queue_of(queues, chain_code);
+      // Saturating: the count only bounds `queueout`, and a short one must not abort `advance`.
+      queue.queued -= std::min(queue.queued, general_shipped);
+      queues.set(ram_payer, outbound_queue_key{chain_code}, queue);
    }
 
    // This envelope's canonical epoch digest: keccak256 over the packed bytes, which equal the
@@ -1715,8 +1728,7 @@ void msgch::buildenv(uint64_t chain_code) {
    // Audit-log row mirrors the outbound emit (WIRE → outpost). Followed
    // by inline drains of the previous-epoch outenvelopes row (one-deep
    // retention; the batch op only ever reads the most-recent emit) and
-   // the just-PROCESSED attestations for this outpost (their bytes are
-   // now baked into `packed` above).
+   // this outpost's inbound attestations, already dispatched.
    {
       // Same endpoints the wire envelope carries (derived above from the
       // destination's `sysio.chains` row).
@@ -1730,16 +1742,13 @@ void msgch::buildenv(uint64_t chain_code) {
          it = by_outpost.erase(std::move(it));
       }
 
-      // Drop the attestations we just consumed (status PROCESSED rows
-      // for this outpost). They've been bundled into `packed`; the
-      // bytes are dead weight on chain.
-      auto processed_idx = atts.get_index<"bystatus"_n>();
-      for (auto it = processed_idx.lower_bound(
-                        static_cast<uint64_t>(AttestationStatus::ATTESTATION_STATUS_PROCESSED));
-           it != processed_idx.end() &&
+      // Drop this outpost's inbound attestations: `evalcons` stores them PROCESSED and dispatches them
+      // inline, so their bytes are dead weight on chain. The range holds this outpost's rows only.
+      for (auto it = queue.lower_bound(
+              queue_key(chain_code, AttestationStatus::ATTESTATION_STATUS_PROCESSED, queue_lane::schedule));
+           it != queue.end() && it->chain_code == chain_code &&
            it->status == AttestationStatus::ATTESTATION_STATUS_PROCESSED; ) {
-         if (it->chain_code != chain_code) { ++it; continue; }
-         it = processed_idx.erase(std::move(it));
+         it = queue.erase(std::move(it));
       }
    }
 }

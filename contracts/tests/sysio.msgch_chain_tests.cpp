@@ -751,7 +751,7 @@ public:
    /// `chain_code`. Read from the surviving `outenvelopes` row, NOT the msgch `attestations`
    /// working table — `advance` queues its schedule attestations via `queueout` and then fans out
    /// `buildenv` inline in the SAME transaction, and `buildenv` packs the READY rows into the
-   /// outbound envelope, marks them PROCESSED, and ERASES them before the transaction ends. The
+   /// outbound envelope and ERASES them before the transaction ends. The
    /// packed envelope (one-deep per outpost) is therefore the only durable copy of what `advance`
    /// emitted; scanning `attestations` after an advance always finds zero rows.
    sysio::opp::attestations::BatchOperatorGroups shipped_batch_operator_groups(uint64_t chain_code) {

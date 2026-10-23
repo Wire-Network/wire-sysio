@@ -335,3 +335,11 @@ LIQ earned-yield distribution and their normal claim actions remain.
 `sysio.synd::setconfig` requires `min_desyndicate` as an ordinary uint64, and `syndconfig` stores it
 as an ordinary field. Bootstrap schema version 1 contains chains, tokens, LIQ pools and syndications;
 it has no external-reserve or underwriting configuration.
+
+## WIRE-415 pre-launch deployment
+
+Deploy this `sysio.msgch` on fresh state and regenerate the SDK contract types with it. The
+`attestations` table's `bystatus`, `bytype` and `byepoch` indexes are replaced by `byqueue`, and a row
+written before the change has no `byqueue` entry, so `buildenv` never finds it: a queued
+`DESYNDICATE_LIQ` would never ship, and an inbound row would never be erased. There is no migration
+path.

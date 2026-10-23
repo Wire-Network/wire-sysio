@@ -11,8 +11,8 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
   post-boundary split with no strict majority opens a `sysio.chalg` dispute
 - Validates the per-outpost envelope chain and message sequence, stores the accepted messages and
   attestations, and routes each attestation to its depot handler
-- Queues outbound attestations and packs them into one OPP envelope per outpost per epoch; whatever
-  does not fit under the envelope cap stays queued for the next epoch
+- Queues outbound attestations and packs them into one OPP envelope per outpost per epoch, schedule
+  attestations first; whatever does not fit under the envelope caps stays queued for the next epoch
 - Drives the epoch: `chkcons` advances `sysio.epoch` once every active outpost has reached
   consensus and the wall-clock boundary has passed
 
@@ -22,7 +22,8 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
 |-------|------|-------------|
 | `envelopes` | `kv::table` | Inbound deliveries, one row per batch operator per outpost per epoch (working state, pruned to the current and previous epoch) |
 | `messages` | `kv::table` | Individual OPP messages extracted from consensus-verified envelopes |
-| `attestations` | `kv::table` | Attestations extracted inbound, and outbound attestations queued (`READY`) for envelope packing |
+| `attestations` | `kv::table` | Attestations extracted inbound, and outbound attestations queued (`READY`) for envelope packing. The `byqueue` index orders them by outpost, status and lane |
+| `outqueue` | `kv::table` | Per-outpost count of queued general-lane attestations, capped at `MAX_QUEUED_ATTESTATIONS` |
 | `outenvelopes` | `kv::table` | Built outbound envelopes awaiting relay, with their canonical epoch digest |
 | `outpcons` | `kv::table` | Per-outpost consensus record: accepted envelope digest and inbound message-chain tip |
 | `attseq` | `kv::table` | Attestation sequence counter |
@@ -37,8 +38,8 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
 | `evalcons` | `sysio.msgch` | Evaluate consensus for an (outpost, epoch); on consensus store and dispatch the attestations; on an eligible split open a `sysio.chalg` dispute |
 | `chkcons` | permissionless | If no dispute is open, every active outpost has consensus and the boundary has passed, call `sysio.epoch::advance` |
 | `resolvedisp` | `sysio.chalg` | Dispatch the winning envelope of a resolved dispute |
-| `queueout` | `sysio.epoch`, `sysio.opreg`, `sysio.synd`, or `sysio.msgch` | Queue an outbound attestation for an outpost. Rejects `data` larger than `MAX_ATTESTATION_DATA_BYTES`, so every queued row fits an envelope |
-| `buildenv` | `sysio.epoch` | Pack `READY` attestations into the outpost's outbound envelope for the epoch |
+| `queueout` | `sysio.epoch`, `sysio.opreg`, `sysio.synd`, or `sysio.msgch` | Queue an outbound attestation for an outpost. Rejects `data` larger than `MAX_ATTESTATION_DATA_BYTES`, or `MAX_GENERAL_ATTESTATION_DATA_BYTES` (7,656) for a general-lane row, which must fit beside a full schedule lane, so every queued row ships. Also rejects a general-lane row once the outpost already holds `MAX_QUEUED_ATTESTATIONS` (512) of them |
+| `buildenv` | `sysio.epoch` | Pack the outpost's `READY` attestations into its outbound envelope for the epoch: the schedule lane (`OPERATORS`, `BATCH_OPERATOR_GROUPS`) first, then the general lane in `queueout` order, up to `MAX_ENVELOPE_BYTES` and `MAX_ENVELOPE_ATTESTATIONS` (64). It reads only that outpost's rows |
 
 ## Attestation routing
 
@@ -55,8 +56,10 @@ Inbound (outpost → depot):
 
 Outbound (depot → outpost), queued through `queueout`:
 
-- `OPERATORS` and `BATCH_OPERATOR_GROUPS` from `sysio.epoch::advance`, to every active outpost
-- `DESYNDICATE_LIQ` from `sysio.synd::desyndicate`
+- `OPERATORS` and `BATCH_OPERATOR_GROUPS` from `sysio.epoch::advance`, to every active outpost. They
+  form the schedule lane, which ships first and which the queue cap never refuses.
+- `DESYNDICATE_LIQ` from `sysio.synd::desyndicate`. A full queue refuses it, and the whole
+  `desyndicate` reverts.
 
 ## Dependencies
 

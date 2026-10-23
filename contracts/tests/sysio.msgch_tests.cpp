@@ -3,6 +3,7 @@
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/opp.pb.h>
+#include <sysio/opp/attestations/attestations.pb.h>
 #include <fc/variant_object.hpp>
 #include <fc/slug_name.hpp>
 
@@ -18,6 +19,20 @@ using namespace fc;
 using mvo = fc::mutable_variant_object;
 
 namespace {
+
+/// A one-of-a-kind attestation payload carrying `index`, so repeated `queueout`s never collapse as
+/// duplicate transactions and a shipped row can be traced back to its `queueout`.
+std::vector<char> indexed_payload(uint32_t index) {
+   return {static_cast<char>(index >> 24), static_cast<char>(index >> 16),
+           static_cast<char>(index >> 8), static_cast<char>(index)};
+}
+
+/// The index an `indexed_payload` carries.
+uint32_t payload_index(const std::string& data) {
+   BOOST_REQUIRE_EQUAL(data.size(), 4u);
+   return (uint32_t{static_cast<uint8_t>(data[0])} << 24) | (uint32_t{static_cast<uint8_t>(data[1])} << 16) |
+          (uint32_t{static_cast<uint8_t>(data[2])} << 8) | uint32_t{static_cast<uint8_t>(data[3])};
+}
 
 } // anonymous namespace
 
@@ -317,6 +332,45 @@ public:
       );
    }
 
+   /// Queue `count` general-lane rows for `chain_code`, with payloads `indexed_payload(first)` onward,
+   /// producing a block every `per_block` so the pending block stays inside its limits.
+   void queue_general(uint64_t chain_code, uint32_t first, uint32_t count, uint32_t per_block = 20) {
+      for (uint32_t i = 0; i < count; ++i) {
+         BOOST_REQUIRE_EQUAL(success(), queueout_with_data(chain_code, opp::types::ATTESTATION_TYPE_DESYNDICATE_LIQ,
+                                                           indexed_payload(first + i)));
+         if ((i + 1) % per_block == 0) produce_block();
+      }
+      produce_block();
+   }
+
+   /// The outpost's general-lane READY count in `outqueue`; 0 before its first such row.
+   uint32_t queued_attestations(uint64_t chain_code) {
+      const auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outqueue"_n, chain_code);
+      if (data.empty()) return 0;
+      const auto row = msgch_abi.binary_to_variant(
+         "outbound_queue_entry", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+      return row["queued"].as<uint32_t>();
+   }
+
+   /// The attestations of the envelope `buildenv` last built for `chain_code`, in shipped order.
+   std::vector<opp::AttestationEntry> shipped_attestations(uint64_t chain_code, uint64_t scan_until = 16) {
+      for (uint64_t id = 0; id < scan_until; ++id) {
+         const auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
+         if (data.empty()) continue;
+         const auto row = msgch_abi.binary_to_variant(
+            "outbound_envelope", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         if (row["chain_code"].as_uint64() != chain_code) continue;
+         const auto raw = row["raw_envelope"].as<std::vector<char>>();
+         opp::Envelope env;
+         BOOST_REQUIRE(env.ParseFromArray(raw.data(), static_cast<int>(raw.size())));
+         BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
+         const auto& shipped = env.messages(0).payload().attestations();
+         return {shipped.begin(), shipped.end()};
+      }
+      BOOST_FAIL("no outbound envelope for the outpost");
+      return {};
+   }
+
    /// Return the first outbound envelope row found in a small id scan.
    fc::variant find_outbound_envelope(uint64_t scan_until = 16) {
       for (uint64_t id = 0; id < scan_until; ++id) {
@@ -362,6 +416,26 @@ constexpr size_t ATTESTATION_OVERHEAD_BYTES = 24;
 /// The largest attestation `data` `queueout` accepts: what an otherwise empty envelope carries.
 constexpr size_t MAX_ATTESTATION_DATA_BYTES =
    MAX_ENVELOPE_BYTES - ENVELOPE_BASELINE_BYTES - ATTESTATION_OVERHEAD_BYTES;
+
+/// Mirrors of the outbound queue bounds in `sysio.msgch.hpp`.
+constexpr size_t   MAX_ENVELOPE_ATTESTATIONS = 64;
+constexpr uint32_t MAX_QUEUED_ATTESTATIONS   = 512;
+constexpr size_t   SCHEDULE_LANE_BYTES       = 24 * 1024;
+constexpr size_t   MAX_GENERAL_ATTESTATION_DATA_BYTES =
+   MAX_ENVELOPE_BYTES - ENVELOPE_BASELINE_BYTES - SCHEDULE_LANE_BYTES - ATTESTATION_OVERHEAD_BYTES;
+
+/// Mirrors of the window ceilings `sysio.epoch::setconfig` enforces in `sysio.epoch.hpp`.
+constexpr uint32_t MAX_BATCH_OP_GROUPS     = 8;
+constexpr uint32_t MAX_OPERATORS_PER_EPOCH = 7;
+
+/// `register_outpost(CHAIN_KIND_SVM, ...)` registers the spelling `"SOL"`.
+constexpr uint64_t SOL_OUTPOST_ID = "SOL"_s.value;
+
+/// A general-lane type (anything but OPERATORS and BATCH_OPERATOR_GROUPS), as `queue_general` queues.
+constexpr auto GENERAL_LANE_TYPE = opp::types::ATTESTATION_TYPE_DESYNDICATE_LIQ;
+
+constexpr auto QUEUE_FULL_ERROR =
+   "assertion failure with message: sysio.msgch::queueout: outbound queue is full for this outpost";
 
 } // anonymous namespace
 
@@ -668,6 +742,225 @@ BOOST_FIXTURE_TEST_CASE(buildenv_ships_an_attestation_at_the_cap_alone, sysio_ms
    BOOST_REQUIRE_EQUAL(env.messages(0).payload().attestations_size(), 1);
    BOOST_REQUIRE_EQUAL(env.messages(0).payload().attestations(0).data().size(), MAX_ATTESTATION_DATA_BYTES);
    BOOST_REQUIRE_EQUAL(1u, count_ready_attestations(ETH_OUTPOST_ID, /*scan_until=*/4));
+} FC_LOG_AND_RETHROW() }
+
+/// WIRE-415: OPERATORS and BATCH_OPERATOR_GROUPS ship ahead of a general-lane backlog queued before
+/// them, so the rosters an outpost needs for the next epoch never wait behind it. The backlog keeps
+/// its `queueout` order.
+BOOST_FIXTURE_TEST_CASE(buildenv_ships_the_schedule_lane_ahead_of_a_backlog, sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   produce_blocks();
+
+   constexpr uint32_t BACKLOG = 4;
+   queue_general(ETH_OUTPOST_ID, /*first=*/0, BACKLOG);
+   BOOST_REQUIRE_EQUAL(success(), queueout_with_data(ETH_OUTPOST_ID, opp::types::ATTESTATION_TYPE_OPERATORS,
+                                                     indexed_payload(100)));
+   BOOST_REQUIRE_EQUAL(success(), queueout_with_data(ETH_OUTPOST_ID,
+                                                     opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS,
+                                                     indexed_payload(101)));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
+   produce_blocks();
+
+   const auto shipped = shipped_attestations(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(shipped.size(), BACKLOG + 2);
+   BOOST_REQUIRE_EQUAL(shipped[0].type(), opp::types::ATTESTATION_TYPE_OPERATORS);
+   BOOST_REQUIRE_EQUAL(shipped[1].type(), opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS);
+   for (uint32_t i = 0; i < BACKLOG; ++i) {
+      BOOST_REQUIRE_EQUAL(shipped[2 + i].type(), GENERAL_LANE_TYPE);
+      BOOST_REQUIRE_EQUAL(payload_index(shipped[2 + i].data()), i);
+   }
+   BOOST_REQUIRE_EQUAL(0u, queued_attestations(ETH_OUTPOST_ID));
+} FC_LOG_AND_RETHROW() }
+
+/// WIRE-415: an envelope carries at most MAX_ENVELOPE_ATTESTATIONS rows however small they are, so
+/// `buildenv`'s work per outpost stays fixed. The rest ship next time, in order.
+BOOST_FIXTURE_TEST_CASE(buildenv_stops_at_the_attestation_cap, sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   produce_blocks();
+
+   constexpr uint32_t LEFT_OVER = 3;
+   constexpr uint32_t QUEUED    = MAX_ENVELOPE_ATTESTATIONS + LEFT_OVER;
+   queue_general(ETH_OUTPOST_ID, /*first=*/0, QUEUED);
+   BOOST_REQUIRE_EQUAL(QUEUED, queued_attestations(ETH_OUTPOST_ID));
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
+   produce_blocks();
+   const auto first = shipped_attestations(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(first.size(), MAX_ENVELOPE_ATTESTATIONS);
+   for (uint32_t i = 0; i < first.size(); ++i) {
+      BOOST_REQUIRE_EQUAL(payload_index(first[i].data()), i);
+   }
+   BOOST_REQUIRE_EQUAL(LEFT_OVER, count_ready_attestations(ETH_OUTPOST_ID, /*scan_until=*/QUEUED + 2));
+   BOOST_REQUIRE_EQUAL(LEFT_OVER, queued_attestations(ETH_OUTPOST_ID));
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
+   produce_blocks();
+   const auto second = shipped_attestations(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(second.size(), LEFT_OVER);
+   for (uint32_t i = 0; i < second.size(); ++i) {
+      BOOST_REQUIRE_EQUAL(payload_index(second[i].data()), MAX_ENVELOPE_ATTESTATIONS + i);
+   }
+   BOOST_REQUIRE_EQUAL(0u, count_ready_attestations(ETH_OUTPOST_ID, /*scan_until=*/QUEUED + 2));
+   BOOST_REQUIRE_EQUAL(0u, queued_attestations(ETH_OUTPOST_ID));
+} FC_LOG_AND_RETHROW() }
+
+/// WIRE-415: `buildenv` takes only its own outpost's rows; another outpost's queue and count are
+/// untouched until its own `buildenv`.
+BOOST_FIXTURE_TEST_CASE(buildenv_ships_only_its_own_outposts_rows, sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   register_outpost(opp::types::CHAIN_KIND_SVM, 1);
+   produce_blocks();
+
+   queue_general(SOL_OUTPOST_ID, /*first=*/0, /*count=*/2);
+   queue_general(ETH_OUTPOST_ID, /*first=*/2, /*count=*/1);
+   queue_general(SOL_OUTPOST_ID, /*first=*/3, /*count=*/1);
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
+   produce_blocks();
+   const auto eth = shipped_attestations(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(eth.size(), 1u);
+   BOOST_REQUIRE_EQUAL(payload_index(eth[0].data()), 2u);
+   BOOST_REQUIRE_EQUAL(3u, count_ready_attestations(SOL_OUTPOST_ID, /*scan_until=*/8));
+   BOOST_REQUIRE_EQUAL(3u, queued_attestations(SOL_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(0u, queued_attestations(ETH_OUTPOST_ID));
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(SOL_OUTPOST_ID));
+   produce_blocks();
+   const auto sol = shipped_attestations(SOL_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(sol.size(), 3u);
+   BOOST_REQUIRE_EQUAL(payload_index(sol[0].data()), 0u);
+   BOOST_REQUIRE_EQUAL(payload_index(sol[1].data()), 1u);
+   BOOST_REQUIRE_EQUAL(payload_index(sol[2].data()), 3u);
+   BOOST_REQUIRE_EQUAL(0u, queued_attestations(SOL_OUTPOST_ID));
+} FC_LOG_AND_RETHROW() }
+
+/// WIRE-415: the largest window's schedule rows fit SCHEDULE_LANE_BYTES, so a general row at
+/// MAX_GENERAL_ATTESTATION_DATA_BYTES always ships beside them. Built at the extremes `sysio.epoch` allows:
+/// 8 groups of 7, 13-character names, and an EVM and an SVM link on every operator.
+BOOST_AUTO_TEST_CASE(the_largest_windows_schedule_fits_its_lane_budget) { try {
+   constexpr size_t EVM_KEY_BYTES = 33;   // a compressed EM key, as authex stores it
+   constexpr size_t SVM_KEY_BYTES = 32;   // an ED key
+   const std::string longest_name = "zzzzzzzzzzzzj";
+
+   opp::attestations::Operators           roster;
+   opp::attestations::BatchOperatorGroups groups;
+   groups.set_active_group_index(MAX_BATCH_OP_GROUPS - 1);
+   groups.set_epoch_index(std::numeric_limits<uint32_t>::max());
+   groups.set_epoch_duration_sec(std::numeric_limits<uint32_t>::max());
+   for (uint32_t g = 0; g < MAX_BATCH_OP_GROUPS; ++g) {
+      auto* group = groups.add_groups();
+      for (uint32_t m = 0; m < MAX_OPERATORS_PER_EPOCH; ++m) {
+         auto* member = group->add_operators();
+         member->set_kind(opp::types::CHAIN_KIND_WIRE);
+         member->set_address(longest_name);
+
+         auto* entry = roster.add_operators();
+         entry->mutable_account()->set_name(longest_name);
+         entry->set_type(opp::types::OPERATOR_TYPE_BATCH);
+         entry->set_status(opp::types::OPERATOR_STATUS_SLASHED);   // the widest status varint
+         auto* evm = entry->add_addresses();
+         evm->set_kind(opp::types::CHAIN_KIND_EVM);
+         evm->set_address(std::string(EVM_KEY_BYTES, '\xff'));
+         auto* svm = entry->add_addresses();
+         svm->set_kind(opp::types::CHAIN_KIND_SVM);
+         svm->set_address(std::string(SVM_KEY_BYTES, '\xff'));
+      }
+   }
+
+   const size_t schedule_bytes =
+      2 * ATTESTATION_OVERHEAD_BYTES + roster.ByteSizeLong() + groups.ByteSizeLong();
+   BOOST_TEST_MESSAGE("largest window's schedule lane = " << schedule_bytes << " bytes");
+   BOOST_REQUIRE_LE(schedule_bytes, SCHEDULE_LANE_BYTES);
+} FC_LOG_AND_RETHROW() }
+
+/// WIRE-415: a general-lane row may carry at most MAX_GENERAL_ATTESTATION_DATA_BYTES, what fits beside a
+/// full schedule lane. A schedule row keeps the whole-envelope cap.
+BOOST_FIXTURE_TEST_CASE(queueout_caps_general_rows_to_fit_beside_the_schedule, sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   produce_blocks();
+
+   const std::vector<char> over_general_cap(MAX_GENERAL_ATTESTATION_DATA_BYTES + 1, 0x42);
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: "
+            "sysio.msgch::queueout: attestation exceeds MAX_GENERAL_ATTESTATION_DATA_BYTES"),
+      queueout_with_data(ETH_OUTPOST_ID, GENERAL_LANE_TYPE, over_general_cap));
+   BOOST_REQUIRE_EQUAL(success(), queueout_with_data(ETH_OUTPOST_ID, GENERAL_LANE_TYPE,
+                                                     std::vector<char>(MAX_GENERAL_ATTESTATION_DATA_BYTES, 0x42)));
+   BOOST_REQUIRE_EQUAL(success(), queueout_with_data(ETH_OUTPOST_ID, opp::types::ATTESTATION_TYPE_OPERATORS,
+                                                     over_general_cap));
+} FC_LOG_AND_RETHROW() }
+
+/// WIRE-415: a general row at its cap ships in the same envelope as a schedule lane at its budget, so
+/// the general lane moves every epoch.
+BOOST_FIXTURE_TEST_CASE(buildenv_ships_a_general_row_at_its_cap_beside_a_full_schedule,
+                        sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   produce_blocks();
+
+   // The schedule budget split between the two schedule rows, each charged its overhead.
+   constexpr size_t BATCH_OPERATOR_GROUPS_BYTES = 4 * 1024;
+   constexpr size_t OPERATORS_BYTES =
+      SCHEDULE_LANE_BYTES - 2 * ATTESTATION_OVERHEAD_BYTES - BATCH_OPERATOR_GROUPS_BYTES;
+   BOOST_REQUIRE_EQUAL(success(), queueout_with_data(ETH_OUTPOST_ID, GENERAL_LANE_TYPE,
+                                                     std::vector<char>(MAX_GENERAL_ATTESTATION_DATA_BYTES, 0x42)));
+   BOOST_REQUIRE_EQUAL(success(), queueout_with_data(ETH_OUTPOST_ID, opp::types::ATTESTATION_TYPE_OPERATORS,
+                                                     std::vector<char>(OPERATORS_BYTES, 0x43)));
+   BOOST_REQUIRE_EQUAL(success(), queueout_with_data(ETH_OUTPOST_ID,
+                                                     opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS,
+                                                     std::vector<char>(BATCH_OPERATOR_GROUPS_BYTES, 0x44)));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
+   produce_blocks();
+
+   const auto shipped = shipped_attestations(ETH_OUTPOST_ID);
+   BOOST_REQUIRE_EQUAL(shipped.size(), 3u);
+   BOOST_REQUIRE_EQUAL(shipped[0].type(), opp::types::ATTESTATION_TYPE_OPERATORS);
+   BOOST_REQUIRE_EQUAL(shipped[1].type(), opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS);
+   BOOST_REQUIRE_EQUAL(shipped[2].type(), GENERAL_LANE_TYPE);
+   BOOST_REQUIRE_EQUAL(shipped[2].data().size(), MAX_GENERAL_ATTESTATION_DATA_BYTES);
+   BOOST_REQUIRE_EQUAL(0u, count_ready_attestations(ETH_OUTPOST_ID, /*scan_until=*/6));
+} FC_LOG_AND_RETHROW() }
+
+/// WIRE-415: an outpost holds at most MAX_QUEUED_ATTESTATIONS general-lane rows; the next one fails its
+/// producer's transaction. Schedule rows and other outposts are unaffected, and shipping rows frees
+/// exactly that many places.
+BOOST_FIXTURE_TEST_CASE(queueout_refuses_general_rows_past_the_queue_cap, sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   register_outpost(opp::types::CHAIN_KIND_SVM, 1);
+   produce_blocks();
+
+   uint32_t next_index = 0;
+   queue_general(ETH_OUTPOST_ID, next_index, MAX_QUEUED_ATTESTATIONS);
+   next_index += MAX_QUEUED_ATTESTATIONS;
+   BOOST_REQUIRE_EQUAL(MAX_QUEUED_ATTESTATIONS, queued_attestations(ETH_OUTPOST_ID));
+
+   BOOST_REQUIRE_EQUAL(error(QUEUE_FULL_ERROR),
+                       queueout_with_data(ETH_OUTPOST_ID, GENERAL_LANE_TYPE, indexed_payload(next_index++)));
+   BOOST_REQUIRE_EQUAL(success(), queueout_with_data(ETH_OUTPOST_ID, opp::types::ATTESTATION_TYPE_OPERATORS,
+                                                     indexed_payload(next_index++)));
+   queue_general(SOL_OUTPOST_ID, next_index++, /*count=*/1);
+   BOOST_REQUIRE_EQUAL(MAX_QUEUED_ATTESTATIONS, queued_attestations(ETH_OUTPOST_ID));
+
+   // The OPERATORS row ships first, then MAX_ENVELOPE_ATTESTATIONS - 1 general rows.
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
+   produce_blocks();
+   constexpr uint32_t FREED = MAX_ENVELOPE_ATTESTATIONS - 1;
+   BOOST_REQUIRE_EQUAL(MAX_QUEUED_ATTESTATIONS - FREED, queued_attestations(ETH_OUTPOST_ID));
+
+   queue_general(ETH_OUTPOST_ID, next_index, FREED);
+   next_index += FREED;
+   BOOST_REQUIRE_EQUAL(MAX_QUEUED_ATTESTATIONS, queued_attestations(ETH_OUTPOST_ID));
+   BOOST_REQUIRE_EQUAL(error(QUEUE_FULL_ERROR),
+                       queueout_with_data(ETH_OUTPOST_ID, GENERAL_LANE_TYPE, indexed_payload(next_index++)));
 } FC_LOG_AND_RETHROW() }
 
 // queueout carries no ABI-level auth. Without the depot-contract gate, any account could call it
