@@ -127,10 +127,15 @@ constexpr const char* DISPUTE_INCOMPLETE_TWO_WAY_LOG =
    "msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): "
    "two versions but only %u of %u eligible operators delivered\n";
 
-/// Diagnostic for a terminal split that cannot be voted on until Tier-1 registration exists.
+/// Diagnostic for a disputed split that cannot be voted on until Tier-1 registration exists.
 constexpr const char* DISPUTE_NO_TIER_ONE_ELECTORATE_LOG =
-   "msgch::maybe_open_dispute: no dispute for (chain=%llu, epoch=%u): "
+   "msgch::open_dispute: no dispute for (chain=%llu, epoch=%u): "
    "no registered tier-1 node owners\n";
+
+/// Inline action shared by the no-majority and bootstrapped-minority dispute policies.
+namespace chalg_actions {
+constexpr name OPEN_DISPUTE_ACTION = "opendispute"_n;
+} // namespace chalg_actions
 
 /// Mint the next attestation id from the `attseq` singleton.
 ///
@@ -920,6 +925,35 @@ void dispatch_node_owner_reg(const std::vector<char>& data, uint64_t chain_code)
    return true;
 }
 
+/// Open a dispute after the caller's consensus policy requires adjudication. Without a Tier-1
+/// electorate, soft-decline without pausing or accepting a winner so chkcons can retry later.
+void open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
+                  const std::vector<checksum256>& seen_checksums,
+                  const std::vector<std::vector<name>>& checksum_operators) {
+   const uint8_t network_gen = roa::current_network_gen(ROA_ACCOUNT);
+   const uint8_t tier_one = magic_enum::enum_integer(NodeOwnerTier::NODE_OWNER_TIER_T1);
+   if (roa::nodeowner_count(ROA_ACCOUNT, network_gen, tier_one) == 0) {
+      sysio::print_f(DISPUTE_NO_TIER_ONE_ELECTORATE_LOG, chain_code, epoch_index);
+      return;
+   }
+
+   std::vector<chalg::dispute_candidate> candidates;
+   candidates.reserve(seen_checksums.size());
+   for (size_t g = 0; g < seen_checksums.size(); ++g) {
+      candidates.push_back(chalg::dispute_candidate{
+         .checksum  = seen_checksums[g],
+         .operators = checksum_operators[g],
+      });
+   }
+
+   action(
+      permission_level{self, "active"_n},
+      CHALG_ACCOUNT,
+      chalg_actions::OPEN_DISPUTE_ACTION,
+      std::make_tuple(chain_code, epoch_index, candidates)
+   ).send();
+}
+
 /// Evaluate the dispute trigger and, if met, open a Tier-1 dispute vote via sysio.chalg. A two-way
 /// split is actionable only after every eligible operator has delivered, preserving the chance for
 /// silent operators to create a strict majority. An existing three-or-more-version split remains
@@ -968,31 +1002,7 @@ void maybe_open_dispute(name self, uint64_t chain_code, uint32_t epoch_index,
       return;
    }
 
-   // `opendispute` defensively asserts this invariant, but this user-triggered evalcons route
-   // must remain retryable: a missing Tier-1 electorate must not revert the terminal delivery or
-   // pause the epoch before a node owner has registered.
-   const uint8_t network_gen = roa::current_network_gen(ROA_ACCOUNT);
-   const uint8_t tier_one = magic_enum::enum_integer(NodeOwnerTier::NODE_OWNER_TIER_T1);
-   if (roa::nodeowner_count(ROA_ACCOUNT, network_gen, tier_one) == 0) {
-      sysio::print_f(DISPUTE_NO_TIER_ONE_ELECTORATE_LOG, chain_code, epoch_index);
-      return;
-   }
-
-   std::vector<chalg::dispute_candidate> candidates;
-   candidates.reserve(seen_checksums.size());
-   for (size_t g = 0; g < seen_checksums.size(); ++g) {
-      candidates.push_back(chalg::dispute_candidate{
-         .checksum  = seen_checksums[g],
-         .operators = checksum_operators[g],
-      });
-   }
-
-   action(
-      permission_level{self, "active"_n},
-      CHALG_ACCOUNT,
-      "opendispute"_n,
-      std::make_tuple(chain_code, epoch_index, candidates)
-   ).send();
+   open_dispute(self, chain_code, epoch_index, seen_checksums, checksum_operators);
 }
 
 } // anonymous namespace
@@ -1210,8 +1220,8 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
    };
 
    // Group envelopes by checksum, tracking the operators that delivered each version (CDT-compatible
-   // parallel vectors). The per-version operator lists become dispute candidates only for an
-   // all-delivered two-way tie or an existing multi-version split.
+   // parallel vectors). The per-version operator lists also supply dispute candidates for a
+   // terminal tie, a multi-version split, or a majority opposed by a bootstrapped minority.
    std::vector<checksum256>       seen_checksums;
    std::vector<uint32_t>          checksum_counts;
    std::vector<std::vector<char>> checksum_data;
@@ -1274,6 +1284,21 @@ void msgch::evalcons(uint64_t chain_code, uint32_t epoch_index) {
       maybe_open_dispute(get_self(), chain_code, epoch_index, group_size, total_deliveries,
                          seen_checksums, checksum_counts, checksum_operators);
       return;
+   }
+
+   // Only delivered, live-eligible dissent counts. A bootstrapped majority member or a silent
+   // operator does not trigger adjudication. The winner selection above preserves boundary timing.
+   opreg::operators_t ops(OPREG_ACCOUNT);
+   for (size_t g = 0; g < checksum_operators.size(); ++g) {
+      if (g == consensus_group) continue;
+      for (const auto& account : checksum_operators[g]) {
+         if (ops.get(opreg::operator_key{account.value}).is_bootstrapped) {
+            // Do not apply the no-majority policy's majority/completeness gates here. Even an
+            // incomplete group must dispute this majority, and no electorate means wait, not win.
+            open_dispute(get_self(), chain_code, epoch_index, seen_checksums, checksum_operators);
+            return;
+         }
+      }
    }
 
    // Consensus reached: store + dispatch the winning envelope and record the per-outpost winner

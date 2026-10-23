@@ -68,18 +68,41 @@ constexpr std::string_view ONE_TO_ONE_RIGHT_PAYLOAD = "one-to-one-right";
 constexpr std::string_view THREE_TO_THREE_LEFT_PAYLOAD = "three-to-three-left";
 constexpr std::string_view THREE_TO_THREE_RIGHT_PAYLOAD = "three-to-three-right";
 
+/// WIRE-369 split fixtures cover both terminal cohorts and a majority with silent members.
+namespace bootstrap_dispute {
+constexpr uint32_t complete_group_size = 3;
+constexpr uint32_t incomplete_group_size = 7;
+constexpr uint32_t multi_version_group_size = 6;
+constexpr uint32_t majority_count = 4;
+constexpr uint32_t small_majority_count = 2;
+constexpr uint32_t minority_count = 1;
+constexpr uint64_t second_dispute_id = 2;
+constexpr const char* majority_payload = "bootstrap-majority";
+constexpr const char* minority_payload = "bootstrap-minority";
+constexpr const char* third_payload = "ordinary-minority";
+constexpr const char* removal_reason = "remove dissenter from live eligible set";
+} // namespace bootstrap_dispute
+
 /// Mirrors of the inbound `envelopes` retention constants in `sysio.msgch.cpp` (contract headers
 /// are not host-compilable).
 constexpr uint32_t INBOUND_ENVELOPE_RETENTION_EPOCHS = 2;
 constexpr uint32_t ENVELOPE_PRUNE_BUDGET             = 4;
 
-/// sysio.opreg action identifiers used by the WNS-16 fixture.
+/// sysio.opreg table identifiers used by the bootstrap dispute regressions.
+namespace opreg_tables {
+constexpr name OPERATORS = "operators"_n;
+} // namespace opreg_tables
+
+/// sysio.opreg action identifiers used by the chain fixture.
 namespace opreg_actions {
 constexpr name SET_CONFIG = "setconfig"_n;
+constexpr name TERMINATE = "terminate"_n;
 } // namespace opreg_actions
 
-/// sysio.opreg ABI field identifiers used by the WNS-16 fixture.
+/// sysio.opreg ABI field identifiers used by the chain fixture.
 namespace opreg_fields {
+constexpr const char* ACCOUNT        = "account";
+constexpr const char* REASON         = "reason";
 constexpr const char* STATUS         = "status";
 constexpr const char* RECENT_ACTIONS = "recent_actions";
 constexpr const char* ACTION         = "action";
@@ -130,6 +153,7 @@ constexpr const char* CHAIN_CODE    = "chain_code";
 constexpr const char* EPOCH_INDEX   = "epoch_index";
 constexpr const char* BATCH_OP_NAME = "batch_op_name";
 constexpr const char* WINNING_CHECKSUM = "winning_checksum";
+constexpr const char* ENVELOPE_DIGEST  = "envelope_digest";
 constexpr const char* CHECKSUM         = "checksum";
 constexpr const char* CONSENSUS_REACHED = "consensus_reached";
 } // namespace msgch_fields
@@ -221,6 +245,7 @@ public:
    static constexpr auto BATCHOP_D      = "batchop.d"_n;
    static constexpr auto BATCHOP_E      = "batchop.e"_n;
    static constexpr auto BATCHOP_F      = "batchop.f"_n;
+   static constexpr auto BATCHOP_G      = "batchop.g"_n;
 
    static constexpr uint32_t EPOCH_DURATION_SEC = 60;
    static constexpr uint32_t ONE_TO_ONE_TIE_GROUP_SIZE = 2;
@@ -244,7 +269,7 @@ public:
       create_accounts({
          TOKEN_ACCOUNT, EPOCH_ACCOUNT, OPREG_ACCOUNT, MSGCH_ACCOUNT,
          CHALG_ACCOUNT, CHAINS_ACCOUNT,
-         BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E, BATCHOP_F,
+         BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E, BATCHOP_F, BATCHOP_G,
          "sysio.dclaim"_n, "sysio.gov"_n, "sysio.ops"_n
       }, false, true, !empty_roa);
       produce_blocks(2);
@@ -348,9 +373,14 @@ public:
             ("pay_cadence_epochs",     uint16_t(1))));
    }
 
-   /// Configure one test cohort of up to six batch operators, the ETH/SOL outpost rows, its one-group
-   /// schedule, and the genesis advance. The configurable cohort supports even split regressions.
-   void bootstrap(uint32_t n_batch_ops = 1, bool batchop_is_bootstrapped = true) {
+   /// Configure up to seven batch operators and the genesis advance. Explicit ordinary members
+   /// are funded and made ACTIVE through deposits; the boolean retains the first-member shorthand.
+   void bootstrap(uint32_t n_batch_ops = 1, bool batchop_is_bootstrapped = true,
+                  const std::vector<name>& ordinary_operators = {}) {
+      const auto is_bootstrapped = [&](name op) {
+         return (op != BATCHOP || batchop_is_bootstrapped) &&
+                std::find(ordinary_operators.begin(), ordinary_operators.end(), op) == ordinary_operators.end();
+      };
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
          "setconfig"_n, mvo()
             ("epoch_duration_sec",                  EPOCH_DURATION_SEC)
@@ -378,17 +408,15 @@ public:
             ("terminate_max_pct_misses_24h",     5)
             ("terminate_window_ms",              uint64_t{24ULL * 60 * 60 * 1000})
             ("req_prod_collat",                  fc::variants{})
-            // Empty collateral requirements intentionally keep non-bootstrapped
-            // operators UNKNOWN. Give the WNS-16 fixture's non-bootstrapped
-            // operator the one-unit native WIRE requirement it satisfies below.
-            ("req_batchop_collat",               batchop_is_bootstrapped
+            // Ordinary members satisfy a depot-native WIRE requirement below.
+            ("req_batchop_collat",               batchop_is_bootstrapped && ordinary_operators.empty()
                                                    ? fc::variants{}
                                                    : fc::variants{
                                                         make_chain_min_bond(WIRE_CHAIN_CODE, WIRE_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL) })
             ("req_uw_collat",                    fc::variants{})));
 
       const std::vector<name> available_batch_ops{
-         BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E, BATCHOP_F};
+         BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E, BATCHOP_F, BATCHOP_G};
       BOOST_REQUIRE(n_batch_ops > 0 && n_batch_ops <= available_batch_ops.size());
       std::vector<name> batch_ops(available_batch_ops.begin(),
                                   available_batch_ops.begin() + n_batch_ops);
@@ -397,7 +425,7 @@ public:
             "regoperator"_n, mvo()
                ("account",          op.to_string())
                ("type",             opp::types::OperatorType::OPERATOR_TYPE_BATCH)
-               ("is_bootstrapped",  op == BATCHOP ? batchop_is_bootstrapped : true)));
+               ("is_bootstrapped",  is_bootstrapped(op))));
       }
 
       register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, ETH_CHAIN_CODE, 31337);
@@ -405,8 +433,12 @@ public:
 
       // A non-bootstrapped batch operator starts UNKNOWN and becomes ACTIVE
       // only after a collateral update re-evaluates its role eligibility.
-      if (!batchop_is_bootstrapped) {
-         BOOST_REQUIRE_EQUAL(success(), fund_and_bond(BATCHOP, BATCH_OPERATOR_MINIMUM_COLLATERAL));
+      for (const auto& op : batch_ops) {
+         if (!is_bootstrapped(op)) {
+            BOOST_REQUIRE_EQUAL(success(), fund_and_bond(op, BATCH_OPERATOR_MINIMUM_COLLATERAL));
+            BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
+                                get_operator(op)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+         }
       }
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT,
@@ -529,6 +561,13 @@ public:
       return data.empty() ? fc::variant() : chalg_abi.binary_to_variant(
          chalg_abi_types::DISPUTE_ENTRY, data,
          abi_serializer::create_yield_function(abi_serializer_max_time));
+   }
+
+   /// Verify that adjudication has not accepted or dispatched any candidate for this outpost.
+   void assert_no_consensus(uint64_t chain_code, uint32_t epoch_index) {
+      const auto consensus = get_outpcons(chain_code);
+      BOOST_REQUIRE(consensus.is_null() || consensus[msgch_fields::EPOCH_INDEX].as<uint32_t>() != epoch_index);
+      BOOST_REQUIRE_EQUAL(attestation_count(chain_code, epoch_index), 0u);
    }
 
    /// Assert that the full `chkcons -> evalcons -> opendispute` route recorded the exact split.
@@ -1854,7 +1893,7 @@ BOOST_FIXTURE_TEST_CASE(terminate_at_duty_rotation_via_advance, sysio_msgch_chai
 // operator behaving correctly. CertiK shipped this as
 // sysio_msgch_chain_tests/short_one_member_group_still_uses_configured_three_member_quorum.
 BOOST_FIXTURE_TEST_CASE(short_group_after_slash_still_reaches_consensus, sysio_msgch_chain_tester) { try {
-   bootstrap(/*n_batch_ops=*/3);   // configured operators_per_epoch == 3, resident group == 3
+   bootstrap(/*n_batch_ops=*/3, /*batchop_is_bootstrapped=*/true, {BATCHOP_C});
 
    // Slash one member. It stays in batch_op_groups[current] until the next reschedule, but can no
    // longer deliver -- so the eligible set is 2 while the configured size is still 3.
@@ -1929,6 +1968,160 @@ BOOST_FIXTURE_TEST_CASE(pre_boundary_majority_finalized_by_chkcons_crank, sysio_
    BOOST_REQUIRE_EQUAL(opc["envelope_digest"].as_string(), digest.str());
 } FC_LOG_AND_RETHROW() }
 
+/// A complete majority waits for Tier-1 adjudication when a bootstrapped operator dissents.
+/// Voting for the majority must dispatch exactly once and allow advance's inline slash to decline.
+BOOST_FIXTURE_TEST_CASE(bootstrapped_minority_disputes_before_dispatch, sysio_msgch_chain_tester) { try {
+   using namespace bootstrap_dispute;
+   bootstrap(complete_group_size);
+   // Bootstrapped operators cannot deposit collateral; retain their valid seeded row byte-for-byte.
+   const auto before = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, opreg_tables::OPERATORS, BATCHOP_C);
+   BOOST_REQUIRE(!before.empty());
+   const uint32_t epoch = current_epoch();
+   const auto majority = encode_delivery(epoch, majority_payload);
+   const auto minority = encode_delivery(epoch, minority_payload);
+   const auto majority_checksum = fc::sha256::hash(majority.data(), majority.size());
+   const auto minority_checksum = fc::sha256::hash(minority.data(), minority.size());
+
+   for (const auto op : {BATCHOP, BATCHOP_B, BATCHOP_C}) {
+      BOOST_REQUIRE_EQUAL(success(), deliver_as(op, SOL_OUTPOST_ID, majority));
+      BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, op == BATCHOP_C ? minority : majority));
+   }
+   assert_no_consensus(ETH_OUTPOST_ID, epoch);
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   BOOST_REQUIRE(!epoch_is_paused());
+
+   elapse_epoch_boundary();
+   advance_via_consensus();
+   assert_open_tie_dispute(epoch, {majority_checksum, minority_checksum},
+                          {small_majority_count, minority_count});
+   BOOST_REQUIRE(epoch_is_paused());
+   for (size_t attempt = 0; attempt < 2; ++attempt) advance_via_consensus();
+   assert_no_consensus(ETH_OUTPOST_ID, epoch);
+   BOOST_REQUIRE(get_dispute(second_dispute_id).is_null());
+   BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   BOOST_REQUIRE(before == get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, opreg_tables::OPERATORS, BATCHOP_C));
+
+   resolve_tie_dispute(epoch, majority_checksum);
+   BOOST_REQUIRE(!epoch_is_paused());
+   BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
+   BOOST_REQUIRE_EQUAL(get_outpcons(ETH_OUTPOST_ID)[msgch_fields::ENVELOPE_DIGEST].as_string(),
+                       oracle::epoch_digest(decode_envelope(majority)).str());
+   advance_via_consensus();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
+                       get_operator(BATCHOP_C)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+   BOOST_REQUIRE(before == get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, opreg_tables::OPERATORS, BATCHOP_C));
+} FC_LOG_AND_RETHROW() }
+
+/// Four ordinary votes against one bootstrapped vote in a seven-member cohort must dispute even
+/// with two silent members. Later deliveries and chkcons calls preserve the original vote snapshot.
+BOOST_FIXTURE_TEST_CASE(bootstrapped_minority_disputes_incomplete_majority, sysio_msgch_chain_tester) { try {
+   using namespace bootstrap_dispute;
+   bootstrap(incomplete_group_size, true, {BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D});
+   const uint32_t epoch = current_epoch();
+   const auto majority = encode_delivery(epoch, majority_payload);
+   const auto minority = encode_delivery(epoch, minority_payload);
+   const auto majority_checksum = fc::sha256::hash(majority.data(), majority.size());
+   const auto minority_checksum = fc::sha256::hash(minority.data(), minority.size());
+   for (const auto op : {BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D}) {
+      BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, majority));
+   }
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_E, ETH_OUTPOST_ID, minority));
+   assert_no_consensus(ETH_OUTPOST_ID, epoch);
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   elapse_epoch_boundary();
+   advance_via_consensus();
+   assert_open_tie_dispute(epoch, {majority_checksum, minority_checksum}, {majority_count, minority_count});
+
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_F, ETH_OUTPOST_ID, majority));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_G, ETH_OUTPOST_ID, minority));
+   advance_via_consensus();
+   assert_open_tie_dispute(epoch, {majority_checksum, minority_checksum}, {majority_count, minority_count});
+   assert_no_consensus(ETH_OUTPOST_ID, epoch);
+   BOOST_REQUIRE(get_dispute(second_dispute_id).is_null());
+   BOOST_REQUIRE(epoch_is_paused());
+   // Tier-1 may select the originally minority candidate, overriding the operator majority.
+   resolve_tie_dispute(epoch, minority_checksum);
+   BOOST_REQUIRE_EQUAL(attestation_count(ETH_OUTPOST_ID, epoch), 1u);
+} FC_LOG_AND_RETHROW() }
+
+/// Every minority bucket must be inspected: the first is ordinary, the second bootstrapped.
+BOOST_FIXTURE_TEST_CASE(bootstrapped_minority_in_later_bucket_disputes, sysio_msgch_chain_tester) { try {
+   using namespace bootstrap_dispute;
+   bootstrap(multi_version_group_size, true, {BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D, BATCHOP_E});
+   const uint32_t epoch = current_epoch();
+   const auto majority = encode_delivery(epoch, majority_payload);
+   const auto ordinary = encode_delivery(epoch, third_payload);
+   const auto minority = encode_delivery(epoch, minority_payload);
+   for (const auto op : {BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D}) {
+      BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, majority));
+   }
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_E, ETH_OUTPOST_ID, ordinary));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_F, ETH_OUTPOST_ID, minority));
+   elapse_epoch_boundary();
+   advance_via_consensus();
+   assert_open_tie_dispute(epoch,
+      {fc::sha256::hash(majority.data(), majority.size()), fc::sha256::hash(ordinary.data(), ordinary.size()),
+       fc::sha256::hash(minority.data(), minority.size())}, {majority_count, minority_count, minority_count});
+   assert_no_consensus(ETH_OUTPOST_ID, epoch);
+} FC_LOG_AND_RETHROW() }
+
+/// A bootstrapped delivery removed from the live eligible set cannot force a dispute.
+BOOST_FIXTURE_TEST_CASE(ineligible_bootstrapped_dissent_does_not_dispute, sysio_msgch_chain_tester) { try {
+   using namespace bootstrap_dispute;
+   bootstrap(complete_group_size, true, {BATCHOP, BATCHOP_B});
+   const uint32_t epoch = current_epoch();
+   const auto majority = encode_delivery(epoch, majority_payload);
+   const auto minority = encode_delivery(epoch, minority_payload);
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, minority));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, majority));
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, majority));
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, opreg_actions::TERMINATE,
+      mvo()(opreg_fields::ACCOUNT, BATCHOP_C)(opreg_fields::REASON, removal_reason)));
+   elapse_epoch_boundary();
+   advance_via_consensus();
+   BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+   BOOST_REQUIRE(!epoch_is_paused());
+   const auto consensus = get_outpcons(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(!consensus.is_null());
+   BOOST_REQUIRE_EQUAL(consensus[msgch_fields::WINNING_CHECKSUM].as_string(),
+                       fc::sha256::hash(majority.data(), majority.size()).str());
+} FC_LOG_AND_RETHROW() }
+
+/// Two bootstrapped-minority disputes share the epoch hold; resolving the first cannot release it.
+BOOST_FIXTURE_TEST_CASE(bootstrapped_minority_disputes_hold_until_both_resolve, sysio_msgch_chain_tester) { try {
+   using namespace bootstrap_dispute;
+   bootstrap(complete_group_size);
+   const uint32_t epoch = current_epoch();
+   const auto majority = encode_delivery(epoch, majority_payload);
+   const auto minority = encode_delivery(epoch, minority_payload);
+   const auto checksum = fc::sha256::hash(majority.data(), majority.size());
+   for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      for (const auto op : {BATCHOP, BATCHOP_B, BATCHOP_C}) {
+         BOOST_REQUIRE_EQUAL(success(), deliver_as(op, chain, op == BATCHOP_C ? minority : majority));
+      }
+   }
+   elapse_epoch_boundary();
+   advance_via_consensus();
+   BOOST_REQUIRE(!get_dispute(FIRST_DISPUTE_ID).is_null());
+   BOOST_REQUIRE(!get_dispute(second_dispute_id).is_null());
+   for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) assert_no_consensus(chain, epoch);
+   for (const auto id : {FIRST_DISPUTE_ID, second_dispute_id}) {
+      BOOST_REQUIRE_EQUAL(success(), vote_dispute(id, checksum));
+      BOOST_REQUIRE_EQUAL(success(), push(CHALG_ACCOUNT, chalg_abi, BATCHOP, chalg_actions::CHECK_DISPUTE,
+                                         mvo()(chalg_vote_fields::DISPUTE_ID, id)));
+      BOOST_REQUIRE_EQUAL(epoch_is_paused(), id == FIRST_DISPUTE_ID);
+      if (id == FIRST_DISPUTE_ID) {
+         advance_via_consensus();
+         BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+      }
+   }
+   advance_via_consensus();
+   BOOST_REQUIRE_EQUAL(epoch + 1, current_epoch());
+   BOOST_REQUIRE_EQUAL(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
+                       get_operator(BATCHOP_C)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+} FC_LOG_AND_RETHROW() }
+
 /// A 1–1 split leaves no strict majority. The deliveries deliberately land before the epoch
 /// boundary, so only the permissionless `chkcons` crank can re-drive evalcons and open the dispute.
 BOOST_FIXTURE_TEST_CASE(chkcons_opens_dispute_for_one_to_one_tie, sysio_msgch_chain_tester) { try {
@@ -1988,7 +2181,7 @@ BOOST_FIXTURE_TEST_CASE(chkcons_opens_dispute_for_three_to_three_tie, sysio_msgc
 /// undecided and unpaused so the final delivery can establish a strict majority without a vote.
 BOOST_FIXTURE_TEST_CASE(chkcons_waits_for_incomplete_two_way_split,
                         sysio_msgch_chain_tester) { try {
-   bootstrap(INCOMPLETE_TWO_WAY_SPLIT_GROUP_SIZE);
+   bootstrap(INCOMPLETE_TWO_WAY_SPLIT_GROUP_SIZE, /*batchop_is_bootstrapped=*/true, {BATCHOP_B});
 
    const uint32_t epoch = current_epoch();
    const auto left = encode_delivery(epoch, std::string(ONE_TO_ONE_LEFT_PAYLOAD));
@@ -2023,6 +2216,36 @@ BOOST_FIXTURE_TEST_CASE(chkcons_waits_for_incomplete_two_way_split,
 struct sysio_msgch_empty_roa_tester : sysio_msgch_chain_tester {
    sysio_msgch_empty_roa_tester() : sysio_msgch_chain_tester(/*empty_roa=*/true) {}
 };
+
+/// No electorate is never permission to accept a bootstrapped minority's opposing majority.
+/// Repeated real cranks leave the epoch retryable until Tier-1 registration enables the dispute.
+BOOST_FIXTURE_TEST_CASE(bootstrapped_minority_retries_after_tier_one_registration,
+                        sysio_msgch_empty_roa_tester) { try {
+   using namespace bootstrap_dispute;
+   bootstrap(incomplete_group_size);
+   const uint32_t epoch = current_epoch();
+   const auto majority = encode_delivery(epoch, majority_payload);
+   const auto minority = encode_delivery(epoch, minority_payload);
+   for (const auto op : {BATCHOP, BATCHOP_B, BATCHOP_C, BATCHOP_D}) {
+      BOOST_REQUIRE_EQUAL(success(), deliver_as(op, ETH_OUTPOST_ID, majority));
+   }
+   elapse_epoch_boundary();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_E, ETH_OUTPOST_ID, minority));
+   for (size_t attempt = 0; attempt < 2; ++attempt) {
+      advance_via_consensus();
+      assert_no_consensus(ETH_OUTPOST_ID, epoch);
+      BOOST_REQUIRE(get_dispute(FIRST_DISPUTE_ID).is_null());
+      BOOST_REQUIRE(!epoch_is_paused());
+      BOOST_REQUIRE_EQUAL(epoch, current_epoch());
+   }
+   register_tier_one_node_owner(TIER_ONE_OWNER);
+   advance_via_consensus();
+   assert_open_tie_dispute(epoch,
+      {fc::sha256::hash(majority.data(), majority.size()), fc::sha256::hash(minority.data(), minority.size())},
+      {majority_count, minority_count});
+   BOOST_REQUIRE(epoch_is_paused());
+   assert_no_consensus(ETH_OUTPOST_ID, epoch);
+} FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(chkcons_retries_terminal_tie_after_tier_one_registration,
                         sysio_msgch_empty_roa_tester) { try {
@@ -2065,7 +2288,7 @@ BOOST_FIXTURE_TEST_CASE(chkcons_retries_terminal_tie_after_tier_one_registration
 // finalizing on A+B even though C -- one of the two currently-ACTIVE members -- never delivered.
 // That is a strictly smaller quorum than the live group, so it must not resolve until C speaks.
 BOOST_FIXTURE_TEST_CASE(slash_after_delivery_does_not_count_toward_consensus, sysio_msgch_chain_tester) { try {
-   bootstrap(/*n_batch_ops=*/3);
+   bootstrap(/*n_batch_ops=*/3, /*batchop_is_bootstrapped=*/false);
 
    const uint32_t epoch = current_epoch();
    auto envelope = encode_delivery(epoch, "slash-after-delivery");
@@ -2360,7 +2583,7 @@ BOOST_FIXTURE_TEST_CASE(envelope_prune_bounded_per_delivery, sysio_msgch_chain_t
 /// slashes the losing deliverer.
 BOOST_FIXTURE_TEST_CASE(dispute_resolves_while_envelopes_are_pruned, sysio_msgch_chain_tester) { try {
    const std::vector<name> ops{BATCHOP, BATCHOP_B};
-   bootstrap(ONE_TO_ONE_TIE_GROUP_SIZE);
+   bootstrap(ONE_TO_ONE_TIE_GROUP_SIZE, /*batchop_is_bootstrapped=*/true, {BATCHOP_B});
    const uint32_t first_epoch = current_epoch();
    inbound_stream_tip tip;
    for (uint32_t i = 0; i < INBOUND_ENVELOPE_RETENTION_EPOCHS; ++i) {

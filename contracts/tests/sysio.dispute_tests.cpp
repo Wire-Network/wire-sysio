@@ -51,6 +51,9 @@ using mvo = fc::mutable_variant_object;
 
 namespace {
 
+/// Native collateral used by the ordinary operator fixture.
+constexpr std::string_view WIRE_CHAIN_CODE = "WIRE";
+
 /// Build an `authority` whose active permission is the account's own active key plus a list of
 /// `{actor, sysio.code}` co-signers — lets the listed contracts authorize inline actions as `account`.
 authority active_with_code_authors(name account, const std::vector<name>& code_authors) {
@@ -106,7 +109,8 @@ public:
    ///        so tests can register node owners in the pre-`setemitcfg` window (where
    ///        `regnodeowner` skips the `sysio.system::addnodeowner` inline registration) and close
    ///        the window themselves.
-   explicit sysio_dispute_tester(bool defer_emission_config = false) {
+   /// @param bootstrapped Whether the seeded batch operator is protected from slashing.
+   explicit sysio_dispute_tester(bool defer_emission_config = false, bool bootstrapped = true) {
       produce_blocks(2);
 
       create_accounts({
@@ -150,7 +154,7 @@ public:
       grant_code_authors(OPREG_ACCOUNT, {CHALG_ACCOUNT, EPOCH_ACCOUNT, MSGCH_ACCOUNT});
       produce_blocks();
 
-      bootstrap_opp_stack();
+      bootstrap_opp_stack(bootstrapped);
    }
 
    // ── deploy / abi helpers ─────────────────────────────────────────────────
@@ -190,7 +194,9 @@ public:
 
    // ── OPP stack bootstrap: one batch op, one outpost, advance to epoch 1 ────
 
-   void bootstrap_opp_stack() {
+   /// Seed a live operator, funding ordinary operators through the real collateral path.
+   void bootstrap_opp_stack(bool bootstrapped) {
+      constexpr uint64_t minimum_bond = 1;
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
          ("epoch_duration_sec", 60)
          ("operators_per_epoch", 1)
@@ -202,12 +208,15 @@ public:
          ("max_available_producers", 21)("max_available_batch_ops", 63)("max_available_underwriters", 21)
          ("terminate_prune_delay_ms", 600000)("terminate_max_consecutive_misses", 5)
          ("terminate_max_pct_misses_24h", 5)("terminate_window_ms", uint64_t{24ULL*60*60*1000})
-         ("req_prod_collat", fc::variants{})("req_batchop_collat", fc::variants{})
+         ("req_prod_collat", fc::variants{})
+         ("req_batchop_collat", bootstrapped ? fc::variants{} :
+            fc::variants{make_chain_min_bond(WIRE_CHAIN_CODE, WIRE_CHAIN_CODE, minimum_bond)})
          ("req_uw_collat", fc::variants{})));
 
       BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
          ("account", BATCHOP.to_string())("type", OperatorType::OPERATOR_TYPE_BATCH)
-         ("is_bootstrapped", true)));
+         ("is_bootstrapped", bootstrapped)));
+      if (!bootstrapped) BOOST_REQUIRE_EQUAL(success(), fund_and_bond(BATCHOP, minimum_bond));
 
       BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, "regchain"_n, mvo()
          ("kind", ChainKind::CHAIN_KIND_EVM)("code", "ETH")
@@ -451,6 +460,11 @@ struct sysio_dispute_empty_roa_tester : tester {
 // =============================================================================
 //  opendispute
 // =============================================================================
+/// Slash regressions need an ordinary ACTIVE seed, since bootstrapped operators are protected.
+struct sysio_dispute_ordinary_tester : sysio_dispute_tester {
+   sysio_dispute_ordinary_tester() : sysio_dispute_tester(false, /*bootstrapped=*/false) {}
+};
+
 BOOST_AUTO_TEST_SUITE(sysio_dispute_tests)
 
 BOOST_FIXTURE_TEST_CASE(opendispute_writes_row_and_pauses, sysio_dispute_tester) { try {
@@ -1056,7 +1070,7 @@ BOOST_FIXTURE_TEST_CASE(chkdispute_unpauses_only_after_last_open_dispute, sysio_
 // additionally gated by emissions readiness, out of scope here), plus the widened slashop auth
 // (callable by sysio.epoch) and opreg's already-slashed guard. The full delivery-driven slash through
 // advance is covered end-to-end by the TS flow flow-batch-operator-slashing.
-BOOST_FIXTURE_TEST_CASE(slashed_op_excluded_from_scheduling_no_double_slash, sysio_dispute_tester) { try {
+BOOST_FIXTURE_TEST_CASE(slashed_op_excluded_from_scheduling_no_double_slash, sysio_dispute_ordinary_tester) { try {
    constexpr auto BATCHOP_B = "batchop.b"_n;
    constexpr auto BATCHOP_C = "batchop.c"_n;
    for (auto op : {BATCHOP_B, BATCHOP_C})
@@ -1076,22 +1090,22 @@ BOOST_FIXTURE_TEST_CASE(slashed_op_excluded_from_scheduling_no_double_slash, sys
    BOOST_REQUIRE(group_contains(g0, BATCHOP));
    BOOST_REQUIRE(group_contains(g0, BATCHOP_B));
 
-   // Slash batchop.b as sysio.epoch (the widened auth path).
-   BOOST_REQUIRE_EQUAL(success(), slashop(BATCHOP_B));
-   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_SLASHED", operator_status(BATCHOP_B));
+   // Slash the ordinary batchop.a as sysio.epoch (the widened auth path).
+   BOOST_REQUIRE_EQUAL(success(), slashop(BATCHOP));
+   BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_SLASHED", operator_status(BATCHOP));
 
    // opreg aborts a second slash -- exactly the abort the scheduling exclusion below must prevent
    // advance from ever triggering.
    BOOST_REQUIRE_EQUAL(error("assertion failure with message: operator already slashed"),
-                       slashop(BATCHOP_B));
+                       slashop(BATCHOP));
 
    // Bring c online so two ACTIVE ops remain, then re-schedule: the filter keeps the live ops
-   // (a, c) and drops the slashed one (b).
+   // (b, c) and drops the slashed one (a).
    BOOST_REQUIRE_EQUAL(success(), regop(BATCHOP_C));
    BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "schbatchgps"_n, mvo()));
    auto g1 = current_group();
-   BOOST_REQUIRE(!group_contains(g1, BATCHOP_B));   // slashed -> never re-enters a group
-   BOOST_REQUIRE(group_contains(g1, BATCHOP));
+   BOOST_REQUIRE(!group_contains(g1, BATCHOP));   // slashed -> never re-enters a group
+   BOOST_REQUIRE(group_contains(g1, BATCHOP_B));
    BOOST_REQUIRE(group_contains(g1, BATCHOP_C));
 } FC_LOG_AND_RETHROW() }
 
@@ -1134,7 +1148,7 @@ BOOST_FIXTURE_TEST_CASE(deliver_accepts_active_group_member, sysio_dispute_teste
    BOOST_REQUIRE_EQUAL(success(), deliver(eth_code(), encode_envelope(epoch, "active")));
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(deliver_rejects_slashed_group_member, sysio_dispute_tester) { try {
+BOOST_FIXTURE_TEST_CASE(deliver_rejects_slashed_group_member, sysio_dispute_ordinary_tester) { try {
    const uint32_t epoch = current_epoch();
    BOOST_REQUIRE_EQUAL(success(), slashop(BATCHOP));
    BOOST_REQUIRE_EQUAL("OPERATOR_STATUS_SLASHED", operator_status(BATCHOP));
