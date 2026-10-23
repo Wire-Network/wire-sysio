@@ -7,18 +7,11 @@ import os
 import re
 import string
 import signal
-from datetime import datetime
 import sys
 import random
 import json
 import socket
 from pathlib import Path
-
-try:
-    from datetime import UTC
-except ImportError:
-    from datetime import timezone
-    UTC = timezone.utc
 
 from .core_symbol import CORE_SYMBOL
 from .accounts import Account, createAccountKeys
@@ -292,7 +285,7 @@ class Cluster(object):
             time.sleep(Cluster.__localLaunchPortCheckSleepSeconds)
         loggingLevelDictString = json.dumps(self.loggingLevelDict, separators=(',', ':'))
         args=(f'-p {pnodes} -n {totalNodes} -d {delay} '
-              f'-i {datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]} -f {producerFlag} '
+              f'-i {Utils.genesisTimestamp()} -f {producerFlag} '
               f'--unstarted-nodes {unstartedNodes} --logging-level {self.loggingLevel} '
               f'--logging-level-map {loggingLevelDictString}')
         argsArr=args.split()

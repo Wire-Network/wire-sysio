@@ -22,6 +22,9 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/block_log_util_test.py ${CMAKE_CURREN
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/block_log_retain_blocks_test.py ${CMAKE_CURRENT_BINARY_DIR}/block_log_retain_blocks_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cluster_launcher.py ${CMAKE_CURRENT_BINARY_DIR}/cluster_launcher.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bootstrap_order_test.py ${CMAKE_CURRENT_BINARY_DIR}/bootstrap_order_test.py COPYONLY)
+configure_file(
+   ${CMAKE_CURRENT_SOURCE_DIR}/genesis_timestamp_test.py
+   ${CMAKE_CURRENT_BINARY_DIR}/genesis_timestamp_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bootstrap_disconnect_test.py ${CMAKE_CURRENT_BINARY_DIR}/bootstrap_disconnect_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/distributed-transactions-test.py ${CMAKE_CURRENT_BINARY_DIR}/distributed-transactions-test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio_util_bls_test.py ${CMAKE_CURRENT_BINARY_DIR}/sysio_util_bls_test.py COPYONLY)
@@ -139,6 +142,7 @@ endif()
 #To run plugin_test with all log from blockchain displayed, put --verbose after --, i.e. plugin_test -- --verbose
 add_p_test(NAME plugin_test COMMAND plugin_test --report_level=detailed --color_output)
 add_p_test(NAME bootstrap_order_test COMMAND tests/bootstrap_order_test.py)
+add_p_test(NAME genesis_timestamp_test COMMAND tests/genesis_timestamp_test.py)
 add_p_test(NAME nodeop_irreversible_mode_progress_test COMMAND tests/nodeop_irreversible_mode_progress_test.py)
 add_np_test(NAME bootstrap_disconnect_test COMMAND tests/bootstrap_disconnect_test.py -v)
 

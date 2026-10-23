@@ -66,8 +66,6 @@ SYNC_SPANS = 3
 PRODUCTION_TIMEOUT_SECONDS = 60
 SYNC_TIMEOUT_SECONDS = 60
 PRODUCER_NAME = "sysio"
-# The native genesis timestamp format keeps milliseconds and drops the remaining microsecond digits.
-SUB_MILLISECOND_DIGITS = 3
 # Each launched nodeop takes the next index for its HTTP and P2P ports.
 NODE_INDEXES = itertools.count()
 
@@ -366,7 +364,6 @@ def write_genesis(directory):
     launcher.define_network()
     launcher.bind_nodes()
     genesis = launcher.init_genesis()
-    genesis["initial_timestamp"] = Utils.timestamp()[:-SUB_MILLISECOND_DIGITS]
     genesis_path.write_text(json.dumps(genesis, indent=2))
     return genesis_path, launcher.network.nodes["bios"].keys[0]
 
