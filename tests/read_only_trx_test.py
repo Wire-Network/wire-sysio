@@ -149,9 +149,8 @@ def startCluster():
     producerNode = cluster.getNode()
     apiNode = cluster.nodes[-1]
 
-    sysioCodeHash = getCodeHash(producerNode, "sysio.token")
     # sysio.* should be using oc unless oc tierup disabled.
-    Utils.assertInitialSysVmOcLogState(producerNode, apiNode, sysioCodeHash, args.sys_vm_oc_enable, ocSupported)
+    Utils.assertInitialSysVmOcLogState(cluster, producerNode, apiNode, args.sys_vm_oc_enable, ocSupported)
 
     if ocRequested:
         verifyOcVirtualMemory()
