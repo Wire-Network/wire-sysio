@@ -28,7 +28,7 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 
 | Action | Auth | Description |
 |--------|------|-------------|
-| `setconfig` | `sysio.epoch` | Set the epoch configuration. Requires `operators_per_epoch * batch_op_groups == batch_operator_minimum_active` and enforces the size caps (`MAX_OPERATORS_PER_EPOCH` 100, `MAX_BATCH_OP_GROUPS` 255, `MAX_SCHEDULED_BATCH_OPERATORS` 1000) |
+| `setconfig` | `sysio.epoch` | Set the epoch configuration. Requires `operators_per_epoch * batch_op_groups == batch_operator_minimum_active` and enforces the outposts' limits (`MAX_OPERATORS_PER_EPOCH` 7, Ethereum's group size; `MAX_BATCH_OP_GROUPS` 8, Solana's group count), so the window holds at most `MAX_SCHEDULED_BATCH_OPERATORS` (56) |
 | `schbatchgps` | `sysio.epoch` | Build the initial window from the `ACTIVE` batch operators on `sysio.opreg` (non-bootstrapped first, then bootstrapped, trimmed to `batch_operator_minimum_active`) |
 | `advance` | permissionless at genesis (epoch 0 → 1); afterwards `sysio.msgch` or `sysio.epoch` | Advance the epoch once the wall-clock boundary has passed and the contract is not paused |
 | `pause` | `sysio.chalg` | Set the global pause |
@@ -45,8 +45,9 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
    The resident groups stay disjoint, so an operator serves at most once every `batch_op_groups`
    epochs.
 4. `sysio.opreg::flushwtdw` matures queued collateral withdrawals.
-5. Queue `OPERATORS` and `BATCH_OPERATOR_GROUPS` to every active outpost through
-   `sysio.msgch::queueout` (an empty group is withheld), then `sysio.msgch::buildenv` per outpost.
+5. Queue `OPERATORS` (the operators the window seats, with their status and authex links; none for
+   an empty window) and `BATCH_OPERATOR_GROUPS` (withheld when the next group is empty) to every
+   active outpost through `sysio.msgch::queueout`, then `sysio.msgch::buildenv` per outpost.
 6. `sysio.system::accrueepoch` and `rcrdbatch`, plus `payepoch` on pay epochs.
 
 ## Dependencies

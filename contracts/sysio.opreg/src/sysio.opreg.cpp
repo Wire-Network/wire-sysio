@@ -1289,8 +1289,10 @@ void opreg::slash(name account, std::string reason) {
 
    // Record one SLASH entry per (chain_code, token_code) with non-zero slashable
    // in the operator's recent_actions log (success=true since the slash itself
-   // was applied). Nothing is sent to an outpost: they learn the SLASHED status
-   // from the next OPERATORS roster.
+   // was applied). Nothing is sent to an outpost: each OPERATORS roster lists the
+   // operator as SLASHED while the schedule window seats it and leaves it out once
+   // its group has left, which revokes it on each outpost that applies that roster
+   // (an empty window queues none).
    for (const auto& sp : to_slash) {
       auto slash_action = build_slash_action(op.account, op.type,
                                              sp.chain_code, sp.token_code, sp.amount,
