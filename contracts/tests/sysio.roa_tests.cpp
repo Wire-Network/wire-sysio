@@ -38,6 +38,13 @@ using sysio::chain::compute_table_id;
 constexpr account_name ROA = "sysio.roa"_n;
 constexpr uint64_t NETWORK_GEN = 0;
 
+/// Weight fields of a `policies` row.
+namespace policy_field {
+constexpr char net_weight[] = "net_weight";
+constexpr char cpu_weight[] = "cpu_weight";
+constexpr char ram_weight[] = "ram_weight";
+} // namespace policy_field
+
 /// Generated sub-account names newuser checks before giving up.
 constexpr size_t NEWUSER_MAX_NAME_ATTEMPTS = 100;
 /// newuser's abort when the nonce was already used by the same creator.
@@ -1509,31 +1516,34 @@ BOOST_FIXTURE_TEST_CASE( reducepolicy_wrong_symbol, sysio_roa_full_tester ) try 
 BOOST_FIXTURE_TEST_CASE( policy_actions_reject_future_network_gen, sysio_roa_full_tester ) try {
    constexpr auto future_gen  = NETWORK_GEN + 1;
    constexpr auto invalid_gen = "Invalid network generation.";
+   constexpr auto granted     = "2.0000 SYS";   // per resource, by addpolicy
+   constexpr auto step        = "1.0000 SYS";   // per resource, added by expandpolicy and taken back by reducepolicy
+   constexpr uint32_t unlocked_time_block = 0;  // lets reducepolicy run at once
    const auto issuer = node_owners[2];
    const auto user   = create_newuser(issuer);
    produce_block();
 
    BOOST_CHECK_EXCEPTION(
-      add_roa_policy(issuer, user, "2.0000 SYS", "2.0000 SYS", "2.0000 SYS", 0, future_gen),
+      add_roa_policy(issuer, user, granted, granted, granted, unlocked_time_block, future_gen),
       sysio_assert_message_exception, sysio_assert_message_is(invalid_gen));
-   add_roa_policy(issuer, user, "2.0000 SYS", "2.0000 SYS", "2.0000 SYS", 0, NETWORK_GEN);
+   add_roa_policy(issuer, user, granted, granted, granted, unlocked_time_block, NETWORK_GEN);
 
    BOOST_CHECK_EXCEPTION(
-      expand_roa_policy(issuer, user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", future_gen),
+      expand_roa_policy(issuer, user, step, step, step, future_gen),
       sysio_assert_message_exception, sysio_assert_message_is(invalid_gen));
-   expand_roa_policy(issuer, user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", NETWORK_GEN);
+   expand_roa_policy(issuer, user, step, step, step, NETWORK_GEN);
 
    BOOST_CHECK_EXCEPTION(
-      reduce_roa_policy(issuer, user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", future_gen),
+      reduce_roa_policy(issuer, user, step, step, step, future_gen),
       sysio_assert_message_exception, sysio_assert_message_is(invalid_gen));
-   reduce_roa_policy(issuer, user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", NETWORK_GEN);
+   reduce_roa_policy(issuer, user, step, step, step, NETWORK_GEN);
    produce_block();
 
-   // Only the current-generation calls moved the policy: 2 + 1 - 1.
+   // Only the current-generation calls moved the policy, and their expand and reduce cancel out.
    const auto p = get_policy(user, issuer);
-   BOOST_TEST(p["net_weight"].as_string() == "2.0000 SYS");
-   BOOST_TEST(p["cpu_weight"].as_string() == "2.0000 SYS");
-   BOOST_TEST(p["ram_weight"].as_string() == "2.0000 SYS");
+   for (const char* field : {policy_field::net_weight, policy_field::cpu_weight, policy_field::ram_weight}) {
+      BOOST_TEST(p[field].as_string() == granted);
+   }
 } FC_LOG_AND_RETHROW()
 
 // ===== 2. expandpolicy validation =====
