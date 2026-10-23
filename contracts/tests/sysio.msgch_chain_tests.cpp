@@ -80,7 +80,9 @@ constexpr uint32_t ENVELOPE_PRUNE_BUDGET             = 4;
 
 /// sysio.opreg action identifiers used by the WNS-16 fixture.
 namespace opreg_actions {
-constexpr name SET_CONFIG = "setconfig"_n;
+constexpr name SET_CONFIG        = "setconfig"_n;
+constexpr name RECORD_DELIVERY   = "recorddel"_n;
+constexpr name TERMINATION_CHECK = "termcheck"_n;
 } // namespace opreg_actions
 
 /// sysio.opreg ABI field identifiers used by the WNS-16 fixture.
@@ -194,6 +196,11 @@ constexpr const char* DISPUTE_ID       = "dispute_id";
 constexpr const char* OWNER            = "owner";
 } // namespace chalg_vote_fields
 
+/// sysio.chains action identifiers used to activate a chain registered after genesis.
+namespace chains_actions {
+constexpr name ACTIVATE_CHAIN = "activchain"_n;
+} // namespace chains_actions
+
 /// sysio.epoch ABI field identifiers used by the WNS-16 fixture.
 namespace epoch_fields {
 constexpr const char* BATCH_OP_GROUPS       = "batch_op_groups";
@@ -278,7 +285,7 @@ public:
       (uint64_t{ROTATION_MAX_CONSECUTIVE_MISSES} + 1) * ROTATION_GROUPS * EPOCH_DURATION_SEC * MS_PER_SEC;
 
    /// Outposts the rotation fixture registers.
-   enum class rotation_outposts { eth, eth_and_sol };
+   enum class rotation_outposts { none, eth, eth_and_sol };
 
    /// Construct an OPP integration fixture, optionally with an activated ROA that has no
    /// registered node owners to exercise the msgch electorate preflight.
@@ -959,14 +966,31 @@ public:
    /// of next_epoch_start spaces every epoch's records exactly epoch_duration apart -- the exact-span
    /// timing the SEC-28 window bound is defined against, with no block-granularity drift.
    uint32_t advance_to_next_epoch() {
+      advance_to_next_epoch_trace();
+      return current_epoch();
+   }
+
+   /// `advance_to_next_epoch`, returning the `advance` trace so a test can inspect its inline actions.
+   transaction_trace_ptr advance_to_next_epoch_trace() {
       auto st = read_epoch_state();
       BOOST_REQUIRE(!st.is_null());
       auto next  = st["next_epoch_start"].as<fc::time_point>();
       auto delta = next - control->head().block_time();
       if (delta.count() > 0) produce_block(delta);
-      BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, MSGCH_ACCOUNT, "advance"_n, mvo()));
+      auto trace = sysio_system::test_support::push_contract_action_trace(
+         *this, EPOCH_ACCOUNT, epoch_abi, MSGCH_ACCOUNT, "advance"_n, mvo());
       produce_blocks();
-      return current_epoch();
+      return trace;
+   }
+
+   /// How many times `account` executed its `action` in `trace`, inline actions included.
+   static uint32_t action_count(const transaction_trace_ptr& trace, name account, name action) {
+      BOOST_REQUIRE(trace);
+      uint32_t n = 0;
+      for (const auto& at : trace->action_traces) {
+         if (at.receiver == account && at.act.account == account && at.act.name == action) ++n;
+      }
+      return n;
    }
 
    static fc::variant make_chain_min_bond(std::string_view chain_code, std::string_view token_code,
@@ -1028,6 +1052,7 @@ public:
    /// registered outposts' chain codes.
    std::vector<uint64_t> bootstrap_rotation(uint64_t terminate_window_ms, bool batchop_is_bootstrapped = false,
                                             rotation_outposts outposts = rotation_outposts::eth) {
+      const bool with_eth = outposts != rotation_outposts::none;
       const bool with_sol = outposts == rotation_outposts::eth_and_sol;
 
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "setconfig"_n, mvo()
@@ -1054,7 +1079,9 @@ public:
             make_chain_min_bond(WIRE_CHAIN_CODE, WIRE_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL) })
          ("req_uw_collat",                    fc::variants{})));
 
-      register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, ETH_CHAIN_CODE, ETH_EXTERNAL_CHAIN_ID);
+      if (with_eth) {
+         register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, ETH_CHAIN_CODE, ETH_EXTERNAL_CHAIN_ID);
+      }
       if (with_sol) {
          register_chain(opp::types::ChainKind::CHAIN_KIND_SVM, SOL_CHAIN_CODE, SOL_EXTERNAL_CHAIN_ID);
       }
@@ -1084,8 +1111,10 @@ public:
       BOOST_REQUIRE_EQUAL(success(), push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, "advance"_n, mvo()));
       produce_blocks();
 
-      return with_sol ? std::vector<uint64_t>{ETH_OUTPOST_ID, SOL_OUTPOST_ID}
-                      : std::vector<uint64_t>{ETH_OUTPOST_ID};
+      std::vector<uint64_t> registered;
+      if (with_eth) registered.push_back(ETH_OUTPOST_ID);
+      if (with_sol) registered.push_back(SOL_OUTPOST_ID);
+      return registered;
    }
 
    /// Walk the rotation through advance() until BATCHOP terminates. On its first duty epoch BATCHOP
@@ -1937,6 +1966,40 @@ BOOST_FIXTURE_TEST_CASE(advance_records_one_row_per_member_per_epoch, sysio_msgc
       BOOST_REQUIRE_EQUAL(1u, rows.size());
       BOOST_REQUIRE_EQUAL(delivered, rows.front()[opreg_fields::DELIVERED].as<bool>());
    }
+} FC_LOG_AND_RETHROW() }
+
+/// With no active outpost the expiring group had nothing to deliver, so advance() sends neither recorddel
+/// nor termcheck; "delivered to every active outpost" would otherwise hold vacuously (0 of 0). Once an
+/// outpost is active, the next advance records and checks the expiring member again.
+BOOST_FIXTURE_TEST_CASE(advance_without_active_outpost_records_nothing, sysio_msgch_chain_tester) { try {
+   BOOST_REQUIRE(bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/false,
+                                    rotation_outposts::none).empty());
+
+   // One full rotation, so every group expires once.
+   for (uint32_t step = 0; step < ROTATION_GROUPS; ++step) {
+      const auto trace = advance_to_next_epoch_trace();
+      BOOST_REQUIRE_EQUAL(0u, action_count(trace, OPREG_ACCOUNT, opreg_actions::RECORD_DELIVERY));
+      BOOST_REQUIRE_EQUAL(0u, action_count(trace, OPREG_ACCOUNT, opreg_actions::TERMINATION_CHECK));
+   }
+   for (const auto& member : {BATCHOP, BATCHOP_B, BATCHOP_C}) BOOST_REQUIRE(dellog_rows(member).empty());
+   BOOST_REQUIRE(opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE ==
+                 get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+
+   // A chain registered after genesis starts inactive until activchain.
+   register_chain(opp::types::ChainKind::CHAIN_KIND_EVM, ETH_CHAIN_CODE, ETH_EXTERNAL_CHAIN_ID);
+   BOOST_REQUIRE_EQUAL(success(), push(CHAINS_ACCOUNT, chains_abi, CHAINS_ACCOUNT, chains_actions::ACTIVATE_CHAIN,
+                                       mvo()("code", ETH_CHAIN_CODE)));
+   produce_blocks(); // land both before the advance's epoch-length jump expires them
+   const name     expiring_member = duty_member();
+   const uint32_t expiring_epoch  = current_epoch();
+   const auto     trace           = advance_to_next_epoch_trace();
+   BOOST_REQUIRE_EQUAL(ROTATION_OPERATORS_PER_GROUP,
+                       action_count(trace, OPREG_ACCOUNT, opreg_actions::RECORD_DELIVERY));
+   BOOST_REQUIRE_EQUAL(ROTATION_OPERATORS_PER_GROUP,
+                       action_count(trace, OPREG_ACCOUNT, opreg_actions::TERMINATION_CHECK));
+   const auto rows = dellog_rows(expiring_member, expiring_epoch);
+   BOOST_REQUIRE_EQUAL(1u, rows.size());
+   BOOST_REQUIRE(!rows.front()[opreg_fields::DELIVERED].as<bool>());
 } FC_LOG_AND_RETHROW() }
 
 // SEC-28 (huang review): terminate on the CONSECUTIVE-miss rail through the REAL rotation -- a
