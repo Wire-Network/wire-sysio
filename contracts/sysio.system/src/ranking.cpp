@@ -247,8 +247,20 @@ namespace sysiosystem {
          return;
       }
 
-      // Sort by producer name for deterministic ordering
-      std::sort( top_producers.begin(), top_producers.end(), []( const value_type& lhs, const value_type& rhs ) {
+      // Rank picked WHO is scheduled. A new set runs in `location` order, name breaking ties. The
+      // set already producing keeps its order: a reorder alone reassigns rounds at activation and
+      // skips miss attribution, so a location change must wait for the set to change.
+      const auto active_schedule = sysio::get_active_producers();
+      const auto active_position = [&]( const value_type& p ) {
+         return static_cast<size_t>( std::find( active_schedule.begin(), active_schedule.end(), p.first.producer_name )
+                                     - active_schedule.begin() );
+      };
+      const bool same_set = top_producers.size() == active_schedule.size()
+         && std::all_of( top_producers.begin(), top_producers.end(),
+                         [&]( const value_type& p ) { return active_position( p ) < active_schedule.size(); } );
+      std::sort( top_producers.begin(), top_producers.end(), [&]( const value_type& lhs, const value_type& rhs ) {
+         if( same_set ) return active_position( lhs ) < active_position( rhs );
+         if( lhs.second != rhs.second ) return lhs.second < rhs.second;
          return lhs.first.producer_name < rhs.first.producer_name;
       } );
 

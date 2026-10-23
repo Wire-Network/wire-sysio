@@ -39,6 +39,27 @@ struct ethereum_confirm_options {
    /// Retry / backoff / deadline envelope — shared with the Solana client.
    /// See `fc::task::retry_options` for per-field semantics.
    fc::task::retry_options   retry         = fc::task::retry_option_defaults;
+
+   /// Least gas limit the transaction is funded with, applied AFTER the
+   /// buffered estimate; `0` leaves the estimate alone.
+   ///
+   /// For a call that stops on a `gasleft()` watchdog and records where it
+   /// stopped rather than reverting, `eth_estimateGas` converges on the least
+   /// gas at which the call returns cleanly, so the estimate systematically
+   /// under-funds it. A floor above the client's `max_gas_limit` is a policy
+   /// rejection, never a silently clamped limit. Ignored when `gas_limit_cap`
+   /// is set.
+   uint64_t                  gas_limit_floor = 0;
+
+   /// The gas limit the transaction is sent with, and the gas the pre-flight
+   /// estimate runs under; `0` leaves the limit to the buffered estimate (and
+   /// the floor). A call that cannot succeed inside the cap is refused by the
+   /// node before anything is signed, instead of reverting on chain for the
+   /// whole budget. The estimate's value is discarded: what is simulated is
+   /// what is sent, so no headroom buffer or buffered-estimate ceiling check
+   /// applies. Must be at least the floor; a cap above the policy ceiling is a
+   /// policy rejection.
+   uint64_t                  gas_limit_cap = 0;
 };
 
 inline constexpr ethereum_confirm_options ethereum_confirm_option_defaults{};
@@ -414,7 +435,9 @@ public:
    fc::uint256 estimate_gas(const address_compat_type& to,
       const std::optional<fc::uint256>& value = {0}, const std::optional<gas_config_t>& gas_config = std::nullopt);
 
-   fc::uint256 estimate_gas(const address_compat_type& to, const abi::contract& contract, const data_or_params_t& params, const std::optional<gas_config_t>& gas_config = std::nullopt);
+   /// @param gas_limit_cap When non-zero, the `gas` the estimate is asked to
+   ///        fit in: the node refuses a call that cannot succeed inside it.
+   fc::uint256 estimate_gas(const address_compat_type& to, const abi::contract& contract, const data_or_params_t& params, const std::optional<gas_config_t>& gas_config = std::nullopt, uint64_t gas_limit_cap = 0);
 
    /**
     * @brief Retrieves the current gas price.
@@ -480,6 +503,26 @@ public:
    std::string wait_for_confirmation(const std::string& tx_hash,
                                       const ethereum_confirm_options& opts =
                                          ethereum_confirm_option_defaults);
+
+   /**
+    * @brief Wait for a previously-submitted tx hash to be included and
+    *        confirmed at `opts.confirmations` depth, and return its receipt.
+    *
+    * Its `blockNumber` lets follow-up reads pin to the block that holds the
+    * effect, and its `logs` carry the events the contract emitted; re-reading
+    * state at `latest` instead risks a lagging backend serving a block from
+    * before the transaction landed.
+    *
+    * Same two-phase wait as `wait_for_confirmation`.
+    *
+    * @param tx_hash Transaction hash returned by an earlier submit.
+    * @param opts    Confirmation depth + retry/backoff envelope.
+    * @return The `eth_getTransactionReceipt` object, as the node returned it.
+    * @throws fc::timeout_exception on deadline expiry, fc::exception on an
+    *         on-chain revert (`status == 0`).
+    */
+   fc::variant wait_for_receipt(const std::string& tx_hash,
+                                const ethereum_confirm_options& opts = ethereum_confirm_option_defaults);
 
    /**
     * @brief Retrieves logs based on filter parameters.
@@ -569,10 +612,15 @@ public:
     * @param to Recipient address (contract address for contract calls)
     * @param contract ABI contract definition for encoding the call data
     * @param params Parameters to pass to the contract function
+    * @param gas_limit_floor Least gas limit to fund the transaction with, or 0
+    *        to use the buffered estimate; see `ethereum_confirm_options::gas_limit_floor`
+    * @param gas_limit_cap The gas limit to send with, and the bound the estimate
+    *        runs under, or 0 for none; see `ethereum_confirm_options::gas_limit_cap`
     * @return Configured eip1559_tx ready for signing and submission
     */
    eip1559_tx create_default_tx(const address_compat_type& to, const abi::contract& contract,
-                                const fc::variants& params = {});
+                                const fc::variants& params = {}, uint64_t gas_limit_floor = 0,
+                                uint64_t gas_limit_cap = 0);
 
    /**
     * @brief Gets or creates a typed contract client instance
@@ -700,7 +748,8 @@ ethereum_contract_tx_fn<RT, Args...> ethereum_contract_client::create_tx_and_con
    abi::contract& abi = abi_map[contract.name];
    return [this, &abi, opts](const Args&... args) -> RT {
       contract_invoke_data_items params = {args...};
-      auto tx      = client->create_default_tx(contract_address, abi, params);
+      auto tx      = client->create_default_tx(contract_address, abi, params, opts.gas_limit_floor,
+                                               opts.gas_limit_cap);
       auto res_var = client->execute_contract_tx_fn(tx, abi, params);
 
       // `execute_contract_tx_fn` returns the submitted tx hash. Await

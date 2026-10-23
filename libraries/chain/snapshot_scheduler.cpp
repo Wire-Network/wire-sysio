@@ -266,7 +266,6 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
    const auto head_block_num = chain.head().block_num();
    const auto head_block_time = chain.head().block_time();
    const auto& snapshot_path = pending_snapshot<snapshot_information>::get_final_path(head_id, _snapshots_dir);
-   const auto& temp_path = pending_snapshot<snapshot_information>::get_temp_path(head_id, _snapshots_dir);
 
    // maintain legacy exception if the snapshot exists
    if(fs::is_regular_file(snapshot_path)) {
@@ -278,22 +277,27 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
    fc::crypto::blake3 captured_root_hash;
    auto write_snapshot = [&](const fs::path& p) -> void {
       fs::create_directory(p.parent_path());
-      auto writer = std::make_shared<threaded_snapshot_writer>(p);
-      chain.write_snapshot(writer);
-      writer->finalize();
-      captured_root_hash = writer->get_root_hash();
+      fc::io::atomic_file output(p);
+      {
+         auto writer = std::make_shared<threaded_snapshot_writer>(output.temporary_path());
+         chain.write_snapshot(writer);
+         writer->finalize();
+         captured_root_hash = writer->get_root_hash();
+         writer->close();
+      }
+      try {
+         output.commit();
+      } catch (const std::filesystem::filesystem_error& e) {
+         SYS_THROW(snapshot_finalization_exception, "Unable to finalize snapshot {} at block {}: {}",
+                   p.string(), head_block_num, e.what());
+      }
    };
 
    // If in irreversible mode, create snapshot and return path to snapshot immediately.
    if(chain.get_read_mode() == db_read_mode::IRREVERSIBLE) {
       try {
          ilog("Starting snapshot creation at block {}", head_block_num);
-         write_snapshot(temp_path);
-         std::error_code ec;
-         fs::rename(temp_path, snapshot_path, ec);
-         SYS_ASSERT(!ec, snapshot_finalization_exception,
-                    "Unable to finalize valid snapshot of block number {}: [code: {}] {}",
-                    head_block_num, ec.value(), ec.message());
+         write_snapshot(snapshot_path);
 
          ilog("Snapshot creation at block {} complete; snapshot placed at {}", head_block_num, snapshot_path.string());
          snapshot_information si{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, snapshot_path.generic_string(), captured_root_hash};
@@ -320,14 +324,7 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
 
       try {
          ilog("Starting snapshot creation at block {}", head_block_num);
-         write_snapshot(temp_path);// create a new pending snapshot
-
-         std::error_code ec;
-         fs::rename(temp_path, pending_path, ec);
-         SYS_ASSERT(!ec, snapshot_finalization_exception,
-                    "Unable to promote temp snapshot {} to pending {} for block number {}: [code: {}] {}",
-                    temp_path.generic_string(), pending_path.generic_string(),
-                    head_block_num, ec.value(), ec.message());
+         write_snapshot(pending_path);
          ilog("Snapshot creation at block {} complete; snapshot will be available once block {} becomes irreversible", head_block_num, head_id);
          _pending_snapshot_index.emplace(head_id, head_block_time, next, pending_path.generic_string(), snapshot_path.generic_string(), captured_root_hash);
          add_pending_snapshot_info(snapshot_information{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, pending_path.generic_string(), captured_root_hash});

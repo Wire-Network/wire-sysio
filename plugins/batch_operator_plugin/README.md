@@ -17,11 +17,13 @@ Run by every member of the elected group, for every active outpost chain:
 **Outbound (WIRE → Outposts):**
 1. Read the outpost's outbound envelope that `sysio.epoch::advance` built
    (`sysio.msgch::buildenv`) from the depot's `outenvelopes` table
-2. Deliver it to the Outpost contract, chunked (ETH: `OPPInbound.epochIn()`, SOL: `epoch_in`)
+2. Deliver it to the Outpost contract (ETH: one `OPPInbound.epochIn()` carrying the whole envelope,
+   continued while its dispatch spills; SOL: `epoch_in`, chunked)
 3. The outpost reaches consensus once enough group members have delivered identical bytes
 
 **Inbound (Outposts → WIRE):**
-1. The consensus-reaching delivery emits the outpost's outbound envelope
+1. The outpost emits its outbound envelope once it has dispatched the inbound one (ETH: in the `epochIn`
+   that finishes dispatch, a continuation if it spilled; SOL: in the consensus-reaching `epoch_in`)
 2. Read the latest outbound envelope from Outpost storage
 3. Deliver its raw protobuf bytes to Depot (`sysio.msgch::deliver`)
 4. Depot evaluates consensus across the group's deliveries
@@ -50,7 +52,7 @@ by the underwriter every poll (see [Underwriter](#underwriter)).
 |--------|---------|-------------|
 | `--batch-operator-account` | — | WIRE account name for this operator. Configuring it enables the relay |
 | `--batch-epoch-poll-ms` | 15000 | How often to check epoch state (ms) |
-| `--batch-delivery-timeout-ms` | 15000 | Max time to wait for chain delivery confirmation (ms) |
+| `--batch-delivery-timeout-ms` | 15000 | Max time for one outbound delivery, every transaction and confirmation wait included (ms). On Ethereum a single receipt wait may use whatever of it is left, so size it past the outpost chain's block time. |
 | `--batch-yield-tick-interval-ms` | 60000 | Minimum spacing between this operator's `sysio.swap::tickyield` pushes per yield pool (ms) |
 | `--batch-underwriter-account` | none | `account` or `account@permission` (default `active`) the underwriter bonds from. Configuring it enables the underwriter |
 | `--batch-underwriter-max-exposure` | none | Most the underwriter may have bonded at once in one shadow token, as an asset (`100.000000000 LIQETH`). Repeat per token; a token without one is not underwritten |
