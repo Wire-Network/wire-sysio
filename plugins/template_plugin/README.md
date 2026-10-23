@@ -151,7 +151,7 @@ ninja -C build/debug test_<name>
 
 If the `test/` directory carries its own `CMakeLists.txt`, `plugin_target` defers to it instead of globbing,
 and the binary lands under `build/debug/plugins/<name>/test/` — that is how the larger suites in this tree
-(`chain_plugin`, `net_plugin`, `producer_plugin`, `status_monitor_plugin`) are laid out.
+(`chain_plugin`, `net_plugin`, `producer_plugin`, `alert_monitor_plugin`) are laid out.
 
 ## Related
 
