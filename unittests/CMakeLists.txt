@@ -28,6 +28,13 @@ else()
   add_subdirectory(test-contracts)
 endif()
 
+# Runtimes the unit_test and wasm_spec_test entries run on. Native-module tests require .so files built by
+# add_native_contract (needs CDT).
+set(UNIT_TEST_RUNTIMES ${SYSIO_WASM_RUNTIMES})
+if(NOT BUILD_SYSTEM_CONTRACTS)
+  list(REMOVE_ITEM UNIT_TEST_RUNTIMES native-module)
+endif()
+
 if(NOT DISABLE_WASM_SPEC_TESTS)
   add_subdirectory(wasm-spec-tests/generated-tests)
 endif()
@@ -59,6 +66,9 @@ unittest_target(
   protocol_feature_digest_tests.cpp
 ) # build unit tests as one executable
 
+# snapshot_attest_fixture.hpp includes the snapshot-attestation constants owned by the sysio.system contract.
+target_include_directories(unit_test PRIVATE ${CMAKE_SOURCE_DIR}/contracts/sysio.system/include)
+
 # No pkg-config cflags; keep flags minimal & portable
 target_compile_options(unit_test PUBLIC -DDISABLE_SYSLIB_SERIALIZE)
 
@@ -71,59 +81,29 @@ endif()
 
 ### MARK TEST SUITES FOR EXECUTION ###
 add_p_test(NAME protocol_feature_digest_unit_test COMMAND unit_test --run_test=protocol_feature_digest_tests --report_level=detailed --log_level=all --color_output)
-set(ctest_tests "protocol_feature_digest_tests")
-foreach(TEST_SUITE ${UNIT_TESTS}) # create an independent target for each test suite
-  execute_process(COMMAND sh -c "grep -E 'BOOST_AUTO_TEST_SUITE\\s*[(]' '${TEST_SUITE}' | grep -vE '//.*BOOST_AUTO_TEST_SUITE\\s*[(]' | cut -d ')' -f 1 | cut -d '(' -f 2" OUTPUT_VARIABLE SUITE_NAMES OUTPUT_STRIP_TRAILING_WHITESPACE) # get the test suite name from the *.cpp file
-  string(REPLACE "\n" ";" SUITE_NAMES "${SUITE_NAMES}")
-  foreach(SUITE_NAME IN LISTS SUITE_NAMES)
-    if (NOT "" STREQUAL "${SUITE_NAME}") # ignore empty lines
-      execute_process(COMMAND sh -c "echo ${SUITE_NAME} | sed -e 's/s$//' | sed -e 's/_test$//'" OUTPUT_VARIABLE TRIMMED_SUITE_NAME OUTPUT_STRIP_TRAILING_WHITESPACE) # trim "_test" or "_tests" from the end of ${SUITE_NAME}
-      # to run unit_test with all log from blockchain displayed, put "--verbose" after "--", i.e. "unit_test -- --verbose"
-      foreach(RUNTIME ${SYSIO_WASM_RUNTIMES})
-        # Native-module tests require .so files built by add_native_contract (needs CDT).
-        if(RUNTIME STREQUAL "native-module" AND NOT BUILD_SYSTEM_CONTRACTS)
-          continue()
-        endif()
-        add_p_test(NAME ${TRIMMED_SUITE_NAME}_unit_test_${RUNTIME} COMMAND unit_test --run_test=${SUITE_NAME} --report_level=detailed --log_level=all --color_output -- --${RUNTIME})
-        # add a duplicate test to run without fsgsbase instructions for a limited number of OC wasm tests
-        if(RUNTIME STREQUAL "sys-vm-oc" AND TRIMMED_SUITE_NAME MATCHES "^wasm_part")
-           add_p_test(NAME ${TRIMMED_SUITE_NAME}_unit_test_${RUNTIME}-nofsgs COMMAND unit_test --run_test=${SUITE_NAME} --report_level=detailed --log_level=all --color_output -- --${RUNTIME} COST 5000)
-           set_tests_properties(${TRIMMED_SUITE_NAME}_unit_test_${RUNTIME}-nofsgs PROPERTIES ENVIRONMENT "SYSIO_DISABLE_FSGSBASE=1")
-        endif()
-        # build list of tests to run during coverage testing
-        if(ctest_tests)
-          string(APPEND ctest_tests "|")
-        endif()
-        string(APPEND ctest_tests ${TRIMMED_SUITE_NAME}_unit_test_$RUNTIME)
-      endforeach()
-    endif()
-  endforeach()
-endforeach()
-set(ctest_tests "'${ctest_tests}' -j8") # surround test list string in apostrophies
-
-# The following tests are known to take the longest, bump up their cost (priority) so that they'll run first
-# even on fresh first time test runs before ctest auto-detects costs
-foreach(RUNTIME ${SYSIO_WASM_RUNTIMES})
-   if(RUNTIME STREQUAL "native-module" AND NOT BUILD_SYSTEM_CONTRACTS)
-      continue()
-   endif()
-   set_tests_properties(api_part1_unit_test_${RUNTIME} PROPERTIES COST 5000)
-   set_tests_properties(api_part2_unit_test_${RUNTIME} PROPERTIES COST 5000)
-   set_tests_properties(api_part3_unit_test_${RUNTIME} PROPERTIES COST 5000)
-   set_tests_properties(checktime_unit_test_${RUNTIME} PROPERTIES COST 5000)
-   set_tests_properties(wasm_part1_unit_test_${RUNTIME} PROPERTIES COST 5000)
-   set_tests_properties(wasm_part2_unit_test_${RUNTIME} PROPERTIES COST 5000)
-   set_tests_properties(wasm_part3_unit_test_${RUNTIME} PROPERTIES COST 5000)
-   set_tests_properties(wasm_config_part1_unit_test_${RUNTIME} PROPERTIES COST 5000)
-   set_tests_properties(wasm_config_part2_unit_test_${RUNTIME} PROPERTIES COST 5000)
-   set_tests_properties(wasm_config_part3_unit_test_${RUNTIME} PROPERTIES COST 5000)
-   set_tests_properties(wasm_config_part4_unit_test_${RUNTIME} PROPERTIES COST 5000)
-   set_tests_properties(wasm_config_part5_unit_test_${RUNTIME} PROPERTIES COST 5000)
-   set_tests_properties(snapshot_part1_unit_test_${RUNTIME} PROPERTIES COST 4000)
-   set_tests_properties(snapshot_part2_unit_test_${RUNTIME} PROPERTIES COST 4000)
-   set_tests_properties(finality_unit_test_${RUNTIME} PROPERTIES COST 4000)
-   set_tests_properties(delay_unit_test_${RUNTIME} PROPERTIES COST 3000)
-endforeach()
+# One entry per suite per runtime, <suite without _tests>_unit_test_<runtime>, discovered from the built executable.
+# To run unit_test with all log from blockchain displayed, put "--verbose" after "--", i.e. "unit_test -- --verbose".
+# COST starts the longest suites first, even on a fresh run before ctest has measured them.
+boost_test_discover_tests(unit_test
+        NAME @NAME@_unit_test_@RUNTIME@
+        NAME_STRIP "s$" "_test$"
+        RUNTIMES ${UNIT_TEST_RUNTIMES}
+        EXCLUDE "^protocol_feature_digest_tests$" # registered above: it does not depend on the runtime
+        ARGS --report_level=detailed --log_level=all --color_output
+        COST_BY_NAME "^(api_part[1-3]|checktime|wasm_part[1-3]|wasm_config_part[1-5])$" 5000
+             "^(snapshot_part[12]|finality)$" 4000
+             "^delay$" 3000)
+if("sys-vm-oc" IN_LIST UNIT_TEST_RUNTIMES)
+  # The wasm_part suites also run on sys-vm-oc without fsgsbase instructions.
+  boost_test_discover_tests(unit_test
+          NAME @NAME@_unit_test_@RUNTIME@-nofsgs
+          NAME_STRIP "s$" "_test$"
+          RUNTIMES sys-vm-oc
+          INCLUDE "^wasm_part"
+          ARGS --report_level=detailed --log_level=all --color_output
+          PROPERTIES ENVIRONMENT SYSIO_DISABLE_FSGSBASE=1 COST 5000)
+endif()
+set(ctest_tests "'_unit_test_|^protocol_feature_digest_unit_test' -LE wasm_spec_tests -j8") # every unit_test entry
 
 ### COVERAGE TESTING ###
 if(ENABLE_COVERAGE_TESTING)

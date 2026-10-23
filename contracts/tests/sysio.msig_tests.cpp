@@ -1053,16 +1053,15 @@ BOOST_FIXTURE_TEST_CASE( sendinline, sysio_msig_tester ) try {
 // threshold inside the contract is `proposal_chunk_size = 200 * 1024`, so
 // every test below builds an inner trx larger than that.
 //
-// We construct the large trx by stacking two `setcode` actions whose `code`
-// field carries the full sysio.system wasm (~134 KiB). Two of those puts the
-// serialized inner trx well above 200 KiB, while keeping each individual
-// dispatched action under `max_inline_action_size` so `exec` succeeds.
+// Two setcode actions carry a minimal valid WASM with bounded custom-section
+// padding. This tests chunking independently of production sysio.system's size:
+// two current system WASMs can exceed the outer transaction's NET limit.
 // ---------------------------------------------------------------------------
 
 namespace {
    // Build an inner transaction whose serialized form is larger than the contract's
-   // chunk threshold. Two setcode actions to two different accounts, each carrying
-   // the full sysio.system wasm. Total ≈ 270 KiB, which forces chunking.
+   // chunk threshold. Two setcode actions total approximately 280 KiB, above
+   // the KV row limit but below the outer transaction NET limit.
    //
    // `expiration_iso` controls the wrapped trx's expiration; defaults to far-future so
    // the common happy-path tests don't have to reason about block time. Tests that
@@ -1072,7 +1071,15 @@ namespace {
                                   sysio_msig_tester& t,
                                   const std::string& expiration_iso = "2025-01-01T00:30")
    {
-      auto wasm = contracts::system_wasm();
+      constexpr uint32_t PaddingBytes = 140 * 1024;
+      constexpr size_t ChunkThreshold = 200 * 1024;
+      constexpr size_t FixtureTransactionLimit = 320 * 1024;
+      auto wasm = wast_to_wasm(R"((module (func (export "apply") (param i64 i64 i64))))");
+      wasm.push_back(0); // WASM custom section.
+      const auto section_size = fc::raw::pack(fc::unsigned_int(PaddingBytes + 1));
+      wasm.insert(wasm.end(), section_size.begin(), section_size.end());
+      wasm.push_back(0); // Empty section name; the remaining bytes are padding.
+      wasm.resize(wasm.size() + PaddingBytes, 0);
 
       auto make_setcode = [&](const char* account_name) {
          return fc::mutable_variant_object()
@@ -1098,6 +1105,8 @@ namespace {
       transaction trx;
       abi_serializer::from_variant(pretty_trx, trx, t.get_resolver(),
                                    abi_serializer::create_yield_function(base_tester::abi_serializer_max_time));
+      BOOST_REQUIRE_GT(fc::raw::pack_size(trx), ChunkThreshold);
+      BOOST_REQUIRE_LT(fc::raw::pack_size(trx), FixtureTransactionLimit);
       return trx;
    }
 }

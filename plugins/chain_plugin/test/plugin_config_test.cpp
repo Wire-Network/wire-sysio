@@ -16,7 +16,7 @@
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/http_client_plugin/http_client_options.hpp>
-#include <sysio/protocol/snapshot_attestation.hpp>
+#include <sysio.system/snapshot_attest_constants.hpp>
 #include <sysio/testing/tester.hpp>
 #include <snapshot_attest_fixture.hpp>
 #include <stdint.h>
@@ -27,7 +27,7 @@
 
 namespace {
 
-namespace snapshot_attest = sysio::protocol::snapshot_attestation;
+namespace snapshot_attest = sysiosystem::snapshot_attestation;
 namespace http = boost::beast::http;
 
 /** Shared command-line and fixture constants for chain-plugin configuration tests. */

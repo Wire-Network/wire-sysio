@@ -29,8 +29,6 @@ namespace {
 // Well-formed sample addresses for the accept paths.
 constexpr auto EVM_OPP      = "0x5FbDB2315678afecb367f032d93F642f64180aa3";  // OPP.sol
 constexpr auto EVM_INBOUND  = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";  // OPPInbound.sol
-constexpr auto EVM_OPREG    = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";  // OperatorRegistry.sol
-constexpr auto EVM_DEPOSIT  = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";  // SwapDeposit emitter
 constexpr auto SVM_PROGRAM  = "So11111111111111111111111111111111111111112"; // 43-char base58
 
 } // namespace
@@ -116,33 +114,28 @@ public:
 
 BOOST_AUTO_TEST_SUITE(sysio_chains_tests)
 
-// ── EVM: all four role addresses are accepted and stored verbatim ──
+// ── EVM: both contract addresses are accepted and stored verbatim ──
 BOOST_FIXTURE_TEST_CASE(regchain_evm_addresses_stored, sysio_chains_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1,
-      evm_outpost_mvo(EVM_OPP, EVM_INBOUND, EVM_OPREG, EVM_DEPOSIT)));
+      evm_outpost_mvo(EVM_OPP, EVM_INBOUND)));
    BOOST_REQUIRE_EQUAL(std::string(EVM_OPP),     stored_addr("ETH", "opp_addr"));
    BOOST_REQUIRE_EQUAL(std::string(EVM_INBOUND), stored_addr("ETH", "opp_inbound_addr"));
-   BOOST_REQUIRE_EQUAL(std::string(EVM_OPREG),   stored_addr("ETH", "operator_registry_addr"));
-   BOOST_REQUIRE_EQUAL(std::string(EVM_DEPOSIT), stored_addr("ETH", "source_deposit_addr"));
 } FC_LOG_AND_RETHROW() }
 
-// ── EVM: a malformed hex address is rejected in EVERY role, not just opp_addr ──
+// ── EVM: a malformed hex address is rejected in both fields, not just opp_addr ──
 BOOST_FIXTURE_TEST_CASE(regchain_evm_bad_hex_rejected, sysio_chains_tester) { try {
    // Wrong length.
    BOOST_REQUIRE(regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1,
-                    evm_outpost_mvo("0xdeadbeef", EVM_INBOUND, EVM_OPREG, EVM_DEPOSIT))
+                    evm_outpost_mvo("0xdeadbeef", EVM_INBOUND))
                     .find("20-byte hex address") != std::string::npos);
-   // Non-hex character in an otherwise 42-char string (trailing 'z'), in each role.
+   // Non-hex character in an otherwise 42-char string (trailing 'z'), in each field.
    const std::string bad_hex = "0x5FbDB2315678afecb367f032d93F642f64180aaz";
    BOOST_REQUIRE(regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1,
-                    evm_outpost_mvo(EVM_OPP, bad_hex, EVM_OPREG, EVM_DEPOSIT))
+                    evm_outpost_mvo(bad_hex, EVM_INBOUND))
+                    .find("opp_addr contains a non-hex character") != std::string::npos);
+   BOOST_REQUIRE(regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1,
+                    evm_outpost_mvo(EVM_OPP, bad_hex))
                     .find("opp_inbound_addr contains a non-hex character") != std::string::npos);
-   BOOST_REQUIRE(regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1,
-                    evm_outpost_mvo(EVM_OPP, EVM_INBOUND, bad_hex, EVM_DEPOSIT))
-                    .find("operator_registry_addr contains a non-hex character") != std::string::npos);
-   BOOST_REQUIRE(regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1,
-                    evm_outpost_mvo(EVM_OPP, EVM_INBOUND, EVM_OPREG, bad_hex))
-                    .find("source_deposit_addr contains a non-hex character") != std::string::npos);
    BOOST_REQUIRE(get_chain("ETH").is_null());   // nothing registered on reject
 } FC_LOG_AND_RETHROW() }
 
@@ -177,18 +170,18 @@ BOOST_FIXTURE_TEST_CASE(regchain_uncanonical_code_rejected, sysio_chains_tester)
 BOOST_FIXTURE_TEST_CASE(regchain_evm_empty_addresses_allowed, sysio_chains_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1, no_outpost_mvo()));
    BOOST_REQUIRE_EQUAL(std::string{}, stored_addr("ETH", "opp_addr"));
-   BOOST_REQUIRE_EQUAL(std::string{}, stored_addr("ETH", "source_deposit_addr"));
+   BOOST_REQUIRE_EQUAL(std::string{}, stored_addr("ETH", "opp_inbound_addr"));
 } FC_LOG_AND_RETHROW() }
 
 // ── EVM: an oversized string cannot reach sysio-billed state ──
 BOOST_FIXTURE_TEST_CASE(regchain_evm_oversized_addr_rejected, sysio_chains_tester) { try {
    const std::string too_long(4096, 'a');
    BOOST_REQUIRE(!regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1,
-                    evm_outpost_mvo(too_long, EVM_INBOUND, EVM_OPREG, EVM_DEPOSIT)).empty());
+                    evm_outpost_mvo(too_long, EVM_INBOUND)).empty());
    BOOST_REQUIRE(get_chain("ETH").is_null());
 } FC_LOG_AND_RETHROW() }
 
-// ── SVM: base58 program id in opp_addr; the single program serves every role ──
+// ── SVM: base58 program id in opp_addr; the single program also receives envelopes ──
 BOOST_FIXTURE_TEST_CASE(regchain_svm_program_id_accepted, sysio_chains_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_SVM, "SOL", 900,
                                            svm_outpost_mvo(SVM_PROGRAM)));
@@ -196,15 +189,10 @@ BOOST_FIXTURE_TEST_CASE(regchain_svm_program_id_accepted, sysio_chains_tester) {
    BOOST_REQUIRE_EQUAL(std::string{},            stored_addr("SOL", "opp_inbound_addr"));
 } FC_LOG_AND_RETHROW() }
 
-// ── SVM: every role other than opp_addr must be left empty ──
-BOOST_FIXTURE_TEST_CASE(regchain_svm_other_roles_must_be_empty, sysio_chains_tester) { try {
-   const auto with = [&](const char* inbound, const char* opreg, const char* deposit) {
-      return regchain(ChainKind::CHAIN_KIND_SVM, "SOL", 900,
-                      evm_outpost_mvo(SVM_PROGRAM, inbound, opreg, deposit));
-   };
-   BOOST_REQUIRE(with(SVM_PROGRAM, "", "").find("opp_inbound_addr must be empty") != std::string::npos);
-   BOOST_REQUIRE(with("", SVM_PROGRAM, "").find("operator_registry_addr must be empty") != std::string::npos);
-   BOOST_REQUIRE(with("", "", SVM_PROGRAM).find("source_deposit_addr must be empty") != std::string::npos);
+// ── SVM: opp_inbound_addr must be left empty ──
+BOOST_FIXTURE_TEST_CASE(regchain_svm_inbound_addr_must_be_empty, sysio_chains_tester) { try {
+   BOOST_REQUIRE(regchain(ChainKind::CHAIN_KIND_SVM, "SOL", 900, evm_outpost_mvo(SVM_PROGRAM, SVM_PROGRAM))
+                    .find("opp_inbound_addr must be empty") != std::string::npos);
    BOOST_REQUIRE(get_chain("SOL").is_null());
 } FC_LOG_AND_RETHROW() }
 
@@ -218,7 +206,7 @@ BOOST_FIXTURE_TEST_CASE(regchain_svm_bad_base58_rejected, sysio_chains_tester) {
 // ── WIRE: the depot self-row has no remote deployment ──
 BOOST_FIXTURE_TEST_CASE(regchain_wire_rejects_addresses, sysio_chains_tester) { try {
    BOOST_REQUIRE(regchain(ChainKind::CHAIN_KIND_WIRE, "WIRE", 0,
-                    evm_outpost_mvo(EVM_OPP, "", "", ""))
+                    evm_outpost_mvo(EVM_OPP, ""))
                     .find("no remote deployment") != std::string::npos);
    // WIRE with every field empty is fine.
    BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_WIRE, "WIRE", 0, no_outpost_mvo()));
@@ -229,18 +217,18 @@ BOOST_FIXTURE_TEST_CASE(setoutpost_updates_and_guards, sysio_chains_tester) { tr
    // Register EVM with empty addresses, then fill them in — the redeploy path.
    BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1, no_outpost_mvo()));
    BOOST_REQUIRE_EQUAL(success(),
-      setoutpost("ETH", evm_outpost_mvo(EVM_OPP, EVM_INBOUND, EVM_OPREG, EVM_DEPOSIT)));
-   BOOST_REQUIRE_EQUAL(std::string(EVM_OPP),   stored_addr("ETH", "opp_addr"));
-   BOOST_REQUIRE_EQUAL(std::string(EVM_OPREG), stored_addr("ETH", "operator_registry_addr"));
+      setoutpost("ETH", evm_outpost_mvo(EVM_OPP, EVM_INBOUND)));
+   BOOST_REQUIRE_EQUAL(std::string(EVM_OPP),     stored_addr("ETH", "opp_addr"));
+   BOOST_REQUIRE_EQUAL(std::string(EVM_INBOUND), stored_addr("ETH", "opp_inbound_addr"));
 
    // Same validation as regchain: a bad address is rejected and the row is unchanged.
-   BOOST_REQUIRE(setoutpost("ETH", evm_outpost_mvo("0xnothex", EVM_INBOUND, EVM_OPREG, EVM_DEPOSIT))
+   BOOST_REQUIRE(setoutpost("ETH", evm_outpost_mvo("0xnothex", EVM_INBOUND))
                     .find("20-byte hex address") != std::string::npos);
    BOOST_REQUIRE_EQUAL(std::string(EVM_OPP), stored_addr("ETH", "opp_addr"));
 
    // The whole set is replaced, so an omitted field is cleared rather than kept.
-   BOOST_REQUIRE_EQUAL(success(), setoutpost("ETH", evm_outpost_mvo(EVM_OPP, EVM_INBOUND, "", "")));
-   BOOST_REQUIRE_EQUAL(std::string{}, stored_addr("ETH", "operator_registry_addr"));
+   BOOST_REQUIRE_EQUAL(success(), setoutpost("ETH", evm_outpost_mvo(EVM_OPP, "")));
+   BOOST_REQUIRE_EQUAL(std::string{}, stored_addr("ETH", "opp_inbound_addr"));
 
    // Unregistered code is rejected.
    BOOST_REQUIRE(setoutpost("NOPE", no_outpost_mvo()).find("not registered") != std::string::npos);
@@ -251,14 +239,14 @@ BOOST_FIXTURE_TEST_CASE(setoutpost_updates_and_guards, sysio_chains_tester) { tr
 } FC_LOG_AND_RETHROW() }
 
 // ── Two same-kind EVM outposts each keep their own distinct deployment ──
-// (the registry half of WSA-075: both operator daemons read these per row.)
+// (the registry half of WSA-075: the batch-operator relay reads these per row.)
 BOOST_FIXTURE_TEST_CASE(two_evm_outposts_keep_distinct_bindings, sysio_chains_tester) { try {
    constexpr auto BASE_OPP     = "0x1111111111111111111111111111111111111111";
    constexpr auto BASE_INBOUND = "0x2222222222222222222222222222222222222222";
    BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_EVM, "ETH", 1,
-      evm_outpost_mvo(EVM_OPP, EVM_INBOUND, EVM_OPREG, EVM_DEPOSIT)));
+      evm_outpost_mvo(EVM_OPP, EVM_INBOUND)));
    BOOST_REQUIRE_EQUAL(success(), regchain(ChainKind::CHAIN_KIND_EVM, "BASE", 8453,
-      evm_outpost_mvo(BASE_OPP, BASE_INBOUND, EVM_OPREG, EVM_DEPOSIT)));
+      evm_outpost_mvo(BASE_OPP, BASE_INBOUND)));
 
    BOOST_REQUIRE_EQUAL(std::string(EVM_OPP),  stored_addr("ETH",  "opp_addr"));
    BOOST_REQUIRE_EQUAL(std::string(BASE_OPP), stored_addr("BASE", "opp_addr"));

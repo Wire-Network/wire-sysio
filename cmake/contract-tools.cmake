@@ -22,6 +22,9 @@ if(BUILD_SYSTEM_CONTRACTS AND NOT CDT_BUILD)
           -DBUILD_TEST_CONTRACTS=${BUILD_TEST_CONTRACTS}
           -DCDT_BUILD=ON
           -DCDT_CONTRACT_INCLUDE_PATH=${CDT_CONTRACT_INCLUDE_PATH}
+          # Contracts build with the CDT toolchain's -Os. The explicit empty build type also overrides a
+          # CMAKE_BUILD_TYPE environment variable, whose Release flags would append -O3 -DNDEBUG.
+          -DCMAKE_BUILD_TYPE=
   )
   if (CDT_ROOT AND EXISTS ${CDT_ROOT}/lib/cmake/cdt/cdt-config.cmake)
       list(APPEND CDT_CMAKE_ARGS -DCDT_ROOT=${CDT_ROOT})

@@ -9,6 +9,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <sysio.system/snapshot_attest_constants.hpp>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/account_object.hpp>
 #include <sysio/chain/application.hpp>
@@ -28,7 +29,6 @@
 #include <sysio/chain_plugin/tracked_votes.hpp>
 #include <sysio/chain_plugin/trx_finality_status_processing.hpp>
 #include <sysio/chain_plugin/trx_retry_db.hpp>
-#include <sysio/protocol/snapshot_attestation.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <vector>
 
@@ -149,13 +149,13 @@ namespace sysio {
    /** Return the canonical physical KV table identifier for final snapshot attestations. */
    inline uint16_t snapshot_attestation_table_id() {
       return chain::compute_table_id(
-         chain::name{protocol::snapshot_attestation::table_snaprecords}.to_uint64_t());
+         chain::name{sysiosystem::snapshot_attestation::table_snaprecords}.to_uint64_t());
    }
 
    /** Return the canonical physical KV table identifier for snapshot attestation configuration. */
    inline uint16_t snapshot_attestation_config_table_id() {
       return chain::compute_table_id(
-         chain::name{protocol::snapshot_attestation::table_snapconfig}.to_uint64_t());
+         chain::name{sysiosystem::snapshot_attestation::table_snapconfig}.to_uint64_t());
    }
 
    /** Compare both immutable tuple components loaded from a snapshot with an attested record. */
@@ -832,13 +832,6 @@ public:
                    std::string_view log_prefix,
                    const std::atomic<bool>& shutdown_flag);
 
-   /// Return true when `provider_key` is a direct key whose weight alone
-   /// reaches `actor`'s active threshold or its owner ancestor. Call only from
-   /// the main app thread or an executor read window.
-   bool provider_can_authorize_active_alone(
-      chain::name actor,
-      const fc::crypto::public_key& provider_key) const;
-
    void accept_transaction(const chain::packed_transaction_ptr& trx, chain::plugin_interface::next_function<chain::transaction_trace_ptr> next);
 
    // Only call this after plugin_initialize()!
@@ -874,6 +867,18 @@ private:
 
    unique_ptr<class chain_plugin_impl> my;
 };
+
+/// True when a signature by `key` alone satisfies the authority of `level`, as the chain's authority checker
+/// evaluates a transaction's signatures (delegated account permissions included). Call only from the main app
+/// thread or an executor read window.
+bool key_alone_satisfies(const chain::controller& chain, const chain::permission_level& level,
+                         const fc::crypto::public_key& key);
+
+/// True when an action `code::action` may declare `level`, by the check a transaction gets: the permission
+/// `level.actor` linked to it (`linkauth`), or `active` when none is, must be `level.permission` or a child of it.
+/// Call only from the main app thread or an executor read window.
+bool permission_satisfies_link(const chain::controller& chain, const chain::permission_level& level,
+                               chain::name code, chain::name action);
 
 } // namespace sysio
 

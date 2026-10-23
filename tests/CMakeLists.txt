@@ -21,6 +21,8 @@ target_include_directories( plugin_test PUBLIC
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/block_log_util_test.py ${CMAKE_CURRENT_BINARY_DIR}/block_log_util_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/block_log_retain_blocks_test.py ${CMAKE_CURRENT_BINARY_DIR}/block_log_retain_blocks_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cluster_launcher.py ${CMAKE_CURRENT_BINARY_DIR}/cluster_launcher.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bootstrap_order_test.py ${CMAKE_CURRENT_BINARY_DIR}/bootstrap_order_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bootstrap_disconnect_test.py ${CMAKE_CURRENT_BINARY_DIR}/bootstrap_disconnect_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/distributed-transactions-test.py ${CMAKE_CURRENT_BINARY_DIR}/distributed-transactions-test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio_util_bls_test.py ${CMAKE_CURRENT_BINARY_DIR}/sysio_util_bls_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio_util_snapshot_info_test.py ${CMAKE_CURRENT_BINARY_DIR}/sysio_util_snapshot_info_test.py COPYONLY)
@@ -77,6 +79,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bridge_for_fork_test_shape.json ${CMA
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/lib_advance_test.py ${CMAKE_CURRENT_BINARY_DIR}/lib_advance_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/http_plugin_test.py ${CMAKE_CURRENT_BINARY_DIR}/http_plugin_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_high_latency_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_high_latency_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_heartbeat_timeout_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_heartbeat_timeout_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_multiple_listen_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_multiple_listen_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_no_listen_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_no_listen_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_sync_throttle_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_sync_throttle_test.py COPYONLY)
@@ -84,6 +87,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_sync_throttle_test_shape.json ${C
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_no_blocks_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_no_blocks_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_no_blocks_test_shape.json ${CMAKE_CURRENT_BINARY_DIR}/p2p_no_blocks_test_shape.json COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_peer_auth_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_peer_auth_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_peer_auth_grace_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_peer_auth_grace_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_peer_scoring_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_peer_scoring_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/compute_transaction_test.py ${CMAKE_CURRENT_BINARY_DIR}/compute_transaction_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/subjective_billing_test.py ${CMAKE_CURRENT_BINARY_DIR}/subjective_billing_test.py COPYONLY)
@@ -132,6 +136,8 @@ endif()
 
 #To run plugin_test with all log from blockchain displayed, put --verbose after --, i.e. plugin_test -- --verbose
 add_p_test(NAME plugin_test COMMAND plugin_test --report_level=detailed --color_output)
+add_p_test(NAME bootstrap_order_test COMMAND tests/bootstrap_order_test.py)
+add_np_test(NAME bootstrap_disconnect_test COMMAND tests/bootstrap_disconnect_test.py -v)
 
 add_np_test(NAME nodeop_sanity_test COMMAND tests/nodeop_run_test.py -v --sanity-test)
 add_np_test(NAME nodeop_run_test COMMAND tests/nodeop_run_test.py -v)
@@ -191,6 +197,7 @@ add_np_test(NAME interrupt-read-only-trx-parallel-if-sys-vm-oc-test COMMAND test
 # read-only thread-heavy clusters at the same time.
 set(READ_ONLY_TRX_TESTS
   read-only-trx-basic-test
+  read-only-trx-irreversible-test
   read-only-trx-parallel-test
   read-only-trx-parallel-if-sys-vm-oc-test
   read-only-trx-parallel-no-oc-if-test
@@ -230,10 +237,12 @@ add_p_test(NAME full-version-label-test COMMAND tests/full-version-label.sh "v${
 add_np_test(NAME nested_container_multi_index_test COMMAND tests/nested_container_multi_index_test.py -n 2)
 
 add_np_test(NAME p2p_multiple_listen_test COMMAND tests/p2p_multiple_listen_test.py -v)
+add_np_test(NAME p2p_heartbeat_timeout_test COMMAND tests/p2p_heartbeat_timeout_test.py -v)
 add_np_test(NAME p2p_no_listen_test COMMAND tests/p2p_no_listen_test.py -v)
 add_lr_test(NAME p2p_sync_throttle_test COMMAND tests/p2p_sync_throttle_test.py -v -d 2)
 add_np_test(NAME p2p_no_blocks_if_test COMMAND tests/p2p_no_blocks_test.py -v -d 2)
 add_np_test(NAME p2p_peer_auth_test COMMAND tests/p2p_peer_auth_test.py -v)
+add_np_test(NAME p2p_peer_auth_grace_test COMMAND tests/p2p_peer_auth_grace_test.py -v)
 add_np_test(NAME p2p_peer_scoring_test COMMAND tests/p2p_peer_scoring_test.py -v)
 
 # needs iproute-tc or iproute2 depending on platform

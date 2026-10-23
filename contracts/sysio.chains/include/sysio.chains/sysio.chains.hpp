@@ -9,6 +9,8 @@
 #include <sysio/slug_name.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 
+#include <optional>
+
 namespace sysio {
 
    /**
@@ -37,27 +39,22 @@ namespace sysio {
     * Grouped into one struct so `regchain` keeps a readable signature and
     * `setoutpost` replaces the whole set atomically. Encoding by kind:
     *  * `EVM`  — each field is a distinct `0x`-prefixed 20-byte hex address:
-    *     the OPP contract, the OPPInbound contract, the OperatorRegistry
-    *     (the `uw_commit` target), and the contract that emits the source
-    *     swap-deposit event scanned by the underwriter's verify path.
+    *     the OPP contract and the OPPInbound contract.
     *  * `SVM`  — `opp_addr` is the outpost program id (base58). The single
-    *     program serves every role, so the other three MUST be empty; the
-    *     daemons substitute `opp_addr` wherever they need one of them.
+    *     program receives inbound envelopes too, so `opp_inbound_addr` MUST be
+    *     empty.
     *  * `WIRE` — all empty; the depot self-row has no remote deployment.
     *
     * Fields may be empty at registration (the remote contract is not deployed
-    * yet) and filled in later via `setoutpost`. Both operator daemons fail
-    * closed: a chain whose address they need but do not have is skipped, so an
+    * yet) and filled in later via `setoutpost`. The batch-operator relay fails
+    * closed: a chain whose address it needs but does not have is skipped, so an
     * unconfigured row never rides on another chain's deployment.
     */
    struct outpost_addrs {
       std::string opp_addr;
       std::string opp_inbound_addr;
-      std::string operator_registry_addr;
-      std::string source_deposit_addr;
 
-      SYSLIB_SERIALIZE(outpost_addrs,
-         (opp_addr)(opp_inbound_addr)(operator_registry_addr)(source_deposit_addr))
+      SYSLIB_SERIALIZE(outpost_addrs, (opp_addr)(opp_inbound_addr))
    };
 
    class [[sysio::contract("sysio.chains")]] chains : public contract {
@@ -134,8 +131,8 @@ namespace sysio {
          uint64_t                       registered_at_ms  = 0;
          uint64_t                       activated_at_ms   = 0;
          /// Remote outpost contract identities for this chain — see {@link outpost_addrs}.
-         /// Read by batch_operator_plugin and underwriter_plugin; every operator
-         /// therefore relays through the same deployment without per-node config.
+         /// Read by batch_operator_plugin; every operator therefore relays through
+         /// the same deployment without per-node config.
          outpost_addrs                  outpost;
 
          uint64_t by_kind()              const { return magic_enum::enum_integer(kind); }
@@ -152,6 +149,17 @@ namespace sysio {
          sysio::kv::index<"byextid"_n,   sysio::const_mem_fun<chain_row, uint64_t, &chain_row::by_external_chain_id>>,
          sysio::kv::index<"byactive"_n,  sysio::const_mem_fun<chain_row, uint64_t, &chain_row::by_active>>
       >;
+
+      /// The chain family of `chain_code` in the registry deployed at `chains_account` when it is an
+      /// active outpost -- a registered, active row that is not the depot -- else `std::nullopt`. Never
+      /// throws. The ONE outpost-family lookup: `sysio.liq` (behind a checked wrapper), `sysio.msgch`'s
+      /// syndication dispatch and `sysio.synd` all use it.
+      static std::optional<opp::types::ChainKind> outpost_kind_of(name chains_account, sysio::slug_name chain_code) {
+         chains_t   chains_tbl(chains_account);
+         const auto row = chains_tbl.try_get(chain_key{chain_code});
+         if (!row || !row->active || row->is_depot) return std::nullopt;
+         return row->kind;
+      }
    };
 
 } // namespace sysio

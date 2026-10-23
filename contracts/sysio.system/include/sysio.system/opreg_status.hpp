@@ -12,9 +12,8 @@
 // deliberately protobuf-free so proto-free downstream contracts (notably
 // sysio.roa) can include it, and sysio.system.hpp is included by many other
 // contracts; pulling the proto dependency into either would widen their
-// include surface. Only the two translation units that need the predicate --
-// reward distribution (emissions.cpp) and producer scheduling (ranking.cpp) --
-// include this header, and both already compile with the OPP include dirs.
+// include surface. Only the translation units that need the predicate include
+// it, and all of them already compile with the OPP include dirs.
 
 namespace sysiosystem {
 

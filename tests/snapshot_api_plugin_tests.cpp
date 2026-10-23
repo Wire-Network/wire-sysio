@@ -10,7 +10,7 @@
 #include <string>
 #include <utility>
 
-namespace snapshot_attest = sysio::protocol::snapshot_attestation;
+namespace snapshot_attest = sysiosystem::snapshot_attestation;
 
 BOOST_AUTO_TEST_SUITE(snapshot_api_plugin_tests)
 

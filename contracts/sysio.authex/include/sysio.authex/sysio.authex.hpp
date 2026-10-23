@@ -51,7 +51,7 @@ namespace sysio {
    * data. It avoids visually ambiguous characters, making it suitable for
    * financial identifiers, cryptocurrency addresses, and similar contexts.
    *
-   * Defined `inline` in the header so cross-contract callers (e.g. sysio.msgch
+   * Defined `inline` in the header so cross-contract callers (e.g. sysio.synd
    * resolving an authex link by pubkey) can call it without linking against
    * sysio.authex.cpp's WASM.
    *
@@ -93,7 +93,7 @@ namespace sysio {
    * @brief Render a public_key into its canonical "PUB_<curve>_<encoding>" string.
    *
    * Mirrors eosjs-ecc's spelling so that off-chain signers, the authex contract,
-   * and any cross-contract caller (e.g. sysio.msgch's bypubkey lookup) all hash
+   * and any cross-contract caller (e.g. sysio.synd's bypubkey lookup) all hash
    * the same byte sequence into the secondary-index key.
    *
    * Supported variants:
@@ -273,9 +273,6 @@ namespace sysio {
         const sysio::public_key &pub_key,
         const uint64_t nonce);
 
-    // ! For testing only, remove before MAINNET deployment.
-    [[sysio::action]] void clearlinks();
-
     /**
      * Record an external-chain public-key link WITHOUT signature verification -- the trusted,
      * depot-only counterpart to createlink. The OPP NodeOwnerRegistration dispatch has already
@@ -288,8 +285,8 @@ namespace sysio {
      * A malformed or mismatched address skips only the sweep, not link insertion. A missing or
      * non-privileged sysio.dclaim deployment likewise skips the sweep. An identical recordlink can
      * retry before node-owner registration completes; after registration, nodeownreg's duplicate
-     * gate returns before this action, so remediation requires an operator-pushed recordlink or
-     * linkswept action.
+     * gate returns before this action, so remediation requires governance to push recordlink or
+     * linkswept as sysio.authex@active.
      *
      * Unlike createlink, this does NOT enforce a unique `pub_key`: one external wallet may hold
      * several WireNodes NFTs and back several Wire accounts, so one ETH key -> many accounts is

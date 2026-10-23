@@ -2,6 +2,7 @@
 #include <sysio/chain/exceptions.hpp>
 
 #include <fc/log/logger.hpp>
+#include <fc/io/atomic_file.hpp>
 
 #include <filesystem>
 #include <iterator>
@@ -122,14 +123,15 @@ std::pair<uint64_t, uint64_t> transaction_dedup::undo_stack_revision_range() con
 // --- File persistence (uses snapshot format for integrity and code reuse) ---
 
 void transaction_dedup::write_to_file(const std::filesystem::path& filepath) const {
-   const auto tmp = filepath.string() + ".tmp";
-
-   auto writer = std::make_shared<threaded_snapshot_writer>(tmp);
-   add_to_snapshot(writer);            // membership set
-   write_revisions_to_file(writer);    // reversible undo stack + current revision (file-only; see header)
-   writer->finalize();
-
-   std::filesystem::rename(tmp, filepath);
+   fc::io::atomic_file output(filepath);
+   {
+      auto writer = std::make_shared<threaded_snapshot_writer>(output.temporary_path());
+      add_to_snapshot(writer);            // membership set
+      write_revisions_to_file(writer);    // reversible undo stack + current revision (file-only; see header)
+      writer->finalize();
+      writer->close();
+   }
+   output.commit();
 }
 
 bool transaction_dedup::read_from_file(const std::filesystem::path& filepath) {

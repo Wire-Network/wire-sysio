@@ -1,4 +1,5 @@
 #include "_http_transport_internal.hpp"
+#include <fc/io/atomic_file.hpp>
 
 #include <boost/asio/co_spawn.hpp>
 
@@ -6,7 +7,6 @@
 #include <array>
 #include <chrono>
 #include <filesystem>
-#include <fstream>
 #include <limits>
 
 namespace fc {
@@ -26,27 +26,14 @@ public:
              std::function<void(const http_file_download_status&)> status_callback,
              std::function<uint64_t(const std::filesystem::path&)> space_available_provider)
       : _output(output)
-      , _temp(output)
       , _max_response_body_bytes(max_response_body_bytes)
       , _status_callback(std::move(status_callback))
       , _space_available_provider(std::move(space_available_provider))
       , _started(std::chrono::steady_clock::now())
-      , _next_status(_started) {
-      _temp += ".downloading";
-   }
+      , _next_status(_started) {}
 
    file_sink(const file_sink&) = delete;
    file_sink& operator=(const file_sink&) = delete;
-
-   /** Remove an incomplete temporary file. */
-   ~file_sink() {
-      if (!_complete) {
-         if (_file.is_open())
-            _file.close();
-         std::error_code error;
-         std::filesystem::remove(_temp, error);
-      }
-   }
 
    /** Report connection-establishment phase. */
    void connecting() {
@@ -89,8 +76,7 @@ public:
       }
       _next_disk_space_check = std::chrono::steady_clock::now() + disk_space_check_interval;
 
-      _file.open(_temp, std::ios::binary | std::ios::trunc);
-      FC_ASSERT(_file.is_open(), "Failed to open temp file {} for writing", _temp.string());
+      _file.emplace(_output);
       transition(http_file_download_phase::downloading);
    }
 
@@ -112,8 +98,7 @@ public:
          _next_disk_space_check = std::chrono::steady_clock::now() + disk_space_check_interval;
       }
 
-      _file.write(data, static_cast<std::streamsize>(bytes));
-      FC_ASSERT(_file.good(), "Failed to write {} bytes to temp file {}", bytes, _temp.string());
+      _file->file().write(data, bytes);
       _downloaded_bytes += bytes;
       _disk_space_write_budget -= bytes;
       report(false);
@@ -136,12 +121,7 @@ public:
          throw transport_failure(failure_kind::http_status, std::move(message));
       }
 
-      _file.close();
-      FC_ASSERT(_file.good(), "Failed to close temp file {} after HTTP download", _temp.string());
-      std::error_code error;
-      std::filesystem::rename(_temp, _output, error);
-      FC_ASSERT(!error, "Failed to rename downloaded file: {}", error.message());
-      _complete = true;
+      _file->commit();
       transition(http_file_download_phase::complete);
    }
 
@@ -158,13 +138,7 @@ private:
 
    /** Return currently available destination-filesystem bytes. */
    uint64_t available_disk_space() const {
-      const auto query_path = space_query_path();
-      if (_space_available_provider)
-         return _space_available_provider(query_path);
-      std::error_code error;
-      const auto space = std::filesystem::space(query_path, error);
-      FC_ASSERT(!error, "Failed to query free disk space at {}: {}", query_path.string(), error.message());
-      return space.available;
+      return fc::io::atomic_file::available_space(_output, _space_available_provider);
    }
 
    /** Require @p required bytes on the destination filesystem. */
@@ -212,11 +186,10 @@ private:
    }
 
    std::filesystem::path _output;
-   std::filesystem::path _temp;
    uint64_t _max_response_body_bytes;
    std::function<void(const http_file_download_status&)> _status_callback;
    std::function<uint64_t(const std::filesystem::path&)> _space_available_provider;
-   std::ofstream _file;
+   std::optional<fc::io::atomic_file_writer> _file;
    uint32_t _status = 0;
    std::optional<uint64_t> _content_length;
    std::string _error_body;
@@ -226,7 +199,6 @@ private:
    http_file_download_phase _phase = http_file_download_phase::connecting;
    std::chrono::steady_clock::time_point _started;
    std::chrono::steady_clock::time_point _next_status;
-   bool _complete = false;
    mutable std::mutex _mutex;
 };
 
@@ -339,6 +311,9 @@ asio::awaitable<void> async_download_atomic(client& source, request req, request
       sink->finish();
    } catch (const transport_failure& failure) {
       throw_public_failure(failure);
+   } catch (const std::system_error& failure) {
+      // Preserve the public HTTP error type for filesystem and cfile failures.
+      FC_THROW_EXCEPTION(fc::exception, "HTTP download file I/O failed for {}: {}", output.string(), failure.what());
    }
 }
 

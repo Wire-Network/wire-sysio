@@ -35,14 +35,14 @@ void require_priv_caller() {
 // ---------------------------------------------------------------------------
 //  Remote-address format validation
 //
-//  These addresses are consensus facts: every batch operator and underwriter
-//  reads the same row, so one malformed value breaks relay for the whole
+//  These addresses are consensus facts: every batch operator reads the same
+//  row, so one malformed value breaks relay for the whole
 //  network rather than for a single misconfigured node. Validate the format at
 //  the ingress boundary, where the caller can still fix it.
 //
 //  Empty is allowed -- a chain may be registered before its remote contracts
-//  are deployed and filled in later via `setoutpost`; both daemons fail closed
-//  and skip a row whose address they need but do not have. The exception is a
+//  are deployed and filled in later via `setoutpost`; the batch-operator relay
+//  fails closed and skips a row whose address it needs but does not have. The exception is a
 //  field that is structurally meaningless for the kind, which must be empty.
 // ---------------------------------------------------------------------------
 
@@ -93,8 +93,7 @@ void check_empty(const std::string& addr, const char* label, const char* why) {
 /// must match the kind's format; structurally-unused fields must be empty.
 void validate_outpost_addrs(opp::types::ChainKind kind, const outpost_addrs& o) {
    // Applies to every kind, including ones with no format rule yet.
-   for (const auto* f : {&o.opp_addr, &o.opp_inbound_addr,
-                         &o.operator_registry_addr, &o.source_deposit_addr}) {
+   for (const auto* f : {&o.opp_addr, &o.opp_inbound_addr}) {
       sysio::check(f->size() <= ADDR_MAX_BYTES,
                    "sysio.chains: outpost address exceeds "
                    + std::to_string(ADDR_MAX_BYTES) + " bytes");
@@ -103,26 +102,20 @@ void validate_outpost_addrs(opp::types::ChainKind kind, const outpost_addrs& o) 
    switch (kind) {
       case opp::types::CHAIN_KIND_WIRE: {
          constexpr auto why = "the WIRE depot self-row has no remote deployment";
-         check_empty(o.opp_addr,               "opp_addr",               why);
-         check_empty(o.opp_inbound_addr,       "opp_inbound_addr",       why);
-         check_empty(o.operator_registry_addr, "operator_registry_addr", why);
-         check_empty(o.source_deposit_addr,    "source_deposit_addr",    why);
+         check_empty(o.opp_addr,         "opp_addr",         why);
+         check_empty(o.opp_inbound_addr, "opp_inbound_addr", why);
          break;
       }
       case opp::types::CHAIN_KIND_EVM:
          // Each role is its own contract on an EVM chain.
-         if (!o.opp_addr.empty())               check_evm_addr(o.opp_addr,               "opp_addr");
-         if (!o.opp_inbound_addr.empty())       check_evm_addr(o.opp_inbound_addr,       "opp_inbound_addr");
-         if (!o.operator_registry_addr.empty()) check_evm_addr(o.operator_registry_addr, "operator_registry_addr");
-         if (!o.source_deposit_addr.empty())    check_evm_addr(o.source_deposit_addr,    "source_deposit_addr");
+         if (!o.opp_addr.empty())         check_evm_addr(o.opp_addr,         "opp_addr");
+         if (!o.opp_inbound_addr.empty()) check_evm_addr(o.opp_inbound_addr, "opp_inbound_addr");
          break;
       case opp::types::CHAIN_KIND_SVM: {
-         // One program serves every role; the daemons substitute opp_addr.
+         // One program sends and receives envelopes, named by opp_addr.
          constexpr auto why = "an SVM outpost is a single program, named by opp_addr";
          if (!o.opp_addr.empty()) check_svm_addr(o.opp_addr, "opp_addr");
-         check_empty(o.opp_inbound_addr,       "opp_inbound_addr",       why);
-         check_empty(o.operator_registry_addr, "operator_registry_addr", why);
-         check_empty(o.source_deposit_addr,    "source_deposit_addr",    why);
+         check_empty(o.opp_inbound_addr, "opp_inbound_addr", why);
          break;
       }
       default:

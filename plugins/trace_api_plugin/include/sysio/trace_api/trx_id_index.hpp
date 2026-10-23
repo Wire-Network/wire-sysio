@@ -71,6 +71,7 @@ inline uint64_t trx_id_prefix(const chain::transaction_id_type& id) {
 class trx_id_index_writer {
 public:
    void add(const chain::transaction_id_type& trx_id, uint32_t block_num);
+   /// Write a fresh index and atomically replace path after checked flush and close.
    void write(const std::filesystem::path& path) const;
    size_t entry_count() const { return _entries.size(); }
 
