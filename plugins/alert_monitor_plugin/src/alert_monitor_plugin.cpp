@@ -207,7 +207,7 @@ void alert_monitor_plugin::impl::on_irreversible_block() {
             if (chain.fork_db_has_root()) {
                const auto lib = chain.fork_db_root();
                fc_wlog(log,
-                       "irreversible block {} is {} s behind wall clock; status documents paused "
+                       "irreversible block {} is {} s behind wall clock; status documents and queries paused "
                        "(node syncing, finality lagging, or the host clock is ahead of the chain)",
                        lib.block_num(), (now - lib.block_time()).to_seconds());
             }
@@ -216,7 +216,7 @@ void alert_monitor_plugin::impl::on_irreversible_block() {
       }
       if (catching_up) {
          catching_up = false;
-         fc_ilog(log, "irreversible block is current; resuming status documents");
+         fc_ilog(log, "irreversible block is current; resuming status documents and queries");
       }
       auto info = read_only_api->get_info({}, fc::time_point::maximum());
       // Deliveries queued behind a multi-block LIB advance all find get_info at the newest LIB; only the first
@@ -314,6 +314,8 @@ void alert_monitor_plugin::set_program_options(options_description&, options_des
 void alert_monitor_plugin::plugin_initialize(const variables_map& options) {
    try {
       _impl->cfg = alert_monitor::parse_config(options, app().config_dir());
+      if (_impl->cfg)
+         alert_monitor::validate_queries(_impl->cfg->queries, options);
       handle_sighup(); // bind the diagnostic logger, the convention every plugin follows at the end of initialize
    }
    FC_LOG_AND_RETHROW()
@@ -331,8 +333,8 @@ void alert_monitor_plugin::plugin_startup() {
       if (!_impl->cfg->queries.empty()) {
          query_plugin = app().find_plugin<query_engine_plugin>();
          SYS_ASSERT(query_plugin && query_plugin->get_state() != appbase::abstract_plugin::registered,
-                    chain::plugin_config_exception, "--{} needs plugin = sysio::query_engine_plugin",
-                    alert_monitor::option::query);
+                    chain::plugin_config_exception, "--{} needs plugin = {}", alert_monitor::option::query,
+                    alert_monitor::query_engine_plugin_name);
       }
       auto& chain_plug = app().get_plugin<chain_plugin>();
       _impl->chain_plug = &chain_plug;
