@@ -138,7 +138,7 @@ WIRE-352 adds separate inline edges whose failure behavior depends on the caller
 | `sysio.msgch` node-owner dispatch | `sysio.roa::nodeownreg` | Deploy `sysio.msgch` and `sysio.roa` as one compatibility-coupled set. | WIRE-352 adds the required `eth_address` field. An old caller underflows the new action decoder; the inverse pairing is also unsupported. Node-owner delivery can abort. |
 | `sysio.roa::nodeownreg` | `sysio.authex::recordlink` | Deploy `sysio.roa` and `sysio.authex` as the same compatibility-coupled set. | WIRE-352 adds the required `native_address` field. An old caller underflows the new action decoder; the inverse pairing is also unsupported. Node-owner delivery can abort. |
 | `sysio.authex::createlink` | `sysio.dclaim::linkswept` | Deploy `sysio.dclaim` before the first user-created external-key link. | A missing or non-privileged callee aborts before link insertion. Any inline failure rolls the transaction back, so the user can submit a fresh retry. |
-| `sysio.authex::recordlink` | `sysio.dclaim::linkswept` | Prefer deploying `sysio.dclaim` before trusted node-owner dispatch begins. | A missing or non-privileged callee skips the sweep but preserves the trusted link; an identical operator-authorized `recordlink` can retry it after bootstrap. |
+| `sysio.authex::recordlink` | `sysio.dclaim::linkswept` | Prefer deploying `sysio.dclaim` before trusted node-owner dispatch begins. | A missing or non-privileged callee skips the sweep but preserves the trusted link; governance can retry it after bootstrap with an identical `recordlink` submitted as `sysio.authex@active`. |
 | `sysio.msgch` inbound envelope dispatch | `sysio.synd::onsynd`, `sysio.synd::onyield`, `sysio.synd::closeenv` | Deploy `sysio.msgch`, `sysio.synd`, `sysio.liq`, `sysio.bond` and `sysio.authex` as one compatibility-coupled set, and deploy `sysio.synd` before any liq token is activated. | The actions run inside the consensus transaction that accepts the envelope. A missing `sysio.synd`, or one without these actions, asserts in its dispatcher and aborts that transaction, so no envelope of the outpost is accepted until the set is whole. |
 | `sysio.synd` intake and queue | `sysio.liq::mint`, `sysio.liq::burn`, `sysio.liq::mintyield` | The same set. | `sysio.synd` verifies every condition `mint` checks before sending it, so the current `sysio.liq` never refuses it. A `sysio.liq` without these actions, or one that does not accept `sysio.synd` as their only signer, aborts the intake and with it the inbound envelope. |
 | `sysio.authex::createlink` | `sysio.synd::linkswept` | None. Nothing is parked before `sysio.synd` is deployed, and it deploys privileged through `setsyscode`. | A missing or non-privileged callee skips the sweep and keeps the link; the permissionless `sysio.synd::sweep` delivers the parked shadow later. The delivery's `sysio.liq::transfer` notifies the linking account, so a contract account whose transfer handler throws aborts its own `createlink` and cannot link while shadow is parked for its key. |
@@ -154,6 +154,27 @@ WIRE-352 adds separate inline edges whose failure behavior depends on the caller
 Production deployment through `sysio.roa::setsyscode` privileges `sysio.dclaim`
 as part of the deploy, so there is no separate privilege step. The durable
 precondition is ordering: deploy DClaim before any link action can execute.
+
+On a fresh deployment, finish the DClaim import before the first `createlink` or
+`recordlink`: fund `sysio.dclaim` with the total of the credits, push every
+`importseed` batch, reconcile the `unmapped` rows against the export, and only
+then seal the import with `importdone`. The LCO import in the cluster bootstrap
+(`LcoImportSteps` in wire-tools-ts) runs these steps in the epoch-0 window and
+stops before the seal when a row differs. A link sweeps only the credits already
+in `unmapped`, and its holder cannot trigger the sweep again: `createlink`
+accepts one link per account and chain, and only `sysio.authex` may send
+`linkswept`. `linkswept` moves the `unmapped` row matching the supplied chain and
+address to the supplied account without consulting the link, so recovering a
+credit imported after its key was linked is for governance, through `sysio.msig`
+as `sysio.authex@active`. The `links` row keeps only the account, chain and
+public key, not the native address, so governance derives the address from the
+stored key (SVM: the raw 32-byte ED key; EVM: the canonical 20-byte address of
+the stored EM key, the trailing 20 bytes of `keccak256(X || Y)` over the 64-byte
+coordinates, without the leading SEC1 `0x04` byte, as
+`opp::evm_address_from_uncompressed_key` computes it) and checks the link and the
+exact target `unmapped` row before proposing `linkswept`. The same derivation and
+check come first when governance replays the identical `recordlink` for a
+node-owner link.
 
 The two added address fields are intentionally not a staged compatibility
 protocol. Activate WIRE-352 in a quiesced maintenance window:

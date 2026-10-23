@@ -30,6 +30,7 @@ using mvo = fc::mutable_variant_object;
 using ChainKind = sysio::opp::types::ChainKind;
 
 using sysio_system::test_support::build_link_message;
+using sysio_system::test_support::sign_createlink;
 
 // ——— Tester class ———
 class sysio_authex_tester : public tester {
@@ -340,6 +341,36 @@ BOOST_FIXTURE_TEST_CASE( createlink_preserves_old_prelink_dclaim_rewards,
    const auto pending = get_dclaim_row("pclaims"_n, "pending_claim", "alice"_n.to_uint64_t());
    BOOST_REQUIRE(!pending.is_null());
    BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 5000);
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( createlink_svm_sweeps_prelink_dclaim_rewards, sysio_authex_tester ) try {
+   deploy_dclaim();
+   const auto private_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::ed);
+   const auto public_key = private_key.get_public_key();
+   const auto raw_key = public_key.get<fc::crypto::ed::public_key_shim>().serialize();
+   const std::vector<char> native_address(raw_key.begin(), raw_key.end());
+   // Same first 8 bytes, hence the same `bychainad` key: the sweep must match the full address.
+   std::vector<char> same_prefix_address = native_address;
+   same_prefix_address.back() ^= char{0x01};
+
+   BOOST_REQUIRE_EQUAL(success(), import_credit(
+      same_prefix_address, 3000, ChainKind::CHAIN_KIND_SVM));
+   BOOST_REQUIRE_EQUAL(success(), import_credit(
+      native_address, 8000, ChainKind::CHAIN_KIND_SVM));
+
+   const auto nonce = now_ms();
+   const auto sig = sign_createlink(private_key, "carol", ChainKind::CHAIN_KIND_SVM, nonce);
+   BOOST_REQUIRE_EQUAL(success(), createlink(
+      "carol"_n, ChainKind::CHAIN_KIND_SVM, "carol", sig, public_key, nonce));
+   produce_blocks();
+
+   BOOST_REQUIRE(get_dclaim_row("unmapped"_n, "unmapped_token", 2).is_null());
+   const auto same_prefix = get_dclaim_row("unmapped"_n, "unmapped_token", 1);
+   BOOST_REQUIRE(!same_prefix.is_null());
+   BOOST_REQUIRE_EQUAL(same_prefix["balance"].as<asset>().get_amount(), 3000);
+   const auto pending = get_dclaim_row("pclaims"_n, "pending_claim", "carol"_n.to_uint64_t());
+   BOOST_REQUIRE(!pending.is_null());
+   BOOST_REQUIRE_EQUAL(pending["balance"].as<asset>().get_amount(), 8000);
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( recordlink_records_link_when_dclaim_is_missing, sysio_authex_tester ) try {
