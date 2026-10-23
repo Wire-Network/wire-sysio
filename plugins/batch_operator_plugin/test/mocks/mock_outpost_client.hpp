@@ -3,6 +3,7 @@
 #include <format>
 #include <functional>
 #include <mutex>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -49,12 +50,6 @@ public:
                          _chain_id);
    }
 
-   struct commit_call {
-      uint64_t          uw_request_id = 0;
-      std::vector<char> uic_bytes;
-      fc::microseconds  deadline;
-   };
-
    /// Deliver response — can be set to either a scripted string or a functor
    /// that produces responses / throws per-call.
    std::function<std::string(const outbound_call&)> deliver_response =
@@ -62,11 +57,6 @@ public:
 
    std::function<std::vector<char>(const inbound_call&)> inbound_response =
       [](const inbound_call&) { return std::vector<char>{}; };
-
-   /// uw_commit response — scripted per call; tests that don't exercise the
-   /// UIC relay path can leave the default in place.
-   std::function<std::string(const commit_call&)> commit_response =
-      [](const commit_call&) { return std::string{"mock-commit-tx"}; };
 
    std::string deliver_outbound_envelope(uint32_t                 epoch_index,
                                          const std::vector<char>& envelope_bytes,
@@ -89,15 +79,17 @@ public:
       return inbound_response(call);
    }
 
-   std::string uw_commit(uint64_t                 uw_request_id,
-                         const std::vector<char>& uic_bytes,
-                         fc::microseconds         deadline) override {
-      commit_call call{uw_request_id, uic_bytes, deadline};
+   /// read_emitted_envelope_digest response, by epoch; the default holds no record.
+   std::function<std::optional<fc::sha256>(uint32_t)> emitted_digest_response =
+      [](uint32_t) { return std::optional<fc::sha256>{}; };
+
+   std::optional<fc::sha256> read_emitted_envelope_digest(uint32_t         epoch_index,
+                                                          fc::microseconds deadline) override {
       {
          std::lock_guard<std::mutex> lock(_mx);
-         commit_calls.push_back(call);
+         emitted_digest_calls.push_back(inbound_call{epoch_index, deadline});
       }
-      return commit_response(call);
+      return emitted_digest_response(epoch_index);
    }
 
    struct crank_call {
@@ -119,7 +111,8 @@ public:
 
    std::vector<outbound_call> outbound_calls;
    std::vector<inbound_call>  inbound_calls;
-   std::vector<commit_call>   commit_calls;
+   std::vector<inbound_call>  emitted_digest_calls;
+
    std::vector<crank_call>    crank_calls;
    std::vector<uint8_t>       caller_address;
 

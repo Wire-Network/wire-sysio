@@ -38,6 +38,21 @@ block_trace_v0 block_with(std::vector<action_trace_v0> actions) {
 
 BOOST_AUTO_TEST_SUITE(bloom_sidecar_tests)
 
+/// A publication failure cleans its sibling and leaves a safe invalid-reader fallback.
+BOOST_AUTO_TEST_CASE(failed_publication_cleans_sibling) {
+   fc::temp_directory tempdir;
+   const auto target = tempdir.path() / "bloom.log";
+   std::filesystem::create_directory(target);
+   bloom_builder builder;
+   builder.add_action(act("alice"_n, "sysio.token"_n, "transfer"_n));
+   BOOST_CHECK_THROW(builder.finalize_and_write(target), std::filesystem::filesystem_error);
+   BOOST_CHECK_EQUAL(std::distance(std::filesystem::directory_iterator(tempdir.path()),
+                                 std::filesystem::directory_iterator()), 1);
+   bloom_reader reader(target);
+   BOOST_CHECK(!reader.valid());
+   BOOST_CHECK(reader.may_contain_receiver("alice"_n));
+}
+
 /// A slice with a known set of receivers yields hits for every inserted receiver and (receiver, action) pair, and
 /// misses for names not inserted.  The miss rate for well-separated unknowns should be at or below the target FPR;
 /// with 32 inserted items at p=0.01 we expect roughly zero false positives on the 8 probe names we test.

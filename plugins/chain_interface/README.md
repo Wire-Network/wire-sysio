@@ -39,9 +39,9 @@ returned `handle` for the lifetime of its subscription or registration.
 | `channels::applied_transaction` | `transaction_trace_ptr` | `chain_plugin`, relaying `controller::applied_transaction` | `low` |
 | `compat::channels::transaction_ack` | `std::pair<fc::exception_ptr, packed_transaction_ptr>` | `producer_plugin` after a speculative transaction is applied or rejected, and `chain_plugin`'s transaction-retry database | `low` |
 
-`irreversible_block` is the one most non-chain plugins consume: `batch_operator_plugin` and
-`underwriter_plugin` each subscribe to it as their sync gate, arming their work only once the node has caught
-up. `net_plugin` subscribes to `compat::channels::transaction_ack` so it can relay or drop a peer's
+`irreversible_block` is the one most non-chain plugins consume: `batch_operator_plugin` subscribes to it as
+its sync gate, arming its work only once the node has caught up, and `status_monitor_plugin` renders one
+document per irreversible block. `net_plugin` subscribes to `compat::channels::transaction_ack` so it can relay or drop a peer's
 transaction according to the result.
 
 ### Methods
@@ -81,9 +81,8 @@ sync_gate_subscription =
 ```
 
 [`usage_pattern.md`](../usage_pattern.md) lists connecting to other plugins' signals and registering
-provider methods among the typical `plugin_initialize` actions; the sync-gate consumers in this tree
-(`batch_operator_plugin`, `underwriter_plugin`) subscribe from `plugin_startup` instead, after their own state
-is built. Either way, keep the returned handle — dropping it cancels the subscription.
+provider methods among the typical `plugin_initialize` actions; the sync-gate consumer in this tree
+(`batch_operator_plugin`) subscribes from `plugin_startup` instead, after its own state is built. Either way, keep the returned handle — dropping it cancels the subscription.
 
 ## Options
 
@@ -113,6 +112,7 @@ to the ack channel. Both run under their own plugin's test target.
   this include path public to the rest of the tree.
 - `net_plugin` — subscribes to `transaction_ack`, and feeds every transaction it accepts from a peer into
   `transaction_async` via `chain_plugin::accept_transaction`.
-- `batch_operator_plugin`, `underwriter_plugin` — subscribe to `irreversible_block` as their sync gate.
+- `batch_operator_plugin` — subscribes to `irreversible_block` as its sync gate.
+- `status_monitor_plugin` — subscribes to `irreversible_block` to ship one snapshot per irreversible block.
 - [`plugins/usage_pattern.md`](../usage_pattern.md) — when to connect, register, and release these handles
   across the appbase lifecycle.

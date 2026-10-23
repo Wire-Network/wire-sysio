@@ -166,14 +166,18 @@ namespace sysiosystem {
       uint64_t                                                 rank_score = producer_rank::unscored();
       bool                                                     is_active = true;
       std::string                                              url;
-      /// Blocks produced and not yet paid -- the ONE pay input. `payepoch` credits every block at
+      /// Blocks counted and not yet paid -- the ONE pay input. `payepoch` credits every block at
       /// the period's per-block rate and zeroes the count of every producer it pays; a block the
       /// producer's slot did not deliver is simply never counted, so its pay stays in the treasury.
+      /// At most one round per rotation is counted; see `last_paid_round`.
       /// The count SURVIVES a park, a demotion, or a lost key: a producer that is not schedulable
-      /// at a payepoch is neither paid nor reset, and whatever it made is paid at the first
+      /// at a payepoch is neither paid nor reset, and whatever was counted is paid at the first
       /// payepoch where it is schedulable again (never, for a slashed one).
       uint32_t                                                 unpaid_blocks = 0;
       time_point                                               last_claim_time;
+      /// Schedule-order key: `update_ranked_producers` sorts a new set of scheduled producers by
+      /// ascending location, then name, and leaves a running set's order alone. Rank, not location,
+      /// selects who is scheduled.
       uint16_t                                                 location = 0;
       sysio::block_signing_authority                           producer_authority; // added in version 1.9.0
       /// Rounds this producer was scheduled for and did not SERVE, consecutively -- a round is
@@ -193,9 +197,15 @@ namespace sysiosystem {
       ///
       /// Inert until T5 is initialised: `current_pay_period` is 0 before then, so every stamp
       /// matches. Bounded -- there is no pay pre-T5, and the snapshot factor saturates.
+      uint32_t                                                 snapshot_period = 0;
+      /// The round (block slot / 12) whose blocks `onblock` last counted toward `unpaid_blocks`, 0
+      /// for never. It counts one round per rotation (round / schedule size), so a schedule switch
+      /// that hands a producer a second round in one rotation does not pay it twice. Rotations use
+      /// the current size, so a size change, rare once the schedule reaches 21, can count a round
+      /// more or less.
       ///
       /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE below.
-      uint32_t                                                 snapshot_period = 0;
+      uint32_t                                                 last_paid_round = 0;
 
       uint64_t by_rank_score()const { return rank_score; }
       bool     active()const      { return is_active;                               }
@@ -208,7 +218,7 @@ namespace sysiosystem {
 
       SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank_score)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority)
                          (consecutive_missed_rounds)(is_demoted)(snapshot_attestations)
-                         (snapshot_period) )
+                         (snapshot_period)(last_paid_round) )
    };
 
    using producers_table = sysio::kv::table< "producers"_n, producer_key_t, producer_info,
@@ -452,7 +462,9 @@ namespace sysiosystem {
           * @param producer - account registering to be a producer candidate,
           * @param producer_key - the public key of the block producer, this is the key used by block producer to sign blocks,
           * @param url - the url of the block producer, normally the url of the block producer presentation website,
-          * @param location - is the country code as defined in the ISO 3166, https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
+          * @param location - the producer's position in the round-robin: a new schedule runs in ascending
+          *        `location` order, account name breaking ties. A change applies when the set of scheduled
+          *        producers next changes. It does not affect rank or pay.
           *
           * @note Creating a producer row, or reactivating one parked by `unregprod`, requires an
           *       ACTIVE OPERATOR_TYPE_PRODUCER operator in sysio.opreg. For ordinary operators,
@@ -476,7 +488,9 @@ namespace sysiosystem {
           * @param producer - account registering to be a producer candidate,
           * @param producer_authority - the weighted threshold multisig block signing authority of the block producer used to sign blocks,
           * @param url - the url of the block producer, normally the url of the block producer presentation website,
-          * @param location - is the country code as defined in the ISO 3166, https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
+          * @param location - the producer's position in the round-robin: a new schedule runs in ascending
+          *        `location` order, account name breaking ties. A change applies when the set of scheduled
+          *        producers next changes. It does not affect rank or pay.
           *
           * @note Creating a producer row, or reactivating one parked by `unregprod`, requires an
           *       ACTIVE OPERATOR_TYPE_PRODUCER operator in sysio.opreg. For ordinary operators,
@@ -529,7 +543,7 @@ namespace sysiosystem {
           * @param finalizer_key - key to be registered. The key is in base64url format.
           * @param proof_of_possession - a valid Proof of Possession signature to show the producer owns the private key of the finalizer_key. The signature is in base64url format.
           *
-          * @pre `finalizer_name` must be a registered producer
+          * @pre `finalizer_name` must be an active producer with active producer-operator standing
           * @pre `finalizer_key` must be in base64url format
           * @pre `proof_of_possession` must be a valid of proof of possession signature
           * @pre Authority of `finalizer_name` to register. `linkauth` may be used to allow a lower authrity to exectute this action.
@@ -689,8 +703,8 @@ namespace sysiosystem {
           * The T5 category buckets (`sysio.ops` capex, `sysio.gov` governance) are NOT credited
           * here — payepoch transfers to them directly. A claim needs `require_auth(account_name)`
           * and neither can ever produce it: `sysio.roa` forces `net_weight`/`cpu_weight` to zero
-          * for every `sysio`-prefixed account, so they cannot pay for a transaction, and unlike
-          * `sysio.dclaim` they carry no contract that could emit the claim inline. They are
+          * for every `sysio`-prefixed account, so they cannot pay for a transaction. They also
+          * carry no contract that could emit the claim inline. They are
           * protocol-owned holding accounts with no code, so the notify-handler threat the pull
           * model defends against does not exist for them. See the note at the push site in
           * emissions.cpp for the standing constraint that keeps it that way.
@@ -721,7 +735,7 @@ namespace sysiosystem {
           * `period_emission` is the gate-computed sum of pending accrued
           * emissions plus this epoch's per-epoch share. payepoch trusts that
           * value (single-trx semantics make recomputation unnecessary) and
-          * distributes it across producer / batch / capital / capex / gov
+          * distributes it across producer / batch / capex / gov
           * pools as today, scaled to the period.
           *
           * `batch_op_groups` is retained as an ABI-compatible reserved field;
@@ -730,10 +744,9 @@ namespace sysiosystem {
           * ACTUAL accrued-epoch count, rather than configured
           * pay_cadence_epochs, because a mid-period config change or shortened
           * genesis period can make those differ. Incomplete history retains the
-          * batch-emission slice in treasury, leaves swap fees in sysio.reserv
-          * for a later payable period, and is reset for the next period. A
-          * complete but all-empty history also leaves swap fees in sysio.reserv;
-          * neither condition may halt sysio.epoch::advance.
+          * batch-emission slice in treasury and is reset for the next period;
+          * neither it nor a complete but all-empty history may halt
+          * sysio.epoch::advance.
           *
           * Runtime conditions (config missing, treasury exhausted, balance
           * insufficient) are caught upstream by the gate, which records the
@@ -778,27 +791,6 @@ namespace sysiosystem {
           */
          [[sysio::action]]
          void rcrdbatch(uint32_t epoch_index, std::vector<sysio::name> members);
-
-         /**
-          * Fund a capital draw against the T5 drainable pool for `recipient`,
-          * one of the two drains: sysio.dclaim, inline from its `onreward` as
-          * each STAKING_REWARD lands, and sysio.liq, inline from its `addyield`
-          * for the kicker on each yield intake. The recipient is funded the
-          * moment its ledger row is written, so a claim can follow at once.
-          * Auth: the recipient.
-          *
-          * Never throws for those two callers (OPP-handler never-throw
-          * contract): if the pool cannot cover `amount`, the transfer caps at
-          * what's available and the unfunded delta is accrued to
-          * t5state.capital_shortfall_total for operator visibility. Any other
-          * recipient is refused.
-          *
-          * Amounts actually transferred count toward t5state.total_distributed
-          * so the emission curve auto-throttles via its remaining-headroom
-          * clamp.
-          */
-         [[sysio::action]]
-         void fundclaim(sysio::name recipient, int64_t amount);
 
          /**
           * Read-only: current T5 treasury emission state.

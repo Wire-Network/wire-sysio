@@ -1,7 +1,6 @@
 {
   "schema_version": 1,
   "network": "dev-cluster",
-  "t5_reserve_allocation": "100000000000",
   "t5_dex_allocation": "20000000000",
   "chains": [
     { "kind": "CHAIN_KIND_WIRE", "code": "WIRE", "external_chain_id": 0,
@@ -52,38 +51,6 @@
       "contract_address": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
       "is_native": false }
   ],
-  "reserves": [
-    { "code": "PRIMARY", "chain_code": "ETHEREUM", "token_code": "ETH",
-      "name": "ETHEREUM-ETH/WIRE primary reserve",
-      "description": "Bootstrap-seeded native ETH ↔ WIRE reserve",
-      "initial_chain_amount": "10000000000", "initial_wire_amount": "10000000000",
-      "connector_weight_bps": 5000, "is_private": false, "owner": "" },
-    { "code": "PRIMARY", "chain_code": "ETHEREUM", "token_code": "USDC",
-      "name": "ETHEREUM-USDC/WIRE primary reserve",
-      "description": "Bootstrap-seeded USDC ↔ WIRE reserve (mock ERC-20)",
-      "initial_chain_amount": "10000000000", "initial_wire_amount": "10000000000",
-      "connector_weight_bps": 5000, "is_private": false, "owner": "" },
-    { "code": "PRIMARY", "chain_code": "ETHEREUM", "token_code": "USDT",
-      "name": "ETHEREUM-USDT/WIRE primary reserve",
-      "description": "Bootstrap-seeded USDT ↔ WIRE reserve (mock ERC-20)",
-      "initial_chain_amount": "10000000000", "initial_wire_amount": "10000000000",
-      "connector_weight_bps": 5000, "is_private": false, "owner": "" },
-    { "code": "PRIMARY", "chain_code": "SOLANA", "token_code": "SOL",
-      "name": "SOLANA-SOL/WIRE primary reserve",
-      "description": "Bootstrap-seeded native SOL ↔ WIRE reserve",
-      "initial_chain_amount": "10000000000", "initial_wire_amount": "10000000000",
-      "connector_weight_bps": 5000, "is_private": false, "owner": "" },
-    { "code": "PRIMARY", "chain_code": "SOLANA", "token_code": "USDCSOL",
-      "name": "SOLANA-USDCSOL/WIRE primary reserve",
-      "description": "Bootstrap-seeded USDC ↔ WIRE reserve on Solana (mock SPL)",
-      "initial_chain_amount": "10000000000", "initial_wire_amount": "10000000000",
-      "connector_weight_bps": 5000, "is_private": false, "owner": "" },
-    { "code": "PRIMARY", "chain_code": "SOLANA", "token_code": "USDTSOL",
-      "name": "SOLANA-USDTSOL/WIRE primary reserve",
-      "description": "Bootstrap-seeded USDT ↔ WIRE reserve on Solana (mock SPL)",
-      "initial_chain_amount": "10000000000", "initial_wire_amount": "10000000000",
-      "connector_weight_bps": 5000, "is_private": false, "owner": "" }
-  ],
   "liq_pools": [
     { "chain_code": "ETHEREUM", "token_code": "LIQETH", "pair_symbol": "LIQETHP",
       "name": "LIQETH/WIRE yield pool",
@@ -108,9 +75,5 @@
     { "chain_code": "SOLANA", "token_code": "LIQSOL",
       "pubkey": "11111111111111111111111111111111",
       "amount": "3000000000" }
-  ],
-  "uwrit": {
-    "fee_bps": 10,
-    "collateral_lock_duration_ms": "43200000"
-  }
+  ]
 }

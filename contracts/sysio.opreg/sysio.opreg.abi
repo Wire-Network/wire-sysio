@@ -141,6 +141,10 @@
                 {
                     "name": "last_updated_ms",
                     "type": "uint64"
+                },
+                {
+                    "name": "shadow_yield",
+                    "type": "position"
                 }
             ]
         },
@@ -187,6 +191,24 @@
                 {
                     "name": "account",
                     "type": "name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
+            "name": "claimyield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
                 }
             ]
         },
@@ -235,42 +257,12 @@
                     "type": "name"
                 },
                 {
-                    "name": "amount",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "depositinle",
-            "base": "",
-            "fields": [
-                {
-                    "name": "account",
-                    "type": "name"
-                },
-                {
-                    "name": "chain_code",
-                    "type": "slug_name"
-                },
-                {
                     "name": "token_code",
                     "type": "slug_name"
                 },
                 {
                     "name": "amount",
                     "type": "uint64"
-                },
-                {
-                    "name": "actor_chain",
-                    "type": "ChainKind"
-                },
-                {
-                    "name": "actor_address",
-                    "type": "bytes"
-                },
-                {
-                    "name": "original_message_id",
-                    "type": "checksum256"
                 }
             ]
         },
@@ -405,6 +397,20 @@
             ]
         },
         {
+            "name": "position",
+            "base": "",
+            "fields": [
+                {
+                    "name": "index_checkpoint",
+                    "type": "uint128"
+                },
+                {
+                    "name": "owed_wire",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "processbatch",
             "base": "",
             "fields": [
@@ -500,28 +506,6 @@
             ]
         },
         {
-            "name": "releaselock",
-            "base": "",
-            "fields": [
-                {
-                    "name": "account",
-                    "type": "name"
-                },
-                {
-                    "name": "chain_code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "token_code",
-                    "type": "slug_name"
-                },
-                {
-                    "name": "amount",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "remit_claim",
             "base": "",
             "fields": [
@@ -530,12 +514,12 @@
                     "type": "name"
                 },
                 {
-                    "name": "balance",
-                    "type": "uint64"
+                    "name": "token_code",
+                    "type": "slug_name"
                 },
                 {
-                    "name": "expires_at_sec",
-                    "type": "uint32"
+                    "name": "balance",
+                    "type": "uint64"
                 }
             ]
         },
@@ -546,6 +530,10 @@
                 {
                     "name": "account",
                     "type": "uint64"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
                 }
             ]
         },
@@ -610,6 +598,16 @@
             ]
         },
         {
+            "name": "sweepyield",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                }
+            ]
+        },
+        {
             "name": "termcheck",
             "base": "",
             "fields": [
@@ -662,6 +660,10 @@
                     "type": "name"
                 },
                 {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
                     "name": "amount",
                     "type": "uint64"
                 }
@@ -712,7 +714,7 @@
             ]
         },
         {
-            "name": "withdrawinle",
+            "name": "yield_debt",
             "base": "",
             "fields": [
                 {
@@ -720,16 +722,44 @@
                     "type": "name"
                 },
                 {
-                    "name": "chain_code",
-                    "type": "slug_name"
-                },
-                {
                     "name": "token_code",
                     "type": "slug_name"
                 },
                 {
-                    "name": "amount",
+                    "name": "owed_wire",
+                    "type": "uint128"
+                }
+            ]
+        },
+        {
+            "name": "yield_pool",
+            "base": "",
+            "fields": [
+                {
+                    "name": "received",
                     "type": "uint64"
+                },
+                {
+                    "name": "credited",
+                    "type": "uint64"
+                },
+                {
+                    "name": "pulled_index",
+                    "type": "uint128"
+                },
+                {
+                    "name": "pulled_owed",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "yield_pool_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
                 }
             ]
         }
@@ -751,13 +781,13 @@
             "ricardian_contract": ""
         },
         {
-            "name": "deposit",
-            "type": "deposit",
+            "name": "claimyield",
+            "type": "claimyield",
             "ricardian_contract": ""
         },
         {
-            "name": "depositinle",
-            "type": "depositinle",
+            "name": "deposit",
+            "type": "deposit",
             "ricardian_contract": ""
         },
         {
@@ -796,11 +826,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "releaselock",
-            "type": "releaselock",
-            "ricardian_contract": ""
-        },
-        {
             "name": "setconfig",
             "type": "setconfig",
             "ricardian_contract": ""
@@ -808,6 +833,11 @@
         {
             "name": "slash",
             "type": "slash",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sweepyield",
+            "type": "sweepyield",
             "ricardian_contract": ""
         },
         {
@@ -823,11 +853,6 @@
         {
             "name": "withdraw",
             "type": "withdraw",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "withdrawinle",
-            "type": "withdrawinle",
             "ricardian_contract": ""
         }
     ],
@@ -887,16 +912,9 @@
             "name": "remitclaims",
             "type": "remit_claim",
             "index_type": "i64",
-            "key_names": ["account"],
-            "key_types": ["uint64"],
-            "table_id": 45499,
-            "secondary_indexes": [
-                {
-                    "name": "byexpiry",
-                    "key_type": "uint128",
-                    "table_id": 43905
-                }
-            ]
+            "key_names": ["account","token_code"],
+            "key_types": ["uint64","slug_name"],
+            "table_id": 45499
         },
         {
             "name": "wtdwqueue",
@@ -917,6 +935,22 @@
                     "table_id": 34233
                 }
             ]
+        },
+        {
+            "name": "yielddebts",
+            "type": "yield_debt",
+            "index_type": "i64",
+            "key_names": ["account","token_code"],
+            "key_types": ["uint64","slug_name"],
+            "table_id": 2779
+        },
+        {
+            "name": "yieldpool",
+            "type": "yield_pool",
+            "index_type": "i64",
+            "key_names": ["token_code"],
+            "key_types": ["slug_name"],
+            "table_id": 51955
         }
     ],
     "ricardian_clauses": [],

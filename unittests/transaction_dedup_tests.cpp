@@ -481,6 +481,19 @@ BOOST_AUTO_TEST_CASE(fork_switch_reapply) {
 
 // ---- File persistence ----
 
+/// Failed publication preserves the target and cleans the completed snapshot sibling.
+BOOST_AUTO_TEST_CASE(file_publication_failure_cleans_temporary) {
+   fc::temp_directory directory;
+   const auto target = directory.path() / "dedup.bin";
+   std::filesystem::create_directory(target);
+   transaction_dedup dedup;
+   dedup.record(make_id(1), make_exp(100));
+   BOOST_CHECK_THROW(dedup.write_to_file(target), std::filesystem::filesystem_error);
+   BOOST_CHECK(std::filesystem::is_directory(target));
+   BOOST_CHECK_EQUAL(std::distance(std::filesystem::directory_iterator(directory.path()),
+                                 std::filesystem::directory_iterator()), 1);
+}
+
 BOOST_AUTO_TEST_CASE(file_round_trip) {
    // Unique per-invocation directory to avoid races when parallel ctest runs
    // the three sys-vm variants of this test binary concurrently.

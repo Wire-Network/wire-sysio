@@ -6,6 +6,7 @@ void swap::transfer( const name& from, const name& to, const asset& quantity,
   const string& memo) {
     check( from != to, "cannot transfer to self" );
     require_auth( from );
+    require_clear();
     check( is_account( to ), "to account does not exist");
     auto sym = quantity.symbol.code();
     stats statstable( get_self() );

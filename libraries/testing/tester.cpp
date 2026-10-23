@@ -120,7 +120,7 @@ namespace sysio::testing {
       return fc::json::from_string( read_gzipped_snapshot(fn) );
    }
 
-   const fc::microseconds base_tester::abi_serializer_max_time{1000*1000}; // 1s for slow test machines
+   const fc::microseconds base_tester::abi_serializer_max_time = fc::seconds(10);
 
    bool expect_assert_message(const fc::exception& ex, string expected) {
       BOOST_TEST_MESSAGE("LOG : " << "expected: " << expected << ", actual: " << ex.get_log().at(0).get_message());

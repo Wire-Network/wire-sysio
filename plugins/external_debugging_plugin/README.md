@@ -175,5 +175,3 @@ it. No test dials a real server.
   plugin's `ext-debugging-*` triple layers over.
 - [`prometheus_plugin`](../prometheus_plugin) -- its `nodeop_outbound_http_*` counters include this plugin's
   outbound traffic, since all outbound callers share one transport.
-- [`underwriter_plugin`](../underwriter_plugin) -- the other OPP-side plugin; it has its own
-  `/v1/underwriter/*` diagnostics rather than an external sink.

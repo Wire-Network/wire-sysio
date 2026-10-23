@@ -64,8 +64,9 @@ std::string to_log_string(const T& req, size_t max_size = 1024) {
    return buffer;
 }
 
-// use the Curiously Recurring Template Pattern so that
-// the same code works with both regular TCP sockets and UNIX sockets
+/// An HTTP session over a TCP or a unix socket. It has no lock or strand: at most one asynchronous operation is
+/// outstanding, and whoever starts one must leave the socket and messages alone afterwards, as its completion may
+/// already be running on an http thread.
 template <class Socket>
 class beast_http_session : public detail::abstract_conn,
                            public std::enable_shared_from_this<beast_http_session<Socket>> {
@@ -411,6 +412,9 @@ public:
       }
    }
 
+   /// Log the exception being handled; the first report on a connection is also sent as a 500, after which the
+   /// connection closes. Call only from a catch block, before the request is answered, as the caller's last use of the
+   /// connection.
    virtual void handle_exception() final {
       std::string err_str;
       try {
@@ -457,12 +461,14 @@ public:
 
 
       if(is_send_exception_response_) {
+         is_send_exception_response_ = false; // at most one exception response per session
          set_content_type_header(http_content_type::json);
          res_->keep_alive(false);
-         res_->set(http::field::server, BOOST_BEAST_VERSION_STRING);
+         if (!plugin_state_->server_header.empty())
+            res_->set(http::field::server, plugin_state_->server_header);
 
+         // keep_alive is false, so the write completion closes the connection
          send_response(std::move(err_str), static_cast<unsigned int>(http::status::internal_server_error));
-         do_eof();
       }
    }
 
@@ -565,7 +571,6 @@ public:
 
    virtual void send_response(std::string&& json, unsigned int code) final {
       auto payload_size = json.size();
-      increment_bytes_in_flight(payload_size);
       write_begin_ = steady_clock::now();
       auto dt = write_begin_ - handle_begin_;
       handle_time_us_ += std::chrono::duration_cast<std::chrono::microseconds>(dt).count();
@@ -580,6 +585,8 @@ public:
       fc_dlog( plugin_state_->get_logger(), "Response: {} {}",
                remote_endpoint_, to_log_string(*res_) );
 
+      // Counted only now: an invalid status or a body the status forbids throws above, and the write releases it.
+      increment_bytes_in_flight(payload_size);
       // Write the response
       http::async_write(
          socket_,

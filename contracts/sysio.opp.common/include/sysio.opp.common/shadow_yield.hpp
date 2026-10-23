@@ -27,6 +27,8 @@
 
 #include <sysio/asset.hpp>
 #include <sysio/check.hpp>
+#include <sysio/kv_scoped_table.hpp>
+#include <sysio/kv_table.hpp>
 #include <sysio/name.hpp>
 #include <sysio/symbol.hpp>
 
@@ -61,6 +63,11 @@ struct symbol_key {
 };
 
 /// A holder's row for one shadow symbol.
+///
+/// LAYOUT IS SHARED STATE. Beyond `sysio.liq`, every custodian built on `shadow_custody.hpp` reads
+/// its own holder row through `custody::custodian_owed` (`sysio.opreg` in `sweepyield` and
+/// `claimyield`), and `sysio.swap` reads its pools' rows. Changing the layout means `sysio.liq` and
+/// every custodian redeploy together.
 struct account {
    asset     balance;
    uint128_t index_checkpoint = 0;   ///< index value at the last settle of this row
@@ -69,12 +76,40 @@ struct account {
 };
 
 /// One shadow symbol's distribution state.
+///
+/// LAYOUT IS SHARED STATE. Beyond `sysio.liq`, every custodian built on `shadow_custody.hpp` reads
+/// this row through `custody::live_index` -- `sysio.opreg` on its never-throw remit paths (withdraw
+/// flush, lock release, termination) as well as its signed actions -- and `sysio.swap` reads it
+/// for its pools. Changing the layout means `sysio.liq` and every custodian redeploy together.
 struct yield_index {
    uint128_t index = 0;   ///< cumulative WIRE per shadow unit, scaled by YIELD_INDEX_SCALE
    uint64_t  pot   = 0;   ///< WIRE held for holders and not yet claimed
    uint64_t  carry = 0;   ///< WIRE received but below one index unit, carried to the next add
    SYSLIB_SERIALIZE(yield_index, (index)(pot)(carry))
 };
+
+/// The token's holder table as any contract reads it: code = the token contract, scope = holder.
+/// Declared here, outside every contract class, so the ABI generator of a contract that merely
+/// READS it (`sysio.swap`, every `shadow_custody.hpp` custodian) does not list it as its own table;
+/// `sysio.liq` aliases it inside its class to declare it as its own.
+using accounts_table = kv::scoped_table<ACCOUNTS_TABLE, symbol_key, account>;
+/// The token's per-symbol index table, as any contract reads it: code = scope = the token contract.
+/// Declared outside every contract class for the same reason as `accounts_table`.
+using yield_index_table = kv::table<YIELD_INDEX_TABLE, symbol_key, yield_index>;
+
+/// The WIRE a position of `balance` units is owed at index `index`: `banked` plus
+/// `balance * (index - index_checkpoint) / YIELD_INDEX_SCALE`, the product in 128
+/// bits and the division floored. Generic over whose position it is: `sysio.liq`
+/// settles its holder rows with it (through the `account` overload below), and a
+/// holder that attributes its own holding among sub-positions (`sysio.opreg` over
+/// the shadow operators bond to it) settles each sub-position against the SAME
+/// token index with the same formula, from its own checkpoint and banked amount.
+///
+/// UNCHECKED, so a never-throw caller can use it: the caller guarantees
+/// `index >= index_checkpoint` (an index only grows) and bounds the result itself.
+inline u128 owed(uint64_t balance, uint64_t banked, u128 index_checkpoint, u128 index) {
+   return static_cast<u128>(banked) + static_cast<u128>(balance) * (index - index_checkpoint) / YIELD_INDEX_SCALE;
+}
 
 /// The WIRE a holder row is owed now, at index `index`: the banked amount plus
 /// the accrual since its checkpoint, floored. Pure, so the token's settle and a
@@ -83,8 +118,7 @@ struct yield_index {
 inline uint64_t owed(const account& row, u128 index) {
    check( index >= row.index_checkpoint, "index precedes the row checkpoint" );
    if (row.balance.amount <= 0) return row.owed_wire;
-   const u128 accrued = static_cast<u128>(row.balance.amount) * (index - row.index_checkpoint) / YIELD_INDEX_SCALE;
-   const u128 total   = static_cast<u128>(row.owed_wire) + accrued;
+   const u128 total = owed(static_cast<uint64_t>(row.balance.amount), row.owed_wire, row.index_checkpoint, index);
    check( total <= static_cast<u128>(asset::max_amount), "owed yield exceeds the asset range" );
    return static_cast<uint64_t>(total);
 }

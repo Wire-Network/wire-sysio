@@ -15,6 +15,12 @@ static_assert(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__);
 
 namespace sysio { namespace chain {
 
+   namespace {
+      constexpr auto empty_active_block_log_message =
+         "{} is empty: the launch that created it did not complete startup. "
+         "Rerun once with --delete-all-blocks.";
+   }
+
    enum versions {
       initial_version = 1,                  ///< complete block log from genesis
       block_x_start_version = 2,            ///< adds optional partial block log, cannot be used for replay without snapshot
@@ -1565,8 +1571,11 @@ namespace sysio { namespace chain {
                                       });
       }
 
-      if (first_block_file.empty() && std::filesystem::exists(block_dir / "blocks.log")) {
-         first_block_file = block_dir / "blocks.log";
+      const auto active_log = block_dir / "blocks.log";
+      if (first_block_file.empty() && std::filesystem::exists(active_log)) {
+         SYS_ASSERT(std::filesystem::file_size(active_log) > 0, block_log_exception,
+                    empty_active_block_log_message, active_log.generic_string());
+         first_block_file = active_log;
       }
 
       if (!first_block_file.empty()) {

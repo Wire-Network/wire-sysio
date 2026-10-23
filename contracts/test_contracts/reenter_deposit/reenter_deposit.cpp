@@ -3,6 +3,7 @@
 #include <sysio/contract.hpp>
 #include <sysio/name.hpp>
 #include <sysio/permission.hpp>
+#include <sysio.opp.common/wire_asset.hpp>
 
 #include <string>
 #include <tuple>
@@ -25,7 +26,7 @@ public:
    using contract::contract;
 
    /// On the deposit's outgoing WIRE transfer, re-enter `opreg::deposit` with a
-   /// `+1` credit. Guards: only react to OUR OWN outgoing transfer
+   /// `+1` WIRE credit. Guards: only react to OUR OWN outgoing transfer
    /// (`from == get_self()`), and only when the moved quantity exceeds the `+1`
    /// re-deposit, so the re-entrant deposit's own transfer cannot recurse.
    [[sysio::on_notify("sysio.token::transfer")]]
@@ -35,7 +36,7 @@ public:
       sysio::action(
          sysio::permission_level{get_self(), sysio::name("active")},
          sysio::name("sysio.opreg"), sysio::name("deposit"),
-         std::make_tuple(get_self(), static_cast<uint64_t>(1))
+         std::make_tuple(get_self(), sysio::opp::wire::token_code, static_cast<uint64_t>(1))
       ).send();
    }
 };

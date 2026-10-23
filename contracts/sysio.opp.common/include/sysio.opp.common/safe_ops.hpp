@@ -4,7 +4,7 @@
  * @brief Non-throwing primitives for the OPP inbound-consensus dispatch path.
  *
  * Every OPP contract handler reachable from `sysio.msgch::deliver -> evalcons ->
- * dispatch` (createuwreq, rcrdcommit, onreward, the swap-settlement tail, ...)
+ * dispatch` (syndication intake, yield reporting, node-owner linking, ...)
  * MUST NOT abort on operator-supplied data: a `check()`/abort there rolls back
  * the consensus-tipping delivery and stalls epoch advancement chain-wide
  * (`feedback_opp_handlers_never_throw.md`). The two recurring foot-guns are
@@ -15,9 +15,8 @@
  *      a wrap corrupts `>=` sufficiency guards and can let a later `asset()` /
  *      `subtract_balance` abort slip through into settlement.
  *
- * The helpers below were previously copied into individual contracts
- * (`sysio.reserv`'s `add_capped_u64`). They live here so every OPP contract
- * saturates the same way — one place to change, one place to audit.
+ * The helpers below live here so every OPP contract saturates the same way —
+ * one place to change, one place to audit.
  *
  * Name VALIDATION is deliberately not here: it belongs to `sysio::name` itself
  * (`name::is_valid_literal`, the predicate its own constructor uses). A copy in
