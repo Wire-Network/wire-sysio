@@ -53,7 +53,7 @@ public:
       BOOST_REQUIRE(accnt != nullptr);
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
-      abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function(abi_serializer_max_time));
+      abi_ser.set_abi(std::move(abi), fixture_abi_yield_function());
    }
 
    action_result push_msgch_action(name signer, name action_name, const variant_object& data) {
@@ -119,21 +119,21 @@ public:
       auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
          "outbound_envelope", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    fc::variant get_envelope(uint64_t id) {
       auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "envelopes"_n, id);
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
          "envelope_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    fc::variant get_attestation(uint64_t id) {
       auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "attestations"_n, id);
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
          "attestation_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    abi_serializer abi_ser;
@@ -223,7 +223,7 @@ public:
       abi_def msgch_abi_;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(msgch_accnt->abi, msgch_abi_), true);
       msgch_abi.set_abi(std::move(msgch_abi_),
-                        abi_serializer::create_yield_function(abi_serializer_max_time));
+                        fixture_abi_yield_function());
    }
 
    action_result push_action(name account, name signer, name action_name, const variant_object& data) {
@@ -301,7 +301,7 @@ public:
          if (data.empty()) continue;
          auto row = msgch_abi.binary_to_variant(
             "attestation_entry", data,
-            abi_serializer::create_yield_function(abi_serializer_max_time));
+            fixture_abi_yield_function());
          if (row["chain_code"].as_uint64() != chain_code) continue;
          // status == READY (matches AttestationStatus::ATTESTATION_STATUS_READY,
          // the value the contract emits for queued-but-not-yet-bundled rows).
@@ -324,7 +324,7 @@ public:
          if (data.empty()) continue;
          return msgch_abi.binary_to_variant(
             "outbound_envelope", data,
-            abi_serializer::create_yield_function(abi_serializer_max_time));
+            fixture_abi_yield_function());
       }
       return fc::variant{};
    }
@@ -375,7 +375,7 @@ BOOST_FIXTURE_TEST_CASE(buildenv_writes_envlog_row, sysio_msgch_envlog_tester) {
    BOOST_REQUIRE(!data.empty());
    auto row = msgch_abi.binary_to_variant(
       "envelope_log_entry", data,
-      abi_serializer::create_yield_function(abi_serializer_max_time));
+      fixture_abi_yield_function());
    BOOST_REQUIRE_EQUAL(1u, row["id"].as_uint64());
    // start = WIRE/1, end = ETH/31337. ABI serializer reflects the
    // ChainKind enum back as its symbolic name; the `chain_id` field is a
@@ -573,7 +573,7 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
       if (data.empty()) continue;
       emitted_row = msgch_abi.binary_to_variant(
          "outbound_envelope", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       emitted_id = id;
       break;
    }
@@ -606,7 +606,7 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
       if (data.empty()) continue;
       emitted_row_2 = msgch_abi.binary_to_variant(
          "outbound_envelope", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       break;
    }
    BOOST_REQUIRE(!emitted_row_2.is_null());
