@@ -4,11 +4,15 @@
 using namespace sysio::net_utils;
 
 struct mock_connection {
-   enum class bp_connection_type { non_bp, bp_config, bp_gossip };
+   enum class bp_connection_type { non_bp, bp_config, bp_gossip, bp_gossip_validating };
    bp_connection_type bp_connection = bp_connection_type::non_bp;
 
    bool is_open            = false;
    bool handshake_received = false;
+   bool closing            = false;
+   int32_t peer_score      = sysio::peer_scoring::baseline;
+   uint32_t connection_id  = 0;
+   boost::asio::ip::address_v6 address;
    mock_connection(bool bp_connection, bool open, bool received)
      : bp_connection(bp_connection ? bp_connection_type::bp_config : bp_connection_type::non_bp)
      , is_open(open)
@@ -16,7 +20,12 @@ struct mock_connection {
    {}
 
    bool socket_is_open() const { return is_open; }
+   bool closed() const { return !is_open || closing; }
+   /// as connection::close(), marks the connection closing at once; its socket closes later on its strand
+   void close(bool reconnect = true) { closing = true; }
    bool incoming_and_handshake_received() const { return handshake_received; }
+   int32_t get_peer_score() const { return peer_score; }
+   boost::asio::ip::address_v6 remote_address() const { return address; }
 };
 
 using namespace sysio::chain::literals;
@@ -337,6 +346,207 @@ BOOST_AUTO_TEST_CASE(test_exceeding_connection_limit) {
    BOOST_CHECK(!plugin.exceeding_connection_limit(plugin.connections.connections[5]));
    BOOST_CHECK(plugin.exceeding_connection_limit(plugin.connections.connections[6]));
    BOOST_CHECK(!plugin.exceeding_connection_limit(plugin.connections.connections[7]));
+}
+
+/// An open inbound client connection from address that has sent its first handshake.
+std::shared_ptr<mock_connection> inbound_from(const std::string& address) {
+   auto conn = std::make_shared<mock_connection>(false, true, true);
+   conn->address = sysio::net_utils::parse_mapped_v6(address).value();
+   return conn;
+}
+
+/// The bp connection type mark_inbound_bp_connection gives an inbound connection from address.
+mock_connection::bp_connection_type marked_type(const mock_net_plugin& plugin, const std::string& address) {
+   const auto conn = inbound_from(address);
+   plugin.mark_inbound_bp_connection(conn.get());
+   return conn->bp_connection;
+}
+
+/// A gossiped bp peer as validate_gossip_bp_peers_message leaves it, signed by a new key so its signature is unique.
+sysio::gossip_bp_peers_message::signed_bp_peer gossip_peer(sysio::name producer, std::string server_endpoint,
+                                                           std::string outbound_ip_address) {
+   sysio::gossip_bp_peers_message::signed_bp_peer peer{{.producer_name = producer}};
+   peer.cached_bp_peer_info.emplace(std::move(server_endpoint), std::move(outbound_ip_address),
+                                    sysio::block_timestamp_type{});
+   peer.bp_peer_info = fc::raw::pack(*peer.cached_bp_peer_info);
+   peer.sig = fc::crypto::private_key::generate().sign(peer.digest(sysio::chain_id_type::empty_chain_id()));
+   return peer;
+}
+
+BOOST_AUTO_TEST_CASE(test_configured_bp_ip_addresses) {
+   mock_net_plugin plugin;
+   plugin.set_configured_bp_peers({ "proda,192.0.2.1:9876"s, "prodb,[2001:db8::2]:9876:blk"s,
+                                    "prodc,p2p.example.com:9876"s, "prodd,192.0.2.1:9877"s }, {});
+
+   // host names are not addresses, and two endpoints on one host give one address
+   BOOST_CHECK_EQUAL(plugin.config.auto_bp_ip_addresses.size(), 2u);
+   BOOST_CHECK(plugin.config.auto_bp_ip_addresses.contains(boost::asio::ip::make_address_v6("::ffff:192.0.2.1")));
+   BOOST_CHECK(plugin.config.auto_bp_ip_addresses.contains(boost::asio::ip::make_address_v6("2001:db8::2")));
+}
+
+BOOST_AUTO_TEST_CASE(test_mark_inbound_configured_bp_by_address) {
+   using bp_type = mock_connection::bp_connection_type;
+   mock_net_plugin plugin;
+   plugin.set_configured_bp_peers({ "proda,192.0.2.1:9876"s, "prodb,[2001:db8::2]:9876"s, "prodc,localhost:9876"s },
+                                  {});
+
+   // a configured bp connects from any port, and an IPv4 peer may be seen in its mapped spelling
+   BOOST_CHECK(marked_type(plugin, "192.0.2.1") == bp_type::bp_config);
+   BOOST_CHECK(marked_type(plugin, "::ffff:192.0.2.1") == bp_type::bp_config);
+   BOOST_CHECK(marked_type(plugin, "2001:db8::2") == bp_type::bp_config);
+
+   // other addresses are clients; a host name entry is never matched by address, even by one it resolves to
+   BOOST_CHECK(marked_type(plugin, "192.0.2.2") == bp_type::non_bp);
+   BOOST_CHECK(marked_type(plugin, "2001:db8::3") == bp_type::non_bp);
+   BOOST_CHECK(marked_type(plugin, "127.0.0.1") == bp_type::non_bp);
+
+   // an unknown remote endpoint matches nothing, even an unspecified address configured as a bp host
+   plugin.config.auto_bp_ip_addresses.insert(boost::asio::ip::address_v6{});
+   BOOST_CHECK(marked_type(plugin, "::") == bp_type::non_bp);
+
+   // a connection already recognized is left as it is
+   const auto gossip = inbound_from("192.0.2.1");
+   gossip->bp_connection = bp_type::bp_gossip;
+   plugin.mark_inbound_bp_connection(gossip.get());
+   BOOST_CHECK(gossip->bp_connection == bp_type::bp_gossip);
+}
+
+BOOST_AUTO_TEST_CASE(test_mark_inbound_gossip_bp_by_address) {
+   using bp_type = mock_connection::bp_connection_type;
+   const auto add_gossip_peers = [](mock_net_plugin& plugin) {
+      fc::lock_guard g(plugin.gossip_bps.mtx);
+      plugin.gossip_bps.index.insert(gossip_peer("proda"_n, "p2p.proda.example.com:9876", "198.51.100.1"));
+      plugin.gossip_bps.index.insert(gossip_peer("prodb"_n, "p2p.prodb.example.com:9876", "2001:db8::b"));
+      plugin.gossip_bps.index.insert(gossip_peer("prodc"_n, "p2p.prodc.example.com:9876", "not-an-ip-address"));
+   };
+
+   mock_net_plugin gossiping;
+   gossiping.set_bp_producer_peers({ "prodt,127.0.0.1:8020,127.0.0.1"s });
+   add_gossip_peers(gossiping);
+   BOOST_CHECK(marked_type(gossiping, "198.51.100.1") == bp_type::bp_gossip_validating);
+   BOOST_CHECK(marked_type(gossiping, "::ffff:198.51.100.1") == bp_type::bp_gossip_validating);
+   BOOST_CHECK(marked_type(gossiping, "2001:db8::b") == bp_type::bp_gossip_validating);
+   BOOST_CHECK(marked_type(gossiping, "198.51.100.2") == bp_type::non_bp);
+   BOOST_CHECK(marked_type(gossiping, "2001:db8::c") == bp_type::non_bp);
+
+   // without bp gossip of its own, a node does not trust gossiped addresses, even with configured bp peers
+   mock_net_plugin configured_only;
+   configured_only.set_configured_bp_peers({ "proda,192.0.2.1:9876"s }, {});
+   add_gossip_peers(configured_only);
+   BOOST_CHECK(marked_type(configured_only, "198.51.100.1") == bp_type::non_bp);
+
+   // without auto bp peering, nothing is recognized
+   mock_net_plugin disabled;
+   add_gossip_peers(disabled);
+   BOOST_CHECK(marked_type(disabled, "198.51.100.1") == bp_type::non_bp);
+}
+
+BOOST_AUTO_TEST_CASE(test_select_client_to_evict) {
+   using sysio::peer_scoring::eviction_threshold;
+   mock_net_plugin plugin;
+   plugin.setup_test_peers();
+   const auto client = [](int32_t score) {
+      auto conn = std::make_shared<mock_connection>(false, true, true);
+      conn->peer_score = score;
+      return conn;
+   };
+   const auto poor         = client(eviction_threshold - 1);
+   const auto poorest      = client(eviction_threshold - 40);
+   const auto bp           = std::make_shared<mock_connection>(true, true, true);
+   const auto no_handshake = std::make_shared<mock_connection>(false, true, false);
+   const auto closed       = std::make_shared<mock_connection>(false, false, true);
+   const auto closing      = client(0);
+   const auto newcomer     = client(0);
+   bp->peer_score = no_handshake->peer_score = closed->peer_score = 0;
+   closing->closing = true;
+   plugin.connections.connections = { client(sysio::peer_scoring::baseline), poor, bp, no_handshake, closed, closing,
+                                      poorest, newcomer };
+
+   // never the newcomer, a bp, a connection that is not an established client, or one already closing
+   BOOST_CHECK(plugin.select_client_to_evict(newcomer) == poorest);
+
+   // a client back at the threshold keeps its slot
+   poorest->peer_score = eviction_threshold;
+   BOOST_CHECK(plugin.select_client_to_evict(newcomer) == poor);
+   poor->peer_score = eviction_threshold;
+   BOOST_CHECK(!plugin.select_client_to_evict(newcomer));
+}
+
+BOOST_AUTO_TEST_CASE(test_configured_bp_address_never_counted_or_evicted) {
+   mock_net_plugin plugin;
+   plugin.set_configured_bp_peers({ "proda,192.0.2.1:9876"s }, {});
+   plugin.connections.max_client_count = 1;
+
+   const auto client = inbound_from("192.0.2.9");
+   const auto bp     = inbound_from("192.0.2.1"); // its handshake p2p_address need not name the configured endpoint
+   bp->peer_score = sysio::peer_scoring::min_score;
+   plugin.connections.connections = { client, bp };
+   plugin.mark_inbound_bp_connection(bp.get());
+   BOOST_CHECK(!plugin.exceeding_connection_limit(bp));
+   BOOST_CHECK_EQUAL(plugin.num_established_clients(), 1u);
+
+   // a further client exceeds the limit, and the misbehaving bp is still not evicted for it
+   const auto newcomer = inbound_from("192.0.2.10");
+   plugin.connections.connections.push_back(newcomer);
+   BOOST_CHECK(plugin.exceeding_connection_limit(newcomer));
+   BOOST_CHECK(!plugin.select_client_to_evict(newcomer));
+}
+
+BOOST_AUTO_TEST_CASE(test_closing_clients_not_counted) {
+   mock_net_plugin plugin;
+   const auto closing = inbound_from("192.0.2.10");
+   closing->closing = true; // evicted or refused, its socket not yet closed
+   plugin.connections.connections = { inbound_from("192.0.2.9"), closing };
+   BOOST_CHECK_EQUAL(plugin.num_established_clients(), 1u);
+}
+
+BOOST_AUTO_TEST_CASE(test_admit_client) {
+   mock_net_plugin plugin;
+   plugin.setup_test_peers(); // auto bp peering, which enforces max_client_count at the handshake
+   plugin.connections.max_client_count = 3;
+   const auto keeper = inbound_from("192.0.2.9");
+
+   // within the limit
+   const auto client = inbound_from("192.0.2.10");
+   plugin.connections.connections = { keeper, client };
+   BOOST_CHECK(plugin.admit_client(client));
+   BOOST_CHECK(!keeper->closing && !client->closing);
+
+   // two newcomers handshake together one over the limit: the first takes the misbehaving client's slot, and the
+   // second then fits, as the evicted client stops counting at once
+   const auto victim = inbound_from("192.0.2.11");
+   victim->peer_score = sysio::peer_scoring::eviction_threshold - 1;
+   const auto first  = inbound_from("192.0.2.12");
+   const auto second = inbound_from("192.0.2.13");
+   plugin.connections.connections = { keeper, victim, first, second };
+   BOOST_CHECK(plugin.admit_client(first));
+   BOOST_CHECK(victim->closing);
+   BOOST_CHECK(plugin.admit_client(second));
+   BOOST_CHECK(!keeper->closing && !first->closing && !second->closing);
+
+   // the limit full of clients in good standing: a newcomer is refused
+   const auto refused = inbound_from("192.0.2.14");
+   plugin.connections.connections = { keeper, first, second, refused };
+   BOOST_CHECK(!plugin.admit_client(refused));
+   BOOST_CHECK(refused->closing);
+
+   // one slot free and three newcomers handshake together: refused newcomers stop counting at once, so the last fits
+   const std::vector<std::shared_ptr<mock_connection>> burst{ inbound_from("192.0.2.15"), inbound_from("192.0.2.16"),
+                                                              inbound_from("192.0.2.17") };
+   plugin.connections.connections = { keeper, first };
+   plugin.connections.connections.insert(plugin.connections.connections.end(), burst.begin(), burst.end());
+   BOOST_CHECK(!plugin.admit_client(burst[0]));
+   BOOST_CHECK(!plugin.admit_client(burst[1]));
+   BOOST_CHECK(plugin.admit_client(burst[2]));
+   BOOST_CHECK_EQUAL(plugin.num_established_clients(), 3u);
+
+   // without auto bp peering, create_session() enforces the limit and the handshake admits every client
+   mock_net_plugin disabled;
+   disabled.connections.max_client_count = 1;
+   const auto over = inbound_from("192.0.2.18");
+   disabled.connections.connections = { inbound_from("192.0.2.19"), over };
+   BOOST_CHECK(disabled.admit_client(over));
+   BOOST_CHECK(!over->closing);
 }
 
 struct bp_peer_info_v2 : sysio::gossip_bp_peers_message::bp_peer_info_v1 {

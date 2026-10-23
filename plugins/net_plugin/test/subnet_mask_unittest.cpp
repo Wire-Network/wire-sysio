@@ -108,3 +108,45 @@ BOOST_AUTO_TEST_CASE(ipv4_slash16) {
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_SUITE(mapped_v6_address_tests)
+
+BOOST_AUTO_TEST_CASE(ipv4_is_mapped) {
+   const auto mapped = sysio::net_utils::to_mapped_v6(boost::asio::ip::make_address("192.0.2.7"));
+   BOOST_CHECK(mapped.is_v4_mapped());
+   BOOST_CHECK(mapped == boost::asio::ip::make_address_v6("::ffff:192.0.2.7"));
+}
+
+BOOST_AUTO_TEST_CASE(ipv6_is_unchanged) {
+   const auto address = boost::asio::ip::make_address("2001:db8::1");
+   BOOST_CHECK(sysio::net_utils::to_mapped_v6(address) == address.to_v6());
+}
+
+BOOST_AUTO_TEST_CASE(parse_ip_literals) {
+   using sysio::net_utils::parse_mapped_v6;
+   BOOST_CHECK(parse_mapped_v6("192.0.2.7") == boost::asio::ip::make_address_v6("::ffff:192.0.2.7"));
+   // an IPv4 peer reaching a dual-stack listener is seen in its mapped spelling
+   BOOST_CHECK(parse_mapped_v6("::ffff:192.0.2.7") == parse_mapped_v6("192.0.2.7"));
+   BOOST_CHECK(parse_mapped_v6("2001:db8::1") == boost::asio::ip::make_address_v6("2001:db8::1"));
+   BOOST_CHECK(parse_mapped_v6("[2001:db8::1]") == boost::asio::ip::make_address_v6("2001:db8::1"));
+}
+
+BOOST_AUTO_TEST_CASE(scope_id_is_dropped) {
+   // a connection's recorded remote address keeps no scope id, so a scoped literal must compare without one
+   const auto parsed = sysio::net_utils::parse_mapped_v6("fe80::1%1");
+   BOOST_REQUIRE(parsed);
+   BOOST_CHECK_EQUAL(parsed->scope_id(), 0u);
+   BOOST_CHECK(*parsed == boost::asio::ip::make_address_v6("fe80::1"));
+}
+
+BOOST_AUTO_TEST_CASE(parse_rejects_non_literals) {
+   using sysio::net_utils::parse_mapped_v6;
+   BOOST_CHECK(!parse_mapped_v6(""));
+   BOOST_CHECK(!parse_mapped_v6("[]"));
+   BOOST_CHECK(!parse_mapped_v6("localhost"));
+   BOOST_CHECK(!parse_mapped_v6("p2p.example.com"));
+   BOOST_CHECK(!parse_mapped_v6("192.0.2.7:9876"));
+   BOOST_CHECK(!parse_mapped_v6("[192.0.2.7"));
+}
+
+BOOST_AUTO_TEST_SUITE_END()

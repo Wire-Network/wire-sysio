@@ -101,13 +101,24 @@ configured, so on a non-producing node `producers` admits nothing by itself. `sp
 at least one `peer-key`, or startup fails.
 
 `p2p-max-nodes-per-host` caps how many client nodes may connect from a single /24 (IPv4) or /48 (IPv6) subnet,
-and a connection over that cap is closed outright. `max-clients` caps accepted inbound connections overall,
+and a connection over that cap is closed outright; it is checked on accept, before a BP peer can be recognized, so
+it applies to BP peers too. `max-clients` caps accepted inbound connections overall,
 with 0 meaning no limit. Reaching that limit does not simply refuse the new peer: the node looks for the
 lowest-scoring inbound non-BP connection that is below the eviction threshold, and if it finds one it closes
 that peer and accepts the new connection, logging `Evicting low-score peer <id> (score <n>)`. Only when no
-peer is evictable is the new socket closed, with `max_client_count <n> exceeded, no evictable peer, closing`.
-With BP peering enabled the accept-time check is skipped and the limit is enforced after the first handshake
-instead — a peer's BP status is not known before then — and it counts only inbound non-BP connections.
+peer is evictable is the new socket closed, with `max_client_count <n> exceeded, no evictable peer, closing` at
+debug level.
+With BP peering enabled the accept-time check is skipped and the limit is enforced at the first handshake
+instead, once the duplicate, version and fork checks have passed. It counts the inbound non-BP connections that have
+sent their first handshake and are not closing. The handshake identifies a BP peer by its `p2p_address`, when that
+names a `p2p-auto-bp-peer` endpoint, or by the connection's source address: the host of a `p2p-auto-bp-peer` entry
+written as an IP address, or, on a node that gossips its own BP endpoints, the outbound IP address a gossiped BP
+signed. A BP peer identified either way is neither counted nor ever evicted. Matching by address needs the BP to
+connect from exactly that address, and exempts everything else that connects from it, such as the BP's other nodes
+behind the same NAT. A client over the limit is then handled as at accept time, one handshake at a time: it takes the
+slot of the lowest-scoring client below the eviction threshold, logging `max_client_count <n> exceeded, evicting
+low-score peer <id> (score <n>) for connection <id>`, or is closed without a go-away, with `max_client_count <n>
+exceeded, no evictable peer, closing connection <id>` at debug level.
 
 ## Enabling / configuration
 

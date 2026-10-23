@@ -5,6 +5,7 @@
 #include <sysio/net_plugin/gossip_bps_index.hpp>
 #include <sysio/net_plugin/net_utils.hpp>
 #include <sysio/net_plugin/buffer_factory.hpp>
+#include <sysio/net_plugin/peer_scoring.hpp>
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/producer_schedule.hpp>
 
@@ -46,6 +47,8 @@ class bp_connection_manager {
       // p2p-auto-bp-peer
       flat_map<account_name, net_utils::endpoint>   auto_bp_addresses;      // --p2p-auto-bp-peer account->endpoint
       flat_map<net_utils::endpoint, account_name>   auto_bp_accounts;       // --p2p-auto-bp-peer endpoint->account
+      // --p2p-auto-bp-peer hosts that are IP addresses, in net_utils::to_mapped_v6 form
+      flat_set<boost::asio::ip::address_v6>         auto_bp_ip_addresses;
       // p2p-bp-gossip-endpoint, producer account -> [inbound_endpoint,outbound_ip_address] for bp gossip
       std::unordered_map<account_name, std::vector<bp_gossip_endpoint_t>>  my_bp_gossip_accounts;
    } config; // thread safe only because modified at plugin startup currently
@@ -62,6 +65,8 @@ class bp_connection_manager {
    name_set_t                    pending_bps GUARDED_BY(mtx); // written on main thread, read by gossip_bp_addresses_to_drop() on net threads
    name_set_t                    active_bps GUARDED_BY(mtx);
    name_set_t                    active_schedule GUARDED_BY(mtx);
+
+   fc::mutex                     client_admission_mtx; // serializes admit_client()
 
    Derived*       self() { return static_cast<Derived*>(this); }
    const Derived* self() const { return static_cast<const Derived*>(this); }
@@ -163,6 +168,8 @@ public:
             SYS_ASSERT(std::find(peers.begin(), peers.end(), addr) == peers.end(), chain::plugin_config_exception,
                        "\"{}\" should only appear in either p2p-peer-address or p2p-auto-bp-peer option, not both.", addr);
             fc_dlog(p2p_log, "Setting p2p-auto-bp-peer {} -> {}", account, addr);
+            if (const auto address = net_utils::parse_mapped_v6(e.host))
+               config.auto_bp_ip_addresses.insert(*address);
             config.auto_bp_accounts[e]        = account;
             config.auto_bp_addresses[account] = std::move(e);
          } catch (chain::name_type_exception&) {
@@ -198,15 +205,7 @@ public:
             SYS_ASSERT( outbound_ip_address.length() <= net_utils::max_p2p_address_length, chain::plugin_config_exception,
                         "p2p-bp-gossip-endpoint outbound-ip-address {} too long, must be less than {}",
                         outbound_ip_address, net_utils::max_p2p_address_length );
-            auto is_valid_ip_address = [](const std::string& ip_str) {
-               try {
-                  boost::asio::ip::make_address(ip_str);
-               } catch ( ... ) {
-                  return false;
-               }
-               return true;
-            };
-            SYS_ASSERT( is_valid_ip_address(outbound_ip_address), chain::plugin_config_exception,
+            SYS_ASSERT( net_utils::parse_mapped_v6(outbound_ip_address), chain::plugin_config_exception,
                         "Invalid p2p-bp-gossip-endpoint outbound ip address {}, syntax ip-address", outbound_ip_address);
 
             fc_dlog(p2p_log, "Setting p2p-bp-gossip-endpoint {} -> {},{}", account, inbound_server_endpoint, outbound_ip_address);
@@ -289,10 +288,44 @@ public:
       }
    }
 
-   // Only called from connection strand
+   /// Only called from connection strand, when the first handshake of an inbound connection is received.
+   /// Recognize the connection as a bp peer by its source address, which, unlike the p2p_address of its handshake, the
+   /// peer cannot choose, so that it neither counts against max_client_count nor is evicted to admit a client:
+   ///   bp_config            - the address is the host of a manually configured bp peer (--p2p-auto-bp-peer)
+   ///   bp_gossip_validating - a gossiped bp peer signed the address as its outbound ip address; the bp gossip
+   ///                          message following the handshake confirms the connection as bp_gossip
+   /// A connection already recognized, by the p2p_address of its handshake, is left as it is.
+   void mark_inbound_bp_connection(Connection* conn) const {
+      if (!auto_bp_peering_enabled() || conn->bp_connection != Connection::bp_connection_type::non_bp)
+         return;
+      const boost::asio::ip::address_v6 address = conn->remote_address();
+      if (address.is_unspecified()) // remote endpoint unknown
+         return;
+      if (config.auto_bp_ip_addresses.contains(address)) {
+         conn->bp_connection = Connection::bp_connection_type::bp_config;
+      } else if (bp_gossip_enabled() && is_gossip_bp_outbound_address(address)) {
+         conn->bp_connection = Connection::bp_connection_type::bp_gossip_validating;
+      }
+   }
+
+   /// thread safe
+   /// @param address in net_utils::to_mapped_v6 form
+   /// @return true if a gossiped bp peer signed address as its outbound ip address
+   bool is_gossip_bp_outbound_address(const boost::asio::ip::address_v6& address) const {
+      fc::lock_guard g(gossip_bps.mtx);
+      return std::any_of(gossip_bps.index.begin(), gossip_bps.index.end(),
+                         [&address](const gossip_bp_peers_message::signed_bp_peer& peer) {
+                            return net_utils::parse_mapped_v6(peer.outbound_ip_address()) == address;
+                         });
+   }
+
+   /// Only called from connection strand
+   /// @return true for a connection counted against max_client_count: an inbound non-bp connection that has sent its
+   ///         first handshake and is not closing, so an evicted or refused connection stops counting at once
    template <typename Conn>
    static bool established_client_connection(Conn&& conn) {
-      return conn->bp_connection == Connection::bp_connection_type::non_bp && conn->socket_is_open() && conn->incoming_and_handshake_received();
+      return conn->bp_connection == Connection::bp_connection_type::non_bp && !conn->closed() &&
+             conn->incoming_and_handshake_received();
    }
 
    send_buffer_type get_gossip_bp_initial_send_buffer() {
@@ -322,6 +355,39 @@ public:
    bool exceeding_connection_limit(std::shared_ptr<Connection> new_connection) const {
       return auto_bp_peering_enabled() && self()->connections.get_max_client_count() != 0 &&
              established_client_connection(new_connection) && num_established_clients() > self()->connections.get_max_client_count();
+   }
+
+   /// Only called from connection strand, when new_connection exceeds the client limit.
+   /// @return the established client connection to evict to admit new_connection, chosen by
+   ///         peer_scoring::select_eviction_victim; never new_connection, a bp connection, or one already closing.
+   ///         Null when new_connection is to be refused instead.
+   std::shared_ptr<Connection> select_client_to_evict(const std::shared_ptr<Connection>& new_connection) const {
+      return peer_scoring::select_eviction_victim<std::shared_ptr<Connection>>(
+         self()->connections, [&new_connection](const std::shared_ptr<Connection>& conn) {
+            return conn != new_connection && established_client_connection(conn);
+         });
+   }
+
+   /// Only called from connection strand, when the first handshake of new_connection is received.
+   /// Enforce max_client_count: a client over the limit takes the slot of the client select_client_to_evict chooses,
+   /// which is closed, or else is closed itself. Admissions are serialized and close() marks a connection closing at
+   /// once, so concurrent newcomers neither claim the same victim nor count one another in.
+   /// @return false when new_connection was refused
+   bool admit_client(const std::shared_ptr<Connection>& new_connection) {
+      fc::lock_guard g(client_admission_mtx);
+      if (!exceeding_connection_limit(new_connection))
+         return true;
+      const uint32_t max_clients = self()->connections.get_max_client_count();
+      if (const std::shared_ptr<Connection> victim = select_client_to_evict(new_connection)) {
+         fc_ilog(p2p_conn_log, "max_client_count {} exceeded, evicting low-score peer {} (score {}) for connection {}",
+                 max_clients, victim->connection_id, victim->get_peer_score(), new_connection->connection_id);
+         victim->close();
+         return true;
+      }
+      fc_dlog(p2p_conn_log, "max_client_count {} exceeded, no evictable peer, closing connection {}",
+              max_clients, new_connection->connection_id);
+      new_connection->close(false);
+      return false;
    }
 
    // thread safe
