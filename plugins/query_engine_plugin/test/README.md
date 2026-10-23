@@ -10,7 +10,7 @@ From the repository root, after the normal full build with tests and test contra
 build/release/plugins/query_engine_plugin/test/test_query_engine_plugin --log_level=test_suite
 build/release/plugins/query_engine_plugin/test/test_query_engine_plugin_http --log_level=test_suite
 build/release/tests/plugin_test --run_test=get_table_tests
-build/release/plugins/status_monitor_plugin/test/test_status_monitor_plugin
+build/release/plugins/alert_monitor_plugin/test/test_alert_monitor_plugin
 ```
 
 Substitute the configured build directory. CTest registers the first query binary as parallelizable
