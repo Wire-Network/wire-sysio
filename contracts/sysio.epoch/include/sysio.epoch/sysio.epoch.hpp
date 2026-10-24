@@ -161,8 +161,8 @@ namespace sysio {
 
       /// Upper bound on `operators_per_epoch` (the size of one schedule group): Ethereum's OPPInbound is
       /// sized and tested for `OPERATORS_PER_GROUP` (7), under Solana's `MAX_GROUP_MEMBERS` (16). Each
-      /// member of the expiring group also costs inline actions in `advance` (opreg::recorddel +
-      /// opreg::termcheck per outpost, and a sysio.system::payepoch transfer).
+      /// member of the expiring group also costs two inline actions in `advance` (opreg::recorddel +
+      /// opreg::termcheck) and a payclaims credit in sysio.system::payepoch.
       static constexpr uint32_t MAX_OPERATORS_PER_EPOCH = 7;
 
       /// Largest schedule window (operators_per_epoch * batch_op_groups, which the product equality pins

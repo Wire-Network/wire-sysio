@@ -170,9 +170,9 @@ namespace sysiosystem {
       /// the period's per-block rate and zeroes the count of every producer it pays; a block the
       /// producer's slot did not deliver is simply never counted, so its pay stays in the treasury.
       /// At most one round per rotation is counted; see `last_paid_round`.
-      /// The count SURVIVES a park, a demotion, or a lost key: a producer that is not schedulable
-      /// at a payepoch is neither paid nor reset, and whatever was counted is paid at the first
-      /// payepoch where it is schedulable again (never, for a slashed or terminated one).
+      /// The count SURVIVES a park, a demotion, a lost key, or a termination: a producer that is not
+      /// schedulable at a payepoch is neither paid nor reset, and whatever was counted is paid at the
+      /// first payepoch where it is schedulable again (never, for a slashed one).
       uint32_t                                                 unpaid_blocks = 0;
       time_point                                               last_claim_time;
       /// Schedule-order key: `update_ranked_producers` sorts a new set of scheduled producers by

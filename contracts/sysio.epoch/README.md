@@ -38,8 +38,9 @@ Operator registration, collateral and status live on `sysio.opreg`; the outpost 
 
 1. Emissions readiness gate (block-and-retry via `blocklog`, never a throw).
 2. Delivery audit of the expiring group for every active outpost: every operator that delivered a
-   non-canonical envelope is slashed through `sysio.chalg::slashop`; each member's delivery result is
-   recorded with `sysio.opreg::recorddel`, followed by `sysio.opreg::termcheck`.
+   non-canonical envelope is slashed through `sysio.chalg::slashop`; then each member gets one
+   `sysio.opreg::recorddel` (delivered only if it reached every active outpost), followed by
+   `sysio.opreg::termcheck`.
 3. Bump the epoch index, drop the expired group from the front of the window and append a new tail
    group drawn from `ACTIVE` batch operators that are not already resident (non-bootstrapped first).
    The resident groups stay disjoint, so an operator serves at most once every `batch_op_groups`

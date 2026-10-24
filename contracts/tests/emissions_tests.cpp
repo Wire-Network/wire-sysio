@@ -62,6 +62,44 @@ static constexpr account_name EPOCH = "sysio.epoch"_n;
 static constexpr account_name CHALG = "sysio.chalg"_n;
 static constexpr account_name MSGCH = "sysio.msgch"_n;
 
+/// sysio.opreg actions the producer collateral and held-pay tests push.
+namespace opreg_action {
+constexpr auto regoperator = "regoperator"_n;
+constexpr auto deposit     = "deposit"_n;
+constexpr auto withdraw    = "withdraw"_n;
+constexpr auto cancelwtdw  = "cancelwtdw"_n;
+constexpr auto claimremit  = "claimremit"_n;
+} // namespace opreg_action
+
+/// sysio.opreg tables the held-pay tests read, with the ABI type of a decoded row.
+namespace opreg_table {
+constexpr auto opcounters       = "opcounters"_n;
+constexpr char opcounters_row[] = "op_counters";
+constexpr auto wtdwqueue        = "wtdwqueue"_n;
+} // namespace opreg_table
+
+/// sysio.opreg action and row fields the producer collateral and held-pay tests use.
+namespace opreg_field {
+constexpr char account[]          = "account";
+constexpr char type[]             = "type";
+constexpr char is_bootstrapped[]  = "is_bootstrapped";
+constexpr char token_code[]       = "token_code";
+constexpr char amount[]           = "amount";
+constexpr char request_id[]       = "request_id";
+constexpr char status[]           = "status";
+constexpr char next_withdraw_id[] = "next_withdraw_id";
+} // namespace opreg_field
+
+/// sysio.epoch `epochstate` field the held-pay payout check reads.
+namespace epoch_field {
+constexpr char current_epoch_index[] = "current_epoch_index";
+} // namespace epoch_field
+
+/// sysio.system `epochlog` field the held-pay payout check reads.
+namespace epochlog_field {
+constexpr char compute_amount[] = "compute_amount";
+} // namespace epochlog_field
+
 // Keep these in sync with contracts/sysio.system/src/emissions.cpp
 static constexpr uint32_t SECONDS_PER_MONTH = 30u * 24u * 60u * 60u;
 static constexpr uint32_t T1_DURATION       = 12u * SECONDS_PER_MONTH;
@@ -232,6 +270,8 @@ static constexpr uint32_t T_STANDBY_END_RANK      = 28;
 static constexpr uint16_t T_STANDBY_BPS           = 800;
 /// The fixture's default epoch (init_epoch_state) is 60s at one block per 500ms.
 static constexpr uint32_t T_EPOCH_SECS            = 60;
+/// Seconds in one T5 emission epoch (24 hours).
+static constexpr uint32_t ONE_EPOCH               = 86400u;
 
 // Helper: amount NOT transferred at payepoch when no producers / batch
 // members are paid. Equals producer_pool + batch_pool (compute share, both
@@ -2487,9 +2527,6 @@ BOOST_AUTO_TEST_SUITE_END() // sysio_emissions_tests
 // =============================================================================
 
 BOOST_AUTO_TEST_SUITE(t5_emissions_tests)
-
-// Helper: number of seconds in one epoch (24 hours)
-static constexpr uint32_t ONE_EPOCH = 86400u;
 
 // ---------------------------------------------------------------------------
 // Init
@@ -5985,8 +6022,14 @@ struct producer_score_tester : public producer_eligibility_tester {
          base_tester::push_action("sysio.liq"_n, "mint"_n, "sysio.synd"_n,
             mvo()("to", account)("token_code", token)("amount", amount));
       }
-      return push_opreg_action(account, "deposit"_n,
-         mvo()("account", account)("token_code", token)("amount", amount));
+      return deposit_collateral(account, amount, token);
+   }
+
+   /// Bond `amount` of `token` the account already holds.
+   action_result deposit_collateral(account_name account, uint64_t amount,
+                                    std::string_view token = collateral_token) {
+      return push_opreg_action(account, opreg_action::deposit, mvo()
+         (opreg_field::account, account)(opreg_field::token_code, token)(opreg_field::amount, amount));
    }
 
    /// Push `setscorecfg`. Defaults mirror the contract's own so a test names only the weight it
@@ -6189,6 +6232,109 @@ struct producer_score_tester : public producer_eligibility_tester {
 
       BOOST_REQUIRE_MESSAGE(control->head().header().producer != target,
          "the jump landed on " << target.to_string() << " instead of skipping it");
+   }
+};
+
+/// Bonded producers on a published schedule, for tests that terminate one, bring it back and
+/// check which payouts pay its held blocks.
+struct terminated_producer_tester : public producer_score_tester {
+
+   /// Producers on the published schedule.
+   static constexpr uint32_t producer_count = 3;
+
+   /// Full rotations produced before the first payout, so every producer holds counted blocks.
+   static constexpr uint32_t warmup_rotations = 2;
+
+   /// T5 starts this many seconds more than one T5 epoch ago, so the first advance pays.
+   static constexpr uint32_t t5_start_overdue_secs = 1;
+
+   /// Blocks produced beyond one sysio.epoch of slots, so the next advance is past the boundary.
+   static constexpr uint32_t epoch_crossing_margin_blocks = 10;
+
+   /// Bond the producers, publish their schedule, produce the warm-up rotations and start T5.
+   std::vector<account_name> setup_paid_producers() {
+      create_t5_holding_accounts();
+      auto names = setup_collateralized_producers(producer_count);
+      BOOST_REQUIRE_EQUAL( success(), set_producer_schedule(names) );
+      produce_blocks(1);
+      wait_for_producer_schedule();
+      produce_complete_cycles(producer_count, warmup_rotations);
+      BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name,
+                                              tpsec(head_secs() - ONE_EPOCH - t5_start_overdue_secs) ) );
+      return names;
+   }
+
+   /// Produce past the next sysio.epoch boundary, so the next advance may run.
+   void cross_epoch_boundary() {
+      produce_blocks(test_nominal_slots(T_EPOCH_SECS) + epoch_crossing_margin_blocks);
+   }
+
+   OperatorStatus operator_status(account_name account) {
+      return get_opreg_operator(account)[opreg_field::status].as<OperatorStatus>();
+   }
+
+   /// Register `account` as a producer operator under its own authority, as an operator would.
+   action_result regoperator(account_name account) {
+      return push_opreg_action(account, opreg_action::regoperator, mvo()
+         (opreg_field::account, account)
+         (opreg_field::type, OperatorType::OPERATOR_TYPE_PRODUCER)
+         (opreg_field::is_bootstrapped, false));
+   }
+
+   action_result withdraw(account_name account, uint64_t amount) {
+      return push_opreg_action(account, opreg_action::withdraw, mvo()
+         (opreg_field::account, account)(opreg_field::token_code, collateral_token)(opreg_field::amount, amount));
+   }
+
+   action_result cancelwtdw(account_name account, uint64_t request_id) {
+      return push_opreg_action(account, opreg_action::cancelwtdw, mvo()
+         (opreg_field::account, account)(opreg_field::request_id, request_id));
+   }
+
+   action_result claimremit(account_name account) {
+      return push_opreg_action(account, opreg_action::claimremit, mvo()
+         (opreg_field::account, account)(opreg_field::token_code, collateral_token));
+   }
+
+   /// The id `withdraw` gave the latest request: one below opreg's next free id.
+   uint64_t last_withdraw_request_id() {
+      const auto data = get_row_by_account(OPREG, OPREG, opreg_table::opcounters, opreg_table::opcounters);
+      BOOST_REQUIRE( !data.empty() );
+      const auto counters = opreg_abi_ser.binary_to_variant(opreg_table::opcounters_row, data,
+                                                            fixture_abi_yield_function());
+      return counters[opreg_field::next_withdraw_id].as<uint64_t>() - 1;
+   }
+
+   bool withdraw_request_queued(uint64_t request_id) {
+      return !get_row_by_id(OPREG, OPREG, opreg_table::wtdwqueue, request_id).empty();
+   }
+
+   /// A payout `producer` is not payable at pays it nothing and keeps its count.
+   void assert_unpaid_payout(account_name producer) {
+      const uint32_t blocks = unpaid_blocks_of(producer);
+      const asset before = get_wire_balance_paid(producer);
+      BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+      BOOST_REQUIRE_EQUAL( get_wire_balance_paid(producer), before );
+      BOOST_REQUIRE_GE( unpaid_blocks_of(producer), blocks );
+   }
+
+   /// The next payout pays `producer` every block it holds, at least `held`, at that period's rate.
+   void assert_payout_pays_held_blocks(const std::vector<account_name>& names, account_name producer,
+                                       uint32_t held) {
+      uint64_t produced = 0;
+      for (const auto& p : names) produced += unpaid_blocks_of(p);
+      const uint32_t blocks = unpaid_blocks_of(producer);
+      BOOST_REQUIRE_GE( blocks, held );
+      const asset before = get_wire_balance_paid(producer);
+      BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+      const int64_t got = get_wire_balance_paid(producer).get_amount() - before.get_amount();
+      // The payout logs the epoch the advance moved to.
+      const auto paid_epoch = get_epoch_state_row()[epoch_field::current_epoch_index].as<uint64_t>();
+      const int64_t active_pool =
+         test_active_pool(get_epoch_log(paid_epoch)[epochlog_field::compute_amount].as<int64_t>());
+      const uint64_t divisor = std::max<uint64_t>(produced, test_nominal_slots(T_EPOCH_SECS));
+      BOOST_REQUIRE_EQUAL( got, test_block_pay(active_pool, blocks, divisor) );
+      BOOST_REQUIRE_GT( got, 0 );
    }
 };
 
@@ -6806,6 +6952,60 @@ BOOST_FIXTURE_TEST_CASE( pruned_operator_row_stays_demoted_through_rescore_sweep
    BOOST_REQUIRE(!rescore_pending());
    BOOST_REQUIRE_EQUAL(tier_demoted, tier_of(rank_score_of(target)));
    BOOST_REQUIRE(!is_scheduled(target));
+} FC_LOG_AND_RETHROW()
+
+// Termination keeps a producer's counted blocks but credits its bond to its claim, and a new
+// registration starts UNKNOWN with no bond, so the blocks are paid only once it bonds again.
+BOOST_FIXTURE_TEST_CASE( terminated_producer_is_paid_held_blocks_once_bonded_again,
+                         terminated_producer_tester ) try {
+   const auto names  = setup_paid_producers();
+   const auto target = names[0];
+   BOOST_REQUIRE_EQUAL( success(), terminate_operator(target) );
+   BOOST_REQUIRE( OperatorStatus::OPERATOR_STATUS_TERMINATED == operator_status(target) );
+   const uint32_t held = unpaid_blocks_of(target);
+   BOOST_REQUIRE_GT( held, 0u );
+   assert_unpaid_payout(target);
+
+   // Pull the returned bond and register again: the new registration holds no bond.
+   const asset unclaimed = get_wire_balance(target);
+   BOOST_REQUIRE_EQUAL( success(), claimremit(target) );
+   BOOST_REQUIRE_EQUAL( static_cast<int64_t>(base_min_bond),
+                        get_wire_balance(target).get_amount() - unclaimed.get_amount() );
+   BOOST_REQUIRE_EQUAL( success(), regoperator(target) );
+   BOOST_REQUIRE( OperatorStatus::OPERATOR_STATUS_UNKNOWN == operator_status(target) );
+   cross_epoch_boundary();
+   assert_unpaid_payout(target);
+
+   // Bond again: the next payout pays every held block at that period's rate.
+   BOOST_REQUIRE_EQUAL( success(), deposit_collateral(target, base_min_bond) );
+   BOOST_REQUIRE( OperatorStatus::OPERATOR_STATUS_ACTIVE == operator_status(target) );
+   cross_epoch_boundary();
+   assert_payout_pays_held_blocks(names, target, held);
+} FC_LOG_AND_RETHROW()
+
+// A withdrawal queued before termination outlives it, and the queue is per account: it reserves part
+// of the new registration's bond until it is cancelled.
+BOOST_FIXTURE_TEST_CASE( stale_withdrawal_holds_back_a_rebonded_producer_until_cancelled,
+                         terminated_producer_tester ) try {
+   constexpr uint64_t stale_amount = base_min_bond / 2;   // any part of the bond
+   const auto names  = setup_paid_producers();
+   const auto target = names[0];
+   BOOST_REQUIRE_EQUAL( success(), withdraw(target, stale_amount) );
+   const uint64_t stale_request = last_withdraw_request_id();
+   BOOST_REQUIRE_EQUAL( success(), terminate_operator(target) );
+   BOOST_REQUIRE( withdraw_request_queued(stale_request) );
+   const uint32_t held = unpaid_blocks_of(target);
+
+   // Register and post the whole required bond at once, while the request is still queued.
+   BOOST_REQUIRE_EQUAL( success(), regoperator(target) );
+   BOOST_REQUIRE_EQUAL( success(), credit_collateral(target, base_min_bond) );
+   BOOST_REQUIRE( OperatorStatus::OPERATOR_STATUS_UNKNOWN == operator_status(target) );
+
+   // Cancelling it frees the bond, and the next payout pays every held block.
+   BOOST_REQUIRE_EQUAL( success(), cancelwtdw(target, stale_request) );
+   BOOST_REQUIRE( !withdraw_request_queued(stale_request) );
+   BOOST_REQUIRE( OperatorStatus::OPERATOR_STATUS_ACTIVE == operator_status(target) );
+   assert_payout_pays_held_blocks(names, target, held);
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
