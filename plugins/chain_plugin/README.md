@@ -4,7 +4,7 @@
 state database, fork database, WASM runtime, protocol features, whitelists and blacklists — brings it up from
 genesis, a snapshot, or existing state, and relays the controller's signals onto the appbase channels
 declared in `chain_interface`. Those channels have few subscribers: `batch_operator_plugin` takes
-`irreversible_block` as its sync gate and `status_monitor_plugin` ships one snapshot per irreversible block;
+`irreversible_block` as its sync gate and `alert_monitor_plugin` ships one snapshot per irreversible block;
 nothing else subscribes to any of them — `net_plugin` connects to the controller's signals directly instead. `nodeop` initializes it on every
 run alongside `resource_monitor_plugin`, `net_plugin`, and `producer_plugin`, so there is no `plugin =` line
 to add; it pulls in `signature_provider_manager_plugin` through `APPBASE_PLUGIN_REQUIRES`, which in turn
@@ -99,7 +99,7 @@ registered by `http_client_plugin`.
 `get_info_db` refreshes its cached `/v1/chain/get_info` result on every irreversible block, and on every
 accepted block outside `read-mode = irreversible` — but only when an in-process consumer is configured.
 "Configured" means a `plugin` option value contains `sysio::chain_api_plugin` or
-`sysio::status_monitor_plugin`. Without one, the cache is filled lazily on first use and not refreshed. The
+`sysio::alert_monitor_plugin`. Without one, the cache is filled lazily on first use and not refreshed. The
 flag is fixed when `chain_plugin` initializes, because appbase runs that before any dependent plugin.
 
 ### Features that add work only when enabled
@@ -342,5 +342,5 @@ VM OC whitelist on builds that have it, and the three side databases: `account_q
   `http_client_plugin`, which registers the process-wide `outbound-http-*` options.
 - [`snapshot_api_plugin`](../snapshot_api_plugin/README.md) — serves the snapshots that `--snapshot-endpoint`
   downloads.
-- [`status_monitor_plugin`](../status_monitor_plugin/README.md) — the second in-process consumer of the
+- [`alert_monitor_plugin`](../alert_monitor_plugin/README.md) — the second in-process consumer of the
   `get_info` cache.

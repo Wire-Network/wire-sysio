@@ -12,6 +12,7 @@ documents what it does, how it works, and how to configure it. The plugin lifecy
 
 | Plugin | Description | Docs |
 |---|---|---|
+| `alert_monitor_plugin` | Ships one `/v1/chain/get_info` snapshot per irreversible block and, with `query_engine_plugin`, configured WireQL query results to an OpenSearch/Elasticsearch `_bulk` endpoint, rendered through an operator JSON template | [README](plugins/alert_monitor_plugin/README.md) |
 | `batch_operator_plugin` | Cranks depot and outpost contracts, ferrying OPP message chains between the WIRE chain and the external blockchains (Ethereum, Solana) on the epoch schedule; can also run an underwriter, which bonds `sysio.synd` envelope requests once the outpost confirms them | [README](plugins/batch_operator_plugin/README.md) |
 | `chain_api_plugin` | Publishes chain_plugin's read and write APIs as the `/v1/chain/*` HTTP endpoints | [README](plugins/chain_api_plugin/README.md) |
 | `chain_plugin` | Owns the controller (block log, chain state, fork database, WASM runtime) and relays its signals onto the appbase channels declared in `chain_interface` | [README](plugins/chain_plugin/README.md) |
@@ -35,7 +36,6 @@ documents what it does, how it works, and how to configure it. The plugin lifecy
 | `signature_provider_ssm_plugin` | Adds the `SSM:` signature-provider scheme, fetching a private key once from an AWS SSM Parameter Store SecureString and signing locally thereafter | [README](plugins/signature_provider_ssm_plugin/README.md) |
 | `snapshot_api_plugin` | Public, read-only HTTP endpoints for snapshot discovery and download, so nodes can bootstrap from each other | [README](plugins/snapshot_api_plugin/README.md) |
 | `state_history_plugin` | Records per-block traces, chain-state deltas, and finality data to append-only logs and streams them to clients over a binary websocket protocol | [README](plugins/state_history_plugin/README.md) |
-| `status_monitor_plugin` | Ships one `/v1/chain/get_info` snapshot per irreversible block to an OpenSearch/Elasticsearch `_bulk` endpoint, rendered through an operator JSON template | [README](plugins/status_monitor_plugin/README.md) |
 | `test_control_api_plugin` | HTTP surface for `test_control_plugin`, registering the `/v1/test_control/*` write endpoints in their own `test_control` API category | [README](plugins/test_control_api_plugin/README.md) |
 | `test_control_plugin` | Test-only plugin that arms deliberate node misbehavior: shut down inside a named producer's round, throw from a controller signal handler, or republish the next block with one action swapped | [README](plugins/test_control_plugin/README.md) |
 | `trace_api_plugin` | Full-history action trace store with HTTP endpoints for querying traces, transactions, actions, and token transfers | [trace_api_plugin.md](plugins/trace_api_plugin/trace_api_plugin.md) |
