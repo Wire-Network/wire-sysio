@@ -1,4 +1,5 @@
 #include <boost/test/unit_test.hpp>
+#include "startup_rpc_server.hpp"
 
 #include <gsl-lite/gsl-lite.hpp>
 
@@ -31,7 +32,7 @@ namespace ethabi = fc::network::ethereum::abi;
 
 namespace {
 
-constexpr std::string_view fake_rpc_url = "http://127.0.0.1:1";
+const std::string fake_rpc_url = startup_test::unused_url();
 constexpr std::string_view contract_address = "5FbDB2315678afecb367f032d93F642f64180aa3";
 constexpr std::string_view transaction_hash =
    "0x1111111111111111111111111111111111111111111111111111111111111111";
@@ -53,62 +54,11 @@ constexpr int64_t short_receipt_deadline_ms = 300;
 constexpr int64_t long_receipt_wait_seconds = 90;
 using tcp = boost::asio::ip::tcp;
 
-/** One-shot JSON-RPC endpoint used to preserve coverage of the historical three-field CLI client form. */
-class chain_id_rpc_server {
+/** Registry-backed fixture shared with deferred-discovery regressions. */
+class chain_id_rpc_server : public startup_test::rpc_server {
 public:
-   /** Start a loopback server that returns the supplied chain id once. */
-   explicit chain_id_rpc_server(std::string_view chain_id_quantity = test_chain_id_quantity)
-      : _response_body(R"json({"jsonrpc":"2.0","id":1,"result":")json" +
-                       std::string(chain_id_quantity) + R"json("})json")
-      , _acceptor(_io, tcp::endpoint(boost::asio::ip::make_address("127.0.0.1"), 0))
-      , _port(_acceptor.local_endpoint().port())
-      , _worker([this] { serve(); }) {}
-
-   chain_id_rpc_server(const chain_id_rpc_server&) = delete;
-   chain_id_rpc_server& operator=(const chain_id_rpc_server&) = delete;
-
-   /** Stop the loopback server and join its worker thread. */
-   ~chain_id_rpc_server() {
-      boost::system::error_code error;
-      _acceptor.close(error);
-      boost::asio::io_context io;
-      tcp::socket socket(io);
-      socket.connect(tcp::endpoint(boost::asio::ip::make_address("127.0.0.1"), _port), error);
-      if (_worker.joinable()) _worker.join();
-   }
-
-   /** Return the loopback URL selected for this server instance. */
-   std::string url() const {
-      return "http://127.0.0.1:" + std::to_string(_port);
-   }
-
-private:
-   /** Serve one fixed JSON-RPC response and then return. */
-   void serve() {
-      boost::system::error_code error;
-      tcp::socket socket(_io);
-      _acceptor.accept(socket, error);
-      if (error) return;
-
-      boost::asio::streambuf request;
-      boost::asio::read_until(socket, request, "\r\n\r\n", error);
-      if (error) return;
-
-      std::ostringstream response;
-      response << "HTTP/1.1 200 OK\r\n"
-               << "Content-Type: application/json\r\n"
-               << "Content-Length: " << _response_body.size() << "\r\n"
-               << "Connection: close\r\n\r\n"
-               << _response_body;
-      const auto response_text = response.str();
-      boost::asio::write(socket, boost::asio::buffer(response_text), error);
-   }
-
-   std::string             _response_body;
-   boost::asio::io_context _io;
-   tcp::acceptor           _acceptor;
-   uint16_t                _port;
-   std::thread             _worker;
+   explicit chain_id_rpc_server(std::string_view quantity = test_chain_id_quantity)
+      : rpc_server("\"" + std::string(quantity) + "\"") {}
 };
 
 /** Return a compact positive policy used by plugin enforcement tests. */
@@ -772,7 +722,7 @@ BOOST_AUTO_TEST_CASE(file_configuration_accepts_nonempty_provider_identifier) {
    BOOST_CHECK_EQUAL(clients.front()->id, "client-a");
 }
 
-BOOST_AUTO_TEST_CASE(file_configuration_rejects_rpc_chain_id_mismatch) {
+BOOST_AUTO_TEST_CASE(file_configuration_uses_local_id_without_rpc_validation) {
    fc::temp_directory directory;
    chain_id_rpc_server rpc_server;
    std::string configuration = R"json({
@@ -789,24 +739,25 @@ BOOST_AUTO_TEST_CASE(file_configuration_rejects_rpc_chain_id_mismatch) {
    bind_rpc_url(configuration, rpc_url_placeholder_a, rpc_server.url());
    const auto path = write_client_configuration_file(directory, configuration);
 
-   BOOST_CHECK_THROW(
-      initialize_outpost_plugin({"--outpost-ethereum-client-config-file", path.string()}),
-      sysio::chain::plugin_config_exception);
+   BOOST_CHECK_NO_THROW(initialize_outpost_plugin({"--outpost-ethereum-client-config-file", path.string()}));
+   BOOST_CHECK_EQUAL(rpc_server.requests.load(), 0u);
 }
 
 BOOST_AUTO_TEST_CASE(file_configuration_rejects_wrong_chain_provider) {
    fc::temp_directory directory;
-   const auto path = write_client_configuration_file(directory, R"json({
+   std::string configuration = R"json({
       "schema_version":1,
       "clients":[{
          "connection":{
             "client_id":"client-a",
             "signature_provider_id":"signer-a",
-            "rpc_url":"http://127.0.0.1:1"
+            "rpc_url":"RPC_URL_A"
          },
          "chain_id":31337
       }]
-   })json");
+   })json";
+   bind_rpc_url(configuration, rpc_url_placeholder_a, startup_test::unused_url());
+   const auto path = write_client_configuration_file(directory, configuration);
    BOOST_CHECK_THROW(
       initialize_outpost_plugin(
          {"--outpost-ethereum-client-config-file", path.string()}, "signer-a", "wire"),
@@ -829,12 +780,13 @@ BOOST_AUTO_TEST_CASE(file_configuration_does_not_publish_a_partial_client_map) {
          "connection":{
             "client_id":"invalid-second",
             "signature_provider_id":"missing-signer",
-            "rpc_url":"http://127.0.0.1:1"
+            "rpc_url":"RPC_URL_B"
          },
          "chain_id":1
       }]
    })json";
    bind_rpc_url(configuration, rpc_url_placeholder_a, rpc_server.url());
+   bind_rpc_url(configuration, rpc_url_placeholder_b, startup_test::unused_url());
    const auto path = write_client_configuration_file(directory, configuration);
    BOOST_CHECK_EQUAL(initialize_rejected_file_and_observe_published_clients(path), 0u);
 }
@@ -859,13 +811,14 @@ BOOST_AUTO_TEST_CASE(cli_client_option_preserves_nonempty_identifier_compatibili
    BOOST_CHECK_EQUAL(clients.front()->client->transaction_policy().client_id, "cli-client");
 }
 
-BOOST_AUTO_TEST_CASE(cli_three_field_client_resolves_chain_id_from_rpc) {
+BOOST_AUTO_TEST_CASE(cli_three_field_client_defers_chain_id_without_signing_client) {
    chain_id_rpc_server rpc_server;
    const auto clients = initialize_outpost_plugin(
       {"--outpost-ethereum-client", "client-a,signer-a," + rpc_server.url()});
    BOOST_REQUIRE_EQUAL(clients.size(), 1u);
-   BOOST_CHECK_EQUAL(clients.front()->chain_id, 31337);
-   BOOST_CHECK_EQUAL(clients.front()->client->get_chain_id(), 31337);
+   BOOST_CHECK_EQUAL(clients.front()->chain_id, 0u);
+   BOOST_CHECK(!clients.front()->client);
+   BOOST_CHECK_EQUAL(rpc_server.requests.load(), 0u);
 }
 
 BOOST_AUTO_TEST_CASE(plugin_startup_rejects_mixed_unified_and_cli_modes) {
@@ -876,7 +829,7 @@ BOOST_AUTO_TEST_CASE(plugin_startup_rejects_mixed_unified_and_cli_modes) {
       {"--outpost-ethereum-client-config-file",
        path.string(),
        "--outpost-ethereum-client",
-       "client-a,signer-a,http://127.0.0.1:1,31337"}),
+       "client-a,signer-a," + startup_test::unused_url() + ",31337"}),
       sysio::chain::plugin_config_exception);
 }
 

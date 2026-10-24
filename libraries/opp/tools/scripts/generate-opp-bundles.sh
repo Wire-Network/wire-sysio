@@ -122,7 +122,7 @@ if [[ -d "$repo_root/../wire-opp" ]]; then
 fi
 
 pushd "$tools_root" >/dev/null
-pnpm install --frozen-lockfile --ignore-scripts
+pnpm install --no-frozen-lockfile --ignore-scripts
 
 # Match the workspace package directories so scoped npm package names do not
 # bypass the OPP tool build on pnpm 10.
