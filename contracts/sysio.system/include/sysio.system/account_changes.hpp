@@ -13,6 +13,11 @@
 /// `sysio.system` both write them from their `setabi` and `setcode` handlers, so a chain has a row for every change
 /// since genesis. Rows are overwritten, never erased. Each contract aliases the tables inside its class, which puts
 /// them in its ABI.
+///
+/// The rows record what the contract on `sysio` sees. A deploy to `sysio` itself is recorded by the incoming code,
+/// since the native `setcode` runs first, so code that does not record (or clearing `sysio`'s code) leaves `sysio`'s
+/// row stale and stops every later record. Only `sysio`'s own authority can do that, and it could rewrite these rows
+/// anyway; the chain's code hash (`get_code_hash`) is the record nothing can bypass.
 namespace sysiosystem {
 
    using sysio::checksum256;

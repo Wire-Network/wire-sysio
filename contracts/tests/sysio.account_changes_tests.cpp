@@ -136,6 +136,20 @@ BOOST_FIXTURE_TEST_CASE(system_records_code_hash_set_replaced_and_cleared, sysio
    require_stamp(*row, stamp);
 } FC_LOG_AND_RETHROW()
 
+// record_code reads the hash with get_code_hash instead of hashing the action's code. That is correct only because the
+// chain applies the native setcode before the contract's setcode handler runs; if the order ever flipped, the row
+// would silently hold the replaced code's hash.
+BOOST_FIXTURE_TEST_CASE(setcode_handler_reads_the_code_being_deployed, sysio_system_tester) try {
+   set_code(tracked_account, contracts::token_wasm());
+   produce_block();
+   set_code(tracked_account, contracts::msig_wasm());
+
+   const auto row = row_for(table_rows(*this, abi_ser, codehash_table, "code_hash"), tracked_account);
+   BOOST_REQUIRE(row);
+   BOOST_REQUIRE_NE((*row)["hash"].as<fc::sha256>(), wasm_hash(contracts::token_wasm()));
+   require_code_hash(*this, *row, tracked_account, contracts::msig_wasm());
+} FC_LOG_AND_RETHROW()
+
 BOOST_FIXTURE_TEST_CASE(system_contract_records_its_own_code, sysio_system_tester) try {
    const auto rows = table_rows(*this, abi_ser, codehash_table, "code_hash");
 
