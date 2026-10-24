@@ -107,6 +107,9 @@ inline constexpr sysio::outbound_http::transport_option_names transport_option_n
 inline constexpr auto query = "alert-monitor-query";
 } // namespace option
 
+/// The plugin the queries run on, as the `plugin` option names it.
+inline constexpr std::string_view query_engine_plugin_name = "sysio::query_engine_plugin";
+
 /// Fields of an --alert-monitor-query spec; fc::split folds the third and later commas into the query field.
 inline constexpr std::size_t query_spec_field_count = 3;
 /// Spec format named in every parse error (never the spec's own text).
@@ -181,9 +184,16 @@ void add_options(boost::program_options::options_description& cfg);
 /// directory stays relocatable. It has no default: an omitted directory would silently resolve a relative path
 /// against the working directory. Throws chain::plugin_config_exception on an invalid value or combination, a
 /// missing index or template file, a template that does not compile, a template that references a name outside
-/// supplied_tokens, an invalid query spec (see parse_query_entry), or a query name used twice (the error names it).
+/// supplied_tokens, an invalid query spec (see parse_query_entry), a query name used twice (the error names it), or
+/// queries with a template that never references `${data}`. Query syntax is validate_queries' check.
 std::optional<config> parse_config(const boost::program_options::variables_map& options,
                                    const std::filesystem::path& config_dir);
+
+/// Parse every query with the query engine's parser and the engine's limits from @p options, under the deadline an
+/// execution gets (query_deadline), so a query that does not parse or exceeds a parse limit fails startup; table,
+/// column, and planning errors still surface when it runs. Throws plugin_config_exception naming the entry, the error
+/// kind, its limit or line and column when it has one, and the engine's message; never the query text.
+void validate_queries(const std::vector<query_entry>& queries, const boost::program_options::variables_map& options);
 
 /// Parse one spec: `fc::split(spec, ',', query_spec_field_count)` (as signature_provider_manager_plugin does).
 /// Exactly three fields; the name matches query_name_pattern and is not reserved; the interval parses with
@@ -398,9 +408,13 @@ private:
    std::shared_ptr<fc::parallel::worker_task_queue<status_snapshot>> _render;
 };
 
-/// Deadline of every query execution: the engine's own default (1 s). It also bounds query_runner::shutdown(),
-/// keeping node shutdown well inside a supervisor's kill grace.
+/// Overall deadline of every query execution, in place of query-timeout-ms: the engine's own default (1 s). Each chain
+/// read is still bounded by the engine's query-max-capture-ms. It also bounds query_runner::shutdown(), keeping node
+/// shutdown well inside a supervisor's kill grace.
 inline constexpr std::chrono::milliseconds query_deadline = query_engine::defaults::timeout;
+/// Wait between attempts of an execution the engine refused with QUERY_BUSY. Attempts continue until query_deadline
+/// after the first, since the engine's admission (query-max-in-flight) is shared by every query and HTTP request.
+inline constexpr std::chrono::milliseconds query_busy_retry_interval{10};
 /// Interval of the throttled failure lines: the delivery failure/recovery line, the per-batch line, and the
 /// per-query lines.
 inline constexpr fc::microseconds failure_report_interval = fc::seconds(60);
@@ -432,7 +446,7 @@ struct query_stats {
 
 /// Runs the configured queries off the application thread: dispatch() admits due entries into a caller pool (one
 /// thread per entry); a caller executes through the injected query service and hands the rendered document to the
-/// pipeline. At most one execution per entry at a time.
+/// pipeline. At most one execution per entry at a time; executions still share the engine's workers and admission.
 class query_runner {
 public:
    /// Production: query_engine_plugin::get_query_service (null before it starts / after it stops). Tests: a fake.
@@ -469,6 +483,9 @@ private:
    /// Caller callback: execute one job and submit its document. noexcept and fully guarded, as the caller pool
    /// requires; clears the entry's running flag last.
    void run(job& j) noexcept;
+   /// Execute @p entry on @p service, retrying QUERY_BUSY every query_busy_retry_interval until query_deadline after
+   /// the first attempt or shutdown(); each retry gets what is left of that deadline. Throws the last failure.
+   query_engine::query_result execute(query_engine::query_service& service, const query_entry& entry);
    /// Add one to @p counter under _stats_mtx.
    void count(uint64_t query_stats::*counter);
    /// Count one failure by @p kind; nullopt counts failed_other.
@@ -484,6 +501,7 @@ private:
    std::vector<chain::block_num_type> _admitted_bucket; ///< application thread only
    std::unique_ptr<std::atomic<bool>[]> _running;       ///< per entry
    std::vector<failure_throttle> _throttles;            ///< per entry; one caller at a time (the _running hand-off)
+   std::atomic<bool> _stopping{false};                  ///< set by shutdown(); ends QUERY_BUSY retries
    mutable std::mutex _stats_mtx;                       ///< guards _stats and _log
    query_stats _stats;                                  ///< see stats()
    std::shared_ptr<fc::parallel::worker_task_queue<job>> _callers; ///< null without queries; last member
@@ -496,8 +514,9 @@ enum class progress : uint8_t {
    recovered, ///< no new failure, and a bulk request was fully acknowledged after a failing streak
 };
 
-/// The reporting policy: any advanced failure or drop counter is `failing`; an acknowledged batch with no new
-/// failure after a failing streak is `recovered`; everything else is `steady`.
+/// The reporting policy: an advanced batch failure, status-side drop, or render failure is `failing` (query document
+/// drops are reported per query); an acknowledged batch with no new failure after a failing streak is `recovered`;
+/// everything else is `steady`.
 progress classify_progress(const pipeline_stats& previous, const pipeline_stats& current, bool was_failing);
 
 } // namespace sysio::alert_monitor

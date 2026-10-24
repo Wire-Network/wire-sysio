@@ -125,7 +125,8 @@ placeholder names the plugin supplies.
 
 An invalid active configuration (bad URL scheme, empty index, missing or unparseable template, a template
 that references a token the plugin does not supply, a value outside its range, auth with only one half set,
-an invalid query spec, two queries with one name, a query without a target URL, or a query without
+an invalid query spec, a query the query engine's parser rejects, two queries with one name, a query without a
+target URL, a query with a template that has no `${data}`, or a query without
 `plugin = sysio::query_engine_plugin`) fails startup with `plugin_config_exception` naming the option.
 
 ## Queries
@@ -149,7 +150,8 @@ A value is a spec in the style of `--signature-provider`:
   as a string at `data.thread` in the same index) are reserved.
 - `<block_interval>` is an integer from 1 to 4294967295: the query runs once each time LIB enters a new
   bucket of that many blocks (`lib / block_interval`). With intervals 1 and 10, both run at LIB 10 and only the
-  first at LIB 11. Missed buckets are never caught up: after a pause or a jump only the current bucket runs.
+  first at LIB 11. Bucket 0 never runs, so a query first runs once LIB reaches its interval. Missed buckets are
+  never caught up: after a pause or a jump only the current bucket runs.
 - `<query...>` is everything after the second comma, commas included, and must not be blank.
 
 Repeat the key in `config.ini`, or the flag on the command line, once per query:
@@ -181,23 +183,44 @@ the failing field's index and label (`0 name`, `1 block_interval`, `2 query`). A
 spec's text -- a missing field shifts query text into the name and interval positions -- except a name that is
 already valid, which the interval, query, and duplicate-name errors include so the entry can be found.
 
+Each query is then parsed with the query engine's own parser and limits, under the same 1 s deadline it runs
+with, so a query that does not parse, or that exceeds a parse limit (a query cut short at a `#` in config.ini
+included), fails startup too. The error names the query, the error kind, the limit or the line and column when the
+error has one, and the engine's message, never the query text. Unknown tables or columns and planning errors still
+surface only when the query runs.
+
 ### Requirements and limits
 
 - **The query engine.** `plugin = sysio::query_engine_plugin` must be enabled whenever a query is configured;
   startup fails otherwise. The query engine refuses producer nodes (a configured `producer-name`), so queries run
-  only on non-producing nodes. `alert_monitor_plugin` itself does not require the engine and runs on producers
-  with status documents alone.
-- **A fixed 1 s deadline.** Every execution has a fixed 1 s deadline, the engine's own default; the node's
-  `query-timeout-ms` does not apply, so queries must stay small. The deadline also bounds shutdown.
+  only on non-producing nodes. The engine also needs `read-only-threads` above 0 and a read mode other than
+  `speculative`, and fails startup with its own message otherwise. `alert_monitor_plugin` itself does not require
+  the engine and runs on producers with status documents alone.
+- **A fixed 1 s deadline.** Every execution has a fixed 1 s overall deadline, the engine's own default, in place
+  of the node's `query-timeout-ms`, so queries must stay small. Each chain read within it is still bounded by
+  `query-max-capture-ms`, which by default is the smaller of `query-timeout-ms` and the read-only transaction
+  time, so a `query-timeout-ms` below the read-only transaction time still cuts alert queries short. The deadline
+  also bounds shutdown.
 - **`${data}` must be a whole value.** A query document's `${data}` is an object keyed by the query's name, so
   the template should write `"data": "${data}"`; a mixed string such as `"data": "x ${data}"` renders it as text.
-  This is not enforced.
-- **One run at a time.** Each query has its own caller thread, so a slow query never delays another or the status
-  documents. A query that becomes due while its previous run is still active is skipped and counted.
+  Startup fails when the template has no `${data}` at all; where it is placed is not checked.
+- **One run at a time.** Each query has its own caller thread. A query that becomes due while its previous run
+  is still active is skipped and counted.
+- **Engine capacity.** Each running query holds one of the engine's `query-max-in-flight` slots (default 4) and
+  runs on one of its `query-worker-threads` (default 2), both shared with HTTP queries. Queries whose intervals
+  share a boundary come due at the same LIB, so size both for the queries that can be due together plus the
+  expected HTTP load. An execution the engine refuses as `QUERY_BUSY` is retried every 10 ms until its 1 s
+  deadline runs out, then counted and logged as `QUERY_BUSY`.
 - **The sync gate.** Queries pause and resume with the status documents.
 - **Size.** A document above the 256 KiB per-document cap is dropped and counted, never sent.
-- **Logging.** A query's text is never logged; diagnostics name the query by its name and position. The text is
-  masked in nodeop's "Non-default options" line.
+- **The delivery queue.** Query documents share the delivery queue with status documents, so a burst of query
+  documents against a slow endpoint can fill it and drop status documents too.
+- **Logging.** The plugin never logs a query's text; its diagnostics name the query by its name and position, and
+  nodeop's "Non-default options" line masks the text. Elsewhere it can still appear: nodeop's own startup error
+  echoes a malformed config.ini line or a mistyped option name, a query given on the command line is visible in
+  the process list, and every result carries the table, owners, and column names the query read.
+- **Absent documents.** A failed run sends no document, only the throttled warning. An alert rule that must notice
+  a failing query watches for its documents stopping, not for an error document.
 
 ### Payload
 
@@ -252,7 +275,7 @@ Tokens the plugin supplies, and what each renders:
 | `message`, `logger` | `alert_monitor` |
 | `file`, `line`, `func` | Source location of the renderer (the absolute source path the build compiled, the line, `render_document`), matching the shape the es log sink emits |
 | `thread` | `alert_monitor` |
-| `data` | An object with one member, `alert_monitor`: `record` (`status`), `version` (`1`, the layout of this object), and `status`, the full `/v1/chain/get_info` body |
+| `data` | An object with one member. A status document's is `alert_monitor`: `record` (`status`), `version` (`1`, the layout of this object), and `status`, the full `/v1/chain/get_info` body. A query document's is the query's name (see [Payload](#payload)) |
 
 Referencing any other name fails startup, and the error names both the offending token and the supplied
 set.
@@ -337,7 +360,7 @@ All diagnostics go through the `alert_monitor` logger (configure it like any oth
   A `403` from the root is not a failure (see Delivery semantics).
 - Queries, per query: one warning for the first failed run, then at most one a minute for that query counting
   the failures in between, naming the query's name and position (never its text) and what failed: the query
-  engine's error kind (with the limit it hit, when it names one), `query service unavailable`,
+  engine's error kind and message (with the limit it hit, or the line and column it names), `query service unavailable`,
   `document dropped: dropped_oversize`, `document dropped: dropped_queue_full`, or `unexpected error`.
 - Liveness: one warning when documents pause because the irreversible block is behind wall-clock time, at
   most once a minute while paused, and one line when they resume.
@@ -398,9 +421,10 @@ The suite covers option registration and validation, rendering of the shipped sa
 supplied token, bulk-body assembly and splitting, the two-stage pipeline with an injected
 sender, drop and failure accounting, progress classification, and the plugin lifecycle without a running
 node. For queries it covers spec parsing (repeated on the command line and in `config.ini`, every rejected form,
-and errors that never reproduce query text), the template path relative to the config directory, the due rule,
+and errors that never reproduce query text), the startup parse under the engine's limits (including a query cut at
+a config.ini `#`), the `${data}` requirement, the template path relative to the config directory, the due rule,
 and the query runner over a scripted query service: one caller per query, skips while a run is active, failures by
-kind, a missing service, dropped documents, the fixed deadline on every execution, and bounded shutdown and
-destruction. One case runs a query end to end: a real query engine over the query engine plugin's own chain fixture
-(the `query_fixture` test contract, so the build needs `BUILD_TEST_CONTRACTS`), through the pipeline and a real
-es client to a loopback capture server. No test dials an external endpoint.
+kind, a missing service, dropped documents, the fixed deadline on every execution, `QUERY_BUSY` retries within it,
+and bounded shutdown and destruction. One case runs a query end to end: a real query engine over the query engine
+plugin's own chain fixture (the `query_fixture` test contract, so the build needs `BUILD_TEST_CONTRACTS`), through
+the pipeline and a real es client to a loopback capture server. No test dials an external endpoint.

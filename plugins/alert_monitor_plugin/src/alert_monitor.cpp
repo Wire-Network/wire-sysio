@@ -5,6 +5,7 @@
 #include <fc/variant_object.hpp>
 #include <sysio/alert_monitor_plugin/alert_monitor.hpp>
 #include <sysio/chain/exceptions.hpp>
+#include <sysio/query_engine_plugin/query_config.hpp>
 
 #include <fmt/format.h>
 #include <fmt/ranges.h> // fmt::join
@@ -16,6 +17,7 @@
 #include <regex>
 #include <string_view>
 #include <system_error>
+#include <thread>
 #include <utility>
 
 namespace sysio::alert_monitor {
@@ -55,8 +57,12 @@ constexpr std::string_view document_dropped_failure_format = "document dropped: 
 constexpr std::string_view service_unavailable_failure = "query service unavailable";
 /// What a query execution's failure line says for anything that is not a query_engine::query_error.
 constexpr std::string_view unexpected_failure = "unexpected error";
-/// A query_error that names the limit it hit: the error kind, then the limit.
-constexpr std::string_view query_error_with_limit_format = "{} (limit {})";
+/// The limit a query_error names, after its kind.
+constexpr std::string_view query_error_limit_format = " (limit {})";
+/// The source location a query_error names, after its kind.
+constexpr std::string_view query_error_span_format = " at line {}, column {}";
+/// A query_error as one clause: its kind, its limit or location (or nothing), then its message.
+constexpr std::string_view query_error_format = "{}{}: {}";
 /// The line logged for a failed query execution: the entry's name and ordinal -- never its text -- what failed, and
 /// the unlogged_events_clause over query_failure_events.
 constexpr std::string_view query_failure_format = "query '{}' (value {}) failed: {}{}";
@@ -84,6 +90,17 @@ void read_optional(const bpo::variables_map& options, const char* name, std::opt
    SYS_THROW(chain::plugin_config_exception, "--{} value {} ('{}'): field {} ({}) {}; format: {}", option::query,
              ordinal, valid_name, magic_enum::enum_integer(field), magic_enum::enum_name(field), problem,
              query_spec_format);
+}
+
+/// @p e as a failure line or startup error states it: the kind, its limit or line and column, and its message, which
+/// the engine keeps free of query text (query_error is its client-visible failure).
+std::string query_error_summary(const query_engine::query_error& e) {
+   std::string qualifier;
+   if (e.limit)
+      qualifier = fmt::format(query_error_limit_format, *e.limit);
+   else if (e.span)
+      qualifier = fmt::format(query_error_span_format, e.span->line, e.span->column);
+   return fmt::format(query_error_format, magic_enum::enum_name(e.kind), qualifier, e.what());
 }
 
 /// Render @p document_template over the supplied_tokens: `data` set to `{ <data_key>: <data_object> }`, the three
@@ -120,7 +137,8 @@ void add_options(bpo::options_description& cfg) {
    // enforce them, so the help text can never advertise a stale option name, a token parse_config rejects, or
    // a bound that has since moved.
    const std::string target_index_description = fmt::format(
-      "Index or write alias the status documents are written to. Required when --{} is set", option::target_url);
+      "Index or write alias the status and query documents are written to. Required when --{} is set",
+      option::target_url);
    const std::string template_file_description = fmt::format(
       "Path of the JSON document template: a JSON object whose string values may contain ${{token}} "
       "placeholders: {}. timestamp accepts :iso8601 or :epoch_millis and level accepts :upper or :lower; every "
@@ -152,18 +170,24 @@ void add_options(bpo::options_description& cfg) {
       "the command line). Format: {}; everything after the second comma is the query, commas included. The name "
       "matches {} over the whole string, is unique, is not a reserved name ({}), and is the ${{data}} key of the "
       "query's documents (so the template's ${{data}} must be a whole value). The block_interval is 1 to {}: the "
-      "query runs once per LIB bucket of that many blocks, never catching up missed buckets. Every execution has a "
-      "fixed {} ms deadline; the node's --{} does not apply, so queries must stay small. Requires --{} and "
-      "plugin = sysio::query_engine_plugin, which refuses producer nodes. A query given in config.ini can contain "
-      "neither # nor a newline, and loses trailing spaces and tabs. On the command line they are fine, but the spec "
-      "must be quoted there, because the option takes multiple tokens",
+      "query runs once per LIB bucket of that many blocks (first at LIB block_interval), never catching up missed "
+      "buckets. Each query is parsed at startup. Every execution has a fixed {} ms overall deadline in place of the "
+      "node's --{}, so queries must stay small; each chain read within it is still bounded by --{}, which by default "
+      "is the smaller of --{} and the read-only transaction time. Queries share the engine's --{} and --{} with each "
+      "other and with HTTP queries; an execution refused as busy is retried within its deadline. Requires --{} and "
+      "plugin = {}, which refuses producer nodes. A query given in config.ini can contain neither # nor a newline, "
+      "and loses trailing spaces and tabs. On the command line they are fine, but the spec must be quoted there, "
+      "because the option takes multiple tokens",
       query_spec_format, query_name_pattern, fmt::join(reserved_query_names, token_list_separator),
-      max_query_block_interval, query_deadline.count(), query_engine::option::timeout_ms, option::target_url);
+      max_query_block_interval, query_deadline.count(), query_engine::option::timeout_ms,
+      query_engine::option::max_capture_ms, query_engine::option::timeout_ms, query_engine::option::worker_threads,
+      query_engine::option::max_in_flight, option::target_url, query_engine_plugin_name);
 
    auto opts = cfg.add_options();
    opts(option::target_url, bpo::value<std::string>(),
-        "Base URL of the OpenSearch/Elasticsearch endpoint that receives one status document per LIB advance "
-        "(e.g. https://opensearch.example.com). If not provided, the plugin is disabled.");
+        "Base URL of the OpenSearch/Elasticsearch endpoint that receives one status document per LIB advance and "
+        "the results of the configured queries (e.g. https://opensearch.example.com). If not provided, the plugin is "
+        "disabled.");
    opts(option::target_index, bpo::value<std::string>(), target_index_description.c_str());
    opts(option::target_template_file, bpo::value<std::filesystem::path>(), template_file_description.c_str());
    opts(option::username, bpo::value<std::string>(), username_description.c_str());
@@ -283,6 +307,10 @@ std::optional<config> parse_config(const bpo::variables_map& options, const std:
                     option::query, ordinal, entry.name, earlier->ordinal);
          cfg.queries.push_back(std::move(entry));
       }
+      // A query's result is its document's ${data}: without the token every query document would be sent empty.
+      SYS_ASSERT(cfg.document_template.contains(fc::json_template_default_token::data), chain::plugin_config_exception,
+                 "--{} ({}): the template must reference ${{{}}} when --{} is set", option::target_template_file,
+                 template_path.string(), magic_enum::enum_name(fc::json_template_default_token::data), option::query);
    }
 
    read_optional(options, option::username, cfg.delivery.username);
@@ -321,6 +349,29 @@ std::optional<config> parse_config(const bpo::variables_map& options, const std:
       SYS_THROW(chain::plugin_config_exception, "--{}: {}", option::target_url, e.top_message());
    }
    return cfg;
+}
+
+void validate_queries(const std::vector<query_entry>& queries, const bpo::variables_map& options) {
+   if (queries.empty())
+      return;
+   query_engine::query_config engine_config;
+   try {
+      engine_config = query_engine::parse_config(options);
+   } catch (const query_engine::query_error& e) {
+      SYS_THROW(chain::plugin_config_exception, "--{}: invalid query engine configuration: {}", option::query,
+                query_error_summary(e));
+   }
+   for (const query_entry& entry : queries) {
+      try {
+         // The deadline an execution gets, as query_runner::execute passes it; never --query-timeout-ms.
+         query_engine::query_budget budget{engine_config, query_engine::query_budget::clock::now,
+                                           query_engine::query_options{.timeout = query_deadline}};
+         query_engine::parse_query(entry.query, budget);
+      } catch (const query_engine::query_error& e) {
+         SYS_THROW(chain::plugin_config_exception, "--{} value {} ('{}'): the query engine rejects the query: {}",
+                   option::query, entry.ordinal, entry.name, query_error_summary(e));
+      }
+   }
 }
 
 std::string render_document(const status_snapshot& snapshot, const fc::json_template& document_template) {
@@ -523,8 +574,9 @@ query_runner::query_runner(const config& cfg, pipeline& sink, service_provider p
    , _throttles(cfg.queries.size()) {
    if (_cfg.queries.empty())
       return;
-   // One caller per entry, so a slow query never delays another; and room for one waiting job per entry, which
-   // _running already guarantees, so the pending bound never refuses a job dispatch() admitted.
+   // One caller per entry, so no entry waits for another's caller (the engine's workers are still shared); and room
+   // for one waiting job per entry, which _running already guarantees, so the pending bound never refuses a job
+   // dispatch() admitted.
    _callers = fc::parallel::worker_task_queue<job>::create(
       {.max_threads = _cfg.queries.size(), .max_pending_items = _cfg.queries.size()}, [this](job& j) { run(j); });
 }
@@ -555,6 +607,7 @@ void query_runner::dispatch(const query_trigger& trigger) {
 }
 
 void query_runner::shutdown() {
+   _stopping = true;
    if (!_callers)
       return;
    _callers->discard_pending();
@@ -578,10 +631,9 @@ void query_runner::run(job& j) noexcept {
       const auto& entry = _cfg.queries[j.ordinal];
       try {
          if (auto service = _provider()) {
-            // A fixed per-call deadline, never the node's query-timeout-ms (30 s on API nodes). Once nodeop starts
-            // quitting, read threads stop draining while the engine shuts down after this plugin. The deadline is
-            // what bounds shutdown().
-            auto result = service->execute(entry.query, query_engine::query_options{.timeout = query_deadline});
+            // A fixed per-call deadline in place of the node's query-timeout-ms (30 s on API nodes); it bounds
+            // shutdown() in either plugin shutdown order. Chain reads keep the engine's query-max-capture-ms.
+            auto result = execute(*service, entry);
             // ${data} = { "<entry.name>": { record, version, query, trigger, observed_at, result } }
             const admission outcome = _sink.submit_document(
                render_query_document(entry, j.trigger, fc::time_point::now(), result, _cfg.document_template));
@@ -595,15 +647,31 @@ void query_runner::run(job& j) noexcept {
          }
       } catch (const query_engine::query_error& e) {
          count_failure(e.kind);
-         report_failure(entry, e.limit
-                                  ? fmt::format(query_error_with_limit_format, magic_enum::enum_name(e.kind), *e.limit)
-                                  : std::string{magic_enum::enum_name(e.kind)});
+         report_failure(entry, query_error_summary(e));
       } catch (...) {
          count_failure(std::nullopt);
          report_failure(entry, unexpected_failure);
       }
    } catch (...) {}
    _running[j.ordinal] = false;
+}
+
+query_engine::query_result query_runner::execute(query_engine::query_service& service, const query_entry& entry) {
+   using clock = std::chrono::steady_clock;
+   const clock::time_point deadline = clock::now() + query_deadline;
+   std::chrono::milliseconds timeout = query_deadline;
+   for (;;) {
+      try {
+         return service.execute(entry.query, query_engine::query_options{.timeout = timeout});
+      } catch (const query_engine::query_error& e) {
+         if (e.kind != query_engine::error_kind::QUERY_BUSY || _stopping)
+            throw;
+         std::this_thread::sleep_for(query_busy_retry_interval);
+         timeout = std::chrono::duration_cast<std::chrono::milliseconds>(deadline - clock::now());
+         if (timeout <= std::chrono::milliseconds::zero() || _stopping)
+            throw;
+      }
+   }
 }
 
 void query_runner::count(uint64_t query_stats::*counter) {

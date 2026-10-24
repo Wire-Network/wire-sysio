@@ -22,6 +22,7 @@
 #include <fc/variant_object.hpp>
 #include <filesystem>
 #include <fmt/format.h>
+#include <fmt/ranges.h> // fmt::join
 #include <fstream>
 #include <initializer_list>
 #include <limits>
@@ -43,6 +44,7 @@
 #include <sysio/alert_monitor_plugin/alert_monitor_plugin.hpp>
 #include <sysio/chain/app.hpp> // detail::log_non_default_options, nodeop's "Non-default options" line
 #include <sysio/chain/exceptions.hpp>
+#include <sysio/query_engine_plugin/query_config.hpp>
 #include <sysio/query_engine_plugin/query_engine.hpp>
 #include <thread>
 #include <utility>
@@ -178,6 +180,30 @@ constexpr std::string_view minimal_query_spec = "n,1,Q";
 constexpr std::string_view masked_option_value = "***";
 /// minimal_query_spec's name with a different interval and query: a duplicate name.
 constexpr std::string_view duplicate_name_spec = "n,2,R";
+/// A query the engine's parser rejects; it starts with query_text_marker, so an error echoing it is found.
+constexpr std::string_view unparseable_query = "SELECT FROM WHERE";
+/// How a startup parse error locates a single-line query's failure.
+constexpr std::string_view syntax_error_location_marker = "at line 1, column";
+/// A valid query with `#` inside a literal: config.ini cuts it at the `#`, leaving the literal unclosed.
+constexpr std::string_view hash_in_literal_spec =
+   "cut_entry,1,SELECT key.id AS id FROM sample.positions WHERE code = 'x#y'";
+/// A template that never references ${data}.
+constexpr std::string_view no_data_template = R"({"message":"${message}"})";
+/// An engine query-size limit below every query of these cases.
+constexpr std::string_view tiny_query_bytes_argument = "--query-max-query-bytes=8";
+/// An engine configuration the engine itself rejects.
+constexpr std::string_view zero_in_flight_argument = "--query-max-in-flight=0";
+/// An engine query timeout far below any parse of long_query(long_query_columns).
+constexpr std::string_view one_ms_query_timeout_argument = "--query-timeout-ms=1";
+/// long_query()'s shape and its repeated select item.
+constexpr std::string_view long_query_format = "SELECT {} FROM sample.positions";
+constexpr std::string_view long_query_column = "amount";
+/// Select items of the long query: within the parser's token and node limits.
+constexpr std::size_t long_query_columns = 600;
+/// A query without a table owner: rejected with QUERY_SEMANTICS, which names no limit and no location.
+constexpr std::string_view ownerless_query = "SELECT key.id AS id FROM positions";
+/// The engine's message for ownerless_query.
+constexpr std::string_view owner_required_message = "An explicit table owner is required";
 
 // --- query scheduling and execution ---
 
@@ -188,7 +214,14 @@ constexpr std::string_view syntax_error = "SELECT syntax_error";         ///< qu
 constexpr std::string_view limit_error = "SELECT limit_error";           ///< query_error QUERY_LIMIT naming a limit
 constexpr std::string_view unexpected_error = "SELECT unexpected_error"; ///< a std::runtime_error, not a query_error
 constexpr std::string_view blocked = "SELECT blocked";                   ///< waits for the gate or its deadline
+constexpr std::string_view busy = "SELECT busy";                         ///< query_error QUERY_BUSY, every time
+constexpr std::string_view busy_then_answer = "SELECT busy_then_answer"; ///< QUERY_BUSY scripted_busy_refusals times
 } // namespace scripted_query
+/// How many times busy_then_answer is refused before it answers.
+constexpr std::size_t scripted_busy_refusals = 2;
+/// The bound on shutdown() while a caller retries QUERY_BUSY: well under the query_deadline the retry would
+/// otherwise run out.
+constexpr auto busy_shutdown_bound = alert_monitor::query_deadline / 2;
 /// The message of every failure the scripted query service throws.
 constexpr std::string_view scripted_failure_message = "scripted failure";
 /// The limit the scripted QUERY_LIMIT failure names.
@@ -617,6 +650,15 @@ public:
                            std::string{scripted_limit});
       if (query == scripted_query::unexpected_error)
          throw std::runtime_error(std::string{scripted_failure_message});
+      if (query == scripted_query::busy)
+         throw query_error(error_kind::QUERY_BUSY, std::string{scripted_failure_message});
+      if (query == scripted_query::busy_then_answer) {
+         std::lock_guard<std::mutex> lk(_mtx);
+         if (_busy_refusals < scripted_busy_refusals) {
+            ++_busy_refusals;
+            throw query_error(error_kind::QUERY_BUSY, std::string{scripted_failure_message});
+         }
+      }
       if (query == scripted_query::blocked) {
          // Absent options take the engine's own default deadline, as the engine does.
          wait_for_gate(timeout.value_or(sysio::query_engine::defaults::timeout));
@@ -675,6 +717,7 @@ private:
    bool _gate_open = false;                                         ///< guarded by _mtx
    std::size_t _blocked = 0;                                        ///< guarded by _mtx
    std::size_t _peak_blocked = 0;                                   ///< guarded by _mtx
+   std::size_t _busy_refusals = 0;                                  ///< guarded by _mtx
    std::vector<std::optional<std::chrono::milliseconds>> _timeouts; ///< guarded by _mtx
    std::atomic<std::size_t> _returned{0};                           ///< see returned()
 };
@@ -1081,6 +1124,144 @@ BOOST_AUTO_TEST_CASE(a_relative_template_path_resolves_against_the_config_dir) t
 
    const auto absolute = alert_monitor::parse_config(parse_options(required_arguments(tpl)), elsewhere.path());
    BOOST_CHECK(absolute.has_value());
+}
+FC_LOG_AND_RETHROW()
+
+// With queries configured the template must reference ${data}, where a query's result is rendered; without queries
+// it need not.
+BOOST_AUTO_TEST_CASE(a_query_needs_a_template_that_references_data) try {
+   const template_file tpl{no_data_template};
+   BOOST_CHECK(active_config(tpl).has_value());
+   const std::string error = config_error_of([&] { active_config(tpl, {query_argument(minimal_query_spec)}); });
+   BOOST_CHECK_MESSAGE(error.find("${data}") != std::string::npos, error);
+   BOOST_CHECK_MESSAGE(error.find(alert_monitor::option::query) != std::string::npos, error);
+}
+FC_LOG_AND_RETHROW()
+
+// Valid queries pass the startup parse, and a configuration without queries has nothing to parse.
+BOOST_AUTO_TEST_CASE(validate_queries_accepts_queries_that_parse) try {
+   const template_file tpl{data_only_template};
+   const auto cfg =
+      active_config(tpl, {query_argument(spec_of(full_query.name, full_query.block_interval, full_query.query)),
+                          query_argument(spec_of(end_to_end_query_name, end_to_end_block_interval, end_to_end_query))});
+   BOOST_REQUIRE(cfg.has_value());
+   BOOST_CHECK_NO_THROW(alert_monitor::validate_queries(cfg->queries, parse_options({})));
+   BOOST_CHECK_NO_THROW(alert_monitor::validate_queries({}, parse_options({})));
+}
+FC_LOG_AND_RETHROW()
+
+// A query the engine's parser rejects fails startup, naming the entry, the error kind, and the line and column --
+// never the query text.
+BOOST_AUTO_TEST_CASE(a_query_that_does_not_parse_fails_startup) try {
+   using sysio::query_engine::error_kind;
+   constexpr std::string_view broken_name = "broken_entry";
+   const template_file tpl{data_only_template};
+   const auto cfg = active_config(tpl, {query_argument(spec_of(broken_name, every_block, unparseable_query))});
+   BOOST_REQUIRE(cfg.has_value());
+   const std::string error =
+      config_error_of([&] { alert_monitor::validate_queries(cfg->queries, parse_options({})); });
+   BOOST_CHECK_MESSAGE(error.find(quoted_name(broken_name)) != std::string::npos, error);
+   BOOST_CHECK_MESSAGE(error.find(magic_enum::enum_name(error_kind::QUERY_SYNTAX)) != std::string::npos, error);
+   BOOST_CHECK_MESSAGE(error.find(syntax_error_location_marker) != std::string::npos, error);
+   BOOST_CHECK_MESSAGE(error.find(query_text_marker) == std::string::npos, error);
+}
+FC_LOG_AND_RETHROW()
+
+// config.ini cuts a query at its first `#`, which WireQL allows only inside a quoted literal, so the cut leaves the
+// literal unclosed and the startup parse rejects it. The same spec on the command line is whole and passes.
+BOOST_AUTO_TEST_CASE(a_query_cut_at_a_config_ini_comment_fails_startup) try {
+   using sysio::query_engine::error_kind;
+   const template_file tpl{data_only_template};
+   const auto options = parse_command_line_and_config_ini(
+      required_arguments(tpl), config_ini_line(alert_monitor::option::query, hash_in_literal_spec));
+   const auto cut = alert_monitor::parse_config(options, tpl.dir.path());
+   BOOST_REQUIRE(cut.has_value());
+   const std::string error = config_error_of([&] { alert_monitor::validate_queries(cut->queries, options); });
+   BOOST_CHECK_MESSAGE(error.find(magic_enum::enum_name(error_kind::QUERY_SYNTAX)) != std::string::npos, error);
+
+   const auto whole = active_config(tpl, {query_argument(hash_in_literal_spec)});
+   BOOST_REQUIRE(whole.has_value());
+   BOOST_CHECK_NO_THROW(alert_monitor::validate_queries(whole->queries, parse_options({})));
+}
+FC_LOG_AND_RETHROW()
+
+namespace {
+
+/// required_arguments(@p tpl), one query @p spec and one query engine option @p engine_argument, parsed with the query
+/// engine's options registered as nodeop registers them.
+bpo::variables_map parse_options_with_engine(const template_file& tpl, std::string_view spec,
+                                             std::string_view engine_argument) {
+   bpo::options_description cfg;
+   add_component_options(cfg);
+   sysio::query_engine::add_options(cfg);
+   std::vector<std::string> arguments = required_arguments(tpl);
+   arguments.push_back(query_argument(spec));
+   arguments.emplace_back(engine_argument);
+   bpo::variables_map options;
+   bpo::store(bpo::command_line_parser(arguments).options(cfg).run(), options);
+   bpo::notify(options);
+   return options;
+}
+
+/// A valid query of @p columns select items: long enough that parsing it outlasts a 1 ms deadline.
+std::string long_query(std::size_t columns) {
+   std::vector<std::string_view> items(columns, long_query_column);
+   return fmt::format(long_query_format, fmt::join(items, ", "));
+}
+
+} // anonymous namespace
+
+// The startup parse runs under the engine's own configured limits, and an engine configuration the engine rejects
+// fails it too.
+BOOST_AUTO_TEST_CASE(validate_queries_applies_the_engine_configuration) try {
+   using sysio::query_engine::error_kind;
+   const template_file tpl{data_only_template};
+   const std::string spec = spec_of(full_query.name, full_query.block_interval, full_query.query);
+
+   const auto small = parse_options_with_engine(tpl, spec, tiny_query_bytes_argument);
+   const auto cfg = alert_monitor::parse_config(small, tpl.dir.path());
+   BOOST_REQUIRE(cfg.has_value());
+   const std::string limit_error = config_error_of([&] { alert_monitor::validate_queries(cfg->queries, small); });
+   BOOST_CHECK_MESSAGE(limit_error.find(magic_enum::enum_name(error_kind::QUERY_LIMIT)) != std::string::npos,
+                       limit_error);
+   BOOST_CHECK_MESSAGE(limit_error.find(sysio::query_engine::option::max_query_bytes) != std::string::npos,
+                       limit_error);
+
+   const auto invalid = parse_options_with_engine(tpl, spec, zero_in_flight_argument);
+   const std::string config_error = config_error_of([&] { alert_monitor::validate_queries(cfg->queries, invalid); });
+   BOOST_CHECK_MESSAGE(config_error.find(magic_enum::enum_name(error_kind::INVALID_PARAMS)) != std::string::npos,
+                       config_error);
+}
+FC_LOG_AND_RETHROW()
+
+// The startup parse uses the deadline an execution gets (query_deadline), not --query-timeout-ms, which alert queries
+// never run under: a 1 ms engine timeout does not reject a long query that parses well within query_deadline.
+BOOST_AUTO_TEST_CASE(validate_queries_uses_the_query_deadline) try {
+   const template_file tpl{data_only_template};
+   const auto options =
+      parse_options_with_engine(tpl, spec_of("long_entry", every_block, long_query(long_query_columns)),
+                                one_ms_query_timeout_argument);
+   const auto cfg = alert_monitor::parse_config(options, tpl.dir.path());
+   BOOST_REQUIRE(cfg.has_value());
+   try {
+      alert_monitor::validate_queries(cfg->queries, options);
+   } catch (const chain::plugin_config_exception& e) {
+      BOOST_FAIL(e.to_detail_string());
+   }
+}
+FC_LOG_AND_RETHROW()
+
+// An error with neither a limit nor a location still carries the engine's message, which never holds query text.
+BOOST_AUTO_TEST_CASE(a_query_error_without_a_location_carries_its_message) try {
+   using sysio::query_engine::error_kind;
+   const template_file tpl{data_only_template};
+   const auto cfg = active_config(tpl, {query_argument(spec_of("ownerless_entry", every_block, ownerless_query))});
+   BOOST_REQUIRE(cfg.has_value());
+   const std::string error =
+      config_error_of([&] { alert_monitor::validate_queries(cfg->queries, parse_options({})); });
+   BOOST_CHECK_MESSAGE(error.find(magic_enum::enum_name(error_kind::QUERY_SEMANTICS)) != std::string::npos, error);
+   BOOST_CHECK_MESSAGE(error.find(owner_required_message) != std::string::npos, error);
+   BOOST_CHECK_MESSAGE(error.find(query_text_marker) == std::string::npos, error);
 }
 FC_LOG_AND_RETHROW()
 
@@ -1654,7 +1835,8 @@ BOOST_AUTO_TEST_CASE(a_failing_query_blocks_neither_other_queries_nor_status_doc
                                            std::string{healthy_b}};
    BOOST_CHECK_EQUAL_COLLECTIONS(keys.begin(), keys.end(), expected.begin(), expected.end());
 
-   BOOST_CHECK(harness.log.has_line_with({quoted_name(syntax_name), magic_enum::enum_name(error_kind::QUERY_SYNTAX)}));
+   BOOST_CHECK(harness.log.has_line_with(
+      {quoted_name(syntax_name), magic_enum::enum_name(error_kind::QUERY_SYNTAX), scripted_failure_message}));
    BOOST_CHECK(harness.log.has_line_with(
       {quoted_name(limit_name), magic_enum::enum_name(error_kind::QUERY_LIMIT), scripted_limit}));
    BOOST_CHECK(harness.log.has_line_with({quoted_name(unexpected_name)}));
@@ -1783,6 +1965,65 @@ BOOST_AUTO_TEST_CASE(every_query_execution_carries_query_deadline) try {
 }
 FC_LOG_AND_RETHROW()
 
+// An execution the engine refuses as QUERY_BUSY is retried until it is admitted: the entry succeeds, and each retry
+// carries what is left of the first attempt's query_deadline.
+BOOST_AUTO_TEST_CASE(a_busy_query_is_retried_within_its_deadline) try {
+   runner_harness harness{{spec_of("busy_then_admitted", every_block, scripted_query::busy_then_answer)}};
+   harness.start();
+   harness.runner->dispatch(trigger_at(first_lib));
+   wait_for(*harness.runner, [](const auto& s) { return s.succeeded == 1; });
+   harness.runner->shutdown();
+   const auto done = harness.runner->stats();
+   BOOST_CHECK_EQUAL(done.succeeded, 1u);
+   BOOST_CHECK_EQUAL(failed_by_any_kind(done), 0u);
+   const auto timeouts = harness.service->timeouts();
+   BOOST_REQUIRE_EQUAL(timeouts.size(), scripted_busy_refusals + 1);
+   BOOST_REQUIRE(timeouts.front().has_value());
+   BOOST_CHECK_EQUAL(timeouts.front()->count(), alert_monitor::query_deadline.count());
+   for (std::size_t i = 1; i < timeouts.size(); ++i) {
+      BOOST_REQUIRE(timeouts[i].has_value());
+      BOOST_CHECK(*timeouts[i] < *timeouts[i - 1]);
+   }
+}
+FC_LOG_AND_RETHROW()
+
+// A query refused as QUERY_BUSY until its deadline runs out is counted and logged as QUERY_BUSY, after more than one
+// attempt.
+BOOST_AUTO_TEST_CASE(a_query_busy_until_its_deadline_fails_as_busy) try {
+   using sysio::query_engine::error_kind;
+   constexpr std::string_view busy_name = "always_busy";
+   runner_harness harness{{spec_of(busy_name, every_block, scripted_query::busy)}};
+   harness.start();
+   harness.runner->dispatch(trigger_at(first_lib));
+   wait_for(*harness.runner, [](const auto& s) { return s.failed[failure_slot(error_kind::QUERY_BUSY)] == 1; });
+   harness.runner->shutdown(); // joins the caller, so its report has been logged
+   const auto done = harness.runner->stats();
+   BOOST_CHECK_EQUAL(done.failed[failure_slot(error_kind::QUERY_BUSY)], 1u);
+   BOOST_CHECK_EQUAL(done.succeeded, 0u);
+   BOOST_CHECK_GT(harness.service->timeouts().size(), 1u);
+   BOOST_CHECK(harness.log.has_line_with({quoted_name(busy_name), magic_enum::enum_name(error_kind::QUERY_BUSY)}));
+}
+FC_LOG_AND_RETHROW()
+
+// shutdown() ends a QUERY_BUSY retry at once instead of letting it run out its deadline.
+BOOST_AUTO_TEST_CASE(shutdown_ends_a_busy_retry) try {
+   runner_harness harness{{spec_of("busy_at_shutdown", every_block, scripted_query::busy)}};
+   harness.start();
+   harness.runner->dispatch(trigger_at(first_lib));
+   // A second attempt shows the caller is inside the retry loop.
+   const auto deadline = std::chrono::steady_clock::now() + drain_wait;
+   while (harness.service->timeouts().size() < 2 && std::chrono::steady_clock::now() < deadline)
+      std::this_thread::sleep_for(drain_poll);
+   BOOST_REQUIRE_GE(harness.service->timeouts().size(), 2u);
+   const auto started = std::chrono::steady_clock::now();
+   harness.runner->shutdown();
+   const auto elapsed = std::chrono::steady_clock::now() - started;
+   BOOST_CHECK_MESSAGE(
+      elapsed < busy_shutdown_bound,
+      fmt::format("shutdown took {} ms", std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count()));
+}
+FC_LOG_AND_RETHROW()
+
 // shutdown() with every caller blocked returns once each blocked call reaches its deadline -- bounded, not waiting for
 // the service -- and is idempotent; a dispatch afterwards admits nothing.
 BOOST_AUTO_TEST_CASE(query_runner_shutdown_is_bounded_with_blocked_callers) try {
@@ -1867,6 +2108,16 @@ BOOST_AUTO_TEST_CASE(plugin_initialize_propagates_config_errors_and_tolerates_no
       chain::plugin_config_exception);
    const std::vector<std::string> active = required_arguments(tpl);
    BOOST_CHECK_NO_THROW(plugin.plugin_initialize(parse_plugin_options(plugin, active)));
+}
+FC_LOG_AND_RETHROW()
+
+// plugin_initialize runs the startup parse: a query that does not parse fails initialization.
+BOOST_AUTO_TEST_CASE(plugin_initialize_rejects_a_query_that_does_not_parse) try {
+   const template_file tpl{data_only_template};
+   std::vector<std::string> arguments = required_arguments(tpl);
+   arguments.push_back(query_argument(spec_of("broken_entry", every_block, unparseable_query)));
+   alert_monitor_plugin plugin;
+   BOOST_CHECK_THROW(plugin.plugin_initialize(parse_plugin_options(plugin, arguments)), chain::plugin_config_exception);
 }
 FC_LOG_AND_RETHROW()
 
