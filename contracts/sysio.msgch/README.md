@@ -37,7 +37,7 @@ Inbound/outbound OPP message chain management and consensus tracking contract.
 | `evalcons` | `sysio.msgch` | Evaluate consensus for an (outpost, epoch); on consensus store and dispatch the attestations; on an eligible split open a `sysio.chalg` dispute |
 | `chkcons` | permissionless | If no dispute is open, every active outpost has consensus and the boundary has passed, call `sysio.epoch::advance` |
 | `resolvedisp` | `sysio.chalg` | Dispatch the winning envelope of a resolved dispute |
-| `queueout` | `sysio.epoch`, `sysio.opreg`, `sysio.synd`, or `sysio.msgch` | Queue an outbound attestation for an outpost |
+| `queueout` | `sysio.epoch`, `sysio.opreg`, `sysio.synd`, or `sysio.msgch` | Queue an outbound attestation for an outpost. Rejects `data` larger than `MAX_ATTESTATION_DATA_BYTES`, so every queued row fits an envelope |
 | `buildenv` | `sysio.epoch` | Pack `READY` attestations into the outpost's outbound envelope for the epoch |
 
 ## Attestation routing

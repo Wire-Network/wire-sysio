@@ -201,8 +201,8 @@ pre-launch procedure because a complete immutable roster history is required
 to credit the batch-operator payout:
 
 1. Set `pay_cadence_epochs` to a value in `[1, 10]` that also satisfies
-   `pay_cadence_epochs * operators_per_epoch <= 100` before the window. At the
-   intended 21-operator topology, the maximum is 4. An older stored value
+   `pay_cadence_epochs * operators_per_epoch <= 100` before the window. Groups are
+   at most 7 operators, so any cadence up to 10 qualifies. An older stored value
    outside the accepted bounds is read with an effective clamp until rewritten.
 2. Prefer a completed payment period and verify that `t5state` has
    `pending_emission_amount == 0`, all `batch_group_epochs` counters are zero,
