@@ -18,8 +18,10 @@ using namespace fc::network::ethereum;
 struct ethereum_client_entry_t {
    std::string                        id;
    fc::crypto::signature_provider_ptr signature_provider;
+   /// Null while a three-field CLI client's chain ID is being discovered.
+   /// Entries are immutable snapshots: fetch again to observe readiness.
    ethereum_client_ptr                client;
-   /// Authoritative numeric EVM chain id. Lets the
+   /// Authoritative numeric EVM chain id (zero until discovery completes). Lets the
    /// batch operator auto-select the client for an outpost row by matching the
    /// row's `external_chain_id`, so multiple EVM outposts never share one
    /// remote endpoint.

@@ -18,17 +18,22 @@ int main(int argc, char** argv) {
    try {
       auto& cron_plug = app().get_plugin<cron_plugin>();
       auto& eth_plug = app().get_plugin<outpost_ethereum_client_plugin>();
-      // Ethereum clients are constructed at plugin_initialize (the signature_provider_manager_plugin creates every
-      // provider at its own init, before this plugin initializes), so they are ready to read immediately after init<>.
+      /// Omitted chain IDs are discovered asynchronously; retain identity rather than a pending snapshot.
       auto eth_clients = eth_plug.get_clients();
       FC_ASSERT(!eth_clients.empty(), "At least 1 ethereum client must be configured");
-      auto eth_client = eth_clients[0];
+      const auto eth_client_id = eth_clients[0]->id;
 
       cron_plug.add_job(
          {
             .milliseconds = {cron_service::job_schedule::step_value{5000}}
          },
          [&]() {
+            /// Discovery replaces immutable entries, so every tick must fetch the current snapshot.
+            auto eth_client = eth_plug.get_client(eth_client_id);
+            if (!eth_client || !eth_client->client) {
+               ilog("Ethereum client {} is pending discovery; retrying on the next tick", eth_client_id);
+               return;
+            }
             // The logging framework already timestamps log messages.
             ilog("Getting ethereum gas price");
 

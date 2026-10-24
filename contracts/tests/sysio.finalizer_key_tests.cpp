@@ -116,6 +116,15 @@ BOOST_AUTO_TEST_SUITE(sysio_system_finalizer_key_tests)
 const name alice = "alice1111111"_n;
 const name bob   = "bob111111111"_n;
 
+/// Fields of the `finalizers` and `finkeys` rows.
+namespace finalizer_field {
+constexpr char active_key_id[]       = "active_key_id";
+constexpr char finalizer_key_count[] = "finalizer_key_count";
+constexpr char active_key_binary[]   = "active_key_binary";
+constexpr char finalizer_name[]      = "finalizer_name";
+constexpr char finalizer_key[]       = "finalizer_key";
+} // namespace finalizer_field
+
 const std::string finalizer_key_1 = "PUB_BLS_6j4Y3LfsRiBxY-DgvqrZNMCttHftBQPIWwDiN2CMhHWULjN1nGwM1O_nEEJefqwAG4X09n4Kdt4a1mfZ1ES1cLGjQo6uLLSloiVW4i9BUhMHU2nVujP1_U_9ihdI3egZ17N-iA";
 const std::string finalizer_key_2 = "PUB_BLS_gtaOjOTa0NzDt8etBDqLoZKlfKTpTalcdfmbTJknLUJB2Fu4Cv-uoa8unF3bJ5kFewaCzf3tjYUyNE6CDSrwvYP5Nw47Y9oE9x4nqJWfJykMOoaI0kJz-GDrGN2nZdUAp5tWEg";
 const std::string finalizer_key_3 = "PUB_BLS_CT8khvZYYZdObeIV9aTnd8fZ8bdaCL1UpSRyqNLZZM5sdrOSpOjDTAY2drTYGvQPVS21BhtD8acLJhqGyTfjqrWjyY5FTfqLdcligofSpa2lrG3FqKVNeUULR5QgcIMYga4vkQ";
@@ -524,6 +533,35 @@ BOOST_FIXTURE_TEST_CASE(delete_last_finalizer_key_test, finalizer_key_tester) tr
    BOOST_REQUIRE_EQUAL( true, get_finalizer_info(alice).is_null() );
 }
 FC_LOG_AND_RETHROW() // delete_last_finalizer_key_test
+
+// A deleted key can be registered again. The new registration gets a fresh id, because key ids are
+// never reused, even once no row holds the old one.
+BOOST_FIXTURE_TEST_CASE(reregister_deleted_finalizer_key_gets_new_id, finalizer_key_tester) try {
+   BOOST_REQUIRE_EQUAL( success(), regproducer(alice) );
+
+   BOOST_REQUIRE_EQUAL( success(), register_finalizer_key(alice, finalizer_key_1, pop_1) );
+   const uint64_t first_id = get_finalizer_info(alice)[finalizer_field::active_key_id].as_uint64();
+
+   // Deleting alice's only key erases her finalizer row along with the key row.
+   BOOST_REQUIRE_EQUAL( success(), delete_finalizer_key(alice, finalizer_key_1) );
+   BOOST_REQUIRE( get_finalizer_info(alice).is_null() );
+   BOOST_REQUIRE( get_finalizer_key_info(first_id).is_null() );
+
+   BOOST_REQUIRE_EQUAL( success(), register_finalizer_key(alice, finalizer_key_1, pop_1) );
+
+   // The key is active again under a new id, and the old id stays vacant.
+   const auto alice_info = get_finalizer_info(alice);
+   const uint64_t second_id = alice_info[finalizer_field::active_key_id].as_uint64();
+   BOOST_REQUIRE_GT( second_id, first_id );
+   BOOST_REQUIRE_EQUAL( 1, alice_info[finalizer_field::finalizer_key_count].as_uint64() );
+   BOOST_REQUIRE_EQUAL( finalizer_key_binary_1, alice_info[finalizer_field::active_key_binary].as_string() );
+
+   const auto key_info = get_finalizer_key_info(second_id);
+   BOOST_REQUIRE_EQUAL( alice.to_string(), key_info[finalizer_field::finalizer_name].as_string() );
+   BOOST_REQUIRE_EQUAL( finalizer_key_1, key_info[finalizer_field::finalizer_key].as_string() );
+   BOOST_REQUIRE( get_finalizer_key_info(first_id).is_null() );
+}
+FC_LOG_AND_RETHROW() // reregister_deleted_finalizer_key_gets_new_id
 
 // After registering keys and waiting for update_ranked_producers, test key activation
 BOOST_FIXTURE_TEST_CASE(multi_activation_tests, finalizer_key_tester) try {

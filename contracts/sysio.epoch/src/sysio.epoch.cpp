@@ -71,11 +71,18 @@ inline bool is_active_outpost(const sysio::chains::chain_row& row) {
 struct emissions_gate_result {
    bool                  ready              = false;
    bool                  is_pay_epoch       = false; // true on the period-boundary epoch where payepoch fires
-   int64_t               emission_amount    = 0;  // per-epoch emission for THIS epoch (always populated when ready)
+   /// This epoch's share, sized on the net headroom. May be 0 when ready: the open pay period has emission pending, and
+   /// either it has committed the rest of the budget or the curve is zero.
+   int64_t               emission_amount    = 0;
    int64_t               period_emission    = 0;  // pending + emission_amount; populated only on pay-epoch
-   int64_t               treasury_remaining = 0;  // for blocklog row
+   /// Net headroom (budget not yet paid out or accrued), for the blocklog row.
+   int64_t               treasury_remaining = 0;
    int64_t               sysio_balance      = 0;  // for blocklog row
    EmissionsBlockReason  reason             = opp::types::EMISSIONS_BLOCK_REASON_UNSPECIFIED;
+
+   /// What the gate tried to authorize, for the blocklog row: the period total on a pay epoch (the amount the balance
+   /// test compares), otherwise this epoch's share.
+   int64_t attempted_emission() const { return is_pay_epoch ? period_emission : emission_amount; }
 };
 
 emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec,
@@ -96,26 +103,22 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec,
       return r;
    }
    const auto t5s = t5s_tbl.get();
-   r.treasury_remaining = cfg.t5_distributable - cfg.t5_floor - t5s.total_distributed;
+   r.treasury_remaining = sysiosystem::emissions::net_headroom(cfg, t5s);
 
    // epoch_duration_sec is the canonical value from sysio.epoch::epochcfg,
    // passed by advance() so this gate and sysio.system see identical inputs
    // and the gate doesn't repeat advance()'s read of the same singleton.
 
-   // Compute would-be per-epoch emission. First-epoch case: use initial; cap at remaining.
-   if (t5s.epoch_count == 0) {
-      r.emission_amount = sysiosystem::emissions::scale_annual_to_epoch(
-         cfg.annual_initial_emission, epoch_duration_sec);
-      if (r.emission_amount > r.treasury_remaining) r.emission_amount = r.treasury_remaining;
-   } else {
-      r.emission_amount = sysiosystem::emissions::compute_epoch_emission(
-         cfg, epoch_duration_sec, t5s.last_epoch_emission, t5s.total_distributed);
-   }
+   // Capped at the net headroom, so the open pay period can never commit more than the budget.
+   r.emission_amount = sysiosystem::emissions::compute_epoch_emission(cfg, epoch_duration_sec, t5s);
 
-   // TREASURY_EXHAUSTED gates every epoch (pay or non-pay). A zero per-epoch
-   // emission means the treasury is at floor; advancing the epoch silently
-   // would let the chain roll forward into a depleted treasury.
-   if (r.emission_amount <= 0) {
+   // TREASURY_EXHAUSTED gates every epoch (pay or non-pay) and is decided on the GROSS headroom: advancing past a
+   // spent budget would roll the chain forward into a depleted treasury. An open period whose share drops to zero,
+   // because it has committed the rest of the budget or the curve is zero, still advances and pays what it accrued at
+   // its boundary. A zero share with nothing pending blocks: there is nothing to pay, and payepoch asserts on an empty
+   // period, which would abort advance.
+   if (sysiosystem::emissions::gross_headroom(cfg, t5s) <= 0 ||
+       (r.emission_amount <= 0 && t5s.pending_emission_amount <= 0)) {
       r.reason = opp::types::EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED;
       return r;
    }
@@ -197,7 +200,7 @@ void record_gate_block(name self, uint32_t epoch_index, const emissions_gate_res
       log_tbl.emplace(ram_payer, pk, epoch::blocklog_entry{
          .epoch_index        = epoch_index,
          .reason             = gate.reason,
-         .attempted_emission = gate.emission_amount,
+         .attempted_emission = gate.attempted_emission(),
          .treasury_remaining = gate.treasury_remaining,
          .sysio_balance      = gate.sysio_balance,
          .first_blocked_at   = now_secs,
@@ -209,7 +212,7 @@ void record_gate_block(name self, uint32_t epoch_index, const emissions_gate_res
 
    log_tbl.modify(ram_payer, pk, [&](auto& row) {
       row.reason             = gate.reason;
-      row.attempted_emission = gate.emission_amount;
+      row.attempted_emission = gate.attempted_emission();
       row.treasury_remaining = gate.treasury_remaining;
       row.sysio_balance      = gate.sysio_balance;
       row.last_retry_at      = now_secs;
@@ -412,9 +415,12 @@ void epoch::advance() {
    // For each (outpost × member of the expiring group):
    //   - scan `msgch::envelopes` (`byoutepoch` index) for any row matching
    //     (chain_code, current_epoch_index, batch_op_name == member)
-   //   - collect the delivery result and every non-canonical deliverer
-   //   - slash all non-canonical deliverers before delivery accounting can
-   //     terminate them, then record the result and run `termcheck`
+   //   - count the outposts the member delivered to and collect every
+   //     non-canonical deliverer
+   // Then slash the non-canonical deliverers before delivery accounting can
+   // terminate them, and record one result per member, delivered only if it
+   // reached every active outpost: `sysio.opreg`'s miss thresholds count duty
+   // epochs, not outposts.
    //
    // The outpost set is sourced via a cross-contract read of
    // `sysio.chains::chains` (no local mirror) filtered to
@@ -441,18 +447,23 @@ void epoch::advance() {
       // operator, which would abort advance and stall the chain).
       std::vector<name> to_slash;
 
-      /// A delivery result retained until non-canonical offenders have been
-      /// slashed. `recorddel` remains an audit record even for a newly
+      /// One member's delivery result for the expiring epoch, accumulated across
+      /// the active outposts and retained until non-canonical offenders have
+      /// been slashed. `recorddel` remains an audit record even for a newly
       /// slashed operator, while `termcheck` safely skips non-ACTIVE rows.
       struct delivery_observation {
          name member;
-         bool did_deliver;
+         uint32_t outposts_delivered = 0; ///< Active outposts this member delivered to.
       };
       std::vector<delivery_observation> observations;
+      observations.reserve(expiring_group.size());
+      for (const auto& member : expiring_group) observations.push_back({member});
+      uint32_t active_outposts = 0;
 
       sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
       for (auto op_it = chains_tbl.begin(); op_it != chains_tbl.end(); ++op_it) {
          if (!is_active_outpost(*op_it)) continue;
+         ++active_outposts;
 
          const uint64_t chain_code = op_it->code.value;
          const uint128_t composite =
@@ -491,17 +502,17 @@ void epoch::advance() {
             }
          }
 
-         for (const auto& member : expiring_group) {
+         for (auto& observation : observations) {
             bool        did_deliver = false;
             checksum256 member_checksum{};
             for (size_t i = 0; i < delivered.size(); ++i) {
-               if (delivered[i] == member) {
+               if (delivered[i] == observation.member) {
                   did_deliver     = true;
                   member_checksum = delivered_checksums[i];
                   break;
                }
             }
-            observations.push_back({member, did_deliver});
+            if (did_deliver) ++observation.outposts_delivered;
 
             // Single slash path (dispute-vote design, per-operator outcome table): a delivered
             // NON-canonical checksum is a fault -> slash. Silence (no delivery) is never slashed; it
@@ -509,9 +520,9 @@ void epoch::advance() {
             if (did_deliver && have_winner && member_checksum != winner) {
                bool queued = false;
                for (const auto& s : to_slash) {
-                  if (s == member) { queued = true; break; }
+                  if (s == observation.member) { queued = true; break; }
                }
-               if (!queued) to_slash.push_back(member);
+               if (!queued) to_slash.push_back(observation.member);
             }
          }
       }
@@ -542,20 +553,24 @@ void epoch::advance() {
 
       // Preserve delivery history and ordinary termination accounting. Inline
       // slashing completes before these actions, and all mutations complete
-      // before finishadv reads the registry for outbound attestations.
-      for (const auto& observation : observations) {
-         action(
-            permission_level{get_self(), "owner"_n},
-            OPREG_ACCOUNT,
-            opreg_actions::RECORD_DELIVERY,
-            std::make_tuple(observation.member, state.current_epoch_index, observation.did_deliver)
-         ).send();
-         action(
-            permission_level{get_self(), "owner"_n},
-            OPREG_ACCOUNT,
-            opreg_actions::TERMINATION_CHECK,
-            std::make_tuple(observation.member)
-         ).send();
+      // before finishadv reads the registry for outbound attestations. With no
+      // active outpost nothing was due, so nothing is recorded.
+      if (active_outposts > 0) {
+         for (const auto& observation : observations) {
+            const bool delivered_everywhere = observation.outposts_delivered == active_outposts;
+            action(
+               permission_level{get_self(), "owner"_n},
+               OPREG_ACCOUNT,
+               opreg_actions::RECORD_DELIVERY,
+               std::make_tuple(observation.member, state.current_epoch_index, delivered_everywhere)
+            ).send();
+            action(
+               permission_level{get_self(), "owner"_n},
+               OPREG_ACCOUNT,
+               opreg_actions::TERMINATION_CHECK,
+               std::make_tuple(observation.member)
+            ).send();
+         }
       }
 
       // The envelope rows read above are left in place: `sysio.msgch::deliver`
@@ -944,7 +959,7 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
    // Emissions side. Accrual and history precede advance's payout sibling:
    //   1. accrueepoch: always queued. Records this epoch's per-epoch share
    //      onto t5state (pending_emission_amount + batch_group_epochs[group]
-   //      + last_epoch_emission for decay continuity).
+   //      + last_epoch_emission for decay continuity). The share may be 0.
    //   2. rcrdbatch: always queued. Records the immutable roster that accrued
    //      this epoch after the schedule has slid for the next advance.
    //   3. payepoch: queued only on pay-epochs. Reads the now-updated t5state
