@@ -99,6 +99,7 @@ class Utils:
     ConfigDir=f"{DataPath}/"
 
     TimeFmt='%Y-%m-%dT%H:%M:%S.%f'
+    SubMillisecondDigits=3
     TestPortOffsetEnvVar="SYSIO_TEST_PORT_OFFSET"
     PortShip="ship"
     PortStateHistory="state_history"
@@ -308,7 +309,13 @@ class Utils:
 
     @staticmethod
     def timestamp():
-        return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%S.%f")
+        """Return the current UTC instant with microsecond precision and no timezone suffix."""
+        return datetime.now(UTC).strftime(Utils.TimeFmt)
+
+    @staticmethod
+    def genesisTimestamp():
+        """Return a UTC genesis timestamp, truncating microseconds to milliseconds."""
+        return Utils.timestamp()[:-Utils.SubMillisecondDigits]
 
     @staticmethod
     def checkOutputFileWrite(time, cmd, output, error):

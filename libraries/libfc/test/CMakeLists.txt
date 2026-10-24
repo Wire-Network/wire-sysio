@@ -48,6 +48,7 @@ add_executable( test_fc
         test_bitset.cpp
         test_ordered_diff.cpp
         test_system_timer.cpp
+        test_time.cpp
         parallel/test_worker_task_queue.cpp
         parallel/test_batch_task_queue.cpp
         task/test_retry.cpp
