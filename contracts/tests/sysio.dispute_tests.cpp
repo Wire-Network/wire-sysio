@@ -37,6 +37,7 @@
 #include <fc/crypto/sha256.hpp>
 
 #include "contracts.hpp"
+#include "registry_test_support.hpp"
 // Canonical-encoding + header-derivation oracle: inbound envelopes must carry
 // spec-derived semantic headers or apply_consensus drops them before dispatch.
 #include "opp_envelope_oracle.hpp"
@@ -1161,6 +1162,8 @@ BOOST_FIXTURE_TEST_CASE(deliver_rejects_decollateralized_unknown_group_member, s
    constexpr auto     BATCHOP_B = "batchop.b"_n;
    constexpr uint64_t MIN_BOND  = 1'000'000;
    create_account(BATCHOP_B, config::system_account_name, false, true, /*include_roa_policy=*/false);
+
+   sysio_system::test_support::registry::seed_depot_pair(*this);
 
    // Require an ETH bond so a non-bootstrapped op's status tracks its collateral.
    BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "setconfig"_n, mvo()

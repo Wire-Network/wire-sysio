@@ -13,6 +13,7 @@
 
 #include "sysio.system_tester.hpp"
 #include "finalizer_test_keys.hpp"
+#include "registry_test_support.hpp"
 
 using namespace sysio_system;
 
@@ -181,6 +182,7 @@ public:
    ///
    /// `setconfig` re-evaluates no operator, so a status earned under the previous minimum stays stored.
    void set_producer_min_bond(uint64_t min_bond) {
+      test_support::registry::seed_depot_pair(*this);
       base_tester::push_action("sysio.opreg"_n, "setconfig"_n, "sysio.opreg"_n, mvo()
          ("max_available_producers",          uint32_t{21})
          ("max_available_batch_ops",          uint32_t{63})

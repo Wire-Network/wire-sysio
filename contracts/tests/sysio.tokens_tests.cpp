@@ -11,11 +11,13 @@
 #include <sysio/chain/kv_table_objects.hpp>
 
 #include <fc/variant_object.hpp>
+#include <fc/io/json.hpp>
 #include <fc/slug_name.hpp>
 
 #include <cstring>
 
 #include "contracts.hpp"
+#include "registry_test_support.hpp"
 #include <sysio/opp/opp.hpp>
 
 using namespace sysio::testing;
@@ -26,21 +28,54 @@ using namespace sysio::opp::types;
 
 using mvo = fc::mutable_variant_object;
 
+namespace {
+/// Values and expected errors for registry parent/binding regression cases.
+constexpr char kEthCode[] =
+   "ETH";
+constexpr char kEthName[] =
+   "Ethereum";
+constexpr char kWireCode[] =
+   "WIRE";
+constexpr char kWireName[] =
+   "Wire";
+constexpr char kUsdcCode[] =
+   "USDC";
+constexpr char kMissingCode[] =
+   "MISSING";
+constexpr char kMissingChainError[] =
+   "assertion failure with message: sysio.tokens: chain code not registered";
+constexpr char kMissingTokenError[] =
+   "assertion failure with message: sysio.tokens: token code not registered";
+constexpr char kDuplicateBindingError[] =
+   "assertion failure with message: sysio.tokens: (chain_code, token_code) binding already registered";
+constexpr char kDuplicateNativeError[] =
+   "assertion failure with message: sysio.tokens: chain already has an active is_native binding";
+constexpr uint64_t kEthChainId = 1;
+/// Shared registry fixture ABI identifiers.
+namespace registry_action = sysio_system::test_support::registry::action;
+namespace registry_field = sysio_system::test_support::registry::field;
+} // namespace
+
+
 /// Minimal fixture: deploy the privileged sysio.tokens registry on a plain
 /// (non-ROA) tester. With no sysio.epoch deployed, `current_epoch_index`
 /// reads as 0 — the bootstrap window — so registrations come up `active`.
 class sysio_tokens_tester : public tester {
 public:
    static constexpr auto TOKENS_ACCOUNT = "sysio.tokens"_n;
+   static constexpr auto CHAINS_ACCOUNT = "sysio.chains"_n;
 
    sysio_tokens_tester() {
       produce_blocks(2);
-      create_accounts({ TOKENS_ACCOUNT });
+      create_accounts({ TOKENS_ACCOUNT, CHAINS_ACCOUNT });
       produce_blocks(2);
 
       set_code(TOKENS_ACCOUNT, contracts::tokens_wasm());
       set_abi(TOKENS_ACCOUNT, contracts::tokens_abi().data());
       set_privileged(TOKENS_ACCOUNT);
+      set_code(CHAINS_ACCOUNT, contracts::chains_wasm());
+      set_abi(CHAINS_ACCOUNT, contracts::chains_abi().data());
+      set_privileged(CHAINS_ACCOUNT);
       produce_blocks();
 
       const auto* accnt = control->find_account_metadata(TOKENS_ACCOUNT);
@@ -73,35 +108,27 @@ public:
          ("address",     mvo()("kind", ChainKind::CHAIN_KIND_UNKNOWN)("address", "")));
    }
 
+   /// Register a parent chain before testing binding acceptance.
+   void regchain() {
+      base_tester::push_action(CHAINS_ACCOUNT, registry_action::regchain, CHAINS_ACCOUNT, mvo()
+         (registry_field::kind, ChainKind::CHAIN_KIND_EVM)(registry_field::code, kEthCode)
+         (registry_field::external_chain_id, kEthChainId)
+         (registry_field::name, kEthName)(registry_field::description, std::string{})
+         (registry_field::outpost, sysio_system::test_support::no_outpost_mvo()));
+      produce_block();
+   }
+
+   /// Register a binding using the same action shape for all rejection/success paths.
+   action_result regctok(std::string_view chain, std::string_view token, bool native = false) {
+      return push_action(TOKENS_ACCOUNT, registry_action::regctok, mvo()
+         (registry_field::chain_code, chain)(registry_field::token_code, token)
+         (registry_field::contract_addr, std::string{})(registry_field::is_native, native));
+   }
+
    /// `chaintokens` is a uint128-keyed kv::table; `get_row_by_id` only supports
    /// uint64 keys, so walk the table by its DB index and match the slug pair.
    fc::variant find_chaintoken(std::string_view chain_code, std::string_view token_code) {
-      const auto target_chain = fc::slug_name{chain_code}.value;
-      const auto target_token = fc::slug_name{token_code}.value;
-
-      const auto& db = control->db();
-      const auto table_id = chain::compute_table_id("chaintokens"_n.to_uint64_t());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto itr = kv_idx.lower_bound(boost::make_tuple(TOKENS_ACCOUNT, table_id, std::string_view{}));
-      for (; itr != kv_idx.end()
-             && itr->code == TOKENS_ACCOUNT
-             && itr->table_id == table_id; ++itr) {
-         std::vector<char> raw(itr->value.size());
-         if (!raw.empty())
-            std::memcpy(raw.data(), itr->value.data(), raw.size());
-         try {
-            auto row = abi_ser.binary_to_variant(
-               "chain_token_row", raw,
-               fixture_abi_yield_function());
-            if (row["chain_code"].as<fc::slug_name>().value == target_chain &&
-                row["token_code"].as<fc::slug_name>().value == target_token) {
-               return row;
-            }
-         } catch (...) {
-            // skip rows that don't decode
-         }
-      }
-      return fc::variant();
+      return sysio_system::test_support::registry::binding(*this, chain_code, token_code);
    }
 
 private:
@@ -115,6 +142,9 @@ BOOST_AUTO_TEST_SUITE(sysio_tokens_tests)
 // stored on the binding — the depot's per-token precision lives on
 // Token.precision and the reserve row; the outpost owns the boundary conversion.
 BOOST_FIXTURE_TEST_CASE(regctok_records_binding, sysio_tokens_tester) { try {
+   regchain();
+   BOOST_REQUIRE_EQUAL(success(), regtoken(kWireCode, kWireName, std::string{}));
+   BOOST_REQUIRE_EQUAL(success(), regtoken(kUsdcCode, kUsdcCode, std::string{}));
    // Native binding.
    BOOST_REQUIRE_EQUAL(success(), push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
       ("chain_code",    "ETH")
@@ -176,6 +206,7 @@ BOOST_FIXTURE_TEST_CASE(regtoken_regctok_uncanonical_code_rejected, sysio_tokens
       .find("has no canonical slug_name spelling") != std::string::npos);
 
    // Control: spellable codes on the same shapes still register.
+   regchain();
    BOOST_REQUIRE_EQUAL(success(), regtoken("WIRE", "Wire", "ok"));
    BOOST_REQUIRE_EQUAL(success(), push_action(TOKENS_ACCOUNT, "regctok"_n, mvo()
       ("chain_code",    "ETH")
@@ -198,6 +229,44 @@ BOOST_FIXTURE_TEST_CASE(regtoken_bounds_metadata, sysio_tokens_tester) { try {
    // The bounds are inclusive, and a rejected registration never claimed the code.
    BOOST_REQUIRE_EQUAL(success(),
       regtoken("WIRE", std::string(128, 'x'), std::string(256, 'x')));
+} FC_LOG_AND_RETHROW() }
+
+/// Missing parents cannot reserve a binding key; registering them permits a later retry.
+BOOST_FIXTURE_TEST_CASE(regctok_requires_registered_parents, sysio_tokens_tester) { try {
+   BOOST_REQUIRE_EQUAL(error(kMissingChainError),
+                       regctok(kEthCode, kWireCode, true));
+   BOOST_REQUIRE(find_chaintoken(kEthCode, kWireCode).is_null());
+   regchain();
+   BOOST_REQUIRE_EQUAL(error(kMissingTokenError),
+                       regctok(kEthCode, kWireCode, true));
+   BOOST_REQUIRE(find_chaintoken(kEthCode, kWireCode).is_null());
+   BOOST_REQUIRE_EQUAL(success(), regtoken(kWireCode, kWireName, std::string{}));
+   BOOST_REQUIRE_EQUAL(success(), regctok(kEthCode, kWireCode, true));
+   const auto before = find_chaintoken(kEthCode, kWireCode);
+   BOOST_REQUIRE_EQUAL(error(kMissingChainError),
+                       regctok(kMissingCode, kWireCode));
+   BOOST_REQUIRE(find_chaintoken(kMissingCode, kWireCode).is_null());
+   BOOST_REQUIRE_EQUAL(fc::json::to_string(before, fc::time_point::maximum()),
+                       fc::json::to_string(find_chaintoken(kEthCode, kWireCode), fc::time_point::maximum()));
+} FC_LOG_AND_RETHROW() }
+
+/// Parent activation is independent of binding registration; uniqueness rules still apply.
+BOOST_FIXTURE_TEST_CASE(regctok_accepts_inactive_parents_and_preserves_native_rules, sysio_tokens_tester) { try {
+   regchain();
+   BOOST_REQUIRE_EQUAL(success(), regtoken(kWireCode, kWireName, std::string{}));
+   BOOST_REQUIRE_EQUAL(success(), regtoken(kUsdcCode, kUsdcCode, std::string{}));
+   sysio_system::test_support::registry::make_inactive(*this);
+   BOOST_REQUIRE_EQUAL(success(), regctok(kEthCode, kWireCode, true));
+   produce_blocks();
+   const auto before = find_chaintoken(kEthCode, kWireCode);
+   BOOST_REQUIRE_EQUAL(error(kDuplicateBindingError),
+                       regctok(kEthCode, kWireCode, true));
+   BOOST_REQUIRE_EQUAL(error(kDuplicateNativeError),
+                       regctok(kEthCode, kUsdcCode, true));
+   BOOST_REQUIRE(find_chaintoken(kEthCode, kUsdcCode).is_null());
+   BOOST_REQUIRE_EQUAL(fc::json::to_string(before, fc::time_point::maximum()),
+                       fc::json::to_string(find_chaintoken(kEthCode, kWireCode), fc::time_point::maximum()));
+   BOOST_REQUIRE_EQUAL(success(), regctok(kEthCode, kUsdcCode));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

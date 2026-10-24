@@ -36,6 +36,7 @@
 #include <sysio/opp/opp.hpp>
 
 #include "sysio.system_tester.hpp"
+#include "registry_test_support.hpp"
 #include <sysio/testing/bls_utils.hpp>
 
 #include "finalizer_test_keys.hpp"
@@ -5946,6 +5947,7 @@ struct producer_score_tester : public producer_eligibility_tester {
    /// @return the action result.
    action_result set_producer_collateral(const fc::variants& req_prod_collat,
                                          uint64_t prune_delay_ms = 600'000) {
+      sysio_system::test_support::registry::seed_depot_pair(*this);
       return push_opreg_action(OPREG, "setconfig"_n, mvo()
          ("max_available_producers",          uint32_t{21})
          ("max_available_batch_ops",          uint32_t{63})
@@ -6401,6 +6403,8 @@ BOOST_FIXTURE_TEST_CASE( collateral_topup_raises_score_and_position, producer_sc
 // The collateral factor is the MINIMUM across the required pairs, with no sum term: posting extra
 // on the cheapest chain must do nothing at all, so raising the score requires lifting EVERY pair.
 BOOST_FIXTURE_TEST_CASE( collateral_is_minimum_across_required_pairs, producer_score_tester ) try {
+   setup_score_shadow();
+   sysio_system::test_support::registry::seed_depot_pair(*this, second_token);
    BOOST_REQUIRE_EQUAL( success(), set_producer_collateral(fc::variants{
       min_bond_mvo(collateral_chain, collateral_token, base_min_bond),
       min_bond_mvo(second_chain,     second_token,     base_min_bond)}) );
