@@ -35,7 +35,7 @@ inline constexpr size_t SOLANA_MAX_CHUNK_BYTES = 668;
 ///
 /// A legacy Solana transaction is capped at 1232 bytes and each account costs
 /// 32 bytes of key plus 1 byte of index; after the instruction's own static
-/// account list, the fee payer, the compute-budget pre-instruction, header,
+/// account list, the fee payer, the two-instruction ComputeBudget preamble, header,
 /// blockhash and signature, ~16 dynamic accounts fit. This lives in the RELAY
 /// because the relay builds the transaction -- the depot used to carry an
 /// equivalent estimate and could not, since a WIRE consensus contract has no
@@ -50,13 +50,22 @@ inline constexpr size_t MAX_TERMINAL_DYNAMIC_ACCOUNTS = 16;
 /// The frame rides with the work it protects: that call decodes the staged
 /// envelope, dispatches its effects, and on the draining call encodes the
 /// outbound emit -- all of which allocate well past Solana's 32 KiB default
-/// heap. The compute-budget pre-instruction carrying it also costs packet
-/// budget, which is why `dispatch_attestations_full_manifest_fits_packet_limit`
-/// measures the transaction WITH it.
+/// heap. The ComputeBudget preamble carrying it and the CU ceiling also costs
+/// packet budget, which is why `dispatch_attestations_full_manifest_fits_packet_limit`
+/// measures the transaction WITH both instructions.
 ///
 /// Exported so the packet-limit test (and the program-side test pinning the
 /// same frame) measure THIS constant rather than a copy of it.
 inline constexpr uint32_t SOLANA_DISPATCH_HEAP_FRAME_BYTES = 256'000;
+
+/// Compute-unit ceiling requested on every `dispatch_attestations` call.
+///
+/// Dispatch decodes the complete staged envelope on every resumable round,
+/// applies the selected effects, and emits the outbound envelope on the
+/// draining round. The producer capacity suite exercises this complete path at
+/// Solana's 1,400,000-CU per-transaction ceiling; using the same explicit
+/// ceiling prevents a valid window from rolling back at the default budget.
+inline constexpr uint32_t SOLANA_DISPATCH_COMPUTE_UNIT_LIMIT = 1'400'000;
 
 /// Backstop on `dispatch_attestations` rounds per envelope. The drain loop
 /// already exits on a drained cursor, on consensus not yet reached, and on a
@@ -73,6 +82,18 @@ inline constexpr uint32_t SOLANA_DISPATCH_HEAP_FRAME_BYTES = 256'000;
 inline constexpr uint32_t MAX_DISPATCH_ROUNDS = 128;
 
 namespace outpost_solana_client_detail {
+
+/// Build the exact ComputeBudget preamble for production dispatch cranks.
+///
+/// The heap request must precede the compute-unit limit to match the producer
+/// capacity transaction shape. Packet tests call this helper directly so they
+/// cannot pass against a test-only approximation of the relay preamble.
+inline std::vector<fc::network::solana::instruction> dispatch_attestations_pre_instructions() {
+   return {
+      fc::network::solana::system::compute_budget::request_heap_frame(SOLANA_DISPATCH_HEAP_FRAME_BYTES),
+      fc::network::solana::system::compute_budget::set_compute_unit_limit(SOLANA_DISPATCH_COMPUTE_UNIT_LIMIT),
+   };
+}
 
 /// Assert that the loaded IDL's `LatestOutboundEnvelope` declaration has the
 /// shape `read_inbound_envelope` relies on: the account exists (inline fields
@@ -463,9 +484,11 @@ void assert_global_state_shape(const fc::network::solana::idl::program& program)
  * chain-agnostic SPI.
  *
  * `deliver_outbound_envelope` stages chunks through `epoch_in`, then sends a
- * zero-data terminal `epoch_in` call. When that call reaches consensus the
- * program emits its queued outbound envelope inline; the return value is the
- * terminal call's signature.
+ * zero-data terminal `epoch_in` call. That call records delivery and may reach
+ * consensus; the relay then attempts the separate resumable
+ * `dispatch_attestations` drain, which applies effects and emits outbound on
+ * its final round. The delivery return value remains the terminal call's
+ * signature even if settlement must resume later.
  *
  * Constructed by `outpost_solana_client_plugin::create_outpost_client` —
  * `batch_operator_plugin` never builds one directly.
