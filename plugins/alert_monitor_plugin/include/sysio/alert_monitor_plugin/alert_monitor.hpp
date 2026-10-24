@@ -190,8 +190,9 @@ std::optional<config> parse_config(const boost::program_options::variables_map& 
                                    const std::filesystem::path& config_dir);
 
 /// Parse every query with the query engine's parser and the engine's limits from @p options, under the deadline an
-/// execution gets (query_deadline), so a query that cannot run fails startup. Throws plugin_config_exception naming
-/// the entry, the error kind, its limit or line and column, and the engine's message; never the query text.
+/// execution gets (query_deadline), so a query that does not parse or exceeds a parse limit fails startup; table,
+/// column, and planning errors still surface when it runs. Throws plugin_config_exception naming the entry, the error
+/// kind, its limit or line and column when it has one, and the engine's message; never the query text.
 void validate_queries(const std::vector<query_entry>& queries, const boost::program_options::variables_map& options);
 
 /// Parse one spec: `fc::split(spec, ',', query_spec_field_count)` (as signature_provider_manager_plugin does).
@@ -407,8 +408,9 @@ private:
    std::shared_ptr<fc::parallel::worker_task_queue<status_snapshot>> _render;
 };
 
-/// Deadline of every query execution: the engine's own default (1 s). It also bounds query_runner::shutdown(),
-/// keeping node shutdown well inside a supervisor's kill grace.
+/// Overall deadline of every query execution, in place of query-timeout-ms: the engine's own default (1 s). Each chain
+/// read is still bounded by the engine's query-max-capture-ms. It also bounds query_runner::shutdown(), keeping node
+/// shutdown well inside a supervisor's kill grace.
 inline constexpr std::chrono::milliseconds query_deadline = query_engine::defaults::timeout;
 /// Wait between attempts of an execution the engine refused with QUERY_BUSY. Attempts continue until query_deadline
 /// after the first, since the engine's admission (query-max-in-flight) is shared by every query and HTTP request.
