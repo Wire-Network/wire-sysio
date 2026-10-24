@@ -84,6 +84,7 @@ std::vector<char> encode_envelope_with_mixed_attestations(
 
    auto* msg     = env.add_messages();
    auto* payload = msg->mutable_payload();
+   payload->set_version(1); // Match every active OPP emitter's payload format.
    // Open protobuf enums retain raw wire discriminants, including undeclared values.
    constexpr auto type_field = "type";
    for (const auto raw_type : unknown_types) {
