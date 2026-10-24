@@ -10,12 +10,20 @@
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.27.0",
+  "resolutions": {
+    "@aws-sdk/client-firehose": "3.1102.0",
+    "@aws-sdk/client-kms": "3.1102.0",
+    "@aws-sdk/client-sns": "3.1102.0",
+    "@aws-sdk/client-ssm": "3.1102.0",
+    "@aws-sdk/client-sts": "3.1102.0"
+  },
   "devDependencies": {
     "@3fv/guard": "^1.4.39",
     "@3fv/prelude-ts": "^0.8.37",
     "@types/lodash": "^4.17.21",
     "@types/node": "^24.10.13",
     "@types/shelljs": "^0.10.0",
+    "@wireio/cluster-tool": "0.1.20",
     "fs-extra": "^11.3.3",
     "json5": "^2.2.3",
     "lodash": "^4.18.1",
@@ -24,8 +32,5 @@
     "shelljs": "^0.10.0",
     "source-map-support": "^0.5.21",
     "typescript": "^5.9.3"
-  },
-  "dependencies": {
-
   }
 }
