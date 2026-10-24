@@ -171,16 +171,17 @@ void add_options(bpo::options_description& cfg) {
       "matches {} over the whole string, is unique, is not a reserved name ({}), and is the ${{data}} key of the "
       "query's documents (so the template's ${{data}} must be a whole value). The block_interval is 1 to {}: the "
       "query runs once per LIB bucket of that many blocks (first at LIB block_interval), never catching up missed "
-      "buckets. Each query is parsed at startup. Every execution has a fixed {} ms deadline; the node's --{} does "
-      "not apply, so queries must stay small. Queries share the engine's --{} and --{} with each other and with "
-      "HTTP queries; an execution refused as busy is retried within its deadline. Requires --{} and plugin = {}, "
-      "which refuses producer nodes. A query given in config.ini can contain neither # nor a newline, and loses "
-      "trailing spaces and tabs. On the command line they are fine, but the spec must be quoted there, because the "
-      "option takes multiple tokens",
+      "buckets. Each query is parsed at startup. Every execution has a fixed {} ms overall deadline in place of the "
+      "node's --{}, so queries must stay small; each chain read within it is still bounded by --{}, which by default "
+      "is the smaller of --{} and the read-only transaction time. Queries share the engine's --{} and --{} with each "
+      "other and with HTTP queries; an execution refused as busy is retried within its deadline. Requires --{} and "
+      "plugin = {}, which refuses producer nodes. A query given in config.ini can contain neither # nor a newline, "
+      "and loses trailing spaces and tabs. On the command line they are fine, but the spec must be quoted there, "
+      "because the option takes multiple tokens",
       query_spec_format, query_name_pattern, fmt::join(reserved_query_names, token_list_separator),
       max_query_block_interval, query_deadline.count(), query_engine::option::timeout_ms,
-      query_engine::option::worker_threads, query_engine::option::max_in_flight, option::target_url,
-      query_engine_plugin_name);
+      query_engine::option::max_capture_ms, query_engine::option::timeout_ms, query_engine::option::worker_threads,
+      query_engine::option::max_in_flight, option::target_url, query_engine_plugin_name);
 
    auto opts = cfg.add_options();
    opts(option::target_url, bpo::value<std::string>(),
@@ -630,8 +631,8 @@ void query_runner::run(job& j) noexcept {
       const auto& entry = _cfg.queries[j.ordinal];
       try {
          if (auto service = _provider()) {
-            // A fixed per-call deadline, never the node's query-timeout-ms (30 s on API nodes); it bounds shutdown()
-            // in either plugin shutdown order.
+            // A fixed per-call deadline in place of the node's query-timeout-ms (30 s on API nodes); it bounds
+            // shutdown() in either plugin shutdown order. Chain reads keep the engine's query-max-capture-ms.
             auto result = execute(*service, entry);
             // ${data} = { "<entry.name>": { record, version, query, trigger, observed_at, result } }
             const admission outcome = _sink.submit_document(

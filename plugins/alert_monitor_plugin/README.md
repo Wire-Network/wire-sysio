@@ -184,9 +184,10 @@ spec's text -- a missing field shifts query text into the name and interval posi
 already valid, which the interval, query, and duplicate-name errors include so the entry can be found.
 
 Each query is then parsed with the query engine's own parser and limits, under the same 1 s deadline it runs
-with, so a syntax error, or a query cut short at a `#` in config.ini, fails startup too: the error names the query,
-the error kind, the line and column (or the limit it exceeded), and the engine's message, never the query text.
-Table and column names are resolved only when the query runs.
+with, so a query that does not parse, or that exceeds a parse limit (a query cut short at a `#` in config.ini
+included), fails startup too. The error names the query, the error kind, the limit or the line and column when the
+error has one, and the engine's message, never the query text. Unknown tables or columns and planning errors still
+surface only when the query runs.
 
 ### Requirements and limits
 
@@ -195,8 +196,11 @@ Table and column names are resolved only when the query runs.
   only on non-producing nodes. The engine also needs `read-only-threads` above 0 and a read mode other than
   `speculative`, and fails startup with its own message otherwise. `alert_monitor_plugin` itself does not require
   the engine and runs on producers with status documents alone.
-- **A fixed 1 s deadline.** Every execution has a fixed 1 s deadline, the engine's own default; the node's
-  `query-timeout-ms` does not apply, so queries must stay small. The deadline also bounds shutdown.
+- **A fixed 1 s deadline.** Every execution has a fixed 1 s overall deadline, the engine's own default, in place
+  of the node's `query-timeout-ms`, so queries must stay small. Each chain read within it is still bounded by
+  `query-max-capture-ms`, which by default is the smaller of `query-timeout-ms` and the read-only transaction
+  time, so a `query-timeout-ms` below the read-only transaction time still cuts alert queries short. The deadline
+  also bounds shutdown.
 - **`${data}` must be a whole value.** A query document's `${data}` is an object keyed by the query's name, so
   the template should write `"data": "${data}"`; a mixed string such as `"data": "x ${data}"` renders it as text.
   Startup fails when the template has no `${data}` at all; where it is placed is not checked.
