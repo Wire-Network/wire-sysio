@@ -25,7 +25,7 @@ The curve decays from `annual_initial_emission` toward `annual_min_emission`
 
 The T5 budget is `t5_distributable - t5_floor`. Accruals are sized against the
 part not yet paid out or accrued (`net_headroom` in `emissions.hpp`), so
-`total_distributed + pending_emission_amount` never exceeds the budget. `setemitcfg` refuses a budget below
+`total_distributed + pending_emission_amount` never exceeds the budget. `setemitcfg` refuses a `t5_distributable` below
 `t5_floor + total_distributed + pending_emission_amount`.
 
 Once the open pay period has accrued the rest of the budget, its remaining
