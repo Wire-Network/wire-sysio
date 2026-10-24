@@ -196,9 +196,9 @@ namespace sysio {
             sysio::const_mem_fun<attestation_entry, uint64_t, &attestation_entry::by_epoch>>
       >;
 
-      /// Outbound envelope table. One-deep per outpost: `buildenv` erases every older row for the
-      /// destination `chain_code` after inserting the new emit, so the surviving row doubles as the
-      /// per-outpost chain tip.
+      /// Outbound envelope table. `buildenv` erases a row only once the outpost has consumed it
+      /// (`outpcons.epoch_index` covers its `epoch_index`), so it is one-deep in the healthy path.
+      /// The chain tip is the newest row: read it through `byoutepoch`, as `byoutpost` yields the oldest.
       ///
       /// `envelope_hash` is the canonical epoch digest: keccak256 over the canonical
       /// field-complete encoding with the in-envelope `envelope_hash` field blanked (equal to
