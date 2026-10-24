@@ -18,6 +18,29 @@ namespace sysio {
       using contract::contract;
 
       // -----------------------------------------------------------------------
+      //  Envelope sizing
+      // -----------------------------------------------------------------------
+
+      /// Hard cap on an encoded envelope in both directions, mirroring the Solana
+      /// (`opp_outpost::MAX_ENVELOPE_BYTES`) and Ethereum (`OPP.MAX_ENVELOPE_BYTES`) caps. Ethereum is
+      /// the binding constraint: a cold `emitOutboundEnvelope` of a near-64-KiB envelope exceeds the
+      /// EIP-7825 per-transaction gas cap. Inbound, `deliver` rejects anything larger.
+      static constexpr size_t MAX_ENVELOPE_BYTES = 32'768;
+
+      /// Per-attestation framing `buildenv` budgets for (tags, length prefixes, type and data-size
+      /// fields). Over-counts the real encoding by a few bytes.
+      static constexpr size_t ATTESTATION_OVERHEAD_BYTES = 24;
+
+      /// Envelope and message header `buildenv` budgets for, with margin for length prefixes.
+      /// Over-counts the real encoding.
+      static constexpr size_t ENVELOPE_BASELINE_BYTES = 512;
+
+      /// Largest attestation `data` an otherwise empty envelope can carry. `queueout` rejects anything
+      /// larger, so every READY row can ship.
+      static constexpr size_t MAX_ATTESTATION_DATA_BYTES =
+         MAX_ENVELOPE_BYTES - ENVELOPE_BASELINE_BYTES - ATTESTATION_OVERHEAD_BYTES;
+
+      // -----------------------------------------------------------------------
       //  Actions
       // -----------------------------------------------------------------------
 
@@ -60,7 +83,8 @@ namespace sysio {
       void resolvedisp(uint64_t chain_code, uint32_t epoch_index, checksum256 winning_checksum);
 
       /// Queue an outbound attestation for an outpost.
-      /// Writes to the attestations table with status READY.
+      /// Writes to the attestations table with status READY. Rejects `data` larger than
+      /// MAX_ATTESTATION_DATA_BYTES, so every READY row fits an envelope.
       ///
       /// `chain_code` is the destination outpost's chain slug_name value
       /// (uint64). Called by sibling system contracts that need to send
@@ -196,9 +220,9 @@ namespace sysio {
             sysio::const_mem_fun<attestation_entry, uint64_t, &attestation_entry::by_epoch>>
       >;
 
-      /// Outbound envelope table. One-deep per outpost: `buildenv` erases every older row for the
-      /// destination `chain_code` after inserting the new emit, so the surviving row doubles as the
-      /// per-outpost chain tip.
+      /// Outbound envelope table. `buildenv` erases a row only once the outpost has consumed it
+      /// (`outpcons.epoch_index` covers its `epoch_index`), so it is one-deep in the healthy path.
+      /// The chain tip is the newest row: read it through `byoutepoch`, as `byoutpost` yields the oldest.
       ///
       /// `envelope_hash` is the canonical epoch digest: keccak256 over the canonical
       /// field-complete encoding with the in-envelope `envelope_hash` field blanked (equal to

@@ -317,16 +317,26 @@ public:
       );
    }
 
-   /// Return the first outbound envelope row found in a small id scan.
+   /// Return the newest outbound envelope row in a small id scan (the chain tip).
    fc::variant find_outbound_envelope(uint64_t scan_until = 16) {
+      fc::variant newest;
       for (uint64_t id = 0; id < scan_until; ++id) {
          auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
          if (data.empty()) continue;
-         return msgch_abi.binary_to_variant(
+         newest = msgch_abi.binary_to_variant(
             "outbound_envelope", data,
             fixture_abi_yield_function());
       }
-      return fc::variant{};
+      return newest;
+   }
+
+   /// Number of live `outenvelopes` rows in the id range `[0, scan_until)`.
+   uint32_t outbound_envelope_count(uint64_t scan_until = 16) {
+      uint32_t n = 0;
+      for (uint64_t id = 0; id < scan_until; ++id) {
+         if (!get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id).empty()) ++n;
+      }
+      return n;
    }
 
    /// Count populated `envlog` rows in the id range `[0, max_id_exclusive)`.
@@ -354,6 +364,14 @@ using fc::slug_name_literals::operator""_s;
 constexpr uint64_t ETH_OUTPOST_ID = "ETH"_s.value;
 
 constexpr auto EVM_TEST_ATTESTATION_TYPE       = opp::types::ATTESTATION_TYPE_OPERATORS;
+
+/// Mirrors of the envelope sizing in `sysio.msgch.hpp` (contract headers are not host-compilable).
+constexpr size_t MAX_ENVELOPE_BYTES         = 32'768;
+constexpr size_t ENVELOPE_BASELINE_BYTES    = 512;
+constexpr size_t ATTESTATION_OVERHEAD_BYTES = 24;
+/// The largest attestation `data` `queueout` accepts: what an otherwise empty envelope carries.
+constexpr size_t MAX_ATTESTATION_DATA_BYTES =
+   MAX_ENVELOPE_BYTES - ENVELOPE_BASELINE_BYTES - ATTESTATION_OVERHEAD_BYTES;
 
 } // anonymous namespace
 
@@ -464,10 +482,9 @@ BOOST_FIXTURE_TEST_CASE(envlog_cap_tracks_outpost_count, sysio_msgch_envlog_test
    BOOST_REQUIRE_EQUAL(7u, alive);
 } FC_LOG_AND_RETHROW() }
 
-/// Existing `outenvelopes` row gets dropped on the next `buildenv` for
-/// the same outpost — one-deep retention (the batch op only ever reads
-/// the most-recent emit).
-BOOST_FIXTURE_TEST_CASE(buildenv_drops_previous_outenvelopes, sysio_msgch_envlog_tester) { try {
+/// WNS-18 / WIRE-348: without inbound consensus nothing is acknowledged, so `buildenv` keeps every
+/// prior emit. The acknowledged half is `buildenv_erases_acknowledged_outenvelope`.
+BOOST_FIXTURE_TEST_CASE(buildenv_retains_unacknowledged_outenvelopes, sysio_msgch_envlog_tester) { try {
    bootstrap_epoch_config(/*retention=*/200);
    register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
    produce_blocks();
@@ -479,16 +496,23 @@ BOOST_FIXTURE_TEST_CASE(buildenv_drops_previous_outenvelopes, sysio_msgch_envlog
    produce_blocks();
    auto first = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, 1);
    BOOST_REQUIRE(!first.empty());
+   BOOST_REQUIRE_EQUAL(1u, outbound_envelope_count());
 
    BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));
    BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
    produce_blocks();
 
-   // First row is now gone (replaced by the second emit).
+   // Both rows live: the outpost acknowledged neither.
    first = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, 1);
-   BOOST_REQUIRE(first.empty());
+   BOOST_REQUIRE(!first.empty());
    auto second = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, 2);
    BOOST_REQUIRE(!second.empty());
+   BOOST_REQUIRE_EQUAL(2u, outbound_envelope_count());
+
+   // The tip is the newest row, not the retained row 1.
+   auto tip = find_outbound_envelope();
+   BOOST_REQUIRE(!tip.is_null());
+   BOOST_REQUIRE_EQUAL(2u, tip["id"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 /// `attestations` PROCESSED rows for a given outpost are dropped at the
@@ -547,7 +571,6 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
    // it at the 32 KiB cap — invariant 3 requires an empty queue after emit#2.
    constexpr size_t  PER_ATTEST_BYTES   = 8 * 1024;
    constexpr uint32_t TOTAL_ATTESTATIONS = 6;
-   constexpr size_t  MAX_ENV_BYTES      = 32'768;
 
    // Vary one byte per attestation so each tx has a distinct payload —
    // identical transactions in the same block collapse to a single
@@ -564,25 +587,15 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
    BOOST_REQUIRE_EQUAL(success(), buildenv(/*chain_code=*/ETH_OUTPOST_ID));
    produce_blocks();
 
-   // The most recent emit lives at one of the early ids; the one-deep
-   // retention sweep means at most one row exists per outpost. Find it.
-   fc::variant emitted_row;
-   uint64_t    emitted_id = std::numeric_limits<uint64_t>::max();
-   for (uint64_t id = 0; id < 16; ++id) {
-      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
-      if (data.empty()) continue;
-      emitted_row = msgch_abi.binary_to_variant(
-         "outbound_envelope", data,
-         fixture_abi_yield_function());
-      emitted_id = id;
-      break;
-   }
+   // The newest emit; earlier ones are retained because nothing is acknowledged here.
+   fc::variant emitted_row = find_outbound_envelope();
    BOOST_REQUIRE(!emitted_row.is_null());
+   const uint64_t emitted_id = emitted_row["id"].as_uint64();
 
    // ── Invariant 1: emitted envelope is at or under the cross-chain cap.
    const auto& raw = emitted_row["raw_envelope"].as<std::vector<char>>();
    BOOST_TEST_MESSAGE("emit#1 envelope size = " << raw.size() << " bytes");
-   BOOST_REQUIRE_LE(raw.size(), MAX_ENV_BYTES);
+   BOOST_REQUIRE_LE(raw.size(), MAX_ENVELOPE_BYTES);
 
    // ── Invariant 2: NOT every attestation made it into this envelope —
    //    the packing loop genuinely dropped some onto the next epoch.
@@ -598,25 +611,61 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
    BOOST_REQUIRE_EQUAL(success(), buildenv(/*chain_code=*/ETH_OUTPOST_ID));
    produce_blocks();
 
-   // Find the new emitted row (one-deep retention dropped the prior one).
-   fc::variant emitted_row_2;
-   for (uint64_t id = 0; id < 16; ++id) {
-      if (id == emitted_id) continue;        // prior row was evicted
-      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
-      if (data.empty()) continue;
-      emitted_row_2 = msgch_abi.binary_to_variant(
-         "outbound_envelope", data,
-         fixture_abi_yield_function());
-      break;
-   }
+   // The new tip; emit#1's row is still present (unacknowledged).
+   fc::variant emitted_row_2 = find_outbound_envelope();
    BOOST_REQUIRE(!emitted_row_2.is_null());
+   BOOST_REQUIRE_NE(emitted_id, emitted_row_2["id"].as_uint64());
    const auto& raw2 = emitted_row_2["raw_envelope"].as<std::vector<char>>();
    BOOST_TEST_MESSAGE("emit#2 envelope size = " << raw2.size() << " bytes");
-   BOOST_REQUIRE_LE(raw2.size(), MAX_ENV_BYTES);
+   BOOST_REQUIRE_LE(raw2.size(), MAX_ENVELOPE_BYTES);
 
    uint32_t still_ready_after_emit2 =
       count_ready_attestations(/*chain_code=*/ETH_OUTPOST_ID, /*scan_until=*/TOTAL_ATTESTATIONS + 4);
    BOOST_REQUIRE_EQUAL(still_ready_after_emit2, 0u);
+} FC_LOG_AND_RETHROW() }
+
+/// WNS-56: a row no envelope can carry would abort every later `buildenv`, and with it
+/// `sysio.epoch::advance`. `queueout` refuses it, so only the producer's own transaction reverts.
+BOOST_FIXTURE_TEST_CASE(queueout_rejects_an_attestation_no_envelope_can_carry,
+                        sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   produce_blocks();
+
+   const std::vector<char> oversized(MAX_ATTESTATION_DATA_BYTES + 1, 0x42);
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: sysio.msgch::queueout: attestation exceeds MAX_ATTESTATION_DATA_BYTES"),
+      queueout_with_data(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE, oversized));
+   BOOST_REQUIRE_EQUAL(0u, count_ready_attestations(ETH_OUTPOST_ID, /*scan_until=*/4));
+} FC_LOG_AND_RETHROW() }
+
+/// The largest row `queueout` accepts fits an otherwise empty envelope, which is what keeps
+/// `buildenv`'s single-attestation guards unreachable: it ships alone, and the row behind it waits.
+BOOST_FIXTURE_TEST_CASE(buildenv_ships_an_attestation_at_the_cap_alone, sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   produce_blocks();
+
+   const std::vector<char> at_cap(MAX_ATTESTATION_DATA_BYTES, 0x42);
+   const std::vector<char> next_row(1, 0x01);
+   BOOST_REQUIRE_EQUAL(success(), queueout_with_data(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE, at_cap));
+   BOOST_REQUIRE_EQUAL(success(), queueout_with_data(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE, next_row));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
+   produce_blocks();
+
+   const auto row = find_outbound_envelope();
+   BOOST_REQUIRE(!row.is_null());
+   const auto raw = row["raw_envelope"].as<std::vector<char>>();
+   BOOST_TEST_MESSAGE("at-cap envelope size = " << raw.size() << " bytes");
+   BOOST_REQUIRE_LE(raw.size(), MAX_ENVELOPE_BYTES);
+   opp::Envelope env;
+   BOOST_REQUIRE(env.ParseFromArray(raw.data(), static_cast<int>(raw.size())));
+   BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
+   BOOST_REQUIRE_EQUAL(env.messages(0).payload().attestations_size(), 1);
+   BOOST_REQUIRE_EQUAL(env.messages(0).payload().attestations(0).data().size(), MAX_ATTESTATION_DATA_BYTES);
+   BOOST_REQUIRE_EQUAL(1u, count_ready_attestations(ETH_OUTPOST_ID, /*scan_until=*/4));
 } FC_LOG_AND_RETHROW() }
 
 // queueout carries no ABI-level auth. Without the depot-contract gate, any account could call it

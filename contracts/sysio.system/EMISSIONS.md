@@ -21,6 +21,18 @@ The curve decays from `annual_initial_emission` toward `annual_min_emission`
 (clamped by `annual_max_emission`), stops at `t5_floor`, and auto-throttles as
 `total_distributed` rises.
 
+## Budget headroom
+
+The T5 budget is `t5_distributable - t5_floor`. Accruals are sized against the
+part not yet paid out or accrued (`net_headroom` in `emissions.hpp`), so
+`total_distributed + pending_emission_amount` never exceeds the budget. `setemitcfg` refuses a `t5_distributable` below
+`t5_floor + total_distributed + pending_emission_amount`.
+
+Once the open pay period has accrued the rest of the budget, its remaining
+epochs accrue zero and still advance, and its `payepoch` settles what was
+accrued. Epochs block with `TREASURY_EXHAUSTED` once the budget is spent, or
+when the curve yields zero with nothing pending.
+
 ## How each bucket reaches its recipient
 
 `payepoch` runs inline from `sysio.epoch::advance`, which must never abort. A
@@ -103,12 +115,12 @@ rotation cannot reassign an earlier epoch to the current front group.
 
 `setemitcfg` accepts a payment cadence only in `[1, 10]`, which bounds an
 ordinary payment period to at most ten immutable roster snapshots. It also
-validates `pay_cadence_epochs * operators_per_epoch <= 100`, preserving the
-prior one-roster ceiling on expensive per-recipient credits; `sysio.epoch`
-enforces the same constraint when its operator count changes. At the intended
-production topology of 21 operators per epoch, the maximum accepted cadence is
-4 (about 24 minutes at six-minute epochs); the conservative 100-credit ceiling
-limits peak work in the mandatory `advance` transaction. When
+validates `pay_cadence_epochs * operators_per_epoch <= 100`, a conservative
+ceiling on expensive per-recipient credits that limits peak work in the
+mandatory `advance` transaction; `sysio.epoch` enforces the same constraint when
+its operator count changes. The largest group `setconfig` accepts is 7 operators,
+so the ten-snapshot bound is the limit (an hour at six-minute epochs, 70
+credits). When
 `sysio.epoch` reads an older serialized configuration during an upgrade, it
 effectively shortens the cadence to satisfy both bounds; the stored value is not
 rewritten until a normal `setemitcfg` update. `payepoch` independently refuses
@@ -200,7 +212,7 @@ period_emission
 | `rcrdbatch` | `sysio.epoch` | Record the batch-operator roster for this accrued epoch |
 | `payepoch` | `sysio.epoch` | Distribute the period's compute / capex / governance (credits `payclaims`; pushes only the category buckets) |
 | `viewnodedist` | read-only | Preview a node owner's claimable amount |
-| `viewepoch` | read-only | Current treasury / next-emission estimate |
+| `viewepoch` | read-only | Remaining budget / next-emission estimate |
 | `viewemitcfg` | read-only | Current emission config |
 
 ## Tables

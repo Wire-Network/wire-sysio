@@ -17,6 +17,7 @@
 #include <zpp_bits.h>
 #include <magic_enum/magic_enum.hpp>
 #include <algorithm>
+#include <limits>
 #include <optional>
 
 namespace sysio {
@@ -72,34 +73,6 @@ constexpr uint32_t WIRE_CHAIN_ID  = 1;
 /// (only `external_chain_id` differs: 1 on mainnet, 31337 on the anvil devnet). `dispatch_node_owner_reg`
 /// binds inbound registrations to this exact outpost — see the WSA-005 note there.
 constexpr sysio::slug_name NODE_OWNER_SRC_CHAIN = "ETHEREUM"_s;
-
-/// Hard cap on the encoded envelope size in BOTH directions, mirroring the
-/// Solana (`opp_outpost::MAX_ENVELOPE_BYTES`) and Ethereum (`OPP.MAX_ENVELOPE_BYTES`)
-/// caps. 32 KiB is the e2e-supported maximum across WIRE / Ethereum / Solana.
-/// Solana's 256 KiB BPF heap divided by ~3.3× envelope-size peak heap usage
-/// during the finalising chunk's `Envelope::decode + keccak::hash + clone`
-/// tolerates more, but Ethereum is the binding constraint: a cold
-/// `emitOutboundEnvelope` of a near-64-KiB envelope costs ~45 M gas, ~2.7× the
-/// EIP-7825 per-transaction cap of 16 777 216, so the platform cap is 32 768.
-/// Outbound, the `buildenv` packing loop uses this to decide how many READY
-/// attestations to bundle into the current epoch's envelope; any that don't fit
-/// stay in the `attestations` table with status READY for the next epoch's
-/// `buildenv` call. Inbound, `deliver` rejects anything larger before hashing
-/// or storing it.
-constexpr size_t   MAX_ENVELOPE_BYTES         = 32'768;
-
-/// Conservative per-attestation byte budget used by the `buildenv` packing
-/// loop: protobuf tags + length prefixes + the attestation type/data-size
-/// fields. Over-counts by a few bytes per attestation versus the actual
-/// `zpp::bits` encoded size, which keeps the loop O(N) and always errs on the
-/// side of leaving a gap. The trailing `packed.size()` check after final
-/// serialisation is the hard backstop.
-constexpr size_t   ATTESTATION_OVERHEAD_BYTES = 24;
-
-/// Conservative envelope/message header budget for the packing loop —
-/// covers the `Envelope` header fields, the wrapping `Message`, its header
-/// + payload preamble, and a safety margin for `zpp::bits` length prefixes.
-constexpr size_t   ENVELOPE_BASELINE_BYTES    = 512;
 
 /// Epochs of inbound `envelopes` rows kept: the current epoch, which every on-chain reader uses, and
 /// the previous one, so a batch operator whose cached epoch lags by one still finds its delivery.
@@ -1452,6 +1425,12 @@ void msgch::queueout(uint64_t chain_code,
          has_auth(synd::account) || has_auth(get_self()),
          "queueout: caller not authorized to queue outbound attestations");
 
+   // A row no envelope can carry would abort every later `buildenv`, and with it `sysio.epoch::advance`.
+   // Rejecting it here reverts only the producer's transaction, including the state change it queued
+   // the row for.
+   check(data.size() <= MAX_ATTESTATION_DATA_BYTES,
+         "sysio.msgch::queueout: attestation exceeds MAX_ATTESTATION_DATA_BYTES");
+
    // The chains registry is the ONLY authority on which chain codes exist.
    //
    // This is not an attack gate -- the authorization check above is. It is an
@@ -1588,10 +1567,8 @@ void msgch::buildenv(uint64_t chain_code) {
       ++included_count;
    }
 
-   // First-attestation-too-big guard. The estimator picks zero only when the first candidate alone
-   // overshoots the envelope; the trim loop below would surface the same condition, but aborting
-   // upfront avoids building anything in the doomed case. Never expected at protocol level because
-   // every valid current attestation should fit by itself.
+   // Invariant, not a reachable failure: `queueout` caps every row at MAX_ATTESTATION_DATA_BYTES, which
+   // is what the estimate leaves an otherwise empty envelope, so the first candidate always fits.
    check(included_count > 0,
          "sysio.msgch::buildenv: a single READY attestation exceeds the outbound envelope");
 
@@ -1602,21 +1579,21 @@ void msgch::buildenv(uint64_t chain_code) {
       candidate_ids.begin(),
       candidate_ids.begin() + included_count);
 
-   // Chain links: the previous envelope emitted for this outpost. `outenvelopes` is one-deep per
-   // outpost (see the cleanup below), so the single surviving row is the previous emit; its
-   // `envelope_hash` is that envelope's epoch digest and its `last_message_id` is this outpost's
-   // message-stream tip. The first emit for an outpost has no row and chains both links from
-   // empty (genesis), matching the outpost contracts' zero genesis tip.
+   // Chain links come from the previous emit, the newest row for this outpost: one step back from the
+   // first `byoutepoch` entry past it, so retained rows are never walked. No row means genesis: both
+   // links chain from empty.
    outenvelopes_t envelopes(get_self());
    std::vector<char> prev_envelope_digest;
    std::vector<char> prev_message_id;
    {
-      auto by_outpost = envelopes.get_index<"byoutpost"_n>();
-      auto prev_it = by_outpost.lower_bound(chain_code);
-      if (prev_it != by_outpost.end() && prev_it->chain_code == chain_code) {
-         const auto digest_bytes = prev_it->envelope_hash.extract_as_byte_array();
+      auto by_epoch = envelopes.get_index<"byoutepoch"_n>();
+      auto it = by_epoch.upper_bound(
+         opp::outpost_epoch_key(chain_code, std::numeric_limits<uint32_t>::max()));
+      --it;
+      if (it != by_epoch.end() && it->chain_code == chain_code) {
+         const auto digest_bytes = it->envelope_hash.extract_as_byte_array();
          prev_envelope_digest.assign(digest_bytes.begin(), digest_bytes.end());
-         const auto tip_bytes = prev_it->last_message_id.extract_as_byte_array();
+         const auto tip_bytes = it->last_message_id.extract_as_byte_array();
          prev_message_id.assign(tip_bytes.begin(), tip_bytes.end());
       }
    }
@@ -1693,6 +1670,8 @@ void msgch::buildenv(uint64_t chain_code) {
    // converges so a popped entry never needs a status revert.
    std::vector<char> packed = build_packed(entries);
    while (packed.size() > MAX_ENVELOPE_BYTES) {
+      // Invariant: the estimate over-counts the real encoding, so one row within the `queueout` cap
+      // always packs and the loop never pops the last entry.
       check(entries.size() > 1,
             "sysio.msgch::buildenv: a single READY attestation exceeds "
             "MAX_ENVELOPE_BYTES -- cannot pack into an envelope");
@@ -1734,22 +1713,33 @@ void msgch::buildenv(uint64_t chain_code) {
 
    // === AUDIT LOG + INLINE CLEANUP OF WORKING STATE ===
    //
-   // Audit-log row mirrors the outbound emit (WIRE → outpost). Followed
-   // by inline drains of the previous-epoch outenvelopes row (one-deep
-   // retention; the batch op only ever reads the most-recent emit) and
-   // the just-PROCESSED attestations for this outpost (their bytes are
-   // now baked into `packed` above).
+   // Audit-log row mirrors the outbound emit (WIRE → outpost). Then drain the outenvelopes rows the
+   // outpost has consumed and its PROCESSED attestations (now baked into `packed`).
    {
       // Same endpoints the wire envelope carries (derived above from the
       // destination's `sysio.chains` row).
       write_envelope_log(get_self(), route_endpoints, epoch, envelope_digest);
 
-      // Drop previous outpost emits — keep only the row we just inserted.
-      auto by_outpost = envelopes.get_index<"byoutpost"_n>();
-      for (auto it = by_outpost.lower_bound(chain_code);
-           it != by_outpost.end() && it->chain_code == chain_code; ) {
-         if (it->id == out_id) { ++it; continue; }
-         it = by_outpost.erase(std::move(it));
+      // Drop the prefix of prior emits the outpost has consumed: an outpost emits epoch N only after
+      // accepting ours, so `outpcons.epoch_index` covering a row's epoch proves consumption. The walk
+      // stops at the first row it does not cover, the oldest copy the outpost still needs; no
+      // `outpcons` row acknowledges nothing.
+      auto by_epoch = envelopes.get_index<"byoutepoch"_n>();
+      auto it = by_epoch.lower_bound(opp::outpost_epoch_key(chain_code, 0));
+      outpost_consensus_t opcons(get_self());
+      const auto opc_pk = outpost_consensus_key{chain_code};
+      if (opcons.contains(opc_pk)) {
+         const uint32_t acked = opcons.get(opc_pk).epoch_index;
+         while (it != by_epoch.end() && it->chain_code == chain_code && it->epoch_index <= acked) {
+            if (it->id == out_id) { ++it; continue; }
+            it = by_epoch.erase(std::move(it));
+         }
+      }
+      if (it != by_epoch.end() && it->chain_code == chain_code && it->id != out_id) {
+         // Not expected: only a transaction signed directly by sysio.msgch or sysio.epoch skips the
+         // `chkcons` consensus check. Logged once so retained rows are visible.
+         sysio::print_f("msgch::buildenv: retaining unacknowledged emits from epoch %u, chain_code=%llu\n",
+                        it->epoch_index, static_cast<unsigned long long>(chain_code));
       }
 
       // Drop the attestations we just consumed (status PROCESSED rows

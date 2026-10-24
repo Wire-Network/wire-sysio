@@ -71,11 +71,18 @@ inline bool is_active_outpost(const sysio::chains::chain_row& row) {
 struct emissions_gate_result {
    bool                  ready              = false;
    bool                  is_pay_epoch       = false; // true on the period-boundary epoch where payepoch fires
-   int64_t               emission_amount    = 0;  // per-epoch emission for THIS epoch (always populated when ready)
+   /// This epoch's share, sized on the net headroom. May be 0 when ready: the open pay period has emission pending, and
+   /// either it has committed the rest of the budget or the curve is zero.
+   int64_t               emission_amount    = 0;
    int64_t               period_emission    = 0;  // pending + emission_amount; populated only on pay-epoch
-   int64_t               treasury_remaining = 0;  // for blocklog row
+   /// Net headroom (budget not yet paid out or accrued), for the blocklog row.
+   int64_t               treasury_remaining = 0;
    int64_t               sysio_balance      = 0;  // for blocklog row
    EmissionsBlockReason  reason             = opp::types::EMISSIONS_BLOCK_REASON_UNSPECIFIED;
+
+   /// What the gate tried to authorize, for the blocklog row: the period total on a pay epoch (the amount the balance
+   /// test compares), otherwise this epoch's share.
+   int64_t attempted_emission() const { return is_pay_epoch ? period_emission : emission_amount; }
 };
 
 emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec,
@@ -96,26 +103,22 @@ emissions_gate_result check_emissions_ready(uint32_t epoch_duration_sec,
       return r;
    }
    const auto t5s = t5s_tbl.get();
-   r.treasury_remaining = cfg.t5_distributable - cfg.t5_floor - t5s.total_distributed;
+   r.treasury_remaining = sysiosystem::emissions::net_headroom(cfg, t5s);
 
    // epoch_duration_sec is the canonical value from sysio.epoch::epochcfg,
    // passed by advance() so this gate and sysio.system see identical inputs
    // and the gate doesn't repeat advance()'s read of the same singleton.
 
-   // Compute would-be per-epoch emission. First-epoch case: use initial; cap at remaining.
-   if (t5s.epoch_count == 0) {
-      r.emission_amount = sysiosystem::emissions::scale_annual_to_epoch(
-         cfg.annual_initial_emission, epoch_duration_sec);
-      if (r.emission_amount > r.treasury_remaining) r.emission_amount = r.treasury_remaining;
-   } else {
-      r.emission_amount = sysiosystem::emissions::compute_epoch_emission(
-         cfg, epoch_duration_sec, t5s.last_epoch_emission, t5s.total_distributed);
-   }
+   // Capped at the net headroom, so the open pay period can never commit more than the budget.
+   r.emission_amount = sysiosystem::emissions::compute_epoch_emission(cfg, epoch_duration_sec, t5s);
 
-   // TREASURY_EXHAUSTED gates every epoch (pay or non-pay). A zero per-epoch
-   // emission means the treasury is at floor; advancing the epoch silently
-   // would let the chain roll forward into a depleted treasury.
-   if (r.emission_amount <= 0) {
+   // TREASURY_EXHAUSTED gates every epoch (pay or non-pay) and is decided on the GROSS headroom: advancing past a
+   // spent budget would roll the chain forward into a depleted treasury. An open period whose share drops to zero,
+   // because it has committed the rest of the budget or the curve is zero, still advances and pays what it accrued at
+   // its boundary. A zero share with nothing pending blocks: there is nothing to pay, and payepoch asserts on an empty
+   // period, which would abort advance.
+   if (sysiosystem::emissions::gross_headroom(cfg, t5s) <= 0 ||
+       (r.emission_amount <= 0 && t5s.pending_emission_amount <= 0)) {
       r.reason = opp::types::EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED;
       return r;
    }
@@ -197,7 +200,7 @@ void record_gate_block(name self, uint32_t epoch_index, const emissions_gate_res
       log_tbl.emplace(ram_payer, pk, epoch::blocklog_entry{
          .epoch_index        = epoch_index,
          .reason             = gate.reason,
-         .attempted_emission = gate.emission_amount,
+         .attempted_emission = gate.attempted_emission(),
          .treasury_remaining = gate.treasury_remaining,
          .sysio_balance      = gate.sysio_balance,
          .first_blocked_at   = now_secs,
@@ -209,7 +212,7 @@ void record_gate_block(name self, uint32_t epoch_index, const emissions_gate_res
 
    log_tbl.modify(ram_payer, pk, [&](auto& row) {
       row.reason             = gate.reason;
-      row.attempted_emission = gate.emission_amount;
+      row.attempted_emission = gate.attempted_emission();
       row.treasury_remaining = gate.treasury_remaining;
       row.sysio_balance      = gate.sysio_balance;
       row.last_retry_at      = now_secs;
@@ -247,22 +250,21 @@ void epoch::setconfig(uint32_t epoch_duration_sec,
    check(operators_per_epoch > 0, "operators_per_epoch must be positive");
    check(batch_op_groups > 0, "batch_op_groups must be positive");
    check(batch_op_groups <= MAX_BATCH_OP_GROUPS,
-         "batch_op_groups exceeds the uint8 group-index ceiling (255)");
+         "batch_op_groups exceeds the outpost group ceiling (8)");
    // Widen the product to uint64 so a large operators_per_epoch cannot wrap the
    // uint32 multiply into a small value that spuriously matches a small
    // batch_operator_minimum_active; an honest product beyond uint32 simply fails
    // the equality against the uint32 field, which is the intended rejection.
    check(static_cast<uint64_t>(operators_per_epoch) * batch_op_groups == batch_operator_minimum_active,
          "batch_operator_minimum_active must equal operators_per_epoch * batch_op_groups");
-   // Magnitude bounds, checked after the relationship above so an inconsistent
+   // Magnitude bound, checked after the relationship above so an inconsistent
    // triple reports the equality error. The equality alone cannot reject an
-   // internally consistent but absurd size (UINT32_MAX groups of one), which
-   // would later abort advance() on its schedule-window vector reserves and
-   // halt epoch advancement chain-wide.
+   // internally consistent but absurd size (UINT32_MAX operators in one group),
+   // which would later abort advance() on its schedule-window vector reserves and
+   // halt epoch advancement chain-wide. With both factors bounded, the window
+   // cannot exceed MAX_SCHEDULED_BATCH_OPERATORS.
    check(operators_per_epoch <= MAX_OPERATORS_PER_EPOCH,
-         "operators_per_epoch exceeds the per-epoch schedule ceiling (100)");
-   check(batch_operator_minimum_active <= MAX_SCHEDULED_BATCH_OPERATORS,
-         "batch_operator_minimum_active exceeds the schedule-window ceiling (1000)");
+         "operators_per_epoch exceeds the outpost group-size ceiling (7)");
    check(epoch_retention_envelope_log_count > 0,
          "epoch_retention_envelope_log_count must be positive");
 
@@ -412,9 +414,12 @@ void epoch::advance() {
    // For each (outpost × member of the expiring group):
    //   - scan `msgch::envelopes` (`byoutepoch` index) for any row matching
    //     (chain_code, current_epoch_index, batch_op_name == member)
-   //   - collect the delivery result and every non-canonical deliverer
-   //   - slash all non-canonical deliverers before delivery accounting can
-   //     terminate them, then record the result and run `termcheck`
+   //   - count the outposts the member delivered to and collect every
+   //     non-canonical deliverer
+   // Then slash the non-canonical deliverers before delivery accounting can
+   // terminate them, and record one result per member, delivered only if it
+   // reached every active outpost: `sysio.opreg`'s miss thresholds count duty
+   // epochs, not outposts.
    //
    // The outpost set is sourced via a cross-contract read of
    // `sysio.chains::chains` (no local mirror) filtered to
@@ -441,18 +446,23 @@ void epoch::advance() {
       // operator, which would abort advance and stall the chain).
       std::vector<name> to_slash;
 
-      /// A delivery result retained until non-canonical offenders have been
-      /// slashed. `recorddel` remains an audit record even for a newly
+      /// One member's delivery result for the expiring epoch, accumulated across
+      /// the active outposts and retained until non-canonical offenders have
+      /// been slashed. `recorddel` remains an audit record even for a newly
       /// slashed operator, while `termcheck` safely skips non-ACTIVE rows.
       struct delivery_observation {
          name member;
-         bool did_deliver;
+         uint32_t outposts_delivered = 0; ///< Active outposts this member delivered to.
       };
       std::vector<delivery_observation> observations;
+      observations.reserve(expiring_group.size());
+      for (const auto& member : expiring_group) observations.push_back({member});
+      uint32_t active_outposts = 0;
 
       sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
       for (auto op_it = chains_tbl.begin(); op_it != chains_tbl.end(); ++op_it) {
          if (!is_active_outpost(*op_it)) continue;
+         ++active_outposts;
 
          const uint64_t chain_code = op_it->code.value;
          const uint128_t composite =
@@ -491,17 +501,17 @@ void epoch::advance() {
             }
          }
 
-         for (const auto& member : expiring_group) {
+         for (auto& observation : observations) {
             bool        did_deliver = false;
             checksum256 member_checksum{};
             for (size_t i = 0; i < delivered.size(); ++i) {
-               if (delivered[i] == member) {
+               if (delivered[i] == observation.member) {
                   did_deliver     = true;
                   member_checksum = delivered_checksums[i];
                   break;
                }
             }
-            observations.push_back({member, did_deliver});
+            if (did_deliver) ++observation.outposts_delivered;
 
             // Single slash path (dispute-vote design, per-operator outcome table): a delivered
             // NON-canonical checksum is a fault -> slash. Silence (no delivery) is never slashed; it
@@ -509,9 +519,9 @@ void epoch::advance() {
             if (did_deliver && have_winner && member_checksum != winner) {
                bool queued = false;
                for (const auto& s : to_slash) {
-                  if (s == member) { queued = true; break; }
+                  if (s == observation.member) { queued = true; break; }
                }
-               if (!queued) to_slash.push_back(member);
+               if (!queued) to_slash.push_back(observation.member);
             }
          }
       }
@@ -542,20 +552,24 @@ void epoch::advance() {
 
       // Preserve delivery history and ordinary termination accounting. Inline
       // slashing completes before these actions, and all mutations complete
-      // before finishadv reads the registry for outbound attestations.
-      for (const auto& observation : observations) {
-         action(
-            permission_level{get_self(), "owner"_n},
-            OPREG_ACCOUNT,
-            opreg_actions::RECORD_DELIVERY,
-            std::make_tuple(observation.member, state.current_epoch_index, observation.did_deliver)
-         ).send();
-         action(
-            permission_level{get_self(), "owner"_n},
-            OPREG_ACCOUNT,
-            opreg_actions::TERMINATION_CHECK,
-            std::make_tuple(observation.member)
-         ).send();
+      // before finishadv reads the registry for outbound attestations. With no
+      // active outpost nothing was due, so nothing is recorded.
+      if (active_outposts > 0) {
+         for (const auto& observation : observations) {
+            const bool delivered_everywhere = observation.outposts_delivered == active_outposts;
+            action(
+               permission_level{get_self(), "owner"_n},
+               OPREG_ACCOUNT,
+               opreg_actions::RECORD_DELIVERY,
+               std::make_tuple(observation.member, state.current_epoch_index, delivered_everywhere)
+            ).send();
+            action(
+               permission_level{get_self(), "owner"_n},
+               OPREG_ACCOUNT,
+               opreg_actions::TERMINATION_CHECK,
+               std::make_tuple(observation.member)
+            ).send();
+         }
       }
 
       // The envelope rows read above are left in place: `sysio.msgch::deliver`
@@ -720,7 +734,11 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
 
    state_tbl.set(state, ram_payer);
 
-   // Queue OPERATORS attestation (full roster with authex chain addresses) for each outpost.
+   // Queue the OPERATORS roster for each outpost: every operator seated in the window, with its current
+   // status and authex chain addresses. Outposts read the roster only to map the window's members to
+   // the keys they deliver with (Solana also refuses a window that seats an ineligible member), so the
+   // window is all they need, and the roster stays within MAX_SCHEDULED_BATCH_OPERATORS however many
+   // operators register. A member whose opreg row was pruned is left out.
    // IMPORTANT: Must come before BATCH_OPERATOR_GROUPS so that the ETH outpost's
    // _handleOperators populates operatorEthAddress before _handleBatchOperatorGroups
    // looks up those addresses.
@@ -730,61 +748,70 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
       authex::links_t authex_links(AUTHEX_ACCOUNT);
       auto links_by_name = authex_links.get_index<"byname"_n>();
 
-      for (auto it = opreg_ops.begin(); it != opreg_ops.end(); ++it) {
-         opp::attestations::OperatorEntry entry;
-         entry.account.name = it->account.to_string();
-         entry.type = it->type;
-         entry.status = it->status;
+      for (const auto& group : state.batch_op_groups) {
+         for (const auto& member : group) {
+            const auto op = opreg_ops.try_get(opreg::operator_key{member.value});
+            if (!op) continue;
 
-         // Collect all authex-linked chain addresses for this operator.
-         // Store raw public key bytes from the variant (33 bytes for EM/secp256k1,
-         // 32 bytes for ED/Ed25519).
-         auto link_it = links_by_name.lower_bound(it->account.value);
-         while (link_it != links_by_name.end() && link_it->username == it->account) {
-            opp::types::ChainAddress chain_addr;
-            chain_addr.kind = link_it->chain_kind;
+            opp::attestations::OperatorEntry entry;
+            entry.account.name = member.to_string();
+            entry.type = op->type;
+            entry.status = op->status;
 
-            std::visit([&](const auto& key_data) {
-               using T = std::decay_t<decltype(key_data)>;
-               if constexpr (std::is_same_v<T, webauthn_public_key>) {
-                  // EM (secp256k1 compressed) — 33 bytes in key.key
-                  chain_addr.address.assign(key_data.key.begin(), key_data.key.end());
-               } else if constexpr (std::is_same_v<T, ed_public_key>) {
-                  // ED (Ed25519) — 32 bytes
-                  chain_addr.address.assign(
-                     reinterpret_cast<const char*>(key_data.data()),
-                     reinterpret_cast<const char*>(key_data.data() + key_data.size()));
-               } else if constexpr (std::is_same_v<T, ecc_public_key>) {
-                  // K1/R1 (secp256k1/P-256 compressed) — 33 bytes
-                  chain_addr.address.assign(key_data.begin(), key_data.end());
-               }
-               // Skip BLS keys — not used for chain address linking
-            }, link_it->pub_key);
+            // Collect all authex-linked chain addresses for this operator.
+            // Store raw public key bytes from the variant (33 bytes for EM/secp256k1,
+            // 32 bytes for ED/Ed25519).
+            auto link_it = links_by_name.lower_bound(member.value);
+            while (link_it != links_by_name.end() && link_it->username == member) {
+               opp::types::ChainAddress chain_addr;
+               chain_addr.kind = link_it->chain_kind;
 
-            entry.addresses.push_back(std::move(chain_addr));
-            ++link_it;
+               std::visit([&](const auto& key_data) {
+                  using T = std::decay_t<decltype(key_data)>;
+                  if constexpr (std::is_same_v<T, webauthn_public_key>) {
+                     // EM (secp256k1 compressed) — 33 bytes in key.key
+                     chain_addr.address.assign(key_data.key.begin(), key_data.key.end());
+                  } else if constexpr (std::is_same_v<T, ed_public_key>) {
+                     // ED (Ed25519) — 32 bytes
+                     chain_addr.address.assign(
+                        reinterpret_cast<const char*>(key_data.data()),
+                        reinterpret_cast<const char*>(key_data.data() + key_data.size()));
+                  } else if constexpr (std::is_same_v<T, ecc_public_key>) {
+                     // K1/R1 (secp256k1/P-256 compressed) — 33 bytes
+                     chain_addr.address.assign(key_data.begin(), key_data.end());
+                  }
+                  // Skip BLS keys — not used for chain address linking
+               }, link_it->pub_key);
+
+               entry.addresses.push_back(std::move(chain_addr));
+               ++link_it;
+            }
+
+            ops_attest.operators.push_back(std::move(entry));
          }
-
-         ops_attest.operators.push_back(std::move(entry));
       }
 
-      std::vector<char> encoded;
-      auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
-      (void)out(ops_attest);
+      // An empty roster tells an outpost nothing (Solana skips it as an anomaly), so an empty window
+      // queues none; the BatchOperatorGroups withhold below reports that state.
+      if (!ops_attest.operators.empty()) {
+         std::vector<char> encoded;
+         auto out = zpp::bits::out{encoded, zpp::bits::no_size{}};
+         (void)out(ops_attest);
 
-      sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
-      for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
-         if (!is_active_outpost(*it)) continue;
-         action(
-            permission_level{get_self(), "owner"_n},
-            MSGCH_ACCOUNT,
-            "queueout"_n,
-            std::make_tuple(
-               it->code.value,
-               opp::types::ATTESTATION_TYPE_OPERATORS,
-               encoded
-            )
-         ).send();
+         sysio::chains::chains_t chains_tbl(CHAINS_ACCOUNT);
+         for (auto it = chains_tbl.begin(); it != chains_tbl.end(); ++it) {
+            if (!is_active_outpost(*it)) continue;
+            action(
+               permission_level{get_self(), "owner"_n},
+               MSGCH_ACCOUNT,
+               "queueout"_n,
+               std::make_tuple(
+                  it->code.value,
+                  opp::types::ATTESTATION_TYPE_OPERATORS,
+                  encoded
+               )
+            ).send();
+         }
       }
    }
 
@@ -944,7 +971,7 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
    // Emissions side. Accrual and history precede advance's payout sibling:
    //   1. accrueepoch: always queued. Records this epoch's per-epoch share
    //      onto t5state (pending_emission_amount + batch_group_epochs[group]
-   //      + last_epoch_emission for decay continuity).
+   //      + last_epoch_emission for decay continuity). The share may be 0.
    //   2. rcrdbatch: always queued. Records the immutable roster that accrued
    //      this epoch after the schedule has slid for the next advance.
    //   3. payepoch: queued only on pay-epochs. Reads the now-updated t5state
