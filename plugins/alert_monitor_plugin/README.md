@@ -183,9 +183,10 @@ the failing field's index and label (`0 name`, `1 block_interval`, `2 query`). A
 spec's text -- a missing field shifts query text into the name and interval positions -- except a name that is
 already valid, which the interval, query, and duplicate-name errors include so the entry can be found.
 
-Each query is then parsed with the query engine's own parser and limits, so a syntax error, or a query cut short
-at a `#` in config.ini, fails startup too: the error names the query, the error kind, and the line and column (or
-the limit it exceeded), never the text. Table and column names are resolved only when the query runs.
+Each query is then parsed with the query engine's own parser and limits, under the same 1 s deadline it runs
+with, so a syntax error, or a query cut short at a `#` in config.ini, fails startup too: the error names the query,
+the error kind, the line and column (or the limit it exceeded), and the engine's message, never the query text.
+Table and column names are resolved only when the query runs.
 
 ### Requirements and limits
 
@@ -355,7 +356,7 @@ All diagnostics go through the `alert_monitor` logger (configure it like any oth
   A `403` from the root is not a failure (see Delivery semantics).
 - Queries, per query: one warning for the first failed run, then at most one a minute for that query counting
   the failures in between, naming the query's name and position (never its text) and what failed: the query
-  engine's error kind (with the limit it hit, or the line and column it names), `query service unavailable`,
+  engine's error kind and message (with the limit it hit, or the line and column it names), `query service unavailable`,
   `document dropped: dropped_oversize`, `document dropped: dropped_queue_full`, or `unexpected error`.
 - Liveness: one warning when documents pause because the irreversible block is behind wall-clock time, at
   most once a minute while paused, and one line when they resume.
