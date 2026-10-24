@@ -365,6 +365,14 @@ constexpr uint64_t ETH_OUTPOST_ID = "ETH"_s.value;
 
 constexpr auto EVM_TEST_ATTESTATION_TYPE       = opp::types::ATTESTATION_TYPE_OPERATORS;
 
+/// Mirrors of the envelope sizing in `sysio.msgch.hpp` (contract headers are not host-compilable).
+constexpr size_t MAX_ENVELOPE_BYTES         = 32'768;
+constexpr size_t ENVELOPE_BASELINE_BYTES    = 512;
+constexpr size_t ATTESTATION_OVERHEAD_BYTES = 24;
+/// The largest attestation `data` `queueout` accepts: what an otherwise empty envelope carries.
+constexpr size_t MAX_ATTESTATION_DATA_BYTES =
+   MAX_ENVELOPE_BYTES - ENVELOPE_BASELINE_BYTES - ATTESTATION_OVERHEAD_BYTES;
+
 } // anonymous namespace
 
 /// Smoke: queueout + buildenv writes one row to `envlog` with the
@@ -563,7 +571,6 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
    // it at the 32 KiB cap — invariant 3 requires an empty queue after emit#2.
    constexpr size_t  PER_ATTEST_BYTES   = 8 * 1024;
    constexpr uint32_t TOTAL_ATTESTATIONS = 6;
-   constexpr size_t  MAX_ENV_BYTES      = 32'768;
 
    // Vary one byte per attestation so each tx has a distinct payload —
    // identical transactions in the same block collapse to a single
@@ -588,7 +595,7 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
    // ── Invariant 1: emitted envelope is at or under the cross-chain cap.
    const auto& raw = emitted_row["raw_envelope"].as<std::vector<char>>();
    BOOST_TEST_MESSAGE("emit#1 envelope size = " << raw.size() << " bytes");
-   BOOST_REQUIRE_LE(raw.size(), MAX_ENV_BYTES);
+   BOOST_REQUIRE_LE(raw.size(), MAX_ENVELOPE_BYTES);
 
    // ── Invariant 2: NOT every attestation made it into this envelope —
    //    the packing loop genuinely dropped some onto the next epoch.
@@ -610,11 +617,55 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
    BOOST_REQUIRE_NE(emitted_id, emitted_row_2["id"].as_uint64());
    const auto& raw2 = emitted_row_2["raw_envelope"].as<std::vector<char>>();
    BOOST_TEST_MESSAGE("emit#2 envelope size = " << raw2.size() << " bytes");
-   BOOST_REQUIRE_LE(raw2.size(), MAX_ENV_BYTES);
+   BOOST_REQUIRE_LE(raw2.size(), MAX_ENVELOPE_BYTES);
 
    uint32_t still_ready_after_emit2 =
       count_ready_attestations(/*chain_code=*/ETH_OUTPOST_ID, /*scan_until=*/TOTAL_ATTESTATIONS + 4);
    BOOST_REQUIRE_EQUAL(still_ready_after_emit2, 0u);
+} FC_LOG_AND_RETHROW() }
+
+/// WNS-56: a row no envelope can carry would abort every later `buildenv`, and with it
+/// `sysio.epoch::advance`. `queueout` refuses it, so only the producer's own transaction reverts.
+BOOST_FIXTURE_TEST_CASE(queueout_rejects_an_attestation_no_envelope_can_carry,
+                        sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   produce_blocks();
+
+   const std::vector<char> oversized(MAX_ATTESTATION_DATA_BYTES + 1, 0x42);
+   BOOST_REQUIRE_EQUAL(
+      error("assertion failure with message: sysio.msgch::queueout: attestation exceeds MAX_ATTESTATION_DATA_BYTES"),
+      queueout_with_data(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE, oversized));
+   BOOST_REQUIRE_EQUAL(0u, count_ready_attestations(ETH_OUTPOST_ID, /*scan_until=*/4));
+} FC_LOG_AND_RETHROW() }
+
+/// The largest row `queueout` accepts fits an otherwise empty envelope, which is what keeps
+/// `buildenv`'s single-attestation guards unreachable: it ships alone, and the row behind it waits.
+BOOST_FIXTURE_TEST_CASE(buildenv_ships_an_attestation_at_the_cap_alone, sysio_msgch_envlog_tester) { try {
+   bootstrap_epoch_config(/*retention=*/200);
+   register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
+   produce_blocks();
+
+   const std::vector<char> at_cap(MAX_ATTESTATION_DATA_BYTES, 0x42);
+   const std::vector<char> next_row(1, 0x01);
+   BOOST_REQUIRE_EQUAL(success(), queueout_with_data(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE, at_cap));
+   BOOST_REQUIRE_EQUAL(success(), queueout_with_data(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE, next_row));
+   produce_blocks();
+
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
+   produce_blocks();
+
+   const auto row = find_outbound_envelope();
+   BOOST_REQUIRE(!row.is_null());
+   const auto raw = row["raw_envelope"].as<std::vector<char>>();
+   BOOST_TEST_MESSAGE("at-cap envelope size = " << raw.size() << " bytes");
+   BOOST_REQUIRE_LE(raw.size(), MAX_ENVELOPE_BYTES);
+   opp::Envelope env;
+   BOOST_REQUIRE(env.ParseFromArray(raw.data(), static_cast<int>(raw.size())));
+   BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
+   BOOST_REQUIRE_EQUAL(env.messages(0).payload().attestations_size(), 1);
+   BOOST_REQUIRE_EQUAL(env.messages(0).payload().attestations(0).data().size(), MAX_ATTESTATION_DATA_BYTES);
+   BOOST_REQUIRE_EQUAL(1u, count_ready_attestations(ETH_OUTPOST_ID, /*scan_until=*/4));
 } FC_LOG_AND_RETHROW() }
 
 // queueout carries no ABI-level auth. Without the depot-contract gate, any account could call it

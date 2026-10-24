@@ -2811,53 +2811,42 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_caps_batch_roster_history, sysio_emissions_t
 
 BOOST_FIXTURE_TEST_CASE( emission_config_boundaries_cap_batch_payout_credit_work,
                          sysio_emissions_tester ) try {
-   // setemitcfg owns cadence changes. With the epoch roster at its maximum of
-   // 100, cadence two would permit 200 distinct recipient credits and must be
-   // rejected at that boundary.
+   // The largest group sysio.epoch accepts (7) over the longest pay period
+   // (10 epochs) is 70 recipient credits, inside the 100-credit cap, so the
+   // bounds that bind are the history bound and the group-size ceiling.
    BOOST_REQUIRE_EQUAL(success(), setemitcfg_defaults(config::system_account_name));
-   BOOST_REQUIRE_EQUAL(success(), init_epoch_state(60, /*operators_per_epoch*/100,
-                                                   /*batch_op_groups_count*/3));
-   auto r = setemitcfg_with_cadence(config::system_account_name, uint16_t(2));
-   BOOST_REQUIRE(r != success());
-   require_substr(r, "pay_cadence_epochs x operators_per_epoch exceeds the batch payout credit safety cap (100)");
-
-   // sysio.epoch::setconfig owns roster-size changes and enforces the same
-   // bound. Ten epochs at the normal seven-member roster fit; raising the
-   // roster to eleven would permit 110 credits and is rejected.
    BOOST_REQUIRE_EQUAL(success(), init_epoch_state(60, /*operators_per_epoch*/7,
                                                    /*batch_op_groups_count*/3));
    BOOST_REQUIRE_EQUAL(success(),
       setemitcfg_with_cadence(config::system_account_name, uint16_t(10)));
-   r = init_epoch_state(60, /*operators_per_epoch*/11, /*batch_op_groups_count*/3);
+   auto r = setemitcfg_with_cadence(config::system_account_name, uint16_t(11));
    BOOST_REQUIRE(r != success());
-   require_substr(r, "pay_cadence_epochs x operators_per_epoch exceeds the batch payout credit safety cap (100)");
+   require_substr(r, "pay_cadence_epochs exceeds batch roster history safety cap");
+
+   r = init_epoch_state(60, /*operators_per_epoch*/8, /*batch_op_groups_count*/3);
+   BOOST_REQUIRE(r != success());
+   require_substr(r, "operators_per_epoch exceeds the outpost group-size ceiling (7)");
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( epoch_setconfig_names_prebootstrap_stored_cadence_in_work_bound_error,
+BOOST_FIXTURE_TEST_CASE( epoch_setconfig_fits_the_largest_group_to_a_prebootstrap_stored_cadence,
                          sysio_emissions_tester ) try {
    // setemitcfg cannot validate the joint bound before sysio.epoch has a
-   // configuration. The first epoch setconfig must reject an incompatible
-   // roster size and point operators back to the already-stored system cadence.
+   // configuration, so the first epoch setconfig checks it against the
+   // already-stored system cadence. The largest group fits the longest cadence.
    BOOST_REQUIRE_EQUAL(success(),
       setemitcfg_with_cadence(config::system_account_name, uint16_t(10)));
-
-   auto r = init_epoch_state(60, /*operators_per_epoch*/11,
-                             /*batch_op_groups_count*/3);
-   BOOST_REQUIRE(r != success());
-   require_substr(
-      r,
-      "stored sysio.system pay_cadence_epochs x operators_per_epoch exceeds the batch payout credit safety cap (100)");
+   BOOST_REQUIRE_EQUAL(success(), init_epoch_state(60, /*operators_per_epoch*/7,
+                                                   /*batch_op_groups_count*/3));
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( epoch_setconfig_recovers_legacy_cadence_with_runtime_work_bound,
+BOOST_FIXTURE_TEST_CASE( epoch_setconfig_recovers_legacy_cadence_with_runtime_clamp,
                          sysio_emissions_tester ) try {
-   // A pre-bound cadence above today's history cap is shortened at runtime.
-   // setconfig must validate that same effective value, while the preceding
-   // boundary test continues to reject an unsafe roster change for a current,
-   // otherwise-valid stored cadence.
+   // A pre-bound cadence above today's history cap is shortened at runtime to
+   // ten epochs. setconfig must validate that same effective value: the raw
+   // 1000 epochs x 7 operators would exceed the 100-credit cap.
    set_legacy_emitcfg_cadence_raw(uint16_t(1000));
    BOOST_REQUIRE_EQUAL(success(), init_epoch_state(
-      60, /*operators_per_epoch*/11, /*batch_op_groups_count*/3));
+      60, /*operators_per_epoch*/7, /*batch_op_groups_count*/3));
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( payepoch_recovers_when_legacy_rosters_exceed_credit_budget,
