@@ -22,6 +22,7 @@
 #include <fc/variant_object.hpp>
 #include <filesystem>
 #include <fmt/format.h>
+#include <fmt/ranges.h> // fmt::join
 #include <fstream>
 #include <initializer_list>
 #include <limits>
@@ -192,6 +193,17 @@ constexpr std::string_view no_data_template = R"({"message":"${message}"})";
 constexpr std::string_view tiny_query_bytes_argument = "--query-max-query-bytes=8";
 /// An engine configuration the engine itself rejects.
 constexpr std::string_view zero_in_flight_argument = "--query-max-in-flight=0";
+/// An engine query timeout far below any parse of long_query(long_query_columns).
+constexpr std::string_view one_ms_query_timeout_argument = "--query-timeout-ms=1";
+/// long_query()'s shape and its repeated select item.
+constexpr std::string_view long_query_format = "SELECT {} FROM sample.positions";
+constexpr std::string_view long_query_column = "amount";
+/// Select items of the long query: within the parser's token and node limits.
+constexpr std::size_t long_query_columns = 600;
+/// A query without a table owner: rejected with QUERY_SEMANTICS, which names no limit and no location.
+constexpr std::string_view ownerless_query = "SELECT key.id AS id FROM positions";
+/// The engine's message for ownerless_query.
+constexpr std::string_view owner_required_message = "An explicit table owner is required";
 
 // --- query scheduling and execution ---
 
@@ -1173,25 +1185,40 @@ BOOST_AUTO_TEST_CASE(a_query_cut_at_a_config_ini_comment_fails_startup) try {
 }
 FC_LOG_AND_RETHROW()
 
+namespace {
+
+/// required_arguments(@p tpl), one query @p spec and one query engine option @p engine_argument, parsed with the query
+/// engine's options registered as nodeop registers them.
+bpo::variables_map parse_options_with_engine(const template_file& tpl, std::string_view spec,
+                                             std::string_view engine_argument) {
+   bpo::options_description cfg;
+   add_component_options(cfg);
+   sysio::query_engine::add_options(cfg);
+   std::vector<std::string> arguments = required_arguments(tpl);
+   arguments.push_back(query_argument(spec));
+   arguments.emplace_back(engine_argument);
+   bpo::variables_map options;
+   bpo::store(bpo::command_line_parser(arguments).options(cfg).run(), options);
+   bpo::notify(options);
+   return options;
+}
+
+/// A valid query of @p columns select items: long enough that parsing it outlasts a 1 ms deadline.
+std::string long_query(std::size_t columns) {
+   std::vector<std::string_view> items(columns, long_query_column);
+   return fmt::format(long_query_format, fmt::join(items, ", "));
+}
+
+} // anonymous namespace
+
 // The startup parse runs under the engine's own configured limits, and an engine configuration the engine rejects
 // fails it too.
 BOOST_AUTO_TEST_CASE(validate_queries_applies_the_engine_configuration) try {
    using sysio::query_engine::error_kind;
    const template_file tpl{data_only_template};
-   const auto engine_options = [&](std::string_view engine_argument) {
-      bpo::options_description cfg;
-      add_component_options(cfg);
-      sysio::query_engine::add_options(cfg);
-      std::vector<std::string> arguments = required_arguments(tpl);
-      arguments.push_back(query_argument(spec_of(full_query.name, full_query.block_interval, full_query.query)));
-      arguments.emplace_back(engine_argument);
-      bpo::variables_map options;
-      bpo::store(bpo::command_line_parser(arguments).options(cfg).run(), options);
-      bpo::notify(options);
-      return options;
-   };
+   const std::string spec = spec_of(full_query.name, full_query.block_interval, full_query.query);
 
-   const auto small = engine_options(tiny_query_bytes_argument);
+   const auto small = parse_options_with_engine(tpl, spec, tiny_query_bytes_argument);
    const auto cfg = alert_monitor::parse_config(small, tpl.dir.path());
    BOOST_REQUIRE(cfg.has_value());
    const std::string limit_error = config_error_of([&] { alert_monitor::validate_queries(cfg->queries, small); });
@@ -1200,10 +1227,41 @@ BOOST_AUTO_TEST_CASE(validate_queries_applies_the_engine_configuration) try {
    BOOST_CHECK_MESSAGE(limit_error.find(sysio::query_engine::option::max_query_bytes) != std::string::npos,
                        limit_error);
 
-   const auto invalid = engine_options(zero_in_flight_argument);
+   const auto invalid = parse_options_with_engine(tpl, spec, zero_in_flight_argument);
    const std::string config_error = config_error_of([&] { alert_monitor::validate_queries(cfg->queries, invalid); });
    BOOST_CHECK_MESSAGE(config_error.find(magic_enum::enum_name(error_kind::INVALID_PARAMS)) != std::string::npos,
                        config_error);
+}
+FC_LOG_AND_RETHROW()
+
+// The startup parse uses the deadline an execution gets (query_deadline), not --query-timeout-ms, which alert queries
+// never run under: a 1 ms engine timeout does not reject a long query that parses well within query_deadline.
+BOOST_AUTO_TEST_CASE(validate_queries_uses_the_query_deadline) try {
+   const template_file tpl{data_only_template};
+   const auto options =
+      parse_options_with_engine(tpl, spec_of("long_entry", every_block, long_query(long_query_columns)),
+                                one_ms_query_timeout_argument);
+   const auto cfg = alert_monitor::parse_config(options, tpl.dir.path());
+   BOOST_REQUIRE(cfg.has_value());
+   try {
+      alert_monitor::validate_queries(cfg->queries, options);
+   } catch (const chain::plugin_config_exception& e) {
+      BOOST_FAIL(e.to_detail_string());
+   }
+}
+FC_LOG_AND_RETHROW()
+
+// An error with neither a limit nor a location still carries the engine's message, which never holds query text.
+BOOST_AUTO_TEST_CASE(a_query_error_without_a_location_carries_its_message) try {
+   using sysio::query_engine::error_kind;
+   const template_file tpl{data_only_template};
+   const auto cfg = active_config(tpl, {query_argument(spec_of("ownerless_entry", every_block, ownerless_query))});
+   BOOST_REQUIRE(cfg.has_value());
+   const std::string error =
+      config_error_of([&] { alert_monitor::validate_queries(cfg->queries, parse_options({})); });
+   BOOST_CHECK_MESSAGE(error.find(magic_enum::enum_name(error_kind::QUERY_SEMANTICS)) != std::string::npos, error);
+   BOOST_CHECK_MESSAGE(error.find(owner_required_message) != std::string::npos, error);
+   BOOST_CHECK_MESSAGE(error.find(query_text_marker) == std::string::npos, error);
 }
 FC_LOG_AND_RETHROW()
 
@@ -1777,7 +1835,8 @@ BOOST_AUTO_TEST_CASE(a_failing_query_blocks_neither_other_queries_nor_status_doc
                                            std::string{healthy_b}};
    BOOST_CHECK_EQUAL_COLLECTIONS(keys.begin(), keys.end(), expected.begin(), expected.end());
 
-   BOOST_CHECK(harness.log.has_line_with({quoted_name(syntax_name), magic_enum::enum_name(error_kind::QUERY_SYNTAX)}));
+   BOOST_CHECK(harness.log.has_line_with(
+      {quoted_name(syntax_name), magic_enum::enum_name(error_kind::QUERY_SYNTAX), scripted_failure_message}));
    BOOST_CHECK(harness.log.has_line_with(
       {quoted_name(limit_name), magic_enum::enum_name(error_kind::QUERY_LIMIT), scripted_limit}));
    BOOST_CHECK(harness.log.has_line_with({quoted_name(unexpected_name)}));

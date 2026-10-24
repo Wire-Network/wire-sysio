@@ -189,9 +189,9 @@ void add_options(boost::program_options::options_description& cfg);
 std::optional<config> parse_config(const boost::program_options::variables_map& options,
                                    const std::filesystem::path& config_dir);
 
-/// Parse every query with the query engine's parser and the engine's limits from @p options, so a query that cannot
-/// run fails startup. Throws plugin_config_exception naming the entry, the error kind, and its limit or line and
-/// column; never the query text.
+/// Parse every query with the query engine's parser and the engine's limits from @p options, under the deadline an
+/// execution gets (query_deadline), so a query that cannot run fails startup. Throws plugin_config_exception naming
+/// the entry, the error kind, its limit or line and column, and the engine's message; never the query text.
 void validate_queries(const std::vector<query_entry>& queries, const boost::program_options::variables_map& options);
 
 /// Parse one spec: `fc::split(spec, ',', query_spec_field_count)` (as signature_provider_manager_plugin does).

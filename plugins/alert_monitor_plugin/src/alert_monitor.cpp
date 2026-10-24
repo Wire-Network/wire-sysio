@@ -57,10 +57,12 @@ constexpr std::string_view document_dropped_failure_format = "document dropped: 
 constexpr std::string_view service_unavailable_failure = "query service unavailable";
 /// What a query execution's failure line says for anything that is not a query_engine::query_error.
 constexpr std::string_view unexpected_failure = "unexpected error";
-/// A query_error that names the limit it hit: the error kind, then the limit.
-constexpr std::string_view query_error_with_limit_format = "{} (limit {})";
-/// A query_error with a source location: the error kind, then the line and column.
-constexpr std::string_view query_error_with_span_format = "{} at line {}, column {}";
+/// The limit a query_error names, after its kind.
+constexpr std::string_view query_error_limit_format = " (limit {})";
+/// The source location a query_error names, after its kind.
+constexpr std::string_view query_error_span_format = " at line {}, column {}";
+/// A query_error as one clause: its kind, its limit or location (or nothing), then its message.
+constexpr std::string_view query_error_format = "{}{}: {}";
 /// The line logged for a failed query execution: the entry's name and ordinal -- never its text -- what failed, and
 /// the unlogged_events_clause over query_failure_events.
 constexpr std::string_view query_failure_format = "query '{}' (value {}) failed: {}{}";
@@ -90,13 +92,15 @@ void read_optional(const bpo::variables_map& options, const char* name, std::opt
              query_spec_format);
 }
 
-/// @p e as a failure line or startup error states it: the kind, then its limit or its line and column. Never e.what().
+/// @p e as a failure line or startup error states it: the kind, its limit or line and column, and its message, which
+/// the engine keeps free of query text (query_error is its client-visible failure).
 std::string query_error_summary(const query_engine::query_error& e) {
+   std::string qualifier;
    if (e.limit)
-      return fmt::format(query_error_with_limit_format, magic_enum::enum_name(e.kind), *e.limit);
-   if (e.span)
-      return fmt::format(query_error_with_span_format, magic_enum::enum_name(e.kind), e.span->line, e.span->column);
-   return std::string{magic_enum::enum_name(e.kind)};
+      qualifier = fmt::format(query_error_limit_format, *e.limit);
+   else if (e.span)
+      qualifier = fmt::format(query_error_span_format, e.span->line, e.span->column);
+   return fmt::format(query_error_format, magic_enum::enum_name(e.kind), qualifier, e.what());
 }
 
 /// Render @p document_template over the supplied_tokens: `data` set to `{ <data_key>: <data_object> }`, the three
@@ -358,7 +362,9 @@ void validate_queries(const std::vector<query_entry>& queries, const bpo::variab
    }
    for (const query_entry& entry : queries) {
       try {
-         query_engine::query_budget budget{engine_config};
+         // The deadline an execution gets, as query_runner::execute passes it; never --query-timeout-ms.
+         query_engine::query_budget budget{engine_config, query_engine::query_budget::clock::now,
+                                           query_engine::query_options{.timeout = query_deadline}};
          query_engine::parse_query(entry.query, budget);
       } catch (const query_engine::query_error& e) {
          SYS_THROW(chain::plugin_config_exception, "--{} value {} ('{}'): the query engine rejects the query: {}",
