@@ -6,6 +6,7 @@
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/account_object.hpp>
+#include <sysio/chain/kv_table_objects.hpp>
 #include <sysio/chain/permission_object.hpp>
 #include <sysio/chain/permission_link_object.hpp>
 #include <sysio/testing/tester.hpp>
@@ -413,10 +414,18 @@ BOOST_FIXTURE_TEST_CASE(setcode_first_time_ram_billing, validating_tester) { try
 
     auto after = rlm.get_account_ram_usage("alice"_n);
 
-    // First setcode on an account: bill = wasm.size() * multiplier + metadata.
+    // sysio.bios records the deploy in its codehash table, billed to the account: an owner key and a row of
+    // owner, sha256, block time and block number (sysio.system/account_changes.hpp).
+    constexpr int64_t codehash_key_bytes = sizeof(uint64_t);
+    constexpr int64_t codehash_row_bytes = sizeof(uint64_t) + sizeof(fc::sha256) + sizeof(int64_t) + sizeof(uint32_t);
+    const int64_t codehash_billable =
+       codehash_key_bytes + codehash_row_bytes + static_cast<int64_t>(config::billable_size_v<kv_object>);
+
+    // First setcode on an account: bill = wasm.size() * multiplier + metadata + the codehash row.
     int64_t expected =
           static_cast<int64_t>(wasm.size()) * static_cast<int64_t>(config::setcode_ram_bytes_multiplier)
-        + static_cast<int64_t>(config::billable_size_v<account_metadata_object>);
+        + static_cast<int64_t>(config::billable_size_v<account_metadata_object>)
+        + codehash_billable;
     BOOST_REQUIRE_EQUAL(after - before, expected);
 } FC_LOG_AND_RETHROW() }
 
