@@ -205,7 +205,7 @@ class PerformanceTestBasic:
         self.testEnd = self.testStart
         self.testNamePath = testNamePath
         # Keep concurrent CTest runs from sharing performance artifact directories.
-        logDirUniqueSuffix = f"-{self.ptbConfig.targetTps}-{Utils.getTestPortOffset()}-{os.getpid()}"
+        logDirUniqueSuffix = f"-{self.ptbConfig.targetTps}-{os.getpid()}"
         self.loggingConfig = PerformanceTestBasic.LoggingConfig(logDirBase=Path(self.ptbConfig.logDirRoot)/f"{self.testNamePath}Logs",
                                                                 logDirTimestamp=f"{self.testStart.strftime('%Y-%m-%d_%H-%M-%S')}",
                                                                 logDirTimestampedOptSuffix=logDirUniqueSuffix)

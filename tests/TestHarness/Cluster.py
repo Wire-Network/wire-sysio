@@ -58,7 +58,6 @@ class Cluster(object):
     __WalletName="MyWallet"
     __localHost="localhost"
     __BiosHost="localhost"
-    __BiosPort=Utils.getPort(Utils.PortBiosHttp)
     __LauncherCmdArr=[]
     __bootlog="wire_sysio-ignition-wd/bootlog.txt"
     __localLaunchPortCheckAttempts=90
@@ -98,10 +97,10 @@ class Cluster(object):
         self.wallet=None
         self.walletMgr=None
         self.host=host
-        self.port=Utils.getPort(Utils.PortNodeHttp) if port is None else port
-        self.p2pBasePort=Utils.getPort(Utils.PortP2P)
+        # None means this test's leased port, looked up on first use (see the port properties).
+        self._port=port
         self.walletHost=walletHost
-        self.walletPort=Utils.getPort(Utils.PortWallet) if walletPort is None else walletPort
+        self._walletPort=walletPort
         self.staging=staging
         self.loggingLevel=loggingLevel
         self.loggingLevelDict=loggingLevelDict
@@ -507,8 +506,8 @@ class Cluster(object):
             sysdcmd = launcher.construct_command_line(instance)
 
             nodeNum = instance.index
-            # Bios port is shard-offset to PortBiosHttp; it no longer equals cluster.port+biosNodeId.
-            node_port = Cluster.__BiosPort if nodeNum == Node.biosNodeId else self.port + nodeNum
+            # The bios HTTP port has its own lease slot; it is not cluster.port+biosNodeId.
+            node_port = Utils.getPort(Utils.PortBiosHttp) if nodeNum == Node.biosNodeId else self.port + nodeNum
             node = Node(self.host, node_port, nodeNum, Path(instance.data_dir_name),
                         Path(instance.config_dir_name), sysdcmd, unstarted=instance.dont_start,
                         launch_time=launcher.launch_time, walletMgr=self.walletMgr, nodeopVers=self.nodeopVers)
@@ -578,7 +577,7 @@ class Cluster(object):
 
     # Initialize the default nodes (at present just the root node)
     def initializeNodes(self, defproduceraPrvtKey=None, defproducerbPrvtKey=None, onlyBios=False):
-        port=Cluster.__BiosPort if onlyBios else self.port
+        port=Utils.getPort(Utils.PortBiosHttp) if onlyBios else self.port
         host=Cluster.__BiosHost if onlyBios else self.host
         nodeNum="bios" if onlyBios else 0
         node=Node(host, port, nodeNum, walletMgr=self.walletMgr, nodeopVers=self.nodeopVers)
@@ -747,19 +746,41 @@ class Cluster(object):
         return True
 
     def getNodeP2pPort(self, nodeId: int):
-        """Return the sharded P2P port for a non-BIOS node."""
+        """Return the leased P2P port for a non-BIOS node."""
         return Utils.getPort(Utils.PortP2P, nodeId)
 
     def getNodeP2pEndpoint(self, nodeId: int):
-        """Return the sharded P2P endpoint for a non-BIOS node."""
+        """Return the leased P2P endpoint for a non-BIOS node."""
         return f"{self.host}:{self.getNodeP2pPort(nodeId)}"
 
     def getBiosP2pEndpoint(self):
-        """Return the sharded P2P endpoint for the BIOS node."""
+        """Return the leased P2P endpoint for the BIOS node."""
         return f"{self.host}:{Utils.getPort(Utils.PortBiosP2P)}"
 
+    @property
+    def port(self):
+        """Node HTTP base port: the one passed in, else this test's leased node HTTP port (looked up lazily)."""
+        if self._port is None:
+            self._port = Utils.getPort(Utils.PortNodeHttp)
+        return self._port
+
+    @port.setter
+    def port(self, value):
+        self._port = value
+
+    @property
+    def walletPort(self):
+        """kiod port: the one passed in, else this test's leased wallet port (looked up lazily)."""
+        if self._walletPort is None:
+            self._walletPort = Utils.getPort(Utils.PortWallet)
+        return self._walletPort
+
+    @walletPort.setter
+    def walletPort(self, value):
+        self._walletPort = value
+
     def getHttpEndpoint(self, nodeId: int):
-        """Return the sharded HTTP endpoint for a non-BIOS node."""
+        """Return the leased HTTP endpoint for a non-BIOS node."""
         return f"{self.host}:{self.port + nodeId}"
 
     def getNode(self, nodeId=0, exitOnError=True):

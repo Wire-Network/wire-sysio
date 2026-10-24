@@ -11,7 +11,7 @@
 #include <regex>
 #include <string>
 
-#include "test_port_shard.hpp"
+#include "test_ports.hpp"
 
 using mvo = fc::mutable_variant_object;
 using tcp = boost::asio::ip::tcp;
@@ -33,12 +33,13 @@ int main(int argc, char* argv[]) {
 
    bpo::options_description cli("ship_client command line options");
    bool help = false;
-   std::string socket_address = sysio::testing::default_state_history_endpoint();
+   std::string socket_address; // Default resolved after parsing, so --help and -a need no port lease.
    uint32_t num_requests = 1;
 
    cli.add_options()
       ("help,h", bpo::bool_switch(&help)->default_value(false), "Print this help message and exit.")
-      ("socket-address,a", bpo::value<std::string>(&socket_address)->default_value(socket_address), "Websocket address and port.")
+      ("socket-address,a", bpo::value<std::string>(&socket_address),
+       "Websocket address and port (default: this test's leased state-history endpoint).")
       ("num-requests,n", bpo::value<uint32_t>(&num_requests)->default_value(num_requests), "number of requests to make");
    bpo::variables_map varmap;
    bpo::store(bpo::parse_command_line(argc, argv, cli), varmap);
@@ -47,6 +48,14 @@ int main(int argc, char* argv[]) {
    if(help) {
       cli.print(std::cout);
       return 0;
+   }
+   if(socket_address.empty()) {
+      try {
+         socket_address = sysio::testing::default_state_history_endpoint();
+      } catch(const std::runtime_error& e) {
+         std::cerr << e.what() << " (or pass --socket-address)" << std::endl;
+         return 1;
+      }
    }
 
    std::string statehistory_server, statehistory_port;

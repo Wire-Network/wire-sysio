@@ -30,6 +30,7 @@ if [ -n "$dev" ]; then
     grep -q "^Depends:.*wire-sysio (= " "$tmp/devctrl/control" || fail "dev deb missing versioned base dependency"
     echo "$dc" | grep -q "^./usr/lib/python3/dist-packages/TestHarness" || fail "dev payload missing TestHarness dist-packages symlink"
     echo "$dc" | grep -q "^./usr/share/sysio_testing/bin/nodeop" || fail "dev payload missing sysio_testing/bin programs"
+    echo "$dc" | grep -qx "./usr/share/sysio_testing/tests/TestHarness/bind_registry.py" || fail "dev payload missing TestHarness/bind_registry.py"
 fi
 pkgdir=$(cd "$(dirname "$d")" && pwd)
 devbase=""; [ -n "$dev" ] && devbase=$(basename "$dev")
@@ -54,6 +55,9 @@ docker run --rm -v "$pkgdir":/pkg ubuntu:24.04 bash -ec "
         test -d /usr/include/fc
         test -f /usr/lib/libfc.a
         test -L /usr/lib/python3/dist-packages/TestHarness
+        # The installed TestHarness must import on its own (it carries its bind-registry client).
+        apt-get install -y python3 > /tmp/apt-python3.log 2>&1 || { tail -15 /tmp/apt-python3.log; exit 1; }
+        cd /tmp && python3 -c 'import TestHarness; from TestHarness import bind_registry; assert bind_registry.LEASE_PORT_COUNT'
     fi
 " || fail "container install / debconf defaults"
 # S6: runtime verification -- the installed service must enable, start, and
