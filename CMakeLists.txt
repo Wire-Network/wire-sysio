@@ -132,6 +132,9 @@ set(CMAKE_DISABLE_FIND_PACKAGE_OpenSSL On)
 # many tests require handling of signals themselves and even when they don't we'd like for them to generate a core dump, this
 # is effectively --catch_system_errors=no broadly across all tests
 add_compile_definitions(BOOST_TEST_DEFAULTS_TO_CORE_DUMP)
+# softfloat's legacy float32_t/float64_t aliases collide with arm_neon.h, which Boost.Unordered pulls in on arm64;
+# nothing here uses them.
+add_compile_definitions(SOFTFLOAT_DISABLE_LEGACY_TYPE_ALIASES)
 
 add_definitions(-DSYSIO_SYS_VM_RUNTIME_ENABLED)
 

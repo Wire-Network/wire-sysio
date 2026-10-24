@@ -108,7 +108,9 @@ namespace sysio {
          uint32_t                              epoch_index        = 0;
          sysio::opp::types::EmissionsBlockReason reason           =
             sysio::opp::types::EMISSIONS_BLOCK_REASON_UNSPECIFIED;
+         /// What the gate tried to authorize: the period total on a pay epoch, otherwise the epoch's share.
          int64_t                               attempted_emission = 0;
+         /// T5 budget not yet paid out or accrued to the open pay period (net headroom), not floored at 0.
          int64_t                               treasury_remaining = 0;
          int64_t                               sysio_balance      = 0;
          uint32_t                              first_blocked_at   = 0; // unix seconds
@@ -162,9 +164,9 @@ namespace sysio {
       static constexpr uint32_t MAX_BATCH_OP_GROUPS = 255;
 
       /// Upper bound on `operators_per_epoch` (the size of one schedule group).
-      /// Every member of the expiring group costs two inline actions per active
-      /// outpost in `advance` (opreg::recorddel + opreg::termcheck) plus an inline
-      /// transfer in sysio.system::payepoch, so group size directly scales the
+      /// Every member of the expiring group costs two inline actions in
+      /// `advance` (opreg::recorddel + opreg::termcheck) plus a payclaims
+      /// credit in sysio.system::payepoch, so group size directly scales the
       /// epoch-boundary transaction; an absurd value (which the product equality
       /// alone cannot reject -- UINT32_MAX groups of one is internally consistent)
       /// would abort `advance` on its vector reserves and halt epoch advancement

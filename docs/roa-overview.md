@@ -289,7 +289,7 @@ A policy is a grant of resource weight from a node owner (the **issuer**) to an 
 | `cpu_weight` | SYS-denominated weight granted for CPU |
 | `ram_weight` | SYS-denominated weight granted for RAM |
 | `bytes_per_unit` | Bytes per 0.0001 SYS, **frozen at the moment the policy was created** |
-| `time_block` | Block height before which the policy cannot be reduced or reclaimed |
+| `time_block` | Block height before which the policy cannot be reduced or reclaimed; at or below the current block, the grant is unlocked |
 
 RAM weight converts to bytes at `bytes_per_unit`. At the network's launch price of 104 bytes per
 0.0001 SYS, **1 SYS of `ram_weight` ≈ 1.04 MB**.
@@ -836,9 +836,10 @@ owners simultaneously, and any one of them can reduce their own policy — at or
 cleanly: see [Stacking policies](#stacking-policies-from-multiple-issuers) for what consumed RAM
 does to the reclaim.
 
-**Grants are time-committed.** `reducepolicy` is blocked until `time_block`, and `extendpolicy` can
-only push that block further out, never shorten it. An issuer commits to a term when they issue and
-cannot reclaim before it elapses.
+**Grants can be time-committed.** `reducepolicy` is blocked until `time_block`, and `extendpolicy`
+can only push that block further out, never shorten it. An issuer that sets a future `time_block`
+commits to that term and cannot reclaim before it elapses. A `time_block` at or below the current
+block issues the grant unlocked, reducible immediately; `extendpolicy` can lock it later.
 
 **Caps are enforced on-chain** against the authoritative node-owner rows — 21 / 84 / 1,000 —
 counted in `regnodeowner` at registration time.

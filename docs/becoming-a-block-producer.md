@@ -213,6 +213,15 @@ first payout after you are payable again. Unregistering right after producing an
 re-registering before your next round costs you nothing provided you still meet the admission
 requirements; if governance raised a collateral minimum while you were parked, top up first.
 
+Termination does not forfeit them either, but re-registering alone does not make you payable:
+termination credits your whole bond to your `claimremit` claim, and `regoperator` starts a new
+`UNKNOWN` registration with no bond. Cancel any withdrawal still queued from before termination with
+`cancelwtdw`: the queue is per account, so it would reserve part of the new bond and be paid out of
+it when it matures. Then post every required bond again, and call `regproducer` if your producer row
+was parked; the held blocks are paid at the first payout after that. Slashing is the exception: a
+slashed producer can never be payable again, so any blocks it produced and was not yet paid for are
+forfeited.
+
 The one bound worth stating: a payout walks the ranking from the top and stops after a fixed number
 of rows, far below which no producer is paid anything anyway. Settling held blocks therefore
 requires you to be back within that reach, which is roughly twenty times the paid band — so in
