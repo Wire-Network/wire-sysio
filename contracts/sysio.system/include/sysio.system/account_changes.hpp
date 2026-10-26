@@ -10,9 +10,9 @@
 #include <vector>
 
 /// Tables on the `sysio` account recording when an account's ABI or code last changed. `sysio.bios` and
-/// `sysio.system` both write them from their `setabi` and `setcode` handlers, so a chain has a row for every change
-/// since genesis. Rows are overwritten, never erased. Each contract aliases the tables inside its class, which puts
-/// them in its ABI.
+/// `sysio.system` both write them from their `setabi` and `setcode` handlers, so, apart from the `sysio` case below, a
+/// chain has a row for every change since genesis. Rows are overwritten, never erased. Each contract aliases the tables
+/// inside its class, which puts them in its ABI.
 ///
 /// The rows record what the contract on `sysio` sees. A deploy to `sysio` itself is recorded by the incoming code,
 /// since the native `setcode` runs first, so code that does not record (or clearing `sysio`'s code) leaves `sysio`'s
@@ -49,7 +49,7 @@ namespace sysiosystem {
    /// The hash of an account's code and when it was last set.
    struct [[sysio::table("codehash")]] code_hash {
       name        owner;      ///< the account the code belongs to
-      checksum256 hash;       ///< the chain's code hash: sha256 of the wasm, all zero once the code is cleared
+      checksum256 hash;       ///< the chain's code hash: sha256 of the wasm, all zero once cleared (not for `sysio`)
       time_point  updated_at; ///< block time of the last `setcode`
       uint32_t    block_num;  ///< block of the last `setcode`
 
