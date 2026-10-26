@@ -78,7 +78,7 @@ enum class block_tag_t {
    /// Most recent beacon-chain-finalized block. Unlike `latest` (canonical head, routinely
    /// reorged) this tag only advances on beacon-chain finality (~2 epochs, ~12.8 min), which
    /// carries cryptoeconomic finality and cannot revert without a third of staked ETH being
-   /// slashed. Required for reads that downstream consensus commits against.
+   /// slashed.
    finalized,
    /// Head of the beacon-chain-justified fork — will not reorg under honest-majority operation
    /// but lacks the cryptoeconomic guarantee of `finalized`.
@@ -110,6 +110,66 @@ using block_number_or_tag_t = std::variant<std::string, block_tag_t>;
  * @return String representation of the block parameter
  */
 std::string to_block_tag(const block_number_or_tag_t& block);
+
+/// Mainnet beacon-chain timing the read-confirmation defaults are sized from.
+inline constexpr int64_t ethereum_seconds_per_slot = 12;
+inline constexpr int64_t ethereum_slots_per_epoch  = 32;
+
+/// Confirmations a `latest` read waits for by default: 12 blocks, about 2.4 minutes on mainnet.
+inline constexpr uint32_t default_read_confirmations = 12;
+
+/// Epochs the finalized block may trail the head before a `latest` read falls back to it. A
+/// finalizing chain keeps the finalized block 2 to 3 epochs behind the head, so more than 3 means
+/// at least one epoch went unfinalized.
+inline constexpr int64_t default_max_finality_lag_epochs = 3;
+
+/// The default finality-lag limit: three mainnet epochs, 1152 seconds.
+inline constexpr fc::microseconds default_max_finality_lag =
+   fc::seconds(default_max_finality_lag_epochs * ethereum_slots_per_epoch * ethereum_seconds_per_slot);
+
+/**
+ * How settled a block must be before a read treats the state it holds as fact: the reads whose
+ * result another chain acts on, such as the envelope an outpost emitted.
+ *
+ * `finalized` and `safe` read at that tag. `latest` reads `confirmations` blocks deep, the head
+ * counting as the first, or at the finalized block when that is the fresher of the two. While the
+ * finalized block trails the head by more than `max_finality_lag`, a `latest` read is made at the
+ * finalized block instead: a chain that has stopped finalizing is a chain on which a reorg deeper
+ * than `confirmations` can happen.
+ */
+struct ethereum_read_confirmation {
+   /// `finalized`, `safe` or `latest`; `earliest` and `pending` are refused.
+   block_tag_t      tag              = block_tag_t::latest;
+   /// `latest` only: how deep the read is, at least 1 (the head).
+   uint32_t         confirmations    = default_read_confirmations;
+   /// `latest` only: how far the finalized block's timestamp may trail the head's before the read
+   /// falls back to the finalized block. Must be positive.
+   fc::microseconds max_finality_lag = default_max_finality_lag;
+};
+
+inline constexpr ethereum_read_confirmation ethereum_read_confirmation_defaults{};
+
+/**
+ * @brief Refuses a read confirmation that no read can be made at.
+ *
+ * @param confirmation The configuration to check
+ * @throws fc::invalid_arg_exception on a tag other than `finalized`, `safe` or `latest`, zero
+ *         confirmations, or a finality-lag limit below one second
+ */
+void validate_read_confirmation(const ethereum_read_confirmation& confirmation);
+
+/**
+ * @brief Where a read at an `ethereum_read_confirmation` lands
+ */
+struct ethereum_read_block {
+   /// The block to read at: the configured tag, or a block number for `latest`.
+   block_number_or_tag_t block;
+   /// `latest` only: the finalized block trailed the head by more than the limit, so `block` is
+   /// the finalized block rather than the confirmation depth.
+   bool                  finality_fallback = false;
+   /// `latest` only: how far the finalized block's timestamp trailed the head's.
+   fc::microseconds      finality_lag{};
+};
 
 /**
  * @brief Type alias for contract call data - either raw hex string or structured parameters
@@ -406,6 +466,21 @@ public:
     * @return The block data in JSON format.
     */
    fc::variant_object get_block_by_hash(const std::string& block_hash, bool full_transaction_data = false);
+
+   /**
+    * @brief Resolves the block a read at `confirmation` is made at.
+    *
+    * `finalized` and `safe` resolve to the tag itself, with no RPC. `latest` reads the head and the
+    * finalized block: the result is the block `confirmations - 1` below the head, or the finalized
+    * block when that is fresher, or the finalized block outright when its timestamp trails the
+    * head's by more than `max_finality_lag`.
+    *
+    * @param confirmation A configuration `validate_read_confirmation` accepts
+    * @return The block to read at, and whether finality lag forced the fallback
+    * @throws fc::invalid_arg_exception on a configuration `validate_read_confirmation` refuses
+    * @throws fc::exception when the node returns no head or finalized block
+    */
+   ethereum_read_block resolve_read_block(const ethereum_read_confirmation& confirmation);
 
    /**
     * @brief Retrieves transaction information by transaction hash.

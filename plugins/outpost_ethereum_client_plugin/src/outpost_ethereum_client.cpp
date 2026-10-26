@@ -39,6 +39,19 @@ constexpr std::string_view OP_REALIZE_YIELD    = "crank_outpost:realizeYield";
 /// Retry label for the pinned progress read, see `PINNED_READ_RETRY`.
 constexpr std::string_view OP_READ_PROGRESS    = "ethereum:read_progress";
 
+/// Retry label for the wait on an in-flight `epochIn`, see `IN_FLIGHT_POLL`.
+constexpr std::string_view OP_SETTLE_IN_FLIGHT = "ethereum:settle_in_flight";
+
+/// How the wait on an in-flight `epochIn` polls its hashes. A block is ~12 s,
+/// so polling faster than a second only adds load.
+constexpr fc::microseconds IN_FLIGHT_POLL_INITIAL_BACKOFF = fc::seconds(1);
+constexpr fc::microseconds IN_FLIGHT_POLL_MAX_BACKOFF     = fc::seconds(4);
+
+/// Nodes refuse a same-nonce replacement that raises either fee by less than
+/// 10% (geth's default `txpool.pricebump`); a replacement raises each by more
+/// than an eighth of what it was.
+constexpr uint64_t REPLACEMENT_FEE_BUMP_DIVISOR = 8;
+
 /// Execution APIs code for a call the node executed and that reverted, as distinct from a
 /// protocol error such as a parse failure, where the node never ran the call at all. Not an
 /// EIP-1474 code — that spec only defines the negative range; 3 is geth's convention, which
@@ -119,6 +132,31 @@ constexpr auto address = "address";
 constexpr auto topics  = "topics";
 constexpr auto data    = "data";
 } // namespace receipt_log_field
+
+/// `eth_getTransactionReceipt` result fields and values the in-flight settle reads.
+namespace receipt_field {
+constexpr auto status = "status";
+/// The status of a transaction the EVM executed and reverted.
+constexpr auto status_reverted = "0x0";
+} // namespace receipt_field
+
+/// Whether a receipt records a reverted transaction.
+bool receipt_reverted(const fc::variant& receipt) {
+   if (!receipt.is_object()) return false;
+   const auto& object = receipt.get_object();
+   return object.contains(receipt_field::status) && object[receipt_field::status].is_string() &&
+          object[receipt_field::status].as_string() == receipt_field::status_reverted;
+}
+
+/// `fee` raised by more than an eighth, or `std::nullopt` where that leaves uint256.
+std::optional<fc::uint256> bumped_fee(const fc::uint256& fee) {
+   const fc::uint256 raise{fee / REPLACEMENT_FEE_BUMP_DIVISOR + 1};
+   if (fee > fc::uint256{eth::maximum_ethereum_transaction_policy_value() - raise}) return std::nullopt;
+   return fc::uint256{fee + raise};
+}
+
+/// The larger of two fees.
+fc::uint256 larger_fee(const fc::uint256& lhs, const fc::uint256& rhs) { return lhs > rhs ? lhs : rhs; }
 
 /// Most `epochIn` calls one tick sends for one epoch before handing the rest
 /// to the next tick. A bound, not a budget: a full-cap envelope spills a
@@ -540,6 +578,48 @@ bool is_routable_handler(std::string_view handler_address) {
    return !same_evm_address(handler_address, attestation_blackhole_address);
 }
 
+in_flight_step decide_in_flight(bool known_to_node, const epoch_in_fees& paid,
+                                const ethereum_client::gas_config_t& market) {
+   if (!known_to_node) return in_flight_step::rebroadcast;
+   // What a block builder earns from it at today's base fee (EIP-1559): the tip,
+   // up to whatever the fee cap leaves above the base fee.
+   const fc::uint256 headroom = paid.max_fee_per_gas > market.base_fee
+                                   ? fc::uint256{paid.max_fee_per_gas - market.base_fee}
+                                   : fc::uint256{0};
+   const fc::uint256 effective_tip =
+      paid.max_priority_fee_per_gas < headroom ? paid.max_priority_fee_per_gas : headroom;
+   return effective_tip < market.tip ? in_flight_step::replace : in_flight_step::wait;
+}
+
+std::optional<epoch_in_fees> resend_fees(in_flight_step step, const epoch_in_fees& paid,
+                                         const ethereum_client::gas_config_t& market,
+                                         const ethereum_transaction_policy&   policy) {
+   epoch_in_fees fees;
+   switch (step) {
+   case in_flight_step::wait:
+      return std::nullopt;
+   case in_flight_step::rebroadcast:
+      fees = {.max_priority_fee_per_gas = larger_fee(paid.max_priority_fee_per_gas, market.tip),
+              .max_fee_per_gas          = larger_fee(paid.max_fee_per_gas, market.max_fee_per_gas)};
+      break;
+   case in_flight_step::replace: {
+      const auto tip     = bumped_fee(paid.max_priority_fee_per_gas);
+      const auto max_fee = bumped_fee(paid.max_fee_per_gas);
+      if (!tip || !max_fee) return std::nullopt;
+      fees = {.max_priority_fee_per_gas = larger_fee(*tip, market.tip),
+              .max_fee_per_gas          = larger_fee(*max_fee, market.max_fee_per_gas)};
+      break;
+   }
+   }
+   // EIP-1559 refuses a fee cap below the tip.
+   fees.max_fee_per_gas = larger_fee(fees.max_fee_per_gas, fees.max_priority_fee_per_gas);
+   if (fees.max_priority_fee_per_gas > policy.max_priority_fee_per_gas ||
+       fees.max_fee_per_gas > policy.max_fee_per_gas) {
+      return std::nullopt;
+   }
+   return fees;
+}
+
 } // namespace outpost_ethereum_client_detail
 
 outpost_ethereum_client::outpost_ethereum_client(
@@ -612,8 +692,9 @@ outpost_ethereum_client::authenticated_caller_address() const {
    return {address.begin(), address.end()};
 }
 
-detail::delivery_progress outpost_ethereum_client::read_progress(uint32_t epoch_index, const fc::uint256& block) {
-   const auto at = pinned(block);
+detail::delivery_progress outpost_ethereum_client::read_progress(uint32_t                          epoch_index,
+                                                                 const eth::block_number_or_tag_t& at) {
+   const auto block = eth::to_block_tag(at);
    // A backend that has not seen `block` yet answers with a JSON-RPC error
    // rather than stale state; that is the one failure worth waiting out.
    // Everything else (a malformed response, the deadline) propagates.
@@ -627,13 +708,13 @@ detail::delivery_progress outpost_ethereum_client::read_progress(uint32_t epoch_
             progress.settled_digest = read_settled_digest(*_opp_inbound_client, at, to_string());
             dlog("outpost_ethereum_client[{}]: epoch={} at block {}: next_epoch={} spill(tipped={} dispatched={} "
                  "complete={} finalized={}) own={} settled={}",
-                 to_string(), epoch_index, block.str(), progress.next_epoch_index, progress.spill.tipped,
+                 to_string(), epoch_index, block, progress.next_epoch_index, progress.spill.tipped,
                  progress.spill.dispatched, progress.spill.complete, progress.spill.finalized, progress.own_digest,
                  progress.settled_digest);
             return progress;
          } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
             dlog("outpost_ethereum_client[{}]: progress read at block {} refused ({}); retrying", to_string(),
-                 block.str(), refusal.to_string());
+                 block, refusal.to_string());
             return std::nullopt;
          }
       });
@@ -667,6 +748,137 @@ detail::pending_consensus outpost_ethereum_client::read_pending_consensus(const 
    return consensus;
 }
 
+bool outpost_ethereum_client::settled_past_delivery(uint32_t epoch_index) {
+   const auto progress = read_progress(epoch_index, read_settled_block());
+   return progress.next_epoch_index > epoch_index || progress.spill.finalized || progress.spill.tipped ||
+          !is_zero_word(progress.own_digest);
+}
+
+std::optional<fc::uint256> outpost_ethereum_client::settle_in_flight(fc::time_point deadline_abs) {
+   FC_ASSERT(_in_flight, "outpost_ethereum_client[{}]: no epochIn is in flight", to_string());
+   auto&       submission = *_in_flight;
+   const auto& client     = _entry->client;
+   const auto  signer     = client->get_signer_address();
+
+   // The receipt of any hash signed at the nonce, or the nonce used by a hash
+   // this relay never saw: either one ends the wait.
+   std::optional<fc::uint256> landed_at;
+   const auto                 settled = [&]() -> bool {
+      for (const auto& hash : submission.tx_hashes) {
+         const fc::variant receipt = client->get_transaction_receipt(hash);
+         if (receipt.is_null()) continue;
+         landed_at = parse_epoch_in_receipt(hash, receipt).block_number;
+         if (receipt_reverted(receipt)) {
+            wlog("outpost_ethereum_client[{}]: in-flight epochIn for epoch={} at nonce {} reverted in block {} "
+                 "(tx={}); the outpost's state decides what to send next",
+                 to_string(), submission.epoch_index, submission.nonce.str(), landed_at->str(), hash);
+         } else {
+            ilog("outpost_ethereum_client[{}]: in-flight epochIn for epoch={} at nonce {} landed in block {} (tx={})",
+                 to_string(), submission.epoch_index, submission.nonce.str(), landed_at->str(), hash);
+         }
+         return true;
+      }
+      if (client->get_transaction_count(signer, eth::block_tag_t::latest) > submission.nonce) {
+         wlog("outpost_ethereum_client[{}]: nonce {} of the in-flight epochIn for epoch={} was used by a "
+              "transaction none of its {} hashes match; the outpost's state decides what to send next",
+              to_string(), submission.nonce.str(), submission.epoch_index, submission.tx_hashes.size());
+         return true;
+      }
+      return false;
+   };
+
+   if (!settled()) {
+      // Still pending. A send whose outcome was unknown left no hash, so the
+      // node's pending nonce says whether it holds something at this one.
+      const auto held_by_node = [&](const std::string& hash) {
+         return !client->get_transaction_by_hash(hash).is_null();
+      };
+      const bool known_to_node = std::ranges::any_of(submission.tx_hashes, held_by_node) ||
+                                 client->get_transaction_count(signer, eth::block_tag_t::pending) > submission.nonce;
+      try {
+         const auto market = client->get_gas_config();
+         const auto step   = detail::decide_in_flight(known_to_node, submission.fees, market);
+         if (step != detail::in_flight_step::wait) {
+            const auto fees = detail::resend_fees(step, submission.fees, market, client->transaction_policy());
+            if (!fees) {
+               wlog("outpost_ethereum_client[{}]: in-flight epochIn for epoch={} at nonce {} needs a {} the fee caps "
+                    "leave no room for (paying max_fee={} tip={}, market max_fee={} tip={}); waiting for it as sent",
+                    to_string(), submission.epoch_index, submission.nonce.str(), magic_enum::enum_name(step),
+                    submission.fees.max_fee_per_gas.str(), submission.fees.max_priority_fee_per_gas.str(),
+                    market.max_fee_per_gas.str(), market.tip.str());
+            } else {
+               const auto hash = _opp_inbound_client->resend_epoch_in(submission, *fees);
+               submission.tx_hashes.push_back(hash);
+               submission.fees = *fees;
+               ilog("outpost_ethereum_client[{}]: {} the in-flight epochIn for epoch={} at nonce {}: tx={} max_fee={} "
+                    "tip={}",
+                    to_string(), magic_enum::enum_name(step), submission.epoch_index, submission.nonce.str(), hash,
+                    fees->max_fee_per_gas.str(), fees->max_priority_fee_per_gas.str());
+            }
+         }
+      } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
+         // A node still holding an earlier hash may refuse the re-send, or the
+         // nonce may have just been used; the wait below finds out which.
+         wlog("outpost_ethereum_client[{}]: re-sending the in-flight epochIn for epoch={} at nonce {} was refused "
+              "({}); waiting for the hashes already sent",
+              to_string(), submission.epoch_index, submission.nonce.str(), refusal.to_string());
+      } catch (const eth::ethereum_transaction_policy_exception& rejection) {
+         wlog("outpost_ethereum_client[{}]: re-sending the in-flight epochIn for epoch={} at nonce {} is outside the "
+              "transaction policy ({}); waiting for it as sent",
+              to_string(), submission.epoch_index, submission.nonce.str(), rejection.to_string());
+      }
+
+      const fc::task::retry_options poll{
+         .initial_backoff = IN_FLIGHT_POLL_INITIAL_BACKOFF,
+         .max_backoff     = IN_FLIGHT_POLL_MAX_BACKOFF,
+         .total_timeout   = std::max(fc::microseconds(), deadline_abs - fc::time_point::now()),
+      };
+      try {
+         fc::task::retry_until<bool>(OP_SETTLE_IN_FLIGHT, poll, [&]() -> std::optional<bool> {
+            return settled() ? std::optional<bool>{true} : std::nullopt;
+         });
+      } catch (const fc::timeout_exception&) {
+         SYS_THROW(chain::outpost_delivery_incomplete_exception,
+                   "outpost_ethereum_client[{}]: the epochIn for epoch={} at nonce {} is still pending ({} hashes); "
+                   "nothing more is sent until it lands",
+                   to_string(), submission.epoch_index, submission.nonce.str(), submission.tx_hashes.size());
+      }
+   }
+   _in_flight.reset();
+   return landed_at;
+}
+
+epoch_in_receipt outpost_ethereum_client::send_epoch_in(uint32_t epoch_index, const std::string& envelope_hex,
+                                                        uint64_t gas_budget, fc::time_point deadline_abs) {
+   // The ABI arguments are bound as non-const lvalue references, so each one
+   // needs a named local.
+   uint32_t            epoch_arg   = epoch_index;
+   std::string         payload_hex = envelope_hex;
+   epoch_in_submission submission;
+   std::string         unconfirmed;
+   try {
+      return _opp_inbound_client->epoch_in(epoch_arg, payload_hex, gas_budget, deadline_abs, submission);
+   } catch (const eth::ethereum_transaction_policy_exception&) {
+      throw;   // refused locally, before anything was signed
+   } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
+      // The node's refusal, of the pre-flight or of the send itself. Only an
+      // error after a hash came back can leave the call pending.
+      if (submission.tx_hashes.empty()) throw;
+      unconfirmed = refusal.to_string();
+   } catch (const fc::exception& failure) {
+      // A timeout or transport failure: once the send was attempted, the node
+      // may hold the call whether or not a hash came back.
+      if (!submission.send_attempted) throw;
+      unconfirmed = failure.to_string();
+   }
+   const auto nonce = submission.nonce;
+   _in_flight       = std::move(submission);
+   SYS_THROW(chain::outpost_delivery_incomplete_exception,
+             "outpost_ethereum_client[{}]: epochIn for epoch={} at nonce {} was sent without a receipt ({}); the next "
+             "tick settles it before sending again",
+             to_string(), epoch_index, nonce.str(), unconfirmed);
+}
+
 std::string outpost_ethereum_client::deliver_outbound_envelope(
    uint32_t                 epoch_index,
    const std::vector<char>& envelope_bytes,
@@ -698,6 +910,12 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
    // The digest the outpost records for this delivery and settles consensus on.
    const std::string local_digest = detail::envelope_digest_word(envelope_bytes);
 
+   // An `epochIn` an earlier tick left pending holds this signer's next nonce:
+   // anything sent before it lands would queue behind it, or pay for the same
+   // delivery twice. Settle it first; while it is still pending, nothing is sent.
+   std::optional<fc::uint256> in_flight_landed_at;
+   if (_in_flight) in_flight_landed_at = settle_in_flight(deadline_abs);
+
    // Each call is funded to what it has left to carry (`delivery_gas_budget`),
    // never to a fixed figure: the attestations the outpost's cursor says are
    // still to dispatch, doubled for every call this tick that fell short. The
@@ -718,6 +936,7 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
    // read at `latest` could be served by a backend behind the block that just
    // confirmed and report the state from before the call.
    fc::uint256 pinned_block = _entry->client->get_block_number();
+   if (in_flight_landed_at && *in_flight_landed_at > pinned_block) pinned_block = *in_flight_landed_at;
 
    // A call that cannot be sent at its budget, or that was sent and moved
    // nothing, is a stalled epoch: logged at error once per stall position,
@@ -748,10 +967,23 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
    uint32_t                                 stale_refusals = 0;
    uint64_t                                 last_budget    = 0;
    std::optional<detail::delivery_progress> before_last_send;
+
+   // An epoch is reported handled only once the outpost's state at the read
+   // confirmation shows this relay's part done. Until then the next tick reads
+   // the outpost again, so a delivery a reorg removed is delivered again.
+   const auto handled = [&]() -> std::string {
+      if (!settled_past_delivery(epoch_index)) {
+         SYS_THROW(chain::outpost_delivery_incomplete_exception,
+                   "outpost_ethereum_client[{}]: epoch={} is done at the head but not yet at the read "
+                   "confirmation; checking again next tick",
+                   to_string(), epoch_index);
+      }
+      return last_tx;
+   };
    for (;;) {
       throw_if_past_deadline(deadline_abs, OP_DELIVER_OUTBOUND);
 
-      const auto progress = read_progress(epoch_index, pinned_block);
+      const auto progress = read_progress(epoch_index, pinned(pinned_block));
       const auto settlement =
          detail::classify_settlement(progress.own_digest, progress.settled_digest, progress.spill.tipped);
 
@@ -783,7 +1015,7 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
                  "already finalized it (nextEpochIndex={})",
                  to_string(), epoch_index, progress.next_epoch_index);
          }
-         return last_tx;
+         return handled();
 
       case detail::delivery_action::outpost_behind:
          // Not a handled epoch: the outpost will accept this delivery once it
@@ -807,7 +1039,7 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
                  "(dispatched={} complete={}); its deliverers carry the continuation",
                  to_string(), epoch_index, progress.spill.dispatched, progress.spill.complete);
          }
-         return last_tx;
+         return handled();
 
       case detail::delivery_action::await_peers:
          if (sends == 0) {
@@ -831,7 +1063,7 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
             dlog("outpost_ethereum_client[{}]: epoch={} delivery recorded; consensus not yet tipped", to_string(),
                  epoch_index);
          }
-         return last_tx;
+         return handled();
 
       case detail::delivery_action::retry_consensus:
          ilog("outpost_ethereum_client[{}]: epoch={} re-delivering to run the boundary tip (agreeing={} "
@@ -848,7 +1080,7 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
             wlog("outpost_ethereum_client[{}]: epoch={} is tipped on digest {} but the envelope held hashes to "
                  "{}; this relay cannot continue it",
                  to_string(), epoch_index, progress.settled_digest, local_digest);
-            return last_tx;
+            return handled();
          }
          break;
 
@@ -901,13 +1133,9 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
            to_string(), epoch_index, gas_budget,
            remaining ? std::to_string(*remaining) : "unknown", escalations, gas_ceiling);
 
-      // The ABI arguments are bound as non-const lvalue references, so each
-      // one needs a named local.
-      uint32_t         epoch_arg   = epoch_index;
-      std::string      payload_hex = envelope_hex;
       epoch_in_receipt receipt;
       try {
-         receipt = _opp_inbound_client->epoch_in(epoch_arg, payload_hex, gas_budget, deadline_abs);
+         receipt = send_epoch_in(epoch_index, envelope_hex, gas_budget, deadline_abs);
       } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
          // The node refused the call before anything was signed: the
          // pre-flight estimate runs under the budget.
@@ -925,7 +1153,7 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
                  "ceiling ({} gas)",
                  to_string(), epoch_index, gas_budget, magic_enum::enum_name(*revert), gas_ceiling);
             gas_budget = gas_ceiling;
-            receipt    = _opp_inbound_client->epoch_in(epoch_arg, payload_hex, gas_budget, deadline_abs);
+            receipt    = send_epoch_in(epoch_index, envelope_hex, gas_budget, deadline_abs);
             break;
 
          case detail::epoch_in_revert::non_sequential_epoch:
@@ -961,6 +1189,24 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
    }
 }
 
+eth::block_number_or_tag_t outpost_ethereum_client::read_settled_block() {
+   const auto& confirmation = _entry->read_confirmation;
+   const auto  resolved     = _entry->client->resolve_read_block(confirmation);
+   if (_finality_fallback.exchange(resolved.finality_fallback) != resolved.finality_fallback) {
+      if (resolved.finality_fallback) {
+         wlog("outpost_ethereum_client[{}]: the finalized block trails the head by {} s, more than the {} s limit; "
+              "reading at the finalized block {} instead of {} confirmations until finality catches up",
+              to_string(), resolved.finality_lag.to_seconds(), confirmation.max_finality_lag.to_seconds(),
+              eth::to_block_tag(resolved.block), confirmation.confirmations);
+      } else {
+         ilog("outpost_ethereum_client[{}]: finality caught up (the finalized block trails the head by {} s); "
+              "reading {} confirmations deep again",
+              to_string(), resolved.finality_lag.to_seconds(), confirmation.confirmations);
+      }
+   }
+   return resolved.block;
+}
+
 std::vector<char> outpost_ethereum_client::read_inbound_envelope(
    uint32_t         epoch_index,
    fc::microseconds deadline) {
@@ -984,14 +1230,11 @@ std::vector<char> outpost_ethereum_client::read_inbound_envelope(
    // so we get the structured outputs `(uint32 epoch_, bytes data_)`
    // back as a `mutable_variant_object`.
    const auto& abi = _opp_client->get_abi(opp_abi::view_latest_outbound_envelope);
-   // Read at `finalized`, not `latest`. WIRE consensus on inbound is committed forward against this
-   // read: an operator that reads a slot at `latest` can achieve WIRE-side consensus on it and queue
-   // attestations off it, then watch that slot reorg out of Ethereum's canonical chain seconds later,
-   // leaving WIRE committed to history that no longer exists. `finalized` is the only tag with
-   // cryptoeconomic finality. This is deliberately not operator-configurable: the read commitment is a
-   // consensus parameter, and operators reading at different commitments would deliver divergent
-   // envelopes for the same epoch, manufacturing disputes among honest operators.
-   const auto raw_hex_var = _opp_client->get_latest_outbound_envelope(eth::block_tag_t::finalized);
+   // Read at the client's read confirmation, never at the head. WIRE consensus on inbound is
+   // committed forward against this read: an operator that reads a slot a reorg then removes can
+   // reach WIRE-side consensus on it and queue attestations off it, leaving WIRE committed to
+   // history that no longer exists. See `read_settled_block` for what reading unlike the group costs.
+   const auto raw_hex_var = _opp_client->get_latest_outbound_envelope(read_settled_block());
    if (!raw_hex_var.is_string()) {
       wlog("outpost_ethereum_client[{}]: getLatestOutboundEnvelope returned non-string variant",
            to_string());
@@ -1101,9 +1344,10 @@ std::optional<fc::sha256> outpost_ethereum_client::read_emitted_envelope_digest(
    FC_ASSERT(_opp_client->outbound_envelopes, "outpost_ethereum_client[{}]: the loaded OPP ABI declares no {} view",
              to_string(), opp_contract_client::view_outbound_envelopes);
 
-   // `finalized`, as `read_inbound_envelope` reads: a record from a block that can still reorg out proves nothing.
+   // At the read confirmation, as `read_inbound_envelope` reads: a record from a block that can still reorg out
+   // proves nothing.
    uint32_t          epoch   = epoch_index;
-   const fc::variant raw_var = _opp_client->outbound_envelopes(eth::block_tag_t::finalized, epoch);
+   const fc::variant raw_var = _opp_client->outbound_envelopes(read_settled_block(), epoch);
    // Three static words: (uint32 epochIndex, uint64 emittedAt, bytes32 checksum).
    constexpr size_t record_hex_chars = HEX_PREFIX_CHARS + 3 * EVM_ABI_WORD_BYTES * HEX_CHARS_PER_BYTE;
    FC_ASSERT(raw_var.is_string() && raw_var.as_string().size() == record_hex_chars,

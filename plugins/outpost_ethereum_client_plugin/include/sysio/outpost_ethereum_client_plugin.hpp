@@ -26,6 +26,11 @@ struct ethereum_client_entry_t {
    /// row's `external_chain_id`, so multiple EVM outposts never share one
    /// remote endpoint.
    uint32_t                           chain_id;
+   /// How settled the outpost state this client reads must be before the
+   /// operator acts on it: the envelope the outpost emitted. See
+   /// `outpost_ethereum_client::read_settled_block` for what reading unlike the
+   /// rest of the group costs.
+   ethereum_read_confirmation         read_confirmation = ethereum_read_confirmation_defaults;
 };
 
 using ethereum_client_entry_ptr = std::shared_ptr<ethereum_client_entry_t>;
@@ -197,6 +202,33 @@ inline constexpr auto block_number = "blockNumber";
 inline constexpr auto logs         = "logs";
 } // namespace ethereum_receipt_field
 
+/// The fees one EIP-1559 transaction pays per gas.
+struct epoch_in_fees {
+   fc::uint256 max_priority_fee_per_gas;
+   fc::uint256 max_fee_per_gas;
+};
+
+/// One `epochIn` this relay signed, from just before it was sent until its
+/// receipt shows where it landed. Every hash signed at `nonce` is kept: the
+/// first send and each same-nonce replacement, any one of which may be the
+/// one that mines. A receipt wait that runs out leaves the submission in
+/// flight, and the relay settles it before it sends anything else, so a slow
+/// block is never paid for twice under a second nonce.
+struct epoch_in_submission {
+   uint32_t                 epoch_index = 0;
+   /// The call's arguments, kept to sign a replacement with.
+   std::string              envelope_hex;
+   uint64_t                 gas_budget  = 0;
+   fc::uint256              nonce;
+   /// The fees of the latest hash in `tx_hashes`.
+   epoch_in_fees            fees;
+   /// Set just before the first `eth_sendRawTransaction`: from then on a
+   /// failure that is not the node's refusal may still have left the call in
+   /// the mempool.
+   bool                     send_attempted = false;
+   std::vector<std::string> tx_hashes;
+};
+
 /// What one `epochIn` left on chain, read from its receipt once it confirmed.
 struct epoch_in_receipt {
    /// The transaction's hash, for logs.
@@ -256,10 +288,17 @@ struct opp_inbound_contract_client : ethereum_contract_client {
    /// that way (see `ethereum_abi::encode_dynamic_data`).
    ///
    /// The ABI arguments are bound as non-const lvalue references, so callers
-   /// must materialize named locals for both.
+   /// must materialize named locals for both. `submission` is filled before
+   /// anything is sent, so a caller whose wait threw still knows the nonce,
+   /// the fees and the hash of the call it may have left in flight.
    std::function<epoch_in_receipt(uint32_t& epoch_index, std::string& envelope_hex, uint64_t gas_budget,
-                                  fc::time_point deadline)>
+                                  fc::time_point deadline, epoch_in_submission& submission)>
       epoch_in;
+   /// Sign `submission`'s call again at its nonce with `fees` and send it,
+   /// returning the new hash. The relay's way to replace an `epochIn` the
+   /// market priced out, or to re-send one the node no longer holds. Does not
+   /// wait: the relay polls every hash signed at the nonce.
+   std::function<std::string(const epoch_in_submission& submission, const epoch_in_fees& fees)> resend_epoch_in;
    /// `nextEpochIndex()` view — the epoch the outpost is currently accepting.
    ethereum_contract_call_fn<fc::variant> next_epoch_index;
    /// `dispatchSpill(uint32 epochIndex)` view — where a tipped epoch's dispatch
@@ -294,15 +333,42 @@ struct opp_inbound_contract_client : ethereum_contract_client {
                                const std::vector<fc::network::ethereum::abi::contract>& contracts)
       : ethereum_contract_client(client, contract_address, contracts)
       , epoch_in([this](uint32_t& epoch_index, std::string& envelope_hex, uint64_t gas_budget,
-                        fc::time_point deadline) -> epoch_in_receipt {
+                        fc::time_point deadline, epoch_in_submission& submission) -> epoch_in_receipt {
            const auto&                abi    = get_abi(opp_inbound_abi_name::epoch_in);
            contract_invoke_data_items params = {epoch_index, envelope_hex};
            auto tx = this->client->create_default_tx(this->contract_address, abi, params, gas_budget, gas_budget);
+           submission = epoch_in_submission{
+              .epoch_index    = epoch_index,
+              .envelope_hex   = envelope_hex,
+              .gas_budget     = gas_budget,
+              .nonce          = tx.nonce,
+              .fees           = {.max_priority_fee_per_gas = tx.max_priority_fee_per_gas,
+                                 .max_fee_per_gas          = tx.max_fee_per_gas},
+              .send_attempted = true,
+              .tx_hashes      = {},
+           };
            const auto tx_hash = this->client->execute_contract_tx_fn(tx, abi, params).as_string();
+           submission.tx_hashes.push_back(tx_hash);
            // Measured after the send, so the wait gets exactly what is left.
            const auto receipt_wait = std::max(fc::microseconds(), deadline - fc::time_point::now());
            return parse_epoch_in_receipt(
               tx_hash, this->client->wait_for_receipt(tx_hash, delivery_confirm_options(gas_budget, receipt_wait)));
+        })
+      , resend_epoch_in([this](const epoch_in_submission& submission, const epoch_in_fees& fees) -> std::string {
+           const auto&                abi    = get_abi(opp_inbound_abi_name::epoch_in);
+           contract_invoke_data_items params = {submission.epoch_index, submission.envelope_hex};
+           const eip1559_tx           tx{
+                        .chain_id                 = this->client->get_chain_id(),
+                        .nonce                    = submission.nonce,
+                        .max_priority_fee_per_gas = fees.max_priority_fee_per_gas,
+                        .max_fee_per_gas          = fees.max_fee_per_gas,
+                        .gas_limit                = fc::uint256{submission.gas_budget},
+                        .to                       = this->contract_address,
+                        .value                    = 0,
+                        .data                     = {},
+                        .access_list              = {},
+           };
+           return this->client->execute_contract_tx_fn(tx, abi, params).as_string();
         })
       , next_epoch_index(create_call<fc::variant>(get_abi(opp_inbound_abi_name::next_epoch_index)))
       , dispatch_spill(create_call<fc::variant, uint32_t>(get_abi(opp_inbound_abi_name::dispatch_spill)))

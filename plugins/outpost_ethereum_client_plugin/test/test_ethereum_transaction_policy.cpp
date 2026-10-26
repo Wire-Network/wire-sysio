@@ -589,21 +589,70 @@ BOOST_AUTO_TEST_CASE(epoch_in_waits_for_its_receipt_until_the_given_deadline) {
        no_argument_function("pendingEpochHash"), bytes32_argument_function("pendingConsensusForDigest"),
        uint16_argument_function("attestationHandlers")},
    };
-   uint32_t    epoch_index = 1;
-   std::string envelope    = "01";
+   uint32_t                   epoch_index = 1;
+   std::string                envelope    = "01";
+   sysio::epoch_in_submission submission;
 
    // No receipt ever appears.
    const auto start = fc::time_point::now();
    BOOST_CHECK_THROW(
-      inbound.epoch_in(epoch_index, envelope, 999, start + fc::milliseconds(short_receipt_deadline_ms)),
+      inbound.epoch_in(epoch_index, envelope, 999, start + fc::milliseconds(short_receipt_deadline_ms), submission),
       fc::timeout_exception);
    const auto waited = fc::time_point::now() - start;
 
    BOOST_CHECK(waited >= fc::milliseconds(short_receipt_deadline_ms));
    BOOST_CHECK(waited < ethereum_confirm_option_defaults.retry.total_timeout);
    BOOST_CHECK_GE(client->receipt_reads, 1u);
-   // The call was sent; only the wait gave up.
+   // The call was sent; only the wait gave up. The submission still says what
+   // was sent, so the caller can settle it later.
    BOOST_CHECK_EQUAL(client->broadcast_count, 1u);
+   BOOST_CHECK(submission.send_attempted);
+   BOOST_CHECK_EQUAL(submission.epoch_index, epoch_index);
+   BOOST_CHECK_EQUAL(submission.envelope_hex, envelope);
+   BOOST_CHECK_EQUAL(submission.gas_budget, 999u);
+   BOOST_CHECK(submission.nonce == fc::uint256{0});
+   BOOST_CHECK(submission.fees.max_priority_fee_per_gas == fc::uint256{10});
+   BOOST_CHECK(submission.fees.max_fee_per_gas == fc::uint256{100});
+   BOOST_REQUIRE_EQUAL(submission.tx_hashes.size(), 1u);
+   BOOST_CHECK_EQUAL(submission.tx_hashes.front(), transaction_hash);
+}
+
+/// A resend signs the same call again at the submission's nonce and the fees
+/// it is given, with no pre-flight and no nonce lookup, inside the policy.
+BOOST_AUTO_TEST_CASE(resend_epoch_in_signs_the_call_again_at_its_nonce) {
+   std::atomic<size_t> sign_count = 0;
+   const auto provider = make_recording_signer(sign_count);
+   auto client = std::make_shared<recording_ethereum_client>(provider, bounded_policy());
+   sysio::opp_inbound_contract_client inbound{
+      client,
+      std::string(contract_address),
+      {whole_envelope_epoch_in_function("epochIn"), no_argument_function("nextEpochIndex"),
+       uint32_argument_function("dispatchSpill"), epoch_deliveries_function("epochDeliveries"),
+       no_argument_function("pendingEpochHash"), bytes32_argument_function("pendingConsensusForDigest"),
+       uint16_argument_function("attestationHandlers")},
+   };
+   const sysio::epoch_in_submission submission{
+      .epoch_index    = 1,
+      .envelope_hex   = "01",
+      .gas_budget     = 999,
+      .nonce          = 7,
+      .fees           = {.max_priority_fee_per_gas = 5, .max_fee_per_gas = 50},
+      .send_attempted = true,
+      .tx_hashes      = {"0x01"},
+   };
+
+   const auto hash = inbound.resend_epoch_in(submission, {.max_priority_fee_per_gas = 10, .max_fee_per_gas = 100});
+   BOOST_CHECK_EQUAL(hash, transaction_hash);
+   BOOST_CHECK_EQUAL(client->broadcast_count, 1u);
+   BOOST_CHECK_EQUAL(sign_count.load(), 1u);
+   BOOST_CHECK(std::ranges::count(client->methods, "eth_getTransactionCount") == 0);
+   BOOST_CHECK(std::ranges::count(client->methods, "eth_estimateGas") == 0);
+
+   // Fees past the policy's caps are refused before anything is signed.
+   expect_policy_rejection(
+      [&] { inbound.resend_epoch_in(submission, {.max_priority_fee_per_gas = 11, .max_fee_per_gas = 100}); });
+   BOOST_CHECK_EQUAL(client->broadcast_count, 1u);
+   BOOST_CHECK_EQUAL(sign_count.load(), 1u);
 }
 
 BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
@@ -627,9 +676,11 @@ BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
    uint32_t    epoch_index = 1;
    std::string envelope = "01";
    const auto  deadline = fc::time_point::now() + fc::seconds(receipt_deadline_seconds);
-   expect_policy_rejection([&] { inbound.epoch_in(epoch_index, envelope, 1000, deadline); });
+   sysio::epoch_in_submission submission;
+   expect_policy_rejection([&] { inbound.epoch_in(epoch_index, envelope, 1000, deadline, submission); });
+   BOOST_CHECK(!submission.send_attempted);
    client->receipt_response = fc::mutable_variant_object("status", "0x1")("blockNumber", "0x10")("logs", fc::variants{});
-   const auto receipt = inbound.epoch_in(epoch_index, envelope, 999, deadline);
+   const auto receipt = inbound.epoch_in(epoch_index, envelope, 999, deadline, submission);
    BOOST_CHECK_EQUAL(receipt.block_number, fc::uint256{16});
    BOOST_CHECK(receipt.logs.empty());
    // The budget reached the pre-flight as the gas the call must fit in.
@@ -831,6 +882,97 @@ BOOST_AUTO_TEST_CASE(plugin_startup_rejects_mixed_unified_and_cli_modes) {
        "--outpost-ethereum-client",
        "client-a,signer-a," + startup_test::unused_url() + ",31337"}),
       sysio::chain::plugin_config_exception);
+}
+
+/// CLI clients read at the default confirmation unless the read options say otherwise.
+BOOST_AUTO_TEST_CASE(cli_clients_read_at_the_configured_confirmation) {
+   chain_id_rpc_server rpc_server;
+   const std::string   spec = "client-a,signer-a," + rpc_server.url() + ",31337";
+
+   auto clients = initialize_outpost_plugin({"--outpost-ethereum-client", spec});
+   BOOST_REQUIRE_EQUAL(clients.size(), 1u);
+   auto confirmation = clients.front()->read_confirmation;
+   BOOST_CHECK(confirmation.tag == block_tag_t::latest);
+   BOOST_CHECK_EQUAL(confirmation.confirmations, default_read_confirmations);
+   BOOST_CHECK(confirmation.max_finality_lag == default_max_finality_lag);
+
+   clients = initialize_outpost_plugin({"--outpost-ethereum-client", spec, "--outpost-ethereum-read-confirmations",
+                                        "6", "--outpost-ethereum-read-max-finality-lag-sec", "600"});
+   confirmation = clients.front()->read_confirmation;
+   BOOST_CHECK(confirmation.tag == block_tag_t::latest);
+   BOOST_CHECK_EQUAL(confirmation.confirmations, 6u);
+   BOOST_CHECK(confirmation.max_finality_lag == fc::seconds(600));
+
+   for (const auto tag : {block_tag_t::finalized, block_tag_t::safe}) {
+      clients = initialize_outpost_plugin({"--outpost-ethereum-client", spec, "--outpost-ethereum-read-block-tag",
+                                           fc::network::ethereum::to_string(tag)});
+      BOOST_CHECK(clients.front()->read_confirmation.tag == tag);
+   }
+
+   // A three-field client waiting on chain-id discovery carries it too.
+   clients = initialize_outpost_plugin({"--outpost-ethereum-client", "client-a,signer-a," + rpc_server.url(),
+                                        "--outpost-ethereum-read-block-tag", "safe"});
+   BOOST_CHECK(clients.front()->read_confirmation.tag == block_tag_t::safe);
+}
+
+/// Read options that name no readable confirmation, or a depth beside a tag
+/// that has none, are configuration errors.
+BOOST_AUTO_TEST_CASE(cli_read_options_refuse_what_no_read_can_be_made_at) {
+   const std::string spec = "client-a,signer-a," + startup_test::unused_url() + ",31337";
+   for (const auto& options : std::vector<std::vector<std::string>>{
+           {"--outpost-ethereum-read-block-tag", "bogus"},
+           {"--outpost-ethereum-read-block-tag", "pending"},
+           {"--outpost-ethereum-read-block-tag", "earliest"},
+           {"--outpost-ethereum-read-confirmations", "0"},
+           {"--outpost-ethereum-read-max-finality-lag-sec", "0"},
+           {"--outpost-ethereum-read-block-tag", "safe", "--outpost-ethereum-read-confirmations", "12"},
+           {"--outpost-ethereum-read-block-tag", "finalized", "--outpost-ethereum-read-max-finality-lag-sec", "600"},
+        }) {
+      std::vector<std::string> arguments{"--outpost-ethereum-client", spec};
+      arguments.insert(arguments.end(), options.begin(), options.end());
+      BOOST_CHECK_THROW(initialize_outpost_plugin(arguments), sysio::chain::plugin_config_exception);
+   }
+}
+
+/// A configuration file sets the read confirmation per client, defaulting a
+/// client that leaves it out, and refuses the CLI read options beside it.
+BOOST_AUTO_TEST_CASE(file_configuration_sets_the_read_confirmation_per_client) {
+   fc::temp_directory  directory;
+   chain_id_rpc_server rpc_server_a;
+   chain_id_rpc_server rpc_server_b{ethereum_mainnet_chain_id_quantity};
+   chain_id_rpc_server rpc_server_c;
+   std::string configuration = R"json({
+      "schema_version": 1,
+      "clients": [{
+         "connection": {"client_id": "client-a", "signature_provider_id": "signer-a", "rpc_url": "RPC_URL_A"},
+         "chain_id": 31337,
+         "read_confirmation": {"block_tag": "EVM_READ_BLOCK_TAG_SAFE"}
+      }, {
+         "connection": {"client_id": "client-b", "signature_provider_id": "signer-a", "rpc_url": "RPC_URL_B"},
+         "chain_id": 1,
+         "read_confirmation": {"confirmations": 20}
+      }, {
+         "connection": {"client_id": "client-c", "signature_provider_id": "signer-a", "rpc_url": "RPC_URL_C"},
+         "chain_id": 11155111
+      }]
+   })json";
+   bind_rpc_url(configuration, rpc_url_placeholder_a, rpc_server_a.url());
+   bind_rpc_url(configuration, rpc_url_placeholder_b, rpc_server_b.url());
+   bind_rpc_url(configuration, "RPC_URL_C", rpc_server_c.url());
+   const auto path = write_client_configuration_file(directory, configuration);
+
+   const auto clients = initialize_outpost_plugin({"--outpost-ethereum-client-config-file", path.string()});
+   BOOST_REQUIRE_EQUAL(clients.size(), 3u);
+   BOOST_CHECK(clients[0]->read_confirmation.tag == block_tag_t::safe);
+   BOOST_CHECK(clients[1]->read_confirmation.tag == block_tag_t::latest);
+   BOOST_CHECK_EQUAL(clients[1]->read_confirmation.confirmations, 20u);
+   BOOST_CHECK(clients[1]->read_confirmation.max_finality_lag == default_max_finality_lag);
+   BOOST_CHECK(clients[2]->read_confirmation.tag == block_tag_t::latest);
+   BOOST_CHECK_EQUAL(clients[2]->read_confirmation.confirmations, default_read_confirmations);
+
+   BOOST_CHECK_THROW(initialize_outpost_plugin({"--outpost-ethereum-client-config-file", path.string(),
+                                                "--outpost-ethereum-read-block-tag", "safe"}),
+                     sysio::chain::plugin_config_exception);
 }
 
 BOOST_AUTO_TEST_CASE(outpost_factory_reports_client_configuration_chain_mismatch) {

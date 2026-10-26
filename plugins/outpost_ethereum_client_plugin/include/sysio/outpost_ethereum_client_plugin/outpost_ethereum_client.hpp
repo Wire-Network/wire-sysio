@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <cstdint>
 #include <memory>
 #include <optional>
@@ -250,6 +251,34 @@ std::optional<uint32_t> count_envelope_attestations(const std::vector<char>& env
 /// dropped the type).
 bool is_routable_handler(std::string_view handler_address);
 
+/// What the relay does about an `epochIn` still pending from an earlier tick.
+enum class in_flight_step {
+   /// It pays enough to be included at today's prices: keep waiting.
+   wait,
+   /// Today's base fee and tip leave it less than the market tip: sign it again
+   /// at the same nonce with every fee raised.
+   replace,
+   /// The node holds none of its hashes and nothing at its nonce: send it again
+   /// at the same nonce.
+   rebroadcast
+};
+
+/// Decide what to do about an `epochIn` still pending at its nonce.
+///
+/// @param known_to_node Whether the node still holds a transaction at the nonce.
+/// @param paid          The fees the latest hash signed at the nonce pays.
+/// @param market        The node's fee suggestion now (`ethereum_client::get_gas_config`).
+in_flight_step decide_in_flight(bool known_to_node, const epoch_in_fees& paid,
+                                const ethereum_client::gas_config_t& market);
+
+/// The fees a same-nonce resend pays. A replacement pays at least the market's
+/// fees and raises each of `paid`'s by more than the 10% nodes require of a
+/// replacement; a rebroadcast pays at least `paid` and the market. `nullopt`
+/// when `step` is `wait`, or when the policy's fee caps leave no room.
+std::optional<epoch_in_fees> resend_fees(in_flight_step step, const epoch_in_fees& paid,
+                                         const ethereum_client::gas_config_t& market,
+                                         const ethereum_transaction_policy&   policy);
+
 } // namespace outpost_ethereum_client_detail
 
 /**
@@ -303,11 +332,14 @@ public:
                                          const std::vector<char>& envelope_bytes,
                                          fc::microseconds         deadline) override;
 
+   /// `OPP.getLatestOutboundEnvelope()` at the client's read confirmation (`read_settled_block`): the envelope the
+   /// outpost emitted for `epoch_index`, or empty while the slot holds another epoch.
    std::vector<char> read_inbound_envelope(uint32_t         epoch_index,
                                            fc::microseconds deadline) override;
 
-   /// `OPP.outboundEnvelopes(epoch)` at `finalized`: the checksum the outpost recorded when it emitted that epoch's
-   /// envelope. Throws when the loaded OPP ABI does not declare the view.
+   /// `OPP.outboundEnvelopes(epoch)` at the client's read confirmation (`read_settled_block`): the checksum the
+   /// outpost recorded when it emitted that epoch's envelope. Throws when the loaded OPP ABI does not declare the
+   /// view.
    std::optional<fc::sha256> read_emitted_envelope_digest(uint32_t         epoch_index,
                                                           fc::microseconds deadline) override;
 
@@ -328,6 +360,8 @@ public:
    /// The liq syndication pool the crank drives, `0x`-hex, or empty until the
    /// outpost's `DESYNDICATE_LIQ` handler has been discovered.
    const std::string&               syndication_pool_address()    const { return _syndication_pool_addr; }
+   /// The `epochIn` a receipt wait left pending, until a later tick settles it.
+   const std::optional<epoch_in_submission>& in_flight()           const { return _in_flight; }
    /// Bind the pool wrapper the crank drives to `address`, replacing whatever was
    /// bound. Discovery goes through this; tests bind a wrapper whose
    /// `realize_yield` is a stub.
@@ -352,22 +386,60 @@ private:
    /// the relay pay for the call twice. A backend that does not know the block
    /// yet is retried for a bounded time.
    ///
-   /// Not `finalized` either (unlike `read_inbound_envelope`): finality lags
-   /// head by roughly 64 blocks, and a continuation gated on it would wait that
-   /// out between every stretch of dispatch. A reorg under the read costs a
-   /// paid re-delivery before the tip or a refused continuation after it; a
-   /// send missed because the read was behind is covered by the per-call
-   /// progress invariant and the next tick.
+   /// Not at the read confirmation either (unlike `read_inbound_envelope`):
+   /// the cursor is this relay's own work in progress, and a continuation
+   /// gated on confirmation depth would wait it out between every stretch of
+   /// dispatch. A reorg under the read costs a paid re-delivery before the tip
+   /// or a refused continuation after it; a send missed because the read was
+   /// behind is covered by the per-call progress invariant and the next tick.
    ///
    /// @throws fc::exception on transport failure, deadline expiry, or an
    ///         unparsable response.
-   outpost_ethereum_client_detail::delivery_progress read_progress(uint32_t epoch_index, const fc::uint256& block);
+   outpost_ethereum_client_detail::delivery_progress
+   read_progress(uint32_t epoch_index, const fc::network::ethereum::block_number_or_tag_t& block);
+
+   /// Whether the outpost's state at the read confirmation (`read_settled_block`)
+   /// already shows this relay's part of `epoch_index` done: the epoch closed or
+   /// tipped, or this relay's delivery recorded. The relay reports an epoch
+   /// handled only then, so a delivery a reorg removes is delivered again
+   /// instead of left to the one consensus retry.
+   bool settled_past_delivery(uint32_t epoch_index);
+
+   /// Settle the `epochIn` a receipt wait left pending before anything else is
+   /// sent: find the receipt of any hash signed at its nonce, replace it at that
+   /// nonce when the market priced it out, or send it again when the node no
+   /// longer holds it, then wait for it until `deadline_abs`.
+   ///
+   /// @return The block the call landed in, or `std::nullopt` when the nonce was
+   ///         used by a transaction this relay holds no hash for.
+   /// @throws chain::outpost_delivery_incomplete_exception while it is still
+   ///         pending at the deadline; the submission stays in flight.
+   std::optional<fc::uint256> settle_in_flight(fc::time_point deadline_abs);
+
+   /// Send one `epochIn` at `gas_budget`. A call that may be in the mempool when
+   /// its wait fails (the receipt wait ran out, or the send's outcome is
+   /// unknown) becomes `_in_flight`, reported as
+   /// `chain::outpost_delivery_incomplete_exception`; a node refusal propagates.
+   epoch_in_receipt send_epoch_in(uint32_t epoch_index, const std::string& envelope_hex, uint64_t gas_budget,
+                                  fc::time_point deadline_abs);
 
    /// Read `OPPInbound.pendingConsensusForDigest(digest)` at `block` and decode it.
    /// @throws fc::exception on transport failure, deadline expiry, or an
    ///         unparsable response.
    outpost_ethereum_client_detail::pending_consensus read_pending_consensus(const std::string& digest_word,
                                                                             const fc::uint256& block);
+
+   /// The block the reads of what the outpost emitted are made at, from the
+   /// client's `read_confirmation`. Across a reorg deeper than the shallower of
+   /// two operators' settings the two read different envelopes, and the depot
+   /// slashes whichever delivered the one the group's majority did not; an
+   /// operator reading stronger than its group also delivers after consensus.
+   /// Logs once when finality lag forces the fallback to the finalized block,
+   /// and once when it ends.
+   ///
+   /// @throws fc::exception on transport failure or a node without a head or
+   ///         finalized block.
+   fc::network::ethereum::block_number_or_tag_t read_settled_block();
 
    ethereum_client_entry_ptr                              _entry;
    std::string                                            _opp_addr;
@@ -387,6 +459,13 @@ private:
    /// error is reported once and repeats stay at debug level until the cursor
    /// moves.
    std::optional<std::pair<uint32_t, uint16_t>>           _reported_stall;
+   /// Whether the last `read_settled_block` fell back to the finalized block,
+   /// so the fallback is logged when it starts and ends rather than per read.
+   /// The relay and the underwriter read from different threads.
+   std::atomic<bool>                                      _finality_fallback{false};
+   /// See `in_flight()`. Touched only by `deliver_outbound_envelope`, which the
+   /// relay job runs one call at a time.
+   std::optional<epoch_in_submission>                     _in_flight;
    uint64_t                                               _outpost_id;
    uint32_t                                               _chain_id;
 };

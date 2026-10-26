@@ -135,15 +135,16 @@ bytes; every continuation re-supplies them.
 `epochDeliveries(epoch, self)` and `pendingEpochHash()` read at ONE block number — the head when the tick
 starts, then the block each confirmed call landed in (from its receipt) — never at `latest`, which a
 backend lagging the block that just confirmed could serve from before the call. A backend that does not
-know the block yet is retried for a bounded time. The reads are not at `finalized` either. The cursor is
-the outpost's bookkeeping for work in progress, a reorg under it costs a paid re-delivery before the tip or a
-refused continuation after it, and gating on finality would wait ~64 blocks between continuations.
+know the block yet is retried for a bounded time. The reads are not at the read confirmation (see Inbound
+reads) either. The cursor is the outpost's bookkeeping for work in progress, a reorg under it costs a paid
+re-delivery before the tip or a refused continuation after it, and gating on confirmation depth would wait
+it out between continuations.
 
 From those reads the relay decides, per `outpost_ethereum_client_detail::decide_delivery`:
 
 | Outpost state | Action |
 |---|---|
-| `nextEpochIndex > epoch`, or the spill cursor reports `finalized` | Nothing to send; an EMPTY tx id marks the epoch handled |
+| `nextEpochIndex > epoch`, or the spill cursor reports `finalized` | Nothing to send; an EMPTY tx id marks the epoch handled, once the read confirmation shows it too |
 | `nextEpochIndex < epoch` | The outpost is behind: `outpost_delivery_incomplete_exception`, retried next tick |
 | Tipped and unfinished, and this relay's recorded digest IS `pendingEpochHash` | Continue: re-send the envelope (after checking its `keccak256` is the settled digest) |
 | Tipped and unfinished on a digest this relay did not deliver, or delivered a minority of | Nothing to send; its deliverers carry the continuation |
@@ -176,13 +177,62 @@ exception ends a tick that reaches `MAX_CONTINUATIONS_PER_TICK` (32) calls with 
 Calls are submitted sequentially, one in flight at a time, so the signer's nonce advances in lock-step; a
 mid-sequence failure or deadline abandons the tick, and the next one resumes from the outpost's cursor.
 
+**An epoch is handled only once the read confirmation shows it.** Every return that tells the job the epoch
+is done (nothing to send, the epoch closed, the delivery recorded and awaiting peers, tipped on another
+relay's digest) first reads the outpost again at the read confirmation's block. Unless that read shows the
+epoch closed or tipped, or this relay's delivery recorded, the tick ends in
+`outpost_delivery_incomplete_exception` and the next tick checks again, sending nothing while the head still
+shows the delivery. A delivery that a reorg removes before it is that deep is seen missing at the head on a
+later tick and delivered again, rather than left to the job's one consensus retry.
+
+### In-flight transactions
+
+Each `epochIn` is recorded just before it is sent: its nonce, fees, gas and arguments, and every hash
+signed at that nonce. When its receipt wait runs out, or the send fails in a way that may still have left it
+in the mempool, the call stays **in flight** and the tick ends in `outpost_delivery_incomplete_exception`.
+The next tick settles it before sending anything else, so a slow block is never paid for twice under a
+second nonce:
+
+| What the node reports | What the relay does |
+|---|---|
+| A receipt for any of its hashes | Settled. A reverted one is logged; the relay reads the outpost from the block it landed in and decides what to send |
+| The nonce used, by none of its hashes | Settled; the outpost's state decides |
+| Pending, and at today's base fee it still pays the market tip | Waits for it until the tick's deadline |
+| Pending, and the base fee or the market tip has left it behind | Re-signs it at the same nonce with every fee raised by more than an eighth (nodes refuse a replacement under 10%) and at least the market's, within the transaction policy's caps, then waits for any of its hashes |
+| Neither the hash nor anything at the nonce | Sends it again at the same nonce, at the larger of its fees and the market's |
+
+While it is still pending at the deadline nothing else is sent, and the next tick repeats the check. A
+replacement the caps leave no room for, or one the node refuses, is logged and the original is waited for.
+
 ### Inbound reads
 
-`read_inbound_envelope` makes one `getLatestOutboundEnvelope` view call at the **`finalized`** block tag, not
-`latest`. WIRE consensus on inbound is committed forward against this read, so an operator that read at
-`latest` could reach WIRE-side consensus on a slot that a reorg then removes. The decoded result's epoch is
-compared with the requested one and a mismatch returns an empty vector at debug level, since observing the
-preceding epoch is normal until the `epochIn` that emits this one overwrites the slot.
+`read_inbound_envelope` makes one `getLatestOutboundEnvelope` view call, and `read_emitted_envelope_digest`
+(the underwriter's check) one `outboundEnvelopes(epoch)` call, at the client's **read confirmation**, never
+at the head. WIRE consensus on inbound is committed forward against this read, so an operator that read a
+slot a reorg then removes could reach WIRE-side consensus on it. The decoded result's epoch is compared with
+the requested one and a mismatch returns an empty vector at debug level, since observing the preceding epoch
+is normal until the `epochIn` that emits this one overwrites the slot.
+
+The read confirmation is one of:
+
+| Setting | Read at | Mainnet wait after the outpost emits |
+|---|---|---|
+| `latest` with N confirmations (default: 12) | The block N-1 below the head, or the finalized block when that is fresher | N x 12 s (about 2.4 min for 12) |
+| `finalized` | The `finalized` tag | 13 to 19 min |
+| `safe` | The `safe` tag (the justified checkpoint) | 6.6 to 12.8 min |
+
+With `latest`, while the finalized block's timestamp trails the head's by more than the finality-lag limit
+(default 1152 s, three mainnet epochs), reads are made at the finalized block instead. A chain that has
+stopped finalizing is a chain on which a reorg deeper than the confirmation depth can happen, and the
+fallback turns that into a stall rather than a read the chain may take back. The fallback is logged at
+warning level when it starts and at info level when it ends.
+
+**Each operator chooses its own read confirmation, and bears the consequences.** Consensus is what the group's
+majority delivers. An operator reading weaker than its group delivers first, and across a reorg deeper than
+its setting can deliver an envelope the chain no longer holds and be slashed for it. One reading stronger
+delivers after the group has reached consensus, so its delivery is a no-op recorded as a miss each epoch; and
+across a reorg deeper than the group's setting, the group's envelope is the canonical one and it is the
+minority. Reading as the group does is the setting that avoids both.
 
 ### Outpost cranks
 
@@ -257,14 +307,21 @@ For per-client expenditure limits, replace `--outpost-ethereum-client` with
       "max_fee_per_gas_wei": "120000000000",
       "max_gas_limit": "16000000",
       "max_total_native_cost_wei": "2000000000000000000"
+    },
+    "read_confirmation": {
+      "block_tag": "EVM_READ_BLOCK_TAG_LATEST",
+      "confirmations": 12,
+      "max_finality_lag_sec": 1152
     }
   }]
 }
 ```
 
 A client with no `transaction_policy` runs under the maximum policy — the same posture every CLI-configured
-client gets. Key material never appears in this document; it stays in the separately configured signature
-provider.
+client gets. A client with no `read_confirmation`, or one that leaves a field out, takes the defaults; a
+`confirmations` or `max_finality_lag_sec` beside `EVM_READ_BLOCK_TAG_FINALIZED` or `EVM_READ_BLOCK_TAG_SAFE`
+is refused. In this form the `outpost-ethereum-read-*` options are refused. Key material never appears in
+this document; it stays in the separately configured signature provider.
 
 ## Options
 
@@ -278,6 +335,9 @@ Every option is registered in the config-file description, which appbase also ac
 | `outpost-ethereum-additional-ca-file` | unset | PEM CA bundle added to system trust for Ethereum RPC HTTPS requests. |
 | `outpost-ethereum-additional-ca-path` | unset | Hashed CA directory added to system trust for Ethereum RPC HTTPS requests. |
 | `outpost-ethereum-proxy` | unset | Explicit proxy URL for Ethereum RPC HTTP requests. |
+| `outpost-ethereum-read-block-tag` | `latest` | Read confirmation for the `outpost-ethereum-client` clients: `finalized`, `safe` or `latest`. See Inbound reads. |
+| `outpost-ethereum-read-confirmations` | `12` | With `latest`: how many blocks deep the read is, the head counting as one. Refused with another tag. |
+| `outpost-ethereum-read-max-finality-lag-sec` | `1152` | With `latest`: how far the finalized block may trail the head before reads fall back to it. Refused with another tag. |
 
 No option is marked deprecated in the source.
 
@@ -295,7 +355,8 @@ Startup and configuration:
 
 - `Loading ABI file: <path>` per ABI file, and `Already registered ABI file: <path>` at warning level for a
   repeated path.
-- `Added Ethereum client (id=...,endpoint=...,chain_id=...)` per successfully constructed client.
+- `Added Ethereum client (id=...,endpoint=...,chain_id=...,read_confirmation=...)` per successfully
+  constructed client.
 - `Starting outpost Ethereum client plugin` / `Shutdown outpost Ethereum client plugin`.
 - `Rejected Ethereum client configuration (reason_code=...,field=...,observed=...,allowed=...)` at error
   level when client configuration fails validation, then rethrown so the node does not start. Policy-value
@@ -315,6 +376,13 @@ Per-client runtime lines are prefixed with the SPI label `outpost_ethereum_clien
   no funding carries the attestation there; `still open after N calls in one tick` at warning level when
   the per-tick bound is reached.
 - `read inbound envelope epoch=... bytes=...` after a successful inbound read.
+- `the finalized block trails the head by N s, more than the L s limit; reading at the finalized block` at
+  warning level when finality lag starts the fallback, and `finality caught up` at info level when it ends.
+- `epoch=... is done at the head but not yet at the read confirmation; checking again next tick` while an
+  epoch waits to be reported handled.
+- `epochIn for epoch=... at nonce N was sent without a receipt`, `in-flight epochIn ... landed in block`,
+  `replace|rebroadcast the in-flight epochIn ... at nonce N` and `is still pending (K hashes); nothing more is
+  sent until it lands` for a call left in flight.
 - Warning-level lines for every malformed view result (`latestOutboundEnvelope data_ not a string` and
   siblings); an epoch mismatch on the inbound slot stays at debug level so steady-state polling is not
   noisy.
@@ -336,13 +404,16 @@ delivery path — one call, tip-and-spill continued in the same tick, resume fro
 and never-delivered digests, consensus retry gated on the outpost's own majority view, pinned-block reads,
 escalation after a call that advanced nothing and the stall report at the ceiling, revert classification,
 outpost behind, the per-tick bound, epoch advanced, deadline abandonment, and the empty and over-cap
-rejections — and the outpost crank: idle without the pool ABI or a registered handler, binding the
+rejections — the read confirmation (each tag, the depth, the finalized block when fresher, the finality-lag
+fallback and its boundary, refusals), an epoch reported handled only once the read confirmation shows it, an
+in-flight call that lands, reverts, waits, is replaced, is re-broadcast or loses its nonce, the replacement
+fees — and the outpost crank: idle without the pool ABI or a registered handler, binding the
 registered pool and re-binding on a change, the pool's own three refusals, unrecognised reverts and protocol
 errors, and deadline abandonment.
 `outpost_ethereum_transaction_policy_tests` covers the expenditure-policy boundary: that a rejection happens
 before signing or broadcasting, that exact caps pass through once, that two clients enforce their own
-policies, that file and CLI configuration produce the expected policies, and that a partial client map is
-never published. No test dials a public endpoint.
+policies, that file and CLI configuration produce the expected policies and read confirmations, that a
+re-signed `epochIn` keeps its nonce inside the policy, and that a partial client map is never published. No test dials a public endpoint.
 
 CTest runs this binary through `tests/run_with_bind_config.cjs`, which keeps platform registry reservations
 alive for the test process. It requires Node and the version-pinned `@wireio/cluster-tool` development
