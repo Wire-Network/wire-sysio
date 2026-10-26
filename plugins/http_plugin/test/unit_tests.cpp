@@ -25,7 +25,7 @@
 #include <future>
 #include <optional>
 
-#include "test_port_shard.hpp"
+#include "test_ports.hpp"
 
 namespace bu = boost::unit_test;
 
@@ -48,15 +48,15 @@ constexpr uint32_t requests_in_flight_index = 4;
 constexpr uint32_t request_body_bytes_in_flight_index = 5;
 constexpr uint32_t category_snapshot_index = 6;
 constexpr uint32_t plaintext_response_index = 7;
-// Keeps unsharded IPv6 probe coverage on the historical port 9999.
+/** Index of the IPv6 probe listener used by the IPv6 tests. */
 constexpr uint32_t ipv6_probe_index = 2;
 
-/** Return the string form of a node HTTP port from this test's shard. */
+/** Return the string form of a node HTTP port from this test's lease. */
 std::string test_http_port(uint32_t index) {
    return std::to_string(sysio::testing::get_port(sysio::testing::port_category::node_http, index));
 }
 
-/** Return host:port with this test's port shard applied. */
+/** Return host:port for a node HTTP port from this test's lease. */
 std::string test_http_endpoint(const std::string& host, uint32_t index) {
    return host + ":" + test_http_port(index);
 }

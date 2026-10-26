@@ -192,6 +192,18 @@ ninja -C $BUILD_DIR unit_test       # Build unit tests
 
 ## Testing Commands
 
+### Test ports
+
+Network tests get their ports from the host's bind registry, shared with wire-tools-ts clusters (protocol:
+wire-tools-ts `docs/bind-registry/README.md`; details: [docs/test-ports.md](docs/test-ports.md)).
+
+- **ctest** wraps every `add_np_test` / `add_lr_test` in `tests/bind_registry.py`, which leases the ports and releases
+  them when the test's whole session has exited.
+- **A Python test run by hand needs nothing**: it leases ports on first use and releases them on exit.
+- **A native test binary run by hand** goes through the wrapper: `python3 tests/bind_registry.py <binary> [args]`.
+- Ask for ports with `Utils.getPort(<category>, index)` (Python) or `sysio::testing::get_port(...)` (C++), never a
+  literal.
+
 ### Run All Parallelizable Tests
 ```bash
 cd $BUILD_DIR && ctest -j "$(nproc)" -LE _tests

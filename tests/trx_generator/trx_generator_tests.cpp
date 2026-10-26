@@ -2,7 +2,7 @@
 #include <trx_generator.hpp>
 #include <http_client_async.hpp>
 #include <simple_rest_server.hpp>
-#include <test_port_shard.hpp>
+#include <test_ports.hpp>
 #include <sysio/net_plugin/protocol.hpp>
 
 #define BOOST_TEST_MODULE trx_generator_tests
@@ -19,6 +19,7 @@
 #include <stdexcept>
 #include <string>
 #include <thread>
+#include <vector>
 
 using namespace sysio;
 using namespace sysio::testing;
@@ -27,57 +28,71 @@ using namespace std::literals::string_literals;
 static const char* api_name = "/v1/chain/test";
 
 namespace {
-/** Restore SYSIO_TEST_PORT_OFFSET after tests that exercise environment parsing. */
-class test_port_offset_env_guard {
+/** Restore SYSIO_TEST_PORTS after tests that exercise lease parsing. */
+class test_ports_env_guard {
  public:
-   test_port_offset_env_guard() {
-      if(const char* value = std::getenv(test_port_offset_env_var))
+   test_ports_env_guard() {
+      if(const char* value = std::getenv(test_ports_env_var))
          _previous = value;
    }
 
-   ~test_port_offset_env_guard() {
+   ~test_ports_env_guard() {
       if(_previous)
-         setenv(test_port_offset_env_var, _previous->c_str(), 1);
+         setenv(test_ports_env_var, _previous->c_str(), 1);
       else
-         unsetenv(test_port_offset_env_var);
+         unsetenv(test_ports_env_var);
    }
 
-   /** Set the current process test port offset for this scoped test. */
-   void set(const char* value) const { setenv(test_port_offset_env_var, value, 1); }
+   /** Set the lease for this scoped test. */
+   void set(const std::string& value) const { setenv(test_ports_env_var, value.c_str(), 1); }
 
-   /** Clear the current process test port offset for this scoped test. */
-   void clear() const { unsetenv(test_port_offset_env_var); }
+   /** Clear the lease for this scoped test. */
+   void clear() const { unsetenv(test_ports_env_var); }
 
  private:
    std::optional<std::string> _previous;
 };
 
+/** Each category's expected slots; must match `Utils.getPort` in tests/TestHarness/testUtils.py. */
 struct expected_port {
    port_category category;
    uint32_t      slot;
    uint32_t      count;
-   uint16_t      unsharded_base;
 };
 
 constexpr std::array expected_ports{
-    expected_port{port_category::ship, compact_ship_slot, 1, 7899},
-    expected_port{port_category::state_history, compact_state_history_slot, 1, default_state_history_port},
-    expected_port{port_category::bios_http, compact_bios_http_slot, 1, 8788},
-    expected_port{port_category::bios_p2p, compact_bios_p2p_slot, 1, compact_bios_p2p_port},
-    expected_port{port_category::node_http, compact_http_slot, compact_http_last_port - compact_http_first_port + 1,
-                  compact_http_first_port},
-    expected_port{port_category::alternate_service, compact_alternate_service_slot, 1, 8976},
-    expected_port{port_category::plugin_http_peer, compact_plugin_http_peer_slot, 1, 9009},
-    expected_port{port_category::plugin_http_local, compact_plugin_http_local_slot, 1, 9011},
-    expected_port{port_category::alternate_p2p, compact_alternate_p2p_slot,
-                  compact_alternate_last_port - compact_alternate_first_port + 1, compact_alternate_first_port},
-    expected_port{port_category::p2p, compact_p2p_slot, compact_p2p_last_port - compact_p2p_first_port + 1,
-                  compact_p2p_first_port},
-    expected_port{port_category::wallet, compact_wallet_base_slot, wallet_port_count, compact_wallet_first_port},
-    expected_port{port_category::transaction_only, compact_transaction_only_slot, transaction_only_port_count,
-                  compact_transaction_only_first_port},
-    expected_port{port_category::ipv6_probe, compact_ipv6_probe_slot,
-                  compact_ipv6_probe_last_port - compact_ipv6_probe_first_port + 1, compact_ipv6_probe_first_port}};
+    expected_port{port_category::ship, 0, 1},
+    expected_port{port_category::state_history, 1, 1},
+    expected_port{port_category::bios_http, 2, 1},
+    expected_port{port_category::node_http, 3, 88},
+    expected_port{port_category::alternate_service, 91, 1},
+    expected_port{port_category::plugin_http_peer, 92, 1},
+    expected_port{port_category::plugin_http_local, 93, 1},
+    expected_port{port_category::bios_p2p, 94, 1},
+    expected_port{port_category::alternate_p2p, 95, 46},
+    expected_port{port_category::p2p, 141, 23},
+    expected_port{port_category::wallet, 164, 5},
+    expected_port{port_category::transaction_only, 169, 2},
+    expected_port{port_category::ipv6_probe, 171, 4}};
+
+/** The lease this test was started with; fails the test when it runs without one. */
+std::vector<uint16_t> require_lease() {
+   const char* lease = std::getenv(test_ports_env_var);
+   BOOST_REQUIRE_MESSAGE(lease != nullptr, "run through ctest or `python3 tests/bind_registry.py`");
+   return parse_test_ports(lease);
+}
+
+/** Join ports into a SYSIO_TEST_PORTS value. */
+std::string join_ports(const std::vector<uint32_t>& ports) {
+   std::string joined;
+   for(const auto port : ports)
+      joined += (joined.empty() ? "" : ",") + std::to_string(port);
+   return joined;
+}
+
+/** Leased P2P slots of the provider tests' local peers (slot 0 is the constructor test's address). */
+constexpr uint32_t handshake_test_p2p_index = 1;
+constexpr uint32_t write_failure_test_p2p_index = 2;
 
 constexpr int16_t expected_trx_generator_handshake_generation = 1;
 constexpr int16_t expected_trx_generator_response_handshake_generation = 2;
@@ -235,6 +250,32 @@ struct mock_trx_generator {
    }
 };
 
+/** A mock generator whose send number `late_call` takes `delay` to return. */
+struct late_mock_trx_generator {
+   std::vector<fc::time_point> _calls;
+   size_t _late_call;
+   std::chrono::microseconds _delay;
+
+   bool setup() { return true; }
+   bool tear_down() { return true; }
+   bool stop_on_trx_fail() { return false; }
+
+   bool generate_and_send() {
+      _calls.push_back(fc::time_point::now());
+      if (_calls.size() - 1 == _late_call)
+         std::this_thread::sleep_for(_delay);
+      return true;
+   }
+
+   late_mock_trx_generator(size_t expected_num_calls, size_t late_call, std::chrono::microseconds delay)
+       : _late_call(late_call), _delay(delay) {
+      _calls.reserve(expected_num_calls);
+   }
+};
+
+// fc::time_point::now() is the wall clock, so timing checks allow it to step back by this much.
+constexpr int64_t wall_clock_tolerance_us = 2000;
+
 BOOST_AUTO_TEST_SUITE(trx_generator_tests)
 
 BOOST_AUTO_TEST_CASE(tps_short_run_low_tps)
@@ -242,25 +283,64 @@ BOOST_AUTO_TEST_CASE(tps_short_run_low_tps)
    constexpr uint32_t test_duration_s = 5;
    constexpr uint32_t test_tps = 5;
    constexpr uint32_t expected_trxs = test_duration_s * test_tps;
-   constexpr uint64_t expected_runtime_us = test_duration_s * 1000000;
-   constexpr uint64_t allowable_runtime_deviation_per = 20;
-   constexpr uint64_t allowable_runtime_deviation_us = expected_runtime_us / allowable_runtime_deviation_per;
-   constexpr int64_t minimum_runtime_us = expected_runtime_us - allowable_runtime_deviation_us;
-   constexpr int64_t maximum_runtime_us = expected_runtime_us + allowable_runtime_deviation_us;
+   constexpr int64_t interval_us = std::chrono::microseconds(1s).count() / test_tps;
 
    std::shared_ptr<mock_trx_generator> generator = std::make_shared<mock_trx_generator>(expected_trxs);
    std::shared_ptr<simple_tps_monitor> monitor = std::make_shared<simple_tps_monitor>(expected_trxs);
 
    trx_tps_tester<mock_trx_generator, simple_tps_monitor> t1(generator, monitor, {test_duration_s, test_tps});
 
-   fc::time_point start = fc::time_point::now();
-   t1.run();
-   fc::time_point end = fc::time_point::now();
-   fc::microseconds runtime_us = end.time_since_epoch() - start.time_since_epoch();
-
+   BOOST_REQUIRE(t1.run());
    BOOST_REQUIRE_EQUAL(generator->_calls.size(), expected_trxs);
-   BOOST_REQUIRE_GT(runtime_us.count(), minimum_runtime_us);
-   BOOST_REQUIRE_LT(runtime_us.count(), maximum_runtime_us);
+   BOOST_REQUIRE_EQUAL(monitor->_calls.size(), expected_trxs);
+   const auto start = monitor->_calls.front().start_time;
+   for (uint32_t index = 0; index < expected_trxs; ++index) {
+      const auto& stats = monitor->_calls[index];
+      // Send k is due at start + k intervals (anchored, so a late send does not shift the rest; see
+      // tps_catches_up_after_late_send). Being late is the scheduler's business; being early is a bug.
+      BOOST_CHECK_EQUAL((stats.start_time - start).count(), 0);
+      BOOST_CHECK_EQUAL(stats.trx_interval.count(), interval_us);
+      BOOST_CHECK_EQUAL((stats.next_run - start).count(), (index + 1) * interval_us);
+      BOOST_CHECK_EQUAL((stats.expected_end_time - start).count(), test_duration_s * std::chrono::microseconds(1s).count());
+      BOOST_CHECK_EQUAL(stats.trxs_sent, index + 1);
+      BOOST_CHECK_EQUAL(stats.trxs_left, expected_trxs - index - 1);
+      BOOST_CHECK_GE((generator->_calls[index] - start).count(), index * interval_us - wall_clock_tolerance_us);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(tps_catches_up_after_late_send)
+{
+   constexpr uint32_t test_duration_s = 2;
+   constexpr uint32_t test_tps = 5;
+   constexpr uint32_t expected_trxs = test_duration_s * test_tps;
+   constexpr int64_t interval_us = std::chrono::microseconds(1s).count() / test_tps;
+   constexpr uint32_t late_call = 1;
+   constexpr int64_t late_intervals = 4;
+
+   // Send 1 takes 4 intervals, so sends 2..4 are already overdue when they come up: an anchored schedule sends them
+   // without sleeping (negative time to next) instead of pushing every later send back by 4 intervals.
+   auto generator = std::make_shared<late_mock_trx_generator>(expected_trxs, late_call,
+                                                              std::chrono::microseconds(late_intervals * interval_us));
+   auto monitor = std::make_shared<simple_tps_monitor>(expected_trxs);
+   trx_tps_tester<late_mock_trx_generator, simple_tps_monitor> t1(generator, monitor, {test_duration_s, test_tps});
+
+   BOOST_REQUIRE(t1.run());
+   BOOST_REQUIRE_EQUAL(generator->_calls.size(), expected_trxs);
+   BOOST_REQUIRE_EQUAL(monitor->_calls.size(), expected_trxs);
+   const auto start = monitor->_calls.front().start_time;
+   for (uint32_t index = late_call; index < late_call + late_intervals - 1; ++index) {
+      BOOST_TEST_CONTEXT("send " << index) {
+         BOOST_CHECK_EQUAL((monitor->_calls[index].next_run - start).count(), (index + 1) * interval_us);
+         // The monitor sees each send's time to next one send later.
+         BOOST_CHECK_LT(monitor->_calls[index + 1].time_to_next_trx_us, 0);
+      }
+   }
+   for (uint32_t index = 0; index < expected_trxs; ++index) {
+      BOOST_CHECK_GE((generator->_calls[index] - start).count(), index * interval_us - wall_clock_tolerance_us);
+   }
+   // The overdue sends go out back to back: together they take less than one interval.
+   BOOST_CHECK_LT((generator->_calls[late_call + late_intervals - 1] - generator->_calls[late_call + 1]).count(),
+                  interval_us);
 }
 
 BOOST_AUTO_TEST_CASE(tps_short_run_high_tps)
@@ -512,52 +592,50 @@ BOOST_AUTO_TEST_CASE(tps_cant_keep_up_monitored)
    BOOST_REQUIRE_LT(generator->_calls.size(), expected_trxs);
 }
 
-BOOST_AUTO_TEST_CASE(test_port_shard_unsharded_defaults)
+BOOST_AUTO_TEST_CASE(test_ports_category_slots)
 {
-   test_port_offset_env_guard env;
-   env.clear();
-
+   const auto ports = require_lease();
    for(const auto& expected : expected_ports) {
-      BOOST_REQUIRE_EQUAL(get_port(expected.category), expected.unsharded_base);
-      BOOST_REQUIRE_EQUAL(get_port(expected.category, expected.count - 1),
-                          expected.unsharded_base + expected.count - 1);
+      BOOST_TEST_CONTEXT("slot " << expected.slot) {
+         BOOST_REQUIRE_EQUAL(slots_of(expected.category).start, expected.slot);
+         BOOST_REQUIRE_EQUAL(slots_of(expected.category).count, expected.count);
+         BOOST_REQUIRE_EQUAL(get_port(expected.category), ports.at(expected.slot));
+         BOOST_REQUIRE_EQUAL(get_port(expected.category, expected.count - 1),
+                             ports.at(expected.slot + expected.count - 1));
+      }
    }
 }
 
-BOOST_AUTO_TEST_CASE(test_port_shard_sharded_offsets)
+BOOST_AUTO_TEST_CASE(test_ports_rejects_invalid_indices)
 {
-   test_port_offset_env_guard env;
-   env.set("100");
-
-   constexpr uint32_t offset = 100;
-   for(const auto& expected : expected_ports) {
-      BOOST_REQUIRE_EQUAL(get_port(expected.category), compact_shard_anchor_port + offset + expected.slot);
-      BOOST_REQUIRE_EQUAL(get_port(expected.category, expected.count - 1),
-                          compact_shard_anchor_port + offset + expected.slot + expected.count - 1);
-   }
-}
-
-BOOST_AUTO_TEST_CASE(test_port_shard_rejects_invalid_indices)
-{
-   test_port_offset_env_guard env;
-   env.set("100");
-
+   require_lease();
    for(const auto& expected : expected_ports) {
       BOOST_REQUIRE_THROW(get_port(expected.category, expected.count), std::runtime_error);
    }
 }
 
-BOOST_AUTO_TEST_CASE(test_port_shard_rejects_invalid_offsets)
+BOOST_AUTO_TEST_CASE(test_ports_parses_leases)
 {
-   test_port_offset_env_guard env;
-
-   for(const char* value : {"-1", "+1", " 1", "1 ", "1_000"}) {
-      env.set(value);
-      BOOST_REQUIRE_THROW(test_port_offset(), std::runtime_error);
+   BOOST_REQUIRE((parse_test_ports("20000") == std::vector<uint16_t>{20000}));
+   BOOST_REQUIRE((parse_test_ports("20000,20001,20002") == std::vector<uint16_t>{20000, 20001, 20002}));
+   for(const char* invalid : {"", ",", "20000,", ",20000", "20000,,20001", "0", "65536", "-1", "+1", " 1", "1 ",
+                              "abc", "20000,20002", "20001,20000", "20000,20000"}) {
+      BOOST_TEST_CONTEXT("lease '" << invalid << "'") {
+         BOOST_REQUIRE_THROW(parse_test_ports(invalid), std::runtime_error);
+      }
    }
+}
 
-   env.set("60000");
-   BOOST_REQUIRE_THROW(get_port(port_category::ipv6_probe, 3), std::runtime_error);
+BOOST_AUTO_TEST_CASE(test_ports_requires_a_lease)
+{
+   test_ports_env_guard env;
+   env.clear();
+   BOOST_REQUIRE_THROW(get_port(port_category::p2p), std::runtime_error);
+
+   // A lease too short for a category's slots is refused rather than read out of range.
+   env.set(join_ports({20000, 20001}));
+   BOOST_REQUIRE_EQUAL(get_port(port_category::state_history), 20001);
+   BOOST_REQUIRE_THROW(get_port(port_category::bios_http), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(trx_generator_constructor)
@@ -579,8 +657,8 @@ BOOST_AUTO_TEST_CASE(trx_generator_constructor)
 BOOST_AUTO_TEST_CASE(p2p_provider_sends_handshake_on_setup)
 {
    boost::asio::io_context io;
-   boost::asio::ip::tcp::acceptor acceptor(io, {boost::asio::ip::tcp::v4(), 0});
-   const uint16_t port = acceptor.local_endpoint().port();
+   const uint16_t port = get_port(port_category::p2p, handshake_test_p2p_index);
+   boost::asio::ip::tcp::acceptor acceptor(io, {boost::asio::ip::address_v4::loopback(), port});
 
    const chain::chain_id_type chain_id{std::string(expected_trx_generator_chain_id)};
    const auto lib_id = fc::variant(std::string(expected_trx_generator_lib_id)).as<chain::block_id_type>();
@@ -652,8 +730,8 @@ BOOST_AUTO_TEST_CASE(p2p_provider_sends_handshake_on_setup)
 BOOST_AUTO_TEST_CASE(p2p_provider_write_failure_does_not_ack_transaction)
 {
    boost::asio::io_context io;
-   boost::asio::ip::tcp::acceptor acceptor(io, {boost::asio::ip::tcp::v4(), 0});
-   const uint16_t port = acceptor.local_endpoint().port();
+   const uint16_t port = get_port(port_category::p2p, write_failure_test_p2p_index);
+   boost::asio::ip::tcp::acceptor acceptor(io, {boost::asio::ip::address_v4::loopback(), port});
 
    const chain::chain_id_type chain_id{std::string(expected_trx_generator_chain_id)};
    const auto lib_id = fc::variant(std::string(expected_trx_generator_lib_id)).as<chain::block_id_type>();
