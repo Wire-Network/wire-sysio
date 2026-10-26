@@ -29,8 +29,8 @@ page and queue a signed block update, with one and with two read-only threads, o
 read-exclusive queue the plugin schedules its reads on. The update must remain excluded through
 capture; worker evaluation of owned bytes then returns the old state and the next query returns the
 new state. A deterministic capture timeout must leave subsequent block application live. Startup
-guards reject zero read-only threads and a `query-max-capture-ms` above producer_plugin's read-only
-transaction time.
+guards reject a `query-max-capture-ms` above producer_plugin's read-only transaction time; a node
+without read-only threads starts and fails every query with STATE_UNAVAILABLE.
 
 `query_application_representative_workload` reports native capture microseconds, copied bytes,
 accounted capture memory, configured admitted memory, total concurrent HTTP latency, scanned rows

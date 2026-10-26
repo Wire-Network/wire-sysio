@@ -20,9 +20,10 @@ public:
    ~query_engine_plugin();
    /// Register immutable query-* limits for config.ini and CLI.
    void set_program_options(options_description&, options_description&) override;
-   /// Validate options and reject configured block producers.
+   /// Validate and keep the query-* options.
    void plugin_initialize(const variables_map&);
-   /// Start the query service; register a route only if HTTP and its chain_ro category are enabled.
+   /// Start the query service; register a route only if HTTP and its chain_ro category are enabled. Without
+   /// read-only threads every query fails with STATE_UNAVAILABLE.
    void plugin_startup();
    /// Return the shared C++ API, or nullptr before startup/after shutdown. Retained services reject calls after stop.
    std::shared_ptr<query_engine::query_service> get_query_service() const;
