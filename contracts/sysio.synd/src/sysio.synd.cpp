@@ -113,7 +113,10 @@ constexpr std::string_view desynd_budget_message = "desyndication exceeds the cu
 constexpr std::string_view min_desynd_config_message =
    "minimum desyndication must be positive and fit the burst and asset range";
 constexpr std::string_view min_desynd_quantity_message = "quantity is below the minimum desyndication";
+constexpr std::string_view desynd_max_fee_message = "desyndication fee exceeds max_fee";
 constexpr std::string_view desynd_net_message    = "desyndication net of the fee must be positive";
+constexpr std::string_view desynd_fee_flat_message =
+   "flat desyndication fee must fit an asset and be below the minimum desyndication";
 
 /// Diagnostic path names of the intake actions.
 constexpr std::string_view onsynd_path   = "onsynd";
@@ -396,6 +399,32 @@ uint64_t take_bounty(name self, sysio::slug_name token_code, symbol_code sym, ui
 /// because `setconfig` bounds `bps` by the denominator.
 uint64_t fee_of(uint64_t amount, uint32_t bps) {
    return static_cast<uint64_t>(static_cast<uint128_t>(amount) * bps / bond::BPS_DENOMINATOR);
+}
+
+/// The desyndication fee on `quantity` under `config`: the basis-point part, `fee_of(quantity,
+/// desynd_fee_bps)`, plus the flat `desynd_fee_flat`, which covers the external-chain gas of the round trip.
+/// The basis-point part is at most `quantity` and `setconfig` bounds the flat part by the asset range, so
+/// with `quantity` within the asset range the sum stays below 2^63 and cannot wrap. The fee may reach or
+/// exceed `quantity` (at a high basis-point rate); the caller refuses that.
+uint64_t desynd_fee_of(const synd::synd_config& config, uint64_t quantity) {
+   return fee_of(quantity, config.desynd_fee_bps) + config.desynd_fee_flat;
+}
+
+/// Resolve the pair and validate the gross quantity identically for quotes and execution.
+synd::synd_config assert_desynd_config(name self, slug_name chain_code, slug_name token_code, uint64_t quantity) {
+   check(quantity > 0 && quantity <= max_asset_amount, quantity_message.data());
+   const auto config = synd::syndconfig_t(self).try_get(
+      synd::config_key{.chain_code = chain_code.value, .token_code = token_code.value});
+   check(config.has_value(), desynd_unset_message.data());
+   check(quantity >= config->min_desyndicate, min_desynd_quantity_message.data());
+   return *config;
+}
+
+/// Validate a positive net and calculate the same fee/net pair for quotes and execution.
+synd::desynd_quote assert_desynd_fee(const synd::synd_config& config, uint64_t quantity) {
+   const uint64_t fee = desynd_fee_of(config, quantity);
+   check(fee < quantity, desynd_net_message.data());
+   return {.fee = fee, .net = quantity - fee};
 }
 
 /// The key of the bucket of `(chain_code, token_code, direction)`.
@@ -1144,7 +1173,7 @@ void synd::closeenv(sysio::slug_name chain_code, uint32_t epoch_index, checksum2
 void synd::setconfig(sysio::slug_name chain_code, sysio::slug_name token_code, uint32_t synd_fee_bps,
                      uint32_t desynd_fee_bps, uint64_t synd_burst, uint64_t synd_refill, uint64_t desynd_burst,
                      uint64_t desynd_refill, uint32_t window_sec, uint64_t bounty, uint64_t challenge_extra,
-                     uint64_t min_desyndicate) {
+                     uint64_t min_desyndicate, uint64_t desynd_fee_flat) {
    require_auth(SYSTEM_ACCOUNT);
    check(outpost_kind(chain_code).has_value(), not_outpost_message.data());
    const auto st = liq::find_stat_by_token(LIQ_ACCOUNT, token_code);
@@ -1159,6 +1188,8 @@ void synd::setconfig(sysio::slug_name chain_code, sysio::slug_name token_code, u
    syndconfig_t configs(get_self());
    check(min_desyndicate > 0 && min_desyndicate <= max_asset_amount &&
          (desynd_burst == 0 || min_desyndicate <= desynd_burst), min_desynd_config_message.data());
+   // Below the minimum, so a minimum-size desyndication nets at least one base unit at 0 bps.
+   check(desynd_fee_flat <= max_asset_amount && desynd_fee_flat < min_desyndicate, desynd_fee_flat_message.data());
    configs.set(ram_payer, config_key{.chain_code = chain_code.value, .token_code = token_code.value},
                synd_config{
                   .chain_code      = chain_code,
@@ -1173,6 +1204,7 @@ void synd::setconfig(sysio::slug_name chain_code, sysio::slug_name token_code, u
                   .bounty          = bounty,
                   .challenge_extra = challenge_extra,
                   .min_desyndicate = min_desyndicate,
+                  .desynd_fee_flat = desynd_fee_flat,
                });
 }
 
@@ -1427,7 +1459,11 @@ void synd::linkswept(name account, ChainKind chain_kind, std::vector<char> pubke
 //  Desyndication
 // ---------------------------------------------------------------------------
 
-void synd::desyndicate(name holder, asset quantity) {
+synd::desynd_quote synd::quotedesynd(slug_name chain_code, slug_name token_code, uint64_t quantity) {
+   return assert_desynd_fee(assert_desynd_config(get_self(), chain_code, token_code, quantity), quantity);
+}
+
+void synd::desyndicate(name holder, asset quantity, uint64_t max_fee) {
    require_auth(holder);
    andon::check_clear(andon::ANDON_ACCOUNT);
    check(quantity.is_valid() && quantity.amount > 0, quantity_message.data());
@@ -1443,24 +1479,22 @@ void synd::desyndicate(name holder, asset quantity) {
 
    // The pair's desyndication bucket, ticked to the depot's current epoch, must hold the whole quantity;
    // it drops by the whole quantity, the fee included.
-   syndconfig_t   configs(get_self());
-   const auto     config = configs.try_get(config_key{.chain_code = st.chain_code.value,
-                                                      .token_code = st.token_code.value});
-   check(config.has_value(), desynd_unset_message.data());
    const uint64_t quantity_units = static_cast<uint64_t>(quantity.amount);
-   check(quantity_units >= config->min_desyndicate, min_desynd_quantity_message.data());
+   const auto config = assert_desynd_config(get_self(), st.chain_code, st.token_code, quantity_units);
+   const auto quote = assert_desynd_fee(config, quantity_units);
+   check(quote.fee <= max_fee, desynd_max_fee_message.data());
    bucket_row     bucket = tick_bucket(get_self(), st.chain_code, st.token_code, bucket_direction::DESYNDICATION,
-                                       config->desynd_burst, config->desynd_refill, epoch::current_epoch_index());
+                                       config.desynd_burst, config.desynd_refill, epoch::current_epoch_index());
    check(quantity_units <= bucket.level, desynd_budget_message.data());
    bucket.level -= quantity_units;
    buckets_t(get_self()).set(ram_payer, bucket_key_of(st.chain_code, st.token_code, bucket_direction::DESYNDICATION),
                              bucket);
 
-   // The fee stays in this contract as part of the fee pot; only the rest is burned and released on the
-   // outpost. A fee that rounds to zero leaves the whole quantity to burn.
-   const uint64_t fee    = fee_of(quantity_units, config->desynd_fee_bps);
-   const uint64_t amount = quantity_units - fee;
-   check(amount > 0, desynd_net_message.data());
+   // The fee, basis points plus the flat part, stays in this contract as part of the fee pot; only the rest
+   // is burned and released on the outpost. A zero fee leaves the whole quantity to burn; a fee of the whole
+   // quantity or more leaves nothing to release and is refused before the subtraction.
+   const uint64_t fee    = quote.fee;
+   const uint64_t amount = quote.net;
    // The depot's outstanding shadow once the burn below has run, read from `st` before it: the burn is
    // inline, so nothing has moved supply yet. The net was part of the holder's balance, so it is within
    // the supply and the difference cannot underflow.
