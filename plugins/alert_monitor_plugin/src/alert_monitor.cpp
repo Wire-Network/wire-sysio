@@ -175,13 +175,14 @@ void add_options(bpo::options_description& cfg) {
       "node's --{}, so queries must stay small; each chain read within it is still bounded by --{}, which by default "
       "is the smaller of --{} and the read-only transaction time. Queries share the engine's --{} and --{} with each "
       "other and with HTTP queries; an execution refused as busy is retried within its deadline. Requires --{} and "
-      "plugin = {}, which refuses producer nodes. A query given in config.ini can contain neither # nor a newline, "
-      "and loses trailing spaces and tabs. On the command line they are fine, but the spec must be quoted there, "
-      "because the option takes multiple tokens",
+      "plugin = {}; a node without read-only threads fails every query (counted as {}). A query given in config.ini "
+      "can contain neither # nor a newline, and loses trailing spaces and tabs. On the command line they are fine, "
+      "but the spec must be quoted there, because the option takes multiple tokens",
       query_spec_format, query_name_pattern, fmt::join(reserved_query_names, token_list_separator),
       max_query_block_interval, query_deadline.count(), query_engine::option::timeout_ms,
       query_engine::option::max_capture_ms, query_engine::option::timeout_ms, query_engine::option::worker_threads,
-      query_engine::option::max_in_flight, option::target_url, query_engine_plugin_name);
+      query_engine::option::max_in_flight, option::target_url, query_engine_plugin_name,
+      magic_enum::enum_name(query_engine::error_kind::STATE_UNAVAILABLE));
 
    auto opts = cfg.add_options();
    opts(option::target_url, bpo::value<std::string>(),

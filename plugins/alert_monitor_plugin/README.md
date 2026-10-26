@@ -192,10 +192,10 @@ surface only when the query runs.
 ### Requirements and limits
 
 - **The query engine.** `plugin = sysio::query_engine_plugin` must be enabled whenever a query is configured;
-  startup fails otherwise. The query engine refuses producer nodes (a configured `producer-name`), so queries run
-  only on non-producing nodes. The engine also needs `read-only-threads` above 0 and a read mode other than
-  `speculative`, and fails startup with its own message otherwise. `alert_monitor_plugin` itself does not require
-  the engine and runs on producers with status documents alone.
+  startup fails otherwise. The engine can be configured on any node, but it runs chain reads only on read-only
+  threads: on a node without `read-only-threads` (every producing node) each query fails with `STATE_UNAVAILABLE`
+  and is counted. The engine refuses the `speculative` read mode and fails startup with its own message.
+  `alert_monitor_plugin` itself does not require the engine and runs with status documents alone.
 - **A fixed 1 s deadline.** Every execution has a fixed 1 s overall deadline, the engine's own default, in place
   of the node's `query-timeout-ms`, so queries must stay small. Each chain read within it is still bounded by
   `query-max-capture-ms`, which by default is the smaller of `query-timeout-ms` and the read-only transaction
