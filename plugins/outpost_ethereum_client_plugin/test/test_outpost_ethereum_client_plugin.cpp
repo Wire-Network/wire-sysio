@@ -421,8 +421,12 @@ constexpr uint64_t test_finalized_lag_seconds = 24;
 enum class scripted_send {
    /// Accepted: the node reports the hash of the bytes and holds them.
    accepted,
-   /// Refused with a JSON-RPC error, as a replacement that does not raise every fee enough is.
+   /// Refused as underpriced, as a replacement that does not raise every fee enough is.
    refused,
+   /// Refused for a reason that is not its fees: the signer cannot pay for it.
+   refused_unfunded,
+   /// Refused because the node already holds the bytes.
+   already_known,
    /// Accepted and held, but the response is lost on the way back.
    response_lost
 };
@@ -533,6 +537,14 @@ private:
          if (outcome == scripted_send::refused) {
             throw fc::network::json_rpc::json_rpc_error(test_refused_send_rpc_code,
                                                         "replacement transaction underpriced");
+         }
+         if (outcome == scripted_send::refused_unfunded) {
+            throw fc::network::json_rpc::json_rpc_error(test_refused_send_rpc_code,
+                                                        "insufficient funds for gas * price + value");
+         }
+         if (outcome == scripted_send::already_known) {
+            _script->known_hashes.insert(hash);
+            throw fc::network::json_rpc::json_rpc_error(test_refused_send_rpc_code, "already known");
          }
          _script->known_hashes.insert(hash);
          if (outcome == scripted_send::response_lost) {
@@ -813,9 +825,10 @@ relay_test_stack create_relay_test_stack(ethereum_transaction_policy transaction
 
 /// Stand up a `whole_envelope_delivery_fixture`. The stubs capture it by
 /// reference, so it must not be moved after this returns.
-std::unique_ptr<whole_envelope_delivery_fixture> create_whole_envelope_delivery_fixture() {
+std::unique_ptr<whole_envelope_delivery_fixture>
+create_whole_envelope_delivery_fixture(ethereum_transaction_policy transaction_policy = relay_test_policy()) {
    auto fixture = std::make_unique<whole_envelope_delivery_fixture>();
-   auto stack = create_relay_test_stack();
+   auto stack = create_relay_test_stack(std::move(transaction_policy));
    fixture->tester = std::move(stack.tester);
    fixture->rpc    = stack.rpc;
    fixture->entry  = stack.entry;
@@ -3111,6 +3124,143 @@ BOOST_AUTO_TEST_CASE(a_replacement_refused_all_tick_resumes_above_its_refused_fe
    BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 1u);
 } FC_LOG_AND_RETHROW();
 
+/// Per-gas caps of 1,000 wei, and a total cost that leaves a 21,000-gas
+/// transfer at most 200 wei a gas.
+ethereum_transaction_policy total_cost_bounded_policy() {
+   auto policy                     = relay_test_policy();
+   policy.max_priority_fee_per_gas = 1'000;
+   policy.max_fee_per_gas          = 1'000;
+   policy.max_total_native_cost    = 4'200'000;
+   return policy;
+}
+
+/// A cancel escalates within the policy's total cost, not only its per-gas
+/// caps: 12/113 is refused, then 24/200 (226 a gas would cost more than the
+/// policy allows), and 48/200 is taken, as it would be against a 25/150
+/// holding the nonce.
+BOOST_AUTO_TEST_CASE(a_cancel_escalates_within_the_total_cost_cap) try {
+   auto fixture  = create_whole_envelope_delivery_fixture(total_cost_bounded_policy());
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->rpc->pending_nonce = 1;   // something this relay did not sign holds nonce 0
+   fixture->entry->submissions->unaccounted_nonce_grace = fc::microseconds(0);
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+
+   fixture->rpc->send_outcomes = {scripted_send::refused, scripted_send::refused};
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.size(), 3u);
+   const auto cancel = fixture->only_submission();
+   BOOST_REQUIRE_EQUAL(cancel.attempts.size(), 1u);
+   BOOST_CHECK(cancel.attempts.front().fees.max_priority_fee_per_gas == fc::uint256{48});
+   BOOST_CHECK(cancel.attempts.front().fees.max_fee_per_gas == fc::uint256{200});
+   BOOST_REQUIRE(cancel.refused_fees);
+   BOOST_CHECK(cancel.refused_fees->max_priority_fee_per_gas == fc::uint256{24});
+   BOOST_CHECK(cancel.refused_fees->max_fee_per_gas == fc::uint256{200});
+} FC_LOG_AND_RETHROW();
+
+/// A journaled call's replacement escalates within the same total cost, sized
+/// by its own gas limit: 12/113 is refused, and the next signing raises the
+/// tip and pays the most a gas its limit leaves, short of the 226 doubling.
+BOOST_AUTO_TEST_CASE(a_replacement_escalates_within_the_total_cost_cap) try {
+   auto policy                  = total_cost_bounded_policy();
+   policy.max_total_native_cost = 1'200'000'000;
+   auto fixture  = create_whole_envelope_delivery_fixture(policy);
+   auto envelope = serialize_envelope_with_attestations(test_wire_epoch, 1, 100);
+   fixture->unconfirmed_calls = {1};
+   BOOST_CHECK_THROW(deliver(*fixture, envelope), sysio::chain::outpost_delivery_incomplete_exception);
+   const auto        gas_limit = fixture->only_submission().transaction.gas_limit;
+   const fc::uint256 cap{policy.max_total_native_cost / gas_limit};
+   BOOST_REQUIRE(cap > fc::uint256{113} && cap < fc::uint256{226});
+   // The node holds something at nonce 0, but not the call's hash.
+   fixture->rpc->pending_nonce = 1;
+   fixture->rpc->send_outcomes = {scripted_send::refused};
+
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.size(), 2u);
+   const auto replaced = fixture->only_submission();
+   BOOST_REQUIRE_EQUAL(replaced.attempts.size(), 2u);
+   const auto& fees = replaced.attempts.back().fees;
+   BOOST_CHECK(fees.max_priority_fee_per_gas == fc::uint256{24});
+   BOOST_CHECK(fees.max_fee_per_gas == cap);
+   BOOST_CHECK(fees.max_fee_per_gas * gas_limit <= policy.max_total_native_cost);
+   BOOST_REQUIRE(replaced.refused_fees);
+   BOOST_CHECK(replaced.refused_fees->max_fee_per_gas == fc::uint256{113});
+} FC_LOG_AND_RETHROW();
+
+/// A refusal that is not about fees (here the signer cannot pay) does not move
+/// the floor: the tick stops trying, and once the cause clears the next tick
+/// sends the same cancel at the same fees.
+BOOST_AUTO_TEST_CASE(a_cancel_refused_for_another_reason_is_retried_at_the_same_fees) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->rpc->pending_nonce = 1;   // something this relay did not sign holds nonce 0
+   fixture->entry->submissions->unaccounted_nonce_grace = fc::microseconds(0);
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+
+   fixture->rpc->send_outcomes = {scripted_send::refused_unfunded};
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.size(), 1u);
+   BOOST_CHECK(fixture->outpost->submissions().empty());
+   BOOST_REQUIRE(fixture->entry->submissions->unaccounted_nonce);
+   BOOST_CHECK(!fixture->entry->submissions->unaccounted_nonce->refused_fees);
+
+   // Funded again: the same signing goes through.
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.size(), 2u);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.back(), fixture->rpc->sent_hashes.front());
+   const auto cancel = fixture->only_submission();
+   BOOST_REQUIRE_EQUAL(cancel.attempts.size(), 1u);
+   BOOST_CHECK(cancel.attempts.front().fees.max_priority_fee_per_gas ==
+               fc::uint256{test_scripted_tip + test_scripted_tip / 8 + 1});
+   BOOST_CHECK(!cancel.refused_fees);
+} FC_LOG_AND_RETHROW();
+
+/// A node that answers a re-send with "already known" holds those bytes: the
+/// signing is kept, nothing is counted as refused, and it is waited for.
+BOOST_AUTO_TEST_CASE(a_resend_the_node_already_holds_is_kept_not_refused) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->unconfirmed_calls = {1};
+   BOOST_CHECK_THROW(deliver(*fixture, envelope), sysio::chain::outpost_delivery_incomplete_exception);
+   fixture->rpc->send_outcomes = {scripted_send::already_known};
+
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.size(), 1u);
+   const auto resent = fixture->only_submission();
+   BOOST_REQUIRE_EQUAL(resent.attempts.size(), 2u);
+   BOOST_CHECK_EQUAL(resent.attempts.back().tx_hash, fixture->rpc->sent_hashes.front());
+   BOOST_CHECK(!resent.refused_fees);
+} FC_LOG_AND_RETHROW();
+
+/// Refusals are told apart by the node's message, across the clients' wordings;
+/// anything not positively a fee or a duplicate is neither.
+BOOST_AUTO_TEST_CASE(send_refusals_are_classified_by_the_nodes_message) try {
+   const auto classify = [](std::string_view message) {
+      return sysio::classify_send_refusal(
+         fc::network::json_rpc::json_rpc_error(test_refused_send_rpc_code, std::string(message)));
+   };
+   for (const auto message : {"replacement transaction underpriced", "transaction underpriced",
+                              "max fee per gas less than block base fee: address 0x.., maxFeePerGas: 1, baseFee: 2",
+                              "FeeTooLowToCompete", "ReplacementNotAllowed", "Replacement transaction underpriced",
+                              "Transaction gas price is too low. There is another transaction with same nonce"}) {
+      BOOST_CHECK_MESSAGE(classify(message) == sysio::send_refusal::underpriced, message);
+   }
+   for (const auto message : {"already known", "AlreadyKnown", "Known transaction",
+                              "Transaction with the same hash was already imported."}) {
+      BOOST_CHECK_MESSAGE(classify(message) == sysio::send_refusal::already_known, message);
+   }
+   for (const auto message : {"insufficient funds for gas * price + value", "nonce too low", "intrinsic gas too low",
+                              "upstream connect error", ""}) {
+      BOOST_CHECK_MESSAGE(classify(message) == sysio::send_refusal::other, message);
+   }
+} FC_LOG_AND_RETHROW();
+
 /// The node's nonces are checked before every send, continuations included: a
 /// transaction another sender left pending mid-tick stops the next call.
 BOOST_AUTO_TEST_CASE(nothing_is_sent_behind_a_nonce_another_sender_took_mid_tick) try {
@@ -3159,7 +3309,8 @@ BOOST_AUTO_TEST_CASE(in_flight_decision_and_resend_fees) try {
    BOOST_CHECK(detail::decide_in_flight(true, tipless, tipless_risen) == detail::in_flight_step::replace);
    BOOST_CHECK(detail::decide_in_flight(true, tipless, tipless_calm) == detail::in_flight_step::wait);
 
-   const auto policy = relay_test_policy();
+   const auto& unbounded = maximum_ethereum_transaction_policy_value();
+   const detail::fee_caps policy{.max_priority_fee_per_gas = unbounded, .max_fee_per_gas = unbounded};
    BOOST_CHECK(!detail::resend_fees(detail::in_flight_step::wait, paid, calm, policy));
 
    auto fees = detail::resend_fees(detail::in_flight_step::replace, paid, risen, policy);
@@ -3184,6 +3335,23 @@ BOOST_AUTO_TEST_CASE(in_flight_decision_and_resend_fees) try {
    capped                          = policy;
    capped.max_priority_fee_per_gas = 11;
    BOOST_CHECK(!detail::resend_fees(detail::in_flight_step::replace, paid, calm, capped));
+
+   // The total-cost term is a cap too: 21,000 gas within 4,200,000 wei is at
+   // most 200 a gas, whatever the per-gas caps allow.
+   auto total_bounded = total_cost_bounded_policy();
+   const eip1559_tx transfer{.gas_limit = 21'000, .value = 0};
+   const auto       caps = detail::transaction_fee_caps(total_bounded, transfer);
+   BOOST_CHECK(caps.max_fee_per_gas == fc::uint256{200});
+   BOOST_CHECK(caps.max_priority_fee_per_gas == fc::uint256{200});
+   // The value comes out of the budget first; a value past it leaves nothing.
+   BOOST_CHECK(detail::transaction_fee_caps(total_bounded, {.gas_limit = 21'000, .value = 2'100'000})
+                  .max_fee_per_gas == fc::uint256{100});
+   BOOST_CHECK(detail::transaction_fee_caps(total_bounded, {.gas_limit = 21'000, .value = 5'000'000})
+                  .max_fee_per_gas == fc::uint256{0});
+   // A tighter per-gas cap still binds, and no gas leaves only the per-gas caps.
+   total_bounded.max_priority_fee_per_gas = 50;
+   BOOST_CHECK(detail::transaction_fee_caps(total_bounded, transfer).max_priority_fee_per_gas == fc::uint256{50});
+   BOOST_CHECK(detail::transaction_fee_caps(total_bounded, {.gas_limit = 0}).max_fee_per_gas == fc::uint256{1'000});
 } FC_LOG_AND_RETHROW();
 
 /// The journal's pricing and nonce arithmetic: the baseline across attempts,
@@ -3191,7 +3359,8 @@ BOOST_AUTO_TEST_CASE(in_flight_decision_and_resend_fees) try {
 /// the journal does not account for.
 BOOST_AUTO_TEST_CASE(journal_fee_and_nonce_helpers) try {
    namespace detail = sysio::outpost_ethereum_client_detail;
-   const auto policy = relay_test_policy();
+   const auto& unbounded = maximum_ethereum_transaction_policy_value();
+   const detail::fee_caps policy{.max_priority_fee_per_gas = unbounded, .max_fee_per_gas = unbounded};
 
    const std::vector<sysio::submission_attempt> attempts{
       {.tx_hash = "0x01", .fees = {.max_priority_fee_per_gas = 10, .max_fee_per_gas = 100}},

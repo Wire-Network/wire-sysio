@@ -214,11 +214,20 @@ whole delivery, so only one sender uses the signer's nonces at a time:
 While anything is still pending at the deadline nothing else is sent, and the next tick repeats the check. A
 replacement the caps leave no room for is logged and what was sent is waited for.
 
+Every resend is priced within the transaction's own caps: the policy's per-gas caps, with the fee cap also
+bounded by what `max_total_native_cost` leaves after the value for its gas limit, so a candidate is never
+refused at signing.
+
 An escalating replacement (a cancel, or a call whose nonce something it did not sign holds) doubles each fee
-after a node refuses it, up to the transaction policy's caps. A refused signing never reached a pool, so one
-fee at its cap does not stop the other from rising; the escalation ends only when neither can. A tick tries
-at most `MAX_REPLACEMENT_ESCALATIONS` (8) signings; the highest refused fees are kept, on the submission or on
+after a node refuses it as underpriced, up to those caps. A refused signing never reached a pool, so one fee
+at its cap does not stop the other from rising; the escalation ends only when neither can. A tick tries at
+most `MAX_REPLACEMENT_ESCALATIONS` (8) signings; the highest refused fees are kept, on the submission or on
 the unaccounted nonce's record, and the next tick resumes above them rather than from the market.
+
+Refusals are told apart by the node's message, across the clients' wordings. Only one that says the fees were
+too low raises that floor. Any other (insufficient funds, a backend fault) ends the tick's attempts and leaves
+the floor alone, so the same fees go out again once the cause clears; `already known` means the node holds the
+bytes, and the signing is kept as sent.
 
 The unaccounted-nonce case covers what the journal cannot: a call left pending before a restart, a
 `realizeYield` crank whose wait ran out, or another process signing with the same key. A transaction priced
@@ -434,8 +443,9 @@ journaled call that lands, reverts, waits, is replaced, is re-broadcast, loses i
 read confirmation, comes back after a reorg, or had a replacement whose response was lost, the journal
 surviving a rebuilt relay, an unaccounted nonce waited on and cancelled after a restart (refused cancels
 escalating, and an escalation refused all tick resuming above its refused fees on the next, for a cancel and
-for a replacement), the check before every send, the replacement, cancel, escalation and resume fees, and the
-network hash
+for a replacement), escalation within the total-cost cap for a cancel and for a replacement, a non-fee refusal
+retried at the same fees, a resend the node already holds, the refusal classification, the check before every
+send, the replacement, cancel, escalation and resume fees and the per-transaction caps, and the network hash
 of a signed transaction against foundry's vectors — and the outpost crank: idle without the pool ABI or a registered handler, binding the
 registered pool and re-binding on a change, the pool's own three refusals, unrecognised reverts and protocol
 errors, and deadline abandonment.
@@ -443,7 +453,7 @@ errors, and deadline abandonment.
 before signing or broadcasting, that exact caps pass through once, that two clients enforce their own
 policies, that file and CLI configuration produce the expected policies and read confirmations, that
 signing checks the policy without sending, that a signing's recorded hash survives every send outcome but a
-refusal, and that a partial client map is never published. No test dials a public endpoint.
+refusal (an `already known` included), and that a partial client map is never published. No test dials a public endpoint.
 
 CTest runs this binary through `tests/run_with_bind_config.cjs`, which keeps platform registry reservations
 alive for the test process. It requires Node and the version-pinned `@wireio/cluster-tool` development

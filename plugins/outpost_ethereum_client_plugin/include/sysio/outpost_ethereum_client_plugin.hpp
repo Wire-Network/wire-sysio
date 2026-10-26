@@ -1,7 +1,6 @@
 #pragma once
 
 #include <algorithm>
-#include <cctype>
 #include <functional>
 #include <mutex>
 #include <optional>
@@ -12,7 +11,6 @@
 #include <sysio/outpost_client/outpost_client.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <fc/int256.hpp>
-#include <fc/log/logger.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/network/ethereum/ethereum_client.hpp>
 #include <fc/time.hpp>
@@ -294,36 +292,41 @@ inline constexpr auto block_number = "blockNumber";
 inline constexpr auto logs         = "logs";
 } // namespace ethereum_receipt_field
 
+/// How a node refused to take a transaction, read from its error message: clients phrase the same refusal
+/// differently, and only an underpricing refusal says anything about fees.
+enum class send_refusal {
+   /// The fees were too low: below the pool's floor, below the base fee, or short of what replacing the
+   /// transaction at its nonce needs. Higher fees may be taken.
+   underpriced,
+   /// The node already holds these exact bytes: the signing is held, not refused.
+   already_known,
+   /// Anything else (insufficient funds, a used nonce, a backend fault): higher fees would not help.
+   other
+};
+
+/**
+ * @brief Classify a node's refusal of `eth_sendRawTransaction` by its message.
+ * @param refusal The node's JSON-RPC error.
+ * @return What the refusal says about the transaction; `other` for anything not positively identified.
+ */
+send_refusal classify_send_refusal(const fc::network::json_rpc::json_rpc_error& refusal);
+
 /**
  * @brief Send one signing of `submission` whose attempt is already recorded as its last.
  *
  * A node refusal removes the attempt again, since the node does not hold it; any other failure keeps it,
- * since the node may. A node that reports a different hash for the bytes than the one computed from them is
- * logged, and its hash is recorded too so every wait watches both.
+ * since the node may. A node that already holds the bytes keeps it too. A node that reports a different
+ * hash for the bytes than the one computed from them is logged, and its hash is recorded too so every wait
+ * watches both.
  *
  * @param client     The client that signed it.
  * @param signed_tx  The signed bytes and the hash recorded for them.
  * @param submission The submission the attempt belongs to.
- * @return The hash the node reported.
+ * @return The hash the node reported, or the computed one when the node already held the bytes.
  * @throws fc::network::json_rpc::json_rpc_error when the node refuses the transaction.
  */
-inline std::string send_submission_attempt(ethereum_client& client, const signed_transaction& signed_tx,
-                                           ethereum_submission& submission) {
-   std::string reported;
-   try {
-      reported = client.send_raw_transaction(signed_tx.raw_hex);
-   } catch (const fc::network::json_rpc::json_rpc_error&) {
-      submission.attempts.pop_back();
-      throw;
-   }
-   const auto same_digit = [](unsigned char lhs, unsigned char rhs) { return std::tolower(lhs) == std::tolower(rhs); };
-   if (!std::ranges::equal(reported, signed_tx.tx_hash, same_digit)) {
-      elog("ethereum transaction at nonce {}: the node reported hash {} for the bytes hashing to {}; watching both",
-           submission.transaction.nonce.str(), reported, signed_tx.tx_hash);
-      submission.attempts.push_back({.tx_hash = reported, .fees = submission.attempts.back().fees});
-   }
-   return reported;
-}
+std::string send_submission_attempt(ethereum_client& client, const signed_transaction& signed_tx,
+                                    ethereum_submission& submission);
 
 /// What one `epochIn` left on chain, read from its receipt once it confirmed.
 struct epoch_in_receipt {

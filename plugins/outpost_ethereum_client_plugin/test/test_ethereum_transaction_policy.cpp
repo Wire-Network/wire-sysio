@@ -164,6 +164,8 @@ enum class send_outcome {
    accepted,
    /// Refused: the node answers with a JSON-RPC error.
    refused,
+   /// Refused because the node already holds the bytes.
+   already_known,
    /// Accepted, but the response is lost on the way back.
    response_lost,
    /// Accepted, and the node reports a hash other than the bytes'.
@@ -200,6 +202,8 @@ public:
             return fc::variant(hash);
          case send_outcome::refused:
             throw fc::network::json_rpc::json_rpc_error(refused_send_rpc_code, "replacement transaction underpriced");
+         case send_outcome::already_known:
+            throw fc::network::json_rpc::json_rpc_error(refused_send_rpc_code, "already known");
          case send_outcome::response_lost:
             FC_THROW_EXCEPTION(fc::timeout_exception, "the send's response was lost");
          case send_outcome::misreported:
@@ -655,8 +659,9 @@ BOOST_AUTO_TEST_CASE(epoch_in_waits_for_its_receipt_until_the_given_deadline) {
 }
 
 /// The attempt is recorded before the send: a refusal removes it again and
-/// propagates, a lost response keeps it, and a node that reports another hash
-/// for the bytes has that hash recorded beside the computed one.
+/// propagates, a lost response keeps it, a node that already holds the bytes
+/// keeps it without an error, and a node that reports another hash for the
+/// bytes has that hash recorded beside the computed one.
 BOOST_AUTO_TEST_CASE(a_submission_attempt_survives_every_send_outcome_but_a_refusal) {
    std::atomic<size_t> sign_count = 0;
    const auto provider = make_recording_signer(sign_count);
@@ -690,6 +695,9 @@ BOOST_AUTO_TEST_CASE(a_submission_attempt_survives_every_send_outcome_but_a_refu
    const auto refused = send(send_outcome::refused);
    BOOST_CHECK(refused.refused);
    BOOST_CHECK(refused.submission.attempts.empty());
+   const auto known = send(send_outcome::already_known);
+   BOOST_CHECK(!known.refused);
+   BOOST_CHECK_EQUAL(known.submission.attempts.size(), 1u);
    const auto lost = send(send_outcome::response_lost);
    BOOST_CHECK(!lost.refused);
    BOOST_CHECK_EQUAL(lost.submission.attempts.size(), 1u);

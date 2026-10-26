@@ -1,6 +1,7 @@
 #include <sysio/outpost_ethereum_client_plugin/outpost_ethereum_client.hpp>
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <limits>
 #include <optional>
@@ -165,16 +166,27 @@ ethereum_transaction_fees larger_fees(const ethereum_transaction_fees& lhs, cons
 }
 
 /// `fees` with the fee cap raised to the tip where it was below (EIP-1559 refuses a fee cap below the tip),
-/// or `std::nullopt` when the result is past the policy's caps.
-std::optional<ethereum_transaction_fees> within_policy(ethereum_transaction_fees          fees,
-                                                       const ethereum_transaction_policy& policy) {
+/// or `std::nullopt` when the result is past `caps`.
+std::optional<ethereum_transaction_fees> within_caps(ethereum_transaction_fees fees, const detail::fee_caps& caps) {
    fees.max_fee_per_gas = larger_fee(fees.max_fee_per_gas, fees.max_priority_fee_per_gas);
-   if (fees.max_priority_fee_per_gas > policy.max_priority_fee_per_gas ||
-       fees.max_fee_per_gas > policy.max_fee_per_gas) {
+   if (fees.max_priority_fee_per_gas > caps.max_priority_fee_per_gas || fees.max_fee_per_gas > caps.max_fee_per_gas) {
       return std::nullopt;
    }
    return fees;
 }
+
+/// Lower-cased fragments of the messages execution clients refuse an underpriced transaction with: geth,
+/// erigon, reth, anvil and besu (`replacement transaction underpriced`, `transaction underpriced`), geth's
+/// `max fee per gas less than block base fee`, nethermind (`FeeTooLow`, `FeeTooLowToCompete`,
+/// `ReplacementNotAllowed`) and openethereum (`gas price is too low`).
+constexpr std::array<std::string_view, 6> UNDERPRICED_REFUSAL_FRAGMENTS{
+   "underpriced", "less than block base fee", "fee too low", "feetoolow", "replacementnotallowed",
+   "price is too low"};
+
+/// Lower-cased fragments of the messages clients refuse bytes they already hold with: geth's `already known`,
+/// nethermind's `AlreadyKnown`, besu's `Known transaction` and openethereum's `already imported`.
+constexpr std::array<std::string_view, 4> ALREADY_KNOWN_REFUSAL_FRAGMENTS{
+   "already known", "alreadyknown", "known transaction", "already imported"};
 
 /// How much each fee rises when a node refuses a replacement of a transaction whose fees are unknown.
 /// Doubling reaches any fee within the policy's caps in a few refusals; only the fees of the signing that
@@ -648,9 +660,22 @@ ethereum_transaction_fees highest_fees(const std::vector<submission_attempt>& at
    return highest;
 }
 
+fee_caps transaction_fee_caps(const ethereum_transaction_policy& policy, const eip1559_tx& transaction) {
+   fc::uint256 max_fee = policy.max_fee_per_gas;
+   if (transaction.gas_limit > 0) {
+      const fc::uint256 budget = transaction.value < policy.max_total_native_cost
+                                    ? fc::uint256{policy.max_total_native_cost - transaction.value}
+                                    : fc::uint256{0};
+      const fc::uint256 affordable{budget / transaction.gas_limit};
+      if (affordable < max_fee) max_fee = affordable;
+   }
+   const fc::uint256 tip = policy.max_priority_fee_per_gas < max_fee ? policy.max_priority_fee_per_gas : max_fee;
+   return {.max_priority_fee_per_gas = tip, .max_fee_per_gas = max_fee};
+}
+
 std::optional<ethereum_transaction_fees> resend_fees(in_flight_step step, const ethereum_transaction_fees& paid,
                                                      const ethereum_client::gas_config_t& market,
-                                                     const ethereum_transaction_policy&   policy) {
+                                                     const fee_caps&                      caps) {
    ethereum_transaction_fees fees;
    switch (step) {
    case in_flight_step::wait:
@@ -668,30 +693,26 @@ std::optional<ethereum_transaction_fees> resend_fees(in_flight_step step, const 
       break;
    }
    }
-   return within_policy(fees, policy);
+   return within_caps(fees, caps);
 }
 
 std::optional<ethereum_transaction_fees> cancel_fees(const ethereum_client::gas_config_t& market,
-                                                     const ethereum_transaction_policy&   policy) {
+                                                     const fee_caps&                      caps) {
    const auto tip     = bumped_fee(market.tip);
    const auto max_fee = bumped_fee(market.max_fee_per_gas);
    if (!tip || !max_fee) return std::nullopt;
-   return within_policy({.max_priority_fee_per_gas = *tip, .max_fee_per_gas = *max_fee}, policy);
+   return within_caps({.max_priority_fee_per_gas = *tip, .max_fee_per_gas = *max_fee}, caps);
 }
 
-std::optional<ethereum_transaction_fees> escalated_fees(const ethereum_transaction_fees&   fees,
-                                                        const ethereum_transaction_policy& policy) {
+std::optional<ethereum_transaction_fees> escalated_fees(const ethereum_transaction_fees& fees,
+                                                        const fee_caps&                  caps) {
    const auto raised = [](const fc::uint256& fee, const fc::uint256& cap) {
       if (fee >= cap) return fee;
       return fee > fc::uint256{cap / ESCALATION_FEE_MULTIPLIER} ? cap : fc::uint256{fee * ESCALATION_FEE_MULTIPLIER};
    };
-   // The tip can never exceed the fee cap, so the fee cap's limit bounds it too.
-   const fc::uint256 tip_cap = policy.max_priority_fee_per_gas < policy.max_fee_per_gas
-                                  ? policy.max_priority_fee_per_gas
-                                  : policy.max_fee_per_gas;
    const ethereum_transaction_fees next{
-      .max_priority_fee_per_gas = raised(fees.max_priority_fee_per_gas, tip_cap),
-      .max_fee_per_gas          = raised(fees.max_fee_per_gas, policy.max_fee_per_gas),
+      .max_priority_fee_per_gas = raised(fees.max_priority_fee_per_gas, caps.max_priority_fee_per_gas),
+      .max_fee_per_gas          = raised(fees.max_fee_per_gas, caps.max_fee_per_gas),
    };
    // A refused signing never entered a pool, so the next one has only to beat
    // what holds the nonce: either fee rising is worth another try.
@@ -699,16 +720,16 @@ std::optional<ethereum_transaction_fees> escalated_fees(const ethereum_transacti
        next.max_fee_per_gas <= fees.max_fee_per_gas) {
       return std::nullopt;
    }
-   return within_policy(next, policy);
+   return within_caps(next, caps);
 }
 
 std::optional<ethereum_transaction_fees> resume_fees(const ethereum_transaction_fees&                start,
                                                      const std::optional<ethereum_transaction_fees>& refused,
-                                                     const ethereum_transaction_policy&              policy) {
+                                                     const fee_caps&                                 caps) {
    if (!refused) return start;
-   const auto above = escalated_fees(*refused, policy);
+   const auto above = escalated_fees(*refused, caps);
    if (!above) return std::nullopt;
-   return within_policy(larger_fees(start, *above), policy);
+   return within_caps(larger_fees(start, *above), caps);
 }
 
 std::optional<fc::uint256> first_unaccounted_nonce(const fc::uint256& latest, const fc::uint256& pending,
@@ -724,6 +745,39 @@ std::optional<fc::uint256> first_unaccounted_nonce(const fc::uint256& latest, co
 }
 
 } // namespace outpost_ethereum_client_detail
+
+send_refusal classify_send_refusal(const fc::network::json_rpc::json_rpc_error& refusal) {
+   std::string message = refusal.top_message();
+   std::ranges::transform(message, message.begin(), [](unsigned char c) { return std::tolower(c); });
+   const auto mentions = [&](const auto& fragments) {
+      return std::ranges::any_of(fragments, [&](std::string_view fragment) { return message.contains(fragment); });
+   };
+   if (mentions(ALREADY_KNOWN_REFUSAL_FRAGMENTS)) return send_refusal::already_known;
+   if (mentions(UNDERPRICED_REFUSAL_FRAGMENTS)) return send_refusal::underpriced;
+   return send_refusal::other;
+}
+
+std::string send_submission_attempt(ethereum_client& client, const signed_transaction& signed_tx,
+                                    ethereum_submission& submission) {
+   std::string reported;
+   try {
+      reported = client.send_raw_transaction(signed_tx.raw_hex);
+   } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
+      if (classify_send_refusal(refusal) == send_refusal::already_known) {
+         dlog("ethereum transaction at nonce {}: the node already holds {}", submission.transaction.nonce.str(),
+              signed_tx.tx_hash);
+         return signed_tx.tx_hash;
+      }
+      submission.attempts.pop_back();
+      throw;
+   }
+   if (!same_hex(reported, signed_tx.tx_hash)) {
+      elog("ethereum transaction at nonce {}: the node reported hash {} for the bytes hashing to {}; watching both",
+           submission.transaction.nonce.str(), reported, signed_tx.tx_hash);
+      submission.attempts.push_back({.tx_hash = reported, .fees = submission.attempts.back().fees});
+   }
+   return reported;
+}
 
 outpost_ethereum_client::outpost_ethereum_client(
    ethereum_client_entry_ptr                         entry,
@@ -911,6 +965,7 @@ void outpost_ethereum_client::refresh_submission(ethereum_submission& submission
 bool outpost_ethereum_client::resubmit(ethereum_submission& submission, ethereum_transaction_fees fees, bool escalate,
                                        std::string_view why) {
    const auto& client = _entry->client;
+   const auto  caps   = detail::transaction_fee_caps(client->transaction_policy(), submission.transaction);
    for (uint32_t signing = 1;; ++signing) {
       auto transaction                     = submission.transaction;
       transaction.max_priority_fee_per_gas = fees.max_priority_fee_per_gas;
@@ -926,9 +981,14 @@ bool outpost_ethereum_client::resubmit(ethereum_submission& submission, ethereum
               fees.max_priority_fee_per_gas.str());
          return true;
       } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
-         wlog("outpost_ethereum_client[{}]: {} {} was refused at max_fee={} tip={} ({})", to_string(), why,
+         const bool underpriced = classify_send_refusal(refusal) == send_refusal::underpriced;
+         wlog("outpost_ethereum_client[{}]: {} {} was refused at max_fee={} tip={}{} ({})", to_string(), why,
               describe_submission(submission), fees.max_fee_per_gas.str(), fees.max_priority_fee_per_gas.str(),
-              refusal.to_string());
+              underpriced ? "" : ", not for its fees; the same fees are tried again next tick",
+              refusal.top_message());
+         // Only a fee refusal says the next signing must pay more. Any other
+         // leaves the floor where it is, so the cause clearing lets it through.
+         if (!underpriced) return false;
       }
       if (!escalate) return false;
       submission.refused_fees = submission.refused_fees ? larger_fees(*submission.refused_fees, fees) : fees;
@@ -938,7 +998,7 @@ bool outpost_ethereum_client::resubmit(ethereum_submission& submission, ethereum
           submission.transaction.nonce) {
          return false;
       }
-      const auto next = detail::escalated_fees(fees, client->transaction_policy());
+      const auto next = detail::escalated_fees(fees, caps);
       if (!next) {
          wlog("outpost_ethereum_client[{}]: {} {} cannot be raised past max_fee={} tip={} within the transaction "
               "policy; waiting for what holds the nonce",
@@ -1009,9 +1069,10 @@ std::optional<fc::uint256> outpost_ethereum_client::settle_submissions(fc::time_
             held_unknown ? detail::in_flight_step::replace
                          : detail::decide_in_flight(!held.empty(), detail::highest_fees(held), market);
          if (step == detail::in_flight_step::wait) continue;
-         auto fees = detail::resend_fees(step, detail::highest_fees(submission.attempts), market, policy);
+         const auto caps = detail::transaction_fee_caps(policy, submission.transaction);
+         auto       fees = detail::resend_fees(step, detail::highest_fees(submission.attempts), market, caps);
          // An escalation an earlier tick left refused goes on above where it stopped.
-         if (fees && held_unknown) fees = detail::resume_fees(*fees, submission.refused_fees, policy);
+         if (fees && held_unknown) fees = detail::resume_fees(*fees, submission.refused_fees, caps);
          if (!fees) {
             wlog("outpost_ethereum_client[{}]: {} needs a {} the fee caps leave no room for (market max_fee={} "
                  "tip={}); waiting for what holds its nonce",
@@ -1031,30 +1092,37 @@ std::optional<fc::uint256> outpost_ethereum_client::settle_submissions(fc::time_
                  "record of; nothing is sent behind it, and it is cancelled if still pending after {} s",
                  to_string(), unaccounted->str(), journal.unaccounted_nonce_grace.to_seconds());
          } else if (now - journal.unaccounted_nonce->first_seen >= journal.unaccounted_nonce_grace) {
-            auto fees = detail::cancel_fees(market, policy);
+            // A zero-value transfer to the signer, at the nonce; the fees are
+            // set per signing.
+            const eip1559_tx cancel_transaction{.chain_id                 = client->get_chain_id(),
+                                                .nonce                    = *unaccounted,
+                                                .max_priority_fee_per_gas = 0,
+                                                .max_fee_per_gas          = 0,
+                                                .gas_limit                = fc::uint256{PLAIN_TRANSFER_GAS},
+                                                .to                       = signer,
+                                                .value                    = 0,
+                                                .data                     = {},
+                                                .access_list              = {}};
+            const auto caps = detail::transaction_fee_caps(policy, cancel_transaction);
+            auto       fees = detail::cancel_fees(market, caps);
             // A cancel an earlier tick left refused goes on above where it stopped.
-            if (fees) fees = detail::resume_fees(*fees, journal.unaccounted_nonce->refused_fees, policy);
+            if (fees) fees = detail::resume_fees(*fees, journal.unaccounted_nonce->refused_fees, caps);
             if (!fees) {
                wlog("outpost_ethereum_client[{}]: cancelling the transaction at nonce {} needs fees the policy's caps "
                     "leave no room for (market max_fee={} tip={}); waiting for what holds the nonce",
                     to_string(), unaccounted->str(), market.max_fee_per_gas.str(), market.tip.str());
             } else {
+               // The cancel carries the nonce's refused fees, so a tick whose
+               // signing fails before anything is sent loses none of them.
                journal_submission(journal.submissions,
                                   ethereum_submission{
-                                     .purpose     = submission_purpose::cancel,
-                                     .epoch_index = 0,
-                                     .transaction = {.chain_id                 = client->get_chain_id(),
-                                                     .nonce                    = *unaccounted,
-                                                     .max_priority_fee_per_gas = fees->max_priority_fee_per_gas,
-                                                     .max_fee_per_gas          = fees->max_fee_per_gas,
-                                                     .gas_limit                = fc::uint256{PLAIN_TRANSFER_GAS},
-                                                     .to                       = signer,
-                                                     .value                    = 0,
-                                                     .data                     = {},
-                                                     .access_list              = {}},
-                                     .attempts    = {},
-                                     .state       = submission_state::pending,
-                                     .landed_at   = std::nullopt,
+                                     .purpose      = submission_purpose::cancel,
+                                     .epoch_index  = 0,
+                                     .transaction  = cancel_transaction,
+                                     .attempts     = {},
+                                     .state        = submission_state::pending,
+                                     .landed_at    = std::nullopt,
+                                     .refused_fees = journal.unaccounted_nonce->refused_fees,
                                   });
                const auto cancel = std::ranges::find_if(journal.submissions, [&](const ethereum_submission& s) {
                   return s.purpose == submission_purpose::cancel && s.transaction.nonce == *unaccounted;

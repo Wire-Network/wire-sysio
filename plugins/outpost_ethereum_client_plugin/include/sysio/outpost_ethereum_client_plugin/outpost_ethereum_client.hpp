@@ -273,6 +273,17 @@ enum class in_flight_step {
 in_flight_step decide_in_flight(bool known_to_node, const ethereum_transaction_fees& paid,
                                 const ethereum_client::gas_config_t& market);
 
+/// The most one transaction may pay per gas under the transaction policy.
+struct fee_caps {
+   fc::uint256 max_priority_fee_per_gas;
+   fc::uint256 max_fee_per_gas;
+};
+
+/// `policy`'s per-gas caps for `transaction`, with the fee cap also bounded by what `max_total_native_cost`
+/// leaves after the transaction's value for its gas limit (the policy refuses `gas_limit * max_fee_per_gas +
+/// value` above it), and the tip by the fee cap. Fees within these caps are never refused at signing.
+fee_caps transaction_fee_caps(const ethereum_transaction_policy& policy, const eip1559_tx& transaction);
+
 /// The highest of each fee across `attempts`. A node holds at most one of them at the nonce, but which one
 /// can be unknown (a send whose response was lost), and a replacement priced off the highest is valid against
 /// any of them. Zero fees for no attempts.
@@ -281,32 +292,33 @@ ethereum_transaction_fees highest_fees(const std::vector<submission_attempt>& at
 /// The fees a same-nonce resend pays. A replacement pays at least the market's
 /// fees and raises each of `paid`'s by more than the 10% nodes require of a
 /// replacement; a rebroadcast pays at least `paid` and the market. `nullopt`
-/// when `step` is `wait`, or when the policy's fee caps leave no room.
+/// when `step` is `wait`, or when `caps` leave no room.
 ///
 /// @param paid The highest fees any attempt at the nonce was signed with (`highest_fees`).
+/// @param caps `transaction_fee_caps` of the transaction resent.
 std::optional<ethereum_transaction_fees> resend_fees(in_flight_step step, const ethereum_transaction_fees& paid,
                                                      const ethereum_client::gas_config_t& market,
-                                                     const ethereum_transaction_policy&   policy);
+                                                     const fee_caps&                      caps);
 
 /// The fees of the first signing of a cancel: the market's, each raised the way a replacement is, since it
-/// replaces a transaction whose fees are unknown and was likely signed at the market. `nullopt` when the
-/// policy's fee caps leave no room.
+/// replaces a transaction whose fees are unknown and was likely signed at the market. `nullopt` when `caps`
+/// (the cancel's `transaction_fee_caps`) leave no room.
 std::optional<ethereum_transaction_fees> cancel_fees(const ethereum_client::gas_config_t& market,
-                                                     const ethereum_transaction_policy&   policy);
+                                                     const fee_caps&                      caps);
 
-/// The fees to try after a node refused a replacement of a transaction whose fees are unknown: each doubled,
-/// up to the policy's caps. A refused signing never entered a pool, so the next one only has to beat the
-/// transaction holding the nonce: one fee at its cap does not stop the other from rising. `nullopt` once
-/// neither can rise.
-std::optional<ethereum_transaction_fees> escalated_fees(const ethereum_transaction_fees&   fees,
-                                                        const ethereum_transaction_policy& policy);
+/// The fees to try after a node refused a replacement of a transaction whose fees are unknown as
+/// underpriced: each doubled, up to `caps` (the transaction's `transaction_fee_caps`). A refused signing
+/// never entered a pool, so the next one only has to beat the transaction holding the nonce: one fee at its
+/// cap does not stop the other from rising. `nullopt` once neither can rise.
+std::optional<ethereum_transaction_fees> escalated_fees(const ethereum_transaction_fees& fees,
+                                                        const fee_caps&                  caps);
 
 /// Where an escalating replacement starts: `start`, raised above `refused` (`escalated_fees` of it) when a
 /// node already refused a signing there, so a later tick goes on from where the last one stopped. `nullopt`
-/// when nothing above `refused` fits the policy's caps.
+/// when nothing above `refused` fits `caps`.
 std::optional<ethereum_transaction_fees> resume_fees(const ethereum_transaction_fees&                start,
                                                      const std::optional<ethereum_transaction_fees>& refused,
-                                                     const ethereum_transaction_policy&              policy);
+                                                     const fee_caps&                                 caps);
 
 /// The lowest nonce in `[latest, pending)` that no submission holds: one the node has a pending transaction
 /// at that this process did not sign, or `nullopt`.
@@ -466,10 +478,12 @@ private:
    void refresh_submission(ethereum_submission& submission, const fc::uint256& latest_count);
 
    /// Sign `submission` again at its nonce with `fees` and send it, recording the
-   /// attempt before the send. With `escalate`, a refused send is recorded in
-   /// `refused_fees` and retried with `escalated_fees` while the nonce is unused,
-   /// up to `MAX_REPLACEMENT_ESCALATIONS` signings; the next tick resumes above
-   /// the highest refused.
+   /// attempt before the send. With `escalate`, a send the node refuses as
+   /// underpriced is recorded in `refused_fees` and retried with `escalated_fees`
+   /// while the nonce is unused, up to `MAX_REPLACEMENT_ESCALATIONS` signings; the
+   /// next tick resumes above the highest refused. Any other refusal ends the
+   /// tick's attempts without moving `refused_fees`, so the same fees are tried
+   /// again next tick.
    ///
    /// @return Whether a node accepted a signing, or its outcome is unknown.
    /// @throws ethereum_transaction_policy_exception when the policy refuses `fees`.
