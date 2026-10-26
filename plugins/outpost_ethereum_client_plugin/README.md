@@ -207,12 +207,18 @@ whole delivery, so only one sender uses the signer's nonces at a time:
 | The nonce used, by none of its hashes | Superseded; the outpost's state decides |
 | Pending, and at today's base fee it still pays the market tip | Waits for it until the tick's deadline |
 | Pending, and its fee cap is below the base fee, or the tip it can pay at that base fee is below the market's | Re-signs it at the same nonce with every fee raised by more than an eighth over the highest fees any of its signings carried (nodes refuse a replacement under 10%) and at least the market's, within the transaction policy's caps |
-| Something at the nonce, but none of its hashes | Replaces it the same way, doubling both fees after each refusal up to the caps, since the fees of what holds the nonce are unknown |
+| Something at the nonce, but none of its hashes | Replaces it the same way, then escalates, since the fees of what holds the nonce are unknown (see below) |
 | Neither its hashes nor anything at the nonce | Sends it again at the same nonce, at the larger of its fees and the market's |
-| A pending transaction at a nonce no journal entry accounts for | Sends nothing behind it. After `default_unaccounted_nonce_grace` (60 s) it is cancelled: a zero-value transfer to the signer at that nonce, at the market's fees raised by an eighth, doubled after each refusal up to the caps. The cancel is journaled like any other transaction |
+| A pending transaction at a nonce no journal entry accounts for | Sends nothing behind it. After `default_unaccounted_nonce_grace` (60 s) it is cancelled: a zero-value transfer to the signer at that nonce, at the market's fees raised by an eighth, escalating after each refusal (see below). The cancel is journaled like any other transaction |
 
 While anything is still pending at the deadline nothing else is sent, and the next tick repeats the check. A
 replacement the caps leave no room for is logged and what was sent is waited for.
+
+An escalating replacement (a cancel, or a call whose nonce something it did not sign holds) doubles each fee
+after a node refuses it, up to the transaction policy's caps. A refused signing never reached a pool, so one
+fee at its cap does not stop the other from rising; the escalation ends only when neither can. A tick tries
+at most `MAX_REPLACEMENT_ESCALATIONS` (8) signings; the highest refused fees are kept, on the submission or on
+the unaccounted nonce's record, and the next tick resumes above them rather than from the market.
 
 The unaccounted-nonce case covers what the journal cannot: a call left pending before a restart, a
 `realizeYield` crank whose wait ran out, or another process signing with the same key. A transaction priced
@@ -427,7 +433,9 @@ fallback and its boundary, refusals), an epoch reported handled only once the re
 journaled call that lands, reverts, waits, is replaced, is re-broadcast, loses its nonce, is forgotten at the
 read confirmation, comes back after a reorg, or had a replacement whose response was lost, the journal
 surviving a rebuilt relay, an unaccounted nonce waited on and cancelled after a restart (refused cancels
-escalating), the check before every send, the replacement, cancel and escalation fees, and the network hash
+escalating, and an escalation refused all tick resuming above its refused fees on the next, for a cancel and
+for a replacement), the check before every send, the replacement, cancel, escalation and resume fees, and the
+network hash
 of a signed transaction against foundry's vectors — and the outpost crank: idle without the pool ABI or a registered handler, binding the
 registered pool and re-binding on a change, the pool's own three refusals, unrecognised reverts and protocol
 errors, and deadline abandonment.

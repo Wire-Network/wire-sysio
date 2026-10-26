@@ -295,10 +295,18 @@ std::optional<ethereum_transaction_fees> cancel_fees(const ethereum_client::gas_
                                                      const ethereum_transaction_policy&   policy);
 
 /// The fees to try after a node refused a replacement of a transaction whose fees are unknown: each doubled,
-/// up to the policy's caps. `nullopt` when a cap stops either fee from rising, since a replacement that does
-/// not raise both is refused again.
+/// up to the policy's caps. A refused signing never entered a pool, so the next one only has to beat the
+/// transaction holding the nonce: one fee at its cap does not stop the other from rising. `nullopt` once
+/// neither can rise.
 std::optional<ethereum_transaction_fees> escalated_fees(const ethereum_transaction_fees&   fees,
                                                         const ethereum_transaction_policy& policy);
+
+/// Where an escalating replacement starts: `start`, raised above `refused` (`escalated_fees` of it) when a
+/// node already refused a signing there, so a later tick goes on from where the last one stopped. `nullopt`
+/// when nothing above `refused` fits the policy's caps.
+std::optional<ethereum_transaction_fees> resume_fees(const ethereum_transaction_fees&                start,
+                                                     const std::optional<ethereum_transaction_fees>& refused,
+                                                     const ethereum_transaction_policy&              policy);
 
 /// The lowest nonce in `[latest, pending)` that no submission holds: one the node has a pending transaction
 /// at that this process did not sign, or `nullopt`.
@@ -458,8 +466,10 @@ private:
    void refresh_submission(ethereum_submission& submission, const fc::uint256& latest_count);
 
    /// Sign `submission` again at its nonce with `fees` and send it, recording the
-   /// attempt before the send. With `escalate`, a refused send is retried with
-   /// `escalated_fees` while the nonce is unused, up to the policy's caps.
+   /// attempt before the send. With `escalate`, a refused send is recorded in
+   /// `refused_fees` and retried with `escalated_fees` while the nonce is unused,
+   /// up to `MAX_REPLACEMENT_ESCALATIONS` signings; the next tick resumes above
+   /// the highest refused.
    ///
    /// @return Whether a node accepted a signing, or its outcome is unknown.
    /// @throws ethereum_transaction_policy_exception when the policy refuses `fees`.

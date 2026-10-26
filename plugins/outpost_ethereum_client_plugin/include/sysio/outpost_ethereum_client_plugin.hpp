@@ -69,6 +69,10 @@ struct ethereum_submission {
    submission_state                state = submission_state::pending;
    /// The block holding it while `state` is `landed`.
    std::optional<fc::uint256>      landed_at;
+   /// The highest fees a node refused a replacement of it at, while something it did not sign held the
+   /// nonce. Kept apart from `attempts`, since a refused signing never reached a pool, so the next tick's
+   /// escalation resumes above it rather than from the market.
+   std::optional<ethereum_transaction_fees> refused_fees;
 };
 
 /// How long the relay waits on a pending transaction at a nonce it has no record of before cancelling it.
@@ -77,6 +81,15 @@ struct ethereum_submission {
 /// would have landed on their own.
 inline constexpr fc::microseconds default_unaccounted_nonce_grace = fc::seconds(60);
 
+/// A pending transaction at a nonce no submission accounts for, as the relay has seen it.
+struct unaccounted_nonce_record {
+   fc::uint256                              nonce;
+   /// When the relay first saw it; it is cancelled once `unaccounted_nonce_grace` has passed.
+   fc::time_point                           first_seen;
+   /// The highest fees a node refused a cancel of it at, so the next tick's cancel resumes above them.
+   std::optional<ethereum_transaction_fees> refused_fees;
+};
+
 /// Everything the relay signed with one client's signer that is not yet safe to forget, and what it saw of
 /// nonces it did not sign.
 struct ethereum_submission_journal {
@@ -84,8 +97,8 @@ struct ethereum_submission_journal {
    std::mutex                       mutex;
    /// Ascending by nonce.
    std::vector<ethereum_submission> submissions;
-   /// The lowest pending nonce no submission accounts for, and when it was first seen.
-   std::optional<std::pair<fc::uint256, fc::time_point>> unaccounted_nonce;
+   /// The lowest pending nonce no submission accounts for.
+   std::optional<unaccounted_nonce_record> unaccounted_nonce;
    /// See `default_unaccounted_nonce_grace`.
    fc::microseconds                 unaccounted_nonce_grace = default_unaccounted_nonce_grace;
 };

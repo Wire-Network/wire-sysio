@@ -2981,7 +2981,7 @@ BOOST_AUTO_TEST_CASE(after_a_restart_an_unaccounted_pending_nonce_is_cancelled_n
    BOOST_CHECK(fixture->rpc->sent_hashes.empty());
    BOOST_CHECK(fixture->outpost->submissions().empty());
    BOOST_REQUIRE(fixture->entry->submissions->unaccounted_nonce);
-   BOOST_CHECK(fixture->entry->submissions->unaccounted_nonce->first == fc::uint256{0});
+   BOOST_CHECK(fixture->entry->submissions->unaccounted_nonce->nonce == fc::uint256{0});
 
    // Past the grace: cancelled at its nonce, at the market's fees raised the
    // way a replacement's are.
@@ -3037,6 +3037,80 @@ BOOST_AUTO_TEST_CASE(a_refused_cancel_is_raised_until_a_node_takes_it) try {
    BOOST_CHECK(fixture->delivery_calls.empty());
 } FC_LOG_AND_RETHROW();
 
+/// A cancel every signing of which a node refuses in one tick is not given up:
+/// the next tick resumes above the highest refused fees instead of starting
+/// again from the market, so a transaction holding the nonce at fees past the
+/// first tick's reach is still outbid while the policy allows it.
+BOOST_AUTO_TEST_CASE(a_cancel_refused_all_tick_resumes_above_its_refused_fees_next_tick) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->rpc->pending_nonce = 1;   // something this relay did not sign holds nonce 0
+   fixture->entry->submissions->unaccounted_nonce_grace = fc::microseconds(0);
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+
+   constexpr size_t signings_per_tick = 8;
+   fixture->rpc->send_outcomes.assign(signings_per_tick, scripted_send::refused);
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.size(), signings_per_tick);
+   BOOST_CHECK(fixture->outpost->submissions().empty());
+   // The cancel's first fees doubled seven times: the last signing refused.
+   constexpr uint64_t first_tip  = test_scripted_tip + test_scripted_tip / 8 + 1;
+   constexpr uint64_t first_cap  = test_scripted_max_fee + test_scripted_max_fee / 8 + 1;
+   constexpr uint64_t last_raise = uint64_t{1} << (signings_per_tick - 1);
+   const auto&        record     = fixture->entry->submissions->unaccounted_nonce;
+   BOOST_REQUIRE(record && record->refused_fees);
+   BOOST_CHECK(record->refused_fees->max_priority_fee_per_gas == fc::uint256{first_tip * last_raise});
+   BOOST_CHECK(record->refused_fees->max_fee_per_gas == fc::uint256{first_cap * last_raise});
+
+   // The next tick's first signing is above every refused one, and a node takes it.
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.size(), signings_per_tick + 1);
+   const auto cancel = fixture->only_submission();
+   BOOST_CHECK(cancel.purpose == sysio::submission_purpose::cancel);
+   BOOST_REQUIRE_EQUAL(cancel.attempts.size(), 1u);
+   BOOST_CHECK(cancel.attempts.front().fees.max_priority_fee_per_gas == fc::uint256{first_tip * last_raise * 2});
+   BOOST_CHECK(cancel.attempts.front().fees.max_fee_per_gas == fc::uint256{first_cap * last_raise * 2});
+   BOOST_CHECK(fixture->delivery_calls.empty());
+} FC_LOG_AND_RETHROW();
+
+/// The same for a journaled call whose nonce something it did not sign holds:
+/// the refused fees ride the submission, and the next tick resumes above them.
+BOOST_AUTO_TEST_CASE(a_replacement_refused_all_tick_resumes_above_its_refused_fees_next_tick) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->unconfirmed_calls = {1};
+   BOOST_CHECK_THROW(deliver(*fixture, envelope), sysio::chain::outpost_delivery_incomplete_exception);
+   // The node holds something at nonce 0, but not the call's hash.
+   fixture->rpc->pending_nonce = 1;
+
+   constexpr size_t signings_per_tick = 8;
+   fixture->rpc->send_outcomes.assign(signings_per_tick, scripted_send::refused);
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.size(), signings_per_tick);
+   const auto refused = fixture->only_submission();
+   BOOST_CHECK_EQUAL(refused.attempts.size(), 1u);
+   // A replacement of the call's own 10/100 doubled seven times.
+   constexpr uint64_t first_tip  = test_scripted_tip + test_scripted_tip / 8 + 1;
+   constexpr uint64_t first_cap  = test_scripted_max_fee + test_scripted_max_fee / 8 + 1;
+   constexpr uint64_t last_raise = uint64_t{1} << (signings_per_tick - 1);
+   BOOST_REQUIRE(refused.refused_fees);
+   BOOST_CHECK(refused.refused_fees->max_priority_fee_per_gas == fc::uint256{first_tip * last_raise});
+   BOOST_CHECK(refused.refused_fees->max_fee_per_gas == fc::uint256{first_cap * last_raise});
+
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.size(), signings_per_tick + 1);
+   const auto replaced = fixture->only_submission();
+   BOOST_REQUIRE_EQUAL(replaced.attempts.size(), 2u);
+   BOOST_CHECK(replaced.attempts.back().fees.max_priority_fee_per_gas == fc::uint256{first_tip * last_raise * 2});
+   BOOST_CHECK(replaced.attempts.back().fees.max_fee_per_gas == fc::uint256{first_cap * last_raise * 2});
+   BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 1u);
+} FC_LOG_AND_RETHROW();
+
 /// The node's nonces are checked before every send, continuations included: a
 /// transaction another sender left pending mid-tick stops the next call.
 BOOST_AUTO_TEST_CASE(nothing_is_sent_behind_a_nonce_another_sender_took_mid_tick) try {
@@ -3057,7 +3131,7 @@ BOOST_AUTO_TEST_CASE(nothing_is_sent_behind_a_nonce_another_sender_took_mid_tick
    check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 1);
    BOOST_CHECK(fixture->only_submission().state == sysio::submission_state::landed);
    BOOST_REQUIRE(fixture->entry->submissions->unaccounted_nonce);
-   BOOST_CHECK(fixture->entry->submissions->unaccounted_nonce->first == fc::uint256{1});
+   BOOST_CHECK(fixture->entry->submissions->unaccounted_nonce->nonce == fc::uint256{1});
 } FC_LOG_AND_RETHROW();
 
 /// What a pending call needs: nothing while it pays the market tip, a
@@ -3140,7 +3214,9 @@ BOOST_AUTO_TEST_CASE(journal_fee_and_nonce_helpers) try {
    BOOST_REQUIRE(escalated);
    BOOST_CHECK(escalated->max_priority_fee_per_gas == fc::uint256{24});
    BOOST_CHECK(escalated->max_fee_per_gas == fc::uint256{226});
-   // Bounded by the caps, and over once a cap stops a fee from rising.
+   // Bounded by the caps. A fee at its cap does not stop the other from
+   // rising: a refused 24/200 is followed by 30/200, which can still replace a
+   // 25/150 holding the nonce. Only once neither can rise is it over.
    capped                          = policy;
    capped.max_priority_fee_per_gas = 30;
    capped.max_fee_per_gas          = 200;
@@ -3148,7 +3224,25 @@ BOOST_AUTO_TEST_CASE(journal_fee_and_nonce_helpers) try {
    BOOST_REQUIRE(bounded);
    BOOST_CHECK(bounded->max_priority_fee_per_gas == fc::uint256{24});
    BOOST_CHECK(bounded->max_fee_per_gas == fc::uint256{200});
-   BOOST_CHECK(!detail::escalated_fees(*bounded, capped));
+   const auto tip_only = detail::escalated_fees(*bounded, capped);
+   BOOST_REQUIRE(tip_only);
+   BOOST_CHECK(tip_only->max_priority_fee_per_gas == fc::uint256{30});
+   BOOST_CHECK(tip_only->max_fee_per_gas == fc::uint256{200});
+   BOOST_CHECK(!detail::escalated_fees(*tip_only, capped));
+
+   // Resuming: nothing refused starts where asked; a refusal starts above it,
+   // and above the start too; a refusal at both caps leaves nothing to try.
+   const sysio::ethereum_transaction_fees start{.max_priority_fee_per_gas = 12, .max_fee_per_gas = 113};
+   const auto fresh = detail::resume_fees(start, std::nullopt, policy);
+   BOOST_REQUIRE(fresh);
+   BOOST_CHECK(fresh->max_priority_fee_per_gas == fc::uint256{12});
+   BOOST_CHECK(fresh->max_fee_per_gas == fc::uint256{113});
+   const auto resumed = detail::resume_fees(
+      start, sysio::ethereum_transaction_fees{.max_priority_fee_per_gas = 48, .max_fee_per_gas = 100}, policy);
+   BOOST_REQUIRE(resumed);
+   BOOST_CHECK(resumed->max_priority_fee_per_gas == fc::uint256{96});
+   BOOST_CHECK(resumed->max_fee_per_gas == fc::uint256{200});
+   BOOST_CHECK(!detail::resume_fees(start, *tip_only, capped));
 
    const auto journaled = [](std::vector<uint64_t> nonces) {
       std::vector<sysio::ethereum_submission> submissions;
