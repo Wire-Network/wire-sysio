@@ -28,6 +28,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <algorithm>
 #include <map>
 
 #include <sysio/testing/tester.hpp>
@@ -60,6 +61,44 @@ static constexpr account_name OPREG = "sysio.opreg"_n;
 static constexpr account_name EPOCH = "sysio.epoch"_n;
 static constexpr account_name CHALG = "sysio.chalg"_n;
 static constexpr account_name MSGCH = "sysio.msgch"_n;
+
+/// sysio.opreg actions the producer collateral and held-pay tests push.
+namespace opreg_action {
+constexpr auto regoperator = "regoperator"_n;
+constexpr auto deposit     = "deposit"_n;
+constexpr auto withdraw    = "withdraw"_n;
+constexpr auto cancelwtdw  = "cancelwtdw"_n;
+constexpr auto claimremit  = "claimremit"_n;
+} // namespace opreg_action
+
+/// sysio.opreg tables the held-pay tests read, with the ABI type of a decoded row.
+namespace opreg_table {
+constexpr auto opcounters       = "opcounters"_n;
+constexpr char opcounters_row[] = "op_counters";
+constexpr auto wtdwqueue        = "wtdwqueue"_n;
+} // namespace opreg_table
+
+/// sysio.opreg action and row fields the producer collateral and held-pay tests use.
+namespace opreg_field {
+constexpr char account[]          = "account";
+constexpr char type[]             = "type";
+constexpr char is_bootstrapped[]  = "is_bootstrapped";
+constexpr char token_code[]       = "token_code";
+constexpr char amount[]           = "amount";
+constexpr char request_id[]       = "request_id";
+constexpr char status[]           = "status";
+constexpr char next_withdraw_id[] = "next_withdraw_id";
+} // namespace opreg_field
+
+/// sysio.epoch `epochstate` field the held-pay payout check reads.
+namespace epoch_field {
+constexpr char current_epoch_index[] = "current_epoch_index";
+} // namespace epoch_field
+
+/// sysio.system `epochlog` field the held-pay payout check reads.
+namespace epochlog_field {
+constexpr char compute_amount[] = "compute_amount";
+} // namespace epochlog_field
 
 // Keep these in sync with contracts/sysio.system/src/emissions.cpp
 static constexpr uint32_t SECONDS_PER_MONTH = 30u * 24u * 60u * 60u;
@@ -231,6 +270,8 @@ static constexpr uint32_t T_STANDBY_END_RANK      = 28;
 static constexpr uint16_t T_STANDBY_BPS           = 800;
 /// The fixture's default epoch (init_epoch_state) is 60s at one block per 500ms.
 static constexpr uint32_t T_EPOCH_SECS            = 60;
+/// Seconds in one T5 emission epoch (24 hours).
+static constexpr uint32_t ONE_EPOCH               = 86400u;
 
 // Helper: amount NOT transferred at payepoch when no producers / batch
 // members are paid. Equals producer_pool + batch_pool (compute share, both
@@ -299,7 +340,7 @@ public:
          BOOST_REQUIRE( accnt != nullptr );
          abi_def abi;
          BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(accnt->abi, abi), true );
-         roa_abi_ser.set_abi( abi, abi_serializer::create_yield_function(abi_serializer_max_time) );
+         roa_abi_ser.set_abi( abi, fixture_abi_yield_function() );
       }
 
       // --- sysio.token setup (only create the account if it doesn't exist) ---
@@ -327,7 +368,7 @@ public:
          BOOST_REQUIRE( accnt != nullptr );
          abi_def abi;
          BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(accnt->abi, abi), true );
-         token_abi_ser.set_abi( abi, abi_serializer::create_yield_function(abi_serializer_max_time) );
+         token_abi_ser.set_abi( abi, fixture_abi_yield_function() );
       }
 
       // --- Ensure WIRE exists + fund sysio for claim transfers ---
@@ -388,14 +429,14 @@ public:
          BOOST_REQUIRE( accnt != nullptr );
          abi_def abi;
          BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(accnt->abi, abi), true );
-         opreg_abi_ser.set_abi( abi, abi_serializer::create_yield_function(abi_serializer_max_time) );
+         opreg_abi_ser.set_abi( abi, fixture_abi_yield_function() );
       }
       {
          const auto* accnt = control->find_account_metadata( EPOCH );
          BOOST_REQUIRE( accnt != nullptr );
          abi_def abi;
          BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(accnt->abi, abi), true );
-         epoch_abi_ser.set_abi( abi, abi_serializer::create_yield_function(abi_serializer_max_time) );
+         epoch_abi_ser.set_abi( abi, fixture_abi_yield_function() );
       }
 
       // --- Set default emission configuration ---
@@ -440,7 +481,7 @@ protected:
       BOOST_REQUIRE( accnt != nullptr );
       abi_def abi;
       BOOST_REQUIRE_EQUAL( abi_serializer::to_abi(accnt->abi, abi), true );
-      sysio_abi_ser.set_abi( abi, abi_serializer::create_yield_function(abi_serializer_max_time) );
+      sysio_abi_ser.set_abi( abi, fixture_abi_yield_function() );
    }
 
 public:
@@ -572,7 +613,7 @@ public:
    void set_legacy_emitcfg_cadence_raw( uint16_t cadence ) {
       const auto bytes = sysio_abi_ser.variant_to_binary(
          "emission_config", default_emit_cfg(cadence),
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
 
       char key_buf[chain::kv_pri_key_size];
       chain::kv_encode_be64(key_buf, "emitcfg"_n.to_uint64_t());
@@ -638,7 +679,7 @@ public:
       act.name    = action_name;
       act.data    = sysio_abi_ser.variant_to_binary(
          sysio_abi_ser.get_action_type(action_name), data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
 
       signed_transaction trx;
       trx.actions.emplace_back(std::move(act));
@@ -706,14 +747,14 @@ public:
                                      "nodecount"_n);
       if (data.empty()) return fc::variant();
       return sysio_abi_ser.binary_to_variant("node_count_state", data,
-          abi_serializer::create_yield_function(abi_serializer_max_time));
+          fixture_abi_yield_function());
    }
 
    fc::variant get_blocklog_row(uint64_t epoch_index) {
       auto data = get_row_by_account(EPOCH, EPOCH, "blocklog"_n, account_name(epoch_index));
       if (data.empty()) return fc::variant();
       return epoch_abi_ser.binary_to_variant("blocklog_entry", data,
-          abi_serializer::create_yield_function(abi_serializer_max_time));
+          fixture_abi_yield_function());
    }
 
    fc::variant get_t5_state() {
@@ -723,7 +764,7 @@ public:
                                      "t5state"_n);
       if (data.empty()) return fc::variant();
       return sysio_abi_ser.binary_to_variant("t5_state", data,
-          abi_serializer::create_yield_function(abi_serializer_max_time));
+          fixture_abi_yield_function());
    }
 
    /// Block slots accumulated for the OPEN pay period, one accrual at a time.
@@ -743,7 +784,7 @@ public:
                                      account_name(sysio_epoch_index));
       if (data.empty()) return fc::variant();
       return sysio_abi_ser.binary_to_variant("epoch_log", data,
-          abi_serializer::create_yield_function(abi_serializer_max_time));
+          fixture_abi_yield_function());
    }
 
    fc::variant get_batch_epoch( uint64_t sysio_epoch_index ) {
@@ -765,7 +806,7 @@ public:
       vector<char> data(it->value.begin(), it->value.end());
       if (data.empty()) return fc::variant();
       return sysio_abi_ser.binary_to_variant("batch_epoch", data,
-          abi_serializer::create_yield_function(abi_serializer_max_time));
+          fixture_abi_yield_function());
    }
 
    // -----------------------------
@@ -779,7 +820,7 @@ public:
                                      producer);
       if (data.empty()) return fc::variant();
       return sysio_abi_ser.binary_to_variant("producer_info", data,
-          abi_serializer::create_yield_function(abi_serializer_max_time));
+          fixture_abi_yield_function());
    }
 
    /// Blocks `producer` has made this pay period -- the row's `unpaid_blocks`, the one pay input.
@@ -1001,7 +1042,7 @@ public:
       return sysio_abi_ser.binary_to_variant(
          "emission_state",
          data,
-         abi_serializer::create_yield_function(abi_serializer_max_time)
+         fixture_abi_yield_function()
       );
    }
 
@@ -1020,7 +1061,7 @@ public:
          : sysio_abi_ser.binary_to_variant(
               "node_owner_distribution",
               data,
-              abi_serializer::create_yield_function(abi_serializer_max_time)
+              fixture_abi_yield_function()
            );
    }
 
@@ -1041,7 +1082,7 @@ public:
                                      "payclaims"_n, acc);
       if (data.empty()) return 0;
       auto v = sysio_abi_ser.binary_to_variant(
-         "pay_claim", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         "pay_claim", data, fixture_abi_yield_function());
       return static_cast<int64_t>(v["balance"].as_uint64());
    }
 
@@ -1054,7 +1095,7 @@ public:
                                      "payclaimtot"_n, "payclaimtot"_n);
       if (data.empty()) return 0;
       auto v = sysio_abi_ser.binary_to_variant(
-         "pay_claim_total", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         "pay_claim_total", data, fixture_abi_yield_function());
       return static_cast<int64_t>(v["outstanding"].as_uint64());
    }
 
@@ -1090,7 +1131,7 @@ public:
          : token_abi_ser.binary_to_variant(
               "currency_stats",
               data,
-              abi_serializer::create_yield_function(abi_serializer_max_time)
+              fixture_abi_yield_function()
            );
    }
 
@@ -1110,7 +1151,7 @@ public:
          : token_abi_ser.binary_to_variant(
               "account",
               data,
-              abi_serializer::create_yield_function(abi_serializer_max_time)
+              fixture_abi_yield_function()
            );
    }
 
@@ -1147,7 +1188,7 @@ protected:
       act.data    = sysio_abi_ser.variant_to_binary(
                       action_type_name,
                       data,
-                      abi_serializer::create_yield_function(abi_serializer_max_time)
+                      fixture_abi_yield_function()
                     );
 
       return base_tester::push_action( std::move(act), signer.to_uint64_t() );
@@ -1172,7 +1213,7 @@ protected:
          { signer, config::active_name } };
       act.data = sysio_abi_ser.variant_to_binary(
          sysio_abi_ser.get_action_type(act_name), data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
 
       signed_transaction trx;
       trx.actions.emplace_back( std::move(act) );
@@ -1219,7 +1260,7 @@ protected:
       act.name    = name;
       act.data    = token_abi_ser.variant_to_binary(
                       action_type_name, data,
-                      abi_serializer::create_yield_function(abi_serializer_max_time)
+                      fixture_abi_yield_function()
                     );
 
       return base_tester::push_action( std::move(act), signer.to_uint64_t() );
@@ -1248,7 +1289,7 @@ protected:
       if (data.empty()) return fc::variant();
       return roa_abi_ser.binary_to_variant(
          "policies", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time)
+         fixture_abi_yield_function()
       );
    }
 
@@ -1327,14 +1368,14 @@ public:
       auto data = get_row_by_account(OPREG, OPREG, "operators"_n, account);
       if (data.empty()) return fc::variant();
       return opreg_abi_ser.binary_to_variant("operator_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    fc::variant get_epoch_state_row() {
       auto data = get_row_by_account(EPOCH, EPOCH, "epochstate"_n, "epochstate"_n);
       if (data.empty()) return fc::variant();
       return epoch_abi_ser.binary_to_variant("epoch_state", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
 protected:
@@ -2487,9 +2528,6 @@ BOOST_AUTO_TEST_SUITE_END() // sysio_emissions_tests
 
 BOOST_AUTO_TEST_SUITE(t5_emissions_tests)
 
-// Helper: number of seconds in one epoch (24 hours)
-static constexpr uint32_t ONE_EPOCH = 86400u;
-
 // ---------------------------------------------------------------------------
 // Init
 // ---------------------------------------------------------------------------
@@ -2538,6 +2576,34 @@ BOOST_FIXTURE_TEST_CASE( accrueepoch_saturates_pending_accumulator, sysio_emissi
          ("epoch_index", 2)("batch_group_index", 0)("per_epoch_emission", near_max) ) );
    BOOST_REQUIRE_EQUAL( asset::max_amount,
       get_t5_state()["pending_emission_amount"].as<int64_t>() );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( accrueepoch_accepts_a_zero_share_and_keeps_the_decay_base, sysio_emissions_tester ) try {
+   // The gate passes a zero share to an open pay period with emission pending once the rest of the budget is committed
+   // or the curve is zero. The epoch must still count toward the period, while the decay base stays at the last
+   // positive share: resetting it would restart the curve at the per-epoch minimum.
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(head_secs()) ) );
+
+   constexpr int64_t positive_share = 5'000'000'000;
+   BOOST_REQUIRE_EQUAL( success(), push_system_action( EPOCH, "accrueepoch"_n, mvo()
+      ("epoch_index", 1)("batch_group_index", 0)("per_epoch_emission", positive_share) ) );
+   const uint64_t slots_per_epoch = pending_nominal_slots();
+   BOOST_REQUIRE_GT( slots_per_epoch, 0u );
+
+   BOOST_REQUIRE_EQUAL( success(), push_system_action( EPOCH, "accrueepoch"_n, mvo()
+      ("epoch_index", 2)("batch_group_index", 0)("per_epoch_emission", int64_t(0)) ) );
+   const auto state = get_t5_state();
+   BOOST_REQUIRE_EQUAL( state["last_epoch_emission"].as<int64_t>(), positive_share );
+   BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), positive_share );
+   BOOST_REQUIRE_EQUAL( state["last_epoch_index"].as<uint32_t>(), 2u );
+   BOOST_REQUIRE_EQUAL( state["batch_group_epochs"].get_array().at(0).as<uint32_t>(), 2u );
+   BOOST_REQUIRE_EQUAL( pending_nominal_slots(), 2 * slots_per_epoch );
+
+   // A negative share is still refused.
+   auto r = push_system_action( EPOCH, "accrueepoch"_n, mvo()
+      ("epoch_index", 3)("batch_group_index", 0)("per_epoch_emission", int64_t(-1)) );
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "accrueepoch per_epoch_emission must be non-negative" );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( payepoch_recovers_from_incomplete_batch_roster_history, sysio_emissions_tester ) try {
@@ -2911,6 +2977,47 @@ BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_rejects_unreachable_min_emission
    auto r = setemitcfg(config::system_account_name, cfg);
    BOOST_REQUIRE( r != success() );
    require_substr( r, "annual_min_emission per-epoch share exceeds remaining distributable" );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( setemitcfg_post_initt5_counts_pending_emission, sysio_emissions_tester ) try {
+   // The open pay period's accrual is owed at its boundary, so the post-init guard must count it alongside what has
+   // been paid out: a budget that covers only the payouts would let the boundary pay past the floor, and the per-epoch
+   // floor must fit in what is left uncommitted.
+   create_t5_holding_accounts();
+   constexpr uint16_t cadence = 2;
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg_with_cadence( config::system_account_name, cadence ) );
+   BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(head_secs() - ONE_EPOCH - 1) ) );
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // epoch 1: the shortened genesis period pays
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // epoch 2: accrues toward epoch 3
+
+   const auto state = get_t5_state();
+   const int64_t pending = state["pending_emission_amount"].as<int64_t>();
+   BOOST_REQUIRE_GT( pending, 0 );
+   const int64_t committed = T5_FLOOR + state["total_distributed"].as<int64_t>() + pending;
+   const int64_t per_epoch_min = test_scale_annual_to_epoch(ANNUAL_MIN_EMISSION, T_EPOCH_SECS);
+
+   auto budget_cfg = [&](int64_t t5_distributable, int64_t annual_min_emission) {
+      return fc::mutable_variant_object( default_emit_cfg(cadence) )
+         .set("t5_distributable",    t5_distributable)
+         .set("annual_min_emission", annual_min_emission);
+   };
+
+   auto r = setemitcfg( config::system_account_name, budget_cfg(committed - 1, 0) );
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "t5_distributable must cover floor + already-distributed + pending emission" );
+
+   r = setemitcfg( config::system_account_name, budget_cfg(committed + per_epoch_min - 1, ANNUAL_MIN_EMISSION) );
+   BOOST_REQUIRE( r != success() );
+   require_substr( r, "annual_min_emission per-epoch share exceeds remaining distributable" );
+
+   // Exactly floor + distributed + pending is a workable budget: the boundary accrues a zero share and pays the period
+   // in full.
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg( config::system_account_name, budget_cfg(committed, 0) ) );
+   produce_blocks(130);
+   BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );   // epoch 3
+   BOOST_REQUIRE_EQUAL( get_epoch_log(3)["total_emission"].as<int64_t>(), pending );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["pending_emission_amount"].as<int64_t>(), 0 );
 } FC_LOG_AND_RETHROW()
 
 // ---------------------------------------------------------------------------
@@ -5157,6 +5264,305 @@ BOOST_FIXTURE_TEST_CASE( pay_cadence_change_via_setemitcfg_takes_effect, sysio_e
    }
 } FC_LOG_AND_RETHROW()
 
+// ---------------------------------------------------------------------------
+// The end of the T5 budget: shares sized on the headroom net of pending
+// ---------------------------------------------------------------------------
+
+/// Drives the T5 budget to its end at a pay cadence above one.
+///
+/// Its config pushes the whole period emission to the capex bucket, so nothing is credited or retained: every payepoch
+/// adds exactly the period total to total_distributed, and the budget can be checked to the subunit.
+class t5_budget_tail_tester : public sysio_emissions_tester {
+public:
+   /// Every epoch of the first pay period accrues this share (60s epochs).
+   const int64_t initial_share = test_scale_annual_to_epoch(ANNUAL_INITIAL_EMISSION, T_EPOCH_SECS);
+
+   /// Capex-only config at `cadence` whose T5 budget is `budget` subunits above the floor.
+   fc::variant_object capex_only_cfg( uint16_t cadence, int64_t budget ) {
+      return fc::mutable_variant_object( default_emit_cfg(cadence) )
+         .set("t5_distributable", T5_FLOOR + budget)
+         .set("compute_bps",      uint16_t(0))
+         .set("capex_bps",        uint16_t(10'000))
+         .set("governance_bps",   uint16_t(0));
+   }
+
+   /// Apply capex_only_cfg and initialize T5.
+   void start( uint16_t cadence, int64_t budget ) {
+      create_t5_holding_accounts();
+      BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, capex_only_cfg(cadence, budget)) );
+      BOOST_REQUIRE_EQUAL( success(), initt5(config::system_account_name, tpsec(head_secs() - ONE_EPOCH - 1)) );
+   }
+
+   /// Cross the epoch's wall-clock boundary and push advance. A gate block also returns success.
+   void advance_one() {
+      produce_blocks(130);
+      BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+   }
+
+   /// The share the gate accrues next, mirroring compute_epoch_emission: the initial share during the first pay period,
+   /// then the decayed last positive share clamped to the per-epoch min/max, either way capped at the budget left net
+   /// of the pending accrual.
+   int64_t expected_share( const fc::variant& state, int64_t budget ) const {
+      const int64_t net = budget - state["total_distributed"].as<int64_t>()
+                                 - state["pending_emission_amount"].as<int64_t>();
+      if (net <= 0) return 0;
+      int64_t curve = initial_share;
+      if (state["epoch_count"].as<uint64_t>() > 0) {
+         curve = std::clamp(
+            test_apply_decay(state["last_epoch_emission"].as<int64_t>(), TARGET_ANNUAL_DECAY_BPS, T_EPOCH_SECS),
+            test_scale_annual_to_epoch(ANNUAL_MIN_EMISSION, T_EPOCH_SECS),
+            test_scale_annual_to_epoch(ANNUAL_MAX_EMISSION, T_EPOCH_SECS));
+      }
+      return std::min(curve, net);
+   }
+
+   /// Advance epochs 1 through `last_epoch`, checking after every advance that the epoch moved, that
+   /// total_distributed + pending_emission_amount never exceeds the budget, and that the epoch accrued expected_share.
+   /// Each boundary must pay exactly what its period accrued, leave nothing pending, and find the period's roster
+   /// history complete, zero-share epochs included.
+   ///
+   /// @return how many of those epochs accrued a zero share.
+   uint32_t walk_epochs( uint16_t cadence, int64_t budget, uint32_t last_epoch ) {
+      uint32_t zero_shares = 0;
+      for (uint32_t epoch = 1; epoch <= last_epoch; ++epoch) {
+         const auto before = get_t5_state();
+         const int64_t share              = expected_share(before, budget);
+         const int64_t distributed_before = before["total_distributed"].as<int64_t>();
+         const int64_t pending_before     = before["pending_emission_amount"].as<int64_t>();
+         const int64_t capex_before       = get_wire_balance(CAPEX_ACCOUNT).get_amount();
+         advance_one();
+
+         const auto after = get_t5_state();
+         const int64_t distributed = after["total_distributed"].as<int64_t>();
+         const int64_t pending     = after["pending_emission_amount"].as<int64_t>();
+         BOOST_REQUIRE_EQUAL( after["last_epoch_index"].as<uint32_t>(), epoch );
+         BOOST_REQUIRE_LE( distributed + pending, budget );
+         if (share == 0) ++zero_shares;
+
+         // period_start_epoch starts at 0, so the genesis period is one epoch short: boundaries fall at cadence - 1,
+         // 2 * cadence - 1, and so on.
+         if ((epoch + 1) % cadence == 0) {
+            const int64_t period = pending_before + share;
+            const auto log = get_epoch_log(epoch);
+            BOOST_REQUIRE_EQUAL( log["total_emission"].as<int64_t>(), period );
+            BOOST_REQUIRE( log["batch_history_complete"].as_bool() );
+            BOOST_REQUIRE_EQUAL( distributed - distributed_before, period );
+            BOOST_REQUIRE_EQUAL( get_wire_balance(CAPEX_ACCOUNT).get_amount() - capex_before, period );
+            BOOST_REQUIRE_EQUAL( pending, 0 );
+         } else {
+            BOOST_REQUIRE_EQUAL( pending - pending_before, share );
+            BOOST_REQUIRE_EQUAL( distributed, distributed_before );
+         }
+      }
+      return zero_shares;
+   }
+
+   /// The budget is cadence - 1/2 shares. The shortened genesis period accrues cadence - 1 of them, leaving the first
+   /// full period half a share: less than `cadence` epochs of emission. That period's first epoch takes the half, its
+   /// other epochs accrue nothing, and its boundary pays exactly the half. The budget is then spent, so the next epoch
+   /// halts.
+   void check_budget_holds_through_the_tail( uint16_t cadence ) {
+      const int64_t budget = (2 * cadence - 1) * initial_share / 2;
+      start(cadence, budget);
+      BOOST_REQUIRE_EQUAL( walk_epochs(cadence, budget, 2u * cadence - 1), static_cast<uint32_t>(cadence - 1) );
+      BOOST_REQUIRE_EQUAL( get_t5_state()["total_distributed"].as<int64_t>(), budget );
+
+      advance_one();
+      const uint32_t halted = 2u * cadence;
+      const auto row = get_blocklog_row(halted);
+      BOOST_REQUIRE( !row.is_null() );
+      BOOST_REQUIRE_EQUAL( row["reason"].as_string(), "EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED" );
+      BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), halted - 1 );
+   }
+
+   /// Move `amount` WIRE from `from` to `to`, signed by `from`.
+   void transfer_wire( account_name from, account_name to, int64_t amount ) {
+      base_tester::push_action( TOKEN, "transfer"_n, vector<permission_level>{{ from, "active"_n }},
+         mvo()("from", from)("to", to)("quantity", asset(amount, WIRE_SYMBOL))("memo", "t5 budget tail test") );
+      produce_blocks(1);
+   }
+
+   static constexpr account_name CAPEX_ACCOUNT = "sysio.ops"_n;
+};
+
+BOOST_FIXTURE_TEST_CASE( tail_pay_period_stays_within_budget_at_cadence_2, t5_budget_tail_tester ) try {
+   check_budget_holds_through_the_tail(2);
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( tail_pay_period_stays_within_budget_at_cadence_4, t5_budget_tail_tester ) try {
+   check_budget_holds_through_the_tail(4);
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( genesis_pay_period_caps_its_shares_at_net_headroom, t5_budget_tail_tester ) try {
+   // Every genesis-period epoch accrues the initial share, capped only by the budget. With 1.5 shares of budget,
+   // epoch 1 takes a full share, epoch 2 the half left net of it, and boundary epoch 3 accrues nothing and pays the
+   // 1.5 shares. The budget is then spent, so epoch 4 halts.
+   constexpr uint16_t cadence = 4;
+   const int64_t budget = 3 * initial_share / 2;
+   start(cadence, budget);
+   BOOST_REQUIRE_EQUAL( walk_epochs(cadence, budget, cadence - 1u), 1u );
+   BOOST_REQUIRE_EQUAL( get_epoch_log(cadence - 1u)["total_emission"].as<int64_t>(), budget );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["total_distributed"].as<int64_t>(), budget );
+
+   advance_one();
+   const auto row = get_blocklog_row(cadence);
+   BOOST_REQUIRE( !row.is_null() );
+   BOOST_REQUIRE_EQUAL( row["reason"].as_string(), "EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED" );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), cadence - 1u );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( zero_share_epochs_keep_the_decay_base, t5_budget_tail_tester ) try {
+   // The first full period opens with 1.5 shares left: a decayed share, then the clamped remainder, then two zero
+   // shares. The zero shares must leave the decay base at that remainder, so once governance raises the budget the
+   // curve resumes from it, not from the per-epoch minimum a reset base would give.
+   constexpr uint16_t cadence = 4;
+   const int64_t budget = 9 * initial_share / 2;
+   start(cadence, budget);
+   BOOST_REQUIRE_EQUAL( walk_epochs(cadence, budget, 2u * cadence - 1), 2u );
+
+   const int64_t decayed   = test_apply_decay(initial_share, TARGET_ANNUAL_DECAY_BPS, T_EPOCH_SECS);
+   const int64_t remainder = budget - 3 * initial_share - decayed;
+   BOOST_REQUIRE_GT( remainder, 0 );
+   BOOST_REQUIRE_LT( remainder, decayed );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_emission"].as<int64_t>(), remainder );
+
+   advance_one();
+   const auto halted = get_blocklog_row(2u * cadence);
+   BOOST_REQUIRE( !halted.is_null() );
+   BOOST_REQUIRE_EQUAL( halted["reason"].as_string(), "EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED" );
+
+   BOOST_REQUIRE_EQUAL( success(),
+      setemitcfg(config::system_account_name, capex_only_cfg(cadence, budget + 10 * initial_share)) );
+   advance_one();
+   const int64_t resumed = test_apply_decay(remainder, TARGET_ANNUAL_DECAY_BPS, T_EPOCH_SECS);
+   BOOST_REQUIRE_GT( resumed, test_scale_annual_to_epoch(ANNUAL_MIN_EMISSION, T_EPOCH_SECS) );
+   const auto state = get_t5_state();
+   BOOST_REQUIRE_EQUAL( state["last_epoch_index"].as<uint32_t>(), 2u * cadence );
+   BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), resumed );
+   BOOST_REQUIRE_EQUAL( state["last_epoch_emission"].as<int64_t>(), resumed );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( zero_curve_pays_the_open_period_then_blocks_with_budget_left, t5_budget_tail_tester ) try {
+   // Governance can zero the curve mid-period while budget remains. The period's remaining epochs accrue nothing but
+   // still advance, and its boundary pays what was pending. The next epoch has a zero share with nothing pending and
+   // must block as TREASURY_EXHAUSTED: letting it through would reach a boundary with an empty period, which payepoch
+   // refuses, aborting every advance. Restoring the curve resumes from the last positive share.
+   constexpr uint16_t cadence = 4;
+   const int64_t budget = 100 * initial_share;
+   start(cadence, budget);
+   walk_epochs(cadence, budget, cadence);   // the genesis period pays at epoch 3; epoch 4 accrues a decayed share
+
+   const int64_t decayed = test_apply_decay(initial_share, TARGET_ANNUAL_DECAY_BPS, T_EPOCH_SECS);
+   BOOST_REQUIRE_EQUAL( get_t5_state()["pending_emission_amount"].as<int64_t>(), decayed );
+
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name,
+      fc::mutable_variant_object( capex_only_cfg(cadence, budget) )
+         .set("annual_max_emission", int64_t(0))
+         .set("annual_min_emission", int64_t(0))) );
+
+   const uint32_t boundary = 2u * cadence - 1;
+   for (uint32_t epoch = cadence + 1; epoch < boundary; ++epoch) {
+      advance_one();
+      const auto state = get_t5_state();
+      BOOST_REQUIRE_EQUAL( state["last_epoch_index"].as<uint32_t>(), epoch );
+      BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), decayed );
+      BOOST_REQUIRE_EQUAL( state["last_epoch_emission"].as<int64_t>(), decayed );
+   }
+
+   const int64_t distributed_before = get_t5_state()["total_distributed"].as<int64_t>();
+   advance_one();
+   BOOST_REQUIRE_EQUAL( get_epoch_log(boundary)["total_emission"].as<int64_t>(), decayed );
+   auto state = get_t5_state();
+   BOOST_REQUIRE_EQUAL( state["last_epoch_index"].as<uint32_t>(), boundary );
+   BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), 0 );
+   const int64_t distributed = state["total_distributed"].as<int64_t>();
+   BOOST_REQUIRE_EQUAL( distributed, distributed_before + decayed );
+
+   advance_one();
+   const auto row = get_blocklog_row(boundary + 1);
+   BOOST_REQUIRE( !row.is_null() );
+   BOOST_REQUIRE_EQUAL( row["reason"].as_string(), "EMISSIONS_BLOCK_REASON_TREASURY_EXHAUSTED" );
+   BOOST_REQUIRE_EQUAL( row["treasury_remaining"].as<int64_t>(), budget - distributed );
+   BOOST_REQUIRE_LT( distributed, budget );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), boundary );
+
+   BOOST_REQUIRE_EQUAL( success(), setemitcfg(config::system_account_name, capex_only_cfg(cadence, budget)) );
+   advance_one();
+   const int64_t resumed = test_apply_decay(decayed, TARGET_ANNUAL_DECAY_BPS, T_EPOCH_SECS);
+   state = get_t5_state();
+   BOOST_REQUIRE_EQUAL( state["last_epoch_index"].as<uint32_t>(), boundary + 1 );
+   BOOST_REQUIRE_EQUAL( state["pending_emission_amount"].as<int64_t>(), resumed );
+   BOOST_REQUIRE_EQUAL( state["last_epoch_emission"].as<int64_t>(), resumed );
+   BOOST_REQUIRE( get_blocklog_row(boundary + 1).is_null() );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( viewepoch_reports_headroom_net_of_pending, t5_budget_tail_tester ) try {
+   // treasury_remaining must exclude what the open pay period has already accrued, and next_emission_est must be the
+   // share the gate then accrues: zero once the period holds the rest of the budget.
+   constexpr uint16_t cadence = 4;
+   const int64_t budget = 9 * initial_share / 2;
+   start(cadence, budget);
+
+   bool saw_partial_commit = false; // pending > 0 with budget still uncommitted
+   bool saw_full_commit    = false; // pending > 0 and nothing left uncommitted
+   for (uint32_t epoch = 1; epoch <= 2u * cadence - 1; ++epoch) {
+      const auto state = get_t5_state();
+      const int64_t pending = state["pending_emission_amount"].as<int64_t>();
+      const int64_t net     = budget - state["total_distributed"].as<int64_t>() - pending;
+      const auto info = viewepoch();
+      BOOST_REQUIRE_EQUAL( info.treasury_remaining, std::max<int64_t>(net, 0) );
+      saw_partial_commit = saw_partial_commit || (pending > 0 && net > 0);
+      saw_full_commit    = saw_full_commit || (pending > 0 && net == 0 && info.next_emission_est == 0);
+
+      advance_one();
+      const bool boundary = epoch == cadence - 1u || epoch == 2u * cadence - 1;
+      const int64_t accrued = boundary
+         ? get_epoch_log(epoch)["total_emission"].as<int64_t>() - pending
+         : get_t5_state()["pending_emission_amount"].as<int64_t>() - pending;
+      BOOST_REQUIRE_EQUAL( accrued, info.next_emission_est );
+   }
+   BOOST_REQUIRE( saw_partial_commit );
+   BOOST_REQUIRE( saw_full_commit );
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( balance_blocked_zero_share_boundary_records_the_period_total, t5_budget_tail_tester ) try {
+   // The tail boundary accrues a zero share, so its period total is all pending. If the treasury cannot cover it, the
+   // blocklog must record that total (the amount the balance test compared) rather than the zero share, and the retry
+   // must pay it in full once the balance is back.
+   const account_name DRAIN = "tailbaldrain"_n;
+   constexpr uint16_t cadence = 4;
+   const int64_t budget = 9 * initial_share / 2;
+   start(cadence, budget);
+   const uint32_t boundary = 2u * cadence - 1;
+   for (uint32_t epoch = 1; epoch < boundary; ++epoch) advance_one();
+
+   const auto state = get_t5_state();
+   const int64_t pending = state["pending_emission_amount"].as<int64_t>();
+   BOOST_REQUIRE_GT( pending, 0 );
+   BOOST_REQUIRE_EQUAL( expected_share(state, budget), 0 );
+
+   create_user_accounts({ DRAIN });
+   const int64_t drained = get_wire_balance(config::system_account_name).get_amount() - pending / 2;
+   transfer_wire(config::system_account_name, DRAIN, drained);
+   advance_one();
+
+   const auto row = get_blocklog_row(boundary);
+   BOOST_REQUIRE( !row.is_null() );
+   BOOST_REQUIRE_EQUAL( row["reason"].as_string(), "EMISSIONS_BLOCK_REASON_BALANCE_INSUFFICIENT" );
+   BOOST_REQUIRE_EQUAL( row["attempted_emission"].as<int64_t>(), pending );
+   BOOST_REQUIRE_EQUAL( row["treasury_remaining"].as<int64_t>(), 0 );
+   BOOST_REQUIRE_EQUAL( row["sysio_balance"].as<int64_t>(), pending / 2 );
+   BOOST_REQUIRE_EQUAL( get_t5_state()["last_epoch_index"].as<uint32_t>(), boundary - 1 );
+
+   transfer_wire(DRAIN, config::system_account_name, drained);
+   advance_one();
+   BOOST_REQUIRE( get_blocklog_row(boundary).is_null() );
+   BOOST_REQUIRE_EQUAL( get_epoch_log(boundary)["total_emission"].as<int64_t>(), pending );
+   const auto after = get_t5_state();
+   BOOST_REQUIRE_EQUAL( after["pending_emission_amount"].as<int64_t>(), 0 );
+   BOOST_REQUIRE_EQUAL( after["total_distributed"].as<int64_t>(), budget );
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END() // t5_emissions_tests
 
 // ===========================================================================
@@ -5239,7 +5645,7 @@ struct producer_eligibility_tester : public sysio_emissions_tester {
                                      "finalizers"_n, producer);
       if (data.empty()) return false;
       auto v = sysio_abi_ser.binary_to_variant("finalizer_info", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       auto ids = sysio_test::get_last_prop_fin_ids(*this, sysio_abi_ser);
       return ids.count(v["active_key_id"].as_uint64()) > 0;
    }
@@ -5616,8 +6022,14 @@ struct producer_score_tester : public producer_eligibility_tester {
          base_tester::push_action("sysio.liq"_n, "mint"_n, "sysio.synd"_n,
             mvo()("to", account)("token_code", token)("amount", amount));
       }
-      return push_opreg_action(account, "deposit"_n,
-         mvo()("account", account)("token_code", token)("amount", amount));
+      return deposit_collateral(account, amount, token);
+   }
+
+   /// Bond `amount` of `token` the account already holds.
+   action_result deposit_collateral(account_name account, uint64_t amount,
+                                    std::string_view token = collateral_token) {
+      return push_opreg_action(account, opreg_action::deposit, mvo()
+         (opreg_field::account, account)(opreg_field::token_code, token)(opreg_field::amount, amount));
    }
 
    /// Push `setscorecfg`. Defaults mirror the contract's own so a test names only the weight it
@@ -5666,7 +6078,7 @@ struct producer_score_tester : public producer_eligibility_tester {
                                      "global"_n, "global"_n);
       if (data.empty()) return fc::variant();
       return sysio_abi_ser.binary_to_variant("sysio_global_state", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    bool rescore_pending() {
@@ -5742,6 +6154,23 @@ struct producer_score_tester : public producer_eligibility_tester {
       BOOST_FAIL("producer " << expected.to_string() << " never entered the active schedule");
    }
 
+   /// Produce until the ACTIVE schedule is exactly `expected`, in order, then require it.
+   void wait_for_active_schedule_order(const std::vector<account_name>& expected,
+                                       uint32_t max_blocks = 400) {
+      for (uint32_t produced = 0; produced < max_blocks && active_schedule_names() != expected; ++produced) {
+         produce_blocks(1);
+      }
+      const auto schedule = active_schedule_names();
+      BOOST_REQUIRE_EQUAL_COLLECTIONS(schedule.begin(), schedule.end(), expected.begin(), expected.end());
+   }
+
+   /// Re-register `producer` with its fixture key at `location`, the schedule-order key.
+   action_result set_location(account_name producer, uint16_t location) {
+      return push_system_action(producer, "regproducer"_n, mvo()
+         ("producer", producer)("producer_key", get_public_key(producer, "active"))("url", "")
+         ("location", location));
+   }
+
    /// Skip `target`'s rounds until the schedule has actually dropped it.
    ///
    /// A rebuild only PROPOSES, so a sunk producer holds its slot until that proposal goes final --
@@ -5803,6 +6232,109 @@ struct producer_score_tester : public producer_eligibility_tester {
 
       BOOST_REQUIRE_MESSAGE(control->head().header().producer != target,
          "the jump landed on " << target.to_string() << " instead of skipping it");
+   }
+};
+
+/// Bonded producers on a published schedule, for tests that terminate one, bring it back and
+/// check which payouts pay its held blocks.
+struct terminated_producer_tester : public producer_score_tester {
+
+   /// Producers on the published schedule.
+   static constexpr uint32_t producer_count = 3;
+
+   /// Full rotations produced before the first payout, so every producer holds counted blocks.
+   static constexpr uint32_t warmup_rotations = 2;
+
+   /// T5 starts this many seconds more than one T5 epoch ago, so the first advance pays.
+   static constexpr uint32_t t5_start_overdue_secs = 1;
+
+   /// Blocks produced beyond one sysio.epoch of slots, so the next advance is past the boundary.
+   static constexpr uint32_t epoch_crossing_margin_blocks = 10;
+
+   /// Bond the producers, publish their schedule, produce the warm-up rotations and start T5.
+   std::vector<account_name> setup_paid_producers() {
+      create_t5_holding_accounts();
+      auto names = setup_collateralized_producers(producer_count);
+      BOOST_REQUIRE_EQUAL( success(), set_producer_schedule(names) );
+      produce_blocks(1);
+      wait_for_producer_schedule();
+      produce_complete_cycles(producer_count, warmup_rotations);
+      BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name,
+                                              tpsec(head_secs() - ONE_EPOCH - t5_start_overdue_secs) ) );
+      return names;
+   }
+
+   /// Produce past the next sysio.epoch boundary, so the next advance may run.
+   void cross_epoch_boundary() {
+      produce_blocks(test_nominal_slots(T_EPOCH_SECS) + epoch_crossing_margin_blocks);
+   }
+
+   OperatorStatus operator_status(account_name account) {
+      return get_opreg_operator(account)[opreg_field::status].as<OperatorStatus>();
+   }
+
+   /// Register `account` as a producer operator under its own authority, as an operator would.
+   action_result regoperator(account_name account) {
+      return push_opreg_action(account, opreg_action::regoperator, mvo()
+         (opreg_field::account, account)
+         (opreg_field::type, OperatorType::OPERATOR_TYPE_PRODUCER)
+         (opreg_field::is_bootstrapped, false));
+   }
+
+   action_result withdraw(account_name account, uint64_t amount) {
+      return push_opreg_action(account, opreg_action::withdraw, mvo()
+         (opreg_field::account, account)(opreg_field::token_code, collateral_token)(opreg_field::amount, amount));
+   }
+
+   action_result cancelwtdw(account_name account, uint64_t request_id) {
+      return push_opreg_action(account, opreg_action::cancelwtdw, mvo()
+         (opreg_field::account, account)(opreg_field::request_id, request_id));
+   }
+
+   action_result claimremit(account_name account) {
+      return push_opreg_action(account, opreg_action::claimremit, mvo()
+         (opreg_field::account, account)(opreg_field::token_code, collateral_token));
+   }
+
+   /// The id `withdraw` gave the latest request: one below opreg's next free id.
+   uint64_t last_withdraw_request_id() {
+      const auto data = get_row_by_account(OPREG, OPREG, opreg_table::opcounters, opreg_table::opcounters);
+      BOOST_REQUIRE( !data.empty() );
+      const auto counters = opreg_abi_ser.binary_to_variant(opreg_table::opcounters_row, data,
+                                                            fixture_abi_yield_function());
+      return counters[opreg_field::next_withdraw_id].as<uint64_t>() - 1;
+   }
+
+   bool withdraw_request_queued(uint64_t request_id) {
+      return !get_row_by_id(OPREG, OPREG, opreg_table::wtdwqueue, request_id).empty();
+   }
+
+   /// A payout `producer` is not payable at pays it nothing and keeps its count.
+   void assert_unpaid_payout(account_name producer) {
+      const uint32_t blocks = unpaid_blocks_of(producer);
+      const asset before = get_wire_balance_paid(producer);
+      BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+      BOOST_REQUIRE_EQUAL( get_wire_balance_paid(producer), before );
+      BOOST_REQUIRE_GE( unpaid_blocks_of(producer), blocks );
+   }
+
+   /// The next payout pays `producer` every block it holds, at least `held`, at that period's rate.
+   void assert_payout_pays_held_blocks(const std::vector<account_name>& names, account_name producer,
+                                       uint32_t held) {
+      uint64_t produced = 0;
+      for (const auto& p : names) produced += unpaid_blocks_of(p);
+      const uint32_t blocks = unpaid_blocks_of(producer);
+      BOOST_REQUIRE_GE( blocks, held );
+      const asset before = get_wire_balance_paid(producer);
+      BOOST_REQUIRE_EQUAL( success(), advance_epoch_state() );
+      const int64_t got = get_wire_balance_paid(producer).get_amount() - before.get_amount();
+      // The payout logs the epoch the advance moved to.
+      const auto paid_epoch = get_epoch_state_row()[epoch_field::current_epoch_index].as<uint64_t>();
+      const int64_t active_pool =
+         test_active_pool(get_epoch_log(paid_epoch)[epochlog_field::compute_amount].as<int64_t>());
+      const uint64_t divisor = std::max<uint64_t>(produced, test_nominal_slots(T_EPOCH_SECS));
+      BOOST_REQUIRE_EQUAL( got, test_block_pay(active_pool, blocks, divisor) );
+      BOOST_REQUIRE_GT( got, 0 );
    }
 };
 
@@ -6422,6 +6954,60 @@ BOOST_FIXTURE_TEST_CASE( pruned_operator_row_stays_demoted_through_rescore_sweep
    BOOST_REQUIRE(!is_scheduled(target));
 } FC_LOG_AND_RETHROW()
 
+// Termination keeps a producer's counted blocks but credits its bond to its claim, and a new
+// registration starts UNKNOWN with no bond, so the blocks are paid only once it bonds again.
+BOOST_FIXTURE_TEST_CASE( terminated_producer_is_paid_held_blocks_once_bonded_again,
+                         terminated_producer_tester ) try {
+   const auto names  = setup_paid_producers();
+   const auto target = names[0];
+   BOOST_REQUIRE_EQUAL( success(), terminate_operator(target) );
+   BOOST_REQUIRE( OperatorStatus::OPERATOR_STATUS_TERMINATED == operator_status(target) );
+   const uint32_t held = unpaid_blocks_of(target);
+   BOOST_REQUIRE_GT( held, 0u );
+   assert_unpaid_payout(target);
+
+   // Pull the returned bond and register again: the new registration holds no bond.
+   const asset unclaimed = get_wire_balance(target);
+   BOOST_REQUIRE_EQUAL( success(), claimremit(target) );
+   BOOST_REQUIRE_EQUAL( static_cast<int64_t>(base_min_bond),
+                        get_wire_balance(target).get_amount() - unclaimed.get_amount() );
+   BOOST_REQUIRE_EQUAL( success(), regoperator(target) );
+   BOOST_REQUIRE( OperatorStatus::OPERATOR_STATUS_UNKNOWN == operator_status(target) );
+   cross_epoch_boundary();
+   assert_unpaid_payout(target);
+
+   // Bond again: the next payout pays every held block at that period's rate.
+   BOOST_REQUIRE_EQUAL( success(), deposit_collateral(target, base_min_bond) );
+   BOOST_REQUIRE( OperatorStatus::OPERATOR_STATUS_ACTIVE == operator_status(target) );
+   cross_epoch_boundary();
+   assert_payout_pays_held_blocks(names, target, held);
+} FC_LOG_AND_RETHROW()
+
+// A withdrawal queued before termination outlives it, and the queue is per account: it reserves part
+// of the new registration's bond until it is cancelled.
+BOOST_FIXTURE_TEST_CASE( stale_withdrawal_holds_back_a_rebonded_producer_until_cancelled,
+                         terminated_producer_tester ) try {
+   constexpr uint64_t stale_amount = base_min_bond / 2;   // any part of the bond
+   const auto names  = setup_paid_producers();
+   const auto target = names[0];
+   BOOST_REQUIRE_EQUAL( success(), withdraw(target, stale_amount) );
+   const uint64_t stale_request = last_withdraw_request_id();
+   BOOST_REQUIRE_EQUAL( success(), terminate_operator(target) );
+   BOOST_REQUIRE( withdraw_request_queued(stale_request) );
+   const uint32_t held = unpaid_blocks_of(target);
+
+   // Register and post the whole required bond at once, while the request is still queued.
+   BOOST_REQUIRE_EQUAL( success(), regoperator(target) );
+   BOOST_REQUIRE_EQUAL( success(), credit_collateral(target, base_min_bond) );
+   BOOST_REQUIRE( OperatorStatus::OPERATOR_STATUS_UNKNOWN == operator_status(target) );
+
+   // Cancelling it frees the bond, and the next payout pays every held block.
+   BOOST_REQUIRE_EQUAL( success(), cancelwtdw(target, stale_request) );
+   BOOST_REQUIRE( !withdraw_request_queued(stale_request) );
+   BOOST_REQUIRE( OperatorStatus::OPERATOR_STATUS_ACTIVE == operator_status(target) );
+   assert_payout_pays_held_blocks(names, target, held);
+} FC_LOG_AND_RETHROW()
+
 // ---------------------------------------------------------------------------
 // Position versus index slot
 // ---------------------------------------------------------------------------
@@ -6640,6 +7226,140 @@ BOOST_FIXTURE_TEST_CASE( collateralised_producers_displace_the_bootstrap_at_the_
    BOOST_REQUIRE( !is_scheduled(bootstrap) );
    BOOST_REQUIRE(  is_scheduled(names[0]) );
    BOOST_REQUIRE_EQUAL( "OPERATOR_STATUS_ACTIVE", get_opreg_operator(bootstrap)["status"].as_string() );
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// Schedule order
+// ---------------------------------------------------------------------------
+
+// A new set of scheduled producers takes its rounds in ascending `location`, account name breaking
+// ties.
+BOOST_FIXTURE_TEST_CASE( a_new_schedule_runs_in_location_order, producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);   // producera..producere, every one at location 0
+
+   // producerb and producerd tie at 100; the field's full range is usable.
+   const std::vector<uint16_t> locations = { std::numeric_limits<uint16_t>::max(), 100, 200, 100, 0 };
+   for (uint32_t i = 0; i < names.size(); ++i) {
+      BOOST_REQUIRE_EQUAL( success(), set_location(names[i], locations[i]) );
+   }
+   trigger_reschedule();
+   wait_for_active_schedule_order({ names[4], names[1], names[3], names[2], names[0] });
+} FC_LOG_AND_RETHROW()
+
+// The set already producing keeps its order through any number of location changes: a reorder alone
+// would reassign rounds at activation, handing one producer two in a row and skipping miss
+// attribution. The new locations apply when the set next changes.
+BOOST_FIXTURE_TEST_CASE( a_location_change_alone_never_reorders_the_schedule, producer_score_tester ) try {
+   auto names = setup_ranked_producers(5);   // producera..producere, every one at location 0
+   trigger_reschedule();
+   wait_for_active_schedule_order(names);
+   const auto version = control->active_producers().version;
+
+   const std::vector<std::vector<uint16_t>> moves = {
+      { 5, 4, 3, 2, 1 },   // reverse the order
+      { 3, 4, 0, 1, 2 },   // then rotate it to start at producerc
+   };
+   for (const auto& locations : moves) {
+      for (uint32_t i = 0; i < names.size(); ++i) {
+         BOOST_REQUIRE_EQUAL( success(), set_location(names[i], locations[i]) );
+      }
+      trigger_reschedule();
+      produce_blocks(3 * slots_per_producer);   // time for any proposal to activate
+      BOOST_REQUIRE_EQUAL( version, control->active_producers().version );
+      const auto schedule = active_schedule_names();
+      BOOST_REQUIRE_EQUAL_COLLECTIONS(schedule.begin(), schedule.end(), names.begin(), names.end());
+   }
+
+   // Terminating producera changes the set; the four left run in their latest location order.
+   BOOST_REQUIRE_EQUAL( success(), terminate_operator(names[0]) );
+   trigger_reschedule();
+   wait_for_active_schedule_order({ names[2], names[3], names[4], names[1] });
+} FC_LOG_AND_RETHROW()
+
+// Location orders the producers rank selected and never selects them: the producer at position 22
+// takes the lowest location of all and still holds its position and no slot.
+BOOST_FIXTURE_TEST_CASE( location_never_selects_a_standby_into_the_schedule, producer_score_tester ) try {
+   constexpr uint32_t scheduled_count = 21;   // max_producers
+   auto names = setup_ranked_producers(scheduled_count + 1);
+   const auto standby = names.back();
+
+   // Reverse the name order across the ranked 21; the standby goes to the front of the line.
+   for (uint32_t i = 0; i < scheduled_count; ++i) {
+      BOOST_REQUIRE_EQUAL( success(), set_location(names[i], static_cast<uint16_t>(scheduled_count - i)) );
+   }
+   BOOST_REQUIRE_EQUAL( success(), set_location(standby, 0) );
+   produce_blocks(1);
+   BOOST_REQUIRE_EQUAL( scheduled_count + 1, producer_rank_position(standby) );
+
+   trigger_reschedule();
+   const std::vector<account_name> by_location(names.rbegin() + 1, names.rend());   // produceru..producera
+   wait_for_active_schedule_order(by_location);
+   BOOST_REQUIRE( !is_scheduled(standby) );
+   BOOST_REQUIRE_EQUAL( scheduled_count + 1, producer_rank_position(standby) );
+} FC_LOG_AND_RETHROW()
+
+// A switch can hand a producer a second round inside one rotation; only one round per rotation is
+// paid. Replacing the last producer with a standby that sorts first moves everyone one slot later,
+// so the producer just before the switch point produces again right after it. The switch charges
+// no retained producer a missed round either.
+BOOST_FIXTURE_TEST_CASE( a_switch_never_pays_a_second_round_in_one_rotation, producer_score_tester ) try {
+   constexpr uint32_t scheduled_count = 21;   // max_producers: a rotation is this many rounds
+   auto names = setup_ranked_producers(scheduled_count + 1);
+   const auto standby = names.back();
+   const auto leaving = names[scheduled_count - 1];
+   const std::vector<account_name> before(names.begin(), names.begin() + scheduled_count);
+   std::vector<account_name> after(before.begin(), before.end() - 1);
+   after.insert(after.begin(), standby);
+
+   for (uint32_t i = 0; i < scheduled_count; ++i) {
+      BOOST_REQUIRE_EQUAL( success(), set_location(names[i], static_cast<uint16_t>(i + 1)) );
+   }
+   BOOST_REQUIRE_EQUAL( success(), set_location(standby, 0) );
+   trigger_reschedule();
+   wait_for_active_schedule_order(before);
+
+   // Replay the rule over every block from here on. The rows count each block once it is the head.
+   std::map<account_name, uint32_t> last_paid;
+   std::map<account_name, uint32_t> expected;
+   for (const auto& p : names) {
+      last_paid[p] = get_producer_info(p)["last_paid_round"].as<uint32_t>();
+      expected[p]  = unpaid_blocks_of(p);
+   }
+   uint32_t uncounted = 0;
+   const auto produce_and_replay = [&] {
+      produce_block();
+      const auto producer = control->head().header().producer;
+      const uint32_t round = control->head().header().timestamp.slot / slots_per_producer;
+      auto& last = last_paid[producer];
+      if (last != round) {
+         if (last != 0 && last / scheduled_count == round / scheduled_count) {
+            ++uncounted;
+            return;
+         }
+         last = round;
+      }
+      ++expected[producer];
+   };
+
+   BOOST_REQUIRE_EQUAL( success(), terminate_operator(leaving) );
+   constexpr uint32_t max_blocks = 400;
+   for (uint32_t produced = 0; produced < max_blocks && active_schedule_names() != after; ++produced) {
+      produce_and_replay();
+   }
+   const auto schedule = active_schedule_names();
+   BOOST_REQUIRE_EQUAL_COLLECTIONS(schedule.begin(), schedule.end(), after.begin(), after.end());
+   for (uint32_t i = 0; i < scheduled_count * slots_per_producer; ++i) {
+      produce_and_replay();
+   }
+
+   BOOST_REQUIRE_MESSAGE( uncounted > 0, "no producer took a second round in the switch's rotation" );
+   for (const auto& p : names) {
+      BOOST_REQUIRE_MESSAGE( unpaid_blocks_of(p) == expected[p],
+         p.to_string() << " has " << unpaid_blocks_of(p) << " unpaid blocks, expected " << expected[p] );
+   }
+   for (const auto& p : after) {
+      BOOST_REQUIRE_EQUAL( 0u, missed_rounds_of(p) );
+   }
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END() // sysio_producer_score_tests

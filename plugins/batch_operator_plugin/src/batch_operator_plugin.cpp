@@ -965,7 +965,7 @@ struct batch_operator_plugin::impl {
    struct client_build {
       std::shared_ptr<sysio::outpost_client> client;
       /// Why this node cannot serve the chain at all; empty when `client` is set, or when the row only lacks
-      /// its remote contract address so far.
+      /// its remote contract address or is awaiting Ethereum chain-ID discovery.
       std::string                            unserviceable;
    };
 
@@ -975,7 +975,7 @@ struct batch_operator_plugin::impl {
    /// A missing RPC client, an unsupported chain kind or a factory refusal is local configuration only the
    /// operator can fix, reported as `unserviceable`. Missing CONTRACT ADDRESSES are governance state on the row,
    /// fixable with `sysio.chains::setoutpost` without touching any node, so the chain is skipped (no client, no
-   /// reason) and picked up on a later refresh.
+   /// reason) and picked up on a later refresh. Pending Ethereum discovery is likewise retried by either role.
    client_build make_outpost_client(const outpost_descriptor& op, solana_outpost_role role) {
       const std::string code_str = fc::slug_name{op.id}.to_string();
       try {
@@ -984,12 +984,15 @@ struct batch_operator_plugin::impl {
             // client is the one registered under this chain's OWN code, and
             // the OPP / OPPInbound contract addresses come from the row
             // itself. `create_outpost_client` additionally asserts the
-            // client's verified eth_chainId equals the row's
+            // client's configured or discovered chain ID equals the row's
             // external_chain_id, so a client registered under the wrong code
             // is caught rather than relayed through.
-            if (!eth_plug->get_client(code_str)) {
+            const auto entry = eth_plug->get_client(code_str);
+            if (!entry) {
                return {.unserviceable = "no Ethereum RPC client is registered under this chain code"};
             }
+            // Discovery publishes a ready snapshot later; both roles retry on their normal refresh tick.
+            if (!entry->client) return {};
             if (op.opp_addr.empty() || op.opp_inbound_addr.empty()) {
                wlog("batch_operator: outpost {} (EVM) has no OPP/OPPInbound address on its "
                     "sysio.chains row; skipping until sysio.chains::setoutpost supplies both",
@@ -1036,7 +1039,7 @@ struct batch_operator_plugin::impl {
 
    /// Build, with `wrap(op, client)`, what `built` lacks for each chain in `active`, the clients made for `role`.
    /// Returns the chains this node cannot serve; a chain whose row has no remote address yet is skipped until
-   /// `setoutpost` supplies one.
+   /// `setoutpost` supplies one. Pending Ethereum clients wait for discovery on a later refresh.
    template <typename Key, typename Built, typename Wrap>
    std::vector<unserviceable_chain> build_missing(std::map<Key, Built>& built,
                                                   const std::vector<outpost_descriptor>& active,
@@ -1050,7 +1053,7 @@ struct batch_operator_plugin::impl {
             unserviceable.push_back({fc::slug_name{op.id}.to_string(), std::move(made.unserviceable)});
             continue;
          }
-         if (!made.client) continue;   // no remote address on the row yet
+         if (!made.client) continue;   // remote address or Ethereum discovery is still pending
          built.emplace(key, wrap(op, made.client));
       }
       return unserviceable;

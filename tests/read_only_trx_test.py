@@ -52,7 +52,6 @@ numTestRuns=args.num_test_runs
 
 Utils.Debug=debug
 testSuccessful=False
-errorInThread=False
 noOC = args.sys_vm_oc_enable == Utils.SysVmOcEnableNone
 ocSupported = Utils.nodeopSupportsSysVmOc()
 ocRequested = Utils.sysVmOcExecutionExpected(args.sys_vm_oc_enable)
@@ -149,9 +148,8 @@ def startCluster():
     producerNode = cluster.getNode()
     apiNode = cluster.nodes[-1]
 
-    sysioCodeHash = getCodeHash(producerNode, "sysio.token")
     # sysio.* should be using oc unless oc tierup disabled.
-    Utils.assertInitialSysVmOcLogState(producerNode, apiNode, sysioCodeHash, args.sys_vm_oc_enable, ocSupported)
+    Utils.assertInitialSysVmOcLogState(cluster, producerNode, apiNode, args.sys_vm_oc_enable, ocSupported)
 
     if ocRequested:
         verifyOcVirtualMemory()
@@ -242,101 +240,137 @@ def sendReadOnlyForeverInfinite():
 def sendReadOnlySEGV():
     return sendTransaction('infinite', action='segv', data={}, auth=[], opts='--read')
 
-# Send read-only trxs from multiple threads to bump load
+# Exception codes a read-only transaction may legitimately fail with
+# (libraries/chain/include/sysio/chain/exceptions.hpp). Anything else, above all a transport
+# error from clio because nodeop is gone, is a test failure.
+TX_CPU_USAGE_EXCEEDED = 3080004 # tx_cpu_usage_exceeded: the transaction's own CPU limit
+DEADLINE_EXCEPTION    = 3080006 # deadline_exception: a deadline closed on the transaction
+WASM_EXECUTION_ERROR  = 3070002 # wasm_execution_error: e.g. an access violation in the contract
+TIMEOUT_CODES = (TX_CPU_USAGE_EXCEEDED, DEADLINE_EXCEPTION)
+
+def assertFailedWithCode(result, expectedCodes, what):
+    """Require a failure that carries one of expectedCodes.
+
+    pushTransaction reports every clio failure, a refused connection after nodeop died included,
+    as a (False, message) tuple, so a bare `not result[0]` would accept a dead node. A read-only
+    failure arrives as a trace dict; a regular transaction's failure may arrive as clio's stderr
+    text, which still has to name the expected code.
+    """
+    ok, payload = result
+    assert not ok, f"{what}: expected a failure, but the transaction succeeded: {payload}"
+    if isinstance(payload, dict):
+        exc = payload.get('processed', {}).get('except')
+        assert exc is not None, f"{what}: response carries no exception trace: {payload}"
+        assert exc['code'] in expectedCodes, \
+            f"{what}: unexpected exception {exc['code']} {exc['name']}: {exc['message']}"
+    else:
+        text = str(payload)
+        assert any(str(code) in text for code in expectedCodes), \
+            f"{what}: clio failed without the expected exception, is nodeop still up? {text}"
+
+def assertApiNodeAlive(stage):
+    """Fail if the API node process exited: no read-only workload may take nodeop down."""
+    pid = apiNode.pid
+    assert apiNode.verifyAlive(), f"API node (pid {pid}) exited during {stage}"
+
+class WorkerThread(threading.Thread):
+    """A thread that keeps the exception its target raised, so joinAll can fail the test on it.
+
+    A plain Thread prints the traceback and dies; join() then returns as if nothing happened.
+    """
+    def __init__(self, target, args=()):
+        super().__init__(target=target, args=args)
+        self.targetName = target.__name__
+        self.error = None
+
+    def run(self):
+        try:
+            super().run()
+        except Exception as e:
+            self.error = e
+            Print(f"Exception in {self.name} ({self.targetName}): {repr(e)}")
+            traceback.print_exc()
+
+def joinAll(threads):
+    """Join every thread, then fail on the ones that raised."""
+    for thr in threads:
+        thr.join()
+    failed = [f"{thr.name} ({thr.targetName}): {repr(thr.error)}" for thr in threads if thr.error is not None]
+    assert not failed, "worker thread failures: " + "; ".join(failed)
+
+# Send read-only trxs from multiple threads to bump load. Runs on a WorkerThread, which keeps a
+# failure for joinAll.
 def sendReadOnlyTrxOnThread(startId, numTrxs):
     Print("start sendReadOnlyTrxOnThread")
 
-    global errorInThread
-    errorInThread = False
-    try:
-       for i in range(numTrxs):
-           results = sendTransaction(testAccountName, 'age', {"user": userAccountName, "id": startId + i}, opts='--read')
-           assert(results[0])
-           assert(results[1]['processed']['action_traces'][0]['return_value_data'] == 25)
+    for i in range(numTrxs):
+        results = sendTransaction(testAccountName, 'age', {"user": userAccountName, "id": startId + i}, opts='--read')
+        assert results[0], f"read-only age failed: {results[1]}"
+        assert(results[1]['processed']['action_traces'][0]['return_value_data'] == 25)
 
-           results = sendReadOnlyPayloadless()
-           assert(results[0])
-           assert(results[1]['processed']['action_traces'][0]['console'] == "Im a payloadless action")
+        results = sendReadOnlyPayloadless()
+        assert results[0], f"read-only payloadless failed: {results[1]}"
+        assert(results[1]['processed']['action_traces'][0]['console'] == "Im a payloadless action")
 
-           results = sendReadOnlySlowPayloadless()
-           assert(results[0])
-           assert(results[1]['processed']['action_traces'][0]['console'] == "Im a payloadless slow action")
-           assert(int(results[1]['processed']['elapsed']) > 100)
-    except Exception as e:
-        Print("Exception in sendReadOnlyTrxOnThread: ", repr(e))
-        traceback.print_exc()
-        errorInThread = True
+        results = sendReadOnlySlowPayloadless()
+        assert results[0], f"read-only slow payloadless failed: {results[1]}"
+        assert(results[1]['processed']['action_traces'][0]['console'] == "Im a payloadless slow action")
+        assert(int(results[1]['processed']['elapsed']) > 100)
 
-# Send regular trxs from mutltiple threads to bump load
+# Send regular trxs from multiple threads to bump load. Runs on a WorkerThread.
 def sendTrxsOnThread(startId, numTrxs, opts=None):
     Print("sendTrxsOnThread: ", startId, numTrxs, opts)
 
-    global errorInThread
-    errorInThread = False
-    try:
-        for i in range(numTrxs):
-            results = sendTransaction(testAccountName, 'age', {"user": userAccountName, "id": startId + i}, auth=[{"actor": userAccountName, "permission":"active"}], opts=opts)
-            assert(results[0])
-    except Exception as e:
-        Print("Exception in sendTrxsOnThread: ", repr(e))
-        traceback.print_exc()
-        errorInThread = True
+    for i in range(numTrxs):
+        results = sendTransaction(testAccountName, 'age', {"user": userAccountName, "id": startId + i}, auth=[{"actor": userAccountName, "permission":"active"}], opts=opts)
+        assert results[0], f"age transaction failed: {results[1]}"
 
+# Issue an RPC repeatedly. Runs on a WorkerThread.
 def doRpc(resource, command, numRuns, fieldIn, expectedValue, code, payload={}):
-    global errorInThread
-    errorInThread = False
-    try:
-        for i in range(numRuns):
-            ret_json = apiNode.processUrllibRequest(resource, command, payload)
-            if code is None:
-                assert(ret_json["payload"][fieldIn] is not None)
-                if expectedValue is not None:
-                    assert(ret_json["payload"][fieldIn] == expectedValue)
-            else:
-                assert(ret_json["code"] == code)
-    except Exception as e:
-        Print("Exception in doRpc: ", repr(e))
-        traceback.print_exc()
-        errorInThread = True
+    for i in range(numRuns):
+        ret_json = apiNode.processUrllibRequest(resource, command, payload)
+        if code is None:
+            assert(ret_json["payload"][fieldIn] is not None)
+            if expectedValue is not None:
+                assert(ret_json["payload"][fieldIn] == expectedValue)
+        else:
+            assert(ret_json["code"] == code)
 
 def runReadOnlyTrxAndRpcInParallel(resource, command, fieldIn=None, expectedValue=None, code=None, payload={}):
     Print("runReadOnlyTrxAndRpcInParallel: ", command)
 
     numRuns = 10
-    trxThread = threading.Thread(target = sendReadOnlyTrxOnThread, args = (0, numRuns ))
-    rpcThread = threading.Thread(target = doRpc, args = (resource, command, numRuns, fieldIn, expectedValue, code, payload))
+    trxThread = WorkerThread(sendReadOnlyTrxOnThread, (0, numRuns))
+    rpcThread = WorkerThread(doRpc, (resource, command, numRuns, fieldIn, expectedValue, code, payload))
     trxThread.start()
     rpcThread.start()
 
-    trxThread.join()
-    rpcThread.join()
-    assert(not errorInThread)
+    joinAll([trxThread, rpcThread])
+    assertApiNodeAlive(f"runReadOnlyTrxAndRpcInParallel {command}")
 
 def mixedOpsTest(opt=None):
     Print("mixedOpsTest -- opt = ", opt)
 
     numRuns = 100
-    readOnlyThread = threading.Thread(target = sendReadOnlyTrxOnThread, args = (0, numRuns ))
+    readOnlyThread = WorkerThread(sendReadOnlyTrxOnThread, (0, numRuns))
     readOnlyThread.start()
-    sendTrxThread = threading.Thread(target = sendTrxsOnThread, args = (numRuns, numRuns, opt))
+    sendTrxThread = WorkerThread(sendTrxsOnThread, (numRuns, numRuns, opt))
     sendTrxThread.start()
-    getRawThread = threading.Thread(target = doRpc, args = ("chain", "get_raw_code_and_abi", numRuns, "account_name", testAccountName, 200, {"account_name":testAccountName}))
+    getRawThread = WorkerThread(doRpc, ("chain", "get_raw_code_and_abi", numRuns, "account_name", testAccountName, 200, {"account_name":testAccountName}))
     getRawThread.start()
 
-    readOnlyThread.join()
-    sendTrxThread.join()
-    getRawThread.join()
-    assert(not errorInThread)
+    joinAll([readOnlyThread, sendTrxThread, getRawThread])
+    assertApiNodeAlive("mixedOpsTest")
 
 def sendMulReadOnlyTrx(numThreads):
     threadList = []
     num_trxs_per_thread = 200
     for i in range(numThreads):
-        thr = threading.Thread(target = sendReadOnlyTrxOnThread, args = (i * num_trxs_per_thread, num_trxs_per_thread ))
+        thr = WorkerThread(sendReadOnlyTrxOnThread, (i * num_trxs_per_thread, num_trxs_per_thread))
         thr.start()
         threadList.append(thr)
-    for thr in threadList:
-        thr.join()
+    joinAll(threadList)
+    assertApiNodeAlive(f"sendMulReadOnlyTrx with {numThreads} threads")
 
 def basicTests():
     Print("Insert a user")
@@ -364,11 +398,12 @@ def basicTests():
 
     Print("Send a non-read-only SEGV transaction")
     result = sendTransaction('infinite', action='segv', data={}, auth=[{"actor": userAccountName, "permission": "active"}])
-    assert(result[0] == False)
+    assertFailedWithCode(result, (WASM_EXECUTION_ERROR,), "non-read-only segv")
 
     Print("Send a read-only SEGV transaction")
     result = sendReadOnlySEGV()
-    assert(result[0] == False)
+    assertFailedWithCode(result, (WASM_EXECUTION_ERROR,), "read-only segv")
+    assertApiNodeAlive("basicTests")
 
 def multiReadOnlyTests():
     sendMulReadOnlyTrx(numThreads=5)
@@ -403,43 +438,40 @@ def netApiTests():
     runReadOnlyTrxAndRpcInParallel("net", "disconnect", code=201, payload = "localhost")
 
 def runEverythingParallel():
-    threadList = []
-    threadList.append(threading.Thread(target = multiReadOnlyTests))
-    threadList.append(threading.Thread(target = chainApiTests))
-    threadList.append(threading.Thread(target = netApiTests))
-    threadList.append(threading.Thread(target = mixedOpsTest))
+    threadList = [WorkerThread(multiReadOnlyTests), WorkerThread(chainApiTests), WorkerThread(netApiTests),
+                  WorkerThread(mixedOpsTest)]
     for thr in threadList:
         thr.start()
-    for thr in threadList:
-        thr.join()
+    joinAll(threadList)
+    assertApiNodeAlive("runEverythingParallel")
 
 def fastTransactions():
     Print("fastTransactions")
     for i in range(1000):
         result = sendReadOnlyPayloadless()
-        assert(result[0] or (result[1]['processed']['elapsed'] > max_trx_time))
+        if not result[0]:
+            assertFailedWithCode(result, TIMEOUT_CODES, "read-only payloadless under load")
+            assert(result[1]['processed']['elapsed'] > max_trx_time)
 
 def slowTransactions():
     Print("slowTransactions")
     for i in range(100):  # run fewer number than regular Payloadless so total running time is close
         result = sendReadOnlySlowPayloadless()
-        assert(result[0] or (result[1]['processed']['elapsed'] > max_trx_time))
+        if not result[0]:
+            assertFailedWithCode(result, TIMEOUT_CODES, "read-only slow payloadless under load")
+            assert(result[1]['processed']['elapsed'] > max_trx_time)
 
 def foreverTransactions():
     Print("foreverTransactions")
     for i in range(5): # run fewer number than slowPayloadless so total running time is close
-        result = sendReadOnlyForeverPayloadless()
-        assert(result[0] == False) # should fail
-        result = sendReadOnlySEGV()
-        assert(result[0] == False) # should fail
+        assertFailedWithCode(sendReadOnlyForeverPayloadless(), TIMEOUT_CODES, "read-only forever payloadless")
+        assertFailedWithCode(sendReadOnlySEGV(), (WASM_EXECUTION_ERROR,), "read-only segv")
 
 def infiniteTransactions():
     Print("infiniteTransactions")
     for i in range(5): # run fewer number than slowPayloadless so total running time is close
-        result = sendReadOnlyForeverInfinite()
-        assert(result[0] == False) # should fail
-        result = sendReadOnlySEGV()
-        assert(result[0] == False) # should fail
+        assertFailedWithCode(sendReadOnlyForeverInfinite(), TIMEOUT_CODES, "read-only infinite loop")
+        assertFailedWithCode(sendReadOnlySEGV(), (WASM_EXECUTION_ERROR,), "read-only segv")
 
 def timeoutTest():
     Print("timeoutTest")
@@ -460,28 +492,19 @@ def timeoutTest():
     )
     '''
     if Utils.Debug: Utils.Print(f"result: {results}")
-    assert(results[0] == False)
-    assert('except' in results[1]['processed'])
-    assert(results[1]['processed']['except']['code'] == 3080004)
-    assert(results[1]['processed']['except']['name'] == "tx_cpu_usage_exceeded")
+    assertFailedWithCode(results, (TX_CPU_USAGE_EXCEEDED,), "forever read-only transaction")
 
     # Send multiple different speeds of read only transactions simutaneously
     # to trigger forever transactions are exhausted in read window but RETRYING
     # at next round.
-    threadList = []
-    threadList.append(threading.Thread(target = fastTransactions))
-    threadList.append(threading.Thread(target = slowTransactions))
-    threadList.append(threading.Thread(target = foreverTransactions))
-    threadList.append(threading.Thread(target = infiniteTransactions))
-    threadList.append(threading.Thread(target = infiniteTransactions))
-    threadList.append(threading.Thread(target = foreverTransactions))
-    threadList.append(threading.Thread(target = infiniteTransactions))
-    threadList.append(threading.Thread(target = foreverTransactions))
+    threadList = [WorkerThread(target) for target in (fastTransactions, slowTransactions, foreverTransactions,
+                                                       infiniteTransactions, infiniteTransactions, foreverTransactions,
+                                                       infiniteTransactions, foreverTransactions)]
     Print("Sending different speeds of read only transactions simultaneously")
     for thr in threadList:
         thr.start()
-    for thr in threadList:
-        thr.join()
+    joinAll(threadList)
+    assertApiNodeAlive("timeoutTest")
 
 try:
     startCluster()

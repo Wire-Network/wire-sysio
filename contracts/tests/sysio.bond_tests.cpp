@@ -321,7 +321,7 @@ public:
    fc::variant decode(abi_serializer& ser, const char* type, const std::vector<char>& data) {
       return data.empty()
                 ? fc::variant()
-                : ser.binary_to_variant(type, data, abi_serializer::create_yield_function(abi_serializer_max_time));
+                : ser.binary_to_variant(type, data, fixture_abi_yield_function());
    }
    fc::variant request_row_of(uint64_t id) {
       return decode(bond_abi_ser, "request_row", get_row_by_id(BOND_ACCOUNT, BOND_ACCOUNT, "requests"_n, id));
@@ -370,7 +370,7 @@ public:
       mvo row(request_row_of(id).get_object());
       row("token_code", codename_mvo(token_code));
       const auto bytes = bond_abi_ser.variant_to_binary("request_row", row,
-                                                        abi_serializer::create_yield_function(abi_serializer_max_time));
+                                                        fixture_abi_yield_function());
       const auto* obj = kv_row("requests"_n, request_key_of(id));
       BOOST_REQUIRE(obj != nullptr);
       auto& db = const_cast<chainbase::database&>(control->db());
@@ -479,7 +479,7 @@ public:
       for (const auto& at : last_trace->action_traces) {
          if (at.act.account != token_contract || at.act.name != "transfer"_n || at.receiver != token_contract) continue;
          const auto v = ser.binary_to_variant("transfer", at.act.data,
-                                              abi_serializer::create_yield_function(abi_serializer_max_time));
+                                              fixture_abi_yield_function());
          seen.push_back({v["from"].as<name>(), v["to"].as<name>(), v["quantity"].as<asset>(), v["memo"].as_string()});
       }
       return seen;
@@ -490,7 +490,7 @@ public:
       for (const auto& at : last_trace->action_traces) {
          if (at.act.account != LIQ_ACCOUNT || at.act.name != "settle"_n || at.receiver != LIQ_ACCOUNT) continue;
          const auto v = liq_abi_ser.binary_to_variant("settle", at.act.data,
-                                              abi_serializer::create_yield_function(abi_serializer_max_time));
+                                              fixture_abi_yield_function());
          seen.push_back({v["custodian"].as<name>(), v["beneficiary"].as<name>(), v["quantity"].as<asset>(), {}});
       }
       return seen;
@@ -505,7 +505,7 @@ public:
       for (const auto& at : last_trace->action_traces) {
          if (at.act.account != LIQ_ACCOUNT || at.act.name != "addyield"_n || at.receiver != LIQ_ACCOUNT) continue;
          const auto v = liq_abi_ser.binary_to_variant("addyield", at.act.data,
-                                                      abi_serializer::create_yield_function(abi_serializer_max_time));
+                                                      fixture_abi_yield_function());
          seen.emplace_back(v["from"].as<name>(), v["quantity"].as<asset>());
       }
       return seen;

@@ -108,7 +108,9 @@ namespace sysio {
          uint32_t                              epoch_index        = 0;
          sysio::opp::types::EmissionsBlockReason reason           =
             sysio::opp::types::EMISSIONS_BLOCK_REASON_UNSPECIFIED;
+         /// What the gate tried to authorize: the period total on a pay epoch, otherwise the epoch's share.
          int64_t                               attempted_emission = 0;
+         /// T5 budget not yet paid out or accrued to the open pay period (net headroom), not floored at 0.
          int64_t                               treasury_remaining = 0;
          int64_t                               sysio_balance      = 0;
          uint32_t                              first_blocked_at   = 0; // unix seconds
@@ -159,8 +161,8 @@ namespace sysio {
 
       /// Upper bound on `operators_per_epoch` (the size of one schedule group): Ethereum's OPPInbound is
       /// sized and tested for `OPERATORS_PER_GROUP` (7), under Solana's `MAX_GROUP_MEMBERS` (16). Each
-      /// member of the expiring group also costs inline actions in `advance` (opreg::recorddel +
-      /// opreg::termcheck per outpost, and a sysio.system::payepoch transfer).
+      /// member of the expiring group also costs two inline actions in `advance` (opreg::recorddel +
+      /// opreg::termcheck) and a payclaims credit in sysio.system::payepoch.
       static constexpr uint32_t MAX_OPERATORS_PER_EPOCH = 7;
 
       /// Largest schedule window (operators_per_epoch * batch_op_groups, which the product equality pins

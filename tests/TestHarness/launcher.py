@@ -367,10 +367,11 @@ class cluster_generator:
             json.dump(cfg, out, cls=EnhancedEncoder, indent=2)
 
     def init_genesis(self):
+        """Load the supplied genesis or create one at the current UTC millisecond."""
         genesis_path = self.args.genesis if self.args.genesis.is_absolute() else Path.cwd() / self.args.genesis
         genesis = None
         if not genesis_path.is_file():
-            genesis = { 'initial_timestamp': datetime.datetime.now().isoformat(),
+            genesis = { 'initial_timestamp': Utils.genesisTimestamp(),
                         'initial_key': self.network.nodes['bios'].keys[0].pubkey,
                         'initial_finalizer_key': self.network.nodes['bios'].keys[0].blspubkey,
                         'initial_configuration': {

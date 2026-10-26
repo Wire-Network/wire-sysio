@@ -52,7 +52,7 @@ public:
       BOOST_REQUIRE(accnt != nullptr);
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
-      chains_abi.set_abi(std::move(abi), abi_serializer::create_yield_function(abi_serializer_max_time));
+      chains_abi.set_abi(std::move(abi), fixture_abi_yield_function());
    }
 
    action_result push_chains(name action_name, const fc::variant_object& data) {
@@ -62,7 +62,7 @@ public:
          act.account = CHAINS_ACCOUNT;
          act.name    = action_name;
          act.data    = chains_abi.variant_to_binary(action_type, data,
-                          abi_serializer::create_yield_function(abi_serializer_max_time));
+                          fixture_abi_yield_function());
          act.authorization = std::vector<permission_level>{{CHAINS_ACCOUNT, config::active_name}};
 
          signed_transaction trx;
@@ -99,7 +99,7 @@ public:
    fc::variant get_chain(std::string_view code) {
       auto data = get_row_by_id(CHAINS_ACCOUNT, CHAINS_ACCOUNT, "chains"_n, fc::slug_name{code}.value);
       return data.empty() ? fc::variant() : chains_abi.binary_to_variant(
-         "chain_row", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         "chain_row", data, fixture_abi_yield_function());
    }
 
    /// One address field off a stored row's nested `outpost` struct.

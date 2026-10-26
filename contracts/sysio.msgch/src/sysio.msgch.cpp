@@ -17,6 +17,7 @@
 #include <zpp_bits.h>
 #include <magic_enum/magic_enum.hpp>
 #include <algorithm>
+#include <limits>
 #include <optional>
 
 namespace sysio {
@@ -1536,13 +1537,13 @@ void msgch::buildenv(uint64_t chain_code) {
    // effect accounts than one Solana transaction can carry is settled across several calls rather
    // than refused here. Sizing a WIRE consensus envelope against another chain's packet limit put
    // that chain's MTU inside depot consensus; the cursor removes the need.
-   auto queue = atts.get_index<"byqueue"_n>();
+   auto by_queue = atts.get_index<"byqueue"_n>();
    const auto in_ready_queue = [&](const auto& row) {
-      return row != queue.end() && row->chain_code == chain_code &&
+      return row != by_queue.end() && row->chain_code == chain_code &&
              row->status == AttestationStatus::ATTESTATION_STATUS_READY;
    };
 
-   auto ready = queue.lower_bound(
+   auto ready = by_queue.lower_bound(
       queue_key(chain_code, AttestationStatus::ATTESTATION_STATUS_READY, queue_lane::schedule));
    if (!in_ready_queue(ready)) return;
 
@@ -1587,21 +1588,21 @@ void msgch::buildenv(uint64_t chain_code) {
    route_endpoints.end.kind   = op_row.kind;
    route_endpoints.end.id     = op_row.external_chain_id;
 
-   // Chain links: the previous envelope emitted for this outpost. `outenvelopes` is one-deep per
-   // outpost (see the cleanup below), so the single surviving row is the previous emit; its
-   // `envelope_hash` is that envelope's epoch digest and its `last_message_id` is this outpost's
-   // message-stream tip. The first emit for an outpost has no row and chains both links from
-   // empty (genesis), matching the outpost contracts' zero genesis tip.
+   // Chain links come from the previous emit, the newest row for this outpost: one step back from the
+   // first `byoutepoch` entry past it, so retained rows are never walked. No row means genesis: both
+   // links chain from empty.
    outenvelopes_t envelopes(get_self());
    std::vector<char> prev_envelope_digest;
    std::vector<char> prev_message_id;
    {
-      auto by_outpost = envelopes.get_index<"byoutpost"_n>();
-      auto prev_it = by_outpost.lower_bound(chain_code);
-      if (prev_it != by_outpost.end() && prev_it->chain_code == chain_code) {
-         const auto digest_bytes = prev_it->envelope_hash.extract_as_byte_array();
+      auto by_epoch = envelopes.get_index<"byoutepoch"_n>();
+      auto it = by_epoch.upper_bound(
+         opp::outpost_epoch_key(chain_code, std::numeric_limits<uint32_t>::max()));
+      --it;
+      if (it != by_epoch.end() && it->chain_code == chain_code) {
+         const auto digest_bytes = it->envelope_hash.extract_as_byte_array();
          prev_envelope_digest.assign(digest_bytes.begin(), digest_bytes.end());
-         const auto tip_bytes = prev_it->last_message_id.extract_as_byte_array();
+         const auto tip_bytes = it->last_message_id.extract_as_byte_array();
          prev_message_id.assign(tip_bytes.begin(), tip_bytes.end());
       }
    }
@@ -1725,30 +1726,42 @@ void msgch::buildenv(uint64_t chain_code) {
 
    // === AUDIT LOG + INLINE CLEANUP OF WORKING STATE ===
    //
-   // Audit-log row mirrors the outbound emit (WIRE → outpost). Followed
-   // by inline drains of the previous-epoch outenvelopes row (one-deep
-   // retention; the batch op only ever reads the most-recent emit) and
-   // this outpost's inbound attestations, already dispatched.
+   // Audit-log row mirrors the outbound emit (WIRE → outpost). Then drain the outenvelopes rows the
+   // outpost has consumed and this outpost's inbound attestations, already dispatched.
    {
       // Same endpoints the wire envelope carries (derived above from the
       // destination's `sysio.chains` row).
       write_envelope_log(get_self(), route_endpoints, epoch, envelope_digest);
 
-      // Drop previous outpost emits — keep only the row we just inserted.
-      auto by_outpost = envelopes.get_index<"byoutpost"_n>();
-      for (auto it = by_outpost.lower_bound(chain_code);
-           it != by_outpost.end() && it->chain_code == chain_code; ) {
-         if (it->id == out_id) { ++it; continue; }
-         it = by_outpost.erase(std::move(it));
+      // Drop the prefix of prior emits the outpost has consumed: an outpost emits epoch N only after
+      // accepting ours, so `outpcons.epoch_index` covering a row's epoch proves consumption. The walk
+      // stops at the first row it does not cover, the oldest copy the outpost still needs; no
+      // `outpcons` row acknowledges nothing.
+      auto by_epoch = envelopes.get_index<"byoutepoch"_n>();
+      auto it = by_epoch.lower_bound(opp::outpost_epoch_key(chain_code, 0));
+      outpost_consensus_t opcons(get_self());
+      const auto opc_pk = outpost_consensus_key{chain_code};
+      if (opcons.contains(opc_pk)) {
+         const uint32_t acked = opcons.get(opc_pk).epoch_index;
+         while (it != by_epoch.end() && it->chain_code == chain_code && it->epoch_index <= acked) {
+            if (it->id == out_id) { ++it; continue; }
+            it = by_epoch.erase(std::move(it));
+         }
+      }
+      if (it != by_epoch.end() && it->chain_code == chain_code && it->id != out_id) {
+         // Not expected: only a transaction signed directly by sysio.msgch or sysio.epoch skips the
+         // `chkcons` consensus check. Logged once so retained rows are visible.
+         sysio::print_f("msgch::buildenv: retaining unacknowledged emits from epoch %u, chain_code=%llu\n",
+                        it->epoch_index, static_cast<unsigned long long>(chain_code));
       }
 
       // Drop this outpost's inbound attestations: `evalcons` stores them PROCESSED and dispatches them
       // inline, so their bytes are dead weight on chain. The range holds this outpost's rows only.
-      for (auto it = queue.lower_bound(
+      for (auto inbound = by_queue.lower_bound(
               queue_key(chain_code, AttestationStatus::ATTESTATION_STATUS_PROCESSED, queue_lane::schedule));
-           it != queue.end() && it->chain_code == chain_code &&
-           it->status == AttestationStatus::ATTESTATION_STATUS_PROCESSED; ) {
-         it = queue.erase(std::move(it));
+           inbound != by_queue.end() && inbound->chain_code == chain_code &&
+           inbound->status == AttestationStatus::ATTESTATION_STATUS_PROCESSED; ) {
+         inbound = by_queue.erase(std::move(inbound));
       }
    }
 }

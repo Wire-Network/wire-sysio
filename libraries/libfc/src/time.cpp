@@ -9,6 +9,19 @@
 
 namespace fc {
 
+  namespace {
+     /// Separate whole seconds from decimal fractional digits.
+     constexpr auto fraction_separator = '.';
+     /// Lower bound of an ASCII decimal digit.
+     constexpr auto zero_digit = '0';
+     /// Upper bound of an ASCII decimal digit.
+     constexpr auto nine_digit = '9';
+     /// Scale successive fractional places in base ten.
+     constexpr auto decimal_radix = 10;
+     /// Diagnose nondecimal fractional input.
+     constexpr auto invalid_fraction_message = "ISO fractional seconds must contain only decimal digits";
+  }
+
   namespace bch = boost::chrono;
   std::tm to_utc_tm(std::time_t tt) {
      std::tm out{};
@@ -70,14 +83,19 @@ namespace fc {
 
   time_point time_point::from_iso_string( const std::string& s )
   { try {
-      auto dot = s.find( '.' );
+      const auto dot = s.find( fraction_separator );
       if( dot == std::string::npos )
          return time_point_sec::from_iso_string( s ).to_time_point();
       else {
-         auto ms = s.substr( dot );
-         ms[0] = '1';
-         while( ms.size() < 4 ) ms.push_back('0');
-         return time_point_sec::from_iso_string( s ).to_time_point() + milliseconds( to_int64(ms) - 1000 );
+         int64_t fraction = 0;
+         auto place = seconds(1).count();
+         for( auto i = dot + 1; i < s.size(); ++i ) {
+            const auto digit = s[i];
+            FC_ASSERT( digit >= zero_digit && digit <= nine_digit, "{}", invalid_fraction_message );
+            place /= decimal_radix;
+            fraction += (digit - zero_digit) * place;
+         }
+         return time_point_sec::from_iso_string( s ).to_time_point() + microseconds(fraction);
       }
   } FC_RETHROW_EXCEPTIONS( warn, "unable to convert ISO-formatted string to fc::time_point" ) }
 

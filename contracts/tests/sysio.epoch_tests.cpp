@@ -51,13 +51,13 @@ public:
       BOOST_REQUIRE(accnt != nullptr);
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
-      abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function(abi_serializer_max_time));
+      abi_ser.set_abi(std::move(abi), fixture_abi_yield_function());
 
       const auto* chains_accnt = control->find_account_metadata(CHAINS_ACCOUNT);
       BOOST_REQUIRE(chains_accnt != nullptr);
       abi_def chains_abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(chains_accnt->abi, chains_abi), true);
-      chains_abi_ser.set_abi(std::move(chains_abi), abi_serializer::create_yield_function(abi_serializer_max_time));
+      chains_abi_ser.set_abi(std::move(chains_abi), fixture_abi_yield_function());
    }
 
    action_result push_epoch_action(name signer, name action_name, const variant_object& data) {
@@ -127,7 +127,7 @@ public:
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
          "epoch_config",
          data,
-         abi_serializer::create_yield_function(abi_serializer_max_time) );
+         fixture_abi_yield_function() );
    }
 
    fc::variant get_epoch_state() {
@@ -135,7 +135,7 @@ public:
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
          "epoch_state",
          data,
-         abi_serializer::create_yield_function(abi_serializer_max_time) );
+         fixture_abi_yield_function() );
    }
 
    /// Read a chain row from sysio.chains by code (slug_name PK).
@@ -145,7 +145,7 @@ public:
       return data.empty() ? fc::variant() : chains_abi_ser.binary_to_variant(
          "chain_row",
          data,
-         abi_serializer::create_yield_function(abi_serializer_max_time) );
+         fixture_abi_yield_function() );
    }
 
    abi_serializer abi_ser;

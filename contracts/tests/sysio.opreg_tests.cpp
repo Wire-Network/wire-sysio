@@ -359,14 +359,14 @@ public:
       BOOST_REQUIRE(accnt != nullptr);
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
-      opreg_abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function(abi_serializer_max_time));
+      opreg_abi_ser.set_abi(std::move(abi), fixture_abi_yield_function());
 
       // Load epoch ABI serializer
       const auto* epoch_accnt = control->find_account_metadata(EPOCH_ACCOUNT);
       BOOST_REQUIRE(epoch_accnt != nullptr);
       abi_def epoch_abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(epoch_accnt->abi, epoch_abi), true);
-      epoch_abi_ser.set_abi(std::move(epoch_abi), abi_serializer::create_yield_function(abi_serializer_max_time));
+      epoch_abi_ser.set_abi(std::move(epoch_abi), fixture_abi_yield_function());
    }
 
    // ── SlugName helpers ──
@@ -573,7 +573,7 @@ public:
       auto data = get_row_by_id(OPREG_ACCOUNT, OPREG_ACCOUNT, "wtdwqueue"_n, request_id);
       return data.empty() ? fc::variant() : opreg_abi_ser.binary_to_variant(
          "withdraw_request", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    // ── Table read helpers ──
@@ -582,14 +582,14 @@ public:
       auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "opconfig"_n, "opconfig"_n);
       return data.empty() ? fc::variant() : opreg_abi_ser.binary_to_variant(
          "op_config", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    fc::variant get_operator(name account) {
       auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "operators"_n, account);
       return data.empty() ? fc::variant() : opreg_abi_ser.binary_to_variant(
          "operator_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    /// Raw dellog row by log_id; empty variant when the row does not exist.
@@ -597,7 +597,7 @@ public:
       auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, "dellog"_n, name{log_id});
       return data.empty() ? fc::variant() : opreg_abi_ser.binary_to_variant(
          "delivery_log_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    /// Newest entry in the operator's `recent_actions` ring buffer.
@@ -616,14 +616,14 @@ public:
       auto data = get_row_by_id(OPREG_ACCOUNT, account, "remitclaims"_n, cn(token_code).value);
       return data.empty() ? fc::variant() : opreg_abi_ser.binary_to_variant(
          "remit_claim", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    /// Banked yield retained independently of an operator's registration, or zero when absent.
    fc::uint128_t yield_debt(name account, std::string_view token_code = kLiqEthCodename) {
       const auto data = get_row_by_id(OPREG_ACCOUNT, account, "yielddebts"_n, cn(token_code).value);
       return data.empty() ? fc::uint128_t{0} : opreg_abi_ser.binary_to_variant(
-         "yield_debt", data, abi_serializer::create_yield_function(abi_serializer_max_time))["owed_wire"].as_uint128();
+         "yield_debt", data, fixture_abi_yield_function())["owed_wire"].as_uint128();
    }
 
    /// Seed an existing ledger field at an arithmetic boundary without issuing impossible token
@@ -642,15 +642,15 @@ public:
       BOOST_REQUIRE(it != idx.end());
       const std::vector<char> data(it->value.data(), it->value.data() + it->value.size());
       mvo row(opreg_abi_ser.binary_to_variant(row_type, data,
-         abi_serializer::create_yield_function(abi_serializer_max_time)).get_object());
+         fixture_abi_yield_function()).get_object());
       row.set(field, value);
       const auto encoded = opreg_abi_ser.variant_to_binary(row_type, row,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       auto& db = const_cast<chainbase::database&>(control->db());
       db.modify(*it, [&](auto& r) { r.value.assign(encoded.data(), encoded.size()); });
       const std::vector<char> stored(it->value.data(), it->value.data() + it->value.size());
       const auto observed = opreg_abi_ser.binary_to_variant(row_type, stored,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       BOOST_REQUIRE_EQUAL(value.as_string(), observed[field].as_string());
    }
 
@@ -832,7 +832,7 @@ public:
       const auto data = get_row_by_id(LIQ_ACCOUNT, LIQ_ACCOUNT, "yieldidx"_n, kLiqEthSymbol.to_symbol_code().value);
       return data.empty() ? fc::uint128_t{0}
                           : liq_abi_ser.binary_to_variant("yield_index", data,
-                               abi_serializer::create_yield_function(abi_serializer_max_time))["index"].as_uint128();
+                               fixture_abi_yield_function())["index"].as_uint128();
    }
 
    /// `account`'s depot-native `(WIRE, token_code)` balance row; empty variant when absent.
@@ -852,7 +852,7 @@ public:
       const auto sym_code = kLiqEthSymbol.to_symbol_code().value;
       const auto holder   = liq_abi_ser.binary_to_variant("account",
          get_row_by_id(LIQ_ACCOUNT, OPREG_ACCOUNT, "accounts"_n, sym_code),
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
       return yield_reference::owed(holder["balance"].as<asset>().get_amount(), liq_index(),
                                    holder["index_checkpoint"].as_uint128(), holder["owed_wire"].as_uint64());
    }
@@ -1072,7 +1072,7 @@ BOOST_FIXTURE_TEST_CASE(termcheck_terminates_at_duty_rotation_cadence, sysio_opr
    // resident operator is recorded once per 3-epoch rotation, so a
    // consecutive-miss run reaching the threshold spans
    // (threshold + 1) * kDutyRotationMs of wall clock — the arithmetic the
-   // SEC-28 span bound protects. Drive one outpost's records at exactly that
+   // span bound protects. Drive one record per duty epoch at exactly that
    // cadence under a window sized by the bound (with one rotation of margin
    // for block-time skew) and require the run to stay observable end to end.
    BOOST_REQUIRE_EQUAL(success(), set_epoch_config(kWindowBoundEpochDurationSec));
@@ -1305,7 +1305,7 @@ BOOST_FIXTURE_TEST_CASE(multiple_bootstrapped_batch_ops, sysio_opreg_tester) { t
    BOOST_REQUIRE(!epoch_state_data.empty());
    auto epoch_state = epoch_abi_ser.binary_to_variant(
       "epoch_state", epoch_state_data,
-      abi_serializer::create_yield_function(abi_serializer_max_time));
+      fixture_abi_yield_function());
    auto groups = epoch_state["batch_op_groups"].get_array();
    BOOST_REQUIRE_EQUAL(3, groups.size());
 } FC_LOG_AND_RETHROW() }

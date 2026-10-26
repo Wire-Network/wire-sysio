@@ -657,7 +657,7 @@ public:
    fc::variant decode(abi_serializer& ser, const char* type, const std::vector<char>& data) {
       return data.empty()
                 ? fc::variant()
-                : ser.binary_to_variant(type, data, abi_serializer::create_yield_function(abi_serializer_max_time));
+                : ser.binary_to_variant(type, data, fixture_abi_yield_function());
    }
    /// Append `value` to a kv key as the big-endian word the CDT key serializer writes.
    static void append_key_word(std::string& key, uint64_t value) {

@@ -68,7 +68,7 @@ public:
       BOOST_REQUIRE(accnt != nullptr);
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
-      abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function(abi_serializer_max_time));
+      abi_ser.set_abi(std::move(abi), fixture_abi_yield_function());
    }
 
    action_result push_msgch_action(name signer, name action_name, const variant_object& data) {
@@ -134,21 +134,21 @@ public:
       auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
          "outbound_envelope", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    fc::variant get_envelope(uint64_t id) {
       auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "envelopes"_n, id);
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
          "envelope_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    fc::variant get_attestation(uint64_t id) {
       auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "attestations"_n, id);
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant(
          "attestation_entry", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
+         fixture_abi_yield_function());
    }
 
    abi_serializer abi_ser;
@@ -238,7 +238,7 @@ public:
       abi_def msgch_abi_;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(msgch_accnt->abi, msgch_abi_), true);
       msgch_abi.set_abi(std::move(msgch_abi_),
-                        abi_serializer::create_yield_function(abi_serializer_max_time));
+                        fixture_abi_yield_function());
    }
 
    action_result push_action(name account, name signer, name action_name, const variant_object& data) {
@@ -316,7 +316,7 @@ public:
          if (data.empty()) continue;
          auto row = msgch_abi.binary_to_variant(
             "attestation_entry", data,
-            abi_serializer::create_yield_function(abi_serializer_max_time));
+            fixture_abi_yield_function());
          if (row["chain_code"].as_uint64() != chain_code) continue;
          // status == READY (matches AttestationStatus::ATTESTATION_STATUS_READY,
          // the value the contract emits for queued-but-not-yet-bundled rows).
@@ -348,39 +348,49 @@ public:
       const auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outqueue"_n, chain_code);
       if (data.empty()) return 0;
       const auto row = msgch_abi.binary_to_variant(
-         "outbound_queue_entry", data, abi_serializer::create_yield_function(abi_serializer_max_time));
+         "outbound_queue_entry", data, fixture_abi_yield_function());
       return row["queued"].as<uint32_t>();
    }
 
-   /// The attestations of the envelope `buildenv` last built for `chain_code`, in shipped order.
+   /// The attestations of the envelope `buildenv` last built for `chain_code`, in shipped order. Earlier
+   /// emits the outpost has not acknowledged stay in `outenvelopes`, so this reads the newest row.
    std::vector<opp::AttestationEntry> shipped_attestations(uint64_t chain_code, uint64_t scan_until = 16) {
+      fc::variant newest;
       for (uint64_t id = 0; id < scan_until; ++id) {
          const auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
          if (data.empty()) continue;
-         const auto row = msgch_abi.binary_to_variant(
-            "outbound_envelope", data, abi_serializer::create_yield_function(abi_serializer_max_time));
-         if (row["chain_code"].as_uint64() != chain_code) continue;
-         const auto raw = row["raw_envelope"].as<std::vector<char>>();
-         opp::Envelope env;
-         BOOST_REQUIRE(env.ParseFromArray(raw.data(), static_cast<int>(raw.size())));
-         BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
-         const auto& shipped = env.messages(0).payload().attestations();
-         return {shipped.begin(), shipped.end()};
+         auto row = msgch_abi.binary_to_variant("outbound_envelope", data, fixture_abi_yield_function());
+         if (row["chain_code"].as_uint64() == chain_code) newest = std::move(row);
       }
-      BOOST_FAIL("no outbound envelope for the outpost");
-      return {};
+      BOOST_REQUIRE_MESSAGE(!newest.is_null(), "no outbound envelope for the outpost");
+      const auto raw = newest["raw_envelope"].as<std::vector<char>>();
+      opp::Envelope env;
+      BOOST_REQUIRE(env.ParseFromArray(raw.data(), static_cast<int>(raw.size())));
+      BOOST_REQUIRE_EQUAL(env.messages_size(), 1);
+      const auto& shipped = env.messages(0).payload().attestations();
+      return {shipped.begin(), shipped.end()};
    }
 
-   /// Return the first outbound envelope row found in a small id scan.
+   /// Return the newest outbound envelope row in a small id scan (the chain tip).
    fc::variant find_outbound_envelope(uint64_t scan_until = 16) {
+      fc::variant newest;
       for (uint64_t id = 0; id < scan_until; ++id) {
          auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
          if (data.empty()) continue;
-         return msgch_abi.binary_to_variant(
+         newest = msgch_abi.binary_to_variant(
             "outbound_envelope", data,
-            abi_serializer::create_yield_function(abi_serializer_max_time));
+            fixture_abi_yield_function());
       }
-      return fc::variant{};
+      return newest;
+   }
+
+   /// Number of live `outenvelopes` rows in the id range `[0, scan_until)`.
+   uint32_t outbound_envelope_count(uint64_t scan_until = 16) {
+      uint32_t n = 0;
+      for (uint64_t id = 0; id < scan_until; ++id) {
+         if (!get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id).empty()) ++n;
+      }
+      return n;
    }
 
    /// Count populated `envlog` rows in the id range `[0, max_id_exclusive)`.
@@ -457,7 +467,7 @@ BOOST_FIXTURE_TEST_CASE(buildenv_writes_envlog_row, sysio_msgch_envlog_tester) {
    BOOST_REQUIRE(!data.empty());
    auto row = msgch_abi.binary_to_variant(
       "envelope_log_entry", data,
-      abi_serializer::create_yield_function(abi_serializer_max_time));
+      fixture_abi_yield_function());
    BOOST_REQUIRE_EQUAL(1u, row["id"].as_uint64());
    // start = WIRE/1, end = ETH/31337. ABI serializer reflects the
    // ChainKind enum back as its symbolic name; the `chain_id` field is a
@@ -546,10 +556,9 @@ BOOST_FIXTURE_TEST_CASE(envlog_cap_tracks_outpost_count, sysio_msgch_envlog_test
    BOOST_REQUIRE_EQUAL(7u, alive);
 } FC_LOG_AND_RETHROW() }
 
-/// Existing `outenvelopes` row gets dropped on the next `buildenv` for
-/// the same outpost — one-deep retention (the batch op only ever reads
-/// the most-recent emit).
-BOOST_FIXTURE_TEST_CASE(buildenv_drops_previous_outenvelopes, sysio_msgch_envlog_tester) { try {
+/// WNS-18 / WIRE-348: without inbound consensus nothing is acknowledged, so `buildenv` keeps every
+/// prior emit. The acknowledged half is `buildenv_erases_acknowledged_outenvelope`.
+BOOST_FIXTURE_TEST_CASE(buildenv_retains_unacknowledged_outenvelopes, sysio_msgch_envlog_tester) { try {
    bootstrap_epoch_config(/*retention=*/200);
    register_outpost(opp::types::CHAIN_KIND_EVM, 31337);
    produce_blocks();
@@ -561,16 +570,23 @@ BOOST_FIXTURE_TEST_CASE(buildenv_drops_previous_outenvelopes, sysio_msgch_envlog
    produce_blocks();
    auto first = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, 1);
    BOOST_REQUIRE(!first.empty());
+   BOOST_REQUIRE_EQUAL(1u, outbound_envelope_count());
 
    BOOST_REQUIRE_EQUAL(success(), queueout(ETH_OUTPOST_ID, EVM_TEST_ATTESTATION_TYPE));
    BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
    produce_blocks();
 
-   // First row is now gone (replaced by the second emit).
+   // Both rows live: the outpost acknowledged neither.
    first = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, 1);
-   BOOST_REQUIRE(first.empty());
+   BOOST_REQUIRE(!first.empty());
    auto second = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, 2);
    BOOST_REQUIRE(!second.empty());
+   BOOST_REQUIRE_EQUAL(2u, outbound_envelope_count());
+
+   // The tip is the newest row, not the retained row 1.
+   auto tip = find_outbound_envelope();
+   BOOST_REQUIRE(!tip.is_null());
+   BOOST_REQUIRE_EQUAL(2u, tip["id"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 /// `attestations` PROCESSED rows for a given outpost are dropped at the
@@ -645,20 +661,10 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
    BOOST_REQUIRE_EQUAL(success(), buildenv(/*chain_code=*/ETH_OUTPOST_ID));
    produce_blocks();
 
-   // The most recent emit lives at one of the early ids; the one-deep
-   // retention sweep means at most one row exists per outpost. Find it.
-   fc::variant emitted_row;
-   uint64_t    emitted_id = std::numeric_limits<uint64_t>::max();
-   for (uint64_t id = 0; id < 16; ++id) {
-      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
-      if (data.empty()) continue;
-      emitted_row = msgch_abi.binary_to_variant(
-         "outbound_envelope", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
-      emitted_id = id;
-      break;
-   }
+   // The newest emit; earlier ones are retained because nothing is acknowledged here.
+   fc::variant emitted_row = find_outbound_envelope();
    BOOST_REQUIRE(!emitted_row.is_null());
+   const uint64_t emitted_id = emitted_row["id"].as_uint64();
 
    // ── Invariant 1: emitted envelope is at or under the cross-chain cap.
    const auto& raw = emitted_row["raw_envelope"].as<std::vector<char>>();
@@ -679,18 +685,10 @@ BOOST_FIXTURE_TEST_CASE(buildenv_packs_until_cap_then_leaves_remainder,
    BOOST_REQUIRE_EQUAL(success(), buildenv(/*chain_code=*/ETH_OUTPOST_ID));
    produce_blocks();
 
-   // Find the new emitted row (one-deep retention dropped the prior one).
-   fc::variant emitted_row_2;
-   for (uint64_t id = 0; id < 16; ++id) {
-      if (id == emitted_id) continue;        // prior row was evicted
-      auto data = get_row_by_id(MSGCH_ACCOUNT, MSGCH_ACCOUNT, "outenvelopes"_n, id);
-      if (data.empty()) continue;
-      emitted_row_2 = msgch_abi.binary_to_variant(
-         "outbound_envelope", data,
-         abi_serializer::create_yield_function(abi_serializer_max_time));
-      break;
-   }
+   // The new tip; emit#1's row is still present (unacknowledged).
+   fc::variant emitted_row_2 = find_outbound_envelope();
    BOOST_REQUIRE(!emitted_row_2.is_null());
+   BOOST_REQUIRE_NE(emitted_id, emitted_row_2["id"].as_uint64());
    const auto& raw2 = emitted_row_2["raw_envelope"].as<std::vector<char>>();
    BOOST_TEST_MESSAGE("emit#2 envelope size = " << raw2.size() << " bytes");
    BOOST_REQUIRE_LE(raw2.size(), MAX_ENVELOPE_BYTES);

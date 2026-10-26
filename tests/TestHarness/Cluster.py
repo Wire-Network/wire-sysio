@@ -7,18 +7,11 @@ import os
 import re
 import string
 import signal
-from datetime import datetime
 import sys
 import random
 import json
 import socket
 from pathlib import Path
-
-try:
-    from datetime import UTC
-except ImportError:
-    from datetime import timezone
-    UTC = timezone.utc
 
 from .core_symbol import CORE_SYMBOL
 from .accounts import Account, createAccountKeys
@@ -292,7 +285,7 @@ class Cluster(object):
             time.sleep(Cluster.__localLaunchPortCheckSleepSeconds)
         loggingLevelDictString = json.dumps(self.loggingLevelDict, separators=(',', ':'))
         args=(f'-p {pnodes} -n {totalNodes} -d {delay} '
-              f'-i {datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]} -f {producerFlag} '
+              f'-i {Utils.genesisTimestamp()} -f {producerFlag} '
               f'--unstarted-nodes {unstartedNodes} --logging-level {self.loggingLevel} '
               f'--logging-level-map {loggingLevelDictString}')
         argsArr=args.split()
@@ -1341,6 +1334,10 @@ class Cluster(object):
             if not self.deploySystemContract(biosNode, sysioAccount):
                 return None
 
+        if not onlyBios and not onlySetProds:
+            if not self.initializeBootstrapContracts(biosNode, sysioAccount, producerKeys, loadSystemContract):
+                return None
+
         # verify node is synced before setting prods
         headBlockNum=biosNode.getHeadBlockNum()
         assert self.getNode().waitForBlock(headBlockNum, timeout=Utils.systemWaitTimeout)
@@ -1398,6 +1395,18 @@ class Cluster(object):
 
         if onlySetProds: return biosNode
 
+        Utils.Print("Cluster bootstrap done.")
+
+        return True
+
+    def initializeBootstrapContracts(self, biosNode, sysioAccount, producerKeys, loadSystemContract):
+        """Finish bootstrap writes before BIOS gives up production.
+
+        BIOS has no transaction retry service. Once it stops producing, an
+        accepted speculative transaction can be lost while its peers reconnect.
+        Keep all initialization on the active BIOS producer so its unapplied
+        transactions remain eligible for block inclusion during a disconnect.
+        """
         sysioTokenAccount = copy.deepcopy(sysioAccount)
         sysioTokenAccount.name = 'sysio.token'
         contract="sysio.token"
@@ -1600,8 +1609,6 @@ class Cluster(object):
         if loadSystemContract:
             if not self.initializeSystemContract(biosNode, sysioAccount):
                 return None
-
-        Utils.Print("Cluster bootstrap done.")
 
         return True
 
