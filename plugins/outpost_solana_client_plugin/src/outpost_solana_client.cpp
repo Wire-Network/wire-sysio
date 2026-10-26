@@ -1457,7 +1457,7 @@ std::string outpost_solana_client::send_dispatch_attestations(
    // every round decodes the staged envelope and dispatches effects, while the
    // draining round also encodes the outbound emit. The helper is shared with
    // the packet regression so the tested preamble is the submitted preamble.
-   auto pre_ixs = outpost_solana_client_detail::dispatch_attestations_pre_instructions();
+   auto pre_ixs = outpost_solana_client_detail::relay_compute_budget_pre_instructions();
    auto accounts = _program_client->resolve_accounts(instr, params, overrides);
    accounts.reserve(accounts.size() + extra_remaining_accounts.size());
    accounts.insert(accounts.end(), extra_remaining_accounts.begin(),

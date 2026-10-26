@@ -45,28 +45,6 @@ inline constexpr size_t SOLANA_MAX_CHUNK_BYTES = 668;
 /// THIS constant rather than a copy of it.
 inline constexpr size_t MAX_TERMINAL_DYNAMIC_ACCOUNTS = 16;
 
-/// Heap frame requested on every `dispatch_attestations` call, in bytes.
-///
-/// The frame rides with the work it protects: that call decodes the staged
-/// envelope, dispatches its effects, and on the draining call encodes the
-/// outbound emit -- all of which allocate well past Solana's 32 KiB default
-/// heap. The ComputeBudget preamble carrying it and the CU ceiling also costs
-/// packet budget, which is why `dispatch_attestations_full_manifest_fits_packet_limit`
-/// measures the transaction WITH both instructions.
-///
-/// Exported so the packet-limit test (and the program-side test pinning the
-/// same frame) measure THIS constant rather than a copy of it.
-inline constexpr uint32_t SOLANA_DISPATCH_HEAP_FRAME_BYTES = 256'000;
-
-/// Compute-unit ceiling requested on every `dispatch_attestations` call.
-///
-/// Dispatch decodes the complete staged envelope on every resumable round,
-/// applies the selected effects, and emits the outbound envelope on the
-/// draining round. The producer capacity suite exercises this complete path at
-/// Solana's 1,400,000-CU per-transaction ceiling; using the same explicit
-/// ceiling prevents a valid window from rolling back at the default budget.
-inline constexpr uint32_t SOLANA_DISPATCH_COMPUTE_UNIT_LIMIT = 1'400'000;
-
 /// Backstop on `dispatch_attestations` rounds per envelope. The drain loop
 /// already exits on a drained cursor, on consensus not yet reached, and on a
 /// cursor that fails to advance; this only bounds a pathological envelope so
@@ -82,18 +60,6 @@ inline constexpr uint32_t SOLANA_DISPATCH_COMPUTE_UNIT_LIMIT = 1'400'000;
 inline constexpr uint32_t MAX_DISPATCH_ROUNDS = 128;
 
 namespace outpost_solana_client_detail {
-
-/// Build the exact ComputeBudget preamble for production dispatch cranks.
-///
-/// The heap request must precede the compute-unit limit to match the producer
-/// capacity transaction shape. Packet tests call this helper directly so they
-/// cannot pass against a test-only approximation of the relay preamble.
-inline std::vector<fc::network::solana::instruction> dispatch_attestations_pre_instructions() {
-   return {
-      fc::network::solana::system::compute_budget::request_heap_frame(SOLANA_DISPATCH_HEAP_FRAME_BYTES),
-      fc::network::solana::system::compute_budget::set_compute_unit_limit(SOLANA_DISPATCH_COMPUTE_UNIT_LIMIT),
-   };
-}
 
 /// Assert that the loaded IDL's `LatestOutboundEnvelope` declaration has the
 /// shape `read_inbound_envelope` relies on: the account exists (inline fields

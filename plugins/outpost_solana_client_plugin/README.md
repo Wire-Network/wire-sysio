@@ -480,26 +480,16 @@ Envelope data chunks stay bare so the full 668-byte chunk remains within Solana'
 2. set the compute-unit limit to 1,400,000; and
 3. invoke liqsol-core.
 
-The limit is an execution ceiling, not expected consumption. On the historical producer
-revision that exposed the incident, a retained production three-attestation dispatch
-(`DESYNDICATE_LIQ`, `OPERATORS`, and `BATCH_OPERATOR_GROUPS`) consumed 202,794 of its
-implicit 202,850-CU budget before the meter stopped it. That truncated failure is only a
-lower bound on the required compute. The terminal call in the same flow consumed 35,220
-CU. Two comparison runs of the same logical flow measured terminal/dispatch pairs of
-42,755/194,226 and 33,751/179,225 CU, demonstrating that a single passing run does not
-establish an upper bound. Treat those figures as historical paying-path evidence; current
-release validation must record the coherent producer/relay E2E measurement. The
-1,400,000-CU ceiling matches liqsol-core's cap-sized capacity transaction rather than
-extrapolating from the variable observations.
+The limit is an execution ceiling, not expected consumption. Terminal admission and
+dispatch share one budget definition and preamble builder, matching liqsol-core's
+capacity tests.
 
 `epoch_in_full_data_chunk_fits_packet_limit`,
 `epoch_in_terminal_budget_matches_producer_and_fits_packet_limit`, and
 `dispatch_attestations_full_manifest_fits_packet_limit` serialize the production
 instruction vectors. They pin the bare chunk behavior, exact heap/CU ordering, and
-packet size at the relay's full dynamic-account budget. The current integrated IDL
-fixture measures 1,061 bytes for the full data chunk, 440 bytes for the budgeted terminal
-call, and 1,026 bytes for budgeted dispatch with all 16 dynamic accounts, each below the
-1,232-byte limit.
+packet size at the relay's full dynamic-account budget against the 1,232-byte limit.
+The tests report measured sizes for the current IDL and account layout.
 
 ## Outpost Cranks
 

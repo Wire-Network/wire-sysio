@@ -625,8 +625,8 @@ BOOST_AUTO_TEST_CASE(epoch_in_terminal_budget_matches_producer_and_fits_packet_l
 
    constexpr uint16_t total_chunks = 2;
    auto instructions = sysio::outpost_solana_client_detail::epoch_in_pre_instructions(total_chunks, total_chunks);
-   check_compute_budget_preamble(instructions, sysio::SOLANA_TERMINAL_EPOCH_IN_HEAP_FRAME_BYTES,
-                                 sysio::SOLANA_TERMINAL_EPOCH_IN_COMPUTE_UNIT_LIMIT);
+   check_compute_budget_preamble(instructions, sysio::SOLANA_RELAY_HEAP_FRAME_BYTES,
+                                 sysio::SOLANA_RELAY_COMPUTE_UNIT_LIMIT);
 
    const auto fee_payer = measurement_pubkey(1);
    instructions.push_back(instruction{measurement_pubkey(3), production_static_accounts(*epoch_in, fee_payer),
@@ -669,9 +669,9 @@ BOOST_AUTO_TEST_CASE(dispatch_attestations_full_manifest_fits_packet_limit) try 
    write_u32_le(data, 1);                                                    // epoch_index
    write_u32_le(data, static_cast<uint32_t>(sysio::MAX_TERMINAL_DYNAMIC_ACCOUNTS)); // dispatch_limit
 
-   auto instructions = sysio::outpost_solana_client_detail::dispatch_attestations_pre_instructions();
-   check_compute_budget_preamble(instructions, sysio::SOLANA_DISPATCH_HEAP_FRAME_BYTES,
-                                 sysio::SOLANA_DISPATCH_COMPUTE_UNIT_LIMIT);
+   auto instructions = sysio::outpost_solana_client_detail::relay_compute_budget_pre_instructions();
+   check_compute_budget_preamble(instructions, sysio::SOLANA_RELAY_HEAP_FRAME_BYTES,
+                                 sysio::SOLANA_RELAY_COMPUTE_UNIT_LIMIT);
    instructions.push_back(instruction{measurement_pubkey(3), accounts, data});
 
    const auto packet = build_measured_legacy_transaction(instructions, fee_payer).serialize();

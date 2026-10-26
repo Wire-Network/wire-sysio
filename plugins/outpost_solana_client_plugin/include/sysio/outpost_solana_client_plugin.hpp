@@ -14,22 +14,35 @@ using namespace fc::network::solana;
 /// Default IDL name; integrated liqsol-core deployments override it through configuration.
 inline constexpr const char* OPP_SOLANA_OUTPOST_PROGRAM_NAME = "opp_outpost";
 
-/// Heap frame requested by the zero-data terminal `epoch_in` call, in bytes.
+/// Shared heap frame for terminal `epoch_in` and every dispatch round, in bytes.
 ///
 /// Data chunks stay bare so a full chunk remains inside Solana's packet limit.
-/// The terminal call decodes the staged envelope and records consensus, so it
-/// uses the same 256,000-byte frame exercised by the producer capacity suite.
-inline constexpr uint32_t SOLANA_TERMINAL_EPOCH_IN_HEAP_FRAME_BYTES = 256'000;
+/// Terminal admission and resumable dispatch both decode the staged envelope;
+/// the draining dispatch also encodes outbound effects. Both paths use the
+/// same relay budget contract exercised by liqsol-core's capacity suite.
+/// The two-instruction ComputeBudget preamble also costs packet budget, which
+/// is why the packet tests measure the transaction with both instructions.
+inline constexpr uint32_t SOLANA_RELAY_HEAP_FRAME_BYTES = 256'000;
 
-/// Compute-unit ceiling requested by the zero-data terminal `epoch_in` call.
+/// Shared compute-unit ceiling for terminal `epoch_in` and every dispatch round.
 ///
 /// This is Solana's per-transaction ceiling and matches the producer's
 /// full-envelope capacity tests. Requesting it explicitly prevents the
-/// terminal path from silently falling back to the approximately 200,000-CU
+/// relay from silently falling back to the approximately 200,000-CU
 /// default as the envelope and roster approach their supported bounds.
-inline constexpr uint32_t SOLANA_TERMINAL_EPOCH_IN_COMPUTE_UNIT_LIMIT = 1'400'000;
+inline constexpr uint32_t SOLANA_RELAY_COMPUTE_UNIT_LIMIT = 1'400'000;
 
 namespace outpost_solana_client_detail {
+
+/// Build the shared heap-first, CU-second preamble for terminal and dispatch work.
+/// Packet tests use this production builder so neither path can drift from the
+/// producer capacity transaction shape or measure a test-only approximation.
+inline std::vector<fc::network::solana::instruction> relay_compute_budget_pre_instructions() {
+   return {
+      fc::network::solana::system::compute_budget::request_heap_frame(SOLANA_RELAY_HEAP_FRAME_BYTES),
+      fc::network::solana::system::compute_budget::set_compute_unit_limit(SOLANA_RELAY_COMPUTE_UNIT_LIMIT),
+   };
+}
 
 /// Build the exact ComputeBudget preamble for one production `epoch_in` call.
 ///
@@ -42,10 +55,7 @@ inline std::vector<fc::network::solana::instruction> epoch_in_pre_instructions(u
                                                                                uint16_t total_chunks) {
    if (chunk_index != total_chunks)
       return {};
-   return {
-      fc::network::solana::system::compute_budget::request_heap_frame(SOLANA_TERMINAL_EPOCH_IN_HEAP_FRAME_BYTES),
-      fc::network::solana::system::compute_budget::set_compute_unit_limit(SOLANA_TERMINAL_EPOCH_IN_COMPUTE_UNIT_LIMIT),
-   };
+   return relay_compute_budget_pre_instructions();
 }
 
 } // namespace outpost_solana_client_detail
