@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sysio.system/account_changes.hpp>
+
 #include <sysio/action.hpp>
 #include <sysio/binary_extension.hpp>
 #include <sysio/contract.hpp>
@@ -94,25 +96,6 @@ namespace sysiosystem {
                                      (schedule_version)(new_producers))
    };
 
-   struct abihash_key {
-      uint64_t owner;
-      SYSLIB_SERIALIZE(abihash_key, (owner))
-   };
-
-   /**
-    * abi_hash is the structure underlying the abihash table and consists of:
-    * - `owner`: the account owner of the contract's abi
-    * - `hash`: is the sha256 hash of the abi/binary
-    */
-   struct [[sysio::table("abihash"), sysio::contract("sysio.system")]] abi_hash {
-      name              owner;
-      checksum256       hash;
-
-      SYSLIB_SERIALIZE( abi_hash, (owner)(hash) )
-   };
-
-   using abi_hash_table = sysio::kv::table< "abihash"_n, abihash_key, abi_hash >;
-
    void check_auth_change(name contract, name account, const binary_extension<name>& authorized_by);
 
    // Method parameters commented out to prevent generation of code that parses input data.
@@ -124,12 +107,16 @@ namespace sysiosystem {
 
          using sysio::contract::contract;
 
+         /// The ABI and code hash tables (account_changes.hpp), aliased here to put them in this contract's ABI.
+         using abi_hash_table  = sysiosystem::abi_hash_table;
+         using code_hash_table = sysiosystem::code_hash_table;
+
          /**
           * These actions map one-on-one with the ones defined in core layer of SYSIO, that's where their implementation
           * actually is done.
-          * They are present here only so they can show up in the abi file and thus user can send them
-          * to this contract, but they have no specific implementation at this contract level,
-          * they will execute the implementation at the core layer and nothing else.
+          * They are present here so they show up in the abi file and users can send them to this contract. At this
+          * level they only enforce the rules documented on each; `setabi` and `setcode` also record the change in the
+          * `abihash` and `codehash` tables.
           */
 
          /**
@@ -275,12 +262,15 @@ namespace sysiosystem {
           * @param account - the account for which to set the contract code.
           * @param vmtype - reserved, set it to zero.
           * @param vmversion - reserved, set it to zero.
-          * @param code - the code content to be set, in the form of a blob binary..
+          * @param code - the code content to be set, in the form of a blob binary. Not deserialized here: the code
+          * hash recorded in `codehash` is read from the chain.
           * @param memo - may be omitted
           */
          [[sysio::action]]
-         void setcode( const name& account, uint8_t vmtype, uint8_t vmversion, const std::vector<char>& code,
-                       const binary_extension<std::string>& memo ) {}
+         void setcode( const name& account, uint8_t vmtype, uint8_t vmversion, ignore<std::vector<char>> code,
+                       ignore<binary_extension<std::string>> memo ) {
+            record_code(get_self(), account);
+         }
 
          using newaccount_action = sysio::action_wrapper<"newaccount"_n, &native::newaccount>;
          using updateauth_action = sysio::action_wrapper<"updateauth"_n, &native::updateauth>;

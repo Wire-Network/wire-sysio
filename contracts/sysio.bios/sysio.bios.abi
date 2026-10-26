@@ -19,6 +19,14 @@
                 {
                     "name": "hash",
                     "type": "checksum256"
+                },
+                {
+                    "name": "updated_at",
+                    "type": "time_point"
+                },
+                {
+                    "name": "block_num",
+                    "type": "uint32"
                 }
             ]
         },
@@ -153,6 +161,38 @@
                 {
                     "name": "max_kv_secondary_key_size",
                     "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "code_hash",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "updated_at",
+                    "type": "time_point"
+                },
+                {
+                    "name": "block_num",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "codehash_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "uint64"
                 }
             ]
         },
@@ -583,6 +623,14 @@
             "key_names": ["owner"],
             "key_types": ["uint64"],
             "table_id": 49446
+        },
+        {
+            "name": "codehash",
+            "type": "code_hash",
+            "index_type": "i64",
+            "key_names": ["owner"],
+            "key_types": ["uint64"],
+            "table_id": 16298
         }
     ],
     "ricardian_clauses": [],
