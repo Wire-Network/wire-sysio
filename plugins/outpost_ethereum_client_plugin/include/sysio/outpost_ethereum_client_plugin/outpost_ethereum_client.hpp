@@ -301,25 +301,14 @@ std::optional<ethereum_transaction_fees> resend_fees(in_flight_step step, const 
                                                      const ethereum_client::gas_config_t& market,
                                                      const fee_caps&                      caps);
 
-/// The fees of the first signing of a cancel: the market's, each raised the way a replacement is, since it
-/// replaces a transaction whose fees are unknown and was likely signed at the market, and lowered to `caps`
-/// (the cancel's `transaction_fee_caps`) where that goes past them.
-std::optional<ethereum_transaction_fees> cancel_fees(const ethereum_client::gas_config_t& market,
-                                                     const fee_caps&                      caps);
-
-/// The fees to try after a node refused a replacement of a transaction whose fees are unknown as
-/// underpriced: each doubled, up to `caps` (the transaction's `transaction_fee_caps`). A refused signing
-/// never entered a pool, so the next one only has to beat the transaction holding the nonce: one fee at its
-/// cap does not stop the other from rising. `nullopt` once neither can rise.
-std::optional<ethereum_transaction_fees> escalated_fees(const ethereum_transaction_fees& fees,
-                                                        const fee_caps&                  caps);
-
-/// Where an escalating replacement starts: `start`, raised above `refused` (`escalated_fees` of it) when a
-/// node already refused a signing there, so a later tick goes on from where the last one stopped. `nullopt`
-/// when nothing above `refused` fits `caps`.
-std::optional<ethereum_transaction_fees> resume_fees(const ethereum_transaction_fees&                start,
-                                                     const std::optional<ethereum_transaction_fees>& refused,
-                                                     const fee_caps&                                 caps);
+/// The fees to sign at a nonce something with unknown fees holds (a transaction left from before a restart,
+/// or another sender's): a tip and a fee cap both of the market's fee cap raised by an eighth, lowered to
+/// `caps` where that goes past them. A transaction stuck because the base fee rose past its fee cap, or
+/// because the tip it can pay fell under the market's, has a fee cap below the market's, so these raise both
+/// of its fees by more than the 10% a replacement needs.
+///
+/// @param caps `transaction_fee_caps` of the transaction signed.
+ethereum_transaction_fees outbid_fees(const ethereum_client::gas_config_t& market, const fee_caps& caps);
 
 /// The lowest nonce in `[latest, pending)` that no submission holds: one the node has a pending transaction
 /// at that this process did not sign, or `nullopt`.
@@ -479,18 +468,13 @@ private:
    void refresh_submission(ethereum_submission& submission, const fc::uint256& latest_count);
 
    /// Sign `submission` again at its nonce with `fees` and send it, recording the
-   /// attempt before the send. With `escalate`, a send the node refuses as
-   /// underpriced is recorded in `refused_fees` and retried with `escalated_fees`
-   /// while the nonce is unused, up to `MAX_REPLACEMENT_ESCALATIONS` signings; the
-   /// next tick resumes above the highest refused. Any other refusal ends the
-   /// tick's attempts without moving `refused_fees`, so the same fees are tried
-   /// again next tick.
+   /// attempt before the send. A refused send is logged; the next tick decides
+   /// again from the market.
    ///
-   /// @return Whether a node accepted a signing, or its outcome is unknown.
+   /// @return Whether a node took the signing.
    /// @throws ethereum_transaction_policy_exception when the policy refuses `fees`.
    /// @throws fc::exception on transport failure; the attempt stays recorded.
-   bool resubmit(ethereum_submission& submission, ethereum_transaction_fees fees, bool escalate,
-                 std::string_view why);
+   bool resubmit(ethereum_submission& submission, const ethereum_transaction_fees& fees, std::string_view why);
 
    /// Send one `epochIn` at `gas_budget`, after settling the journal. The call is
    /// journaled once it was sent: landed when its receipt came back, pending

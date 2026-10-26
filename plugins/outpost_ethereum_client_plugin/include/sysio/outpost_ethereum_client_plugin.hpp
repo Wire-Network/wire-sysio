@@ -67,10 +67,6 @@ struct ethereum_submission {
    submission_state                state = submission_state::pending;
    /// The block holding it while `state` is `landed`.
    std::optional<fc::uint256>      landed_at;
-   /// The highest fees a node refused a replacement of it at, while something it did not sign held the
-   /// nonce. Kept apart from `attempts`, since a refused signing never reached a pool, so the next tick's
-   /// escalation resumes above it rather than from the market.
-   std::optional<ethereum_transaction_fees> refused_fees;
 };
 
 /// How long the relay waits on a pending transaction at a nonce it has no record of before cancelling it.
@@ -81,11 +77,9 @@ inline constexpr fc::microseconds default_unaccounted_nonce_grace = fc::seconds(
 
 /// A pending transaction at a nonce no submission accounts for, as the relay has seen it.
 struct unaccounted_nonce_record {
-   fc::uint256                              nonce;
+   fc::uint256    nonce;
    /// When the relay first saw it; it is cancelled once `unaccounted_nonce_grace` has passed.
-   fc::time_point                           first_seen;
-   /// The highest fees a node refused a cancel of it at, so the next tick's cancel resumes above them.
-   std::optional<ethereum_transaction_fees> refused_fees;
+   fc::time_point first_seen;
 };
 
 /// Everything the relay signed with one client's signer that is not yet safe to forget, and what it saw of
@@ -292,37 +286,17 @@ inline constexpr auto block_number = "blockNumber";
 inline constexpr auto logs         = "logs";
 } // namespace ethereum_receipt_field
 
-/// How a node refused to take a transaction, read from its error message: clients phrase the same refusal
-/// differently, and only an underpricing refusal says anything about fees.
-enum class send_refusal {
-   /// The fees were too low: below the pool's floor, below the base fee, or short of what replacing the
-   /// transaction at its nonce needs. Higher fees may be taken.
-   underpriced,
-   /// The node already holds these exact bytes: the signing is held, not refused.
-   already_known,
-   /// Anything else (insufficient funds, a used nonce, a backend fault): higher fees would not help.
-   other
-};
-
-/**
- * @brief Classify a node's refusal of `eth_sendRawTransaction` by its message.
- * @param refusal The node's JSON-RPC error.
- * @return What the refusal says about the transaction; `other` for anything not positively identified.
- */
-send_refusal classify_send_refusal(const fc::network::json_rpc::json_rpc_error& refusal);
-
 /**
  * @brief Send one signing of `submission` whose attempt is already recorded as its last.
  *
  * A node refusal removes the attempt again, since the node does not hold it; any other failure keeps it,
- * since the node may. A node that already holds the bytes keeps it too. A node that reports a different
- * hash for the bytes than the one computed from them is logged, and its hash is recorded too so every wait
- * watches both.
+ * since the node may. A node that reports a different hash for the bytes than the one computed from them is
+ * logged, and its hash is recorded too so every wait watches both.
  *
  * @param client     The client that signed it.
  * @param signed_tx  The signed bytes and the hash recorded for them.
  * @param submission The submission the attempt belongs to.
- * @return The hash the node reported, or the computed one when the node already held the bytes.
+ * @return The hash the node reported.
  * @throws fc::network::json_rpc::json_rpc_error when the node refuses the transaction.
  */
 std::string send_submission_attempt(ethereum_client& client, const signed_transaction& signed_tx,
