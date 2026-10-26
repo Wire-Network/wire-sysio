@@ -5,13 +5,11 @@
 #include <boost/beast/http.hpp>
 #include <boost/program_options.hpp>
 #include <boost/test/unit_test.hpp>
-#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <iterator>
 #include <limits>
 #include <mutex>
-#include <stdexcept>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/app.hpp>
 #include <sysio/chain/config.hpp>

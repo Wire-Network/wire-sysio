@@ -301,7 +301,8 @@ BOOST_AUTO_TEST_CASE(tps_short_run_low_tps)
       BOOST_CHECK_EQUAL((stats.start_time - start).count(), 0);
       BOOST_CHECK_EQUAL(stats.trx_interval.count(), interval_us);
       BOOST_CHECK_EQUAL((stats.next_run - start).count(), (index + 1) * interval_us);
-      BOOST_CHECK_EQUAL((stats.expected_end_time - start).count(), test_duration_s * std::chrono::microseconds(1s).count());
+      BOOST_CHECK_EQUAL((stats.expected_end_time - start).count(),
+                        test_duration_s * std::chrono::microseconds(1s).count());
       BOOST_CHECK_EQUAL(stats.trxs_sent, index + 1);
       BOOST_CHECK_EQUAL(stats.trxs_left, expected_trxs - index - 1);
       BOOST_CHECK_GE((generator->_calls[index] - start).count(), index * interval_us - wall_clock_tolerance_us);
