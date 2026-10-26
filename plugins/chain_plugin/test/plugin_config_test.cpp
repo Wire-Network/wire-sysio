@@ -582,9 +582,9 @@ BOOST_AUTO_TEST_CASE(get_info_consumer_plugin_policy) {
    BOOST_CHECK(!sysio::get_info_consumer_configured({}));
    BOOST_CHECK(!sysio::get_info_consumer_configured({"sysio::net_plugin", "sysio::producer_plugin"}));
    BOOST_CHECK(sysio::get_info_consumer_configured({"sysio::chain_api_plugin"}));
-   BOOST_CHECK(sysio::get_info_consumer_configured({"sysio::status_monitor_plugin"}));
+   BOOST_CHECK(sysio::get_info_consumer_configured({"sysio::alert_monitor_plugin"}));
    // appbase lets one `plugin` value carry several names; the match is per name, not per value.
-   BOOST_CHECK(sysio::get_info_consumer_configured({"sysio::net_plugin sysio::status_monitor_plugin"}));
+   BOOST_CHECK(sysio::get_info_consumer_configured({"sysio::net_plugin sysio::alert_monitor_plugin"}));
    // The match is deliberately loose: a longer name that contains a consumer's name matches.
    BOOST_CHECK(sysio::get_info_consumer_configured({"sysio::chain_api_plugin_extended"}));
 }
@@ -845,7 +845,7 @@ BOOST_AUTO_TEST_CASE(outbound_http_global_option_registration) {
    bpo::options_description debugging;
    bpo::options_description signing;
    bpo::options_description snapshot;
-   bpo::options_description status_monitor;
+   bpo::options_description alert_monitor;
    bpo::options_description options;
 
    sysio::outbound_http::add_global_transport_program_options(global);
@@ -870,10 +870,10 @@ BOOST_AUTO_TEST_CASE(outbound_http_global_option_registration) {
       {"snapshot-endpoint-additional-ca-file", "snapshot-endpoint-additional-ca-path", "snapshot-endpoint-proxy"},
       "snapshot endpoint");
    sysio::outbound_http::add_transport_program_options(
-      status_monitor,
-      {"status-monitor-additional-ca-file", "status-monitor-additional-ca-path", "status-monitor-proxy"},
-      "status monitor");
-   options.add(global).add(ethereum).add(solana).add(debugging).add(signing).add(snapshot).add(status_monitor);
+      alert_monitor,
+      {"alert-monitor-additional-ca-file", "alert-monitor-additional-ca-path", "alert-monitor-proxy"},
+      "alert monitor");
+   options.add(global).add(ethereum).add(solana).add(debugging).add(signing).add(snapshot).add(alert_monitor);
 
    const auto proxy_url = unused_test_url();
    std::array arguments{
