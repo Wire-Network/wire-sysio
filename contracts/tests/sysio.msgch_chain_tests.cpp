@@ -141,6 +141,7 @@ constexpr name CHECK_CONSENSUS = "chkcons"_n;
 
 /// sysio.msgch table identifiers used by the WNS-16 fixture.
 namespace msgch_tables {
+constexpr name ATTESTATIONS       = "attestations"_n;
 constexpr name ENVELOPES          = "envelopes"_n;
 constexpr name OUTBOUND_ENVELOPES = "outenvelopes"_n;
 } // namespace msgch_tables
@@ -152,6 +153,7 @@ constexpr name BY_OUTPOST_EPOCH = "byoutepoch"_n;
 
 /// sysio.msgch ABI type identifiers used by the WNS-16 fixture.
 namespace msgch_abi_types {
+constexpr const char* ATTESTATION_ENTRY = "attestation_entry";
 constexpr const char* ENVELOPE_ENTRY    = "envelope_entry";
 constexpr const char* OUTBOUND_ENVELOPE = "outbound_envelope";
 } // namespace msgch_abi_types
@@ -166,6 +168,7 @@ constexpr const char* BATCH_OP_NAME = "batch_op_name";
 constexpr const char* WINNING_CHECKSUM = "winning_checksum";
 constexpr const char* CHECKSUM         = "checksum";
 constexpr const char* CONSENSUS_REACHED = "consensus_reached";
+constexpr const char* STATUS            = "status";
 } // namespace msgch_fields
 
 /// sysio.chalg table identifiers used by the split-consensus regressions.
@@ -773,15 +776,31 @@ public:
       return n;
    }
 
+   /// Attestation rows for `chain_code` with `status`, over the whole table.
+   uint32_t attestation_status_count(uint64_t chain_code, opp::types::AttestationStatus status) {
+      uint32_t n = 0;
+      for (const auto& row : table_rows(MSGCH_ACCOUNT, msgch_tables::ATTESTATIONS, msgch_abi,
+                                        msgch_abi_types::ATTESTATION_ENTRY)) {
+         if (row[msgch_fields::CHAIN_CODE].as_uint64() == chain_code &&
+             row[msgch_fields::STATUS].as<opp::types::AttestationStatus>() == status) ++n;
+      }
+      return n;
+   }
+
    // -- Inbound envelope builder --
 
-   /// Encode a deliverable envelope carrying one OPERATORS roster echo (dispatch drops
-   /// the attestation silently; acceptance is still fully observable via `outpcons` and the
-   /// stored attestation row). The semantic header is derived per the spec — `apply_consensus`
-   /// drops envelopes whose header fields do not recompute or whose message does not continue the
-   /// per-outpost message chain. `prev` (previous_envelope_hash), `prev_message_id`, and
-   /// `env_hash` are raw 32-byte strings (or empty for stream genesis).
-   std::vector<char> encode_delivery(uint32_t epoch_index, const std::string& att_data,
+   /// One attestation of an inbound envelope.
+   struct inbound_attestation {
+      sysio::opp::types::AttestationType type;
+      std::string                        data;
+   };
+
+   /// Encode a deliverable envelope carrying `attestations` in one message. The semantic header is
+   /// derived per the spec — `apply_consensus` drops envelopes whose header fields do not recompute
+   /// or whose message does not continue the per-outpost message chain. `prev`
+   /// (previous_envelope_hash), `prev_message_id`, and `env_hash` are raw 32-byte strings (or empty
+   /// for stream genesis).
+   std::vector<char> encode_delivery(uint32_t epoch_index, const std::vector<inbound_attestation>& attestations,
                                      const std::string& prev = {},
                                      const std::string& prev_message_id = {},
                                      const std::string& env_hash = {}) {
@@ -791,14 +810,29 @@ public:
       env.set_epoch_timestamp(1'775'612'516'983ULL);
       if (!prev.empty()) env.set_previous_envelope_hash(prev);
       if (!env_hash.empty()) env.set_envelope_hash(env_hash);
-      auto* att = env.add_messages()->mutable_payload()->add_attestations();
-      att->set_type(sysio::opp::types::ATTESTATION_TYPE_OPERATORS);
-      att->set_data(att_data);
-      att->set_data_size(static_cast<uint32_t>(att_data.size()));
+      auto* payload = env.add_messages()->mutable_payload();
+      for (const auto& attestation : attestations) {
+         auto* att = payload->add_attestations();
+         att->set_type(attestation.type);
+         att->set_data(attestation.data);
+         att->set_data_size(static_cast<uint32_t>(attestation.data.size()));
+      }
       oracle::finalize_header(*env.mutable_messages(0), prev_message_id, 1'775'612'516'983ULL);
       std::vector<char> out(env.ByteSizeLong());
       env.SerializeToArray(out.data(), static_cast<int>(out.size()));
       return out;
+   }
+
+   /// Encode a deliverable envelope carrying one OPERATORS roster echo (dispatch drops
+   /// the attestation silently; acceptance is still fully observable via `outpcons` and the
+   /// stored attestation row).
+   std::vector<char> encode_delivery(uint32_t epoch_index, const std::string& att_data,
+                                     const std::string& prev = {},
+                                     const std::string& prev_message_id = {},
+                                     const std::string& env_hash = {}) {
+      const std::vector<inbound_attestation> attestations{
+         {sysio::opp::types::ATTESTATION_TYPE_OPERATORS, att_data}};
+      return encode_delivery(epoch_index, attestations, prev, prev_message_id, env_hash);
    }
 
    /// Decode the raw bytes back into the pb Envelope (asserts success).
@@ -1512,6 +1546,53 @@ BOOST_FIXTURE_TEST_CASE(buildenv_handles_unacknowledged_backlog, sysio_msgch_cha
    const uint32_t next_epoch = advance_one_epoch();
    BOOST_REQUIRE_EQUAL(1u, outbound_envelope_count(ETH_OUTPOST_ID));
    BOOST_REQUIRE(!outbound_envelope_for_epoch(ETH_OUTPOST_ID, next_epoch).is_null());
+} FC_LOG_AND_RETHROW() }
+
+// ---------------------------------------------------------------------------
+//  Inbound cleanup: buildenv erases only its own outpost's dispatched rows.
+// ---------------------------------------------------------------------------
+
+/// WIRE-415: `evalcons` stores every inbound attestation PROCESSED, and `buildenv` erases the
+/// destination outpost's PROCESSED rows through the `byqueue` range for that outpost. Each envelope
+/// carries one attestation per lane, so a range that misses a lane or reads another status leaves a
+/// row behind. Another outpost's rows, PROCESSED or READY, survive until its own `buildenv`.
+BOOST_FIXTURE_TEST_CASE(buildenv_erases_only_its_outposts_processed_rows, sysio_msgch_chain_tester) { try {
+   constexpr auto processed = opp::types::AttestationStatus::ATTESTATION_STATUS_PROCESSED;
+   constexpr auto ready     = opp::types::AttestationStatus::ATTESTATION_STATUS_READY;
+   bootstrap();
+
+   // Each outpost's first envelope reaches consensus on the single bootstrapped operator's delivery.
+   // OPERATORS is a schedule-lane type and OPERATOR_ACTION a general-lane one; dispatch drops both.
+   const uint32_t epoch = current_epoch();
+   const std::vector<inbound_attestation> attestations{
+      {opp::types::ATTESTATION_TYPE_OPERATORS,       "schedule-lane"},
+      {opp::types::ATTESTATION_TYPE_OPERATOR_ACTION, "general-lane"}};
+   for (const uint64_t outpost : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      BOOST_REQUIRE_EQUAL(success(), deliver(outpost, encode_delivery(epoch, attestations)));
+   }
+   produce_blocks();
+   for (const uint64_t outpost : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      BOOST_REQUIRE_EQUAL(attestations.size(), attestation_status_count(outpost, processed));
+      // A READY row on each outpost: `buildenv` builds nothing without one.
+      BOOST_REQUIRE_EQUAL(success(), queueout(outpost, opp::types::ATTESTATION_TYPE_DESYNDICATE_LIQ,
+                                              std::vector<char>(8, '\x01')));
+   }
+   produce_blocks();
+
+   // ETH's build ships ETH's READY row and erases both of its inbound rows. SOL's are untouched.
+   BOOST_REQUIRE_EQUAL(success(), buildenv(ETH_OUTPOST_ID));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(0u, attestation_status_count(ETH_OUTPOST_ID, processed));
+   BOOST_REQUIRE_EQUAL(0u, attestation_status_count(ETH_OUTPOST_ID, ready));
+   BOOST_REQUIRE_EQUAL(attestations.size(), attestation_status_count(SOL_OUTPOST_ID, processed));
+   BOOST_REQUIRE_EQUAL(1u, attestation_status_count(SOL_OUTPOST_ID, ready));
+
+   // The real advance path builds SOL's envelope, which erases SOL's inbound rows in turn.
+   advance_one_epoch();
+   for (const uint64_t outpost : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      BOOST_REQUIRE_EQUAL(0u, attestation_status_count(outpost, processed));
+      BOOST_REQUIRE_EQUAL(0u, attestation_status_count(outpost, ready));
+   }
 } FC_LOG_AND_RETHROW() }
 
 // ---------------------------------------------------------------------------
