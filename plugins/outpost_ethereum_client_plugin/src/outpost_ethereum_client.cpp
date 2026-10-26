@@ -177,11 +177,34 @@ std::optional<ethereum_transaction_fees> within_caps(ethereum_transaction_fees f
 
 /// Lower-cased fragments of the messages execution clients refuse an underpriced transaction with: geth,
 /// erigon, reth, anvil and besu (`replacement transaction underpriced`, `transaction underpriced`), geth's
-/// `max fee per gas less than block base fee`, nethermind (`FeeTooLow`, `FeeTooLowToCompete`,
+/// `max fee per gas less than block base fee`, besu's `Gas price below configured minimum gas price` and
+/// `Gas price below current base fee`, nethermind (`FeeTooLow`, `FeeTooLowToCompete`,
 /// `ReplacementNotAllowed`) and openethereum (`gas price is too low`).
-constexpr std::array<std::string_view, 6> UNDERPRICED_REFUSAL_FRAGMENTS{
-   "underpriced", "less than block base fee", "fee too low", "feetoolow", "replacementnotallowed",
-   "price is too low"};
+constexpr std::array<std::string_view, 7> UNDERPRICED_REFUSAL_FRAGMENTS{
+   "underpriced", "less than block base fee", "gas price below", "fee too low", "feetoolow",
+   "replacementnotallowed", "price is too low"};
+
+/// What `wanted` asks for, lowered to `caps` where it goes past them but never below `required`, the least the
+/// signing must pay (a replacement's bump, or what was signed before). `std::nullopt` when `required` itself
+/// does not fit `caps`.
+std::optional<ethereum_transaction_fees> priced_within(const ethereum_transaction_fees& required,
+                                                        const ethereum_transaction_fees& wanted,
+                                                        const detail::fee_caps&          caps) {
+   const auto priced = [](const fc::uint256& least, const fc::uint256& want, const fc::uint256& cap) {
+      const fc::uint256 fee = larger_fee(least, want);
+      return fee < cap ? fee : cap;
+   };
+   const ethereum_transaction_fees fees{
+      .max_priority_fee_per_gas = priced(required.max_priority_fee_per_gas, wanted.max_priority_fee_per_gas,
+                                         caps.max_priority_fee_per_gas),
+      .max_fee_per_gas = priced(required.max_fee_per_gas, wanted.max_fee_per_gas, caps.max_fee_per_gas),
+   };
+   if (fees.max_priority_fee_per_gas < required.max_priority_fee_per_gas ||
+       fees.max_fee_per_gas < required.max_fee_per_gas) {
+      return std::nullopt;
+   }
+   return within_caps(fees, caps);
+}
 
 /// Lower-cased fragments of the messages clients refuse bytes they already hold with: geth's `already known`,
 /// nethermind's `AlreadyKnown`, besu's `Known transaction` and openethereum's `already imported`.
@@ -676,24 +699,21 @@ fee_caps transaction_fee_caps(const ethereum_transaction_policy& policy, const e
 std::optional<ethereum_transaction_fees> resend_fees(in_flight_step step, const ethereum_transaction_fees& paid,
                                                      const ethereum_client::gas_config_t& market,
                                                      const fee_caps&                      caps) {
-   ethereum_transaction_fees fees;
+   const ethereum_transaction_fees wanted{.max_priority_fee_per_gas = market.tip,
+                                          .max_fee_per_gas          = market.max_fee_per_gas};
    switch (step) {
    case in_flight_step::wait:
       return std::nullopt;
    case in_flight_step::rebroadcast:
-      fees = {.max_priority_fee_per_gas = larger_fee(paid.max_priority_fee_per_gas, market.tip),
-              .max_fee_per_gas          = larger_fee(paid.max_fee_per_gas, market.max_fee_per_gas)};
-      break;
+      return priced_within(paid, wanted, caps);
    case in_flight_step::replace: {
       const auto tip     = bumped_fee(paid.max_priority_fee_per_gas);
       const auto max_fee = bumped_fee(paid.max_fee_per_gas);
       if (!tip || !max_fee) return std::nullopt;
-      fees = {.max_priority_fee_per_gas = larger_fee(*tip, market.tip),
-              .max_fee_per_gas          = larger_fee(*max_fee, market.max_fee_per_gas)};
-      break;
+      return priced_within({.max_priority_fee_per_gas = *tip, .max_fee_per_gas = *max_fee}, wanted, caps);
    }
    }
-   return within_caps(fees, caps);
+   return std::nullopt;
 }
 
 std::optional<ethereum_transaction_fees> cancel_fees(const ethereum_client::gas_config_t& market,
@@ -701,7 +721,10 @@ std::optional<ethereum_transaction_fees> cancel_fees(const ethereum_client::gas_
    const auto tip     = bumped_fee(market.tip);
    const auto max_fee = bumped_fee(market.max_fee_per_gas);
    if (!tip || !max_fee) return std::nullopt;
-   return within_caps({.max_priority_fee_per_gas = *tip, .max_fee_per_gas = *max_fee}, caps);
+   // What holds the nonce is unknown, so nothing is required: the padded
+   // market's fees, lowered to the caps where they go past them.
+   return priced_within({.max_priority_fee_per_gas = 0, .max_fee_per_gas = 0},
+                        {.max_priority_fee_per_gas = *tip, .max_fee_per_gas = *max_fee}, caps);
 }
 
 std::optional<ethereum_transaction_fees> escalated_fees(const ethereum_transaction_fees& fees,

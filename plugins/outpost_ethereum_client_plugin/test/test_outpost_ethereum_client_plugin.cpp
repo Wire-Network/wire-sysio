@@ -423,6 +423,8 @@ enum class scripted_send {
    accepted,
    /// Refused as underpriced, as a replacement that does not raise every fee enough is.
    refused,
+   /// Refused as below the node's minimum gas price, in besu's words.
+   refused_below_minimum,
    /// Refused for a reason that is not its fees: the signer cannot pay for it.
    refused_unfunded,
    /// Refused because the node already holds the bytes.
@@ -537,6 +539,10 @@ private:
          if (outcome == scripted_send::refused) {
             throw fc::network::json_rpc::json_rpc_error(test_refused_send_rpc_code,
                                                         "replacement transaction underpriced");
+         }
+         if (outcome == scripted_send::refused_below_minimum) {
+            throw fc::network::json_rpc::json_rpc_error(test_refused_send_rpc_code,
+                                                        "Gas price below configured minimum gas price");
          }
          if (outcome == scripted_send::refused_unfunded) {
             throw fc::network::json_rpc::json_rpc_error(test_refused_send_rpc_code,
@@ -3189,6 +3195,52 @@ BOOST_AUTO_TEST_CASE(a_replacement_escalates_within_the_total_cost_cap) try {
    BOOST_CHECK(replaced.refused_fees->max_fee_per_gas == fc::uint256{113});
 } FC_LOG_AND_RETHROW();
 
+/// A cancel whose padded market fees pass the total-cost cap is sent at the
+/// cap rather than not at all: the market suggests 10/190, padded to 12/214,
+/// and 200 a gas is the most a 21,000-gas transfer may pay.
+BOOST_AUTO_TEST_CASE(a_cancel_pays_the_cap_when_the_market_asks_for_more) try {
+   auto fixture  = create_whole_envelope_delivery_fixture(total_cost_bounded_policy());
+   auto envelope = make_envelope(mid_envelope_bytes);
+   constexpr uint64_t base_fee = 90;   // `2 * 90 + 10` = 190
+   fixture->rpc->base_fee_hex  = format_rpc_quantity(fc::uint256{base_fee});
+   fixture->rpc->pending_nonce = 1;    // something this relay did not sign holds nonce 0
+   fixture->entry->submissions->unaccounted_nonce_grace = fc::microseconds(0);
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.size(), 1u);
+   const auto cancel = fixture->only_submission();
+   BOOST_REQUIRE_EQUAL(cancel.attempts.size(), 1u);
+   BOOST_CHECK(cancel.attempts.front().fees.max_priority_fee_per_gas == fc::uint256{12});
+   BOOST_CHECK(cancel.attempts.front().fees.max_fee_per_gas == fc::uint256{200});
+} FC_LOG_AND_RETHROW();
+
+/// A node's minimum-gas-price refusal, in besu's words, is an underpricing
+/// refusal: the cancel escalates past it rather than retrying the same fees.
+BOOST_AUTO_TEST_CASE(a_cancel_below_a_nodes_minimum_gas_price_escalates) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->rpc->pending_nonce = 1;   // something this relay did not sign holds nonce 0
+   fixture->entry->submissions->unaccounted_nonce_grace = fc::microseconds(0);
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+
+   fixture->rpc->send_outcomes = {scripted_send::refused_below_minimum};
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.size(), 2u);
+   const auto cancel = fixture->only_submission();
+   BOOST_REQUIRE_EQUAL(cancel.attempts.size(), 1u);
+   constexpr uint64_t first_tip = test_scripted_tip + test_scripted_tip / 8 + 1;
+   constexpr uint64_t first_cap = test_scripted_max_fee + test_scripted_max_fee / 8 + 1;
+   BOOST_CHECK(cancel.attempts.front().fees.max_priority_fee_per_gas == fc::uint256{2 * first_tip});
+   BOOST_CHECK(cancel.attempts.front().fees.max_fee_per_gas == fc::uint256{2 * first_cap});
+   BOOST_REQUIRE(cancel.refused_fees);
+   BOOST_CHECK(cancel.refused_fees->max_fee_per_gas == fc::uint256{first_cap});
+} FC_LOG_AND_RETHROW();
+
 /// A refusal that is not about fees (here the signer cannot pay) does not move
 /// the floor: the tick stops trying, and once the cause clears the next tick
 /// sends the same cancel at the same fees.
@@ -3248,6 +3300,7 @@ BOOST_AUTO_TEST_CASE(send_refusals_are_classified_by_the_nodes_message) try {
    for (const auto message : {"replacement transaction underpriced", "transaction underpriced",
                               "max fee per gas less than block base fee: address 0x.., maxFeePerGas: 1, baseFee: 2",
                               "FeeTooLowToCompete", "ReplacementNotAllowed", "Replacement transaction underpriced",
+                              "Gas price below configured minimum gas price", "Gas price below current base fee",
                               "Transaction gas price is too low. There is another transaction with same nonce"}) {
       BOOST_CHECK_MESSAGE(classify(message) == sysio::send_refusal::underpriced, message);
    }
@@ -3328,9 +3381,23 @@ BOOST_AUTO_TEST_CASE(in_flight_decision_and_resend_fees) try {
    BOOST_CHECK(fees->max_priority_fee_per_gas == fc::uint256{20});
    BOOST_CHECK(fees->max_fee_per_gas == fc::uint256{110});
 
-   // The caps bound a resend: none at all when the raise does not fit.
+   // The caps bound a resend. The market's fees past a cap are lowered to it
+   // while the bump a replacement needs still fits: 113 is needed, the market
+   // asks 200, and 150 is the cap.
    auto capped            = policy;
    capped.max_fee_per_gas = 150;
+   fees = detail::resend_fees(detail::in_flight_step::replace, paid, risen, capped);
+   BOOST_REQUIRE(fees);
+   BOOST_CHECK(fees->max_priority_fee_per_gas == fc::uint256{12});
+   BOOST_CHECK(fees->max_fee_per_gas == fc::uint256{150});
+   // A rebroadcast the same: 100 is needed, the market asks 110, 105 is the cap.
+   capped.max_fee_per_gas = 105;
+   fees = detail::resend_fees(detail::in_flight_step::rebroadcast, paid, tip_war, capped);
+   BOOST_REQUIRE(fees);
+   BOOST_CHECK(fees->max_priority_fee_per_gas == fc::uint256{20});
+   BOOST_CHECK(fees->max_fee_per_gas == fc::uint256{105});
+   // None at all when the bump itself does not fit.
+   capped.max_fee_per_gas = 112;
    BOOST_CHECK(!detail::resend_fees(detail::in_flight_step::replace, paid, risen, capped));
    capped                          = policy;
    capped.max_priority_fee_per_gas = 11;
@@ -3375,9 +3442,13 @@ BOOST_AUTO_TEST_CASE(journal_fee_and_nonce_helpers) try {
    BOOST_REQUIRE(cancel);
    BOOST_CHECK(cancel->max_priority_fee_per_gas == fc::uint256{12});
    BOOST_CHECK(cancel->max_fee_per_gas == fc::uint256{113});
+   // The padded market past a cap is lowered to it: 113 asked, 112 allowed.
    auto capped            = policy;
    capped.max_fee_per_gas = 112;
-   BOOST_CHECK(!detail::cancel_fees(market, capped));
+   const auto lowered     = detail::cancel_fees(market, capped);
+   BOOST_REQUIRE(lowered);
+   BOOST_CHECK(lowered->max_priority_fee_per_gas == fc::uint256{12});
+   BOOST_CHECK(lowered->max_fee_per_gas == fc::uint256{112});
 
    const auto escalated = detail::escalated_fees(*cancel, policy);
    BOOST_REQUIRE(escalated);

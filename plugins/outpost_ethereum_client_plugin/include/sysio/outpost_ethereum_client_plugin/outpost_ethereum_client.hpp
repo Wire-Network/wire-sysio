@@ -289,10 +289,11 @@ fee_caps transaction_fee_caps(const ethereum_transaction_policy& policy, const e
 /// any of them. Zero fees for no attempts.
 ethereum_transaction_fees highest_fees(const std::vector<submission_attempt>& attempts);
 
-/// The fees a same-nonce resend pays. A replacement pays at least the market's
-/// fees and raises each of `paid`'s by more than the 10% nodes require of a
-/// replacement; a rebroadcast pays at least `paid` and the market. `nullopt`
-/// when `step` is `wait`, or when `caps` leave no room.
+/// The fees a same-nonce resend pays. A replacement must raise each of `paid`'s
+/// by more than the 10% nodes require of a replacement; a rebroadcast must pay
+/// `paid`. Either pays the market's fees where they are higher, lowered to
+/// `caps` where the market goes past them. `nullopt` when `step` is `wait`, or
+/// when what it must pay does not fit `caps`.
 ///
 /// @param paid The highest fees any attempt at the nonce was signed with (`highest_fees`).
 /// @param caps `transaction_fee_caps` of the transaction resent.
@@ -301,8 +302,8 @@ std::optional<ethereum_transaction_fees> resend_fees(in_flight_step step, const 
                                                      const fee_caps&                      caps);
 
 /// The fees of the first signing of a cancel: the market's, each raised the way a replacement is, since it
-/// replaces a transaction whose fees are unknown and was likely signed at the market. `nullopt` when `caps`
-/// (the cancel's `transaction_fee_caps`) leave no room.
+/// replaces a transaction whose fees are unknown and was likely signed at the market, and lowered to `caps`
+/// (the cancel's `transaction_fee_caps`) where that goes past them.
 std::optional<ethereum_transaction_fees> cancel_fees(const ethereum_client::gas_config_t& market,
                                                      const fee_caps&                      caps);
 

@@ -216,7 +216,8 @@ replacement the caps leave no room for is logged and what was sent is waited for
 
 Every resend is priced within the transaction's own caps: the policy's per-gas caps, with the fee cap also
 bounded by what `max_total_native_cost` leaves after the value for its gas limit, so a candidate is never
-refused at signing.
+refused at signing. The market's suggested fees are lowered to those caps where they go past them; only what
+a resend must pay (a replacement's bump, or what was signed before) has to fit, or nothing is sent.
 
 An escalating replacement (a cancel, or a call whose nonce something it did not sign holds) doubles each fee
 after a node refuses it as underpriced, up to those caps. A refused signing never reached a pool, so one fee
@@ -444,7 +445,8 @@ read confirmation, comes back after a reorg, or had a replacement whose response
 surviving a rebuilt relay, an unaccounted nonce waited on and cancelled after a restart (refused cancels
 escalating, and an escalation refused all tick resuming above its refused fees on the next, for a cancel and
 for a replacement), escalation within the total-cost cap for a cancel and for a replacement, a non-fee refusal
-retried at the same fees, a resend the node already holds, the refusal classification, the check before every
+retried at the same fees, a cancel at the cap when the market asks for more, a node's minimum-gas-price refusal
+escalated, a resend the node already holds, the refusal classification, the check before every
 send, the replacement, cancel, escalation and resume fees and the per-transaction caps, and the network hash
 of a signed transaction against foundry's vectors — and the outpost crank: idle without the pool ABI or a registered handler, binding the
 registered pool and re-binding on a change, the pool's own three refusals, unrecognised reverts and protocol
