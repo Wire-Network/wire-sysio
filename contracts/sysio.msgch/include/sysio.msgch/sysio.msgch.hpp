@@ -9,6 +9,7 @@
 #include <sysio/slug_name.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
 #include <sysio.opp.common/opp_keys.hpp>
+#include <magic_enum/magic_enum.hpp>
 
 namespace sysio {
 
@@ -39,6 +40,55 @@ namespace sysio {
       /// larger, so every READY row can ship.
       static constexpr size_t MAX_ATTESTATION_DATA_BYTES =
          MAX_ENVELOPE_BYTES - ENVELOPE_BASELINE_BYTES - ATTESTATION_OVERHEAD_BYTES;
+
+      /// Most attestations one envelope carries, so the rows `buildenv` reads and erases per outpost
+      /// per epoch stay fixed whatever their sizes. Neither outpost needs it: both resume dispatch
+      /// across calls.
+      static constexpr size_t MAX_ENVELOPE_ATTESTATIONS = 64;
+
+      // -----------------------------------------------------------------------
+      //  Outbound queue
+      // -----------------------------------------------------------------------
+
+      /// Most general-lane attestations an outpost's READY queue holds. `queueout` refuses another
+      /// until `buildenv` ships some, so the producer's transaction fails instead of the queue growing
+      /// without bound. Schedule-lane rows are exempt: `sysio.epoch` queues them inside `advance`.
+      static constexpr uint32_t MAX_QUEUED_ATTESTATIONS = 512;
+
+      /// Lane of an outbound attestation. `buildenv` ships the schedule lane first, so a backlog never
+      /// delays the rosters an outpost needs to admit the next epoch's deliveries.
+      enum class queue_lane : uint8_t {
+         schedule = 0, ///< OPERATORS and BATCH_OPERATOR_GROUPS
+         general  = 1, ///< every other type, in `queueout` order
+      };
+
+      /// The lane `type` queues in.
+      static constexpr queue_lane lane_of(opp::types::AttestationType type) {
+         return type == opp::types::ATTESTATION_TYPE_OPERATORS ||
+                      type == opp::types::ATTESTATION_TYPE_BATCH_OPERATOR_GROUPS
+                   ? queue_lane::schedule
+                   : queue_lane::general;
+      }
+
+      /// Most envelope bytes one epoch's schedule-lane rows take, counted as `buildenv` estimates them
+      /// (`data` plus ATTESTATION_OVERHEAD_BYTES each). The largest window's OPERATORS and
+      /// BATCH_OPERATOR_GROUPS come to about 6.8 KB, and 15.4 KB even at Solana's 16 per group; 24 KiB also
+      /// matches Solana's OPERATORS payload cap.
+      static constexpr size_t SCHEDULE_LANE_BYTES = 24 * 1024;
+
+      /// Largest general-lane `data` that fits beside a full schedule lane, which every envelope carries
+      /// first. `queueout` rejects anything larger, so no general row can stall the rows behind it.
+      static constexpr size_t MAX_GENERAL_ATTESTATION_DATA_BYTES =
+         MAX_ENVELOPE_BYTES - ENVELOPE_BASELINE_BYTES - SCHEDULE_LANE_BYTES - ATTESTATION_OVERHEAD_BYTES;
+
+      /// `byqueue` key: outpost, then status, then lane. Rows with equal keys sort by id, so each lane
+      /// is FIFO. 128 bits keep the full slug range of `chain_code` (see `opp::outpost_epoch_key`).
+      static constexpr uint128_t queue_key(uint64_t chain_code, opp::types::AttestationStatus status,
+                                           queue_lane lane) {
+         return (static_cast<uint128_t>(chain_code) << 16) |
+                (static_cast<uint128_t>(magic_enum::enum_integer(status)) << 8) |
+                static_cast<uint128_t>(magic_enum::enum_integer(lane));
+      }
 
       // -----------------------------------------------------------------------
       //  Actions
@@ -84,7 +134,9 @@ namespace sysio {
 
       /// Queue an outbound attestation for an outpost.
       /// Writes to the attestations table with status READY. Rejects `data` larger than
-      /// MAX_ATTESTATION_DATA_BYTES, so every READY row fits an envelope.
+      /// MAX_ATTESTATION_DATA_BYTES (MAX_GENERAL_ATTESTATION_DATA_BYTES for a general-lane row), so every
+      /// READY row ships, and a general-lane row once the outpost already holds MAX_QUEUED_ATTESTATIONS
+      /// of them.
       ///
       /// `chain_code` is the destination outpost's chain slug_name value
       /// (uint64). Called by sibling system contracts that need to send
@@ -107,7 +159,9 @@ namespace sysio {
                     std::vector<char> data);
 
       /// Build outbound envelope from READY attestations for an outpost.
-      /// Collects attestations, packs into OPP Envelope, stores in outenvelopes.
+      /// Walks only this outpost's READY rows, schedule lane first, and stops at MAX_ENVELOPE_BYTES or
+      /// MAX_ENVELOPE_ATTESTATIONS, so its cost does not grow with the backlog. Packs the rows into an
+      /// OPP Envelope, stores it in outenvelopes and erases them.
       /// Stamps the envelope's route endpoints (start = WIRE, end = the
       /// destination's `sysio.chains` `{kind, external_chain_id}`) so the
       /// receiving outpost can reject an envelope a misconfigured relay
@@ -202,9 +256,7 @@ namespace sysio {
          uint64_t                        ready_timestamp;
          uint64_t                        processed_timestamp;
 
-         uint64_t by_status() const { return static_cast<uint64_t>(status); }
-         uint64_t by_type()   const { return static_cast<uint64_t>(type); }
-         uint64_t by_epoch()  const { return epoch_index; }
+         uint128_t by_queue() const { return queue_key(chain_code, status, lane_of(type)); }
 
          SYSLIB_SERIALIZE(attestation_entry,
             (id)(chain_code)(epoch_index)(type)(status)(data)
@@ -212,12 +264,8 @@ namespace sysio {
       };
 
       using attestations_t = sysio::kv::table<"attestations"_n, id_key, attestation_entry,
-         sysio::kv::index<"bystatus"_n,
-            sysio::const_mem_fun<attestation_entry, uint64_t, &attestation_entry::by_status>>,
-         sysio::kv::index<"bytype"_n,
-            sysio::const_mem_fun<attestation_entry, uint64_t, &attestation_entry::by_type>>,
-         sysio::kv::index<"byepoch"_n,
-            sysio::const_mem_fun<attestation_entry, uint64_t, &attestation_entry::by_epoch>>
+         sysio::kv::index<"byqueue"_n,
+            sysio::const_mem_fun<attestation_entry, uint128_t, &attestation_entry::by_queue>>
       >;
 
       /// Outbound envelope table. `buildenv` erases a row only once the outpost has consumed it
@@ -305,16 +353,33 @@ namespace sysio {
       using outpost_consensus_t =
          sysio::kv::table<"outpcons"_n, outpost_consensus_key, outpost_consensus_entry>;
 
+      /// Per-outpost outbound queue primary key.
+      struct outbound_queue_key {
+         uint64_t chain_code;
+         SYSLIB_SERIALIZE(outbound_queue_key, (chain_code))
+      };
+
+      /// The general-lane READY attestations queued for an outpost. `queueout` counts them in and
+      /// refuses one past MAX_QUEUED_ATTESTATIONS; `buildenv` counts the shipped ones out.
+      struct [[sysio::table("outqueue")]] outbound_queue_entry {
+         uint64_t chain_code;
+         uint32_t queued;
+
+         SYSLIB_SERIALIZE(outbound_queue_entry, (chain_code)(queued))
+      };
+
+      using outqueue_t = sysio::kv::table<"outqueue"_n, outbound_queue_key, outbound_queue_entry>;
+
       /// Singleton holding the monotonic next-attestation-id counter.
       ///
-      /// Why a singleton instead of `atts.available_primary_key()`: the
-      /// `buildenv` outbound-bundle cleanup at the bottom of this file
-      /// erases the just-bundled `ATTESTATION_STATUS_PROCESSED` rows for
-      /// the destination `chain_code`. Inbound `deliver()`-inserted rows
-      /// also carry `status = PROCESSED` (they go straight to dispatch),
-      /// so the cleanup drains both. Once the atts table is empty,
-      /// `available_primary_key()` resets to 0, our `std::max(1, ...)`
-      /// floor bumps it to 1, reusing a prior attestation's audit identity.
+      /// Why a singleton instead of `atts.available_primary_key()`:
+      /// `buildenv` erases the rows it ships for the destination
+      /// `chain_code`, and that outpost's inbound `deliver()`-inserted rows,
+      /// which carry `status = PROCESSED` (they go straight to dispatch).
+      /// Once the atts table is empty, `available_primary_key()` resets to
+      /// 0, our `std::max(1, ...)` floor bumps it to 1, reusing a prior
+      /// attestation's audit identity. Monotonic ids also keep each
+      /// `byqueue` lane FIFO.
       ///
       /// `att_seq` is a one-row table holding `next` — the next id to
       /// mint. `mint_att_id()` reads + bumps it atomically. Cleanup

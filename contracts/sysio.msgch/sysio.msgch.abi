@@ -309,6 +309,30 @@
             ]
         },
         {
+            "name": "outbound_queue_entry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                },
+                {
+                    "name": "queued",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "outbound_queue_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "outpost_consensus_entry",
             "base": "",
             "fields": [
@@ -442,19 +466,9 @@
             "table_id": 4978,
             "secondary_indexes": [
                 {
-                    "name": "bystatus",
-                    "key_type": "uint64",
-                    "table_id": 15348
-                },
-                {
-                    "name": "bytype",
-                    "key_type": "uint64",
-                    "table_id": 31638
-                },
-                {
-                    "name": "byepoch",
-                    "key_type": "uint64",
-                    "table_id": 21249
+                    "name": "byqueue",
+                    "key_type": "uint128",
+                    "table_id": 11308
                 }
             ]
         },
@@ -541,6 +555,14 @@
             "key_names": ["chain_code"],
             "key_types": ["uint64"],
             "table_id": 51836
+        },
+        {
+            "name": "outqueue",
+            "type": "outbound_queue_entry",
+            "index_type": "i64",
+            "key_names": ["chain_code"],
+            "key_types": ["uint64"],
+            "table_id": 52512
         }
     ],
     "ricardian_clauses": [],

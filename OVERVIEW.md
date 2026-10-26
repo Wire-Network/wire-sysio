@@ -55,8 +55,8 @@ This allows a single unified message format across all supported chains.
 
 ### Outbound (Wire → External Chain)
 
-1. System contracts queue attestations for a target outpost via `sysio.msgch::queueout()`.
-2. When the epoch advances, `buildenv()` packs the `READY` attestations into a protobuf-encoded outbound envelope; anything that does not fit stays queued for the next epoch.
+1. System contracts queue attestations for a target outpost via `sysio.msgch::queueout()`. Once an outpost has 512 non-roster attestations waiting, `queueout` refuses another.
+2. When the epoch advances, `buildenv()` packs the outpost's `READY` attestations, rosters first, into a protobuf-encoded outbound envelope of at most 32,768 bytes and 64 attestations; the rest stays queued for the next epoch.
 3. Batch operators read the outbound envelope and submit it to the target chain's Outpost — chunked on both chains (`OPPInbound.epochIn` on Ethereum, `epoch_in` on Solana).
 4. The Outpost verifies the envelope chain and group consensus, then routes attestations to their registered handlers. An unhandled type is skipped, never reverted.
 

@@ -1472,6 +1472,32 @@ BOOST_FIXTURE_TEST_CASE(desyndicate_burns_and_queues_the_attestation, sysio_synd
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(150 * UNIT), supply());
 } FC_LOG_AND_RETHROW()
 
+// WIRE-415: once the outpost's outbound queue is full, `queueout` refuses the DESYNDICATE_LIQ and the
+// whole `desyndicate` reverts: the holder keeps the shadow, nothing burns, and no `returns` row is
+// written. The holder retries once `buildenv` frees a place.
+BOOST_FIXTURE_TEST_CASE(desyndicate_reverts_whole_when_the_outbound_queue_is_full, sysio_synd_tester) try {
+   constexpr uint32_t MAX_QUEUED_ATTESTATIONS = 512;   // mirrors sysio.msgch.hpp
+   constexpr uint32_t QUEUEOUTS_PER_BLOCK     = 20;
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+
+   for (uint32_t i = 0; i < MAX_QUEUED_ATTESTATIONS; ++i) {
+      BOOST_REQUIRE_EQUAL(success(), push(MSGCH_ACCOUNT, msgch_abi_ser, MSGCH_ACCOUNT, "queueout"_n, mvo()
+         ("chain_code", slug_value(SOLANA))
+         ("attest_type", static_cast<uint32_t>(sysio::opp::types::ATTESTATION_TYPE_DESYNDICATE_LIQ))
+         ("data", std::vector<char>{static_cast<char>(i >> 8), static_cast<char>(i)})));
+      if ((i + 1) % QUEUEOUTS_PER_BLOCK == 0) produce_block();
+   }
+   produce_block();
+
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("sysio.msgch::queueout: outbound queue is full for this outpost"),
+                       desyndicate("alice"_n, 40 * UNIT));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(100 * UNIT), liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(100 * UNIT), supply());
+   BOOST_REQUIRE(return_row(1).is_null());
+} FC_LOG_AND_RETHROW()
+
 /// Outstanding returns retain the original beneficiary and exact obligation, without lifetime totals.
 BOOST_FIXTURE_TEST_CASE(outstanding_returns_record_the_original_obligation, sysio_synd_tester) try {
    BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
