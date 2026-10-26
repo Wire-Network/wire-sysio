@@ -9,7 +9,6 @@
 #include <fstream>
 #include <iterator>
 #include <limits>
-#include <mutex>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/app.hpp>
 #include <sysio/chain/config.hpp>
@@ -71,18 +70,8 @@ constexpr uint32_t snapshot_block_log_extension_block_count = 3;
 constexpr uint32_t attestation_finality_block_count = 24;
 constexpr uint32_t snapshot_endpoint_response_count = 2;
 
-/** Consume one node-HTTP port from this CTest process's registry lease. */
-uint16_t next_test_port() {
-   static std::mutex mutex;
-   static uint32_t port_index = 0;
-   std::lock_guard lock(mutex);
-   return sysio::testing::get_port(sysio::testing::port_category::node_http, port_index++);
-}
-
-/** Return an unused loopback URL whose port remains reserved by this process's registry lease. */
-std::string unused_test_url() {
-   return loopback_url_prefix + std::to_string(next_test_port());
-}
+/** Node-HTTP ports consumed by this test process's local servers and refusal fixtures. */
+sysio::testing::test_port_allocator node_http_ports{sysio::testing::port_category::node_http};
 
 /** Serve one snapshot endpoint metadata response and its binary download on loopback. */
 class snapshot_endpoint_server {
@@ -95,7 +84,7 @@ public:
               (snapshot_root_hash_field, root_hash.str()),
            fc::time_point::maximum()))
       , snapshot_body(read_snapshot(snapshot_path))
-      , acceptor(io, tcp::endpoint(boost::asio::ip::make_address(loopback_address), next_test_port()))
+      , acceptor(io, tcp::endpoint(boost::asio::ip::make_address(loopback_address), node_http_ports.next()))
       , port(acceptor.local_endpoint().port())
       , worker([this] { serve(); }) {}
 
@@ -246,7 +235,7 @@ sysio::chain::exit_code::exit_code initialize_with_snapshot_size_limit(std::stri
    sysio::chain::application exe({.enable_resource_monitor = false});
 
    const auto tmp_path = tmp.path().string();
-   const auto endpoint_url = unused_test_url();
+   const auto endpoint_url = node_http_ports.next_loopback_url();
    std::vector<std::string> arguments{
       chain_plugin_test_program_name,
       "--snapshot-endpoint",
@@ -796,7 +785,7 @@ BOOST_AUTO_TEST_CASE(chain_plugin_snapshot_endpoint_option_registration) {
    plugin.set_program_options(cli, cfg);
    options.add(cli).add(cfg);
 
-   const auto endpoint_url = unused_test_url();
+   const auto endpoint_url = node_http_ports.next_loopback_url();
    std::array arguments{
       chain_plugin_test_program_name,
       "--snapshot-endpoint", endpoint_url.c_str(),
@@ -864,7 +853,7 @@ BOOST_AUTO_TEST_CASE(outbound_http_global_option_registration) {
       "alert monitor");
    options.add(global).add(ethereum).add(solana).add(debugging).add(signing).add(snapshot).add(alert_monitor);
 
-   const auto proxy_url = unused_test_url();
+   const auto proxy_url = node_http_ports.next_loopback_url();
    std::array arguments{
       chain_plugin_test_program_name,
       "--outbound-http-additional-ca-file", "/tmp/wire-global-ca.pem",

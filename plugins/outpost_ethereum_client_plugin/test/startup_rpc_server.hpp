@@ -3,7 +3,6 @@
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 #include <atomic>
-#include <mutex>
 #include <memory>
 #include <test_ports.hpp>
 #include <thread>
@@ -11,16 +10,14 @@
 
 namespace startup_test {
 
+/** Node-HTTP ports consumed by Ethereum client test servers and refusal fixtures. */
+inline sysio::testing::test_port_allocator node_http_ports{sysio::testing::port_category::node_http};
+
 /** Consume one node-HTTP port from this test process's registry lease. */
-inline uint16_t next_port() {
-   static std::mutex mutex;
-   static uint32_t port_index = 0;
-   std::lock_guard lock(mutex);
-   return sysio::testing::get_port(sysio::testing::port_category::node_http, port_index++);
-}
+inline uint16_t next_port() { return node_http_ports.next(); }
 
 /** Return an unused, registry-owned endpoint, including for refusal and fake-client fixtures. */
-inline std::string unused_url() { return "http://127.0.0.1:" + std::to_string(next_port()); }
+inline std::string unused_url() { return node_http_ports.next_loopback_url(); }
 
 /** Controllable RPC endpoint: a hung request keeps its socket alive until teardown. */
 class rpc_server {

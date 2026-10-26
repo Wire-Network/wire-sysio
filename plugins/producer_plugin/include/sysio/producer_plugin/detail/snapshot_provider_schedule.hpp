@@ -27,14 +27,13 @@ enum class snapshot_provider_schedule_disposition {
 /** Result of reconciling the provider-owned recurring request with authoritative configuration. */
 struct snapshot_provider_schedule_reconciliation {
    /** Enabled cadence, or no value when snapshot attestation is disabled. */
-   std::optional<uint32_t>                  block_spacing;
+   std::optional<uint32_t> block_spacing;
    /** How the active request, if any, was obtained. */
-   snapshot_provider_schedule_disposition  disposition =
-      snapshot_provider_schedule_disposition::disabled;
+   snapshot_provider_schedule_disposition disposition = snapshot_provider_schedule_disposition::disabled;
    /** Active recurring request identifier, when reconciliation leaves one in use. */
-   std::optional<uint32_t>                  request_id;
+   std::optional<uint32_t> request_id;
    /** Identifiers of stale provider-owned requests removed during reconciliation. */
-   std::vector<uint32_t>                    removed_request_ids;
+   std::vector<uint32_t> removed_request_ids;
 };
 
 /**
@@ -45,8 +44,9 @@ struct snapshot_provider_schedule_reconciliation {
  * request. The returned disposition and identifiers let the plugin update its vote cache and log
  * only state changes.
  */
-inline snapshot_provider_schedule_reconciliation reconcile_snapshot_provider_schedule(
-   chain::snapshot_scheduler& scheduler, std::optional<uint32_t> desired_block_spacing) {
+inline snapshot_provider_schedule_reconciliation
+reconcile_snapshot_provider_schedule(chain::snapshot_scheduler& scheduler,
+                                     std::optional<uint32_t> desired_block_spacing) {
    snapshot_provider_schedule_reconciliation result;
 
    const auto existing_requests = scheduler.get_snapshot_requests().snapshot_requests;
@@ -56,10 +56,9 @@ inline snapshot_provider_schedule_reconciliation reconcile_snapshot_provider_sch
          continue;
       }
 
-      const bool matches = desired_block_spacing
-                           && request.block_spacing == *desired_block_spacing
-                           && request.start_block_num == *desired_block_spacing
-                           && request.end_block_num == std::numeric_limits<uint32_t>::max();
+      const bool matches = desired_block_spacing && request.block_spacing == *desired_block_spacing &&
+                           request.start_block_num == *desired_block_spacing &&
+                           request.end_block_num == std::numeric_limits<uint32_t>::max();
       if (matches && !matching_automatic_request) {
          matching_automatic_request = request.snapshot_request_id;
          continue;
@@ -82,8 +81,7 @@ inline snapshot_provider_schedule_reconciliation reconcile_snapshot_provider_sch
 
    const auto block_spacing = *desired_block_spacing;
    const auto maximum_block_num = std::numeric_limits<uint32_t>::max();
-   if (const auto existing = scheduler.find_snapshot_request(
-          block_spacing, block_spacing, maximum_block_num)) {
+   if (const auto existing = scheduler.find_snapshot_request(block_spacing, block_spacing, maximum_block_num)) {
       result.disposition = snapshot_provider_schedule_disposition::reused_manual;
       result.request_id = existing;
       return result;
