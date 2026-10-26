@@ -423,6 +423,8 @@ enum class scripted_send {
    accepted,
    /// Refused with a JSON-RPC error, as a replacement that does not raise every fee enough is.
    refused,
+   /// Refused as already known: the node holds the bytes.
+   already_known,
    /// Accepted and held, but the response is lost on the way back.
    response_lost
 };
@@ -536,6 +538,9 @@ private:
          }
 
          _script->known_hashes.insert(hash);
+         if (outcome == scripted_send::already_known) {
+            throw fc::network::json_rpc::json_rpc_error(test_refused_send_rpc_code, "already known");
+         }
          if (outcome == scripted_send::response_lost) {
             FC_THROW_EXCEPTION(fc::timeout_exception, "the scripted send's response was lost");
          }
@@ -3068,6 +3073,23 @@ BOOST_AUTO_TEST_CASE(a_refused_cancel_is_sent_again_next_tick) try {
    BOOST_CHECK(cancel.purpose == sysio::submission_purpose::cancel);
    BOOST_CHECK_EQUAL(cancel.attempts.size(), 1u);
    BOOST_CHECK(fixture->delivery_calls.empty());
+} FC_LOG_AND_RETHROW();
+
+/// A re-send the node refuses as already known is kept: asked for the hash,
+/// the node holds it, so the signing is journaled as sent and waited for.
+BOOST_AUTO_TEST_CASE(a_resend_the_node_already_holds_is_kept) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->unconfirmed_calls = {1};
+   BOOST_CHECK_THROW(deliver(*fixture, envelope), sysio::chain::outpost_delivery_incomplete_exception);
+   fixture->rpc->send_outcomes = {scripted_send::already_known};
+
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.size(), 1u);
+   const auto resent = fixture->only_submission();
+   BOOST_REQUIRE_EQUAL(resent.attempts.size(), 2u);
+   BOOST_CHECK_EQUAL(resent.attempts.back().tx_hash, fixture->rpc->sent_hashes.front());
 } FC_LOG_AND_RETHROW();
 
 /// A journaled call whose nonce the node holds something else at, with none of

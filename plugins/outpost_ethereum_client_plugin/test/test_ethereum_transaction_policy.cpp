@@ -21,6 +21,7 @@
 #include <fstream>
 #include <functional>
 #include <limits>
+#include <set>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -162,8 +163,10 @@ signature_provider_ptr make_recording_signer(std::atomic<size_t>& sign_count) {
 enum class send_outcome {
    /// Accepted: the node reports the hash of the bytes.
    accepted,
-   /// Refused: the node answers with a JSON-RPC error.
+   /// Refused: the node answers with a JSON-RPC error, and does not hold the bytes.
    refused,
+   /// Refused as already known: the node holds the bytes.
+   already_known,
    /// Accepted, but the response is lost on the way back.
    response_lost,
    /// Accepted, and the node reports a hash other than the bytes'.
@@ -200,6 +203,9 @@ public:
             return fc::variant(hash);
          case send_outcome::refused:
             throw fc::network::json_rpc::json_rpc_error(refused_send_rpc_code, "replacement transaction underpriced");
+         case send_outcome::already_known:
+            held_hashes.insert(hash);
+            throw fc::network::json_rpc::json_rpc_error(refused_send_rpc_code, "already known");
          case send_outcome::response_lost:
             FC_THROW_EXCEPTION(fc::timeout_exception, "the send's response was lost");
          case send_outcome::misreported:
@@ -211,6 +217,11 @@ public:
          return receipt_response;
       }
       if (method == "eth_blockNumber") return fc::variant(block_number_response);
+      if (method == "eth_getTransactionByHash") {
+         if (lookups_fail) FC_THROW_EXCEPTION(fc::timeout_exception, "the lookup's response was lost");
+         const auto hash = params.get_array().front().as_string();
+         return held_hashes.contains(hash) ? fc::variant(fc::mutable_variant_object("hash", hash)) : fc::variant();
+      }
       FC_THROW_EXCEPTION(fc::invalid_arg_exception, "unexpected fake RPC method {}", method);
    }
 
@@ -233,6 +244,10 @@ public:
    std::vector<std::string> sent_hashes;
    /** How the node answers the next send. */
    send_outcome             next_send_outcome = send_outcome::accepted;
+   /** The hashes `eth_getTransactionByHash` finds. */
+   std::set<std::string>    held_hashes;
+   /** Whether `eth_getTransactionByHash` fails instead of answering. */
+   bool                     lookups_fail = false;
 };
 
 /** Return a transaction that exactly reaches the bounded policy values. */
@@ -655,8 +670,9 @@ BOOST_AUTO_TEST_CASE(epoch_in_waits_for_its_receipt_until_the_given_deadline) {
 }
 
 /// The attempt is recorded before the send: a refusal removes it again and
-/// propagates, a lost response keeps it, and a node that reports another hash
-/// for the bytes has that hash recorded beside the computed one.
+/// propagates, unless the node holds the bytes anyway (already known), or
+/// asking it fails; a lost response keeps it; and a node that reports another
+/// hash for the bytes has that hash recorded beside the computed one.
 BOOST_AUTO_TEST_CASE(a_submission_attempt_survives_every_send_outcome_but_a_refusal) {
    std::atomic<size_t> sign_count = 0;
    const auto provider = make_recording_signer(sign_count);
@@ -690,12 +706,49 @@ BOOST_AUTO_TEST_CASE(a_submission_attempt_survives_every_send_outcome_but_a_refu
    const auto refused = send(send_outcome::refused);
    BOOST_CHECK(refused.refused);
    BOOST_CHECK(refused.submission.attempts.empty());
+   const auto known = send(send_outcome::already_known);
+   BOOST_CHECK(!known.refused);
+   BOOST_CHECK_EQUAL(known.submission.attempts.size(), 1u);
+   client->lookups_fail = true;
+   const auto unknown = send(send_outcome::refused);
+   BOOST_CHECK(unknown.refused);
+   BOOST_CHECK_EQUAL(unknown.submission.attempts.size(), 1u);
+   client->lookups_fail = false;
    const auto lost = send(send_outcome::response_lost);
    BOOST_CHECK(!lost.refused);
    BOOST_CHECK_EQUAL(lost.submission.attempts.size(), 1u);
    const auto misreported = send(send_outcome::misreported);
    BOOST_REQUIRE_EQUAL(misreported.submission.attempts.size(), 2u);
    BOOST_CHECK_EQUAL(misreported.submission.attempts.back().tx_hash, transaction_hash);
+}
+
+/// A first `epochIn` the node refuses as already known is kept as sent: the
+/// submission still carries the signing, so the relay journals the call and
+/// waits for it instead of sending another at the next nonce.
+BOOST_AUTO_TEST_CASE(epoch_in_keeps_a_first_send_the_node_already_holds) {
+   std::atomic<size_t> sign_count = 0;
+   const auto provider = make_recording_signer(sign_count);
+   auto client = std::make_shared<recording_ethereum_client>(provider, bounded_policy());
+   sysio::opp_inbound_contract_client inbound{
+      client,
+      std::string(contract_address),
+      {whole_envelope_epoch_in_function("epochIn"), no_argument_function("nextEpochIndex"),
+       uint32_argument_function("dispatchSpill"), epoch_deliveries_function("epochDeliveries"),
+       no_argument_function("pendingEpochHash"), bytes32_argument_function("pendingConsensusForDigest"),
+       uint16_argument_function("attestationHandlers")},
+   };
+   uint32_t                   epoch_index = 1;
+   std::string                envelope    = "01";
+   sysio::ethereum_submission submission;
+   client->next_send_outcome = send_outcome::already_known;
+
+   // The node never shows a receipt, so the wait runs out; the call is not refused.
+   BOOST_CHECK_THROW(inbound.epoch_in(epoch_index, envelope, 999,
+                                      fc::time_point::now() + fc::milliseconds(short_receipt_deadline_ms), submission),
+                     fc::timeout_exception);
+   BOOST_CHECK_EQUAL(client->broadcast_count, 1u);
+   BOOST_REQUIRE_EQUAL(submission.attempts.size(), 1u);
+   BOOST_CHECK_EQUAL(submission.attempts.front().tx_hash, client->sent_hashes.front());
 }
 
 /// Signing checks the policy first: a transaction past its caps is refused

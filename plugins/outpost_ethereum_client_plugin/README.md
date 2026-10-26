@@ -190,7 +190,8 @@ later tick and delivered again, rather than left to the job's one consensus retr
 Every transaction the relay signs goes into the **journal** of the client entry it signs with: its nonce,
 recipient, gas and calldata, and every signing at that nonce with its fees. Each signing's hash is computed
 from the signed bytes and recorded before the send, so a send whose response is lost still leaves the hash
-and the fees on record. A node's refusal removes that signing again. The journal is shared by every outpost
+and the fees on record. A node's refusal removes that signing again, unless asking the node for the hash
+shows it holds the bytes anyway (a refusal as already known). The journal is shared by every outpost
 client built on the entry, so it survives the batch operator rebuilding a relay job; a restart loses it.
 
 A transaction stays in the journal until its nonce is used at the client's read confirmation, not just until
@@ -438,7 +439,7 @@ fallback and its boundary, refusals), an epoch reported handled only once the re
 journaled call that lands, reverts, waits, is replaced, is re-broadcast, loses its nonce, is forgotten at the
 read confirmation, comes back after a reorg, or had a replacement whose response was lost, the journal
 surviving a rebuilt relay, an unaccounted nonce waited on and cancelled after a restart, a refused cancel sent
-again next tick, a cancel at the cap when the market asks for more, a journaled call outbid when something
+again next tick, a resend the node already holds, a cancel at the cap when the market asks for more, a journaled call outbid when something
 else holds its nonce, the check before every send, the replacement and outbid fees and the per-transaction
 caps, and the network hash
 of a signed transaction against foundry's vectors — and the outpost crank: idle without the pool ABI or a registered handler, binding the
@@ -448,7 +449,8 @@ errors, and deadline abandonment.
 before signing or broadcasting, that exact caps pass through once, that two clients enforce their own
 policies, that file and CLI configuration produce the expected policies and read confirmations, that
 signing checks the policy without sending, that a signing's recorded hash survives every send outcome but a
-refusal, and that a partial client map is never published. No test dials a public endpoint.
+refusal of bytes the node does not hold, that a first `epochIn` the node already holds is kept as sent, and
+that a partial client map is never published. No test dials a public endpoint.
 
 CTest runs this binary through `tests/run_with_bind_config.cjs`, which keeps platform registry reservations
 alive for the test process. It requires Node and the version-pinned `@wireio/cluster-tool` development

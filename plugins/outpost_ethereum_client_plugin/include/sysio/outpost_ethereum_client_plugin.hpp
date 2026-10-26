@@ -289,15 +289,16 @@ inline constexpr auto logs         = "logs";
 /**
  * @brief Send one signing of `submission` whose attempt is already recorded as its last.
  *
- * A node refusal removes the attempt again, since the node does not hold it; any other failure keeps it,
- * since the node may. A node that reports a different hash for the bytes than the one computed from them is
- * logged, and its hash is recorded too so every wait watches both.
+ * A node refusal removes the attempt again, unless asking the node for the hash shows it holds the bytes
+ * anyway (it refused them as already known); any other failure keeps it, since the node may hold them. A
+ * node that reports a different hash for the bytes than the one computed from them is logged, and its hash
+ * is recorded too so every wait watches both.
  *
  * @param client     The client that signed it.
  * @param signed_tx  The signed bytes and the hash recorded for them.
  * @param submission The submission the attempt belongs to.
- * @return The hash the node reported.
- * @throws fc::network::json_rpc::json_rpc_error when the node refuses the transaction.
+ * @return The hash the node reported, or the computed one when the node refused bytes it holds.
+ * @throws fc::network::json_rpc::json_rpc_error when the node refuses the transaction and does not hold it.
  */
 std::string send_submission_attempt(ethereum_client& client, const signed_transaction& signed_tx,
                                     ethereum_submission& submission);

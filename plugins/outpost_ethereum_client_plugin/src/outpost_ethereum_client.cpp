@@ -714,8 +714,23 @@ std::string send_submission_attempt(ethereum_client& client, const signed_transa
    std::string reported;
    try {
       reported = client.send_raw_transaction(signed_tx.raw_hex);
-   } catch (const fc::network::json_rpc::json_rpc_error&) {
-      submission.attempts.pop_back();
+   } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
+      // A node refuses bytes it already holds too ("already known", in each
+      // client's own words). Asking for the hash tells the two apart.
+      std::optional<bool> held;
+      try {
+         held = !client.get_transaction_by_hash(signed_tx.tx_hash).is_null();
+      } catch (const fc::exception& lookup) {
+         wlog("ethereum transaction at nonce {}: asking the node for {} after it refused it ({}) failed ({}); "
+              "keeping it as possibly sent",
+              submission.transaction.nonce.str(), signed_tx.tx_hash, refusal.top_message(), lookup.top_message());
+      }
+      if (held && *held) {
+         dlog("ethereum transaction at nonce {}: the node refused {} it already holds ({})",
+              submission.transaction.nonce.str(), signed_tx.tx_hash, refusal.top_message());
+         return signed_tx.tx_hash;
+      }
+      if (held) submission.attempts.pop_back();
       throw;
    }
    if (!same_hex(reported, signed_tx.tx_hash)) {
