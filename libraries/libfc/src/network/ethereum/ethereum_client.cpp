@@ -236,6 +236,7 @@ fc::variant ethereum_client::execute_contract_tx_fn(const eip1559_tx& source_tx,
                                                     const contract_invoke_data_items& params, bool sign) {
    eip1559_tx tx = source_tx;
    tx.data = from_hex(contract_encode_data(abi, params));
+   if (sign) return send_raw_transaction(sign_transaction(tx, abi.name).raw_hex);
 
    try {
       validate_transaction_against_policy(_transaction_policy, tx);
@@ -243,24 +244,34 @@ fc::variant ethereum_client::execute_contract_tx_fn(const eip1559_tx& source_tx,
       log_transaction_rejection(rejection, abi.name);
       throw;
    }
+   return send_raw_transaction(to_hex(rlp::encode_eip1559_unsigned_typed(tx)));
+}
 
-   auto tx_encoded = rlp::encode_eip1559_unsigned_typed(tx);
-   if (sign) {
-      fc::crypto::eth_client_signer signer(*_signature_provider);
-      auto tx_sig = signer.sign(tx_encoded);
-      auto& tx_sig_data = tx_sig.get<fc::em::signature_shim>().serialize();
-      std::copy_n(tx_sig_data.begin(), 32, tx.r.begin());
-      std::copy_n(tx_sig_data.begin() + 32, 32, tx.s.begin());
-      // Byte 64 of the recoverable signature is the Ethereum `v`, encoded
-      // pre-EIP-155 as `27 + recovery_id` (Yellow Paper Appendix F) by every
-      // signing path -- local `em` keys and the AWS KMS signer alike. EIP-1559
-      // typed transactions carry the bare recovery id, so strip the offset
-      // here; this is the exact inverse of the packing done at signing time.
-      tx.v = tx_sig_data[64] - fc::crypto::ethereum::v_offset; // recovery id
-      tx_encoded = rlp::encode_eip1559_signed_typed(tx);
+signed_transaction ethereum_client::sign_transaction(const eip1559_tx& source_tx, std::string_view operation) {
+   try {
+      validate_transaction_against_policy(_transaction_policy, source_tx);
+   } catch (const ethereum_transaction_policy_exception& rejection) {
+      log_transaction_rejection(rejection, operation);
+      throw;
    }
 
-   return send_raw_transaction(to_hex(tx_encoded));
+   eip1559_tx tx = source_tx;
+   fc::crypto::eth_client_signer signer(*_signature_provider);
+   auto tx_sig = signer.sign(rlp::encode_eip1559_unsigned_typed(tx));
+   auto& tx_sig_data = tx_sig.get<fc::em::signature_shim>().serialize();
+   std::copy_n(tx_sig_data.begin(), 32, tx.r.begin());
+   std::copy_n(tx_sig_data.begin() + 32, 32, tx.s.begin());
+   // Byte 64 of the recoverable signature is the Ethereum `v`, encoded
+   // pre-EIP-155 as `27 + recovery_id` (Yellow Paper Appendix F) by every
+   // signing path -- local `em` keys and the AWS KMS signer alike. EIP-1559
+   // typed transactions carry the bare recovery id, so strip the offset
+   // here; this is the exact inverse of the packing done at signing time.
+   tx.v = tx_sig_data[64] - fc::crypto::ethereum::v_offset; // recovery id
+   const auto signed_encoding = rlp::encode_eip1559_signed_typed(tx);
+   return signed_transaction{
+      .raw_hex = to_hex(signed_encoding),
+      .tx_hash = hash_to_hex(keccak256::hash(std::span<const uint8_t>(signed_encoding)), /*add_prefix=*/true),
+   };
 }
 
 

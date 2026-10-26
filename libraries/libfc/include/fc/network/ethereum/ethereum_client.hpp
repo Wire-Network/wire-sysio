@@ -172,6 +172,16 @@ struct ethereum_read_block {
 };
 
 /**
+ * @brief A transaction signed for `eth_sendRawTransaction`, and the hash the network knows it by
+ */
+struct signed_transaction {
+   /// The signed typed encoding (`0x02 || rlp(...)`) as hex, as `send_raw_transaction` takes it.
+   std::string raw_hex;
+   /// `keccak256` of that encoding as `0x`-hex (EIP-2718): the hash nodes report and key receipts by.
+   std::string tx_hash;
+};
+
+/**
  * @brief Type alias for contract call data - either raw hex string or structured parameters
  */
 using data_or_params_t  = std::variant<std::string, fc::variants>;
@@ -441,6 +451,19 @@ public:
 
    fc::variant execute_contract_tx_fn(const eip1559_tx& tx, const abi::contract& abi,
                                       const contract_invoke_data_items& params = {}, bool sign = true);
+
+   /**
+    * @brief Check `tx` against the transaction policy and sign it, without sending it.
+    *
+    * The hash comes back with the signed bytes, so a caller can record it before
+    * `send_raw_transaction`, whose response can be lost after the node accepted the transaction.
+    *
+    * @param tx        The transaction as it will be sent, calldata included.
+    * @param operation What the transaction does, for the policy-rejection log.
+    * @return The signed encoding and its hash.
+    * @throws ethereum_transaction_policy_exception when the policy refuses `tx`; nothing is signed.
+    */
+   signed_transaction sign_transaction(const eip1559_tx& tx, std::string_view operation);
 
    // Ethereum RPC Methods
 

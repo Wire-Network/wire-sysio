@@ -4,6 +4,8 @@
 #include <gsl-lite/gsl-lite.hpp>
 
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
+#include <fc/crypto/hex.hpp>
+#include <fc/crypto/keccak256.hpp>
 #include <fc/crypto/private_key.hpp>
 #include <fc/filesystem.hpp>
 #include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
@@ -34,8 +36,11 @@ namespace {
 
 const std::string fake_rpc_url = startup_test::unused_url();
 constexpr std::string_view contract_address = "5FbDB2315678afecb367f032d93F642f64180aa3";
+/// A hash the recording node reports when told to misreport one.
 constexpr std::string_view transaction_hash =
    "0x1111111111111111111111111111111111111111111111111111111111111111";
+/// The JSON-RPC error code a node refuses a transaction with (geth's invalid-input code).
+constexpr int refused_send_rpc_code = -32000;
 constexpr std::string_view signer_public_key =
    "0x8318535b54105d4a7aae60c08fc45f9687181b4fdfc625bd1a753fa7397fed7535"
    "47f11ca8696646f2f3acb08e31016afac23e630c5d11f59f61fef57b0d2aa5";
@@ -153,6 +158,18 @@ signature_provider_ptr make_recording_signer(std::atomic<size_t>& sign_count) {
    return provider;
 }
 
+/** How the recording node answers one `eth_sendRawTransaction`. */
+enum class send_outcome {
+   /// Accepted: the node reports the hash of the bytes.
+   accepted,
+   /// Refused: the node answers with a JSON-RPC error.
+   refused,
+   /// Accepted, but the response is lost on the way back.
+   response_lost,
+   /// Accepted, and the node reports a hash other than the bytes'.
+   misreported
+};
+
 /** Deterministic Ethereum client that records RPC and broadcast activity. */
 class recording_ethereum_client final : public ethereum_client {
 public:
@@ -175,7 +192,19 @@ public:
       if (method == "eth_getTransactionCount") return fc::variant("0x0");
       if (method == "eth_sendRawTransaction") {
          ++broadcast_count;
-         return fc::variant(std::string(transaction_hash));
+         const auto raw = params.get_array().front().as_string();
+         const auto hash = "0x" + fc::crypto::keccak256::hash(std::span<const uint8_t>(fc::from_hex(raw))).str();
+         sent_hashes.push_back(hash);
+         switch (next_send_outcome) {
+         case send_outcome::accepted:
+            return fc::variant(hash);
+         case send_outcome::refused:
+            throw fc::network::json_rpc::json_rpc_error(refused_send_rpc_code, "replacement transaction underpriced");
+         case send_outcome::response_lost:
+            FC_THROW_EXCEPTION(fc::timeout_exception, "the send's response was lost");
+         case send_outcome::misreported:
+            return fc::variant(std::string(transaction_hash));
+         }
       }
       if (method == "eth_getTransactionReceipt") {
          ++receipt_reads;
@@ -200,6 +229,10 @@ public:
    std::string              block_number_response = "0x10";
    size_t                   receipt_reads   = 0;
    size_t                   broadcast_count = 0;
+   /** `keccak256` of every raw transaction sent, in order. */
+   std::vector<std::string> sent_hashes;
+   /** How the node answers the next send. */
+   send_outcome             next_send_outcome = send_outcome::accepted;
 };
 
 /** Return a transaction that exactly reaches the bounded policy values. */
@@ -385,7 +418,8 @@ BOOST_AUTO_TEST_CASE(exact_caps_reach_the_signer_and_broadcast_once) {
    auto client = std::make_shared<recording_ethereum_client>(provider, bounded_policy());
 
    const auto result = client->execute_contract_tx_fn(exact_transaction(), no_argument_function("submit"));
-   BOOST_CHECK_EQUAL(result.as_string(), transaction_hash);
+   BOOST_REQUIRE_EQUAL(client->sent_hashes.size(), 1u);
+   BOOST_CHECK_EQUAL(result.as_string(), client->sent_hashes.front());
    BOOST_CHECK_EQUAL(sign_count.load(), 1u);
    BOOST_CHECK_EQUAL(client->broadcast_count, 1u);
 }
@@ -591,7 +625,7 @@ BOOST_AUTO_TEST_CASE(epoch_in_waits_for_its_receipt_until_the_given_deadline) {
    };
    uint32_t                   epoch_index = 1;
    std::string                envelope    = "01";
-   sysio::epoch_in_submission submission;
+   sysio::ethereum_submission submission;
 
    // No receipt ever appears.
    const auto start = fc::time_point::now();
@@ -606,53 +640,82 @@ BOOST_AUTO_TEST_CASE(epoch_in_waits_for_its_receipt_until_the_given_deadline) {
    // The call was sent; only the wait gave up. The submission still says what
    // was sent, so the caller can settle it later.
    BOOST_CHECK_EQUAL(client->broadcast_count, 1u);
-   BOOST_CHECK(submission.send_attempted);
+   BOOST_CHECK(submission.purpose == sysio::submission_purpose::epoch_in);
+   BOOST_CHECK(submission.state == sysio::submission_state::pending);
    BOOST_CHECK_EQUAL(submission.epoch_index, epoch_index);
-   BOOST_CHECK_EQUAL(submission.envelope_hex, envelope);
-   BOOST_CHECK_EQUAL(submission.gas_budget, 999u);
-   BOOST_CHECK(submission.nonce == fc::uint256{0});
-   BOOST_CHECK(submission.fees.max_priority_fee_per_gas == fc::uint256{10});
-   BOOST_CHECK(submission.fees.max_fee_per_gas == fc::uint256{100});
-   BOOST_REQUIRE_EQUAL(submission.tx_hashes.size(), 1u);
-   BOOST_CHECK_EQUAL(submission.tx_hashes.front(), transaction_hash);
+   BOOST_CHECK(submission.transaction.nonce == fc::uint256{0});
+   BOOST_CHECK(submission.transaction.gas_limit == fc::uint256{999});
+   BOOST_CHECK(!submission.transaction.data.empty());
+   // The hash was computed from the signed bytes, and is the one the node saw.
+   BOOST_REQUIRE_EQUAL(submission.attempts.size(), 1u);
+   BOOST_REQUIRE_EQUAL(client->sent_hashes.size(), 1u);
+   BOOST_CHECK_EQUAL(submission.attempts.front().tx_hash, client->sent_hashes.front());
+   BOOST_CHECK(submission.attempts.front().fees.max_priority_fee_per_gas == fc::uint256{10});
+   BOOST_CHECK(submission.attempts.front().fees.max_fee_per_gas == fc::uint256{100});
 }
 
-/// A resend signs the same call again at the submission's nonce and the fees
-/// it is given, with no pre-flight and no nonce lookup, inside the policy.
-BOOST_AUTO_TEST_CASE(resend_epoch_in_signs_the_call_again_at_its_nonce) {
+/// The attempt is recorded before the send: a refusal removes it again and
+/// propagates, a lost response keeps it, and a node that reports another hash
+/// for the bytes has that hash recorded beside the computed one.
+BOOST_AUTO_TEST_CASE(a_submission_attempt_survives_every_send_outcome_but_a_refusal) {
    std::atomic<size_t> sign_count = 0;
    const auto provider = make_recording_signer(sign_count);
    auto client = std::make_shared<recording_ethereum_client>(provider, bounded_policy());
-   sysio::opp_inbound_contract_client inbound{
-      client,
-      std::string(contract_address),
-      {whole_envelope_epoch_in_function("epochIn"), no_argument_function("nextEpochIndex"),
-       uint32_argument_function("dispatchSpill"), epoch_deliveries_function("epochDeliveries"),
-       no_argument_function("pendingEpochHash"), bytes32_argument_function("pendingConsensusForDigest"),
-       uint16_argument_function("attestationHandlers")},
+   const sysio::ethereum_transaction_fees fees{.max_priority_fee_per_gas = 10, .max_fee_per_gas = 100};
+
+   /// What one send with `outcome` leaves in a submission, and whether the node's refusal propagated.
+   struct outcome_result {
+      sysio::ethereum_submission submission;
+      bool                       refused = false;
    };
-   const sysio::epoch_in_submission submission{
-      .epoch_index    = 1,
-      .envelope_hex   = "01",
-      .gas_budget     = 999,
-      .nonce          = 7,
-      .fees           = {.max_priority_fee_per_gas = 5, .max_fee_per_gas = 50},
-      .send_attempted = true,
-      .tx_hashes      = {"0x01"},
+   const auto send = [&](send_outcome outcome) {
+      outcome_result result{.submission = {.transaction = exact_transaction()}};
+      const auto signed_tx = client->sign_transaction(result.submission.transaction, "submit");
+      result.submission.attempts.push_back({.tx_hash = signed_tx.tx_hash, .fees = fees});
+      client->next_send_outcome = outcome;
+      try {
+         sysio::send_submission_attempt(*client, signed_tx, result.submission);
+      } catch (const fc::network::json_rpc::json_rpc_error&) {
+         result.refused = true;
+      } catch (const fc::timeout_exception&) {
+      }
+      // The computed hash is the one the node derives from the bytes.
+      BOOST_CHECK_EQUAL(signed_tx.tx_hash, client->sent_hashes.back());
+      return result;
    };
 
-   const auto hash = inbound.resend_epoch_in(submission, {.max_priority_fee_per_gas = 10, .max_fee_per_gas = 100});
-   BOOST_CHECK_EQUAL(hash, transaction_hash);
-   BOOST_CHECK_EQUAL(client->broadcast_count, 1u);
-   BOOST_CHECK_EQUAL(sign_count.load(), 1u);
-   BOOST_CHECK(std::ranges::count(client->methods, "eth_getTransactionCount") == 0);
-   BOOST_CHECK(std::ranges::count(client->methods, "eth_estimateGas") == 0);
+   const auto accepted = send(send_outcome::accepted);
+   BOOST_CHECK(!accepted.refused);
+   BOOST_CHECK_EQUAL(accepted.submission.attempts.size(), 1u);
+   const auto refused = send(send_outcome::refused);
+   BOOST_CHECK(refused.refused);
+   BOOST_CHECK(refused.submission.attempts.empty());
+   const auto lost = send(send_outcome::response_lost);
+   BOOST_CHECK(!lost.refused);
+   BOOST_CHECK_EQUAL(lost.submission.attempts.size(), 1u);
+   const auto misreported = send(send_outcome::misreported);
+   BOOST_REQUIRE_EQUAL(misreported.submission.attempts.size(), 2u);
+   BOOST_CHECK_EQUAL(misreported.submission.attempts.back().tx_hash, transaction_hash);
+}
 
-   // Fees past the policy's caps are refused before anything is signed.
-   expect_policy_rejection(
-      [&] { inbound.resend_epoch_in(submission, {.max_priority_fee_per_gas = 11, .max_fee_per_gas = 100}); });
-   BOOST_CHECK_EQUAL(client->broadcast_count, 1u);
+/// Signing checks the policy first: a transaction past its caps is refused
+/// before the signer is asked, and nothing is sent either way.
+BOOST_AUTO_TEST_CASE(sign_transaction_signs_within_the_policy_without_sending) {
+   std::atomic<size_t> sign_count = 0;
+   const auto provider = make_recording_signer(sign_count);
+   auto client = std::make_shared<recording_ethereum_client>(provider, bounded_policy());
+
+   const auto signed_tx = client->sign_transaction(exact_transaction(), "submit");
    BOOST_CHECK_EQUAL(sign_count.load(), 1u);
+   const auto signed_bytes = fc::from_hex(signed_tx.raw_hex);
+   const auto expected_hash = fc::crypto::keccak256::hash(std::span<const uint8_t>(signed_bytes));
+   BOOST_CHECK_EQUAL(signed_tx.tx_hash, "0x" + expected_hash.str());
+
+   auto past_cap = exact_transaction();
+   ++past_cap.max_priority_fee_per_gas;
+   expect_policy_rejection([&] { client->sign_transaction(past_cap, "submit"); });
+   BOOST_CHECK_EQUAL(sign_count.load(), 1u);
+   BOOST_CHECK_EQUAL(client->broadcast_count, 0u);
 }
 
 BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
@@ -676,9 +739,9 @@ BOOST_AUTO_TEST_CASE(all_typed_write_wrappers_share_the_policy_enforced_path) {
    uint32_t    epoch_index = 1;
    std::string envelope = "01";
    const auto  deadline = fc::time_point::now() + fc::seconds(receipt_deadline_seconds);
-   sysio::epoch_in_submission submission;
+   sysio::ethereum_submission submission;
    expect_policy_rejection([&] { inbound.epoch_in(epoch_index, envelope, 1000, deadline, submission); });
-   BOOST_CHECK(!submission.send_attempted);
+   BOOST_CHECK(submission.attempts.empty());
    client->receipt_response = fc::mutable_variant_object("status", "0x1")("blockNumber", "0x10")("logs", fc::variants{});
    const auto receipt = inbound.epoch_in(epoch_index, envelope, 999, deadline, submission);
    BOOST_CHECK_EQUAL(receipt.block_number, fc::uint256{16});

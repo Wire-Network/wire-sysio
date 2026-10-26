@@ -39,11 +39,11 @@ constexpr std::string_view OP_REALIZE_YIELD    = "crank_outpost:realizeYield";
 /// Retry label for the pinned progress read, see `PINNED_READ_RETRY`.
 constexpr std::string_view OP_READ_PROGRESS    = "ethereum:read_progress";
 
-/// Retry label for the wait on an in-flight `epochIn`, see `IN_FLIGHT_POLL`.
-constexpr std::string_view OP_SETTLE_IN_FLIGHT = "ethereum:settle_in_flight";
+/// Retry label for the wait on the signer's pending transactions, see `IN_FLIGHT_POLL_*`.
+constexpr std::string_view OP_SETTLE_SUBMISSIONS = "ethereum:settle_submissions";
 
-/// How the wait on an in-flight `epochIn` polls its hashes. A block is ~12 s,
-/// so polling faster than a second only adds load.
+/// How the wait on pending transactions polls their hashes and the signer's
+/// nonces. A block is ~12 s, so polling faster than a second only adds load.
 constexpr fc::microseconds IN_FLIGHT_POLL_INITIAL_BACKOFF = fc::seconds(1);
 constexpr fc::microseconds IN_FLIGHT_POLL_MAX_BACKOFF     = fc::seconds(4);
 
@@ -157,6 +157,29 @@ std::optional<fc::uint256> bumped_fee(const fc::uint256& fee) {
 
 /// The larger of two fees.
 fc::uint256 larger_fee(const fc::uint256& lhs, const fc::uint256& rhs) { return lhs > rhs ? lhs : rhs; }
+
+/// `fees` with the fee cap raised to the tip where it was below (EIP-1559 refuses a fee cap below the tip),
+/// or `std::nullopt` when the result is past the policy's caps.
+std::optional<ethereum_transaction_fees> within_policy(ethereum_transaction_fees          fees,
+                                                       const ethereum_transaction_policy& policy) {
+   fees.max_fee_per_gas = larger_fee(fees.max_fee_per_gas, fees.max_priority_fee_per_gas);
+   if (fees.max_priority_fee_per_gas > policy.max_priority_fee_per_gas ||
+       fees.max_fee_per_gas > policy.max_fee_per_gas) {
+      return std::nullopt;
+   }
+   return fees;
+}
+
+/// How much each fee rises when a node refuses a replacement of a transaction whose fees are unknown.
+/// Doubling reaches any fee within the policy's caps in a few refusals; only the fees of the signing that
+/// lands are paid.
+constexpr uint64_t ESCALATION_FEE_MULTIPLIER = 2;
+
+/// Most signings one replacement of a transaction with unknown fees tries before the tick moves on.
+constexpr uint32_t MAX_REPLACEMENT_ESCALATIONS = 8;
+
+/// Gas a zero-value transfer to an account without code uses, all a cancel needs.
+constexpr uint64_t PLAIN_TRANSFER_GAS = 21'000;
 
 /// Most `epochIn` calls one tick sends for one epoch before handing the rest
 /// to the next tick. A bound, not a budget: a full-cap envelope spills a
@@ -394,6 +417,22 @@ std::string revert_hex(const fc::network::json_rpc::json_rpc_error& refusal) {
    return refusal.data.is_string() ? refusal.data.as_string() : std::string{};
 }
 
+/// A journaled transaction as the logs name it.
+std::string describe_submission(const ethereum_submission& submission) {
+   if (submission.purpose == submission_purpose::cancel) {
+      return "the cancel at nonce " + submission.transaction.nonce.str();
+   }
+   return "the epochIn for epoch=" + std::to_string(submission.epoch_index) + " at nonce " +
+          submission.transaction.nonce.str();
+}
+
+/// Add `submission` to `submissions`, keeping them ascending by nonce.
+void journal_submission(std::vector<ethereum_submission>& submissions, ethereum_submission submission) {
+   const auto position = std::ranges::upper_bound(submissions, submission.transaction.nonce, std::less{},
+                                                  [](const ethereum_submission& s) { return s.transaction.nonce; });
+   submissions.insert(position, std::move(submission));
+}
+
 } // namespace
 
 namespace outpost_ethereum_client_detail {
@@ -578,23 +617,34 @@ bool is_routable_handler(std::string_view handler_address) {
    return !same_evm_address(handler_address, attestation_blackhole_address);
 }
 
-in_flight_step decide_in_flight(bool known_to_node, const epoch_in_fees& paid,
+in_flight_step decide_in_flight(bool known_to_node, const ethereum_transaction_fees& paid,
                                 const ethereum_client::gas_config_t& market) {
    if (!known_to_node) return in_flight_step::rebroadcast;
-   // What a block builder earns from it at today's base fee (EIP-1559): the tip,
-   // up to whatever the fee cap leaves above the base fee.
-   const fc::uint256 headroom = paid.max_fee_per_gas > market.base_fee
-                                   ? fc::uint256{paid.max_fee_per_gas - market.base_fee}
-                                   : fc::uint256{0};
+   // A fee cap below the base fee cannot be included at all (EIP-1559), whatever
+   // tip the market asks for — zero included.
+   if (paid.max_fee_per_gas < market.base_fee) return in_flight_step::replace;
+   // What a block builder earns from it at today's base fee: the tip, up to
+   // whatever the fee cap leaves above the base fee.
+   const fc::uint256 headroom{paid.max_fee_per_gas - market.base_fee};
    const fc::uint256 effective_tip =
       paid.max_priority_fee_per_gas < headroom ? paid.max_priority_fee_per_gas : headroom;
    return effective_tip < market.tip ? in_flight_step::replace : in_flight_step::wait;
 }
 
-std::optional<epoch_in_fees> resend_fees(in_flight_step step, const epoch_in_fees& paid,
-                                         const ethereum_client::gas_config_t& market,
-                                         const ethereum_transaction_policy&   policy) {
-   epoch_in_fees fees;
+ethereum_transaction_fees highest_fees(const std::vector<submission_attempt>& attempts) {
+   ethereum_transaction_fees highest{.max_priority_fee_per_gas = 0, .max_fee_per_gas = 0};
+   for (const auto& attempt : attempts) {
+      highest.max_priority_fee_per_gas =
+         larger_fee(highest.max_priority_fee_per_gas, attempt.fees.max_priority_fee_per_gas);
+      highest.max_fee_per_gas = larger_fee(highest.max_fee_per_gas, attempt.fees.max_fee_per_gas);
+   }
+   return highest;
+}
+
+std::optional<ethereum_transaction_fees> resend_fees(in_flight_step step, const ethereum_transaction_fees& paid,
+                                                     const ethereum_client::gas_config_t& market,
+                                                     const ethereum_transaction_policy&   policy) {
+   ethereum_transaction_fees fees;
    switch (step) {
    case in_flight_step::wait:
       return std::nullopt;
@@ -611,13 +661,44 @@ std::optional<epoch_in_fees> resend_fees(in_flight_step step, const epoch_in_fee
       break;
    }
    }
-   // EIP-1559 refuses a fee cap below the tip.
-   fees.max_fee_per_gas = larger_fee(fees.max_fee_per_gas, fees.max_priority_fee_per_gas);
-   if (fees.max_priority_fee_per_gas > policy.max_priority_fee_per_gas ||
-       fees.max_fee_per_gas > policy.max_fee_per_gas) {
+   return within_policy(fees, policy);
+}
+
+std::optional<ethereum_transaction_fees> cancel_fees(const ethereum_client::gas_config_t& market,
+                                                     const ethereum_transaction_policy&   policy) {
+   const auto tip     = bumped_fee(market.tip);
+   const auto max_fee = bumped_fee(market.max_fee_per_gas);
+   if (!tip || !max_fee) return std::nullopt;
+   return within_policy({.max_priority_fee_per_gas = *tip, .max_fee_per_gas = *max_fee}, policy);
+}
+
+std::optional<ethereum_transaction_fees> escalated_fees(const ethereum_transaction_fees&   fees,
+                                                        const ethereum_transaction_policy& policy) {
+   const auto raised = [](const fc::uint256& fee, const fc::uint256& cap) {
+      return fee > fc::uint256{cap / ESCALATION_FEE_MULTIPLIER} ? cap : fc::uint256{fee * ESCALATION_FEE_MULTIPLIER};
+   };
+   ethereum_transaction_fees next{
+      .max_priority_fee_per_gas = raised(fees.max_priority_fee_per_gas, policy.max_priority_fee_per_gas),
+      .max_fee_per_gas          = raised(fees.max_fee_per_gas, policy.max_fee_per_gas),
+   };
+   // A replacement must raise both; a fee already at its cap cannot rise.
+   if (next.max_priority_fee_per_gas <= fees.max_priority_fee_per_gas ||
+       next.max_fee_per_gas <= fees.max_fee_per_gas) {
       return std::nullopt;
    }
-   return fees;
+   return within_policy(next, policy);
+}
+
+std::optional<fc::uint256> first_unaccounted_nonce(const fc::uint256& latest, const fc::uint256& pending,
+                                                   const std::vector<ethereum_submission>& submissions) {
+   fc::uint256 nonce = latest;
+   for (const auto& submission : submissions) {
+      if (submission.transaction.nonce < nonce) continue;
+      if (submission.transaction.nonce != nonce) break;
+      ++nonce;
+   }
+   if (nonce < pending) return nonce;
+   return std::nullopt;
 }
 
 } // namespace outpost_ethereum_client_detail
@@ -754,125 +835,275 @@ bool outpost_ethereum_client::settled_past_delivery(uint32_t epoch_index) {
           !is_zero_word(progress.own_digest);
 }
 
-std::optional<fc::uint256> outpost_ethereum_client::settle_in_flight(fc::time_point deadline_abs) {
-   FC_ASSERT(_in_flight, "outpost_ethereum_client[{}]: no epochIn is in flight", to_string());
-   auto&       submission = *_in_flight;
-   const auto& client     = _entry->client;
-   const auto  signer     = client->get_signer_address();
+std::vector<ethereum_submission> outpost_ethereum_client::submissions() const {
+   auto&                  journal = *_entry->submissions;
+   const std::lock_guard lock(journal.mutex);
+   return journal.submissions;
+}
 
-   // The receipt of any hash signed at the nonce, or the nonce used by a hash
-   // this relay never saw: either one ends the wait.
+void outpost_ethereum_client::refresh_submission(ethereum_submission& submission, const fc::uint256& latest_count) {
+   const auto&                client = _entry->client;
    std::optional<fc::uint256> landed_at;
-   const auto                 settled = [&]() -> bool {
-      for (const auto& hash : submission.tx_hashes) {
-         const fc::variant receipt = client->get_transaction_receipt(hash);
-         if (receipt.is_null()) continue;
-         landed_at = parse_epoch_in_receipt(hash, receipt).block_number;
-         if (receipt_reverted(receipt)) {
-            wlog("outpost_ethereum_client[{}]: in-flight epochIn for epoch={} at nonce {} reverted in block {} "
-                 "(tx={}); the outpost's state decides what to send next",
-                 to_string(), submission.epoch_index, submission.nonce.str(), landed_at->str(), hash);
-         } else {
-            ilog("outpost_ethereum_client[{}]: in-flight epochIn for epoch={} at nonce {} landed in block {} (tx={})",
-                 to_string(), submission.epoch_index, submission.nonce.str(), landed_at->str(), hash);
-         }
-         return true;
+   std::string                landed_hash;
+   bool                       reverted = false;
+   for (const auto& attempt : submission.attempts) {
+      const fc::variant receipt = client->get_transaction_receipt(attempt.tx_hash);
+      if (receipt.is_null()) continue;
+      landed_at   = parse_epoch_in_receipt(attempt.tx_hash, receipt).block_number;
+      landed_hash = attempt.tx_hash;
+      reverted    = receipt_reverted(receipt);
+      break;
+   }
+
+   const auto previous_state = submission.state;
+   const auto previous_block = submission.landed_at;
+   submission.landed_at      = landed_at;
+   submission.state          = landed_at                                   ? submission_state::landed
+                               : submission.transaction.nonce < latest_count ? submission_state::superseded
+                                                                             : submission_state::pending;
+   if (submission.state == previous_state && submission.landed_at == previous_block) return;
+
+   switch (submission.state) {
+   case submission_state::landed:
+      if (reverted) {
+         wlog("outpost_ethereum_client[{}]: {} reverted in block {} (tx={}); the outpost's state decides what to "
+              "send next",
+              to_string(), describe_submission(submission), landed_at->str(), landed_hash);
+      } else {
+         ilog("outpost_ethereum_client[{}]: {} landed in block {} (tx={})", to_string(),
+              describe_submission(submission), landed_at->str(), landed_hash);
       }
-      if (client->get_transaction_count(signer, eth::block_tag_t::latest) > submission.nonce) {
-         wlog("outpost_ethereum_client[{}]: nonce {} of the in-flight epochIn for epoch={} was used by a "
-              "transaction none of its {} hashes match; the outpost's state decides what to send next",
-              to_string(), submission.nonce.str(), submission.epoch_index, submission.tx_hashes.size());
+      break;
+   case submission_state::superseded:
+      wlog("outpost_ethereum_client[{}]: the nonce of {} was used by a transaction none of its {} hashes match; "
+           "the outpost's state decides what to send next",
+           to_string(), describe_submission(submission), submission.attempts.size());
+      break;
+   case submission_state::pending:
+      wlog("outpost_ethereum_client[{}]: {} is pending again after a reorg{}", to_string(),
+           describe_submission(submission), previous_block ? " (it was in block " + previous_block->str() + ")" : "");
+      break;
+   }
+}
+
+bool outpost_ethereum_client::resubmit(ethereum_submission& submission, ethereum_transaction_fees fees, bool escalate,
+                                       std::string_view why) {
+   const auto& client = _entry->client;
+   for (uint32_t signing = 1;; ++signing) {
+      auto transaction                     = submission.transaction;
+      transaction.max_priority_fee_per_gas = fees.max_priority_fee_per_gas;
+      transaction.max_fee_per_gas          = fees.max_fee_per_gas;
+      const auto signed_tx = client->sign_transaction(transaction, magic_enum::enum_name(submission.purpose));
+      // Recorded before the send: a send whose response is lost may still have
+      // reached the node, and the next replacement must be priced against it.
+      submission.attempts.push_back({.tx_hash = signed_tx.tx_hash, .fees = fees});
+      try {
+         send_submission_attempt(*client, signed_tx, submission);
+         ilog("outpost_ethereum_client[{}]: {} {}: tx={} max_fee={} tip={}", to_string(), why,
+              describe_submission(submission), signed_tx.tx_hash, fees.max_fee_per_gas.str(),
+              fees.max_priority_fee_per_gas.str());
          return true;
+      } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
+         wlog("outpost_ethereum_client[{}]: {} {} was refused at max_fee={} tip={} ({})", to_string(), why,
+              describe_submission(submission), fees.max_fee_per_gas.str(), fees.max_priority_fee_per_gas.str(),
+              refusal.to_string());
       }
-      return false;
+      if (!escalate || signing >= MAX_REPLACEMENT_ESCALATIONS) return false;
+      // The refusal may be the nonce being used meanwhile: nothing to replace then.
+      if (client->get_transaction_count(client->get_signer_address(), eth::block_tag_t::latest) >
+          submission.transaction.nonce) {
+         return false;
+      }
+      const auto next = detail::escalated_fees(fees, client->transaction_policy());
+      if (!next) {
+         wlog("outpost_ethereum_client[{}]: {} {} cannot be raised past max_fee={} tip={} within the transaction "
+              "policy; waiting for what holds the nonce",
+              to_string(), why, describe_submission(submission), fees.max_fee_per_gas.str(),
+              fees.max_priority_fee_per_gas.str());
+         return false;
+      }
+      fees = *next;
+   }
+}
+
+std::optional<fc::uint256> outpost_ethereum_client::settle_submissions(fc::time_point deadline_abs) {
+   auto&       journal = *_entry->submissions;
+   const auto& client  = _entry->client;
+   const auto& policy  = client->transaction_policy();
+   const auto  signer  = client->get_signer_address();
+
+   // A submission whose nonce is used at the read confirmation is as settled as
+   // anything the relay reads: no reorg the relay is configured to survive
+   // undoes it.
+   const auto settled_count = client->get_transaction_count(signer, read_settled_block());
+   std::erase_if(journal.submissions, [&](const ethereum_submission& submission) {
+      if (submission.transaction.nonce >= settled_count) return false;
+      dlog("outpost_ethereum_client[{}]: {} is settled at the read confirmation", to_string(),
+           describe_submission(submission));
+      return true;
+   });
+
+   // Where the journal stands against the head, and the lowest nonce the node
+   // holds a pending transaction at that no submission accounts for.
+   fc::uint256                pending_count;
+   std::optional<fc::uint256> unaccounted;
+   const auto                 observe = [&]() -> bool {
+      const auto latest_count = client->get_transaction_count(signer, eth::block_tag_t::latest);
+      pending_count =
+         std::max(latest_count, client->get_transaction_count(signer, eth::block_tag_t::pending));
+      for (auto& submission : journal.submissions) refresh_submission(submission, latest_count);
+      unaccounted = detail::first_unaccounted_nonce(latest_count, pending_count, journal.submissions);
+      return !unaccounted && std::ranges::none_of(journal.submissions, [](const ethereum_submission& submission) {
+         return submission.state == submission_state::pending;
+      });
+   };
+   const auto highest_landed = [&]() {
+      std::optional<fc::uint256> highest;
+      for (const auto& submission : journal.submissions) {
+         if (submission.landed_at && (!highest || *submission.landed_at > *highest)) highest = submission.landed_at;
+      }
+      return highest;
    };
 
-   if (!settled()) {
-      // Still pending. A send whose outcome was unknown left no hash, so the
-      // node's pending nonce says whether it holds something at this one.
-      const auto held_by_node = [&](const std::string& hash) {
-         return !client->get_transaction_by_hash(hash).is_null();
-      };
-      const bool known_to_node = std::ranges::any_of(submission.tx_hashes, held_by_node) ||
-                                 client->get_transaction_count(signer, eth::block_tag_t::pending) > submission.nonce;
-      try {
-         const auto market = client->get_gas_config();
-         const auto step   = detail::decide_in_flight(known_to_node, submission.fees, market);
-         if (step != detail::in_flight_step::wait) {
-            const auto fees = detail::resend_fees(step, submission.fees, market, client->transaction_policy());
-            if (!fees) {
-               wlog("outpost_ethereum_client[{}]: in-flight epochIn for epoch={} at nonce {} needs a {} the fee caps "
-                    "leave no room for (paying max_fee={} tip={}, market max_fee={} tip={}); waiting for it as sent",
-                    to_string(), submission.epoch_index, submission.nonce.str(), magic_enum::enum_name(step),
-                    submission.fees.max_fee_per_gas.str(), submission.fees.max_priority_fee_per_gas.str(),
-                    market.max_fee_per_gas.str(), market.tip.str());
-            } else {
-               const auto hash = _opp_inbound_client->resend_epoch_in(submission, *fees);
-               submission.tx_hashes.push_back(hash);
-               submission.fees = *fees;
-               ilog("outpost_ethereum_client[{}]: {} the in-flight epochIn for epoch={} at nonce {}: tx={} max_fee={} "
-                    "tip={}",
-                    to_string(), magic_enum::enum_name(step), submission.epoch_index, submission.nonce.str(), hash,
-                    fees->max_fee_per_gas.str(), fees->max_priority_fee_per_gas.str());
-            }
+   if (observe()) {
+      journal.unaccounted_nonce.reset();
+      return highest_landed();
+   }
+
+   try {
+      const auto market = client->get_gas_config();
+      for (auto& submission : journal.submissions) {
+         if (submission.state != submission_state::pending) continue;
+         std::vector<submission_attempt> held;
+         for (const auto& attempt : submission.attempts) {
+            if (!client->get_transaction_by_hash(attempt.tx_hash).is_null()) held.push_back(attempt);
          }
-      } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
-         // A node still holding an earlier hash may refuse the re-send, or the
-         // nonce may have just been used; the wait below finds out which.
-         wlog("outpost_ethereum_client[{}]: re-sending the in-flight epochIn for epoch={} at nonce {} was refused "
-              "({}); waiting for the hashes already sent",
-              to_string(), submission.epoch_index, submission.nonce.str(), refusal.to_string());
-      } catch (const eth::ethereum_transaction_policy_exception& rejection) {
-         wlog("outpost_ethereum_client[{}]: re-sending the in-flight epochIn for epoch={} at nonce {} is outside the "
-              "transaction policy ({}); waiting for it as sent",
-              to_string(), submission.epoch_index, submission.nonce.str(), rejection.to_string());
+         // Something holds the nonce at the node, but none of these hashes: its
+         // fees are unknown, so only an escalating replacement can supersede it.
+         const bool held_unknown = held.empty() && pending_count > submission.transaction.nonce;
+         const auto step =
+            held_unknown ? detail::in_flight_step::replace
+                         : detail::decide_in_flight(!held.empty(), detail::highest_fees(held), market);
+         if (step == detail::in_flight_step::wait) continue;
+         const auto fees = detail::resend_fees(step, detail::highest_fees(submission.attempts), market, policy);
+         if (!fees) {
+            wlog("outpost_ethereum_client[{}]: {} needs a {} the fee caps leave no room for (market max_fee={} "
+                 "tip={}); waiting for it as sent",
+                 to_string(), describe_submission(submission), magic_enum::enum_name(step),
+                 market.max_fee_per_gas.str(), market.tip.str());
+            continue;
+         }
+         resubmit(submission, *fees, held_unknown, magic_enum::enum_name(step));
       }
 
-      const fc::task::retry_options poll{
-         .initial_backoff = IN_FLIGHT_POLL_INITIAL_BACKOFF,
-         .max_backoff     = IN_FLIGHT_POLL_MAX_BACKOFF,
-         .total_timeout   = std::max(fc::microseconds(), deadline_abs - fc::time_point::now()),
-      };
-      try {
-         fc::task::retry_until<bool>(OP_SETTLE_IN_FLIGHT, poll, [&]() -> std::optional<bool> {
-            return settled() ? std::optional<bool>{true} : std::nullopt;
-         });
-      } catch (const fc::timeout_exception&) {
-         SYS_THROW(chain::outpost_delivery_incomplete_exception,
-                   "outpost_ethereum_client[{}]: the epochIn for epoch={} at nonce {} is still pending ({} hashes); "
-                   "nothing more is sent until it lands",
-                   to_string(), submission.epoch_index, submission.nonce.str(), submission.tx_hashes.size());
+      if (unaccounted) {
+         const auto now = fc::time_point::now();
+         if (!journal.unaccounted_nonce || journal.unaccounted_nonce->first != *unaccounted) {
+            journal.unaccounted_nonce = {*unaccounted, now};
+            wlog("outpost_ethereum_client[{}]: the node holds a pending transaction at nonce {} this relay has no "
+                 "record of; nothing is sent behind it, and it is cancelled if still pending after {} s",
+                 to_string(), unaccounted->str(), journal.unaccounted_nonce_grace.to_seconds());
+         } else if (now - journal.unaccounted_nonce->second >= journal.unaccounted_nonce_grace) {
+            const auto fees = detail::cancel_fees(market, policy);
+            if (!fees) {
+               wlog("outpost_ethereum_client[{}]: cancelling the transaction at nonce {} needs fees the policy's caps "
+                    "leave no room for (market max_fee={} tip={})",
+                    to_string(), unaccounted->str(), market.max_fee_per_gas.str(), market.tip.str());
+            } else {
+               journal_submission(journal.submissions,
+                                  ethereum_submission{
+                                     .purpose     = submission_purpose::cancel,
+                                     .epoch_index = 0,
+                                     .transaction = {.chain_id                 = client->get_chain_id(),
+                                                     .nonce                    = *unaccounted,
+                                                     .max_priority_fee_per_gas = fees->max_priority_fee_per_gas,
+                                                     .max_fee_per_gas          = fees->max_fee_per_gas,
+                                                     .gas_limit                = fc::uint256{PLAIN_TRANSFER_GAS},
+                                                     .to                       = signer,
+                                                     .value                    = 0,
+                                                     .data                     = {},
+                                                     .access_list              = {}},
+                                     .attempts    = {},
+                                     .state       = submission_state::pending,
+                                     .landed_at   = std::nullopt,
+                                  });
+               const auto cancel = std::ranges::find_if(journal.submissions, [&](const ethereum_submission& s) {
+                  return s.purpose == submission_purpose::cancel && s.transaction.nonce == *unaccounted;
+               });
+               // A cancel no node took is not journaled; the next tick tries again.
+               bool sent = false;
+               try {
+                  sent = resubmit(*cancel, *fees, /*escalate=*/true, "sending");
+               } catch (...) {
+                  if (cancel->attempts.empty()) journal.submissions.erase(cancel);
+                  throw;
+               }
+               if (cancel->attempts.empty()) journal.submissions.erase(cancel);
+               if (sent) journal.unaccounted_nonce.reset();
+            }
+         }
       }
+   } catch (const eth::ethereum_transaction_policy_exception& rejection) {
+      wlog("outpost_ethereum_client[{}]: re-sending a pending transaction is outside the transaction policy ({}); "
+           "waiting for what was sent",
+           to_string(), rejection.to_string());
    }
-   _in_flight.reset();
-   return landed_at;
+
+   const fc::task::retry_options poll{
+      .initial_backoff = IN_FLIGHT_POLL_INITIAL_BACKOFF,
+      .max_backoff     = IN_FLIGHT_POLL_MAX_BACKOFF,
+      .total_timeout   = std::max(fc::microseconds(), deadline_abs - fc::time_point::now()),
+   };
+   try {
+      fc::task::retry_until<bool>(OP_SETTLE_SUBMISSIONS, poll, [&]() -> std::optional<bool> {
+         return observe() ? std::optional<bool>{true} : std::nullopt;
+      });
+   } catch (const fc::timeout_exception&) {
+      const auto pending = std::ranges::count_if(journal.submissions, [](const ethereum_submission& submission) {
+         return submission.state == submission_state::pending;
+      });
+      SYS_THROW(chain::outpost_delivery_incomplete_exception,
+                "outpost_ethereum_client[{}]: {} journaled transaction(s) still pending{}; nothing more is sent until "
+                "they land",
+                to_string(), pending, unaccounted ? " behind unaccounted nonce " + unaccounted->str() : "");
+   }
+   journal.unaccounted_nonce.reset();
+   return highest_landed();
 }
 
 epoch_in_receipt outpost_ethereum_client::send_epoch_in(uint32_t epoch_index, const std::string& envelope_hex,
                                                         uint64_t gas_budget, fc::time_point deadline_abs) {
+   // Nothing is sent behind a nonce the relay cannot account for or reprice.
+   settle_submissions(deadline_abs);
+
    // The ABI arguments are bound as non-const lvalue references, so each one
    // needs a named local.
    uint32_t            epoch_arg   = epoch_index;
    std::string         payload_hex = envelope_hex;
-   epoch_in_submission submission;
+   ethereum_submission submission;
    std::string         unconfirmed;
+   auto&               journal = _entry->submissions->submissions;
    try {
-      return _opp_inbound_client->epoch_in(epoch_arg, payload_hex, gas_budget, deadline_abs, submission);
+      auto receipt = _opp_inbound_client->epoch_in(epoch_arg, payload_hex, gas_budget, deadline_abs, submission);
+      submission.state     = submission_state::landed;
+      submission.landed_at = receipt.block_number;
+      journal_submission(journal, std::move(submission));
+      return receipt;
    } catch (const eth::ethereum_transaction_policy_exception&) {
       throw;   // refused locally, before anything was signed
    } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
-      // The node's refusal, of the pre-flight or of the send itself. Only an
-      // error after a hash came back can leave the call pending.
-      if (submission.tx_hashes.empty()) throw;
+      // The node's refusal of the pre-flight or of the send leaves no attempt.
+      // An error after the node took the call can leave it pending.
+      if (submission.attempts.empty()) throw;
       unconfirmed = refusal.to_string();
    } catch (const fc::exception& failure) {
-      // A timeout or transport failure: once the send was attempted, the node
-      // may hold the call whether or not a hash came back.
-      if (!submission.send_attempted) throw;
+      // A timeout or transport failure: once the call was signed and sent, the
+      // node may hold it whether or not its response came back.
+      if (submission.attempts.empty()) throw;
       unconfirmed = failure.to_string();
    }
-   const auto nonce = submission.nonce;
-   _in_flight       = std::move(submission);
+   const auto nonce = submission.transaction.nonce;
+   journal_submission(journal, std::move(submission));
    SYS_THROW(chain::outpost_delivery_incomplete_exception,
              "outpost_ethereum_client[{}]: epochIn for epoch={} at nonce {} was sent without a receipt ({}); the next "
              "tick settles it before sending again",
@@ -910,11 +1141,13 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
    // The digest the outpost records for this delivery and settles consensus on.
    const std::string local_digest = detail::envelope_digest_word(envelope_bytes);
 
-   // An `epochIn` an earlier tick left pending holds this signer's next nonce:
+   // One sender at a time on the signer's nonces. A transaction an earlier tick
+   // left pending, or a reorg put back in the mempool, holds the next nonce:
    // anything sent before it lands would queue behind it, or pay for the same
-   // delivery twice. Settle it first; while it is still pending, nothing is sent.
-   std::optional<fc::uint256> in_flight_landed_at;
-   if (_in_flight) in_flight_landed_at = settle_in_flight(deadline_abs);
+   // delivery twice. Settle the journal first; while anything in it is still
+   // pending, nothing is sent.
+   const std::unique_lock journal_lock(_entry->submissions->mutex);
+   const auto             journal_landed_at = settle_submissions(deadline_abs);
 
    // Each call is funded to what it has left to carry (`delivery_gas_budget`),
    // never to a fixed figure: the attestations the outpost's cursor says are
@@ -936,7 +1169,7 @@ std::string outpost_ethereum_client::deliver_outbound_envelope(
    // read at `latest` could be served by a backend behind the block that just
    // confirmed and report the state from before the call.
    fc::uint256 pinned_block = _entry->client->get_block_number();
-   if (in_flight_landed_at && *in_flight_landed_at > pinned_block) pinned_block = *in_flight_landed_at;
+   if (journal_landed_at && *journal_landed_at > pinned_block) pinned_block = *journal_landed_at;
 
    // A call that cannot be sent at its budget, or that was sent and moved
    // nothing, is a stalled epoch: logged at error once per stall position,

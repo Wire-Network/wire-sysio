@@ -1,19 +1,94 @@
 #pragma once
 
 #include <algorithm>
+#include <cctype>
 #include <functional>
+#include <mutex>
 #include <optional>
+#include <utility>
+#include <vector>
 
 #include <sysio/outpost_client_plugin.hpp>
 #include <sysio/outpost_client/outpost_client.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <fc/int256.hpp>
+#include <fc/log/logger.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/network/ethereum/ethereum_client.hpp>
+#include <fc/time.hpp>
 
 namespace sysio {
 using namespace fc::crypto::ethereum;
 using namespace fc::network::ethereum;
+
+/// The fees one EIP-1559 transaction pays per gas.
+struct ethereum_transaction_fees {
+   fc::uint256 max_priority_fee_per_gas;
+   fc::uint256 max_fee_per_gas;
+};
+
+/// What a journaled transaction is for.
+enum class submission_purpose {
+   /// `OPPInbound.epochIn` for the submission's epoch.
+   epoch_in,
+   /// A zero-value transfer to the signer itself, sent to replace a pending transaction at a nonce this
+   /// process holds no record of, so the relay does not queue behind something it cannot reprice.
+   cancel
+};
+
+/// Where a journaled transaction stood at the last check against the head.
+enum class submission_state {
+   /// None of its hashes has a receipt and its nonce is unused.
+   pending,
+   /// One of its hashes has a receipt, in `landed_at`.
+   landed,
+   /// Its nonce is used by a transaction none of its hashes match.
+   superseded
+};
+
+/// One signing of a journaled transaction at its nonce.
+struct submission_attempt {
+   /// The hash, computed from the signed bytes before they were sent.
+   std::string               tx_hash;
+   ethereum_transaction_fees fees;
+};
+
+/// One transaction this relay signed, kept from just before its first send until its nonce is used at the
+/// client's read confirmation. Until then a reorg can put it back in the mempool, and the relay must still be
+/// able to sign it again at its nonce rather than queue a new call behind it.
+struct ethereum_submission {
+   submission_purpose purpose     = submission_purpose::epoch_in;
+   /// The epoch an `epochIn` delivers; zero for a cancel.
+   uint32_t           epoch_index = 0;
+   /// The transaction as signed, without its signature: nonce, recipient, gas limit and calldata. The fees
+   /// are each attempt's own.
+   eip1559_tx         transaction;
+   /// Every signing that may have reached a node, oldest first. An attempt the node refused is dropped; one
+   /// whose send failed any other way is kept, since the node may hold it.
+   std::vector<submission_attempt> attempts;
+   submission_state                state = submission_state::pending;
+   /// The block holding it while `state` is `landed`.
+   std::optional<fc::uint256>      landed_at;
+};
+
+/// How long the relay waits on a pending transaction at a nonce it has no record of before cancelling it.
+/// A transaction priced to be included lands within a block or two; one still pending after five blocks is
+/// taken as stuck. Raising it delays recovery after a restart; lowering it cancels more transactions that
+/// would have landed on their own.
+inline constexpr fc::microseconds default_unaccounted_nonce_grace = fc::seconds(60);
+
+/// Everything the relay signed with one client's signer that is not yet safe to forget, and what it saw of
+/// nonces it did not sign.
+struct ethereum_submission_journal {
+   /// Held for a whole delivery, so only one sender uses the signer's nonces at a time.
+   std::mutex                       mutex;
+   /// Ascending by nonce.
+   std::vector<ethereum_submission> submissions;
+   /// The lowest pending nonce no submission accounts for, and when it was first seen.
+   std::optional<std::pair<fc::uint256, fc::time_point>> unaccounted_nonce;
+   /// See `default_unaccounted_nonce_grace`.
+   fc::microseconds                 unaccounted_nonce_grace = default_unaccounted_nonce_grace;
+};
 
 struct ethereum_client_entry_t {
    std::string                        id;
@@ -31,6 +106,10 @@ struct ethereum_client_entry_t {
    /// `outpost_ethereum_client::read_settled_block` for what reading unlike the
    /// rest of the group costs.
    ethereum_read_confirmation         read_confirmation = ethereum_read_confirmation_defaults;
+   /// What the relay signed with this client's signer. The entry's one mutable part: every outpost client
+   /// built on the entry shares it, so it outlives a relay job the batch operator rebuilds. A restart loses
+   /// it, and the relay then cancels whatever the node still holds at a nonce it has no record of.
+   std::shared_ptr<ethereum_submission_journal> submissions = std::make_shared<ethereum_submission_journal>();
 };
 
 using ethereum_client_entry_ptr = std::shared_ptr<ethereum_client_entry_t>;
@@ -202,32 +281,36 @@ inline constexpr auto block_number = "blockNumber";
 inline constexpr auto logs         = "logs";
 } // namespace ethereum_receipt_field
 
-/// The fees one EIP-1559 transaction pays per gas.
-struct epoch_in_fees {
-   fc::uint256 max_priority_fee_per_gas;
-   fc::uint256 max_fee_per_gas;
-};
-
-/// One `epochIn` this relay signed, from just before it was sent until its
-/// receipt shows where it landed. Every hash signed at `nonce` is kept: the
-/// first send and each same-nonce replacement, any one of which may be the
-/// one that mines. A receipt wait that runs out leaves the submission in
-/// flight, and the relay settles it before it sends anything else, so a slow
-/// block is never paid for twice under a second nonce.
-struct epoch_in_submission {
-   uint32_t                 epoch_index = 0;
-   /// The call's arguments, kept to sign a replacement with.
-   std::string              envelope_hex;
-   uint64_t                 gas_budget  = 0;
-   fc::uint256              nonce;
-   /// The fees of the latest hash in `tx_hashes`.
-   epoch_in_fees            fees;
-   /// Set just before the first `eth_sendRawTransaction`: from then on a
-   /// failure that is not the node's refusal may still have left the call in
-   /// the mempool.
-   bool                     send_attempted = false;
-   std::vector<std::string> tx_hashes;
-};
+/**
+ * @brief Send one signing of `submission` whose attempt is already recorded as its last.
+ *
+ * A node refusal removes the attempt again, since the node does not hold it; any other failure keeps it,
+ * since the node may. A node that reports a different hash for the bytes than the one computed from them is
+ * logged, and its hash is recorded too so every wait watches both.
+ *
+ * @param client     The client that signed it.
+ * @param signed_tx  The signed bytes and the hash recorded for them.
+ * @param submission The submission the attempt belongs to.
+ * @return The hash the node reported.
+ * @throws fc::network::json_rpc::json_rpc_error when the node refuses the transaction.
+ */
+inline std::string send_submission_attempt(ethereum_client& client, const signed_transaction& signed_tx,
+                                           ethereum_submission& submission) {
+   std::string reported;
+   try {
+      reported = client.send_raw_transaction(signed_tx.raw_hex);
+   } catch (const fc::network::json_rpc::json_rpc_error&) {
+      submission.attempts.pop_back();
+      throw;
+   }
+   const auto same_digit = [](unsigned char lhs, unsigned char rhs) { return std::tolower(lhs) == std::tolower(rhs); };
+   if (!std::ranges::equal(reported, signed_tx.tx_hash, same_digit)) {
+      elog("ethereum transaction at nonce {}: the node reported hash {} for the bytes hashing to {}; watching both",
+           submission.transaction.nonce.str(), reported, signed_tx.tx_hash);
+      submission.attempts.push_back({.tx_hash = reported, .fees = submission.attempts.back().fees});
+   }
+   return reported;
+}
 
 /// What one `epochIn` left on chain, read from its receipt once it confirmed.
 struct epoch_in_receipt {
@@ -288,17 +371,14 @@ struct opp_inbound_contract_client : ethereum_contract_client {
    /// that way (see `ethereum_abi::encode_dynamic_data`).
    ///
    /// The ABI arguments are bound as non-const lvalue references, so callers
-   /// must materialize named locals for both. `submission` is filled before
-   /// anything is sent, so a caller whose wait threw still knows the nonce,
-   /// the fees and the hash of the call it may have left in flight.
+   /// must materialize named locals for both. `submission` is filled after
+   /// signing and before the send, with the hash computed from the signed
+   /// bytes, so a caller whose send or wait threw still knows the nonce, the
+   /// fees and the hash of the call it may have left in flight. A node that
+   /// refuses the send leaves it with no attempt.
    std::function<epoch_in_receipt(uint32_t& epoch_index, std::string& envelope_hex, uint64_t gas_budget,
-                                  fc::time_point deadline, epoch_in_submission& submission)>
+                                  fc::time_point deadline, ethereum_submission& submission)>
       epoch_in;
-   /// Sign `submission`'s call again at its nonce with `fees` and send it,
-   /// returning the new hash. The relay's way to replace an `epochIn` the
-   /// market priced out, or to re-send one the node no longer holds. Does not
-   /// wait: the relay polls every hash signed at the nonce.
-   std::function<std::string(const epoch_in_submission& submission, const epoch_in_fees& fees)> resend_epoch_in;
    /// `nextEpochIndex()` view — the epoch the outpost is currently accepting.
    ethereum_contract_call_fn<fc::variant> next_epoch_index;
    /// `dispatchSpill(uint32 epochIndex)` view — where a tipped epoch's dispatch
@@ -333,42 +413,27 @@ struct opp_inbound_contract_client : ethereum_contract_client {
                                const std::vector<fc::network::ethereum::abi::contract>& contracts)
       : ethereum_contract_client(client, contract_address, contracts)
       , epoch_in([this](uint32_t& epoch_index, std::string& envelope_hex, uint64_t gas_budget,
-                        fc::time_point deadline, epoch_in_submission& submission) -> epoch_in_receipt {
+                        fc::time_point deadline, ethereum_submission& submission) -> epoch_in_receipt {
            const auto&                abi    = get_abi(opp_inbound_abi_name::epoch_in);
            contract_invoke_data_items params = {epoch_index, envelope_hex};
            auto tx = this->client->create_default_tx(this->contract_address, abi, params, gas_budget, gas_budget);
-           submission = epoch_in_submission{
-              .epoch_index    = epoch_index,
-              .envelope_hex   = envelope_hex,
-              .gas_budget     = gas_budget,
-              .nonce          = tx.nonce,
-              .fees           = {.max_priority_fee_per_gas = tx.max_priority_fee_per_gas,
-                                 .max_fee_per_gas          = tx.max_fee_per_gas},
-              .send_attempted = true,
-              .tx_hashes      = {},
+           tx.data              = fc::from_hex(contract_encode_data(abi, params));
+           const auto signed_tx = this->client->sign_transaction(tx, abi.name);
+           submission           = ethereum_submission{
+                        .purpose     = submission_purpose::epoch_in,
+                        .epoch_index = epoch_index,
+                        .transaction = tx,
+                        .attempts    = {{.tx_hash = signed_tx.tx_hash,
+                                         .fees    = {.max_priority_fee_per_gas = tx.max_priority_fee_per_gas,
+                                                     .max_fee_per_gas          = tx.max_fee_per_gas}}},
+                        .state       = submission_state::pending,
+                        .landed_at   = std::nullopt,
            };
-           const auto tx_hash = this->client->execute_contract_tx_fn(tx, abi, params).as_string();
-           submission.tx_hashes.push_back(tx_hash);
+           const auto tx_hash = send_submission_attempt(*this->client, signed_tx, submission);
            // Measured after the send, so the wait gets exactly what is left.
            const auto receipt_wait = std::max(fc::microseconds(), deadline - fc::time_point::now());
            return parse_epoch_in_receipt(
               tx_hash, this->client->wait_for_receipt(tx_hash, delivery_confirm_options(gas_budget, receipt_wait)));
-        })
-      , resend_epoch_in([this](const epoch_in_submission& submission, const epoch_in_fees& fees) -> std::string {
-           const auto&                abi    = get_abi(opp_inbound_abi_name::epoch_in);
-           contract_invoke_data_items params = {submission.epoch_index, submission.envelope_hex};
-           const eip1559_tx           tx{
-                        .chain_id                 = this->client->get_chain_id(),
-                        .nonce                    = submission.nonce,
-                        .max_priority_fee_per_gas = fees.max_priority_fee_per_gas,
-                        .max_fee_per_gas          = fees.max_fee_per_gas,
-                        .gas_limit                = fc::uint256{submission.gas_budget},
-                        .to                       = this->contract_address,
-                        .value                    = 0,
-                        .data                     = {},
-                        .access_list              = {},
-           };
-           return this->client->execute_contract_tx_fn(tx, abi, params).as_string();
         })
       , next_epoch_index(create_call<fc::variant>(get_abi(opp_inbound_abi_name::next_epoch_index)))
       , dispatch_spill(create_call<fc::variant, uint32_t>(get_abi(opp_inbound_abi_name::dispatch_spill)))

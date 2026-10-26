@@ -6,6 +6,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <fc/int256.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
@@ -251,33 +252,62 @@ std::optional<uint32_t> count_envelope_attestations(const std::vector<char>& env
 /// dropped the type).
 bool is_routable_handler(std::string_view handler_address);
 
-/// What the relay does about an `epochIn` still pending from an earlier tick.
+/// What the relay does about a journaled transaction still pending at its nonce.
 enum class in_flight_step {
    /// It pays enough to be included at today's prices: keep waiting.
    wait,
-   /// Today's base fee and tip leave it less than the market tip: sign it again
-   /// at the same nonce with every fee raised.
+   /// Its fee cap is below today's base fee, or the tip it can pay at that base
+   /// fee is below the market's: sign it again at the same nonce with every fee
+   /// raised.
    replace,
    /// The node holds none of its hashes and nothing at its nonce: send it again
    /// at the same nonce.
    rebroadcast
 };
 
-/// Decide what to do about an `epochIn` still pending at its nonce.
+/// Decide what to do about a transaction still pending at its nonce.
 ///
 /// @param known_to_node Whether the node still holds a transaction at the nonce.
-/// @param paid          The fees the latest hash signed at the nonce pays.
+/// @param paid          The fees of what the node holds there (`highest_fees` of the attempts it holds).
 /// @param market        The node's fee suggestion now (`ethereum_client::get_gas_config`).
-in_flight_step decide_in_flight(bool known_to_node, const epoch_in_fees& paid,
+in_flight_step decide_in_flight(bool known_to_node, const ethereum_transaction_fees& paid,
                                 const ethereum_client::gas_config_t& market);
+
+/// The highest of each fee across `attempts`. A node holds at most one of them at the nonce, but which one
+/// can be unknown (a send whose response was lost), and a replacement priced off the highest is valid against
+/// any of them. Zero fees for no attempts.
+ethereum_transaction_fees highest_fees(const std::vector<submission_attempt>& attempts);
 
 /// The fees a same-nonce resend pays. A replacement pays at least the market's
 /// fees and raises each of `paid`'s by more than the 10% nodes require of a
 /// replacement; a rebroadcast pays at least `paid` and the market. `nullopt`
 /// when `step` is `wait`, or when the policy's fee caps leave no room.
-std::optional<epoch_in_fees> resend_fees(in_flight_step step, const epoch_in_fees& paid,
-                                         const ethereum_client::gas_config_t& market,
-                                         const ethereum_transaction_policy&   policy);
+///
+/// @param paid The highest fees any attempt at the nonce was signed with (`highest_fees`).
+std::optional<ethereum_transaction_fees> resend_fees(in_flight_step step, const ethereum_transaction_fees& paid,
+                                                     const ethereum_client::gas_config_t& market,
+                                                     const ethereum_transaction_policy&   policy);
+
+/// The fees of the first signing of a cancel: the market's, each raised the way a replacement is, since it
+/// replaces a transaction whose fees are unknown and was likely signed at the market. `nullopt` when the
+/// policy's fee caps leave no room.
+std::optional<ethereum_transaction_fees> cancel_fees(const ethereum_client::gas_config_t& market,
+                                                     const ethereum_transaction_policy&   policy);
+
+/// The fees to try after a node refused a replacement of a transaction whose fees are unknown: each doubled,
+/// up to the policy's caps. `nullopt` when a cap stops either fee from rising, since a replacement that does
+/// not raise both is refused again.
+std::optional<ethereum_transaction_fees> escalated_fees(const ethereum_transaction_fees&   fees,
+                                                        const ethereum_transaction_policy& policy);
+
+/// The lowest nonce in `[latest, pending)` that no submission holds: one the node has a pending transaction
+/// at that this process did not sign, or `nullopt`.
+///
+/// @param latest      The signer's transaction count at the head.
+/// @param pending     The signer's transaction count including the node's pending transactions.
+/// @param submissions The journal's submissions, ascending by nonce.
+std::optional<fc::uint256> first_unaccounted_nonce(const fc::uint256& latest, const fc::uint256& pending,
+                                                   const std::vector<ethereum_submission>& submissions);
 
 } // namespace outpost_ethereum_client_detail
 
@@ -360,8 +390,9 @@ public:
    /// The liq syndication pool the crank drives, `0x`-hex, or empty until the
    /// outpost's `DESYNDICATE_LIQ` handler has been discovered.
    const std::string&               syndication_pool_address()    const { return _syndication_pool_addr; }
-   /// The `epochIn` a receipt wait left pending, until a later tick settles it.
-   const std::optional<epoch_in_submission>& in_flight()           const { return _in_flight; }
+   /// A copy of the signer's journal: every transaction the relay signed whose nonce is not yet used at the
+   /// read confirmation, ascending by nonce.
+   std::vector<ethereum_submission> submissions() const;
    /// Bind the pool wrapper the crank drives to `address`, replacing whatever was
    /// bound. Discovery goes through this; tests bind a wrapper whose
    /// `realize_yield` is a stub.
@@ -405,20 +436,41 @@ private:
    /// instead of left to the one consensus retry.
    bool settled_past_delivery(uint32_t epoch_index);
 
-   /// Settle the `epochIn` a receipt wait left pending before anything else is
-   /// sent: find the receipt of any hash signed at its nonce, replace it at that
-   /// nonce when the market priced it out, or send it again when the node no
-   /// longer holds it, then wait for it until `deadline_abs`.
+   /// Settle the signer's journal before anything else is sent, the journal's
+   /// lock held:
+   ///  - forget every submission whose nonce is used at the read confirmation;
+   ///  - check every other one against the head, so a call a reorg put back in
+   ///    the mempool is pending again;
+   ///  - replace a pending one at its nonce when the market priced it out, or
+   ///    send it again when the node no longer holds it;
+   ///  - wait on, and after `unaccounted_nonce_grace` cancel, a pending
+   ///    transaction at a nonce no submission accounts for;
+   ///  - then wait until nothing is pending or `deadline_abs`.
    ///
-   /// @return The block the call landed in, or `std::nullopt` when the nonce was
-   ///         used by a transaction this relay holds no hash for.
-   /// @throws chain::outpost_delivery_incomplete_exception while it is still
-   ///         pending at the deadline; the submission stays in flight.
-   std::optional<fc::uint256> settle_in_flight(fc::time_point deadline_abs);
+   /// @return The highest block a journaled submission is in, or `std::nullopt`.
+   /// @throws chain::outpost_delivery_incomplete_exception while anything is
+   ///         still pending at the deadline.
+   std::optional<fc::uint256> settle_submissions(fc::time_point deadline_abs);
 
-   /// Send one `epochIn` at `gas_budget`. A call that may be in the mempool when
-   /// its wait fails (the receipt wait ran out, or the send's outcome is
-   /// unknown) becomes `_in_flight`, reported as
+   /// Classify `submission` against the head: `landed` when one of its hashes
+   /// has a receipt, `superseded` when its nonce is below `latest_count`
+   /// without one, `pending` otherwise. Logs each change of state.
+   void refresh_submission(ethereum_submission& submission, const fc::uint256& latest_count);
+
+   /// Sign `submission` again at its nonce with `fees` and send it, recording the
+   /// attempt before the send. With `escalate`, a refused send is retried with
+   /// `escalated_fees` while the nonce is unused, up to the policy's caps.
+   ///
+   /// @return Whether a node accepted a signing, or its outcome is unknown.
+   /// @throws ethereum_transaction_policy_exception when the policy refuses `fees`.
+   /// @throws fc::exception on transport failure; the attempt stays recorded.
+   bool resubmit(ethereum_submission& submission, ethereum_transaction_fees fees, bool escalate,
+                 std::string_view why);
+
+   /// Send one `epochIn` at `gas_budget`, after settling the journal. The call is
+   /// journaled once it was sent: landed when its receipt came back, pending
+   /// when its wait failed (the receipt wait ran out, or the send's outcome is
+   /// unknown), which is reported as
    /// `chain::outpost_delivery_incomplete_exception`; a node refusal propagates.
    epoch_in_receipt send_epoch_in(uint32_t epoch_index, const std::string& envelope_hex, uint64_t gas_budget,
                                   fc::time_point deadline_abs);
@@ -463,9 +515,6 @@ private:
    /// so the fallback is logged when it starts and ends rather than per read.
    /// The relay and the underwriter read from different threads.
    std::atomic<bool>                                      _finality_fallback{false};
-   /// See `in_flight()`. Touched only by `deliver_outbound_envelope`, which the
-   /// relay job runs one call at a time.
-   std::optional<epoch_in_submission>                     _in_flight;
    uint64_t                                               _outpost_id;
    uint32_t                                               _chain_id;
 };

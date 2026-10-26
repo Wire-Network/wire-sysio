@@ -187,22 +187,37 @@ later tick and delivered again, rather than left to the job's one consensus retr
 
 ### In-flight transactions
 
-Each `epochIn` is recorded just before it is sent: its nonce, fees, gas and arguments, and every hash
-signed at that nonce. When its receipt wait runs out, or the send fails in a way that may still have left it
-in the mempool, the call stays **in flight** and the tick ends in `outpost_delivery_incomplete_exception`.
-The next tick settles it before sending anything else, so a slow block is never paid for twice under a
-second nonce:
+Every transaction the relay signs goes into the **journal** of the client entry it signs with: its nonce,
+recipient, gas and calldata, and every signing at that nonce with its fees. Each signing's hash is computed
+from the signed bytes and recorded before the send, so a send whose response is lost still leaves the hash
+and the fees on record. A node's refusal removes that signing again. The journal is shared by every outpost
+client built on the entry, so it survives the batch operator rebuilding a relay job; a restart loses it.
+
+A transaction stays in the journal until its nonce is used at the client's read confirmation, not just until
+its receipt comes back. A reorg shallower than that can put a call that already landed back in the mempool,
+and the relay must still be able to sign it again at its own nonce rather than queue a new call behind it.
+
+Before every send, continuations included, the relay settles the journal. It holds the journal's lock for the
+whole delivery, so only one sender uses the signer's nonces at a time:
 
 | What the node reports | What the relay does |
 |---|---|
-| A receipt for any of its hashes | Settled. A reverted one is logged; the relay reads the outpost from the block it landed in and decides what to send |
-| The nonce used, by none of its hashes | Settled; the outpost's state decides |
+| The nonce used at the read confirmation | Forgets it |
+| A receipt for any of its hashes | Landed. A reverted one is logged; the relay reads the outpost from the highest block a journaled call landed in and decides what to send |
+| The nonce used, by none of its hashes | Superseded; the outpost's state decides |
 | Pending, and at today's base fee it still pays the market tip | Waits for it until the tick's deadline |
-| Pending, and the base fee or the market tip has left it behind | Re-signs it at the same nonce with every fee raised by more than an eighth (nodes refuse a replacement under 10%) and at least the market's, within the transaction policy's caps, then waits for any of its hashes |
-| Neither the hash nor anything at the nonce | Sends it again at the same nonce, at the larger of its fees and the market's |
+| Pending, and its fee cap is below the base fee, or the tip it can pay at that base fee is below the market's | Re-signs it at the same nonce with every fee raised by more than an eighth over the highest fees any of its signings carried (nodes refuse a replacement under 10%) and at least the market's, within the transaction policy's caps |
+| Something at the nonce, but none of its hashes | Replaces it the same way, doubling both fees after each refusal up to the caps, since the fees of what holds the nonce are unknown |
+| Neither its hashes nor anything at the nonce | Sends it again at the same nonce, at the larger of its fees and the market's |
+| A pending transaction at a nonce no journal entry accounts for | Sends nothing behind it. After `default_unaccounted_nonce_grace` (60 s) it is cancelled: a zero-value transfer to the signer at that nonce, at the market's fees raised by an eighth, doubled after each refusal up to the caps. The cancel is journaled like any other transaction |
 
-While it is still pending at the deadline nothing else is sent, and the next tick repeats the check. A
-replacement the caps leave no room for, or one the node refuses, is logged and the original is waited for.
+While anything is still pending at the deadline nothing else is sent, and the next tick repeats the check. A
+replacement the caps leave no room for is logged and what was sent is waited for.
+
+The unaccounted-nonce case covers what the journal cannot: a call left pending before a restart, a
+`realizeYield` crank whose wait ran out, or another process signing with the same key. A transaction priced
+to be included lands well inside the grace, so only a stuck one is cancelled; the delivery then goes out at
+the next nonce from the outpost's state.
 
 ### Inbound reads
 
@@ -380,9 +395,12 @@ Per-client runtime lines are prefixed with the SPI label `outpost_ethereum_clien
   warning level when finality lag starts the fallback, and `finality caught up` at info level when it ends.
 - `epoch=... is done at the head but not yet at the read confirmation; checking again next tick` while an
   epoch waits to be reported handled.
-- `epochIn for epoch=... at nonce N was sent without a receipt`, `in-flight epochIn ... landed in block`,
-  `replace|rebroadcast the in-flight epochIn ... at nonce N` and `is still pending (K hashes); nothing more is
-  sent until it lands` for a call left in flight.
+- `epochIn for epoch=... at nonce N was sent without a receipt`, `... landed in block`, `... is pending again
+  after a reorg`, `replace|rebroadcast the epochIn ... at nonce N`, `... was refused at max_fee=... tip=...`
+  and `journaled transaction(s) still pending; nothing more is sent until they land` for a transaction left
+  in flight.
+- `the node holds a pending transaction at nonce N this relay has no record of` at warning level the first
+  time an unaccounted nonce is seen, and `sending the cancel at nonce N` when the grace runs out.
 - Warning-level lines for every malformed view result (`latestOutboundEnvelope data_ not a string` and
   siblings); an epoch mismatch on the inbound slot stays at debug level so steady-state polling is not
   noisy.
@@ -405,15 +423,19 @@ and never-delivered digests, consensus retry gated on the outpost's own majority
 escalation after a call that advanced nothing and the stall report at the ceiling, revert classification,
 outpost behind, the per-tick bound, epoch advanced, deadline abandonment, and the empty and over-cap
 rejections — the read confirmation (each tag, the depth, the finalized block when fresher, the finality-lag
-fallback and its boundary, refusals), an epoch reported handled only once the read confirmation shows it, an
-in-flight call that lands, reverts, waits, is replaced, is re-broadcast or loses its nonce, the replacement
-fees — and the outpost crank: idle without the pool ABI or a registered handler, binding the
+fallback and its boundary, refusals), an epoch reported handled only once the read confirmation shows it, a
+journaled call that lands, reverts, waits, is replaced, is re-broadcast, loses its nonce, is forgotten at the
+read confirmation, comes back after a reorg, or had a replacement whose response was lost, the journal
+surviving a rebuilt relay, an unaccounted nonce waited on and cancelled after a restart (refused cancels
+escalating), the check before every send, the replacement, cancel and escalation fees, and the network hash
+of a signed transaction against foundry's vectors — and the outpost crank: idle without the pool ABI or a registered handler, binding the
 registered pool and re-binding on a change, the pool's own three refusals, unrecognised reverts and protocol
 errors, and deadline abandonment.
 `outpost_ethereum_transaction_policy_tests` covers the expenditure-policy boundary: that a rejection happens
 before signing or broadcasting, that exact caps pass through once, that two clients enforce their own
-policies, that file and CLI configuration produce the expected policies and read confirmations, that a
-re-signed `epochIn` keeps its nonce inside the policy, and that a partial client map is never published. No test dials a public endpoint.
+policies, that file and CLI configuration produce the expected policies and read confirmations, that
+signing checks the policy without sending, that a signing's recorded hash survives every send outcome but a
+refusal, and that a partial client map is never published. No test dials a public endpoint.
 
 CTest runs this binary through `tests/run_with_bind_config.cjs`, which keeps platform registry reservations
 alive for the test process. It requires Node and the version-pinned `@wireio/cluster-tool` development
