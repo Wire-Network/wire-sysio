@@ -298,14 +298,6 @@ window must never reopen imports. Removal of an inline action requires retiring 
 callers first; addition requires deploying the callee first. Fresh-state bootstrap must
 use a matching contract set and generated SDK interface.
 
-> **WIRE-350 pre-launch note:** Provider nodes that previously started with the old automatic
-> snapshot schedule must delete their local `snapshot-schedule.json` once before starting this
-> build. The old `(spacing=25000, start=24999, end=MAX)` request and the corrected
-> `(spacing=25000, start=25000, end=MAX)` request have different identities, so the scheduler would
-> otherwise retain both persisted requests. No on-chain migration or production upgrade path is
-> provided because snapshot attestation is being deployed before launch.
->
-
 **A downgrade is not the upgrade run backwards. It is a data-migration problem
 first, and a code-ordering problem second** — because by the time you want to
 roll back, the claim tables may hold value that only the NEW code can pay out:
@@ -356,6 +348,20 @@ LIQ earned-yield distribution and their normal claim actions remain.
 `sysio.synd::setconfig` requires `min_desyndicate` as an ordinary uint64, and `syndconfig` stores it
 as an ordinary field. Bootstrap schema version 1 contains chains, tokens, LIQ pools and syndications;
 it has no external-reserve or underwriting configuration.
+
+## WIRE-382 pre-launch deployment
+
+This change extends the persisted `snapconfig` row from `min_providers` to
+`(min_providers, block_spacing)` and extends `setsnpcfg` by the same required field. There is no in-place
+row migration, compatibility shim, or mixed-version contract/node interface. Bootstrap fresh state with
+matching system-contract artifacts, native nodes, and generated SDK types, then initialize the two-field
+configuration before enabling snapshot providers or endpoint bootstrap.
+
+Provider nodes automatically reconcile the persisted request carrying the reserved
+`snapshot-provider auto` description with the enabled on-chain cadence. Startup and irreversible-block
+reconciliation remove stale reserved requests and create or reuse the exact configured schedule, so
+operators do not need to delete `snapshot-schedule.json`. Requests created manually by operators are not
+reserved and remain untouched.
 
 ## WIRE-415 pre-launch deployment
 

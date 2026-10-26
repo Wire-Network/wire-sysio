@@ -346,11 +346,12 @@ try:
     # ===================================================================
     # Snapshot endpoint cadence enforcement
     # ===================================================================
-    # These API-created snapshots are manual and therefore intentionally outside the
-    # 25,000-block attestation cadence. Base-URL discovery must ignore them, while an
-    # explicit block request must still reject an unscheduled height before download;
-    # scheduled-attestation verification is covered by C++ tests that can construct
-    # cadence heights without hours of wall-clock block production.
+    # No snapconfig row exists in this integration chain, so base-URL discovery has no
+    # active attestation cadence and must ignore these API-created snapshots. Their
+    # heights also fall outside the default cadence used to classify explicit downloads,
+    # so a specific-block bootstrap can download the requested file. Strict post-load
+    # configuration preflight must then reject it before replay. Enabled-cadence behavior
+    # is covered by the faster C++ contract and plugin fixtures.
 
     # ---------------------------------------------------------------
     # Test 8: Base-URL bootstrap ignores manual snapshots
@@ -378,7 +379,7 @@ try:
     Print("Test 8 PASSED")
 
     # ---------------------------------------------------------------
-    # Test 9: Reject specific manual snapshot endpoint
+    # Test 9: Reject specific manual snapshot after configuration preflight
     # ---------------------------------------------------------------
     Print("=== Test 9: Reject specific manual snapshot endpoint ===")
 
@@ -395,10 +396,10 @@ try:
     assert not isRelaunchSuccess, \
         "Bootstrap should reject an unattestable specific manual snapshot"
     assert bootstrapNode.findInLog(
-        rf"Snapshot endpoint returned unscheduled block #{snapBlockNum}") is not None, \
-        "Missing specific-block snapshot endpoint diagnostic"
-    assert not list(bootstrapNode.data_dir.glob("snapshots/snapshot-bootstrap-*.bin")), \
-        "Specific unscheduled endpoint snapshot was downloaded before rejection"
+        r"min_providers must be configured before bootstrap") is not None, \
+        "Missing disabled snapshot-attestation configuration diagnostic"
+    assert list(bootstrapNode.data_dir.glob("snapshots/snapshot-bootstrap-*.bin")), \
+        "Specific manual endpoint snapshot was not downloaded before configuration preflight"
 
     Print("Test 9 PASSED")
 

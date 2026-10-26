@@ -14,11 +14,10 @@ from TestHarness.TestHelper import AppArgs
 #  This test validates the snapshot serving pipeline:
 #  - Snapshot provider registration and account rotation
 #  - Manual snapshot creation
-#  - Rejection of votes outside the fixed 25,000-block cadence
+#  - Rejection of votes outside the configured block-height cadence
 #
-#  Successful fixed-K formation and attestation-record persistence use synthetic
-#  scheduled heights in the C++ contract and unit test suites. Waiting for that
-#  height in this wall-clock integration test would take hours.
+#  Successful fixed-K formation and attestation-record persistence use controlled
+#  scheduled heights in the C++ contract and unit test suites.
 #
 #  Cluster layout:
 #    Node 0: producer (defproducera) — takes snapshots, pushes actions
@@ -38,8 +37,8 @@ debug=args.v
 dumpErrorDetails=args.dump_error_details
 
 Utils.Debug=debug
-# Fixed production cadence shared by provider scheduling and the system contract.
-snapshotAttestationBlockSpacing=25000
+# Small supported cadence configured through the same contract path used in production.
+snapshotAttestationBlockSpacing=250
 
 testSuccessful=False
 
@@ -158,12 +157,15 @@ try:
     regSnapProvTransIds.append(node0.getTransId(trans))
 
     # ---------------------------------------------------------------
-    # Set attestation config: fixed K=1.
+    # Set attestation config: fixed K=1 and immutable block-height cadence.
     # This confirms governance configuration independently of the cadence rejection below.
     # ---------------------------------------------------------------
     Print("Set snapshot attestation config")
     success, trans = node0.pushMessage("sysio", "setsnpcfg",
-        json.dumps({"min_providers": 1}),
+        json.dumps({
+            "min_providers": 1,
+            "block_spacing": snapshotAttestationBlockSpacing
+        }),
         "--permission sysio@active")
     assert success, f"Failed to set snapshot config: {trans}"
     setCfgTransId = node0.getTransId(trans)
@@ -187,16 +189,24 @@ try:
     # ---------------------------------------------------------------
     Print("=== Test 1: Manual snapshot vote rejection ===")
 
-    ret = node0.createSnapshot()
-    assert ret is not None, "Snapshot creation failed"
-    snapInfo = ret["payload"]
-    snapBlockNum = snapInfo["head_block_num"]
-    snapBlockId = snapInfo["head_block_id"]
-    snapRootHash = snapInfo["root_hash"]
+    # Avoid making the assertion probabilistic now that the test cadence is deliberately small.
+    # If the first manual snapshot happens to land on the cadence, advance LIB and retry once.
+    for attempt in range(2):
+        ret = node0.createSnapshot()
+        assert ret is not None, "Snapshot creation failed"
+        snapInfo = ret["payload"]
+        snapBlockNum = snapInfo["head_block_num"]
+        snapBlockId = snapInfo["head_block_id"]
+        snapRootHash = snapInfo["root_hash"]
+        if snapBlockNum % snapshotAttestationBlockSpacing != 0:
+            break
+        assert attempt == 0, "Manual snapshots repeatedly landed on the configured cadence"
+        assert node0.waitForLibToAdvance(timeout=30), \
+            "LIB did not advance before retrying the manual snapshot"
     Print(f"Manual snapshot: block_num={snapBlockNum}, root_hash={snapRootHash}")
 
     assert snapBlockNum % snapshotAttestationBlockSpacing != 0, (
-        "Wall-clock integration snapshot unexpectedly landed on the production cadence"
+        "Wall-clock integration snapshot unexpectedly landed on the configured cadence"
     )
     assert len(snapRootHash) == 64 and all(c in '0123456789abcdef' for c in snapRootHash), \
         f"Snapshot root_hash should be a 64-char hex string, got: {snapRootHash}"

@@ -7,6 +7,7 @@
 #include <fc/scoped_exit.hpp>
 
 #include <regex>
+#include <set>
 
 using namespace sysio;
 using namespace sysio::chain;
@@ -99,6 +100,28 @@ BOOST_AUTO_TEST_CASE(snapshot_scheduler_test) {
       BOOST_CHECK_EXCEPTION(scheduler.schedule_snapshot(sri_start_end, {}), invalid_snapshot_request, [](const fc::assert_exception& e) {
          return e.to_detail_string().find("End block number should be greater or equal to start block number") != std::string::npos;
       });
+
+      const auto max_block_num = std::numeric_limits<uint32_t>::max();
+      snapshot_request_information sri_overflow = {
+         .block_spacing = 16,
+         .start_block_num = max_block_num - 8,
+         .end_block_num = max_block_num,
+      };
+      BOOST_CHECK_EXCEPTION(
+         scheduler.schedule_snapshot(sri_overflow, {}), invalid_snapshot_request,
+         [](const fc::assert_exception& e) {
+            return e.to_detail_string().find("Block spacing exceeds defined by start and end range") !=
+                   std::string::npos;
+         });
+
+      snapshot_request_information sri_max_boundary = {
+         .block_spacing = 8,
+         .start_block_num = max_block_num - 8,
+         .end_block_num = max_block_num,
+      };
+      const auto max_boundary_request = scheduler.schedule_snapshot(sri_max_boundary, {});
+      BOOST_CHECK_EQUAL(max_boundary_request.block_spacing, 8u);
+      scheduler.unschedule_snapshot(max_boundary_request.snapshot_request_id);
    }
    {
       fc::temp_directory temp_dir;
@@ -225,6 +248,47 @@ BOOST_AUTO_TEST_CASE(snapshot_scheduler_test) {
          throw;
       }
    }
+}
+
+/** A restored scheduler allocates beyond persisted ids instead of silently colliding with them. */
+BOOST_AUTO_TEST_CASE(snapshot_scheduler_restored_request_ids_remain_unique) {
+   fc::temp_directory temp_dir;
+   snapshot_scheduler::snapshot_db_json db;
+   db.set_path(temp_dir.path());
+
+   snapshot_scheduler::snapshot_schedule_information persisted;
+   persisted.snapshot_request_id = 0;
+   persisted.block_spacing = 10;
+   persisted.start_block_num = 10;
+   persisted.end_block_num = 100;
+   persisted.snapshot_description = "persisted manual schedule";
+   auto persisted_high_id = persisted;
+   persisted_high_id.snapshot_request_id = 7;
+   persisted_high_id.block_spacing = 15;
+   persisted_high_id.start_block_num = 15;
+   persisted_high_id.snapshot_description = "second persisted manual schedule";
+   db << std::vector<snapshot_scheduler::snapshot_schedule_information>{
+      persisted, persisted_high_id};
+
+   snapshot_scheduler restored;
+   restored.set_db_path(temp_dir.path());
+   const auto added = restored.schedule_snapshot(
+      snapshot_request_information{
+         .block_spacing = 20,
+         .start_block_num = 20,
+         .end_block_num = 100,
+         .snapshot_description = "new automatic schedule",
+      },
+      {});
+
+   BOOST_CHECK_EQUAL(added.snapshot_request_id, 8u);
+   const auto requests = restored.get_snapshot_requests().snapshot_requests;
+   BOOST_REQUIRE_EQUAL(requests.size(), 3u);
+   std::set<uint32_t> request_ids;
+   for (const auto& request : requests) {
+      request_ids.insert(request.snapshot_request_id);
+   }
+   BOOST_CHECK_EQUAL(request_ids.size(), requests.size());
 }
 
 //created via a schedule_snapshot with {"block_spacing":5,"snapshot_description":"banana"} on leap4

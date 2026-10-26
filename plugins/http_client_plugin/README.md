@@ -111,8 +111,13 @@ triple plus every caller triple (including `http-client-*`) and asserts the loca
 
 ```bash
 ninja -C build/debug test_chain_plugin
-./build/debug/plugins/chain_plugin/test/test_chain_plugin -t outbound_http_global_option_registration
+ctest --test-dir build/debug \
+  -R '^test_chain_plugin_outbound_http_global_option_registration$' \
+  --output-on-failure
 ```
+
+CTest supplies the test's required `WIRE_TEST_PORTS` reservation through
+`tests/run_with_bind_config.cjs`; see the `chain_plugin` test documentation for direct filtered runs.
 
 ## Related plugins
 

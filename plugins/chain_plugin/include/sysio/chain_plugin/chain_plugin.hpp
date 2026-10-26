@@ -130,14 +130,39 @@ namespace sysio {
       return {};
    }
 
+   /** Decoded governance values consumed by native snapshot-attestation components. */
+   struct snapshot_attestation_config {
+      /// Fixed number of distinct provider votes required; zero means unconfigured.
+      uint32_t min_providers = 0;
+      /// Positive block-height interval between eligible snapshots.
+      uint32_t block_spacing = sysiosystem::snapshot_attestation::default_block_spacing;
+
+      /** Return whether governance has enabled snapshot attestation. */
+      constexpr bool enabled() const noexcept { return min_providers > 0; }
+   };
+
+   /** Return whether a finalized height is still inside the configured post-snapshot grace window. */
+   constexpr bool snapshot_attestation_within_grace(uint32_t snapshot_height,
+                                                     uint32_t current_height,
+                                                     uint32_t block_spacing) noexcept {
+      return sysiosystem::snapshot_attestation::is_valid_block_spacing(block_spacing)
+             && static_cast<uint64_t>(current_height)
+                   < static_cast<uint64_t>(snapshot_height)
+                        + sysiosystem::snapshot_attestation::snapshot_attestation_grace_blocks(
+                           block_spacing);
+   }
+
    /** Return whether an ABI declares the tables consumed during auto-fetched snapshot bootstrap. */
    bool has_required_snapshot_attestation_schema(const abi_def& abi);
 
-   /** Return whether one decoded snapconfig row enables snapshot attestation. */
-   bool snapshot_attestation_config_is_enabled(const fc::variants& rows);
+   /** Decode one exact snapconfig row; an empty table yields disabled production defaults. */
+   std::optional<snapshot_attestation_config>
+   decode_snapshot_attestation_config(const fc::variants& rows);
 
-   /** Return whether endpoint metadata identifies the loaded scheduled snapshot head exactly. */
-   bool snapshot_endpoint_block_matches(uint32_t advertised_block_num, uint32_t loaded_block_num);
+   /** Return whether endpoint metadata identifies the loaded configured-cadence head exactly. */
+   bool snapshot_endpoint_block_matches(uint32_t advertised_block_num,
+                                        uint32_t loaded_block_num,
+                                        uint32_t block_spacing);
 
    /** Return whether endpoint metadata honors an optional specifically requested block. */
    bool snapshot_endpoint_request_matches(const std::optional<uint32_t>& requested_block_num,
@@ -824,6 +849,16 @@ public:
                            fc::microseconds abi_serializer_timeout,
                            std::string log_prefix,
                            const std::atomic<bool>& shutdown_flag);
+
+   /// Read and decode snapshot-attestation governance state without conflating an empty table with failure.
+   ///
+   /// `timeout` bounds both the queued request and ABI decoding. The returned default-valued configuration
+   /// represents a successful read of an empty table; `std::nullopt` represents either a failed read or a
+   /// malformed row, so safety-sensitive callers can fail closed.
+   std::optional<snapshot_attestation_config>
+   read_snapshot_attestation_config(fc::microseconds timeout,
+                                    std::string log_prefix,
+                                    const std::atomic<bool>& shutdown_flag);
 
    /** Run a table scan while preserving the legacy empty-result-on-failure behavior. */
    chain_apis::read_only::get_table_rows_result

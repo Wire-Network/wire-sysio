@@ -73,14 +73,6 @@ namespace snapshot_attest = sysiosystem::snapshot_attestation;
 /// several channels; medium is process_incoming_block's, so deliveries run between block-apply batches.
 constexpr int block_channel_priority = appbase::priority::medium;
 
-/// Finalized-block grace window past the snapshot height during which a missing snaprecords row keeps
-/// snapshot-attestation verification pending even after this node has caught up to the live chain tip.
-/// A node bootstrapping from a recently-taken snapshot reaches the tip before the providers'
-/// votesnaphash transactions (which must be generated, voted on, and reach quorum) have landed, so a
-/// missing record at the tip is not immediately conclusive. Half of the fixed provider snapshot
-/// interval.
-constexpr uint32_t snapshot_attestation_grace_blocks = snapshot_attest::block_spacing / 2;
-
 /// Fatal diagnostic when an auto-fetched snapshot remains unverifiable after the grace window.
 constexpr auto snapshot_attestation_table_read_failure_log =
    "FATAL: Could not read the on-chain snapshot attestation for block #{} after syncing {} blocks "
@@ -111,6 +103,10 @@ constexpr auto snapshot_attestation_config_read_failure_reason = "table read fai
 constexpr auto snapshot_attestation_config_unset_reason =
    "min_providers must be configured before bootstrap";
 
+/// Failure reason when the decoded governance row does not match the required value ranges.
+constexpr auto snapshot_attestation_config_malformed_reason =
+   "configuration row must contain valid min_providers and block_spacing values";
+
 /// Startup diagnostic when endpoint metadata describes a different snapshot than the downloaded file.
 constexpr auto snapshot_endpoint_block_mismatch_message =
    "Auto-fetched snapshot head #{} does not match endpoint metadata block #{}";
@@ -135,7 +131,8 @@ constexpr auto snapshot_attestation_record_log_prefix = "snapshot_attest";
 
 /// Startup log for an auto-fetched snapshot entering strict post-sync verification.
 constexpr auto snapshot_auto_fetched_loaded_log =
-   "Auto-fetched snapshot loaded at block #{} with root hash {}; will verify attestation after sync";
+   "Auto-fetched snapshot loaded at block #{} with root hash {} on a {}-block cadence; "
+   "will verify attestation after sync";
 
 /// Startup log for an explicitly trusted manual snapshot.
 constexpr auto snapshot_manual_loaded_log =
@@ -435,31 +432,56 @@ bool has_required_snapshot_attestation_schema(const abi_def& abi) {
 
    const auto config = std::ranges::find(abi.structs, snapshot_attest::type_snap_config,
                                          &struct_def::name);
-   return config != abi.structs.end() && config->base.empty() && config->fields.size() == 1
-          && config->fields.front().name == snapshot_attest::field::min_providers
-          && config->fields.front().type == snapshot_attest::abi_type::uint32;
+   const std::vector<field_def> expected_config_fields = {
+      {snapshot_attest::field::min_providers, snapshot_attest::abi_type::uint32},
+      {snapshot_attest::field::block_spacing, snapshot_attest::abi_type::uint32},
+   };
+   return config != abi.structs.end() && config->base.empty()
+          && config->fields == expected_config_fields;
 }
 
-bool snapshot_attestation_config_is_enabled(const fc::variants& rows) {
+std::optional<snapshot_attestation_config>
+decode_snapshot_attestation_config(const fc::variants& rows) {
+   if (rows.empty()) {
+      return snapshot_attestation_config{};
+   }
    if (rows.size() != 1 || !rows.front().is_object()) {
-      return false;
+      return std::nullopt;
    }
 
    const auto& config = rows.front().get_object();
-   if (!config.contains(snapshot_attest::field::min_providers)) {
-      return false;
+   if (config.size() != 2
+       || !config.contains(snapshot_attest::field::min_providers)
+       || !config.contains(snapshot_attest::field::block_spacing)) {
+      return std::nullopt;
    }
 
-   try {
-      return config[snapshot_attest::field::min_providers].as_uint64() > 0;
-   } catch (...) {
-      return false;
+   const auto& min_providers = config[snapshot_attest::field::min_providers];
+   const auto& block_spacing = config[snapshot_attest::field::block_spacing];
+   if (!min_providers.is_uint64() || !block_spacing.is_uint64()) {
+      return std::nullopt;
    }
+
+   const uint64_t min_providers_value = min_providers.as_uint64();
+   const uint64_t block_spacing_value = block_spacing.as_uint64();
+   if (min_providers_value > sysiosystem::snapshot_attestation::maximum_providers
+       || block_spacing_value > std::numeric_limits<uint32_t>::max()
+       || !snapshot_attest::is_valid_block_spacing(
+          static_cast<uint32_t>(block_spacing_value))) {
+      return std::nullopt;
+   }
+
+   return snapshot_attestation_config{
+      .min_providers = static_cast<uint32_t>(min_providers_value),
+      .block_spacing = static_cast<uint32_t>(block_spacing_value),
+   };
 }
 
-bool snapshot_endpoint_block_matches(uint32_t advertised_block_num, uint32_t loaded_block_num) {
+bool snapshot_endpoint_block_matches(uint32_t advertised_block_num,
+                                     uint32_t loaded_block_num,
+                                     uint32_t block_spacing) {
    return advertised_block_num == loaded_block_num
-          && snapshot_attest::is_scheduled_block(loaded_block_num);
+          && snapshot_attest::is_scheduled_block(loaded_block_num, block_spacing);
 }
 
 bool snapshot_endpoint_request_matches(const std::optional<uint32_t>& requested_block_num,
@@ -506,6 +528,18 @@ make_snapshot_attestation_record_query(uint32_t block_num) {
    return params;
 }
 
+/** Build the bounded singleton query for snapshot-attestation configuration. */
+static chain_apis::read_only::get_table_rows_params
+make_snapshot_attestation_config_query() {
+   chain_apis::read_only::get_table_rows_params params;
+   params.json        = true;
+   params.code        = config::system_account_name;
+   params.table       = snapshot_attest::table_snapconfig;
+   params.limit       = 1;
+   params.values_only = true;
+   return params;
+}
+
 class chain_plugin_impl {
 public:
    chain_plugin_impl()
@@ -541,6 +575,9 @@ public:
    block_id_type              snapshot_loaded_block_id;
    /// BLAKE3 root loaded from the auto-fetched snapshot and compared with the attested tuple.
    fc::crypto::blake3         snapshot_loaded_root_hash;
+   /// Configured cadence retained for deterministic missing-attestation verification.
+   uint32_t                   snapshot_loaded_block_spacing =
+      snapshot_attest::default_block_spacing;
    /// Whether the configured snapshot path was populated by --snapshot-endpoint.
    bool                       snapshot_auto_fetched = false;
 
@@ -583,7 +620,7 @@ public:
    void plugin_initialize(const variables_map& options);
    void plugin_startup();
    /// Require an auto-fetched snapshot to contain enabled, readable attestation state.
-   void require_snapshot_attestation_configuration() const;
+   snapshot_attestation_config require_snapshot_attestation_configuration() const;
    /// Verify the loaded snapshot against its on-chain attestation. Invoked from the
    /// irreversible-block handler with the just-finalized block; retries on later finalized
    /// blocks until the attestation record appears or the node catches up to the chain tip.
@@ -1647,7 +1684,8 @@ void chain_plugin::plugin_initialize(const variables_map& options) {
    my->plugin_initialize(options);
 }
 
-void chain_plugin_impl::require_snapshot_attestation_configuration() const {
+snapshot_attestation_config
+chain_plugin_impl::require_snapshot_attestation_configuration() const {
    const auto* system_account = chain->find_account_metadata(config::system_account_name);
    SYS_ASSERT(system_account, plugin_config_exception, snapshot_attestation_missing_system_account_message,
               config::system_account_name);
@@ -1662,19 +1700,12 @@ void chain_plugin_impl::require_snapshot_attestation_configuration() const {
               config::system_account_name, snapshot_attest::table_snaprecords,
               snapshot_attest::table_snapconfig);
 
-   chain_apis::read_only::get_table_rows_params params;
-   params.json        = true;
-   params.code        = config::system_account_name;
-   params.table       = snapshot_attest::table_snapconfig;
-   params.limit       = 1;
-   params.values_only = true;
-
    static const std::atomic<bool> not_shutting_down{false};
    const auto table_read_timeout =
       snapshot_attestation_startup_table_read_timeout(abi_serializer_max_time_us);
    const auto read_result = retry_snapshot_attestation_table_read([&]() {
       return app().get_plugin<chain_plugin>().read_table_rows_checked(
-         params, table_read_timeout, table_read_timeout,
+         make_snapshot_attestation_config_query(), table_read_timeout, table_read_timeout,
          snapshot_attestation_config_log_prefix, not_shutting_down);
    });
    SYS_ASSERT(read_result, plugin_config_exception,
@@ -1682,11 +1713,18 @@ void chain_plugin_impl::require_snapshot_attestation_configuration() const {
               config::system_account_name, snapshot_attest::table_snapconfig,
               snapshot_attestation_config_read_failure_reason,
               chain_config->state_dir.generic_string());
-   SYS_ASSERT(snapshot_attestation_config_is_enabled(read_result->rows), plugin_config_exception,
+   const auto attestation_config = decode_snapshot_attestation_config(read_result->rows);
+   SYS_ASSERT(attestation_config, plugin_config_exception,
+              snapshot_attestation_config_failure_message,
+              config::system_account_name, snapshot_attest::table_snapconfig,
+              snapshot_attestation_config_malformed_reason,
+              chain_config->state_dir.generic_string());
+   SYS_ASSERT(attestation_config->enabled(), plugin_config_exception,
               snapshot_attestation_config_failure_message,
               config::system_account_name, snapshot_attest::table_snapconfig,
               snapshot_attestation_config_unset_reason,
               chain_config->state_dir.generic_string());
+   return *attestation_config;
 }
 
 void chain_plugin_impl::plugin_startup()
@@ -1705,16 +1743,24 @@ void chain_plugin_impl::plugin_startup()
                SYS_ASSERT(snapshot_endpoint_block_num, plugin_config_exception,
                           snapshot_endpoint_metadata_missing_message);
                const uint32_t advertised_block_num = *snapshot_endpoint_block_num;
-               SYS_ASSERT(snapshot_endpoint_block_matches(advertised_block_num, loaded_block_num),
+               SYS_ASSERT(advertised_block_num == loaded_block_num,
                           plugin_config_exception,
                           snapshot_endpoint_block_mismatch_message,
                           loaded_block_num, advertised_block_num);
-               require_snapshot_attestation_configuration();
+               const auto attestation_config = require_snapshot_attestation_configuration();
+               SYS_ASSERT(snapshot_endpoint_block_matches(
+                             advertised_block_num, loaded_block_num,
+                             attestation_config.block_spacing),
+                          plugin_config_exception,
+                          snapshot_endpoint_unscheduled_block_message,
+                          loaded_block_num, attestation_config.block_spacing);
                snapshot_loaded_block_num = loaded_block_num;
                snapshot_loaded_block_id = chain->head().id();
                snapshot_loaded_root_hash = snapshot_reader->get_root_hash();
+               snapshot_loaded_block_spacing = attestation_config.block_spacing;
                ilog(snapshot_auto_fetched_loaded_log,
-                    *snapshot_loaded_block_num, snapshot_loaded_root_hash.str());
+                    *snapshot_loaded_block_num, snapshot_loaded_root_hash.str(),
+                    attestation_config.block_spacing);
             } else {
                ilog(snapshot_manual_loaded_log, chain->head().block_num());
             }
@@ -1910,6 +1956,20 @@ chain_plugin::read_table_rows_checked(chain_apis::read_only::get_table_rows_para
    return fut.get();
 }
 
+std::optional<snapshot_attestation_config>
+chain_plugin::read_snapshot_attestation_config(
+   fc::microseconds timeout,
+   std::string log_prefix,
+   const std::atomic<bool>& shutdown_flag) {
+   auto result = read_table_rows_checked(
+      make_snapshot_attestation_config_query(), timeout, timeout,
+      std::move(log_prefix), shutdown_flag);
+   if (!result) {
+      return std::nullopt;
+   }
+   return decode_snapshot_attestation_config(result->rows);
+}
+
 chain_apis::read_only::get_table_rows_result
 chain_plugin::read_table_rows(chain_apis::read_only::get_table_rows_params params,
                               fc::microseconds timeout,
@@ -2028,9 +2088,6 @@ void chain_plugin_impl::fetch_snapshot_from_endpoint(
                  plugin_config_exception, snapshot_endpoint_requested_block_mismatch_message,
                  snap_block_num, *request_block_num);
    }
-   SYS_ASSERT(snapshot_attest::is_scheduled_block(snap_block_num), plugin_config_exception,
-              snapshot_endpoint_unscheduled_block_message, snap_block_num,
-              snapshot_attest::block_spacing);
    const auto snap_root_hash = metadata_response["root_hash"].as<fc::crypto::blake3>();
 
    ilog("Snapshot metadata: block #{}, hash {}", snap_block_num, snap_root_hash.str());
@@ -2085,9 +2142,8 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
    const auto caught_up_tolerance = fc::seconds(30);
    const bool caught_up =
       fc::time_point::now() - lib_block->timestamp.to_time_point() < caught_up_tolerance;
-   const bool within_grace =
-      static_cast<uint64_t>(lib_block->block_num())
-      < static_cast<uint64_t>(snap_block_num) + snapshot_attestation_grace_blocks;
+   const bool within_grace = snapshot_attestation_within_grace(
+      snap_block_num, lib_block->block_num(), snapshot_loaded_block_spacing);
 
    try {
       bool        have_record       = false;
@@ -2150,7 +2206,7 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
 
          // Even at the live tip a missing record is not yet conclusive -- the providers'
          // votesnaphash transactions (which must be generated, voted on, and reach quorum) may
-         // still be in flight (see snapshot_attestation_grace_blocks). Keep verification pending
+         // still be in flight (see snapshot_loaded_block_spacing). Keep verification pending
          // for a deterministic window of finalized blocks past the snapshot height before
          // concluding the height was never attested.
          if (within_grace)

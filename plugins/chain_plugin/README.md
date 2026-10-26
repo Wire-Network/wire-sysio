@@ -78,15 +78,16 @@ The CLI options select where the node comes up from:
 - **A snapshot file** — `--snapshot <path>`. Operator-trusted; no attestation is verified.
 - **A snapshot endpoint** — `--snapshot-endpoint <url>`, which downloads and hash-checks a snapshot from a
   serving node and then loads it. This path is not trusted the same way, and it carries hard constraints. The
-  endpoint must serve a snapshot taken at a block number that is a multiple of 25000, because only those
-  heights are attested on chain, and the snapshot must contain readable, enabled on-chain attestation state.
-  After the node syncs past the snapshot's height, the loaded block id and root hash are checked against the
-  on-chain attestation record on each finalized block: a record that does not match the loaded snapshot stops
-  the node immediately, with no grace, while a record that has not appeared yet keeps verification pending.
-  Verification only concludes once the node has caught up to the live tip: until then every finalized block
-  simply retries, with no limit. Past that point a missing record is tolerated for a grace window of 12,500
-  finalized blocks beyond the snapshot height before the node is stopped. The option requires an empty
-  database; use `--delete-all-blocks` to clear existing data.
+  snapshot must contain readable, enabled on-chain attestation state with its immutable configured block
+  spacing `S`. Once the snapshot is loaded, its actual head must be a positive multiple of `S`; endpoint
+  metadata is not trusted to establish cadence before load. After the node syncs past the snapshot's height,
+  the loaded block id and root hash are checked against the on-chain attestation record on each finalized
+  block: a record that does not match the loaded snapshot stops the node immediately, with no grace, while a
+  record that has not appeared yet keeps verification pending. Verification only concludes once the node has
+  caught up to the live tip: until then every finalized block simply retries, with no limit. Past that point a
+  missing record is tolerated for a grace window of `floor(S / 2)` finalized blocks beyond the snapshot height
+  before the node is stopped. The option requires an empty database; use `--delete-all-blocks` to clear
+  existing data.
 
 Both snapshot paths share the chain-state size setting as their download and state ceiling
 (`--chain-state-db-size-mb`), and the endpoint path accepts per-caller HTTPS transport overrides
@@ -272,7 +273,7 @@ process-wide `outbound-http-*` fallback that `http_client_plugin` registers.
 | `truncate-at-block` | `0` | Stop hard replay or block-log recovery at this block number when non-zero. Combined with `terminate-at-block`, prunes received blocks from the fork database on exit. |
 | `terminate-at-block` | `0` | Stop the node after reaching this block number when non-zero. To pause at a block instead, use `/v1/producer/pause_at_block`. |
 | `snapshot` | unset | File to read the snapshot state from. |
-| `snapshot-endpoint` | unset | Fetch a snapshot from a URL and bootstrap. `http(s)://host:port` fetches the latest snapshot; `http(s)://host:port/50000` fetches the snapshot at block 50000. The served snapshot's block number must be a multiple of 25000, since only those heights are attested on chain. Requires an empty database. |
+| `snapshot-endpoint` | unset | Fetch a snapshot from a URL and bootstrap. `http(s)://host:port` fetches the latest snapshot; `http(s)://host:port/50000` fetches the snapshot at block 50000. After load, the snapshot head must be a positive multiple of its immutable configured block spacing `S`. Requires an empty database. |
 
 ## HTTP API
 
@@ -314,14 +315,19 @@ a dedicated handler and shut the node down; the fix is more space or a larger `c
 
 ```bash
 ninja -C build/debug test_chain_plugin
-./build/debug/plugins/chain_plugin/test/test_chain_plugin
+ctest --test-dir build/debug -R '^test_chain_plugin_' --output-on-failure
 ```
 
 The suite is registered as one CTest case per Boost test case, so a single area can be run on its own:
 
 ```bash
-./build/debug/plugins/chain_plugin/test/test_chain_plugin --run_test=get_info_consumer_plugin_policy
+ctest --test-dir build/debug -R '^test_chain_plugin_get_info_consumer_plugin_policy$' --output-on-failure
 ```
+
+CTest runs this binary through `tests/run_with_bind_config.cjs`, which supplies the `WIRE_TEST_PORTS`
+reservation required by tests that bind sockets. The wrapper requires Node and the version-pinned
+`@wireio/cluster-tool` development dependency; a built companion may be selected explicitly with
+`WIRE_TOOLS_TS_ROOT`. For direct filtered runs, invoke that wrapper before the binary and Boost arguments.
 
 It covers the snapshot attestation policies (configuration preflight, required schemas, record tuple, block
 identity, table-read failure, timeout, and retry), snapshot-endpoint option registration and validation,

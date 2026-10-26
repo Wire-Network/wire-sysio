@@ -108,7 +108,7 @@ Actions are implemented as a sub-contract class (`snapshot_attest`) following th
 regsnapprov(producer, snap_account)       // producer auth — register a snapshot provider
 delsnapprov(producer)                     // producer auth — retire a snapshot provider
 votesnaphash(snap_account, block_id, snapshot_hash)  // snap_account auth
-setsnpcfg(min_providers)                  // sysio auth — set fixed K
+setsnpcfg(min_providers, block_spacing)   // sysio auth — set K and initialize cadence
 getsnaphash(block_num)                    // read-only — returns attested record
 ```
 
@@ -116,7 +116,7 @@ getsnaphash(block_num)                    // read-only — returns attested reco
 
 | Table | Primary Key | Description |
 |-------|------------|-------------|
-| `snapconfig` | singleton | `{ min_providers }` |
+| `snapconfig` | singleton | `{ min_providers, block_spacing }` |
 | `snapprovs` | `snap_account` | `{ snap_account, producer }` + `byproducer` secondary |
 | `snapvotes` | auto-increment `id` | `{ id, block_num, block_id, snapshot_hash, voters[] }` + `byblocknum` secondary |
 | `snaprecords` | `block_num` | `{ block_num, block_id, snapshot_hash, attested_at_block }` |
@@ -126,22 +126,25 @@ getsnaphash(block_num)                    // read-only — returns attested reco
 - Repeating the same registration is idempotent; registering a new snap_account atomically rotates that producer's mapping without retracting producer-keyed votes. Rotation is deliberately not eligibility-gated, and `delsnapprov` does not subsume it: leaving is one-way because re-registering is gated, so an ineligible producer that rotates keeps a delegation it can carry back into eligibility. It replaces that producer's single row, so it grants nothing a gated registration would. The gate keys on the absence of a current mapping, so a producer whose row was evicted by the capacity prune is gated again when it re-registers.
 - The table is capped at 30. Producer lifecycle actions do no attestation work. Only a gated registration that finds the table full lazily removes mappings, evicting every producer that would now fail the gate: one that has no `producers` row, has gone inactive, lost its ACTIVE `OPERATOR_TYPE_PRODUCER` row in sysio.opreg or its active finalizer key, or ranks outside the top 30. Pending votes remain monotonic.
 **Voting:**
-- The contract accepts only block heights divisible by 25,000, matching the automatic provider schedule; manual/on-demand heights are rejected.
+- The contract accepts only positive block heights divisible by configured `block_spacing`, matching the automatic provider schedule; manual/on-demand heights are rejected. The cadence is based on block number, never elapsed slots or time.
 - Votes accumulate per `(block_num, block_id, snapshot_hash)` tuple. A producer can vote at multiple scheduled heights but cannot equivocate at one height, and exact retries of a pending tuple are idempotent while the producer keeps its operator standing (a retry of a finalized tuple is a no-op). A vote is accepted only while the producer is an ACTIVE PRODUCER operator in sysio.opreg that clears the live collateral minimum (bootstrapped operators exempt), so a raised minimum applies at the next vote.
 - Registration, producer, and configuration churn never retracts an accepted vote.
 **Attestation threshold:**
 - `min_providers` is the fixed governance-set K required for every tuple.
 - It defaults to zero, disabling voting until governance configures it in the range 1..30.
 - K does not scale with registrations. Configuration changes apply to pending heights, and an exact retry from a producer that still has operator standing can finalize a tuple that already meets a lowered K.
+**Snapshot cadence:**
+- `block_spacing` is configured in the range 4..25,000; 25,000 is the production default.
+- The first successful `setsnpcfg` fixes the cadence permanently. Later calls may change K only when they repeat the existing spacing, so pending votes, historical records, retained files, and provider schedules retain one interpretation.
 **Storage:**
 - `snap_vote` stores each competing tuple and its monotonic producer voters. Votes remain at every scheduled height until finalization.
 - When one tuple reaches quorum, the contract writes `snap_record { block_num, block_id, snapshot_hash, attested_at_block }` and purges pending tuples through that height.
 - Once a height has a final record, a conflicting block ID or hash raises disagreement error 9001.
-- Only scheduled heights can create rows. Attested records arrive at roughly 2,523 per year at a 0.5-second block interval and consume negligible long-term storage.
+- Only scheduled heights can create rows. Record frequency follows the configured cadence and compact records keep long-term storage bounded in practice.
 ### Snapshot Provider Node
 
 A snapshot provider is a syncing node (not a producer, not a finalizer) that:
-1. Generates snapshots every 25,000 blocks (automatic, at exact multiples: block 25000, 50000, 75000, ...)
+1. Generates snapshots at exact multiples of the network's configured `block_spacing`
 2. Computes the deterministic BLAKE3 root hash
 3. Submits `votesnaphash` transactions to the chain
 4. Optionally serves snapshots over HTTP (Phase 3)
@@ -153,7 +156,7 @@ snapshot-provider-account = <account>    # enables snapshot provider mode + hash
 ```
 
 When `snapshot-provider-account` is set:
-- A snapshot schedule is automatically created with `block_spacing = 25000` (constant, not configurable — all providers must use the same interval to produce snapshots at identical block heights).
+- Once enabled `snapconfig` is available, an automatic schedule is created from its immutable `block_spacing`, so all providers produce at identical block heights.
 - On each finalized scheduled snapshot, a `votesnaphash` transaction is automatically submitted; unscheduled manual snapshots are not voted.
 - If the contract returns a disagreement error (hash mismatch with attested record), the node logs a fatal error and shuts down.
 
@@ -287,12 +290,11 @@ The block number is encoded as a trailing path component of the URL. If the last
    This works naturally with `--delete-all-blocks` which clears state before snapshot handling.
 3. **Fetch metadata:** POST to `/v1/snapshot/latest` or `/v1/snapshot/by_block` depending on URL format.
    A by-block response must identify exactly the block requested in the URL.
-4. **Cadence check:** Reject metadata whose block number is not an exact 25,000-block cadence
-   height. Such a snapshot can never receive an on-chain attestation, so it is rejected before download.
-5. **Download snapshot:** Uses bounded `fc::http_client::post_to_file()` streaming to POST to
+4. **Download snapshot:** Uses bounded `fc::http_client::post_to_file()` streaming to POST to
    `/v1/snapshot/download`, enforce size and disk-headroom bounds, and atomically save the response to the local
    snapshots directory.
-6. **Snapshot identity and root verification:** Uses `threaded_snapshot_reader::load_index()` to read the footer and compare the stored root hash against the advertised `root_hash`. This is a fast metadata-only check that catches download corruption. Full integrity verification (re-hashing all sections) happens during snapshot loading. The loaded scheduled head must equal the advertised block. The system ABI schemas and nonzero fixed K are validated immediately after loading and before replay; the attested block ID and hash are checked after syncing.
+5. **Snapshot identity and root verification:** Uses `threaded_snapshot_reader::load_index()` to read the footer and compare the stored root hash against the advertised `root_hash`. This is a fast metadata-only check that catches download corruption. Full integrity verification (re-hashing all sections) happens during snapshot loading. The loaded head must equal the advertised block.
+6. **Configuration and cadence check:** After loading exposes on-chain state, validate the system ABI, enabled `{ min_providers, block_spacing }` configuration, supported spacing bounds, and that the loaded block is an exact configured multiple. These checks finish before replay; the attested block ID and hash are checked after syncing.
 7. **Continue normal loading:** Sets `snapshot_path` to downloaded file and `snapshot_auto_fetched = true`. No `--genesis-json` needed — snapshot contains genesis.
 
 The bootstrap logic is encapsulated in `chain_plugin_impl::fetch_snapshot_from_endpoint()`.
@@ -306,17 +308,17 @@ Manual `--snapshot` is the operator-trusted escape hatch and bypasses attestatio
 |-----------|--------|
 | Manual `--snapshot` | Trusted load; no attestation checks |
 | Specifically requested block differs from returned metadata | **FATAL** — rejected before download |
-| Endpoint metadata outside the 25,000-block cadence | **FATAL** — rejected before download |
+| Loaded snapshot height outside its configured cadence | **FATAL** — rejected before replay |
 | Loaded snapshot head differs from endpoint metadata | **FATAL** — rejected before replay |
 | Missing/incompatible `snaprecords` or `snapconfig` schema | **FATAL** — startup rejected before replay |
-| Missing, malformed, or zero `min_providers` configuration | **FATAL** — startup rejected before replay |
+| Missing, malformed, disabled, or out-of-range `{ min_providers, block_spacing }` configuration | **FATAL** — startup rejected before replay |
 | No record or persistent read failure after grace | **FATAL** — shutdown |
 | Block ID or hash mismatch | **FATAL** — shutdown |
 | Block ID and hash match | Success |
 
 **Retry-based verification:** The attestation check (`verify_snapshot_attestation()`) runs on each irreversible block after the snapshot block. In the real-world flow, a snapshot is taken first, then providers independently generate their own snapshots (which can take minutes), submit votes, reach quorum, and the attestation becomes irreversible. The bootstrap node loads the snapshot, syncs forward, and eventually reaches the block containing the attestation record.
 
-The auto-fetched snapshot must contain a valid system ABI with compatible physical `snaprecords` and `snapconfig` table identifiers, keys, and value schemas. Its configuration row must enable a nonzero K; bounded startup reads use a one-second cold-state budget per attempt and these checks run before block replay. A configuration-read or disabled-configuration rejection tells the operator to delete the loaded chain state before restarting without `--snapshot-endpoint`. The record check then retries on each finalized block while the node is still catching up (finalized block time more than ~30 seconds behind wall-clock), and it applies the same retry behavior to transient table-read failures. At the live tip, both missing records and read failures remain pending for a grace window of 12,500 finalized blocks past the snapshot height (half the 25,000-block provider snapshot interval). After grace, the node shuts down because the remote source is untrusted without an on-chain record.
+The auto-fetched snapshot must contain a valid system ABI with compatible physical `snaprecords` and `snapconfig` table identifiers, keys, and value schemas. Its configuration row must enable a nonzero K, contain a supported spacing, and classify the loaded height as scheduled; bounded startup reads use a one-second cold-state budget per attempt and these checks run before block replay. A configuration-read or disabled-configuration rejection tells the operator to delete the loaded chain state before restarting without `--snapshot-endpoint`. The record check then retries on each finalized block while the node is still catching up (finalized block time more than ~30 seconds behind wall-clock), and it applies the same retry behavior to transient table-read failures. At the live tip, both missing records and read failures remain pending for `block_spacing / 2` finalized blocks past the snapshot height. After that configured grace, the node shuts down because the remote source is untrusted without an on-chain record.
 
 **Note:** ABI compatibility is verified before replay. Record existence and the attested block ID/hash are verified after sync, because the node cannot query later on-chain state before it has replayed to that state.
 
@@ -330,7 +332,7 @@ The auto-fetched snapshot must contain a valid system ABI with compatible physic
   (no snapshot-provider-account)     (no producer-name)
 ```
 
-The producer registers the snapshot provider's account via `regsnapprov`. The snapshot provider node syncs the chain, automatically generates snapshots every 25,000 blocks, votes on hashes via `votesnaphash`, and optionally serves snapshots over HTTP. No shared keys between the two nodes.
+The producer registers the snapshot provider's account via `regsnapprov`. The snapshot provider node syncs the chain, automatically generates snapshots at the configured cadence, votes on hashes via `votesnaphash`, and optionally serves snapshots over HTTP. No shared keys between the two nodes.
 
 For a complete operator setup guide — including producer registration, provider account delegation, attestation quorum configuration, snapshot generation, attestation voting, and HTTP network configuration with `--http-category-address` — see [`plugins/snapshot_api_plugin/README.md`](../plugins/snapshot_api_plugin/README.md).
 
@@ -342,8 +344,8 @@ For a complete operator setup guide — including producer registration, provide
 
 **Contract tests** (`contracts/tests/sysio.snapshot_attest_tests.cpp`):
 - Registration: authority/eligibility checks and rejections that name the failed condition, idempotent rotation, `delsnapprov` retirement, ungated rotation and retirement by a producer that has since become ineligible, bounded capacity, side-effect-free conflicts, and traceable lazy stale-row pruning only when full
-- Configuration: validation, authority, explicit initialization, and current fixed-K enforcement
-- Voting: scheduled/future bounds, idempotency, per-height equivocation rejection, and independent heights
+- Configuration: authority, K/cadence bounds, immutable cadence, and mutable fixed-K enforcement
+- Voting: exact and adjacent configured-height bounds, future bounds, idempotency, per-height equivocation rejection, and independent heights
 - Quorum: fixed K independent of registration count, governance changes on pending tuples, and explicit K=1 behavior
 - Storage: monotonic producer votes, finalization purge, historical-height closure, disagreement error 9001, and `getsnaphash` behavior
 **Chain-plugin policy tests** (`plugins/chain_plugin/test/plugin_config_test.cpp`):
@@ -362,7 +364,7 @@ For a complete operator setup guide — including producer registration, provide
 - `attestation_survives_snapshot_load` — attestation data survives snapshot round-trip in `snapshotted_tester`
 
 **Integration test** (`tests/snapshot_attest_test.py` — 2 tests):
-- Manual snapshot creation and rejection outside the fixed production cadence
+- Manual snapshot creation and rejection outside the configured test cadence
 - Provider registration and snapshot-account rotation
 
 **Snapshot API policy tests** (`tests/snapshot_api_plugin_tests.cpp`):
@@ -384,13 +386,14 @@ Phase 3 (API endpoints):
 
 Phase 4 (bootstrap):
 - Base-URL bootstrap fails discovery when no attested scheduled snapshot is downloadable
-- A specific manual snapshot URL is rejected before download for the same cadence invariant
+- A specific manual snapshot URL is rejected before replay for the same cadence invariant
 - Raw snapshot downloads honor HTTP `max-bytes-in-flight` admission control
 
-C++ tests construct cadence heights without waiting for 25,000 wall-clock blocks and cover the
-contract record, scheduled-serving attestation gate, snapshot round trip, and strict auto-fetch verification. The
-integration test proves manual endpoint snapshots cannot enter base-URL discovery and fail closed before download when
-requested explicitly.
+C++ fixtures configure a 250-block cadence and cover the contract record, scheduled-serving
+attestation gate, snapshot round trip, and strict auto-fetch verification. Integration coverage
+proves manual endpoint snapshots cannot enter base-URL discovery: the serving API fails closed
+before download, and the bootstrap client rejects an explicitly requested manual snapshot before
+replay.
 
 ---
 
@@ -401,7 +404,7 @@ requested explicitly.
 - **Snapshot format:** Single-file binary with section index at end (not tar.zst — simpler, deterministic, already 10% faster than Spring)
 - **Signing mechanism:** On-chain voting contract in `sysio.system`, not BLS aggregate signatures
   (no P2P changes; trust rests on durable registrations whose producers were schedulable when they entered the provider set)
-- **Snapshot interval:** Every 25,000 blocks, constant (not configurable) — all providers must use the same interval
+- **Snapshot interval:** governance initializes an immutable 4..25,000-block cadence in `snapconfig`; 25,000 is the production default and every provider reads the same value
 - **Attestation threshold:** governance sets a fixed K in `min_providers`; it does not scale with registration count
 - **Contract location:** Actions added to `sysio.system` as a sub-contract class (not a separate `sysio.snapshot` contract) for direct access to the producers table and rank index
 - **Manual snapshot verification:** manual `--snapshot` is operator-trusted and bypasses attestation checks. Auto-fetch via `--snapshot-endpoint` requires compatible `snaprecords`/`snapconfig` schemas and nonzero K before replay, then strictly verifies after sync.

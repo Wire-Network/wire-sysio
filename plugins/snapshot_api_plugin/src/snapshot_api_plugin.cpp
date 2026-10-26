@@ -52,12 +52,15 @@ constexpr std::string_view snapshot_download_content_type = "application/octet-s
 /// Request header that asks for part of a snapshot file.
 constexpr std::string_view snapshot_download_range_header = "Range";
 
-/// Request and ABI-decoder budget for one steady-state attestation-record lookup.
+/// Request and ABI-decoder budget for one steady-state snapshot-attestation table lookup.
 constexpr auto snapshot_attestation_query_timeout =
    snapshot_attestation_minimum_table_read_timeout;
 
 /// Log label for a scheduled catalog entry whose attestation record cannot be inspected.
 constexpr auto snapshot_attestation_query_log_prefix = "snapshot_api_plugin";
+
+/// Log label for the cadence configuration read that precedes serving-policy decisions.
+constexpr auto snapshot_attestation_config_query_log_prefix = "snapshot_api_plugin_config";
 
 struct snapshot_entry {
    block_num_type         block_num = 0;
@@ -122,6 +125,16 @@ public:
    /// Chain access used only through a valid main-thread or executor read window.
    chain_plugin&                               chain_plugin_;
 
+   /** Read authoritative cadence state, retrying transient failures without masking absence. */
+   std::optional<snapshot_attestation_config> read_snapshot_attestation_config() const {
+      static const std::atomic<bool> not_shutting_down{false};
+      return retry_snapshot_attestation_table_read([this]() {
+         return chain_plugin_.read_snapshot_attestation_config(
+            snapshot_attestation_query_timeout,
+            snapshot_attestation_config_query_log_prefix, not_shutting_down);
+      });
+   }
+
    /** Return whether irreversible local state attests the exact snapshot tuple. */
    bool is_attested_snapshot(const snapshot_entry& entry) const {
       const auto expected_block_num = entry.block_num;
@@ -151,9 +164,14 @@ public:
 
    /** Return whether an explicit snapshot download passes file and scheduled-serving policy. */
    bool is_servable_snapshot(const snapshot_entry& entry) const {
-      return is_snapshot_file_available(entry)
+      if (!is_snapshot_file_available(entry)) {
+         return false;
+      }
+      const auto config = read_snapshot_attestation_config();
+      return config
              && snapshot_api::is_snapshot_servable(
-                entry.block_num, entry,
+                entry.block_num,
+                snapshot_api::explicit_snapshot_download_block_spacing(*config), entry,
                 [this](const snapshot_entry& snapshot) { return is_attested_snapshot(snapshot); });
    }
 
@@ -236,6 +254,14 @@ public:
     */
    snapshot_api::snapshot_discovery_result<snapshot_entry>
    get_latest(fc::microseconds max_response_time) const {
+      const auto config = read_snapshot_attestation_config();
+      if (!config) {
+         return {snapshot_api::snapshot_discovery_status::unavailable, std::nullopt};
+      }
+      if (!config->enabled()) {
+         return {snapshot_api::snapshot_discovery_status::not_found, std::nullopt};
+      }
+
       std::shared_ptr<const std::map<block_num_type, snapshot_entry>> catalog_snapshot;
       {
          std::lock_guard lock(catalog_mtx_);
@@ -249,11 +275,13 @@ public:
       const auto is_available = [](const snapshot_entry& snapshot) {
          return is_snapshot_file_available(snapshot);
       };
-      const auto is_servable_attestation = [this](const auto& catalog, const fc::variant& row) {
+      const auto block_spacing = config->block_spacing;
+      const auto is_servable_attestation = [this, block_spacing](const auto& catalog,
+                                                                const fc::variant& row) {
          const auto& chain = chain_plugin_.chain();
          return chain.fork_db_has_root()
                 && snapshot_api::is_servable_catalog_snapshot_attestation(
-                   catalog, row, chain.fork_db_root().block_num(),
+                   catalog, row, block_spacing, chain.fork_db_root().block_num(),
                    [](const snapshot_entry& snapshot) {
                       return is_snapshot_file_available(snapshot);
                    });
@@ -270,8 +298,8 @@ public:
          return fc::time_point::now() >= discovery_deadline;
       };
       return snapshot_api::discover_latest_servable_scheduled_snapshot(
-         catalog_snapshot, is_available, is_servable_attestation, read_page,
-         deadline_reached);
+         catalog_snapshot, block_spacing, is_available, is_servable_attestation,
+         read_page, deadline_reached);
    }
 
    /** Return an explicit catalog entry without applying the separate download policy. */

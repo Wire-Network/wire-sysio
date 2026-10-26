@@ -10,6 +10,8 @@ target_link_libraries( test_chain_plugin chain_plugin sysio_testing sysio_chain_
 target_include_directories(test_chain_plugin PRIVATE
         ${CMAKE_SOURCE_DIR}/unittests
         ${CMAKE_BINARY_DIR}/unittests/include)
+find_program(WIRE_TEST_NODE node REQUIRED)
 boost_test_discover_tests(test_chain_plugin
         NAME test_chain_plugin_@UNIT@
+        COMMAND_PREFIX ${WIRE_TEST_NODE} ${CMAKE_SOURCE_DIR}/tests/run_with_bind_config.cjs
         ARGS --report_level=detailed --color_output)

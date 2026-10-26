@@ -5,10 +5,14 @@
 #include <boost/beast/http.hpp>
 #include <boost/program_options.hpp>
 #include <boost/test/unit_test.hpp>
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <iterator>
 #include <limits>
+#include <mutex>
+#include <sstream>
+#include <stdexcept>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/app.hpp>
 #include <sysio/chain/config.hpp>
@@ -41,6 +45,7 @@ constexpr auto snapshot_without_attestation_table_filename =
    "snapshot-without-attestation-table.bin";
 constexpr auto valid_snapshot_filename = "snapshot-with-valid-attestation.bin";
 constexpr auto unconfigured_snapshot_filename = "snapshot-without-enabled-attestation.bin";
+constexpr auto unscheduled_snapshot_filename = "snapshot-at-unscheduled-height.bin";
 constexpr auto snapshot_metadata_path = "/v1/snapshot/latest";
 constexpr auto snapshot_by_block_path = "/v1/snapshot/by_block";
 constexpr auto snapshot_download_path = "/v1/snapshot/download";
@@ -67,7 +72,28 @@ constexpr uint32_t snapshot_source_block_count = 3;
 constexpr uint32_t snapshot_block_log_extension_block_count = 3;
 constexpr uint32_t attestation_finality_block_count = 24;
 constexpr uint32_t snapshot_endpoint_response_count = 2;
-constexpr uint16_t ephemeral_port = 0;
+
+/** Consume one registry-owned port held for this CTest process. */
+uint16_t next_test_port() {
+   static std::mutex mutex;
+   static std::istringstream ports([] {
+      const auto* value = std::getenv("WIRE_TEST_PORTS");
+      return value ? std::string(value) : std::string{};
+   }());
+   std::lock_guard lock(mutex);
+   unsigned port = 0;
+   if (!(ports >> port) || port == 0 || port > std::numeric_limits<uint16_t>::max()) {
+      throw std::runtime_error(
+         "Run chain-plugin tests through tests/run_with_bind_config.cjs "
+         "(WIRE_TEST_PORTS exhausted)");
+   }
+   return static_cast<uint16_t>(port);
+}
+
+/** Return an unused loopback URL whose port remains reserved by BindConfigProvider. */
+std::string unused_test_url() {
+   return loopback_url_prefix + std::to_string(next_test_port());
+}
 
 /** Serve one snapshot endpoint metadata response and its binary download on loopback. */
 class snapshot_endpoint_server {
@@ -80,7 +106,7 @@ public:
               (snapshot_root_hash_field, root_hash.str()),
            fc::time_point::maximum()))
       , snapshot_body(read_snapshot(snapshot_path))
-      , acceptor(io, tcp::endpoint(boost::asio::ip::make_address(loopback_address), ephemeral_port))
+      , acceptor(io, tcp::endpoint(boost::asio::ip::make_address(loopback_address), next_test_port()))
       , port(acceptor.local_endpoint().port())
       , worker([this] { serve(); }) {}
 
@@ -165,7 +191,7 @@ private:
    boost::asio::io_context io;
    /// Loopback listener retained until teardown.
    tcp::acceptor acceptor;
-   /// Ephemeral port assigned by the operating system.
+   /// Registry-owned port retained by BindConfigProvider for this test process.
    uint16_t port;
    /// Worker serving the bounded request sequence.
    std::thread worker;
@@ -219,6 +245,7 @@ sysio::chain::abi_def make_snapshot_attestation_abi() {
       "",
       std::vector<sysio::chain::field_def>{
          {snapshot_attest::field::min_providers, snapshot_attest::abi_type::uint32},
+         {snapshot_attest::field::block_spacing, snapshot_attest::abi_type::uint32},
       });
    return abi;
 }
@@ -230,10 +257,11 @@ sysio::chain::exit_code::exit_code initialize_with_snapshot_size_limit(std::stri
    sysio::chain::application exe({.enable_resource_monitor = false});
 
    const auto tmp_path = tmp.path().string();
+   const auto endpoint_url = unused_test_url();
    std::vector<std::string> arguments{
       chain_plugin_test_program_name,
       "--snapshot-endpoint",
-      "http://127.0.0.1:1",
+      endpoint_url,
       config_dir_option_name,
       tmp_path,
       data_dir_option_name,
@@ -402,16 +430,99 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_required_schema_policy) {
    auto wrong_config_field = valid_abi;
    wrong_config_field.structs.back().fields.front().type = snapshot_attest::abi_type::uint64;
    BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(wrong_config_field));
+
+   auto missing_config_field = valid_abi;
+   missing_config_field.structs.back().fields.pop_back();
+   BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(missing_config_field));
+
+   auto reordered_config_fields = valid_abi;
+   std::swap(reordered_config_fields.structs.back().fields[0],
+             reordered_config_fields.structs.back().fields[1]);
+   BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(reordered_config_fields));
+
+   auto extended_config = valid_abi;
+   extended_config.structs.back().fields.push_back(
+      {"future_extension", snapshot_attest::abi_type::uint64});
+   BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(extended_config));
 }
 
-/** Recognize only one decoded snapconfig row with a positive fixed K. */
-BOOST_AUTO_TEST_CASE(snapshot_attestation_enabled_config_policy) {
-   BOOST_CHECK(sysio::snapshot_attestation_config_is_enabled(
-      {fc::mutable_variant_object()(snapshot_attest::field::min_providers, 1)}));
-   BOOST_CHECK(!sysio::snapshot_attestation_config_is_enabled({}));
-   BOOST_CHECK(!sysio::snapshot_attestation_config_is_enabled(
-      {fc::mutable_variant_object()(snapshot_attest::field::min_providers, 0)}));
-   BOOST_CHECK(!sysio::snapshot_attestation_config_is_enabled({fc::variant{"malformed"}}));
+/** Decode exact two-field governance state while preserving a valid empty-table default. */
+BOOST_AUTO_TEST_CASE(snapshot_attestation_config_decode_policy) {
+   const auto row = [](uint64_t min_providers, uint64_t block_spacing) {
+      return fc::mutable_variant_object()
+         (snapshot_attest::field::min_providers, min_providers)
+         (snapshot_attest::field::block_spacing, block_spacing);
+   };
+
+   const auto enabled = sysio::decode_snapshot_attestation_config(
+      {row(1, snapshot_attest::minimum_block_spacing)});
+   BOOST_REQUIRE(enabled);
+   BOOST_CHECK(enabled->enabled());
+   BOOST_CHECK_EQUAL(enabled->min_providers, 1u);
+   BOOST_CHECK_EQUAL(enabled->block_spacing, snapshot_attest::minimum_block_spacing);
+
+   const auto empty = sysio::decode_snapshot_attestation_config({});
+   BOOST_REQUIRE(empty);
+   BOOST_CHECK(!empty->enabled());
+   BOOST_CHECK_EQUAL(empty->block_spacing, snapshot_attest::default_block_spacing);
+
+   const auto disabled = sysio::decode_snapshot_attestation_config(
+      {row(0, snapshot_attest::maximum_block_spacing)});
+   BOOST_REQUIRE(disabled);
+   BOOST_CHECK(!disabled->enabled());
+   BOOST_CHECK_EQUAL(disabled->block_spacing, snapshot_attest::maximum_block_spacing);
+
+   BOOST_CHECK(sysio::decode_snapshot_attestation_config(
+      {row(sysiosystem::snapshot_attestation::maximum_providers,
+           snapshot_attest::maximum_block_spacing)}));
+   BOOST_CHECK(!sysio::decode_snapshot_attestation_config(
+      {row(sysiosystem::snapshot_attestation::maximum_providers + 1,
+           snapshot_attest::minimum_block_spacing)}));
+   BOOST_CHECK(!sysio::decode_snapshot_attestation_config(
+      {row(1, snapshot_attest::minimum_block_spacing - 1)}));
+   BOOST_CHECK(!sysio::decode_snapshot_attestation_config(
+      {row(1, static_cast<uint64_t>(snapshot_attest::maximum_block_spacing) + 1)}));
+   BOOST_CHECK(!sysio::decode_snapshot_attestation_config({fc::variant{"malformed"}}));
+   BOOST_CHECK(!sysio::decode_snapshot_attestation_config(
+      {fc::mutable_variant_object()
+          (snapshot_attest::field::min_providers, uint64_t{1})}));
+   BOOST_CHECK(!sysio::decode_snapshot_attestation_config(
+      {fc::mutable_variant_object()
+          (snapshot_attest::field::min_providers, uint64_t{1})
+          (snapshot_attest::field::block_spacing,
+           uint64_t{snapshot_attest::minimum_block_spacing})
+          ("extra", uint64_t{0})}));
+   BOOST_CHECK(!sysio::decode_snapshot_attestation_config(
+      {fc::mutable_variant_object()
+          (snapshot_attest::field::min_providers, "1")
+          (snapshot_attest::field::block_spacing,
+           uint64_t{snapshot_attest::minimum_block_spacing})}));
+   BOOST_CHECK(!sysio::decode_snapshot_attestation_config(
+      {row(1, snapshot_attest::minimum_block_spacing),
+       row(1, snapshot_attest::minimum_block_spacing)}));
+}
+
+/** The configured half-cadence grace is exclusive and remains safe near uint32 overflow. */
+BOOST_AUTO_TEST_CASE(snapshot_attestation_grace_boundary_policy) {
+   constexpr uint32_t snapshot_height = 1'000;
+   constexpr uint32_t even_spacing = 10;
+   constexpr uint32_t odd_spacing = 5;
+
+   BOOST_CHECK(sysio::snapshot_attestation_within_grace(
+      snapshot_height, snapshot_height + even_spacing / 2 - 1, even_spacing));
+   BOOST_CHECK(!sysio::snapshot_attestation_within_grace(
+      snapshot_height, snapshot_height + even_spacing / 2, even_spacing));
+
+   // Odd cadences deliberately use floor(S / 2).
+   BOOST_CHECK(sysio::snapshot_attestation_within_grace(
+      snapshot_height, snapshot_height + odd_spacing / 2 - 1, odd_spacing));
+   BOOST_CHECK(!sysio::snapshot_attestation_within_grace(
+      snapshot_height, snapshot_height + odd_spacing / 2, odd_spacing));
+
+   constexpr uint32_t near_max_height = std::numeric_limits<uint32_t>::max() - 1;
+   BOOST_CHECK(sysio::snapshot_attestation_within_grace(
+      near_max_height, std::numeric_limits<uint32_t>::max(),
+      snapshot_attest::minimum_block_spacing));
 }
 
 /** Match both the loaded block id and root hash against the attested tuple. */
@@ -431,15 +542,21 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_record_tuple_policy) {
 
 /** Require endpoint metadata to identify the loaded scheduled snapshot head exactly. */
 BOOST_AUTO_TEST_CASE(snapshot_endpoint_block_identity_policy) {
-   constexpr uint32_t scheduled_block = snapshot_attest::block_spacing;
-   constexpr uint32_t other_scheduled_block = snapshot_attest::block_spacing * 2;
+   constexpr uint32_t block_spacing = snapshot_attest::minimum_block_spacing;
+   constexpr uint32_t scheduled_block = block_spacing * 2;
+   constexpr uint32_t other_scheduled_block = block_spacing * 3;
    constexpr uint32_t unscheduled_block = scheduled_block + 1;
    constexpr uint64_t first_unsupported_block =
       static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1;
 
-   BOOST_CHECK(sysio::snapshot_endpoint_block_matches(scheduled_block, scheduled_block));
-   BOOST_CHECK(!sysio::snapshot_endpoint_block_matches(scheduled_block, other_scheduled_block));
-   BOOST_CHECK(!sysio::snapshot_endpoint_block_matches(unscheduled_block, unscheduled_block));
+   BOOST_CHECK(sysio::snapshot_endpoint_block_matches(
+      scheduled_block, scheduled_block, block_spacing));
+   BOOST_CHECK(!sysio::snapshot_endpoint_block_matches(
+      scheduled_block, other_scheduled_block, block_spacing));
+   BOOST_CHECK(!sysio::snapshot_endpoint_block_matches(
+      unscheduled_block, unscheduled_block, block_spacing));
+   BOOST_CHECK(!sysio::snapshot_endpoint_block_matches(
+      scheduled_block, scheduled_block, snapshot_attest::minimum_block_spacing - 1));
    BOOST_CHECK(sysio::snapshot_endpoint_request_matches(std::nullopt, scheduled_block));
    BOOST_CHECK(sysio::snapshot_endpoint_request_matches(
       std::optional<uint32_t>{scheduled_block}, scheduled_block));
@@ -476,12 +593,13 @@ BOOST_AUTO_TEST_CASE(get_info_consumer_plugin_policy) {
 BOOST_FIXTURE_TEST_CASE(
    chain_plugin_accepts_attested_auto_fetched_snapshot,
    snapshot_attest_test_support::snapshot_attest_fixture) {
-   set_snap_config(snapshot_attest_test_support::single_provider_minimum);
+   set_snap_config(snapshot_attest_test_support::single_provider_minimum,
+                   snapshot_attest_test_support::test_block_spacing);
    control->abort_block();
 
    const auto snapshot_block_num = control->head().block_num();
    const auto snapshot_block_id = control->head().id();
-   BOOST_REQUIRE_EQUAL(snapshot_block_num, snapshot_attest::block_spacing);
+   BOOST_REQUIRE_EQUAL(snapshot_block_num, snapshot_attest_test_support::test_block_spacing);
 
    fc::temp_directory snapshot_dir;
    const auto snapshot_path = snapshot_dir.path() / valid_snapshot_filename;
@@ -536,7 +654,7 @@ BOOST_FIXTURE_TEST_CASE(
    control->abort_block();
 
    const auto snapshot_block_num = control->head().block_num();
-   BOOST_REQUIRE_EQUAL(snapshot_block_num, snapshot_attest::block_spacing);
+   BOOST_REQUIRE_EQUAL(snapshot_block_num, snapshot_attest_test_support::test_block_spacing);
 
    fc::temp_directory snapshot_dir;
    const auto snapshot_path = snapshot_dir.path() / unconfigured_snapshot_filename;
@@ -571,6 +689,53 @@ BOOST_FIXTURE_TEST_CASE(
          const auto detail = error.to_detail_string();
          return detail.find(unconfigured_attestation_error_fragment) != std::string::npos
                 && detail.find(delete_loaded_chain_state_error_fragment) != std::string::npos;
+      });
+}
+
+/** Reject endpoint metadata whose loaded head is outside the cadence stored in that snapshot. */
+BOOST_FIXTURE_TEST_CASE(
+   chain_plugin_rejects_auto_fetched_snapshot_at_unscheduled_height,
+   snapshot_attest_test_support::snapshot_attest_fixture) {
+   set_snap_config(snapshot_attest_test_support::single_provider_minimum,
+                   snapshot_attest_test_support::test_block_spacing);
+   produce_block();
+   control->abort_block();
+
+   const auto snapshot_block_num = control->head().block_num();
+   BOOST_REQUIRE_EQUAL(snapshot_block_num,
+                       snapshot_attest_test_support::test_block_spacing + 1);
+
+   fc::temp_directory snapshot_dir;
+   const auto snapshot_path = snapshot_dir.path() / unscheduled_snapshot_filename;
+   const auto snapshot_root_hash = write_chain_plugin_snapshot(*control, snapshot_path);
+   extend_block_log_past_snapshot(*this);
+   const auto source_blocks_path = get_config().blocks_dir.string();
+   validate_and_close();
+
+   snapshot_endpoint_server endpoint(snapshot_block_num, snapshot_root_hash, snapshot_path);
+   fc::temp_directory node_dir;
+   sysio::chain::application exe({.enable_resource_monitor = false});
+   const auto node_path = node_dir.path().string();
+   const auto endpoint_url = endpoint.url();
+   std::array args{
+      chain_plugin_test_program_name,
+      snapshot_endpoint_option_name,
+      endpoint_url.c_str(),
+      blocks_dir_option_name,
+      source_blocks_path.c_str(),
+      config_dir_option_name,
+      node_path.c_str(),
+      data_dir_option_name,
+      node_path.c_str(),
+   };
+
+   BOOST_REQUIRE(exe.init<sysio::chain_plugin>(args.size(), const_cast<char**>(args.data()))
+                 == sysio::chain::exit_code::SUCCESS);
+   auto& plugin = appbase::app().get_plugin<sysio::chain_plugin>();
+   BOOST_CHECK_EXCEPTION(
+      plugin.plugin_startup(), sysio::chain::plugin_config_exception,
+      [](const sysio::chain::plugin_config_exception& error) {
+         return error.to_detail_string().find("unscheduled block") != std::string::npos;
       });
 }
 
@@ -642,9 +807,10 @@ BOOST_AUTO_TEST_CASE(chain_plugin_snapshot_endpoint_option_registration) {
    plugin.set_program_options(cli, cfg);
    options.add(cli).add(cfg);
 
+   const auto endpoint_url = unused_test_url();
    std::array arguments{
       chain_plugin_test_program_name,
-      "--snapshot-endpoint", "http://127.0.0.1:1",
+      "--snapshot-endpoint", endpoint_url.c_str(),
    };
    boost::program_options::variables_map variables;
    boost::program_options::store(
@@ -652,7 +818,7 @@ BOOST_AUTO_TEST_CASE(chain_plugin_snapshot_endpoint_option_registration) {
       variables);
    boost::program_options::notify(variables);
 
-   BOOST_CHECK_EQUAL(variables.at("snapshot-endpoint").as<std::string>(), "http://127.0.0.1:1");
+   BOOST_CHECK_EQUAL(variables.at("snapshot-endpoint").as<std::string>(), endpoint_url);
    BOOST_CHECK(options.find_nothrow("snapshot-endpoint-additional-ca-file", false) != nullptr);
    BOOST_CHECK(options.find_nothrow("snapshot-endpoint-additional-ca-path", false) != nullptr);
    BOOST_CHECK(options.find_nothrow("snapshot-endpoint-proxy", false) != nullptr);
@@ -709,11 +875,12 @@ BOOST_AUTO_TEST_CASE(outbound_http_global_option_registration) {
       "status monitor");
    options.add(global).add(ethereum).add(solana).add(debugging).add(signing).add(snapshot).add(status_monitor);
 
+   const auto proxy_url = unused_test_url();
    std::array arguments{
       chain_plugin_test_program_name,
       "--outbound-http-additional-ca-file", "/tmp/wire-global-ca.pem",
       "--outbound-http-additional-ca-path", "/tmp/wire-global-ca",
-      "--outbound-http-proxy", "http://127.0.0.1:3128",
+      "--outbound-http-proxy", proxy_url.c_str(),
       "--outpost-solana-additional-ca-file", "/tmp/wire-solana-ca.pem",
    };
    bpo::variables_map variables;
@@ -730,7 +897,7 @@ BOOST_AUTO_TEST_CASE(outbound_http_global_option_registration) {
       std::filesystem::path("/tmp/wire-global-ca"));
    BOOST_CHECK_EQUAL(
       variables.at("outbound-http-proxy").as<std::string>(),
-      "http://127.0.0.1:3128");
+      proxy_url);
 
    const auto solana_options =
       sysio::outbound_http::read_transport_options(
@@ -741,7 +908,7 @@ BOOST_AUTO_TEST_CASE(outbound_http_global_option_registration) {
    BOOST_REQUIRE(solana_options.additional_ca_path);
    BOOST_CHECK_EQUAL(*solana_options.additional_ca_path, std::filesystem::path("/tmp/wire-global-ca"));
    BOOST_REQUIRE(solana_options.proxy);
-   BOOST_CHECK_EQUAL(*solana_options.proxy, "http://127.0.0.1:3128");
+   BOOST_CHECK_EQUAL(*solana_options.proxy, proxy_url);
 }
 
 /** Verify that the snapshot response-size limit rejects zero and overflow before connecting. */
