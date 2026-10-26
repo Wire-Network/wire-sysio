@@ -11,7 +11,6 @@
 #include <iterator>
 #include <limits>
 #include <mutex>
-#include <sstream>
 #include <stdexcept>
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/app.hpp>
@@ -26,6 +25,7 @@
 #include <stdint.h>
 #include <string>
 #include <string_view>
+#include <test_ports.hpp>
 #include <thread>
 #include <vector>
 
@@ -73,24 +73,15 @@ constexpr uint32_t snapshot_block_log_extension_block_count = 3;
 constexpr uint32_t attestation_finality_block_count = 24;
 constexpr uint32_t snapshot_endpoint_response_count = 2;
 
-/** Consume one registry-owned port held for this CTest process. */
+/** Consume one node-HTTP port from this CTest process's registry lease. */
 uint16_t next_test_port() {
    static std::mutex mutex;
-   static std::istringstream ports([] {
-      const auto* value = std::getenv("WIRE_TEST_PORTS");
-      return value ? std::string(value) : std::string{};
-   }());
+   static uint32_t port_index = 0;
    std::lock_guard lock(mutex);
-   unsigned port = 0;
-   if (!(ports >> port) || port == 0 || port > std::numeric_limits<uint16_t>::max()) {
-      throw std::runtime_error(
-         "Run chain-plugin tests through tests/run_with_bind_config.cjs "
-         "(WIRE_TEST_PORTS exhausted)");
-   }
-   return static_cast<uint16_t>(port);
+   return sysio::testing::get_port(sysio::testing::port_category::node_http, port_index++);
 }
 
-/** Return an unused loopback URL whose port remains reserved by BindConfigProvider. */
+/** Return an unused loopback URL whose port remains reserved by this process's registry lease. */
 std::string unused_test_url() {
    return loopback_url_prefix + std::to_string(next_test_port());
 }
@@ -191,7 +182,7 @@ private:
    boost::asio::io_context io;
    /// Loopback listener retained until teardown.
    tcp::acceptor acceptor;
-   /// Registry-owned port retained by BindConfigProvider for this test process.
+   /// Port retained by this test process's registry lease.
    uint16_t port;
    /// Worker serving the bounded request sequence.
    std::thread worker;

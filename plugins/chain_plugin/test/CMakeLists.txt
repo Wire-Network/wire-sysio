@@ -9,9 +9,9 @@ add_executable( test_chain_plugin
 target_link_libraries( test_chain_plugin chain_plugin sysio_testing sysio_chain_wrap version )
 target_include_directories(test_chain_plugin PRIVATE
         ${CMAKE_SOURCE_DIR}/unittests
+        ${CMAKE_SOURCE_DIR}/tests
         ${CMAKE_BINARY_DIR}/unittests/include)
-find_program(WIRE_TEST_NODE node REQUIRED)
 boost_test_discover_tests(test_chain_plugin
         NAME test_chain_plugin_@UNIT@
-        COMMAND_PREFIX ${WIRE_TEST_NODE} ${CMAKE_SOURCE_DIR}/tests/run_with_bind_config.cjs
+        COMMAND_PREFIX "${SYSIO_TEST_PYTHON}" "${SYSIO_TEST_PORT_LEASE_WRAPPER}"
         ARGS --report_level=detailed --color_output)

@@ -3,28 +3,20 @@
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 #include <atomic>
-#include <cstdlib>
 #include <mutex>
 #include <memory>
-#include <sstream>
-#include <stdexcept>
+#include <test_ports.hpp>
 #include <thread>
 #include <vector>
 
 namespace startup_test {
 
-/** Consume ports held by tests/run_with_bind_config.cjs for this test process. */
+/** Consume one node-HTTP port from this test process's registry lease. */
 inline uint16_t next_port() {
    static std::mutex mutex;
-   static std::istringstream ports([] {
-      const auto* value = std::getenv("WIRE_TEST_PORTS");
-      return value ? std::string(value) : std::string{};
-   }());
+   static uint32_t port_index = 0;
    std::lock_guard lock(mutex);
-   unsigned port;
-   if (!(ports >> port) || port == 0 || port > UINT16_MAX)
-      throw std::runtime_error("Run Ethereum tests through tests/run_with_bind_config.cjs (WIRE_TEST_PORTS exhausted)");
-   return static_cast<uint16_t>(port);
+   return sysio::testing::get_port(sysio::testing::port_category::node_http, port_index++);
 }
 
 /** Return an unused, registry-owned endpoint, including for refusal and fake-client fixtures. */

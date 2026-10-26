@@ -324,10 +324,10 @@ The suite is registered as one CTest case per Boost test case, so a single area 
 ctest --test-dir build/debug -R '^test_chain_plugin_get_info_consumer_plugin_policy$' --output-on-failure
 ```
 
-CTest runs this binary through `tests/run_with_bind_config.cjs`, which supplies the `WIRE_TEST_PORTS`
-reservation required by tests that bind sockets. The wrapper requires Node and the version-pinned
-`@wireio/cluster-tool` development dependency; a built companion may be selected explicitly with
-`WIRE_TOOLS_TS_ROOT`. For direct filtered runs, invoke that wrapper before the binary and Boost arguments.
+CTest runs this binary through the build tree's `tests/bind_registry.py`, which supplies the
+`SYSIO_TEST_PORTS` lease required by tests that bind sockets. The wrapper uses Python's standard library and
+the host-wide WIRE bind-registry protocol. For direct filtered runs, invoke that wrapper before the binary
+and Boost arguments.
 
 It covers the snapshot attestation policies (configuration preflight, required schemas, record tuple, block
 identity, table-read failure, timeout, and retry), snapshot-endpoint option registration and validation,

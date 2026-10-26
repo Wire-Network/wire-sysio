@@ -116,8 +116,8 @@ ctest --test-dir build/debug \
   --output-on-failure
 ```
 
-CTest supplies the test's required `WIRE_TEST_PORTS` reservation through
-`tests/run_with_bind_config.cjs`; see the `chain_plugin` test documentation for direct filtered runs.
+CTest supplies the test's required `SYSIO_TEST_PORTS` lease through the build tree's
+`tests/bind_registry.py`; see the `chain_plugin` test documentation for direct filtered runs.
 
 ## Related plugins
 
