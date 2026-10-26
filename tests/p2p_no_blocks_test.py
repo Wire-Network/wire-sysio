@@ -56,10 +56,13 @@ try:
     # 02 & 03 are connected to the bios node to get blocks until bios node is killed.
     #
     specificExtraNodeopArgs = {}
+    # Explicit, because waitForBool raises instead of returning False at its 60 s default.
+    waitTimeoutSeconds = 30
+    syncTimeoutSeconds = 120  # Catching up from bios; generous for a loaded host.
     trxOnlyPort02 = Utils.getPort(Utils.PortTransactionOnly)
     trxOnlyPort03 = Utils.getPort(Utils.PortTransactionOnly, 1)
     # nonProdNode01 will connect normally but will not send blocks because 02 & 03 have specified :trx only
-    specificExtraNodeopArgs[1] = f'--p2p-peer-address localhost:{trxOnlyPort02} --p2p-peer-address localhost:{trxOnlyPort03} '
+    specificExtraNodeopArgs[1] = '--plugin sysio::net_api_plugin '
     # add a trx only listen endpoint to noBlocks02 & noBlocks03
     specificExtraNodeopArgs[2] =  f'--p2p-peer-address {cluster.getBiosP2pEndpoint()} --read-mode speculative ' # connect to bios
     specificExtraNodeopArgs[2] += f'--p2p-listen-endpoint {cluster.getNodeP2pEndpoint(2)} --p2p-server-address {cluster.getNodeP2pEndpoint(2)} '
@@ -84,11 +87,21 @@ try:
     assert noBlocks02.verifyAlive(), "node 02 did not launch"
     assert noBlocks03.verifyAlive(), "node 03 did not launch"
 
+    # Dial only after the receivers listen: a connect sent earlier can hang until the OS TCP timeout.
+    for port in (trxOnlyPort02, trxOnlyPort03):
+        endpoint = f'localhost:{port}'
+        nonProdNode01.processUrllibRequest('net', 'connect', endpoint, exitOnError=True)
+        assert Utils.waitForBool(lambda: any(
+            conn['is_socket_open'] and conn['is_transactions_only'] and
+            conn['last_handshake']['p2p_address'].split()[0] == endpoint + ':trx'
+            for conn in nonProdNode01.processUrllibRequest('net', 'connections')['payload']
+        ), timeout=waitTimeoutSeconds), f'Transaction-only peer {endpoint} did not complete its handshake'
+
     headBlockNum = nonProdNode01.getHeadBlockNum()
 
     Print("Sync from bios")
-    assert noBlocks02.waitForBlock(headBlockNum), "node02 did not sync from bios"
-    assert noBlocks03.waitForBlock(headBlockNum), "node03 did not sync from bios"
+    assert noBlocks02.waitForBlock(headBlockNum, timeout=syncTimeoutSeconds), "node02 did not sync from bios"
+    assert noBlocks03.waitForBlock(headBlockNum, timeout=syncTimeoutSeconds), "node03 did not sync from bios"
 
     # create transfer transaction now so it has a valid TAPOS
     sysioBalanceBefore = nonProdNode01.getAccountSysBalance("sysio")
@@ -100,8 +113,8 @@ try:
     # Make sure node2 and node3 have trx reference block before killing bios node otherwise the trx will fail
     # because the reference block is not available.
     headBlockNum = nonProdNode01.getHeadBlockNum()
-    assert noBlocks02.waitForBlock(headBlockNum), "node02 did not get block before bios shutdown"
-    assert noBlocks03.waitForBlock(headBlockNum), "node03 did not get block before bios shutdown"
+    assert noBlocks02.waitForBlock(headBlockNum, timeout=syncTimeoutSeconds), "node02 did not get block before bios shutdown"
+    assert noBlocks03.waitForBlock(headBlockNum, timeout=syncTimeoutSeconds), "node03 did not get block before bios shutdown"
 
     Print("Killing bios node")
     cluster.biosNode.kill(signal.SIGTERM)
@@ -112,14 +125,18 @@ try:
     Print("Verify head no longer advancing after bios killed")
     assert not noBlocks02.waitForHeadToAdvance(), "head advanced on node02 unexpectedly"
     assert not noBlocks03.waitForHeadToAdvance(), "head advanced on node03 unexpectedly"
+    frozenHead02 = noBlocks02.getHeadBlockNum()
+    frozenHead03 = noBlocks03.getHeadBlockNum()
 
     Print("Send transfer trx")
     cmdDesc = "push transaction --skip-sign"
     cmd     = "%s '%s'" % (cmdDesc, json.dumps(trx))
     trans = nonProdNode01.processClioCmd(cmd, cmdDesc, silentErrors=False, exitOnError=True)
 
-    # can't wait for transaction in block, so just sleep
-    time.sleep(0.5)
+    # 02 and 03 lost their only block source with bios, so the transfer can only show up speculatively on 02.
+    assert Utils.waitForBool(lambda: noBlocks02.getAccountSysBalance("sysio") == sysioBalanceBefore - 500000,
+                             timeout=waitTimeoutSeconds), \
+        "Transaction-only peer did not execute the forwarded transfer"
 
     sysioBalanceNode02 = noBlocks02.getAccountSysBalance("sysio")
     defprodueraBalanceNode02 = noBlocks02.getAccountSysBalance("defproducera")
@@ -131,6 +148,8 @@ try:
 
     assert sysioBalanceBefore == sysioBalanceNode03, f"{sysioBalanceBefore} != {sysioBalanceNode03}"
     assert defprodueraBalanceBefore == defprodueraBalanceNode03, f"{defprodueraBalanceBefore} != {defprodueraBalanceNode03}"
+    assert noBlocks02.getHeadBlockNum() == frozenHead02, "node02 received a block after bios, its only block source, was killed"
+    assert noBlocks03.getHeadBlockNum() == frozenHead03, "node03 received a block after bios, its only block source, was killed"
 
     cluster.biosNode.relaunch()
 

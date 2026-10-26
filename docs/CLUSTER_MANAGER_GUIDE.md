@@ -132,8 +132,17 @@ Start a previously created cluster in the foreground. All node stderr logs are s
 - Adds `--enable-stale-production` so producers resume even if the chain timestamp is in the past.
 - Writes a `.pid` file to enforce singleton (only one `run` per chain-dir).
 - Press **Ctrl+C** to gracefully shut down all nodes (SIGTERM).
+- Registers the cluster's ports in the host's bind registry for as long as it runs (see below).
 
 The `run` command does **not** require `--build-dir` since the cluster is already created and all paths are stored in the state file.
+
+#### Ports
+
+`create` takes the cluster's ports from a bind-registry lease (the same registry the integration tests and
+wire-tools-ts clusters use; see [test-ports.md](test-ports.md)) and saves them in `.cluster_state.json`. That
+lease ends when `create` exits. `run` registers exactly those ports again for its own lifetime, so no other test or
+cluster is handed them while the nodes run. If another live process took any of them in between, `run` stops with
+the conflicting ports: stop that process, or re-create the cluster.
 
 ---
 

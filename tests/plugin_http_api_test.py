@@ -18,11 +18,11 @@ from TestHarness import Account, Node, TestHelper, Utils, WalletMgr, ReturnType
 class HttpCategoryConfig:
     categories = ["chain_ro", "chain_rw", "db_size", "net_ro", "net_rw", "producer_ro",
                   "producer_rw", "snapshot", "trace_api", "prometheus", "test_control"]
-    default_port = int(TestHelper.DEFAULT_PORT)
     def __init__(self, use_category: bool):
+        self.default_port = int(TestHelper.DEFAULT_PORT)  # Read here, not in the class body: --help takes no lease.
         if use_category:
             self.ports = dict(zip(HttpCategoryConfig.categories, range(
-                HttpCategoryConfig.default_port, HttpCategoryConfig.default_port+len(HttpCategoryConfig.categories))))
+                self.default_port, self.default_port+len(HttpCategoryConfig.categories))))
         else:
             self.ports = None
 
@@ -36,24 +36,21 @@ class HttpCategoryConfig:
         clio_categories = ["chain_rw",
                             "producer_ro", "producer_rw", "trace_api"]
         args += list(map(
-            lambda item: f"--http-category-address {item},{TestHelper.LOCAL_HOST}:{HttpCategoryConfig.default_port}", clio_categories))
+            lambda item: f"--http-category-address {item},{TestHelper.LOCAL_HOST}:{self.default_port}", clio_categories))
 
         return " ".join(["--http-server-address http-category-address"] + args)
 
     def port(self, category: str):
-        return self.ports[category] if self.ports else HttpCategoryConfig.default_port
+        return self.ports[category] if self.ports else self.default_port
 
 
 class PluginHttpTest(unittest.TestCase):
     sleep_s = 2
-    base_wallet_cmd_str = f"http://{TestHelper.LOCAL_HOST}:{TestHelper.DEFAULT_WALLET_PORT}"
-    kiod = WalletMgr(True, TestHelper.DEFAULT_PORT, TestHelper.LOCAL_HOST, TestHelper.DEFAULT_WALLET_PORT, TestHelper.LOCAL_HOST)
     node_id = 1
     data_dir = Path(Utils.getNodeDataDir(node_id))
     config_dir = Path(Utils.getNodeConfigDir(node_id))
     empty_content_dict = {}
     http_post_invalid_param = '{invalid}'
-    p2p_peer_endpoint = f"localhost:{Utils.getPort(Utils.PortPluginHttpLocal)}"
     SYSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
     SYSIO_ACCT_PUBLIC_DEFAULT_KEY = "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
 
@@ -1564,6 +1561,11 @@ class PluginHttpTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
+        # Port-bearing attributes are set here, not in the class body: --help takes no lease.
+        self.base_wallet_cmd_str = f"http://{TestHelper.LOCAL_HOST}:{TestHelper.DEFAULT_WALLET_PORT}"
+        self.kiod = WalletMgr(True, TestHelper.DEFAULT_PORT, TestHelper.LOCAL_HOST, TestHelper.DEFAULT_WALLET_PORT,
+                              TestHelper.LOCAL_HOST)
+        self.p2p_peer_endpoint = f"localhost:{Utils.getPort(Utils.PortPluginHttpLocal)}"
         self.cleanEnv(self)
         self.startEnv(self)
 
@@ -1574,13 +1576,13 @@ class PluginHttpTest(unittest.TestCase):
 
 if __name__ == "__main__":
     test_category = True if os.environ.get("PLUGIN_HTTP_TEST_CATEGORY") == "ON" else False
-    category_config = HttpCategoryConfig(test_category)
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--keep-logs', action='store_true')
     parser.add_argument('unittest_args', nargs=argparse.REMAINDER)
 
     args = parser.parse_args()
+    category_config = HttpCategoryConfig(test_category)
     keepLogs = args.keep_logs
 
     # Now set the sys.argv to the unittest_args (leaving sys.argv[0] alone)
