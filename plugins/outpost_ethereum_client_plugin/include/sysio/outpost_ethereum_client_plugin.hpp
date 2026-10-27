@@ -23,14 +23,17 @@ using namespace fc::network::ethereum;
 struct ethereum_transaction_fees {
    fc::uint256 max_priority_fee_per_gas;
    fc::uint256 max_fee_per_gas;
+
+   bool operator==(const ethereum_transaction_fees&) const = default;
 };
 
 /// What a journaled transaction is for.
 enum class submission_purpose {
    /// `OPPInbound.epochIn` for the submission's epoch.
    epoch_in,
-   /// A zero-value transfer to the signer itself, sent to replace a pending transaction at a nonce this
-   /// process holds no record of, so the relay does not queue behind something it cannot reprice.
+   /// A zero-value transfer to the signer itself at a nonce this process holds no record of: it replaces a
+   /// pending transaction the relay cannot reprice, or fills a nonce nothing holds below one the relay
+   /// journaled, so the relay never queues behind something it cannot move.
    cancel
 };
 
@@ -49,6 +52,10 @@ struct submission_attempt {
    /// The hash, computed from the signed bytes before they were sent.
    std::string               tx_hash;
    ethereum_transaction_fees fees;
+   /// The signed bytes, sent again as they are whenever these fees are: a signer whose signatures are not
+   /// deterministic (AWS KMS) would give the same call at the same fees another hash, which a node holding
+   /// the first refuses as an underpriced replacement.
+   std::string               raw_hex;
 };
 
 /// One transaction this relay signed, kept from just before its first send until its nonce is used at the
@@ -61,21 +68,22 @@ struct ethereum_submission {
    /// The transaction as signed, without its signature: nonce, recipient, gas limit and calldata. The fees
    /// are each attempt's own.
    eip1559_tx         transaction;
-   /// Every signing that may have reached a node, oldest first, each hash once. A refused one is kept too,
-   /// since the node, or another behind the same endpoint, may hold it.
+   /// Every signing that may have reached a node, oldest first, each hash once and each fee pair signed
+   /// once. A refused one is kept too, since the node, or another behind the same endpoint, may hold it.
    std::vector<submission_attempt> attempts;
    submission_state                state = submission_state::pending;
    /// The block holding it while `state` is `landed`.
    std::optional<fc::uint256>      landed_at;
 };
 
-/// How long the relay waits on a pending transaction at a nonce it has no record of before cancelling it.
-/// A transaction priced to be included lands within a block or two; one still pending after five blocks is
-/// taken as stuck. Raising it delays recovery after a restart; lowering it cancels more transactions that
-/// would have landed on their own.
+/// How long the relay waits on a nonce it has no record of before cancelling it: a pending transaction
+/// there, or nothing below one the relay journaled. A transaction priced to be included lands within a block
+/// or two; one still pending after five blocks is taken as stuck. Raising it delays recovery after a restart;
+/// lowering it cancels more transactions that would have landed on their own.
 inline constexpr fc::microseconds default_unaccounted_nonce_grace = fc::seconds(60);
 
-/// A pending transaction at a nonce no submission accounts for, as the relay has seen it.
+/// A nonce no submission accounts for, as the relay has seen it: the node holds a pending transaction there,
+/// or nothing at all below a nonce the relay journaled.
 struct unaccounted_nonce_record {
    fc::uint256    nonce;
    /// When the relay first saw it; it is cancelled once `unaccounted_nonce_grace` has passed.
@@ -89,7 +97,7 @@ struct ethereum_submission_journal {
    std::mutex                       mutex;
    /// Ascending by nonce.
    std::vector<ethereum_submission> submissions;
-   /// The lowest pending nonce no submission accounts for.
+   /// The lowest nonce no submission accounts for.
    std::optional<unaccounted_nonce_record> unaccounted_nonce;
    /// See `default_unaccounted_nonce_grace`.
    fc::microseconds                 unaccounted_nonce_grace = default_unaccounted_nonce_grace;
@@ -416,7 +424,8 @@ struct opp_inbound_contract_client : ethereum_contract_client {
                         .transaction = tx,
                         .attempts    = {{.tx_hash = signed_tx.tx_hash,
                                          .fees    = {.max_priority_fee_per_gas = tx.max_priority_fee_per_gas,
-                                                     .max_fee_per_gas          = tx.max_fee_per_gas}}},
+                                                     .max_fee_per_gas          = tx.max_fee_per_gas},
+                                         .raw_hex = signed_tx.raw_hex}},
                         .state       = submission_state::pending,
                         .landed_at   = std::nullopt,
            };

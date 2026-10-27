@@ -672,7 +672,7 @@ BOOST_AUTO_TEST_CASE(a_submission_attempt_survives_every_send_outcome) {
    const auto send = [&](send_outcome outcome) {
       outcome_result result{.submission = {.transaction = exact_transaction()}};
       const auto signed_tx = client->sign_transaction(result.submission.transaction, "submit");
-      result.submission.attempts.push_back({.tx_hash = signed_tx.tx_hash, .fees = fees});
+      result.submission.attempts.push_back({.tx_hash = signed_tx.tx_hash, .fees = fees, .raw_hex = signed_tx.raw_hex});
       client->next_send_outcome = outcome;
       try {
          sysio::send_submission_attempt(*client, signed_tx, result.submission);
@@ -697,6 +697,8 @@ BOOST_AUTO_TEST_CASE(a_submission_attempt_survives_every_send_outcome) {
    auto misreported = send(send_outcome::misreported);
    BOOST_REQUIRE_EQUAL(misreported.submission.attempts.size(), 2u);
    BOOST_CHECK_EQUAL(misreported.submission.attempts.back().tx_hash, transaction_hash);
+   // The reported hash is watched for the same bytes.
+   BOOST_CHECK_EQUAL(misreported.submission.attempts.back().raw_hex, misreported.submission.attempts.front().raw_hex);
 
    // The same bytes sent again, and misreported again, record nothing new.
    const auto signed_tx = client->sign_transaction(misreported.submission.transaction, "submit");

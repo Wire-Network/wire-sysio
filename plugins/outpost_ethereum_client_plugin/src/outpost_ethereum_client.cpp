@@ -662,6 +662,13 @@ ethereum_transaction_fees highest_fees(const std::vector<submission_attempt>& at
    return highest;
 }
 
+const submission_attempt& highest_signing(const std::vector<submission_attempt>& attempts) {
+   FC_ASSERT(!attempts.empty(), "a submission without a signing has no highest one");
+   return *std::ranges::max_element(attempts, std::less{}, [](const submission_attempt& attempt) {
+      return std::tie(attempt.fees.max_fee_per_gas, attempt.fees.max_priority_fee_per_gas);
+   });
+}
+
 fee_caps transaction_fee_caps(const ethereum_transaction_policy& policy, const eip1559_tx& transaction) {
    fc::uint256 max_fee = policy.max_fee_per_gas;
    if (transaction.gas_limit > 0) {
@@ -709,7 +716,8 @@ std::optional<fc::uint256> first_unaccounted_nonce(const fc::uint256& latest, co
    fc::uint256 nonce = latest;
    for (const auto& submission : submissions) {
       if (submission.transaction.nonce < nonce) continue;
-      if (submission.transaction.nonce != nonce) break;
+      // A submission above `nonce` waits on it, whatever the node holds there.
+      if (submission.transaction.nonce != nonce) return nonce;
       ++nonce;
    }
    if (nonce < pending) return nonce;
@@ -730,7 +738,7 @@ std::string send_submission_attempt(ethereum_client& client, const signed_transa
       FC_ASSERT(signed_attempt != submission.attempts.end(), "the signing {} was sent before it was recorded",
                 signed_tx.tx_hash);
       const auto fees = signed_attempt->fees;
-      record_attempt(submission, {.tx_hash = reported, .fees = fees});
+      record_attempt(submission, {.tx_hash = reported, .fees = fees, .raw_hex = signed_tx.raw_hex});
    }
    return reported;
 }
@@ -920,14 +928,20 @@ void outpost_ethereum_client::refresh_submission(ethereum_submission& submission
 
 void outpost_ethereum_client::resubmit(ethereum_submission& submission, const ethereum_transaction_fees& fees,
                                        std::string_view why) {
-   const auto& client                   = _entry->client;
-   auto        transaction              = submission.transaction;
-   transaction.max_priority_fee_per_gas = fees.max_priority_fee_per_gas;
-   transaction.max_fee_per_gas          = fees.max_fee_per_gas;
-   const auto signed_tx = client->sign_transaction(transaction, magic_enum::enum_name(submission.purpose));
-   // Recorded before the send: a send whose response is lost may still have
-   // reached the node, and the next replacement must be priced against it.
-   record_attempt(submission, {.tx_hash = signed_tx.tx_hash, .fees = fees});
+   const auto&        client = _entry->client;
+   signed_transaction signed_tx;
+   if (const auto recorded = std::ranges::find(submission.attempts, fees, &submission_attempt::fees);
+       recorded != submission.attempts.end()) {
+      signed_tx = {.raw_hex = recorded->raw_hex, .tx_hash = recorded->tx_hash};
+   } else {
+      auto transaction                     = submission.transaction;
+      transaction.max_priority_fee_per_gas = fees.max_priority_fee_per_gas;
+      transaction.max_fee_per_gas          = fees.max_fee_per_gas;
+      signed_tx = client->sign_transaction(transaction, magic_enum::enum_name(submission.purpose));
+      // Recorded before the send: a send whose response is lost may still have
+      // reached the node, and the next replacement must be priced against it.
+      record_attempt(submission, {.tx_hash = signed_tx.tx_hash, .fees = fees, .raw_hex = signed_tx.raw_hex});
+   }
    try {
       send_submission_attempt(*client, signed_tx, submission);
       ilog("outpost_ethereum_client[{}]: {} {}: tx={} max_fee={} tip={}", to_string(), why,
@@ -957,8 +971,8 @@ std::optional<fc::uint256> outpost_ethereum_client::settle_submissions(fc::time_
       return true;
    });
 
-   // Where the journal stands against the head, and the lowest nonce the node
-   // holds a pending transaction at that no submission accounts for.
+   // Where the journal stands against the head, and the lowest nonce no
+   // submission accounts for.
    fc::uint256                pending_count;
    std::optional<fc::uint256> unaccounted;
    const auto                 observe = [&]() -> bool {
@@ -1001,30 +1015,38 @@ std::optional<fc::uint256> outpost_ethereum_client::settle_submissions(fc::time_
          }
          const auto step = detail::decide_in_flight(!held.empty(), detail::highest_fees(held), market);
          if (step == detail::in_flight_step::wait) continue;
-         // A replacement is priced against the signings the node holds: one it
-         // does not show need not be outbid, and bumping it may leave no fees
-         // within the caps. A re-send of a dropped call pays at least what was
-         // signed before.
-         const auto paid =
-            detail::highest_fees(step == detail::in_flight_step::replace ? held : submission.attempts);
-         const auto fees = detail::resend_fees(step, paid, market, caps);
-         if (!fees) {
-            wlog("outpost_ethereum_client[{}]: {} needs a {} the fee caps leave no room for (market max_fee={} "
-                 "tip={}); waiting for what holds its nonce",
-                 to_string(), describe_submission(submission), magic_enum::enum_name(step),
-                 market.max_fee_per_gas.str(), market.tip.str());
+         // Priced over every signing on record: one the node asked does not
+         // show may still be held by another node behind the endpoint.
+         if (const auto fees = detail::resend_fees(step, detail::highest_fees(submission.attempts), market, caps)) {
+            resubmit(submission, *fees, magic_enum::enum_name(step));
             continue;
          }
-         resubmit(submission, *fees, magic_enum::enum_name(step));
+         // No replacement fits the caps. The highest signing, sent again as it
+         // was, still replaces a lower one the node holds.
+         const auto highest = detail::highest_signing(submission.attempts);
+         const auto held_already = std::ranges::any_of(held, [&](const submission_attempt& attempt) {
+            return same_hex(attempt.tx_hash, highest.tx_hash);
+         });
+         if (!held_already) {
+            resubmit(submission, highest.fees, "re-sending the highest signing of");
+            continue;
+         }
+         wlog("outpost_ethereum_client[{}]: {} needs a {} the fee caps leave no room for (market max_fee={} "
+              "tip={}); waiting for what holds its nonce",
+              to_string(), describe_submission(submission), magic_enum::enum_name(step),
+              market.max_fee_per_gas.str(), market.tip.str());
       }
 
       if (unaccounted) {
          const auto now = fc::time_point::now();
          if (!journal.unaccounted_nonce || journal.unaccounted_nonce->nonce != *unaccounted) {
             journal.unaccounted_nonce = unaccounted_nonce_record{.nonce = *unaccounted, .first_seen = now};
-            wlog("outpost_ethereum_client[{}]: the node holds a pending transaction at nonce {} this relay has no "
-                 "record of; nothing is sent behind it, and it is cancelled if still pending after {} s",
-                 to_string(), unaccounted->str(), journal.unaccounted_nonce_grace.to_seconds());
+            const auto what = *unaccounted < pending_count
+                                 ? "the node holds a pending transaction at nonce " + unaccounted->str()
+                                 : "nothing fills nonce " + unaccounted->str() + ", below what this relay sent";
+            wlog("outpost_ethereum_client[{}]: {}, and this relay has no record of it; nothing is sent behind it, "
+                 "and it is cancelled if still unaccounted for after {} s",
+                 to_string(), what, journal.unaccounted_nonce_grace.to_seconds());
          } else if (now - journal.unaccounted_nonce->first_seen >= journal.unaccounted_nonce_grace) {
             // A zero-value transfer to the signer, at the nonce; the fees are
             // set per signing.

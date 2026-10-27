@@ -7,8 +7,10 @@
 #include <boost/process/v1/io.hpp>
 
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <chrono>
+#include <cstring>
 #include <iomanip>
 #include <map>
 #include <memory>
@@ -42,6 +44,8 @@
 #include <sysio/outpost_ethereum_client_plugin/outpost_ethereum_client.hpp>
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/opp.pb.h>
+
+#include <secp256k1_recovery.h>
 
 using namespace std::literals;
 
@@ -785,6 +789,45 @@ struct relay_test_stack {
    std::shared_ptr<sysio::ethereum_client_entry_t>  entry;
 };
 
+/// How the relay's signer signs.
+enum class test_signer {
+   /// The local key: RFC 6979 nonces, so a digest always gets the same signature.
+   deterministic,
+   /// A remote signer whose every signature of a digest is new, as AWS KMS's are.
+   randomized
+};
+
+/// The extra entropy libsecp256k1's RFC 6979 nonce function takes, in bytes.
+constexpr size_t secp256k1_nonce_entropy_bytes = 32;
+
+/// `local`'s key behind a remote signer that signs every digest with fresh nonce entropy, as AWS KMS does:
+/// each signature is valid, low-S and recovers to the key, and no two are alike.
+fc::crypto::signature_provider_ptr randomized_signer(const fc::crypto::signature_provider_ptr& local) {
+   BOOST_REQUIRE(local->private_key);
+   const auto secret     = local->private_key->get<fc::em::private_key_shim>().serialize();
+   auto       remote     = std::make_shared<fc::crypto::signature_provider_t>(*local);
+   remote->private_key   = std::nullopt;
+   remote->self_verified = std::make_shared<std::atomic<bool>>(false);
+   remote->sign = [secret, signings = std::make_shared<std::atomic<uint64_t>>(0)](const fc::sha256& digest) {
+      static const secp256k1_context* context = secp256k1_context_create(SECP256K1_CONTEXT_NONE);
+      // Each signing's own entropy, so no two signatures of a digest are alike.
+      std::array<unsigned char, secp256k1_nonce_entropy_bytes> entropy{};
+      const uint64_t signing = ++*signings;
+      std::memcpy(entropy.data(), &signing, sizeof(signing));
+      secp256k1_ecdsa_recoverable_signature signature;
+      FC_ASSERT(secp256k1_ecdsa_sign_recoverable(context, &signature,
+                                                 reinterpret_cast<const unsigned char*>(digest.data()),
+                                                 reinterpret_cast<const unsigned char*>(secret.data()),
+                                                 secp256k1_nonce_function_rfc6979, entropy.data()) == 1);
+      fc::em::compact_signature compact{};
+      int                       recovery_id = 0;
+      secp256k1_ecdsa_recoverable_signature_serialize_compact(context, compact.data(), &recovery_id, &signature);
+      compact.back() = static_cast<unsigned char>(fc::crypto::ethereum::v_offset + recovery_id);
+      return fc::crypto::signature(fc::crypto::signature::storage_type(fc::em::signature_shim(compact)));
+   };
+   return remote;
+}
+
 /// The maximum policy, with `max_gas_limit` overridden when a case needs a ceiling.
 ethereum_transaction_policy relay_test_policy(fc::uint256 max_gas_limit = maximum_ethereum_transaction_policy_value()) {
    return ethereum_transaction_policy{
@@ -797,7 +840,8 @@ ethereum_transaction_policy relay_test_policy(fc::uint256 max_gas_limit = maximu
    };
 }
 
-relay_test_stack create_relay_test_stack(ethereum_transaction_policy transaction_policy = relay_test_policy()) {
+relay_test_stack create_relay_test_stack(ethereum_transaction_policy transaction_policy = relay_test_policy(),
+                                         test_signer                 signer             = test_signer::deterministic) {
    relay_test_stack stack;
    stack.tester = create_app();
 
@@ -807,6 +851,7 @@ relay_test_stack create_relay_test_stack(ethereum_transaction_policy transaction
       chain_key_type_ethereum,
       std::string(latest_slot_test_public_key),
       to_private_key_spec(std::string(latest_slot_test_private_key)));
+   if (signer == test_signer::randomized) stack.sig_provider = randomized_signer(stack.sig_provider);
 
    stack.rpc        = std::make_shared<scripted_rpc>();
    stack.eth_client = std::make_shared<scripted_ethereum_client>(stack.sig_provider, std::move(transaction_policy),
@@ -823,9 +868,10 @@ relay_test_stack create_relay_test_stack(ethereum_transaction_policy transaction
 /// Stand up a `whole_envelope_delivery_fixture`. The stubs capture it by
 /// reference, so it must not be moved after this returns.
 std::unique_ptr<whole_envelope_delivery_fixture>
-create_whole_envelope_delivery_fixture(ethereum_transaction_policy transaction_policy = relay_test_policy()) {
+create_whole_envelope_delivery_fixture(ethereum_transaction_policy transaction_policy = relay_test_policy(),
+                                       test_signer                 signer             = test_signer::deterministic) {
    auto fixture = std::make_unique<whole_envelope_delivery_fixture>();
-   auto stack = create_relay_test_stack(std::move(transaction_policy));
+   auto stack = create_relay_test_stack(std::move(transaction_policy), signer);
    fixture->tester = std::move(stack.tester);
    fixture->rpc    = stack.rpc;
    fixture->entry  = stack.entry;
@@ -853,25 +899,28 @@ create_whole_envelope_delivery_fixture(ethereum_transaction_policy transaction_p
       }
       const size_t call = raw->delivery_calls.size();
       // Signed at the node's pending nonce, as `create_default_tx` signs it.
-      const auto nonce = raw->rpc->pending_nonce;
-      const auto hash  = std::string(hex_prefix) + abi_word(call);
-      submission       = sysio::ethereum_submission{
-               .purpose     = sysio::submission_purpose::epoch_in,
-               .epoch_index = epoch_index,
-               .transaction = {.chain_id                 = test_evm_chain_id,
-                               .nonce                    = nonce,
-                               .max_priority_fee_per_gas = test_scripted_tip,
-                               .max_fee_per_gas          = test_scripted_max_fee,
-                               .gas_limit                = gas_budget,
-                               .to                       = fc::crypto::ethereum::to_address(inbound_address),
-                               .value                    = 0,
-                               .data                     = fc::from_hex(envelope_hex),
-                               .access_list              = {}},
-               .attempts    = {{.tx_hash = hash,
-                                .fees    = {.max_priority_fee_per_gas = fc::uint256{test_scripted_tip},
-                                            .max_fee_per_gas          = fc::uint256{test_scripted_max_fee}}}},
-               .state       = sysio::submission_state::pending,
-               .landed_at   = std::nullopt,
+      const auto       nonce = raw->rpc->pending_nonce;
+      const eip1559_tx transaction{.chain_id                 = test_evm_chain_id,
+                                   .nonce                    = nonce,
+                                   .max_priority_fee_per_gas = test_scripted_tip,
+                                   .max_fee_per_gas          = test_scripted_max_fee,
+                                   .gas_limit                = gas_budget,
+                                   .to                       = fc::crypto::ethereum::to_address(inbound_address),
+                                   .value                    = 0,
+                                   .data                     = fc::from_hex(envelope_hex),
+                                   .access_list              = {}};
+      const auto signed_tx = raw->entry->client->sign_transaction(transaction, "epochIn");
+      const auto hash      = signed_tx.tx_hash;
+      submission           = sysio::ethereum_submission{
+                   .purpose     = sysio::submission_purpose::epoch_in,
+                   .epoch_index = epoch_index,
+                   .transaction = transaction,
+                   .attempts    = {{.tx_hash = hash,
+                                    .fees    = {.max_priority_fee_per_gas = fc::uint256{test_scripted_tip},
+                                                .max_fee_per_gas          = fc::uint256{test_scripted_max_fee}},
+                                    .raw_hex = signed_tx.raw_hex}},
+                   .state       = sysio::submission_state::pending,
+                   .landed_at   = std::nullopt,
       };
       if (raw->unconfirmed_calls.contains(call)) {
          FC_THROW_EXCEPTION(fc::timeout_exception, "scripted receipt wait for call {} ran out", call);
@@ -2725,7 +2774,11 @@ BOOST_AUTO_TEST_CASE(an_epoch_in_without_a_receipt_stays_pending_in_the_journal)
    BOOST_CHECK_EQUAL(submission.epoch_index, test_wire_epoch);
    BOOST_CHECK(submission.transaction.nonce == fc::uint256{0});
    BOOST_REQUIRE_EQUAL(submission.attempts.size(), 1u);
-   BOOST_CHECK_EQUAL(submission.attempts.front().tx_hash, std::string(hex_prefix) + abi_word(1));
+   // The signed bytes are kept beside the hash computed from them.
+   const auto& attempt = submission.attempts.front();
+   BOOST_REQUIRE(!attempt.raw_hex.empty());
+   BOOST_CHECK_EQUAL(attempt.tx_hash,
+                     "0x" + fc::crypto::keccak256::hash(std::span<const uint8_t>(fc::from_hex(attempt.raw_hex))).str());
 } FC_LOG_AND_RETHROW();
 
 /// The next tick finds the pending call's receipt, reads the outpost from the
@@ -2828,7 +2881,8 @@ BOOST_AUTO_TEST_CASE(a_priced_out_epoch_in_is_replaced_at_its_nonce) try {
    BOOST_CHECK(fixture->delivery_calls.empty());
 } FC_LOG_AND_RETHROW();
 
-/// A call the node no longer holds is sent again at its nonce.
+/// A call the node no longer holds is sent again at its nonce. The market asks
+/// no more than it paid, so it goes out as the bytes it was signed as.
 BOOST_AUTO_TEST_CASE(an_epoch_in_the_node_dropped_is_sent_again) try {
    auto fixture  = create_whole_envelope_delivery_fixture();
    auto envelope = make_envelope(mid_envelope_bytes);
@@ -2840,9 +2894,39 @@ BOOST_AUTO_TEST_CASE(an_epoch_in_the_node_dropped_is_sent_again) try {
    BOOST_REQUIRE_EQUAL(fixture->rpc->sent_hashes.size(), 1u);
    const auto resent = fixture->only_submission();
    BOOST_CHECK(resent.transaction.nonce == fc::uint256{0});
-   BOOST_REQUIRE_EQUAL(resent.attempts.size(), 2u);
-   BOOST_CHECK(resent.attempts.back().fees.max_priority_fee_per_gas == fc::uint256{test_scripted_tip});
-   BOOST_CHECK(resent.attempts.back().fees.max_fee_per_gas == fc::uint256{test_scripted_max_fee});
+   BOOST_REQUIRE_EQUAL(resent.attempts.size(), 1u);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.front(), resent.attempts.front().tx_hash);
+} FC_LOG_AND_RETHROW();
+
+/// A signer whose signatures are not deterministic, as AWS KMS's are not,
+/// would give the same call at the same fees a new hash on every signing, and a
+/// node holding the first would refuse it as an underpriced replacement. A
+/// resend at fees already signed at sends the recorded bytes, so the call
+/// keeps one hash however often it is re-sent.
+BOOST_AUTO_TEST_CASE(a_resend_at_recorded_fees_sends_the_recorded_bytes_whatever_the_signer) try {
+   auto fixture  = create_whole_envelope_delivery_fixture(relay_test_policy(), test_signer::randomized);
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->unconfirmed_calls = {1};
+   BOOST_CHECK_THROW(deliver(*fixture, envelope), sysio::chain::outpost_delivery_incomplete_exception);
+   const auto signed_once = fixture->only_submission().attempts.front();
+
+   // The signer does give the same transaction another signature.
+   const auto signed_again =
+      fixture->entry->client->sign_transaction(fixture->only_submission().transaction, "epochIn");
+   BOOST_CHECK_NE(signed_again.tx_hash, signed_once.tx_hash);
+
+   // The node drops the call twice; each time it goes out as the bytes signed first.
+   for (size_t drop = 1; drop <= 2; ++drop) {
+      fixture->rpc->known_hashes.clear();
+      BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                        sysio::chain::outpost_delivery_incomplete_exception);
+      BOOST_REQUIRE_EQUAL(fixture->rpc->sent_hashes.size(), drop);
+      BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.back(), signed_once.tx_hash);
+      const auto resent = fixture->only_submission();
+      BOOST_REQUIRE_EQUAL(resent.attempts.size(), 1u);
+      BOOST_CHECK_EQUAL(resent.attempts.front().raw_hex, signed_once.raw_hex);
+   }
+   BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 1u);
 } FC_LOG_AND_RETHROW();
 
 /// A nonce something else used ends the wait, and the outpost's state decides
@@ -3058,10 +3142,11 @@ BOOST_AUTO_TEST_CASE(a_cancel_pays_the_cap_when_the_market_asks_for_more) try {
 } FC_LOG_AND_RETHROW();
 
 /// A cancel a node refuses is journaled all the same, since a node may hold
-/// it, and the next tick outbids what holds the nonce with it again: the same
-/// fees give the same bytes, recorded once.
+/// it, and the next tick outbids what holds the nonce with it again: at the
+/// same fees it goes out as the bytes it was signed as, recorded once, even
+/// from a signer that never signs the same way twice.
 BOOST_AUTO_TEST_CASE(a_refused_cancel_is_kept_and_sent_again_next_tick) try {
-   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto fixture  = create_whole_envelope_delivery_fixture(relay_test_policy(), test_signer::randomized);
    auto envelope = make_envelope(mid_envelope_bytes);
    fixture->rpc->pending_nonce = 1;   // something this relay did not sign holds nonce 0
    fixture->entry->submissions->unaccounted_nonce_grace = fc::microseconds(0);
@@ -3090,9 +3175,9 @@ BOOST_AUTO_TEST_CASE(a_refused_cancel_is_kept_and_sent_again_next_tick) try {
 
 /// A first `epochIn` a backend refuses as already known keeps its signing,
 /// although the backend the next lookup reaches does not show it yet. The call
-/// is journaled, signed again at its own nonce while nothing shows it, and
-/// waited for once the node does. Nothing is sent at a later nonce, and
-/// nothing is cancelled.
+/// is journaled, sent again at its own nonce as the same bytes while nothing
+/// shows it, and waited for once the node does. Nothing is sent at a later
+/// nonce, and nothing is cancelled.
 BOOST_AUTO_TEST_CASE(a_first_epoch_in_refused_as_already_known_is_kept_across_lagging_backends) try {
    auto fixture  = create_whole_envelope_delivery_fixture();
    auto envelope = make_envelope(mid_envelope_bytes);
@@ -3107,10 +3192,11 @@ BOOST_AUTO_TEST_CASE(a_first_epoch_in_refused_as_already_known_is_kept_across_la
    BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
                      sysio::chain::outpost_delivery_incomplete_exception);
    BOOST_REQUIRE_EQUAL(fixture->rpc->sent_hashes.size(), 1u);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.front(), hash);
    const auto resent = fixture->only_submission();
    BOOST_CHECK(resent.purpose == sysio::submission_purpose::epoch_in);
    BOOST_CHECK(resent.transaction.nonce == fc::uint256{0});
-   BOOST_REQUIRE_EQUAL(resent.attempts.size(), 2u);
+   BOOST_REQUIRE_EQUAL(resent.attempts.size(), 1u);
    BOOST_CHECK_EQUAL(resent.attempts.front().tx_hash, hash);
 
    // Now it shows the first signing pending: the call is waited for.
@@ -3124,38 +3210,52 @@ BOOST_AUTO_TEST_CASE(a_first_epoch_in_refused_as_already_known_is_kept_across_la
    BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 1u);
 } FC_LOG_AND_RETHROW();
 
-/// The fee cap per gas of the replacement-baseline test: the market's fee cap
-/// at its base fee, `2 * 95 + 10`.
+/// The market's fee cap of the replacement tests at their base fee, `2 * 95 + 10`.
 constexpr uint64_t replacement_test_max_fee = 200;
 /// The base fee there: the call's fee cap of 100 leaves a tip of only 5.
 constexpr uint64_t replacement_test_base_fee = 95;
+/// The replacement those tests sign over the call's 10/100: the tip raised by an eighth and a wei, and the
+/// market's fee cap.
+constexpr uint64_t replacement_test_tip = test_scripted_tip + test_scripted_tip / 8 + 1;
 
-/// A replacement is priced against the signings the node holds. The call pays
-/// 10/100, and its replacement at 12/200 is refused (the signer ran short of
-/// funds) and kept. Once the signer is funded the node still holds only the
-/// call: bumping the refused signing would need 14/226, past the 200 cap, so
-/// the relay would wait forever, while priced against the call the
-/// replacement is 12/200 again, the same bytes, recorded once.
-BOOST_AUTO_TEST_CASE(a_replacement_is_priced_against_the_signings_the_node_holds) try {
+/// Deliver once with the receipt wait running out, so the call stays pending at nonce 0 at 10/100 and the
+/// node shows it. Then raise the base fee to `replacement_test_base_fee` and run one tick, the node
+/// answering its send with `outcome`: the relay replaces the call with a signing at 12/200.
+///
+/// @return The replacement.
+sysio::submission_attempt replace_the_call_once(whole_envelope_delivery_fixture& fixture,
+                                                const std::vector<char>& envelope, scripted_send outcome) {
+   fixture.unconfirmed_calls = {1};
+   BOOST_CHECK_THROW(deliver(fixture, envelope), sysio::chain::outpost_delivery_incomplete_exception);
+   fixture.rpc->known_hashes.insert(fixture.only_submission().attempts.front().tx_hash);
+   fixture.rpc->pending_nonce = 1;
+   fixture.rpc->base_fee_hex  = format_rpc_quantity(fc::uint256{replacement_test_base_fee});
+   fixture.rpc->send_outcomes = {outcome};
+
+   BOOST_CHECK_THROW(deliver(fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   const auto replaced = fixture.only_submission();
+   BOOST_REQUIRE_EQUAL(replaced.attempts.size(), 2u);
+   const auto replacement = replaced.attempts.back();
+   BOOST_CHECK(replacement.fees.max_priority_fee_per_gas == fc::uint256{replacement_test_tip});
+   BOOST_CHECK(replacement.fees.max_fee_per_gas == fc::uint256{replacement_test_max_fee});
+   return replacement;
+}
+
+/// When no replacement fits the caps, the highest signing is sent again as its
+/// bytes. The call pays 10/100, and its replacement at 12/200 is refused (the
+/// signer ran short of funds) and kept. Once the signer is funded the node
+/// still shows only the call: replacing over the refused signing would need
+/// 14/226, past the 200 cap, so the relay re-sends the 12/200 bytes, which
+/// replace the call. The signer never signs the same way twice, so the sent
+/// hash being the recorded one shows the bytes were not signed again.
+BOOST_AUTO_TEST_CASE(a_replacement_past_the_caps_sends_the_highest_signing_again) try {
    auto policy                     = relay_test_policy();
    policy.max_priority_fee_per_gas = replacement_test_max_fee;
    policy.max_fee_per_gas          = replacement_test_max_fee;
-   auto fixture                    = create_whole_envelope_delivery_fixture(policy);
-   auto envelope                   = make_envelope(mid_envelope_bytes);
-   fixture->unconfirmed_calls = {1};
-   BOOST_CHECK_THROW(deliver(*fixture, envelope), sysio::chain::outpost_delivery_incomplete_exception);
-   fixture->rpc->known_hashes.insert(fixture->only_submission().attempts.front().tx_hash);
-   fixture->rpc->pending_nonce = 1;
-   fixture->rpc->base_fee_hex  = format_rpc_quantity(fc::uint256{replacement_test_base_fee});
-   fixture->rpc->send_outcomes = {scripted_send::refused};
-
-   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
-                     sysio::chain::outpost_delivery_incomplete_exception);
-   const auto refused = fixture->only_submission();
-   BOOST_REQUIRE_EQUAL(refused.attempts.size(), 2u);
-   const auto replacement = refused.attempts.back();
-   BOOST_CHECK(replacement.fees.max_priority_fee_per_gas == fc::uint256{test_scripted_tip + test_scripted_tip / 8 + 1});
-   BOOST_CHECK(replacement.fees.max_fee_per_gas == fc::uint256{replacement_test_max_fee});
+   auto       fixture     = create_whole_envelope_delivery_fixture(policy, test_signer::randomized);
+   const auto envelope    = make_envelope(mid_envelope_bytes);
+   const auto replacement = replace_the_call_once(*fixture, envelope, scripted_send::refused);
    BOOST_CHECK(!fixture->rpc->known_hashes.contains(replacement.tx_hash));
 
    BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
@@ -3164,6 +3264,41 @@ BOOST_AUTO_TEST_CASE(a_replacement_is_priced_against_the_signings_the_node_holds
    BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.back(), replacement.tx_hash);
    BOOST_CHECK(fixture->rpc->known_hashes.contains(replacement.tx_hash));
    BOOST_CHECK_EQUAL(fixture->only_submission().attempts.size(), 2u);
+   BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 1u);
+} FC_LOG_AND_RETHROW();
+
+/// The market of the split-backend test: a base fee of 103 and a tip of 13, so
+/// a fee cap of `2 * 103 + 13`.
+constexpr uint64_t split_backend_base_fee = 103;
+constexpr uint64_t split_backend_tip      = 13;
+
+/// A replacement beats every signing on record, not only those the backend
+/// asked shows. The write backend took the 12/200 replacement, while the read
+/// backend still shows only the 10/100 call. At a base fee of 103 and a tip of
+/// 13, priced over the call alone the next replacement would be 13/219, which
+/// the write backend refuses as less than a tenth over the 12/200 it holds;
+/// priced over both it is 14/226.
+BOOST_AUTO_TEST_CASE(a_replacement_beats_a_signing_the_read_backend_does_not_show) try {
+   auto       fixture     = create_whole_envelope_delivery_fixture();
+   const auto envelope    = make_envelope(mid_envelope_bytes);
+   const auto replacement = replace_the_call_once(*fixture, envelope, scripted_send::accepted);
+   fixture->rpc->known_hashes.erase(replacement.tx_hash);
+   fixture->rpc->base_fee_hex     = format_rpc_quantity(fc::uint256{split_backend_base_fee});
+   fixture->rpc->priority_fee_hex = format_rpc_quantity(fc::uint256{split_backend_tip});
+
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_REQUIRE_EQUAL(fixture->rpc->sent_hashes.size(), 2u);
+   const auto replaced = fixture->only_submission();
+   BOOST_REQUIRE_EQUAL(replaced.attempts.size(), 3u);
+   const auto& next = replaced.attempts.back();
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.back(), next.tx_hash);
+   // 12 and 200 each raised by an eighth and a wei, above the market's 13/219.
+   BOOST_CHECK(next.fees.max_priority_fee_per_gas == fc::uint256{replacement_test_tip + replacement_test_tip / 8 + 1});
+   BOOST_CHECK(next.fees.max_fee_per_gas == fc::uint256{replacement_test_max_fee + replacement_test_max_fee / 8 + 1});
+   // Both more than a tenth over what the write backend holds.
+   BOOST_CHECK(next.fees.max_priority_fee_per_gas * 10 > fc::uint256{replacement_test_tip * 11});
+   BOOST_CHECK(next.fees.max_fee_per_gas * 10 > fc::uint256{replacement_test_max_fee * 11});
    BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 1u);
 } FC_LOG_AND_RETHROW();
 
@@ -3210,6 +3345,52 @@ BOOST_AUTO_TEST_CASE(nothing_is_sent_behind_a_nonce_another_sender_took_mid_tick
    BOOST_CHECK(fixture->only_submission().state == sysio::submission_state::landed);
    BOOST_REQUIRE(fixture->entry->submissions->unaccounted_nonce);
    BOOST_CHECK(fixture->entry->submissions->unaccounted_nonce->nonce == fc::uint256{1});
+} FC_LOG_AND_RETHROW();
+
+/// A nonce nothing fills below a journaled call is cancelled like one the node
+/// holds an unknown transaction at. Another sender's transaction at nonce 0 was
+/// at the head when the relay signed its call at nonce 1; a reorg then removed
+/// it and the node dropped it. Nothing is pending at nonce 0, both of the
+/// node's counts fall back to 0, and the call waits behind the gap. After the
+/// grace a cancel fills nonce 0, and the call is not signed again.
+BOOST_AUTO_TEST_CASE(a_nonce_nothing_fills_below_a_journaled_call_is_cancelled) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->rpc->latest_nonce  = 1;   // another sender's transaction at nonce 0, at the head
+   fixture->rpc->pending_nonce = 1;
+   fixture->unconfirmed_calls  = {1};
+   BOOST_CHECK_THROW(deliver(*fixture, envelope), sysio::chain::outpost_delivery_incomplete_exception);
+   const auto call = fixture->only_submission();
+   BOOST_REQUIRE(call.transaction.nonce == fc::uint256{1});
+
+   // The reorg drops nonce 0, and the node keeps the call queued behind the gap.
+   fixture->rpc->latest_nonce  = 0;
+   fixture->rpc->pending_nonce = 0;
+   fixture->rpc->known_hashes.insert(call.attempts.front().tx_hash);
+   fixture->entry->submissions->unaccounted_nonce_grace = fc::microseconds(0);
+
+   // First sight: waited on, nothing sent.
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_CHECK(fixture->rpc->sent_hashes.empty());
+   BOOST_REQUIRE(fixture->entry->submissions->unaccounted_nonce);
+   BOOST_CHECK(fixture->entry->submissions->unaccounted_nonce->nonce == fc::uint256{0});
+
+   // Past the grace: a cancel at nonce 0, journaled ahead of the call.
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_REQUIRE_EQUAL(fixture->rpc->sent_hashes.size(), 1u);
+   const auto submissions = fixture->outpost->submissions();
+   BOOST_REQUIRE_EQUAL(submissions.size(), 2u);
+   const auto& cancel = submissions.front();
+   BOOST_CHECK(cancel.purpose == sysio::submission_purpose::cancel);
+   BOOST_CHECK(cancel.transaction.nonce == fc::uint256{0});
+   BOOST_REQUIRE_EQUAL(cancel.attempts.size(), 1u);
+   BOOST_CHECK_EQUAL(cancel.attempts.front().tx_hash, fixture->rpc->sent_hashes.front());
+   BOOST_CHECK(submissions.back().purpose == sysio::submission_purpose::epoch_in);
+   BOOST_CHECK_EQUAL(submissions.back().attempts.size(), 1u);
+   BOOST_CHECK(!fixture->entry->submissions->unaccounted_nonce);
+   BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 1u);
 } FC_LOG_AND_RETHROW();
 
 /// What a pending call needs: nothing while it pays the market tip, a
@@ -3297,7 +3478,8 @@ BOOST_AUTO_TEST_CASE(in_flight_decision_and_resend_fees) try {
 } FC_LOG_AND_RETHROW();
 
 /// The journal's pricing and nonce arithmetic: the baseline across attempts,
-/// the outbid fees, and the first nonce the journal does not account for.
+/// the highest signing, the outbid fees, and the first nonce the journal does
+/// not account for.
 BOOST_AUTO_TEST_CASE(journal_fee_and_nonce_helpers) try {
    namespace detail = sysio::outpost_ethereum_client_detail;
 
@@ -3308,6 +3490,14 @@ BOOST_AUTO_TEST_CASE(journal_fee_and_nonce_helpers) try {
    BOOST_CHECK(highest.max_priority_fee_per_gas == fc::uint256{12});
    BOOST_CHECK(highest.max_fee_per_gas == fc::uint256{100});
    BOOST_CHECK(detail::highest_fees({}).max_fee_per_gas == fc::uint256{0});
+
+   // The highest signing is a recorded one: the highest fee cap, the higher tip
+   // breaking a tie.
+   BOOST_CHECK_EQUAL(detail::highest_signing(attempts).tx_hash, "0x01");
+   auto tied = attempts;
+   tied.push_back({.tx_hash = "0x03", .fees = {.max_priority_fee_per_gas = 11, .max_fee_per_gas = 100}});
+   BOOST_CHECK_EQUAL(detail::highest_signing(tied).tx_hash, "0x03");
+   BOOST_CHECK_THROW(detail::highest_signing({}), fc::assert_exception);
 
    // Outbidding: tip and fee cap both the market's fee cap raised by an eighth
    // and a wei, lowered to the transaction's caps where that goes past them.
@@ -3331,6 +3521,10 @@ BOOST_AUTO_TEST_CASE(journal_fee_and_nonce_helpers) try {
    BOOST_CHECK(!detail::first_unaccounted_nonce(3, 5, journaled({3, 4})));
    BOOST_CHECK(detail::first_unaccounted_nonce(3, 4, journaled({1, 2})) == fc::uint256{3});
    BOOST_CHECK(detail::first_unaccounted_nonce(3, 6, journaled({3, 5})) == fc::uint256{4});
+   // A nonce nothing fills below a journaled one, the node holding nothing past the head.
+   BOOST_CHECK(detail::first_unaccounted_nonce(3, 3, journaled({4})) == fc::uint256{3});
+   BOOST_CHECK(detail::first_unaccounted_nonce(3, 3, journaled({3, 5})) == fc::uint256{4});
+   BOOST_CHECK(!detail::first_unaccounted_nonce(3, 3, journaled({1, 3, 4})));
 } FC_LOG_AND_RETHROW();
 
 /// The hash `sign_transaction` records before a send is the one the network

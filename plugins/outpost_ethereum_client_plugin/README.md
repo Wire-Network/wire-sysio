@@ -191,9 +191,12 @@ Every transaction the relay signs goes into the **journal** of the client entry 
 recipient, gas and calldata, and every signing at that nonce with its fees. Each signing's hash is computed
 from the signed bytes and recorded before the send, so a send whose response is lost still leaves the hash
 and the fees on record. A refused signing stays recorded too: the node may hold the bytes anyway (a refusal
-as already known), or another backend behind the same endpoint may. Each hash is recorded once, since signing
-again at the same fees gives the same bytes. The journal is shared by every outpost
-client built on the entry, so it survives the batch operator rebuilding a relay job; a restart loses it.
+as already known), or another backend behind the same endpoint may. The signed bytes are kept with each
+signing, and a resend at fees already signed at sends them again rather than signing anew: a signer whose
+signatures are not deterministic (AWS KMS) would otherwise give the call another hash at the same fees, which
+a node holding the first refuses as an underpriced replacement. Each hash is recorded once. The journal is
+shared by every outpost client built on the entry, so it survives the batch operator rebuilding a relay job;
+a restart loses it.
 
 A transaction stays in the journal until its nonce is used at the client's read confirmation, not just until
 its receipt comes back. A reorg shallower than that can put a call that already landed back in the mempool,
@@ -208,13 +211,14 @@ whole delivery, so only one sender uses the signer's nonces at a time:
 | A receipt for any of its hashes | Landed. A reverted one is logged; the relay reads the outpost from the highest block a journaled call landed in and decides what to send |
 | The nonce used, by none of its hashes | Superseded; the outpost's state decides |
 | Pending, and at today's base fee it still pays the market tip | Waits for it until the tick's deadline |
-| Pending, and its fee cap is below the base fee, or the tip it can pay at that base fee is below the market's | Re-signs it at the same nonce with every fee raised by more than an eighth over the highest fees of its signings the node holds (nodes refuse a replacement under 10%) and at least the market's, within the transaction policy's caps |
+| Pending, and its fee cap is below the base fee, or the tip it can pay at that base fee is below the market's | Re-signs it at the same nonce with every fee raised by more than an eighth over the highest fees any of its signings carried (nodes refuse a replacement under 10%) and at least the market's, within the transaction policy's caps. Signings the node does not show count too: another node behind the endpoint may hold one |
 | Something at the nonce, but none of its hashes | Outbids it (see below), since the fees of what holds the nonce are unknown |
 | Neither its hashes nor anything at the nonce | Sends it again at the same nonce, at the larger of its fees and the market's |
-| A pending transaction at a nonce no journal entry accounts for | Sends nothing behind it. After `default_unaccounted_nonce_grace` (60 s) it is cancelled: a zero-value transfer to the signer at that nonce, at the outbid fees (see below). The cancel is journaled like any other transaction |
+| A pending transaction at a nonce no journal entry accounts for, or nothing at a nonce below a journaled one | Sends nothing behind it. After `default_unaccounted_nonce_grace` (60 s) it is cancelled: a zero-value transfer to the signer at that nonce, at the outbid fees (see below). The cancel is journaled like any other transaction |
 
-While anything is still pending at the deadline nothing else is sent, and the next tick repeats the check. A
-replacement the caps leave no room for is logged and what was sent is waited for.
+While anything is still pending at the deadline nothing else is sent, and the next tick repeats the check.
+When the caps leave no room for a replacement, the highest signing is sent again as its bytes, since it
+replaces a lower one the node holds; when the node already shows it, it is waited for.
 
 Every resend is priced within the transaction's own caps: the policy's per-gas caps, with the fee cap also
 bounded by what `max_total_native_cost` leaves after the value for its gas limit, so a candidate is never
@@ -228,9 +232,11 @@ so these fees raise both of its fees by more than a replacement needs. A refused
 next tick signs again from the market. Nothing escalates and no refusal is interpreted.
 
 The unaccounted-nonce case covers what the journal cannot: a call left pending before a restart, a
-`realizeYield` crank whose wait ran out, or another process signing with the same key. A transaction priced
-to be included lands well inside the grace, so only a stuck one is cancelled; the delivery then goes out at
-the next nonce from the outpost's state.
+`realizeYield` crank whose wait ran out, or another process signing with the same key. When such a
+transaction is dropped after the relay signed past it (a reorg removes it, and the node does not take it
+back), its nonce is left empty and the journaled call queued behind it, so that nonce is cancelled the same
+way. A transaction priced to be included lands well inside the grace, so only a stuck one is cancelled; the
+delivery then goes out at the next nonce from the outpost's state.
 
 ### Inbound reads
 
@@ -439,9 +445,12 @@ rejections — the read confirmation (each tag, the depth, the finalized block w
 fallback and its boundary, refusals), an epoch reported handled only once the read confirmation shows it, a
 journaled call that lands, reverts, waits, is replaced, is re-broadcast, loses its nonce, is forgotten at the
 read confirmation, comes back after a reorg, or had a replacement whose response was lost, the journal
-surviving a rebuilt relay, an unaccounted nonce waited on and cancelled after a restart, a refused cancel kept
-and sent again next tick, a first `epochIn` refused as already known while the backend asked next does not show
-it yet, a replacement priced against what the node holds rather than a refused signing, a cancel at the cap when the market asks for more, a journaled call outbid when something
+surviving a rebuilt relay, an unaccounted nonce waited on and cancelled after a restart, an empty nonce below
+a journaled call cancelled, a refused cancel kept and sent again next tick, a first `epochIn` refused as
+already known while the backend asked next does not show it yet, a resend at fees already signed at sending
+the recorded bytes from a signer that never signs the same way twice, the highest signing sent again when no
+replacement fits the caps, a replacement that beats a signing the read backend does not show, a cancel at the
+cap when the market asks for more, a journaled call outbid when something
 else holds its nonce, the check before every send, the replacement and outbid fees and the per-transaction
 caps, and the network hash
 of a signed transaction against foundry's vectors — and the outpost crank: idle without the pool ABI or a registered handler, binding the
@@ -450,9 +459,9 @@ errors, and deadline abandonment.
 `outpost_ethereum_transaction_policy_tests` covers the expenditure-policy boundary: that a rejection happens
 before signing or broadcasting, that exact caps pass through once, that two clients enforce their own
 policies, that file and CLI configuration produce the expected policies and read confirmations, that
-signing checks the policy without sending, that a signing's recorded hash survives every send outcome, once
-per hash, that a first `epochIn` the node refuses keeps its signing, and that a partial client map is never
-published. No test dials a public endpoint.
+signing checks the policy without sending, that a signing's recorded hash and bytes survive every send
+outcome, once per hash, that a first `epochIn` the node refuses keeps its signing, and that a partial client
+map is never published. No test dials a public endpoint.
 
 CTest runs this binary through `tests/run_with_bind_config.cjs`, which keeps platform registry reservations
 alive for the test process. It requires Node and the version-pinned `@wireio/cluster-tool` development

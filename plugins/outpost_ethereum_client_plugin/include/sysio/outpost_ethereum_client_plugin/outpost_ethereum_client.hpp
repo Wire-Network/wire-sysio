@@ -289,6 +289,11 @@ fee_caps transaction_fee_caps(const ethereum_transaction_policy& policy, const e
 /// any of them. Zero fees for no attempts.
 ethereum_transaction_fees highest_fees(const std::vector<submission_attempt>& attempts);
 
+/// The signing in `attempts` with the highest fee cap, the higher tip breaking a tie: the one sent again
+/// when no replacement fits the caps, since it replaces a lower one a node holds. `attempts` must not be
+/// empty.
+const submission_attempt& highest_signing(const std::vector<submission_attempt>& attempts);
+
 /// The fees a same-nonce resend pays. A replacement must raise each of `paid`'s
 /// by more than the 10% nodes require of a replacement; a rebroadcast must pay
 /// `paid`. Either pays the market's fees where they are higher, lowered to
@@ -310,8 +315,9 @@ std::optional<ethereum_transaction_fees> resend_fees(in_flight_step step, const 
 /// @param caps `transaction_fee_caps` of the transaction signed.
 ethereum_transaction_fees outbid_fees(const ethereum_client::gas_config_t& market, const fee_caps& caps);
 
-/// The lowest nonce in `[latest, pending)` that no submission holds: one the node has a pending transaction
-/// at that this process did not sign, or `nullopt`.
+/// The lowest nonce from `latest` on that no submission holds, while the node has a pending transaction there
+/// that this process did not sign, or a submission waits above it with nothing to fill it, so none of the
+/// relay's can be included. `nullopt` otherwise.
 ///
 /// @param latest      The signer's transaction count at the head.
 /// @param pending     The signer's transaction count including the node's pending transactions.
@@ -451,10 +457,13 @@ private:
    ///  - forget every submission whose nonce is used at the read confirmation;
    ///  - check every other one against the head, so a call a reorg put back in
    ///    the mempool is pending again;
-   ///  - replace a pending one at its nonce when the market priced it out, or
-   ///    send it again when the node no longer holds it;
-   ///  - wait on, and after `unaccounted_nonce_grace` cancel, a pending
-   ///    transaction at a nonce no submission accounts for;
+   ///  - replace a pending one at its nonce when the market priced it out,
+   ///    over every signing on record, or send its highest signing again when
+   ///    no replacement fits the caps; send it again when the node no longer
+   ///    holds it;
+   ///  - wait on, and after `unaccounted_nonce_grace` cancel, a nonce no
+   ///    submission accounts for: a pending transaction there, or nothing
+   ///    below a journaled one;
    ///  - then wait until nothing is pending or `deadline_abs`.
    ///
    /// @return The highest block a journaled submission is in, or `std::nullopt`.
@@ -467,9 +476,9 @@ private:
    /// without one, `pending` otherwise. Logs each change of state.
    void refresh_submission(ethereum_submission& submission, const fc::uint256& latest_count);
 
-   /// Sign `submission` again at its nonce with `fees` and send it, recording the
-   /// attempt before the send. A refused send is logged and its attempt kept; the
-   /// next tick decides again.
+   /// Send `submission` again at its nonce with `fees`: the recorded bytes of its
+   /// signing at those fees, or else a new signing, recorded before the send. A
+   /// refused send is logged and its attempt kept; the next tick decides again.
    ///
    /// @throws ethereum_transaction_policy_exception when the policy refuses `fees`.
    /// @throws fc::exception on transport failure; the attempt stays recorded.
