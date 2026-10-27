@@ -6,6 +6,12 @@
 
 namespace sysio::chain {
 
+namespace {
+/// Scheduling failures that must be reported instead of silently losing a request.
+constexpr auto snapshot_ids_exhausted = "Snapshot request IDs exhausted";
+constexpr auto snapshot_insertion_failed = "Unable to store snapshot request";
+} // anonymous namespace
+
 // snapshot_scheduler_listener
 void snapshot_scheduler::on_start_block(uint32_t height, chain::controller& chain) {
    // Identify the single request due at this height (one snapshot per height), then execute it AFTER
@@ -18,8 +24,11 @@ void snapshot_scheduler::on_start_block(uint32_t height, chain::controller& chai
 
    for(const auto& req: _snapshot_requests.get<0>()) {
       // -1 since its called from start block
-      bool recurring_snapshot  = req.block_spacing && (height >= req.start_block_num + 1) && (!((height - req.start_block_num - 1) % req.block_spacing));
-      bool onetime_snapshot    = (!req.block_spacing) && (height == req.start_block_num + 1);
+      const bool recurring_snapshot = req.block_spacing && height > req.start_block_num
+                                      && !((height - req.start_block_num - 1)
+                                           % req.block_spacing);
+      const bool onetime_snapshot = !req.block_spacing && height > 0
+                                    && req.start_block_num == height - 1;
 
       if(recurring_snapshot || onetime_snapshot) {
          dlog("snapshot scheduler creating a snapshot from the request [start_block_num:{}, end_block_num={}, block_spacing={}], height={}",
@@ -108,7 +117,9 @@ snapshot_scheduler::snapshot_schedule_result snapshot_scheduler::schedule_snapsh
    // from the block-start path where a throwing callback has no caller to report to
    SYS_ASSERT(!find_snapshot_request(sri.block_spacing, sri.start_block_num, sri.end_block_num), chain::duplicate_snapshot_request, "Duplicate snapshot request");
    SYS_ASSERT(sri.start_block_num <= sri.end_block_num, chain::invalid_snapshot_request, "End block number should be greater or equal to start block number");
-   SYS_ASSERT(sri.start_block_num + sri.block_spacing <= sri.end_block_num, chain::invalid_snapshot_request, "Block spacing exceeds defined by start and end range");
+   SYS_ASSERT(sri.block_spacing <= sri.end_block_num - sri.start_block_num,
+              chain::invalid_snapshot_request,
+              "Block spacing exceeds defined by start and end range");
 
    // a request with no caller to answer gets no slot at all, so a null slot and an emptied one are
    // never confused with each other
@@ -116,11 +127,29 @@ snapshot_scheduler::snapshot_schedule_result snapshot_scheduler::schedule_snapsh
    if(next)
       caller = std::make_shared<next_function<snapshot_information>>(std::move(next));
 
-   _snapshot_requests.emplace(snapshot_schedule_information{{_snapshot_id++}, {sri.block_spacing, sri.start_block_num, sri.end_block_num, sri.snapshot_description}, {}, std::move(caller)});
+   /** Skip ids retained by an earlier process, including after counter wrap. The size check
+    * guarantees a free id exists, so the scan cannot loop forever on an exhausted id space.
+    */
+   auto& snapshot_by_id = _snapshot_requests.get<by_snapshot_id>();
+   SYS_ASSERT(snapshot_by_id.size() <= std::numeric_limits<uint32_t>::max(),
+              chain::invalid_snapshot_request, snapshot_ids_exhausted);
+   while(snapshot_by_id.find(_snapshot_id) != snapshot_by_id.end())
+      ++_snapshot_id;
+   const uint32_t snapshot_request_id = _snapshot_id++;
+
+   const bool inserted = _snapshot_requests.emplace(
+      snapshot_schedule_information{{snapshot_request_id},
+                                    {sri.block_spacing, sri.start_block_num,
+                                     sri.end_block_num, sri.snapshot_description},
+                                    {}, std::move(caller)}).second;
+   SYS_ASSERT(inserted, chain::invalid_snapshot_request, snapshot_insertion_failed);
    x_serialize();
 
    // returning snapshot_schedule_result
-   return snapshot_schedule_result{{_snapshot_id - 1}, {sri.block_spacing, sri.start_block_num, sri.end_block_num, sri.snapshot_description}};
+   return snapshot_schedule_result{
+      {snapshot_request_id},
+      {sri.block_spacing, sri.start_block_num, sri.end_block_num, sri.snapshot_description}
+   };
 }
 
 snapshot_scheduler::snapshot_schedule_result snapshot_scheduler::remove_request(uint32_t sri, fc::log_message undelivered_reason) {
@@ -180,12 +209,17 @@ void snapshot_scheduler::set_db_path(fs::path db_path) {
       _snapshot_db >> sr;
       // if db read succeeded, clear/load
       _snapshot_requests.get<by_snapshot_id>().clear();
+      /// Recover from accepted entries only; duplicate ids or values retain the first request.
+      std::optional<uint32_t> largest_snapshot_id;
       for(snapshot_schedule_information& ssi : sr) {
          //fix up Leap v4's "forever" value of 0 to MAX
          if(ssi.end_block_num == 0)
             ssi.end_block_num = std::numeric_limits<uint32_t>::max();
-         _snapshot_requests.insert(ssi);
+         const bool inserted = _snapshot_requests.insert(ssi).second;
+         if(inserted && (!largest_snapshot_id || ssi.snapshot_request_id > *largest_snapshot_id))
+            largest_snapshot_id = ssi.snapshot_request_id;
       }
+      _snapshot_id = largest_snapshot_id ? *largest_snapshot_id + 1 : 0;
    }
 }
 
