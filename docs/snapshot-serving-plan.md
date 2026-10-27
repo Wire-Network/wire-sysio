@@ -156,7 +156,7 @@ snapshot-provider-account = <account>    # enables snapshot provider mode + hash
 ```
 
 When `snapshot-provider-account` is set:
-- Startup creates or reuses the schedule for its cached `block_spacing` (25,000 if no row exists), removing provider-owned automatic requests with different spacing. Manual requests are preserved; there is no per-irreversible-block cadence refresh.
+- Startup creates or reuses the exact automatic request shape for its cached `block_spacing` (25,000 if no row exists), removing provider-owned requests with different spacing or bounds. An interval too large to repeat uses one request at its sole triggerable height; no automatic request remains if no future trigger exists, including at `UINT32_MAX` spacing. Manual requests are preserved; there is no per-irreversible-block cadence refresh.
 - On each finalized scheduled snapshot, a `votesnaphash` transaction is automatically submitted; unscheduled manual snapshots are not voted.
 - If the contract returns a disagreement error (hash mismatch with attested record), the node logs a fatal error and shuts down.
 

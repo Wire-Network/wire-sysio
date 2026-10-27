@@ -153,9 +153,11 @@ snapshot-provider-account = mysnapprov1
 ```
 
 Provider mode schedules at exact multiples of its startup `block_spacing`, using 25,000 when no row exists.
-For `block_spacing = 25000`, those are 25,000, 50,000, 75,000, and so on. Startup reuses an exact schedule,
-removes differently-spaced provider-owned automatic requests, and leaves manual schedules untouched. The
-contract still rejects votes until governance configures a nonzero quorum. No per-block cadence refresh occurs.
+For `block_spacing = 25000`, those are 25,000, 50,000, 75,000, and so on. Startup reuses the exact automatic
+request shape and removes provider-owned requests with different spacing or bounds. An interval too large
+to repeat uses a one-shot request at its sole triggerable height; no automatic request remains if no future
+trigger exists, including at `UINT32_MAX` spacing. Manual schedules are untouched. The contract still rejects
+votes until governance configures a nonzero quorum. No per-block cadence refresh occurs.
 
 `votesnaphash` is submitted automatically after each configured-cadence snapshot finalizes. Manual snapshots are not
 attested unless their height also happens to be eligible under the configured cadence.

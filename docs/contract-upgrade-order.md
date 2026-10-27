@@ -362,9 +362,12 @@ configuration before enabling snapshot providers or endpoint bootstrap.
 Nodes read the two-uint32 `snapconfig` KV row directly once at startup, defaulting to 25,000 blocks
 when it is absent. Governance may change any positive uint32 interval, but operators must restart
 provider and serving nodes afterward. Small values are for testing; production should use much larger
-values because the grace window is half the spacing. At startup, provider nodes remove requests with
-the reserved `snapshot-provider auto` description only when their spacing differs, then create or reuse
-the exact configured schedule. Manual requests remain untouched. There is no irreversible-block refresh.
+values because the grace window is half the spacing. At startup, provider nodes create or reuse the
+exact automatic request shape, removing requests with the reserved `snapshot-provider auto` description
+when their spacing or bounds differ. An interval too large to repeat uses a one-shot request at its sole
+triggerable height. If no future trigger exists, including at `UINT32_MAX` spacing, all provider-owned
+automatic requests are removed and none is created. Manual requests remain untouched. There is no
+irreversible-block refresh.
 
 ## WIRE-415 pre-launch deployment
 
