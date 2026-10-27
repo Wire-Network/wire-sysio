@@ -372,17 +372,19 @@ clio push action sysio votesnaphash \
 - Contract tests (`contracts/tests/sysio.snapshot_attest_tests.cpp`) cover registration, rotation
   and `delsnapprov` retirement, rejections that name the failed eligibility condition,
   side-effect-free uniqueness failures, traceable lazy full-table pruning, fixed-K configuration,
-  positive mutable cadence, startup KV reads, adjacent-height rejection, per-vote operator-standing rejection
+  positive mutable cadence, adjacent-height rejection, per-vote operator-standing rejection
   including a raised collateral minimum, monotonic votes across churn and heights,
   equivocation/disagreement rejection, finalization purging, and the `getsnaphash` query.
 - Unit tests (`unittests/snapshot_attest_tests.cpp`) cover snapshot round-trip hash
   stability, a full chain whose snapshot hash matches its on-chain record, mismatch
   detection, the no-attestation case, and survival of attestation state across a snapshot
   load. The shared real-contract fixture also drives a chain-plugin auto-fetch test through
-  download, early schema/configuration validation, retained-block replay, and terminal tuple
-  verification. Chain-plugin tests additionally cover disabled configuration, endpoint-to-file
+  download, early schema validation, retained-block replay, post-replay configuration validation,
+  and terminal tuple verification. Chain-plugin tests additionally cover direct startup KV reads,
+  replayed governance changes, deliberate replay termination, disabled configuration, endpoint-to-file
   block identity, and the trusted manual-snapshot bypass.
 - The wall-clock integration test (`tests/snapshot_attest_test.py`) covers provider lifecycle
-  actions and proves an on-demand snapshot is rejected outside its configured cadence. C++
+  actions, startup cadence, provider restart/reuse and manual-request preservation, and proves an
+  on-demand snapshot is rejected outside its configured cadence. C++
   fixtures configure a 250-block cadence to cover fixed-K voting, attestation-record persistence,
   snapshot round trips, and strict auto-fetch verification without manufacturing 25,000 blocks.

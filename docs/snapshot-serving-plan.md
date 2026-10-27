@@ -345,11 +345,12 @@ For a complete operator setup guide — including producer registration, provide
 
 **Contract tests** (`contracts/tests/sysio.snapshot_attest_tests.cpp`):
 - Registration: authority/eligibility checks and rejections that name the failed condition, idempotent rotation, `delsnapprov` retirement, ungated rotation and retirement by a producer that has since become ineligible, bounded capacity, side-effect-free conflicts, and traceable lazy stale-row pruning only when full
-- Configuration: authority, quorum bounds, any positive uint32 cadence, mutable quorum/cadence and startup KV reads
+- Configuration: authority, quorum bounds, any positive uint32 cadence, and mutable quorum/cadence
 - Voting: exact and adjacent configured-height bounds, future bounds, idempotency, per-height equivocation rejection, and independent heights
 - Quorum: fixed K independent of registration count, governance changes on pending tuples, and explicit K=1 behavior
 - Storage: monotonic producer votes, finalization purge, historical-height closure, disagreement error 9001, and `getsnaphash` behavior
 **Chain-plugin policy tests** (`plugins/chain_plugin/test/plugin_config_test.cpp`):
+- direct startup KV reads, post-replay governance state, and successful deliberate replay termination
 - transient table-read retry/grace behavior and decoder-timeout floor
 - pre-replay `snaprecords`/`snapconfig` schema validation, enabled-configuration policy, recovery diagnostics, and trusted manual-snapshot bypass
 - loaded block-ID and root-hash tuple matching
@@ -364,9 +365,10 @@ For a complete operator setup guide — including producer registration, provide
 - `snapshot_no_attestation_detected` — no vote → no record found
 - `attestation_survives_snapshot_load` — attestation data survives snapshot round-trip in `snapshotted_tester`
 
-**Integration test** (`tests/snapshot_attest_test.py` — 2 tests):
+**Integration test** (`tests/snapshot_attest_test.py` — 3 tests):
 - Manual snapshot creation and rejection outside the configured test cadence
 - Provider registration and snapshot-account rotation
+- Provider startup cadence, snapshot creation, restart after governance changes, unchanged-cadence reuse, and manual-request preservation
 
 **Snapshot API policy tests** (`tests/snapshot_api_plugin_tests.cpp`):
 - scheduled explicit serving requires a complete, exact block-ID/root tuple whose attestation block is irreversible
