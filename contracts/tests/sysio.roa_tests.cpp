@@ -264,6 +264,7 @@ public:
       return fc::variant();
    }
 
+   /// The owner's sponsored-account count, or zero when it has no `sponsorcount` row.
    uint64_t get_sponsor_count( account_name acc )
    {
       const auto row = get_sponsorcount(acc);
