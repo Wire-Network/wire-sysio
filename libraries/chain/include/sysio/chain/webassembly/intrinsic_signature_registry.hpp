@@ -106,6 +106,8 @@ SYS_PIN_INTRINSIC( get_active_producers,
 // =============================================================================
 // Crypto -- hashes + signature recovery
 // =============================================================================
+SYS_PIN_INTRINSIC( ed25519_verify,
+                   int32_t (interface::*)(span<const char>, span<const char>, span<const char>) const );
 SYS_PIN_INTRINSIC( assert_recover_key,
                    void (interface::*)(aligned_ptr<const fc::sha256>,
                                        span<const char>,
