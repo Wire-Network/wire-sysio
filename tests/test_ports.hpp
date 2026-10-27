@@ -14,10 +14,10 @@
 #include <vector>
 
 /**
- * Listener ports for native network tests, taken from the test's bind-registry lease.
+ * Network ports for native tests, taken from the test's bind-registry lease.
  *
  * CTest runs every network test under `tests/bind_registry.py`, which leases one block of consecutive ports from the
- * host's bind registry and passes it in `SYSIO_TEST_PORTS`. Test code asks for a port by listener category and index;
+ * host's bind registry and passes it in `SYSIO_TEST_PORTS`. Test code asks for a port by category and index;
  * the category picks a fixed slot range inside the lease. The slot layout matches `Utils.getPort` in
  * `tests/TestHarness/testUtils.py`.
  */
@@ -27,7 +27,7 @@ namespace sysio::testing {
 inline constexpr const char* test_ports_env_var = "SYSIO_TEST_PORTS";
 inline constexpr char test_ports_separator = ',';
 
-/** Logical listener classes inside a test's lease. */
+/** Logical port categories inside a test's lease. */
 enum class port_category {
    ship,
    state_history,
@@ -41,7 +41,8 @@ enum class port_category {
    p2p,
    wallet,
    transaction_only,
-   ipv6_probe
+   ipv6_probe,
+   raw_client // not listeners: source ports of the raw P2P sessions tests/TestHarness/raw_p2p.py dials
 };
 
 /** The slots a category occupies in the lease: `[start, start + count)`. */
@@ -64,14 +65,16 @@ inline constexpr uint32_t wallet_port_count = 5;
 inline constexpr uint32_t transaction_only_port_count = 2;
 /** IPv6 probe ports reserved for address-family tests. */
 inline constexpr uint32_t ipv6_probe_port_count = 4;
+/** Source ports reserved for raw P2P test sessions. */
+inline constexpr uint32_t raw_client_port_count = 16;
 
-/** A listener category and the number of consecutive lease slots it owns. */
+/** A port category and the number of consecutive lease slots it owns. */
 struct port_layout_entry {
    port_category category;
    uint32_t count;
 };
 
-/** Authoritative listener layout in lease-slot order. */
+/** Authoritative port layout in lease-slot order. */
 inline constexpr std::array port_layout{
    port_layout_entry{port_category::ship,              single_port_count          },
    port_layout_entry{port_category::state_history,     single_port_count          },
@@ -86,9 +89,10 @@ inline constexpr std::array port_layout{
    port_layout_entry{port_category::wallet,            wallet_port_count          },
    port_layout_entry{port_category::transaction_only,  transaction_only_port_count},
    port_layout_entry{port_category::ipv6_probe,        ipv6_probe_port_count      },
+   port_layout_entry{port_category::raw_client,        raw_client_port_count      },
 };
 
-/** Return the slot range of a listener category. */
+/** Return the slot range of a port category. */
 constexpr port_slots slots_of(port_category category) {
    uint32_t start = 0;
    for (const auto& entry : port_layout) {
@@ -124,7 +128,7 @@ inline std::vector<uint16_t> parse_test_ports(std::string_view value) {
 }
 
 /**
- * Return this test's leased port for a listener class and index.
+ * Return this test's leased port for a port category and index.
  * @throws std::runtime_error when the test runs without a lease, or the index is outside the category.
  */
 inline uint16_t get_port(port_category category, uint32_t index = 0) {
@@ -163,7 +167,7 @@ private:
    /** Canonical HTTP loopback prefix used by local test servers. */
    inline static constexpr std::string_view loopback_http_prefix = "http://127.0.0.1:";
 
-   /** Listener category whose slots this allocator owns. */
+   /** Port category whose slots this allocator owns. */
    port_category category;
    /** Next category-relative slot to return. */
    uint32_t next_index = 0;

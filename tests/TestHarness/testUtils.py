@@ -114,12 +114,15 @@ class Utils:
     PortWallet="wallet"
     PortTransactionOnly="transaction_only"
     PortIpv6Probe="ipv6_probe"
+    PortRawClient="raw_client"
     WalletPortCount=5
     TransactionOnlyPortCount=2
     Ipv6ProbePortCount=4
+    RawClientPortCount=16
     PortWalletSlot=164
     PortTransactionOnlySlot=PortWalletSlot + WalletPortCount
     PortIpv6ProbeSlot=PortTransactionOnlySlot + TransactionOnlyPortCount
+    PortRawClientSlot=PortIpv6ProbeSlot + Ipv6ProbePortCount
     _nodeopHelpOutput=None
     # Lock subprocess_results.log writes and cached nodeop option discovery across threads.
     _check_output_lock = threading.Lock()
@@ -152,6 +155,7 @@ class Utils:
             Utils.PortWallet: (Utils.PortWalletSlot, Utils.WalletPortCount),
             Utils.PortTransactionOnly: (Utils.PortTransactionOnlySlot, Utils.TransactionOnlyPortCount),
             Utils.PortIpv6Probe: (Utils.PortIpv6ProbeSlot, Utils.Ipv6ProbePortCount),
+            Utils.PortRawClient: (Utils.PortRawClientSlot, Utils.RawClientPortCount),
         }
 
         if port_category not in slotRanges:
