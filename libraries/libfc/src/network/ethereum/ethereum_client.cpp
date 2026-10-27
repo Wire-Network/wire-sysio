@@ -30,6 +30,8 @@ constexpr std::string_view estimated_gas = "estimated_gas";
 constexpr std::string_view gas_price = "gas_price";
 constexpr std::string_view gas_limit_floor = "gas_limit_floor";
 constexpr std::string_view gas_limit_cap = "gas_limit_cap";
+constexpr std::string_view block_number = "block_number";
+constexpr std::string_view block_timestamp = "block_timestamp";
 } // namespace transaction_policy_field
 
 namespace ethereum_rpc_field {
@@ -37,7 +39,30 @@ constexpr std::string_view base_fee_per_gas = "baseFeePerGas";
 constexpr std::string_view max_priority_fee_per_gas = "maxPriorityFeePerGas";
 constexpr std::string_view max_fee_per_gas = "maxFeePerGas";
 constexpr std::string_view gas = "gas";
+constexpr std::string_view number = "number";
+constexpr std::string_view timestamp = "timestamp";
 } // namespace ethereum_rpc_field
+
+/// The shortest finality-lag limit a read confirmation accepts.
+constexpr fc::microseconds minimum_max_finality_lag = fc::seconds(1);
+
+/** A block's number and timestamp, as `eth_getBlockByNumber` reported them. */
+struct block_position {
+   fc::uint256 number;
+   fc::uint256 timestamp;
+};
+
+/** Read the number and timestamp out of an `eth_getBlockByNumber` block object. */
+block_position read_block_position(const fc::variant_object& block, block_tag_t tag) {
+   const std::string number_field{ethereum_rpc_field::number};
+   const std::string timestamp_field{ethereum_rpc_field::timestamp};
+   FC_ASSERT(block.contains(number_field) && block.contains(timestamp_field),
+             "eth_getBlockByNumber({}) returned a block without a number and timestamp", to_string(tag));
+   return block_position{
+      .number    = parse_rpc_quantity(block[number_field], transaction_policy_field::block_number),
+      .timestamp = parse_rpc_quantity(block[timestamp_field], transaction_policy_field::block_timestamp),
+   };
+}
 
 constexpr std::string_view gas_configuration_operation = "get_gas_config";
 } // namespace
@@ -65,6 +90,23 @@ std::string to_block_tag(const block_number_or_tag_t& block) {
       return std::get<std::string>(block);
    }
    return to_string(std::get<block_tag_t>(block));
+}
+
+void validate_read_confirmation(const ethereum_read_confirmation& confirmation) {
+   const bool readable_tag = confirmation.tag == block_tag_t::finalized || confirmation.tag == block_tag_t::safe ||
+                             confirmation.tag == block_tag_t::latest;
+   if (!readable_tag) {
+      FC_THROW_EXCEPTION(fc::invalid_arg_exception, "a read confirmation is finalized, safe or latest, not {}",
+                         to_string(confirmation.tag));
+   }
+   if (confirmation.confirmations == 0) {
+      FC_THROW_EXCEPTION(fc::invalid_arg_exception, "a read confirmation needs at least one confirmation");
+   }
+   if (confirmation.max_finality_lag < minimum_max_finality_lag) {
+      FC_THROW_EXCEPTION(fc::invalid_arg_exception,
+                         "a read confirmation's finality-lag limit must be at least {} s, not {} us",
+                         minimum_max_finality_lag.to_seconds(), confirmation.max_finality_lag.count());
+   }
 }
 
 /**
@@ -194,6 +236,7 @@ fc::variant ethereum_client::execute_contract_tx_fn(const eip1559_tx& source_tx,
                                                     const contract_invoke_data_items& params, bool sign) {
    eip1559_tx tx = source_tx;
    tx.data = from_hex(contract_encode_data(abi, params));
+   if (sign) return send_raw_transaction(sign_transaction(tx, abi.name).raw_hex);
 
    try {
       validate_transaction_against_policy(_transaction_policy, tx);
@@ -201,24 +244,34 @@ fc::variant ethereum_client::execute_contract_tx_fn(const eip1559_tx& source_tx,
       log_transaction_rejection(rejection, abi.name);
       throw;
    }
+   return send_raw_transaction(to_hex(rlp::encode_eip1559_unsigned_typed(tx)));
+}
 
-   auto tx_encoded = rlp::encode_eip1559_unsigned_typed(tx);
-   if (sign) {
-      fc::crypto::eth_client_signer signer(*_signature_provider);
-      auto tx_sig = signer.sign(tx_encoded);
-      auto& tx_sig_data = tx_sig.get<fc::em::signature_shim>().serialize();
-      std::copy_n(tx_sig_data.begin(), 32, tx.r.begin());
-      std::copy_n(tx_sig_data.begin() + 32, 32, tx.s.begin());
-      // Byte 64 of the recoverable signature is the Ethereum `v`, encoded
-      // pre-EIP-155 as `27 + recovery_id` (Yellow Paper Appendix F) by every
-      // signing path -- local `em` keys and the AWS KMS signer alike. EIP-1559
-      // typed transactions carry the bare recovery id, so strip the offset
-      // here; this is the exact inverse of the packing done at signing time.
-      tx.v = tx_sig_data[64] - fc::crypto::ethereum::v_offset; // recovery id
-      tx_encoded = rlp::encode_eip1559_signed_typed(tx);
+signed_transaction ethereum_client::sign_transaction(const eip1559_tx& source_tx, std::string_view operation) {
+   try {
+      validate_transaction_against_policy(_transaction_policy, source_tx);
+   } catch (const ethereum_transaction_policy_exception& rejection) {
+      log_transaction_rejection(rejection, operation);
+      throw;
    }
 
-   return send_raw_transaction(to_hex(tx_encoded));
+   eip1559_tx tx = source_tx;
+   fc::crypto::eth_client_signer signer(*_signature_provider);
+   auto tx_sig = signer.sign(rlp::encode_eip1559_unsigned_typed(tx));
+   auto& tx_sig_data = tx_sig.get<fc::em::signature_shim>().serialize();
+   std::copy_n(tx_sig_data.begin(), 32, tx.r.begin());
+   std::copy_n(tx_sig_data.begin() + 32, 32, tx.s.begin());
+   // Byte 64 of the recoverable signature is the Ethereum `v`, encoded
+   // pre-EIP-155 as `27 + recovery_id` (Yellow Paper Appendix F) by every
+   // signing path -- local `em` keys and the AWS KMS signer alike. EIP-1559
+   // typed transactions carry the bare recovery id, so strip the offset
+   // here; this is the exact inverse of the packing done at signing time.
+   tx.v = tx_sig_data[64] - fc::crypto::ethereum::v_offset; // recovery id
+   const auto signed_encoding = rlp::encode_eip1559_signed_typed(tx);
+   return signed_transaction{
+      .raw_hex = to_hex(signed_encoding),
+      .tx_hash = hash_to_hex(keccak256::hash(std::span<const uint8_t>(signed_encoding)), /*add_prefix=*/true),
+   };
 }
 
 
@@ -411,7 +464,39 @@ fc::variant_object ethereum_client::get_block_by_number(const block_number_or_ta
                                                         bool full_transaction_data) {
    auto block_number = to_block_tag(block_number_or_tag);
    fc::variants params{block_number, full_transaction_data};
-   return execute_idempotent("eth_getBlockByNumber", params).get_object();
+   const auto block = execute_idempotent("eth_getBlockByNumber", params);
+   // A node answers null for a block it does not have, such as `finalized` before the chain has
+   // finalized anything.
+   FC_ASSERT(block.is_object(), "eth_getBlockByNumber({}) returned no block", block_number);
+   return block.get_object();
+}
+
+ethereum_read_block ethereum_client::resolve_read_block(const ethereum_read_confirmation& confirmation) {
+   validate_read_confirmation(confirmation);
+   if (confirmation.tag != block_tag_t::latest) return ethereum_read_block{.block = confirmation.tag};
+
+   const auto head      = read_block_position(get_block_by_number(block_tag_t::latest), block_tag_t::latest);
+   const auto finalized = read_block_position(get_block_by_number(block_tag_t::finalized), block_tag_t::finalized);
+
+   // Measured by the chain's own timestamps rather than block counts: missed slots shrink the
+   // block gap while finality stalls, and the wall clock is not the chain's.
+   const fc::uint256 lag_seconds =
+      head.timestamp > finalized.timestamp ? fc::uint256{head.timestamp - finalized.timestamp} : fc::uint256{0};
+   const fc::uint256      longest_lag_seconds{fc::microseconds::maximum().to_seconds()};
+   const fc::microseconds finality_lag      = lag_seconds > longest_lag_seconds
+                                                 ? fc::microseconds::maximum()
+                                                 : fc::seconds(lag_seconds.convert_to<int64_t>());
+   const bool             finality_fallback = finality_lag > confirmation.max_finality_lag;
+
+   // The head counts as the first confirmation.
+   const fc::uint256 below_head{confirmation.confirmations - 1};
+   const fc::uint256 deep = head.number > below_head ? fc::uint256{head.number - below_head} : fc::uint256{0};
+   const fc::uint256 read_at = finality_fallback || finalized.number > deep ? finalized.number : deep;
+   return ethereum_read_block{
+      .block             = format_rpc_quantity(read_at),
+      .finality_fallback = finality_fallback,
+      .finality_lag      = finality_lag,
+   };
 }
 
 /**

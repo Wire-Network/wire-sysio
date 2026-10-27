@@ -37,6 +37,7 @@ enum class client_config_reason {
    policy_value_invalid,
    policy_fee_relationship_invalid,
    chain_id_duplicate,
+   read_confirmation_invalid,
 };
 
 /** Return the stable log spelling of a client-configuration reason. */

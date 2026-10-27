@@ -101,6 +101,29 @@ BOOST_AUTO_TEST_CASE(block_tag_wire_spelling) try {
 }
 FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(read_confirmation_defaults_and_validation) try {
+   // 12 confirmations deep, falling back to `finalized` past three mainnet epochs of finality lag.
+   BOOST_CHECK(eth::ethereum_read_confirmation_defaults.tag == eth::block_tag_t::latest);
+   BOOST_CHECK_EQUAL(eth::ethereum_read_confirmation_defaults.confirmations, 12u);
+   BOOST_CHECK_EQUAL(eth::ethereum_read_confirmation_defaults.max_finality_lag.to_seconds(), 1152);
+   BOOST_CHECK_NO_THROW(eth::validate_read_confirmation(eth::ethereum_read_confirmation_defaults));
+
+   for (const auto tag : {eth::block_tag_t::finalized, eth::block_tag_t::safe, eth::block_tag_t::latest}) {
+      BOOST_CHECK_NO_THROW(eth::validate_read_confirmation(eth::ethereum_read_confirmation{.tag = tag}));
+   }
+   for (const auto tag : {eth::block_tag_t::earliest, eth::block_tag_t::pending}) {
+      BOOST_CHECK_THROW(eth::validate_read_confirmation(eth::ethereum_read_confirmation{.tag = tag}),
+                        fc::invalid_arg_exception);
+   }
+   BOOST_CHECK_THROW(eth::validate_read_confirmation(eth::ethereum_read_confirmation{.confirmations = 0}),
+                     fc::invalid_arg_exception);
+   BOOST_CHECK_THROW(
+      eth::validate_read_confirmation(eth::ethereum_read_confirmation{.max_finality_lag = fc::microseconds(0)}),
+      fc::invalid_arg_exception);
+   BOOST_CHECK_NO_THROW(eth::validate_read_confirmation(eth::ethereum_read_confirmation{.confirmations = 1}));
+}
+FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(can_load_abi_json_file) try {
    using namespace fc::network::ethereum;
    auto abi_filename = fc::test::get_test_fixtures_path() / bfs::path(test_contract_abi_json_file_01);
