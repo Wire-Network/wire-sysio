@@ -2760,4 +2760,153 @@ BOOST_AUTO_TEST_CASE(decode_envelope_log_digest_finds_the_epochs_record) try {
                      fc::exception);
 } FC_LOG_AND_RETHROW();
 
+// ── EnvelopeChunks upload resume. A partial upload used to restart at chunk 0
+//    every tick; the program no-ops already-staged chunks, but each one still
+//    costs a send + confirm, so an envelope larger than one delivery deadline's
+//    worth of chunks never completed. These pin the header read the resume
+//    depends on against the program's bytemuck layout.
+
+namespace {
+
+/// Stub outpost program + `EnvelopeChunks` declared as `liqsol_core`'s IDL
+/// declares it: the bytemuck `repr(C)` header, explicit `_padding` included.
+idl::program outpost_program_with_envelope_chunks() {
+   constexpr std::string_view envelope_chunks = "EnvelopeChunks";
+   auto prog = load_idl_fixture(opp_outpost_idl_fixture);
+   std::erase_if(prog.accounts, [&](const idl::account& a) { return a.name == envelope_chunks; });
+   std::erase_if(prog.types, [&](const idl::type_def& t) { return t.name == envelope_chunks; });
+
+   idl::type_def header;
+   header.name          = std::string{envelope_chunks};
+   header.struct_fields = std::vector<idl::field>{
+      {"epoch_index", prim(idl::primitive_type::u32)},
+      {"total_bytes", prim(idl::primitive_type::u32)},
+      {"total_chunks", prim(idl::primitive_type::u16)},
+      {"received_chunks", prim(idl::primitive_type::u16)},
+      {"bump", prim(idl::primitive_type::u8)},
+      {"_padding", idl::idl_type::make_array(prim(idl::primitive_type::u8), 3)},
+      {"operator", prim(idl::primitive_type::pubkey)}};
+   prog.types.push_back(std::move(header));
+   idl::account account;
+   account.name = std::string{envelope_chunks};
+   account.compute_discriminator();
+   prog.accounts.push_back(std::move(account));
+   return prog;
+}
+
+/// An `EnvelopeChunks` account as the program lays it out: discriminator, the
+/// little-endian `repr(C)` header, then `staged_bytes` of raw payload tail.
+std::vector<uint8_t> envelope_chunks_account(uint32_t epoch, uint32_t total_bytes, uint16_t total_chunks,
+                                             uint16_t received, const solana_public_key& uploader,
+                                             size_t staged_bytes) {
+   borsh::encoder enc;
+   const auto disc = idl::compute_account_discriminator("EnvelopeChunks");
+   enc.write_fixed_bytes(disc.data(), disc.size());
+   enc.write_u32(epoch);
+   enc.write_u32(total_bytes);
+   enc.write_u16(total_chunks);
+   enc.write_u16(received);
+   enc.write_u8(0xFE); // bump
+   const std::array<uint8_t, 3> padding{};
+   enc.write_fixed_bytes(padding.data(), padding.size());
+   enc.write_pubkey(uploader);
+   auto bytes = enc.data();
+   bytes.resize(bytes.size() + staged_bytes, 0xAB);
+   return bytes;
+}
+
+} // anonymous namespace
+
+BOOST_AUTO_TEST_CASE(first_unstaged_chunk_resumes_the_same_upload) try {
+   using sysio::outpost_solana_client_detail::decode_first_unstaged_chunk;
+   const auto prog = outpost_program_with_envelope_chunks();
+   sysio::opp_solana_outpost_client program_client(solana_client_ptr{}, measurement_pubkey(42), {prog});
+   const auto     me           = measurement_pubkey(7);
+   constexpr auto total_chunks = uint16_t{50};
+   constexpr auto total_bytes  = uint32_t{32'768};
+
+   // Partially staged: resume at the first chunk the buffer has not received.
+   // The staged payload tail past the header must not disturb the read.
+   BOOST_CHECK_EQUAL(decode_first_unstaged_chunk(
+                        program_client,
+                        envelope_chunks_account(9, total_bytes, total_chunks, 20, me, 20 * sysio::SOLANA_MAX_CHUNK_BYTES),
+                        9, total_chunks, total_bytes, me),
+                     20u);
+   // Fully staged: every data chunk is skipped and only the terminal call remains.
+   BOOST_CHECK_EQUAL(decode_first_unstaged_chunk(program_client,
+                                                 envelope_chunks_account(9, total_bytes, total_chunks, total_chunks,
+                                                                         me, total_bytes),
+                                                 9, total_chunks, total_bytes, me),
+                     total_chunks);
+   // A received count past the envelope's chunk count is clamped, never skipping the terminal call's range.
+   BOOST_CHECK_EQUAL(decode_first_unstaged_chunk(program_client,
+                                                 envelope_chunks_account(9, total_bytes, total_chunks, 60, me,
+                                                                         total_bytes),
+                                                 9, total_chunks, total_bytes, me),
+                     total_chunks);
+   // A header claiming more chunks than the account's length can hold (a misread from a drifted IDL) is capped by
+   // the length, which the program sets to exactly the header plus the staged bytes. Resuming past it would start
+   // every tick at a chunk the program rejects as out of order.
+   BOOST_CHECK_EQUAL(decode_first_unstaged_chunk(program_client,
+                                                 envelope_chunks_account(9, total_bytes, total_chunks, 20, me,
+                                                                         5 * sysio::SOLANA_MAX_CHUNK_BYTES),
+                                                 9, total_chunks, total_bytes, me),
+                     5u);
+   // Freshly created for chunk 0 (one chunk's room, nothing received): nothing to skip.
+   BOOST_CHECK_EQUAL(decode_first_unstaged_chunk(program_client,
+                                                 envelope_chunks_account(9, total_bytes, total_chunks, 0, me,
+                                                                         sysio::SOLANA_MAX_CHUNK_BYTES),
+                                                 9, total_chunks, total_bytes, me),
+                     0u);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(first_unstaged_chunk_starts_over_for_another_upload) try {
+   using sysio::outpost_solana_client_detail::decode_first_unstaged_chunk;
+   const auto prog = outpost_program_with_envelope_chunks();
+   sysio::opp_solana_outpost_client program_client(solana_client_ptr{}, measurement_pubkey(42), {prog});
+   const auto me     = measurement_pubkey(7);
+   const auto staged = 2 * sysio::SOLANA_MAX_CHUNK_BYTES; // room for the 2 chunks every header claims
+
+   // Any header field that differs from this upload means the buffer is not
+   // ours to resume: start at 0 and let the program's shape checks speak.
+   BOOST_CHECK_EQUAL(decode_first_unstaged_chunk(program_client, envelope_chunks_account(8, 2000, 3, 2, me, staged), 9,
+                                                 3, 2000, me),
+                     0u);
+   BOOST_CHECK_EQUAL(decode_first_unstaged_chunk(program_client, envelope_chunks_account(9, 1999, 3, 2, me, staged), 9,
+                                                 3, 2000, me),
+                     0u);
+   BOOST_CHECK_EQUAL(decode_first_unstaged_chunk(program_client, envelope_chunks_account(9, 2000, 4, 2, me, staged), 9,
+                                                 3, 2000, me),
+                     0u);
+   BOOST_CHECK_EQUAL(decode_first_unstaged_chunk(program_client,
+                                                 envelope_chunks_account(9, 2000, 3, 2, measurement_pubkey(8), staged), 9,
+                                                 3, 2000, me),
+                     0u);
+   // Sanity: the same fixture with every field matching does resume.
+   BOOST_CHECK_EQUAL(decode_first_unstaged_chunk(program_client, envelope_chunks_account(9, 2000, 3, 2, me, staged), 9,
+                                                 3, 2000, me),
+                     2u);
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(first_unstaged_chunk_without_the_idl_declaration_or_with_foreign_bytes) try {
+   using sysio::outpost_solana_client_detail::decode_first_unstaged_chunk;
+   const auto me      = measurement_pubkey(7);
+   const auto account = envelope_chunks_account(9, 2000, 3, 2, me, 0);
+
+   // An IDL that does not declare EnvelopeChunks keeps the pre-resume behaviour.
+   {
+      auto prog = load_idl_fixture(opp_outpost_idl_fixture);
+      std::erase_if(prog.accounts, [](const idl::account& a) { return a.name == "EnvelopeChunks"; });
+      sysio::opp_solana_outpost_client program_client(solana_client_ptr{}, measurement_pubkey(42), {prog});
+      BOOST_CHECK_EQUAL(decode_first_unstaged_chunk(program_client, account, 9, 3, 2000, me), 0u);
+   }
+   // Another account's bytes at the buffer's address are a failed read, not an answer.
+   {
+      const auto prog = outpost_program_with_envelope_chunks();
+      sysio::opp_solana_outpost_client program_client(solana_client_ptr{}, measurement_pubkey(42), {prog});
+      BOOST_CHECK_THROW(decode_first_unstaged_chunk(program_client, envelope_log_account({}), 9, 3, 2000, me),
+                        fc::exception);
+   }
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_SUITE_END()

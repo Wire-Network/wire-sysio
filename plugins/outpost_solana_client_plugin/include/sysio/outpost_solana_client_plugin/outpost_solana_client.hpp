@@ -174,6 +174,32 @@ std::optional<fc::sha256> decode_envelope_log_digest(opp_solana_outpost_client& 
                                                      const std::vector<uint8_t>& account_data,
                                                      uint32_t                    epoch_index);
 
+/// The first `epoch_in` data chunk the uploader still has to send, read from its fetched `EnvelopeChunks` staging
+/// buffer: the buffer's `received_chunks` when the buffer was staged for exactly this upload (same epoch, uploader,
+/// `total_chunks` and `total_bytes`), else 0. The program treats a re-sent chunk below `received_chunks` as an
+/// idempotent no-op, so 0 is always safe -- but every no-op still costs a full send + confirm, and restarting from 0
+/// each tick capped an upload at what ONE delivery deadline can carry. Resuming here lets a large envelope finish
+/// across ticks. A buffer staged for a different shape returns 0, which is the program's own
+/// `ChunkBufferShapeMismatch` path. An IDL that does not declare `EnvelopeChunks` also returns 0 (the pre-resume
+/// behaviour). The result never exceeds the chunks the account's length can hold, so a `received_chunks` misread
+/// through a drifted IDL cannot resume past what is staged. Exposed for the plugin's unit tests, which drive it
+/// against synthesized accounts.
+///
+/// @param program_client  outpost program client whose loaded IDL decodes the account.
+/// @param account_data    raw fetched account bytes (incl. discriminator and the staged payload tail).
+/// @param epoch_index     the WIRE epoch being uploaded.
+/// @param total_chunks    data-chunk count of the envelope being uploaded.
+/// @param total_bytes     byte length of the envelope being uploaded.
+/// @param uploader        this relay's signer, the buffer's third PDA seed.
+/// @return the chunk index to resume from, in `[0, total_chunks]`.
+/// @throws fc::exception if the bytes do not decode as an `EnvelopeChunks` the loaded IDL declares.
+uint16_t decode_first_unstaged_chunk(opp_solana_outpost_client&                    program_client,
+                                     const std::vector<uint8_t>&                   account_data,
+                                     uint32_t                                      epoch_index,
+                                     uint16_t                                      total_chunks,
+                                     uint32_t                                      total_bytes,
+                                     const fc::network::solana::solana_public_key& uploader);
+
 /// Assert that the loaded IDL's `EpochDeliveries` declaration carries the
 /// fields the dispatch cursor read depends on: `consensus_reached` (bool) and
 /// `dispatched_count` (u32), in either IDL field home (inline on the account
@@ -535,6 +561,10 @@ private:
    /// treated as an error.
    outpost_solana_client_detail::epoch_dispatch_progress
    read_epoch_dispatch_progress(uint32_t epoch_index);
+
+   /// The first data chunk of `epoch_index`'s envelope this relay still has to upload, from its own on-chain
+   /// `EnvelopeChunks` buffer (`decode_first_unstaged_chunk`). A missing or not-yet-program-owned buffer is 0.
+   uint16_t read_first_unstaged_chunk(uint32_t epoch_index, uint16_t total_chunks, uint32_t total_bytes);
 
    /// Send ONE `dispatch_attestations(epoch_index, dispatch_limit)` call,
    /// appending `extra_remaining_accounts` (the packed effect-account batch)

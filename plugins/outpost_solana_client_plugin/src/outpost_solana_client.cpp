@@ -126,6 +126,19 @@ namespace envelope_log {
    constexpr auto field_checksum  = "checksum";
 } // namespace envelope_log
 
+/// Identifiers of the per-(epoch, uploader) `EnvelopeChunks` staging buffer header the upload resume reads.
+namespace envelope_chunks {
+   constexpr auto account_name          = "EnvelopeChunks";
+   constexpr auto field_epoch_index     = "epoch_index";
+   constexpr auto field_total_bytes     = "total_bytes";
+   constexpr auto field_total_chunks    = "total_chunks";
+   constexpr auto field_received_chunks = "received_chunks";
+   constexpr auto field_operator        = "operator";
+   /// `EnvelopeChunks::DATA_OFFSET`: the 8-byte discriminator + the 48-byte `repr(C)` header. The program sizes the
+   /// account as exactly this plus the bytes staged so far, which bounds `received_chunks` without the IDL.
+   constexpr size_t data_offset = 8 + 48;
+} // namespace envelope_chunks
+
 /// Identifiers of the per-epoch `EpochDeliveries` account + the two fields the
 /// dispatch cursor read consumes. Both are validated at boot for the
 /// batch-operator role (`assert_epoch_deliveries_shape`): a drifted
@@ -1293,6 +1306,36 @@ std::optional<fc::sha256> decode_envelope_log_digest(opp_solana_outpost_client& 
    return std::nullopt;
 }
 
+uint16_t decode_first_unstaged_chunk(opp_solana_outpost_client&                    program_client,
+                                     const std::vector<uint8_t>&                   account_data,
+                                     uint32_t                                      epoch_index,
+                                     uint16_t                                      total_chunks,
+                                     uint32_t                                      total_bytes,
+                                     const fc::network::solana::solana_public_key& uploader) {
+   const auto* program = program_client.get_program();
+   if (program == nullptr || program->find_account(envelope_chunks::account_name) == nullptr) return 0;
+
+   // The account is bytemuck `repr(C)` with explicit padding, so its header decodes byte-for-byte as the Borsh
+   // fields the IDL declares; the staged payload tail past the header is simply not read.
+   const fc::variant         decoded = program_client.decode_account_info_data(envelope_chunks::account_name,
+                                                                               account_data);
+   const fc::variant_object& header  = decoded.get_object();
+   const bool same_upload =
+      header[envelope_chunks::field_epoch_index].as_uint64() == epoch_index &&
+      header[envelope_chunks::field_total_chunks].as_uint64() == total_chunks &&
+      header[envelope_chunks::field_total_bytes].as_uint64() == total_bytes &&
+      header[envelope_chunks::field_operator].as_string() == uploader.to_string(fc::yield_function_t{});
+   if (!same_upload) return 0;
+   // Never resume past what the account's length can hold. A misread `received_chunks` (an IDL whose field order
+   // drifted from the program) would otherwise start every tick at a chunk the program rejects as out of order.
+   const size_t   staged_bytes   = account_data.size() > envelope_chunks::data_offset
+                                      ? account_data.size() - envelope_chunks::data_offset
+                                      : 0;
+   const uint64_t chunks_by_size = (staged_bytes + SOLANA_MAX_CHUNK_BYTES - 1) / SOLANA_MAX_CHUNK_BYTES;
+   return static_cast<uint16_t>(std::min<uint64_t>(
+      {header[envelope_chunks::field_received_chunks].as_uint64(), chunks_by_size, uint64_t{total_chunks}}));
+}
+
 } // namespace outpost_solana_client_detail
 
 outpost_solana_client::outpost_solana_client(
@@ -1426,6 +1469,28 @@ outpost_solana_client::read_epoch_dispatch_progress(uint32_t epoch_index) {
    progress.dispatched_count =
       static_cast<uint32_t>(row[epoch_deliveries::field_dispatched_count].as_uint64());
    return progress;
+}
+
+uint16_t outpost_solana_client::read_first_unstaged_chunk(uint32_t epoch_index, uint16_t total_chunks,
+                                                          uint32_t total_bytes) {
+   const auto uploader   = _entry->client->get_pubkey();
+   const auto buffer_pda = derive_envelope_chunks_pda(_program_id, epoch_index, uploader);
+   // `processed`, to match the chunk writes `execute_tx_and_confirm` waits for. A processed read that later rolls
+   // back over-reports; the next chunk then fails `ChunkOutOfOrder` and the following tick re-reads. A lagging
+   // read under-reports, which only re-sends no-op chunks.
+   const auto info = _entry->client->get_account_info(buffer_pda, fc::network::solana::commitment_t::processed);
+   // Absent, or still system-owned before its first chunk created it: nothing staged.
+   if (!info.has_value() || info->data.empty() || info->owner != _program_id) return 0;
+   // Starting at 0 is always safe (the program no-ops staged chunks), so an undecodable buffer costs only the
+   // resume, never the delivery.
+   try {
+      return outpost_solana_client_detail::decode_first_unstaged_chunk(*_program_client, info->data, epoch_index,
+                                                                      total_chunks, total_bytes, uploader);
+   } catch (const fc::exception& e) {
+      wlog("outpost_solana_client[{}]: cannot decode staged EnvelopeChunks for epoch={}: {}; uploading from chunk 0",
+           to_string(), epoch_index, e.to_detail_string());
+      return 0;
+   }
 }
 
 std::string outpost_solana_client::send_dispatch_attestations(
@@ -1718,8 +1783,18 @@ std::string outpost_solana_client::deliver_outbound_envelope(
    // operator's only Solana-side instruction family is `epoch_in`**: all
    // non-empty data chunks stage bytes, then terminal calls trigger the
    // program's `finalize_envelope`.
+   //
+   // Resume past whatever an earlier tick already staged. Restarting at 0
+   // spent the whole delivery deadline re-sending no-op chunks, so an
+   // envelope larger than one deadline's worth of chunks never completed.
+   const uint16_t first_chunk =
+      read_first_unstaged_chunk(epoch_index, total_chunks, static_cast<uint32_t>(total));
+   if (first_chunk > 0) {
+      ilog("outpost_solana_client[{}]: epoch_in resuming epoch={} at chunk {}/{} already staged",
+           to_string(), epoch_index, first_chunk, total_chunks);
+   }
    std::string last_sig;
-   for (uint16_t i = 0; i < total_chunks; ++i) {
+   for (uint16_t i = first_chunk; i < total_chunks; ++i) {
       throw_if_past_deadline(deadline_abs, OP_EPOCH_IN);
 
       const size_t off = static_cast<size_t>(i) * SOLANA_MAX_CHUNK_BYTES;
@@ -1737,7 +1812,8 @@ std::string outpost_solana_client::deliver_outbound_envelope(
    // Memoize once the buffer is fully staged: the program refuses to crank a
    // partial buffer (TerminalChunkBeforeDataComplete), so the crank-once-consensus-
    // tips path is only reachable from a COMPLETE staged buffer. A partial upload
-   // leaves this unset and the next run_outbound tick re-uploads from offset zero.
+   // leaves this unset and the next run_outbound tick resumes from the buffer's
+   // on-chain `received_chunks`.
    _delivered_envelope = std::make_pair(epoch_index, envelope_bytes);
 
    // ONE terminal call: records this operator's delivery and runs the consensus
