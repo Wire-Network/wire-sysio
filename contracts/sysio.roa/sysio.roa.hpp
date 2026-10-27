@@ -175,8 +175,10 @@ namespace sysio {
              * - The registration count for the `creator` will be incremented.
              * - The sponsor mapping (creator, nonce -> username) will be recorded in the sponsors table.
              * - The action fails if ROA is inactive, the `creator` is not a tier-1 node owner, the
-             *   creator name cannot fit a generated suffix, the nonce was already used by that creator,
-             *   or no unused generated name is found within the bounded candidate search.
+             *   `creator` has already sponsored as many accounts as its account limit allows (see
+             *   `raiseacctlim`), the creator name cannot fit a generated suffix, the nonce was already
+             *   used by that creator, or no unused generated name is found within the bounded
+             *   candidate search.
              *
              * ### Rights Granted
              * - The new user account is granted access to the network with the specified public key.
@@ -188,6 +190,46 @@ namespace sysio {
              */
             [[sysio::action]]
             name newuser(const name& creator, const name& nonce, const public_key& pubkey);
+
+            /**
+             * @brief Sets the account limit every tier-1 node owner's `newuser` is held to.
+             *
+             * Governance-only (`sysio.roa` authority). Until it is first called, `newuser` and
+             * `raiseacctlim` use DEFAULT_ACCOUNT_LIMIT and DEFAULT_MAX_RAISE_MULTIPLIER_BPS.
+             *
+             * An owner's limit is the larger of `default_limit` and the limit it last raised itself to,
+             * so raising the default lifts every owner below it, and lowering it leaves raised limits in
+             * place. An owner whose sponsored count is at or above a lowered limit cannot call `newuser`
+             * until it raises its limit past that count.
+             *
+             * @param default_limit            Accounts each tier-1 owner may sponsor without raising its
+             *                                 limit. Must be positive.
+             * @param max_raise_multiplier_bps Largest factor one `raiseacctlim` call may multiply an
+             *                                 owner's limit by, in basis points (15000 = 1.5x). Must
+             *                                 exceed BPS_DENOMINATOR, or no raise could grow a limit.
+             */
+            [[sysio::action]]
+            void setacctlim(uint64_t default_limit, uint32_t max_raise_multiplier_bps);
+
+            /**
+             * @brief Raises a tier-1 node owner's own account limit for the current network generation.
+             *
+             * The limit guards against runaway account creation: a script that calls `newuser` in a loop
+             * stops at the limit until the owner raises it. Raising is not gated on usage or time; it
+             * only has to be done deliberately, and one call may multiply the current limit by at most
+             * the configured `max_raise_multiplier_bps`, rounded up so every raise can add at least one.
+             *
+             * The raised limit is stored on the owner's `sponsorcount` row, which is billed to the owner
+             * like the rest of its sponsorship rows. When `newuser` has not created that row yet, this
+             * call creates it, so `{owner, sysio.payer}` must come first in the authorizations, as it
+             * does for `newuser`.
+             *
+             * @param owner     The tier-1 node owner raising its own limit.
+             * @param new_limit The new limit: greater than the current limit and at most
+             *                  `max_raise_multiplier_bps` / BPS_DENOMINATOR times it, rounded up.
+             */
+            [[sysio::action]]
+            void raiseacctlim(const name& owner, uint64_t new_limit);
 
             /**
              * @brief Create a node-owner account with a user-chosen (vanity) name and the holder's
@@ -460,12 +502,34 @@ namespace sysio {
 
             struct [[sysio::table("sponsorcount")]] sponsorcount {
                 name owner;
-                uint64_t count;
+                uint64_t count = 0;        // Accounts the owner has sponsored with newuser.
+                uint64_t raised_limit = 0; // Limit the owner last raised itself to with raiseacctlim; 0 until then.
 
-                SYSLIB_SERIALIZE(sponsorcount, (owner)(count))
+                SYSLIB_SERIALIZE(sponsorcount, (owner)(count)(raised_limit))
             };
 
             using sponsorcount_t = kv::scoped_table<"sponsorcount"_n, sponsorcount_key, sponsorcount>;
+
+            /// Basis points in 1x.
+            static constexpr uint32_t BPS_DENOMINATOR = 10000;
+            /// Accounts each tier-1 owner may sponsor until it raises its limit, before `setacctlim` is called.
+            static constexpr uint64_t DEFAULT_ACCOUNT_LIMIT = 1000;
+            /// Largest factor one `raiseacctlim` call may multiply a limit by (1.5x), before `setacctlim` is called.
+            static constexpr uint32_t DEFAULT_MAX_RAISE_MULTIPLIER_BPS = 15000;
+
+            /**
+             * @brief Account limit policy for tier-1 `newuser`, set by governance through `setacctlim`.
+             *
+             * Absent until the first `setacctlim`; readers fall back to the member defaults.
+             */
+            struct [[sysio::table("acctlimcfg")]] account_limit_config {
+                uint64_t default_limit            = DEFAULT_ACCOUNT_LIMIT;
+                uint32_t max_raise_multiplier_bps = DEFAULT_MAX_RAISE_MULTIPLIER_BPS;
+
+                SYSLIB_SERIALIZE(account_limit_config, (default_limit)(max_raise_multiplier_bps))
+            };
+
+            using acctlimcfg_t = kv::global<"acctlimcfg"_n, account_limit_config>;
 
             // ---- Private Functions ----
 
@@ -477,8 +541,9 @@ namespace sysio {
              * issuance) and a reslimit row.
              *
              * Only tier 1 additionally gets a personal self-issued policy. It is the only tier that can
-             * call `newuser`, whose `sponsors` / `sponsorcount` rows are the sole writes in this
-             * contract billed to a node owner instead of to `sysio.roa`. Tiers 2 and 3 need no
+             * call `newuser`, and the `sponsors` / `sponsorcount` rows that `newuser` and
+             * `raiseacctlim` write are the sole rows in this contract billed to a node owner instead of
+             * to `sysio.roa`. Tiers 2 and 3 need no
              * allocation of their own: a policy action that does not name an explicit `sysio.payer`
              * resolves `action::payer()` to `sysio.roa` and bills its rows to `sysio.roa`, so it draws
              * nothing from the issuer. They can self-issue on demand with `addpolicy` against the
@@ -554,6 +619,34 @@ namespace sysio {
              * @return An asset containing the amount of SYS a node owner of this tier may issue
              */
             asset get_allocation_for_tier(uint8_t tier);
+
+            /**
+             * @brief Whether `account` is a registered tier-1 node owner in `network_gen`, the only tier
+             *        that sponsors accounts (`newuser`) and so the only one with an account limit.
+             */
+            bool is_tier1_node_owner(const name& account, uint8_t network_gen) const;
+
+            /// The governance-set account limit policy, or the defaults before the first `setacctlim`.
+            account_limit_config get_account_limit_config() const;
+
+            /**
+             * @brief `owner`'s row in `sponsorships`, or an empty one (nothing sponsored, never raised)
+             *        when the owner has none yet.
+             */
+            static sponsorcount get_sponsorship(const sponsorcount_t& sponsorships, const name& owner);
+
+            /**
+             * @brief How many accounts the owner of `sponsorship` may have sponsored: the configured
+             *        default limit, or the limit it raised itself to when that is higher.
+             */
+            static uint64_t account_limit(const account_limit_config& config, const sponsorcount& sponsorship);
+
+            /**
+             * @brief The largest limit one `raiseacctlim` call may move `current_limit` to:
+             *        `current_limit * max_raise_multiplier_bps / BPS_DENOMINATOR`, rounded up so it always
+             *        exceeds `current_limit`, and saturated at the largest uint64.
+             */
+            static uint64_t max_raised_limit(const account_limit_config& config, uint64_t current_limit);
 
             struct resources_t {
                 asset net;

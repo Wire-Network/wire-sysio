@@ -346,8 +346,8 @@ node.allocated_sys`. A node owner cannot issue more than they hold.
 
 The three land in a self-issued policy — `issuer == owner` — carrying `time_block = 1`, so the
 owner can reshape or reclaim them immediately with `expandpolicy` or `reducepolicy`. Tier 1 gets
-them because it is the only tier that can call `newuser`, whose `sponsors` and `sponsorcount` rows
-are the only writes in the contract billed to a node owner.
+them because it is the only tier that can call `newuser`. The `sponsors` and `sponsorcount` rows
+that `newuser` and `raiseacctlim` write are the only rows in the contract billed to a node owner.
 
 Registration writes no policy for `sysio`. Its tier-1 share was carved out at activation, so an
 owner's `allocated_sys` is exactly the sum of the policies it has issued.
@@ -364,9 +364,10 @@ Almost nothing. Managing policies costs a node owner no resources at all:
 An owner reduced to zero CPU, zero NET, and zero spare RAM can still issue a policy. Membership —
 the `nodeowners` row — is what confers the ability to issue, not any allocation the owner holds.
 
-The one exception is tier-1's `newuser`, which bills its `sponsors` and `sponsorcount` rows to
-`creator`. Those are the only two writes in the contract charged to a node owner, so a tier-1
-owner needs RAM headroom before its first `newuser` call.
+The one exception is tier-1 account sponsorship. `newuser` bills its `sponsors` and `sponsorcount`
+rows to `creator`, and `raiseacctlim` bills the same `sponsorcount` row to the owner. Those are the
+only rows in the contract charged to a node owner, so a tier-1 owner needs RAM headroom before its
+first `newuser` or `raiseacctlim` call.
 
 ### What differs between tiers
 
@@ -376,10 +377,11 @@ owner needs RAM headroom before its first `newuser` call.
 | Budget per owner | 2,717.8560 SYS | 113.2440 SYS | 2.2649 SYS |
 | Max owners | 21 | 84 | 1,000 |
 | `newuser` (sponsored accounts) | Yes | No | No |
+| `raiseacctlim` (raise own account limit) | Yes | No | No |
 
 Policy mechanics are identical across tiers — there is no tier check in any of the four policy
-actions. `newuser` is the only tier-gated capability, guarded by
-`check(node.tier == 1, "Creator is not a registered tier-1 node owner")`.
+actions. Account sponsorship is the only tier-gated capability: `newuser` and `raiseacctlim` both
+refuse any caller that is not a registered tier-1 owner.
 
 ### Where network RAM comes from
 
@@ -400,8 +402,8 @@ tier-1 owner's own free budget of ~2.83 GB is the only one that scales with how 
 actually onboards.
 
 A sponsorship costs **144 bytes** — a 16-byte key and 16-byte value over
-`billable_size_v<kv_object>` of 112 — plus a one-time 144-byte `sponsorcount` row on a creator's
-first `newuser`. Neither pool is a ceiling: `addpolicy` refuses CPU and NET to a `sysio.`-prefixed
+`billable_size_v<kv_object>` of 112 — plus a one-time 152-byte `sponsorcount` row (a 24-byte value:
+owner, count, raised limit) on a creator's first `newuser` or `raiseacctlim`. Neither pool is a ceiling: `addpolicy` refuses CPU and NET to a `sysio.`-prefixed
 account but not RAM, so a node owner can extend either with a RAM-only policy. The ~157 MB is
 where `activateroa` starts `sysio.roa`.
 
@@ -775,9 +777,15 @@ The created account has **no CPU/NET policy** — and does not need one, because
 against contracts that carry their own. A user gets an account at no cost to themselves and can
 immediately use every provisioned contract on the network.
 
-Two limits worth knowing:
+Three limits worth knowing:
 
 - `newuser` is **tier-1 only**. Tiers 2 and 3 cannot use it.
+- Each tier-1 owner has an **account limit**, so a script that calls `newuser` in a loop stops
+  instead of running away. The limit starts at a governance-set default (1,000 until `setacctlim`
+  changes it). The owner raises its own limit with `raiseacctlim` whenever it chooses, with no usage
+  or time gate, but one call can multiply the current limit by at most 1.5, rounded up (the
+  multiplier is also set by `setacctlim`, in basis points). An owner's limit is the larger of the
+  default and the limit it last raised to, and it applies per network generation.
 - Ordinary accounts cannot call the native `newaccount` directly: Wire gates it on the declared
   creator being privileged, which replaced Antelope's name-suffix ownership rule. A privileged
   creator that authorized the action can. For applications that means `sysio.roa` — `newuser`, or
@@ -865,6 +873,8 @@ and are omitted.
 | `extendpolicy` | issuer | Push `time_block` further out |
 | `reducepolicy` | issuer, at or after `time_block` | Reclaim weight |
 | `newuser` | tier-1 node owner | Create a sponsored sub-account |
+| `raiseacctlim` | tier-1 node owner | Raise its own account limit, at most by the configured multiplier |
+| `setacctlim` | `sysio.roa` | Set the default account limit and the raise multiplier |
 | `newnameduser` | `sysio.roa` | Create a vanity account (NFT-claim flow) |
 | `nodeownreg` | `sysio.roa` | Register a node owner from an OPP attestation |
 | `forcereg` | `sysio.roa` | Register a node owner directly (governance/bootstrap) |
@@ -879,6 +889,8 @@ and are omitted.
 | `nodeowners` | `network_gen` | Node owner rows: tier, total and allocated SYS |
 | `policies` | issuer | One row per (issuer, owner) pair |
 | `reslimit` | global | Per-account totals summed across all its policies |
+| `sponsorcount` | `network_gen` | Per tier-1 owner: accounts sponsored and the limit it raised to |
+| `acctlimcfg` | singleton | Default account limit and the raise multiplier |
 
 ### Errors you may encounter
 
@@ -893,6 +905,8 @@ and are omitted.
 | `Cannot allocate CPU/NET to sysio accounts.` | ROA refuses CPU/NET policies for any `sysio.`-prefixed owner. It does not mean the account is unlimited — `sysio.acct` is at zero |
 | `Only privileged accounts can create new accounts` | The declared creator is not privileged. Ordinary accounts cannot call native `newaccount`; `sysio.roa::newuser` is the supported flow, and only for a registered tier-1 sponsor |
 | `Creator is not a registered tier-1 node owner` | `newuser` is tier-1 only |
+| `Creator has reached its account limit of N; raise it with raiseacctlim` | The owner has sponsored N accounts; `raiseacctlim` before the next `newuser` |
+| `New account limit may be at most M for a current limit of N` | One `raiseacctlim` call can multiply the limit by at most the configured multiplier (1.5 by default); raise in steps |
 
 ---
 
