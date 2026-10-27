@@ -14,6 +14,52 @@ using namespace fc::network::solana;
 /// Default IDL name; integrated liqsol-core deployments override it through configuration.
 inline constexpr const char* OPP_SOLANA_OUTPOST_PROGRAM_NAME = "opp_outpost";
 
+/// Shared heap frame for terminal `epoch_in` and every dispatch round, in bytes.
+///
+/// Data chunks stay bare so a full chunk remains inside Solana's packet limit.
+/// Terminal admission and resumable dispatch both decode the staged envelope;
+/// the draining dispatch also encodes outbound effects. Both paths use the
+/// same relay budget contract exercised by liqsol-core's capacity suite.
+/// The two-instruction ComputeBudget preamble also costs packet budget, which
+/// is why the packet tests measure the transaction with both instructions.
+inline constexpr uint32_t SOLANA_RELAY_HEAP_FRAME_BYTES = 256'000;
+
+/// Shared compute-unit ceiling for terminal `epoch_in` and every dispatch round.
+///
+/// This is Solana's per-transaction ceiling and matches the producer's
+/// full-envelope capacity tests. Requesting it explicitly prevents the
+/// relay from silently falling back to the approximately 200,000-CU
+/// default as the envelope and roster approach their supported bounds.
+inline constexpr uint32_t SOLANA_RELAY_COMPUTE_UNIT_LIMIT = 1'400'000;
+
+namespace outpost_solana_client_detail {
+
+/// Build the shared heap-first, CU-second preamble for terminal and dispatch work.
+/// Packet tests use this production builder so neither path can drift from the
+/// producer capacity transaction shape or measure a test-only approximation.
+inline std::vector<fc::network::solana::instruction> relay_compute_budget_pre_instructions() {
+   return {
+      fc::network::solana::system::compute_budget::request_heap_frame(SOLANA_RELAY_HEAP_FRAME_BYTES),
+      fc::network::solana::system::compute_budget::set_compute_unit_limit(SOLANA_RELAY_COMPUTE_UNIT_LIMIT),
+   };
+}
+
+/// Build the exact ComputeBudget preamble for one production `epoch_in` call.
+///
+/// Non-terminal data chunks intentionally return an empty preamble. The
+/// zero-data terminal call requests the producer-tested heap frame followed by
+/// the producer-tested compute-unit ceiling. Keeping this composition in one
+/// helper lets packet tests exercise the same instruction vector the relay
+/// submits.
+inline std::vector<fc::network::solana::instruction> epoch_in_pre_instructions(uint16_t chunk_index,
+                                                                               uint16_t total_chunks) {
+   if (chunk_index != total_chunks)
+      return {};
+   return relay_compute_budget_pre_instructions();
+}
+
+} // namespace outpost_solana_client_detail
+
 /// Consumer role a Solana `outpost_client` is constructed for. Boot-time IDL
 /// validation is role-aware: only roles that call `read_inbound_envelope`
 /// require the loaded IDL to declare a decodable `LatestOutboundEnvelope`
@@ -98,13 +144,11 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    /// EpochDeliveries PDA and the per-(epoch, signer) chunk-buffer PDA.
    ///
    /// `extra_remaining_accounts` is appended past the IDL's account list as
-   /// Anchor `remaining_accounts`. The cranker
-   /// (`outpost_solana_client::deliver_outbound_envelope`) decodes the
-   /// committed envelope and builds account metas for every effect account the
-   /// terminal handlers may touch: syndicated LIQ custody, recipient wallets,
-   /// canonical ATAs, mints, and token/ATA/system programs. Data
-   /// chunks ignore the slice — only the zero-data terminal call's account
-   /// list matters for dispatch.
+   /// Anchor `remaining_accounts`. Production delivery passes an empty slice
+   /// for both data chunks and the zero-data terminal call: that call only
+   /// finalizes the envelope and records consensus. Effect accounts for LIQ
+   /// custody, recipient wallets, canonical ATAs, mints, and token programs
+   /// travel on the separate `dispatch_attestations` crank.
    solana_program_tx_fn<std::string, uint32_t, uint16_t, uint16_t, uint32_t,
                          std::vector<uint8_t>,
                          std::vector<fc::network::solana::account_meta>> epoch_in;
@@ -115,7 +159,7 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
    solana_program_tx_fn<std::string, uint32_t>             cleanup_envelope_chunks;
    /// `emit_outbound_envelope(wire_epoch_index: u32) -> signature`.
    /// Recovery/admin escape hatch only. The steady-state batch-operator relay
-   /// never calls it because the consensus-reaching terminal `epoch_in` emits
+   /// never calls it because the draining `dispatch_attestations` round emits
    /// the outbound envelope inline.
    solana_program_tx_fn<std::string, uint32_t>             emit_outbound_envelope;
    /// Decode already-fetched Anchor account bytes using the outpost IDL.
@@ -185,11 +229,11 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
                   epoch_seed,
                   std::vector<uint8_t>(signer_pk.begin(), signer_pk.end())},
                  program_id);
-           // `epoch_in` only stages/finalizes inbound chunks and, on
-           // consensus reach, processes the enclosed attestations inline —
-           // it no longer fires an outbound emit itself (that moved to the
+           // `epoch_in` only stages/finalizes inbound chunks and records the
+           // delivery/consensus result. It neither applies the enclosed
+           // attestations nor fires an outbound emit; both belong to the
            // `dispatch_attestations` crank below, which drains the epoch's
-           // attestation cursor and carries the outbound-emit accounts).
+           // attestation cursor and carries the effect/outbound accounts.
            // The IDL's `epoch_in` account list is just the 7 delivery/
            // staging/consensus accounts below; no outbound PDAs needed here.
            account_overrides_t overrides = {
@@ -209,38 +253,19 @@ struct opp_solana_outpost_client : fc::network::solana::solana_program_client {
            };
 
            // ComputeBudget pre-ixs are injected ONLY on the zero-data
-           // terminal call — that's the call that triggers `finalize_envelope` +
-           // `emit_outbound_inner` on the Solana side, which compounds:
-           //   * Anchor deserialise of 9 mut accounts (~5–7 KiB heap)
-           //   * `chunk_buffer.data` manual read + envelope_data clone (~5 KiB)
-           //   * decoded Envelope proto + nested attestation Vecs (~5–10 KiB)
-           //   * inline message processing temp allocs + emit_outbound encode
-           // peak ≈ 22–30 KiB, right at the 32 KiB default BPF heap.
-           // Bounded +88 B/epoch growth in the inbound + outbound EnvelopeLog
-           // Vecs tipped the cluster over the heap ceiling at epoch 13 (OOM
-           // panic in `log_info.resize`); bumping to 256 KiB on this one tx
-           // gives the finalize path 8× margin and removes the failure mode.
+           // terminal call. That call decodes the staged envelope, hashes it,
+           // records the delivery, and runs consensus.
+           // The producer's cap-sized capacity suite exercises that path with
+           // a 256,000-byte heap and Solana's 1,400,000-CU transaction ceiling.
            //
-           // Non-final chunks just `chunk_buffer.data.extend_from_slice(...)`
-           // and consume <5 KiB heap — they don't need the bump, and
-           // injecting pre-ixs there bloats the chunk-write tx past the
-           // 1 232-byte MTU (the bug we hit earlier with always-on pre-ixs;
-           // the encoded tx hit 1 744 > 1 644 cap).
-           //
-           // Deliberately NOT injecting `set_compute_unit_limit` — the
-           // OOM tx consumed 116 K of 200 K CU, so CU is not the
-           // bottleneck for the production 2.5 KB envelope. Add a CU
-           // bump only when cap-sized (32 KiB) envelopes land live.
-           std::vector<fc::network::solana::instruction> pre_ixs;
-           if (chunk_index == total_chunks) {
-              pre_ixs.push_back(
-                 fc::network::solana::system::compute_budget::request_heap_frame(256'000));
-           }
+           // Data chunks only copy their bounded slice into the zero-copy
+           // staging account. They need no budget bump, and keeping them bare
+           // preserves the full-chunk packet-size invariant.
+           auto pre_ixs = outpost_solana_client_detail::epoch_in_pre_instructions(chunk_index, total_chunks);
            // Resolve the IDL's declared accounts first, then append any
-           // extra `remaining_accounts` the cranker decoded from the
-           // inbound envelope (syndicated LIQ custody, recipient wallets,
-           // and token programs that effect handlers need to
-           // address).
+           // caller-supplied `remaining_accounts`. Production delivery uses
+           // none; settlement effect accounts belong to
+           // `dispatch_attestations`.
            // Anchor's runtime exposes everything past the IDL's declared
            // accounts as `ctx.remaining_accounts`; the relay supplies full
            // account metas so writable/readonly flags match each effect
