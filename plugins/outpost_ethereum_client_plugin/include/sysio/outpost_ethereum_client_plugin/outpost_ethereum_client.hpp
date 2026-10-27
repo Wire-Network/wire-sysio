@@ -290,8 +290,8 @@ fee_caps transaction_fee_caps(const ethereum_transaction_policy& policy, const e
 ethereum_transaction_fees highest_fees(const std::vector<submission_attempt>& attempts);
 
 /// The signing in `attempts` with the highest fee cap, the higher tip breaking a tie: the one sent again
-/// when no replacement fits the caps, since it replaces a lower one a node holds. `attempts` must not be
-/// empty.
+/// when no replacement fits the caps and the base fee has not passed its fee cap, since it replaces a lower
+/// one a node holds. `attempts` must not be empty.
 const submission_attempt& highest_signing(const std::vector<submission_attempt>& attempts);
 
 /// The fees a same-nonce resend pays. A replacement must raise each of `paid`'s
@@ -458,9 +458,10 @@ private:
    ///  - check every other one against the head, so a call a reorg put back in
    ///    the mempool is pending again;
    ///  - replace a pending one at its nonce when the market priced it out,
-   ///    over every signing on record, or send its highest signing again when
-   ///    no replacement fits the caps; send it again when the node no longer
-   ///    holds it;
+   ///    over every signing on record; when no replacement fits the caps, send
+   ///    its highest signing again, or, once the base fee has passed that
+   ///    signing's fee cap, a replacement over only what the node holds; send
+   ///    it again when the node no longer holds it;
    ///  - wait on, and after `unaccounted_nonce_grace` cancel, a nonce no
    ///    submission accounts for: a pending transaction there, or nothing
    ///    below a journaled one;

@@ -218,7 +218,9 @@ whole delivery, so only one sender uses the signer's nonces at a time:
 
 While anything is still pending at the deadline nothing else is sent, and the next tick repeats the check.
 When the caps leave no room for a replacement, the highest signing is sent again as its bytes, since it
-replaces a lower one the node holds; when the node already shows it, it is waited for.
+replaces a lower one the node holds; when the node already shows it, it is waited for. Once the base fee has
+passed that signing's fee cap no block can include it, so a signing priced over only what the node shows
+goes instead, within the caps, and the highest stays on record in case another node holds it.
 
 Every resend is priced within the transaction's own caps: the policy's per-gas caps, with the fee cap also
 bounded by what `max_total_native_cost` leaves after the value for its gas limit, so a candidate is never
@@ -449,7 +451,9 @@ surviving a rebuilt relay, an unaccounted nonce waited on and cancelled after a 
 a journaled call cancelled, a refused cancel kept and sent again next tick, a first `epochIn` refused as
 already known while the backend asked next does not show it yet, a resend at fees already signed at sending
 the recorded bytes from a signer that never signs the same way twice, the highest signing sent again when no
-replacement fits the caps, a replacement that beats a signing the read backend does not show, a cancel at the
+replacement fits the caps, a signing over what the node holds sent instead once the base fee has passed the
+highest one's fee cap, a held signing the base fee has passed waited for when nothing fits the caps, a
+replacement that beats a signing the read backend does not show, a cancel at the
 cap when the market asks for more, a journaled call outbid when something
 else holds its nonce, the check before every send, the replacement and outbid fees and the per-transaction
 caps, and the network hash

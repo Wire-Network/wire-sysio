@@ -3302,6 +3302,73 @@ BOOST_AUTO_TEST_CASE(a_replacement_beats_a_signing_the_read_backend_does_not_sho
    BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 1u);
 } FC_LOG_AND_RETHROW();
 
+/// The policy's fee cap in the rising-base-fee tests, far above what they sign.
+constexpr uint64_t rising_base_fee_test_fee_cap = 500;
+/// Their base fee once it has risen: one past the 12/200 replacement's fee cap.
+constexpr uint64_t risen_past_replacement_base_fee = replacement_test_max_fee + 1;
+
+/// A policy whose tip cap is the replacement tests' tip, so no replacement can
+/// raise a 12 tip again, under a fee cap far above the market.
+ethereum_transaction_policy tip_at_cap_policy() {
+   auto policy                     = relay_test_policy();
+   policy.max_priority_fee_per_gas = replacement_test_tip;
+   policy.max_fee_per_gas          = rising_base_fee_test_fee_cap;
+   return policy;
+}
+
+/// The highest signing is not sent again once the base fee has passed its fee
+/// cap. The call pays 10/100 and its 12/200 replacement is refused and kept.
+/// The base fee then rises to 201, so the market asks for 10/412. Replacing
+/// over the refused signing would need a tip of 14, past the cap of 12, and its
+/// own 12/200 bytes cannot be included at a base fee of 201. A signing priced
+/// over the call the node holds, 12/412, goes instead, and is waited for.
+BOOST_AUTO_TEST_CASE(a_highest_signing_the_base_fee_passed_gives_way_to_one_over_what_the_node_holds) try {
+   auto       fixture     = create_whole_envelope_delivery_fixture(tip_at_cap_policy());
+   const auto envelope    = make_envelope(mid_envelope_bytes);
+   const auto replacement = replace_the_call_once(*fixture, envelope, scripted_send::refused);
+   BOOST_CHECK(!fixture->rpc->known_hashes.contains(replacement.tx_hash));
+   fixture->rpc->base_fee_hex = format_rpc_quantity(fc::uint256{risen_past_replacement_base_fee});
+
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_REQUIRE_EQUAL(fixture->rpc->sent_hashes.size(), 2u);
+   const auto replaced = fixture->only_submission();
+   BOOST_REQUIRE_EQUAL(replaced.attempts.size(), 3u);
+   BOOST_CHECK_EQUAL(replaced.attempts[1].tx_hash, replacement.tx_hash);
+   const auto& next = replaced.attempts.back();
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.back(), next.tx_hash);
+   BOOST_CHECK_NE(next.tx_hash, replacement.tx_hash);
+   // The tip at its cap, and the market's `2 * 201 + 10` fee cap.
+   BOOST_CHECK(next.fees.max_priority_fee_per_gas == fc::uint256{replacement_test_tip});
+   BOOST_CHECK(next.fees.max_fee_per_gas == fc::uint256{2 * risen_past_replacement_base_fee + test_scripted_tip});
+
+   // The node holds it, and it pays the market's tip: nothing more is sent.
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.size(), 2u);
+   BOOST_CHECK_EQUAL(fixture->only_submission().attempts.size(), 3u);
+   BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 1u);
+} FC_LOG_AND_RETHROW();
+
+/// A signing the node holds, past which the base fee has risen, is waited for
+/// when no replacement fits the caps: nothing within a tip cap of 12 replaces
+/// the 12/200 the node holds.
+BOOST_AUTO_TEST_CASE(a_held_signing_the_base_fee_passed_is_waited_for_when_no_replacement_fits) try {
+   auto       fixture     = create_whole_envelope_delivery_fixture(tip_at_cap_policy());
+   const auto envelope    = make_envelope(mid_envelope_bytes);
+   const auto replacement = replace_the_call_once(*fixture, envelope, scripted_send::accepted);
+   // The node replaced the call with it.
+   fixture->rpc->known_hashes.erase(fixture->only_submission().attempts.front().tx_hash);
+   fixture->rpc->base_fee_hex = format_rpc_quantity(fc::uint256{risen_past_replacement_base_fee});
+
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_REQUIRE_EQUAL(fixture->rpc->sent_hashes.size(), 1u);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.front(), replacement.tx_hash);
+   BOOST_CHECK_EQUAL(fixture->only_submission().attempts.size(), 2u);
+   BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 1u);
+} FC_LOG_AND_RETHROW();
+
 /// A journaled call whose nonce the node holds something else at, with none of
 /// its hashes, is signed again at the outbid fees rather than priced off its
 /// own: what it has to beat is unknown.
