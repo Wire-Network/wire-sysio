@@ -574,7 +574,7 @@ desyndication. The row must exist, with the buckets set, before the pair carries
 - Deploy `sysio.andon` privileged before `sysio.synd` carries traffic and configure its native
   pull/clear permissions (see the emergency-stop playbook). Its active permission exists from
   account creation and is declared by syndication's privileged inline pull. Redeploy Andon,
-  swap, liq, bond and synd together when the shared cord layout changes. The simplified cord
+  swap, liq, bond, synd and kicker together when the shared cord layout changes. The simplified cord
   and bucket layouts require a fresh deployment; no in-place state migration is included.
 
 ## Misconfigurations that stall a pair for good
