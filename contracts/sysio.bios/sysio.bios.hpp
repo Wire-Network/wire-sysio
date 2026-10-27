@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sysio.system/account_changes.hpp>
+
 #include <sysio/action.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/sysio.hpp>
@@ -149,13 +151,19 @@ namespace sysiobios {
    class [[sysio::contract("sysio.bios")]] bios : public sysio::contract {
       public:
          using contract::contract;
+
+         /// The ABI and code hash tables `sysio.system` also writes (sysio.system/account_changes.hpp), aliased here
+         /// to put them in this contract's ABI.
+         using abi_hash_table  = sysiosystem::abi_hash_table;
+         using code_hash_table = sysiosystem::code_hash_table;
+
          /**
           * @{
           * These actions map one-on-one with the ones defined in
           * [Native Action Handlers](@ref native_action_handlers) section.
           * They are present here so they can show up in the abi file and thus user can send them
-          * to this contract, but they have no specific implementation at this contract level,
-          * they will execute the implementation at the core level and nothing else.
+          * to this contract. Apart from `setcode`, which records the code hash in the `codehash` table, they have no
+          * specific implementation at this contract level and execute the implementation at the core level only.
           */
          /**
           * New account action
@@ -249,19 +257,21 @@ namespace sysiobios {
           * @param account - the account for which to set the contract code.
           * @param vmtype - reserved, set it to zero.
           * @param vmversion - reserved, set it to zero.
-          * @param code - the code content to be set, in the form of a blob binary..
+          * @param code - the code content to be set, in the form of a blob binary. Not deserialized here: the code
+          * hash recorded in `codehash` is read from the chain.
           */
          [[sysio::action]]
-         void setcode( name account, uint8_t vmtype, uint8_t vmversion, const std::vector<char>& code ) {}
+         void setcode( name account, uint8_t vmtype, uint8_t vmversion, ignore<std::vector<char>> code ) {
+            sysiosystem::record_code(get_self(), account);
+         }
 
          /** @}*/
 
          /**
           * Set abi for contract.
           *
-          * @details Set the abi for contract identified by `account` name. Creates an entry in the abi_hash_table
-          * index, with `account` name as key, if it is not already present and sets its value with the abi hash.
-          * Otherwise it is updating the current abi hash value for the existing `account` key.
+          * @details Set the abi for contract identified by `account` name, recording its hash, block time and block
+          * number in the `abihash` table under `account`.
           *
           * @param account - the name of the account to set the abi for
           * @param abi     - the abi hash represented as a vector of characters
@@ -367,32 +377,6 @@ namespace sysiobios {
           */
          [[sysio::action]]
          void reqactivated( const sysio::checksum256& feature_digest );
-
-         /**
-          * Abi hash structure
-          *
-          * @details Abi hash structure is defined by contract owner and the contract hash.
-          */
-         struct abihash_key {
-            uint64_t owner;
-            SYSLIB_SERIALIZE( abihash_key, (owner) )
-         };
-
-         /**
-          * Abi hash structure
-          *
-          * @details Stores the contract ABI hash indexed by owner account.
-          */
-         struct [[sysio::table("abihash")]] abi_hash {
-            name              owner;
-            checksum256       hash;
-            SYSLIB_SERIALIZE( abi_hash, (owner)(hash) )
-         };
-
-         /**
-          * KV table that stores the contracts' abi index by their owners/accounts.
-          */
-         using abi_hash_table = sysio::kv::table<"abihash"_n, abihash_key, abi_hash>;
 
          using newaccount_action = action_wrapper<"newaccount"_n, &bios::newaccount>;
          using updateauth_action = action_wrapper<"updateauth"_n, &bios::updateauth>;

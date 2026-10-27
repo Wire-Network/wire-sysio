@@ -12,10 +12,9 @@ from TestHarness import Cluster, Node, TestHelper, Utils, WalletMgr, CORE_SYMBOL
 testSuccessful = False
 
 class TraceApiPluginTest(unittest.TestCase):
-    cluster=Cluster(defproduceraPrvtKey=None)
-    walletMgr=WalletMgr(True)
+    cluster=None
+    walletMgr=None
     accounts = []
-    cluster.setWalletMgr(walletMgr)
 
     # start kiod and nodeop
     def startEnv(self) :
@@ -147,10 +146,16 @@ class TraceApiPluginTest(unittest.TestCase):
         testSuccessful = True
     @classmethod
     def setUpClass(self):
+        # Built here, not in the class body: importing the test or --help takes no port lease.
+        self.cluster = Cluster(defproduceraPrvtKey=None)
+        self.walletMgr = WalletMgr(True)
+        self.cluster.setWalletMgr(self.walletMgr)
         self.startEnv(self)
 
     @classmethod
     def tearDownClass(self):
+        if TraceApiPluginTest.cluster is None:
+            return
         TraceApiPluginTest.cluster.testFailed = not testSuccessful
         TraceApiPluginTest.cluster.shutdown()
 

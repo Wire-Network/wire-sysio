@@ -2076,7 +2076,7 @@ BOOST_FIXTURE_TEST_CASE(a_shortfall_freezes_the_same_envelopes_queue_step, sysio
       ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("LIQETH"))("synd_fee_bps", 0)
       ("desynd_fee_bps", 0)("synd_burst", 1'000'000 * LIQ_UNIT)("synd_refill", 1'000'000 * LIQ_UNIT)
       ("desynd_burst", 0)("desynd_refill", 0)("window_sec", 10800)("bounty", 0)("challenge_extra", 0)
-      ("min_desyndicate", 1)));
+      ("min_desyndicate", 1)("desynd_fee_flat", 0)));
    setup_wire_token();
    enable_epoch_advancement();
 
@@ -2210,7 +2210,7 @@ try {
       ("chain_code", codename_mvo("ETH"))("token_code", codename_mvo("LIQETH"))("synd_fee_bps", 0)
       ("desynd_fee_bps", 0)("synd_burst", 1'000'000 * LIQ_UNIT)("synd_refill", 1'000'000 * LIQ_UNIT)
       ("desynd_burst", 0)("desynd_refill", 0)("window_sec", window_sec)("bounty", 0)("challenge_extra", 0)
-      ("min_desyndicate", 1)));
+      ("min_desyndicate", 1)("desynd_fee_flat", 0)));
    setup_wire_token();
    enable_epoch_advancement();
    const auto request_of = [&](uint64_t id) {

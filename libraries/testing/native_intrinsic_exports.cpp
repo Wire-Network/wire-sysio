@@ -568,6 +568,14 @@ int32_t get_permission_lower_bound(uint64_t account, uint64_t permission, char* 
 // Crypto extensions
 // ============================================================================
 
+/// Dispatch one detached Ed25519 verification through the active native contract context.
+INTRINSIC_EXPORT
+int32_t ed25519_verify(const char* sig, uint32_t sig_len, const char* pub, uint32_t pub_len,
+                       const char* msg, uint32_t msg_len) {
+   return native_context_stack::current()->ed25519_verify(
+      span<const char>{sig, sig_len}, span<const char>{pub, pub_len}, span<const char>{msg, msg_len});
+}
+
 INTRINSIC_EXPORT
 int32_t alt_bn128_add(const char* op1, uint32_t op1_len, const char* op2, uint32_t op2_len, char* result, uint32_t result_len) {
    return native_context_stack::current()->alt_bn128_add(

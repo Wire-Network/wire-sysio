@@ -8,6 +8,7 @@
 #include <boost/asio/ip/address_v6.hpp>
 
 #include <cstdlib>
+#include <optional>
 #include <set>
 #include <string>
 #include <string_view>
@@ -291,6 +292,26 @@ namespace detail {
          addr[i / 8] &= ~(0x80 >> (i % 8));
       }
       return addr;
+   }
+
+   /// The IPv6 form peer addresses are compared in: an IPv4 address mapped to ::ffff:a.b.c.d, and no scope id, which a
+   /// connection's recorded remote address does not keep.
+   inline boost::asio::ip::address_v6 to_mapped_v6(const boost::asio::ip::address& address) {
+      if (address.is_v4())
+         return boost::asio::ip::make_address_v6(boost::asio::ip::v4_mapped, address.to_v4());
+      return boost::asio::ip::address_v6{address.to_v6().to_bytes()};
+   }
+
+   /// Parse an IP address literal, IPv6 optionally in brackets, into the form of to_mapped_v6().
+   /// @return the address, or nullopt when text is not an IP address literal, such as a host name
+   inline std::optional<boost::asio::ip::address_v6> parse_mapped_v6(std::string_view text) {
+      if (text.size() > 1 && text.front() == '[' && text.back() == ']')
+         text = text.substr(1, text.size() - 2);
+      boost::system::error_code ec;
+      const auto address = boost::asio::ip::make_address(text, ec);
+      if (ec)
+         return std::nullopt;
+      return to_mapped_v6(address);
    }
 
 } // namespace sysio::net_utils

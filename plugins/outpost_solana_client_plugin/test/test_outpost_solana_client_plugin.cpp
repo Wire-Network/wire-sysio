@@ -109,33 +109,33 @@ void write_u32_le(std::vector<uint8_t>& out, uint32_t value) {
    out.push_back(static_cast<uint8_t>((value >> 24) & 0xff));
 }
 
-/// Borsh-encode a data-chunk `epoch_in` instruction payload carrying
-/// `chunk_data_bytes` of chunk data. Mirrors the client's argument order:
-/// `epoch_index, chunk_index, total_chunks, total_bytes, chunk_data,
-/// dispatch_limit`.
-std::vector<uint8_t> epoch_in_data_chunk_payload(const idl::instruction& instr,
-                                                 size_t chunk_data_bytes) {
+/// Borsh-encode an `epoch_in` instruction payload with the production
+/// argument order: `epoch_index, chunk_index, total_chunks, total_bytes,
+/// chunk_data`. A zero-length chunk with `chunk_index == total_chunks` is the
+/// terminal call.
+std::vector<uint8_t> epoch_in_payload(const idl::instruction& instr, uint16_t chunk_index, uint16_t total_chunks,
+                                      uint32_t total_bytes, size_t chunk_data_bytes) {
    std::vector<uint8_t> data;
-   data.reserve(instr.discriminator.size() + 20 + chunk_data_bytes);
+   data.reserve(instr.discriminator.size() + 16 + chunk_data_bytes);
    data.insert(data.end(), instr.discriminator.begin(), instr.discriminator.end());
-   write_u32_le(data, 1);                                          // epoch_index
-   write_u16_le(data, 0);                                          // chunk_index
-   write_u16_le(data, 2);                                          // total_chunks
-   write_u32_le(data, static_cast<uint32_t>(chunk_data_bytes * 2)); // total_bytes
-   write_u32_le(data, static_cast<uint32_t>(chunk_data_bytes));     // chunk_data length prefix
+   write_u32_le(data, 1); // epoch_index
+   write_u16_le(data, chunk_index);
+   write_u16_le(data, total_chunks);
+   write_u32_le(data, total_bytes);
+   write_u32_le(data, static_cast<uint32_t>(chunk_data_bytes)); // chunk_data length prefix
    data.resize(data.size() + chunk_data_bytes);
    return data;
 }
 
-/// Build the IDL-declared static account metas for terminal `epoch_in`.
-std::vector<account_meta> terminal_static_accounts(const idl::instruction& instr,
-                                                   const solana_public_key& fee_payer) {
+/// Build the IDL-declared static account metas used by production relay calls.
+std::vector<account_meta> production_static_accounts(const idl::instruction& instr,
+                                                     const solana_public_key& fee_payer) {
    std::vector<account_meta> accounts;
    accounts.reserve(instr.accounts.size());
    for (size_t i = 0; i < instr.accounts.size(); ++i) {
       const auto& acct = instr.accounts[i];
       solana_public_key key;
-      if (acct.name == "operator") {
+      if (acct.is_signer) {
          key = fee_payer;
       } else if (acct.name == "system_program") {
          key = system::program_ids::SYSTEM_PROGRAM;
@@ -152,6 +152,20 @@ std::vector<account_meta> terminal_static_accounts(const idl::instruction& instr
       }
    }
    return accounts;
+}
+
+/// Assert the ordered heap-frame then compute-unit-limit producer contract.
+void check_compute_budget_preamble(const std::vector<instruction>& instructions, uint32_t heap_frame_bytes,
+                                   uint32_t compute_unit_limit) {
+   BOOST_REQUIRE_EQUAL(instructions.size(), 2u);
+   const auto heap = system::compute_budget::request_heap_frame(heap_frame_bytes);
+   const auto units = system::compute_budget::set_compute_unit_limit(compute_unit_limit);
+   BOOST_CHECK(instructions[0].program_id == system::program_ids::COMPUTE_BUDGET_PROGRAM);
+   BOOST_CHECK(instructions[0].accounts.empty());
+   BOOST_CHECK(instructions[0].data == heap.data);
+   BOOST_CHECK(instructions[1].program_id == system::program_ids::COMPUTE_BUDGET_PROGRAM);
+   BOOST_CHECK(instructions[1].accounts.empty());
+   BOOST_CHECK(instructions[1].data == units.data);
 }
 
 /// Build a legacy Solana transaction using the same account ordering rules as the client.
@@ -526,9 +540,9 @@ BOOST_AUTO_TEST_CASE(opp_outpost_epoch_in_has_chunked_args) try {
 
    // Accounts: operator (signer), config, operator_registry, epoch_deliveries,
    //           chunk_buffer, inbound_envelopes, system_program. No outbound-emit
-   //           accounts here -- epoch_in only stages/finalizes inbound chunks and
-   //           processes the enclosed attestations inline on consensus reach;
-   //           dispatch_attestations (asserted above) owns the outbound emit.
+   //           or effect accounts here -- epoch_in only stages/finalizes inbound
+   //           chunks and records consensus; dispatch_attestations (asserted
+   //           above) owns effect processing and the outbound emit.
    BOOST_CHECK_EQUAL(epoch_in->accounts.size(), 7u);
    BOOST_CHECK(epoch_in->accounts[0].is_signer);
    BOOST_CHECK_EQUAL(epoch_in->accounts[4].name, "chunk_buffer");
@@ -593,20 +607,41 @@ BOOST_AUTO_TEST_CASE(epoch_in_full_data_chunk_fits_packet_limit) try {
    BOOST_REQUIRE(epoch_in);
 
    const auto fee_payer = measurement_pubkey(1);
-   std::vector<instruction> instructions = {
-      instruction{measurement_pubkey(3),
-                  terminal_static_accounts(*epoch_in, fee_payer),
-                  epoch_in_data_chunk_payload(*epoch_in, sysio::SOLANA_MAX_CHUNK_BYTES)},
-   };
+   auto instructions = sysio::outpost_solana_client_detail::epoch_in_pre_instructions(1, 2);
+   BOOST_CHECK(instructions.empty());
+   instructions.push_back(
+      instruction{measurement_pubkey(3), production_static_accounts(*epoch_in, fee_payer),
+                  epoch_in_payload(*epoch_in, 1, 2, static_cast<uint32_t>(2 * sysio::SOLANA_MAX_CHUNK_BYTES),
+                                   sysio::SOLANA_MAX_CHUNK_BYTES)});
 
    const auto packet = build_measured_legacy_transaction(instructions, fee_payer).serialize();
+   BOOST_TEST_MESSAGE("full epoch_in data chunk serialises to " << packet.size() << " bytes");
+   BOOST_CHECK_LE(packet.size(), limits::PACKET_DATA_SIZE);
+} FC_LOG_AND_RETHROW();
+BOOST_AUTO_TEST_CASE(epoch_in_terminal_budget_matches_producer_and_fits_packet_limit) try {
+   auto prog = load_idl_fixture(opp_outpost_idl_fixture);
+   const auto* epoch_in = prog.find_instruction("epoch_in");
+   BOOST_REQUIRE(epoch_in);
+
+   constexpr uint16_t total_chunks = 2;
+   auto instructions = sysio::outpost_solana_client_detail::epoch_in_pre_instructions(total_chunks, total_chunks);
+   check_compute_budget_preamble(instructions, sysio::SOLANA_RELAY_HEAP_FRAME_BYTES,
+                                 sysio::SOLANA_RELAY_COMPUTE_UNIT_LIMIT);
+
+   const auto fee_payer = measurement_pubkey(1);
+   instructions.push_back(instruction{measurement_pubkey(3), production_static_accounts(*epoch_in, fee_payer),
+                                      epoch_in_payload(*epoch_in, total_chunks, total_chunks,
+                                                       static_cast<uint32_t>(2 * sysio::SOLANA_MAX_CHUNK_BYTES), 0)});
+
+   const auto packet = build_measured_legacy_transaction(instructions, fee_payer).serialize();
+   BOOST_TEST_MESSAGE("terminal epoch_in tx with heap and CU budgets serialises to " << packet.size() << " bytes");
    BOOST_CHECK_LE(packet.size(), limits::PACKET_DATA_SIZE);
 } FC_LOG_AND_RETHROW();
 BOOST_AUTO_TEST_CASE(dispatch_attestations_full_manifest_fits_packet_limit) try {
    // MAX_TERMINAL_DYNAMIC_ACCOUNTS is a BUDGET, and a budget nobody measures is
    // a guess. It counts only the `remaining_accounts` extras -- not the
-   // instruction's ~11 IDL-declared accounts, not the fee payer, not the
-   // compute-budget pre-instruction the relay injects on this call. This test
+   // instruction's 9 IDL-declared accounts, not the fee payer, not the
+   // compute-budget preamble the relay injects on this call. This test
    // is what makes the number honest: a dispatch_attestations tx carrying a
    // FULL manifest must still serialise inside Solana's packet limit.
    //
@@ -620,7 +655,7 @@ BOOST_AUTO_TEST_CASE(dispatch_attestations_full_manifest_fits_packet_limit) try 
    BOOST_REQUIRE(dispatch);
 
    const auto fee_payer = measurement_pubkey(1);
-   auto accounts = terminal_static_accounts(*dispatch, fee_payer);
+   auto accounts = production_static_accounts(*dispatch, fee_payer);
 
    // A full extras manifest: distinct writable accounts, the worst case for
    // packet size since each costs a fresh 32-byte key in the message.
@@ -634,12 +669,10 @@ BOOST_AUTO_TEST_CASE(dispatch_attestations_full_manifest_fits_packet_limit) try 
    write_u32_le(data, 1);                                                    // epoch_index
    write_u32_le(data, static_cast<uint32_t>(sysio::MAX_TERMINAL_DYNAMIC_ACCOUNTS)); // dispatch_limit
 
-   // The relay injects a heap-frame request on this call; it occupies packet
-   // budget exactly like any other instruction, so the measurement includes it.
-   std::vector<instruction> instructions = {
-      system::compute_budget::request_heap_frame(sysio::SOLANA_DISPATCH_HEAP_FRAME_BYTES),
-      instruction{measurement_pubkey(3), accounts, data},
-   };
+   auto instructions = sysio::outpost_solana_client_detail::relay_compute_budget_pre_instructions();
+   check_compute_budget_preamble(instructions, sysio::SOLANA_RELAY_HEAP_FRAME_BYTES,
+                                 sysio::SOLANA_RELAY_COMPUTE_UNIT_LIMIT);
+   instructions.push_back(instruction{measurement_pubkey(3), accounts, data});
 
    const auto packet = build_measured_legacy_transaction(instructions, fee_payer).serialize();
    BOOST_TEST_MESSAGE("dispatch_attestations tx with "
@@ -2423,8 +2456,7 @@ BOOST_AUTO_TEST_CASE(current_global_state_layout_is_eligible_for_automatic_yield
             const auto* report = prog.find_instruction("report_liq_yield");
             BOOST_REQUIRE(report);
             const auto payer = measurement_pubkey(1);
-            auto metas = terminal_static_accounts(*report, payer);
-            for (auto& meta : metas) if (meta.is_signer) meta.key = payer;
+            auto metas = production_static_accounts(*report, payer);
             auto instructions = pre_instructions;
             instructions.push_back(instruction{measurement_pubkey(42), metas,
                {report->discriminator.begin(), report->discriminator.end()}});

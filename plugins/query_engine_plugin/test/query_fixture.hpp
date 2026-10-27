@@ -14,6 +14,7 @@
 #include <future>
 #include <mutex>
 #include <test_contracts.hpp>
+#include <thread>
 
 namespace sysio::query_engine::test {
 using namespace sysio::chain::literals;
@@ -29,6 +30,17 @@ inline constexpr auto status_open = "POSITION_STATUS_OPEN";
 inline constexpr auto status_closed = "POSITION_STATUS_CLOSED";
 inline constexpr auto status_archived = "POSITION_STATUS_ARCHIVED";
 inline constexpr auto test_wait = std::chrono::seconds(10);
+
+/// Bound harness synchronization without advancing the injected query clock.
+template <typename Predicate>
+void await(Predicate predicate) {
+   const auto deadline = query_budget::clock::now() + test_wait;
+   while (!predicate()) {
+      BOOST_REQUIRE(query_budget::clock::now() < deadline);
+      std::this_thread::yield();
+   }
+}
+
 /// Deadlines for direct evaluation on a real clock: generous, since these tests assert on results and
 /// accounting, never on wall-clock behavior, and sanitizer builds are slow.
 inline constexpr auto relaxed_deadline = std::chrono::seconds(60);

@@ -198,7 +198,8 @@ inline constexpr auto get_intrinsic_table() {
       "env.kv_idx_prev",
       "env.kv_idx_key",
       "env.kv_idx_primary_key",
-      "env.kv_idx_destroy"
+      "env.kv_idx_destroy",
+      "env.ed25519_verify"
    );
 }
 inline constexpr std::size_t find_intrinsic_index(std::string_view hf) {

@@ -138,17 +138,31 @@ banked, and a later delivery pays it. Parked funds have already paid the fee and
 
 ## Desyndication
 
-`desyndicate(holder, quantity)`, signed by the holder, sends shadow LIQ back to its outpost.
+Read-only `quotedesynd(chain_code, token_code, quantity)` returns `desynd_quote { fee, net }`,
+all in shadow base units. It uses the same config lookup, minimum and fee checks as `desyndicate`:
+a missing config, quantity below the minimum, fee at least the quantity, or nonpositive/out-of-asset-range
+quantity is refused. It needs no authorization and writes nothing; it does not check holder links,
+balances, the Andon cord or bucket capacity. Pass its `fee` as `max_fee` to protect against a governance
+fee increase between quoting and execution.
+
+`desyndicate(holder, quantity, max_fee)`, signed by the holder, sends shadow LIQ back to its outpost.
 
 1. The holder must be AuthX-linked for the token's chain; the outpost pays that pubkey.
-2. The pair must have a `syndconfig` row (`desyndication budget is not configured`).
+2. The pair must have a `syndconfig` row (`desyndication budget is not configured`). The quantity
+   must meet `min_desyndicate` and the fee must leave a positive net. `max_fee`, the last argument,
+   caps the fee in shadow base units: `desyndication fee exceeds max_fee` refuses before the bucket
+   tick, transfers, burn or fee-pot credit.
 3. The pair's desyndication bucket is ticked, as above. A quantity above its level is refused
    (`desyndication exceeds the current budget`). The bucket drops by the whole quantity.
 4. The quantity moves from the holder's own `sysio.liq` row to `sysio.synd`. Only that row can be
    desyndicated: shadow held in an item or in `parked` sits in `sysio.synd`'s row and is not the
    holder's to send.
-5. The fee, `quantity * desynd_fee_bps / 10000` floored, stays in the fee pot. A fee that rounds to
-   zero leaves the whole quantity to burn; a fee of the whole quantity (10000 bps) is refused, since
+5. The fee, `floor(quantity * desynd_fee_bps / 10000) + desynd_fee_flat`, stays in the fee pot. The
+   flat part exists because syndication is kept free by design (`synd_fee_bps` stays 0), so the
+   desyndication fee, flat plus basis points, is sized to recover the external-chain gas the batch
+   operators pay for both legs of the round trip: the syndication drain and the desyndication payout.
+   A basis-point fee alone does not cover that gas on a small quantity. A zero fee leaves the whole quantity to burn; a fee of the whole quantity or more
+   (10000 bps, or a basis-point part that lifts the flat part past the quantity) is refused, since
    nothing would reach the outpost.
 6. The net rest is burned with `sysio.liq::burn` and queued to the outpost as `DESYNDICATE_LIQ`, with
    the next request id from `syndcounters`. `returns` retains the original holder, destination key,
@@ -497,13 +511,14 @@ Envelope states: OPEN, WAITING, REQUESTED, RELEASABLE, HELD, INVALID, DONE.
 ## Configuration
 
 `setconfig(chain_code, token_code, synd_fee_bps, desynd_fee_bps, synd_burst, synd_refill,
-desynd_burst, desynd_refill, window_sec, bounty, challenge_extra, min_desyndicate)`, signed by `sysio`. It replaces the
+desynd_burst, desynd_refill, window_sec, bounty, challenge_extra, min_desyndicate, desynd_fee_flat)`, signed by `sysio`. It replaces the
 pair's whole row.
 
 | Knob | Default (no row) | Meaning |
 |---|---|---|
 | `synd_fee_bps` | 0 | fee on each released syndication tranche, at most 10000 |
-| `desynd_fee_bps` | 0 | fee on each desyndication, at most 10000 |
+| `desynd_fee_bps` | 0 | basis-point part of the fee on each desyndication, at most 10000 |
+| `desynd_fee_flat` | 0 | flat part of the fee on each desyndication, in shadow base units, added to the basis-point part. Syndication is kept free by design, so the desyndication fee (flat plus basis points) is sized to recover the external-chain gas the batch operators pay for both legs of the round trip: the syndication drain and the desyndication payout. Below `min_desyndicate`, so a minimum desyndication at 0 bps nets at least one base unit |
 | `synd_burst`, `synd_refill` | unset: nothing releases | syndication bucket size, and refill per depot epoch, in base units |
 | `min_desyndicate` | explicit bootstrap value: 1,000,000 | shared gross return floor (0.001 SOL at nine decimals), intentionally arbitrary; at most a nonzero desyndication burst; rejected before moving custody |
 | `desynd_burst`, `desynd_refill` | unset: nothing desyndicates | desyndication bucket size and refill |
@@ -526,8 +541,10 @@ desyndication. The row must exist, with the buckets set, before the pair carries
 - An envelope ruled INVALID burns what had not yet been released; what had been released stays.
 - The WIRE a held or parked syndication earned is owed on the holder's own `sysio.liq` row once it is
   delivered, and `sysio.liq::claim` pays it.
-- `desyndicate` takes the whole quantity from the holder's balance and releases the quantity less the
-  desyndication fee on the outpost. It is refused when the pair's desyndication budget is too low now;
+- `quotedesynd` returns the current fee and net without writes.
+- `desyndicate(holder, quantity, max_fee)` refuses a fee above the cap before anything moves, then
+  takes the whole quantity from the holder's balance and releases the quantity less the desyndication
+  fee on the outpost. It is refused when the pair's desyndication budget is too low now;
   it refills every depot epoch. It is also refused while the outpost's outbound queue is full, which
   drains every depot epoch.
 
@@ -557,7 +574,7 @@ desyndication. The row must exist, with the buckets set, before the pair carries
 - Deploy `sysio.andon` privileged before `sysio.synd` carries traffic and configure its native
   pull/clear permissions (see the emergency-stop playbook). Its active permission exists from
   account creation and is declared by syndication's privileged inline pull. Redeploy Andon,
-  swap, liq, bond and synd together when the shared cord layout changes. The simplified cord
+  swap, liq, bond, synd and kicker together when the shared cord layout changes. The simplified cord
   and bucket layouts require a fresh deployment; no in-place state migration is included.
 
 ## Misconfigurations that stall a pair for good

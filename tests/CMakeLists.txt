@@ -1,5 +1,17 @@
 include_directories( "${CMAKE_SOURCE_DIR}/plugins/wallet_plugin/include" )
 
+# Port-lease wrapper for network tests (see cmake/test-helpers.cmake) and its self-tests. The self-tests use private
+# registries (the stress test uses the host registry), so they run unwrapped in the long-running lane.
+configure_file(bind_registry.py bind_registry.py COPYONLY)
+configure_file(bind_registry_register.py bind_registry_register.py COPYONLY)
+configure_file(bind_registry_test.py bind_registry_test.py COPYONLY)
+configure_file(bind_registry_stress_test.py bind_registry_stress_test.py COPYONLY)
+add_lr_test(NAME bind_registry_test NO_PORT_LEASE COMMAND "${SYSIO_TEST_PYTHON}" tests/bind_registry_test.py -v TIMEOUT 1800)
+add_lr_test(NAME bind_registry_stress_test NO_PORT_LEASE COMMAND "${SYSIO_TEST_PYTHON}" tests/bind_registry_stress_test.py TIMEOUT 1800)
+set_property(TEST bind_registry_test bind_registry_stress_test APPEND PROPERTY LABELS bind_registry_tests)
+# The stress test binds thousands of host-registry ports at once: never alongside another test.
+set_tests_properties(bind_registry_stress_test PROPERTIES RUN_SERIAL TRUE)
+
 if( DONT_SKIP_TESTS )
   add_compile_definitions(RUN_FAILING_TESTS=TRUE)
 endif()
@@ -94,6 +106,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_no_blocks_test_shape.json ${CMAKE
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_peer_auth_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_peer_auth_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_peer_auth_grace_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_peer_auth_grace_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_peer_scoring_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_peer_scoring_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_max_clients_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_max_clients_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/compute_transaction_test.py ${CMAKE_CURRENT_BINARY_DIR}/compute_transaction_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/subjective_billing_test.py ${CMAKE_CURRENT_BINARY_DIR}/subjective_billing_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/get_account_test.py ${CMAKE_CURRENT_BINARY_DIR}/get_account_test.py COPYONLY)
@@ -251,6 +264,7 @@ add_np_test(NAME p2p_no_blocks_if_test COMMAND tests/p2p_no_blocks_test.py -v -d
 add_np_test(NAME p2p_peer_auth_test COMMAND tests/p2p_peer_auth_test.py -v)
 add_np_test(NAME p2p_peer_auth_grace_test COMMAND tests/p2p_peer_auth_grace_test.py -v)
 add_np_test(NAME p2p_peer_scoring_test COMMAND tests/p2p_peer_scoring_test.py -v)
+add_np_test(NAME p2p_max_clients_test COMMAND tests/p2p_max_clients_test.py -v)
 
 # needs iproute-tc or iproute2 depending on platform
 #add_np_test(NAME p2p_high_latency_test COMMAND tests/p2p_high_latency_test.py -v)
@@ -310,11 +324,13 @@ add_p_test(NAME solana_idl_stub_consistency_test
 
 add_np_test(NAME http_plugin_test COMMAND tests/http_plugin_test.py TIMEOUT 200)
 
-add_np_test(NAME plugin_http_api_test COMMAND tests/plugin_http_api_test.py TIMEOUT 100)
+# 300 s: ~25 s of test plus a lease that took up to 134 s under ctest -j12 on a slow-bind (WSL2) host.
+add_np_test(NAME plugin_http_api_test COMMAND tests/plugin_http_api_test.py TIMEOUT 300)
 
 add_np_test(NAME plugin_http_api_test_savanna COMMAND tests/plugin_http_api_test_savanna.py TIMEOUT 340)
 
-add_np_test(NAME plugin_http_category_api_test COMMAND tests/plugin_http_api_test.py TIMEOUT 100 ENVIRONMENT
+# 300 s: as plugin_http_api_test.
+add_np_test(NAME plugin_http_category_api_test COMMAND tests/plugin_http_api_test.py TIMEOUT 300 ENVIRONMENT
             PLUGIN_HTTP_TEST_CATEGORY=ON)
 
 add_np_test(NAME trace_plugin_test COMMAND tests/trace_plugin_test.py -v TIMEOUT 400)

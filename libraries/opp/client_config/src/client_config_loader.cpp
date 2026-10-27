@@ -34,6 +34,10 @@ constexpr std::string_view max_priority_fee_per_gas_wei = "max_priority_fee_per_
 constexpr std::string_view max_fee_per_gas_wei = "max_fee_per_gas_wei";
 constexpr std::string_view max_gas_limit = "max_gas_limit";
 constexpr std::string_view max_total_native_cost_wei = "max_total_native_cost_wei";
+constexpr std::string_view read_confirmation = "read_confirmation";
+constexpr std::string_view block_tag = "block_tag";
+constexpr std::string_view confirmations = "confirmations";
+constexpr std::string_view max_finality_lag_sec = "max_finality_lag_sec";
 } // namespace configuration_field
 
 namespace diagnostic_observation {
@@ -50,6 +54,8 @@ constexpr std::string_view http_url_scheme = "http";
 constexpr std::string_view https_url_scheme = "https";
 constexpr auto positive_uint32_range = "1..UINT32_MAX";
 constexpr auto unavailable_allowed_value = "n/a";
+constexpr auto read_block_tag_values = "EVM_READ_BLOCK_TAG_FINALIZED|EVM_READ_BLOCK_TAG_SAFE|EVM_READ_BLOCK_TAG_LATEST";
+constexpr auto latest_only_allowed_value = "only with EVM_READ_BLOCK_TAG_LATEST";
 
 /** Throw a structured configuration rejection while centralizing string ownership conversion. */
 [[noreturn]] void throw_client_config_failure(client_config_reason       reason,
@@ -125,6 +131,38 @@ void validate_rpc_url(std::string_view raw_url) {
    throw_client_config_failure(client_config_reason::rpc_url_invalid,
                                configuration_field::rpc_url,
                                diagnostic_observation::invalid);
+}
+
+/** Validate a client's read confirmation: a readable tag, and depth settings only where they apply. */
+void validate_read_confirmation(const EvmReadConfirmation& confirmation) {
+   const EvmReadBlockTag tag = confirmation.has_block_tag() ? confirmation.block_tag() : EVM_READ_BLOCK_TAG_LATEST;
+   const bool readable_tag = tag == EVM_READ_BLOCK_TAG_FINALIZED || tag == EVM_READ_BLOCK_TAG_SAFE ||
+                             tag == EVM_READ_BLOCK_TAG_LATEST;
+   if (!readable_tag) {
+      throw_client_config_failure(client_config_reason::read_confirmation_invalid,
+                                  configuration_field::block_tag,
+                                  EvmReadBlockTag_Name(tag),
+                                  read_block_tag_values);
+   }
+   const auto check_depth_field = [&](bool present, uint32_t value, std::string_view field) {
+      if (!present) return;
+      if (tag != EVM_READ_BLOCK_TAG_LATEST) {
+         throw_client_config_failure(client_config_reason::read_confirmation_invalid,
+                                     field,
+                                     std::to_string(value),
+                                     latest_only_allowed_value);
+      }
+      if (value == 0) {
+         throw_client_config_failure(client_config_reason::read_confirmation_invalid,
+                                     field,
+                                     diagnostic_observation::zero,
+                                     positive_uint32_range);
+      }
+   };
+   check_depth_field(confirmation.has_confirmations(), confirmation.confirmations(),
+                     configuration_field::confirmations);
+   check_depth_field(confirmation.has_max_finality_lag_sec(), confirmation.max_finality_lag_sec(),
+                     configuration_field::max_finality_lag_sec);
 }
 
 } // namespace
@@ -234,6 +272,8 @@ void validate_evm_client_configuration(const EvmClientConfigurationFile& configu
                                      configuration_field::chain_id,
                                      std::to_string(client.chain_id()));
       }
+
+      if (client.has_read_confirmation()) validate_read_confirmation(client.read_confirmation());
 
       if (!client.has_transaction_policy()) continue;
       const auto& policy = client.transaction_policy();

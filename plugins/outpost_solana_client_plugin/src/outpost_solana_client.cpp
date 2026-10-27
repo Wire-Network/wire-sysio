@@ -1559,12 +1559,11 @@ std::string outpost_solana_client::send_dispatch_attestations(
       fc::variant(epoch_index),
       fc::variant(dispatch_limit),
    };
-   // The heap frame rides with the work it protects: this call decodes the
-   // staged envelope, dispatches its effects, and on the draining call
-   // encodes the outbound emit.
-   std::vector<fc::network::solana::instruction> pre_ixs;
-   pre_ixs.push_back(
-      fc::network::solana::system::compute_budget::request_heap_frame(SOLANA_DISPATCH_HEAP_FRAME_BYTES));
+   // The complete producer-tested budget rides with the work it protects:
+   // every round decodes the staged envelope and dispatches effects, while the
+   // draining round also encodes the outbound emit. The helper is shared with
+   // the packet regression so the tested preamble is the submitted preamble.
+   auto pre_ixs = outpost_solana_client_detail::relay_compute_budget_pre_instructions();
    auto accounts = _program_client->resolve_accounts(instr, params, overrides);
    accounts.reserve(accounts.size() + extra_remaining_accounts.size());
    accounts.insert(accounts.end(), extra_remaining_accounts.begin(),
@@ -1821,9 +1820,9 @@ std::string outpost_solana_client::deliver_outbound_envelope(
    // goes through `solana_program_client::execute_tx_and_confirm`, which
    // serialises submission + waits for `processed`-commitment confirmation
    // before returning. Chunks are submitted sequentially -- the **batch
-   // operator's only Solana-side instruction family is `epoch_in`**: all
-   // non-empty data chunks stage bytes, then terminal calls trigger the
-   // program's `finalize_envelope`.
+   // operator's delivery instruction family is `epoch_in`**: all non-empty
+   // data chunks stage bytes, then the terminal call triggers the program's
+   // `finalize_envelope`. Settlement follows through `dispatch_attestations`.
    //
    // Resume past whatever an earlier tick already staged. Restarting at 0
    // spent the whole delivery deadline re-sending no-op chunks, so an

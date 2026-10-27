@@ -122,6 +122,20 @@
             ]
         },
         {
+            "name": "desynd_quote",
+            "base": "",
+            "fields": [
+                {
+                    "name": "fee",
+                    "type": "uint64"
+                },
+                {
+                    "name": "net",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "desyndicate",
             "base": "",
             "fields": [
@@ -132,6 +146,10 @@
                 {
                     "name": "quantity",
                     "type": "asset"
+                },
+                {
+                    "name": "max_fee",
+                    "type": "uint64"
                 }
             ]
         },
@@ -659,6 +677,24 @@
             ]
         },
         {
+            "name": "quotedesynd",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "reconcile",
             "base": "",
             "fields": [
@@ -781,6 +817,10 @@
                 {
                     "name": "min_desyndicate",
                     "type": "uint64"
+                },
+                {
+                    "name": "desynd_fee_flat",
+                    "type": "uint64"
                 }
             ]
         },
@@ -886,6 +926,10 @@
                 },
                 {
                     "name": "min_desyndicate",
+                    "type": "uint64"
+                },
+                {
+                    "name": "desynd_fee_flat",
                     "type": "uint64"
                 }
             ]
@@ -1039,6 +1083,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "quotedesynd",
+            "type": "quotedesynd",
+            "ricardian_contract": ""
+        },
+        {
             "name": "reconcile",
             "type": "reconcile",
             "ricardian_contract": ""
@@ -1182,7 +1231,12 @@
     ],
     "ricardian_clauses": [],
     "variants": [],
-    "action_results": [],
+    "action_results": [
+        {
+            "name": "quotedesynd",
+            "result_type": "desynd_quote"
+        }
+    ],
     "enums": [
         {
             "name": "ChainKind",

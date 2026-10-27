@@ -41,10 +41,28 @@ that is offline, and each is a cheap no-op once its work is done:
 | `sysio.chalg::chkdispute(dispute_id)` | every OPEN envelope dispute | a dispute pauses `sysio.epoch::advance`, so no inline poke can reach it |
 | `sysio.swap::tickyield(pair_token)` | every yield pool whose reservoir has a queued balance, at most once per `--batch-yield-tick-interval-ms` per pool from this operator | the reservoir is sold into the pool as time passes; only a tick moves the clock |
 | `sysio.liq::queueyield(sym)` | every shadow with yield pending from an outpost `LIQ_YIELD` report | the report lands in `sysio.liq`'s pending balance; queuing it into the swap is a separate, permissionless step |
+| `sysio.kicker::kick(sym)` | every kicker pool that could pay, at most ten pools per poll from the crank's own cron job, resuming the next page each poll; an attempt that does not pay is retried after `--batch-kick-interval-ms`, doubling to an hour | only a kick pays accrued gifts; TWAP, catch-up and daily caps are enforced on chain (`contracts/sysio.system/EMISSIONS.md`) |
 
 The two yield cranks stay idle, without logging a read failure per poll, until both
-`sysio.swap` and `sysio.liq` are deployed on the depot. `sysio.synd::crank` is pushed
-by the underwriter every poll (see [Underwriter](#underwriter)).
+`sysio.swap` and `sysio.liq` are deployed on the depot; the kick crank likewise until
+`sysio.kicker` is deployed, and it pushes nothing before `setconfig`. The kick crank
+pushes only when the rows say `kick` could pay: the pool's `min_interval_sec` has passed
+since `last_kick`, the token's `sysio.liq` supply is not zero, its price observation
+(restarted by every payment) spans `twap_window_sec`, and `budget_remaining` and the pool's unspent UTC-day ceiling each cover
+`min_gift`. For the supplies it looks up the `sysio.liq::stat` row of each token on the
+page, one exact read each, so the page bounds every read in a poll. A failed read of
+`kickcfg` or of a supply ends the poll without pushing. Between payments it reads the pools and pushes nothing. A kick that passes those
+checks and still does not pay — an Andon hold, a gift below `min_gift`, a treasury reserve,
+spot past the contract's spot-versus-TWAP guard —
+leaves `last_kick` where it was; the next attempt waits `--batch-kick-interval-ms`, and the
+wait doubles per unpaid attempt up to an hour, starting over once `last_kick` moves. The
+wait is spent on every attempt, failed or not. The crank runs as its own cron job, so its
+pushes, each of which can wait out `--batch-delivery-timeout-ms`, never delay the epoch tick.
+A failed pool-page read ends the poll and is retried from the same page; the plugin prunes
+removed symbols from the retry state only at the end of a complete sweep.
+`--batch-kick-crank=false` turns the kick crank off on this node, and the relay's
+permission then need not be linked for `sysio.kicker::kick`.
+`sysio.synd::crank` is pushed by the underwriter every poll (see [Underwriter](#underwriter)).
 
 ## Configuration
 
@@ -56,6 +74,8 @@ by the underwriter every poll (see [Underwriter](#underwriter)).
 | `--batch-yield-tick-interval-ms` | 60000 | Minimum spacing between this operator's `sysio.swap::tickyield` pushes per yield pool (ms) |
 | `--batch-underwriter-account` | none | `account` or `account@permission` (default `active`) the underwriter bonds from. Configuring it enables the underwriter |
 | `--batch-underwriter-max-exposure` | none | Most the underwriter may have bonded at once in one shadow token, as an asset (`100.000000000 LIQETH`). Repeat per token; a token without one is not underwritten |
+| `--batch-kick-crank` | true | Push `sysio.kicker::kick` for every kicker pool that could pay. Off, the relay's permission need not authorize `kick` |
+| `--batch-kick-interval-ms` | 60000 | First wait before this operator retries a `sysio.kicker::kick` that did not pay (ms); doubles per unpaid attempt, up to an hour. Must be 1 to 3600000; startup fails otherwise |
 
 There is no separate enable flag: the relay runs when `--batch-operator-account`
 is configured, the way `producer_plugin` keys off `--producer-name`, and the
@@ -116,7 +136,8 @@ requests `sysio.synd` issues for syndication envelopes. Each poll it:
    outpost, the depot epoch and the digest of the envelope the depot accepted. The
    outpost keeps its own write-once record of each envelope it emitted, the keccak256
    of its canonical bytes (Ethereum `OPP.outboundEnvelopes`, Solana's outbound
-   `EnvelopeLog`); read at finality, that record must carry the statement's digest.
+   `EnvelopeLog`); read at the outpost client's settled commitment (Solana `finalized`,
+   the Ethereum client's read confirmation), that record must carry the statement's digest.
    Whether the statement is true is checked against the outpost alone; amounts,
    states and windows still come from the depot's tables.
 2. **Bonds** each verified OPEN request `sysio.synd` issued under the `oppenvelope`
