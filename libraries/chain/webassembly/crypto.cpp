@@ -7,6 +7,7 @@
 #include <fc/crypto/blake2.hpp>
 #include <fc/crypto/sha3.hpp>
 #include <fc/crypto/k1_recover.hpp>
+#include <fc/crypto/elliptic_ed.hpp>
 #include <bn256/bn256.h>
 #include <bls12-381/bls12-381.hpp>
 #include <openssl/blake2.h>
@@ -30,6 +31,15 @@ namespace {
 }
 
 namespace sysio::chain::webassembly {
+
+   int32_t interface::ed25519_verify(span<const char> sig, span<const char> pub, span<const char> msg) const {
+      if (msg.size() > config::max_ed25519_message_size)
+         return return_code::failure;
+
+      // One bounded verification; the WASM runtime enforces the deadline when execution resumes.
+      return fc::crypto::ed::verify_detached(std::as_bytes(sig), std::as_bytes(msg), std::as_bytes(pub))
+                ? return_code::success : return_code::failure;
+   }
 
    void interface::assert_recover_key( aligned_ptr<const fc::sha256> digest,
                                        span<const char> sig,

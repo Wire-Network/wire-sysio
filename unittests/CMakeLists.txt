@@ -68,6 +68,8 @@ unittest_target(
 
 # snapshot_attest_fixture.hpp includes the snapshot-attestation constants owned by the sysio.system contract.
 target_include_directories(unit_test PRIVATE ${CMAKE_SOURCE_DIR}/contracts/sysio.system/include)
+# Share the frozen crypto vectors with test_fc without source-relative includes.
+target_include_directories(unit_test PRIVATE ${CMAKE_SOURCE_DIR}/libraries/libfc/test)
 
 # No pkg-config cflags; keep flags minimal & portable
 target_compile_options(unit_test PUBLIC -DDISABLE_SYSLIB_SERIALIZE)

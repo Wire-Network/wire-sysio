@@ -372,6 +372,19 @@ namespace webassembly {
          int32_t recover_key(aligned_ptr<const fc::sha256> digest, span<const char> sig, span<char> pub) const;
 
          /**
+          * Verify one detached Ed25519 signature over unchanged message bytes.
+          * @param sig Exactly 64 signature bytes, without an embedded public key.
+          * @param pub Exactly 32 public-key bytes.
+          * @param msg Raw message, at most config::max_ed25519_message_size bytes; may be empty.
+          * @return return_code::success (0) on success, return_code::failure (-1) for invalid sizes,
+          *         signatures, or keys. WASM memory and resource exceptions still abort the transaction.
+          * @note A single size-limited verification bounds uninterrupted host work. The runtime enforces
+          *       deadlines when WASM resumes; callers perform independent verifications in a WASM loop.
+          * @ingroup crypto
+          */
+         int32_t ed25519_verify(span<const char> sig, span<const char> pub, span<const char> msg) const;
+
+         /**
           * Tests if the sha256 hash generated from data matches the provided digest.
           *
           * @ingroup crypto

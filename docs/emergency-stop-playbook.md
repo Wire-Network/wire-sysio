@@ -67,9 +67,9 @@ into protocol custody remain allowed.
 
 Each item is a deploy or upgrade step. An item not done is a freeze that cannot be pulled.
 
-1. **Depot.** `sysio.andon` is deployed privileged before `sysio.swap`, `sysio.liq`, `sysio.bond` and
-   `sysio.synd` ([`contract-upgrade-order.md`](contract-upgrade-order.md)); until it exists every
-   reader sees a clear cord. Fund permission storage through a RAM-only ROA policy
+1. **Depot.** `sysio.andon` is deployed privileged before `sysio.swap`, `sysio.liq`, `sysio.bond`,
+   `sysio.synd` and `sysio.kicker` ([`contract-upgrade-order.md`](contract-upgrade-order.md)); until it
+   exists every reader sees a clear cord. Fund permission storage through a RAM-only ROA policy
    from an existing registered node owner (`ROA_ISSUER`), then delegate and link the actions:
    ```bash
    clio -u "$DEPOT_URL" push action sysio.roa addpolicy "[\"sysio.andon\",\"$ROA_ISSUER\",\"0.0000 SYS\",\"0.0000 SYS\",\"0.0100 SYS\",0,0]" -p "$ROA_ISSUER@active"
@@ -111,6 +111,7 @@ Each item is a deploy or upgrade step. An item not done is a freeze that cannot 
 | `sysio.swap` | every action that moves tokens (among them `exchange`, `addliquidity`, `remliquidity`, `withdraw`, `closeext` of a funded deposit, `tickyield` and `accrueyield` with yield owed, `inittoken`) | reads, and actions that move nothing (`sync`, `changefee`, `openext`, `setyield`) |
 | `sysio.liq` | `transfer` to anything but a custody contract (`sysio.bond`, `sysio.synd`, `sysio.opreg`), so holders cannot move shadow LIQ between themselves; `claim` by anyone but a custody contract; `queueyield` | `mint`; transfers into a custody contract; `claim` by a custody contract (it moves WIRE into custody) |
 | `sysio.bond` | `claim` | `request`, `addbounty`, `accept`, `hold`, `approve`, `rslvvalid`, `rslvinvalid`, `sweepyield`, `prune` |
+| `sysio.kicker` | `kick` returns without paying and without writing: `last_kick` stays where it was, so accrual keeps running and the first paying `kick` after the clear covers it, within the 72-hour catch-up | `setconfig`, `addpool`, `setpool`, `rmpool` |
 | `sysio.synd` | the queue step's releases, delivery from `parked`, burns and the forward of a hold share (deferred to the first step after the clear); `desyndicate`, `sweep`, `dropenv`, `sweepyield` (refused: `the andon cord is pulled: funds cannot leave custody`); `linkswept` delivers nothing and returns | intake (`onsynd`, `onyield`, `closeenv`); the queue step's refresh, outcome recording and request issuing; `challenge`; `setconfig`; `importsynd` |
 | `sysio.msgch`, `sysio.epoch` | nothing | everything |
 
@@ -119,8 +120,9 @@ wait for the clear` and spends none of its budget. On the first tick after clear
 buckets refill for all elapsed epochs, including the freeze, up to their burst cap.
 Challenge windows keep counting (they do not extend).
 
-**What the freeze does not cover.** The depot freeze covers syndication and swap custody. Operator
-collateral and the other depot payouts are a separate concern and are not frozen:
+**What the freeze does not cover.** The depot freeze covers syndication and swap custody and the
+`sysio.kicker` gifts. Operator collateral and the other depot payouts listed below are a separate concern
+and are not frozen:
 
 - `sysio.opreg::claimremit(account, WIRE)` pays through `sysio.token` and runs during a freeze.
 - `sysio.opreg::claimremit(account, token_code)` for a shadow LIQ `token_code` pays through `sysio.liq::transfer` to the
@@ -700,8 +702,8 @@ solana -u "$SOL_RPC" balance "$RELAY_SIGNER"
   its separate yield-index layout marker is unsupported. Check the deployed program/IDL and
   marker; follow the program's yield-index upgrade procedure if that marker is unsupported.
   Configure and verify the panic account and freeze controls before admitting traffic.
-- **Depot.** Deploy `sysio.andon` and configure native pull/clear permissions before the four contracts that read the cord;
-  redeploy all five together whenever the `cord` row layout changes
+- **Depot.** Deploy `sysio.andon` and configure native pull/clear permissions before the five contracts that read the cord
+  (swap, liq, bond, synd, kicker); redeploy all six together whenever the `cord` row layout changes
   ([`contract-upgrade-order.md`](contract-upgrade-order.md)).
 - **Ethereum.** Run the permissions steps above with `panicAccount` set.
 

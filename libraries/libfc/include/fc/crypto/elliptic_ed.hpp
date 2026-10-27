@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstring>               // for memset
+#include <span>
+#include <cstddef>
 #include <ostream>               // for std::ostream
 #include <sodium.h>              // for ED25519 methods
 #include <fc/crypto/sha256.hpp>
@@ -11,6 +13,17 @@
 #include <fc/network/message_buffer.hpp>
 
 namespace fc { namespace crypto { namespace ed {
+
+/**
+ * Verify a detached Ed25519 signature over unchanged bytes using initialized libsodium.
+ * @param signature Exactly crypto_sign_BYTES bytes, without an embedded public key.
+ * @param message Message bytes; empty messages are supported. Callers enforce resource limits.
+ * @param public_key Exactly crypto_sign_PUBLICKEYBYTES bytes.
+ * @return False for incorrect signature/key sizes or invalid signatures/key encodings.
+ * @note Initialization failures remain exceptions.
+ */
+bool verify_detached(std::span<const std::byte> signature, std::span<const std::byte> message,
+                     std::span<const std::byte> public_key);
 
 // Forward declarations
 struct public_key_shim;
@@ -86,7 +99,9 @@ struct signature_shim {
    using public_key_type = public_key_shim;
    public_key_shim recover(const sha256& digest) const;
 
+   /// Verify the ASCII-hex digest through the shared raw verifier, preserving transaction signature semantics.
    bool verify(const sha256& digest, const public_key_shim& pub) const;
+   /// Verify unchanged Solana message bytes using the detached portion of this signature.
    bool verify_solana(const uint8_t* data, size_t len, const public_key_shim& pub) const;
 
    std::string to_string(const fc::yield_function_t& yield)const {
