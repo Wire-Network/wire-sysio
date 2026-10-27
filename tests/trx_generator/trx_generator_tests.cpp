@@ -11,6 +11,7 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 
+#include <array>
 #include <cstdlib>
 #include <exception>
 #include <future>
@@ -51,6 +52,29 @@ class test_ports_env_guard {
  private:
    std::optional<std::string> _previous;
 };
+
+/** Each category's expected slots; must match `Utils.getPort` in tests/TestHarness/testUtils.py. */
+struct expected_port {
+   port_category category;
+   uint32_t      slot;
+   uint32_t      count;
+};
+
+constexpr std::array expected_ports{
+    expected_port{port_category::ship, 0, 1},
+    expected_port{port_category::state_history, 1, 1},
+    expected_port{port_category::bios_http, 2, 1},
+    expected_port{port_category::node_http, 3, 88},
+    expected_port{port_category::alternate_service, 91, 1},
+    expected_port{port_category::plugin_http_peer, 92, 1},
+    expected_port{port_category::plugin_http_local, 93, 1},
+    expected_port{port_category::bios_p2p, 94, 1},
+    expected_port{port_category::alternate_p2p, 95, 46},
+    expected_port{port_category::p2p, 141, 23},
+    expected_port{port_category::wallet, 164, 5},
+    expected_port{port_category::transaction_only, 169, 2},
+    expected_port{port_category::ipv6_probe, 171, 4},
+    expected_port{port_category::raw_client, 175, 16}};
 
 /** The lease this test was started with; fails the test when it runs without one. */
 std::vector<uint16_t> require_lease() {
@@ -250,7 +274,7 @@ struct late_mock_trx_generator {
    }
 };
 
-/** Wall-clock regression tolerated by scheduling checks that use `fc::time_point::now()`. */
+// fc::time_point::now() is the wall clock, so timing checks allow it to step back by this much.
 constexpr int64_t wall_clock_tolerance_us = 2000;
 
 BOOST_AUTO_TEST_SUITE(trx_generator_tests)
@@ -278,8 +302,7 @@ BOOST_AUTO_TEST_CASE(tps_short_run_low_tps)
       BOOST_CHECK_EQUAL((stats.start_time - start).count(), 0);
       BOOST_CHECK_EQUAL(stats.trx_interval.count(), interval_us);
       BOOST_CHECK_EQUAL((stats.next_run - start).count(), (index + 1) * interval_us);
-      BOOST_CHECK_EQUAL((stats.expected_end_time - start).count(),
-                        test_duration_s * std::chrono::microseconds(1s).count());
+      BOOST_CHECK_EQUAL((stats.expected_end_time - start).count(), test_duration_s * std::chrono::microseconds(1s).count());
       BOOST_CHECK_EQUAL(stats.trxs_sent, index + 1);
       BOOST_CHECK_EQUAL(stats.trxs_left, expected_trxs - index - 1);
       BOOST_CHECK_GE((generator->_calls[index] - start).count(), index * interval_us - wall_clock_tolerance_us);
@@ -573,13 +596,13 @@ BOOST_AUTO_TEST_CASE(tps_cant_keep_up_monitored)
 BOOST_AUTO_TEST_CASE(test_ports_category_slots)
 {
    const auto ports = require_lease();
-   for(const auto& entry : port_layout) {
-      const auto slots = slots_of(entry.category);
-      BOOST_TEST_CONTEXT("slot " << slots.start) {
-         BOOST_REQUIRE_GT(slots.count, 0u);
-         BOOST_REQUIRE_LE(slots.start + slots.count, ports.size());
-         BOOST_REQUIRE_EQUAL(get_port(entry.category), ports.at(slots.start));
-         BOOST_REQUIRE_EQUAL(get_port(entry.category, slots.count - 1), ports.at(slots.start + slots.count - 1));
+   for(const auto& expected : expected_ports) {
+      BOOST_TEST_CONTEXT("slot " << expected.slot) {
+         BOOST_REQUIRE_EQUAL(slots_of(expected.category).start, expected.slot);
+         BOOST_REQUIRE_EQUAL(slots_of(expected.category).count, expected.count);
+         BOOST_REQUIRE_EQUAL(get_port(expected.category), ports.at(expected.slot));
+         BOOST_REQUIRE_EQUAL(get_port(expected.category, expected.count - 1),
+                             ports.at(expected.slot + expected.count - 1));
       }
    }
 }
@@ -587,8 +610,8 @@ BOOST_AUTO_TEST_CASE(test_ports_category_slots)
 BOOST_AUTO_TEST_CASE(test_ports_rejects_invalid_indices)
 {
    require_lease();
-   for(const auto& entry : port_layout) {
-      BOOST_REQUIRE_THROW(get_port(entry.category, slots_of(entry.category).count), std::runtime_error);
+   for(const auto& expected : expected_ports) {
+      BOOST_REQUIRE_THROW(get_port(expected.category, expected.count), std::runtime_error);
    }
 }
 

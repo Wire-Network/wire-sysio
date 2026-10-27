@@ -68,8 +68,9 @@ Each category owns fixed slots of the lease. Python (`testUtils.py`) and C++ (`t
 | `wallet` | `164..168` | 5 | kiod |
 | `transaction_only` | `169..170` | 2 | transaction-only P2P listeners |
 | `ipv6_probe` | `171..174` | 4 | IPv6 probe listeners |
+| `raw_client` | `175..190` | 16 | source ports of the raw P2P sessions `TestHarness/raw_p2p.py` dials |
 
-Slots `175..191` are free for new categories. The lease is consecutive, so `getPort(PortNodeHttp, i)` equals
+Slot `191` is free for a new category. The lease is consecutive, so `getPort(PortNodeHttp, i)` equals
 `getPort(PortNodeHttp) + i`.
 
 ## Self-tests
