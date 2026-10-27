@@ -103,20 +103,8 @@ namespace sysio {
                 : configured_timeout;
    }
 
-   /// Minimum decoder and request budget for a cold startup configuration read.
-   inline constexpr fc::microseconds snapshot_attestation_startup_minimum_table_read_timeout{
-      1'000'000};
-
    /// Maximum number of bounded attestation-table reads before the caller fails closed.
    inline constexpr uint32_t snapshot_attestation_table_read_attempts = 3;
-
-   /** Give a cold startup read more headroom than steady-state attestation polling. */
-   constexpr fc::microseconds snapshot_attestation_startup_table_read_timeout(
-      fc::microseconds configured_timeout) {
-      return configured_timeout < snapshot_attestation_startup_minimum_table_read_timeout
-                ? snapshot_attestation_startup_minimum_table_read_timeout
-                : configured_timeout;
-   }
 
    /** Retry transient attestation-table read failures while preserving a terminal empty result. */
    template <typename Read>
@@ -155,9 +143,10 @@ namespace sysio {
    /** Return whether an ABI declares the tables consumed during auto-fetched snapshot bootstrap. */
    bool has_required_snapshot_attestation_schema(const abi_def& abi);
 
-   /** Decode one exact snapconfig row; an empty table yields disabled production defaults. */
-   std::optional<snapshot_attestation_config>
-   decode_snapshot_attestation_config(const fc::variants& rows);
+   /** Read the fixed two-uint32 snapconfig KV row directly; absence yields production defaults.
+    * Call only during startup or while the caller owns a controller read/write window.
+    */
+   snapshot_attestation_config read_snapshot_attestation_config(const chain::database& db);
 
    /** Return whether endpoint metadata identifies the loaded configured-cadence head exactly. */
    bool snapshot_endpoint_block_matches(uint32_t advertised_block_num,
@@ -850,15 +839,8 @@ public:
                            std::string log_prefix,
                            const std::atomic<bool>& shutdown_flag);
 
-   /// Read and decode snapshot-attestation governance state without conflating an empty table with failure.
-   ///
-   /// `timeout` bounds both the queued request and ABI decoding. The returned default-valued configuration
-   /// represents a successful read of an empty table; `std::nullopt` represents either a failed read or a
-   /// malformed row, so safety-sensitive callers can fail closed.
-   std::optional<snapshot_attestation_config>
-   read_snapshot_attestation_config(fc::microseconds timeout,
-                                    std::string log_prefix,
-                                    const std::atomic<bool>& shutdown_flag);
+   /** Return the immutable startup snapshot configuration; restart to adopt governance changes. */
+   const snapshot_attestation_config& get_snapshot_attestation_config() const;
 
    /** Run a table scan while preserving the legacy empty-result-on-failure behavior. */
    chain_apis::read_only::get_table_rows_result

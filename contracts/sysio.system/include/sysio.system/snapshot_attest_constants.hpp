@@ -9,18 +9,12 @@ namespace sysiosystem::snapshot_attestation {
 /// Maximum number of producers that may participate in snapshot attestation.
 inline constexpr uint32_t maximum_providers = 30;
 
-/// Production default and largest supported distance between attested snapshot heights.
+/// Default distance between attested snapshot heights; small values are intended for tests.
 inline constexpr uint32_t default_block_spacing = 25'000;
 
-/// Smallest supported distance between attested snapshot heights.
-inline constexpr uint32_t minimum_block_spacing = 4;
-
-/// Largest supported distance between attested snapshot heights.
-inline constexpr uint32_t maximum_block_spacing = default_block_spacing;
-
-/** Return whether a snapshot-attestation cadence is within the supported bounds. */
+/** Return whether a snapshot-attestation cadence advances block height. */
 constexpr bool is_valid_block_spacing(uint32_t block_spacing) {
-   return block_spacing >= minimum_block_spacing && block_spacing <= maximum_block_spacing;
+   return block_spacing > 0;
 }
 
 /** Return whether a block height belongs to the supplied snapshot-attestation cadence. */
@@ -87,7 +81,7 @@ inline constexpr auto name = "name";
 /// Fixed number of distinct producer votes required to attest a tuple.
 inline constexpr auto min_providers = "min_providers";
 
-/// Immutable distance between eligible snapshot-attestation heights.
+/// Governance-configurable distance between eligible snapshot-attestation heights.
 inline constexpr auto block_spacing = "block_spacing";
 
 /// Producer account associated with a snapshot provider.

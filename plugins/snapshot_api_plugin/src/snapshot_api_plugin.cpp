@@ -59,9 +59,6 @@ constexpr auto snapshot_attestation_query_timeout =
 /// Log label for a scheduled catalog entry whose attestation record cannot be inspected.
 constexpr auto snapshot_attestation_query_log_prefix = "snapshot_api_plugin";
 
-/// Log label for the cadence configuration read that precedes serving-policy decisions.
-constexpr auto snapshot_attestation_config_query_log_prefix = "snapshot_api_plugin_config";
-
 struct snapshot_entry {
    block_num_type         block_num = 0;
    chain::block_id_type   block_id;
@@ -125,16 +122,6 @@ public:
    /// Chain access used only through a valid main-thread or executor read window.
    chain_plugin&                               chain_plugin_;
 
-   /** Read authoritative cadence state, retrying transient failures without masking absence. */
-   std::optional<snapshot_attestation_config> read_snapshot_attestation_config() const {
-      static const std::atomic<bool> not_shutting_down{false};
-      return retry_snapshot_attestation_table_read([this]() {
-         return chain_plugin_.read_snapshot_attestation_config(
-            snapshot_attestation_query_timeout,
-            snapshot_attestation_config_query_log_prefix, not_shutting_down);
-      });
-   }
-
    /** Return whether irreversible local state attests the exact snapshot tuple. */
    bool is_attested_snapshot(const snapshot_entry& entry) const {
       const auto expected_block_num = entry.block_num;
@@ -167,11 +154,10 @@ public:
       if (!is_snapshot_file_available(entry)) {
          return false;
       }
-      const auto config = read_snapshot_attestation_config();
-      return config
-             && snapshot_api::is_snapshot_servable(
+      const auto& config = chain_plugin_.get_snapshot_attestation_config();
+      return snapshot_api::is_snapshot_servable(
                 entry.block_num,
-                snapshot_api::explicit_snapshot_download_block_spacing(*config), entry,
+                snapshot_api::explicit_snapshot_download_block_spacing(config), entry,
                 [this](const snapshot_entry& snapshot) { return is_attested_snapshot(snapshot); });
    }
 
@@ -254,11 +240,8 @@ public:
     */
    snapshot_api::snapshot_discovery_result<snapshot_entry>
    get_latest(fc::microseconds max_response_time) const {
-      const auto config = read_snapshot_attestation_config();
-      if (!config) {
-         return {snapshot_api::snapshot_discovery_status::unavailable, std::nullopt};
-      }
-      if (!config->enabled()) {
+      const auto& config = chain_plugin_.get_snapshot_attestation_config();
+      if (!config.enabled()) {
          return {snapshot_api::snapshot_discovery_status::not_found, std::nullopt};
       }
 
@@ -275,7 +258,7 @@ public:
       const auto is_available = [](const snapshot_entry& snapshot) {
          return is_snapshot_file_available(snapshot);
       };
-      const auto block_spacing = config->block_spacing;
+      const auto block_spacing = config.block_spacing;
       const auto is_servable_attestation = [this, block_spacing](const auto& catalog,
                                                                 const fc::variant& row) {
          const auto& chain = chain_plugin_.chain();

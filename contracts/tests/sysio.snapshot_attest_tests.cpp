@@ -11,6 +11,9 @@
 #include <fc/exception/exception.hpp>
 #include <fc/variant_object.hpp>
 
+#include <array>
+#include <limits>
+
 #include "sysio.system_tester.hpp"
 #include "finalizer_test_keys.hpp"
 
@@ -682,70 +685,61 @@ BOOST_FIXTURE_TEST_CASE(setsnpcfg_validation, snapshot_attest_tester) { try {
    // One past each supported boundary is rejected without initializing the singleton.
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("min_providers exceeds the maximum registrable providers"),
                         setsnpcfg(31));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("block_spacing must be between 4 and 25000"),
-                       setsnpcfg(1, sysiosystem::snapshot_attestation::minimum_block_spacing - 1));
-   BOOST_REQUIRE_EQUAL(wasm_assert_msg("block_spacing must be between 4 and 25000"),
-                       setsnpcfg(1, sysiosystem::snapshot_attestation::maximum_block_spacing + 1));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("block_spacing must be greater than 0"),
+                       setsnpcfg(1, 0));
    BOOST_REQUIRE(get_snap_config().is_null());
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(setsnpcfg_accepts_minimum_block_spacing, snapshot_attest_tester) { try {
-   constexpr uint32_t spacing = sysiosystem::snapshot_attestation::minimum_block_spacing;
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, spacing));
-   const auto config = get_snap_config();
-   BOOST_REQUIRE(!config.is_null());
-   BOOST_REQUIRE_EQUAL(1u, config["min_providers"].as_uint64());
-   BOOST_REQUIRE_EQUAL(spacing, config["block_spacing"].as_uint64());
+/** Governance can select every positive uint32 cadence, including single-block test spacing. */
+BOOST_FIXTURE_TEST_CASE(setsnpcfg_accepts_every_positive_block_spacing, snapshot_attest_tester) { try {
+   const std::array spacings{
+      uint32_t{1}, sysiosystem::snapshot_attestation::default_block_spacing + 1,
+      std::numeric_limits<uint32_t>::max()};
+   for (const auto spacing : spacings) {
+      BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, spacing));
+      const auto config = get_snap_config();
+      BOOST_REQUIRE(!config.is_null());
+      BOOST_REQUIRE_EQUAL(1u, config["min_providers"].as_uint64());
+      BOOST_REQUIRE_EQUAL(spacing, config["block_spacing"].as_uint64());
+   }
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(setsnpcfg_accepts_maximum_block_spacing, snapshot_attest_tester) { try {
-   constexpr uint32_t spacing = sysiosystem::snapshot_attestation::maximum_block_spacing;
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(30, spacing));
-   const auto config = get_snap_config();
-   BOOST_REQUIRE(!config.is_null());
-   BOOST_REQUIRE_EQUAL(30u, config["min_providers"].as_uint64());
-   BOOST_REQUIRE_EQUAL(spacing, config["block_spacing"].as_uint64());
-} FC_LOG_AND_RETHROW() }
-
-BOOST_FIXTURE_TEST_CASE(setsnpcfg_keeps_cadence_immutable_while_updating_quorum,
-                        snapshot_attest_tester) { try {
+/** Quorum and cadence can change together; a rejected zero leaves the previous values intact. */
+BOOST_FIXTURE_TEST_CASE(setsnpcfg_updates_cadence_and_quorum, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(3));
-   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2));
-
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(2, test_block_spacing + 1));
    auto config = get_snap_config();
    BOOST_REQUIRE_EQUAL(2u, config["min_providers"].as_uint64());
-   BOOST_REQUIRE_EQUAL(test_block_spacing, config["block_spacing"].as_uint64());
+   BOOST_REQUIRE_EQUAL(test_block_spacing + 1, config["block_spacing"].as_uint64());
 
-   BOOST_REQUIRE_EQUAL(
-      wasm_assert_msg(
-         "block_spacing cannot be changed after snapshot attestation configuration is initialized"),
-      setsnpcfg(1, test_block_spacing + 1));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("block_spacing must be greater than 0"),
+                       setsnpcfg(1, 0));
    config = get_snap_config();
    BOOST_REQUIRE_EQUAL(2u, config["min_providers"].as_uint64());
-   BOOST_REQUIRE_EQUAL(test_block_spacing, config["block_spacing"].as_uint64());
+   BOOST_REQUIRE_EQUAL(test_block_spacing + 1, config["block_spacing"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
+/** Height eligibility accepts any positive cadence and grace deliberately rounds down. */
 BOOST_AUTO_TEST_CASE(snapshot_attestation_cadence_helpers_enforce_boundaries) {
    namespace cadence = sysiosystem::snapshot_attestation;
+   constexpr uint32_t small_spacing = 4;
+   constexpr uint32_t odd_spacing = 5;
+   constexpr auto largest_spacing = std::numeric_limits<uint32_t>::max();
+   BOOST_CHECK(!cadence::is_valid_block_spacing(0));
+   BOOST_CHECK(cadence::is_valid_block_spacing(1));
+   BOOST_CHECK(cadence::is_valid_block_spacing(cadence::default_block_spacing + 1));
+   BOOST_CHECK(cadence::is_valid_block_spacing(largest_spacing));
 
-   BOOST_CHECK(!cadence::is_valid_block_spacing(cadence::minimum_block_spacing - 1));
-   BOOST_CHECK(cadence::is_valid_block_spacing(cadence::minimum_block_spacing));
-   BOOST_CHECK(cadence::is_valid_block_spacing(cadence::maximum_block_spacing));
-   BOOST_CHECK(!cadence::is_valid_block_spacing(cadence::maximum_block_spacing + 1));
+   BOOST_CHECK(!cadence::is_scheduled_block(0, small_spacing));
+   BOOST_CHECK(!cadence::is_scheduled_block(small_spacing - 1, small_spacing));
+   BOOST_CHECK(cadence::is_scheduled_block(small_spacing, small_spacing));
+   BOOST_CHECK(!cadence::is_scheduled_block(small_spacing + 1, small_spacing));
+   BOOST_CHECK(cadence::is_scheduled_block(largest_spacing, largest_spacing));
+   BOOST_CHECK(!cadence::is_scheduled_block(largest_spacing, 0));
+   BOOST_CHECK(cadence::is_scheduled_block(1, 1));
 
-   BOOST_CHECK(!cadence::is_scheduled_block(0, cadence::minimum_block_spacing));
-   BOOST_CHECK(!cadence::is_scheduled_block(cadence::minimum_block_spacing - 1,
-                                             cadence::minimum_block_spacing));
-   BOOST_CHECK(cadence::is_scheduled_block(cadence::minimum_block_spacing,
-                                            cadence::minimum_block_spacing));
-   BOOST_CHECK(!cadence::is_scheduled_block(cadence::minimum_block_spacing + 1,
-                                             cadence::minimum_block_spacing));
-   BOOST_CHECK(cadence::is_scheduled_block(cadence::maximum_block_spacing,
-                                            cadence::maximum_block_spacing));
-   BOOST_CHECK(!cadence::is_scheduled_block(cadence::maximum_block_spacing, 0));
-
-   BOOST_CHECK_EQUAL(2u,
-                     cadence::snapshot_attestation_grace_blocks(cadence::minimum_block_spacing));
+   BOOST_CHECK_EQUAL(0u, cadence::snapshot_attestation_grace_blocks(1));
+   BOOST_CHECK_EQUAL(2u, cadence::snapshot_attestation_grace_blocks(odd_spacing));
    BOOST_CHECK_EQUAL(12'500u,
                      cadence::snapshot_attestation_grace_blocks(cadence::default_block_spacing));
 }
@@ -753,6 +747,19 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_cadence_helpers_enforce_boundaries) {
 // ---------------------------------------------------------------------------
 // votesnaphash tests
 // ---------------------------------------------------------------------------
+/** A cadence update changes eligible heights immediately in the contract. */
+BOOST_FIXTURE_TEST_CASE(votesnaphash_uses_updated_cadence, snapshot_voting_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
+   BOOST_REQUIRE_EQUAL(success(), regsnapprov("producer1"_n, "snapprov1"_n));
+   const auto formerly_unscheduled = make_block_id(vote_block_num() - 1);
+   const auto snapshot_hash = make_snap_hash(1);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("snapshot block is not a scheduled attestation height"),
+                       votesnaphash("snapprov1"_n, formerly_unscheduled, snapshot_hash));
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1, 1));
+   BOOST_REQUIRE_EQUAL(success(),
+                       votesnaphash("snapprov1"_n, formerly_unscheduled, snapshot_hash));
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(votesnaphash_unregistered, snapshot_voting_tester) { try {
    BOOST_REQUIRE_EQUAL(success(), setsnpcfg(1));
    auto bid = make_block_id(vote_block_num());

@@ -3,6 +3,7 @@
 """Exercise provider registration and the scheduled-height attestation boundary."""
 
 import json
+import signal
 
 from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 from TestHarness.TestHelper import AppArgs
@@ -39,6 +40,37 @@ dumpErrorDetails=args.dump_error_details
 Utils.Debug=debug
 # Small supported cadence configured through the same contract path used in production.
 snapshotAttestationBlockSpacing=250
+snapshotProviderDescription="snapshot-provider auto"
+providerTestBlockSpacing=17
+updatedProviderBlockSpacing=19
+manualSnapshotDescription="operator manual cadence test"
+manualSnapshotHeight=2**32-1
+
+
+def setSnapshotCadence(node, blockSpacing):
+    """Configure the cadence and wait until a provider can restart from irreversible state."""
+    success, trans = node.pushMessage("sysio", "setsnpcfg",
+        json.dumps({"min_providers": 1, "block_spacing": blockSpacing}),
+        "--permission sysio@active")
+    assert success, f"Failed to set snapshot config: {trans}"
+    transId = node.getTransId(trans)
+    assert node.waitForTransFinalization(transId, timeout=60), "Snapshot config was not finalized"
+    return transId
+
+
+def snapshotRequests(node):
+    """Read the live provider/manual schedule without changing it."""
+    result = node.processUrllibRequest("producer", "get_snapshot_requests")
+    assert result is not None, "Failed to read snapshot requests"
+    return result["payload"]["snapshot_requests"]
+
+
+def providerSchedule(node):
+    """Require exactly one canonical provider-owned request."""
+    requests = [request for request in snapshotRequests(node)
+                if request["snapshot_description"] == snapshotProviderDescription]
+    assert len(requests) == 1, f"Expected one automatic snapshot request, got {requests}"
+    return requests[0]
 
 testSuccessful=False
 
@@ -157,18 +189,11 @@ try:
     regSnapProvTransIds.append(node0.getTransId(trans))
 
     # ---------------------------------------------------------------
-    # Set attestation config: fixed K=1 and immutable block-height cadence.
+    # Set attestation config: fixed K=1 and a small block-height cadence.
     # This confirms governance configuration independently of the cadence rejection below.
     # ---------------------------------------------------------------
     Print("Set snapshot attestation config")
-    success, trans = node0.pushMessage("sysio", "setsnpcfg",
-        json.dumps({
-            "min_providers": 1,
-            "block_spacing": snapshotAttestationBlockSpacing
-        }),
-        "--permission sysio@active")
-    assert success, f"Failed to set snapshot config: {trans}"
-    setCfgTransId = node0.getTransId(trans)
+    setCfgTransId = setSnapshotCadence(node0, snapshotAttestationBlockSpacing)
 
     # ---------------------------------------------------------------
     # Verify provider registration via table query
@@ -252,6 +277,60 @@ try:
         f"Unexpected providers after rotation: {providerAccounts}"
 
     Print("Test 2 PASSED: Provider account rotation replaces the old mapping")
+
+    # ---------------------------------------------------------------
+    # Test 3: Provider and API cadence is fixed at startup until a restart.
+    # ---------------------------------------------------------------
+    Print("=== Test 3: Startup-only provider cadence and restart ===")
+    providerNode = cluster.getNode(2)
+    configuredTransId = setSnapshotCadence(node0, providerTestBlockSpacing)
+    assert providerNode.waitForTransFinalization(configuredTransId, timeout=60), \
+        "Provider did not receive finalized snapshot configuration"
+    providerNode.kill(signal.SIGTERM)
+    assert providerNode.relaunch(
+        chainArg=f"--snapshot-provider-account {snapProv1.name} --plugin sysio::snapshot_api_plugin"), \
+        "Provider failed to start after snapshot configuration"
+    schedule = providerSchedule(providerNode)
+    assert schedule["block_spacing"] == providerTestBlockSpacing
+    assert schedule["start_block_num"] == providerTestBlockSpacing
+
+    # An actual finalized file demonstrates that the startup schedule reaches the API catalog.
+    snapshotHeight = (providerNode.getInfo()["head_block_num"] // providerTestBlockSpacing + 1) \
+        * providerTestBlockSpacing
+    assert Utils.waitForBool(
+        lambda: providerNode.processUrllibRequest("snapshot", "by_block",
+            payload={"block_num": snapshotHeight}, silentErrors=True) is not None,
+        timeout=90), "Provider did not finalize its scheduled snapshot"
+
+    changedTransId = setSnapshotCadence(node0, updatedProviderBlockSpacing)
+    assert providerNode.waitForTransFinalization(changedTransId, timeout=60)
+    assert providerSchedule(providerNode)["block_spacing"] == providerTestBlockSpacing, \
+        "Provider unexpectedly refreshed cadence without restarting"
+
+    # A manual request must survive replacing only the differently-spaced automatic request.
+    manual = providerNode.processUrllibRequest("producer", "schedule_snapshot", payload={
+        "start_block_num": manualSnapshotHeight,
+        "end_block_num": manualSnapshotHeight,
+        "snapshot_description": manualSnapshotDescription
+    })
+    assert manual is not None, "Manual snapshot schedule failed"
+    manualRequestId = manual["payload"]["snapshot_request_id"]
+    providerNode.kill(signal.SIGTERM)
+    assert providerNode.relaunch(), "Provider failed to restart with changed snapshot cadence"
+    schedule = providerSchedule(providerNode)
+    assert schedule["block_spacing"] == updatedProviderBlockSpacing
+    assert schedule["start_block_num"] == updatedProviderBlockSpacing
+    requests = snapshotRequests(providerNode)
+    assert len(requests) == 2, f"Unexpected requests after cadence restart: {requests}"
+    assert any(request["snapshot_request_id"] == manualRequestId
+               and request["snapshot_description"] == manualSnapshotDescription
+               for request in requests), "Restart removed the operator's manual request"
+    providerNode.kill(signal.SIGTERM)
+    assert providerNode.relaunch(), "Provider failed to restart with an unchanged snapshot cadence"
+    assert providerSchedule(providerNode)["snapshot_request_id"] == schedule["snapshot_request_id"], \
+        "Unchanged restart did not reuse the automatic request"
+    assert len(snapshotRequests(providerNode)) == 2, "Unchanged restart duplicated a request"
+    Print("Test 3 PASSED: Provider cadence changes on restart and scheduled files enter the catalog")
 
     # ---------------------------------------------------------------
     Print("All snapshot attestation tests PASSED")

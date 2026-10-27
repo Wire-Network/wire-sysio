@@ -32,9 +32,7 @@ constexpr char historical_block_id_error[] = "snapshot block is older than lates
 constexpr char future_block_id_error[] = "snapshot block cannot be in the future";
 constexpr char min_providers_range_error[] = "min_providers must be at least 1";
 constexpr char min_providers_capacity_error[] = "min_providers exceeds the maximum registrable providers";
-constexpr char block_spacing_range_error[] = "block_spacing must be between 4 and 25000";
-constexpr char block_spacing_immutable_error[] =
-   "block_spacing cannot be changed after snapshot attestation configuration is initialized";
+constexpr char block_spacing_range_error[] = "block_spacing must be greater than 0";
 constexpr char snapshot_record_not_found_error[] = "no attested snapshot record for this block number";
 constexpr char stale_provider_prune_log_prefix[] = "regsnapprov: pruned stale mapping for producer ";
 constexpr char stale_provider_prune_log_infix[] = " and snapshot provider ";
@@ -388,9 +386,6 @@ void snapshot_attest::setsnpcfg(uint32_t min_providers, uint32_t block_spacing) 
    check(snapshot_attestation::is_valid_block_spacing(block_spacing), block_spacing_range_error);
 
    snap_config_singleton config_singleton(get_self());
-   if (config_singleton.exists()) {
-      check(config_singleton.get().block_spacing == block_spacing, block_spacing_immutable_error);
-   }
    config_singleton.set(snap_config{min_providers, block_spacing}, get_self());
 }
 

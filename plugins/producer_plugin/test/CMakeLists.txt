@@ -6,7 +6,6 @@ add_executable( test_producer_plugin
         test_disallow_delayed_trx.cpp
         test_mockable_timers.cpp
         test_received_block.cpp
-        test_snapshot_provider_schedule.cpp
         main.cpp
         )
 target_link_libraries( test_producer_plugin producer_plugin sysio_testing sysio_chain_wrap )

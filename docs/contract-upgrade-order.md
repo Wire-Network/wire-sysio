@@ -359,11 +359,12 @@ row migration, compatibility shim, or mixed-version contract/node interface. Boo
 matching system-contract artifacts, native nodes, and generated SDK types, then initialize the two-field
 configuration before enabling snapshot providers or endpoint bootstrap.
 
-Provider nodes automatically reconcile the persisted request carrying the reserved
-`snapshot-provider auto` description with the enabled on-chain cadence. Startup and irreversible-block
-reconciliation remove stale reserved requests and create or reuse the exact configured schedule, so
-operators do not need to delete `snapshot-schedule.json`. Requests created manually by operators are not
-reserved and remain untouched.
+Nodes read the two-uint32 `snapconfig` KV row directly once at startup, defaulting to 25,000 blocks
+when it is absent. Governance may change any positive uint32 interval, but operators must restart
+provider and serving nodes afterward. Small values are for testing; production should use much larger
+values because the grace window is half the spacing. At startup, provider nodes remove requests with
+the reserved `snapshot-provider auto` description only when their spacing differs, then create or reuse
+the exact configured schedule. Manual requests remain untouched. There is no irreversible-block refresh.
 
 ## WIRE-415 pre-launch deployment
 

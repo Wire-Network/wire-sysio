@@ -103,7 +103,7 @@ public:
       BOOST_REQUIRE_EQUAL(success(), result);
    }
 
-   /** Configure the fixed K and immutable cadence, using the small test cadence by default. */
+   /** Configure quorum and cadence, using the small test cadence by default. */
    void set_snap_config(uint32_t min_providers, uint32_t block_spacing = test_block_spacing) {
       const auto result = push_action(
          config::system_account_name, action_name{snapshot_attestation::action_setsnapcfg},

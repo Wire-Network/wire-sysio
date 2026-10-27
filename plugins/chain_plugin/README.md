@@ -78,9 +78,10 @@ The CLI options select where the node comes up from:
 - **A snapshot file** — `--snapshot <path>`. Operator-trusted; no attestation is verified.
 - **A snapshot endpoint** — `--snapshot-endpoint <url>`, which downloads and hash-checks a snapshot from a
   serving node and then loads it. This path is not trusted the same way, and it carries hard constraints. The
-  snapshot must contain readable, enabled on-chain attestation state with its immutable configured block
-  spacing `S`. Once the snapshot is loaded, its actual head must be a positive multiple of `S`; endpoint
-  metadata is not trusted to establish cadence before load. After the node syncs past the snapshot's height,
+  loaded state must declare compatible attestation schemas. After replay, readable, enabled on-chain
+  attestation state provides startup block spacing `S`; the loaded snapshot head must be a positive
+  multiple of `S` before startup completes. Endpoint metadata is not trusted to establish cadence.
+  After the node syncs past the snapshot's height,
   the loaded block id and root hash are checked against the on-chain attestation record on each finalized
   block: a record that does not match the loaded snapshot stops the node immediately, with no grace, while a
   record that has not appeared yet keeps verification pending. Verification only concludes once the node has
@@ -88,6 +89,10 @@ The CLI options select where the node comes up from:
   missing record is tolerated for a grace window of `floor(S / 2)` finalized blocks beyond the snapshot height
   before the node is stopped. The option requires an empty database; use `--delete-all-blocks` to clear
   existing data.
+
+Cadence is read once after startup replay directly from the two-uint32 `snapconfig` KV row, with a 25,000-block
+fallback if no row exists. Restart nodes after governance changes the interval; small values are for testing,
+and production should use much larger intervals because the grace window is half the spacing.
 
 Both snapshot paths share the chain-state size setting as their download and state ceiling
 (`--chain-state-db-size-mb`), and the endpoint path accepts per-caller HTTPS transport overrides
@@ -273,7 +278,7 @@ process-wide `outbound-http-*` fallback that `http_client_plugin` registers.
 | `truncate-at-block` | `0` | Stop hard replay or block-log recovery at this block number when non-zero. Combined with `terminate-at-block`, prunes received blocks from the fork database on exit. |
 | `terminate-at-block` | `0` | Stop the node after reaching this block number when non-zero. To pause at a block instead, use `/v1/producer/pause_at_block`. |
 | `snapshot` | unset | File to read the snapshot state from. |
-| `snapshot-endpoint` | unset | Fetch a snapshot from a URL and bootstrap. `http(s)://host:port` fetches the latest snapshot; `http(s)://host:port/50000` fetches the snapshot at block 50000. After load, the snapshot head must be a positive multiple of its immutable configured block spacing `S`. Requires an empty database. |
+| `snapshot-endpoint` | unset | Fetch a snapshot from a URL and bootstrap. `http(s)://host:port` fetches the latest snapshot; `http(s)://host:port/50000` fetches the snapshot at block 50000. After load, the snapshot head must be a positive multiple of its startup configured block spacing `S`. Requires an empty database. |
 
 ## HTTP API
 

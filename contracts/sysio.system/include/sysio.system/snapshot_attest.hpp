@@ -40,7 +40,7 @@ static constexpr auto by_block_num = "byblocknum"_n;
 struct [[sysio::table("snapconfig"), sysio::contract("sysio.system")]] snap_config {
    /// Fixed number of distinct producer votes required; zero disables attestation.
    uint32_t min_providers = 0;
-   /// Immutable distance between eligible snapshot heights.
+   /// Configurable block interval; nodes must restart to adopt a changed value.
    uint32_t block_spacing = snapshot_attestation::default_block_spacing;
 
    SYSLIB_SERIALIZE(snap_config, (min_providers)(block_spacing))
@@ -197,13 +197,14 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     * Update snapshot attestation configuration. Requires contract authority.
     *
     * @param min_providers fixed number of distinct producer voters required to attest (1..30).
-    * @param block_spacing distance between eligible snapshot heights (4..25,000).
+    * @param block_spacing Positive block interval; small values are for testing. Nodes restart to adopt changes.
     *
     * No attestation is permitted until this action stores a nonzero min_providers. Governance is
     * responsible for choosing K with the desired security and liveness tradeoff. K changes apply to
     * pending heights; an exact vote retry, from a producer that still has operator standing,
-    * finalizes a tuple that already meets a newly lowered K. The first successful call fixes
-    * block_spacing permanently, so subsequent calls must supply the same value.
+    * finalizes a tuple that already meets a newly lowered K. Cadence may change at any time;
+    * operators restart nodes to adopt it. Production spacing should be much larger than test
+    * values because the post-snapshot grace window is block_spacing / 2 blocks.
     */
    [[sysio::action]]
    void setsnpcfg(uint32_t min_providers, uint32_t block_spacing);

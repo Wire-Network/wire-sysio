@@ -350,7 +350,7 @@ try:
     # active attestation cadence and must ignore these API-created snapshots. Their
     # heights also fall outside the default cadence used to classify explicit downloads,
     # so a specific-block bootstrap can download the requested file. Strict post-load
-    # configuration preflight must then reject it before replay. Enabled-cadence behavior
+    # configuration check must then reject it after replay and before startup completes. Enabled-cadence behavior
     # is covered by the faster C++ contract and plugin fixtures.
 
     # ---------------------------------------------------------------

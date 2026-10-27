@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <string>
 #include <string_view>
+#include <test_ports.hpp>
 #include <thread>
 #include <vector>
 
@@ -37,6 +38,8 @@ constexpr auto snapshot_endpoint_option_name = "--snapshot-endpoint";
 constexpr auto blocks_dir_option_name = "--blocks-dir";
 constexpr auto config_dir_option_name = "--config-dir";
 constexpr auto data_dir_option_name = "--data-dir";
+constexpr auto terminate_at_block_option_name = "--terminate-at-block";
+constexpr auto truncate_at_block_option_name = "--truncate-at-block";
 constexpr auto snapshot_without_attestation_table_filename =
    "snapshot-without-attestation-table.bin";
 constexpr auto valid_snapshot_filename = "snapshot-with-valid-attestation.bin";
@@ -68,7 +71,6 @@ constexpr uint32_t snapshot_source_block_count = 3;
 constexpr uint32_t snapshot_block_log_extension_block_count = 3;
 constexpr uint32_t attestation_finality_block_count = 24;
 constexpr uint32_t snapshot_endpoint_response_count = 2;
-constexpr uint16_t ephemeral_port = 0;
 
 /** Serve one snapshot endpoint metadata response and its binary download on loopback. */
 class snapshot_endpoint_server {
@@ -81,7 +83,8 @@ public:
               (snapshot_root_hash_field, root_hash.str()),
            fc::time_point::maximum()))
       , snapshot_body(read_snapshot(snapshot_path))
-      , acceptor(io, tcp::endpoint(boost::asio::ip::make_address(loopback_address), ephemeral_port))
+      , acceptor(io, tcp::endpoint(boost::asio::ip::make_address(loopback_address),
+                                  sysio::testing::get_port(sysio::testing::port_category::node_http)))
       , port(acceptor.local_endpoint().port())
       , worker([this] { serve(); }) {}
 
@@ -307,15 +310,6 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_table_read_timeout_policy) {
    BOOST_CHECK(sysio::snapshot_attestation_table_read_timeout(above_minimum)
                == above_minimum);
 
-   BOOST_CHECK(sysio::snapshot_attestation_startup_table_read_timeout(disabled_timeout)
-               == sysio::snapshot_attestation_startup_minimum_table_read_timeout);
-   BOOST_CHECK(sysio::snapshot_attestation_startup_table_read_timeout(above_minimum)
-               == sysio::snapshot_attestation_startup_minimum_table_read_timeout);
-   BOOST_CHECK(sysio::snapshot_attestation_startup_table_read_timeout(
-                  sysio::snapshot_attestation_startup_minimum_table_read_timeout
-                  + sysio::snapshot_attestation_startup_minimum_table_read_timeout)
-               == sysio::snapshot_attestation_startup_minimum_table_read_timeout
-                     + sysio::snapshot_attestation_startup_minimum_table_read_timeout);
 }
 
 /** A transient attestation read is retried, while a confirmed empty read is terminal. */
@@ -420,60 +414,25 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_required_schema_policy) {
    BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(extended_config));
 }
 
-/** Decode exact two-field governance state while preserving a valid empty-table default. */
-BOOST_AUTO_TEST_CASE(snapshot_attestation_config_decode_policy) {
-   const auto row = [](uint64_t min_providers, uint64_t block_spacing) {
-      return fc::mutable_variant_object()
-         (snapshot_attest::field::min_providers, min_providers)
-         (snapshot_attest::field::block_spacing, block_spacing);
-   };
+/** Direct KV reads use the real contract key and two uint32 fields, without an ABI table query. */
+BOOST_FIXTURE_TEST_CASE(snapshot_attestation_startup_config_reads_kv,
+                       snapshot_attest_test_support::snapshot_attest_fixture) {
+   const auto empty = sysio::read_snapshot_attestation_config(control->db());
+   BOOST_CHECK(!empty.enabled());
+   BOOST_CHECK_EQUAL(empty.block_spacing, snapshot_attest::default_block_spacing);
 
-   const auto enabled = sysio::decode_snapshot_attestation_config(
-      {row(1, snapshot_attest::minimum_block_spacing)});
-   BOOST_REQUIRE(enabled);
-   BOOST_CHECK(enabled->enabled());
-   BOOST_CHECK_EQUAL(enabled->min_providers, 1u);
-   BOOST_CHECK_EQUAL(enabled->block_spacing, snapshot_attest::minimum_block_spacing);
+   constexpr uint32_t smallest_spacing = 1;
+   set_snap_config(snapshot_attest_test_support::single_provider_minimum, smallest_spacing);
+   const auto first = sysio::read_snapshot_attestation_config(control->db());
+   BOOST_CHECK(first.enabled());
+   BOOST_CHECK_EQUAL(first.min_providers, snapshot_attest_test_support::single_provider_minimum);
+   BOOST_CHECK_EQUAL(first.block_spacing, smallest_spacing);
 
-   const auto empty = sysio::decode_snapshot_attestation_config({});
-   BOOST_REQUIRE(empty);
-   BOOST_CHECK(!empty->enabled());
-   BOOST_CHECK_EQUAL(empty->block_spacing, snapshot_attest::default_block_spacing);
-
-   const auto disabled = sysio::decode_snapshot_attestation_config(
-      {row(0, snapshot_attest::maximum_block_spacing)});
-   BOOST_REQUIRE(disabled);
-   BOOST_CHECK(!disabled->enabled());
-   BOOST_CHECK_EQUAL(disabled->block_spacing, snapshot_attest::maximum_block_spacing);
-
-   BOOST_CHECK(sysio::decode_snapshot_attestation_config(
-      {row(sysiosystem::snapshot_attestation::maximum_providers,
-           snapshot_attest::maximum_block_spacing)}));
-   BOOST_CHECK(!sysio::decode_snapshot_attestation_config(
-      {row(sysiosystem::snapshot_attestation::maximum_providers + 1,
-           snapshot_attest::minimum_block_spacing)}));
-   BOOST_CHECK(!sysio::decode_snapshot_attestation_config(
-      {row(1, snapshot_attest::minimum_block_spacing - 1)}));
-   BOOST_CHECK(!sysio::decode_snapshot_attestation_config(
-      {row(1, static_cast<uint64_t>(snapshot_attest::maximum_block_spacing) + 1)}));
-   BOOST_CHECK(!sysio::decode_snapshot_attestation_config({fc::variant{"malformed"}}));
-   BOOST_CHECK(!sysio::decode_snapshot_attestation_config(
-      {fc::mutable_variant_object()
-          (snapshot_attest::field::min_providers, uint64_t{1})}));
-   BOOST_CHECK(!sysio::decode_snapshot_attestation_config(
-      {fc::mutable_variant_object()
-          (snapshot_attest::field::min_providers, uint64_t{1})
-          (snapshot_attest::field::block_spacing,
-           uint64_t{snapshot_attest::minimum_block_spacing})
-          ("extra", uint64_t{0})}));
-   BOOST_CHECK(!sysio::decode_snapshot_attestation_config(
-      {fc::mutable_variant_object()
-          (snapshot_attest::field::min_providers, "1")
-          (snapshot_attest::field::block_spacing,
-           uint64_t{snapshot_attest::minimum_block_spacing})}));
-   BOOST_CHECK(!sysio::decode_snapshot_attestation_config(
-      {row(1, snapshot_attest::minimum_block_spacing),
-       row(1, snapshot_attest::minimum_block_spacing)}));
+   constexpr auto largest_spacing = std::numeric_limits<uint32_t>::max();
+   set_snap_config(snapshot_attest_test_support::single_provider_minimum, largest_spacing);
+   const auto updated = sysio::read_snapshot_attestation_config(control->db());
+   BOOST_CHECK_EQUAL(updated.block_spacing, largest_spacing);
+   BOOST_CHECK_EQUAL(first.block_spacing, smallest_spacing);
 }
 
 /** The configured half-cadence grace is exclusive and remains safe near uint32 overflow. */
@@ -496,7 +455,7 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_grace_boundary_policy) {
    constexpr uint32_t near_max_height = std::numeric_limits<uint32_t>::max() - 1;
    BOOST_CHECK(sysio::snapshot_attestation_within_grace(
       near_max_height, std::numeric_limits<uint32_t>::max(),
-      snapshot_attest::minimum_block_spacing));
+      snapshot_attest_test_support::test_block_spacing));
 }
 
 /** Match both the loaded block id and root hash against the attested tuple. */
@@ -516,7 +475,7 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_record_tuple_policy) {
 
 /** Require endpoint metadata to identify the loaded scheduled snapshot head exactly. */
 BOOST_AUTO_TEST_CASE(snapshot_endpoint_block_identity_policy) {
-   constexpr uint32_t block_spacing = snapshot_attest::minimum_block_spacing;
+   constexpr uint32_t block_spacing = snapshot_attest_test_support::test_block_spacing;
    constexpr uint32_t scheduled_block = block_spacing * 2;
    constexpr uint32_t other_scheduled_block = block_spacing * 3;
    constexpr uint32_t unscheduled_block = scheduled_block + 1;
@@ -530,7 +489,7 @@ BOOST_AUTO_TEST_CASE(snapshot_endpoint_block_identity_policy) {
    BOOST_CHECK(!sysio::snapshot_endpoint_block_matches(
       unscheduled_block, unscheduled_block, block_spacing));
    BOOST_CHECK(!sysio::snapshot_endpoint_block_matches(
-      scheduled_block, scheduled_block, snapshot_attest::minimum_block_spacing - 1));
+      scheduled_block, scheduled_block, 0));
    BOOST_CHECK(sysio::snapshot_endpoint_request_matches(std::nullopt, scheduled_block));
    BOOST_CHECK(sysio::snapshot_endpoint_request_matches(
       std::optional<uint32_t>{scheduled_block}, scheduled_block));
@@ -620,7 +579,7 @@ BOOST_FIXTURE_TEST_CASE(
    plugin.plugin_shutdown();
 }
 
-/** Reject an auto-fetched snapshot before replay when governance has not enabled attestation. */
+/** Reject an auto-fetched snapshot before startup completes when attestation remains disabled. */
 BOOST_FIXTURE_TEST_CASE(
    chain_plugin_rejects_auto_fetched_snapshot_without_enabled_config,
    snapshot_attest_test_support::snapshot_attest_fixture) {
@@ -769,6 +728,65 @@ BOOST_AUTO_TEST_CASE(chain_plugin_accepts_trusted_manual_snapshot_without_attest
    BOOST_CHECK(!plugin.has_pending_snapshot_attestation());
    BOOST_CHECK(!appbase::app().is_quiting());
    plugin.plugin_shutdown();
+}
+
+/** Snapshot replay must capture a governance change from the retained block log at startup. */
+BOOST_FIXTURE_TEST_CASE(snapshot_attestation_startup_config_follows_snapshot_replay,
+                       snapshot_attest_test_support::snapshot_attest_fixture) {
+   set_snap_config(snapshot_attest_test_support::single_provider_minimum);
+   control->abort_block();
+   fc::temp_directory snapshot_dir;
+   const auto snapshot_path = snapshot_dir.path() / valid_snapshot_filename;
+   write_chain_plugin_snapshot(*control, snapshot_path);
+   const auto terminate_block = std::to_string(control->head().block_num() + 1);
+
+   constexpr uint32_t updated_spacing = 19;
+   produce_block();
+   set_snap_config(snapshot_attest_test_support::single_provider_minimum, updated_spacing);
+   produce_blocks(attestation_finality_block_count);
+   const auto source_blocks_path = get_config().blocks_dir.string();
+   validate_and_close();
+
+   fc::temp_directory node_dir;
+   const auto node_path = node_dir.path().string();
+   const auto snapshot_path_string = snapshot_path.string();
+   std::array args{
+      chain_plugin_test_program_name,
+      snapshot_option_name, snapshot_path_string.c_str(),
+      blocks_dir_option_name, source_blocks_path.c_str(),
+      config_dir_option_name, node_path.c_str(),
+      data_dir_option_name, node_path.c_str(),
+   };
+   {
+      sysio::chain::application exe({.enable_resource_monitor = false});
+      BOOST_REQUIRE(exe.init<sysio::chain_plugin>(args.size(), const_cast<char**>(args.data()))
+                    == sysio::chain::exit_code::SUCCESS);
+      auto& plugin = appbase::app().get_plugin<sysio::chain_plugin>();
+      plugin.plugin_startup();
+      BOOST_CHECK_EQUAL(plugin.get_snapshot_attestation_config().block_spacing, updated_spacing);
+      BOOST_CHECK_EQUAL(sysio::read_snapshot_attestation_config(plugin.chain().db()).block_spacing,
+                        updated_spacing);
+      BOOST_CHECK(!appbase::app().is_quiting());
+      plugin.plugin_shutdown();
+   }
+
+   // A deliberate replay stop must still exit successfully, without exposing partial startup state.
+   fc::temp_directory stopped_node_dir;
+   const auto stopped_node_path = stopped_node_dir.path().string();
+   std::vector<const char*> stopped_args(args.begin(), args.end());
+   stopped_args.insert(stopped_args.end(), {
+      terminate_at_block_option_name, terminate_block.c_str(),
+      truncate_at_block_option_name, terminate_block.c_str(),
+   });
+   const auto config_option = std::find(stopped_args.begin(), stopped_args.end(), config_dir_option_name);
+   const auto data_option = std::find(stopped_args.begin(), stopped_args.end(), data_dir_option_name);
+   *(config_option + 1) = stopped_node_path.c_str();
+   *(data_option + 1) = stopped_node_path.c_str();
+   sysio::chain::application stopped_exe({.enable_resource_monitor = false});
+   BOOST_REQUIRE(stopped_exe.init<sysio::chain_plugin>(stopped_args.size(), const_cast<char**>(stopped_args.data()))
+                 == sysio::chain::exit_code::SUCCESS);
+   BOOST_CHECK(stopped_exe.exec() == sysio::chain::exit_code::SUCCESS);
+   BOOST_CHECK(appbase::app().is_quiting());
 }
 
 /** Verify snapshot endpoint registration and removal of endpoint-specific resource knobs. */

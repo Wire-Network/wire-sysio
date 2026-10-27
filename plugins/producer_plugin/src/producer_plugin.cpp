@@ -1,6 +1,5 @@
 #include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/producer_plugin/block_timing_util.hpp>
-#include <sysio/producer_plugin/detail/snapshot_provider_schedule.hpp>
 #include <sysio/producer_plugin/production_pause_vote_tracker.hpp>
 #include <sysio/producer_plugin/trx_priority_db.hpp>
 #include <sysio/chain/authorization_manager.hpp>
@@ -670,84 +669,12 @@ public:
       return {chain.head().id(), chain.calculate_integrity_hash()};
    }
 
-   /** Remove stale provider-owned requests and install the configured recurring cadence. */
-   void reconcile_snapshot_provider_schedule(std::optional<uint32_t> desired_block_spacing) {
-      const auto previous_block_spacing = _snapshot_provider_block_spacing;
-      const auto previous_request_id = _snapshot_provider_schedule_request_id;
-      _snapshot_provider_block_spacing.reset();
-      _snapshot_provider_schedule_request_id.reset();
-      const auto reconciliation = producer_plugin_detail::reconcile_snapshot_provider_schedule(
-         _snapshot_scheduler, desired_block_spacing);
-      _snapshot_provider_block_spacing = reconciliation.block_spacing;
-      _snapshot_provider_schedule_request_id = reconciliation.request_id;
-
-      for (const auto request_id : reconciliation.removed_request_ids) {
-         ilog("Snapshot provider mode: removed stale persisted auto-schedule request {}",
-              request_id);
-      }
-
-      using disposition = producer_plugin_detail::snapshot_provider_schedule_disposition;
-      switch (reconciliation.disposition) {
-         case disposition::disabled:
-            return;
-         case disposition::reused_automatic:
-            if (previous_block_spacing != reconciliation.block_spacing
-                || previous_request_id != reconciliation.request_id) {
-               ilog("Snapshot provider mode: reusing persisted auto-schedule for every {} blocks "
-                    "(request id {})",
-                    *reconciliation.block_spacing, *reconciliation.request_id);
-            }
-            return;
-         case disposition::reused_manual:
-            if (previous_block_spacing != reconciliation.block_spacing
-                || previous_request_id != reconciliation.request_id) {
-               ilog("Snapshot provider mode: using existing manual schedule for every {} blocks "
-                    "(request id {})",
-                    *reconciliation.block_spacing, *reconciliation.request_id);
-            }
-            return;
-         case disposition::created_automatic:
-            ilog("Snapshot provider mode: auto-scheduled snapshots every {} blocks "
-                 "(request id {})",
-                 *reconciliation.block_spacing, *reconciliation.request_id);
-            return;
-      }
-   }
-
-   /** Read governance configuration and enable provider scheduling only after it is active. */
-   void refresh_snapshot_provider_schedule() {
-      if (_snapshot_provider_account.empty()) {
-         return;
-      }
-
-      static const std::atomic<bool> not_shutting_down{false};
-      const auto table_read_timeout = snapshot_attestation_table_read_timeout(
-         chain_plug->get_abi_serializer_max_time());
-      const auto config = retry_snapshot_attestation_table_read([&]() {
-         return chain_plug->read_snapshot_attestation_config(
-            table_read_timeout, _snapshot_provider_config_log_prefix, not_shutting_down);
-      });
-      if (!config || !config->enabled()) {
-         reconcile_snapshot_provider_schedule(std::nullopt);
-         return;
-      }
-
-      reconcile_snapshot_provider_schedule(config->block_spacing);
-   }
-
    /** Build, sign, and asynchronously submit one finalized snapshot vote. */
    void submit_snapshot_vote(const snapshot_scheduler::snapshot_information& si) {
       if (_snapshot_provider_account.empty()) return;
 
-      if (!_snapshot_provider_block_spacing) {
-         dlog("Snapshot provider: skipping on-chain vote for block {} without an active "
-              "readable snapshot-attestation configuration",
-              si.head_block_num);
-         return;
-      }
-
       if (!snapshot_attest::is_scheduled_block(
-             si.head_block_num, *_snapshot_provider_block_spacing)) {
+             si.head_block_num, chain_plug->get_snapshot_attestation_config().block_spacing)) {
          dlog("Snapshot provider: skipping on-chain vote for unscheduled manual snapshot at block {}",
               si.head_block_num);
          return;
@@ -956,14 +883,10 @@ public:
 
    // snapshot provider configuration
    std::string _snapshot_provider_account;
-   /// Active immutable cadence read from the governance singleton; unset until configuration exists.
-   std::optional<uint32_t> _snapshot_provider_block_spacing;
-   /// Request supplying the active cadence, whether provider-owned or adopted manual state.
-   std::optional<uint32_t> _snapshot_provider_schedule_request_id;
    /// Lifetime of an automatically submitted provider vote transaction.
    static constexpr uint32_t _snapshot_vote_expiration_seconds = 30;
-   /// Log label for provider-mode configuration table reads.
-   static constexpr auto _snapshot_provider_config_log_prefix = "snapshot_provider_config";
+   /// Description persisted with the automatic provider schedule.
+   static constexpr auto _snapshot_provider_schedule_description = "snapshot-provider auto";
 
    std::function<void(speculative_block_metrics)> _update_speculative_block_metrics;
 
@@ -1087,7 +1010,6 @@ public:
       const chain::controller& chain = chain_plug->chain();
       SYS_ASSERT(chain.is_write_window(), producer_exception, "write window is expected for on_irreversible_block signal");
       _irreversible_block_time = lib->timestamp.to_time_point();
-      refresh_snapshot_provider_schedule();
       _snapshot_scheduler.on_irreversible_block(lib, block_id, chain);
       _trx_priority_db.on_irreversible_block(lib, block_id, chain);
    }
@@ -1883,10 +1805,39 @@ void producer_plugin_impl::plugin_startup() {
          }
       }));
 
-      // A persisted automatic request is inactive until the authoritative configuration can be
-      // read. Disabled or unreadable state removes only provider-owned requests; manual schedules
-      // remain untouched. Later irreversible blocks retry until governance enables attestation.
-      refresh_snapshot_provider_schedule();
+      // Auto-schedule periodic snapshots for snapshot provider mode.
+      // Every provider keeps the on-chain cadence observed at startup until the node restarts.
+      // on_start_block(height) snapshots the current head at height - 1, so start_block_num equal
+      // to block_spacing snapshots exact head-height multiples:
+      // blocks S, 2S, 3S, ...
+      if (!_snapshot_provider_account.empty()) {
+         const auto block_spacing = chain_plug->get_snapshot_attestation_config().block_spacing;
+         for (const auto& request : _snapshot_scheduler.get_snapshot_requests().snapshot_requests) {
+            if (request.snapshot_description == _snapshot_provider_schedule_description
+                && request.block_spacing != block_spacing)
+               _snapshot_scheduler.unschedule_snapshot(request.snapshot_request_id);
+         }
+
+         snapshot_scheduler::snapshot_request_information sri;
+         sri.block_spacing = block_spacing;
+         sri.start_block_num = block_spacing;
+         sri.end_block_num = std::numeric_limits<uint32_t>::max();
+         sri.snapshot_description = _snapshot_provider_schedule_description;
+
+         // The auto-schedule is persisted to snapshot-schedule.json and reloaded by set_db_path()
+         // on restart, so only schedule it when an identical request is not already present;
+         // otherwise schedule_snapshot() would throw duplicate_snapshot_request on every restart.
+         if (auto existing = _snapshot_scheduler.find_snapshot_request(sri.block_spacing, sri.start_block_num, sri.end_block_num)) {
+            ilog("Snapshot provider mode: reusing persisted auto-schedule for every {} blocks (request id {})",
+                 block_spacing, *existing);
+         } else {
+            // scheduled (non create_snapshot) requests store no completion callback; the produced
+            // snapshots are observed through add_snapshot_finalized_callback (provider-mode voting)
+            auto result = _snapshot_scheduler.schedule_snapshot(sri, {});
+            ilog("Snapshot provider mode: auto-scheduled snapshots every {} blocks (request id {})",
+                 block_spacing, result.snapshot_request_id);
+         }
+      }
 
       if (is_configured_producer()) { // track votes if producer to verify votes are being processed
          auto on_vote_signal = [this]( const vote_signal_params& vote_signal ) {
