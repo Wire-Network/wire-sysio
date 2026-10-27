@@ -427,9 +427,29 @@ public:
       return push(SYND_ACCOUNT, synd_abi_ser, signer, "linkswept"_n, mvo()
          ("account", account)("chain_kind", kind)("pubkey", pubkey));
    }
-   action_result desyndicate(name holder, uint64_t amount, symbol sym = LIQSOL_SYM, name signer = name{}) {
+   /// Desyndicate with an explicit fee cap; existing cases allow any representable fee.
+   action_result desyndicate(name holder, uint64_t amount, symbol sym = LIQSOL_SYM, name signer = name{},
+                             uint64_t max_fee = std::numeric_limits<uint64_t>::max()) {
       return push(SYND_ACCOUNT, synd_abi_ser, signer == name{} ? holder : signer, "desyndicate"_n, mvo()
-         ("holder", holder)("quantity", asset(static_cast<int64_t>(amount), sym)));
+         ("holder", holder)("quantity", asset(static_cast<int64_t>(amount), sym))("max_fee", max_fee));
+   }
+   /// Query the fee path and retain its return trace, including refusal diagnostics.
+   action_result quotedesynd(std::string_view chain, std::string_view token, uint64_t quantity) {
+      return push(SYND_ACCOUNT, synd_abi_ser, SYND_ACCOUNT, "quotedesynd"_n, mvo()
+         ("chain_code", codename_mvo(chain))("token_code", codename_mvo(token))("quantity", quantity));
+   }
+   /// Decode the serialized fee/net pair returned by the last successful quote.
+   std::pair<uint64_t, uint64_t> desynd_quote() {
+      BOOST_REQUIRE(last_trace && !last_trace->action_traces.empty());
+      return fc::raw::unpack<std::pair<uint64_t, uint64_t>>(last_trace->action_traces.front().return_value);
+   }
+   /// Capture all KV rows plus the liquid ledger and request counter to detect quote/refusal writes.
+   auto desynd_state() {
+      std::vector<std::vector<char>> rows;
+      for (const auto& row : control->db().get_index<kv_index, by_code_key>())
+         rows.emplace_back(row.value.data(), row.value.data() + row.value.size());
+      return std::make_tuple(rows, liq_balance("alice"_n), liq_balance(SYND_ACCOUNT), supply(),
+         get_row_by_account(SYND_ACCOUNT, SYND_ACCOUNT, "syndcounters"_n, "syndcounters"_n));
    }
    static mvo credit(const std::vector<char>& pubkey, uint64_t amount) {
       return mvo()("pubkey", pubkey)("amount", amount);
@@ -457,6 +477,7 @@ public:
       uint64_t bounty          = 0;
       uint64_t challenge_extra = 0;
       uint64_t min_desyndicate = 1; ///< Permissive fixture floor for small-value edge cases.
+      uint64_t desynd_fee_flat = 0; ///< Flat desyndication fee, in base units, below `min_desyndicate`.
    };
    action_result setconfig(std::string_view chain_code, std::string_view token_code, const pair_config& cfg,
                            name signer = SYSIO_ACCOUNT) {
@@ -464,7 +485,8 @@ public:
          ("chain_code", codename_mvo(chain_code))("token_code", codename_mvo(token_code))
          ("synd_fee_bps", cfg.synd_fee_bps)("desynd_fee_bps", cfg.desynd_fee_bps)("synd_burst", cfg.synd_burst)
          ("synd_refill", cfg.synd_refill)("desynd_burst", cfg.desynd_burst)("desynd_refill", cfg.desynd_refill)
-         ("window_sec", cfg.window_sec)("bounty", cfg.bounty)("challenge_extra", cfg.challenge_extra)("min_desyndicate", cfg.min_desyndicate);
+         ("window_sec", cfg.window_sec)("bounty", cfg.bounty)("challenge_extra", cfg.challenge_extra)("min_desyndicate", cfg.min_desyndicate)
+         ("desynd_fee_flat", cfg.desynd_fee_flat);
       return push(SYND_ACCOUNT, synd_abi_ser, signer, "setconfig"_n, data);
    }
    action_result dropenv(std::string_view chain_code, std::string_view token_code, uint32_t epoch,
@@ -1777,6 +1799,195 @@ BOOST_FIXTURE_TEST_CASE(desyndicate_fee_rounding_to_zero, sysio_synd_tester) try
    BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, quantity + 1));
    BOOST_REQUIRE_EQUAL(1u, feepot_balance(LIQSOL));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(quantity), queued_desyndication(*this, 2).amount().amount());
+} FC_LOG_AND_RETHROW()
+
+/// Equal caps succeed, lower caps and stale quotes refuse without changing any ledger or bucket.
+BOOST_FIXTURE_TEST_CASE(desyndicate_caps_fee_before_movement, sysio_synd_tester) try {
+   constexpr uint64_t flat = UNIT / 1000;
+   constexpr uint64_t quantity = 10 * UNIT;
+   constexpr auto cap_message = "desyndication fee exceeds max_fee";
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL,
+      {.min_desyndicate = UNIT, .desynd_fee_flat = flat}));
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, quantity, LIQSOL_SYM, name{}, flat));
+   BOOST_REQUIRE_EQUAL(success(), set_epoch(5));
+   const auto before = desynd_state();
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(cap_message),
+      desyndicate("alice"_n, quantity, LIQSOL_SYM, name{}, flat - 1));
+   BOOST_REQUIRE(before == desynd_state());
+   BOOST_REQUIRE_EQUAL(success(), quotedesynd(SOLANA, LIQSOL, quantity));
+   const auto quoted = desynd_quote();
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL,
+      {.min_desyndicate = UNIT, .desynd_fee_flat = flat + 1}));
+   const auto raised = desynd_state();
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(cap_message),
+      desyndicate("alice"_n, quantity, LIQSOL_SYM, name{}, quoted.first));
+   BOOST_REQUIRE(raised == desynd_state());
+} FC_LOG_AND_RETHROW()
+
+/// Flat, proportional and combined quotes match the fee pot and outbound net, without quote writes.
+BOOST_FIXTURE_TEST_CASE(quotedesynd_matches_execution_without_writes, sysio_synd_tester) try {
+   constexpr uint64_t flat = UNIT / 1000;
+   constexpr uint64_t quantity = 10 * UNIT + 333;
+   constexpr uint32_t bps = 30;
+   constexpr uint32_t bps_denominator = 10000;
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+   uint64_t request = 0;
+   for (const auto& cfg : {pair_config{.min_desyndicate = UNIT, .desynd_fee_flat = flat},
+                           pair_config{.desynd_fee_bps = bps, .min_desyndicate = UNIT},
+                           pair_config{.desynd_fee_bps = bps, .min_desyndicate = UNIT, .desynd_fee_flat = flat}}) {
+      BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, cfg));
+      const auto before = desynd_state();
+      const auto pot = feepot_balance(LIQSOL);
+      BOOST_REQUIRE_EQUAL(success(), quotedesynd(SOLANA, LIQSOL, quantity));
+      const auto [fee, net] = desynd_quote();
+      BOOST_REQUIRE(before == desynd_state());
+      BOOST_REQUIRE_EQUAL(quantity * cfg.desynd_fee_bps / bps_denominator + cfg.desynd_fee_flat, fee);
+      BOOST_REQUIRE_EQUAL(quantity - fee, net);
+      BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, quantity, LIQSOL_SYM, name{}, fee));
+      BOOST_REQUIRE_EQUAL(pot + fee, feepot_balance(LIQSOL));
+      BOOST_REQUIRE_EQUAL(static_cast<int64_t>(net), queued_desyndication(*this, ++request).amount().amount());
+   }
+} FC_LOG_AND_RETHROW()
+
+/// Every fee-path refusal, including both unsigned range boundaries, leaves state untouched.
+BOOST_FIXTURE_TEST_CASE(quotedesynd_refuses_invalid_fee_path_without_writes, sysio_synd_tester) try {
+   constexpr auto range_message = "quantity must be positive";
+   constexpr uint32_t full_fee_bps = 10000;
+   const auto initial = desynd_state();
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("desyndication budget is not configured"), quotedesynd(SOLANA, LIQSOL, UNIT));
+   BOOST_REQUIRE(initial == desynd_state());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.min_desyndicate = UNIT}));
+   const auto configured = desynd_state();
+   for (const auto quantity : {uint64_t{0}, static_cast<uint64_t>(asset::max_amount) + 1,
+                               std::numeric_limits<uint64_t>::max()}) {
+      BOOST_REQUIRE_EQUAL(wasm_assert_msg(range_message), quotedesynd(SOLANA, LIQSOL, quantity));
+      BOOST_REQUIRE(configured == desynd_state());
+   }
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("quantity is below the minimum desyndication"),
+      quotedesynd(SOLANA, LIQSOL, UNIT - 1));
+   BOOST_REQUIRE(configured == desynd_state());
+   // Asset's inclusive upper bound is quotable even without a holder, link or sufficient bucket.
+   BOOST_REQUIRE_EQUAL(success(), quotedesynd(SOLANA, LIQSOL, asset::max_amount));
+   const auto [fee, net] = desynd_quote();
+   BOOST_REQUIRE_EQUAL(0u, fee);
+   BOOST_REQUIRE_EQUAL(static_cast<uint64_t>(asset::max_amount), net);
+   BOOST_REQUIRE(configured == desynd_state());
+   for (const auto flat : {uint64_t{0}, uint64_t{1}}) {
+      BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL,
+         {.desynd_fee_bps = full_fee_bps, .min_desyndicate = UNIT, .desynd_fee_flat = flat}));
+      const auto before = desynd_state();
+      BOOST_REQUIRE_EQUAL(wasm_assert_msg("desyndication net of the fee must be positive"),
+         quotedesynd(SOLANA, LIQSOL, UNIT));
+      BOOST_REQUIRE(before == desynd_state());
+   }
+} FC_LOG_AND_RETHROW()
+
+// A flat desyndication fee alone: `desynd_fee_flat` base units stay in `feepot`, and the quantity net of
+// it is burned, queued, logged and summed. The bucket still drops by the whole quantity.
+BOOST_FIXTURE_TEST_CASE(desyndicate_charges_the_flat_fee, sysio_synd_tester) try {
+   constexpr uint64_t flat = UNIT / 1000;
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.desynd_burst = 100 * UNIT, .min_desyndicate = UNIT,
+                                                             .desynd_fee_flat = flat}));
+
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 10 * UNIT));
+   constexpr uint64_t net = 10 * UNIT - flat;
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(90 * UNIT), liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(flat, feepot_balance(LIQSOL));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(flat), liq_balance(SYND_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(100 * UNIT - net), supply());
+   const auto msg = queued_desyndication(*this, 1);
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(net), msg.amount().amount());
+   BOOST_REQUIRE_EQUAL(100 * UNIT - net, msg.total_syndicated());
+   BOOST_REQUIRE_EQUAL(net, return_row(1)["amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(90 * UNIT, desynd_bucket_row(SOLANA, LIQSOL)["level"].as_uint64());
+
+   // The flat part is charged again on every desyndication, whatever its size.
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, UNIT));
+   BOOST_REQUIRE_EQUAL(2 * flat, feepot_balance(LIQSOL));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(UNIT - flat), queued_desyndication(*this, 2).amount().amount());
+} FC_LOG_AND_RETHROW()
+
+// The basis-point part and the flat part add: 2.5% of 40 is 1, plus a flat 0.3, leaves 38.7 to burn and
+// queue. The total carried is the outstanding shadow after that burn.
+BOOST_FIXTURE_TEST_CASE(desyndicate_adds_the_flat_fee_to_the_bps_fee, sysio_synd_tester) try {
+   constexpr uint64_t flat = 3 * UNIT / 10;
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, 100 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.desynd_fee_bps = 250, .desynd_burst = 100 * UNIT,
+                                                             .min_desyndicate = UNIT, .desynd_fee_flat = flat}));
+
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, 40 * UNIT));
+   constexpr uint64_t fee = UNIT + flat;
+   constexpr uint64_t net = 40 * UNIT - fee;
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(60 * UNIT), liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(fee, feepot_balance(LIQSOL));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(fee), liq_balance(SYND_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(100 * UNIT - net), supply());
+   const auto msg = queued_desyndication(*this, 1);
+   BOOST_REQUIRE_EQUAL(slug_value(LIQSOL), msg.amount().token_code());
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(net), msg.amount().amount());
+   BOOST_REQUIRE_EQUAL(100 * UNIT - net, msg.total_syndicated());
+   BOOST_REQUIRE_EQUAL(net, return_row(1)["amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(60 * UNIT, desynd_bucket_row(SOLANA, LIQSOL)["level"].as_uint64());
+} FC_LOG_AND_RETHROW()
+
+// The largest flat fee `setconfig` admits is one base unit below `min_desyndicate`, so a minimum-size
+// desyndication at 0 bps nets exactly one base unit. Any basis-point rate on top makes the fee reach the
+// quantity, which is refused before anything moves.
+BOOST_FIXTURE_TEST_CASE(desyndicate_minimum_nets_one_unit_at_the_largest_flat_fee, sysio_synd_tester) try {
+   constexpr uint64_t minimum = UNIT / 1000;
+   constexpr uint64_t flat    = minimum - 1;
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("alice"_n, LIQSOL, UNIT));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, ed_key()));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.min_desyndicate = minimum, .desynd_fee_flat = flat}));
+
+   BOOST_REQUIRE_EQUAL(success(), desyndicate("alice"_n, minimum));
+   BOOST_REQUIRE_EQUAL(1, queued_desyndication(*this, 1).amount().amount());
+   BOOST_REQUIRE_EQUAL(1u, return_row(1)["amount"].as_uint64());
+   BOOST_REQUIRE_EQUAL(flat, feepot_balance(LIQSOL));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(UNIT - 1), supply());
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(UNIT - minimum), liq_balance("alice"_n));
+
+   // One basis point on top: 100 more base units of fee push it past the quantity.
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.desynd_fee_bps = 1, .min_desyndicate = minimum,
+                                                             .desynd_fee_flat = flat}));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("desyndication net of the fee must be positive"),
+                       desyndicate("alice"_n, minimum));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(UNIT - minimum), liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(flat, feepot_balance(LIQSOL));
+   BOOST_REQUIRE_EQUAL(2u, counters_row()["next_request_id"].as_uint64());
+} FC_LOG_AND_RETHROW()
+
+// `setconfig` refuses a flat desyndication fee at or above `min_desyndicate` or outside the asset range,
+// leaving the row as it was, and the row carries an accepted flat fee back.
+BOOST_FIXTURE_TEST_CASE(setconfig_validates_and_stores_the_flat_fee, sysio_synd_tester) try {
+   constexpr auto     message = "flat desyndication fee must fit an asset and be below the minimum desyndication";
+   constexpr uint64_t range   = static_cast<uint64_t>(asset::max_amount);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(message),
+                       setconfig(SOLANA, LIQSOL, {.min_desyndicate = UNIT, .desynd_fee_flat = UNIT}));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(message),
+                       setconfig(SOLANA, LIQSOL, {.min_desyndicate = UNIT, .desynd_fee_flat = UNIT + 1}));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(message), setconfig(SOLANA, LIQSOL,
+      {.desynd_burst = 0, .min_desyndicate = range, .desynd_fee_flat = range + 1}));
+   BOOST_REQUIRE(config_row(SOLANA, LIQSOL).is_null());
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.min_desyndicate = UNIT, .desynd_fee_flat = UNIT - 1}));
+   BOOST_REQUIRE_EQUAL(UNIT - 1, config_row(SOLANA, LIQSOL)["desynd_fee_flat"].as_uint64());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL,
+      {.desynd_burst = 0, .min_desyndicate = range, .desynd_fee_flat = range - 1}));
+   BOOST_REQUIRE_EQUAL(range - 1, config_row(SOLANA, LIQSOL)["desynd_fee_flat"].as_uint64());
+
+   // A refusal keeps the row the last accepted configuration wrote; the default is no flat fee.
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg(message), setconfig(SOLANA, LIQSOL,
+      {.desynd_burst = 0, .min_desyndicate = range, .desynd_fee_flat = range}));
+   BOOST_REQUIRE_EQUAL(range - 1, config_row(SOLANA, LIQSOL)["desynd_fee_flat"].as_uint64());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+   BOOST_REQUIRE_EQUAL(0u, config_row(SOLANA, LIQSOL)["desynd_fee_flat"].as_uint64());
 } FC_LOG_AND_RETHROW()
 
 // Only a balance in the holder's own sysio.liq row can be desyndicated: a syndication held for the

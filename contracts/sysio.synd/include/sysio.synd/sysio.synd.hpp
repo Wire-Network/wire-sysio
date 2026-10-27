@@ -58,9 +58,12 @@
  * that `sysio.liq::claim` pays. WIRE the pool cannot cover yet stays banked on the parked row, kept at
  * balance 0, for a later delivery.
  *
- * Desyndication. `desyndicate` ticks the pair's desyndication bucket and refuses a quantity above its
+ * Desyndication. `desyndicate(holder, quantity, max_fee)` caps the fee in shadow base units before
+ * any bucket tick or movement. Read-only `quotedesynd` returns the current fee and net using the same
+ * config, minimum and fee checks. `desyndicate` ticks the pair's desyndication bucket and refuses a quantity above its
  * level (and any desyndication of a pair with no `syndconfig` row), then moves the holder's shadow here.
- * The fee, `quantity * desynd_fee_bps / 10000` floored, stays in `feepot`; the rest is burned with
+ * The fee, `quantity * desynd_fee_bps / 10000` floored plus `desynd_fee_flat`, stays in `feepot`; the
+ * flat part covers the external-chain gas the batch operators pay for the round trip. The rest is burned with
  * `sysio.liq::burn`, queued as DESYNDICATE_LIQ to the token's outpost with the next request id, and
  * retained in `returns` until governance establishes its external outcome. The bucket drops by the whole quantity.
  * The attestation carries `total_syndicated`, the depot's outstanding shadow of the symbol
@@ -244,11 +247,14 @@ namespace sysio {
       /// `dropenv` clears one). Auth=sysio.
       /// `min_desyndicate` is a positive gross quantity in shadow base units, at most a nonzero
       /// desyndication burst. Every configuration supplies this value explicitly.
+      /// `desynd_fee_flat` is a flat desyndication fee in shadow base units, added to the basis-point
+      /// part; it fits an asset and is below `min_desyndicate`, so a minimum desyndication at 0 bps
+      /// still nets a positive amount.
       [[sysio::action]] void setconfig(sysio::slug_name chain_code, sysio::slug_name token_code,
                                        uint32_t synd_fee_bps, uint32_t desynd_fee_bps, uint64_t synd_burst,
                                        uint64_t synd_refill, uint64_t desynd_burst, uint64_t desynd_refill,
                                        uint32_t window_sec, uint64_t bounty, uint64_t challenge_extra,
-                                       uint64_t min_desyndicate);
+                                       uint64_t min_desyndicate, uint64_t desynd_fee_flat);
 
       /// Run bounded outcome synchronization, FIFO release, and underwriting, in that order. Sync
       /// visits at most `limit` envelopes; underwriting and release each have `limit` work units and
@@ -339,15 +345,28 @@ namespace sysio {
       /// to the depot's current epoch; a quantity above its level is refused, as is any desyndication of
       /// a pair with no `syndconfig` row. The quantity moves from the holder's own `sysio.liq` row (never
       /// a held or parked balance) to this contract. The fee, `quantity * desynd_fee_bps /
-      /// BPS_DENOMINATOR` floored, stays in `feepot`; the net rest is burned with `sysio.liq::burn`, and
-      /// is what the attestation, `returns` carry. The bucket drops
-      /// by the whole quantity. A fee that rounds to zero burns and queues the whole quantity; a fee of
-      /// the whole quantity is refused. The request takes the next id from `syndcounters`. The attestation
+      /// BPS_DENOMINATOR` floored plus `desynd_fee_flat`, stays in `feepot`; the net rest is burned with
+      /// `sysio.liq::burn`, and is what the attestation, `returns` carry. The bucket drops
+      /// by the whole quantity. A fee of zero burns and queues the whole quantity; a fee of
+      /// the whole quantity or more is refused. The request takes the next id from `syndcounters`. The attestation
       /// carries `total_syndicated`, the depot's outstanding shadow of the symbol after
       /// this burn (`liq::outstanding_of`: supply plus parked yield, net of the burned amount). The burn is
       /// final: an outpost refusal is reconciled by governance through request-keyed `refundreturn`. Refused while
       /// the `sysio.andon` cord is pulled. Holder's authority.
-      [[sysio::action]] void desyndicate(name holder, asset quantity);
+      /// `max_fee` caps the fee in shadow base units before any bucket tick or movement.
+      [[sysio::action]] void desyndicate(name holder, asset quantity, uint64_t max_fee);
+
+      /// Current desyndication fee and amount released, both in shadow base units.
+      struct desynd_quote {
+         uint64_t fee; ///< Flat plus floored basis-point charge.
+         uint64_t net; ///< Gross quantity less the charge.
+         SYSLIB_SERIALIZE(desynd_quote, (fee)(net))
+      };
+
+      /// Quote the pair's config, minimum and fee checks without authorization or writes.
+      /// Quantity must be positive and fit an asset. Does not check links, balances or budget.
+      [[sysio::action, sysio::read_only]]
+      desynd_quote quotedesynd(slug_name chain_code, slug_name token_code, uint64_t quantity);
 
       // -----------------------------------------------------------------------
       //  Launch ingestion (privileged caller, epoch-0 bootstrap window)
@@ -607,8 +626,12 @@ namespace sysio {
          uint64_t         bounty           = 0;   ///< bounty posted on each request, paid from `feepot`
          uint64_t         challenge_extra  = 0;   ///< charged to a challenger on top of the hold bond
          uint64_t min_desyndicate; ///< Positive gross return minimum.
+         /// Flat fee on a desyndication, in shadow base units, added to the basis-point part. It covers the
+         /// external-chain gas of the round trip, which the batch operators pay. Below `min_desyndicate`.
+         uint64_t         desynd_fee_flat  = 0;
          SYSLIB_SERIALIZE(synd_config, (chain_code)(token_code)(synd_fee_bps)(desynd_fee_bps)(synd_burst)
-                          (synd_refill)(desynd_burst)(desynd_refill)(window_sec)(bounty)(challenge_extra)(min_desyndicate))
+                          (synd_refill)(desynd_burst)(desynd_refill)(window_sec)(bounty)(challenge_extra)(min_desyndicate)
+                          (desynd_fee_flat))
       };
 
       /// Rules by outpost and token.
