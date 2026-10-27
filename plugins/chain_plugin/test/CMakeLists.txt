@@ -8,6 +8,7 @@ add_executable( test_chain_plugin
         )
 target_link_libraries( test_chain_plugin chain_plugin sysio_testing sysio_chain_wrap version )
 target_include_directories(test_chain_plugin PRIVATE
+        ${CMAKE_SOURCE_DIR}/tests
         ${CMAKE_SOURCE_DIR}/unittests
         ${CMAKE_BINARY_DIR}/unittests/include)
 boost_test_discover_tests(test_chain_plugin
