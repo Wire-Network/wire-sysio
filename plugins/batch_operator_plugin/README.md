@@ -136,7 +136,8 @@ requests `sysio.synd` issues for syndication envelopes. Each poll it:
    outpost, the depot epoch and the digest of the envelope the depot accepted. The
    outpost keeps its own write-once record of each envelope it emitted, the keccak256
    of its canonical bytes (Ethereum `OPP.outboundEnvelopes`, Solana's outbound
-   `EnvelopeLog`); read at finality, that record must carry the statement's digest.
+   `EnvelopeLog`); read at the outpost client's settled commitment (Solana `finalized`,
+   the Ethereum client's read confirmation), that record must carry the statement's digest.
    Whether the statement is true is checked against the outpost alone; amounts,
    states and windows still come from the depot's tables.
 2. **Bonds** each verified OPEN request `sysio.synd` issued under the `oppenvelope`

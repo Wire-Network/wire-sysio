@@ -1822,7 +1822,8 @@ struct batch_operator_plugin::impl {
    }
 
    /// The digest each outpost recorded for the envelope it emitted, for every (chain, epoch) an OPEN envelope request
-   /// names, read at finality. A chain whose read fails is reported and leaves only its own requests waiting.
+   /// names, read at each outpost client's settled commitment. A chain whose read fails is reported and leaves only
+   /// its own requests waiting.
    std::map<uw::envelope_key, fc::sha256> read_emitted_digests(const std::vector<uw::request>& requests) {
       return uw::collect_emitted(
          uw::wanted_envelopes(requests),

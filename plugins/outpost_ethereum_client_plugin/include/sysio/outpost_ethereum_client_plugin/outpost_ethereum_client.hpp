@@ -1,10 +1,12 @@
 #pragma once
 
+#include <atomic>
 #include <cstdint>
 #include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <fc/int256.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
@@ -250,6 +252,79 @@ std::optional<uint32_t> count_envelope_attestations(const std::vector<char>& env
 /// dropped the type).
 bool is_routable_handler(std::string_view handler_address);
 
+/// What the relay does about a journaled transaction still pending at its nonce.
+enum class in_flight_step {
+   /// It pays enough to be included at today's prices: keep waiting.
+   wait,
+   /// Its fee cap is below today's base fee, or the tip it can pay at that base
+   /// fee is below the market's: sign it again at the same nonce with every fee
+   /// raised.
+   replace,
+   /// The node holds none of its hashes and nothing at its nonce: send it again
+   /// at the same nonce.
+   rebroadcast
+};
+
+/// Decide what to do about a transaction still pending at its nonce.
+///
+/// @param known_to_node Whether the node still holds a transaction at the nonce.
+/// @param paid          The fees of what the node holds there (`highest_fees` of the attempts it holds).
+/// @param market        The node's fee suggestion now (`ethereum_client::get_gas_config`).
+in_flight_step decide_in_flight(bool known_to_node, const ethereum_transaction_fees& paid,
+                                const ethereum_client::gas_config_t& market);
+
+/// The most one transaction may pay per gas under the transaction policy.
+struct fee_caps {
+   fc::uint256 max_priority_fee_per_gas;
+   fc::uint256 max_fee_per_gas;
+};
+
+/// `policy`'s per-gas caps for `transaction`, with the fee cap also bounded by what `max_total_native_cost`
+/// leaves after the transaction's value for its gas limit (the policy refuses `gas_limit * max_fee_per_gas +
+/// value` above it), and the tip by the fee cap. Fees within these caps are never refused at signing.
+fee_caps transaction_fee_caps(const ethereum_transaction_policy& policy, const eip1559_tx& transaction);
+
+/// The highest of each fee across `attempts`. A node holds at most one of them at the nonce, but which one
+/// can be unknown (a send whose response was lost), and a replacement priced off the highest is valid against
+/// any of them. Zero fees for no attempts.
+ethereum_transaction_fees highest_fees(const std::vector<submission_attempt>& attempts);
+
+/// The signing in `attempts` with the highest fee cap, the higher tip breaking a tie: the one sent again
+/// when no replacement fits the caps and it still pays the market's tip, since it replaces a lower one a
+/// node holds. `attempts` must not be empty.
+const submission_attempt& highest_signing(const std::vector<submission_attempt>& attempts);
+
+/// The fees a same-nonce resend pays. A replacement must raise each of `paid`'s
+/// by more than the 10% nodes require of a replacement; a rebroadcast must pay
+/// `paid`. Either pays the market's fees where they are higher, lowered to
+/// `caps` where the market goes past them. `nullopt` when `step` is `wait`, or
+/// when what it must pay does not fit `caps`.
+///
+/// @param paid The highest fees any attempt at the nonce was signed with (`highest_fees`).
+/// @param caps `transaction_fee_caps` of the transaction resent.
+std::optional<ethereum_transaction_fees> resend_fees(in_flight_step step, const ethereum_transaction_fees& paid,
+                                                     const ethereum_client::gas_config_t& market,
+                                                     const fee_caps&                      caps);
+
+/// The fees to sign at a nonce something with unknown fees holds (a transaction left from before a restart,
+/// or another sender's): a tip and a fee cap both of the market's fee cap raised by an eighth, lowered to
+/// `caps` where that goes past them. A transaction stuck because the base fee rose past its fee cap, or
+/// because the tip it can pay fell under the market's, has a fee cap below the market's, so these raise both
+/// of its fees by more than the 10% a replacement needs.
+///
+/// @param caps `transaction_fee_caps` of the transaction signed.
+ethereum_transaction_fees outbid_fees(const ethereum_client::gas_config_t& market, const fee_caps& caps);
+
+/// The lowest nonce from `latest` on that no submission holds, while the node has a pending transaction there
+/// that this process did not sign, or a submission waits above it with nothing to fill it, so none of the
+/// relay's can be included. `nullopt` otherwise.
+///
+/// @param latest      The signer's transaction count at the head.
+/// @param pending     The signer's transaction count including the node's pending transactions.
+/// @param submissions The journal's submissions, ascending by nonce.
+std::optional<fc::uint256> first_unaccounted_nonce(const fc::uint256& latest, const fc::uint256& pending,
+                                                   const std::vector<ethereum_submission>& submissions);
+
 } // namespace outpost_ethereum_client_detail
 
 /**
@@ -303,11 +378,14 @@ public:
                                          const std::vector<char>& envelope_bytes,
                                          fc::microseconds         deadline) override;
 
+   /// `OPP.getLatestOutboundEnvelope()` at the client's read confirmation (`read_settled_block`): the envelope the
+   /// outpost emitted for `epoch_index`, or empty while the slot holds another epoch.
    std::vector<char> read_inbound_envelope(uint32_t         epoch_index,
                                            fc::microseconds deadline) override;
 
-   /// `OPP.outboundEnvelopes(epoch)` at `finalized`: the checksum the outpost recorded when it emitted that epoch's
-   /// envelope. Throws when the loaded OPP ABI does not declare the view.
+   /// `OPP.outboundEnvelopes(epoch)` at the client's read confirmation (`read_settled_block`): the checksum the
+   /// outpost recorded when it emitted that epoch's envelope. Throws when the loaded OPP ABI does not declare the
+   /// view.
    std::optional<fc::sha256> read_emitted_envelope_digest(uint32_t         epoch_index,
                                                           fc::microseconds deadline) override;
 
@@ -328,6 +406,9 @@ public:
    /// The liq syndication pool the crank drives, `0x`-hex, or empty until the
    /// outpost's `DESYNDICATE_LIQ` handler has been discovered.
    const std::string&               syndication_pool_address()    const { return _syndication_pool_addr; }
+   /// A copy of the signer's journal: every transaction the relay signed whose nonce is not yet used at the
+   /// read confirmation, ascending by nonce.
+   std::vector<ethereum_submission> submissions() const;
    /// Bind the pool wrapper the crank drives to `address`, replacing whatever was
    /// bound. Discovery goes through this; tests bind a wrapper whose
    /// `realize_yield` is a stub.
@@ -352,22 +433,83 @@ private:
    /// the relay pay for the call twice. A backend that does not know the block
    /// yet is retried for a bounded time.
    ///
-   /// Not `finalized` either (unlike `read_inbound_envelope`): finality lags
-   /// head by roughly 64 blocks, and a continuation gated on it would wait that
-   /// out between every stretch of dispatch. A reorg under the read costs a
-   /// paid re-delivery before the tip or a refused continuation after it; a
-   /// send missed because the read was behind is covered by the per-call
-   /// progress invariant and the next tick.
+   /// Not at the read confirmation either (unlike `read_inbound_envelope`):
+   /// the cursor is this relay's own work in progress, and a continuation
+   /// gated on confirmation depth would wait it out between every stretch of
+   /// dispatch. A reorg under the read costs a paid re-delivery before the tip
+   /// or a refused continuation after it; a send missed because the read was
+   /// behind is covered by the per-call progress invariant and the next tick.
    ///
    /// @throws fc::exception on transport failure, deadline expiry, or an
    ///         unparsable response.
-   outpost_ethereum_client_detail::delivery_progress read_progress(uint32_t epoch_index, const fc::uint256& block);
+   outpost_ethereum_client_detail::delivery_progress
+   read_progress(uint32_t epoch_index, const fc::network::ethereum::block_number_or_tag_t& block);
+
+   /// Whether the outpost's state at the read confirmation (`read_settled_block`)
+   /// already shows this relay's part of `epoch_index` done: the epoch closed or
+   /// tipped, or this relay's delivery recorded. The relay reports an epoch
+   /// handled only then, so a delivery a reorg removes is delivered again
+   /// instead of left to the one consensus retry.
+   bool settled_past_delivery(uint32_t epoch_index);
+
+   /// Settle the signer's journal before anything else is sent, the journal's
+   /// lock held:
+   ///  - forget every submission whose nonce is used at the read confirmation;
+   ///  - check every other one against the head, so a call a reorg put back in
+   ///    the mempool is pending again;
+   ///  - replace a pending one at its nonce when the market priced it out,
+   ///    over every signing on record; when no replacement fits the caps, send
+   ///    its highest signing again, or, when that signing no longer pays the
+   ///    market's tip, a replacement over only what the node holds; send it
+   ///    again when the node no longer holds it;
+   ///  - wait on, and after `unaccounted_nonce_grace` cancel, a nonce no
+   ///    submission accounts for: a pending transaction there, or nothing
+   ///    below a journaled one;
+   ///  - then wait until nothing is pending or `deadline_abs`.
+   ///
+   /// @return The highest block a journaled submission is in, or `std::nullopt`.
+   /// @throws chain::outpost_delivery_incomplete_exception while anything is
+   ///         still pending at the deadline.
+   std::optional<fc::uint256> settle_submissions(fc::time_point deadline_abs);
+
+   /// Classify `submission` against the head: `landed` when one of its hashes
+   /// has a receipt, `superseded` when its nonce is below `latest_count`
+   /// without one, `pending` otherwise. Logs each change of state.
+   void refresh_submission(ethereum_submission& submission, const fc::uint256& latest_count);
+
+   /// Send `submission` again at its nonce with `fees`: the recorded bytes of its
+   /// signing at those fees, or else a new signing, recorded before the send. A
+   /// refused send is logged and its attempt kept; the next tick decides again.
+   ///
+   /// @throws ethereum_transaction_policy_exception when the policy refuses `fees`.
+   /// @throws fc::exception on transport failure; the attempt stays recorded.
+   void resubmit(ethereum_submission& submission, const ethereum_transaction_fees& fees, std::string_view why);
+
+   /// Send one `epochIn` at `gas_budget`, after settling the journal. The call is
+   /// journaled once it was sent: landed when its receipt came back, pending
+   /// when its wait failed (the receipt wait ran out, or the send's outcome is
+   /// unknown), which is reported as
+   /// `chain::outpost_delivery_incomplete_exception`; a node refusal propagates.
+   epoch_in_receipt send_epoch_in(uint32_t epoch_index, const std::string& envelope_hex, uint64_t gas_budget,
+                                  fc::time_point deadline_abs);
 
    /// Read `OPPInbound.pendingConsensusForDigest(digest)` at `block` and decode it.
    /// @throws fc::exception on transport failure, deadline expiry, or an
    ///         unparsable response.
    outpost_ethereum_client_detail::pending_consensus read_pending_consensus(const std::string& digest_word,
                                                                             const fc::uint256& block);
+
+   /// The block the reads of what the outpost emitted are made at, from the
+   /// client's `read_confirmation`. Across a reorg deeper than the shallower of
+   /// two operators' settings the two read different envelopes, and the depot
+   /// slashes whichever delivered the one the group's majority did not; an
+   /// operator reading stronger than its group also delivers after consensus.
+   /// Logs once when finality lag forces the fallback to the finalized block,
+   /// and once when it ends.
+   ///
+   /// @throws fc::exception on transport failure or a node without a head or
+   ///         finalized block.
+   fc::network::ethereum::block_number_or_tag_t read_settled_block();
 
    ethereum_client_entry_ptr                              _entry;
    std::string                                            _opp_addr;
@@ -387,6 +529,10 @@ private:
    /// error is reported once and repeats stay at debug level until the cursor
    /// moves.
    std::optional<std::pair<uint32_t, uint16_t>>           _reported_stall;
+   /// Whether the last `read_settled_block` fell back to the finalized block,
+   /// so the fallback is logged when it starts and ends rather than per read.
+   /// The relay and the underwriter read from different threads.
+   std::atomic<bool>                                      _finality_fallback{false};
    uint64_t                                               _outpost_id;
    uint32_t                                               _chain_id;
 };
