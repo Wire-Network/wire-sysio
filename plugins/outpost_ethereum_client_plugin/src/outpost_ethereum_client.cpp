@@ -1022,12 +1022,14 @@ std::optional<fc::uint256> outpost_ethereum_client::settle_submissions(fc::time_
             continue;
          }
          // No replacement fits the caps. The highest signing, sent again as it
-         // was, still replaces a lower one the node holds, unless the base fee
-         // has passed its fee cap: no block includes it then, so a signing
+         // was, still replaces a lower one the node holds, as long as it pays
+         // the market's tip at today's base fee (a fee cap at or below the base
+         // fee pays none, and builders skip it). When it does not, a signing
          // priced over only what the node holds goes instead, and the highest
          // stays on record in case another node holds it.
          const auto highest = detail::highest_signing(submission.attempts);
-         if (highest.fees.max_fee_per_gas < market.base_fee) {
+         if (detail::decide_in_flight(/*known_to_node=*/true, highest.fees, market) !=
+             detail::in_flight_step::wait) {
             if (const auto fees = detail::resend_fees(step, detail::highest_fees(held), market, caps)) {
                resubmit(submission, *fees, "replacing, over what the node holds,");
                continue;
