@@ -1,14 +1,14 @@
 """Verify a real cranker survives pending discovery and later reads gas prices.
 
-Run through tests/bind_registry.py; every endpoint uses its held ports.
+Run through tests/run_with_bind_config.cjs; every endpoint uses its held ports.
 Run directories and logs are retained for diagnostics. Only owned children stop.
 """
 import argparse
 import json
+import os
 from pathlib import Path
 import signal
 import subprocess
-import sys
 import tempfile
 import threading
 import time
@@ -107,13 +107,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--binary", type=Path, required=True)
     parser.add_argument("--source", type=Path, required=True)
-    parser.add_argument("--test-harness", type=Path, required=True)
     parser.add_argument("--output-root", type=Path, required=True)
     args = parser.parse_args()
-    sys.path.insert(0, str(args.test_harness.resolve()))
-    from TestHarness.testUtils import Utils
-
-    ports = [Utils.getPort(Utils.PortNodeHttp, index) for index in range(2)]
+    ports = [int(value) for value in os.environ["WIRE_TEST_PORTS"].split()]
+    assert len(ports) >= 2, "run through run_with_bind_config.cjs"
     args.output_root.mkdir(parents=True, exist_ok=True)
     output = Path(tempfile.mkdtemp(prefix="cranker-startup-", dir=args.output_root)).resolve()
     print(f"Evidence directory: {output}", flush=True)

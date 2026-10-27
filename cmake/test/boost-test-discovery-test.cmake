@@ -75,7 +75,6 @@ string(CONCAT listing
 make_executable(full "${listing}" 0)
 # Lists arrive joined into single arguments, as the generated include script passes them.
 discover(full NAME "@NAME@_unit_test_@RUNTIME@" NAME_STRIP "s$;_test$" RUNTIMES "r1;r2" EXCLUDE "^loose"
-         COMMAND_PREFIX "${CMAKE_COMMAND};-E;env;WIRE_TEST_WRAPPED=1"
          ARGS "--report_level=detailed" PROPERTIES "LABELS;lane" COST_BY_NAME "^alpha$;500")
 get_property(tests GLOBAL PROPERTY recorded_tests)
 list(SORT tests)
@@ -84,9 +83,7 @@ set(expected alpha_unit_test_r1 alpha_unit_test_r2 bare_unit_test_r1 bare_unit_t
     "tmpl_case<unsigned long>_unit_test_r1" "tmpl_case<unsigned long>_unit_test_r2")
 expect_equal("${tests}" "${expected}" "registered tests")
 get_property(command GLOBAL PROPERTY "command:alpha_unit_test_r2")
-expect_equal("${command}"
-             "${CMAKE_COMMAND} -E env WIRE_TEST_WRAPPED=1 ${work}/full.sh --run_test=alpha_tests --report_level=detailed -- --r2"
-             "command")
+expect_equal("${command}" "${work}/full.sh --run_test=alpha_tests --report_level=detailed -- --r2" "command")
 get_property(properties GLOBAL PROPERTY "properties:alpha_unit_test_r1")
 expect_equal("${properties}" " PROPERTIES WORKING_DIRECTORY ${work} LABELS lane COST 500" "enabled unit properties")
 get_property(properties GLOBAL PROPERTY "properties:quiet_one_unit_test_r1")
@@ -205,9 +202,7 @@ file(WRITE "${project}/CMakeLists.txt"
    "add_executable(fake fake.cpp)\n"
    "set_target_properties(fake PROPERTIES RUNTIME_OUTPUT_DIRECTORY \"$<1:\${CMAKE_BINARY_DIR}>\")\n"
    "target_compile_definitions(fake PRIVATE [==[LISTING_FILE=\"${project}/listing.txt\"]==])\n"
-   "boost_test_discover_tests(fake NAME e2e.@UNIT@.@RUNTIME@ RUNTIMES a b\n"
-   "   COMMAND_PREFIX [==[${CMAKE_COMMAND}]==] -E env WIRE_TEST_WRAPPED=1\n"
-   "   ARGS --x PROPERTIES LABELS lane TIMEOUT 7)\n")
+   "boost_test_discover_tests(fake NAME e2e.@UNIT@.@RUNTIME@ RUNTIMES a b ARGS --x PROPERTIES LABELS lane TIMEOUT 7)\n")
 
 function(run what)
    execute_process(COMMAND ${ARGN} RESULT_VARIABLE result OUTPUT_VARIABLE output ERROR_VARIABLE output)
@@ -253,9 +248,7 @@ foreach(i RANGE 1 ${last})
    string(JSON argument GET "${json}" tests 0 command ${i})
    list(APPEND arguments "${argument}")
 endforeach()
-expect_equal("${arguments}"
-             "-E;env;WIRE_TEST_WRAPPED=1;${build}/fake${CMAKE_EXECUTABLE_SUFFIX};--run_test=one_tests;--x;--;--a"
-             "discovered command")
+expect_equal("${arguments}" "--run_test=one_tests;--x;--;--a" "discovered command")
 string(JSON properties GET "${json}" tests 0 properties)
 expect_contains("${properties}" "\"lane\"" "LABELS")
 expect_contains("${properties}" "\"TIMEOUT\"" "TIMEOUT")

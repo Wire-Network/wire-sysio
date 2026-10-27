@@ -22,7 +22,6 @@
 #include <stdint.h>
 #include <string>
 #include <string_view>
-#include <test_ports.hpp>
 #include <thread>
 #include <vector>
 
@@ -69,9 +68,7 @@ constexpr uint32_t snapshot_source_block_count = 3;
 constexpr uint32_t snapshot_block_log_extension_block_count = 3;
 constexpr uint32_t attestation_finality_block_count = 24;
 constexpr uint32_t snapshot_endpoint_response_count = 2;
-
-/** Node-HTTP ports consumed by this test process's local servers and refusal fixtures. */
-sysio::testing::test_port_allocator node_http_ports{sysio::testing::port_category::node_http};
+constexpr uint16_t ephemeral_port = 0;
 
 /** Serve one snapshot endpoint metadata response and its binary download on loopback. */
 class snapshot_endpoint_server {
@@ -84,7 +81,7 @@ public:
               (snapshot_root_hash_field, root_hash.str()),
            fc::time_point::maximum()))
       , snapshot_body(read_snapshot(snapshot_path))
-      , acceptor(io, tcp::endpoint(boost::asio::ip::make_address(loopback_address), node_http_ports.next()))
+      , acceptor(io, tcp::endpoint(boost::asio::ip::make_address(loopback_address), ephemeral_port))
       , port(acceptor.local_endpoint().port())
       , worker([this] { serve(); }) {}
 
@@ -169,7 +166,7 @@ private:
    boost::asio::io_context io;
    /// Loopback listener retained until teardown.
    tcp::acceptor acceptor;
-   /// Port retained by this test process's registry lease.
+   /// Ephemeral port assigned by the operating system.
    uint16_t port;
    /// Worker serving the bounded request sequence.
    std::thread worker;
@@ -235,11 +232,10 @@ sysio::chain::exit_code::exit_code initialize_with_snapshot_size_limit(std::stri
    sysio::chain::application exe({.enable_resource_monitor = false});
 
    const auto tmp_path = tmp.path().string();
-   const auto endpoint_url = node_http_ports.next_loopback_url();
    std::vector<std::string> arguments{
       chain_plugin_test_program_name,
       "--snapshot-endpoint",
-      endpoint_url,
+      "http://127.0.0.1:1",
       config_dir_option_name,
       tmp_path,
       data_dir_option_name,
@@ -785,10 +781,9 @@ BOOST_AUTO_TEST_CASE(chain_plugin_snapshot_endpoint_option_registration) {
    plugin.set_program_options(cli, cfg);
    options.add(cli).add(cfg);
 
-   const auto endpoint_url = node_http_ports.next_loopback_url();
    std::array arguments{
       chain_plugin_test_program_name,
-      "--snapshot-endpoint", endpoint_url.c_str(),
+      "--snapshot-endpoint", "http://127.0.0.1:1",
    };
    boost::program_options::variables_map variables;
    boost::program_options::store(
@@ -796,7 +791,7 @@ BOOST_AUTO_TEST_CASE(chain_plugin_snapshot_endpoint_option_registration) {
       variables);
    boost::program_options::notify(variables);
 
-   BOOST_CHECK_EQUAL(variables.at("snapshot-endpoint").as<std::string>(), endpoint_url);
+   BOOST_CHECK_EQUAL(variables.at("snapshot-endpoint").as<std::string>(), "http://127.0.0.1:1");
    BOOST_CHECK(options.find_nothrow("snapshot-endpoint-additional-ca-file", false) != nullptr);
    BOOST_CHECK(options.find_nothrow("snapshot-endpoint-additional-ca-path", false) != nullptr);
    BOOST_CHECK(options.find_nothrow("snapshot-endpoint-proxy", false) != nullptr);
@@ -853,12 +848,11 @@ BOOST_AUTO_TEST_CASE(outbound_http_global_option_registration) {
       "alert monitor");
    options.add(global).add(ethereum).add(solana).add(debugging).add(signing).add(snapshot).add(alert_monitor);
 
-   const auto proxy_url = node_http_ports.next_loopback_url();
    std::array arguments{
       chain_plugin_test_program_name,
       "--outbound-http-additional-ca-file", "/tmp/wire-global-ca.pem",
       "--outbound-http-additional-ca-path", "/tmp/wire-global-ca",
-      "--outbound-http-proxy", proxy_url.c_str(),
+      "--outbound-http-proxy", "http://127.0.0.1:3128",
       "--outpost-solana-additional-ca-file", "/tmp/wire-solana-ca.pem",
    };
    bpo::variables_map variables;
@@ -875,7 +869,7 @@ BOOST_AUTO_TEST_CASE(outbound_http_global_option_registration) {
       std::filesystem::path("/tmp/wire-global-ca"));
    BOOST_CHECK_EQUAL(
       variables.at("outbound-http-proxy").as<std::string>(),
-      proxy_url);
+      "http://127.0.0.1:3128");
 
    const auto solana_options =
       sysio::outbound_http::read_transport_options(
@@ -886,7 +880,7 @@ BOOST_AUTO_TEST_CASE(outbound_http_global_option_registration) {
    BOOST_REQUIRE(solana_options.additional_ca_path);
    BOOST_CHECK_EQUAL(*solana_options.additional_ca_path, std::filesystem::path("/tmp/wire-global-ca"));
    BOOST_REQUIRE(solana_options.proxy);
-   BOOST_CHECK_EQUAL(*solana_options.proxy, proxy_url);
+   BOOST_CHECK_EQUAL(*solana_options.proxy, "http://127.0.0.1:3128");
 }
 
 /** Verify that the snapshot response-size limit rejects zero and overflow before connecting. */

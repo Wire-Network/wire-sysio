@@ -315,19 +315,14 @@ a dedicated handler and shut the node down; the fix is more space or a larger `c
 
 ```bash
 ninja -C build/debug test_chain_plugin
-ctest --test-dir build/debug -R '^test_chain_plugin_' --output-on-failure
+./build/debug/plugins/chain_plugin/test/test_chain_plugin
 ```
 
 The suite is registered as one CTest case per Boost test case, so a single area can be run on its own:
 
 ```bash
-ctest --test-dir build/debug -R '^test_chain_plugin_get_info_consumer_plugin_policy$' --output-on-failure
+./build/debug/plugins/chain_plugin/test/test_chain_plugin --run_test=get_info_consumer_plugin_policy
 ```
-
-CTest runs this binary through the build tree's `tests/bind_registry.py`, which supplies the
-`SYSIO_TEST_PORTS` lease required by tests that bind sockets. The wrapper uses Python's standard library and
-the host-wide WIRE bind-registry protocol. For direct filtered runs, invoke that wrapper before the binary
-and Boost arguments.
 
 It covers the snapshot attestation policies (configuration preflight, required schemas, record tuple, block
 identity, table-read failure, timeout, and retry), snapshot-endpoint option registration and validation,

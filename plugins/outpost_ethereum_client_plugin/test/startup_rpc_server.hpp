@@ -3,21 +3,32 @@
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 #include <atomic>
+#include <cstdlib>
+#include <mutex>
 #include <memory>
-#include <test_ports.hpp>
+#include <sstream>
+#include <stdexcept>
 #include <thread>
 #include <vector>
 
 namespace startup_test {
 
-/** Node-HTTP ports consumed by Ethereum client test servers and refusal fixtures. */
-inline sysio::testing::test_port_allocator node_http_ports{sysio::testing::port_category::node_http};
-
-/** Consume one node-HTTP port from this test process's registry lease. */
-inline uint16_t next_port() { return node_http_ports.next(); }
+/** Consume ports held by tests/run_with_bind_config.cjs for this test process. */
+inline uint16_t next_port() {
+   static std::mutex mutex;
+   static std::istringstream ports([] {
+      const auto* value = std::getenv("WIRE_TEST_PORTS");
+      return value ? std::string(value) : std::string{};
+   }());
+   std::lock_guard lock(mutex);
+   unsigned port;
+   if (!(ports >> port) || port == 0 || port > UINT16_MAX)
+      throw std::runtime_error("Run Ethereum tests through tests/run_with_bind_config.cjs (WIRE_TEST_PORTS exhausted)");
+   return static_cast<uint16_t>(port);
+}
 
 /** Return an unused, registry-owned endpoint, including for refusal and fake-client fixtures. */
-inline std::string unused_url() { return node_http_ports.next_loopback_url(); }
+inline std::string unused_url() { return "http://127.0.0.1:" + std::to_string(next_port()); }
 
 /** Controllable RPC endpoint: a hung request keeps its socket alive until teardown. */
 class rpc_server {

@@ -69,7 +69,6 @@ struct resmon_fixture {
 };
 
 namespace {
-/** Deterministic filesystem-stat provider used to drive resource-monitor thresholds. */
 struct fixed_space_provider {
    uintmax_t available;
    int get_stat(const char*, struct stat* result) {
@@ -82,7 +81,6 @@ struct fixed_space_provider {
    }
 };
 
-/** Capture resource-monitor log messages while restoring the prior logger state on teardown. */
 struct captured_monitor_logger {
    std::ostringstream output;
    fc::logger logger = fc::logger::default_logger();

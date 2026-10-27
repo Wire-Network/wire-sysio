@@ -111,13 +111,8 @@ triple plus every caller triple (including `http-client-*`) and asserts the loca
 
 ```bash
 ninja -C build/debug test_chain_plugin
-ctest --test-dir build/debug \
-  -R '^test_chain_plugin_outbound_http_global_option_registration$' \
-  --output-on-failure
+./build/debug/plugins/chain_plugin/test/test_chain_plugin -t outbound_http_global_option_registration
 ```
-
-CTest supplies the test's required `SYSIO_TEST_PORTS` lease through the build tree's
-`tests/bind_registry.py`; see the `chain_plugin` test documentation for direct filtered runs.
 
 ## Related plugins
 

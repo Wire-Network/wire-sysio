@@ -344,9 +344,10 @@ before signing or broadcasting, that exact caps pass through once, that two clie
 policies, that file and CLI configuration produce the expected policies, and that a partial client map is
 never published. No test dials a public endpoint.
 
-CTest runs this binary through the build tree's `tests/bind_registry.py`, which keeps its host-wide WIRE
-bind-registry lease alive for the test process and exposes the ports in `SYSIO_TEST_PORTS`. The wrapper uses
-Python's standard library. For direct filtered runs, use that wrapper before the binary and Boost arguments.
+CTest runs this binary through `tests/run_with_bind_config.cjs`, which keeps platform registry reservations
+alive for the test process. It requires Node and the version-pinned `@wireio/cluster-tool` development
+dependency. A built companion may be selected explicitly with `WIRE_TOOLS_TS_ROOT`. For direct filtered
+runs, use that wrapper before the binary and Boost arguments.
 
 A companion RPC tool is built alongside the plugin when `ENABLE_TESTS` is on:
 

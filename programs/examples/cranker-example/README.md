@@ -47,8 +47,8 @@ until discovery succeeds; the process can recover without a restart.
 
 After the normal build, run `ctest --test-dir <build-dir> -R '^cranker_startup_recovery$' --output-on-failure`
 to verify delayed discovery, configured-ID operation, and graceful shutdown.
-The test reserves its RPC ports through the host-wide WIRE bind registry and retains a new diagnostic
-directory under the example's build directory for every run.
+The test reserves its RPC ports through `BindConfigProvider` and retains a new
+diagnostic directory under the example's build directory for every run.
 
 #### Ethereum ABI File (`--ethereum-abi-file`)
 Path to an Ethereum contract ABI file (relative from current working directory or absolute path). The file should contain a JSON array of ABI-compliant contract definitions.

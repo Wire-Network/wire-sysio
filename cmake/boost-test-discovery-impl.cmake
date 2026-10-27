@@ -44,8 +44,7 @@ function(boost_test_discover_tests_impl)
    # Lists arrive as single `;`-joined arguments; the ${ARGN} form splits them where PARSE_ARGV would not.
    set(single_values EXECUTABLE TESTS_FILE INCLUDE_FILE FAILURE_NAME CMAKE_COMMAND WORKING_DIRECTORY NAME INCLUDE
        EXCLUDE LOCK_TIMEOUT)
-   cmake_parse_arguments(arg "" "${single_values}"
-                         "NAME_STRIP;RUNTIMES;COMMAND_PREFIX;ARGS;PROPERTIES;COST_BY_NAME" ${ARGN})
+   cmake_parse_arguments(arg "" "${single_values}" "NAME_STRIP;RUNTIMES;ARGS;PROPERTIES;COST_BY_NAME" ${ARGN})
 
    # One ctest process discovers at a time, and one that waited finds the script already current. Without the lock the
    # shared files are not this process's to touch, so it keeps the current list and reports why.
@@ -131,7 +130,7 @@ function(boost_test_discover_tests_impl)
          set(runtimes "${_BOOST_TEST_NO_RUNTIME}")
       endif()
       foreach(RUNTIME IN LISTS runtimes)
-         set(command ${arg_COMMAND_PREFIX} "${arg_EXECUTABLE}" "--run_test=${UNIT}" ${arg_ARGS})
+         set(command "${arg_EXECUTABLE}" "--run_test=${UNIT}" ${arg_ARGS})
          if(RUNTIME STREQUAL _BOOST_TEST_NO_RUNTIME)
             set(RUNTIME "")
          else()

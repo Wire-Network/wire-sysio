@@ -57,8 +57,14 @@ int main(int argc, char* argv[]) {
       cli.print(std::cout);
       return 0;
    }
-   if(!sysio::testing::resolve_state_history_endpoint(socket_address, std::cerr))
-      return 1;
+   if(socket_address.empty()) {
+      try {
+         socket_address = sysio::testing::default_state_history_endpoint();
+      } catch(const std::runtime_error& e) {
+         std::cerr << e.what() << " (or pass --socket-address)" << std::endl;
+         return 1;
+      }
+   }
 
    std::string::size_type colon = socket_address.find(':');
    FC_ASSERT(colon != std::string::npos, "Missing ':' seperator in Websocket address and port");
