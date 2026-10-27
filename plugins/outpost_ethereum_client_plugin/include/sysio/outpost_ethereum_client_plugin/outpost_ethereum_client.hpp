@@ -468,13 +468,12 @@ private:
    void refresh_submission(ethereum_submission& submission, const fc::uint256& latest_count);
 
    /// Sign `submission` again at its nonce with `fees` and send it, recording the
-   /// attempt before the send. A refused send is logged; the next tick decides
-   /// again from the market.
+   /// attempt before the send. A refused send is logged and its attempt kept; the
+   /// next tick decides again.
    ///
-   /// @return Whether a node took the signing.
    /// @throws ethereum_transaction_policy_exception when the policy refuses `fees`.
    /// @throws fc::exception on transport failure; the attempt stays recorded.
-   bool resubmit(ethereum_submission& submission, const ethereum_transaction_fees& fees, std::string_view why);
+   void resubmit(ethereum_submission& submission, const ethereum_transaction_fees& fees, std::string_view why);
 
    /// Send one `epochIn` at `gas_budget`, after settling the journal. The call is
    /// journaled once it was sent: landed when its receipt came back, pending

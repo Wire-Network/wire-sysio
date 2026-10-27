@@ -438,6 +438,15 @@ std::string describe_submission(const ethereum_submission& submission) {
           submission.transaction.nonce.str();
 }
 
+/// Record `attempt` on `submission` unless its hash already is: signing the
+/// same transaction at the same fees gives the same bytes.
+void record_attempt(ethereum_submission& submission, submission_attempt attempt) {
+   const auto recorded = std::ranges::any_of(submission.attempts, [&](const submission_attempt& existing) {
+      return same_hex(existing.tx_hash, attempt.tx_hash);
+   });
+   if (!recorded) submission.attempts.push_back(std::move(attempt));
+}
+
 /// Add `submission` to `submissions`, keeping them ascending by nonce.
 void journal_submission(std::vector<ethereum_submission>& submissions, ethereum_submission submission) {
    const auto position = std::ranges::upper_bound(submissions, submission.transaction.nonce, std::less{},
@@ -711,32 +720,17 @@ std::optional<fc::uint256> first_unaccounted_nonce(const fc::uint256& latest, co
 
 std::string send_submission_attempt(ethereum_client& client, const signed_transaction& signed_tx,
                                     ethereum_submission& submission) {
-   std::string reported;
-   try {
-      reported = client.send_raw_transaction(signed_tx.raw_hex);
-   } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
-      // A node refuses bytes it already holds too ("already known", in each
-      // client's own words). Asking for the hash tells the two apart.
-      std::optional<bool> held;
-      try {
-         held = !client.get_transaction_by_hash(signed_tx.tx_hash).is_null();
-      } catch (const fc::exception& lookup) {
-         wlog("ethereum transaction at nonce {}: asking the node for {} after it refused it ({}) failed ({}); "
-              "keeping it as possibly sent",
-              submission.transaction.nonce.str(), signed_tx.tx_hash, refusal.top_message(), lookup.top_message());
-      }
-      if (held && *held) {
-         dlog("ethereum transaction at nonce {}: the node refused {} it already holds ({})",
-              submission.transaction.nonce.str(), signed_tx.tx_hash, refusal.top_message());
-         return signed_tx.tx_hash;
-      }
-      if (held) submission.attempts.pop_back();
-      throw;
-   }
+   const auto reported = client.send_raw_transaction(signed_tx.raw_hex);
    if (!same_hex(reported, signed_tx.tx_hash)) {
       elog("ethereum transaction at nonce {}: the node reported hash {} for the bytes hashing to {}; watching both",
            submission.transaction.nonce.str(), reported, signed_tx.tx_hash);
-      submission.attempts.push_back({.tx_hash = reported, .fees = submission.attempts.back().fees});
+      const auto signed_attempt = std::ranges::find_if(submission.attempts, [&](const submission_attempt& attempt) {
+         return same_hex(attempt.tx_hash, signed_tx.tx_hash);
+      });
+      FC_ASSERT(signed_attempt != submission.attempts.end(), "the signing {} was sent before it was recorded",
+                signed_tx.tx_hash);
+      const auto fees = signed_attempt->fees;
+      record_attempt(submission, {.tx_hash = reported, .fees = fees});
    }
    return reported;
 }
@@ -924,7 +918,7 @@ void outpost_ethereum_client::refresh_submission(ethereum_submission& submission
    }
 }
 
-bool outpost_ethereum_client::resubmit(ethereum_submission& submission, const ethereum_transaction_fees& fees,
+void outpost_ethereum_client::resubmit(ethereum_submission& submission, const ethereum_transaction_fees& fees,
                                        std::string_view why) {
    const auto& client                   = _entry->client;
    auto        transaction              = submission.transaction;
@@ -933,18 +927,16 @@ bool outpost_ethereum_client::resubmit(ethereum_submission& submission, const et
    const auto signed_tx = client->sign_transaction(transaction, magic_enum::enum_name(submission.purpose));
    // Recorded before the send: a send whose response is lost may still have
    // reached the node, and the next replacement must be priced against it.
-   submission.attempts.push_back({.tx_hash = signed_tx.tx_hash, .fees = fees});
+   record_attempt(submission, {.tx_hash = signed_tx.tx_hash, .fees = fees});
    try {
       send_submission_attempt(*client, signed_tx, submission);
       ilog("outpost_ethereum_client[{}]: {} {}: tx={} max_fee={} tip={}", to_string(), why,
            describe_submission(submission), signed_tx.tx_hash, fees.max_fee_per_gas.str(),
            fees.max_priority_fee_per_gas.str());
-      return true;
    } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
       wlog("outpost_ethereum_client[{}]: {} {} was refused at max_fee={} tip={} ({}); the next tick decides again",
            to_string(), why, describe_submission(submission), fees.max_fee_per_gas.str(),
            fees.max_priority_fee_per_gas.str(), refusal.top_message());
-      return false;
    }
 }
 
@@ -1009,7 +1001,13 @@ std::optional<fc::uint256> outpost_ethereum_client::settle_submissions(fc::time_
          }
          const auto step = detail::decide_in_flight(!held.empty(), detail::highest_fees(held), market);
          if (step == detail::in_flight_step::wait) continue;
-         const auto fees = detail::resend_fees(step, detail::highest_fees(submission.attempts), market, caps);
+         // A replacement is priced against the signings the node holds: one it
+         // does not show need not be outbid, and bumping it may leave no fees
+         // within the caps. A re-send of a dropped call pays at least what was
+         // signed before.
+         const auto paid =
+            detail::highest_fees(step == detail::in_flight_step::replace ? held : submission.attempts);
+         const auto fees = detail::resend_fees(step, paid, market, caps);
          if (!fees) {
             wlog("outpost_ethereum_client[{}]: {} needs a {} the fee caps leave no room for (market max_fee={} "
                  "tip={}); waiting for what holds its nonce",
@@ -1047,19 +1045,21 @@ std::optional<fc::uint256> outpost_ethereum_client::settle_submissions(fc::time_
                .state       = submission_state::pending,
                .landed_at   = std::nullopt,
             };
-            // Journaled once a node may hold it; one no node took is not, and the
-            // next tick sends another.
-            const auto journal_if_sent = [&] {
-               if (!cancel.attempts.empty()) journal_submission(journal.submissions, std::move(cancel));
+            // Journaled once signed, refused or not: a node may hold it, and the
+            // journal settles it from there.
+            const auto journal_if_signed = [&] {
+               if (cancel.attempts.empty()) return;
+               journal_submission(journal.submissions, std::move(cancel));
+               journal.unaccounted_nonce.reset();
             };
             const auto fees = detail::outbid_fees(market, detail::transaction_fee_caps(policy, cancel_transaction));
             try {
-               if (resubmit(cancel, fees, "sending")) journal.unaccounted_nonce.reset();
+               resubmit(cancel, fees, "sending");
             } catch (...) {
-               journal_if_sent();
+               journal_if_signed();
                throw;
             }
-            journal_if_sent();
+            journal_if_signed();
          }
       }
    } catch (const eth::ethereum_transaction_policy_exception& rejection) {
@@ -1111,8 +1111,8 @@ epoch_in_receipt outpost_ethereum_client::send_epoch_in(uint32_t epoch_index, co
    } catch (const eth::ethereum_transaction_policy_exception&) {
       throw;   // refused locally, before anything was signed
    } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
-      // The node's refusal of the pre-flight or of the send leaves no attempt.
-      // An error after the node took the call can leave it pending.
+      // A refusal of the pre-flight leaves no attempt. One of the send keeps
+      // it: the node, or another behind the endpoint, may hold the call.
       if (submission.attempts.empty()) throw;
       unconfirmed = refusal.to_string();
    } catch (const fc::exception& failure) {

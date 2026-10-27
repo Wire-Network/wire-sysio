@@ -423,7 +423,7 @@ enum class scripted_send {
    accepted,
    /// Refused with a JSON-RPC error, as a replacement that does not raise every fee enough is.
    refused,
-   /// Refused as already known: the node holds the bytes.
+   /// Refused as already known: the backend the send reaches holds the bytes.
    already_known,
    /// Accepted and held, but the response is lost on the way back.
    response_lost
@@ -677,6 +677,9 @@ struct whole_envelope_delivery_fixture {
    /// Delivery calls (1-based) whose receipt wait runs out: the stub fills the
    /// submission and throws the timeout instead of confirming.
    std::set<size_t> unconfirmed_calls;
+   /// Delivery calls (1-based) whose send a backend refuses as already known:
+   /// the stub fills the submission and throws the refusal, as `epochIn` does.
+   std::set<size_t> already_known_calls;
    /// Run after each delivery call (1-based) confirms: what the chain does next.
    std::function<void(size_t)> on_confirm;
    /// What the views answer at the read confirmation's block. Unset: the last
@@ -872,6 +875,9 @@ create_whole_envelope_delivery_fixture(ethereum_transaction_policy transaction_p
       };
       if (raw->unconfirmed_calls.contains(call)) {
          FC_THROW_EXCEPTION(fc::timeout_exception, "scripted receipt wait for call {} ran out", call);
+      }
+      if (raw->already_known_calls.contains(call)) {
+         throw fc::network::json_rpc::json_rpc_error(test_refused_send_rpc_code, "already known");
       }
       sysio::epoch_in_receipt receipt;
       receipt.tx_hash      = hash;
@@ -3051,8 +3057,10 @@ BOOST_AUTO_TEST_CASE(a_cancel_pays_the_cap_when_the_market_asks_for_more) try {
    BOOST_CHECK(cancel.attempts.front().fees.max_fee_per_gas == fc::uint256{200});
 } FC_LOG_AND_RETHROW();
 
-/// A cancel a node refuses is not journaled, and the next tick sends another.
-BOOST_AUTO_TEST_CASE(a_refused_cancel_is_sent_again_next_tick) try {
+/// A cancel a node refuses is journaled all the same, since a node may hold
+/// it, and the next tick outbids what holds the nonce with it again: the same
+/// fees give the same bytes, recorded once.
+BOOST_AUTO_TEST_CASE(a_refused_cancel_is_kept_and_sent_again_next_tick) try {
    auto fixture  = create_whole_envelope_delivery_fixture();
    auto envelope = make_envelope(mid_envelope_bytes);
    fixture->rpc->pending_nonce = 1;   // something this relay did not sign holds nonce 0
@@ -3063,33 +3071,100 @@ BOOST_AUTO_TEST_CASE(a_refused_cancel_is_sent_again_next_tick) try {
    fixture->rpc->send_outcomes = {scripted_send::refused};
    BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
                      sysio::chain::outpost_delivery_incomplete_exception);
-   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.size(), 1u);
-   BOOST_CHECK(fixture->outpost->submissions().empty());
+   BOOST_REQUIRE_EQUAL(fixture->rpc->sent_hashes.size(), 1u);
+   const auto refused = fixture->only_submission();
+   BOOST_CHECK(refused.purpose == sysio::submission_purpose::cancel);
+   BOOST_REQUIRE_EQUAL(refused.attempts.size(), 1u);
+   BOOST_CHECK_EQUAL(refused.attempts.front().tx_hash, fixture->rpc->sent_hashes.front());
+   BOOST_CHECK(!fixture->entry->submissions->unaccounted_nonce);
 
    BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
                      sysio::chain::outpost_delivery_incomplete_exception);
-   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.size(), 2u);
+   BOOST_REQUIRE_EQUAL(fixture->rpc->sent_hashes.size(), 2u);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.back(), fixture->rpc->sent_hashes.front());
    const auto cancel = fixture->only_submission();
    BOOST_CHECK(cancel.purpose == sysio::submission_purpose::cancel);
    BOOST_CHECK_EQUAL(cancel.attempts.size(), 1u);
    BOOST_CHECK(fixture->delivery_calls.empty());
 } FC_LOG_AND_RETHROW();
 
-/// A re-send the node refuses as already known is kept: asked for the hash,
-/// the node holds it, so the signing is journaled as sent and waited for.
-BOOST_AUTO_TEST_CASE(a_resend_the_node_already_holds_is_kept) try {
+/// A first `epochIn` a backend refuses as already known keeps its signing,
+/// although the backend the next lookup reaches does not show it yet. The call
+/// is journaled, signed again at its own nonce while nothing shows it, and
+/// waited for once the node does. Nothing is sent at a later nonce, and
+/// nothing is cancelled.
+BOOST_AUTO_TEST_CASE(a_first_epoch_in_refused_as_already_known_is_kept_across_lagging_backends) try {
    auto fixture  = create_whole_envelope_delivery_fixture();
    auto envelope = make_envelope(mid_envelope_bytes);
-   fixture->unconfirmed_calls = {1};
-   BOOST_CHECK_THROW(deliver(*fixture, envelope), sysio::chain::outpost_delivery_incomplete_exception);
-   fixture->rpc->send_outcomes = {scripted_send::already_known};
+   fixture->already_known_calls = {1};
 
+   BOOST_CHECK_THROW(deliver(*fixture, envelope), sysio::chain::outpost_delivery_incomplete_exception);
+   const auto first = fixture->only_submission();
+   BOOST_REQUIRE_EQUAL(first.attempts.size(), 1u);
+   const auto hash = first.attempts.front().tx_hash;
+
+   // The backend asked next has not seen it: no such hash, nothing pending at its nonce.
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_REQUIRE_EQUAL(fixture->rpc->sent_hashes.size(), 1u);
+   const auto resent = fixture->only_submission();
+   BOOST_CHECK(resent.purpose == sysio::submission_purpose::epoch_in);
+   BOOST_CHECK(resent.transaction.nonce == fc::uint256{0});
+   BOOST_REQUIRE_EQUAL(resent.attempts.size(), 2u);
+   BOOST_CHECK_EQUAL(resent.attempts.front().tx_hash, hash);
+
+   // Now it shows the first signing pending: the call is waited for.
+   fixture->rpc->known_hashes.insert(hash);
+   fixture->rpc->pending_nonce = 1;
    BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
                      sysio::chain::outpost_delivery_incomplete_exception);
    BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.size(), 1u);
-   const auto resent = fixture->only_submission();
-   BOOST_REQUIRE_EQUAL(resent.attempts.size(), 2u);
-   BOOST_CHECK_EQUAL(resent.attempts.back().tx_hash, fixture->rpc->sent_hashes.front());
+   BOOST_CHECK(fixture->only_submission().state == sysio::submission_state::pending);
+   BOOST_CHECK(!fixture->entry->submissions->unaccounted_nonce);
+   BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 1u);
+} FC_LOG_AND_RETHROW();
+
+/// The fee cap per gas of the replacement-baseline test: the market's fee cap
+/// at its base fee, `2 * 95 + 10`.
+constexpr uint64_t replacement_test_max_fee = 200;
+/// The base fee there: the call's fee cap of 100 leaves a tip of only 5.
+constexpr uint64_t replacement_test_base_fee = 95;
+
+/// A replacement is priced against the signings the node holds. The call pays
+/// 10/100, and its replacement at 12/200 is refused (the signer ran short of
+/// funds) and kept. Once the signer is funded the node still holds only the
+/// call: bumping the refused signing would need 14/226, past the 200 cap, so
+/// the relay would wait forever, while priced against the call the
+/// replacement is 12/200 again, the same bytes, recorded once.
+BOOST_AUTO_TEST_CASE(a_replacement_is_priced_against_the_signings_the_node_holds) try {
+   auto policy                     = relay_test_policy();
+   policy.max_priority_fee_per_gas = replacement_test_max_fee;
+   policy.max_fee_per_gas          = replacement_test_max_fee;
+   auto fixture                    = create_whole_envelope_delivery_fixture(policy);
+   auto envelope                   = make_envelope(mid_envelope_bytes);
+   fixture->unconfirmed_calls = {1};
+   BOOST_CHECK_THROW(deliver(*fixture, envelope), sysio::chain::outpost_delivery_incomplete_exception);
+   fixture->rpc->known_hashes.insert(fixture->only_submission().attempts.front().tx_hash);
+   fixture->rpc->pending_nonce = 1;
+   fixture->rpc->base_fee_hex  = format_rpc_quantity(fc::uint256{replacement_test_base_fee});
+   fixture->rpc->send_outcomes = {scripted_send::refused};
+
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   const auto refused = fixture->only_submission();
+   BOOST_REQUIRE_EQUAL(refused.attempts.size(), 2u);
+   const auto replacement = refused.attempts.back();
+   BOOST_CHECK(replacement.fees.max_priority_fee_per_gas == fc::uint256{test_scripted_tip + test_scripted_tip / 8 + 1});
+   BOOST_CHECK(replacement.fees.max_fee_per_gas == fc::uint256{replacement_test_max_fee});
+   BOOST_CHECK(!fixture->rpc->known_hashes.contains(replacement.tx_hash));
+
+   BOOST_CHECK_THROW(deliver(*fixture, envelope, fc::milliseconds(in_flight_tick_ms)),
+                     sysio::chain::outpost_delivery_incomplete_exception);
+   BOOST_REQUIRE_EQUAL(fixture->rpc->sent_hashes.size(), 2u);
+   BOOST_CHECK_EQUAL(fixture->rpc->sent_hashes.back(), replacement.tx_hash);
+   BOOST_CHECK(fixture->rpc->known_hashes.contains(replacement.tx_hash));
+   BOOST_CHECK_EQUAL(fixture->only_submission().attempts.size(), 2u);
+   BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 1u);
 } FC_LOG_AND_RETHROW();
 
 /// A journaled call whose nonce the node holds something else at, with none of

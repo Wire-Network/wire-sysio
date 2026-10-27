@@ -190,8 +190,9 @@ later tick and delivered again, rather than left to the job's one consensus retr
 Every transaction the relay signs goes into the **journal** of the client entry it signs with: its nonce,
 recipient, gas and calldata, and every signing at that nonce with its fees. Each signing's hash is computed
 from the signed bytes and recorded before the send, so a send whose response is lost still leaves the hash
-and the fees on record. A node's refusal removes that signing again, unless asking the node for the hash
-shows it holds the bytes anyway (a refusal as already known). The journal is shared by every outpost
+and the fees on record. A refused signing stays recorded too: the node may hold the bytes anyway (a refusal
+as already known), or another backend behind the same endpoint may. Each hash is recorded once, since signing
+again at the same fees gives the same bytes. The journal is shared by every outpost
 client built on the entry, so it survives the batch operator rebuilding a relay job; a restart loses it.
 
 A transaction stays in the journal until its nonce is used at the client's read confirmation, not just until
@@ -207,7 +208,7 @@ whole delivery, so only one sender uses the signer's nonces at a time:
 | A receipt for any of its hashes | Landed. A reverted one is logged; the relay reads the outpost from the highest block a journaled call landed in and decides what to send |
 | The nonce used, by none of its hashes | Superseded; the outpost's state decides |
 | Pending, and at today's base fee it still pays the market tip | Waits for it until the tick's deadline |
-| Pending, and its fee cap is below the base fee, or the tip it can pay at that base fee is below the market's | Re-signs it at the same nonce with every fee raised by more than an eighth over the highest fees any of its signings carried (nodes refuse a replacement under 10%) and at least the market's, within the transaction policy's caps |
+| Pending, and its fee cap is below the base fee, or the tip it can pay at that base fee is below the market's | Re-signs it at the same nonce with every fee raised by more than an eighth over the highest fees of its signings the node holds (nodes refuse a replacement under 10%) and at least the market's, within the transaction policy's caps |
 | Something at the nonce, but none of its hashes | Outbids it (see below), since the fees of what holds the nonce are unknown |
 | Neither its hashes nor anything at the nonce | Sends it again at the same nonce, at the larger of its fees and the market's |
 | A pending transaction at a nonce no journal entry accounts for | Sends nothing behind it. After `default_unaccounted_nonce_grace` (60 s) it is cancelled: a zero-value transfer to the signer at that nonce, at the outbid fees (see below). The cancel is journaled like any other transaction |
@@ -438,8 +439,9 @@ rejections — the read confirmation (each tag, the depth, the finalized block w
 fallback and its boundary, refusals), an epoch reported handled only once the read confirmation shows it, a
 journaled call that lands, reverts, waits, is replaced, is re-broadcast, loses its nonce, is forgotten at the
 read confirmation, comes back after a reorg, or had a replacement whose response was lost, the journal
-surviving a rebuilt relay, an unaccounted nonce waited on and cancelled after a restart, a refused cancel sent
-again next tick, a resend the node already holds, a cancel at the cap when the market asks for more, a journaled call outbid when something
+surviving a rebuilt relay, an unaccounted nonce waited on and cancelled after a restart, a refused cancel kept
+and sent again next tick, a first `epochIn` refused as already known while the backend asked next does not show
+it yet, a replacement priced against what the node holds rather than a refused signing, a cancel at the cap when the market asks for more, a journaled call outbid when something
 else holds its nonce, the check before every send, the replacement and outbid fees and the per-transaction
 caps, and the network hash
 of a signed transaction against foundry's vectors — and the outpost crank: idle without the pool ABI or a registered handler, binding the
@@ -448,9 +450,9 @@ errors, and deadline abandonment.
 `outpost_ethereum_transaction_policy_tests` covers the expenditure-policy boundary: that a rejection happens
 before signing or broadcasting, that exact caps pass through once, that two clients enforce their own
 policies, that file and CLI configuration produce the expected policies and read confirmations, that
-signing checks the policy without sending, that a signing's recorded hash survives every send outcome but a
-refusal of bytes the node does not hold, that a first `epochIn` the node already holds is kept as sent, and
-that a partial client map is never published. No test dials a public endpoint.
+signing checks the policy without sending, that a signing's recorded hash survives every send outcome, once
+per hash, that a first `epochIn` the node refuses keeps its signing, and that a partial client map is never
+published. No test dials a public endpoint.
 
 CTest runs this binary through `tests/run_with_bind_config.cjs`, which keeps platform registry reservations
 alive for the test process. It requires Node and the version-pinned `@wireio/cluster-tool` development

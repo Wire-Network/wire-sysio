@@ -61,8 +61,8 @@ struct ethereum_submission {
    /// The transaction as signed, without its signature: nonce, recipient, gas limit and calldata. The fees
    /// are each attempt's own.
    eip1559_tx         transaction;
-   /// Every signing that may have reached a node, oldest first. An attempt the node refused is dropped; one
-   /// whose send failed any other way is kept, since the node may hold it.
+   /// Every signing that may have reached a node, oldest first, each hash once. A refused one is kept too,
+   /// since the node, or another behind the same endpoint, may hold it.
    std::vector<submission_attempt> attempts;
    submission_state                state = submission_state::pending;
    /// The block holding it while `state` is `landed`.
@@ -287,18 +287,18 @@ inline constexpr auto logs         = "logs";
 } // namespace ethereum_receipt_field
 
 /**
- * @brief Send one signing of `submission` whose attempt is already recorded as its last.
+ * @brief Send one signing of `submission` whose attempt is already recorded.
  *
- * A node refusal removes the attempt again, unless asking the node for the hash shows it holds the bytes
- * anyway (it refused them as already known); any other failure keeps it, since the node may hold them. A
- * node that reports a different hash for the bytes than the one computed from them is logged, and its hash
- * is recorded too so every wait watches both.
+ * The attempt stays recorded whatever the send does, a refusal included: the node may hold the bytes anyway
+ * (a refusal as already known), or another backend behind the same endpoint may, and the journal settles it
+ * from there. A node that reports a different hash for the bytes than the one computed from them is logged,
+ * and its hash is recorded too so every wait watches both.
  *
  * @param client     The client that signed it.
  * @param signed_tx  The signed bytes and the hash recorded for them.
  * @param submission The submission the attempt belongs to.
- * @return The hash the node reported, or the computed one when the node refused bytes it holds.
- * @throws fc::network::json_rpc::json_rpc_error when the node refuses the transaction and does not hold it.
+ * @return The hash the node reported.
+ * @throws fc::network::json_rpc::json_rpc_error when the node refuses the transaction.
  */
 std::string send_submission_attempt(ethereum_client& client, const signed_transaction& signed_tx,
                                     ethereum_submission& submission);
@@ -365,8 +365,8 @@ struct opp_inbound_contract_client : ethereum_contract_client {
    /// must materialize named locals for both. `submission` is filled after
    /// signing and before the send, with the hash computed from the signed
    /// bytes, so a caller whose send or wait threw still knows the nonce, the
-   /// fees and the hash of the call it may have left in flight. A node that
-   /// refuses the send leaves it with no attempt.
+   /// fees and the hash of the call it may have left in flight, a refused send
+   /// included.
    std::function<epoch_in_receipt(uint32_t& epoch_index, std::string& envelope_hex, uint64_t gas_budget,
                                   fc::time_point deadline, ethereum_submission& submission)>
       epoch_in;
