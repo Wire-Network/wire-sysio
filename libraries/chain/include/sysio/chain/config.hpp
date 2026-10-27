@@ -113,6 +113,9 @@ namespace sysio::chain::config {
 
   static constexpr uint32_t   hashing_checktime_block_size       = 10*1024;  /// call checktime from hashing intrinsic once per this number of bytes
 
+  /// Consensus limit bounding one uninterrupted libsodium Ed25519 verification.
+  static constexpr uint32_t   max_ed25519_message_size          = 65'536;
+
   // KV default limits — on-chain consensus values are in chain_config
   static constexpr uint32_t   default_max_kv_key_size           = 256;       ///< maximum KV primary key size in bytes
   static constexpr uint32_t   default_max_kv_value_size         = 256*1024;  ///< maximum KV value size (256 KiB)
