@@ -45,6 +45,7 @@ providerTestBlockSpacing=17
 updatedProviderBlockSpacing=19
 manualSnapshotDescription="operator manual cadence test"
 manualSnapshotHeight=2**32-1
+largestRecurringBlockSpacing=manualSnapshotHeight//2
 
 
 def setSnapshotCadence(node, blockSpacing):
@@ -286,6 +287,16 @@ try:
     configuredTransId = setSnapshotCadence(node0, providerTestBlockSpacing)
     assert providerNode.waitForTransFinalization(configuredTransId, timeout=60), \
         "Provider did not receive finalized snapshot configuration"
+    # Persist manual ID 0 before provider mode creates automatic ID 1. This is the ordering
+    # that used to lose the replacement automatic request when its ID counter reset on restart.
+    manual = providerNode.processUrllibRequest("producer", "schedule_snapshot", payload={
+        "start_block_num": manualSnapshotHeight,
+        "end_block_num": manualSnapshotHeight,
+        "snapshot_description": manualSnapshotDescription
+    })
+    assert manual is not None, "Manual snapshot schedule failed"
+    manualRequestId = manual["payload"]["snapshot_request_id"]
+    assert manualRequestId == 0, "Manual-first regression did not start with request ID 0"
     providerNode.kill(signal.SIGTERM)
     assert providerNode.relaunch(
         chainArg=f"--snapshot-provider-account {snapProv1.name} --plugin sysio::snapshot_api_plugin"), \
@@ -307,14 +318,7 @@ try:
     assert providerSchedule(providerNode)["block_spacing"] == providerTestBlockSpacing, \
         "Provider unexpectedly refreshed cadence without restarting"
 
-    # A manual request must survive replacing only the differently-spaced automatic request.
-    manual = providerNode.processUrllibRequest("producer", "schedule_snapshot", payload={
-        "start_block_num": manualSnapshotHeight,
-        "end_block_num": manualSnapshotHeight,
-        "snapshot_description": manualSnapshotDescription
-    })
-    assert manual is not None, "Manual snapshot schedule failed"
-    manualRequestId = manual["payload"]["snapshot_request_id"]
+    # The earlier manual request must survive replacing only the stale automatic request.
     providerNode.kill(signal.SIGTERM)
     assert providerNode.relaunch(), "Provider failed to restart with changed snapshot cadence"
     schedule = providerSchedule(providerNode)
@@ -331,6 +335,39 @@ try:
         "Unchanged restart did not reuse the automatic request"
     assert len(snapshotRequests(providerNode)) == 2, "Unchanged restart duplicated a request"
     Print("Test 3 PASSED: Provider cadence changes on restart and scheduled files enter the catalog")
+
+    # ---------------------------------------------------------------
+    # Test 4: Every positive uint32 cadence permits startup without overflowing its schedule.
+    # ---------------------------------------------------------------
+    Print("=== Test 4: Large-cadence recurring, one-shot and no-trigger startup ===")
+    for blockSpacing in [largestRecurringBlockSpacing, largestRecurringBlockSpacing + 1,
+                         manualSnapshotHeight - 1, manualSnapshotHeight]:
+        changedTransId = setSnapshotCadence(node0, blockSpacing)
+        assert providerNode.waitForTransFinalization(changedTransId, timeout=60)
+        providerNode.kill(signal.SIGTERM)
+        assert providerNode.relaunch(), f"Provider failed to restart with spacing {blockSpacing}"
+        requests = snapshotRequests(providerNode)
+        assert any(request["snapshot_request_id"] == manualRequestId
+                   and request["snapshot_description"] == manualSnapshotDescription
+                   for request in requests), "Cadence boundary removed the manual request"
+        if blockSpacing == manualSnapshotHeight:
+            assert len(requests) == 1, f"Terminal cadence retained an automatic request: {requests}"
+            continue
+        schedule = providerSchedule(providerNode)
+        assert len(requests) == 2, f"Cadence boundary duplicated an automatic request: {requests}"
+        assert schedule["start_block_num"] == blockSpacing
+        if blockSpacing == largestRecurringBlockSpacing:
+            assert schedule["block_spacing"] == blockSpacing
+            assert schedule["end_block_num"] == manualSnapshotHeight
+        else:
+            assert schedule["block_spacing"] == 0, "Large cadence did not use a one-shot request"
+            assert schedule["end_block_num"] == blockSpacing
+            providerNode.kill(signal.SIGTERM)
+            assert providerNode.relaunch(), "Unchanged one-shot cadence failed to restart"
+            assert providerSchedule(providerNode)["snapshot_request_id"] == schedule["snapshot_request_id"], \
+                "Unchanged restart replaced the one-shot automatic request"
+            assert len(snapshotRequests(providerNode)) == 2, "One-shot restart duplicated a request"
+    Print("Test 4 PASSED: Large cadences preserve manual requests and reuse the correct automatic shape")
 
     # ---------------------------------------------------------------
     Print("All snapshot attestation tests PASSED")

@@ -365,10 +365,11 @@ For a complete operator setup guide — including producer registration, provide
 - `snapshot_no_attestation_detected` — no vote → no record found
 - `attestation_survives_snapshot_load` — attestation data survives snapshot round-trip in `snapshotted_tester`
 
-**Integration test** (`tests/snapshot_attest_test.py` — 3 tests):
+**Integration test** (`tests/snapshot_attest_test.py` — 4 tests):
 - Manual snapshot creation and rejection outside the configured test cadence
 - Provider registration and snapshot-account rotation
 - Provider startup cadence, snapshot creation, restart after governance changes, unchanged-cadence reuse, and manual-request preservation
+- Manual-first persisted request IDs, half-range recurring/one-shot boundaries, changed/unchanged one-shot reuse, and terminal-height no-trigger startup
 
 **Snapshot API policy tests** (`tests/snapshot_api_plugin_tests.cpp`):
 - scheduled explicit serving requires a complete, exact block-ID/root tuple whose attestation block is irreversible

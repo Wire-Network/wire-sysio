@@ -242,9 +242,13 @@ snapshot-provider-account = <snap_account>
 When this option is set, `nodeop`:
 
 1. Uses the startup `snapconfig.block_spacing` (25,000 if no row exists) to schedule snapshots at
-   exact multiples. Startup removes provider-owned automatic requests with a different spacing,
+   exact multiples. Startup removes provider-owned automatic requests with a stale schedule shape,
    reuses an identical request, and leaves manual requests alone. It does not refresh cadence on
    irreversible blocks; restart the node after governance changes the interval.
+   Intervals above half the uint32 height range use a one-shot request at their sole eligible height.
+   A snapshot at height `H` needs block-start `H + 1`; if no such future trigger remains, including
+   for `block_spacing == UINT32_MAX`, startup logs the reason and schedules no automatic request.
+   The contract still accepts every positive uint32 interval.
 2. On each finalized snapshot at an exact configured-cadence height, computes the deterministic
    BLAKE3 root hash and automatically builds, signs, and submits a `votesnaphash` transaction.
    Unscheduled manual/on-demand snapshots are retained locally but skipped by the vote callback.

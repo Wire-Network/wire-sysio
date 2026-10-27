@@ -25,7 +25,7 @@ plugin_startup
   |  connect controller signals: accepted_block, accepted_block_header,
   |                              irreversible_block, block_start
   |  producers configured -> also aggregated_vote and voted_block
-  |  provider mode -> use startup cadence and replace differently-spaced automatic requests
+  |  provider mode -> use startup cadence and replace stale automatic request shapes
   |  read-only-threads > 0 -> start the read-only pool, begin the write window
   |  start the 1-thread production timer
   |  post schedule_production_loop (runs after net_plugin has started)
@@ -84,11 +84,18 @@ at startup (25,000 when the row is absent), schedules snapshots at exact multipl
 nonzero quorum. Configure small test intervals before starting providers, or restart them afterward.
 
 The provider-owned request is persisted to `snapshot-schedule.json` in the snapshots directory. On restart,
-the plugin reuses an exact match, removes differently-spaced requests carrying its reserved
+the plugin reuses an exact match, removes stale requests carrying its reserved
 `snapshot-provider auto` description, and leaves operator-created manual schedules untouched. It does not
 refresh cadence while running. Governance can change any positive uint32 interval, but operators must restart
 nodes to adopt it. Small values are for testing; production should use much larger intervals because the
 verification grace window is only half the spacing.
+
+Block heights end at `UINT32_MAX`. A cadence above `UINT32_MAX / 2` has at most one eligible
+height, so the provider uses a one-shot automatic request for it rather than an invalid recurring
+range. That request retains the reserved description and is reused unchanged on restart. Capturing
+height `H` requires the start of block `H + 1`: when no triggerable eligible height remains,
+including a cadence of `UINT32_MAX`, startup removes stale automatic requests, logs the reason,
+and continues without an automatic request. This does not cap or alter the on-chain cadence.
 
 Provider mode needs a signing key of its own. The attestation is signed in-process from the `wire` signature
 providers that carry a local private key, and at least one of them must satisfy the configured account's
@@ -256,7 +263,9 @@ Lines an operator should recognize:
   <n>us set to fit in the effective read-only window <n>us.` — the read window sizing that was actually
   applied.
 - `Snapshot provider mode: auto-scheduled snapshots every <n> blocks (request id <n>)`, or
-  `... reusing persisted auto-schedule ...` on a restart.
+  `... auto-scheduled one snapshot at block <n> ...` for a large cadence,
+  `... reusing persisted snapshot request ...` on a restart, or
+  `... no future snapshot trigger ...` when the block-height range is exhausted.
 - `Producer paused.` on an explicit pause.
 - `Exception in read-only thread pool, exiting` and `Exception in producer timer thread, exiting` — either
   quits the node.
