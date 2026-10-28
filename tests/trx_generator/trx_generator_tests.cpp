@@ -97,8 +97,9 @@ std::string join_ports(const std::vector<uint32_t>& ports) {
 constexpr uint32_t handshake_test_p2p_index = 1;
 constexpr uint32_t write_failure_test_p2p_index = 2;
 
-/** Independent URL and CLI spellings expected by native port consumers. */
+/** Independent endpoint, URL and CLI spellings expected by native port consumers. */
 constexpr std::string_view expected_loopback_http_prefix = "http://127.0.0.1:";
+constexpr std::string_view expected_state_history_endpoint_prefix = "127.0.0.1:";
 constexpr std::string_view expected_socket_address_option = "--socket-address";
 
 constexpr int16_t expected_trx_generator_handshake_generation = 1;
@@ -646,11 +647,12 @@ BOOST_AUTO_TEST_CASE(test_ports_allocator_concurrent_exhaustion)
 /** SHiP uses the leased default, preserves an explicit endpoint, and reports a missing lease. */
 BOOST_AUTO_TEST_CASE(test_ports_state_history_endpoint_resolution)
 {
-   require_lease();
+   const auto ports = require_lease();
    std::ostringstream error;
    std::string endpoint;
    BOOST_REQUIRE(resolve_state_history_endpoint(endpoint, error));
-   BOOST_REQUIRE_EQUAL(endpoint, default_state_history_endpoint());
+   BOOST_REQUIRE_EQUAL(endpoint,
+                       std::string(expected_state_history_endpoint_prefix) + std::to_string(ports.at(1)));
    BOOST_REQUIRE(error.str().empty());
 
    test_ports_env_guard env;
