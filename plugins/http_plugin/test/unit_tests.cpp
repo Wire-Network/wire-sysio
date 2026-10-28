@@ -49,6 +49,7 @@ constexpr uint32_t request_body_bytes_in_flight_index = 5;
 constexpr uint32_t category_snapshot_index = 6;
 constexpr uint32_t plaintext_response_index = 7;
 constexpr uint32_t request_body_read_index = 8;
+constexpr uint32_t request_body_deadline_index = 9;
 /** Index of the IPv6 probe listener used by the IPv6 tests. */
 constexpr uint32_t ipv6_probe_index = 2;
 
@@ -1444,6 +1445,97 @@ BOOST_FIXTURE_TEST_CASE(request_body_reserved_while_read, http_plugin_test_fixtu
    second.close();
    BOOST_CHECK(in_flight_becomes(0));
    for (auto* socket : {&first, &third, &expecting, &chunked})
+      socket->close();
+   BOOST_CHECK(wait_until([&] { return plugin->requests_in_flight() == 0; }));
+}
+
+/// A body has a fixed allowance plus its size at the minimum rate to arrive.
+BOOST_AUTO_TEST_CASE(request_body_read_timeout_scales_with_size) {
+   using namespace std::chrono_literals;
+   BOOST_CHECK(request_body_read_timeout(0) == request_body_read_allowance);
+   BOOST_CHECK(request_body_read_timeout(request_body_min_bytes_per_second) == request_body_read_allowance + 1s);
+   BOOST_CHECK(request_body_read_timeout(2 * 1024 * 1024) == 42s); // the default max-body-size
+}
+
+/// A body that does not arrive in time closes its connection and releases its reservation, whether the client sent
+/// only the header or waited for 100 Continue, and the larger the body the longer it has; one that pauses but arrives
+/// in time is answered. While stalled bodies hold the budget, a body that does not fit is refused; once their
+/// connections close it is served.
+BOOST_FIXTURE_TEST_CASE(stalled_request_body_closed_at_deadline, http_plugin_test_fixture) {
+   using namespace std::chrono_literals;
+   using steady_clock = std::chrono::steady_clock;
+   constexpr size_t budget_bytes = 1024 * 1024;
+   constexpr auto   budget = "--http-max-bytes-in-flight-mb=1";
+   constexpr size_t small_body = 1;
+   constexpr size_t large_body = 2 * request_body_min_bytes_per_second; // two seconds past the allowance
+   constexpr size_t paused_body = 2;
+   constexpr size_t stalled_bytes = small_body + large_body + small_body;
+   constexpr size_t too_large_while_stalled = budget_bytes - large_body / 2;
+   static_assert(stalled_bytes + too_large_while_stalled > budget_bytes && too_large_while_stalled < budget_bytes);
+   constexpr auto pause = 5s;
+   static_assert(pause < request_body_read_allowance);
+   const std::string endpoint = test_http_endpoint("127.0.0.1", request_body_deadline_index);
+   const std::string server_address = "--http-server-address=" + endpoint;
+
+   http_plugin* plugin = init({"--plugin=sysio::http_plugin", server_address.c_str(), budget});
+   BOOST_REQUIRE(plugin);
+   body_size_client::add_route(*plugin);
+
+   net::io_context ctx;
+   const body_size_client client{ctx, endpoint, test_http_port(request_body_deadline_index)};
+   const auto in_flight_becomes = [&](size_t bytes) {
+      return wait_until([&] { return plugin->bytes_in_flight() == bytes; });
+   };
+
+   auto small = client.connect();
+   auto large = client.connect();
+   auto expecting = client.connect();
+   auto paused = client.connect();
+   // Taken before any header is sent, so no deadline can have started earlier.
+   const auto start = steady_clock::now();
+   net::write(small, net::buffer(client.header(body_size_client::content_length(small_body))));
+   net::write(large, net::buffer(client.header(body_size_client::content_length(large_body))));
+   net::write(expecting, net::buffer(client.header(body_size_client::content_length(small_body) +
+                                                   "Expect: 100-continue\r\n")));
+   BOOST_CHECK(body_size_client::read_response(expecting).result() == http::status::continue_);
+   net::write(paused, net::buffer(client.header(body_size_client::content_length(paused_body)) + "x"));
+   BOOST_REQUIRE(in_flight_becomes(stalled_bytes + paused_body));
+
+   // The stalled bodies hold the budget, so one that does not fit beside them is refused.
+   auto refused = client.connect();
+   net::write(refused, net::buffer(client.header(body_size_client::content_length(too_large_while_stalled))));
+   BOOST_CHECK(body_size_client::read_response(refused).result() == http::status::service_unavailable);
+   BOOST_CHECK(closed_by_server(read_until_closed(ctx, refused)));
+
+   // A pause short of the deadline does not cut a body off.
+   std::this_thread::sleep_until(start + pause);
+   net::write(paused, net::buffer(std::string("y")));
+   const auto answered = body_size_client::read_response(paused);
+   BOOST_CHECK(answered.result() == http::status::ok);
+   BOOST_CHECK_EQUAL(answered.body(), std::to_string(paused_body));
+   BOOST_REQUIRE(in_flight_becomes(stalled_bytes));
+
+   // Each stalled body's connection closes at its deadline, not before.
+   const auto closed_after = [&](tcp::socket& socket, size_t body_size) {
+      const auto deadline = request_body_read_timeout(body_size);
+      BOOST_CHECK(closed_by_server(read_until_closed(ctx, socket, deadline + server_reaction_limit)));
+      BOOST_CHECK_MESSAGE(steady_clock::now() - start >= deadline,
+                          "a " << body_size << " byte body was cut off before its deadline");
+   };
+   closed_after(small, small_body);
+   closed_after(expecting, small_body);
+   closed_after(large, large_body);
+   BOOST_CHECK(in_flight_becomes(0));
+
+   // With the reservations released, the body refused before now fits.
+   auto served = client.connect();
+   net::write(served, net::buffer(client.header(body_size_client::content_length(too_large_while_stalled))));
+   net::write(served, net::buffer(std::string(too_large_while_stalled, 'x')));
+   const auto response = body_size_client::read_response(served);
+   BOOST_CHECK(response.result() == http::status::ok);
+   BOOST_CHECK_EQUAL(response.body(), std::to_string(too_large_while_stalled));
+
+   for (auto* socket : {&small, &large, &expecting, &paused, &refused, &served})
       socket->close();
    BOOST_CHECK(wait_until([&] { return plugin->requests_in_flight() == 0; }));
 }
