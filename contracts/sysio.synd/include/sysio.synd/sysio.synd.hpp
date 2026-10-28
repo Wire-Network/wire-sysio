@@ -79,12 +79,14 @@
  * outstanding after its own mint, since the carried custody already holds this syndication, `onyield` with
  * the outstanding as it is, since the report is held and mints nothing yet. `sysio.msgch` sends an
  * envelope's messages as inline actions, which run depth-first, so each message sees the mints of the ones
- * before it. The check is one-sided, `custody >= outstanding`, because every message in flight moves
+ * before it. The check is one-sided: excess custody never triggers it, because every message in flight moves
  * custody up or the outstanding down: a syndication is locked before it is minted, a desyndication burned
  * before it is paid (or while its payout is stored as pending), yield claimed before it is reported; an
  * INVALID envelope is burned while the outpost keeps the custody, a request-keyed `refundreturn` after
  * definitive external cancellation restores supply the outpost still holds, and anyone may send tokens to a custody account. An
- * excess is printed (`EXCESS`) and nothing else. A shortfall writes a `mismatch` row, pulls the
+ * excess is printed (`EXCESS`) and nothing else. A shortfall at or below the pair's configured fraction
+ * of outstanding liabilities prints `TOLERATED`; absent configuration means zero tolerance.
+ * A shortfall beyond that tolerance writes a `mismatch` row, pulls the
  * `sysio.andon` cord using the Andon account's active permission when the cord is clear,
  * prints why when it does not, and the message is then held, minted and added to its envelope exactly as
  * without it. Andon must already be deployed for the inline pull to succeed. The check reads live balances
@@ -250,11 +252,15 @@ namespace sysio {
       /// `desynd_fee_flat` is a flat desyndication fee in shadow base units, added to the basis-point
       /// part; it fits an asset and is below `min_desyndicate`, so a minimum desyndication at 0 bps
       /// still nets a positive amount.
+      /// `custody_shortfall_bps` tolerates a custody shortfall of at most this fraction of outstanding
+      /// liabilities (supply plus pending yield), in basis points; zero requires full backing. Must be
+      /// at most 1000 (10%), a hardcoded maximum. Does not clear existing incidents.
       [[sysio::action]] void setconfig(sysio::slug_name chain_code, sysio::slug_name token_code,
                                        uint32_t synd_fee_bps, uint32_t desynd_fee_bps, uint64_t synd_burst,
                                        uint64_t synd_refill, uint64_t desynd_burst, uint64_t desynd_refill,
                                        uint32_t window_sec, uint64_t bounty, uint64_t challenge_extra,
-                                       uint64_t min_desyndicate, uint64_t desynd_fee_flat);
+                                       uint64_t min_desyndicate, uint64_t desynd_fee_flat,
+                                       uint32_t custody_shortfall_bps);
 
       /// Run bounded outcome synchronization, FIFO release, and underwriting, in that order. Sync
       /// visits at most `limit` envelopes; underwriting and release each have `limit` work units and
@@ -617,9 +623,10 @@ namespace sysio {
          /// Flat fee on a desyndication, in shadow base units, added to the basis-point part. It covers the
          /// external-chain gas of the round trip, which the batch operators pay. Below `min_desyndicate`.
          uint64_t         desynd_fee_flat  = 0;
+         uint32_t         custody_shortfall_bps = 0; ///< Inclusive shortfall tolerance / outstanding, in basis points.
          SYSLIB_SERIALIZE(synd_config, (chain_code)(token_code)(synd_fee_bps)(desynd_fee_bps)(synd_burst)
                           (synd_refill)(desynd_burst)(desynd_refill)(window_sec)(bounty)(challenge_extra)(min_desyndicate)
-                          (desynd_fee_flat))
+                          (desynd_fee_flat)(custody_shortfall_bps))
       };
 
       /// Rules by outpost and token.
@@ -693,7 +700,8 @@ namespace sysio {
 
       /// The solvency check of one admitted message on path `path`: `reported`, the outpost custody of the
       /// shadow `st` the message carried, against `expected`, the depot's outstanding shadow of it. At or
-      /// above: nothing, but an excess prints `EXCESS`. Below: a `mismatch` row keyed `(chain_code,
+      /// above: nothing, but an excess prints `EXCESS`. Within tolerance: print `TOLERATED`, preserving
+      /// existing incidents. Beyond tolerance: a `mismatch` row keyed `(chain_code,
       /// token_code)` for the message of `kind` in the envelope of depot epoch `epoch_index`, and a
       /// `sysio.andon::pull` with Andon active authorization when the cord is clear.
       /// Requires Andon to be deployed before processing envelopes.

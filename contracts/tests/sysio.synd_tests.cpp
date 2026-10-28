@@ -26,6 +26,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <limits>
 #include <map>
 #include <sstream>
 #include <string>
@@ -100,9 +101,11 @@ constexpr std::string_view QUEUE_FROZEN_BURN =
    "-- request ruled INVALID while the andon cord is pulled; the burn waits for the clear, the pair waits";
 constexpr std::string_view LINKSWEPT_FROZEN =
    "sysio.synd::linkswept: the andon cord is pulled; the parked balance waits for sweep after the clear";
-/// Console fragments of the solvency check (every verdict line carries one of the two words).
+/// Console fragments of the solvency check (each verdict identifies excess, tolerated loss or shortfall).
 constexpr std::string_view SHORTFALL       = ": SHORTFALL -- reported ";
 constexpr std::string_view EXCESS          = ": EXCESS -- reported ";
+/// A custody loss within the pair's configured allowance does not trigger an incident.
+constexpr std::string_view TOLERATED       = ": TOLERATED -- reported ";
 constexpr std::string_view CORD_PULLED     = ": CORD PULLED -- custody shortfall ";
 constexpr std::string_view CORD_ALREADY    = ": CORD ALREADY PULLED -- the shortfall is recorded";
 /// The intake paths as the verdicts name them.
@@ -479,6 +482,7 @@ public:
       uint64_t challenge_extra = 0;
       uint64_t min_desyndicate = 1; ///< Permissive fixture floor for small-value edge cases.
       uint64_t desynd_fee_flat = 0; ///< Flat desyndication fee, in base units, below `min_desyndicate`.
+      uint32_t custody_shortfall_bps = 0; ///< Strict backing unless this pair explicitly allows a loss.
    };
    action_result setconfig(std::string_view chain_code, std::string_view token_code, const pair_config& cfg,
                            name signer = SYSIO_ACCOUNT) {
@@ -487,8 +491,15 @@ public:
          ("synd_fee_bps", cfg.synd_fee_bps)("desynd_fee_bps", cfg.desynd_fee_bps)("synd_burst", cfg.synd_burst)
          ("synd_refill", cfg.synd_refill)("desynd_burst", cfg.desynd_burst)("desynd_refill", cfg.desynd_refill)
          ("window_sec", cfg.window_sec)("bounty", cfg.bounty)("challenge_extra", cfg.challenge_extra)("min_desyndicate", cfg.min_desyndicate)
-         ("desynd_fee_flat", cfg.desynd_fee_flat);
+         ("desynd_fee_flat", cfg.desynd_fee_flat)("custody_shortfall_bps", cfg.custody_shortfall_bps);
       return push(SYND_ACCOUNT, synd_abi_ser, signer, "setconfig"_n, data);
+   }
+   /// Attest current custody to reconcile an incident without clearing the global cord.
+   action_result reconcile(name signer, uint64_t reported, std::string_view chain_code = SOLANA,
+                           std::string_view token_code = LIQSOL) {
+      return push(SYND_ACCOUNT, synd_abi_ser, signer, "reconcile"_n,
+         mvo()("chain_code", codename_mvo(chain_code))
+              ("token_code", codename_mvo(token_code))("reported", reported));
    }
    action_result dropenv(std::string_view chain_code, std::string_view token_code, uint32_t epoch,
                          name signer = SYSIO_ACCOUNT) {
@@ -3993,6 +4004,146 @@ BOOST_FIXTURE_TEST_CASE(custody_equal_to_the_outstanding_records_nothing, sysio_
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT), supply());
 } FC_LOG_AND_RETHROW()
 
+/// LIQETH accepts losses up to 1% on both intake paths; a single base unit beyond pulls Andon.
+BOOST_FIXTURE_TEST_CASE(custody_tolerance_is_inclusive_on_syndication_and_yield, sysio_synd_tester) try {
+   constexpr uint32_t tolerance_bps = 100;
+   constexpr uint64_t outstanding = 100 * UNIT;
+   constexpr uint64_t loss = UNIT;
+   const auto digest = digest_of("eth-tolerance");
+   const auto pubkey = em_bytes(em_key());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(ETH, LIQETH, {.custody_shortfall_bps = tolerance_bps}));
+   BOOST_REQUIRE_EQUAL(success(), onsynd(ETH, 1, digest, 1, ChainKind::CHAIN_KIND_EVM, pubkey,
+      LIQETH, outstanding, MSGCH_ACCOUNT, outstanding - loss));
+   BOOST_REQUIRE(console_has(TOLERATED));
+   require_no_shortfall();
+   BOOST_REQUIRE_EQUAL(success(), onyield(ETH, 1, digest, 2, 1, LIQETH, UNIT, MSGCH_ACCOUNT,
+      outstanding - loss + 1));
+   require_no_shortfall();
+   BOOST_REQUIRE_EQUAL(success(), onyield(ETH, 1, digest, 3, 1, LIQETH, UNIT, MSGCH_ACCOUNT,
+      outstanding - loss));
+   require_no_shortfall();
+   BOOST_REQUIRE_EQUAL(success(), onyield(ETH, 1, digest, 4, 1, LIQETH, UNIT, MSGCH_ACCOUNT,
+      outstanding - loss - 1));
+   BOOST_REQUIRE(cord_pulled());
+   const auto rows = mismatch_rows();
+   BOOST_REQUIRE_EQUAL(1u, rows.size());
+   require_mismatch(rows[0], ETH, LIQETH, 1, 4, MISMATCH_YIELD, outstanding - loss - 1, outstanding);
+} FC_LOG_AND_RETHROW()
+
+/// A configured token cannot lend its tolerance to another token, even on the same outpost.
+BOOST_FIXTURE_TEST_CASE(custody_tolerance_is_per_pair_and_can_be_disabled, sysio_synd_tester) try {
+   constexpr uint32_t tolerance_bps = 100;
+   constexpr uint64_t amount = 100 * UNIT;
+   const auto digest = digest_of("pair-tolerance");
+   const auto pubkey = ed_bytes(ed_key());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.custody_shortfall_bps = tolerance_bps}));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQTWO, {}));
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 1, ChainKind::CHAIN_KIND_SVM, pubkey,
+      LIQSOL, amount, MSGCH_ACCOUNT, amount - 1));
+   require_no_shortfall();
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 2, ChainKind::CHAIN_KIND_SVM, pubkey,
+      LIQTWO, amount, MSGCH_ACCOUNT, amount - 1));
+   BOOST_REQUIRE(cord_pulled());
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+   BOOST_REQUIRE_EQUAL(success(), onyield(SOLANA, 1, digest, 3, 1, LIQSOL, UNIT, MSGCH_ACCOUNT, amount - 1));
+   BOOST_REQUIRE_EQUAL(2u, mismatch_rows().size());
+} FC_LOG_AND_RETHROW()
+
+/// Increasing tolerance never erases existing evidence or permits reconciliation while underbacked.
+BOOST_FIXTURE_TEST_CASE(custody_tolerance_preserves_incidents_and_full_backing_reconciliation, sysio_synd_tester) try {
+   constexpr uint64_t amount = 100 * UNIT;
+   constexpr uint32_t tolerance_bps = 100;
+   const auto digest = digest_of("incident-tolerance");
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 1, ChainKind::CHAIN_KIND_SVM, ed_bytes(ed_key()),
+      LIQSOL, amount, MSGCH_ACCOUNT, amount - 1));
+   BOOST_REQUIRE(cord_pulled());
+   const auto original = mismatch_rows();
+   BOOST_REQUIRE_EQUAL(1u, original.size());
+   require_mismatch(original[0], SOLANA, LIQSOL, 1, 1, MISMATCH_SYNDICATION, amount - 1, amount);
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.custody_shortfall_bps = tolerance_bps}));
+   BOOST_REQUIRE_EQUAL(success(), onyield(SOLANA, 1, digest, 2, 1, LIQSOL, UNIT, MSGCH_ACCOUNT, amount - 1));
+   const auto rows = mismatch_rows();
+   BOOST_REQUIRE_EQUAL(1u, rows.size());
+   BOOST_REQUIRE_EQUAL(1u, rows[0]["sequence"].as_uint64());
+   BOOST_REQUIRE_EQUAL(original[0]["at"].as<time_point_sec>(), rows[0]["at"].as<time_point_sec>());
+   BOOST_REQUIRE(cord_pulled());
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("custody still below outstanding"), reconcile(SYSIO_ACCOUNT, amount - 1));
+   BOOST_REQUIRE_EQUAL(success(), reconcile(SYSIO_ACCOUNT, amount));
+} FC_LOG_AND_RETHROW()
+
+/// Fractional-base-unit allowances round down; the ratio comparison stays exact at the asset limit.
+BOOST_FIXTURE_TEST_CASE(custody_tolerance_handles_dust_and_large_outstanding, sysio_synd_tester) try {
+   constexpr uint32_t tolerance_bps = 100;
+   // Leave mint headroom for yield intake and align the held amount with the bond increment.
+   constexpr uint64_t amount = (static_cast<uint64_t>(asset::max_amount) / UNIT - 1) * UNIT;
+   constexpr uint64_t percent_denominator = 100;
+   const auto digest = digest_of("large-tolerance");
+   BOOST_REQUIRE_EQUAL(success(), setconfig(ETH, LIQETH, {.custody_shortfall_bps = tolerance_bps}));
+   BOOST_REQUIRE_EQUAL(success(), onsynd(ETH, 1, digest, 1, ChainKind::CHAIN_KIND_EVM, em_bytes(em_key()),
+      LIQETH, amount, MSGCH_ACCOUNT, amount - amount / percent_denominator));
+   require_no_shortfall();
+   BOOST_REQUIRE_EQUAL(success(), onyield(ETH, 1, digest, 2, 1, LIQETH, 1, MSGCH_ACCOUNT,
+      amount - amount / percent_denominator - 1));
+   BOOST_REQUIRE(cord_pulled());
+   // Unlike the near-boundary readings, half backing distinguishes widened products from uint64
+   // wraparound: narrowing both products would tolerate this report and leave sequence 2's evidence.
+   constexpr uint64_t half_backed = amount / 2;
+   BOOST_REQUIRE_EQUAL(success(), onyield(ETH, 1, digest, 3, 1, LIQETH, 1, MSGCH_ACCOUNT, half_backed));
+   const auto large_incidents = mismatch_rows();
+   BOOST_REQUIRE_EQUAL(1u, large_incidents.size());
+   require_mismatch(large_incidents[0], ETH, LIQETH, 1, 3, MISMATCH_YIELD, half_backed, amount);
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 1, ChainKind::CHAIN_KIND_SVM, ed_bytes(ed_key()),
+      LIQSOL, 1, MSGCH_ACCOUNT, 1));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.custody_shortfall_bps = tolerance_bps}));
+   BOOST_REQUIRE_EQUAL(success(), onyield(SOLANA, 1, digest, 2, 1, LIQSOL, 1, MSGCH_ACCOUNT, 0));
+   BOOST_REQUIRE(cord_pulled());
+   BOOST_REQUIRE_EQUAL(2u, mismatch_rows().size());
+} FC_LOG_AND_RETHROW()
+
+/// Configuration accepts the hardcoded 10% cap and rejects every value above it.
+BOOST_FIXTURE_TEST_CASE(custody_tolerance_configuration_is_bounded, sysio_synd_tester) try {
+   constexpr uint32_t maximum_bps = 1'000;
+   constexpr uint32_t full_loss_bps = 10'000;
+   constexpr std::string_view message = "custody shortfall tolerance must be at most 1000 basis points";
+   for (const uint32_t invalid : {maximum_bps + 1, full_loss_bps, std::numeric_limits<uint32_t>::max()}) {
+      BOOST_REQUIRE_EQUAL(wasm_assert_msg(std::string(message)),
+         setconfig(ETH, LIQETH, {.custody_shortfall_bps = invalid}));
+      BOOST_REQUIRE(config_row(ETH, LIQETH).is_null());
+   }
+   BOOST_REQUIRE_EQUAL(success(), setconfig(ETH, LIQETH, {.custody_shortfall_bps = maximum_bps}));
+   BOOST_REQUIRE_EQUAL(maximum_bps, config_row(ETH, LIQETH)["custody_shortfall_bps"].as_uint64());
+   BOOST_REQUIRE_EQUAL(success(), onsynd(ETH, 1, digest_of("total-loss"), 1, ChainKind::CHAIN_KIND_EVM,
+      em_bytes(em_key()), LIQETH, UNIT, MSGCH_ACCOUNT, 0));
+   BOOST_REQUIRE(cord_pulled());
+} FC_LOG_AND_RETHROW()
+
+/// The allowance includes pending yield and syndication's imminent mint; the next unit of loss trips it.
+BOOST_FIXTURE_TEST_CASE(custody_tolerance_uses_all_outstanding_on_syndication, sysio_synd_tester) try {
+   constexpr uint32_t tolerance_bps = 100;
+   constexpr uint64_t initial = 50 * UNIT;
+   constexpr uint64_t pending_yield = 49 * UNIT;
+   constexpr uint64_t amount = UNIT;
+   constexpr uint64_t outstanding = initial + pending_yield + amount;
+   constexpr uint64_t loss = UNIT;
+   constexpr uint64_t percent_denominator = 100;
+   constexpr uint64_t next_reported = outstanding + amount - (outstanding + amount) / percent_denominator - 1;
+   const auto pubkey = ed_bytes(ed_key());
+   const auto digest = digest_of("pending-tolerance");
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.custody_shortfall_bps = tolerance_bps}));
+   BOOST_REQUIRE_EQUAL(success(), liq_mint(SYND_ACCOUNT, LIQSOL, initial));
+   BOOST_REQUIRE_EQUAL(success(), liq_mintyield(SOLANA, LIQSOL, pending_yield));
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 1, ChainKind::CHAIN_KIND_SVM,
+      pubkey, LIQSOL, amount, MSGCH_ACCOUNT, outstanding - loss));
+   require_no_shortfall();
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 2, ChainKind::CHAIN_KIND_SVM,
+      pubkey, LIQSOL, amount, MSGCH_ACCOUNT, next_reported));
+   BOOST_REQUIRE(cord_pulled());
+   const auto rows = mismatch_rows();
+   BOOST_REQUIRE_EQUAL(1u, rows.size());
+   require_mismatch(rows[0], SOLANA, LIQSOL, 1, 2, MISMATCH_SYNDICATION,
+      next_reported, outstanding + amount);
+} FC_LOG_AND_RETHROW()
+
 // Custody above the outstanding -- a donation to the custody account -- is normal: it is printed as EXCESS
 // and nothing else happens.
 BOOST_FIXTURE_TEST_CASE(an_excess_is_printed_and_nothing_else, sysio_synd_tester) try {
@@ -4276,9 +4427,6 @@ BOOST_FIXTURE_TEST_CASE(incident_reconciliation_is_explicit_and_pair_local, sysi
    BOOST_REQUIRE_EQUAL(success(), onyield(SOLANA, 1, digest_of("one"), 2, 2, LIQSOL, UNIT,
                                          MSGCH_ACCOUNT, 10 * UNIT));
    BOOST_REQUIRE_EQUAL(1u, mismatch_rows().size());
-   const auto reconcile = [&](name signer, uint64_t reported) { return push(SYND_ACCOUNT, synd_abi_ser,
-      signer, "reconcile"_n, mvo()("chain_code", codename_mvo(SOLANA))
-      ("token_code", codename_mvo(LIQSOL))("reported", reported)); };
    BOOST_REQUIRE(mentions(reconcile("alice"_n, 10 * UNIT), "missing authority of sysio"));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("custody still below outstanding"), reconcile(SYSIO_ACCOUNT, 9 * UNIT));
    BOOST_REQUIRE_EQUAL(success(), reconcile(SYSIO_ACCOUNT, 10 * UNIT));
