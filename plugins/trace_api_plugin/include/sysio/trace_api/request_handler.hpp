@@ -2,8 +2,10 @@
 
 #include <algorithm>
 #include <cassert>
+#include <functional>
 #include <limits>
 #include <optional>
+#include <string_view>
 #include <type_traits>
 #include <fc/exception/exception.hpp>
 #include <fc/variant.hpp>
@@ -16,24 +18,17 @@
 #include <sysio/trace_api/common.hpp>
 
 namespace sysio::trace_api {
-   using data_handler_function = std::function<std::tuple<fc::variant, std::optional<fc::variant>>( const std::variant<action_trace_v0>& action)>;
-
-   // Streaming counterpart of data_handler_function: instead of returning a variant tuple that the caller then
-   // re-serializes to JSON, the callback emits the action's "params" and (when applicable) "return_data"
-   // key/value pairs directly into the writer.  Decoded bytes flow straight from abi_serializer through
-   // binary_to_json_stream into the output buffer with no intermediate fc::variant allocation.
+   // Emits an action's ABI-decoded "params" and (when applicable) "return_data" key/value pairs directly into the
+   // writer.  Decoded bytes flow straight from abi_serializer through binary_to_json_stream into the output buffer
+   // with no intermediate fc::variant allocation.
    using stream_data_handler_function = std::function<void(const std::variant<action_trace_v0>& action, fc::json_writer& w)>;
 
    namespace detail {
       class response_formatter {
       public:
-         static fc::variant process_block( const data_log_entry& trace, bool irreversible, const data_handler_function& data_handler );
-
-         // Streaming counterpart: emit the same JSON payload as process_block directly into the
-         // caller-provided fc::json_writer, skipping the fc::mutable_variant_object tree entirely.
-         // Output is byte-for-byte identical to fc::json::to_string(process_block(...)).  The HTTP
-         // path passes the guarded writer the streaming callback provides, so the memory budget
-         // observes the response while it serializes.
+         // Emit a block trace's JSON directly into the caller-provided fc::json_writer.  The HTTP path
+         // passes the guarded writer the streaming callback provides, so the memory budget observes the
+         // response while it serializes.
          static void process_block_to_stream( const data_log_entry& trace, bool irreversible, const stream_data_handler_function& data_handler, fc::json_writer& w );
 
          // Buffer-building wrapper over process_block_to_stream (unguarded writer into a local
@@ -48,8 +43,7 @@ namespace sysio::trace_api {
          // Streaming counterpart for a single transaction inside a block trace.  Walks the block's
          // transaction list and, for the first entry whose id matches trxid, emits just that
          // transaction's JSON object (no surrounding block wrapper) into the caller-provided writer.
-         // Returns false (and emits nothing) if no transaction in the block matches.  Output for a
-         // matching trx is byte-for-byte identical to fc::json::to_string(get_transaction_trace(...)).
+         // Returns false (and emits nothing) if no transaction in the block matches.
          static bool process_transaction_to_stream( const data_log_entry& trace, const chain::transaction_id_type& trxid, const stream_data_handler_function& data_handler, fc::json_writer& w );
 
          // Buffer-building wrapper over process_transaction_to_stream; returns an empty string on a
@@ -58,38 +52,11 @@ namespace sysio::trace_api {
       };
    }
 
-   // Serialise an action's authorization vector to {actor, permission} JSON
-   // objects.  Shared by get_block (response_formatter) and the get_actions
-   // / get_token_transfers handlers below.
-   inline fc::variants serialize_authorizations(const std::vector<authorization_trace_v0>& auths) {
-      fc::variants result;
-      result.reserve(auths.size());
-      for (const auto& a : auths)
-         result.emplace_back(fc::mutable_variant_object()
-            ("actor",      a.actor.to_string())
-            ("permission", a.permission.to_string()));
-      return result;
-   }
-
-   // ABI decode payload used by the shared variant builder below.  Mirrors
-   // abi_data_handler::decode_result fields that end up in the HTTP response.
-   struct decoded_action {
-      fc::variant                params;
-      std::optional<fc::variant> return_data;
-      std::string                error_message;
-   };
-
-   enum class variant_shape {
+   /// The fields an action object carries.
+   enum class action_shape {
       full,  // get_actions / get_block: every field on action_trace_v0
       slim,  // get_token_transfers: drops ordinals, receipt seqs, ram_deltas, resource usage
    };
-
-   // Shared action->variant builder used by get_actions, get_token_transfers,
-   // and the legacy process_block path.  Lives in request_handler.cpp so the
-   // formatting logic isn't duplicated in every template instantiation.
-   fc::mutable_variant_object build_action_variant(const action_trace_v0& a,
-                                                   const decoded_action& decoded,
-                                                   variant_shape shape);
 
    /**
     * Filter parameters for the get_actions endpoint.
@@ -109,26 +76,69 @@ namespace sysio::trace_api {
     * matching actions are decoded, hex-serialized, and held in memory from that window, so a broad
     * or unfiltered query over a busy range cannot materialize an unbounded response set.
     *
-    * Enforced at block boundaries (see get_actions_impl): the scan stops once a fully scanned block
+    * Enforced at block boundaries (see scan_actions): the scan stops once a fully scanned block
     * brings the running total to this value, so a single response may exceed it by at most one
     * block's worth of matching actions (itself bounded by consensus block limits).  Clients page
-    * past the ceiling by resuming the scan at actions_result::last_block_num + 1.
+    * past the ceiling by resuming the scan at the response's block_num_end + 1.
     *
     * Intentionally a hard-coded constant, NOT a nodeop configuration option: there is no setting to
     * raise or disable it, so the bound holds on every node regardless of operator configuration.
     */
    inline constexpr uint32_t max_actions_per_response = 10'000;
 
+   /// Key of the action list in a get_actions response.
+   inline constexpr std::string_view actions_list_key   = "actions";
+   /// Key of the action list in a get_token_transfers response.
+   inline constexpr std::string_view transfers_list_key = "transfers";
+
    /**
-    * Result returned by get_actions.
+    * A transaction holding at least one action a get_actions / get_token_transfers scan matched.  The scan moves
+    * the matched actions out of the block trace it read, so building the response never holds a whole block.
     */
-   struct actions_result {
-      fc::variants actions;
-      /// Highest block number fully scanned by the request.  Equals the clamped block_num_end on a
-      /// complete scan; lower when max_actions_per_response stopped the scan early.  Clients resume
-      /// at last_block_num + 1.
-      uint32_t     last_block_num = 0;
+   struct matched_transaction {
+      chain::transaction_id_type          id;
+      uint32_t                            block_num = 0;
+      chain::block_timestamp_type         block_time;
+      std::optional<chain::block_id_type> producer_block_id;
+      uint32_t                            cpu_usage_us = 0;
+      fc::unsigned_int                    net_usage_words;
+      bool                                irreversible = false; ///< finality of the containing block
+      std::vector<action_trace_v0>        actions;              ///< the matches, in global_sequence order
    };
+
+   /**
+    * A get_actions / get_token_transfers scan before any action is decoded.
+    */
+   struct actions_scan {
+      std::vector<matched_transaction> transactions;
+      size_t                           action_count   = 0;
+      /// Highest block number fully scanned, reported as the response's block_num_end.  Equals the clamped
+      /// block_num_end on a complete scan; lower when max_actions_per_response stopped the scan early.  Clients
+      /// resume at last_block_num + 1.
+      uint32_t                         last_block_num = 0;
+   };
+
+   /**
+    * A scanned get_actions / get_token_transfers response.  emit writes the whole response object from the
+    * matched traces it owns, decoding each action straight into the writer.  retained_size is the packed size of
+    * those traces, so the HTTP layer can charge them to its memory budget until the response is written.
+    */
+   struct actions_emitter {
+      std::function<void(fc::json_writer&)> emit;
+      size_t                                retained_size = 0;
+   };
+
+   /// Write the transaction and block fields that end every get_actions / get_token_transfers action object.
+   void write_transaction_fields(fc::json_writer& w, const matched_transaction& trx, action_shape shape);
+
+   /**
+    * Write the fields of an action object that come from the trace itself: everything before the decoded "params".
+    * Shared by the get_block / get_transaction_trace and get_actions / get_token_transfers responses.
+    */
+   void write_action_fields(fc::json_writer& w, const action_trace_v0& a, action_shape shape);
+
+   /// Packed size of the action traces a scan holds: the estimate actions_emitter::retained_size reports.
+   size_t packed_size(const actions_scan& scan);
 
    /**
     * Fill query.block_num_start / block_num_end from an already-parsed request body object.
@@ -206,32 +216,7 @@ namespace sysio::trace_api {
       }
 
       /**
-       * Fetch the trace for a given block height and convert it to a fc::variant for conversion to a final format
-       * (eg JSON)
-       *
-       * @param block_height - the height of the block whose trace is requested
-       * @return a properly formatted variant representing the trace for the given block height if it exists, an
-       * empty variant otherwise.
-       * @throws bad_data_exception when there are issues with the underlying data preventing processing.
-       */
-      fc::variant get_block_trace( uint32_t block_height ) {
-         auto data = logfile_provider.get_block(block_height);
-         if (!data) {
-            _log("No block found at block height " + std::to_string(block_height) );
-            return {};
-         }
-
-         auto data_handler = [this](const std::variant<action_trace_v0>& action) -> std::tuple<fc::variant, std::optional<fc::variant>> {
-            return std::visit([&](const auto& a) {
-               return data_handler_provider.serialize_to_variant(a);
-            }, action);
-         };
-
-         return detail::response_formatter::process_block(std::get<0>(*data), std::get<1>(*data), data_handler);
-      }
-
-      /**
-       * Streaming variant of get_block_trace for the HTTP streaming-callback path.
+       * Fetch the trace for a given block height, for the HTTP streaming-callback path.
        *
        * Resolves block existence up front so the caller can produce its 404 before
        * committing to a 200 emitter; the returned closure (owning the block's decoded
@@ -275,75 +260,7 @@ namespace sysio::trace_api {
       }
 
       /**
-       * Fetch the trace for a given transaction id and convert it to a fc::variant for conversion to a final format
-       * (eg JSON)
-       *
-       * @param trxid - the transaction id whose trace is requested
-       * @param block_height - the height of the block whose trace contains requested transaction trace
-       * @return a properly formatted variant representing the trace for the given transaction id if it exists, an
-       * empty variant otherwise.
-       * @throws bad_data_exception when there are issues with the underlying data preventing processing.
-       */
-      fc::variant get_transaction_trace(chain::transaction_id_type trxid, uint32_t block_height){
-         _log("get_transaction_trace called" );
-         // Named local with the exact return type so the compiler can NRVO it
-         // directly into the caller's slot.  Scan the raw transaction_trace_v0[]
-         // for a matching id (cheap sha256 equality) and build the variant for
-         // ONLY the matching trx.  The previous implementation materialised the
-         // full block variant (ABI-decoding every action) and then string-matched
-         // through the resulting JSON, which cost O(block) work per lookup.
-         fc::variant result;
-
-         auto data = logfile_provider.get_block(block_height);
-         if (!data) {
-            _log("No block found at block height " + std::to_string(block_height));
-            return result;
-         }
-
-         auto data_handler = [this](const std::variant<action_trace_v0>& action) -> std::tuple<fc::variant, std::optional<fc::variant>> {
-            return std::visit([&](const auto& a) {
-               return data_handler_provider.serialize_to_variant(a);
-            }, action);
-         };
-         const bool irreversible = std::get<1>(*data);
-
-         std::visit([&](const auto& block_trace) {
-            for (const auto& trx : block_trace.transactions) {
-               if (trx.id == trxid) {
-                  // Build a single-transaction variant by calling the shared
-                  // formatter on a synthesized block containing only this trx.
-                  // Copy the scalar header fields plus the one matching
-                  // transaction - copying the whole block first (and discarding
-                  // its transaction vector) would duplicate every action's data
-                  // buffers and decode nothing extra for it.
-                  std::decay_t<decltype(block_trace)> single;
-                  single.id                = block_trace.id;
-                  single.number            = block_trace.number;
-                  single.previous_id       = block_trace.previous_id;
-                  single.timestamp         = block_trace.timestamp;
-                  single.producer          = block_trace.producer;
-                  single.transaction_mroot = block_trace.transaction_mroot;
-                  single.finality_mroot    = block_trace.finality_mroot;
-                  single.transactions      = {trx};
-                  auto block_var = detail::response_formatter::process_block(
-                     data_log_entry{std::move(single)}, irreversible, data_handler);
-                  const auto& obj = block_var.get_object();
-                  if (obj.contains("transactions")) {
-                     const auto& txs = obj["transactions"];
-                     if (!txs.is_null() && txs.size() > 0)
-                        result = txs[size_t{0}];
-                  }
-                  return;
-               }
-            }
-            _log("Transaction id " + trxid.str() + " not found in block " + std::to_string(block_height));
-         }, std::get<0>(*data));
-
-         return result;
-      }
-
-      /**
-       * Streaming variant of get_transaction_trace for the HTTP streaming-callback path.
+       * Fetch the trace for a given transaction id, for the HTTP streaming-callback path.
        *
        * Resolves both misses up front -- block absent, or trxid not present in the block
        * (via response_formatter::contains_transaction) -- so the caller can produce its
@@ -394,30 +311,78 @@ namespace sysio::trace_api {
       }
 
       /**
-       * Scan a block range for action traces matching the given filter.
+       * Scan a block range for action traces matching the given filter, for get_actions.
        *
-       * Blocks are scanned in ascending order.  Within each block, actions are visited in ascending
+       * Blocks are scanned in ascending order.  Within each block, actions are listed in ascending
        * global_sequence order.  Matching actions in the (caller-clamped) block range are returned up
        * to max_actions_per_response; if that ceiling is reached the scan stops at the next block
-       * boundary and actions_result::last_block_num reports the last block fully scanned, so the
-       * client can resume at last_block_num + 1.  Capping the block window itself remains the
+       * boundary and the response's block_num_end reports the last block fully scanned, so the
+       * client can resume at block_num_end + 1.  Capping the block window itself remains the
        * caller's responsibility (trace-max-block-range).
        *
-       * @param query - filter parameters
-       * @return actions_result with the matching actions and the last block scanned
+       * Scans now and returns an emitter for the whole response, {"block_num_start", "block_num_end",
+       * "actions": [...]}, that decodes each matched action straight into the caller's writer.  The emitter
+       * binds `this`, so it must not outlive the handler.
+       *
+       * @param query - filter parameters; block_num_start is echoed in the response
        */
-      actions_result get_actions(const action_query& query) {
-         return get_actions_impl(query, variant_shape::full);
+      actions_emitter get_actions_emitter(const action_query& query) {
+         return make_actions_emitter(query, action_shape::full, actions_list_key);
       }
 
-      /// Slim response for get_token_transfers: transfer-relevant fields only.
-      /// Omits execution-tree ordinals, receipt sequences, ram_deltas, and resource usage.
-      /// Subject to the same max_actions_per_response ceiling as get_actions.
-      actions_result get_token_transfer_actions(const action_query& query) {
-         return get_actions_impl(query, variant_shape::slim);
+      /// get_token_transfers: as get_actions_emitter, with the slim shape (transfer-relevant fields only: no
+      /// execution-tree ordinals, receipt sequences, ram_deltas or resource usage) listed under "transfers".
+      actions_emitter get_token_transfer_actions_emitter(const action_query& query) {
+         return make_actions_emitter(query, action_shape::slim, transfers_list_key);
+      }
+
+      /**
+       * Buffer-building wrapper over get_actions_emitter: emits the response into a local string through an
+       * unguarded writer.  Kept for tests; the HTTP path uses the emitter so the guarded writer's budget applies.
+       */
+      std::string get_actions_json(const action_query& query) {
+         return emit_to_json(get_actions_emitter(query));
+      }
+
+      /// Buffer-building wrapper over get_token_transfer_actions_emitter, as get_actions_json.
+      std::string get_token_transfer_actions_json(const action_query& query) {
+         return emit_to_json(get_token_transfer_actions_emitter(query));
       }
 
    private:
+      static std::string emit_to_json(const actions_emitter& emitter) {
+         std::string out;
+         {
+            fc::json_writer w(out);
+            emitter.emit(w);
+         }
+         return out;
+      }
+
+      actions_emitter make_actions_emitter(const action_query& query, action_shape shape, std::string_view list_key) {
+         actions_scan scan     = scan_actions(query);
+         const size_t retained = packed_size(scan);
+         return {[this, scan = std::move(scan), block_num_start = query.block_num_start, shape,
+                  list_key](fc::json_writer& w) {
+                    w.begin_object();
+                    w.set("block_num_start", block_num_start).set("block_num_end", scan.last_block_num);
+                    w.key(list_key);
+                    w.begin_array();
+                    for (const auto& trx : scan.transactions) {
+                       for (const auto& a : trx.actions) {
+                          w.begin_object();
+                          write_action_fields(w, a, shape);
+                          data_handler_provider.decode_to_json_stream(a, w);
+                          write_transaction_fields(w, trx, shape);
+                          w.end_object();
+                       }
+                    }
+                    w.end_array();
+                    w.end_object();
+                 },
+                 retained};
+      }
+
       /// Adapter from the provider's per-action streaming serializer to the
       /// stream_data_handler_function shape the response_formatter consumes.  Shared by
       /// both emitter factories; binds `this`, so emitters must not outlive the handler.
@@ -429,8 +394,14 @@ namespace sysio::trace_api {
          };
       }
 
-      actions_result get_actions_impl(const action_query& query, variant_shape shape) {
-         actions_result result;
+      /**
+       * Collect the action traces in the query's block range that match its filter, without decoding them.  Each
+       * match is moved out of the block trace it was read from, along with its transaction's fields, so a block is
+       * held only while it is scanned.  Stops at the block boundary where the match count reaches
+       * max_actions_per_response (see get_actions_emitter).
+       */
+      actions_scan scan_actions(const action_query& query) {
+         actions_scan scan;
 
          // Hoist filter state out of the hot loop: avoids re-loading the optional's discriminator and value on every
          // action comparison in the inner scan.
@@ -443,7 +414,7 @@ namespace sysio::trace_api {
 
          // Reused across all transactions in all blocks: clear() keeps the vector's capacity so repeated scans of
          // trxs with similar action counts avoid per-trx allocations.
-         std::vector<const action_trace_v0*> matches;
+         std::vector<action_trace_v0*> matches;
 
          // Per-slice bloom skip state.  When the caller supplies a receiver (or a non-include_notifications
          // request whose receiver is auto-mirrored onto account upstream), probe the slice's receiver bloom and
@@ -467,7 +438,7 @@ namespace sysio::trace_api {
          // Default to reporting a complete scan; lowered below only if the action ceiling stops us
          // early.  On natural completion this stays at the clamped end, so trailing blocks with no
          // recorded data are still counted as scanned and a client resumes past them, not before.
-         result.last_block_num = query.block_num_end;
+         scan.last_block_num = query.block_num_end;
 
          const uint64_t end = query.block_num_end;
          for (uint64_t bn = query.block_num_start; bn <= end; ++bn) {
@@ -506,11 +477,10 @@ namespace sysio::trace_api {
             // tuple so callers can trust trace_api as a single source of truth for "did this action's
             // block reach finality."  Promotion (pending -> irreversible) happens out-of-band as LIB
             // advances; consumers that gate on finality must re-poll, same as get_block today.
-            const bool        irreversible_block = std::get<1>(*data);
-            const char* const block_status_str   = irreversible_block ? "irreversible" : "pending";
+            const bool irreversible_block = std::get<1>(*data);
 
-            std::visit([&](const auto& bt) {
-               for (const auto& trx : bt.transactions) {
+            std::visit([&](auto& bt) {
+               for (auto& trx : bt.transactions) {
                   // Filter first, sort after.  trx.actions is stored in schedule order (how apply_context scheduled
                   // action slots), which is NOT global_sequence order when a parent action queues both inline actions
                   // and require_recipient notifications: notifications run before inlines, so the inline's
@@ -520,7 +490,7 @@ namespace sysio::trace_api {
                   // filtering avoids the cost for transactions whose actions are all rejected by the filter - the
                   // common case when scanning for a specific receiver/account/action across a wide block range.
                   matches.clear();
-                  for (const auto& a : trx.actions) {
+                  for (auto& a : trx.actions) {
                      if (has_receiver && a.receiver != receiver_name) continue;
                      if (has_account  && a.account  != account_name)  continue;
                      if (has_action   && a.action   != action_name)   continue;
@@ -529,36 +499,19 @@ namespace sysio::trace_api {
                   if (matches.empty()) continue;
                   std::ranges::sort(matches, {}, &action_trace_v0::global_sequence);
 
-                  // Hoist per-trx variant fields so a multi-match trx doesn't repeat the checksum->hex conversion or
-                  // re-read the same block-level members for each emitted action.  trx_cpu_usage_us /
-                  // trx_net_usage_words are full-shape only - they are the parent transaction's resource totals
-                  // (action-level cpu_usage_us / net_usage are per-action and in different units: action net_usage
-                  // is bytes, trx net_usage_words is ceil(net_usage / 8)).  Slim (get_token_transfers) omits all
-                  // resource fields, so we don't emit the trx-level totals there either.
-                  const std::string trx_id_str = trx.id.str();
-                  const uint32_t    trx_block  = trx.block_num;
-                  const auto&       trx_time   = trx.block_time;
-                  const auto&       trx_pbid   = trx.producer_block_id;
-                  const bool        full_shape = (shape == variant_shape::full);
-
-                  for (const action_trace_v0* ap : matches) {
-                     const auto& a = *ap;
-                     // Decode via the provider; build the variant via the shared helper so get_actions /
-                     // get_token_transfers / get_block all agree on field shapes.
-                     auto dec = data_handler_provider.decode(a);
-                     decoded_action da{std::move(dec.params), std::move(dec.return_data), std::move(dec.error_message)};
-                     fc::mutable_variant_object av = build_action_variant(a, da, shape);
-                     av("trx_id",            trx_id_str)
-                       ("block_num",         trx_block)
-                       ("block_time",        trx_time)
-                       ("producer_block_id", trx_pbid)
-                       ("block_status",      block_status_str);
-                     if (full_shape) {
-                        av("trx_cpu_usage_us",    trx.cpu_usage_us)
-                          ("trx_net_usage_words", trx.net_usage_words);
-                     }
-                     result.actions.emplace_back(std::move(av));
-                  }
+                  // The block is discarded after this scan, so its matched actions move into the result.
+                  matched_transaction& matched = scan.transactions.emplace_back();
+                  matched.id                   = trx.id;
+                  matched.block_num            = trx.block_num;
+                  matched.block_time           = trx.block_time;
+                  matched.producer_block_id    = trx.producer_block_id;
+                  matched.cpu_usage_us         = trx.cpu_usage_us;
+                  matched.net_usage_words      = trx.net_usage_words;
+                  matched.irreversible         = irreversible_block;
+                  matched.actions.reserve(matches.size());
+                  for (action_trace_v0* ap : matches)
+                     matched.actions.push_back(std::move(*ap));
+                  scan.action_count += matches.size();
                }
             }, std::get<0>(*data));
 
@@ -566,13 +519,13 @@ namespace sysio::trace_api {
             // was scanned in full above, so no partial block is ever returned and a client resuming
             // at last_block_num + 1 neither skips nor duplicates actions.  Worst-case overshoot is
             // one block's matching actions.
-            if (result.actions.size() >= max_actions_per_response) {
-               result.last_block_num = block_num;
+            if (scan.action_count >= max_actions_per_response) {
+               scan.last_block_num = block_num;
                break;
             }
          }
 
-         return result;
+         return scan;
       }
 
       LogfileProvider logfile_provider;

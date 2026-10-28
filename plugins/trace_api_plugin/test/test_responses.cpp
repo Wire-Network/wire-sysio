@@ -46,14 +46,8 @@ struct response_test_fixture {
       :fixture(fixture)
       {}
 
-      std::tuple<fc::variant, std::optional<fc::variant>> serialize_to_variant(const action_trace_v0& action) {
-         return fixture.mock_data_handler(action);
-      }
-
-      // Streaming peer for the mock: delegates to the same mock_data_handler that the variant path uses,
-      // then walks the resulting variant via fc::to_json_stream so the streaming output matches the
-      // variant output byte-for-byte.  Production uses abi_serializer::binary_to_json_stream end-to-end;
-      // here we don't have a real ABI, so we fake parity by re-using the variant tuple.
+      // Writes the decoded fields mock_data_handler returns.  Production decodes with
+      // abi_serializer::binary_to_json_stream; these tests have no ABI.
       void serialize_to_json_stream(const action_trace_v0& action, fc::json_writer& w) {
          auto [params, return_data] = fixture.mock_data_handler(action);
          if (!params.is_null()) {
@@ -78,16 +72,20 @@ struct response_test_fixture {
 
    }
 
+   /// The block trace response parsed back from its JSON, or a null variant when the block is missing.
    fc::variant get_block_trace( uint32_t block_height ) {
-      return response_impl.get_block_trace( block_height );
+      const std::string json = get_block_trace_json( block_height );
+      return json.empty() ? fc::variant() : fc::json::from_string( json );
    }
 
    std::string get_block_trace_json( uint32_t block_height ) {
       return response_impl.get_block_trace_json( block_height );
    }
 
+   /// The transaction trace response parsed back from its JSON, or a null variant on a miss.
    fc::variant get_transaction_trace( const chain::transaction_id_type& trxid, uint32_t block_height ) {
-      return response_impl.get_transaction_trace( trxid, block_height );
+      const std::string json = get_transaction_trace_json( trxid, block_height );
+      return json.empty() ? fc::variant() : fc::json::from_string( json );
    }
 
    std::string get_transaction_trace_json( const chain::transaction_id_type& trxid, uint32_t block_height ) {
@@ -562,12 +560,9 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
       BOOST_TEST(null_response.is_null());
    }
 
-   // The streaming JSON response (process_block_to_json) must produce the same
-   // observable shape as the variant response (process_block) for every field.
-   // Round-trip the streaming bytes through fc::json::from_string and compare
-   // key-by-key with the variant path.  Catches silent shape regressions like
-   // status: "executed" -> 0 or block_time: {"slot":N} -> N.
-   BOOST_FIXTURE_TEST_CASE(streaming_vs_variant_block_response_parity, response_test_fixture)
+   // Exact block response bytes: field order, number formats and string encodings.  Catches silent shape
+   // regressions like status: "executed" -> 0 or block_time: {"slot":N} -> N.
+   BOOST_FIXTURE_TEST_CASE(block_response_exact_json, response_test_fixture)
    {
       action_trace_v0 action_trace{};
       action_trace.global_sequence = 0;
@@ -605,18 +600,30 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
          return std::make_tuple(data_log_entry(block_trace), false);
       };
 
-      fc::variant variant_response   = get_block_trace( 1 );
-      std::string streamed_response  = get_block_trace_json( 1 );
-      fc::variant streamed_as_variant = fc::json::from_string( streamed_response );
-
-      BOOST_TEST(to_kv(variant_response) == to_kv(streamed_as_variant), boost::test_tools::per_element());
+      BOOST_TEST(get_block_trace_json( 1 ) ==
+                 R"json({"id":"b000000000000000000000000000000000000000000000000000000000000001","number":1,)json"
+                 R"json("previous_id":"0000000000000000000000000000000000000000000000000000000000000000",)json"
+                 R"json("status":"pending","timestamp":"2025-01-01T00:00:00.000Z","producer":"bp.one",)json"
+                 R"json("transaction_mroot":"0000000000000000000000000000000000000000000000000000000000000000",)json"
+                 R"json("finality_mroot":"0000000000000000000000000000000000000000000000000000000000000000",)json"
+                 R"json("transactions":[{"id":"0000000000000000000000000000000000000000000000000000000000000001")json"
+                 R"json(,"block_num":1,"block_time":"2025-01-01T00:00:00.000","producer_block_id":null,)json"
+                 R"json("actions":[{"global_sequence":0,"receiver":"receiver","account":"contract",)json"
+                 R"json("name":"action","authorization":[{"actor":"alice","permission":"active"}],)json"
+                 R"json("data":"00010203","return_value":"04050607","action_ordinal":0,)json"
+                 R"json("creator_action_ordinal":0,"closest_unnotified_ancestor_action_ordinal":0,)json"
+                 R"json("recv_sequence":0,"auth_sequence":[],"code_sequence":0,"abi_sequence":0,)json"
+                 R"json("account_ram_deltas":[],"params":{"hex":"00010203"},"return_data":{"hex":"04050607"}}],)json"
+                 R"json("cpu_usage_us":10,"net_usage_words":5,"signatures":["SIG_K1_1111111111111111111111111111)json"
+                 R"json(11111111111111111111111111111111111116uk5ne"],)json"
+                 R"json("transaction_header":{"expiration":"1970-01-01T00:00:00","ref_block_num":1,)json"
+                 R"json("ref_block_prefix":0,"max_net_usage_words":100,"max_cpu_usage_ms":50,"delay_sec":0}}]})json");
    }
 
-   // The streaming JSON response (process_transaction_to_json) must produce the same observable shape as the variant
-   // response (get_transaction_trace) for a matching trxid.  Round-trip the streaming bytes through fc::json::from_string
-   // and compare key-by-key with the variant path.  Catches silent shape regressions in the per-transaction emitter that
-   // the block-level parity test would not detect because they are masked by the surrounding block wrapper.
-   BOOST_FIXTURE_TEST_CASE(streaming_vs_variant_transaction_response_parity, response_test_fixture)
+   // Exact transaction response bytes for a matching trxid, and an empty response for a missing one.  Catches
+   // shape regressions in the per-transaction emitter that the block-level test would not, because they are
+   // masked by the surrounding block wrapper.
+   BOOST_FIXTURE_TEST_CASE(transaction_response_exact_json, response_test_fixture)
    {
       auto trx_id_a = "0000000000000000000000000000000000000000000000000000000000000001"_h;
       auto trx_id_b = "0000000000000000000000000000000000000000000000000000000000000002"_h;
@@ -630,8 +637,8 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
       action_a.data            = { 0x00, 0x01, 0x02, 0x03 };
       action_a.return_value    = { 0x04, 0x05, 0x06, 0x07 };
 
-      // Populate every optional / container field the full variant shape emits, so the
-      // parity assertion also covers the ordinal, auth_sequence, ram-delta and usage paths.
+      // Populate every optional / container field the full shape emits, so the
+      // assertion also covers the ordinal, auth_sequence, ram-delta and usage paths.
       action_trace_v0 action_b{};
       action_b.action_ordinal                             = 2;
       action_b.creator_action_ordinal                     = 1;
@@ -688,24 +695,24 @@ BOOST_AUTO_TEST_SUITE(trace_responses)
          return std::make_tuple(data_log_entry(block_trace), false);
       };
 
-      // Hit case: trxid present in the block.  Both paths must agree on every field.
-      {
-         fc::variant variant_response    = get_transaction_trace( trx_id_b, 1 );
-         std::string streamed_response   = get_transaction_trace_json( trx_id_b, 1 );
-         BOOST_TEST(!variant_response.is_null());
-         BOOST_TEST(!streamed_response.empty());
-         fc::variant streamed_as_variant = fc::json::from_string( streamed_response );
-         BOOST_TEST(to_kv(variant_response) == to_kv(streamed_as_variant), boost::test_tools::per_element());
-      }
+      // Hit case: only the matching transaction is emitted.
+      BOOST_TEST(get_transaction_trace_json( trx_id_b, 1 ) ==
+                 R"json({"id":"0000000000000000000000000000000000000000000000000000000000000002","block_num":1,)json"
+                 R"json("block_time":"2025-01-01T00:00:00.000","producer_block_id":null,)json"
+                 R"json("actions":[{"global_sequence":1,"receiver":"receiver","account":"contract",)json"
+                 R"json("name":"action","authorization":[{"actor":"bob","permission":"active"}],"data":"1011",)json"
+                 R"json("return_value":"","action_ordinal":2,"creator_action_ordinal":1,)json"
+                 R"json("closest_unnotified_ancestor_action_ordinal":1,"recv_sequence":7,)json"
+                 R"json("auth_sequence":[["bob",3]],"code_sequence":2,"abi_sequence":4,)json"
+                 R"json("account_ram_deltas":[{"account":"bob","delta":240}],"cpu_usage_us":11,"net_usage":8,)json"
+                 R"json("params":{"hex":"1011"}}],"cpu_usage_us":20,"net_usage_words":6,)json"
+                 R"json("signatures":["SIG_K1_111111111111111111111111111111111111111111111111111111111111111116)json"
+                 R"json(uk5ne"],"transaction_header":{"expiration":"1970-01-01T00:00:00","ref_block_num":2,)json"
+                 R"json("ref_block_prefix":0,"max_net_usage_words":200,"max_cpu_usage_ms":60,"delay_sec":0}})json");
 
-      // Miss case: trxid not in the block.  Variant path returns null variant; streaming path returns empty string.
-      {
-         auto missing_id = "00000000000000000000000000000000000000000000000000000000000000ff"_h;
-         fc::variant variant_response  = get_transaction_trace( missing_id, 1 );
-         std::string streamed_response = get_transaction_trace_json( missing_id, 1 );
-         BOOST_TEST(variant_response.is_null());
-         BOOST_TEST(streamed_response.empty());
-      }
+      // Miss case: trxid not in the block.
+      auto missing_id = "00000000000000000000000000000000000000000000000000000000000000ff"_h;
+      BOOST_TEST(get_transaction_trace_json( missing_id, 1 ).empty());
    }
 
    // The HTTP layer commits to a 200 before the emitter runs, so both emitter factories must

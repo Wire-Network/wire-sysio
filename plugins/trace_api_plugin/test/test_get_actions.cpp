@@ -5,6 +5,8 @@
 #include <stdexcept>
 
 #include <fc/filesystem.hpp>
+#include <fc/io/json.hpp>
+#include <fc/io/raw.hpp>
 
 #include <sysio/trace_api/abi_data_handler.hpp>
 #include <sysio/trace_api/bloom_sidecar.hpp>
@@ -53,23 +55,14 @@ struct get_actions_fixture {
    struct mock_data_handler_provider {
       mock_data_handler_provider(get_actions_fixture& f) : fixture(f) {}
 
-      std::tuple<fc::variant, std::optional<fc::variant>> serialize_to_variant(const action_trace_v0& a) {
-         return fixture.mock_data_handler(a);
-      }
-
-      // Production shared_provider exposes decode(); the request_handler's
-      // get_actions path calls decode() directly so a decode_error field can
-      // be surfaced on failure.  The mock builds a decode_result from the
-      // tuple returned by mock_data_handler -- decode never fails in tests.
-      abi_data_handler::decode_result decode(const action_trace_v0& a) {
+      // Writes the decoded fields mock_data_handler returns; a null params variant means "no ABI", so nothing is
+      // written.  Decoding never fails in these tests.
+      void decode_to_json_stream(const action_trace_v0& a, fc::json_writer& w) {
          auto [params, return_data] = fixture.mock_data_handler(a);
-         abi_data_handler::decode_result r;
-         r.params      = std::move(params);
-         r.return_data = std::move(return_data);
-         r.status      = r.params.is_null()
-                           ? abi_data_handler::decode_status::not_attempted
-                           : abi_data_handler::decode_status::ok;
-         return r;
+         if (!params.is_null())
+            w.set("params", params);
+         if (return_data)
+            w.set("return_data", *return_data);
       }
 
       get_actions_fixture& fixture;
@@ -82,12 +75,32 @@ struct get_actions_fixture {
           [](const std::string& msg){ fc_dlog(fc::logger::default_logger(), "{}", msg); })
    {}
 
-   actions_result get_actions(const action_query& query) {
-      return impl.get_actions(query);
+   /// A response parsed back from its JSON, for tests that inspect individual fields.
+   struct actions_response {
+      fc::variants actions;
+      uint32_t     last_block_num = 0; ///< the response's block_num_end
+   };
+
+   static actions_response parse_response(const std::string& json, std::string_view list_key) {
+      const fc::variant      parsed = fc::json::from_string(json);
+      const fc::variant_object& obj = parsed.get_object();
+      return {obj[std::string(list_key)].get_array(), obj["block_num_end"].as<uint32_t>()};
    }
 
-   actions_result get_token_transfer_actions(const action_query& query) {
-      return impl.get_token_transfer_actions(query);
+   actions_response get_actions(const action_query& query) {
+      return parse_response(get_actions_json(query), actions_list_key);
+   }
+
+   actions_response get_token_transfer_actions(const action_query& query) {
+      return parse_response(get_token_transfer_actions_json(query), transfers_list_key);
+   }
+
+   std::string get_actions_json(const action_query& query) {
+      return impl.get_actions_json(query);
+   }
+
+   std::string get_token_transfer_actions_json(const action_query& query) {
+      return impl.get_token_transfer_actions_json(query);
    }
 
    // Default: no ABI decoding — params/return_data absent from result
@@ -1069,6 +1082,136 @@ BOOST_FIXTURE_TEST_CASE(ceiling_applies_to_token_transfers, get_actions_fixture)
    BOOST_TEST(r.actions.size() <  static_cast<size_t>(max_actions_per_response) + per_block);
    BOOST_TEST(r.last_block_num == stop_block);
    BOOST_TEST(r.last_block_num <  q.block_num_end);
+}
+
+// ---------------------------------------------------------------------------
+// Exact response bytes: field order, number formats (64-bit values above 2^32 as strings) and escaping.
+// ---------------------------------------------------------------------------
+
+// Every field the full shape emits: ordinals, auth_sequence, ram deltas, action and transaction resource
+// usage, producer_block_id, both block statuses, decoded params and return_data, an undecoded action, and a
+// missing block inside the range.
+BOOST_FIXTURE_TEST_CASE(get_actions_exact_json, get_actions_fixture)
+{
+   // 64-bit sequences above 2^32 are emitted as JSON strings.
+   action_trace_v0 full = make_action(5'000'000'007, "alice"_n, "token"_n, "transfer"_n, {0x00, 0x01, 0x02});
+   full.action_ordinal                             = 2;
+   full.creator_action_ordinal                     = 1;
+   full.closest_unnotified_ancestor_action_ordinal = 1;
+   full.recv_sequence                              = 6'000'000'009;
+   full.auth_sequence                              = {{"alice"_n, 3}, {"bob"_n, 4}};
+   full.code_sequence                              = 2;
+   full.abi_sequence                               = 5;
+   full.authorization                              = {{"alice"_n, "active"_n}};
+   full.return_value                               = {0x0a, 0x0b};
+   full.account_ram_deltas                         = {{"alice"_n, -240}, {"bob"_n, 128}};
+   full.cpu_usage_us                               = 11;
+   full.net_usage                                  = 8;
+
+   transaction_trace_v0 trx = make_trx(TRX1, 1, {full, make_action(3, "bob"_n, "token"_n, "issue"_n)});
+   trx.cpu_usage_us      = 1234;
+   trx.net_usage_words   = fc::unsigned_int{56};
+   trx.block_time        = chain::block_timestamp_type(42);
+   trx.producer_block_id = "b000000000000000000000000000000000000000000000000000000000000001"_h;
+   blocks[1] = make_block(1, {std::move(trx)});
+   blocks[3] = make_block(3, {make_trx(TRX2, 3, {make_action(12, "carol"_n, "token"_n, "transfer"_n)})});
+   pending_blocks.insert(3);
+
+   mock_data_handler = [](const action_trace_v0& a) -> std::tuple<fc::variant, std::optional<fc::variant>> {
+      if (a.action == "issue"_n)
+         return {};
+      fc::variant params = fc::mutable_variant_object()("from", "alice")("quantity", "1.0000 SYS")("memo", "q\"uote");
+      if (a.return_value.empty())
+         return {params, std::nullopt};
+      return {params, fc::variant(fc::mutable_variant_object()("ok", true))};
+   };
+
+   action_query q;
+   q.block_num_start = 1;
+   q.block_num_end   = 4;
+
+   BOOST_TEST(get_actions_json(q) ==
+              R"json({"block_num_start":1,"block_num_end":4,"actions":[{"global_sequence":3,"receiver":"bob",)json"
+              R"json("account":"token","name":"issue","authorization":[],"data":"","return_value":"",)json"
+              R"json("action_ordinal":0,"creator_action_ordinal":0,)json"
+              R"json("closest_unnotified_ancestor_action_ordinal":0,"recv_sequence":0,"auth_sequence":[],)json"
+              R"json("code_sequence":0,"abi_sequence":0,"account_ram_deltas":[],)json"
+              R"json("trx_id":"0000000000000000000000000000000000000000000000000000000000000001","block_num":1,)json"
+              R"json("block_time":"2025-01-01T00:00:21.000","producer_block_id":"b000000000000000000000000000000)json"
+              R"json(000000000000000000000000000000001","block_status":"irreversible","trx_cpu_usage_us":1234,)json"
+              R"json("trx_net_usage_words":56},{"global_sequence":"5000000007","receiver":"alice",)json"
+              R"json("account":"token","name":"transfer","authorization":[{"actor":"alice",)json"
+              R"json("permission":"active"}],"data":"000102","return_value":"0a0b","action_ordinal":2,)json"
+              R"json("creator_action_ordinal":1,"closest_unnotified_ancestor_action_ordinal":1,)json"
+              R"json("recv_sequence":"6000000009","auth_sequence":[["alice",3],["bob",4]],"code_sequence":2,)json"
+              R"json("abi_sequence":5,"account_ram_deltas":[{"account":"alice","delta":-240},{"account":"bob",)json"
+              R"json("delta":128}],"cpu_usage_us":11,"net_usage":8,"params":{"from":"alice",)json"
+              R"json("quantity":"1.0000 SYS","memo":"q\"uote"},"return_data":{"ok":true},)json"
+              R"json("trx_id":"0000000000000000000000000000000000000000000000000000000000000001","block_num":1,)json"
+              R"json("block_time":"2025-01-01T00:00:21.000","producer_block_id":"b000000000000000000000000000000)json"
+              R"json(000000000000000000000000000000001","block_status":"irreversible","trx_cpu_usage_us":1234,)json"
+              R"json("trx_net_usage_words":56},{"global_sequence":12,"receiver":"carol","account":"token",)json"
+              R"json("name":"transfer","authorization":[],"data":"","return_value":"","action_ordinal":0,)json"
+              R"json("creator_action_ordinal":0,"closest_unnotified_ancestor_action_ordinal":0,)json"
+              R"json("recv_sequence":0,"auth_sequence":[],"code_sequence":0,"abi_sequence":0,)json"
+              R"json("account_ram_deltas":[],"params":{"from":"alice","quantity":"1.0000 SYS","memo":"q\"uote"},)json"
+              R"json("trx_id":"0000000000000000000000000000000000000000000000000000000000000002","block_num":3,)json"
+              R"json("block_time":"2025-01-01T00:00:00.000","producer_block_id":null,"block_status":"pending",)json"
+              R"json("trx_cpu_usage_us":0,"trx_net_usage_words":0}]})json");
+
+   // The emitter's budget charge is the packed size of the traces it holds.
+   const actions_emitter emitter = impl.get_actions_emitter(q);
+   size_t traces_size = 0;
+   for (const auto& [num, blk] : blocks)
+      for (const auto& t : blk.transactions)
+         traces_size += fc::raw::pack_size(t.actions);
+   BOOST_TEST(emitter.retained_size == traces_size);
+}
+
+// The slim shape lists its matches under "transfers" and drops the resource and ordinal fields.
+BOOST_FIXTURE_TEST_CASE(get_token_transfers_exact_json, get_actions_fixture)
+{
+   transaction_trace_v0 trx = make_trx(TRX1, 1, {
+      make_action(1, "sysio.token"_n, "sysio.token"_n, "transfer"_n, {0x01}),
+      make_action(2, "bob"_n,         "sysio.token"_n, "transfer"_n)
+   });
+   trx.cpu_usage_us    = 1234;
+   trx.net_usage_words = fc::unsigned_int{56};
+   blocks[1] = make_block(1, {std::move(trx)});
+
+   mock_data_handler = [](const action_trace_v0&) -> std::tuple<fc::variant, std::optional<fc::variant>> {
+      return {fc::mutable_variant_object()("to", "bob"), std::nullopt};
+   };
+
+   action_query q;
+   q.block_num_start = 1;
+   q.block_num_end   = 1;
+   q.receiver        = "sysio.token"_n;
+   q.account         = "sysio.token"_n;
+   q.action          = "transfer"_n;
+
+   BOOST_TEST(get_token_transfer_actions_json(q) ==
+              R"json({"block_num_start":1,"block_num_end":1,"transfers":[{"global_sequence":1,)json"
+              R"json("receiver":"sysio.token","account":"sysio.token","name":"transfer","authorization":[],)json"
+              R"json("data":"01","return_value":"","params":{"to":"bob"},)json"
+              R"json("trx_id":"0000000000000000000000000000000000000000000000000000000000000001","block_num":1,)json"
+              R"json("block_time":"2025-01-01T00:00:00.000","producer_block_id":null,)json"
+              R"json("block_status":"irreversible"}]})json");
+}
+
+// No match: an empty list, with the scanned range still reported, and nothing held for the budget.
+BOOST_FIXTURE_TEST_CASE(get_actions_empty_exact_json, get_actions_fixture)
+{
+   blocks[1] = make_block(1, {make_trx(TRX1, 1, {make_action(1, "alice"_n, "token"_n, "transfer"_n)})});
+
+   action_query q;
+   q.block_num_start = 1;
+   q.block_num_end   = 2;
+   q.receiver        = "nobody"_n;
+
+   BOOST_TEST(get_actions_json(q) ==
+              R"json({"block_num_start":1,"block_num_end":2,"actions":[]})json");
+   BOOST_TEST(impl.get_actions_emitter(q).retained_size == 0u);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -1,5 +1,8 @@
 #include <benchmark.hpp>
 
+#include <sysio/chain/abi_def.hpp>
+#include <sysio/chain/asset.hpp>
+#include <sysio/trace_api/abi_data_handler.hpp>
 #include <sysio/trace_api/request_handler.hpp>
 #include <sysio/trace_api/trace.hpp>
 
@@ -7,19 +10,20 @@
 #include <fc/crypto/private_key.hpp>
 #include <fc/io/json.hpp>
 #include <fc/io/json_stream.hpp>
+#include <fc/io/raw.hpp>
 #include <fc/variant.hpp>
 
+#include <map>
+#include <memory>
 #include <random>
 #include <string>
 #include <vector>
 
-// Compares the two trace_api block serialization paths:
-//   1) fc::mutable_variant_object -> fc::variant -> fc::json::to_string  (legacy)
-//   2) fc::json_writer streaming directly into std::string               (this PR)
+// Times the trace_api responses, written by fc::json_writer directly into a std::string.
 //
 // Each run serializes a fresh synthetic block_trace_v0 with a configurable number of
 // transactions and actions-per-transaction.  The shapes and field types match what
-// real producers emit, so the comparison reflects realistic HTTP workloads.
+// real producers emit, so the timings reflect realistic HTTP workloads.
 
 namespace sysio::benchmark {
 
@@ -28,8 +32,8 @@ namespace {
 using namespace sysio::trace_api;
 
 // Deterministic filler for reproducible timings across runs.  Uses a stable PRNG so
-// the synthetic trace's byte payloads don't change shape between "variant" and
-// "stream" timings - otherwise any compiler/cache effect would dominate the signal.
+// the synthetic trace's byte payloads don't change shape between runs - otherwise any
+// compiler/cache effect would dominate the signal.
 std::mt19937_64 make_rng() { return std::mt19937_64{0xDEADBEEFCAFEF00Dull}; }
 
 chain::bytes random_bytes(std::mt19937_64& rng, size_t n) {
@@ -93,19 +97,80 @@ block_trace_v0 make_synthetic_block_trace(size_t num_trxs, size_t actions_per_tr
    return bt;
 }
 
-// A data_handler that does no ABI decode (returns a null params variant).  The two
-// paths hit the same no-op branch, so this isolates the envelope serialization cost
-// from the ABI decode cost - which is shared unchanged between paths.
-data_handler_function make_noop_data_handler() {
-   return [](const std::variant<action_trace_v0>&) -> std::tuple<fc::variant, std::optional<fc::variant>> {
-      return {fc::variant(), std::optional<fc::variant>{}};
-   };
-}
-
-// Streaming counterpart: emits no params/return_data keys, mirroring the variant noop above so
-// both measured paths skip the same ABI-decode work.
+// A data_handler that does no ABI decode (emits no params/return_data keys), isolating the
+// envelope serialization cost from the ABI decode cost.
 stream_data_handler_function make_noop_stream_data_handler() {
    return [](const std::variant<action_trace_v0>&, fc::json_writer&) {};
+}
+
+constexpr uint32_t    bench_slice_stride = 10'000;
+constexpr chain::name token_account      = chain::string_to_name("sysio.token");
+constexpr chain::name transfer_action    = chain::string_to_name("transfer");
+
+// Serves an in-memory block range to request_handler, as store_provider serves the trace log.  get_block copies
+// the block, as reading it from the log would, and both measured paths pay that copy.
+struct bench_logfile_provider {
+   std::shared_ptr<const std::map<uint32_t, block_trace_v0>> blocks;
+
+   get_block_t get_block(uint32_t height) const {
+      const auto it = blocks->find(height);
+      if (it == blocks->end())
+         return {};
+      return std::make_tuple(data_log_entry{it->second}, true);
+   }
+   uint32_t     slice_stride() const noexcept { return bench_slice_stride; }
+   uint32_t     slice_number(uint32_t block_num) const noexcept { return block_num / bench_slice_stride; }
+   bloom_reader get_bloom(uint32_t) const { return {}; }
+};
+
+using bench_request_handler = request_handler<bench_logfile_provider, abi_data_handler::shared_provider>;
+
+// sysio.token::transfer action data, packed as the chain records it.
+chain::bytes pack_transfer(chain::name from, chain::name to, const chain::asset& quantity, const std::string& memo) {
+   chain::bytes out(fc::raw::pack_size(from) + fc::raw::pack_size(to) + fc::raw::pack_size(quantity) +
+                    fc::raw::pack_size(memo));
+   fc::datastream<char*> ds(out.data(), out.size());
+   fc::raw::pack(ds, from);
+   fc::raw::pack(ds, to);
+   fc::raw::pack(ds, quantity);
+   fc::raw::pack(ds, memo);
+   return out;
+}
+
+// block_count blocks, each holding transfers_per_block single-transfer transactions.
+std::map<uint32_t, block_trace_v0> make_transfer_blocks(uint32_t block_count, uint32_t transfers_per_block) {
+   const chain::bytes data = pack_transfer(chain::name{"alice"}, chain::name{"bob"},
+                                           chain::asset::from_string("1.0000 SYS"), "benchmark transfer");
+   std::map<uint32_t, block_trace_v0> blocks;
+   uint64_t seq = 1;
+   for (uint32_t b = 1; b <= block_count; ++b) {
+      block_trace_v0& bt = blocks[b];
+      bt.id        = fc::sha256::hash(std::string{"block-"} + std::to_string(b));
+      bt.number    = b;
+      bt.timestamp = chain::block_timestamp_type(1'700'000'000u + b);
+      bt.producer  = chain::name{"defproducera"};
+      bt.transactions.reserve(transfers_per_block);
+      for (uint32_t t = 0; t < transfers_per_block; ++t) {
+         action_trace_v0 act;
+         act.global_sequence = seq++;
+         act.receiver        = token_account;
+         act.account         = token_account;
+         act.action          = transfer_action;
+         act.authorization.push_back({chain::name{"alice"}, chain::name{"active"}});
+         act.data            = data;
+
+         transaction_trace_v0 trx;
+         trx.id                = fc::sha256::hash(std::string{"trx-"} + std::to_string(act.global_sequence));
+         trx.actions.push_back(std::move(act));
+         trx.cpu_usage_us      = 150;
+         trx.net_usage_words   = fc::unsigned_int{16};
+         trx.block_num         = b;
+         trx.block_time        = bt.timestamp;
+         trx.producer_block_id = bt.id;
+         bt.transactions.push_back(std::move(trx));
+      }
+   }
+   return blocks;
 }
 
 } // namespace
@@ -124,7 +189,6 @@ void trace_api_json_benchmarking() {
       { 1'000,  4,   128 },  // complex trxs, modest block
    };
 
-   const auto noop_handler        = make_noop_data_handler();
    const auto noop_stream_handler = make_noop_stream_data_handler();
    const bool irreversible = true;
 
@@ -136,31 +200,10 @@ void trace_api_json_benchmarking() {
                                      + std::to_string(s.actions_per_trx) + " acts ("
                                      + std::to_string(s.data_bytes) + "B data)";
 
-      // Legacy total path: build variant tree + json::to_string.  Times the full
-      // chain the HTTP handler would execute (variant build on main thread, then
-      // json::to_string on HTTP thread).  Useful as a total-CPU baseline.
-      benchmarking("variant+json: " + label_prefix, [&]() {
-         auto v = detail::response_formatter::process_block(entry, irreversible, noop_handler);
-         std::string out = fc::json::to_string(v, fc::json::yield_function_t());
-         // Defeat the optimizer.
-         asm volatile("" : : "g"(out.size()) : "memory");
-      });
-
-      // Variant-only: build the variant tree without serializing to JSON.  This is
-      // the actual current main-thread cost in production - json::to_string runs on
-      // an HTTP-pool thread after cb() hands the variant off.  Compare against
-      // `stream:` below to decide whether moving JSON emission onto the main thread
-      // is a net main-thread win or regression.
-      benchmarking("variant-only: " + label_prefix, [&]() {
-         auto v = detail::response_formatter::process_block(entry, irreversible, noop_handler);
-         asm volatile("" : : "g"(v.is_object()) : "memory");
-      });
-
-      // Streaming path: process_block_to_json writes JSON directly into std::string.
-      // This is the proposed new main-thread cost (no variant intermediate, no
-      // separate HTTP-thread serialization step).
+      // process_block_to_json writes the block's JSON directly into std::string.
       benchmarking("stream:       " + label_prefix, [&]() {
          std::string out = detail::response_formatter::process_block_to_json(entry, irreversible, noop_stream_handler);
+         // Defeat the optimizer.
          asm volatile("" : : "g"(out.size()) : "memory");
       });
 
@@ -175,7 +218,7 @@ void trace_api_json_benchmarking() {
       //
       // Pre-builds a pool of data_log_entry copies outside the timing loop so
       // each iter consumes a fresh one.  Setup cost is excluded from the bench
-      // (matches variant-only / stream which also start from a pre-built entry).
+      // (matches stream, which also starts from a pre-built entry).
       const size_t pool_size = 64; // > any reasonable --runs
       std::vector<data_log_entry> fresh_a(pool_size, entry);
       std::vector<data_log_entry> fresh_b(pool_size, entry);
@@ -201,11 +244,51 @@ void trace_api_json_benchmarking() {
       });
    }
 
+   // ---- get_actions: scan + ABI decode + response -------------------------------
+   //
+   // get_actions_json over sysio.token transfers decoded with the real token ABI: the scan, then each action
+   // decoded straight into the json_writer.  10,000 actions is the per-response ceiling (max_actions_per_response).
+   {
+      const std::vector<char> token_abi = fc::raw::pack(fc::json::from_file<chain::abi_def>(TOKEN_ABI_PATH));
+      auto abi_handler = std::make_shared<abi_data_handler>(
+         exception_handler{},
+         [](chain::name account, uint64_t) -> std::optional<uint64_t> {
+            return account == token_account ? std::optional<uint64_t>{0} : std::nullopt;
+         },
+         [&token_abi](chain::name account, uint64_t) -> std::optional<std::vector<char>> {
+            return account == token_account ? std::optional<std::vector<char>>{token_abi} : std::nullopt;
+         });
+
+      struct actions_shape { uint32_t blocks; uint32_t transfers_per_block; };
+      const actions_shape shapes[] = {
+         { 10,  100 },  //  1,000 transfers
+         { 100, 100 },  // 10,000 transfers
+      };
+      for (const auto& s : shapes) {
+         bench_request_handler handler(
+            bench_logfile_provider{std::make_shared<const std::map<uint32_t, block_trace_v0>>(
+               make_transfer_blocks(s.blocks, s.transfers_per_block))},
+            abi_data_handler::shared_provider(abi_handler), [](const std::string&) {});
+
+         action_query query;
+         query.block_num_start = 1;
+         query.block_num_end   = s.blocks;
+         query.receiver        = token_account;
+         query.account         = token_account;
+         query.action          = transfer_action;
+
+         const std::string label = std::to_string(s.blocks * s.transfers_per_block) + " transfers";
+
+         benchmarking("get_actions stream: " + label, [&]() {
+            std::string out = handler.get_actions_json(query);
+            asm volatile("" : : "g"(out.size()) : "memory");
+         });
+      }
+   }
+
    // ---- Isolated hex-emission micro-bench ------------------------------------
    //
-   // Probes the hex-encoding cost in isolation, the suspected dominant cause of
-   // the streaming-vs-variant-only main-thread regression on data-heavy actions.
-   // Two paths per byte size:
+   // Probes the hex-encoding cost in isolation.  Two paths per byte size:
    //   to_hex+value_string : fc::to_hex(...) -> std::string -> w.value_string(sv)
    //   value_hex           : json_writer::value_hex writes hex straight into the buffer
    //

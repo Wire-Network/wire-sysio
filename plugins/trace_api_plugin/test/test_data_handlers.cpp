@@ -28,6 +28,19 @@ namespace {
       };
    }
 
+   // serialize_to_json_stream's output, wrapped in the object the get_block stream writes it into.
+   std::string serialized_json(abi_data_handler& handler, const std::variant<action_trace_v0>& action) {
+      std::string out;
+      {
+         fc::json_writer w(out);
+         w.begin_object();
+         handler.serialize_to_json_stream(action, w);
+         w.end_object();
+         BOOST_REQUIRE(w.balanced());
+      }
+      return out;
+   }
+
    // Fetcher half: returns the packed ABI bytes for the (account, 0) version the resolver names.
    abi_data_handler::abi_blob_fetcher_fn make_fetcher(chain::name account, std::vector<char> abi_bytes) {
       return [account, bytes = std::move(abi_bytes)](chain::name a, uint64_t effective_seq) -> std::optional<std::vector<char>> {
@@ -48,11 +61,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       std::variant<action_trace_v0> action_trace_t = action;
       abi_data_handler handler(exception_handler{});
 
-      auto expected = fc::variant();
-      auto actual = handler.serialize_to_variant(action_trace_t);
-
-      BOOST_TEST(to_kv(expected) == to_kv(std::get<0>(actual)), boost::test_tools::per_element());
-      BOOST_REQUIRE(!std::get<1>(actual));
+      BOOST_TEST(serialized_json(handler, action_trace_t) == "{}");
    }
 
    BOOST_AUTO_TEST_CASE(no_abi)
@@ -68,11 +77,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
          std::variant<action_trace_v0> action_trace_t = action;
          abi_data_handler handler(exception_handler{});
 
-         auto expected = fc::variant();
-         auto actual = handler.serialize_to_variant(action_trace_t);
-
-         BOOST_TEST(to_kv(expected) == to_kv(std::get<0>(actual)), boost::test_tools::per_element());
-         BOOST_REQUIRE(!std::get<1>(actual));
+         BOOST_TEST(serialized_json(handler, action_trace_t) == "{}");
       }
 
       // With return_value
@@ -87,11 +92,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
          std::variant<action_trace_v0> action_trace_t = action;
          abi_data_handler handler(exception_handler{});
 
-         auto expected = fc::variant();
-         auto actual = handler.serialize_to_variant(action_trace_t);
-
-         BOOST_TEST(to_kv(expected) == to_kv(std::get<0>(actual)), boost::test_tools::per_element());
-         BOOST_REQUIRE(!std::get<1>(actual));
+         BOOST_TEST(serialized_json(handler, action_trace_t) == "{}");
       }
    }
 
@@ -119,16 +120,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
 
       abi_data_handler handler(exception_handler{}, make_resolver("alice"_n), make_fetcher("alice"_n, pack_abi(abi)));
 
-      fc::variant expected = fc::mutable_variant_object()
-         ("a", 0)
-         ("b", 1)
-         ("c", 2)
-         ("d", 3);
-
-      auto actual = handler.serialize_to_variant(action_trace_t);
-
-      BOOST_TEST(to_kv(expected) == to_kv(std::get<0>(actual)), boost::test_tools::per_element());
-      BOOST_REQUIRE(!std::get<1>(actual));
+      BOOST_TEST(serialized_json(handler, action_trace_t) == R"json({"params":{"a":0,"b":1,"c":2,"d":3}})json");
    }
 
    BOOST_AUTO_TEST_CASE(basic_abi_with_return_value)
@@ -158,21 +150,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
 
       abi_data_handler handler(exception_handler{}, make_resolver("alice"_n), make_fetcher("alice"_n, pack_abi(abi)));
 
-      fc::variant expected = fc::mutable_variant_object()
-            ("a", 0)
-            ("b", 1)
-            ("c", 2)
-            ("d", 3);
-      fc::variant expected_return = fc::mutable_variant_object()
-            ("e", 4)
-            ("f", 5)
-            ("g", 6);
-
-      auto actual = handler.serialize_to_variant(action_trace_t);
-
-      BOOST_TEST(to_kv(expected) == to_kv(std::get<0>(actual)), boost::test_tools::per_element());
-      BOOST_REQUIRE(std::get<1>(actual));
-      BOOST_TEST(to_kv(expected_return) == to_kv(*std::get<1>(actual)), boost::test_tools::per_element());
+      BOOST_TEST(serialized_json(handler, action_trace_t) == R"json({"params":{"a":0,"b":1,"c":2,"d":3},"return_data":{"e":4,"f":5,"g":6}})json");
    }
 
    BOOST_AUTO_TEST_CASE(basic_abi_wrong_type)
@@ -200,12 +178,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
 
       abi_data_handler handler(exception_handler{}, make_resolver("alice"_n), make_fetcher("alice"_n, pack_abi(abi)));
 
-      auto expected = fc::variant();
-
-      auto actual = handler.serialize_to_variant(action_trace_t);
-
-      BOOST_TEST(to_kv(expected) == to_kv(std::get<0>(actual)), boost::test_tools::per_element());
-      BOOST_REQUIRE(!std::get<1>(actual));
+      BOOST_TEST(serialized_json(handler, action_trace_t) == "{}");
    }
 
    BOOST_AUTO_TEST_CASE(basic_abi_insufficient_data)
@@ -237,13 +210,8 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
          make_fetcher("alice"_n, pack_abi(abi))
       );
 
-      auto expected = fc::variant();
-
-      auto actual = handler.serialize_to_variant(action_trace_t);
-
-      BOOST_TEST(to_kv(expected) == to_kv(std::get<0>(actual)), boost::test_tools::per_element());
+      BOOST_TEST(serialized_json(handler, action_trace_t) == "{}");
       BOOST_TEST(log_called);
-      BOOST_REQUIRE(!std::get<1>(actual));
    }
 
    // If no ABI provided for return type then do not attempt to decode it
@@ -272,16 +240,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
 
       abi_data_handler handler(exception_handler{}, make_resolver("alice"_n), make_fetcher("alice"_n, pack_abi(abi)));
 
-      fc::variant expected = fc::mutable_variant_object()
-            ("a", 0)
-            ("b", 1)
-            ("c", 2)
-            ("d", 3);
-
-      auto actual = handler.serialize_to_variant(action_trace_t);
-
-      BOOST_TEST(to_kv(expected) == to_kv(std::get<0>(actual)), boost::test_tools::per_element());
-      BOOST_REQUIRE(!std::get<1>(actual));
+      BOOST_TEST(serialized_json(handler, action_trace_t) == R"json({"params":{"a":0,"b":1,"c":2,"d":3}})json");
    }
 
    namespace {
@@ -315,38 +274,6 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       }
    }
 
-   // Streaming serialize_to_json_stream must emit byte-equivalent JSON to the variant path
-   // when the same ABI is supplied.  Drive the streamer into a wrapped object so the result
-   // can be parsed back as a variant and compared field-by-field.
-   BOOST_AUTO_TEST_CASE(streaming_basic_abi_with_return_value_parity)
-   {
-      std::variant<action_trace_v0> action_trace_t =
-         make_foo_action({0x00, 0x01, 0x02, 0x03}, {0x04, 0x05, 0x06});
-
-      abi_data_handler handler(exception_handler{}, make_resolver("alice"_n),
-                               make_fetcher("alice"_n, pack_abi(make_foo_abi_with_result())));
-
-      auto [params_v, return_v] = handler.serialize_to_variant(action_trace_t);
-
-      std::string out;
-      {
-         fc::json_writer w(out);
-         w.begin_object();
-         handler.serialize_to_json_stream(action_trace_t, w);
-         w.end_object();
-         BOOST_REQUIRE(w.balanced());
-      }
-
-      fc::variant streamed = fc::json::from_string(out);
-      const auto& streamed_obj = streamed.get_object();
-      BOOST_REQUIRE(streamed_obj.contains("params"));
-      BOOST_REQUIRE(streamed_obj.contains("return_data"));
-
-      BOOST_TEST(to_kv(params_v) == to_kv(streamed_obj["params"]), boost::test_tools::per_element());
-      BOOST_REQUIRE(return_v.has_value());
-      BOOST_TEST(to_kv(*return_v) == to_kv(streamed_obj["return_data"]), boost::test_tools::per_element());
-   }
-
    // No ABI resolvable: the streaming path must emit zero key/value pairs and leave the writer
    // in a balanced, key/value-pair-empty state so the surrounding object closes cleanly.
    BOOST_AUTO_TEST_CASE(streaming_no_abi_emits_nothing)
@@ -368,49 +295,8 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       BOOST_TEST(out == "{}");
    }
 
-   // Variant-pipeline shape on params decode failure: decode() short-circuits with
-   // decode_status::failed, and serialize_to_variant maps anything but ok to the legacy empty
-   // tuple.  The failure is still surfaced through except_handler.
-   BOOST_AUTO_TEST_CASE(variant_basic_abi_params_throws_yields_empty)
-   {
-      std::variant<action_trace_v0> action_trace_t =
-         make_foo_action({0x00, 0x01, 0x02} /* truncated */, {0x04, 0x05, 0x06});
-
-      bool log_called = false;
-      abi_data_handler handler([&log_called](const exception_with_context&){ log_called = true; },
-                               make_resolver("alice"_n),
-                               make_fetcher("alice"_n, pack_abi(make_foo_abi_with_result())));
-
-      auto actual = handler.serialize_to_variant(action_trace_t);
-
-      BOOST_TEST(log_called);
-      BOOST_TEST(std::get<0>(actual).is_null());
-      BOOST_REQUIRE(!std::get<1>(actual).has_value());
-   }
-
-   // Variant-pipeline shape on return_value decode failure: decode() keeps the decoded params in
-   // decode_result (the get_actions path emits them alongside decode_error), but the legacy
-   // tuple wrapper drops the whole action on any failure -- both fields come back empty.
-   BOOST_AUTO_TEST_CASE(variant_basic_abi_return_data_throws_yields_empty)
-   {
-      std::variant<action_trace_v0> action_trace_t =
-         make_foo_action({0x00, 0x01, 0x02, 0x03}, {0x04, 0x05} /* truncated */);
-
-      bool log_called = false;
-      abi_data_handler handler([&log_called](const exception_with_context&){ log_called = true; },
-                               make_resolver("alice"_n),
-                               make_fetcher("alice"_n, pack_abi(make_foo_abi_with_result())));
-
-      auto actual = handler.serialize_to_variant(action_trace_t);
-
-      BOOST_TEST(log_called);
-      BOOST_TEST(std::get<0>(actual).is_null());
-      BOOST_REQUIRE(!std::get<1>(actual).has_value());
-   }
-
-   // Streaming lock-step with the variant pipeline on params decode failure: truncated params
-   // bytes throw after "params" is half-written; the handler rewinds every byte it wrote and
-   // logs, emitting nothing -- the same empty shape serialize_to_variant produces.
+   // Params decode failure: truncated params bytes throw after "params" is half-written; the handler
+   // rewinds every byte it wrote and logs, emitting nothing.
    BOOST_AUTO_TEST_CASE(streaming_basic_abi_params_throws_emits_nothing)
    {
       std::variant<action_trace_v0> action_trace_t =
@@ -434,9 +320,8 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       BOOST_TEST(out == "{}");
    }
 
-   // Streaming lock-step with the variant pipeline on return_value decode failure: params were
-   // already emitted when the return_data decode throws, so the rewind must roll back params as
-   // well -- the variant path returns the legacy empty shape and the two paths must match.
+   // Return_value decode failure: params were already emitted when the return_data decode throws,
+   // and emission is all-or-nothing, so the rewind rolls back params as well.
    BOOST_AUTO_TEST_CASE(streaming_basic_abi_return_data_throws_emits_nothing)
    {
       std::variant<action_trace_v0> action_trace_t =
@@ -494,6 +379,112 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
 
       BOOST_TEST(log_called);
       BOOST_TEST(out == "{}");
+   }
+
+   namespace {
+      // decode_to_json_stream's output, wrapped in the object the get_actions stream writes it into.
+      std::string streamed_decode_json(abi_data_handler& handler, const action_trace_v0& action) {
+         std::string out;
+         {
+            fc::json_writer w(out);
+            w.begin_object();
+            handler.decode_to_json_stream(action, w);
+            w.end_object();
+            BOOST_REQUIRE(w.balanced());
+         }
+         return out;
+      }
+
+      // An action type with a single bytes field, so a payload of any size can be decoded.
+      chain::abi_def make_blob_abi() {
+         auto abi = chain::abi_def ( {},
+            {
+               { "blob", "", { {"payload", "bytes"} } }
+            },
+            {
+               { "foo"_n, "blob", ""}
+            },
+            {}, {}, {}
+         );
+         abi.version = "sysio::abi/1.";
+         return abi;
+      }
+
+      struct budget_abort {};
+   }
+
+   // get_actions' decoder: params and return_data both decoded.
+   BOOST_AUTO_TEST_CASE(decode_stream_with_return_value)
+   {
+      const action_trace_v0 action = make_foo_action({0x00, 0x01, 0x02, 0x03}, {0x04, 0x05, 0x06});
+      abi_data_handler handler(exception_handler{}, make_resolver("alice"_n),
+                               make_fetcher("alice"_n, pack_abi(make_foo_abi_with_result())));
+
+      BOOST_TEST(streamed_decode_json(handler, action) == R"json({"params":{"a":0,"b":1,"c":2,"d":3},"return_data":{"e":4,"f":5,"g":6}})json");
+   }
+
+   // A params failure drops params and reports the exception in decode_error.
+   BOOST_AUTO_TEST_CASE(decode_stream_params_failure)
+   {
+      const action_trace_v0 action = make_foo_action({0x00, 0x01, 0x02} /* truncated */, {0x04, 0x05, 0x06});
+      size_t log_calls = 0;
+      abi_data_handler handler([&log_calls](const exception_with_context&){ ++log_calls; },
+                               make_resolver("alice"_n),
+                               make_fetcher("alice"_n, pack_abi(make_foo_abi_with_result())));
+
+      const fc::variant streamed = fc::json::from_string(streamed_decode_json(handler, action));
+      const auto& obj = streamed.get_object();
+      BOOST_TEST(obj.size() == 1u);
+      BOOST_REQUIRE(obj.contains("decode_error"));
+      const std::string error = obj["decode_error"].as_string();
+      BOOST_TEST(error.starts_with("3015013 unpack_exception"));
+      BOOST_TEST(error.find("unable to unpack field 'd' of struct 'foo'") != std::string::npos);
+      BOOST_TEST(log_calls == 1u);
+   }
+
+   // A return_value failure keeps the decoded params and reports decode_error in place of return_data.
+   BOOST_AUTO_TEST_CASE(decode_stream_return_value_failure)
+   {
+      const action_trace_v0 action = make_foo_action({0x00, 0x01, 0x02, 0x03}, {0x04, 0x05} /* truncated */);
+      size_t log_calls = 0;
+      abi_data_handler handler([&log_calls](const exception_with_context&){ ++log_calls; },
+                               make_resolver("alice"_n),
+                               make_fetcher("alice"_n, pack_abi(make_foo_abi_with_result())));
+
+      const std::string streamed = streamed_decode_json(handler, action);
+      BOOST_TEST(streamed.starts_with(
+         R"json({"params":{"a":0,"b":1,"c":2,"d":3},"decode_error":"return_value decode failed: 3015013 unpack_exception)json"));
+      BOOST_TEST(streamed.find("unable to unpack field 'g' of struct 'foor'") != std::string::npos);
+      BOOST_TEST(log_calls == 1u);
+   }
+
+   // No ABI: nothing to decode, nothing emitted.
+   BOOST_AUTO_TEST_CASE(decode_stream_without_abi_emits_nothing)
+   {
+      const action_trace_v0 action = make_foo_action({0x00, 0x01, 0x02, 0x03}, {});
+      abi_data_handler handler(exception_handler{});
+
+      BOOST_TEST(streamed_decode_json(handler, action) == "{}");
+   }
+
+   // A response-budget abort inside the params decode is not a decode failure: it leaves the writer, it is not
+   // reported as decode_error, and it is not logged.
+   BOOST_AUTO_TEST_CASE(decode_stream_does_not_absorb_budget_abort)
+   {
+      constexpr size_t payload_size = 4096;  // 8 KiB of hex once decoded
+      constexpr size_t budget       = 1024;
+      constexpr size_t guard_stride = 64;
+      const action_trace_v0 action = make_foo_action(fc::raw::pack(chain::bytes(payload_size, 'x')), {});
+      size_t log_calls = 0;
+      abi_data_handler handler([&log_calls](const exception_with_context&){ ++log_calls; },
+                               make_resolver("alice"_n), make_fetcher("alice"_n, pack_abi(make_blob_abi())));
+
+      std::string out;
+      fc::json_writer w(out, [](size_t size) { if (size > budget) throw budget_abort{}; }, guard_stride);
+      w.begin_object();
+      BOOST_CHECK_THROW(handler.decode_to_json_stream(action, w), budget_abort);
+      BOOST_TEST(log_calls == 0u);
+      BOOST_TEST(out.find("decode_error") == std::string::npos);
    }
 
 

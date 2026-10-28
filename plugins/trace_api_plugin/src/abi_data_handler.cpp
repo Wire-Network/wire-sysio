@@ -2,13 +2,21 @@
 #include <sysio/chain/abi_serializer.hpp>
 #include <fc/io/json_stream.hpp>
 #include <fc/io/raw.hpp>
+#include <fc/reflect/json_stream.hpp>
+
+#include <string_view>
 
 namespace sysio::trace_api {
 
    namespace {
+      // decode_to_json_stream's decode_error texts when the exception carries no message of its own.
+      constexpr std::string_view unknown_params_error       = "unknown exception decoding action data";
+      constexpr std::string_view return_value_error_prefix  = "return_value decode failed: ";
+      constexpr std::string_view unknown_return_value_error = "unknown exception decoding return_value";
+
       // ABIs are user-provided; the yield function only enforces the recursion-depth cap and
-      // intentionally has no wall-clock deadline.  Shared between the variant and streaming paths
-      // so they stay in lock-step on what counts as "too deep".
+      // intentionally has no wall-clock deadline.  Shared by both decoders so they agree on what
+      // counts as "too deep".
       auto make_abi_yield() {
          return [](size_t recursion_depth) {
             SYS_ASSERT( recursion_depth < chain::abi_serializer::max_recursion_depth, chain::abi_recursion_depth_exception,
@@ -76,65 +84,51 @@ namespace sysio::trace_api {
       return serializer;
    }
 
-   abi_data_handler::decode_result abi_data_handler::decode(const action_trace_v0& a) {
-      // Named local return so NRVO constructs directly into the caller's slot.
-      decode_result result;
-
+   void abi_data_handler::decode_to_json_stream(const action_trace_v0& a, fc::json_writer& w) {
       auto serializer = get_serializer(a.account, a.global_sequence);
-      if (!serializer) return result;
+      if (!serializer) return;
 
       auto type_name = serializer->get_action_type(a.action);
-      if (type_name.empty()) return result;
+      if (type_name.empty()) return;
 
       auto abi_yield = make_abi_yield();
 
-      // Separate try blocks so that a failure decoding return_value does not
-      // discard successfully-decoded params (and vice versa).
+      // decode_error is written before except_handler runs: if the failure was the response budget aborting the
+      // writer, that write rethrows the abort and the budget rejection is not logged as a decode failure.
+      const auto params_cp = w.checkpoint();
       try {
-         result.params = serializer->binary_to_variant(type_name, a.data, abi_yield);
-         result.status = decode_status::ok;
+         w.key("params");
+         serializer->binary_to_json_stream(type_name, a.data, w, abi_yield);
       } catch (const std::exception& e) {
-         result.status        = decode_status::failed;
-         result.error_message = e.what();
+         w.rewind(params_cp);
+         w.set("decode_error", std::string_view(e.what()));
          except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
-         return result;
+         return;
       } catch (...) {
-         result.status        = decode_status::failed;
-         result.error_message = "unknown exception decoding action data";
+         w.rewind(params_cp);
+         w.set("decode_error", unknown_params_error);
          except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
-         return result;
+         return;
       }
 
-      if (a.return_value.size() > 0) {
-         auto return_type_name = serializer->get_action_result_type(a.action);
-         if (!return_type_name.empty()) {
-            try {
-               result.return_data = serializer->binary_to_variant(return_type_name, a.return_value, abi_yield);
-            } catch (const std::exception& e) {
-               // Params decoded OK but return_value failed: keep params, flag failure
-               // and surface the error message.  Callers can still emit params.
-               result.status        = decode_status::failed;
-               result.error_message = std::string("return_value decode failed: ") + e.what();
-               except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
-            } catch (...) {
-               result.status        = decode_status::failed;
-               result.error_message = "unknown exception decoding return_value";
-               except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
-            }
-         }
+      if (a.return_value.empty()) return;
+      auto return_type_name = serializer->get_action_result_type(a.action);
+      if (return_type_name.empty()) return;
+
+      const auto return_cp = w.checkpoint();
+      try {
+         w.key("return_data");
+         serializer->binary_to_json_stream(return_type_name, a.return_value, w, abi_yield);
+      } catch (const std::exception& e) {
+         // Params decoded: keep them and report the return_value failure.
+         w.rewind(return_cp);
+         w.set("decode_error", std::string(return_value_error_prefix) + e.what());
+         except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
+      } catch (...) {
+         w.rewind(return_cp);
+         w.set("decode_error", unknown_return_value_error);
+         except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
       }
-
-      return result;
-   }
-
-   std::tuple<fc::variant, std::optional<fc::variant>> abi_data_handler::serialize_to_variant(const std::variant<action_trace_v0>& action) {
-      return std::visit([&](const auto& a) -> std::tuple<fc::variant, std::optional<fc::variant>> {
-         auto r = decode(a);
-         if (r.status == decode_status::ok)
-            return {std::move(r.params), std::move(r.return_data)};
-         // failed or not_attempted -> legacy empty shape
-         return {};
-      }, action);
    }
 
    void abi_data_handler::serialize_to_json_stream(const std::variant<action_trace_v0>& action, fc::json_writer& w) {
@@ -146,10 +140,8 @@ namespace sysio::trace_api {
 
          auto abi_yield = make_abi_yield();
 
-         // Kept in lock-step with decode() + serialize_to_variant: the get_block /
-         // get_transaction_trace pipeline emits params/return_data all-or-nothing.  Any decode
-         // failure rewinds every byte this function wrote so the streamed shape matches the
-         // variant path's legacy empty shape (no params, no return_data).
+         // get_block / get_transaction_trace emit params/return_data all-or-nothing: any decode
+         // failure rewinds every byte this function wrote (no params, no return_data).
          auto cp = w.checkpoint();
          try {
             w.key("params");
@@ -168,8 +160,7 @@ namespace sysio::trace_api {
             w.key("return_data");
             serializer->binary_to_json_stream(return_type_name, a.return_value, w, abi_yield);
          } catch (...) {
-            // Roll back params as well: the variant path returns the legacy empty shape when
-            // return_value fails to decode, and the two paths must emit identical JSON.
+            // Roll back params as well: all-or-nothing.
             w.rewind(cp);
             except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
          }

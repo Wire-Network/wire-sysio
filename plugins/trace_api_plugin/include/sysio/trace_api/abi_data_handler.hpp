@@ -38,9 +38,9 @@ namespace sysio {
     * so bulk queries that span many actions sharing the same ABI version hit the same
     * cache entry instead of rebuilding the serializer per action.
     *
-    * Decode results flag success/failure via abi_data_handler::decode_status so the
-    * caller can emit a decode_error field on failure while still returning the raw
-    * hex payload.
+    * get_actions / get_token_transfers report a decode failure in a decode_error field next to the raw hex
+    * payload (decode_to_json_stream); get_block / get_transaction_trace omit the decoded fields instead
+    * (serialize_to_json_stream).
     *
     * Can be used directly as a Data_handler_provider OR shared between request_handlers
     * using the ::shared_provider abstraction.
@@ -57,19 +57,6 @@ namespace sysio {
       /// thread-safe.
       using abi_blob_fetcher_fn = std::function<std::optional<std::vector<char>>(chain::name, uint64_t)>;
 
-      enum class decode_status {
-         not_attempted,  // no ABI available for this action
-         ok,             // decoded successfully
-         failed          // ABI was available but decoding threw
-      };
-
-      struct decode_result {
-         decode_status              status = decode_status::not_attempted;
-         fc::variant                params;         // decoded action data (empty on failure)
-         std::optional<fc::variant> return_data;    // decoded return_value (empty when no return type)
-         std::string                error_message;  // populated only when status == failed
-      };
-
       // At ~500 KB per abi_serializer (for large contracts like sysio.system),
       // 256 entries caps cache memory at roughly 130 MB in the worst case.
       static constexpr size_t default_cache_capacity = 256;
@@ -84,36 +71,30 @@ namespace sysio {
       {}
 
       /**
-       * Decode the data + return_value of an action using the ABI that was in
-       * effect when it executed.  Callers inspect decode_result::status to decide
-       * whether to emit params/return_data or a decode_error field.
+       * Decode an action's data and return_value with the ABI in effect when it executed, for get_actions /
+       * get_token_transfers: emits "params", "return_data" and "decode_error" key/value pairs directly into `w`.
+       * A params failure emits only decode_error; a return_value failure keeps params and emits decode_error in
+       * place of return_data.  Each failed field rewinds only its own bytes.  No-op if the action's account has
+       * no registered ABI or the action is not in the ABI.
+       *
+       * @param action - trace of the action including metadata necessary for finding the ABI
+       * @param w      - writer positioned inside the action's JSON object
        */
-      decode_result decode(const action_trace_v0& action);
+      void decode_to_json_stream(const action_trace_v0& action, fc::json_writer& w);
 
       /**
-       * Tuple-shape wrapper used by the response_formatter::process_block pipeline
-       * (get_block / get_transaction_trace), whose data_handler_function is keyed
-       * to the {params, return_data} tuple.  Returns empty variants on decode
-       * failure -- callers that need the decode error surfaced (get_actions /
-       * get_token_transfers) use decode() directly.
-       */
-      std::tuple<fc::variant, std::optional<fc::variant>> serialize_to_variant(const std::variant<action_trace_v0>& action);
-
-      /**
-       * Streaming counterpart of serialize_to_variant: emits the ABI-decoded "params" and (when applicable)
-       * "return_data" key/value pairs directly into `w` via fc::json_writer, without ever materialising an
-       * fc::variant tree.  Pre-conditions: `w` is positioned inside the action's enclosing JSON object such that
+       * Decode an action for get_block / get_transaction_trace: emits the ABI-decoded "params" and (when
+       * applicable) "return_data" key/value pairs directly into `w` via fc::json_writer, without ever materialising
+       * an fc::variant tree.  Pre-conditions: `w` is positioned inside the action's enclosing JSON object such that
        * additional `key(...) value(...)` pairs are valid (i.e. caller has already written global_sequence, receiver,
        * etc.).  No-op if the action's account has no registered ABI or the action is not in the ABI.
        *
-       * Fields decode independently: a parse failure on one is logged via `except_handler` and rolled back via
-       * `w.rewind()` to its own per-field checkpoint, but does NOT prevent the other from being attempted.  The
-       * lone short-circuit case is `chain::abi_recursion_depth_exception` thrown during the params decode -- the
-       * ABI is structurally bad, so retrying the other field with the same ABI cannot succeed in a useful way
-       * and the function returns early with neither field emitted.  serialize_to_variant uses the same rule.
+       * Emission is all-or-nothing: a failure decoding either field is logged via
+       * `except_handler` and rewinds every byte this call wrote, so neither "params" nor "return_data" appears.
        *
        * @param action - trace of the action including metadata necessary for finding the ABI
-       * @param w      - writer to emit into; on return, zero, one, or both of "params" / "return_data" have been added
+       * @param w      - writer to emit into; on return, either nothing or "params" (plus "return_data" when the
+       *                 action has a decodable return value) has been added
        */
       void serialize_to_json_stream(const std::variant<action_trace_v0>& action, fc::json_writer& w);
 
@@ -126,12 +107,8 @@ namespace sysio {
          :handler(handler)
          {}
 
-         decode_result decode(const action_trace_v0& action) {
-            return handler->decode(action);
-         }
-
-         std::tuple<fc::variant, std::optional<fc::variant>> serialize_to_variant( const std::variant<action_trace_v0>& action ) {
-            return handler->serialize_to_variant(action);
+         void decode_to_json_stream(const action_trace_v0& action, fc::json_writer& w) {
+            handler->decode_to_json_stream(action, w);
          }
 
          void serialize_to_json_stream( const std::variant<action_trace_v0>& action, fc::json_writer& w ) {
