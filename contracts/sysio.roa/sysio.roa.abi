@@ -4,6 +4,20 @@
     "types": [],
     "structs": [
         {
+            "name": "account_limit_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "default_limit",
+                    "type": "uint64"
+                },
+                {
+                    "name": "max_raise_multiplier_bps",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "activateroa",
             "base": "",
             "fields": [
@@ -310,6 +324,20 @@
             ]
         },
         {
+            "name": "raiseacctlim",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "new_limit",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "reducepolicy",
             "base": "",
             "fields": [
@@ -394,6 +422,20 @@
             ]
         },
         {
+            "name": "setacctlim",
+            "base": "",
+            "fields": [
+                {
+                    "name": "default_limit",
+                    "type": "uint64"
+                },
+                {
+                    "name": "max_raise_multiplier_bps",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "setbyteprice",
             "base": "",
             "fields": [
@@ -474,6 +516,10 @@
                 {
                     "name": "count",
                     "type": "uint64"
+                },
+                {
+                    "name": "raised_limit",
+                    "type": "uint64"
                 }
             ]
         },
@@ -535,8 +581,18 @@
             "ricardian_contract": ""
         },
         {
+            "name": "raiseacctlim",
+            "type": "raiseacctlim",
+            "ricardian_contract": ""
+        },
+        {
             "name": "reducepolicy",
             "type": "reducepolicy",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setacctlim",
+            "type": "setacctlim",
             "ricardian_contract": ""
         },
         {
@@ -556,6 +612,14 @@
         }
     ],
     "tables": [
+        {
+            "name": "acctlimcfg",
+            "type": "account_limit_config",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 53885
+        },
         {
             "name": "nodeownerreg",
             "type": "nodeownerreg",
