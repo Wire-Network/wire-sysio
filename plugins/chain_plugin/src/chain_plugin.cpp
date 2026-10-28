@@ -2748,7 +2748,8 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    if (params_deadline != fc::time_point::maximum() && limit > max_return_items)
       limit = max_return_items;
    // The page's copied bytes are bounded whatever the deadline, so neither an unlimited deadline nor large rows let one
-   // request stage an unbounded copy; the page ends with more/next_key after the row that reaches the limit.
+   // request stage an unbounded copy; the page ends with more/next_key after the row that reaches the limit, or on a
+   // secondary index after the last row sharing that row's secondary key.
    const uint64_t max_page_bytes = p.all_rows ? std::numeric_limits<uint64_t>::max() : max_return_bytes;
    bool reverse = p.reverse.has_value() && *p.reverse;
 
@@ -2821,32 +2822,37 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          hp.next_key = fc::to_hex(sk.data(), sk.size());
       };
 
+      // A page ends only where the secondary key changes. next_key is a secondary key, which resumes at the first row
+      // that has it, so a page that ended among rows sharing one would repeat them going forward, possibly as the same
+      // page forever, and skip the rest of them in reverse. A full page therefore reads on to the end of the secondary
+      // key it is on, past the limit, the deadline and the byte limit. The limit alone can end a page before its first
+      // row (limit 0).
+      const auto page_full = [&](uint32_t count, uint64_t bytes) {
+         return count >= limit || (count > 0 && (fc::time_point::now() >= params_deadline || bytes >= max_page_bytes));
+      };
+
       if (!reverse) {
          auto itr = sec_idx.lower_bound(boost::make_tuple(p.code, sec_tid, lb_sv));
-         // Shared by the loop and the deadline cut, so a cut never reports a next row past the upper bound.
+         // The loop cuts only at a row in range, so a cut never reports a next row past the upper bound.
          const auto in_range = [&](const auto& it) {
             return it != sec_idx.end() && it->code == p.code && it->table_id == sec_tid &&
                    (!has_upper || it->sec_key_view() < ub_sv);
          };
          uint32_t count = 0;
          uint64_t bytes = 0;
+         // The last added row's secondary key, a view into the index, which phase 1 does not modify.
+         std::string_view last_added_sk;
          while (in_range(itr)) {
-            if (count >= limit) {
+            if (page_full(count, bytes) && (count == 0 || itr->sec_key_view() != last_added_sk)) {
                hp.more = true;
                emit_secondary_next_key(itr->sec_key_view());
                break;
             }
             const auto& row = hp.rows.emplace_back(fetch_primary(*itr));
             bytes += owned_table_row_bytes(row.key.size(), row.value.size());
+            last_added_sk = itr->sec_key_view();
             ++count;
             ++itr;
-            if (fc::time_point::now() >= params_deadline || bytes >= max_page_bytes) {
-               if (in_range(itr)) {
-                  hp.more = true;
-                  emit_secondary_next_key(itr->sec_key_view());
-               }
-               break;
-            }
          }
       } else {
          // Reverse iteration.
@@ -2883,8 +2889,8 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
                if (itr->code != p.code || itr->table_id != sec_tid) break;
                auto sk = itr->sec_key_view();
                if (!lb_bytes.empty() && sk < lb_sv) break;
-               if (count >= limit) {
-                  if (!last_added_sk_bytes.empty()) {
+               if (page_full(count, bytes) && (count == 0 || sk != last_added_sv())) {
+                  if (count > 0) {
                      hp.more = true;
                      emit_secondary_next_key(last_added_sv());
                   }
@@ -2894,13 +2900,6 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
                bytes += owned_table_row_bytes(row.key.size(), row.value.size());
                last_added_sk_bytes.assign(sk.data(), sk.data() + sk.size());
                ++count;
-               if (fc::time_point::now() >= params_deadline || bytes >= max_page_bytes) {
-                  if (itr != begin) {
-                     hp.more = true;
-                     emit_secondary_next_key(last_added_sv());
-                  }
-                  break;
-               }
             } while (itr != begin);
          }
       }

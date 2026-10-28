@@ -3622,4 +3622,94 @@ BOOST_FIXTURE_TEST_CASE( get_table_by_scope_page_byte_limit_test, validating_tes
 } FC_LOG_AND_RETHROW()
 
 
+/// A secondary-index page ends only where the secondary key changes, since next_key resumes at the first row with a
+/// secondary key: once the byte limit, `limit` or the deadline fills a page, it reads on to the last row sharing the
+/// secondary key it is on. Paging on next_key then returns every row once, forward and reverse, in JSON and in hex.
+BOOST_FIXTURE_TEST_CASE( get_table_rows_secondary_equal_keys_paging_test, validating_tester ) try {
+   constexpr auto account = "secequal"_n;
+   constexpr uint32_t rows_per_page = 3;
+   produce_block();
+   create_accounts({account});
+   produce_block();
+   set_code(account, test_contracts::test_kv_sec_query_wasm());
+   set_abi(account, test_contracts::test_kv_sec_query_abi());
+   produce_block();
+   // byowner orders the rows (owner, id): ids 1 to 10 in turn, with 3 to 8 sharing "u3".
+   const std::map<uint64_t, std::string> owners{{1, "u1"}, {2, "u2"}, {3, "u3"}, {4, "u3"}, {5, "u3"},
+                                                {6, "u3"}, {7, "u3"}, {8, "u3"}, {9, "u4"}, {10, "u5"}};
+   for (const auto& [id, owner] : owners)
+      push_action(account, "adduser"_n, account, mutable_variant_object()("id", id)("owner", owner)("balance", id));
+   produce_block();
+
+   const std::function<uint64_t(const fc::variant&)> id_of = [](const fc::variant& row) {
+      return row["key"]["id"].as_uint64();
+   };
+   const std::function<uint64_t(const fc::variant&)> hex_id_of = [](const fc::variant& row) {
+      const auto key = fc::from_hex(row["key"].as_string());
+      BOOST_REQUIRE_EQUAL(key.size(), sizeof(uint64_t));
+      return chain::kv_load_be64(reinterpret_cast<const char*>(key.data()));
+   };
+
+   std::optional<sysio::chain_apis::tracked_votes> votes;
+   chain_apis::read_only api(*control, {}, {}, votes, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+   chain_apis::read_only::get_table_rows_params p;
+   p.code       = account;
+   p.table      = "users";
+   p.index_name = "byowner";
+   const auto check_both_ways = [&](const std::vector<std::vector<uint64_t>>& forward_pages,
+                                    const std::vector<std::vector<uint64_t>>& reverse_pages) {
+      for (const bool json : {true, false}) {
+         BOOST_TEST_CONTEXT("json " << json) {
+            p.json    = json;
+            p.reverse = false;
+            check_pages(page_through(api, p, json ? id_of : hex_id_of), forward_pages);
+            p.reverse = true;
+            check_pages(page_through(api, p, json ? id_of : hex_id_of), reverse_pages);
+         }
+      }
+   };
+
+   // Three rows fill a page, by bytes and then by `limit`; the page that fills on "u3" takes the rest of it.
+   const std::vector<std::vector<uint64_t>> forward_pages{{1, 2, 3, 4, 5, 6, 7, 8}, {9, 10}};
+   const std::vector<std::vector<uint64_t>> reverse_pages{{10, 9, 8, 7, 6, 5, 4, 3}, {2, 1}};
+   BOOST_TEST_CONTEXT("byte limit") {
+      api.set_max_return_bytes((rows_per_page - 1) * first_row_bytes(*control, account, "users") + 1);
+      p.limit = 100000;
+      check_both_ways(forward_pages, reverse_pages);
+      api.set_max_return_bytes(chain_apis::api_base::default_max_return_bytes);
+   }
+   BOOST_TEST_CONTEXT("limit") {
+      p.limit = rows_per_page;
+      check_both_ways(forward_pages, reverse_pages);
+   }
+
+   // A deadline already past fills a page at its first row.
+   BOOST_TEST_CONTEXT("deadline") {
+      p.limit         = 100000;
+      p.time_limit_ms = 0;
+      check_both_ways({{1}, {2}, {3, 4, 5, 6, 7, 8}, {9}, {10}}, {{10}, {9}, {8, 7, 6, 5, 4, 3}, {2}, {1}});
+      p.time_limit_ms.reset();
+   }
+
+   // The cursor is the next secondary key going forward and the last one returned in reverse.
+   p.json  = true;
+   p.limit = rows_per_page;
+   p.reverse = false;
+   auto page = get_table_rows_kv(api, p, fc::time_point::maximum());
+   BOOST_CHECK(page.more);
+   BOOST_CHECK_EQUAL(page.next_key, R"({"byowner":"u4"})");
+   p.reverse = true;
+   page = get_table_rows_kv(api, p, fc::time_point::maximum());
+   BOOST_CHECK(page.more);
+   BOOST_CHECK_EQUAL(page.next_key, R"({"byowner":"u3"})");
+
+   // `limit` 0 still ends a page before its first row, with a cursor at that row.
+   p.reverse = false;
+   p.limit   = 0;
+   page = get_table_rows_kv(api, p, fc::time_point::maximum());
+   BOOST_CHECK(page.rows.empty());
+   BOOST_CHECK(page.more);
+   BOOST_CHECK_EQUAL(page.next_key, R"({"byowner":"u1"})");
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()

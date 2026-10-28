@@ -41,7 +41,8 @@ POST /v1/chain/get_table_rows
 - `more` — `true` if there are more rows beyond this page. A page ends at `limit`, at the deadline
   (`time_limit_ms` or the server's `http-max-response-time-ms`), or after the row that brings the page to 8 MiB of raw
   row data, whichever comes first; a page always holds at least one row. With a finite deadline `limit` is also capped
-  at 1000.
+  at 1000. On a secondary index a page ends only where the secondary key changes: it goes on past any of these to the
+  last row sharing the secondary key it is on, because `next_key` resumes at the first row with a secondary key.
 - `next_key` — the cursor for the next page. **Forward scans feed it to `lower_bound`; reverse scans feed it to `upper_bound`** (reverse `next_key` is the last key RETURNED, so the exclusive upper bound must advance below it). Usually a JSON key object with the scope stripped (pass the same `scope` param); for a key the ABI cannot name it is a `0x` raw cursor instead — an opaque, complete key. Feed either back verbatim.
 
 ## Scoped Queries
