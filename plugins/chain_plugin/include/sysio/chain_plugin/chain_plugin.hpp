@@ -246,6 +246,8 @@ class read_write;
 class api_base {
 public:
    static constexpr uint32_t max_return_items = 1000;
+   /// Default of read_only's per-page byte limit for table queries; see read_only::set_max_return_bytes.
+   static constexpr uint64_t default_max_return_bytes = 8 * 1024 * 1024;
    static void handle_db_exhaustion();
    static void handle_bad_alloc();
 
@@ -270,6 +272,7 @@ class read_only : public api_base {
    const fc::microseconds abi_serializer_max_time;
    const fc::microseconds http_max_response_time;
    bool  shorten_abi_errors = true;
+   uint64_t max_return_bytes = default_max_return_bytes;
    const trx_finality_status_processing* trx_finality_status_proc;
    friend class api_base;
 
@@ -301,6 +304,10 @@ public:
    }
 
    void set_shorten_abi_errors( bool f ) { shorten_abi_errors = f; }
+
+   /// Bytes of rows one get_table_rows or get_table_by_scope page may copy, whatever the deadline. The page ends with
+   /// `more` after the row that reaches it, so a page always holds at least one row. `all_rows` calls are exempt.
+   void set_max_return_bytes( uint64_t bytes ) { max_return_bytes = bytes; }
 
    void set_tracked_votes_tracking_enabled( bool flag ) {
       if (last_tracked_votes) {

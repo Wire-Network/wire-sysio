@@ -2747,6 +2747,9 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    // unlimited http-max-response-time-ms (-1).
    if (params_deadline != fc::time_point::maximum() && limit > max_return_items)
       limit = max_return_items;
+   // The page's copied bytes are bounded whatever the deadline, so neither an unlimited deadline nor large rows let one
+   // request stage an unbounded copy; the page ends with more/next_key after the row that reaches the limit.
+   const uint64_t max_page_bytes = p.all_rows ? std::numeric_limits<uint64_t>::max() : max_return_bytes;
    bool reverse = p.reverse.has_value() && *p.reverse;
 
    // --- Secondary index query path ---
@@ -2826,16 +2829,18 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
                    (!has_upper || it->sec_key_view() < ub_sv);
          };
          uint32_t count = 0;
+         uint64_t bytes = 0;
          while (in_range(itr)) {
             if (count >= limit) {
                hp.more = true;
                emit_secondary_next_key(itr->sec_key_view());
                break;
             }
-            hp.rows.push_back(fetch_primary(*itr));
+            const auto& row = hp.rows.emplace_back(fetch_primary(*itr));
+            bytes += owned_table_row_bytes(row.key.size(), row.value.size());
             ++count;
             ++itr;
-            if (fc::time_point::now() >= params_deadline) {
+            if (fc::time_point::now() >= params_deadline || bytes >= max_page_bytes) {
                if (in_range(itr)) {
                   hp.more = true;
                   emit_secondary_next_key(itr->sec_key_view());
@@ -2865,6 +2870,7 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
             itr = sec_idx.lower_bound(boost::make_tuple(p.code, sec_tid, ub_sv));
          }
          uint32_t count = 0;
+         uint64_t bytes = 0;
          // Remember the last-returned row's sec_key bytes so the cutoff
          // branches below can feed them to `emit_secondary_next_key`.
          std::vector<char> last_added_sk_bytes;
@@ -2884,10 +2890,11 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
                   }
                   break;
                }
-               hp.rows.push_back(fetch_primary(*itr));
+               const auto& row = hp.rows.emplace_back(fetch_primary(*itr));
+               bytes += owned_table_row_bytes(row.key.size(), row.value.size());
                last_added_sk_bytes.assign(sk.data(), sk.data() + sk.size());
                ++count;
-               if (fc::time_point::now() >= params_deadline) {
+               if (fc::time_point::now() >= params_deadline || bytes >= max_page_bytes) {
                   if (itr != begin) {
                      hp.more = true;
                      emit_secondary_next_key(last_added_sv());
@@ -2990,7 +2997,8 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       has_upper ? std::optional<std::vector<char>>(std::move(ub_bytes)) : std::nullopt,
       reverse ? scan_direction::reverse : scan_direction::forward, limit};
    table_read_budget budget;
-   budget.deadline = params_deadline;
+   budget.deadline  = params_deadline;
+   budget.max_bytes = max_page_bytes;
    auto page = capture_primary_page(db, request, budget);
    hp.rows = std::move(page.rows);
    hp.more = page.more;
@@ -3210,6 +3218,16 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
       return it != tid_to_name.end() ? it->second : string();
    };
 
+   // As in get_table_rows, a page's bytes are bounded whatever the deadline: it ends with `more` after the row that
+   // reaches max_return_bytes. Two row slots cover the row vector's growth.
+   uint64_t bytes = 0;
+   const auto add_row = [&](uint64_t scope_raw, uint16_t tid) {
+      const auto& row =
+         result.rows.emplace_back(get_table_by_scope_result_row{p.code, name(scope_raw), table_name_for(tid)});
+      bytes += 2 * sizeof(get_table_by_scope_result_row) + row.table.size();
+   };
+   const auto page_full = [&] { return fc::time_point::now() >= params_deadline || bytes >= max_return_bytes; };
+
    bool reverse = p.reverse && *p.reverse;
 
    if (!reverse) {
@@ -3261,12 +3279,13 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
             continue;
          }
 
-         // Emit this (table_id, scope) pair
-         if (count >= limit) {
+         // Emit this (table_id, scope) pair, unless the page is full: a page holds at least one row, and ends at the
+         // deadline or byte limit only here, where the next row is known to exist and be in range.
+         if (count >= limit || (count > 0 && page_full())) {
             result.more = table_name_for(cur_tid) + ":" + name(scope_raw).to_string();
             break;
          }
-         result.rows.push_back({p.code, name(scope_raw), table_name_for(cur_tid)});
+         add_row(scope_raw, cur_tid);
          ++count;
 
          // Seek-skip to next scope: advance scope by 1, overflow to next table_id
@@ -3279,14 +3298,6 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
             itr = kv_idx.lower_bound(
                boost::make_tuple(p.code, static_cast<uint16_t>(cur_tid + 1), seek.to_string_view()));
          } else {
-            break;
-         }
-
-         if (fc::time_point::now() >= params_deadline) {
-            if (is_valid(itr)) {
-               uint64_t ns = extract_scope(itr->key_view());
-               result.more = table_name_for(itr->table_id) + ":" + name(ns).to_string();
-            }
             break;
          }
       }
@@ -3337,12 +3348,13 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
             continue;
          }
 
-         // Emit this (table_id, scope) pair
-         if (count >= limit) {
+         // Emit this (table_id, scope) pair, unless the page is full: a page holds at least one row, and ends at the
+         // deadline or byte limit only here, where the next row is known to exist and be in range.
+         if (count >= limit || (count > 0 && page_full())) {
             result.more = table_name_for(cur_tid) + ":" + name(scope_raw).to_string();
             break;
          }
-         result.rows.push_back({p.code, name(scope_raw), table_name_for(cur_tid)});
+         add_row(scope_raw, cur_tid);
          ++count;
 
          // Seek-skip to previous scope
@@ -3358,18 +3370,6 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
          }
          itr = kv_idx.upper_bound(
             boost::make_tuple(p.code, cur_tid, seek.to_string_view()));
-
-         if (fc::time_point::now() >= params_deadline) {
-            if (itr != kv_idx.begin()) {
-               auto prev = itr;
-               --prev;
-               if (is_valid(prev)) {
-                  uint64_t ns = extract_scope(prev->key_view());
-                  result.more = table_name_for(prev->table_id) + ":" + name(ns).to_string();
-               }
-            }
-            break;
-         }
       }
    }
 
