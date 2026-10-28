@@ -117,6 +117,9 @@ namespace fc {
    void to_variant(const crypto::public_key& var, variant& vo, const fc::yield_function_t& yield = fc::yield_function_t());
 
    void from_variant(const variant& var, crypto::public_key& vo);
+
+   class json_writer;
+   void to_json_stream(const crypto::public_key& var, json_writer& w);
 } // namespace fc
 
 FC_REFLECT(fc::crypto::public_key, (_storage) )

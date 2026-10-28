@@ -14,6 +14,8 @@ add_executable( test_fc
         io/test_atomic_file.cpp
         io/test_json.cpp
         io/test_json_template.cpp
+        io/test_json_stream.cpp
+        test_move_only_function.cpp
         io/test_secure_file.cpp
         log/test_json_formatter.cpp
         log/test_es_sink.cpp

@@ -82,7 +82,7 @@ std::vector<char> base64_decode( const std::string& s);
 std::vector<char> base64_decode( std::string_view s);
 std::string base64url_encode(const char* s, size_t len);
 std::string base64url_encode(const std::string& s);
-std::vector<char> base64url_decode(const std::string& s);
+std::vector<char> base64url_decode(std::string_view s);
 
 namespace detail {
  //
@@ -373,7 +373,7 @@ inline std::string base64url_encode(const std::string& s) {
    return base64_encode<std::string>((unsigned char const*)s.data(), s.size(), true);
 }
 
-inline std::vector<char> base64url_decode(const std::string& s) {
-   return detail::decode<std::vector<char>>(s, false, true);
+inline std::vector<char> base64url_decode(std::string_view s) {
+   return detail::decode<std::vector<char>, std::string_view>(s, false, true);
 }
 } // namespace fc

@@ -5,6 +5,7 @@
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
 #include <fc/crypto/hex.hpp>
+#include <fc/io/json_stream.hpp>
 
 namespace fc {
 
@@ -144,20 +145,26 @@ namespace fc {
    }
 
    template<typename T, typename... U>
+   void to_json_stream( const flat_set< T, U... >& s, json_writer& w ) {
+      detail::to_json_stream_from_set( s, w );
+   }
+   template<typename T, typename... U>
    void to_variant( const flat_set< T, U... >& s, fc::variant& vo ) {
       detail::to_variant_from_set( s, vo );
    }
-
    template<typename T, typename... U>
    void from_variant( const fc::variant& v, flat_set< T, U... >& s ) {
       detail::from_variant_to_flat_set( v, s );
    }
 
    template<typename T, typename... U>
+   void to_json_stream( const flat_multiset< T, U... >& s, json_writer& w ) {
+      detail::to_json_stream_from_set( s, w );
+   }
+   template<typename T, typename... U>
    void to_variant( const flat_multiset< T, U... >& s, fc::variant& vo ) {
       detail::to_variant_from_set( s, vo );
    }
-
    template<typename T, typename... U>
    void from_variant( const fc::variant& v, flat_multiset< T, U... >& s ) {
       detail::from_variant_to_flat_set( v, s );
@@ -168,6 +175,11 @@ namespace fc {
       detail::to_variant_from_map( m, vo );
    }
 
+   template<typename K, typename V, typename... U >
+   void to_json_stream( const flat_map< K, V, U... >& m, fc::json_writer& w ) {
+      detail::to_json_stream_from_map( m, w );
+   }
+
    template<typename K, typename V, typename... U>
    void from_variant( const variant& v,  flat_map<K, V, U...>& m ) {
       detail::from_variant_to_flat_map( v, m );
@@ -176,6 +188,11 @@ namespace fc {
    template<typename K, typename V, typename... U >
    void to_variant( const flat_multimap< K, V, U... >& m, fc::variant& vo ) {
       detail::to_variant_from_map( m, vo );
+   }
+
+   template<typename K, typename V, typename... U >
+   void to_json_stream( const flat_multimap< K, V, U... >& m, fc::json_writer& w ) {
+      detail::to_json_stream_from_map( m, w );
    }
 
    template<typename K, typename V, typename... U>

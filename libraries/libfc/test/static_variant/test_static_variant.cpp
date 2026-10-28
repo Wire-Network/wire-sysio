@@ -3,6 +3,17 @@
 #include <fc/static_variant.hpp>
 #include <fc/variant.hpp>
 
+// Include order below static_variant.hpp is LOAD-BEARING, do not sort these up.
+// fc::sha256 gets its JSON serializer from the FC_SERIALIZE_AS_STRING trait declared in
+// fc/serialize_as_string.hpp, which static_variant.hpp does not pull in.  Including it here --
+// after static_variant.hpp -- is exactly the "alternative declared later" arrangement that
+// to_json_stream(std::variant) has to keep working: if that template ever dispatches its
+// alternatives with a qualified fc::to_json_stream again, the overload set is fixed where the
+// template is defined, fc::sha256 falls through to the reflector primary (it is only
+// FC_REFLECT_TYPENAME'd, never FC_REFLECT'd) and this translation unit fails to compile.
+#include <fc/crypto/sha256.hpp>
+#include <fc/io/json_stream.hpp>
+
 BOOST_AUTO_TEST_SUITE(static_variant_test_suite)
    BOOST_AUTO_TEST_CASE(to_from_fc_variant)
    {
@@ -42,6 +53,26 @@ BOOST_AUTO_TEST_SUITE(static_variant_test_suite)
 
       fc::from_index(v, 2);
       BOOST_REQUIRE(std::string{} == std::get<std::string>(v));
+   }
+
+   /// to_json_stream(std::variant) must dispatch its alternatives through ADL, so an alternative
+   /// whose serializer is declared after static_variant.hpp still resolves.  fc::sha256 is that
+   /// alternative here (see the include-order note at the top of this file): with a qualified
+   /// fc::to_json_stream in the visitor, the overload set is frozen where the template is defined,
+   /// sha256 falls through to the reflector primary and this test does not compile.
+   BOOST_AUTO_TEST_CASE(to_json_stream_late_declared_alternative)
+   {
+      using variant_type = std::variant<fc::sha256, int32_t>;
+
+      const auto hash = fc::sha256::hash(std::string{"wire"});
+      const auto hashed = variant_type{hash};
+
+      BOOST_CHECK_EQUAL(fc::to_json_string(hashed), "[0,\"" + hash.str() + "\"]");
+      BOOST_CHECK_EQUAL(fc::to_json_string(variant_type{int32_t{7}}), "[1,7]");
+
+      // ... and the streamed shape stays byte-identical to the variant path's.
+      BOOST_CHECK_EQUAL(fc::to_json_string(hashed),
+                        fc::json::to_string(fc::variant(hashed), fc::json::yield_function_t()));
    }
 
    BOOST_AUTO_TEST_CASE(static_variant_get_index)

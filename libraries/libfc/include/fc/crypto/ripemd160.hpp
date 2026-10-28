@@ -4,6 +4,7 @@
 #include <fc/crypto/packhash.hpp>
 #include <fc/io/raw_fwd.hpp>
 #include <fc/reflect/typename.hpp>
+#include <fc/serialize_as_string.hpp>
 
 namespace fc{
 class sha512;
@@ -13,9 +14,13 @@ class ripemd160 : public add_packhash_to_hash<ripemd160>
 {
   public:
     ripemd160();
-    explicit ripemd160( const std::string& hex_str );
+    explicit ripemd160( std::string_view hex_str );
 
     std::string str()const;
+    std::string to_string() const { return str(); }
+    /// Validating parse used by the FC_SERIALIZE_AS_STRING trait: rejects odd-length
+    /// hex (the strictness the pre-trait from_variant vector<char> path enforced).
+    static ripemd160 from_string(std::string_view s);
 
     char*    data()const;
     size_t data_size()const { return 160/8; }
@@ -69,10 +74,6 @@ class ripemd160 : public add_packhash_to_hash<ripemd160>
     uint32_t _hash[5];
 };
 
-  class variant;
-  void to_variant( const ripemd160& bi, variant& v );
-  void from_variant( const variant& v, ripemd160& bi );
-
   typedef ripemd160 uint160_t;
   typedef ripemd160 uint160;
 
@@ -91,3 +92,5 @@ namespace std
        }
     };
 }
+
+FC_SERIALIZE_AS_STRING(fc::ripemd160)

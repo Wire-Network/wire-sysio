@@ -2,7 +2,7 @@
 
 #include <fc/crypto/hex.hpp>
 #include <fc/exception/exception.hpp>
-#include <fc/variant.hpp>
+#include <fc/serialize_as_string.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -26,7 +26,7 @@ public:
 
    blake3() { memset(_hash, 0, sizeof(_hash)); }
 
-   explicit blake3(const std::string& hex_str) {
+   explicit blake3(std::string_view hex_str) {
       auto bytes = from_hex(hex_str);
       FC_ASSERT(bytes.size() == sizeof(_hash),
                 "Invalid blake3 hex string length: {}", hex_str.size());
@@ -34,6 +34,14 @@ public:
    }
 
    std::string str() const { return to_hex(to_char_span()); }
+   std::string to_string() const { return str(); }
+   /// Validating parse used by the FC_SERIALIZE_AS_STRING trait: rejects odd-length
+   /// hex (a 63-char string would otherwise round up to 32 decoded bytes and pass the
+   /// constructor's size check with a zero-extended final nibble).
+   static blake3 from_string(std::string_view s) {
+      FC_ASSERT(s.size() % 2 == 0, "blake3 hex string length must be even, got {}", s.size());
+      return blake3(s);
+   }
 
    uint8_t*       data()       { return _hash; }
    const uint8_t* data() const { return _hash; }
@@ -74,17 +82,8 @@ private:
 
 } // namespace crypto
 
-inline void to_variant( const crypto::blake3& bi, variant& v ) {
-   v = std::vector<char>( bi.char_data(), bi.char_data() + bi.data_size() );
-}
-
-inline void from_variant( const variant& v, crypto::blake3& bi ) {
-   std::vector<char> ve = v.as< std::vector<char> >();
-   FC_ASSERT(ve.size() == crypto::blake3::byte_size, "Invalid blake3 data size: {}", ve.size());
-   memcpy(bi.char_data(), ve.data(), crypto::blake3::byte_size);
-}
-
 } // namespace fc
 
 #include <fc/reflect/reflect.hpp>
 FC_REFLECT_TYPENAME(fc::crypto::blake3)
+FC_SERIALIZE_AS_STRING(fc::crypto::blake3)

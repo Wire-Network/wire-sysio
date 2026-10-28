@@ -30,11 +30,12 @@ namespace fc::crypto::bls {
       explicit signature(bls::signature_data_span affine_non_montgomery_le);
 
       // affine non-montgomery base64url with signature_prefix
-      explicit signature(const std::string& base64urlstr);
+      explicit signature(std::string_view base64urlstr);
 
       // affine non-montgomery base64url with signature_prefix
       std::string to_string() const;
       static std::string to_string(const bls::signature_data& sig);
+      static signature from_string(std::string_view s) { return signature(s); }
 
       const bls12_381::g2&            jacobian_montgomery_le() const { return _jacobian_montgomery_le; }
       const bls::signature_data&      affine_non_montgomery_le() const { return _affine_non_montgomery_le; }
@@ -93,7 +94,7 @@ namespace fc::crypto::bls {
       aggregate_signature& operator=(aggregate_signature&&) = default;
 
       // affine non-montgomery base64url with signature_prefix
-      explicit aggregate_signature(const std::string& base64_url_str);
+      explicit aggregate_signature(std::string_view base64_url_str);
 
       explicit aggregate_signature(const signature& sig)
          : _jacobian_montgomery_le(sig.jacobian_montgomery_le()) {}
@@ -110,6 +111,7 @@ namespace fc::crypto::bls {
       // affine non-montgomery base64url with signature_prefix
       // Expensive as conversion from Jacobian Montgomery to Affine Non-Montgomery needed
       std::string to_string() const;
+      static aggregate_signature from_string(std::string_view s) { return aggregate_signature(s); }
 
       const bls12_381::g2& jacobian_montgomery_le() const { return _jacobian_montgomery_le; }
 
@@ -148,11 +150,6 @@ namespace fc::crypto::bls {
 
 }  // fc::crypto::bls
 
-namespace fc {
-
-   void to_variant(const crypto::bls::signature& var, variant& vo);
-   void from_variant(const variant& var, crypto::bls::signature& vo);
-   void to_variant(const crypto::bls::aggregate_signature& var, variant& vo);
-   void from_variant(const variant& var, crypto::bls::aggregate_signature& vo);
-
-} // namespace fc
+#include <fc/serialize_as_string.hpp>
+FC_SERIALIZE_AS_STRING(fc::crypto::bls::signature)
+FC_SERIALIZE_AS_STRING(fc::crypto::bls::aggregate_signature)

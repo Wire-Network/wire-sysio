@@ -2,6 +2,7 @@
 #include <fc/crypto/common.hpp>
 #include <fc/crypto/key_serdes.hpp>
 #include <fc/exception/exception.hpp>
+#include <fc/io/json_stream.hpp>
 
 namespace fc { namespace crypto {
    struct hash_visitor : public fc::visitor<size_t> {
@@ -136,5 +137,11 @@ namespace fc
    void from_variant(const fc::variant& var, fc::crypto::signature& vo)
    {
       vo = fc::crypto::signature::from_string(var.as_string());
+   }
+
+   void to_json_stream(const fc::crypto::signature& var, json_writer& w)
+   {
+      // Match to_variant's include-prefix=true output (eg "SIG_K1_..." / "SIG_WA_...").
+      w.value_string(var.to_string(fc::yield_function_t(), true));
    }
 } // fc

@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <fc/filesystem.hpp>
 #include <fc/variant_object.hpp>
+#include <fc/serialize_as_string.hpp>
 #include <memory>
 
 namespace fc {
@@ -39,6 +40,8 @@ namespace fc {
       bool operator==( const url& cmp )const;
 
       operator std::string()const;
+      std::string to_string() const { return std::string(*this); }
+      static url from_string(std::string_view s) { return url(std::string(s)); }
 
       //// file, ssh, tcp, http, ssl, etc...
       std::string               proto()const;
@@ -55,7 +58,6 @@ namespace fc {
       std::shared_ptr<detail::url_impl> my;
   };
 
-  void to_variant( const url& u, fc::variant& v );
-  void from_variant( const fc::variant& v, url& u );
-
 } // namespace fc
+
+FC_SERIALIZE_AS_STRING(fc::url)

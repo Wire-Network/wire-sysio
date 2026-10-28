@@ -4,6 +4,7 @@
 #include <ctime>
 #include <string>
 #include <limits>
+#include <fc/io/json_stream_fwd.hpp>
 
 #ifdef _MSC_VER
   #pragma warning (push)
@@ -45,6 +46,7 @@ namespace fc {
   class variant;
   void to_variant( const fc::microseconds&,  fc::variant&  );
   void from_variant( const fc::variant& , fc::microseconds& );
+  void to_json_stream( const fc::microseconds&, fc::json_writer& );
 
   class time_point {
     public:
