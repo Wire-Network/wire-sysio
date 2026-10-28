@@ -213,12 +213,6 @@ private:
    bool is_protobuf_type(const std::string_view& type) const;
    const google::protobuf::Descriptor* get_pb_descriptor(const std::string_view& type) const;
    fc::variant pb_binary_to_variant(const std::string_view& type, fc::datastream<const char*>& stream) const;
-   /// Streaming protobuf bridge: decodes the protobuf blob and returns the JSON
-   /// string produced by `MessageToJsonString` (which `pb_binary_to_variant`
-   /// otherwise round-trips through `fc::json::from_string`).  Used by
-   /// `stream_sink::unpack_protobuf` to splice via `raw_value` without building
-   /// an intermediate variant tree.
-   std::string pb_binary_to_json_string(const std::string_view& type, fc::datastream<const char*>& stream) const;
    void pb_variant_to_binary(const std::string_view& type, const fc::variant& var, fc::datastream<char*>& ds) const;
 
    fc::variant _binary_to_variant( const std::string_view& type, const bytes& binary, impl::binary_to_variant_context& ctx )const;

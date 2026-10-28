@@ -1014,6 +1014,56 @@ BOOST_AUTO_TEST_CASE(non_finite_float_sign_parity)
 
 } FC_LOG_AND_RETHROW() }
 
+// Built-in arrays stream through their own unpack helper, which must cap the element count at
+// MAX_NUM_ARRAY_ELEMENTS like the variant path's fc::raw vector unpack. The payload carries
+// every element, so only the cap can reject it.
+BOOST_AUTO_TEST_CASE(stream_built_in_array_limit)
+{ try {
+   const char* test_abi = R"=====(
+   {
+      "version": "sysio::abi/1.0",
+      "types": [],
+      "structs": [{ "name": "arr", "base": "", "fields": [{ "name": "items", "type": "uint8[]" }] }],
+      "actions": [], "tables": [], "ricardian_clauses": []
+   }
+   )=====";
+   abi_serializer abis(fc::json::from_string(test_abi).as<abi_def>(), yield_fn());
+
+   constexpr uint32_t over_limit = MAX_NUM_ARRAY_ELEMENTS + 1;
+   bytes packed = fc::raw::pack(fc::unsigned_int(over_limit));
+   packed.resize(packed.size() + over_limit);
+
+   BOOST_CHECK_THROW(abis.binary_to_variant("arr", packed, yield_fn()), unpack_exception);
+   std::string stream_json;
+   fc::json_writer w(stream_json);
+   BOOST_CHECK_THROW(abis.binary_to_json_stream("arr", packed, w, yield_fn()), unpack_exception);
+} FC_LOG_AND_RETHROW() }
+
+// A built-in optional's presence flag is a bool: like the variant path's fc::raw optional
+// unpack, the stream path rejects any byte but 0 or 1 instead of reading it as present.
+BOOST_AUTO_TEST_CASE(stream_built_in_optional_presence_flag)
+{ try {
+   const char* test_abi = R"=====(
+   {
+      "version": "sysio::abi/1.0",
+      "types": [],
+      "structs": [{ "name": "opt", "base": "", "fields": [{ "name": "maybe", "type": "uint32?" }] }],
+      "actions": [], "tables": [], "ricardian_clauses": []
+   }
+   )=====";
+   abi_serializer abis(fc::json::from_string(test_abi).as<abi_def>(), yield_fn());
+
+   constexpr char invalid_presence = 2;
+   bytes packed{invalid_presence};
+   const auto value = fc::raw::pack(uint32_t{1});
+   packed.insert(packed.end(), value.begin(), value.end());
+
+   BOOST_CHECK_THROW(abis.binary_to_variant("opt", packed, yield_fn()), unpack_exception);
+   std::string stream_json;
+   fc::json_writer w(stream_json);
+   BOOST_CHECK_THROW(abis.binary_to_json_stream("opt", packed, w, yield_fn()), unpack_exception);
+} FC_LOG_AND_RETHROW() }
+
 
 // Shared fixture for `general` and the streaming-parity test.  Top-level fields
 // cover every built-in plus inherited base structs, large-int quoting boundaries,
@@ -4380,6 +4430,43 @@ BOOST_AUTO_TEST_CASE(protobuf_action_result_type)
    auto var2 = abis.binary_to_variant("protobuf::test.ActResult", bytes, yield_fn());
    BOOST_TEST( var2["value"].as_int64() == 42 );
    BOOST_TEST( var2["str_value"].as_string() == "success" );
+} FC_LOG_AND_RETHROW() }
+
+// Protobuf values stream through the same fc::variant the variant path builds: fc::json
+// formats doubles and escapes strings differently from protobuf's own JSON printer.
+BOOST_AUTO_TEST_CASE(protobuf_stream_matches_variant)
+{ try {
+   static const char* mixed_abi = R"=====(
+   {
+      "version": "sysio::abi/1.3",
+      "types": [], "structs": [], "actions": [], "tables": [],
+      "ricardian_clauses": [], "variants": [], "action_results": [],
+      "protobuf_types": {
+         "file": [{
+            "name": "mixed.proto",
+            "package": "test",
+            "messageType": [{
+               "name": "Mixed",
+               "field": [
+                  { "name": "ratio", "number": 1, "label": "LABEL_OPTIONAL", "type": "TYPE_DOUBLE" },
+                  { "name": "big", "number": 2, "label": "LABEL_OPTIONAL", "type": "TYPE_INT64" },
+                  { "name": "note", "number": 3, "label": "LABEL_OPTIONAL", "type": "TYPE_STRING" }
+               ]
+            }],
+            "syntax": "proto3"
+         }]
+      }
+   }
+   )=====";
+   constexpr auto mixed_type = "protobuf::test.Mixed";
+
+   abi_serializer abis(fc::json::from_string(mixed_abi).as<abi_def>(), yield_fn());
+   const auto input = fc::json::from_string(R"({"ratio": 1.5, "big": "9007199254740993", "note": "<a & b> \"q\" é"})");
+   const auto packed = abis.variant_to_binary(mixed_type, input, yield_fn());
+   const std::string variant_json =
+      fc::json::to_string(abis.binary_to_variant(mixed_type, packed, yield_fn()), get_deadline());
+
+   verify_stream_matches_variant(abis, mixed_type, packed, variant_json);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE(protobuf_abi_json_roundtrip)

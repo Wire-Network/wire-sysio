@@ -153,6 +153,25 @@ namespace sysio::chain {
       );
    }
 
+   namespace {
+      /// Element count of a built-in array, capped at MAX_NUM_ARRAY_ELEMENTS like the variant
+      /// path's fc::raw::unpack of vector<T>.
+      fc::unsigned_int::base_uint unpack_stream_array_size(fc::datastream<const char*>& stream) {
+         fc::unsigned_int sz;
+         fc::raw::unpack(stream, sz);
+         FC_ASSERT( sz.value <= MAX_NUM_ARRAY_ELEMENTS );
+         return sz.value;
+      }
+
+      /// Presence flag of a built-in optional, read as a bool so that, like the variant path's
+      /// fc::raw::unpack of optional<T>, any byte but 0 or 1 is rejected.
+      bool unpack_stream_presence(fc::datastream<const char*>& stream) {
+         bool present = false;
+         fc::raw::unpack(stream, present);
+         return present;
+      }
+   } // namespace
+
    // Stream-side counterpart to `pack_unpack`.  The lambda reads a single value of type
    // `T` from the datastream and forwards to the per-type `emit(value, json_writer&)`
    // callback, which is responsible for matching the variant path's exact JSON shape
@@ -162,19 +181,16 @@ namespace sysio::chain {
       return [emit]( fc::datastream<const char*>& stream, bool is_array, bool is_optional,
                      const abi_serializer::yield_function_t& yield, fc::json_writer& w ) {
          if( is_array ) {
-            fc::unsigned_int sz;
-            fc::raw::unpack(stream, sz);
+            const auto sz = unpack_stream_array_size(stream);
             w.begin_array();
-            for( fc::unsigned_int::base_uint i = 0; i < sz.value; ++i ) {
+            for( fc::unsigned_int::base_uint i = 0; i < sz; ++i ) {
                T val;
                fc::raw::unpack(stream, val);
                emit(val, w);
             }
             w.end_array();
          } else if( is_optional ) {
-            char flag;
-            fc::raw::unpack(stream, flag);
-            if( flag ) {
+            if( unpack_stream_presence(stream) ) {
                T val;
                fc::raw::unpack(stream, val);
                emit(val, w);
@@ -196,10 +212,9 @@ namespace sysio::chain {
       return [emit]( fc::datastream<const char*>& stream, bool is_array, bool is_optional,
                      const abi_serializer::yield_function_t& yield, fc::json_writer& w ) {
          if( is_array ) {
-            fc::unsigned_int sz;
-            fc::raw::unpack(stream, sz);
+            const auto sz = unpack_stream_array_size(stream);
             w.begin_array();
-            for( fc::unsigned_int::base_uint i = 0; i < sz.value; ++i ) {
+            for( fc::unsigned_int::base_uint i = 0; i < sz; ++i ) {
                T val;
                fc::raw::unpack(stream, val);
                yield(0);
@@ -207,9 +222,7 @@ namespace sysio::chain {
             }
             w.end_array();
          } else if( is_optional ) {
-            char flag;
-            fc::raw::unpack(stream, flag);
-            if( flag ) {
+            if( unpack_stream_presence(stream) ) {
                T val;
                fc::raw::unpack(stream, val);
                yield(0);
@@ -484,61 +497,36 @@ namespace sysio::chain {
       SYS_ASSERT( status.ok(), pack_exception, "Failed to convert JSON to protobuf message: {}", std::string(status.message()) );
    }
 
-   namespace {
-      // Shared length-prefix decode used by both pb_binary_to_variant and
-      // pb_binary_to_json_string.  Returns the decoded protobuf message, having
-      // already advanced `stream` past the consumed bytes.
-      std::unique_ptr<google::protobuf::Message> pb_decode_message(
-            const std::string_view& type, fc::datastream<const char*>& stream,
-            const google::protobuf::Descriptor* desc,
-            google::protobuf::DynamicMessageFactory& factory ) {
-         SYS_ASSERT( desc, unpack_exception, "Unknown protobuf type '{}'", impl::limit_size(type) );
-
-         // Outer varuint32 length prefix covers inner length prefix + protobuf bytes.
-         fc::unsigned_int outer_len;
-         fc::raw::unpack(stream, outer_len);
-         SYS_ASSERT( stream.remaining() >= outer_len.value, unpack_exception,
-                     "Not enough data for protobuf message '{}': need {} bytes, have {}",
-                     impl::limit_size(type), outer_len.value, stream.remaining() );
-
-         // Inner varuint32 length prefix (zpp_bits size_varint format).
-         fc::datastream<const char*> inner_stream(stream.pos(), outer_len.value);
-         fc::unsigned_int pb_len;
-         fc::raw::unpack(inner_stream, pb_len);
-
-         SYS_ASSERT( pb_len.value <= inner_stream.remaining(), unpack_exception,
-                     "Protobuf message '{}': inner length {} exceeds available data {}",
-                     impl::limit_size(type), pb_len.value, inner_stream.remaining() );
-         SYS_ASSERT( pb_len.value == inner_stream.remaining(), unpack_exception,
-                     "Protobuf message '{}': trailing data detected (inner length {} but {} bytes remain)",
-                     impl::limit_size(type), pb_len.value, inner_stream.remaining() );
-
-         auto prototype = factory.GetPrototype(desc);
-         std::unique_ptr<google::protobuf::Message> msg(prototype->New());
-         SYS_ASSERT( msg->ParseFromArray(inner_stream.pos(), pb_len.value), unpack_exception,
-                     "Failed to parse protobuf message '{}'", impl::limit_size(type) );
-         stream.skip(outer_len.value);
-         return msg;
-      }
-   }
-
    fc::variant abi_serializer::pb_binary_to_variant(const std::string_view& type, fc::datastream<const char*>& stream) const {
       auto desc = get_pb_descriptor(type);
-      auto msg = pb_decode_message(type, stream, desc, *pb_factory);
-      return pb_message_to_variant(*msg);
-   }
+      SYS_ASSERT( desc, unpack_exception, "Unknown protobuf type '{}'", impl::limit_size(type) );
 
-   std::string abi_serializer::pb_binary_to_json_string(const std::string_view& type, fc::datastream<const char*>& stream) const {
-      namespace gpb = google::protobuf;
-      auto desc = get_pb_descriptor(type);
-      auto msg = pb_decode_message(type, stream, desc, *pb_factory);
-      std::string json;
-      gpb::util::JsonPrintOptions opts;
-      opts.preserve_proto_field_names = true;
-      auto status = gpb::util::MessageToJsonString(*msg, &json, opts);
-      SYS_ASSERT( status.ok(), unpack_exception, "Failed to convert protobuf message to JSON: {}",
-                  std::string(status.message()) );
-      return json;
+      // Read outer varuint32 length prefix (covers inner length prefix + protobuf bytes)
+      fc::unsigned_int outer_len;
+      fc::raw::unpack(stream, outer_len);
+      SYS_ASSERT( stream.remaining() >= outer_len.value, unpack_exception,
+                  "Not enough data for protobuf message '{}': need {} bytes, have {}",
+                  impl::limit_size(type), outer_len.value, stream.remaining() );
+
+      // Read inner varuint32 length prefix (zpp_bits size_varint format)
+      fc::datastream<const char*> inner_stream(stream.pos(), outer_len.value);
+      fc::unsigned_int pb_len;
+      fc::raw::unpack(inner_stream, pb_len);
+
+      SYS_ASSERT( pb_len.value <= inner_stream.remaining(), unpack_exception,
+                  "Protobuf message '{}': inner length {} exceeds available data {}",
+                  impl::limit_size(type), pb_len.value, inner_stream.remaining() );
+      SYS_ASSERT( pb_len.value == inner_stream.remaining(), unpack_exception,
+                  "Protobuf message '{}': trailing data detected (inner length {} but {} bytes remain)",
+                  impl::limit_size(type), pb_len.value, inner_stream.remaining() );
+
+      auto prototype = pb_factory->GetPrototype(desc);
+      std::unique_ptr<google::protobuf::Message> msg(prototype->New());
+      SYS_ASSERT( msg->ParseFromArray(inner_stream.pos(), pb_len.value), unpack_exception,
+                  "Failed to parse protobuf message '{}'", impl::limit_size(type) );
+      stream.skip(outer_len.value);
+
+      return pb_message_to_variant(*msg);
    }
 
    void abi_serializer::pb_variant_to_binary(const std::string_view& type, const fc::variant& var, fc::datastream<char*>& ds) const {
@@ -1518,9 +1506,10 @@ void stream_sink::unpack_built_in(std::string_view ftype, fc::datastream<const c
 }
 
 void stream_sink::unpack_protobuf(std::string_view ftype, fc::datastream<const char*>& stream) {
-   // MessageToJsonString already produces JSON; splice it directly into the writer.
+   // Through the variant: fc::json formats doubles and escapes strings differently from
+   // MessageToJsonString, and the output must match the variant path byte for byte.
    FC_ASSERT(abi_, "stream_sink::unpack_protobuf requires the abi_serializer-bound constructor");
-   raw_value(abi_->pb_binary_to_json_string(ftype, stream));
+   value_variant(abi_->pb_binary_to_variant(ftype, stream));
 }
 
 void stream_sink::unpack_action_data(const abi_serializer& abi, std::string_view type, const bytes& data,
