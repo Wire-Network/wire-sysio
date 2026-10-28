@@ -172,7 +172,7 @@ All of `http_plugin`'s options are config-file options, so each is equally valid
 |---|---|---|
 | `http-threads` | `2` | Number of worker threads in the HTTP thread pool. Must be greater than 0. |
 | `max-body-size` | `2097152` | Maximum body size in bytes accepted for an incoming RPC request. |
-| `http-max-bytes-in-flight-mb` | `500` | Maximum megabytes `http_plugin` uses for in-flight request processing; `-1` for unlimited. Checked when an app-thread handler is queued and again when the response is sent; a 503 is returned when exceeded. |
+| `http-max-bytes-in-flight-mb` | `500` | Maximum megabytes `http_plugin` uses for in-flight request processing; `-1` for unlimited. A request body is admitted against it as soon as its header arrives (its `Content-Length`, or `max-body-size` when chunked), before any of the body is read, and held until the body is read or the connection closes; it is checked again when an app-thread handler is queued and when the response is sent. A 503 is returned when exceeded, and a refused body closes its connection. |
 | `http-max-in-flight-requests` | `-1` | Maximum number of concurrently open HTTP connections; `-1` for unlimited. The counter goes up when a session is created and down when it is destroyed, so idle keep-alive connections count against it, and it is checked only when a connection is accepted. A 503 is returned when exceeded. |
 | `http-max-response-time-ms` | `15` | Maximum time on the main thread for processing a request; `-1` for unlimited. API plugins read this value as their per-call deadline. |
 | `http-keep-alive` | `true` | When false, connections are not kept alive even if the client requests it. |

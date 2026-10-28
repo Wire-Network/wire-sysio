@@ -48,6 +48,7 @@ constexpr uint32_t requests_in_flight_index = 4;
 constexpr uint32_t request_body_bytes_in_flight_index = 5;
 constexpr uint32_t category_snapshot_index = 6;
 constexpr uint32_t plaintext_response_index = 7;
+constexpr uint32_t request_body_read_index = 8;
 /** Index of the IPv6 probe listener used by the IPv6 tests. */
 constexpr uint32_t ipv6_probe_index = 2;
 
@@ -1287,3 +1288,162 @@ BOOST_FIXTURE_TEST_CASE(raw_handler_exceptions_are_api_errors, quiet_http_plugin
 
 //A warning for future tests: destruction of http_plugin_test_fixture sometimes does not destroy http_plugin's listeners. Tests
 // added in the future should avoid reusing ports of other tests in http_plugin_unit_tests.
+
+namespace {
+/// How long a test waits for the server to do something it is expected to do soon.
+constexpr std::chrono::seconds server_reaction_limit{30};
+
+/// Poll `condition` until it holds or `limit` passes; whether it held.
+bool wait_until(const std::function<bool()>& condition,
+                std::chrono::steady_clock::duration limit = server_reaction_limit) {
+   const auto deadline = std::chrono::steady_clock::now() + limit;
+   while (!condition()) {
+      if (std::chrono::steady_clock::now() > deadline)
+         return false;
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+   }
+   return true;
+}
+
+/// Read from `socket`, discarding what arrives, until the read fails or `limit` passes. The read's error, or
+/// net::error::timed_out if the socket was still open after `limit`.
+beast::error_code read_until_closed(net::io_context& ctx, tcp::socket& socket,
+                                    std::chrono::steady_clock::duration limit = server_reaction_limit) {
+   std::array<char, 4096> buffer;
+   std::optional<beast::error_code> failed;
+   std::function<void()> read = [&] {
+      socket.async_read_some(net::buffer(buffer), [&](beast::error_code ec, size_t) {
+         if (ec)
+            failed = ec;
+         else
+            read();
+      });
+   };
+   read();
+   ctx.restart();
+   ctx.run_for(limit);
+   if (failed)
+      return *failed;
+   socket.cancel();
+   ctx.restart();
+   ctx.run(); // the cancelled read completes before its buffer goes out of scope
+   return net::error::timed_out;
+}
+
+/// Whether a read error means the server closed the connection.
+bool closed_by_server(const beast::error_code& ec) {
+   return ec == net::error::eof || ec == net::error::connection_reset;
+}
+
+/// A client of the `/body_size` route, which answers with the size of the request body it received.
+struct body_size_client {
+   static constexpr auto route = "/body_size";
+
+   net::io_context& ctx;
+   std::string      endpoint;
+   std::string      port;
+
+   /// Add the route to `plugin`, on the app thread like the chain APIs.
+   static void add_route(http_plugin& plugin) {
+      plugin.add_api({{std::string(route), api_category::node,
+                       [](string&&, string&& body, url_response_callback&& cb) { cb(200, fc::variant(body.size())); }}},
+                     appbase::exec_queue::read_write);
+   }
+
+   tcp::socket connect() const {
+      tcp::socket socket(ctx, tcp::v4());
+      tcp::resolver resolver(ctx);
+      net::connect(socket, resolver.resolve("127.0.0.1", port));
+      return socket;
+   }
+
+   /// A POST header for the route, with `fields` (each ending in CRLF) added.
+   std::string header(const std::string& fields) const {
+      return std::string("POST ") + route + " HTTP/1.1\r\nHost: " + endpoint + "\r\n" + fields + "\r\n";
+   }
+
+   static std::string content_length(size_t size) { return "Content-Length: " + std::to_string(size) + "\r\n"; }
+
+   static http::response<http::string_body> read_response(tcp::socket& socket) {
+      http::response<http::string_body> response;
+      beast::flat_buffer buffer;
+      http::read(socket, buffer, response);
+      return response;
+   }
+};
+} // namespace
+
+/// A request body is reserved against bytes_in_flight from the moment its header is read, so the budget bounds bodies
+/// that are still arriving. A body that does not fit is refused with a 503 before any of it is read, in place of the
+/// 100 Continue a client may have asked for; a chunked body reserves max-body-size; the reservation ends when the body
+/// reaches its handler or the connection drops.
+BOOST_FIXTURE_TEST_CASE(request_body_reserved_while_read, http_plugin_test_fixture) {
+   constexpr size_t body_size = 2 * 1024 * 1024; // the default max-body-size
+   constexpr auto   budget = "--http-max-bytes-in-flight-mb=5"; // room for two such bodies, not three
+   const std::string endpoint = test_http_endpoint("127.0.0.1", request_body_read_index);
+   const std::string server_address = "--http-server-address=" + endpoint;
+
+   http_plugin* plugin = init({"--plugin=sysio::http_plugin", server_address.c_str(), budget});
+   BOOST_REQUIRE(plugin);
+   body_size_client::add_route(*plugin);
+
+   net::io_context ctx;
+   const body_size_client client{ctx, endpoint, test_http_port(request_body_read_index)};
+   const auto in_flight_becomes = [&](size_t bytes) {
+      return wait_until([&] { return plugin->bytes_in_flight() == bytes; });
+   };
+   const std::string length_field = body_size_client::content_length(body_size);
+   const std::string half_body(body_size / 2, 'x');
+
+   // Bodies still arriving hold their declared length.
+   auto first = client.connect();
+   net::write(first, net::buffer(client.header(length_field)));
+   net::write(first, net::buffer(half_body));
+   BOOST_REQUIRE(in_flight_becomes(body_size));
+   auto second = client.connect();
+   net::write(second, net::buffer(client.header(length_field)));
+   net::write(second, net::buffer(half_body));
+   BOOST_REQUIRE(in_flight_becomes(2 * body_size));
+
+   // A third does not fit: refused from its header alone, then closed.
+   auto third = client.connect();
+   net::write(third, net::buffer(client.header(length_field)));
+   const auto refused = body_size_client::read_response(third);
+   BOOST_CHECK(refused.result() == http::status::service_unavailable);
+   BOOST_CHECK(refused.body().find("Too many bytes in flight") != std::string::npos);
+   BOOST_CHECK(!refused.keep_alive());
+   BOOST_CHECK(closed_by_server(read_until_closed(ctx, third)));
+
+   // A client waiting for 100 Continue gets the 503 instead.
+   auto expecting = client.connect();
+   net::write(expecting, net::buffer(client.header(length_field + "Expect: 100-continue\r\n")));
+   BOOST_CHECK(body_size_client::read_response(expecting).result() == http::status::service_unavailable);
+   BOOST_CHECK(closed_by_server(read_until_closed(ctx, expecting)));
+   BOOST_CHECK_EQUAL(plugin->bytes_in_flight(), 2 * body_size);
+
+   // The first body completes, reaches its handler whole, and its reservation ends.
+   net::write(first, net::buffer(half_body));
+   const auto completed = body_size_client::read_response(first);
+   BOOST_CHECK(completed.result() == http::status::ok);
+   BOOST_CHECK_EQUAL(completed.body(), std::to_string(body_size));
+   BOOST_REQUIRE(in_flight_becomes(body_size));
+
+   // A chunked body reserves max-body-size, its most, since its length is unknown until it ends.
+   constexpr std::string_view chunk_data = "chunk";
+   const std::string chunked_body = "5\r\n" + std::string(chunk_data) + "\r\n0\r\n\r\n";
+   auto chunked = client.connect();
+   net::write(chunked, net::buffer(client.header("Transfer-Encoding: chunked\r\n")));
+   BOOST_REQUIRE(in_flight_becomes(2 * body_size));
+   net::write(chunked, net::buffer(chunked_body));
+   const auto chunked_response = body_size_client::read_response(chunked);
+   BOOST_CHECK(chunked_response.result() == http::status::ok);
+   BOOST_CHECK_EQUAL(chunked_response.body(), std::to_string(chunk_data.size()));
+   BOOST_REQUIRE(in_flight_becomes(body_size));
+
+   // A client that drops mid-body leaves no reservation behind.
+   second.close();
+   BOOST_CHECK(in_flight_becomes(0));
+   for (auto* socket : {&first, &third, &expecting, &chunked})
+      socket->close();
+   BOOST_CHECK(wait_until([&] { return plugin->requests_in_flight() == 0; }));
+}

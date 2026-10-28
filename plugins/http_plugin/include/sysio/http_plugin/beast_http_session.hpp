@@ -13,6 +13,7 @@
 #include <memory>
 #include <string>
 #include <charconv>
+#include <utility>
 
 namespace sysio {
 
@@ -102,6 +103,9 @@ class beast_http_session : public detail::abstract_conn,
    enum class continue_state_t { none, read_body, reject };
    continue_state_t continue_state_ { continue_state_t::none };
 
+   /// Bytes reserved against bytes_in_flight for the body of the request being read.
+   size_t body_reservation_ = 0;
+
    template<
          class Body, class Allocator>
    void
@@ -157,7 +161,7 @@ class beast_http_session : public detail::abstract_conn,
          auto handler_itr = plugin_state_->url_handlers.find(resource);
          if(handler_itr != plugin_state_->url_handlers.end() && categories_.contains(handler_itr->second.category)) {
             fc_tlog(plugin_state_->get_logger(), "resource: {}", resource);
-            std::string body = req.body();
+            std::string body = std::move(req.body());
             auto content_type = handler_itr->second.content_type;
             set_content_type_header(content_type);
 
@@ -208,6 +212,26 @@ private:
          [self = this->shared_from_this(), res](beast::error_code ec, std::size_t bytes_transferred) {
             self->on_write(ec, bytes_transferred, false);
          });
+   }
+
+   /// Bytes the body of the request being read can occupy in the parser: its declared Content-Length, which beast
+   /// reserves as soon as the body starts, or max-body-size for a chunked body, which grows as chunks arrive. Zero for
+   /// a request without a body. Valid once the header is read.
+   size_t request_body_size() const {
+      if (req_parser_->chunked())
+         return plugin_state_->max_body_size;
+      return req_parser_->content_length().value_or(0);
+   }
+
+   /// Reserve the body of the request being read against bytes_in_flight, until release_request_body().
+   void reserve_request_body(size_t size) {
+      increment_bytes_in_flight(size);
+      body_reservation_ = size;
+   }
+
+   /// Release the reservation of reserve_request_body(), if any.
+   void release_request_body() {
+      decrement_bytes_in_flight(std::exchange(body_reservation_, 0));
    }
 
 public:
@@ -279,6 +303,7 @@ public:
 
    virtual ~beast_http_session() {
       is_send_exception_response_ = false;
+      release_request_body();
       plugin_state_->requests_in_flight -= 1;
       if(plugin_state_->get_logger().is_enabled(fc::log_level::all)) {
          auto session_time = steady_clock::now() - session_begin_;
@@ -310,6 +335,16 @@ public:
             return do_eof();
 
          return fail(ec, "read_header", plugin_state_->get_logger());
+      }
+
+      // Admit the body against the budget before reading any of it, since the parser holds it all until it is complete.
+      if (const size_t body_size = request_body_size(); body_size > 0) {
+         if (auto error_str = verify_max_bytes_in_flight(body_size); !error_str.empty()) {
+            res_->keep_alive(false); // the body stays unread, so the connection cannot carry another request
+            send_busy_response(std::move(error_str));
+            return;
+         }
+         reserve_request_body(body_size);
       }
 
       // Check for the Expect field value
@@ -360,6 +395,10 @@ public:
 
       // Store request fields for potential raw handler access
       last_request_fields_ = req.base();
+
+      // The body is read; the handler path accounts for it from here, an app-thread handler by reserving it before it
+      // queues. Released first so that admission does not count the same bytes twice.
+      release_request_body();
 
       // Send the response
       handle_request(std::move(req));
