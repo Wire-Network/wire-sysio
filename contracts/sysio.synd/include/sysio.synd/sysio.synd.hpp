@@ -23,8 +23,8 @@
  *      acknowledging bond. This phase moves no funds and operates while the cord is pulled.
  *   2. FIFO release advances from `queue_epoch`. BONDED makes an envelope RELEASABLE; HELD pauses it.
  *      Syndications pass through the bucket and fee into linked accounts or parked balances. Yield
- *      reports use mintyield. INVALID burns from the snapshotted settlement; VALID forwards a pending
- *      challenger share. Neither payout path runs while frozen. Empty item sets become DONE.
+ *      reports use mintyield. INVALID burns from the snapshotted settlement, which does not run while
+ *      frozen. Empty item sets become DONE.
  *   3. Underwriting advances from each pair's `underwriting_epoch`, past fully bonded or ruled requests,
  *      and issues its oldest WAITING envelope. Shared bond validation protects non-throwing intake;
  *      requestkeep retains outcomes until acknowledged. A queued syncenv records the real assigned ID.
@@ -33,11 +33,13 @@
  * deadline. Late settlement discovered after DONE rewinds the release cursor to that envelope.
  *
  * Challenge. Any account may `challenge` an envelope that is REQUESTED, RELEASABLE or DONE while its
- * request is OPEN or BONDED: it pays the request's hold bond plus the pair's `challenge_extra` in the
+ * request is BONDED: it pays the request's hold bond plus the pair's `challenge_extra` in the
  * envelope's token (a charge of zero is refused), the extra stays in `feepot`, and this contract, the
  * issuer, holds the request through `sysio.bond::hold` naming the challenger as the beneficiary. The
  * envelope is HELD and releases nothing more until `sysio` rules, and the pair's queue is rewound to
- * it. One challenge per request.
+ * it. One challenge per request. An OPEN request cannot be challenged: nothing has released, and a held
+ * request takes no more bonds, so it would stop the pair until `sysio` rules. A VALID ruling pays the
+ * hold bond to the request's bonds; an INVALID one pays it and the bounty to the challenger.
  *
  * An envelope ruled INVALID. The step that first sees the ruling snapshots the forfeit (the bonded
  * amount) and the bounty returned for want of a hold on the envelope. It burns every unreleased
@@ -91,10 +93,8 @@
  *
  * Emergency stop. While the `sysio.andon` cord is pulled nothing leaves this contract, and nothing it
  * holds is burned: the queue step still refreshes requests, records outcomes and issues requests, but
- * releases no item, forwards no hold share and burns no INVALID envelope -- it prints that it waits, and
- * the first step after the cord clears does that work. A VALID ruling is recorded with its hold-share
- * snapshot during the freeze, so the forward survives a prune of the request and is paid once after the
- * clear. `linkswept` keeps the parked
+ * releases no item and burns no INVALID envelope -- it prints that it waits, and the first step after the
+ * cord clears does that work. `linkswept` keeps the parked
  * balance and returns (the user's link stands; `sweep` delivers after the clear); `sweep`, `desyndicate`,
  * `dropenv` and `sweepyield` are refused. Intake, `challenge` and `setconfig` run. A bucket never refills
  * beyond its burst cap; elapsed frozen epochs refill normally after clear. Challenge windows run on.
@@ -272,7 +272,7 @@ namespace sysio {
       [[sysio::action]] void sync(uint32_t limit);
 
       /// Erase at most `limit` settled prefix envelopes, retaining a replay floor. Stops at the first
-      /// unfinished row; DONE before finality, unacknowledged outcomes, items and pending shares stay.
+      /// unfinished row; DONE before finality, unacknowledged outcomes and items stay.
       /// Permissionless, counts every examined envelope, and never moves funds.
       [[sysio::action]] void pruneenv(sysio::slug_name chain_code, sysio::slug_name token_code, uint32_t limit);
 
@@ -300,15 +300,14 @@ namespace sysio {
       [[sysio::action]] void dropenv(sysio::slug_name chain_code, sysio::slug_name token_code, uint32_t epoch_index);
 
       /// Challenge the envelope of outpost `chain_code`, token `token_code` and depot epoch `epoch_index`,
-      /// REQUESTED, RELEASABLE or DONE with its request OPEN or BONDED: `challenger` pays the request's hold
+      /// REQUESTED, RELEASABLE or DONE with its request BONDED: `challenger` pays the request's hold
       /// bond (`sysio.bond::hold_bond_of` at `sysio.bond`'s `hold_bps`) plus the pair's `challenge_extra` in
       /// the envelope's token; the extra goes to `feepot`, and `sysio.bond::hold` holds the request,
       /// pulling the hold bond back out of this contract and naming `challenger` as the beneficiary of an
       /// INVALID ruling. The envelope becomes HELD, and the pair's `queue_epoch` is rewound to it so the
       /// queue processes the ruling even for an envelope it had finished. A charge of zero (a hold bond
-      /// that rounds to zero and no `challenge_extra`) is refused. One challenge per request.
-      /// `challenger` may not be this contract or `sysio.bond`. Contract accounts receive refunds
-      /// through ledger settlement without recipient execution.
+      /// that rounds to zero and no `challenge_extra`) is refused, and so is a request not yet fully
+      /// bonded. One challenge per request. `challenger` may not be this contract or `sysio.bond`.
       /// Challenger's authority; any row the challenge creates bills the `sysio` RAM pool.
       [[sysio::action]] void challenge(name challenger, sysio::slug_name chain_code, sysio::slug_name token_code,
                                        uint32_t epoch_index);
@@ -429,19 +428,8 @@ namespace sysio {
          /// Base units of bounty `sysio.bond` returns to this contract on that INVALID ruling -- the whole
          /// bounty when the request was never held -- snapshotted with `forfeit`; 0 otherwise.
          uint64_t         bounty_returned = 0;
-         /// Base units of the hold bond a challenger is owed back on a VALID ruling -- the share no bond
-         /// covered, which `sysio.bond` awards this contract, the issuer -- snapshotted with the VALID
-         /// outcome; 0 otherwise. The forward pays it from this snapshot, not the request row, which
-         /// `sysio.bond` may prune once it is paid.
-         uint64_t         hold_share       = 0;
-         /// The challenger `hold_share` is forwarded to, snapshotted with it; empty when there is none.
-         name             hold_beneficiary;
-         /// True from the step that records a VALID outcome with a positive `hold_share` until the step
-         /// that forwards it: the first step while the `sysio.andon` cord is clear.
-         bool             share_pending    = false;
          SYSLIB_SERIALIZE(envelope_row, (chain_code)(token_code)(epoch_index)(digest)(synd_total)(yield_total)
-                          (item_count)(state)(request_id)(released)(burned)(outcome)(forfeit)(bounty_returned)
-                          (hold_share)(hold_beneficiary)(share_pending))
+                          (item_count)(state)(request_id)(released)(burned)(outcome)(forfeit)(bounty_returned))
       };
 
       /// Envelope rows by outpost, token and epoch.

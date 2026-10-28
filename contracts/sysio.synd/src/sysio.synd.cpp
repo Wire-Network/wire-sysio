@@ -78,8 +78,7 @@ constexpr uint64_t max_asset_amount = static_cast<uint64_t>(asset::max_amount);
 /// Memos of the transfers a parked delivery and a desyndication send.
 constexpr std::string_view desyndicate_memo     = "sysio.synd desyndicate";
 /// Memo of the transfers a release to a linked account sends.
-/// Memo of the transfer that pulls a challenger's charge, and of the one that forwards a challenger
-/// the share of the hold bond a VALID ruling returns.
+/// Memo of the transfer that pulls a challenger's charge.
 constexpr std::string_view challenge_memo       = "sysio.synd challenge";
 /// Memo of the transfer that pays `sysio` the WIRE the fee pot earned.
 constexpr std::string_view fee_yield_memo       = "sysio.synd fee pot yield";
@@ -99,6 +98,8 @@ constexpr std::string_view config_range_message  = "bucket, bounty and challenge
 constexpr std::string_view challenger_role_msg   = "the challenger cannot be sysio.synd or sysio.bond";
 constexpr std::string_view no_envelope_message   = "envelope not found";
 constexpr std::string_view challenged_message    = "the envelope's request is already challenged";
+constexpr std::string_view unbonded_message      =
+   "the envelope's request is not fully bonded; it cannot be challenged yet";
 constexpr std::string_view unchallengeable_msg   =
    "only a REQUESTED, RELEASABLE or DONE envelope can be challenged";
 constexpr std::string_view zero_charge_message   = "challenge charge is zero; configure challenge_extra";
@@ -152,8 +153,6 @@ constexpr std::string_view unset_bucket_reason =
    "no syndconfig row: the syndication bucket is unset, nothing releases";
 constexpr std::string_view empty_bucket_reason    = "syndication bucket is empty until it refills";
 constexpr std::string_view yield_headroom_reason  = "yield exceeds the shadow's headroom; the item waits";
-constexpr std::string_view frozen_share_reason    =
-   "the challenger's hold share waits for the andon cord to clear";
 constexpr std::string_view frozen_burn_reason     =
    "request ruled INVALID while the andon cord is pulled; the burn waits for the clear, the pair waits";
 
@@ -491,17 +490,13 @@ void synchronize(name self, synd::envelope_row& row) {
    using state = bond::request_state;
    using outcome = synd::request_outcome;
    if (req->state == state::APPROVED) row.outcome = outcome::APPROVED;
-   else if (req->state == state::VALID) {
-      row.outcome = outcome::VALID;
-      row.hold_share = bond::share_of(req->covered - req->bonded, req->hold_bond, req->covered);
-      row.hold_beneficiary = req->hold_beneficiary;
-      row.share_pending = row.hold_share > 0 && row.hold_beneficiary != name{};
-   } else if (req->state == state::INVALID) {
+   else if (req->state == state::VALID) row.outcome = outcome::VALID;
+   else if (req->state == state::INVALID) {
       row.outcome = outcome::INVALID;
       row.forfeit = req->bonded;
       row.bounty_returned = req->hold_beneficiary == name{} ? req->bounty : 0;
    } else return;
-   if (row.outcome == outcome::INVALID || row.share_pending) {
+   if (row.outcome == outcome::INVALID) {
       if (row.state == synd::envelope_state::DONE) row.state = synd::envelope_state::HELD;
       synd::ledger_t ledger(self);
       const synd::ledger_key key{row.chain_code.value, row.token_code.value};
@@ -661,7 +656,6 @@ private:
          const uint64_t              request_id = row->request_id;
          const uint64_t              released   = row->released;
          const uint64_t              burned     = row->burned;
-         const bool                  pending    = row->share_pending;
          if (row->state == synd::envelope_state::REQUESTED || row->state == synd::envelope_state::RELEASABLE ||
              row->state == synd::envelope_state::HELD) {
             refresh(*row, unbonded, st);
@@ -671,10 +665,9 @@ private:
          }
          if (underwriting_ && row->state == synd::envelope_state::WAITING && !unbonded && spend())
             issue_request(*row, config);
-         // The outcome's snapshots (`forfeit`, `bounty_returned`, `hold_share`, `hold_beneficiary`) are only
-         // ever written with the outcome; `share_pending` clears on its own when the forward is paid.
+         // The outcome's snapshots (`forfeit`, `bounty_returned`) are only ever written with the outcome.
          if (row->state != before || row->outcome != outcome || row->request_id != request_id ||
-             row->released != released || row->burned != burned || row->share_pending != pending) {
+             row->released != released || row->burned != burned) {
             envelopes.set(ram_payer, key, *row);
          }
 
@@ -701,11 +694,11 @@ private:
    /// Refresh `row` from its `sysio.bond` request, found through the request's `bystatement` key. OPEN
    /// keeps it REQUESTED; BONDED makes it RELEASABLE; HELD makes it HELD. The first time the request is
    /// seen APPROVED, VALID or INVALID the outcome is recorded on `row` and the request row is never read
-   /// again: APPROVED and VALID make it RELEASABLE (VALID forwarding a challenger its share of the hold
-   /// bond), INVALID burns it (`invalidate`). Sets `unbonded` when the request is neither bonded nor
-   /// ruled -- OPEN, or HELD before it was fully bonded -- when no request row is found for an envelope
-   /// with no recorded outcome, while an INVALID envelope's burn is unfinished, and on any state it
-   /// does not know, where the items are left untouched.
+   /// again: APPROVED and VALID make it RELEASABLE, INVALID burns it (`invalidate`). Sets `unbonded` when
+   /// the request is neither bonded nor ruled -- OPEN, or HELD before it was fully bonded, which `challenge`
+   /// never does -- when no request row is found for an envelope with no recorded outcome, while an
+   /// INVALID envelope's burn is unfinished, and on any state it does not know, where the items are left
+   /// untouched.
    void refresh(synd::envelope_row& row, bool& unbonded, const liq::currency_stats& st) {
       using request_state = bond::request_state;
       using outcome       = synd::request_outcome;
@@ -715,7 +708,6 @@ private:
          return;
       }
       if (row.outcome != outcome::PENDING) {
-         if (!underwriting_ && row.share_pending) forward_hold_share(row, st);
          row.state = synd::envelope_state::RELEASABLE;
          return;
       }
@@ -738,26 +730,6 @@ private:
          note(row.chain_code, row.token_code, row.epoch_index, unknown_state_reason);
          unbonded = true;
       }
-   }
-
-   /// Forward the challenger the hold share snapshotted on VALID envelope `row` (`hold_share` to
-   /// `hold_beneficiary`), once, and clear `share_pending`: the share of the hold bond no bond covered,
-   /// which `sysio.bond` awards this contract, the issuer, and which the challenger paid. While the
-   /// `sysio.andon` cord is pulled it waits, pending, for the first step after the clear. The award is
-   /// claimed first while `sysio.bond` still owes it (a claim with nothing owed would throw; anyone may have
-   /// claimed it for this contract already, and a request pruned since was fully paid, so the share sits in
-   /// this contract's row either way), then credited by `sysio.liq::settle` without recipient execution.
-   void forward_hold_share(synd::envelope_row& row, const liq::currency_stats& st) {
-      if (frozen_) {
-         note(row.chain_code, row.token_code, row.epoch_index, frozen_share_reason);
-         return;
-      }
-      pull_first(st);
-      if (bond::settlement_due(synd::BOND_ACCOUNT, row.request_id, self_) > 0) send_claim(row.request_id);
-      action(active_of(self_), synd::LIQ_ACCOUNT, settle_action,
-             std::make_tuple(self_, row.hold_beneficiary,
-                             asset{static_cast<int64_t>(row.hold_share), st.supply.symbol})).send();
-      row.share_pending = false;
    }
 
    /// Burn envelope `row`, whose request was ruled INVALID, from the forfeit and bounty snapshotted on it.
@@ -1256,7 +1228,6 @@ void synd::pruneenv(sysio::slug_name chain_code, sysio::slug_name token_code, ui
       const auto row = *it;
       if (row.chain_code != chain_code || row.token_code != token_code) break;
       if (row.state != envelope_state::DONE && row.state != envelope_state::INVALID) break;
-      if (row.share_pending) break;
       const bool dropped = row.state == envelope_state::INVALID && row.request_id == 0;
       if (!dropped && row.outcome == request_outcome::PENDING) break;
       const auto item = items.lower_bound(item_key{chain_code.value, token_code.value, row.epoch_index, 0});
@@ -1356,13 +1327,14 @@ void synd::challenge(name challenger, sysio::slug_name chain_code, sysio::slug_n
             row->state == envelope_state::DONE,
          unchallengeable_msg.data());
 
-   // sysio.bond holds only an OPEN or BONDED request, so a second hold fails its state check; mirrored
-   // here, before anything is charged, in this contract's words.
+   // sysio.bond refuses a second hold; mirrored here, before anything is charged, in this contract's words.
    const auto req = find_request(get_self(), *row);
    check(req.has_value(), no_request_message.data());
    check(req->state != bond::request_state::HELD, challenged_message.data());
-   check(req->state == bond::request_state::OPEN || req->state == bond::request_state::BONDED,
-         request_final_message.data());
+   // Only a fully bonded request: nothing releases before then, and a held request takes no more bonds, so
+   // holding an under-bonded one would stop the pair until `sysio` rules.
+   check(req->state != bond::request_state::OPEN, unbonded_message.data());
+   check(req->state == bond::request_state::BONDED, request_final_message.data());
 
    const auto st = liq::find_stat_by_token(LIQ_ACCOUNT, token_code);
    check(st.has_value(), no_shadow_reason.data());

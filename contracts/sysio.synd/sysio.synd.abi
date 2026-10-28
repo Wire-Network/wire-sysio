@@ -248,18 +248,6 @@
                 {
                     "name": "bounty_returned",
                     "type": "uint64"
-                },
-                {
-                    "name": "hold_share",
-                    "type": "uint64"
-                },
-                {
-                    "name": "hold_beneficiary",
-                    "type": "name"
-                },
-                {
-                    "name": "share_pending",
-                    "type": "bool"
                 }
             ]
         },

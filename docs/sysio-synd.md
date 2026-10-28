@@ -59,7 +59,7 @@ independent bounded phases:
 Syndication uses bond's durable `requestkeep` interface. A terminal request cannot be pruned before
 syndication records and acknowledges its outcome, even when all payouts were claimed and seven days
 have passed. There is no polling deadline. Delayed synchronization delays progress, not recoverability.
-An INVALID outcome or pending challenger share discovered after DONE rewinds settlement to that envelope.
+An INVALID outcome discovered after DONE rewinds settlement to that envelope.
 
 The stable request identity is `(issuer, schema, statement)`, resolved through bond's public accessor.
 An inline `syncenv` after creation records the actual numeric ID; syndication never predicts bond's
@@ -93,7 +93,7 @@ no budget; it waits only when the shadow's headroom cannot take it.
 ### Challenge and ruling
 
 `challenge(challenger, chain_code, token_code, epoch_index)` holds a REQUESTED, RELEASABLE or DONE
-envelope whose request is OPEN or BONDED: an envelope released whole while its request is still only
+envelope whose request is BONDED: an envelope released whole while its request is still only
 bonded can be challenged, since the bond exists for exactly that case. The challenger pays the
 request's hold bond plus the pair's `challenge_extra`; a charge of zero is refused (`challenge charge is
 zero; configure challenge_extra`). The extra stays in the fee pot, and `sysio.synd` holds the request
@@ -101,15 +101,14 @@ through `sysio.bond::hold` naming the challenger as beneficiary. The envelope is
 rules, and the pair's `queue_epoch` is rewound to it so the ruling is processed. One challenge per
 request; contract accounts may challenge. Any row the challenge creates bills `sysio`.
 
-A challenge of a request that is not yet fully bonded freezes the whole pair until `sysio` rules: a
-held request is neither bonded nor ruled, so no later envelope of the pair is requested. That costs the
-challenger only the hold bond and `challenge_extra`. Launch every pair with a non-zero
-`challenge_extra` sized to make such a freeze expensive.
+A request that is not yet fully bonded cannot be challenged (`the envelope's request is not fully
+bonded; it cannot be challenged yet`). Nothing has been released while it is OPEN, and a held request
+takes no more bonds, so holding it would stop every later envelope of the pair until `sysio` rules. An
+unbonded envelope in doubt is ruled INVALID by `sysio` directly (`sysio.bond::rslvinvalid`). A request
+held by a challenge is therefore always fully bonded, and holds back only its own envelope.
 
-- **VALID:** release resumes, and the share of the hold bond `sysio.bond` awards the issuer is
-  forwarded to the challenger. The step that first sees the ruling snapshots that share and the
-  challenger on the envelope (`hold_share`, `hold_beneficiary`, `share_pending`) and forwards it from the
-  snapshot, so the forward does not depend on the request row `sysio.bond` may prune.
+- **VALID:** release resumes. The hold bond goes to the request's bonds, claimed with each underwriter's
+  bond from `sysio.bond`; the challenger gets none of it back, and `challenge_extra` stays in the fee pot.
 - **INVALID:** the step that first sees the ruling snapshots the forfeit (the bonded amount) and the
   bounty returned for want of a hold on the envelope (`forfeit`, `bounty_returned`). Every unreleased
   syndication of the envelope is burned and its yield items dropped, within the step's budget. The
@@ -478,7 +477,7 @@ clear, is [`emergency-stop-playbook.md`](emergency-stop-playbook.md).
 | Queue step: refresh, outcomes, requests | Runs: requests are issued and bonded, APPROVED and INVALID outcomes are recorded with their snapshots. |
 | Queue step: releases | None. The step prints `the andon cord is pulled; releases, deliveries and burns wait for the clear` once and leaves every item where it is; no bucket is ticked. |
 | An INVALID ruling | Recorded, with its forfeit snapshot; the burn and the claim of the forfeit wait (`... the burn waits for the clear, the pair waits`). |
-| A VALID ruling after a challenge | Recorded, with the challenger's hold share snapshotted on the envelope (`hold_share`, `hold_beneficiary`) and marked `share_pending`; the forward waits (`the challenger's hold share waits for the andon cord to clear`). The first step after the clear claims the award if `sysio.bond` still owes it and pays the share from the snapshot, once -- even if `sysio.bond` pruned the request meanwhile. |
+| A VALID ruling after a challenge | Recorded; the envelope is RELEASABLE and releases after the clear. |
 | `challenge` | Runs: the charge moves into `sysio.synd` and the hold bond into `sysio.bond`. Challenge windows keep counting. |
 | `linkswept` | Delivers nothing and returns, so the user's `createlink` still succeeds; `sweep` delivers after the clear. |
 | `sweep`, `desyndicate`, `dropenv`, `sweepyield` | Refused: `the andon cord is pulled: funds cannot leave custody`. |
@@ -493,7 +492,7 @@ Repeated freezes cannot raise capacity beyond that cap.
 | Table | Key | What it holds |
 |---|---|---|
 | `syndconfig` | outpost, token | the pair's rules (below) |
-| `envelopes` | outpost, token, depot epoch | digest, syndicated and yield totals, item count, state, `sysio.bond` request id, released, burned, the request's recorded outcome, the forfeit and returned bounty snapshotted on INVALID, and the challenger's hold share, its beneficiary and whether its forward is pending, snapshotted on VALID |
+| `envelopes` | outpost, token, depot epoch | digest, syndicated and yield totals, item count, state, `sysio.bond` request id, released, burned, the request's recorded outcome, and the forfeit and returned bounty snapshotted on INVALID |
 | `items` | envelope, then id (arrival order) | kind, beneficiary key family and pubkey, amount, remaining, yield position |
 | `parked` | token, key family, pubkey | balance and yield position of an unlinked pubkey |
 | `buckets` | outpost, token, direction | level and the depot epoch last ticked, one per direction (SYNDICATION, DESYNDICATION) |
@@ -524,7 +523,7 @@ pair's whole row.
 | `desynd_burst`, `desynd_refill` | unset: nothing desyndicates | desyndication bucket size and refill |
 | `window_sec` | 10800 | challenge window of each request; above 0 |
 | `bounty` | 0 | bounty posted on each request, paid from the fee pot |
-| `challenge_extra` | 0 | charged to a challenger on top of the hold bond; set it above 0 at launch (see Challenge and ruling) |
+| `challenge_extra` | 0 | charged to a challenger on top of the hold bond and kept in the fee pot whatever the ruling; at 0, an envelope whose hold bond rounds to zero cannot be challenged |
 
 The bucket, bounty and challenge amounts must each fit an asset. A pair with no row still has its
 envelopes requested (with the default window and no bounty), but releases nothing and accepts no
@@ -600,8 +599,8 @@ sequences, counters, import completion, active custody/yield obligations and unr
 
 `pruneenv(chain_code, token_code, limit)` is permissionless and examines at most `limit` envelopes from
 the pair's oldest retained row, stopping at the first unfinished one. It erases only DONE/INVALID rows
-with a consumed terminal outcome (or a never-issued governance drop), no items or pending challenger
-share, and an acknowledged bond result if that request still exists. DONE before finality is retained.
+with a consumed terminal outcome (or a never-issued governance drop), no items, and an acknowledged
+bond result if that request still exists. DONE before finality is retained.
 Settled rows behind a live earlier envelope remain temporarily; this prefix rule avoids a permanent
 per-envelope tombstone table. The widened `retained_from_epoch` floor rejects all future admission below
 it, including fresh sequences, different digests, and previously absent epochs in that prefix.

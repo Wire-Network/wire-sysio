@@ -96,7 +96,6 @@ constexpr std::string_view QUEUE_INVALID_BURNING =
 /// Console fragments of the queue step and `linkswept` while the andon cord is pulled.
 constexpr std::string_view QUEUE_FROZEN =
    "sysio.synd::queue: the andon cord is pulled; releases, deliveries and burns wait for the clear";
-constexpr std::string_view QUEUE_FROZEN_SHARE = "-- the challenger's hold share waits for the andon cord to clear";
 constexpr std::string_view QUEUE_FROZEN_BURN =
    "-- request ruled INVALID while the andon cord is pulled; the burn waits for the clear, the pair waits";
 constexpr std::string_view LINKSWEPT_FROZEN =
@@ -135,6 +134,8 @@ std::string pull_reason(std::string_view chain_code, std::string_view token_code
 constexpr std::string_view CHALLENGE_TWICE     = "the envelope's request is already challenged";
 constexpr std::string_view CHALLENGE_STATE     = "only a REQUESTED, RELEASABLE or DONE envelope can be challenged";
 constexpr std::string_view CHALLENGE_ZERO      = "challenge charge is zero; configure challenge_extra";
+constexpr std::string_view CHALLENGE_UNBONDED  =
+   "the envelope's request is not fully bonded; it cannot be challenged yet";
 /// Refusal of `dropenv`.
 constexpr std::string_view DROPENV_STATE = "only an OPEN or WAITING envelope with no request issued can be dropped";
 constexpr std::string_view CHALLENGE_FINAL     = "the envelope's request is approved or ruled; it cannot be challenged";
@@ -3144,12 +3145,14 @@ BOOST_FIXTURE_TEST_CASE(dropenv_burns_an_unrequested_envelope_and_the_queue_move
 
 // A challenge charges the challenger the request's hold bond plus the pair's extra: the extra stays in
 // the fee pot, sysio.bond pulls the hold bond back out of sysio.synd as the issuer's hold naming the
-// challenger, and the envelope is HELD. It is the challenger's own action, and one per request.
+// challenger, and the envelope is HELD. It is the challenger's own action, and one per request. Here the
+// bonded request is challenged before any step saw the bond, so nothing has been released.
 BOOST_FIXTURE_TEST_CASE(challenge_charges_bond_plus_extra_and_holds, sysio_synd_tester) try {
    const auto pubkey = ed_bytes(ed_key());
    BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.challenge_extra = 2 * UNIT}));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
    const uint64_t id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
+   underwrite_envelope(SOLANA, LIQSOL, 1);
    BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
 
    BOOST_REQUIRE(mentions(challenge("carol"_n, SOLANA, LIQSOL, 1, "bob"_n), "missing authority of carol"));
@@ -3158,9 +3161,9 @@ BOOST_FIXTURE_TEST_CASE(challenge_charges_bond_plus_extra_and_holds, sysio_synd_
    const uint64_t hold_bond = 10 * UNIT * HOLD_BPS / BPS_DENOMINATOR;
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond - 2 * UNIT), liq_balance("carol"_n));
    BOOST_REQUIRE_EQUAL(2 * UNIT, feepot_balance(LIQSOL));
-   // sysio.synd keeps the held syndication and the extra; sysio.bond holds the hold bond.
+   // sysio.synd keeps the held syndication and the extra; sysio.bond holds dave's bond and the hold bond.
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(12 * UNIT), liq_balance(SYND_ACCOUNT));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(hold_bond), liq_balance(BOND_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT + hold_bond), liq_balance(BOND_ACCOUNT));
    const auto req = bond_request(id);
    BOOST_REQUIRE_EQUAL(REQUEST_HELD, req["state"].as_string());
    BOOST_REQUIRE_EQUAL(hold_bond, req["hold_bond"].as_uint64());
@@ -3242,8 +3245,8 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_does_not_extend_the_challenge_deadline, sysio_s
 } FC_LOG_AND_RETHROW()
 
 // Review Focus 4: an envelope with no request issued yet (WAITING behind an unbonded one), or with no
-// row at all, cannot be challenged; nor can sysio.synd, sysio.bond or an account with contract code
-// challenge.
+// row at all, cannot be challenged; nor can sysio.synd or sysio.bond challenge. An account with
+// contract code can.
 BOOST_FIXTURE_TEST_CASE(challenge_refused_on_an_unrequested_envelope, sysio_synd_tester) try {
    const auto pubkey = ed_bytes(ed_key());
    syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
@@ -3254,6 +3257,7 @@ BOOST_FIXTURE_TEST_CASE(challenge_refused_on_an_unrequested_envelope, sysio_synd
    BOOST_REQUIRE(mentions(challenge("carol"_n, SOLANA, LIQSOL, 2), CHALLENGE_STATE));
    BOOST_REQUIRE(mentions(challenge("carol"_n, SOLANA, LIQSOL, 9), CHALLENGE_NO_ROW));
    BOOST_REQUIRE(mentions(challenge(SYND_ACCOUNT, SOLANA, LIQSOL, 1), CHALLENGE_ROLE));
+   underwrite_envelope(SOLANA, LIQSOL, 1);
    BOOST_REQUIRE_EQUAL(success(), liq_mint("bob"_n, LIQSOL, 5 * UNIT));
    set_code("bob"_n, contracts::util::block_transfer_wasm());
    produce_blocks();
@@ -3261,6 +3265,49 @@ BOOST_FIXTURE_TEST_CASE(challenge_refused_on_an_unrequested_envelope, sysio_synd
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT), liq_balance("carol"_n));
    BOOST_REQUIRE_EQUAL(REQUEST_HELD, bond_request(1)["state"].as_string());
    BOOST_REQUIRE_EQUAL(0u, feepot_balance(LIQSOL));
+} FC_LOG_AND_RETHROW()
+
+// A request that is not fully bonded cannot be challenged, with nothing bonded or with part of it, and
+// nothing is charged: nothing has been released, and a held request takes no more bonds, so the hold
+// would stop the pair until sysio rules. Once fully bonded, a challenge holds only its own envelope: the
+// pair's next envelope is requested, and released once bonded.
+BOOST_FIXTURE_TEST_CASE(challenge_refused_until_the_request_is_fully_bonded, sysio_synd_tester) try {
+   const auto key    = ed_key();
+   const auto pubkey = ed_bytes(key);
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.challenge_extra = UNIT}));
+   syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
+   syndicate_and_close(2, 2, pubkey, LIQSOL, 4 * UNIT);
+   const uint64_t id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
+   BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
+
+   // Nothing bonded, then 4 of the 10: refused each time.
+   BOOST_REQUIRE(mentions(challenge("carol"_n, SOLANA, LIQSOL, 1), CHALLENGE_UNBONDED));
+   BOOST_REQUIRE_EQUAL(success(), underwrite("dave"_n, id, 4 * UNIT, LIQSOL));
+   BOOST_REQUIRE_EQUAL(REQUEST_OPEN, bond_request(id)["state"].as_string());
+   BOOST_REQUIRE(mentions(challenge("carol"_n, SOLANA, LIQSOL, 1), CHALLENGE_UNBONDED));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT), liq_balance("carol"_n));
+   BOOST_REQUIRE_EQUAL(0u, feepot_balance(LIQSOL));
+   BOOST_REQUIRE_EQUAL(STATE_REQUESTED, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
+
+   // Fully bonded: the challenge holds the request.
+   BOOST_REQUIRE_EQUAL(success(), underwrite("dave"_n, id, 6 * UNIT, LIQSOL));
+   BOOST_REQUIRE_EQUAL(REQUEST_BONDED, bond_request(id)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(success(), challenge("carol"_n, SOLANA, LIQSOL, 1));
+   BOOST_REQUIRE_EQUAL(REQUEST_HELD, bond_request(id)["state"].as_string());
+
+   // The held envelope releases nothing, but the next one is requested...
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   BOOST_REQUIRE_EQUAL(STATE_HELD, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(10 * UNIT, item_row(1)["remaining"].as_uint64());
+   BOOST_REQUIRE_EQUAL(STATE_REQUESTED, envelope_row(SOLANA, LIQSOL, 2)["state"].as_string());
+
+   // ...and released once bonded, while the first stays held.
+   underwrite_envelope(SOLANA, LIQSOL, 2);
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 2)["state"].as_string());
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(4 * UNIT), liq_balance("alice"_n));
+   BOOST_REQUIRE_EQUAL(STATE_HELD, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
 } FC_LOG_AND_RETHROW()
 
 /// Half-released envelope: alice is linked, the bucket passes 4 per epoch, 10 are syndicated at epoch 1,
@@ -3300,9 +3347,9 @@ BOOST_FIXTURE_TEST_CASE(a_challenge_after_partial_release_stops_further_release,
    BOOST_REQUIRE_EQUAL(4 * UNIT, envelope["released"].as_uint64());
 } FC_LOG_AND_RETHROW()
 
-// A VALID ruling on a challenged, fully bonded request makes the envelope RELEASABLE again: release
-// resumes where it stopped. Every bond covered the hold bond, so nothing is forwarded to the challenger
-// and nothing is claimed.
+// A VALID ruling on a challenged request makes the envelope RELEASABLE again: release resumes where it
+// stopped. sysio.synd claims nothing, and the challenger gets nothing back: dave's claim returns his bond
+// with the whole hold bond.
 BOOST_FIXTURE_TEST_CASE(valid_ruling_resumes_release, sysio_synd_released_tester) try {
    BOOST_REQUIRE_EQUAL(success(), challenge("carol"_n, SOLANA, LIQSOL, 1));
    const int64_t carol = liq_balance("carol"_n);
@@ -3320,6 +3367,10 @@ BOOST_FIXTURE_TEST_CASE(valid_ruling_resumes_release, sysio_synd_released_tester
    BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
    BOOST_REQUIRE_EQUAL(carol, liq_balance("carol"_n));
    BOOST_REQUIRE_EQUAL(0, liq_balance(SYND_ACCOUNT));
+
+   const uint64_t hold_bond = 10 * UNIT * HOLD_BPS / BPS_DENOMINATOR;
+   BOOST_REQUIRE_EQUAL(success(), bond_claim(id, "dave"_n));
+   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT + hold_bond), liq_balance("dave"_n));
 } FC_LOG_AND_RETHROW()
 
 // INVALID after 4 of 10 were released: the 6 still held are burned, the forfeit of 10 is pulled from
@@ -3480,38 +3531,6 @@ BOOST_FIXTURE_TEST_CASE(invalid_without_a_hold_returns_the_bounty_to_the_fee_pot
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(2 * UNIT), liq_balance(SYND_ACCOUNT));
 } FC_LOG_AND_RETHROW()
 
-// VALID after a challenge of a partly bonded request: sysio.bond awards the issuer the share of the hold
-// bond no bond covered; sysio.synd claims it and forwards it to the challenger, who paid it, once. The
-// envelope then releases.
-BOOST_FIXTURE_TEST_CASE(valid_after_challenge_forwards_the_unbonded_hold_share, sysio_synd_tester) try {
-   const auto key    = ed_key();
-   const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
-   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
-   syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
-   const uint64_t id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
-   BOOST_REQUIRE_EQUAL(success(), underwrite("dave"_n, id, 4 * UNIT, LIQSOL));
-   BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), challenge("carol"_n, SOLANA, LIQSOL, 1));
-   const uint64_t hold_bond = 10 * UNIT * HOLD_BPS / BPS_DENOMINATOR;
-   const uint64_t share     = hold_bond * 6 / 10;   // the 6 of 10 no bond covered
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond), liq_balance("carol"_n));
-   BOOST_REQUIRE_EQUAL(success(), rule(id, true));
-
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE(executed(BOND_ACCOUNT, "claim"_n));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond + share), liq_balance("carol"_n));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT), liq_balance("alice"_n));
-   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
-   BOOST_REQUIRE_EQUAL(0, liq_balance(SYND_ACCOUNT));
-
-   // Forwarded once; dave takes his bond and his stake's share of the hold bond.
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond + share), liq_balance("carol"_n));
-   BOOST_REQUIRE_EQUAL(success(), bond_claim(id, "dave"_n));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(4 * UNIT + hold_bond - share), liq_balance("dave"_n));
-} FC_LOG_AND_RETHROW()
-
 // Anyone may claim sysio.synd's forfeit for it before a step sees the ruling: the forfeit is then already
 // in sysio.synd's row, the step sends no claim (it would be refused), and accounts for the forfeit from
 // the request's bonded amount all the same.
@@ -3530,27 +3549,6 @@ BOOST_FIXTURE_TEST_CASE(invalid_accounts_for_a_forfeit_claimed_by_someone_else, 
    BOOST_REQUIRE_EQUAL(6 * UNIT, feepot_balance(LIQSOL));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(6 * UNIT), liq_balance(SYND_ACCOUNT));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(15 * UNIT), supply());
-} FC_LOG_AND_RETHROW()
-
-// Contract challengers receive their refund directly without recipient execution.
-BOOST_FIXTURE_TEST_CASE(valid_after_challenge_credits_a_contract_challenger, sysio_synd_tester) try {
-   const auto pubkey = ed_bytes(ed_key());
-   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
-   syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
-   const uint64_t id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
-   BOOST_REQUIRE_EQUAL(success(), liq_mint("bob"_n, LIQSOL, 5 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), challenge("bob"_n, SOLANA, LIQSOL, 1));
-   set_code("bob"_n, contracts::util::block_transfer_wasm());
-   produce_blocks();
-   BOOST_REQUIRE_EQUAL(success(), rule(id, true));
-
-   // Nothing was bonded: the whole hold bond is the issuer's award.
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   for (const auto& trace : last_trace->action_traces) BOOST_REQUIRE(trace.receiver != "bob"_n);
-   BOOST_REQUIRE(executed(BOND_ACCOUNT, "claim"_n));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT), liq_balance("bob"_n));
-   BOOST_REQUIRE_EQUAL(0u, feepot_balance(LIQSOL));
-   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
 } FC_LOG_AND_RETHROW()
 
 // An envelope released whole while its request is still only BONDED can be challenged: the bond exists
@@ -3601,6 +3599,7 @@ BOOST_FIXTURE_TEST_CASE(a_challenge_of_zero_charge_is_refused, sysio_synd_tester
    // 5 base units cover a hold bond of 5 * 1000 / 10000 = 0.
    syndicate_and_close(1, 1, ed_bytes(ed_key()), LIQPT, 5);
    BOOST_REQUIRE_EQUAL(STATE_REQUESTED, envelope_row(SOLANA, LIQPT, 1)["state"].as_string());
+   underwrite_envelope(SOLANA, LIQPT, 1);
    BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQPT, 100));
    BOOST_REQUIRE(mentions(challenge("carol"_n, SOLANA, LIQPT, 1), CHALLENGE_ZERO));
 
@@ -3609,32 +3608,6 @@ BOOST_FIXTURE_TEST_CASE(a_challenge_of_zero_charge_is_refused, sysio_synd_tester
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(99), liq_balance("carol"_n, LIQPT_SYM));
    BOOST_REQUIRE_EQUAL(1u, feepot_balance(LIQPT));
    BOOST_REQUIRE_EQUAL(STATE_HELD, envelope_row(SOLANA, LIQPT, 1)["state"].as_string());
-} FC_LOG_AND_RETHROW()
-
-// A third party may claim sysio.synd's award of the hold bond for it before a step sees the VALID
-// ruling: the share is then already in sysio.synd's row, the step sends no claim and still forwards it.
-BOOST_FIXTURE_TEST_CASE(valid_forwards_a_hold_share_someone_else_claimed_first, sysio_synd_tester) try {
-   const auto key    = ed_key();
-   const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
-   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
-   syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
-   const uint64_t id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
-   BOOST_REQUIRE_EQUAL(success(), underwrite("dave"_n, id, 4 * UNIT, LIQSOL));
-   BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), challenge("carol"_n, SOLANA, LIQSOL, 1));
-   const uint64_t hold_bond = 10 * UNIT * HOLD_BPS / BPS_DENOMINATOR;
-   const uint64_t share     = hold_bond * 6 / 10;   // the 6 of 10 no bond covered
-   BOOST_REQUIRE_EQUAL(success(), rule(id, true));
-   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi_ser, "bob"_n, "claim"_n, mvo()
-      ("request_id", id)("account", SYND_ACCOUNT)));
-
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE(!executed(BOND_ACCOUNT, "claim"_n));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond + share), liq_balance("carol"_n));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT), liq_balance("alice"_n));
-   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
-   BOOST_REQUIRE_EQUAL(0, liq_balance(SYND_ACCOUNT));
 } FC_LOG_AND_RETHROW()
 
 // INVALID after the envelope's yield report was released: the yield sits in sysio.liq's pending balance,
@@ -3816,7 +3789,8 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_admits_what_comes_in_and_refuses_what_leaves, s
    BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
    syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
    const uint64_t id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
-   BOOST_REQUIRE_EQUAL(REQUEST_OPEN, bond_request(id)["state"].as_string());
+   underwrite_envelope(SOLANA, LIQSOL, 1);
+   BOOST_REQUIRE_EQUAL(REQUEST_BONDED, bond_request(id)["state"].as_string());
 
    BOOST_REQUIRE_EQUAL(success(), andon_pull());
 
@@ -3907,46 +3881,6 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_defers_the_invalid_burn, sysio_synd_released_te
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(15 * UNIT), supply());
 } FC_LOG_AND_RETHROW()
 
-// A VALID ruling seen while the cord is pulled is recorded with the challenger's hold share snapshotted and
-// pending, but nothing is claimed or forwarded; the first step after the clear forwards the share once and
-// releases the envelope.
-BOOST_FIXTURE_TEST_CASE(a_freeze_defers_the_hold_share_of_a_valid_ruling, sysio_synd_tester) try {
-   const auto key    = ed_key();
-   const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
-   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
-   syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
-   const uint64_t id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
-   BOOST_REQUIRE_EQUAL(success(), underwrite("dave"_n, id, 4 * UNIT, LIQSOL));
-   BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), challenge("carol"_n, SOLANA, LIQSOL, 1));
-   const uint64_t hold_bond = 10 * UNIT * HOLD_BPS / BPS_DENOMINATOR;
-   const uint64_t share     = hold_bond * 6 / 10;   // the 6 of 10 no bond covered
-   BOOST_REQUIRE_EQUAL(success(), rule(id, true));
-   BOOST_REQUIRE_EQUAL(success(), andon_pull());
-
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE(console_has(QUEUE_FROZEN_SHARE));
-   BOOST_REQUIRE(!executed(BOND_ACCOUNT, "claim"_n));
-   auto envelope = envelope_row(SOLANA, LIQSOL, 1);
-   BOOST_REQUIRE_EQUAL("VALID", envelope["outcome"].as_string());
-   BOOST_REQUIRE_EQUAL(STATE_RELEASABLE, envelope["state"].as_string());
-   BOOST_REQUIRE_EQUAL(share, envelope["hold_share"].as_uint64());
-   BOOST_REQUIRE_EQUAL("carol"_n, envelope["hold_beneficiary"].as<name>());
-   BOOST_REQUIRE(envelope["share_pending"].as_bool());
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond), liq_balance("carol"_n));
-   BOOST_REQUIRE_EQUAL(0, liq_balance("alice"_n));
-
-   BOOST_REQUIRE_EQUAL(success(), andon_clear());
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond + share), liq_balance("carol"_n));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT), liq_balance("alice"_n));
-   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
-   BOOST_REQUIRE(!envelope_row(SOLANA, LIQSOL, 1)["share_pending"].as_bool());
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond + share), liq_balance("carol"_n));
-} FC_LOG_AND_RETHROW()
-
 // A request is still issued while the cord is pulled: closeenv requests the next envelope and a bond can be
 // placed on it -- the bond moves INTO sysio.bond -- while nothing releases until the clear.
 BOOST_FIXTURE_TEST_CASE(a_freeze_still_issues_requests_and_takes_bonds, sysio_synd_tester) try {
@@ -3968,50 +3902,6 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_still_issues_requests_and_takes_bonds, sysio_sy
    BOOST_REQUIRE_EQUAL(success(), crank());
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT), liq_balance("alice"_n));
    BOOST_REQUIRE_EQUAL(STATE_DONE, envelope_row(SOLANA, LIQSOL, 1)["state"].as_string());
-} FC_LOG_AND_RETHROW()
-
-// The forward survives a prune: every claim on a VALID request is made before the pull (the underwriter's,
-// and sysio.synd's award claimed for it by a bystander), the frozen step records VALID with its snapshot,
-// and sysio.bond prunes the request past its retention while the cord is still pulled. The first step after
-// the clear forwards the challenger's share from the snapshot, once, and releases the envelope.
-BOOST_FIXTURE_TEST_CASE(a_valid_forward_survives_a_prune_during_the_freeze, sysio_synd_tester) try {
-   const auto key    = ed_key();
-   const auto pubkey = ed_bytes(key);
-   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
-   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
-   syndicate_and_close(1, 1, pubkey, LIQSOL, 10 * UNIT);
-   const uint64_t id = envelope_row(SOLANA, LIQSOL, 1)["request_id"].as_uint64();
-   BOOST_REQUIRE_EQUAL(success(), underwrite("dave"_n, id, 4 * UNIT, LIQSOL));
-   BOOST_REQUIRE_EQUAL(success(), liq_mint("carol"_n, LIQSOL, 5 * UNIT));
-   BOOST_REQUIRE_EQUAL(success(), challenge("carol"_n, SOLANA, LIQSOL, 1));
-   const uint64_t hold_bond = 10 * UNIT * HOLD_BPS / BPS_DENOMINATOR;
-   const uint64_t share     = hold_bond * 6 / 10;   // the 6 of 10 no bond covered
-   BOOST_REQUIRE_EQUAL(success(), rule(id, true));
-   BOOST_REQUIRE_EQUAL(success(), bond_claim(id, "dave"_n));
-   BOOST_REQUIRE_EQUAL(success(), push(BOND_ACCOUNT, bond_abi_ser, "bob"_n, "claim"_n, mvo()
-      ("request_id", id)("account", SYND_ACCOUNT)));
-
-   BOOST_REQUIRE_EQUAL(success(), andon_pull());
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE_EQUAL("VALID", envelope_row(SOLANA, LIQSOL, 1)["outcome"].as_string());
-   BOOST_REQUIRE(envelope_row(SOLANA, LIQSOL, 1)["share_pending"].as_bool());
-
-   produce_block(fc::seconds(PRUNE_RETENTION_SEC + 1));
-   BOOST_REQUIRE_EQUAL(success(), bond_prune(id, 10));
-   BOOST_REQUIRE(bond_request(id).is_null());
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond), liq_balance("carol"_n));
-
-   BOOST_REQUIRE_EQUAL(success(), andon_clear());
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE(!executed(BOND_ACCOUNT, "claim"_n));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond + share), liq_balance("carol"_n));
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(10 * UNIT), liq_balance("alice"_n));
-   const auto envelope = envelope_row(SOLANA, LIQSOL, 1);
-   BOOST_REQUIRE_EQUAL(STATE_DONE, envelope["state"].as_string());
-   BOOST_REQUIRE(!envelope["share_pending"].as_bool());
-   BOOST_REQUIRE_EQUAL(0, liq_balance(SYND_ACCOUNT));
-   BOOST_REQUIRE_EQUAL(success(), crank());
-   BOOST_REQUIRE_EQUAL(static_cast<int64_t>(5 * UNIT - hold_bond + share), liq_balance("carol"_n));
 } FC_LOG_AND_RETHROW()
 
 // A bucket holding a positive level at the pull keeps it through a frozen crank -- nothing ticks and
