@@ -275,6 +275,59 @@ BOOST_FIXTURE_TEST_CASE( get_account, validating_tester ) try {
    }
 } FC_LOG_AND_RETHROW() /// get_account
 
+// get_account's deferred call holds the whole Phase-1 result -- every permission and linked action -- while it
+// waits on the http thread pool, so the size it reports for the bytes-in-flight budget must cover that result,
+// with the ROA ABI (whose copied bytes ride along) and without it.
+BOOST_FIXTURE_TEST_CASE( get_account_reservation_covers_result, validating_tester ) try {
+   produce_block();
+   create_accounts({"alice"_n, "bob"_n}, false, false);
+
+   constexpr uint32_t link_count = 16;
+   for (uint32_t i = 0; i < link_count; ++i) {
+      const permission_name requirement = i % 2 == 0 ? config::active_name : config::sysio_any_name;
+      link_authority("alice"_n, "bob"_n, requirement, name(std::string("act") + char('a' + i)));
+   }
+   produce_block();
+
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes, fc::microseconds::maximum(), fc::microseconds::maximum(), nullptr);
+   chain_apis::read_only::get_account_params p{"alice"_n};
+
+   // The reported size and the packed size of what Phase 1 captured: total_resources is only decoded in Phase 2.
+   auto reservation_and_result_size = [&]() {
+      const auto call = plugin.get_account(p, fc::time_point::maximum());
+      auto res = call();
+      BOOST_REQUIRE(!std::holds_alternative<fc::exception_ptr>(res));
+      auto result = std::get<chain_apis::read_only::get_account_results>(std::move(res));
+      BOOST_REQUIRE_EQUAL(link_count / 2, result.sysio_any_linked_actions.size());
+      result.total_resources = fc::variant();
+      return std::pair{call.retained_size(), fc::raw::pack_size(result)};
+   };
+
+   const auto* roa = control->find_account_metadata(config::roa_account_name);
+   BOOST_REQUIRE(roa != nullptr);
+   const size_t roa_abi_size = roa->abi.size();
+   BOOST_REQUIRE(roa_abi_size > 0);
+   {
+      const auto [retained, result_size] = reservation_and_result_size();
+      BOOST_TEST(retained >= roa_abi_size + result_size);
+   }
+
+   // Clear the ROA ABI: Phase 2 then has nothing to decode, but the result still waits on the queue.
+   signed_transaction trx;
+   trx.actions.emplace_back(vector<permission_level>{{config::roa_account_name, config::active_name}},
+                            setabi{.account = config::roa_account_name, .abi = {}});
+   set_transaction_headers(trx);
+   trx.sign(get_private_key(config::roa_account_name, "active"), control->get_chain_id());
+   push_transaction(trx);
+   produce_block();
+   BOOST_REQUIRE_EQUAL(0u, control->find_account_metadata(config::roa_account_name)->abi.size());
+   {
+      const auto [retained, result_size] = reservation_and_result_size();
+      BOOST_TEST(retained >= result_size);
+   }
+} FC_LOG_AND_RETHROW() /// get_account_reservation_covers_result
+
 BOOST_FIXTURE_TEST_CASE( key_alone_satisfies_follows_the_authority_checker, validating_tester ) try {
    produce_block();
    create_accounts({"alice"_n, "bob"_n, "carol"_n}, false, false);

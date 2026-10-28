@@ -4268,10 +4268,10 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
       vector<char> abi_bytes(code_account->abi.data(),
                              code_account->abi.data() + code_account->abi.size());
 
-      // Dominant memory the deferred call holds while it waits on the http pool queue: the ABI
-      // copy and the raw reslimit row.  The typed result it also carries is account metadata and
-      // a bounded permission list -- small fixed-size fields, ignored per the estimate's semantics.
-      const size_t retained = abi_bytes.size()
+      // Memory the deferred call holds while it waits on the http pool queue: the result with its
+      // permissions and linked actions, the ABI copy and the raw reslimit row.  Every queued read of
+      // the same account holds its own copy, so the result is charged per call.
+      const size_t retained = fc::raw::pack_size(result) + abi_bytes.size()
                               + (http_params.total_resources ? http_params.total_resources->size() : 0);
 
       auto phase2 = [http_params = std::move(http_params), result = std::move(result),
@@ -4301,11 +4301,12 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
       };
       return {std::move(phase2), retained};
    }
-   // No contract abi to decode: nothing heavy rides the queue, only the account metadata result.
+   // No contract abi to decode, but the result -- permissions and linked actions -- still waits on the queue.
+   const size_t retained = fc::raw::pack_size(result);
    return {[result = std::move(result)]() mutable -> chain::t_or_exception<read_only::get_account_results> {
               return std::move(result);
            },
-           0};
+           retained};
    } SYS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account info")
 }
 
