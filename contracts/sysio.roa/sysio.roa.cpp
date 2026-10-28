@@ -7,6 +7,8 @@
 #include <sysio.opp.common/safe_ops.hpp>   // add_sat_u64 / add_sat_i64 -- never-throw saturating accumulators
 #include <sysio/permission.hpp>   // get_permission -- read an account's active authority in nodeownreg
 
+#include <algorithm>
+#include <limits>
 #include <string_view>
 
 namespace sysio {
@@ -911,9 +913,10 @@ namespace sysio {
         asset total_sys_allocation = get_allocation_for_tier(tier);
 
         // Only a tier-1 owner is provisioned a personal allocation here. Tier 1 is the sole tier
-        // that can call newuser, and newuser's `sponsors` / `sponsorcount` rows are the only writes
-        // in this contract billed to a node owner rather than to sysio.roa -- so a tier-1 owner
-        // needs RAM headroom before its first sponsorship. No other node-owner capability draws on
+        // that can call newuser, and the `sponsors` / `sponsorcount` rows that newuser and
+        // raiseacctlim write are the only rows in this contract billed to a node owner rather than
+        // to sysio.roa -- so a tier-1 owner needs RAM headroom before its first sponsorship or
+        // raise. No other node-owner capability draws on
         // the owner's own resources: addpolicy / expandpolicy / extendpolicy / reducepolicy are
         // actions on sysio.roa, so unless the caller names an explicit sysio.payer, action::payer()
         // resolves to sysio.roa (unlimited CPU/NET), and every row those actions write is emplaced
@@ -1032,12 +1035,16 @@ namespace sysio {
        auto state = roastate.get();
        check(state.is_active, "ROA is not active yet");
 
-       // Check if creator is a tier-1 node owner
-       nodeowners_t nodeowners(get_self(), state.network_gen);
-       auto node_key = nodeowner_key{creator.value};
-       check(nodeowners.contains(node_key), "Creator is not a registered tier-1 node owner");
-       auto node = nodeowners.get(node_key);
-       check(node.tier == 1, "Creator is not a registered tier-1 node owner");
+       check(is_tier1_node_owner(creator, state.network_gen), "Creator is not a registered tier-1 node owner");
+
+        // Hold the creator to its account limit before doing any work for the new account.
+        sponsorcount_t sponsorships(get_self(), state.network_gen);
+        auto sponsorship = get_sponsorship(sponsorships, creator);
+        const uint64_t limit = account_limit(get_account_limit_config(), sponsorship);
+        check(sponsorship.count < limit, [&] {
+            return "Creator has reached its account limit of " + std::to_string(limit) +
+                   "; raise it with raiseacctlim";
+        });
 
         // Check if nonce already exists in sponsors table for this creator
         sponsors_t sponsors(get_self(), creator.value);
@@ -1118,12 +1125,9 @@ namespace sysio {
             .username = new_username,
         });
 
-        // Update sponsor count for creator (creator-paid, same as the sponsors row above).
-        sponsorcount_t sponsorcount(get_self(), state.network_gen);
-        auto sc_key = sponsorcount_key{creator.value};
-        sponsorcount.upsert(creator, sc_key,
-            roa::sponsorcount{.owner = creator, .count = 1},
-            [&](auto& row) { row.count += 1; });
+        // Count the new account against the creator's limit (creator-paid, same as the sponsors row above).
+        sponsorship.count += 1;
+        sponsorships.upsert(creator, sponsorcount_key{creator.value}, sponsorship);
 
         // Update roa policy for sys_account for tracking RAM provided to accounts for account creation
         // It is not expected that sysio.acct will use the RAM. Instead sysio.acct is a placeholder for
@@ -1145,6 +1149,74 @@ namespace sysio {
         decrease_reslimit("sysio"_n, sysiosystem::newaccount_ram);
 
         return new_username;
+    }
+
+    void roa::setacctlim(uint64_t default_limit, uint32_t max_raise_multiplier_bps) {
+        require_auth(get_self());
+
+        check(default_limit > 0, "default_limit must be positive");
+        check(max_raise_multiplier_bps > BPS_DENOMINATOR, [] {
+            return "max_raise_multiplier_bps must exceed " + std::to_string(BPS_DENOMINATOR);
+        });
+
+        acctlimcfg_t config(get_self());
+        config.set(account_limit_config{
+            .default_limit            = default_limit,
+            .max_raise_multiplier_bps = max_raise_multiplier_bps,
+        }, get_self());
+    }
+
+    void roa::raiseacctlim(const name& owner, uint64_t new_limit) {
+        require_auth(owner);
+
+        roastate_t roastate(get_self());
+        auto state = roastate.get();
+        check(state.is_active, "ROA is not active yet");
+        check(is_tier1_node_owner(owner, state.network_gen), "Owner is not a registered tier-1 node owner");
+
+        const auto config = get_account_limit_config();
+        sponsorcount_t sponsorships(get_self(), state.network_gen);
+        auto sponsorship = get_sponsorship(sponsorships, owner);
+        const uint64_t current_limit = account_limit(config, sponsorship);
+        check(new_limit > current_limit, [&] {
+            return "New account limit must exceed the current limit of " + std::to_string(current_limit);
+        });
+
+        const uint64_t max_new_limit = max_raised_limit(config, current_limit);
+        check(new_limit <= max_new_limit, [&] {
+            return "New account limit may be at most " + std::to_string(max_new_limit) +
+                   " for a current limit of " + std::to_string(current_limit);
+        });
+
+        // Owner-paid, like the count newuser keeps on the same row.
+        sponsorship.raised_limit = new_limit;
+        sponsorships.upsert(owner, sponsorcount_key{owner.value}, sponsorship);
+    }
+
+    bool roa::is_tier1_node_owner(const name& account, uint8_t network_gen) const {
+        nodeowners_t nodeowners(get_self(), network_gen);
+        const auto node = nodeowners.try_get(nodeowner_key{account.value});
+        return node.has_value() && node->tier == 1;
+    }
+
+    roa::account_limit_config roa::get_account_limit_config() const {
+        return acctlimcfg_t(get_self()).get_or_default(account_limit_config{});
+    }
+
+    roa::sponsorcount roa::get_sponsorship(const sponsorcount_t& sponsorships, const name& owner) {
+        return sponsorships.try_get(sponsorcount_key{owner.value}).value_or(sponsorcount{.owner = owner});
+    }
+
+    uint64_t roa::account_limit(const account_limit_config& config, const sponsorcount& sponsorship) {
+        return std::max(config.default_limit, sponsorship.raised_limit);
+    }
+
+    uint64_t roa::max_raised_limit(const account_limit_config& config, uint64_t current_limit) {
+        // A 128-bit product cannot wrap: a uint64 limit times a uint32 multiplier fits in 96 bits.
+        const uint128_t scaled = static_cast<uint128_t>(current_limit) * config.max_raise_multiplier_bps;
+        const uint128_t rounded_up = (scaled + BPS_DENOMINATOR - 1) / BPS_DENOMINATOR;
+        constexpr uint64_t max_limit = std::numeric_limits<uint64_t>::max();
+        return rounded_up > max_limit ? max_limit : static_cast<uint64_t>(rounded_up);
     }
 
     void roa::newnameduser(const name& account, const public_key& pubkey, uint8_t tier) {
