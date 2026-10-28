@@ -152,9 +152,8 @@ static size_t in_flight_sizeof(const std::optional<T>& o) {
 * Deliberately NOT derived from fc::exception or std::exception: mid-emission rollback
 * handlers (eg abi_serializer's catch-rewind-hex-fallback path) catch and absorb serializer
 * exceptions to keep emitting, and absorbing a budget abort would defeat the cap.  A foreign
-* type dodges their typed catches, and json_writer re-fires the guard on the next token
-* after a throw so even a catch(...) absorber re-raises this until it unwinds out of the
-* emitter (see json_writer's guarded-constructor contract).
+* type dodges their typed catches, and json_writer's abort is sticky, so even a catch(...)
+* absorber cannot complete the response (see json_writer's guarded-constructor contract).
 */
 struct stream_response_budget_exceeded {
    std::string error; ///< busy-response text produced by verify_max_bytes_in_flight
@@ -336,7 +335,17 @@ inline auto make_http_stream_response_handler(http_plugin_state& plugin_state, d
                         if (auto error_str = session_ptr->verify_max_bytes_in_flight(0); !error_str.empty())
                            throw detail::stream_response_budget_exceeded{std::move(error_str)};
                      });
-                     emitter(w);
+                     // The writer's abort decides the response, whether a serializer swallowed it and
+                     // finished the document or rethrew it wrapped (FC_RETHROW_EXCEPTIONS turns it into
+                     // an fc::exception).
+                     try {
+                        emitter(w);
+                     } catch (...) {
+                        if (!w.guard_abort())
+                           throw;
+                     }
+                     if (auto abort = w.guard_abort())
+                        std::rethrow_exception(abort);
                   }
                   settle_to(body.size());
                   if (auto error_str = session_ptr->verify_max_bytes_in_flight(0); !error_str.empty())

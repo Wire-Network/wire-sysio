@@ -59,6 +59,7 @@ constexpr uint32_t stream_over_budget_index = 11;
 constexpr uint32_t stream_single_token_index = 12;
 constexpr uint32_t stream_queued_payload_index = 13;
 constexpr uint32_t stream_deferred_payload_index = 14;
+constexpr uint32_t stream_absorbed_abort_index = 15;
 /** Index of the IPv6 probe listener used by the IPv6 tests. */
 constexpr uint32_t ipv6_probe_index = 2;
 
@@ -1563,6 +1564,75 @@ BOOST_FIXTURE_TEST_CASE(stream_response_over_budget_aborts_early, http_plugin_te
 
    // The budget drained: a small streaming response is admitted and served normally.
    BOOST_CHECK(get_status("/small_stream") == boost::beast::http::status::ok);
+}
+
+// A budget abort stays a 503 whatever the emitter does with it: one emitter swallows it and
+// finishes with a fallback small enough to fit (before the abort was sticky, a 200 with the
+// fallback), the other rethrows it wrapped in an fc::exception (a 500).
+BOOST_FIXTURE_TEST_CASE(stream_response_absorbed_abort_is_busy, http_plugin_test_fixture) {
+   const std::string endpoint = test_http_endpoint("127.0.0.1", stream_absorbed_abort_index);
+   const std::string server_address = "--http-server-address=" + endpoint;
+   const std::string port = test_http_port(stream_absorbed_abort_index);
+
+   http_plugin* http_plugin = init({"--plugin=sysio::http_plugin",
+                                    server_address.c_str(),
+                                    "--http-max-bytes-in-flight-mb=1"});
+   BOOST_REQUIRE(http_plugin);
+
+   // 32 MiB attempted against the 1 MiB budget.
+   constexpr size_t chunk_size  = 64 * 1024;
+   constexpr size_t chunk_count = 512;
+   auto emit_oversized = [](fc::json_writer& w) {
+      for (size_t i = 0; i < chunk_count; ++i)
+         w.value_string(std::string(chunk_size, 'x'));
+   };
+   http_plugin->add_api_stream({{std::string("/swallowed_abort"), api_category::node,
+                                 [&](string&&, string&&, url_response_stream_callback&& cb) {
+                                    cb(200, [&](fc::json_writer& w) {
+                                       w.begin_array();
+                                       const auto cp = w.checkpoint();
+                                       try {
+                                          emit_oversized(w);
+                                       } catch (...) {
+                                          w.rewind(cp); // fall back to an empty array
+                                       }
+                                       w.end_array();
+                                    });
+                                 }},
+                                {std::string("/wrapped_abort"), api_category::node,
+                                 [&](string&&, string&&, url_response_stream_callback&& cb) {
+                                    cb(200, [&](fc::json_writer& w) {
+                                       try {
+                                          w.begin_array();
+                                          emit_oversized(w);
+                                          w.end_array();
+                                       } FC_RETHROW_EXCEPTIONS(error, "wrapped serializer failure")
+                                    });
+                                 }}}, appbase::exec_queue::read_write);
+
+   boost::asio::io_context ctx;
+   boost::asio::ip::tcp::resolver resolver(ctx);
+   auto get_status = [&](const char* path) {
+      boost::asio::ip::tcp::socket s(ctx, boost::asio::ip::tcp::v4());
+      boost::asio::connect(s, resolver.resolve("127.0.0.1", port));
+      boost::beast::http::request<boost::beast::http::empty_body> req(boost::beast::http::verb::get, path, 11);
+      req.set(http::field::host, endpoint);
+      boost::beast::http::write(s, req);
+
+      boost::beast::http::response<boost::beast::http::string_body> resp;
+      boost::beast::flat_buffer buffer;
+      boost::beast::http::read(s, buffer, resp);
+      return resp.result();
+   };
+
+   BOOST_CHECK(get_status("/swallowed_abort") == boost::beast::http::status::service_unavailable);
+   BOOST_CHECK(get_status("/wrapped_abort") == boost::beast::http::status::service_unavailable);
+
+   uint16_t max = std::numeric_limits<uint16_t>::max();
+   while (http_plugin->requests_in_flight() > 0 && --max)
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+   BOOST_CHECK(max > 0);
+   BOOST_CHECK_EQUAL(http_plugin->bytes_in_flight(), 0u);
 }
 
 // One oversized token -- a single 32 MiB string value -- must abort mid-token against the

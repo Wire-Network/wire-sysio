@@ -766,31 +766,29 @@ BOOST_AUTO_TEST_CASE(growth_guard_measures_escape_expansion) {
    BOOST_CHECK_LT(out.capacity(), 256 * 1024);
 }
 
-BOOST_AUTO_TEST_CASE(growth_guard_rearms_after_throw) {
-   // A catch-and-continue serializer (eg the abi_serializer hex-fallback path) absorbing
-   // the guard's throw must NOT disable the guard: the very next token re-invokes it
-   // regardless of stride, so the abort re-raises until it unwinds out of the emitter.
-   // Once the guard passes again (budget freed), emission resumes normally.  A rejected
-   // value_string mutates nothing (the size pre-check runs ahead of the separator), so
-   // absorb-and-continue leaves the buffer well-formed.
+BOOST_AUTO_TEST_CASE(growth_guard_abort_is_sticky) {
+   // A catch-and-fallback serializer (eg the abi_serializer rewind-to-hex path) absorbing
+   // the guard's throw must not resume emission, even once a rewind shrinks the buffer
+   // back under the budget: every later token rethrows the first abort without consulting
+   // the guard, and guard_abort() reports it after emission.
    std::string out;
-   bool reject = false;
    size_t calls = 0;
-   fc::json_writer w(out, [&](size_t) { ++calls; if (reject) throw test_budget_abort{}; }, 4);
+   fc::json_writer w(out, [&](size_t sz) { ++calls; if (sz > 32) throw test_budget_abort{}; }, 4);
+   BOOST_CHECK(!w.guard_abort());
    w.begin_array();
-   w.value_string("aaaaaaaaaa");                                 // pre-check crosses the stride; guard approves
-   BOOST_CHECK_EQUAL(calls, 1u);
-   reject = true;                                                // budget exhausted
-   BOOST_CHECK_THROW(w.value_string("bbb"), test_budget_abort);  // pre-check throws, nothing appended
-   BOOST_CHECK_EQUAL(calls, 2u);
-   BOOST_CHECK_THROW(w.value_string("ccc"), test_budget_abort);  // absorbed upstream? re-fires immediately
-   BOOST_CHECK_EQUAL(calls, 3u);
-   reject = false;                                               // budget freed: same retry now passes
-   w.value_string("ddd");
-   w.end_array();
-   BOOST_CHECK_EQUAL(calls, 4u);
-   BOOST_CHECK(w.balanced());
-   BOOST_CHECK_EQUAL(out, R"(["aaaaaaaaaa","ddd"])");
+   w.value_string("aaaaaaaaaa");                        // under budget; guard approves
+   const auto cp = w.checkpoint();
+   const std::string big(64, 'x');
+   BOOST_CHECK_THROW(w.value_string(big), test_budget_abort);
+   const size_t calls_at_abort = calls;
+   BOOST_REQUIRE(w.guard_abort());
+   w.rewind(cp);                                        // the fallback path's rewind: buffer is under budget again
+   BOOST_CHECK_THROW(w.value_hex(big.data(), 1), test_budget_abort); // its small fallback still fails
+   BOOST_CHECK_THROW(w.value_null(), test_budget_abort);
+   BOOST_CHECK_EQUAL(calls, calls_at_abort);            // rethrown without consulting the guard again
+   w.end_array();                                       // closing brackets are not guarded...
+   BOOST_REQUIRE(w.guard_abort());                      // ...so the caller checks the abort after emission
+   BOOST_CHECK_THROW(std::rethrow_exception(w.guard_abort()), test_budget_abort);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

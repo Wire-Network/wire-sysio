@@ -3884,6 +3884,44 @@ BOOST_AUTO_TEST_CASE(abi_to_variant__add_action__data_unpack_throws_falls_back_t
    }
 }
 
+// A response-budget abort raised while action data is decoded must survive the hex fallback.
+// Control characters escape to six bytes each but take two as hex, so after the fallback's
+// rewind the "data" and "hex_data" hex fit under a budget the decoded string exceeded; only
+// the writer's sticky abort keeps the fallback from completing the response.
+BOOST_AUTO_TEST_CASE(abi_to_json_stream__guard_abort_survives_hex_fallback)
+{
+   struct budget_abort {};
+   constexpr size_t control_chars = 4096;   // escaped: ~24 KiB; "data" + "hex_data" hex: ~16 KiB
+   constexpr size_t budget        = 20 * 1024;
+   constexpr size_t guard_stride  = 1024;
+
+   auto abi = R"({
+      "version": "sysio::abi/1.0",
+      "structs": [
+         {"name": "acttest", "base": "", "fields": [
+            {"name": "str", "type": "string"}
+         ]}
+      ],
+      "actions": [
+         {"name": "acttest", "type": "acttest", "ricardian_contract": ""}
+      ]
+   })";
+   auto abidef = fc::json::from_string(abi).as<abi_def>();
+
+   action act(
+      std::vector<sysio::chain::permission_level>{ {account_name{"acctest"}, permission_name{"active"}} },
+      account_name{"acctest"},
+      action_name{"acttest"},
+      fc::raw::pack(std::string(control_chars, '\x01')));
+
+   std::string s;
+   fc::json_writer w(s, [](size_t size) { if (size > budget) throw budget_abort{}; }, guard_stride);
+   // to_json_stream's FC_RETHROW_EXCEPTIONS wraps the abort; the writer keeps the original.
+   BOOST_CHECK_THROW(abi_serializer::to_json_stream(act, w, get_resolver(abidef), yield_fn()), fc::exception);
+   BOOST_REQUIRE(w.guard_abort());
+   BOOST_CHECK_THROW(std::rethrow_exception(w.guard_abort()), budget_abort);
+}
+
 BOOST_AUTO_TEST_CASE(enum_types)
 {
    using sysio::testing::fc_exception_message_starts_with;
