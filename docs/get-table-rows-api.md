@@ -41,9 +41,8 @@ POST /v1/chain/get_table_rows
 - `more` — `true` if there are more rows beyond this page. A page ends at `limit`, at the deadline
   (`time_limit_ms` or the server's `http-max-response-time-ms`), or after the row that brings the page to 8 MiB of raw
   row data, whichever comes first; a page always holds at least one row. With a finite deadline `limit` is also capped
-  at 1000. On a secondary index a page ends only where the secondary key changes: it goes on past any of these to the
-  last row sharing the secondary key it is on, because `next_key` resumes at the first row with a secondary key.
-- `next_key` — the cursor for the next page. **Forward scans feed it to `lower_bound`; reverse scans feed it to `upper_bound`** (reverse `next_key` is the last key RETURNED, so the exclusive upper bound must advance below it). Usually a JSON key object with the scope stripped (pass the same `scope` param); for a key the ABI cannot name it is a `0x` raw cursor instead — an opaque, complete key. Feed either back verbatim.
+  at 1000.
+- `next_key` — the cursor for the next page. **Forward scans feed it to `lower_bound`; reverse scans feed it to `upper_bound`** (reverse `next_key` is the last key RETURNED, so the exclusive upper bound must advance below it). Usually a JSON key object with the scope stripped (pass the same `scope` param); for a key the ABI cannot name it is a `0x` raw cursor instead — an opaque, complete key. Feed either back verbatim. On a secondary index, a cursor that ends a page among rows sharing a secondary key also names the primary key of the row it stops at, since that is how the index orders them: the primary key's fields beside the index's in a key object (`{"byowner":"u3","id":4}`), or `:` and the primary key's hex after a hex cursor.
 
 ## Scoped Queries
 
@@ -192,6 +191,8 @@ The direction matters: a forward `next_key` is the first key NOT returned, so it
    "limit": 50
 }
 ```
+
+A secondary-index `next_key` names a primary key only inside a run of rows that share a secondary key; between runs it is the secondary key alone. Without the primary key, a page resumed inside such a run would start over at the run's first row going forward, or skip the rest of the run in reverse.
 
 A `next_key` key object is scope-stripped — the scope prefix is not included, so pass it back with the same `scope`. A `0x` raw cursor already carries the scope; pass it back with the same `scope` too, and it is used as-is. A `0x` cursor must lie inside the `scope` the request names — one from another scope is rejected rather than silently returning that scope's rows.
 
