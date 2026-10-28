@@ -112,7 +112,7 @@ Each item is a deploy or upgrade step. An item not done is a freeze that cannot 
 | `sysio.liq` | `transfer` to anything but a custody contract (`sysio.bond`, `sysio.synd`, `sysio.opreg`), so holders cannot move shadow LIQ between themselves; `claim` by anyone but a custody contract; `queueyield` | `mint`; transfers into a custody contract; `claim` by a custody contract (it moves WIRE into custody) |
 | `sysio.bond` | `claim` | `request`, `addbounty`, `accept`, `hold`, `approve`, `rslvvalid`, `rslvinvalid`, `sweepyield`, `prune` |
 | `sysio.kicker` | `kick` returns without paying and without writing: `last_kick` stays where it was, so accrual keeps running and the first paying `kick` after the clear covers it, within the 72-hour catch-up | `setconfig`, `addpool`, `setpool`, `rmpool` |
-| `sysio.synd` | the queue step's releases, delivery from `parked`, burns and the forward of a hold share (deferred to the first step after the clear); `desyndicate`, `sweep`, `dropenv`, `sweepyield` (refused: `the andon cord is pulled: funds cannot leave custody`); `linkswept` delivers nothing and returns | intake (`onsynd`, `onyield`, `closeenv`); the queue step's refresh, outcome recording and request issuing; `challenge`; `setconfig`; `importsynd` |
+| `sysio.synd` | the queue step's releases, delivery from `parked` and burns (deferred to the first step after the clear); `desyndicate`, `sweep`, `dropenv`, `sweepyield` (refused: `the andon cord is pulled: funds cannot leave custody`); `linkswept` delivers nothing and returns | intake (`onsynd`, `onyield`, `closeenv`); the queue step's refresh, outcome recording and request issuing; `challenge`; `setconfig`; `importsynd` |
 | `sysio.msgch`, `sysio.epoch` | nothing | everything |
 
 A frozen queue step prints `sysio.synd::queue: the andon cord is pulled; releases, deliveries and burns
@@ -234,7 +234,7 @@ Pausing a paused contract reverts (`EnforcedPause`), which is harmless: it was a
 | 2 | Replace the panic account in case its key is the fault ([Replacing the panic account](#replacing-the-panic-account)). | Skip. |
 | 3 | Record the block, the epoch and the last accepted envelope digest on each chain ([Recording](#recording-the-state-of-each-chain)). | Same. |
 | 4 | Read the depot's `mismatch` table and each outpost's shortfall records, and compare each outpost's custody with the depot's outstanding shadow ([Comparing totals](#comparing-totals), [A shortfall-triggered pull](#a-shortfall-triggered-pull)). | Same. No new `mismatch` row; custody covers the outstanding. |
-| 5 | Before each request's challenge window ends, hold every doubtful OPEN/BONDED request (`sysio.synd::challenge`) or obtain a governance invalid ruling (`sysio.bond::rslvinvalid`). | None. |
+| 5 | Before each request's challenge window ends, hold every doubtful BONDED request (`sysio.synd::challenge`) or obtain a governance invalid ruling (`sysio.bond::rslvinvalid`); a doubtful OPEN request can only be ruled. | None. |
 | 6 | `sysio` rules each held request (`rslvvalid` / `rslvinvalid`). Invalid envelopes burn as in §4.7 once the cord clears. | None. |
 | 7 | Fix and redeploy the faulty contract while still frozen, in the order of [`contract-upgrade-order.md`](contract-upgrade-order.md). | None. |
 | 8 | Repair custody and clear the outposts first. Have each repaired outpost emit a post-repair message (or wait for its next one); wait for depot admission, verify its admission and healthy custody report, run governance `reconcile` for every affected pair, verify its incident is erased, then clear the depot cord and do the work that waited ([Clearing](#clearing-outposts-first-then-the-depot)). | Same admission check before clearing the depot. |
@@ -243,8 +243,8 @@ Pausing a paused contract reverts (`EnforcedPause`), which is harmless: it was a
 
 Challenge windows keep counting during a freeze. Read `sysio.bond::requests`: a BONDED request
 becomes eligible for permissionless approval at `bonded_at + window_sec`; an OPEN request has
-no running challenge deadline yet. `approve` ignores the cord. A challenge or `rslvinvalid`
-still works after the deadline while the request remains OPEN/BONDED, but approval can win
+no running challenge deadline yet. `approve` ignores the cord. A challenge (BONDED only) or `rslvinvalid`
+(OPEN or BONDED) still works after the deadline while the request remains in that state, but approval can win
 that race at any time. Once APPROVED, neither intervention is allowed and held items release
 after clear. Act before approval eligibility whenever possible. A frozen queue step still issues requests, so `crank` during the freeze gives every WAITING
 envelope a request to hold or rule.
@@ -264,12 +264,11 @@ clio -u "$DEPOT_URL" push action sysio.bond rslvvalid   "[$BOND_REQUEST_ID]" -p 
 
 `CHAIN_CODE` and `TOKEN_CODE` are the `chain_code` and `token_code` objects exactly as the `envelopes`
 row prints them, `EPOCH_INDEX` its `epoch_index`, and `BOND_REQUEST_ID` its `request_id`. `challenge`
-accepts only an envelope in state REQUESTED, RELEASABLE or DONE whose request is OPEN or BONDED: a
-WAITING envelope has no request yet, so run `crank` first. `CHALLENGER` must not be `sysio.synd` or `sysio.bond`; contract accounts are supported through ledger settlement. The challenger pays the request's hold bond plus the pair's `challenge_extra`; both transfers go into
+accepts only an envelope in state REQUESTED, RELEASABLE or DONE whose request is BONDED: a
+WAITING envelope has no request yet, so run `crank` first, and an OPEN request is ruled rather than held. `CHALLENGER` must not be `sysio.synd` or `sysio.bond`; contract accounts may challenge. The challenger pays the request's hold bond plus the pair's `challenge_extra`; both transfers go into
 custody, so the challenge runs while the depot is frozen. `rslvinvalid` rules a request bonded or not,
 so an unbonded envelope in doubt is ruled invalid directly. The queue records each ruling on its next
-step; while the cord is pulled the burn of an INVALID envelope and the forward of a VALID ruling's hold
-share wait for the clear.
+step; while the cord is pulled the burn of an INVALID envelope waits for the clear.
 
 ### Replacing the panic account
 
