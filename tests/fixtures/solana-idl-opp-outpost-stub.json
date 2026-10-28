@@ -420,6 +420,19 @@
         249,
         15
       ]
+    },
+    {
+      "name": "EnvelopeChunks",
+      "discriminator": [
+        51,
+        126,
+        62,
+        161,
+        85,
+        175,
+        66,
+        63
+      ]
     }
   ],
   "types": [
@@ -754,6 +767,51 @@
             "type": {
               "vec": "u8"
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "EnvelopeChunks",
+      "serialization": "bytemuck",
+      "repr": {
+        "kind": "c"
+      },
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "epoch_index",
+            "type": "u32"
+          },
+          {
+            "name": "total_bytes",
+            "type": "u32"
+          },
+          {
+            "name": "total_chunks",
+            "type": "u16"
+          },
+          {
+            "name": "received_chunks",
+            "type": "u16"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "_padding",
+            "type": {
+              "array": [
+                "u8",
+                3
+              ]
+            }
+          },
+          {
+            "name": "operator",
+            "type": "pubkey"
           }
         ]
       }
