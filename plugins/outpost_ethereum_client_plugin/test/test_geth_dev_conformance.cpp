@@ -5,13 +5,16 @@
  * and drives the client's RPC surface through it: what geth parses, what it answers, and the
  * shape of its refusals — the things anvil is lenient about and a production endpoint is not.
  *
- * Gated on `WIRE_GETH_BIN`, the path of a geth binary (or of a wrapper that execs one, such as
- * `docker run --rm --network host ethereum/client-go:stable "$@"`). Without it the case logs
- * that it was skipped and passes, so the binary runs everywhere; CI sets the variable where
- * geth is installed. The node's HTTP port comes from this process's registry lease.
+ * The node is `geth` on `PATH`, or the binary (or a wrapper that execs one, such as
+ * `docker run --rm --network host ethereum/client-go:stable "$@"`) that `WIRE_GETH_BIN` names.
+ * Neither being present FAILS the case: a conformance test that can quietly stop running is
+ * the gap that let a geth-refused request ship. The CI platform images install geth
+ * (`.cicd/platforms/*.Dockerfile`), the macOS job through Homebrew, and the devcontainer
+ * alongside Foundry. The node's HTTP port comes from this process's registry lease.
  */
 #include <boost/process/v1/child.hpp>
 #include <boost/process/v1/io.hpp>
+#include <boost/process/v1/search_path.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <fc/crypto/elliptic_em.hpp>
@@ -47,6 +50,7 @@ using sysio::outpost_ethereum_client_detail::classify_epoch_in_revert;
 using sysio::outpost_ethereum_client_detail::epoch_in_revert;
 
 constexpr auto geth_binary_variable = "WIRE_GETH_BIN";
+constexpr auto geth_binary_name     = "geth";
 /// `geth --dev`'s chain id.
 constexpr uint32_t geth_dev_chain_id = 1337;
 /// Blocks every second, so a receipt wait is short and the chain reaches finality during the case.
@@ -114,6 +118,14 @@ ethereum_transaction_policy wide_policy() {
    };
 }
 
+/// The geth to run: `WIRE_GETH_BIN` when set, else `geth` on `PATH`. Empty when there is neither.
+std::string geth_binary() {
+   if (const char* named = std::getenv(geth_binary_variable); named != nullptr && *named != '\0') {
+      return named;
+   }
+   return bp::search_path(geth_binary_name).string();
+}
+
 /// A `geth --dev` node on a registry port, stopped on destruction; its output goes to `log_path`.
 struct geth_dev_node {
    explicit geth_dev_node(const std::string& binary)
@@ -174,11 +186,9 @@ ethereum_confirm_options confirm_within(fc::microseconds budget) {
 BOOST_AUTO_TEST_SUITE(geth_dev_conformance)
 
 BOOST_AUTO_TEST_CASE(the_client_speaks_geth) try {
-   const char* binary = std::getenv(geth_binary_variable);
-   if (binary == nullptr || *binary == '\0') {
-      BOOST_TEST_MESSAGE("skipped: set " << geth_binary_variable << " to a geth binary to run this case");
-      return;
-   }
+   const std::string binary = geth_binary();
+   BOOST_REQUIRE_MESSAGE(!binary.empty(), "no geth: install go-ethereum so `geth` is on PATH, or set "
+                                              << geth_binary_variable << " to a geth binary or a wrapper");
 
    geth_dev_node node{binary};
    node.await_ready();
