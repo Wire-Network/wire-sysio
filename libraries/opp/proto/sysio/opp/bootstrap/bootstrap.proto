@@ -130,7 +130,8 @@ message LiqPoolSpec {
   // Horizon over which queued yield is meant to sell, in seconds (> 0).
   uint32 conversion_horizon_sec = 10;
   // Hard ceiling on one clip, in basis points of the pool's shadow side:
-  // 1..10000, and best kept below roughly twice `fee`.
+  // 1..`fee`. `sysio.swap::setyield` refuses a cap above the pair's fee, the
+  // bound that keeps a yield tick from being worth sandwiching.
   uint32 depth_cap_bps          = 11;
   // Least clip worth selling, in the shadow's subunits (> 0; quote in JSON).
   uint64 clip_floor             = 12;

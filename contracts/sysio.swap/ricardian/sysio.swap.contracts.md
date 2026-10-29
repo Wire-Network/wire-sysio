@@ -184,7 +184,7 @@ title: Set yield parameters
 summary: 'Set the yield tick parameters of {{nowrap pair_token}}'
 ---
 
-The fee authority associated to the token {{pair_token}}, which must be a yield pool, authorizes to set the horizon of {{conversion_horizon_sec}} seconds over which the pool's queued yield is meant to sell, the ceiling of {{depth_cap_bps}} basis points (at most 10000) of the pool's shadow side on one clip, and the least a clip may be, {{clip_floor}}, in units of the shadow token. All three must be nonzero before the pool's yield tick can run. The pair's tick clock restarts now.
+The fee authority associated to the token {{pair_token}}, which must be a yield pool, authorizes to set the horizon of {{conversion_horizon_sec}} seconds over which the pool's queued yield is meant to sell, the ceiling of {{depth_cap_bps}} basis points of the pool's shadow side on one clip, which may not exceed the pair's fee in units of 1/10000, and the least a clip may be, {{clip_floor}}, in units of the shadow token. All three must be nonzero before the pool's yield tick can run. The pair's tick clock restarts now.
 
 
 <h1 class="contract">accrueyield</h1>
@@ -250,7 +250,7 @@ summary: 'Change the fee value associated to a pair'
 ---
 
 The fee authority associated to the token {{pair_token}} authorizes
-to change the fee parameter associated to the same token, to the value {{newfee}}, in units of 1/10000 and at most 9999.
+to change the fee parameter associated to the same token, to the value {{newfee}}, in units of 1/10000 and at most 9999. For a yield pool, {{newfee}} may not be below the pool's depth cap in basis points.
 
 
 <h1 class="contract">setconfig</h1>

@@ -462,6 +462,35 @@ public:
         push_transaction( trx );
         produce_block();
     }
+    // A sandwiched tick, atomic as an attacker would send it: `user` exchanges
+    // `front_run` for `front_for`, ticks `pair`, and exchanges `back_run` for
+    // `back_for`, all in ONE transaction, with no minimum on either exchange.
+    void sandwich_tick_in_one_transaction( name user, symbol_code pair, extended_asset front_run, symbol front_for,
+                                           extended_asset back_run, symbol back_for ) {
+        const auto exchange_action = [&]( const extended_asset& in, symbol out_symbol ) {
+            action act;
+            act.account = "sysio.swap"_n;
+            act.name    = "exchange"_n;
+            act.authorization = { {user, config::sysio_payer_name}, {user, config::active_name} };
+            act.data = abi_ser.variant_to_binary( "exchange", mvo()
+                ( "user", user )( "pair_token", pair )( "ext_asset_in", in )( "min_expected", asset(0, out_symbol) ),
+                fixture_abi_yield_function() );
+            return act;
+        };
+        action tick;
+        tick.account = "sysio.swap"_n;
+        tick.name    = "tickyield"_n;
+        tick.authorization = { {user, config::active_name} };
+        tick.data = abi_ser.variant_to_binary( "tickyield", mvo()( "pair_token", pair ), fixture_abi_yield_function() );
+        signed_transaction trx;
+        trx.actions.emplace_back( exchange_action( front_run, front_for ) );
+        trx.actions.emplace_back( std::move(tick) );
+        trx.actions.emplace_back( exchange_action( back_run, back_for ) );
+        set_transaction_headers( trx );
+        trx.sign( get_private_key( user, "active" ), control->get_chain_id() );
+        push_transaction( trx );
+        produce_block();
+    }
     // The pair's tick clock, in microseconds since the epoch.
     int64_t last_tick_us( symbol_code pair ) {
         return fc::time_point::from_iso_string( pair_row( pair )["last_tick"].as_string() ).time_since_epoch().count();
@@ -792,6 +821,29 @@ namespace yield_reference {
       const wide cap     = wide(pool_shadow) * cap_bps / BpsTotal;
       const wide clip    = std::min( { by_time, cap, wide(queued) } );
       return clip < std::min( wide(clip_floor), wide(queued) ) ? 0 : int64_t( clip );
+   }
+
+   // A sandwiched tick in the contract's integer math: sell `front_run` shadow,
+   // let a cap-sized clip sell, then spend the front-run's WIRE buying shadow
+   // back. The shadow the attacker ends up with beyond `front_run`, against a
+   // pool of `pool_shadow`/`pool_wire` whose depth record is `pool_shadow`.
+   int64_t sandwich_gain( int64_t pool_shadow, int64_t pool_wire, int fee, uint32_t cap_bps, int64_t front_run ) {
+      const int64_t front_proceeds = reference::receive( front_run, pool_shadow, pool_wire, fee );
+      const int64_t shadow_after_front = pool_shadow + front_run;
+      const int64_t wire_after_front   = pool_wire - front_proceeds;
+      const int64_t clip = int64_t( wide( std::min( shadow_after_front, pool_shadow ) ) * cap_bps / BpsTotal );
+      const int64_t clip_proceeds = reference::receive( clip, shadow_after_front, wire_after_front, fee );
+      const int64_t bought_back = reference::receive( front_proceeds, wire_after_front - clip_proceeds,
+                                                      shadow_after_front + clip, fee );
+      return bought_back - front_run;
+   }
+   // The best `sandwich_gain` over front-runs from one unit to ten times the
+   // shadow side, each about 5% above the last.
+   int64_t best_sandwich_gain( int64_t pool_shadow, int64_t pool_wire, int fee, uint32_t cap_bps ) {
+      int64_t best = std::numeric_limits<int64_t>::min();
+      for (int64_t front_run = 1; front_run <= 10 * pool_shadow; front_run = front_run * 21 / 20 + 1)
+         best = std::max( best, sandwich_gain( pool_shadow, pool_wire, fee, cap_bps, front_run ) );
+      return best;
    }
 }
 
@@ -1580,11 +1632,11 @@ BOOST_FIXTURE_TEST_CASE( yield_leg_rules, sysio_swap_tester ) try {
         symbol::from_string("4,BVO"), extend(asset::from_string("1.0000 VOICE")), extend(asset::from_string("1.0000 EOS")),
         10, name{} ) );
 
-    // setyield: fee authority only, yield pools only, cap within basis points,
-    // clip floor within an asset.
+    // setyield: fee authority only, yield pools only, cap within the pair's fee
+    // (10 here), clip floor within an asset.
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair has no yield leg"), setyield( ETUSD, 86400, 3, 1000 ) );
     BOOST_REQUIRE_EQUAL( error("missing authority of sysio"), setyield( EVO, 86400, 3, 1000, "alice"_n ) );
-    BOOST_REQUIRE_EQUAL( wasm_assert_msg("depth_cap_bps out of range"), setyield( EVO, 86400, 10001, 1000 ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("depth_cap_bps cannot exceed the pair's fee"), setyield( EVO, 86400, 11, 1000 ) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("clip_floor out of range"), setyield( EVO, 86400, 3, -1 ) );
     BOOST_REQUIRE_EQUAL( wasm_assert_msg("pair token does not exist"), setyield( EOS, 86400, 3, 1000 ) );
     BOOST_REQUIRE_EQUAL( success(), setyield( EVO, 86400, 3, 1000 ) );
@@ -2068,13 +2120,15 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_
     BOOST_REQUIRE_EQUAL( queued_before_gap - clip, reservoir_of( SHEO ) );
     BOOST_REQUIRE_EQUAL( shadow_pool_of(before) + clip, shadow_pool_of( system_balance( SHEO.value ) ) );
 
-    // With the cap lifted, the same gap drains the queue in one clip, and the
-    // tick after that is a no-op again.
-    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, uint32_t(yield_reference::BpsTotal), clip_floor ) );
+    // With the cap widened to the fee, the widest setyield accepts, the same gap
+    // drains the queue in one clip, and the tick after that is a no-op again.
+    const uint32_t widest_cap_bps = uint32_t(fee);
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, widest_cap_bps, clip_floor ) );
     produce_block();
     produce_block( fc::hours(2) );
     before = system_balance( SHEO.value );
     const int64_t remaining = reservoir_of( SHEO );
+    BOOST_REQUIRE_LE( remaining, shadow_pool_of(before) * widest_cap_bps / yield_reference::BpsTotal );
     BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
     BOOST_REQUIRE_EQUAL( 0, reservoir_of( SHEO ) );
     BOOST_REQUIRE_EQUAL( shadow_pool_of(before) + remaining, shadow_pool_of( system_balance( SHEO.value ) ) );
@@ -2098,7 +2152,7 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_sells_the_reservoir_over_the_horizon, sysio_
     before = system_balance( SHEO.value );
     BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
     clip = yield_reference::clip_size( queued, last_tick_us( SHEO ) - refunded_at, horizon_sec,
-                                       shadow_pool_of(before), uint32_t(yield_reference::BpsTotal), clip_floor );
+                                       shadow_pool_of(before), widest_cap_bps, clip_floor );
     proceeds = reference::receive( clip, shadow_pool_of(before), wire_pool_of(before) + owed, fee );
     after = system_balance( SHEO.value );
     BOOST_REQUIRE_EQUAL( shadow_pool_of(before) + clip,          shadow_pool_of(after) );
@@ -2192,8 +2246,11 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_never_sells_below_the_clip_floor, sysio_swap
 
     // A remainder smaller than the floor is not stranded: the floor gives way to
     // what is queued, so it leaves as one sale once the time share reaches the
-    // whole queue, which takes exactly one horizon.
-    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, uint32_t(yield_reference::BpsTotal), high_floor ) );
+    // whole queue, which takes exactly one horizon. (The cap widens to the fee,
+    // the widest setyield accepts, which covers what is left of the queue.)
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, uint32_t(fee), high_floor ) );
+    BOOST_REQUIRE_LE( reservoir_of( SHEO ),
+                      shadow_pool_of( system_balance( SHEO.value ) ) * fee / yield_reference::BpsTotal );
     produce_block();
     produce_block( fc::hours(2) );
     BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );   // drain whatever is left
@@ -2238,7 +2295,6 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_never_sells_below_the_clip_floor, sysio_swap
 BOOST_FIXTURE_TEST_CASE( yield_tick_never_sells_below_a_fee_bearing_output, sysio_swap_yield_tester ) try {
     setup_yield_pool();
     const uint32_t horizon_sec = 3600;
-    const uint32_t cap_bps     = uint32_t(yield_reference::BpsTotal);   // the cap is not what binds here
     const int64_t  clip_floor  = 1000;
     const auto shadow_pool_of  = [&]( const vector<int64_t>& pool ) { return pool.at(0); };
     const auto wire_pool_of    = [&]( const vector<int64_t>& pool ) { return pool.at(1); };
@@ -2249,6 +2305,9 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_never_sells_below_a_fee_bearing_output, sysi
     // on is the OUTPUT. A floor sized for one fee is wrong for another, and
     // changefee can move the fee under a floor that setyield already set.
     const int fee = 1;
+    // The widest cap that fee admits, 1e6 against the 1e10 shadow side: far
+    // above every clip below, so the cap is not what binds here.
+    const uint32_t cap_bps = uint32_t(fee);
     BOOST_REQUIRE_EQUAL( success(), changefee( SHEO, fee ) );
     BOOST_REQUIRE_EQUAL( fee, pool_fee( SHEO ) );
     const int64_t fee_bearing = reference::min_fee_bearing_output( fee );
@@ -2298,6 +2357,123 @@ BOOST_FIXTURE_TEST_CASE( yield_tick_never_sells_below_a_fee_bearing_output, sysi
     // it either. yield_tick_never_sells_below_the_clip_floor pins that: at its
     // 0.1% fee the 500-unit remainder it drains is itself under the 1000-unit
     // fee-bearing output, and it still leaves.)
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( yield_depth_cap_stays_within_the_fee, sysio_swap_yield_tester ) try {
+    setup_yield_pool();
+    BOOST_REQUIRE_EQUAL( success(), inittoken( "alice"_n, ETUSD5,
+        extend(asset::from_string("1.00 TUSD")), extend( asset( 1'0000, WIRE9 ) ), 10, name{}) );
+    const uint32_t horizon_sec = 3600;
+    const int64_t  clip_floor  = 1000;
+    const int      fee         = pool_fee( SHEO );
+    const uint32_t widest_cap  = uint32_t(fee);
+    const auto cap_of = [&]() { return uint32_t( pair_row( SHEO )["depth_cap_bps"].as_uint64() ); };
+
+    // setyield refuses a cap above the fee, by one basis point or by the whole
+    // side; the fee itself is the widest cap it takes.
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("depth_cap_bps cannot exceed the pair's fee"),
+                         setyield( SHEO, horizon_sec, widest_cap + 1, clip_floor ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("depth_cap_bps cannot exceed the pair's fee"),
+                         setyield( SHEO, horizon_sec, uint32_t(yield_reference::BpsTotal), clip_floor ) );
+    BOOST_REQUIRE_EQUAL( 0u, cap_of() );
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, widest_cap, clip_floor ) );
+    BOOST_REQUIRE_EQUAL( widest_cap, cap_of() );
+
+    // changefee will not take the fee below the cap, zero included. Raising it
+    // is always allowed, and the cap can follow it up.
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("fee cannot go below the pair's depth_cap_bps"), changefee( SHEO, fee - 1 ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("fee cannot go below the pair's depth_cap_bps"), changefee( SHEO, 0 ) );
+    BOOST_REQUIRE_EQUAL( fee, pool_fee( SHEO ) );
+    BOOST_REQUIRE_EQUAL( success(), changefee( SHEO, 2 * fee ) );
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, uint32_t(2 * fee), clip_floor ) );
+    // Lowering both goes cap first, then fee.
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("fee cannot go below the pair's depth_cap_bps"), changefee( SHEO, fee ) );
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, widest_cap, clip_floor ) );
+    BOOST_REQUIRE_EQUAL( success(), changefee( SHEO, fee ) );
+    BOOST_REQUIRE_EQUAL( fee, pool_fee( SHEO ) );
+
+    // A zero fee admits no cap: with the cap cleared the fee can reach zero,
+    // after which setyield refuses any cap and the pair cannot tick.
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, 0, clip_floor ) );
+    BOOST_REQUIRE_EQUAL( success(), changefee( SHEO, 0 ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("depth_cap_bps cannot exceed the pair's fee"),
+                         setyield( SHEO, horizon_sec, 1, clip_floor ) );
+    BOOST_REQUIRE_EQUAL( wasm_assert_msg("yield tick parameters not set"), tickyield( SHEO ) );
+
+    // A plain pool carries no cap, so nothing bounds its fee from below.
+    BOOST_REQUIRE_EQUAL( success(), changefee( ETUSD, 0 ) );
+    BOOST_REQUIRE_EQUAL( 0, pool_fee( ETUSD ) );
+} FC_LOG_AND_RETHROW()
+
+// The reason for that bound, in the contract's integer math on the yield
+// fixture's pool: a sandwich pays nothing beyond a unit of rounding while the
+// cap is within the fee, and pays as soon as the cap is a basis point above it.
+BOOST_AUTO_TEST_CASE( yield_tick_sandwich_pays_only_above_the_fee ) try {
+    // The unit a floored fee can round in the attacker's favour on their buy-back.
+    const int64_t rounding = 1;
+    for (const int fee : { 10, 30 }) {
+        for (const uint32_t cap_bps : { 1u, uint32_t(fee / 2), uint32_t(fee) }) {
+            BOOST_TEST_CONTEXT( "fee " << fee << ", cap " << cap_bps ) {
+                BOOST_CHECK_LE( yield_reference::best_sandwich_gain( YieldPoolShadow, YieldPoolWire, fee, cap_bps ),
+                                rounding );
+            }
+        }
+        BOOST_TEST_CONTEXT( "fee " << fee << ", cap " << fee + 1 ) {
+            BOOST_CHECK_GT( yield_reference::best_sandwich_gain( YieldPoolShadow, YieldPoolWire, fee, uint32_t(fee + 1) ),
+                            1000 );
+        }
+    }
+    // The cluster tool's mock pools used to set a 3000 bps cap at a 30 bps fee:
+    // a sandwich there takes over a tenth of the pool's shadow side.
+    BOOST_CHECK_GT( yield_reference::best_sandwich_gain( YieldPoolShadow, YieldPoolWire, 30, 3000 ),
+                    YieldPoolShadow / 10 );
+} FC_LOG_AND_RETHROW()
+
+// The same sandwich, sent to the contract: front-run, tick and buy-back in one
+// transaction at the widest cap the fee admits.
+BOOST_FIXTURE_TEST_CASE( yield_tick_sandwich_does_not_pay, sysio_swap_yield_tester ) try {
+    setup_yield_pool();
+    const uint32_t horizon_sec = 3600;
+    const int64_t  clip_floor  = 1000;
+    const int      fee         = pool_fee( SHEO );
+    const auto shadow_pool_of  = [&]( const vector<int64_t>& pool ) { return pool.at(0); };
+    const auto wire_pool_of    = [&]( const vector<int64_t>& pool ) { return pool.at(1); };
+
+    // A queue deep enough, and a wait long enough, that the cap is what sizes
+    // the clip: 1e7 of the 1e10 shadow side.
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, uint32_t(fee), clip_floor ) );
+    const int64_t queued = 1'0000'0000;
+    fund_yield_in_one_transaction( "alice"_n, SHEO, asset( queued, SHD4 ) );
+    produce_block();
+    produce_block( fc::hours(2) );
+
+    // bob front-runs with 1% of the shadow side, a size at which a cap one basis
+    // point above the fee would pay him (yield_tick_sandwich_pays_only_above_the_fee).
+    const int64_t front_run = YieldPoolShadow / 100;
+    BOOST_REQUIRE_LT( 0, yield_reference::sandwich_gain( YieldPoolShadow, YieldPoolWire, fee, uint32_t(fee + 1),
+                                                         front_run ) );
+    BOOST_REQUIRE_EQUAL( success(), openext( "bob"_n, "bob"_n, SHADOW ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_transfer( "alice"_n, "bob"_n, asset( front_run, SHD4 ), "" ) );
+    BOOST_REQUIRE_EQUAL( success(), shadow_transfer( "bob"_n, "sysio.swap"_n, asset( front_run, SHD4 ), "" ) );
+    // Settle what the pool is owed first, so the front-run is priced against
+    // exactly the pool read here.
+    BOOST_REQUIRE_EQUAL( success(), accrueyield( SHEO ) );
+
+    const auto before = system_balance( SHEO.value );
+    BOOST_REQUIRE_EQUAL( YieldPoolShadow, last_tick_depth( SHEO ) );
+    const int64_t shadow_before  = deposit_of( "bob"_n, SHADOW );
+    const int64_t wire_before    = deposit_of( "bob"_n, system_token );
+    const int64_t front_proceeds = reference::receive( front_run, shadow_pool_of(before), wire_pool_of(before), fee );
+    sandwich_tick_in_one_transaction( "bob"_n, SHEO, shd( front_run ), WIRE9,
+                                      extend( asset( front_proceeds, WIRE9 ) ), SHD4 );
+
+    // The tick sold a full clip between the two exchanges...
+    const int64_t clip = YieldPoolShadow * fee / yield_reference::BpsTotal;
+    BOOST_REQUIRE_EQUAL( queued - clip, reservoir_of( SHEO ) );
+    // ...and bob, having spent exactly what the front-run paid him, holds less
+    // shadow than he started with.
+    BOOST_REQUIRE_EQUAL( wire_before, deposit_of( "bob"_n, system_token ) );
+    BOOST_REQUIRE_LT( deposit_of( "bob"_n, SHADOW ), shadow_before );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( fee_authority_configuration, sysio_swap_tester ) try {

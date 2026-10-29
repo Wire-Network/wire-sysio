@@ -212,6 +212,10 @@ int64_t swap::min_fee_bearing_output(int fee) {
     return fee > 0 ? FEE_DENOMINATOR / fee : 1;
 }
 
+bool swap::cap_within_fee(uint32_t depth_cap_bps, int fee) {
+    return int64_t(depth_cap_bps) <= int64_t(fee);
+}
+
 extended_asset swap::process_exch(symbol_code pair_token,
   extended_asset ext_asset_in, asset min_expected){
     stats statstable( get_self() );
@@ -483,7 +487,9 @@ void swap::setyield(symbol_code pair_token, uint32_t conversion_horizon_sec, uin
     check ( token.has_value(), "pair token does not exist" );
     require_auth(token->fee_authority);
     const extended_symbol& shadow = require_yield_leg(*token);
-    check( depth_cap_bps <= opp::amm::BPS_TOTAL, "depth_cap_bps out of range" );
+    // A cap within the fee leaves no sandwich worth running (see the header). The
+    // fee is at most MAX_FEE, so this also keeps the cap under the whole side.
+    check( cap_within_fee( depth_cap_bps, token->fee ), "depth_cap_bps cannot exceed the pair's fee" );
     check( clip_floor >= 0 && clip_floor <= MAX, "clip_floor out of range" );
     const int64_t shadow_depth = pool_of( *token, shadow ).quantity.amount;
     statstable.modify( name{}, key, [&]( auto& a ) {
@@ -590,6 +596,8 @@ void swap::changefee(symbol_code pair_token, int newfee) {
     check ( token.has_value(), "pair token does not exist" );
     require_auth(token->fee_authority);
     check( 0 <= newfee && newfee <= MAX_FEE, "fee out of range" );
+    // A plain pool, or a yield pool that has never set a cap, carries a cap of 0.
+    check( cap_within_fee( token->depth_cap_bps, newfee ), "fee cannot go below the pair's depth_cap_bps" );
     statstable.modify( name{}, key, [&]( auto& a ) {
       a.fee = newfee;
     } );
