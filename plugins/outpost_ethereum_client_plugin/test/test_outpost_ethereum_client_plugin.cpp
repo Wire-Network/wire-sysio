@@ -1637,6 +1637,66 @@ BOOST_AUTO_TEST_CASE(read_inbound_envelope_validates_latest_slot) try {
    }
 } FC_LOG_AND_RETHROW();
 
+/// The inbound slot is read where the read confirmation lands, never at the
+/// head. On hoodi and mainnet finality trails the head by two beacon epochs
+/// and more, so the slot the relay reads still holds the PREVIOUS epoch's
+/// envelope for minutes after the outpost emitted this one: the relay reports
+/// nothing, and delivers once the confirmed block reaches the emit. A local
+/// anvil finalizes two blocks behind the head and never shows this gap.
+BOOST_AUTO_TEST_CASE(read_inbound_envelope_waits_out_the_read_confirmations_lag) try {
+   auto clean_app = gsl_lite::finally([]() { appbase::application::reset_app_singleton(); });
+   auto tester           = create_app();
+   auto private_key_spec = to_private_key_spec(std::string(latest_slot_test_private_key));
+   auto sig_provider     = tester->plugin().create_provider(std::string(latest_slot_test_entry_id), chain_kind_ethereum,
+                                                            chain_key_type_ethereum,
+                                                            std::string(latest_slot_test_public_key), private_key_spec);
+   auto rpc        = std::make_shared<scripted_rpc>();
+   auto eth_client = std::make_shared<scripted_ethereum_client>(sig_provider, relay_test_policy(), rpc);
+   auto abis       = load_abi_fixture(opp_abi_fixture);
+   const std::string opp_address{test_opp_address};
+   auto typed_opp = eth_client->get_contract<sysio::opp_contract_client>(opp_address, abis);
+   auto entry     = std::make_shared<sysio::ethereum_client_entry_t>();
+   entry->id                 = latest_slot_test_entry_id;
+   entry->signature_provider = sig_provider;
+   entry->client             = eth_client;
+   entry->chain_id           = test_evm_chain_id;
+   sysio::outpost_ethereum_client outpost(entry, opp_address, "", abis, test_outpost_chain_code, test_evm_chain_id);
+
+   // Finality lagging the head by more than the default confirmation tolerates
+   // (hoodi after a slow finalization: 100 blocks, 20 minutes), so every read
+   // at the default confirmation falls back to the finalized block.
+   constexpr uint64_t lagging_finality_blocks  = 100;
+   constexpr uint64_t lagging_finality_seconds = lagging_finality_blocks * ethereum_seconds_per_slot;
+   rpc->finalized_lag_blocks  = lagging_finality_blocks;
+   rpc->finalized_lag_seconds = lagging_finality_seconds;
+   // The outpost emitted this epoch's envelope 40 blocks below the head: past
+   // the finalized block, so the finalized state still shows the previous one.
+   const uint64_t emit_block = test_head_block - 40;
+   const auto     previous   = serialize_envelope(test_stale_wire_epoch);
+   const auto     current    = serialize_envelope(test_wire_epoch);
+
+   std::vector<std::string> blocks_read;
+   typed_opp->get_latest_outbound_envelope = [&](const block_number_or_tag_t& block) -> fc::variant {
+      BOOST_REQUIRE(std::holds_alternative<std::string>(block));
+      const auto& pinned = std::get<std::string>(block);
+      blocks_read.push_back(pinned);
+      const auto number = parse_rpc_quantity(fc::variant(pinned), "block").convert_to<uint64_t>();
+      return fc::variant(number >= emit_block ? encode_latest_outbound_result(test_wire_epoch, current)
+                                              : encode_latest_outbound_result(test_stale_wire_epoch, previous));
+   };
+
+   // Nothing yet: the confirmed block predates the emit, and the head is never read.
+   BOOST_CHECK(outpost.read_inbound_envelope(test_wire_epoch, fc::seconds(test_rpc_deadline_seconds)).empty());
+   BOOST_REQUIRE_EQUAL(blocks_read.size(), 1u);
+   BOOST_CHECK_EQUAL(blocks_read.back(), pinned_block_hex(test_head_block - lagging_finality_blocks));
+
+   // The chain advances past the emit by enough for finality to cover it.
+   rpc->head_block = fc::uint256{test_head_block + 60};
+   BOOST_CHECK(outpost.read_inbound_envelope(test_wire_epoch, fc::seconds(test_rpc_deadline_seconds)) == current);
+   BOOST_REQUIRE_EQUAL(blocks_read.size(), 2u);
+   BOOST_CHECK_EQUAL(blocks_read.back(), pinned_block_hex(test_head_block + 60 - lagging_finality_blocks));
+} FC_LOG_AND_RETHROW();
+
 /// `outboundEnvelopes(uint32)` returns `(uint32 epochIndex, uint64 emittedAt, bytes32 checksum)`.
 std::string encode_outbound_record_result(uint64_t epoch, const fc::sha256& checksum) {
    constexpr uint64_t emitted_at = 1'700'000'000;

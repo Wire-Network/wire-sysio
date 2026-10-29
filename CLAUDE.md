@@ -105,6 +105,12 @@ sudo apt-get install -y build-essential binutils ccache cmake curl git ninja-bui
     libcurl4-openssl-dev libgmp-dev zlib1g-dev python3 python3-pip clang-18 libclang-18-dev \
     openjdk-21-jre-headless
 
+# go-ethereum: `test_outpost_ethereum_client_plugin` starts `geth --dev` for its
+# conformance suite and FAILS when no `geth` is on PATH (or in WIRE_GETH_BIN).
+# The CI images pin a release in .cicd/platforms/*.Dockerfile; locally, install the
+# same way or `docker run --rm --network host ethereum/client-go:stable` behind a
+# `geth` wrapper script on PATH.
+
 # Initialize required submodules
 git submodule update --init --recursive vcpkg libraries/appbase
 

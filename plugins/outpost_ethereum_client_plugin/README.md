@@ -483,6 +483,18 @@ geth-backed hoodi endpoint — fails the unit test that produces it. The wire fo
 issues is pinned separately in libfc's `ethereum_client_requests` suite, which drives a real client through a
 recording HTTP server.
 
+A third suite, `geth_dev_conformance`, runs the client against a real go-ethereum node: it starts
+`geth --dev` on a registry port, funds the test signer from the dev account, deploys a contract that reverts
+with `OPP_NonSequentialEpoch`, and checks what the node parses and answers — `eth_call` and `eth_estimateGas`
+on an account without code and on the reverter (a code-3 refusal carrying the error bytes the relay
+classifies), a signed transaction from fee lookup through its receipt, reads pinned to the receipt's block,
+and the `finalized` / `safe` tags the read confirmation resolves through. It runs `geth` from `PATH`, or the
+binary (or a wrapper that execs one, for example `docker run --rm --network host ethereum/client-go:stable
+"$@"`) that `WIRE_GETH_BIN` names, and FAILS when there is neither: a conformance case that can quietly stop
+running is the gap that let a geth-refused request ship. The CI platform images install a pinned geth
+(`.cicd/platforms/*.Dockerfile`), the macOS job takes it from Homebrew, and the devcontainer installs it
+alongside Foundry.
+
 CTest runs this binary through the build tree's `tests/bind_registry.py`, which keeps its host-wide WIRE
 bind-registry lease alive for the test process and exposes the ports in `SYSIO_TEST_PORTS`. The wrapper uses
 Python's standard library. For direct filtered runs, use that wrapper before the binary and Boost arguments.

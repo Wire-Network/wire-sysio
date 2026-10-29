@@ -82,7 +82,9 @@ BOOST_AUTO_TEST_CASE(default_options_are_correct) try {
    boost::program_options::notify(vm);
 
    BOOST_CHECK_EQUAL(vm["batch-epoch-poll-ms"].as<uint32_t>(), 15000u);
-   BOOST_CHECK_EQUAL(vm["batch-delivery-timeout-ms"].as<uint32_t>(), 15000u);
+   // Two 12-second slots plus the relay's own round trips: a receipt wait that
+   // outlasts a transaction missing the next block.
+   BOOST_CHECK_EQUAL(vm["batch-delivery-timeout-ms"].as<uint32_t>(), 30000u);
    BOOST_CHECK_EQUAL(vm["batch-yield-tick-interval-ms"].as<uint32_t>(), 60000u);
    // The kick crank is on by default, like the other depot cranks, and retries a
    // pool no faster than the tickyield crank ticks one.

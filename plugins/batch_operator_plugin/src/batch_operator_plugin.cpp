@@ -49,7 +49,14 @@ namespace eth = fc::network::ethereum;
 namespace sol = fc::network::solana;
 
 namespace {
-   constexpr fc::microseconds DELIVERY_TIMEOUT  = fc::seconds(15);
+   /// One outbound delivery's budget, every transaction and confirmation wait
+   /// included. Sized for a 12-second-slot chain: a transaction that misses the
+   /// next block lands in the one after, so one receipt wait needs two slots
+   /// plus the relay's own round trips before the send. The journal keeps a
+   /// transaction that outlasts the budget and the next tick settles it, so a
+   /// shorter budget costs ticks, not deliveries -- but on a 12-second chain a
+   /// 15-second budget turned nearly every delivery into a two-tick affair.
+   constexpr fc::microseconds DELIVERY_TIMEOUT  = fc::seconds(30);
    constexpr fc::microseconds EPOCH_POLL        = fc::seconds(15);
    constexpr fc::microseconds EPOCH_EDGE_BUFFER = fc::milliseconds(2500);
    /// Minimum spacing between this operator's `sysio.swap::tickyield` pushes per
