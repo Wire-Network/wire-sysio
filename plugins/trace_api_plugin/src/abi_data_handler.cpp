@@ -14,6 +14,12 @@ namespace sysio::trace_api {
       constexpr std::string_view return_value_error_prefix  = "return_value decode failed: ";
       constexpr std::string_view unknown_return_value_error = "unknown exception decoding return_value";
 
+      // An action type that resolves to an optional decodes to null when its presence flag is 0.  Responses omit
+      // "params" then, as they do when there is no ABI to decode with.
+      bool decodes_to_null(const chain::abi_serializer& abi, std::string_view type, const chain::bytes& data) {
+         return abi.is_optional(abi.resolve_type(type)) && !data.empty() && data.front() == 0;
+      }
+
       // ABIs are user-provided; the yield function only enforces the recursion-depth cap and
       // intentionally has no wall-clock deadline.  Shared by both decoders so they agree on what
       // counts as "too deep".
@@ -95,20 +101,22 @@ namespace sysio::trace_api {
 
       // decode_error is written before except_handler runs: if the failure was the response budget aborting the
       // writer, that write rethrows the abort and the budget rejection is not logged as a decode failure.
-      const auto params_cp = w.checkpoint();
-      try {
-         w.key("params");
-         serializer->binary_to_json_stream(type_name, a.data, w, abi_yield);
-      } catch (const std::exception& e) {
-         w.rewind(params_cp);
-         w.set("decode_error", std::string_view(e.what()));
-         except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
-         return;
-      } catch (...) {
-         w.rewind(params_cp);
-         w.set("decode_error", unknown_params_error);
-         except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
-         return;
+      if (!decodes_to_null(*serializer, type_name, a.data)) {
+         const auto params_cp = w.checkpoint();
+         try {
+            w.key("params");
+            serializer->binary_to_json_stream(type_name, a.data, w, abi_yield);
+         } catch (const std::exception& e) {
+            w.rewind(params_cp);
+            w.set("decode_error", std::string_view(e.what()));
+            except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
+            return;
+         } catch (...) {
+            w.rewind(params_cp);
+            w.set("decode_error", unknown_params_error);
+            except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
+            return;
+         }
       }
 
       if (a.return_value.empty()) return;
@@ -143,13 +151,15 @@ namespace sysio::trace_api {
          // get_block / get_transaction_trace emit params/return_data all-or-nothing: any decode
          // failure rewinds every byte this function wrote (no params, no return_data).
          auto cp = w.checkpoint();
-         try {
-            w.key("params");
-            serializer->binary_to_json_stream(type_name, a.data, w, abi_yield);
-         } catch (...) {
-            w.rewind(cp);
-            except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
-            return;
+         if (!decodes_to_null(*serializer, type_name, a.data)) {
+            try {
+               w.key("params");
+               serializer->binary_to_json_stream(type_name, a.data, w, abi_yield);
+            } catch (...) {
+               w.rewind(cp);
+               except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
+               return;
+            }
          }
 
          if (a.return_value.empty()) return;

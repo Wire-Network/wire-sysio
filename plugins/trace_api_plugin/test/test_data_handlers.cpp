@@ -487,5 +487,42 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       BOOST_TEST(out.find("decode_error") == std::string::npos);
    }
 
+   namespace {
+      // Action "foo" typed as an optional uint8 (through a typedef), with return type "foor".
+      chain::abi_def make_optional_action_abi() {
+         auto abi = chain::abi_def ( { {"opt8", "uint8?"} },
+            {
+               { "foor", "", { {"e", "varuint32"}, {"f", "varuint32"}, {"g", "varuint32"} } }
+            },
+            {
+               { "foo"_n, "opt8", ""}
+            },
+            {}, {}, {}
+         );
+         abi.version = "sysio::abi/1.";
+         abi.action_results = { std::vector<chain::action_result_def>{ chain::action_result_def{ "foo"_n, "foor"} } };
+         return abi;
+      }
+   }
+
+   // An action whose optional type is absent decodes to null: both decoders omit "params" then, and still decode
+   // return_data.
+   BOOST_AUTO_TEST_CASE(optional_action_absent_omits_params)
+   {
+      abi_data_handler handler(exception_handler{}, make_resolver("alice"_n),
+                               make_fetcher("alice"_n, pack_abi(make_optional_action_abi())));
+
+      const action_trace_v0 absent = make_foo_action({0x00}, {});
+      BOOST_TEST(serialized_json(handler, absent) == "{}");
+      BOOST_TEST(streamed_decode_json(handler, absent) == "{}");
+
+      const action_trace_v0 absent_with_return = make_foo_action({0x00}, {0x04, 0x05, 0x06});
+      BOOST_TEST(serialized_json(handler, absent_with_return) == R"json({"return_data":{"e":4,"f":5,"g":6}})json");
+      BOOST_TEST(streamed_decode_json(handler, absent_with_return) == R"json({"return_data":{"e":4,"f":5,"g":6}})json");
+
+      const action_trace_v0 present = make_foo_action({0x01, 0x07}, {});
+      BOOST_TEST(serialized_json(handler, present) == R"json({"params":7})json");
+      BOOST_TEST(streamed_decode_json(handler, present) == R"json({"params":7})json");
+   }
 
 BOOST_AUTO_TEST_SUITE_END()
