@@ -42,6 +42,9 @@ constexpr std::chrono::milliseconds request_wait{5000};
 /// `setNumber(uint256)` with argument 60, as the ABI encoder emits it (no prefix).
 constexpr std::string_view set_number_calldata =
    "3fb5c1cb000000000000000000000000000000000000000000000000000000000000003c";
+constexpr std::string_view total_supply_name = "totalSupply";
+constexpr std::string_view total_supply_selector = "18160ddd";
+constexpr std::string_view rpc_hex_prefix = "0x";
 
 /// One JSON-RPC result body echoing the client's first request id.
 std::string rpc_result(std::string_view result_json, int64_t id = 1) {
@@ -206,11 +209,30 @@ BOOST_AUTO_TEST_CASE(contract_view_call_sends_prefixed_calldata_at_the_block_ask
    BOOST_CHECK_EQUAL(pinned[1].as_string(), "0x1a");
 } FC_LOG_AND_RETHROW();
 
-/// A signed call reaches the node as `0x`-prefixed raw bytes, whatever the caller's hex carried.
+/// Selector-only views carry the same prefix, while the ABI encoder retains raw hex.
+BOOST_AUTO_TEST_CASE(selector_only_view_call_sends_prefixed_calldata) try {
+   recorded_client recorded({reply("\"0x\"")});
+   const eth::abi::contract contract{
+      .name = std::string(total_supply_name),
+      .type = eth::abi::invoke_target_type::function,
+      .inputs = {},
+      .outputs = {},
+   };
+   const auto target = fc::crypto::ethereum::to_address(std::string(test_contract));
+   const contract_invoke_data_items no_arguments;
+   (void) recorded.client->execute_contract_view_fn(target, contract, block_tag_t::finalized, no_arguments);
+   const auto params = recorded.conformant_params(0, "eth_call");
+   BOOST_CHECK_EQUAL(params.at(0).get_object()["data"].as_string(),
+                     std::string(rpc_hex_prefix) + std::string(total_supply_selector));
+   BOOST_CHECK_EQUAL(contract_encode_data(contract, no_arguments), total_supply_selector);
+} FC_LOG_AND_RETHROW();
+
+/// Signed and unsigned submission paths carry prefixed bytes without doubling an existing prefix.
 BOOST_AUTO_TEST_CASE(raw_transaction_is_sent_with_its_prefix) try {
    recorded_client recorded({reply("\"" + std::string(test_tx_hash) + "\""),
                              reply("\"" + std::string(test_tx_hash) + "\"", 2),
-                             reply("\"" + std::string(test_tx_hash) + "\"", 3)});
+                             reply("\"" + std::string(test_tx_hash) + "\"", 3),
+                             reply("\"" + std::string(test_tx_hash) + "\"", 4)});
 
    // Pre-signed bytes given without a prefix.
    (void) recorded.client->send_raw_transaction("02f8");
@@ -235,6 +257,9 @@ BOOST_AUTO_TEST_CASE(raw_transaction_is_sent_with_its_prefix) try {
    (void) recorded.client->execute_contract_tx_fn(tx, set_number_abi(), {fc::variant(uint64_t{60})});
    const auto signed_params = recorded.conformant_params(2, "eth_sendRawTransaction");
    BOOST_CHECK(signed_params.at(0).as_string().starts_with("0x02"));
+   (void) recorded.client->execute_contract_tx_fn(tx, set_number_abi(), {fc::variant(uint64_t{60})}, /*sign=*/false);
+   const auto unsigned_params = recorded.conformant_params(3, "eth_sendRawTransaction");
+   BOOST_CHECK(unsigned_params.at(0).as_string().starts_with("0x02"));
 } FC_LOG_AND_RETHROW();
 
 /// The pre-flight estimate names the same calldata in `data` and `input`, prefixed, with

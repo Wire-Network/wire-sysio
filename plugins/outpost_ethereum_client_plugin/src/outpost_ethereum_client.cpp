@@ -14,6 +14,7 @@
 #include <fc/log/logger.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/network/json_rpc/json_rpc_client.hpp>
+#include <fc/string.hpp>
 #include <fc/task/deadline.hpp>
 #include <fc/task/retry.hpp>
 #include <fc/time.hpp>
@@ -207,12 +208,12 @@ constexpr uint32_t MAX_STALE_REFUSALS_PER_TICK = 2;
 
 /// How the pinned progress read retries a backend that does not know the
 /// block yet (a load-balanced endpoint behind the one that confirmed the
-/// transaction). Short, because the block exists: the backend is behind by
-/// seconds, not minutes, and the tick's own deadline bounds it anyway.
+/// transaction). Allow thirty seconds for backend lag; the enclosing delivery
+/// deadline can shorten this budget when earlier work has consumed the tick.
 constexpr fc::task::retry_options PINNED_READ_RETRY{
    .initial_backoff = fc::milliseconds(250),
    .max_backoff     = fc::seconds(1),
-   .total_timeout   = fc::seconds(10),
+   .total_timeout   = fc::seconds(30),
 };
 
 /// EIP-1474's "Resource not found": what reth and nethermind answer a read at a
@@ -557,8 +558,7 @@ std::optional<epoch_in_revert> classify_epoch_in_revert(int rpc_code, std::strin
 
 bool is_block_unavailable_refusal(int rpc_code, std::string_view message) {
    if (rpc_code == rpc_resource_not_found_code) return true;
-   std::string lowered(message);
-   std::ranges::transform(lowered, lowered.begin(), [](unsigned char c) { return std::tolower(c); });
+   const auto lowered = fc::to_lower(std::string(message));
    return std::ranges::any_of(block_unavailable_fragments,
                               [&](std::string_view fragment) { return lowered.find(fragment) != std::string::npos; });
 }
@@ -840,8 +840,7 @@ detail::delivery_progress outpost_ethereum_client::read_progress(uint32_t       
    // rather than stale state; that is the one failure worth waiting out. A
    // refusal of the request itself (malformed parameters, an unknown method,
    // a revert) is the same on every retry and propagates at once, with the
-   // node's reason, rather than surfacing ten seconds later as a bare timeout
-   // -- which is how a geth `-32602` read as a slow endpoint on hoodi.
+   // node's reason, rather than surfacing later as a bare timeout.
    // Everything else (a malformed response, the deadline) propagates too.
    std::string last_refusal;
    try {
@@ -862,8 +861,6 @@ detail::delivery_progress outpost_ethereum_client::read_progress(uint32_t       
                return progress;
             } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
                if (!detail::is_block_unavailable_refusal(refusal.code, refusal.top_message())) {
-                  wlog("outpost_ethereum_client[{}]: progress read at block {} refused by the node (code={}): {}",
-                       to_string(), block, refusal.code, refusal.top_message());
                   throw;
                }
                last_refusal = refusal.to_string();
@@ -873,8 +870,9 @@ detail::delivery_progress outpost_ethereum_client::read_progress(uint32_t       
             }
          });
    } catch (fc::timeout_exception& timeout) {
-      FC_RETHROW_EXCEPTION(timeout, warn, "outpost_ethereum_client[{}]: the node did not serve block {} within the "
-                           "pinned read's budget; its last refusal: {}",
+      if (last_refusal.empty()) throw;
+      FC_RETHROW_EXCEPTION(timeout, warn, "outpost_ethereum_client[{}]: progress read at block {} timed out; "
+                           "last RPC refusal: {}",
                            to_string(), block, last_refusal);
    }
 }
