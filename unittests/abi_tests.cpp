@@ -1064,6 +1064,109 @@ BOOST_AUTO_TEST_CASE(stream_built_in_optional_presence_flag)
    BOOST_CHECK_THROW(abis.binary_to_json_stream("opt", packed, w, yield_fn()), unpack_exception);
 } FC_LOG_AND_RETHROW() }
 
+namespace {
+   // An ABI of structs named <prefix>0 .. <prefix><levels>: <prefix>0 holds a uint8, and each further struct
+   // derives from (inherit) or wraps (nest) the one below it.
+   abi_def make_depth_chain_abi(const std::string& prefix, size_t levels, bool inherit) {
+      abi_def abi;
+      abi.version = "sysio::abi/1.0";
+      abi.structs.push_back(struct_def{prefix + "0", "", {{"value", "uint8"}}});
+      for (size_t i = 1; i <= levels; ++i) {
+         const std::string below = prefix + std::to_string(i - 1);
+         if (inherit)
+            abi.structs.push_back(struct_def{prefix + std::to_string(i), below, {}});
+         else
+            abi.structs.push_back(struct_def{prefix + std::to_string(i), "", {{"inner", below}}});
+      }
+      return abi;
+   }
+
+   // Decode `packed` as `type` through both sinks and require they agree: both succeed with the same JSON, or
+   // both reject it as too deep.  Returns whether the decode succeeded.
+   bool decodes_within_depth(const abi_serializer& abis, const std::string& type, const bytes& packed) {
+      const auto yield = abi_serializer::create_depth_yield_function();
+      std::optional<std::string> variant_json;
+      try {
+         variant_json = fc::json::to_string(abis.binary_to_variant(type, packed, yield), get_deadline());
+      } catch (const abi_recursion_depth_exception&) {}
+
+      std::string stream_json;
+      fc::json_writer w(stream_json);
+      if (!variant_json) {
+         BOOST_CHECK_THROW(abis.binary_to_json_stream(type, packed, w, yield), abi_recursion_depth_exception);
+         return false;
+      }
+      abis.binary_to_json_stream(type, packed, w, yield);
+      BOOST_TEST(stream_json == *variant_json);
+      return true;
+   }
+}
+
+// Every base struct counts toward max_recursion_depth, so a long inheritance chain is rejected like deep nesting.
+// The traversal starts at depth 1, and decoding layer<levels> adds the bytes boundary, the walk into it, one scope
+// per struct in the chain and the uint8 field: levels + 5 in all, which must stay below max_recursion_depth.
+BOOST_AUTO_TEST_CASE(struct_inheritance_counts_toward_recursion_depth)
+{ try {
+   constexpr size_t deepest = abi_serializer::max_recursion_depth - 6;
+   constexpr size_t longest = 64;
+   abi_serializer abis(make_depth_chain_abi("layer", longest, true), yield_fn());
+   const bytes packed{7};
+
+   for (size_t levels = 0; levels <= longest; ++levels) {
+      BOOST_TEST_INFO("inheritance levels " << levels);
+      BOOST_TEST(decodes_within_depth(abis, "layer" + std::to_string(levels), packed) == (levels <= deepest));
+   }
+} FC_LOG_AND_RETHROW() }
+
+// A nested struct counts two levels: the walk into the field's type and the struct itself.  Decoding nest<levels>
+// reaches depth 2 * levels + 5.
+BOOST_AUTO_TEST_CASE(nested_structs_count_toward_recursion_depth)
+{ try {
+   constexpr size_t deepest = (abi_serializer::max_recursion_depth - 6) / 2;
+   constexpr size_t longest = deepest + 3;
+   abi_serializer abis(make_depth_chain_abi("nest", longest, false), yield_fn());
+   const bytes packed{7};
+
+   for (size_t levels = 0; levels <= longest; ++levels) {
+      BOOST_TEST_INFO("nesting levels " << levels);
+      BOOST_TEST(decodes_within_depth(abis, "nest" + std::to_string(levels), packed) == (levels <= deepest));
+   }
+} FC_LOG_AND_RETHROW() }
+
+// Action data inside an action decodes at the same depth whether the action streams or becomes a variant: at the
+// depth where the decode stops fitting, both fall back to the same hex output.
+BOOST_AUTO_TEST_CASE(action_data_stream_depth_matches_variant)
+{ try {
+   // Deeper than any limit, so the range also covers every depth where the two outputs could diverge.
+   constexpr size_t longest = abi_serializer::max_recursion_depth + 4;
+   const auto abidef = make_depth_chain_abi("nest", longest, false);
+   size_t decoded = 0;
+
+   for (size_t levels = 0; levels <= longest; ++levels) {
+      BOOST_TEST_INFO("nesting levels " << levels);
+      auto abi = abidef;
+      abi.actions.push_back(action_def{"acttest"_n, "nest" + std::to_string(levels), ""});
+      const auto abi_resolver = [&abi](const account_name&) -> std::optional<abi_serializer> {
+         return abi_serializer(abi_def(abi), yield_fn());
+      };
+      const action act({{"acctest"_n, config::active_name}}, "acctest"_n, "acttest"_n, bytes{7});
+
+      fc::variant var;
+      abi_serializer::to_variant(act, var, abi_resolver, abi_serializer::create_depth_yield_function());
+      std::string stream_json;
+      {
+         fc::json_writer w(stream_json);
+         abi_serializer::to_json_stream(act, w, abi_resolver, abi_serializer::create_depth_yield_function());
+      }
+      BOOST_TEST(stream_json == fc::json::to_string(var, get_deadline()));
+      if (var.get_object()["data"].is_object())
+         ++decoded;
+   }
+   // The range crosses the depth limit: the shallow levels decode, the deep ones fall back to hex.
+   BOOST_TEST(decoded > 0u);
+   BOOST_TEST(decoded <= longest);
+} FC_LOG_AND_RETHROW() }
+
 
 // Shared fixture for `general` and the streaming-parity test.  Top-level fields
 // cover every built-in plus inherited base structs, large-int quoting boundaries,

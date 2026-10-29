@@ -733,9 +733,9 @@ namespace sysio::chain {
 
    fc::variant abi_serializer::_binary_to_variant( const std::string_view& type, const bytes& binary, impl::binary_to_variant_context& ctx )const
    {
-      auto h = ctx.enter_scope();
-      fc::datastream<const char*> ds( binary.data(), binary.size() );
-      return _binary_to_variant(type, ds, ctx);
+      impl::variant_sink sink(*this);
+      _binary_walk_bytes(type, binary, sink, ctx);
+      return std::move(sink).take_result();
    }
 
    fc::variant abi_serializer::binary_to_variant( const std::string_view& type, const bytes& binary, const yield_function_t& yield, bool short_path )const {
@@ -780,14 +780,18 @@ namespace sysio::chain {
 
    void abi_serializer::binary_to_json_stream( const std::string_view& type, const bytes& binary, fc::json_writer& w,
                                                const yield_function_t& yield, bool short_path )const {
-      fc::datastream<const char*> ds(binary.data(), binary.size());
-      binary_to_json_stream(type, ds, w, yield, short_path);
+      impl::binary_to_variant_context ctx(*this, yield, fc::microseconds{}, type);
+      ctx.short_path = short_path;
+      impl::stream_sink sink(*this, w);
+      _binary_walk_bytes(type, binary, sink, ctx);
    }
 
    void abi_serializer::binary_to_json_stream( const std::string_view& type, const bytes& binary, fc::json_writer& w,
                                                const fc::microseconds& max_action_data_serialization_time, bool short_path )const {
-      fc::datastream<const char*> ds(binary.data(), binary.size());
-      binary_to_json_stream(type, ds, w, max_action_data_serialization_time, short_path);
+      impl::binary_to_variant_context ctx(*this, create_depth_yield_function(), max_action_data_serialization_time, type);
+      ctx.short_path = short_path;
+      impl::stream_sink sink(*this, w);
+      _binary_walk_bytes(type, binary, sink, ctx);
    }
 
    void abi_serializer::_variant_to_binary( const std::string_view& type, const fc::variant& var, fc::datastream<char *>& ds, impl::variant_to_binary_context& ctx )const
@@ -1516,8 +1520,7 @@ void stream_sink::unpack_action_data(const abi_serializer& abi, std::string_view
                                      abi_traverse_context& ctx, bool short_path) {
    action_data_to_variant_context inner(abi, ctx, type);
    inner.short_path = short_path;
-   fc::datastream<const char*> ds(data.data(), data.size());
-   abi._binary_walk(type, ds, *this, inner);
+   abi._binary_walk_bytes(type, data, *this, inner);
 }
 
 bool stream_sink::unpack_action_data_field(std::string_view key_name, const abi_serializer& abi,
@@ -1535,8 +1538,7 @@ bool stream_sink::unpack_action_data_field(std::string_view key_name, const abi_
       w_.key(key_name);
       action_data_to_variant_context inner(abi, ctx, type);
       inner.short_path = short_path;
-      fc::datastream<const char*> ds(data.data(), data.size());
-      abi._binary_walk(type, ds, *this, inner);
+      abi._binary_walk_bytes(type, data, *this, inner);
       on_value_emitted();
       return true;
    } catch(...) {
@@ -1580,6 +1582,7 @@ void abi_serializer::_binary_walk_struct_fields(
       fc::datastream<const char*>& stream,
       Sink& sink, impl::binary_to_variant_context& ctx )const
 {
+   auto h = ctx.enter_scope();
    const auto& st = s_itr->second;
    if( st.base != type_name() ) {
       auto base_itr = structs.find(resolve_type(st.base));
@@ -1728,8 +1731,21 @@ void abi_serializer::_binary_walk( const std::string_view& type, fc::datastream<
    SYS_ASSERT( emitted_any, unpack_exception, "Unable to unpack '{}' from stream", ctx.get_path_string() );
 }
 
+template<typename Sink>
+void abi_serializer::_binary_walk_bytes( const std::string_view& type, const bytes& binary, Sink& sink,
+                                         impl::binary_to_variant_context& ctx )const
+{
+   auto h = ctx.enter_scope();
+   fc::datastream<const char*> ds( binary.data(), binary.size() );
+   _binary_walk(type, ds, sink, ctx);
+}
+
 // Explicit instantiations for the two sinks defined in abi_sinks.hpp.  Keeps the
 // member-template definitions out of headers without sacrificing the link surface.
+template void abi_serializer::_binary_walk_bytes<impl::variant_sink>(
+      const std::string_view&, const bytes&, impl::variant_sink&, impl::binary_to_variant_context&) const;
+template void abi_serializer::_binary_walk_bytes<impl::stream_sink>(
+      const std::string_view&, const bytes&, impl::stream_sink&, impl::binary_to_variant_context&) const;
 template void abi_serializer::_binary_walk<impl::variant_sink>(
       const std::string_view&, fc::datastream<const char*>&, impl::variant_sink&,
       impl::binary_to_variant_context&) const;

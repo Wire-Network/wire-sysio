@@ -226,9 +226,16 @@ private:
    void _binary_walk( const std::string_view& type, fc::datastream<const char*>& stream,
                       Sink& sink, impl::binary_to_variant_context& ctx )const;
 
+   /// Walk a value of `type` packed in `binary`.  Enters one recursion scope for the bytes
+   /// boundary, so every sink and entry point counts nesting depth the same way.
+   template<typename Sink>
+   void _binary_walk_bytes( const std::string_view& type, const bytes& binary, Sink& sink,
+                            impl::binary_to_variant_context& ctx )const;
+
    /// Walk struct fields without emitting `begin_object`/`end_object`.  Recurses
    /// into the base struct (if any) so its fields land in the same object frame
-   /// the caller already opened.
+   /// the caller already opened.  Enters a recursion scope per struct and per base,
+   /// so an inheritance chain counts toward max_recursion_depth.
    template<typename Sink>
    void _binary_walk_struct_fields( const map<type_name, struct_def, std::less<>>::const_iterator& s_itr,
                                     fc::datastream<const char*>& stream,
