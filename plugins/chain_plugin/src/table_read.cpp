@@ -48,11 +48,15 @@ primary_scan_page capture_primary_page(const chain::controller& db, const primar
       page.resume.assign(key.begin(), key.end());
       page.more = true;
    };
+   // A compatibility caller's page ends after the row that reaches the deadline or the byte limit.
+   const auto soft_limit_reached = [&] {
+      return !budget.check && (fc::time_point::now() >= budget.deadline || budget.bytes >= budget.max_bytes);
+   };
    const auto copy_row = [&](const chain::kv_object& row) {
       if (budget.check)
          budget.check();
-      // Two row slots cover vector growth's temporary allocations. Charge before copying.
-      const uint64_t bytes = row.key.size() + row.value.size() + 2 * sizeof(owned_table_row);
+      // Charge before copying.
+      const uint64_t bytes = owned_table_row_bytes(row.key.size(), row.value.size());
       if (budget.before_copy)
          budget.before_copy(1, bytes);
       owned_table_row owned;
@@ -71,7 +75,7 @@ primary_scan_page capture_primary_page(const chain::controller& db, const primar
             break;
          }
          copy_row(*iterator++);
-         if (!budget.check && fc::time_point::now() >= budget.deadline) {
+         if (soft_limit_reached()) {
             if (in_partition(iterator) && (!upper || iterator->key_view() < *upper))
                continuation(iterator->key_view());
             break;
@@ -93,7 +97,7 @@ primary_scan_page capture_primary_page(const chain::controller& db, const primar
             break;
          }
          copy_row(*iterator);
-         if (!budget.check && fc::time_point::now() >= budget.deadline) {
+         if (soft_limit_reached()) {
             // `begin` is the partition start, not `lower`, so check that the row below is still in range.
             if (iterator != begin && std::prev(iterator)->key_view() >= lower)
                continuation(iterator->key_view());
