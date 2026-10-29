@@ -215,6 +215,18 @@ constexpr fc::task::retry_options PINNED_READ_RETRY{
    .total_timeout   = fc::seconds(10),
 };
 
+/// EIP-1474's "Resource not found": what reth and nethermind answer a read at a
+/// block they do not have.
+constexpr int rpc_resource_not_found_code = -32001;
+
+/// Message fragments, matched case-insensitively, by which geth, erigon and besu
+/// (all on the generic `-32000`) say a pinned block is not served: the header is
+/// unknown, or its state has been pruned.
+constexpr std::string_view block_unavailable_fragments[] = {
+   "header not found", "block not found", "unknown block", "missing trie node",
+   "state not available", "state unavailable", "historical state", "pruned",
+};
+
 constexpr size_t EVM_ABI_WORD_BYTES            = 32;
 constexpr size_t EVM_ADDRESS_BYTES             = 20;
 constexpr size_t EVM_SELECTOR_BYTES            = 4;
@@ -543,6 +555,14 @@ std::optional<epoch_in_revert> classify_epoch_in_revert(int rpc_code, std::strin
    return std::nullopt;
 }
 
+bool is_block_unavailable_refusal(int rpc_code, std::string_view message) {
+   if (rpc_code == rpc_resource_not_found_code) return true;
+   std::string lowered(message);
+   std::ranges::transform(lowered, lowered.begin(), [](unsigned char c) { return std::tolower(c); });
+   return std::ranges::any_of(block_unavailable_fragments,
+                              [&](std::string_view fragment) { return lowered.find(fragment) != std::string::npos; });
+}
+
 delivery_receipt_summary summarize_delivery_receipt(const fc::variants& logs, std::string_view inbound_address,
                                                     uint32_t epoch_index, std::string_view operator_address) {
    const auto delivery_topic   = signature_hash_hex(epoch_delivery_event_signature);
@@ -817,28 +837,46 @@ detail::delivery_progress outpost_ethereum_client::read_progress(uint32_t       
                                                                  const eth::block_number_or_tag_t& at) {
    const auto block = eth::to_block_tag(at);
    // A backend that has not seen `block` yet answers with a JSON-RPC error
-   // rather than stale state; that is the one failure worth waiting out.
-   // Everything else (a malformed response, the deadline) propagates.
-   return fc::task::retry_until<detail::delivery_progress>(
-      OP_READ_PROGRESS, PINNED_READ_RETRY, [&]() -> std::optional<detail::delivery_progress> {
-         try {
-            detail::delivery_progress progress;
-            progress.next_epoch_index = read_next_epoch_index(*_opp_inbound_client, at, to_string());
-            progress.spill            = read_dispatch_spill(*_opp_inbound_client, epoch_index, at, to_string());
-            progress.own_digest = read_own_digest(*_opp_inbound_client, epoch_index, _signer_address_hex, at, to_string());
-            progress.settled_digest = read_settled_digest(*_opp_inbound_client, at, to_string());
-            dlog("outpost_ethereum_client[{}]: epoch={} at block {}: next_epoch={} spill(tipped={} dispatched={} "
-                 "complete={} finalized={}) own={} settled={}",
-                 to_string(), epoch_index, block, progress.next_epoch_index, progress.spill.tipped,
-                 progress.spill.dispatched, progress.spill.complete, progress.spill.finalized, progress.own_digest,
-                 progress.settled_digest);
-            return progress;
-         } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
-            dlog("outpost_ethereum_client[{}]: progress read at block {} refused ({}); retrying", to_string(),
-                 block, refusal.to_string());
-            return std::nullopt;
-         }
-      });
+   // rather than stale state; that is the one failure worth waiting out. A
+   // refusal of the request itself (malformed parameters, an unknown method,
+   // a revert) is the same on every retry and propagates at once, with the
+   // node's reason, rather than surfacing ten seconds later as a bare timeout
+   // -- which is how a geth `-32602` read as a slow endpoint on hoodi.
+   // Everything else (a malformed response, the deadline) propagates too.
+   std::string last_refusal;
+   try {
+      return fc::task::retry_until<detail::delivery_progress>(
+         OP_READ_PROGRESS, PINNED_READ_RETRY, [&]() -> std::optional<detail::delivery_progress> {
+            try {
+               detail::delivery_progress progress;
+               progress.next_epoch_index = read_next_epoch_index(*_opp_inbound_client, at, to_string());
+               progress.spill            = read_dispatch_spill(*_opp_inbound_client, epoch_index, at, to_string());
+               progress.own_digest =
+                  read_own_digest(*_opp_inbound_client, epoch_index, _signer_address_hex, at, to_string());
+               progress.settled_digest = read_settled_digest(*_opp_inbound_client, at, to_string());
+               dlog("outpost_ethereum_client[{}]: epoch={} at block {}: next_epoch={} spill(tipped={} dispatched={} "
+                    "complete={} finalized={}) own={} settled={}",
+                    to_string(), epoch_index, block, progress.next_epoch_index, progress.spill.tipped,
+                    progress.spill.dispatched, progress.spill.complete, progress.spill.finalized,
+                    progress.own_digest, progress.settled_digest);
+               return progress;
+            } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
+               if (!detail::is_block_unavailable_refusal(refusal.code, refusal.top_message())) {
+                  wlog("outpost_ethereum_client[{}]: progress read at block {} refused by the node (code={}): {}",
+                       to_string(), block, refusal.code, refusal.top_message());
+                  throw;
+               }
+               last_refusal = refusal.to_string();
+               dlog("outpost_ethereum_client[{}]: progress read at block {} refused ({}); retrying", to_string(),
+                    block, last_refusal);
+               return std::nullopt;
+            }
+         });
+   } catch (fc::timeout_exception& timeout) {
+      FC_RETHROW_EXCEPTION(timeout, warn, "outpost_ethereum_client[{}]: the node did not serve block {} within the "
+                           "pinned read's budget; its last refusal: {}",
+                           to_string(), block, last_refusal);
+   }
 }
 
 detail::pending_consensus outpost_ethereum_client::read_pending_consensus(const std::string& digest_word,
