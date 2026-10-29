@@ -1,4 +1,5 @@
 #pragma once
+#include <fc/serialize_as_string.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/symbol.hpp>
@@ -103,12 +104,9 @@ bool  operator <= (const asset& a, const asset& b);
 
 }} // namespace sysio::chain
 
-namespace fc {
-inline void to_variant(const sysio::chain::asset& var, fc::variant& vo) { vo = var.to_string(); }
-inline void from_variant(const fc::variant& var, sysio::chain::asset& vo) {
-   vo = sysio::chain::asset::from_string(var.get_string());
-}
-}
+// Must precede the extended_asset from_variant body below; that body resolves
+// fc::from_variant on asset, which instantiates the primary trait.
+FC_SERIALIZE_AS_STRING(sysio::chain::asset)
 
 namespace fc {
 inline void from_variant(const fc::variant& var, sysio::chain::extended_asset& vo) {

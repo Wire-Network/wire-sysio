@@ -10,7 +10,7 @@ keccak256::keccak256() {
    memset(_hash, 0, sizeof(_hash));
 }
 
-keccak256::keccak256(const std::string& hex_str) {
+keccak256::keccak256(std::string_view hex_str) {
    auto bytes = from_hex(hex_str);
    FC_ASSERT(bytes.size() == sizeof(_hash),
              "Invalid keccak256 hex string length: {}", hex_str.size());
@@ -59,16 +59,12 @@ void keccak256::encoder::reset() {
    data.clear();
 }
 
+  keccak256 keccak256::from_string(std::string_view s) {
+    // The pre-trait from_variant path (vector<char>) rejected odd-length hex;
+    // keep that strictness so a trailing lone nibble is malformed input, not
+    // silently zero-extended.
+    FC_ASSERT(s.size() % 2 == 0, "keccak256 hex string length must be even, got {}", s.size());
+    return keccak256(s);
+  }
+
 } // namespace fc::crypto
-
-namespace fc {
-
-void to_variant(const crypto::keccak256& bi, variant& v) {
-   v = bi.str();
-}
-
-void from_variant(const variant& v, crypto::keccak256& bi) {
-   bi = crypto::keccak256(v.as_string());
-}
-
-} // namespace  fc

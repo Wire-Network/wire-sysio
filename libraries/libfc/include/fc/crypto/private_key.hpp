@@ -105,6 +105,13 @@ namespace fc {
    void to_variant(const crypto::private_key& var, variant& vo, const fc::yield_function_t& yield = fc::yield_function_t());
 
    void from_variant(const variant& var, crypto::private_key& vo);
+
+   // Deleting the streaming-JSON overload is a load-bearing safety check, not a
+   // not-yet-implemented marker.  HTTP responses must never expose private key
+   // material; the variant path remains available for wallet_api_plugin and other
+   // server-internal consumers that intentionally serialize private keys.
+   class json_writer;
+   void to_json_stream(const crypto::private_key& var, json_writer& w) = delete;
 } // namespace fc
 
 FC_REFLECT(fc::crypto::private_key, (_storage) )

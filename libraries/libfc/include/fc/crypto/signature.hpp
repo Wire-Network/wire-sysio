@@ -115,6 +115,9 @@ namespace fc {
 void to_variant(const crypto::signature& var, variant& vo, const fc::yield_function_t& yield = fc::yield_function_t());
 
 void from_variant(const variant& var, crypto::signature& vo);
+
+class json_writer;
+void to_json_stream(const crypto::signature& var, json_writer& w);
 } // namespace fc
 
 template <>

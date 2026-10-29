@@ -1,5 +1,6 @@
 #pragma once
 #include <fc/exception/exception.hpp>
+#include <fc/serialize_as_string.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/core_symbol.hpp>
@@ -47,6 +48,25 @@ namespace sysio::chain {
          uint64_t value;
 
          operator uint64_t()const { return value; }
+
+         /// Decode value as a packed-byte ASCII string (low byte first), e.g. 0x535953 -> "SYS".
+         /// Mirrors the long form `symbol(value << 8).name()` but without going through symbol's
+         /// validating constructor; serialization paths must not throw on already-resident state.
+         std::string to_string() const {
+            uint64_t v = value;
+            std::string result;
+            while (v > 0) {
+               char c = v & 0xFF;
+               result += c;
+               v >>= 8;
+            }
+            return result;
+         }
+
+         /// Parse a bare symbol-name string (e.g. "SYS") into a symbol_code.  Routes through
+         /// symbol's precision-zero constructor, which validates that all characters are
+         /// uppercase letters and length <= 7.
+         static symbol_code from_string(std::string_view s);
       };
 
       class symbol : fc::reflect_init {
@@ -83,18 +103,7 @@ namespace sysio::chain {
                }
                return p10;
             }
-            string name() const
-            {
-               uint64_t v = m_value;
-               v >>= 8;
-               string result;
-               while (v > 0) {
-                  char c = v & 0xFF;
-                  result += c;
-                  v >>= 8;
-               }
-               return result;
-            }
+            string name() const { return to_symbol_code().to_string(); }
 
             symbol_code to_symbol_code()const { return {m_value >> 8}; }
 
@@ -124,6 +133,10 @@ namespace sysio::chain {
             uint64_t m_value;
             friend struct fc::reflector<symbol>;
       }; // class symbol
+
+      inline symbol_code symbol_code::from_string(std::string_view s) {
+         return symbol(0, s).to_symbol_code();
+      }
 
       struct extended_symbol {
          symbol       sym;
@@ -168,22 +181,8 @@ namespace sysio::chain {
       }
 } // namespace sysio::chain
 
-namespace fc {
-   inline void to_variant(const sysio::chain::symbol& var, fc::variant& vo) { vo = var.to_string(); }
-   inline void from_variant(const fc::variant& var, sysio::chain::symbol& vo) {
-      vo = sysio::chain::symbol::from_string(var.get_string());
-   }
-}
-
-namespace fc {
-   inline void to_variant(const sysio::chain::symbol_code& var, fc::variant& vo) {
-      vo = sysio::chain::symbol(var.value << 8).name();
-   }
-   inline void from_variant(const fc::variant& var, sysio::chain::symbol_code& vo) {
-      vo = sysio::chain::symbol(0, var.get_string()).to_symbol_code();
-   }
-}
-
 FC_REFLECT(sysio::chain::symbol_code, (value))
 FC_REFLECT(sysio::chain::symbol, (m_value))
 FC_REFLECT(sysio::chain::extended_symbol, (sym)(contract))
+FC_SERIALIZE_AS_STRING(sysio::chain::symbol)
+FC_SERIALIZE_AS_STRING(sysio::chain::symbol_code)

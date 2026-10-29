@@ -26,6 +26,8 @@ constexpr auto simulated_push_failure = "simulated push failure";
 constexpr auto simulated_deferred_push_failure = "simulated deferred push failure";
 constexpr auto callback_failure_message = "callback failure";
 constexpr uint32_t expected_error_log_count = 1;
+/// A test deferred call captures nothing, so it retains no bytes for the http budget.
+constexpr size_t no_retained_bytes = 0;
 
 namespace callback_lifetime_action {
 constexpr auto contract = "sysio.system";
@@ -152,12 +154,13 @@ BOOST_AUTO_TEST_CASE(async_action_completion_handles_deferred_push_result) {
    bool success_logged = false;
    bool failure_logged = false;
    push_result deferred_result{
-      std::function<sysio::chain::t_or_exception<sysio::chain_apis::read_write::push_transaction_results>()>{
+      sysio::chain::deferred_call<sysio::chain_apis::read_write::push_transaction_results>{
          [&deferred_called] {
             deferred_called = true;
             return sysio::chain::t_or_exception<sysio::chain_apis::read_write::push_transaction_results>{
                sysio::chain_apis::read_write::push_transaction_results{}};
-         }}};
+         },
+         no_retained_bytes}};
 
    BOOST_CHECK(completion.complete_push_result(
       deferred_result,
@@ -184,10 +187,11 @@ BOOST_AUTO_TEST_CASE(async_action_completion_handles_deferred_push_failure) try 
    bool success_logged = false;
    uint32_t error_logs{};
    push_result deferred_result{
-      std::function<sysio::chain::t_or_exception<sysio::chain_apis::read_write::push_transaction_results>()>{
+      sysio::chain::deferred_call<sysio::chain_apis::read_write::push_transaction_results>{
          [&push_error] {
             return sysio::chain::t_or_exception<sysio::chain_apis::read_write::push_transaction_results>{push_error};
-         }}};
+         },
+         no_retained_bytes}};
 
    BOOST_CHECK(completion.complete_push_result(
       deferred_result,

@@ -69,8 +69,8 @@ public:
             success.store(true, std::memory_order_release);
             on_success();
          } else {
-            const auto& deferred = std::get<std::function<
-               chain::t_or_exception<chain_apis::read_write::push_transaction_results>()>>(result);
+            const auto& deferred =
+               std::get<chain::deferred_call<chain_apis::read_write::push_transaction_results>>(result);
             const auto deferred_result = deferred();
             if (const auto* error = std::get_if<fc::exception_ptr>(&deferred_result)) {
                on_failure(*error);

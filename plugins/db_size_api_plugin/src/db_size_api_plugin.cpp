@@ -1,32 +1,18 @@
 #include <fc/variant.hpp>
 #include <fc/io/json.hpp>
 #include <sysio/db_size_api_plugin/db_size_api_plugin.hpp>
-#include <sysio/http_plugin/http_plugin.hpp>
+#include <sysio/http_plugin/bind_stream.hpp>
 
 namespace sysio {
 
 using namespace sysio;
 
-#define CALL_WITH_400(api_name, api_handle, call_name, INVOKE, http_response_code) \
-{std::string("/v1/" #api_name "/" #call_name), \
-   api_category::db_size, \
-   [api_handle](string&&, string&& body, url_response_callback&& cb) mutable { \
-          try { \
-             body = parse_params<std::string, http_params_types::no_params>(body); \
-             INVOKE \
-             cb(http_response_code, fc::variant(result)); \
-          } catch (...) { \
-             http_plugin::handle_exception(#api_name, #call_name, body, cb); \
-          } \
-       }}
-
-#define INVOKE_R_V(api_handle, call_name) \
-     auto result = api_handle->call_name();
-
-
 void db_size_api_plugin::plugin_startup() {
-   app().get_plugin<http_plugin>().add_api({
-       CALL_WITH_400(db_size, this, get,  INVOKE_R_V(this, get), 200),
+   auto& _http_plugin = app().get_plugin<http_plugin>();
+   _http_plugin.add_api_stream({
+      bind_stream<&db_size_api_plugin::get, dispatch::sync>(
+         _http_plugin, this, "/v1/db_size/get",
+         api_category::db_size, http_params_types::no_params, 200),
    }, appbase::exec_queue::read_only);
 }
 
@@ -45,8 +31,5 @@ db_size_stats db_size_api_plugin::get() {
 
    return ret;
 }
-
-#undef INVOKE_R_V
-#undef CALL
 
 }

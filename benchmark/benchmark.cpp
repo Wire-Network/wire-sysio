@@ -17,6 +17,8 @@ std::map<std::string, std::function<void()>> features {
    { "blake2", blake2_benchmarking },
    { "bls", bls_benchmarking },
    { "merkle", merkle_benchmarking },
+   { "trace_api_json", trace_api_json_benchmarking },
+   { "abi_serializer", abi_serializer_benchmarking },
    { "auth", auth_benchmarking }
 };
 
@@ -78,7 +80,18 @@ void benchmarking(const std::string& name, const std::function<void()>& func,
 
    for (auto i = 0U; i < runs; ++i) {
       auto start_time = std::chrono::high_resolution_clock::now();
-      func();
+      // A throwing scenario (e.g. an abi-serialization deadline tripped by a transient
+      // machine stall during a long -r run) reports and skips the scenario instead of
+      // taking the whole benchmark process down with an uncaught exception.
+      try {
+         func();
+      } catch (const std::exception& e) {
+         std::cout << name << ": SKIPPED after run " << i << " -- " << e.what() << "\n";
+         return;
+      } catch (...) {
+         std::cout << name << ": SKIPPED after run " << i << " -- unknown exception\n";
+         return;
+      }
       auto end_time = std::chrono::high_resolution_clock::now();
 
       uint64_t duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count();

@@ -8,6 +8,7 @@
 #include <fc/platform_independence.hpp>
 #include <fc/crypto/packhash.hpp>
 #include <fc/io/raw_fwd.hpp>
+#include <fc/serialize_as_string.hpp>
 #include <boost/functional/hash.hpp>
 
 namespace fc
@@ -28,6 +29,10 @@ class sha256 : public add_packhash_to_hash<sha256>
     explicit sha256( const char *data, size_t size );
 
     std::string str()const;
+    std::string to_string() const { return str(); }
+    /// Validating parse used by the FC_SERIALIZE_AS_STRING trait: rejects odd-length
+    /// hex (the strictness the pre-trait from_variant vector<char> path enforced).
+    static sha256 from_string(std::string_view s);
     std::string short_id()const;
 
     const char* data()const;
@@ -129,10 +134,6 @@ class sha256 : public add_packhash_to_hash<sha256>
     uint64_t _hash[uint64_size];
 };
 
-class variant;
-void to_variant( const sha256& bi, variant& v );
-void from_variant( const variant& v, sha256& bi );
-
 uint64_t hash64(const char* buf, size_t len);
 
 constexpr auto format_as(const fc::sha256& h) {
@@ -179,3 +180,4 @@ namespace fc {
 
 #include <fc/reflect/reflect.hpp>
 FC_REFLECT_TYPENAME( fc::sha256 )
+FC_SERIALIZE_AS_STRING(fc::sha256)
