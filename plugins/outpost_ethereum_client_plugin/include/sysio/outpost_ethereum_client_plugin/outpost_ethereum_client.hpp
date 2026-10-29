@@ -182,6 +182,20 @@ enum class epoch_in_revert {
 /// @param revert_data  `json_rpc_error::data`, the node's revert bytes as `0x`-hex.
 std::optional<epoch_in_revert> classify_epoch_in_revert(int rpc_code, std::string_view revert_data);
 
+/// Whether a node's refusal of a read says the block the read was pinned to is
+/// not served there -- a load-balanced backend behind the one that confirmed
+/// the relay's call, or a node whose state for that block is pruned -- as
+/// distinct from a refusal of the request itself (malformed parameters, an
+/// unknown method, a revert), which no amount of waiting changes.
+///
+/// Nodes spell this differently: geth and erigon answer `-32000 header not
+/// found` (or `missing trie node` for pruned state), besu `-32000 Block not
+/// found`, reth and nethermind the EIP-1474 `-32001` resource-not-found code.
+///
+/// @param rpc_code  `json_rpc_error::code`.
+/// @param message   `json_rpc_error`'s message.
+bool is_block_unavailable_refusal(int rpc_code, std::string_view message);
+
 /// What one confirmed `epochIn` did, read from the `OPPInbound` events in its
 /// receipt. Absent events mean the call recorded nothing new, which is the
 /// contract's benign no-op for a late or redundant call.

@@ -135,7 +135,12 @@ bytes; every continuation re-supplies them.
 `epochDeliveries(epoch, self)` and `pendingEpochHash()` read at ONE block number — the head when the tick
 starts, then the block each confirmed call landed in (from its receipt) — never at `latest`, which a
 backend lagging the block that just confirmed could serve from before the call. A backend that does not
-know the block yet is retried for a bounded time. The reads are not at the read confirmation (see Inbound
+know the block yet is retried for a bounded time: a refusal that says so (`-32000 header not found` or
+`missing trie node` from geth and erigon, `Block not found` from besu, EIP-1474's `-32001` from reth and
+nethermind — `outpost_ethereum_client_detail::is_block_unavailable_refusal`) is retried for up to 10 s and
+the timeout it ends in names the node's last refusal, while any other refusal of the read (malformed
+parameters, an unknown method, a revert) ends the tick at once with the node's reason, since no retry would
+change it. The reads are not at the read confirmation (see Inbound
 reads) either. The cursor is the outpost's bookkeeping for work in progress, a reorg under it costs a paid
 re-delivery before the tip or a refused continuation after it, and gating on confirmation depth would wait
 it out between continuations.
@@ -408,6 +413,8 @@ Per-client runtime lines are prefixed with the SPI label `outpost_ethereum_clien
   not deliver`, `delivery already recorded; consensus not tipped`, `re-delivering to run the boundary tip`
   and `not delivered — the outpost is still on epoch ...` for each decision that sends nothing (or
   re-sends).
+- `progress read at block ... refused by the node (code=...): ...` at warning level when a pinned read is refused
+  for its parameters rather than for a block the backend lacks; the tick ends with that refusal.
 - `refused at ... gas (...); retrying at the ceiling` at warning level for a gas refusal below the ceiling,
   and `cannot advance past attestation N at the ceiling` at error level — once per cursor position — when
   no funding carries the attestation there; `still open after N calls in one tick` at warning level when
@@ -467,6 +474,14 @@ policies, that file and CLI configuration produce the expected policies and read
 signing checks the policy without sending, that a signing's recorded hash and bytes survive every send
 outcome, once per hash, that a first `epochIn` the node refuses keeps its signing, and that a partial client
 map is never published. No test dials a public endpoint.
+
+Every node double in both suites holds each request to what go-ethereum parses before answering it
+(`fc-test/execution_api_strictness.hpp`: `0x`-prefixed byte strings, canonical quantities, fixed-length
+addresses and hashes, valid block parameters, the `TransactionArgs` exclusions, positional arity). A request
+shape only anvil accepts — calldata without its prefix was one, and it stopped every `eth_call` on a
+geth-backed hoodi endpoint — fails the unit test that produces it. The wire form of each RPC the client
+issues is pinned separately in libfc's `ethereum_client_requests` suite, which drives a real client through a
+recording HTTP server.
 
 CTest runs this binary through the build tree's `tests/bind_registry.py`, which keeps its host-wide WIRE
 bind-registry lease alive for the test process and exposes the ports in `SYSIO_TEST_PORTS`. The wrapper uses

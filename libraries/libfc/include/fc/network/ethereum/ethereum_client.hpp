@@ -175,7 +175,7 @@ struct ethereum_read_block {
  * @brief A transaction signed for `eth_sendRawTransaction`, and the hash the network knows it by
  */
 struct signed_transaction {
-   /// The signed typed encoding (`0x02 || rlp(...)`) as hex, as `send_raw_transaction` takes it.
+   /// The signed typed encoding (`0x02 || rlp(...)`) as `0x`-prefixed hex, as `eth_sendRawTransaction` takes it.
    std::string raw_hex;
    /// `keccak256` of that encoding as `0x`-hex (EIP-2718): the hash nodes report and key receipts by.
    std::string tx_hash;
