@@ -74,6 +74,8 @@ constexpr name pull_action = "pull"_n;
 
 /// Largest amount an `asset` carries, as the unsigned base units every row holds.
 constexpr uint64_t max_asset_amount = static_cast<uint64_t>(asset::max_amount);
+/// Governance may tolerate at most a 10% custody loss.
+constexpr uint32_t max_custody_shortfall_bps = 1'000;
 
 /// Memos of the transfers a parked delivery and a desyndication send.
 constexpr std::string_view desyndicate_memo     = "sysio.synd desyndicate";
@@ -93,6 +95,7 @@ constexpr std::string_view no_symbol_message     = "shadow symbol does not exist
 constexpr std::string_view window_message        = "importsynd is bootstrap-window only";
 constexpr std::string_view finalized_message     = "import already finalized";
 constexpr std::string_view fee_bps_message       = "fee must be at most 10000 basis points";
+constexpr std::string_view custody_bps_message   = "custody shortfall tolerance must be at most 1000 basis points";
 constexpr std::string_view window_sec_message    = "window_sec must be positive";
 constexpr std::string_view config_range_message  = "bucket, bounty and challenge amounts must fit an asset";
 constexpr std::string_view challenger_role_msg   = "the challenger cannot be sysio.synd or sysio.bond";
@@ -163,6 +166,7 @@ constexpr std::string_view frozen_step_note =
 /// `custody shortfall <chain> <token> seq <n>`, far below `andon::MAX_TEXT_BYTES`.
 constexpr std::string_view excess_verdict       = ": EXCESS -- reported ";
 constexpr std::string_view shortfall_verdict    = ": SHORTFALL -- reported ";
+constexpr std::string_view tolerated_verdict    = ": TOLERATED -- reported ";
 constexpr std::string_view outstanding_label    = " outstanding ";
 constexpr std::string_view shortfall_reason     = "custody shortfall ";
 constexpr std::string_view sequence_label       = " seq ";
@@ -1145,13 +1149,14 @@ void synd::closeenv(sysio::slug_name chain_code, uint32_t epoch_index, checksum2
 void synd::setconfig(sysio::slug_name chain_code, sysio::slug_name token_code, uint32_t synd_fee_bps,
                      uint32_t desynd_fee_bps, uint64_t synd_burst, uint64_t synd_refill, uint64_t desynd_burst,
                      uint64_t desynd_refill, uint32_t window_sec, uint64_t bounty, uint64_t challenge_extra,
-                     uint64_t min_desyndicate, uint64_t desynd_fee_flat) {
+                     uint64_t min_desyndicate, uint64_t desynd_fee_flat, uint32_t custody_shortfall_bps) {
    require_auth(SYSTEM_ACCOUNT);
    check(outpost_kind(chain_code).has_value(), not_outpost_message.data());
    const auto st = liq::find_stat_by_token(LIQ_ACCOUNT, token_code);
    check(st.has_value(), no_shadow_reason.data());
    check(st->chain_code == chain_code, other_chain_reason.data());
    check(synd_fee_bps <= bond::BPS_DENOMINATOR && desynd_fee_bps <= bond::BPS_DENOMINATOR, fee_bps_message.data());
+   check(custody_shortfall_bps <= max_custody_shortfall_bps, custody_bps_message.data());
    check(window_sec > 0, window_sec_message.data());
    for (const uint64_t amount : { synd_burst, synd_refill, desynd_burst, desynd_refill, bounty, challenge_extra }) {
       check(amount <= max_asset_amount, config_range_message.data());
@@ -1177,6 +1182,7 @@ void synd::setconfig(sysio::slug_name chain_code, sysio::slug_name token_code, u
                   .challenge_extra = challenge_extra,
                   .min_desyndicate = min_desyndicate,
                   .desynd_fee_flat = desynd_fee_flat,
+                  .custody_shortfall_bps = custody_shortfall_bps,
                });
 }
 
@@ -1569,6 +1575,18 @@ void synd::check_custody(std::string_view path, const liq::currency_stats& st, s
       if (reported > expected)
          sysio::print("sysio.synd::", std::string(path), std::string(excess_verdict), reported,
                       std::string(outstanding_label), expected, "\n");
+      return;
+   }
+
+   const auto config = syndconfig_t(get_self()).try_get(
+      config_key{.chain_code = chain_code.value, .token_code = st.token_code.value});
+   const uint32_t tolerance_bps = config ? config->custody_shortfall_bps : 0;
+   // Compare exact ratios with widened integer products: no overflow, floating point or rounding up
+   // of sub-unit tolerances. `reported < expected` above makes subtraction safe.
+   if (static_cast<uint128_t>(expected - reported) * bond::BPS_DENOMINATOR <=
+       static_cast<uint128_t>(expected) * tolerance_bps) {
+      sysio::print("sysio.synd::", std::string(path), std::string(tolerated_verdict), reported,
+                   std::string(outstanding_label), expected, "\n");
       return;
    }
 
