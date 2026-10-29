@@ -253,7 +253,9 @@ namespace sysio {
      * sweep: if sysio.dclaim is missing, non-privileged, or rejects the inline action, the link is
      * rolled back so the user can submit a fresh retry after bootstrap.
      * EVM links require an EM key and EM signature so recovery applies EIP-191 domain separation;
-     * SVM links require an ED key. Duplicate-key detection uses the verified recovered key.
+     * SVM links require an ED key. The signature is the proof that the key can sign, so a key with no
+     * private key (an all-zero or other small-order ED key, or EM bytes off the curve) fails proof
+     * verification and is never inserted. Duplicate-key detection uses the verified recovered key.
      *
      * @param chain_kind The chain identifier from `opp::types::ChainKind`
      *                   (CHAIN_KIND_EVM / CHAIN_KIND_SVM).
@@ -274,19 +276,22 @@ namespace sysio {
         const uint64_t nonce);
 
     /**
-     * Record an external-chain public-key link WITHOUT signature verification -- the trusted,
-     * depot-only counterpart to createlink. The OPP NodeOwnerRegistration dispatch has already
-     * established (via the deposit attestation) that `pub_key` belongs to `account`, so this skips
-     * createlink's signature/nonce checks and inserts the link.
+     * Record an EVM public-key link WITHOUT signature verification -- the trusted, depot-only
+     * counterpart to createlink. The OPP NodeOwnerRegistration dispatch has already established (via
+     * the deposit attestation, whose key the Ethereum outpost bound to the depositing sender) that
+     * `pub_key` belongs to `account`, so this skips createlink's signature/nonce checks and inserts
+     * the link.
      * `require_auth(get_self())`; idempotent and non-throwing so the trust-OPP depot dispatch is
-     * never aborted. Unsupported chain/key pairs are silently ignored. With a correctly sized
-     * `native_address`, a successful or idempotent link also sweeps matching pre-link DClaim
-     * rewards. EVM addresses must be 20 bytes; SVM addresses must equal the raw ED public-key bytes.
-     * A malformed or mismatched address skips only the sweep, not link insertion. A missing or
-     * non-privileged sysio.dclaim deployment likewise skips the sweep. An identical recordlink can
-     * retry before node-owner registration completes; after registration, nodeownreg's duplicate
-     * gate returns before this action, so remediation requires governance to push recordlink or
-     * linkswept as sysio.authex@active.
+     * never aborted. Only an EVM link with an EM key that is a secp256k1 curve point is recorded;
+     * anything else -- every SVM link, a key of another curve, or EM bytes off the curve -- is
+     * silently ignored before insertion or sweeping, because a link without a signature by its key
+     * must not reach the OPERATORS roster `sysio.epoch::advance` builds from this table. SVM links
+     * exist only through createlink. With a 20-byte `native_address`, a successful or idempotent
+     * link also sweeps matching pre-link DClaim rewards. A malformed address skips only the sweep,
+     * not link insertion. A missing or non-privileged sysio.dclaim deployment likewise skips the
+     * sweep. An identical recordlink can retry before node-owner registration completes; after
+     * registration, nodeownreg's duplicate gate returns before this action, so remediation requires
+     * governance to push recordlink or linkswept as sysio.authex@active.
      *
      * Unlike createlink, this does NOT enforce a unique `pub_key`: one external wallet may hold
      * several WireNodes NFTs and back several Wire accounts, so one ETH key -> many accounts is
@@ -312,6 +317,12 @@ namespace sysio {
 
     /**
      * @brief The links table stores the mapping between the WIRE account name and their external chain identity. SCOPE: Default
+     *
+     * `sysio.epoch::advance` copies an operator's rows verbatim into the OPERATORS roster each outpost
+     * seats signers from, so every stored key must be one that can sign: an SVM row exists only
+     * after createlink verified an ed25519 signature by its key, and an EVM row holds either the key
+     * createlink recovered from a signature or, through recordlink, a validated secp256k1 point from
+     * a node-owner deposit.
      */
     struct [[sysio::table("links")]] links_s {
       uint64_t key;

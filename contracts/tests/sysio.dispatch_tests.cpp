@@ -1761,12 +1761,17 @@ BOOST_FIXTURE_TEST_CASE(syndicate_liq_refuses_a_key_of_another_chain_family,
    constexpr auto EVM = ChainKind::CHAIN_KIND_EVM;
    constexpr auto SVM = ChainKind::CHAIN_KIND_SVM;
    // A Solana key the underwriter has linked, and one nobody has.
-   const auto linked_sol_key = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::ed).get_public_key();
+   // SVM links exist only through a signed createlink.
+   const auto linked_sol_priv = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::ed);
+   const auto linked_sol_key = linked_sol_priv.get_public_key();
    const auto linked_sol_raw = linked_sol_key.get<fc::crypto::ed::public_key_shim>().serialize();
    const std::vector<char> linked_sol(linked_sol_raw.begin(), linked_sol_raw.end());
+   const uint64_t link_nonce = control->head().block_time().time_since_epoch().count() / 1000;
    BOOST_REQUIRE_EQUAL(success(), push(
-      AUTHEX_ACCOUNT, authex_abi, AUTHEX_ACCOUNT, "recordlink"_n, mvo()
-         ("account", UWRIT_OP)("chain_kind", SVM)("pub_key", linked_sol_key)("native_address", linked_sol)));
+      AUTHEX_ACCOUNT, authex_abi, UWRIT_OP, "createlink"_n, mvo()
+         ("chain_kind", SVM)("account", UWRIT_OP.to_string())
+         ("sig", sign_createlink(linked_sol_priv, UWRIT_OP.to_string(), SVM, link_nonce))
+         ("pub_key", linked_sol_key)("nonce", link_nonce)));
    produce_block();
    const auto stranger_sol_raw = fc::crypto::private_key::generate(fc::crypto::private_key::key_type::ed)
                                     .get_public_key().get<fc::crypto::ed::public_key_shim>().serialize();
