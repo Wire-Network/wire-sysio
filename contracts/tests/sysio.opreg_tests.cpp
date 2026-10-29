@@ -77,6 +77,23 @@ constexpr uint32_t kDisablingPctMisses24h = 100;
 /// Compact collateral amount used to activate non-bootstrapped batch operators.
 constexpr uint64_t kTestMinBond = 1;
 
+/// Cross the contract's 32-row reconciliation budget with one more registered operator.
+constexpr uint32_t kBatchRecheckRows = 32;
+constexpr uint32_t kSweepOperatorCount = kBatchRecheckRows + 1;
+/// Native shadow collateral and account prefix used by policy-only reconciliation tests.
+constexpr std::string_view kSweepFirstToken = "NTA";
+constexpr std::string_view kSweepSecondToken = "NTB";
+constexpr std::string_view kSweepOperatorPrefix = "sweep.";
+
+/// ABI names of the bounded batch-collateral maintenance surface.
+namespace batch_sweep {
+constexpr auto action = "recheckbatch"_n;
+constexpr auto table = "batchsweep"_n;
+constexpr const char* row_type = "batch_sweep";
+constexpr const char* pending = "pending";
+constexpr const char* cursor = "cursor";
+} // namespace batch_sweep
+
 /// Collateral request that exceeds the compact test balance.
 constexpr uint64_t kInsufficientTestBond = kTestMinBond + 1;
 
@@ -452,6 +469,27 @@ public:
          ("type", type)
          ("is_bootstrapped", is_bootstrapped)
       );
+   }
+
+   /// Change just the batch requirements using the fixture's standard registry policy.
+   action_result set_batch_requirements(std::vector<fc::variant> requirements) {
+      return setconfig(kTestMaxProducers, kTestMaxBatchOperators, kTestMaxUnderwriters,
+                       kDefaultPruneDelayMs, kDefaultMaxConsecutiveMisses,
+                       kDefaultMaxPctMisses24h, kTerminateWindowMs, {}, std::move(requirements), {});
+   }
+
+   /// Drain one bounded maintenance slice, independently of any epoch or consensus transaction.
+   action_result recheckbatch(name signer = OPREG_ACCOUNT) {
+      auto result = push_opreg_action(signer, batch_sweep::action, mvo());
+      produce_blocks();
+      return result;
+   }
+
+   /// Observe the actual on-chain sweep cursor rather than inferring completion from changed rows.
+   fc::variant get_batch_sweep() {
+      const auto data = get_row_by_account(OPREG_ACCOUNT, OPREG_ACCOUNT, batch_sweep::table, batch_sweep::table);
+      return data.empty() ? fc::variant() : opreg_abi_ser.binary_to_variant(
+         batch_sweep::row_type, data, fixture_abi_yield_function());
    }
 
    action_result slash(name account, std::string reason) {
@@ -2409,6 +2447,194 @@ BOOST_FIXTURE_TEST_CASE(setconfig_two_native_asset_bond_activation, sysio_opreg_
    op = get_operator("batchop.a"_n);
    BOOST_REQUIRE(OperatorStatus::OPERATOR_STATUS_ACTIVE == op["status"].as<OperatorStatus>());
    BOOST_REQUIRE(op["available_at"].as_uint64() > 0);
+} FC_LOG_AND_RETHROW() }
+
+/// A policy-only raise is reconciled in bounded slices; a relaxation restarts earlier rows as well.
+BOOST_FIXTURE_TEST_CASE(batch_policy_sweep_is_bounded_and_restarts_on_policy_change, sysio_opreg_tester) { try {
+   BOOST_REQUIRE_EQUAL(success(), set_batch_requirements({
+      make_chain_min_bond(kWireCodename, kSweepFirstToken, kTestMinBond)}));
+   std::vector<name> operators;
+   constexpr uint32_t alphabet_size = 26;
+   for (uint32_t i = 0; i < kSweepOperatorCount; ++i) {
+      std::string spelling{kSweepOperatorPrefix};
+      spelling += char('a' + i / alphabet_size);
+      spelling += char('a' + i % alphabet_size);
+      const name account(spelling);
+      create_accounts({account});
+      BOOST_REQUIRE_EQUAL(success(), regoperator(account, OPERATOR_TYPE_BATCH, false));
+      BOOST_REQUIRE_EQUAL(success(), bond_generic(account, kSweepFirstToken, kTestMinBond));
+      operators.push_back(account);
+   }
+   BOOST_REQUIRE_EQUAL(success(), set_batch_requirements({
+      make_chain_min_bond(kWireCodename, kSweepFirstToken, kInsufficientTestBond)}));
+   BOOST_REQUIRE_EQUAL(success(), recheckbatch(EPOCH_ACCOUNT));
+   for (uint32_t i = 0; i < kBatchRecheckRows; ++i) {
+      BOOST_REQUIRE(get_operator(operators[i])[eligibility_field::status].as<OperatorStatus>() ==
+                    OPERATOR_STATUS_UNKNOWN);
+   }
+   BOOST_REQUIRE(get_operator(operators.back())[eligibility_field::status].as<OperatorStatus>() ==
+                 OPERATOR_STATUS_ACTIVE);
+   const auto partial = get_batch_sweep();
+   BOOST_REQUIRE(partial[batch_sweep::pending].as<bool>());
+   BOOST_REQUIRE_EQUAL(partial[batch_sweep::cursor].as<uint64_t>(), operators.back().to_uint64_t());
+
+   // Timestamp-only rewrites cannot starve a pending sweep by repeatedly resetting its cursor.
+   BOOST_REQUIRE_EQUAL(success(), set_batch_requirements({
+      make_chain_min_bond(kWireCodename, kSweepFirstToken, kInsufficientTestBond)}));
+   BOOST_REQUIRE_EQUAL(get_batch_sweep()[batch_sweep::cursor].as<uint64_t>(),
+                       partial[batch_sweep::cursor].as<uint64_t>());
+
+   BOOST_REQUIRE_EQUAL(success(), set_batch_requirements({
+      make_chain_min_bond(kWireCodename, kSweepFirstToken, kTestMinBond)}));
+   BOOST_REQUIRE_EQUAL(0u, get_batch_sweep()[batch_sweep::cursor].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(success(), recheckbatch());
+   BOOST_REQUIRE(get_batch_sweep()[batch_sweep::pending].as<bool>());
+   for (const auto& account : operators) {
+      BOOST_REQUIRE(get_operator(account)[eligibility_field::status].as<OperatorStatus>() ==
+                 OPERATOR_STATUS_ACTIVE);
+   }
+   BOOST_REQUIRE_EQUAL(success(), recheckbatch());
+   BOOST_REQUIRE(!get_batch_sweep()[batch_sweep::pending].as<bool>());
+   BOOST_REQUIRE_EQUAL(success(), recheckbatch());
+   BOOST_REQUIRE(!get_batch_sweep()[batch_sweep::pending].as<bool>());
+
+   // Completion must perform the last transition as well as clear the cursor.
+   BOOST_REQUIRE_EQUAL(success(), set_batch_requirements({
+      make_chain_min_bond(kWireCodename, kSweepFirstToken, kInsufficientTestBond)}));
+   BOOST_REQUIRE_EQUAL(success(), recheckbatch());
+   BOOST_REQUIRE(get_operator(operators.back())[eligibility_field::status].as<OperatorStatus>() ==
+                 OPERATOR_STATUS_ACTIVE);
+   BOOST_REQUIRE_EQUAL(success(), recheckbatch());
+   BOOST_REQUIRE(get_operator(operators.back())[eligibility_field::status].as<OperatorStatus>() ==
+                 OPERATOR_STATUS_UNKNOWN);
+   BOOST_REQUIRE(!get_batch_sweep()[batch_sweep::pending].as<bool>());
+} FC_LOG_AND_RETHROW() }
+
+/// Adding a pair, relaxing it, and clearing the policy update existing operators without a balance change.
+BOOST_FIXTURE_TEST_CASE(batch_policy_sweep_handles_pair_changes_and_pending_withdrawals, sysio_opreg_tester) { try {
+   activate_batch_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE_EQUAL(success(), set_batch_requirements({
+      make_chain_min_bond(kWireCodename, kSweepFirstToken, kTestMinBond),
+      make_chain_min_bond(kWireCodename, kSweepSecondToken, kTestMinBond)}));
+   BOOST_REQUIRE_EQUAL(success(), recheckbatch());
+   BOOST_REQUIRE(get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>() ==
+                 OPERATOR_STATUS_UNKNOWN);
+   BOOST_REQUIRE_EQUAL(success(), set_batch_requirements({
+      make_chain_min_bond(kWireCodename, kSweepFirstToken, kTestMinBond)}));
+   BOOST_REQUIRE_EQUAL(success(), recheckbatch());
+   BOOST_REQUIRE(get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>() ==
+                 OPERATOR_STATUS_ACTIVE);
+
+   BOOST_REQUIRE_EQUAL(success(), withdraw(kEligibilityBatchOperator, kSweepFirstToken, kTestMinBond));
+   BOOST_REQUIRE_EQUAL(success(), set_batch_requirements({}));
+   BOOST_REQUIRE_EQUAL(success(), recheckbatch());
+   BOOST_REQUIRE_EQUAL(success(), set_batch_requirements({
+      make_chain_min_bond(kWireCodename, kSweepFirstToken, kTestMinBond)}));
+   BOOST_REQUIRE_EQUAL(success(), recheckbatch());
+   BOOST_REQUIRE(get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>() ==
+                 OPERATOR_STATUS_UNKNOWN);
+   BOOST_REQUIRE_EQUAL(success(), cancelwtdw(kEligibilityBatchOperator, kEligibilityBatchOperator,
+                                            kFirstWithdrawalRequestId));
+   BOOST_REQUIRE(get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>() ==
+                 OPERATOR_STATUS_ACTIVE);
+   BOOST_REQUIRE_EQUAL(success(), set_batch_requirements({}));
+   BOOST_REQUIRE_EQUAL(success(), recheckbatch());
+   BOOST_REQUIRE(get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>() ==
+                 OPERATOR_STATUS_UNKNOWN);
+} FC_LOG_AND_RETHROW() }
+
+/// Skipped roles consume the visit budget; pruning its next row cannot strand the cursor or skip a survivor.
+BOOST_FIXTURE_TEST_CASE(batch_policy_sweep_handles_registration_and_pruning, sysio_opreg_tester) { try {
+   activate_batch_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.b"_n, OPERATOR_TYPE_BATCH, false));
+   BOOST_REQUIRE_EQUAL(success(), bond_generic("batchop.b"_n, kSweepFirstToken, kTestMinBond));
+   constexpr uint32_t alphabet_size = 26;
+   constexpr std::string_view skipped_prefix = "aaa.";
+   for (uint32_t i = 0; i < kBatchRecheckRows; ++i) {
+      std::string spelling{skipped_prefix};
+      spelling += char('a' + i / alphabet_size);
+      spelling += char('a' + i % alphabet_size);
+      const name account(spelling);
+      create_accounts({account});
+      BOOST_REQUIRE_EQUAL(success(), regoperator(account, OPERATOR_TYPE_CHALLENGER, true));
+   }
+   BOOST_REQUIRE_EQUAL(success(), set_batch_requirements({
+      make_chain_min_bond(kWireCodename, kSweepFirstToken, kInsufficientTestBond)}));
+   BOOST_REQUIRE_EQUAL(success(), recheckbatch());
+   BOOST_REQUIRE_EQUAL(kEligibilityBatchOperator.to_uint64_t(),
+                       get_batch_sweep()[batch_sweep::cursor].as<uint64_t>());
+   BOOST_REQUIRE_EQUAL(success(), terminate(kEligibilityBatchOperator, std::string(kTestTerminationReason)));
+   constexpr uint64_t milliseconds_per_second = 1000;
+   // Finalize the termination before advancing beyond its transaction expiration to the prune delay.
+   produce_blocks();
+   produce_block(fc::seconds(kDefaultPruneDelayMs / milliseconds_per_second + 1));
+   BOOST_REQUIRE_EQUAL(success(), prune());
+   BOOST_REQUIRE(get_operator(kEligibilityBatchOperator).is_null());
+
+   // This account sorts behind the drained prefix but before the retained cursor. Registration
+   // evaluates current policy, so it need not wait for a cursor that has already passed its key.
+   constexpr auto inserted = "aaaa.new"_n;
+   create_accounts({inserted});
+   BOOST_REQUIRE_EQUAL(success(), regoperator(inserted, OPERATOR_TYPE_BATCH, false));
+   BOOST_REQUIRE_EQUAL(success(), bond_generic(inserted, kSweepFirstToken, kInsufficientTestBond));
+   BOOST_REQUIRE_EQUAL(success(), recheckbatch());
+   BOOST_REQUIRE(!get_batch_sweep()[batch_sweep::pending].as<bool>());
+   BOOST_REQUIRE(get_operator(inserted)[eligibility_field::status].as<OperatorStatus>() ==
+                 OPERATOR_STATUS_ACTIVE);
+   BOOST_REQUIRE(get_operator("batchop.b"_n)[eligibility_field::status].as<OperatorStatus>() ==
+                 OPERATOR_STATUS_UNKNOWN);
+} FC_LOG_AND_RETHROW() }
+
+/// Only privileged maintenance may reconcile; bootstrap exemptions and terminal exclusions survive policy changes.
+BOOST_FIXTURE_TEST_CASE(batch_policy_sweep_preserves_bootstrap_and_terminal_status, sysio_opreg_tester) { try {
+   activate_batch_operator(kEligibilityBatchOperator);
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.b"_n, OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.c"_n, OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), slash("batchop.c"_n, std::string(kTestSlashReason)));
+   BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.a"_n, OPERATOR_TYPE_BATCH, false));
+   BOOST_REQUIRE_EQUAL(success(), terminate("uwrit.a"_n, std::string(kTestTerminationReason)));
+   BOOST_REQUIRE(recheckbatch(kEligibilityBatchOperator) != success());
+   BOOST_REQUIRE_EQUAL(success(), set_batch_requirements({}));
+   BOOST_REQUIRE_EQUAL(success(), recheckbatch());
+   BOOST_REQUIRE(get_operator("batchop.b"_n)[eligibility_field::status].as<OperatorStatus>() ==
+                 OPERATOR_STATUS_ACTIVE);
+   BOOST_REQUIRE(get_operator("batchop.c"_n)[eligibility_field::status].as<OperatorStatus>() ==
+                 OPERATOR_STATUS_SLASHED);
+   BOOST_REQUIRE(get_operator("uwrit.a"_n)[eligibility_field::status].as<OperatorStatus>() ==
+                 OPERATOR_STATUS_TERMINATED);
+   BOOST_REQUIRE_EQUAL(success(), set_batch_requirements({
+      make_chain_min_bond(kWireCodename, kSweepFirstToken, kTestMinBond)}));
+   BOOST_REQUIRE_EQUAL(success(), recheckbatch());
+   BOOST_REQUIRE(get_operator("batchop.c"_n)[eligibility_field::status].as<OperatorStatus>() ==
+                 OPERATOR_STATUS_SLASHED);
+   BOOST_REQUIRE(get_operator("uwrit.a"_n)[eligibility_field::status].as<OperatorStatus>() ==
+                 OPERATOR_STATUS_TERMINATED);
+} FC_LOG_AND_RETHROW() }
+
+/// A live-policy exclusion ends the duty interval even when policy is restored before the cursor arrives.
+BOOST_FIXTURE_TEST_CASE(batch_policy_sweep_does_not_join_misses_across_policy_ineligibility,
+                        sysio_opreg_tester) { try {
+   activate_batch_operator(kEligibilityBatchOperator, kSingleAllowedConsecutiveMiss,
+                           kMaxAcceptedPctMisses24h);
+   BOOST_REQUIRE_EQUAL(success(), recorddel(kEligibilityBatchOperator, kFirstDeliveryLogId, true));
+   BOOST_REQUIRE_EQUAL(success(), recorddel(kEligibilityBatchOperator, kSecondDeliveryLogId, false));
+   produce_blocks(2);
+
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kTestMaxProducers, kTestMaxBatchOperators, kTestMaxUnderwriters,
+      kDefaultPruneDelayMs, kSingleAllowedConsecutiveMiss, kMaxAcceptedPctMisses24h, kTerminateWindowMs, {},
+      {make_chain_min_bond(kWireCodename, kSweepFirstToken, kInsufficientTestBond)}, {}));
+   BOOST_REQUIRE_EQUAL(success(), recorddel(kEligibilityBatchOperator, kThirdDeliveryLogId, false));
+   BOOST_REQUIRE(get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>() ==
+                 OPERATOR_STATUS_UNKNOWN);
+   produce_blocks(2);
+   BOOST_REQUIRE_EQUAL(success(), setconfig(kTestMaxProducers, kTestMaxBatchOperators, kTestMaxUnderwriters,
+      kDefaultPruneDelayMs, kSingleAllowedConsecutiveMiss, kMaxAcceptedPctMisses24h, kTerminateWindowMs, {},
+      {make_chain_min_bond(kWireCodename, kSweepFirstToken, kTestMinBond)}, {}));
+   BOOST_REQUIRE_EQUAL(success(), recheckbatch());
+   BOOST_REQUIRE_EQUAL(success(), recorddel(kEligibilityBatchOperator, kThirdDeliveryLogId + 1, false));
+   BOOST_REQUIRE_EQUAL(success(), termcheck(kEligibilityBatchOperator));
+   BOOST_REQUIRE(get_operator(kEligibilityBatchOperator)[eligibility_field::status].as<OperatorStatus>() ==
+                 OPERATOR_STATUS_ACTIVE);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(setconfig_rejects_duplicate_chain_token_in_collat, sysio_opreg_tester) { try {

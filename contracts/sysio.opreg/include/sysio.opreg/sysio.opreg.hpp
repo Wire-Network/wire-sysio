@@ -29,6 +29,7 @@ namespace sysio {
       using contract::contract;
 
       // Well-known accounts
+      static constexpr name ACCOUNT        = "sysio.opreg"_n;
       static constexpr name EPOCH_ACCOUNT  = "sysio.epoch"_n;
       static constexpr name MSGCH_ACCOUNT  = "sysio.msgch"_n;
 
@@ -56,6 +57,12 @@ namespace sysio {
       /// well under the transaction CPU ceiling shared with the rest of
       /// advance's fan-out.
       static constexpr uint32_t MAX_WTDW_FLUSH_PER_EPOCH = 32;
+
+      /// Bound registry rows visited per collateral-policy reconciliation action, including skipped roles.
+      static constexpr uint32_t MAX_BATCH_RECHECK_ROWS = 32;
+
+      /// Epoch maintenance and privileged recovery share the same bounded reconciliation entry point.
+      static constexpr name RECHECK_BATCH = "recheckbatch"_n;
 
       /// Rolling delivery-buffer thresholds for batch-op termination. Per the
       /// plan §1: missing a delivery is NOT a slash; consistent missing IS
@@ -167,7 +174,7 @@ namespace sysio {
       /// implicitly — an operator that isn't bonded on an entry's chain
       /// has `available(...) == 0` and fails the predicate. This is the
       /// only mechanism that enforces "ACTIVE requires deposit on every
-      /// active outpost"; `meets_role_min` (in this contract) iterates
+      /// active outpost"; the shared `meets_role_min` predicate iterates
       /// the matching vector for each eligibility evaluation.
       ///
       /// `config_timestamp_ms` on each entry is overwritten by
@@ -175,6 +182,8 @@ namespace sysio {
       /// caller's clock isn't trusted for staleness comparisons. Within
       /// each vector, every `(chain, token_kind)` pair must be unique;
       /// duplicates fail the action.
+      /// Changing batch requirements restarts bounded status reconciliation; batch consumers enforce
+      /// the current policy immediately while that sweep is pending.
       [[sysio::action]]
       void setconfig(uint32_t max_available_producers,
                      uint32_t max_available_batch_ops,
@@ -186,6 +195,12 @@ namespace sysio {
                      std::vector<chain_min_bond> req_prod_collat,
                      std::vector<chain_min_bond> req_batchop_collat,
                      std::vector<chain_min_bond> req_uw_collat);
+
+      /// Reconcile at most MAX_BATCH_RECHECK_ROWS registry rows against the current batch policy.
+      /// Authorized by sysio.epoch during advance, or sysio.opreg independently of consensus progress.
+      /// Configuration changes restart the sweep; new registrations evaluate the current policy directly.
+      [[sysio::action]]
+      void recheckbatch();
 
       /// Register a new operator.
       [[sysio::action]]
@@ -427,6 +442,17 @@ namespace sysio {
       };
 
       using opconfig_t = sysio::kv::global<"opconfig"_n, op_config>;
+
+      /// Next registry account to examine after a batch-collateral policy change. A completed sweep
+      /// retains no cursor dependency on a row that may subsequently be pruned.
+      struct [[sysio::table("batchsweep")]] batch_sweep {
+         uint64_t cursor = 0;
+         bool pending = false;
+
+         SYSLIB_SERIALIZE(batch_sweep, (cursor)(pending))
+      };
+
+      using batchsweep_t = sysio::kv::global<"batchsweep"_n, batch_sweep>;
 
       /// Pending-withdraw row keyed by sequential `request_id`. Drained by
       /// `flushwtdw` once `eligible_at_epoch <= current_epoch`. Subtracted by

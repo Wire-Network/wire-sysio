@@ -1,4 +1,5 @@
 #include <sysio.opreg/sysio.opreg.hpp>
+#include <sysio.opreg/eligibility.hpp>
 #include <sysio.epoch/sysio.epoch.hpp>
 #include <sysio.chains/sysio.chains.hpp>
 #include <sysio.authex/sysio.authex.hpp>
@@ -26,6 +27,21 @@ using opp::attestations::OperatorAction;
 using opp::attestations::OperatorActionLog;
 
 namespace {
+
+using opreg_eligibility::available_inline;
+using opreg_eligibility::find_balance;
+using opreg_eligibility::has_terminal_status;
+using opreg_eligibility::meets_role_min;
+using opreg_eligibility::sum_pending_withdraws;
+
+/// Timestamps record when policy was written, not its meaning; unchanged minimums preserve sweep progress.
+bool same_collateral_policy(const std::vector<opreg::chain_min_bond>& left,
+                            const std::vector<opreg::chain_min_bond>& right) {
+   return left.size() == right.size() && std::equal(left.begin(), left.end(), right.begin(),
+      [](const auto& a, const auto& b) {
+         return a.chain_code == b.chain_code && a.token_code == b.token_code && a.min_bond == b.min_bond;
+      });
+}
 
 /// Forward declaration -- defined with the other eligibility helpers further down. `regoperator`
 /// needs it so registering a PRODUCER notifies sysio.system to score the new operator row.
@@ -270,6 +286,10 @@ void opreg::setconfig(uint32_t max_available_producers,
 
    opconfig_t cfg_tbl(get_self());
    op_config cfg = cfg_tbl.get_or_default(op_config{});
+   if (!same_collateral_policy(cfg.req_batchop_collat, req_batchop_collat)) {
+      batchsweep_t sweep(get_self());
+      sweep.set(batch_sweep{.cursor = 0, .pending = true}, ram_payer);
+   }
    cfg.max_available_producers          = max_available_producers;
    cfg.max_available_batch_ops          = max_available_batch_ops;
    cfg.max_available_underwriters       = max_available_underwriters;
@@ -378,64 +398,6 @@ void opreg::regoperator(name account,
 
 namespace {
 
-/// Sum the pending (not-yet-flushed) withdraws on this contract for a given
-/// (op, chain, token). Subtracted by `available()` so a queued withdraw
-/// effectively reserves the funds for its 2-epoch wait.
-///
-/// Per the split-index design: `wtdwqueue_t` exposes only uint64
-/// secondary indexes. `byaccount` keys on `account.value`; rows are filtered
-/// on `(chain_code, token_code)` in memory. Per-account pending-withdraw
-/// counts are bounded by the operator's collateral-bucket count.
-uint64_t sum_pending_withdraws(name account, sysio::slug_name chain_code, sysio::slug_name token_code) {
-   // The queue is scoped to opreg itself; reference the well-known account.
-   opreg::wtdwqueue_t real_queue(name{"sysio.opreg"_n});
-   auto idx = real_queue.template get_index<"byaccount"_n>();
-
-   uint64_t total = 0;
-   auto it  = idx.lower_bound(account.value);
-   auto end = idx.upper_bound(account.value);
-   for (; it != end; ++it) {
-      if (it->chain_code != chain_code || it->token_code != token_code) continue;
-      // Saturating: amounts are uncapped uint64 (external-chain values); a
-      // wrapped subtotal would understate `reserved` and overstate availability.
-      total = opp::safe::add_sat_u64(total, it->amount);
-   }
-   return total;
-}
-
-/// Look up the operator's balance row for a given (chain_code, token_code).
-/// Returns nullptr if no row exists.
-const opreg::balance_entry*
-find_balance(const opreg::operator_entry& op,
-             sysio::slug_name chain_code, sysio::slug_name token_code) {
-   for (const auto& b : op.balances) {
-      if (b.chain_code == chain_code && b.token_code == token_code) return &b;
-   }
-   return nullptr;
-}
-
-/// Return true when the operator has entered a permanent punishment or
-/// removal state that collateral changes must never reverse.
-bool has_terminal_status(OperatorStatus status) {
-   return status == OperatorStatus::OPERATOR_STATUS_SLASHED ||
-          status == OperatorStatus::OPERATOR_STATUS_TERMINATED;
-}
-
-/// Compute available balance for a given (op, chain, token). The single
-/// rollup formula: balance - sum(pending withdraws),
-/// gated by status. Slashed / terminated operators read as zero.
-uint64_t available_inline(const opreg::operator_entry& op,
-                          sysio::slug_name chain_code, sysio::slug_name token_code) {
-   if (has_terminal_status(op.status)) {
-      return 0;
-   }
-   const auto* bal = find_balance(op, chain_code, token_code);
-   if (!bal) return 0;
-
-   uint64_t pending = sum_pending_withdraws(op.account, chain_code, token_code);
-   return bal->balance > pending ? bal->balance - pending : 0;
-}
-
 /// The full balance is slashable, including queued withdrawals. Withdrawals of a
 /// slashed operator are forfeit (silently dropped at flush time).
 uint64_t slashable_now(const opreg::operator_entry& op,
@@ -443,38 +405,6 @@ uint64_t slashable_now(const opreg::operator_entry& op,
    const auto* bal = find_balance(op, chain_code, token_code);
    if (!bal) return 0;
    return bal->balance;
-}
-
-/// Check whether the operator's available balance on (chain_code, token_code)
-/// covers the role's minimum bond on that pair.
-///
-/// Bootstrapped operators are ACTIVE-by-fiat and bypass the per-token
-/// bond check regardless of how `req_*_collat` is configured — they
-/// represent system-installed operators that the depot trusts without
-/// requiring collateral. Non-bootstrapped operators must satisfy every
-/// `(chain_code, token_code)` entry in the matching `req_*_collat` vector;
-/// an empty/unset vector means "no operator of this role can become
-/// ACTIVE until configuration lands."
-bool meets_role_min(const opreg::operator_entry& op,
-                    const opreg::op_config& cfg) {
-   if (op.is_bootstrapped) {
-      return true;
-   }
-   const std::vector<opreg::chain_min_bond>* reqs = nullptr;
-   switch (op.type) {
-      case OperatorType::OPERATOR_TYPE_PRODUCER:    reqs = &cfg.req_prod_collat;    break;
-      case OperatorType::OPERATOR_TYPE_BATCH:       reqs = &cfg.req_batchop_collat; break;
-      case OperatorType::OPERATOR_TYPE_UNDERWRITER: reqs = &cfg.req_uw_collat;      break;
-      default:                                       return false;
-   }
-   if (!reqs || reqs->empty()) {
-      return false;
-   }
-   for (const auto& req : *reqs) {
-      uint64_t avail = available_inline(op, req.chain_code, req.token_code);
-      if (avail < req.min_bond) return false;
-   }
-   return true;
 }
 
 } // anonymous namespace
@@ -1246,6 +1176,26 @@ void opreg::processbatch(name account, bool was_eligible, bool is_eligible) {
    process_eligibility_change(get_self(), account, was_eligible, is_eligible, /*notify_system*/ false);
 }
 
+void opreg::recheckbatch() {
+   if (!has_auth(get_self())) require_auth(EPOCH_ACCOUNT);
+   batchsweep_t sweep_tbl(get_self());
+   auto sweep = sweep_tbl.get_or_default(batch_sweep{});
+   if (!sweep.pending) return;
+
+   operators_t ops(get_self());
+   auto it = ops.lower_bound(operator_key{sweep.cursor});
+   uint32_t visited = 0;
+   for (; it != ops.end() && visited < MAX_BATCH_RECHECK_ROWS; ++it, ++visited) {
+      if (it->type == OperatorType::OPERATOR_TYPE_BATCH) {
+         const auto account = it->account;
+         reevaluate_eligibility(ops, operator_key{account.value}, get_self(), account);
+      }
+   }
+   sweep.pending = it != ops.end();
+   sweep.cursor = sweep.pending ? it->account.value : 0;
+   sweep_tbl.set(sweep, ram_payer);
+}
+
 void opreg::processuw(name account, bool was_eligible, bool is_eligible) {
    require_auth(get_self());
    process_eligibility_change(get_self(), account, was_eligible, is_eligible, /*notify_system*/ false);
@@ -1483,9 +1433,17 @@ void opreg::recorddel(name account, uint32_t epoch, bool delivered) {
    operators_t ops(get_self());
    auto op_pk = operator_key{account.value};
    if (ops.contains(op_pk)) {
-      auto status = ops.get(op_pk).status;
+      const auto op = ops.get(op_pk);
+      const auto status = op.status;
       if (status != OperatorStatus::OPERATOR_STATUS_ACTIVE &&
           !has_terminal_status(status)) {
+         return;
+      }
+      if (op.type == OperatorType::OPERATOR_TYPE_BATCH && !has_terminal_status(status) &&
+          !opreg_eligibility::is_active_batch_operator(op, opreg_eligibility::current_config())) {
+         // End this duty interval even if the bounded cursor has not reached the row. Otherwise a
+         // policy relaxation before the sweep arrives would join misses across the blocked interval.
+         reevaluate_eligibility(ops, op_pk, get_self(), account);
          return;
       }
    }
@@ -1540,6 +1498,9 @@ void opreg::termcheck(name account) {
    //
    // Underwriter offline-too-long remains open; they have no committee and no schedule to miss.
    if (op.type != OperatorType::OPERATOR_TYPE_BATCH) return;
+
+   // A policy-ineligible resident cannot deliver; its expected downtime must not cause termination.
+   if (!opreg_eligibility::is_active_batch_operator(op, opreg_eligibility::current_config())) return;
 
    // Thresholds come from opconfig — tests can dial them down so the
    // miss-window evaluation fits the test timeout budget.

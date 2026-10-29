@@ -2,6 +2,7 @@
 #include <sysio.system/emissions.hpp>
 #include <sysio.system/opreg_status.hpp>
 #include <sysio.system/producer_score.hpp>
+#include <sysio.opreg/eligibility.hpp>
 
 #include <sysio/opp/types/types.pb.hpp>
 #include <sysio.opp.common/opp_table_types.hpp>
@@ -1008,6 +1009,7 @@ void system_contract::payepoch(uint32_t epoch_index,
    // credits by MAX_BATCH_PAYOUT_CREDITS. Incomplete or over-budget history
    // takes the non-halting retention path below, so it cannot abort advance.
    // =======================================================================
+   const auto batch_collateral_config = sysio::opreg_eligibility::current_config();
    auto pay_batch_group = [&](const std::vector<sysio::name>& group,
                               uint32_t active_epochs) {
       if (group.empty() || active_epochs == 0) return;
@@ -1020,7 +1022,8 @@ void system_contract::payepoch(uint32_t epoch_index,
       const int64_t per_member     = group_pool / members;
 
       for (const auto& m : group) {
-         if (!is_op_active(m, OperatorType::OPERATOR_TYPE_BATCH)) continue;
+         const auto op = find_active_operator(m, OperatorType::OPERATOR_TYPE_BATCH);
+         if (!op || !sysio::opreg_eligibility::is_active_batch_operator(*op, batch_collateral_config)) continue;
          credit_pay(get_self(), m, per_member, memo::batch_op_reward);
          actual_paid += per_member;
          batch_emission_paid += per_member;

@@ -1,5 +1,6 @@
 #include <sysio.epoch/sysio.epoch.hpp>
 #include <sysio.opreg/sysio.opreg.hpp>
+#include <sysio.opreg/eligibility.hpp>
 #include <sysio.msgch/sysio.msgch.hpp>
 #include <sysio.opp.common/opp_keys.hpp>
 #include <sysio.authex/sysio.authex.hpp>
@@ -595,6 +596,10 @@ void epoch::advance() {
       std::make_tuple(state.current_epoch_index)
    ).send();
 
+   // Reconciliation callbacks complete before finishadv selects and publishes the next roster.
+   // Live checks below also protect rows beyond this epoch's bounded sweep budget.
+   action(permission_level{get_self(), "owner"_n}, OPREG_ACCOUNT, opreg::RECHECK_BATCH, std::make_tuple()).send();
+
    action(
       permission_level{get_self(), "owner"_n},
       get_self(),
@@ -671,13 +676,14 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
       // operator seated in two groups therefore stages against a group it is
       // not serving in. Do not "fill" a short tail by re-seating a resident.
       opreg::operators_t opreg_ops(OPREG_ACCOUNT);
+      const auto collateral_config = opreg_eligibility::current_config();
       auto status_idx = opreg_ops.get_index<"bystatus"_n>();
       std::vector<std::pair<name, bool>> pool;
       for (auto it = status_idx.lower_bound(
               magic_enum::enum_integer(OperatorStatus::OPERATOR_STATUS_ACTIVE));
            it != status_idx.end() &&
            it->status == OperatorStatus::OPERATOR_STATUS_ACTIVE; ++it) {
-         if (it->type != OperatorType::OPERATOR_TYPE_BATCH) continue;
+         if (!opreg_eligibility::is_active_batch_operator(*it, collateral_config)) continue;
          if (is_resident(it->account)) continue;
          pool.push_back({it->account, it->is_bootstrapped});
       }
@@ -745,6 +751,7 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
    {
       opp::attestations::Operators ops_attest;
       opreg::operators_t opreg_ops(OPREG_ACCOUNT);
+      const auto collateral_config = opreg_eligibility::current_config();
       authex::links_t authex_links(AUTHEX_ACCOUNT);
       auto links_by_name = authex_links.get_index<"byname"_n>();
 
@@ -757,6 +764,11 @@ void epoch::finishadv(uint32_t epoch_index, int64_t emission_amount) {
             entry.account.name = member.to_string();
             entry.type = op->type;
             entry.status = op->status;
+            // Preserve seated members and terminal statuses, but never export stale ACTIVE standing.
+            if (entry.status == OperatorStatus::OPERATOR_STATUS_ACTIVE &&
+                !opreg_eligibility::is_active_batch_operator(*op, collateral_config)) {
+               entry.status = OperatorStatus::OPERATOR_STATUS_UNKNOWN;
+            }
 
             // Collect all authex-linked chain addresses for this operator.
             // Store raw public key bytes from the variant (33 bytes for EM/secp256k1,
@@ -1033,13 +1045,14 @@ void epoch::schbatchgps() {
 
    // Collect ACTIVE batch operators (non-bootstrapped first, then bootstrapped).
    opreg::operators_t opreg_ops(OPREG_ACCOUNT);
+   const auto collateral_config = opreg_eligibility::current_config();
    auto status_idx = opreg_ops.get_index<"bystatus"_n>();
    std::vector<std::pair<name, bool>> available_batch; // (account, is_bootstrapped)
    for (auto it = status_idx.lower_bound(
            magic_enum::enum_integer(OperatorStatus::OPERATOR_STATUS_ACTIVE));
         it != status_idx.end() &&
         it->status == OperatorStatus::OPERATOR_STATUS_ACTIVE; ++it) {
-      if (it->type == OperatorType::OPERATOR_TYPE_BATCH) {
+      if (opreg_eligibility::is_active_batch_operator(*it, collateral_config)) {
          available_batch.push_back({it->account, it->is_bootstrapped});
       }
    }

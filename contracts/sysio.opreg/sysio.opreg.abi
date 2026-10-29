@@ -149,6 +149,20 @@
             ]
         },
         {
+            "name": "batch_sweep",
+            "base": "",
+            "fields": [
+                {
+                    "name": "cursor",
+                    "type": "uint64"
+                },
+                {
+                    "name": "pending",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
             "name": "cancelwtdw",
             "base": "",
             "fields": [
@@ -466,6 +480,11 @@
         },
         {
             "name": "prune",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "recheckbatch",
             "base": "",
             "fields": []
         },
@@ -816,6 +835,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "recheckbatch",
+            "type": "recheckbatch",
+            "ricardian_contract": ""
+        },
+        {
             "name": "recorddel",
             "type": "recorddel",
             "ricardian_contract": ""
@@ -857,6 +881,14 @@
         }
     ],
     "tables": [
+        {
+            "name": "batchsweep",
+            "type": "batch_sweep",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 2840
+        },
         {
             "name": "dellog",
             "type": "delivery_log_entry",
