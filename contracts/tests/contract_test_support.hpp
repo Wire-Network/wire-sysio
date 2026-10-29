@@ -19,6 +19,7 @@
 
 #include <magic_enum/magic_enum.hpp>
 
+#include <array>
 #include <string>
 
 namespace sysio_system::test_support {
@@ -291,5 +292,67 @@ typename Tester::action_result clear(Tester& tester, abi_serializer& ser, name a
 inline constexpr const char* frozen_message = "the andon cord is pulled: funds cannot leave custody";
 
 } // namespace andon
+
+/// secp256k1 encodings for tests that feed the depot keys which are not curve points. libsecp256k1
+/// (through fc) is the oracle the contracts' own `mod_exp` arithmetic is checked against.
+namespace secp256k1 {
+
+/// One big-endian field element (an x or y coordinate).
+using coordinate = std::array<char, 32>;
+
+/// The field prime p = 2^256 - 2^32 - 977, big-endian.
+inline coordinate field_prime() {
+   coordinate p;
+   p.fill(char(0xff));
+   p[27] = char(0xfe);
+   p[30] = char(0xfc);
+   p[31] = char(0x2f);
+   return p;
+}
+
+/// x + p: a non-canonical spelling of x, which still fits in 32 bytes for any x < 2^32 + 977.
+inline coordinate plus_field_prime(const coordinate& x) {
+   const auto p = field_prime();
+   coordinate sum;
+   unsigned carry = 0;
+   for (size_t i = sum.size(); i-- > 0;) {
+      carry += static_cast<uint8_t>(x[i]) + static_cast<uint8_t>(p[i]);
+      sum[i] = static_cast<char>(carry & 0xffu);
+      carry >>= 8;
+   }
+   BOOST_REQUIRE_EQUAL(carry, 0u);
+   return sum;
+}
+
+/// A compressed SEC1 encoding from a prefix byte and an x-coordinate.
+inline fc::em::public_key_data compressed_key(uint8_t prefix, const coordinate& x) {
+   fc::em::public_key_data key{};
+   key[0] = static_cast<char>(prefix);
+   std::copy(x.begin(), x.end(), key.begin() + 1);
+   return key;
+}
+
+/// Whether libsecp256k1 parses the bytes as a compressed point.
+inline bool is_point(const fc::em::public_key_data& key) {
+   try {
+      fc::em::public_key::serialize_uncompressed(key);
+      return true;
+   } catch (const fc::exception&) {
+      return false;
+   }
+}
+
+/// The smallest x >= 1 that has a curve point, or (with `want_point` false) the smallest that has none.
+inline coordinate smallest_x(bool want_point) {
+   for (uint8_t candidate = 1; candidate != 0; ++candidate) {
+      coordinate x{};
+      x.back() = static_cast<char>(candidate);
+      if (is_point(compressed_key(0x02, x)) == want_point) return x;
+   }
+   BOOST_FAIL("no small x-coordinate found");
+   return {};
+}
+
+} // namespace secp256k1
 
 } // namespace sysio_system::test_support

@@ -147,7 +147,9 @@ namespace sysio {
              * createlink. Claim-payload problems (bad name, account controlled by a different key,
              * already registered, tier full) are soft-failed -- recorded in `nodeownerreg` with a reject_reason
              * and returned -- never thrown, so the dispatching transaction commits. Depot/system
-             * invariants (tier range, ETH key type, ROA active) stay hard checks.
+             * invariants (tier range, ETH key type and curve membership, ROA active) stay hard checks:
+             * sysio.msgch drops a depositor key that is not a secp256k1 point before dispatch, and
+             * one that still arrived would leave recordlink skipping the link this action confirms.
              *
              * @param owner        The Wire account to register as node owner (created in-flow if absent).
              * @param tier         Node owner tier: 1, 2, or 3.
