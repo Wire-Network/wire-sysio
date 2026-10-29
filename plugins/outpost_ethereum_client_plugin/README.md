@@ -106,9 +106,6 @@ Separately, every SPI call takes a caller-supplied `deadline`: the concrete open
 `fc::task::deadline_scope` at `now + deadline` and re-checks the clock before each blocking RPC, so a hung
 endpoint cannot occupy a cron worker past its budget.
 
-The progress-read retry budget is 30 seconds, bounded by the enclosing delivery deadline.
-Invalid-parameter RPC errors (`-32602`) propagate immediately instead of consuming the progress-read retry budget.
-
 ### The contract clients
 
 Two typed wrappers are built over the shared connection, each only when its address was supplied to
