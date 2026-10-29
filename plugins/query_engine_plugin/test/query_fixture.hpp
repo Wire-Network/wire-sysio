@@ -2,6 +2,7 @@
 #include "query_schema.hpp"
 
 #include <fc/io/json.hpp>
+#include <fc/io/json_stream.hpp>
 #include <fc/variant_object.hpp>
 #include <sysio/query_engine_plugin/query_http_handler.hpp>
 #include <sysio/testing/tester.hpp>
@@ -141,24 +142,41 @@ inline std::string flag(const char* option) {
    return std::string("--") + option;
 }
 
+/// The body a streamed response writes, as http_plugin collects it.
+inline std::string emit(stream_emitter& emitter) {
+   std::string body;
+   fc::json_writer writer(body);
+   emitter(writer);
+   return body;
+}
+
+/// Adapt a status-and-envelope callback to the stream callback the handler answers through; a response
+/// without a body arrives as nullopt.
+inline url_response_stream_callback decode_response(std::function<void(int, std::optional<fc::variant>)> handler) {
+   return [handler = std::move(handler)](int code, stream_emitter emitter) {
+      const auto body = emit(emitter);
+      handler(code, body.empty() ? std::nullopt : std::optional(fc::json::from_string(body)));
+   };
+}
+
 /// Run the production HTTP handler through its worker queues, with a finite test harness deadline.
 inline fc::variant submit(query_http_handler& handler, read_queue& reads, const std::string& sql) {
-   std::promise<fc::variant> completion;
+   std::promise<std::string> completion;
    auto future = completion.get_future();
    std::atomic<int> status{0}; // asserted on the test thread; the callback runs on an HTTP worker
-   handler.submit(request_body(sql), [&](int code, std::optional<fc::variant> result) {
+   handler.submit(request_body(sql), [&](int code, stream_emitter emitter) {
       status = code;
-      completion.set_value(result.value());
+      completion.set_value(emit(emitter));
    });
    const auto deadline = query_budget::clock::now() + test_wait;
    while (future.wait_for(std::chrono::milliseconds(0)) != std::future_status::ready) {
       BOOST_REQUIRE(query_budget::clock::now() < deadline);
       reads.run_one();
    }
-   auto response = future.get();
+   const auto body = future.get();
    BOOST_CHECK_EQUAL(status.load(), 200);
-   validate_response(fc::json::to_string(response, fc::time_point::maximum()));
-   return response;
+   validate_response(body);
+   return fc::json::from_string(body);
 }
 /// Exercise the public blocking API from a caller worker while the test thread drives safe reads.
 inline query_result execute(query_engine& engine, read_queue& reads, const std::string& sql,
