@@ -176,6 +176,57 @@ namespace sysio {
          YIELD          ///< a LIQ_YIELD amount: a number only, minted nowhere until released
       };
 
+      /// Where this release's net principal went. Yield is accounted for separately.
+      enum class release_destination : uint8_t { ACCOUNT, PARKED, FEE_ONLY };
+
+      /// Accepted envelope identity joined to the operational item before it can be released or erased.
+      struct intake_receipt {
+         uint64_t item_id;
+         sysio::slug_name chain_code;
+         sysio::slug_name token_code;
+         uint32_t epoch_index;
+         checksum256 digest;
+         uint64_t sequence;
+         opp::types::ChainKind chain_kind;
+         std::vector<char> pubkey;
+         uint64_t amount;
+         SYSLIB_SERIALIZE(intake_receipt,
+                          (item_id)(chain_code)(token_code)(epoch_index)(digest)(sequence)(chain_kind)(pubkey)(amount))
+      };
+      /// One positive gross tranche and its exact principal destination; not challenge finality.
+      struct release_receipt {
+         uint64_t item_id;
+         sysio::slug_name chain_code;
+         sysio::slug_name token_code;
+         uint32_t epoch_index;
+         uint64_t gross;
+         uint64_t fee;
+         uint64_t net;
+         uint64_t remaining;
+         release_destination destination;
+         name recipient;
+         uint64_t parked_batch_id; ///< zero for direct/fee-only releases, or exhausted receipt IDs
+         SYSLIB_SERIALIZE(
+            release_receipt,
+            (item_id)(chain_code)(token_code)(epoch_index)(gross)(fee)(net)(remaining)(destination)(recipient)(parked_batch_id))
+      };
+      /// Whole principal payout for a batch, separating imports and pre-receipt balances.
+      struct parked_receipt {
+         uint64_t batch_id; ///< zero for a legacy balance with no post-upgrade contribution
+         sysio::slug_name token_code;
+         opp::types::ChainKind chain_kind;
+         std::vector<char> pubkey;
+         name recipient;
+         uint64_t amount;
+         uint64_t unattributed; ///< legacy/import principal not linked to a release receipt
+         SYSLIB_SERIALIZE(parked_receipt, (batch_id)(token_code)(chain_kind)(pubkey)(recipient)(amount)(unattributed))
+      };
+
+      /// Trace-only receipts: self-inline calls only; no notifications or balance/state mutation.
+      [[sysio::action]] void logintake(intake_receipt receipt);
+      [[sysio::action]] void logrelease(release_receipt receipt);
+      [[sysio::action]] void logparked(parked_receipt receipt);
+
       /// The terminal outcome of an envelope's `sysio.bond` request, recorded on the envelope row the first
       /// time the queue sees it. Once recorded the request row is never read again: `sysio.bond` may prune
       /// it once its ruling is PRUNE_RETENTION_SEC old and nothing is owed on it.
@@ -562,6 +613,20 @@ namespace sysio {
 
       /// Parked rows by token, chain family and pubkey.
       using parkeds_t = kv::table<"parked"_n, parked_key, parked_row>;
+
+      /// Only the active principal batch is retained. Existing parked/counter layouts are unchanged.
+      struct [[sysio::table("parkbatches")]] parked_batch {
+         uint64_t id = 0;
+         uint64_t unattributed = 0;
+         SYSLIB_SERIALIZE(parked_batch, (id)(unattributed))
+      };
+      using parkbatches_t = kv::table<"parkbatches"_n, parked_key, parked_batch>;
+      /// Independent allocation leaves existing operational counter serialization intact.
+      struct [[sysio::table("receiptstate")]] receipt_state {
+         uint64_t next_batch_id = 1;
+         SYSLIB_SERIALIZE(receipt_state, (next_batch_id))
+      };
+      using receiptstate_t = kv::global<"receiptstate"_n, receipt_state>;
 
       /// Stable identity of an outstanding external return. IDs are never reused.
       struct return_key {

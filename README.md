@@ -165,3 +165,6 @@ ctest -L "long_running_tests"
     </td>
   </tr>
 </table>
+
+Syndication clients can follow [typed delivery receipts](docs/sysio-synd.md#delivery-receipts)
+from admitted intake through partial releases and parked payouts.
