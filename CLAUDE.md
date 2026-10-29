@@ -321,6 +321,12 @@ FC_REFLECT_ENUM(my_namespace::my_enum, (value1)(value2)(value3))
 
 `git add -A` / `git add .` are fine — an authorized commit stages the whole working tree rather than silently omitting files someone judged "unrelated". Build artifacts, core dumps, and CDT-generated `.actions.cpp`/`.dispatch.cpp`/`.desc` files are kept out by `.gitignore`; if something untracked shows up that shouldn't be committed, fix the ignore rules rather than hand-picking paths at stage time.
 
+## WIP decisions
+
+`sysio.councl` WIP actions use independent tables, immutable revisions and bounded electorate snapshots.
+Keep election cleanup independent; do not enable policy defaults or execute proposals implicitly.
+See [WIP policy and acceptance](docs/proposals/wip-endorsements-and-voting.md).
+
 ## Documentation Comments
 
 All generated or modified code **must** include documentation comments.
