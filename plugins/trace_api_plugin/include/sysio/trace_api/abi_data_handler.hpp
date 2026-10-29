@@ -75,7 +75,7 @@ namespace sysio {
        * get_token_transfers: emits "params", "return_data" and "decode_error" key/value pairs directly into `w`.
        * A params failure emits only decode_error; a return_value failure keeps params and emits decode_error in
        * place of return_data.  Each failed field rewinds only its own bytes.  Params that decode to null (an
-       * optional action type with its presence flag 0) are omitted.  No-op if the action's account has no
+       * absent optional action type, however deeply nested) are omitted.  No-op if the action's account has no
        * registered ABI or the action is not in the ABI.
        *
        * @param action - trace of the action including metadata necessary for finding the ABI
@@ -88,8 +88,8 @@ namespace sysio {
        * applicable) "return_data" key/value pairs directly into `w` via fc::json_writer, without ever materialising
        * an fc::variant tree.  Pre-conditions: `w` is positioned inside the action's enclosing JSON object such that
        * additional `key(...) value(...)` pairs are valid (i.e. caller has already written global_sequence, receiver,
-       * etc.).  Params that decode to null (an optional action type with its presence flag 0) are omitted.  No-op
-       * if the action's account has no registered ABI or the action is not in the ABI.
+       * etc.).  Params that decode to null (an absent optional action type, however deeply nested) are omitted.
+       * No-op if the action's account has no registered ABI or the action is not in the ABI.
        *
        * Emission is all-or-nothing: a failure decoding either field is logged via
        * `except_handler` and rewinds every byte this call wrote, so neither "params" nor "return_data" appears.

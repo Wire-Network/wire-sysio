@@ -488,14 +488,14 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
    }
 
    namespace {
-      // Action "foo" typed as an optional uint8 (through a typedef), with return type "foor".
+      // Action "foo" typed as a nested optional (outer = opt8?, opt8 = uint8?), with return type "foor".
       chain::abi_def make_optional_action_abi() {
-         auto abi = chain::abi_def ( { {"opt8", "uint8?"} },
+         auto abi = chain::abi_def ( { {"opt8", "uint8?"}, {"outer", "opt8?"} },
             {
                { "foor", "", { {"e", "varuint32"}, {"f", "varuint32"}, {"g", "varuint32"} } }
             },
             {
-               { "foo"_n, "opt8", ""}
+               { "foo"_n, "outer", ""}
             },
             {}, {}, {}
          );
@@ -505,22 +505,28 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       }
    }
 
-   // An action whose optional type is absent decodes to null: both decoders omit "params" then, and still decode
-   // return_data.
-   BOOST_AUTO_TEST_CASE(optional_action_absent_omits_params)
+   // An action whose data decodes to null omits "params" in both decoders, which still decode return_data.  The
+   // outer optional absent (00) and the outer present with the inner absent (01 00) both decode to null.
+   BOOST_AUTO_TEST_CASE(optional_action_decoding_to_null_omits_params)
    {
       abi_data_handler handler(exception_handler{}, make_resolver("alice"_n),
                                make_fetcher("alice"_n, pack_abi(make_optional_action_abi())));
 
-      const action_trace_v0 absent = make_foo_action({0x00}, {});
-      BOOST_TEST(serialized_json(handler, absent) == "{}");
-      BOOST_TEST(streamed_decode_json(handler, absent) == "{}");
+      for (const chain::bytes& null_data : {chain::bytes{0x00}, chain::bytes{0x01, 0x00}}) {
+         BOOST_TEST_CONTEXT("data of size " << null_data.size()) {
+            const action_trace_v0 absent = make_foo_action(null_data, {});
+            BOOST_TEST(serialized_json(handler, absent) == "{}");
+            BOOST_TEST(streamed_decode_json(handler, absent) == "{}");
 
-      const action_trace_v0 absent_with_return = make_foo_action({0x00}, {0x04, 0x05, 0x06});
-      BOOST_TEST(serialized_json(handler, absent_with_return) == R"json({"return_data":{"e":4,"f":5,"g":6}})json");
-      BOOST_TEST(streamed_decode_json(handler, absent_with_return) == R"json({"return_data":{"e":4,"f":5,"g":6}})json");
+            const action_trace_v0 absent_with_return = make_foo_action(null_data, {0x04, 0x05, 0x06});
+            BOOST_TEST(serialized_json(handler, absent_with_return) ==
+                       R"json({"return_data":{"e":4,"f":5,"g":6}})json");
+            BOOST_TEST(streamed_decode_json(handler, absent_with_return) ==
+                       R"json({"return_data":{"e":4,"f":5,"g":6}})json");
+         }
+      }
 
-      const action_trace_v0 present = make_foo_action({0x01, 0x07}, {});
+      const action_trace_v0 present = make_foo_action({0x01, 0x01, 0x07}, {});
       BOOST_TEST(serialized_json(handler, present) == R"json({"params":7})json");
       BOOST_TEST(streamed_decode_json(handler, present) == R"json({"params":7})json");
    }

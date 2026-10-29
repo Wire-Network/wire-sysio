@@ -791,4 +791,44 @@ BOOST_AUTO_TEST_CASE(growth_guard_abort_is_sticky) {
    BOOST_CHECK_THROW(std::rethrow_exception(w.guard_abort()), test_budget_abort);
 }
 
+BOOST_AUTO_TEST_CASE(value_is_null_since_matches_only_a_whole_null) {
+   std::string out;
+   fc::json_writer w(out);
+   w.begin_object();
+
+   w.key("absent");
+   auto cp = w.checkpoint();
+   BOOST_CHECK(!w.value_is_null_since(cp));             // nothing emitted yet
+   w.value_null();
+   BOOST_CHECK(w.value_is_null_since(cp));
+
+   w.key("string");
+   cp = w.checkpoint();
+   w.value_string("null");
+   BOOST_CHECK(!w.value_is_null_since(cp));             // the string "null" is not null
+
+   w.key("object");
+   cp = w.checkpoint();
+   w.begin_object();
+   w.key("inner");
+   w.value_null();
+   w.end_object();
+   BOOST_CHECK(!w.value_is_null_since(cp));             // an object holding a null is not null
+
+   w.key("array");
+   cp = w.checkpoint();
+   w.begin_array();
+   w.value_null();
+   w.end_array();
+   BOOST_CHECK(!w.value_is_null_since(cp));             // nor is an array holding one
+
+   w.key("number");
+   cp = w.checkpoint();
+   w.value_uint64(0);
+   BOOST_CHECK(!w.value_is_null_since(cp));
+
+   w.end_object();
+   BOOST_CHECK_EQUAL(out, R"json({"absent":null,"string":"null","object":{"inner":null},"array":[null],"number":0})json");
+}
+
 BOOST_AUTO_TEST_SUITE_END()

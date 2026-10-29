@@ -14,10 +14,17 @@ namespace sysio::trace_api {
       constexpr std::string_view return_value_error_prefix  = "return_value decode failed: ";
       constexpr std::string_view unknown_return_value_error = "unknown exception decoding return_value";
 
-      // An action type that resolves to an optional decodes to null when its presence flag is 0.  Responses omit
-      // "params" then, as they do when there is no ABI to decode with.
-      bool decodes_to_null(const chain::abi_serializer& abi, std::string_view type, const chain::bytes& data) {
-         return abi.is_optional(abi.resolve_type(type)) && !data.empty() && data.front() == 0;
+      // Decodes an action's data into `w` as "params".  When the data decodes to null (an absent optional action
+      // type, however deeply nested) the key is rewound, so responses omit "params" as they do when there is no ABI
+      // to decode with.  A decode failure propagates with "params" half-written; the caller rewinds.
+      void write_params(const chain::abi_serializer& abi, std::string_view type, const chain::bytes& data,
+                        fc::json_writer& w, const chain::abi_serializer::yield_function_t& yield) {
+         const auto field_cp = w.checkpoint();
+         w.key("params");
+         const auto value_cp = w.checkpoint();
+         abi.binary_to_json_stream(type, data, w, yield);
+         if (w.value_is_null_since(value_cp))
+            w.rewind(field_cp);
       }
 
       // ABIs are user-provided; the yield function only enforces the recursion-depth cap and
@@ -101,22 +108,19 @@ namespace sysio::trace_api {
 
       // decode_error is written before except_handler runs: if the failure was the response budget aborting the
       // writer, that write rethrows the abort and the budget rejection is not logged as a decode failure.
-      if (!decodes_to_null(*serializer, type_name, a.data)) {
-         const auto params_cp = w.checkpoint();
-         try {
-            w.key("params");
-            serializer->binary_to_json_stream(type_name, a.data, w, abi_yield);
-         } catch (const std::exception& e) {
-            w.rewind(params_cp);
-            w.set("decode_error", std::string_view(e.what()));
-            except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
-            return;
-         } catch (...) {
-            w.rewind(params_cp);
-            w.set("decode_error", unknown_params_error);
-            except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
-            return;
-         }
+      const auto params_cp = w.checkpoint();
+      try {
+         write_params(*serializer, type_name, a.data, w, abi_yield);
+      } catch (const std::exception& e) {
+         w.rewind(params_cp);
+         w.set("decode_error", std::string_view(e.what()));
+         except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
+         return;
+      } catch (...) {
+         w.rewind(params_cp);
+         w.set("decode_error", unknown_params_error);
+         except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
+         return;
       }
 
       if (a.return_value.empty()) return;
@@ -151,15 +155,12 @@ namespace sysio::trace_api {
          // get_block / get_transaction_trace emit params/return_data all-or-nothing: any decode
          // failure rewinds every byte this function wrote (no params, no return_data).
          auto cp = w.checkpoint();
-         if (!decodes_to_null(*serializer, type_name, a.data)) {
-            try {
-               w.key("params");
-               serializer->binary_to_json_stream(type_name, a.data, w, abi_yield);
-            } catch (...) {
-               w.rewind(cp);
-               except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
-               return;
-            }
+         try {
+            write_params(*serializer, type_name, a.data, w, abi_yield);
+         } catch (...) {
+            w.rewind(cp);
+            except_handler(MAKE_EXCEPTION_WITH_CONTEXT(std::current_exception()));
+            return;
          }
 
          if (a.return_value.empty()) return;

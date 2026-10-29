@@ -28,6 +28,9 @@ static_assert(int64_decimal_buf_size >= std::numeric_limits<uint64_t>::digits10 
 /// Shortest-roundtrip std::to_chars of a finite double fits well within this.
 inline constexpr size_t double_shortest_buf_size = 32;
 
+/// The JSON null literal.
+inline constexpr std::string_view json_null = "null";
+
 /// 64-bit integers whose magnitude exceeds this are emitted as quoted JSON strings to
 /// preserve precision past JS's 2^53 mantissa.  Single source of truth for the streaming
 /// emitters; matches fc::json::to_string's emission (libfc/src/io/json.cpp int64/uint64 cases).
@@ -209,7 +212,7 @@ public:
 
    void value_null() {
       value_prefix();
-      out_.append("null", 4);
+      out_.append(json_null);
    }
 
    /// Emits a JSON string token whose content is the lowercase hex encoding of the
@@ -332,6 +335,14 @@ public:
       stack_.resize(cp.stack_size);
       if (!stack_.empty()) stack_.back().has_item = cp.surviving_top_has_item;
       awaiting_value_ = cp.awaiting_value;
+   }
+
+   /// Whether everything emitted since `cp` is exactly the value null.  Take `cp` right after
+   /// key(), so the bytes since it are one value with no separator.  An object or array holding
+   /// a null, or the string "null", is not null.
+   bool value_is_null_since(const checkpoint_t& cp) const noexcept {
+      return out_.size() >= cp.buf_size && out_.size() - cp.buf_size == json_null.size() &&
+             out_.compare(cp.buf_size, json_null.size(), json_null) == 0;
    }
 
 private:
