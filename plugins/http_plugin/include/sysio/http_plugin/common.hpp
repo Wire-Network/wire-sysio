@@ -32,6 +32,7 @@
 #include <boost/asio/detail/config.hpp>
 
 #include <atomic>
+#include <chrono>
 #include <filesystem>
 #include <map>
 #include <optional>
@@ -167,6 +168,20 @@ typedef map<string, detail::internal_url_handler> url_handlers_type;
 // Streaming-cb counterpart of url_handlers_type.  Disjoint URL-set from the variant
 // path; an endpoint registers either form, never both.
 typedef map<string, detail::internal_url_handler_stream> url_handlers_stream_type;
+
+/// A request body has this long, plus its size at request_body_min_bytes_per_second, to arrive once its header is read.
+/// Past that the connection is closed, which releases the body's bytes_in_flight reservation: a stalled upload cannot
+/// hold its share of the budget for longer, while a slow one that keeps coming is not cut off.
+inline constexpr std::chrono::seconds request_body_read_allowance{10};
+/// The average rate, in bytes per second, a request body must at least keep up; see request_body_read_allowance.
+inline constexpr uint64_t request_body_min_bytes_per_second = 64 * 1024;
+
+/// The time a request body of `body_size` bytes has to arrive once its header is read; see request_body_read_allowance.
+inline std::chrono::microseconds request_body_read_timeout(size_t body_size) {
+   constexpr uint64_t microseconds_per_second = 1'000'000;
+   return request_body_read_allowance +
+          std::chrono::microseconds(body_size * microseconds_per_second / request_body_min_bytes_per_second);
+}
 
 struct http_plugin_state {
    string access_control_allow_origin;

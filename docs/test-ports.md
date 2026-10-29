@@ -1,8 +1,7 @@
 # Test ports
 
-Network tests (`nonparallelizable_tests` and `long_running_tests`) take their listener ports from the host's **bind
-registry**, the same registry wire-tools-ts clusters use. Every port a test binds comes from a lease, so tests and
-clusters running at the same time on one host never collide.
+Network tests take their ports from the host's **bind registry**, the same registry wire-tools-ts clusters use.
+Every port a test binds comes from a lease, so tests and clusters running at the same time on one host never collide.
 
 The registry protocol is specified in wire-tools-ts
 [`docs/bind-registry/README.md`](https://github.com/Wire-Network/wire-tools-ts/blob/master/docs/bind-registry/README.md).
@@ -11,9 +10,11 @@ installed TestHarness leases ports too; `tests/bind_registry.py` is its command-
 
 ## How a test gets its ports
 
-- **Under CTest**, `add_np_test` / `add_lr_test` (`cmake/test-helpers.cmake`) run the test through
-  `tests/bind_registry.py`. The wrapper leases one block of 192 consecutive ports, runs the test in its own session
-  with the lease in `SYSIO_TEST_PORTS`, waits for the whole session to exit, deletes its registration and exits with
+- **Under CTest**, `add_np_test` / `add_lr_test` (`cmake/test-helpers.cmake`), the discovered chain-plugin Boost
+  cases, the Ethereum RPC tests, and cranker startup recovery run through `tests/bind_registry.py`. Boost discovery
+  uses `COMMAND_PREFIX` so each discovered case takes its own lease. The wrapper leases one block of 192 consecutive
+  ports, runs the test in its own session with the lease in `SYSIO_TEST_PORTS`, waits for the whole session to exit,
+  deletes its registration and exits with
   the test's status (`128 + N` when the test died of signal N). Signals sent to the wrapper are forwarded to the
   session. Processes the test leaves behind get 5 s, then SIGTERM and 10 s, then SIGKILL and 10 s; if any survive the
   wrapper fails loudly. A test that can leave processes behind needs up to 25 s of its CTest `TIMEOUT` for this.
@@ -49,6 +50,11 @@ Ask by listener category and index, never by number:
 - Python: `Utils.getPort(Utils.PortStateHistory)`, `Utils.getPort(Utils.PortP2P, node_id)`, or the `Cluster`
   helpers (`getHttpEndpoint`, `getNodeP2pEndpoint`, `getBiosP2pEndpoint`).
 - C++: `sysio::testing::get_port(port_category::state_history, index)` from `tests/test_ports.hpp`.
+
+For C++ fixtures that need successive ports, share a `sysio::testing::test_port_allocator` for the selected
+category. `next()` returns the next leased port; `next_loopback_url()` returns an HTTP loopback URL using the next
+port. Allocation is synchronized across threads and throws when the category is exhausted. Each allocator starts
+at category index zero, so fixtures sharing a category must share an allocator to avoid reusing slots.
 
 Each category owns fixed slots of the lease. Python (`testUtils.py`) and C++ (`test_ports.hpp`) share this layout;
 `trx_generator_tests` checks the C++ side.

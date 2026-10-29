@@ -248,18 +248,6 @@
                 {
                     "name": "bounty_returned",
                     "type": "uint64"
-                },
-                {
-                    "name": "hold_share",
-                    "type": "uint64"
-                },
-                {
-                    "name": "hold_beneficiary",
-                    "type": "name"
-                },
-                {
-                    "name": "share_pending",
-                    "type": "bool"
                 }
             ]
         },
@@ -821,6 +809,10 @@
                 {
                     "name": "desynd_fee_flat",
                     "type": "uint64"
+                },
+                {
+                    "name": "custody_shortfall_bps",
+                    "type": "uint32"
                 }
             ]
         },
@@ -931,6 +923,10 @@
                 {
                     "name": "desynd_fee_flat",
                     "type": "uint64"
+                },
+                {
+                    "name": "custody_shortfall_bps",
+                    "type": "uint32"
                 }
             ]
         },

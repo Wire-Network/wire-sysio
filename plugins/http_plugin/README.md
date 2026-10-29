@@ -41,14 +41,16 @@ Handlers reach the plugin through three registration paths, and the path decides
 | `add_async_handler` / `add_async_api` | runs inline on an HTTP worker thread | calls that do not touch the controller, or that do their own posting |
 | `add_raw_handler` | inline on an HTTP worker thread, handler answers through the connection | binary and file responses (`snapshot_api_plugin` downloads) |
 
-Admission control happens in two places. When a connection is accepted, the number of open connections is
-checked against `http-max-in-flight-requests` and a 503 "Busy" response is returned if it is over. For a
-handler posted to the app thread the request body is then checked against `http-max-bytes-in-flight-mb` before
-anything is queued -- a 503 if it would push the in-flight byte total over -- and reserved against that budget
-for as long as it sits in the executor queue, released exactly once when the posted work runs, throws, returns
-early on shutdown, or is discarded. Handlers that run inline on an HTTP worker thread get no request-body
-check. The byte budget is checked once more when the response is sent, so a 503 can come back after the call
-has already executed.
+Admission control happens in three places. When a connection is accepted, the number of open connections is
+checked against `http-max-in-flight-requests` and a 503 "Busy" response is returned if it is over. When a
+request's header arrives, its body is reserved against `http-max-bytes-in-flight-mb` before any of it is read;
+a body that has not arrived 10 s plus its size at 64 KiB/s later closes its connection, which releases the
+reservation. For a handler posted to the app thread the request body is then checked against
+`http-max-bytes-in-flight-mb` before anything is queued -- a 503 if it would push the in-flight byte total
+over -- and reserved against that budget for as long as it sits in the executor queue, released exactly once
+when the posted work runs, throws, returns early on shutdown, or is discarded. Handlers that run inline on an
+HTTP worker thread get no request-body check. The byte budget is checked once more when the response is sent,
+so a 503 can come back after the call has already executed.
 
 `/v1/node/get_supported_apis` is answered by the HTTP connection handler itself rather than by a registered
 handler: it returns the paths of every handler whose category is enabled on the listener that received the
@@ -172,7 +174,7 @@ All of `http_plugin`'s options are config-file options, so each is equally valid
 |---|---|---|
 | `http-threads` | `2` | Number of worker threads in the HTTP thread pool. Must be greater than 0. |
 | `max-body-size` | `2097152` | Maximum body size in bytes accepted for an incoming RPC request. |
-| `http-max-bytes-in-flight-mb` | `500` | Maximum megabytes `http_plugin` uses for in-flight request processing; `-1` for unlimited. Checked when an app-thread handler is queued and again when the response is sent; a 503 is returned when exceeded. |
+| `http-max-bytes-in-flight-mb` | `500` | Maximum megabytes `http_plugin` uses for in-flight request processing; `-1` for unlimited. A request body is admitted against it as soon as its header arrives (its `Content-Length`, or `max-body-size` when chunked), before any of the body is read, and held until the body is read or the connection closes. A body must arrive within 10 s plus its size at 64 KiB/s (42 s for 2 MiB), or the connection is closed. The budget is checked again when an app-thread handler is queued and when the response is sent. A 503 is returned when exceeded, and a refused body closes its connection. |
 | `http-max-in-flight-requests` | `-1` | Maximum number of concurrently open HTTP connections; `-1` for unlimited. The counter goes up when a session is created and down when it is destroyed, so idle keep-alive connections count against it, and it is checked only when a connection is accepted. A 503 is returned when exceeded. |
 | `http-max-response-time-ms` | `15` | Maximum time on the main thread for processing a request; `-1` for unlimited. API plugins read this value as their per-call deadline. |
 | `http-keep-alive` | `true` | When false, connections are not kept alive even if the client requests it. |

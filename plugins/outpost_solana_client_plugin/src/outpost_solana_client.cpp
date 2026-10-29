@@ -3,6 +3,7 @@
 #include <magic_enum/magic_enum.hpp>
 
 #include <algorithm>
+#include <array>
 #include <cstring>
 #include <limits>
 #include <map>
@@ -19,6 +20,7 @@
 #include <fc/task/deadline.hpp>
 #include <fc/variant_object.hpp>
 
+#include <sysio/chain/exceptions.hpp>
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/opp.pb.h>
 #include <sysio/opp/attestations/attestations.pb.h>
@@ -125,6 +127,28 @@ namespace envelope_log {
    constexpr auto field_epoch     = "epoch_index";
    constexpr auto field_checksum  = "checksum";
 } // namespace envelope_log
+
+/// Identifiers of the per-(epoch, uploader) `EnvelopeChunks` staging buffer header the upload resume reads.
+namespace envelope_chunks {
+   constexpr auto account_name          = "EnvelopeChunks";
+   constexpr auto field_epoch_index     = "epoch_index";
+   constexpr auto field_total_bytes     = "total_bytes";
+   constexpr auto field_total_chunks    = "total_chunks";
+   constexpr auto field_received_chunks = "received_chunks";
+   constexpr auto field_operator        = "operator";
+   /// Every field the resume reads; each must be present in the decoded header.
+   constexpr std::array<const char*, 5> fields_read = {field_epoch_index, field_total_bytes, field_total_chunks,
+                                                      field_received_chunks, field_operator};
+   /// Anchor's account discriminator, which precedes the header.
+   constexpr size_t discriminator_bytes = 8;
+   /// The bytemuck `repr(C)` header: epoch_index u32, total_bytes u32, total_chunks u16, received_chunks u16, bump u8,
+   /// _padding [u8; 3], operator pubkey.
+   constexpr size_t header_bytes = 4 + 4 + 2 + 2 + 1 + 3 + 32;
+   /// `EnvelopeChunks::DATA_OFFSET`. The program sizes the account as exactly this plus the bytes staged so far, and
+   /// only ever grows it, which bounds `received_chunks` without the IDL.
+   constexpr size_t data_offset = discriminator_bytes + header_bytes;
+   static_assert(data_offset == 56, "must equal the program's EnvelopeChunks::DATA_OFFSET");
+} // namespace envelope_chunks
 
 /// Identifiers of the per-epoch `EpochDeliveries` account + the two fields the
 /// dispatch cursor read consumes. Both are validated at boot for the
@@ -1293,6 +1317,63 @@ std::optional<fc::sha256> decode_envelope_log_digest(opp_solana_outpost_client& 
    return std::nullopt;
 }
 
+uint16_t decode_first_unstaged_chunk(opp_solana_outpost_client&                              program_client,
+                                     const std::optional<fc::network::solana::account_info>& buffer,
+                                     uint32_t                                                epoch_index,
+                                     uint16_t                                                total_chunks,
+                                     uint32_t                                                total_bytes,
+                                     const fc::network::solana::solana_public_key&           uploader) {
+   // Absent, or still system-owned before its first chunk created it: nothing staged.
+   if (!buffer.has_value() || buffer->data.empty() || buffer->owner != program_client.program_id) return 0;
+   const auto* program = program_client.get_program();
+   if (program == nullptr || program->find_account(envelope_chunks::account_name) == nullptr) return 0;
+
+   // The account is bytemuck `repr(C)` with explicit padding, so its header decodes byte-for-byte as the Borsh
+   // fields the IDL declares; the staged payload tail past the header is simply not read.
+   const fc::variant         decoded = program_client.decode_account_info_data(envelope_chunks::account_name,
+                                                                               buffer->data);
+   const fc::variant_object& header  = decoded.get_object();
+   // Name the drifted field rather than fail on a bare missing-key lookup: the caller turns any throw here into a
+   // resume from 0, so this message is the only trace of an IDL that silently disabled the resume.
+   for (const auto field : envelope_chunks::fields_read) {
+      FC_ASSERT(header.contains(field),
+                "EnvelopeChunks decoded without '{}'; the loaded IDL disagrees with the deployed program", field);
+   }
+   // The PDA seeds bind the epoch and the uploader, so a buffer at this address that disagrees on either can only
+   // be a decode that disagrees with the program -- IDL drift that still decodes, e.g. a dropped `_padding` reading
+   // `operator` 3 bytes off. Warn: it silently disables the resume otherwise.
+   const uint64_t decoded_epoch    = header[envelope_chunks::field_epoch_index].as_uint64();
+   const auto     decoded_operator = fc::network::solana::solana_public_key::from_base58_string(
+      header[envelope_chunks::field_operator].as_string());
+   if (decoded_epoch != epoch_index || decoded_operator != uploader) {
+      wlog("outpost_solana_client: EnvelopeChunks for epoch={} decoded as epoch={} operator={}, but its address is "
+           "seeded by epoch={} uploader={}; the loaded IDL disagrees with the program, uploading from chunk 0",
+           epoch_index, decoded_epoch, decoded_operator.to_string(fc::yield_function_t{}), epoch_index,
+           uploader.to_string(fc::yield_function_t{}));
+      return 0;
+   }
+   // A different `total_chunks` / `total_bytes` is a real shape change, which the program itself reports as
+   // `ChunkBufferShapeMismatch` on chunk 0.
+   if (header[envelope_chunks::field_total_chunks].as_uint64() != total_chunks ||
+       header[envelope_chunks::field_total_bytes].as_uint64() != total_bytes) {
+      return 0;
+   }
+   // Never resume past what the account's length can hold. A misread `received_chunks` (an IDL whose field order
+   // drifted from the program) would otherwise start every tick at a chunk the program rejects as out of order.
+   const size_t   staged_bytes   = buffer->data.size() > envelope_chunks::data_offset
+                                      ? buffer->data.size() - envelope_chunks::data_offset
+                                      : 0;
+   const uint64_t chunks_by_size = (staged_bytes + SOLANA_MAX_CHUNK_BYTES - 1) / SOLANA_MAX_CHUNK_BYTES;
+   const uint64_t received       = header[envelope_chunks::field_received_chunks].as_uint64();
+   if (received > chunks_by_size) {
+      // The program sizes the account to exactly the bytes received, so this too means the decode disagrees with it.
+      wlog("outpost_solana_client: EnvelopeChunks for epoch={} claims received_chunks={} but holds only {} staged "
+           "bytes ({} chunks); the loaded IDL disagrees with the program, resuming at chunk {}",
+           epoch_index, received, staged_bytes, chunks_by_size, std::min<uint64_t>(chunks_by_size, total_chunks));
+   }
+   return static_cast<uint16_t>(std::min<uint64_t>({received, chunks_by_size, uint64_t{total_chunks}}));
+}
+
 } // namespace outpost_solana_client_detail
 
 outpost_solana_client::outpost_solana_client(
@@ -1426,6 +1507,31 @@ outpost_solana_client::read_epoch_dispatch_progress(uint32_t epoch_index) {
    progress.dispatched_count =
       static_cast<uint32_t>(row[epoch_deliveries::field_dispatched_count].as_uint64());
    return progress;
+}
+
+uint16_t outpost_solana_client::read_first_unstaged_chunk(uint32_t epoch_index, uint16_t total_chunks,
+                                                          uint32_t total_bytes) {
+   // Starting at 0 never skips data (the program no-ops staged chunks), so a failure anywhere in the lookup costs
+   // only the resume, never the delivery: an RPC error must not stop this tick from uploading.
+   const auto upload_from_zero = [&](const std::string& reason) -> uint16_t {
+      wlog("outpost_solana_client[{}]: cannot read staged EnvelopeChunks for epoch={}: {}; uploading from chunk 0",
+           to_string(), epoch_index, reason);
+      return 0;
+   };
+   try {
+      const auto uploader   = _entry->client->get_pubkey();
+      const auto buffer_pda = derive_envelope_chunks_pda(_program_id, epoch_index, uploader);
+      // `processed`, to match the chunk writes `execute_tx_and_confirm` waits for. A processed read that later
+      // rolls back over-reports; the next chunk then fails `ChunkOutOfOrder` and the following tick re-reads. A
+      // lagging read under-reports, which only re-sends no-op chunks.
+      const auto buffer = _entry->client->get_account_info(buffer_pda, fc::network::solana::commitment_t::processed);
+      return outpost_solana_client_detail::decode_first_unstaged_chunk(*_program_client, buffer, epoch_index,
+                                                                      total_chunks, total_bytes, uploader);
+   } catch (const fc::exception& e) {
+      return upload_from_zero(e.to_detail_string());
+   } catch (const std::exception& e) {
+      return upload_from_zero(e.what());
+   }
 }
 
 std::string outpost_solana_client::send_dispatch_attestations(
@@ -1717,46 +1823,87 @@ std::string outpost_solana_client::deliver_outbound_envelope(
    // operator's delivery instruction family is `epoch_in`**: all non-empty
    // data chunks stage bytes, then the terminal call triggers the program's
    // `finalize_envelope`. Settlement follows through `dispatch_attestations`.
-   std::string last_sig;
-   for (uint16_t i = 0; i < total_chunks; ++i) {
-      throw_if_past_deadline(deadline_abs, OP_EPOCH_IN);
-
-      const size_t off = static_cast<size_t>(i) * SOLANA_MAX_CHUNK_BYTES;
-      const size_t len = std::min(SOLANA_MAX_CHUNK_BYTES, total - off);
-      std::vector<uint8_t> chunk(
-         reinterpret_cast<const uint8_t*>(envelope_bytes.data() + off),
-         reinterpret_cast<const uint8_t*>(envelope_bytes.data() + off + len));
-
-      last_sig = _program_client->epoch_in(
-         epoch_index, i, total_chunks, static_cast<uint32_t>(total), chunk, {});
-      ilog("outpost_solana_client[{}]: epoch_in chunk sent epoch={} chunk={}/{} bytes={} sig={}",
-           to_string(), epoch_index, i, total_chunks, len, last_sig);
+   //
+   // Resume past whatever an earlier tick already staged. Restarting at 0
+   // spent the whole delivery deadline re-sending no-op chunks, so an
+   // envelope larger than one deadline's worth of chunks never completed.
+   const uint16_t first_chunk =
+      read_first_unstaged_chunk(epoch_index, total_chunks, static_cast<uint32_t>(total));
+   // The read swallows its own failures, including an RPC cut short by the
+   // deadline, and a fully staged buffer skips the loop's per-chunk check
+   // entirely -- so enforce the deadline here before sending anything.
+   throw_if_past_deadline(deadline_abs, OP_EPOCH_IN);
+   if (first_chunk == total_chunks) {
+      ilog("outpost_solana_client[{}]: epoch_in epoch={} has all {} chunks staged; sending only the terminal call",
+           to_string(), epoch_index, total_chunks);
+   } else if (first_chunk > 0) {
+      ilog("outpost_solana_client[{}]: epoch_in resuming epoch={} at chunk {}/{} already staged",
+           to_string(), epoch_index, first_chunk, total_chunks);
    }
+   std::string last_sig;
+   // One past the last chunk this tick confirmed; the loop advances it only
+   // after a chunk's `epoch_in` returns.
+   uint16_t next_chunk = first_chunk;
+   try {
+      for (; next_chunk < total_chunks; ++next_chunk) {
+         throw_if_past_deadline(deadline_abs, OP_EPOCH_IN);
 
-   // Memoize once the buffer is fully staged: the program refuses to crank a
-   // partial buffer (TerminalChunkBeforeDataComplete), so the crank-once-consensus-
-   // tips path is only reachable from a COMPLETE staged buffer. A partial upload
-   // leaves this unset and the next run_outbound tick re-uploads from offset zero.
-   _delivered_envelope = std::make_pair(epoch_index, envelope_bytes);
+         const size_t off = static_cast<size_t>(next_chunk) * SOLANA_MAX_CHUNK_BYTES;
+         const size_t len = std::min(SOLANA_MAX_CHUNK_BYTES, total - off);
+         std::vector<uint8_t> chunk(
+            reinterpret_cast<const uint8_t*>(envelope_bytes.data() + off),
+            reinterpret_cast<const uint8_t*>(envelope_bytes.data() + off + len));
 
-   // ONE terminal call: records this operator's delivery and runs the consensus
-   // predicate. It carries no effect accounts and no dispatch limit, so it is
-   // fixed-size and cannot fail on account budget -- a dispatch concern can no
-   // longer wedge consensus, and a decode failure can no longer prevent the
-   // delivery from being recorded.
-   last_sig = _program_client->epoch_in(
-      epoch_index, total_chunks, total_chunks, static_cast<uint32_t>(total), {}, {});
-   ilog("outpost_solana_client[{}]: epoch_in terminal delivery sent epoch={} sig={}",
-        to_string(), epoch_index, last_sig);
+         last_sig = _program_client->epoch_in(
+            epoch_index, next_chunk, total_chunks, static_cast<uint32_t>(total), chunk, {});
+         ilog("outpost_solana_client[{}]: epoch_in chunk sent epoch={} chunk={}/{} bytes={} sig={}",
+              to_string(), epoch_index, next_chunk, total_chunks, len, last_sig);
+      }
+
+      // Memoize once the buffer is fully staged: the program refuses to crank a
+      // partial buffer (TerminalChunkBeforeDataComplete), so the crank-once-consensus-
+      // tips path is only reachable from a COMPLETE staged buffer. A partial upload
+      // leaves this unset and the next run_outbound tick resumes from the buffer's
+      // on-chain `received_chunks`.
+      _delivered_envelope = std::make_pair(epoch_index, envelope_bytes);
+
+      // ONE terminal call: records this operator's delivery and runs the consensus
+      // predicate. It carries no effect accounts and no dispatch limit, so it is
+      // fixed-size and cannot fail on account budget -- a dispatch concern can no
+      // longer wedge consensus, and a decode failure can no longer prevent the
+      // delivery from being recorded.
+      last_sig = _program_client->epoch_in(
+         epoch_index, total_chunks, total_chunks, static_cast<uint32_t>(total), {}, {});
+      ilog("outpost_solana_client[{}]: epoch_in terminal delivery sent epoch={} sig={}",
+           to_string(), epoch_index, last_sig);
+   } catch (const fc::exception& e) {
+      // An envelope larger than one deadline's worth of chunks is EXPECTED to
+      // span ticks. A tick whose deadline ran out after it staged at least one
+      // chunk made progress the next tick resumes from, so report it as an
+      // epoch left open -- not as a failure, which would warn on every tick of a
+      // healthy large upload and hide a real stall among them. The deadline can
+      // end the tick at the loop's own check or inside an `epoch_in` (its
+      // confirmation polling is clamped to the scoped deadline), so the test is
+      // the clock rather than the exception type. A tick that staged nothing
+      // keeps the original error: that is what a stall looks like.
+      if (next_chunk > first_chunk && fc::time_point::now() >= deadline_abs) {
+         SYS_THROW(chain::outpost_delivery_incomplete_exception,
+                   "outpost_solana_client[{}]: epoch={} staged chunks {}..{} of {} before the delivery deadline; the "
+                   "next tick resumes from the staged buffer ({})",
+                   to_string(), epoch_index, first_chunk, next_chunk - 1, total_chunks, e.top_message());
+      }
+      throw;
+   }
 
    // Delivery IS complete at this point -- the terminal call above recorded it
    // and ran the consensus predicate. Settlement is a separate instruction and
    // a separate concern (`drain_dispatch`): kick it inline so the tipping
    // operator normally closes the epoch immediately, but never let a
    // settlement failure travel back into the delivery result. A throw here
-   // would make the caller treat the DELIVERY as failed and re-upload every
-   // chunk from offset zero on its next tick, even though the chunks and the
-   // terminal call already landed; settlement instead resumes from the
+   // would make the caller treat the DELIVERY as failed and deliver again on
+   // its next tick -- the staged buffer is complete, so that is a redundant
+   // terminal call -- even though the chunks and the terminal call already
+   // landed; settlement instead resumes from the
    // on-chain cursor on a later drain. The failure is logged, never swallowed
    // -- the chain-side reason is the diagnostic.
    try {

@@ -11,11 +11,13 @@
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 
+#include <algorithm>
 #include <array>
 #include <cstdlib>
 #include <exception>
 #include <future>
 #include <optional>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <thread>
@@ -94,6 +96,11 @@ std::string join_ports(const std::vector<uint32_t>& ports) {
 /** Leased P2P slots of the provider tests' local peers (slot 0 is the constructor test's address). */
 constexpr uint32_t handshake_test_p2p_index = 1;
 constexpr uint32_t write_failure_test_p2p_index = 2;
+
+/** Independent endpoint, URL and CLI spellings expected by native port consumers. */
+constexpr std::string_view expected_loopback_http_prefix = "http://127.0.0.1:";
+constexpr std::string_view expected_state_history_endpoint_prefix = "127.0.0.1:";
+constexpr std::string_view expected_socket_address_option = "--socket-address";
 
 constexpr int16_t expected_trx_generator_handshake_generation = 1;
 constexpr int16_t expected_trx_generator_response_handshake_generation = 2;
@@ -613,6 +620,51 @@ BOOST_AUTO_TEST_CASE(test_ports_rejects_invalid_indices)
    for(const auto& expected : expected_ports) {
       BOOST_REQUIRE_THROW(get_port(expected.category, expected.count), std::runtime_error);
    }
+}
+
+/** Concurrent fixture starts consume distinct category slots and fail at exhaustion. */
+BOOST_AUTO_TEST_CASE(test_ports_allocator_concurrent_exhaustion)
+{
+   const auto ports = require_lease();
+   const auto slots = slots_of(port_category::node_http);
+   test_port_allocator allocator{port_category::node_http};
+   std::vector<std::future<uint16_t>> pending;
+   for(uint32_t index = 0; index < slots.count; ++index)
+      pending.push_back(std::async(std::launch::async, [&allocator] { return allocator.next(); }));
+   std::vector<uint16_t> allocated;
+   for(auto& port : pending)
+      allocated.push_back(port.get());
+   std::sort(allocated.begin(), allocated.end());
+   for(uint32_t index = 0; index < slots.count; ++index)
+      BOOST_REQUIRE_EQUAL(allocated.at(index), ports.at(slots.start + index));
+   BOOST_REQUIRE_THROW(allocator.next(), std::runtime_error);
+
+   test_port_allocator urls{port_category::node_http};
+   BOOST_REQUIRE_EQUAL(urls.next_loopback_url(),
+                       std::string(expected_loopback_http_prefix) + std::to_string(ports.at(slots.start)));
+}
+
+/** SHiP uses the leased default, preserves an explicit endpoint, and reports a missing lease. */
+BOOST_AUTO_TEST_CASE(test_ports_state_history_endpoint_resolution)
+{
+   const auto ports = require_lease();
+   std::ostringstream error;
+   std::string endpoint;
+   BOOST_REQUIRE(resolve_state_history_endpoint(endpoint, error));
+   BOOST_REQUIRE_EQUAL(endpoint,
+                       std::string(expected_state_history_endpoint_prefix) + std::to_string(ports.at(1)));
+   BOOST_REQUIRE(error.str().empty());
+
+   test_ports_env_guard env;
+   env.clear();
+   const auto explicit_endpoint = endpoint;
+   BOOST_REQUIRE(resolve_state_history_endpoint(endpoint, error));
+   BOOST_REQUIRE_EQUAL(endpoint, explicit_endpoint);
+   endpoint.clear();
+   BOOST_REQUIRE(!resolve_state_history_endpoint(endpoint, error));
+   BOOST_REQUIRE(endpoint.empty());
+   BOOST_REQUIRE(error.str().find(test_ports_env_var) != std::string::npos);
+   BOOST_REQUIRE(error.str().find(expected_socket_address_option) != std::string::npos);
 }
 
 BOOST_AUTO_TEST_CASE(test_ports_parses_leases)

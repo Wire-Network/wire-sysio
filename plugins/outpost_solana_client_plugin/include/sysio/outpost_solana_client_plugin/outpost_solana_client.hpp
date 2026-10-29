@@ -161,6 +161,44 @@ std::optional<fc::sha256> decode_envelope_log_digest(opp_solana_outpost_client& 
                                                      const std::vector<uint8_t>& account_data,
                                                      uint32_t                    epoch_index);
 
+/// The first `epoch_in` data chunk the uploader still has to send, read from its fetched `EnvelopeChunks` staging
+/// buffer: the buffer's `received_chunks` when the buffer was staged for exactly this upload (same epoch, uploader,
+/// `total_chunks` and `total_bytes`), else 0. The program treats a re-sent chunk below `received_chunks` as an
+/// idempotent no-op, so starting at 0 never skips data -- but every no-op still costs a full send + confirm, and
+/// restarting from 0 each tick capped an upload at what ONE delivery deadline can carry. Resuming here lets a large
+/// envelope finish across ticks.
+///
+/// Returns 0 without decoding when nothing is staged: the account is absent, empty, or not yet owned by the program
+/// (system-owned before its first chunk created it). Also returns 0 when the loaded IDL does not declare
+/// `EnvelopeChunks` (the pre-resume behaviour), and for a buffer staged for a different upload shape -- that buffer
+/// still rejects chunk 0 with the program's own `ChunkBufferShapeMismatch`, exactly as before the resume existed.
+///
+/// The result never exceeds the chunks the account's length can hold. This relies on the program sizing the account
+/// to exactly `DATA_OFFSET + bytes received` and only ever growing it, so a `received_chunks` misread through a
+/// drifted IDL cannot resume past what is staged; a program that pre-sized the buffer would void this bound.
+///
+/// The PDA seeds bind the epoch and the uploader, so a decoded `epoch_index` or `operator` that differs from them,
+/// or a `received_chunks` the account's length cannot hold, can only mean the loaded IDL disagrees with the program.
+/// Those cases log a warning (and resume from 0, or from the length cap) so the drift is visible rather than
+/// silently disabling the resume. Exposed for the plugin's unit tests, which drive it against synthesized accounts.
+///
+/// @param program_client  outpost program client whose loaded IDL decodes the account and whose `program_id` must
+///                        own it.
+/// @param buffer          the fetched `EnvelopeChunks` account, or `std::nullopt` when it does not exist.
+/// @param epoch_index     the WIRE epoch being uploaded.
+/// @param total_chunks    data-chunk count of the envelope being uploaded.
+/// @param total_bytes     byte length of the envelope being uploaded.
+/// @param uploader        this relay's signer, the buffer's third PDA seed.
+/// @return the chunk index to resume from, in `[0, total_chunks]`.
+/// @throws fc::exception if a program-owned account does not decode as the `EnvelopeChunks` the loaded IDL declares,
+///         or the decoded header lacks a field the resume reads.
+uint16_t decode_first_unstaged_chunk(opp_solana_outpost_client&                              program_client,
+                                     const std::optional<fc::network::solana::account_info>& buffer,
+                                     uint32_t                                                epoch_index,
+                                     uint16_t                                                total_chunks,
+                                     uint32_t                                                total_bytes,
+                                     const fc::network::solana::solana_public_key&           uploader);
+
 /// Assert that the loaded IDL's `EpochDeliveries` declaration carries the
 /// fields the dispatch cursor read depends on: `consensus_reached` (bool) and
 /// `dispatched_count` (u32), in either IDL field home (inline on the account
@@ -454,7 +492,11 @@ void assert_global_state_shape(const fc::network::solana::idl::program& program)
  * consensus; the relay then attempts the separate resumable
  * `dispatch_attestations` drain, which applies effects and emits outbound on
  * its final round. The delivery return value remains the terminal call's
- * signature even if settlement must resume later.
+ * signature even if settlement must resume later. An envelope too large for
+ * one delivery deadline resumes from the staged buffer on later ticks: a tick
+ * that staged at least one chunk before its deadline ran out throws
+ * `chain::outpost_delivery_incomplete_exception` (progress, retried next tick),
+ * and only a tick that staged nothing surfaces the deadline as a failure.
  *
  * Constructed by `outpost_solana_client_plugin::create_outpost_client` —
  * `batch_operator_plugin` never builds one directly.
@@ -524,6 +566,13 @@ private:
    /// treated as an error.
    outpost_solana_client_detail::epoch_dispatch_progress
    read_epoch_dispatch_progress(uint32_t epoch_index);
+
+   /// The first data chunk of `epoch_index`'s envelope this relay still has to upload, from its own on-chain
+   /// `EnvelopeChunks` buffer (`decode_first_unstaged_chunk`). The resume is an optimisation the delivery must never
+   /// depend on, so any failure -- signer or PDA lookup, the RPC read, or decoding -- is logged and yields 0. The
+   /// caller still owns the delivery deadline: an RPC that fails because the deadline passed also yields 0 here, so
+   /// the caller checks the deadline after this returns.
+   uint16_t read_first_unstaged_chunk(uint32_t epoch_index, uint16_t total_chunks, uint32_t total_bytes);
 
    /// Send ONE `dispatch_attestations(epoch_index, dispatch_limit)` call,
    /// appending `extra_remaining_accounts` (the packed effect-account batch)

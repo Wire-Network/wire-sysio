@@ -2471,6 +2471,16 @@ std::string to_raw_cursor(std::string_view key) {
    return fc::to_hex(key.data(), static_cast<uint32_t>(key.size()), /*add_prefix=*/true);
 }
 
+/// Separates the secondary key from the primary key in a hex secondary-index cursor that names both.
+constexpr char secondary_position_separator = ':';
+
+/// Append a primary key to a hex secondary-index cursor, so it names one row among those sharing its secondary key.
+std::string append_primary_position(std::string cursor, std::string_view primary_key) {
+   cursor += secondary_position_separator;
+   cursor += fc::to_hex(primary_key.data(), static_cast<uint32_t>(primary_key.size()));
+   return cursor;
+}
+
 /// Render a json=true row `key` the codec could not NAME, the same way on the variant and
 /// streaming paths. The hex is scope-relative, matching strip_scope_fields on the JSON path,
 /// so the hex form and a decoded key describe the same key; untagged hex still means "within
@@ -2488,7 +2498,7 @@ std::string unnamed_key_to_hex(std::string_view key, size_t scope_prefix_size) {
 size_t read_only::phase1_retained_size(const read_only::table_rows_phase1& hp) {
    size_t sz = fc::raw::pack_size(hp.abi) + hp.next_key.size();
    for (const auto& row : hp.rows)
-      sz += row.key.size() + row.value.size();
+      sz += owned_table_row_bytes(row.key.size(), row.value.size());
    return sz;
 }
 
@@ -2648,6 +2658,20 @@ read_only::collect_table_rows_phase1( const read_only::get_table_rows_params& p,
                               bound_key_shapes->begin() + static_cast<ptrdiff_t>(scope_key_count));
    }
 
+   // A secondary index orders the rows that share a secondary key by primary key, so a cursor that ends a page inside
+   // such a run names the primary key too. JSON spells it as the primary key's fields beside the index's field, the way
+   // a row's `key` names them: within the scope, which is all a scoped table's index stores. Not possible when a
+   // primary key field has the index's name; such a cursor takes the raw form.
+   std::optional<std::vector<chain::be_key_codec::key_shape>> primary_position_shapes;
+   if (!resolved_index_name.empty() && key_shapes) {
+      primary_position_shapes = key_shapes;
+      if (table_is_scoped)
+         primary_position_shapes->erase(primary_position_shapes->begin());
+      if (std::ranges::any_of(*primary_position_shapes,
+                              [&](const auto& shape) { return shape.name == resolved_index_name; }))
+         primary_position_shapes.reset();
+   }
+
    // Parse bounds. When json=true the first NON-WHITESPACE character says which of
    // three forms a bound takes:
    //   '{'   a JSON key OBJECT — names the fields WITHIN the scope, so the scope
@@ -2658,11 +2682,19 @@ read_only::collect_table_rows_phase1( const read_only::get_table_rows_params& p,
    // unrepresentable key type, or a slug_name with no canonical spelling); see
    // to_raw_cursor for why it carries the whole key rather than the remainder.
    // json=false is hex only and unchanged — the complete stored key, untagged.
+   //
+   // A secondary-index cursor may also name a primary key (see primary_position_shapes):
+   // as the primary key's fields in the JSON object, or as `:` and the primary key's hex
+   // after either hex form.
    struct parsed_bound {
       std::vector<char> bytes;
       /// The bytes are already a COMPLETE stored key, scope prefix included, so they
       /// are never prefixed again -- and must be checked to lie inside the scope.
       bool              complete = false;
+      /// For a secondary index, the stored primary key that places the bound among the
+      /// rows sharing its secondary key: the bound sits just before that row. Empty
+      /// otherwise, which sorts before every primary key, so the bound sits before them all.
+      std::vector<char> primary;
    };
    auto parse_bound = [&](const std::string& bound) {
       parsed_bound out;
@@ -2676,12 +2708,27 @@ read_only::collect_table_rows_phase1( const read_only::get_table_rows_params& p,
       const size_t start = bound.find_first_not_of(" \t\n\r");
       SYS_ASSERT(start != std::string::npos, chain::contract_table_query_exception,
                  "Table {} bound is entirely whitespace", p.table);
-      const std::string body = bound.substr(start);
+      std::string body = bound.substr(start);
       if (p.json && body.starts_with('{')) {
          SYS_ASSERT(bound_key_shapes, chain::contract_table_query_exception,
                     "Table {} key type is not representable as a JSON bound; use hex bounds", p.table);
-         out.bytes = chain::be_key_codec::encode_key(fc::json::from_string(body), *bound_key_shapes);
+         const auto key_var = fc::json::from_string(body);
+         out.bytes = chain::be_key_codec::encode_key(key_var, *bound_key_shapes);
+         if (primary_position_shapes) {
+            const auto& fields = key_var.get_object();
+            if (std::ranges::any_of(*primary_position_shapes,
+                                    [&](const auto& shape) { return fields.contains(shape.name.c_str()); }))
+               out.primary = chain::be_key_codec::encode_key(key_var, *primary_position_shapes);
+         }
          return out;
+      }
+      if (const size_t separator = body.find(secondary_position_separator); separator != std::string::npos) {
+         SYS_ASSERT(!resolved_index_name.empty(), chain::contract_table_query_exception,
+                    "Table {} bound '{}' names a primary key position, which only a secondary index bound can",
+                    p.table, bound);
+         const auto primary = fc::from_hex(fc::trim_hex_prefix(body.substr(separator + 1)));
+         out.primary.assign(primary.begin(), primary.end());
+         body.resize(separator);
       }
       // Which bounds are already COMPLETE keys:
       //   json=true  + "0x"  -> a raw cursor (fc::from_hex trims the tag itself; this
@@ -2712,20 +2759,26 @@ read_only::collect_table_rows_phase1( const read_only::get_table_rows_params& p,
    };
 
    std::vector<char> lb_bytes;
+   std::vector<char> lb_primary;
    bool              lb_complete = false;
    if (!effective_lower.empty()) {
       auto parsed = parse_bound(effective_lower);
       lb_bytes    = std::move(parsed.bytes);
+      lb_primary  = std::move(parsed.primary);
       lb_complete = parsed.complete;
    }
    std::vector<char> ub_bytes;
+   std::vector<char> ub_primary;
    bool              ub_complete = false;
    bool has_upper = !effective_upper.empty();
    if (has_upper) {
       auto parsed = parse_bound(effective_upper);
       ub_bytes    = std::move(parsed.bytes);
+      ub_primary  = std::move(parsed.primary);
       ub_complete = parsed.complete;
    }
+   SYS_ASSERT(p.find.empty() || lb_primary.empty(), chain::contract_table_query_exception,
+              "Table {} find '{}' names a primary key position; find takes a key, not a page cursor", p.table, p.find);
 
    // For find: upper bound must be exclusive, so increment the encoded bytes
    // to create an exclusive upper bound (find key + 1 byte).
@@ -2778,6 +2831,8 @@ read_only::collect_table_rows_phase1( const read_only::get_table_rows_params& p,
 
    std::string_view lb_sv(lb_bytes.data(), lb_bytes.size());
    std::string_view ub_sv(ub_bytes.data(), ub_bytes.size());
+   std::string_view lb_primary_sv(lb_primary.data(), lb_primary.size());
+   std::string_view ub_primary_sv(ub_primary.data(), ub_primary.size());
 
    uint32_t limit = effective_limit;
    // Bound the per-page row count exactly as get_table_by_scope does: when the scan is subject to a finite
@@ -2788,6 +2843,9 @@ read_only::collect_table_rows_phase1( const read_only::get_table_rows_params& p,
    // unlimited http-max-response-time-ms (-1).
    if (params_deadline != fc::time_point::maximum() && limit > max_return_items)
       limit = max_return_items;
+   // The page's copied bytes are bounded whatever the deadline, so neither an unlimited deadline nor large rows let one
+   // request stage an unbounded copy; the page ends with more/next_key after the row that reaches the limit.
+   const uint64_t max_page_bytes = p.all_rows ? std::numeric_limits<uint64_t>::max() : max_return_bytes;
    bool reverse = p.reverse.has_value() && *p.reverse;
 
    // --- Secondary index query path ---
@@ -2832,12 +2890,28 @@ read_only::collect_table_rows_phase1( const read_only::get_table_rows_params& p,
          return r;
       };
 
-      // Format a secondary-index `next_key` value. When `p.json` is set, emit a JSON
-      // object matching the bound syntax (e.g. `{"byowner":"u4"}`) so
+      // Whether a cursor at index row `it` must name its primary key: the row before it in the index shares its
+      // secondary key, so the secondary key alone would put the cursor at the start of their run. A forward page
+      // resumed there repeats rows, and can repeat the same page forever; a reverse one skips the rest of the run.
+      const auto shares_secondary_key_with_previous = [&](const auto& it) {
+         if (it == sec_idx.begin())
+            return false;
+         const auto& previous = *std::prev(it);
+         return previous.code == it->code && previous.table_id == it->table_id &&
+                previous.sec_key_view() == it->sec_key_view();
+      };
+
+      // Format a secondary-index `next_key` value at index row `it`, naming its primary key
+      // when shares_secondary_key_with_previous says the secondary key alone cannot place it.
+      // When `p.json` is set, emit a JSON object matching the bound syntax (e.g.
+      // `{"byowner":"u4"}`, or `{"byowner":"u3","id":4}` with the primary key) so
       // `upper_bound = next_key` round-trips through the bound parser, which expects
       // JSON when `p.json` is set. A key the codec cannot NAME falls back to a raw
       // cursor, which that parser feeds back verbatim — so next_key is always feedable.
-      auto emit_secondary_next_key = [&](std::string_view sk) {
+      auto emit_secondary_next_key = [&](const auto& it) {
+         const std::string_view sk = it->sec_key_view();
+         const std::optional<std::string_view> pk =
+            shares_secondary_key_with_previous(it) ? std::optional{it->pri_key_view()} : std::nullopt;
          if (p.json) {
             try {
                // The shape describes the WITHIN-SCOPE fields, so the decode sees the
@@ -2847,39 +2921,59 @@ read_only::collect_table_rows_phase1( const read_only::get_table_rows_params& p,
                   sv.remove_prefix(scope_prefix_bytes.size());
                }
                FC_ASSERT(bound_key_shapes, "be_key_codec: key shape unresolved");
-               auto key_var = chain::be_key_codec::decode_key(sv.data(), sv.size(), *bound_key_shapes);
-               hp.next_key = fc::json::to_string(key_var, fc::time_point::maximum());
+               fc::mutable_variant_object key_obj(
+                  chain::be_key_codec::decode_key(sv.data(), sv.size(), *bound_key_shapes).get_object());
+               if (pk) {
+                  FC_ASSERT(primary_position_shapes, "be_key_codec: primary key position not nameable");
+                  const auto primary =
+                     chain::be_key_codec::decode_key(pk->data(), pk->size(), *primary_position_shapes);
+                  for (const auto& field : primary.get_object())
+                     key_obj(field.key(), field.value());
+               }
+               hp.next_key = fc::json::to_string(fc::variant(std::move(key_obj)), fc::time_point::maximum());
                return;
             } catch (...) {
-               hp.next_key = to_raw_cursor(sk);
+               hp.next_key = pk ? append_primary_position(to_raw_cursor(sk), *pk) : to_raw_cursor(sk);
                return;
             }
          }
          // json=false takes the stored key verbatim on the way back in.
          hp.next_key = fc::to_hex(sk.data(), sk.size());
+         if (pk)
+            hp.next_key = append_primary_position(std::move(hp.next_key), *pk);
+      };
+
+      // Bounds are positions (secondary key, primary key) in the index's own order. A bound without a primary key has
+      // an empty one, which sorts first, so it sits before every row with its secondary key.
+      const auto lower_position = boost::make_tuple(p.code, sec_tid, lb_sv, lb_primary_sv);
+      const auto upper_position = boost::make_tuple(p.code, sec_tid, ub_sv, ub_primary_sv);
+      const auto below_upper = [&](const auto& it) {
+         return std::pair{it->sec_key_view(), it->pri_key_view()} < std::pair{ub_sv, ub_primary_sv};
       };
 
       if (!reverse) {
-         auto itr = sec_idx.lower_bound(boost::make_tuple(p.code, sec_tid, lb_sv));
+         auto itr = sec_idx.lower_bound(lower_position);
          // Shared by the loop and the deadline cut, so a cut never reports a next row past the upper bound.
          const auto in_range = [&](const auto& it) {
             return it != sec_idx.end() && it->code == p.code && it->table_id == sec_tid &&
-                   (!has_upper || it->sec_key_view() < ub_sv);
+                   (!has_upper || below_upper(it));
          };
          uint32_t count = 0;
+         uint64_t bytes = 0;
          while (in_range(itr)) {
             if (count >= limit) {
                hp.more = true;
-               emit_secondary_next_key(itr->sec_key_view());
+               emit_secondary_next_key(itr);
                break;
             }
-            hp.rows.push_back(fetch_primary(*itr));
+            const auto& row = hp.rows.emplace_back(fetch_primary(*itr));
+            bytes += owned_table_row_bytes(row.key.size(), row.value.size());
             ++count;
             ++itr;
-            if (fc::time_point::now() >= params_deadline) {
+            if (fc::time_point::now() >= params_deadline || bytes >= max_page_bytes) {
                if (in_range(itr)) {
                   hp.more = true;
-                  emit_secondary_next_key(itr->sec_key_view());
+                  emit_secondary_next_key(itr);
                }
                break;
             }
@@ -2887,31 +2981,28 @@ read_only::collect_table_rows_phase1( const read_only::get_table_rows_params& p,
       } else {
          // Reverse iteration.
          //
-         // Resume cursor semantics: `next_key` is the LAST RETURNED row's sk,
-         // not the first unseen row's sk. Callers resume with
+         // Resume cursor semantics: `next_key` is the LAST RETURNED row's position,
+         // not the first unseen row's. Callers resume with
          // `upper_bound = next_key`; since `upper_bound` is exclusive and the
          // reverse loop starts at `lower_bound(upper_bound)` then `--itr`, the
          // next page yields the first row strictly below the last returned
          // one -- i.e. the first unseen row. Setting `next_key` to the first
-         // unseen row's sk instead would skip that row at every page boundary.
-         auto begin = sec_idx.lower_bound(boost::make_tuple(p.code, sec_tid, lb_sv));
+         // unseen row's position instead would skip that row at every page boundary.
+         auto begin = sec_idx.lower_bound(lower_position);
          decltype(sec_idx.end()) itr;
          if (!has_upper) {
             itr = sec_idx.upper_bound(boost::make_tuple(p.code, sec_tid));
-         } else if (ub_sv < lb_sv) {
+         } else if (std::pair{ub_sv, ub_primary_sv} < std::pair{lb_sv, lb_primary_sv}) {
             // An inverted range is empty. Seeking the upper bound would start `itr` below `begin`, and the walk down
             // could then step off the front of the index.
             itr = begin;
          } else {
-            itr = sec_idx.lower_bound(boost::make_tuple(p.code, sec_tid, ub_sv));
+            itr = sec_idx.lower_bound(upper_position);
          }
          uint32_t count = 0;
-         // Remember the last-returned row's sec_key bytes so the cutoff
-         // branches below can feed them to `emit_secondary_next_key`.
-         std::vector<char> last_added_sk_bytes;
-         auto last_added_sv = [&]() {
-            return std::string_view(last_added_sk_bytes.data(), last_added_sk_bytes.size());
-         };
+         uint64_t bytes = 0;
+         // The last-returned row, which the cutoff branches below feed to `emit_secondary_next_key`.
+         std::optional<decltype(itr)> last_added;
          if (itr != begin) {
             do {
                --itr;
@@ -2919,19 +3010,20 @@ read_only::collect_table_rows_phase1( const read_only::get_table_rows_params& p,
                auto sk = itr->sec_key_view();
                if (!lb_bytes.empty() && sk < lb_sv) break;
                if (count >= limit) {
-                  if (!last_added_sk_bytes.empty()) {
+                  if (last_added) {
                      hp.more = true;
-                     emit_secondary_next_key(last_added_sv());
+                     emit_secondary_next_key(*last_added);
                   }
                   break;
                }
-               hp.rows.push_back(fetch_primary(*itr));
-               last_added_sk_bytes.assign(sk.data(), sk.data() + sk.size());
+               const auto& row = hp.rows.emplace_back(fetch_primary(*itr));
+               bytes += owned_table_row_bytes(row.key.size(), row.value.size());
+               last_added = itr;
                ++count;
-               if (fc::time_point::now() >= params_deadline) {
+               if (fc::time_point::now() >= params_deadline || bytes >= max_page_bytes) {
                   if (itr != begin) {
                      hp.more = true;
-                     emit_secondary_next_key(last_added_sv());
+                     emit_secondary_next_key(itr);
                   }
                   break;
                }
@@ -2953,7 +3045,8 @@ read_only::collect_table_rows_phase1( const read_only::get_table_rows_params& p,
       has_upper ? std::optional<std::vector<char>>(std::move(ub_bytes)) : std::nullopt,
       reverse ? scan_direction::reverse : scan_direction::forward, limit};
    table_read_budget budget;
-   budget.deadline = params_deadline;
+   budget.deadline  = params_deadline;
+   budget.max_bytes = max_page_bytes;
    auto page = capture_primary_page(db, request, budget);
    hp.rows = std::move(page.rows);
    hp.more = page.more;
@@ -3272,6 +3365,16 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
       return it != tid_to_name.end() ? it->second : string();
    };
 
+   // As in get_table_rows, a page's bytes are bounded whatever the deadline: it ends with `more` after the row that
+   // reaches max_return_bytes. Two row slots cover the row vector's growth.
+   uint64_t bytes = 0;
+   const auto add_row = [&](uint64_t scope_raw, uint16_t tid) {
+      const auto& row =
+         result.rows.emplace_back(get_table_by_scope_result_row{p.code, name(scope_raw), table_name_for(tid)});
+      bytes += 2 * sizeof(get_table_by_scope_result_row) + row.table.size();
+   };
+   const auto page_full = [&] { return fc::time_point::now() >= params_deadline || bytes >= max_return_bytes; };
+
    bool reverse = p.reverse && *p.reverse;
 
    if (!reverse) {
@@ -3323,12 +3426,13 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
             continue;
          }
 
-         // Emit this (table_id, scope) pair
-         if (count >= limit) {
+         // Emit this (table_id, scope) pair, unless the page is full: a page holds at least one row, and ends at the
+         // deadline or byte limit only here, where the next row is known to exist and be in range.
+         if (count >= limit || (count > 0 && page_full())) {
             result.more = table_name_for(cur_tid) + ":" + name(scope_raw).to_string();
             break;
          }
-         result.rows.push_back({p.code, name(scope_raw), table_name_for(cur_tid)});
+         add_row(scope_raw, cur_tid);
          ++count;
 
          // Seek-skip to next scope: advance scope by 1, overflow to next table_id
@@ -3341,14 +3445,6 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
             itr = kv_idx.lower_bound(
                boost::make_tuple(p.code, static_cast<uint16_t>(cur_tid + 1), seek.to_string_view()));
          } else {
-            break;
-         }
-
-         if (fc::time_point::now() >= params_deadline) {
-            if (is_valid(itr)) {
-               uint64_t ns = extract_scope(itr->key_view());
-               result.more = table_name_for(itr->table_id) + ":" + name(ns).to_string();
-            }
             break;
          }
       }
@@ -3399,12 +3495,13 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
             continue;
          }
 
-         // Emit this (table_id, scope) pair
-         if (count >= limit) {
+         // Emit this (table_id, scope) pair, unless the page is full: a page holds at least one row, and ends at the
+         // deadline or byte limit only here, where the next row is known to exist and be in range.
+         if (count >= limit || (count > 0 && page_full())) {
             result.more = table_name_for(cur_tid) + ":" + name(scope_raw).to_string();
             break;
          }
-         result.rows.push_back({p.code, name(scope_raw), table_name_for(cur_tid)});
+         add_row(scope_raw, cur_tid);
          ++count;
 
          // Seek-skip to previous scope
@@ -3420,18 +3517,6 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
          }
          itr = kv_idx.upper_bound(
             boost::make_tuple(p.code, cur_tid, seek.to_string_view()));
-
-         if (fc::time_point::now() >= params_deadline) {
-            if (itr != kv_idx.begin()) {
-               auto prev = itr;
-               --prev;
-               if (is_valid(prev)) {
-                  uint64_t ns = extract_scope(prev->key_view());
-                  result.more = table_name_for(prev->table_id) + ":" + name(ns).to_string();
-               }
-            }
-            break;
-         }
       }
    }
 

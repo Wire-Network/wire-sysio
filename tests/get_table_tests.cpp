@@ -3436,4 +3436,384 @@ BOOST_FIXTURE_TEST_CASE( get_kv_rows_pagination_edges_test, validating_tester ) 
 
 } FC_LOG_AND_RETHROW() /// get_kv_rows_pagination_edges_test
 
+/// Bytes a captured row of `account`'s `table` costs against the page byte limit; every row of the tests below has the
+/// same size.
+static uint64_t first_row_bytes(const controller& control, account_name account, const std::string& table) {
+   const auto abi = chain_apis::get_abi(control, account);
+   const auto def = std::find_if(abi.tables.begin(), abi.tables.end(), [&](const auto& t) { return t.name == table; });
+   BOOST_REQUIRE(def != abi.tables.end());
+   chain_apis::primary_scan_request scan;
+   scan.code      = account;
+   scan.table_id  = def->table_id;
+   scan.page_rows = 1;
+   chain_apis::table_read_budget budget;
+   const auto page = chain_apis::capture_primary_page(control, scan, budget);
+   BOOST_REQUIRE_EQUAL(page.rows.size(), 1u);
+   return chain_apis::owned_table_row_bytes(page.rows.front().key.size(), page.rows.front().value.size());
+}
+
+/// Page through `p` until `more` is false, resuming each page from `next_key`, and return each page's rows as `id_of`
+/// names them.
+template <typename Id>
+static std::vector<std::vector<Id>> page_through(chain_apis::read_only& api,
+                                                 chain_apis::read_only::get_table_rows_params p,
+                                                 const std::function<Id(const fc::variant&)>& id_of) {
+   constexpr size_t max_pages = 100;
+   std::vector<std::vector<Id>> pages;
+   const bool reverse = p.reverse.value_or(false);
+   while (pages.size() < max_pages) {
+      const auto page = get_table_rows_kv(api, p, fc::time_point::maximum());
+      auto& ids = pages.emplace_back();
+      for (const auto& row : page.rows)
+         ids.push_back(id_of(row));
+      if (!page.more)
+         break;
+      (reverse ? p.upper_bound : p.lower_bound) = page.next_key;
+   }
+   BOOST_REQUIRE_LT(pages.size(), max_pages);
+   return pages;
+}
+
+/// Check that paging returned `expected`, printing both as JSON when it did not.
+template <typename Id>
+static void check_pages(const std::vector<std::vector<Id>>& actual, const std::vector<std::vector<Id>>& expected) {
+   const auto json = [](const std::vector<std::vector<Id>>& pages) {
+      return fc::json::to_string(fc::variant(pages), fc::time_point::maximum());
+   };
+   BOOST_CHECK_MESSAGE(actual == expected, "pages " << json(actual) << " != " << json(expected));
+}
+
+/// A get_table_rows page ends after the row that brings its copied bytes to read_only's byte limit, under an
+/// unlimited deadline and a limit past max_return_items, on the primary index forward and reverse. Paging on next_key
+/// still returns every row once; a row larger than the limit still makes a page; all_rows is exempt.
+BOOST_FIXTURE_TEST_CASE( get_table_rows_page_byte_limit_test, validating_tester ) try {
+   constexpr auto account = "kvbytes"_n;
+   constexpr uint64_t row_count = 12;
+   constexpr size_t payload_size = 8 * 1024;
+   constexpr uint32_t rows_per_page = 3;
+   produce_block();
+   // No ROA policy or RAM gift, so the account has unlimited RAM for the rows.
+   create_accounts({account}, false, true, false, false);
+   produce_block();
+   set_code(account, test_contracts::test_kv_map_wasm());
+   set_abi(account, test_contracts::test_kv_map_abi());
+   produce_block();
+   const std::string payload(payload_size, 'p');
+   for (uint64_t id = 0; id < row_count; ++id)
+      kv_put(*this, account, "r", id, payload, id);
+   produce_block();
+
+   std::optional<sysio::chain_apis::tracked_votes> votes;
+   // http-max-response-time-ms = -1: an unlimited deadline, so limit is not clamped to max_return_items either.
+   chain_apis::read_only api(*control, {}, {}, votes, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+   chain_apis::read_only::get_table_rows_params p;
+   p.json  = true;
+   p.code  = account;
+   p.table = "geodata";
+   p.limit = 100000;
+   const std::function<uint64_t(const fc::variant&)> id_of = [](const fc::variant& row) {
+      return row["value"]["amount"].as_uint64();
+   };
+
+   // Under the default limit the whole table is one page.
+   check_pages(page_through(api, p, id_of), {{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}});
+
+   api.set_max_return_bytes((rows_per_page - 1) * first_row_bytes(*control, account, "geodata") + 1);
+   const std::vector<std::vector<uint64_t>> forward_pages{{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {9, 10, 11}};
+   check_pages(page_through(api, p, id_of), forward_pages);
+
+   p.reverse = true;
+   const std::vector<std::vector<uint64_t>> reverse_pages{{11, 10, 9}, {8, 7, 6}, {5, 4, 3}, {2, 1, 0}};
+   check_pages(page_through(api, p, id_of), reverse_pages);
+
+   // A row larger than the limit is still returned, alone, so paging always progresses.
+   api.set_max_return_bytes(1);
+   p.reverse = false;
+   std::vector<std::vector<uint64_t>> single_row_pages;
+   for (uint64_t id = 0; id < row_count; ++id)
+      single_row_pages.push_back({id});
+   check_pages(page_through(api, p, id_of), single_row_pages);
+
+   // all_rows walks the whole table in one call whatever the limit.
+   p.all_rows = true;
+   const auto all = get_table_rows_kv(api, p, fc::time_point::maximum());
+   BOOST_CHECK_EQUAL(all.rows.size(), row_count);
+   BOOST_CHECK(!all.more);
+} FC_LOG_AND_RETHROW()
+
+/// The page byte limit cuts a secondary-index scan too, forward and reverse, without dropping a row at a page
+/// boundary.
+BOOST_FIXTURE_TEST_CASE( get_table_rows_secondary_page_byte_limit_test, validating_tester ) try {
+   constexpr auto account = "secbytes"_n;
+   constexpr uint32_t rows_per_page = 3;
+   setup_secrev(*this, account);
+
+   std::optional<sysio::chain_apis::tracked_votes> votes;
+   chain_apis::read_only api(*control, {}, {}, votes, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+   // A secondary page copies the same primary rows a primary page does.
+   api.set_max_return_bytes((rows_per_page - 1) * first_row_bytes(*control, account, "users") + 1);
+
+   chain_apis::read_only::get_table_rows_params p;
+   p.json       = true;
+   p.code       = account;
+   p.table      = "users";
+   p.index_name = "byowner";
+   p.limit      = 100000;
+   const std::function<std::string(const fc::variant&)> owner_of = [](const fc::variant& row) {
+      return row["value"]["owner"].as_string();
+   };
+   const std::vector<std::vector<std::string>> forward_pages{{"u1", "u2", "u3"}, {"u4", "u5"}};
+   check_pages(page_through(api, p, owner_of), forward_pages);
+
+   p.reverse = true;
+   const std::vector<std::vector<std::string>> reverse_pages{{"u5", "u4", "u3"}, {"u2", "u1"}};
+   check_pages(page_through(api, p, owner_of), reverse_pages);
+} FC_LOG_AND_RETHROW()
+
+/// get_table_by_scope pages on the same byte limit, forward and reverse, whatever the deadline.
+BOOST_FIXTURE_TEST_CASE( get_table_by_scope_page_byte_limit_test, validating_tester ) try {
+   produce_block();
+   create_accounts({"sysio.token"_n});
+   const std::vector<account_name> holders{"inita"_n, "initb"_n, "initc"_n, "initd"_n};
+   create_accounts(holders);
+   produce_block();
+   set_code("sysio.token"_n, test_contracts::sysio_token_wasm());
+   set_abi("sysio.token"_n, test_contracts::sysio_token_abi());
+   set_privileged("sysio.token"_n);
+   produce_block();
+   push_action("sysio.token"_n, "create"_n, "sysio.token"_n,
+               mutable_variant_object()("issuer", "sysio")
+                                       ("maximum_supply", asset::from_string("1000000000.0000 SYS")));
+   for (account_name holder : holders)
+      issue_tokens(*this, config::system_account_name, holder, asset::from_string("999.0000 SYS"));
+   produce_block();
+   const std::vector<name> scopes{"inita"_n, "initb"_n, "initc"_n, "initd"_n, "sysio"_n};
+
+   std::optional<sysio::chain_apis::tracked_votes> votes;
+   chain_apis::read_only api(*control, {}, {}, votes, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+   chain_apis::read_only::get_table_by_scope_params p{"sysio.token"_n, "accounts"_n, "", "", 100000};
+   const auto scopes_of = [&](bool reverse) {
+      std::vector<std::vector<name>> pages;
+      auto params = p;
+      params.reverse = reverse;
+      for (size_t page_count = 0; page_count <= scopes.size(); ++page_count) {
+         const auto page = api.get_table_by_scope(params, fc::time_point::maximum());
+         auto& page_scopes = pages.emplace_back();
+         for (const auto& row : page.rows)
+            page_scopes.push_back(row.scope);
+         if (page.more.empty())
+            break;
+         (reverse ? params.upper_bound : params.lower_bound) = page.more;
+      }
+      return pages;
+   };
+
+   // Under the default limit the whole table is one page.
+   check_pages(scopes_of(false), std::vector<std::vector<name>>{scopes});
+
+   // A limit below one row's bytes returns one row per page, each resuming where the last ended.
+   api.set_max_return_bytes(1);
+   std::vector<std::vector<name>> forward_pages, reverse_pages;
+   for (const auto& scope : scopes)
+      forward_pages.push_back({scope});
+   reverse_pages.assign(forward_pages.rbegin(), forward_pages.rend());
+   check_pages(scopes_of(false), forward_pages);
+   check_pages(scopes_of(true), reverse_pages);
+} FC_LOG_AND_RETHROW()
+
+
+/// Hex of `v` as an 8-byte big-endian key, the way the KV index stores a uint64, name or slug_name key.
+static std::string be64_hex(uint64_t v) {
+   char buf[8];
+   chain::kv_encode_be64(buf, v);
+   return fc::to_hex(buf, sizeof(buf));
+}
+
+/// A secondary index orders rows that share a secondary key by primary key, so a page that ends among them names the
+/// primary key of the row it stops at as well; between runs the cursor stays the secondary key alone. Paging on
+/// next_key returns every row once, forward and reverse, whether the byte limit, `limit` or the deadline ends the page,
+/// in JSON and in hex. A primary key position is refused on the primary index and in `find`.
+BOOST_FIXTURE_TEST_CASE( get_table_rows_secondary_equal_keys_paging_test, validating_tester ) try {
+   constexpr auto account = "secequal"_n;
+   constexpr uint32_t rows_per_page = 3;
+   produce_block();
+   create_accounts({account});
+   produce_block();
+   set_code(account, test_contracts::test_kv_sec_query_wasm());
+   set_abi(account, test_contracts::test_kv_sec_query_abi());
+   produce_block();
+   // byowner orders the rows (owner, id): ids 1 to 10 in turn, with 3 to 8 sharing "u3".
+   const std::map<uint64_t, std::string> owners{{1, "u1"}, {2, "u2"}, {3, "u3"}, {4, "u3"}, {5, "u3"},
+                                                {6, "u3"}, {7, "u3"}, {8, "u3"}, {9, "u4"}, {10, "u5"}};
+   for (const auto& [id, owner] : owners)
+      push_action(account, "adduser"_n, account, mutable_variant_object()("id", id)("owner", owner)("balance", id));
+   produce_block();
+
+   const std::vector<std::vector<uint64_t>> forward_pages{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}, {10}};
+   const std::vector<std::vector<uint64_t>> reverse_pages{{10, 9, 8}, {7, 6, 5}, {4, 3, 2}, {1}};
+   const std::function<uint64_t(const fc::variant&)> id_of = [](const fc::variant& row) {
+      return row["key"]["id"].as_uint64();
+   };
+   const std::function<uint64_t(const fc::variant&)> hex_id_of = [](const fc::variant& row) {
+      const auto key = fc::from_hex(row["key"].as_string());
+      BOOST_REQUIRE_EQUAL(key.size(), sizeof(uint64_t));
+      return chain::kv_load_be64(reinterpret_cast<const char*>(key.data()));
+   };
+
+   std::optional<sysio::chain_apis::tracked_votes> votes;
+   chain_apis::read_only api(*control, {}, {}, votes, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+   chain_apis::read_only::get_table_rows_params p;
+   p.code       = account;
+   p.table      = "users";
+   p.index_name = "byowner";
+   const auto check_both_ways = [&](const std::vector<std::vector<uint64_t>>& forward,
+                                    const std::vector<std::vector<uint64_t>>& reverse) {
+      for (const bool json : {true, false}) {
+         BOOST_TEST_CONTEXT("json " << json) {
+            p.json    = json;
+            p.reverse = false;
+            check_pages(page_through(api, p, json ? id_of : hex_id_of), forward);
+            p.reverse = true;
+            check_pages(page_through(api, p, json ? id_of : hex_id_of), reverse);
+         }
+      }
+   };
+
+   // Pages ended by the byte limit, under a limit that never ends one.
+   api.set_max_return_bytes((rows_per_page - 1) * first_row_bytes(*control, account, "users") + 1);
+   p.limit = 100000;
+   check_both_ways(forward_pages, reverse_pages);
+
+   // Pages ended by `limit`.
+   api.set_max_return_bytes(chain_apis::api_base::default_max_return_bytes);
+   p.limit = rows_per_page;
+   check_both_ways(forward_pages, reverse_pages);
+
+   // Pages ended by the deadline: one already past ends each page at its first row.
+   p.limit         = 100000;
+   p.time_limit_ms = 0;
+   std::vector<std::vector<uint64_t>> single_row_pages;
+   for (const auto& [id, owner] : owners)
+      single_row_pages.push_back({id});
+   check_both_ways(single_row_pages, {single_row_pages.rbegin(), single_row_pages.rend()});
+   p.time_limit_ms.reset();
+
+   // The cursor forms. Forward names the first row not returned, reverse the last one returned.
+   const auto first_cursor = [&](bool json, bool reverse, uint32_t limit) {
+      p.json    = json;
+      p.reverse = reverse;
+      p.limit   = limit;
+      const auto page = get_table_rows_kv(api, p, fc::time_point::maximum());
+      BOOST_REQUIRE(page.more);
+      return page.next_key;
+   };
+   const std::string u3 = be64_hex("u3"_n.to_uint64_t());
+   BOOST_CHECK_EQUAL(first_cursor(true, false, 3), R"({"byowner":"u3","id":4})");
+   BOOST_CHECK_EQUAL(first_cursor(true, false, 2), R"({"byowner":"u3"})"); // id 3 starts the run
+   BOOST_CHECK_EQUAL(first_cursor(true, true, 3), R"({"byowner":"u3","id":8})");
+   BOOST_CHECK_EQUAL(first_cursor(true, true, 2), R"({"byowner":"u4"})"); // id 9 is the only "u4"
+   BOOST_CHECK_EQUAL(first_cursor(false, false, 3), u3 + ":" + be64_hex(4));
+   BOOST_CHECK_EQUAL(first_cursor(false, true, 3), u3 + ":" + be64_hex(8));
+
+   // A bound may name a primary key position by hand too, in either form.
+   p.json    = true;
+   p.reverse = false;
+   p.limit   = 100;
+   p.lower_bound = R"({"byowner":"u3","id":7})";
+   p.upper_bound = "0x" + u3 + ":" + be64_hex(8);
+   const auto bounded = get_table_rows_kv(api, p, fc::time_point::maximum());
+   BOOST_REQUIRE_EQUAL(bounded.rows.size(), 1u);
+   BOOST_CHECK_EQUAL(id_of(bounded.rows[0]), 7u);
+   BOOST_CHECK(!bounded.more);
+
+   // Refused where it does not apply: on the primary index, and in a `find`.
+   p.upper_bound.clear();
+   p.json        = false;
+   p.index_name.clear();
+   p.lower_bound = be64_hex(1) + ":" + be64_hex(1);
+   BOOST_CHECK_THROW(get_table_rows_kv(api, p, fc::time_point::maximum()), chain::contract_table_query_exception);
+   p.json        = true;
+   p.index_name  = "byowner";
+   p.lower_bound.clear();
+   p.find        = R"({"byowner":"u3","id":4})";
+   BOOST_CHECK_THROW(get_table_rows_kv(api, p, fc::time_point::maximum()), chain::contract_table_query_exception);
+} FC_LOG_AND_RETHROW()
+
+/// The primary key a scoped secondary cursor names is the one the index stores, within the scope, so it pages within
+/// the scope; one the ABI cannot name is carried in the raw form, hex after `:`.
+BOOST_FIXTURE_TEST_CASE( get_table_rows_scoped_secondary_equal_keys_paging_test, validating_tester ) try {
+   constexpr uint64_t shared_payload = 10;
+   constexpr uint64_t unnamed_code = uint64_t{34} << 42; // no canonical spelling; sorts after "WIRE"
+   create_account("test"_n);
+   set_code("test"_n, test_contracts::get_table_test_wasm());
+   set_abi("test"_n, test_contracts::get_table_test_abi());
+   produce_block();
+
+   const uint64_t sca = "sca"_n.to_uint64_t();
+   const auto add = [&](const fc::variant& code, uint64_t payload, const std::string& alt) {
+      push_action("test"_n, "addsslug"_n, "test"_n,
+                  mutable_variant_object()("scope", sca)("code", code)("payload", payload)("alt", alt));
+   };
+   // bypayload orders the rows (payload, code): AAA, BBB, CCC, DDD share the payload, then EEE.
+   add(fc::variant("ETH"), shared_payload, "AAA");
+   add(fc::variant("SOL"), shared_payload, "BBB");
+   add(fc::variant("USDC"), shared_payload, "CCC");
+   // The transitional object carrier is the one writer left that stores a slug with no spelling.
+   add(fc::variant(mutable_variant_object()("value", unnamed_code)), shared_payload, "DDD");
+   add(fc::variant("WIRE"), shared_payload * 2, "EEE");
+   produce_block();
+
+   std::optional<sysio::chain_apis::tracked_votes> votes;
+   chain_apis::read_only api(*control, {}, {}, votes, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+   chain_apis::read_only::get_table_rows_params p;
+   p.json       = true;
+   p.code       = "test"_n;
+   p.table      = "sslugobjs";
+   p.scope      = "sca";
+   p.index_name = "bypayload";
+   p.limit      = 1;
+
+   const auto page_cursors = [&](bool reverse) {
+      std::vector<std::string> alts, cursors;
+      p.reverse = reverse;
+      p.lower_bound.clear();
+      p.upper_bound.clear();
+      for (size_t page_count = 0; page_count < 10; ++page_count) {
+         const auto page = get_table_rows_kv(api, p, fc::time_point::maximum());
+         BOOST_REQUIRE_EQUAL(page.rows.size(), 1u);
+         // In hex a row is its stored key and value, so name it by its key.
+         alts.push_back(p.json ? page.rows[0]["value"]["alt"].as_string() : page.rows[0]["key"].as_string());
+         if (!page.more)
+            break;
+         cursors.push_back(page.next_key);
+         (reverse ? p.upper_bound : p.lower_bound) = page.next_key;
+      }
+      return std::pair{alts, cursors};
+   };
+   const std::string payload_key = be64_hex(sca) + be64_hex(shared_payload);
+   const std::string unnamed_cursor = "0x" + payload_key + ":" + be64_hex(unnamed_code);
+
+   const auto [forward_alts, forward_cursors] = page_cursors(false);
+   BOOST_CHECK(forward_alts == (std::vector<std::string>{"AAA", "BBB", "CCC", "DDD", "EEE"}));
+   BOOST_CHECK(forward_cursors == (std::vector<std::string>{R"({"bypayload":10,"code":"SOL"})",
+                                                            R"({"bypayload":10,"code":"USDC"})",
+                                                            unnamed_cursor,
+                                                            R"({"bypayload":20})"}));
+
+   const auto [reverse_alts, reverse_cursors] = page_cursors(true);
+   BOOST_CHECK(reverse_alts == (std::vector<std::string>{"EEE", "DDD", "CCC", "BBB", "AAA"}));
+   BOOST_CHECK(reverse_cursors == (std::vector<std::string>{R"({"bypayload":20})",
+                                                            unnamed_cursor,
+                                                            R"({"bypayload":10,"code":"USDC"})",
+                                                            R"({"bypayload":10,"code":"SOL"})"}));
+
+   // In hex every cursor is the stored secondary key, and the stored primary key inside a run.
+   p.json = false;
+   const auto [hex_keys, hex_cursors] = page_cursors(false);
+   BOOST_CHECK_EQUAL(hex_keys.size(), 5u);
+   BOOST_REQUIRE_EQUAL(hex_cursors.size(), 4u);
+   BOOST_CHECK_EQUAL(hex_cursors[2], payload_key + ":" + be64_hex(unnamed_code));
+   BOOST_CHECK_EQUAL(hex_cursors[3], be64_hex(sca) + be64_hex(shared_payload * 2));
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()
