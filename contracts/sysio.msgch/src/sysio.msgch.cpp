@@ -5,6 +5,7 @@
 #include <sysio.tokens/sysio.tokens.hpp>   // active-liq-token gate on the SYNDICATE_LIQ / LIQ_YIELD paths
 #include <sysio.chalg/sysio.chalg.hpp>     // dispute trigger + open-dispute gate (disputes table)
 #include <sysio.opreg/sysio.opreg.hpp>     // operator-status delivery gate (operators table)
+#include <sysio.opreg/eligibility.hpp>
 #include <sysio.roa.hpp>                    // authoritative Tier-1 electorate preflight
 #include <sysio/slug_name.hpp>
 #include <sysio.opp.common/evm_address.hpp>
@@ -147,7 +148,8 @@ msgch::outbound_queue_entry outbound_queue_of(const msgch::outqueue_t& queues, u
 /// consensus becomes arithmetically impossible and the epoch stalls chain-wide.
 ///
 /// The count is of members who can ACTUALLY deliver, which is the resident group INTERSECTED with
-/// current opreg ACTIVE status -- exactly the admission rule `deliver` enforces. The resident group
+/// current opreg ACTIVE status and batch collateral policy -- exactly the admission rule `deliver` enforces.
+/// The resident group
 /// is a snapshot taken at schbatchgps/advance time; an operator slashed, terminated, or dropped
 /// below its collateral minimum mid-window stays in `batch_op_groups[current]` but is refused by
 /// `deliver` ("delivering operator is not ACTIVE in sysio.opreg"). Counting raw snapshot members
@@ -174,11 +176,12 @@ std::vector<name> eligible_batch_operators() {
    if (state.current_batch_op_group >= state.batch_op_groups.size()) return {};
 
    opreg::operators_t ops(OPREG_ACCOUNT);
+   const auto collateral_config = opreg_eligibility::current_config();
    std::vector<name> eligible;
    for (const auto& member : state.batch_op_groups[state.current_batch_op_group]) {
       const auto key = opreg::operator_key{member.value};
       if (!ops.contains(key)) continue;
-      if (ops.get(key).status == opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE) {
+      if (opreg_eligibility::is_active_batch_operator(ops.get(key), collateral_config)) {
          eligible.push_back(member);
       }
    }
@@ -1011,17 +1014,17 @@ void msgch::bootstrap() {
 void msgch::deliver(name batch_op_name, uint64_t chain_code, std::vector<char> data) {
    is_batch_operator_active(batch_op_name);
 
-   // Gate on the operator's *current* opreg status, not just resident-group
-   // membership. The batch-op group is a snapshot taken at advance()/schbatchgps
+   // Gate on current standing, including a policy increase that has not yet
+   // changed stored status. The group is a snapshot taken at advance()/schbatchgps
    // time; an operator slashed, terminated, or dropped below its collateral
-   // minimum (status -> UNKNOWN) mid-window stays in batch_op_groups[current]
+   // minimum mid-window stays in batch_op_groups[current]
    // until the next reschedule. Membership is therefore necessary but not
-   // sufficient: only an ACTIVE operator may deliver and be counted toward
+   // sufficient: only a currently eligible ACTIVE batch operator may deliver and be counted toward
    // consensus. A missing operator row is treated as not-active (fail closed).
    opreg::operators_t ops(OPREG_ACCOUNT);
    auto op = ops.get(opreg::operator_key{batch_op_name.value},
                      "delivering operator has no sysio.opreg registration");
-   check(op.status == opp::types::OperatorStatus::OPERATOR_STATUS_ACTIVE,
+   check(opreg_eligibility::is_active_batch_operator(op, opreg_eligibility::current_config()),
          "delivering operator is not ACTIVE in sysio.opreg");
 
    check(!data.empty(), "delivery data cannot be empty");

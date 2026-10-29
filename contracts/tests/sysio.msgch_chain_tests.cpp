@@ -66,6 +66,24 @@ constexpr uint32_t SOL_EXTERNAL_CHAIN_ID = 1;     ///< External chain id the fix
 /// Native collateral used by the operator fixtures.
 constexpr std::string_view WIRE_CHAIN_CODE = "WIRE";
 constexpr uint64_t BATCH_OPERATOR_MINIMUM_COLLATERAL = 1;
+/// The reconciliation slice must be exhausted before a seated stale ACTIVE row is visited.
+constexpr uint32_t BATCH_RECHECK_ROWS = 32;
+/// Default policy thresholds mirrored from sysio.opreg for policy-only collateral changes.
+constexpr uint32_t DEFAULT_MAX_CONSECUTIVE_MISSES = 5;
+constexpr uint32_t DEFAULT_MAX_PERCENT_MISSES = 5;
+/// Payloads distinguish the eligibility regressions' independently constructed envelopes.
+constexpr char RAISED_COLLATERAL_PAYLOAD[] = "raised-collateral-minimum";
+constexpr char COLLATERAL_CHANGE_PAYLOAD[] = "collateral-change-after-delivery";
+constexpr char PRE_POLICY_DELIVERY_PAYLOAD[] = "delivery-before-collateral-change";
+constexpr char POLICY_RECOVERY_PAYLOAD[] = "policy-recovery";
+constexpr char POLICY_ROSTER_PAYLOAD[] = "policy-roster-anchor";
+/// Lower-key registrations exhaust maintenance before any seated batch operator is visited.
+constexpr std::string_view SWEEP_PREFIX = "aaa.";
+/// Admission and scheduling errors observed at the public action boundary.
+constexpr char INELIGIBLE_DELIVERY_ERROR[] =
+   "assertion failure with message: delivering operator is not ACTIVE in sysio.opreg";
+constexpr char INSUFFICIENT_BATCH_OPERATORS_ERROR[] =
+   "assertion failure with message: not enough available batch operators for group assignment";
 constexpr uint64_t TABLE_SCAN_LIMIT = 64;
 constexpr uint32_t ONE_OPERATOR_PER_TIED_VERSION = 1;
 constexpr uint32_t THREE_OPERATORS_PER_TIED_VERSION = 3;
@@ -88,6 +106,8 @@ namespace opreg_actions {
 constexpr name SET_CONFIG        = "setconfig"_n;
 constexpr name RECORD_DELIVERY   = "recorddel"_n;
 constexpr name TERMINATION_CHECK = "termcheck"_n;
+constexpr name RECHECK_BATCH     = "recheckbatch"_n;
+constexpr name REGISTER_OPERATOR = "regoperator"_n;
 } // namespace opreg_actions
 
 /// sysio.opreg ABI field identifiers used by the WNS-16 fixture.
@@ -102,6 +122,8 @@ constexpr const char* CHAIN_CODE     = "chain_code";
 constexpr const char* ACCOUNT        = "account";
 constexpr const char* EPOCH          = "epoch";
 constexpr const char* DELIVERED      = "delivered";
+constexpr const char* TYPE           = "type";
+constexpr const char* IS_BOOTSTRAPPED = "is_bootstrapped";
 } // namespace opreg_fields
 
 /// sysio.opreg tables read by delivery-log assertions.
@@ -225,11 +247,35 @@ constexpr name FORCE_REGISTER = "forcereg"_n;
 /// sysio.system identifiers used while activating the empty ROA fixture.
 namespace system_actions {
 constexpr name SET_PRIVILEGED = "setpriv"_n;
+constexpr name ACCRUE_EPOCH = "accrueepoch"_n;
+constexpr name RECORD_BATCH = "rcrdbatch"_n;
+constexpr name PAY_EPOCH = "payepoch"_n;
 } // namespace system_actions
+
+/// System reward-claim table and ABI type inspected by batch policy regressions.
+namespace system_tables {
+constexpr auto PAY_CLAIMS = "payclaims"_n;
+} // namespace system_tables
+
+namespace system_abi_types {
+constexpr const char* PAY_CLAIM = "pay_claim";
+} // namespace system_abi_types
+
+/// Epoch scheduling entry point whose pool must enforce the current collateral policy.
+namespace epoch_actions {
+constexpr auto SCHEDULE_BATCH_GROUPS = "schbatchgps"_n;
+} // namespace epoch_actions
 
 namespace system_fields {
 constexpr const char* ACCOUNT = "account";
 constexpr const char* IS_PRIVILEGED = "is_priv";
+constexpr const char* EPOCH_INDEX = "epoch_index";
+constexpr const char* BATCH_GROUP_INDEX = "batch_group_index";
+constexpr const char* PER_EPOCH_EMISSION = "per_epoch_emission";
+constexpr const char* MEMBERS = "members";
+constexpr const char* BATCH_OP_GROUPS = "batch_op_groups";
+constexpr const char* PERIOD_EMISSION = "period_emission";
+constexpr const char* BALANCE = "balance";
 } // namespace system_fields
 
 /// sysio.roa ABI field identifiers used by the empty-electorate retry regression.
@@ -884,8 +930,10 @@ public:
 
    /// The OPERATORS roster the most recent envelope for `chain_code` carries, checked against the
    /// schedule after inline mutations: it lists exactly the window's members that have an opreg row,
-   /// each with its current status, ahead of BATCH_OPERATOR_GROUPS. Returns account name -> status.
-   std::map<std::string, opp::types::OperatorStatus> require_roster_is_window(uint64_t chain_code) {
+   /// each with its current status, ahead of BATCH_OPERATOR_GROUPS. Explicit overrides pin effective
+   /// policy standing for a row whose stored status the bounded sweep has not yet reconciled.
+   std::map<std::string, opp::types::OperatorStatus> require_roster_is_window(uint64_t chain_code,
+      const std::map<std::string, opp::types::OperatorStatus>& expected_status_overrides = {}) {
       const auto row = find_outbound_envelope(chain_code);
       BOOST_REQUIRE(!row.is_null());
       const auto env = decode_envelope(row["raw_envelope"].as<std::vector<char>>());
@@ -916,7 +964,10 @@ public:
       BOOST_REQUIRE_EQUAL(roster.size(), window.size());
       for (const auto& [account, status] : roster) {
          BOOST_REQUIRE_MESSAGE(window.count(account), account << " is in the roster but not seated");
-         BOOST_REQUIRE_EQUAL(status, get_operator(name{account})["status"].as<opp::types::OperatorStatus>());
+         const auto override = expected_status_overrides.find(account);
+         const auto expected = override == expected_status_overrides.end()
+            ? get_operator(name{account})["status"].as<opp::types::OperatorStatus>() : override->second;
+         BOOST_REQUIRE_EQUAL(status, expected);
       }
       return roster;
    }
@@ -1070,10 +1121,10 @@ public:
          ("config_timestamp_ms", uint64_t{0}));
    }
 
-   /// Reconfigure only the rolling-termination rails while preserving the WNS-16 fixture's
-   /// collateral requirements. This lets the test build real history under a permissive policy,
-   /// then demonstrate that deferred slashing wins when the same history becomes terminating.
-   void set_termination_thresholds(uint32_t max_consecutive_misses, uint32_t max_percent_misses) {
+   /// Reconfigure the operator policy, preserving the fixture's collateral minimum by default.
+   /// Tests may raise the minimum independently of any operator balance or stored status change.
+   void set_termination_thresholds(uint32_t max_consecutive_misses, uint32_t max_percent_misses,
+                                   uint64_t minimum_collateral = BATCH_OPERATOR_MINIMUM_COLLATERAL) {
       constexpr uint32_t MAX_AVAILABLE_PRODUCERS    = 21;
       constexpr uint32_t MAX_AVAILABLE_BATCH_OPERATORS = 63;
       constexpr uint32_t MAX_AVAILABLE_UNDERWRITERS = 21;
@@ -1091,8 +1142,15 @@ public:
             (opreg_config_fields::TERMINATE_WINDOW_MS,              TERMINATE_WINDOW_MS)
             (opreg_config_fields::REQUIRED_PRODUCER_COLLATERAL,     fc::variants{})
             (opreg_config_fields::REQUIRED_BATCH_OPERATOR_COLLATERAL, fc::variants{
-               make_chain_min_bond(WIRE_CHAIN_CODE, WIRE_CHAIN_CODE, BATCH_OPERATOR_MINIMUM_COLLATERAL) })
+               make_chain_min_bond(WIRE_CHAIN_CODE, WIRE_CHAIN_CODE, minimum_collateral) })
             (opreg_config_fields::REQUIRED_UNDERWRITER_COLLATERAL,  fc::variants{})));
+   }
+
+   /// Observe unpaid batch rewards without claiming them or changing the historical roster.
+   uint64_t batch_pay_claim(name account) {
+      const auto data = get_row_by_account(SYSIO_ACCOUNT, SYSIO_ACCOUNT, system_tables::PAY_CLAIMS, account);
+      return data.empty() ? 0 : sysio_abi.binary_to_variant(system_abi_types::PAY_CLAIM, data,
+         fixture_abi_yield_function())[system_fields::BALANCE].as<uint64_t>();
    }
 
    /// Once every active outpost has a durable consensus row for the current epoch, trigger the
@@ -2232,6 +2290,129 @@ BOOST_FIXTURE_TEST_CASE(partial_delivery_is_a_duty_epoch_miss, sysio_msgch_chain
    walk_rotation_to_consecutive_termination(outposts, [&outposts](uint32_t duty) {
       return std::vector<uint64_t>{outposts[duty % outposts.size()]};
    });
+} FC_LOG_AND_RETHROW() }
+
+/// WNS-33: a policy change must block an undercollateralized delivery before the registry sweep.
+BOOST_FIXTURE_TEST_CASE(raised_collateral_minimum_blocks_stale_active_delivery, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3, /*batchop_is_bootstrapped=*/false);
+   constexpr uint64_t raised_minimum = BATCH_OPERATOR_MINIMUM_COLLATERAL + 1;
+   set_termination_thresholds(DEFAULT_MAX_CONSECUTIVE_MISSES, DEFAULT_MAX_PERCENT_MISSES, raised_minimum);
+   BOOST_REQUIRE(get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>() ==
+                 opp::types::OPERATOR_STATUS_ACTIVE);
+
+   const auto envelope = encode_delivery(current_epoch(), RAISED_COLLATERAL_PAYLOAD);
+   BOOST_REQUIRE_EQUAL(
+      error(INELIGIBLE_DELIVERY_ERROR),
+      deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
+
+   // The bootstrapped controls retain their collateral exemption and can still finalize.
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, envelope));
+   BOOST_REQUIRE(get_outpcons(ETH_OUTPOST_ID)[msgch_fields::CONSENSUS_REACHED].as<bool>());
+} FC_LOG_AND_RETHROW() }
+
+/// WNS-33: both the quorum and counted votes exclude a delivery made before a policy increase.
+BOOST_FIXTURE_TEST_CASE(collateral_change_after_delivery_uses_one_eligible_consensus_set,
+                        sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3, /*batchop_is_bootstrapped=*/false);
+   const auto envelope = encode_delivery(current_epoch(), COLLATERAL_CHANGE_PAYLOAD);
+   const auto prior_envelope = encode_delivery(current_epoch(), PRE_POLICY_DELIVERY_PAYLOAD);
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, prior_envelope));
+   produce_blocks();
+   constexpr uint64_t raised_minimum = BATCH_OPERATOR_MINIMUM_COLLATERAL + 1;
+   set_termination_thresholds(DEFAULT_MAX_CONSECUTIVE_MISSES, DEFAULT_MAX_PERCENT_MISSES, raised_minimum);
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_B, ETH_OUTPOST_ID, envelope));
+   auto consensus = get_outpcons(ETH_OUTPOST_ID);
+   BOOST_REQUIRE(consensus.is_null() || !consensus[msgch_fields::CONSENSUS_REACHED].as<bool>());
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP_C, ETH_OUTPOST_ID, envelope));
+   BOOST_REQUIRE(get_outpcons(ETH_OUTPOST_ID)[msgch_fields::CONSENSUS_REACHED].as<bool>());
+} FC_LOG_AND_RETHROW() }
+
+/// WNS-33: historical batch members cannot draw rewards through ACTIVE stored under an obsolete policy.
+BOOST_FIXTURE_TEST_CASE(raised_collateral_minimum_blocks_stale_active_batch_pay, sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/3, /*batchop_is_bootstrapped=*/false);
+   const uint64_t target_before = batch_pay_claim(BATCHOP);
+   const uint64_t control_before = batch_pay_claim(BATCHOP_B);
+   constexpr uint64_t raised_minimum = BATCH_OPERATOR_MINIMUM_COLLATERAL + 1;
+   constexpr int64_t period_emission = 1'000'000'000;
+   set_termination_thresholds(DEFAULT_MAX_CONSECUTIVE_MISSES, DEFAULT_MAX_PERCENT_MISSES, raised_minimum);
+
+   const uint32_t epoch = current_epoch() + 1;
+   BOOST_REQUIRE_EQUAL(success(), push(SYSIO_ACCOUNT, sysio_abi, EPOCH_ACCOUNT, system_actions::ACCRUE_EPOCH,
+      mvo()(system_fields::EPOCH_INDEX, epoch)(system_fields::BATCH_GROUP_INDEX, 0)
+           (system_fields::PER_EPOCH_EMISSION, period_emission)));
+   BOOST_REQUIRE_EQUAL(success(), push(SYSIO_ACCOUNT, sysio_abi, EPOCH_ACCOUNT, system_actions::RECORD_BATCH,
+      mvo()(system_fields::EPOCH_INDEX, epoch)
+           (system_fields::MEMBERS, std::vector<name>{BATCHOP, BATCHOP_B, BATCHOP_C})));
+   BOOST_REQUIRE_EQUAL(success(), push(SYSIO_ACCOUNT, sysio_abi, EPOCH_ACCOUNT, system_actions::PAY_EPOCH,
+      mvo()(system_fields::EPOCH_INDEX, epoch)(system_fields::BATCH_OP_GROUPS, std::vector<std::vector<name>>{})
+           (system_fields::PERIOD_EMISSION, period_emission)));
+   BOOST_REQUIRE(get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>() ==
+                 opp::types::OPERATOR_STATUS_ACTIVE);
+   BOOST_REQUIRE_EQUAL(target_before, batch_pay_claim(BATCHOP));
+   BOOST_REQUIRE_GT(batch_pay_claim(BATCHOP_B), control_before);
+} FC_LOG_AND_RETHROW() }
+
+/// WNS-33: configuration restoration and privileged maintenance work even when no operator can reach consensus.
+BOOST_FIXTURE_TEST_CASE(batch_collateral_reconciliation_recovers_without_epoch_progress,
+                        sysio_msgch_chain_tester) { try {
+   bootstrap(/*n_batch_ops=*/1, /*batchop_is_bootstrapped=*/false);
+   constexpr uint64_t raised_minimum = BATCH_OPERATOR_MINIMUM_COLLATERAL + 1;
+   set_termination_thresholds(DEFAULT_MAX_CONSECUTIVE_MISSES, DEFAULT_MAX_PERCENT_MISSES, raised_minimum);
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, opreg_actions::RECHECK_BATCH, mvo()));
+   produce_blocks();
+   const auto envelope = encode_delivery(current_epoch(), POLICY_RECOVERY_PAYLOAD);
+   BOOST_REQUIRE_EQUAL(
+      error(INELIGIBLE_DELIVERY_ERROR),
+      deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
+   const auto epoch_before = current_epoch();
+   set_termination_thresholds(DEFAULT_MAX_CONSECUTIVE_MISSES, DEFAULT_MAX_PERCENT_MISSES);
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, opreg_actions::RECHECK_BATCH, mvo()));
+   produce_blocks();
+   BOOST_REQUIRE_EQUAL(epoch_before, current_epoch());
+   BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, ETH_OUTPOST_ID, envelope));
+   BOOST_REQUIRE(get_outpcons(ETH_OUTPOST_ID)[msgch_fields::CONSENSUS_REACHED].as<bool>());
+} FC_LOG_AND_RETHROW() }
+
+/// WNS-33: neither initial scheduling nor the epoch roster can expose a stale ACTIVE row beyond the sweep budget.
+BOOST_FIXTURE_TEST_CASE(batch_roster_uses_live_collateral_before_sweep_reaches_member,
+                        sysio_msgch_chain_tester) { try {
+   const auto outposts = bootstrap_rotation(ROTATION_WINDOW_MS, /*batchop_is_bootstrapped=*/false,
+                                            rotation_outposts::eth_and_sol);
+   const auto anchor = encode_delivery(current_epoch(), POLICY_ROSTER_PAYLOAD);
+   for (const auto chain : outposts) BOOST_REQUIRE_EQUAL(success(), deliver_as(BATCHOP, chain, anchor));
+   produce_blocks();
+   // BATCHOP moves from the expiring front to the tail, so it remains seated on the next advance.
+   advance_to_next_epoch();
+   constexpr uint32_t alphabet_size = 26;
+   for (uint32_t i = 0; i < BATCH_RECHECK_ROWS; ++i) {
+      std::string spelling{SWEEP_PREFIX};
+      spelling += char('a' + i / alphabet_size);
+      spelling += char('a' + i % alphabet_size);
+      const name account(spelling);
+      create_accounts({account});
+      BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, opreg_actions::REGISTER_OPERATOR,
+         mvo()(opreg_fields::ACCOUNT, account)(opreg_fields::TYPE, opp::types::OPERATOR_TYPE_CHALLENGER)
+              (opreg_fields::IS_BOOTSTRAPPED, true)));
+   }
+   constexpr uint64_t raised_minimum = BATCH_OPERATOR_MINIMUM_COLLATERAL + 1;
+   set_termination_thresholds(DEFAULT_MAX_CONSECUTIVE_MISSES, DEFAULT_MAX_PERCENT_MISSES, raised_minimum);
+   BOOST_REQUIRE_EQUAL(error(INSUFFICIENT_BATCH_OPERATORS_ERROR),
+                       push(EPOCH_ACCOUNT, epoch_abi, EPOCH_ACCOUNT, epoch_actions::SCHEDULE_BATCH_GROUPS, mvo()));
+   // Commit registration and policy transactions before the helper jumps across the epoch boundary.
+   produce_blocks();
+   advance_to_next_epoch();
+   BOOST_REQUIRE(get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>() ==
+                 opp::types::OPERATOR_STATUS_ACTIVE);
+   BOOST_REQUIRE(dellog_rows(BATCHOP, current_epoch() - 1).empty());
+   for (const auto chain : {ETH_OUTPOST_ID, SOL_OUTPOST_ID}) {
+      const auto roster = require_roster_is_window(chain,
+         {{BATCHOP.to_string(), opp::types::OPERATOR_STATUS_UNKNOWN}});
+      BOOST_REQUIRE(roster.at(BATCHOP.to_string()) == opp::types::OPERATOR_STATUS_UNKNOWN);
+      BOOST_REQUIRE(roster.at(BATCHOP_B.to_string()) == opp::types::OPERATOR_STATUS_ACTIVE);
+   }
 } FC_LOG_AND_RETHROW() }
 
 // WNS-15(a) / WNS-08 (WIRE-346 / WIRE-322): consensus thresholds must derive from the group that
