@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cerrno>
 #include <linux/memfd.h>
 #include <sys/mman.h>
 

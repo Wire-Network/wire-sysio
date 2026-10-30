@@ -19,6 +19,18 @@ endif()
 file(GLOB UNIT_TESTS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" CONFIGURE_DEPENDS "*.cpp")
 list(REMOVE_ITEM UNIT_TESTS ship_client.cpp)
 list(REMOVE_ITEM UNIT_TESTS ship_streamer.cpp)
+list(REMOVE_ITEM UNIT_TESTS libcxx_runtime_test.cpp)
+
+# Verify the standard library actually selected by the production build.
+add_executable(libcxx_runtime_test libcxx_runtime_test.cpp libcxx_c_runtime.c)
+target_link_libraries(libcxx_runtime_test PRIVATE Threads::Threads)
+add_test(NAME libcxx_runtime_test COMMAND libcxx_runtime_test)
+if("native-module" IN_LIST SYSIO_WASM_RUNTIMES)
+  add_library(native_libcxx_module MODULE ../cmake/test/libcxx/native_module.cpp)
+  add_executable(native_libcxx_host ../cmake/test/libcxx/native_host.cpp)
+  target_link_libraries(native_libcxx_host PRIVATE ${CMAKE_DL_LIBS})
+  add_test(NAME native_libcxx_test COMMAND native_libcxx_host $<TARGET_FILE:native_libcxx_module>)
+endif()
 
 add_executable( plugin_test ${UNIT_TESTS} )
 target_link_libraries( plugin_test sysio_testing sysio_chain_wrap chainbase chain_plugin producer_plugin wallet_plugin fc state_history ${PLATFORM_SPECIFIC_LIBS} )

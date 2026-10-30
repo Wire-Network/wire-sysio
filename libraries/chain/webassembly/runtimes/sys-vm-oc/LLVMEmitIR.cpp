@@ -111,7 +111,9 @@ namespace LLVMJIT
 
 	// Overloaded functions that compile a literal value to a LLVM constant of the right type.
 	inline llvm::ConstantInt* emitLiteral(U32 value) { return (llvm::ConstantInt*)llvm::ConstantInt::get(llvmI32Type,llvm::APInt(32,(U64)value,false)); }
-	inline llvm::ConstantInt* emitLiteral(I32 value) { return (llvm::ConstantInt*)llvm::ConstantInt::get(llvmI32Type,llvm::APInt(32,(I64)value,false)); }
+	// Signed inputs need sign-aware truncation: LLVM 23 no longer implicitly
+	// truncates an unsigned APInt constructor's value to its declared bit width.
+	inline llvm::ConstantInt* emitLiteral(I32 value) { return (llvm::ConstantInt*)llvm::ConstantInt::get(llvmI32Type,llvm::APInt(32,(I64)value,true)); }
 	inline llvm::ConstantInt* emitLiteral(U64 value) { return (llvm::ConstantInt*)llvm::ConstantInt::get(llvmI64Type,llvm::APInt(64,value,false)); }
 	inline llvm::ConstantInt* emitLiteral(I64 value) { return (llvm::ConstantInt*)llvm::ConstantInt::get(llvmI64Type,llvm::APInt(64,value,false)); }
 	inline llvm::Constant* emitLiteral(F32 value) { return llvm::ConstantFP::get(context,llvm::APFloat(value)); }
@@ -356,9 +358,10 @@ namespace LLVMJIT
 			return irBuilder.CreateCall(Callee, Args);
 		}
 
+		/// Resolve an overloaded intrinsic using the LLVM 23 declaration API.
 		llvm::Function* getLLVMIntrinsic(const std::initializer_list<llvm::Type*>& argTypes,llvm::Intrinsic::ID id)
 		{
-			return llvm::Intrinsic::getDeclaration(moduleContext.llvmModule,id,llvm::ArrayRef<llvm::Type*>(argTypes.begin(),argTypes.end()));
+			return llvm::Intrinsic::getOrInsertDeclaration(moduleContext.llvmModule,id,llvm::ArrayRef<llvm::Type*>(argTypes.begin(),argTypes.end()));
 		}
 		
 		// Emits a call to a WAVM intrinsic function.
