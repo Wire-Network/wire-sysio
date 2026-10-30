@@ -49,7 +49,8 @@ namespace eth = fc::network::ethereum;
 namespace sol = fc::network::solana;
 
 namespace {
-   constexpr fc::microseconds DELIVERY_TIMEOUT  = fc::seconds(15);
+   /// Shared RPC/depot budget; see the SHARED KNOB comment in set_program_options.
+   constexpr fc::microseconds DELIVERY_TIMEOUT  = fc::seconds(60);
    constexpr fc::microseconds EPOCH_POLL        = fc::seconds(15);
    constexpr fc::microseconds EPOCH_EDGE_BUFFER = fc::milliseconds(2500);
    /// Minimum spacing between this operator's `sysio.swap::tickyield` pushes per
@@ -2107,13 +2108,13 @@ void batch_operator_plugin::set_program_options(options_description& cli,
    // most for a full-cap envelope), and each receipt wait may use whatever of
    // this budget is left; Solana chunks the envelope at 672 bytes. Size it as
    //     expected transactions x (target block time + confirmation margin)
-   // for the largest expected envelope; the 15000 ms default covers a 1 s block
-   // time with wide margin. Undersizing is not fatal: the relay resumes from the
-   // outpost's on-chain cursor on the next cron tick. SHARED KNOB: this value
-   // also bounds the depot push_action completion wait (see push_action above).
+   // for the largest expected envelope; the 60000 ms default leaves room for
+   // confirmation plus a 30 s progress-read retry. Undersizing is not fatal:
+   // the relay resumes from the outpost's on-chain cursor on the next cron tick.
+   // SHARED KNOB: this value also bounds the depot push_action completion wait
+   // (see push_action above), depot table reads, and the read-write API deadline.
    // A timeout there is safe (the async_action_completion callback retains its
-   // own state), but raising this lengthens BOTH waits, so raise it deliberately
-   // rather than as a blanket tuning step.
+   // own state), but raising this also lengthens depot waits, so size it deliberately.
    // Help text below must stay ASCII with no " --" sequence (PerformanceHarness
    // splits nodeop --help output on that token).
    opts("batch-delivery-timeout-ms", bpo::value<uint32_t>()->default_value(whole_milliseconds(DELIVERY_TIMEOUT)),
