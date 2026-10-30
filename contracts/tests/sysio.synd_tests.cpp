@@ -765,7 +765,7 @@ public:
    /// The `parked` row of `(token_code, kind, pubkey)`; null when there is none. The key is the token and
    /// the chain kind as big-endian words, then the pubkey NUL-escaped and NUL-NUL terminated (the kv key
    /// encoding of the contract's `parked_key`).
-   fc::variant parked_row(std::string_view token_code, ChainKind kind, const std::vector<char>& pubkey) {
+   static std::string parked_key_bytes(std::string_view token_code, ChainKind kind, const std::vector<char>& pubkey) {
       std::string key;
       append_key_word(key, slug_value(token_code));
       append_key_word(key, static_cast<uint64_t>(magic_enum::enum_integer(kind)));
@@ -775,11 +775,16 @@ public:
       }
       key.push_back('\0');
       key.push_back('\0');
+      return key;
+   }
+   fc::variant parked_row(std::string_view token_code, ChainKind kind, const std::vector<char>& pubkey,
+                          name table = "parked"_n, const char* type = "parked_row") {
+      const auto key = parked_key_bytes(token_code, kind, pubkey);
       const auto& kv_idx = control->db().get_index<kv_index, by_code_key>();
-      const auto  itr    = kv_idx.find(boost::make_tuple(SYND_ACCOUNT, compute_table_id("parked"_n.to_uint64_t()),
-                                                         std::string_view(key)));
+      const auto itr =
+         kv_idx.find(boost::make_tuple(SYND_ACCOUNT, compute_table_id(table.to_uint64_t()), std::string_view(key)));
       if (itr == kv_idx.end()) return fc::variant();
-      return decode(synd_abi_ser, "parked_row",
+      return decode(synd_abi_ser, type,
                     std::vector<char>(itr->value.data(), itr->value.data() + itr->value.size()));
    }
    uint64_t parked_balance(std::string_view token_code, ChainKind kind, const std::vector<char>& pubkey) {
@@ -864,6 +869,47 @@ public:
       return std::any_of(last_trace->action_traces.begin(), last_trace->action_traces.end(), [&](const auto& at) {
          return at.act.account == code && at.act.name == action_name && at.receiver == code;
       });
+   }
+
+   /// Decode authenticated self-receipt action payloads from the last successful transaction.
+   std::vector<fc::variant> receipts(name action_name) {
+      std::vector<fc::variant> result;
+      if (!last_trace)
+         return result;
+      for (const auto& at : last_trace->action_traces) {
+         if (at.receiver != SYND_ACCOUNT || at.act.account != SYND_ACCOUNT || at.act.name != action_name)
+            continue;
+         result.push_back(synd_abi_ser.binary_to_variant(synd_abi_ser.get_action_type(action_name), at.act.data,
+                                                         fixture_abi_yield_function())["receipt"]);
+      }
+      return result;
+   }
+   fc::variant parked_batch(const std::vector<char>& pubkey) {
+      return parked_row(LIQSOL, ChainKind::CHAIN_KIND_SVM, pubkey, "parkbatches"_n, "parked_batch");
+   }
+   /// Model a pre-upgrade parked balance: the unchanged principal row exists, the new sidecar does not.
+   void erase_receipt_batch_for_upgrade(const std::vector<char>& pubkey) {
+      const auto key = parked_key_bytes(LIQSOL, ChainKind::CHAIN_KIND_SVM, pubkey);
+      auto& db = const_cast<chainbase::database&>(control->db());
+      const auto& index = db.get_index<kv_index, by_code_key>();
+      const auto it = index.find(
+         boost::make_tuple(SYND_ACCOUNT, compute_table_id("parkbatches"_n.to_uint64_t()), std::string_view(key)));
+      BOOST_REQUIRE(it != index.end());
+      db.remove(*it);
+   }
+
+   /// Exercise the allocation boundary without creating 2^64 batches in the fixture.
+   void exhaust_receipt_ids() {
+      constexpr auto table = "receiptstate"_n;
+      std::string key;
+      append_key_word(key, table.value);
+      auto& db = const_cast<chainbase::database&>(control->db());
+      const auto& index = db.get_index<kv_index, by_code_key>();
+      const auto it = index.find(boost::make_tuple(SYND_ACCOUNT, compute_table_id(table.value), std::string_view(key)));
+      BOOST_REQUIRE(it != index.end());
+      const auto value = synd_abi_ser.variant_to_binary(
+         "receipt_state", mvo()("next_batch_id", std::numeric_limits<uint64_t>::max()), fixture_abi_yield_function());
+      db.modify(*it, [&](auto& row) { row.value.assign(value.data(), value.size()); });
    }
 
    abi_serializer synd_abi_ser, liq_abi_ser, token_abi_ser, tokens_abi_ser, chains_abi_ser, authex_abi_ser,
@@ -3879,6 +3925,7 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_defers_the_parked_delivery_of_a_new_link, sysio
    BOOST_REQUIRE_EQUAL(success(), createlink("alice"_n, priv));
    BOOST_REQUIRE(executed(SYND_ACCOUNT, "linkswept"_n));
    BOOST_REQUIRE(console_has(LINKSWEPT_FROZEN));
+   BOOST_REQUIRE(receipts("logparked"_n).empty());
    BOOST_REQUIRE_EQUAL(30 * UNIT, parked_balance(LIQETH, ChainKind::CHAIN_KIND_EVM, pubkey));
    BOOST_REQUIRE_EQUAL(0, liq_balance("alice"_n, LIQETH_SYM));
    BOOST_REQUIRE_EQUAL(frozen(), sweep("alice"_n, ChainKind::CHAIN_KIND_EVM));
@@ -3886,6 +3933,7 @@ BOOST_FIXTURE_TEST_CASE(a_freeze_defers_the_parked_delivery_of_a_new_link, sysio
    BOOST_REQUIRE_EQUAL(success(), andon_clear());
    BOOST_REQUIRE_EQUAL(success(), sweep("alice"_n, ChainKind::CHAIN_KIND_EVM));
    BOOST_REQUIRE(parked_row(LIQETH, ChainKind::CHAIN_KIND_EVM, pubkey).is_null());
+   BOOST_REQUIRE_EQUAL(receipts("logparked"_n).size(), 1u);
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(30 * UNIT), liq_balance("alice"_n, LIQETH_SYM));
    BOOST_REQUIRE_EQUAL(static_cast<int64_t>(3 * UNIT), liq_owed("alice"_n, LIQETH_SYM));
 } FC_LOG_AND_RETHROW()
@@ -4901,6 +4949,198 @@ BOOST_AUTO_TEST_CASE(generic_governance_and_provider_release_have_identical_sett
          }
       }
    }
+}
+
+// Equal-value deposits have distinct admitted identities; replays and bad intake produce no receipt.
+BOOST_FIXTURE_TEST_CASE(receipts_bind_intakes_without_accepting_forged_logs, sysio_synd_tester) {
+   const auto bytes = ed_bytes(ed_key());
+   const auto digest = digest_of("receipt-envelope");
+   for (const uint64_t sequence : {1u, 2u}) {
+      BOOST_REQUIRE_EQUAL(success(),
+                          onsynd(SOLANA, 1, digest, sequence, ChainKind::CHAIN_KIND_SVM, bytes, LIQSOL, UNIT));
+      const auto logs = receipts("logintake"_n);
+      BOOST_REQUIRE_EQUAL(logs.size(), 1u);
+      const auto receipt = logs[0];
+      BOOST_REQUIRE_EQUAL(receipt["sequence"].as_uint64(), sequence);
+      BOOST_REQUIRE_EQUAL(receipt["item_id"].as_uint64(), sequence);
+      BOOST_REQUIRE_EQUAL(receipt["amount"].as_uint64(), UNIT);
+      BOOST_REQUIRE_EQUAL(receipt["digest"].as<fc::sha256>(), digest);
+      BOOST_REQUIRE(receipt["pubkey"].as<std::vector<char>>() == bytes);
+      BOOST_REQUIRE(mentions(push(SYND_ACCOUNT, synd_abi_ser, SYND_ACCOUNT, "logintake"_n, mvo()("receipt", receipt)),
+                             "self inline action"));
+      BOOST_REQUIRE(mentions(push(SYND_ACCOUNT, synd_abi_ser, "alice"_n, "logintake"_n, mvo()("receipt", receipt)),
+                             "missing authority"));
+   }
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 2, ChainKind::CHAIN_KIND_SVM, bytes, LIQSOL, UNIT));
+   BOOST_REQUIRE(receipts("logintake"_n).empty());
+   BOOST_REQUIRE_EQUAL(success(), onsynd(SOLANA, 1, digest, 3, ChainKind::CHAIN_KIND_SVM, bytes, LIQNONE, UNIT));
+   BOOST_REQUIRE(receipts("logintake"_n).empty());
+   const auto evm_bytes = em_bytes(em_key());
+   BOOST_REQUIRE_EQUAL(success(), onsynd(ETH, 1, digest, 1, ChainKind::CHAIN_KIND_EVM, evm_bytes, LIQETH, UNIT));
+   const auto eth_log = receipts("logintake"_n);
+   BOOST_REQUIRE_EQUAL(eth_log.size(), 1u);
+   BOOST_REQUIRE_EQUAL(eth_log[0]["chain_code"].as_string(), ETH);
+   BOOST_REQUIRE_EQUAL(eth_log[0]["token_code"].as_string(), LIQETH);
+   BOOST_REQUIRE_EQUAL(eth_log[0]["item_id"].as_uint64(), 3u);
+}
+
+BOOST_FIXTURE_TEST_CASE(receipts_correlate_partial_release_fee_and_item_erasure, sysio_synd_tester) {
+   const auto key = ed_key();
+   const auto bytes = ed_bytes(key);
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(
+      success(), setconfig(SOLANA, LIQSOL, {.synd_fee_bps = 1000, .synd_burst = 4 * UNIT, .synd_refill = 4 * UNIT}));
+   syndicate_and_close(1, 1, bytes, LIQSOL, 10 * UNIT);
+   BOOST_REQUIRE(receipts("logrelease"_n).empty());
+   underwrite_envelope(SOLANA, LIQSOL, 1);
+   uint64_t released = 0;
+   uint64_t fees = 0;
+   for (uint32_t epoch = 1; epoch <= 3; ++epoch) {
+      BOOST_REQUIRE_EQUAL(success(), set_epoch(epoch));
+      BOOST_REQUIRE_EQUAL(success(), crank());
+      const auto logs = receipts("logrelease"_n);
+      BOOST_REQUIRE_EQUAL(logs.size(), 1u);
+      const auto log = logs[0];
+      const auto gross = log["gross"].as_uint64();
+      const auto fee = log["fee"].as_uint64();
+      BOOST_REQUIRE_EQUAL(log["item_id"].as_uint64(), 1u);
+      BOOST_REQUIRE_EQUAL(log["destination"].as_string(), "ACCOUNT");
+      BOOST_REQUIRE_EQUAL(log["recipient"].as_string(), "alice");
+      BOOST_REQUIRE_EQUAL(log["parked_batch_id"].as_uint64(), 0u);
+      BOOST_REQUIRE_EQUAL(log["net"].as_uint64() + fee, gross);
+      released += gross;
+      fees += fee;
+      BOOST_REQUIRE_EQUAL(log["remaining"].as_uint64(), 10 * UNIT - released);
+      BOOST_REQUIRE_EQUAL(liq_balance("alice"_n), int64_t(released - fees));
+      BOOST_REQUIRE_EQUAL(feepot_balance(LIQSOL), fees);
+      BOOST_REQUIRE(mentions(push(SYND_ACCOUNT, synd_abi_ser, SYND_ACCOUNT, "logrelease"_n, mvo()("receipt", log)),
+                             "self inline action"));
+      BOOST_REQUIRE_EQUAL(success(), crank());
+      BOOST_REQUIRE(receipts("logrelease"_n).empty());
+   }
+   BOOST_REQUIRE(item_row(1).is_null());
+   BOOST_REQUIRE_EQUAL(released, 10 * UNIT);
+}
+
+BOOST_FIXTURE_TEST_CASE(receipts_join_multiple_parked_items_and_preserve_unattributed_import, sysio_synd_tester) {
+   const auto key = ed_key();
+   const auto bytes = ed_bytes(key);
+   BOOST_REQUIRE_EQUAL(success(), importsynd(SOLANA, LIQSOL, {credit(bytes, 2 * UNIT)}));
+   // Simulate an unchanged old row surviving a contract upgrade without a receipt sidecar.
+   erase_receipt_batch_for_upgrade(bytes);
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_fee_bps = 1000}));
+   const auto digest = digest_of("parked-receipt-envelope");
+   for (const uint64_t sequence : {1u, 2u})
+      BOOST_REQUIRE_EQUAL(success(),
+                          onsynd(SOLANA, 1, digest, sequence, ChainKind::CHAIN_KIND_SVM, bytes, LIQSOL, 10 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), closeenv(SOLANA, 1, digest));
+   underwrite_envelope(SOLANA, LIQSOL, 1);
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   const auto releases = receipts("logrelease"_n);
+   BOOST_REQUIRE_EQUAL(releases.size(), 2u);
+   const auto batch_id = releases[0]["parked_batch_id"].as_uint64();
+   BOOST_REQUIRE_GT(batch_id, 0u);
+   for (const auto& release : releases) {
+      BOOST_REQUIRE_EQUAL(release["destination"].as_string(), "PARKED");
+      BOOST_REQUIRE_EQUAL(release["parked_batch_id"].as_uint64(), batch_id);
+      BOOST_REQUIRE_EQUAL(release["net"].as_uint64(), 9 * UNIT);
+   }
+   BOOST_REQUIRE_EQUAL(parked_batch(bytes)["unattributed"].as_uint64(), 2 * UNIT);
+   BOOST_REQUIRE_EQUAL(success(), importsynd(SOLANA, LIQSOL, {credit(bytes, UNIT)}));
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), sweep("alice"_n, ChainKind::CHAIN_KIND_SVM));
+   const auto delivered = receipts("logparked"_n);
+   BOOST_REQUIRE_EQUAL(delivered.size(), 1u);
+   const auto log = delivered[0];
+   BOOST_REQUIRE_EQUAL(log["batch_id"].as_uint64(), batch_id);
+   BOOST_REQUIRE_EQUAL(log["amount"].as_uint64(), 21 * UNIT);
+   BOOST_REQUIRE_EQUAL(log["unattributed"].as_uint64(), 3 * UNIT);
+   BOOST_REQUIRE_EQUAL(log["recipient"].as_string(), "alice");
+   BOOST_REQUIRE_EQUAL(liq_balance("alice"_n), int64_t(21 * UNIT));
+   BOOST_REQUIRE(parked_batch(bytes).is_null());
+   BOOST_REQUIRE(mentions(push(SYND_ACCOUNT, synd_abi_ser, SYND_ACCOUNT, "logparked"_n, mvo()("receipt", log)),
+                          "self inline action"));
+   BOOST_REQUIRE_EQUAL(success(), sweep("alice"_n, ChainKind::CHAIN_KIND_SVM));
+   BOOST_REQUIRE(receipts("logparked"_n).empty());
+}
+
+BOOST_FIXTURE_TEST_CASE(receipts_distinguish_fee_only_release_and_legacy_sweep, sysio_synd_tester) {
+   const auto key = ed_key();
+   const auto bytes = ed_bytes(key);
+   BOOST_REQUIRE_EQUAL(success(), importsynd(SOLANA, LIQSOL, {credit(bytes, 2 * UNIT)}));
+   erase_receipt_batch_for_upgrade(bytes);
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), sweep("alice"_n, ChainKind::CHAIN_KIND_SVM));
+   const auto paid = receipts("logparked"_n);
+   BOOST_REQUIRE_EQUAL(paid.size(), 1u);
+   BOOST_REQUIRE_EQUAL(paid[0]["batch_id"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(paid[0]["unattributed"].as_uint64(), 2 * UNIT);
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {.synd_fee_bps = 10000}));
+   syndicate_and_close(1, 1, bytes, LIQSOL, UNIT);
+   underwrite_envelope(SOLANA, LIQSOL, 1);
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   const auto release = receipts("logrelease"_n);
+   BOOST_REQUIRE_EQUAL(release.size(), 1u);
+   BOOST_REQUIRE_EQUAL(release[0]["destination"].as_string(), "FEE_ONLY");
+   BOOST_REQUIRE_EQUAL(release[0]["net"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(release[0]["gross"].as_uint64(), UNIT);
+   BOOST_REQUIRE_EQUAL(release[0]["fee"].as_uint64(), UNIT);
+   BOOST_REQUIRE_EQUAL(release[0]["remaining"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(release[0]["recipient"].as_string(), "");
+   BOOST_REQUIRE_EQUAL(release[0]["parked_batch_id"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(liq_balance("alice"_n), int64_t(2 * UNIT));
+   BOOST_REQUIRE(parked_batch(bytes).is_null());
+}
+
+// Principal identity is retired even if unpaid WIRE retains the parked row. New principal has a fresh batch.
+BOOST_FIXTURE_TEST_CASE(receipts_retire_principal_batches_independently_of_yield, sysio_synd_tester) {
+   const auto bytes = ed_bytes(ed_key());
+   const auto other = ed_bytes(ed_key());
+   BOOST_REQUIRE_EQUAL(success(), importsynd(SOLANA, LIQSOL, {credit(bytes, 50 * UNIT), credit(other, 50 * UNIT)}));
+   const auto old_id = parked_batch(bytes)["id"].as_uint64();
+   BOOST_REQUIRE_EQUAL(success(), addyield("carol"_n, 10 * UNIT));
+   BOOST_REQUIRE_EQUAL(success(), liq_claim(SYND_ACCOUNT));
+   BOOST_REQUIRE_EQUAL(success(), linkswept("alice"_n, ChainKind::CHAIN_KIND_SVM, bytes));
+   const auto first = receipts("logparked"_n);
+   BOOST_REQUIRE_EQUAL(first.size(), 1u);
+   BOOST_REQUIRE_EQUAL(first[0]["batch_id"].as_uint64(), old_id);
+   BOOST_REQUIRE_EQUAL(parked_row(LIQSOL, ChainKind::CHAIN_KIND_SVM, bytes)["balance"].as_uint64(), 0u);
+   BOOST_REQUIRE(parked_batch(bytes).is_null());
+   BOOST_REQUIRE_EQUAL(success(), importsynd(SOLANA, LIQSOL, {credit(bytes, UNIT)}));
+   const auto next_id = parked_batch(bytes)["id"].as_uint64();
+   BOOST_REQUIRE_GT(next_id, old_id);
+   BOOST_REQUIRE_EQUAL(success(), linkswept("alice"_n, ChainKind::CHAIN_KIND_SVM, bytes));
+   const auto next = receipts("logparked"_n);
+   BOOST_REQUIRE_EQUAL(next.size(), 1u);
+   BOOST_REQUIRE_EQUAL(next[0]["batch_id"].as_uint64(), next_id);
+   BOOST_REQUIRE_EQUAL(next[0]["amount"].as_uint64(), UNIT);
+   BOOST_REQUIRE(parked_batch(bytes).is_null());
+   BOOST_REQUIRE_EQUAL(success(), linkswept("alice"_n, ChainKind::CHAIN_KIND_SVM, bytes));
+   BOOST_REQUIRE(receipts("logparked"_n).empty());
+}
+
+/// Exhaustion never reuses an identity or blocks settlement; correlation becomes explicitly unknown.
+BOOST_FIXTURE_TEST_CASE(receipt_id_exhaustion_does_not_block_principal, sysio_synd_tester) {
+   const auto key = ed_key();
+   const auto bytes = ed_bytes(key);
+   BOOST_REQUIRE_EQUAL(success(), importsynd(SOLANA, LIQSOL, {credit(bytes, UNIT)}));
+   erase_receipt_batch_for_upgrade(bytes);
+   exhaust_receipt_ids();
+   BOOST_REQUIRE_EQUAL(success(), setconfig(SOLANA, LIQSOL, {}));
+   syndicate_and_close(1, 1, bytes, LIQSOL, UNIT);
+   underwrite_envelope(SOLANA, LIQSOL, 1);
+   BOOST_REQUIRE_EQUAL(success(), crank());
+   const auto release = receipts("logrelease"_n);
+   BOOST_REQUIRE_EQUAL(release.size(), 1u);
+   BOOST_REQUIRE_EQUAL(release[0]["parked_batch_id"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(parked_batch(bytes)["unattributed"].as_uint64(), 2 * UNIT);
+   BOOST_REQUIRE_EQUAL(success(), link_svm("alice"_n, key));
+   BOOST_REQUIRE_EQUAL(success(), sweep("alice"_n, ChainKind::CHAIN_KIND_SVM));
+   const auto paid = receipts("logparked"_n);
+   BOOST_REQUIRE_EQUAL(paid.size(), 1u);
+   BOOST_REQUIRE_EQUAL(paid[0]["batch_id"].as_uint64(), 0u);
+   BOOST_REQUIRE_EQUAL(paid[0]["unattributed"].as_uint64(), 2 * UNIT);
+   BOOST_REQUIRE_EQUAL(liq_balance("alice"_n), int64_t(2 * UNIT));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

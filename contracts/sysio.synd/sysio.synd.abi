@@ -317,6 +317,48 @@
             ]
         },
         {
+            "name": "intake_receipt",
+            "base": "",
+            "fields": [
+                {
+                    "name": "item_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "digest",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "sequence",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "pubkey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "item_key",
             "base": "",
             "fields": [
@@ -439,6 +481,36 @@
                 {
                     "name": "pubkey",
                     "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "logintake",
+            "base": "",
+            "fields": [
+                {
+                    "name": "receipt",
+                    "type": "intake_receipt"
+                }
+            ]
+        },
+        {
+            "name": "logparked",
+            "base": "",
+            "fields": [
+                {
+                    "name": "receipt",
+                    "type": "parked_receipt"
+                }
+            ]
+        },
+        {
+            "name": "logrelease",
+            "base": "",
+            "fields": [
+                {
+                    "name": "receipt",
+                    "type": "release_receipt"
                 }
             ]
         },
@@ -575,6 +647,20 @@
             ]
         },
         {
+            "name": "parked_batch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "unattributed",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "parked_key",
             "base": "",
             "fields": [
@@ -589,6 +675,40 @@
                 {
                     "name": "pubkey",
                     "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "parked_receipt",
+            "base": "",
+            "fields": [
+                {
+                    "name": "batch_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "chain_kind",
+                    "type": "ChainKind"
+                },
+                {
+                    "name": "pubkey",
+                    "type": "bytes"
+                },
+                {
+                    "name": "recipient",
+                    "type": "name"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint64"
+                },
+                {
+                    "name": "unattributed",
+                    "type": "uint64"
                 }
             ]
         },
@@ -683,6 +803,16 @@
             ]
         },
         {
+            "name": "receipt_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "next_batch_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "reconcile",
             "base": "",
             "fields": [
@@ -706,6 +836,56 @@
             "fields": [
                 {
                     "name": "request_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "release_receipt",
+            "base": "",
+            "fields": [
+                {
+                    "name": "item_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "gross",
+                    "type": "uint64"
+                },
+                {
+                    "name": "fee",
+                    "type": "uint64"
+                },
+                {
+                    "name": "net",
+                    "type": "uint64"
+                },
+                {
+                    "name": "remaining",
+                    "type": "uint64"
+                },
+                {
+                    "name": "destination",
+                    "type": "release_destination"
+                },
+                {
+                    "name": "recipient",
+                    "type": "name"
+                },
+                {
+                    "name": "parked_batch_id",
                     "type": "uint64"
                 }
             ]
@@ -1064,6 +1244,21 @@
             "ricardian_contract": ""
         },
         {
+            "name": "logintake",
+            "type": "logintake",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "logparked",
+            "type": "logparked",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "logrelease",
+            "type": "logrelease",
+            "ricardian_contract": ""
+        },
+        {
             "name": "onsynd",
             "type": "onsynd",
             "ricardian_contract": ""
@@ -1169,12 +1364,28 @@
             "table_id": 57982
         },
         {
+            "name": "parkbatches",
+            "type": "parked_batch",
+            "index_type": "i64",
+            "key_names": ["token_code","chain_kind","pubkey"],
+            "key_types": ["uint64","uint64","bytes"],
+            "table_id": 29501
+        },
+        {
             "name": "parked",
             "type": "parked_row",
             "index_type": "i64",
             "key_names": ["token_code","chain_kind","pubkey"],
             "key_types": ["uint64","uint64","bytes"],
             "table_id": 38854
+        },
+        {
+            "name": "receiptstate",
+            "type": "receipt_state",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 6848
         },
         {
             "name": "returns",
@@ -1315,6 +1526,24 @@
                 {
                     "name": "YIELD",
                     "value": 1
+                }
+            ]
+        },
+        {
+            "name": "release_destination",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "ACCOUNT",
+                    "value": 0
+                },
+                {
+                    "name": "PARKED",
+                    "value": 1
+                },
+                {
+                    "name": "FEE_ONLY",
+                    "value": 2
                 }
             ]
         },

@@ -399,6 +399,13 @@ cd $BUILD_DIR && python3 tests/<test_name>.py
 ```
 Do NOT run from the source root — that would use stale or missing binaries.
 
+## Syndication delivery receipts
+
+Keep `logintake`, `logrelease` and `logparked` self-inline-only and notification-free.
+Receipt batching must not change custody, release budgets, fees or existing serialized rows.
+Preserve unattributed legacy/import balances and erase the sidecar only when principal is delivered.
+See [receipt correlation](docs/sysio-synd.md#delivery-receipts).
+
 ## Smart Contract Compilation (System Contracts specifically)
 
 The system contracts are compiled via the `contracts_project` CMake target.

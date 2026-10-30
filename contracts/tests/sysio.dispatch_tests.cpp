@@ -827,7 +827,7 @@ public:
       return decoded;
    }
 
-   /// The sysio.synd actions `trace` executed, in execution order.
+   /// The sysio.synd actions in flat trace order, not the depth-first execution timeline.
    static std::vector<name> synd_actions(const transaction_trace_ptr& trace) {
       std::vector<name> actions;
       for (const auto& at : trace->action_traces)
@@ -1595,11 +1595,12 @@ BOOST_FIXTURE_TEST_CASE(msgch_routes_syndicate_liq_to_synd,
    BOOST_REQUIRE(!trace->except);
    const auto console = all_console(trace);
 
-   // Four onsynd (the malformed one never leaves msgch), then exactly one closeenv, last.
+   // Parent actions precede their inline receipt entries in the flat trace, not execution order.
+   // Only the three accepted intakes emit a receipt; the replay does not.
    const auto actions = synd_actions(trace);
-   BOOST_REQUIRE_EQUAL(5u, actions.size());
-   for (size_t i = 0; i < 4; ++i) BOOST_CHECK_EQUAL("onsynd"_n, actions[i]);
-   BOOST_CHECK_EQUAL("closeenv"_n, actions[4]);
+   const std::vector<name> expected_actions{"onsynd"_n,   "onsynd"_n,    "onsynd"_n,    "onsynd"_n,
+                                            "closeenv"_n, "logintake"_n, "logintake"_n, "logintake"_n};
+   BOOST_REQUIRE_EQUAL_COLLECTIONS(actions.begin(), actions.end(), expected_actions.begin(), expected_actions.end());
    BOOST_CHECK_NE(std::string::npos, console.find("sysio.synd::onsynd: DROP -- replayed sequence"));
 
    // The linked and the unlinked key are held alike; nobody is credited.
@@ -1632,6 +1633,19 @@ BOOST_FIXTURE_TEST_CASE(msgch_routes_syndicate_liq_to_synd,
    BOOST_CHECK_EQUAL(9 * LIQ_UNIT, envelope["synd_total"].as<int64_t>());
    BOOST_CHECK_EQUAL(3u, envelope["item_count"].as<uint32_t>());
    BOOST_CHECK_EQUAL(accepted_envelope_digest(eth), envelope["digest"].as<fc::sha256>());
+
+   const auto receipts = synd_action_data(trace, "logintake"_n);
+   const std::array<uint64_t, 3> sequences{1, 2, 9};
+   BOOST_REQUIRE_EQUAL(receipts.size(), items.size());
+   for (size_t i = 0; i < receipts.size(); ++i) {
+      const auto& receipt = receipts[i]["receipt"];
+      BOOST_CHECK_EQUAL(receipt["item_id"].as_uint64(), items[i]["id"].as_uint64());
+      BOOST_CHECK_EQUAL(receipt["sequence"].as_uint64(), sequences[i]);
+      BOOST_CHECK_EQUAL(receipt["epoch_index"].as_uint64(), epoch);
+      BOOST_CHECK_EQUAL(receipt["digest"].as<fc::sha256>(), accepted_envelope_digest(eth));
+      BOOST_CHECK_EQUAL(receipt["amount"].as_uint64(), items[i]["amount"].as_uint64());
+      BOOST_CHECK(receipt["pubkey"].as<std::vector<char>>() == items[i]["pubkey"].as<std::vector<char>>());
+   }
 
    // Linking the stranger's key later credits nothing at intake: the item stays held.
    create_accounts({"stranger"_n});
@@ -1788,9 +1802,13 @@ BOOST_FIXTURE_TEST_CASE(syndicate_liq_refuses_a_key_of_another_chain_family,
    const auto console = all_console(trace);
 
    const auto actions = synd_actions(trace);
-   BOOST_REQUIRE_EQUAL(2u, actions.size());
+   BOOST_REQUIRE_EQUAL(3u, actions.size());
    BOOST_CHECK_EQUAL("onsynd"_n, actions[0]);
    BOOST_CHECK_EQUAL("closeenv"_n, actions[1]);
+   BOOST_CHECK_EQUAL("logintake"_n, actions[2]);
+   const auto receipts = synd_action_data(trace, "logintake"_n);
+   BOOST_REQUIRE_EQUAL(receipts.size(), 1u);
+   BOOST_CHECK_EQUAL(receipts[0]["receipt"]["sequence"].as_uint64(), 3u);
    const auto items = synd_items();
    BOOST_REQUIRE_EQUAL(1u, items.size());
    BOOST_CHECK(uwrit_op_eth_pubkey == items[0]["pubkey"].as<std::vector<char>>());
@@ -1960,8 +1978,9 @@ BOOST_FIXTURE_TEST_CASE(a_pulled_andon_cord_leaves_deliveries_running, sysio_dis
    BOOST_REQUIRE(trace != nullptr);
    BOOST_REQUIRE(!trace->except);
    const auto actions = synd_actions(trace);
-   BOOST_REQUIRE_EQUAL(3u, actions.size());
-   BOOST_CHECK_EQUAL("closeenv"_n, actions[2]);
+   const std::vector<name> expected_actions{"onsynd"_n, "onsynd"_n, "closeenv"_n, "logintake"_n, "logintake"_n};
+   BOOST_REQUIRE_EQUAL_COLLECTIONS(actions.begin(), actions.end(), expected_actions.begin(), expected_actions.end());
+   BOOST_REQUIRE(synd_action_data(trace, "logrelease"_n).empty());
    BOOST_CHECK_NE(std::string::npos,
                   all_console(trace).find("sysio.synd::queue: the andon cord is pulled; releases, deliveries and "
                                           "burns wait for the clear"));
