@@ -7,6 +7,9 @@ contains blockchain node software and supporting tools for developers and node o
 
 The `master` branch is the latest stable branch.
 
+WIP endorsement and Council decision actions are described in the
+[proposal and policy review](docs/proposals/wip-endorsements-and-voting.md); existing election behavior is unchanged.
+
 ## Supported Operating Systems
 
 We currently support the following operating systems.

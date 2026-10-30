@@ -30,6 +30,12 @@ inline constexpr uint8_t MIN_CANDIDATES = SEATS + 2;             ///< 23: <=20 e
 inline constexpr uint32_t MAX_CANDIDATES = 1000;                 ///< hard bound on one generation's candidate pool
 inline constexpr size_t MAX_HANDLE_LEN = 32;                     ///< candidate-handle byte cap
 inline constexpr uint64_t MAX_TIME_SLOT_SEC = 30 * 24 * 60 * 60; ///< thirty-day operational safety cap
+inline constexpr size_t MAX_WIP_URI_BYTES = 512;
+inline constexpr size_t MAX_WIP_REASON_BYTES = 256;
+
+/// Proposal decisions are separate from election flights. Values are stable ABI identities.
+enum class wip_status : uint8_t { OPEN = 0, PASSED = 1, REJECTED = 2, EXPIRED = 3, CANCELLED = 4 };
+enum class wip_choice : uint8_t { YES = 0, NO = 1, ABSTAIN = 2 };
 
 constexpr name ROA_ACCOUNT = "sysio.roa"_n; ///< owner of the nodeowners / roastate tables
 constexpr name SYSTEM_ACCOUNT = "sysio"_n;  ///< system RAM pool payer
@@ -157,6 +163,39 @@ public:
    /// Authenticated entropy contribution. Never alters a seed already frozen for generation.
    [[sysio::action]]
    void stir(name caller);
+
+   // ---- WIP decisions (independent of election lifecycle) ------------------
+
+   /// All thresholds are absolute counts; no production policy is implicitly enabled.
+   struct wip_policy {
+      uint32_t minimum_endorsements;
+      uint8_t quorum;
+      uint8_t minimum_yes;
+      uint32_t endorsement_seconds;
+      uint32_t voting_seconds;
+      SYSLIB_SERIALIZE(wip_policy, (minimum_endorsements)(quorum)(minimum_yes)(endorsement_seconds)(voting_seconds))
+   };
+
+   /// Governance opens an immutable revision and explicitly selects a completed Council for it.
+   /// Snapshot current ROA T2 owners and the selected Council; never change sysio authority.
+   [[sysio::action]]
+   uint64_t openwip(std::string uri, checksum256 content_hash, uint64_t council_gen, wip_policy policy);
+
+   /// One immutable endorsement by a snapshotted Tier-2 owner, bound to the reviewed revision.
+   [[sysio::action]]
+   void endorsewip(name owner, uint64_t proposal_id, checksum256 content_hash);
+
+   /// One immutable Council ballot after endorsement closes and before voting closes.
+   [[sysio::action]]
+   void votewip(name voter, uint64_t proposal_id, checksum256 content_hash, councl::wip_choice choice);
+
+   /// Public authenticated finalization after the appropriate deadline; never executes the proposal.
+   [[sysio::action]]
+   void settlewip(name caller, uint64_t proposal_id);
+
+   /// Governance cancels an open proposal with a bounded reason, preserving its evidence.
+   [[sysio::action]]
+   void cancelwip(uint64_t proposal_id, std::string reason);
 
    // -----------------------------------------------------------------------
    //  Tables
@@ -302,6 +341,59 @@ public:
       SYSLIB_SERIALIZE(council_row, (seat)(seat_owner)(filled_tier)(proposer)(member)(round_id))
    };
    using council_t = sysio::kv::scoped_table<"council"_n, index_key, council_row>;
+
+   struct wip_key {
+      uint64_t id;
+      SYSLIB_SERIALIZE(wip_key, (id))
+   };
+   /// Bounded membership snapshots make election cleanup/turnover unable to change an open WIP.
+   struct [[sysio::table("wips")]] wip_row {
+      uint64_t id;
+      std::string uri;
+      checksum256 content_hash;
+      uint8_t network_gen;
+      uint64_t council_gen;
+      wip_policy policy;
+      std::vector<name> endorsers;
+      std::vector<name> members;
+      time_point opened_at;
+      time_point endorse_until;
+      time_point vote_until;
+      councl::wip_status status = councl::wip_status::OPEN;
+      uint32_t endorsements = 0;
+      uint8_t yes = 0;
+      uint8_t no = 0;
+      uint8_t abstain = 0;
+      time_point closed_at{};
+      std::string reason;
+      SYSLIB_SERIALIZE(
+         wip_row,
+         (id)(uri)(content_hash)(network_gen)(council_gen)(policy)(endorsers)(members)(opened_at)(endorse_until)(vote_until)(status)(endorsements)(yes)(no)(abstain)(closed_at)(reason))
+   };
+   using wips_t = sysio::kv::table<"wips"_n, wip_key, wip_row>;
+
+   struct [[sysio::table("wipcounter")]] wip_counter {
+      uint64_t next_id = 1;
+      SYSLIB_SERIALIZE(wip_counter, (next_id))
+   };
+   using wipcounter_t = sysio::kv::global<"wipcounter"_n, wip_counter>;
+
+   struct [[sysio::table("wipendorses")]] wip_endorsement {
+      name owner;
+      checksum256 content_hash;
+      time_point signed_at;
+      SYSLIB_SERIALIZE(wip_endorsement, (owner)(content_hash)(signed_at))
+   };
+   using wipendorses_t = sysio::kv::scoped_table<"wipendorses"_n, cand_key, wip_endorsement>;
+
+   struct [[sysio::table("wipballots")]] wip_ballot {
+      name voter;
+      checksum256 content_hash;
+      councl::wip_choice choice;
+      time_point signed_at;
+      SYSLIB_SERIALIZE(wip_ballot, (voter)(content_hash)(choice)(signed_at))
+   };
+   using wipballots_t = sysio::kv::scoped_table<"wipballots"_n, cand_key, wip_ballot>;
 
 private:
    /// Reject stale signed requests before any state mutation.

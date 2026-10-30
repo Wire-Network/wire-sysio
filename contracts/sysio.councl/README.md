@@ -14,3 +14,9 @@ The candidate pool remains 23–1,000 self-registered accounts with short handle
 See [RESOURCE_USAGE.md](RESOURCE_USAGE.md) for the opt-in CPU/RAM measurement, observed maximum-size costs, and measurement limits.
 
 Build through the root ON/ON configuration's `contracts_project` target, synchronize the council ABI/WASM here, and regenerate `SysioContractTypes.ts` with the canonical generator. Run `council_math_tests,sysio_councl_tests` in `contracts_unit_test` with explicit `--sys-vm-jit`, plus SDK compile/serialization checks. Unrelated snapshot fixtures do not change with this council contract.
+
+## WIP endorsements and decisions
+
+The separate [WIP actions and policy proposal](../../docs/proposals/wip-endorsements-and-voting.md)
+add Tier-2 endorsements and Council decisions without changing elections or system authority.
+No WIP is opened by bootstrap; governance must explicitly choose its policy and electorate.
