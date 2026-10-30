@@ -97,7 +97,8 @@ namespace sysio {
          /// the fee below it. A sandwich around a tick pays only when the clip moves the
          /// price by more than the attacker's two fees, and a clip is at most
          /// `depth_cap_bps` of the shadow side it sells into, so none pays beyond a unit
-         /// of rounding. A zero-fee yield pool therefore never sells.
+         /// of rounding. `tickyield` holds the stored cap to the fee as well, so a
+         /// zero-fee yield pool never sells.
          [[sysio::action]] void setyield(symbol_code pair_token,
            uint32_t conversion_horizon_sec, uint32_t depth_cap_bps, int64_t clip_floor);
          /// Settle the WIRE yield a yield pool is owed on the shadow it holds into the
@@ -123,8 +124,8 @@ namespace sysio {
          /// Sell one clip of a yield pool's reservoir through the pool and hand the
          /// proceeds to the shadow token's holders. The clip is the reservoir's share
          /// of the horizon elapsed since the last tick, floored, capped by
-         /// `depth_cap_bps` of `last_tick_depth` or the current shadow side, whichever
-         /// is smaller, and by what is queued; it is sold
+         /// `depth_cap_bps`, or the pair's fee if that is lower, of `last_tick_depth`
+         /// or the current shadow side, whichever is smaller, and by what is queued; it is sold
          /// at the pool's own curve and fee, after the pool's owed yield has been
          /// settled, and the proceeds go out through the token's `addyield`, so the
          /// pool takes its own share back on the next accrual.

@@ -499,6 +499,14 @@ public:
     int64_t last_tick_depth( symbol_code pair ) {
         return pair_row( pair )["last_tick_depth"].as_int64();
     }
+    // Rewrite the depth cap in the pair's row directly, to hold a cap no action
+    // would accept.
+    void store_depth_cap( symbol_code pair, uint32_t cap_bps ) {
+        auto row = mvo( pair_row( pair ).get_object() );
+        row( "depth_cap_bps", cap_bps );
+        sysio_system::test_support::write_kv_row( *this, "sysio.swap"_n, "stat"_n, pair.value,
+            abi_ser.variant_to_binary( "currency_stats", row, fixture_abi_yield_function() ) );
+    }
     // `holder`'s row for `sym` on the shadow token (scope = holder, key = symbol code).
     shadow_account_row shadow_account( name holder, symbol_code sym ) {
         const auto data = get_kv_row( "sysio.liq"_n, "accounts"_n, { holder.to_uint64_t(), sym.value } );
@@ -905,6 +913,53 @@ struct sysio_swap_yield_tester : public sysio_swap_tester {
         BOOST_REQUIRE_EQUAL( YieldPoolShadow, held.balance.get_amount() );
         BOOST_REQUIRE_EQUAL( 0u, held.index_checkpoint );
         BOOST_REQUIRE_EQUAL( 0u, held.owed_wire );
+    }
+
+    static constexpr uint32_t QueueHorizonSec = 3600;
+    static constexpr int64_t  QueueClipFloor  = 1000;
+    static constexpr int64_t  QueuedYield     = 1'0000'0000;
+
+    // Fund the reservoir and wait two horizons, so the cap sizes the clip rather
+    // than the time share.
+    void queue_yield_and_wait() {
+        fund_yield_in_one_transaction( "alice"_n, SHEO, asset( QueuedYield, SHD4 ) );
+        produce_block();
+        produce_block( fc::hours(2) );
+    }
+
+    // bob sandwiches a tick in one transaction, front-running with 1% of the shadow
+    // side, a size at which a cap one basis point above the fee would pay him
+    // (yield_tick_sandwich_pays_only_above_the_fee).
+    void assert_sandwich_does_not_pay() {
+        const int fee = pool_fee( SHEO );
+        const auto shadow_pool_of = [&]( const vector<int64_t>& pool ) { return pool.at(0); };
+        const auto wire_pool_of   = [&]( const vector<int64_t>& pool ) { return pool.at(1); };
+
+        const int64_t front_run = YieldPoolShadow / 100;
+        BOOST_REQUIRE_LT( 0, yield_reference::sandwich_gain( YieldPoolShadow, YieldPoolWire, fee, uint32_t(fee + 1),
+                                                             front_run ) );
+        BOOST_REQUIRE_EQUAL( success(), openext( "bob"_n, "bob"_n, SHADOW ) );
+        BOOST_REQUIRE_EQUAL( success(), shadow_transfer( "alice"_n, "bob"_n, asset( front_run, SHD4 ), "" ) );
+        BOOST_REQUIRE_EQUAL( success(), shadow_transfer( "bob"_n, "sysio.swap"_n, asset( front_run, SHD4 ), "" ) );
+        // Settle what the pool is owed first, so the front-run is priced against
+        // exactly the pool read here.
+        BOOST_REQUIRE_EQUAL( success(), accrueyield( SHEO ) );
+
+        const auto before = system_balance( SHEO.value );
+        BOOST_REQUIRE_EQUAL( YieldPoolShadow, last_tick_depth( SHEO ) );
+        const int64_t shadow_before  = deposit_of( "bob"_n, SHADOW );
+        const int64_t wire_before    = deposit_of( "bob"_n, system_token );
+        const int64_t front_proceeds = reference::receive( front_run, shadow_pool_of(before), wire_pool_of(before), fee );
+        sandwich_tick_in_one_transaction( "bob"_n, SHEO, shd( front_run ), WIRE9,
+                                          extend( asset( front_proceeds, WIRE9 ) ), SHD4 );
+
+        // The tick sold the fee's share of the side between the two exchanges...
+        const int64_t clip = YieldPoolShadow * fee / yield_reference::BpsTotal;
+        BOOST_CHECK_EQUAL( QueuedYield - clip, reservoir_of( SHEO ) );
+        // ...and bob, having spent exactly what the front-run paid him, holds less
+        // shadow than he started with.
+        BOOST_REQUIRE_EQUAL( wire_before, deposit_of( "bob"_n, system_token ) );
+        BOOST_REQUIRE_LT( deposit_of( "bob"_n, SHADOW ), shadow_before );
     }
 };
 
@@ -2433,47 +2488,38 @@ BOOST_AUTO_TEST_CASE( yield_tick_sandwich_pays_only_above_the_fee ) try {
 // transaction at the widest cap the fee admits.
 BOOST_FIXTURE_TEST_CASE( yield_tick_sandwich_does_not_pay, sysio_swap_yield_tester ) try {
     setup_yield_pool();
-    const uint32_t horizon_sec = 3600;
-    const int64_t  clip_floor  = 1000;
-    const int      fee         = pool_fee( SHEO );
-    const auto shadow_pool_of  = [&]( const vector<int64_t>& pool ) { return pool.at(0); };
-    const auto wire_pool_of    = [&]( const vector<int64_t>& pool ) { return pool.at(1); };
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, QueueHorizonSec, uint32_t( pool_fee( SHEO ) ), QueueClipFloor ) );
+    queue_yield_and_wait();
+    assert_sandwich_does_not_pay();
+} FC_LOG_AND_RETHROW()
 
-    // A queue deep enough, and a wait long enough, that the cap is what sizes
-    // the clip: 1e7 of the 1e10 shadow side.
-    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, horizon_sec, uint32_t(fee), clip_floor ) );
-    const int64_t queued = 1'0000'0000;
-    fund_yield_in_one_transaction( "alice"_n, SHEO, asset( queued, SHD4 ) );
-    produce_block();
-    produce_block( fc::hours(2) );
+// The tick holds the cap to the fee itself, so the sandwich fails the same way
+// against a row carrying ten times the fee, which setyield would refuse.
+BOOST_FIXTURE_TEST_CASE( yield_tick_sandwich_does_not_pay_over_a_stored_cap, sysio_swap_yield_tester ) try {
+    setup_yield_pool();
+    const uint32_t fee = uint32_t( pool_fee( SHEO ) );
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, QueueHorizonSec, fee, QueueClipFloor ) );
+    queue_yield_and_wait();
+    store_depth_cap( SHEO, 10 * fee );
+    BOOST_REQUIRE_EQUAL( 10 * fee, pair_row( SHEO )["depth_cap_bps"].as_uint64() );
+    assert_sandwich_does_not_pay();
+} FC_LOG_AND_RETHROW()
 
-    // bob front-runs with 1% of the shadow side, a size at which a cap one basis
-    // point above the fee would pay him (yield_tick_sandwich_pays_only_above_the_fee).
-    const int64_t front_run = YieldPoolShadow / 100;
-    BOOST_REQUIRE_LT( 0, yield_reference::sandwich_gain( YieldPoolShadow, YieldPoolWire, fee, uint32_t(fee + 1),
-                                                         front_run ) );
-    BOOST_REQUIRE_EQUAL( success(), openext( "bob"_n, "bob"_n, SHADOW ) );
-    BOOST_REQUIRE_EQUAL( success(), shadow_transfer( "alice"_n, "bob"_n, asset( front_run, SHD4 ), "" ) );
-    BOOST_REQUIRE_EQUAL( success(), shadow_transfer( "bob"_n, "sysio.swap"_n, asset( front_run, SHD4 ), "" ) );
-    // Settle what the pool is owed first, so the front-run is priced against
-    // exactly the pool read here.
-    BOOST_REQUIRE_EQUAL( success(), accrueyield( SHEO ) );
+// A zero fee leaves a stored cap nothing to allow: the tick declines as it does
+// below the floor, without failing, and the pair's clock does not move.
+BOOST_FIXTURE_TEST_CASE( yield_tick_at_a_zero_fee_sells_nothing, sysio_swap_yield_tester ) try {
+    setup_yield_pool();
+    BOOST_REQUIRE_EQUAL( success(), setyield( SHEO, QueueHorizonSec, 0, QueueClipFloor ) );
+    BOOST_REQUIRE_EQUAL( success(), changefee( SHEO, 0 ) );
+    queue_yield_and_wait();
+    store_depth_cap( SHEO, 100 );
 
-    const auto before = system_balance( SHEO.value );
-    BOOST_REQUIRE_EQUAL( YieldPoolShadow, last_tick_depth( SHEO ) );
-    const int64_t shadow_before  = deposit_of( "bob"_n, SHADOW );
-    const int64_t wire_before    = deposit_of( "bob"_n, system_token );
-    const int64_t front_proceeds = reference::receive( front_run, shadow_pool_of(before), wire_pool_of(before), fee );
-    sandwich_tick_in_one_transaction( "bob"_n, SHEO, shd( front_run ), WIRE9,
-                                      extend( asset( front_proceeds, WIRE9 ) ), SHD4 );
-
-    // The tick sold a full clip between the two exchanges...
-    const int64_t clip = YieldPoolShadow * fee / yield_reference::BpsTotal;
-    BOOST_REQUIRE_EQUAL( queued - clip, reservoir_of( SHEO ) );
-    // ...and bob, having spent exactly what the front-run paid him, holds less
-    // shadow than he started with.
-    BOOST_REQUIRE_EQUAL( wire_before, deposit_of( "bob"_n, system_token ) );
-    BOOST_REQUIRE_LT( deposit_of( "bob"_n, SHADOW ), shadow_before );
+    const auto    pool_before = system_balance( SHEO.value );
+    const int64_t clock       = last_tick_us( SHEO );
+    BOOST_REQUIRE_EQUAL( success(), tickyield( SHEO ) );
+    BOOST_REQUIRE_EQUAL( QueuedYield, reservoir_of( SHEO ) );
+    BOOST_REQUIRE_EQUAL( clock, last_tick_us( SHEO ) );
+    BOOST_REQUIRE_EQUAL( pool_before.at(0), system_balance( SHEO.value ).at(0) );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( fee_authority_configuration, sysio_swap_tester ) try {

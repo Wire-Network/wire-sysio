@@ -536,7 +536,10 @@ void swap::tickyield(symbol_code pair_token) {
     // genuinely shrinks, and lets genuine growth through one tick later.
     const uint128_t cap_depth = std::min( uint128_t( pool_of( token, shadow ).quantity.amount ),
                                           uint128_t( token.last_tick_depth ) );
-    const uint128_t cap = cap_depth * token.depth_cap_bps / opp::amm::BPS_TOTAL;
+    // The fee bounds the cap here as well as in setyield and changefee, so the sale
+    // keeps that bound whatever the row holds.
+    const uint128_t cap_bps = std::min( token.depth_cap_bps, uint32_t(token.fee) );
+    const uint128_t cap = cap_depth * cap_bps / opp::amm::BPS_TOTAL;
     uint128_t clip = ( uint128_t(queued) * elapsed_us ) / horizon_us;
     clip = std::min( { clip, cap, uint128_t(queued) } );
     // Below the floor there is nothing worth selling yet, so return WITHOUT
