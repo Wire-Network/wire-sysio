@@ -179,7 +179,7 @@ validator in `test_bootstrap_platform_config.cpp` enforces:
 | V5 | exactly one native token per non-depot chain |
 | V6–V9 | retired with the external-reserve and underwriting configuration |
 | V10 | `t5_dex_allocation > 0` when any liq pool is seeded; Σ `liq_pools[].initial_wire_amount` ≤ `t5_dex_allocation` |
-| V11 | each liq pool references a declared `TOKEN_KIND_LIQ` token on its chain and is unique; `pair_symbol` 1..7 characters `[A-Z]`; seeds > 0; `fee ≤ 9999`; `conversion_horizon_sec > 0`; `depth_cap_bps` ∈ 1..10000; `clip_floor > 0` |
+| V11 | each liq pool references a declared `TOKEN_KIND_LIQ` token on its chain and is unique; `pair_symbol` 1..7 characters `[A-Z]`; seeds > 0; `fee ≤ 9999`; `conversion_horizon_sec > 0`; `depth_cap_bps` ∈ 1..`fee` (`sysio.swap::setyield` refuses a cap above the fee); `clip_floor > 0` |
 | V12 | each syndication references a declared liq token on its chain; `pubkey` fits the chain family; `amount > 0` |
 | V13 | a non-zero `custody_total` equals the pool's `initial_chain_amount` plus the sum of that token's `syndications` |
 

@@ -179,7 +179,7 @@ public:
    }
    action_result regliqpool(std::string_view chain_code, std::string_view token_code, symbol pair_symbol,
                             uint64_t initial_chain_amount, uint64_t initial_wire_amount, int32_t fee = 30,
-                            int64_t locked_shares = 0, uint32_t horizon_sec = 86400, uint32_t depth_cap_bps = 300,
+                            int64_t locked_shares = 0, uint32_t horizon_sec = 86400, uint32_t depth_cap_bps = 30,
                             int64_t clip_floor = 1000, name signer = LIQ_ACCOUNT) {
       return push_liq(signer, "regliqpool"_n, mvo()("chain_code", codename_mvo(chain_code))("token_code", codename_mvo(token_code))
          ("pair_symbol", pair_symbol)("initial_chain_amount", initial_chain_amount)

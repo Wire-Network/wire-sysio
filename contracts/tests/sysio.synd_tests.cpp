@@ -4689,7 +4689,9 @@ BOOST_FIXTURE_TEST_CASE(generic_parked_credit_yield_conversion_and_fee_rounded_r
    constexpr uint64_t Yield = 10 * UNIT;
    constexpr uint32_t FeeBps = 37;
    constexpr uint64_t PoolSeed = 1'000 * UNIT;
-   constexpr uint32_t Horizon = 86'400, DepthBps = 300;
+   constexpr int32_t PoolFee = 30;
+   // setyield caps a clip at the pair's fee.
+   constexpr uint32_t Horizon = 86'400, DepthBps = PoolFee;
    constexpr int64_t ClipFloor = 1000;
    for (size_t i = 0; i < outposts.size(); ++i) {
       BOOST_TEST_CONTEXT("chain=" << outposts[i].asset().chain) {
@@ -4699,7 +4701,7 @@ BOOST_FIXTURE_TEST_CASE(generic_parked_credit_yield_conversion_and_fee_rounded_r
          const auto pair = symbol::from_string(i == 0 ? "9,POOLA" : "9,POOLB");
          external.donate(PoolSeed);
          BOOST_REQUIRE_EQUAL(success(), create_pool(a.chain, a.token, pair, PoolSeed, PoolSeed,
-            30, 0, Horizon, DepthBps, ClipFloor));
+            PoolFee, 0, Horizon, DepthBps, ClipFloor));
          BOOST_REQUIRE_EQUAL(success(), setconfig(a.chain, a.token,
             {.synd_fee_bps = FeeBps, .desynd_fee_bps = FeeBps, .window_sec = Window}));
          const auto private_key = fc::crypto::private_key::generate(a.kind == ChainKind::CHAIN_KIND_EVM
