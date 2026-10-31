@@ -346,11 +346,11 @@ SYS_PIN_INTRINSIC( blake2_f,
                    int32_t (interface::*)(uint32_t,
                                           span<const char>, span<const char>,
                                           span<const char>, span<const char>,
-                                          int32_t, span<char>) const );
+                                          bool, span<char>) const );
 SYS_PIN_INTRINSIC( blake2b_256,
                    int32_t (interface::*)(span<const char>, span<char>) const );
 SYS_PIN_INTRINSIC( sha3,
-                   void (interface::*)(span<const char>, span<char>, int32_t) const );
+                   void (interface::*)(span<const char>, span<char>, bool) const );
 SYS_PIN_INTRINSIC( k1_recover,
                    int32_t (interface::*)(span<const char>, span<const char>, span<char>) const );
 

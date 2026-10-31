@@ -29,17 +29,18 @@ using sysio::chain::webassembly::native_module::native_context_stack;
 
 INTRINSIC_EXPORT
 void sysio_assert(uint32_t test, const char* msg) {
-   native_context_stack::current()->sysio_assert(test, null_terminated_ptr{msg});
+   native_context_stack::current()->sysio_assert(checked_bool(test), null_terminated_ptr{msg});
 }
 
 INTRINSIC_EXPORT
 void sysio_assert_message(uint32_t test, const char* msg, uint32_t msg_len) {
-   native_context_stack::current()->sysio_assert_message(test, aligned_span<const char>{(void*)msg, msg_len});
+   native_context_stack::current()->sysio_assert_message(checked_bool(test),
+                                                         aligned_span<const char>{(void*)msg, msg_len});
 }
 
 INTRINSIC_EXPORT
 void sysio_assert_code(uint32_t test, uint64_t code) {
-   native_context_stack::current()->sysio_assert_code(test, code);
+   native_context_stack::current()->sysio_assert_code(checked_bool(test), code);
 }
 
 INTRINSIC_EXPORT
@@ -614,7 +615,7 @@ int32_t blake2_f(uint32_t rounds, const char* state, uint32_t state_len, const c
       sysio::vm::span<const char>{msg, msg_len},
       sysio::vm::span<const char>{t0_offset, t0_len},
       sysio::vm::span<const char>{t1_offset, t1_len},
-      final,
+      checked_bool(final),
       sysio::vm::span<char>{result, result_len});
 }
 
@@ -623,7 +624,7 @@ void sha3(const char* data, uint32_t data_len, char* hash, uint32_t hash_len, in
    native_context_stack::current()->sha3(
       sysio::vm::span<const char>{data, data_len},
       sysio::vm::span<char>{hash, hash_len},
-      keccak);
+      checked_bool(keccak));
 }
 
 INTRINSIC_EXPORT

@@ -488,4 +488,26 @@ BOOST_AUTO_TEST_CASE(base64_wonky) try {
    });
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(unknown_user_presence) try {
+   constexpr size_t compressed_key_size = 33;
+
+   const auto packed_key = [](uint8_t presence) {
+      std::vector<char> packed(compressed_key_size, 0);
+      packed.push_back(static_cast<char>(presence));
+      const std::vector<char> rpid = fc::raw::pack(std::string{"wire.network"});
+      packed.insert(packed.end(), rpid.begin(), rpid.end());
+      return packed;
+   };
+
+   for (const uint8_t presence : {uint8_t{0}, uint8_t{1}, uint8_t{2}})
+      BOOST_CHECK_NO_THROW(fc::raw::unpack<webauthn::public_key>(packed_key(presence)));
+
+   for (const uint8_t presence : {uint8_t{3}, uint8_t{255}}) {
+      BOOST_CHECK_EXCEPTION(fc::raw::unpack<webauthn::public_key>(packed_key(presence)), fc::assert_exception,
+                            [](const fc::assert_exception& e) {
+                               return e.to_detail_string().find("unknown user presence") != std::string::npos;
+                            });
+   }
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_SUITE_END()

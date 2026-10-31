@@ -2,8 +2,11 @@
 #include <fc/crypto/common.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <fc/crypto/elliptic_r1.hpp>
+#include <fc/exception/exception.hpp>
 #include <fc/fwd.hpp>
 #include <fc/io/raw_fwd.hpp>
+
+#include <magic_enum/magic_enum.hpp>
 
 namespace fc { namespace crypto { namespace webauthn {
 
@@ -60,7 +63,9 @@ class public_key {
          fc::raw::unpack(ds, k.public_key_data);
          uint8_t t;
          fc::raw::unpack(ds, t);
-         k.user_verification_type = static_cast<user_presence_t>(t);
+         const auto presence = magic_enum::enum_cast<user_presence_t>(t);
+         FC_ASSERT(presence.has_value(), "webauthn pubkey has unknown user presence {}", uint32_t(t));
+         k.user_verification_type = *presence;
          fc::raw::unpack(ds, k.rpid);
          k.post_init();
          return ds;

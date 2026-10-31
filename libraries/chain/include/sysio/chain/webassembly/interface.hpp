@@ -129,7 +129,7 @@ namespace webassembly {
            * @ingroup privileged
            *
            * @param[out] packed_parameters the ouput for the parameters.
-           * @param max_version has no effect, but should be 0.
+           * @param max_version must be 0. Any other value aborts with wasm_config_unknown_version.
            *
            * @return the size of the packed parameters if packed_parameters is empty, otherwise it returns the amount of data written in packed_parameters.
          */
@@ -142,7 +142,7 @@ namespace webassembly {
            *
            * @ingroup privileged
            *
-           * @param packed_parameters - a span containing the packed configuration to set.
+           * @param packed_parameters - a span containing the packed configuration to set. Trailing bytes abort.
          */
          void set_wasm_parameters_packed( span<const char> packed_parameters );
 
@@ -151,7 +151,7 @@ namespace webassembly {
           *
           * @ingroup privileged
           *
-          * @param packed_producer_schedule - vector of producer keys
+          * @param packed_producer_schedule - vector of producer keys. Trailing bytes abort.
           *
           * @return pre-savanna:  -1 if proposing a new producer schedule was unsuccessful, otherwise returns the version of the new proposed schedule.
           *         post-savanna: -1 if proposing a new producer schedule was unsuccessful, otherwise returns max uint32_t
@@ -167,8 +167,9 @@ namespace webassembly {
           *
           * @ingroup privileged
           *
-          * @param packed_producer_format - format of the producer data blob.
+          * @param packed_producer_format - format of the producer data blob. Any other value aborts.
           * @param packed_producer_schedule - packed data of representing the producer schedule in the format indicated.
+          *                                   Trailing bytes abort.
           *
           * @return pre-savanna:  -1 if proposing a new producer schedule was unsuccessful, otherwise returns the version of the new proposed schedule.
           *         post-savanna: -1 if proposing a new producer schedule was unsuccessful, otherwise returns max uint32_t
@@ -194,8 +195,8 @@ namespace webassembly {
           *
           * @ingroup privileged
           *
-          * @param packed_finalizer_format - format of the finalizer_policy data blob.
-          * @param packed_finalizer_policy - a serialized finalizer_policy object.
+          * @param packed_finalizer_format - format of the finalizer_policy data blob. Any other value aborts.
+          * @param packed_finalizer_policy - a serialized finalizer_policy object. Trailing bytes abort.
          */
          void set_finalizers(uint64_t packed_finalizer_format, span<const char> packed_finalizer_policy);
 
@@ -215,7 +216,8 @@ namespace webassembly {
           *
           * @ingroup privileged
           *
-          * @param packed_blockchain_parameters - a span containing the packed blockchain config parameters.
+          * @param packed_blockchain_parameters - a span containing the packed blockchain config parameters. Trailing
+          *                                       bytes abort.
          */
          void set_blockchain_parameters_packed(span<const char> packed_blockchain_parameters);
 
@@ -232,7 +234,7 @@ namespace webassembly {
           * @brief Retrieve the blockchain config parameters.
           * @ingroup privileged
           *
-          * @param packed_parameter_ids - the input buffer with the format as described above.
+          * @param packed_parameter_ids - the input buffer with the format as described above. Trailing bytes abort.
           * @param[out] packed_parameters - the output buffer with the format as described above.
          */
          uint32_t get_parameters_packed( span<const char> packed_parameter_ids, span<char> packed_parameters) const;
@@ -251,7 +253,8 @@ namespace webassembly {
           * @brief Set the blockchain parameters in a flexible manner.
           * @ingroup privileged
           *
-          * @param packed_parameters - buffer to hold the packed data with the format described above.
+          * @param packed_parameters - buffer to hold the packed data with the format described above. Trailing bytes
+          *                            abort.
          */
          void set_parameters_packed( span<const char> packed_parameters );
 
@@ -271,7 +274,7 @@ namespace webassembly {
           *
           * @ingroup privileged
           * @param account - name of the account that we want to give the privileged status.
-          * @param is_priv - privileged status (true or false).
+          * @param is_priv - privileged status: 1 or 0. Any other value aborts.
          */
          void set_privileged(account_name account, bool is_priv);
 
@@ -354,8 +357,8 @@ namespace webassembly {
           *
           * @ingroup crypto
           * @param digest - digest of the message that was signed.
-          * @param sig - signature.
-          * @param pub - public key.
+          * @param sig - signature. Trailing bytes abort.
+          * @param pub - public key. Trailing bytes abort.
          */
          void assert_recover_key(aligned_ptr<const fc::sha256> digest, span<const char> sig, span<const char> pub) const;
 
@@ -364,10 +367,10 @@ namespace webassembly {
           *
           * @ingroup crypto
           * @param digest - digest of the message that was signed.
-          * @param sig - signature.
+          * @param sig - signature. Trailing bytes are a malformed signature and return -1.
           * @param[out] pub - output buffer for the public key result.
           *
-          * @return size of data written on the buffer.
+          * @return the packed size of the public key, or -1 if no key could be recovered.
          */
          int32_t recover_key(aligned_ptr<const fc::sha256> digest, span<const char> sig, span<char> pub) const;
 
@@ -460,9 +463,10 @@ namespace webassembly {
           * Checks if a transaction is authorized by a provided set of keys and permissions.
           *
           * @ingroup permission
-          * @param trx_data - serialized transaction.
-          * @param pubkeys_data - serialized vector of provided public keys.
+          * @param trx_data - serialized transaction. Trailing bytes and transaction extensions abort.
+          * @param pubkeys_data - serialized vector of provided public keys. Trailing bytes abort.
           * @param perms_data - serialized vector of provided permissions (empty permission name acts as wildcard).
+          *                     Trailing bytes abort.
           *
           * @retval true if transaction is authorized.
           * @retval false otherwise.
@@ -475,8 +479,9 @@ namespace webassembly {
           * @ingroup permission
           * @param account - the account owner of the permission.
           * @param permission - the name of the permission to check for authorization.
-          * @param pubkeys_data - serialized vector of provided public keys.
+          * @param pubkeys_data - serialized vector of provided public keys. Trailing bytes abort.
           * @param perms_data - serialized vector of provided permissions (empty permission name acts as wildcard).
+          *                     Trailing bytes abort.
           * @param delay_us - must be zero for wire as delayed transactions not supported
           *
           * @retval true if permission is authorized.
@@ -560,7 +565,7 @@ namespace webassembly {
           *
           * @ingroup authorization
           * @param account - name of the account to check.
-          * @param struct_version - use 0.
+          * @param struct_version - must be 0. Any other value aborts.
           * @param packed_result - receives the packed result.
           *
           * @return the size of the packed result.
@@ -635,7 +640,7 @@ namespace webassembly {
           * Aborts processing of this action if the test condition is false.
           *
           * @ingroup context-free
-          * @param condition - test condition.
+          * @param condition - test condition: 1 or 0. Any other value aborts.
           * @param msg - string explaining the reason for failure.
          */
          void sysio_assert(bool condition, null_terminated_ptr msg) const;
@@ -644,7 +649,7 @@ namespace webassembly {
           * Aborts processing of this action if the test condition is false.
           *
           * @ingroup context-free
-          * @param condition - test condition.
+          * @param condition - test condition: 1 or 0. Any other value aborts.
           * @param msg - string explaining the reason for failure.
           */
          void sysio_assert_message(bool condition, span<const char> msg) const;
@@ -655,8 +660,8 @@ namespace webassembly {
           * If the assertion fails, the provided error code will be made available through the exception message.
           *
           * @ingroup context-free
-          * @param condition - test condition.
-          * @param error_code - the error code associated.
+          * @param condition - test condition: 1 or 0. Any other value aborts.
+          * @param error_code - the error code associated. A reserved code aborts whatever the condition is.
          */
          void sysio_assert_code(bool condition, uint64_t error_code) const;
 
@@ -664,7 +669,7 @@ namespace webassembly {
           * This method will abort execution of wasm without failing the contract.
           *
           * @ingroup context-free
-          * @param code - the exit code
+          * @param code - must be 0. Any other value aborts the action. The host gives the code no meaning.
          */
          void sysio_exit(int32_t code) const;
 
@@ -1071,7 +1076,7 @@ namespace webassembly {
           * Send an inline action in the context of the parent transaction of this operation.
           *
           * @ingroup transaction
-          * @param data - the inline action to be sent.
+          * @param data - the inline action to be sent. Trailing bytes abort.
          */
          void send_inline(span<const char> data);
 
@@ -1079,7 +1084,7 @@ namespace webassembly {
           * Send a context free inline action in the context of the parent transaction of this operation.
           *
           * @ingroup transaction
-          * @param data - the packed free inline action to be sent.
+          * @param data - the packed free inline action to be sent. Trailing bytes abort.
          */
          void send_context_free_inline(span<const char> data);
 
@@ -1200,11 +1205,11 @@ namespace webassembly {
           * @param message       - a span containing the message block vector - 16 unsigned 64-bit little-endian words
           * @param t0_offset     - offset counters - unsigned 64-bit little-endian word
           * @param t1_offset     - offset counters - unsigned 64-bit little-endian word
-          * @param final         - the final block indicator flag - (1-true, all other values == false)
+          * @param final         - the final block indicator flag: 1 or 0. Any other value aborts.
           * @param[out] result   - the result
           * @return                -1 if there was an error, 0 otherwise
          */
-         int32_t blake2_f( uint32_t rounds, span<const char> state, span<const char> message, span<const char> t0_offset, span<const char> t1_offset, int32_t final, span<char> result) const;
+         int32_t blake2_f( uint32_t rounds, span<const char> state, span<const char> message, span<const char> t0_offset, span<const char> t1_offset, bool final, span<char> result) const;
 
          /**
           * BLAKE2b-256 hash
@@ -1221,10 +1226,10 @@ namespace webassembly {
           *
           * @ingroup crypto
           * @param data - a span containing the data.
-          * @param[out] hash_val - the resulting digest.
-          * @param keccak - use keccak version (1-true, all other values == false).
+          * @param[out] hash_val - the resulting digest. Must be exactly 32 bytes.
+          * @param keccak - use keccak version: 1 or 0. Any other value aborts.
          */
-         void sha3( span<const char> data, span<char> hash_val, int32_t keccak) const;
+         void sha3( span<const char> data, span<char> hash_val, bool keccak) const;
 
          /**
           * Calculates the uncompressed public key used for a given signature on a given digest.

@@ -215,7 +215,7 @@ struct sys_vm_oc_type_converter : public sysio::vm::type_converter<webassembly::
    using base_type::as_result;
    using base_type::get_host;
 
-   SYS_VM_FROM_WASM(bool, (uint32_t value)) { return value ? 1 : 0; }
+   SYS_VM_FROM_WASM(bool, (uint32_t value)) { return checked_bool(value); }
 
    SYS_VM_FROM_WASM(memcpy_params, (vm::wasm_ptr_t dst, vm::wasm_ptr_t src, vm::wasm_size_t size)) {
       auto d = array_ptr_impl<char>(dst, size);

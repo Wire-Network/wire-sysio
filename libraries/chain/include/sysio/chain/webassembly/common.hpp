@@ -1,7 +1,9 @@
 #pragma once
 
+#include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/wasm_interface.hpp>
 #include <sysio/chain/wasm_sysio_constraints.hpp>
+#include <fc/io/datastream.hpp>
 #include <sysio/vm/host_function.hpp>
 #include <sysio/vm/argument_proxy.hpp>
 #include <sysio/vm/span.hpp>
@@ -55,6 +57,26 @@ namespace sysio { namespace chain {
       vm::wasm_size_t size;
    };
 
+   /// sysio_exit takes 0 only. The host gives the code no meaning, so a protocol feature can still define one.
+   inline void assert_exit_code(int32_t code) {
+      constexpr int32_t accepted_code = 0;
+      SYS_ASSERT(code == accepted_code, wasm_execution_error, "sysio_exit code must be {}, got {}", accepted_code, code);
+   }
+
+   /// Converts a wasm argument the host reads as a flag. Anything but 0 or 1 aborts, so a protocol feature can give
+   /// other values a meaning without having to keep accepting what contracts passed before.
+   inline bool checked_bool(uint32_t value) {
+      SYS_ASSERT(value <= 1, wasm_execution_error, "intrinsic flag must be 0 or 1, got {}", value);
+      return value == 1;
+   }
+
+   /// Aborts when a packed intrinsic argument has bytes left after unpacking, which a later format could read as new
+   /// fields.
+   inline void assert_all_unpacked(const fc::datastream<const char*>& ds, const char* what) {
+      SYS_ASSERT(ds.remaining() == 0, wasm_execution_error, "{}: {} trailing bytes after the packed argument", what,
+                 ds.remaining());
+   }
+
    // define the type converter for sysio
    template<typename Interface>
    struct basic_type_converter : public sysio::vm::type_converter<webassembly::interface, Interface> {
@@ -63,7 +85,7 @@ namespace sysio { namespace chain {
       using base_type::from_wasm;
       using base_type::to_wasm;
 
-      SYS_VM_FROM_WASM(bool, (uint32_t value)) { return value ? 1 : 0; }
+      SYS_VM_FROM_WASM(bool, (uint32_t value)) { return checked_bool(value); }
 
       SYS_VM_FROM_WASM(memcpy_params, (vm::wasm_ptr_t dst, vm::wasm_ptr_t src, vm::wasm_size_t size)) {
          auto d = this->template validate_pointer<char>(dst, size);

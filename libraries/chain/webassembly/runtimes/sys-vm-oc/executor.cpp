@@ -5,6 +5,7 @@
 #include <sysio/chain/webassembly/sys-vm-oc/intrinsic_mapping.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/intrinsic.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/sys-vm-oc.h>
+#include <sysio/chain/webassembly/common.hpp>
 #include <sysio/chain/wasm_sysio_constraints.hpp>
 #include <sysio/chain/apply_context.hpp>
 #include <sysio/chain/transaction_context.hpp>
@@ -81,7 +82,15 @@ static intrinsic grow_memory_intrinsic SYSVMOC_INTRINSIC_INIT_PRIORITY("sysvmoc_
 
 //This is effectively overriding the sysio_exit intrinsic in wasm_interface
 static void sysio_exit(int32_t code) {
-   siglongjmp(*sys_vm_oc_get_jmp_buf(), SYSVMOC_EXIT_CLEAN_EXIT);
+   int exit_kind = SYSVMOC_EXIT_CLEAN_EXIT;
+   try {
+      assert_exit_code(code);
+   }
+   catch(...) {
+      *reinterpret_cast<std::exception_ptr*>(sys_vm_oc_get_exception_ptr()) = std::current_exception();
+      exit_kind = SYSVMOC_EXIT_EXCEPTION;
+   }
+   siglongjmp(*sys_vm_oc_get_jmp_buf(), exit_kind);
    __builtin_unreachable();
 }
 static intrinsic sysio_exit_intrinsic("env.sysio_exit", IR::FunctionType::get(IR::ResultType::none,{IR::ValueType::i32}), (void*)&sysio_exit,

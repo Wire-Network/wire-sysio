@@ -10,20 +10,29 @@ namespace sysio { namespace chain { namespace webassembly {
       keys.clear();
       if( pubkeys_size == 0 ) return;
 
-      keys = fc::raw::unpack<flat_set<public_key_type>>( pubkeys_data, pubkeys_size );
+      fc::datastream<const char*> ds( pubkeys_data, pubkeys_size );
+      fc::raw::unpack( ds, keys );
+      assert_all_unpacked( ds, "provided public keys" );
    }
 
    void unpack_provided_permissions( flat_set<permission_level>& permissions, const char* perms_data, uint32_t perms_size ) {
       permissions.clear();
       if( perms_size == 0 ) return;
 
-      permissions = fc::raw::unpack<flat_set<permission_level>>( perms_data, perms_size );
+      fc::datastream<const char*> ds( perms_data, perms_size );
+      fc::raw::unpack( ds, permissions );
+      assert_all_unpacked( ds, "provided permissions" );
    }
 
    bool interface::check_transaction_authorization( span<const char> trx_data,
                                                     span<const char> pubkeys_data,
                                                     span<const char> perms_data ) const {
-      transaction trx = fc::raw::unpack<transaction>( trx_data.data(), trx_data.size() );
+      transaction trx;
+      fc::datastream<const char*> ds( trx_data.data(), trx_data.size() );
+      fc::raw::unpack( ds, trx );
+      assert_all_unpacked( ds, "check_transaction_authorization" );
+      SYS_ASSERT( trx.transaction_extensions.empty(), invalid_transaction_extension,
+                  "transaction extensions are not currently supported" );
 
       flat_set<public_key_type> provided_keys;
       unpack_provided_keys( provided_keys, pubkeys_data.data(), pubkeys_data.size() );
