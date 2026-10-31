@@ -38,10 +38,13 @@ constexpr auto snapshot_endpoint_option_name = "--snapshot-endpoint";
 constexpr auto blocks_dir_option_name = "--blocks-dir";
 constexpr auto config_dir_option_name = "--config-dir";
 constexpr auto data_dir_option_name = "--data-dir";
+constexpr auto terminate_at_block_option_name = "--terminate-at-block";
+constexpr auto truncate_at_block_option_name = "--truncate-at-block";
 constexpr auto snapshot_without_attestation_table_filename =
    "snapshot-without-attestation-table.bin";
 constexpr auto valid_snapshot_filename = "snapshot-with-valid-attestation.bin";
 constexpr auto unconfigured_snapshot_filename = "snapshot-without-enabled-attestation.bin";
+constexpr auto unscheduled_snapshot_filename = "snapshot-at-unscheduled-height.bin";
 constexpr auto snapshot_metadata_path = "/v1/snapshot/latest";
 constexpr auto snapshot_by_block_path = "/v1/snapshot/by_block";
 constexpr auto snapshot_download_path = "/v1/snapshot/download";
@@ -222,6 +225,7 @@ sysio::chain::abi_def make_snapshot_attestation_abi() {
       "",
       std::vector<sysio::chain::field_def>{
          {snapshot_attest::field::min_providers, snapshot_attest::abi_type::uint32},
+         {snapshot_attest::field::block_spacing, snapshot_attest::abi_type::uint32},
       });
    return abi;
 }
@@ -309,15 +313,6 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_table_read_timeout_policy) {
    BOOST_CHECK(sysio::snapshot_attestation_table_read_timeout(above_minimum)
                == above_minimum);
 
-   BOOST_CHECK(sysio::snapshot_attestation_startup_table_read_timeout(disabled_timeout)
-               == sysio::snapshot_attestation_startup_minimum_table_read_timeout);
-   BOOST_CHECK(sysio::snapshot_attestation_startup_table_read_timeout(above_minimum)
-               == sysio::snapshot_attestation_startup_minimum_table_read_timeout);
-   BOOST_CHECK(sysio::snapshot_attestation_startup_table_read_timeout(
-                  sysio::snapshot_attestation_startup_minimum_table_read_timeout
-                  + sysio::snapshot_attestation_startup_minimum_table_read_timeout)
-               == sysio::snapshot_attestation_startup_minimum_table_read_timeout
-                     + sysio::snapshot_attestation_startup_minimum_table_read_timeout);
 }
 
 /** A transient attestation read is retried, while a confirmed empty read is terminal. */
@@ -406,16 +401,64 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_required_schema_policy) {
    auto wrong_config_field = valid_abi;
    wrong_config_field.structs.back().fields.front().type = snapshot_attest::abi_type::uint64;
    BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(wrong_config_field));
+
+   auto missing_config_field = valid_abi;
+   missing_config_field.structs.back().fields.pop_back();
+   BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(missing_config_field));
+
+   auto reordered_config_fields = valid_abi;
+   std::swap(reordered_config_fields.structs.back().fields[0],
+             reordered_config_fields.structs.back().fields[1]);
+   BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(reordered_config_fields));
+
+   auto extended_config = valid_abi;
+   extended_config.structs.back().fields.push_back(
+      {"future_extension", snapshot_attest::abi_type::uint64});
+   BOOST_CHECK(!sysio::has_required_snapshot_attestation_schema(extended_config));
 }
 
-/** Recognize only one decoded snapconfig row with a positive fixed K. */
-BOOST_AUTO_TEST_CASE(snapshot_attestation_enabled_config_policy) {
-   BOOST_CHECK(sysio::snapshot_attestation_config_is_enabled(
-      {fc::mutable_variant_object()(snapshot_attest::field::min_providers, 1)}));
-   BOOST_CHECK(!sysio::snapshot_attestation_config_is_enabled({}));
-   BOOST_CHECK(!sysio::snapshot_attestation_config_is_enabled(
-      {fc::mutable_variant_object()(snapshot_attest::field::min_providers, 0)}));
-   BOOST_CHECK(!sysio::snapshot_attestation_config_is_enabled({fc::variant{"malformed"}}));
+/** Direct KV reads use the real contract key and two uint32 fields, without an ABI table query. */
+BOOST_FIXTURE_TEST_CASE(snapshot_attestation_startup_config_reads_kv,
+                       snapshot_attest_test_support::snapshot_attest_fixture) {
+   const auto empty = sysio::read_snapshot_attestation_config(control->db());
+   BOOST_CHECK(!empty.enabled());
+   BOOST_CHECK_EQUAL(empty.block_spacing, snapshot_attest::default_block_spacing);
+
+   constexpr uint32_t smallest_spacing = 1;
+   set_snap_config(snapshot_attest_test_support::single_provider_minimum, smallest_spacing);
+   const auto first = sysio::read_snapshot_attestation_config(control->db());
+   BOOST_CHECK(first.enabled());
+   BOOST_CHECK_EQUAL(first.min_providers, snapshot_attest_test_support::single_provider_minimum);
+   BOOST_CHECK_EQUAL(first.block_spacing, smallest_spacing);
+
+   constexpr auto largest_spacing = std::numeric_limits<uint32_t>::max();
+   set_snap_config(snapshot_attest_test_support::single_provider_minimum, largest_spacing);
+   const auto updated = sysio::read_snapshot_attestation_config(control->db());
+   BOOST_CHECK_EQUAL(updated.block_spacing, largest_spacing);
+   BOOST_CHECK_EQUAL(first.block_spacing, smallest_spacing);
+}
+
+/** The configured half-cadence grace is exclusive and remains safe near uint32 overflow. */
+BOOST_AUTO_TEST_CASE(snapshot_attestation_grace_boundary_policy) {
+   constexpr uint32_t snapshot_height = 1'000;
+   constexpr uint32_t even_spacing = 10;
+   constexpr uint32_t odd_spacing = 5;
+
+   BOOST_CHECK(sysio::snapshot_attestation_within_grace(
+      snapshot_height, snapshot_height + even_spacing / 2 - 1, even_spacing));
+   BOOST_CHECK(!sysio::snapshot_attestation_within_grace(
+      snapshot_height, snapshot_height + even_spacing / 2, even_spacing));
+
+   // Odd cadences deliberately use floor(S / 2).
+   BOOST_CHECK(sysio::snapshot_attestation_within_grace(
+      snapshot_height, snapshot_height + odd_spacing / 2 - 1, odd_spacing));
+   BOOST_CHECK(!sysio::snapshot_attestation_within_grace(
+      snapshot_height, snapshot_height + odd_spacing / 2, odd_spacing));
+
+   constexpr uint32_t near_max_height = std::numeric_limits<uint32_t>::max() - 1;
+   BOOST_CHECK(sysio::snapshot_attestation_within_grace(
+      near_max_height, std::numeric_limits<uint32_t>::max(),
+      snapshot_attest_test_support::test_block_spacing));
 }
 
 /** Match both the loaded block id and root hash against the attested tuple. */
@@ -435,15 +478,21 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_record_tuple_policy) {
 
 /** Require endpoint metadata to identify the loaded scheduled snapshot head exactly. */
 BOOST_AUTO_TEST_CASE(snapshot_endpoint_block_identity_policy) {
-   constexpr uint32_t scheduled_block = snapshot_attest::block_spacing;
-   constexpr uint32_t other_scheduled_block = snapshot_attest::block_spacing * 2;
+   constexpr uint32_t block_spacing = snapshot_attest_test_support::test_block_spacing;
+   constexpr uint32_t scheduled_block = block_spacing * 2;
+   constexpr uint32_t other_scheduled_block = block_spacing * 3;
    constexpr uint32_t unscheduled_block = scheduled_block + 1;
    constexpr uint64_t first_unsupported_block =
       static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1;
 
-   BOOST_CHECK(sysio::snapshot_endpoint_block_matches(scheduled_block, scheduled_block));
-   BOOST_CHECK(!sysio::snapshot_endpoint_block_matches(scheduled_block, other_scheduled_block));
-   BOOST_CHECK(!sysio::snapshot_endpoint_block_matches(unscheduled_block, unscheduled_block));
+   BOOST_CHECK(sysio::snapshot_endpoint_block_matches(
+      scheduled_block, scheduled_block, block_spacing));
+   BOOST_CHECK(!sysio::snapshot_endpoint_block_matches(
+      scheduled_block, other_scheduled_block, block_spacing));
+   BOOST_CHECK(!sysio::snapshot_endpoint_block_matches(
+      unscheduled_block, unscheduled_block, block_spacing));
+   BOOST_CHECK(!sysio::snapshot_endpoint_block_matches(
+      scheduled_block, scheduled_block, 0));
    BOOST_CHECK(sysio::snapshot_endpoint_request_matches(std::nullopt, scheduled_block));
    BOOST_CHECK(sysio::snapshot_endpoint_request_matches(
       std::optional<uint32_t>{scheduled_block}, scheduled_block));
@@ -480,12 +529,13 @@ BOOST_AUTO_TEST_CASE(get_info_consumer_plugin_policy) {
 BOOST_FIXTURE_TEST_CASE(
    chain_plugin_accepts_attested_auto_fetched_snapshot,
    snapshot_attest_test_support::snapshot_attest_fixture) {
-   set_snap_config(snapshot_attest_test_support::single_provider_minimum);
+   set_snap_config(snapshot_attest_test_support::single_provider_minimum,
+                   snapshot_attest_test_support::test_block_spacing);
    control->abort_block();
 
    const auto snapshot_block_num = control->head().block_num();
    const auto snapshot_block_id = control->head().id();
-   BOOST_REQUIRE_EQUAL(snapshot_block_num, snapshot_attest::block_spacing);
+   BOOST_REQUIRE_EQUAL(snapshot_block_num, snapshot_attest_test_support::test_block_spacing);
 
    fc::temp_directory snapshot_dir;
    const auto snapshot_path = snapshot_dir.path() / valid_snapshot_filename;
@@ -532,7 +582,7 @@ BOOST_FIXTURE_TEST_CASE(
    plugin.plugin_shutdown();
 }
 
-/** Reject an auto-fetched snapshot before replay when governance has not enabled attestation. */
+/** Reject an auto-fetched snapshot before startup completes when attestation remains disabled. */
 BOOST_FIXTURE_TEST_CASE(
    chain_plugin_rejects_auto_fetched_snapshot_without_enabled_config,
    snapshot_attest_test_support::snapshot_attest_fixture) {
@@ -540,7 +590,7 @@ BOOST_FIXTURE_TEST_CASE(
    control->abort_block();
 
    const auto snapshot_block_num = control->head().block_num();
-   BOOST_REQUIRE_EQUAL(snapshot_block_num, snapshot_attest::block_spacing);
+   BOOST_REQUIRE_EQUAL(snapshot_block_num, snapshot_attest_test_support::test_block_spacing);
 
    fc::temp_directory snapshot_dir;
    const auto snapshot_path = snapshot_dir.path() / unconfigured_snapshot_filename;
@@ -575,6 +625,53 @@ BOOST_FIXTURE_TEST_CASE(
          const auto detail = error.to_detail_string();
          return detail.find(unconfigured_attestation_error_fragment) != std::string::npos
                 && detail.find(delete_loaded_chain_state_error_fragment) != std::string::npos;
+      });
+}
+
+/** Reject endpoint metadata whose loaded head is outside the cadence stored in that snapshot. */
+BOOST_FIXTURE_TEST_CASE(
+   chain_plugin_rejects_auto_fetched_snapshot_at_unscheduled_height,
+   snapshot_attest_test_support::snapshot_attest_fixture) {
+   set_snap_config(snapshot_attest_test_support::single_provider_minimum,
+                   snapshot_attest_test_support::test_block_spacing);
+   produce_block();
+   control->abort_block();
+
+   const auto snapshot_block_num = control->head().block_num();
+   BOOST_REQUIRE_EQUAL(snapshot_block_num,
+                       snapshot_attest_test_support::test_block_spacing + 1);
+
+   fc::temp_directory snapshot_dir;
+   const auto snapshot_path = snapshot_dir.path() / unscheduled_snapshot_filename;
+   const auto snapshot_root_hash = write_chain_plugin_snapshot(*control, snapshot_path);
+   extend_block_log_past_snapshot(*this);
+   const auto source_blocks_path = get_config().blocks_dir.string();
+   validate_and_close();
+
+   snapshot_endpoint_server endpoint(snapshot_block_num, snapshot_root_hash, snapshot_path);
+   fc::temp_directory node_dir;
+   sysio::chain::application exe({.enable_resource_monitor = false});
+   const auto node_path = node_dir.path().string();
+   const auto endpoint_url = endpoint.url();
+   std::array args{
+      chain_plugin_test_program_name,
+      snapshot_endpoint_option_name,
+      endpoint_url.c_str(),
+      blocks_dir_option_name,
+      source_blocks_path.c_str(),
+      config_dir_option_name,
+      node_path.c_str(),
+      data_dir_option_name,
+      node_path.c_str(),
+   };
+
+   BOOST_REQUIRE(exe.init<sysio::chain_plugin>(args.size(), const_cast<char**>(args.data()))
+                 == sysio::chain::exit_code::SUCCESS);
+   auto& plugin = appbase::app().get_plugin<sysio::chain_plugin>();
+   BOOST_CHECK_EXCEPTION(
+      plugin.plugin_startup(), sysio::chain::plugin_config_exception,
+      [](const sysio::chain::plugin_config_exception& error) {
+         return error.to_detail_string().find("unscheduled block") != std::string::npos;
       });
 }
 
@@ -634,6 +731,65 @@ BOOST_AUTO_TEST_CASE(chain_plugin_accepts_trusted_manual_snapshot_without_attest
    BOOST_CHECK(!plugin.has_pending_snapshot_attestation());
    BOOST_CHECK(!appbase::app().is_quiting());
    plugin.plugin_shutdown();
+}
+
+/** Snapshot replay must capture a governance change from the retained block log at startup. */
+BOOST_FIXTURE_TEST_CASE(snapshot_attestation_startup_config_follows_snapshot_replay,
+                       snapshot_attest_test_support::snapshot_attest_fixture) {
+   set_snap_config(snapshot_attest_test_support::single_provider_minimum);
+   control->abort_block();
+   fc::temp_directory snapshot_dir;
+   const auto snapshot_path = snapshot_dir.path() / valid_snapshot_filename;
+   write_chain_plugin_snapshot(*control, snapshot_path);
+   const auto terminate_block = std::to_string(control->head().block_num() + 1);
+
+   constexpr uint32_t updated_spacing = 19;
+   produce_block();
+   set_snap_config(snapshot_attest_test_support::single_provider_minimum, updated_spacing);
+   produce_blocks(attestation_finality_block_count);
+   const auto source_blocks_path = get_config().blocks_dir.string();
+   validate_and_close();
+
+   fc::temp_directory node_dir;
+   const auto node_path = node_dir.path().string();
+   const auto snapshot_path_string = snapshot_path.string();
+   std::array args{
+      chain_plugin_test_program_name,
+      snapshot_option_name, snapshot_path_string.c_str(),
+      blocks_dir_option_name, source_blocks_path.c_str(),
+      config_dir_option_name, node_path.c_str(),
+      data_dir_option_name, node_path.c_str(),
+   };
+   {
+      sysio::chain::application exe({.enable_resource_monitor = false});
+      BOOST_REQUIRE(exe.init<sysio::chain_plugin>(args.size(), const_cast<char**>(args.data()))
+                    == sysio::chain::exit_code::SUCCESS);
+      auto& plugin = appbase::app().get_plugin<sysio::chain_plugin>();
+      plugin.plugin_startup();
+      BOOST_CHECK_EQUAL(plugin.get_snapshot_attestation_config().block_spacing, updated_spacing);
+      BOOST_CHECK_EQUAL(sysio::read_snapshot_attestation_config(plugin.chain().db()).block_spacing,
+                        updated_spacing);
+      BOOST_CHECK(!appbase::app().is_quiting());
+      plugin.plugin_shutdown();
+   }
+
+   // A deliberate replay stop must still exit successfully, without exposing partial startup state.
+   fc::temp_directory stopped_node_dir;
+   const auto stopped_node_path = stopped_node_dir.path().string();
+   std::vector<const char*> stopped_args(args.begin(), args.end());
+   stopped_args.insert(stopped_args.end(), {
+      terminate_at_block_option_name, terminate_block.c_str(),
+      truncate_at_block_option_name, terminate_block.c_str(),
+   });
+   const auto config_option = std::find(stopped_args.begin(), stopped_args.end(), config_dir_option_name);
+   const auto data_option = std::find(stopped_args.begin(), stopped_args.end(), data_dir_option_name);
+   *(config_option + 1) = stopped_node_path.c_str();
+   *(data_option + 1) = stopped_node_path.c_str();
+   sysio::chain::application stopped_exe({.enable_resource_monitor = false});
+   BOOST_REQUIRE(stopped_exe.init<sysio::chain_plugin>(stopped_args.size(), const_cast<char**>(stopped_args.data()))
+                 == sysio::chain::exit_code::SUCCESS);
+   BOOST_CHECK(stopped_exe.exec() == sysio::chain::exit_code::SUCCESS);
+   BOOST_CHECK(appbase::app().is_quiting());
 }
 
 /** Verify snapshot endpoint registration and removal of endpoint-specific resource knobs. */

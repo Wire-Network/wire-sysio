@@ -28,6 +28,9 @@ inline constexpr auto snapshot_provider_account = "snapprov1"_n;
 /// One-provider fixed K used by tests that finalize with one vote.
 inline constexpr uint32_t single_provider_minimum = 1;
 
+/// Small configured cadence used by native tests that need real scheduled heights.
+inline constexpr uint32_t test_block_spacing = 250;
+
 /// Distance from a scheduled height to the immediately preceding block.
 inline constexpr uint32_t preceding_block_offset = 1;
 
@@ -43,7 +46,7 @@ inline fc::sha256 to_contract_snapshot_hash(const fc::crypto::blake3& snapshot_r
  * Real-contract fixture for scheduled snapshot-attestation and bootstrap tests.
  *
  * The fixture deploys the current token and system contracts, registers one producer/provider
- * pair, and stops immediately before the first 25,000-block production cadence height.
+ * pair, and stops immediately before the first configured test-cadence height.
  */
 class snapshot_attest_fixture : public sysio_system::sysio_system_tester {
 public:
@@ -82,8 +85,8 @@ public:
                (snapshot_attestation::field::snap_account, snapshot_provider_account)));
       produce_blocks();
 
-      const uint32_t block_before_first_snapshot =
-         snapshot_attestation::block_spacing - preceding_block_offset;
+      BOOST_REQUIRE_LT(control->head().block_num(), test_block_spacing);
+      const uint32_t block_before_first_snapshot = test_block_spacing - preceding_block_offset;
       if (control->head().block_num() < block_before_first_snapshot) {
          produce_blocks(block_before_first_snapshot - control->head().block_num(), true);
       }
@@ -100,11 +103,12 @@ public:
       BOOST_REQUIRE_EQUAL(success(), result);
    }
 
-   /** Configure the governance-controlled fixed K and commit the action in a new block. */
-   void set_snap_config(uint32_t min_providers) {
+   /** Configure quorum and cadence, using the small test cadence by default. */
+   void set_snap_config(uint32_t min_providers, uint32_t block_spacing = test_block_spacing) {
       const auto result = push_action(
          config::system_account_name, action_name{snapshot_attestation::action_setsnapcfg},
-         mvo()(snapshot_attestation::field::min_providers, min_providers));
+         mvo()(snapshot_attestation::field::min_providers, min_providers)
+            (snapshot_attestation::field::block_spacing, block_spacing));
       BOOST_REQUIRE_EQUAL(success(), result);
    }
 

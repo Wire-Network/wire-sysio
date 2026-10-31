@@ -300,14 +300,6 @@ window must never reopen imports. Removal of an inline action requires retiring 
 callers first; addition requires deploying the callee first. Fresh-state bootstrap must
 use a matching contract set and generated SDK interface.
 
-> **WIRE-350 pre-launch note:** Provider nodes that previously started with the old automatic
-> snapshot schedule must delete their local `snapshot-schedule.json` once before starting this
-> build. The old `(spacing=25000, start=24999, end=MAX)` request and the corrected
-> `(spacing=25000, start=25000, end=MAX)` request have different identities, so the scheduler would
-> otherwise retain both persisted requests. No on-chain migration or production upgrade path is
-> provided because snapshot attestation is being deployed before launch.
->
-
 **A downgrade is not the upgrade run backwards. It is a data-migration problem
 first, and a code-ordering problem second** — because by the time you want to
 roll back, the claim tables may hold value that only the NEW code can pay out:
@@ -363,6 +355,24 @@ Custody tolerance adds an ordinary `uint32 custody_shortfall_bps` field to `setc
 Deploy on fresh pre-launch state and regenerate SDK contract types. Supply zero for strict backing on
 other pairs and 100 for LIQETH's 1% shortfall allowance. This is part of the existing per-pair row;
 there is no compatibility table or migration. Every later `setconfig` must preserve the intended value.
+
+## WIRE-382 pre-launch deployment
+
+This change extends the persisted `snapconfig` row from `min_providers` to
+`(min_providers, block_spacing)` and extends `setsnpcfg` by the same required field. There is no in-place
+row migration, compatibility shim, or mixed-version contract/node interface. Bootstrap fresh state with
+matching system-contract artifacts, native nodes, and generated SDK types, then initialize the two-field
+configuration before enabling snapshot providers or endpoint bootstrap.
+
+Nodes read the two-uint32 `snapconfig` KV row directly once at startup, defaulting to 25,000 blocks
+when it is absent. Governance may change any positive uint32 interval, but operators must restart
+provider and serving nodes afterward. Small values are for testing; production should use much larger
+values because the grace window is half the spacing. At startup, provider nodes create or reuse the
+exact automatic request shape, removing requests with the reserved `snapshot-provider auto` description
+when their spacing or bounds differ. An interval too large to repeat uses a one-shot request at its sole
+triggerable height. If no future trigger exists, including at `UINT32_MAX` spacing, all provider-owned
+automatic requests are removed and none is created. Manual requests remain untouched. There is no
+irreversible-block refresh.
 
 ## WIRE-415 pre-launch deployment
 

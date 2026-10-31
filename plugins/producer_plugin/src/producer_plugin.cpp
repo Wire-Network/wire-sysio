@@ -673,7 +673,8 @@ public:
    void submit_snapshot_vote(const snapshot_scheduler::snapshot_information& si) {
       if (_snapshot_provider_account.empty()) return;
 
-      if (!snapshot_attest::is_scheduled_block(si.head_block_num)) {
+      if (!snapshot_attest::is_scheduled_block(
+             si.head_block_num, chain_plug->get_snapshot_attestation_config().block_spacing)) {
          dlog("Snapshot provider: skipping on-chain vote for unscheduled manual snapshot at block {}",
               si.head_block_num);
          return;
@@ -886,6 +887,13 @@ public:
    static constexpr uint32_t _snapshot_vote_expiration_seconds = 30;
    /// Description persisted with the automatic provider schedule.
    static constexpr auto _snapshot_provider_schedule_description = "snapshot-provider auto";
+   /// Startup diagnostics for finite block-height scheduling and persisted request reuse.
+   static constexpr auto _snapshot_provider_no_future_log =
+      "Snapshot provider mode: no future snapshot trigger at cadence {} from head {}; automatic scheduling disabled";
+   static constexpr auto _snapshot_provider_one_shot_log =
+      "Snapshot provider mode: auto-scheduled one snapshot at block {} (request id {})";
+   static constexpr auto _snapshot_provider_reused_request_log =
+      "Snapshot provider mode: reusing persisted snapshot request {} (cadence {}, start {}, end {})";
 
    std::function<void(speculative_block_metrics)> _update_speculative_block_metrics;
 
@@ -1805,29 +1813,54 @@ void producer_plugin_impl::plugin_startup() {
       }));
 
       // Auto-schedule periodic snapshots for snapshot provider mode.
-      // All providers use the same block_spacing so they snapshot at identical heights.
+      // Every provider keeps the on-chain cadence observed at startup until the node restarts.
       // on_start_block(height) snapshots the current head at height - 1, so start_block_num equal
       // to block_spacing snapshots exact head-height multiples:
-      // blocks 25000, 50000, 75000, ...
+      // blocks S, 2S, 3S, ...
       if (!_snapshot_provider_account.empty()) {
+         const auto block_spacing = chain_plug->get_snapshot_attestation_config().block_spacing;
+         constexpr auto maximum_block_num = std::numeric_limits<uint32_t>::max();
+         // Capturing head H needs block_start(H + 1); the terminal uint32 height has no trigger.
+         const auto last_scheduled_block = ((maximum_block_num - 1) / block_spacing) * block_spacing;
+         const bool has_future_trigger = last_scheduled_block > 0 && chain.head().block_num() <= last_scheduled_block;
+
          snapshot_scheduler::snapshot_request_information sri;
-         sri.block_spacing = snapshot_attest::block_spacing;
-         sri.start_block_num = snapshot_attest::block_spacing;
-         sri.end_block_num = std::numeric_limits<uint32_t>::max();
+         sri.block_spacing = block_spacing;
+         sri.start_block_num = block_spacing;
+         sri.end_block_num = maximum_block_num;
          sri.snapshot_description = _snapshot_provider_schedule_description;
+         // A valid interval too large to repeat still has one eligible height, unless no trigger remains.
+         if (block_spacing > maximum_block_num - block_spacing) {
+            sri.block_spacing = 0;
+            sri.end_block_num = sri.start_block_num;
+         }
+
+         for (const auto& request : _snapshot_scheduler.get_snapshot_requests().snapshot_requests) {
+            if (request.snapshot_description == _snapshot_provider_schedule_description
+                && (!has_future_trigger || request.block_spacing != sri.block_spacing
+                    || request.start_block_num != sri.start_block_num || request.end_block_num != sri.end_block_num))
+               _snapshot_scheduler.unschedule_snapshot(request.snapshot_request_id);
+         }
 
          // The auto-schedule is persisted to snapshot-schedule.json and reloaded by set_db_path()
          // on restart, so only schedule it when an identical request is not already present;
          // otherwise schedule_snapshot() would throw duplicate_snapshot_request on every restart.
-         if (auto existing = _snapshot_scheduler.find_snapshot_request(sri.block_spacing, sri.start_block_num, sri.end_block_num)) {
-            ilog("Snapshot provider mode: reusing persisted auto-schedule for every {} blocks (request id {})",
-                 snapshot_attest::block_spacing, *existing);
+         if (!has_future_trigger) {
+            ilog(_snapshot_provider_no_future_log, block_spacing, chain.head().block_num());
+         } else if (auto existing = _snapshot_scheduler.find_snapshot_request(
+                       sri.block_spacing, sri.start_block_num, sri.end_block_num)) {
+            ilog(_snapshot_provider_reused_request_log, *existing, block_spacing,
+                 sri.start_block_num, sri.end_block_num);
          } else {
             // scheduled (non create_snapshot) requests store no completion callback; the produced
             // snapshots are observed through add_snapshot_finalized_callback (provider-mode voting)
             auto result = _snapshot_scheduler.schedule_snapshot(sri, {});
-            ilog("Snapshot provider mode: auto-scheduled snapshots every {} blocks (request id {})",
-                 snapshot_attest::block_spacing, result.snapshot_request_id);
+            if (sri.block_spacing) {
+               ilog("Snapshot provider mode: auto-scheduled snapshots every {} blocks (request id {})",
+                    block_spacing, result.snapshot_request_id);
+            } else {
+               ilog(_snapshot_provider_one_shot_log, sri.start_block_num, result.snapshot_request_id);
+            }
          }
       }
 

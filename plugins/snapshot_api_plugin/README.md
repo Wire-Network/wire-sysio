@@ -127,17 +127,22 @@ clio push action sysio regsnapprov \
   -p myproducer1@active
 ```
 
-### 3. Configure attestation quorum (network-wide)
+### 3. Configure attestation quorum and cadence (network-wide)
 
-The attestation config is a network-wide singleton set by the `sysio` authority. It controls how many provider votes are needed before a snapshot is considered attested:
+The attestation config is a network-wide singleton set by the `sysio` authority. It controls both how many provider
+votes are needed and which block heights are eligible:
 
 ```bash
 clio push action sysio setsnpcfg \
-  '{"min_providers": 3}' \
+  '{"min_providers": 3, "block_spacing": 25000}' \
   -p sysio@active
 ```
 
 - `min_providers` — fixed number K of distinct producer votes required; voting remains disabled until this nonzero value is configured
+- `block_spacing` — any positive uint32 block interval, default 25,000; governance may change it at any time.
+  Nodes read the two-uint32 KV row directly once at startup, without ABI decoding or queued configuration reads.
+  Restart provider and serving nodes to adopt changes. Small values are for testing; production should use much
+  larger intervals because the verification grace window is only `floor(block_spacing / 2)` blocks.
 
 ### 4. Enable automatic scheduled snapshots
 
@@ -147,14 +152,20 @@ For production, enable snapshot provider mode in `config.ini`:
 snapshot-provider-account = mysnapprov1
 ```
 
-Provider mode creates the canonical schedule automatically: snapshots are taken at exact 25,000-block multiples
-(25,000, 50,000, 75,000, ...), and `votesnaphash` is submitted automatically after each scheduled snapshot finalizes.
-Manual snapshots are not attested because their heights need not satisfy the shared cadence.
+Provider mode schedules at exact multiples of its startup `block_spacing`, using 25,000 when no row exists.
+For `block_spacing = 25000`, those are 25,000, 50,000, 75,000, and so on. Startup reuses the exact automatic
+request shape and removes provider-owned requests with different spacing or bounds. An interval too large
+to repeat uses a one-shot request at its sole triggerable height; no automatic request remains if no future
+trigger exists, including at `UINT32_MAX` spacing. Manual schedules are untouched. The contract still rejects
+votes until governance configures a nonzero quorum. No per-block cadence refresh occurs.
+
+`votesnaphash` is submitted automatically after each configured-cadence snapshot finalizes. Manual snapshots are not
+attested unless their height also happens to be eligible under the configured cadence.
 
 ### 5. Attestation lifecycle
 
 The provider plugin submits the snapshot's block ID and root hash automatically. The equivalent action is shown here
-only as a protocol reference; its block ID must name an exact 25,000-block cadence height:
+only as a protocol reference; its block ID must name an exact multiple of the configured `block_spacing`:
 
 ```bash
 clio push action sysio votesnaphash \
@@ -167,7 +178,8 @@ registration count does not change it. Configuration changes apply to pending he
 does not retract accepted votes. Once K is met, the system contract moves the entry to `snaprecords` and purges pending
 votes through that height.
 
-Before replay, auto-fetching nodes require compatible `snaprecords` and `snapconfig` schemas plus a nonzero K. A
+Auto-fetching nodes require compatible table schemas before replay, then a nonzero K and eligible height
+against the single post-replay startup configuration before dependent plugins start serving. A
 configuration-read or disabled-configuration rejection tells the operator to delete the loaded chain state before
 restarting without `--snapshot-endpoint`. After syncing, nodes verify the `snaprecords` row and shut down if the
 snapshot is missing or disagrees. Manual `--snapshot` remains an operator-trusted path without attestation verification.
@@ -191,6 +203,10 @@ irreversible and whose file is still available on disk. Newer manual snapshots, 
 snapshots that are not yet attested are skipped, so base-URL bootstrap discovers the newest snapshot it can immediately
 download. Discovery reads final attestation records newest-first in bounded pages limited to the locally available
 snapshot-height range, and transient table-read failures are retried before discovery fails closed.
+
+When attestation was not configured at startup, this endpoint returns 404. The cadence and configured-state
+values remain fixed until restart. Malformed binary configuration fails node startup; record discovery read
+failures can still return 503.
 
 **Request:** empty body or `{}`
 
@@ -229,6 +245,9 @@ download endpoint.
 
 Downloads a snapshot file as a binary stream. Scheduled snapshots return 404 until an irreversible on-chain
 `snaprecords` row matches the exact block ID and root hash. Manual unscheduled snapshots remain explicitly downloadable.
+An absent configuration at startup uses the default 25,000-block spacing to classify explicit downloads, so files
+at those heights retain the attestation gate even though discovery is disabled. Serving uses the same startup
+configuration as provider scheduling and endpoint verification.
 
 **Request:**
 ```json
@@ -267,16 +286,15 @@ nodeop \
 
 The bootstrap process:
 1. Fetches snapshot metadata from the endpoint
-2. Rejects snapshots outside the exact 25,000-block attestation cadence
-3. Downloads the snapshot binary
-4. Verifies the file's root hash matches the advertised hash
-5. Loads the snapshot and begins syncing from that point
-6. After syncing, verifies the snapshot's on-chain attestation record
+2. Downloads the snapshot binary and verifies its advertised root hash
+3. Restores/replays chain state, reads the startup KV configuration once, and rejects a loaded head outside its cadence
+4. Begins syncing from the loaded snapshot
+5. After syncing, verifies the snapshot's on-chain attestation record
 
 `--delete-all-blocks` is required when existing chain data is present. The `--snapshot-endpoint` option is incompatible with `--snapshot` (local file).
 Manual/on-demand snapshots remain available through the explicit-block serving APIs. Base-URL discovery ignores their
-unscheduled heights, and an explicit-block bootstrap request rejects them before download because they can never
-receive an on-chain attestation.
+unscheduled heights. An explicit-block bootstrap can download one, but rejects it before startup completes if the height
+is outside the post-replay startup cadence and therefore cannot receive a matching attestation.
 
 ### Bootstrap download status and limits
 

@@ -1457,6 +1457,10 @@
                 {
                     "name": "min_providers",
                     "type": "uint32"
+                },
+                {
+                    "name": "block_spacing",
+                    "type": "uint32"
                 }
             ]
         },
@@ -1466,6 +1470,10 @@
             "fields": [
                 {
                     "name": "min_providers",
+                    "type": "uint32"
+                },
+                {
+                    "name": "block_spacing",
                     "type": "uint32"
                 }
             ]

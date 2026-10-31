@@ -103,20 +103,8 @@ namespace sysio {
                 : configured_timeout;
    }
 
-   /// Minimum decoder and request budget for a cold startup configuration read.
-   inline constexpr fc::microseconds snapshot_attestation_startup_minimum_table_read_timeout{
-      1'000'000};
-
    /// Maximum number of bounded attestation-table reads before the caller fails closed.
    inline constexpr uint32_t snapshot_attestation_table_read_attempts = 3;
-
-   /** Give a cold startup read more headroom than steady-state attestation polling. */
-   constexpr fc::microseconds snapshot_attestation_startup_table_read_timeout(
-      fc::microseconds configured_timeout) {
-      return configured_timeout < snapshot_attestation_startup_minimum_table_read_timeout
-                ? snapshot_attestation_startup_minimum_table_read_timeout
-                : configured_timeout;
-   }
 
    /** Retry transient attestation-table read failures while preserving a terminal empty result. */
    template <typename Read>
@@ -130,14 +118,40 @@ namespace sysio {
       return {};
    }
 
+   /** Decoded governance values consumed by native snapshot-attestation components. */
+   struct snapshot_attestation_config {
+      /// Fixed number of distinct provider votes required; zero means unconfigured.
+      uint32_t min_providers = 0;
+      /// Positive block-height interval between eligible snapshots.
+      uint32_t block_spacing = sysiosystem::snapshot_attestation::default_block_spacing;
+
+      /** Return whether governance has enabled snapshot attestation. */
+      constexpr bool enabled() const noexcept { return min_providers > 0; }
+   };
+
+   /** Return whether a finalized height is still inside the configured post-snapshot grace window. */
+   constexpr bool snapshot_attestation_within_grace(uint32_t snapshot_height,
+                                                     uint32_t current_height,
+                                                     uint32_t block_spacing) noexcept {
+      return sysiosystem::snapshot_attestation::is_valid_block_spacing(block_spacing)
+             && static_cast<uint64_t>(current_height)
+                   < static_cast<uint64_t>(snapshot_height)
+                        + sysiosystem::snapshot_attestation::snapshot_attestation_grace_blocks(
+                           block_spacing);
+   }
+
    /** Return whether an ABI declares the tables consumed during auto-fetched snapshot bootstrap. */
    bool has_required_snapshot_attestation_schema(const abi_def& abi);
 
-   /** Return whether one decoded snapconfig row enables snapshot attestation. */
-   bool snapshot_attestation_config_is_enabled(const fc::variants& rows);
+   /** Read the fixed two-uint32 snapconfig KV row directly; absence yields production defaults.
+    * Call only during startup or while the caller owns a controller read/write window.
+    */
+   snapshot_attestation_config read_snapshot_attestation_config(const chain::database& db);
 
-   /** Return whether endpoint metadata identifies the loaded scheduled snapshot head exactly. */
-   bool snapshot_endpoint_block_matches(uint32_t advertised_block_num, uint32_t loaded_block_num);
+   /** Return whether endpoint metadata identifies the loaded configured-cadence head exactly. */
+   bool snapshot_endpoint_block_matches(uint32_t advertised_block_num,
+                                        uint32_t loaded_block_num,
+                                        uint32_t block_spacing);
 
    /** Return whether endpoint metadata honors an optional specifically requested block. */
    bool snapshot_endpoint_request_matches(const std::optional<uint32_t>& requested_block_num,
@@ -831,6 +845,9 @@ public:
                            fc::microseconds abi_serializer_timeout,
                            std::string log_prefix,
                            const std::atomic<bool>& shutdown_flag);
+
+   /** Return the immutable startup snapshot configuration; restart to adopt governance changes. */
+   const snapshot_attestation_config& get_snapshot_attestation_config() const;
 
    /** Run a table scan while preserving the legacy empty-result-on-failure behavior. */
    chain_apis::read_only::get_table_rows_result

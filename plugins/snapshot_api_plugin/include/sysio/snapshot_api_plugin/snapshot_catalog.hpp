@@ -76,14 +76,17 @@ inline std::optional<uint32_t> snapshot_attestation_block_num(const fc::variant&
    }
 }
 
-/** Return whether one decoded row makes its matching local catalog entry servable. */
+/** Return whether one decoded row makes its matching local entry servable under an active cadence. */
 template <typename Catalog, typename IsAvailable>
 bool is_servable_catalog_snapshot_attestation(const Catalog& catalog,
                                               const fc::variant& row,
+                                              std::optional<uint32_t> active_block_spacing,
                                               uint32_t last_irreversible_block_num,
                                               IsAvailable&& is_available) {
    const auto block_num = snapshot_attestation_block_num(row);
-   if (!block_num || !sysiosystem::snapshot_attestation::is_scheduled_block(*block_num)) {
+   if (!active_block_spacing || !block_num
+       || !sysiosystem::snapshot_attestation::is_scheduled_block(
+          *block_num, *active_block_spacing)) {
       return false;
    }
 
@@ -98,6 +101,7 @@ bool is_servable_catalog_snapshot_attestation(const Catalog& catalog,
 /**
  * Discover the newest locally available scheduled snapshot through bounded reverse table pages.
  *
+ * An absent cadence means attestation is disabled and produces a normal not-found result.
  * The reader must apply the supplied C++-only row filter while servicing each page. An exhausted
  * scan is a genuine absence; a failed read, expired deadline, or inconsistent filtered row is a
  * temporary discovery failure.
@@ -105,6 +109,7 @@ bool is_servable_catalog_snapshot_attestation(const Catalog& catalog,
 template <typename Catalog, typename IsAvailable, typename IsServableAttestation,
           typename ReadPage, typename DeadlineReached>
 auto discover_latest_servable_scheduled_snapshot(std::shared_ptr<const Catalog> catalog_snapshot,
+                                                 std::optional<uint32_t> active_block_spacing,
                                                  IsAvailable&& is_available,
                                                  IsServableAttestation&& is_servable_attestation,
                                                  ReadPage&& read_page,
@@ -112,11 +117,18 @@ auto discover_latest_servable_scheduled_snapshot(std::shared_ptr<const Catalog> 
    -> snapshot_discovery_result<typename Catalog::mapped_type> {
    using result_type = snapshot_discovery_result<typename Catalog::mapped_type>;
    const auto& catalog = *catalog_snapshot;
+   if (!active_block_spacing) {
+      return result_type{snapshot_discovery_status::not_found, std::nullopt};
+   }
+   if (!sysiosystem::snapshot_attestation::is_valid_block_spacing(*active_block_spacing)) {
+      return result_type{snapshot_discovery_status::unavailable, std::nullopt};
+   }
 
    std::optional<uint32_t> oldest_available_scheduled;
    std::optional<uint32_t> newest_available_scheduled;
    for (const auto& [block_num, entry] : catalog) {
-      if (!sysiosystem::snapshot_attestation::is_scheduled_block(block_num)
+      if (!sysiosystem::snapshot_attestation::is_scheduled_block(
+             block_num, *active_block_spacing)
           || !is_available(entry)) {
          continue;
       }
@@ -172,11 +184,25 @@ auto discover_latest_servable_scheduled_snapshot(std::shared_ptr<const Catalog> 
    }
 }
 
-/** Return whether an entry may be served explicitly: manual, or scheduled and attested. */
+/** Select the explicit-download cadence while preserving the disabled default policy. */
+inline uint32_t explicit_snapshot_download_block_spacing(
+   const snapshot_attestation_config& config) noexcept {
+   return config.enabled()
+             ? config.block_spacing
+             : sysiosystem::snapshot_attestation::default_block_spacing;
+}
+
+/** Return whether an entry may be served explicitly under a successfully decoded cadence. */
 template <typename Snapshot, typename IsAttested>
-bool is_snapshot_servable(uint32_t block_num, const Snapshot& snapshot, IsAttested&& is_attested) {
-   return !sysiosystem::snapshot_attestation::is_scheduled_block(block_num)
-          || is_attested(snapshot);
+bool is_snapshot_servable(uint32_t block_num,
+                          std::optional<uint32_t> configured_block_spacing,
+                          const Snapshot& snapshot, IsAttested&& is_attested) {
+   return configured_block_spacing
+          && sysiosystem::snapshot_attestation::is_valid_block_spacing(
+                 *configured_block_spacing)
+          && (!sysiosystem::snapshot_attestation::is_scheduled_block(
+                 block_num, *configured_block_spacing)
+              || is_attested(snapshot));
 }
 
 } // namespace sysio::snapshot_api

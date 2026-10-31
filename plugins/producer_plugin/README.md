@@ -25,7 +25,7 @@ plugin_startup
   |  connect controller signals: accepted_block, accepted_block_header,
   |                              irreversible_block, block_start
   |  producers configured -> also aggregated_vote and voted_block
-  |  provider mode -> auto-schedule snapshots every 25000 blocks
+  |  provider mode -> use startup cadence and replace stale automatic request shapes
   |  read-only-threads > 0 -> start the read-only pool, begin the write window
   |  start the 1-thread production timer
   |  post schedule_production_loop (runs after net_plugin has started)
@@ -78,11 +78,24 @@ creation, scheduling, and a finalization callback that `snapshot_api_plugin` use
 current.
 
 Setting `snapshot-provider-account` turns on **provider mode**, which cannot be combined with
-`producer-name`. In provider mode the plugin auto-schedules snapshots on the shared 25,000-block cadence
-(25000, 50000, 75000, ...) so every provider snapshots at identical heights, and submits a `votesnaphash`
-attestation from the configured account each time a scheduled snapshot finalizes. The auto-schedule is
-persisted to `snapshot-schedule.json` in the snapshots directory and reused across restarts rather than
-re-created.
+`producer-name`. Provider mode uses the on-chain `snapconfig.block_spacing` read once by `chain_plugin`
+at startup (25,000 when the row is absent), schedules snapshots at exact multiples, and submits a
+`votesnaphash` attestation when an eligible snapshot finalizes. Contract voting still requires a configured
+nonzero quorum. Configure small test intervals before starting providers, or restart them afterward.
+
+The provider-owned request is persisted to `snapshot-schedule.json` in the snapshots directory. On restart,
+the plugin reuses an exact match, removes stale requests carrying its reserved
+`snapshot-provider auto` description, and leaves operator-created manual schedules untouched. It does not
+refresh cadence while running. Governance can change any positive uint32 interval, but operators must restart
+nodes to adopt it. Small values are for testing; production should use much larger intervals because the
+verification grace window is only half the spacing.
+
+Block heights end at `UINT32_MAX`. A cadence above `UINT32_MAX / 2` has at most one eligible
+height, so the provider uses a one-shot automatic request for it rather than an invalid recurring
+range. That request retains the reserved description and is reused unchanged on restart. Capturing
+height `H` requires the start of block `H + 1`: when no triggerable eligible height remains,
+including a cadence of `UINT32_MAX`, startup removes stale automatic requests, logs the reason,
+and continues without an automatic request. This does not cap or alter the on-chain cadence.
 
 Provider mode needs a signing key of its own. The attestation is signed in-process from the `wire` signature
 providers that carry a local private key, and at least one of them must satisfy the configured account's
@@ -249,8 +262,10 @@ Lines an operator should recognize:
 - `read-only-threads <n>, max read-only trx time to be enforced: <n> us` and `Read-only max transaction time
   <n>us set to fit in the effective read-only window <n>us.` — the read window sizing that was actually
   applied.
-- `Snapshot provider mode: auto-scheduled snapshots every 25000 blocks (request id <n>)`, or
-  `... reusing persisted auto-schedule ...` on a restart.
+- `Snapshot provider mode: auto-scheduled snapshots every <n> blocks (request id <n>)`, or
+  `... auto-scheduled one snapshot at block <n> ...` for a large cadence,
+  `... reusing persisted snapshot request ...` on a restart, or
+  `... no future snapshot trigger ...` when the block-height range is exhausted.
 - `Producer paused.` on an explicit pause.
 - `Exception in read-only thread pool, exiting` and `Exception in producer timer thread, exiting` — either
   quits the node.
@@ -271,9 +286,10 @@ ninja -C build/debug test_producer_plugin
 ```
 
 The suite covers the implicit production-pause vote tracker, full transaction handling, block timing
-calculations, rejection of delayed transactions, and the mockable timers the production loop is built on. It
-does not cover this plugin's option parsing or validation: `test_options.cpp` holds one case, and what it
-checks is that `chain_plugin`'s `--state-dir` is honored.
+calculations, rejection of delayed transactions, and the mockable timers the production loop is built on.
+The snapshot attestation process test covers startup cadence, reuse, replacement and manual-request preservation.
+It does not cover this plugin's option parsing or validation: `test_options.cpp` holds one
+case, and what it checks is that `chain_plugin`'s `--state-dir` is honored.
 
 ## Related plugins
 
