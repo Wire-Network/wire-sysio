@@ -197,12 +197,16 @@ ninja -C $BUILD_DIR unit_test       # Build unit tests
 Network tests get their ports from the host's bind registry, shared with wire-tools-ts clusters (protocol:
 wire-tools-ts `docs/bind-registry/README.md`; details: [docs/test-ports.md](docs/test-ports.md)).
 
-- **ctest** wraps every `add_np_test` / `add_lr_test` in `tests/bind_registry.py`, which leases the ports and releases
-  them when the test's whole session has exited.
+- **ctest** wraps `add_np_test` / `add_lr_test`, the discovered chain-plugin Boost cases, the Ethereum RPC tests,
+  and cranker startup recovery in `tests/bind_registry.py`. It leases the ports and releases them when the test's
+  whole session has exited.
 - **A Python test run by hand needs nothing**: it leases ports on first use and releases them on exit.
 - **A native test binary run by hand** goes through the wrapper: `python3 tests/bind_registry.py <binary> [args]`.
 - Ask for ports with `Utils.getPort(<category>, index)` (Python) or `sysio::testing::get_port(...)` (C++), never a
   literal.
+- For successive C++ fixture ports, share a `sysio::testing::test_port_allocator` for the category. Its `next()` and
+  `next_loopback_url()` methods allocate distinct leased ports within that allocator, including across threads,
+  and throw when the category is exhausted.
 
 ### Run All Parallelizable Tests
 ```bash

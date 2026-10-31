@@ -112,7 +112,7 @@ Each item is a deploy or upgrade step. An item not done is a freeze that cannot 
 | `sysio.liq` | `transfer` to anything but a custody contract (`sysio.bond`, `sysio.synd`, `sysio.opreg`), so holders cannot move shadow LIQ between themselves; `claim` by anyone but a custody contract; `queueyield` | `mint`; transfers into a custody contract; `claim` by a custody contract (it moves WIRE into custody) |
 | `sysio.bond` | `claim` | `request`, `addbounty`, `accept`, `hold`, `approve`, `rslvvalid`, `rslvinvalid`, `sweepyield`, `prune` |
 | `sysio.kicker` | `kick` returns without paying and without writing: `last_kick` stays where it was, so accrual keeps running and the first paying `kick` after the clear covers it, within the 72-hour catch-up | `setconfig`, `addpool`, `setpool`, `rmpool` |
-| `sysio.synd` | the queue step's releases, delivery from `parked`, burns and the forward of a hold share (deferred to the first step after the clear); `desyndicate`, `sweep`, `dropenv`, `sweepyield` (refused: `the andon cord is pulled: funds cannot leave custody`); `linkswept` delivers nothing and returns | intake (`onsynd`, `onyield`, `closeenv`); the queue step's refresh, outcome recording and request issuing; `challenge`; `setconfig`; `importsynd` |
+| `sysio.synd` | the queue step's releases, delivery from `parked` and burns (deferred to the first step after the clear); `desyndicate`, `sweep`, `dropenv`, `sweepyield` (refused: `the andon cord is pulled: funds cannot leave custody`); `linkswept` delivers nothing and returns | intake (`onsynd`, `onyield`, `closeenv`); the queue step's refresh, outcome recording and request issuing; `challenge`; `setconfig`; `importsynd` |
 | `sysio.msgch`, `sysio.epoch` | nothing | everything |
 
 A frozen queue step prints `sysio.synd::queue: the andon cord is pulled; releases, deliveries and burns
@@ -170,8 +170,9 @@ comparison (wire-ethereum `contracts/outpost/SyndicationPool.sol:620-627` at d4f
 token or the pool refuses while the pool itself is unpaused (liqETH paused, the transfer returning false
 or reverting, an amount above the pool's principal) is stored as a pending desyndication with reason
 `SETTLEMENT_REFUSED` (`DesyndicationDeferred`), not paid, and is paid by `payPendingDesyndication` once
-the cause clears (for liqETH, once `LiqEthToken` is unpaused). A pool that would hold less than the
-depot's outstanding after the payout, a pool below the payout included, is a custody shortfall: the pool
+the cause clears (for liqETH, once `LiqEthToken` is unpaused). A pool that cannot fund the payout, or
+whose projected remaining deficit exceeds `custodyShortfallBps` of the carried depot outstanding,
+fails the custody check: the pool
 pauses itself and stores the release with reason `CUSTODY_SHORTFALL`
 ([A shortfall-triggered pull](#a-shortfall-triggered-pull)). Pausing
 `SyndicationPool` first and unpausing it last is still the practice: it stores every release under
@@ -233,8 +234,8 @@ Pausing a paused contract reverts (`EnforcedPause`), which is harmless: it was a
 | 1 | Pull the cord on the affected chain ([Pulling the cord](#pulling-the-cord)). Pull the others if the fault may have crossed. | Same. When unsure, pull. |
 | 2 | Replace the panic account in case its key is the fault ([Replacing the panic account](#replacing-the-panic-account)). | Skip. |
 | 3 | Record the block, the epoch and the last accepted envelope digest on each chain ([Recording](#recording-the-state-of-each-chain)). | Same. |
-| 4 | Read the depot's `mismatch` table and each outpost's shortfall records, and compare each outpost's custody with the depot's outstanding shadow ([Comparing totals](#comparing-totals), [A shortfall-triggered pull](#a-shortfall-triggered-pull)). | Same. No new `mismatch` row; custody covers the outstanding. |
-| 5 | Before each request's challenge window ends, hold every doubtful OPEN/BONDED request (`sysio.synd::challenge`) or obtain a governance invalid ruling (`sysio.bond::rslvinvalid`). | None. |
+| 4 | Read the depot's `mismatch` table and each outpost's shortfall records, and compare each outpost's custody with the depot's outstanding shadow ([Comparing totals](#comparing-totals), [A shortfall-triggered pull](#a-shortfall-triggered-pull)). | Same. No new `mismatch` row; readings pass the applicable configured tolerance. |
+| 5 | Before each request's challenge window ends, hold every doubtful BONDED request (`sysio.synd::challenge`) or obtain a governance invalid ruling (`sysio.bond::rslvinvalid`); a doubtful OPEN request can only be ruled. | None. |
 | 6 | `sysio` rules each held request (`rslvvalid` / `rslvinvalid`). Invalid envelopes burn as in §4.7 once the cord clears. | None. |
 | 7 | Fix and redeploy the faulty contract while still frozen, in the order of [`contract-upgrade-order.md`](contract-upgrade-order.md). | None. |
 | 8 | Repair custody and clear the outposts first. Have each repaired outpost emit a post-repair message (or wait for its next one); wait for depot admission, verify its admission and healthy custody report, run governance `reconcile` for every affected pair, verify its incident is erased, then clear the depot cord and do the work that waited ([Clearing](#clearing-outposts-first-then-the-depot)). | Same admission check before clearing the depot. |
@@ -243,8 +244,8 @@ Pausing a paused contract reverts (`EnforcedPause`), which is harmless: it was a
 
 Challenge windows keep counting during a freeze. Read `sysio.bond::requests`: a BONDED request
 becomes eligible for permissionless approval at `bonded_at + window_sec`; an OPEN request has
-no running challenge deadline yet. `approve` ignores the cord. A challenge or `rslvinvalid`
-still works after the deadline while the request remains OPEN/BONDED, but approval can win
+no running challenge deadline yet. `approve` ignores the cord. A challenge (BONDED only) or `rslvinvalid`
+(OPEN or BONDED) still works after the deadline while the request remains in that state, but approval can win
 that race at any time. Once APPROVED, neither intervention is allowed and held items release
 after clear. Act before approval eligibility whenever possible. A frozen queue step still issues requests, so `crank` during the freeze gives every WAITING
 envelope a request to hold or rule.
@@ -264,12 +265,11 @@ clio -u "$DEPOT_URL" push action sysio.bond rslvvalid   "[$BOND_REQUEST_ID]" -p 
 
 `CHAIN_CODE` and `TOKEN_CODE` are the `chain_code` and `token_code` objects exactly as the `envelopes`
 row prints them, `EPOCH_INDEX` its `epoch_index`, and `BOND_REQUEST_ID` its `request_id`. `challenge`
-accepts only an envelope in state REQUESTED, RELEASABLE or DONE whose request is OPEN or BONDED: a
-WAITING envelope has no request yet, so run `crank` first. `CHALLENGER` must not be `sysio.synd` or `sysio.bond`; contract accounts are supported through ledger settlement. The challenger pays the request's hold bond plus the pair's `challenge_extra`; both transfers go into
+accepts only an envelope in state REQUESTED, RELEASABLE or DONE whose request is BONDED: a
+WAITING envelope has no request yet, so run `crank` first, and an OPEN request is ruled rather than held. `CHALLENGER` must not be `sysio.synd` or `sysio.bond`; contract accounts may challenge. The challenger pays the request's hold bond plus the pair's `challenge_extra`; both transfers go into
 custody, so the challenge runs while the depot is frozen. `rslvinvalid` rules a request bonded or not,
 so an unbonded envelope in doubt is ruled invalid directly. The queue records each ruling on its next
-step; while the cord is pulled the burn of an INVALID envelope and the forward of a VALID ruling's hold
-share wait for the clear.
+step; while the cord is pulled the burn of an INVALID envelope waits for the clear.
 
 ### Replacing the panic account
 
@@ -324,16 +324,28 @@ cast call --rpc-url "$ETH_RPC_URL" "$OPP_INBOUND" 'previousEpochHash()(bytes32)'
 The depot compares for you. Every `SYNDICATE_LIQ` and `LIQ_YIELD` an outpost sends carries its live
 custody balance (`total_syndicated`), and `sysio.synd` checks it against the depot's outstanding shadow
 of the token (the `sysio.liq` supply plus the yield in `liqpending`) as it admits the message
-([`sysio-synd.md`](sysio-synd.md), The solvency check). Custody below the outstanding is a shortfall:
-it is written to `mismatch` and pulls the cord. Custody above it is normal and only printed as `EXCESS`.
+([`sysio-synd.md`](sysio-synd.md), The solvency check). A syndication is compared against outstanding
+after its own mint. A gap beyond the pair's `syndconfig.custody_shortfall_bps` is written to `mismatch`
+and pulls the cord. A smaller or equal gap is only logged as `TOLERATED`: it neither writes nor clears
+an incident. Custody above outstanding is normal and only printed as `EXCESS`.
+
+Read the policy as well as the balances. The depot defaults to zero tolerance without configuration;
+bootstrap configures LIQETH at 100 bps (1%) and other tokens at zero. Ethereum independently uses
+`custodyShortfallBps`, configured at 100 bps on deployment. Both settings have a hard maximum of
+1000 bps (10%); do not assume their governance settings still match. For a deficit, the accepted
+inequality is `(expected - reported) * 10000 <= expected * tolerance_bps`, using widened integers.
+For Ethereum, `reported` is projected custody after subtracting a fully funded payout and `expected`
+is the message's post-burn outstanding. Solana retains its strict post-payout backing check.
 
 ```bash
 clio -u "$DEPOT_URL" get table sysio.synd mismatch -S sysio.synd -l 100   # latest unresolved incident per pair: chain_code, token_code, epoch_index, sequence, kind, reported, expected, at
+clio -u "$DEPOT_URL" get table sysio.synd syndconfig -S sysio.synd        # custody_shortfall_bps per outpost/token; read every page
 clio -u "$DEPOT_URL" get table sysio.liq stat -S sysio.liq                 # supply per shadow symbol
 clio -u "$DEPOT_URL" get table sysio.liq liqpending -S sysio.liq           # released yield not yet queued
 clio -u "$DEPOT_URL" get table sysio.synd syndcursors -S sysio.synd        # last_sequence admitted per outpost
 clio -u "$DEPOT_URL" get table sysio.synd returns -S sysio.synd -r -l 20 # outstanding unpaid return obligations
 cast call --rpc-url "$ETH_RPC_URL" "$SYNDICATION_POOL" 'poolBalanceDepot()(uint64)'
+cast call --rpc-url "$ETH_RPC_URL" "$SYNDICATION_POOL" 'custodyShortfallBps()(uint32)'
 cast call --rpc-url "$ETH_RPC_URL" "$SYNDICATION_POOL" 'liqSequence()(uint64)'
 ```
 
@@ -342,20 +354,27 @@ and `status` on Solana (`liq_sequence`, the pool ATA balance). What to check:
 - Each `mismatch` row names the outpost, token and sequence of the message that reported the shortfall,
   the custody it reported and the outstanding it was compared with (`expected`). Match the sequence to
   the outpost's `synd` call (Solana) or `Syndicated` / yield event (Ethereum) to find the envelope.
-  There is one row per `(chain_code, token_code)`: each new shortfall overwrites it. Snapshot
+  There is one row per `(chain_code, token_code)`: each new above-tolerance shortfall overwrites it. Snapshot
   every observed row and its admission trace externally. Only governance `reconcile` erases it;
   a later healthy report does not erase the incident.
-- Now: each outpost's custody (the Solana pool ATA, `poolBalanceDepot`) is at least the depot's
-  outstanding for its token (`supply` plus `liqpending`). Messages in flight only widen the margin: an
-  unpaid or pending desyndication, an INVALID burn and a request-keyed `refundreturn` all leave custody above the
-  outstanding.
+- Now: compare each outpost's live custody (the Solana pool ATA, `poolBalanceDepot`) with the depot's
+  current outstanding (`supply` plus `liqpending`) under that pair's depot tolerance. Separately check
+  the outpost payout rule above: Ethereum permits its configured post-payout gap; Solana requires full
+  backing after payment. Messages in flight only widen the margin: an unpaid or pending desyndication,
+  an INVALID burn and a request-keyed `refundreturn` increase custody relative to outstanding, but do
+  not guarantee full backing when a tolerated deficit already exists.
 - `syndcursors.last_sequence` for an outpost is at most the outpost's sequence (`liqSequence` /
   `liq_sequence`); the gap is messages the depot has not yet admitted, and so not yet compared.
 - Every `returns` request id the outpost has not paid is still in flight on the depot, stored as a
   pending payout on the outpost ([Deferred desyndications](#deferred-desyndications)), or skipped by the
   outpost; a permanently cancelled one is reconciled by the return recovery rule
   ([Reconciling](#reconciling-a-desyndication-the-outpost-did-not-pay)).
-- Between two readings during a freeze, no outpost custody balance falls.
+- A freeze prevents custody leaving through guarded payouts, but a negative liqETH rebase can still
+  reduce the token balance. Monitor custody and its deficit while frozen too.
+
+A tolerated reading is a runtime threshold pass, not permission to clear an existing incident.
+Governance `reconcile` still requires verified custody covering the full current outstanding. Recovery
+after a pull also reserves every stored payout; follow the clearing procedure below.
 
 
 ### Reconciling a desyndication the outpost did not pay
@@ -423,17 +442,18 @@ Each chain names the two readings differently. Custody: the depot's `reported`, 
 `depot_outstanding`, Ethereum's `totalSyndicated`. The depot's `expected` includes the message's own
 syndication; the outposts' custody is read before the payout leaves.
 
-A custody shortfall pulls the cord of the chain that found it: the depot finds one when an outpost's
-`SYNDICATE_LIQ` or `LIQ_YIELD` reports less custody than the depot's outstanding; an outpost finds one
-when a `DESYNDICATE_LIQ` would leave it holding less than the outstanding the depot carried. A shortfall
-is not proof of loss: either reading may be wrong. Compare the live balances of
+A gap beyond the applicable allowance pulls the cord of the chain that found it. The depot compares
+an admitted `SYNDICATE_LIQ` or `LIQ_YIELD` with outstanding under the pair's `custody_shortfall_bps`.
+Ethereum compares projected post-payout custody with the carried outstanding under `custodyShortfallBps`,
+while Solana still requires full backing. Both outposts always require enough custody for the payout
+itself. An above-tolerance shortfall is not proof of loss: either reading may be wrong. Compare the live balances of
 [Comparing totals](#comparing-totals) before ruling envelopes, and pull the other chains if the fault
 may have crossed.
 
 **Depot.** A cord pulled by `sysio.synd` is identifiable in the action trace and has a reason of the form
 `custody shortfall <chain> <token> seq <n>`. Start at step 3 of [the playbook](#the-playbook): the
 `mismatch` row for `(chain_code, token_code)` has the figures (`reported`, `expected`).
-The message that reported it was still held and minted. Each later shortfall overwrites that pair's
+The message that reported it was still held and minted. Each later above-tolerance shortfall overwrites that pair's
 row, even while the cord remains pulled. Snapshot every observed overwrite and its admission trace
 externally; the table is not an incident history.
 
@@ -474,12 +494,16 @@ checks, in order (`:591-652`):
 1. content (`wrong chain`, `wrong token`, `amount out of range`), then `already paid`, then the recipient
    (`unresolvable recipient`): each dropped;
 2. paused: stored as `OUTPOST_FROZEN` with no comparison (request id 0 dropped);
-3. the solvency check: a shortfall emits the event, pauses the pool and stores the release. A request id
+3. the solvency check: insufficient funds for the payout, or a projected post-payout gap beyond
+   `custodyShortfallBps` of the carried outstanding, emits `CustodyShortfall`, pauses the pool and
+   stores the release. A gap exactly at the configured limit passes. A request id
    0 still emits the event and pauses the pool, then is dropped (`request id 0 cannot be deferred`); a
    request id already stored still emits the event and pauses the pool, then is dropped as
    `already pending`, the first record kept;
 4. `already pending`: dropped;
-5. settlement: paid, or a refusal stored as `SETTLEMENT_REFUSED` (request id 0 dropped).
+5. settlement: paid, or a refusal stored as `SETTLEMENT_REFUSED` (request id 0 dropped). A successful
+   payout with a tolerated gap emits `CustodyShortfallTolerated`, carrying the projected remaining
+   custody, carried outstanding and configured tolerance. Refused or deferred payouts do not emit it.
 
 Read the evidence:
 
@@ -495,8 +519,11 @@ release after `unpause`, with the same rule as Solana: unpause only once the poo
 outstanding plus every release still stored.
 
 **A negative liqETH rebase** (`Yield.sol` calls `liqEth.decreaseIndex`, wire-ethereum
-`contracts/liqEth/Yield.sol:514-518`) lowers the pool's custody with no depot burn: a true shortfall,
-raised on both sides. Recovery at v1 is a top-up. Send liqETH to the pool until `poolBalanceDepot()`
+`contracts/liqEth/Yield.sol:514-518`) lowers the pool's custody with no depot burn. A deficit within the
+configured allowance does not pull the depot or Ethereum cord through this check; a larger deficit
+does so on the next relevant admitted report or payout. Ethereum still requires the payout to be
+fully funded. If either cord has pulled, recovery at v1 is a full-backing top-up, not merely reducing
+the deficit to within tolerance. Send liqETH to the pool until `poolBalanceDepot()`
 covers the depot's outstanding plus every stored release (a plain transfer: a donation only raises
 custody), then unpause the pool and pay the stored releases. Have the repaired outpost emit a
 post-repair message (or wait for its next one), wait for depot admission and confirm no `mismatch` row

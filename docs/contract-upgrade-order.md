@@ -351,6 +351,11 @@ LIQ earned-yield distribution and their normal claim actions remain.
 as an ordinary field. Bootstrap schema version 1 contains chains, tokens, LIQ pools and syndications;
 it has no external-reserve or underwriting configuration.
 
+Custody tolerance adds an ordinary `uint32 custody_shortfall_bps` field to `setconfig` and `syndconfig`.
+Deploy on fresh pre-launch state and regenerate SDK contract types. Supply zero for strict backing on
+other pairs and 100 for LIQETH's 1% shortfall allowance. This is part of the existing per-pair row;
+there is no compatibility table or migration. Every later `setconfig` must preserve the intended value.
+
 ## WIRE-382 pre-launch deployment
 
 This change extends the persisted `snapconfig` row from `min_providers` to

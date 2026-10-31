@@ -135,7 +135,12 @@ bytes; every continuation re-supplies them.
 `epochDeliveries(epoch, self)` and `pendingEpochHash()` read at ONE block number — the head when the tick
 starts, then the block each confirmed call landed in (from its receipt) — never at `latest`, which a
 backend lagging the block that just confirmed could serve from before the call. A backend that does not
-know the block yet is retried for a bounded time. The reads are not at the read confirmation (see Inbound
+know the block yet is retried for a bounded time: a refusal that says so (`-32000 header not found` or
+`missing trie node` from geth and erigon, `Block not found` from besu, EIP-1474's `-32001` from reth and
+nethermind — `outpost_ethereum_client_detail::is_block_unavailable_refusal`) is retried for up to 30 s and
+the timeout it ends in names the node's last refusal, while any other refusal of the read (malformed
+parameters, an unknown method, a revert) ends the tick at once with the node's reason, since no retry would
+change it. The reads are not at the read confirmation (see Inbound
 reads) either. The cursor is the outpost's bookkeeping for work in progress, a reorg under it costs a paid
 re-delivery before the tip or a refused continuation after it, and gating on confirmation depth would wait
 it out between continuations.
@@ -468,10 +473,16 @@ signing checks the policy without sending, that a signing's recorded hash and by
 outcome, once per hash, that a first `epochIn` the node refuses keeps its signing, and that a partial client
 map is never published. No test dials a public endpoint.
 
-CTest runs this binary through `tests/run_with_bind_config.cjs`, which keeps platform registry reservations
-alive for the test process. It requires Node and the version-pinned `@wireio/cluster-tool` development
-dependency. A built companion may be selected explicitly with `WIRE_TOOLS_TS_ROOT`. For direct filtered
-runs, use that wrapper before the binary and Boost arguments.
+The scripted and recording RPC-level node doubles validate requests before answering them
+(`fc-test/execution_api_strictness.hpp`: `0x`-prefixed byte strings, canonical quantities, fixed-length
+addresses and hashes, valid block parameters, the `TransactionArgs` exclusions, positional arity).
+The whole-envelope delivery fixture also stubs OPPInbound views at the contract-client level;
+those calls bypass the RPC-level checks. Their serialized wire format is covered separately by
+libfc's `ethereum_client_requests` suite, which drives a real client through a recording HTTP server.
+
+CTest runs this binary through the build tree's `tests/bind_registry.py`, which keeps its host-wide WIRE
+bind-registry lease alive for the test process and exposes the ports in `SYSIO_TEST_PORTS`. The wrapper uses
+Python's standard library. For direct filtered runs, use that wrapper before the binary and Boost arguments.
 
 A companion RPC tool is built alongside the plugin when `ENABLE_TESTS` is on:
 

@@ -24,8 +24,8 @@ epoch and the envelope's canonical digest.
 - Both add to the `(outpost, token, epoch)` row in `envelopes` and to the `(outpost, token)` running
   sums in `ledger`.
 - Both compare the outpost custody the message carries with the depot's outstanding shadow first
-  ([The solvency check](#the-solvency-check)); a shortfall is recorded and pulls the cord, and the
-  message is held all the same.
+  ([The solvency check](#the-solvency-check)); a shortfall beyond the pair's tolerance is recorded and
+  pulls the cord, and the message is held all the same.
 - `closeenv` moves the envelope's rows from OPEN to WAITING and runs one step of the queue, with a
   small fixed budget (`CLOSEENV_QUEUE_LIMIT`, 16 units of work).
 
@@ -59,7 +59,7 @@ independent bounded phases:
 Syndication uses bond's durable `requestkeep` interface. A terminal request cannot be pruned before
 syndication records and acknowledges its outcome, even when all payouts were claimed and seven days
 have passed. There is no polling deadline. Delayed synchronization delays progress, not recoverability.
-An INVALID outcome or pending challenger share discovered after DONE rewinds settlement to that envelope.
+An INVALID outcome discovered after DONE rewinds settlement to that envelope.
 
 The stable request identity is `(issuer, schema, statement)`, resolved through bond's public accessor.
 An inline `syncenv` after creation records the actual numeric ID; syndication never predicts bond's
@@ -93,7 +93,7 @@ no budget; it waits only when the shadow's headroom cannot take it.
 ### Challenge and ruling
 
 `challenge(challenger, chain_code, token_code, epoch_index)` holds a REQUESTED, RELEASABLE or DONE
-envelope whose request is OPEN or BONDED: an envelope released whole while its request is still only
+envelope whose request is BONDED: an envelope released whole while its request is still only
 bonded can be challenged, since the bond exists for exactly that case. The challenger pays the
 request's hold bond plus the pair's `challenge_extra`; a charge of zero is refused (`challenge charge is
 zero; configure challenge_extra`). The extra stays in the fee pot, and `sysio.synd` holds the request
@@ -101,15 +101,14 @@ through `sysio.bond::hold` naming the challenger as beneficiary. The envelope is
 rules, and the pair's `queue_epoch` is rewound to it so the ruling is processed. One challenge per
 request; contract accounts may challenge. Any row the challenge creates bills `sysio`.
 
-A challenge of a request that is not yet fully bonded freezes the whole pair until `sysio` rules: a
-held request is neither bonded nor ruled, so no later envelope of the pair is requested. That costs the
-challenger only the hold bond and `challenge_extra`. Launch every pair with a non-zero
-`challenge_extra` sized to make such a freeze expensive.
+A request that is not yet fully bonded cannot be challenged (`the envelope's request is not fully
+bonded; it cannot be challenged yet`). Nothing has been released while it is OPEN, and a held request
+takes no more bonds, so holding it would stop every later envelope of the pair until `sysio` rules. An
+unbonded envelope in doubt is ruled INVALID by `sysio` directly (`sysio.bond::rslvinvalid`). A request
+held by a challenge is therefore always fully bonded, and holds back only its own envelope.
 
-- **VALID:** release resumes, and the share of the hold bond `sysio.bond` awards the issuer is
-  forwarded to the challenger. The step that first sees the ruling snapshots that share and the
-  challenger on the envelope (`hold_share`, `hold_beneficiary`, `share_pending`) and forwards it from the
-  snapshot, so the forward does not depend on the request row `sysio.bond` may prune.
+- **VALID:** release resumes. The hold bond goes to the request's bonds, claimed with each underwriter's
+  bond from `sysio.bond`; the challenger gets none of it back, and `challenge_extra` stays in the fee pot.
 - **INVALID:** the step that first sees the ruling snapshots the forfeit (the bonded amount) and the
   bounty returned for want of a hold on the envelope (`forfeit`, `bounty_returned`). Every unreleased
   syndication of the envelope is burned and its yield items dropped, within the step's budget. The
@@ -239,9 +238,20 @@ every `DESYNDICATE_LIQ` carries the depot's outstanding in the same field.
 **On the depot**, as `sysio.synd` admits a `SYNDICATE_LIQ` or `LIQ_YIELD`:
 
 ```
-onsynd:   total_syndicated >= outstanding_of(st) + amount      (sysio.synd.cpp:1106-1107)
-onyield:  total_syndicated >= outstanding_of(st)               (sysio.synd.cpp:1147-1148)
+onsynd:   expected = outstanding_of(st) + amount
+onyield:  expected = outstanding_of(st)
+pull if:  total_syndicated < expected AND
+          (expected - total_syndicated) * 10000 > expected * custody_shortfall_bps
 ```
+
+`custody_shortfall_bps` lives in the pair's `syndconfig` row and defaults to zero when there is no row.
+Configure LIQETH at **100 bps (1%)** to tolerate small temporary validator-slashing losses. Other tokens
+remain at zero unless explicitly configured. The boundary is inclusive: at 100 LIQETH outstanding,
+99 held passes; one base unit less pulls Andon. The comparison uses widened integer products, including
+pending yield in outstanding, so it cannot overflow or round a sub-unit allowance up. A tolerated
+shortfall logs `TOLERATED` and neither writes nor clears a mismatch. Ethereum's `SyndicationPool`
+uses the matching `custodyShortfallBps` policy for post-payout backing, configured at 100 on fresh
+deployments and go-live. The payout itself must always be fully funded. Solana retains its existing check.
 
 - **Only an admitted message is compared**, after `admit_sequence` has consumed its sequence
   (`sysio.synd.cpp:1100`, `:1142`). A replayed or dropped message can carry a stale, lower total, and
@@ -254,7 +264,11 @@ onyield:  total_syndicated >= outstanding_of(st)               (sysio.synd.cpp:1
 **On an outpost**, as it settles a `DESYNDICATE_LIQ` from the envelope:
 
 ```
-pool_balance - amount >= total_syndicated      (a pool below amount is a shortfall too)
+pool_balance >= amount
+post_payout = pool_balance - amount
+Ethereum: (total_syndicated - post_payout) / total_syndicated <= custodyShortfallBps / 10000
+          (only when post_payout < total_syndicated; exact widened integer products)
+Solana:   post_payout >= total_syndicated
 ```
 
 - Solana: `settle_desyndication` with `solvency_floor = Some(total_syndicated)` (`inbound.rs:5580-5591`).
@@ -262,14 +276,17 @@ pool_balance - amount >= total_syndicated      (a pool below amount is a shortfa
   payout that would also be refused still raises the alarm. `pay_pending_desyndication` passes `None`
   (`inbound.rs:5822-5833`): the total stored with a shortfall record is a snapshot, and clearing the
   cord is the operator's decision.
-- Ethereum: the same rule in `_handleDesyndicateLIQ` (`SyndicationPool.sol:629-633`). It runs after
+- Ethereum: `_handleDesyndicateLIQ` always requires enough custody for the payout itself, then allows
+  a projected gap against the carried outstanding up to `custodyShortfallBps` (default 100 bps for
+  LIQETH, hard maximum 1000 bps). Solana's post-payout floor remains strict. The Ethereum check runs after
   the content checks, `already paid` and the recipient, and after the pause check: a paused pool stores
   the release as `OUTPOST_FROZEN` with no comparison (`:620-627`), as a frozen Solana outpost does. The
   `already pending` check comes after it (`:638-641`), so a re-emit of a stored id still raises the
   alarm. `payPendingDesyndication` applies no floor (`:751-773`).
 
-The check is one-sided, custody >= outstanding. Every state in flight moves custody up or the
-outstanding down, so none of them raises a false alarm:
+The checks are one-sided: excess custody never pulls the cord, and a gap triggers only beyond the
+applicable allowance. Solana's outpost always requires full backing. Every state in flight moves
+custody up or the outstanding down, so none of them raises a false alarm:
 
 - a syndication is locked on the outpost before the depot mints it;
 - a desyndication is burned on the depot before the outpost pays it, or while the outpost stores the
@@ -299,7 +316,8 @@ Every writer of the depot outstanding is matched by custody, or is a launch or g
 |---|---|
 | custody = outstanding | Nothing. |
 | custody > outstanding | `sysio.synd::<path>: EXCESS -- reported <r> outstanding <o>` is printed, and nothing else. |
-| custody < outstanding | Record a `mismatch` and send `sysio.andon::pull` with `sysio.andon@active` if the cord is clear; otherwise record the shortfall without repeating the pull. |
+| shortfall within tolerance | Print `TOLERATED`; leave existing incidents and the cord unchanged. |
+| shortfall beyond tolerance | Record a `mismatch` and send `sysio.andon::pull` with `sysio.andon@active` if the cord is clear; otherwise record the shortfall without repeating the pull. |
 
 With the required Andon deployment in place, intake is still held and minted and the envelope
 continues. Privileged syndication bypasses inline authorization but declares the existing
@@ -373,14 +391,16 @@ released; that shows up as held envelopes, not as a `mismatch` row. And a shortf
 found only when the outpost next sends a `SYNDICATE_LIQ` or `LIQ_YIELD`; a shortfall on an outpost only
 when the depot next sends it a `DESYNDICATE_LIQ`.
 
-**A negative liqETH rebase is a true alarm.** liqETH rebases: when its yield oracle finalizes a negative
+**A negative liqETH rebase can create a custody deficit.** liqETH rebases: when its yield oracle finalizes a negative
 delta, `Yield.sol` calls `liqEth.decreaseIndex` (wire-ethereum `contracts/liqEth/Yield.sol:514-518`,
 `contracts/liqEth/liqEth.sol:68-71`), which lowers the pool's balance with no depot burn behind it. The
-custody no longer covers the outstanding, and both sides say so: the depot on the next `SYNDICATE_LIQ`
-or `LIQ_YIELD` (a `mismatch` row and the cord), the pool on the next `DESYNDICATE_LIQ` (it pauses itself
-and stores the release as `CUSTODY_SHORTFALL`). `realizeYield` sends nothing meanwhile: it reverts with
+custody may no longer cover the outstanding. A gap within each side's configured allowance does not
+pull its cord: the depot logs `TOLERATED`, and Ethereum can still pay a fully funded release if its
+projected remaining gap is within `custodyShortfallBps`. Beyond the allowance, the depot records a
+`mismatch` and pulls on the next admitted `SYNDICATE_LIQ` or `LIQ_YIELD`, while Ethereum pauses and stores
+the next failing `DESYNDICATE_LIQ` as `CUSTODY_SHORTFALL`. `realizeYield` still reverts with
 `WIRE_PoolUnderbacked` while the balance is below principal (`SyndicationPool.sol:499`). Recovery at v1
-is a top-up: send liqETH to the pool until `poolBalanceDepot()` covers the outstanding plus every stored
+after a pull is a top-up: send liqETH to the pool until `poolBalanceDepot()` covers the outstanding plus every stored
 release, then unpause the pool and pay the stored releases. Keep the depot cord pulled until a message
 built after the repair has been admitted without a mismatch, as described above
 ([`emergency-stop-playbook.md`](emergency-stop-playbook.md), A shortfall-triggered pull). A governance
@@ -478,7 +498,7 @@ clear, is [`emergency-stop-playbook.md`](emergency-stop-playbook.md).
 | Queue step: refresh, outcomes, requests | Runs: requests are issued and bonded, APPROVED and INVALID outcomes are recorded with their snapshots. |
 | Queue step: releases | None. The step prints `the andon cord is pulled; releases, deliveries and burns wait for the clear` once and leaves every item where it is; no bucket is ticked. |
 | An INVALID ruling | Recorded, with its forfeit snapshot; the burn and the claim of the forfeit wait (`... the burn waits for the clear, the pair waits`). |
-| A VALID ruling after a challenge | Recorded, with the challenger's hold share snapshotted on the envelope (`hold_share`, `hold_beneficiary`) and marked `share_pending`; the forward waits (`the challenger's hold share waits for the andon cord to clear`). The first step after the clear claims the award if `sysio.bond` still owes it and pays the share from the snapshot, once -- even if `sysio.bond` pruned the request meanwhile. |
+| A VALID ruling after a challenge | Recorded; the envelope is RELEASABLE and releases after the clear. |
 | `challenge` | Runs: the charge moves into `sysio.synd` and the hold bond into `sysio.bond`. Challenge windows keep counting. |
 | `linkswept` | Delivers nothing and returns, so the user's `createlink` still succeeds; `sweep` delivers after the clear. |
 | `sweep`, `desyndicate`, `dropenv`, `sweepyield` | Refused: `the andon cord is pulled: funds cannot leave custody`. |
@@ -493,7 +513,7 @@ Repeated freezes cannot raise capacity beyond that cap.
 | Table | Key | What it holds |
 |---|---|---|
 | `syndconfig` | outpost, token | the pair's rules (below) |
-| `envelopes` | outpost, token, depot epoch | digest, syndicated and yield totals, item count, state, `sysio.bond` request id, released, burned, the request's recorded outcome, the forfeit and returned bounty snapshotted on INVALID, and the challenger's hold share, its beneficiary and whether its forward is pending, snapshotted on VALID |
+| `envelopes` | outpost, token, depot epoch | digest, syndicated and yield totals, item count, state, `sysio.bond` request id, released, burned, the request's recorded outcome, and the forfeit and returned bounty snapshotted on INVALID |
 | `items` | envelope, then id (arrival order) | kind, beneficiary key family and pubkey, amount, remaining, yield position |
 | `parked` | token, key family, pubkey | balance and yield position of an unlinked pubkey |
 | `buckets` | outpost, token, direction | level and the depot epoch last ticked, one per direction (SYNDICATION, DESYNDICATION) |
@@ -511,7 +531,8 @@ Envelope states: OPEN, WAITING, REQUESTED, RELEASABLE, HELD, INVALID, DONE.
 ## Configuration
 
 `setconfig(chain_code, token_code, synd_fee_bps, desynd_fee_bps, synd_burst, synd_refill,
-desynd_burst, desynd_refill, window_sec, bounty, challenge_extra, min_desyndicate, desynd_fee_flat)`, signed by `sysio`. It replaces the
+desynd_burst, desynd_refill, window_sec, bounty, challenge_extra, min_desyndicate, desynd_fee_flat,
+custody_shortfall_bps)`, signed by `sysio`. It replaces the
 pair's whole row.
 
 | Knob | Default (no row) | Meaning |
@@ -519,12 +540,13 @@ pair's whole row.
 | `synd_fee_bps` | 0 | fee on each released syndication tranche, at most 10000 |
 | `desynd_fee_bps` | 0 | basis-point part of the fee on each desyndication, at most 10000 |
 | `desynd_fee_flat` | 0 | flat part of the fee on each desyndication, in shadow base units, added to the basis-point part. Syndication is kept free by design, so the desyndication fee (flat plus basis points) is sized to recover the external-chain gas the batch operators pay for both legs of the round trip: the syndication drain and the desyndication payout. Below `min_desyndicate`, so a minimum desyndication at 0 bps nets at least one base unit |
+| `custody_shortfall_bps` | 0 | maximum tolerated custody shortfall as a fraction of outstanding liabilities; hard cap 1000 (10%); configure LIQETH at 100 (1%) |
 | `synd_burst`, `synd_refill` | unset: nothing releases | syndication bucket size, and refill per depot epoch, in base units |
 | `min_desyndicate` | explicit bootstrap value: 1,000,000 | shared gross return floor (0.001 SOL at nine decimals), intentionally arbitrary; at most a nonzero desyndication burst; rejected before moving custody |
 | `desynd_burst`, `desynd_refill` | unset: nothing desyndicates | desyndication bucket size and refill |
 | `window_sec` | 10800 | challenge window of each request; above 0 |
 | `bounty` | 0 | bounty posted on each request, paid from the fee pot |
-| `challenge_extra` | 0 | charged to a challenger on top of the hold bond; set it above 0 at launch (see Challenge and ruling) |
+| `challenge_extra` | 0 | charged to a challenger on top of the hold bond and kept in the fee pot whatever the ruling; at 0, an envelope whose hold bond rounds to zero cannot be challenged |
 
 The bucket, bounty and challenge amounts must each fit an asset. A pair with no row still has its
 envelopes requested (with the default window and no bounty), but releases nothing and accepts no
@@ -600,17 +622,19 @@ sequences, counters, import completion, active custody/yield obligations and unr
 
 `pruneenv(chain_code, token_code, limit)` is permissionless and examines at most `limit` envelopes from
 the pair's oldest retained row, stopping at the first unfinished one. It erases only DONE/INVALID rows
-with a consumed terminal outcome (or a never-issued governance drop), no items or pending challenger
-share, and an acknowledged bond result if that request still exists. DONE before finality is retained.
+with a consumed terminal outcome (or a never-issued governance drop), no items, and an acknowledged
+bond result if that request still exists. DONE before finality is retained.
 Settled rows behind a live earlier envelope remain temporarily; this prefix rule avoids a permanent
 per-envelope tombstone table. The widened `retained_from_epoch` floor rejects all future admission below
 it, including fresh sequences, different digests, and previously absent epochs in that prefix.
 
 A later shortfall replaces the same pair's incident; a healthy report does not erase it.
+Neither a tolerated report nor increasing the configured tolerance clears an existing incident.
 `reconcile(chain_code, token_code, reported)` requires `sysio` and an existing incident, verifies the
 attested custody covers current live outstanding supply, and erases only that incident. `reported` is a
 governance attestation, not a fresh oracle measurement. The global Andon cord must be cleared separately
 after every relevant incident and other cause has been resolved.
+Reconciliation still requires full backing, even when the pair permits small shortfalls at intake.
 
 Existing deployed tables require a coordinated migration for the changed layouts and renamed return
 table; no automatic migration or recovery from previously discarded data is included.
