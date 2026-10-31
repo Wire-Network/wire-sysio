@@ -24,29 +24,29 @@ namespace sysio { namespace chain { namespace webassembly {
    }
 
    void interface::sysio_assert_code( bool condition, uint64_t error_code ) const {
+      if( BOOST_UNLIKELY( error_code >= static_cast<uint64_t>(system_error_code::generic_system_error) ) ) {
+         restricted_error_code_exception e( FC_LOG_MESSAGE(
+                                                error,
+                                                "sysio_assert_code called with reserved error code: {}",
+                                                error_code
+         ) );
+         e.error_code = static_cast<uint64_t>(system_error_code::contract_restricted_error_code);
+         throw e;
+      }
       if( BOOST_UNLIKELY( !condition ) ) {
-         if( error_code >= static_cast<uint64_t>(system_error_code::generic_system_error) ) {
-            restricted_error_code_exception e( FC_LOG_MESSAGE(
-                                                   error,
-                                                   "sysio_assert_code called with reserved error code: {}",
-                                                   error_code
-            ) );
-            e.error_code = static_cast<uint64_t>(system_error_code::contract_restricted_error_code);
-            throw e;
-         } else {
-            sysio_assert_code_exception e( FC_LOG_MESSAGE(
-                                             error,
-                                             "assertion failure with error code: {}",
-                                             error_code
-            ) );
-            e.error_code = error_code;
-            throw e;
-         }
+         sysio_assert_code_exception e( FC_LOG_MESSAGE(
+                                          error,
+                                          "assertion failure with error code: {}",
+                                          error_code
+         ) );
+         e.error_code = error_code;
+         throw e;
       }
    }
 
    //be aware that SYS VM OC handles sysio_exit internally and this function will not be called by OC
    void interface::sysio_exit( int32_t code ) const {
+      assert_exit_code( code );
       throw wasm_exit{};
    }
 }}} // ns sysio::chain::webassembly

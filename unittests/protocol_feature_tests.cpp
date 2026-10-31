@@ -1401,7 +1401,7 @@ static const char webauthn_recover_key_wast[] = R"=====(
  (memory $0 1)
  (export "apply" (func $apply))
  (func $apply (param $0 i64) (param $1 i64) (param $2 i64)
-   (drop
+   (if (i32.lt_s
       (call $recover_key
          (i32.const 8)
          (i32.const 40)
@@ -1409,6 +1409,7 @@ static const char webauthn_recover_key_wast[] = R"=====(
          (i32.const 1024)
          (i32.const 1024)
       )
+      (i32.const 0)) (then (unreachable))
    )
  )
  (data (i32.const 8) "\a2\25\6b\e7\21\c7\d0\90\ba\13\d6\c3\7e\ee\2a\06\c6\63\47\3a\40\95\0d\4f\64\f0\a7\62\db\e1\3d\49")
@@ -1447,7 +1448,7 @@ static const char webauthn_assert_recover_key_wast[] = R"=====(
       (i32.const 40)
       (i32.const 220)
       (i32.const 1024)
-      (i32.const 1024)
+      (i32.const 49)
    )
  )
  (data (i32.const 8) "\a2\25\6b\e7\21\c7\d0\90\ba\13\d6\c3\7e\ee\2a\06\c6\63\47\3a\40\95\0d\4f\64\f0\a7\62\db\e1\3d\49")
@@ -1579,7 +1580,7 @@ static const char import_get_parameters_packed_wast[] = R"=====(
    (drop
       (call $get_parameters_packed
          (i32.const 0)
-         (i32.const 4)
+         (i32.const 1)
          (i32.const 4)
          (i32.const 0)
       )
@@ -1635,7 +1636,7 @@ static const char import_set_parameters_packed_wast[] = R"=====(
  (func $apply (param $0 i64) (param $1 i64) (param $2 i64)
    (call $set_parameters_packed
          (i32.const 0)
-         (i32.const 4)
+         (i32.const 1)
    )
  )
  (data (i32.const 0) "\00\00\00\00")
