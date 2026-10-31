@@ -487,8 +487,9 @@ void swap::setyield(symbol_code pair_token, uint32_t conversion_horizon_sec, uin
     check ( token.has_value(), "pair token does not exist" );
     require_auth(token->fee_authority);
     const extended_symbol& shadow = require_yield_leg(*token);
-    // A cap within the fee leaves no sandwich worth running (see the header). The
-    // fee is at most MAX_FEE, so this also keeps the cap under the whole side.
+    // A cap within the fee leaves no sandwich of one tick worth running (see the
+    // header). The fee is at most MAX_FEE, so this also keeps the cap under the
+    // whole side.
     check( cap_within_fee( depth_cap_bps, token->fee ), "depth_cap_bps cannot exceed the pair's fee" );
     check( clip_floor >= 0 && clip_floor <= MAX, "clip_floor out of range" );
     const int64_t shadow_depth = pool_of( *token, shadow ).quantity.amount;

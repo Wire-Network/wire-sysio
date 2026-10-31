@@ -94,11 +94,17 @@ namespace sysio {
          /// clip below the floor and the pair stops selling entirely.
          ///
          /// `depth_cap_bps` may not exceed the pair's fee, and `changefee` will not lower
-         /// the fee below it. A sandwich around a tick pays only when the clip moves the
+         /// the fee below it. A sandwich around one tick pays only when the clip moves the
          /// price by more than the attacker's two fees, and a clip is at most
          /// `depth_cap_bps` of the shadow side it sells into, so none pays beyond a unit
          /// of rounding. `tickyield` holds the stored cap to the fee as well, so a
          /// zero-fee yield pool never sells.
+         ///
+         /// That bounds one tick, not the sale. A position held across several ticks pays
+         /// the two fees once and collects every clip's move, so it gains once what sells
+         /// during the hold exceeds about the fee's share of the shadow side. It carries
+         /// the hold's price risk, and the lowered price is open to arbitrage. A longer
+         /// horizon or a higher fee lengthens the hold.
          [[sysio::action]] void setyield(symbol_code pair_token,
            uint32_t conversion_horizon_sec, uint32_t depth_cap_bps, int64_t clip_floor);
          /// Settle the WIRE yield a yield pool is owed on the shadow it holds into the

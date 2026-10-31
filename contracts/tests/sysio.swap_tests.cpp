@@ -2461,8 +2461,9 @@ BOOST_FIXTURE_TEST_CASE( yield_depth_cap_stays_within_the_fee, sysio_swap_yield_
 } FC_LOG_AND_RETHROW()
 
 // The reason for that bound, in the contract's integer math on the yield
-// fixture's pool: a sandwich pays nothing beyond a unit of rounding while the
-// cap is within the fee, and pays as soon as the cap is a basis point above it.
+// fixture's pool: a sandwich around one tick pays nothing beyond a unit of
+// rounding while the cap is within the fee, and pays as soon as the cap is a
+// basis point above it.
 BOOST_AUTO_TEST_CASE( yield_tick_sandwich_pays_only_above_the_fee ) try {
     // The unit a floored fee can round in the attacker's favour on their buy-back.
     const int64_t rounding = 1;
