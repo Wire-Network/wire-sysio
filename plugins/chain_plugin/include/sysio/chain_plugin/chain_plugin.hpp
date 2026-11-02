@@ -678,19 +678,17 @@ public:
    template<typename Function>
    void walk_key_value_table(const name& code, const name& scope, const name& table, Function f) const
    {
-      const auto& d = db.db();
-
       // KV storage: iterate [scope:8B BE] prefix within table_id partition
       const auto table_id = chain::compute_table_id(table.to_uint64_t());
       char scope_prefix[chain::kv_scope_prefix_size];
       chain::kv_encode_be64(scope_prefix, scope.to_uint64_t());
       std::string_view scope_sv(scope_prefix, chain::kv_scope_prefix_size);
 
-      const auto& kv_idx = d.get_index<chain::kv_index, chain::by_code_key>();
-      auto itr = kv_idx.lower_bound(boost::make_tuple(code, table_id, scope_sv));
-
-      while (itr != kv_idx.end() && itr->code == code && itr->table_id == table_id) {
-         auto kv = itr->key_view();
+      auto cursor = db.kv().open_row_cursor();
+      chain::kv_row stored;
+      for (bool more = cursor->seek_lower({code, table_id, scope_sv}, stored);
+           more && stored.code == code && stored.table_id == table_id; more = cursor->next(stored)) {
+         auto kv = stored.key;
          if (kv.size() != chain::kv_scoped_key_size ||
              memcmp(kv.data(), scope_prefix, chain::kv_scope_prefix_size) != 0) break;
 
@@ -703,12 +701,11 @@ public:
 
          kv_row_view row;
          row.primary_key = chain::kv_decode_be64(kv.data() + chain::kv_scope_prefix_size);
-         row.payer = itr->payer;
-         row.value._data = itr->value.data();
-         row.value._size = itr->value.size();
+         row.payer = stored.payer;
+         row.value._data = stored.value.data();
+         row.value._size = stored.value.size();
 
          if (!f(row)) break;
-         ++itr;
       }
    }
 

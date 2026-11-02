@@ -3,24 +3,40 @@
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/config.hpp>
 #include <sysio/chain/exceptions.hpp>
+#include <sysio/chain/kv_store.hpp>
+#include <boost/container/small_vector.hpp>
+#include <algorithm>
 #include <vector>
 #include <cstring>
 #include <cstdint>
+#include <memory>
+#include <string_view>
 
 namespace sysio { namespace chain {
 
-enum class kv_it_stat : int32_t {
-   iterator_ok     = 0,
-   iterator_end    = 1,
-   iterator_erased = 2
+/// Result of a KV call. Contracts branch on these values, so they are part of the consensus surface.
+enum class kv_status : int32_t {
+   ok     = 0, ///< the write happened, or the iterator is on a row
+   end    = 1, ///< the iterator is past the last row in its prefix
+   no_row = 2, ///< no row is stored at the key
+   exists = 3  ///< a row is already stored at the key
+};
+
+/// What kv_get and kv_idx_find return when no row matches. No value size or handle is negative.
+inline constexpr int32_t kv_miss = -1;
+
+/// The `mode` argument of kv_set. Contracts pass these values, so they are part of the consensus surface.
+enum class kv_set_mode : uint32_t {
+   upsert = 0, ///< create the row, or replace the one stored at the key
+   insert = 1, ///< create the row; kv_status::exists if the key is taken
+   update = 2  ///< replace the row; kv_status::no_row if the key is free
 };
 
 // ---------------------------------------------------------------------------
 // Handle encoding (CONSENSUS-OBSERVABLE)
 //
-// Iterator handles are returned to contracts from kv_it_create /
-// kv_idx_find_secondary / kv_idx_lower_bound and accepted back by every
-// kv_it_* / kv_idx_* entry point.  Contracts may read, store, and branch on
+// Iterator handles are returned to contracts from kv_it_create / kv_idx_create /
+// kv_idx_find and accepted back by every kv_it_* / kv_idx_* entry point.  Contracts may read, store, and branch on
 // these values, so the layout is part of the consensus surface.
 //
 //   [ 0.. 9]  slot index (10 bits, covers config::max_kv_iterators = 1024)
@@ -71,11 +87,23 @@ inline uint32_t validate_secondary_handle(uint32_t handle, const char* op) {
    return kv_handle_slot_index(handle);
 }
 
-// Bound iterator prefix size. Prefix bytes are copied into the slot's vector; without a cap a contract could allocate
-// arbitrary host-side storage per iterator. Uses the absolute key-size ceiling (not the dynamic max_kv_key_size).
+// Bound iterator prefix size. Prefix bytes are copied into the slot; without a cap a contract could allocate arbitrary
+// host-side storage per iterator. Uses the absolute key-size ceiling (not the dynamic max_kv_key_size).
 inline void kv_check_prefix_size(uint32_t prefix_size) {
    SYS_ASSERT(prefix_size <= config::max_kv_key_size_limit, kv_key_too_large,
               "KV iterator prefix size {} exceeds limit {}", prefix_size, config::max_kv_key_size_limit);
+}
+
+/// Key bytes a slot holds without touching the heap: room for a checksum256 secondary key or a scope and two uint64s.
+inline constexpr size_t kv_inline_key_bytes = 32;
+
+/// Slots in a pool after its first allocation. Most actions hold only a few iterators open at once.
+inline constexpr uint32_t kv_initial_iterator_slots = 8;
+
+using kv_key_buffer = boost::container::small_vector<char, kv_inline_key_bytes>;
+
+inline std::string_view to_sv(const kv_key_buffer& bytes) {
+   return std::string_view(bytes.data(), bytes.size());
 }
 
 // ---------------------------------------------------------------------------
@@ -86,176 +114,172 @@ inline void kv_check_prefix_size(uint32_t prefix_size) {
 // carry only the data the operation needs.
 // ---------------------------------------------------------------------------
 
+template<typename Row>
 struct kv_iterator_slot_common {
+   using row_type = Row;
+
    bool              in_use = false;
-   kv_it_stat        status = kv_it_stat::iterator_end;
+   bool              at_end = true; ///< past the last row in the prefix; otherwise positioned on the saved key bytes
+   // Whether `cursor` is on the row stored at the saved key, so a step needs no search. If not, a read or step re-seeks
+   // by the key bytes. kv_erase, kv_idx_erase and a kv_idx_update that changes the key clear this through
+   // kv_iterator_pool::forget_row. Only those calls erase or move a row while a slot is open: handles last for one
+   // receiver's execution and nothing else writes these tables during it.
+   bool              on_row = false;
    account_name      code;
    uint16_t          table_id = 0;
-   // Cached chainbase id for the iterator_to fast path.  -1 means no cached
-   // id; falls back to lower_bound re-seek via the saved key bytes.
-   int64_t           cached_id = -1;
+   std::unique_ptr<kv_cursor<Row>> cursor; ///< opened on the slot's first use and kept when the slot is reused
+   kv_key_buffer     prefix; ///< bounds the iteration; applies to the key, or to the secondary key of an index entry
 };
 
-struct kv_primary_slot : kv_iterator_slot_common {
-   std::vector<char>  prefix;       ///< prefix for bounded iteration
-   std::vector<char>  current_key;  ///< current position key bytes (for re-seek)
+struct kv_primary_slot : kv_iterator_slot_common<kv_row> {
+   static constexpr std::string_view pool_name = "primary";
+
+   kv_key_buffer  current_key;  ///< current position key bytes (for re-seek)
 
    void reset() {
-      status    = kv_it_stat::iterator_end;
-      cached_id = -1;
+      at_end = true;
+      on_row = false;
       prefix.clear();
       current_key.clear();
    }
+
+   /// Whether the row at this slot's saved position is `row`.
+   bool positioned_at(const kv_row& row) const {
+      return code == row.code && table_id == row.table_id && to_sv(current_key) == row.key;
+   }
 };
 
-struct kv_secondary_slot : kv_iterator_slot_common {
-   std::vector<char>  current_sec_key;  ///< current secondary key bytes
-   std::vector<char>  current_pri_key;  ///< current primary key bytes
+struct kv_secondary_slot : kv_iterator_slot_common<kv_index_entry> {
+   static constexpr std::string_view pool_name = "secondary";
+
+   kv_key_buffer  current_sec_key;  ///< current secondary key bytes
+   kv_key_buffer  current_pri_key;  ///< current primary key bytes
 
    void reset() {
-      status    = kv_it_stat::iterator_end;
-      cached_id = -1;
+      at_end = true;
+      on_row = false;
+      prefix.clear();
       current_sec_key.clear();
       current_pri_key.clear();
    }
+
+   /// Whether the entry at this slot's saved position is `entry`.
+   bool positioned_at(const kv_index_entry& entry) const {
+      return code == entry.code && table_id == entry.table_id && to_sv(current_sec_key) == entry.sec_key &&
+             to_sv(current_pri_key) == entry.pri_key;
+   }
 };
 
-// ---------------------------------------------------------------------------
-// Primary iterator pool (kv_it_*)
-//
-// The slot array is lazily sized on first allocate() so actions that touch no
-// KV iterators (e.g. sysio.token transfer, which routes through kv_get and
-// kv_set only) pay zero heap for this pool.  Once sized, the pool behaves
-// identically to an eagerly-allocated one.
-// ---------------------------------------------------------------------------
-class kv_primary_iterator_pool {
-public:
-   kv_primary_iterator_pool() = default;
+/**
+ * @brief Where a KV read copies a row, and the sizes it reports back.
+ *
+ * `first` receives the key (primary rows) or secondary key (index entries). `second` receives the value or primary key.
+ * A zero-size buffer skips that copy and a short buffer truncates it. Either way, a read that finds a row reports the
+ * field's full size, so a contract can size a buffer from it. A call that finds no row leaves both sizes at 0.
+ */
+struct kv_row_buffers {
+   char*    first           = nullptr;
+   uint32_t first_capacity  = 0;
+   char*    second          = nullptr;
+   uint32_t second_capacity = 0;
+   uint32_t first_size      = 0; ///< [out] full size of the first field
+   uint32_t second_size     = 0; ///< [out] full size of the second field
+};
 
-   uint32_t allocate(uint16_t table_id, account_name code,
-                     const char* prefix, uint32_t prefix_size) {
-      if (_slots.empty()) _slots.resize(config::max_kv_iterators);
+/// Copies `field` from `offset` into `dest`, up to `dest_size` bytes. An offset at or past the end copies nothing.
+inline void kv_copy_field(std::string_view field, uint32_t offset, char* dest, uint32_t dest_size) {
+   if (offset >= field.size()) return;
+   const size_t copy_size = std::min<size_t>(dest_size, field.size() - offset);
+   if (copy_size > 0) memcpy(dest, field.data() + offset, copy_size);
+}
+
+// ---------------------------------------------------------------------------
+// Iterator pool
+//
+// One pool per iterator family, so a contract may hold up to max_kv_iterators
+// of each kind at once. The slot array starts empty and grows on demand, so an
+// action that opens no iterator pays no heap and one that opens a few pays for
+// a few slots. Growth moves slots, so do not hold a slot reference across an
+// allocate(). A handle's slot number does not depend on the array's size.
+// ---------------------------------------------------------------------------
+
+template<typename Slot>
+class kv_iterator_pool {
+public:
+   /// Opens the lowest free slot on (table_id, code), bounded by `prefix`, and returns its index.
+   uint32_t allocate(uint16_t table_id, account_name code, std::string_view prefix) {
       uint32_t idx = find_free();
       auto& s = _slots[idx];
       s.reset();
       s.in_use   = true;
       s.code     = code;
       s.table_id = table_id;
-      s.prefix.assign(prefix, prefix + prefix_size);
+      s.prefix.assign(prefix.begin(), prefix.end());
       return idx;
    }
 
    void release(uint32_t slot_index) {
-      SYS_ASSERT(slot_index < _slots.size() && _slots[slot_index].in_use,
-                 kv_invalid_iterator, "invalid KV primary iterator slot {}", slot_index);
-      auto& s = _slots[slot_index];
+      auto& s = get(slot_index);
       s.reset();
       s.in_use = false;
       if (slot_index < _next_free) _next_free = slot_index;
+      while (_used_end > 0 && !_slots[_used_end - 1].in_use) --_used_end;
    }
 
-   kv_primary_slot& get(uint32_t slot_index) {
+   Slot& get(uint32_t slot_index) {
       SYS_ASSERT(slot_index < _slots.size() && _slots[slot_index].in_use,
-                 kv_invalid_iterator, "invalid KV primary iterator slot {}", slot_index);
+                 kv_invalid_iterator, "invalid KV {} iterator slot {}", Slot::pool_name, slot_index);
       return _slots[slot_index];
    }
 
-   const kv_primary_slot& get(uint32_t slot_index) const {
+   const Slot& get(uint32_t slot_index) const {
       SYS_ASSERT(slot_index < _slots.size() && _slots[slot_index].in_use,
-                 kv_invalid_iterator, "invalid KV primary iterator slot {}", slot_index);
+                 kv_invalid_iterator, "invalid KV {} iterator slot {}", Slot::pool_name, slot_index);
       return _slots[slot_index];
    }
+
+   /// Closes every iterator. Handles last for one receiver's execution, so exec_one() calls this first.
+   void release_all() {
+      for (uint32_t i = 0; i < _used_end; ++i) {
+         _slots[i].reset();
+         _slots[i].in_use = false;
+      }
+      _next_free = 0;
+      _used_end  = 0;
+   }
+
+   /// Points every open slot on `row` back at its saved key bytes. Call before a write erases `row` or moves it to
+   /// another sort position. The key bytes stay, so the next read or step re-seeks from the old position.
+   void forget_row(const typename Slot::row_type& row) {
+      for (uint32_t i = 0; i < _used_end; ++i) {
+         auto& slot = _slots[i];
+         if (slot.on_row && slot.positioned_at(row)) slot.on_row = false;
+      }
+   }
+
+   /// Slots the pool holds now, whether open or not.
+   size_t capacity() const { return _slots.size(); }
 
 private:
    uint32_t find_free() {
-      for (uint32_t i = _next_free; i < _slots.size(); ++i) {
-         if (!_slots[i].in_use) {
-            _next_free = i + 1;
-            return i;
-         }
+      uint32_t i = _next_free;
+      while (i < _used_end && _slots[i].in_use) ++i;
+      SYS_ASSERT(i < config::max_kv_iterators, kv_iterator_limit_exceeded,
+                 "exceeded maximum number of KV {} iterators ({})", Slot::pool_name, config::max_kv_iterators);
+      if (i == _slots.size()) {
+         _slots.resize(std::clamp<size_t>(_slots.size() * 2, kv_initial_iterator_slots, config::max_kv_iterators));
       }
-      SYS_THROW(kv_iterator_limit_exceeded,
-                "exceeded maximum number of KV primary iterators ({})",
-                config::max_kv_iterators);
+      _next_free = i + 1;
+      _used_end  = std::max(_used_end, _next_free);
+      return i;
    }
 
-   std::vector<kv_primary_slot> _slots;
-   uint32_t _next_free = 0;
+   std::vector<Slot> _slots;
+   uint32_t _next_free = 0; ///< no slot below this one is free
+   uint32_t _used_end  = 0; ///< one past the highest open slot; every slot from here up is closed
 };
 
-// ---------------------------------------------------------------------------
-// Secondary iterator pool (kv_idx_*)
-//
-// Independent free-list from the primary pool so a contract may hold up to
-// max_kv_iterators of each kind simultaneously.  Lazily sized on first
-// allocate(), same as the primary pool.
-// ---------------------------------------------------------------------------
-class kv_secondary_iterator_pool {
-public:
-   kv_secondary_iterator_pool() = default;
-
-   uint32_t allocate(account_name code, uint16_t table_id) {
-      if (_slots.empty()) _slots.resize(config::max_kv_iterators);
-      uint32_t idx = find_free();
-      auto& s = _slots[idx];
-      s.reset();
-      s.in_use   = true;
-      s.code     = code;
-      s.table_id = table_id;
-      return idx;
-   }
-
-   void release(uint32_t slot_index) {
-      SYS_ASSERT(slot_index < _slots.size() && _slots[slot_index].in_use,
-                 kv_invalid_iterator, "invalid KV secondary iterator slot {}", slot_index);
-      auto& s = _slots[slot_index];
-      s.reset();
-      s.in_use = false;
-      if (slot_index < _next_free) _next_free = slot_index;
-   }
-
-   kv_secondary_slot& get(uint32_t slot_index) {
-      SYS_ASSERT(slot_index < _slots.size() && _slots[slot_index].in_use,
-                 kv_invalid_iterator, "invalid KV secondary iterator slot {}", slot_index);
-      return _slots[slot_index];
-   }
-
-   const kv_secondary_slot& get(uint32_t slot_index) const {
-      SYS_ASSERT(slot_index < _slots.size() && _slots[slot_index].in_use,
-                 kv_invalid_iterator, "invalid KV secondary iterator slot {}", slot_index);
-      return _slots[slot_index];
-   }
-
-   // Clears cached_id on any slot referencing the given kv_index_object id.
-   // Preserves stored key bytes and iterator status so the next op uses the
-   // slow re-seek path from the old position.  Used before db.modify of a
-   // secondary entry where the chainbase id survives but the object's sort
-   // position moves.
-   void invalidate_cache(account_name code, uint16_t table_id, int64_t object_id) {
-      for (auto& s : _slots) {
-         if (s.in_use &&
-             s.code == code && s.table_id == table_id &&
-             s.cached_id == object_id) {
-            s.cached_id = -1;
-         }
-      }
-   }
-
-private:
-   uint32_t find_free() {
-      for (uint32_t i = _next_free; i < _slots.size(); ++i) {
-         if (!_slots[i].in_use) {
-            _next_free = i + 1;
-            return i;
-         }
-      }
-      SYS_THROW(kv_iterator_limit_exceeded,
-                "exceeded maximum number of KV secondary iterators ({})",
-                config::max_kv_iterators);
-   }
-
-   std::vector<kv_secondary_slot> _slots;
-   uint32_t _next_free = 0;
-};
+using kv_primary_iterator_pool   = kv_iterator_pool<kv_primary_slot>;
+using kv_secondary_iterator_pool = kv_iterator_pool<kv_secondary_slot>;
 
 } } // namespace sysio::chain

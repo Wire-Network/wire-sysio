@@ -2,6 +2,7 @@
 #include <sysio/chain/block_state.hpp>
 #include <sysio/chain/block_handle.hpp>
 #include <sysio/chain/block_log.hpp>
+#include <sysio/chain/kv_store.hpp>
 #include <sysio/chain/trace.hpp>
 #include <sysio/chain/genesis_state.hpp>
 #include <chainbase/pinnable_mapped_file.hpp>
@@ -238,6 +239,8 @@ namespace sysio::chain {
          void sign_block( const signer_callback_type& signer_callback );
          void commit_block();
          void testing_allow_voting(bool val);
+         /// Runs this controller on another KV engine. Call before startup. Only the test harness calls this.
+         void testing_set_kv_store(std::shared_ptr<kv_store> store);
          bool get_testing_allow_voting_flag();
          void set_async_voting(async_t val);
          void set_async_aggregation(async_t val);
@@ -268,6 +271,9 @@ namespace sysio::chain {
          boost::asio::io_context& get_thread_pool();
 
          const chainbase::database& db()const;
+
+         /// The engine holding KV rows and index entries. All reads of KV state go through it.
+         const kv_store& kv()const;
 
          const account_object&                 get_account( account_name n )const;
          const account_object*                 find_account( account_name n )const;
@@ -561,6 +567,7 @@ namespace sysio::chain {
          friend class savanna_cluster::node_t;
 
          chainbase::database& mutable_db()const;
+         kv_store& mutable_kv()const;
 
          std::unique_ptr<controller_impl> my;
    }; // controller

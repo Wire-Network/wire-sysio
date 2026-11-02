@@ -118,6 +118,7 @@ add_library( sysio_chain
               snapshot.cpp
               snapshot_scheduler.cpp
               deep_mind.cpp
+              kv_store.cpp
 
              ${CHAIN_SYSVMOC_SOURCES}
              ${CHAIN_SYSVM_SOURCES}
