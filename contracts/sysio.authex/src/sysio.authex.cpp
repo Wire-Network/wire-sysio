@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.opp.common/evm_address.hpp>
+#include <sysio.opp.common/secp256k1_point.hpp>
 #include <sysio/print.hpp>
 #include <sysio/privileged.hpp>
 
@@ -28,6 +29,20 @@ using ed_raw_key_t = std::array<uint8_t, 32>;
    using ChainKind = opp::types::ChainKind;
    return (chain_kind == ChainKind::CHAIN_KIND_EVM && pub_key.index() == fc::crypto::key_type_em) ||
           (chain_kind == ChainKind::CHAIN_KIND_SVM && pub_key.index() == fc::crypto::key_type_ed);
+}
+
+/**
+ * Return whether recordlink may store this link without a signature by its key.
+ *
+ * The trusted path is the node-owner one: an EVM link with an EM key the Ethereum outpost bound to
+ * the depositing sender. The key must still be a secp256k1 curve point, since bytes off the curve
+ * have no private key yet would be published in the OPERATORS roster. SVM links are refused
+ * outright: each one must come from createlink, whose ed25519 verification is what keeps a key
+ * that cannot sign (Solana's all-zero `Pubkey::default()` included) out of the roster.
+ */
+[[nodiscard]] bool is_recordable_link(const opp::types::ChainKind chain_kind, const sysio::public_key& pub_key) {
+   return chain_kind == opp::types::ChainKind::CHAIN_KIND_EVM && pub_key.index() == fc::crypto::key_type_em &&
+          opp::secp256k1::is_compressed_key(std::get<fc::crypto::key_type_em>(pub_key));
 }
 
 [[maybe_unused]] ed_raw_key_t get_ed_raw_key(const sysio::public_key& pub_key) {
@@ -221,21 +236,19 @@ namespace sysio {
 }
 
 
-// Trusted depot-only link insert -- the counterpart to createlink that skips signature/nonce
+// Trusted depot-only EVM link insert -- the counterpart to createlink that skips signature/nonce
 // verification. The OPP NodeOwnerRegistration attestation is the proof; privileged sysio.roa
 // declares sysio.authex.active on the inline action, so no cross-contract active-permission
-// delegation is required. Unsupported chain/key pairs are soft-dropped. Idempotent and
-// non-throwing so the trust-OPP dispatch never aborts when sysio.dclaim is absent or not yet
-// privileged at bootstrap.
+// delegation is required. Anything but an EVM link with an EM curve point is soft-dropped.
+// Idempotent and non-throwing so the trust-OPP dispatch never aborts when sysio.dclaim is absent or
+// not yet privileged at bootstrap.
 [[sysio::action]] void authex::recordlink(const name& account, const opp::types::ChainKind chain_kind,
                                           const public_key& pub_key, const bytes& native_address) {
    require_auth(get_self());
 
-   if (!is_supported_chain_key_pair(chain_kind, pub_key))
+   if (!is_recordable_link(chain_kind, pub_key))
       return;
-   const bool can_sweep = chain_kind == opp::types::ChainKind::CHAIN_KIND_EVM
-                             ? native_address.size() == opp::evm_address_size
-                             : native_address == pubkey_to_bytes(pub_key);
+   const bool can_sweep = native_address.size() == opp::evm_address_size;
 
    links_t links(get_self());
    auto by_namechain = links.get_index<"bynamechain"_n>();

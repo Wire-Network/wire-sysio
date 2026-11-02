@@ -70,7 +70,7 @@ permission then need not be linked for `sysio.kicker::kick`.
 |--------|---------|-------------|
 | `--batch-operator-account` | — | WIRE account name for this operator. Configuring it enables the relay |
 | `--batch-epoch-poll-ms` | 15000 | How often to check epoch state (ms) |
-| `--batch-delivery-timeout-ms` | 15000 | Max time for one outbound delivery, every transaction and confirmation wait included (ms). On Ethereum a single receipt wait may use whatever of it is left, so size it past the outpost chain's block time. |
+| `--batch-delivery-timeout-ms` | 60000 | Max time for one outbound delivery, every transaction and confirmation wait included (ms). On Ethereum a single receipt wait may use whatever of it is left, so size it past the outpost chain's block time. |
 | `--batch-yield-tick-interval-ms` | 60000 | Minimum spacing between this operator's `sysio.swap::tickyield` pushes per yield pool (ms) |
 | `--batch-underwriter-account` | none | `account` or `account@permission` (default `active`) the underwriter bonds from. Configuring it enables the underwriter |
 | `--batch-underwriter-max-exposure` | none | Most the underwriter may have bonded at once in one shadow token, as an asset (`100.000000000 LIQETH`). Repeat per token; a token without one is not underwritten |

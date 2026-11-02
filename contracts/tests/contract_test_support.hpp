@@ -19,6 +19,7 @@
 
 #include <magic_enum/magic_enum.hpp>
 
+#include <array>
 #include <string>
 
 namespace sysio_system::test_support {
@@ -33,6 +34,26 @@ void load_account_abi(Tester& tester, name account, abi_serializer& out_ser) {
    abi_def parsed;
    BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(metadata->abi, parsed), true);
    out_ser.set_abi(std::move(parsed), Tester::fixture_abi_yield_function());
+}
+
+/// Store `encoded` as the kv row `id` of `code`'s `table` without going through the contract,
+/// for state no action can reach. A new row is billed to `sysio`.
+template <typename Tester>
+void write_kv_row(Tester& tester, name code, name table, uint64_t id, const std::vector<char>& encoded) {
+   char key[kv_pri_key_size];
+   kv_encode_be64(key, id);
+   auto& db = const_cast<chainbase::database&>(tester.control->db());
+   const auto& index = db.template get_index<kv_index, by_code_key>();
+   const auto it = index.find(boost::make_tuple(code, compute_table_id(table.value),
+                                                std::string_view(key, sizeof(key))));
+   if (it != index.end()) db.modify(*it, [&](auto& row) { row.value.assign(encoded.data(), encoded.size()); });
+   else db.template create<kv_object>([&](auto& row) {
+      row.code = code;
+      row.payer = config::system_account_name;
+      row.table_id = compute_table_id(table.value);
+      row.key.assign(key, sizeof(key));
+      row.value.assign(encoded.data(), encoded.size());
+   });
 }
 
 /// The authorization an action needs when an unprivileged contract bills RAM to `signer`
@@ -291,5 +312,67 @@ typename Tester::action_result clear(Tester& tester, abi_serializer& ser, name a
 inline constexpr const char* frozen_message = "the andon cord is pulled: funds cannot leave custody";
 
 } // namespace andon
+
+/// secp256k1 encodings for tests that feed the depot keys which are not curve points. libsecp256k1
+/// (through fc) is the oracle the contracts' own `mod_exp` arithmetic is checked against.
+namespace secp256k1 {
+
+/// One big-endian field element (an x or y coordinate).
+using coordinate = std::array<char, 32>;
+
+/// The field prime p = 2^256 - 2^32 - 977, big-endian.
+inline coordinate field_prime() {
+   coordinate p;
+   p.fill(char(0xff));
+   p[27] = char(0xfe);
+   p[30] = char(0xfc);
+   p[31] = char(0x2f);
+   return p;
+}
+
+/// x + p: a non-canonical spelling of x, which still fits in 32 bytes for any x < 2^32 + 977.
+inline coordinate plus_field_prime(const coordinate& x) {
+   const auto p = field_prime();
+   coordinate sum;
+   unsigned carry = 0;
+   for (size_t i = sum.size(); i-- > 0;) {
+      carry += static_cast<uint8_t>(x[i]) + static_cast<uint8_t>(p[i]);
+      sum[i] = static_cast<char>(carry & 0xffu);
+      carry >>= 8;
+   }
+   BOOST_REQUIRE_EQUAL(carry, 0u);
+   return sum;
+}
+
+/// A compressed SEC1 encoding from a prefix byte and an x-coordinate.
+inline fc::em::public_key_data compressed_key(uint8_t prefix, const coordinate& x) {
+   fc::em::public_key_data key{};
+   key[0] = static_cast<char>(prefix);
+   std::copy(x.begin(), x.end(), key.begin() + 1);
+   return key;
+}
+
+/// Whether libsecp256k1 parses the bytes as a compressed point.
+inline bool is_point(const fc::em::public_key_data& key) {
+   try {
+      fc::em::public_key::serialize_uncompressed(key);
+      return true;
+   } catch (const fc::exception&) {
+      return false;
+   }
+}
+
+/// The smallest x >= 1 that has a curve point, or (with `want_point` false) the smallest that has none.
+inline coordinate smallest_x(bool want_point) {
+   for (uint8_t candidate = 1; candidate != 0; ++candidate) {
+      coordinate x{};
+      x.back() = static_cast<char>(candidate);
+      if (is_point(compressed_key(0x02, x)) == want_point) return x;
+   }
+   BOOST_FAIL("no small x-coordinate found");
+   return {};
+}
+
+} // namespace secp256k1
 
 } // namespace sysio_system::test_support

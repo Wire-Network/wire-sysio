@@ -8,6 +8,7 @@
 #include <sysio.roa.hpp>                    // authoritative Tier-1 electorate preflight
 #include <sysio/slug_name.hpp>
 #include <sysio.opp.common/evm_address.hpp>
+#include <sysio.opp.common/secp256k1_point.hpp>
 #include <sysio.opp.common/safe_ops.hpp>   // to_depot_amount — WSA-028 fail-closed TokenAmount gate
 #include <sysio.opp.common/name_ops.hpp>   // parse_wire_account_name — never-throw account-name parse
 #include <sysio.opp.common/opp_canonical_codec.hpp> // canonical envelope encoding + keccak epoch digest
@@ -543,14 +544,18 @@ struct em_identity {
 
 /// Validate the BAR-provided uncompressed secp256k1 key, compress it for authex storage, and derive
 /// its canonical EVM address from the same bytes. `reg.actor.address` is metadata only and is never
-/// trusted as identity input.
+/// trusted as identity input. Bytes that are not a curve point are refused: no private key exists
+/// for them, so the link they would create could never sign, yet `advance` would still publish it
+/// in the OPERATORS roster.
 std::optional<em_identity> em_identity_from_uncompressed_key(const std::vector<char>& b) {
+   if (!opp::secp256k1::is_uncompressed_key(b.data(), b.size())) return std::nullopt;
    const auto address = opp::evm_address_from_uncompressed_key(b.data(), b.size());
    if (!address) return std::nullopt;
 
    sysio::ecc_public_key compressed{};
-   // Compressed prefix = 0x02 if Y is even, 0x03 if odd; Y is bytes [33,65), parity is its LSB.
-   compressed[0] = static_cast<char>(0x02 | (static_cast<uint8_t>(b[64]) & 1));
+   // The compressed prefix encodes Y's parity; Y is bytes [33,65), parity is its LSB.
+   compressed[0] = (static_cast<uint8_t>(b[64]) & 1) == 0 ? opp::secp256k1::compressed_even_y_prefix
+                                                          : opp::secp256k1::compressed_odd_y_prefix;
    std::copy(b.begin() + 1, b.begin() + 33, compressed.begin() + 1);  // X coordinate
 
    sysio::public_key pk;
