@@ -387,6 +387,70 @@ public:
       BOOST_REQUIRE(get_config()[complete_field].as_bool());
    }
 
+   // WIP fixtures use the real election path; no direct writes to governance tables.
+   static constexpr uint32_t WIP_WINDOW = 300;
+   static constexpr uint64_t FIRST_WIP = 1;
+   static constexpr auto WIP_URI = "https://example.org/wip/revision-1.md";
+   /// Digest of the exact off-chain revision used by this fixture.
+   static fc::sha256 wip_hash() { return fc::sha256::hash(std::string("immutable WIP revision")); }
+   /// Small explicit test policy; these counts and durations are not deployment defaults.
+   static mvo wip_policy(uint32_t endorsements = 2, uint8_t quorum = 3, uint8_t yes = 2) {
+      return mvo()("minimum_endorsements", endorsements)("quorum", quorum)("minimum_yes", yes)(
+         "endorsement_seconds", WIP_WINDOW)("voting_seconds", WIP_WINDOW);
+   }
+   /// Elect all 21 members through the ordinary nomination, voting and settlement actions.
+   void complete_wip_council() {
+      init_ready(23, 2, 0);
+      for (uint8_t seat = 0; seat < 21; ++seat)
+         BOOST_REQUIRE_EQUAL(success(), repcandidate(t1_owners[seat], candidates_[seat], candidates_[(seat + 1) % 23],
+                                                     candidates_[(seat + 2) % 23]));
+      open_votes();
+      std::map<uint8_t, std::array<bool, 3>> choices;
+      for (uint8_t seat = 0; seat < 21; ++seat)
+         choices[seat] = {true, true, true};
+      BOOST_REQUIRE_EQUAL(success(), vote(t2_owners[0], choices));
+      close_votes();
+      BOOST_REQUIRE_EQUAL(phase(), PH_DONE);
+   }
+   /// Open one proposal with explicit content, policy, electorate and authority.
+   action_result open_wip(mvo policy = wip_policy(), name signer = COUNCL_ACCOUNT, std::string uri = WIP_URI,
+                          fc::sha256 hash = wip_hash(), uint64_t generation = GEN0) {
+      return push(COUNCL_ACCOUNT, councl_abi, signer, "openwip"_n,
+                  mvo()("uri", uri)("content_hash", hash)("council_gen", generation)("policy", policy));
+   }
+   /// Submit an owner endorsement, optionally signed by a different account for authorization tests.
+   action_result endorse_wip(name owner, uint64_t id = FIRST_WIP, fc::sha256 hash = wip_hash(), name signer = name{}) {
+      return push(COUNCL_ACCOUNT, councl_abi, signer == name{} ? owner : signer, "endorsewip"_n,
+                  mvo()("owner", owner)("proposal_id", id)("content_hash", hash));
+   }
+   /// Submit a revision-bound Council ballot through the deployed ABI.
+   action_result vote_wip(name voter, std::string choice = "YES", uint64_t id = FIRST_WIP, fc::sha256 hash = wip_hash(),
+                          name signer = name{}) {
+      return push(COUNCL_ACCOUNT, councl_abi, signer == name{} ? voter : signer, "votewip"_n,
+                  mvo()("voter", voter)("proposal_id", id)("content_hash", hash)("choice", choice));
+   }
+   /// Finalize with an ordinary authenticated account, without contract authority.
+   action_result settle_wip(uint64_t id = FIRST_WIP) {
+      return push(COUNCL_ACCOUNT, councl_abi, candidates_[0], "settlewip"_n,
+                  mvo()("caller", candidates_[0])("proposal_id", id));
+   }
+   /// Request governance cancellation while retaining the proposal and its decisions.
+   action_result cancel_wip(std::string reason, uint64_t id = FIRST_WIP, name signer = COUNCL_ACCOUNT) {
+      return push(COUNCL_ACCOUNT, councl_abi, signer, "cancelwip"_n, mvo()("proposal_id", id)("reason", reason));
+   }
+   /// Decode the public proposal row, or return null if it does not exist.
+   fc::variant wip(uint64_t id = FIRST_WIP) {
+      const auto bytes = get_row_by_id(COUNCL_ACCOUNT, COUNCL_ACCOUNT, "wips"_n, id);
+      return bytes.empty() ? fc::variant{}
+                           : councl_abi.binary_to_variant("wip_row", bytes, fixture_abi_yield_function());
+   }
+   /// Qualify a proposal and advance beyond its endorsement deadline.
+   void endorse_and_open_wip_vote(uint64_t id = FIRST_WIP) {
+      for (auto owner : t2_owners)
+         BOOST_REQUIRE_EQUAL(success(), endorse_wip(owner, id));
+      produce_block(fc::seconds(WIP_WINDOW + 1));
+   }
+
    // ── state / config readers ────────────────────────────────────────────────
    fc::variant get_state() {
       auto data = get_row_by_account(COUNCL_ACCOUNT, COUNCL_ACCOUNT, "state"_n, "state"_n);
@@ -1368,6 +1432,215 @@ BOOST_FIXTURE_TEST_CASE(sixteen_winners_then_five_vacancies_complete, sysio_coun
       else
          BOOST_CHECK_EQUAL(council_seat(seat)["round_id"].as_uint64(), 2u);
    }
+}
+
+/// A complete ordinary-owner / Council journey survives election retirement and retains public evidence.
+BOOST_FIXTURE_TEST_CASE(wip_endorse_vote_finalize_survives_election_cleanup, sysio_councl_tester) {
+   complete_wip_council();
+   BOOST_REQUIRE_EQUAL(success(), open_wip());
+   const auto initial = wip();
+   BOOST_REQUIRE_EQUAL(initial["members"].get_array().size(), 21u);
+   BOOST_REQUIRE_EQUAL(initial["endorsers"].get_array().size(), 2u);
+   BOOST_REQUIRE_EQUAL(initial["content_hash"].as<fc::sha256>(), wip_hash());
+   BOOST_REQUIRE(settle_wip() != success());
+   BOOST_REQUIRE(vote_wip(candidates_[0]) != success());
+   endorse_and_open_wip_vote();
+   BOOST_REQUIRE_EQUAL(success(), reset());
+   finish_cleanup();
+   BOOST_REQUIRE_EQUAL(success(), vote_wip(candidates_[0]));
+   BOOST_REQUIRE_EQUAL(success(), vote_wip(candidates_[1]));
+   BOOST_REQUIRE_EQUAL(success(), vote_wip(candidates_[2], "ABSTAIN"));
+   BOOST_REQUIRE(settle_wip() != success());
+   produce_block(fc::seconds(WIP_WINDOW + 1));
+   BOOST_REQUIRE_EQUAL(success(), settle_wip());
+   BOOST_REQUIRE_EQUAL(wip()["status"].as_string(), "PASSED");
+   BOOST_REQUIRE_EQUAL(wip()["yes"].as_uint64(), 2u);
+   BOOST_REQUIRE_EQUAL(wip()["abstain"].as_uint64(), 1u);
+   BOOST_REQUIRE(!get_row_by_id(COUNCL_ACCOUNT, name(FIRST_WIP), "wipendorses"_n, t2_owners[0].value).empty());
+   BOOST_REQUIRE(!get_row_by_id(COUNCL_ACCOUNT, name(FIRST_WIP), "wipballots"_n, candidates_[0].value).empty());
+   const auto terminal = json_text(wip());
+   BOOST_REQUIRE(settle_wip() != success());
+   BOOST_REQUIRE(cancel_wip("cannot rewrite a result") != success());
+   BOOST_REQUIRE_EQUAL(json_text(wip()), terminal);
+}
+
+/// Unauthorized, stale and duplicate decisions cannot change either the tally or the retained ballot.
+BOOST_FIXTURE_TEST_CASE(wip_rejects_wrong_signers_revisions_duplicates_and_new_owners, sysio_councl_tester) {
+   complete_wip_council();
+   BOOST_REQUIRE(open_wip(wip_policy(), candidates_[0]) != success());
+   BOOST_REQUIRE_EQUAL(success(), open_wip());
+   const auto before_endorsements = json_text(wip());
+   const auto wrong_hash = fc::sha256::hash(std::string("edited WIP"));
+   BOOST_REQUIRE(endorse_wip(t2_owners[0], FIRST_WIP, wrong_hash) != success());
+   BOOST_REQUIRE(endorse_wip(t2_owners[0], FIRST_WIP, wip_hash(), candidates_[0]) != success());
+   BOOST_REQUIRE(endorse_wip(t1_owners[0]) != success());
+   const auto late_owner = "latetwo"_n;
+   mk(late_owner);
+   forcereg_owner(late_owner, 2);
+   BOOST_REQUIRE(endorse_wip(late_owner) != success());
+   BOOST_REQUIRE_EQUAL(json_text(wip()), before_endorsements);
+   BOOST_REQUIRE(get_row_by_id(COUNCL_ACCOUNT, name(FIRST_WIP), "wipendorses"_n, late_owner.value).empty());
+   BOOST_REQUIRE_EQUAL(success(), endorse_wip(t2_owners[0]));
+   const auto first_endorsement = get_row_by_id(COUNCL_ACCOUNT, name(FIRST_WIP), "wipendorses"_n, t2_owners[0].value);
+   BOOST_REQUIRE(endorse_wip(t2_owners[0]) != success());
+   BOOST_REQUIRE(first_endorsement ==
+                 get_row_by_id(COUNCL_ACCOUNT, name(FIRST_WIP), "wipendorses"_n, t2_owners[0].value));
+   BOOST_REQUIRE_EQUAL(wip()["endorsements"].as_uint64(), 1u);
+   BOOST_REQUIRE_EQUAL(success(), endorse_wip(t2_owners[1]));
+   produce_block(fc::seconds(WIP_WINDOW + 1));
+   const auto before_ballots = json_text(wip());
+   BOOST_REQUIRE(endorse_wip(t2_owners[1]) != success());
+   BOOST_REQUIRE(vote_wip(t2_owners[0]) != success());
+   BOOST_REQUIRE(vote_wip(candidates_[0], "YES", FIRST_WIP, wrong_hash) != success());
+   BOOST_REQUIRE(vote_wip(candidates_[0], "YES", FIRST_WIP, wip_hash(), candidates_[1]) != success());
+   BOOST_REQUIRE_EQUAL(json_text(wip()), before_ballots);
+   BOOST_REQUIRE(get_row_by_id(COUNCL_ACCOUNT, name(FIRST_WIP), "wipballots"_n, candidates_[0].value).empty());
+   BOOST_REQUIRE_EQUAL(success(), vote_wip(candidates_[0], "NO"));
+   const auto first_ballot = get_row_by_id(COUNCL_ACCOUNT, name(FIRST_WIP), "wipballots"_n, candidates_[0].value);
+   BOOST_REQUIRE(vote_wip(candidates_[0], "YES") != success());
+   BOOST_REQUIRE(first_ballot == get_row_by_id(COUNCL_ACCOUNT, name(FIRST_WIP), "wipballots"_n, candidates_[0].value));
+   BOOST_REQUIRE_EQUAL(wip()["no"].as_uint64(), 1u);
+   BOOST_REQUIRE_EQUAL(wip()["yes"].as_uint64(), 0u);
+   produce_block(fc::seconds(WIP_WINDOW + 1));
+   BOOST_REQUIRE(vote_wip(candidates_[1]) != success());
+}
+
+/// Each deadline produces the documented terminal result; new revisions inherit no votes.
+BOOST_FIXTURE_TEST_CASE(wip_thresholds_expiry_cancellation_and_separate_revisions, sysio_councl_tester) {
+   complete_wip_council();
+   BOOST_REQUIRE_EQUAL(success(), open_wip());
+   BOOST_REQUIRE_EQUAL(success(), open_wip());
+   BOOST_REQUIRE_EQUAL(success(), open_wip());
+   BOOST_REQUIRE_EQUAL(success(), open_wip());
+   // ID 1 lacks endorsements; IDs 2/3 qualify, but fail approval/quorum respectively.
+   for (const auto id : {2u, 3u})
+      for (auto owner : t2_owners)
+         BOOST_REQUIRE_EQUAL(success(), endorse_wip(owner, id));
+   BOOST_REQUIRE(cancel_wip("no authority", 4, candidates_[0]) != success());
+   BOOST_REQUIRE(cancel_wip("", 4) != success());
+   BOOST_REQUIRE_EQUAL(success(), cancel_wip("proposal superseded", 4));
+   BOOST_REQUIRE_EQUAL(wip(4)["status"].as_string(), "CANCELLED");
+   BOOST_REQUIRE(endorse_wip(t2_owners[0], 4) != success());
+   produce_block(fc::seconds(WIP_WINDOW + 1));
+   BOOST_REQUIRE(vote_wip(candidates_[0], "YES", 1) != success());
+   BOOST_REQUIRE(cancel_wip("too late to veto", 1) != success());
+   BOOST_REQUIRE_EQUAL(success(), settle_wip(1));
+   BOOST_REQUIRE_EQUAL(wip(1)["status"].as_string(), "EXPIRED");
+   BOOST_REQUIRE_EQUAL(success(), vote_wip(candidates_[0], "YES", 2));
+   BOOST_REQUIRE_EQUAL(success(), vote_wip(candidates_[1], "NO", 2));
+   BOOST_REQUIRE_EQUAL(success(), vote_wip(candidates_[2], "ABSTAIN", 2));
+   BOOST_REQUIRE_EQUAL(success(), vote_wip(candidates_[0], "YES", 3));
+   BOOST_REQUIRE_EQUAL(success(), vote_wip(candidates_[1], "YES", 3));
+   produce_block(fc::seconds(WIP_WINDOW + 1));
+   BOOST_REQUIRE(cancel_wip("too late to veto", 2) != success());
+   BOOST_REQUIRE_EQUAL(success(), settle_wip(2));
+   BOOST_REQUIRE_EQUAL(wip(2)["status"].as_string(), "REJECTED");
+   BOOST_REQUIRE_EQUAL(success(), settle_wip(3));
+   BOOST_REQUIRE_EQUAL(wip(3)["status"].as_string(), "EXPIRED");
+   // Same URI/new digest is a distinct review, not an in-place edit or inherited endorsements.
+   const auto revision = fc::sha256::hash(std::string("revision two"));
+   BOOST_REQUIRE_EQUAL(success(), open_wip(wip_policy(), COUNCL_ACCOUNT, WIP_URI, revision));
+   BOOST_REQUIRE_EQUAL(wip(5)["endorsements"].as_uint64(), 0u);
+   BOOST_REQUIRE(endorse_wip(t2_owners[0], 5) != success());
+   BOOST_REQUIRE_EQUAL(success(), endorse_wip(t2_owners[0], 5, revision));
+}
+
+/// Invalid opening requests leave no proposal behind and do not consume its identity.
+BOOST_FIXTURE_TEST_CASE(wip_open_requires_complete_council_and_explicit_valid_policy, sysio_councl_tester) {
+   BOOST_REQUIRE(open_wip() != success());
+   complete_wip_council();
+   for (const auto field : {"minimum_endorsements", "quorum", "minimum_yes", "endorsement_seconds", "voting_seconds"}) {
+      auto policy = wip_policy();
+      policy(field, 0);
+      BOOST_REQUIRE(open_wip(policy) != success());
+   }
+   BOOST_REQUIRE(open_wip(wip_policy(3)) != success());
+   BOOST_REQUIRE(open_wip(wip_policy(2, 22)) != success());
+   BOOST_REQUIRE(open_wip(wip_policy(2, 3, 22)) != success());
+   for (const auto field : {"endorsement_seconds", "voting_seconds"}) {
+      auto too_long = wip_policy();
+      too_long(field, 30 * 24 * 60 * 60 + 1);
+      BOOST_REQUIRE(open_wip(too_long) != success());
+   }
+   BOOST_REQUIRE(open_wip(wip_policy(), COUNCL_ACCOUNT, "javascript:bad") != success());
+   BOOST_REQUIRE(open_wip(wip_policy(), COUNCL_ACCOUNT, std::string(513, 'a')) != success());
+   BOOST_REQUIRE(open_wip(wip_policy(), COUNCL_ACCOUNT, WIP_URI, fc::sha256{}) != success());
+   BOOST_REQUIRE(open_wip(wip_policy(), COUNCL_ACCOUNT, WIP_URI, wip_hash(), 1) != success());
+   BOOST_REQUIRE(wip().is_null());
+   BOOST_REQUIRE_EQUAL(success(), open_wip());
+   BOOST_REQUIRE_EQUAL(wip()["id"].as_uint64(), FIRST_WIP);
+}
+
+/// WIP windows are half-open: voting replaces endorsements at the cutoff; settlement replaces voting.
+BOOST_FIXTURE_TEST_CASE(wip_exact_deadlines_do_not_depend_on_a_keeper, sysio_councl_tester) {
+   complete_wip_council();
+   BOOST_REQUIRE_EQUAL(success(), open_wip(wip_policy(1, 1, 1)));
+   BOOST_REQUIRE_EQUAL(success(), endorse_wip(t2_owners[0]));
+   BOOST_REQUIRE(vote_wip(candidates_[0]) != success());
+   const auto endorsement_end = wip()["endorse_until"].as<fc::time_point>();
+   produce_block(endorsement_end - control->pending_block_time());
+   BOOST_REQUIRE(control->pending_block_time() == endorsement_end);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("WIP endorsement window is closed"), endorse_wip(t2_owners[1]));
+   BOOST_REQUIRE_EQUAL(success(), vote_wip(candidates_[0]));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("WIP deadline has not passed"), settle_wip());
+   const auto voting_end = wip()["vote_until"].as<fc::time_point>();
+   produce_block(voting_end - control->pending_block_time());
+   BOOST_REQUIRE(control->pending_block_time() == voting_end);
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("WIP voting window is not open"), vote_wip(candidates_[1]));
+   BOOST_REQUIRE_EQUAL(wasm_assert_msg("WIP outcome is already finalizable"), cancel_wip("late cancellation"));
+   BOOST_REQUIRE_EQUAL(success(), settle_wip());
+   BOOST_REQUIRE_EQUAL(wip()["status"].as_string(), "PASSED");
+   BOOST_REQUIRE(wip()["closed_at"].as<fc::time_point>() == voting_end);
+}
+
+/// Cancellation during voting preserves accepted evidence and cannot be overturned by later settlement.
+BOOST_FIXTURE_TEST_CASE(wip_cancellation_retains_endorsements_and_ballots, sysio_councl_tester) {
+   complete_wip_council();
+   BOOST_REQUIRE_EQUAL(success(), open_wip());
+   endorse_and_open_wip_vote();
+   BOOST_REQUIRE_EQUAL(success(), vote_wip(candidates_[0]));
+   const auto endorsement = get_row_by_id(COUNCL_ACCOUNT, name(FIRST_WIP), "wipendorses"_n, t2_owners[0].value);
+   const auto ballot = get_row_by_id(COUNCL_ACCOUNT, name(FIRST_WIP), "wipballots"_n, candidates_[0].value);
+   BOOST_REQUIRE(cancel_wip(std::string(257, 'a')) != success());
+   BOOST_REQUIRE_EQUAL(success(), cancel_wip("new Council should reconsider"));
+   const auto cancelled = json_text(wip());
+   BOOST_REQUIRE_EQUAL(wip()["reason"].as_string(), "new Council should reconsider");
+   BOOST_REQUIRE_EQUAL(wip()["status"].as_string(), "CANCELLED");
+   BOOST_REQUIRE(vote_wip(candidates_[1]) != success());
+   BOOST_REQUIRE(cancel_wip("overwrite the reason") != success());
+   produce_block(fc::seconds(WIP_WINDOW + 1));
+   BOOST_REQUIRE(settle_wip() != success());
+   BOOST_REQUIRE_EQUAL(json_text(wip()), cancelled);
+   BOOST_REQUIRE(endorsement == get_row_by_id(COUNCL_ACCOUNT, name(FIRST_WIP), "wipendorses"_n, t2_owners[0].value));
+   BOOST_REQUIRE(ballot == get_row_by_id(COUNCL_ACCOUNT, name(FIRST_WIP), "wipballots"_n, candidates_[0].value));
+}
+
+/// Opening, endorsements and ballots fit the transaction budget at full T2/Council participation.
+BOOST_FIXTURE_TEST_CASE(wip_maximum_snapshot_fits_transaction_budget, sysio_councl_tester) {
+   complete_wip_council();
+   constexpr size_t MaximumTier2 = 84;
+   for (size_t i = t2_owners.size(); i < MaximumTier2; ++i) {
+      const auto owner = bulk_name('t', i);
+      mk(owner);
+      forcereg_owner(owner, 2);
+      t2_owners.push_back(owner);
+   }
+   measure_resources = true;
+   BOOST_REQUIRE_EQUAL(success(), open_wip(wip_policy(MaximumTier2, 21, 21)));
+   endorse_and_open_wip_vote();
+   for (size_t seat = 0; seat < 21; ++seat)
+      BOOST_REQUIRE_EQUAL(success(), vote_wip(candidates_[seat]));
+   produce_block(fc::seconds(WIP_WINDOW + 1));
+   BOOST_REQUIRE_EQUAL(success(), settle_wip());
+   measure_resources = false;
+   BOOST_REQUIRE_EQUAL(wip()["status"].as_string(), "PASSED");
+   BOOST_REQUIRE_EQUAL(wip()["endorsers"].get_array().size(), MaximumTier2);
+   BOOST_REQUIRE_EQUAL(resource_samples.at("openwip").calls, 1u);
+   BOOST_REQUIRE_EQUAL(resource_samples.at("endorsewip").calls, MaximumTier2);
+   BOOST_REQUIRE_EQUAL(resource_samples.at("votewip").calls, 21u);
+   BOOST_TEST_MESSAGE("WIP open (84 T2 / 21 Council): billed_us=" << resource_samples.at("openwip").billed_max_us
+                                                                  << ", RAM bytes="
+                                                                  << resource_samples.at("openwip").ram_delta);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

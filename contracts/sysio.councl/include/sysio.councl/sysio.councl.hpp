@@ -30,6 +30,23 @@ inline constexpr uint8_t MIN_CANDIDATES = SEATS + 2;             ///< 23: <=20 e
 inline constexpr uint32_t MAX_CANDIDATES = 1000;                 ///< hard bound on one generation's candidate pool
 inline constexpr size_t MAX_HANDLE_LEN = 32;                     ///< candidate-handle byte cap
 inline constexpr uint64_t MAX_TIME_SLOT_SEC = 30 * 24 * 60 * 60; ///< thirty-day operational safety cap
+inline constexpr size_t MAX_WIP_URI_BYTES = 512;                 ///< maximum off-chain revision locator size
+inline constexpr size_t MAX_WIP_REASON_BYTES = 256;              ///< maximum retained cancellation reason size
+
+/// Proposal decisions are separate from election flights. Values are stable ABI identities.
+enum class wip_status : uint8_t {
+   OPEN = 0,     ///< not yet settled or cancelled; deadlines still govern allowed actions
+   PASSED = 1,   ///< quorum and absolute YES threshold met
+   REJECTED = 2, ///< quorum met but YES threshold not met
+   EXPIRED = 3,  ///< endorsement threshold or voting quorum not met
+   CANCELLED = 4 ///< governance cancelled before the outcome became finalizable
+};
+/// An immutable Council decision; every choice counts toward participation quorum.
+enum class wip_choice : uint8_t {
+   YES = 0,    ///< approve the committed revision
+   NO = 1,     ///< oppose the committed revision
+   ABSTAIN = 2 ///< participate without contributing to the YES threshold
+};
 
 constexpr name ROA_ACCOUNT = "sysio.roa"_n; ///< owner of the nodeowners / roastate tables
 constexpr name SYSTEM_ACCOUNT = "sysio"_n;  ///< system RAM pool payer
@@ -79,12 +96,13 @@ static_assert(SLATE_SIZE == 3, "the fixed action and state schema require a thre
 } // namespace councl
 
 /**
- * @brief The council election contract.
+ * @brief Council elections and separate, non-executing WIP decisions.
  *
- * Actions fall into three groups: registration (`addcandidate`/`rmcandidate`), staged init
+ * Election actions fall into three groups: registration (`addcandidate`/`rmcandidate`), staged init
  * (`startinit`/`loadtier`/`finalizeinit`, plus `reset`/`purge`), and the election
  * (`repcandidate`/`vote`/`settle`). `stir` is a public,
- * caller-authenticated entropy crank.
+ * caller-authenticated entropy crank. WIP actions record Tier-2 endorsements and Council
+ * decisions independently of election cleanup; they do not execute proposals.
  */
 class [[sysio::contract("sysio.councl")]] council : public contract {
 public:
@@ -157,6 +175,40 @@ public:
    /// Authenticated entropy contribution. Never alters a seed already frozen for generation.
    [[sysio::action]]
    void stir(name caller);
+
+   // ---- WIP decisions (independent of election lifecycle) ------------------
+
+   /// All thresholds are absolute counts; no production policy is implicitly enabled.
+   struct wip_policy {
+      uint32_t minimum_endorsements; ///< distinct frozen T2 owners required before Council voting
+      uint8_t quorum;                ///< minimum YES + NO + ABSTAIN ballots
+      uint8_t minimum_yes;           ///< absolute approvals required, independent of NO count
+      uint32_t endorsement_seconds;  ///< window length from opening, at most MAX_TIME_SLOT_SEC
+      uint32_t voting_seconds;       ///< window length after endorsements, at most MAX_TIME_SLOT_SEC
+      SYSLIB_SERIALIZE(wip_policy, (minimum_endorsements)(quorum)(minimum_yes)(endorsement_seconds)(voting_seconds))
+   };
+
+   /// Governance opens an immutable revision and explicitly selects a completed Council for it.
+   /// Snapshot current ROA T2 owners and the selected Council; never change sysio authority.
+   /// @return Fresh proposal ID used as the scope for endorsements and ballots.
+   [[sysio::action]]
+   uint64_t openwip(std::string uri, checksum256 content_hash, uint64_t council_gen, wip_policy policy);
+
+   /// One immutable endorsement by a snapshotted Tier-2 owner, bound to the reviewed revision.
+   [[sysio::action]]
+   void endorsewip(name owner, uint64_t proposal_id, checksum256 content_hash);
+
+   /// One immutable Council ballot after endorsement closes and before voting closes.
+   [[sysio::action]]
+   void votewip(name voter, uint64_t proposal_id, checksum256 content_hash, councl::wip_choice choice);
+
+   /// Public authenticated finalization after the appropriate deadline; never executes the proposal.
+   [[sysio::action]]
+   void settlewip(name caller, uint64_t proposal_id);
+
+   /// Governance cancels before the outcome is finalizable, retaining a bounded reason and all votes.
+   [[sysio::action]]
+   void cancelwip(uint64_t proposal_id, std::string reason);
 
    // -----------------------------------------------------------------------
    //  Tables
@@ -302,6 +354,64 @@ public:
       SYSLIB_SERIALIZE(council_row, (seat)(seat_owner)(filled_tier)(proposer)(member)(round_id))
    };
    using council_t = sysio::kv::scoped_table<"council"_n, index_key, council_row>;
+
+   /// Contract-scoped proposal identity, independent of election generations.
+   struct wip_key {
+      uint64_t id; ///< monotonically allocated proposal ID
+      SYSLIB_SERIALIZE(wip_key, (id))
+   };
+   /// Bounded membership snapshots make election cleanup/turnover unable to change an open WIP.
+   struct [[sysio::table("wips")]] wip_row {
+      uint64_t id;                                          ///< proposal identity and endorsement/ballot scope
+      std::string uri;                                      ///< HTTPS-prefixed locator; the contract does not fetch it
+      checksum256 content_hash;                             ///< SHA-256 of the exact reviewed UTF-8 content bytes
+      uint8_t network_gen;                                  ///< ROA generation read when snapshotting T2 owners
+      uint64_t council_gen;                                 ///< completed Council selected by governance
+      wip_policy policy;                                    ///< immutable thresholds and window lengths
+      std::vector<name> endorsers;                          ///< eligible T2 accounts, not the submitted endorsements
+      std::vector<name> members;                            ///< the 21 unique elected accounts permitted to vote
+      time_point opened_at;                                 ///< opening transaction's block time
+      time_point endorse_until;                             ///< exclusive endorsement deadline / inclusive voting start
+      time_point vote_until;                                ///< exclusive voting deadline
+      councl::wip_status status = councl::wip_status::OPEN; ///< stored outcome, not a timer-driven phase
+      uint32_t endorsements = 0;                            ///< accepted immutable endorsements
+      uint8_t yes = 0;                                      ///< accepted YES ballots
+      uint8_t no = 0;                                       ///< accepted NO ballots
+      uint8_t abstain = 0;                                  ///< accepted ABSTAIN ballots
+      time_point closed_at{};                               ///< settlement/cancellation time; zero while OPEN
+      std::string reason;                                   ///< cancellation explanation; empty for settled outcomes
+      SYSLIB_SERIALIZE(
+         wip_row,
+         (id)(uri)(content_hash)(network_gen)(council_gen)(policy)(endorsers)(members)(opened_at)(endorse_until)
+         (vote_until)(status)(endorsements)(yes)(no)(abstain)(closed_at)(reason))
+   };
+   using wips_t = sysio::kv::table<"wips"_n, wip_key, wip_row>;
+
+   /// Proposal allocator persists across election cleanup and never reuses a retained identity.
+   struct [[sysio::table("wipcounter")]] wip_counter {
+      uint64_t next_id = 1; ///< ID to allocate on the next successful openwip
+      SYSLIB_SERIALIZE(wip_counter, (next_id))
+   };
+   using wipcounter_t = sysio::kv::global<"wipcounter"_n, wip_counter>;
+
+   /// One retained, immutable endorsement per eligible owner, scoped by proposal ID.
+   struct [[sysio::table("wipendorses")]] wip_endorsement {
+      name owner;               ///< authenticated frozen T2 account
+      checksum256 content_hash; ///< reviewed proposal revision
+      time_point signed_at;     ///< endorsement transaction's block time
+      SYSLIB_SERIALIZE(wip_endorsement, (owner)(content_hash)(signed_at))
+   };
+   using wipendorses_t = sysio::kv::scoped_table<"wipendorses"_n, cand_key, wip_endorsement>;
+
+   /// One retained, immutable ballot per eligible Council member, scoped by proposal ID.
+   struct [[sysio::table("wipballots")]] wip_ballot {
+      name voter;                ///< authenticated frozen Council account
+      checksum256 content_hash;  ///< reviewed proposal revision
+      councl::wip_choice choice; ///< public YES / NO / ABSTAIN decision
+      time_point signed_at;      ///< ballot transaction's block time
+      SYSLIB_SERIALIZE(wip_ballot, (voter)(content_hash)(choice)(signed_at))
+   };
+   using wipballots_t = sysio::kv::scoped_table<"wipballots"_n, cand_key, wip_ballot>;
 
 private:
    /// Reject stale signed requests before any state mutation.

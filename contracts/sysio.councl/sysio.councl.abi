@@ -44,6 +44,20 @@
             ]
         },
         {
+            "name": "cancelwip",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposal_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "reason",
+                    "type": "string"
+                }
+            ]
+        },
+        {
             "name": "cand_key",
             "base": "",
             "fields": [
@@ -234,6 +248,24 @@
             ]
         },
         {
+            "name": "endorsewip",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "proposal_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "content_hash",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
             "name": "finalizeinit",
             "base": "",
             "fields": []
@@ -307,6 +339,28 @@
                 {
                     "name": "max_rows",
                     "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "openwip",
+            "base": "",
+            "fields": [
+                {
+                    "name": "uri",
+                    "type": "string"
+                },
+                {
+                    "name": "content_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "council_gen",
+                    "type": "uint64"
+                },
+                {
+                    "name": "policy",
+                    "type": "wip_policy"
                 }
             ]
         },
@@ -398,6 +452,20 @@
                 {
                     "name": "max_steps",
                     "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "settlewip",
+            "base": "",
+            "fields": [
+                {
+                    "name": "caller",
+                    "type": "name"
+                },
+                {
+                    "name": "proposal_id",
+                    "type": "uint64"
                 }
             ]
         },
@@ -500,6 +568,192 @@
                     "type": "flight_vote[]"
                 }
             ]
+        },
+        {
+            "name": "votewip",
+            "base": "",
+            "fields": [
+                {
+                    "name": "voter",
+                    "type": "name"
+                },
+                {
+                    "name": "proposal_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "content_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "choice",
+                    "type": "wip_choice"
+                }
+            ]
+        },
+        {
+            "name": "wip_ballot",
+            "base": "",
+            "fields": [
+                {
+                    "name": "voter",
+                    "type": "name"
+                },
+                {
+                    "name": "content_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "choice",
+                    "type": "wip_choice"
+                },
+                {
+                    "name": "signed_at",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "wip_counter",
+            "base": "",
+            "fields": [
+                {
+                    "name": "next_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "wip_endorsement",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "content_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "signed_at",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "wip_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "wip_policy",
+            "base": "",
+            "fields": [
+                {
+                    "name": "minimum_endorsements",
+                    "type": "uint32"
+                },
+                {
+                    "name": "quorum",
+                    "type": "uint8"
+                },
+                {
+                    "name": "minimum_yes",
+                    "type": "uint8"
+                },
+                {
+                    "name": "endorsement_seconds",
+                    "type": "uint32"
+                },
+                {
+                    "name": "voting_seconds",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "wip_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "uri",
+                    "type": "string"
+                },
+                {
+                    "name": "content_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "network_gen",
+                    "type": "uint8"
+                },
+                {
+                    "name": "council_gen",
+                    "type": "uint64"
+                },
+                {
+                    "name": "policy",
+                    "type": "wip_policy"
+                },
+                {
+                    "name": "endorsers",
+                    "type": "name[]"
+                },
+                {
+                    "name": "members",
+                    "type": "name[]"
+                },
+                {
+                    "name": "opened_at",
+                    "type": "time_point"
+                },
+                {
+                    "name": "endorse_until",
+                    "type": "time_point"
+                },
+                {
+                    "name": "vote_until",
+                    "type": "time_point"
+                },
+                {
+                    "name": "status",
+                    "type": "wip_status"
+                },
+                {
+                    "name": "endorsements",
+                    "type": "uint32"
+                },
+                {
+                    "name": "yes",
+                    "type": "uint8"
+                },
+                {
+                    "name": "no",
+                    "type": "uint8"
+                },
+                {
+                    "name": "abstain",
+                    "type": "uint8"
+                },
+                {
+                    "name": "closed_at",
+                    "type": "time_point"
+                },
+                {
+                    "name": "reason",
+                    "type": "string"
+                }
+            ]
         }
     ],
     "actions": [
@@ -507,6 +761,16 @@
             "name": "addcandidate",
             "type": "addcandidate",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Add Council Candidate\nsummary: '{{nowrap account}} registers as a council candidate.'\n---\n\n{{account}} registers as a candidate for the council election with the short handle {{handle}} and\npays the RAM for that candidate row. A generation accepts at most 1,000 candidates.\n\n## Preconditions\n- The caller must be authorized as {{account}}.\n- Candidate registration must be open (before the election has started).\n- {{account}} must not already be a candidate.\n- The handle must use the contract's allowed 1–32-byte ASCII character set."
+        },
+        {
+            "name": "cancelwip",
+            "type": "cancelwip",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "endorsewip",
+            "type": "endorsewip",
+            "ricardian_contract": ""
         },
         {
             "name": "finalizeinit",
@@ -517,6 +781,11 @@
             "name": "loadtier",
             "type": "loadtier",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Load Tier Snapshot\nsummary: 'Append tier-{{nowrap tier}} node owners into the frozen snapshot.'\n---\n\nThe contract owner inspects at most {{max_rows}} node-owner rows from sysio.roa while appending\ntier-{{tier}} identities into the frozen voting snapshot. A persistent source cursor bounds\nreads as well as writes, and identity deduplication allows a later pass to absorb newly observed\nowners. Called repeatedly until the tier scan is complete."
+        },
+        {
+            "name": "openwip",
+            "type": "openwip",
+            "ricardian_contract": ""
         },
         {
             "name": "purge",
@@ -544,6 +813,11 @@
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Advance the Council Round\nsummary: '{{nowrap caller}} advances bounded election work.'\n---\n\nAuthenticated {{caller}} advances election {{election_gen}}, round {{round_id}}, processing at most {{max_steps}} seats (1–21) in the persisted original order. After nominations expire, generation freezes one seed; voting opens only after all flights are finalized. After the shared voting deadline, tabulation processes each seat through T1, T2, T3 and A, B, C, immediately excluding elected members from later seats. A subsequent continuation starts fresh nominations, tallies, and ballot counters for every vacancy while retaining winners and snapshots. Rounds repeat until all 21 seats are filled; there is no manual assignment fallback. Stale identities fail. Exact deadlines do not trigger settlement. This action also contributes public entropy."
         },
         {
+            "name": "settlewip",
+            "type": "settlewip",
+            "ricardian_contract": ""
+        },
+        {
             "name": "startinit",
             "type": "startinit",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Start Election Initialization\nsummary: 'Freeze the tier-1 roster and begin an election.'\n---\n\nThe contract owner begins an election: registration closes, the ordered list of 21 tier-1 node\nowners is frozen as the seat roster, and the roa network generation is captured.\n\n## Preconditions\n- The caller must have contract-owner authorization.\n- At least 23 candidates must be registered.\n- `time_slot_sec` must be between one second and 30 days, inclusive.\n- `ordered_owners` must be a permutation of exactly the 21 tier-1 node owners in sysio.roa."
@@ -557,6 +831,11 @@
             "name": "vote",
             "type": "vote",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Submit a Council Round Ballot\nsummary: '{{nowrap voter}} submits one immutable ballot for the finalized round.'\n---\n\n{{voter}} submits independent YES/NO decisions in {{votes}} for every eligible flight in ascending seat order. Election {{election_gen}}, round {{round_id}}, and finalized flight commitment {{flight_hash}} must match the active voting window. The voter must authorize the action and belong to a frozen electorate. T1 owners omit their own seat's flight, including automatically generated flights; T2/T3 owners vote on every available flight without implicit YES credit. Ballots cannot be revised or duplicated. Votes and running totals are public. Submissions at the exact deadline are accepted. Results are tabulated only after the shared window closes. The YES threshold is floor(2*B/3)+1, where B is all accepted ballots from that tier in this round, identical for every flight. A valid empty T1 ballot still counts toward B. Zero submissions cannot elect; there is no additional turnout quorum."
+        },
+        {
+            "name": "votewip",
+            "type": "votewip",
+            "ricardian_contract": ""
         }
     ],
     "tables": [
@@ -652,11 +931,48 @@
                     "table_id": 6673
                 }
             ]
+        },
+        {
+            "name": "wipballots",
+            "type": "wip_ballot",
+            "index_type": "i64",
+            "key_names": ["scope","account"],
+            "key_types": ["name","uint64"],
+            "table_id": 18765
+        },
+        {
+            "name": "wipcounter",
+            "type": "wip_counter",
+            "index_type": "i64",
+            "key_names": ["name"],
+            "key_types": ["name"],
+            "table_id": 19988
+        },
+        {
+            "name": "wipendorses",
+            "type": "wip_endorsement",
+            "index_type": "i64",
+            "key_names": ["scope","account"],
+            "key_types": ["name","uint64"],
+            "table_id": 14538
+        },
+        {
+            "name": "wips",
+            "type": "wip_row",
+            "index_type": "i64",
+            "key_names": ["id"],
+            "key_types": ["uint64"],
+            "table_id": 62195
         }
     ],
     "ricardian_clauses": [],
     "variants": [],
-    "action_results": [],
+    "action_results": [
+        {
+            "name": "openwip",
+            "result_type": "uint64"
+        }
+    ],
     "enums": [
         {
             "name": "cleanup_mode",
@@ -785,6 +1101,50 @@
                 {
                     "name": "CLEANING",
                     "value": 3
+                }
+            ]
+        },
+        {
+            "name": "wip_choice",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "YES",
+                    "value": 0
+                },
+                {
+                    "name": "NO",
+                    "value": 1
+                },
+                {
+                    "name": "ABSTAIN",
+                    "value": 2
+                }
+            ]
+        },
+        {
+            "name": "wip_status",
+            "type": "uint8",
+            "values": [
+                {
+                    "name": "OPEN",
+                    "value": 0
+                },
+                {
+                    "name": "PASSED",
+                    "value": 1
+                },
+                {
+                    "name": "REJECTED",
+                    "value": 2
+                },
+                {
+                    "name": "EXPIRED",
+                    "value": 3
+                },
+                {
+                    "name": "CANCELLED",
+                    "value": 4
                 }
             ]
         }
