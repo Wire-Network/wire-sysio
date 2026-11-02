@@ -3066,6 +3066,34 @@ BOOST_FIXTURE_TEST_CASE( nodeownreg_invalid_tier, sysio_roa_nodeownreg_tester ) 
       nodeownreg("someacct"_n, 4, eth_pub, wire_pub));
 } FC_LOG_AND_RETHROW()
 
+// An EM depositor key that is not a secp256k1 point is a depot invariant -> hard abort. msgch drops
+// such keys before dispatch; one that arrived anyway would make recordlink skip the link while this
+// action recorded CONFIRMED, so nothing may be registered, audited or linked.
+BOOST_FIXTURE_TEST_CASE( nodeownreg_rejects_em_key_off_the_curve, sysio_roa_nodeownreg_tester ) try {
+   const auto owner    = "claimacct"_n;
+   const auto wire_pub = gen_k1_key();
+   BOOST_REQUIRE_EQUAL(success(), newnameduser(owner, wire_pub, 2));
+   produce_blocks();
+
+   // x = 0 has no point (7 is not a square mod p); the all-zero bytes have no valid prefix either.
+   fc::em::public_key_data zero_x{};
+   zero_x[0] = 0x02;
+   for (const auto& key_bytes : {fc::em::public_key_data{}, zero_x}) {
+      const fc::crypto::public_key eth_pub{fc::crypto::public_key::storage_type{fc::em::public_key_shim{key_bytes}}};
+      action act;
+      act.account = ROA;
+      act.name    = "nodeownreg"_n;
+      // Packed raw: the ABI serializer's key rendering refuses some of these encodings.
+      act.data    = fc::raw::pack(std::make_tuple(owner, uint8_t{2}, eth_pub, wire_pub,
+                                                  std::vector<char>(20, char{0x01})));
+      BOOST_REQUIRE_EQUAL(error("assertion failure with message: eth_pub_key must be a secp256k1 curve point"),
+                          base_tester::push_action(std::move(act), ROA.to_uint64_t()));
+      BOOST_REQUIRE(get_nodeowner(owner).is_null());
+      BOOST_REQUIRE(get_nodeownerreg(owner).is_null());
+      BOOST_REQUIRE(get_authex_link(0).is_null());
+   }
+} FC_LOG_AND_RETHROW()
+
 // Non-EM depositor key is a depot invariant -> hard abort.
 BOOST_FIXTURE_TEST_CASE( nodeownreg_non_em_key, sysio_roa_nodeownreg_tester ) try {
    const auto wire_pub = gen_k1_key();

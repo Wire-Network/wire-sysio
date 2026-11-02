@@ -1,6 +1,8 @@
 #include <boost/test/unit_test.hpp>
 #include "startup_rpc_server.hpp"
 
+#include <fc-test/execution_api_strictness.hpp>
+
 #include <gsl-lite/gsl-lite.hpp>
 
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
@@ -178,8 +180,12 @@ public:
                              ethereum_transaction_policy   policy)
       : ethereum_client(provider, std::string(fake_rpc_url), std::move(policy)) {}
 
-   /** Return deterministic responses for the RPC methods used by transaction construction. */
+   /**
+    * Return deterministic responses for the RPC methods used by transaction construction, after holding
+    * the request to what geth parses so a shape only anvil accepts fails here.
+    */
    fc::variant execute(const std::string& method, const fc::variant& params) override {
+      fc::test::execution_api::require_conformant(method, params);
       methods.emplace_back(method);
       if (method == "eth_maxPriorityFeePerGas") return fc::variant("0xa");
       if (method == "eth_getBlockByNumber") {

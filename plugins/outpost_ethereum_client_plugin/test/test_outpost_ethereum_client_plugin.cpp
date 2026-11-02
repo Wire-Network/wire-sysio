@@ -37,6 +37,7 @@
 #include <sysio/chain/types.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <fc-test/build_info.hpp>
+#include <fc-test/execution_api_strictness.hpp>
 #include <fc-test/crypto_utils.hpp>
 #include "startup_rpc_server.hpp"
 
@@ -243,6 +244,14 @@ constexpr int json_rpc_parse_error_code = -32700;
 /// confirmed the relay's transaction returns.
 constexpr int              unknown_block_rpc_code    = -32000;
 constexpr std::string_view unknown_block_rpc_message = "header not found";
+
+/// JSON-RPC's invalid-params code, and the refusal a geth-backed hoodi endpoint
+/// answered every `eth_call` with on 2026-10-29 while the relay sent its
+/// calldata without the `0x` prefix.
+constexpr int              invalid_params_rpc_code    = -32602;
+constexpr std::string_view malformed_calldata_message =
+   "invalid argument 0: json: cannot unmarshal hex string without 0x prefix into Go struct field "
+   "TransactionArgs.data of type hexutil.Bytes";
 
 /// A one-address custom error the client has no reading for — the same shape as
 /// `AccessManagedUnauthorized(address)`, a different selector.
@@ -488,11 +497,15 @@ public:
                         std::move(policy))
       , _script(std::move(script)) {}
 
+   /// Every request is held to what geth parses before it is answered, so a
+   /// shape only anvil accepts fails here rather than on a real network.
    fc::variant execute(const std::string& method, const fc::variant& params) override {
+      fc::test::execution_api::require_conformant(method, params);
       if (const auto scripted = answer(method, params)) return *scripted;
       return ethereum_client::execute(method, params);
    }
    fc::variant execute_idempotent(const std::string& method, const fc::variant& params) override {
+      fc::test::execution_api::require_conformant(method, params);
       if (const auto scripted = answer(method, params)) return *scripted;
       return ethereum_client::execute_idempotent(method, params);
    }
@@ -605,6 +618,11 @@ fc::network::json_rpc::json_rpc_error epoch_in_refusal(std::string_view selector
 /// load-balanced backend behind the one that confirmed the relay's call.
 fc::network::json_rpc::json_rpc_error unknown_block_refusal() {
    return fc::network::json_rpc::json_rpc_error(unknown_block_rpc_code, std::string(unknown_block_rpc_message));
+}
+
+/// A node's refusal of the read's parameters: the same answer on every retry.
+fc::network::json_rpc::json_rpc_error malformed_calldata_refusal() {
+   return fc::network::json_rpc::json_rpc_error(invalid_params_rpc_code, std::string(malformed_calldata_message));
 }
 
 /// Harness binding a real `outpost_ethereum_client` to a stubbed OPPInbound
@@ -2472,6 +2490,28 @@ BOOST_AUTO_TEST_CASE(delivery_retries_a_progress_read_the_backend_cannot_serve_y
    }
 } FC_LOG_AND_RETHROW();
 
+/// A backend can recover after the former ten-second cap without abandoning
+/// the pinned block or sending a duplicate transaction.
+BOOST_AUTO_TEST_CASE(delivery_progress_retry_survives_more_than_ten_seconds_of_backend_lag) try {
+   // Backoffs of 250 ms, 500 ms, then eleven 1 s waits exceed the old budget.
+   constexpr size_t lagging_read_attempts = 13;
+   constexpr auto delivery_budget = fc::seconds(60);
+   auto fixture = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->spill_read_refusals.assign(lagging_read_attempts, unknown_block_refusal());
+
+   const auto tx = fixture->outpost->deliver_outbound_envelope(test_wire_epoch, envelope, delivery_budget);
+
+   BOOST_CHECK(!tx.empty());
+   check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 1);
+   BOOST_CHECK_EQUAL(fixture->spill_read_attempts, lagging_read_attempts + 2);
+   const std::vector<std::string> expected_blocks{pinned_block_hex(test_head_block),
+                                                 pinned_block_hex(test_head_block + 1)};
+   const auto blocks = fixture->blocks_read();
+   BOOST_CHECK_EQUAL_COLLECTIONS(blocks.begin(), blocks.end(), expected_blocks.begin(), expected_blocks.end());
+   BOOST_CHECK_EQUAL(fixture->rpc->block_number_reads, 1u);
+} FC_LOG_AND_RETHROW();
+
 /// A backend that never catches up to the pinned block within the tick's
 /// deadline ends the tick in a timeout — which the job retries — never in a
 /// decision taken without the read, and never in a second, paid delivery.
@@ -2484,9 +2524,14 @@ BOOST_AUTO_TEST_CASE(delivery_times_out_rather_than_guess_when_the_pinned_block_
    fixture->spill_read_refusals.insert(fixture->spill_read_refusals.end(), persistent_refusal_attempts,
                                        unknown_block_refusal());
 
-   BOOST_CHECK_THROW(fixture->outpost->deliver_outbound_envelope(
-                        test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds)),
-                     fc::timeout_exception);
+   try {
+      fixture->outpost->deliver_outbound_envelope(test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
+      BOOST_FAIL("a pinned block the node never serves must end the tick in a timeout");
+   } catch (const fc::timeout_exception& timeout) {
+      // The timeout carries the node's last refusal, so the log names why the
+      // block never served instead of a bare deadline.
+      BOOST_CHECK_NE(timeout.to_detail_string().find(unknown_block_rpc_message), std::string::npos);
+   }
 
    check_delivery_calls(fixture->delivery_calls, envelope, test_wire_epoch, 1);
    // The read was retried, not abandoned after the first refusal …
@@ -2498,6 +2543,87 @@ BOOST_AUTO_TEST_CASE(delivery_times_out_rather_than_guess_when_the_pinned_block_
    const auto blocks = fixture->blocks_read();
    BOOST_CHECK_EQUAL_COLLECTIONS(blocks.begin(), blocks.end(), expected_blocks.begin(), expected_blocks.end());
    BOOST_CHECK_EQUAL(fixture->rpc->block_number_reads, 1u);
+} FC_LOG_AND_RETHROW();
+
+/// Transport timeouts retain their cause, with neutral context only when an
+/// earlier RPC refusal exists; they must not be labeled as retry-budget expiry.
+BOOST_AUTO_TEST_CASE(progress_transport_timeout_preserves_its_cause_and_optional_refusal) try {
+   constexpr std::string_view transport_timeout_message = "HTTP response header deadline exceeded";
+   constexpr std::string_view refusal_context = "last RPC refusal:";
+   constexpr std::string_view incorrect_budget_context = "pinned read's budget";
+   constexpr auto delivery_budget = fc::seconds(10);
+   for (const bool with_prior_refusal : {false, true}) {
+      auto fixture = create_whole_envelope_delivery_fixture();
+      auto envelope = make_envelope(mid_envelope_bytes);
+      size_t attempts = 0;
+      fixture->inbound->dispatch_spill =
+         [&](const block_number_or_tag_t&, uint32_t&) -> fc::variant {
+            ++attempts;
+            if (with_prior_refusal && attempts == 1) throw unknown_block_refusal();
+            FC_THROW_EXCEPTION(fc::timeout_exception, "{}", std::string(transport_timeout_message));
+         };
+      try {
+         fixture->outpost->deliver_outbound_envelope(test_wire_epoch, envelope, delivery_budget);
+         BOOST_FAIL("a transport timeout must propagate");
+      } catch (const fc::timeout_exception& timeout) {
+         const auto detail = timeout.to_detail_string();
+         BOOST_CHECK_NE(detail.find(transport_timeout_message), std::string::npos);
+         BOOST_CHECK_EQUAL(detail.find(refusal_context) != std::string::npos, with_prior_refusal);
+         BOOST_CHECK_EQUAL(detail.find(unknown_block_rpc_message) != std::string::npos, with_prior_refusal);
+         BOOST_CHECK_EQUAL(detail.find(incorrect_budget_context), std::string::npos);
+      }
+      BOOST_CHECK_EQUAL(attempts, with_prior_refusal ? 2u : 1u);
+      BOOST_CHECK(fixture->delivery_calls.empty());
+   }
+} FC_LOG_AND_RETHROW();
+
+/// A progress read the node refuses for its PARAMETERS -- what a geth-backed
+/// endpoint answers a request only anvil accepts -- is not a backend behind
+/// the pinned block. It fails the tick at once with the node's own reason,
+/// never retried for the pinned read's whole budget and never reported as a
+/// timeout, which is how the hoodi relay's `-32602` hid for a day as "Timeout".
+BOOST_AUTO_TEST_CASE(delivery_fails_the_tick_at_once_on_a_progress_read_the_node_refuses_as_malformed) try {
+   auto fixture  = create_whole_envelope_delivery_fixture();
+   auto envelope = make_envelope(mid_envelope_bytes);
+   fixture->spill_read_refusals = {malformed_calldata_refusal()};
+
+   try {
+      fixture->outpost->deliver_outbound_envelope(test_wire_epoch, envelope, fc::seconds(test_rpc_deadline_seconds));
+      BOOST_FAIL("a refusal of the read's parameters must fail the tick");
+   } catch (const fc::network::json_rpc::json_rpc_error& refusal) {
+      BOOST_CHECK_EQUAL(refusal.code, invalid_params_rpc_code);
+      BOOST_CHECK_EQUAL(refusal.top_message(), std::string(malformed_calldata_message));
+   }
+   // One attempt, no waiting out a budget the retry could never satisfy.
+   BOOST_CHECK_EQUAL(fixture->spill_read_attempts, 1u);
+   // Nothing was sent on a read that never completed.
+   BOOST_CHECK_EQUAL(fixture->delivery_calls.size(), 0u);
+   BOOST_CHECK_EQUAL(fixture->attempted_budgets.size(), 0u);
+} FC_LOG_AND_RETHROW();
+
+/// Which refusals the pinned read waits out: the ways geth, erigon, besu, reth
+/// and nethermind say a block is not served there -- and nothing else.
+BOOST_AUTO_TEST_CASE(block_unavailable_refusals_are_told_apart_from_request_refusals) try {
+   using sysio::outpost_ethereum_client_detail::is_block_unavailable_refusal;
+   // geth and erigon: the generic code with their messages, including pruned state.
+   BOOST_CHECK(is_block_unavailable_refusal(unknown_block_rpc_code, "header not found"));
+   BOOST_CHECK(is_block_unavailable_refusal(unknown_block_rpc_code, "unknown block"));
+   BOOST_CHECK(is_block_unavailable_refusal(
+      unknown_block_rpc_code, "missing trie node 0ab3 (path ) state 0ab3 is not available, not found"));
+   BOOST_CHECK(
+      is_block_unavailable_refusal(unknown_block_rpc_code, "historical state not available in path scheme yet"));
+   // besu capitalises; the match is case-insensitive.
+   BOOST_CHECK(is_block_unavailable_refusal(unknown_block_rpc_code, "Block not found"));
+   // reth and nethermind: EIP-1474's resource-not-found code, whatever the message.
+   BOOST_CHECK(is_block_unavailable_refusal(-32001, "header not found"));
+   BOOST_CHECK(is_block_unavailable_refusal(-32001, "Resource not found"));
+
+   // A refusal of the request is not a block the node lacks.
+   BOOST_CHECK(!is_block_unavailable_refusal(invalid_params_rpc_code, std::string(malformed_calldata_message)));
+   BOOST_CHECK(!is_block_unavailable_refusal(-32601, "the method eth_call does not exist/is not available"));
+   BOOST_CHECK(!is_block_unavailable_refusal(contract_revert_rpc_code, "execution reverted"));
+   BOOST_CHECK(!is_block_unavailable_refusal(unknown_block_rpc_code, "insufficient funds for gas * price + value"));
+   BOOST_CHECK(!is_block_unavailable_refusal(unknown_block_rpc_code, ""));
 } FC_LOG_AND_RETHROW();
 
 /// A tick sends at most `MAX_CONTINUATIONS_PER_TICK` calls; an epoch still
@@ -3614,8 +3740,9 @@ BOOST_AUTO_TEST_CASE(sign_transaction_hashes_the_signed_bytes_as_the_network_doe
    auto stack     = create_relay_test_stack();
 
    const auto set_number = stack.eth_client->sign_transaction(test_tx_01, "setNumber");
+   // Prefixed, as `eth_sendRawTransaction` takes it: geth refuses the bare form.
    BOOST_CHECK_EQUAL(set_number.raw_hex,
-                     "02f891827a690d8477359400847737208083018c80945fbdb2315678afecb367f032d93f642f64180aa380a4"
+                     "0x02f891827a690d8477359400847737208083018c80945fbdb2315678afecb367f032d93f642f64180aa380a4"
                      "3fb5c1cb000000000000000000000000000000000000000000000000000000000000003cc080a093166a3ed10a"
                      "4050dce7261c4ca8bcba16a1731117c453a326a1742c959b33f0a07c17a232cd69ce93f21a30579a2a94309b2d"
                      "71918043134b4c5df5788078a0e4");

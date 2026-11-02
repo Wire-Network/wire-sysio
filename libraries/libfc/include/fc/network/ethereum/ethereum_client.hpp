@@ -175,7 +175,7 @@ struct ethereum_read_block {
  * @brief A transaction signed for `eth_sendRawTransaction`, and the hash the network knows it by
  */
 struct signed_transaction {
-   /// The signed typed encoding (`0x02 || rlp(...)`) as hex, as `send_raw_transaction` takes it.
+   /// The signed typed encoding (`0x02 || rlp(...)`) as `0x`-prefixed hex, as `eth_sendRawTransaction` takes it.
    std::string raw_hex;
    /// `keccak256` of that encoding as `0x`-hex (EIP-2718): the hash nodes report and key receipts by.
    std::string tx_hash;
@@ -446,6 +446,11 @@ public:
     */
    virtual fc::variant execute_idempotent(const std::string& method, const fc::variant& params);
 
+   /**
+    * Execute an ABI-encoded view at the supplied block using `eth_call`.
+    * Calldata is serialized as a `0x`-prefixed JSON-RPC byte string.
+    * @return The raw JSON-RPC result, without ABI decoding.
+    */
    fc::variant execute_contract_view_fn(const address& contract_address, const abi::contract& abi,
                                         const block_number_or_tag_t& block, const contract_invoke_data_items& params);
 
@@ -551,9 +556,10 @@ public:
    std::string send_transaction(const std::string& raw_tx_data);
 
    /**
-    * @brief Sends a raw encoded transaction.
-    * @param raw_tx_data The raw transaction data.
-    * @return The transaction hash (if successful),
+    * @brief Submit a signed, RLP-encoded transaction using `eth_sendRawTransaction`.
+    * The RPC boundary supplies a `0x` prefix when absent without changing the transaction bytes.
+    * @param raw_tx_data Signed transaction hex, with or without a prefix.
+    * @return The transaction hash if successful.
     * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails or returns an error.
     */
    std::string send_raw_transaction(const std::string& raw_tx_data);

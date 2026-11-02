@@ -33,12 +33,16 @@ namespace sysio { namespace chain { namespace webassembly {
       uint8_t vm_version;
    };
 
+   /// The one get_code_hash_result layout the host writes.
+   static constexpr uint32_t code_hash_struct_version = 0;
+
    uint32_t interface::get_code_hash(
       account_name account,
       uint32_t struct_version,
       vm::span<char> packed_result
    ) const {
-      struct_version = std::min(uint32_t(0), struct_version);
+      SYS_ASSERT(struct_version == code_hash_struct_version, wasm_execution_error,
+                 "get_code_hash: Unknown struct version: {}", struct_version);
       get_code_hash_result result = {struct_version};
       context.get_code_hash(account, result.code_sequence, result.code_hash, result.vm_type, result.vm_version);
 

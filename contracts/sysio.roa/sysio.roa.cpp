@@ -4,6 +4,7 @@
 
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.opp.common/evm_address.hpp>
+#include <sysio.opp.common/secp256k1_point.hpp>
 #include <sysio.opp.common/safe_ops.hpp>   // add_sat_u64 / add_sat_i64 -- never-throw saturating accumulators
 #include <sysio/permission.hpp>   // get_permission -- read an account's active authority in nodeownreg
 
@@ -738,6 +739,11 @@ namespace sysio {
         // NFT deposits land on Ethereum, so the recorded link is always an EM (secp256k1) key.
         check(eth_pub_key.index() == fc::crypto::key_type_em,
               "eth_pub_key must be an EM (secp256k1) public key");
+        // msgch refuses depositor keys that are not curve points before dispatching here. A key
+        // that still is not one would make recordlink drop the link while this action recorded
+        // CONFIRMED, so it is a depot bug, not a claim to soft-fail.
+        check(opp::secp256k1::is_compressed_key(std::get<fc::crypto::key_type_em>(eth_pub_key)),
+              "eth_pub_key must be a secp256k1 curve point");
         check(eth_address.size() == opp::evm_address_size,
               "eth_address must be exactly 20 bytes");
 
