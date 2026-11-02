@@ -32,6 +32,8 @@ constexpr auto table_route = "/v1/chain/get_table_rows";
 constexpr int http_version = 11;
 constexpr uint32_t default_read_threads = 2;
 constexpr auto write_window_option = "read-only-write-window-time-us";
+/// http_plugin's budget for request and response bytes held at once, in MiB.
+constexpr auto bytes_in_flight_option = "http-max-bytes-in-flight-mb";
 /// producer_plugin's option naming the producers this node signs for.
 constexpr auto producer_name_option = "producer-name";
 /// Real-clock request deadlines include read-window waits; a generous default keeps runs on a loaded
@@ -817,6 +819,28 @@ BOOST_AUTO_TEST_CASE(query_application_coherent_pages_and_capture_timeout) {
       const auto after = fc::json::from_string(server.request(request_body(selected_sql)).body())["result"];
       BOOST_CHECK_EQUAL(after["state"]["block_id"].as_string(), fixture.control->head().id().str());
    }
+}
+
+/// A query response counts toward http_plugin's in-flight byte budget: one larger than the budget is answered
+/// busy, and a smaller one on the same node is still sent.
+BOOST_AUTO_TEST_CASE(query_http_response_counts_toward_bytes_in_flight) {
+   constexpr uint32_t batch_rows = 2000;
+   constexpr uint32_t batches = 3;
+   constexpr auto budget_mib = "1";
+   chain_fixture fixture;
+   for (uint32_t batch = 0; batch < batches; ++batch) {
+      fixture.seed(account, 4 + uint64_t(batch) * batch_rows, batch_rows, "alice"_n, 1);
+      fixture.produce_block();
+   }
+   http_application server;
+   BOOST_REQUIRE(server.initialize(true, default_read_threads, {flag(bytes_in_flight_option), budget_mib}) ==
+                 chain::exit_code::SUCCESS);
+   server.start();
+   server.sync(fixture);
+   const auto busy = server.request(request_body("SELECT * FROM sample.positions"));
+   BOOST_CHECK(busy.result() == http::status::service_unavailable);
+   BOOST_CHECK(busy.body().find("Too many bytes in flight") != std::string::npos);
+   BOOST_CHECK(server.request(request_body(selected_sql)).result() == http::status::ok);
 }
 
 /// Measure bounded native capture and concurrent HTTP work while signed blocks continue applying.

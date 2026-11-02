@@ -35,10 +35,10 @@ BOOST_AUTO_TEST_CASE(http_queue_deadlines_and_shutdown_do_not_need_query_workers
    std::array<std::atomic<size_t>, 3> calls{};
    for (size_t i = 0; i < completed.size(); ++i) {
       responses[i] = completed[i].get_future();
-      handler.submit(request_body(count_query), [&, i](int, std::optional<fc::variant> response) {
-         if (++calls[i] == 1)
-            completed[i].set_value(std::move(response.value()));
-      });
+      handler.submit(request_body(count_query), decode_response([&, i](int, std::optional<fc::variant> response) {
+                        if (++calls[i] == 1)
+                           completed[i].set_value(std::move(response.value()));
+                     }));
       if (i == 0)
          await([&] { return reads.size() == 1; });
    }
@@ -75,11 +75,12 @@ BOOST_AUTO_TEST_CASE(http_handler_stop_completes_in_flight_requests_once) {
    std::array<std::atomic<int>, 2> statuses{};
    for (size_t i = 0; i < completed.size(); ++i) {
       responses[i] = completed[i].get_future();
-      handler->submit(request_body(count_query), [&, i](int status, std::optional<fc::variant> response) {
-         statuses[i] = status;
-         if (++calls[i] == 1)
-            completed[i].set_value(std::move(response.value()));
-      });
+      handler->submit(request_body(count_query),
+                      decode_response([&, i](int status, std::optional<fc::variant> response) {
+                         statuses[i] = status;
+                         if (++calls[i] == 1)
+                            completed[i].set_value(std::move(response.value()));
+                      }));
    }
    await([&] { return reads.size() == completed.size(); });
    auto stopped = std::async(std::launch::async, [&] { handler->stop(); });
@@ -259,10 +260,10 @@ BOOST_AUTO_TEST_CASE(http_timeout_after_a_window_cut_names_the_window) {
       std::promise<fc::variant> completion;
       auto response = completion.get_future();
       std::atomic<size_t> calls{0};
-      handler.submit(request_body(count_query), [&](int, std::optional<fc::variant> result) {
-         if (++calls == 1)
-            completion.set_value(std::move(result.value()));
-      });
+      handler.submit(request_body(count_query), decode_response([&](int, std::optional<fc::variant> result) {
+                        if (++calls == 1)
+                           completion.set_value(std::move(result.value()));
+                     }));
       await([&] { return reads.size() == 1; });
       BOOST_REQUIRE(reads.run_one()); // the window has ended: the attempt is queued again
       await([&] { return reads.size() == 1; });
@@ -400,10 +401,10 @@ BOOST_AUTO_TEST_CASE(notifications_have_no_payload_even_on_invocation_errors) {
       std::promise<std::pair<int, std::optional<fc::variant>>> completion;
       auto result = completion.get_future();
       std::atomic<size_t> calls{0};
-      handler.submit(body, [&](int status, std::optional<fc::variant> response) {
-         if (++calls == 1)
-            completion.set_value({status, std::move(response)});
-      });
+      handler.submit(body, decode_response([&](int status, std::optional<fc::variant> response) {
+                        if (++calls == 1)
+                           completion.set_value({status, std::move(response)});
+                     }));
       BOOST_REQUIRE(result.wait_for(test_wait) == std::future_status::ready);
       const auto [status, response] = result.get();
       BOOST_CHECK_EQUAL(status, 204);
@@ -426,5 +427,44 @@ BOOST_AUTO_TEST_CASE(response_byte_limit_has_no_partial_result) {
    engine->stop();
    BOOST_CHECK_EQUAL(engine->stats().returned_rows, 1);
    BOOST_CHECK_EQUAL(engine->stats().in_flight, 0);
+}
+
+/// A response body is encoded before its callback runs and charged to the in-flight budget until the
+/// emitter has copied it into the response buffer; a notification carries no body and charges nothing.
+BOOST_AUTO_TEST_CASE(response_bodies_are_charged_until_emitted) {
+   read_queue reads;
+   auto engine = std::make_shared<query_engine>(query_config{}, reads.create_api(*validating_node));
+   std::atomic<size_t> reserved{0};
+   query_http_handler handler(engine, [&](size_t size) {
+      reserved += size;
+      return std::shared_ptr<void>(nullptr, [&reserved, size](void*) { reserved -= size; });
+   });
+   const auto notification =
+      std::string(R"({"jsonrpc":"2.0","method":"query.execute","params":{"query":")") + count_query + R"("}})";
+   for (const auto& body : {request_body(count_query), std::string("{"), notification}) {
+      std::promise<std::pair<int, sysio::stream_emitter>> completion;
+      auto result = completion.get_future();
+      handler.submit(
+         body, [&](int status, sysio::stream_emitter emitter) { completion.set_value({status, std::move(emitter)}); });
+      const auto deadline = query_budget::clock::now() + test_wait;
+      while (result.wait_for(std::chrono::milliseconds(0)) != std::future_status::ready) {
+         BOOST_REQUIRE(query_budget::clock::now() < deadline);
+         reads.run_one();
+      }
+      auto [status, emitter] = result.get();
+      const auto queued = reserved.load();
+      const auto response = emit(emitter);
+      BOOST_CHECK_EQUAL(queued, response.size());
+      BOOST_CHECK_EQUAL(reserved.load(), 0);
+      if (body == notification) {
+         BOOST_CHECK_EQUAL(status, 204);
+         BOOST_CHECK(response.empty());
+      } else {
+         BOOST_CHECK_EQUAL(status, 200);
+         BOOST_CHECK(!response.empty());
+         validate_response(response);
+      }
+   }
+   engine->stop();
 }
 BOOST_AUTO_TEST_SUITE_END()

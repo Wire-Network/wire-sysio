@@ -110,8 +110,9 @@ void query_engine_plugin::plugin_startup() {
        (http->get_state() == appbase::abstract_plugin::initialized ||
         http->get_state() == appbase::abstract_plugin::started) &&
        http->is_enabled(api_category::chain_ro)) {
-      _impl->http_handler = std::make_shared<query_engine::query_http_handler>(engine);
-      http->add_async_api(_impl->http_handler->create_api());
+      _impl->http_handler = std::make_shared<query_engine::query_http_handler>(
+         engine, [http](size_t size) { return http->reserve_bytes_in_flight(size); });
+      http->add_async_api_stream(_impl->http_handler->create_api());
       fc_ilog(_impl->log, "Query HTTP endpoint {} enabled", query_engine::constants::endpoint);
    }
    fc_ilog(_impl->log,
