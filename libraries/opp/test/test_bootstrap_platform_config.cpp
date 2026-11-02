@@ -185,7 +185,8 @@ std::vector<std::string> validate(const BootstrapPlatformConfig& c) {
       // 0..9999: the swap's changefee/inittoken ceiling (MAX_FEE); 10000 is refused on-chain.
       if (p.fee() > 9999)                                      e.push_back("V11 fee > 9999 (100%): " + label);
       if (p.conversion_horizon_sec() == 0)                     e.push_back("V11 conversion_horizon_sec must be > 0: " + label);
-      if (p.depth_cap_bps() == 0 || p.depth_cap_bps() > 10000) e.push_back("V11 depth_cap_bps out of 1..10000: " + label);
+      // 1..fee: sysio.swap::setyield refuses a cap above the pair's fee, and fee <= 9999 above.
+      if (p.depth_cap_bps() == 0 || p.depth_cap_bps() > p.fee()) e.push_back("V11 depth_cap_bps out of 1..fee: " + label);
       if (p.clip_floor() == 0)                                 e.push_back("V11 clip_floor must be > 0: " + label);
       sum_pool_wire += p.initial_wire_amount();
    }
@@ -333,6 +334,12 @@ BOOST_AUTO_TEST_CASE(validator_rejects_mutations) {
      BOOST_CHECK(!validate(c).empty()); }                               // V11 fee 10000 rejected on-chain
    { auto c = base; c.mutable_liq_pools(0)->set_depth_cap_bps(0);
      BOOST_CHECK(!validate(c).empty()); }                               // V11 a zero cap never sells
+   { auto c = base; c.mutable_liq_pools(0)->set_depth_cap_bps(c.liq_pools(0).fee() + 1);
+     BOOST_CHECK(!validate(c).empty()); }                               // V11 a cap above the fee is sandwichable
+   { auto c = base; c.mutable_liq_pools(0)->set_depth_cap_bps(c.liq_pools(0).fee());
+     BOOST_CHECK(validate(c).empty()); }                                // V11 a cap equal to the fee is the widest
+   { auto c = base; c.mutable_liq_pools(0)->set_fee(0);
+     BOOST_CHECK(!validate(c).empty()); }                               // V11 a zero fee admits no cap
    { auto c = base; c.mutable_liq_pools(0)->set_clip_floor(0);
      BOOST_CHECK(!validate(c).empty()); }                               // V11 floor
    { auto c = base; c.mutable_liq_pools(0)->set_conversion_horizon_sec(0);
