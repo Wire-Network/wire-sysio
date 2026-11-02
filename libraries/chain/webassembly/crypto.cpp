@@ -51,6 +51,8 @@ namespace sysio::chain::webassembly {
 
       fc::raw::unpack( ds, s );
       fc::raw::unpack( pubds, p );
+      assert_all_unpacked( ds, "assert_recover_key signature" );
+      assert_all_unpacked( pubds, "assert_recover_key public key" );
 
       using sig_type = fc::crypto::signature::sig_type;
       using key_type = fc::crypto::public_key::key_type;
@@ -92,6 +94,8 @@ namespace sysio::chain::webassembly {
       try {
          fc::datastream<const char*> ds( sig.data(), sig.size() );
          fc::raw::unpack( ds, s );
+         if ( ds.remaining() != 0 )
+            return -1;  // trailing bytes
       } catch ( const fc::exception& ) {
          return -1;  // empty / truncated / bad-variant-tag sig
       }
@@ -249,10 +253,9 @@ namespace sysio::chain::webassembly {
                                 span<const char> message,
                                 span<const char> t0_offset,
                                 span<const char> t1_offset,
-                                int32_t final,
+                                bool final,
                                 span<char> out) const {
 
-      bool _final = final == 1;
       bytes bstate(state.data(), state.data() + state.size());
       bytes bmessage(message.data(), message.data() + message.size());
       bytes bt0_offset(t0_offset.data(), t0_offset.data() + t0_offset.size());
@@ -260,7 +263,7 @@ namespace sysio::chain::webassembly {
 
       auto checktime = [this]() { context.trx_context.checktime(); };
 
-      auto maybe_err = fc::blake2b(rounds, bstate, bmessage, bt0_offset, bt1_offset, _final, checktime);
+      auto maybe_err = fc::blake2b(rounds, bstate, bmessage, bt0_offset, bt1_offset, final, checktime);
       if(std::holds_alternative<fc::blake2b_error>(maybe_err)) {
          return return_code::failure;
       }
@@ -290,8 +293,7 @@ namespace sysio::chain::webassembly {
       return return_code::success;
   }
 
-   void interface::sha3( span<const char> input, span<char> output, int32_t keccak ) const {
-      bool _keccak = keccak == 1;
+   void interface::sha3( span<const char> input, span<char> output, bool keccak ) const {
       const size_t bs = sysio::chain::config::hashing_checktime_block_size;
       const char* data = input.data();
       uint32_t datalen = input.size();
@@ -303,10 +305,11 @@ namespace sysio::chain::webassembly {
          context.trx_context.checktime();
       }
       enc.write( data, datalen);
-      auto res = enc.result(!_keccak);
+      auto res = enc.result(!keccak);
 
-      auto copy_size = std::min( output.size(), res.data_size() );
-      std::memcpy( output.data(), res.data(), copy_size );
+      SYS_ASSERT( output.size() == res.data_size(), wasm_execution_error, "sha3 output must be {} bytes, got {}",
+                  res.data_size(), output.size() );
+      std::memcpy( output.data(), res.data(), res.data_size() );
    }
 
    int32_t interface::k1_recover( span<const char> signature, span<const char> digest, span<char> pub) const {
