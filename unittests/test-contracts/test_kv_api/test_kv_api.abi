@@ -245,6 +245,16 @@
             ]
         },
         {
+            "name": "rdoreads",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "rdoseed",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "sec_big_row",
             "base": "",
             "fields": [
@@ -274,11 +284,6 @@
         },
         {
             "name": "testbinround",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "testcrossrd",
             "base": "",
             "fields": []
         },
@@ -468,6 +473,11 @@
             "fields": []
         },
         {
+            "name": "testownrd",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "testpartread",
             "base": "",
             "fields": []
@@ -603,11 +613,6 @@
             "fields": []
         },
         {
-            "name": "tstkeyoffbnd",
-            "base": "",
-            "fields": []
-        },
-        {
             "name": "tstlbound",
             "base": "",
             "fields": []
@@ -639,16 +644,6 @@
         },
         {
             "name": "tstnexteras",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "tstnotifyram",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "tstovrkyupd",
             "base": "",
             "fields": []
         },
@@ -769,11 +764,6 @@
         },
         {
             "name": "tstsecrbig",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "tstsendnotif",
             "base": "",
             "fields": []
         },
@@ -915,13 +905,18 @@
             "ricardian_contract": ""
         },
         {
-            "name": "testbinround",
-            "type": "testbinround",
+            "name": "rdoreads",
+            "type": "rdoreads",
             "ricardian_contract": ""
         },
         {
-            "name": "testcrossrd",
-            "type": "testcrossrd",
+            "name": "rdoseed",
+            "type": "rdoseed",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "testbinround",
+            "type": "testbinround",
             "ricardian_contract": ""
         },
         {
@@ -1110,6 +1105,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "testownrd",
+            "type": "testownrd",
+            "ricardian_contract": ""
+        },
+        {
             "name": "testpartread",
             "type": "testpartread",
             "ricardian_contract": ""
@@ -1240,11 +1240,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "tstkeyoffbnd",
-            "type": "tstkeyoffbnd",
-            "ricardian_contract": ""
-        },
-        {
             "name": "tstlbound",
             "type": "tstlbound",
             "ricardian_contract": ""
@@ -1277,16 +1272,6 @@
         {
             "name": "tstnexteras",
             "type": "tstnexteras",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "tstnotifyram",
-            "type": "tstnotifyram",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "tstovrkyupd",
-            "type": "tstovrkyupd",
             "ricardian_contract": ""
         },
         {
@@ -1410,11 +1395,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "tstsendnotif",
-            "type": "tstsendnotif",
-            "ricardian_contract": ""
-        },
-        {
             "name": "tstvalreplce",
             "type": "tstvalreplce",
             "ricardian_contract": ""
@@ -1472,14 +1452,6 @@
     ],
     "tables": [
         {
-            "name": "dbl_row",
-            "type": "dbl_row",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 49742
-        },
-        {
             "name": "dbltbl",
             "type": "dbl_row",
             "index_type": "i64",
@@ -1495,36 +1467,12 @@
             ]
         },
         {
-            "name": "mi_row",
-            "type": "mi_row",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 14755
-        },
-        {
             "name": "mitable",
             "type": "mi_row",
             "index_type": "i64",
             "key_names": ["scope","primary_key"],
             "key_types": ["name","uint64"],
             "table_id": 28466
-        },
-        {
-            "name": "sec_big_row",
-            "type": "sec_big_row",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 21480
-        },
-        {
-            "name": "sec_row",
-            "type": "sec_row",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 60117
         },
         {
             "name": "secbigtbl",
@@ -1559,5 +1507,10 @@
     ],
     "ricardian_clauses": [],
     "variants": [],
-    "action_results": []
+    "action_results": [
+        {
+            "name": "rdoreads",
+            "result_type": "bytes"
+        }
+    ]
 }

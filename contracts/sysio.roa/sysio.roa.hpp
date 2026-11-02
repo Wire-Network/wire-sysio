@@ -490,7 +490,7 @@ namespace sysio {
             // creator from the username by string arithmetic alone -- cheaper than any index read.
             // The only lookup the contract performs is the point read of the (creator, nonce)
             // replay guard, which the primary key already serves. Dropping the index halves the
-            // sponsoring owner's RAM cost per user (~296 -> ~152 bytes), which matters because
+            // sponsoring owner's RAM cost per user (~296 -> ~144 bytes), which matters because
             // these are the only rows in the contract billed to a node owner.
             using sponsors_t = kv::scoped_table<"sponsors"_n, sponsor_key, sponsor>;
 
