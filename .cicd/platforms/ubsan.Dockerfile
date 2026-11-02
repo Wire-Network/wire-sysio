@@ -73,8 +73,7 @@ ENV CMAKE_MAKE_PROGRAM=/usr/bin/ninja
 
 COPY <<-EOF /extras.cmake
   set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "" FORCE)
-  set(CMAKE_C_COMPILER "clang-18" CACHE STRING "")
-  set(CMAKE_CXX_COMPILER "clang++-18" CACHE STRING "")
+  # Compiler selection comes from the pinned LLVM distribution in build-sysio.sh.
   set(CMAKE_C_FLAGS "-fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer" CACHE STRING "")
   set(CMAKE_CXX_FLAGS "-fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer" CACHE STRING "")
 EOF

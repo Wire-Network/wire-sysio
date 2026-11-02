@@ -9,6 +9,34 @@ VCPKG_TARGET_TRIPLET="${VCPKG_TARGET_TRIPLET:-x64-linux-release}"
 VCPKG_HOST_TRIPLET="${VCPKG_HOST_TRIPLET:-$VCPKG_TARGET_TRIPLET}"
 VCPKG_OVERLAY_TRIPLETS="${VCPKG_OVERLAY_TRIPLETS:-$GITHUB_WORKSPACE/.github/vcpkg-triplets}"
 
+# ANTLR and its generated consumers share libc++ container annotations.
+# Track this choice in vcpkg so ASan never reuses the ordinary runtime archive.
+export WIRE_ASAN_ANTLR=0
+if [[ "${SYSIO_PLATFORM_NAME:-}" == asan ]]; then
+  export WIRE_ASAN_ANTLR=1
+fi
+
+# Provision libc++ before vcpkg: all host C++ dependencies must be rebuilt with
+# this ABI, while CDT remains an independently selected contract toolchain.
+export WIRE_LLVM_ROOT="${WIRE_LLVM_ROOT:-${RUNNER_TEMP:-$GITHUB_WORKSPACE/build}/llvm-23.1.3}"
+if [[ ! -x "$WIRE_LLVM_ROOT/bin/clang" ]]; then
+  bash "$GITHUB_WORKSPACE/scripts/llvm/install-toolchain.sh" "$WIRE_LLVM_ROOT"
+fi
+if [[ "${SYSIO_PLATFORM_NAME:-}" == gcc ]]; then
+  export CC=gcc-15 CXX=g++-15
+else
+  export CC="$WIRE_LLVM_ROOT/bin/clang" CXX="$WIRE_LLVM_ROOT/bin/clang++"
+fi
+
+# Exercise the host runtime before building vcpkg's native tools (LLVM TableGen
+# included). A runtime/linker mismatch should fail before dependency compilation.
+cmake -S "$GITHUB_WORKSPACE/cmake/test/libcxx" -B "$BUILD_DIR/libcxx-preflight" -G Ninja \
+  -DCMAKE_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/cmake/llvm-toolchain.cmake" \
+  -DWIRE_LLVM_ROOT="$WIRE_LLVM_ROOT" -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_C_COMPILER="$CC" -DCMAKE_CXX_COMPILER="$CXX"
+cmake --build "$BUILD_DIR/libcxx-preflight" --parallel "$BUILD_JOBS"
+ctest --test-dir "$BUILD_DIR/libcxx-preflight" --no-tests=error --output-on-failure
+
 echo "Building for ${SYSIO_PLATFORM_NAME:-unknown platform}"
 echo "Build directory: ${BUILD_DIR}"
 echo "vcpkg target triplet: ${VCPKG_TARGET_TRIPLET}"
@@ -57,6 +85,9 @@ cmake_args=(
    -DVCPKG_TARGET_TRIPLET="$VCPKG_TARGET_TRIPLET"
    -DVCPKG_HOST_TRIPLET="$VCPKG_HOST_TRIPLET"
    -DVCPKG_OVERLAY_TRIPLETS="$VCPKG_OVERLAY_TRIPLETS"
+   -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE="$GITHUB_WORKSPACE/cmake/llvm-toolchain.cmake"
+   -DWIRE_LLVM_ROOT="$WIRE_LLVM_ROOT"
+   -DSYSIO_DETECT_LISTENING_TEST_PORTS=ON
    -DBUILD_SYSTEM_CONTRACTS="$SYSIO_BUILD_SYSTEM_CONTRACTS"
    -DBUILD_TEST_CONTRACTS="$SYSIO_BUILD_TEST_CONTRACTS"
    -DENABLE_CCACHE=ON
@@ -82,6 +113,18 @@ fi
 cmake "${cmake_args[@]}"
 
 cmake --build "$BUILD_DIR" -- -j "$BUILD_JOBS"
+
+# Native Debug modules require a shared runtime; Release packages use static archives.
+# Keep the array nonempty: macOS Bash 3.2 rejects empty arrays under set -u.
+runtime_check_command=(python3 .github/scripts/check-libcxx-linkage.py)
+if [[ "$(sed -n 's/^CMAKE_BUILD_TYPE:STRING=//p' "$BUILD_DIR/CMakeCache.txt")" == Debug ]]; then
+  runtime_check_command+=(--shared-runtime-root "$WIRE_LLVM_ROOT")
+fi
+"${runtime_check_command[@]}" \
+  "$BUILD_DIR/programs/nodeop/nodeop" "$BUILD_DIR/programs/clio/clio" \
+  "$BUILD_DIR/programs/kiod/kiod" "$BUILD_DIR/programs/sys-util/sys-util" \
+  "$BUILD_DIR/tests/libcxx_runtime_test"
+ctest --test-dir "$BUILD_DIR" -R '^libcxx_runtime_test$' --no-tests=error --output-on-failure
 
 echo "=== ccache statistics ==="
 ccache -s || true

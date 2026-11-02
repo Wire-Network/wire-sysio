@@ -47,7 +47,8 @@ enum sysvmoc_exitcode : int {
 /// Version stamped into each cached code_descriptor; entries carrying a different version are recompiled.
 /// Bump together with code_cache.cpp's header_id whenever generated code would change for the same WASM:
 /// intrinsic-table renumbering, gs-region layout changes, or codegen logic changes.
-static constexpr uint8_t current_codegen_version = 3;
+/// LLVM 23 changes generated machine code; LLVM 18 cache entries must be rebuilt.
+static constexpr uint8_t current_codegen_version = 4;
 
 }
 

@@ -10,6 +10,8 @@ RUN apt-get update && apt-get install -y \
     gnupg
 
 RUN add-apt-repository ppa:deadsnakes/ppa -y
+# libc++ 23 supports GCC 15 and later; retain the independent GCC lane.
+RUN add-apt-repository ppa:ubuntu-toolchain-r/test -y
 RUN apt-get update
 
 RUN apt-get update && apt-get upgrade -y && \
@@ -44,21 +46,21 @@ RUN apt-get update && apt-get upgrade -y && \
     libstdc++-14-dev     \
     gcc-10               \
     g++-10               \
-    gcc-14               \
-    g++-14               \
+    gcc-15               \
+    g++-15               \
     autoconf automake libtool libltdl-dev
 
-RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100 && \
-    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-15 100 && \
+    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-15 100
 
-ENV CC=/usr/bin/gcc-14
-ENV CXX=/usr/bin/g++-14
+ENV CC=/usr/bin/gcc-15
+ENV CXX=/usr/bin/g++-15
 ENV CMAKE_MAKE_PROGRAM=/usr/bin/ninja
 
 COPY <<-EOF /extras.cmake
   set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "" FORCE)
-  set(CMAKE_C_COMPILER "gcc-14" CACHE STRING "")
-  set(CMAKE_CXX_COMPILER "g++-14" CACHE STRING "")
+  set(CMAKE_C_COMPILER "gcc-15" CACHE STRING "")
+  set(CMAKE_CXX_COMPILER "g++-15" CACHE STRING "")
   set(CMAKE_C_FLAGS "-Wall -Wextra -fdiagnostics-color=always" CACHE STRING "")
   set(CMAKE_CXX_FLAGS "-Wall -Wextra -fdiagnostics-color=always" CACHE STRING "")
 EOF

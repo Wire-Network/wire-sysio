@@ -4,9 +4,16 @@ The native-module runtime lets you debug smart contracts with standard C/C++ deb
 
 ## Prerequisites
 
-1. **wire-cdt** built and available via `find_package(cdt)` (either installed or pointed to via `CMAKE_PREFIX_PATH`).
+1. **wire-cdt** built with the [WIRE-277 datastream header fix](https://github.com/Wire-Network/wire-cdt/commit/03603e7676b23c6a7c9393790a8288b33e8e7ab0) and available via
+   `find_package(cdt)` (either installed or pointed to via `CMAKE_PREFIX_PATH`).
+   This header fix is required for host libc++ 23; CDT's compiler and contract
+   standard library remain unchanged. See [the toolchain guide](../docs/llvm-23-toolchain.md).
 
-2. **wire-sysio** configured with native-module support:
+2. **wire-sysio** configured with native-module support. Provision LLVM/libc++
+   23.1.3 and export `WIRE_LLVM_ROOT` as described in
+   [the host toolchain guide](../docs/llvm-23-toolchain.md). Native modules and
+   their host share the matching libc++/libc++abi/libunwind; CDT WASM compilation
+   remains independent:
    ```bash
    cmake -B cmake-build-debug -S . -G Ninja \
      -DCMAKE_BUILD_TYPE=Debug \
@@ -22,7 +29,7 @@ The native-module runtime lets you debug smart contracts with standard C/C++ deb
    ```bash
    cmake -B build/macos-native-debug -S . -G Ninja \
      -DCMAKE_BUILD_TYPE=Debug \
-     -DVCPKG_TARGET_TRIPLET=arm64-osx \
+     -DVCPKG_TARGET_TRIPLET=arm64-osx-release \
      -DBUILD_SYSTEM_CONTRACTS=ON \
      -DBUILD_TEST_CONTRACTS=ON \
      -DENABLE_TESTS=ON \
@@ -73,7 +80,7 @@ When you run tests with `--native-module`:
 
 ## How Native Compilation Works
 
-The `add_native_contract()` function (defined in CDT's `CDTMacros.cmake`) compiles contract sources with the **host compiler** (e.g. `clang++-18`) — not the CDT WASM toolchain — to produce a shared library (`.so`) that can be `dlopen`'d by the native-module runtime.
+The `add_native_contract()` function (defined in CDT's `CDTMacros.cmake`) compiles contract sources with the **host compiler** (Clang 23.1.3 by default) to produce a shared library (`.so`) that can be `dlopen`'d by the native-module runtime. Sysio replaces the macro's legacy GNU runtime link libraries with the matching host libc++ runtime.
 
 ### Compiler and Flags
 
@@ -87,8 +94,8 @@ The host `CXX` compiler (whatever is configured for the wire-sysio build) is use
 | **Force-included headers** | `cstdint`, `cstdlib`, `cstring`, `memory` (via `-include`) |
 | **Linux linker flags** | `--allow-shlib-undefined` (intrinsics resolved at dlopen time) |
 | **macOS linker flags** | `-bundle -undefined dynamic_lookup` with `_native.so` suffix |
-| **Linux linked libraries** | Shared `libgcc_s`, `libstdc++` (for cross-`.so` exception unwinding) |
-| **macOS linked libraries** | AppleClang/libc++ system libraries |
+| **Linux linked libraries** | Shared libc++, libc++abi and libunwind 23.1.3 from `WIRE_LLVM_ROOT` |
+| **macOS linked libraries** | Shared libc++, libc++abi and libunwind 23.1.3 from `WIRE_LLVM_ROOT` |
 
 ### Include Paths
 

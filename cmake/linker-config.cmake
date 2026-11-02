@@ -4,14 +4,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND (CMAKE_C_COMPILER_ID STREQUAL "Clang" 
   add_link_options($<$<LINK_LANGUAGE:CXX>:-fuse-ld=bfd>)
 endif()
 
-# Portable binary: statically link C++ runtime on Linux
-# so the only NEEDED shared libs are libc.so, libm.so, and ld-linux.
+# The host toolchain links the matching libc++/libc++abi/unwinder archives.
+# Do not inject libstdc++ or a second C++ ABI here.
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  add_link_options(
-          -static-libgcc
-          $<$<LINK_LANGUAGE:CXX>:-static-libstdc++>
-  )
-
   # Locate static libatomic for use as a link target (instead of -latomic)
   execute_process(
     COMMAND ${CMAKE_CXX_COMPILER} --print-file-name=libatomic.a

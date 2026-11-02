@@ -47,10 +47,7 @@ macro(link_native_exports TARGET)
       if(NOT APPLE)
          target_link_options(${TARGET} PRIVATE
             "-Wl,--dynamic-list=${NATIVE_EXPORT_LIST}")
-         # Override the global -static-libgcc (from linker-config.cmake).
-         # Both the executable and the .so must use the SAME shared libgcc_s.so
-         # for C++ exception unwinding to work across the dlopen boundary.
-         target_link_libraries(${TARGET} PUBLIC gcc_s stdc++)
+         # native-libcxx.cmake supplies the matching shared C++ ABI and unwinder.
       else()
          target_link_options(${TARGET} PRIVATE
             "-Wl,-exported_symbols_list,${NATIVE_EXPORT_LIST}")

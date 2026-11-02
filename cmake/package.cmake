@@ -108,6 +108,11 @@ set(CPACK_DEBIAN_PACKAGE_DEPENDS
   "libc6 (>= 2.38), debconf (>= 0.5) | debconf-2.0"
 )
 set(CPACK_DEBIAN_BASE_PACKAGE_RECOMMENDS "logrotate")
+if("native-module" IN_LIST SYSIO_WASM_RUNTIMES AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  # The pinned shared libc++ used by native Debug modules needs libatomic.so.1.
+  string(APPEND CPACK_DEBIAN_PACKAGE_DEPENDS ", libatomic1")
+  set(CPACK_RPM_PACKAGE_REQUIRES "libatomic")
+endif()
 
 set(CPACK_DEBIAN_BASE_PACKAGE_SECTION "utils")
 
