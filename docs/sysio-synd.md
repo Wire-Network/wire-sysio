@@ -515,14 +515,14 @@ Repeated freezes cannot raise capacity beyond that cap.
 | `syndconfig` | outpost, token | the pair's rules (below) |
 | `envelopes` | outpost, token, depot epoch | digest, syndicated and yield totals, item count, state, `sysio.bond` request id, released, burned, the request's recorded outcome, and the forfeit and returned bounty snapshotted on INVALID |
 | `items` | envelope, then id (arrival order) | kind, beneficiary key family and pubkey, amount, remaining, yield position |
-| `parked` | token, key family, pubkey | balance and yield position of an unlinked pubkey |
+| `parked` | token, key family, pubkey | balance, yield position, active principal batch id and unattributed imported principal of an unlinked pubkey |
 | `buckets` | outpost, token, direction | level and the depot epoch last ticked, one per direction (SYNDICATION, DESYNDICATION) |
 | `ledger` | outpost, token | release and underwriting cursors; `retained_from_epoch` replay floor |
 | `returns` | request id | original holder, destination family/key, outpost, token and exact net burned amount; erased upon explicit resolution |
 | `feepot` | token | collected fees, with a yield position; bounties are paid from it, and its yield goes to `sysio` |
 | `yieldpool` | token | the WIRE `sysio.synd`'s holder row earned, pulled from `sysio.liq` and credited out to held, parked and fee positions |
 | `syndcursors` | outpost | the highest sequence admitted (replay guard) |
-| `syndcounters` | singleton | the next item id and the next desyndication request id |
+| `syndcounters` | singleton | the next item, desyndication request and parked principal batch ids |
 | `syndstate` | singleton | whether the launch import is closed; the pair the next queue step starts at |
 | `mismatch` | outpost, token | latest unresolved shortfall evidence: epoch, sequence, kind, reported custody, expected outstanding, and time |
 
@@ -641,66 +641,33 @@ table; no automatic migration or recovery from previously discarded data is incl
 
 ## Delivery receipts
 
-The user-story journey requires a particular external syndication to become usable
-shadow LIQ. Aggregate wallet growth alone cannot prove which intake was paid.
-Previously `onsynd` carried envelope digest/sequence, `items` kept a separate ID,
-completed items were erased, and `parked` combined several intakes before one
-payout. Those existing accounting rows and all settlement rules are unchanged.
+Authenticated self-inline actions join each accepted source message to its principal movement:
 
-Three new, typed **self-inline-only** receipt actions provide the missing joins:
-
-| Receipt | Correlation and meaning |
+| Receipt | Meaning |
 |---|---|
-| `logintake(receipt)` | Accepted `(chain_code, epoch_index, digest, sequence)` → `item_id`, token, beneficiary key and gross amount. No receipt for rejected or replayed input. The source transaction is established through the existing outpost/envelope trace, not a new unauthenticated transaction-ID parameter. |
-| `logrelease(receipt)` | `item_id` → exact gross, fee, net, remaining and either the actual recipient, a parked batch ID, or `FEE_ONLY`. Every positive tranche records separately; a partial release is not completion. |
-| `logparked(receipt)` | A whole principal batch → actual recipient and amount, with any unattributed legacy/import portion stated separately. WIRE yield is not counted as LIQ principal. |
+| `logintake(receipt)` | Accepted outpost, token, epoch, digest and sequence → item id, beneficiary key and gross principal. Rejected and replayed messages emit none. |
+| `logrelease(receipt)` | Item id → gross, fee, net, remaining and actual account, parked batch id, or `FEE_ONLY`. Each positive tranche emits separately. |
+| `logparked(receipt)` | Principal batch → actual recipient, total principal and unattributed imported principal. WIRE yield is separate. |
+| `logburn(receipt)` | Outpost, token, epoch and digest → terminal invalidation. Emitted after all held items are removed by an INVALID ruling or `dropenv`; earlier releases are not reversed. |
 
-A direct receipt is emitted in the same transaction as `sysio.liq::settle`.
-Failed transactions roll back the settlement and receipts together. A parked
-release is **not** delivery: join its nonzero batch ID to the later `logparked`
-receipt. For an item, sum its release net amounts; verify each parked contribution
-against that batch's payout and wait for `remaining == 0` before claiming the whole
-intake was delivered. Gross equals fee + net for every tranche. A 100% fee emits
-`FEE_ONLY` with no recipient, never a fictitious credit.
+Match the source transaction through the existing outpost/envelope evidence, then follow its
+`logintake` item id through each `logrelease`. A direct release shares its transaction with
+`sysio.liq::settle`. A PARKED release is not wallet delivery: join its batch id to `logparked`.
+Sum the exact net tranches and require zero remaining principal before declaring full delivery.
+A `logburn` closes the unreleased remainder, including when the last release had nonzero
+`remaining`. Previously parked tranches still require their batch payout receipt. A 100% fee is
+`FEE_ONLY`, never a wallet credit.
 
-Readers must check successful irreversible transaction status, `sysio.synd` as
-both action account and receiver, and the receipt schema from the deployed ABI.
-Correlate the receipt identities; flat action-array order is not execution order.
-The receipt actions require the contract's authority **and** immediate inline
-sender; even a top-level action signed as the contract cannot fabricate one.
-They notify no external account. They attest principal movement, not final
-underwriting/challenge completion: that remains the envelope's separate lifecycle.
+Each parked row holds one active principal batch. Imports increase `unattributed` without being
+assigned to a live intake. Principal payout resets the batch even if unpaid WIRE yield retains the
+row; later principal gets a fresh id from `syndcounters`. No permanent per-deposit history is stored.
 
-`parkbatches` stores only one small sidecar per active parked-principal key;
-`receiptstate` allocates non-reused batch IDs. There is no permanent per-deposit
-history table or per-intake sweep loop. A sweep erases the sidecar even when the
-existing parked row retains unpaid WIRE yield. Subsequent principal gets a fresh
-batch ID. This leaves release budgets and principal/yield accounting unchanged.
+Read only successful irreversible traces with `sysio.synd` as both action account and receiver,
+using the deployed ABI. Failed transactions roll back receipts and movement together. The actions
+require the contract's authority and immediate self-inline sender and notify no external account.
+Correlate identities rather than flat action-array order. Delivery does not establish underwriting
+challenge finality, which remains the envelope's separate lifecycle.
 
-Upgrade boundaries are explicit:
-
-- Existing `items`, `parked`, counters, action arguments and OPP messages keep their
-  serialized layouts. No migration, replay, fee/configuration change or callback
-  is required.
-- Principal parked before receipts existed is `unattributed`; an entirely legacy
-  sweep has batch ID zero. Imported principal is also unattributed to live intake.
-  Mixed batches retain this amount instead of assigning it to a newer syndication.
-- A held pre-upgrade item can emit release receipts, but without its earlier
-  intake receipt a client cannot invent a source-sequence join.
-- If the uint64 receipt-ID space is exhausted, principal still moves with batch
-  ID zero and an unattributed payout; IDs never wrap or block consensus intake.
-- Downgrading while active `parkbatches` exist is unsupported: older code can move
-  principal without maintaining them. Drain those batches first, or use a reviewed
-  reconciliation migration before re-enabling receipts. No automatic downgrade
-  or sidecar reset is provided.
-- Receipts live in transaction traces. Retain/index those traces for historical
-  queries; pruning operational rows does not provide a permanent history API.
-  Missing history means unknown correlation, not inferred success from balance.
-
-After rebuilding WASM/ABI, regenerate SDK system-contract types with the canonical
-producer generator. SDK/Hub adoption of these schemas is a downstream integration;
-this contract PR does not claim live client adoption or deployment acceptance.
-Contract coverage includes equal deposits, both chain families, replay/drop,
-partial releases, exact fees, forged logs, parked aggregation, mixed legacy/import
-principal, fee-only release, ID exhaustion and repeated sweeps. Existing custody, challenge,
-freeze, linked-contract and yield cases must continue to pass.
+Receipt history requires retained transaction traces; pruned operational rows cannot replace it.
+Missing history leaves correlation unknown. The `parked` and `syndcounters` layouts require a fresh
+deployment or a coordinated state migration. Regenerate SDK system-contract types from the rebuilt ABI.

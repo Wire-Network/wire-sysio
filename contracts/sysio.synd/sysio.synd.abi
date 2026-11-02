@@ -48,6 +48,28 @@
             ]
         },
         {
+            "name": "burn_receipt",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "token_code",
+                    "type": "slug_name"
+                },
+                {
+                    "name": "epoch_index",
+                    "type": "uint32"
+                },
+                {
+                    "name": "digest",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
             "name": "challenge",
             "base": "",
             "fields": [
@@ -485,6 +507,16 @@
             ]
         },
         {
+            "name": "logburn",
+            "base": "",
+            "fields": [
+                {
+                    "name": "receipt",
+                    "type": "burn_receipt"
+                }
+            ]
+        },
+        {
             "name": "logintake",
             "base": "",
             "fields": [
@@ -647,20 +679,6 @@
             ]
         },
         {
-            "name": "parked_batch",
-            "base": "",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "uint64"
-                },
-                {
-                    "name": "unattributed",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
             "name": "parked_key",
             "base": "",
             "fields": [
@@ -735,6 +753,14 @@
                 {
                     "name": "position",
                     "type": "position"
+                },
+                {
+                    "name": "batch_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "unattributed",
+                    "type": "uint64"
                 }
             ]
         },
@@ -798,16 +824,6 @@
                 },
                 {
                     "name": "quantity",
-                    "type": "uint64"
-                }
-            ]
-        },
-        {
-            "name": "receipt_state",
-            "base": "",
-            "fields": [
-                {
-                    "name": "next_batch_id",
                     "type": "uint64"
                 }
             ]
@@ -1121,6 +1137,10 @@
                 {
                     "name": "next_request_id",
                     "type": "uint64"
+                },
+                {
+                    "name": "next_batch_id",
+                    "type": "uint64"
                 }
             ]
         },
@@ -1244,6 +1264,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "logburn",
+            "type": "logburn",
+            "ricardian_contract": ""
+        },
+        {
             "name": "logintake",
             "type": "logintake",
             "ricardian_contract": ""
@@ -1364,28 +1389,12 @@
             "table_id": 57982
         },
         {
-            "name": "parkbatches",
-            "type": "parked_batch",
-            "index_type": "i64",
-            "key_names": ["token_code","chain_kind","pubkey"],
-            "key_types": ["uint64","uint64","bytes"],
-            "table_id": 29501
-        },
-        {
             "name": "parked",
             "type": "parked_row",
             "index_type": "i64",
             "key_names": ["token_code","chain_kind","pubkey"],
             "key_types": ["uint64","uint64","bytes"],
             "table_id": 38854
-        },
-        {
-            "name": "receiptstate",
-            "type": "receipt_state",
-            "index_type": "i64",
-            "key_names": ["name"],
-            "key_types": ["name"],
-            "table_id": 6848
         },
         {
             "name": "returns",
