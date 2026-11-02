@@ -765,7 +765,7 @@ public:
    /// The `parked` row of `(token_code, kind, pubkey)`; null when there is none. The key is the token and
    /// the chain kind as big-endian words, then the pubkey NUL-escaped and NUL-NUL terminated (the kv key
    /// encoding of the contract's `parked_key`).
-   static std::string parked_key_bytes(std::string_view token_code, ChainKind kind, const std::vector<char>& pubkey) {
+   fc::variant parked_row(std::string_view token_code, ChainKind kind, const std::vector<char>& pubkey) {
       std::string key;
       append_key_word(key, slug_value(token_code));
       append_key_word(key, static_cast<uint64_t>(magic_enum::enum_integer(kind)));
@@ -775,13 +775,9 @@ public:
       }
       key.push_back('\0');
       key.push_back('\0');
-      return key;
-   }
-   fc::variant parked_row(std::string_view token_code, ChainKind kind, const std::vector<char>& pubkey) {
-      const auto key = parked_key_bytes(token_code, kind, pubkey);
       const auto& kv_idx = control->db().get_index<kv_index, by_code_key>();
-      const auto itr = kv_idx.find(
-         boost::make_tuple(SYND_ACCOUNT, compute_table_id("parked"_n.to_uint64_t()), std::string_view(key)));
+      const auto  itr    = kv_idx.find(boost::make_tuple(SYND_ACCOUNT, compute_table_id("parked"_n.to_uint64_t()),
+                                                         std::string_view(key)));
       if (itr == kv_idx.end()) return fc::variant();
       return decode(synd_abi_ser, "parked_row",
                     std::vector<char>(itr->value.data(), itr->value.data() + itr->value.size()));

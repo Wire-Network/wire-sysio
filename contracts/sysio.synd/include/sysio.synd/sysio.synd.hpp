@@ -585,7 +585,7 @@ namespace sysio {
       struct [[sysio::table("syndcounters")]] synd_counters {
          uint64_t next_item_id    = 1;   ///< id the next `items` row takes
          uint64_t next_request_id = 1;   ///< DESYNDICATE_LIQ request id; the outpost reads 0 as "no id"
-         uint64_t next_batch_id = 1;     ///< id allocated when a parked principal batch starts
+         uint64_t next_batch_id   = 1;   ///< id allocated when a parked principal batch starts
          SYSLIB_SERIALIZE(synd_counters, (next_item_id)(next_request_id)(next_batch_id))
       };
 
@@ -625,8 +625,8 @@ namespace sysio {
          std::vector<char>              pubkey;                                               ///< native pubkey
          uint64_t                       balance    = 0;   ///< shadow base units held for the pubkey
          opp::shadow::custody::position position;         ///< the shadow yield of `balance`
-         uint64_t batch_id = 0;     ///< active principal batch, zero while only unpaid WIRE yield remains
-         uint64_t unattributed = 0; ///< imported principal in this batch, not joined to a live intake
+         uint64_t                       batch_id     = 0;   ///< active principal batch, zero while only unpaid WIRE yield remains
+         uint64_t                       unattributed = 0;   ///< imported principal in this batch, not joined to a live intake
          SYSLIB_SERIALIZE(parked_row, (token_code)(chain_kind)(pubkey)(balance)(position)(batch_id)(unattributed))
       };
 

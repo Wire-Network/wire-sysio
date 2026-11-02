@@ -670,4 +670,4 @@ challenge finality, which remains the envelope's separate lifecycle.
 
 Receipt history requires retained transaction traces; pruned operational rows cannot replace it.
 Missing history leaves correlation unknown. The `parked` and `syndcounters` layouts require a fresh
-deployment or a coordinated state migration. Regenerate SDK system-contract types from the rebuilt ABI.
+deployment or a coordinated state migration.

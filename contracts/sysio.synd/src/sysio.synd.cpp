@@ -384,7 +384,7 @@ uint64_t park_shadow(name self, sysio::slug_name token_code, symbol_code sym, Ch
    if (amount > 0) {
       if (row.balance == 0) {
          synd::syndcounters_t counters(self);
-         auto state = counters.get_or_default(synd::synd_counters{});
+         synd::synd_counters  state = counters.get_or_default(synd::synd_counters{});
          row.batch_id = state.next_batch_id++;
          counters.set(state, ram_payer);
       }
