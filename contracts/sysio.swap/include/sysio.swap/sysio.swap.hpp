@@ -93,11 +93,18 @@ namespace sysio {
          /// It must stay under the depth cap, though: a floor above the cap caps every
          /// clip below the floor and the pair stops selling entirely.
          ///
-         /// Keep `depth_cap_bps` below roughly twice the pair's fee. The cap is what
-         /// makes a tick not worth sandwiching: an attacker pays the round-trip fee on
-         /// their own position to capture a share of the clip's price impact, so the
-         /// attack only clears its cost once a clip can move the pool by more than the
-         /// fee costs them.
+         /// `depth_cap_bps` may not exceed the pair's fee, and `changefee` will not lower
+         /// the fee below it. A sandwich around one tick pays only when the clip moves the
+         /// price by more than the attacker's two fees, and a clip is at most
+         /// `depth_cap_bps` of the shadow side it sells into, so none pays beyond a unit
+         /// of rounding. `tickyield` holds the stored cap to the fee as well, so a
+         /// zero-fee yield pool never sells.
+         ///
+         /// That bounds one tick, not the sale. A position held across several ticks pays
+         /// the two fees once and collects every clip's move, so it gains once what sells
+         /// during the hold exceeds about the fee's share of the shadow side. It carries
+         /// the hold's price risk, and the lowered price is open to arbitrage. A longer
+         /// horizon or a higher fee lengthens the hold.
          [[sysio::action]] void setyield(symbol_code pair_token,
            uint32_t conversion_horizon_sec, uint32_t depth_cap_bps, int64_t clip_floor);
          /// Settle the WIRE yield a yield pool is owed on the shadow it holds into the
@@ -123,8 +130,8 @@ namespace sysio {
          /// Sell one clip of a yield pool's reservoir through the pool and hand the
          /// proceeds to the shadow token's holders. The clip is the reservoir's share
          /// of the horizon elapsed since the last tick, floored, capped by
-         /// `depth_cap_bps` of `last_tick_depth` or the current shadow side, whichever
-         /// is smaller, and by what is queued; it is sold
+         /// `depth_cap_bps`, or the pair's fee if that is lower, of `last_tick_depth`
+         /// or the current shadow side, whichever is smaller, and by what is queued; it is sold
          /// at the pool's own curve and fee, after the pool's owed yield has been
          /// settled, and the proceeds go out through the token's `addyield`, so the
          /// pool takes its own share back on the next accrual.
@@ -150,6 +157,8 @@ namespace sysio {
          [[sysio::action]] void addliquidity(name user, asset to_buy, asset max_asset1, asset max_asset2);
          [[sysio::action]] void remliquidity(name user, asset to_sell, asset min_asset1, asset min_asset2);
          [[sysio::action]] void exchange( name user, symbol_code pair_token, extended_asset ext_asset_in, asset min_expected );
+         /// Set the pair's fee to `newfee`, in [0, MAX_FEE] (fee authority). A yield
+         /// pool's fee may not go below its `depth_cap_bps`; see `setyield`.
          [[sysio::action]] void changefee(symbol_code pair_token, int newfee);
          /// Bring the pair's cumulative-price accumulators up to the current block
          /// time without trading, so a reader can take an up-to-date snapshot. No
@@ -336,6 +345,12 @@ namespace sysio {
          /// itself. Stated in output units, which is the only place the condition is
          /// price-independent.
          static int64_t min_fee_bearing_output(int fee);
+         /// Whether a clip ceiling of `depth_cap_bps` is within `fee`, the bound
+         /// `setyield` and `changefee` hold on a yield pool (see `setyield`). Both are
+         /// in ten-thousandths, so they compare directly.
+         static bool cap_within_fee(uint32_t depth_cap_bps, int fee);
+         static_assert( uint32_t(FEE_DENOMINATOR) == opp::amm::BPS_TOTAL,
+                        "cap_within_fee compares a fee and a depth cap in the same unit" );
          /// Settle an exact-input swap of `paying` through the pair `evo_token`: the
          /// output is the constant-product quote (amm::out_given_in at equal weights)
          /// net of the pair's fee (amm::split_wire_fee, at least MIN_SWAP_FEE when the
