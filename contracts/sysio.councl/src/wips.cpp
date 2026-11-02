@@ -3,7 +3,6 @@
 #include <sysio.system/emissions.hpp>
 
 #include <algorithm>
-#include <limits>
 #include <string_view>
 #include <sysio.roa.hpp>
 
@@ -21,7 +20,6 @@ constexpr auto EMPTY_HASH = "WIP content hash must not be zero";
 constexpr auto INVALID_COUNCIL = "WIP requires a complete elected Council";
 constexpr auto INVALID_T2 = "WIP requires a nonempty Tier-2 snapshot within the owner cap";
 constexpr auto INVALID_POLICY = "WIP thresholds must be positive and reachable in the frozen electorates";
-constexpr auto EXHAUSTED_IDS = "WIP identity exhausted";
 constexpr auto ENDORSEMENT_CLOSED = "WIP endorsement window is closed";
 constexpr auto NOT_ENDORSER = "account is not a frozen WIP Tier-2 owner";
 constexpr auto DUPLICATE_ENDORSEMENT = "account already endorsed this WIP";
@@ -89,7 +87,6 @@ uint64_t council::openwip(std::string uri, checksum256 content_hash, uint64_t co
 
    wipcounter_t counter(get_self());
    auto ids = counter.get_or_default(wip_counter{});
-   check(ids.next_id > 0 && ids.next_id < std::numeric_limits<uint64_t>::max(), EXHAUSTED_IDS);
    const auto id = ids.next_id++;
    const auto now = current_time_point();
    const auto endorsement_end = now + seconds(policy.endorsement_seconds);
