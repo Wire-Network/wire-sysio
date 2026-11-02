@@ -362,7 +362,7 @@ BOOST_FIXTURE_TEST_CASE(regliqpool_refusals, sysio_liq_tester) try {
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("token_code has no shadow symbol"), regliqpool(ETH, LIQETH, POOL_SYM, UNIT, UNIT));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("token_code belongs to another chain"), regliqpool(ETH, LIQSOL, POOL_SYM, UNIT, UNIT));
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("both seeds must be positive"), regliqpool(SOLANA, LIQSOL, POOL_SYM, 0, UNIT));
-   BOOST_REQUIRE(mentions(regliqpool(SOLANA, LIQSOL, POOL_SYM, UNIT, UNIT, 30, 0, 86400, 300, 1000, "alice"_n),
+   BOOST_REQUIRE(mentions(regliqpool(SOLANA, LIQSOL, POOL_SYM, UNIT, UNIT, 30, 0, 86400, 30, 1000, "alice"_n),
                           "missing authority of sysio.liq"));
    BOOST_REQUIRE_EQUAL("", stat_row()["pair_symbol"].as_string());
 } FC_LOG_AND_RETHROW()

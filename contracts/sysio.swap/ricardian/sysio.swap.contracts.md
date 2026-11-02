@@ -184,7 +184,7 @@ title: Set yield parameters
 summary: 'Set the yield tick parameters of {{nowrap pair_token}}'
 ---
 
-The fee authority associated to the token {{pair_token}}, which must be a yield pool, authorizes to set the horizon of {{conversion_horizon_sec}} seconds over which the pool's queued yield is meant to sell, the ceiling of {{depth_cap_bps}} basis points (at most 10000) of the pool's shadow side on one clip, and the least a clip may be, {{clip_floor}}, in units of the shadow token. All three must be nonzero before the pool's yield tick can run. The pair's tick clock restarts now.
+The fee authority associated to the token {{pair_token}}, which must be a yield pool, authorizes to set the horizon of {{conversion_horizon_sec}} seconds over which the pool's queued yield is meant to sell, the ceiling of {{depth_cap_bps}} basis points of the pool's shadow side on one clip, which may not exceed the pair's fee in units of 1/10000, and the least a clip may be, {{clip_floor}}, in units of the shadow token. All three must be nonzero before the pool's yield tick can run. The pair's tick clock restarts now.
 
 
 <h1 class="contract">accrueyield</h1>
@@ -236,7 +236,7 @@ title: Tick yield
 summary: 'Sell one clip of the reservoir of {{nowrap pair_token}} through the pool'
 ---
 
-The token {{pair_token}} must be a yield pool whose tick parameters have been set. The yield owed to the pool is settled first, as in accrueyield. Then a clip of the reservoir is exchanged through the pool for the other leg, under the same conversion rules and fee as the exchange action with no minimum: the clip is the reservoir multiplied by the time elapsed since the pair's tick clock last advanced and divided by the conversion horizon, rounded downward, but at most the depth cap and at most the reservoir. The depth cap is the pair's basis points of the pool's shadow side as it stands now or as it stood at the last setyield or selling tick, whichever of the two is smaller, so that a shadow side enlarged since that tick cannot widen it. The clock then advances to now. The other-leg proceeds are handed to the shadow token's addyield action, which distributes them to every holder of the shadow; this contract, holding the pool's shadow, receives its share on a later accrual.
+The token {{pair_token}} must be a yield pool whose tick parameters have been set. The yield owed to the pool is settled first, as in accrueyield. Then a clip of the reservoir is exchanged through the pool for the other leg, under the same conversion rules and fee as the exchange action with no minimum: the clip is the reservoir multiplied by the time elapsed since the pair's tick clock last advanced and divided by the conversion horizon, rounded downward, but at most the depth cap and at most the reservoir. The depth cap is the pair's basis points, or its fee in units of 1/10000 if that is lower, of the pool's shadow side as it stands now or as it stood at the last setyield or selling tick, whichever of the two is smaller, so that a shadow side enlarged since that tick cannot widen it. The clock then advances to now. The other-leg proceeds are handed to the shadow token's addyield action, which distributes them to every holder of the shadow; this contract, holding the pool's shadow, receives its share on a later accrual.
 
 The exchange happens only if two conditions hold. The clip must have reached the pair's clip floor, or the whole of the reservoir if that is smaller. And, unless the whole reservoir is what is being sold, what the clip would fetch must be enough that the pair's own fee rate is the fee it pays rather than the one-unit minimum. When either fails, and when the reservoir is empty or no time has elapsed, the pools, the reservoir and the clock are all left unmodified; in particular the clock is not advanced, so the elapsed time counts toward the next clip instead of being discarded. No authorization is required.
 
@@ -250,7 +250,7 @@ summary: 'Change the fee value associated to a pair'
 ---
 
 The fee authority associated to the token {{pair_token}} authorizes
-to change the fee parameter associated to the same token, to the value {{newfee}}, in units of 1/10000 and at most 9999.
+to change the fee parameter associated to the same token, to the value {{newfee}}, in units of 1/10000 and at most 9999. For a yield pool, {{newfee}} may not be below the pool's depth cap in basis points.
 
 
 <h1 class="contract">setconfig</h1>

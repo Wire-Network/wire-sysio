@@ -36,6 +36,20 @@ void load_account_abi(Tester& tester, name account, abi_serializer& out_ser) {
    out_ser.set_abi(std::move(parsed), Tester::fixture_abi_yield_function());
 }
 
+/// Store `encoded` as the kv row `id` of `code`'s `table` without going through the contract,
+/// for state no action can reach. A new row is billed to `sysio`.
+template <typename Tester>
+void write_kv_row(Tester& tester, name code, name table, uint64_t id, const std::vector<char>& encoded) {
+   char key[kv_pri_key_size];
+   kv_encode_be64(key, id);
+   auto& store = const_cast<kv_store&>(tester.control->kv());
+   const auto table_id = compute_table_id(table.value);
+   const std::string_view key_view(key, sizeof(key));
+   const std::string_view value(encoded.data(), encoded.size());
+   if (const auto row = store.find_row(code, table_id, key_view)) store.update_row(*row, row->payer, value);
+   else store.insert_row(code, table_id, config::system_account_name, key_view, value);
+}
+
 /// The authorization an action needs when an unprivileged contract bills RAM to `signer`
 /// (a deposit row emplaced for a user, say): the signer's `sysio.payer` beside `active`.
 /// The active key satisfies both.
