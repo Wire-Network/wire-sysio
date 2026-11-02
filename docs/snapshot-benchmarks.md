@@ -36,6 +36,53 @@ Benchmark uses the same section distribution as a real EOS mainnet snapshot:
 Note: Run-to-run variance is ~10-30% due to disk cache state. Spring and Wire
 benchmarks use identical data sets and were run back-to-back on the same machine.
 
+## KV Key Order (release build)
+
+KV sections are written in key order. They used to follow row ids, which is allocation order, so the cost of key
+order depends on how far apart the two orders are. The results above predate KV rows. `snapshot_large_benchmark` now
+measures `kv_object` and `kv_index_object`, so its numbers below cannot be compared with those above.
+
+Each run inserts its rows in one of three orders:
+
+- `sorted`: keys ascend, so a walk by key matches allocation order
+- `interleaved`: tables take turns, each appending ascending keys, as contract tables do on a live chain
+- `random`: keys are unrelated to allocation order, the worst case for a walk by key
+
+Times are medians in seconds, measured on an i9-12950HX with 125 GB of RAM and ext4 on NVMe, using two binaries that
+differ only in the walk order. Before and after runs alternated, under an exclusive lock on the host.
+
+10M rows + 14M index entries, 1.69 GB snapshot, state in memory, 3 runs of each:
+
+| Insertion order | Hash before | Hash after | Write before | Write after | Load before | Load after |
+|---|---|---|---|---|---|---|
+| `sorted` | 3.5 | 3.5 | 4.6 | 4.3 | 7.4 | 8.3 |
+| `interleaved` | 3.5 | 5.5 | 4.5 | 6.1 | 9.2 | 8.6 |
+| `random` | 3.5 | 9.8 | 4.5 | 11.1 | 39.7 | 7.6 |
+
+The same rows with the state evicted from memory before each walk, 2 runs of each:
+
+| Insertion order | Hash before | Hash after | Write before | Write after | Load before | Load after |
+|---|---|---|---|---|---|---|
+| `sorted` | 10.5 | 10.7 | 11.8 | 11.5 | 7.5 | 7.8 |
+| `interleaved` | 10.8 | 8.1 | 11.8 | 9.1 | 9.4 | 7.9 |
+| `random` | 10.7 | 18.0 | 11.7 | 19.2 | 37.9 | 8.1 |
+
+50M rows + 70M index entries, 8.44 GB snapshot, state in memory, `random` only, 2 runs of each:
+
+| Hash before | Hash after | Write before | Write after | Load before | Load after |
+|---|---|---|---|---|---|
+| 17.5 | 56.4 | 22.0 | 63.4 | 369.3 | 47.8 |
+
+- **Write and hash**: slower when rows are scattered in memory, because the walk follows them. The cost grows slightly
+  faster than the row count: 6.3 s of extra hash time at 24M objects, 38.9 s at 120M.
+- **Load**: no longer depends on insertion history, because the file is always in key order. With `random` insertion
+  it is 5 to 8 times faster.
+- **Noise**: with `sorted` insertion both binaries walk the same rows in the same order, so that row shows the noise.
+  Load ranged from 7.0 to 8.5 s there.
+- **Evicted state**: a stand-in for state bigger than RAM, not a model of it. Pages stay in memory once a walk has
+  faulted them back, so a real memory shortage could cost more than these numbers. The faster `interleaved` result is
+  measured, not explained.
+
 ## Design Evolution
 
 The following approaches were explored during development. All measurements below

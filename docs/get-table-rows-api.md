@@ -16,14 +16,15 @@ POST /v1/chain/get_table_rows
 | `code` | name | required | Contract account |
 | `table` | string | required | Table name (from ABI) |
 | `scope` | string | `""` | Scope for scoped tables. Empty = unscoped (all rows). Parsed using ABI type. |
-| `find` | string | `""` | Exact key lookup (JSON key object or hex). Cannot be combined with bounds. |
+| `find` | string | `""` | Exact key lookup: a JSON key object encoded as a string, or hex. Cannot be combined with bounds. |
 | `index_name` | string | `""` | Secondary index name (e.g. `"byowner"`) or position (e.g. `"2"`). Empty = primary key. |
-| `lower_bound` | string | `""` | Lower bound (inclusive). Forward pagination feeds `next_key` here. When `json=true` one of three forms: a JSON key object, untagged hex (both within-scope), or a `0x` raw cursor (a complete key, used verbatim). When `json=false`: hex of the complete key. |
+| `lower_bound` | string | `""` | Lower bound (inclusive). Forward pagination feeds `next_key` here. When `json=true` one of three forms: a JSON key object encoded as a string, untagged hex (both within-scope), or a `0x` raw cursor (a complete key, used verbatim). When `json=false`: hex of the complete key. |
 | `upper_bound` | string | `""` | Upper bound (exclusive). Same format as `lower_bound`. |
 | `limit` | uint32 | `50` | Max rows to return |
 | `reverse` | bool | `false` | Iterate in reverse order |
 | `show_payer` | bool | `false` | Include RAM payer in each row |
 | `time_limit_ms` | uint32 | (server default) | Max processing time |
+| `values_only` | bool | `false` | Return each row as just its value instead of `{key, value}` |
 
 ## Response
 
@@ -37,12 +38,12 @@ POST /v1/chain/get_table_rows
 }
 ```
 
-- `rows` — array of `{key, value}` objects. When `show_payer=true`, includes `payer` field.
-- `more` — `true` if there are more rows beyond this page. A page ends at `limit`, at the deadline
+- `rows`: array of `{key, value}` objects. When `show_payer=true`, includes `payer` field.
+- `more`: `true` if there are more rows beyond this page. A page ends at `limit`, at the deadline
   (`time_limit_ms` or the server's `http-max-response-time-ms`), or after the row that brings the page to 8 MiB of raw
   row data, whichever comes first; a page always holds at least one row. With a finite deadline `limit` is also capped
   at 1000.
-- `next_key` — the cursor for the next page. **Forward scans feed it to `lower_bound`; reverse scans feed it to `upper_bound`** (reverse `next_key` is the last key RETURNED, so the exclusive upper bound must advance below it). Usually a JSON key object with the scope stripped (pass the same `scope` param); for a key the ABI cannot name it is a `0x` raw cursor instead — an opaque, complete key. Feed either back verbatim. On a secondary index, a cursor that ends a page among rows sharing a secondary key also names the primary key of the row it stops at, since that is how the index orders them: the primary key's fields beside the index's in a key object (`{"byowner":"u3","id":4}`), or `:` and the primary key's hex after a hex cursor.
+- `next_key`: the cursor for the next page. **Forward scans feed it to `lower_bound`; reverse scans feed it to `upper_bound`** (reverse `next_key` is the last key RETURNED, so the exclusive upper bound must advance below it). Usually a JSON key object with the scope stripped (pass the same `scope` param); for a key the ABI cannot name it is a `0x` raw cursor instead, an opaque, complete key. Feed either back verbatim. On a secondary index, a cursor that ends a page among rows sharing a secondary key also names the primary key of the row it stops at, since that is how the index orders them: the primary key's fields beside the index's in a key object (`{"byowner":"u3","id":4}`), or `:` and the primary key's hex after a hex cursor.
 
 ## Scoped Queries
 
@@ -65,7 +66,7 @@ Returns all token balances for account `alice`.
 The scope string is parsed using the ABI's declared scope type (fixes [AntelopeIO/spring#1379](https://github.com/AntelopeIO/spring/issues/1379)):
 - When ABI scope type is `"name"`: `"alice"` → name encoding. Fallback to uint64 for values like `"0"` (= `name{}`).
 - When ABI scope type is `"uint64"`: parsed as uint64 directly.
-- When ABI scope type is `"symbol_code"`: parsed as symbol (e.g., `"4,SYS"`).
+- When ABI scope type is `"symbol_code"`: pass the bare code (`"SYS"`). `"4,SYS"` is parsed as a full symbol and selects a different scope.
 
 ### All scopes (no scope filter)
 
@@ -87,11 +88,11 @@ Look up a single row by exact key:
    "code": "sysio.token",
    "table": "accounts",
    "scope": "alice",
-   "find": {"primary_key": 1397703940}
+   "find": "{\"sym_code\":5462355}"
 }
 ```
 
-Where `1397703940` is `symbol_code("SYS").raw()`. Returns alice's SYS balance.
+Where `5462355` is `symbol_code("SYS").raw()` and `sym_code` is the key field the `sysio.token` ABI names. Returns alice's SYS balance. `find` and the bounds are strings, so a key object is passed as JSON text.
 
 `find` cannot be combined with `lower_bound` or `upper_bound`.
 
@@ -99,16 +100,16 @@ Where `1397703940` is `symbol_code("SYS").raw()`. Returns alice's SYS balance.
 
 ### Bounded range
 
-Bounds are JSON objects with field names matching the table's `key_names` from the ABI. For scoped tables with `scope` set, a key object represents the within-scope key and the scope is prepended automatically.
+Bounds are JSON key objects, encoded as strings, with field names matching the table's `key_names` from the ABI. For scoped tables with `scope` set, a key object represents the within-scope key and the scope is prepended automatically.
 
-A `0x` raw cursor is the exception: it is already the complete stored key, so it is used verbatim and nothing is prepended. It must lie inside the `scope` the request names — a cursor from another scope is rejected rather than silently returning that other scope's rows.
+A `0x` raw cursor is the exception: it is already the complete stored key, so it is used verbatim and nothing is prepended. It must lie inside the `scope` the request names: a cursor from another scope is rejected rather than silently returning that other scope's rows.
 
 ```json
 {
    "code": "mycontract",
    "table": "users",
-   "lower_bound": {"id": 10},
-   "upper_bound": {"id": 20}
+   "lower_bound": "{\"id\":10}",
+   "upper_bound": "{\"id\":20}"
 }
 ```
 
@@ -137,8 +138,8 @@ Query by secondary index using `index_name`. Accepts index names (`"byowner"`) o
    "code": "mycontract",
    "table": "users",
    "index_name": "byowner",
-   "lower_bound": {"byowner": "alice"},
-   "upper_bound": {"byowner": "alicf"}
+   "lower_bound": "{\"byowner\":\"alice\"}",
+   "upper_bound": "{\"byowner\":\"alicf\"}"
 }
 ```
 
@@ -167,7 +168,7 @@ Position 1 = primary, 2 = first secondary, 3 = second secondary, etc.
 
 ## Pagination
 
-When `more` is `true`, feed `next_key` back for the next request — to **`lower_bound` going forward, `upper_bound` going in reverse**. Keep the same `scope` parameter:
+When `more` is `true`, feed `next_key` back for the next request: to **`lower_bound` going forward, `upper_bound` going in reverse**. Keep the same `scope` parameter:
 
 ```json
 {
@@ -179,7 +180,7 @@ When `more` is `true`, feed `next_key` back for the next request — to **`lower
 }
 ```
 
-The direction matters: a forward `next_key` is the first key NOT returned, so it belongs in `lower_bound`. A reverse `next_key` is the last key that WAS returned, so it belongs in `upper_bound` — the exclusive bound then advances below it. Putting a reverse cursor in `lower_bound` re-reads the same top row.
+The direction matters: a forward `next_key` is the first key NOT returned, so it belongs in `lower_bound`. A reverse `next_key` is the last key that WAS returned, so it belongs in `upper_bound`, and the exclusive bound then advances below it. Putting a reverse cursor in `lower_bound` re-reads the same top row.
 
 ```json
 {
@@ -194,7 +195,7 @@ The direction matters: a forward `next_key` is the first key NOT returned, so it
 
 A secondary-index `next_key` names a primary key only inside a run of rows that share a secondary key; between runs it is the secondary key alone. Without the primary key, a page resumed inside such a run would start over at the run's first row going forward, or skip the rest of the run in reverse.
 
-A `next_key` key object is scope-stripped — the scope prefix is not included, so pass it back with the same `scope`. A `0x` raw cursor already carries the scope; pass it back with the same `scope` too, and it is used as-is. A `0x` cursor must lie inside the `scope` the request names — one from another scope is rejected rather than silently returning that scope's rows.
+A `next_key` key object is scope-stripped: the scope prefix is not included, so pass it back with the same `scope`. A `0x` raw cursor already carries the scope; pass it back with the same `scope` too, and it is used as-is. A `0x` cursor must lie inside the `scope` the request names: one from another scope is rejected rather than silently returning that scope's rows.
 
 ## RAM Payer
 
@@ -209,7 +210,7 @@ A `next_key` key object is scope-stripped — the scope prefix is not included, 
 
 Response rows include `"payer"` field:
 ```json
-{"key": {"primary_key": 1397703940}, "value": {"balance": "100.0000 SYS"}, "payer": "sysio"}
+{"key": {"sym_code": 5462355}, "value": {"balance": "100.0000 SYS"}, "payer": "sysio"}
 ```
 
 ## ABI Requirements
@@ -238,7 +239,7 @@ Scoped tables have `"scope"` as the first entry in `key_names`:
    "name": "accounts",
    "type": "account",
    "table_id": 25660,
-   "key_names": ["scope", "primary_key"],
+   "key_names": ["scope", "sym_code"],
    "key_types": ["name", "uint64"]
 }
 ```
@@ -253,4 +254,4 @@ Scoped tables have `"scope"` as the first entry in `key_names`:
 | `encode_type` | Not needed |
 | `table_key` | Not needed |
 
-Old params are silently ignored if present — existing curl scripts continue to work for simple queries. The main breaking change is the response format: rows are now `{key, value}` objects instead of bare value objects.
+Old params are silently ignored if present, so existing curl scripts continue to work for simple queries. The main breaking change is the response format: rows are now `{key, value}` objects instead of bare value objects.
