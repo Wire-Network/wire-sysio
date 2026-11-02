@@ -74,7 +74,7 @@ BOOST_FIXTURE_TEST_CASE(kv_erase, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("testkverase"_n));
 }
 
-BOOST_FIXTURE_TEST_CASE(kv_contains, kv_api_tester) {
+BOOST_FIXTURE_TEST_CASE(kv_get_finds_row, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("testkvexist"_n));
 }
 
@@ -100,11 +100,11 @@ BOOST_FIXTURE_TEST_CASE(it_lower_bound, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("testitlbound"_n));
 }
 
-BOOST_FIXTURE_TEST_CASE(it_key_read, kv_api_tester) {
+BOOST_FIXTURE_TEST_CASE(it_read_returns_key, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("testitkey"_n));
 }
 
-BOOST_FIXTURE_TEST_CASE(it_value_read, kv_api_tester) {
+BOOST_FIXTURE_TEST_CASE(it_read_returns_value, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("testitvalue"_n));
 }
 
@@ -126,7 +126,7 @@ BOOST_FIXTURE_TEST_CASE(idx_update, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("testidxupdat"_n));
 }
 
-BOOST_FIXTURE_TEST_CASE(idx_find_secondary, kv_api_tester) {
+BOOST_FIXTURE_TEST_CASE(idx_find, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("testidxfind"_n));
 }
 
@@ -142,18 +142,18 @@ BOOST_FIXTURE_TEST_CASE(idx_prev, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("testidxprev"_n));
 }
 
-BOOST_FIXTURE_TEST_CASE(idx_key_read, kv_api_tester) {
+BOOST_FIXTURE_TEST_CASE(idx_read_returns_secondary_key, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("testidxkey"_n));
 }
 
-BOOST_FIXTURE_TEST_CASE(idx_primary_key_read, kv_api_tester) {
+BOOST_FIXTURE_TEST_CASE(idx_read_returns_primary_key, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("testidxprik"_n));
 }
 
 // ─── Edge cases ────────────────────────────────────────────────────────────
 
-BOOST_FIXTURE_TEST_CASE(cross_contract_read, kv_api_tester) {
-   BOOST_CHECK_NO_THROW(run_action("testcrossrd"_n));
+BOOST_FIXTURE_TEST_CASE(read_own_code, kv_api_tester) {
+   BOOST_CHECK_NO_THROW(run_action("testownrd"_n));
 }
 
 BOOST_FIXTURE_TEST_CASE(empty_value, kv_api_tester) {
@@ -182,7 +182,7 @@ BOOST_FIXTURE_TEST_CASE(it_erased_row_invalidation, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("tsterasedinv"_n));
 }
 
-BOOST_FIXTURE_TEST_CASE(it_pool_full_16, kv_api_tester) {
+BOOST_FIXTURE_TEST_CASE(it_pool_full_1024, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstitexhaust"_n));
 }
 
@@ -201,12 +201,20 @@ BOOST_FIXTURE_TEST_CASE(it_empty_prefix, kv_api_tester) {
 
 // ─── Write permission & authorization ──────────────────────────────────────
 
-BOOST_FIXTURE_TEST_CASE(write_perm_key_format, kv_api_tester) {
+BOOST_FIXTURE_TEST_CASE(write_to_second_table_id, kv_api_tester) {
+   const auto ram_before = t.control->get_resource_limits_manager().get_account_ram_usage(test_account);
    BOOST_CHECK_NO_THROW(run_action("tstwriteperm"_n));
+   // A 24-byte key and a 15-byte value.
+   BOOST_CHECK_EQUAL(t.control->get_resource_limits_manager().get_account_ram_usage(test_account),
+                     ram_before + 24 + 15 + config::kv_row_overhead_ram_bytes);
 }
 
 BOOST_FIXTURE_TEST_CASE(payer_variants, kv_api_tester) {
+   const auto ram_before = t.control->get_resource_limits_manager().get_account_ram_usage(test_account);
    BOOST_CHECK_NO_THROW(run_action("testpayer"_n));
+   // Two rows with 3-byte keys, one left with a 2-byte value and the other shrunk from 5 bytes to 1.
+   BOOST_CHECK_EQUAL(t.control->get_resource_limits_manager().get_account_ram_usage(test_account),
+                     ram_before + 2 * (3 + config::kv_row_overhead_ram_bytes) + 2 + 1);
 }
 
 // ─── Key size boundaries ───────────────────────────────────────────────────
@@ -228,10 +236,6 @@ BOOST_FIXTURE_TEST_CASE(large_value_1024, kv_api_tester) {
 
 BOOST_FIXTURE_TEST_CASE(max_key_256_update, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstmaxkeyupd"_n));
-}
-
-BOOST_FIXTURE_TEST_CASE(oversize_key_257_update, kv_api_tester) {
-   BOOST_CHECK_THROW(run_action("tstovrkyupd"_n), kv_key_too_large);
 }
 
 BOOST_FIXTURE_TEST_CASE(max_value_262144_create, kv_api_tester) {
@@ -264,9 +268,9 @@ BOOST_FIXTURE_TEST_CASE(value_replace_grow_shrink, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstvalreplce"_n));
 }
 
-// ─── Key format parameter ──────────────────────────────────────────────────
+// ─── Table isolation ──────────────────────────────────────────────────────
 
-BOOST_FIXTURE_TEST_CASE(key_format_variants, kv_api_tester) {
+BOOST_FIXTURE_TEST_CASE(table_id_isolation, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstkeyfrmt"_n));
 }
 
@@ -414,12 +418,12 @@ BOOST_FIXTURE_TEST_CASE(payer_other_requires_auth, kv_api_tester) {
 
 // empty key rejection tests
 BOOST_FIXTURE_TEST_CASE(empty_key_rejected_kv_set, kv_api_tester) {
-   BOOST_CHECK_THROW(run_action("tstemptykey"_n), fc::exception);
+   BOOST_CHECK_THROW(run_action("tstemptykey"_n), kv_empty_key);
 }
 
 // table_id > UINT16_MAX is rejected
 BOOST_FIXTURE_TEST_CASE(table_id_overflow_rejected, kv_api_tester) {
-   BOOST_CHECK_THROW(run_action("tstbadfmt"_n), fc::exception);
+   BOOST_CHECK_THROW(run_action("tstbadfmt"_n), kv_invalid_table_id);
 }
 
 // security edge case tests (from audit)
@@ -445,56 +449,27 @@ BOOST_FIXTURE_TEST_CASE(iterator_prev_from_begin, kv_api_tester) {
 }
 
 BOOST_FIXTURE_TEST_CASE(iterator_prev_erased, kv_api_tester) {
-   // kv_it_key on erased row should return erased status
+   // kv_it_read on an erased row returns no_row; kv_it_prev then lands on the predecessor
    BOOST_CHECK_NO_THROW(run_action("tstpreveras"_n));
 }
 
 BOOST_FIXTURE_TEST_CASE(read_only_trx_rejects_write, kv_api_tester) {
-   // kv_set in a read-only transaction must fail
+   // kv_set in a read-only transaction must fail. No authorization: a read-only action carrying one is rejected
+   // before the contract runs.
    signed_transaction trx;
    trx.actions.emplace_back(
-      vector<permission_level>{{test_account, config::active_name}},
-      test_account, "tstrdonly"_n, bytes{}
+      vector<permission_level>{}, test_account, "tstrdonly"_n, bytes{}
    );
    t.set_transaction_headers(trx);
-   trx.sign(t.get_private_key(test_account, "active"), t.control->get_chain_id());
    BOOST_CHECK_THROW(
       t.push_transaction(trx, fc::time_point::maximum(), kv_shared_tester::DEFAULT_BILLED_CPU_TIME_US, false,
                        transaction_metadata::trx_type::read_only),
-      fc::exception);
-}
-
-BOOST_FIXTURE_TEST_CASE(key_offset_beyond_size, kv_api_tester) {
-   // kv_it_key with offset >= key_size should return 0 bytes copied
-   BOOST_CHECK_NO_THROW(run_action("tstkeyoffbnd"_n));
+      table_operation_not_permitted);
 }
 
 BOOST_FIXTURE_TEST_CASE(oversized_secondary_key_rejected, kv_api_tester) {
    // kv_idx_store with sec_key > max_kv_secondary_key_size must fail
-   BOOST_CHECK_THROW(run_action("tstbigseckey"_n), fc::exception);
-}
-
-BOOST_FIXTURE_TEST_CASE(notify_context_ram_billing, kv_api_tester) {
-   // When a contract receives a notification (receiver != act.account),
-   // kv_set writes to the receiver's namespace and bills receiver's RAM
-   name notify_acct = "kvnotify"_n;
-   t.create_accounts({notify_acct});
-   t.produce_block();
-   t.set_code(notify_acct, test_contracts::test_kv_api_wasm());
-   t.set_abi(notify_acct, test_contracts::test_kv_api_abi().c_str());
-   t.produce_block();
-
-   // Push tstsendnotif on test_account -- it calls require_recipient(kvnotify)
-   // kvnotify receives the notification and executes tstnotifyram handler (via apply)
-   // Actually, require_recipient just forwards the same action, so kvnotify's
-   // apply will see action=tstsendnotif. The notification will succeed and
-   // any kv_set in kvnotify's on_notify will write to kvnotify's KV space.
-   // For this test, we just verify the notification doesn't crash.
-   BOOST_CHECK_NO_THROW(run_action("tstsendnotif"_n));
-   t.produce_block();
-
-   // Verify kvnotify did NOT write to test_account's KV space
-   // (notification receiver writes to its own namespace)
+   BOOST_CHECK_THROW(run_action("tstbigseckey"_n), kv_secondary_key_too_large);
 }
 
 // secondary iterator clone with duplicate keys
@@ -553,10 +528,10 @@ BOOST_FIXTURE_TEST_CASE(sec_cross_scope_upper_bound, kv_api_fresh_tester) {
 // RAM billing tests -- verify correct billing on create, update, erase
 // --------------------------------------------------------------------------
 
-// billable_size_v<kv_object> / <kv_index_object> from config -- use the actual
-// compile-time constants so these tests catch any drift in the billing formula.
-static constexpr int64_t KV_OVERHEAD = config::billable_size_v<kv_object>;
-static constexpr int64_t KV_INDEX_OVERHEAD = config::billable_size_v<kv_index_object>;
+// The RAM price of a row and of an index entry, as literals on purpose. These numbers are protocol: a change that
+// moves either one must fail here rather than follow a constant.
+static constexpr int64_t KV_OVERHEAD = 112;
+static constexpr int64_t KV_INDEX_OVERHEAD = 112;
 
 struct kv_billing_tester : validating_tester {
    kv_billing_tester() {
@@ -700,7 +675,7 @@ BOOST_FIXTURE_TEST_CASE(billing_idx_create_row, kv_billing_tester) {
 }
 
 BOOST_FIXTURE_TEST_CASE(billing_idx_create_erase_net_zero, kv_billing_tester) {
-   // testidxremov calls kv_idx_store then kv_idx_remove on the same row.
+   // testidxremov calls kv_idx_store then kv_idx_erase on the same row.
    // If store and remove bill the same formula, the net delta is zero.
    auto before = get_ram_usage();
    push_action(test_account, "testidxremov"_n, test_account, mutable_variant_object());
@@ -731,7 +706,7 @@ BOOST_FIXTURE_TEST_CASE(billing_idx_update_shrink, kv_billing_tester) {
 // Payer change billing tests — verify correct billing when payer changes
 // ════════════════════════════════════════════════════════════════════════════
 
-static constexpr int64_t KV_IDX_OVERHEAD = config::billable_size_v<kv_index_object>;
+static constexpr int64_t KV_IDX_OVERHEAD = KV_INDEX_OVERHEAD;
 
 struct kv_payer_billing_tester : validating_tester {
    kv_payer_billing_tester() {
@@ -996,7 +971,7 @@ BOOST_FIXTURE_TEST_CASE(idx_billing_store, kv_billing_tester) {
    BOOST_REQUIRE_EQUAL(after - before, expected);
 }
 
-// kv_idx_remove refunds the full billable amount
+// kv_idx_erase refunds the full billable amount
 BOOST_FIXTURE_TEST_CASE(idx_billing_remove, kv_billing_tester) {
    push_action(test_account, "ramidxstore"_n, test_account,
       mutable_variant_object()("sec_size", 8)("pri_size", 4));
@@ -1122,6 +1097,24 @@ BOOST_FIXTURE_TEST_CASE(idx_update_payer_change, kv_payer_billing_tester) {
 // Read-only transaction rejection tests
 // ════════════════════════════════════════════════════════════════════════════
 
+// A read-only transaction can make every read call of both families, each of which finds what it should.
+BOOST_FIXTURE_TEST_CASE(read_only_trx_allows_every_read, kv_api_tester) {
+   BOOST_REQUIRE_NO_THROW(t.push_action(test_account, "rdoseed"_n, test_account, mutable_variant_object()));
+   t.produce_block();
+
+   signed_transaction trx;
+   trx.actions.emplace_back(vector<permission_level>{}, test_account, "rdoreads"_n, bytes{});
+   t.set_transaction_headers(trx);
+   const auto trace = t.push_transaction(trx, fc::time_point::maximum(), kv_shared_tester::DEFAULT_BILLED_CPU_TIME_US,
+                                         false, transaction_metadata::trx_type::read_only);
+
+   // kv_get, then the moves and read on each family, then kv_idx_find, in the order rdoreads calls them.
+   const std::string expected = "one" "ka" "kb" "ka" "two" "sa" "sb" "pa" "pb" "pa";
+   BOOST_TEST(fc::raw::unpack<std::vector<char>>(trace->action_traces.at(0).return_value) ==
+                 std::vector<char>(expected.begin(), expected.end()),
+              boost::test_tools::per_element());
+}
+
 BOOST_FIXTURE_TEST_CASE(read_only_rejects_kv_erase, kv_api_tester) {
    signed_transaction trx;
    trx.actions.emplace_back(
@@ -1146,7 +1139,7 @@ BOOST_FIXTURE_TEST_CASE(read_only_rejects_kv_idx_store, kv_api_tester) {
       table_operation_not_permitted);
 }
 
-BOOST_FIXTURE_TEST_CASE(read_only_rejects_kv_idx_remove, kv_api_tester) {
+BOOST_FIXTURE_TEST_CASE(read_only_rejects_kv_idx_erase, kv_api_tester) {
    signed_transaction trx;
    trx.actions.emplace_back(
       vector<permission_level>{}, test_account, "tstrdoidxrm"_n, bytes{}
@@ -1273,11 +1266,9 @@ BOOST_FIXTURE_TEST_CASE(idx_iter_mutation_insert, kv_api_tester) {
    BOOST_CHECK_NO_THROW(run_action("tstidxinsert"_n));
 }
 
-// Fork/undo coverage note:
-// All KV test fixtures use validating_tester, which replays every block on a
-// second chain and compares integrity hashes. This implicitly verifies that
-// kv_object and kv_index_object chainbase undo sessions work correctly —
-// any mismatch would cause test failure. Savanna consensus does not support
-// pop_block, so explicit undo testing is handled via the validating replay.
+// Undo coverage note:
+// validating_tester replays every block on a second chain and compares integrity
+// hashes, which shows two chains agree but undoes nothing. The tests that roll KV
+// writes back are the kv_*_undo_with_the_* cases in kv_tests.cpp.
 
 BOOST_AUTO_TEST_SUITE_END()

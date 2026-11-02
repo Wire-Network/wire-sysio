@@ -211,15 +211,16 @@ inline constexpr auto table = "nodeowners"_n;
 /// Count authoritative owners in one generation, independently of the optional emissions mirror.
 template <typename Tester>
 uint32_t count(Tester& tester, abi_serializer& serializer, uint8_t tier, uint64_t generation = 0) {
-   const auto& index = tester.control->db().template get_index<kv_index, by_code_key>();
    const auto scope_start = make_kv_scoped_key(generation, uint64_t{0});
    const auto scope_end = make_kv_scoped_key(generation + 1, uint64_t{0});
    const auto table_id = compute_table_id(table.to_uint64_t());
-   auto it = index.lower_bound(boost::make_tuple(account, table_id, scope_start.to_string_view()));
-   const auto end = index.lower_bound(boost::make_tuple(account, table_id, scope_end.to_string_view()));
    uint32_t result = 0;
-   for (; it != end; ++it) {
-      const std::vector<char> bytes(it->value.begin(), it->value.end());
+   auto cursor = tester.control->kv().open_row_cursor();
+   kv_row stored;
+   for (bool more = cursor->seek_lower({account, table_id, scope_start.to_string_view()}, stored);
+        more && stored.code == account && stored.table_id == table_id && stored.key < scope_end.to_string_view();
+        more = cursor->next(stored)) {
+      const std::vector<char> bytes(stored.value.begin(), stored.value.end());
       const auto row = serializer.binary_to_variant(
          "nodeowners", bytes, Tester::fixture_abi_yield_function());
       if (row["tier"].template as<uint8_t>() == tier) ++result;

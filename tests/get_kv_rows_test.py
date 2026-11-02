@@ -10,9 +10,9 @@ from TestHarness import Account, Cluster, TestHelper, Utils, WalletMgr
 # get_kv_rows_test
 #
 # Verifies the /v1/chain/get_table_rows API endpoint for
-# kv::raw_table (format=0) data.
+# kv::raw_table data.
 #
-# 1. Deploys test_kv_map contract (format=0 / kv::raw_table)
+# 1. Deploys test_kv_map contract (kv::raw_table)
 # 2. Pushes several put actions to store data
 # 3. Calls get_table_rows and verifies ABI-decoded keys and values
 # 4. Tests pagination (limit + next_key)

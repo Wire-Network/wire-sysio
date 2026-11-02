@@ -204,12 +204,11 @@ public:
 
    fc::variant get_nodeowner( account_name acc )
    {
-      const auto& db = control->db();
       auto key = make_kv_scoped_key(static_cast<uint64_t>(NETWORK_GEN), acc.to_uint64_t());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id(name("nodeowners").to_uint64_t()), key.to_string_view()));
-      if (it != kv_idx.end()) {
-         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+      const auto row =
+         control->kv().find_row(ROA, compute_table_id(name("nodeowners").to_uint64_t()), key.to_string_view());
+      if (row) {
+         const vector<char> data(row->value.begin(), row->value.end());
          if (!data.empty()) {
             return abi_ser.binary_to_variant( "nodeowners", data, fixture_abi_yield_function() );
          }
@@ -220,12 +219,11 @@ public:
    // Read the nodeownerreg audit row (status/reason/tier) written by nodeownreg's soft-fail path.
    fc::variant get_nodeownerreg( account_name acc )
    {
-      const auto& db = control->db();
       auto key = make_kv_scoped_key(static_cast<uint64_t>(NETWORK_GEN), acc.to_uint64_t());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id(name("nodeownerreg").to_uint64_t()), key.to_string_view()));
-      if (it != kv_idx.end()) {
-         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+      const auto row =
+         control->kv().find_row(ROA, compute_table_id(name("nodeownerreg").to_uint64_t()), key.to_string_view());
+      if (row) {
+         const vector<char> data(row->value.begin(), row->value.end());
          if (!data.empty()) {
             return abi_ser.binary_to_variant( "nodeownerreg", data, fixture_abi_yield_function() );
          }
@@ -235,12 +233,10 @@ public:
 
    fc::variant get_sponsorship( account_name acc, account_name nonce)
    {
-      const auto& db = control->db();
       auto key = make_kv_scoped_key(acc, nonce.to_uint64_t());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id("sponsors"_n.to_uint64_t()), key.to_string_view()));
-      if (it != kv_idx.end()) {
-         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+      const auto row = control->kv().find_row(ROA, compute_table_id("sponsors"_n.to_uint64_t()), key.to_string_view());
+      if (row) {
+         const vector<char> data(row->value.begin(), row->value.end());
          if (!data.empty()) {
             return abi_ser.binary_to_variant( "sponsor", data, fixture_abi_yield_function() );
          }
@@ -251,12 +247,11 @@ public:
    /// The owner's `sponsorcount` row (count and raised limit), or null when it has none.
    fc::variant get_sponsorcount( account_name acc )
    {
-      const auto& db = control->db();
       auto key = make_kv_scoped_key(static_cast<uint64_t>(NETWORK_GEN), acc.to_uint64_t());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id(name("sponsorcount").to_uint64_t()), key.to_string_view()));
-      if (it != kv_idx.end()) {
-         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+      const auto row =
+         control->kv().find_row(ROA, compute_table_id(name("sponsorcount").to_uint64_t()), key.to_string_view());
+      if (row) {
+         const vector<char> data(row->value.begin(), row->value.end());
          if (!data.empty()) {
             return abi_ser.binary_to_variant("sponsorcount", data, fixture_abi_yield_function());
          }
@@ -292,14 +287,12 @@ public:
    fc::variant get_reslimit( account_name acc )
    {
       // reslimit is kv::table (unscoped) — key is [owner:8B BE]
-      const auto& db = control->db();
       char key_buf[chain::kv_pri_key_size];
       chain::kv_encode_be64(key_buf, acc.to_uint64_t());
       std::string_view key_sv(key_buf, chain::kv_pri_key_size);
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id("reslimit"_n.to_uint64_t()), key_sv));
-      if (it != kv_idx.end()) {
-         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+      const auto row = control->kv().find_row(ROA, compute_table_id("reslimit"_n.to_uint64_t()), key_sv);
+      if (row) {
+         const vector<char> data(row->value.begin(), row->value.end());
          if (!data.empty()) {
             return abi_ser.binary_to_variant( "reslimit", data, fixture_abi_yield_function() );
          }
@@ -309,12 +302,10 @@ public:
 
    fc::variant get_policy( account_name acc, account_name owner )
    {
-      const auto& db = control->db();
       auto key = make_kv_scoped_key(owner, acc.to_uint64_t());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA, compute_table_id("policies"_n.to_uint64_t()), key.to_string_view()));
-      if (it != kv_idx.end()) {
-         const vector<char> data(it->value.data(), it->value.data() + it->value.size());
+      const auto row = control->kv().find_row(ROA, compute_table_id("policies"_n.to_uint64_t()), key.to_string_view());
+      if (row) {
+         const vector<char> data(row->value.begin(), row->value.end());
          if (!data.empty()) {
             return abi_ser.binary_to_variant( "policies", data, fixture_abi_yield_function() );
          }

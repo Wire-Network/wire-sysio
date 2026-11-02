@@ -29,12 +29,13 @@ constexpr auto deploy_memo     = "deploy sysio.msig";
 /// Every row of one of sysio's ABI and code hash tables, decoded as `row_type`.
 std::vector<fc::variant> table_rows(const base_tester& t, const abi_serializer& serializer, name table,
                                     const std::string& row_type) {
-   const auto& index    = t.control->db().get_index<kv_index, by_code_key>();
-   const auto  table_id = compute_table_id(table.to_uint64_t());
+   const auto table_id = compute_table_id(table.to_uint64_t());
    std::vector<fc::variant> rows;
-   for (auto it = index.lower_bound(boost::make_tuple(config::system_account_name, table_id));
-        it != index.end() && it->code == config::system_account_name && it->table_id == table_id; ++it) {
-      const std::vector<char> bytes(it->value.begin(), it->value.end());
+   auto cursor = t.control->kv().open_row_cursor();
+   kv_row row;
+   for (bool more = cursor->seek_lower({config::system_account_name, table_id}, row);
+        more && row.code == config::system_account_name && row.table_id == table_id; more = cursor->next(row)) {
+      const std::vector<char> bytes(row.value.begin(), row.value.end());
       rows.push_back(serializer.binary_to_variant(row_type, bytes, base_tester::fixture_abi_yield_function()));
    }
    return rows;

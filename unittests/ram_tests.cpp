@@ -418,8 +418,8 @@ BOOST_FIXTURE_TEST_CASE(setcode_first_time_ram_billing, validating_tester) { try
     // owner, sha256, block time and block number (sysio.system/account_changes.hpp).
     constexpr int64_t codehash_key_bytes = sizeof(uint64_t);
     constexpr int64_t codehash_row_bytes = sizeof(uint64_t) + sizeof(fc::sha256) + sizeof(int64_t) + sizeof(uint32_t);
-    const int64_t codehash_billable =
-       codehash_key_bytes + codehash_row_bytes + static_cast<int64_t>(config::billable_size_v<kv_object>);
+    constexpr int64_t kv_row_overhead = 112; // a protocol price, so a literal rather than the config constant
+    const int64_t codehash_billable = codehash_key_bytes + codehash_row_bytes + kv_row_overhead;
 
     // First setcode on an account: bill = wasm.size() * multiplier + metadata + the codehash row.
     int64_t expected =

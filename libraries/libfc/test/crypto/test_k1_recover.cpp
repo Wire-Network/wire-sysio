@@ -53,6 +53,27 @@ BOOST_AUTO_TEST_CASE(recover) try {
          fc::k1_recover_error::input_error
       },
 
+      //test (first byte 31, the K1 encoding of 27, recovers the same key as the first test)
+      {
+         "1f323dd47a1dd5592c296ee2ee12e0af38974087a475e99098a440284f19c1f7642fa0baa10a8a3ab800dfdbe987dee68a09b6fa3db45a5cc4f3a5835a1671d4dd",
+         "92390316873c5a9d520b28aba61e7a8f00025ac069acd9c4d2a71d775a55fa5f",
+         to_bytes("044424982f5c4044aaf27444965d15b53f219c8ad332bf98a98a902ebfb05d46cb86ea6fe663aa83fd4ce0a383855dfae9bf7a07b779d34c84c347fec79d04c51e")
+      },
+
+      //test (first byte 30, recovery id 3. Ids 2 and 3 need x = r + n, so r is tiny and no private key signed this)
+      {
+         "1e00000000000000000000000000000000000000000000000000000000000000022fa0baa10a8a3ab800dfdbe987dee68a09b6fa3db45a5cc4f3a5835a1671d4dd",
+         "92390316873c5a9d520b28aba61e7a8f00025ac069acd9c4d2a71d775a55fa5f",
+         to_bytes("04d3ce54f08a16552241256afa2150ad10d3b874e0d7575c944a728fb54d618889e0057d53f5f5a0ae53a9c09fdde5f066089817a4b645bfc9de5485eccc4f1761")
+      },
+
+      //test (first byte 34, the K1 encoding of 30, recovers the same key as the test above)
+      {
+         "2200000000000000000000000000000000000000000000000000000000000000022fa0baa10a8a3ab800dfdbe987dee68a09b6fa3db45a5cc4f3a5835a1671d4dd",
+         "92390316873c5a9d520b28aba61e7a8f00025ac069acd9c4d2a71d775a55fa5f",
+         to_bytes("04d3ce54f08a16552241256afa2150ad10d3b874e0d7575c944a728fb54d618889e0057d53f5f5a0ae53a9c09fdde5f066089817a4b645bfc9de5485eccc4f1761")
+      },
+
    };
 
     for(const auto& test : tests) {

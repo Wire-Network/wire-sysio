@@ -440,8 +440,10 @@ public:
    /// Capture all KV rows plus the liquid ledger and request counter to detect quote/refusal writes.
    auto desynd_state() {
       std::vector<std::vector<char>> rows;
-      for (const auto& row : control->db().get_index<kv_index, by_code_key>())
-         rows.emplace_back(row.value.data(), row.value.data() + row.value.size());
+      auto cursor = control->kv().open_row_cursor();
+      chain::kv_row row;
+      for (bool more = cursor->seek_lower({}, row); more; more = cursor->next(row))
+         rows.emplace_back(row.value.begin(), row.value.end());
       return std::make_tuple(rows, liq_balance("alice"_n), liq_balance(SYND_ACCOUNT), supply(),
          get_row_by_account(SYND_ACCOUNT, SYND_ACCOUNT, "syndcounters"_n, "syndcounters"_n));
    }
@@ -689,14 +691,14 @@ public:
    }
    /// sysio.synd's kv rows of `table` in key order whose key starts with `prefix`, as raw values.
    std::vector<std::vector<char>> kv_rows(name table, const std::string& prefix = {}) {
-      const auto&                    kv_idx   = control->db().get_index<kv_index, by_code_key>();
       const auto                     table_id = compute_table_id(table.to_uint64_t());
       std::vector<std::vector<char>> rows;
-      for (auto itr = kv_idx.lower_bound(boost::make_tuple(SYND_ACCOUNT, table_id, std::string_view(prefix)));
-           itr != kv_idx.end() && itr->code == SYND_ACCOUNT && itr->table_id == table_id &&
-           itr->key_view().starts_with(prefix);
-           ++itr)
-         rows.emplace_back(itr->value.data(), itr->value.data() + itr->value.size());
+      auto cursor = control->kv().open_row_cursor();
+      chain::kv_row row;
+      for (bool more = cursor->seek_lower({SYND_ACCOUNT, table_id, prefix}, row);
+           more && row.code == SYND_ACCOUNT && row.table_id == table_id && row.key.starts_with(prefix);
+           more = cursor->next(row))
+         rows.emplace_back(row.value.begin(), row.value.end());
       return rows;
    }
    /// The `envelopes` row of `(chain_code, token_code, epoch)`; null when there is none.
@@ -775,12 +777,9 @@ public:
       }
       key.push_back('\0');
       key.push_back('\0');
-      const auto& kv_idx = control->db().get_index<kv_index, by_code_key>();
-      const auto  itr    = kv_idx.find(boost::make_tuple(SYND_ACCOUNT, compute_table_id("parked"_n.to_uint64_t()),
-                                                         std::string_view(key)));
-      if (itr == kv_idx.end()) return fc::variant();
-      return decode(synd_abi_ser, "parked_row",
-                    std::vector<char>(itr->value.data(), itr->value.data() + itr->value.size()));
+      const auto row = control->kv().find_row(SYND_ACCOUNT, compute_table_id("parked"_n.to_uint64_t()), key);
+      if (!row) return fc::variant();
+      return decode(synd_abi_ser, "parked_row", std::vector<char>(row->value.begin(), row->value.end()));
    }
    uint64_t parked_balance(std::string_view token_code, ChainKind kind, const std::vector<char>& pubkey) {
       const auto row = parked_row(token_code, kind, pubkey);

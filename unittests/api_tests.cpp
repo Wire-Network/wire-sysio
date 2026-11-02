@@ -750,9 +750,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(require_notice_tests, T, validating_testers) { try
 
    } FC_LOG_AND_RETHROW() }
 
-// ram_billing_in_notify_tests removed: KV always bills RAM to the contract (receiver) account,
-// so the legacy payer-based RAM billing restrictions in notify contexts no longer apply.
-// The test_ram_billing_in_notify action uses legacy db_store_i64 which no longer exists.
+// ram_billing_in_notify_tests removed. validate_account_ram_deltas still stops a notified contract from growing
+// another account's RAM, and kv_api_tests/notify_third_party_payer_fails pins that. The test_ram_billing_in_notify
+// action has no test calling it now.
 
 /*************************************************************************************
  * context free action tests
@@ -1531,8 +1531,8 @@ BOOST_FIXTURE_TEST_CASE(test_get_ram_usage, validating_tester) { try {
 // KV notification semantics are tested elsewhere.
 
 // Legacy db_tests, multi_index_tests, find_secondary_key, test_invalid_access removed.
-// KV equivalents provided by kv_api_tests (77 test cases covering all 24 KV intrinsics,
-// multi_index API, secondary indices, kv::raw_table, kv::table, and begin_all_scopes).
+// KV equivalents provided by kv_api_tests (all 19 KV intrinsics, multi_index API,
+// secondary indices, kv::raw_table, kv::table, and begin_all_scopes).
 
 
 /*************************************************************************************
@@ -1974,16 +1974,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(permission_tests, T, validating_testers) { try {
    chain.produce_block();
 
    auto get_result_int64 = [&]() -> int64_t {
-      const auto& db = chain.control->db();
-      const auto& idx = db.template get_index<kv_index, by_code_key>();
-
       // The test contract stores its result under its own code with a fixed key.
-      // Use lower_bound on the contract's code to find its first (and only) KV row.
-      auto itr = idx.lower_bound(boost::make_tuple("testapi"_n, uint16_t(0)));
-      FC_ASSERT( itr != idx.end() && itr->code == "testapi"_n, "KV row not found for testapi");
+      // Use a lower seek on the contract's code to find its first (and only) KV row.
+      kv_row row;
+      const bool found = chain.control->kv().open_row_cursor()->seek_lower({"testapi"_n}, row);
+      FC_ASSERT( found && row.code == "testapi"_n, "KV row not found for testapi");
 
-      FC_ASSERT( 0 != itr->value.size(), "unexpected result size");
-      return *reinterpret_cast<const int64_t *>(itr->value.data());
+      FC_ASSERT( !row.value.empty(), "unexpected result size");
+      return *reinterpret_cast<const int64_t *>(row.value.data());
    };
 
    CALL_TEST_FUNCTION( chain, "test_permission", "check_authorization",

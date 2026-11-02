@@ -1,14 +1,53 @@
 #pragma once
 
+#include <sysio/chain/apply_context.hpp>
+#include <sysio/chain/transaction_context.hpp>
+#include <sysio/chain/webassembly/interface.hpp>
 #include <sysio/testing/tester.hpp>
 
 #include <fc/exception/exception.hpp>
+#include <fmt/format.h>
 
 #include <exception>
+#include <iterator>
+#include <string>
+#include <utility>
 
 namespace sysio::test_utils {
 
 using namespace sysio::chain;
+
+/// Escapes bytes for a wast data segment.
+inline std::string to_wast_string(const bytes& data) {
+   std::string escaped;
+   escaped.reserve(data.size() * 3);
+   for (const char c : data)
+      fmt::format_to(std::back_inserter(escaped), "\\{:02x}", static_cast<uint8_t>(c));
+   return escaped;
+}
+
+/**
+ * Calls `test` with a host interface on a real context, so a test can reach a native export or a host method directly.
+ * The transaction runs but is not committed.
+ * @param chain the chain to run on
+ * @param trx a signed transaction with one action, which the chain would accept
+ * @param test called with the interface and the transaction context
+ */
+template <typename F>
+void with_interface(testing::base_tester& chain, const signed_transaction& trx, F&& test) {
+   packed_transaction packed(trx, packed_transaction::compression_type::none);
+   platform_timer timer;
+   const accounts_billing_t previous_billing;
+   transaction_context context(*chain.control, packed, transaction_checktime_timer(timer), fc::time_point::now(),
+                               transaction_metadata::trx_type::input, std::nullopt, fc::time_point::maximum(),
+                               fc::microseconds::maximum(), true, previous_billing,
+                               cpu_usage_t{fc::unsigned_int{testing::base_tester::DEFAULT_BILLED_CPU_TIME_US}});
+   context.init_for_input_trx();
+   context.exec();
+   apply_context action_context(*chain.control, context, 1);
+   webassembly::interface host(action_context);
+   std::forward<F>(test)(host, context);
+}
 
 inline bool is_access_violation(const fc::unhandled_exception& e) {
    try {

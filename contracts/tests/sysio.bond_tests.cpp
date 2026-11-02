@@ -333,22 +333,19 @@ public:
    }
    /// sysio.bond's kv rows of `table` in key order whose key starts with `prefix`, as raw values.
    std::vector<std::vector<char>> kv_rows(name table, const std::string& prefix) {
-      const auto&                    kv_idx   = control->db().get_index<kv_index, by_code_key>();
       const auto                     table_id = compute_table_id(table.to_uint64_t());
       std::vector<std::vector<char>> rows;
-      for (auto itr = kv_idx.lower_bound(boost::make_tuple(BOND_ACCOUNT, table_id, std::string_view(prefix)));
-           itr != kv_idx.end() && itr->code == BOND_ACCOUNT && itr->table_id == table_id &&
-           itr->key_view().starts_with(prefix);
-           ++itr)
-         rows.emplace_back(itr->value.data(), itr->value.data() + itr->value.size());
+      auto cursor = control->kv().open_row_cursor();
+      chain::kv_row row;
+      for (bool more = cursor->seek_lower({BOND_ACCOUNT, table_id, prefix}, row);
+           more && row.code == BOND_ACCOUNT && row.table_id == table_id && row.key.starts_with(prefix);
+           more = cursor->next(row))
+         rows.emplace_back(row.value.begin(), row.value.end());
       return rows;
    }
    /// The kv row of sysio.bond's `table` whose key is exactly `key`; null when there is none.
-   const kv_object* kv_row(name table, const std::string& key) {
-      const auto& kv_idx = control->db().get_index<kv_index, by_code_key>();
-      const auto  it     = kv_idx.find(
-         boost::make_tuple(BOND_ACCOUNT, compute_table_id(table.to_uint64_t()), std::string_view(key)));
-      return it == kv_idx.end() ? nullptr : &*it;
+   std::optional<chain::kv_row> find_kv_row(name table, const std::string& key) {
+      return control->kv().find_row(BOND_ACCOUNT, compute_table_id(table.to_uint64_t()), key);
    }
    /// The kv key of request `id`: the id as a big-endian word.
    static std::string request_key_of(uint64_t id) {
@@ -358,8 +355,8 @@ public:
    }
    /// The account that pays the RAM of the kv row of `table` keyed `key`; the test fails without one.
    name payer_of(name table, const std::string& key) {
-      const auto* row = kv_row(table, key);
-      BOOST_REQUIRE_MESSAGE(row != nullptr, "no " << table << " row");
+      const auto row = find_kv_row(table, key);
+      BOOST_REQUIRE_MESSAGE(row.has_value(), "no " << table << " row");
       return row->payer;
    }
    /// The RAM `account` uses, in bytes.
@@ -371,10 +368,9 @@ public:
       row("token_code", codename_mvo(token_code));
       const auto bytes = bond_abi_ser.variant_to_binary("request_row", row,
                                                         fixture_abi_yield_function());
-      const auto* obj = kv_row("requests"_n, request_key_of(id));
-      BOOST_REQUIRE(obj != nullptr);
-      auto& db = const_cast<chainbase::database&>(control->db());
-      db.modify(*obj, [&](auto& r) { r.value.assign(bytes.data(), bytes.size()); });
+      const auto stored = find_kv_row("requests"_n, request_key_of(id));
+      BOOST_REQUIRE(stored);
+      const_cast<kv_store&>(control->kv()).update_row(*stored, stored->payer, {bytes.data(), bytes.size()});
    }
    /// The `escrows` row of `request_id` and `kind`: its kv key is the request id as a big-endian
    /// word followed by the kind byte.
