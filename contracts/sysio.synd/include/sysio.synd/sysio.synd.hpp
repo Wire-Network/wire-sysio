@@ -106,10 +106,10 @@
  *
  * Never-throw: `onsynd`, `onyield` and `closeenv` run inside `sysio.msgch`'s consensus transaction.
  * They `check` nothing on their input; a message that fails a rule is dropped with a `DROP`
- * diagnostic on the console and consumes no sequence. The one inline action they send, the
- * `sysio.liq::mint` of a held syndication, is sent only after every condition that `mint` checks has
- * been verified here; the queue step `closeenv` runs keeps the same discipline for every action it
- * sends.
+ * diagnostic on the console and consumes no sequence. The inline `sysio.liq::mint` of a held
+ * syndication is sent only after every condition that `mint` checks has been verified here. Receipt
+ * actions accept only self-inline calls; the queue step `closeenv` runs keeps the same discipline
+ * for every action it sends.
  *
  * Privileged (roa::setsyscode): every row bills the `sysio` RAM pool -- there is no signer to bill on
  * the envelope path -- and inline actions carry this contract's own authority without a
@@ -175,6 +175,73 @@ namespace sysio {
          SYNDICATION,   ///< shadow minted into this contract's holder row for a beneficiary pubkey
          YIELD          ///< a LIQ_YIELD amount: a number only, minted nowhere until released
       };
+
+      /// Where a released principal tranche went; WIRE yield is separate.
+      enum class release_destination : uint8_t {
+         ACCOUNT, ///< credited directly to the linked Wire account
+         PARKED,  ///< held for the pubkey until a later batch payout
+         FEE_ONLY ///< the entire gross tranche was charged as a fee
+      };
+
+      /// Accepted source message joined to its operational item.
+      struct intake_receipt {
+         uint64_t item_id;                 ///< allocated item identity
+         sysio::slug_name chain_code;      ///< source outpost
+         sysio::slug_name token_code;      ///< shadow token
+         uint32_t epoch_index;             ///< depot envelope epoch
+         checksum256 digest;               ///< accepted envelope digest
+         uint64_t sequence;                ///< source message sequence
+         opp::types::ChainKind chain_kind; ///< beneficiary key family
+         std::vector<char> pubkey;         ///< beneficiary native public key
+         uint64_t amount;                  ///< admitted gross principal in shadow base units
+         SYSLIB_SERIALIZE(intake_receipt,
+                          (item_id)(chain_code)(token_code)(epoch_index)(digest)(sequence)(chain_kind)(pubkey)(amount))
+      };
+      /// One positive gross tranche; delivery does not establish challenge finality.
+      struct release_receipt {
+         uint64_t item_id;                ///< intake item identity
+         sysio::slug_name chain_code;     ///< source outpost
+         sysio::slug_name token_code;     ///< shadow token
+         uint32_t epoch_index;            ///< depot envelope epoch
+         uint64_t gross;                  ///< principal removed from the item
+         uint64_t fee;                    ///< principal charged to the fee pot
+         uint64_t net;                    ///< gross less fee
+         uint64_t remaining;              ///< item's unreleased principal after this tranche
+         release_destination destination; ///< destination of the net principal
+         name recipient;                  ///< actual account, empty unless destination is ACCOUNT
+         uint64_t parked_batch_id;        ///< payout batch, zero unless destination is PARKED
+         SYSLIB_SERIALIZE(release_receipt,
+                          (item_id)(chain_code)(token_code)(epoch_index)(gross)(fee)(net)(remaining)
+                          (destination)(recipient)(parked_batch_id))
+      };
+      /// A whole parked-principal payout; imported principal has no live intake identity.
+      struct parked_receipt {
+         uint64_t batch_id;                ///< principal batch shared by its parked releases
+         sysio::slug_name token_code;      ///< shadow token
+         opp::types::ChainKind chain_kind; ///< beneficiary key family
+         std::vector<char> pubkey;         ///< beneficiary native public key
+         name recipient;                   ///< account credited by this payout
+         uint64_t amount;                  ///< total principal paid, excluding WIRE yield
+         uint64_t unattributed;            ///< imported principal included in amount
+         SYSLIB_SERIALIZE(parked_receipt, (batch_id)(token_code)(chain_kind)(pubkey)(recipient)(amount)(unattributed))
+      };
+      /// Terminal invalidation after every held item is removed; earlier releases remain valid movements.
+      struct burn_receipt {
+         sysio::slug_name chain_code; ///< source outpost
+         sysio::slug_name token_code; ///< shadow token
+         uint32_t epoch_index;        ///< depot envelope epoch
+         checksum256 digest;          ///< accepted envelope digest
+         SYSLIB_SERIALIZE(burn_receipt, (chain_code)(token_code)(epoch_index)(digest))
+      };
+
+      /// Record accepted intake; self-inline only, with no notifications or state mutation.
+      [[sysio::action]] void logintake(intake_receipt receipt);
+      /// Record a released tranche; self-inline only, with no notifications or state mutation.
+      [[sysio::action]] void logrelease(release_receipt receipt);
+      /// Record a parked payout; self-inline only, with no notifications or state mutation.
+      [[sysio::action]] void logparked(parked_receipt receipt);
+      /// Close a burned envelope; self-inline only, with no notifications or state mutation.
+      [[sysio::action]] void logburn(burn_receipt receipt);
 
       /// The terminal outcome of an envelope's `sysio.bond` request, recorded on the envelope row the first
       /// time the queue sees it. Once recorded the request row is never read again: `sysio.bond` may prune
@@ -518,7 +585,8 @@ namespace sysio {
       struct [[sysio::table("syndcounters")]] synd_counters {
          uint64_t next_item_id    = 1;   ///< id the next `items` row takes
          uint64_t next_request_id = 1;   ///< DESYNDICATE_LIQ request id; the outpost reads 0 as "no id"
-         SYSLIB_SERIALIZE(synd_counters, (next_item_id)(next_request_id))
+         uint64_t next_batch_id   = 1;   ///< id allocated when a parked principal batch starts
+         SYSLIB_SERIALIZE(synd_counters, (next_item_id)(next_request_id)(next_batch_id))
       };
 
       /// The counters singleton.
@@ -557,7 +625,9 @@ namespace sysio {
          std::vector<char>              pubkey;                                               ///< native pubkey
          uint64_t                       balance    = 0;   ///< shadow base units held for the pubkey
          opp::shadow::custody::position position;         ///< the shadow yield of `balance`
-         SYSLIB_SERIALIZE(parked_row, (token_code)(chain_kind)(pubkey)(balance)(position))
+         uint64_t                       batch_id     = 0;   ///< active principal batch, zero while only unpaid WIRE yield remains
+         uint64_t                       unattributed = 0;   ///< imported principal in this batch, not joined to a live intake
+         SYSLIB_SERIALIZE(parked_row, (token_code)(chain_kind)(pubkey)(balance)(position)(batch_id)(unattributed))
       };
 
       /// Parked rows by token, chain family and pubkey.
