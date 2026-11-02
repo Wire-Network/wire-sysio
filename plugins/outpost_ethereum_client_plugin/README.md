@@ -137,7 +137,7 @@ starts, then the block each confirmed call landed in (from its receipt) — neve
 backend lagging the block that just confirmed could serve from before the call. A backend that does not
 know the block yet is retried for a bounded time: a refusal that says so (`-32000 header not found` or
 `missing trie node` from geth and erigon, `Block not found` from besu, EIP-1474's `-32001` from reth and
-nethermind — `outpost_ethereum_client_detail::is_block_unavailable_refusal`) is retried for up to 10 s and
+nethermind — `outpost_ethereum_client_detail::is_block_unavailable_refusal`) is retried for up to 30 s and
 the timeout it ends in names the node's last refusal, while any other refusal of the read (malformed
 parameters, an unknown method, a revert) ends the tick at once with the node's reason, since no retry would
 change it. The reads are not at the read confirmation (see Inbound
@@ -413,8 +413,6 @@ Per-client runtime lines are prefixed with the SPI label `outpost_ethereum_clien
   not deliver`, `delivery already recorded; consensus not tipped`, `re-delivering to run the boundary tip`
   and `not delivered — the outpost is still on epoch ...` for each decision that sends nothing (or
   re-sends).
-- `progress read at block ... refused by the node (code=...): ...` at warning level when a pinned read is refused
-  for its parameters rather than for a block the backend lacks; the tick ends with that refusal.
 - `refused at ... gas (...); retrying at the ceiling` at warning level for a gas refusal below the ceiling,
   and `cannot advance past attestation N at the ceiling` at error level — once per cursor position — when
   no funding carries the attestation there; `still open after N calls in one tick` at warning level when
@@ -475,13 +473,12 @@ signing checks the policy without sending, that a signing's recorded hash and by
 outcome, once per hash, that a first `epochIn` the node refuses keeps its signing, and that a partial client
 map is never published. No test dials a public endpoint.
 
-Every node double in both suites holds each request to what go-ethereum parses before answering it
+The scripted and recording RPC-level node doubles validate requests before answering them
 (`fc-test/execution_api_strictness.hpp`: `0x`-prefixed byte strings, canonical quantities, fixed-length
-addresses and hashes, valid block parameters, the `TransactionArgs` exclusions, positional arity). A request
-shape only anvil accepts — calldata without its prefix was one, and it stopped every `eth_call` on a
-geth-backed hoodi endpoint — fails the unit test that produces it. The wire form of each RPC the client
-issues is pinned separately in libfc's `ethereum_client_requests` suite, which drives a real client through a
-recording HTTP server.
+addresses and hashes, valid block parameters, the `TransactionArgs` exclusions, positional arity).
+The whole-envelope delivery fixture also stubs OPPInbound views at the contract-client level;
+those calls bypass the RPC-level checks. Their serialized wire format is covered separately by
+libfc's `ethereum_client_requests` suite, which drives a real client through a recording HTTP server.
 
 CTest runs this binary through the build tree's `tests/bind_registry.py`, which keeps its host-wide WIRE
 bind-registry lease alive for the test process and exposes the ports in `SYSIO_TEST_PORTS`. The wrapper uses

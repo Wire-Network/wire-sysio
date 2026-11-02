@@ -48,6 +48,7 @@ constexpr fc::microseconds minimum_max_finality_lag = fc::seconds(1);
 
 /// The prefix every `hexutil.Bytes` argument carries on the wire.
 constexpr std::string_view hex_bytes_prefix = "0x";
+constexpr std::string_view uppercase_hex_bytes_prefix = "0X";
 
 /**
  * `hex` as a node parses a `hexutil.Bytes` argument: `0x`-prefixed. A prefix already present is kept.
@@ -56,7 +57,9 @@ constexpr std::string_view hex_bytes_prefix = "0x";
  * anvil accepts either form, which is why the omission only surfaces on a real network.
  */
 std::string with_hex_prefix(std::string hex) {
-   if (!hex.starts_with(hex_bytes_prefix) && !hex.starts_with("0X")) hex.insert(0, hex_bytes_prefix);
+   if (!hex.starts_with(hex_bytes_prefix) && !hex.starts_with(uppercase_hex_bytes_prefix)) {
+      hex.insert(0, hex_bytes_prefix);
+   }
    return hex;
 }
 
@@ -211,19 +214,6 @@ void ethereum_client::log_transaction_rejection(
         rejection.allowed().value_or(unavailable_policy_limit));
 }
 
-/**
- * @brief Executes a contract view function (read-only call)
- *
- * Encodes the function call according to the ABI, executes it via eth_call,
- * and returns the result. This does not create a transaction or modify state.
- *
- * @param contract_address The address of the smart contract
- * @param abi The ABI definition of the function to call
- * @param block The block parameter at which to execute the call (explicit number or named tag)
- * @param params The parameters to pass to the contract function
- * @return The result of the contract call as a variant
- * @throws fc::network::json_rpc::json_rpc_exception if the call fails
- */
 fc::variant ethereum_client::execute_contract_view_fn(const address& contract_address, const abi::contract& abi,
                                                       const block_number_or_tag_t& block,
                                                       const contract_invoke_data_items& params) {
@@ -697,17 +687,6 @@ std::string ethereum_client::send_transaction(const std::string& raw_tx_data) {
    return resp.as_string();
 }
 
-/**
- * @brief Sends a signed raw transaction using eth_sendRawTransaction
- *
- * Submits a pre-signed transaction to the network. The transaction must be
- * RLP-encoded and signed before calling this method.
- *
- * @param raw_tx_data The signed, RLP-encoded transaction data as hex, with or without the "0x" prefix;
- *        it is sent prefixed, as `hexutil.Bytes` requires
- * @return The transaction hash as a string
- * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
- */
 std::string ethereum_client::send_raw_transaction(const std::string& raw_tx_data) {
    fc::variants params{with_hex_prefix(raw_tx_data)};
    auto resp = execute("eth_sendRawTransaction", params);

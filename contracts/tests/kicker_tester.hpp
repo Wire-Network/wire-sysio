@@ -212,20 +212,7 @@ public:
    }
    /// Store exact serialized bytes without routing time_point fields through JSON.
    void write_raw_row(name code, name table, uint64_t id, const std::vector<char>& encoded) {
-      char key[chain::kv_pri_key_size];
-      chain::kv_encode_be64(key, id);
-      auto& db = const_cast<chainbase::database&>(control->db());
-      const auto& index = db.get_index<chain::kv_index, chain::by_code_key>();
-      const auto it = index.find(boost::make_tuple(code, chain::compute_table_id(table.value),
-                                                   std::string_view(key, sizeof(key))));
-      if (it != index.end()) db.modify(*it, [&](auto& row) { row.value.assign(encoded.data(), encoded.size()); });
-      else db.create<chain::kv_object>([&](auto& row) {
-         row.code = code;
-         row.payer = SYSIO_ACCOUNT;
-         row.table_id = chain::compute_table_id(table.value);
-         row.key.assign(key, sizeof(key));
-         row.value.assign(encoded.data(), encoded.size());
-      });
+      sysio_system::test_support::write_kv_row(*this, code, table, id, encoded);
    }
    /// Add nonzero pending emissions and claims for reserve and gate tests.
    void reserves(uint64_t pending, uint64_t claims) {
