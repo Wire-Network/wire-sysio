@@ -6,6 +6,7 @@
 #include <sysio/action.hpp>
 #include <sysio/print.hpp>
 #include <sysio/privileged.hpp>
+#include <sysio/system.hpp>
 #include <sysio/opp/attestations/attestations.pb.hpp>
 #include <sysio.authex/sysio.authex.hpp>
 #include <sysio.bond/sysio.bond.hpp>
@@ -36,6 +37,11 @@ constexpr name ack_action = "ack"_n;
 constexpr name settle_action = "settle"_n;
 constexpr name requestkeep_action = "requestkeep"_n;
 constexpr name syncenv_action = "syncenv"_n;
+constexpr name logintake_action = "logintake"_n;
+constexpr name logrelease_action = "logrelease"_n;
+constexpr name logparked_action = "logparked"_n;
+constexpr name logburn_action = "logburn"_n;
+constexpr auto self_inline_receipt_msg = "syndication receipts require a self inline action";
 constexpr auto outpost_token_not_found_msg = "outpost token not found";
 constexpr auto custody_incident_not_found_msg = "custody incident not found";
 constexpr auto custody_still_below_outstanding_msg = "custody still below outstanding";
@@ -301,14 +307,15 @@ synd::item_key item_key_of(const synd::item_row& item) {
                          .id          = item.id};
 }
 
-/// Store `item` under the next item id, which it is given. Never throws.
-void add_item(name self, synd::item_row item) {
+/// Store `item` under the next item id and return that id. Never throws.
+uint64_t add_item(name self, synd::item_row item) {
    synd::syndcounters_t counters(self);
    synd::synd_counters  c = counters.get_or_default(synd::synd_counters{});
    item.id                = c.next_item_id++;
    counters.set(c, ram_payer);
    synd::items_t items(self);
    items.set(ram_payer, item_key_of(item), item);
+   return item.id;
 }
 
 /// The key of the parked row of `(token_code, chain_kind, pubkey)`.
@@ -354,13 +361,19 @@ void credit_owed(name self, name account, symbol_code sym, uint64_t wire) {
 /// True iff `account` exists and has contract code. Never throws.
 bool has_code(name account) { return is_account(account) && get_code_hash(account) != checksum256{}; }
 
-/// Hold `amount` of the shadow `token_code` (symbol `sym`), already in this contract's own `sysio.liq`
-/// row, in the parked row of `(chain_kind, pubkey)`, with `banked` WIRE the pubkey earned elsewhere in
-/// this contract added to its position. The position settles at the live index before the balance
-/// grows. Nothing is written when both are zero. Never throws.
-void park_shadow(name self, sysio::slug_name token_code, symbol_code sym, ChainKind chain_kind,
-                 const std::vector<char>& pubkey, uint64_t amount, uint64_t banked) {
-   if (amount == 0 && banked == 0) return;
+/// Whether parked principal came from a receipted live release or a launch import.
+enum class principal_source {
+   RELEASE, ///< principal joined to a live intake receipt
+   IMPORT   ///< launch principal with no live intake receipt
+};
+
+/// Hold shadow principal and banked WIRE for a pubkey, returning its principal batch ID.
+/// A yield-only contribution allocates no batch. Imports remain unattributed to live intakes.
+/// The position settles at the live index before its balance grows. Never throws.
+uint64_t park_shadow(name self, sysio::slug_name token_code, symbol_code sym, ChainKind chain_kind,
+                     const std::vector<char>& pubkey, uint64_t amount, uint64_t banked, principal_source source) {
+   if (amount == 0 && banked == 0)
+      return 0;
    synd::parkeds_t        parked(self);
    const synd::parked_key key = parked_key_of(token_code, chain_kind, pubkey);
    synd::parked_row       row = parked.try_get(key).value_or(synd::parked_row{
@@ -368,9 +381,27 @@ void park_shadow(name self, sysio::slug_name token_code, symbol_code sym, ChainK
       .chain_kind = chain_kind,
       .pubkey     = pubkey,
    });
+   if (amount > 0) {
+      if (row.balance == 0) {
+         synd::syndcounters_t counters(self);
+         synd::synd_counters  state = counters.get_or_default(synd::synd_counters{});
+         row.batch_id = state.next_batch_id++;
+         counters.set(state, ram_payer);
+      }
+      if (source == principal_source::IMPORT)
+         row.unattributed = opp::safe::add_sat_u64(row.unattributed, amount);
+   }
    custody::settle_and_adjust(row.position, row.balance, static_cast<int64_t>(amount), synd::LIQ_ACCOUNT, sym);
    row.position.owed_wire = std::min(custody::MAX_OWED_WIRE, opp::safe::add_sat_u64(row.position.owed_wire, banked));
    parked.set(ram_payer, key, row);
+   return amount > 0 ? row.batch_id : 0;
+}
+
+/// Emit a terminal receipt only once the envelope's held items have all been removed.
+void log_burn(name self, const synd::envelope_row& row) {
+   action(active_of(self), self, logburn_action,
+          std::make_tuple(synd::burn_receipt{row.chain_code, row.token_code, row.epoch_index, row.digest}))
+      .send();
 }
 
 /// Add `amount` of the shadow `token_code` (symbol `sym`) to the token's fee pot, settling its position
@@ -788,6 +819,7 @@ private:
       burn(row, repaid);
       add_to_feepot(self_, row.token_code, code, opp::safe::add_sat_u64(row.forfeit - repaid, row.bounty_returned));
       row.state = synd::envelope_state::INVALID;
+      log_burn(self_, row);
       note(row.chain_code, row.token_code, row.epoch_index, invalid_burned_reason);
    }
 
@@ -942,6 +974,7 @@ private:
       const symbol      sym  = st.supply.symbol;
       const symbol_code code = sym.code();
       const name        account = deliverable_account(self_, item.chain_kind, item.pubkey);
+      uint64_t parked_batch_id = 0;
       if (account != name{}) {
          // Pull first -- nothing this release queues may touch this contract's liq row ahead of the
          // claim (custody obligation 3) -- then take the item's banked WIRE out of what the pool covers.
@@ -955,7 +988,8 @@ private:
          // released whole it would be erased with it, so it moves to the pubkey's parked row instead,
          // which a later `sweep` pays once the pool covers it.
          if (item.remaining == 0 && item.position.owed_wire > 0) {
-            park_shadow(self_, item.token_code, code, item.chain_kind, item.pubkey, 0, item.position.owed_wire);
+            park_shadow(self_, item.token_code, code, item.chain_kind, item.pubkey, 0, item.position.owed_wire,
+                        principal_source::RELEASE);
             item.position.owed_wire = 0;
          }
          if (net > 0) {
@@ -970,10 +1004,19 @@ private:
                                     code);
          const uint64_t banked   = item.position.owed_wire;
          item.position.owed_wire = 0;
-         park_shadow(self_, item.token_code, code, item.chain_kind, item.pubkey, net, banked);
+         parked_batch_id = park_shadow(self_, item.token_code, code, item.chain_kind, item.pubkey, net, banked,
+                                       principal_source::RELEASE);
       }
       add_to_feepot(self_, item.token_code, code, fee);
       row.released = opp::safe::add_sat_u64(row.released, tranche);
+      const auto destination = net == 0            ? synd::release_destination::FEE_ONLY
+                               : account != name{} ? synd::release_destination::ACCOUNT
+                                                   : synd::release_destination::PARKED;
+      action(active_of(self_), self_, logrelease_action,
+             std::make_tuple(synd::release_receipt{item.id, item.chain_code, item.token_code, item.epoch_index, tranche,
+                                                   fee, net, item.remaining, destination, net > 0 ? account : name{},
+                                                   parked_batch_id}))
+         .send();
    }
 
    /// Release yield `item` whole into `sysio.liq`'s pending yield by `mintyield`: no fee and no
@@ -1026,6 +1069,12 @@ private:
 
 };
 
+/// Receipt payloads are authenticated by their immediate emitter, not a user-supplied signer.
+void require_receipt_origin(name self) {
+   require_auth(self);
+   check(get_sender() == self, self_inline_receipt_msg);
+}
+
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
@@ -1075,13 +1124,18 @@ void synd::onsynd(sysio::slug_name chain_code, uint32_t epoch_index, checksum256
    };
    custody::settle_and_adjust(item.position, item.remaining, static_cast<int64_t>(amount), LIQ_ACCOUNT,
                               st->supply.symbol.code());
-   add_item(get_self(), std::move(item));
+   // Keep the source identity in the action trace even after the operational item is erased.
+   const auto item_id = add_item(get_self(), item);
    add_to_envelope(get_self(), chain_code, token_code, epoch_index, digest, amount, 0);
    ensure_ledger(get_self(), chain_code, token_code);
 
    // resolve_intake verified every condition `mint` checks: the shadow exists and the amount is
    // positive and within its headroom. This contract is an account, so the mint cannot fail.
    action(active_of(get_self()), LIQ_ACCOUNT, mint_action, std::make_tuple(get_self(), token_code, amount)).send();
+   action(active_of(get_self()), get_self(), logintake_action,
+          std::make_tuple(intake_receipt{item_id, chain_code, token_code, epoch_index, digest, sequence, chain_kind,
+                                         std::move(item.pubkey), amount}))
+      .send();
 }
 
 void synd::onyield(sysio::slug_name chain_code, uint32_t epoch_index, checksum256 digest, uint64_t sequence,
@@ -1314,6 +1368,7 @@ void synd::dropenv(sysio::slug_name chain_code, sysio::slug_name token_code, uin
    row->burned = opp::safe::add_sat_u64(row->burned, unreleased);
    row->state  = envelope_state::INVALID;
    envelopes.set(same_payer, key, *row);
+   log_burn(get_self(), *row);
    note(chain_code, token_code, epoch_index, dropped_reason);
 }
 
@@ -1643,6 +1698,8 @@ void synd::deliver_parked(name account, ChainKind chain_kind, const std::vector<
       const uint64_t balance = settled.balance;
       if (settled.position.owed_wire > 0) {
          settled.balance = 0;
+         settled.batch_id = 0;
+         settled.unattributed = 0;
          parked.set(ram_payer, key, settled);
       } else {
          parked.erase(key);
@@ -1651,6 +1708,10 @@ void synd::deliver_parked(name account, ChainKind chain_kind, const std::vector<
       if (balance > 0) {
          action(active_of(get_self()), LIQ_ACCOUNT, settle_action,
                 std::make_tuple(get_self(), account, asset{static_cast<int64_t>(balance), sym}))
+            .send();
+         action(active_of(get_self()), get_self(), logparked_action,
+                std::make_tuple(parked_receipt{row->batch_id, it->token_code, chain_kind, pubkey, account, balance,
+                                               row->unattributed}))
             .send();
       }
       credit_owed(get_self(), account, code, banked);
@@ -1667,8 +1728,24 @@ void synd::credit_by_pubkey(sysio::slug_name token_code, symbol_code sym, ChainK
    // Parked: the position settles at the live index before the balance grows, and the shadow it
    // attributes arrives in this contract's own row by the mint sent right after (custody
    // obligation 0).
-   park_shadow(get_self(), token_code, sym, chain_kind, pubkey, amount, 0);
+   park_shadow(get_self(), token_code, sym, chain_kind, pubkey, amount, 0, principal_source::IMPORT);
    action(active_of(get_self()), LIQ_ACCOUNT, mint_action, std::make_tuple(get_self(), token_code, amount)).send();
+}
+
+void synd::logintake(intake_receipt) {
+   require_receipt_origin(get_self());
+}
+
+void synd::logrelease(release_receipt) {
+   require_receipt_origin(get_self());
+}
+
+void synd::logparked(parked_receipt) {
+   require_receipt_origin(get_self());
+}
+
+void synd::logburn(burn_receipt) {
+   require_receipt_origin(get_self());
 }
 
 } // namespace sysio
