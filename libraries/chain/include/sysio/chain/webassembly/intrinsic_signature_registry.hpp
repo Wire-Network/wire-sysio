@@ -57,10 +57,6 @@ SYS_PIN_INTRINSIC( get_context_free_data,
 // =============================================================================
 // Privileged
 // =============================================================================
-SYS_PIN_INTRINSIC( is_feature_active,
-                   int32_t (interface::*)(int64_t) const );
-SYS_PIN_INTRINSIC( activate_feature,
-                   void (interface::*)(int64_t) const );
 SYS_PIN_INTRINSIC( preactivate_feature,
                    void (interface::*)(aligned_ptr<const digest_type>) );
 SYS_PIN_INTRINSIC( set_resource_limits,
@@ -151,8 +147,7 @@ SYS_PIN_INTRINSIC( check_transaction_authorization,
 SYS_PIN_INTRINSIC( check_permission_authorization,
                    bool (interface::*)(account_name, permission_name,
                                        span<const char>,
-                                       span<const char>,
-                                       uint64_t) const );
+                                       span<const char>) const );
 SYS_PIN_INTRINSIC( get_permission_lower_bound,
                    int32_t (interface::*)(account_name, permission_name, span<char>) );
 SYS_PIN_INTRINSIC( require_auth,
@@ -227,75 +222,99 @@ SYS_PIN_INTRINSIC( printhex,
                    void (interface::*)(span<const char>) );
 
 // =============================================================================
-// KV database (all 22 -- the biggest cleanup target by signature count)
+// KV database (all 19 -- the biggest cleanup target by signature count)
 // =============================================================================
 SYS_PIN_INTRINSIC( kv_set,
-                   int64_t (interface::*)(uint32_t, uint64_t,
+                   int32_t (interface::*)(uint32_t, uint64_t,
                                           span<const char>,
-                                          span<const char>) );
+                                          span<const char>,
+                                          uint32_t) );
+SYS_PIN_INTRINSIC( kv_erase,
+                   int32_t (interface::*)(uint32_t, span<const char>) );
 SYS_PIN_INTRINSIC( kv_get,
                    int32_t (interface::*)(uint32_t, uint64_t,
                                           span<const char>,
+                                          uint32_t,
                                           span<char>) );
-SYS_PIN_INTRINSIC( kv_erase,
-                   int64_t (interface::*)(uint32_t, span<const char>) );
-SYS_PIN_INTRINSIC( kv_contains,
+SYS_PIN_INTRINSIC( kv_idx_store,
                    int32_t (interface::*)(uint32_t, uint64_t,
+                                          span<const char>,
+                                          span<const char>) );
+SYS_PIN_INTRINSIC( kv_idx_update,
+                   int32_t (interface::*)(uint32_t, uint64_t,
+                                          span<const char>,
+                                          span<const char>,
+                                          span<const char>) );
+SYS_PIN_INTRINSIC( kv_idx_erase,
+                   int32_t (interface::*)(uint32_t,
+                                          span<const char>,
                                           span<const char>) );
 SYS_PIN_INTRINSIC( kv_it_create,
-                   uint32_t (interface::*)(uint32_t, uint64_t,
-                                           span<const char>) );
-SYS_PIN_INTRINSIC( kv_it_destroy,
-                   void (interface::*)(uint32_t) );
-SYS_PIN_INTRINSIC( kv_it_status,
-                   int32_t (interface::*)(uint32_t) );
-SYS_PIN_INTRINSIC( kv_it_next,
-                   int32_t (interface::*)(uint32_t) );
-SYS_PIN_INTRINSIC( kv_it_prev,
-                   int32_t (interface::*)(uint32_t) );
-SYS_PIN_INTRINSIC( kv_it_lower_bound,
-                   int32_t (interface::*)(uint32_t, span<const char>) );
-SYS_PIN_INTRINSIC( kv_it_key,
-                   int32_t (interface::*)(uint32_t, uint32_t,
-                                          span<char>,
-                                          aligned_ptr<uint32_t>) );
-SYS_PIN_INTRINSIC( kv_it_value,
-                   int32_t (interface::*)(uint32_t, uint32_t,
-                                          span<char>,
-                                          aligned_ptr<uint32_t>) );
-SYS_PIN_INTRINSIC( kv_idx_store,
-                   void (interface::*)(uint64_t, uint32_t,
-                                       span<const char>,
-                                       span<const char>) );
-SYS_PIN_INTRINSIC( kv_idx_remove,
-                   void (interface::*)(uint32_t,
-                                       span<const char>,
-                                       span<const char>) );
-SYS_PIN_INTRINSIC( kv_idx_update,
-                   void (interface::*)(uint64_t, uint32_t,
-                                       span<const char>,
-                                       span<const char>,
-                                       span<const char>) );
-SYS_PIN_INTRINSIC( kv_idx_find_secondary,
-                   int32_t (interface::*)(uint64_t, uint32_t,
+                   int32_t (interface::*)(uint32_t, uint64_t,
+                                          span<const char>,
                                           span<const char>) );
-SYS_PIN_INTRINSIC( kv_idx_lower_bound,
-                   int32_t (interface::*)(uint64_t, uint32_t,
+SYS_PIN_INTRINSIC( kv_it_next,
+                   int32_t (interface::*)(int32_t,
+                                          span<char>,
+                                          span<char>,
+                                          aligned_ptr<uint32_t>,
+                                          aligned_ptr<uint32_t>) );
+SYS_PIN_INTRINSIC( kv_it_prev,
+                   int32_t (interface::*)(int32_t,
+                                          span<char>,
+                                          span<char>,
+                                          aligned_ptr<uint32_t>,
+                                          aligned_ptr<uint32_t>) );
+SYS_PIN_INTRINSIC( kv_it_lower_bound,
+                   int32_t (interface::*)(int32_t,
+                                          span<const char>,
+                                          span<char>,
+                                          span<char>,
+                                          aligned_ptr<uint32_t>,
+                                          aligned_ptr<uint32_t>) );
+SYS_PIN_INTRINSIC( kv_it_read,
+                   int32_t (interface::*)(int32_t, uint32_t,
+                                          span<char>,
+                                          span<char>,
+                                          aligned_ptr<uint32_t>,
+                                          aligned_ptr<uint32_t>) );
+SYS_PIN_INTRINSIC( kv_it_destroy,
+                   void (interface::*)(int32_t) );
+SYS_PIN_INTRINSIC( kv_idx_create,
+                   int32_t (interface::*)(uint32_t, uint64_t,
+                                          span<const char>,
                                           span<const char>) );
 SYS_PIN_INTRINSIC( kv_idx_next,
-                   int32_t (interface::*)(uint32_t) );
-SYS_PIN_INTRINSIC( kv_idx_prev,
-                   int32_t (interface::*)(uint32_t) );
-SYS_PIN_INTRINSIC( kv_idx_key,
-                   int32_t (interface::*)(uint32_t, uint32_t,
+                   int32_t (interface::*)(int32_t,
                                           span<char>,
+                                          span<char>,
+                                          aligned_ptr<uint32_t>,
                                           aligned_ptr<uint32_t>) );
-SYS_PIN_INTRINSIC( kv_idx_primary_key,
-                   int32_t (interface::*)(uint32_t, uint32_t,
+SYS_PIN_INTRINSIC( kv_idx_prev,
+                   int32_t (interface::*)(int32_t,
                                           span<char>,
+                                          span<char>,
+                                          aligned_ptr<uint32_t>,
+                                          aligned_ptr<uint32_t>) );
+SYS_PIN_INTRINSIC( kv_idx_lower_bound,
+                   int32_t (interface::*)(int32_t,
+                                          span<const char>,
+                                          span<char>,
+                                          span<char>,
+                                          aligned_ptr<uint32_t>,
+                                          aligned_ptr<uint32_t>) );
+SYS_PIN_INTRINSIC( kv_idx_read,
+                   int32_t (interface::*)(int32_t,
+                                          span<char>,
+                                          span<char>,
+                                          aligned_ptr<uint32_t>,
                                           aligned_ptr<uint32_t>) );
 SYS_PIN_INTRINSIC( kv_idx_destroy,
-                   void (interface::*)(uint32_t) );
+                   void (interface::*)(int32_t) );
+SYS_PIN_INTRINSIC( kv_idx_find,
+                   int32_t (interface::*)(uint32_t, uint64_t,
+                                          span<const char>,
+                                          span<const char>) );
 
 // =============================================================================
 // Memory (struct-by-value params; pinned here because the argument unpack

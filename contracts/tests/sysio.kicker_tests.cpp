@@ -460,12 +460,11 @@ BOOST_FIXTURE_TEST_CASE(missing_emitcfg_fails_closed, kicker_tester) {
    constexpr auto table = "emitcfg"_n;
    char key[chain::kv_pri_key_size];
    chain::kv_encode_be64(key, table.value);
-   auto& db = const_cast<chainbase::database&>(control->db());
-   const auto& index = db.get_index<chain::kv_index, chain::by_code_key>();
-   const auto it = index.find(boost::make_tuple(SYSIO_ACCOUNT, chain::compute_table_id(table.value),
-                                               std::string_view(key, sizeof(key))));
-   BOOST_REQUIRE(it != index.end());
-   db.remove(*it);
+   auto& store = const_cast<chain::kv_store&>(control->kv());
+   const auto row =
+      store.find_row(SYSIO_ACCOUNT, chain::compute_table_id(table.value), std::string_view(key, sizeof(key)));
+   BOOST_REQUIRE(row);
+   store.erase_row(*row);
    BOOST_REQUIRE(treasury(table, "emission_config").is_null());
    BOOST_REQUIRE(!treasury("t5state"_n, "t5_state").is_null());
    const auto gift = expected();

@@ -2565,7 +2565,6 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    bool show_payer = p.show_payer.has_value() && *p.show_payer;
    http_params_t hp{ p.json, show_payer, false, {}, {} };
 
-   const auto& d = db.db();
 
    // --- Resolve index_name ---
    // Supports: empty (primary), named secondary ("byowner"), or numeric position ("2" = first secondary)
@@ -2822,8 +2821,7 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       SYS_ASSERT(found_idx, chain::contract_table_query_exception,
          "Secondary index '{}' not found in ABI for table '{}'", resolved_index_name, p.table);
 
-      const auto& sec_idx = d.get_index<chain::kv_index_index, chain::by_code_table_id_seckey>();
-      const auto& pri_idx = d.get_index<chain::kv_index, chain::by_code_key>();
+      const auto& store = db.kv();
 
       // For scoped tables (multi_index, kv_multi_index, kv::scoped_table), the
       // contract stores pri_key as the in-scope portion only — the chain's
@@ -2832,45 +2830,45 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
       // full key in r.key so the downstream ABI decoder (which expects scope +
       // pk fields) can decode it. For unscoped kv::table, scope_prefix_bytes
       // is empty and the pri_key already represents the full primary key.
-      auto fetch_primary = [&](const chain::kv_index_object& sec_obj) -> raw_row {
+      auto fetch_primary = [&](const chain::kv_index_entry& sec_obj) -> raw_row {
          std::vector<char> full_key;
          full_key.reserve(scope_prefix_bytes.size() + sec_obj.pri_key.size());
          full_key.insert(full_key.end(), scope_prefix_bytes.begin(), scope_prefix_bytes.end());
-         full_key.insert(full_key.end(), sec_obj.pri_key.data(),
-                         sec_obj.pri_key.data() + sec_obj.pri_key.size());
+         full_key.insert(full_key.end(), sec_obj.pri_key.begin(), sec_obj.pri_key.end());
          std::string_view full_sv(full_key.data(), full_key.size());
-         auto itr = pri_idx.find(boost::make_tuple(p.code, table_id, full_sv));
+         const auto primary = store.find_row(p.code, table_id, full_sv);
          raw_row r;
          r.key = std::move(full_key);
-         if (itr != pri_idx.end()) {
-            r.value.assign(itr->value.data(), itr->value.data() + itr->value.size());
-            r.payer = itr->payer;
+         if (primary) {
+            r.value.assign(primary->value.begin(), primary->value.end());
+            r.payer = primary->payer;
          }
          return r;
       };
 
-      // Whether a cursor at index row `it` must name its primary key: the row before it in the index shares its
+      // Whether a cursor at index row `at` must name its primary key: the row before it in the index shares its
       // secondary key, so the secondary key alone would put the cursor at the start of their run. A forward page
       // resumed there repeats rows, and can repeat the same page forever; a reverse one skips the rest of the run.
-      const auto shares_secondary_key_with_previous = [&](const auto& it) {
-         if (it == sec_idx.begin())
-            return false;
-         const auto& previous = *std::prev(it);
-         return previous.code == it->code && previous.table_id == it->table_id &&
-                previous.sec_key_view() == it->sec_key_view();
+      const auto shares_secondary_key_with_previous = [&](const chain::kv_index_entry& at,
+                                                          const chain::kv_index_cursor& cursor) {
+         chain::kv_index_entry previous;
+         return cursor.clone()->prev(previous) && previous.code == at.code && previous.table_id == at.table_id &&
+                previous.sec_key == at.sec_key;
       };
 
-      // Format a secondary-index `next_key` value at index row `it`, naming its primary key
+      // Format a secondary-index `next_key` value at the row under `cursor`, naming its primary key
       // when shares_secondary_key_with_previous says the secondary key alone cannot place it.
       // When `p.json` is set, emit a JSON object matching the bound syntax (e.g.
       // `{"byowner":"u4"}`, or `{"byowner":"u3","id":4}` with the primary key) so
       // `upper_bound = next_key` round-trips through the bound parser, which expects
       // JSON when `p.json` is set. A key the codec cannot NAME falls back to a raw
       // cursor, which that parser feeds back verbatim — so next_key is always feedable.
-      auto emit_secondary_next_key = [&](const auto& it) {
-         const std::string_view sk = it->sec_key_view();
+      auto emit_secondary_next_key = [&](const chain::kv_index_cursor& cursor) {
+         chain::kv_index_entry at;
+         cursor.read(at);
+         const std::string_view sk = at.sec_key;
          const std::optional<std::string_view> pk =
-            shares_secondary_key_with_previous(it) ? std::optional{it->pri_key_view()} : std::nullopt;
+            shares_secondary_key_with_previous(at, cursor) ? std::optional{at.pri_key} : std::nullopt;
          if (p.json) {
             try {
                // The shape describes the WITHIN-SCOPE fields, so the decode sees the
@@ -2904,35 +2902,36 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
 
       // Bounds are positions (secondary key, primary key) in the index's own order. A bound without a primary key has
       // an empty one, which sorts first, so it sits before every row with its secondary key.
-      const auto lower_position = boost::make_tuple(p.code, sec_tid, lb_sv, lb_primary_sv);
-      const auto upper_position = boost::make_tuple(p.code, sec_tid, ub_sv, ub_primary_sv);
-      const auto below_upper = [&](const auto& it) {
-         return std::pair{it->sec_key_view(), it->pri_key_view()} < std::pair{ub_sv, ub_primary_sv};
+      const chain::kv_position lower_position{p.code, sec_tid, lb_sv, lb_primary_sv};
+      const chain::kv_position upper_position{p.code, sec_tid, ub_sv, ub_primary_sv};
+      const auto below_upper = [&](const chain::kv_index_entry& entry) {
+         return std::pair{entry.sec_key, entry.pri_key} < std::pair{ub_sv, ub_primary_sv};
       };
 
+      auto cursor = store.open_index_cursor();
+      chain::kv_index_entry entry;
       if (!reverse) {
-         auto itr = sec_idx.lower_bound(lower_position);
+         bool on_entry = cursor->seek_lower(lower_position, entry);
          // Shared by the loop and the deadline cut, so a cut never reports a next row past the upper bound.
-         const auto in_range = [&](const auto& it) {
-            return it != sec_idx.end() && it->code == p.code && it->table_id == sec_tid &&
-                   (!has_upper || below_upper(it));
+         const auto in_range = [&] {
+            return on_entry && entry.code == p.code && entry.table_id == sec_tid && (!has_upper || below_upper(entry));
          };
          uint32_t count = 0;
          uint64_t bytes = 0;
-         while (in_range(itr)) {
+         while (in_range()) {
             if (count >= limit) {
                hp.more = true;
-               emit_secondary_next_key(itr);
+               emit_secondary_next_key(*cursor);
                break;
             }
-            const auto& row = hp.rows.emplace_back(fetch_primary(*itr));
+            const auto& row = hp.rows.emplace_back(fetch_primary(entry));
             bytes += owned_table_row_bytes(row.key.size(), row.value.size());
             ++count;
-            ++itr;
+            on_entry = cursor->next(entry);
             if (fc::time_point::now() >= params_deadline || bytes >= max_page_bytes) {
-               if (in_range(itr)) {
+               if (in_range()) {
                   hp.more = true;
-                  emit_secondary_next_key(itr);
+                  emit_secondary_next_key(*cursor);
                }
                break;
             }
@@ -2947,46 +2946,53 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          // next page yields the first row strictly below the last returned
          // one -- i.e. the first unseen row. Setting `next_key` to the first
          // unseen row's position instead would skip that row at every page boundary.
-         auto begin = sec_idx.lower_bound(lower_position);
-         decltype(sec_idx.end()) itr;
+         chain::kv_index_entry begin;
+         const bool begin_exists = store.open_index_cursor()->seek_lower(lower_position, begin);
+         const auto same_position = [](const chain::kv_index_entry& a, const chain::kv_index_entry& b) {
+            return a.code == b.code && a.table_id == b.table_id && a.sec_key == b.sec_key && a.pri_key == b.pri_key;
+         };
+         const auto at_begin = [&](bool exists, const chain::kv_index_entry& at) {
+            return exists && begin_exists ? same_position(at, begin) : exists == begin_exists;
+         };
+         bool on_entry;
          if (!has_upper) {
-            itr = sec_idx.upper_bound(boost::make_tuple(p.code, sec_tid));
+            on_entry = cursor->seek_past_table(p.code, sec_tid, entry);
          } else if (std::pair{ub_sv, ub_primary_sv} < std::pair{lb_sv, lb_primary_sv}) {
-            // An inverted range is empty. Seeking the upper bound would start `itr` below `begin`, and the walk down
-            // could then step off the front of the index.
-            itr = begin;
+            // An inverted range is empty. Seeking the upper bound would start the cursor below `begin`, and the walk
+            // down could then step off the front of the index.
+            on_entry = cursor->seek_lower(lower_position, entry);
          } else {
-            itr = sec_idx.lower_bound(upper_position);
+            on_entry = cursor->seek_lower(upper_position, entry);
          }
          uint32_t count = 0;
          uint64_t bytes = 0;
-         // The last-returned row, which the cutoff branches below feed to `emit_secondary_next_key`.
-         std::optional<decltype(itr)> last_added;
-         if (itr != begin) {
+         if (!at_begin(on_entry, entry)) {
             do {
-               --itr;
-               if (itr->code != p.code || itr->table_id != sec_tid) break;
-               auto sk = itr->sec_key_view();
-               if (!lb_bytes.empty() && sk < lb_sv) break;
+               on_entry = cursor->prev(entry);
+               if (!on_entry || entry.code != p.code || entry.table_id != sec_tid) break;
+               if (!lb_bytes.empty() && entry.sec_key < lb_sv) break;
                if (count >= limit) {
-                  if (last_added) {
+                  if (count > 0) {
                      hp.more = true;
+                     // `next_key` names the last-returned row, one step above the row this cursor has just reached.
+                     const auto last_added = cursor->clone();
+                     chain::kv_index_entry last_returned;
+                     last_added->next(last_returned);
                      emit_secondary_next_key(*last_added);
                   }
                   break;
                }
-               const auto& row = hp.rows.emplace_back(fetch_primary(*itr));
+               const auto& row = hp.rows.emplace_back(fetch_primary(entry));
                bytes += owned_table_row_bytes(row.key.size(), row.value.size());
-               last_added = itr;
                ++count;
                if (fc::time_point::now() >= params_deadline || bytes >= max_page_bytes) {
-                  if (itr != begin) {
+                  if (!at_begin(on_entry, entry)) {
                      hp.more = true;
-                     emit_secondary_next_key(itr);
+                     emit_secondary_next_key(*cursor);
                   }
                   break;
                }
-            } while (itr != begin);
+            } while (!at_begin(on_entry, entry));
          }
       }
 
@@ -3204,7 +3210,6 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
    fc::time_point params_deadline = p.time_limit_ms ? std::min(fc::time_point::now().safe_add(fc::milliseconds(*p.time_limit_ms)), deadline) : deadline;
 
    read_only::get_table_by_scope_result result;
-   const auto& d = db.db();
 
    // With scoped keys, table name is no longer in the key bytes — it's represented
    // by table_id (uint16_t) in the kv_object.  Keys are [scope:8B BE][pk:8B BE].
@@ -3226,7 +3231,7 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
                try {
                   tid = chain::compute_table_id(name(t.name).to_uint64_t());
                } catch (...) {
-                  tid = chain::compute_table_id(t.name);
+                  tid = chain::compute_string_table_id(t.name);
                }
             }
             tid_to_name[tid] = t.name;
@@ -3270,8 +3275,6 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
    if (deadline != fc::time_point::maximum() && limit > max_return_items)
       limit = max_return_items;
 
-   const auto& kv_idx = d.get_index<chain::kv_index, chain::by_code_key>();
-
    // When p.table is set, compute a single target table_id; otherwise iterate all.
    const uint16_t filter_tid = p.table ? chain::compute_table_id(p.table.to_uint64_t()) : uint16_t(0);
 
@@ -3284,10 +3287,13 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
       return chain::make_kv_scoped_key(scope, std::numeric_limits<uint64_t>::max());
    };
 
-   // Check if an iterator points to a valid 16-byte scoped key for this code
-   auto is_valid = [&](const auto& it) -> bool {
-      return it != kv_idx.end() && it->code == p.code &&
-             it->key.size() == chain::kv_scoped_key_size;
+   auto cursor = db.kv().open_row_cursor();
+   chain::kv_row row;
+   bool on_row = false;
+
+   // Check if the cursor is on a valid 16-byte scoped key for this code
+   auto is_valid = [&]() -> bool {
+      return on_row && row.code == p.code && row.key.size() == chain::kv_scoped_key_size;
    };
 
    // Extract scope from a 16-byte key (first 8 bytes)
@@ -3329,12 +3335,11 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
       }
 
       auto seek = make_seek_key(start_scope);
-      auto itr = kv_idx.lower_bound(
-         boost::make_tuple(p.code, cur_tid, seek.to_string_view()));
+      on_row = cursor->seek_lower({p.code, cur_tid, seek.to_string_view()}, row);
 
       uint32_t count = 0;
-      while (is_valid(itr)) {
-         uint16_t tid = itr->table_id;
+      while (is_valid()) {
+         uint16_t tid = row.table_id;
 
          // Table_id filter
          if (p.table) {
@@ -3344,14 +3349,12 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
             cur_tid = tid;
          }
 
-         auto kv = itr->key_view();
-         uint64_t scope_raw = extract_scope(kv);
+         uint64_t scope_raw = extract_scope(row.key);
 
          // Scope bounds
          if (scope_raw < lower_scope) {
             seek = make_seek_key(lower_scope);
-            itr = kv_idx.lower_bound(
-               boost::make_tuple(p.code, cur_tid, seek.to_string_view()));
+            on_row = cursor->seek_lower({p.code, cur_tid, seek.to_string_view()}, row);
             continue;
          }
          if (scope_raw > upper_scope) {
@@ -3359,8 +3362,7 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
             if (p.table) break;
             if (cur_tid == std::numeric_limits<uint16_t>::max()) break;
             seek = make_seek_key(lower_scope);
-            itr = kv_idx.lower_bound(
-               boost::make_tuple(p.code, static_cast<uint16_t>(cur_tid + 1), seek.to_string_view()));
+            on_row = cursor->seek_lower({p.code, static_cast<uint16_t>(cur_tid + 1), seek.to_string_view()}, row);
             continue;
          }
 
@@ -3376,12 +3378,10 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
          // Seek-skip to next scope: advance scope by 1, overflow to next table_id
          if (scope_raw < std::numeric_limits<uint64_t>::max()) {
             seek = make_seek_key(scope_raw + 1);
-            itr = kv_idx.lower_bound(
-               boost::make_tuple(p.code, cur_tid, seek.to_string_view()));
+            on_row = cursor->seek_lower({p.code, cur_tid, seek.to_string_view()}, row);
          } else if (!p.table && cur_tid < std::numeric_limits<uint16_t>::max()) {
             seek = make_seek_key(lower_scope);
-            itr = kv_idx.lower_bound(
-               boost::make_tuple(p.code, static_cast<uint16_t>(cur_tid + 1), seek.to_string_view()));
+            on_row = cursor->seek_lower({p.code, static_cast<uint16_t>(cur_tid + 1), seek.to_string_view()}, row);
          } else {
             break;
          }
@@ -3396,16 +3396,14 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
       }
 
       auto seek = make_seek_key_max(upper_scope);
-      auto itr = kv_idx.upper_bound(
-         boost::make_tuple(p.code, cur_tid, seek.to_string_view()));
+      on_row = cursor->seek_upper({p.code, cur_tid, seek.to_string_view()}, row);
 
       uint32_t count = 0;
       while (true) {
-         if (itr == kv_idx.begin()) break;
-         --itr;
-         if (!is_valid(itr)) break;
+         on_row = cursor->prev(row);
+         if (!is_valid()) break;
 
-         uint16_t tid = itr->table_id;
+         uint16_t tid = row.table_id;
 
          // Table_id filter
          if (p.table) {
@@ -3414,22 +3412,19 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
             cur_tid = tid;
          }
 
-         auto kv = itr->key_view();
-         uint64_t scope_raw = extract_scope(kv);
+         uint64_t scope_raw = extract_scope(row.key);
 
          // Scope bounds
          if (scope_raw > upper_scope) {
             seek = make_seek_key_max(upper_scope);
-            itr = kv_idx.upper_bound(
-               boost::make_tuple(p.code, cur_tid, seek.to_string_view()));
+            on_row = cursor->seek_upper({p.code, cur_tid, seek.to_string_view()}, row);
             continue;
          }
          if (scope_raw < lower_scope) {
             if (p.table) break;
             if (cur_tid == 0) break;
             seek = make_seek_key_max(upper_scope);
-            itr = kv_idx.upper_bound(
-               boost::make_tuple(p.code, static_cast<uint16_t>(cur_tid - 1), seek.to_string_view()));
+            on_row = cursor->seek_upper({p.code, static_cast<uint16_t>(cur_tid - 1), seek.to_string_view()}, row);
             continue;
          }
 
@@ -3447,14 +3442,12 @@ read_only::get_table_by_scope_result read_only::get_table_by_scope( const read_o
             seek = make_seek_key(scope_raw - 1);
          } else if (!p.table && cur_tid > 0) {
             seek = make_seek_key_max(upper_scope);
-            itr = kv_idx.upper_bound(
-               boost::make_tuple(p.code, static_cast<uint16_t>(cur_tid - 1), seek.to_string_view()));
+            on_row = cursor->seek_upper({p.code, static_cast<uint16_t>(cur_tid - 1), seek.to_string_view()}, row);
             continue;
          } else {
             break;
          }
-         itr = kv_idx.upper_bound(
-            boost::make_tuple(p.code, cur_tid, seek.to_string_view()));
+         on_row = cursor->seek_upper({p.code, cur_tid, seek.to_string_view()}, row);
       }
    }
 
@@ -3466,7 +3459,6 @@ vector<asset> read_only::get_currency_balance( const read_only::get_currency_bal
    (void)get_table_type( abi, "accounts" );
 
    vector<asset> results;
-   const auto& d = db.db();
 
    // KV storage: iterate [scope(account):8B BE][pk:8B BE] under table_id for "accounts"
    const uint16_t accounts_tid = chain::compute_table_id("accounts"_n.to_uint64_t());
@@ -3474,18 +3466,17 @@ vector<asset> read_only::get_currency_balance( const read_only::get_currency_bal
    chain::kv_encode_be64(scope_prefix, p.account.to_uint64_t());
    std::string_view scope_sv(scope_prefix, chain::kv_scope_prefix_size);
 
-   const auto& kv_idx = d.get_index<chain::kv_index, chain::by_code_key>();
-   auto itr = kv_idx.lower_bound(boost::make_tuple(p.code, accounts_tid, scope_sv));
+   auto row_cursor = db.kv().open_row_cursor();
+   chain::kv_row row;
+   for (bool more = row_cursor->seek_lower({p.code, accounts_tid, scope_sv}, row);
+        more && row.code == p.code && row.table_id == accounts_tid; more = row_cursor->next(row)) {
+      if (row.key.size() != chain::kv_scoped_key_size ||
+          memcmp(row.key.data(), scope_prefix, chain::kv_scope_prefix_size) != 0) break;
 
-   while (itr != kv_idx.end() && itr->code == p.code && itr->table_id == accounts_tid) {
-      auto kv = itr->key_view();
-      if (kv.size() != chain::kv_scoped_key_size ||
-          memcmp(kv.data(), scope_prefix, chain::kv_scope_prefix_size) != 0) break;
-
-      SYS_ASSERT(itr->value.size() >= sizeof(asset), chain::asset_type_exception, "Invalid data on table");
+      SYS_ASSERT(row.value.size() >= sizeof(asset), chain::asset_type_exception, "Invalid data on table");
 
       asset cursor;
-      fc::datastream<const char*> ds(itr->value.data(), itr->value.size());
+      fc::datastream<const char*> ds(row.value.data(), row.value.size());
       fc::raw::unpack(ds, cursor);
 
       SYS_ASSERT(cursor.get_symbol().valid(), chain::asset_type_exception, "Invalid asset");
@@ -3495,7 +3486,6 @@ vector<asset> read_only::get_currency_balance( const read_only::get_currency_bal
       }
 
       if (p.symbol && boost::iequals(cursor.symbol_name(), *p.symbol)) break;
-      ++itr;
    }
 
    return results;
@@ -3524,21 +3514,6 @@ fc::variant read_only::get_currency_stats( const read_only::get_currency_stats_p
    });
 
    return results;
-}
-
-fc::variant get_global_row( const database& db, const abi_def& abi, const abi_serializer& abis, const fc::microseconds& abi_serializer_max_time_us, bool shorten_abi_errors ) {
-   // kv::global stores under key = [Name:8B BE] with table_id from Name
-   const uint16_t global_tid = chain::compute_table_id("global"_n.to_uint64_t());
-   char key_buf[chain::kv_pri_key_size];
-   chain::kv_encode_be64(key_buf, "global"_n.to_uint64_t());
-   std::string_view key_sv(key_buf, chain::kv_pri_key_size);
-
-   const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-   auto it = kv_idx.find(boost::make_tuple(config::system_account_name, global_tid, key_sv));
-   SYS_ASSERT(it != kv_idx.end(), chain::contract_table_query_exception, "Missing row in table global");
-
-   vector<char> data(it->value.data(), it->value.data() + it->value.size());
-   return abis.binary_to_variant(abis.get_table_type("global"), data, abi_serializer::create_yield_function( abi_serializer_max_time_us ), shorten_abi_errors );
 }
 
 read_only::get_finalizer_info_result read_only::get_finalizer_info( const read_only::get_finalizer_info_params& p, const fc::time_point& ) const {
@@ -4182,11 +4157,10 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
          auto key = chain::make_kv_scoped_key(params.account_name, core_symbol.to_symbol_code());
          auto key_sv = key.to_string_view();
          const uint16_t accounts_tid = chain::compute_table_id("accounts"_n.to_uint64_t());
-         const auto& kv_idx = d.get_index<chain::kv_index, chain::by_code_key>();
-         auto it = kv_idx.find(boost::make_tuple(token_code, accounts_tid, key_sv));
-         if (it != kv_idx.end() && it->value.size() >= sizeof(asset)) {
+         const auto balance = db.kv().find_row(token_code, accounts_tid, key_sv);
+         if (balance && balance->value.size() >= sizeof(asset)) {
             asset bal;
-            fc::datastream<const char*> ds(it->value.data(), it->value.size());
+            fc::datastream<const char*> ds(balance->value.data(), balance->value.size());
             fc::raw::unpack(ds, bal);
             if (bal.get_symbol().valid() && bal.get_symbol() == core_symbol)
                result.core_liquid_balance = bal;
@@ -4200,10 +4174,9 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
          char key_buf[chain::kv_pri_key_size];
          chain::kv_encode_be64(key_buf, account_name.to_uint64_t());
          std::string_view key_sv(key_buf, chain::kv_pri_key_size);
-         const auto& kv_idx = d.get_index<chain::kv_index, chain::by_code_key>();
-         auto it = kv_idx.find(boost::make_tuple(config::roa_account_name, tid, key_sv));
-         if (it != kv_idx.end()) {
-            return vector<char>(it->value.data(), it->value.data() + it->value.size());
+         const auto row = db.kv().find_row(config::roa_account_name, tid, key_sv);
+         if (row) {
+            return vector<char>(row->value.begin(), row->value.end());
          }
          return {};
       };
@@ -4297,16 +4270,14 @@ chain::symbol read_only::extract_core_symbol()const {
    symbol core_symbol(0);
 
    // The following code makes assumptions about the contract deployed on sysio.token account and how it stores its data.
-   const auto& d = db.db();
 
    const uint16_t stat_tid = chain::compute_table_id("stat"_n.to_uint64_t());
 
-   const auto& kv_idx = d.get_index<chain::kv_index, chain::by_code_key>();
-   auto itr = kv_idx.lower_bound(boost::make_tuple("sysio.token"_n, stat_tid, std::string_view()));
-   if (itr != kv_idx.end() && itr->code == "sysio.token"_n && itr->table_id == stat_tid) {
-      auto kv = itr->key_view();
-      if (kv.size() == chain::kv_scoped_key_size) {
-         vector<char> data(itr->value.data(), itr->value.data() + itr->value.size());
+   chain::kv_row row;
+   if (db.kv().open_row_cursor()->seek_lower({"sysio.token"_n, stat_tid}, row) && row.code == "sysio.token"_n &&
+       row.table_id == stat_tid) {
+      if (row.key.size() == chain::kv_scoped_key_size) {
+         vector<char> data(row.value.begin(), row.value.end());
          fc::datastream<const char*> ds(data.data(), data.size());
          read_only::get_currency_stats_result result;
          fc::raw::unpack(ds, result.supply);

@@ -75,6 +75,10 @@ Key points:
 
 - The root hash is BLAKE3 over the concatenation of the per-section hashes in canonical
   order. Two providers that snapshot the same finalized block compute the same root hash.
+- Within the KV sections, rows are in key order: `kv_object` by (code, table_id, key) and
+  `kv_index_object` by (code, table_id, sec_key, pri_key), comparing keys as unsigned bytes
+  with a shorter prefix first. Row order is therefore part of the hash but does not depend on
+  insertion history or on the storage engine.
 - The writer streams sequentially through a hashing buffer, so hashing adds essentially no
   overhead over a plain write. The reader memory-maps the file and uses the trailing index
   for direct section lookup.

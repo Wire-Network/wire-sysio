@@ -9,7 +9,6 @@
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/permission_object.hpp>
 #include <sysio/chain/wast_to_wasm.hpp>
-#include <sysio/chain/kv_table_objects.hpp>   // kv_index / by_code_key for reading sysio.roa kv tables
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/opp.pb.h>
 #include <sysio/opp/attestations/attestations.pb.h>
@@ -582,13 +581,11 @@ public:
    // Read sysio.roa's kv tables (scoped by network_gen). `nodeowners` proves registration;
    // `nodeownerreg` is the audit row (status / reject_reason).
    fc::variant get_nodeowner(name acc) {
-      const auto& db = control->db();
       auto key = chain::make_kv_scoped_key(ROA_NETWORK_GEN, acc.to_uint64_t());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA_ACCOUNT,
-                  chain::compute_table_id(name("nodeowners").to_uint64_t()), key.to_string_view()));
-      if (it != kv_idx.end() && it->value.size()) {
-         std::vector<char> data(it->value.data(), it->value.data() + it->value.size());
+      const auto row = control->kv().find_row(ROA_ACCOUNT, chain::compute_table_id(name("nodeowners").to_uint64_t()),
+                                              key.to_string_view());
+      if (row && !row->value.empty()) {
+         std::vector<char> data(row->value.begin(), row->value.end());
          return roa_abi.binary_to_variant("nodeowners", data,
             fixture_abi_yield_function());
       }
@@ -596,13 +593,11 @@ public:
    }
 
    fc::variant get_nodeownerreg(name acc) {
-      const auto& db = control->db();
       auto key = chain::make_kv_scoped_key(ROA_NETWORK_GEN, acc.to_uint64_t());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA_ACCOUNT,
-                  chain::compute_table_id(name("nodeownerreg").to_uint64_t()), key.to_string_view()));
-      if (it != kv_idx.end() && it->value.size()) {
-         std::vector<char> data(it->value.data(), it->value.data() + it->value.size());
+      const auto row = control->kv().find_row(ROA_ACCOUNT, chain::compute_table_id(name("nodeownerreg").to_uint64_t()),
+                                              key.to_string_view());
+      if (row && !row->value.empty()) {
+         std::vector<char> data(row->value.begin(), row->value.end());
          return roa_abi.binary_to_variant("nodeownerreg", data,
             fixture_abi_yield_function());
       }
@@ -777,12 +772,13 @@ public:
 
    /// sysio.synd's kv rows of `table`, in key order, as raw values.
    std::vector<std::vector<char>> synd_rows(name table) {
-      const auto& kv_idx   = control->db().get_index<kv_index, by_code_key>();
-      const auto  table_id = compute_table_id(table.to_uint64_t());
+      const auto table_id = compute_table_id(table.to_uint64_t());
       std::vector<std::vector<char>> rows;
-      for (auto itr = kv_idx.lower_bound(boost::make_tuple(SYND_ACCOUNT, table_id, std::string_view{}));
-           itr != kv_idx.end() && itr->code == SYND_ACCOUNT && itr->table_id == table_id; ++itr)
-         rows.emplace_back(itr->value.data(), itr->value.data() + itr->value.size());
+      auto cursor = control->kv().open_row_cursor();
+      chain::kv_row row;
+      for (bool more = cursor->seek_lower({SYND_ACCOUNT, table_id}, row);
+           more && row.code == SYND_ACCOUNT && row.table_id == table_id; more = cursor->next(row))
+         rows.emplace_back(row.value.begin(), row.value.end());
       return rows;
    }
 
@@ -827,7 +823,7 @@ public:
       return decoded;
    }
 
-   /// The sysio.synd actions `trace` executed, in execution order.
+   /// The sysio.synd actions in flat trace order, not the depth-first execution timeline.
    static std::vector<name> synd_actions(const transaction_trace_ptr& trace) {
       std::vector<name> actions;
       for (const auto& at : trace->action_traces)
@@ -1595,11 +1591,12 @@ BOOST_FIXTURE_TEST_CASE(msgch_routes_syndicate_liq_to_synd,
    BOOST_REQUIRE(!trace->except);
    const auto console = all_console(trace);
 
-   // Four onsynd (the malformed one never leaves msgch), then exactly one closeenv, last.
+   // Parent actions precede their inline receipt entries in the flat trace, not execution order.
+   // Only the three accepted intakes emit a receipt; the replay does not.
    const auto actions = synd_actions(trace);
-   BOOST_REQUIRE_EQUAL(5u, actions.size());
-   for (size_t i = 0; i < 4; ++i) BOOST_CHECK_EQUAL("onsynd"_n, actions[i]);
-   BOOST_CHECK_EQUAL("closeenv"_n, actions[4]);
+   const std::vector<name> expected_actions{"onsynd"_n,   "onsynd"_n,    "onsynd"_n,    "onsynd"_n,
+                                            "closeenv"_n, "logintake"_n, "logintake"_n, "logintake"_n};
+   BOOST_REQUIRE_EQUAL_COLLECTIONS(actions.begin(), actions.end(), expected_actions.begin(), expected_actions.end());
    BOOST_CHECK_NE(std::string::npos, console.find("sysio.synd::onsynd: DROP -- replayed sequence"));
 
    // The linked and the unlinked key are held alike; nobody is credited.
@@ -1632,6 +1629,19 @@ BOOST_FIXTURE_TEST_CASE(msgch_routes_syndicate_liq_to_synd,
    BOOST_CHECK_EQUAL(9 * LIQ_UNIT, envelope["synd_total"].as<int64_t>());
    BOOST_CHECK_EQUAL(3u, envelope["item_count"].as<uint32_t>());
    BOOST_CHECK_EQUAL(accepted_envelope_digest(eth), envelope["digest"].as<fc::sha256>());
+
+   const auto receipts = synd_action_data(trace, "logintake"_n);
+   const std::array<uint64_t, 3> sequences{1, 2, 9};
+   BOOST_REQUIRE_EQUAL(receipts.size(), items.size());
+   for (size_t i = 0; i < receipts.size(); ++i) {
+      const auto& receipt = receipts[i]["receipt"];
+      BOOST_CHECK_EQUAL(receipt["item_id"].as_uint64(), items[i]["id"].as_uint64());
+      BOOST_CHECK_EQUAL(receipt["sequence"].as_uint64(), sequences[i]);
+      BOOST_CHECK_EQUAL(receipt["epoch_index"].as_uint64(), epoch);
+      BOOST_CHECK_EQUAL(receipt["digest"].as<fc::sha256>(), accepted_envelope_digest(eth));
+      BOOST_CHECK_EQUAL(receipt["amount"].as_uint64(), items[i]["amount"].as_uint64());
+      BOOST_CHECK(receipt["pubkey"].as<std::vector<char>>() == items[i]["pubkey"].as<std::vector<char>>());
+   }
 
    // Linking the stranger's key later credits nothing at intake: the item stays held.
    create_accounts({"stranger"_n});
@@ -1788,9 +1798,13 @@ BOOST_FIXTURE_TEST_CASE(syndicate_liq_refuses_a_key_of_another_chain_family,
    const auto console = all_console(trace);
 
    const auto actions = synd_actions(trace);
-   BOOST_REQUIRE_EQUAL(2u, actions.size());
+   BOOST_REQUIRE_EQUAL(3u, actions.size());
    BOOST_CHECK_EQUAL("onsynd"_n, actions[0]);
    BOOST_CHECK_EQUAL("closeenv"_n, actions[1]);
+   BOOST_CHECK_EQUAL("logintake"_n, actions[2]);
+   const auto receipts = synd_action_data(trace, "logintake"_n);
+   BOOST_REQUIRE_EQUAL(receipts.size(), 1u);
+   BOOST_CHECK_EQUAL(receipts[0]["receipt"]["sequence"].as_uint64(), 3u);
    const auto items = synd_items();
    BOOST_REQUIRE_EQUAL(1u, items.size());
    BOOST_CHECK(uwrit_op_eth_pubkey == items[0]["pubkey"].as<std::vector<char>>());
@@ -1960,8 +1974,9 @@ BOOST_FIXTURE_TEST_CASE(a_pulled_andon_cord_leaves_deliveries_running, sysio_dis
    BOOST_REQUIRE(trace != nullptr);
    BOOST_REQUIRE(!trace->except);
    const auto actions = synd_actions(trace);
-   BOOST_REQUIRE_EQUAL(3u, actions.size());
-   BOOST_CHECK_EQUAL("closeenv"_n, actions[2]);
+   const std::vector<name> expected_actions{"onsynd"_n, "onsynd"_n, "closeenv"_n, "logintake"_n, "logintake"_n};
+   BOOST_REQUIRE_EQUAL_COLLECTIONS(actions.begin(), actions.end(), expected_actions.begin(), expected_actions.end());
+   BOOST_REQUIRE(synd_action_data(trace, "logrelease"_n).empty());
    BOOST_CHECK_NE(std::string::npos,
                   all_console(trace).find("sysio.synd::queue: the andon cord is pulled; releases, deliveries and "
                                           "burns wait for the clear"));

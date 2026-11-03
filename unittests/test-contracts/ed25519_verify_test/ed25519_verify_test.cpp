@@ -12,17 +12,18 @@ int32_t ed25519_verify(const char* sig, uint32_t sig_len, const char* pub, uint3
                        const char* msg, uint32_t msg_len);
 
 /// Store a marker before the operation that must abort the transaction.
-__attribute__((sysio_wasm_import)) int64_t kv_set(uint32_t table_id, uint64_t payer, const void* key, uint32_t key_size,
-                                                  const void* value, uint32_t value_size);
+__attribute__((sysio_wasm_import)) int32_t kv_set(uint32_t table_id, uint64_t payer, const void* key, uint32_t key_size,
+                                                  const void* value, uint32_t value_size, uint32_t mode);
 
 /// Inspect the marker after rollback without changing state.
 __attribute__((sysio_wasm_import)) int32_t kv_get(uint32_t table_id, uint64_t code, const void* key, uint32_t key_size,
-                                                  void* value, uint32_t value_size);
+                                                  uint32_t offset, void* value, uint32_t value_size);
 }
 
 namespace {
 constexpr int32_t success = 0;
 constexpr int32_t failure = -1;
+constexpr uint32_t kv_upsert = 0;
 constexpr uint32_t signature_buffer = 0;
 constexpr uint32_t key_buffer = 1;
 constexpr uint32_t message_buffer = 2;
@@ -92,7 +93,7 @@ void ed25519_verify_test::badptr(uint32_t buffer) {
 
 void ed25519_verify_test::stress(const ed25519_input& entry) {
    using namespace ed25519_test;
-   kv_set(marker_table, get_self().value, &marker_key, sizeof(marker_key), &marker_value, sizeof(marker_value));
+   (void)kv_set(marker_table, get_self().value, &marker_key, sizeof(marker_key), &marker_value, sizeof(marker_value), kv_upsert);
    sysio::print(ready_message);
    for (uint32_t i = 0; i < stress_count; ++i)
       sysio::check(verify_one(entry) == success, "stress signature must verify");
@@ -102,6 +103,6 @@ void ed25519_verify_test::stress(const ed25519_input& entry) {
 void ed25519_verify_test::clean() {
    using namespace ed25519_test;
    char value = 0;
-   sysio::check(kv_get(marker_table, get_self().value, &marker_key, sizeof(marker_key), &value, sizeof(value)) == -1,
+   sysio::check(kv_get(marker_table, get_self().value, &marker_key, sizeof(marker_key), 0, &value, sizeof(value)) == -1,
                 "timed-out action left a marker");
 }

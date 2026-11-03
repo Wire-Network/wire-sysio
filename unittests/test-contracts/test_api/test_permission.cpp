@@ -1,5 +1,3 @@
-#include <limits>
-
 #include <sysio/action.hpp>
 #include <sysio/sysio.hpp>
 #include <sysio/permission.hpp>
@@ -27,13 +25,12 @@ void test_permission::check_authorization( uint64_t receiver, uint64_t code, uin
    int64_t res64 = sysio::check_permission_authorization( params.account,
                                                      params.permission,
                                                      packed_pubkeys.data(), packed_pubkeys.size(),
-                                                     (const char*)0,        0,
-                                                     microseconds{ 0 }
+                                                     (const char*)0,        0
                                                    );
 
    char key[24];
    make_kv_key(self, self, 1, key);
    // kv_set does upsert — stores if new, updates if exists
-   kv_set( 0, self, key, 24, &res64, sizeof(int64_t) );
+   (void)kv_set( 0, self, key, 24, &res64, sizeof(int64_t), kv_upsert );
 }
 

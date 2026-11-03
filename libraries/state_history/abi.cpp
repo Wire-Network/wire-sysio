@@ -312,16 +312,6 @@ extern const char* const state_history_plugin_abi = R"({
             ]
         },
         {
-            "name": "contract_row_v0", "fields": [
-                { "type": "name", "name": "code" },
-                { "type": "name", "name": "scope" },
-                { "type": "name", "name": "table" },
-                { "type": "uint64", "name": "primary_key" },
-                { "type": "name", "name": "payer" },
-                { "type": "bytes", "name": "value" }
-            ]
-        },
-        {
             "name": "contract_row_kv_v0", "fields": [
                 { "type": "name", "name": "code" },
                 { "type": "name", "name": "payer" },
@@ -658,7 +648,6 @@ extern const char* const state_history_plugin_abi = R"({
         { "name": "account", "types": ["account_v0"] },
         { "name": "account_metadata", "types": ["account_metadata_v0"] },
         { "name": "code", "types": ["code_v0"] },
-        { "name": "contract_row", "types": ["contract_row_v0"] },
         { "name": "contract_row_kv", "types": ["contract_row_kv_v0"] },
         { "name": "contract_index_kv", "types": ["contract_index_kv_v0"] },
         { "name": "chain_config", "types": ["chain_config_v0"] },
@@ -683,9 +672,8 @@ extern const char* const state_history_plugin_abi = R"({
         { "name": "account", "type": "account", "key_names": ["name"] },
         { "name": "account_metadata", "type": "account_metadata", "key_names": ["name"] },
         { "name": "code", "type": "code", "key_names": ["vm_type", "vm_version", "code_hash"] },
-        { "name": "contract_row", "type": "contract_row", "key_names": ["code", "scope", "table", "primary_key"] },
-        { "name": "contract_row_kv", "type": "contract_row_kv", "key_names": ["code", "table_id"] },
-        { "name": "contract_index_kv", "type": "contract_index_kv", "key_names": ["code", "table_id"] },
+        { "name": "contract_row_kv", "type": "contract_row_kv", "key_names": ["code", "table_id", "key"] },
+        { "name": "contract_index_kv", "type": "contract_index_kv", "key_names": ["code", "table_id", "sec_key", "pri_key"] },
         { "name": "global_property", "type": "global_property", "key_names": [] },
         { "name": "generated_transaction", "type": "generated_transaction", "key_names": ["sender", "sender_id"] },
         { "name": "protocol_state", "type": "protocol_state", "key_names": [] },

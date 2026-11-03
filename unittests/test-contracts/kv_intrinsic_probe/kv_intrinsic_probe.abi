@@ -4,6 +4,55 @@
     "types": [],
     "structs": [
         {
+            "name": "abrtchild",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "abrtinline",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "abrtnotify",
+            "base": "",
+            "fields": [
+                {
+                    "name": "notified",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "abrtram",
+            "base": "",
+            "fields": [
+                {
+                    "name": "other",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "abrtramnote",
+            "base": "",
+            "fields": [
+                {
+                    "name": "notified",
+                    "type": "name"
+                },
+                {
+                    "name": "other",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "abrtseed",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "alias",
             "base": "",
             "fields": []
@@ -14,12 +63,27 @@
             "fields": []
         },
         {
+            "name": "badmode",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "bigkey",
             "base": "",
             "fields": []
         },
         {
             "name": "bigpfx",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "bigpfxfind",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "bigpfxidx",
             "base": "",
             "fields": []
         },
@@ -39,17 +103,17 @@
             "fields": []
         },
         {
+            "name": "clearsizes",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "contcns",
             "base": "",
             "fields": []
         },
         {
             "name": "crshdst",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "crshk",
             "base": "",
             "fields": []
         },
@@ -69,17 +133,12 @@
             "fields": []
         },
         {
+            "name": "crshrd",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "crshs",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "crshst",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "crshv",
             "base": "",
             "fields": []
         },
@@ -89,17 +148,17 @@
             "fields": []
         },
         {
-            "name": "crsik",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "crsipk",
+            "name": "crsilb",
             "base": "",
             "fields": []
         },
         {
             "name": "crsiprv",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "crsird",
             "base": "",
             "fields": []
         },
@@ -110,6 +169,41 @@
         },
         {
             "name": "dbldest",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "dupcheck",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "dupclean",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "dupseed",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "dupstore",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "dupupdate",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "dupupdkept",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "emptyindex",
             "base": "",
             "fields": []
         },
@@ -129,7 +223,47 @@
             "fields": []
         },
         {
+            "name": "firstrun",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "firstseed",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "getoffs",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idxminkeep",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idxmoveread",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idxprefix",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idxrekey",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "idxrmmis",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "idxsamekey",
             "base": "",
             "fields": []
         },
@@ -149,6 +283,16 @@
             "fields": []
         },
         {
+            "name": "inlchild2",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "inlpar2",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "inlparnt",
             "base": "",
             "fields": []
@@ -159,12 +303,72 @@
             "fields": []
         },
         {
+            "name": "itlbclamp",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "itlimit",
             "base": "",
             "fields": []
         },
         {
+            "name": "itmoveread",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "itprvbgn",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "itrekey",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "ixalias",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "ixdbldest",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "ixdupkeys",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "ixprvedge",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "ixrdrules",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "ixuaf",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "keyorder",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "lastrun",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "lastseed",
             "base": "",
             "fields": []
         },
@@ -179,7 +383,160 @@
             "fields": []
         },
         {
+            "name": "leakiter",
+            "base": "",
+            "fields": [
+                {
+                    "name": "first",
+                    "type": "name"
+                },
+                {
+                    "name": "second",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "leakuse",
+            "base": "",
+            "fields": [
+                {
+                    "name": "notified",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "leakusesec",
+            "base": "",
+            "fields": [
+                {
+                    "name": "notified",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "limrow",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "value_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "limrowchk",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "value_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "limrowdel",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "limsec",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pri_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "sec_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "limsecchk",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sec_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "limsecdel",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pri_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "sec_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "limsecupd",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pri_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "old_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "new_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "maxok",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "negdst",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "negidst",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "negird",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "negrd",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "nolimit",
             "base": "",
             "fields": []
         },
@@ -189,9 +546,145 @@
             "fields": []
         },
         {
+            "name": "onekey",
+            "base": "",
+            "fields": [
+                {
+                    "name": "table_id",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "onekeymiss",
+            "base": "",
+            "fields": [
+                {
+                    "name": "table_id",
+                    "type": "uint32"
+                },
+                {
+                    "name": "code",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "payclean",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "payerwrite",
+            "base": "",
+            "fields": [
+                {
+                    "name": "write",
+                    "type": "uint32"
+                },
+                {
+                    "name": "payer",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "paymodes",
+            "base": "",
+            "fields": [
+                {
+                    "name": "mode",
+                    "type": "uint32"
+                },
+                {
+                    "name": "exists",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "paysetup",
+            "base": "",
+            "fields": [
+                {
+                    "name": "payer",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "paysize",
+            "base": "",
+            "fields": [
+                {
+                    "name": "size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "paysizeadd",
+            "base": "",
+            "fields": [
+                {
+                    "name": "payer",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "paysizedel",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sec_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "paysizesec",
+            "base": "",
+            "fields": [
+                {
+                    "name": "old_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "new_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "payzero",
             "base": "",
             "fields": []
+        },
+        {
+            "name": "payzeroins",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "pfxmax",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "poolfull",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "poollimit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "call",
+                    "type": "uint32"
+                }
+            ]
         },
         {
             "name": "prixtab",
@@ -204,9 +697,234 @@
             "fields": []
         },
         {
+            "name": "prvempty",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "prverased",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "prvnosucc",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "rdinoverlap",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "rdnullsz",
+            "base": "",
+            "fields": [
+                {
+                    "name": "call",
+                    "type": "uint32"
+                },
+                {
+                    "name": "which",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "rdoutoverlap",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "rdoverlap",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "rdrules",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "rdsizeptr",
+            "base": "",
+            "fields": [
+                {
+                    "name": "addr",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "secilim",
             "base": "",
             "fields": []
+        },
+        {
+            "name": "sizedidx",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sec_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "pri_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "sizedidxpay",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sec_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "pri_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "payer",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "sizedidxrm",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sec_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "pri_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "sizedidxup",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sec_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "pri_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "new_sec_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "sizedrow",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "value_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "sizedrowrm",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "sizeentry",
+            "base": "",
+            "fields": [
+                {
+                    "name": "seed",
+                    "type": "uint32"
+                },
+                {
+                    "name": "sec_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "pri_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "sizeptrs",
+            "base": "",
+            "fields": [
+                {
+                    "name": "read",
+                    "type": "uint32"
+                },
+                {
+                    "name": "first",
+                    "type": "uint32"
+                },
+                {
+                    "name": "second",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "sizerow",
+            "base": "",
+            "fields": [
+                {
+                    "name": "seed",
+                    "type": "uint32"
+                },
+                {
+                    "name": "key_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "value_size",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "slotreuse",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "storeatend",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "tidbad",
+            "base": "",
+            "fields": [
+                {
+                    "name": "call",
+                    "type": "uint32"
+                },
+                {
+                    "name": "table_id",
+                    "type": "uint32"
+                }
+            ]
         },
         {
             "name": "tidmax",
@@ -214,7 +932,47 @@
             "fields": []
         },
         {
+            "name": "tidtop",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "twoslots",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "uaf",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "updedges",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "updsamekey",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "wrstatus",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "xciter",
+            "base": "",
+            "fields": [
+                {
+                    "name": "other",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "xcseed",
             "base": "",
             "fields": []
         },
@@ -229,7 +987,22 @@
             "fields": []
         },
         {
+            "name": "zprikey",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "zpriupd",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "zseckey",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "zsecupd",
             "base": "",
             "fields": []
         },
@@ -241,6 +1014,36 @@
     ],
     "actions": [
         {
+            "name": "abrtchild",
+            "type": "abrtchild",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "abrtinline",
+            "type": "abrtinline",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "abrtnotify",
+            "type": "abrtnotify",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "abrtram",
+            "type": "abrtram",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "abrtramnote",
+            "type": "abrtramnote",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "abrtseed",
+            "type": "abrtseed",
+            "ricardian_contract": ""
+        },
+        {
             "name": "alias",
             "type": "alias",
             "ricardian_contract": ""
@@ -251,6 +1054,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "badmode",
+            "type": "badmode",
+            "ricardian_contract": ""
+        },
+        {
             "name": "bigkey",
             "type": "bigkey",
             "ricardian_contract": ""
@@ -258,6 +1066,16 @@
         {
             "name": "bigpfx",
             "type": "bigpfx",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "bigpfxfind",
+            "type": "bigpfxfind",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "bigpfxidx",
+            "type": "bigpfxidx",
             "ricardian_contract": ""
         },
         {
@@ -276,6 +1094,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "clearsizes",
+            "type": "clearsizes",
+            "ricardian_contract": ""
+        },
+        {
             "name": "contcns",
             "type": "contcns",
             "ricardian_contract": ""
@@ -283,11 +1106,6 @@
         {
             "name": "crshdst",
             "type": "crshdst",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "crshk",
-            "type": "crshk",
             "ricardian_contract": ""
         },
         {
@@ -306,18 +1124,13 @@
             "ricardian_contract": ""
         },
         {
+            "name": "crshrd",
+            "type": "crshrd",
+            "ricardian_contract": ""
+        },
+        {
             "name": "crshs",
             "type": "crshs",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "crshst",
-            "type": "crshst",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "crshv",
-            "type": "crshv",
             "ricardian_contract": ""
         },
         {
@@ -326,18 +1139,18 @@
             "ricardian_contract": ""
         },
         {
-            "name": "crsik",
-            "type": "crsik",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "crsipk",
-            "type": "crsipk",
+            "name": "crsilb",
+            "type": "crsilb",
             "ricardian_contract": ""
         },
         {
             "name": "crsiprv",
             "type": "crsiprv",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "crsird",
+            "type": "crsird",
             "ricardian_contract": ""
         },
         {
@@ -348,6 +1161,41 @@
         {
             "name": "dbldest",
             "type": "dbldest",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "dupcheck",
+            "type": "dupcheck",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "dupclean",
+            "type": "dupclean",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "dupseed",
+            "type": "dupseed",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "dupstore",
+            "type": "dupstore",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "dupupdate",
+            "type": "dupupdate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "dupupdkept",
+            "type": "dupupdkept",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "emptyindex",
+            "type": "emptyindex",
             "ricardian_contract": ""
         },
         {
@@ -366,8 +1214,48 @@
             "ricardian_contract": ""
         },
         {
+            "name": "firstrun",
+            "type": "firstrun",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "firstseed",
+            "type": "firstseed",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "getoffs",
+            "type": "getoffs",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "idxminkeep",
+            "type": "idxminkeep",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "idxmoveread",
+            "type": "idxmoveread",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "idxprefix",
+            "type": "idxprefix",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "idxrekey",
+            "type": "idxrekey",
+            "ricardian_contract": ""
+        },
+        {
             "name": "idxrmmis",
             "type": "idxrmmis",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "idxsamekey",
+            "type": "idxsamekey",
             "ricardian_contract": ""
         },
         {
@@ -386,6 +1274,16 @@
             "ricardian_contract": ""
         },
         {
+            "name": "inlchild2",
+            "type": "inlchild2",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "inlpar2",
+            "type": "inlpar2",
+            "ricardian_contract": ""
+        },
+        {
             "name": "inlparnt",
             "type": "inlparnt",
             "ricardian_contract": ""
@@ -396,13 +1294,73 @@
             "ricardian_contract": ""
         },
         {
+            "name": "itlbclamp",
+            "type": "itlbclamp",
+            "ricardian_contract": ""
+        },
+        {
             "name": "itlimit",
             "type": "itlimit",
             "ricardian_contract": ""
         },
         {
+            "name": "itmoveread",
+            "type": "itmoveread",
+            "ricardian_contract": ""
+        },
+        {
             "name": "itprvbgn",
             "type": "itprvbgn",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "itrekey",
+            "type": "itrekey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ixalias",
+            "type": "ixalias",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ixdbldest",
+            "type": "ixdbldest",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ixdupkeys",
+            "type": "ixdupkeys",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ixprvedge",
+            "type": "ixprvedge",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ixrdrules",
+            "type": "ixrdrules",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "ixuaf",
+            "type": "ixuaf",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "keyorder",
+            "type": "keyorder",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "lastrun",
+            "type": "lastrun",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "lastseed",
+            "type": "lastseed",
             "ricardian_contract": ""
         },
         {
@@ -416,8 +1374,83 @@
             "ricardian_contract": ""
         },
         {
+            "name": "leakiter",
+            "type": "leakiter",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "leakuse",
+            "type": "leakuse",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "leakusesec",
+            "type": "leakusesec",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "limrow",
+            "type": "limrow",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "limrowchk",
+            "type": "limrowchk",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "limrowdel",
+            "type": "limrowdel",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "limsec",
+            "type": "limsec",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "limsecchk",
+            "type": "limsecchk",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "limsecdel",
+            "type": "limsecdel",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "limsecupd",
+            "type": "limsecupd",
+            "ricardian_contract": ""
+        },
+        {
             "name": "maxok",
             "type": "maxok",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "negdst",
+            "type": "negdst",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "negidst",
+            "type": "negidst",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "negird",
+            "type": "negird",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "negrd",
+            "type": "negrd",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "nolimit",
+            "type": "nolimit",
             "ricardian_contract": ""
         },
         {
@@ -426,8 +1459,78 @@
             "ricardian_contract": ""
         },
         {
+            "name": "onekey",
+            "type": "onekey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "onekeymiss",
+            "type": "onekeymiss",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "payclean",
+            "type": "payclean",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "payerwrite",
+            "type": "payerwrite",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "paymodes",
+            "type": "paymodes",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "paysetup",
+            "type": "paysetup",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "paysize",
+            "type": "paysize",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "paysizeadd",
+            "type": "paysizeadd",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "paysizedel",
+            "type": "paysizedel",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "paysizesec",
+            "type": "paysizesec",
+            "ricardian_contract": ""
+        },
+        {
             "name": "payzero",
             "type": "payzero",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "payzeroins",
+            "type": "payzeroins",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "pfxmax",
+            "type": "pfxmax",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "poolfull",
+            "type": "poolfull",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "poollimit",
+            "type": "poollimit",
             "ricardian_contract": ""
         },
         {
@@ -441,8 +1544,113 @@
             "ricardian_contract": ""
         },
         {
+            "name": "prvempty",
+            "type": "prvempty",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "prverased",
+            "type": "prverased",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "prvnosucc",
+            "type": "prvnosucc",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "rdinoverlap",
+            "type": "rdinoverlap",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "rdnullsz",
+            "type": "rdnullsz",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "rdoutoverlap",
+            "type": "rdoutoverlap",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "rdoverlap",
+            "type": "rdoverlap",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "rdrules",
+            "type": "rdrules",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "rdsizeptr",
+            "type": "rdsizeptr",
+            "ricardian_contract": ""
+        },
+        {
             "name": "secilim",
             "type": "secilim",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sizedidx",
+            "type": "sizedidx",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sizedidxpay",
+            "type": "sizedidxpay",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sizedidxrm",
+            "type": "sizedidxrm",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sizedidxup",
+            "type": "sizedidxup",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sizedrow",
+            "type": "sizedrow",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sizedrowrm",
+            "type": "sizedrowrm",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sizeentry",
+            "type": "sizeentry",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sizeptrs",
+            "type": "sizeptrs",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "sizerow",
+            "type": "sizerow",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "slotreuse",
+            "type": "slotreuse",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "storeatend",
+            "type": "storeatend",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tidbad",
+            "type": "tidbad",
             "ricardian_contract": ""
         },
         {
@@ -451,8 +1659,43 @@
             "ricardian_contract": ""
         },
         {
+            "name": "tidtop",
+            "type": "tidtop",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "twoslots",
+            "type": "twoslots",
+            "ricardian_contract": ""
+        },
+        {
             "name": "uaf",
             "type": "uaf",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "updedges",
+            "type": "updedges",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "updsamekey",
+            "type": "updsamekey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "wrstatus",
+            "type": "wrstatus",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "xciter",
+            "type": "xciter",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "xcseed",
+            "type": "xcseed",
             "ricardian_contract": ""
         },
         {
@@ -466,8 +1709,23 @@
             "ricardian_contract": ""
         },
         {
+            "name": "zprikey",
+            "type": "zprikey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "zpriupd",
+            "type": "zpriupd",
+            "ricardian_contract": ""
+        },
+        {
             "name": "zseckey",
             "type": "zseckey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "zsecupd",
+            "type": "zsecupd",
             "ricardian_contract": ""
         },
         {

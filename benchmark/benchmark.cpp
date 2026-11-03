@@ -17,7 +17,12 @@ std::map<std::string, std::function<void()>> features {
    { "blake2", blake2_benchmarking },
    { "bls", bls_benchmarking },
    { "merkle", merkle_benchmarking },
-   { "auth", auth_benchmarking }
+   { "auth", auth_benchmarking },
+   { "kv_chainbase", kv_chainbase_benchmarking },
+   { "kv_contract", kv_contract_benchmarking },
+   { "kv_token", kv_token_benchmarking },
+   { "kv_ops", kv_ops_benchmarking },
+   { "kv_table", kv_table_benchmarking }
 };
 
 // values to control cout format
@@ -27,6 +32,13 @@ constexpr auto time_width = 12;
 constexpr auto ns_width = 2;
 
 uint32_t num_runs = 1;
+std::vector<uint32_t> kv_rows = {100'000};
+chain::wasm_interface::vm_type wasm_runtime =
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+   chain::wasm_interface::vm_type::sys_vm_oc;
+#else
+   chain::wasm_interface::vm_type::sys_vm;
+#endif
 
 std::map<std::string, std::function<void()>> get_features() {
    return features;
@@ -38,6 +50,22 @@ void set_num_runs(uint32_t runs) {
 
 uint32_t get_num_runs() {
    return num_runs;
+}
+
+void set_kv_rows(std::vector<uint32_t> rows) {
+   kv_rows = std::move(rows);
+}
+
+const std::vector<uint32_t>& get_kv_rows() {
+   return kv_rows;
+}
+
+void set_wasm_runtime(chain::wasm_interface::vm_type runtime) {
+   wasm_runtime = runtime;
+}
+
+chain::wasm_interface::vm_type get_wasm_runtime() {
+   return wasm_runtime;
 }
 
 void print_header() {

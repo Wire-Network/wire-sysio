@@ -27,7 +27,6 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
-#include <sysio/chain/kv_table_objects.hpp>   // kv_index / kv_index_index for the envelopes retention walk
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/opp.pb.h>
 
@@ -720,15 +719,15 @@ public:
    }
 
    /// Every row of `code`'s `table` in primary-key order, decoded as `abi_type`. Read straight from
-   /// chainbase so the walk does not depend on ids staying inside a fixed probe range.
+   /// the KV store so the walk does not depend on ids staying inside a fixed probe range.
    std::vector<fc::variant> table_rows(name code, name table, const abi_serializer& abi, const char* abi_type) {
-      const auto  table_id = compute_table_id(table.to_uint64_t());
-      const auto& kv_idx   = control->db().get_index<kv_index, by_code_key>();
+      const auto table_id = compute_table_id(table.to_uint64_t());
       std::vector<fc::variant> rows;
-      for (auto itr = kv_idx.lower_bound(boost::make_tuple(code, table_id, std::string_view{}));
-           itr != kv_idx.end() && itr->code == code && itr->table_id == table_id; ++itr) {
-         std::vector<char> raw(itr->value.size());
-         if (!raw.empty()) std::memcpy(raw.data(), itr->value.data(), raw.size());
+      auto cursor = control->kv().open_row_cursor();
+      chain::kv_row row;
+      for (bool more = cursor->seek_lower({code, table_id}, row);
+           more && row.code == code && row.table_id == table_id; more = cursor->next(row)) {
+         const std::vector<char> raw(row.value.begin(), row.value.end());
          rows.push_back(abi.binary_to_variant(abi_type, raw, fixture_abi_yield_function()));
       }
       return rows;
@@ -753,10 +752,11 @@ public:
    size_t envelope_index_entries() {
       const auto  table_id = compute_sec_table_id(msgch_tables::ENVELOPES.to_uint64_t(),
                                                   msgch_indexes::BY_OUTPOST_EPOCH.to_uint64_t());
-      const auto& idx = control->db().get_index<kv_index_index, by_code_table_id_seckey>();
       size_t n = 0;
-      for (auto itr = idx.lower_bound(boost::make_tuple(MSGCH_ACCOUNT, table_id));
-           itr != idx.end() && itr->code == MSGCH_ACCOUNT && itr->table_id == table_id; ++itr) {
+      auto cursor = control->kv().open_index_cursor();
+      chain::kv_index_entry entry;
+      for (bool more = cursor->seek_lower({MSGCH_ACCOUNT, table_id}, entry);
+           more && entry.code == MSGCH_ACCOUNT && entry.table_id == table_id; more = cursor->next(entry)) {
          ++n;
       }
       return n;

@@ -1,4 +1,5 @@
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/account_object.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/testing/tester.hpp>
@@ -11,6 +12,7 @@
 #include <test_contracts.hpp>
 
 #include "fork_test_utilities.hpp"
+#include "kv_write_driver.hpp"
 
 using namespace sysio::chain;
 using namespace sysio::testing;
@@ -680,8 +682,7 @@ BOOST_AUTO_TEST_CASE( get_sender_test ) { try {
    );
 } FC_LOG_AND_RETHROW() }
 
-// KV billing: RAM is always charged to the contract (receiver) account.
-// The payer argument in kv_multi_index is accepted for API compat but ignored.
+// KV billing: kv_multi_index passes its payer argument through to the host, which bills that account.
 // This test verifies data can be moved between tables with RAM billed to the contract.
 BOOST_AUTO_TEST_CASE(move_my_ram) {
    try {
@@ -876,11 +877,12 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
 /***
  * Test that ram resource limits are enforced under KV billing with ROA.
  *
- * KV billing: RAM is always charged to the contract (receiver) account, regardless of
- * the payer argument passed by the contract.  This test verifies:
- *  - A contract with insufficient RAM cannot store data.
- *  - After expanding the contract's ROA policy, storage succeeds.
- *  - Notification-based storage also bills the notified contract.
+ * KV bills the payer the contract names, and validate_account_ram_deltas decides who it may name.
+ * This test verifies:
+ *  - A contract cannot grow the RAM of an account that has not authorized the action.
+ *  - A notified contract cannot grow another account's RAM, even one that authorized the action.
+ *  - An account that authorizes the action can pay for new data itself.
+ *  - The receiver can take over payment, even within a notification, if it has the RAM.
  */
 BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    tester c( setup_policy::full );
@@ -1089,7 +1091,7 @@ BOOST_AUTO_TEST_CASE( kv_roa_limit_enforcement ) { try {
    const auto& alice_account = account_name("alice");
 
    c.create_accounts( {tester1_account, alice_account}, false, true, false );
-   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0986 SYS", 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.1100 SYS", 0, 0);
    // Give alice a small RAM quota — enough for small data but not large
    c.add_roa_policy(c.NODE_DADDY, alice_account, "1.0000 SYS", "1.0000 SYS", "0.0100 SYS", 0, 0);
    c.produce_block();
@@ -1113,6 +1115,83 @@ BOOST_AUTO_TEST_CASE( kv_roa_limit_enforcement ) { try {
       fc_exception_message_contains("has insufficient ram")
    );
 
+} FC_LOG_AND_RETHROW() }
+
+// The RAM limit on the two index writes that can grow a payer. The check runs at the end of the transaction, on what the
+// account then holds, so filling the quota to the byte passes and one byte more does not.
+BOOST_AUTO_TEST_CASE( kv_roa_limit_on_index_writes ) { try {
+   using namespace kv_write_driver;
+   constexpr uint16_t table = 1;
+   const account_name writer = "kvwriter"_n;
+   const account_name payer  = "kvpayer"_n;
+
+   tester c( setup_policy::full );
+   c.produce_block();
+   c.create_accounts( {writer, payer}, false, true, false );
+   c.add_roa_policy(c.NODE_DADDY, writer, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, payer, "1.0000 SYS", "1.0000 SYS", "0.0100 SYS", 0, 0);
+   c.produce_block();
+   c.set_code( writer, kv_write_wast );
+   c.produce_block();
+
+   const auto room = [&] {
+      int64_t ram_limit = 0, net_limit = 0, cpu_limit = 0;
+      const auto& limits = c.control->get_resource_limits_manager();
+      limits.get_account_limits(payer, ram_limit, net_limit, cpu_limit);
+      return ram_limit - limits.get_account_ram_usage(payer);
+   };
+
+   // Entries of a known size, up to a last one that leaves 10 bytes.
+   constexpr int64_t entry_overhead = config::kv_index_entry_overhead_ram_bytes;
+   constexpr int64_t pri_size = 8, fill_sec_size = 80, spare = 10;
+   uint32_t filled = 0;
+   const auto pri_key = [](uint32_t i) { return std::to_string(10'000'000 + i); }; // 8 digits
+   for (; room() > 340; ++filled) {
+      push_kv_writes(c, writer, {store_entry(table, payer, pri_key(filled), std::string(fill_sec_size, 'a'))});
+   }
+   const auto last_sec_size = room() - pri_size - entry_overhead - spare;
+   const std::string last_sec(last_sec_size, 'b');
+   push_kv_writes(c, writer, {store_entry(table, payer, pri_key(filled), last_sec)});
+   c.produce_block();
+   BOOST_REQUIRE_EQUAL(room(), spare);
+
+   // Past the quota, by an update that grows and by a new entry.
+   const std::string one_too_many(last_sec_size + spare + 1, 'b');
+   BOOST_REQUIRE_EXCEPTION(push_kv_writes(c, writer, {update_entry(table, payer, pri_key(filled), last_sec, one_too_many)}),
+                           ram_usage_exceeded, fc_exception_message_contains("has insufficient ram"));
+   BOOST_REQUIRE_EXCEPTION(push_kv_writes(c, writer, {store_entry(table, payer, pri_key(filled + 1), "s")}),
+                           ram_usage_exceeded, fc_exception_message_contains("has insufficient ram"));
+   BOOST_REQUIRE_EQUAL(room(), spare);
+
+   // The quota itself is allowed.
+   push_kv_writes(c, writer, {update_entry(table, payer, pri_key(filled), last_sec, one_too_many.substr(1))});
+   BOOST_REQUIRE_EQUAL(room(), 0);
+} FC_LOG_AND_RETHROW() }
+
+// A payer has to be an account, or there is nothing to bill. Payer 0 is a separate case, refused by the call.
+BOOST_AUTO_TEST_CASE( kv_payer_with_no_account_aborts ) { try {
+   using namespace kv_write_driver;
+   constexpr uint16_t table = 1;
+   const account_name writer = "kvwriter"_n;
+   const account_name nobody = "nobody"_n;
+
+   tester c( setup_policy::full );
+   c.produce_block();
+   c.create_accounts( {writer}, false, true, false );
+   c.add_roa_policy(c.NODE_DADDY, writer, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   c.produce_block();
+   c.set_code( writer, kv_write_wast );
+   c.produce_block();
+   const auto* account = c.control->db().find<account_object,by_name>(nobody);
+   BOOST_REQUIRE(account == nullptr);
+
+   // The check on a new row or entry runs after the write, so the abort has to undo it.
+   const auto before = kv_state_of(c, {writer});
+   BOOST_CHECK_EXCEPTION(push_kv_writes(c, writer, {set_row(table, nobody, "key", "value")}, payers::do_not_authorize),
+                         invalid_table_payer, fc_exception_message_contains("is not an account"));
+   BOOST_CHECK_EXCEPTION(push_kv_writes(c, writer, {store_entry(table, nobody, "pk", "sec")}, payers::do_not_authorize),
+                         invalid_table_payer, fc_exception_message_contains("is not an account"));
+   check_same_kv_state(kv_state_of(c, {writer}), before);
 } FC_LOG_AND_RETHROW() }
 
 // Privileged sysio.* contract bypasses payer authorization.
@@ -1148,7 +1227,7 @@ BOOST_AUTO_TEST_CASE( privileged_kv_payer_bypass ) { try {
    // Non-sysio privileged contract still requires sysio.payer auth
    const auto& priv2_account = account_name("privtest");
    c.create_accounts( {priv2_account}, false, true, false );
-   c.add_roa_policy(c.NODE_DADDY, priv2_account, "1.0000 SYS", "1.0000 SYS", "0.0986 SYS", 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, priv2_account, "1.0000 SYS", "1.0000 SYS", "0.1100 SYS", 0, 0);
    c.produce_block();
    c.set_code( priv2_account, test_contracts::ram_restrictions_test_wasm() );
    c.set_abi( priv2_account, test_contracts::ram_restrictions_test_abi() );
@@ -1167,13 +1246,59 @@ BOOST_AUTO_TEST_CASE( privileged_kv_payer_bypass ) { try {
 
 } FC_LOG_AND_RETHROW() }
 
+// `sysio` among an action's authorizers waives sysio.payer for the account billed. The receiver here is unprivileged, so
+// neither of the privileged exemptions applies, and the payer still has to authorize the action.
+BOOST_AUTO_TEST_CASE( kv_sysio_actor_waives_sysio_payer_permission ) { try {
+   using namespace kv_write_driver;
+   constexpr uint16_t table = 1;
+   constexpr uint32_t row_overhead = 112;
+   const account_name writer = "kvwriter"_n;
+   const account_name alice = "alice"_n;
+   const std::string key = "key", second_key = "yek", value = "value";
+   const permission_level alice_active{alice, config::active_name};
+   const permission_level sysio_active{config::system_account_name, config::active_name};
+
+   tester c( setup_policy::full );
+   c.produce_block();
+   c.create_accounts( {writer, alice}, false, true, false );
+   c.add_roa_policy(c.NODE_DADDY, writer, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, alice, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   c.produce_block();
+   c.set_code( writer, kv_write_wast );
+   c.produce_block();
+
+   const auto bill_alice = [&](const std::string& row_key, const std::vector<permission_level>& auths) {
+      signed_transaction trx;
+      trx.actions.emplace_back(auths, writer, "write"_n, pack_kv_write(set_row(table, alice, row_key, value)));
+      c.set_transaction_headers(trx);
+      for (const auto& auth : auths) trx.sign(c.get_private_key(auth.actor, "active"), c.get_chain_id());
+      c.push_transaction(trx);
+   };
+
+   // Her active permission lets the receiver grow her RAM, and on its own it does not stand in for sysio.payer.
+   const auto before = kv_state_of(c, {alice});
+   BOOST_CHECK_EXCEPTION(bill_alice(key, {alice_active}), unsatisfied_authorization,
+                         fc_exception_message_contains("Requested payer alice did not authorize payment"));
+   check_same_kv_state(kv_state_of(c, {alice}), before);
+
+   // With sysio authorizing as well, in either position, the same write goes through and bills her.
+   bill_alice(key, {alice_active, sysio_active});
+   bill_alice(second_key, {sysio_active, alice_active});
+   const auto after = kv_state_of(c, {writer, alice});
+   BOOST_REQUIRE_EQUAL(after.rows.size(), 2u);
+   BOOST_CHECK_EQUAL(after.rows[0].payer, alice);
+   BOOST_CHECK_EQUAL(after.rows[1].payer, alice);
+   BOOST_CHECK_EQUAL(after.usage[1].usage, before.usage[0].usage + 2 * (key.size() + value.size() + row_overhead));
+} FC_LOG_AND_RETHROW() }
+
 /***
  * Test KV RAM billing without ROA (unlimited RAM).
  *
- * KV billing: RAM is always charged to the contract (receiver) account regardless of the
- * payer argument.  Without ROA all accounts have unlimited RAM, so all operations succeed.
- * This test verifies that data can be stored, moved between tables, and stored via
- * notification — with RAM always charged to the respective contract.
+ * KV bills the payer the contract names, and validate_account_ram_deltas decides who it may name.
+ * Without ROA no account runs out of RAM, so this test pins that check alone. It verifies that
+ * growing another account's RAM is refused without its authorization and within a notification,
+ * that moving data without growing the payer's RAM is allowed, and that the receiver can take
+ * over payment.
  */
 BOOST_AUTO_TEST_CASE( ram_restrictions_test ) { try {
    tester c( setup_policy::preactivate_feature_and_new_bios );

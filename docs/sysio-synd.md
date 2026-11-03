@@ -515,14 +515,14 @@ Repeated freezes cannot raise capacity beyond that cap.
 | `syndconfig` | outpost, token | the pair's rules (below) |
 | `envelopes` | outpost, token, depot epoch | digest, syndicated and yield totals, item count, state, `sysio.bond` request id, released, burned, the request's recorded outcome, and the forfeit and returned bounty snapshotted on INVALID |
 | `items` | envelope, then id (arrival order) | kind, beneficiary key family and pubkey, amount, remaining, yield position |
-| `parked` | token, key family, pubkey | balance and yield position of an unlinked pubkey |
+| `parked` | token, key family, pubkey | balance, yield position, active principal batch id and unattributed imported principal of an unlinked pubkey |
 | `buckets` | outpost, token, direction | level and the depot epoch last ticked, one per direction (SYNDICATION, DESYNDICATION) |
 | `ledger` | outpost, token | release and underwriting cursors; `retained_from_epoch` replay floor |
 | `returns` | request id | original holder, destination family/key, outpost, token and exact net burned amount; erased upon explicit resolution |
 | `feepot` | token | collected fees, with a yield position; bounties are paid from it, and its yield goes to `sysio` |
 | `yieldpool` | token | the WIRE `sysio.synd`'s holder row earned, pulled from `sysio.liq` and credited out to held, parked and fee positions |
 | `syndcursors` | outpost | the highest sequence admitted (replay guard) |
-| `syndcounters` | singleton | the next item id and the next desyndication request id |
+| `syndcounters` | singleton | the next item, desyndication request and parked principal batch ids |
 | `syndstate` | singleton | whether the launch import is closed; the pair the next queue step starts at |
 | `mismatch` | outpost, token | latest unresolved shortfall evidence: epoch, sequence, kind, reported custody, expected outstanding, and time |
 
@@ -638,3 +638,36 @@ Reconciliation still requires full backing, even when the pair permits small sho
 
 Existing deployed tables require a coordinated migration for the changed layouts and renamed return
 table; no automatic migration or recovery from previously discarded data is included.
+
+## Delivery receipts
+
+Authenticated self-inline actions join each accepted source message to its principal movement:
+
+| Receipt | Meaning |
+|---|---|
+| `logintake(receipt)` | Accepted outpost, token, epoch, digest and sequence → item id, beneficiary key and gross principal. Rejected and replayed messages emit none. |
+| `logrelease(receipt)` | Item id → gross, fee, net, remaining and actual account, parked batch id, or `FEE_ONLY`. Each positive tranche emits separately. |
+| `logparked(receipt)` | Principal batch → actual recipient, total principal and unattributed imported principal. WIRE yield is separate. |
+| `logburn(receipt)` | Outpost, token, epoch and digest → terminal invalidation. Emitted after all held items are removed by an INVALID ruling or `dropenv`; earlier releases are not reversed. |
+
+Match the source transaction through the existing outpost/envelope evidence, then follow its
+`logintake` item id through each `logrelease`. A direct release shares its transaction with
+`sysio.liq::settle`. A PARKED release is not wallet delivery: join its batch id to `logparked`.
+Sum the exact net tranches and require zero remaining principal before declaring full delivery.
+A `logburn` closes the unreleased remainder, including when the last release had nonzero
+`remaining`. Previously parked tranches still require their batch payout receipt. A 100% fee is
+`FEE_ONLY`, never a wallet credit.
+
+Each parked row holds one active principal batch. Imports increase `unattributed` without being
+assigned to a live intake. Principal payout resets the batch even if unpaid WIRE yield retains the
+row; later principal gets a fresh id from `syndcounters`. No permanent per-deposit history is stored.
+
+Read only successful irreversible traces with `sysio.synd` as both action account and receiver,
+using the deployed ABI. Failed transactions roll back receipts and movement together. The actions
+require the contract's authority and immediate self-inline sender and notify no external account.
+Correlate identities rather than flat action-array order. Delivery does not establish underwriting
+challenge finality, which remains the envelope's separate lifecycle.
+
+Receipt history requires retained transaction traces; pruned operational rows cannot replace it.
+Missing history leaves correlation unknown. The `parked` and `syndcounters` layouts require a fresh
+deployment or a coordinated state migration.
