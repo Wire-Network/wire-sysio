@@ -1536,8 +1536,13 @@ void opreg::termcheck(name account) {
    opconfig_t cfg_tbl(get_self());
    const auto cfg = cfg_tbl.get_or_default(op_config{});
 
+   // Both rails read only the current registration: a re-registered account's earlier rows stay
+   // in the log until they age out. They start after the registration's own second, because
+   // `current_time_ms` has second resolution and the block that terminated the previous
+   // registration can share it. A return to ACTIVE within a registration resets neither rail,
+   // so a cancelled withdrawal cannot clear the misses recorded while the operator was UNKNOWN.
    uint64_t now_ms      = current_time_ms();
-   uint64_t window_open = termination_window_open_ms(now_ms, cfg);
+   uint64_t window_open = std::max(termination_window_open_ms(now_ms, cfg), op.registered_at + 1);
 
    dellog_t log(get_self());
    auto idx = log.get_index<"byaccountts"_n>();
@@ -1553,8 +1558,6 @@ void opreg::termcheck(name account) {
       total_in_window++;
       if (!it->delivered) total_misses++;
 
-      // A return to ACTIVE does not restart the run: a cancelled withdrawal would otherwise
-      // clear every miss recorded while the operator was UNKNOWN.
       if (!it->delivered) {
          consecutive_misses++;
          if (consecutive_misses > worst_consecutive) worst_consecutive = consecutive_misses;

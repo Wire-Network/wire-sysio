@@ -263,10 +263,10 @@ namespace sysio {
       /// Terminate the operator inline when its rolling buffer holds more than
       /// `terminate_max_consecutive_misses` consecutive misses, or a
       /// whole-percent miss rate (rounded down) above
-      /// `terminate_max_pct_misses_24h`. Both rails count duty epochs, and a
-      /// return to ACTIVE does not reset either one. ACTIVE and UNKNOWN
-      /// operators are both evaluated. Called by `sysio.epoch::advance` after
-      /// every `recorddel`.
+      /// `terminate_max_pct_misses_24h`. Both rails count duty epochs recorded
+      /// after the second of the operator's current registration, and a return
+      /// to ACTIVE does not reset either one. ACTIVE and UNKNOWN operators are both
+      /// evaluated. Called by `sysio.epoch::advance` after every `recorddel`.
       [[sysio::action]]
       void termcheck(name account);
 
