@@ -494,7 +494,9 @@ namespace sysio { namespace chain {
 
          virtual signed_block_ptr                   read_block_by_num(uint32_t block_num)        = 0;
          virtual std::vector<char>                  read_serialized_block_by_num(uint32_t block_num) = 0;
-         virtual std::vector<std::vector<char>>     read_serialized_blocks_by_num(uint32_t first_block_num, uint32_t count) = 0;
+         /// Batch read; every block passes `budget` before it is read.
+         virtual std::vector<std::vector<char>>     read_serialized_blocks_by_num(uint32_t first_block_num, uint32_t count,
+                                                                                  serialized_block_batch_budget& budget) = 0;
          virtual std::optional<signed_block_header> read_block_header_by_num(uint32_t block_num) = 0;
 
          virtual uint32_t version() const = 0;
@@ -532,7 +534,7 @@ namespace sysio { namespace chain {
 
          signed_block_ptr read_block_by_num(uint32_t block_num) final { return {}; };
          std::vector<char> read_serialized_block_by_num(uint32_t block_num) final { return {}; };
-         std::vector<std::vector<char>> read_serialized_blocks_by_num(uint32_t, uint32_t) final { return {}; };
+         std::vector<std::vector<char>> read_serialized_blocks_by_num(uint32_t, uint32_t, serialized_block_batch_budget&) final { return {}; };
          std::optional<signed_block_header> read_block_header_by_num(uint32_t block_num) final { return {}; };
 
          uint32_t         version() const final { return 0; }
@@ -576,7 +578,8 @@ namespace sysio { namespace chain {
          virtual void             post_append(uint64_t pos) {}
          virtual signed_block_ptr retry_read_block_by_num(uint32_t block_num) { return {}; }
          virtual std::vector<char> retry_read_serialized_block_by_num(uint32_t block_num) { return {}; }
-         virtual std::vector<std::vector<char>> retry_read_serialized_blocks_by_num(uint32_t first_block_num, uint32_t count) { return {}; }
+         virtual std::vector<std::vector<char>> retry_read_serialized_blocks_by_num(uint32_t first_block_num, uint32_t count,
+                                                                                    serialized_block_batch_budget& budget) { return {}; }
          virtual std::optional<signed_block_header> retry_read_block_header_by_num(uint32_t block_num) { return {}; }
 
          void append(const signed_block_ptr& b, const block_id_type& id,
@@ -682,7 +685,8 @@ namespace sysio { namespace chain {
             FC_LOG_AND_RETHROW()
          }
 
-         std::vector<std::vector<char>> read_serialized_blocks_by_num(uint32_t first_block_num, uint32_t count) final {
+         std::vector<std::vector<char>> read_serialized_blocks_by_num(uint32_t first_block_num, uint32_t count,
+                                                                      serialized_block_batch_budget& budget) final {
             if (count == 0)
                return {};
 
@@ -691,7 +695,7 @@ namespace sysio { namespace chain {
                result.reserve(count);
 
                if (!head)
-                  return retry_read_serialized_blocks_by_num(first_block_num, count);
+                  return retry_read_serialized_blocks_by_num(first_block_num, count, budget);
 
                const uint32_t last_block_num = block_header::num_from_id(head->id);
                const uint32_t working_first  = working_block_file_first_block_num();
@@ -705,9 +709,9 @@ namespace sysio { namespace chain {
                // If the range starts before the working file, delegate to retry (catalog)
                if (first_block_num < working_first) {
                   uint32_t pre_count = std::min(count, working_first - first_block_num);
-                  result = retry_read_serialized_blocks_by_num(first_block_num, pre_count);
+                  result = retry_read_serialized_blocks_by_num(first_block_num, pre_count, budget);
                   if (result.size() < pre_count)
-                     return result; // catalog couldn't provide all, stop here
+                     return result; // catalog couldn't provide all, or over budget; stop here
                   // Adjust for remaining blocks from working file
                   first_block_num = working_first;
                   count -= pre_count;
@@ -750,6 +754,8 @@ namespace sysio { namespace chain {
                              block_end, block_start, block_pos_field_size);
 
                   uint64_t block_size = block_end - block_start - block_pos_field_size;
+                  if (!budget.admit(block_size))
+                     break; // over budget
                   block_file.seek(block_start);
                   result.push_back(read_serialized_block(block_file, block_size));
                }
@@ -1189,7 +1195,8 @@ namespace sysio { namespace chain {
             return {};
          }
 
-         std::vector<std::vector<char>> retry_read_serialized_blocks_by_num(uint32_t first_block_num, uint32_t count) final {
+         std::vector<std::vector<char>> retry_read_serialized_blocks_by_num(uint32_t first_block_num, uint32_t count,
+                                                                            serialized_block_batch_budget& budget) final {
             std::vector<std::vector<char>> result;
             result.reserve(count);
             uint32_t remaining   = count;
@@ -1199,8 +1206,10 @@ namespace sysio { namespace chain {
                auto pos_sizes = catalog.get_block_positions_and_sizes(current_num, remaining, blocks_read);
                if (blocks_read == 0)
                   break;
-               // Read all blocks sequentially from the same catalog data file
+               // Read blocks sequentially from the same catalog data file, within the byte budget
                for (uint32_t i = 0; i < blocks_read; ++i) {
+                  if (!budget.admit(pos_sizes[i].size))
+                     return result; // over budget
                   auto& ds = catalog.log_data.ro_stream_at(pos_sizes[i].position);
                   result.push_back(read_serialized_block(ds, pos_sizes[i].size));
                }
@@ -1411,9 +1420,11 @@ namespace sysio { namespace chain {
       return my->read_serialized_block_by_num(block_num);
    }
 
-   std::vector<std::vector<char>> block_log::read_serialized_blocks_by_num(uint32_t first_block_num, uint32_t count) const {
+   std::vector<std::vector<char>> block_log::read_serialized_blocks_by_num(uint32_t first_block_num, uint32_t count,
+                                                                            uint64_t max_bytes) const {
       std::lock_guard g(my->mtx);
-      return my->read_serialized_blocks_by_num(first_block_num, count);
+      serialized_block_batch_budget budget(max_bytes);
+      return my->read_serialized_blocks_by_num(first_block_num, count, budget);
    }
 
    std::optional<signed_block_header> block_log::read_block_header_by_num(uint32_t block_num) const {

@@ -1773,14 +1773,21 @@ namespace sysio {
       }
       uint32_t num = peer_requested->last + 1;
 
-      // Compute batch size: min of remaining blocks and batch limit
+      // Never let sync push the write queue past its cap (start_read_message closes there); the pending write retries.
+      const uint32_t write_queue_size = buffer_queue.write_queue_size();
+      if( sync_batch_must_defer( write_queue_size ) ) {
+         peer_dlog( p2p_blk_log, this, "defer enqueue sync block {}, write queue size {} bytes", num, write_queue_size );
+         return false;
+      }
+
+      // Compute batch size: min of remaining blocks and batch limit, further bounded to def_sync_fetch_batch_max_bytes
       uint32_t remaining = peer_requested->end_block - num + 1;
       uint32_t batch_count = std::min(remaining, def_sync_fetch_batch_size);
 
       controller& cc = my_impl->chain_plug->chain();
       std::vector<std::vector<char>> blocks;
       try {
-         blocks = cc.fetch_serialized_blocks_by_number( num, batch_count ); // thread-safe
+         blocks = cc.fetch_serialized_blocks_by_number( num, batch_count, def_sync_fetch_batch_max_bytes ); // thread-safe
       } FC_LOG_AND_DROP();
 
       if( !blocks.empty() ) {
@@ -3080,7 +3087,7 @@ namespace sysio {
                            uint32_t message_length;
                            auto index = conn->pending_message_buffer.read_index();
                            conn->pending_message_buffer.peek(&message_length, sizeof(message_length), index);
-                           if(message_length > def_send_buffer_size*2 || message_length == 0) {
+                           if(message_length > def_max_message_size || message_length == 0) {
                               peer_elog( p2p_conn_log, conn, "incoming message length unexpected ({})", message_length);
                               close_connection = true;
                               break;

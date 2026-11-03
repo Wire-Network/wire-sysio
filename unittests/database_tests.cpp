@@ -3,6 +3,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <numeric>
+
 using namespace sysio::chain;
 using namespace sysio::testing;
 
@@ -162,6 +164,40 @@ BOOST_AUTO_TEST_SUITE(database_tests)
          for (uint32_t i = 0; i < expected_count; ++i) {
             auto blk = fc::raw::unpack<signed_block>(batch[i]);
             BOOST_REQUIRE_EQUAL(blk.block_num(), start + i);
+         }
+      } FC_LOG_AND_RETHROW()
+   }
+
+   // Batch fetch under a byte budget spanning block_log and fork_db: the budget carries across both sources
+   BOOST_AUTO_TEST_CASE( batch_fetch_byte_budget_spanning_blog_and_forkdb ) {
+      try {
+         savanna_tester chain;
+         chain.produce_blocks(30);
+
+         uint32_t lib_num  = chain.last_irreversible_block_num();
+         uint32_t head_num = chain.head().block_num();
+         BOOST_REQUIRE_GT(lib_num, 5u);
+         BOOST_REQUIRE_GT(head_num, lib_num);
+
+         // from a few blocks before LIB (block_log) through head (fork_db)
+         uint32_t start = lib_num - 3;
+         uint32_t count = head_num - start + 1;
+         std::vector<uint64_t> sizes;
+         for (uint32_t i = 0; i < count; ++i)
+            sizes.push_back(chain.control->fetch_serialized_block_by_number(start + i).size());
+
+         for (uint32_t k = 1; k <= count; ++k) {
+            const uint64_t exact = std::accumulate(sizes.begin(), sizes.begin() + k, uint64_t{0});
+
+            // a budget that exactly fits k blocks returns those k blocks
+            auto batch = chain.control->fetch_serialized_blocks_by_number(start, count, exact);
+            BOOST_REQUIRE_EQUAL(batch.size(), k);
+            for (uint32_t i = 0; i < k; ++i)
+               BOOST_REQUIRE(batch[i] == chain.control->fetch_serialized_block_by_number(start + i));
+
+            // one byte less returns k - 1 blocks, never fewer than the first
+            auto under = chain.control->fetch_serialized_blocks_by_number(start, count, exact - 1);
+            BOOST_REQUIRE_EQUAL(under.size(), std::max(k - 1, 1u));
          }
       } FC_LOG_AND_RETHROW()
    }

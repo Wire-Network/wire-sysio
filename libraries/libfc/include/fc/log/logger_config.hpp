@@ -60,10 +60,12 @@ namespace fc {
           std::string  color;
       };
 
-      enum class output_t { stderr, stdout };
+      /// The stream a console_sink writes to, spelled "stderr" or "stdout" in a logging config. The enumerators carry a
+      /// prefix because <cstdio> may define stderr and stdout as macros, as macOS does.
+      enum class output_t { output_stderr, output_stdout };
 
       struct console_sink_config {
-         output_t                      output_type = output_t::stderr;
+         output_t                      output_type = output_t::output_stderr;
          bool                          color = true;
          std::vector<level_color>      level_colors; // ignored if color = false
       };
@@ -142,7 +144,7 @@ FC_REFLECT( fc::format_config, (type)(args) )
 FC_REFLECT( fc::format::pattern_config, (pattern) )
 FC_REFLECT( fc::format::json_config, (extra_fields)(layout) )
 FC_REFLECT( fc::sink::level_color, (level)(color) )
-FC_REFLECT_ENUM( fc::sink::output_t, (stderr)(stdout) )
+FC_REFLECT_ENUM_WITH_STRIP( fc::sink::output_t, (output_stderr)(output_stdout), true )
 FC_REFLECT( fc::sink::console_sink_config, (color)(level_colors)(output_type) )
 FC_REFLECT( fc::sink::daily_file_sink_config, (base_filename)(rotation_hour)(rotation_minute)(truncate)(max_files) )
 FC_REFLECT( fc::sink::rotating_file_sink_config, (base_filename)(max_size)(max_files) )
