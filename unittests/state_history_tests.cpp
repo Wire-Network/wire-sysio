@@ -15,6 +15,7 @@
 #include <sysio/chain/block_state.hpp>
 #include <sysio/chain/resource_limits.hpp>
 
+#include "kv_write_driver.hpp"
 #include "test_cfd_transaction.hpp"
 
 #include <boost/iostreams/device/back_inserter.hpp>
@@ -23,6 +24,8 @@
 using namespace sysio::chain;
 using namespace sysio::testing;
 using namespace std::literals;
+
+extern const char* const state_history_plugin_abi; // the whole ship ABI, which ship_abi_without_tables cuts down
 
 static const abi_serializer::yield_function_t null_yield_function{};
 
@@ -50,12 +53,12 @@ datastream<ST>& operator>>(datastream<ST>& ds, sysio::state_history::big_vector_
    return ds;
 }
 
-std::vector<table_delta> create_deltas(const chainbase::database& db, bool full_snapshot) {
+std::vector<table_delta> create_deltas(const chain::controller& control, bool full_snapshot) {
    namespace bio = boost::iostreams;
    std::vector<char> buf;
    bio::filtering_ostreambuf obuf;
    obuf.push(bio::back_inserter(buf));
-   pack_deltas(obuf, db, full_snapshot);
+   pack_deltas(obuf, control.db(), control.kv(), full_snapshot);
 
    fc::datastream<const char*> is{buf.data(), buf.size()};
    std::vector<table_delta> result;
@@ -104,7 +107,7 @@ public:
    using deltas_vector = vector<sysio::state_history::table_delta>;
 
    pair<bool, deltas_vector::iterator> find_table_delta(const std::string &name, bool full_snapshot = false) {
-      v = sysio::state_history::create_deltas(control->db(), full_snapshot);;
+      v = sysio::state_history::create_deltas(*control, full_snapshot);;
 
       auto find_by_name = [&name](const auto& x) {
          return x.name == name;
@@ -136,7 +139,7 @@ using testers = boost::mpl::list<savanna_tester>;
 BOOST_AUTO_TEST_CASE(test_deltas_not_empty) {
    table_deltas_tester chain;
 
-   auto deltas = sysio::state_history::create_deltas(chain.control->db(), false);
+   auto deltas = sysio::state_history::create_deltas(*chain.control, false);
 
    for(const auto &delta: deltas) {
       BOOST_REQUIRE(!delta.rows.obj.empty());
@@ -415,12 +418,329 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
    BOOST_REQUIRE_GT(tester_idx_count, 0);
 }
 
-// Verify all KV rows (including format=1) appear in "contract_row_kv"
-BOOST_AUTO_TEST_CASE(test_deltas_contract_row_format1_only) {
+namespace {
+
+/// A KV row or index entry in a block's deltas. `first` is the row's key or the entry's secondary key, and `second` is
+/// the row's value or the entry's primary key.
+struct kv_delta {
+   bool         present = false;
+   account_name payer;
+   uint16_t     table_id = 0;
+   std::string  first;
+   std::string  second;
+
+   bool operator==(const kv_delta&) const = default;
+
+   friend std::ostream& operator<<(std::ostream& os, const kv_delta& d) {
+      return os << (d.present ? "present " : "removed ") << d.payer << ' ' << d.table_id << ' ' << d.first << ' '
+                << d.second;
+   }
+};
+using kv_deltas = std::vector<kv_delta>;
+
+std::string as_text(const fc::variant& field) {
+   const auto data = field.as<bytes>();
+   return {data.begin(), data.end()};
+}
+
+/// The deltas the pending block holds so far for `code` in one SHiP table.
+kv_deltas pending_kv_deltas(table_deltas_tester& chain, const std::string& table, const std::string& row_type,
+                            const std::string& first_field, const std::string& second_field, account_name code,
+                            bool full_snapshot = false) {
+   kv_deltas result;
+   auto [found, it] = chain.find_table_delta(table, full_snapshot);
+   if (!found) return result;
+   const auto rows = chain.deserialize_data(it, row_type, table);
+   for (size_t i = 0; i < rows.size(); ++i) {
+      if (rows[i]["code"].as<account_name>() != code) continue;
+      result.push_back({it->rows.obj[i].first, rows[i]["payer"].as<account_name>(),
+                        rows[i]["table_id"].as<uint16_t>(), as_text(rows[i][first_field.c_str()]),
+                        as_text(rows[i][second_field.c_str()])});
+   }
+   return result;
+}
+
+kv_deltas pending_row_deltas(table_deltas_tester& chain, account_name code) {
+   return pending_kv_deltas(chain, "contract_row_kv", "contract_row_kv_v0", "key", "value", code);
+}
+
+kv_deltas pending_index_deltas(table_deltas_tester& chain, account_name code, bool full_snapshot = false) {
+   return pending_kv_deltas(chain, "contract_index_kv", "contract_index_kv_v0", "sec_key", "pri_key", code,
+                            full_snapshot);
+}
+
+constexpr uint16_t kv_delta_table_id = 7;
+constexpr account_name kv_delta_writer  = "kvwriter"_n;
+constexpr account_name kv_delta_payer   = "alice"_n;
+
+/// A chain with the KV write driver deployed, in a fresh block.
+void deploy_kv_writer(table_deltas_tester& chain) {
+   chain.produce_block();
+   chain.create_account(kv_delta_writer, config::system_account_name, false, false, false, false);
+   chain.create_account(kv_delta_payer, config::system_account_name, false, false, false, false);
+   chain.set_code(kv_delta_writer, kv_write_driver::kv_write_wast);
+   chain.produce_block();
+}
+
+} // namespace
+
+// A row's store, update and erase each give one delta. An update gives the row as it now is. An erase gives the row it
+// removed, with present false.
+BOOST_AUTO_TEST_CASE(test_deltas_contract_row_kv_values) {
+   using namespace kv_write_driver;
+   table_deltas_tester chain;
+   deploy_kv_writer(chain);
+   const auto writer = kv_delta_writer;
+   const auto payer  = kv_delta_payer;
+   const auto table  = kv_delta_table_id;
+
+   push_kv_writes(chain, writer, {set_row(table, writer, "key", "one", kv_set_mode::insert)});
+   BOOST_TEST(pending_row_deltas(chain, writer) == (kv_deltas{{true, writer, table, "key", "one"}}),
+              boost::test_tools::per_element());
+   chain.produce_block();
+
+   push_kv_writes(chain, writer, {set_row(table, writer, "key", "two", kv_set_mode::update)});
+   BOOST_TEST(pending_row_deltas(chain, writer) == (kv_deltas{{true, writer, table, "key", "two"}}),
+              boost::test_tools::per_element());
+   chain.produce_block();
+
+   push_kv_writes(chain, writer, {set_row(table, payer, "key", "two", kv_set_mode::update)});
+   BOOST_TEST(pending_row_deltas(chain, writer) == (kv_deltas{{true, payer, table, "key", "two"}}),
+              boost::test_tools::per_element());
+   chain.produce_block();
+
+   push_kv_writes(chain, writer, {erase_row(table, "key")});
+   BOOST_TEST(pending_row_deltas(chain, writer) == (kv_deltas{{false, payer, table, "key", "two"}}),
+              boost::test_tools::per_element());
+}
+
+// The same for an index entry. An entry's identity is its (sec_key, pri_key) pair, so a key change is a removal of the
+// old pair and a new entry at the new one, and a payer change keeps the pair and gives one present delta.
+BOOST_AUTO_TEST_CASE(test_deltas_contract_index_kv_values) {
+   using namespace kv_write_driver;
+   table_deltas_tester chain;
+   deploy_kv_writer(chain);
+   const auto writer = kv_delta_writer;
+   const auto payer  = kv_delta_payer;
+   const auto table  = kv_delta_table_id;
+
+   push_kv_writes(chain, writer, {store_entry(table, writer, "pk", "sec1")});
+   BOOST_TEST(pending_index_deltas(chain, writer) == (kv_deltas{{true, writer, table, "sec1", "pk"}}),
+              boost::test_tools::per_element());
+   chain.produce_block();
+
+   push_kv_writes(chain, writer, {update_entry(table, writer, "pk", "sec1", "sec2")});
+   BOOST_TEST(pending_index_deltas(chain, writer) ==
+                 (kv_deltas{{false, writer, table, "sec1", "pk"}, {true, writer, table, "sec2", "pk"}}),
+              boost::test_tools::per_element());
+   chain.produce_block();
+
+   push_kv_writes(chain, writer, {update_entry(table, payer, "pk", "sec2", "sec2")});
+   BOOST_TEST(pending_index_deltas(chain, writer) == (kv_deltas{{true, payer, table, "sec2", "pk"}}),
+              boost::test_tools::per_element());
+   chain.produce_block();
+
+   push_kv_writes(chain, writer, {erase_entry(table, "pk", "sec2")});
+   BOOST_TEST(pending_index_deltas(chain, writer) == (kv_deltas{{false, payer, table, "sec2", "pk"}}),
+              boost::test_tools::per_element());
+}
+
+// Deltas are net of the block, not one per write: a block sees each row's state against the block before.
+BOOST_AUTO_TEST_CASE(test_deltas_kv_are_net_of_the_block) {
+   using namespace kv_write_driver;
+   table_deltas_tester chain;
+   deploy_kv_writer(chain);
+   const auto writer = kv_delta_writer;
+   const auto table  = kv_delta_table_id;
+
+   // Created and erased in one block: nothing to report.
+   push_kv_writes(chain, writer, {set_row(table, writer, "gone", "x", kv_set_mode::insert), erase_row(table, "gone"),
+                                  store_entry(table, writer, "pk", "gone"), erase_entry(table, "pk", "gone")});
+   BOOST_TEST(pending_row_deltas(chain, writer).empty());
+   BOOST_TEST(pending_index_deltas(chain, writer).empty());
+   chain.produce_block();
+
+   // Created and changed in one block: one delta, with the final bytes.
+   push_kv_writes(chain, writer, {set_row(table, writer, "key", "one", kv_set_mode::insert),
+                                  set_row(table, writer, "key", "two", kv_set_mode::update),
+                                  store_entry(table, writer, "pk", "sec1"),
+                                  update_entry(table, writer, "pk", "sec1", "sec2")});
+   BOOST_TEST(pending_row_deltas(chain, writer) == (kv_deltas{{true, writer, table, "key", "two"}}),
+              boost::test_tools::per_element());
+   BOOST_TEST(pending_index_deltas(chain, writer) == (kv_deltas{{true, writer, table, "sec2", "pk"}}),
+              boost::test_tools::per_element());
+   chain.produce_block();
+
+   // Rewritten with the same bytes and payer: nothing to report, as a row ending the block as it began has no delta.
+   push_kv_writes(chain, writer, {set_row(table, writer, "key", "two", kv_set_mode::update),
+                                  update_entry(table, writer, "pk", "sec2", "sec2")});
+   BOOST_TEST(pending_row_deltas(chain, writer).empty());
+   BOOST_TEST(pending_index_deltas(chain, writer).empty());
+   chain.produce_block();
+
+   // Erased and stored again with the same bytes: the same, since a delta is per key.
+   push_kv_writes(chain, writer, {erase_row(table, "key"), set_row(table, writer, "key", "two", kv_set_mode::insert),
+                                  erase_entry(table, "pk", "sec2"), store_entry(table, writer, "pk", "sec2")});
+   BOOST_TEST(pending_row_deltas(chain, writer).empty());
+   BOOST_TEST(pending_index_deltas(chain, writer).empty());
+   chain.produce_block();
+
+   // Erased and stored again with new bytes: one present delta, not a removal and a new row.
+   push_kv_writes(chain, writer, {erase_row(table, "key"), set_row(table, writer, "key", "new", kv_set_mode::insert)});
+   BOOST_TEST(pending_row_deltas(chain, writer) == (kv_deltas{{true, writer, table, "key", "new"}}),
+              boost::test_tools::per_element());
+   chain.produce_block();
+   push_kv_writes(chain, writer, {set_row(table, writer, "key", "two", kv_set_mode::update)});
+   chain.produce_block();
+
+   // Changed and erased in one block: a removal carrying the bytes the block started with, not the bytes last written.
+   push_kv_writes(chain, writer, {set_row(table, writer, "key", "three", kv_set_mode::update), erase_row(table, "key"),
+                                  update_entry(table, writer, "pk", "sec2", "sec3"), erase_entry(table, "pk", "sec3")});
+   BOOST_TEST(pending_row_deltas(chain, writer) == (kv_deltas{{false, writer, table, "key", "two"}}),
+              boost::test_tools::per_element());
+   BOOST_TEST(pending_index_deltas(chain, writer) == (kv_deltas{{false, writer, table, "sec2", "pk"}}),
+              boost::test_tools::per_element());
+}
+
+// One block's deltas for a table list its removals first and then its present rows, each in key order, whatever order
+// the writes ran in. Removals first means a client mirroring an index never holds an entry at two positions.
+BOOST_AUTO_TEST_CASE(test_deltas_kv_removals_come_first_in_key_order) {
+   using namespace kv_write_driver;
+   table_deltas_tester chain;
+   deploy_kv_writer(chain);
+   const auto writer = kv_delta_writer;
+   const auto table  = kv_delta_table_id;
+
+   push_kv_writes(chain, writer, {set_row(table, writer, "b", "1", kv_set_mode::insert),
+                                  set_row(table, writer, "c", "1", kv_set_mode::insert),
+                                  set_row(table, writer, "d", "1", kv_set_mode::insert),
+                                  set_row(table, writer, "f", "1", kv_set_mode::insert),
+                                  store_entry(table, writer, "p", "b"), store_entry(table, writer, "q", "c"),
+                                  store_entry(table, writer, "r", "d")});
+   chain.produce_block();
+
+   // Keys are written out of order, so that only sorting could give this result.
+   push_kv_writes(chain, writer, {set_row(table, writer, "g", "2", kv_set_mode::insert), erase_row(table, "f"),
+                                  set_row(table, writer, "c", "2", kv_set_mode::update), erase_row(table, "b"),
+                                  set_row(table, writer, "a", "2", kv_set_mode::insert),
+                                  // Moved to a position ahead of its old one, and one behind.
+                                  update_entry(table, writer, "r", "d", "a"), update_entry(table, writer, "p", "b", "e"),
+                                  store_entry(table, writer, "s", "f"), erase_entry(table, "q", "c")});
+   BOOST_TEST(pending_row_deltas(chain, writer) ==
+                 (kv_deltas{{false, writer, table, "b", "1"}, {false, writer, table, "f", "1"},
+                            {true, writer, table, "a", "2"},  {true, writer, table, "c", "2"},
+                            {true, writer, table, "g", "2"}}),
+              boost::test_tools::per_element());
+   BOOST_TEST(pending_index_deltas(chain, writer) ==
+                 (kv_deltas{{false, writer, table, "b", "p"}, {false, writer, table, "c", "q"},
+                            {false, writer, table, "d", "r"}, {true, writer, table, "a", "r"},
+                            {true, writer, table, "e", "p"},  {true, writer, table, "f", "s"}}),
+              boost::test_tools::per_element());
+}
+
+// The bytes of a contract_index_kv row taken apart by hand, so nothing here depends on the ABI agreeing with the writer.
+// The keys hold a zero byte and high bytes, at the start and the end.
+BOOST_AUTO_TEST_CASE(test_deltas_contract_index_kv_format) {
+   using namespace kv_write_driver;
+   table_deltas_tester chain;
+   deploy_kv_writer(chain);
+   const auto writer = kv_delta_writer;
+   const auto table  = kv_delta_table_id;
+   const std::string sec_key("\x00\xff\x80\x01", 4);
+   const std::string pri_key("\xfe\x00", 2);
+
+   push_kv_writes(chain, writer, {store_entry(table, writer, pri_key, sec_key)});
+
+   auto [found, it] = chain.find_table_delta("contract_index_kv");
+   BOOST_REQUIRE(found);
+   BOOST_REQUIRE_EQUAL(it->rows.obj.size(), 1u);
+   BOOST_CHECK_EQUAL(it->rows.obj[0].first, 1); // present
+   const auto& packed = it->rows.obj[0].second;
+
+   fc::datastream<const char*> ds(packed.data(), packed.size());
+   fc::unsigned_int struct_version;
+   uint64_t code = 0, payer = 0;
+   uint16_t table_id = 0;
+   std::vector<char> sec, pri;
+   fc::raw::unpack(ds, struct_version);
+   fc::raw::unpack(ds, code);
+   fc::raw::unpack(ds, payer);
+   fc::raw::unpack(ds, table_id);
+   fc::raw::unpack(ds, sec);
+   fc::raw::unpack(ds, pri);
+
+   BOOST_CHECK_EQUAL(struct_version.value, 0u);
+   BOOST_CHECK_EQUAL(code, writer.to_uint64_t());
+   BOOST_CHECK_EQUAL(payer, writer.to_uint64_t());
+   BOOST_CHECK_EQUAL(table_id, table);
+   BOOST_TEST(std::string(sec.begin(), sec.end()) == sec_key);
+   BOOST_TEST(std::string(pri.begin(), pri.end()) == pri_key);
+   BOOST_CHECK_EQUAL(ds.remaining(), 0u);
+}
+
+// A value's length prefix and bytes, at the two ends: nothing at all, and the cap.
+BOOST_AUTO_TEST_CASE(test_deltas_contract_row_kv_value_sizes) {
+   using namespace kv_write_driver;
+   table_deltas_tester chain;
+   deploy_kv_writer(chain);
+   const auto writer = kv_delta_writer;
+   const auto table  = kv_delta_table_id;
+
+   push_kv_writes(chain, writer, {set_row(table, writer, std::string("\x00\xff", 2), "")});
+   BOOST_TEST(pending_row_deltas(chain, writer) == (kv_deltas{{true, writer, table, std::string("\x00\xff", 2), ""}}),
+              boost::test_tools::per_element());
+   chain.produce_block();
+
+   // Action data cannot carry 1 MiB, so this row comes from a contract. limrow writes in the probe's tid_limits.
+   constexpr uint16_t limits_table = 583;
+   const account_name big = "kvbigvalue"_n;
+   const uint32_t     size = config::max_kv_value_size_limit;
+   auto params = chain.control->get_global_properties().configuration;
+   params.max_kv_value_size = size;
+   chain.push_action(config::system_account_name, "setparams"_n, config::system_account_name,
+                     mutable_variant_object()("params", params));
+   chain.create_accounts({big}, false, true, false);
+   chain.add_roa_policy(chain.NODE_DADDY, big, "0.0010 SYS", "0.0010 SYS", "2.0000 SYS", 0, 0);
+   chain.set_code(big, test_contracts::kv_intrinsic_probe_wasm());
+   chain.set_abi(big, test_contracts::kv_intrinsic_probe_abi().c_str());
+   chain.produce_block();
+
+   chain.push_action(big, "limrow"_n, big, mutable_variant_object()("key_size", 1)("value_size", size));
+   const auto deltas = pending_row_deltas(chain, big);
+   BOOST_REQUIRE_EQUAL(deltas.size(), 1u);
+   BOOST_CHECK(deltas[0].present);
+   BOOST_CHECK_EQUAL(deltas[0].table_id, limits_table);
+   BOOST_CHECK_EQUAL(deltas[0].first, "k");
+   BOOST_CHECK(deltas[0].second == std::string(size, 'v'));
+}
+
+// A full-snapshot delta reports every entry a contract holds, whatever the last block did.
+BOOST_AUTO_TEST_CASE(test_deltas_contract_index_kv_full_snapshot) {
+   using namespace kv_write_driver;
+   table_deltas_tester chain;
+   deploy_kv_writer(chain);
+   const auto writer = kv_delta_writer;
+   const auto payer  = kv_delta_payer;
+   const auto table  = kv_delta_table_id;
+
+   push_kv_writes(chain, writer, {store_entry(table, writer, "p1", "s1"), store_entry(table, payer, "p2", "s2"),
+                                  store_entry(table, writer, "p3", "gone")});
+   chain.produce_block();
+   push_kv_writes(chain, writer, {erase_entry(table, "p3", "gone")});
+   chain.produce_block();
+
+   BOOST_TEST(pending_index_deltas(chain, writer).empty());
+   BOOST_TEST(pending_index_deltas(chain, writer, true) == (kv_deltas{{true, writer, table, "s1", "p1"},
+                                                                      {true, payer, table, "s2", "p2"}}),
+              boost::test_tools::per_element());
+}
+
+// Verify all KV rows appear in "contract_row_kv"
+BOOST_AUTO_TEST_CASE(test_deltas_contract_row_multi_index) {
    table_deltas_tester chain;
    chain.produce_block();
 
-   // get_table_test uses multi_index → format=1 keys
+   // get_table_test uses multi_index
    chain.create_account("tester"_n, config::system_account_name, false, false, false, false);
    chain.set_code("tester"_n, test_contracts::get_table_test_wasm());
    chain.set_abi("tester"_n, test_contracts::get_table_test_abi());
@@ -435,7 +755,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract_row_format1_only) {
 }
 
 // Verify KV rows appear in "contract_row_kv" delta
-BOOST_AUTO_TEST_CASE(test_deltas_contract_row_kv_format0) {
+BOOST_AUTO_TEST_CASE(test_deltas_contract_row_kv_raw) {
    table_deltas_tester chain;
    chain.produce_block();
 
@@ -445,21 +765,17 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract_row_kv_format0) {
    chain.set_abi("kvtest"_n, test_contracts::test_kv_api_abi());
    chain.produce_block();
 
-   // testkvstord uses kv_set with table_id=0
+   // testkvstord uses kv_set with table_id 42
    chain.push_action("kvtest"_n, "testkvstord"_n, "kvtest"_n, mutable_variant_object());
 
    // KV rows should appear in "contract_row_kv"
    auto kv_result = chain.find_table_delta("contract_row_kv");
    BOOST_REQUIRE(kv_result.first);
    BOOST_REQUIRE_GT(kv_result.second->rows.obj.size(), 0u);
-
-   // KV rows should NOT appear in legacy "contract_row"
-   auto legacy_result = chain.find_table_delta("contract_row");
-   BOOST_CHECK(!legacy_result.first);
 }
 
 // Verify kv_map entries appear in contract_row_kv delta
-BOOST_AUTO_TEST_CASE(test_deltas_kv_map_format0) {
+BOOST_AUTO_TEST_CASE(test_deltas_kv_map) {
    table_deltas_tester chain;
    chain.produce_block();
 
@@ -478,6 +794,101 @@ BOOST_AUTO_TEST_CASE(test_deltas_kv_map_format0) {
 }
 
 // Verify decoded fields for contract_row_kv delta
+// What one block's contract_index_kv delta says about an entry that moved or changed payer. The test contract stores
+// a secondary key of 's' bytes, so its length tells two positions apart.
+BOOST_AUTO_TEST_CASE(test_deltas_contract_index_kv_exact) {
+   using mvo = fc::mutable_variant_object;
+   table_deltas_tester chain;
+   const name probe     = "kvprobe"_n;
+   const name new_payer = "kvpayer"_n;
+   chain.create_accounts({probe, new_payer});
+   chain.set_code(probe, test_contracts::kv_intrinsic_probe_wasm());
+   chain.set_abi(probe, test_contracts::kv_intrinsic_probe_abi());
+   chain.produce_block();
+
+   constexpr uint32_t pri_size = 8;
+   const std::string  pri_key  = fc::to_hex(std::string(pri_size, 'p'));
+   const auto sec_key = [](uint32_t size) { return fc::to_hex(std::string(size, 's')); };
+
+   const auto store = [&](uint32_t sec_size) {
+      chain.push_action(probe, "sizedidx"_n, probe, mvo()("sec_size", sec_size)("pri_size", pri_size));
+      chain.produce_block();
+   };
+   const auto move = [&](uint32_t sec_size, uint32_t new_sec_size) {
+      chain.push_action(probe, "sizedidxup"_n, probe,
+                        mvo()("sec_size", sec_size)("pri_size", pri_size)("new_sec_size", new_sec_size));
+   };
+   // (present, sec_key, payer) for each row of the delta, in the order a client receives them.
+   using row_t = std::tuple<bool, std::string, std::string>;
+   const auto delta_rows = [&] {
+      std::vector<row_t> rows;
+      auto [found, it] = chain.find_table_delta("contract_index_kv");
+      if (!found)
+         return rows;
+      const variants entries = chain.deserialize_data(it, "contract_index_kv_v0", "contract_index_kv");
+      for (size_t i = 0; i < entries.size(); ++i) {
+         BOOST_CHECK_EQUAL(entries[i]["pri_key"].as_string(), pri_key);
+         rows.emplace_back(it->rows.obj[i].first, entries[i]["sec_key"].as_string(), entries[i]["payer"].as_string());
+      }
+      return rows;
+   };
+   const auto expect_rows = [&](const std::vector<row_t>& expected) {
+      const auto rows = delta_rows();
+      BOOST_REQUIRE_EQUAL(rows.size(), expected.size());
+      for (size_t i = 0; i < rows.size(); ++i) {
+         BOOST_TEST_CONTEXT("delta row " << i) {
+            BOOST_CHECK_EQUAL(std::get<0>(rows[i]), std::get<0>(expected[i]));
+            BOOST_CHECK_EQUAL(std::get<1>(rows[i]), std::get<1>(expected[i]));
+            BOOST_CHECK_EQUAL(std::get<2>(rows[i]), std::get<2>(expected[i]));
+         }
+      }
+   };
+
+   // A move reports the old position gone, ahead of the new row, whichever sorts first.
+   constexpr uint32_t short_sec = 2;
+   constexpr uint32_t mid_sec   = 3;
+   constexpr uint32_t long_sec  = 5;
+   store(mid_sec);
+   move(mid_sec, long_sec);
+   expect_rows({{false, sec_key(mid_sec), probe.to_string()}, {true, sec_key(long_sec), probe.to_string()}});
+   chain.produce_block();
+   move(long_sec, short_sec);
+   expect_rows({{false, sec_key(long_sec), probe.to_string()}, {true, sec_key(short_sec), probe.to_string()}});
+   chain.produce_block();
+
+   // A move undone in the same block leaves no delta.
+   move(short_sec, long_sec);
+   move(long_sec, short_sec);
+   expect_rows({});
+   chain.produce_block();
+
+   // A payer change keeps the position, so it is one present row with the new payer.
+   const auto pay = [&] {
+      chain.push_action(probe, "sizedidxpay"_n,
+                        vector<permission_level>{{new_payer, config::sysio_payer_name}, {new_payer, config::active_name}},
+                        mvo()("sec_size", short_sec)("pri_size", pri_size)("payer", new_payer));
+   };
+   pay();
+   expect_rows({{true, sec_key(short_sec), new_payer.to_string()}});
+   chain.produce_block();
+
+   // An update that changes nothing leaves no delta.
+   pay();
+   expect_rows({});
+}
+
+// A client builds a row's identity from key_names, so they must be a real key of each KV table.
+BOOST_AUTO_TEST_CASE(test_kv_table_key_names) {
+   const auto abi = fc::json::from_string(state_history_plugin_abi).as<abi_def>();
+   const auto key_names = [&](const std::string& table) {
+      const auto it = std::find_if(abi.tables.begin(), abi.tables.end(),
+                                   [&](const table_def& def) { return def.name == table; });
+      return it == abi.tables.end() ? std::vector<field_name>{} : it->key_names;
+   };
+   BOOST_CHECK(key_names("contract_row_kv") == (std::vector<field_name>{"code", "table_id", "key"}));
+   BOOST_CHECK(key_names("contract_index_kv") == (std::vector<field_name>{"code", "table_id", "sec_key", "pri_key"}));
+}
+
 BOOST_AUTO_TEST_CASE(test_deltas_contract_row_fields) {
    table_deltas_tester chain;
    chain.produce_block();
@@ -509,7 +920,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract_row_fields) {
       table_deltas_tester main;
       main.produce_block();
 
-      auto v = sysio::state_history::create_deltas(main.control->db(), false);
+      auto v = sysio::state_history::create_deltas(*main.control, false);
 
       std::string name="permission";
       auto find_by_name = [&name](const auto& x) {
@@ -528,7 +939,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract_row_fields) {
 
       main.create_account("newacc"_n, config::system_account_name, false, false, false, false);
 
-      v = sysio::state_history::create_deltas(main.control->db(), false);
+      v = sysio::state_history::create_deltas(*main.control, false);
 
       name="permission";
       it = std::find_if(v.begin(), v.end(), find_by_name);
@@ -544,7 +955,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract_row_fields) {
 
       main.produce_block();
 
-      v = sysio::state_history::create_deltas(main.control->db(), false);
+      v = sysio::state_history::create_deltas(*main.control, false);
 
       name="permission";
       it = std::find_if(v.begin(), v.end(), find_by_name);
@@ -690,7 +1101,7 @@ struct state_history_tester : state_history_tester_logs, T {
          });
 
          chain_state_log.pack_and_write_entry(id, block->previous, [&control](auto&& buf) {
-            sysio::state_history::pack_deltas(buf, control.db(), true);
+            sysio::state_history::pack_deltas(buf, control.db(), control.kv(), true);
          });
       });
       control.block_start().connect([this](uint32_t block_num) {
@@ -1426,36 +1837,6 @@ BOOST_AUTO_TEST_CASE(test_delta_abi_roundtrip) {
          BOOST_CHECK_EQUAL(l["ram_bytes"].as_int64(), ram);
          BOOST_CHECK_EQUAL(l["net_weight"].as_int64(), net);
          BOOST_CHECK_EQUAL(l["cpu_weight"].as_int64(), cpu);
-      }
-   }
-
-   // --- contract_index64_v0: verify secondary index fields ---
-   {
-      auto [found, it] = chain.find_table_delta("contract_index64");
-      if (found) {
-         auto indices = chain.deserialize_data(it, "contract_index64_v0", "contract_index64");
-         for (auto& idx : indices) {
-            BOOST_CHECK_EQUAL(idx["code"].as_string(), "newacc");
-            BOOST_CHECK(!idx["table"].as_string().empty());
-            BOOST_CHECK(idx.get_object().contains("primary_key"));
-            BOOST_CHECK(idx.get_object().contains("secondary_key"));
-            BOOST_CHECK_EQUAL(idx["payer"].as_string(), "newacc");
-         }
-      }
-   }
-
-   // --- contract_index256_v0: verify secondary index fields ---
-   {
-      auto [found, it] = chain.find_table_delta("contract_index256");
-      if (found) {
-         auto indices = chain.deserialize_data(it, "contract_index256_v0", "contract_index256");
-         for (auto& idx : indices) {
-            BOOST_CHECK_EQUAL(idx["code"].as_string(), "newacc");
-            BOOST_CHECK(!idx["table"].as_string().empty());
-            BOOST_CHECK(idx.get_object().contains("primary_key"));
-            BOOST_CHECK(idx.get_object().contains("secondary_key"));
-            BOOST_CHECK_EQUAL(idx["payer"].as_string(), "newacc");
-         }
       }
    }
 }

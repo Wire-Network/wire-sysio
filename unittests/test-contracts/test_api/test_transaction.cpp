@@ -244,7 +244,7 @@ void test_transaction::stateful_api() {
    char buf[4] = {1};
    char key[24];
    make_kv_key(sysio::name{"table"}.value, sysio::name{"testtrans"}.value, 0, key);
-   kv_set( 0, sysio::name{"testtrans"}.value, key, 24, buf, 4 );
+   (void)kv_set( 0, sysio::name{"testtrans"}.value, key, 24, buf, 4, kv_upsert );
 }
 
 void test_transaction::context_free_api() {

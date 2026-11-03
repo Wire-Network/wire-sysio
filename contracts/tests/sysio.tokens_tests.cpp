@@ -79,16 +79,12 @@ public:
       const auto target_chain = fc::slug_name{chain_code}.value;
       const auto target_token = fc::slug_name{token_code}.value;
 
-      const auto& db = control->db();
       const auto table_id = chain::compute_table_id("chaintokens"_n.to_uint64_t());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto itr = kv_idx.lower_bound(boost::make_tuple(TOKENS_ACCOUNT, table_id, std::string_view{}));
-      for (; itr != kv_idx.end()
-             && itr->code == TOKENS_ACCOUNT
-             && itr->table_id == table_id; ++itr) {
-         std::vector<char> raw(itr->value.size());
-         if (!raw.empty())
-            std::memcpy(raw.data(), itr->value.data(), raw.size());
+      auto cursor = control->kv().open_row_cursor();
+      chain::kv_row stored;
+      for (bool more = cursor->seek_lower({TOKENS_ACCOUNT, table_id}, stored);
+           more && stored.code == TOKENS_ACCOUNT && stored.table_id == table_id; more = cursor->next(stored)) {
+         const std::vector<char> raw(stored.value.begin(), stored.value.end());
          try {
             auto row = abi_ser.binary_to_variant(
                "chain_token_row", raw,

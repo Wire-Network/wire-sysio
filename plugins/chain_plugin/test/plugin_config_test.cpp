@@ -17,6 +17,7 @@
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/http_client_plugin/http_client_options.hpp>
 #include <sysio.system/snapshot_attest_constants.hpp>
+#include <sysio/testing/kv_map_store.hpp>
 #include <sysio/testing/tester.hpp>
 #include <snapshot_attest_fixture.hpp>
 #include <stdint.h>
@@ -203,11 +204,12 @@ void rewrite_snapshot_configuration(sysio::chain::controller& control, const std
    const sysio::chain::name table_name{snapshot_attest::table_snapconfig};
    std::array<char, sysio::chain::kv_pri_key_size> key;
    sysio::chain::kv_encode_be64(key.data(), table_name.to_uint64_t());
-   auto& db = const_cast<sysio::chain::database&>(control.db());
-   const auto& row = db.get<sysio::chain::kv_object, sysio::chain::by_code_key>(boost::make_tuple(
+   auto& store = const_cast<sysio::chain::kv_store&>(control.kv());
+   const auto row = store.find_row(
       sysio::chain::config::system_account_name, sysio::chain::compute_table_id(table_name.to_uint64_t()),
-      std::string_view{key.data(), key.size()}));
-   db.modify(row, [&](auto& object) { object.value.assign(value.data(), value.size()); });
+      std::string_view{key.data(), key.size()});
+   BOOST_REQUIRE(row.has_value());
+   store.update_row(*row, row->payer, std::string_view{value.data(), value.size()});
 }
 
 /** Build the exact attestation ABI fragment required before auto-fetched snapshot replay. */
@@ -436,22 +438,47 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_required_schema_policy) {
 /** Direct KV reads use the real contract key and two uint32 fields, without an ABI table query. */
 BOOST_FIXTURE_TEST_CASE(snapshot_attestation_startup_config_reads_kv,
                        snapshot_attest_test_support::snapshot_attest_fixture) {
-   const auto empty = sysio::read_snapshot_attestation_config(control->db());
+   const auto empty = sysio::read_snapshot_attestation_config(control->kv());
    BOOST_CHECK(!empty.enabled());
    BOOST_CHECK_EQUAL(empty.block_spacing, snapshot_attest::default_block_spacing);
 
    constexpr uint32_t smallest_spacing = 1;
    set_snap_config(snapshot_attest_test_support::single_provider_minimum, smallest_spacing);
-   const auto first = sysio::read_snapshot_attestation_config(control->db());
+   const auto first = sysio::read_snapshot_attestation_config(control->kv());
    BOOST_CHECK(first.enabled());
    BOOST_CHECK_EQUAL(first.min_providers, snapshot_attest_test_support::single_provider_minimum);
    BOOST_CHECK_EQUAL(first.block_spacing, smallest_spacing);
 
    constexpr auto largest_spacing = std::numeric_limits<uint32_t>::max();
    set_snap_config(snapshot_attest_test_support::single_provider_minimum, largest_spacing);
-   const auto updated = sysio::read_snapshot_attestation_config(control->db());
+   const auto updated = sysio::read_snapshot_attestation_config(control->kv());
    BOOST_CHECK_EQUAL(updated.block_spacing, largest_spacing);
    BOOST_CHECK_EQUAL(first.block_spacing, smallest_spacing);
+}
+
+/** Configuration reads use the selected KV engine, not the controller's chainbase tables. */
+BOOST_AUTO_TEST_CASE(snapshot_attestation_startup_config_reads_map_kv) {
+   const auto store = sysio::testing::make_map_kv_store();
+   const auto empty = sysio::read_snapshot_attestation_config(*store);
+   BOOST_CHECK(!empty.enabled());
+   BOOST_CHECK_EQUAL(empty.block_spacing, snapshot_attest::default_block_spacing);
+
+   const sysio::chain::name table_name{snapshot_attest::table_snapconfig};
+   std::array<char, sysio::chain::kv_pri_key_size> key;
+   sysio::chain::kv_encode_be64(key.data(), table_name.to_uint64_t());
+   constexpr auto minimum = snapshot_attest_test_support::single_provider_minimum;
+   constexpr auto spacing = snapshot_attest_test_support::test_block_spacing;
+   std::array<char, sizeof(minimum) + sizeof(spacing)> value;
+   fc::datastream<char*> data(value.data(), value.size());
+   fc::raw::pack(data, minimum);
+   fc::raw::pack(data, spacing);
+   BOOST_REQUIRE(store->insert_row(sysio::chain::config::system_account_name,
+      sysio::chain::compute_table_id(table_name.to_uint64_t()), sysio::chain::config::system_account_name,
+      std::string_view{key.data(), key.size()}, std::string_view{value.data(), value.size()}).has_value());
+
+   const auto actual = sysio::read_snapshot_attestation_config(*store);
+   BOOST_CHECK_EQUAL(actual.min_providers, minimum);
+   BOOST_CHECK_EQUAL(actual.block_spacing, spacing);
 }
 
 /** Half-cadence grace is exclusive, capped independently of untrusted state, and overflow safe. */
@@ -897,7 +924,7 @@ BOOST_FIXTURE_TEST_CASE(snapshot_attestation_startup_config_follows_snapshot_rep
       auto& plugin = appbase::app().get_plugin<sysio::chain_plugin>();
       plugin.plugin_startup();
       BOOST_CHECK_EQUAL(plugin.get_snapshot_attestation_config().block_spacing, updated_spacing);
-      BOOST_CHECK_EQUAL(sysio::read_snapshot_attestation_config(plugin.chain().db()).block_spacing,
+      BOOST_CHECK_EQUAL(sysio::read_snapshot_attestation_config(plugin.chain().kv()).block_spacing,
                         updated_spacing);
       BOOST_CHECK(!appbase::app().is_quiting());
       plugin.plugin_shutdown();

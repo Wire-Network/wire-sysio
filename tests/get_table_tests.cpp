@@ -1319,7 +1319,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_find_scoped_test, validating_tester ) try {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // get_table_rows KV tests — exercise the /v1/chain/get_table_rows API endpoint
-// using the test_kv_map contract (kv::raw_table format=0).
+// using the test_kv_map contract (kv::raw_table).
 // ─────────────────────────────────────────────────────────────────────────────
 
 static auto get_table_rows_kv = [](chain_apis::read_only& plugin,
@@ -3657,7 +3657,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_rows_secondary_equal_keys_paging_test, valida
    const std::function<uint64_t(const fc::variant&)> hex_id_of = [](const fc::variant& row) {
       const auto key = fc::from_hex(row["key"].as_string());
       BOOST_REQUIRE_EQUAL(key.size(), sizeof(uint64_t));
-      return chain::kv_load_be64(reinterpret_cast<const char*>(key.data()));
+      return chain::kv_decode_be64(reinterpret_cast<const char*>(key.data()));
    };
 
    std::optional<sysio::chain_apis::tracked_votes> votes;

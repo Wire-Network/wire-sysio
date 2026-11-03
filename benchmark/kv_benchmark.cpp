@@ -1,27 +1,28 @@
-#include <boost/test/unit_test.hpp>
+#include <benchmark.hpp>
 
 #include <chainbase/chainbase.hpp>
+#include <fc/exception/exception.hpp>
+#include <fc/filesystem.hpp>
 #include <sysio/chain/kv_table_objects.hpp>
 
 #include <chrono>
-#include <filesystem>
 #include <iomanip>
 #include <iostream>
 #include <random>
 #include <sstream>
 #include <vector>
 
-using namespace sysio::chain;
-namespace fs = std::filesystem;
+// Times kv_object operations directly against chainbase, with no WASM or intrinsic layer.
+//
+//    benchmark/benchmark -f kv_chainbase
 
-// Helper: RAII temp dir
-struct temp_db_dir {
-   fs::path path;
-   temp_db_dir() : path(fs::temp_directory_path() / ("kv_bench_" + std::to_string(getpid()))) {
-      fs::create_directories(path);
-   }
-   ~temp_db_dir() { fs::remove_all(path); }
-};
+using namespace sysio::chain;
+
+namespace sysio::benchmark {
+namespace {
+
+constexpr uint16_t bench_table_id = 1;
+constexpr uint64_t bench_db_size  = 1024 * 1024 * 256; // 256 MB
 
 // Helper: measure execution time
 template<typename Func>
@@ -50,11 +51,9 @@ static std::string fmt_ns(double ns) {
    return ss.str();
 }
 
-BOOST_AUTO_TEST_SUITE(kv_benchmark)
-
-BOOST_AUTO_TEST_CASE(chainbase_micro_benchmark) {
-   temp_db_dir dir;
-   chainbase::database db(dir.path, chainbase::database::read_write, 1024 * 1024 * 256); // 256 MB
+void chainbase_micro_benchmark() {
+   fc::temp_directory dir;
+   chainbase::database db(dir.path(), chainbase::database::read_write, bench_db_size);
 
    // Register KV indices
    db.add_index<kv_index>();
@@ -86,8 +85,9 @@ BOOST_AUTO_TEST_CASE(chainbase_micro_benchmark) {
 
          db.create<kv_object>([&](auto& o) {
             o.code = "benchmark"_n;
-            o.key.assign(kv_keys[i].data(), kv_keys[i].size());
-            o.value.assign(value.data(), value.size());
+            o.table_id = bench_table_id;
+            o.set_key(kv_keys[i].data(), kv_keys[i].size());
+            o.set_value({value.data(), value.size()});
          });
       }, N);
 
@@ -101,8 +101,8 @@ BOOST_AUTO_TEST_CASE(chainbase_micro_benchmark) {
       double kv_find = measure_ns([&](int i) {
          int idx = i % N;
          auto sv = std::string_view(kv_keys[idx].data(), kv_keys[idx].size());
-         auto itr = kv_idx.find(boost::make_tuple(name("benchmark"), uint16_t(1), sv));
-         BOOST_REQUIRE(itr != kv_idx.end());
+         auto itr = kv_idx.find(boost::make_tuple(name("benchmark"), bench_table_id, sv));
+         FC_ASSERT(itr != kv_idx.end());
       }, N);
 
       std::cout << std::setw(25) << "Point Lookup"
@@ -111,13 +111,13 @@ BOOST_AUTO_TEST_CASE(chainbase_micro_benchmark) {
 
       // --- SEQUENTIAL ITERATION benchmark ---
       double kv_iter = measure_ns([&](int) {
-         auto itr = kv_idx.lower_bound(boost::make_tuple(name("benchmark"), uint16_t(1)));
+         auto itr = kv_idx.lower_bound(boost::make_tuple(name("benchmark"), bench_table_id));
          int count = 0;
          while (itr != kv_idx.end() && itr->code == name("benchmark")) {
             ++count;
             ++itr;
          }
-         BOOST_REQUIRE_EQUAL(count, N);
+         FC_ASSERT(count == N);
       }, 1);
 
       std::cout << std::setw(25) << "Full Iteration"
@@ -130,9 +130,9 @@ BOOST_AUTO_TEST_CASE(chainbase_micro_benchmark) {
       double kv_update = measure_ns([&](int i) {
          int idx = i % N;
          auto sv = std::string_view(kv_keys[idx].data(), kv_keys[idx].size());
-         auto itr = kv_idx.find(boost::make_tuple(name("benchmark"), uint16_t(1), sv));
+         auto itr = kv_idx.find(boost::make_tuple(name("benchmark"), bench_table_id, sv));
          db.modify(*itr, [&](auto& o) {
-            o.value.assign(new_value.data(), new_value.size());
+            o.set_value({new_value.data(), new_value.size()});
          });
       }, N);
 
@@ -143,8 +143,8 @@ BOOST_AUTO_TEST_CASE(chainbase_micro_benchmark) {
       // --- ERASE benchmark ---
       double kv_erase = measure_ns([&](int i) {
          auto sv = std::string_view(kv_keys[i].data(), kv_keys[i].size());
-         auto itr = kv_idx.find(boost::make_tuple(name("benchmark"), uint16_t(1), sv));
-         BOOST_REQUIRE(itr != kv_idx.end());
+         auto itr = kv_idx.find(boost::make_tuple(name("benchmark"), bench_table_id, sv));
+         FC_ASSERT(itr != kv_idx.end());
          db.remove(*itr);
       }, N);
 
@@ -160,9 +160,9 @@ BOOST_AUTO_TEST_CASE(chainbase_micro_benchmark) {
    std::cout << "=================================================\n\n";
 }
 
-BOOST_AUTO_TEST_CASE(full_intrinsic_path_benchmark) {
-   temp_db_dir dir;
-   chainbase::database db(dir.path, chainbase::database::read_write, 1024 * 1024 * 256);
+void full_intrinsic_path_benchmark() {
+   fc::temp_directory dir;
+   chainbase::database db(dir.path(), chainbase::database::read_write, bench_db_size);
 
    db.add_index<kv_index>();
 
@@ -195,12 +195,13 @@ BOOST_AUTO_TEST_CASE(full_intrinsic_path_benchmark) {
          auto sv = std::string_view(key_buf, 8);
 
          // Check if exists (what kv_set does)
-         (void)kv_idx.find(boost::make_tuple(name("kvbench"), uint16_t(1), sv));
+         (void)kv_idx.find(boost::make_tuple(name("kvbench"), bench_table_id, sv));
          // Create new
          db.create<kv_object>([&](auto& o) {
             o.code = "kvbench"_n;
-            o.key.assign(key_buf, 8);
-            o.value.assign(value.data(), value.size());
+            o.table_id = bench_table_id;
+            o.set_key(key_buf, 8);
+            o.set_value({value.data(), value.size()});
          });
       }, N);
 
@@ -212,8 +213,8 @@ BOOST_AUTO_TEST_CASE(full_intrinsic_path_benchmark) {
       double kv_find = measure_ns([&](int i) {
          int idx = i % N;
          auto sv = std::string_view(kv_keys[idx].data(), kv_keys[idx].size());
-         auto itr = kv_idx.find(boost::make_tuple(name("kvbench"), uint16_t(1), sv));
-         BOOST_REQUIRE(itr != kv_idx.end());
+         auto itr = kv_idx.find(boost::make_tuple(name("kvbench"), bench_table_id, sv));
+         FC_ASSERT(itr != kv_idx.end());
       }, N);
 
       std::cout << std::setw(25) << "Find (full path)"
@@ -224,14 +225,14 @@ BOOST_AUTO_TEST_CASE(full_intrinsic_path_benchmark) {
       double kv_update = measure_ns([&](int i) {
          int idx = i % N;
          auto sv = std::string_view(kv_keys[idx].data(), kv_keys[idx].size());
-         auto itr = kv_idx.find(boost::make_tuple(name("kvbench"), uint16_t(1), sv));
+         auto itr = kv_idx.find(boost::make_tuple(name("kvbench"), bench_table_id, sv));
          // Compute delta on value size (simulating intrinsic path)
-         int64_t old_size = static_cast<int64_t>(itr->value.size());
+         int64_t old_size = static_cast<int64_t>(itr->value_view().size());
          int64_t new_size = static_cast<int64_t>(new_value.size());
          volatile int64_t delta = new_size - old_size;
          (void)delta;
          db.modify(*itr, [&](auto& o) {
-            o.value.assign(new_value.data(), new_value.size());
+            o.set_value({new_value.data(), new_value.size()});
          });
       }, N);
 
@@ -242,8 +243,8 @@ BOOST_AUTO_TEST_CASE(full_intrinsic_path_benchmark) {
       // --- ERASE benchmark ---
       double kv_erase = measure_ns([&](int i) {
          auto sv = std::string_view(kv_keys[i].data(), kv_keys[i].size());
-         auto itr = kv_idx.find(boost::make_tuple(name("kvbench"), uint16_t(1), sv));
-         BOOST_REQUIRE(itr != kv_idx.end());
+         auto itr = kv_idx.find(boost::make_tuple(name("kvbench"), bench_table_id, sv));
+         FC_ASSERT(itr != kv_idx.end());
          db.remove(*itr);
       }, N);
 
@@ -259,4 +260,11 @@ BOOST_AUTO_TEST_CASE(full_intrinsic_path_benchmark) {
    std::cout << "=================================================\n\n";
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+} // namespace
+
+void kv_chainbase_benchmarking() {
+   chainbase_micro_benchmark();
+   full_intrinsic_path_benchmark();
+}
+
+} // namespace sysio::benchmark

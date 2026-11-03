@@ -9,7 +9,7 @@
 
 using namespace sysio;
 
-static constexpr uint32_t kv_fmt_raw = 0;
+static constexpr uint32_t test_table_id = 0;
 
 void test_action::read_action_normal() {
 
@@ -125,18 +125,18 @@ void test_action::test_cf_action() {
       // attempt to access non context free api, kv_api
       char key[24];
       make_kv_key("testapi"_n.value, "testapi"_n.value, 0, key);
-      kv_set( kv_fmt_raw, "testapi"_n.value, key, 24, "test", 4 );
+      (void)kv_set( test_table_id, "testapi"_n.value, key, 24, "test", 4, kv_upsert );
       sysio_assert( false, "kv_api should not be allowed" );
    } else if ( cfa.payload == 203 ) {
       // attempt to access non context free api, kv_idx_api
       uint64_t i = 0;
       uint64_t pk = 0;
-      kv_idx_store( 0, 100, &pk, sizeof(pk), &i, sizeof(i) );
+      (void)kv_idx_store( 100, 0, &pk, sizeof(pk), &i, sizeof(i) );
       sysio_assert( false, "kv_api should not be allowed" );
    } else if ( cfa.payload == 204 ) {
       char key[24];
       make_kv_key("testapi"_n.value, "testapi"_n.value, 1, key);
-      kv_contains( kv_fmt_raw, "testapi"_n.value, key, 24 );
+      kv_get( test_table_id, "testapi"_n.value, key, 24, 0, nullptr, 0 );
       sysio_assert( false, "kv_api should not be allowed" );
    } else if ( cfa.payload == 205 ) {
       // attempt to access non context free api, send action
@@ -256,12 +256,12 @@ void test_action::test_ram_billing_in_notify( uint64_t receiver, uint64_t code, 
       // Remove row if it already exists.
       char key[24];
       make_kv_key("notifytest"_n.value, "notifytest"_n.value, "notifytest"_n.value, key);
-      if( kv_contains( kv_fmt_raw, receiver, key, 24 ) )
-         kv_erase( kv_fmt_raw, key, 24 );
+      if( kv_get( test_table_id, receiver, key, 24, 0, nullptr, 0 ) >= 0 )
+         (void)kv_erase( test_table_id, key, 24 );
 
       // Create the row simply for the purpose of charging code more RAM.
       if( payer != 0 )
-         kv_set( kv_fmt_raw, payer, key, 24, &to_notify, sizeof(to_notify) );
+         (void)kv_set( test_table_id, payer, key, 24, &to_notify, sizeof(to_notify), kv_upsert );
    }
 }
 

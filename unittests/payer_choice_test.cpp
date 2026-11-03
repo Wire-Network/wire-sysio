@@ -32,7 +32,7 @@ struct kv_billing_fixture : tester {
       create_accounts({CONTRACT, ALICE, CAROL, OWNER}, false, true, false, true);
       produce_block();
       register_node_owner(OWNER, 2);
-      add_roa_policy(OWNER, CONTRACT, "10.0000 SYS", "10.0000 SYS", "1.2000 SYS", 0, 0);
+      add_roa_policy(OWNER, CONTRACT, "10.0000 SYS", "10.0000 SYS", "1.3000 SYS", 0, 0);
       add_roa_policy(NODE_DADDY, ALICE, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0, 0);
       add_roa_policy(NODE_DADDY, CAROL, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0, 0);
       produce_block();
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
         // ROA: give kvtest enough RAM for contract deployment (WASM × 10 multiplier),
         // alice enough for data storage.
         c.register_node_owner(bob_account, 2);
-        c.add_roa_policy(bob_account, contract_account, "10.0000 SYS", "10.0000 SYS", "1.2000 SYS", 0, 0);
+        c.add_roa_policy(bob_account, contract_account, "10.0000 SYS", "10.0000 SYS", "1.3000 SYS", 0, 0);
         c.add_roa_policy(c.NODE_DADDY, alice_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0, 0);
         c.produce_block();
 
@@ -170,9 +170,9 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
         int64_t alice_delta = alice_ram_after - alice_ram_before;
         BOOST_TEST_MESSAGE("kv_idx_payer_billing: alice RAM delta = " << alice_delta);
 
-        // Sanity: delta must cover both kv_object overhead and kv_index_object overhead
-        int64_t min_expected = static_cast<int64_t>(config::billable_size_v<kv_object>)
-                             + static_cast<int64_t>(config::billable_size_v<kv_index_object>);
+        // Sanity: delta must cover the row overhead and the index entry overhead. Literals on purpose: both are
+        // protocol prices.
+        constexpr int64_t min_expected = 112 + 112;
         BOOST_REQUIRE_GE(alice_delta, min_expected);
 
     } FC_LOG_AND_RETHROW();
@@ -265,7 +265,7 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
     //   kv_erase             -> refund row payer (below)
     //   kv_idx_store insert  -> kv_idx_payer_billing (explicit), insert-0 throws (below)
     //   kv_idx_update        -> change (below), same_payer (below)
-    //   kv_idx_remove        -> refund entry payer (below)
+    //   kv_idx_erase         -> refund entry payer (below)
     // =========================================================================
 
     // kv_set UPDATE with an explicit different payer moves the row's RAM from the
@@ -354,8 +354,8 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
         BOOST_REQUIRE_EQUAL(ram(CONTRACT), c0);    // receiver NOT billed (regression check)
     } FC_LOG_AND_RETHROW();
 
-    // kv_idx_remove refunds the secondary entry's payer (alice), not the receiver.
-    BOOST_FIXTURE_TEST_CASE(kv_idx_remove_refunds_entry_payer, kv_billing_fixture) try {
+    // kv_idx_erase refunds the secondary entry's payer (alice), not the receiver.
+    BOOST_FIXTURE_TEST_CASE(kv_idx_erase_refunds_entry_payer, kv_billing_fixture) try {
         deploy_kv_api();
         const auto alice0 = ram(ALICE), c0 = ram(CONTRACT);
 

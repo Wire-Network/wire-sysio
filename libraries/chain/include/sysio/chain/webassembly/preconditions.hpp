@@ -127,8 +127,8 @@ namespace sysio { namespace chain { namespace webassembly {
          }));
 
    namespace detail {
-      template<typename T>
-      vm::span<const char> to_span(const vm::argument_proxy<T*>& val) {
+      template<typename T, std::size_t Align>
+      vm::span<const char> to_span(const vm::argument_proxy<T*, Align>& val) {
          return {static_cast<const char*>(val.get_original_pointer()), sizeof(T)};
       }
 

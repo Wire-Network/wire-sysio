@@ -42,18 +42,12 @@ template <typename Tester>
 void write_kv_row(Tester& tester, name code, name table, uint64_t id, const std::vector<char>& encoded) {
    char key[kv_pri_key_size];
    kv_encode_be64(key, id);
-   auto& db = const_cast<chainbase::database&>(tester.control->db());
-   const auto& index = db.template get_index<kv_index, by_code_key>();
-   const auto it = index.find(boost::make_tuple(code, compute_table_id(table.value),
-                                                std::string_view(key, sizeof(key))));
-   if (it != index.end()) db.modify(*it, [&](auto& row) { row.value.assign(encoded.data(), encoded.size()); });
-   else db.template create<kv_object>([&](auto& row) {
-      row.code = code;
-      row.payer = config::system_account_name;
-      row.table_id = compute_table_id(table.value);
-      row.key.assign(key, sizeof(key));
-      row.value.assign(encoded.data(), encoded.size());
-   });
+   auto& store = const_cast<kv_store&>(tester.control->kv());
+   const auto table_id = compute_table_id(table.value);
+   const std::string_view key_view(key, sizeof(key));
+   const std::string_view value(encoded.data(), encoded.size());
+   if (const auto row = store.find_row(code, table_id, key_view)) store.update_row(*row, row->payer, value);
+   else store.insert_row(code, table_id, config::system_account_name, key_view, value);
 }
 
 /// The authorization an action needs when an unprivileged contract bills RAM to `signer`
@@ -231,15 +225,16 @@ inline constexpr auto table = "nodeowners"_n;
 /// Count authoritative owners in one generation, independently of the optional emissions mirror.
 template <typename Tester>
 uint32_t count(Tester& tester, abi_serializer& serializer, uint8_t tier, uint64_t generation = 0) {
-   const auto& index = tester.control->db().template get_index<kv_index, by_code_key>();
    const auto scope_start = make_kv_scoped_key(generation, uint64_t{0});
    const auto scope_end = make_kv_scoped_key(generation + 1, uint64_t{0});
    const auto table_id = compute_table_id(table.to_uint64_t());
-   auto it = index.lower_bound(boost::make_tuple(account, table_id, scope_start.to_string_view()));
-   const auto end = index.lower_bound(boost::make_tuple(account, table_id, scope_end.to_string_view()));
    uint32_t result = 0;
-   for (; it != end; ++it) {
-      const std::vector<char> bytes(it->value.begin(), it->value.end());
+   auto cursor = tester.control->kv().open_row_cursor();
+   kv_row stored;
+   for (bool more = cursor->seek_lower({account, table_id, scope_start.to_string_view()}, stored);
+        more && stored.code == account && stored.table_id == table_id && stored.key < scope_end.to_string_view();
+        more = cursor->next(stored)) {
+      const std::vector<char> bytes(stored.value.begin(), stored.value.end());
       const auto row = serializer.binary_to_variant(
          "nodeowners", bytes, Tester::fixture_abi_yield_function());
       if (row["tier"].template as<uint8_t>() == tier) ++result;

@@ -57,10 +57,7 @@ namespace sysio { namespace chain { namespace webassembly {
 
    bool interface::check_permission_authorization( account_name account, permission_name permission,
                                                    span<const char> pubkeys_data,
-                                                   span<const char> perms_data,
-                                                   uint64_t delay_us ) const {
-      SYS_ASSERT( delay_us == 0, action_validate_exception, "delayed transactions not supported" );
-
+                                                   span<const char> perms_data ) const {
       flat_set<public_key_type> provided_keys;
       unpack_provided_keys( provided_keys, pubkeys_data.data(), pubkeys_data.size() );
 

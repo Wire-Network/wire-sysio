@@ -605,11 +605,9 @@ public:
         std::string key;
         for (uint64_t word : key_words)
             for (int shift = 56; shift >= 0; shift -= 8) key.push_back( char((word >> shift) & 0xff) );
-        const auto& kv_idx = control->db().get_index<chain::kv_index, chain::by_code_key>();
-        const auto itr = kv_idx.find( boost::make_tuple( code, chain::compute_table_id(table.to_uint64_t()),
-                                                         std::string_view(key) ) );
-        if (itr == kv_idx.end()) return {};
-        return vector<char>( itr->value.data(), itr->value.data() + itr->value.size() );
+        const auto row = control->kv().find_row( code, chain::compute_table_id(table.to_uint64_t()), key );
+        if (!row) return {};
+        return vector<char>( row->value.begin(), row->value.end() );
     }
     // A user's deposit of `sym`, with the token contract resolved as `extend` does:
     // the evodexacnts row keyed by the extended symbol, scoped by the user.

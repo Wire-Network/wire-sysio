@@ -10,14 +10,14 @@ static constexpr uint32_t bench_table_id = 42;
 
 extern "C" {
    __attribute__((sysio_wasm_import))
-   int64_t kv_set(uint32_t table_id, uint64_t payer, const void* key, uint32_t key_size, const void* value, uint32_t value_size);
+   int32_t kv_set(uint32_t table_id, uint64_t payer, const void* key, uint32_t key_size, const void* value, uint32_t value_size, uint32_t mode);
    __attribute__((sysio_wasm_import))
-   int32_t kv_get(uint32_t table_id, uint64_t code, const void* key, uint32_t key_size, void* value, uint32_t value_size);
+   int32_t kv_get(uint32_t table_id, uint64_t code, const void* key, uint32_t key_size, uint32_t offset, void* value, uint32_t value_size);
    __attribute__((sysio_wasm_import))
-   int64_t kv_erase(uint32_t key_format, const void* key, uint32_t key_size);
-   __attribute__((sysio_wasm_import))
-   int32_t kv_contains(uint32_t key_format, uint64_t code, const void* key, uint32_t key_size);
+   int32_t kv_erase(uint32_t table_id, const void* key, uint32_t key_size);
 }
+
+static constexpr uint32_t kv_upsert = 0;
 
 using namespace sysio;
 
@@ -51,7 +51,7 @@ public:
       char key[24];
       for (uint32_t i = 0; i < num_accounts; ++i) {
          make_key(key, i, 1);
-         kv_set(0, get_self().value, key, 24, &bal, 16);
+         (void)kv_set(bench_table_id, get_self().value, key, 24, &bal, 16, kv_upsert);
       }
    }
 
@@ -67,18 +67,18 @@ public:
 
          // sub_balance: read, subtract, write
          make_key(from_key, from_scope, 1);
-         int32_t sz = kv_get(bench_table_id, code, from_key, 24, &from_bal, 16);
+         int32_t sz = kv_get(bench_table_id, code, from_key, 24, 0, &from_bal, 16);
          check(sz == 16, "no balance");
          check(from_bal.amount >= 1, "overdrawn");
          from_bal.amount -= 1;
-         kv_set(0, get_self().value, from_key, 24, &from_bal, 16);
+         (void)kv_set(bench_table_id, get_self().value, from_key, 24, &from_bal, 16, kv_upsert);
 
          // add_balance: read, add, write
          make_key(to_key, to_scope, 1);
-         sz = kv_get(bench_table_id, code, to_key, 24, &to_bal, 16);
+         sz = kv_get(bench_table_id, code, to_key, 24, 0, &to_bal, 16);
          check(sz == 16, "no balance");
          to_bal.amount += 1;
-         kv_set(0, get_self().value, to_key, 24, &to_bal, 16);
+         (void)kv_set(bench_table_id, get_self().value, to_key, 24, &to_bal, 16, kv_upsert);
       }
    }
 };

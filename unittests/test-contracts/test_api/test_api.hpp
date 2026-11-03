@@ -32,10 +32,10 @@ extern "C" {
     void set_action_return_value(const char*, size_t);
 
     __attribute__((sysio_wasm_import))
-    void  sysio_assert( uint32_t test, const char* msg );
+    void  sysio_assert( bool test, const char* msg );
 
     __attribute__((sysio_wasm_import))
-    void  sysio_assert_code( uint32_t test, uint64_t code );
+    void  sysio_assert_code( bool test, uint64_t code );
 
     __attribute__((sysio_wasm_import))
     uint64_t  current_time();
@@ -45,21 +45,18 @@ extern "C" {
 
     //kv.h — replacements for legacy db_* intrinsics
     __attribute__((sysio_wasm_import))
-    int64_t kv_set(uint32_t key_format, uint64_t payer, const void* key, uint32_t key_size, const void* value, uint32_t value_size);
+    int32_t kv_set(uint32_t table_id, uint64_t payer, const void* key, uint32_t key_size, const void* value, uint32_t value_size, uint32_t mode);
 
     __attribute__((sysio_wasm_import))
-    int32_t kv_get(uint32_t key_format, uint64_t code, const void* key, uint32_t key_size, void* value, uint32_t value_size);
+    int32_t kv_get(uint32_t table_id, uint64_t code, const void* key, uint32_t key_size, uint32_t offset, void* value, uint32_t value_size);
 
     __attribute__((sysio_wasm_import))
-    int64_t kv_erase(uint32_t key_format, const void* key, uint32_t key_size);
+    int32_t kv_erase(uint32_t table_id, const void* key, uint32_t key_size);
 
     __attribute__((sysio_wasm_import))
-    int32_t kv_contains(uint32_t key_format, uint64_t code, const void* key, uint32_t key_size);
-
-    __attribute__((sysio_wasm_import))
-    void kv_idx_store(uint64_t payer, uint32_t table_id,
-                      const void* pri_key, uint32_t pri_key_size,
-                      const void* sec_key, uint32_t sec_key_size);
+    int32_t kv_idx_store(uint32_t table_id, uint64_t payer,
+                         const void* pri_key, uint32_t pri_key_size,
+                         const void* sec_key, uint32_t sec_key_size);
 
     //privilege.h
     __attribute__((sysio_wasm_import))
@@ -69,6 +66,8 @@ extern "C" {
     __attribute__((sysio_wasm_import))
     uint32_t get_active_producers( capi_name* producers, uint32_t datalen );
 }
+
+static constexpr uint32_t kv_upsert = 0;
 
 // Helper: build a 24-byte KV key from (table, scope, id) in big-endian.
 // Layout: [table:8BE][scope:8BE][id:8BE]

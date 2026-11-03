@@ -30,28 +30,6 @@ namespace webassembly {
          int32_t get_context_free_data(uint32_t index, span<char> buffer) const;
 
          /**
-          * Check if a feature is found on the activation set.
-          *
-          * @ingroup privileged
-          * @param feature_name - 256-bit digest representing the feature to query.
-          *
-          * @return false (deprecated)
-          *
-          * @deprecated
-         */
-         int32_t is_feature_active(int64_t feature_name) const;
-
-         /**
-          * Activate a a consensus protocol upgrade.
-          *
-          * @ingroup privileged
-          * @param feature_name - 256-bit digest representing the feature to activate.
-          *
-          * @deprecated
-         */
-         void activate_feature(int64_t feature_name) const;
-
-         /**
           * Allows a privileged smart contract, e.g. the system contract, to pre-activate a consensus protocol upgrade feature.
           *
           * @ingroup privileged
@@ -474,7 +452,7 @@ namespace webassembly {
          bool check_transaction_authorization(span<const char> trx_data, span<const char> pubkeys_data, span<const char> perms_data) const;
 
          /**
-          * Checks if a permission is authorized by a provided delay and a provided set of keys and permissions.
+          * Checks if a permission is authorized by a provided set of keys and permissions.
           *
           * @ingroup permission
           * @param account - the account owner of the permission.
@@ -482,12 +460,11 @@ namespace webassembly {
           * @param pubkeys_data - serialized vector of provided public keys. Trailing bytes abort.
           * @param perms_data - serialized vector of provided permissions (empty permission name acts as wildcard).
           *                     Trailing bytes abort.
-          * @param delay_us - must be zero for wire as delayed transactions not supported
           *
           * @retval true if permission is authorized.
           * @retval false otherwise.
          */
-         bool check_permission_authorization(account_name account, permission_name permission, span<const char> pubkeys_data, span<const char> perms_data, uint64_t delay_us) const;
+         bool check_permission_authorization(account_name account, permission_name permission, span<const char> pubkeys_data, span<const char> perms_data) const;
 
          /**
           * Look up the permission of an account with the smallest name >= the given permission name.
@@ -795,276 +772,286 @@ namespace webassembly {
           */
          void printhex(span<const char> data);
 
-         // ---- KV Database API -- Primary Operations ----
+         // ---- KV Database API ----
+         //
+         // A state miss is returned and misuse throws. Calls that return a status return a kv_status: 0 ok, 1 end,
+         // 2 no_row, 3 exists. Calls that return a size or a handle use -1 for none. Bad arguments, size limits and
+         // the iterator limit throw.
+         //
+         // table_id is a table's namespace: the low 16 bits of DJB2 over the 8 big-endian bytes of name::raw. A
+         // secondary index has its own table_id, from two chained passes over the table's name::raw and then the
+         // index's (position + 1 for multi_index). The chain does not enforce uniqueness; CDT codegen checks within one
+         // ABI. A value above 65535 throws kv_invalid_table_id.
+         //
+         // Keys are arbitrary non-empty byte sequences, compared as unsigned bytes with a shorter prefix first. An empty
+         // key throws kv_empty_key on every call that takes a key, since no row can have one. A prefix or a seek is not
+         // a key and may be empty. Index entries sort by sec_key, then pri_key. max_kv_key_size and
+         // max_kv_secondary_key_size default to 256 bytes and max_kv_value_size to 256 KiB. Governance can raise the key
+         // sizes to 512 bytes and the value size to 1 MiB. A key a call only looks up has no size limit.
+         //
+         // Reads copy into caller buffers. A zero-size buffer skips the copy and a short buffer truncates it. When a
+         // row is found, the size reported is the field's full size either way, so a contract can size a buffer from
+         // it. Offsets exist on value reads only: an offset at or past the end copies nothing.
+         //
+         // Writes apply to the executing contract's (`receiver`) tables. The RAM check is per action, for unprivileged
+         // receivers, and a payer other than the receiver must authorize with sysio.payer. Payer 0 (the CDT
+         // `same_payer` sentinel, name{}) keeps the current payer when the row exists and throws `invalid_table_payer`
+         // when the call would create one. A payer change refunds the old payer in full and charges the new one in full.
+
+         // ---- KV Database API -- Rows ----
 
          /**
-          * Store or update a key-value pair in the executing contract's KV table.
+          * Write a row in the executing contract's KV table.
           *
-          * Writes are scoped to the executing contract (`receiver`); a contract cannot
-          * write to another contract's namespace. Keys are arbitrary byte sequences
-          * (max 256 bytes), values up to 256 KiB.
-          *
-          * @param table_id - table namespace identifier (lower 16 bits of the DJB2 hash of table name)
-          * @param payer - account to bill for RAM. 0 is the CDT `same_payer` sentinel (name{}) and is
-          *   valid only on update (existing key), where it keeps the row's current payer so billing
-          *   does not move off it. On insert (new key) there is no existing payer to keep, so 0 is
-          *   rejected with `invalid_table_payer` -- the caller must name the paying account. A
-          *   non-zero payer bills that account explicitly; the transaction-level
-          *   `unauthorized_ram_usage_increase` check then requires the payer to have authorized the
-          *   action (or net RAM usage must not increase).
+          * @param table_id - table namespace
+          * @param payer - account to bill for RAM, or 0 to keep the current payer
           * @param key - the key bytes
           * @param value - the value bytes
-          * @return RAM byte delta (positive on growth, negative on shrink, 0 on same-size update)
+          * @param mode - 0 upsert, 1 insert, 2 update
+          * @return kv_status: ok; exists if mode is insert and the key is taken; no_row if mode is update and the key
+          *   is free
+          * @throws kv_invalid_mode if mode is not 0, 1 or 2
           */
-         int64_t  kv_set(uint32_t table_id, uint64_t payer, span<const char> key, span<const char> value);
+         int32_t  kv_set(uint32_t table_id, uint64_t payer, span<const char> key, span<const char> value, uint32_t mode);
 
          /**
-          * Read a value by key from any contract's KV table.
+          * Erase a row from the executing contract's KV table. Its RAM is refunded to the row's current payer.
           *
-          * If the destination buffer is smaller than the stored value, the value is
-          * truncated but the full size is still returned, allowing the caller to
-          * allocate and retry. Pass a zero-length buffer to probe the size.
+          * @param table_id - table namespace
+          * @param key - the key bytes to erase
+          * @return kv_status: ok, or no_row if the key is free
+          */
+         int32_t  kv_erase(uint32_t table_id, span<const char> key);
+
+         /**
+          * Read a row's value by key from any contract's KV table.
           *
-          * @param table_id - table namespace identifier (lower 16 bits of the DJB2 hash of table name)
+          * @param table_id - table namespace
           * @param code - account whose KV table to read from
           * @param key - the key bytes to look up
-          * @param value - destination buffer for the value
-          * @return actual value size in bytes, or -1 if the key does not exist
-          */
-         int32_t  kv_get(uint32_t table_id, uint64_t code, span<const char> key, span<char> value);
-
-         /**
-          * Erase a key-value pair from the executing contract's KV table.
-          *
-          * The RAM charged for the row is refunded to the original payer.
-          *
-          * @param table_id - table namespace identifier (lower 16 bits of the DJB2 hash of table name)
-          * @param key - the key bytes to erase
-          * @return negative RAM byte delta (refund amount)
-          * @throws kv_key_not_found if the key does not exist
-          */
-         int64_t  kv_erase(uint32_t table_id, span<const char> key);
-
-         /**
-          * Test whether a key exists in a contract's KV table without reading the value.
-          *
-          * @param table_id - table namespace identifier (lower 16 bits of the DJB2 hash of table name)
-          * @param code - account whose KV table to check
-          * @param key - the key bytes to look up
-          * @return 1 if the key exists, 0 otherwise
-          */
-         int32_t  kv_contains(uint32_t table_id, uint64_t code, span<const char> key);
-
-         // ---- KV Database API -- Primary Iterators ----
-         //
-         // Iterators traverse keys lexicographically within a prefix scope.
-         // They re-seek by key on each operation, so they are never invalidated
-         // by concurrent writes or undo operations.
-         //
-         // Up to config::max_kv_iterators (1024) live iterator handles are available per apply
-         // context. Handles must be destroyed with kv_it_destroy when no longer needed.
-
-         /**
-          * Create a forward iterator over keys matching a given prefix.
-          *
-          * The iterator is positioned directly ON the first matching key (status 0); if no key
-          * matches the prefix it starts in the end state (status 1).
-          *
-          * @param table_id - table namespace identifier (lower 16 bits of the DJB2 hash of table name)
-          * @param code - account whose KV table to iterate
-          * @param prefix - key prefix to scope the iteration (may be empty for all keys)
-          * @return iterator handle
-          * @throws kv_iterator_limit_exceeded if the iterator pool is exhausted
-          */
-         uint32_t kv_it_create(uint32_t table_id, uint64_t code, span<const char> prefix);
-
-         /**
-          * Release an iterator handle back to the pool.
-          *
-          * @param handle - iterator handle from kv_it_create
-          */
-         void     kv_it_destroy(uint32_t handle);
-
-         /**
-          * Query the current position status of an iterator.
-          *
-          * Status values (kv_it_stat): 0 = positioned on a valid key, 1 = at end (no current
-          * key), 2 = erased (the current row was erased out from under the iterator).
-          *
-          * @param handle - iterator handle
-          * @return current status (0, 1, or 2)
-          */
-         int32_t  kv_it_status(uint32_t handle);
-
-         /**
-          * Advance the iterator to the next key in lexicographic order.
-          *
-          * @param handle - iterator handle
-          * @return new status (0 = valid, 1 = at end)
-          */
-         int32_t  kv_it_next(uint32_t handle);
-
-         /**
-          * Move the iterator to the previous key in lexicographic order.
-          *
-          * From the end state the iterator moves to the LAST in-prefix key; from the first
-          * in-prefix key it moves to the end state.
-          *
-          * @param handle - iterator handle
-          * @return new status (0 = valid, 1 = at end)
-          */
-         int32_t  kv_it_prev(uint32_t handle);
-
-         /**
-          * Seek the iterator to the first key >= the given key within the prefix scope.
-          *
-          * @param handle - iterator handle
-          * @param key - key to seek to (keys below the prefix seek from the prefix itself)
-          * @return new status: 0 if positioned on any in-prefix key >= the seek key (not
-          *         necessarily an exact match), 1 if no such key exists (at end)
-          */
-         int32_t  kv_it_lower_bound(uint32_t handle, span<const char> key);
-
-         /**
-          * Read the key at the iterator's current position.
-          *
-          * If the iterator is not on a valid key, returns the iterator status (1 = end,
-          * 2 = erased) and sets actual_size to 0 without copying anything.
-          *
-          * @param handle - iterator handle
-          * @param offset - byte offset within the key to start reading
-          * @param dest - destination buffer
-          * @param actual_size - [out] receives the full key size
-          * @return 0 on success, otherwise the iterator status
-          */
-         int32_t  kv_it_key(uint32_t handle, uint32_t offset, span<char> dest, aligned_ptr<uint32_t> actual_size);
-
-         /**
-          * Read the value at the iterator's current position.
-          *
-          * If the iterator is not on a valid key, returns the iterator status (1 = end,
-          * 2 = erased) and sets actual_size to 0 without copying anything.
-          *
-          * @param handle - iterator handle
           * @param offset - byte offset within the value to start reading
-          * @param dest - destination buffer
-          * @param actual_size - [out] receives the full value size
-          * @return 0 on success, otherwise the iterator status
+          * @param value - destination buffer
+          * @return the value's full size in bytes, or -1 if the key is free
+          * @throws kv_empty_key if key is empty
           */
-         int32_t  kv_it_value(uint32_t handle, uint32_t offset, span<char> dest, aligned_ptr<uint32_t> actual_size);
+         int32_t  kv_get(uint32_t table_id, uint64_t code, span<const char> key, uint32_t offset, span<char> value);
 
-         // ---- KV Database API -- Secondary Index Operations ----
+         // ---- KV Database API -- Index Entries ----
          //
-         // Secondary indices map (sec_key -> pri_key) within a table namespace.
-         // The executing contract manages index entries explicitly; the CDT
-         // `kv_multi_index` wrapper automates this.
+         // A secondary index holds (sec_key, pri_key) entries in a table namespace of its own. The executing contract
+         // manages entries explicitly; the CDT table wrappers automate this.
 
          /**
-          * Insert a secondary index entry mapping a secondary key to a primary key.
+          * Insert a secondary index entry mapping a secondary key to a primary key. Both keys must be non-empty.
           *
-          * @param payer - account to bill for RAM. kv_idx_store always creates a new entry, so a
-          *   paying account must be named; 0 (`same_payer`) is rejected with `invalid_table_payer`.
           * @param table_id - secondary index identifier
+          * @param payer - account to bill for RAM
           * @param pri_key - primary key bytes this entry points to
           * @param sec_key - secondary key bytes (order-preserving encoded)
+          * @return kv_status: ok, or exists if the (sec_key, pri_key) pair is taken
           */
-         void     kv_idx_store(uint64_t payer, uint32_t table_id, span<const char> pri_key, span<const char> sec_key);
+         int32_t  kv_idx_store(uint32_t table_id, uint64_t payer, span<const char> pri_key, span<const char> sec_key);
 
          /**
-          * Remove a secondary index entry.
+          * Change a secondary index entry's key in place. All three keys must be non-empty.
           *
           * @param table_id - secondary index identifier
-          * @param pri_key - primary key associated with the entry
-          * @param sec_key - secondary key to remove
-          */
-         void     kv_idx_remove(uint32_t table_id, span<const char> pri_key, span<const char> sec_key);
-
-         /**
-          * Update a secondary index entry's key (remove old, insert new).
-          *
-          * @param payer - account to bill for RAM. 0 (the CDT `same_payer` sentinel) keeps the
-          *   entry's existing payer -- kv_idx_update always operates on an existing entry, so there
-          *   is no "bill the receiver" default here. Pass a non-zero payer to bill that account
-          *   explicitly.
-          * @param table_id - secondary index identifier
+          * @param payer - account to bill for RAM, or 0 to keep the current payer
           * @param pri_key - primary key (unchanged)
           * @param old_sec_key - current secondary key to replace
           * @param new_sec_key - new secondary key value
+          * @return kv_status: ok; no_row if the entry does not exist; exists if (new_sec_key, pri_key) is taken
           */
-         void     kv_idx_update(uint64_t payer, uint32_t table_id, span<const char> pri_key,
+         int32_t  kv_idx_update(uint32_t table_id, uint64_t payer, span<const char> pri_key,
                                 span<const char> old_sec_key, span<const char> new_sec_key);
 
          /**
-          * Find an exact secondary key match and return an iterator handle.
+          * Erase a secondary index entry. Its RAM is refunded to the entry's current payer. Both keys must be non-empty.
           *
-          * @param code - account whose indices to search
           * @param table_id - secondary index identifier
-          * @param sec_key - secondary key to find
-          * @return iterator handle (>= 0) positioned on the match, or -1 if not found
+          * @param pri_key - primary key associated with the entry
+          * @param sec_key - secondary key to erase
+          * @return kv_status: ok, or no_row if the entry does not exist
           */
-         int32_t kv_idx_find_secondary(uint64_t code, uint32_t table_id, span<const char> sec_key);
+         int32_t  kv_idx_erase(uint32_t table_id, span<const char> pri_key, span<const char> sec_key);
+
+         // ---- KV Database API -- Primary Iterators ----
+         //
+         // An iterator's position is a key. Moves land on a row or at end, and return ok or end. Reads return the row
+         // stored at the current key now, or no_row if there is none, so a row erased and stored again at that key
+         // reads back. A move from a position with no row goes strictly past that key.
+         //
+         // A prefix bounds an iterator: moves past either edge of the prefix reach end. A seek below the prefix starts
+         // from the prefix, and an empty seek is the first row. Moving back from end lands on the last row in the
+         // prefix. Moving back from the first row goes to end.
+         //
+         // Up to config::max_kv_iterators (1024) live iterator handles are available per pool. A handle lasts for one
+         // contract's execution: every open handle is released before the next notified contract runs, and inline
+         // actions start with empty pools. Destroy handles with kv_it_destroy when no longer needed.
 
          /**
-          * Find the first secondary key >= the given key and return an iterator handle.
+          * Create an iterator over keys matching a prefix and seek it. Allocates a handle whatever it lands on.
           *
-          * @param code - account whose indices to search
+          * @param table_id - table namespace
+          * @param code - account whose KV table to iterate
+          * @param prefix - key prefix bounding the iteration (may be empty for all keys)
+          * @param seek - first key to land at or above (may be empty for the first row)
+          * @return iterator handle
+          * @throws kv_iterator_limit_exceeded if the iterator pool is exhausted
+          */
+         int32_t  kv_it_create(uint32_t table_id, uint64_t code, span<const char> prefix, span<const char> seek);
+
+         /**
+          * Move to the next key and read the row there.
+          *
+          * @param handle - iterator handle
+          * @param key - destination for the key
+          * @param value - destination for the value
+          * @param key_size - [out] full key size, 0 at end
+          * @param value_size - [out] full value size, 0 at end. Must not overlap the other size
+          * @return kv_status: ok or end
+          */
+         int32_t  kv_it_next(int32_t handle, span<char> key, span<char> value,
+                             aligned_ptr<uint32_t> key_size, aligned_ptr<uint32_t> value_size);
+
+         /**
+          * Move to the previous key and read the row there.
+          *
+          * @param handle - iterator handle
+          * @param key - destination for the key
+          * @param value - destination for the value
+          * @param key_size - [out] full key size, 0 at end
+          * @param value_size - [out] full value size, 0 at end. Must not overlap the other size
+          * @return kv_status: ok or end
+          */
+         int32_t  kv_it_prev(int32_t handle, span<char> key, span<char> value,
+                             aligned_ptr<uint32_t> key_size, aligned_ptr<uint32_t> value_size);
+
+         /**
+          * Move to the first key at or above `seek` and read the row there.
+          *
+          * @param handle - iterator handle
+          * @param seek - key to seek to
+          * @param key - destination for the key
+          * @param value - destination for the value
+          * @param key_size - [out] full key size, 0 at end
+          * @param value_size - [out] full value size, 0 at end. Must not overlap the other size
+          * @return kv_status: ok or end
+          */
+         int32_t  kv_it_lower_bound(int32_t handle, span<const char> seek, span<char> key, span<char> value,
+                                    aligned_ptr<uint32_t> key_size, aligned_ptr<uint32_t> value_size);
+
+         /**
+          * Read the row stored at the iterator's current key.
+          *
+          * @param handle - iterator handle
+          * @param offset - byte offset within the value to start reading
+          * @param key - destination for the key
+          * @param value - destination for the value
+          * @param key_size - [out] full key size, 0 unless the status is ok
+          * @param value_size - [out] full value size, 0 unless the status is ok. Must not overlap the other size
+          * @return kv_status: ok; end; no_row if no row is stored at the current key
+          */
+         int32_t  kv_it_read(int32_t handle, uint32_t offset, span<char> key, span<char> value,
+                             aligned_ptr<uint32_t> key_size, aligned_ptr<uint32_t> value_size);
+
+         /**
+          * Release an iterator handle back to the pool. -1 is not a handle and throws kv_invalid_iterator.
+          *
+          * @param handle - iterator handle from kv_it_create
+          */
+         void     kv_it_destroy(int32_t handle);
+
+         // ---- KV Database API -- Secondary Iterators ----
+         //
+         // These work as the primary iterators do, over index entries in (sec_key, pri_key) order. Prefix and seek apply
+         // to sec_key. A position is the (sec_key, pri_key) pair.
+
+         /**
+          * Create an iterator over index entries whose secondary key matches a prefix, and seek it. Allocates a handle
+          * whatever it lands on.
+          *
           * @param table_id - secondary index identifier
-          * @param sec_key - secondary key lower bound
-          * @return handle >= 0 on match or in iterator_end state (bound past all
-          *   entries but table non-empty, enables kv_idx_prev). Returns -1 only when
-          *   the table has no entries for this (code, table_id).
+          * @param code - account whose indices to iterate
+          * @param prefix - secondary key prefix bounding the iteration (may be empty for all entries)
+          * @param seek - first secondary key to land at or above (may be empty for the first entry)
+          * @return secondary iterator handle
+          * @throws kv_iterator_limit_exceeded if the iterator pool is exhausted
           */
-         int32_t kv_idx_lower_bound(uint64_t code, uint32_t table_id, span<const char> sec_key);
+         int32_t  kv_idx_create(uint32_t table_id, uint64_t code, span<const char> prefix, span<const char> seek);
 
          /**
-          * Advance a secondary index iterator to the next entry.
+          * Move to the next entry and read it.
           *
           * @param handle - secondary iterator handle
-          * @return 0 = valid, 1 = at end
+          * @param sec_key - destination for the secondary key
+          * @param pri_key - destination for the primary key
+          * @param sec_size - [out] full secondary key size, 0 at end
+          * @param pri_size - [out] full primary key size, 0 at end. Must not overlap the other size
+          * @return kv_status: ok or end
           */
-         int32_t  kv_idx_next(uint32_t handle);
+         int32_t  kv_idx_next(int32_t handle, span<char> sec_key, span<char> pri_key,
+                              aligned_ptr<uint32_t> sec_size, aligned_ptr<uint32_t> pri_size);
 
          /**
-          * Move a secondary index iterator to the previous entry.
-          *
-          * From the end state the iterator moves to the LAST entry of the (code, table_id)
-          * range; from the first entry it moves to the end state.
+          * Move to the previous entry and read it.
           *
           * @param handle - secondary iterator handle
-          * @return 0 = valid, 1 = at end
+          * @param sec_key - destination for the secondary key
+          * @param pri_key - destination for the primary key
+          * @param sec_size - [out] full secondary key size, 0 at end
+          * @param pri_size - [out] full primary key size, 0 at end. Must not overlap the other size
+          * @return kv_status: ok or end
           */
-         int32_t  kv_idx_prev(uint32_t handle);
+         int32_t  kv_idx_prev(int32_t handle, span<char> sec_key, span<char> pri_key,
+                              aligned_ptr<uint32_t> sec_size, aligned_ptr<uint32_t> pri_size);
 
          /**
-          * Read the secondary key at a secondary iterator's current position.
+          * Move to the first entry whose secondary key is at or above `seek`, and read it.
           *
           * @param handle - secondary iterator handle
-          * @param offset - byte offset within the key
-          * @param dest - destination buffer
-          * @param actual_size - [out] receives the full secondary key size
-          * @return 0 on success
+          * @param seek - secondary key to seek to
+          * @param sec_key - destination for the secondary key
+          * @param pri_key - destination for the primary key
+          * @param sec_size - [out] full secondary key size, 0 at end
+          * @param pri_size - [out] full primary key size, 0 at end. Must not overlap the other size
+          * @return kv_status: ok or end
           */
-         int32_t  kv_idx_key(uint32_t handle, uint32_t offset, span<char> dest, aligned_ptr<uint32_t> actual_size);
+         int32_t  kv_idx_lower_bound(int32_t handle, span<const char> seek, span<char> sec_key, span<char> pri_key,
+                                     aligned_ptr<uint32_t> sec_size, aligned_ptr<uint32_t> pri_size);
 
          /**
-          * Read the primary key associated with a secondary iterator's current entry.
+          * Read the entry stored at the iterator's current position.
           *
           * @param handle - secondary iterator handle
-          * @param offset - byte offset within the primary key
-          * @param dest - destination buffer
-          * @param actual_size - [out] receives the full primary key size
-          * @return 0 on success
+          * @param sec_key - destination for the secondary key
+          * @param pri_key - destination for the primary key
+          * @param sec_size - [out] full secondary key size, 0 unless the status is ok
+          * @param pri_size - [out] full primary key size, 0 unless the status is ok. Must not overlap the other size
+          * @return kv_status: ok; end; no_row if no entry is stored at the current position
           */
-         int32_t  kv_idx_primary_key(uint32_t handle, uint32_t offset, span<char> dest, aligned_ptr<uint32_t> actual_size);
+         int32_t  kv_idx_read(int32_t handle, span<char> sec_key, span<char> pri_key,
+                              aligned_ptr<uint32_t> sec_size, aligned_ptr<uint32_t> pri_size);
 
          /**
-          * Release a secondary index iterator handle back to the pool.
-          * Only call with a valid handle (>= 0) returned by kv_idx_find_secondary
-          * or kv_idx_lower_bound. Do NOT call with -1 (not-found sentinel).
+          * Release a secondary iterator handle back to the pool. -1 is not a handle and throws kv_invalid_iterator.
           *
-          * @param handle - secondary iterator handle from kv_idx_find_secondary or kv_idx_lower_bound
+          * @param handle - secondary iterator handle from kv_idx_create or kv_idx_find
           */
-         void     kv_idx_destroy(uint32_t handle);
+         void     kv_idx_destroy(int32_t handle);
+
+         /**
+          * Find an exact secondary key match and return an iterator on the first entry with that key.
+          *
+          * @param table_id - secondary index identifier
+          * @param code - account whose indices to search
+          * @param prefix - secondary key prefix bounding the iterator's later moves
+          * @param sec_key - secondary key to find, prefix included
+          * @return secondary iterator handle, or -1 with no handle allocated if no entry has that key
+          * @throws kv_empty_key if sec_key is empty
+          * @throws kv_key_outside_prefix if sec_key does not start with prefix
+          */
+         int32_t  kv_idx_find(uint32_t table_id, uint64_t code, span<const char> prefix, span<const char> sec_key);
 
          // memory api
          void* memcpy(memcpy_params) const;
@@ -1154,7 +1141,7 @@ namespace webassembly {
           * @ingroup crypto
           * @param op1 - a span containing the first operand G1 point.
           * @param op2 - a span containing the second operand G1 point.
-          * @param[out] result - the result op1 + op2.
+          * @param[out] result - the result op1 + op2. Must be exactly 64 bytes.
           * @return -1 if there was an error, 0 otherwise
          */
          int32_t alt_bn128_add(span<const char> op1, span<const char> op2, span<char> result) const;
@@ -1165,7 +1152,7 @@ namespace webassembly {
           * @ingroup crypto
           * @param g1_point - a span containing G1 point.
           * @param scalar   - a span containing the scalar.
-          * @param[out] result - g1 * scalar.
+          * @param[out] result - g1 * scalar. Must be exactly 64 bytes.
           * @return -1 if there was an error, 0 otherwise
          */
          int32_t alt_bn128_mul(span<const char> g1_point, span<const char> scalar, span<char> result) const;
@@ -1189,7 +1176,7 @@ namespace webassembly {
           * @param base        - a span containing BASE.
           * @param exp         - a span containing EXPONENT.
           * @param modulus     - a span containing MODULUS.
-          * @param[out] out    - the result (BASE**EXPONENT) % MODULUS
+          * @param[out] out    - the result (BASE**EXPONENT) % MODULUS. Must be exactly the size of modulus.
           * @return              -1 if there was an error, 0 otherwise
          */
          int32_t mod_exp(span<const char> base, span<const char> exp, span<const char> modulus, span<char> out) const;
@@ -1206,7 +1193,7 @@ namespace webassembly {
           * @param t0_offset     - offset counters - unsigned 64-bit little-endian word
           * @param t1_offset     - offset counters - unsigned 64-bit little-endian word
           * @param final         - the final block indicator flag: 1 or 0. Any other value aborts.
-          * @param[out] result   - the result
+          * @param[out] result   - the result. Must be exactly 64 bytes.
           * @return                -1 if there was an error, 0 otherwise
          */
          int32_t blake2_f( uint32_t rounds, span<const char> state, span<const char> message, span<const char> t0_offset, span<const char> t1_offset, bool final, span<char> result) const;
@@ -1237,7 +1224,7 @@ namespace webassembly {
           * @ingroup crypto
           * @param signatue - signature.
           * @param digest - digest of the message that was signed.
-          * @param[out] pub - output buffer for the public key result.
+          * @param[out] pub - output buffer for the public key result. Must be exactly 65 bytes.
           *
           * @return -1 if there was an error, 0 otherwise.
          */

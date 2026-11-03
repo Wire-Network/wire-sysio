@@ -22,7 +22,7 @@ static constexpr size_t total_header_size = header_offset + header_size;
 // renumbered: OC bakes ordinal-derived dispatch offsets into the generated machine code, so a cache produced
 // under any other intrinsic table must be discarded even though its file format is otherwise readable.
 // Bump this (together with current_codegen_version) on ANY change to intrinsic ordinals or gs-region layout.
-static constexpr uint64_t header_id = 0x33434f4d56535953ULL; //"SYSVMOC3" little endian
+static constexpr uint64_t header_id = 0x31434f4d56535953ULL; //"SYSVMOC1" little endian
 
 struct code_cache_header {
    uint64_t id = header_id;

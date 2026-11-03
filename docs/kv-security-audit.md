@@ -1,491 +1,207 @@
 # KV Database Intrinsic Security Audit
 
-## Background
-
-This document catalogs known security vulnerabilities, bugs, and fixes related to
-database intrinsic/host functions (db_store_i64, db_find_i64, db_update_i64,
-db_remove_i64, db_get_i64, db_next_i64, db_previous_i64, db_lowerbound_i64,
-db_upperbound_i64, db_end_i64, and all db_idx* secondary index functions) across
-EOSIO, Leap, and Spring (AntelopeIO) — and evaluates whether each class of
-vulnerability applies to Wire's new KV implementation.
-
----
-
-## 1. Known Upstream Security Vulnerabilities
-
-### 1.1 Cross-Contract Write via Iterator Reuse (EOSIO #2208) — CRITICAL
-
-**What:** In the transition from old to new DB API, the check that
-`table_obj.code == context.receiver` was accidentally omitted from
-`db_update_i64` and `db_remove_i64`. A contract could use `db_find_i64` to
-obtain an iterator to *another* contract's table row, then call `db_update_i64`
-or `db_remove_i64` with that iterator to modify or delete data it did not own.
+This audit checks the 19 KV intrinsics against the known bugs in the database intrinsics of EOSIO, Leap and Spring, and
+records the issues found in Wire's own implementation. `docs/kv-behavior-spec.md` states the behavior these findings rely
+on, with a test for each rule.
 
-**Exploit:** Contract A calls `db_find_i64(B.code, scope, table, pk)` → gets
-iterator `i`. Then calls `db_update_i64(i, A, new_buffer, size)` → overwrites
-B's row.
+## 1. Known upstream issues
 
-**Fix:** Added `EOS_ASSERT(table_obj.code == context.receiver, table_access_violation,
-"db access violation")` to `db_update_i64`, `db_remove_i64`, and all secondary
-index `update`/`remove` methods.
-
-**KV assessment: MITIGATED.** Our KV implementation uses `receiver` (not a
-user-supplied `code` parameter) as the lookup key for all write operations
-(`kv_set`, `kv_erase`, `kv_idx_store`, `kv_idx_remove`,
-`kv_idx_update`). Since writes always query by `(receiver, key)`, a contract
-cannot write to another contract's namespace. Read operations (`kv_get`,
-`kv_contains`, `kv_it_create`, `kv_idx_find_secondary`, `kv_idx_lower_bound`)
-accept a `code` parameter, which is the correct design (cross-contract reads are
-permitted; cross-contract writes are not).
-
-**Recommendation:** No action needed. The architectural choice of keying writes
-by `receiver` structurally prevents this class of bug. Add a unit test that
-explicitly verifies cross-contract write attempts fail.
-
----
-
-### 1.2 onerror Handler Spoofing (EOSIO #2671) — HIGH
-
-**What:** After the onerror handling was moved out of the system contract, any
-user-signed transaction could deliver a fake `onerror` action to a contract
-without going through the system contract. Contracts that trusted the onerror
-payload could be tricked into performing unintended state changes.
-
-**KV assessment: NOT DIRECTLY APPLICABLE.** This is an action-dispatch issue,
-not a database intrinsic issue. However, any contract using KV storage inside
-an `onerror` handler should validate the action source.
-
-**Recommendation:** No KV-specific action needed.
-
----
-
-### 1.3 Iterator Cache Use-After-Remove (Upstream Ongoing) — HIGH
-
-**What:** In the legacy `iterator_cache` design, calling `db_remove_i64(iter)`
-sets `_iterator_to_object[iter] = nullptr` but the integer handle remains valid
-from the WASM side. A subsequent `db_get_i64(iter)` or `db_next_i64(iter)` on
-the stale handle triggers `EOS_ASSERT(result, table_operation_not_permitted,
-"dereference of deleted object")`.
-
-While the assertion prevents a crash, the behavior is non-obvious and has led to
-contract bugs.
-
-**Upstream fix:** The `iterator_cache::get()` method checks for null pointer:
-```cpp
-auto result = _iterator_to_object[iterator];
-EOS_ASSERT( result, table_operation_not_permitted, "dereference of deleted object" );
-```
-
-**KV assessment: DIFFERENT DESIGN, PARTIALLY APPLICABLE.** Our KV iterator pool
-uses a `kv_iterator_slot` with an explicit `in_use` flag and `status` enum
-(`iterator_ok`, `iterator_end`, `iterator_erased`). When a row pointed to by an
-iterator is erased, `kv_it_key` and `kv_it_value` detect the deletion by
-re-seeking the chainbase index and set `status = iterator_erased`. This is a
-better design than the upstream pointer-nulling approach.
+### 1.1 Cross-contract write through a reused iterator (EOSIO #2208): critical
 
-**HOWEVER: There is a subtle issue.** If the iterator's `current_key` still
-matches a row that was erased and then a *new* row was inserted with the same
-key (within the same transaction), the iterator would find the new row rather
-than reporting `iterator_erased`. This is technically correct (cursor-like
-semantics) but differs from the legacy behavior.
+In the move to a new database API, the check that `table_obj.code == context.receiver` was left out of `db_update_i64`
+and `db_remove_i64`. A contract could call `db_find_i64` on another contract's row, then pass that iterator to an update
+or remove and change a row it did not own.
 
-**Recommendation:**
-1. Document the cursor-reseeking semantics explicitly.
-2. Add a test: erase a row pointed to by an iterator, insert a new row with the
-   same key, and verify the iterator finds the new row (not erased status).
+**KV: not possible.** No write takes a `code` argument or a handle. `kv_set`, `kv_erase`, `kv_idx_store`, `kv_idx_update`
+and `kv_idx_erase` always use `receiver`, so there is no check to leave out. `kv_get`, `kv_it_create`, `kv_idx_create` and
+`kv_idx_find` take a `code`, because reading another contract's tables is allowed.
 
----
+### 1.2 Forged onerror (EOSIO #2671): high
 
-### 1.4 Chainbase Iterator Invalidation on Session Rollback (EOSIO #9530) — HIGH
+Any user could deliver a fake `onerror` action to a contract after the handler moved out of the system contract.
 
-**What:** When chainbase sessions are rolled back (undo), all chainbase iterators
-become invalid because the underlying B-tree nodes may be freed. The
-`session-invalidate-iterators` branch added explicit invalidation of all
-iterators when a session is undone.
-
-**KV assessment: MITIGATED BY DESIGN.** Our KV iterators store `current_key`
-bytes (not chainbase iterator pointers) and re-seek using
-`idx.find(boost::make_tuple(code, sv_key))` on every access. This means a
-session rollback that removes the pointed-to row will be detected at next use
-(the find will return `end()`), and the iterator transitions to
-`iterator_erased` or `iterator_end`.
-
-**Recommendation:** Add a test that:
-1. Creates a KV iterator pointing to a row
-2. Triggers a session rollback (e.g. via failed inline action)
-3. Verifies the iterator correctly reports `iterator_erased`/`iterator_end`
-
----
-
-### 1.5 db_lowerbound_i64 Incorrect Results (ENF/Leap PR #720 lineage) — MEDIUM
-
-**What:** The `db_lowerbound_i64` function had a bug in certain edge cases with
-the RocksDB backing store where the lower_bound returned incorrect results when
-the search key was at the boundary of a table's range. The merge commit
-`0cb196b7fa` references "fix-db-lowerbound-i64-desc".
-
-**KV assessment: NEEDS VERIFICATION.** Our `kv_it_lower_bound` implementation
-uses `idx.lower_bound(boost::make_tuple(slot.code, seek_key))` and then
-validates that the result has the correct prefix:
-```cpp
-if (itr != idx.end() && itr->code == slot.code && key_has_prefix(*itr, slot.prefix))
-```
-This should be correct, but the prefix boundary check deserves testing.
-
-**Recommendation:** Add edge-case tests for:
-- lower_bound at exact prefix boundary
-- lower_bound with key == prefix (should find first entry)
-- lower_bound with key beyond all entries in prefix range
-- lower_bound with empty prefix (should iterate all of code's data)
+**KV: does not apply.** This is an action dispatch issue, not a database one.
 
----
+### 1.3 Use of an iterator after its row is removed: high
 
-### 1.6 db_previous_i64 Off-by-One (EOSIO RocksDB) — MEDIUM
+In the legacy `iterator_cache`, removing a row left the handle valid from WASM, and using it threw "dereference of
+deleted object". The assert prevented a crash, but the behavior surprised contracts.
 
-**What:** Commit `bfbd46047b` fixed a one-line bug in `db_previous_i64` for the
-RocksDB backing store, where the reverse iteration logic produced incorrect
-results.
-
-**KV assessment: NEEDS VERIFICATION.** Our `kv_it_prev` has complex logic for
-both "at end" and "at valid position" cases, using `byte_successor` to compute
-the upper bound of the prefix range. The `byte_successor` function for all-0xFF
-prefix bytes (which produces an empty successor, meaning "end of code range")
-needs careful testing.
-
-**Recommendation:** Test `kv_it_prev` from:
-- `iterator_end` state with entries in range → should find last entry
-- `iterator_end` state with NO entries in range → should stay `iterator_end`
-- First entry → should transition to `iterator_end`
-- Middle entry → should find previous entry
-- With prefix = `\xFF\xFF\xFF` (all-FF prefix edge case)
-
----
-
-### 1.7 RocksDB DB Intrinsic Replay Inconsistency (EOSIO #9632) — MEDIUM
-
-**What:** The RocksDB implementation of database intrinsics had bugs in replay
-logic causing inconsistencies. Commit `5dfa382e3b` merged fixes for "DB
-intrinsic replay logic".
-
-**KV assessment: MITIGATED.** We use chainbase (shared memory), not RocksDB, for
-KV storage. Chainbase's undo/redo mechanism is well-tested. However, the general
-lesson applies: all state mutations must be deterministic and replayable.
-
-**Recommendation:** Ensure that the new KV intrinsics are included in the
-deep_mind logging (already done via `dm_logger->on_kv_set()` and
-`dm_logger->on_kv_erase()`).
-
----
-
-### 1.8 abi_serializer Stack Overflow (CVE-2018-1000618) — LOW (for KV)
-
-**What:** EOSIO eos had a stack overflow in `abi_serializer` that could crash a
-node by sending deeply nested ABI types.
-
-**KV assessment: NOT DIRECTLY APPLICABLE.** The KV API deals with raw bytes, not
-ABI-deserialized data. However, the `chain_plugin` RPC endpoints that read KV
-data and deserialize it via ABI should enforce recursion limits.
-
-**Recommendation:** No KV-specific action needed. Ensure chain_plugin KV query
-endpoints use the existing `abi_serializer::max_recursion_depth` limits.
-
----
-
-### 1.9 RAM Billing Manipulation via Notify Context (General Pattern) — HIGH
-
-**What:** In the legacy API, a contract receiving a notification (where
-`receiver != act->account`) could manipulate RAM billing by storing data with a
-payer that is the notifying contract or a third party. The protection is:
-```cpp
-// In validate_account_ram_deltas():
-if (!privileged && itr->delta > 0 && itr->account != receiver) {
-   EOS_ASSERT(not_in_notify_context, unauthorized_ram_usage_increase, ...);
-   EOS_ASSERT(has_authorization(itr->account), unauthorized_ram_usage_increase, ...);
-}
-```
-
-**KV assessment: CORRECTLY HANDLED.** Our KV implementation:
-1. `kv_set` always writes to `receiver`'s namespace
-2. Payer defaults to `receiver`; explicit payer enforced by transaction-level `unauthorized_ram_usage_increase` check
-3. `validate_account_ram_deltas()` runs after every action execution and catches
-   unauthorized RAM increases
-4. Additional Wire-specific payer authorization checks enforce
-   `config::sysio_payer_name` permission
-
-**Recommendation:** Verify test coverage for:
-- Non-privileged contract trying `payer != receiver` without auth (should fail via unauthorized_ram_usage_increase)
-- Notify context RAM billing (should fail for non-self increases)
-- Contract with payer authorization setting arbitrary payer (should succeed)
-
----
-
-### 1.10 key_type Enforcement on table_id_object (EOSIO, 2018) — LOW
-
-**What:** Commit `9f7bd6e4b0` added `key_type` to `table_id_object` to enforce
-consistent key usage — preventing a contract from accessing the same table with
-different key types (e.g. using `db_idx64` operations on a table created with
-`db_store_i64` only).
-
-**KV assessment: NOT APPLICABLE.** The KV API has a single unified key format
-(byte strings). The `key_format` field (0=raw, 1=standard) is stored per row
-and does not affect lookup behavior.
-
-**Recommendation:** No action needed.
-
----
-
-### 1.11 Foreign Key / Snapshot Integrity (EOSIO, 2018) — MEDIUM
-
-**What:** Commit `0099d40555` fixed how contract table objects were snapshotted
-and integrity-checked. The issue was that `table_id_object` rows served as
-foreign keys for `key_value_object` rows, and snapshot traversal needed to
-respect this relationship to avoid orphaned or misattributed data.
-
-**KV assessment: PARTIALLY APPLICABLE.** Our `kv_object` has no foreign key
-dependency (it's keyed by `(code, key)` directly). However, `kv_index_object`
-rows reference their parent `kv_object` via the same `(code, table, primary_key)`
-tuple. **If a `kv_object` is erased without cleaning up its `kv_index_object`
-entries, orphaned secondary index rows will remain.**
-
-**THIS IS A REAL ISSUE IN OUR CODE.** Looking at `kv_erase()`:
-```cpp
-int64_t apply_context::kv_erase(const char* key, uint32_t key_size) {
-   ...
-   db.remove(*itr);  // Removes kv_object only
-   return delta;      // Does NOT remove associated kv_index_object entries!
-}
-```
-The `kv_erase` intrinsic removes the primary `kv_object` row but does **not**
-clean up any associated `kv_index_object` rows. This is a data consistency bug.
-
-**The CDT-side `wire::kv::table` is expected to call `kv_idx_remove` for each
-secondary index before calling `kv_erase`.** However, a malicious contract
-could call `kv_erase` directly via the raw intrinsic without cleaning up
-secondary indices, leaving orphaned index entries that:
-- Waste RAM (billed to the payer of the secondary index rows)
-- Could cause stale secondary index lookups to return primary keys that no
-  longer exist
-- Could cause snapshot inconsistency if integrity checks expect referential
-  consistency
-
-**Recommendation: HIGH PRIORITY.**
-1. **Option A (Enforce at intrinsic level):** Have `kv_erase` automatically
-   remove all `kv_index_object` rows matching the erased key's primary key.
-   This requires knowing the table/index structure, which the raw intrinsic
-   does not have.
-2. **Option B (Best-effort cleanup):** If `key_format == 1` (standard encoding
-   with table:scope:pk embedded), extract the table and pk from the key and
-   remove matching secondary index entries.
-3. **Option C (Document and test):** Accept that the CDT library is responsible
-   for cleanup, document this clearly, and add integrity-check logic that can
-   detect orphaned secondary index rows.
-4. **Option D (Hybrid):** Add a `kv_erase_with_indices(key, table)` intrinsic
-   that does the cleanup atomically.
+**KV: different design.** An iterator's position is a key, not a row. After the row is erased, `kv_it_read` and
+`kv_idx_read` return `no_row`, and if a row is stored again at that key they read it back. Moves go strictly past the key.
+Slots cache a pointer to the row for speed, and `kv_erase`, `kv_idx_erase` and `kv_idx_update` clear it through
+`kv_iterator_pool::forget_row` for every open slot on that row. Nothing else can change a KV row while a slot is open,
+because a handle lasts for one contract's execution and only that contract's code is running.
 
----
+### 1.4 Chainbase iterators after a session rollback (EOSIO #9530): high
 
-## 2. Vulnerability Classes and KV Assessment
+Rolling back a session freed nodes that iterators still pointed to.
 
-### 2.1 Iterator Invalidation
+**KV: does not apply.** A slot's cached row pointer cannot outlive a rollback. An undo happens only when the transaction
+fails, which ends the contract that held the handle, and every handle is released before the next contract runs.
 
-| Check | Legacy (upstream) | Our KV |
-|-------|-------------------|--------|
-| Bounds check on iterator handle | `EOS_ASSERT(iterator >= 0 && < size)` | `kv_iterators.get(handle)` checks `in_use` flag |
-| Deleted object dereference | Null pointer check in `iterator_cache::get()` | Re-seek by key; detects missing rows as `iterator_erased` |
-| End iterator dereference | `EOS_ASSERT(iterator >= 0)` blocks negative values | `status == iterator_end` check in `kv_it_key/value` |
-| Session rollback invalidation | Explicit invalidation added in EOSIO #9530 | Re-seek design is inherently safe |
-| Iterator pool exhaustion | No limit (grows unbounded) | Fixed pool of `max_kv_iterators=16` with limit check |
-
-**Overall: IMPROVED.** The re-seeking design and fixed pool are safer than upstream.
-
----
+### 1.5 lower_bound at a table boundary (merge `0cb196b7fa`): medium
 
-### 2.2 RAM Billing
+`db_lowerbound_i64` returned wrong results in edge cases at the boundary of a table's range.
 
-| Check | Legacy (upstream) | Our KV |
-|-------|-------------------|--------|
-| Read-only transaction blocks writes | `EOS_ASSERT(!trx_context.is_read_only())` | Same check on `kv_set`, `kv_erase`, `kv_idx_*` |
-| Empty payer rejected | `EOS_ASSERT(payer != account_name())` | Payer defaults to `receiver` when 0; never empty |
-| Non-owner payer enforced at transaction level | N/A (legacy uses `require_authorization`) | Payer defaults to `receiver` when 0; non-zero payer enforced by `unauthorized_ram_usage_increase` |
-| Notify context RAM protection | `validate_account_ram_deltas()` | Same function runs, same checks |
-| Billable size accounting | `config::billable_size_v<key_value_object>` | `config::billable_size_v<kv_object>` with correct overhead |
+**KV: covered.** A seek searches for (code, table_id, the greater of seek and prefix), and the landing row must have the
+slot's code and table_id and start with its prefix, or the iterator is at `end`. A seek below the prefix starts from the
+prefix, and one above it is `end`. An empty prefix covers one (code, table_id), not all of a contract's data.
 
-**Overall: EQUIVALENT with additional Wire-specific payer permission checks.**
+### 1.6 Off by one in reverse iteration: medium
 
----
+Upstream fixed a bug in the reverse step of its RocksDB backing store.
 
-### 2.3 Cross-Contract Access
+**KV: covered.** From `end`, `kv_step_prev` seeks to the byte successor of the prefix and steps back. An all-0xFF prefix
+has no successor, so it seeks from the end of the (code, table_id) range instead. From the first row of the index it goes
+to `end`, and it never moves out of the prefix.
 
-| Check | Legacy (upstream) | Our KV |
-|-------|-------------------|--------|
-| Write scoping | `table_obj.code == receiver` check (was missing, EOSIO #2208) | Writes always use `receiver` as code — structural guarantee |
-| Read access | Any contract can read any table via `db_find_i64(code, ...)` | Same: `kv_get(code, ...)`, `kv_it_create(code, ...)` |
-| Secondary index writes | `table_obj.code == context.receiver` | `kv_idx_store/remove/update` use `receiver` as code; payer tracked per-entry like `kv_object` |
+### 1.7 Replay inconsistency in a RocksDB backing store (EOSIO #9632): medium
 
-**Overall: STRUCTURALLY STRONGER.** The legacy API required a runtime check that
-was once missing; our KV API prevents the bug by design.
+**KV: does not apply today.** State is in chainbase. The general lesson stands for any future engine: every state change
+has to be deterministic and replayable.
 
----
+### 1.8 abi_serializer stack overflow (CVE-2018-1000618): low
 
-### 2.4 Buffer Overflow / Size Validation
+**KV: does not apply to the intrinsics,** which handle raw bytes. RPC reads that decode rows through an ABI use
+`abi_serializer` with its `max_recursion_depth`.
 
-| Check | Legacy (upstream) | Our KV |
-|-------|-------------------|--------|
-| Key size limit | N/A (fixed 8-byte uint64_t) | `max_kv_key_size = 256` enforced |
-| Value size limit | Implicit via RAM limits only | `max_kv_value_size = 256KB` enforced |
-| Partial write overflow | N/A | `static_cast<uint64_t>(offset) + value_size <= max` (uint64 cast prevents uint32 wrap) |
-| Secondary key size | N/A (fixed type-specific sizes) | `max_kv_secondary_key_size = 256` enforced |
-| Iterator pool overflow | Unbounded growth | `max_kv_iterators = 16` with assertion |
-| Read buffer overrun | WASM linear memory bounds checked by sys-vm | Same (legacy_span enforces bounds) |
+### 1.9 RAM billing through a notification: high
 
-**Overall: IMPROVED.** Explicit limits where legacy had none.
+A notified contract could bill data to the notifying contract or a third party.
 
----
+**KV: covered.** `validate_account_ram_deltas` runs after every action. For an unprivileged receiver:
 
-### 2.5 Undo/Rollback Consistency
+- A notified contract cannot grow another account's RAM at all.
+- Otherwise an account whose RAM grew must have authorized the action, or it fails with
+  `unauthorized_ram_usage_increase`.
+- It must have authorized with `sysio.payer`, or it fails with `unsatisfied_authorization`. This is a Wire addition.
 
-| Check | Legacy (upstream) | Our KV |
-|-------|-------------------|--------|
-| Chainbase undo support | Built-in for all index types | Built-in for `kv_object` and `kv_index_object` |
-| Value size undo amplification | Unbounded (could create huge undo entries) | `max_kv_value_size = 256KB` caps amplification |
-| Iterator state after undo | Invalidated (EOSIO #9530) | Re-seek design handles transparently |
+The payer must be named on insert: 0 is rejected with `invalid_table_payer`. On a row that exists, 0 keeps the payer.
 
-**Overall: EQUIVALENT with improvement from value size cap.**
+`sysio.payer` is bypassed for a privileged `sysio.*` receiver, for a privileged receiver naming `sysio` as payer, and for
+any action with `sysio` as an authorizing actor.
 
----
+### 1.10 key_type enforcement on table_id_object (`9f7bd6e4b0`): low
 
-## 3. Identified Issues in Our KV Implementation
+**KV: does not apply.** There is one kind of key, a byte string, and no per-row format. A call that names a table takes
+its `table_id` as a `uint32_t`, refused above 65535. Iterator moves take a handle and no `table_id`.
 
-### ISSUE-1: kv_erase Does Not Clean Up Secondary Index Entries — BY DESIGN
+### 1.11 Foreign keys in snapshots (`0099d40555`): medium
 
-The `kv_erase` intrinsic removes only the `kv_object` row. Any `kv_index_object`
-rows referencing the same primary key must be removed separately via `kv_idx_remove`.
+Legacy rows referred to `table_id_object` rows, and snapshots had to respect that link.
 
-**Status: Not a bug.** This is the same pattern as legacy `multi_index` where the
-CDT wrapper calls `remove_secondaries()` before `db_remove_i64`. The host provides
-primitives; the CDT library orchestrates cleanup. A contract calling raw `kv_erase`
-without `kv_idx_remove` would leave orphaned secondaries, but that is a contract
-bug, not a host bug.
+**KV: does not apply.** `kv_object` is keyed by (code, table_id, key) and refers to nothing. Nothing links an index entry
+to a row, and snapshots do no referential check. See [Orphaned index entries](#orphaned-index-entries).
 
-**File:** `libraries/chain/apply_context.cpp` (kv_erase function)
+## 2. Comparison with the legacy intrinsics
 
-### ISSUE-1a: Fixes Applied During This Audit
+### Iterators
 
-The following hardening was applied based on this audit:
-
-1. **Empty key rejection** — `kv_set`, `kv_erase` now assert
-   `key_size > 0`. An empty key could cause confusion with prefix iteration.
-2. **key_format validation** — `kv_set` now asserts
-   `key_format <= 1`. Values other than 0 (raw) or 1 (standard) are rejected.
-
----
-
-### ISSUE-2: kv_it_key/kv_it_value Missing Offset Bounds Check (LOW)
-
-In `kv_it_key`:
-```cpp
-if (dest_size > 0 && offset < itr->key_size) {
-    uint32_t copy_size = std::min(dest_size, itr->key_size - offset);
-    memcpy(dest, itr->key_data() + offset, copy_size);
-}
-```
-This is correct — it silently returns 0 bytes copied if offset >= key_size.
-However, `actual_size` is set to the full key size regardless of offset, which
-could confuse callers. The same pattern exists in `kv_it_value`.
-
-**Impact:** Low — the CDT library handles this correctly, but a raw intrinsic
-user might be confused by `actual_size` not reflecting the offset.
-
-**Recommendation:** Consider whether `actual_size` should be
-`max(0, key_size - offset)` instead of `key_size`.
-
----
-
-### ISSUE-3: No Rate Limiting on Iterator Create/Destroy Cycles (LOW)
-
-A malicious contract could call `kv_it_create`/`kv_it_destroy` in a tight loop.
-The pool size is limited to 16, so at most 16 iterators exist simultaneously.
-However, the create/destroy cycle itself has no CPU cost beyond the intrinsic
-call overhead.
-
-**Impact:** Minimal. The existing CPU billing per intrinsic call provides
-implicit rate limiting.
-
-**Recommendation:** No action needed. The CPU billing model handles this.
-
----
-
-### ISSUE-4: Billable Size Accounting for kv_erase (MEDIUM)
-
-In `kv_erase`:
-```cpp
-int64_t delta = -static_cast<int64_t>(itr->key_size + itr->value.size()
-                + config::billable_size_v<kv_object>);
-```
-
-This credits back the primary key row's billable size. But if there were
-associated `kv_index_object` rows (secondary indices), their billable size is
-NOT credited back because `kv_erase` does not remove them (ISSUE-1). This means
-the payer of the secondary index rows continues to be billed for storage that
-is effectively orphaned.
-
-**Impact:** Economic — users pay for orphaned secondary index storage.
-
-**File:** Same as ISSUE-1.
-
----
-
-## 4. CVE Summary
-
-| CVE | Description | Applies to KV? |
-|-----|-------------|-----------------|
-| CVE-2018-1000618 | abi_serializer stack overflow | No (KV uses raw bytes) |
-| CVE-2022-27134 | batdappboomx access control in transfer | No (contract-level, not intrinsic) |
-
-No CVEs were found specifically targeting EOSIO/Leap/Spring database host
-functions. Most security fixes were made via internal issue tracking (EOSIO
-GitHub issues #2208, #2671, etc.) without CVE assignment. The EOSIO project did
-not systematically use CVEs for their security disclosures.
-
----
-
-## 5. Priority Recommendations
-
-| Priority | Issue | Status |
-|----------|-------|--------|
-| ~~HIGH~~ | ~~ISSUE-1: Orphaned secondary indices~~ | **By design** — CDT handles cleanup |
-| ~~HIGH~~ | ~~ISSUE-5: Billable size from orphaned indices~~ | **By design** — same as above |
-| **DONE** | Empty key rejection | Fixed: `key_size > 0` asserted in kv_set/kv_erase |
-| **DONE** | key_format validation | Fixed: `key_format <= 1` asserted in kv_set |
-| **DONE** | Section 1.5: kv_it_lower_bound edge cases | Tests: testitlbound, tstlbound |
-| **DONE** | Section 1.6: kv_it_prev edge cases | Tests: tstprevbgn, tstpreveras, tstreviter |
-| **DONE** | Section 1.3: Iterator after erase+reinsert | Test: tstreraseins |
-| **DONE** | Read-only transaction write rejection | Test: tstrdonly |
-| **LOW** | ISSUE-2: actual_size semantics with offset | CDT handles correctly |
-| **LOW** | ISSUE-3: Iterator create/destroy cycles | No action (CPU billing handles it) |
-
----
-
-## 6. Test Coverage Checklist
-
-These tests should exist in the KV test suite to guard against the vulnerability
-classes identified above:
-
-- [x] Cross-contract write attempt via kv_set with different code → fails (testcrossrd)
-- [x] Cross-contract read via kv_get with different code → succeeds (testcrossrd)
-- [x] Iterator to erased row → reports iterator_erased (tsterasedinv)
-- [x] Erase row, insert same key, iterator finds new row (tstreraseins)
-- [x] kv_set with payer != receiver without auth → fails (tstpayeroth, unauthorized_ram_usage_increase)
-- [x] kv_set with payer != receiver with payer auth → succeeds (move_my_ram in protocol_feature_tests)
-- [x] kv_it_lower_bound at exact key and gap (testitlbound, tstlbound)
-- [x] kv_it_prev from iterator_end → finds last entry (tstreviter, tstrbegin)
-- [x] kv_it_prev from first entry → transitions to end (tstprevbgn)
-- [x] kv_it_prev on erased iterator → reports erased status (tstpreveras)
-- [x] Iterator pool exhaustion (create 16+1 iterators) → exception (tstitexhfail)
-- [x] Empty key (key_size=0) rejected by kv_set (tstemptykey)
-- [x] Invalid key_format (>1) rejected by kv_set (tstbadfmt)
-- [x] kv_set in read-only transaction → fails (tstrdonly)
-- [x] RAM billing in notify context — notification receiver writes to own namespace (tstsendnotif → kvnotify)
-- [x] Read-only transaction calling kv_set → table_operation_not_permitted (tstrdonly)
-- [x] kv_it_key with offset >= key_size → returns 0 bytes copied (tstkeyoffbnd)
-- [x] Secondary key size > max_kv_secondary_key_size → kv_secondary_key_too_large (tstbigseckey)
+| Check | Legacy | KV |
+|---|---|---|
+| Handle bounds | Asserted in `iterator_cache` | Reserved bits, pool tag and an open slot, all checked |
+| Row removed | Throws on use | `no_row` from a read, and moves go past the key |
+| End of range | Asserted | `end`, with both sizes 0 |
+| Pool size | Grows without limit | 1024 per pool, primary and secondary |
+
+### RAM
+
+| Check | Legacy | KV |
+|---|---|---|
+| Read-only transaction | Writes throw | Same, on all five writes |
+| Payer | Must be named | Must be named on insert, and 0 keeps it on update |
+| Notify context | `validate_account_ram_deltas` | Same |
+| Payer consent | Authorization | Authorization, with `sysio.payer` |
+| Row price | `billable_size_v` of the object | `key + value + 112`, and `sec_key + pri_key + 112` for an index entry. Protocol constants |
+
+### Sizes
+
+| Check | Legacy | KV |
+|---|---|---|
+| Key | Fixed 8 bytes | `max_kv_key_size`, default 256, up to 512 |
+| Value | RAM limits only | `max_kv_value_size`, default 256 KiB, up to 1 MiB |
+| Secondary key | Fixed by type | `max_kv_secondary_key_size`, default 256, up to 512 |
+| Prefix | None | 512, the absolute limit |
+| Table namespace | 64-bit names | `table_id` up to 65535, then `kv_invalid_table_id` |
+| Read buffers | Bounds checked by the VM | Same, through `span` and `aligned_ptr` |
+
+`seek` has no size limit, and it needs none. It is not copied, and comparing it against a stored key stops at the end of
+the shorter one, which is at most 512 bytes.
+
+## 3. Issues found in the KV implementation
+
+### Fixed
+
+| Issue | Severity | Fix | Tests |
+|---|---|---|---|
+| An empty index key was accepted, and the snapshot writer refuses one. Any contract keeping such an entry stopped snapshots and integrity hashes on every node. | High | `kv_idx_store` and `kv_idx_update` throw `kv_empty_key` | `kv_intrinsic_probe_tests/zero_length_sec_key`, `zero_length_pri_key`, `zero_length_new_sec_key` |
+| A duplicate or colliding index entry threw an untyped chainbase error. | Medium | The call returns `exists`, and the host checks before `db.modify`, which on a row written in the same session would have lost it | `kv_intrinsic_probe_tests/duplicate_index_store_returns_exists`, `colliding_index_update_returns_exists`, `colliding_update_keeps_existing_entries` |
+| Iterator handles carried over into notified contracts. | Low | `exec_one` releases both pools first | `kv_intrinsic_probe_tests/notified_receiver_cannot_use_primary_handle`, `notified_receiver_cannot_use_secondary_handle`, `notified_receiver_starts_from_slot_zero` |
+| Attested snapshot hashes depended on allocation order, which another engine cannot reproduce, and two chains with the same rows could disagree. | High | KV sections are written in key order | `snapshot_part2_tests/test_kv_insertion_order_does_not_change_integrity_hash` |
+| RAM prices followed `sizeof`, so a layout or engine change could move them. | Medium | The overhead is a named protocol constant | `kv_api_tests/billing_create_row`, `billing_idx_create_row` |
+| An oversized `table_id` reported `kv_key_too_large`. | Low | `kv_invalid_table_id` | `kv_intrinsic_probe_tests/table_id_above_uint16_rejected` |
+| Deep mind did not report index entries, and KV RAM lines had no trace. | Low | `KV_IDX_OP` lines and named `RAM_OP` lines | `deep_mind_tests/deep_mind` |
+
+### Open
+
+| Issue | Severity | Note |
+|---|---|---|
+| `table_id` collisions | Low | The chain does not enforce uniqueness of a 16-bit `table_id`. CDT codegen rejects a collision within one ABI, and a contract calling the intrinsics directly has no such check. A collision stays inside one contract's own tables, since `code` partitions them. RPC and SHiP trust the ABI's `table_id`, so a contract with colliding tables can make its rows decode as the wrong type for readers. |
+| Charge below the stored size | Low | The charge is a price, not what a row occupies. Keys of 8 to 24 bytes, held inside the row, bill above what they store, except for 2 bytes on a row whose value lands just past a rounding boundary. Keys under 8 bytes fall a few bytes short. Keys past 24 bytes need a blob and can bill less: a `checksum256` entry stores 12 bytes above its charge, and at the worst lengths, 25 and 33 bytes, an index entry stores 42 above its charge and a row 26. `docs/kv-ram-billing.md` has the measured table. It is bounded per row, and the price is a protocol constant, so this will not change by itself. |
+
+### By design
+
+#### Orphaned index entries
+
+`kv_erase` removes the row only, and any index entries remain until they are erased with `kv_idx_erase`. The host has no
+way to find them: it does not know which secondary `table_id` belongs to a table, and `pri_key` is opaque. CDT removes
+entries before it erases a row, as `multi_index` always did.
+
+A contract that calls `kv_erase` directly keeps paying for its own orphaned entries, and stale lookups can then return
+primary keys that no longer exist. Both stay inside that contract. An orphaned entry cannot break a snapshot, which does
+no referential check.
+
+#### Full sizes with an offset
+
+`kv_get` and `kv_it_read` report a value's full size whatever the offset, so a contract can size a buffer from any read.
+
+#### Iterator create and destroy cycles
+
+Creating and destroying iterators in a loop costs CPU, which is billed. A slot holds at most 512 prefix bytes and its
+position, and there are 2048 slots at most, so the memory an action can hold this way is bounded.
+
+## 4. CVE summary
+
+| CVE | Description | Applies to KV |
+|---|---|---|
+| CVE-2018-1000618 | `abi_serializer` stack overflow | No, the intrinsics handle raw bytes |
+| CVE-2022-27134 | `batdappboomx` access control in `transfer` | No, this is at contract level |
+
+Most upstream security fixes were made through issue tracking with no CVE, so this table is not a measure of what upstream
+fixed.
+
+## 5. Test checklist
+
+| Class | Tests |
+|---|---|
+| Writes cannot name another contract | The intrinsics have no such argument |
+| Cross-contract read | `kv_api_tests/cross_contract_idx_read` |
+| Row erased under an iterator | `kv_intrinsic_probe_tests/iterator_invalidated_by_erase`, `kv_api_tests/it_erased_row_invalidation` |
+| Erased and stored again | `kv_intrinsic_probe_tests/primary_position_is_by_key`, `secondary_position_is_by_key`, `kv_api_tests/iterator_erase_reinsert_same_key` |
+| Unauthorized payer | `kv_api_tests/payer_other_requires_auth`, `payer_change_unauth_fails` |
+| Payer without `sysio.payer` | `kv_api_tests/payer_change_active_only_fails` |
+| Authorized payer | `kv_api_tests/payer_change_same_size` |
+| Privileged bypass | `protocol_feature_tests/privileged_kv_payer_bypass` |
+| Notify context | `kv_api_tests/notify_self_pay_bills_receiver`, `notify_third_party_payer_fails` |
+| Seek bounds | `kv_intrinsic_probe_tests/primary_moves_read_the_row`, `secondary_prefix_bounds_the_iterator` |
+| Reverse from end and from the first row | `kv_intrinsic_probe_tests/primary_moves_read_the_row`, `it_prev_at_begin_transitions_to_end`, `kv_api_tests/iterator_prev_from_begin` |
+| All-0xFF prefix, secondary | `kv_intrinsic_probe_tests/secondary_prefix_bounds_the_iterator` |
+| Iterator pool limits | `kv_api_tests/it_pool_overflow_1025`, `kv_intrinsic_probe_tests/secondary_iterator_slot_exhaustion` |
+| Fabricated and wrong-pool handles | `kv_intrinsic_probe_tests/reserved_bits_handle_rejected`, `primary_intrinsic_on_secondary_handle_rejected`, `no_handle_value_rejected` |
+| Empty keys | `kv_intrinsic_probe_tests/kv_set_empty_key_rejected`, `kv_erase_empty_key_rejected`, `zero_length_sec_key` |
+| Size limits | `kv_intrinsic_probe_tests/kv_set_oversize_key_rejected`, `kv_set_oversize_value_rejected`, `kv_idx_store_oversize_sec_rejected` |
+| Read-only transactions | `kv_api_tests/read_only_trx_rejects_write`, `read_only_rejects_kv_erase` |
+| Offsets past the end | `kv_intrinsic_probe_tests/it_value_offset_boundaries`, `read_offsets_with_short_buffers` |
+| Hand-built snapshots | `snapshot_part2_tests/kv_snapshot_reader_enforces_row_limits` |
+| Orphaned entries | `kv_intrinsic_probe_tests/dangling_secondary_after_primary_erase` |

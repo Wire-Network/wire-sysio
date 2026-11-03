@@ -75,6 +75,10 @@ Key points:
 
 - The root hash is BLAKE3 over the concatenation of the per-section hashes in canonical
   order. Two providers that snapshot the same finalized block compute the same root hash.
+- Within the KV sections, rows are in key order: `kv_object` by (code, table_id, key) and
+  `kv_index_object` by (code, table_id, sec_key, pri_key), comparing keys as unsigned bytes
+  with a shorter prefix first. Row order is therefore part of the hash but does not depend on
+  insertion history or on the storage engine.
 - The writer streams sequentially through a hashing buffer, so hashing adds essentially no
   overhead over a plain write. The reader memory-maps the file and uses the trailing index
   for direct section lookup.
@@ -200,7 +204,7 @@ to avoid excessive snapshot overhead. Verification grace is `floor(min(block_spa
 blocks: small test values shorten it, but a large value cannot extend it beyond 12,500 blocks.
 
 The contract applies changes immediately. Each node reads the fixed two-uint32 `snapconfig` KV row
-once at startup, directly from chainbase, using the table identifier and eight-byte name key. If
+once at startup through the controller's KV store, using the table identifier and eight-byte name key. If
 there is no row, it uses 25,000. There is no ABI decode, queued read, timeout or retry for cadence.
 Operators must restart provider and serving nodes after a change so they adopt the same interval;
 snapshot bootstrap checks the loaded height against its own pre-replay configuration. The post-replay
