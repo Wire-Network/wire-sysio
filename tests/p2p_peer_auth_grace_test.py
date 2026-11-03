@@ -23,7 +23,6 @@ import json
 import secrets
 import select
 import shutil
-import socket
 import threading
 import time
 from pathlib import Path
@@ -33,7 +32,7 @@ from TestHarness.TestHelper import AppArgs
 from TestHarness.raw_p2p import (CONNECTION_CLEANUP_PERIOD_SECONDS, INITIAL_GENERATION, KEEPALIVE_SECONDS, LOOPBACK,
                                  POLL_SECONDS, RECV_BYTES, RESPONSE_TIMEOUT_SECONDS, STARTUP_TIMEOUT_SECONDS,
                                  GoAwayReason, RawPeer, accept_connection, answer_handshake, connect, launch_nodeop,
-                                 node_log, open_incoming, producer_args, stop_node, wait_for_block,
+                                 listen, node_log, open_incoming, producer_args, stop_node, wait_for_block,
                                  wait_for_chain_id, wait_for_log, write_genesis)
 
 
@@ -240,10 +239,7 @@ def run_auth_timeout(case_index, args):
     peer_port = Utils.getPort(Utils.PortAlternateP2P, case_index)
     node = None
     peers = []
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
-        listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        listener.bind((LOOPBACK, peer_port))
-        listener.listen()
+    with listen(peer_port) as listener:
         try:
             node, _ = launch_node("auth_timeout", ["--p2p-peer-address", f"{LOOPBACK}:{peer_port}"])
             connection = accept_connection(listener, node, time.monotonic() + STARTUP_TIMEOUT_SECONDS)
@@ -337,10 +333,7 @@ def run_redial_sync(case_index, args):
     genesis_path, bios_key = write_genesis(Path(Utils.DataPath) / "redial_sync")
     source = sync_node = relay = None
     peers = []
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
-        listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        listener.bind((LOOPBACK, peer_port))
-        listener.listen()
+    with listen(peer_port) as listener:
         try:
             source, source_p2p_port = launch_node("redial_sync/source", producer_args(bios_key), genesis_path)
             irreversible_target = SYNC_SPANS * SYNC_FETCH_SPAN

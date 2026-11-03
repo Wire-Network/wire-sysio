@@ -145,7 +145,7 @@ namespace fc {
             if (cfg.sinks[i].type == "console_sink") {
                auto config = cfg.sinks[i].args.as<sink::console_sink_config>();
                if (config.color) {
-                  if (config.output_type == sink::output_t::stderr) {
+                  if (config.output_type == sink::output_t::output_stderr) {
                      auto color_sink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
                      config_colors(color_sink, config.level_colors);
                      sink = color_sink;
@@ -155,7 +155,7 @@ namespace fc {
                      sink = color_sink;
                   }
                } else {
-                  if (config.output_type == sink::output_t::stderr) {
+                  if (config.output_type == sink::output_t::output_stderr) {
                      sink = std::make_shared<spdlog::sinks::stderr_sink_mt>();
                   } else {
                      sink = std::make_shared<spdlog::sinks::stdout_sink_mt>();

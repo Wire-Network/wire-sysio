@@ -42,7 +42,8 @@ NODE_INDEXES = itertools.count()
 # raw_client lease slots free for connect() to bind. A closed session's slot goes to the back, so it is reused as
 # late as possible.
 FREE_CLIENT_PORT_INDEXES = collections.deque(range(Utils.RawClientPortCount))
-# struct linger {l_onoff, l_linger} that makes close() reset the connection, leaving no TIME_WAIT on its port.
+# struct linger {l_onoff, l_linger} that makes close() reset the connection, leaving no TIME_WAIT on its port. It is set
+# when a socket is made: macOS refuses socket options once the node has reset the connection.
 LINGER_RESET = struct.pack("ii", 1, 0)
 
 FRAME_LENGTH = struct.Struct("<I")
@@ -135,11 +136,9 @@ class RawPeer:
             self.close()
 
     def close(self):
-        """Reset the connection, unless it is already closed, and give back its raw_client port."""
+        """Close the connection, which its SO_LINGER resets, and give back its raw_client port."""
         self.closed = True
-        if self.connection.fileno() != -1:
-            self.connection.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, LINGER_RESET)
-            self.connection.close()
+        self.connection.close()
         if self.client_port_index is not None:
             FREE_CLIENT_PORT_INDEXES.append(self.client_port_index)
             self.client_port_index = None
@@ -385,6 +384,7 @@ def connect(p2p_port, label, source_address=None):
             connection.settimeout(STARTUP_TIMEOUT_SECONDS)
             connection.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             connection.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, LINGER_RESET)
+            connection.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             connection.bind(source_address)
             connection.connect((LOOPBACK, p2p_port))
         except ConnectionRefusedError:
@@ -395,8 +395,25 @@ def connect(p2p_port, label, source_address=None):
         except OSError:
             connection.close()
             raise
-        connection.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         return RawPeer(connection, label, client_port_index)
+
+
+def listen(port):
+    """Return a socket listening on LOOPBACK:port for the node to dial.
+
+    The sessions it accepts inherit its SO_LINGER, so closing one resets the connection, as for a session connect()
+    opened.
+    """
+    listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        listener.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, LINGER_RESET)
+        listener.bind((LOOPBACK, port))
+        listener.listen()
+    except OSError:
+        listener.close()
+        raise
+    return listener
 
 
 def accept_connection(listener, node, deadline):
