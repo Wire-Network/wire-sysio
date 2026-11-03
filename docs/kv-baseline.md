@@ -9,7 +9,8 @@ All numbers are the mean of three clean passes under sys-vm-oc in a Release buil
 operation. The ranges show the lowest and highest of the three pass averages.
 
 The tables from here through Token transfers are the first baseline, from before the work on the chain started. Final
-timing, at the end of this file, gives where the work ended up.
+timing, at the end of this file, gives where the work ended up on a 30-byte key slot, and its section The 24-byte slot
+gives the layout in use now.
 
 ## `kv::table` per-operation time (`kv_table`)
 
@@ -84,7 +85,7 @@ stored, so that find is likely cheaper than the `find` row above.
 call validates the handle, reads the row under the cursor and writes the key and value sizes through two pointers. It
 does no tree search and copies no key or value (`apply_context::kv_it_read`).
 
-These are the final numbers. Final timing has how they compare with base.
+These are the Final timing numbers, measured on the 30-byte key slot. Final timing has how they compare with base.
 
 | Nanoseconds | 1M rows | 10M rows |
 |---|---:|---:|
@@ -179,7 +180,7 @@ calls.
 
 | | |
 |---|---|
-| Commit | the `multi_index` tables: the commit that adds this file, on top of `fae750b37b`. The `kv::table` tables: the commit that adds them, on top of `9c7f21610f` |
+| Commit | the `multi_index` tables: the commit that adds this file, on top of `fae750b37b`. The `kv::table` tables: the commit that adds them, on top of that commit |
 | Build type | Release, clang-18 |
 | WASM runtime | sys-vm-oc (`sys_vm_oc`, the benchmark default) |
 | wire-cdt | `187d6a24` |
@@ -215,10 +216,14 @@ Every pass ran on a quiet machine, with no builds or tests running. Disturbed pa
 
 ## Final timing
 
-Where the pre-launch work ended up. The build type, runtime, core and commands are the ones above, and so is the
-quiet-machine rule. All four builds ran in one session on the same contract WASMs, with each pass running every build in
-turn, so drift in the session falls on all of them alike. That makes the builds easier to compare with each other than
-with the tables above, which came from other sessions and an older interface.
+Where the pre-launch work stood on a 30-byte key slot. The build type, runtime, core and commands are the ones above,
+and so is the quiet-machine rule. All four builds ran in one session on the same contract WASMs, with each pass running
+every build in turn, so drift in the session falls on all of them alike. That makes the builds easier to compare with
+each other than with the tables above, which came from other sessions and an older interface.
+
+The step 6, step 7 and final columns in this section were measured with keys of up to 30 bytes inside the row, and base
+with keys outside it. The slot holds 24 now: The 24-byte slot below has how that layout compares, and Memory and
+populate has what it stores.
 
 | Column | Commit | What it adds |
 |---|---|---|
@@ -229,13 +234,13 @@ with the tables above, which came from other sessions and an older interface.
 
 | | |
 |---|---|
-| wire-cdt | `6a570a17` |
+| wire-cdt | the approved KV intrinsics, before the audit fixes |
 | `bench_kv_ops.wasm` sha256 | `f6d115533d3e6bf55ddfe9c0f9d86082946abaac1ea722f3301a6cc64a604110` |
 | `bench_kv_table.wasm` sha256 | `63337fb11d8952de097be6462afe124820796d9a1f754d2646e7340c12a14148` |
 
 ### `kv::table`
 
-Nanoseconds per operation. Change is final against base.
+Nanoseconds per operation. Step 6, step 7 and final are the 30-byte slot. Change is final against base.
 
 | Operation | 1M base | 1M final | Change | 10M base | 10M step 6 | 10M step 7 | 10M final | 10M final range | Change |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -253,6 +258,8 @@ Nanoseconds per operation. Change is final against base.
 
 ### `multi_index`
 
+The same columns, with step 6, step 7 and final on the 30-byte slot.
+
 | Operation | 1M base | 1M final | Change | 10M base | 10M step 6 | 10M step 7 | 10M final | 10M final range | Change |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | get | 1,355 | 982 | -28% | 1,899 | 1,415 | 1,429 | 1,439 | 1,427 to 1,458 | -24% |
@@ -268,22 +275,46 @@ Against the first baseline at 10M rows, `kv::table` get went from 1,692 ns to 1,
 scan from 2,028 to 422 and secondary scan from 4,048 to 1,951. Those come from different sessions, so treat them as
 rough.
 
+### The 24-byte slot
+
+The slot went from 30 bytes to 24, and the key size moved into the padding of the row. This was timed on a build with
+the 24-byte slot and RAM prices of 112 bytes, and a wire-cdt with the audit fixes that change no API: the same build
+type, runtime, core and commands, in two sessions of three passes each, with the order of the builds reversed between
+them. Later changes, which include comparing the key tail as a padded word, are not in these numbers.
+
+Each change below is the mean of the two sessions against one cell of the named table. An operation counts once at 1M
+rows and once at 10M, so `kv::table` has 11 operations at each size. `multi_index` has 7 at each size in the first
+baseline, leaving out `erase, derived` and the host call, and 8 in Final, with the host call.
+
+| Compared with | Operations | Median | Range |
+|---|---:|---:|---:|
+| First baseline, `kv::table` | 22 | -41.6% | -78.9% to +10.0% |
+| First baseline, `multi_index` | 14 | -43.6% | -65.8% to -23.7% |
+| Final, `kv::table` | 22 | +4.5% | -3.4% to +7.5% |
+| Final, `multi_index` | 16 | +1.6% | -7.7% to +6.1% |
+
+Against the first baseline, only `kv::global` get is slower, by 4 to 5 ns. The Final builds were not timed beside this
+one, and the sessions and the CDT differ, so the change from Final cannot be split between the session, the CDT and the
+slot. The contract WASMs differ too: their sha256 hashes start `1780c329` for `bench_kv_ops.wasm` and `aaa33acd` for
+`bench_kv_table.wasm`.
+
 ### Memory and populate
 
-An id is two rows and one index entry. Keys now sit in the row, so the three table types come out the same.
+An id is two rows and one index entry. Keys now sit in the row, so the three table types come out the same. Final is the
+30-byte slot, and the last column is the build timed under The 24-byte slot.
 
-| | Base | Final |
-|---|---:|---:|
-| `kv::table` state memory, bytes per id at 10M rows | 456.3 | 488.2 |
-| `kv::scoped_table` state memory, bytes per id at 10M rows | 464.3 | 488.2 |
-| `multi_index` state memory, bytes per id at 10M rows | 480.3 | 488.2 |
-| `kv::table` populate, 10M rows, seconds | 21.3 to 23.5 | 18.3 to 18.5 |
-| `multi_index` populate, 10M rows, seconds | 37.7 to 38.0 | 27.4 to 27.5 |
+| | Base | Final | 24-byte slot |
+|---|---:|---:|---:|
+| `kv::table` state memory, bytes per id at 10M rows | 456.3 | 488.2 | 456.2 |
+| `kv::scoped_table` state memory, bytes per id at 10M rows | 464.3 | 488.2 | 456.2 |
+| `multi_index` state memory, bytes per id at 10M rows | 480.3 | 488.2 | 456.2 |
+| `kv::table` populate, 10M rows, seconds | 21.3 to 23.5 | 18.3 to 18.5 | 18.5 to 19.0 |
+| `multi_index` populate, 10M rows, seconds | 37.7 to 38.0 | 27.4 to 27.5 | 24.2 to 24.5 |
 
 ### Small tables
 
-Microseconds, shown in whole numbers by the benchmark. Most of these searches stay in the CPU caches, so they show the
-cost of the code more than the cost of memory.
+Microseconds, shown in whole numbers by the benchmark, with step 6, step 7 and final on the 30-byte slot. Most of these
+searches stay in the CPU caches, so they show the cost of the code more than the cost of memory.
 
 | Operation | Rows | KV Raw base | KV Raw final | KV Shim base | KV Shim final |
 |---|---:|---:|---:|---:|---:|
@@ -349,6 +380,9 @@ Each was timed at 10M rows against the build before it.
 | Value size in the row | Nothing slower beyond the spread, `kv::global` get -2%, no memory cost | Kept |
 | Word-at-a-time compare for other key sizes | Raw token transfers 215 us to 185 us at 500. At 10M rows three operations moved past the spread, on paths it does not touch: `kv::table` emplace -2.0%, find + erase -1.3%, scoped primary scan +2.1% | Kept |
 | 40-byte key slot, 38 bytes inline | 520.2 bytes per id, +6.6%. `kv::table` emplace +3.1%, find + erase +3.2%, secondary scan +6.4%. `multi_index` get +2.3%, find +2.9%, secondary scan +9.8% | Not adopted |
+| 24-byte key slot, 24 bytes inline, against the 30-byte slot | 456.2 bytes per id, -6.5%, on the 8-byte and 16-byte keys above. Those keys run level: `kv::table` get +3.6% and +3.3%, inside the spread, `multi_index` get -1.2% and -3.6%. On a 28-byte key with a `checksum256` index, get and find +39% to +40%, and 616.3 bytes per id against 528.2 | Kept |
 
 The benchmarks use 8-byte and 16-byte keys, so the 40-byte slot shows only its cost. None of them has a key of 31 to 38
-bytes, where it would help.
+bytes, where it would help. The 24-byte slot row used a separate benchmark for its longer keys, and its two figures for
+one operation are two sessions. Its 28-byte figures are from before the key tail was compared as a padded word, which
+gained 10% to 13% on 28-byte keys at 10M rows.

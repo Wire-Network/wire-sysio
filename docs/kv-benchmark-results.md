@@ -2,10 +2,9 @@
 
 A summary of what KV storage costs, for contract writers. The full record is `docs/kv-baseline.md`.
 
-Every number here comes from `docs/kv-baseline.md` as it stood at commit `8940102fbb`. Those numbers were measured before
-the iterator and interface work on that branch, and they are the baseline that work reports against. They describe the
-intrinsics as they were then, so they do not show the cost of the current ones. The host call counts below have the same
-limit.
+Every number here comes from the first baseline in `docs/kv-baseline.md`. Those numbers were measured before the
+iterator and interface work, and they are the baseline that work reports against. They describe the intrinsics as they
+were then, so they do not show the cost of the current ones. The host call counts below have the same limit.
 
 All of it is a Release build under sys-vm-oc, on a quiet machine. Each number is the mean of three clean passes.
 `docs/kv-baseline.md` has the ranges and the commands. A change smaller than a range is not shown by these numbers.
@@ -94,23 +93,27 @@ row.
 | 100 | 118 | 49 | 120 | 2.4 | 2.5 |
 | 500 | 504 | 187 | 509 | 2.7 | 2.7 |
 
-## What these numbers say
+## What these numbers said
 
-- **Use `kv::table`.** It beat `multi_index` on every operation both measure, and the system contracts use it and its
+These conclusions are from the tables above, when this summary was written. For the current costs, see Final timing and
+Host call cost in `docs/kv-baseline.md`.
+
+- **Use `kv::table`.** It beat `multi_index` on every operation both measured, and the system contracts use it and its
   relatives. `multi_index` is the compatibility shim. In CDT, `sysio::multi_index` is `kv_multi_index`, and `kv::table` is
   `sysio::kv::table<Name, K, V>`, with `sysio::kv::scoped_table` for scoped tables.
-- **Crossing into the host is a small part of the cost.** A scan step makes three host calls, about 6 ns each, together
-  about 1% of the step. That is a lower bound, as the call measured passes no pointers.
-- **Raw intrinsics pay off where a contract does not need a wrapper.** They took 2 to 8.5 times less time than
+- **Crossing into the host was a small part of the cost.** A scan step made three host calls then, about 6 ns each,
+  together about 1% of the step. That is a lower bound, as the call measured passed no pointers. The host call is about
+  23 ns now, and a `kv::table` primary scan step makes one.
+- **Raw intrinsics paid off where a contract did not need a wrapper.** They took 2 to 8.5 times less time than
   `multi_index` in these tests, at the price of writing a storage layer by hand.
 
 ## How KV storage works
 
-These are the facts behind the numbers, at the commit above.
+These are the facts behind the numbers, as they stood when this summary was written.
 
 - Rows sort by (code, table_id, key) and index entries by (code, table_id, sec_key, pri_key), compared by `kv_key_less`,
   which has an integer fast path for 8-byte keys.
-- Keys and values were separate allocations behind offset pointers at that commit. Keys up to 24 bytes have moved inside
+- Keys and values were separate allocations behind offset pointers at that point. Keys up to 24 bytes have moved inside
   the row since then, and these numbers do not show it. Longer keys and all values are still separate allocations.
 - Each row and index entry has a payer, and a payer change moves the charge. `docs/kv-ram-billing.md` has the rules.
 - An action has two iterator pools, primary and secondary, each sized on demand up to 1024 slots.

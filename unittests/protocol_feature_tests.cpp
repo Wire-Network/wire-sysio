@@ -1246,6 +1246,51 @@ BOOST_AUTO_TEST_CASE( privileged_kv_payer_bypass ) { try {
 
 } FC_LOG_AND_RETHROW() }
 
+// `sysio` among an action's authorizers waives sysio.payer for the account billed. The receiver here is unprivileged, so
+// neither of the privileged exemptions applies, and the payer still has to authorize the action.
+BOOST_AUTO_TEST_CASE( kv_sysio_actor_waives_sysio_payer_permission ) { try {
+   using namespace kv_write_driver;
+   constexpr uint16_t table = 1;
+   constexpr uint32_t row_overhead = 112;
+   const account_name writer = "kvwriter"_n;
+   const account_name alice = "alice"_n;
+   const std::string key = "key", second_key = "yek", value = "value";
+   const permission_level alice_active{alice, config::active_name};
+   const permission_level sysio_active{config::system_account_name, config::active_name};
+
+   tester c( setup_policy::full );
+   c.produce_block();
+   c.create_accounts( {writer, alice}, false, true, false );
+   c.add_roa_policy(c.NODE_DADDY, writer, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, alice, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   c.produce_block();
+   c.set_code( writer, kv_write_wast );
+   c.produce_block();
+
+   const auto bill_alice = [&](const std::string& row_key, const std::vector<permission_level>& auths) {
+      signed_transaction trx;
+      trx.actions.emplace_back(auths, writer, "write"_n, pack_kv_write(set_row(table, alice, row_key, value)));
+      c.set_transaction_headers(trx);
+      for (const auto& auth : auths) trx.sign(c.get_private_key(auth.actor, "active"), c.get_chain_id());
+      c.push_transaction(trx);
+   };
+
+   // Her active permission lets the receiver grow her RAM, and on its own it does not stand in for sysio.payer.
+   const auto before = kv_state_of(c, {alice});
+   BOOST_CHECK_EXCEPTION(bill_alice(key, {alice_active}), unsatisfied_authorization,
+                         fc_exception_message_contains("Requested payer alice did not authorize payment"));
+   check_same_kv_state(kv_state_of(c, {alice}), before);
+
+   // With sysio authorizing as well, in either position, the same write goes through and bills her.
+   bill_alice(key, {alice_active, sysio_active});
+   bill_alice(second_key, {sysio_active, alice_active});
+   const auto after = kv_state_of(c, {writer, alice});
+   BOOST_REQUIRE_EQUAL(after.rows.size(), 2u);
+   BOOST_CHECK_EQUAL(after.rows[0].payer, alice);
+   BOOST_CHECK_EQUAL(after.rows[1].payer, alice);
+   BOOST_CHECK_EQUAL(after.usage[1].usage, before.usage[0].usage + 2 * (key.size() + value.size() + row_overhead));
+} FC_LOG_AND_RETHROW() }
+
 /***
  * Test KV RAM billing without ROA (unlimited RAM).
  *

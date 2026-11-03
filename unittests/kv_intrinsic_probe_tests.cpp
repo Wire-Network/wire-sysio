@@ -233,7 +233,7 @@ BOOST_FIXTURE_TEST_CASE(zero_length_value, kv_probe_tester) {
 }
 
 
-BOOST_FIXTURE_TEST_CASE(existence_probe_matches_read, kv_probe_tester) {
+BOOST_FIXTURE_TEST_CASE(kv_get_finds_a_key_only_under_its_own_code, kv_probe_tester) {
    BOOST_CHECK_NO_THROW(run_action("contcns"_n));
 }
 

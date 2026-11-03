@@ -4,6 +4,7 @@
 #include <sysio/chain/multi_index_includes.hpp>
 #include <sysio/chain/config.hpp>
 #include <algorithm>
+#include <bit>
 #include <cassert>
 #include <cstddef>
 #include <cstring>

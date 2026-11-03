@@ -655,7 +655,9 @@ kv_status apply_context::kv_set(uint16_t table_id, uint64_t payer_val, std::stri
       // A new row has no existing payer to keep, so payer 0 (`same_payer`, the CDT name{}) is invalid here. This
       // matches the classic db_store_i64 / generic_index::store `invalid_table_payer` assert.
       SYS_ASSERT( payer_val != 0, invalid_table_payer, "must specify a valid account to pay for new record" );
-      finish_create(*create_row());
+      const auto row = create_row();
+      if (!row) return kv_status::exists;
+      finish_create(*row);
       return kv_status::ok;
    }
 

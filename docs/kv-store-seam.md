@@ -22,7 +22,7 @@ Two engines exist:
 | `deep_mind.cpp` | Rows by value, from the caller |
 | `tester` and the contract test fixtures | Point gets, cursors, and a few direct writes |
 
-`unittests/kv_tests.cpp`, parts of `unittests/kv_comprehensive_tests.cpp`, the performance cases in
+`unittests/kv_object_tests.cpp`, parts of `unittests/kv_comprehensive_tests.cpp`, the performance cases in
 `unittests/snapshot_tests.cpp` and `benchmark/kv_benchmark.cpp` still use `kv_object` directly. They test the chainbase
 engine's own objects, so they belong on that side of the seam.
 
@@ -125,5 +125,8 @@ hashed by the chain.
 - `chains_on_both_engines_match` runs one chain on each engine. One validates the other's blocks, and the test compares
   history bytes per block, integrity hashes, snapshots, and each engine loading the snapshot the other wrote.
 
-The KV suites also run with `SYSIO_TEST_KV_ENGINE=map` as ctest entries ending in `-kv-map`. A `validating_tester` keeps
-its validator on chainbase, so a block the engines disagree on fails validation.
+The KV suites also run with `SYSIO_TEST_KV_ENGINE=map` as ctest entries ending in `-kv-map`, and so does
+`forked_tests_savanna/fork_switch_undoes_kv_writes`, which undoes several blocks through the controller. A
+`validating_tester` keeps its validator on chainbase and compares block ids, so a difference between the engines fails
+there only if it changes a block, by changing what a transaction does. A difference in stored bytes that nothing reads
+back changes no block. `chains_on_both_engines_match` is the test that compares integrity hashes between the engines.
