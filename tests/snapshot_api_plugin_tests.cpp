@@ -35,6 +35,10 @@ constexpr uint32_t attestation_delay_blocks = 10;
 /// Number of table pages read by the continuation scenario.
 constexpr std::size_t expected_discovery_page_count = 2;
 
+/// Historical cadence proving attestation discovery is independent of today's cadence.
+constexpr uint32_t configured_block_spacing = 17;
+static_assert(snapshot_attest::default_block_spacing % configured_block_spacing != 0);
+
 /** Minimal catalog value used to exercise attestation-driven discovery. */
 struct test_snapshot_entry {
    uint32_t                    block_num;
@@ -60,8 +64,8 @@ fc::variant make_attestation_record(uint32_t block_num,
 
 /** Exact scheduled serving accepts only complete, irreversible attestation rows. */
 BOOST_AUTO_TEST_CASE(servable_snapshot_attestation_requires_final_exact_tuple) {
-   constexpr uint32_t snapshot_block_num = snapshot_attest::block_spacing;
-   constexpr uint32_t other_snapshot_block_num = snapshot_block_num + snapshot_attest::block_spacing;
+   constexpr uint32_t snapshot_block_num = configured_block_spacing;
+   constexpr uint32_t other_snapshot_block_num = snapshot_block_num + configured_block_spacing;
    constexpr uint32_t attestation_block_num = snapshot_block_num + attestation_delay_blocks;
    const auto expected_block_id = sysio::chain::block_id_type::hash(expected_block_seed);
    const auto other_block_id = sysio::chain::block_id_type::hash(other_block_seed);
@@ -97,9 +101,9 @@ BOOST_AUTO_TEST_CASE(servable_snapshot_attestation_requires_final_exact_tuple) {
 
 /** Discovery continues after a filtered-empty newest page and selects the older matching row. */
 BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_paginates_filtered_empty_page) {
-   constexpr uint32_t first_scheduled_block = snapshot_attest::block_spacing;
-   constexpr uint32_t pending_scheduled_block = snapshot_attest::block_spacing * 2;
-   constexpr uint32_t stale_scheduled_block = snapshot_attest::block_spacing * 3;
+   constexpr uint32_t first_scheduled_block = configured_block_spacing;
+   constexpr uint32_t pending_scheduled_block = configured_block_spacing * 2;
+   constexpr uint32_t stale_scheduled_block = configured_block_spacing * 3;
    constexpr uint32_t newer_manual_block = stale_scheduled_block + 1;
    constexpr uint32_t last_irreversible_block = stale_scheduled_block + attestation_delay_blocks;
    const auto first_block_id = sysio::chain::block_id_type::hash(expected_block_seed);
@@ -117,6 +121,8 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_paginates_filtered_empty
        {stale_scheduled_block, stale_block_id, stale_hash, false}},
       {newer_manual_block,
        {newer_manual_block, stale_block_id, stale_hash, true}},
+      {snapshot_attest::default_block_spacing,
+       {snapshot_attest::default_block_spacing, stale_block_id, stale_hash, true}},
    });
    const auto is_attested = [](const test_snapshot_entry& snapshot) {
       const uint32_t block_num = snapshot.block_num;
@@ -138,7 +144,7 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_paginates_filtered_empty
       first_scheduled_block).lower_bound;
    const auto expected_upper_bound = fc::json::to_string(
       fc::mutable_variant_object()
-      (snapshot_attest::field::block_num, static_cast<uint64_t>(pending_scheduled_block) + 1),
+      (snapshot_attest::field::block_num, static_cast<uint64_t>(snapshot_attest::default_block_spacing) + 1),
       fc::time_point::maximum());
    std::size_t page_count = 0;
    const auto read_page = [&](const sysio::chain_apis::read_only::get_table_rows_params& params)
@@ -183,16 +189,28 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_paginates_filtered_empty
    BOOST_CHECK_EQUAL(page_count, expected_discovery_page_count);
 
    BOOST_CHECK(sysio::snapshot_api::is_snapshot_servable(
-      first_scheduled_block, catalog->at(first_scheduled_block), is_attested));
+      first_scheduled_block, configured_block_spacing,
+      catalog->at(first_scheduled_block), is_attested));
    BOOST_CHECK(!sysio::snapshot_api::is_snapshot_servable(
-      pending_scheduled_block, catalog->at(pending_scheduled_block), is_attested));
+      pending_scheduled_block, configured_block_spacing,
+      catalog->at(pending_scheduled_block), is_attested));
    BOOST_CHECK(sysio::snapshot_api::is_snapshot_servable(
-      newer_manual_block, catalog->at(newer_manual_block), is_attested));
+      pending_scheduled_block, snapshot_attest::default_block_spacing,
+      catalog->at(pending_scheduled_block), is_attested));
+   BOOST_CHECK(sysio::snapshot_api::is_snapshot_servable(
+      newer_manual_block, configured_block_spacing,
+      catalog->at(newer_manual_block), is_attested));
+   BOOST_CHECK(sysio::snapshot_api::is_snapshot_servable(
+      snapshot_attest::default_block_spacing, configured_block_spacing,
+      catalog->at(snapshot_attest::default_block_spacing), is_attested));
+   BOOST_CHECK(!sysio::snapshot_api::is_snapshot_servable(
+      snapshot_attest::default_block_spacing, snapshot_attest::default_block_spacing,
+      catalog->at(snapshot_attest::default_block_spacing), is_attested));
 }
 
 /** Discovery distinguishes exhausted scans from read and deadline failures. */
 BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_reports_discovery_outcome) {
-   constexpr uint32_t scheduled_block = snapshot_attest::block_spacing;
+   constexpr uint32_t scheduled_block = configured_block_spacing;
    constexpr uint32_t last_irreversible_block = scheduled_block + attestation_delay_blocks;
    const auto block_id = sysio::chain::block_id_type::hash(expected_block_seed);
    const fc::crypto::blake3 snapshot_hash;
@@ -244,7 +262,7 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_reports_discovery_outcom
 
 /** A copied table request owns its catalog and predicate after discovery returns. */
 BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_filter_owns_abandoned_request_state) {
-   constexpr uint32_t scheduled_block = snapshot_attest::block_spacing;
+   constexpr uint32_t scheduled_block = configured_block_spacing;
    constexpr uint32_t last_irreversible_block = scheduled_block + attestation_delay_blocks;
    const auto block_id = sysio::chain::block_id_type::hash(expected_block_seed);
    const fc::crypto::blake3 snapshot_hash;

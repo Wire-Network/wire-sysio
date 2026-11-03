@@ -52,7 +52,7 @@ constexpr std::string_view snapshot_download_content_type = "application/octet-s
 /// Request header that asks for part of a snapshot file.
 constexpr std::string_view snapshot_download_range_header = "Range";
 
-/// Request and ABI-decoder budget for one steady-state attestation-record lookup.
+/// Request and ABI-decoder budget for one steady-state snapshot-attestation table lookup.
 constexpr auto snapshot_attestation_query_timeout =
    snapshot_attestation_minimum_table_read_timeout;
 
@@ -151,9 +151,13 @@ public:
 
    /** Return whether an explicit snapshot download passes file and scheduled-serving policy. */
    bool is_servable_snapshot(const snapshot_entry& entry) const {
-      return is_snapshot_file_available(entry)
-             && snapshot_api::is_snapshot_servable(
-                entry.block_num, entry,
+      if (!is_snapshot_file_available(entry)) {
+         return false;
+      }
+      const auto& config = chain_plugin_.get_snapshot_attestation_config();
+      return snapshot_api::is_snapshot_servable(
+                entry.block_num,
+                config.block_spacing, entry,
                 [this](const snapshot_entry& snapshot) { return is_attested_snapshot(snapshot); });
    }
 
