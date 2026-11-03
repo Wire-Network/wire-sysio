@@ -253,17 +253,20 @@ namespace sysio {
 
       /// Record a batch operator's result for one duty epoch in the rolling
       /// buffer. Called inline from `sysio.epoch::advance` once per
-      /// expiring-group member; `delivered` only if it reached every active
-      /// outpost. Each write also prunes up to `MAX_DELLOG_PRUNE_PER_WRITE` rows
-      /// that have aged out of the window, so no dedicated crank is needed.
+      /// expiring-group member, whatever its status at the close; `delivered`
+      /// only if it reached every active outpost. Each write also prunes up to
+      /// `MAX_DELLOG_PRUNE_PER_WRITE` rows that have aged out of the window, so
+      /// no dedicated crank is needed.
       [[sysio::action]]
       void recorddel(name account, uint32_t epoch, bool delivered);
 
       /// Terminate the operator inline when its rolling buffer holds more than
       /// `terminate_max_consecutive_misses` consecutive misses, or a
       /// whole-percent miss rate (rounded down) above
-      /// `terminate_max_pct_misses_24h`. Both rails count duty epochs. Called
-      /// by `sysio.epoch::advance` after every `recorddel`.
+      /// `terminate_max_pct_misses_24h`. Both rails count duty epochs, and a
+      /// return to ACTIVE does not reset either one. ACTIVE and UNKNOWN
+      /// operators are both evaluated. Called by `sysio.epoch::advance` after
+      /// every `recorddel`.
       [[sysio::action]]
       void termcheck(name account);
 

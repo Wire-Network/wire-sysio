@@ -1475,21 +1475,9 @@ void opreg::claimyield(name account, sysio::slug_name token_code) {
 void opreg::recorddel(name account, uint32_t epoch, bool delivered) {
    require_auth(EPOCH_ACCOUNT);
 
-   // A temporarily ineligible operator cannot submit deliveries because
-   // sysio.msgch requires ACTIVE status. Do not turn that expected downtime
-   // into termination misses after collateral is restored. Terminal-state
-   // observations remain durable audit records; termcheck already excludes
-   // those operators permanently.
-   operators_t ops(get_self());
-   auto op_pk = operator_key{account.value};
-   if (ops.contains(op_pk)) {
-      auto status = ops.get(op_pk).status;
-      if (status != OperatorStatus::OPERATOR_STATUS_ACTIVE &&
-          !has_terminal_status(status)) {
-         return;
-      }
-   }
-
+   // Recorded whatever the operator's status at close: the seat is the duty. A withdrawal below
+   // the minimum makes a seated operator UNKNOWN, unable to deliver, and a cancel restores ACTIVE,
+   // so skipping UNKNOWN members let an operator miss its epoch without a miss on record.
    uint64_t now_ms = current_time_ms();
 
    // On-write half of the dellog retention contract: sweep a bounded number
@@ -1516,7 +1504,9 @@ void opreg::termcheck(name account) {
    auto op_pk = operator_key{account.value};
    if (!ops.contains(op_pk)) return;
    auto op = ops.get(op_pk);
-   if (op.status != OperatorStatus::OPERATOR_STATUS_ACTIVE) return;
+   // UNKNOWN is evaluated too. This runs only when the operator's own duty epoch closes, and an
+   // operator that withdraws before each close and cancels after it is UNKNOWN every time.
+   if (has_terminal_status(op.status)) return;
    // Bootstrapped operators are the genesis / chain-of-trust seed set and
    // are NEVER subject to rolling-window termination — see
    // .claude/rules/bootstrapped-operator-invariants.md at the wire root. A
@@ -1563,14 +1553,8 @@ void opreg::termcheck(name account) {
       total_in_window++;
       if (!it->delivered) total_misses++;
 
-      // A transition back to ACTIVE starts a new duty interval. Earlier rows
-      // remain part of the rolling miss-rate sample, but must not join a
-      // consecutive run across time when the operator could not deliver.
-      if (it->ts_ms < op.available_at) {
-         consecutive_misses = 0;
-         continue;
-      }
-
+      // A return to ACTIVE does not restart the run: a cancelled withdrawal would otherwise
+      // clear every miss recorded while the operator was UNKNOWN.
       if (!it->delivered) {
          consecutive_misses++;
          if (consecutive_misses > worst_consecutive) worst_consecutive = consecutive_misses;
