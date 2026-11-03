@@ -2,10 +2,13 @@ name: "Tag Release"
 
 # Gate 2 of the Strategy-C release path (docs/release-workflow.md). The job runs
 # under the `release` Environment, so it PAUSES for a required reviewer before it
-# creates anything. After approval it tags master, opens a DRAFT release, and
-# dispatches the platform builds plus the asset workflow.
+# creates anything. After approval it tags the HEAD of `branch`, opens a DRAFT
+# release, and dispatches the platform builds plus the asset workflow.
 #
-# `version` is the SOLE input; its suffix IS the channel (suffix => prerelease).
+# `version`'s suffix IS the channel (suffix => prerelease). `branch` is master or
+# the version's release/<major>.<minor> branch. The `release` Environment only
+# deploys from master, so this workflow is always dispatched on master and takes
+# the branch to tag as an input.
 #
 # Structurally identical to wire-cdt/.github/workflows/tag-release.yaml -- the two
 # repos run the same release path, so the two files are kept in lock-step.
@@ -13,11 +16,16 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Version to tag, without a leading v (e.g. 1.0.0-dev, 1.1.0-rc1, 1.1.0). Must already be master's version."
+        description: "Version to tag, without a leading v (e.g. 1.0.0-dev, 1.1.0-rc1, 1.1.0). Must already be the branch's version."
         type: string
         required: true
+      branch:
+        description: "Branch whose HEAD is tagged: master, or the version's release/<major>.<minor> branch (e.g. release/1.1 for 1.1.0-rc1)"
+        type: string
+        required: true
+        default: master
       wire-cdt-release:
-        description: "Optional wire-cdt RELEASE tag to build against (e.g. v1.0.1). When omitted, the build resolves the latest published wire-cdt release in the same channel as this version."
+        description: "Optional wire-cdt RELEASE tag to build against (e.g. v1.0.1). When omitted, the build resolves the highest-versioned published wire-cdt release in the same channel as this version."
         type: string
         required: false
         default: ""
@@ -40,37 +48,78 @@ defaults:
 
 jobs:
   tag:
-    name: Tag master and start the release builds
+    name: Tag the branch and start the release builds
     runs-on: ubuntu-latest
     # Required reviewers on this Environment are gate 2 -- nothing below runs until
     # a human approves the deployment.
     environment: release
     env:
       GH_TOKEN: ${{ github.token }}
-      # Untrusted dispatch input: environment variable only, never interpolated
+      # Untrusted dispatch inputs: environment variables only, never interpolated
       # into a script body.
       VERSION: ${{ inputs.version }}
+      TARGET_BRANCH: ${{ inputs.branch }}
     steps:
+      # master stays at the workspace root: its parser vets the inputs and reads
+      # the target branch's version, so no code from the target branch runs here.
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
         with:
           ref: master
 
-      - name: Assert master HEAD carries the requested version
-        id: assert
+      - name: Validate the version and the target branch
         run: |
           set -euo pipefail
 
           # The grammar is cmake-version.py's VERSION_RE, asserted by the parser
-          # itself rather than re-spelled here -- the same check prepare-release
-          # ran on this version before it reached master.
+          # itself rather than re-spelled here -- the same checks prepare-release
+          # ran on this version and branch before the bump merged.
           python3 .github/scripts/cmake-version.py validate "$VERSION" \
             || { echo "::error::'${VERSION}' is not <major>.<minor>.<patch>[-<suffix>] (no leading v)" >&2; exit 1; }
+          python3 .github/scripts/cmake-version.py validate "$VERSION" --branch "$TARGET_BRANCH" \
+            || { echo "::error::${VERSION} is tagged on master or its own release/<major>.<minor> branch, not '${TARGET_BRANCH}'" >&2; exit 1; }
+
+          # Once a line has its release branch, its versions are tagged there.
+          if [[ "$TARGET_BRANCH" == master ]]; then
+            release_branch="$(python3 .github/scripts/cmake-version.py release-branch "$VERSION")"
+            status=0
+            git ls-remote --exit-code --heads origin "refs/heads/${release_branch}" >/dev/null || status=$?
+            if [[ $status -eq 0 ]]; then
+              echo "::error::${release_branch} exists, so ${VERSION} is tagged there, not on master." >&2
+              exit 1
+            elif [[ $status -ne 2 ]]; then
+              echo "::error::Could not check origin for ${release_branch} (git ls-remote exit ${status})." >&2
+              exit 1
+            fi
+          fi
+
+          # The bump PR (gate 1) shows only the version change, so the branch's
+          # other commits must already have been reviewed: refuse a branch whose
+          # rules do not require a pull request.
+          rules="$(gh api "repos/${GITHUB_REPOSITORY}/rules/branches/${TARGET_BRANCH}" --jq '[.[].type] | join(",")')"
+          if [[ ",${rules}," != *",pull_request,"* ]]; then
+            echo "::error::${TARGET_BRANCH} has no pull_request rule (rules: ${rules:-none}). Protect it before tagging from it." >&2
+            exit 1
+          fi
+
+      # refs/heads/ so a tag that shares the branch's name is never checked out.
+      # No credentials: nothing in this job pushes from the target tree.
+      - name: Check out the target branch
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # actions/checkout@v5
+        with:
+          ref: refs/heads/${{ inputs.branch }}
+          path: target
+          persist-credentials: false
+
+      - name: Assert the branch HEAD carries the requested version
+        id: assert
+        run: |
+          set -euo pipefail
 
           # The same parser prepare-release.yaml writes with and release.yaml
           # cross-checks the tag against.
-          head_version="$(python3 .github/scripts/cmake-version.py read)"
+          head_version="$(python3 .github/scripts/cmake-version.py read --cmakelists target/CMakeLists.txt)"
           if [[ "$head_version" != "$VERSION" ]]; then
-            echo "::error::master HEAD is version ${head_version}, not ${VERSION}. Merge the prepare-release PR first." >&2
+            echo "::error::${TARGET_BRANCH} HEAD is version ${head_version}, not ${VERSION}. Merge the prepare-release PR first." >&2
             exit 1
           fi
 
@@ -89,7 +138,7 @@ jobs:
 
           {
             echo "tag=$tag"
-            echo "sha=$(git rev-parse HEAD)"
+            echo "sha=$(git -C target rev-parse HEAD)"
             echo "prerelease=$prerelease"
           } >> "$GITHUB_OUTPUT"
 
@@ -150,8 +199,8 @@ jobs:
           # exactly as on a tag push.
           #
           # An explicit wire-cdt-release travels to the linux build (the only CDT
-          # consumer); when omitted, the build's `v` job resolves the latest
-          # published wire-cdt release in this version's channel.
+          # consumer); when omitted, the build's `v` job resolves the
+          # highest-versioned published wire-cdt release in this version's channel.
           linux_args=()
           if [[ -n "$WIRE_CDT_RELEASE" ]]; then
             linux_args+=(-f wire-cdt-release="$WIRE_CDT_RELEASE")

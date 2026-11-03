@@ -5,12 +5,15 @@ on:
     branches:
       - master
       - "release/*"
+      # Version-bump PR branches: their PR runs the checks.
+      - "!release/prep-*"
     tags:
       - "v*"
   pull_request:
     types: [opened, synchronize, reopened]
     branches:
       - master
+      - "release/*"
   workflow_dispatch:
     inputs:
       wire-cdt-release:
@@ -38,6 +41,9 @@ jobs:
 
       - name: Validate coredump isolation policy
         run: python3 .github/scripts/check-coredump-policy.py
+
+      - name: Test the release version parser
+        run: python3 -m unittest discover -s .github/scripts -p 'test_*.py' -v
 
       - name: Setup pnpm
         uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
@@ -601,11 +607,10 @@ jobs:
           fi
 
           # The version's suffix IS the channel (same rule as everywhere on the
-          # Strategy-C path); resolve the latest PUBLISHED wire-cdt release in
-          # that channel. There is no first-class "latest prerelease" endpoint,
-          # so the release list is filtered by draft/prerelease and the newest
-          # by creation date wins — the same resolution prepare-release
-          # performed when it wrote the retired .cicd/defaults.json pin.
+          # Strategy-C path); resolve the highest-versioned PUBLISHED wire-cdt
+          # release in that channel. Version, not creation date: wire-cdt
+          # release branches publish patches to older lines after newer lines
+          # have shipped.
           version="$(python3 .github/scripts/cmake-version.py read)"
           if [[ "$version" == *-* ]]; then
             channel="prerelease"
@@ -619,13 +624,11 @@ jobs:
             gh api "repos/Wire-Network/wire-cdt/releases?per_page=100" \
               -H "X-GitHub-Api-Version: 2022-11-28"
           )"
-          cdt_release="$(
+          cdt_tags="$(
             jq -r --argjson pre "$prerelease" '
-              [.[] | select(.draft == false and .prerelease == $pre)]
-              | sort_by(.created_at)
-              | last
-              | .tag_name // empty' <<<"$releases_json"
+              .[] | select(.draft == false and .prerelease == $pre) | .tag_name' <<<"$releases_json"
           )"
+          cdt_release="$(sort -V <<<"$cdt_tags" | tail -n1)"
           if [[ -z "$cdt_release" ]]; then
             echo "::error::No published wire-cdt release found for channel ${channel} (version ${version}). Publish one, or dispatch with an explicit wire-cdt-release." >&2
             exit 1
@@ -635,7 +638,7 @@ jobs:
             echo "cdt-release=$cdt_release"
             echo "cdt-channel=$channel"
           } >> "$GITHUB_OUTPUT"
-          echo "Resolved wire-cdt ${cdt_release} (latest published in channel ${channel} for version ${version})"
+          echo "Resolved wire-cdt ${cdt_release} (highest published in channel ${channel} for version ${version})"
 
   verify-packages:
     name: Verify packages (S1-S6)

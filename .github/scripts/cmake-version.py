@@ -3,7 +3,7 @@
 
 The release workflows are the only consumers: ``prepare-release.yaml`` writes the
 requested version into the tree, ``tag-release.yaml`` reads it back to assert that
-master's HEAD really carries the version being tagged, and ``release.yaml``
+the target branch's HEAD really carries the version being tagged, and ``release.yaml``
 validates the tag it was handed. All three go through this one parser so those
 assertions can never drift apart.
 
@@ -17,12 +17,19 @@ never re-spell it as an inline bash regex: every version/tag shape assertion in
 prepare-release.yaml, tag-release.yaml and release.yaml routes through this one
 implementation of :data:`VERSION_RE`.
 
+``validate --branch`` adds the branch rule prepare-release.yaml and
+tag-release.yaml enforce: ``master`` carries any version, and a
+``release/<major>.<minor>`` branch carries only its own line's versions.
+``release-branch`` prints the branch of a version's line, so those workflows can
+also refuse master for a line whose release branch already exists.
+
 Usage::
 
     cmake-version.py read [--cmakelists PATH]
     cmake-version.py write <version> [--cmakelists PATH]
-    cmake-version.py validate <version>
+    cmake-version.py validate <version> [--branch BRANCH]
     cmake-version.py validate --tag <vversion>
+    cmake-version.py release-branch <version>
 """
 
 from __future__ import annotations
@@ -34,9 +41,16 @@ from pathlib import Path
 
 #: ``<major>.<minor>.<patch>`` with an optional ``-<suffix>`` of dot-separated
 #: alphanumerics -- deliberately conservative so a typo cannot reach the tree.
-VERSION_RE = re.compile(r"^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*))?$")
+#: Anchored with ``\Z`` rather than ``$``, which would also accept a trailing newline.
+VERSION_RE = re.compile(r"^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*))?\Z")
 
 DEFAULT_CMAKELISTS = Path(__file__).resolve().parents[2] / "CMakeLists.txt"
+
+#: The development branch. Any version may be prepared and tagged on it.
+DEVELOPMENT_BRANCH = "master"
+
+#: Prefix of a release branch, ``release/<major>.<minor>``.
+RELEASE_BRANCH_PREFIX = "release/"
 
 
 def _field_re(name: str) -> re.Pattern[str]:
@@ -74,6 +88,32 @@ def validate_version(version: str, tag: bool = False) -> str:
             f"{prefix}<major>.<minor>.<patch>[-<suffix>]"
         )
     return bare
+
+
+def release_branch(version: str) -> str:
+    """Return the ``release/<major>.<minor>`` branch of ``version``'s line.
+
+    ``version`` must already have passed :func:`validate_version`.
+    """
+    major, minor = VERSION_RE.match(version).group(1, 2)
+    return f"{RELEASE_BRANCH_PREFIX}{major}.{minor}"
+
+
+def validate_branch(branch: str, version: str) -> None:
+    """Assert ``version`` may be prepared and tagged on ``branch``.
+
+    :data:`DEVELOPMENT_BRANCH` takes any version. A release branch takes only its
+    own line, so ``1.2.0`` can never be cut from ``release/1.1``. Any other
+    branch is refused.
+    """
+    if branch == DEVELOPMENT_BRANCH:
+        return
+    expected = release_branch(version)
+    if branch != expected:
+        raise SystemExit(
+            f"cmake-version: version '{version}' is prepared and tagged on "
+            f"'{DEVELOPMENT_BRANCH}' or '{expected}', not '{branch}'"
+        )
 
 
 def read_version(text: str) -> str:
@@ -121,7 +161,7 @@ def write_version(text: str, version: str) -> str:
 def main() -> int:
     """Parse arguments and dispatch to the read or write mode."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("read", "write", "validate"))
+    parser.add_argument("mode", choices=("read", "write", "validate", "release-branch"))
     parser.add_argument(
         "version", nargs="?", help="version to write or validate"
     )
@@ -134,6 +174,11 @@ def main() -> int:
         metavar="TAG",
         help="validate mode: the vX.Y.Z[-suffix] tag to check; prints its bare version",
     )
+    parser.add_argument(
+        "--branch",
+        metavar="BRANCH",
+        help="validate mode: also assert the version may be prepared and tagged on BRANCH",
+    )
     parser.add_argument("--cmakelists", type=Path, default=DEFAULT_CMAKELISTS)
     args = parser.parse_args()
 
@@ -142,6 +187,8 @@ def main() -> int:
     # also depend on a readable CMakeLists.txt.
     if args.mode == "validate":
         if args.tag:
+            if args.branch is not None:
+                raise SystemExit("cmake-version: --branch applies to a version, not --tag")
             # The tag form is consumed as `version=$(... validate --tag "$TAG")`,
             # so it prints the bare version; the plain form is a pure exit-status
             # check and stays silent on success.
@@ -152,6 +199,14 @@ def main() -> int:
                 "cmake-version: validate mode requires a version argument or --tag"
             )
         validate_version(args.version)
+        if args.branch is not None:
+            validate_branch(args.branch, args.version)
+        return 0
+
+    if args.mode == "release-branch":
+        if not args.version:
+            raise SystemExit("cmake-version: release-branch mode requires a version argument")
+        print(release_branch(validate_version(args.version)))
         return 0
 
     text = args.cmakelists.read_text()
