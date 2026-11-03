@@ -127,6 +127,15 @@ constexpr uint32_t kFlushAllMaturedEpoch = std::numeric_limits<uint32_t>::max();
 /// Batch operator account used by focused eligibility tests.
 constexpr auto kEligibilityBatchOperator = "batchop.a"_n;
 
+/// Second batch operator retained while eligibility reconciliation resumes after pruning.
+constexpr auto kEligibilitySecondBatchOperator = "batchop.b"_n;
+
+/// Batch operator whose slashed state must survive eligibility reconciliation.
+constexpr auto kEligibilitySlashedBatchOperator = "batchop.c"_n;
+
+/// Batch operator whose terminated state must survive eligibility reconciliation.
+constexpr auto kEligibilityTerminatedBatchOperator = "uwrit.a"_n;
+
 /// Producer account used by focused eligibility tests.
 constexpr auto kEligibilityProducer = "producer.a"_n;
 
@@ -2544,8 +2553,8 @@ BOOST_FIXTURE_TEST_CASE(batch_policy_sweep_handles_pair_changes_and_pending_with
 /// Skipped roles consume the visit budget; pruning its next row cannot strand the cursor or skip a survivor.
 BOOST_FIXTURE_TEST_CASE(batch_policy_sweep_handles_registration_and_pruning, sysio_opreg_tester) { try {
    activate_batch_operator(kEligibilityBatchOperator);
-   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.b"_n, OPERATOR_TYPE_BATCH, false));
-   BOOST_REQUIRE_EQUAL(success(), bond_generic("batchop.b"_n, kSweepFirstToken, kTestMinBond));
+   BOOST_REQUIRE_EQUAL(success(), regoperator(kEligibilitySecondBatchOperator, OPERATOR_TYPE_BATCH, false));
+   BOOST_REQUIRE_EQUAL(success(), bond_generic(kEligibilitySecondBatchOperator, kSweepFirstToken, kTestMinBond));
    constexpr uint32_t alphabet_size = 26;
    constexpr std::string_view skipped_prefix = "aaa.";
    for (uint32_t i = 0; i < kBatchRecheckRows; ++i) {
@@ -2579,33 +2588,33 @@ BOOST_FIXTURE_TEST_CASE(batch_policy_sweep_handles_registration_and_pruning, sys
    BOOST_REQUIRE(!get_batch_sweep()[batch_sweep::pending].as<bool>());
    BOOST_REQUIRE(get_operator(inserted)[eligibility_field::status].as<OperatorStatus>() ==
                  OPERATOR_STATUS_ACTIVE);
-   BOOST_REQUIRE(get_operator("batchop.b"_n)[eligibility_field::status].as<OperatorStatus>() ==
+   BOOST_REQUIRE(get_operator(kEligibilitySecondBatchOperator)[eligibility_field::status].as<OperatorStatus>() ==
                  OPERATOR_STATUS_UNKNOWN);
 } FC_LOG_AND_RETHROW() }
 
 /// Only privileged maintenance may reconcile; bootstrap exemptions and terminal exclusions survive policy changes.
 BOOST_FIXTURE_TEST_CASE(batch_policy_sweep_preserves_bootstrap_and_terminal_status, sysio_opreg_tester) { try {
    activate_batch_operator(kEligibilityBatchOperator);
-   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.b"_n, OPERATOR_TYPE_BATCH, true));
-   BOOST_REQUIRE_EQUAL(success(), regoperator("batchop.c"_n, OPERATOR_TYPE_BATCH, true));
-   BOOST_REQUIRE_EQUAL(success(), slash("batchop.c"_n, std::string(kTestSlashReason)));
-   BOOST_REQUIRE_EQUAL(success(), regoperator("uwrit.a"_n, OPERATOR_TYPE_BATCH, false));
-   BOOST_REQUIRE_EQUAL(success(), terminate("uwrit.a"_n, std::string(kTestTerminationReason)));
+   BOOST_REQUIRE_EQUAL(success(), regoperator(kEligibilitySecondBatchOperator, OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), regoperator(kEligibilitySlashedBatchOperator, OPERATOR_TYPE_BATCH, true));
+   BOOST_REQUIRE_EQUAL(success(), slash(kEligibilitySlashedBatchOperator, std::string(kTestSlashReason)));
+   BOOST_REQUIRE_EQUAL(success(), regoperator(kEligibilityTerminatedBatchOperator, OPERATOR_TYPE_BATCH, false));
+   BOOST_REQUIRE_EQUAL(success(), terminate(kEligibilityTerminatedBatchOperator, std::string(kTestTerminationReason)));
    BOOST_REQUIRE(recheckbatch(kEligibilityBatchOperator) != success());
    BOOST_REQUIRE_EQUAL(success(), set_batch_requirements({}));
    BOOST_REQUIRE_EQUAL(success(), recheckbatch());
-   BOOST_REQUIRE(get_operator("batchop.b"_n)[eligibility_field::status].as<OperatorStatus>() ==
+   BOOST_REQUIRE(get_operator(kEligibilitySecondBatchOperator)[eligibility_field::status].as<OperatorStatus>() ==
                  OPERATOR_STATUS_ACTIVE);
-   BOOST_REQUIRE(get_operator("batchop.c"_n)[eligibility_field::status].as<OperatorStatus>() ==
+   BOOST_REQUIRE(get_operator(kEligibilitySlashedBatchOperator)[eligibility_field::status].as<OperatorStatus>() ==
                  OPERATOR_STATUS_SLASHED);
-   BOOST_REQUIRE(get_operator("uwrit.a"_n)[eligibility_field::status].as<OperatorStatus>() ==
+   BOOST_REQUIRE(get_operator(kEligibilityTerminatedBatchOperator)[eligibility_field::status].as<OperatorStatus>() ==
                  OPERATOR_STATUS_TERMINATED);
    BOOST_REQUIRE_EQUAL(success(), set_batch_requirements({
       make_chain_min_bond(kWireCodename, kSweepFirstToken, kTestMinBond)}));
    BOOST_REQUIRE_EQUAL(success(), recheckbatch());
-   BOOST_REQUIRE(get_operator("batchop.c"_n)[eligibility_field::status].as<OperatorStatus>() ==
+   BOOST_REQUIRE(get_operator(kEligibilitySlashedBatchOperator)[eligibility_field::status].as<OperatorStatus>() ==
                  OPERATOR_STATUS_SLASHED);
-   BOOST_REQUIRE(get_operator("uwrit.a"_n)[eligibility_field::status].as<OperatorStatus>() ==
+   BOOST_REQUIRE(get_operator(kEligibilityTerminatedBatchOperator)[eligibility_field::status].as<OperatorStatus>() ==
                  OPERATOR_STATUS_TERMINATED);
 } FC_LOG_AND_RETHROW() }
 
