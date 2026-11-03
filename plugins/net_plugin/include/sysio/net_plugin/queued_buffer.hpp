@@ -27,6 +27,29 @@ namespace sysio {
    constexpr auto     def_send_buffer_size = 1024*1024*def_send_buffer_size_mb;
    constexpr auto     def_max_write_queue_size = def_send_buffer_size*10;
 
+   /// Largest message length a peer accepts; `start_read_message` closes a connection that sends a longer one.
+   constexpr uint32_t def_max_message_size = def_send_buffer_size*2;
+
+   /// Largest write-queue entry for one message: its length prefix plus the largest accepted message.
+   constexpr uint32_t def_max_queued_message_size = message_header_size + def_max_message_size;
+
+   /// Serialized-block byte budget for one `enqueue_sync_block` batch: one send buffer's worth.
+   constexpr uint32_t def_sync_fetch_batch_max_bytes = def_send_buffer_size;
+
+   static_assert(def_sync_fetch_batch_max_bytes <= def_max_message_size,
+                 "a sync batch adds at most one maximum-size message to the write queue");
+   static_assert(def_max_queued_message_size < def_max_write_queue_size,
+                 "the write queue must hold at least one maximum-size message");
+
+   /**
+    * True when the write queue lacks room for one maximum-size message, the most a sync batch adds, so sync never takes
+    * it past `def_max_write_queue_size`. An empty queue never defers: no pending write would retry `enqueue_sync_block`.
+    */
+   constexpr bool sync_batch_must_defer(uint32_t write_queue_size) {
+      constexpr uint32_t defer_above = def_max_write_queue_size - def_max_queued_message_size;
+      return write_queue_size != 0 && write_queue_size > defer_above;
+   }
+
    // thread safe
    class queued_buffer : boost::noncopyable {
    public:
