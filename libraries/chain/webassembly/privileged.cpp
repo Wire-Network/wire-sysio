@@ -16,12 +16,6 @@
 
 namespace sysio { namespace chain { namespace webassembly {
 
-   int interface::is_feature_active( int64_t feature_name ) const { return false; }
-
-   void interface::activate_feature( int64_t feature_name ) const {
-      SYS_ASSERT( false, unsupported_feature, "Unsupported Hardfork Detected" );
-   }
-
    void interface::preactivate_feature( aligned_ptr<const digest_type> feature_digest ) {
       SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "preactivate_feature not allowed in a readonly transaction");
       context.control.preactivate_feature( *feature_digest, context.trx_context.is_transient() );

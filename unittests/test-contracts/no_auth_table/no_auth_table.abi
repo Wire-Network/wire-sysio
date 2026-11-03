@@ -164,14 +164,6 @@
                     "table_id": 9945
                 }
             ]
-        },
-        {
-            "name": "person",
-            "type": "person",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": [],
-            "table_id": 23668
         }
     ],
     "ricardian_clauses": [],

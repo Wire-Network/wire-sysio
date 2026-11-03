@@ -9,7 +9,6 @@
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/permission_object.hpp>
 #include <sysio/chain/wast_to_wasm.hpp>
-#include <sysio/chain/kv_table_objects.hpp>   // kv_index / by_code_key for reading sysio.roa kv tables
 #include <sysio/opp/opp.hpp>
 #include <sysio/opp/opp.pb.h>
 #include <sysio/opp/attestations/attestations.pb.h>
@@ -582,13 +581,11 @@ public:
    // Read sysio.roa's kv tables (scoped by network_gen). `nodeowners` proves registration;
    // `nodeownerreg` is the audit row (status / reject_reason).
    fc::variant get_nodeowner(name acc) {
-      const auto& db = control->db();
       auto key = chain::make_kv_scoped_key(ROA_NETWORK_GEN, acc.to_uint64_t());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA_ACCOUNT,
-                  chain::compute_table_id(name("nodeowners").to_uint64_t()), key.to_string_view()));
-      if (it != kv_idx.end() && it->value.size()) {
-         std::vector<char> data(it->value.data(), it->value.data() + it->value.size());
+      const auto row = control->kv().find_row(ROA_ACCOUNT, chain::compute_table_id(name("nodeowners").to_uint64_t()),
+                                              key.to_string_view());
+      if (row && !row->value.empty()) {
+         std::vector<char> data(row->value.begin(), row->value.end());
          return roa_abi.binary_to_variant("nodeowners", data,
             fixture_abi_yield_function());
       }
@@ -596,13 +593,11 @@ public:
    }
 
    fc::variant get_nodeownerreg(name acc) {
-      const auto& db = control->db();
       auto key = chain::make_kv_scoped_key(ROA_NETWORK_GEN, acc.to_uint64_t());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(ROA_ACCOUNT,
-                  chain::compute_table_id(name("nodeownerreg").to_uint64_t()), key.to_string_view()));
-      if (it != kv_idx.end() && it->value.size()) {
-         std::vector<char> data(it->value.data(), it->value.data() + it->value.size());
+      const auto row = control->kv().find_row(ROA_ACCOUNT, chain::compute_table_id(name("nodeownerreg").to_uint64_t()),
+                                              key.to_string_view());
+      if (row && !row->value.empty()) {
+         std::vector<char> data(row->value.begin(), row->value.end());
          return roa_abi.binary_to_variant("nodeownerreg", data,
             fixture_abi_yield_function());
       }
@@ -777,12 +772,13 @@ public:
 
    /// sysio.synd's kv rows of `table`, in key order, as raw values.
    std::vector<std::vector<char>> synd_rows(name table) {
-      const auto& kv_idx   = control->db().get_index<kv_index, by_code_key>();
-      const auto  table_id = compute_table_id(table.to_uint64_t());
+      const auto table_id = compute_table_id(table.to_uint64_t());
       std::vector<std::vector<char>> rows;
-      for (auto itr = kv_idx.lower_bound(boost::make_tuple(SYND_ACCOUNT, table_id, std::string_view{}));
-           itr != kv_idx.end() && itr->code == SYND_ACCOUNT && itr->table_id == table_id; ++itr)
-         rows.emplace_back(itr->value.data(), itr->value.data() + itr->value.size());
+      auto cursor = control->kv().open_row_cursor();
+      chain::kv_row row;
+      for (bool more = cursor->seek_lower({SYND_ACCOUNT, table_id}, row);
+           more && row.code == SYND_ACCOUNT && row.table_id == table_id; more = cursor->next(row))
+         rows.emplace_back(row.value.begin(), row.value.end());
       return rows;
    }
 

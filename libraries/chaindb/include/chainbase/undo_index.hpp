@@ -8,6 +8,8 @@
 #include <boost/intrusive/slist.hpp>
 #include <boost/container/deque.hpp>
 #include <boost/throw_exception.hpp>
+
+#include <stdexcept>
 #include <boost/mpl/fold.hpp>
 #include <boost/mp11/list.hpp>
 #include <boost/mp11/algorithm.hpp>
@@ -28,6 +30,13 @@
 #include <sstream>
 
 namespace chainbase {
+
+   /// A create collided with a key a unique index already holds. A caller that expects collisions catches this alone,
+   /// so that every other logic_error chainbase throws still propagates.
+   class uniqueness_violation : public std::logic_error {
+   public:
+      using std::logic_error::logic_error;
+   };
 
    namespace detail {
       // Types whose value-copy leaves the copy aliasing the source's storage
@@ -443,7 +452,7 @@ namespace chainbase {
          alloc_traits::construct(_allocator, &*p, constructor, constructor_tag());
          auto guard1 = scope_exit{[&]{ alloc_traits::destroy(_allocator, &*p); }};
          if(!insert_impl<1>(p->_item))
-            BOOST_THROW_EXCEPTION( std::logic_error{ "could not insert object, most likely a uniqueness constraint was violated" } );
+            BOOST_THROW_EXCEPTION( uniqueness_violation{ "could not insert object, most likely a uniqueness constraint was violated" } );
          std::get<0>(_indices).push_back(p->_item); // cannot fail and we know that it will definitely insert at the end.
          on_create(p->_item);
          ++_next_id;
@@ -489,6 +498,15 @@ namespace chainbase {
          }
          if(!success)
             BOOST_THROW_EXCEPTION( std::logic_error{ "could not modify object, most likely a uniqueness constraint was violated" } );
+      }
+
+      // For a modifier that leaves every indexed field as it was. The object keeps its place in every index, so none
+      // of them is touched, which saves the comparisons against its neighbors that modify makes on a composite key.
+      template<typename Modifier>
+      void modify_unindexed( const value_type& obj, Modifier&& m ) {
+         on_modify(obj);
+         m(const_cast<value_type&>(obj));
+         assert(in_index_order<1>(obj));
       }
 
       void remove( const value_type& obj ) noexcept {
@@ -790,6 +808,23 @@ namespace chainbase {
       }
 
       // Moves a modified node into the correct location
+#ifndef NDEBUG
+      // Whether `p` still sorts between its neighbors in index N and every index after it. Only a neighbor on the wrong
+      // side fails this, so an equal neighbor passes.
+      template<int N>
+      bool in_index_order(const value_type& p) const {
+         if constexpr (N < sizeof...(Indices)) {
+            const auto& idx = std::get<N>(_indices);
+            auto itr = idx.iterator_to(p);
+            if (itr != idx.begin() && idx.value_comp()(p, *std::prev(itr))) return false;
+            ++itr;
+            if (itr != idx.end() && idx.value_comp()(*itr, p)) return false;
+            return in_index_order<N+1>(p);
+         }
+         return true;
+      }
+#endif
+
       template<bool unique, int N = 0>
       bool post_modify(value_type& p) {
          if constexpr (N < sizeof...(Indices)) {

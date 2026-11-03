@@ -60,7 +60,8 @@ namespace sysio { namespace chain {
    /// sysio_exit takes 0 only. The host gives the code no meaning, so a protocol feature can still define one.
    inline void assert_exit_code(int32_t code) {
       constexpr int32_t accepted_code = 0;
-      SYS_ASSERT(code == accepted_code, wasm_execution_error, "sysio_exit code must be {}, got {}", accepted_code, code);
+      SYS_ASSERT(code == accepted_code, wasm_execution_error, "sysio_exit code must be {}, got {}", accepted_code,
+                 code);
    }
 
    /// Converts a wasm argument the host reads as a flag. Anything but 0 or 1 aborts, so a protocol feature can give

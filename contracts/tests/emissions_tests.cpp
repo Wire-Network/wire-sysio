@@ -497,14 +497,13 @@ public:
       char key_buf[chain::kv_pri_key_size];
       chain::kv_encode_be64( key_buf, "global"_n.to_uint64_t() );
 
-      const auto& kv_idx = control->db().get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find( boost::make_tuple( config::system_account_name,
-                                                chain::compute_table_id( "global"_n.to_uint64_t() ),
-                                                std::string_view( key_buf, chain::kv_pri_key_size ) ) );
+      const auto row = control->kv().find_row( config::system_account_name,
+                                               chain::compute_table_id( "global"_n.to_uint64_t() ),
+                                               std::string_view( key_buf, chain::kv_pri_key_size ) );
 
       vector<char> data;
-      if( it != kv_idx.end() )
-         data.assign( it->value.begin(), it->value.end() );
+      if( row )
+         data.assign( row->value.begin(), row->value.end() );
       return data;
    }
 
@@ -617,16 +616,11 @@ public:
 
       char key_buf[chain::kv_pri_key_size];
       chain::kv_encode_be64(key_buf, "emitcfg"_n.to_uint64_t());
-      auto& db = const_cast<chainbase::database&>(control->db());
-      const auto& kv_idx = db.get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(
-         config::system_account_name,
-         chain::compute_table_id("emitcfg"_n.to_uint64_t()),
-         std::string_view(key_buf, chain::kv_pri_key_size)));
-      BOOST_REQUIRE(it != kv_idx.end());
-      db.modify(*it, [&](auto& row) {
-         row.value.assign(bytes.data(), bytes.size());
-      });
+      auto& store = const_cast<chain::kv_store&>(control->kv());
+      const auto row = store.find_row(config::system_account_name, chain::compute_table_id("emitcfg"_n.to_uint64_t()),
+                                      std::string_view(key_buf, chain::kv_pri_key_size));
+      BOOST_REQUIRE(row);
+      store.update_row(*row, row->payer, {bytes.data(), bytes.size()});
    }
 
    action_result setinittime( account_name signer, time_point_sec start ) {
@@ -797,13 +791,11 @@ public:
          static_cast<char>(index >> 8),
          static_cast<char>(index),
       };
-      const auto& kv_idx = control->db().get_index<chain::kv_index, chain::by_code_key>();
-      auto it = kv_idx.find(boost::make_tuple(
-         config::system_account_name,
-         chain::compute_table_id("batchepochs"_n.to_uint64_t()),
-         std::string_view(key_buf, sizeof(key_buf))));
-      if (it == kv_idx.end()) return fc::variant();
-      vector<char> data(it->value.begin(), it->value.end());
+      const auto row = control->kv().find_row(config::system_account_name,
+                                              chain::compute_table_id("batchepochs"_n.to_uint64_t()),
+                                              std::string_view(key_buf, sizeof(key_buf)));
+      if (!row) return fc::variant();
+      vector<char> data(row->value.begin(), row->value.end());
       if (data.empty()) return fc::variant();
       return sysio_abi_ser.binary_to_variant("batch_epoch", data,
           fixture_abi_yield_function());

@@ -147,19 +147,9 @@ struct ed25519_tester : tester {
    /// Construct a real context to exercise the native export with the same host implementation.
    template <typename F>
    void with_interface(F&& test) {
-      auto trx = transaction(verify_action, fc::raw::pack(std::make_tuple(known_input(), verification_success, false)));
-      packed_transaction packed(trx, packed_transaction::compression_type::none);
-      platform_timer timer;
-      const accounts_billing_t previous_billing;
-      transaction_context context(*control, packed, transaction_checktime_timer(timer), fc::time_point::now(),
-                                  transaction_metadata::trx_type::input, std::nullopt, fc::time_point::maximum(),
-                                  fc::microseconds::maximum(), true, previous_billing,
-                                  cpu_usage_t{fc::unsigned_int{DEFAULT_BILLED_CPU_TIME_US}});
-      context.init_for_input_trx();
-      context.exec();
-      apply_context action_context(*control, context, 1);
-      webassembly::interface host(action_context);
-      test(host, context);
+      const auto trx = transaction(verify_action,
+                                   fc::raw::pack(std::make_tuple(known_input(), verification_success, false)));
+      sysio::test_utils::with_interface(*this, trx, std::forward<F>(test));
    }
 };
 

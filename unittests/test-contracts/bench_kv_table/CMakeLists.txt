@@ -1,0 +1,6 @@
+if( BUILD_TEST_CONTRACTS )
+   add_contract( bench_kv_table bench_kv_table bench_kv_table.cpp )
+else()
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/bench_kv_table.wasm ${CMAKE_CURRENT_BINARY_DIR}/bench_kv_table.wasm COPYONLY )
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/bench_kv_table.abi  ${CMAKE_CURRENT_BINARY_DIR}/bench_kv_table.abi  COPYONLY )
+endif()

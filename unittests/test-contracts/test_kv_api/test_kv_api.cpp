@@ -1,8 +1,7 @@
 // Comprehensive KV intrinsic test contract.
 // Tests KV host functions through WASM.
 // Replaces legacy test_api_db / test_api_multi_index for KV coverage.
-// Intrinsic declarations are provided by the CDT headers (kv_multi_index.hpp,
-// kv_raw_table.hpp, kv_table.hpp).
+// Intrinsic declarations are provided by the CDT headers (kv.h, through kv_multi_index.hpp).
 
 #include <sysio/sysio.hpp>
 #include <sysio/kv_multi_index.hpp>
@@ -23,6 +22,8 @@ static constexpr uint32_t xc_tid      = 302;
 static constexpr uint32_t idxmut_tid  = 303;
 static constexpr uint32_t idxmut2_tid = 304;
 static constexpr uint32_t idxmut3_tid = 305;
+static constexpr uint32_t rdoreads_tid = 306;
+static constexpr uint32_t rdoreads_ix  = 307;
 
 using namespace sysio;
 
@@ -45,10 +46,98 @@ static void make_prefixed_key(uint8_t prefix, const void* payload, uint32_t payl
    *out_sz = 1 + payload_sz;
 }
 
-// kv_set wrapper using test_table_id and self as payer
-static int64_t kv_put(uint64_t self, const void* key, uint32_t key_size,
+// The intrinsics take every optional argument at once. Most tests here care about one of them, so these name the
+// common shapes: upsert writes, value reads from offset 0, and moves and reads that want one field or none.
+
+static void must(int32_t status) {
+   check(status == kv_status_ok, "KV write must return ok");
+}
+
+static int32_t put_row(uint32_t table_id, uint64_t payer, const void* key, uint32_t key_size,
+                       const void* value, uint32_t value_size) {
+   return kv_set(table_id, payer, key, key_size, value, value_size, kv_set_upsert);
+}
+
+// put_row using test_table_id and self as payer
+static int32_t kv_put(uint64_t self, const void* key, uint32_t key_size,
                       const void* value, uint32_t value_size) {
-   return kv_set(test_table_id, self, key, key_size, value, value_size);
+   return put_row(test_table_id, self, key, key_size, value, value_size);
+}
+
+static int32_t get_row(uint32_t table_id, uint64_t code, const void* key, uint32_t key_size,
+                       void* value, uint32_t value_size) {
+   return kv_get(table_id, code, key, key_size, 0, value, value_size);
+}
+
+static int32_t has_row(uint32_t table_id, uint64_t code, const void* key, uint32_t key_size) {
+   return get_row(table_id, code, key, key_size, nullptr, 0) >= 0 ? 1 : 0;
+}
+
+static int32_t it_create(uint32_t table_id, uint64_t code, const void* prefix, uint32_t prefix_size) {
+   return kv_it_create(table_id, code, prefix, prefix_size, nullptr, 0);
+}
+
+static int32_t it_next(int32_t handle) {
+   uint32_t key_size = 0, value_size = 0;
+   return kv_it_next(handle, nullptr, 0, nullptr, 0, &key_size, &value_size);
+}
+
+static int32_t it_prev(int32_t handle) {
+   uint32_t key_size = 0, value_size = 0;
+   return kv_it_prev(handle, nullptr, 0, nullptr, 0, &key_size, &value_size);
+}
+
+static int32_t it_seek(int32_t handle, const void* seek, uint32_t seek_size) {
+   uint32_t key_size = 0, value_size = 0;
+   return kv_it_lower_bound(handle, seek, seek_size, nullptr, 0, nullptr, 0, &key_size, &value_size);
+}
+
+static int32_t it_status(int32_t handle) {
+   uint32_t key_size = 0, value_size = 0;
+   return kv_it_read(handle, 0, nullptr, 0, nullptr, 0, &key_size, &value_size);
+}
+
+static int32_t it_key(int32_t handle, void* dest, uint32_t dest_size, uint32_t* key_size) {
+   uint32_t value_size = 0;
+   return kv_it_read(handle, 0, dest, dest_size, nullptr, 0, key_size, &value_size);
+}
+
+static int32_t it_value(int32_t handle, uint32_t offset, void* dest, uint32_t dest_size, uint32_t* value_size) {
+   uint32_t key_size = 0;
+   return kv_it_read(handle, offset, nullptr, 0, dest, dest_size, &key_size, value_size);
+}
+
+static int32_t idx_find(uint64_t code, uint32_t table_id, const void* sec_key, uint32_t sec_key_size) {
+   return kv_idx_find(table_id, code, nullptr, 0, sec_key, sec_key_size);
+}
+
+static int32_t idx_seek(uint64_t code, uint32_t table_id, const void* seek, uint32_t seek_size) {
+   return kv_idx_create(table_id, code, nullptr, 0, seek, seek_size);
+}
+
+static int32_t idx_next(int32_t handle) {
+   uint32_t sec_size = 0, pri_size = 0;
+   return kv_idx_next(handle, nullptr, 0, nullptr, 0, &sec_size, &pri_size);
+}
+
+static int32_t idx_prev(int32_t handle) {
+   uint32_t sec_size = 0, pri_size = 0;
+   return kv_idx_prev(handle, nullptr, 0, nullptr, 0, &sec_size, &pri_size);
+}
+
+static int32_t idx_status(int32_t handle) {
+   uint32_t sec_size = 0, pri_size = 0;
+   return kv_idx_read(handle, nullptr, 0, nullptr, 0, &sec_size, &pri_size);
+}
+
+static int32_t idx_key(int32_t handle, void* dest, uint32_t dest_size, uint32_t* sec_size) {
+   uint32_t pri_size = 0;
+   return kv_idx_read(handle, dest, dest_size, nullptr, 0, sec_size, &pri_size);
+}
+
+static int32_t idx_pri(int32_t handle, void* dest, uint32_t dest_size, uint32_t* pri_size) {
+   uint32_t sec_size = 0;
+   return kv_idx_read(handle, nullptr, 0, dest, dest_size, &sec_size, pri_size);
 }
 
 // ── Contract ───────────────────────────────────────────────────────────────────
@@ -66,7 +155,7 @@ public:
       kv_put(self, key, sizeof(key), val, sizeof(val));
 
       char buf[64] = {};
-      int32_t sz = kv_get(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
+      int32_t sz = get_row(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
       check(sz == (int32_t)sizeof(val), "kv_get size mismatch");
       check(memcmp(buf, val, sizeof(val)) == 0, "kv_get data mismatch");
    }
@@ -82,7 +171,7 @@ public:
       kv_put(self, key, sizeof(key), v2, sizeof(v2));
 
       char buf[64] = {};
-      int32_t sz = kv_get(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
+      int32_t sz = get_row(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
       check(sz == (int32_t)sizeof(v2), "update: size mismatch");
       check(memcmp(buf, v2, sizeof(v2)) == 0, "update: data mismatch");
    }
@@ -95,10 +184,10 @@ public:
       const char val[] = "to_erase";
       kv_put(self, key, sizeof(key), val, sizeof(val));
 
-      kv_erase(test_table_id, key, sizeof(key));
+      must(kv_erase(test_table_id, key, sizeof(key)));
 
       char buf[64];
-      int32_t sz = kv_get(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
+      int32_t sz = get_row(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
       check(sz == -1, "erase: kv_get should return -1");
    }
 
@@ -109,10 +198,10 @@ public:
       const char key[] = {0x04, 0x00, 0x01};
       const char val[] = "exists";
       kv_put(self, key, sizeof(key), val, sizeof(val));
-      check(kv_contains(test_table_id, self, key, sizeof(key)) == 1, "contains: should be 1");
+      check(has_row(test_table_id, self, key, sizeof(key)) == 1, "contains: should be 1");
 
-      kv_erase(test_table_id, key, sizeof(key));
-      check(kv_contains(test_table_id, self, key, sizeof(key)) == 0, "contains: should be 0 after erase");
+      must(kv_erase(test_table_id, key, sizeof(key)));
+      check(has_row(test_table_id, self, key, sizeof(key)) == 0, "contains: should be 0 after erase");
    }
 
    // ─── 5. testkvsetbt: partial write at offset ───────────────────────────
@@ -125,13 +214,13 @@ public:
 
       // Overwrite bytes 3..5 with "XYZ" using read-modify-write
       char buf[64] = {};
-      int32_t sz = kv_get(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
+      int32_t sz = get_row(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
       check(sz == 10, "setbytes: size should be 10");
       buf[3] = 'X'; buf[4] = 'Y'; buf[5] = 'Z';
       kv_put(self, key, sizeof(key), buf, 10);
 
       char buf2[64] = {};
-      kv_get(test_table_id, self, key, sizeof(key), buf2, sizeof(buf2));
+      get_row(test_table_id, self, key, sizeof(key), buf2, sizeof(buf2));
       check(buf2[0] == 'A', "setbytes: byte 0");
       check(buf2[3] == 'X', "setbytes: byte 3");
       check(buf2[4] == 'Y', "setbytes: byte 4");
@@ -149,13 +238,12 @@ public:
       kv_put(self, key, sizeof(key), val, sizeof(val));
 
       const char prefix[] = {0x06};
-      uint32_t handle = kv_it_create(test_table_id, self, prefix, 1);
-      int32_t status = kv_it_status(handle);
-      // After create, iterator is positioned before the first element (status = 0 ok or 2 end)
-      // After lower_bound to first key, should be on a valid row
-      kv_it_lower_bound(handle, key, sizeof(key));
-      status = kv_it_status(handle);
-      check(status == 0, "it_create: status should be 0 (ok) after lower_bound to existing key");
+      uint32_t handle = it_create(test_table_id, self, prefix, 1);
+      // Create lands on the first row in the prefix, with no seek needed.
+      char     kbuf[8];
+      uint32_t klen = 0;
+      check(it_key(handle, kbuf, sizeof(kbuf), &klen) == kv_status_ok, "it_create: must start on the first row");
+      check(klen == sizeof(key) && memcmp(kbuf, key, sizeof(key)) == 0, "it_create: wrong row");
       kv_it_destroy(handle);
    }
 
@@ -174,20 +262,20 @@ public:
       }
 
       const char prefix[] = {0x07};
-      uint32_t handle = kv_it_create(test_table_id, self, prefix, 1);
+      uint32_t handle = it_create(test_table_id, self, prefix, 1);
 
       // Seek to beginning of prefix
       char seek_key[] = {0x07, 0,0,0,0,0,0,0,0};
-      kv_it_lower_bound(handle, seek_key, 9);
+      it_seek(handle, seek_key, 9);
 
       uint32_t count = 0;
       uint64_t prev_id = 0;
       bool first = true;
-      while (kv_it_status(handle) == 0) {
+      while (it_status(handle) == 0) {
          // Read the key to verify ordering
          char kbuf[16];
          uint32_t klen = 0;
-         kv_it_key(handle, 0, kbuf, sizeof(kbuf), &klen);
+         it_key(handle, kbuf, sizeof(kbuf), &klen);
          check(klen == 9, "it_next: key size should be 9");
 
          // Decode the id from key bytes [1..8]
@@ -201,7 +289,7 @@ public:
          prev_id = id;
          first = false;
          ++count;
-         kv_it_next(handle);
+         it_next(handle);
       }
       check(count == 5, "it_next: should iterate 5 rows");
       kv_it_destroy(handle);
@@ -222,22 +310,22 @@ public:
       }
 
       const char prefix[] = {0x08};
-      uint32_t handle = kv_it_create(test_table_id, self, prefix, 1);
+      uint32_t handle = it_create(test_table_id, self, prefix, 1);
 
       // Seek past the last key in prefix: lower_bound on prefix+1
       // (prefix 0x09 is beyond all 0x08 keys)
       char past_key[] = {0x09, 0,0,0,0,0,0,0,0};
-      kv_it_lower_bound(handle, past_key, 1);
+      it_seek(handle, past_key, 1);
 
       // Now prev should land on the last 0x08 key
-      kv_it_prev(handle);
+      it_prev(handle);
 
       uint32_t count = 0;
       uint64_t prev_id = 99;
-      while (kv_it_status(handle) == 0) {
+      while (it_status(handle) == 0) {
          char kbuf[16];
          uint32_t klen = 0;
-         kv_it_key(handle, 0, kbuf, sizeof(kbuf), &klen);
+         it_key(handle, kbuf, sizeof(kbuf), &klen);
          check(klen == 9, "it_prev: key size should be 9");
 
          uint64_t id = 0;
@@ -249,7 +337,7 @@ public:
          }
          prev_id = id;
          ++count;
-         kv_it_prev(handle);
+         it_prev(handle);
       }
       check(count == 5, "it_prev: should iterate 5 rows backward");
       kv_it_destroy(handle);
@@ -269,19 +357,19 @@ public:
       }
 
       const char prefix[] = {0x09};
-      uint32_t handle = kv_it_create(test_table_id, self, prefix, 1);
+      uint32_t handle = it_create(test_table_id, self, prefix, 1);
 
       // lower_bound on key 25 -> should land on 30
       char seek[9];
       seek[0] = 0x09;
       encode_u64(25, seek + 1);
-      kv_it_lower_bound(handle, seek, 9);
+      it_seek(handle, seek, 9);
 
-      check(kv_it_status(handle) == 0, "lb: should be on valid row");
+      check(it_status(handle) == 0, "lb: should be on valid row");
 
       char kbuf[16];
       uint32_t klen = 0;
-      kv_it_key(handle, 0, kbuf, sizeof(kbuf), &klen);
+      it_key(handle, kbuf, sizeof(kbuf), &klen);
       uint64_t found_id = 0;
       for (int j = 1; j <= 8; ++j)
          found_id = (found_id << 8) | (uint8_t)kbuf[j];
@@ -300,12 +388,12 @@ public:
       kv_put(self, key, 9, "val42", 5);
 
       const char prefix[] = {0x0A};
-      uint32_t handle = kv_it_create(test_table_id, self, prefix, 1);
-      kv_it_lower_bound(handle, key, 9);
+      uint32_t handle = it_create(test_table_id, self, prefix, 1);
+      it_seek(handle, key, 9);
 
       char dest[16];
       uint32_t actual = 0;
-      int32_t status = kv_it_key(handle, 0, dest, sizeof(dest), &actual);
+      int32_t status = it_key(handle, dest, sizeof(dest), &actual);
       check(status == 0, "it_key: status should be 0");
       check(actual == 9, "it_key: actual size should be 9");
       check(memcmp(dest, key, 9) == 0, "it_key: data mismatch");
@@ -324,12 +412,12 @@ public:
       kv_put(self, key, 9, val, sizeof(val));
 
       const char prefix[] = {0x0B};
-      uint32_t handle = kv_it_create(test_table_id, self, prefix, 1);
-      kv_it_lower_bound(handle, key, 9);
+      uint32_t handle = it_create(test_table_id, self, prefix, 1);
+      it_seek(handle, key, 9);
 
       char dest[64];
       uint32_t actual = 0;
-      int32_t status = kv_it_value(handle, 0, dest, sizeof(dest), &actual);
+      int32_t status = it_value(handle, 0, dest, sizeof(dest), &actual);
       check(status == 0, "it_value: status should be 0");
       check(actual == sizeof(val), "it_value: size mismatch");
       check(memcmp(dest, val, sizeof(val)) == 0, "it_value: data mismatch");
@@ -351,19 +439,19 @@ public:
       }
 
       const char prefix[] = {0x0C};
-      uint32_t handle = kv_it_create(test_table_id, self, prefix, 1);
+      uint32_t handle = it_create(test_table_id, self, prefix, 1);
 
       // upper_bound(20) = lower_bound(21) -> should land on 30
       char seek[9];
       seek[0] = 0x0C;
       encode_u64(21, seek + 1);
-      kv_it_lower_bound(handle, seek, 9);
+      it_seek(handle, seek, 9);
 
-      check(kv_it_status(handle) == 0, "ub: should be on valid row");
+      check(it_status(handle) == 0, "ub: should be on valid row");
 
       char kbuf[16];
       uint32_t klen = 0;
-      kv_it_key(handle, 0, kbuf, sizeof(kbuf), &klen);
+      it_key(handle, kbuf, sizeof(kbuf), &klen);
       uint64_t found_id = 0;
       for (int j = 1; j <= 8; ++j)
          found_id = (found_id << 8) | (uint8_t)kbuf[j];
@@ -379,17 +467,17 @@ public:
 
       const char sec[] = "alice";
       const char pri[] = {0x0D, 0x00, 0x01};
-      kv_idx_store(get_self().value, test_sec_table_id, pri, 3, sec, 5);
+      must(kv_idx_store(test_sec_table_id, get_self().value, pri, 3, sec, 5));
 
-      int32_t handle = kv_idx_find_secondary(self, test_sec_table_id, sec, 5);
+      int32_t handle = idx_find(self, test_sec_table_id, sec, 5);
       check(handle >= 0, "idx_store: find should succeed");
       // Check we can read the primary key back
       char pk_buf[16];
       uint32_t pk_sz = 0;
-      kv_idx_primary_key((uint32_t)handle, 0, pk_buf, sizeof(pk_buf), &pk_sz);
+      idx_pri(handle, pk_buf, sizeof(pk_buf), &pk_sz);
       check(pk_sz == 3, "idx_store: pri key size");
       check(memcmp(pk_buf, pri, 3) == 0, "idx_store: pri key mismatch");
-      kv_idx_destroy((uint32_t)handle);
+      kv_idx_destroy(handle);
    }
 
    // ─── 14. testidxremov: store then remove ─────────────────────────────────
@@ -400,20 +488,21 @@ public:
 
       const char sec[] = "bob";
       const char pri[] = {0x0E, 0x00, 0x01};
-      kv_idx_store(get_self().value, sec_tid, pri, 3, sec, 3);
+      must(kv_idx_store(sec_tid, get_self().value, pri, 3, sec, 3));
 
       // Verify it exists
-      int32_t h = kv_idx_find_secondary(self, sec_tid, sec, 3);
+      int32_t h = idx_find(self, sec_tid, sec, 3);
       check(h >= 0, "idx_remove: find should succeed before remove");
-      int32_t st = kv_idx_next((uint32_t)h); // check handle is valid by calling next
-      kv_idx_destroy((uint32_t)h);
+      int32_t st = idx_next(h); // check handle is valid by calling next
+      kv_idx_destroy(h);
 
       // Remove
-      kv_idx_remove(sec_tid, pri, 3, sec, 3);
+      must(kv_idx_erase(sec_tid, pri, 3, sec, 3));
 
-      // lower_bound should not find it: returns -1 (no entry in range)
-      int32_t h2 = kv_idx_lower_bound(self, sec_tid, sec, 3);
-      check(h2 < 0, "idx_remove: entry should be gone");
+      // A seek lands at end: the table has no entries left
+      int32_t h2 = idx_seek(self, sec_tid, sec, 3);
+      check(idx_status(h2) == kv_status_end, "idx_remove: entry should be gone");
+      kv_idx_destroy(h2);
    }
 
    // ─── 15. testidxupdat: update secondary key ─────────────────────────────
@@ -426,18 +515,18 @@ public:
       const char new_sec[] = "david";
       const char pri[] = {0x0F, 0x00, 0x01};
 
-      kv_idx_store(get_self().value, sec_tid, pri, 3, old_sec, 7);
-      kv_idx_update(0, sec_tid, pri, 3, old_sec, 7, new_sec, 5);
+      must(kv_idx_store(sec_tid, get_self().value, pri, 3, old_sec, 7));
+      must(kv_idx_update(sec_tid, 0, pri, 3, old_sec, 7, new_sec, 5));
 
       // Find by new key
-      int32_t h = kv_idx_find_secondary(self, sec_tid, new_sec, 5);
+      int32_t h = idx_find(self, sec_tid, new_sec, 5);
       check(h >= 0, "idx_update: find should succeed");
       char pk_buf[16];
       uint32_t pk_sz = 0;
-      kv_idx_primary_key((uint32_t)h, 0, pk_buf, sizeof(pk_buf), &pk_sz);
+      idx_pri(h, pk_buf, sizeof(pk_buf), &pk_sz);
       check(pk_sz == 3, "idx_update: pri key size");
       check(memcmp(pk_buf, pri, 3) == 0, "idx_update: pri key mismatch");
-      kv_idx_destroy((uint32_t)h);
+      kv_idx_destroy(h);
    }
 
    // ─── 16. testidxfind: find by secondary key ─────────────────────────────
@@ -450,18 +539,18 @@ public:
       const char secs[][8] = {"alpha", "beta", "gamma"};
       for (int i = 0; i < 3; ++i) {
          char pri[3] = {0x10, 0x00, (char)(i + 1)};
-         kv_idx_store(get_self().value, sec_tid, pri, 3, secs[i], (uint32_t)strlen(secs[i]));
+         must(kv_idx_store(sec_tid, get_self().value, pri, 3, secs[i], (uint32_t)strlen(secs[i])));
       }
 
       // Find "beta"
-      int32_t h = kv_idx_find_secondary(self, sec_tid, "beta", 4);
+      int32_t h = idx_find(self, sec_tid, "beta", 4);
       check(h >= 0, "idx_find: should find beta");
       char sk_buf[16];
       uint32_t sk_sz = 0;
-      kv_idx_key((uint32_t)h, 0, sk_buf, sizeof(sk_buf), &sk_sz);
+      idx_key(h, sk_buf, sizeof(sk_buf), &sk_sz);
       check(sk_sz == 4, "idx_find: sec key size");
       check(memcmp(sk_buf, "beta", 4) == 0, "idx_find: sec key mismatch");
-      kv_idx_destroy((uint32_t)h);
+      kv_idx_destroy(h);
    }
 
    // ─── 17. testidxlbnd: lower_bound on secondary index ────────────────────
@@ -477,18 +566,18 @@ public:
          sec[1] = '0';
          sec[2] = '\0';
          char pri[3] = {0x11, 0x00, (char)i};
-         kv_idx_store(get_self().value, sec_tid, pri, 3, sec, 2);
+         must(kv_idx_store(sec_tid, get_self().value, pri, 3, sec, 2));
       }
 
       // lower_bound("15") should land on "20"
-      int32_t h = kv_idx_lower_bound(self, sec_tid, "15", 2);
+      int32_t h = idx_seek(self, sec_tid, "15", 2);
       check(h >= 0, "idx_lbound: should find entry");
       char sk_buf[16];
       uint32_t sk_sz = 0;
-      kv_idx_key((uint32_t)h, 0, sk_buf, sizeof(sk_buf), &sk_sz);
+      idx_key(h, sk_buf, sizeof(sk_buf), &sk_sz);
       check(sk_sz == 2, "idx_lbound: sec key size");
       check(sk_buf[0] == '2' && sk_buf[1] == '0', "idx_lbound: should land on '20'");
-      kv_idx_destroy((uint32_t)h);
+      kv_idx_destroy(h);
    }
 
    // ─── 18. testidxnext: forward iterate secondary index ────────────────────
@@ -500,21 +589,21 @@ public:
       const char secs[][4] = {"aaa", "bbb", "ccc"};
       for (int i = 0; i < 3; ++i) {
          char pri[3] = {0x12, 0x00, (char)(i + 1)};
-         kv_idx_store(get_self().value, sec_tid, pri, 3, secs[i], 3);
+         must(kv_idx_store(sec_tid, get_self().value, pri, 3, secs[i], 3));
       }
 
-      int32_t h = kv_idx_lower_bound(self, sec_tid, "aaa", 3);
+      int32_t h = idx_seek(self, sec_tid, "aaa", 3);
       check(h >= 0, "idx_next: lower_bound should find entry");
       // We should be on "aaa", advance to "bbb"
-      int32_t st = kv_idx_next((uint32_t)h);
+      int32_t st = idx_next(h);
       check(st == 0, "idx_next: should return 0 (ok)");
 
       char sk_buf[16];
       uint32_t sk_sz = 0;
-      kv_idx_key((uint32_t)h, 0, sk_buf, sizeof(sk_buf), &sk_sz);
+      idx_key(h, sk_buf, sizeof(sk_buf), &sk_sz);
       check(sk_sz == 3, "idx_next: key size");
       check(memcmp(sk_buf, "bbb", 3) == 0, "idx_next: should be on bbb");
-      kv_idx_destroy((uint32_t)h);
+      kv_idx_destroy(h);
    }
 
    // ─── 19. testidxprev: backward iterate secondary index ───────────────────
@@ -526,21 +615,21 @@ public:
       const char secs[][4] = {"xxx", "yyy", "zzz"};
       for (int i = 0; i < 3; ++i) {
          char pri[3] = {0x13, 0x00, (char)(i + 1)};
-         kv_idx_store(get_self().value, sec_tid, pri, 3, secs[i], 3);
+         must(kv_idx_store(sec_tid, get_self().value, pri, 3, secs[i], 3));
       }
 
       // Find "zzz", then prev to "yyy"
-      int32_t h = kv_idx_find_secondary(self, sec_tid, "zzz", 3);
+      int32_t h = idx_find(self, sec_tid, "zzz", 3);
       check(h >= 0, "idx_prev: find should succeed");
-      int32_t st = kv_idx_prev((uint32_t)h);
+      int32_t st = idx_prev(h);
       check(st == 0, "idx_prev: should return 0 (ok)");
 
       char sk_buf[16];
       uint32_t sk_sz = 0;
-      kv_idx_key((uint32_t)h, 0, sk_buf, sizeof(sk_buf), &sk_sz);
+      idx_key(h, sk_buf, sizeof(sk_buf), &sk_sz);
       check(sk_sz == 3, "idx_prev: key size");
       check(memcmp(sk_buf, "yyy", 3) == 0, "idx_prev: should be on yyy");
-      kv_idx_destroy((uint32_t)h);
+      kv_idx_destroy(h);
    }
 
    // ─── 20. testidxkey: read secondary key from iterator ────────────────────
@@ -551,17 +640,17 @@ public:
 
       const char sec[] = "seckey_data";
       const char pri[] = {0x14, 0x00, 0x01};
-      kv_idx_store(get_self().value, sec_tid, pri, 3, sec, 11);
+      must(kv_idx_store(sec_tid, get_self().value, pri, 3, sec, 11));
 
-      int32_t h = kv_idx_find_secondary(self, sec_tid, sec, 11);
+      int32_t h = idx_find(self, sec_tid, sec, 11);
       check(h >= 0, "idx_key: find should succeed");
       char dest[32];
       uint32_t actual = 0;
-      int32_t st = kv_idx_key((uint32_t)h, 0, dest, sizeof(dest), &actual);
+      int32_t st = idx_key(h, dest, sizeof(dest), &actual);
       check(st == 0, "idx_key: status");
       check(actual == 11, "idx_key: size");
       check(memcmp(dest, sec, 11) == 0, "idx_key: data mismatch");
-      kv_idx_destroy((uint32_t)h);
+      kv_idx_destroy(h);
    }
 
    // ─── 21. testidxprik: read primary key from secondary iterator ───────────
@@ -574,36 +663,31 @@ public:
       char pri[9];
       pri[0] = 0x15;
       encode_u64(12345, pri + 1);
-      kv_idx_store(get_self().value, sec_tid, pri, 9, sec, 6);
+      must(kv_idx_store(sec_tid, get_self().value, pri, 9, sec, 6));
 
-      int32_t h = kv_idx_find_secondary(self, sec_tid, sec, 6);
+      int32_t h = idx_find(self, sec_tid, sec, 6);
       check(h >= 0, "idx_prikey: find should succeed");
       char pk_buf[16];
       uint32_t pk_sz = 0;
-      int32_t st = kv_idx_primary_key((uint32_t)h, 0, pk_buf, sizeof(pk_buf), &pk_sz);
+      int32_t st = idx_pri(h, pk_buf, sizeof(pk_buf), &pk_sz);
       check(st == 0, "idx_prikey: status");
       check(pk_sz == 9, "idx_prikey: size");
       check(memcmp(pk_buf, pri, 9) == 0, "idx_prikey: data mismatch");
-      kv_idx_destroy((uint32_t)h);
+      kv_idx_destroy(h);
    }
 
-   // ─── 22. testcrossrd: cross-contract read ────────────────────────────────
+   // ─── 22. testownrd: read through kv_get's code argument, naming this contract ──
    [[sysio::action]]
-   void testcrossrd() {
+   void testownrd() {
       uint64_t self = get_self().value;
       const char key[] = {0x16, 0x00, 0x01};
-      const char val[] = "cross_contract";
+      const char val[] = "own_code_read";
       kv_put(self, key, sizeof(key), val, sizeof(val));
 
-      // Read using own code (should succeed)
       char buf[64];
-      int32_t sz = kv_get(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
-      check(sz == (int32_t)sizeof(val), "crossrd: self read size");
-      check(memcmp(buf, val, sizeof(val)) == 0, "crossrd: self read data");
-
-      // Note: cross-contract read with a different code would require
-      // deploying to another account. We verify the self-read path here;
-      // the test driver handles the cross-contract scenario.
+      int32_t sz = get_row(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
+      check(sz == (int32_t)sizeof(val), "ownrd: read size");
+      check(memcmp(buf, val, sizeof(val)) == 0, "ownrd: read data");
    }
 
    // ─── 23. testemptyval: empty value ───────────────────────────────────────
@@ -612,10 +696,10 @@ public:
       uint64_t self = get_self().value;
       const char key[] = {0x17, 0x00, 0x01};
       // Set with empty value (nullptr, size 0)
-      kv_set(test_table_id, self, key, sizeof(key), nullptr, 0);
+      put_row(test_table_id, self, key, sizeof(key), nullptr, 0);
 
       char buf[16];
-      int32_t sz = kv_get(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
+      int32_t sz = get_row(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
       check(sz == 0, "emptyval: kv_get should return 0 for empty value");
    }
 
@@ -630,7 +714,7 @@ public:
          const char val[] = "one_byte_key";
          kv_put(self, key, 1, val, sizeof(val));
          char buf[32];
-         int32_t sz = kv_get(test_table_id, self, key, 1, buf, sizeof(buf));
+         int32_t sz = get_row(test_table_id, self, key, 1, buf, sizeof(buf));
          check(sz == (int32_t)sizeof(val), "multikey: 1B size");
          check(memcmp(buf, val, sizeof(val)) == 0, "multikey: 1B data");
       }
@@ -642,7 +726,7 @@ public:
          const char val[] = "eight_byte_key";
          kv_put(self, key, 8, val, sizeof(val));
          char buf[32];
-         int32_t sz = kv_get(test_table_id, self, key, 8, buf, sizeof(buf));
+         int32_t sz = get_row(test_table_id, self, key, 8, buf, sizeof(buf));
          check(sz == (int32_t)sizeof(val), "multikey: 8B size");
          check(memcmp(buf, val, sizeof(val)) == 0, "multikey: 8B data");
       }
@@ -654,7 +738,7 @@ public:
          const char val[] = "twentyfour_byte_key";
          kv_put(self, key, 24, val, sizeof(val));
          char buf[32];
-         int32_t sz = kv_get(test_table_id, self, key, 24, buf, sizeof(buf));
+         int32_t sz = get_row(test_table_id, self, key, 24, buf, sizeof(buf));
          check(sz == (int32_t)sizeof(val), "multikey: 24B size");
          check(memcmp(buf, val, sizeof(val)) == 0, "multikey: 24B data");
       }
@@ -666,7 +750,7 @@ public:
          const char val[] = "hundred_byte_key";
          kv_put(self, key, 100, val, sizeof(val));
          char buf[32];
-         int32_t sz = kv_get(test_table_id, self, key, 100, buf, sizeof(buf));
+         int32_t sz = get_row(test_table_id, self, key, 100, buf, sizeof(buf));
          check(sz == (int32_t)sizeof(val), "multikey: 100B size");
          check(memcmp(buf, val, sizeof(val)) == 0, "multikey: 100B data");
       }
@@ -709,7 +793,7 @@ public:
 
       // Read back and verify
       char read_buf[256];
-      int32_t sz = kv_get(test_table_id, self, key, sizeof(key), read_buf, sizeof(read_buf));
+      int32_t sz = get_row(test_table_id, self, key, sizeof(key), read_buf, sizeof(read_buf));
       check(sz == (int32_t)pos, "nested: total size mismatch");
 
       uint32_t rpos = 0;
@@ -741,14 +825,14 @@ public:
       kv_put(self, key, sizeof(key), "val", 3);
 
       const char prefix[] = {0x20};
-      uint32_t h = kv_it_create(test_table_id, self, prefix, 1);
+      uint32_t h = it_create(test_table_id, self, prefix, 1);
       kv_it_destroy(h);
 
       // After destroy, the handle slot is freed.
       // Create a new iterator — should succeed (reuses the freed slot or another).
-      uint32_t h2 = kv_it_create(test_table_id, self, prefix, 1);
-      kv_it_lower_bound(h2, key, sizeof(key));
-      check(kv_it_status(h2) == 0, "itdestr: new iterator should work");
+      uint32_t h2 = it_create(test_table_id, self, prefix, 1);
+      it_seek(h2, key, sizeof(key));
+      check(it_status(h2) == 0, "itdestr: new iterator should work");
       kv_it_destroy(h2);
    }
 
@@ -763,9 +847,9 @@ public:
 
       // Allocate and free 5 times, all should succeed
       for (int i = 0; i < 5; ++i) {
-         uint32_t h = kv_it_create(test_table_id, self, prefix, 1);
-         kv_it_lower_bound(h, key, sizeof(key));
-         check(kv_it_status(h) == 0, "itreuse: iterator should be valid");
+         uint32_t h = it_create(test_table_id, self, prefix, 1);
+         it_seek(h, key, sizeof(key));
+         check(it_status(h) == 0, "itreuse: iterator should be valid");
          kv_it_destroy(h);
       }
    }
@@ -780,26 +864,26 @@ public:
       kv_put(self, key2, sizeof(key2), "b", 1);
 
       const char prefix[] = {0x22};
-      uint32_t h = kv_it_create(test_table_id, self, prefix, 1);
-      kv_it_lower_bound(h, key1, sizeof(key1));
-      check(kv_it_status(h) == 0, "iterasedinv: on key1");
+      uint32_t h = it_create(test_table_id, self, prefix, 1);
+      it_seek(h, key1, sizeof(key1));
+      check(it_status(h) == 0, "iterasedinv: on key1");
 
       // Erase key1 while iterator points to it
-      kv_erase(test_table_id, key1, sizeof(key1));
+      must(kv_erase(test_table_id, key1, sizeof(key1)));
 
-      // kv_it_key should detect the erasure and return status 2 (erased)
+      // kv_it_read should detect the erasure and return no_row
       char kbuf[16];
       uint32_t klen = 0;
-      int32_t st = kv_it_key(h, 0, kbuf, sizeof(kbuf), &klen);
+      int32_t st = it_key(h, kbuf, sizeof(kbuf), &klen);
       check(st == 2, "iterasedinv: should return erased status (2)");
 
       // kv_it_next should still advance past the erased row to key2
-      kv_it_next(h);
-      check(kv_it_status(h) == 0, "iterasedinv: should advance to key2");
+      it_next(h);
+      check(it_status(h) == 0, "iterasedinv: should advance to key2");
 
       char kbuf2[16];
       uint32_t klen2 = 0;
-      kv_it_key(h, 0, kbuf2, sizeof(kbuf2), &klen2);
+      it_key(h, kbuf2, sizeof(kbuf2), &klen2);
       check(klen2 == sizeof(key2), "iterasedinv: key2 size");
       check(memcmp(kbuf2, key2, sizeof(key2)) == 0, "iterasedinv: key2 data");
 
@@ -814,7 +898,7 @@ public:
 
       // Allocate all 1024 slots
       for (int i = 0; i < 1024; ++i) {
-         kv_it_create(test_table_id, self, prefix, 1);
+         it_create(test_table_id, self, prefix, 1);
       }
       // Note: iterators destroyed automatically at end of transaction
    }
@@ -827,10 +911,10 @@ public:
 
       // Allocate all 1024 slots
       for (int i = 0; i < 1024; ++i) {
-         kv_it_create(test_table_id, self, prefix, 1);
+         it_create(test_table_id, self, prefix, 1);
       }
       // 1025th should fail — this line triggers the exception
-      kv_it_create(test_table_id, self, prefix, 1);
+      it_create(test_table_id, self, prefix, 1);
       // Should not reach here
       check(false, "itexhfail: should have thrown");
    }
@@ -848,21 +932,21 @@ public:
       kv_put(self, k3, sizeof(k3), "c", 1);
 
       const char prefix[] = {0x25};
-      uint32_t h = kv_it_create(test_table_id, self, prefix, 1);
+      uint32_t h = it_create(test_table_id, self, prefix, 1);
 
       // Seek to start of prefix
       char seek[] = {0x25, 0x00, 0x00};
-      kv_it_lower_bound(h, seek, sizeof(seek));
+      it_seek(h, seek, sizeof(seek));
 
       uint32_t count = 0;
-      while (kv_it_status(h) == 0) {
+      while (it_status(h) == 0) {
          // Verify key starts with 0x25
          char kbuf[16];
          uint32_t klen = 0;
-         kv_it_key(h, 0, kbuf, sizeof(kbuf), &klen);
+         it_key(h, kbuf, sizeof(kbuf), &klen);
          check(kbuf[0] == 0x25, "itprefix: key should start with 0x25");
          ++count;
-         kv_it_next(h);
+         it_next(h);
       }
       check(count == 2, "itprefix: should see exactly 2 rows");
       kv_it_destroy(h);
@@ -874,9 +958,9 @@ public:
       uint64_t self = get_self().value;
       // Use prefix 0x27 — never populated
       const char prefix[] = {0x27};
-      uint32_t h = kv_it_create(test_table_id, self, prefix, 1);
+      uint32_t h = it_create(test_table_id, self, prefix, 1);
       // Should be at end immediately since no rows match
-      check(kv_it_status(h) == 1, "itempttbl: status should be 1 (end)");
+      check(it_status(h) == 1, "itempttbl: status should be 1 (end)");
       kv_it_destroy(h);
    }
 
@@ -890,39 +974,35 @@ public:
       memset(key, 0, 24);
       key[0] = 0x28;
       const char val[] = "alt_table_test";
-      int64_t delta = kv_set(alt_table_id, self, key, 24, val, sizeof(val));
-      check(delta > 0, "writeperm: delta should be positive for new row");
+      must(put_row(alt_table_id, self, key, 24, val, sizeof(val)));
 
       char buf[64];
-      int32_t sz = kv_get(alt_table_id, self, key, 24, buf, sizeof(buf));
+      int32_t sz = get_row(alt_table_id, self, key, 24, buf, sizeof(buf));
       check(sz == (int32_t)sizeof(val), "writeperm: size mismatch");
       check(memcmp(buf, val, sizeof(val)) == 0, "writeperm: data mismatch");
    }
 
-   // ─── 34. testpayer: kv_set with explicit self payer, verify delta ────────
+   // ─── 34. testpayer: kv_set with explicit self payer ──────────────────────
    [[sysio::action]]
    void testpayer() {
       uint64_t self = get_self().value;
       // Payer = self via kv_put helper
       const char k1[] = {0x29, 0x00, 0x01};
-      int64_t d1 = kv_put(self, k1, sizeof(k1), "p1", 2);
-      check(d1 > 0, "payer: create delta should be positive");
+      must(kv_put(self, k1, sizeof(k1), "p1", 2));
 
       char buf[16];
-      int32_t sz = kv_get(test_table_id, self, k1, sizeof(k1), buf, sizeof(buf));
+      int32_t sz = get_row(test_table_id, self, k1, sizeof(k1), buf, sizeof(buf));
       check(sz == 2, "payer: self payer read size");
 
       // Payer = self via explicit kv_set
       const char k2[] = {0x29, 0x00, 0x02};
-      int64_t d2 = kv_set(test_table_id, self, k2, sizeof(k2), "p2val", 5);
-      check(d2 > 0, "payer: explicit self payer delta should be positive");
+      must(put_row(test_table_id, self, k2, sizeof(k2), "p2val", 5));
 
-      sz = kv_get(test_table_id, self, k2, sizeof(k2), buf, sizeof(buf));
+      sz = get_row(test_table_id, self, k2, sizeof(k2), buf, sizeof(buf));
       check(sz == 5, "payer: explicit payer read size");
 
-      // Update with smaller value — delta should be negative
-      int64_t d3 = kv_set(test_table_id, self, k2, sizeof(k2), "x", 1);
-      check(d3 < 0, "payer: shrink delta should be negative");
+      // Update with smaller value
+      must(put_row(test_table_id, self, k2, sizeof(k2), "x", 1));
    }
 
    // ─── 35. testmaxkey: kv_set with exactly max_kv_key_size (256 bytes) ─────
@@ -935,7 +1015,7 @@ public:
       kv_put(self, key, 256, val, sizeof(val));
 
       char buf[16];
-      int32_t sz = kv_get(test_table_id, self, key, 256, buf, sizeof(buf));
+      int32_t sz = get_row(test_table_id, self, key, 256, buf, sizeof(buf));
       check(sz == (int32_t)sizeof(val), "maxkey: size mismatch");
    }
 
@@ -962,7 +1042,7 @@ public:
       kv_put(self, key, sizeof(key), val, 1024);
 
       char buf[1024];
-      int32_t sz = kv_get(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
+      int32_t sz = get_row(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
       check(sz == 1024, "maxval: size mismatch");
       check(memcmp(buf, val, 1024) == 0, "maxval: data mismatch");
    }
@@ -974,19 +1054,11 @@ public:
    void tstmaxkeyupd() {
       char key[256];
       memset(key, 0xB0, 256);
-      kv_set(test_table_id, get_self().value, key, 256, "v1", 2);  // create
-      kv_set(test_table_id, get_self().value, key, 256, "v2", 2);  // update — same key, different value
+      put_row(test_table_id, get_self().value, key, 256, "v1", 2);  // create
+      put_row(test_table_id, get_self().value, key, 256, "v2", 2);  // update — same key, different value
       char buf[4]; uint32_t actual = 0;
-      check(kv_get(test_table_id, get_self().value, key, 256, buf, 4) == 2, "maxkeyupd: value size");
+      check(get_row(test_table_id, get_self().value, key, 256, buf, 4) == 2, "maxkeyupd: value size");
       check(memcmp(buf, "v2", 2) == 0, "maxkeyupd: value should be updated");
-   }
-
-   // Update with oversize key (257 bytes) — should fail
-   [[sysio::action]]
-   void tstovrkyupd() {
-      char key[257];
-      memset(key, 0xB1, 257);
-      kv_set(test_table_id, get_self().value, key, 257, "v", 1);
    }
 
    // Create with max value size (256 KiB = 262144 bytes)
@@ -994,8 +1066,8 @@ public:
    void tstmaxvalcr() {
       char key[] = {(char)0xB2, 0x01};
       std::vector<char> val(262144, 'V');
-      kv_set(test_table_id, get_self().value, key, 2, val.data(), 262144);
-      check(kv_get(test_table_id, get_self().value, key, 2, nullptr, 0) == 262144, "maxvalcr: size");
+      put_row(test_table_id, get_self().value, key, 2, val.data(), 262144);
+      check(get_row(test_table_id, get_self().value, key, 2, nullptr, 0) == 262144, "maxvalcr: size");
    }
 
    // Create with oversize value (262145 bytes) — should fail
@@ -1003,26 +1075,26 @@ public:
    void tstovrvalcr() {
       char key[] = {(char)0xB3, 0x01};
       std::vector<char> val(262145, 'X');
-      kv_set(test_table_id, get_self().value, key, 2, val.data(), 262145);
+      put_row(test_table_id, get_self().value, key, 2, val.data(), 262145);
    }
 
    // Update to max value size
    [[sysio::action]]
    void tstmaxvalupd() {
       char key[] = {(char)0xB4, 0x01};
-      kv_set(test_table_id, get_self().value, key, 2, "small", 5);  // create small
+      put_row(test_table_id, get_self().value, key, 2, "small", 5);  // create small
       std::vector<char> val(262144, 'W');
-      kv_set(test_table_id, get_self().value, key, 2, val.data(), 262144);  // update to max
-      check(kv_get(test_table_id, get_self().value, key, 2, nullptr, 0) == 262144, "maxvalupd: size");
+      put_row(test_table_id, get_self().value, key, 2, val.data(), 262144);  // update to max
+      check(get_row(test_table_id, get_self().value, key, 2, nullptr, 0) == 262144, "maxvalupd: size");
    }
 
    // Update to oversize value — should fail
    [[sysio::action]]
    void tstovrvalupd() {
       char key[] = {(char)0xB5, 0x01};
-      kv_set(test_table_id, get_self().value, key, 2, "small", 5);  // create small
+      put_row(test_table_id, get_self().value, key, 2, "small", 5);  // create small
       std::vector<char> val(262145, 'Y');
-      kv_set(test_table_id, get_self().value, key, 2, val.data(), 262145);  // update to over max
+      put_row(test_table_id, get_self().value, key, 2, val.data(), 262145);  // update to over max
    }
 
    // ─── 38. testpartread: kv_get with small buffer returns actual size ───────
@@ -1035,14 +1107,14 @@ public:
 
       // Read with small buffer (4 bytes)
       char buf[4] = {};
-      int32_t actual_sz = kv_get(test_table_id, self, key, sizeof(key), buf, 4);
+      int32_t actual_sz = get_row(test_table_id, self, key, sizeof(key), buf, 4);
       // actual_sz should be the full value size
       check(actual_sz == (int32_t)sizeof(val), "partread: should return full size");
       // Buffer should contain first 4 bytes
       check(memcmp(buf, val, 4) == 0, "partread: partial data mismatch");
 
       // Read with zero-size buffer — should just return size
-      int32_t sz_only = kv_get(test_table_id, self, key, sizeof(key), nullptr, 0);
+      int32_t sz_only = get_row(test_table_id, self, key, sizeof(key), nullptr, 0);
       check(sz_only == (int32_t)sizeof(val), "partread: zero-buf should return size");
    }
 
@@ -1051,12 +1123,12 @@ public:
    void testzeroval() {
       uint64_t self = get_self().value;
       const char key[] = {0x2E, 0x00, 0x01};
-      kv_set(test_table_id, self, key, sizeof(key), nullptr, 0);
+      put_row(test_table_id, self, key, sizeof(key), nullptr, 0);
 
       char buf[16];
-      int32_t sz = kv_get(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
+      int32_t sz = get_row(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
       check(sz == 0, "zeroval: should return 0 for empty value");
-      check(kv_contains(test_table_id, self, key, sizeof(key)) == 1, "zeroval: should still exist");
+      check(has_row(test_table_id, self, key, sizeof(key)) == 1, "zeroval: should still exist");
    }
 
    // ─── 40. tstvalreplce: overwrite with different value sizes ──────────────
@@ -1068,19 +1140,19 @@ public:
       // Start small
       kv_put(self, key, sizeof(key), "ab", 2);
       char buf[64];
-      int32_t sz = kv_get(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
+      int32_t sz = get_row(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
       check(sz == 2, "valreplace: initial size");
 
       // Grow
       const char bigger[] = "abcdefghijklmnop";
       kv_put(self, key, sizeof(key), bigger, 16);
-      sz = kv_get(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
+      sz = get_row(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
       check(sz == 16, "valreplace: grown size");
       check(memcmp(buf, bigger, 16) == 0, "valreplace: grown data");
 
       // Shrink
       kv_put(self, key, sizeof(key), "x", 1);
-      sz = kv_get(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
+      sz = get_row(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
       check(sz == 1, "valreplace: shrunk size");
       check(buf[0] == 'x', "valreplace: shrunk data");
    }
@@ -1092,21 +1164,21 @@ public:
 
       // table_id 42 (test_table_id)
       const char k0[] = {0x31, 0x00, 0x01};
-      kv_set(test_table_id, self, k0, sizeof(k0), "tid42", 5);
+      put_row(test_table_id, self, k0, sizeof(k0), "tid42", 5);
       char buf[16];
-      int32_t sz = kv_get(test_table_id, self, k0, sizeof(k0), buf, sizeof(buf));
+      int32_t sz = get_row(test_table_id, self, k0, sizeof(k0), buf, sizeof(buf));
       check(sz == 5, "tableid: tid42 size");
       check(memcmp(buf, "tid42", 5) == 0, "tableid: tid42 data");
 
       // table_id 99 (different namespace)
       static constexpr uint32_t other_table_id = 99;
-      kv_set(other_table_id, self, k0, sizeof(k0), "tid99", 5);
-      sz = kv_get(other_table_id, self, k0, sizeof(k0), buf, sizeof(buf));
+      put_row(other_table_id, self, k0, sizeof(k0), "tid99", 5);
+      sz = get_row(other_table_id, self, k0, sizeof(k0), buf, sizeof(buf));
       check(sz == 5, "tableid: tid99 size");
       check(memcmp(buf, "tid99", 5) == 0, "tableid: tid99 data");
 
       // Verify isolation: table_id 42 still has its own value
-      sz = kv_get(test_table_id, self, k0, sizeof(k0), buf, sizeof(buf));
+      sz = get_row(test_table_id, self, k0, sizeof(k0), buf, sizeof(buf));
       check(sz == 5, "tableid: tid42 still 5");
       check(memcmp(buf, "tid42", 5) == 0, "tableid: tid42 data unchanged");
    }
@@ -1122,30 +1194,30 @@ public:
       const char pri[] = {0x32, 0x00, 0x01};
 
       // Store 3 different secondary keys on 3 different table_ids
-      kv_idx_store(get_self().value, sec_tid_name, pri, 3, "name_alice", 10);
-      kv_idx_store(get_self().value, sec_tid_age,  pri, 3, "age_30", 6);
-      kv_idx_store(get_self().value, sec_tid_loc,  pri, 3, "loc_nyc", 7);
+      must(kv_idx_store(sec_tid_name, get_self().value, pri, 3, "name_alice", 10));
+      must(kv_idx_store(sec_tid_age, get_self().value, pri, 3, "age_30", 6));
+      must(kv_idx_store(sec_tid_loc, get_self().value, pri, 3, "loc_nyc", 7));
 
       // Find on each index independently
-      int32_t h0 = kv_idx_find_secondary(self, sec_tid_name, "name_alice", 10);
+      int32_t h0 = idx_find(self, sec_tid_name, "name_alice", 10);
       check(h0 >= 0, "idxmulti: idx0 find should succeed");
       char pk[16]; uint32_t pk_sz = 0;
-      kv_idx_primary_key((uint32_t)h0, 0, pk, sizeof(pk), &pk_sz);
+      idx_pri(h0, pk, sizeof(pk), &pk_sz);
       check(pk_sz == 3, "idxmulti: idx0 prikey size");
       check(memcmp(pk, pri, 3) == 0, "idxmulti: idx0 prikey");
-      kv_idx_destroy((uint32_t)h0);
+      kv_idx_destroy(h0);
 
-      int32_t h1 = kv_idx_find_secondary(self, sec_tid_age, "age_30", 6);
+      int32_t h1 = idx_find(self, sec_tid_age, "age_30", 6);
       check(h1 >= 0, "idxmulti: idx1 find should succeed");
-      kv_idx_primary_key((uint32_t)h1, 0, pk, sizeof(pk), &pk_sz);
+      idx_pri(h1, pk, sizeof(pk), &pk_sz);
       check(pk_sz == 3, "idxmulti: idx1 prikey size");
-      kv_idx_destroy((uint32_t)h1);
+      kv_idx_destroy(h1);
 
-      int32_t h2 = kv_idx_find_secondary(self, sec_tid_loc, "loc_nyc", 7);
+      int32_t h2 = idx_find(self, sec_tid_loc, "loc_nyc", 7);
       check(h2 >= 0, "idxmulti: idx2 find should succeed");
-      kv_idx_primary_key((uint32_t)h2, 0, pk, sizeof(pk), &pk_sz);
+      idx_pri(h2, pk, sizeof(pk), &pk_sz);
       check(pk_sz == 3, "idxmulti: idx2 prikey size");
-      kv_idx_destroy((uint32_t)h2);
+      kv_idx_destroy(h2);
    }
 
    // ─── 44. testidxdupsk: multiple rows with same secondary key ──────────────
@@ -1157,24 +1229,24 @@ public:
       // 3 rows with same secondary key "shared"
       for (int i = 0; i < 3; ++i) {
          char pri[3] = {0x33, 0x00, (char)(i + 1)};
-         kv_idx_store(get_self().value, sec_tid, pri, 3, "shared", 6);
+         must(kv_idx_store(sec_tid, get_self().value, pri, 3, "shared", 6));
       }
 
       // lower_bound on "shared", iterate, count all
-      int32_t h = kv_idx_lower_bound(self, sec_tid, "shared", 6);
+      int32_t h = idx_seek(self, sec_tid, "shared", 6);
       check(h >= 0, "idxdupsk: lower_bound should find entry");
       uint32_t count = 0;
       while (true) {
          char sk[16]; uint32_t sk_sz = 0;
-         int32_t st = kv_idx_key((uint32_t)h, 0, sk, sizeof(sk), &sk_sz);
+         int32_t st = idx_key(h, sk, sizeof(sk), &sk_sz);
          if (st != 0 || sk_sz != 6 || memcmp(sk, "shared", 6) != 0)
             break;
          ++count;
-         if (kv_idx_next((uint32_t)h) != 0)
+         if (idx_next(h) != 0)
             break;
       }
       check(count == 3, "idxdupsk: should find 3 rows with same sec key");
-      kv_idx_destroy((uint32_t)h);
+      kv_idx_destroy(h);
    }
 
    // ─── 45. testidxrange: lower_bound + iterate through range ────────────────
@@ -1187,23 +1259,23 @@ public:
       for (int i = 0; i < 5; ++i) {
          char sec[1] = {(char)('a' + i)};
          char pri[3] = {0x34, 0x00, (char)(i + 1)};
-         kv_idx_store(get_self().value, sec_tid, pri, 3, sec, 1);
+         must(kv_idx_store(sec_tid, get_self().value, pri, 3, sec, 1));
       }
 
       // Range [b, d]: lower_bound("b"), iterate while sec_key <= "d"
-      int32_t h = kv_idx_lower_bound(self, sec_tid, "b", 1);
+      int32_t h = idx_seek(self, sec_tid, "b", 1);
       check(h >= 0, "idxrange: lower_bound should find entry");
       uint32_t count = 0;
       while (true) {
          char sk[4]; uint32_t sk_sz = 0;
-         int32_t st = kv_idx_key((uint32_t)h, 0, sk, sizeof(sk), &sk_sz);
+         int32_t st = idx_key(h, sk, sizeof(sk), &sk_sz);
          if (st != 0) break;
          if (sk_sz == 1 && sk[0] > 'd') break;
          ++count;
-         if (kv_idx_next((uint32_t)h) != 0) break;
+         if (idx_next(h) != 0) break;
       }
       check(count == 3, "idxrange: should find b,c,d = 3 entries");
-      kv_idx_destroy((uint32_t)h);
+      kv_idx_destroy(h);
    }
 
    // ─── 46. testidxempty: query secondary index with no entries ──────────────
@@ -1212,9 +1284,11 @@ public:
       uint64_t self = get_self().value;
       static constexpr uint32_t sec_tid = 111;
 
-      // lower_bound on a table with no entries — returns -1 (not found)
-      int32_t h = kv_idx_lower_bound(self, sec_tid, "anything", 8);
-      check(h < 0, "idxempty: should return -1 for empty table");
+      // A seek on a table with no entries still returns a handle, at end
+      int32_t h = idx_seek(self, sec_tid, "anything", 8);
+      check(h >= 0, "idxempty: should return a handle for an empty table");
+      check(idx_status(h) == kv_status_end, "idxempty: handle should be at end");
+      kv_idx_destroy(h);
    }
 
    // ─── 47. testmultiit: multiple iterators simultaneously on same prefix ────
@@ -1231,23 +1305,23 @@ public:
 
       const char prefix[] = {0x35};
       // Open two iterators on same prefix
-      uint32_t h1 = kv_it_create(test_table_id, self, prefix, 1);
-      uint32_t h2 = kv_it_create(test_table_id, self, prefix, 1);
+      uint32_t h1 = it_create(test_table_id, self, prefix, 1);
+      uint32_t h2 = it_create(test_table_id, self, prefix, 1);
 
       char seek[] = {0x35, 0,0,0,0,0,0,0,0};
-      kv_it_lower_bound(h1, seek, 9);
-      kv_it_lower_bound(h2, seek, 9);
+      it_seek(h1, seek, 9);
+      it_seek(h2, seek, 9);
 
       // Advance h1 twice, h2 once
-      kv_it_next(h1);
-      kv_it_next(h1);
-      kv_it_next(h2);
+      it_next(h1);
+      it_next(h1);
+      it_next(h2);
 
       // h1 should be on key 2, h2 should be on key 1
       char kbuf1[16], kbuf2[16];
       uint32_t klen1 = 0, klen2 = 0;
-      kv_it_key(h1, 0, kbuf1, sizeof(kbuf1), &klen1);
-      kv_it_key(h2, 0, kbuf2, sizeof(kbuf2), &klen2);
+      it_key(h1, kbuf1, sizeof(kbuf1), &klen1);
+      it_key(h2, kbuf2, sizeof(kbuf2), &klen2);
 
       uint64_t id1 = 0, id2 = 0;
       for (int j = 1; j <= 8; ++j) {
@@ -1272,21 +1346,21 @@ public:
       kv_put(self, k3, 9, "c", 1);
 
       const char prefix[] = {0x36};
-      uint32_t h = kv_it_create(test_table_id, self, prefix, 1);
+      uint32_t h = it_create(test_table_id, self, prefix, 1);
       char seek[] = {0x36, 0,0,0,0,0,0,0,0};
-      kv_it_lower_bound(h, seek, 9);
-      check(kv_it_status(h) == 0, "itwritev: on first row");
+      it_seek(h, seek, 9);
+      check(it_status(h) == 0, "itwritev: on first row");
 
       // Insert a new row between existing ones
       char k2[9]; k2[0] = 0x36; encode_u64(20, k2 + 1);
       kv_put(self, k2, 9, "b", 1);
 
       // Advance — should see the new row
-      kv_it_next(h);
-      check(kv_it_status(h) == 0, "itwritev: should see next row");
+      it_next(h);
+      check(it_status(h) == 0, "itwritev: should see next row");
 
       char kbuf[16]; uint32_t klen = 0;
-      kv_it_key(h, 0, kbuf, sizeof(kbuf), &klen);
+      it_key(h, kbuf, sizeof(kbuf), &klen);
       uint64_t id = 0;
       for (int j = 1; j <= 8; ++j)
          id = (id << 8) | (uint8_t)kbuf[j];
@@ -1309,21 +1383,21 @@ public:
 
       // Iterate table A — should see 2 rows
       const char pa[] = {0x37};
-      uint32_t ha = kv_it_create(test_table_id, self, pa, 1);
+      uint32_t ha = it_create(test_table_id, self, pa, 1);
       char seek_a[] = {0x37, 0x00};
-      kv_it_lower_bound(ha, seek_a, 2);
+      it_seek(ha, seek_a, 2);
       uint32_t count_a = 0;
-      while (kv_it_status(ha) == 0) { ++count_a; kv_it_next(ha); }
+      while (it_status(ha) == 0) { ++count_a; it_next(ha); }
       check(count_a == 2, "multitbl: table A should have 2 rows");
       kv_it_destroy(ha);
 
       // Iterate table B — should see 1 row
       const char pb[] = {0x38};
-      uint32_t hb = kv_it_create(test_table_id, self, pb, 1);
+      uint32_t hb = it_create(test_table_id, self, pb, 1);
       char seek_b[] = {0x38, 0x00};
-      kv_it_lower_bound(hb, seek_b, 2);
+      it_seek(hb, seek_b, 2);
       uint32_t count_b = 0;
-      while (kv_it_status(hb) == 0) { ++count_b; kv_it_next(hb); }
+      while (it_status(hb) == 0) { ++count_b; it_next(hb); }
       check(count_b == 1, "multitbl: table B should have 1 row");
       kv_it_destroy(hb);
    }
@@ -1340,16 +1414,16 @@ public:
       key[0] = 0x39;
       encode_u64(100, key + 1);
 
-      kv_set(tid_scope_a, self, key, 9, "scopeA", 6);
-      kv_set(tid_scope_b, self, key, 9, "scopeB", 6);
+      put_row(tid_scope_a, self, key, 9, "scopeA", 6);
+      put_row(tid_scope_b, self, key, 9, "scopeB", 6);
 
       // Read each and verify isolation
       char buf[16];
-      int32_t sz = kv_get(tid_scope_a, self, key, 9, buf, sizeof(buf));
+      int32_t sz = get_row(tid_scope_a, self, key, 9, buf, sizeof(buf));
       check(sz == 6, "scoped: A size");
       check(memcmp(buf, "scopeA", 6) == 0, "scoped: A data");
 
-      sz = kv_get(tid_scope_b, self, key, 9, buf, sizeof(buf));
+      sz = get_row(tid_scope_b, self, key, 9, buf, sizeof(buf));
       check(sz == 6, "scoped: B size");
       check(memcmp(buf, "scopeB", 6) == 0, "scoped: B data");
    }
@@ -1367,7 +1441,7 @@ public:
       kv_put(self, key, sizeof(key), val, 256);
 
       char buf[256];
-      int32_t sz = kv_get(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
+      int32_t sz = get_row(test_table_id, self, key, sizeof(key), buf, sizeof(buf));
       check(sz == 256, "binround: size");
       check(memcmp(buf, val, 256) == 0, "binround: data mismatch");
    }
@@ -1389,18 +1463,18 @@ public:
 
       // Iterate all rows
       const char prefix[] = {0x3B};
-      uint32_t h = kv_it_create(test_table_id, self, prefix, 1);
+      uint32_t h = it_create(test_table_id, self, prefix, 1);
 
       char seek[] = {0x3B, 0,0,0,0,0,0,0,0};
-      kv_it_lower_bound(h, seek, 9);
+      it_seek(h, seek, 9);
 
       uint32_t count = 0;
       uint64_t prev_id = 0;
       bool first = true;
-      while (kv_it_status(h) == 0) {
+      while (it_status(h) == 0) {
          char kbuf[16];
          uint32_t klen = 0;
-         kv_it_key(h, 0, kbuf, sizeof(kbuf), &klen);
+         it_key(h, kbuf, sizeof(kbuf), &klen);
          check(klen == 9, "largepop: key size");
 
          uint64_t id = 0;
@@ -1413,7 +1487,7 @@ public:
          prev_id = id;
          first = false;
          ++count;
-         kv_it_next(h);
+         it_next(h);
       }
       check(count == 100, "largepop: should iterate 100 rows");
       kv_it_destroy(h);
@@ -1796,7 +1870,7 @@ public:
    void tstpayerself() {
       char key[] = "payerself";
       char val[] = "data";
-      kv_set(test_table_id, 0, key, sizeof(key), val, sizeof(val));  // must throw invalid_table_payer
+      put_row(test_table_id, 0, key, sizeof(key), val, sizeof(val));  // must throw invalid_table_payer
    }
 
    // ─── tstpayeroth: kv_set with non-zero payer — fails at transaction level
@@ -1805,7 +1879,7 @@ public:
    void tstpayeroth() {
       char key[] = "payerother";
       char val[] = "data";
-      kv_set(test_table_id, "alice"_n.value, key, sizeof(key), val, sizeof(val));
+      put_row(test_table_id, "alice"_n.value, key, sizeof(key), val, sizeof(val));
    }
 
    // ─── tstemptykey: empty key (size=0) must be rejected ──────────────────────
@@ -1813,18 +1887,18 @@ public:
    void tstemptykey() {
       char val[] = "data";
       // This should throw — empty keys are not allowed
-      kv_set(test_table_id, get_self().value, nullptr, 0, val, sizeof(val));
+      put_row(test_table_id, get_self().value, nullptr, 0, val, sizeof(val));
    }
 
    // ─── tstbadfmt: table_id > UINT16_MAX is rejected ───────────────────────
    // The chain validates table_id fits in uint16_t. Values > 65535 abort.
-   // This action is expected to fail with kv_key_too_large.
+   // This action is expected to fail with kv_invalid_table_id.
    [[sysio::action]]
    void tstbadfmt() {
       char key[] = "badfmt";
       char val[] = "data";
-      // 65536 > UINT16_MAX → should be rejected by checked_table_id
-      kv_set(65536, 0, key, sizeof(key), val, sizeof(val));
+      // 65536 > UINT16_MAX → should be rejected by checked_table_id. The payer is valid, so only that check can fire.
+      put_row(65536, get_self().value, key, sizeof(key), val, sizeof(val));
    }
 
    // ════════════════════════════════════════════════════════════════════════════
@@ -1840,19 +1914,19 @@ public:
       char val2[] = "replaced";
 
       // Store and create iterator positioned at key
-      kv_set(test_table_id, get_self().value, key, sizeof(key), val1, sizeof(val1));
-      uint32_t h = kv_it_create(test_table_id, get_self().value, prefix, sizeof(prefix));
-      int32_t st = kv_it_lower_bound(h, key, sizeof(key));
+      put_row(test_table_id, get_self().value, key, sizeof(key), val1, sizeof(val1));
+      uint32_t h = it_create(test_table_id, get_self().value, prefix, sizeof(prefix));
+      int32_t st = it_seek(h, key, sizeof(key));
       check(st == 0, "tstreraseins: should find key");
 
       // Erase and reinsert with different value
-      kv_erase(test_table_id, key, sizeof(key));
-      kv_set(test_table_id, get_self().value, key, sizeof(key), val2, sizeof(val2));
+      must(kv_erase(test_table_id, key, sizeof(key)));
+      put_row(test_table_id, get_self().value, key, sizeof(key), val2, sizeof(val2));
 
       // Read via iterator — should see new row (re-seek semantics)
       uint32_t actual = 0;
       char buf[16] = {};
-      int32_t status = kv_it_value(h, 0, buf, sizeof(buf), &actual);
+      int32_t status = it_value(h, 0, buf, sizeof(buf), &actual);
       // Status should be ok (0) — cursor re-seeks to key which now exists
       check(status == 0, "tstreraseins: iterator should find reinserted row");
       check(actual == sizeof(val2), "tstreraseins: value size should match new value");
@@ -1861,10 +1935,10 @@ public:
    }
 
    // --- tstnexteras: erase row under iterator, reinsert same key, kv_it_next must ADVANCE.
-   // Pins the slow-path re-seek in apply_context::kv_it_next: the erase+reinsert leaves the
-   // iterator's cached row id stale, and a lower_bound re-seek would land back on the
-   // reinserted key so next would return the same key forever. The host must seek strictly
-   // past the current key (upper_bound) and land on key2.
+   // Pins the slow path of kv_step_next: the erase clears the slot's row pointer, so next seeks
+   // from the saved key, and a lower_bound re-seek would land back on the reinserted key so next
+   // would return the same key forever. The host must seek strictly past the current key
+   // (upper_bound) and land on key2.
    [[sysio::action]]
    void tstnexteras() {
       char prefix[] = {(char)0xF6};
@@ -1873,29 +1947,29 @@ public:
       char val1[] = "original";
       char val2[] = "replaced";
 
-      kv_set(test_table_id, get_self().value, key1, sizeof(key1), val1, sizeof(val1));
-      kv_set(test_table_id, get_self().value, key2, sizeof(key2), val1, sizeof(val1));
+      put_row(test_table_id, get_self().value, key1, sizeof(key1), val1, sizeof(val1));
+      put_row(test_table_id, get_self().value, key2, sizeof(key2), val1, sizeof(val1));
 
-      uint32_t h = kv_it_create(test_table_id, get_self().value, prefix, sizeof(prefix));
-      int32_t st = kv_it_lower_bound(h, key1, sizeof(key1));
+      uint32_t h = it_create(test_table_id, get_self().value, prefix, sizeof(prefix));
+      int32_t st = it_seek(h, key1, sizeof(key1));
       check(st == 0, "tstnexteras: should find key1");
 
-      // Erase and reinsert key1 -- same key bytes, fresh row (stale cached id)
-      kv_erase(test_table_id, key1, sizeof(key1));
-      kv_set(test_table_id, get_self().value, key1, sizeof(key1), val2, sizeof(val2));
+      // Erase and reinsert key1: same key bytes, fresh row
+      must(kv_erase(test_table_id, key1, sizeof(key1)));
+      put_row(test_table_id, get_self().value, key1, sizeof(key1), val2, sizeof(val2));
 
-      int32_t next_st = kv_it_next(h);
+      int32_t next_st = it_next(h);
       check(next_st == 0, "tstnexteras: next after erase+reinsert should land on key2");
 
       uint32_t actual = 0;
       char kbuf[4] = {};
-      int32_t key_st = kv_it_key(h, 0, kbuf, sizeof(kbuf), &actual);
+      int32_t key_st = it_key(h, kbuf, sizeof(kbuf), &actual);
       check(key_st == 0, "tstnexteras: key read should succeed");
       check(actual == sizeof(key2), "tstnexteras: key size should match");
       check(kbuf[1] == 0x02, "tstnexteras: iterator must advance to key2, not revisit reinserted key1");
 
       // And from key2, next reaches end
-      check(kv_it_next(h) == 1, "tstnexteras: next from last key should reach end");
+      check(it_next(h) == 1, "tstnexteras: next from last key should reach end");
 
       kv_it_destroy(h);
    }
@@ -1912,32 +1986,32 @@ public:
       const char pri1[] = {0x7A, 0x01};
       const char pri2[] = {0x7A, 0x02};
 
-      kv_idx_store(self, sec_tid, pri1, sizeof(pri1), sec1, sizeof(sec1));
-      kv_idx_store(self, sec_tid, pri2, sizeof(pri2), sec2, sizeof(sec2));
+      must(kv_idx_store(sec_tid, self, pri1, sizeof(pri1), sec1, sizeof(sec1)));
+      must(kv_idx_store(sec_tid, self, pri2, sizeof(pri2), sec2, sizeof(sec2)));
 
-      int32_t h = kv_idx_find_secondary(self, sec_tid, sec1, sizeof(sec1));
+      int32_t h = idx_find(self, sec_tid, sec1, sizeof(sec1));
       check(h >= 0, "tstidxnxtras: should find sec1");
 
       // Remove and re-store the entry under the iterator -- same keys, fresh row
-      kv_idx_remove(sec_tid, pri1, sizeof(pri1), sec1, sizeof(sec1));
-      kv_idx_store(self, sec_tid, pri1, sizeof(pri1), sec1, sizeof(sec1));
+      must(kv_idx_erase(sec_tid, pri1, sizeof(pri1), sec1, sizeof(sec1)));
+      must(kv_idx_store(sec_tid, self, pri1, sizeof(pri1), sec1, sizeof(sec1)));
 
-      int32_t next_st = kv_idx_next((uint32_t)h);
+      int32_t next_st = idx_next(h);
       check(next_st == 0, "tstidxnxtras: next after remove+restore should land on sec2");
 
       uint32_t sk_sz = 0;
       char sk_buf[8] = {};
-      int32_t key_st = kv_idx_key((uint32_t)h, 0, sk_buf, sizeof(sk_buf), &sk_sz);
+      int32_t key_st = idx_key(h, sk_buf, sizeof(sk_buf), &sk_sz);
       check(key_st == 0, "tstidxnxtras: sec key read should succeed");
       check(sk_sz == sizeof(sec2), "tstidxnxtras: sec key size should match");
       check(memcmp(sk_buf, sec2, sizeof(sec2)) == 0,
             "tstidxnxtras: iterator must advance to sec2, not revisit reinserted sec1");
 
-      kv_idx_destroy((uint32_t)h);
+      kv_idx_destroy(h);
 
       // Cleanup so reruns within the same chain state start fresh
-      kv_idx_remove(sec_tid, pri1, sizeof(pri1), sec1, sizeof(sec1));
-      kv_idx_remove(sec_tid, pri2, sizeof(pri2), sec2, sizeof(sec2));
+      must(kv_idx_erase(sec_tid, pri1, sizeof(pri1), sec1, sizeof(sec1)));
+      must(kv_idx_erase(sec_tid, pri2, sizeof(pri2), sec2, sizeof(sec2)));
    }
 
    // ─── tstprevbgn: kv_it_prev from begin position should return end status
@@ -1947,14 +2021,14 @@ public:
       char key[] = {(char)0xEF, 0x01};
       char val[] = "data";
 
-      kv_set(test_table_id, get_self().value, key, sizeof(key), val, sizeof(val));
+      put_row(test_table_id, get_self().value, key, sizeof(key), val, sizeof(val));
 
-      uint32_t h = kv_it_create(test_table_id, get_self().value, prefix, sizeof(prefix));
-      int32_t st = kv_it_status(h);
+      uint32_t h = it_create(test_table_id, get_self().value, prefix, sizeof(prefix));
+      int32_t st = it_status(h);
       check(st == 0, "tstprevbgn: should be at first element");
 
       // prev from first element should go to end (status 1)
-      int32_t prev_st = kv_it_prev(h);
+      int32_t prev_st = it_prev(h);
       check(prev_st == 1, "tstprevbgn: prev from begin should return end status");
 
       kv_it_destroy(h);
@@ -1968,24 +2042,31 @@ public:
       char key2[] = {(char)0xF0, 0x02};
       char val[] = "data";
 
-      kv_set(test_table_id, get_self().value, key1, sizeof(key1), val, sizeof(val));
-      kv_set(test_table_id, get_self().value, key2, sizeof(key2), val, sizeof(val));
+      put_row(test_table_id, get_self().value, key1, sizeof(key1), val, sizeof(val));
+      put_row(test_table_id, get_self().value, key2, sizeof(key2), val, sizeof(val));
 
       // Position iterator at key2
-      uint32_t h = kv_it_create(test_table_id, get_self().value, prefix, sizeof(prefix));
-      kv_it_lower_bound(h, key2, sizeof(key2));
-      check(kv_it_status(h) == 0, "tstpreveras: should be at key2");
+      uint32_t h = it_create(test_table_id, get_self().value, prefix, sizeof(prefix));
+      it_seek(h, key2, sizeof(key2));
+      check(it_status(h) == 0, "tstpreveras: should be at key2");
 
       // Erase key2
-      kv_erase(test_table_id, key2, sizeof(key2));
+      must(kv_erase(test_table_id, key2, sizeof(key2)));
 
-      // kv_it_key should report erased
+      // kv_it_read should report no_row
       uint32_t actual = 0;
       char buf[4];
-      int32_t key_st = kv_it_key(h, 0, buf, sizeof(buf), &actual);
+      int32_t key_st = it_key(h, buf, sizeof(buf), &actual);
       check(key_st == 2, "tstpreveras: should report erased status");
 
+      // kv_it_prev from the erased position lands on the predecessor
+      check(it_prev(h) == 0, "tstpreveras: prev should land on key1");
+      key_st = it_key(h, buf, sizeof(buf), &actual);
+      check(key_st == 0, "tstpreveras: key1 should read ok");
+      check(actual == sizeof(key1) && memcmp(buf, key1, sizeof(key1)) == 0, "tstpreveras: should be at key1");
+
       kv_it_destroy(h);
+      must(kv_erase(test_table_id, key1, sizeof(key1)));
    }
 
    // ─── tstrdonly: kv_set in read-only context must fail
@@ -1995,36 +2076,7 @@ public:
    void tstrdonly() {
       char key[] = "rdonly";
       char val[] = "data";
-      kv_set(test_table_id, get_self().value, key, sizeof(key), val, sizeof(val));
-   }
-
-   // ─── tstkeyoffbnd: kv_it_key with offset >= key_size returns 0 bytes ──────
-   [[sysio::action]]
-   void tstkeyoffbnd() {
-      char prefix[] = {(char)0xF1};
-      char key[] = {(char)0xF1, 0x01, 0x02};
-      char val[] = "data";
-      kv_set(test_table_id, get_self().value, key, sizeof(key), val, sizeof(val));
-
-      uint32_t h = kv_it_create(test_table_id, get_self().value, prefix, sizeof(prefix));
-      check(kv_it_status(h) == 0, "tstkeyoffbnd: should be at key");
-
-      // Read key with offset == key_size (3) — should copy 0 bytes
-      uint32_t actual = 0;
-      char buf[8] = {0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42};
-      int32_t st = kv_it_key(h, 3, buf, sizeof(buf), &actual);
-      check(st == 0, "tstkeyoffbnd: status should be ok");
-      check(actual == 3, "tstkeyoffbnd: actual_size should be full key size");
-      // buf should be untouched since offset >= key_size
-      check(buf[0] == 0x42, "tstkeyoffbnd: buf should be untouched");
-
-      // Read key with offset > key_size — same behavior
-      uint32_t actual2 = 0;
-      st = kv_it_key(h, 100, buf, sizeof(buf), &actual2);
-      check(st == 0, "tstkeyoffbnd: status ok for large offset");
-      check(actual2 == 3, "tstkeyoffbnd: actual_size still full key size");
-
-      kv_it_destroy(h);
+      put_row(test_table_id, get_self().value, key, sizeof(key), val, sizeof(val));
    }
 
    // ─── tstbigseckey: oversized secondary key must be rejected ───────────────
@@ -2035,24 +2087,7 @@ public:
       char sec_key[257];
       memset(sec_key, 'A', sizeof(sec_key));
       char pri_key[] = {0x01};
-      kv_idx_store(get_self().value, test_sec_table_id, pri_key, sizeof(pri_key), sec_key, sizeof(sec_key));
-   }
-
-   // ─── tstnotifyram: write in notification context bills receiver's RAM ─────
-   [[sysio::action]]
-   void tstnotifyram() {
-      // When receiving a notification (receiver != act.account),
-      // kv_set writes to receiver's KV namespace and bills receiver
-      char key[] = "notifykey";
-      char val[] = "notifyval";
-      kv_set(test_table_id, get_self().value, key, sizeof(key), val, sizeof(val));
-   }
-
-   // ─── tstsendnotif: send notification to trigger tstnotifyram on another account
-   [[sysio::action]]
-   void tstsendnotif() {
-      // This sends a notification to 'kvnotify' account which also has this contract
-      require_recipient("kvnotify"_n);
+      must(kv_idx_store(test_sec_table_id, get_self().value, pri_key, sizeof(pri_key), sec_key, sizeof(sec_key)));
    }
 
    // ════════════════════════════════════════════════════════════════════════════
@@ -2139,7 +2174,7 @@ public:
       char key[4];
       memcpy(key, &key_id, 4);
       std::vector<char> val(val_size, 'X');
-      kv_set(test_table_id, get_self().value, key, 4, val.data(), val_size);
+      put_row(test_table_id, get_self().value, key, 4, val.data(), val_size);
    }
 
    // Update an existing row with a new value size
@@ -2148,7 +2183,7 @@ public:
       char key[4];
       memcpy(key, &key_id, 4);
       std::vector<char> val(val_size, 'Y');
-      kv_set(test_table_id, get_self().value, key, 4, val.data(), val_size);
+      put_row(test_table_id, get_self().value, key, 4, val.data(), val_size);
    }
 
    // Erase a row
@@ -2156,7 +2191,7 @@ public:
    void ramerase(uint32_t key_id) {
       char key[4];
       memcpy(key, &key_id, 4);
-      kv_erase(test_table_id, key, 4);
+      must(kv_erase(test_table_id, key, 4));
    }
 
    // ─── tstidxpayer: kv_set + kv_idx_store with explicit payer ──────────────
@@ -2167,13 +2202,12 @@ public:
       // Primary row: 4-byte key, 10-byte value
       char pk[] = {0x50, 0x41, 0x59, 0x01};  // "PAY\x01"
       char val[] = "idxpayerv1";
-      kv_set(test_table_id, payer.value, pk, sizeof(pk), val, sizeof(val));
+      put_row(test_table_id, payer.value, pk, sizeof(pk), val, sizeof(val));
 
       // Secondary index: 8-byte sec key, 4-byte pri key
       static constexpr uint32_t sec_tid = 112;
       char sec_key[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x42};
-      kv_idx_store(payer.value, sec_tid,
-                   pk, sizeof(pk), sec_key, sizeof(sec_key));
+      must(kv_idx_store(sec_tid, payer.value, pk, sizeof(pk), sec_key, sizeof(sec_key)));
    }
 
    // ── Payer-billing route probes ──────────────────────────────────────────────
@@ -2186,8 +2220,8 @@ public:
    void bilkvera(sysio::name pa) {
       char k[]   = {0x42, 0x45, 0x52, 0x01};   // "BER\x01"
       char val[] = "eraseval";
-      kv_set(test_table_id, pa.value, k, sizeof(k), val, sizeof(val));
-      kv_erase(test_table_id, k, sizeof(k));
+      put_row(test_table_id, pa.value, k, sizeof(k), val, sizeof(val));
+      must(kv_erase(test_table_id, k, sizeof(k)));
    }
 
    // bilidxchg: secondary entry stored billed to `pa`, then its key updated billed
@@ -2200,20 +2234,19 @@ public:
       char pri[]   = {0x43, 0x48, 0x47, 0x01};            // "CHG\x01"
       char sec_a[] = {0x01, 0x02, 0x03, 0x04, 0x05};
       char sec_b[] = {0x06, 0x07, 0x08, 0x09, 0x0a};
-      kv_idx_store(pa.value, sec_tid, pri, sizeof(pri), sec_a, sizeof(sec_a));
-      kv_idx_update(pb.value, sec_tid, pri, sizeof(pri),
-                    sec_a, sizeof(sec_a), sec_b, sizeof(sec_b));
+      must(kv_idx_store(sec_tid, pa.value, pri, sizeof(pri), sec_a, sizeof(sec_a)));
+      must(kv_idx_update(sec_tid, pb.value, pri, sizeof(pri), sec_a, sizeof(sec_a), sec_b, sizeof(sec_b)));
    }
 
-   // bilidxrm: secondary entry stored billed to `pa`, then removed. kv_idx_remove
+   // bilidxrm: secondary entry stored billed to `pa`, then removed. kv_idx_erase
    // must refund the entry's payer (pa), so pa's net RAM is zero.
    [[sysio::action]]
    void bilidxrm(sysio::name pa) {
       static constexpr uint32_t sec_tid = 114;
       char pri[] = {0x52, 0x4d, 0x56, 0x01};              // "RMV\x01"
       char sec[] = {0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
-      kv_idx_store(pa.value, sec_tid, pri, sizeof(pri), sec, sizeof(sec));
-      kv_idx_remove(sec_tid, pri, sizeof(pri), sec, sizeof(sec));
+      must(kv_idx_store(sec_tid, pa.value, pri, sizeof(pri), sec, sizeof(sec)));
+      must(kv_idx_erase(sec_tid, pri, sizeof(pri), sec, sizeof(sec)));
    }
 
    // idxnopay: kv_idx_store INSERT with payer=0 (same_payer) is rejected. A new secondary
@@ -2224,7 +2257,7 @@ public:
       static constexpr uint32_t sec_tid = 116;
       char pri[] = {0x5a, 0x45, 0x52, 0x01};              // "ZER\x01"
       char sec[] = {0x21, 0x22, 0x23, 0x24, 0x25};
-      kv_idx_store(0, sec_tid, pri, sizeof(pri), sec, sizeof(sec));  // must throw invalid_table_payer
+      must(kv_idx_store(sec_tid, 0, pri, sizeof(pri), sec, sizeof(sec)));  // must throw invalid_table_payer
    }
 
    // ═══════════════════════════════════════════════════════════════════════════
@@ -2433,7 +2466,7 @@ public:
       char key[4];
       memcpy(key, &key_id, 4);
       std::vector<char> val(val_size, 'X');
-      kv_set(test_table_id, payer.value, key, 4, val.data(), val_size);
+      put_row(test_table_id, payer.value, key, 4, val.data(), val_size);
    }
 
    // ════════════════════════════════════════════════════════════════════════════
@@ -2445,8 +2478,7 @@ public:
    void ramidxstore(uint32_t sec_size, uint32_t pri_size) {
       std::vector<char> sec_key(sec_size, 'S');
       std::vector<char> pri_key(pri_size, 'P');
-      kv_idx_store(get_self().value, ramidx_tid,
-                   pri_key.data(), pri_size, sec_key.data(), sec_size);
+      must(kv_idx_store(ramidx_tid, get_self().value, pri_key.data(), pri_size, sec_key.data(), sec_size));
    }
 
    // Remove secondary index
@@ -2454,8 +2486,7 @@ public:
    void ramidxremov(uint32_t sec_size, uint32_t pri_size) {
       std::vector<char> sec_key(sec_size, 'S');
       std::vector<char> pri_key(pri_size, 'P');
-      kv_idx_remove(ramidx_tid,
-                    pri_key.data(), pri_size, sec_key.data(), sec_size);
+      must(kv_idx_erase(ramidx_tid, pri_key.data(), pri_size, sec_key.data(), sec_size));
    }
 
    // Update secondary index (old sec filled with 'S', new with 'T')
@@ -2464,9 +2495,7 @@ public:
       std::vector<char> old_sec(old_ss, 'S');
       std::vector<char> new_sec(new_ss, 'T');
       std::vector<char> pri_key(pri_size, 'P');
-      kv_idx_update(0, ramidx_tid,
-                    pri_key.data(), pri_size,
-                    old_sec.data(), old_ss, new_sec.data(), new_ss);
+      must(kv_idx_update(ramidx_tid, 0, pri_key.data(), pri_size, old_sec.data(), old_ss, new_sec.data(), new_ss));
    }
 
    // Secondary index store with explicit payer (for cross-account billing tests)
@@ -2474,8 +2503,7 @@ public:
    void ramidxstpyr(sysio::name payer, uint32_t sec_size, uint32_t pri_size) {
       std::vector<char> sec_key(sec_size, 'S');
       std::vector<char> pri_key(pri_size, 'P');
-      kv_idx_store(payer.value, ramidx_tid,
-                   pri_key.data(), pri_size, sec_key.data(), sec_size);
+      must(kv_idx_store(ramidx_tid, payer.value, pri_key.data(), pri_size, sec_key.data(), sec_size));
    }
 
    // Secondary index update with explicit payer
@@ -2484,9 +2512,7 @@ public:
       std::vector<char> old_sec(old_ss, 'S');
       std::vector<char> new_sec(new_ss, 'T');
       std::vector<char> pri_key(pri_size, 'P');
-      kv_idx_update(payer.value, ramidx_tid,
-                    pri_key.data(), pri_size,
-                    old_sec.data(), old_ss, new_sec.data(), new_ss);
+      must(kv_idx_update(ramidx_tid, payer.value, pri_key.data(), pri_size, old_sec.data(), old_ss, new_sec.data(), new_ss));
    }
 
    // ════════════════════════════════════════════════════════════════════════════
@@ -2496,21 +2522,21 @@ public:
    [[sysio::action]]
    void tstrdoerase() {
       char key[] = "rdoerase";
-      kv_erase(test_table_id, key, sizeof(key));
+      must(kv_erase(test_table_id, key, sizeof(key)));
    }
 
    [[sysio::action]]
    void tstrdoidxst() {
       char sec[] = "sec";
       char pri[] = "pri";
-      kv_idx_store(get_self().value, rdo_tid, pri, 3, sec, 3);
+      must(kv_idx_store(rdo_tid, get_self().value, pri, 3, sec, 3));
    }
 
    [[sysio::action]]
    void tstrdoidxrm() {
       char sec[] = "sec";
       char pri[] = "pri";
-      kv_idx_remove(rdo_tid, pri, 3, sec, 3);
+      must(kv_idx_erase(rdo_tid, pri, 3, sec, 3));
    }
 
    [[sysio::action]]
@@ -2518,7 +2544,7 @@ public:
       char os[] = "sec";
       char ns[] = "new";
       char pri[] = "pri";
-      kv_idx_update(0, rdo_tid, pri, 3, os, 3, ns, 3);
+      must(kv_idx_update(rdo_tid, 0, pri, 3, os, 3, ns, 3));
    }
 
    // ════════════════════════════════════════════════════════════════════════════
@@ -2537,7 +2563,7 @@ public:
       char key[4];
       memcpy(key, &key_id, 4);
       std::vector<char> val(val_size, 'N');
-      kv_set(test_table_id, get_self().value, key, 4, val.data(), val_size);
+      put_row(test_table_id, get_self().value, key, 4, val.data(), val_size);
    }
 
    // Send notification — receiver's handler tries third-party payer
@@ -2552,7 +2578,7 @@ public:
       char key[4];
       memcpy(key, &key_id, 4);
       std::vector<char> val(val_size, 'E');
-      kv_set(test_table_id, payer.value, key, 4, val.data(), val_size);
+      put_row(test_table_id, payer.value, key, 4, val.data(), val_size);
    }
 
    // ════════════════════════════════════════════════════════════════════════════
@@ -2564,18 +2590,18 @@ public:
    void tstmutupdval() {
       char prefix[] = {(char)0xA0};
       char key[] = {(char)0xA0, 0x01};
-      kv_set(test_table_id, get_self().value, key, 2, "old", 3);
+      put_row(test_table_id, get_self().value, key, 2, "old", 3);
 
-      uint32_t h = kv_it_create(test_table_id, get_self().value, prefix, 1);
-      kv_it_lower_bound(h, key, 2);
-      check(kv_it_status(h) == 0, "mutupdval: should be valid");
+      uint32_t h = it_create(test_table_id, get_self().value, prefix, 1);
+      it_seek(h, key, 2);
+      check(it_status(h) == 0, "mutupdval: should be valid");
 
       // Update value while iterator points to row
-      kv_set(test_table_id, get_self().value, key, 2, "newval", 6);
+      put_row(test_table_id, get_self().value, key, 2, "newval", 6);
 
       // Iterator should still be valid (key unchanged) and see new value
       char vbuf[16]; uint32_t vlen = 0;
-      int32_t st = kv_it_value(h, 0, vbuf, sizeof(vbuf), &vlen);
+      int32_t st = it_value(h, 0, vbuf, sizeof(vbuf), &vlen);
       check(st == 0, "mutupdval: status after update");
       check(vlen == 6, "mutupdval: new value size");
       check(memcmp(vbuf, "newval", 6) == 0, "mutupdval: new value data");
@@ -2590,23 +2616,23 @@ public:
       char k1[] = {(char)0xA1, 0x01};
       char k2[] = {(char)0xA1, 0x02};
       char k3[] = {(char)0xA1, 0x03};
-      kv_set(test_table_id, get_self().value, k1, 2, "a", 1);
-      kv_set(test_table_id, get_self().value, k2, 2, "b", 1);
-      kv_set(test_table_id, get_self().value, k3, 2, "c", 1);
+      put_row(test_table_id, get_self().value, k1, 2, "a", 1);
+      put_row(test_table_id, get_self().value, k2, 2, "b", 1);
+      put_row(test_table_id, get_self().value, k3, 2, "c", 1);
 
-      uint32_t h = kv_it_create(test_table_id, get_self().value, prefix, 1);
-      kv_it_lower_bound(h, k2, 2);
-      check(kv_it_status(h) == 0, "erasenext: on k2");
+      uint32_t h = it_create(test_table_id, get_self().value, prefix, 1);
+      it_seek(h, k2, 2);
+      check(it_status(h) == 0, "erasenext: on k2");
 
       // Erase k2 under the iterator
-      kv_erase(test_table_id, k2, 2);
+      must(kv_erase(test_table_id, k2, 2));
 
       // next() should advance to k3
-      int32_t st = kv_it_next(h);
+      int32_t st = it_next(h);
       check(st == 0, "erasenext: next should find k3");
 
       char kbuf[4]; uint32_t klen = 0;
-      kv_it_key(h, 0, kbuf, sizeof(kbuf), &klen);
+      it_key(h, kbuf, sizeof(kbuf), &klen);
       check(klen == 2, "erasenext: key size");
       check(kbuf[1] == 0x03, "erasenext: should be at k3");
 
@@ -2619,19 +2645,19 @@ public:
       char prefix[] = {(char)0xA2};
       char k1[] = {(char)0xA2, 0x01};
       char k2[] = {(char)0xA2, 0x02};
-      kv_set(test_table_id, get_self().value, k1, 2, "a", 1);
-      kv_set(test_table_id, get_self().value, k2, 2, "b", 1);
+      put_row(test_table_id, get_self().value, k1, 2, "a", 1);
+      put_row(test_table_id, get_self().value, k2, 2, "b", 1);
 
-      uint32_t h = kv_it_create(test_table_id, get_self().value, prefix, 1);
-      kv_it_lower_bound(h, k1, 2);
-      check(kv_it_status(h) == 0, "eraseall: on k1");
+      uint32_t h = it_create(test_table_id, get_self().value, prefix, 1);
+      it_seek(h, k1, 2);
+      check(it_status(h) == 0, "eraseall: on k1");
 
       // Erase both rows
-      kv_erase(test_table_id, k1, 2);
-      kv_erase(test_table_id, k2, 2);
+      must(kv_erase(test_table_id, k1, 2));
+      must(kv_erase(test_table_id, k2, 2));
 
       // next() should reach end (status 1)
-      int32_t st = kv_it_next(h);
+      int32_t st = it_next(h);
       check(st == 1, "eraseall: should be at end");
 
       kv_it_destroy(h);
@@ -2646,22 +2672,22 @@ public:
       char sec2[] = "bravo";
       char pri1[] = "pk1";
       char pri2[] = "pk2";
-      kv_idx_store(get_self().value, table, pri1, 3, sec1, 5);
-      kv_idx_store(get_self().value, table, pri2, 3, sec2, 5);
+      must(kv_idx_store(table, get_self().value, pri1, 3, sec1, 5));
+      must(kv_idx_store(table, get_self().value, pri2, 3, sec2, 5));
 
       // Position sec iterator on "alpha"
-      int32_t h = kv_idx_find_secondary(self, table, sec1, 5);
+      int32_t h = idx_find(self, table, sec1, 5);
       check(h >= 0, "idxerase: should find alpha");
 
       // Remove "alpha" entry
-      kv_idx_remove(table, pri1, 3, sec1, 5);
+      must(kv_idx_erase(table, pri1, 3, sec1, 5));
 
       // next() should advance to "bravo"
-      int32_t st = kv_idx_next(h);
+      int32_t st = idx_next(h);
       check(st == 0, "idxerase: next should find bravo");
 
       char sbuf[16]; uint32_t slen = 0;
-      kv_idx_key(h, 0, sbuf, sizeof(sbuf), &slen);
+      idx_key(h, sbuf, sizeof(sbuf), &slen);
       check(slen == 5, "idxerase: sec key size");
       check(memcmp(sbuf, "bravo", 5) == 0, "idxerase: should be bravo");
 
@@ -2676,21 +2702,21 @@ public:
       char sec_old[] = "delta";
       char sec_new[] = "zebra";
       char pri[] = "pk1";
-      kv_idx_store(get_self().value, table, pri, 3, sec_old, 5);
+      must(kv_idx_store(table, get_self().value, pri, 3, sec_old, 5));
 
       // Position sec iterator on "delta"
-      int32_t h = kv_idx_find_secondary(self, table, sec_old, 5);
+      int32_t h = idx_find(self, table, sec_old, 5);
       check(h >= 0, "idxmutupd: should find delta");
 
-      // Update "delta" -> "zebra" — removes old entry, inserts new one
-      kv_idx_update(0, table, pri, 3, sec_old, 5, sec_new, 5);
+      // Update "delta" -> "zebra": the entry moves, and the iterator stays at "delta"
+      must(kv_idx_update(table, 0, pri, 3, sec_old, 5, sec_new, 5));
 
-      // next() re-scans from "delta" position: "delta" gone, lower_bound lands on "zebra"
-      int32_t st = kv_idx_next(h);
+      // next() re-scans from "delta" position: "delta" gone, upper_bound lands on "zebra"
+      int32_t st = idx_next(h);
       check(st == 0, "idxmutupd: should find zebra");
 
       char sbuf[16]; uint32_t slen = 0;
-      kv_idx_key(h, 0, sbuf, sizeof(sbuf), &slen);
+      idx_key(h, sbuf, sizeof(sbuf), &slen);
       check(slen == 5, "idxmutupd: key size");
       check(memcmp(sbuf, "zebra", 5) == 0, "idxmutupd: should be zebra");
 
@@ -2706,24 +2732,24 @@ public:
       char sec3[] = "ccc";
       char pri1[] = "pk1";
       char pri3[] = "pk3";
-      kv_idx_store(get_self().value, table, pri1, 3, sec1, 3);
-      kv_idx_store(get_self().value, table, pri3, 3, sec3, 3);
+      must(kv_idx_store(table, get_self().value, pri1, 3, sec1, 3));
+      must(kv_idx_store(table, get_self().value, pri3, 3, sec3, 3));
 
       // Position on "aaa"
-      int32_t h = kv_idx_find_secondary(self, table, sec1, 3);
+      int32_t h = idx_find(self, table, sec1, 3);
       check(h >= 0, "idxinsert: should find aaa");
 
       // Insert "bbb" between aaa and ccc
       char sec2[] = "bbb";
       char pri2[] = "pk2";
-      kv_idx_store(get_self().value, table, pri2, 3, sec2, 3);
+      must(kv_idx_store(table, get_self().value, pri2, 3, sec2, 3));
 
       // next() should see "bbb"
-      int32_t st = kv_idx_next(h);
+      int32_t st = idx_next(h);
       check(st == 0, "idxinsert: next should find bbb");
 
       char sbuf[8]; uint32_t slen = 0;
-      kv_idx_key(h, 0, sbuf, sizeof(sbuf), &slen);
+      idx_key(h, sbuf, sizeof(sbuf), &slen);
       check(slen == 3, "idxinsert: key size");
       check(memcmp(sbuf, "bbb", 3) == 0, "idxinsert: should be bbb");
 
@@ -2739,33 +2765,87 @@ public:
    void xcsetup() {
       char key[] = "xcpri";
       char val[] = "xcval";
-      kv_set(test_table_id, get_self().value, key, 5, val, 5);
+      put_row(test_table_id, get_self().value, key, 5, val, 5);
       char sec[] = "xcsec";
       char pri[] = "xcpri";
-      kv_idx_store(get_self().value, xc_tid, pri, 5, sec, 5);
+      must(kv_idx_store(xc_tid, get_self().value, pri, 5, sec, 5));
    }
 
    // Read another contract's secondary index
    [[sysio::action]]
    void xcidxread(sysio::name other) {
       // Find secondary index entry on other contract
-      int32_t h = kv_idx_find_secondary(other.value, xc_tid, "xcsec", 5);
+      int32_t h = idx_find(other.value, xc_tid, "xcsec", 5);
       check(h >= 0, "xcidxread: secondary not found");
 
       // Read primary key from the iterator
       char pk_buf[16];
       uint32_t pk_sz = 0;
-      int32_t st = kv_idx_primary_key(h, 0, pk_buf, sizeof(pk_buf), &pk_sz);
+      int32_t st = idx_pri(h, pk_buf, sizeof(pk_buf), &pk_sz);
       check(st == 0, "xcidxread: iterator status");
       check(pk_sz == 5, "xcidxread: pri_key size");
       check(memcmp(pk_buf, "xcpri", 5) == 0, "xcidxread: pri_key data");
 
       // Use that primary key to read the row from the other contract
       char val_buf[16];
-      int32_t val_sz = kv_get(test_table_id, other.value, "xcpri", 5, val_buf, sizeof(val_buf));
+      int32_t val_sz = get_row(test_table_id, other.value, "xcpri", 5, val_buf, sizeof(val_buf));
       check(val_sz == 5, "xcidxread: value size");
       check(memcmp(val_buf, "xcval", 5) == 0, "xcidxread: value data");
 
       kv_idx_destroy(h);
+   }
+
+   // What rdoreads reads, written in an ordinary transaction.
+   [[sysio::action]]
+   void rdoseed() {
+      const uint64_t self = get_self().value;
+      must(put_row(rdoreads_tid, self, "ka", 2, "one", 3));
+      must(put_row(rdoreads_tid, self, "kb", 2, "two", 3));
+      must(kv_idx_store(rdoreads_ix, self, "pa", 2, "sa", 2));
+      must(kv_idx_store(rdoreads_ix, self, "pb", 2, "sb", 2));
+   }
+
+   // Every read intrinsic of both families, for a read-only transaction. What each call found goes into the return
+   // value in call order, so the host test compares bytes it can name.
+   [[sysio::action]]
+   std::vector<char> rdoreads() {
+      const uint64_t    self = get_self().value;
+      std::vector<char> found;
+      char              key[2], value[3];
+      uint32_t          first = 0, second = 0;
+      const auto keep = [&](const char* bytes, uint32_t size) { found.insert(found.end(), bytes, bytes + size); };
+
+      check(kv_get(rdoreads_tid, self, "ka", 2, 0, value, sizeof(value)) == 3, "rdoreads: kv_get");
+      keep(value, sizeof(value));
+
+      const int32_t h = kv_it_create(rdoreads_tid, self, "k", 1, nullptr, 0);
+      check(kv_it_read(h, 0, key, sizeof(key), value, sizeof(value), &first, &second) == kv_status_ok, "rdoreads: read");
+      keep(key, first);
+      check(kv_it_next(h, key, sizeof(key), value, sizeof(value), &first, &second) == kv_status_ok, "rdoreads: next");
+      keep(key, first);
+      check(kv_it_prev(h, key, sizeof(key), value, sizeof(value), &first, &second) == kv_status_ok, "rdoreads: prev");
+      keep(key, first);
+      check(kv_it_lower_bound(h, "kb", 2, key, sizeof(key), value, sizeof(value), &first, &second) == kv_status_ok,
+            "rdoreads: lower_bound");
+      keep(value, second);
+      kv_it_destroy(h);
+
+      const int32_t x = kv_idx_create(rdoreads_ix, self, "s", 1, nullptr, 0);
+      check(kv_idx_read(x, key, sizeof(key), nullptr, 0, &first, &second) == kv_status_ok, "rdoreads: idx read");
+      keep(key, first);
+      check(kv_idx_next(x, key, sizeof(key), nullptr, 0, &first, &second) == kv_status_ok, "rdoreads: idx next");
+      keep(key, first);
+      check(kv_idx_prev(x, nullptr, 0, key, sizeof(key), &first, &second) == kv_status_ok, "rdoreads: idx prev");
+      keep(key, second);
+      check(kv_idx_lower_bound(x, "sb", 2, nullptr, 0, key, sizeof(key), &first, &second) == kv_status_ok,
+            "rdoreads: idx lower_bound");
+      keep(key, second);
+      kv_idx_destroy(x);
+
+      const int32_t found_x = kv_idx_find(rdoreads_ix, self, nullptr, 0, "sa", 2);
+      check(kv_idx_read(found_x, nullptr, 0, key, sizeof(key), &first, &second) == kv_status_ok, "rdoreads: idx find");
+      keep(key, second);
+      kv_idx_destroy(found_x);
+      return found;
    }
 };

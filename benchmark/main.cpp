@@ -19,6 +19,8 @@ int main(int argc, char* argv[]) {
       ("feature,f", bpo::value<std::string>(), "feature to be benchmarked; if this option is not present, all features are benchmarked.")
       ("list,l", "list of supported features")
       ("runs,r", bpo::value<uint32_t>(&num_runs)->default_value(1000), "the number of times running a function during benchmarking")
+      ("kv-rows", bpo::value<std::vector<uint32_t>>()->multitoken(), "table sizes for the kv_ops and kv_table features, each at least 10000")
+      ("wasm-runtime", bpo::value<sysio::chain::wasm_interface::vm_type>(), "WASM runtime for the kv_contract, kv_token, kv_ops and kv_table features: sys-vm, sys-vm-jit or sys-vm-oc-forced")
       ("help,h", "benchmark functions, and report average, minimum, and maximum execution time in nanoseconds");
 
    variables_map vmap;
@@ -46,6 +48,14 @@ int main(int argc, char* argv[]) {
          return 0;
       }
 
+      if (vmap.count("kv-rows") > 0) {
+         sysio::benchmark::set_kv_rows(vmap["kv-rows"].as<std::vector<uint32_t>>());
+      }
+
+      if (vmap.count("wasm-runtime") > 0) {
+         sysio::benchmark::set_wasm_runtime(vmap["wasm-runtime"].as<sysio::chain::wasm_interface::vm_type>());
+      }
+
       if (vmap.count("feature") > 0) {
          feature_name = vmap["feature"].as<std::string>();
          if (features.find(feature_name) == features.end()) {
@@ -53,7 +63,7 @@ int main(int argc, char* argv[]) {
             return 1;
          }
       }
-   } catch (bpo::unknown_option &ex) {
+   } catch (const bpo::error& ex) {
       std::cerr << ex.what() << std::endl;
       cli.print (std::cerr);
       return 1;
@@ -64,16 +74,21 @@ int main(int argc, char* argv[]) {
    sysio::benchmark::set_num_runs(num_runs);
    sysio::benchmark::print_header();
 
-   if (feature_name.empty()) {
-      for (auto& [name, f]: features) {
-         std::cout << name << ":" << std::endl;
-         f();
+   try {
+      if (feature_name.empty()) {
+         for (auto& [name, f]: features) {
+            std::cout << name << ":" << std::endl;
+            f();
+            std::cout << std::endl;
+         }
+      } else {
+         std::cout << feature_name << ":" << std::endl;
+         features[feature_name]();
          std::cout << std::endl;
       }
-   } else {
-      std::cout << feature_name << ":" << std::endl;
-      features[feature_name]();
-      std::cout << std::endl;
+   } catch (const fc::exception& ex) {
+      std::cerr << ex.to_detail_string() << std::endl;
+      return 1;
    }
 
    return 0;

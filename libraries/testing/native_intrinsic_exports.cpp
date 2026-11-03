@@ -280,113 +280,98 @@ void printhex(const void* data, uint32_t datalen) {
 // ============================================================================
 
 INTRINSIC_EXPORT
-int64_t kv_set(uint32_t table_id, uint64_t payer, const char* key, uint32_t key_len, const char* value, uint32_t value_len) {
-   return native_context_stack::current()->kv_set(table_id, payer, aligned_span<const char>{(void*)key, key_len}, aligned_span<const char>{(void*)value, value_len});
+int32_t kv_set(uint32_t table_id, uint64_t payer, const char* key, uint32_t key_len, const char* value, uint32_t value_len, uint32_t mode) {
+   return native_context_stack::current()->kv_set(table_id, payer, span<const char>{key, key_len}, span<const char>{value, value_len}, mode);
 }
 
 INTRINSIC_EXPORT
-int32_t kv_get(uint32_t table_id, uint64_t code, const char* key, uint32_t key_len, char* value, uint32_t value_len) {
-   return native_context_stack::current()->kv_get(table_id, code, aligned_span<const char>{(void*)key, key_len}, aligned_span<char>{(void*)value, value_len});
+int32_t kv_erase(uint32_t table_id, const char* key, uint32_t key_len) {
+   return native_context_stack::current()->kv_erase(table_id, span<const char>{key, key_len});
 }
 
 INTRINSIC_EXPORT
-int64_t kv_erase(uint32_t table_id, const char* key, uint32_t key_len) {
-   return native_context_stack::current()->kv_erase(table_id, aligned_span<const char>{(void*)key, key_len});
+int32_t kv_get(uint32_t table_id, uint64_t code, const char* key, uint32_t key_len, uint32_t offset, char* value, uint32_t value_len) {
+   return native_context_stack::current()->kv_get(table_id, code, span<const char>{key, key_len}, offset, span<char>{value, value_len});
 }
 
 INTRINSIC_EXPORT
-int32_t kv_contains(uint32_t table_id, uint64_t code, const char* key, uint32_t key_len) {
-   return native_context_stack::current()->kv_contains(table_id, code, aligned_span<const char>{(void*)key, key_len});
+int32_t kv_idx_store(uint32_t table_id, uint64_t payer, const char* pri_key, uint32_t pri_key_len, const char* sec_key, uint32_t sec_key_len) {
+   return native_context_stack::current()->kv_idx_store(table_id, payer, span<const char>{pri_key, pri_key_len}, span<const char>{sec_key, sec_key_len});
 }
 
 INTRINSIC_EXPORT
-uint32_t kv_it_create(uint32_t table_id, uint64_t code, const char* prefix, uint32_t prefix_len) {
-   return native_context_stack::current()->kv_it_create(table_id, code, aligned_span<const char>{(void*)prefix, prefix_len});
+int32_t kv_idx_update(uint32_t table_id, uint64_t payer, const char* pri_key, uint32_t pri_key_len, const char* old_sec_key, uint32_t old_sec_key_len, const char* new_sec_key, uint32_t new_sec_key_len) {
+   return native_context_stack::current()->kv_idx_update(table_id, payer, span<const char>{pri_key, pri_key_len}, span<const char>{old_sec_key, old_sec_key_len}, span<const char>{new_sec_key, new_sec_key_len});
 }
 
 INTRINSIC_EXPORT
-void kv_it_destroy(uint32_t handle) {
+int32_t kv_idx_erase(uint32_t table_id, const char* pri_key, uint32_t pri_key_len, const char* sec_key, uint32_t sec_key_len) {
+   return native_context_stack::current()->kv_idx_erase(table_id, span<const char>{pri_key, pri_key_len}, span<const char>{sec_key, sec_key_len});
+}
+
+INTRINSIC_EXPORT
+int32_t kv_it_create(uint32_t table_id, uint64_t code, const char* prefix, uint32_t prefix_len, const char* seek, uint32_t seek_len) {
+   return native_context_stack::current()->kv_it_create(table_id, code, span<const char>{prefix, prefix_len}, span<const char>{seek, seek_len});
+}
+
+INTRINSIC_EXPORT
+int32_t kv_it_next(int32_t handle, char* key, uint32_t key_len, char* value, uint32_t value_len, uint32_t* key_size, uint32_t* value_size) {
+   return native_context_stack::current()->kv_it_next(handle, span<char>{key, key_len}, span<char>{value, value_len}, aligned_ptr<uint32_t>{key_size}, aligned_ptr<uint32_t>{value_size});
+}
+
+INTRINSIC_EXPORT
+int32_t kv_it_prev(int32_t handle, char* key, uint32_t key_len, char* value, uint32_t value_len, uint32_t* key_size, uint32_t* value_size) {
+   return native_context_stack::current()->kv_it_prev(handle, span<char>{key, key_len}, span<char>{value, value_len}, aligned_ptr<uint32_t>{key_size}, aligned_ptr<uint32_t>{value_size});
+}
+
+INTRINSIC_EXPORT
+int32_t kv_it_lower_bound(int32_t handle, const char* seek, uint32_t seek_len, char* key, uint32_t key_len, char* value, uint32_t value_len, uint32_t* key_size, uint32_t* value_size) {
+   return native_context_stack::current()->kv_it_lower_bound(handle, span<const char>{seek, seek_len}, span<char>{key, key_len}, span<char>{value, value_len}, aligned_ptr<uint32_t>{key_size}, aligned_ptr<uint32_t>{value_size});
+}
+
+INTRINSIC_EXPORT
+int32_t kv_it_read(int32_t handle, uint32_t offset, char* key, uint32_t key_len, char* value, uint32_t value_len, uint32_t* key_size, uint32_t* value_size) {
+   return native_context_stack::current()->kv_it_read(handle, offset, span<char>{key, key_len}, span<char>{value, value_len}, aligned_ptr<uint32_t>{key_size}, aligned_ptr<uint32_t>{value_size});
+}
+
+INTRINSIC_EXPORT
+void kv_it_destroy(int32_t handle) {
    native_context_stack::current()->kv_it_destroy(handle);
 }
 
 INTRINSIC_EXPORT
-int32_t kv_it_status(uint32_t handle) {
-   return native_context_stack::current()->kv_it_status(handle);
+int32_t kv_idx_create(uint32_t table_id, uint64_t code, const char* prefix, uint32_t prefix_len, const char* seek, uint32_t seek_len) {
+   return native_context_stack::current()->kv_idx_create(table_id, code, span<const char>{prefix, prefix_len}, span<const char>{seek, seek_len});
 }
 
 INTRINSIC_EXPORT
-int32_t kv_it_next(uint32_t handle) {
-   return native_context_stack::current()->kv_it_next(handle);
+int32_t kv_idx_next(int32_t handle, char* sec_key, uint32_t sec_key_len, char* pri_key, uint32_t pri_key_len, uint32_t* sec_size, uint32_t* pri_size) {
+   return native_context_stack::current()->kv_idx_next(handle, span<char>{sec_key, sec_key_len}, span<char>{pri_key, pri_key_len}, aligned_ptr<uint32_t>{sec_size}, aligned_ptr<uint32_t>{pri_size});
 }
 
 INTRINSIC_EXPORT
-int32_t kv_it_prev(uint32_t handle) {
-   return native_context_stack::current()->kv_it_prev(handle);
+int32_t kv_idx_prev(int32_t handle, char* sec_key, uint32_t sec_key_len, char* pri_key, uint32_t pri_key_len, uint32_t* sec_size, uint32_t* pri_size) {
+   return native_context_stack::current()->kv_idx_prev(handle, span<char>{sec_key, sec_key_len}, span<char>{pri_key, pri_key_len}, aligned_ptr<uint32_t>{sec_size}, aligned_ptr<uint32_t>{pri_size});
 }
 
 INTRINSIC_EXPORT
-int32_t kv_it_lower_bound(uint32_t handle, const char* key, uint32_t key_len) {
-   return native_context_stack::current()->kv_it_lower_bound(handle, aligned_span<const char>{(void*)key, key_len});
+int32_t kv_idx_lower_bound(int32_t handle, const char* seek, uint32_t seek_len, char* sec_key, uint32_t sec_key_len, char* pri_key, uint32_t pri_key_len, uint32_t* sec_size, uint32_t* pri_size) {
+   return native_context_stack::current()->kv_idx_lower_bound(handle, span<const char>{seek, seek_len}, span<char>{sec_key, sec_key_len}, span<char>{pri_key, pri_key_len}, aligned_ptr<uint32_t>{sec_size}, aligned_ptr<uint32_t>{pri_size});
 }
 
 INTRINSIC_EXPORT
-int32_t kv_it_key(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_len, uint32_t* actual_size) {
-   return native_context_stack::current()->kv_it_key(handle, offset, aligned_span<char>{(void*)dest, dest_len}, aligned_ptr<uint32_t>{actual_size});
+int32_t kv_idx_read(int32_t handle, char* sec_key, uint32_t sec_key_len, char* pri_key, uint32_t pri_key_len, uint32_t* sec_size, uint32_t* pri_size) {
+   return native_context_stack::current()->kv_idx_read(handle, span<char>{sec_key, sec_key_len}, span<char>{pri_key, pri_key_len}, aligned_ptr<uint32_t>{sec_size}, aligned_ptr<uint32_t>{pri_size});
 }
 
 INTRINSIC_EXPORT
-int32_t kv_it_value(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_len, uint32_t* actual_size) {
-   return native_context_stack::current()->kv_it_value(handle, offset, aligned_span<char>{(void*)dest, dest_len}, aligned_ptr<uint32_t>{actual_size});
-}
-
-INTRINSIC_EXPORT
-void kv_idx_store(uint64_t payer, uint32_t table_id, const char* pri_key, uint32_t pri_key_len, const char* sec_key, uint32_t sec_key_len) {
-   native_context_stack::current()->kv_idx_store(payer, table_id, span<const char>{pri_key, pri_key_len}, span<const char>{sec_key, sec_key_len});
-}
-
-INTRINSIC_EXPORT
-void kv_idx_remove(uint32_t table_id, const char* pri_key, uint32_t pri_key_len, const char* sec_key, uint32_t sec_key_len) {
-   native_context_stack::current()->kv_idx_remove(table_id, span<const char>{pri_key, pri_key_len}, span<const char>{sec_key, sec_key_len});
-}
-
-INTRINSIC_EXPORT
-void kv_idx_update(uint64_t payer, uint32_t table_id, const char* pri_key, uint32_t pri_key_len, const char* old_sec_key, uint32_t old_sec_key_len, const char* new_sec_key, uint32_t new_sec_key_len) {
-   native_context_stack::current()->kv_idx_update(payer, table_id, span<const char>{pri_key, pri_key_len}, span<const char>{old_sec_key, old_sec_key_len}, span<const char>{new_sec_key, new_sec_key_len});
-}
-
-INTRINSIC_EXPORT
-int32_t kv_idx_find_secondary(uint64_t code, uint32_t table_id, const char* sec_key, uint32_t sec_key_len) {
-   return native_context_stack::current()->kv_idx_find_secondary(code, table_id, aligned_span<const char>{(void*)sec_key, sec_key_len});
-}
-
-INTRINSIC_EXPORT
-int32_t kv_idx_lower_bound(uint64_t code, uint32_t table_id, const char* sec_key, uint32_t sec_key_len) {
-   return native_context_stack::current()->kv_idx_lower_bound(code, table_id, aligned_span<const char>{(void*)sec_key, sec_key_len});
-}
-
-INTRINSIC_EXPORT
-int32_t kv_idx_next(uint32_t handle) {
-   return native_context_stack::current()->kv_idx_next(handle);
-}
-
-INTRINSIC_EXPORT
-int32_t kv_idx_prev(uint32_t handle) {
-   return native_context_stack::current()->kv_idx_prev(handle);
-}
-
-INTRINSIC_EXPORT
-int32_t kv_idx_key(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_len, uint32_t* actual_size) {
-   return native_context_stack::current()->kv_idx_key(handle, offset, aligned_span<char>{(void*)dest, dest_len}, aligned_ptr<uint32_t>{actual_size});
-}
-
-INTRINSIC_EXPORT
-int32_t kv_idx_primary_key(uint32_t handle, uint32_t offset, char* dest, uint32_t dest_len, uint32_t* actual_size) {
-   return native_context_stack::current()->kv_idx_primary_key(handle, offset, aligned_span<char>{(void*)dest, dest_len}, aligned_ptr<uint32_t>{actual_size});
-}
-
-INTRINSIC_EXPORT
-void kv_idx_destroy(uint32_t handle) {
+void kv_idx_destroy(int32_t handle) {
    native_context_stack::current()->kv_idx_destroy(handle);
+}
+
+INTRINSIC_EXPORT
+int32_t kv_idx_find(uint32_t table_id, uint64_t code, const char* prefix, uint32_t prefix_len, const char* sec_key, uint32_t sec_key_len) {
+   return native_context_stack::current()->kv_idx_find(table_id, code, span<const char>{prefix, prefix_len}, span<const char>{sec_key, sec_key_len});
 }
 
 // ============================================================================
@@ -551,13 +536,11 @@ int32_t check_transaction_authorization(const char* trx_data, uint32_t trx_size,
 INTRINSIC_EXPORT
 int32_t check_permission_authorization(uint64_t account, uint64_t permission,
                                        const char* pubkeys_data, uint32_t pubkeys_size,
-                                       const char* perms_data, uint32_t perms_size,
-                                       uint64_t delay_us) {
+                                       const char* perms_data, uint32_t perms_size) {
    return native_context_stack::current()->check_permission_authorization(
       name{account}, name{permission},
       aligned_span<const char>{(void*)pubkeys_data, pubkeys_size},
-      aligned_span<const char>{(void*)perms_data, perms_size},
-      delay_us);
+      aligned_span<const char>{(void*)perms_data, perms_size});
 }
 
 INTRINSIC_EXPORT

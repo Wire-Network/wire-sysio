@@ -636,19 +636,17 @@ public:
       };
       if (table != "yieldpool"_n) append_word(account.to_uint64_t());
       append_word(cn(token_code).value);
-      const auto& idx = control->db().get_index<kv_index, by_code_key>();
-      const auto it = idx.find(boost::make_tuple(OPREG_ACCOUNT, compute_table_id(table.to_uint64_t()),
-                                                std::string_view(key)));
-      BOOST_REQUIRE(it != idx.end());
-      const std::vector<char> data(it->value.data(), it->value.data() + it->value.size());
+      auto& store = const_cast<kv_store&>(control->kv());
+      const auto stored_row = store.find_row(OPREG_ACCOUNT, compute_table_id(table.to_uint64_t()), key);
+      BOOST_REQUIRE(stored_row);
+      const std::vector<char> data(stored_row->value.begin(), stored_row->value.end());
       mvo row(opreg_abi_ser.binary_to_variant(row_type, data,
          fixture_abi_yield_function()).get_object());
       row.set(field, value);
       const auto encoded = opreg_abi_ser.variant_to_binary(row_type, row,
          fixture_abi_yield_function());
-      auto& db = const_cast<chainbase::database&>(control->db());
-      db.modify(*it, [&](auto& r) { r.value.assign(encoded.data(), encoded.size()); });
-      const std::vector<char> stored(it->value.data(), it->value.data() + it->value.size());
+      const auto updated = store.update_row(*stored_row, stored_row->payer, {encoded.data(), encoded.size()});
+      const std::vector<char> stored(updated.value.begin(), updated.value.end());
       const auto observed = opreg_abi_ser.binary_to_variant(row_type, stored,
          fixture_abi_yield_function());
       BOOST_REQUIRE_EQUAL(value.as_string(), observed[field].as_string());

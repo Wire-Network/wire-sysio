@@ -698,7 +698,8 @@ EXCEPTION_TEST_CASE(test_insert_non_unique) {
                             boost::multi_index::ordered_unique<key<&test_element_t::secondary>>> i0(alloc);
       i0->emplace([](test_element_t& elem) { elem.secondary = 42; });
       BOOST_TEST(i0->find(0)->secondary == 42);
-      BOOST_CHECK_THROW(i0->emplace([](test_element_t& elem) { elem.secondary = 42; }),  std::exception);
+      BOOST_CHECK_THROW(i0->emplace([](test_element_t& elem) { elem.secondary = 42; }),
+                        chainbase::uniqueness_violation);
       BOOST_TEST(i0->find(0)->secondary == 42);
    } catch ( ... ) {
       fs::remove_all( temp );
@@ -716,6 +717,40 @@ struct conflict_element_t {
    int x2;
    throwing_copy dummy;
 };
+
+// modify_unindexed stays out of the indices, and undo restores the object as it does after modify.
+EXCEPTION_TEST_CASE(test_modify_unindexed) {
+   fs::path temp = fs::temp_directory_path() / "pinnable_mapped_file";
+   try {
+      chainbase::pinnable_mapped_file db(temp, true, 1024 * 1024, false, chainbase::pinnable_mapped_file::map_mode::mapped);
+      test_allocator<conflict_element_t> alloc(db.get_segment_manager());
+      undo_index_in_segment<conflict_element_t, test_allocator<conflict_element_t>,
+                            boost::multi_index::ordered_unique<key<&conflict_element_t::id>>,
+                            boost::multi_index::ordered_unique<key<&conflict_element_t::x0>>> i0(alloc);
+      i0->emplace([](conflict_element_t& elem) { elem.x0 = 1; elem.x1 = 10; });
+      i0->emplace([](conflict_element_t& elem) { elem.x0 = 2; elem.x1 = 20; });
+      {
+         auto session = i0->start_undo_session(true);
+         i0->modify_unindexed(*i0->find(0), [](conflict_element_t& elem) { elem.x1 = 11; });
+         i0->modify_unindexed(*i0->find(0), [](conflict_element_t& elem) { elem.x1 = 12; });
+         BOOST_TEST(i0->find(0)->x1 == 12);
+         BOOST_TEST(i0->find(1)->x1 == 20);
+      }
+      BOOST_TEST(i0->find(0)->x1 == 10);
+      {
+         auto session = i0->start_undo_session(true);
+         i0->modify_unindexed(*i0->find(1), [](conflict_element_t& elem) { elem.x1 = 21; });
+         session.push();
+      }
+      BOOST_TEST(i0->find(1)->x1 == 21);
+      i0->undo();
+      BOOST_TEST(i0->find(1)->x1 == 20);
+   } catch ( ... ) {
+      fs::remove_all( temp );
+      throw;
+   }
+   fs::remove_all( temp );
+}
 
 EXCEPTION_TEST_CASE(test_modify_conflict) {
    fs::path temp = fs::temp_directory_path() / "pinnable_mapped_file";

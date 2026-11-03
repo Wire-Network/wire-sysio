@@ -74,8 +74,6 @@ public:
    {
       FC_ASSERT(start_block_height <= end_block_height, "invalid inputs");
 
-      const auto& kv_idx = control->db().get_index<sysio::chain::kv_index, sysio::chain::by_code_key>();
-
       // blockinfo is kv::table (unscoped) — key is [block_height:8B BE]
       const auto blockinfo_tid = sysio::chain::compute_table_id(blockinfo_table_name.to_uint64_t());
       char lo_key[sysio::chain::kv_pri_key_size];
@@ -85,14 +83,16 @@ public:
       unsigned int rows_visited = 0;
       block_info_record r;
 
-      auto itr = kv_idx.lower_bound(boost::make_tuple(config::system_account_name, blockinfo_tid, lo_sv));
-      for (; itr != kv_idx.end() && itr->code == config::system_account_name && itr->table_id == blockinfo_tid; ++itr) {
-         auto kv = itr->key_view();
+      auto cursor = control->kv().open_row_cursor();
+      sysio::chain::kv_row row;
+      for (bool more = cursor->seek_lower({config::system_account_name, blockinfo_tid, lo_sv}, row);
+           more && row.code == config::system_account_name && row.table_id == blockinfo_tid; more = cursor->next(row)) {
+         auto kv = row.key;
          if (kv.size() != sysio::chain::kv_pri_key_size) break;
          uint64_t pk = sysio::chain::kv_decode_be64(kv.data());
          if (pk > end_block_height) break;
 
-         fc::datastream<const char*> ds(itr->value.data(), itr->value.size());
+         fc::datastream<const char*> ds(row.value.data(), row.value.size());
          fc::raw::unpack(ds, r);
          ++rows_visited;
          if (!visitor(std::move(r))) {

@@ -397,12 +397,12 @@ refuse any caller that is not a registered tier-1 owner.
 
 The gap between those two pools is why `newuser` bills its sponsorship rows to the sponsoring
 tier-1 owner rather than to the contract. Billed to the contract, `sysio.roa`'s ~157 MB would cap
-sponsorship near **1.09 million** users — well short of what `sysio`'s account pool can create. A
+sponsorship near **1.09 million** users, well short of what `sysio`'s account pool can create. A
 tier-1 owner's own free budget of ~2.83 GB is the only one that scales with how many users it
 actually onboards.
 
-A sponsorship costs **144 bytes** — a 16-byte key and 16-byte value over
-`billable_size_v<kv_object>` of 112 — plus a one-time 152-byte `sponsorcount` row (a 24-byte value:
+A sponsorship costs **144 bytes** (a 16-byte key and 16-byte value over
+`billable_size_v<kv_object>` of 112) plus a one-time 152-byte `sponsorcount` row (a 24-byte value:
 owner, count, raised limit) on a creator's first `newuser` or `raiseacctlim`. Neither pool is a ceiling: `addpolicy` refuses CPU and NET to a `sysio.`-prefixed
 account but not RAM, so a node owner can extend either with a RAM-only policy. The ~157 MB is
 where `activateroa` starts `sysio.roa`.
@@ -644,9 +644,11 @@ Alice is charged nothing, for anything, on a token transfer.
 > third-party contract cannot unilaterally charge RAM to its users either. For a positive RAM delta
 > billed to an account other than the receiving contract,
 > `apply_context::validate_account_ram_deltas` requires that account to appear in the action's
-> authorizations with the `sysio.payer` permission; without it the action fails with
-> `Requested payer ... Missing sysio.payer`. On a *declared* action that marker also makes the user
-> the action's CPU and NET payer; on an inline one it authorizes the RAM alone.
+> authorizations with the `sysio.payer` permission. If the account authorized with some other
+> permission, the action fails with `Requested payer ... Missing sysio.payer`. If it is not in the
+> authorizations at all, the action fails earlier with `unauthorized_ram_usage_increase`. On a
+> *declared* action that marker also makes the user the action's CPU and NET payer; on an inline
+> one it authorizes the RAM alone.
 >
 > So billing RAM to a user is an explicit opt-in by the user, not a choice the contract makes
 > alone. Contract authors who want the gasless experience should bill RAM to the contract account,

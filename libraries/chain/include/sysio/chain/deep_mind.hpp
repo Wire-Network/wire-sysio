@@ -7,7 +7,8 @@
 
 namespace sysio::chain {
 
-class kv_object;
+struct kv_row;
+struct kv_index_entry;
 class permission_object;
 struct protocol_feature;
 struct signed_transaction;
@@ -38,6 +39,49 @@ public:
 
    ram_trace()
    {}
+};
+
+/// Names one kind of KV RAM charge on its RAM_OP line.
+struct kv_ram_op {
+   const char* family;
+   const char* operation;
+   const char* legacy_tag;
+};
+
+/// The kinds of RAM charge a KV write can make for one type of object.
+struct kv_ram_ops {
+   kv_ram_op add;
+   kv_ram_op update;
+   kv_ram_op remove;
+   kv_ram_op update_remove_old_payer;
+   kv_ram_op update_add_new_payer;
+};
+
+/// KV rows keep the family and tag names that contract table rows have always had on RAM_OP lines.
+inline constexpr kv_ram_ops kv_row_ram_ops = {
+   .add                     = {"table_row", "add", "primary_index_add"},
+   .update                  = {"table_row", "update", "primary_index_update"},
+   .remove                  = {"table_row", "remove", "primary_index_remove"},
+   .update_remove_old_payer = {"table_row", "remove", "primary_index_update_remove_old_payer"},
+   .update_add_new_payer    = {"table_row", "add", "primary_index_update_add_new_payer"},
+};
+
+/// KV index entries keep the secondary_index family. `update` is new, since legacy secondary keys had a fixed size, and
+/// the old payer's refund gets the same tag shape as a row's.
+inline constexpr kv_ram_ops kv_index_ram_ops = {
+   .add                     = {"secondary_index", "add", "secondary_index_add"},
+   .update                  = {"secondary_index", "update", "secondary_index_update"},
+   .remove                  = {"secondary_index", "remove", "secondary_index_remove"},
+   .update_remove_old_payer = {"secondary_index", "remove", "secondary_index_update_remove_old_payer"},
+   .update_add_new_payer    = {"secondary_index", "add", "secondary_index_update_add_new_payer"},
+};
+
+/// What a KV RAM charge is for, as its RAM_OP event id gives it. `key` is the primary key. `sec_key` is empty for a
+/// row.
+struct kv_ram_subject {
+   uint16_t         table_id = 0;
+   std::string_view key;
+   std::string_view sec_key = {};
 };
 
 class deep_mind_handler
@@ -71,8 +115,15 @@ public:
    void on_require_recipient();
    void on_send_inline();
    void on_send_context_free_inline();
-   void on_kv_set(const kv_object& obj, bool is_new, account_name old_payer = account_name(), const char* old_value = nullptr, std::size_t old_value_size = 0);
-   void on_kv_erase(const kv_object& obj);
+   void on_kv_set(const kv_row& row, bool is_new, account_name old_payer = account_name(),
+                  const char* old_value = nullptr, std::size_t old_value_size = 0);
+   void on_kv_erase(const kv_row& row);
+   /// Logs a KV_IDX_OP INS line for an entry just stored.
+   void on_kv_idx_store(const kv_index_entry& entry);
+   /// Logs a KV_IDX_OP UPD line. `entry` is the entry after the update, and the other two are what it held before.
+   void on_kv_idx_update(const kv_index_entry& entry, account_name old_payer, std::string_view old_sec_key);
+   /// Logs a KV_IDX_OP REM line for an entry about to be erased.
+   void on_kv_idx_erase(const kv_index_entry& entry);
    void on_init_resource_limits(const resource_limits::resource_limits_config_object& config, const resource_limits::resource_limits_state_object& state);
    void on_update_resource_limits_config(const resource_limits::resource_limits_config_object& config);
    void on_update_resource_limits_state(const resource_limits::resource_limits_state_object& state);
@@ -81,6 +132,8 @@ public:
    void on_set_account_limits(const resource_limits::resource_pending_object& limits);
    // The trace is consumed by the next ram_event or ram_correction
    void on_ram_trace(std::string&& event_id, const char* family, const char* operation, const char* legacy_tag);
+   // A KV write's trace, consumed the same way. A write can make no charge or two, so set it right before each charge.
+   void on_kv_ram_trace(const kv_ram_op& op, account_name code, const kv_ram_subject& subject);
    void on_ram_event(account_name account, uint64_t new_usage, int64_t delta);
    void on_create_permission(const permission_object& p);
    void on_modify_permission(const permission_object& old_permission, const permission_object& new_permission);
