@@ -157,7 +157,7 @@ public:
       const auto& config = chain_plugin_.get_snapshot_attestation_config();
       return snapshot_api::is_snapshot_servable(
                 entry.block_num,
-                snapshot_api::explicit_snapshot_download_block_spacing(config), entry,
+                config.block_spacing, entry,
                 [this](const snapshot_entry& snapshot) { return is_attested_snapshot(snapshot); });
    }
 
@@ -240,11 +240,6 @@ public:
     */
    snapshot_api::snapshot_discovery_result<snapshot_entry>
    get_latest(fc::microseconds max_response_time) const {
-      const auto& config = chain_plugin_.get_snapshot_attestation_config();
-      if (!config.enabled()) {
-         return {snapshot_api::snapshot_discovery_status::not_found, std::nullopt};
-      }
-
       std::shared_ptr<const std::map<block_num_type, snapshot_entry>> catalog_snapshot;
       {
          std::lock_guard lock(catalog_mtx_);
@@ -258,13 +253,11 @@ public:
       const auto is_available = [](const snapshot_entry& snapshot) {
          return is_snapshot_file_available(snapshot);
       };
-      const auto block_spacing = config.block_spacing;
-      const auto is_servable_attestation = [this, block_spacing](const auto& catalog,
-                                                                const fc::variant& row) {
+      const auto is_servable_attestation = [this](const auto& catalog, const fc::variant& row) {
          const auto& chain = chain_plugin_.chain();
          return chain.fork_db_has_root()
                 && snapshot_api::is_servable_catalog_snapshot_attestation(
-                   catalog, row, block_spacing, chain.fork_db_root().block_num(),
+                   catalog, row, chain.fork_db_root().block_num(),
                    [](const snapshot_entry& snapshot) {
                       return is_snapshot_file_available(snapshot);
                    });
@@ -281,8 +274,8 @@ public:
          return fc::time_point::now() >= discovery_deadline;
       };
       return snapshot_api::discover_latest_servable_scheduled_snapshot(
-         catalog_snapshot, block_spacing, is_available, is_servable_attestation,
-         read_page, deadline_reached);
+         catalog_snapshot, is_available, is_servable_attestation, read_page,
+         deadline_reached);
    }
 
    /** Return an explicit catalog entry without applying the separate download policy. */

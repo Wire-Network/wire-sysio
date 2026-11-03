@@ -590,12 +590,13 @@ public:
    void plugin_startup();
    /// Validate an auto-fetched snapshot's table schemas before replay begins.
    void require_snapshot_attestation_schema() const;
-   /// Require enabled snapshot attestation after the startup KV configuration has been captured.
+   /// Read and validate auto-fetched snapshot configuration, with loaded-state recovery guidance.
    snapshot_attestation_config require_snapshot_attestation_configuration() const;
    /// Verify the loaded snapshot against its on-chain attestation. Invoked from the
    /// irreversible-block handler with the just-finalized block; retries on later finalized
    /// blocks until the attestation record appears or the node catches up to the chain tip.
-   void verify_snapshot_attestation(const signed_block_ptr& lib_block);
+   /// Return false only when verification rejects the snapshot, not on an unrelated shutdown request.
+   bool verify_snapshot_attestation(const signed_block_ptr& lib_block);
    /// Download and hash-check a bounded snapshot from a remote provider, leaving snapshot_path
    /// pointing at the downloaded file for the normal snapshot-load path to consume.
    void fetch_snapshot_from_endpoint(
@@ -1672,7 +1673,14 @@ void chain_plugin_impl::require_snapshot_attestation_schema() const {
 
 snapshot_attestation_config
 chain_plugin_impl::require_snapshot_attestation_configuration() const {
-   const auto& attestation_config = snapshot_attestation_startup_config.value();
+   snapshot_attestation_config attestation_config;
+   try {
+      attestation_config = read_snapshot_attestation_config(chain->db());
+   } catch (const plugin_config_exception& error) {
+      SYS_THROW(plugin_config_exception, snapshot_attestation_config_failure_message,
+                config::system_account_name, snapshot_attest::table_snapconfig,
+                error.to_detail_string(), chain_config->state_dir.generic_string());
+   }
    SYS_ASSERT(attestation_config.enabled(), plugin_config_exception,
               snapshot_attestation_config_failure_message,
               config::system_account_name, snapshot_attest::table_snapconfig,
@@ -1702,9 +1710,19 @@ void chain_plugin_impl::plugin_startup()
                           snapshot_endpoint_block_mismatch_message,
                           loaded_block_num, advertised_block_num);
                require_snapshot_attestation_schema();
+               const auto attestation_config = require_snapshot_attestation_configuration();
+               SYS_ASSERT(snapshot_endpoint_block_matches(
+                             advertised_block_num, loaded_block_num, attestation_config.block_spacing),
+                          plugin_config_exception, snapshot_attestation_config_failure_message,
+                          config::system_account_name, snapshot_attest::table_snapconfig,
+                          fmt::format(snapshot_endpoint_unscheduled_block_message,
+                                      loaded_block_num, attestation_config.block_spacing),
+                          chain_config->state_dir.generic_string());
                snapshot_loaded_block_num = loaded_block_num;
                snapshot_loaded_block_id = chain->head().id();
                snapshot_loaded_root_hash = snapshot_reader->get_root_hash();
+               ilog(snapshot_auto_fetched_loaded_log, loaded_block_num, snapshot_loaded_root_hash.str(),
+                    attestation_config.block_spacing);
             } else {
                ilog(snapshot_manual_loaded_log, chain->head().block_num());
             }
@@ -1725,26 +1743,21 @@ void chain_plugin_impl::plugin_startup()
    if (app().is_quiting())
       return;
    // Replay may apply setsnpcfg, so all native consumers share the resulting startup state.
-   snapshot_attestation_startup_config = read_snapshot_attestation_config(chain->db());
+   snapshot_attestation_startup_config = snapshot_auto_fetched
+      ? require_snapshot_attestation_configuration() : read_snapshot_attestation_config(chain->db());
    if (snapshot_auto_fetched) {
       SYS_ASSERT(snapshot_loaded_block_num && snapshot_endpoint_block_num, plugin_config_exception,
                  snapshot_endpoint_metadata_missing_message);
-      const auto attestation_config = require_snapshot_attestation_configuration();
       const auto loaded_block_num = *snapshot_loaded_block_num;
-      SYS_ASSERT(snapshot_endpoint_block_matches(
-                    *snapshot_endpoint_block_num, loaded_block_num, attestation_config.block_spacing),
-                 plugin_config_exception, snapshot_endpoint_unscheduled_block_message,
-                 loaded_block_num, attestation_config.block_spacing);
-      ilog(snapshot_auto_fetched_loaded_log, loaded_block_num, snapshot_loaded_root_hash.str(),
-           attestation_config.block_spacing);
 
       // Irreversible callbacks during replay defer verification until this one configuration read.
       const auto irreversible = chain->fork_db_root();
       if (irreversible.block() && irreversible.block_num() > loaded_block_num) {
-         verify_snapshot_attestation(irreversible.block());
-         SYS_ASSERT(!app().is_quiting(), plugin_config_exception,
+         SYS_ASSERT(verify_snapshot_attestation(irreversible.block()), plugin_config_exception,
                     snapshot_attestation_startup_verification_error);
       }
+      if (app().is_quiting())
+         return;
    }
 
    if(!readonly) {
@@ -2096,8 +2109,8 @@ void chain_plugin_impl::fetch_snapshot_from_endpoint(
    snapshot_loaded_root_hash = snap_root_hash;
 }
 
-void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_block) {
-   if (!snapshot_loaded_block_num || !snapshot_attestation_startup_config) return;
+bool chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_block) {
+   if (!snapshot_loaded_block_num || !snapshot_attestation_startup_config) return true;
 
    const auto snap_block_num = *snapshot_loaded_block_num;
    const auto caught_up_tolerance = fc::seconds(30);
@@ -2134,7 +2147,7 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
                      : snapshot_attestation_table_read_status::failure,
          caught_up, within_grace)) {
          case snapshot_attestation_table_read_action::retry:
-            return;
+            return true;
          case snapshot_attestation_table_read_action::apply_missing_record_policy:
             table_read_failed = true;
             break;
@@ -2148,7 +2161,7 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
              && rows[0].get_object()[snapshot_attest::field::block_num].as_uint64() == snap_block_num) {
             if (rows[0].get_object()[snapshot_attest::field::attested_at_block].as_uint64()
                 > lib_block->block_num()) {
-               return;
+               return true;
             }
             have_record = true;
             record_row  = rows[0];
@@ -2163,7 +2176,7 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
          // This is local, non-consensus bookkeeping, so comparing the finalized block time against
          // wall-clock to detect "caught up" is appropriate.
          if (!caught_up)
-            return; // retry on the next finalized block while still catching up
+            return true; // retry on the next finalized block while still catching up
 
          // Even at the live tip a missing record is not yet conclusive -- the providers'
          // votesnaphash transactions (which must be generated, voted on, and reach quorum) may
@@ -2171,7 +2184,7 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
          // for a deterministic window of finalized blocks past the snapshot height before
          // concluding the height was never attested.
          if (within_grace)
-            return; // retry on the next finalized block while the attestation can still arrive
+            return true; // retry on the next finalized block while the attestation can still arrive
 
          snapshot_loaded_block_num.reset();
          if (table_read_failed) {
@@ -2182,7 +2195,7 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
                  snap_block_num, lib_block->block_num() - snap_block_num);
          }
          app().quit();
-         return;
+         return false;
       }
 
       // The record is present -- this attempt is terminal regardless of the outcome below.
@@ -2201,11 +2214,12 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
               snap_block_num, attested_block_id, attested_snapshot_hash,
               snapshot_loaded_block_id, snapshot_loaded_root_hash.str());
          app().quit();
-         return;
+         return false;
       }
 
       ilog(snapshot_attestation_verified_log,
            snap_block_num, snapshot_loaded_block_id, snapshot_loaded_root_hash.str());
+      return true;
 
    } catch (const fc::exception& e) {
       snapshot_loaded_block_num.reset();
@@ -2218,6 +2232,7 @@ void chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
            snap_block_num, e.what());
       app().quit();
    }
+   return false;
 }
 
 void chain_plugin_impl::enable_accept_transactions() {

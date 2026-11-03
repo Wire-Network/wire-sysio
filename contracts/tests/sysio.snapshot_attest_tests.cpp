@@ -688,6 +688,8 @@ BOOST_FIXTURE_TEST_CASE(setsnpcfg_validation, snapshot_attest_tester) { try {
    BOOST_REQUIRE_EQUAL(wasm_assert_msg("block_spacing must be greater than 0"),
                        setsnpcfg(1, 0));
    BOOST_REQUIRE(get_snap_config().is_null());
+   BOOST_REQUIRE_EQUAL(success(), setsnpcfg(30));
+   BOOST_REQUIRE_EQUAL(30u, get_snap_config()["min_providers"].as_uint64());
 } FC_LOG_AND_RETHROW() }
 
 /** Governance can select every positive uint32 cadence, including single-block test spacing. */

@@ -78,21 +78,24 @@ The CLI options select where the node comes up from:
 - **A snapshot file** — `--snapshot <path>`. Operator-trusted; no attestation is verified.
 - **A snapshot endpoint** — `--snapshot-endpoint <url>`, which downloads and hash-checks a snapshot from a
   serving node and then loads it. This path is not trusted the same way, and it carries hard constraints. The
-  loaded state must declare compatible attestation schemas. After replay, readable, enabled on-chain
-  attestation state provides startup block spacing `S`; the loaded snapshot head must be a positive
-  multiple of `S` before startup completes. Endpoint metadata is not trusted to establish cadence.
+  loaded state must declare compatible attestation schemas. Before replay, its readable, enabled
+  attestation state provides block spacing `S`; the loaded snapshot head must be a positive
+  multiple of `S`. Rejections tell the operator to delete the loaded state. Endpoint metadata is not trusted
+  to establish cadence. After replay the resulting configuration becomes the running node's startup value.
   After the node syncs past the snapshot's height,
   the loaded block id and root hash are checked against the on-chain attestation record on each finalized
   block: a record that does not match the loaded snapshot stops the node immediately, with no grace, while a
   record that has not appeared yet keeps verification pending. Verification only concludes once the node has
   caught up to the live tip: until then every finalized block simply retries, with no limit. Past that point a
-  missing record is tolerated for a grace window of `floor(S / 2)` finalized blocks beyond the snapshot height
+  missing record is tolerated for `floor(min(block_spacing, 25000) / 2)` finalized blocks beyond the snapshot height,
+  using the post-replay startup spacing rather than the pre-replay classification value `S`,
   before the node is stopped. The option requires an empty database; use `--delete-all-blocks` to clear
   existing data.
 
 Cadence is read once after startup replay directly from the two-uint32 `snapconfig` KV row, with a 25,000-block
 fallback if no row exists. Restart nodes after governance changes the interval; small values are for testing,
-and production should use much larger intervals because the grace window is half the spacing.
+and production should use much larger intervals to avoid excessive snapshot overhead. Small intervals
+shorten verification grace; large intervals cannot extend it beyond 12,500 blocks.
 
 Both snapshot paths share the chain-state size setting as their download and state ceiling
 (`--chain-state-db-size-mb`), and the endpoint path accepts per-caller HTTPS transport overrides

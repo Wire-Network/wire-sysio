@@ -6,9 +6,6 @@
 /// pushes its actions. Include only headers that both CDT and the host build provide.
 namespace sysiosystem::snapshot_attestation {
 
-/// Maximum number of producers that may participate in snapshot attestation.
-inline constexpr uint32_t maximum_providers = 30;
-
 /// Default distance between attested snapshot heights; small values are intended for tests.
 inline constexpr uint32_t default_block_spacing = 25'000;
 
@@ -23,9 +20,9 @@ constexpr bool is_scheduled_block(uint32_t block_num, uint32_t block_spacing) {
           && block_num % block_spacing == 0;
 }
 
-/** Return the finalized-block grace window associated with a valid cadence. */
+/** Bound verification grace independently of an unverified snapshot's configured cadence. */
 constexpr uint32_t snapshot_attestation_grace_blocks(uint32_t block_spacing) {
-   return block_spacing / 2;
+   return (block_spacing < default_block_spacing ? block_spacing : default_block_spacing) / 2;
 }
 
 /// Contract error code emitted when a provider's local tuple conflicts with a final record.

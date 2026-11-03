@@ -346,11 +346,11 @@ try:
     # ===================================================================
     # Snapshot endpoint cadence enforcement
     # ===================================================================
-    # No snapconfig row exists in this integration chain, so base-URL discovery has no
-    # active attestation cadence and must ignore these API-created snapshots. Their
+    # No snaprecords rows exist in this integration chain, so base-URL discovery
+    # cannot find an attested tuple for these API-created snapshots. Their
     # heights also fall outside the default cadence used to classify explicit downloads,
     # so a specific-block bootstrap can download the requested file. Strict post-load
-    # configuration check must then reject it after replay and before startup completes. Enabled-cadence behavior
+    # configuration check must then reject it before replay. Enabled-cadence behavior
     # is covered by the faster C++ contract and plugin fixtures.
 
     # ---------------------------------------------------------------

@@ -129,7 +129,7 @@ namespace sysio {
       constexpr bool enabled() const noexcept { return min_providers > 0; }
    };
 
-   /** Return whether a finalized height is still inside the configured post-snapshot grace window. */
+   /** Return whether a finalized height is inside the capped post-snapshot verification grace. */
    constexpr bool snapshot_attestation_within_grace(uint32_t snapshot_height,
                                                      uint32_t current_height,
                                                      uint32_t block_spacing) noexcept {

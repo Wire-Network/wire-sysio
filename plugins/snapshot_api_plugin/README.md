@@ -142,7 +142,8 @@ clio push action sysio setsnpcfg \
 - `block_spacing` — any positive uint32 block interval, default 25,000; governance may change it at any time.
   Nodes read the two-uint32 KV row directly once at startup, without ABI decoding or queued configuration reads.
   Restart provider and serving nodes to adopt changes. Small values are for testing; production should use much
-  larger intervals because the verification grace window is only `floor(block_spacing / 2)` blocks.
+  larger intervals to avoid excessive snapshot overhead. Verification grace is
+  `floor(min(block_spacing, 25000) / 2)` blocks and cannot exceed 12,500 blocks.
 
 ### 4. Enable automatic scheduled snapshots
 
@@ -155,8 +156,8 @@ snapshot-provider-account = mysnapprov1
 Provider mode schedules at exact multiples of its startup `block_spacing`, using 25,000 when no row exists.
 For `block_spacing = 25000`, those are 25,000, 50,000, 75,000, and so on. Startup reuses the exact automatic
 request shape and removes provider-owned requests with different spacing or bounds. An interval too large
-to repeat uses a one-shot request at its sole triggerable height; no automatic request remains if no future
-trigger exists, including at `UINT32_MAX` spacing. Manual schedules are untouched. The contract still rejects
+to repeat (above half the uint32 height range) disables automatic scheduling with a diagnostic.
+Manual schedules are untouched. The contract still rejects
 votes until governance configures a nonzero quorum. No per-block cadence refresh occurs.
 
 `votesnaphash` is submitted automatically after each configured-cadence snapshot finalizes. Manual snapshots are not
@@ -178,9 +179,9 @@ registration count does not change it. Configuration changes apply to pending he
 does not retract accepted votes. Once K is met, the system contract moves the entry to `snaprecords` and purges pending
 votes through that height.
 
-Auto-fetching nodes require compatible table schemas before replay, then a nonzero K and eligible height
-against the single post-replay startup configuration before dependent plugins start serving. A
-configuration-read or disabled-configuration rejection tells the operator to delete the loaded chain state before
+Auto-fetching nodes require compatible table schemas, nonzero K and an eligible height in the loaded
+snapshot's own configuration before replay. After replay, the resulting configuration is cached for the
+running node. Configuration or cadence rejection tells the operator to delete the loaded chain state before
 restarting without `--snapshot-endpoint`. After syncing, nodes verify the `snaprecords` row and shut down if the
 snapshot is missing or disagrees. Manual `--snapshot` remains an operator-trusted path without attestation verification.
 
@@ -198,15 +199,16 @@ All endpoints use POST with JSON bodies, consistent with other Wire Sysio APIs.
 
 ### `POST /v1/snapshot/latest`
 
-Returns metadata for the newest snapshot at an exact attestation-cadence height whose matching on-chain attestation is
+Returns metadata for the newest snapshot whose matching on-chain attestation is
 irreversible and whose file is still available on disk. Newer manual snapshots, unavailable files, and scheduled
 snapshots that are not yet attested are skipped, so base-URL bootstrap discovers the newest snapshot it can immediately
 download. Discovery reads final attestation records newest-first in bounded pages limited to the locally available
 snapshot-height range, and transient table-read failures are retried before discovery fails closed.
 
-When attestation was not configured at startup, this endpoint returns 404. The cadence and configured-state
-values remain fixed until restart. Malformed binary configuration fails node startup; record discovery read
-failures can still return 503.
+Discovery does not depend on startup quorum or cadence: an exact irreversible attestation row remains
+proof after cadence changes, including on nodes that started before the first `setsnpcfg`.
+No matching attestation returns 404. Malformed binary configuration fails node startup;
+record discovery read failures can still return 503.
 
 **Request:** empty body or `{}`
 
@@ -246,8 +248,8 @@ download endpoint.
 Downloads a snapshot file as a binary stream. Scheduled snapshots return 404 until an irreversible on-chain
 `snaprecords` row matches the exact block ID and root hash. Manual unscheduled snapshots remain explicitly downloadable.
 An absent configuration at startup uses the default 25,000-block spacing to classify explicit downloads, so files
-at those heights retain the attestation gate even though discovery is disabled. Serving uses the same startup
-configuration as provider scheduling and endpoint verification.
+at those heights retain the attestation gate. Discovery independently scans exact irreversible tuples.
+Explicit serving uses the same post-replay startup configuration as provider scheduling and verification grace.
 
 **Request:**
 ```json
@@ -287,14 +289,14 @@ nodeop \
 The bootstrap process:
 1. Fetches snapshot metadata from the endpoint
 2. Downloads the snapshot binary and verifies its advertised root hash
-3. Restores/replays chain state, reads the startup KV configuration once, and rejects a loaded head outside its cadence
+3. Loads the snapshot and rejects a head outside its own KV cadence before replay; afterward, caches the resulting startup configuration
 4. Begins syncing from the loaded snapshot
 5. After syncing, verifies the snapshot's on-chain attestation record
 
 `--delete-all-blocks` is required when existing chain data is present. The `--snapshot-endpoint` option is incompatible with `--snapshot` (local file).
 Manual/on-demand snapshots remain available through the explicit-block serving APIs. Base-URL discovery ignores their
 unscheduled heights. An explicit-block bootstrap can download one, but rejects it before startup completes if the height
-is outside the post-replay startup cadence and therefore cannot receive a matching attestation.
+is outside the snapshot's own pre-replay cadence and therefore cannot receive a matching attestation.
 
 ### Bootstrap download status and limits
 

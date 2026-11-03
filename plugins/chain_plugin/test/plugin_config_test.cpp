@@ -45,6 +45,7 @@ constexpr auto snapshot_without_attestation_table_filename =
 constexpr auto valid_snapshot_filename = "snapshot-with-valid-attestation.bin";
 constexpr auto unconfigured_snapshot_filename = "snapshot-without-enabled-attestation.bin";
 constexpr auto unscheduled_snapshot_filename = "snapshot-at-unscheduled-height.bin";
+constexpr auto tampered_snapshot_filename = "snapshot-with-rewritten-config.bin";
 constexpr auto snapshot_metadata_path = "/v1/snapshot/latest";
 constexpr auto snapshot_by_block_path = "/v1/snapshot/by_block";
 constexpr auto snapshot_download_path = "/v1/snapshot/download";
@@ -66,10 +67,13 @@ constexpr auto other_snapshot_hash =
 constexpr auto unconfigured_attestation_error_fragment = "min_providers must be configured before bootstrap";
 /// Recovery instruction required when loaded state fails attestation configuration preflight.
 constexpr auto delete_loaded_chain_state_error_fragment = "Delete chain state in";
+constexpr auto rejected_attestation_error_fragment = "attestation verification failed during startup";
 constexpr uint16_t incompatible_table_id = 0;
 constexpr uint32_t snapshot_source_block_count = 3;
 constexpr uint32_t snapshot_block_log_extension_block_count = 3;
 constexpr uint32_t attestation_finality_block_count = 24;
+/// Same live-tip tolerance used by snapshot verification's caught-up predicate.
+constexpr uint32_t snapshot_caught_up_tolerance_seconds = 30;
 constexpr uint32_t snapshot_endpoint_response_count = 2;
 
 /** Node-HTTP ports consumed by this test process's local servers and refusal fixtures. */
@@ -192,6 +196,18 @@ fc::crypto::blake3 write_chain_plugin_snapshot(
 template <typename Tester>
 void extend_block_log_past_snapshot(Tester& source) {
    source.produce_blocks(snapshot_block_log_extension_block_count);
+}
+
+/** Model an endpoint rewriting the fixed binary configuration without an authorized action. */
+void rewrite_snapshot_configuration(sysio::chain::controller& control, const std::vector<char>& value) {
+   const sysio::chain::name table_name{snapshot_attest::table_snapconfig};
+   std::array<char, sysio::chain::kv_pri_key_size> key;
+   sysio::chain::kv_encode_be64(key.data(), table_name.to_uint64_t());
+   auto& db = const_cast<sysio::chain::database&>(control.db());
+   const auto& row = db.get<sysio::chain::kv_object, sysio::chain::by_code_key>(boost::make_tuple(
+      sysio::chain::config::system_account_name, sysio::chain::compute_table_id(table_name.to_uint64_t()),
+      std::string_view{key.data(), key.size()}));
+   db.modify(row, [&](auto& object) { object.value.assign(value.data(), value.size()); });
 }
 
 /** Build the exact attestation ABI fragment required before auto-fetched snapshot replay. */
@@ -438,7 +454,7 @@ BOOST_FIXTURE_TEST_CASE(snapshot_attestation_startup_config_reads_kv,
    BOOST_CHECK_EQUAL(first.block_spacing, smallest_spacing);
 }
 
-/** The configured half-cadence grace is exclusive and remains safe near uint32 overflow. */
+/** Half-cadence grace is exclusive, capped independently of untrusted state, and overflow safe. */
 BOOST_AUTO_TEST_CASE(snapshot_attestation_grace_boundary_policy) {
    constexpr uint32_t snapshot_height = 1'000;
    constexpr uint32_t even_spacing = 10;
@@ -454,6 +470,15 @@ BOOST_AUTO_TEST_CASE(snapshot_attestation_grace_boundary_policy) {
       snapshot_height, snapshot_height + odd_spacing / 2 - 1, odd_spacing));
    BOOST_CHECK(!sysio::snapshot_attestation_within_grace(
       snapshot_height, snapshot_height + odd_spacing / 2, odd_spacing));
+
+   constexpr auto default_grace = snapshot_attest::default_block_spacing / 2;
+   for (const auto spacing : {snapshot_attest::default_block_spacing,
+                              std::numeric_limits<uint32_t>::max()}) {
+      BOOST_CHECK(sysio::snapshot_attestation_within_grace(
+         snapshot_height, snapshot_height + default_grace - 1, spacing));
+      BOOST_CHECK(!sysio::snapshot_attestation_within_grace(
+         snapshot_height, snapshot_height + default_grace, spacing));
+   }
 
    constexpr uint32_t near_max_height = std::numeric_limits<uint32_t>::max() - 1;
    BOOST_CHECK(sysio::snapshot_attestation_within_grace(
@@ -547,6 +572,11 @@ BOOST_FIXTURE_TEST_CASE(
    vote_snapshot(snapshot_attest_test_support::snapshot_provider_account,
                  snapshot_block_id, contract_hash);
    const auto attestation_block_num = produce_block()->block_num();
+   // Retained blocks can change cadence after the snapshot: classify the loaded height
+   // before replay, but retain the post-replay value for the running node.
+   constexpr uint32_t replayed_spacing = 19;
+   static_assert(snapshot_attest_test_support::test_block_spacing % replayed_spacing != 0);
+   set_snap_config(snapshot_attest_test_support::single_provider_minimum, replayed_spacing);
    produce_blocks(attestation_finality_block_count);
    BOOST_REQUIRE_GT(last_irreversible_block_num(), attestation_block_num);
 
@@ -579,6 +609,7 @@ BOOST_FIXTURE_TEST_CASE(
    BOOST_CHECK_GE(plugin.chain().head().block_num(), attestation_block_num);
    BOOST_CHECK(!plugin.has_pending_snapshot_attestation());
    BOOST_CHECK(!appbase::app().is_quiting());
+   BOOST_CHECK_EQUAL(plugin.get_snapshot_attestation_config().block_spacing, replayed_spacing);
    plugin.plugin_shutdown();
 }
 
@@ -671,8 +702,107 @@ BOOST_FIXTURE_TEST_CASE(
    BOOST_CHECK_EXCEPTION(
       plugin.plugin_startup(), sysio::chain::plugin_config_exception,
       [](const sysio::chain::plugin_config_exception& error) {
-         return error.to_detail_string().find("unscheduled block") != std::string::npos;
+         const auto detail = error.to_detail_string();
+         return detail.find("unscheduled block") != std::string::npos
+                && detail.find(delete_loaded_chain_state_error_fragment) != std::string::npos;
       });
+}
+
+/** A snapshot cannot buy a longer verification grace by rewriting spacing to its own height. */
+BOOST_FIXTURE_TEST_CASE(chain_plugin_caps_grace_for_snapshot_with_rewritten_spacing,
+                       snapshot_attest_test_support::snapshot_attest_fixture) {
+   set_snap_config(snapshot_attest_test_support::single_provider_minimum);
+   constexpr auto snapshot_height = snapshot_attest::default_block_spacing
+                                    + snapshot_attest_test_support::test_block_spacing + 1;
+   produce_blocks(snapshot_height - control->head().block_num(), true);
+   control->abort_block();
+   BOOST_REQUIRE_EQUAL(control->head().block_num(), snapshot_height);
+   rewrite_snapshot_configuration(*control, fc::raw::pack(std::make_pair(
+      snapshot_attest_test_support::single_provider_minimum, snapshot_height)));
+   fc::temp_directory snapshot_dir;
+   const auto snapshot_path = snapshot_dir.path() / tampered_snapshot_filename;
+   const auto snapshot_root_hash = write_chain_plugin_snapshot(*control, snapshot_path);
+   constexpr auto capped_grace = snapshot_attest::default_block_spacing / 2;
+   produce_blocks(capped_grace, true);
+   // Only activate the existing caught-up predicate with wall-clock time; cadence and
+   // grace are still counted strictly by block height, never by slots or elapsed time.
+   produce_block(fc::time_point::now() - control->head().block_time());
+   produce_blocks(attestation_finality_block_count);
+   const auto irreversible = control->fork_db_root();
+   BOOST_REQUIRE(irreversible.block());
+   BOOST_REQUIRE_GE(irreversible.block_num(), snapshot_height + capped_grace);
+   BOOST_REQUIRE_LT(irreversible.block_num(), snapshot_height + snapshot_height / 2);
+   BOOST_REQUIRE(fc::time_point::now() - irreversible.block()->timestamp.to_time_point()
+                 < fc::seconds(snapshot_caught_up_tolerance_seconds));
+   const auto source_blocks_path = get_config().blocks_dir.string();
+   // Tampering deliberately diverges from the fixture's independent validator.
+   skip_validate = true;
+   close();
+
+   snapshot_endpoint_server endpoint(snapshot_height, snapshot_root_hash, snapshot_path);
+   fc::temp_directory node_dir;
+   sysio::chain::application exe({.enable_resource_monitor = false});
+   const auto node_path = node_dir.path().string();
+   const auto endpoint_url = endpoint.url();
+   std::array args{
+      chain_plugin_test_program_name,
+      snapshot_endpoint_option_name, endpoint_url.c_str(),
+      blocks_dir_option_name, source_blocks_path.c_str(),
+      config_dir_option_name, node_path.c_str(),
+      data_dir_option_name, node_path.c_str(),
+   };
+   BOOST_REQUIRE(exe.init<sysio::chain_plugin>(args.size(), const_cast<char**>(args.data()))
+                 == sysio::chain::exit_code::SUCCESS);
+   auto& plugin = appbase::app().get_plugin<sysio::chain_plugin>();
+   BOOST_CHECK_EXCEPTION(plugin.plugin_startup(), sysio::chain::plugin_config_exception,
+      [](const auto& error) {
+         return error.to_detail_string().find(rejected_attestation_error_fragment) != std::string::npos;
+      });
+   const auto spacing = plugin.get_snapshot_attestation_config().block_spacing;
+   BOOST_REQUIRE_EQUAL(spacing, snapshot_height);
+   BOOST_CHECK(!plugin.has_pending_snapshot_attestation());
+   BOOST_CHECK(appbase::app().is_quiting());
+}
+
+/** Every malformed loaded configuration reports how to remove unverified state before a restart. */
+BOOST_AUTO_TEST_CASE(chain_plugin_rejects_malformed_snapshot_config_with_recovery_guidance) {
+   const auto valid_quorum = snapshot_attest_test_support::single_provider_minimum;
+   for (const auto& value : {fc::raw::pack(valid_quorum),
+                             fc::raw::pack(std::make_pair(valid_quorum, uint32_t{0}))}) {
+      snapshot_attest_test_support::snapshot_attest_fixture source;
+      source.set_snap_config(valid_quorum);
+      source.produce_block();
+      source.control->abort_block();
+      const auto height = source.control->head().block_num();
+      rewrite_snapshot_configuration(*source.control, value);
+      fc::temp_directory snapshot_dir;
+      const auto snapshot_path = snapshot_dir.path() / tampered_snapshot_filename;
+      const auto root_hash = write_chain_plugin_snapshot(*source.control, snapshot_path);
+      extend_block_log_past_snapshot(source);
+      const auto source_blocks_path = source.get_config().blocks_dir.string();
+      source.skip_validate = true;
+      source.close();
+
+      snapshot_endpoint_server endpoint(height, root_hash, snapshot_path);
+      fc::temp_directory node_dir;
+      sysio::chain::application exe({.enable_resource_monitor = false});
+      const auto node_path = node_dir.path().string();
+      const auto endpoint_url = endpoint.url();
+      std::array args{
+         chain_plugin_test_program_name,
+         snapshot_endpoint_option_name, endpoint_url.c_str(),
+         blocks_dir_option_name, source_blocks_path.c_str(),
+         config_dir_option_name, node_path.c_str(),
+         data_dir_option_name, node_path.c_str(),
+      };
+      BOOST_REQUIRE(exe.init<sysio::chain_plugin>(args.size(), const_cast<char**>(args.data()))
+                    == sysio::chain::exit_code::SUCCESS);
+      auto& plugin = appbase::app().get_plugin<sysio::chain_plugin>();
+      BOOST_CHECK_EXCEPTION(plugin.plugin_startup(), sysio::chain::plugin_config_exception,
+         [](const auto& error) {
+            return error.to_detail_string().find(delete_loaded_chain_state_error_fragment) != std::string::npos;
+         });
+   }
 }
 
 /** A manual --snapshot is an operator-trusted escape hatch without an attestation schema gate. */

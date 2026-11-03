@@ -17,7 +17,7 @@ using sysio::checksum256;
 using sysio::name;
 
 /// Maximum producer rank eligible to register a snapshot provider.
-static constexpr uint32_t max_snap_provider_rank = snapshot_attestation::maximum_providers;
+static constexpr uint32_t max_snap_provider_rank = 30;
 
 /// Maximum number of producer-to-snapshot-account delegations retained at once.
 static constexpr uint32_t max_snap_providers = max_snap_provider_rank;
@@ -181,8 +181,9 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     *
     * Votes aggregate per (block_num, block_id, snapshot_hash) and finalize when the current fixed
     * min_providers value is reached. Votes are monotonic, producer equivocation is rejected per
-    * height, and retrying the same tuple is idempotent. Snapshot heights must be exact multiples of
-    * the configured block_spacing. Rejects with snap_hash_disagreement_error when a final record at
+    * height, and retrying the same tuple is idempotent while its height remains eligible under the
+    * current cadence. Snapshot heights must be exact multiples of the configured block_spacing.
+    * Rejects with snap_hash_disagreement_error when a final record at
     * the height differs by block id or snapshot hash. A height without its own final record cannot
     * be reopened below the latest attested height after pending rows have been purged.
     *
@@ -203,8 +204,8 @@ struct [[sysio::contract("sysio.system")]] snapshot_attest : public sysio::contr
     * responsible for choosing K with the desired security and liveness tradeoff. K changes apply to
     * pending heights; an exact vote retry, from a producer that still has operator standing,
     * finalizes a tuple that already meets a newly lowered K. Cadence may change at any time;
-    * operators restart nodes to adopt it. Production spacing should be much larger than test
-    * values because the post-snapshot grace window is block_spacing / 2 blocks.
+    * operators restart nodes to adopt it. Small intervals increase snapshot overhead and shorten
+    * verification grace; production should use much larger values. Grace is capped at 12,500 blocks.
     */
    [[sysio::action]]
    void setsnpcfg(uint32_t min_providers, uint32_t block_spacing);

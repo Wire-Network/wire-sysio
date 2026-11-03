@@ -196,17 +196,19 @@ already met.
 `block_spacing` is the positive block-height distance between eligible snapshots, defaulting to
 25,000. Governance may change it at any time; zero is rejected, with no minimum or maximum beyond
 the uint32 type. Small values are intended for testing. Production should use much larger values
-because the verification grace window is only `floor(block_spacing / 2)` blocks.
+to avoid excessive snapshot overhead. Verification grace is `floor(min(block_spacing, 25000) / 2)`
+blocks: small test values shorten it, but a large value cannot extend it beyond 12,500 blocks.
 
 The contract applies changes immediately. Each node reads the fixed two-uint32 `snapconfig` KV row
 once at startup, directly from chainbase, using the table identifier and eight-byte name key. If
 there is no row, it uses 25,000. There is no ABI decode, queued read, timeout or retry for cadence.
 Operators must restart provider and serving nodes after a change so they adopt the same interval;
-snapshot bootstrap uses the startup value after restoring and replaying local state. Retained files and records
-are classified against that startup interval, not a dynamically refreshed configuration.
+snapshot bootstrap checks the loaded height against its own pre-replay configuration. The post-replay
+value is then cached for the running node. Already-attested records remain discoverable after cadence changes.
 
 A producer may retry a pending tuple idempotently while it keeps its operator standing (retrying a
-finalized tuple is a no-op), and may vote at multiple scheduled heights, but cannot submit two
+finalized tuple is a no-op while its height remains eligible under the current cadence), and may vote at
+multiple scheduled heights, but cannot submit two
 different tuples at one height. Registration and producer-status churn never removes an accepted
 vote.
 
@@ -245,9 +247,8 @@ When this option is set, `nodeop`:
    exact multiples. Startup removes provider-owned automatic requests with a stale schedule shape,
    reuses an identical request, and leaves manual requests alone. It does not refresh cadence on
    irreversible blocks; restart the node after governance changes the interval.
-   Intervals above half the uint32 height range use a one-shot request at their sole eligible height.
-   A snapshot at height `H` needs block-start `H + 1`; if no such future trigger remains, including
-   for `block_spacing == UINT32_MAX`, startup logs the reason and schedules no automatic request.
+   Intervals above half the uint32 height range cannot form a recurring request. Startup logs the
+   reason and schedules no automatic request for those intervals.
    The contract still accepts every positive uint32 interval.
 2. On each finalized snapshot at an exact configured-cadence height, computes the deterministic
    BLAKE3 root hash and automatically builds, signs, and submits a `votesnaphash` transaction.
@@ -280,9 +281,10 @@ attestation ABI or enabled attestation and never enters the post-sync verificati
 other startup modes, it still reads and validates any existing cadence configuration after replay.
 
 For `--snapshot-endpoint`, a specific `/N` request must return metadata for exactly block N, and
-the loaded snapshot head must match that metadata. Once replay finishes, `snapconfig` is read
-directly from the resulting on-chain state. Before startup completes, the loaded height is checked
-against that startup cadence; an ineligible height is rejected at that gate.
+the loaded snapshot head must match that metadata. Before replay begins, `snapconfig` is read
+directly from the loaded snapshot and its height is checked against that cadence. An ineligible height
+is rejected with guidance to delete the loaded chain state. After replay, the resulting configuration
+is read once as the startup value for the running node.
 
 Each attempt reads the on-chain `snaprecords` table (through the standard table-read path,
 which performs ABI decoding) and resolves as follows:
@@ -298,7 +300,7 @@ which performs ABI decoding) and resolves as follows:
 | Unexpected error during verification | Fatal error; node halts. |
 
 "Caught up" means the latest finalized block's timestamp is within 30 seconds of wall-clock
-time. The grace window is `block_spacing / 2` finalized blocks past the snapshot height and exists
+time. The grace window is `floor(min(block_spacing, 25000) / 2)` finalized blocks past the snapshot height and exists
 because a node bootstrapping from a fresh snapshot can reach the live tip before the providers'
 votes for that height have landed. A missing record only becomes the terminal "never attested"
 failure once the node is caught up *and* the finalized head has crossed that configured grace.
@@ -306,9 +308,9 @@ failure once the node is caught up *and* the finalized head has crossed that con
 Two implementation details worth knowing as an operator:
 
 - Before replay begins, an auto-fetched snapshot's system ABI must declare compatible `snaprecords`
-  and `snapconfig` table identifiers, keys and value schemas. After replay, one direct binary KV read
-  captures the startup configuration: nonzero `min_providers`, positive `block_spacing`, and a loaded
-  height at an exact multiple of that spacing are required before startup completes. No queued read,
+  and `snapconfig` table identifiers, keys and value schemas. A direct binary KV read before replay
+  requires nonzero `min_providers`, positive `block_spacing`, and a loaded height at an exact multiple
+  of that spacing. After replay, a second read captures the running node's startup value. No queued read,
   timeout or retry is involved. Any deferred irreversible attestation verification is caught up before
   dependent plugins can start serving. A rejection tells the operator to delete loaded chain state
   before restarting without `--snapshot-endpoint`.

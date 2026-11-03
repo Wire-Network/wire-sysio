@@ -35,7 +35,7 @@ constexpr uint32_t attestation_delay_blocks = 10;
 /// Number of table pages read by the continuation scenario.
 constexpr std::size_t expected_discovery_page_count = 2;
 
-/// Non-production cadence proving catalog policy follows on-chain configuration.
+/// Historical cadence proving attestation discovery is independent of today's cadence.
 constexpr uint32_t configured_block_spacing = 17;
 static_assert(snapshot_attest::default_block_spacing % configured_block_spacing != 0);
 
@@ -135,8 +135,7 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_paginates_filtered_empty
                                            const auto& candidate_catalog,
                                            const fc::variant& row) {
       return sysio::snapshot_api::is_servable_catalog_snapshot_attestation(
-         candidate_catalog, row, configured_block_spacing,
-         last_irreversible_block, is_available);
+         candidate_catalog, row, last_irreversible_block, is_available);
    };
 
    const auto first_page_cursor = sysio::make_snapshot_attestation_record_query(
@@ -145,7 +144,7 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_paginates_filtered_empty
       first_scheduled_block).lower_bound;
    const auto expected_upper_bound = fc::json::to_string(
       fc::mutable_variant_object()
-      (snapshot_attest::field::block_num, static_cast<uint64_t>(pending_scheduled_block) + 1),
+      (snapshot_attest::field::block_num, static_cast<uint64_t>(snapshot_attest::default_block_spacing) + 1),
       fc::time_point::maximum());
    std::size_t page_count = 0;
    const auto read_page = [&](const sysio::chain_apis::read_only::get_table_rows_params& params)
@@ -183,8 +182,7 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_paginates_filtered_empty
    const auto deadline_reached = []() { return false; };
 
    const auto latest = sysio::snapshot_api::discover_latest_servable_scheduled_snapshot(
-      catalog, configured_block_spacing, is_available, is_servable_attestation,
-      read_page, deadline_reached);
+      catalog, is_available, is_servable_attestation, read_page, deadline_reached);
    BOOST_CHECK(latest.status == sysio::snapshot_api::snapshot_discovery_status::found);
    BOOST_REQUIRE(latest.snapshot);
    BOOST_CHECK_EQUAL(latest.snapshot->block_num, first_scheduled_block);
@@ -195,9 +193,6 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_paginates_filtered_empty
       catalog->at(first_scheduled_block), is_attested));
    BOOST_CHECK(!sysio::snapshot_api::is_snapshot_servable(
       pending_scheduled_block, configured_block_spacing,
-      catalog->at(pending_scheduled_block), is_attested));
-   BOOST_CHECK(!sysio::snapshot_api::is_snapshot_servable(
-      pending_scheduled_block, std::nullopt,
       catalog->at(pending_scheduled_block), is_attested));
    BOOST_CHECK(sysio::snapshot_api::is_snapshot_servable(
       pending_scheduled_block, snapshot_attest::default_block_spacing,
@@ -211,26 +206,6 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_paginates_filtered_empty
    BOOST_CHECK(!sysio::snapshot_api::is_snapshot_servable(
       snapshot_attest::default_block_spacing, snapshot_attest::default_block_spacing,
       catalog->at(snapshot_attest::default_block_spacing), is_attested));
-   BOOST_CHECK(!sysio::snapshot_api::is_snapshot_servable(
-      newer_manual_block, 0, catalog->at(newer_manual_block), is_attested));
-}
-
-/** Explicit downloads use configured cadence only while attestation is enabled. */
-BOOST_AUTO_TEST_CASE(explicit_snapshot_download_uses_default_cadence_when_disabled) {
-   BOOST_CHECK_EQUAL(
-      sysio::snapshot_api::explicit_snapshot_download_block_spacing(
-         sysio::snapshot_attestation_config{
-            .min_providers = 0,
-            .block_spacing = configured_block_spacing,
-         }),
-      snapshot_attest::default_block_spacing);
-   BOOST_CHECK_EQUAL(
-      sysio::snapshot_api::explicit_snapshot_download_block_spacing(
-         sysio::snapshot_attestation_config{
-            .min_providers = 1,
-            .block_spacing = configured_block_spacing,
-         }),
-      configured_block_spacing);
 }
 
 /** Discovery distinguishes exhausted scans from read and deadline failures. */
@@ -249,27 +224,15 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_reports_discovery_outcom
                                            const auto& candidate_catalog,
                                            const fc::variant& row) {
       return sysio::snapshot_api::is_servable_catalog_snapshot_attestation(
-         candidate_catalog, row, configured_block_spacing,
-         last_irreversible_block, is_available);
+         candidate_catalog, row, last_irreversible_block, is_available);
    };
    const auto deadline_not_reached = []() { return false; };
-
-   std::size_t disabled_read_count = 0;
-   const auto disabled_read = [&disabled_read_count](const auto&) {
-      ++disabled_read_count;
-      return std::optional{sysio::chain_apis::read_only::get_table_rows_result{}};
-   };
-   const auto disabled = sysio::snapshot_api::discover_latest_servable_scheduled_snapshot(
-      catalog, std::nullopt, is_available, is_servable_attestation, disabled_read,
-      deadline_not_reached);
-   BOOST_CHECK(disabled.status == sysio::snapshot_api::snapshot_discovery_status::not_found);
-   BOOST_CHECK_EQUAL(disabled_read_count, 0U);
 
    const auto exhausted_read = [](const auto&) {
       return std::optional{sysio::chain_apis::read_only::get_table_rows_result{}};
    };
    const auto exhausted = sysio::snapshot_api::discover_latest_servable_scheduled_snapshot(
-      catalog, configured_block_spacing, is_available, is_servable_attestation, exhausted_read,
+      catalog, is_available, is_servable_attestation, exhausted_read,
       deadline_not_reached);
    BOOST_CHECK(exhausted.status == sysio::snapshot_api::snapshot_discovery_status::not_found);
    BOOST_CHECK(!exhausted.snapshot);
@@ -279,7 +242,7 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_reports_discovery_outcom
       return std::nullopt;
    };
    const auto failed = sysio::snapshot_api::discover_latest_servable_scheduled_snapshot(
-      catalog, configured_block_spacing, is_available, is_servable_attestation, failed_read,
+      catalog, is_available, is_servable_attestation, failed_read,
       deadline_not_reached);
    BOOST_CHECK(failed.status == sysio::snapshot_api::snapshot_discovery_status::unavailable);
    BOOST_CHECK(!failed.snapshot);
@@ -291,8 +254,7 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_reports_discovery_outcom
    };
    const auto deadline_reached = []() { return true; };
    const auto timed_out = sysio::snapshot_api::discover_latest_servable_scheduled_snapshot(
-      catalog, configured_block_spacing, is_available, is_servable_attestation, unread_page,
-      deadline_reached);
+      catalog, is_available, is_servable_attestation, unread_page, deadline_reached);
    BOOST_CHECK(timed_out.status == sysio::snapshot_api::snapshot_discovery_status::unavailable);
    BOOST_CHECK(!timed_out.snapshot);
    BOOST_CHECK_EQUAL(deadline_read_count, 0U);
@@ -318,8 +280,7 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_filter_owns_abandoned_re
                                      const fc::variant& row) {
       return *predicate_lifetime
              && sysio::snapshot_api::is_servable_catalog_snapshot_attestation(
-                candidate_catalog, row, configured_block_spacing,
-                last_irreversible_block, is_available);
+                candidate_catalog, row, last_irreversible_block, is_available);
    };
    std::optional<sysio::chain_apis::read_only::get_table_rows_params> abandoned_request;
    const auto abandon_read = [&abandoned_request](const auto& params)
@@ -329,8 +290,7 @@ BOOST_AUTO_TEST_CASE(latest_servable_scheduled_snapshot_filter_owns_abandoned_re
    };
 
    const auto result = sysio::snapshot_api::discover_latest_servable_scheduled_snapshot(
-      catalog, configured_block_spacing, is_available,
-      std::move(is_servable_attestation), abandon_read,
+      catalog, is_available, std::move(is_servable_attestation), abandon_read,
       []() { return false; });
    BOOST_CHECK(result.status == sysio::snapshot_api::snapshot_discovery_status::unavailable);
    BOOST_REQUIRE(abandoned_request);
