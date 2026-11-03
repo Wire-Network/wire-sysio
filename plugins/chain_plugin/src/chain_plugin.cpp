@@ -2157,11 +2157,9 @@ bool chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
       if (read_result) {
          const auto& rows = read_result->rows;
          if (!rows.empty() && rows[0].is_object()
-             && rows[0].get_object()[snapshot_attest::field::block_num].as_uint64() == snap_block_num) {
-            if (rows[0].get_object()[snapshot_attest::field::attested_at_block].as_uint64()
-                > lib_block->block_num()) {
-               return true;
-            }
+             && rows[0].get_object()[snapshot_attest::field::block_num].as_uint64() == snap_block_num
+             && rows[0].get_object()[snapshot_attest::field::attested_at_block].as_uint64()
+                   <= lib_block->block_num()) {
             have_record = true;
             record_row  = rows[0];
          }
@@ -2170,8 +2168,10 @@ bool chain_plugin_impl::verify_snapshot_attestation(const signed_block_ptr& lib_
       if (!have_record) {
          // The snaprecords row is created by votesnaphash transactions that only land a few blocks
          // after the snapshot height, so on a fresh bootstrap it may not have synced into state by
-         // the time the first finalized block past the snapshot height arrives. Keep retrying on
-         // later finalized blocks; snapshot_loaded_block_num is left set so the caller retries.
+         // the time the first finalized block past the snapshot height arrives. A record above LIB
+         // is likewise unusable and must share this bounded wait: an untrusted snapshot can forge
+         // an attested_at_block that never becomes irreversible. Leave snapshot_loaded_block_num
+         // set while retrying on later finalized blocks.
          // This is local, non-consensus bookkeeping, so comparing the finalized block time against
          // wall-clock to detect "caught up" is appropriate.
          if (!caught_up)
