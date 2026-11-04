@@ -12,10 +12,12 @@
 #include <string>
 #include <string_view>
 
+#include <fc/crypto/base58.hpp>
 #include <fc/crypto/base64.hpp>
 #include <fc/crypto/keccak256.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <fc/exception/exception.hpp>
+#include <fc/io/json.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/task/deadline.hpp>
 #include <fc/variant_object.hpp>
@@ -41,13 +43,9 @@ constexpr std::string_view OP_DISPATCH_ATTESTATIONS =
 constexpr std::string_view OP_READ_LATEST = "read_inbound_envelope:get_account_info";
 constexpr std::string_view OP_READ_EMITTED_DIGEST = "read_emitted_envelope_digest:get_account_info";
 
-/// Anchor seed literals for the outpost program's per-epoch PDAs. Byte-exact
-/// mirrors of the program's `EPOCH_DELIVERIES_SEED` / `ENVELOPE_CHUNKS_SEED`
-/// constants (wire-solana `opp_states.rs`) -- these derivations MUST agree
-/// with the program's `#[account(seeds = ...)]` declarations or every
-/// seeds-validated call fails.
-constexpr std::string_view EPOCH_DELIVERIES_SEED = "epoch_deliveries";
-constexpr std::string_view ENVELOPE_CHUNKS_SEED  = "envelope_chunks";
+using outpost_solana_client_detail::derive_epoch_deliveries_pda;
+using outpost_solana_client_detail::derive_envelope_chunks_pda;
+using outpost_solana_client_detail::CLEANUP_ENVELOPE_CHUNKS_INSTRUCTION;
 
 /// The liqSOL pool's seeds (wire-solana `liqsol-core`: `inbound.rs` and the
 /// `report_liq_yield` / `synd` account declarations), same lock-step caveat.
@@ -57,48 +55,13 @@ constexpr std::string_view LIQSOL_POOL_SEED               = "liqsol_pool";
 constexpr std::string_view LIQSOL_BUCKET_SEED             = "liqsol_bucket";
 constexpr std::string_view LIQSOL_USER_RECORD_SEED        = "user_record";
 
-/// The 4-byte little-endian seed encoding of a WIRE epoch index -- the exact
-/// bytes the program's `epoch_index.to_le_bytes()` seed component uses.
-std::vector<uint8_t> epoch_index_le_seed(uint32_t epoch_index) {
-   return {static_cast<uint8_t>(epoch_index & 0xFF),
-           static_cast<uint8_t>((epoch_index >> 8) & 0xFF),
-           static_cast<uint8_t>((epoch_index >> 16) & 0xFF),
-           static_cast<uint8_t>((epoch_index >> 24) & 0xFF)};
-}
-
-/// Derive the per-epoch `EpochDeliveries` PDA:
-/// seeds `[EPOCH_DELIVERIES_SEED, epoch_index.to_le_bytes()]`.
-fc::network::solana::solana_public_key
-derive_epoch_deliveries_pda(const fc::network::solana::solana_public_key& program_id,
-                            uint32_t                                      epoch_index) {
-   return fc::network::solana::system::find_program_address(
-             {std::vector<uint8_t>(EPOCH_DELIVERIES_SEED.begin(), EPOCH_DELIVERIES_SEED.end()),
-              epoch_index_le_seed(epoch_index)},
-             program_id)
-      .first;
-}
-
-/// Derive the per-(epoch, uploader) envelope chunk-buffer PDA:
-/// seeds `[ENVELOPE_CHUNKS_SEED, epoch_index.to_le_bytes(), uploader]`. The
-/// uploader's pubkey is the third seed so multiple operators in the same
-/// group stage their own buffers without contention.
-fc::network::solana::solana_public_key
-derive_envelope_chunks_pda(const fc::network::solana::solana_public_key& program_id,
-                           uint32_t                                      epoch_index,
-                           const fc::network::solana::solana_public_key& uploader) {
-   const auto uploader_bytes = uploader.serialize();
-   return fc::network::solana::system::find_program_address(
-             {std::vector<uint8_t>(ENVELOPE_CHUNKS_SEED.begin(), ENVELOPE_CHUNKS_SEED.end()),
-              epoch_index_le_seed(epoch_index),
-              std::vector<uint8_t>(uploader_bytes.begin(), uploader_bytes.end())},
-             program_id)
-      .first;
-}
-
 /// Byte width the on-chain `LatestOutboundEnvelope.checksum` field decodes
 /// to: `keccak256(encoded_envelope)`, written identically by both program
 /// versions (standalone `opp_outpost` and integrated `liqsol_core`).
 constexpr size_t LATEST_ENVELOPE_CHECKSUM_BYTES = fc::crypto::keccak256::byte_size;
+
+/// Anchor discriminators precede all account headers used here.
+constexpr size_t ANCHOR_DISCRIMINATOR_BYTES = 8;
 
 /// Identifiers of the `LatestOutboundEnvelope` account + the fields the
 /// inbound reader consumes. The two program versions declare the struct's
@@ -112,11 +75,15 @@ constexpr size_t LATEST_ENVELOPE_CHECKSUM_BYTES = fc::crypto::keccak256::byte_si
 /// decoding the INTEGRATED account produced the epoch=511 RCA - the
 /// integrated layout puts `bump`=0xFF at byte 8 and `epoch_index`=1 at byte
 /// 9, so a u32 read at byte 8 yields 0xFF | (1<<8) = 511.
+/// The inbound read still decodes through the IDL; the reap gate reads the
+/// integrated offset below, checked at boot (no standalone program on `next`).
 namespace latest_envelope {
    constexpr auto account_name   = "LatestOutboundEnvelope";
    constexpr auto field_epoch    = "epoch_index";
    constexpr auto field_data     = "data";
    constexpr auto field_checksum = "checksum";
+   /// Integrated layout: Anchor discriminator, then bump u8.
+   constexpr size_t epoch_offset = ANCHOR_DISCRIMINATOR_BYTES + sizeof(uint8_t);
 } // namespace latest_envelope
 
 /// Identifiers of the outbound `EnvelopeLog` account: one record of each envelope the program emitted, kept for
@@ -140,7 +107,7 @@ namespace envelope_chunks {
    constexpr std::array<const char*, 5> fields_read = {field_epoch_index, field_total_bytes, field_total_chunks,
                                                       field_received_chunks, field_operator};
    /// Anchor's account discriminator, which precedes the header.
-   constexpr size_t discriminator_bytes = 8;
+   constexpr size_t discriminator_bytes = ANCHOR_DISCRIMINATOR_BYTES;
    /// The bytemuck `repr(C)` header: epoch_index u32, total_bytes u32, total_chunks u16, received_chunks u16, bump u8,
    /// _padding [u8; 3], operator pubkey.
    constexpr size_t header_bytes = 4 + 4 + 2 + 2 + 1 + 3 + 32;
@@ -148,7 +115,49 @@ namespace envelope_chunks {
    /// only ever grows it, which bounds `received_chunks` without the IDL.
    constexpr size_t data_offset = discriminator_bytes + header_bytes;
    static_assert(data_offset == 56, "must equal the program's EnvelopeChunks::DATA_OFFSET");
+   /// Byte offset of the epoch used by the boot round-trip.
+   constexpr size_t epoch_offset = discriminator_bytes;
+   /// Byte offset of `operator` in the account (discriminator, then epoch_index u32, total_bytes u32, total_chunks
+   /// u16, received_chunks u16, bump u8, _padding [u8; 3]). The reaper's discovery read filters on it, so it is
+   /// the one header offset the relay depends on outside the IDL decode.
+   constexpr size_t operator_offset = discriminator_bytes + 4 + 4 + 2 + 2 + 1 + 3;
+   static_assert(operator_offset + 32 == data_offset, "`operator` is the header's last field");
 } // namespace envelope_chunks
+
+/// `OutpostConfig` -- the singleton whose `next_epoch_index` gates the chunk reaper.
+namespace outpost_config {
+   constexpr auto account_name           = "OutpostConfig";
+   constexpr auto field_next_epoch_index = "next_epoch_index";
+   /// Integrated layout: discriminator, bump u8, config_version u8, chain_code u64.
+   constexpr size_t epoch_offset = ANCHOR_DISCRIMINATOR_BYTES + 2 * sizeof(uint8_t) + sizeof(uint64_t);
+} // namespace outpost_config
+
+/// Reconcile failed closes at processed even though successful closes wait for confirmed status.
+/// A transport timeout before the sweep deadline may follow execution in the processed bank.
+/// Absence avoids false failure back-off;
+/// a dropped fork only delays recovery until a later confirmed discovery sweep, with no rent attributed here.
+constexpr auto ENVELOPE_CHUNK_ABSENCE_COMMITMENT = fc::network::solana::commitment_t::processed;
+
+/// Number of accounts requested together for the cleanup eligibility cursors.
+constexpr size_t REAP_GATE_ACCOUNT_COUNT = 2;
+/// Keep both discriminators and both complete u32 cursors, without the envelope payload.
+constexpr size_t REAP_GATE_HEADER_BYTES =
+   std::max(outpost_config::epoch_offset, latest_envelope::epoch_offset) + sizeof(uint32_t);
+
+/// Field names of one `getProgramAccounts` result entry, as the Solana JSON-RPC returns it.
+namespace program_account_entry {
+   constexpr auto field_pubkey   = "pubkey";
+   constexpr auto field_account  = "account";
+   constexpr auto field_data     = "data";
+   constexpr auto field_lamports = "lamports";
+} // namespace program_account_entry
+
+/// The JSON-RPC `memcmp` filter object's keys.
+namespace memcmp_filter {
+   constexpr auto key    = "memcmp";
+   constexpr auto offset = "offset";
+   constexpr auto bytes  = "bytes";
+} // namespace memcmp_filter
 
 /// Identifiers of the per-epoch `EpochDeliveries` account + the two fields the
 /// dispatch cursor read consumes. Both are validated at boot for the
@@ -272,6 +281,63 @@ void assert_latest_envelope_shape(const fc::network::solana::idl::program& progr
    }
    FC_ASSERT(has_epoch, "LatestOutboundEnvelope IDL missing '{}' field", latest_envelope::field_epoch);
    FC_ASSERT(has_data, "LatestOutboundEnvelope IDL missing '{}' field", latest_envelope::field_data);
+}
+
+void assert_envelope_chunks_shape(opp_solana_outpost_client& program_client) {
+   constexpr uint32_t probe_epoch = 0x12345678;
+   constexpr uint8_t probe_key_byte = 0xAB;
+   const auto* program = program_client.get_program();
+   FC_ASSERT(program != nullptr, "no IDL program loaded");
+   const auto* account = program->find_account(envelope_chunks::account_name);
+   FC_ASSERT(account != nullptr, "outpost program IDL declares no EnvelopeChunks");
+   std::vector<uint8_t> header(envelope_chunks::data_offset);
+   std::copy(account->discriminator.begin(), account->discriminator.end(), header.begin());
+   const auto epoch = epoch_index_le_seed(probe_epoch);
+   std::copy(epoch.begin(), epoch.end(), header.begin() + envelope_chunks::epoch_offset);
+   std::fill(header.begin() + envelope_chunks::operator_offset, header.end(), probe_key_byte);
+   fc::variant decoded;
+   try {
+      decoded = program_client.decode_account_info_data(envelope_chunks::account_name, header);
+   } catch (fc::exception& e) {
+      FC_RETHROW_EXCEPTION(e, warn, "{} IDL probe cannot be decoded for chunk discovery filter",
+                           envelope_chunks::account_name);
+   }
+   const auto& fields = decoded.get_object();
+   FC_ASSERT(fields.contains(envelope_chunks::field_epoch_index) && fields.contains(envelope_chunks::field_operator),
+             "EnvelopeChunks IDL missing epoch_index/operator fields for chunk discovery");
+   const auto key = fc::network::solana::solana_public_key::from_base58_string(
+      fields[envelope_chunks::field_operator].as_string()).serialize();
+   const bool operator_matches =
+      std::all_of(key.begin(), key.end(), [](uint8_t byte) { return byte == probe_key_byte; });
+   FC_ASSERT(fields[envelope_chunks::field_epoch_index].as_uint64() == probe_epoch && operator_matches,
+             "EnvelopeChunks IDL epoch/operator offsets disagree with chunk discovery");
+}
+
+void assert_envelope_chunk_gate_shapes(opp_solana_outpost_client& program_client) {
+   constexpr uint32_t probe_epoch = 0x12345678;
+   // Zero vector lengths and a generous zero tail allow the full IDL decode to reach both cursors.
+   constexpr size_t probe_account_bytes = 1024;
+   const auto probe = [&](const char* name, const char* field, size_t offset) {
+      const auto* account = program_client.get_program()->find_account(name);
+      FC_ASSERT(account != nullptr, "outpost program IDL declares no {}", name);
+      std::vector<uint8_t> bytes(probe_account_bytes);
+      std::copy(account->discriminator.begin(), account->discriminator.end(), bytes.begin());
+      const auto epoch = epoch_index_le_seed(probe_epoch);
+      std::copy(epoch.begin(), epoch.end(), bytes.begin() + offset);
+      fc::variant decoded;
+      try {
+         decoded = program_client.decode_account_info_data(name, bytes);
+      } catch (fc::exception& e) {
+         FC_RETHROW_EXCEPTION(e, warn, "{} IDL probe cannot be decoded for chunk reap gates", name);
+      }
+      const auto& fields = decoded.get_object();
+      FC_ASSERT(fields.contains(field), "{} IDL missing '{}' for chunk reap gates", name, field);
+      FC_ASSERT(fields[field].as_uint64() == probe_epoch,
+                "{} IDL cursor offset disagrees with chunk reap gates", name);
+   };
+   FC_ASSERT(program_client.get_program() != nullptr, "no IDL program loaded");
+   probe(outpost_config::account_name, outpost_config::field_next_epoch_index, outpost_config::epoch_offset);
+   probe(latest_envelope::account_name, latest_envelope::field_epoch, latest_envelope::epoch_offset);
 }
 
 /// Assert the loaded IDL declares `EpochDeliveries` with the two cursor fields
@@ -1294,6 +1360,369 @@ std::string drive_dispatch_rounds(
    return last_sig;
 }
 
+envelope_chunk_reap_gates decode_envelope_chunk_reap_gates(
+   opp_solana_outpost_client& program_client,
+   const std::vector<std::optional<fc::network::solana::account_info>>& infos) {
+   FC_ASSERT(program_client.get_program() != nullptr, "no IDL program loaded");
+   FC_ASSERT(infos.size() == REAP_GATE_ACCOUNT_COUNT, "getMultipleAccounts returned {} accounts for {} addresses",
+             infos.size(), REAP_GATE_ACCOUNT_COUNT);
+   const auto read_field = [&](const std::optional<fc::network::solana::account_info>& info,
+                               const char* account_name, size_t offset) -> uint32_t {
+      FC_ASSERT(info.has_value() && !info.value().data.empty(), "{} is absent or empty", account_name);
+      const auto& account = info.value();
+      FC_ASSERT(account.owner == program_client.program_id, "{} is owned by {} instead of program {}", account_name,
+                account.owner.to_string(fc::yield_function_t{}),
+                program_client.program_id.to_string(fc::yield_function_t{}));
+      const auto* declaration = program_client.get_program()->find_account(account_name);
+      FC_ASSERT(declaration != nullptr, "outpost program IDL declares no {}", account_name);
+      FC_ASSERT(account.data.size() >= offset + sizeof(uint32_t), "{} cursor header is truncated", account_name);
+      FC_ASSERT(declaration->discriminator.size() <= account.data.size() &&
+                   std::equal(declaration->discriminator.begin(), declaration->discriminator.end(),
+                              account.data.begin()),
+                "{} discriminator disagrees with the loaded IDL", account_name);
+      return le_u32(account.data.data() + offset);
+   };
+   return {
+      .next_epoch_index =
+         read_field(infos[0], outpost_config::account_name, outpost_config::epoch_offset),
+      .latest_outbound_epoch = read_field(infos[1], latest_envelope::account_name, latest_envelope::epoch_offset),
+   };
+}
+
+bool envelope_chunks_reapable(const envelope_chunk_reap_gates& gates, uint32_t epoch_index) {
+   return gates.next_epoch_index > epoch_index && gates.latest_outbound_epoch >= epoch_index;
+}
+
+bool outpost_epoch_settled(const envelope_chunk_reap_gates& gates, uint32_t epoch_index) {
+   return gates.next_epoch_index > epoch_index;
+}
+
+bool envelope_chunk_sweep_schedule::backing_off(fc::time_point now) const {
+   return now < _retry_after;
+}
+
+bool envelope_chunk_sweep_schedule::due(uint32_t next_epoch_index, fc::time_point now) const {
+   return !backing_off(now) && _swept_through != next_epoch_index;
+}
+
+bool envelope_chunk_sweep_schedule::record(uint32_t                          next_epoch_index,
+                                           const envelope_chunk_reap_result& result,
+                                           fc::time_point                    now) {
+   _cut_off_close = result.cut_off_close;
+   if (result.deadline_reached && result.reaped == 0 && result.already_closed == 0 && result.failed == 0) {
+      return record_deadline_stop(now);
+   }
+   reset_deadline_stops();
+   if (result.failed > 0) {
+      record_failure(now);
+      return false;
+   }
+   // Partial walks stay due without back-off.
+   if (!result.complete()) return false;
+   _swept_through = next_epoch_index;
+   return false;
+}
+
+uint32_t envelope_chunk_sweep_schedule::reconcile_cut_off_close(
+   const std::vector<envelope_chunk_buffer>& buffers) {
+   if (!_cut_off_close) return 0;
+   const bool missing = std::none_of(buffers.begin(), buffers.end(), [&](const auto& buffer) {
+      return buffer.address == *_cut_off_close;
+   });
+   _cut_off_close.reset();
+   return missing ? 1 : 0;
+}
+
+bool envelope_chunk_sweep_schedule::record_deadline_stop(fc::time_point now) {
+   if (++_deadline_stops >= ENVELOPE_CHUNK_SWEEP_DEADLINE_STOP_LIMIT) {
+      _deadline_stops = 0;
+      _retry_after = now + ENVELOPE_CHUNK_SWEEP_RETRY_BACKOFF;
+      return true;
+   }
+   return false;
+}
+
+void envelope_chunk_sweep_schedule::reset_deadline_stops() {
+   _deadline_stops = 0;
+}
+
+void envelope_chunk_sweep_schedule::record_failure(fc::time_point now) {
+   reset_deadline_stops();
+   _retry_after = now + ENVELOPE_CHUNK_SWEEP_RETRY_BACKOFF;
+}
+
+std::vector<fc::variant> envelope_chunk_buffer_filters(const std::array<uint8_t, 8>&                 discriminator,
+                                                       const fc::network::solana::solana_public_key& uploader) {
+   const auto memcmp = [](size_t offset, std::string base58_bytes) {
+      return fc::variant(fc::mutable_variant_object()(
+         memcmp_filter::key,
+         fc::mutable_variant_object()(memcmp_filter::offset, offset)(memcmp_filter::bytes, std::move(base58_bytes))));
+   };
+   return {
+      memcmp(0, fc::to_base58(reinterpret_cast<const char*>(discriminator.data()), discriminator.size(),
+                              fc::yield_function_t{})),
+      memcmp(envelope_chunks::operator_offset, uploader.to_string(fc::yield_function_t{})),
+   };
+}
+
+fc::network::solana::data_slice envelope_chunk_buffer_header_slice() {
+   return {.offset = 0, .length = envelope_chunks::data_offset};
+}
+
+std::vector<envelope_chunk_buffer> decode_envelope_chunk_buffers(
+   opp_solana_outpost_client& program_client, const fc::variant& program_accounts,
+   const fc::network::solana::solana_public_key& uploader) {
+   const auto* program = program_client.get_program();
+   FC_ASSERT(program != nullptr && program->find_account(envelope_chunks::account_name) != nullptr,
+             "outpost program IDL declares no {}; this relay cannot find its chunk buffers",
+             envelope_chunks::account_name);
+   FC_ASSERT(program_accounts.is_array(), "getProgramAccounts did not return an array: {}",
+             fc::json::to_string(program_accounts, fc::json::yield_function_t{}));
+
+   std::vector<envelope_chunk_buffer> buffers;
+   for (const fc::variant& entry_v : program_accounts.get_array()) {
+      const auto& entry   = entry_v.get_object();
+      const auto  address = fc::network::solana::solana_public_key::from_base58_string(
+         entry[program_account_entry::field_pubkey].as_string());
+      const auto& account = entry[program_account_entry::field_account].get_object();
+      // `data` is `[<base64>, "base64"]`, the encoding the discovery read requests.
+      const auto decoded_b64 =
+         fc::base64_decode(account[program_account_entry::field_data].get_array().at(0).as_string());
+      const std::vector<uint8_t> header(decoded_b64.begin(), decoded_b64.end());
+
+      const fc::variant decoded =
+         program_client.decode_account_info_data(envelope_chunks::account_name, header);
+      const fc::variant_object& fields  = decoded.get_object();
+      FC_ASSERT(fields.contains(envelope_chunks::field_epoch_index) && fields.contains(envelope_chunks::field_operator),
+                "EnvelopeChunks decoded without '{}' / '{}'; the loaded IDL disagrees with the deployed program",
+                envelope_chunks::field_epoch_index, envelope_chunks::field_operator);
+      const uint64_t epoch_index = fields[envelope_chunks::field_epoch_index].as_uint64();
+      const auto decoded_operator = fc::network::solana::solana_public_key::from_base58_string(
+         fields[envelope_chunks::field_operator].as_string());
+
+      // The memcmp filter already selected `operator == uploader`, so a buffer that decodes to another operator, an
+      // out-of-range epoch, or an address its own (epoch, uploader) seeds do not derive can only be a decode that
+      // disagrees with the program. A close built from it would fail its seeds check -- skip it, loudly.
+      if (decoded_operator != uploader || epoch_index > std::numeric_limits<uint32_t>::max() ||
+          derive_envelope_chunks_pda(program_client.program_id, static_cast<uint32_t>(epoch_index), uploader) !=
+             address) {
+         wlog("outpost_solana_client: EnvelopeChunks {} decoded as epoch={} operator={}, which does not derive that "
+              "address for uploader {}; the loaded IDL disagrees with the program, leaving the buffer in place",
+              address.to_string(fc::yield_function_t{}), epoch_index,
+              decoded_operator.to_string(fc::yield_function_t{}), uploader.to_string(fc::yield_function_t{}));
+         continue;
+      }
+      buffers.push_back(envelope_chunk_buffer{address, static_cast<uint32_t>(epoch_index),
+                                              account[program_account_entry::field_lamports].as_uint64()});
+   }
+   std::ranges::sort(buffers, {}, &envelope_chunk_buffer::epoch_index);
+   return buffers;
+}
+
+envelope_chunk_reap_result drive_envelope_chunk_reap(
+   const envelope_chunk_reap_gates&                     gates,
+   std::vector<envelope_chunk_buffer>                   buffers,
+   const std::function<bool()>&                         deadline_passed,
+   const std::function<std::string(uint32_t)>&          send_cleanup,
+   const std::string&                                   log_label,
+   const std::function<bool(const envelope_chunk_buffer&)>& buffer_absent) {
+   envelope_chunk_reap_result result;
+   for (const auto& buffer : buffers) {
+      // One confirmed snapshot observes drain and emit atomically; rejected epochs have not drained yet.
+      if (!envelope_chunks_reapable(gates, buffer.epoch_index)) {
+         ++result.not_yet_eligible;
+         continue;
+      }
+      if (result.deadline_reached ||
+          result.reaped + result.already_closed + result.failed >= MAX_ENVELOPE_CHUNK_REAPS_PER_SWEEP) {
+         ++result.deferred;
+         continue;
+      }
+      if (deadline_passed()) {
+         result.deadline_reached = true;
+         ++result.deferred;
+         continue;
+      }
+      // A close that throws after the deadline passed was cut short by it -- its confirmation polling and the RPC
+      // transport both stop at the scoped deadline -- so it is left for the next sweep rather than counted as a failed
+      // close. It may even have landed; the next discovery read no longer lists the buffer if it did.
+      const auto close_threw = [&](const std::string& error) {
+         // A generic Anchor AccountNotInitialized can refer to config or the latest envelope as well.
+         // Verify this exact buffer instead of parsing error strings. nullopt represents absence, but libfc also
+         // returns it for a malformed reply. That can delay recovery until a later discovery; no rent is claimed.
+         // Empty data is still present, and thrown read errors preserve failure. The callback shares the deadline.
+         if (!deadline_passed() && buffer_absent) {
+            try {
+               if (buffer_absent(buffer)) {
+                  ++result.already_closed;
+                  ilog("outpost_solana_client[{}]: cleanup buffer={} epoch={} already closed; rent not attributed",
+                       log_label, buffer.address.to_string(fc::yield_function_t{}), buffer.epoch_index);
+                  return;
+               }
+            } catch (const fc::exception& e) {
+               dlog("outpost_solana_client[{}]: cleanup absence check failed buffer={}: {}",
+                    log_label, buffer.address.to_string(fc::yield_function_t{}), e.to_detail_string());
+            } catch (const std::exception& e) {
+               dlog("outpost_solana_client[{}]: cleanup absence check failed buffer={}: {}",
+                    log_label, buffer.address.to_string(fc::yield_function_t{}), e.what());
+            }
+         }
+         if (deadline_passed()) {
+            result.deadline_reached = true;
+            result.cut_off_close = buffer.address;
+            ++result.deferred;
+            ilog("outpost_solana_client[{}]: cleanup_envelope_chunks for epoch={} buffer={} ran into the sweep "
+                 "deadline: {}; the next sweep retries it if it did not land",
+                 log_label, buffer.epoch_index, buffer.address.to_string(fc::yield_function_t{}), error);
+            return;
+         }
+         ++result.failed;
+         wlog("outpost_solana_client[{}]: cleanup_envelope_chunks failed for epoch={} buffer={}: {}; the next sweep "
+              "retries it",
+              log_label, buffer.epoch_index, buffer.address.to_string(fc::yield_function_t{}), error);
+      };
+      try {
+         const auto sig = send_cleanup(buffer.epoch_index);
+         ++result.reaped;
+         result.lamports_reaped += buffer.lamports;
+         ilog("outpost_solana_client[{}]: cleanup_envelope_chunks closed epoch={} buffer={} returning {} lamports "
+              "sig={}",
+              log_label, buffer.epoch_index, buffer.address.to_string(fc::yield_function_t{}), buffer.lamports, sig);
+      } catch (const fc::exception& e) {
+         close_threw(e.to_detail_string());
+      } catch (const std::exception& e) {
+         close_threw(e.what());
+      }
+   }
+   return result;
+}
+
+envelope_chunk_sweep_outcome sweep_envelope_chunks(envelope_chunk_sweep_schedule&                  schedule,
+                                                   fc::time_point                                  sweep_start,
+                                                   fc::time_point                                  deadline_abs,
+                                                   const std::optional<envelope_chunk_reap_gates>& gates,
+                                                   const envelope_chunk_sweep_touchpoints&         touchpoints,
+                                                   const std::string&                              log_label) {
+   // Both checks precede every RPC: a backing-off schedule and a spent deadline each cost nothing.
+   if (schedule.backing_off(touchpoints.now())) return envelope_chunk_sweep_outcome::backing_off;
+   if (touchpoints.now() >= deadline_abs) {
+      dlog("outpost_solana_client[{}]: no deadline left for the chunk-buffer sweep; the next call runs it", log_label);
+      return envelope_chunk_sweep_outcome::deadline_spent;
+   }
+   bool discovery_complete = false;
+   const auto deadline_passed = [&] { return touchpoints.now() >= deadline_abs; };
+   /// Attribute the back-off warning to this client for both thrown reads and returned walks.
+   const auto warn_deadline_backoff = [&] {
+      wlog("outpost_solana_client[{}]: chunk-buffer sweep reached {} consecutive deadline stops without progress; "
+           "sweeps retry after {} s",
+           log_label, ENVELOPE_CHUNK_SWEEP_DEADLINE_STOP_LIMIT,
+           ENVELOPE_CHUNK_SWEEP_RETRY_BACKOFF.to_seconds());
+   };
+
+   /// Only attribute read exhaustion to the endpoint when it had the full sweep budget.
+   const auto warn_discovery_exhausted = [&] {
+      if (deadline_abs - sweep_start >= ENVELOPE_CHUNK_SWEEP_BUDGET) {
+         wlog("outpost_solana_client[{}]: chunk-buffer gate/discovery reads exhausted the sweep budget "
+              "({} s) before any close attempt; the reads alone used the full budget",
+              log_label, ENVELOPE_CHUNK_SWEEP_BUDGET.to_seconds());
+      } else {
+         ilog("outpost_solana_client[{}]: chunk-buffer gate/discovery reads reached the deadline; "
+              "the caller or outer scope left less than the full {} s sweep budget",
+              log_label, ENVELOPE_CHUNK_SWEEP_BUDGET.to_seconds());
+      }
+   };
+
+   // A throw is a failed sweep -- one that backs off -- only while the deadline still had time on it. A read the
+   // deadline cut short (the RPC transport and the confirmation polling both stop at the scoped deadline and throw)
+   // counts toward a consecutive-stop limit, so one tight tick does not stand every later sweep down.
+   // Repeated slow reads stand down every sweep; all paths share the same short budget.
+   // The test is the clock, not the exception type: an RPC's own connect or read timeout also throws
+   // `fc::timeout_exception`, and a dead endpoint must back off.
+   const auto sweep_threw = [&](const std::string& error) {
+      if (deadline_passed()) {
+         if (!discovery_complete) warn_discovery_exhausted();
+         ilog("outpost_solana_client[{}]: chunk-buffer sweep stopped at its deadline: {}",
+              log_label, error);
+         if (schedule.record_deadline_stop(touchpoints.now())) warn_deadline_backoff();
+         return envelope_chunk_sweep_outcome::cut_short;
+      }
+      schedule.record_failure(touchpoints.now());
+      wlog("outpost_solana_client[{}]: chunk-buffer sweep failed: {}; the buffers stay on chain and the sweep "
+           "retries them after {} s",
+           log_label, error, ENVELOPE_CHUNK_SWEEP_RETRY_BACKOFF.to_seconds());
+      return envelope_chunk_sweep_outcome::failed;
+   };
+   try {
+      const auto cursors = gates.has_value() ? *gates : touchpoints.read_gates();
+      if (deadline_passed()) {
+         warn_discovery_exhausted();
+         if (schedule.record_deadline_stop(touchpoints.now())) warn_deadline_backoff();
+         return envelope_chunk_sweep_outcome::cut_short;
+      }
+      // Not due: no epoch has settled since the last complete sweep, so nothing new can be reapable.
+      if (!schedule.due(cursors.next_epoch_index, touchpoints.now())) {
+         schedule.reset_deadline_stops();
+         return envelope_chunk_sweep_outcome::not_due;
+      }
+
+      const auto buffers = touchpoints.read_buffers();
+      discovery_complete = true;
+      if (deadline_passed()) warn_discovery_exhausted();
+      const auto already_closed = schedule.reconcile_cut_off_close(buffers);
+      auto result = drive_envelope_chunk_reap(cursors, buffers, deadline_passed,
+                                              touchpoints.send_cleanup, log_label, touchpoints.buffer_absent);
+      result.already_closed += already_closed;
+      if (result.reaped + result.already_closed + result.failed + result.deferred > 0) {
+         ilog("outpost_solana_client[{}]: chunk-buffer sweep at next_epoch={} closed {} ({} lamports), failed {}, "
+              "already closed {} (rent not attributed), deferred {}{}, {} not yet settled",
+              log_label, cursors.next_epoch_index, result.reaped, result.lamports_reaped, result.failed,
+              result.already_closed,
+              result.deferred, result.deadline_reached ? " (stopped at the deadline)" : "", result.not_yet_eligible);
+      }
+      if (schedule.record(cursors.next_epoch_index, result, touchpoints.now())) warn_deadline_backoff();
+      return envelope_chunk_sweep_outcome::swept;
+   } catch (const fc::exception& e) {
+      return sweep_threw(e.to_detail_string());
+   } catch (const std::exception& e) {
+      return sweep_threw(e.what());
+   }
+}
+
+bool skip_settled_epoch_delivery(uint32_t                                                     epoch_index,
+                                 const std::function<envelope_chunk_reap_gates()>&            read_gates,
+                                 const std::function<void(const envelope_chunk_reap_gates&)>& sweep,
+                                 const std::string&                                           log_label) {
+   // Never let the settled check block delivery: an unread cursor means "not known settled", so upload as usual.
+   const auto check_failed = [&](const std::string& error) {
+      wlog("outpost_solana_client[{}]: settled-epoch check for epoch={} failed: {}; delivering normally", log_label,
+           epoch_index, error);
+   };
+   std::optional<envelope_chunk_reap_gates> gates;
+   try {
+      gates = read_gates();
+   } catch (const fc::exception& e) {
+      check_failed(e.to_detail_string());
+      return false;
+   } catch (const std::exception& e) {
+      check_failed(e.what());
+      return false;
+   }
+   if (!outpost_epoch_settled(*gates, epoch_index)) return false;
+
+   ilog("outpost_solana_client[{}]: epoch_in epoch={} skipped; the outpost already settled it (next_epoch={})",
+        log_label, epoch_index, gates->next_epoch_index);
+   sweep(*gates);
+   return true;
+}
+
+std::vector<char> read_envelope_then_sweep_when_idle(const std::function<std::vector<char>()>& read_envelope,
+                                                     const std::function<void(fc::time_point)>& sweep,
+                                                     fc::time_point                            deadline_abs) {
+   auto envelope = read_envelope();
+   if (envelope.empty()) sweep(deadline_abs);
+   return envelope;
+}
+
 std::optional<fc::sha256> decode_envelope_log_digest(opp_solana_outpost_client&  program_client,
                                                      const std::vector<uint8_t>& account_data,
                                                      uint32_t                    epoch_index) {
@@ -1432,6 +1861,17 @@ outpost_solana_client::outpost_solana_client(
       // a dlog -- the outpost would stop settling with no error anywhere.
       // Fail at boot instead, where the IDL is still fixable.
       outpost_solana_client_detail::assert_epoch_deliveries_shape(*_program_client->get_program());
+      // Every delivery stages an `EnvelopeChunks` buffer the relay pays rent for, and only the reaper returns it.
+      // Require cleanup declarations and validate the header offsets used by discovery before the first sweep.
+      FC_ASSERT(_program_client->has_idl(CLEANUP_ENVELOPE_CHUNKS_INSTRUCTION),
+                "outpost program IDL lacks `{}`; this relay could never return its chunk-buffer rent",
+                CLEANUP_ENVELOPE_CHUNKS_INSTRUCTION);
+      for (const auto* account_name : {envelope_chunks::account_name, outpost_config::account_name}) {
+         FC_ASSERT(_program_client->get_program()->find_account(account_name),
+                   "outpost program IDL declares no {}; the chunk-buffer reaper reads it", account_name);
+      }
+      outpost_solana_client_detail::assert_envelope_chunks_shape(*_program_client);
+      outpost_solana_client_detail::assert_envelope_chunk_gate_shapes(*_program_client);
       // `DistributionState` is read only for DESYNDICATE_LIQ manifests, and only
       // the integrated liqsol-core program declares it -- a standalone outpost
       // IDL has no syndicated pool to release from, and its DistributionState
@@ -1569,6 +2009,69 @@ std::string outpost_solana_client::send_dispatch_attestations(
    accounts.insert(accounts.end(), extra_remaining_accounts.begin(),
                    extra_remaining_accounts.end());
    return _program_client->execute_tx_and_confirm(instr, accounts, params, pre_ixs);
+}
+
+std::vector<std::optional<fc::network::solana::account_info>> outpost_solana_client::read_chunk_reap_accounts(
+   const std::vector<fc::network::solana::solana_public_key>& accounts, fc::network::solana::commitment_t commitment,
+   const std::optional<fc::network::solana::data_slice>& slice) {
+   return _entry->client->get_multiple_accounts(accounts, commitment, slice);
+}
+
+fc::variant outpost_solana_client::read_chunk_program_accounts(
+   const fc::network::solana::solana_public_key& program_id, const std::vector<fc::variant>& filters,
+   fc::network::solana::commitment_t commitment, const std::optional<fc::network::solana::data_slice>& slice) {
+   return _entry->client->get_program_accounts(program_id, filters, commitment, slice);
+}
+
+outpost_solana_client_detail::envelope_chunk_reap_gates outpost_solana_client::read_envelope_chunk_reap_gates() {
+   // One confirmed bank observes the atomic drain and riding emit together.
+   const auto infos = read_chunk_reap_accounts(
+      {_program_client->config_pda, _program_client->latest_outbound_envelope_pda},
+      fc::network::solana::commitment_t::confirmed,
+      fc::network::solana::data_slice{.offset = 0, .length = REAP_GATE_HEADER_BYTES});
+   return outpost_solana_client_detail::decode_envelope_chunk_reap_gates(*_program_client, infos);
+}
+
+std::vector<outpost_solana_client_detail::envelope_chunk_buffer>
+outpost_solana_client::read_own_envelope_chunk_buffers() {
+   const auto* program = _program_client->get_program();
+   FC_ASSERT(program != nullptr, "no IDL program loaded");
+   const auto* chunks_account = program->find_account(envelope_chunks::account_name);
+   FC_ASSERT(chunks_account != nullptr, "outpost program IDL declares no {}", envelope_chunks::account_name);
+
+   const auto uploader = _entry->client->get_pubkey();
+   const auto result   = read_chunk_program_accounts(
+      _program_id, outpost_solana_client_detail::envelope_chunk_buffer_filters(chunks_account->discriminator, uploader),
+      fc::network::solana::commitment_t::confirmed, outpost_solana_client_detail::envelope_chunk_buffer_header_slice());
+   return outpost_solana_client_detail::decode_envelope_chunk_buffers(*_program_client, result, uploader);
+}
+
+std::optional<fc::network::solana::account_info> outpost_solana_client::read_envelope_chunk_buffer(
+   const fc::network::solana::solana_public_key& address, fc::network::solana::commitment_t commitment) {
+   return _entry->client->get_account_info(address, commitment);
+}
+
+void outpost_solana_client::reap_settled_envelope_chunks(
+   fc::time_point                                                               deadline_abs,
+   const std::optional<outpost_solana_client_detail::envelope_chunk_reap_gates>& gates) {
+   const auto sweep_start = fc::time_point::now();
+   deadline_abs = fc::task::clamp_to_current_deadline(
+      std::min(deadline_abs, sweep_start + outpost_solana_client_detail::ENVELOPE_CHUNK_SWEEP_BUDGET));
+   // Every RPC the sweep makes -- the gate read, the discovery read, each close and its confirmation polling -- runs
+   // under this scope, so none outlives `deadline_abs` (a nested scope only ever shortens the caller's).
+   fc::task::deadline_scope rpc_deadline(deadline_abs);
+   outpost_solana_client_detail::sweep_envelope_chunks(
+      _chunk_sweep_schedule, sweep_start, deadline_abs, gates,
+      {
+         .now          = &fc::time_point::now,
+         .read_gates   = [this] { return read_envelope_chunk_reap_gates(); },
+         .read_buffers = [this] { return read_own_envelope_chunk_buffers(); },
+         .send_cleanup = [this](uint32_t epoch_index) { return _program_client->cleanup_envelope_chunks(epoch_index); },
+         .buffer_absent = [this](const outpost_solana_client_detail::envelope_chunk_buffer& buffer) {
+            return !read_envelope_chunk_buffer(buffer.address, ENVELOPE_CHUNK_ABSENCE_COMMITMENT).has_value();
+         },
+      },
+      to_string());
 }
 
 std::string outpost_solana_client::drain_dispatch(
@@ -1816,6 +2319,32 @@ std::string outpost_solana_client::deliver_outbound_envelope(
    const uint16_t total_chunks = static_cast<uint16_t>(
       (total + SOLANA_MAX_CHUNK_BYTES - 1) / SOLANA_MAX_CHUNK_BYTES);
 
+   // An epoch the outpost has already settled has nothing left to deliver: the program answers every `epoch_in` for
+   // it with a late no-op. This check has to come before the staged-chunk read, because the sweep closes a settled
+   // epoch's buffer -- a depot consensus retry for that epoch would then find no buffer, read 0 chunks staged, and
+   // re-send every chunk plus the terminal call as paid no-ops, overrunning the delivery deadline on a large envelope
+   // every tick. An empty tx id tells the job the outpost already finalized the epoch.
+   //
+   // The gates are read at `confirmed`, the commitment the sweep reads them at. A buffer is reaped only after a
+   // `confirmed` read showed its epoch settled, and a later `confirmed` read from the same node normally still shows it
+   // settled, so a retry for a reaped epoch takes this branch and never reaches the re-upload below. That assumes one
+   // RPC node, or nodes that agree: `confirmed` can still revert, and a load-balanced endpoint can answer from a node
+   // that is behind. When such a read shows a reaped epoch open, that one retry re-sends its chunks and terminal call
+   // as paid late no-ops; a later retry reads the cursor past the epoch again and takes this branch.
+   if (outpost_solana_client_detail::skip_settled_epoch_delivery(
+          epoch_index, [this] {
+             // This optional read must leave time for upload even when the endpoint stalls.
+             fc::task::deadline_scope check_deadline(
+                fc::time_point::now() + outpost_solana_client_detail::ENVELOPE_CHUNK_SETTLED_CHECK_BUDGET);
+             return read_envelope_chunk_reap_gates();
+          },
+          [&](const outpost_solana_client_detail::envelope_chunk_reap_gates& gates) {
+             reap_settled_envelope_chunks(deadline_abs, gates);
+          },
+          to_string())) {
+      return {};
+   }
+
    // Stream the envelope into the per-(epoch, signer) chunk buffer. Each call
    // goes through `solana_program_client::execute_tx_and_confirm`, which
    // serialises submission + waits for `processed`-commitment confirmation
@@ -1919,6 +2448,11 @@ std::string outpost_solana_client::deliver_outbound_envelope(
            "cursor",
            to_string(), epoch_index, e.what());
    }
+   // Return the rent of buffers this relay staged for OLDER epochs that have since settled. The epoch just delivered
+   // is rarely among them: the drain above confirms at `processed`, while the sweep reads its gates at `confirmed`,
+   // which normally still shows this epoch open -- a later sweep reaps its buffer. Best-effort and non-throwing, like
+   // the drain: the delivery has already landed.
+   reap_settled_envelope_chunks(deadline_abs);
    return last_sig;
 }
 
@@ -1971,6 +2505,20 @@ std::vector<char> outpost_solana_client::read_inbound_envelope(
               to_string(), epoch_index, e.what());
       }
    }
+
+   // A found envelope goes straight back: the caller delivers it to the depot only after this returns, so a sweep here
+   // would sit in front of that delivery. An empty read is an idle tick, and only that tick sweeps the chunk buffers,
+   // within `ENVELOPE_CHUNK_SWEEP_BUDGET` -- the tick that finds the confirmed cursor moved often reads the
+   // finalized envelope still empty, and the caller holds its job lock across this call.
+   return outpost_solana_client_detail::read_envelope_then_sweep_when_idle(
+      [&] { return read_latest_outbound_envelope(epoch_index, deadline_abs); },
+      [this](fc::time_point sweep_deadline_abs) { reap_settled_envelope_chunks(sweep_deadline_abs); },
+      deadline_abs);
+}
+
+std::vector<char> outpost_solana_client::read_latest_outbound_envelope(uint32_t       epoch_index,
+                                                                       fc::time_point deadline_abs) {
+   throw_if_past_deadline(deadline_abs, OP_READ_LATEST);
 
    // Single RPC: fetch the `latest_outbound_envelope` PDA. The Solana
    // program overwrites this account with the most recent emitted

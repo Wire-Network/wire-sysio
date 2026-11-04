@@ -8,6 +8,7 @@ The `outpost_solana_client_plugin` provides Solana JSON-RPC client integration f
 - [Class Diagrams](#class-diagrams)
 - [Inbound Dispatch Manifests](#inbound-dispatch-manifests)
 - [Outpost Cranks](#outpost-cranks)
+- [Envelope Chunk Cleanup](#envelope-chunk-cleanup)
 - [Client Architecture](#client-architecture)
 - [solana_client (RPC Client)](#solana_client-rpc-client)
 - [solana_program_data_client (Raw/Vanilla Programs)](#solana_program_data_client-rawvanilla-programs)
@@ -509,6 +510,29 @@ every account of the instruction (`report_liq_yield_overrides`),
 signs with the operator's Solana key, and skips on a program that does not declare the
 instruction. A failed crank is logged by the job and retried with the next epoch's
 delivery.
+
+---
+
+## Envelope Chunk Cleanup
+
+The batch operator reaps its own settled `EnvelopeChunks` buffers after delivery,
+on delivery-path settled skips, and on idle inbound ticks. It calls
+`cleanup_envelope_chunks` only after the epoch
+has drained and its outbound envelope has been emitted, returning rent to the
+uploader. Sweeps close oldest buffers first within a five-second budget; failures
+and repeated deadline stops without progress back off before retrying.
+
+The RPC endpoint must allow `getProgramAccounts` with discriminator and operator
+`memcmp` filters and a header-only `dataSlice`, as well as `getMultipleAccounts`
+with a header-only `dataSlice` for both settlement gates in one `confirmed`
+snapshot. Cleanup uses `confirmed`; inbound envelope delivery still reads the full
+outbound account at `finalized`. A failed close is reconciled by a `getAccountInfo`
+absence read of that exact buffer at `processed`.
+
+The batch operator's loaded IDL must declare `cleanup_envelope_chunks`,
+`EnvelopeChunks`, `OutpostConfig` and `LatestOutboundEnvelope`. Boot validates the
+`EnvelopeChunks` epoch/operator offsets and both settlement cursor offsets against
+that IDL so header drift fails visibly at startup.
 
 ---
 
