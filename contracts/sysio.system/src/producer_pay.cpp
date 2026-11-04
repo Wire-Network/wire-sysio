@@ -4,6 +4,7 @@
 #include <sysio.token/sysio.token.hpp>
 
 #include <algorithm>
+#include <limits>
 #include <vector>
 
 namespace sysiosystem {
@@ -11,6 +12,18 @@ namespace sysiosystem {
    using sysio::current_time_point;
    using sysio::microseconds;
    using sysio::token;
+
+   namespace {
+      /// Milliseconds in a second, for the block interval.
+      constexpr uint64_t milliseconds_per_second = 1'000;
+
+      /// Seconds one producer's round lasts: `blocks_per_round` slots at the block interval.
+      constexpr uint64_t round_duration_sec =
+         uint64_t{blocks_per_round} * sysio::block_timestamp::block_interval_ms / milliseconds_per_second;
+      static_assert( uint64_t{blocks_per_round} * sysio::block_timestamp::block_interval_ms
+                        % milliseconds_per_second == 0,
+                     "a round must last a whole number of seconds" );
+   }
 
    void system_contract::onblock( ignore<block_header> ) {
       using namespace sysio;
@@ -102,6 +115,10 @@ namespace sysiosystem {
          observed_tbl.set( producer_rank::observed_schedule{ .producers = active_schedule }, get_self() );
       }
 
+      // A rotation is every scheduled producer's round once, so a served round credits the time
+      // until the producer's next one: a day in the schedule is a day of seniority at any size.
+      const uint64_t rotation_sec = active_schedule.size() * round_duration_sec;
+
       if( schedule_unchanged && state.last_producer.value != 0 ) {
          const auto previous = std::find( active_schedule.begin(), active_schedule.end(),
                                           state.last_producer );
@@ -120,7 +137,7 @@ namespace sysiosystem {
                if( slot == active_schedule.end() ) slot = active_schedule.begin();
                if( slot == current ) break;
                // Held a slot and delivered nothing.
-               record_round_outcome( *slot, /*blocks_delivered*/ 0, weights );
+               record_round_outcome( *slot, /*blocks_delivered*/ 0, rotation_sec, weights );
                ++slot;
             }
          }
@@ -134,7 +151,8 @@ namespace sysiosystem {
           && block_height > state.round_start_block ) {
          producer_rank::producer_score_config_t weights_tbl( get_self() );
          const auto weights = weights_tbl.get_or_default( producer_rank::producer_score_config{} );
-         record_round_outcome( state.last_producer, block_height - state.round_start_block, weights );
+         record_round_outcome( state.last_producer, block_height - state.round_start_block, rotation_sec,
+                               weights );
       }
 
       _global.modify( get_self(), [&]( auto& g ) {
@@ -143,7 +161,7 @@ namespace sysiosystem {
       });
    }
 
-   void system_contract::record_round_outcome( const name& producer, uint32_t blocks_delivered,
+   void system_contract::record_round_outcome( const name& producer, uint32_t blocks_delivered, uint64_t rotation_sec,
                                                const producer_rank::producer_score_config& weights ) {
       auto key = producer_key_t{producer.value};
       if( !_producers.contains(key) ) return;
@@ -157,6 +175,7 @@ namespace sysiosystem {
       const auto before = _producers.get(key);
       const auto before_streak  = before.consecutive_missed_rounds;
       const auto before_demoted = before.is_demoted;
+      const uint64_t before_seniority = producer_rank::seniority_credit( before.service_sec );
 
       _producers.modify( same_payer, key, [&]( auto& p ) {
          if( served ) {
@@ -165,10 +184,17 @@ namespace sysiosystem {
             // schedule -- so without this it would produce indefinitely for nothing.
             p.consecutive_missed_rounds = 0;
             p.is_demoted                = false;
+            // Seniority is service as a registered producer: a row whose registration a
+            // termination or slash cleared accrues nothing until `regproducer` takes a new order.
+            if( p.registration_seq == 0 ) return;
+            p.service_sec = p.service_sec > std::numeric_limits<uint64_t>::max() - rotation_sec
+                               ? std::numeric_limits<uint64_t>::max()
+                               : p.service_sec + rotation_sec;
             return;
          }
 
          p.consecutive_missed_rounds++;
+         p.service_sec -= std::min<uint64_t>( p.service_sec, weights.miss_penalty_sec );
          // Categorical: a tier no score climbs out of. Back via `regproducer`, or by serving a
          // round while still scheduled.
          if( producer_rank::warrants_demotion( p.consecutive_missed_rounds, weights ) ) {
@@ -176,10 +202,11 @@ namespace sysiosystem {
          }
       });
 
-      // Only these two feed the score, and a rescore costs two cross-contract opreg reads on an
-      // `onblock` path -- so a round that moved neither pays nothing.
+      // Rescore only when the round moved the streak, the demotion or the seniority hour: a rescore
+      // costs two cross-contract opreg reads on an `onblock` path.
       const auto after = _producers.get(key);
-      if( after.consecutive_missed_rounds != before_streak || after.is_demoted != before_demoted ) {
+      if( after.consecutive_missed_rounds != before_streak || after.is_demoted != before_demoted
+          || producer_rank::seniority_credit( after.service_sec ) != before_seniority ) {
          rescore_producer( producer );
       }
    }

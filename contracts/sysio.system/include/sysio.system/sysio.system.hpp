@@ -130,11 +130,14 @@ namespace sysiosystem {
       /// to `last_producer` by construction -- a round is a contiguous run of slots held by one
       /// producer -- so the difference IS the block count it delivered, with no per-block counter
       /// and no work on the 11-of-12 blocks that do not change producer.
+      uint32_t             round_start_block = 0;
+
+      /// The last `producer_info::registration_seq` assigned, 0 before the first. Only increases.
       ///
       /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE_DERIVED below. The ABI is generated
       /// from the declarations while the wasm serializes in macro order, so a field inserted
       /// anywhere but the end makes the two disagree silently.
-      uint32_t             round_start_block = 0;
+      uint64_t             last_registration_seq = 0;
 
       // explicit serialization macro is not necessary, used here only to improve compilation time
       SYSLIB_SERIALIZE_DERIVED( sysio_global_state, sysio::blockchain_parameters,
@@ -143,7 +146,8 @@ namespace sysiosystem {
                                 (last_producer_schedule_size)
                                 (last_producer)
                                 (rescore_cursor)(rescore_pending)
-                                (round_start_block) )
+                                (round_start_block)
+                                (last_registration_seq) )
    };
 
    inline sysio::block_signing_authority convert_to_block_signing_authority( const sysio::public_key& producer_key ) {
@@ -159,10 +163,10 @@ namespace sysiosystem {
    struct [[sysio::table("producers"), sysio::contract("sysio.system")]] producer_info {
       name                                                     owner;
       sysio::public_key                                        producer_key; /// a packed public key object
-      /// Packed ordering key: producer_tier in the high bits, inverted composite score below.
-      /// NOT a rank -- `rank` is position in the "prodrank" index among schedulable producers,
-      /// derived by iteration. Defaults to the demoted tier's worst score so a registered but
-      /// never-scored row can never outrank a scored one.
+      /// Packed ordering key: producer_tier in the high bits, inverted composite score, then
+      /// registration order; see `producer_rank::pack`. NOT a rank -- `rank` is position in the
+      /// "prodrank" index among schedulable producers, derived by iteration. Defaults to the demoted
+      /// tier's worst score so a registered but never-scored row can never outrank a scored one.
       uint64_t                                                 rank_score = producer_rank::unscored();
       bool                                                     is_active = true;
       std::string                                              url;
@@ -203,9 +207,20 @@ namespace sysiosystem {
       /// that hands a producer a second round in one rotation does not pay it twice. Rotations use
       /// the current size, so a size change, rare once the schedule reaches 21, can count a round
       /// more or less.
+      uint32_t                                                 last_paid_round = 0;
+      /// Seniority in seconds. A served round adds the rotation's duration (schedule size times
+      /// one round), so a day in the schedule credits a day at any schedule size; an unserved round
+      /// subtracts prodscorecfg's `miss_penalty_sec`, floored at 0. Kept through park, standby and
+      /// demotion, and accrues only in scheduled rounds while `registration_seq` is assigned. Reset
+      /// to 0 when the operator is terminated or slashed. Scored in whole hours.
+      uint64_t                                                 service_sec = 0;
+      /// Registration order, from `sysio_global_state::last_registration_seq`: assigned when the
+      /// row is created, or on the next `regproducer` after a termination or slash cleared it.
+      /// 0 is unassigned. Equal composites rank by ascending order, so the earlier registration
+      /// ranks first.
       ///
       /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE below.
-      uint32_t                                                 last_paid_round = 0;
+      uint64_t                                                 registration_seq = 0;
 
       uint64_t by_rank_score()const { return rank_score; }
       bool     active()const      { return is_active;                               }
@@ -218,7 +233,7 @@ namespace sysiosystem {
 
       SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank_score)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority)
                          (consecutive_missed_rounds)(is_demoted)(snapshot_attestations)
-                         (snapshot_period)(last_paid_round) )
+                         (snapshot_period)(last_paid_round)(service_sec)(registration_seq) )
    };
 
    using producers_table = sysio::kv::table< "producers"_n, producer_key_t, producer_info,
@@ -515,15 +530,17 @@ namespace sysiosystem {
          [[sysio::action]]
          void unregprod( const name& producer );
          /**
-          * Install the producer-score weights.
+          * Install the producer-score configuration.
           *
-          * Each weight scales one normalised factor of the composite score that orders the
-          * `prodrank` index; a weight of 0 removes that factor's influence entirely, which is how
-          * `relay` / `api` / `benchmark` ship until an attestation path exists for them. Changing a
-          * weight invalidates every stored `rank_score`, so this flags a rescore sweep on the
-          * global and `onblock` drains the cursor.
+          * The composite that orders the `prodrank` index is in seconds of seniority-equivalent:
+          * each weight is the seconds of seniority its factor is worth at full credit, and a weight
+          * of 0 removes that factor's influence entirely, which is how `relay` / `api` / `benchmark`
+          * ship until an attestation path exists for them. Weights and the miss penalty are not
+          * bounded; every score term saturates instead. Changing the configuration invalidates every
+          * stored `rank_score`, so this flags a rescore sweep on the global and `onblock` drains the
+          * cursor.
           *
-          * @param weights - the full weight set plus the demotion threshold.
+          * @param weights - the weights, the demotion threshold and the miss penalty.
           *
           * @pre Require the authority of the contract itself
           */
@@ -642,11 +659,12 @@ namespace sysiosystem {
           * Rescore a producer whose collateral standing just changed on sysio.opreg.
           *
           * `sysio.opreg::processprod` notifies this contract on every producer balance change --
-          * not only on an eligibility transition -- because producer rank is scored on the
-          * collateral actually posted: a top-up must raise the score and a withdraw must lower it.
+          * not only on an eligibility transition -- because the collateral minimum gates the score
+          * and the posted bond can weigh in it. Slash and termination notify on the same channel;
+          * an operator found SLASHED or TERMINATED also loses its seniority and registration order.
           * The handler recomputes from authoritative tables, so it needs no argument beyond the
           * account and asserts no authority of its own: `require_recipient` delivers it only from
-          * sysio.opreg, and its sole effect is to bring a derived value back in step.
+          * sysio.opreg, and its sole effect is to bring derived values back in step.
           */
          [[sysio::on_notify("sysio.opreg::processprod")]]
          void onprocessprod( name account, bool was_eligible, bool is_eligible );
@@ -832,8 +850,9 @@ namespace sysiosystem {
          void update_ranked_producers( const block_timestamp& timestamp );
 
          /// Recompute and store one producer's packed `rank_score`. Called from every path that can
-         /// move a scoring input: regproducer (tier clear), the opreg eligibility notification
-         /// (collateral), onblock (miss counter), and the rescore sweep.
+         /// move a scoring input: regproducer (tier clear, registration order), the opreg
+         /// notification (collateral, termination, slash), onblock (miss streak, seniority), and the
+         /// rescore sweep.
          void rescore_producer( const name& producer );
 
          /// Attribute missed rounds to the producers the active schedule skipped, and demote any
@@ -847,17 +866,30 @@ namespace sysiosystem {
          /**
           * Record one scheduled round for `producer`, scored by how much of it was delivered.
           *
-          * A round counts as SERVED at `min_blocks_per_round` blocks or more and clears the miss
-          * streak; anything less -- including nothing at all -- increments it, and the streak
+          * A round counts as SERVED at `min_blocks_per_round` blocks or more: it clears the miss
+          * streak and adds `rotation_sec` of seniority. Anything less -- including nothing at all --
+          * increments the streak and subtracts `miss_penalty_sec`, floored at 0, and the streak
           * reaching `max_consecutive_missed_rounds` demotes. ONE threshold, applied ONCE per
           * round, at the transition where the block count is finally known.
           *
           * @param producer         the producer whose round this was.
           * @param blocks_delivered blocks it produced in that round.
+          * @param rotation_sec     seconds one rotation of the active schedule lasts.
           * @param weights          the live score configuration.
           */
-         void record_round_outcome( const name& producer, uint32_t blocks_delivered,
+         void record_round_outcome( const name& producer, uint32_t blocks_delivered, uint64_t rotation_sec,
                                     const producer_rank::producer_score_config& weights );
+
+         /// Take the next registration order from `sysio_global_state::last_registration_seq`.
+         ///
+         /// @return the assigned order, never 0.
+         uint64_t next_registration_seq();
+
+         /// Clear `producer`'s seniority and registration order, the reset a termination or slash
+         /// applies. A name with no producers row is ignored.
+         ///
+         /// @param producer the producer whose operator was terminated or slashed.
+         void reset_seniority( const name& producer );
 
          /// Restart the rescore cursor from row 0 and flag the sweep pending -- every stored
          /// score is stale after a weight change (`setscorecfg`) or a collateral-minimum change

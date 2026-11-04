@@ -5,6 +5,9 @@
 #include <sysio/kv_table.hpp>
 #include <sysio/serialize.hpp>
 
+#include <sysio.system/producer_rank_constants.hpp>
+
+#include <algorithm>
 #include <cstdint>
 #include <vector>
 
@@ -26,9 +29,8 @@ namespace sysiosystem {
    /**
     * Ordering tier -- the high bits of the packed producer sort key.
     *
-    * A tier is CATEGORICAL: no score within a lower tier can overtake a higher one. That is what
-    * makes the uncapped collateral term safe -- no amount of money buys a demoted producer back
-    * into the schedule.
+    * A tier is CATEGORICAL: no score within a lower tier can overtake a higher one, so no amount of
+    * seniority or collateral buys a demoted producer back into the schedule.
     *
     * Ordered so ascending index iteration yields healthy producers first, then the bootstrapped
     * backstop, then producers demoted for missing rounds. A demoted producer is demonstrably
@@ -42,78 +44,72 @@ namespace sysiosystem {
 
    namespace producer_rank {
 
-      /// Fixed-point scale for every factor and weight: basis points. A factor at `score_scale` is
-      /// "100%"; a collateral ratio of exactly the configured minimum bond is also `score_scale`.
-      constexpr uint64_t score_scale = 10'000;
-
-      /// Ceiling `setscorecfg` accepts for any single factor weight.
-      ///
-      /// Weights are multiplied by factors normalised to `score_scale`, and `mul_sat` already stops
-      /// one term from wrapping -- but a saturated term carries no ordering information, so a
-      /// configuration above this bound silently stops ranking rather than ranking differently.
-      /// A hundred times full scale leaves ample room to make one factor dominant on purpose.
-      constexpr uint32_t max_factor_weight = static_cast<uint32_t>(score_scale) * 100;
-
-      /// Bits the packed key reserves for producer_tier (the two high bits).
-      constexpr unsigned tier_bits = 2;
-
-      /// Bits left for the composite score.
-      constexpr unsigned composite_bits = 64 - tier_bits;
-
-      /// Largest representable composite, and the saturation point.
-      ///
-      /// The collateral factor is deliberately uncapped as a POLICY -- producers compete for rank by
-      /// posting more -- so this ceiling is a bit-budget artifact, not a policy cap, and must stay
-      /// economically unreachable. At a collateral weight of `score_scale` it corresponds to a bond
-      /// roughly 4.6e10 times the configured minimum.
-      constexpr uint64_t composite_max = (uint64_t{1} << composite_bits) - 1;
-
       /**
        * Saturating add over the composite's range.
        *
-       * @param lhs first addend.
-       * @param rhs second addend.
+       * @param lhs first addend; values past `composite_max` count as `composite_max`.
+       * @param rhs second addend; values past `composite_max` count as `composite_max`.
        * @return the sum, clamped to `composite_max`.
        */
       inline uint64_t add_sat(uint64_t lhs, uint64_t rhs) {
-         return lhs > composite_max - rhs ? composite_max : lhs + rhs;
+         const uint64_t a = std::min(lhs, composite_max);
+         const uint64_t b = std::min(rhs, composite_max);
+         return a > composite_max - b ? composite_max : a + b;
       }
 
       /**
-       * Saturating multiply of a factor by its weight.
+       * One weighted factor term: `factor * weight / score_scale`, saturating.
        *
-       * Mandatory, not defensive: the collateral factor is deliberately UNCAPPED as a policy, so it
-       * runs to `composite_max` (~2^62) on a large enough bond. Multiplying that by any weight
-       * above 1 overflows uint64 and would wrap a top-ranked producer to the bottom of the index.
-       * The uint128 intermediate makes the saturation explicit.
+       * The collateral factor is uncapped, so the product runs past uint64 on a large bond; the
+       * uint128 intermediate keeps it from wrapping a top-ranked producer to the bottom of the index.
        *
-       * @param factor a normalised factor, in basis points.
-       * @param weight the configured weight for that factor.
-       * @return factor * weight, clamped to `composite_max`.
+       * @param factor a factor in basis points.
+       * @param weight seconds of seniority the factor is worth at `score_scale`.
+       * @return the term in seconds, clamped to `composite_max`.
        */
-      inline uint64_t mul_sat(uint64_t factor, uint32_t weight) {
-         const unsigned __int128 product =
-            static_cast<unsigned __int128>(factor) * static_cast<unsigned __int128>(weight);
-         return product > static_cast<unsigned __int128>(composite_max)
+      inline uint64_t scale_sat(uint64_t factor, uint32_t weight) {
+         const unsigned __int128 term =
+            static_cast<unsigned __int128>(factor) * static_cast<unsigned __int128>(weight)
+            / static_cast<unsigned __int128>(score_scale);
+         return term > static_cast<unsigned __int128>(composite_max)
                    ? composite_max
-                   : static_cast<uint64_t>(product);
+                   : static_cast<uint64_t>(term);
       }
 
       /**
-       * Pack a tier + composite score into the `prodrank` sort key.
+       * The seniority a producer's service time scores: whole hours, in seconds.
        *
-       * The composite is INVERTED so a higher score sorts EARLIER under the index's ascending
-       * iteration, while the tier is not -- a higher tier must sort later. Equal keys fall back to
-       * primary-key order (the account name value), which supplies the name tiebreak for free.
+       * Quantized so a served round moves the key, and so costs a rescore, only when it crosses an
+       * hour rather than on every round.
        *
-       * @param tier      the producer's ordering tier.
-       * @param composite the weighted composite score, saturated to `composite_max`.
+       * @param service_sec the producer's accrued `service_sec`.
+       * @return `service_sec` floored to a multiple of `seniority_quantum_sec`.
+       */
+      inline uint64_t seniority_credit(uint64_t service_sec) {
+         return service_sec / seniority_quantum_sec * seniority_quantum_sec;
+      }
+
+      /**
+       * Pack a tier, composite score and registration order into the `prodrank` sort key.
+       *
+       * Layout, high to low: tier (`tier_bits`), INVERTED composite (`composite_bits`), registration
+       * order (`registration_bits`). The composite is inverted so a higher score sorts EARLIER under
+       * the index's ascending iteration; the tier is not, so a higher tier sorts later. Equal
+       * composites sort by ascending registration order, so the earlier registration ranks first.
+       * Equal keys fall back to primary-key order (the account name value).
+       *
+       * @param tier             the producer's ordering tier.
+       * @param composite        the composite score in seconds, saturated to `composite_max`.
+       * @param registration_seq the producer's registration order; 0 (unassigned) sorts last.
        * @return the packed sort key stored as `producer_info::rank_score`.
        */
-      inline uint64_t pack(producer_tier tier, uint64_t composite) {
-         const uint64_t bounded = composite > composite_max ? composite_max : composite;
-         return (static_cast<uint64_t>(magic_enum::enum_integer(tier)) << composite_bits)
-              | (composite_max - bounded);
+      inline uint64_t pack(producer_tier tier, uint64_t composite, uint64_t registration_seq) {
+         const uint64_t bounded = std::min(composite, composite_max);
+         const uint64_t order   = registration_seq == 0 ? registration_max
+                                                        : std::min(registration_seq, registration_max);
+         return (static_cast<uint64_t>(magic_enum::enum_integer(tier)) << tier_shift)
+              | ((composite_max - bounded) << registration_bits)
+              | order;
       }
 
       /**
@@ -124,12 +120,13 @@ namespace sysiosystem {
        *         last rather than being trusted.
        */
       inline producer_tier tier_of(uint64_t rank_score) {
-         const auto raw = static_cast<uint8_t>(rank_score >> composite_bits);
+         const auto raw = static_cast<uint8_t>(rank_score >> tier_shift);
          return magic_enum::enum_cast<producer_tier>(raw).value_or(producer_tier::demoted);
       }
 
       /**
-       * The sort key of a producer that has never been scored: worst composite in the demoted tier.
+       * The sort key of a producer that has never been scored: worst composite and order in the
+       * demoted tier.
        *
        * This is `producer_info::rank_score`'s default, and it is the safe one. A zero key would
        * decode as tier `healthy` with a MAXIMUM inverted composite -- i.e. a registered-but-unscored
@@ -138,46 +135,17 @@ namespace sysiosystem {
        * @return the packed key for an unscored producer.
        */
       inline uint64_t unscored() {
-         return pack(producer_tier::demoted, 0);
+         return pack(producer_tier::demoted, 0, 0);
       }
 
       /**
-       * Participation factor, derived from the same counter the demotion model maintains -- no
-       * additional state.
+       * Score configuration: the factor weights, the demotion threshold and the miss penalty.
        *
-       * It only orders producers across the misses BEFORE demotion fires; the categorical
-       * consequence of being offline is the tier, not this term.
-       *
-       * A miss short of demotion still has a lasting consequence, and it is deliberate. The streak
-       * clears only when the producer SERVES a round -- `min_blocks_per_round` or better -- so a
-       * producer whose penalty drops it below the active schedule stops being scheduled, stops
-       * producing, and holds the penalty until it acts: `regproducer` clears the streak once the
-       * schedule has dropped it, and enough additional collateral outranks it. That
-       * is the intended shape -- a producer that missed is worth less than an identical one that
-       * did not, and the way back is an explicit assertion of readiness rather than the passage of
-       * time. The alternative, clearing the streak for producers outside the schedule, would let a
-       * producer sitting on the boundary flap in and out at every rebuild.
-       *
-       * @param consecutive_missed_rounds     the producer's current miss streak.
-       * @param max_consecutive_missed_rounds the configured demotion threshold.
-       * @return the participation factor in basis points, clamped to [0, score_scale].
-       */
-      inline uint64_t participation_factor(uint32_t consecutive_missed_rounds,
-                                           uint32_t max_consecutive_missed_rounds) {
-         if (max_consecutive_missed_rounds == 0) return score_scale;
-         if (consecutive_missed_rounds >= max_consecutive_missed_rounds) return 0;
-         const uint64_t missed = static_cast<uint64_t>(consecutive_missed_rounds) * score_scale
-                               / static_cast<uint64_t>(max_consecutive_missed_rounds);
-         return score_scale - missed;
-      }
-
-      /**
-       * Per-factor weights for the composite producer score, plus the demotion threshold.
-       *
-       * Adding a scoring factor is a new weight field defaulting to 0 plus a new factor function --
-       * the packed key's LAYOUT never changes, so the mere existence of a new factor invalidates no
-       * stored key. Only a weight CHANGE invalidates scores, and that is what the rescore cursor on
-       * the global singleton drains.
+       * The composite is in SECONDS of seniority-equivalent: seniority (`service_sec` in whole hours)
+       * plus each factor term, where a weight is the seconds of seniority its factor is worth at full
+       * credit. Adding a factor is a new weight defaulting to 0 plus a term in `compute`; the key's
+       * layout never changes. A config change invalidates every stored score, which is what the
+       * rescore cursor on the global singleton drains.
        *
        * `relay` / `api` / `benchmark` ship at 0 deliberately. A `peerkeys` row proves registration,
        * not service, and nothing on chain observes an API node or a CPU benchmark at all; weighting
@@ -185,18 +153,12 @@ namespace sysiosystem {
        * exists.
        */
       struct [[sysio::table("prodscorecfg"), sysio::contract("sysio.system")]] producer_score_config {
-         /// Weight on the collateral ratio (linear, uncapped, min across the required pairs).
-         uint32_t collateral_weight    = static_cast<uint32_t>(score_scale);
-         /// Weight on the participation factor derived from consecutive missed rounds.
-         uint32_t participation_weight = static_cast<uint32_t>(score_scale);
-         /// Weight on the snapshot-provider attestation rate. A TENTH of the collateral weight,
-         /// deliberately: at parity a single quorum attestation moved the composite by as much as
-         /// an entire minimum bond, so among producers bonded near each other the credit decided
-         /// the top-21 boundary and the pay-period reset decided it back -- two producer-schedule
-         /// and finalizer-policy proposals per snapshot event, with no change in real standing.
-         /// Snapshot service should separate producers the collateral term has left tied, not
-         /// outrank collateral.
-         uint32_t snapshot_weight      = static_cast<uint32_t>(score_scale) / 10;
+         /// Seconds of seniority one minimum bond is worth, scaled by the collateral ratio (linear,
+         /// uncapped, min across the required pairs). Zero makes collateral a pure gate: a producer
+         /// below the live minimum is still unscored, and more collateral buys no rank.
+         uint32_t collateral_weight    = 0;
+         /// Seconds of seniority full snapshot credit is worth, pro rata below the target.
+         uint32_t snapshot_weight      = default_snapshot_weight_sec;
          /// Reserved -- needs an attestation path before it can carry weight.
          uint32_t relay_weight         = 0;
          /// Reserved -- needs an attestation path before it can carry weight.
@@ -227,16 +189,18 @@ namespace sysiosystem {
          /// Zero disables the check, leaving only a wholly unproduced round as a miss. The default
          /// is half a standard 12-slot round, matching the threshold the retired per-round pay
          /// model used.
-         ///
-         /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE below.
          uint32_t min_blocks_per_round = 6;
 
+         /// Seconds of seniority an UNSERVED round costs, floored at zero. Zero disables the penalty.
+         ///
+         /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE below.
+         uint32_t miss_penalty_sec = default_miss_penalty_sec;
 
          SYSLIB_SERIALIZE(producer_score_config,
-            (collateral_weight)(participation_weight)(snapshot_weight)
+            (collateral_weight)(snapshot_weight)
             (relay_weight)(api_weight)(benchmark_weight)
             (max_consecutive_missed_rounds)(snapshot_target_attestations)
-            (min_blocks_per_round))
+            (min_blocks_per_round)(miss_penalty_sec))
       };
 
       /// The `prodscorecfg` singleton. Mirrors `emitcfg_t`: absent until governance installs it, so

@@ -1075,6 +1075,14 @@
                 {
                     "name": "last_paid_round",
                     "type": "uint32"
+                },
+                {
+                    "name": "service_sec",
+                    "type": "uint64"
+                },
+                {
+                    "name": "registration_seq",
+                    "type": "uint64"
                 }
             ]
         },
@@ -1125,10 +1133,6 @@
                     "type": "uint32"
                 },
                 {
-                    "name": "participation_weight",
-                    "type": "uint32"
-                },
-                {
                     "name": "snapshot_weight",
                     "type": "uint32"
                 },
@@ -1154,6 +1158,10 @@
                 },
                 {
                     "name": "min_blocks_per_round",
+                    "type": "uint32"
+                },
+                {
+                    "name": "miss_penalty_sec",
                     "type": "uint32"
                 }
             ]
@@ -1609,6 +1617,10 @@
                 {
                     "name": "round_start_block",
                     "type": "uint32"
+                },
+                {
+                    "name": "last_registration_seq",
+                    "type": "uint64"
                 }
             ]
         },
