@@ -1,6 +1,7 @@
 #include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/producer_plugin/block_timing_util.hpp>
 #include <sysio/producer_plugin/production_pause_vote_tracker.hpp>
+#include <sysio/producer_plugin/round_block_status.hpp>
 #include <sysio/producer_plugin/trx_priority_db.hpp>
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/plugin_interface.hpp>
@@ -812,10 +813,10 @@ public:
    pending_block_mode                                _pending_block_mode = pending_block_mode::speculating;
    // Tracks blocks signed during the current producing round so we can summarize on-head-vs-orphaned at round exit.
    struct producing_round_state {
-      account_name                producer;
-      block_timestamp_type        round_start;
-      block_num_type              first_block_num{};
-      std::vector<block_id_type>  signed_blocks;
+      account_name                    producer;
+      block_timestamp_type            round_start;
+      block_num_type                  first_block_num{};
+      std::vector<round_signed_block> signed_blocks; // oldest first
    };
    std::optional<producing_round_state>              _producing_round;
    unapplied_transaction_queue                       _unapplied_transactions;
@@ -2528,21 +2529,16 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
    _time_tracker.clear(); // make sure we start tracking block time after `apply_blocks()`
 
    // Round transition diagnostics: at round-start slots, summarize the previous round (if any) and log entry for the
-   // new one. On-head check uses head.extends, valid for blocks still above LIB which is true at next-round-start;
-   // sub-second fork switches after round end could shift the count by a block or two.
+   // new one. classify_round_blocks checks the signed blocks against the applied chain, including the block log for
+   // blocks that are already final; sub-second fork switches after round end could shift the count by a block or two.
    const bool round_start_slot =
       (block_timestamp_type(block_time).slot % chain::config::producer_repetitions) == 0;
    if (round_start_slot) {
       if (_producing_round) {
-         size_t on_head = 0;
-         for (const auto& id : _producing_round->signed_blocks) {
-            if (head.id() == id || head.extends(id))
-               ++on_head;
-         }
-         const auto signed_count = _producing_round->signed_blocks.size();
-         ilog("Round complete for {} starting #{} at {}: signed {}, on head {}, orphaned {}",
+         const round_block_counts counts = classify_round_blocks(chain, _producing_round->signed_blocks);
+         ilog("Round complete for {} starting #{} at {}: signed {}, on head {}, orphaned {}, unverifiable {}",
               _producing_round->producer, _producing_round->first_block_num, _producing_round->round_start,
-              signed_count, on_head, signed_count - on_head);
+              _producing_round->signed_blocks.size(), counts.on_head, counts.orphaned, counts.unverifiable);
          _producing_round.reset();
       }
       if (in_producing_mode()) {
@@ -3282,7 +3278,7 @@ void producer_plugin_impl::produce_block() {
 
    const signed_block_ptr new_b = chain.head().block();
    if (_producing_round)
-      _producing_round->signed_blocks.push_back(chain.head().id());
+      _producing_round->signed_blocks.push_back({chain.head().id(), new_b->previous});
    fc::time_point now = fc::time_point::now();
    _time_tracker.add_other_time(now);
    _time_tracker.report(new_b->block_num(), new_b->producer, now);
