@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 #include <boost/test/unit_test.hpp>
+#include <fc-test/capture_http_server.hpp>
+#include <fc-test/crypto_utils.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/network/solana/solana_borsh.hpp>
@@ -15,6 +17,117 @@ using namespace fc::network::solana;
 using namespace fc::crypto::solana;
 
 BOOST_AUTO_TEST_SUITE(solana_client_tests)
+
+/// Pin the serialized getProgramAccounts options with and without a header slice.
+BOOST_AUTO_TEST_CASE(get_program_accounts_request_params) try {
+   constexpr uint64_t slice_offset = 7;
+   constexpr uint64_t slice_length = 56;
+   constexpr uint64_t filter_size = 128;
+   constexpr size_t unsliced_config_keys = 3;
+   constexpr std::string_view rpc_method = "getProgramAccounts";
+   constexpr std::string_view program_address = "11111111111111111111111111111111";
+   constexpr std::string_view response = R"({"jsonrpc":"2.0","id":1,"result":[]})";
+   constexpr auto method_key = "method";
+   constexpr auto params_key = "params";
+   constexpr auto datasize_key = "dataSize";
+   constexpr auto commitment_key = "commitment";
+   constexpr auto encoding_key = "encoding";
+   constexpr auto filters_key = "filters";
+   constexpr auto dataslice_key = "dataSlice";
+   constexpr auto offset_key = "offset";
+   constexpr auto length_key = "length";
+   constexpr auto confirmed_key = "confirmed";
+   constexpr auto base64_key = "base64";
+   constexpr auto solana_key = "solana";
+   for (const bool sliced : {false, true}) {
+      fc::test::capture_http_server::scripted_response reply;
+      reply.body = response;
+      fc::test::capture_http_server server({reply});
+      auto signer = std::make_shared<fc::crypto::signature_provider_t>();
+      signer->public_key = fc::crypto::public_key::from_string(fc::test::load_keygen_fixture(solana_key, 1).public_key,
+                                                              fc::crypto::public_key::key_type::ed);
+      solana_client client(signer, server.url());
+      const std::vector<fc::variant> filters{fc::mutable_variant_object()(datasize_key, filter_size)};
+      const auto slice = sliced ? std::optional<data_slice>{{.offset = slice_offset, .length = slice_length}}
+                                : std::nullopt;
+      BOOST_CHECK(client.get_program_accounts(std::string(program_address), filters, commitment_t::confirmed, slice)
+                     .get_array().empty());
+      BOOST_REQUIRE_EQUAL(server.request_count(), 1u);
+      const auto request = fc::json::from_string(server.request(0).body).get_object();
+      BOOST_CHECK_EQUAL(request[method_key].as_string(), std::string(rpc_method));
+      const auto& params = request[params_key].get_array();
+      BOOST_REQUIRE_EQUAL(params.size(), 2u);
+      BOOST_CHECK_EQUAL(params[0].as_string(), std::string(program_address));
+      const auto& config = params[1].get_object();
+      BOOST_CHECK_EQUAL(config.size(), unsliced_config_keys + (sliced ? 1u : 0u));
+      BOOST_CHECK_EQUAL(config[commitment_key].as_string(), confirmed_key);
+      BOOST_CHECK_EQUAL(config[encoding_key].as_string(), base64_key);
+      BOOST_REQUIRE_EQUAL(config[filters_key].get_array().size(), 1u);
+      BOOST_CHECK_EQUAL(config[filters_key].get_array()[0].get_object()[datasize_key].as_uint64(), filter_size);
+      BOOST_CHECK_EQUAL(config.contains(dataslice_key), sliced);
+      if (sliced) {
+         BOOST_REQUIRE(config.contains(dataslice_key));
+         const auto& sent = config[dataslice_key].get_object();
+         BOOST_CHECK_EQUAL(sent[offset_key].as_uint64(), slice_offset);
+         BOOST_CHECK_EQUAL(sent[length_key].as_uint64(), slice_length);
+      }
+   }
+} FC_LOG_AND_RETHROW();
+
+/// Pin the serialized getMultipleAccounts options with and without a header slice.
+BOOST_AUTO_TEST_CASE(get_multiple_accounts_request_params) try {
+   constexpr uint64_t slice_offset = 7;
+   constexpr uint64_t slice_length = 56;
+   constexpr size_t unsliced_config_keys = 2;
+   constexpr std::string_view rpc_method = "getMultipleAccounts";
+   constexpr std::string_view program_address = "11111111111111111111111111111111";
+   constexpr std::string_view response = R"({"jsonrpc":"2.0","id":1,"result":{"value":[null]}})";
+   constexpr auto method_key = "method";
+   constexpr auto params_key = "params";
+   constexpr auto commitment_key = "commitment";
+   constexpr auto encoding_key = "encoding";
+   constexpr auto dataslice_key = "dataSlice";
+   constexpr auto offset_key = "offset";
+   constexpr auto length_key = "length";
+   constexpr auto confirmed_key = "confirmed";
+   constexpr auto base64_key = "base64";
+   constexpr auto solana_key = "solana";
+   for (const bool sliced : {false, true}) {
+      fc::test::capture_http_server::scripted_response reply;
+      reply.body = response;
+      fc::test::capture_http_server server({reply});
+      auto signer = std::make_shared<fc::crypto::signature_provider_t>();
+      signer->public_key = fc::crypto::public_key::from_string(fc::test::load_keygen_fixture(solana_key, 1).public_key,
+                                                              fc::crypto::public_key::key_type::ed);
+      solana_client client(signer, server.url());
+      const auto slice = sliced ? std::optional<data_slice>{{.offset = slice_offset, .length = slice_length}}
+                                : std::nullopt;
+      const std::vector addresses{solana_public_key::from_base58_string(std::string(program_address))};
+      const auto result = sliced ? client.get_multiple_accounts(addresses, commitment_t::confirmed, slice)
+                                 : client.get_multiple_accounts(addresses, commitment_t::confirmed);
+      BOOST_REQUIRE_EQUAL(result.size(), 1u);
+      BOOST_CHECK(!result.front());
+      BOOST_REQUIRE_EQUAL(server.request_count(), 1u);
+      const auto request = fc::json::from_string(server.request(0).body).get_object();
+      BOOST_CHECK_EQUAL(request[method_key].as_string(), std::string(rpc_method));
+      const auto& params = request[params_key].get_array();
+      BOOST_REQUIRE_EQUAL(params.size(), 2u);
+      BOOST_REQUIRE_EQUAL(params[0].get_array().size(), 1u);
+      BOOST_CHECK_EQUAL(params[0].get_array()[0].as_string(), std::string(program_address));
+      const auto& config = params[1].get_object();
+      BOOST_CHECK_EQUAL(config.size(), unsliced_config_keys + (sliced ? 1u : 0u));
+      BOOST_CHECK_EQUAL(config[commitment_key].as_string(), confirmed_key);
+      BOOST_CHECK_EQUAL(config[encoding_key].as_string(), base64_key);
+      BOOST_CHECK_EQUAL(config.contains(dataslice_key), sliced);
+      if (sliced) {
+         BOOST_REQUIRE(config.contains(dataslice_key));
+         const auto& sent = config[dataslice_key].get_object();
+         BOOST_CHECK_EQUAL(sent.size(), 2u);
+         BOOST_CHECK_EQUAL(sent[offset_key].as_uint64(), slice_offset);
+         BOOST_CHECK_EQUAL(sent[length_key].as_uint64(), slice_length);
+      }
+   }
+} FC_LOG_AND_RETHROW();
 
 namespace {
 
