@@ -295,19 +295,21 @@ which performs ABI decoding) and resolves as follows:
 
 | Condition | Result |
 |-----------|--------|
-| Record found; block ID and hash match the loaded snapshot tuple | Success; logged, verification complete. |
-| Record found; block ID or hash differs from the loaded snapshot tuple | Fatal error; node halts. |
-| No record; node still syncing | Pending; retry on the next finalized block. |
-| No record; caught up; within the grace window | Pending; retry on the next finalized block. |
+| Irreversible record found; block ID and hash match the loaded snapshot tuple | Success; logged, verification complete. |
+| Irreversible record found; block ID or hash differs from the loaded snapshot tuple | Fatal error; node halts. |
+| No irreversible record; node still syncing | Pending; retry on the next finalized block. |
+| No irreversible record; caught up; within the grace window | Pending; retry on the next finalized block. |
 | Table read fails; syncing or within the grace window | Pending; retry on the next finalized block. |
-| No record/read failure; caught up; grace exhausted | Fatal error; node halts. |
+| No irreversible record/read failure; caught up; grace exhausted | Fatal error; node halts. |
 | Unexpected error during verification | Fatal error; node halts. |
 
 "Caught up" means the latest finalized block's timestamp is within 30 seconds of wall-clock
 time. The grace window is `floor(min(block_spacing, 25000) / 2)` finalized blocks past the snapshot height and exists
 because a node bootstrapping from a fresh snapshot can reach the live tip before the providers'
 votes for that height have landed. A missing record only becomes the terminal "never attested"
-failure once the node is caught up *and* the finalized head has crossed that configured grace.
+failure once the node is caught up *and* the finalized head has reached the end of that configured grace.
+A record whose `attested_at_block` is above the latest finalized height follows the same policy;
+even an unreachable claimed attestation height cannot extend the grace window.
 
 Two implementation details worth knowing as an operator:
 

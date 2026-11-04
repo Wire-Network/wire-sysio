@@ -25,6 +25,7 @@
 #include <string_view>
 #include <test_ports.hpp>
 #include <thread>
+#include <tuple>
 #include <vector>
 
 namespace {
@@ -47,6 +48,8 @@ constexpr auto valid_snapshot_filename = "snapshot-with-valid-attestation.bin";
 constexpr auto unconfigured_snapshot_filename = "snapshot-without-enabled-attestation.bin";
 constexpr auto unscheduled_snapshot_filename = "snapshot-at-unscheduled-height.bin";
 constexpr auto tampered_snapshot_filename = "snapshot-with-rewritten-config.bin";
+/// Forged snapshot carrying a final attestation for its own height.
+constexpr auto unfinalized_attestation_snapshot_filename = "snapshot-with-unfinalized-attestation.bin";
 constexpr auto snapshot_metadata_path = "/v1/snapshot/latest";
 constexpr auto snapshot_by_block_path = "/v1/snapshot/by_block";
 constexpr auto snapshot_download_path = "/v1/snapshot/download";
@@ -638,6 +641,103 @@ BOOST_FIXTURE_TEST_CASE(
    BOOST_CHECK(!appbase::app().is_quiting());
    BOOST_CHECK_EQUAL(plugin.get_snapshot_attestation_config().block_spacing, replayed_spacing);
    plugin.plugin_shutdown();
+}
+
+/** An unreachable attestation height shares the missing-record sync and grace limits. */
+BOOST_AUTO_TEST_CASE(chain_plugin_bounds_unfinalized_snapshot_attestation_wait) {
+   struct scenario {
+      bool caught_up;
+      bool grace_exhausted;
+   };
+   constexpr std::array scenarios{
+      scenario{false, true}, scenario{true, false}, scenario{true, true}};
+   constexpr auto unreachable_attestation_height = std::numeric_limits<uint32_t>::max();
+   constexpr auto grace_blocks = snapshot_attest::snapshot_attestation_grace_blocks(
+      snapshot_attest_test_support::test_block_spacing);
+
+   for (const auto& [caught_up, grace_exhausted] : scenarios) {
+      BOOST_TEST_CONTEXT("caught_up=" << caught_up << ", grace_exhausted=" << grace_exhausted) {
+         snapshot_attest_test_support::snapshot_attest_fixture source;
+         source.set_snap_config(snapshot_attest_test_support::single_provider_minimum);
+         source.control->abort_block();
+         const auto snapshot_height = source.control->head().block_num();
+         const auto snapshot_block_id = source.control->head().id();
+         BOOST_REQUIRE_EQUAL(snapshot_height, snapshot_attest_test_support::test_block_spacing);
+
+         fc::temp_directory snapshot_dir;
+         const auto snapshot_path = snapshot_dir.path() / unfinalized_attestation_snapshot_filename;
+         const auto honest_hash = write_chain_plugin_snapshot(*source.control, snapshot_path);
+         const auto contract_hash = snapshot_attest_test_support::to_contract_snapshot_hash(honest_hash);
+         const auto record_value = fc::raw::pack(std::make_tuple(
+            snapshot_height, snapshot_block_id, contract_hash, unreachable_attestation_height));
+         std::array<char, sysio::chain::kv_pri_key_size> record_key;
+         sysio::chain::kv_encode_be64(record_key.data(), snapshot_height);
+         auto& store = const_cast<sysio::chain::kv_store&>(source.control->kv());
+         BOOST_REQUIRE(store.insert_row(
+            sysio::chain::config::system_account_name, sysio::snapshot_attestation_table_id(),
+            sysio::chain::config::system_account_name,
+            std::string_view{record_key.data(), record_key.size()},
+            std::string_view{record_value.data(), record_value.size()}).has_value());
+         const auto forged_hash = write_chain_plugin_snapshot(*source.control, snapshot_path);
+
+         // A real vote for the honest tuple cannot repair the forged final record.
+         source.produce_block();
+         source.vote_snapshot(snapshot_attest_test_support::snapshot_provider_account,
+                              snapshot_block_id, contract_hash);
+         source.produce_block();
+         BOOST_REQUIRE(source.get_row_by_id(
+            sysio::chain::config::system_account_name, sysio::chain::config::system_account_name,
+            sysio::chain::name{snapshot_attest::table_snaprecords}, snapshot_height) == record_value);
+
+         if (grace_exhausted) {
+            source.produce_blocks(grace_blocks, true);
+         }
+         if (caught_up) {
+            source.produce_block(fc::time_point::now() - source.control->head().block_time());
+         }
+         source.produce_blocks(attestation_finality_block_count);
+         const auto irreversible = source.control->fork_db_root();
+         BOOST_REQUIRE(irreversible.block());
+         BOOST_REQUIRE_EQUAL(!sysio::snapshot_attestation_within_grace(
+            snapshot_height, irreversible.block_num(), snapshot_attest_test_support::test_block_spacing),
+            grace_exhausted);
+         BOOST_REQUIRE_EQUAL(fc::time_point::now() - irreversible.block()->timestamp.to_time_point()
+                                < fc::seconds(snapshot_caught_up_tolerance_seconds), caught_up);
+         const auto source_blocks_path = source.get_config().blocks_dir.string();
+         // The endpoint tampering deliberately differs from the independent validator's state.
+         source.skip_validate = true;
+         source.close();
+
+         snapshot_endpoint_server endpoint(snapshot_height, forged_hash, snapshot_path);
+         fc::temp_directory node_dir;
+         sysio::chain::application exe({.enable_resource_monitor = false});
+         const auto node_path = node_dir.path().string();
+         const auto endpoint_url = endpoint.url();
+         std::array args{
+            chain_plugin_test_program_name,
+            snapshot_endpoint_option_name, endpoint_url.c_str(),
+            blocks_dir_option_name, source_blocks_path.c_str(),
+            config_dir_option_name, node_path.c_str(),
+            data_dir_option_name, node_path.c_str(),
+         };
+         BOOST_REQUIRE(exe.init<sysio::chain_plugin>(args.size(), const_cast<char**>(args.data()))
+                       == sysio::chain::exit_code::SUCCESS);
+         auto& plugin = appbase::app().get_plugin<sysio::chain_plugin>();
+         if (caught_up && grace_exhausted) {
+            BOOST_CHECK_EXCEPTION(plugin.plugin_startup(), sysio::chain::plugin_config_exception,
+               [](const auto& error) {
+                  return error.to_detail_string().find(rejected_attestation_error_fragment) != std::string::npos;
+               });
+            BOOST_CHECK(!plugin.has_pending_snapshot_attestation());
+            BOOST_CHECK(appbase::app().is_quiting());
+         } else {
+            plugin.plugin_startup();
+            BOOST_CHECK(plugin.has_pending_snapshot_attestation());
+            BOOST_CHECK(!appbase::app().is_quiting());
+            plugin.plugin_shutdown();
+         }
+      }
+   }
 }
 
 /** Reject an auto-fetched snapshot before startup completes when attestation remains disabled. */
