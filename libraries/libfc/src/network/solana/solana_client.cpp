@@ -962,7 +962,8 @@ uint64_t solana_client::get_balance(const pubkey_compat_t& address, commitment_t
 }
 
 std::vector<std::optional<account_info>>
-solana_client::get_multiple_accounts(const std::vector<solana_public_key>& addresses, commitment_t commitment) {
+solana_client::get_multiple_accounts(const std::vector<solana_public_key>& addresses, commitment_t commitment,
+                                     const std::optional<data_slice>& slice) {
    fc::variants addr_list;
    for (const auto& addr : addresses) {
       addr_list.push_back(addr.to_string(fc::yield_function_t{}));
@@ -971,6 +972,10 @@ solana_client::get_multiple_accounts(const std::vector<solana_public_key>& addre
    fc::mutable_variant_object config;
    config("commitment", to_string(commitment));
    config("encoding", "base64");
+
+   if (slice.has_value()) {
+      config("dataSlice", fc::mutable_variant_object()("offset", slice->offset)("length", slice->length));
+   }
 
    fc::variants params{addr_list, config};
    auto result = execute_idempotent("getMultipleAccounts", params);
@@ -1416,7 +1421,8 @@ std::string solana_client::request_airdrop(const pubkey_compat_t& address, uint6
 //=============================================================================
 
 fc::variant solana_client::get_program_accounts(const pubkey_compat_t& program_id,
-                                                const std::vector<fc::variant>& filters, commitment_t commitment) {
+                                                const std::vector<fc::variant>& filters, commitment_t commitment,
+                                                const std::optional<data_slice>& slice) {
    auto addr = to_pubkey(program_id);
    fc::mutable_variant_object config;
    config("commitment", to_string(commitment));
@@ -1424,6 +1430,9 @@ fc::variant solana_client::get_program_accounts(const pubkey_compat_t& program_i
 
    if (!filters.empty()) {
       config("filters", filters);
+   }
+   if (slice.has_value()) {
+      config("dataSlice", fc::mutable_variant_object()("offset", slice->offset)("length", slice->length));
    }
 
    fc::variants params{addr.to_string(fc::yield_function_t{}), config};

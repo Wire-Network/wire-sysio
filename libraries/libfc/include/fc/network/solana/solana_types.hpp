@@ -229,6 +229,16 @@ struct account_info {
 };
 
 /**
+ * @brief The `dataSlice` account-read option: return only `length` bytes of each account's data, starting at
+ * `offset`. Lamports, owner and the account address are unaffected. Useful when only a fixed header of a large
+ * account is needed.
+ */
+struct data_slice {
+   uint64_t offset = 0;
+   uint64_t length = 0;
+};
+
+/**
  * @brief RPC response context
  */
 struct rpc_context {
