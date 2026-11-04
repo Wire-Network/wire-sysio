@@ -66,6 +66,10 @@ constexpr std::string_view yield_remit_full_msg = "claim WIRE remit before colle
 /// Message of the `check` `sweepyield` raises for WIRE, which is not a shadow token.
 constexpr std::string_view wire_earns_no_yield_msg = "WIRE collateral earns no shadow yield";
 
+/// Message of the `check` `regoperator` raises for an account the batch schedule still seats.
+constexpr std::string_view still_seated_msg =
+   "operator still holds a batch schedule seat: it may register again once its seats have closed";
+
 /// Resolve a depot-native collateral `token_code` through the shared resolver, against this
 /// registry's custody contracts (`sysio.token` for WIRE, `sysio.liq` for a shadow LIQ symbol).
 ///
@@ -191,6 +195,17 @@ void preserve_yield_debt(name self, const opreg::operator_entry& op) {
       debt.owed_wire += owed;
       debts.upsert(ram_payer, key, debt);
    }
+}
+
+/// True while `account` holds a seat in any group of sysio.epoch's batch-operator schedule window.
+/// A seat stays until the window slides past it, whatever the operator's status in the meantime.
+bool holds_schedule_seat(name account) {
+   sysio::epoch::epochstate_t es(opreg::EPOCH_ACCOUNT);
+   if (!es.exists()) return false;
+   for (const auto& group : es.get().batch_op_groups) {
+      if (std::find(group.begin(), group.end(), account) != group.end()) return true;
+   }
+   return false;
 }
 
 } // anonymous namespace
@@ -329,6 +344,11 @@ void opreg::regoperator(name account,
       preserve_yield_debt(get_self(), existing);
       ops.erase(op_pk);
    }
+
+   // A seat left from an earlier registration would close against this one and record a miss for
+   // a duty it never received. `terminate` leaves the operator's later seats in place until the
+   // window slides past them.
+   check(!holds_schedule_seat(account), still_seated_msg);
 
    // Verify authex links exist for all active outpost chains.
    // Skip when: bootstrapped OR privileged caller (sysio.opreg registering on behalf)

@@ -448,8 +448,8 @@ void epoch::advance() {
 
       /// One member's delivery result for the expiring epoch, accumulated across
       /// the active outposts and retained until non-canonical offenders have
-      /// been slashed. `recorddel` remains an audit record even for a newly
-      /// slashed operator, while `termcheck` safely skips non-ACTIVE rows.
+      /// been slashed. `recorddel` records every member, a newly slashed one
+      /// included, while `termcheck` skips SLASHED and TERMINATED rows.
       struct delivery_observation {
          name member;
          uint32_t outposts_delivered = 0; ///< Active outposts this member delivered to.

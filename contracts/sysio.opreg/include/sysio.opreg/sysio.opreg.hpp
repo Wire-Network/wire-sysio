@@ -187,7 +187,8 @@ namespace sysio {
                      std::vector<chain_min_bond> req_batchop_collat,
                      std::vector<chain_min_bond> req_uw_collat);
 
-      /// Register a new operator.
+      /// Register a new operator. A terminated account registers again only once its balances are
+      /// drained and it holds no seat in the batch-operator schedule.
       [[sysio::action]]
       void regoperator(name account,
                        opp::types::OperatorType type,
