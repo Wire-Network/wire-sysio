@@ -6112,6 +6112,14 @@ struct producer_score_tester : public producer_eligibility_tester {
       return info["registration_seq"].as<uint64_t>();
    }
 
+   /// The block slot of the producer's last seniority credit, `producer_info::last_service_credit`;
+   /// 0 for never.
+   uint32_t last_service_credit_slot_of(account_name producer) {
+      auto info = get_producer_info(producer);
+      BOOST_REQUIRE_MESSAGE(!info.is_null(), "no producers row for " << producer.to_string());
+      return info["last_service_credit"].as<block_timestamp_type>().slot;
+   }
+
    /// Push `regproducer` for `producer` with its fixture key at location 0.
    action_result push_regproducer(account_name producer) {
       return push_system_action(producer, "regproducer"_n, mvo()
@@ -7217,6 +7225,86 @@ BOOST_FIXTURE_TEST_CASE( seniority_accrues_wall_clock_time_on_a_full_schedule, p
    require_seniority_tracks_wall_clock(names, accrual_window_blocks);
 } FC_LOG_AND_RETHROW()
 
+// A membership change that also reverses the retained order hands the producers late in the old
+// rotation a second round early in the new one. Each credit is bounded by the time since the
+// producer's last one, so no rotation is credited twice: every credit is exactly the smaller of a
+// rotation and that gap, some gaps are shorter than a rotation, and no retained producer gains more
+// than the wall-clock time since its last credit before the change.
+BOOST_FIXTURE_TEST_CASE( a_reorder_never_credits_a_rotation_twice, producer_score_tester ) try {
+   constexpr uint32_t scheduled_count = 21;   // max_producers
+   auto names = setup_ranked_producers(scheduled_count + 1);
+   const auto standby = names.back();
+   const auto leaving = names[scheduled_count - 1];
+   const std::vector<account_name> before(names.begin(), names.begin() + scheduled_count);
+   const std::vector<account_name> retained(names.begin(), names.begin() + scheduled_count - 1);
+   std::vector<account_name> after(retained.rbegin(), retained.rend());
+   after.insert(after.begin(), standby);
+
+   for (uint32_t i = 0; i < scheduled_count; ++i) {
+      BOOST_REQUIRE_EQUAL( success(), set_location(names[i], static_cast<uint16_t>(i + 1)) );
+   }
+   BOOST_REQUIRE_EQUAL( success(), set_location(standby, 0) );
+   trigger_reschedule();
+   wait_for_active_schedule_order(before);
+   produce_blocks(scheduled_count * slots_per_producer);   // every producer credited
+
+   // The reversed order applies when the set changes; until then the running order stands.
+   for (uint32_t i = 0; i < retained.size(); ++i) {
+      BOOST_REQUIRE_EQUAL( success(), set_location(retained[i], static_cast<uint16_t>(scheduled_count - i)) );
+   }
+
+   const uint64_t rotation_sec = scheduled_count * round_sec;
+   std::map<account_name, uint32_t> start_slot;
+   std::map<account_name, uint64_t> start_service;
+   std::map<account_name, uint32_t> credit_slot;
+   std::map<account_name, uint64_t> service;
+   for (const auto& p : retained) {
+      start_slot[p]    = credit_slot[p] = last_service_credit_slot_of(p);
+      start_service[p] = service[p]     = service_sec_of(p);
+      BOOST_REQUIRE_GT( start_slot[p], 0u );
+   }
+   uint32_t short_gaps = 0;
+   // At most one credit per producer lands between two checks, so each is checked on its own.
+   const auto check_credits = [&] {
+      for (const auto& p : retained) {
+         const fc::variant info     = get_producer_info(p);
+         const uint32_t slot        = info["last_service_credit"].as<block_timestamp_type>().slot;
+         const uint64_t now_service = info["service_sec"].as<uint64_t>();
+         if (slot == credit_slot[p]) {
+            BOOST_REQUIRE_EQUAL( service[p], now_service );
+            continue;
+         }
+         const uint64_t gap = elapsed_sec(credit_slot[p], slot);
+         BOOST_REQUIRE_MESSAGE( now_service - service[p] == std::min(rotation_sec, gap),
+            p.to_string() << " was credited " << now_service - service[p] << " s after a " << gap << " s gap" );
+         if (gap < rotation_sec) ++short_gaps;
+         credit_slot[p] = slot;
+         service[p]     = now_service;
+      }
+   };
+
+   BOOST_REQUIRE_EQUAL( success(), terminate_operator(leaving) );
+   check_credits();
+   constexpr uint32_t max_blocks = 400;
+   for (uint32_t produced = 0; produced < max_blocks && active_schedule_names() != after; ++produced) {
+      produce_block();
+      check_credits();
+   }
+   const auto schedule = active_schedule_names();
+   BOOST_REQUIRE_EQUAL_COLLECTIONS(schedule.begin(), schedule.end(), after.begin(), after.end());
+   for (uint32_t i = 0; i < 2 * scheduled_count * slots_per_producer; ++i) {
+      produce_block();
+      check_credits();
+   }
+
+   BOOST_REQUIRE_MESSAGE( short_gaps > 0, "the reorder never gave a retained producer two rounds in one rotation" );
+   const uint32_t end_slot = control->head().header().timestamp.slot;
+   for (const auto& p : retained) {
+      BOOST_REQUIRE_LE( service_sec_of(p) - start_service[p], elapsed_sec(start_slot[p], end_slot) );
+      BOOST_REQUIRE_EQUAL( 0u, missed_rounds_of(p) );
+   }
+} FC_LOG_AND_RETHROW()
+
 // An unserved round subtracts the penalty exactly and floors at zero. The first miss runs with the
 // penalty off, which pins the seniority the penalized misses start from.
 BOOST_FIXTURE_TEST_CASE( an_unserved_round_costs_the_miss_penalty_floored_at_zero, producer_score_tester ) try {
@@ -7324,6 +7412,7 @@ BOOST_FIXTURE_TEST_CASE( termination_and_slash_reset_seniority_and_registration_
    for (const auto& p : {terminated, slashed}) {
       BOOST_REQUIRE_EQUAL( 0u, service_sec_of(p) );
       BOOST_REQUIRE_EQUAL( 0u, registration_seq_of(p) );
+      BOOST_REQUIRE_EQUAL( 0u, last_service_credit_slot_of(p) );
       BOOST_REQUIRE_EQUAL( tier_demoted, tier_of(rank_score_of(p)) );
    }
    for (uint32_t i = 0; i < 3; ++i) {

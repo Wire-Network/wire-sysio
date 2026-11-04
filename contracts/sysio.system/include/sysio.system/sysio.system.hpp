@@ -208,19 +208,26 @@ namespace sysiosystem {
       /// the current size, so a size change, rare once the schedule reaches 21, can count a round
       /// more or less.
       uint32_t                                                 last_paid_round = 0;
-      /// Seniority in seconds. A served round adds the rotation's duration (schedule size times
-      /// one round), so a day in the schedule credits a day at any schedule size; an unserved round
-      /// subtracts prodscorecfg's `miss_penalty_sec`, floored at 0. Kept through park, standby and
-      /// demotion, and accrues only in scheduled rounds while `registration_seq` is assigned. Reset
-      /// to 0 when the operator is terminated or slashed. Scored in whole hours.
+      /// Seniority in seconds. A served round adds the time since `last_service_credit`, at most
+      /// one rotation (schedule size times one round), so a day in the schedule credits a day at
+      /// any schedule size; an unserved round subtracts prodscorecfg's `miss_penalty_sec`, floored
+      /// at 0. Kept through park, standby and demotion, and accrues only in scheduled rounds while
+      /// `registration_seq` is assigned. Reset to 0 when the operator is terminated or slashed.
+      /// Scored in whole hours.
       uint64_t                                                 service_sec = 0;
       /// Registration order, from `sysio_global_state::last_registration_seq`: assigned when the
       /// row is created, or on the next `regproducer` after a termination or slash cleared it.
       /// 0 is unassigned. Equal composites rank by ascending order, so the earlier registration
       /// ranks first.
+      uint64_t                                                 registration_seq = 0;
+      /// Block time of the served round that last credited `service_sec`; the default (slot 0)
+      /// for never. Seniority never grows by more than the wall-clock time between credits, so a
+      /// reorder or a size change that hands a producer two rounds in one rotation cannot credit
+      /// that rotation twice. A miss leaves it, so the round after a miss credits at most one
+      /// rotation. Reset with `service_sec`.
       ///
       /// DECLARED LAST, matching the tail of SYSLIB_SERIALIZE below.
-      uint64_t                                                 registration_seq = 0;
+      block_timestamp                                          last_service_credit{};
 
       uint64_t by_rank_score()const { return rank_score; }
       bool     active()const      { return is_active;                               }
@@ -233,7 +240,8 @@ namespace sysiosystem {
 
       SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank_score)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority)
                          (consecutive_missed_rounds)(is_demoted)(snapshot_attestations)
-                         (snapshot_period)(last_paid_round)(service_sec)(registration_seq) )
+                         (snapshot_period)(last_paid_round)(service_sec)(registration_seq)
+                         (last_service_credit) )
    };
 
    using producers_table = sysio::kv::table< "producers"_n, producer_key_t, producer_info,
@@ -861,23 +869,28 @@ namespace sysiosystem {
          /// @param current_producer the producer of the block being processed.
          /// @param block_height     that block's height, used to measure the OUTGOING producer's
          ///                         round length. Derived from the block header already in hand.
-         void record_round_participation( const name& current_producer, uint32_t block_height );
+         /// @param block_time       that block's timestamp, which bounds a seniority credit.
+         void record_round_participation( const name& current_producer, uint32_t block_height,
+                                          const block_timestamp& block_time );
 
          /**
           * Record one scheduled round for `producer`, scored by how much of it was delivered.
           *
           * A round counts as SERVED at `min_blocks_per_round` blocks or more: it clears the miss
-          * streak and adds `rotation_sec` of seniority. Anything less -- including nothing at all --
-          * increments the streak and subtracts `miss_penalty_sec`, floored at 0, and the streak
-          * reaching `max_consecutive_missed_rounds` demotes. ONE threshold, applied ONCE per
+          * streak and adds the seconds since `producer_info::last_service_credit` to seniority, at
+          * most `rotation_sec`, which a first credit takes whole. Anything less -- including nothing
+          * at all -- increments the streak and subtracts `miss_penalty_sec`, floored at 0, and the
+          * streak reaching `max_consecutive_missed_rounds` demotes. ONE threshold, applied ONCE per
           * round, at the transition where the block count is finally known.
           *
           * @param producer         the producer whose round this was.
           * @param blocks_delivered blocks it produced in that round.
           * @param rotation_sec     seconds one rotation of the active schedule lasts.
+          * @param block_time       the current block's timestamp.
           * @param weights          the live score configuration.
           */
          void record_round_outcome( const name& producer, uint32_t blocks_delivered, uint64_t rotation_sec,
+                                    const block_timestamp& block_time,
                                     const producer_rank::producer_score_config& weights );
 
          /// Take the next registration order from `sysio_global_state::last_registration_seq`.
@@ -885,8 +898,8 @@ namespace sysiosystem {
          /// @return the assigned order, never 0.
          uint64_t next_registration_seq();
 
-         /// Clear `producer`'s seniority and registration order, the reset a termination or slash
-         /// applies. A name with no producers row is ignored.
+         /// Clear `producer`'s seniority, its credit time and its registration order, the reset a
+         /// termination or slash applies. A name with no producers row is ignored.
          ///
          /// @param producer the producer whose operator was terminated or slashed.
          void reset_seniority( const name& producer );

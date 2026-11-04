@@ -23,6 +23,12 @@ namespace sysiosystem {
       static_assert( uint64_t{blocks_per_round} * sysio::block_timestamp::block_interval_ms
                         % milliseconds_per_second == 0,
                      "a round must last a whole number of seconds" );
+
+      /// Whole seconds from `from` to `to`; 0 unless `to` is later.
+      uint64_t seconds_between( const block_timestamp& from, const block_timestamp& to ) {
+         if( to.slot <= from.slot ) return 0;
+         return uint64_t{to.slot - from.slot} * sysio::block_timestamp::block_interval_ms / milliseconds_per_second;
+      }
    }
 
    void system_contract::onblock( ignore<block_header> ) {
@@ -71,7 +77,7 @@ namespace sysiosystem {
       // all, so absence leaves no trace unless the schedule is walked explicitly.
       // The height is already implicit in `previous_block_id`, which is deserialized above, so this
       // costs four shifts rather than a table read.
-      record_round_participation( producer, block_info::block_height_from_id(previous_block_id) + 1 );
+      record_round_participation( producer, block_info::block_height_from_id(previous_block_id) + 1, timestamp );
 
       /// only update block producers once every minute, block_timestamp is in half seconds
       if( timestamp.slot - _global.get().last_producer_schedule_update.slot > 120 ) {
@@ -86,7 +92,8 @@ namespace sysiosystem {
    }
 
    void system_contract::record_round_participation( const name& current_producer,
-                                                     uint32_t block_height ) {
+                                                     uint32_t block_height,
+                                                     const block_timestamp& block_time ) {
       const auto& state = _global.get();
 
       // Mid-round: the same producer made the previous block, so no slot was skipped. Nothing is
@@ -137,7 +144,7 @@ namespace sysiosystem {
                if( slot == active_schedule.end() ) slot = active_schedule.begin();
                if( slot == current ) break;
                // Held a slot and delivered nothing.
-               record_round_outcome( *slot, /*blocks_delivered*/ 0, rotation_sec, weights );
+               record_round_outcome( *slot, /*blocks_delivered*/ 0, rotation_sec, block_time, weights );
                ++slot;
             }
          }
@@ -152,7 +159,7 @@ namespace sysiosystem {
          producer_rank::producer_score_config_t weights_tbl( get_self() );
          const auto weights = weights_tbl.get_or_default( producer_rank::producer_score_config{} );
          record_round_outcome( state.last_producer, block_height - state.round_start_block, rotation_sec,
-                               weights );
+                               block_time, weights );
       }
 
       _global.modify( get_self(), [&]( auto& g ) {
@@ -162,6 +169,7 @@ namespace sysiosystem {
    }
 
    void system_contract::record_round_outcome( const name& producer, uint32_t blocks_delivered, uint64_t rotation_sec,
+                                               const block_timestamp& block_time,
                                                const producer_rank::producer_score_config& weights ) {
       auto key = producer_key_t{producer.value};
       if( !_producers.contains(key) ) return;
@@ -187,9 +195,15 @@ namespace sysiosystem {
             // Seniority is service as a registered producer: a row whose registration a
             // termination or slash cleared accrues nothing until `regproducer` takes a new order.
             if( p.registration_seq == 0 ) return;
-            p.service_sec = p.service_sec > std::numeric_limits<uint64_t>::max() - rotation_sec
+            // At most the time since the last credit: a reorder or a size change that hands this
+            // producer a second round within one rotation cannot credit that rotation twice.
+            const uint64_t credit_sec = p.last_service_credit == block_timestamp{}
+               ? rotation_sec
+               : std::min( rotation_sec, seconds_between( p.last_service_credit, block_time ) );
+            p.service_sec = p.service_sec > std::numeric_limits<uint64_t>::max() - credit_sec
                                ? std::numeric_limits<uint64_t>::max()
-                               : p.service_sec + rotation_sec;
+                               : p.service_sec + credit_sec;
+            p.last_service_credit = block_time;
             return;
          }
 

@@ -119,10 +119,12 @@ namespace sysiosystem {
    void system_contract::reset_seniority( const name& producer ) {
       const auto key = producer_key_t{producer.value};
       const std::optional<producer_info> info = _producers.try_get(key);
-      if( !info || ( info->service_sec == 0 && info->registration_seq == 0 ) ) return;
+      if( !info || ( info->service_sec == 0 && info->registration_seq == 0
+                     && info->last_service_credit == block_timestamp{} ) ) return;
       _producers.modify( same_payer, key, []( producer_info& p ) {
-         p.service_sec      = 0;
-         p.registration_seq = 0;
+         p.service_sec         = 0;
+         p.registration_seq    = 0;
+         p.last_service_credit = block_timestamp{};
       });
    }
 

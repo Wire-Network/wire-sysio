@@ -1083,6 +1083,10 @@
                 {
                     "name": "registration_seq",
                     "type": "uint64"
+                },
+                {
+                    "name": "last_service_credit",
+                    "type": "block_timestamp_type"
                 }
             ]
         },
