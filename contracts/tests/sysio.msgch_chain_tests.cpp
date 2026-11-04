@@ -119,6 +119,14 @@ constexpr const char* CONSECUTIVE_MISS_TERMINATION_REASON = "rolling-window: >5 
 /// Payload of the envelopes BATCHOP delivers while the rotation fixture walks its duty epochs.
 constexpr std::string_view ROTATION_DELIVERY_PAYLOAD = "rotation-duty";
 
+/// Reason passed to the privileged `sysio.opreg::terminate` that removes a still-seated operator.
+constexpr std::string_view SEATED_TERMINATION_REASON = "removed while seated";
+
+/// `regoperator`'s refusal for an account the batch schedule still seats.
+constexpr const char* STILL_SEATED_REGISTRATION_ERROR =
+   "assertion failure with message: operator still holds a batch schedule seat: it may register again "
+   "once its seats have closed";
+
 /// sysio.opreg configuration ABI field identifiers used by the WNS-16 fixture.
 namespace opreg_config_fields {
 constexpr const char* MAX_AVAILABLE_PRODUCERS          = "max_available_producers";
@@ -1026,6 +1034,19 @@ public:
       if (cur >= groups.size()) return name{};
       auto members = groups[cur].get_array();
       return members.empty() ? name{} : name(members[0].as_string());
+   }
+
+   /// True while `account` holds a seat in any group of the schedule window.
+   bool holds_schedule_seat(name account) {
+      // Held in a local: a range-for over a member of the temporary would read freed memory.
+      const auto state = read_epoch_state();
+      if (state.is_null()) return false;
+      for (const auto& group : state[epoch_fields::BATCH_OP_GROUPS].get_array()) {
+         for (const auto& member : group.get_array()) {
+            if (member.as_string() == account.to_string()) return true;
+         }
+      }
+      return false;
    }
 
    /// Advance exactly one epoch, landing the advance at the fixed-cadence next_epoch_start. Because
@@ -2645,6 +2666,57 @@ BOOST_FIXTURE_TEST_CASE(advance_roster_excludes_same_epoch_termination,
       }
       BOOST_REQUIRE(found_standby);
    }
+} FC_LOG_AND_RETHROW() }
+
+/// `terminate` leaves the operator's later seats in place. A registration made before they close would
+/// take the miss the next one records, and with that one row in its sample the miss rate would
+/// terminate it again, so `regoperator` refuses the account until its last seat has closed.
+BOOST_FIXTURE_TEST_CASE(regoperator_refuses_account_still_seated, sysio_msgch_chain_tester) { try {
+   const auto outposts = bootstrap_rotation(ROTATION_WINDOW_MS);
+
+   // BATCHOP delivers on its epoch-1 duty, so it stays ACTIVE and the slide seats it again in the tail.
+   BOOST_REQUIRE_EQUAL(BATCHOP, duty_member());
+   for (const uint64_t outpost : outposts) {
+      BOOST_REQUIRE_EQUAL(success(),
+         deliver_as(BATCHOP, outpost, encode_chained_delivery(ROTATION_DELIVERY_PAYLOAD, {})));
+   }
+   produce_blocks();
+   advance_to_next_epoch();
+   BOOST_REQUIRE(duty_member() != BATCHOP);
+   BOOST_REQUIRE(holds_schedule_seat(BATCHOP));
+
+   BOOST_REQUIRE_EQUAL(success(), push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "terminate"_n,
+      mvo()("account", BATCHOP.to_string())("reason", std::string(SEATED_TERMINATION_REASON))));
+   produce_blocks(); // land it before the advance's epoch-length jump expires it
+   BOOST_REQUIRE(opp::types::OperatorStatus::OPERATOR_STATUS_TERMINATED ==
+                 get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
+
+   const auto register_again = [&] {
+      return push(OPREG_ACCOUNT, opreg_abi, OPREG_ACCOUNT, "regoperator"_n, mvo()
+         ("account", BATCHOP.to_string())("type", opp::types::OperatorType::OPERATOR_TYPE_BATCH)
+         ("is_bootstrapped", false));
+   };
+
+   // Refused on every epoch the leftover seat is still in the window, its own duty epoch included.
+   uint32_t leftover_duty_epoch = 0;
+   for (uint32_t step = 0; step < ROTATION_GROUPS && holds_schedule_seat(BATCHOP); ++step) {
+      BOOST_REQUIRE_EQUAL(error(STILL_SEATED_REGISTRATION_ERROR), register_again());
+      if (duty_member() == BATCHOP) leftover_duty_epoch = current_epoch();
+      advance_to_next_epoch();
+   }
+   BOOST_REQUIRE(!holds_schedule_seat(BATCHOP));
+   BOOST_REQUIRE_GT(leftover_duty_epoch, 0u);
+
+   // The closed seat recorded its miss against the terminated registration, which termcheck left alone.
+   const auto leftover_rows = dellog_rows(BATCHOP, leftover_duty_epoch);
+   BOOST_REQUIRE_EQUAL(1u, leftover_rows.size());
+   BOOST_REQUIRE(!leftover_rows.front()[opreg_fields::DELIVERED].as<bool>());
+   BOOST_REQUIRE_EQUAL(std::string(SEATED_TERMINATION_REASON),
+                       get_operator(BATCHOP)[opreg_fields::STATUS_REASON].as_string());
+
+   BOOST_REQUIRE_EQUAL(success(), register_again());
+   BOOST_REQUIRE(opp::types::OperatorStatus::OPERATOR_STATUS_UNKNOWN ==
+                 get_operator(BATCHOP)[opreg_fields::STATUS].as<opp::types::OperatorStatus>());
 } FC_LOG_AND_RETHROW() }
 
 /// WNS-56: the OPERATORS roster lists exactly the operators the window seats, so registrations cannot
