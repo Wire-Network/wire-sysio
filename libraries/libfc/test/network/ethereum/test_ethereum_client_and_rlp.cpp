@@ -75,7 +75,7 @@ std::string test_tx_01_result = "02f84e827a690d8477359400847737208083018c80945fb
 constexpr std::string_view test_contract_abi_json_file_01 = "ethereum-abi-complex-types-01.json";
 
 namespace abi_decode_fixture {
-/// Independent ABI bytes, field names and expected values shared by the decoder regressions.
+/// Independent ABI bytes, field names and expected values shared by the ABI regressions.
 constexpr size_t word_hex_size = 64;
 constexpr size_t pair_size = 2;
 constexpr size_t hex_chars_per_byte = 2;
@@ -83,13 +83,31 @@ constexpr std::string_view hex_prefix = "0x";
 constexpr std::string_view selector = "12345678";
 constexpr char array_field[] = "values";
 constexpr char string_field[] = "label";
+constexpr char first_tuple_field[] = "first";
+constexpr char second_tuple_field[] = "second";
 constexpr std::string_view first_uint = "1";
 constexpr std::string_view second_uint = "2";
+constexpr std::string_view third_uint = "3";
+constexpr std::string_view fourth_uint = "4";
+constexpr uint64_t first_uint_value = 1;
+constexpr uint64_t second_uint_value = 2;
+constexpr uint64_t third_uint_value = 3;
+constexpr uint64_t fourth_uint_value = 4;
 constexpr std::string_view first_string = "a";
 constexpr std::string_view second_string = "b";
 constexpr std::string_view uint_pair =
    "0000000000000000000000000000000000000000000000000000000000000001"
    "0000000000000000000000000000000000000000000000000000000000000002";
+constexpr std::string_view second_uint_pair =
+   "0000000000000000000000000000000000000000000000000000000000000003"
+   "0000000000000000000000000000000000000000000000000000000000000004";
+
+/** Build a static tuple descriptor with distinct uint256 fields for the object decoder. */
+eth::abi::component_type uint_pair_tuple() {
+   return eth::abi::component_type{std::string{}, eth::abi::data_type::tuple,
+                                   {eth::abi::component_type{first_tuple_field, eth::abi::data_type::uint256},
+                                    eth::abi::component_type{second_tuple_field, eth::abi::data_type::uint256}}};
+}
 
 /** Build matching input/output array descriptors without using the ABI encoder. */
 eth::abi::contract array_contract(eth::abi::data_type element_type, size_t size) {
@@ -109,6 +127,14 @@ void check_pair(const fc::variant& decoded, std::string_view first, std::string_
    BOOST_REQUIRE_EQUAL(values.size(), pair_size);
    BOOST_CHECK_EQUAL(values[0].as_string(), first);
    BOOST_CHECK_EQUAL(values[1].as_string(), second);
+}
+
+/** Check the two named fields returned for a static tuple. */
+void check_tuple_pair(const fc::variant& decoded, std::string_view first, std::string_view second) {
+   BOOST_REQUIRE(decoded.is_object());
+   BOOST_REQUIRE_EQUAL(decoded.get_object().size(), pair_size);
+   BOOST_CHECK_EQUAL(decoded[first_tuple_field].as_string(), first);
+   BOOST_CHECK_EQUAL(decoded[second_tuple_field].as_string(), second);
 }
 } // namespace abi_decode_fixture
 } // namespace
@@ -426,6 +452,10 @@ BOOST_AUTO_TEST_CASE(abi_decode_sole_static_array) try {
    using namespace abi_decode_fixture;
    const auto contract = array_contract(eth::abi::data_type::uint256, pair_size);
    BOOST_CHECK(!contract.outputs[0].is_dynamic());
+   const auto encoded = eth::contract_encode_data(
+      contract, fc::variants{fc::variant(fc::variants{first_uint_value, second_uint_value})});
+   BOOST_CHECK_EQUAL(encoded.substr(selector.size()), uint_pair);
+   check_pair(eth::contract_decode_data(contract, encoded, true), first_uint, second_uint);
    for (const bool inputs : {false, true}) {
       const auto prefix = std::string(hex_prefix) + (inputs ? std::string(selector) : std::string{});
       check_pair(eth::contract_decode_data(contract, prefix + std::string(uint_pair), inputs), first_uint, second_uint);
@@ -438,34 +468,70 @@ BOOST_AUTO_TEST_CASE(abi_decode_sole_static_array) try {
 }
 FC_LOG_AND_RETHROW();
 
-/** A static array occupies two head words before a dynamic parameter's offset. */
+/** A fixed array of static tuples is inline, with each tuple occupying two consecutive words. */
+BOOST_AUTO_TEST_CASE(abi_decode_sole_static_tuple_array) try {
+   using namespace abi_decode_fixture;
+   auto contract = array_contract(eth::abi::data_type::tuple, pair_size);
+   contract.outputs[0].components = uint_pair_tuple().components;
+   contract.inputs = contract.outputs;
+   BOOST_CHECK(!contract.outputs[0].is_dynamic());
+   const auto payload = std::string(uint_pair) + std::string(second_uint_pair);
+   const auto encoded = eth::contract_encode_data(
+      contract, fc::variants{fc::variant(fc::variants{fc::variant(fc::variants{first_uint_value, second_uint_value}),
+                                                    fc::variant(fc::variants{third_uint_value, fourth_uint_value})})});
+   BOOST_CHECK_EQUAL(encoded.substr(selector.size()), payload);
+   for (const bool inputs : {false, true}) {
+      const auto prefix = std::string(hex_prefix) + (inputs ? std::string(selector) : std::string{});
+      const auto decoded = eth::contract_decode_data(contract, prefix + payload, inputs);
+      BOOST_REQUIRE(decoded.is_array());
+      BOOST_REQUIRE_EQUAL(decoded.get_array().size(), pair_size);
+      check_tuple_pair(decoded.get_array()[0], first_uint, second_uint);
+      check_tuple_pair(decoded.get_array()[1], third_uint, fourth_uint);
+   }
+}
+FC_LOG_AND_RETHROW();
+
+/** Static arrays and tuples occupy two head words before a dynamic parameter's offset. */
 BOOST_AUTO_TEST_CASE(abi_decode_static_array_in_multiple_parameters) try {
    using namespace abi_decode_fixture;
    constexpr std::string_view string_tail =
       "0000000000000000000000000000000000000000000000000000000000000060" // string offset
       "0000000000000000000000000000000000000000000000000000000000000001" // string length
       "6100000000000000000000000000000000000000000000000000000000000000"; // "a"
-   for (const bool named : {false, true}) {
-      auto contract = array_contract(eth::abi::data_type::uint256, pair_size);
-      contract.outputs[0].name = named ? array_field : std::string_view{};
-      contract.outputs.emplace_back(named ? std::string(string_field) : std::string{}, eth::abi::data_type::string);
-      contract.inputs = contract.outputs;
-      for (const bool inputs : {false, true}) {
-         const auto prefix = std::string(hex_prefix) + (inputs ? std::string(selector) : std::string{});
-         const auto decoded = eth::contract_decode_data(
-            contract, prefix + std::string(uint_pair) + std::string(string_tail), inputs);
-         if (named) {
-            BOOST_REQUIRE(decoded.is_object());
-            check_pair(decoded[array_field], first_uint, second_uint);
-            BOOST_CHECK_EQUAL(decoded[string_field].as_string(), first_string);
-         } else {
-            BOOST_REQUIRE(decoded.is_array());
-            BOOST_REQUIRE_EQUAL(decoded.get_array().size(), pair_size);
-            check_pair(decoded.get_array()[0], first_uint, second_uint);
-            BOOST_CHECK_EQUAL(decoded.get_array()[1].as_string(), first_string);
+   for (const bool tuple : {false, true})
+      for (const bool named : {false, true}) {
+         auto contract = array_contract(eth::abi::data_type::uint256, pair_size);
+         if (tuple)
+            contract.outputs[0] = uint_pair_tuple();
+         contract.outputs[0].name = named ? array_field : std::string_view{};
+         contract.outputs.emplace_back(named ? std::string(string_field) : std::string{}, eth::abi::data_type::string);
+         contract.inputs = contract.outputs;
+         const auto encoded = eth::contract_encode_data(
+            contract, fc::variants{fc::variant(fc::variants{first_uint_value, second_uint_value}),
+                                   std::string(first_string)});
+         BOOST_CHECK_EQUAL(encoded.substr(selector.size()), std::string(uint_pair) + std::string(string_tail));
+         for (const bool inputs : {false, true}) {
+            const auto prefix = std::string(hex_prefix) + (inputs ? std::string(selector) : std::string{});
+            const auto decoded = eth::contract_decode_data(
+               contract, prefix + std::string(uint_pair) + std::string(string_tail), inputs);
+            if (named) {
+               BOOST_REQUIRE(decoded.is_object());
+               if (tuple)
+                  check_tuple_pair(decoded[array_field], first_uint, second_uint);
+               else
+                  check_pair(decoded[array_field], first_uint, second_uint);
+               BOOST_CHECK_EQUAL(decoded[string_field].as_string(), first_string);
+            } else {
+               BOOST_REQUIRE(decoded.is_array());
+               BOOST_REQUIRE_EQUAL(decoded.get_array().size(), pair_size);
+               if (tuple)
+                  check_tuple_pair(decoded.get_array()[0], first_uint, second_uint);
+               else
+                  check_pair(decoded.get_array()[0], first_uint, second_uint);
+               BOOST_CHECK_EQUAL(decoded.get_array()[1].as_string(), first_string);
+            }
          }
       }
-   }
 }
 FC_LOG_AND_RETHROW();
 
@@ -482,6 +548,11 @@ BOOST_AUTO_TEST_CASE(abi_decode_fixed_array_of_strings) try {
       "6200000000000000000000000000000000000000000000000000000000000000"; // "b"
    const auto contract = array_contract(eth::abi::data_type::string, pair_size);
    BOOST_CHECK(contract.outputs[0].is_dynamic());
+   BOOST_CHECK_EQUAL(eth::contract_encode_data(
+                        contract, fc::variants{fc::variant(fc::variants{std::string(first_string),
+                                                                       std::string(second_string)})})
+                        .substr(selector.size()),
+                     encoded);
    for (const bool inputs : {false, true}) {
       const auto prefix = std::string(hex_prefix) + (inputs ? std::string(selector) : std::string{});
       check_pair(eth::contract_decode_data(contract, prefix + std::string(encoded), inputs), first_string,
@@ -506,6 +577,10 @@ BOOST_AUTO_TEST_CASE(abi_decode_dynamic_uint_array) try {
       "0000000000000000000000000000000000000000000000000000000000000002";
    const auto contract = array_contract(eth::abi::data_type::uint256, dynamic_size);
    BOOST_CHECK(contract.outputs[0].is_dynamic());
+   BOOST_CHECK_EQUAL(eth::contract_encode_data(
+                        contract, fc::variants{fc::variant(fc::variants{first_uint_value, second_uint_value})})
+                        .substr(selector.size()),
+                     std::string(head) + std::string(length) + std::string(uint_pair));
    for (const bool inputs : {false, true}) {
       const auto prefix = std::string(hex_prefix) + (inputs ? std::string(selector) : std::string{});
       const auto encoded = prefix + std::string(head) + std::string(length) + std::string(uint_pair);
